@@ -4,6 +4,7 @@ import { Output } from "@pulumi/pulumi";
 import * as aws from "@pulumi/aws";
 import * as certHelper from './certs';
 import * as pulumi from "@pulumi/pulumi"
+import * as random from "@pulumi/random";
 
 type Service = {
     lb: awsx.elasticloadbalancingv2.ApplicationListener,
@@ -14,6 +15,8 @@ type Service = {
 const parentHostname = "footprint.alexgrinman.com";
 const subdomainInternal = "app-internal";
 const subdomainExternal = "app";
+
+const cloudfrontSecret = new random.RandomString("cf-alb-pass", { length: 44 });
 
 function createService(region: Region, certificateArn: pulumi.Output<string>): Service {
     const provider = new aws.Provider(`provider-${region}`, { region });
@@ -103,6 +106,39 @@ async function createRouteRecord(subdomain: string, parent: string, services: Se
 }
 
 async function createCdn(certArn: pulumi.Output<string>, cdnDomain: string, originDomain: string, parent: string) {
+    const requestPolicy = new aws.cloudfront.OriginRequestPolicy("app-cdn-origin-req-policy", {
+        cookiesConfig: {
+            cookieBehavior: "all"
+        },
+        queryStringsConfig: {
+            queryStringBehavior: "all"
+        },
+        headersConfig: {
+            headers: {
+                items: [
+                    "CloudFront-Viewer-Country-Name",
+                    "CloudFront-Viewer-Country-Region",
+                    "CloudFront-Viewer-Country-Region-Name",
+                    "CloudFront-Viewer-City",
+                    "CloudFront-Viewer-Postal-Code",
+                    "CloudFront-Viewer-Time-Zone",
+                    "CloudFront-Viewer-Latitude",
+                    "CloudFront-Viewer-Longitude",
+                    "CloudFront-Viewer-Metro-Code"
+                ],
+            },
+            headerBehavior: "allViewerAndWhitelistCloudFront"
+        }
+    });
+
+    const cachePolicy = new aws.cloudfront.CachePolicy("app-cdn-origin-cache-policy", {
+        parametersInCacheKeyAndForwardedToOrigin: {
+            cookiesConfig: { cookieBehavior: "all" },
+            headersConfig: { headerBehavior: "none" },
+            queryStringsConfig: { queryStringBehavior: "all" }
+        }
+    });
+
     const cdn = new aws.cloudfront.Distribution("app-cdn", {
         enabled: true,
         aliases: [cdnDomain],
@@ -114,7 +150,13 @@ async function createCdn(certArn: pulumi.Output<string>, cdnDomain: string, orig
                 httpPort: 80,
                 originProtocolPolicy: "https-only",
                 originSslProtocols: ["TLSv1.2"]
-            }
+            },
+            customHeaders: [
+                {
+                    name: "X-Token-From-Cloudfront",
+                    value: pulumi.secret(cloudfrontSecret.result)
+                },
+            ]
         }],
         viewerCertificate: {
             acmCertificateArn: certArn,
@@ -124,14 +166,10 @@ async function createCdn(certArn: pulumi.Output<string>, cdnDomain: string, orig
             targetOriginId: originDomain,
             viewerProtocolPolicy: "redirect-to-https",
             allowedMethods: ["GET", "HEAD", "OPTIONS", "POST", "PUT", "DELETE", "PATCH"],
-            cachedMethods: ["HEAD", "GET", "OPTIONS"],
-
-            forwardedValues: {
-                cookies: { forward: "none" },
-                queryString: false,
-            },
+            cachedMethods: ["HEAD", "OPTIONS"],
+            originRequestPolicyId: requestPolicy.id,
+            cachePolicyId: cachePolicy.id,
         },
-
 
         restrictions: {
             geoRestriction: {
