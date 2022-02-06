@@ -1,15 +1,21 @@
-import { ec2, Region, route53,  } from "@pulumi/aws";
+import { ec2, Region, route53, } from "@pulumi/aws";
 import * as awsx from "@pulumi/awsx";
 import { Output } from "@pulumi/pulumi";
 import * as aws from "@pulumi/aws";
 import * as pulumi from "@pulumi/pulumi"
 
-export async function createWildcardCertificate(hostname: string, region: Region): Promise<pulumi.Output<string>> {
-    const provider = new aws.Provider(`provider-cert=${region}`, { region });
-    const hostedZone = await aws.route53.getZone({ name: hostname });
+export type CertConfig = {
+    hostedZoneId: string,
+    domain: string,
+    region: Region
+}
 
-    const cert = new aws.acm.Certificate(`cert-${region}`, {
-        domainName: `*.${hostname}`,        
+export async function CreateCertificate(config: CertConfig): Promise<pulumi.Output<string>> {
+    const nameSuffix = `${config.domain}-cert-${config.region}`;
+    const provider = new aws.Provider(`provider-${nameSuffix}`, { region: config.region });
+
+    const cert = new aws.acm.Certificate(`cert-${nameSuffix}`, {
+        domainName: config.domain,
         validationMethod: "DNS",
     }, { provider });
 
@@ -21,18 +27,18 @@ export async function createWildcardCertificate(hostname: string, region: Region
                 type: vop.resourceRecordType,
             }
         }).map((record, index) => {
-            return new aws.route53.Record(`cert-validation-record-${region.toString()}-${index}`, {
+            return new aws.route53.Record(`cert-validation-record-${nameSuffix}-${index}`, {
                 allowOverwrite: true,
                 name: record.name,
                 records: [record.record],
                 ttl: 60,
                 type: record.type,
-                zoneId: hostedZone.zoneId,
+                zoneId: config.hostedZoneId,
             }, { provider })
         })
     });
 
-    const certValidation = new aws.acm.CertificateValidation(`cert-validation-result-${region.toString()}`, {
+    const certValidation = new aws.acm.CertificateValidation(`cert-validation-result-${nameSuffix}`, {
         certificateArn: cert.arn,
         validationRecordFqdns: records.apply(async recs => { return recs.map(record => record.fqdn) }),
     }, { provider });

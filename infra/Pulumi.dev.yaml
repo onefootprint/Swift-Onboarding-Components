@@ -1,3 +1,10 @@
 config:
   aws:profile: footprint_sandbox
   aws:region: us-east-1
+  infra:constants:
+    cdnProtectionHeaderName: "X-Token-From-CloudFront"
+    rootDomain: "footprint.alexgrinman.com"
+    internalAppSubdomain: "app-internal"
+    cdnAppSubdomain: "app"
+
+
