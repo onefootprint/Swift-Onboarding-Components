@@ -31,7 +31,7 @@ function createService(region: Region, certificateArn: pulumi.Output<string>): S
     const applb = new awsx.elasticloadbalancingv2.ApplicationLoadBalancer(
         `app-lb-${region.toString()}`, {
         vpc,
-        securityGroups: [appLbSg]
+        securityGroups: [appLbSg],
     }, { provider }
     );
 
@@ -68,6 +68,24 @@ function createService(region: Region, certificateArn: pulumi.Output<string>): S
         certificateArn,
         protocol: "HTTPS",
         sslPolicy: "ELBSecurityPolicy-2016-08",
+        defaultAction: {
+            type: "fixed-response",
+            fixedResponse: {
+                statusCode: "409",
+                contentType: "text/html",
+                messageBody: "<html><body>endpoint not authorized</body></html>"
+            }
+        }
+    }, { provider });
+
+    const rule = web.addListenerRule(`web-cloudfront-token-rule-${region}`, {
+        actions: [{ type: "forward", targetGroupArn: target.targetGroup.arn }],
+        conditions: [{
+            httpHeader: {
+                httpHeaderName: "X-Token-From-Cloudfront",
+                values: [pulumi.secret(cloudfrontSecret.result)]
+            }
+        }]
     }, { provider });
 
     // redirect http to https
@@ -124,7 +142,8 @@ async function createCdn(certArn: pulumi.Output<string>, cdnDomain: string, orig
                     "CloudFront-Viewer-Time-Zone",
                     "CloudFront-Viewer-Latitude",
                     "CloudFront-Viewer-Longitude",
-                    "CloudFront-Viewer-Metro-Code"
+                    "CloudFront-Viewer-Metro-Code",
+                    "CloudFront-Viewer-Address"
                 ],
             },
             headerBehavior: "allViewerAndWhitelistCloudFront"
@@ -132,9 +151,10 @@ async function createCdn(certArn: pulumi.Output<string>, cdnDomain: string, orig
     });
 
     const cachePolicy = new aws.cloudfront.CachePolicy("app-cdn-origin-cache-policy", {
+        defaultTtl: 10,
         parametersInCacheKeyAndForwardedToOrigin: {
             cookiesConfig: { cookieBehavior: "all" },
-            headersConfig: { headerBehavior: "none" },
+            headersConfig: { headerBehavior: "whitelist", headers: { items: ["x-forwarded-for"] } },
             queryStringsConfig: { queryStringBehavior: "all" }
         }
     });
@@ -166,7 +186,7 @@ async function createCdn(certArn: pulumi.Output<string>, cdnDomain: string, orig
             targetOriginId: originDomain,
             viewerProtocolPolicy: "redirect-to-https",
             allowedMethods: ["GET", "HEAD", "OPTIONS", "POST", "PUT", "DELETE", "PATCH"],
-            cachedMethods: ["HEAD", "OPTIONS"],
+            cachedMethods: ["HEAD", "GET", "OPTIONS"],
             originRequestPolicyId: requestPolicy.id,
             cachePolicyId: cachePolicy.id,
         },
