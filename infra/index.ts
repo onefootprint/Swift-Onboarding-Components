@@ -81,6 +81,7 @@ function createService(region: Region, certificateArn: pulumi.Output<string>): S
     const rule = web.addListenerRule(`web-cloudfront-token-rule-${region}`, {
         actions: [{ type: "forward", targetGroupArn: target.targetGroup.arn }],
         conditions: [{
+            
             httpHeader: {
                 httpHeaderName: "X-Token-From-Cloudfront",
                 values: [pulumi.secret(cloudfrontSecret.result)]

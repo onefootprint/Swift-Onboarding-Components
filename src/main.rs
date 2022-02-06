@@ -2,15 +2,20 @@ use actix_web::{get, middleware::Logger, App, HttpRequest, HttpResponse, HttpSer
 
 #[get("/")]
 async fn index(req: HttpRequest) -> impl Responder {
-    let headers = req
+    let mut headers = req
         .headers()
         .iter()
+        .filter(|(name, _)| {
+            name.as_str().to_lowercase() != "X-Token-From-Cloudfront".to_lowercase()
+        })
         .map(|(name, value)| {
             let val = value.to_str().unwrap_or("?");
             format!("{name} -> {val}")
         })
-        .collect::<Vec<String>>()
-        .join("\n");
+        .collect::<Vec<String>>();
+
+    headers.sort();
+    let headers = headers.join("\n");
 
     HttpResponse::Ok().body(format!("{headers}"))
 }
