@@ -1,5 +1,8 @@
-use actix_web::{get, middleware::Logger, App, HttpRequest, HttpResponse, HttpServer, Responder};
+use actix_web::{get, App, HttpRequest, HttpResponse, HttpServer, Responder};
+use tracing_actix_web::TracingLogger;
+mod telemetry;
 
+#[tracing::instrument(skip(req))]
 #[get("/")]
 async fn index(req: HttpRequest) -> impl Responder {
     let mut headers = req
@@ -15,19 +18,28 @@ async fn index(req: HttpRequest) -> impl Responder {
         .collect::<Vec<String>>();
 
     headers.sort();
+
+    log_headers(&headers);
+
     let headers = headers.join("\n");
 
     HttpResponse::Ok().body(format!("{headers}"))
 }
 
+#[tracing::instrument(skip(h))]
+fn log_headers(h: &Vec<String>) {
+    tracing::info!(?h, "got headers");
+}
+
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    env_logger::init_from_env(env_logger::Env::new().default_filter_or("info"));
+    telemetry::init();
 
-    log::info!("Starting HTTP server: go to http://localhost:8000");
-
-    HttpServer::new(|| App::new().wrap(Logger::default()).service(index))
+    let res = HttpServer::new(move || App::new().wrap(TracingLogger::default()).service(index))
         .bind(("0.0.0.0", 8000))?
         .run()
-        .await
+        .await;
+
+    telemetry::shutdown();
+    res
 }
