@@ -6,8 +6,8 @@ import { Output } from "@pulumi/pulumi";
 
 export interface Secrets {
     cloudfrontSecret: pulumi.Output<string>;
-    elasticAuthSecret: aws.ssm.Parameter;
     secretsPolicyArn: pulumi.Output<string>;
+    datadogApiKey: aws.ssm.Parameter;
 }
 
 export async function LoadSecrets(config: pulumi.Config): Promise<Secrets> {
@@ -30,7 +30,7 @@ export async function LoadSecrets(config: pulumi.Config): Promise<Secrets> {
     return {
         secretsPolicyArn: secretsPolicy.arn,
         cloudfrontSecret: pulumi.secret(cloudfrontSecret),
-        elasticAuthSecret: createParameter("elasticAuthSecret", config),
+        datadogApiKey: createParameter("datadogApiKey", config),
     }
 }
 

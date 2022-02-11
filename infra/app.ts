@@ -5,6 +5,7 @@ import * as aws from "@pulumi/aws";
 import * as pulumi from "@pulumi/pulumi"
 import { Secrets } from "./secrets";
 import { Constants } from "./constants";
+import { DataDogMonitor } from "./monitor";
 
 export type Service = {
     lb: awsx.elasticloadbalancingv2.ApplicationListener,
@@ -56,6 +57,7 @@ export async function Create(config: AppConfig, constants: Constants, secretsSto
         vpc,
     }, { provider });
 
+
     const service = new awsx.ecs.FargateService(`app-${config.imageName}-service-${region.toString()}`, {
         cluster,
         // deploymentMaximumPercent: 200, // zero down time
@@ -64,55 +66,16 @@ export async function Create(config: AppConfig, constants: Constants, secretsSto
         taskDefinitionArgs: {
             executionRole: createExecRole(region, secretsStore.secretsPolicyArn),
             containers: {
-                image: {
+                api_server: {
                     image,
                     essential: true,
                     memory: config.memoryMB,
                     cpu: config.cpuUnits,
                     portMappings: [target],
-                    logConfiguration: {
-                        logDriver: "awsfirelens",
-                        //@ts-ignore
-                        "secretOptions": [{
-                            "name": "Cloud_Auth",
-                            "valueFrom": secretsStore.elasticAuthSecret.arn
-                        }],
-                        options: {
-                            "Name": "es",
-                            "Port": "9243",
-                            "Tag_Key tags": "tags",
-                            "Include_Tag_Key": "true",
-                            "Host": "https://footprint-core.es.us-east-1.aws.found.io",
-                            "Cloud_ID": constants.elasticCloudId,
-                            "Index": "elastic_firelens",
-                            "tls": "On",
-                            "tls.verify": "Off"
-                        }
-
-                    }
+                    logConfiguration: DataDogMonitor.logConfiguration("api_server", secretsStore)
                 },
-
-                logrouter: {
-                    image: "amazon/aws-for-fluent-bit:latest",
-                    essential: true,
-                    logConfiguration: {
-                        logDriver: "awslogs",
-                        options: {
-                            "awslogs-group": "firelens-container",
-                            "awslogs-region": region,
-                            "awslogs-create-group": "true",
-                            "awslogs-stream-prefix": "firelens"
-                        }
-                    },
-                    firelensConfiguration: {
-                        type: "fluentbit",
-                        options: {
-                            "config-file-type": "file",
-                            "config-file-value": "/fluent-bit/configs/parse-json.conf",
-                            "enable-ecs-log-metadata": "true"
-                        }
-                    }
-                }
+                logrouter: DataDogMonitor.logrouter(),
+                ddagent: DataDogMonitor.apmAgent(secretsStore)
             },
         }
     }, { provider });

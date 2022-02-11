@@ -1,40 +1,43 @@
+use opentelemetry::global;
+use opentelemetry::sdk::propagation::TraceContextPropagator;
 use tracing_bunyan_formatter::BunyanFormattingLayer;
 use tracing_bunyan_formatter::JsonStorageLayer;
-
-use opentelemetry::{global, sdk::propagation::TraceContextPropagator};
 use tracing_subscriber::prelude::*;
 use tracing_subscriber::EnvFilter;
 use tracing_subscriber::Registry;
 
-pub fn init() {
-    let app_name = "fpc";
+use crate::config::Config;
 
-    // Start a new Jaeger trace pipeline.
-    // Spans are exported in batch - recommended setup for a production application.
+pub fn init(config: &Config) -> Result<(), Box<dyn std::error::Error>> {
+    env_logger::init();
+
     global::set_text_map_propagator(TraceContextPropagator::new());
 
-    // let tracer = stdout::new_pipeline().install_simple();
-
-    // Filter based on level - trace, debug, info, warn, error
-    // Tunable via `RUST_LOG` env variable
     let env_filter = EnvFilter::try_from_default_env().unwrap_or(EnvFilter::new("info"));
+    let formatting_layer = BunyanFormattingLayer::new(
+        "fcm".into(),
+        // Output the formatted spans to stdout.
+        std::io::stdout,
+    );
 
-    // let telemetry = tracing_opentelemetry::layer().with_tracer(tracer);
+    let tracer = opentelemetry_datadog::new_pipeline()
+        .with_agent_endpoint("http://0.0.0.0:8126")
+        .with_service_name("fpc")
+        .install_batch(opentelemetry::runtime::Tokio)?;
 
-    // Create a `tracing` layer to emit spans as structured logs to stdout
-    let formatting_layer = BunyanFormattingLayer::new(app_name.into(), std::io::stdout);
-
-    // Combined them all together in a `tracing` subscriber
-    let subscriber = Registry::default()
+    // Initialize `tracing` using `opentelemetry-tracing` and configure logging
+    let sub = Registry::default()
         .with(env_filter)
         .with(JsonStorageLayer)
-        // .with(telemetry)
-        .with(formatting_layer);
+        .with(tracing_subscriber::fmt::layer().pretty())
+        // .with(formatting_layer)
+        .with(tracing_opentelemetry::layer().with_tracer(tracer));
 
-    tracing::subscriber::set_global_default(subscriber)
-        .expect("Failed to install `tracing` subscriber.");
+    tracing::subscriber::set_global_default(sub)?;
+
+    Ok(())
 }
 
 pub fn shutdown() {
-    opentelemetry::global::shutdown_tracer_provider();
+    global::shutdown_tracer_provider();
 }
