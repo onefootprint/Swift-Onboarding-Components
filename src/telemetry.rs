@@ -1,5 +1,9 @@
 use opentelemetry::global;
 use opentelemetry::sdk::propagation::TraceContextPropagator;
+use tracing::Span;
+use tracing_actix_web::root_span;
+use tracing_actix_web::DefaultRootSpanBuilder;
+use tracing_actix_web::RootSpanBuilder;
 use tracing_bunyan_formatter::BunyanFormattingLayer;
 use tracing_bunyan_formatter::JsonStorageLayer;
 use tracing_subscriber::prelude::*;
@@ -40,4 +44,30 @@ pub fn init(config: &Config) -> Result<(), Box<dyn std::error::Error>> {
 
 pub fn shutdown() {
     global::shutdown_tracer_provider();
+}
+
+pub struct TelemetrySpanBuilder;
+impl RootSpanBuilder for TelemetrySpanBuilder {
+    fn on_request_start(request: &actix_web::dev::ServiceRequest) -> Span {
+        let route = format!(
+            "{} {}",
+            request.method().as_str(),
+            request
+                .uri()
+                .path_and_query()
+                .map(|p| p.as_str())
+                .unwrap_or("")
+        );
+        let span = root_span!(request);
+        let _ = span.enter();
+        tracing::info!("{}", route);
+        return span;
+    }
+
+    fn on_request_end<B>(
+        span: Span,
+        outcome: &Result<actix_web::dev::ServiceResponse<B>, actix_web::Error>,
+    ) {
+        DefaultRootSpanBuilder::on_request_end(span, outcome)
+    }
 }

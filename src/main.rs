@@ -1,5 +1,6 @@
 use actix_web::{get, middleware::Logger, App, HttpRequest, HttpResponse, HttpServer, Responder};
 use actix_web_opentelemetry::RequestTracing;
+use telemetry::TelemetrySpanBuilder;
 use tracing_actix_web::TracingLogger;
 mod config;
 mod telemetry;
@@ -31,6 +32,7 @@ async fn index(req: HttpRequest) -> impl Responder {
 #[tracing::instrument(name = "test", skip(req))]
 // #[get("/test")]
 async fn test(req: HttpRequest) -> impl Responder {
+    tracing::info!("in test");
     "hello"
 }
 
@@ -48,7 +50,7 @@ async fn main() -> std::io::Result<()> {
     let res = HttpServer::new(move || {
         App::new()
             .wrap(Logger::default())
-            .wrap(TracingLogger::default())
+            .wrap(TracingLogger::<TelemetrySpanBuilder>::new())
             .service(index)
             .route("/test", actix_web::web::get().to(test))
     })
