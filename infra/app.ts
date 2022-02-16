@@ -5,7 +5,7 @@ import * as aws from "@pulumi/aws";
 import * as pulumi from "@pulumi/pulumi"
 import { Secrets } from "./secrets";
 import { Constants } from "./constants";
-import { DataDogMonitor } from "./monitor";
+import { Monitor } from "./monitor";
 
 export type Service = {
     lb: awsx.elasticloadbalancingv2.ApplicationListener,
@@ -72,10 +72,11 @@ export async function Create(config: AppConfig, constants: Constants, secretsSto
                     memory: config.memoryMB,
                     cpu: config.cpuUnits,
                     portMappings: [target],
-                    logConfiguration: DataDogMonitor.logConfiguration("api_server", secretsStore)
+                    // logConfiguration: Monitor.logConfiguration("api_server", secretsStore, constants),
+                    dependsOn: [{ containerName: "otelcollect", condition: "START" }]
                 },
-                logrouter: DataDogMonitor.logrouter(),
-                ddagent: DataDogMonitor.apmAgent(secretsStore)
+                // logrouter: Monitor.logrouter(region),
+                otelcollect: Monitor.otelCollector(secretsStore, constants, region)
             },
         }
     }, { provider });

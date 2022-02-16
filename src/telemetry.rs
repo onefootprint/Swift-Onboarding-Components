@@ -1,4 +1,9 @@
+use actix_web_opentelemetry::RequestMetrics;
+use futures_util::Stream;
+use futures_util::StreamExt;
 use opentelemetry::global;
+use opentelemetry::sdk::metrics::selectors;
+use opentelemetry::sdk::metrics::PushController;
 use opentelemetry::sdk::propagation::TraceContextPropagator;
 use tracing::Span;
 use tracing_actix_web::root_span;
@@ -12,7 +17,7 @@ use tracing_subscriber::Registry;
 
 use crate::config::Config;
 
-pub fn init(config: &Config) -> Result<(), Box<dyn std::error::Error>> {
+pub fn init(config: &Config) -> Result<PushController, Box<dyn std::error::Error>> {
     env_logger::init();
 
     global::set_text_map_propagator(TraceContextPropagator::new());
@@ -24,22 +29,32 @@ pub fn init(config: &Config) -> Result<(), Box<dyn std::error::Error>> {
         std::io::stdout,
     );
 
-    let tracer = opentelemetry_datadog::new_pipeline()
-        .with_agent_endpoint("http://0.0.0.0:8126")
-        .with_service_name("fpc")
-        .install_batch(opentelemetry::runtime::Tokio)?;
+    let tracer = opentelemetry_otlp::new_pipeline()
+        .tracing()
+        .with_exporter(opentelemetry_otlp::new_exporter().tonic())
+        .install_simple()?;
 
     // Initialize `tracing` using `opentelemetry-tracing` and configure logging
     let sub = Registry::default()
         .with(env_filter)
         .with(JsonStorageLayer)
-        .with(tracing_subscriber::fmt::layer().pretty())
-        // .with(formatting_layer)
-        .with(tracing_opentelemetry::layer().with_tracer(tracer));
+        .with(tracing_opentelemetry::layer().with_tracer(tracer))
+        .with(tracing_subscriber::fmt::layer().pretty());
+    // .with(formatting_layer)
 
     tracing::subscriber::set_global_default(sub)?;
 
-    Ok(())
+    // init metrics
+    fn delayed_interval(duration: std::time::Duration) -> impl Stream<Item = tokio::time::Instant> {
+        opentelemetry::util::tokio_interval_stream(duration).skip(1)
+    }
+    let metrics = opentelemetry_otlp::new_pipeline()
+        .metrics(tokio::spawn, delayed_interval)
+        .with_exporter(opentelemetry_otlp::new_exporter().tonic())
+        .with_aggregator_selector(selectors::simple::Selector::Exact)
+        .build()?;
+
+    Ok(metrics)
 }
 
 pub fn shutdown() {
@@ -59,7 +74,6 @@ impl RootSpanBuilder for TelemetrySpanBuilder {
                 .unwrap_or("")
         );
         let span = root_span!(request);
-        let _ = span.enter();
         tracing::info!("{}", route);
         return span;
     }

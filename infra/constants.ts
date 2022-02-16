@@ -3,5 +3,10 @@ export interface Constants {
     rootDomain: string;
     internalAppSubdomain: string;
     cdnAppSubdomain: string;
-    elasticCloudId: string;
+    elastic: Elastic
+}
+
+export interface Elastic {
+    apmEndpoint: string;
+    cloudId: string;
 }

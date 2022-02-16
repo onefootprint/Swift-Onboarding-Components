@@ -6,74 +6,48 @@ import * as pulumi from "@pulumi/pulumi"
 import * as random from "@pulumi/random";
 import { Secrets } from "./secrets";
 import { Constants } from "./constants";
+import { constants } from "buffer";
 
-export abstract class DataDogMonitor {
-
-    // unused for now...
-    static setupFirehoseStreaming(region: Region, secrets: Secrets) {
-        const provider = new aws.Provider(`provider-kinesis-${region}`, { region });
-
-        const stream = new aws.kinesis.Stream(`dd-log-stream-${region}`, {
-            streamModeDetails: { streamMode: "ON_DEMAND" },
-        }, { provider });
-
-        const role = new aws.iam.Role(`stream-role-${region}`, {
-            assumeRolePolicy: {
-                Version: "2008-10-17",
-                Statement: [{
-                    "Action": "sts:AssumeRole",
-                    "Effect": "Allow",
-                    "Principal": {
-                        "Service": "firehose.amazonaws.com"
-                    }
-                }]
-            },
-        });
-
-        const rpa = new aws.iam.RolePolicyAttachment(`task-exec-${region}-policy`, {
-            role: role.name,
-            policyArn: "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy",
-        });
-
-        const delivery = new aws.kinesis.FirehoseDeliveryStream("dd-log-stream", {
-            destination: "httpEndpoint",
-            httpEndpointConfiguration: {
-                accessKey: secrets.datadogApiKey.value,
-                url: "https://aws-kinesis-http-intake.logs.datadoghq.com/v1/input"
-            },
-            kinesisSourceConfiguration: {
-                kinesisStreamArn: stream.arn,
-                roleArn: role.arn
-            }
-        });
-    }
+export abstract class Monitor {
 
     /// configures a container to log through firelens
-    static logConfiguration(service: string, secrets: Secrets): pulumi.Input<aws.ecs.LogConfiguration> {
+    static logConfiguration(service: string, secrets: Secrets, constants: Constants): pulumi.Input<aws.ecs.LogConfiguration> {
         return {
             logDriver: "awsfirelens",
             //@ts-ignore
             "secretOptions": [
                 {
-                    "name": "apikey",
-                    "valueFrom": secrets.datadogApiKey.arn
+                    "valueFrom": secrets.elasticApiKey.arn,
+                    "name": "Cloud_Auth"
                 }
             ],
             options: {
-                "Name": "datadog",
-                "dd_service": service,
-                "dd_source": `${service}:ecs`,
-                "dd_tags": "project:fluentbit",
-                "provider": "ecs"
+                "Name": "es",
+                "Port": "9243",
+                "Tag_Key tags": "tags",
+                "Include_Tag_Key": "true",
+                "Cloud_ID": constants.elastic.cloudId,
+                "Index": "elastic_firelens",
+                "tls": "On",
+                "tls.verify": "Off"
             }
         }
     }
 
     /// a container that forwards logs via fluent bit to the firelens configuration
-    static logrouter(): awsx.ecs.Container {
+    static logrouter(region: Region): awsx.ecs.Container {
         return {
             image: "amazon/aws-for-fluent-bit:latest",
             essential: true,
+            logConfiguration: {
+                "logDriver": "awslogs",
+                "options": {
+                    "awslogs-create-group": "true",
+                    "awslogs-group": "firelens-container",
+                    "awslogs-region": region,
+                    "awslogs-stream-prefix": "firelens"
+                }
+            },
             firelensConfiguration: {
                 type: "fluentbit",
                 options: {
@@ -86,39 +60,28 @@ export abstract class DataDogMonitor {
     }
 
     /// a datadog APM agent
-    static apmAgent(secrets: Secrets): awsx.ecs.Container {
-        return {
-            image: "public.ecr.aws/datadog/agent:latest",
-            essential: true,
-            portMappings: [
-                {
-                    hostPort: 8126,
-                    protocol: "tcp",
-                    containerPort: 8126
-                }
-            ],
-            secrets: secrets.datadogApiKey.arn.apply(arn => {
-                return [
-                    {
-                        name: "DD_API_KEY",
-                        valueFrom: arn
-                    }
-                ]
+    static otelCollector(secrets: Secrets, constants: Constants, region: Region): awsx.ecs.Container {
 
-            }),
+        const secretsEnv = pulumi.all([secrets.otelConfig.arn, secrets.elasticApiKey.arn]).apply(([config, apiKey]) => [
+            {
+                name: "AOT_CONFIG_CONTENT",
+                valueFrom: config
+            },
+            {
+                name: "ELASTIC_APM_API_KEY",
+                valueFrom: apiKey
+            }
+        ]);
+
+        return {
+            image: "amazon/aws-otel-collector:latest",
+            essential: true,
+            secrets: secretsEnv,
             environment: [
                 {
-                    name: "DD_APM_ENABLED",
-                    value: "true"
+                    name: "ELASTIC_APM_SERVER_ENDPOINT",
+                    value: constants.elastic.apmEndpoint
                 },
-                {
-                    name: "ECS_FARGATE",
-                    value: "true"
-                },
-                {
-                    name: "DD_APM_NON_LOCAL_TRAFFIC",
-                    value: "true"
-                }
             ]
 
         }

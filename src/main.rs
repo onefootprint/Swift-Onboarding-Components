@@ -1,4 +1,5 @@
 use actix_web::{get, middleware::Logger, App, HttpRequest, HttpResponse, HttpServer, Responder};
+use actix_web_opentelemetry::RequestMetrics;
 use telemetry::TelemetrySpanBuilder;
 use tracing_actix_web::TracingLogger;
 mod config;
@@ -44,12 +45,16 @@ pub struct ApiError {}
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     let config = config::Config::load_from_env().expect("failed to load config");
-    telemetry::init(&config).expect("failed to init telemetry layers");
+    let _started = telemetry::init(&config).expect("failed to init telemetry layers");
+    let meter = opentelemetry::global::meter("actix_web");
+
+    let metrics = RequestMetrics::new(meter, Some(should_render_metrics), None);
 
     let res = HttpServer::new(move || {
         App::new()
             .wrap(Logger::default())
             .wrap(TracingLogger::<TelemetrySpanBuilder>::new())
+            .wrap(metrics.clone())
             .service(index)
             .route("/test", actix_web::web::get().to(test))
     })
@@ -59,4 +64,8 @@ async fn main() -> std::io::Result<()> {
 
     // telemetry::shutdown();
     res
+}
+
+fn should_render_metrics(_: &actix_web::dev::ServiceRequest) -> bool {
+    false
 }

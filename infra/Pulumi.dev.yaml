@@ -1,13 +1,13 @@
 config:
-  aws:profile: footprint_sandbox
+  aws:profile: footprint_dev
   aws:region: us-east-1
   infra:constants:
-    cdnAppSubdomain: app
+    cdnAppSubdomain: api
     cdnProtectionHeaderName: X-Token-From-CloudFront
-    elasticCloudId: footprint_core:dXMtZWFzdC0xLmF3cy5mb3VuZC5pbyRiN2IyZmVhOTE0ODE0MjYyOGZmMzk2Yzg1MjgxZTQwMyQ0OTc4YTMyOWIzZjE0MDY0YjA3Y2QwMjU3MzVmNTBmZQ==
-    internalAppSubdomain: app-internal
-    rootDomain: footprint.alexgrinman.com
-  infra:datadogApiKey:
-    secure: AAABALIskiWDCFO5SqnZBYBYpBP9sMy1O90CkHDIKmIUnwNDPZcY7HHef0WcSdNq/CRMJfHchHWCLj+mHFjVJg==
-  infra:elasticAuthSecret:
-    secure: AAABAHE1Nx9k7ac+T4rr1tivPCABwAvZ391YJ8aYKeAOyaeDEKBNNWTC1JUdlPyALcXoazf0DSXR2tm5p7RsMg==
+    elastic:
+      apmEndpoint: 704e0b6270f64a6aa6a9685ab0a539d0.apm.us-east-1.aws.cloud.es.io:443
+      cloudId: footprint_core:dXMtZWFzdC0xLmF3cy5mb3VuZC5pbyRiN2IyZmVhOTE0ODE0MjYyOGZmMzk2Yzg1MjgxZTQwMyQ0OTc4YTMyOWIzZjE0MDY0YjA3Y2QwMjU3MzVmNTBmZQ==
+    internalAppSubdomain: api-internal
+    rootDomain: infra.footprint.dev
+  infra:elasticApiKey:
+    secure: AAABAOsQfRhPcVWPW1HS8x8FeVZ4zclM0vjuhrObu8qMHUzahkXbLC7dNGtUg93waBc=
