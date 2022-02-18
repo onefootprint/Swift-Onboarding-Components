@@ -36,7 +36,7 @@ jobs:
         id: extract_branch        
         
       # create our temp stack
-      - run: pulumi stack init --copy-config-from "footprint/dev" "footprint/dev-${branch}"
+      - run: pulumi stack init --copy-config-from "footprint/dev" "footprint/dev-${{ steps.extract_branch.outputs.branch }}"
         working-directory: infra
         env:
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
@@ -46,6 +46,6 @@ jobs:
         with:
           command: up
           work-dir: infra
-          stack-name: "footprint/dev-${branch}"
+          stack-name: "footprint/dev-${{ steps.extract_branch.outputs.branch }}"
         env:
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
