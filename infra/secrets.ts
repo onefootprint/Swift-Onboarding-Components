@@ -32,7 +32,7 @@ export async function LoadSecrets(config: pulumi.Config): Promise<Secrets> {
     return {
         secretsPolicyArn: secretsPolicy.arn,
         cloudfrontSecret: pulumi.secret(cloudfrontSecret),
-        elasticApiKey: createSecretParameter("elasticApiKey", config),
+        elasticApiKey: createSecretParameter("constants.elastic.apiKey", config),
         otelConfig: new aws.ssm.Parameter(`ssm-param-otelconfig`, {
             type: "String",
             value: fs.readFileSync('./otel/config.yml', 'utf8'),

@@ -8,12 +8,13 @@ import * as random from "@pulumi/random";
 import * as cdn from './cdn';
 import * as app from './app';
 import * as secrets from './secrets'
-import { Constants } from './constants'
+import { Config } from './config'
 
 
 export = async () => {
     let config = new pulumi.Config();
-    const constants = config.requireObject<Constants>("constants");
+    let constants = config.requireObject<Config>("constants");
+    const stack = pulumi.getStack();
     const secretsStore = await secrets.LoadSecrets(config);
 
     const regions = [Region.USEast1, Region.USWest1];
@@ -22,7 +23,7 @@ export = async () => {
 
     const services = await Promise.all(regions.map(async region => {
         // mint a cert for this property
-        const cert = await certs.CreateCertificate({ domain: `*.${constants.rootDomain}`, region, hostedZoneId: hostedZone.id });
+        const cert = await certs.CreateCertificate({ domain: `*.${stack}.${constants.rootDomain}`, region, hostedZoneId: hostedZone.id });
 
         // create our fargate service
         const service = await app.Create({
@@ -31,7 +32,7 @@ export = async () => {
             memoryMB: 512,
             instanceCount: 1,
             certArn: cert,
-            domain: `${constants.internalAppSubdomain}.${constants.rootDomain}`,
+            domain: `${constants.internalAppSubdomain}.${stack}.${constants.rootDomain}`,
             imageName: "fpc",
             imagePath: "../",
             region,
@@ -45,13 +46,13 @@ export = async () => {
         certArn: services[0].cert, // needs US-East-1 cert
         cdnToAlbSecret: secretsStore.cloudfrontSecret,
         cdnToAlbSecretHeaderName: constants.cdnProtectionHeaderName,
-        domain: `${constants.cdnAppSubdomain}.${constants.rootDomain}`,
-        origin: `${constants.internalAppSubdomain}.${constants.rootDomain}`,
+        domain: `${constants.cdnAppSubdomain}.${stack}.${constants.rootDomain}`,
+        origin: `${constants.internalAppSubdomain}.${stack}.${constants.rootDomain}`,
         hostedZoneId: hostedZone.zoneId
     });
 
     return {
-        domain: `${constants.cdnAppSubdomain}.${constants.rootDomain}`,
+        domain: `${constants.cdnAppSubdomain}.${stack}.${constants.rootDomain}`,
         cdn: distribution.domainName,
         appLBs: services.map(svc => { svc.service.lb.loadBalancer.loadBalancer.dnsName })
     }
