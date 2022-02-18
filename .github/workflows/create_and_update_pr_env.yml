@@ -1,11 +1,12 @@
-name: Pulumi
+name: PR Env Stack
 on:
   pull_request:
     types: [reopened, opened, synchronize, edited]
 jobs:
-  ephemeral_stack:
-    name: Ephemeral Stack
+  ephemeral_stack:    
+    name: Create Ephemeral Stack
     runs-on: ubuntu-latest
+    environment: dev
     steps:
       - uses: actions/checkout@v2
       
