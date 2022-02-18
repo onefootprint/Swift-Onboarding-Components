@@ -12,6 +12,14 @@ export interface Secrets {
     otelConfig: aws.ssm.Parameter;
 }
 
+interface SecretConstants {
+    elastic: ElasticSecrets
+}
+
+interface ElasticSecrets {
+    apiKey: string
+}
+
 export async function LoadSecrets(config: pulumi.Config): Promise<Secrets> {
     const cloudfrontSecret = new random.RandomString("cf-alb-pass", { length: 44 }).result;
 
@@ -29,10 +37,12 @@ export async function LoadSecrets(config: pulumi.Config): Promise<Secrets> {
         }),
     });
 
+    const secretConstants = config.requireSecretObject<SecretConstants>("constants");
+
     return {
         secretsPolicyArn: secretsPolicy.arn,
         cloudfrontSecret: pulumi.secret(cloudfrontSecret),
-        elasticApiKey: createSecretParameter("constants.elastic.apiKey", config),
+        elasticApiKey: createSecretParameter("elasticApiKey", secretConstants.elastic.apiKey),
         otelConfig: new aws.ssm.Parameter(`ssm-param-otelconfig`, {
             type: "String",
             value: fs.readFileSync('./otel/config.yml', 'utf8'),
@@ -50,10 +60,10 @@ function GetValue<T>(output: Output<T>): Promise<T> {
 }
 
 /// create a secret param
-function createSecretParameter(name: string, config: pulumi.Config): aws.ssm.Parameter {
+function createSecretParameter(name: string, secretVal: pulumi.Output<string>): aws.ssm.Parameter {
     const secret = new aws.ssm.Parameter(`ssm-param-${name}`, {
         type: "SecureString",
-        value: config.requireSecret(name),
+        value: secretVal,
         name: `/static_secrets/${name}`,
     });
 
