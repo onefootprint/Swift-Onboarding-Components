@@ -34,9 +34,16 @@ jobs:
           branch=$(echo $GITHUB_HEAD_REF | sed -r 's/\//-/g' | sed -r 's/_/-/g')
           echo "##[set-output name=branch;]$(echo ${branch})"
         id: extract_branch        
-        
+      
+      - name: Cache Primes
+        id: cache-primes
+        uses: actions/cache@v2
+        with:
+          path: Pulimi.dev-${{ steps.extract_branch.outputs.branch }}.yml
+          key: ${{ runner.os }}-${{ steps.extract_branch.outputs.branch }}
+
       # create our temp stack
-      - run: pulumi stack init --secrets-provider ${AWS_SECRETS_PROVIDER} --copy-config-from "footprint/dev" "footprint/dev-${{ steps.extract_branch.outputs.branch }}"
+      - run: pulumi stack init --secrets-provider ${{ secrets.AWS_SECRETS_PROVIDER }} --copy-config-from "footprint/dev" "footprint/dev-${{ steps.extract_branch.outputs.branch }}"
         working-directory: infra
         env:
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
