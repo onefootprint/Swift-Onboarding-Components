@@ -22,6 +22,7 @@ interface ElasticSecrets {
 
 export async function LoadSecrets(config: pulumi.Config): Promise<Secrets> {
     const cloudfrontSecret = new random.RandomString("cf-alb-pass", { length: 44 }).result;
+    const stack = pulumi.getStack();
 
     const secretsPolicy = new aws.iam.Policy("secrets_parameter_read_access", {
         policy: JSON.stringify({
@@ -42,11 +43,11 @@ export async function LoadSecrets(config: pulumi.Config): Promise<Secrets> {
     return {
         secretsPolicyArn: secretsPolicy.arn,
         cloudfrontSecret: pulumi.secret(cloudfrontSecret),
-        elasticApiKey: createSecretParameter("elasticApiKey", secretConstants.elastic.apiKey),
+        elasticApiKey: createSecretParameter(`elasticApiKey-${stack}`, secretConstants.elastic.apiKey),
         otelConfig: new aws.ssm.Parameter(`ssm-param-otelconfig`, {
             type: "String",
             value: fs.readFileSync('./otel/config.yml', 'utf8'),
-            name: `/static_secrets/otelconfig`,
+            name: `/static_secrets/otelconfig-${stack}`,
         })
     }
 }
