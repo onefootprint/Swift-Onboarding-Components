@@ -39,7 +39,7 @@ jobs:
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
 
       # copy our stack file just in case
-      - run: cp Pulumi.dev.yml Pulumi.dev-${{ steps.extract_branch.outputs.branch }}.yml
+      - run: cp Pulumi.dev.yaml Pulumi.dev-${{ steps.extract_branch.outputs.branch }}.yaml
         working-directory: infra
           
       # build the container
