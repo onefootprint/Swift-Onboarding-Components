@@ -1,0 +1,54 @@
+name: Deploy Stack
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy_stack:    
+    name: Deploy Stack
+    runs-on: ubuntu-latest
+    environment: dev
+    steps:
+      - uses: actions/checkout@v2
+            
+      # pulumi setup
+      - uses: actions/setup-node@v2
+        with:
+          node-version: 14.x
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-region: ${{ secrets.AWS_REGION }}
+          aw  s-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          
+      - name: Setup Pulumi CLI
+        uses: pulumi/setup-pulumi@v2.0.0            
+      - run: npm install
+        working-directory: infra
+
+      # get the url for the environment
+      - name: Extract env url
+        shell: bash
+        working-directory: infra
+        run: |
+          sub=$(pulumi config --stack footprint/${{ secrets.STACK_NAME }} get --path constants.cdnAppSubdomain)
+          root=$(pulumi config --stack footprint/${{ secrets.STACK_NAME }} get --path constants.rootDomain)
+          url="${sub}.${root}"
+          echo "##[set-output name=url;]$(echo ${url})"
+        id: extract_env_url            
+          
+      # build the container
+      - run: make release
+
+      # bring up the ephemeral stack
+      - uses: pulumi/actions@v3
+        with:
+          command: up
+          work-dir: infra
+          stack-name: "footprint/${{ secrets.STACK_NAME }}"
+          message: "Deployed to https://${{ steps.extract_env_url.outputs.url }}"
+        env:
+          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}

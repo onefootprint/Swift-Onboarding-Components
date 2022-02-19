@@ -1,3 +1,5 @@
+secretsprovider: awskms://4e61ea01-1193-475e-82ee-e9639743efd6?region=us-east-1
+encryptedkey: AQICAHierjVilfttqs7gag2b9al8BtcDNoSoVbmhJTJW+UU0GgGJuMYg+vgtHDUvKoWRioMaAAAAfjB8BgkqhkiG9w0BBwagbzBtAgEAMGgGCSqGSIb3DQEHATAeBglghkgBZQMEAS4wEQQMj/Vfw62zBk4QWSoCAgEQgDsy8VwUnEWcqNAUnFt4UwBe7p2HQDRQCLrCkNyGqXAKPv6DtxBKkM88enMkwb5vgLpEt+v7FCq91wLy9A==
 config:
   aws:profile: footprint_dev
   aws:region: us-east-1
@@ -5,9 +7,8 @@ config:
     cdnAppSubdomain: api
     cdnProtectionHeaderName: X-Token-From-CloudFront
     elastic:
+      apiKey:
+        secure: v1:mtF/qGF+Yz700JJv:O4qFnOOZSWS2/TBDR5wmyv/9X7Rf5OLcH+TYOib3E+RATw==
       apmEndpoint: 704e0b6270f64a6aa6a9685ab0a539d0.apm.us-east-1.aws.cloud.es.io:443
-      cloudId: footprint_core:dXMtZWFzdC0xLmF3cy5mb3VuZC5pbyRiN2IyZmVhOTE0ODE0MjYyOGZmMzk2Yzg1MjgxZTQwMyQ0OTc4YTMyOWIzZjE0MDY0YjA3Y2QwMjU3MzVmNTBmZQ==
     internalAppSubdomain: api-internal
     rootDomain: infra.footprint.dev
-  infra:elasticApiKey:
-    secure: AAABAOsQfRhPcVWPW1HS8x8FeVZ4zclM0vjuhrObu8qMHUzahkXbLC7dNGtUg93waBc=

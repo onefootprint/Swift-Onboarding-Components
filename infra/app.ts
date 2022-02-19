@@ -4,7 +4,7 @@ import { Output } from "@pulumi/pulumi";
 import * as aws from "@pulumi/aws";
 import * as pulumi from "@pulumi/pulumi"
 import { Secrets } from "./secrets";
-import { Constants } from "./constants";
+import { Config } from "./config";
 import { Monitor } from "./monitor";
 
 export type Service = {
@@ -25,7 +25,7 @@ export type AppConfig = {
     domain: string
 }
 
-export async function Create(config: AppConfig, constants: Constants, secretsStore: Secrets): Promise<Service> {
+export async function Create(config: AppConfig, constants: Config, secretsStore: Secrets): Promise<Service> {
     const region = config.region;
     const provider = new aws.Provider(`provider-${config.imageName}-${region}`, { region });
 
@@ -72,10 +72,12 @@ export async function Create(config: AppConfig, constants: Constants, secretsSto
                     memory: config.memoryMB,
                     cpu: config.cpuUnits,
                     portMappings: [target],
-                    // logConfiguration: Monitor.logConfiguration("api_server", secretsStore, constants),
+                    environment: [{
+                        name: "OTEL_RESOURCE_ATTRIBUTES",
+                        value: `service.name=fpc-api,service.version=1.0,deployment.environment=${pulumi.getStack()}`
+                    }],
                     dependsOn: [{ containerName: "otelcollect", condition: "START" }]
-                },
-                // logrouter: Monitor.logrouter(region),
+                },                
                 otelcollect: Monitor.otelCollector(secretsStore, constants, region)
             },
         }

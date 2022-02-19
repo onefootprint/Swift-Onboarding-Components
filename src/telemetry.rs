@@ -17,13 +17,13 @@ use tracing_subscriber::Registry;
 
 use crate::config::Config;
 
-pub fn init(config: &Config) -> Result<PushController, Box<dyn std::error::Error>> {
+pub fn init(_config: &Config) -> Result<PushController, Box<dyn std::error::Error>> {
     env_logger::init();
 
     global::set_text_map_propagator(TraceContextPropagator::new());
 
     let env_filter = EnvFilter::try_from_default_env().unwrap_or(EnvFilter::new("info"));
-    let formatting_layer = BunyanFormattingLayer::new(
+    let _formatting_layer = BunyanFormattingLayer::new(
         "fcm".into(),
         // Output the formatted spans to stdout.
         std::io::stdout,
