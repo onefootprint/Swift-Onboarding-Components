@@ -52,6 +52,8 @@ jobs:
           url="${sub}.dev-${{ steps.extract_branch.outputs.branch }}.${root}"
           echo "##[set-output name=url;]$(echo ${url})"
         id: extract_env_url            
+        env:
+          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
           
       # build the container
       - run: make debug
