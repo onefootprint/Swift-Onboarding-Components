@@ -9,10 +9,7 @@ jobs:
     environment: dev
     steps:
       - uses: actions/checkout@v2
-      
-      # build the container
-      - run: make debug
-      
+            
       # pulumi setup
       - uses: actions/setup-node@v2
         with:
@@ -33,21 +30,21 @@ jobs:
         run: |
           branch=$(echo $GITHUB_HEAD_REF | sed -r 's/\//-/g' | sed -r 's/_/-/g')
           echo "##[set-output name=branch;]$(echo ${branch})"
-        id: extract_branch        
-      
-      - name: Cache Primes
-        id: cache-primes
-        uses: actions/cache@v2
-        with:
-          path: Pulimi.dev-${{ steps.extract_branch.outputs.branch }}.yml
-          key: ${{ runner.os }}-${{ steps.extract_branch.outputs.branch }}
+        id: extract_branch            
 
       # create our temp stack
-      - run: pulumi stack init --secrets-provider ${{ secrets.AWS_SECRETS_PROVIDER }} --copy-config-from "footprint/dev" "footprint/dev-${{ steps.extract_branch.outputs.branch }}"
+      - run: pulumi stack init --secrets-provider ${{ secrets.AWS_SECRETS_PROVIDER }} --copy-config-from "footprint/dev" "footprint/dev-${{ steps.extract_branch.outputs.branch }}" || true
         working-directory: infra
         env:
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
+
+      # copy our stack file just in case
+      - run: cp Pulumi.dev.yml Pulumi.dev-${{ steps.extract_branch.outputs.branch }}.yml
+        working-directory: infra
           
+      # build the container
+      - run: make debug
+
       # bring up the ephemeral stack
       - uses: pulumi/actions@v3
         with:
