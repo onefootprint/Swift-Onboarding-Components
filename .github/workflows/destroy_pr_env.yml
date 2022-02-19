@@ -1,10 +1,10 @@
-name: PR Env Stack
+name: Destroy Ephemeral Env Stack
 on:
   pull_request:
-    types: [reopened, opened, synchronize, edited]
+    types: [closed]
 jobs:
   ephemeral_stack:    
-    name: Create Ephemeral Stack
+    name: Destroy Ephemeral Stack
     runs-on: ubuntu-latest
     environment: dev
     steps:
@@ -53,15 +53,19 @@ jobs:
           echo "##[set-output name=url;]$(echo ${url})"
         id: extract_env_url            
           
-      # build the container
-      - run: make debug
-
       # bring up the ephemeral stack
       - uses: pulumi/actions@v3
         with:
-          command: up
+          command: destroy
           work-dir: infra
           stack-name: "footprint/dev-${{ steps.extract_branch.outputs.branch }}"
-          message: "Deployed to https://${{ steps.extract_env_url.outputs.url }}"
+          message: "Destroyed ephemeral environment https://${{ steps.extract_env_url.outputs.url }}"
         env:
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
+
+      # rm our temp stack
+      - run: pulumi stack --stack footprint/dev-${{ steps.extract_branch.outputs.branch }} rm
+        working-directory: infra
+        env:
+          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
+
