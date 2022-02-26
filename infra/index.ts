@@ -34,7 +34,7 @@ export = async () => {
             certArn: cert,
             domain: `${constants.internalAppSubdomain}.${stack}.${constants.rootDomain}`,
             imageName: "fpc",
-            imagePath: "../",
+            imagePath: "../api.dockerfile",
             region,
             hostedZoneId: hostedZone.zoneId
         }, constants, secretsStore)

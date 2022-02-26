@@ -1,25 +1,7 @@
-[package]
-name = "footprint-core"
-version = "0.1.0"
-edition = "2021"
+[workspace]
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
-[dependencies]
-actix-web = "4.0.0-rc.2"
-env_logger = "0.9.0"
-log = "0.4.14"
-opentelemetry = { version = "0.17", features = ["rt-tokio", "metrics", "serialize"] }
-tracing-opentelemetry = "0.17"
-tracing = "0.1.30"
-tracing-actix-web = { version = "=0.5.0-rc.2", features = ["opentelemetry_0_17"]} 
-tracing-subscriber = { version = "0.3", features = ["json", "registry", "env-filter"] }
-actix-web-opentelemetry = { git = "https://github.com/OutThereLabs/actix-web-opentelemetry", rev = "2d2eb3d415f515ea71b0b15dcda4ccac41987a76", features = ["metrics"]}
-uuid = { version = "0.8.2", features = ["v4"] }
-envconfig = "0.10.0"
-dotenv = "0.15.0"
-tracing-bunyan-formatter = "0.3.2"
-tracing-error = "0.2.0"
-opentelemetry-otlp = { version = "0.10", features = ["tonic", "metrics"] }
-tokio = { version = "1.0", features = ["full"] }
-futures-util = { version = "0.3", default-features = false, features = ["std"] }
+members = [
+    "components/api",
+    "components/enclave/enclave",
+    "components/enclave/enclave_parent",
+]
