@@ -8,6 +8,9 @@ pub struct Config {
     #[envconfig(from = "ENCLAVE_PORT", default = "5000")]
     pub enclave_port: u32,
 
+    #[envconfig(from = "ENCLAVE_CID", default = "16")]
+    pub enclave_cid: u32,
+
     #[envconfig(from = "UNIX_SOCKET")]
     pub unix_sock: Option<String>,
 }

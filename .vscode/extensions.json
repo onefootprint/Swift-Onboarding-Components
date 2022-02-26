@@ -1,0 +1,8 @@
+{
+    "recommendations": [
+        "matklad.rust-analyzer",
+        "panicbit.cargo",
+        "bungcip.better-toml",
+        "serayuzgur.crates"
+    ]
+}

@@ -31,3 +31,5 @@ tracing-bunyan-formatter = "0.3.2"
 tracing-error = "0.2.0"
 opentelemetry-otlp = { version = "0.10", features = ["tonic", "metrics"] }
 futures-util = { version = "0.3", default-features = false, features = ["std"] }
+bb8 = "0.7"
+async-trait = "0.1"
