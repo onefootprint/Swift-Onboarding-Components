@@ -20,7 +20,7 @@ export type AppConfig = {
     memoryMB: number,
     cpuUnits: number,
     imageName: string,
-    imagePath: string,
+    dockerfilePath: string,
     hostedZoneId: string,
     domain: string
 }
@@ -49,8 +49,11 @@ export async function Create(config: AppConfig, constants: Config, secretsStore:
     const target = applb.createTargetGroup(`${config.imageName}-alb-target-${region.toString()}`, { port: 8000, vpc });
 
     // create the container
-    // must be *inside* the region to avoid east to west charges for bandwidth
-    const image = awsx.ecs.Image.fromPath(`${config.imageName}-image-${region}`, config.imagePath);
+    // must be *inside* the region to avoid east to west charges for bandwidth    
+    const image = awsx.ecs.Image.fromDockerBuild(`${config.imageName}-image-${region}`, {
+        context: "../",
+        dockerfile: config.dockerfilePath,
+    });
 
     // create the cluster
     const cluster = new awsx.ecs.Cluster(`cluster-${config.imageName}-${region}`, {
@@ -77,7 +80,7 @@ export async function Create(config: AppConfig, constants: Config, secretsStore:
                         value: `service.name=fpc-api,service.version=1.0,deployment.environment=${pulumi.getStack()}`
                     }],
                     dependsOn: [{ containerName: "otelcollect", condition: "START" }]
-                },                
+                },
                 otelcollect: Monitor.otelCollector(secretsStore, constants, region)
             },
         }
