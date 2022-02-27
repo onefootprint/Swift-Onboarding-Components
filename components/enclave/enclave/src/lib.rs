@@ -4,8 +4,13 @@ use tokio::io::{AsyncRead, AsyncReadExt};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
-pub enum Message {
+pub enum RpcRequest {
     Ping(String),
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum EnclaveResponse {
     Pong(String),
 }
 
@@ -16,7 +21,7 @@ pub struct WireMessage {
 }
 
 impl WireMessage {
-    pub fn new(s: &Message) -> Result<Self, serde_cbor::Error> {
+    pub fn new<S: Serialize>(s: &S) -> Result<Self, serde_cbor::Error> {
         let data = serde_cbor::to_vec(s)?;
         Ok(Self {
             length: data.len(),
@@ -24,9 +29,14 @@ impl WireMessage {
         })
     }
 
-    pub fn message(&self) -> Result<Message, serde_cbor::Error> {
+    pub fn request(&self) -> Result<RpcRequest, serde_cbor::Error> {
         Ok(serde_cbor::from_slice(&self.data)?)
     }
+
+    pub fn response(&self) -> Result<EnclaveResponse, serde_cbor::Error> {
+        Ok(serde_cbor::from_slice(&self.data)?)
+    }
+
 
     pub fn to_bytes(self) -> Result<Vec<u8>, std::io::Error> {
         let mut len_bytes = vec![];

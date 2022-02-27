@@ -4,13 +4,10 @@ mod pool;
 use actix_web::{middleware::Logger, post, web, App, HttpServer, Responder};
 use async_trait::async_trait;
 use config::Config;
-use enclave::{Message, WireMessage};
+use enclave::{EnclaveResponse, RpcRequest, WireMessage};
 use pool::{Stream, StreamConnection};
 
-use tokio::{
-    io::{AsyncWriteExt},
-    net::UnixStream,
-};
+use tokio::{io::AsyncWriteExt, net::UnixStream};
 use tokio_vsock::VsockStream;
 
 #[derive(Clone)]
@@ -41,9 +38,9 @@ impl StreamConnection for StreamManager {
     }
 
     async fn ping(&self, stream: &mut Box<dyn Stream>) -> Result<(), tokio::io::Error> {
-        let message = Message::Ping(format!("test"));
+        let message = RpcRequest::Ping(format!("test"));
         match handle_message(&message, stream).await {
-            Ok(Some(Message::Pong(_))) => Ok(()),
+            Ok(Some(EnclaveResponse::Pong(_))) => Ok(()),
             Ok(None) | Ok(Some(_)) => Err(tokio::io::ErrorKind::NotFound)?,
             Err(e) => Err(e),
         }
@@ -85,12 +82,12 @@ async fn main() -> std::io::Result<()> {
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct ProxyPayload {
-    message: Message,
+    message: RpcRequest,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct ProxyPayloadResponse {
-    message: Option<Message>,
+    message: Option<EnclaveResponse>,
 }
 
 #[post("/proxy")]
@@ -108,15 +105,15 @@ async fn proxy(
 }
 
 async fn handle_message(
-    message: &Message,
+    message: &RpcRequest,
     stream: &mut Box<dyn Stream>,
-) -> std::io::Result<Option<Message>> {
+) -> std::io::Result<Option<EnclaveResponse>> {
     let message = WireMessage::new(message).unwrap().to_bytes()?;
     stream.write_all(&message).await?;
 
     let response = WireMessage::from_stream(stream)
         .await?
-        .map(|wm| wm.message().unwrap());
+        .map(|wm| wm.response().unwrap());
 
     Ok(response)
 }

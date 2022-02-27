@@ -1,7 +1,7 @@
 mod config;
 
 use config::Config;
-use enclave::{Message, WireMessage};
+use enclave::{EnclaveResponse, RpcRequest, WireMessage};
 use futures::StreamExt as _;
 use tokio::{
     io::{AsyncRead, AsyncWrite, AsyncWriteExt},
@@ -60,12 +60,11 @@ async fn handle_stream<S: AsyncRead + AsyncWrite + Unpin + Send + 'static>(strea
             match WireMessage::from_stream(&mut stream).await {
                 Ok(None) => break,
                 Ok(Some(message)) => {
-                    let message = message.message().unwrap();
+                    let message = message.request().unwrap();
                     log::info!("got {message:?}");
 
                     let response = match message {
-                        Message::Ping(m) => Message::Pong(m),
-                        Message::Pong(m) => Message::Ping(m),
+                        RpcRequest::Ping(m) => EnclaveResponse::Pong(m),
                     };
                     let out = WireMessage::new(&response).unwrap().to_bytes().unwrap();
 
