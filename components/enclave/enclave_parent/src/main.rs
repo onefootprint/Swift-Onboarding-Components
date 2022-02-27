@@ -1,6 +1,5 @@
 mod config;
 mod pool;
-use std::sync::Arc;
 
 use actix_web::{middleware::Logger, post, web, App, HttpServer, Responder};
 use async_trait::async_trait;
@@ -9,9 +8,8 @@ use enclave::{Message, WireMessage};
 use pool::{Stream, StreamConnection};
 
 use tokio::{
-    io::{AsyncRead, AsyncWrite, AsyncWriteExt},
+    io::{AsyncWriteExt},
     net::UnixStream,
-    sync::Mutex,
 };
 use tokio_vsock::VsockStream;
 
@@ -40,6 +38,15 @@ impl StreamConnection for StreamManager {
             Box::new(stream)
         };
         Ok(stream)
+    }
+
+    async fn ping(&self, stream: &mut Box<dyn Stream>) -> Result<(), tokio::io::Error> {
+        let message = Message::Ping(format!("test"));
+        match handle_message(&message, stream).await {
+            Ok(Some(Message::Pong(_))) => Ok(()),
+            Ok(None) | Ok(Some(_)) => Err(tokio::io::ErrorKind::NotFound)?,
+            Err(e) => Err(e),
+        }
     }
 }
 
@@ -94,20 +101,20 @@ async fn proxy(
     log::info!("got proxy request");
 
     // local development, we use a unix socket
-    let mut stream = state.pool.get().await.unwrap();
-    let response = handle_message(&message.message, stream.as_mut()).await?;
+    let mut conn = state.pool.get().await.unwrap();
+    let response = handle_message(&message.message, &mut conn).await?;
 
     Ok(web::Json(ProxyPayloadResponse { message: response }))
 }
 
-async fn handle_message<S: AsyncRead + AsyncWrite + Unpin>(
+async fn handle_message(
     message: &Message,
-    mut stream: S,
+    stream: &mut Box<dyn Stream>,
 ) -> std::io::Result<Option<Message>> {
     let message = WireMessage::new(message).unwrap().to_bytes()?;
     stream.write_all(&message).await?;
 
-    let response = WireMessage::from_stream(&mut stream)
+    let response = WireMessage::from_stream(stream)
         .await?
         .map(|wm| wm.message().unwrap());
 

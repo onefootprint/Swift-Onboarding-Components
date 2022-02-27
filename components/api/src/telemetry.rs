@@ -1,4 +1,3 @@
-use actix_web_opentelemetry::RequestMetrics;
 use futures_util::Stream;
 use futures_util::StreamExt;
 use opentelemetry::global;

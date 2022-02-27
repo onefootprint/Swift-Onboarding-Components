@@ -13,6 +13,7 @@ impl Stream for UnixStream {}
 #[async_trait]
 pub trait StreamConnection {
     async fn new_stream(&self) -> Result<Box<dyn Stream>, tokio::io::Error>;
+    async fn ping(&self, stream: &mut Box<dyn Stream>) -> Result<(), tokio::io::Error>;
 }
 
 pub struct StreamManager<T>(pub T);
@@ -31,6 +32,7 @@ where
     }
 
     async fn is_valid(&self, conn: &mut PooledConnection<'_, Self>) -> Result<(), Self::Error> {
+        self.0.ping(conn).await?;
         Ok(())
     }
 
