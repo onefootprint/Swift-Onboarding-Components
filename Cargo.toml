@@ -3,5 +3,5 @@
 members = [
     "components/api",
     "components/enclave/enclave",
-    "components/enclave/enclave_parent",
+    "components/enclave/enclave_proxy",
 ]

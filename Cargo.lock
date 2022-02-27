@@ -551,7 +551,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "enclave_parent"
+name = "enclave_proxy"
 version = "0.1.0"
 dependencies = [
  "actix-web",
