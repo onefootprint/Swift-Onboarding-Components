@@ -41,7 +41,7 @@ impl StreamConnection for StreamManager {
         let message = RpcRequest::Ping(format!("test"));
         match handle_message(&message, stream).await {
             Ok(Some(EnclaveResponse::Pong(_))) => Ok(()),
-            Ok(None) | Ok(Some(_)) => Err(tokio::io::ErrorKind::NotFound)?,
+            Ok(None) => Err(tokio::io::ErrorKind::NotFound)?,
             Err(e) => Err(e),
         }
     }

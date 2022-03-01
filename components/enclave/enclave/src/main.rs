@@ -1,7 +1,10 @@
 mod config;
 
 use config::Config;
-use enclave::{EnclaveResponse, RpcRequest, WireMessage};
+use enclave::{
+    enclave::handle_fn_decrypt, EnclavePayload, EnclaveResponse, RpcPayload, RpcRequest,
+    WireMessage,
+};
 use futures::StreamExt as _;
 use tokio::{
     io::{AsyncRead, AsyncWrite, AsyncWriteExt},
@@ -60,12 +63,11 @@ async fn handle_stream<S: AsyncRead + AsyncWrite + Unpin + Send + 'static>(strea
             match WireMessage::from_stream(&mut stream).await {
                 Ok(None) => break,
                 Ok(Some(message)) => {
-                    let message = message.request().unwrap();
-                    log::info!("got {message:?}");
+                    let request = message.request().unwrap();
+                    log::info!("got request {request:?}");
 
-                    let response = match message {
-                        RpcRequest::Ping(m) => EnclaveResponse::Pong(m),
-                    };
+                    let response = handle_request(request).await.unwrap();
+                    log::info!("proccessed response");
                     let out = WireMessage::new(&response).unwrap().to_bytes().unwrap();
 
                     stream.write_all(&out).await.unwrap();
@@ -76,4 +78,17 @@ async fn handle_stream<S: AsyncRead + AsyncWrite + Unpin + Send + 'static>(strea
             }
         }
     });
+}
+
+async fn handle_request(
+    request: RpcRequest,
+) -> Result<EnclaveResponse, Box<dyn std::error::Error>> {
+    let response = match request.payload {
+        RpcPayload::Ping(m) => EnclavePayload::Pong(m),
+        RpcPayload::FnDecrypt(decrypt_request) => {
+            EnclavePayload::FnDecryption(handle_fn_decrypt(decrypt_request).await?)
+        }
+    };
+
+    Ok(response)
 }
