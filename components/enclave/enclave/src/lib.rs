@@ -1,16 +1,26 @@
 use byteorder::{BigEndian, ByteOrder, WriteBytesExt};
+use crypto::seal::EciesP256Sha256AesGcmSealed;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 use tokio::io::{AsyncRead, AsyncReadExt};
 use uuid::Uuid;
 
-mod enclave;
+pub mod enclave;
 mod ne;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct RpcRequest {
     pub id: Uuid,
     pub payload: RpcPayload,
+}
+
+impl RpcRequest {
+    pub fn new(payload: RpcPayload) -> Self {
+        Self {
+            id: Uuid::new_v4(),
+            payload,
+        }
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -23,18 +33,19 @@ pub enum RpcPayload {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub struct EnvelopeDecrypt {
-    kms_creds: KmsCredentials,
-    transform: DataTransform,
-    sealed_key: Vec<u8>,
-    sealed_data: Vec<u8>,
+    pub kms_creds: KmsCredentials,
+    pub transform: DataTransform,
+    pub public_key: Vec<u8>,
+    pub sealed_key: Vec<u8>,
+    pub sealed_data: EciesP256Sha256AesGcmSealed,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct KmsCredentials {
-    region: String,
-    key_id: String,
-    secret_key: String,
-    session_token: String,
+    pub region: String,
+    pub key_id: String,
+    pub secret_key: String,
+    pub session_token: String,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -57,11 +68,23 @@ pub enum EnclavePayload {
     FnDecryption(FnDecryption),
 }
 
+impl TryFrom<EnclavePayload> for FnDecryption {
+    type Error = crate::Error;
+
+    fn try_from(value: EnclavePayload) -> Result<Self, Self::Error> {
+        if let EnclavePayload::FnDecryption(r) = value {
+            Ok(r)
+        } else {
+            Err(crate::Error::UnexpectedResponse)
+        }
+    }
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub struct FnDecryption {
-    transform: DataTransform,
-    data: Vec<u8>,
+    pub transform: DataTransform,
+    pub data: Vec<u8>,
 }
 
 #[derive(Debug, Clone)]
@@ -78,6 +101,8 @@ pub enum Error {
     Io(#[from] std::io::Error),
     #[error("mismatched request id")]
     MismatchedRequest,
+    #[error("unexpected response")]
+    UnexpectedResponse,
 }
 
 impl WireMessage {

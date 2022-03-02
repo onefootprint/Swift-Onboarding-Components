@@ -23,3 +23,10 @@ tracing-error = "0.2.0"
 opentelemetry-otlp = { version = "0.10", features = ["tonic", "metrics"] }
 tokio = { version = "1.0", features = ["full"] }
 futures-util = { version = "0.3", default-features = false, features = ["std"] }
+enclave_proxy = { path = "../enclave/enclave_proxy" }
+serde = { version = "1.0", features = ["derive"]}
+crypto = { path = "../enclave/crypto" }
+
+aws-config = "0.8"
+aws-sdk-kms = "0.8"
+aws-smithy-client = "0.38"

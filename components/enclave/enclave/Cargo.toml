@@ -18,3 +18,4 @@ byteorder = "1.4"
 env_logger = "0.9"
 uuid = { version = "0.8.2", features = ["v4", "serde"] }
 thiserror = "1.0"
+crypto = { path = "../crypto" }

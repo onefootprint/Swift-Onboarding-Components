@@ -20,3 +20,16 @@ impl Config {
         Ok(Config::init_from_env()?)
     }
 }
+
+impl crate::StreamConfig for Config {
+    fn stream_type(&self) -> crate::StreamType {
+        if let Some(path) = &self.unix_sock {
+            crate::StreamType::UnixSocket(path.clone())
+        } else {
+            crate::StreamType::Vsock {
+                cid: self.enclave_cid,
+                port: self.enclave_port,
+            }
+        }
+    }
+}

@@ -121,6 +121,7 @@ pub mod seal {
         Ok(sealed)
     }
 }
+pub use self::seal::seal_ecies_p256_x963_sha256_aes_gcm;
 
 pub mod unseal {
     use openssl::{

@@ -1,8 +1,11 @@
 pub mod b64;
+pub mod conversion;
 pub mod seal;
 
 use std::str::Utf8Error;
 use thiserror::Error;
+
+pub use hex;
 
 #[derive(Error, Debug)]
 pub enum Error {

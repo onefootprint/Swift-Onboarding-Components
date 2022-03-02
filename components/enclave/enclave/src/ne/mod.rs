@@ -2,12 +2,18 @@
 // SPDX-License-Identifier: Apache-2.0
 
 mod ffi;
-
+use thiserror::Error;
+#[derive(Debug, Error)]
 pub enum Error {
+    #[error("Init")]
     SdkInitError,
+    #[error("Generic")]
     SdkGenericError,
+    #[error("Config")]
     SdkKmsConfigError,
+    #[error("Client")]
     SdkKmsClientError,
+    #[error("Decrypt")]
     SdkKmsDecryptError,
 }
 

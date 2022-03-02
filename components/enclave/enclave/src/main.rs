@@ -68,7 +68,10 @@ async fn handle_stream<S: AsyncRead + AsyncWrite + Unpin + Send + 'static>(strea
 
                     let response = handle_request(request).await.unwrap();
                     log::info!("proccessed response");
-                    let out = WireMessage::new(&response).unwrap().to_bytes().unwrap();
+                    let out = WireMessage::from_response(&response)
+                        .unwrap()
+                        .to_bytes()
+                        .unwrap();
 
                     stream.write_all(&out).await.unwrap();
                 }
@@ -83,12 +86,15 @@ async fn handle_stream<S: AsyncRead + AsyncWrite + Unpin + Send + 'static>(strea
 async fn handle_request(
     request: RpcRequest,
 ) -> Result<EnclaveResponse, Box<dyn std::error::Error>> {
-    let response = match request.payload {
+    let payload = match request.payload {
         RpcPayload::Ping(m) => EnclavePayload::Pong(m),
         RpcPayload::FnDecrypt(decrypt_request) => {
             EnclavePayload::FnDecryption(handle_fn_decrypt(decrypt_request).await?)
         }
     };
 
-    Ok(response)
+    Ok(EnclaveResponse {
+        payload,
+        request_id: request.id,
+    })
 }

@@ -12,8 +12,8 @@ impl Stream for UnixStream {}
 
 #[async_trait]
 pub trait StreamConnection {
-    async fn new_stream(&self) -> Result<Box<dyn Stream>, tokio::io::Error>;
-    async fn ping(&self, stream: &mut Box<dyn Stream>) -> Result<(), tokio::io::Error>;
+    async fn new_stream(&self) -> Result<Box<dyn Stream>, crate::Error>;
+    async fn ping(&self, stream: &mut Box<dyn Stream>) -> Result<(), crate::Error>;
 }
 
 pub struct StreamManager<T>(pub T);
@@ -24,7 +24,7 @@ where
     T: StreamConnection + Sized + Send + Sync + 'static,
 {
     type Connection = Box<dyn Stream>;
-    type Error = tokio::io::Error;
+    type Error = crate::Error;
 
     async fn connect(&self) -> Result<Self::Connection, Self::Error> {
         let stream = self.0.new_stream().await?;
