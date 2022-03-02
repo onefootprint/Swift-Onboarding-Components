@@ -106,7 +106,6 @@ async fn encrypt(
 #[derive(Debug, Clone, serde::Deserialize)]
 struct DataDecryptionRequest {
     sealed_data: String,
-    public_key: Base64Data,
     sealed_private_key: Base64Data,
 }
 
@@ -127,7 +126,6 @@ async fn decrypt(
             session_token: String::new(),
         },
         sealed_data: EciesP256Sha256AesGcmSealed::from_str(req.sealed_data.as_str()).unwrap(),
-        public_key: req.public_key.0,
         sealed_key: req.sealed_private_key.0,
         transform: enclave_proxy::DataTransform::Identity,
     }));

@@ -21,32 +21,15 @@ pub enum Error {
     #[error("JSON coding Error")]
     Cbor(#[from] serde_cbor::Error),
 
-    #[error("Crypto ring internal error")]
-    Ring,
-
     #[error("Invalid utf8")]
     InvalidUtf8(#[from] Utf8Error),
 
-    #[error("OpenSSL crypto error")]
-    OpenSSL,
-}
+    #[error("ecc error {0}")]
+    Ecc(#[from] elliptic_curve::Error),
 
-impl From<openssl::error::ErrorStack> for Error {
-    fn from(_: openssl::error::ErrorStack) -> Self {
-        Error::OpenSSL
-    }
-}
+    #[error("Invalid der public key")]
+    InvalidDerP256PublicKey,
 
-impl From<ring::error::Unspecified> for Error {
-    fn from(_: ring::error::Unspecified) -> Self {
-        Error::Ring
-    }
-}
-
-pub mod util {
-    pub fn safe_compare(a: &[u8], b: &[u8]) -> bool {
-        let left = ring::digest::digest(&ring::digest::SHA256, a);
-        let right = ring::digest::digest(&ring::digest::SHA256, b);
-        left.as_ref() == right.as_ref()
-    }
+    #[error("aead encrypt failed")]
+    AeadEncrypt,
 }

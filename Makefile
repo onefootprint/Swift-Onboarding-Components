@@ -14,6 +14,10 @@ debug:
 build-eif:
 	rm -f ./out/enclave.eif
 	@echo "building enclave"
+
+	aws-nitro-enclaves-sdk-c
+	@docker run -v "cargo-cache:/root/.cargo/registry" -v "${PWD}:/volume" --rm -t enclave_builder:latest cargo build --bin enclave
+
 	@cargo build --bin enclave --target=x86_64-unknown-linux-musl --release
 	@cp ./target/x86_64-unknown-linux-musl/release/enclave ./out/enclave
 	@docker build -t enclave -f enclave.dockerfile .

@@ -19,7 +19,6 @@ pub async fn handle_fn_decrypt(request: EnvelopeDecrypt) -> Result<FnDecryption,
     let EnvelopeDecrypt {
         kms_creds,
         transform,
-        public_key,
         sealed_key,
         sealed_data,
     } = request;
@@ -46,7 +45,6 @@ pub async fn handle_fn_decrypt(request: EnvelopeDecrypt) -> Result<FnDecryption,
 
     let result = crypto::seal::unseal::unseal_ecies_p256_x963_sha256_aes_gcm(
         &private_key_raw,
-        &public_key,
         sealed_data,
     )?;
 

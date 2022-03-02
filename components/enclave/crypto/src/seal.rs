@@ -1,12 +1,16 @@
+use aes_gcm::aead::Payload;
+use aes_gcm::aead::{Aead, NewAead};
+use aes_gcm::{Aes256Gcm, Key, Nonce};
+use p256::{ecdh::EphemeralSecret, EncodedPoint};
+use rand_core::{OsRng, RngCore};
+use serde::{Deserialize, Serialize};
+use sha2::{Digest, Sha256};
 use std::str::FromStr;
 
-use ring::aead::{BoundKey, NonceSequence};
-use ring::agreement::EphemeralPrivateKey;
-use ring::rand::SecureRandom;
-use ring::{agreement, digest, rand};
-use serde::{Deserialize, Serialize};
-
 use crate::b64::Base64Data;
+
+pub use self::seal::seal_ecies_p256_x963_sha256_aes_gcm;
+pub use self::unseal::unseal_ecies_p256_x963_sha256_aes_gcm;
 
 #[derive(Serialize, Debug, Deserialize, Clone)]
 /// ECDH sealed data
@@ -42,186 +46,141 @@ impl EciesP256Sha256AesGcmSealed {
     }
 }
 
-struct OneTimeNonce(Option<ring::aead::Nonce>);
-impl NonceSequence for OneTimeNonce {
-    fn advance(&mut self) -> Result<ring::aead::Nonce, ring::error::Unspecified> {
-        self.0.take().ok_or(ring::error::Unspecified)
-    }
-}
-
 fn x963_kdf_sha256_32(shared_key: &[u8], shared_info: &[u8]) -> [u8; 32] {
     // we only need one round
     let counter: Vec<u8> = vec![0, 0, 0, 1];
     let input = vec![shared_key, &counter, shared_info].concat();
-    let digest = digest::digest(&digest::SHA256, &input);
 
-    let mut output = [0u8; ring::digest::SHA256_OUTPUT_LEN];
-    output.copy_from_slice(digest.as_ref());
-    output
+    let mut hasher = Sha256::new();
+    hasher.update(&input);
+    let output = hasher.finalize();
+    output.into()
 }
 
 pub mod seal {
     use super::*;
 
     /// Anon ECDH0-based sealing under the public key (ECIESEncryptionCofactorVariableIVX963SHA256AESGCM)
+    /// public key is uncompressed
     pub fn seal_ecies_p256_x963_sha256_aes_gcm(
         public_key: &[u8],
         message: Vec<u8>,
     ) -> Result<EciesP256Sha256AesGcmSealed, crate::Error> {
-        let rng = rand::SystemRandom::new();
-
         // generate the ephemeral key pair
-        let ephem_priv_key = agreement::EphemeralPrivateKey::generate(&agreement::ECDH_P256, &rng)?;
+        let ephem_priv_key = EphemeralSecret::random(&mut OsRng);
 
         // generate a nonce
         let mut nonce = [0u8; 12];
-        rng.fill(&mut nonce)?;
+        OsRng.fill_bytes(&mut nonce);
 
         seal_ecies_p256_x963_sha256_aes_gcm_internal(public_key, ephem_priv_key, nonce, message)
     }
 
     /// Anon ECDH0-based sealing under the public key (ECIESEncryptionCofactorVariableIVX963SHA256AESGCM)
+    /// public key is uncompressed
     fn seal_ecies_p256_x963_sha256_aes_gcm_internal(
         recipient_public_key: &[u8],
-        ephemeral_private_key: EphemeralPrivateKey,
-        nonce: [u8; 12],
+        ephemeral_private_key: EphemeralSecret,
+        iv: [u8; 12],
         message: Vec<u8>,
     ) -> Result<EciesP256Sha256AesGcmSealed, crate::Error> {
-        let peer_public_key =
-            agreement::UnparsedPublicKey::new(&agreement::ECDH_P256, recipient_public_key);
+        let peer_public_key = p256::PublicKey::from_sec1_bytes(recipient_public_key)?;
 
-        let ephemeral_public_key = ephemeral_private_key.compute_public_key()?;
+        let ephemeral_public_key = EncodedPoint::from(ephemeral_private_key.public_key());
 
-        let sealed = agreement::agree_ephemeral(
-            ephemeral_private_key,
-            &peer_public_key,
-            ring::error::Unspecified,
-            |shared_key| {
-                // compute x963 over sha256
-                let kdf = x963_kdf_sha256_32(shared_key, ephemeral_public_key.as_ref());
+        let shared_key = {
+            let pre_shared = ephemeral_private_key.diffie_hellman(&peer_public_key);
+            x963_kdf_sha256_32(pre_shared.as_bytes(), ephemeral_public_key.as_bytes())
+        };
 
-                let iv = ring::aead::Nonce::assume_unique_for_key(nonce.clone());
+        let key = Key::from_slice(&shared_key);
+        let cipher = Aes256Gcm::new(key);
+        let nonce = Nonce::from_slice(&iv);
 
-                // do aesgcm-256
-                let key = ring::aead::UnboundKey::new(&ring::aead::AES_256_GCM, &kdf)?;
-                let mut key = ring::aead::SealingKey::new(key, OneTimeNonce(Some(iv)));
-                let aad = ring::aead::Aad::from(recipient_public_key);
+        let payload = Payload {
+            msg: &message,
+            aad: &recipient_public_key,
+        };
+        let ciphertext_and_tag = cipher
+            .encrypt(nonce, payload)
+            .map_err(|_| crate::Error::AeadEncrypt)?;
 
-                let mut sealed = message;
-                key.seal_in_place_append_tag(aad, &mut sealed)?;
-
-                Ok(EciesP256Sha256AesGcmSealed {
-                    ephemeral_public_key: ephemeral_public_key.as_ref().to_vec(),
-                    iv: nonce,
-                    ciphertext_and_tag: sealed,
-                })
-            },
-        )?;
-
-        Ok(sealed)
+        Ok(EciesP256Sha256AesGcmSealed {
+            ephemeral_public_key: ephemeral_public_key.as_ref().to_vec(),
+            iv,
+            ciphertext_and_tag,
+        })
     }
 }
-pub use self::seal::seal_ecies_p256_x963_sha256_aes_gcm;
 
 pub mod unseal {
-    use openssl::{
-        bn::{BigNum, BigNumContext},
-        ec::{self, EcGroup, EcKey, EcPoint},
-        nid::Nid,
-        pkey::PKey,
-    };
-
     use super::*;
+    use elliptic_curve::{ecdh::diffie_hellman, sec1::ToEncodedPoint};
 
     pub struct Plain(pub Vec<u8>);
 
+    /// raw private key BE
     pub fn unseal_ecies_p256_x963_sha256_aes_gcm(
         private_key_bytes: &[u8],
-        public_key_bytes: &[u8],
         sealed: EciesP256Sha256AesGcmSealed,
     ) -> Result<Plain, crate::Error> {
-        openssl::init();
-
         // init our private key
-        let private_key = {
-            let group = EcGroup::from_curve_name(Nid::X9_62_PRIME256V1)?;
-            let mut ctx = BigNumContext::new()?;
-            let pk = EcPoint::from_bytes(&group, &public_key_bytes, &mut ctx)?;
-            let sk = BigNum::from_slice(&private_key_bytes)?;
-            EcKey::from_private_components(&group, &sk, &pk)?
-        };
+        let private_key = p256::SecretKey::from_be_bytes(private_key_bytes)?;
+        let public_key = private_key.public_key().to_encoded_point(false);
 
         let EciesP256Sha256AesGcmSealed {
             ephemeral_public_key,
             iv,
-            ciphertext_and_tag: mut sealed,
+            ciphertext_and_tag,
         } = sealed;
 
         // init the peer public key
-        let peer_public_key = {
-            let group = EcGroup::from_curve_name(Nid::X9_62_PRIME256V1)?;
-            let mut ctx = BigNumContext::new()?;
-            let point = EcPoint::from_bytes(&group, &ephemeral_public_key, &mut ctx)?;
-            EcKey::from_public_key(&group, &point)?
-        };
+        let peer_public_key = p256::PublicKey::from_sec1_bytes(&ephemeral_public_key)?;
 
         // ecdh
-        let our_private_pkey = PKey::from_ec_key(private_key)?;
-        let peer_pkey = PKey::from_ec_key(peer_public_key)?;
+        let shared_key = {
+            let pre_shared =
+                diffie_hellman(private_key.to_nonzero_scalar(), peer_public_key.as_affine());
+            x963_kdf_sha256_32(pre_shared.as_bytes(), &ephemeral_public_key)
+        };
 
-        let mut deriver = openssl::derive::Deriver::new(&our_private_pkey)?;
-        deriver.set_peer(&peer_pkey)?;
+        let key = Key::from_slice(&shared_key);
+        let cipher = Aes256Gcm::new(key);
+        let nonce = Nonce::from_slice(&iv);
+        let payload = Payload {
+            msg: &ciphertext_and_tag,
+            aad: public_key.as_bytes(),
+        };
 
-        let shared_key = deriver.derive_to_vec()?;
-        let kdf = x963_kdf_sha256_32(&shared_key, ephemeral_public_key.as_ref());
+        let plain = cipher
+            .decrypt(nonce, payload)
+            .map_err(|_| crate::Error::AeadEncrypt)?;
 
-        let key = ring::aead::UnboundKey::new(&ring::aead::AES_256_GCM, &kdf)?;
-        let iv = ring::aead::Nonce::assume_unique_for_key(iv.clone());
-        let mut key = ring::aead::OpeningKey::new(key, OneTimeNonce(Some(iv)));
-        let aad = ring::aead::Aad::from(public_key_bytes);
-
-        key.open_in_place(aad, &mut sealed)?;
-        let plaintext_len = sealed.len() - ring::aead::AES_256_GCM.tag_len();
-        Ok(Plain(sealed[0..plaintext_len].to_vec()))
+        Ok(Plain(plain))
     }
 }
 
 #[cfg(test)]
 mod tests {
-
-    use openssl::{
-        bn::BigNumContext,
-        ec::{EcGroup, PointConversionForm},
-        nid::Nid,
-    };
+    use elliptic_curve::sec1::ToEncodedPoint;
 
     use super::*;
 
     #[test]
     fn test_seal_unseal_rand() {
-        openssl::init();
-
-        let group = EcGroup::from_curve_name(Nid::X9_62_PRIME256V1).unwrap();
-        let mut ctx = BigNumContext::new().unwrap();
-
-        let kp = openssl::ec::EcKey::generate(&group).unwrap();
-
-        let sk = kp.private_key().to_vec();
-        dbg!(sk.len());
-        dbg!(hex::encode(&sk));
-
-        let pk = kp
-            .public_key()
-            .to_bytes(&group, PointConversionForm::UNCOMPRESSED, &mut ctx)
-            .unwrap();
+        let sk = p256::SecretKey::random(&mut OsRng);
+        let pk = sk.public_key().to_encoded_point(false);
         dbg!(pk.len());
-        dbg!(hex::encode(&pk));
+        dbg!(sk.to_be_bytes().to_vec().len());
 
         let message = b"hello world";
-        let sealed = seal::seal_ecies_p256_x963_sha256_aes_gcm(&pk, message.to_vec()).unwrap();
+        let sealed =
+            seal::seal_ecies_p256_x963_sha256_aes_gcm(pk.as_bytes(), message.to_vec()).unwrap();
         dbg!(sealed.to_string().unwrap());
-
-        let unsealed = unseal::unseal_ecies_p256_x963_sha256_aes_gcm(&sk, &pk, sealed).unwrap();
+        dbg!(sealed.ephemeral_public_key.len());
+        let unsealed =
+            unseal::unseal_ecies_p256_x963_sha256_aes_gcm(&sk.to_be_bytes().to_vec(), sealed)
+                .unwrap();
 
         assert_eq!(unsealed.0, message.to_vec());
     }
@@ -235,7 +194,6 @@ mod tests {
 
         let unsealed = unseal::unseal_ecies_p256_x963_sha256_aes_gcm(
             &sk,
-            &pk,
             EciesP256Sha256AesGcmSealed::from_str(sealed).unwrap(),
         )
         .unwrap();

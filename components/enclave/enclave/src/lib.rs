@@ -35,7 +35,6 @@ pub enum RpcPayload {
 pub struct EnvelopeDecrypt {
     pub kms_creds: KmsCredentials,
     pub transform: DataTransform,
-    pub public_key: Vec<u8>,
     pub sealed_key: Vec<u8>,
     pub sealed_data: EciesP256Sha256AesGcmSealed,
 }
