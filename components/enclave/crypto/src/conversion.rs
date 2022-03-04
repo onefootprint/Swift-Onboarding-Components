@@ -1,4 +1,7 @@
 use elliptic_curve::{pkcs8::DecodePublicKey, sec1::ToEncodedPoint};
+use sec1::der::Decodable;
+
+use self::ec_decode_helper::EcPrivateKeyWrapper;
 
 pub fn public_key_der_to_raw_uncompressed(der_bytes: &[u8]) -> Result<Vec<u8>, crate::Error> {
     let pk = p256::PublicKey::from_public_key_der(der_bytes)
@@ -7,7 +10,70 @@ pub fn public_key_der_to_raw_uncompressed(der_bytes: &[u8]) -> Result<Vec<u8>, c
 }
 
 pub fn private_key_der_to_raw_uncompressed(der_bytes: &[u8]) -> Result<Vec<u8>, crate::Error> {
-    Ok(p256::SecretKey::from_sec1_der(der_bytes)?
+    let EcPrivateKeyWrapper { private_key } =
+        ec_decode_helper::EcPrivateKeyWrapper::from_der(der_bytes)
+            .map_err(|_| crate::Error::InvalidDerP256PrivateKey)?;
+    Ok(p256::SecretKey::from_be_bytes(private_key.private_key)?
         .to_be_bytes()
         .to_vec())
+}
+
+mod ec_decode_helper {
+    //! SEC1 elliptic curve private key support.
+    //!
+    //! Support for ASN.1 DER-encoded elliptic curve private keys as described in
+    //! SEC1: Elliptic Curve Cryptography (Version 2.0) Appendix C.4 (p.108):
+    //!
+    //! <https://www.secg.org/sec1-v2.pdf>
+
+    use core::fmt;
+    use sec1::{
+        der::{self, Decodable, Decoder},
+        EcPrivateKey,
+    };
+
+    #[derive(Clone)]
+    pub struct EcPrivateKeyWrapper<'a> {
+        /// Private key data.
+        pub private_key: EcPrivateKey<'a>,
+    }
+
+    impl<'a> Decodable<'a> for EcPrivateKeyWrapper<'a> {
+        fn decode(decoder: &mut Decoder<'a>) -> der::Result<Self> {
+            decoder.sequence(|decoder| {
+                if decoder.uint8()? != 0 {
+                    return Err(der::Tag::Integer.value_error());
+                }
+
+                let _ = decoder.any()?;
+
+                let ec_private_key = decoder.octet_string()?.as_bytes();
+                let private_key = EcPrivateKey::from_der(ec_private_key)?;
+
+                Ok(EcPrivateKeyWrapper { private_key })
+            })
+        }
+    }
+    impl<'a> TryFrom<&'a [u8]> for EcPrivateKeyWrapper<'a> {
+        type Error = der::Error;
+
+        fn try_from(bytes: &'a [u8]) -> Result<EcPrivateKeyWrapper<'a>, Self::Error> {
+            Ok(Self::from_der(bytes)?)
+        }
+    }
+
+    impl<'a> fmt::Debug for EcPrivateKeyWrapper<'a> {
+        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+            self.private_key.fmt(f)
+        }
+    }
+}
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn test_convert_private_key() {
+        let key = hex::decode("308193020100301306072a8648ce3d020106082a8648ce3d0301070479307702010104200885f83d737270e27c6d289670b25c53df74c938aa5ff6a92a0973f1078337cea00a06082a8648ce3d030107a1440342000443b939f03a7ece0d11d7bdad66c2c26aca4c8b36ef15af2eb4ce6b2a5126eaad2415a27928a8916db0404a143c74acbaa6ac4af3038d1d8ca97fa56aabb62e67").unwrap();
+
+        super::private_key_der_to_raw_uncompressed(&key).unwrap();
+    }
 }

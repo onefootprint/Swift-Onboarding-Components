@@ -866,6 +866,7 @@ dependencies = [
  "hex",
  "p256",
  "rand_core",
+ "sec1",
  "serde",
  "serde_cbor",
  "sha2 0.10.2",
@@ -1021,6 +1022,9 @@ dependencies = [
 name = "enclave"
 version = "0.1.0"
 dependencies = [
+ "aws-config",
+ "aws-sdk-kms",
+ "aws-types",
  "byteorder",
  "crypto",
  "env_logger",
@@ -1168,7 +1172,6 @@ dependencies = [
  "actix-web-opentelemetry",
  "aws-config",
  "aws-sdk-kms",
- "aws-smithy-client",
  "crypto",
  "dotenv",
  "enclave_proxy",

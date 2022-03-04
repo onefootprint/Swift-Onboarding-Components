@@ -15,12 +15,10 @@ build-eif:
 	rm -f ./out/enclave.eif
 	@echo "building enclave"
 
-	aws-nitro-enclaves-sdk-c
-	@docker run -v "cargo-cache:/root/.cargo/registry" -v "${PWD}:/volume" --rm -t enclave_builder:latest cargo build --bin enclave
+	@docker run -v "cargo-cache:/root/.cargo/registry" -v "${PWD}:/build" --rm -t enclave_builder:latest cargo build --bin enclave --target=x86_64-unknown-linux-musl --no-default-features --features nitro --release
 
-	@cargo build --bin enclave --target=x86_64-unknown-linux-musl --release
 	@cp ./target/x86_64-unknown-linux-musl/release/enclave ./out/enclave
-	@docker build -t enclave -f enclave.dockerfile .
+
 	@nitro-cli build-enclave --docker-dir ./ --docker-uri enclave:latest --output-file ./out/enclave.eif --private-key ../enclavekey.pem --signing-certificate ../cert.pem
 
 run-enclave:

@@ -6,7 +6,8 @@ use aws_sdk_kms::model::DataKeyPairSpec;
 use config::Config;
 use crypto::{b64::Base64Data, seal::EciesP256Sha256AesGcmSealed};
 use enclave_proxy::{
-    bb8, pool, EnvelopeDecrypt, FnDecryption, KmsCredentials, RpcPayload, StreamManager,
+    bb8, pool, EnclavePayload, EnvelopeDecrypt, FnDecryption, KmsCredentials, RpcPayload,
+    StreamManager,
 };
 use serde::Deserialize;
 use telemetry::TelemetrySpanBuilder;
@@ -38,11 +39,22 @@ async fn index(req: HttpRequest) -> impl Responder {
     HttpResponse::Ok().body(format!("{headers}"))
 }
 
-#[tracing::instrument(name = "test", skip(_req))]
+#[tracing::instrument(name = "test", skip(state))]
 #[get("/test")]
-async fn test(_req: HttpRequest) -> impl Responder {
-    tracing::info!("in test");
-    "hello"
+async fn test(state: web::Data<State>) -> impl Responder {
+    let mut conn = state.enclave_connection_pool.get().await.unwrap();
+    let req = enclave_proxy::RpcRequest::new(RpcPayload::Ping("test".into()));
+
+    tracing::info!("sending request");
+    let response = enclave_proxy::send_rpc_request(&req, &mut conn)
+        .await
+        .unwrap();
+
+    if let EnclavePayload::Pong(response) = response {
+        response
+    } else {
+        "invalid response".to_string()
+    }
 }
 
 #[tracing::instrument(name = "log_headers")]
@@ -120,10 +132,10 @@ async fn decrypt(
     let mut conn = state.enclave_connection_pool.get().await.unwrap();
     let req = enclave_proxy::RpcRequest::new(RpcPayload::FnDecrypt(EnvelopeDecrypt {
         kms_creds: KmsCredentials {
-            key_id: state.config.root_key_id.clone(),
+            key_id: state.config.enclave_aws_access_key_id.clone(),
             region: state.config.aws_region.clone(),
             secret_key: state.config.enclave_aws_secret_access_key.clone(),
-            session_token: String::new(),
+            session_token: None,
         },
         sealed_data: EciesP256Sha256AesGcmSealed::from_str(req.sealed_data.as_str()).unwrap(),
         sealed_key: req.sealed_private_key.0,
@@ -159,9 +171,10 @@ async fn main() -> std::io::Result<()> {
         let manager = StreamManager {
             config: config.clone(),
         };
+
         let pool = bb8::Pool::builder()
-            .min_idle(Some(3))
-            .max_size(5)
+            .min_idle(Some(1))
+            .max_size(1)
             .build(pool::StreamManager(manager))
             .await
             .unwrap();
@@ -187,6 +200,7 @@ async fn main() -> std::io::Result<()> {
             .service(index)
             .service(test)
             .service(encrypt)
+            .service(decrypt)
     })
     .bind(("0.0.0.0", config.port))?
     .run()

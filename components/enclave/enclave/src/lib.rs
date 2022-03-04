@@ -6,7 +6,6 @@ use tokio::io::{AsyncRead, AsyncReadExt};
 use uuid::Uuid;
 
 pub mod enclave;
-mod ne;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct RpcRequest {
@@ -44,11 +43,12 @@ pub struct KmsCredentials {
     pub region: String,
     pub key_id: String,
     pub secret_key: String,
-    pub session_token: String,
+    pub session_token: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
+#[serde(tag = "type")]
 pub enum DataTransform {
     /// no transform, just the plain data
     Identity,

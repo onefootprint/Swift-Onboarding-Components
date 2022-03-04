@@ -29,8 +29,10 @@ async fn listen_unix_sock(path: &str) -> std::io::Result<()> {
     let listener = UnixListener::bind(path)?;
     log::info!("Listening for UNIX SOCKET connections at path: {path}");
 
-    while let Some((stream, _)) = listener.accept().await.ok() {
-        handle_stream(stream).await
+    while let Some((mut stream, _)) = listener.accept().await.ok() {
+        let _ = handle_stream(&mut stream)
+            .await
+            .map_err(|e| eprintln!("handle stream error: {:?}", e));
     }
 
     Ok(())
@@ -44,7 +46,17 @@ async fn listen_vsock(port: u32) -> std::io::Result<()> {
     let mut incoming = listener.incoming();
     while let Some(result) = incoming.next().await {
         match result {
-            Ok(stream) => handle_stream(stream).await,
+            Ok(stream) => {
+                log::info!("= new stream =");
+                tokio::spawn(async move {
+                    let mut stream = stream;
+                    loop {
+                        let _ = handle_stream(&mut stream)
+                            .await
+                            .map_err(|e| eprintln!("handle stream error: {:?}", e));
+                    }
+                });
+            }
             Err(e) => {
                 log::error!("Got error accepting connection: {:?}", e);
                 return Err(e);
@@ -55,32 +67,27 @@ async fn listen_vsock(port: u32) -> std::io::Result<()> {
     Ok(())
 }
 
-async fn handle_stream<S: AsyncRead + AsyncWrite + Unpin + Send + 'static>(stream: S) {
-    log::info!("= new stream =");
-    tokio::spawn(async move {
-        let mut stream = stream;
-        loop {
-            match WireMessage::from_stream(&mut stream).await {
-                Ok(None) => break,
-                Ok(Some(message)) => {
-                    let request = message.request().unwrap();
-                    log::info!("got request {request:?}");
+async fn handle_stream<S: AsyncRead + AsyncWrite + Unpin + Send + 'static>(
+    stream: &mut S,
+) -> Result<(), Box<dyn std::error::Error>> {
+    match WireMessage::from_stream(stream).await {
+        Ok(None) => Ok(()),
+        Ok(Some(message)) => {
+            let request = message.request()?;
+            eprintln!("got request {request:?}");
 
-                    let response = handle_request(request).await.unwrap();
-                    log::info!("proccessed response");
-                    let out = WireMessage::from_response(&response)
-                        .unwrap()
-                        .to_bytes()
-                        .unwrap();
+            let response = handle_request(request).await?;
+            eprintln!("proccessed response");
+            let out = WireMessage::from_response(&response)?.to_bytes()?;
 
-                    stream.write_all(&out).await.unwrap();
-                }
-                Err(e) => {
-                    log::error!("invalid message: {e}");
-                }
-            }
+            stream.write_all(&out).await?;
+            Ok(())
         }
-    });
+        Err(e) => {
+            eprintln!("invalid wire message: {e}");
+            Ok(())
+        }
+    }
 }
 
 async fn handle_request(

@@ -30,6 +30,9 @@ pub enum Error {
     #[error("Invalid der public key")]
     InvalidDerP256PublicKey,
 
+    #[error("Invalid der private key")]
+    InvalidDerP256PrivateKey,
+
     #[error("aead encrypt failed")]
     AeadEncrypt,
 }

@@ -1,18 +1,25 @@
 use thiserror::Error;
 
-use crate::ne::kms_decrypt;
+#[cfg(feature = "simulate")]
+mod simulated;
+
+#[cfg(feature = "nitro")]
+mod ne;
+
 use crate::{EnvelopeDecrypt, FnDecryption, KmsCredentials};
 
 #[derive(Error, Debug)]
 pub enum Error {
+    #[cfg(feature = "simulate")]
     #[error("Enclave Error {0}")]
-    EnclaveKmsError(#[from] crate::ne::Error),
+    SimulateEnclaveKmsError(#[from] simulated::Error),
+
+    #[cfg(feature = "nitro")]
+    #[error("Enclave Error {0}")]
+    NitroEnclaveKmsError(#[from] ne::Error),
 
     #[error("Crypto Error {0}")]
     CryptoError(#[from] crypto::Error),
-
-    #[error("join {0}")]
-    JoinError(#[from] tokio::task::JoinError),
 }
 
 pub async fn handle_fn_decrypt(request: EnvelopeDecrypt) -> Result<FnDecryption, Error> {
@@ -23,33 +30,34 @@ pub async fn handle_fn_decrypt(request: EnvelopeDecrypt) -> Result<FnDecryption,
         sealed_data,
     } = request;
 
-    let private_key_der = tokio::task::spawn_blocking(move || {
-        let KmsCredentials {
-            region,
-            key_id,
-            secret_key,
-            session_token,
-        } = kms_creds;
-        kms_decrypt(
-            region.as_bytes(),
-            key_id.as_bytes(),
-            secret_key.as_bytes(),
-            session_token.as_bytes(),
-            &sealed_key,
-        )
-    })
-    .await??;
+    let private_key_der = kms_decrypt(kms_creds, sealed_key).await?;
+
+    log::info!(
+        "got private key plaintext {:?} {:?}",
+        private_key_der.len(),
+        crypto::hex::encode(&private_key_der)
+    );
 
     let private_key_raw =
         crypto::conversion::private_key_der_to_raw_uncompressed(&private_key_der)?;
 
-    let result = crypto::seal::unseal::unseal_ecies_p256_x963_sha256_aes_gcm(
-        &private_key_raw,
-        sealed_data,
-    )?;
+    log::info!("converted private key");
+
+    let result =
+        crypto::seal::unseal::unseal_ecies_p256_x963_sha256_aes_gcm(&private_key_raw, sealed_data)?;
+
+    log::info!("unsealed");
 
     Ok(FnDecryption {
         data: result.0,
         transform,
     })
+}
+
+pub async fn kms_decrypt(kms_creds: KmsCredentials, ciphertext: Vec<u8>) -> Result<Vec<u8>, Error> {
+    #[cfg(feature = "nitro")]
+    return Ok(ne::kms_decrypt(kms_creds, ciphertext).await?);
+
+    #[cfg(feature = "simulate")]
+    return Ok(simulated::kms_decrypt(kms_creds, ciphertext).await?);
 }

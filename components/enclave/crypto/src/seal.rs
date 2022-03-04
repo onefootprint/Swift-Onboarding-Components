@@ -188,7 +188,7 @@ mod tests {
     #[test]
     fn test_seal_unseal_static() {
         let sealed = "fp01o2NlcGuYQQQSGLMYrRjQGCIYwRhLGJwYbBjpGOUY3BjJEhj8GFYYWQcY_xjIGPIY1Bj7GPsYSBj4GN8Y1RiVGH8YVRiTExgaGH4YLhjKGGsYvBi3GJYYXBi9GOUY1xj7GIAYaRiUGEQYaxhoGJwYNBjXGFUTGBsYsBhNGFsY-w0CYml2jBgoGJ0YjxirGOgYQhhaGN8YVBioABjfYWOYGxg7GLwY5xgbGDMYnBjWGMIYawoJGEAYnhg6GJcUGGQY0BiiGOAYGBiYGOQYTRhSGDUYmA";
-        let pk = hex::decode("04b6b5fa75eb4d441a1aa67f7b1f38eee95e4f8c2bb7b203fba687a4c97833fecf1a6dd6ed3b3cc39f3af346df2bb0ac41037ae8b4ffcf992492a90e862353f23f").unwrap();
+        let _pk = hex::decode("04b6b5fa75eb4d441a1aa67f7b1f38eee95e4f8c2bb7b203fba687a4c97833fecf1a6dd6ed3b3cc39f3af346df2bb0ac41037ae8b4ffcf992492a90e862353f23f").unwrap();
         let sk = hex::decode("85420d2c09045a9a13d5a6888026daf2b36716049be081d07faa43d4319f0ae6")
             .unwrap();
 

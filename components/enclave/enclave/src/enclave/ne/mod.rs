@@ -2,7 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 mod ffi;
+
 use thiserror::Error;
+
+use crate::KmsCredentials;
 #[derive(Debug, Error)]
 pub enum Error {
     #[error("Init")]
@@ -15,11 +18,33 @@ pub enum Error {
     SdkKmsClientError,
     #[error("Decrypt")]
     SdkKmsDecryptError,
+
+    #[error("join {0}")]
+    JoinError(#[from] tokio::task::JoinError),
 }
 
+pub async fn kms_decrypt(kms_creds: KmsCredentials, ciphertext: Vec<u8>) -> Result<Vec<u8>, Error> {
+    tokio::task::spawn_blocking(move || {
+        let KmsCredentials {
+            region,
+            key_id,
+            secret_key,
+            session_token,
+        } = kms_creds;
+
+        kms_decrypt_inner(
+            region.as_bytes(),
+            key_id.as_bytes(),
+            secret_key.as_bytes(),
+            session_token.unwrap_or_default().as_bytes(),
+            &ciphertext,
+        )
+    })
+    .await?
+}
 /// KMS decrypt FFI wrapper
 /// TODO: Add a trait for Drop wrappers for SDK resources
-pub fn kms_decrypt(
+fn kms_decrypt_inner(
     aws_region: &[u8],
     aws_key_id: &[u8],
     aws_secret_key: &[u8],

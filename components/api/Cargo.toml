@@ -29,4 +29,3 @@ crypto = { path = "../enclave/crypto" }
 
 aws-config = "0.8"
 aws-sdk-kms = "0.8"
-aws-smithy-client = "0.38"

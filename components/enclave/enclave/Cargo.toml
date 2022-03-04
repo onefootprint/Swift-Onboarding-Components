@@ -5,6 +5,12 @@ edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
+[features]
+default = ["simulate", "nitro"]
+simulate = ["aws-types", "aws-config", "aws-sdk-kms"]
+nitro = []
+
+
 [dependencies]
 tokio = { version = "1", features = ["full"] }
 tokio-vsock = "0.3"
@@ -19,3 +25,7 @@ env_logger = "0.9"
 uuid = { version = "0.8.2", features = ["v4", "serde"] }
 thiserror = "1.0"
 crypto = { path = "../crypto" }
+
+aws-types = { version = "0.8", optional = true }
+aws-config = { version = "0.8", optional = true }
+aws-sdk-kms = { version = "0.8", optional = true }
