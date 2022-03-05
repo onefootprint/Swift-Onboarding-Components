@@ -12,7 +12,7 @@ pub use enclave::{
 use pool::{Stream, StreamConnection};
 
 use thiserror::Error;
-use tokio::{io::AsyncWriteExt, net::UnixStream};
+use tokio::io::AsyncWriteExt;
 use tokio_vsock::VsockStream;
 
 #[derive(Error, Debug)]
@@ -31,7 +31,7 @@ pub enum Error {
 
 #[derive(Debug, Clone)]
 pub enum StreamType {
-    UnixSocket(String),
+    Tcp { address: String },
     Vsock { cid: u32, port: u32 },
 }
 
@@ -51,9 +51,9 @@ where
 {
     async fn new_stream(&self) -> Result<Box<dyn Stream>, Error> {
         let stream: Box<dyn Stream> = match self.config.stream_type() {
-            StreamType::UnixSocket(path) => {
-                let stream = UnixStream::connect(path).await?;
-                log::info!("connected to unix socket based enclave");
+            StreamType::Tcp { address } => {
+                let stream = tokio::net::TcpStream::connect(&address).await?;
+                log::info!("connected to LOCAL TCP based enclave");
                 Box::new(stream)
             }
             StreamType::Vsock { cid, port } => {
@@ -66,7 +66,7 @@ where
     }
 
     async fn ping(&self, stream: &mut Box<dyn Stream>) -> Result<(), Error> {
-        let request = RpcRequest::new(RpcPayload::Ping(format!("test")));
+        let request = RpcRequest::new(RpcPayload::Ping(format!("health_ping")));
         match send_rpc_request(&request, stream).await {
             Ok(EnclavePayload::Pong(_)) => Ok(()),
             Ok(_) => Err(Error::UnexpectedEnclaveResponse),

@@ -9,7 +9,6 @@ use enclave_proxy::{
     bb8, pool, EnclavePayload, EnvelopeDecrypt, FnDecryption, KmsCredentials, RpcPayload,
     StreamManager,
 };
-use serde::Deserialize;
 use telemetry::TelemetrySpanBuilder;
 use tracing_actix_web::TracingLogger;
 mod config;
@@ -162,7 +161,9 @@ pub struct ApiError {}
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     let config = config::Config::load_from_env().expect("failed to load config");
+
     let _started = telemetry::init(&config).expect("failed to init telemetry layers");
+
     let meter = opentelemetry::global::meter("actix_web");
 
     let metrics = RequestMetrics::new(meter, Some(should_render_metrics), None);
@@ -173,8 +174,8 @@ async fn main() -> std::io::Result<()> {
         };
 
         let pool = bb8::Pool::builder()
-            .min_idle(Some(1))
-            .max_size(1)
+            .min_idle(Some(2))
+            .max_size(5)
             .build(pool::StreamManager(manager))
             .await
             .unwrap();

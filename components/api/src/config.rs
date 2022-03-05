@@ -11,8 +11,8 @@ pub struct Config {
     #[envconfig(from = "ENCLAVE_CID", default = "16")]
     pub enclave_cid: u32,
 
-    #[envconfig(from = "UNIX_SOCKET")]
-    pub unix_sock: Option<String>,
+    #[envconfig(from = "LOCAL")]
+    pub use_local: Option<String>,
 
     #[envconfig(from = "AWS_ROOT_KEY_ID")]
     pub root_key_id: String,
@@ -25,6 +25,9 @@ pub struct Config {
 
     #[envconfig(from = "ENCLAVE_AWS_SECRET_ACCESS_KEY")]
     pub enclave_aws_secret_access_key: String,
+
+    #[envconfig(from = "DISABLE_OTEL")]
+    pub disable_otel: Option<String>,
 }
 
 impl Config {
@@ -40,8 +43,10 @@ impl Config {
 
 impl enclave_proxy::StreamConfig for Config {
     fn stream_type(&self) -> enclave_proxy::StreamType {
-        if let Some(path) = &self.unix_sock {
-            enclave_proxy::StreamType::UnixSocket(path.clone())
+        if self.use_local.is_some() {
+            enclave_proxy::StreamType::Tcp {
+                address: format!("127.0.0.1:{}", self.enclave_port),
+            }
         } else {
             enclave_proxy::StreamType::Vsock {
                 cid: self.enclave_cid,

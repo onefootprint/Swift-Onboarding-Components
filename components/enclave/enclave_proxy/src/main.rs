@@ -1,6 +1,6 @@
 use actix_web::{middleware::Logger, post, web, App, HttpServer, Responder, ResponseError};
 use config::Config;
-use enclave::{EnclavePayload, EnclaveResponse, RpcRequest};
+use enclave::{EnclavePayload, RpcRequest};
 use enclave_proxy::*;
 use futures::TryFutureExt;
 use thiserror::Error;

@@ -5,8 +5,8 @@ pub struct Config {
     #[envconfig(from = "PORT", default = "5000")]
     pub port: u16,
 
-    #[envconfig(from = "UNIX_SOCKET")]
-    pub unix_sock: Option<String>,
+    #[envconfig(from = "LOCAL")]
+    pub use_local: Option<String>,
 }
 
 impl Config {

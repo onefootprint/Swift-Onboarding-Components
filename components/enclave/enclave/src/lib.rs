@@ -65,6 +65,7 @@ pub struct EnclaveResponse {
 pub enum EnclavePayload {
     Pong(String),
     FnDecryption(FnDecryption),
+    Error(String),
 }
 
 impl TryFrom<EnclavePayload> for FnDecryption {
@@ -102,6 +103,8 @@ pub enum Error {
     MismatchedRequest,
     #[error("unexpected response")]
     UnexpectedResponse,
+    #[error("Connection reset")]
+    ConnectionReset,
 }
 
 impl WireMessage {
@@ -140,19 +143,51 @@ impl WireMessage {
         Ok([len_bytes, self.data].concat())
     }
 
-    pub async fn from_stream<S: AsyncRead + Unpin>(
-        stream: &mut S,
-    ) -> std::io::Result<Option<WireMessage>> {
-        let mut length_bytes = vec![0u8; 8];
-        let n = stream.read(&mut length_bytes).await?;
-        if n == 0 {
+    fn from_buffer(amt: usize, buffer: &[u8]) -> Result<Option<WireMessage>, Error> {
+        if amt < 8 {
             return Ok(None);
         }
 
-        let length = BigEndian::read_u64(&length_bytes) as usize;
-        let mut data = vec![0u8; length];
-        let _ = stream.read_exact(&mut data).await?;
+        let length = BigEndian::read_u64(&buffer[..8]) as usize;
 
-        Ok(Some(Self { length, data }))
+        if amt < 8 + length {
+            return Ok(None);
+        }
+
+        Ok(Some(Self {
+            length,
+            data: buffer[8..(8 + length)].to_vec(),
+        }))
+    }
+
+    pub async fn from_stream<S: AsyncRead + Unpin>(
+        stream: &mut S,
+    ) -> Result<Option<WireMessage>, Error> {
+        let mut buffer = vec![0u8; 4096];
+        let mut cursor = 0usize;
+
+        loop {
+            if let Some(wire) = Self::from_buffer(cursor, &buffer)? {
+                return Ok(Some(wire));
+            }
+            if buffer.len() == cursor {
+                buffer.resize(cursor * 2, 0);
+            }
+
+            let n = stream.read(&mut buffer[cursor..]).await?;
+
+            log::debug!("read {n} bytes");
+
+            if 0 == n {
+                if cursor == 0 {
+                    return Ok(None);
+                } else {
+                    return Err(Error::ConnectionReset);
+                }
+            } else {
+                // Update our cursor
+                cursor += n;
+            }
+        }
     }
 }
