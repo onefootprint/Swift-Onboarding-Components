@@ -56,4 +56,6 @@ pub async fn kms_decrypt(kms_creds: KmsCredentials, ciphertext: Vec<u8>) -> Resu
 
     #[cfg(feature = "simulate")]
     return Ok(simulated::kms_decrypt(kms_creds, ciphertext).await?);
+
+    unimplemented!()
 }
