@@ -1,10 +1,10 @@
 {
     "name": "infra",
     "devDependencies": {
-        "@types/node": "^14"
+        "@types/node": "^14.18.12"
     },
     "dependencies": {
-        "@pulumi/aws": "^4.37.2",
+        "@pulumi/aws": "^4.23.0",
         "@pulumi/awsx": "^0.33.0",
         "@pulumi/pulumi": "^3.0.0",
         "@pulumi/random": "4.3.1"

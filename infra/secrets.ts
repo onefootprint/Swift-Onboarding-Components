@@ -19,7 +19,6 @@ interface SecretConstants {
 interface ElasticSecrets {
     apiKey: string
 }
-
 export async function LoadSecrets(config: pulumi.Config): Promise<Secrets> {
     const cloudfrontSecret = new random.RandomString("cf-alb-pass", { length: 44 }).result;
     const stack = pulumi.getStack();

@@ -9,7 +9,7 @@ import * as cdn from './cdn';
 import * as app from './app';
 import * as secrets from './secrets'
 import { Config } from './config'
-
+import * as app2 from './app2';
 
 export = async () => {
     let config = new pulumi.Config();
@@ -26,7 +26,7 @@ export = async () => {
         const cert = await certs.CreateCertificate({ domain: `*.${stack}.${constants.rootDomain}`, region, hostedZoneId: hostedZone.id });
 
         // create our fargate service
-        const service = await app.Create({
+        const service = await app2.Create({
             availabilityZones: 2,
             cpuUnits: 256,
             memoryMB: 512,
