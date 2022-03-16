@@ -174,7 +174,7 @@ async fn main() -> std::io::Result<()> {
         };
 
         let pool = bb8::Pool::builder()
-            .min_idle(Some(2))
+            .min_idle(Some(3))
             .max_size(5)
             .build(pool::StreamManager(manager))
             .await

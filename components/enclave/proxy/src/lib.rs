@@ -81,10 +81,10 @@ pub async fn send_rpc_request(
 ) -> Result<EnclavePayload, Error> {
     let message = WireMessage::from_request(request)?.to_bytes()?;
     stream.write_all(&message).await?;
+    stream.flush().await?;
 
     let response = WireMessage::from_stream(stream)
         .await?
-        .ok_or(Error::MissingEnclaveResponse)?
         .response(request.id)?;
 
     Ok(response.payload)

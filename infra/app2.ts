@@ -52,7 +52,28 @@ export async function Create(config: AppConfig, constants: Config, secretsStore:
                 Action: "sts:AssumeRole",
             }],
         },
+        inlinePolicies: [
+            {
+                name: "ecs_task_exec_logs",
+                policy: JSON.stringify({
+                    Version: "2012-10-17",
+                    Statement: [{
+                        Action: [
+                            "logs:CreateLogGroup",
+                            "logs:PutLogEvents",
+                            "logs:DescribeLogStreams",
+                            "logs:CreateLogStream",
+                            "logs:PutLogEvents"
+                        ],
+                        Effect: "Allow",
+                        Resource: "*",
+                    }],
+                }),
+
+            }
+        ]
     });
+
 
     const _taskExecRolePolicyAttachment = new aws.iam.RolePolicyAttachment(`task-exec-${region}-policy`, {
         role: taskExecRole.name,
@@ -87,6 +108,11 @@ export async function Create(config: AppConfig, constants: Config, secretsStore:
                             "ecr:BatchGetImage",
                             "ecr:BatchCheckLayerAvailability",
                             "ecr:GetDownloadUrlForLayer",
+                            "logs:CreateLogGroup",
+                            "logs:PutLogEvents",
+                            "logs:DescribeLogStreams",
+                            "logs:CreateLogStream",
+                            "logs:PutLogEvents"
                         ],
                         Effect: "Allow",
                         Resource: "*",
@@ -140,7 +166,7 @@ export async function Create(config: AppConfig, constants: Config, secretsStore:
             id: launchTemplate.id,
             version: "$Latest"
         },
-        vpcZoneIdentifiers: vpc.privateSubnetIds,
+        vpcZoneIdentifiers: vpc.publicSubnetIds,
         protectFromScaleIn: false,
         instanceRefresh: {
             strategy: "Rolling",
@@ -175,7 +201,8 @@ export async function Create(config: AppConfig, constants: Config, secretsStore:
 
     const appLbSg = new awsx.ec2.SecurityGroup(`app-${config.imageName}-lb-sg-${region}`, {
         vpc,
-        egress: [{ protocol: "-1", fromPort: appPort, toPort: appPort, cidrBlocks: ["0.0.0.0/0"] }],
+        ingress: [{ protocol: "-1", fromPort: appPort, toPort: appPort, cidrBlocks: ["0.0.0.0/0"] }],
+        egress: [{ protocol: "-1", fromPort: 0, toPort: 0, cidrBlocks: ["0.0.0.0/0"] }],
     }, { provider });
 
     const applb = new awsx.elasticloadbalancingv2.ApplicationLoadBalancer(
@@ -186,28 +213,36 @@ export async function Create(config: AppConfig, constants: Config, secretsStore:
 
     const target = applb.createTargetGroup(`${config.imageName}-alb-target-${region.toString()}`, { port: appPort, vpc });
 
-    // create our i
     // create the container
     const image = awsx.ecs.Image.fromDockerBuild(`${config.imageName}-image-${region}`, {
         context: "../",
         dockerfile: config.dockerfilePath,
     });
 
-/*
-AWS_REGION=us-east-1
-AWS_ACCESS_KEY_ID=AKIA3U5XRCZOHHYGTHT4
-*/
-    const taskDef = new aws.ecs.TaskDefinition(`task-${config.imageName}-${region.toString()}`, {
-        memory: `${config.memoryMB}`,
-        cpu: `${config.cpuUnits}`,
-        networkMode: "awsvpc",
-        requiresCompatibilities: ["EC2"],
-        executionRoleArn: taskExecRole.arn,
-        family: "ec2-task-definition",
-        containerDefinitions: JSON.stringify([{
+    const imageName = pulumi.output(image.image(`${config.imageName}-image-${region}`, target));
+
+    const containerDef = imageName.apply(img => {
+        return JSON.stringify([{
             name: config.imageName,
-            image: image,
+            image: img,
+            // image: "nginx",
             environment: [
+                {
+                    name: "AWS_REGION",
+                    value: "us-east-1"
+                },
+                {
+                    name: "AWS_ACCESS_KEY_ID",
+                    value: "AKIA3U5XRCZOHHYGTHT4"
+                },
+                {
+                    name: "AWS_SECRET_ACCESS_KEY",
+                    value: "MNTTSN7DA+DjBepQwdXYrN46w+iOL1hibkXBACL7"
+                },
+                {
+                    name: "AWS_ROOT_KEY_ID",
+                    value: "mrk-514a64acd1524a4793293d2e22820d3b"
+                },
                 {
                     name: "ENCLAVE_AWS_ACCESS_KEY_ID",
                     value: "AKIA3U5XRCZOOWIHM57Y"
@@ -215,22 +250,41 @@ AWS_ACCESS_KEY_ID=AKIA3U5XRCZOHHYGTHT4
                 {
                     name: "ENCLAVE_AWS_SECRET_ACCESS_KEY",
                     value: "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"
-                },   
+                },
                 {
                     name: "RUST_LOG",
                     value: "INFO"
-                },          
+                },
                 {
                     name: "OTEL_RESOURCE_ATTRIBUTES",
                     value: `service.name=fpc-api,service.version=1.0,deployment.environment=${pulumi.getStack()}`
                 }
-            ],    
+            ],
             portMappings: [{
                 containerPort: appPort,
                 hostPort: appPort,
                 protocol: "tcp"
-            }]
-        }]),
+            }],
+            "logConfiguration": {
+                "logDriver": "awslogs",
+                "options": {
+                    "awslogs-group": `/ecs/${config.imageName}_logs`,
+                    "awslogs-region": `${region}`,
+                    "awslogs-create-group": "true",
+                    "awslogs-stream-prefix": "ecs",
+                }
+            }
+        }])
+    });
+
+    const taskDef = new aws.ecs.TaskDefinition(`task-${config.imageName}-${region.toString()}`, {
+        memory: `${config.memoryMB}`,
+        cpu: `${config.cpuUnits}`,
+        networkMode: "awsvpc",
+        requiresCompatibilities: ["EC2"],
+        executionRoleArn: taskExecRole.arn,
+        family: "ec2-task-definition",
+        containerDefinitions: containerDef,
     }, { provider, dependsOn: [cluster] });
 
     const service = new aws.ecs.Service(`svc-${config.imageName}-${region.toString()}`, {
@@ -239,13 +293,12 @@ AWS_ACCESS_KEY_ID=AKIA3U5XRCZOHHYGTHT4
         desiredCount: config.instanceCount,
         taskDefinition: taskDef.arn,
         networkConfiguration: {
-            assignPublicIp: false,
-            subnets: vpc.privateSubnetIds,
+            subnets: vpc.publicSubnetIds,
             securityGroups: [appLbSg.id]
         },
         loadBalancers: [{
             containerName: config.imageName,
-            containerPort: 80,
+            containerPort: appPort,
             targetGroupArn: target.targetGroup.arn,
         }]
     }, { provider, dependsOn: [applb] })
@@ -270,7 +323,6 @@ AWS_ACCESS_KEY_ID=AKIA3U5XRCZOHHYGTHT4
     const rule = web.addListenerRule(`app-${config.imageName}-cloudfront-token-rule-${region}`, {
         actions: [{ type: "forward", targetGroupArn: target.targetGroup.arn }],
         conditions: [{
-
             httpHeader: {
                 httpHeaderName: constants.cdnProtectionHeaderName,
                 values: [secretsStore.cloudfrontSecret]

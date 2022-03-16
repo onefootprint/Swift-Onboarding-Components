@@ -105,6 +105,8 @@ pub enum Error {
     UnexpectedResponse,
     #[error("Connection reset")]
     ConnectionReset,
+    #[error("end stream")]
+    StreamEnded,
 }
 
 impl WireMessage {
@@ -160,15 +162,13 @@ impl WireMessage {
         }))
     }
 
-    pub async fn from_stream<S: AsyncRead + Unpin>(
-        stream: &mut S,
-    ) -> Result<Option<WireMessage>, Error> {
+    pub async fn from_stream<S: AsyncRead + Unpin>(stream: &mut S) -> Result<WireMessage, Error> {
         let mut buffer = vec![0u8; 4096];
         let mut cursor = 0usize;
 
         loop {
             if let Some(wire) = Self::from_buffer(cursor, &buffer)? {
-                return Ok(Some(wire));
+                return Ok(wire);
             }
             if buffer.len() == cursor {
                 buffer.resize(cursor * 2, 0);
@@ -180,7 +180,7 @@ impl WireMessage {
 
             if 0 == n {
                 if cursor == 0 {
-                    return Ok(None);
+                    return Err(Error::StreamEnded);
                 } else {
                     return Err(Error::ConnectionReset);
                 }

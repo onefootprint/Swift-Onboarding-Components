@@ -36,3 +36,13 @@ run-enclave-debug:
 run-enclave:
 	@echo "running enclave"
 	@nitro-cli run-enclave --eif-path ./out/enclave.eif --cpu-count 2 --memory 256 --enclave-cid 16
+
+
+account := $(shell aws sts get-caller-identity --query "Account" --output text)
+
+package-enclave:	
+	@echo "using account $(account)"
+	@docker build -t enclave_pkg:latest -f enclave_package.dockerfile .
+	@aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin $(account).dkr.ecr.us-east-1.amazonaws.com
+	@docker tag enclave_pkg:latest $(account).dkr.ecr.us-east-1.amazonaws.com/enclave_pkg:latest
+	@docker push $(account).dkr.ecr.us-east-1.amazonaws.com/enclave_pkg:latest

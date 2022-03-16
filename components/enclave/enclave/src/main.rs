@@ -1,5 +1,7 @@
 mod config;
 
+use std::time::Duration;
+
 use config::Config;
 use enclave::{
     enclave::handle_fn_decrypt, EnclavePayload, EnclaveResponse, RpcPayload, WireMessage,
@@ -59,19 +61,21 @@ fn stream_listen<S: AsyncRead + AsyncWrite + Unpin + Send + 'static>(stream: S) 
     tokio::spawn(async move {
         let mut stream = stream;
         loop {
-            let _ = handle_stream(&mut stream)
-                .await
-                .map_err(|e| eprintln!("handle stream error: {:?}", e));
+            match handle_stream(&mut stream).await {
+                Ok(_) => tokio::time::sleep(Duration::from_millis(100)).await,
+                Err(e) => {
+                    eprintln!("handle stream error: {:?}", e);
+                    return;
+                }
+            }
         }
     });
 }
 
 async fn handle_stream<S: AsyncRead + AsyncWrite + Unpin + Send + 'static>(
     stream: &mut S,
-) -> Result<(), Box<dyn std::error::Error>> {
-    let message = WireMessage::from_stream(stream)
-        .await?
-        .ok_or("No wire message")?;
+) -> Result<(), enclave::Error> {
+    let message = WireMessage::from_stream(stream).await?;
     let request = message.request()?;
     eprintln!("got request {request:?}");
 
@@ -93,6 +97,7 @@ async fn handle_stream<S: AsyncRead + AsyncWrite + Unpin + Send + 'static>(
     let out = WireMessage::from_response(&response)?.to_bytes()?;
 
     stream.write_all(&out).await?;
+    stream.flush().await?;
 
     eprintln!("wrote stream");
 
