@@ -1182,6 +1182,7 @@ dependencies = [
  "opentelemetry",
  "opentelemetry-otlp",
  "serde",
+ "thiserror",
  "tokio",
  "tracing",
  "tracing-actix-web",

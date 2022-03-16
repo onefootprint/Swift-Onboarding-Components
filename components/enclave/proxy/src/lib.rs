@@ -4,11 +4,13 @@ pub mod pool;
 use async_trait::async_trait;
 pub use bb8;
 pub use config::Config;
+pub use enclave::Error as EnclaveError;
 use enclave::WireMessage;
 pub use enclave::{
     DataTransform, EnclavePayload, EnclaveResponse, EnvelopeDecrypt, FnDecryption, KmsCredentials,
     RpcPayload, RpcRequest,
 };
+
 use pool::{Stream, StreamConnection};
 
 use thiserror::Error;

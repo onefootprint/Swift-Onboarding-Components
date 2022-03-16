@@ -29,3 +29,4 @@ crypto = { path = "../enclave/crypto" }
 
 aws-config = "0.8"
 aws-sdk-kms = "0.8"
+thiserror = "1.0"

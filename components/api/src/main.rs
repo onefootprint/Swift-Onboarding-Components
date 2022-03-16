@@ -1,18 +1,23 @@
 use actix_web::{
     get, middleware::Logger, post, web, App, HttpRequest, HttpResponse, HttpServer, Responder,
+    ResponseError,
 };
 use actix_web_opentelemetry::RequestMetrics;
-use aws_sdk_kms::model::DataKeyPairSpec;
+use aws_sdk_kms::{
+    error::GenerateDataKeyPairWithoutPlaintextError, model::DataKeyPairSpec, types::SdkError,
+};
 use config::Config;
 use crypto::{b64::Base64Data, seal::EciesP256Sha256AesGcmSealed};
 use enclave_proxy::{
     bb8, pool, EnclavePayload, EnvelopeDecrypt, FnDecryption, KmsCredentials, RpcPayload,
     StreamManager,
 };
+use futures_util::TryFutureExt;
 use telemetry::TelemetrySpanBuilder;
 use tracing_actix_web::TracingLogger;
 mod config;
 mod telemetry;
+use thiserror::Error;
 
 #[tracing::instrument(name = "index", skip(req))]
 #[get("/")]
@@ -61,6 +66,22 @@ fn log_headers(headers: &Vec<String>) {
     tracing::info!("got headers");
 }
 
+#[derive(Debug, Error)]
+pub enum ApiError {
+    #[error("kms.generate {0}")]
+    Kms(#[from] SdkError<GenerateDataKeyPairWithoutPlaintextError>),
+    #[error("crypto {0}")]
+    Crypto(#[from] crypto::Error),
+    #[error("enclave_proxy {0}")]
+    EnclaveProxy(#[from] enclave_proxy::Error),
+    #[error("enclave_conn {0}")]
+    EnclaveConnection(#[from] bb8::RunError<enclave_proxy::Error>),
+    #[error("enclave {0}")]
+    Enclave(#[from] enclave_proxy::EnclaveError),
+}
+
+impl ResponseError for ApiError {}
+
 #[derive(Debug, Clone, serde::Deserialize)]
 struct DataEncryptionRequest {
     data: String,
@@ -77,7 +98,7 @@ struct DataEncryptionResponse {
 async fn encrypt(
     state: web::Data<State>,
     request: web::Json<DataEncryptionRequest>,
-) -> impl Responder {
+) -> actix_web::Result<impl Responder> {
     tracing::info!("in encrypt");
 
     let new_key_pair = state
@@ -86,12 +107,13 @@ async fn encrypt(
         .key_id(&state.config.root_key_id)
         .key_pair_spec(DataKeyPairSpec::EccNistP256)
         .send()
-        .await
-        .unwrap();
+        .map_err(ApiError::from)
+        .await?;
 
     let der_public_key = new_key_pair.public_key.unwrap().into_inner();
     let ec_pk_uncompressed =
-        crypto::conversion::public_key_der_to_raw_uncompressed(&der_public_key).unwrap();
+        crypto::conversion::public_key_der_to_raw_uncompressed(&der_public_key)
+            .map_err(ApiError::from)?;
 
     let pk = crypto::hex::encode(&ec_pk_uncompressed);
     tracing::info!(%pk, "got public key");
@@ -100,10 +122,10 @@ async fn encrypt(
         &ec_pk_uncompressed,
         request.data.as_str().as_bytes().to_vec(),
     )
-    .unwrap();
+    .map_err(ApiError::from)?;
 
-    web::Json(DataEncryptionResponse {
-        sealed_data: sealed.to_string().unwrap(),
+    Ok(web::Json(DataEncryptionResponse {
+        sealed_data: sealed.to_string().map_err(ApiError::from)?,
         public_key: Base64Data(ec_pk_uncompressed),
         sealed_private_key: Base64Data(
             new_key_pair
@@ -111,7 +133,7 @@ async fn encrypt(
                 .unwrap()
                 .into_inner(),
         ),
-    })
+    }))
 }
 
 #[derive(Debug, Clone, serde::Deserialize)]
@@ -124,11 +146,15 @@ struct DataDecryptionRequest {
 async fn decrypt(
     state: web::Data<State>,
     request: web::Json<DataDecryptionRequest>,
-) -> impl Responder {
+) -> actix_web::Result<impl Responder> {
     tracing::info!("in decrypt");
 
     let req = request.into_inner();
-    let mut conn = state.enclave_connection_pool.get().await.unwrap();
+    let mut conn = state
+        .enclave_connection_pool
+        .get()
+        .await
+        .map_err(ApiError::from)?;
     let req = enclave_proxy::RpcRequest::new(RpcPayload::FnDecrypt(EnvelopeDecrypt {
         kms_creds: KmsCredentials {
             key_id: state.config.enclave_aws_access_key_id.clone(),
@@ -136,7 +162,8 @@ async fn decrypt(
             secret_key: state.config.enclave_aws_secret_access_key.clone(),
             session_token: None,
         },
-        sealed_data: EciesP256Sha256AesGcmSealed::from_str(req.sealed_data.as_str()).unwrap(),
+        sealed_data: EciesP256Sha256AesGcmSealed::from_str(req.sealed_data.as_str())
+            .map_err(ApiError::from)?,
         sealed_key: req.sealed_private_key.0,
         transform: enclave_proxy::DataTransform::Identity,
     }));
@@ -144,10 +171,10 @@ async fn decrypt(
     tracing::info!("sending request");
     let response = enclave_proxy::send_rpc_request(&req, &mut conn)
         .await
-        .unwrap();
+        .map_err(ApiError::from)?;
     tracing::info!("got response");
-    let response = FnDecryption::try_from(response).unwrap();
-    std::str::from_utf8(&response.data).unwrap().to_string()
+    let response = FnDecryption::try_from(response).map_err(ApiError::from)?;
+    Ok(std::str::from_utf8(&response.data).unwrap().to_string())
 }
 
 #[derive(Clone)]
@@ -157,7 +184,6 @@ pub struct State {
     enclave_connection_pool: bb8::Pool<pool::StreamManager<StreamManager<Config>>>,
 }
 
-pub struct ApiError {}
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     let config = config::Config::load_from_env().expect("failed to load config");
