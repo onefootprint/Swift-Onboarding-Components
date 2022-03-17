@@ -74,6 +74,8 @@ impl TryFrom<EnclavePayload> for FnDecryption {
     fn try_from(value: EnclavePayload) -> Result<Self, Self::Error> {
         if let EnclavePayload::FnDecryption(r) = value {
             Ok(r)
+        } else if let EnclavePayload::Error(error) = value {
+            Err(crate::Error::EnclaveError(error))
         } else {
             Err(crate::Error::UnexpectedResponse)
         }
@@ -103,6 +105,8 @@ pub enum Error {
     MismatchedRequest,
     #[error("unexpected response")]
     UnexpectedResponse,
+    #[error("enclave returned error: {0}")]
+    EnclaveError(String),
     #[error("Connection reset")]
     ConnectionReset,
     #[error("end stream")]

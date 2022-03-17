@@ -31,9 +31,10 @@ export async function Create(config: AppConfig, constants: Config, secretsStore:
     const provider = new aws.Provider(`provider-${config.imageName}-${region}`, { region });
 
     const vpc = new awsx.ec2.Vpc(`vpc-${config.imageName}-${region}`, {
-        numberOfAvailabilityZones: config.availabilityZones
+        numberOfAvailabilityZones: config.availabilityZones,
     }, { provider });
 
+    const vpcPrivateSubnets = await vpc.privateSubnets;
 
     /**
      *  
@@ -73,7 +74,6 @@ export async function Create(config: AppConfig, constants: Config, secretsStore:
             }
         ]
     });
-
 
     const _taskExecRolePolicyAttachment = new aws.iam.RolePolicyAttachment(`task-exec-${region}-policy`, {
         role: taskExecRole.name,
@@ -157,6 +157,9 @@ export async function Create(config: AppConfig, constants: Config, secretsStore:
             arn: ecsInstanceProfile.arn,
         },
         updateDefaultVersion: true,
+        networkInterfaces: vpcPrivateSubnets.map((sn, index) => {
+            return { subnetId: sn.id, deviceIndex: index, securityGroups: [] }
+        }),
     }, { provider });
 
     const autoScaling = new aws.autoscaling.Group(`autoscale-${config.imageName}-${region}`, {
@@ -164,9 +167,9 @@ export async function Create(config: AppConfig, constants: Config, secretsStore:
         maxSize: 2,
         launchTemplate: {
             id: launchTemplate.id,
-            version: "$Latest"
+            version: pulumi.output(launchTemplate.latestVersion).apply(v => `${v}`)
         },
-        vpcZoneIdentifiers: vpc.publicSubnetIds,
+        vpcZoneIdentifiers: vpc.privateSubnetIds,
         protectFromScaleIn: false,
         instanceRefresh: {
             strategy: "Rolling",
@@ -201,9 +204,13 @@ export async function Create(config: AppConfig, constants: Config, secretsStore:
 
     const appLbSg = new awsx.ec2.SecurityGroup(`app-${config.imageName}-lb-sg-${region}`, {
         vpc,
-        ingress: [{ protocol: "-1", fromPort: appPort, toPort: appPort, cidrBlocks: ["0.0.0.0/0"] }],
-        egress: [{ protocol: "-1", fromPort: 0, toPort: 0, cidrBlocks: ["0.0.0.0/0"] }],
+        ingress: [{ protocol: "-1", fromPort: 0, toPort: 0, cidrBlocks: ["0.0.0.0/0"] }],
+        egress: [{ protocol: "-1", fromPort: appPort, toPort: appPort, cidrBlocks: vpcPrivateSubnets.map(sn => sn.subnet.cidrBlock) }],
     }, { provider });
+
+
+    const publicSubnets = await vpc.publicSubnetIds;
+    const privateSubnets = await vpc.privateSubnetIds;
 
     const applb = new awsx.elasticloadbalancingv2.ApplicationLoadBalancer(
         `app-${config.imageName}-alb-${region.toString()}`, {
@@ -287,14 +294,21 @@ export async function Create(config: AppConfig, constants: Config, secretsStore:
         containerDefinitions: containerDef,
     }, { provider, dependsOn: [cluster] });
 
+    const serviceSg = new awsx.ec2.SecurityGroup(`svc-${config.imageName}-sg-${region}`, {
+        vpc,
+        ingress: [{ protocol: "-1", fromPort: appPort, toPort: appPort, cidrBlocks: [vpc.vpc.cidrBlock] }],
+        egress: [{ protocol: "-1", fromPort: 0, toPort: 0, cidrBlocks: ["0.0.0.0/0"] }],
+    }, { provider });
+
+
     const service = new aws.ecs.Service(`svc-${config.imageName}-${region.toString()}`, {
         cluster: cluster.cluster.arn,
         launchType: "EC2",
         desiredCount: config.instanceCount,
         taskDefinition: taskDef.arn,
         networkConfiguration: {
-            subnets: vpc.publicSubnetIds,
-            securityGroups: [appLbSg.id]
+            subnets: vpc.privateSubnetIds,
+            securityGroups: [serviceSg.id]
         },
         loadBalancers: [{
             containerName: config.imageName,
