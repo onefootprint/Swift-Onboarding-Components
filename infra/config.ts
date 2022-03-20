@@ -4,6 +4,7 @@ export interface Config {
     internalAppSubdomain: string;
     cdnAppSubdomain: string;
     elastic: Elastic;
+    enclaveCertPCR8: string;
 }
 
 export interface Elastic {

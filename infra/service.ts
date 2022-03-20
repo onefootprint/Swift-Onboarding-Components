@@ -3,10 +3,11 @@ import * as awsx from "@pulumi/awsx";
 import { Output } from "@pulumi/pulumi";
 import * as aws from "@pulumi/aws";
 import * as pulumi from "@pulumi/pulumi"
-import { Secrets } from "./secrets";
+import { StaticSecrets } from "./secrets";
 import { Config } from "./config";
 import { Monitor } from "./monitor";
 import * as fs from 'fs';
+import { EnclaveKeyDescriptor } from "./enclave_key";
 
 export type Service = {
     lb: awsx.elasticloadbalancingv2.ApplicationListener,
@@ -26,7 +27,7 @@ export type AppConfig = {
     domain: string
 }
 
-export async function Create(config: AppConfig, constants: Config, secretsStore: Secrets): Promise<Service> {
+export async function Create(config: AppConfig, constants: Config, secretsStore: StaticSecrets, enclaveKeyDescriptor: EnclaveKeyDescriptor): Promise<Service> {
     const region = config.region;
     const provider = new aws.Provider(`provider-${config.imageName}-${region}`, { region });
 
@@ -205,7 +206,7 @@ export async function Create(config: AppConfig, constants: Config, secretsStore:
     const appLbSg = new awsx.ec2.SecurityGroup(`app-${config.imageName}-lb-sg-${region}`, {
         vpc,
         ingress: [{ protocol: "-1", fromPort: 0, toPort: 0, cidrBlocks: ["0.0.0.0/0"] }],
-        egress: [{ protocol: "-1", fromPort: appPort, toPort: appPort, cidrBlocks: vpcPrivateSubnets.map(sn => sn.subnet.cidrBlock) }],
+        egress: [{ protocol: "-1", fromPort: appPort, toPort: appPort, cidrBlocks: [vpc.vpc.cidrBlock] }],
     }, { provider });
 
 
@@ -220,7 +221,9 @@ export async function Create(config: AppConfig, constants: Config, secretsStore:
 
     const target = applb.createTargetGroup(`${config.imageName}-alb-target-${region.toString()}`, { port: appPort, vpc });
 
-    // create the container
+    // create the containers
+    const otelCollector = Monitor.otelCollector(secretsStore, constants, region);
+
     const image = awsx.ecs.Image.fromDockerBuild(`${config.imageName}-image-${region}`, {
         context: "../",
         dockerfile: config.dockerfilePath,
@@ -228,35 +231,45 @@ export async function Create(config: AppConfig, constants: Config, secretsStore:
 
     const imageName = pulumi.output(image.image(`${config.imageName}-image-${region}`, target));
 
-    const containerDef = imageName.apply(img => {
+    const containerDef = pulumi.all([
+        imageName,
+        otelCollector,
+        enclaveKeyDescriptor.rootKeyId,
+        enclaveKeyDescriptor.enclaveParentCredentials.access_key_id,
+        secretsStore.enclaveParentSecretKey.arn,
+        enclaveKeyDescriptor.enclaveKmsCredentials.access_key_id,
+        secretsStore.enclaveUserSecretKey.arn
+    ]).apply(([img, otelCollector, rootKeyId, parentAccessKeyId, enclaveParentArn, enclaveAccessKeyId, enclaveUserArn]) => {
         return JSON.stringify([{
             name: config.imageName,
             image: img,
-            // image: "nginx",
-            environment: [
-                {
-                    name: "AWS_REGION",
-                    value: "us-east-1"
-                },
-                {
-                    name: "AWS_ACCESS_KEY_ID",
-                    value: "AKIA3U5XRCZOHHYGTHT4"
-                },
+            essential: true,
+            secrets: [
                 {
                     name: "AWS_SECRET_ACCESS_KEY",
-                    value: "MNTTSN7DA+DjBepQwdXYrN46w+iOL1hibkXBACL7"
-                },
-                {
-                    name: "AWS_ROOT_KEY_ID",
-                    value: "mrk-514a64acd1524a4793293d2e22820d3b"
-                },
-                {
-                    name: "ENCLAVE_AWS_ACCESS_KEY_ID",
-                    value: "AKIA3U5XRCZOOWIHM57Y"
+                    valueFrom: enclaveParentArn
                 },
                 {
                     name: "ENCLAVE_AWS_SECRET_ACCESS_KEY",
-                    value: "/szbUWzwLVHF/SmtYLCT5IF6bHv67kM5LxO9PBeN"
+                    valueFrom: enclaveUserArn
+                }
+            ],
+            environment: [
+                {
+                    name: "AWS_REGION",
+                    value: `${region}`
+                },
+                {
+                    name: "AWS_ACCESS_KEY_ID",
+                    value: parentAccessKeyId
+                },
+                {
+                    name: "AWS_ROOT_KEY_ID",
+                    value: rootKeyId
+                },
+                {
+                    name: "ENCLAVE_AWS_ACCESS_KEY_ID",
+                    value: enclaveAccessKeyId
                 },
                 {
                     name: "RUST_LOG",
@@ -267,6 +280,7 @@ export async function Create(config: AppConfig, constants: Config, secretsStore:
                     value: `service.name=fpc-api,service.version=1.0,deployment.environment=${pulumi.getStack()}`
                 }
             ],
+            dependsOn: [{ containerName: otelCollector.name, condition: "START" }],
             portMappings: [{
                 containerPort: appPort,
                 hostPort: appPort,
@@ -281,7 +295,7 @@ export async function Create(config: AppConfig, constants: Config, secretsStore:
                     "awslogs-stream-prefix": "ecs",
                 }
             }
-        }])
+        }, otelCollector])
     });
 
     const taskDef = new aws.ecs.TaskDefinition(`task-${config.imageName}-${region.toString()}`, {

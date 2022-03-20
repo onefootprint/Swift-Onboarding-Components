@@ -6,27 +6,35 @@ import * as certs from './certs';
 import * as pulumi from "@pulumi/pulumi"
 import * as random from "@pulumi/random";
 import * as cdn from './cdn';
-import * as app from './app';
 import * as secrets from './secrets'
 import { Config } from './config'
-import * as app2 from './app2';
+import * as svc from './service';
+import * as enclaveKey from './enclave_key';
 
 export = async () => {
     let config = new pulumi.Config();
     let constants = config.requireObject<Config>("constants");
     const stack = pulumi.getStack();
-    const secretsStore = await secrets.LoadSecrets(config);
 
-    const regions = [Region.USEast1];
+    const primaryRegion = Region.USEast1;
+    const otherRegions: Region[] = [];//[Region.USWest1];
+    const regions = [primaryRegion, ...otherRegions];
 
     const hostedZone = await aws.route53.getZone({ name: constants.rootDomain });
 
+    // init the enclave key
+    const enclaveKeyConfig = await enclaveKey.Initialize(constants, otherRegions);
+
+    // setup or secrets param store
+    const secretsStore = await secrets.LoadSecrets(config, enclaveKeyConfig);
+
+    // launch of core service
     const services = await Promise.all(regions.map(async region => {
         // mint a cert for this property
         const cert = await certs.CreateCertificate({ domain: `*.${stack}.${constants.rootDomain}`, region, hostedZoneId: hostedZone.id });
 
         // create our fargate service
-        const service = await app2.Create({
+        const service = await svc.Create({
             availabilityZones: 2,
             cpuUnits: 256,
             memoryMB: 512,
@@ -36,8 +44,8 @@ export = async () => {
             imageName: "fpc",
             dockerfilePath: "../api.dockerfile",
             region,
-            hostedZoneId: hostedZone.zoneId
-        }, constants, secretsStore)
+            hostedZoneId: hostedZone.zoneId,
+        }, constants, secretsStore, enclaveKeyConfig)
 
         return { service, cert, region }
     }));

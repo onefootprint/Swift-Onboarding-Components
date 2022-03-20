@@ -81,7 +81,7 @@ export async function Create(config: AppConfig, constants: Config, secretsStore:
                     }],
                     dependsOn: [{ containerName: "otelcollect", condition: "START" }]
                 },
-                otelcollect: Monitor.otelCollector(secretsStore, constants, region)
+                // otelcollect: Monitor.otelCollector(secretsStore, constants, region)
             },
         }
     }, { provider });
