@@ -67,15 +67,20 @@ export async function CreateCluster(clusterName: string, vpc: awsx.ec2.Vpc, nitr
                 status: "DISABLED"
             }
         }
-    }, { provider, dependsOn: [autoScaling] });
-
+    }, { provider });
 
     // create the cluster
     const cluster = new awsx.ecs.Cluster(`cluster-${clusterName}`, {
         name: clusterName,
         vpc,
+    }, { provider });
+
+    // this is used to tear down
+    const clusterCapacityProviders = new aws.ecs.ClusterCapacityProviders(`cluster-capacity-${clusterName}`, {
+        clusterName: cluster.cluster.name,
         capacityProviders: [capacityProvider.name]
-    }, { provider, dependsOn: [capacityProvider] });
+    }, { provider });
+
 
     return cluster;
 }
