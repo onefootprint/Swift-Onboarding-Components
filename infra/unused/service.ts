@@ -214,12 +214,12 @@ export async function Create(config: AppConfig, constants: Config, secretsStore:
     const privateSubnets = await vpc.privateSubnetIds;
 
     const applb = new awsx.elasticloadbalancingv2.ApplicationLoadBalancer(
-        `app-${config.imageName}-alb-${region.toString()}`, {
+        `app-${config.imageName}-alb-${region}`, {
         vpc,
         securityGroups: [appLbSg],
     }, { provider });
 
-    const target = applb.createTargetGroup(`${config.imageName}-alb-target-${region.toString()}`, { port: appPort, vpc });
+    const target = applb.createTargetGroup(`${config.imageName}-alb-target-${region}`, { port: appPort, vpc });
 
     // create the containers
     const otelCollector = Monitor.otelCollector(secretsStore, constants, region);

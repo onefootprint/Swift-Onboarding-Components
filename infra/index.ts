@@ -8,7 +8,7 @@ import * as random from "@pulumi/random";
 import * as cdn from './cdn';
 import * as secrets from './secrets'
 import { Config } from './config'
-import * as svc from './service';
+import * as svc from './service/service';
 import * as enclaveKey from './enclave_key';
 
 export = async () => {
@@ -41,8 +41,7 @@ export = async () => {
             instanceCount: 1,
             certArn: cert,
             domain: `${constants.internalAppSubdomain}.${stack}.${constants.rootDomain}`,
-            imageName: "fpc",
-            dockerfilePath: "../api.dockerfile",
+            serviceName: "fpc",
             region,
             hostedZoneId: hostedZone.zoneId,
         }, constants, secretsStore, enclaveKeyConfig)
@@ -62,6 +61,6 @@ export = async () => {
     return {
         domain: `${constants.cdnAppSubdomain}.${stack}.${constants.rootDomain}`,
         cdn: distribution.domainName,
-        appLBs: services.map(svc => { svc.service.lb.loadBalancer.loadBalancer.dnsName })
+        appLBs: services.map(svc => { svc.service.lb.loadBalancer.dnsName })
     }
 };
