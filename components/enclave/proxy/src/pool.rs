@@ -1,19 +1,18 @@
+use tokio::net::TcpStream;
+
 use async_trait::async_trait;
 use bb8::{self, ManageConnection, PooledConnection};
-use tokio::{
-    io::{AsyncRead, AsyncWrite},
-    net::UnixStream,
-};
+use tokio::io::{AsyncRead, AsyncWrite};
 use tokio_vsock::VsockStream;
 
 pub trait Stream: AsyncRead + AsyncWrite + Unpin + Send {}
 impl Stream for VsockStream {}
-impl Stream for UnixStream {}
+impl Stream for TcpStream {}
 
 #[async_trait]
 pub trait StreamConnection {
-    async fn new_stream(&self) -> Result<Box<dyn Stream>, tokio::io::Error>;
-    async fn ping(&self, stream: &mut Box<dyn Stream>) -> Result<(), tokio::io::Error>;
+    async fn new_stream(&self) -> Result<Box<dyn Stream>, crate::Error>;
+    async fn ping(&self, stream: &mut Box<dyn Stream>) -> Result<(), crate::Error>;
 }
 
 pub struct StreamManager<T>(pub T);
@@ -24,7 +23,7 @@ where
     T: StreamConnection + Sized + Send + Sync + 'static,
 {
     type Connection = Box<dyn Stream>;
-    type Error = tokio::io::Error;
+    type Error = crate::Error;
 
     async fn connect(&self) -> Result<Self::Connection, Self::Error> {
         let stream = self.0.new_stream().await?;

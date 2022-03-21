@@ -15,7 +15,7 @@ log = "0.4"
 serde = { version = "1.0", features = ["derive"]}
 serde_cbor = "0.11"
 byteorder = "1.4"
-enclave = { path = "../enclave" }
+enclave = { path = "../enclave", default-features = false }
 
 actix-web = "4.0.0-rc.2"
 env_logger = "0.9.0"
@@ -33,3 +33,4 @@ opentelemetry-otlp = { version = "0.10", features = ["tonic", "metrics"] }
 futures-util = { version = "0.3", default-features = false, features = ["std"] }
 bb8 = "0.7"
 async-trait = "0.1"
+thiserror = "1.0"

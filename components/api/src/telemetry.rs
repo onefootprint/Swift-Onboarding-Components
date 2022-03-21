@@ -56,6 +56,7 @@ pub fn init(_config: &Config) -> Result<PushController, Box<dyn std::error::Erro
     Ok(metrics)
 }
 
+#[allow(unused)]
 pub fn shutdown() {
     global::shutdown_tracer_provider();
 }

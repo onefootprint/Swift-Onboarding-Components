@@ -4,12 +4,15 @@ import * as awsx from "@pulumi/awsx";
 import * as aws from "@pulumi/aws";
 import { Output } from "@pulumi/pulumi";
 import * as fs from 'fs';
+import { EnclaveKeyDescriptor } from "./enclave_key";
 
-export interface Secrets {
+export interface StaticSecrets {
     cloudfrontSecret: pulumi.Output<string>;
     secretsPolicyArn: pulumi.Output<string>;
     elasticApiKey: aws.ssm.Parameter;
     otelConfig: aws.ssm.Parameter;
+    enclaveParentSecretKey: aws.ssm.Parameter;
+    enclaveUserSecretKey: aws.ssm.Parameter;
 }
 
 interface SecretConstants {
@@ -19,8 +22,7 @@ interface SecretConstants {
 interface ElasticSecrets {
     apiKey: string
 }
-
-export async function LoadSecrets(config: pulumi.Config): Promise<Secrets> {
+export async function LoadSecrets(config: pulumi.Config, enclaveKeyDescriptor: EnclaveKeyDescriptor): Promise<StaticSecrets> {
     const cloudfrontSecret = new random.RandomString("cf-alb-pass", { length: 44 }).result;
     const stack = pulumi.getStack();
 
@@ -44,20 +46,22 @@ export async function LoadSecrets(config: pulumi.Config): Promise<Secrets> {
         secretsPolicyArn: secretsPolicy.arn,
         cloudfrontSecret: pulumi.secret(cloudfrontSecret),
         elasticApiKey: createSecretParameter(`elasticApiKey-${stack}`, secretConstants.elastic.apiKey),
+        enclaveParentSecretKey: new aws.ssm.Parameter(`ssm-param-enclave-parent-key`, {
+            type: "String",
+            value: pulumi.secret(enclaveKeyDescriptor.enclaveParentCredentials.access_secret_key),
+            name: `/static_secrets/enclave-parent-${stack}`,
+        }),
+        enclaveUserSecretKey: new aws.ssm.Parameter(`ssm-param-enclave-user-key`, {
+            type: "String",
+            value: pulumi.secret(enclaveKeyDescriptor.enclaveKmsCredentials.access_secret_key),
+            name: `/static_secrets/enclave-user-${stack}`,
+        }),
         otelConfig: new aws.ssm.Parameter(`ssm-param-otelconfig`, {
             type: "String",
             value: fs.readFileSync('./otel/config.yml', 'utf8'),
             name: `/static_secrets/otelconfig-${stack}`,
         })
     }
-}
-
-function GetValue<T>(output: Output<T>): Promise<T> {
-    return new Promise<T>((resolve, reject) => {
-        output.apply(value => {
-            resolve(value);
-        });
-    });
 }
 
 /// create a secret param

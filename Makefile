@@ -3,21 +3,46 @@
 
 release:
 	@echo "building release mode"
-	@docker run -v "cargo-cache:/root/.cargo/registry" -v "${PWD}:/volume" --rm -t clux/muslrust:stable cargo build --bin footprint-core --release
+	@docker run -v "cargo-cache:/root/.cargo/registry" -v "${PWD}:/volume" --rm -t clux/muslrust:stable cargo build -p footprint-core --release
 	@cp ./target/x86_64-unknown-linux-musl/release/footprint-core ./out/footprint-core
 
 debug:
 	@echo "building debug mode"
-	@docker run -v "cargo-cache:/root/.cargo/registry" -v "${PWD}:/volume" --rm -t clux/muslrust:stable cargo build --bin footprint-core
+	@docker run -v "cargo-cache:/root/.cargo/registry" -v "${PWD}:/volume" --rm -t clux/muslrust:stable cargo build -p footprint-core
 	@cp ./target/x86_64-unknown-linux-musl/debug/footprint-core ./out/footprint-core
 
-build-eif:
+build-enclave-docker:
+	rm -f ./out/enclave
+
 	@echo "building enclave"
-	@cargo build --bin enclave --target=x86_64-unknown-linux-musl --release
+
+	@docker run -v "cargo-cache:/root/.cargo/registry" -v "${PWD}:/build" --rm -t enclave_builder:latest cargo build --target=x86_64-unknown-linux-musl -p enclave --no-default-features --features nitro --release
+
 	@cp ./target/x86_64-unknown-linux-musl/release/enclave ./out/enclave
-	@docker build -t enclave -f enclave.dockerfile .
-	@nitro-cli build-enclave --docker-dir ./ --docker-uri enclave --output-file ./out/enclave.eif
+
+	@docker build -f enclave.dockerfile -t enclave .
+
+build-eif: build-enclave-docker
+	rm -f ./out/enclave.eif
+
+	@echo "building EIF"
+
+	@nitro-cli build-enclave --docker-dir ./ --docker-uri enclave:latest --output-file ./out/enclave.eif --private-key ../enclavekey.pem --signing-certificate ../cert.pem
+
+run-enclave-debug:
+	@echo "running enclave [debug mode]"
+	@nitro-cli run-enclave --eif-path ./out/enclave.eif --cpu-count 2 --memory 256 --enclave-cid 16 --debug-mode
 
 run-enclave:
 	@echo "running enclave"
-	@nitro-cli run-enclave --eif-path ./out/enclave.eif --cpu-count 2 --memory 256
+	@nitro-cli run-enclave --eif-path ./out/enclave.eif --cpu-count 2 --memory 256 --enclave-cid 16
+
+
+account := $(shell aws sts get-caller-identity --query "Account" --output text)
+
+package-enclave:	
+	@echo "using account $(account)"
+	@docker build -t enclave_pkg:latest -f enclave_package.dockerfile .
+	@aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin $(account).dkr.ecr.us-east-1.amazonaws.com
+	@docker tag enclave_pkg:latest $(account).dkr.ecr.us-east-1.amazonaws.com/enclave_pkg:latest
+	@docker push $(account).dkr.ecr.us-east-1.amazonaws.com/enclave_pkg:latest

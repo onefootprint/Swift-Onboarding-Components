@@ -8,7 +8,8 @@ config:
     cdnProtectionHeaderName: X-Token-From-CloudFront
     elastic:
       apiKey:
-        secure: v1:mtF/qGF+Yz700JJv:O4qFnOOZSWS2/TBDR5wmyv/9X7Rf5OLcH+TYOib3E+RATw==
-      apmEndpoint: 704e0b6270f64a6aa6a9685ab0a539d0.apm.us-east-1.aws.cloud.es.io:443
+        secure: v1:lefOi07p1WAkmMbb:6IK3746SDP+nra5/Tpym+AisWeELd2cSzgcTNbdzxBcaSQ==
+      apmEndpoint: 66e04f7b644c4d1c98e26e58b75de669.apm.us-east-2.aws.elastic-cloud.com:443
+    enclaveCertPCR8: 48cb393ec504192fb147ffb2818c2a00c8e2d74659b509cc449a48ffe1c257a266b6a9f9ac356c4cd38a6c11825dd600
     internalAppSubdomain: api-internal
     rootDomain: infra.footprint.dev
