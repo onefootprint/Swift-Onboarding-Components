@@ -29,6 +29,7 @@ jobs:
   # we do this because building the EIF is SLOW!
   check_enclave_changed:
     name: check enclave changed
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - name: check enclave modified
@@ -40,7 +41,6 @@ jobs:
           do
             echo $file
             if [[ $file != components/enclave/* ]]; then
-              echo "This modified file is not under the 'db' folder."
               echo "::set-output name=run_job::false"
               break
             else
