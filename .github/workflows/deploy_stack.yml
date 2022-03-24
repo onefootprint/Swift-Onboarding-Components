@@ -6,10 +6,85 @@ on:
       - master
 
 jobs:
+  # build the main api image
+  build_api:
+    name: Build Signed EIF
+    runs-on: ubuntu-latest
+    environment: dev
+
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-region: ${{ secrets.AWS_REGION }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}                        
+      
+      # package and push the api image
+      - run: make package-api
+  
+  # check if the enclave should be built and packaged
+  # we do this because building the EIF is SLOW!
+  check_enclave_changed:
+    name: check enclave changed
+    steps:
+      - uses: actions/checkout@v2
+      - name: check enclave modified
+        id: check_enclave_modified
+        run: |
+          git diff --name-only HEAD^ HEAD        
+          git diff --name-only HEAD^ HEAD > files.txt
+          while IFS= read -r file
+          do
+            echo $file
+            if [[ $file != components/enclave/* ]]; then
+              echo "This modified file is not under the 'db' folder."
+              echo "::set-output name=run_job::false"
+              break
+            else
+              echo "::set-output name=run_job::true"
+            fi
+          done < files.txt
+
+  # builds the eif enclave image if needed
+  build_eif:
+    name: Build Signed EIF
+    runs-on: eif-builder
+    environment: dev
+    needs: [check_enclave_changed]
+    if: needs.check_enclave_changed.outputs.run_job == 'true'
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-region: ${{ secrets.AWS_REGION }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          
+      # install our signing credentials
+      - run: |
+          echo "${{ secrets.ENCLAVE_SIGNING_KEY }}" > ../enclavekey.pem
+          echo "${{ secrets.ENCLAVE_SIGNING_CERT }}" > ../cert.pem
+        
+      # build the signed eif
+      - run: make build-eif
+      
+      # package and deploy the eif image
+      - run: make package-enclave
+      
+      # cleanup: remove keys
+      - run: rm -f ../enclavekey.pem
+
   deploy_stack:    
     name: Deploy Stack
     runs-on: ubuntu-latest
     environment: dev
+    needs: [build_api, build_eif]
+    if: always() # run even if eif is not built
     steps:
       - uses: actions/checkout@v2
             
@@ -42,9 +117,14 @@ jobs:
         env:
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}            
           
-      # build the container
-      - run: make release
+      # set the container image versions
+      - name: "set api image version"
+        run: pulumi config set --path constants.containers.apiVersion api:$(make get-named-commit)
 
+      - name: "set enclave image version"
+        if: needs.check_enclave_changed.outputs.run_job == 'true'
+        run: pulumi config set --path constants.containers.enclaveVersion enclave_pkg:$(make get-named-commit)
+        
       # bring up the ephemeral stack
       - uses: pulumi/actions@v3
         with:

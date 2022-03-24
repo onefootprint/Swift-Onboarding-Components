@@ -2,16 +2,16 @@ import * as aws from "@pulumi/aws";
 import { Region } from "@pulumi/aws";
 import * as awsx from "@pulumi/awsx";
 import * as pulumi from "@pulumi/pulumi"
+import { Config } from "../config";
 
 export type NitroEnclaveConfig = {
-    version: string | undefined;
     cpus: number;
     memory: number;
     cid: number;
 }
 
 
-export async function CreateCluster(clusterName: string, vpc: awsx.ec2.Vpc, nitroConfig: NitroEnclaveConfig, region: Region, provider: pulumi.ProviderResource): Promise<awsx.ecs.Cluster> {
+export async function CreateCluster(clusterName: string, vpc: awsx.ec2.Vpc, constants: Config, nitroConfig: NitroEnclaveConfig, region: Region, provider: pulumi.ProviderResource): Promise<awsx.ecs.Cluster> {
     const instanceProfile = createInstanceRole(region, provider);
 
     // get our base image AMI
@@ -27,7 +27,7 @@ export async function CreateCluster(clusterName: string, vpc: awsx.ec2.Vpc, nitr
 
     const launchTemplate = new aws.ec2.LaunchTemplate(`template-ec2-${clusterName}`, {
         instanceType: "c5a.xlarge",
-        userData: Buffer.from(await userData(clusterName, nitroConfig)).toString('base64'),
+        userData: Buffer.from(await userData(clusterName, constants, nitroConfig)).toString('base64'),
         enclaveOptions: {
             enabled: true,
         },
@@ -53,7 +53,7 @@ export async function CreateCluster(clusterName: string, vpc: awsx.ec2.Vpc, nitr
         instanceRefresh: {
             strategy: "Rolling",
             preferences: {
-                minHealthyPercentage: 0,
+                minHealthyPercentage: 80,
             },
             triggers: ["tag"],
         },
@@ -141,10 +141,10 @@ function createInstanceRole(region: Region, provider: pulumi.ProviderResource): 
  * This is the "user_data" for booting up an EC2 machine to run our cluster tasks
  * It installs our enclave per the config.
  */
-async function userData(clusterName: string, config: NitroEnclaveConfig): Promise<string> {
-    const enclaveVersionTag = config.version ?? "latest";
+async function userData(clusterName: string, constants: Config, config: NitroEnclaveConfig): Promise<string> {
     const current = await aws.getCallerIdentity({});
     const ecrEndpoint = `${current.accountId}.dkr.ecr.us-east-1.amazonaws.com`;
+    const enclaveImage = `${current.accountId}.dkr.ecr.us-east-1.amazonaws.com/${constants.containers.enclaveVersion}`;
 
     return `
     #!/bin/bash
@@ -162,7 +162,7 @@ async function userData(clusterName: string, config: NitroEnclaveConfig): Promis
     aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${ecrEndpoint}
 
     mkdir -p image
-    docker run --rm -v $(pwd)/image:/shared ${ecrEndpoint}/enclave_pkg:${enclaveVersionTag}
+    docker run --rm -v $(pwd)/image:/shared ${enclaveImage}
     sudo chown $USER:$USER -R image/
 
     sudo systemctl start nitro-enclaves-allocator.service && sudo systemctl enable nitro-enclaves-allocator.service

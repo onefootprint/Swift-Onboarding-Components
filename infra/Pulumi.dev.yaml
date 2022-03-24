@@ -6,6 +6,9 @@ config:
   infra:constants:
     cdnAppSubdomain: api
     cdnProtectionHeaderName: X-Token-From-CloudFront
+    containers:
+      apiVersion: api:master-48-fcb8ff
+      enclaveVersion: enclave_pkg:master-48-fcb8ff
     elastic:
       apiKey:
         secure: v1:lefOi07p1WAkmMbb:6IK3746SDP+nra5/Tpym+AisWeELd2cSzgcTNbdzxBcaSQ==

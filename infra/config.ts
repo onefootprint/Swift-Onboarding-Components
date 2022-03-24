@@ -5,8 +5,14 @@ export interface Config {
     cdnAppSubdomain: string;
     elastic: Elastic;
     enclaveCertPCR8: string;
+    containers: Containers;
 }
 
 export interface Elastic {
     apmEndpoint: string;
+}
+
+export interface Containers {
+    apiVersion: string;
+    enclaveVersion: string;
 }

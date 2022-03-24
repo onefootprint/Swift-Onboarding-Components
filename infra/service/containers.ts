@@ -8,32 +8,26 @@ import { Region } from "@pulumi/aws";
 
 export abstract class ServiceContainers {
 
-    static apiMain(appPort: number, constants: Config, secretsStore: StaticSecrets, enclaveKeyDescriptor: EnclaveKeyDescriptor, region: Region, parent: pulumi.Resource): pulumi.Output<string> {
+    static async apiMain(appPort: number, constants: Config, secretsStore: StaticSecrets, enclaveKeyDescriptor: EnclaveKeyDescriptor, region: Region, parent: pulumi.Resource): Promise<pulumi.Output<string>> {
         const name = "fpc";
 
         // depends on otel
         const otelCollector = ServiceContainers.createOtelCollector(secretsStore, constants);
 
-        // build the image
-        const image = awsx.ecs.Image.fromDockerBuild(`fpc-image-${region}`, {
-            context: "../",
-            dockerfile: "../api.dockerfile",
-        });
-
-        const imageName = pulumi.output(image.image(`${name}-image-${region}`, parent));
+        const current = await aws.getCallerIdentity({});
+        const image = `${current.accountId}.dkr.ecr.us-east-1.amazonaws.com/${constants.containers.apiVersion}`;
 
         const containerDef = pulumi.all([
-            imageName,
             otelCollector,
             enclaveKeyDescriptor.rootKeyId,
             enclaveKeyDescriptor.enclaveParentCredentials.access_key_id,
             secretsStore.enclaveParentSecretKey.arn,
             enclaveKeyDescriptor.enclaveKmsCredentials.access_key_id,
             secretsStore.enclaveUserSecretKey.arn
-        ]).apply(([img, otelCollector, rootKeyId, parentAccessKeyId, enclaveParentArn, enclaveAccessKeyId, enclaveUserArn]) => {
+        ]).apply(([otelCollector, rootKeyId, parentAccessKeyId, enclaveParentArn, enclaveAccessKeyId, enclaveUserArn]) => {
             const def = [{
                 name,
-                image: img,
+                image,
                 essential: true,
                 secrets: [
                     {

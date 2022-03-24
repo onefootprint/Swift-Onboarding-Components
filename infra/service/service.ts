@@ -41,15 +41,14 @@ export async function Create(config: ServiceConfig, constants: Config, secretsSt
     }, { provider });
 
     // init our cluster
-    const cluster = await CreateCluster(`fpc-${pulumi.getStack()}-${region}`, vpc, {
+    const cluster = await CreateCluster(`fpc-${pulumi.getStack()}-${region}`, vpc, constants, {
         cid: 16,
         memory: 256,
         cpus: 2,
-        version: "latest",
     }, region, provider);
 
     // declare the containers we want to run
-    const containerDefinitions = ServiceContainers.apiMain(ServicePort, constants, secretsStore, enclaveKeyDescriptor, region, cluster);
+    const containerDefinitions = await ServiceContainers.apiMain(ServicePort, constants, secretsStore, enclaveKeyDescriptor, region, cluster);
 
     // setup the task
     const taskExecRole = createTaskExecutionRole(secretsStore, region);

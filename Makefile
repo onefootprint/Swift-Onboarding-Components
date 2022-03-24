@@ -1,12 +1,17 @@
 .PHONY: release debug
 .DEFAULT_GOAL := debug
 
-release:
+account := $(shell aws sts get-caller-identity --query "Account" --output text)
+branch := $(shell git rev-parse --abbrev-ref HEAD | sed -r 's/\//-/g' | sed -r 's/_/-/g')
+commit := "$(branch)-$(shell git rev-list HEAD --count)-$(shell git rev-list HEAD -1 | head -c 6)"
+
+
+api-release:
 	@echo "building release mode"
 	@docker run -v "cargo-cache:/root/.cargo/registry" -v "${PWD}:/volume" --rm -t clux/muslrust:stable cargo build -p footprint-core --release
 	@cp ./target/x86_64-unknown-linux-musl/release/footprint-core ./out/footprint-core
 
-debug:
+api-debug:
 	@echo "building debug mode"
 	@docker run -v "cargo-cache:/root/.cargo/registry" -v "${PWD}:/volume" --rm -t clux/muslrust:stable cargo build -p footprint-core
 	@cp ./target/x86_64-unknown-linux-musl/debug/footprint-core ./out/footprint-core
@@ -37,12 +42,24 @@ run-enclave:
 	@echo "running enclave"
 	@nitro-cli run-enclave --eif-path ./out/enclave.eif --cpu-count 2 --memory 256 --enclave-cid 16
 
+get-named-commit:
+	@echo "$(commit)"
 
-account := $(shell aws sts get-caller-identity --query "Account" --output text)
+get-friendly-branch-name:
+	@echo "$(branch)"
 
 package-enclave:	
 	@echo "using account $(account)"
-	@docker build -t enclave_pkg:latest -f enclave_package.dockerfile .
+	@echo "create image tagged as $(commit)"
+	@docker build -t enclave_pkg:$(commit) -f enclave_package.dockerfile .
 	@aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin $(account).dkr.ecr.us-east-1.amazonaws.com
-	@docker tag enclave_pkg:latest $(account).dkr.ecr.us-east-1.amazonaws.com/enclave_pkg:latest
-	@docker push $(account).dkr.ecr.us-east-1.amazonaws.com/enclave_pkg:latest
+	@docker tag enclave_pkg:$(commit) $(account).dkr.ecr.us-east-1.amazonaws.com/enclave_pkg:$(commit)
+	@docker push $(account).dkr.ecr.us-east-1.amazonaws.com/enclave_pkg:$(commit) 
+
+package-api: api-release
+	@echo "using account $(account)"
+	@echo "create image tagged as $(commit)"
+	@docker build -t api:$(commit) -f api.dockerfile .
+	@aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin $(account).dkr.ecr.us-east-1.amazonaws.com
+	@docker tag api:$(commit) $(account).dkr.ecr.us-east-1.amazonaws.com/api:$(commit)
+	@docker push $(account).dkr.ecr.us-east-1.amazonaws.com/api:$(commit) 	

@@ -17,7 +17,7 @@ export = async () => {
     const stack = pulumi.getStack();
 
     const primaryRegion = Region.USEast1;
-    const otherRegions: Region[] = [];//[Region.USWest1];
+    const otherRegions: Region[] = [];// [Region.USWest1];
     const regions = [primaryRegion, ...otherRegions];
 
     const hostedZone = await aws.route53.getZone({ name: constants.rootDomain });
