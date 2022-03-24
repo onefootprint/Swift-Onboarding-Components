@@ -3,9 +3,85 @@ on:
   pull_request:
     types: [reopened, opened, synchronize, edited]
 jobs:
+  # build the main api image
+  build_api:
+    name: Build API container
+    runs-on: ubuntu-latest
+    environment: dev
+
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-region: ${{ secrets.AWS_REGION }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}                        
+      
+      # package and push the api image
+      - run: make package-api
+  
+  # check if the enclave should be built and packaged
+  # we do this because building the EIF is SLOW!
+  check_enclave_changed:
+    name: Check if enclave changed
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 2
+      - name: check enclave modified
+        id: check_enclave_modified
+        run: |
+          git diff --name-only HEAD~1 HEAD        
+          git diff --name-only HEAD~1 HEAD > files.txt
+          while IFS= read -r file
+          do
+            echo $file
+            if [[ $file != components/enclave/* ]]; then
+              echo "::set-output name=run_job::false"
+              break
+            else
+              echo "::set-output name=run_job::true"
+            fi
+          done < files.txt
+
+  # builds the eif enclave image if needed
+  build_eif:
+    name: Build Signed EIF
+    runs-on: eif-builder
+    environment: dev
+    needs: [check_enclave_changed]
+    if: needs.check_enclave_changed.outputs.run_job == 'true' && github.actor != "dependabot[bot]"
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-region: ${{ secrets.AWS_REGION }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}              
+                  
+      # install our signing credentials
+      # build, sign, package and push the eif image      
+      - name: build, sign and package        
+        run: |
+          echo "${{ secrets.ENCLAVE_SIGNING_KEY }}" > ../enclavekey.pem
+          echo "${{ secrets.ENCLAVE_SIGNING_CERT }}" > ../cert.pem
+          make build-eif
+          make package-enclave          
+      
+      # cleanup: remove keys
+      - run: rm -f ../enclavekey.pem
+
   ephemeral_stack:    
     name: Create Ephemeral Stack
     runs-on: ubuntu-latest
+    needs: [build_api, build_eif]
+    # if: always() # run even if eif is not built
+    if: github.actor != "dependabot[bot]" # don't run for dependabot changes
     environment: dev
     steps:
       - uses: actions/checkout@v2
@@ -23,8 +99,10 @@ jobs:
           
       - name: Setup Pulumi CLI
         uses: pulumi/setup-pulumi@v2.0.0            
+        
       - run: npm install
         working-directory: infra
+
       - name: Extract branch name
         shell: bash
         run: |
@@ -55,8 +133,16 @@ jobs:
         env:
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
           
-      # build the container
-      - run: make debug
+      # set the container image versions
+      - name: "set api image version"
+        working-directory: infra
+        run: pulumi config set --path constants.containers.apiVersion api:$(make get-named-commit)
+
+      - name: "set enclave image version"
+        working-directory: infra
+        if: needs.check_enclave_changed.outputs.run_job == 'true'
+        run: pulumi config set --path constants.containers.enclaveVersion enclave_pkg:$(make get-named-commit)
+        
 
       # bring up the ephemeral stack
       - uses: pulumi/actions@v3
