@@ -28,7 +28,7 @@ jobs:
       - name: Extract branch name
         shell: bash
         run: |
-          branch=$(echo $GITHUB_HEAD_REF | sed -r 's/\//-/g' | sed -r 's/_/-/g')
+          branch=$(make get-friendly-branch-name)
           echo "##[set-output name=branch;]$(echo ${branch})"
         id: extract_branch            
 
