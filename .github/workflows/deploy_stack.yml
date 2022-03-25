@@ -56,7 +56,7 @@ jobs:
     runs-on: eif-builder
     environment: dev
     needs: [check_enclave_changed]
-    if: needs.check_enclave_changed.outputs.run_job == 'true' && github.actor != "dependabot[bot]"
+    if: needs.check_enclave_changed.outputs.run_job == 'true' && github.actor != 'dependabot[bot]'
     steps:
       - uses: actions/checkout@v2
       
@@ -85,7 +85,7 @@ jobs:
     environment: dev
     needs: [build_api, build_eif]
     # if: always() # run even if eif is not built
-    if: github.actor != "dependabot[bot]" # don't run for dependabot changes
+    if: github.actor != 'dependabot[bot]' # don't run for dependabot changes
     steps:
       - uses: actions/checkout@v2
             
