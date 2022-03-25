@@ -127,12 +127,12 @@ jobs:
 
       - name: "set api image version"
         working-directory: infra
-        run: pulumi config set --path constants.containers.apiVersion api:${{ steps.extract_container_version.outputs.version }}
+        run: pulumi config set --stack "footprint/${{ secrets.STACK_NAME }}" --path constants.containers.apiVersion api:${{ steps.extract_container_version.outputs.version }}
 
       - name: "set enclave image version"
         working-directory: infra
         if: needs.check_enclave_changed.outputs.run_job == 'true'
-        run: pulumi config set --path constants.containers.enclaveVersion enclave_pkg:${{ steps.extract_container_version.outputs.version }}
+        run: pulumi config set --stack "footprint/${{ secrets.STACK_NAME }}" --path constants.containers.enclaveVersion enclave_pkg:${{ steps.extract_container_version.outputs.version }}
         
       # bring up the ephemeral stack
       - uses: pulumi/actions@v3
