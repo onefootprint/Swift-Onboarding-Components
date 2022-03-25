@@ -84,7 +84,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: dev
     needs: [build_api, build_eif]
-    if: always() # run even if eif is not built
+    # if: always() # run even if eif is not built
     if: github.actor != "dependabot[bot]" # don't run for dependabot changes
     steps:
       - uses: actions/checkout@v2
