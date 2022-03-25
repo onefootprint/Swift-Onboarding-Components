@@ -115,17 +115,24 @@ jobs:
           echo "##[set-output name=url;]$(echo ${url})"
         id: extract_env_url
         env:
-          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}            
-          
+          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}     
+
+                       
       # set the container image versions
+      - name: extract named version
+        id: extract_container_version
+        run: |
+          vers="$(make get-named-commit)"
+          echo "##[set-output name=version;]$(echo ${vers})"
+
       - name: "set api image version"
         working-directory: infra
-        run: pulumi config set --path constants.containers.apiVersion api:$(make get-named-commit)
+        run: pulumi config set --path constants.containers.apiVersion api:${{ steps.extract_container_version.outputs.version }}
 
       - name: "set enclave image version"
         working-directory: infra
         if: needs.check_enclave_changed.outputs.run_job == 'true'
-        run: pulumi config set --path constants.containers.enclaveVersion enclave_pkg:$(make get-named-commit)
+        run: pulumi config set --path constants.containers.enclaveVersion enclave_pkg:${{ steps.extract_container_version.outputs.version }}
         
       # bring up the ephemeral stack
       - uses: pulumi/actions@v3
