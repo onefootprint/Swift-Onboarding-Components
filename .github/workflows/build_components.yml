@@ -101,9 +101,8 @@ jobs:
     environment: dev
     needs: [check_components_changed, build_api, build_eif]
     permissions:          
-      contents: read
-      pull-requests: write
-      repository: write
+      contents: write
+      pull-requests: write      
     if: always() && github.actor != 'dependabot[bot]' # don't run for dependabot changes
     steps:
       - uses: actions/checkout@v2
