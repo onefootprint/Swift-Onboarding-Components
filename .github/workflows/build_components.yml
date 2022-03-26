@@ -99,7 +99,7 @@ jobs:
     name: Prepare stack to be deployed
     runs-on: ubuntu-latest
     environment: dev
-    needs: [build_api, build_eif]
+    needs: [check_components_changed, build_api, build_eif]
     permissions:          
       contents: read
       pull-requests: write
@@ -142,11 +142,11 @@ jobs:
         run: pulumi stack select "footprint/${{ secrets.STACK_NAME }}"
 
       - name: "set api image version"
-        if: needs.check_enclave_changed.outputs.build_api == 'true'      
+        if: needs.check_components_changed.outputs.build_api == 'true'      
         run: make set-api-version
 
       - name: "set enclave image version"
-        if: needs.check_enclave_changed.outputs.build_enclave == 'true'
+        if: needs.check_components_changed.outputs.build_enclave == 'true'
         run: make set-enclave-version
 
       - name: extract named version
@@ -155,9 +155,16 @@ jobs:
           vers="$(make get-named-commit)"
           echo "##[set-output name=version;]$(echo ${vers})"
 
+      - uses: tibdex/github-app-token@v1
+        id: generate-token
+        with:
+          app_id: ${{ secrets.DEPLOY_BOT_APP_ID }}
+          private_key: ${{ secrets.DEPLOY_BOT_PRIVATE_KEY }}
+
       - name: Create Deploy Pull Request
         uses: peter-evans/create-pull-request@v4.0.0
         with:
+          token: ${{ steps.generate-token.outputs.token }}
           commit-message: deploy new build with updated components
           title: Deploy stack ${{ secrets.STACK_NAME }} ${{ steps.extract_container_version.outputs.version }}
           body: Update component versions in pulumi config
