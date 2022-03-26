@@ -2,8 +2,8 @@ name: Build Components
 
 on:
   push:
-    paths:
-      - 'components/**'
+    # paths:
+    #   - 'components/**'
 
     branches:
       - master
@@ -103,6 +103,7 @@ jobs:
     permissions:          
       contents: read
       pull-requests: write
+      repository: write
     if: always() && github.actor != 'dependabot[bot]' # don't run for dependabot changes
     steps:
       - uses: actions/checkout@v2
