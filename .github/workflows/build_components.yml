@@ -2,8 +2,8 @@ name: Build Components
 
 on:
   push:
-    # paths:
-    #   - 'components/**'
+    paths:
+      - 'components/**'
 
     branches:
       - master
