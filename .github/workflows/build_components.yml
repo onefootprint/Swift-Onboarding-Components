@@ -121,7 +121,7 @@ jobs:
       - name: Setup Pulumi CLI
         uses: pulumi/setup-pulumi@v2.0.0       
 
-      - run: npm install
+      - run: yarn install
         working-directory: infra
 
       # get the url for the environment
@@ -155,12 +155,6 @@ jobs:
           vers="$(make get-named-commit)"
           echo "##[set-output name=version;]$(echo ${vers})"
 
-      # - uses: tibdex/github-app-token@v1
-      #   id: generate-token
-      #   with:
-      #     app_id: ${{ secrets.DEPLOY_BOT_APP_ID }}
-      #     private_key: ${{ secrets.DEPLOY_BOT_PRIVATE_KEY }}
-
       - name: Create Deploy Pull Request
         uses: peter-evans/create-pull-request@v4.0.0
         with:
@@ -168,4 +162,3 @@ jobs:
           title: Deploy stack ${{ secrets.STACK_NAME }} ${{ steps.extract_container_version.outputs.version }}
           body: Update component versions in pulumi config
           branch: deploy/${{ steps.extract_container_version.outputs.version }}
-          base: master
