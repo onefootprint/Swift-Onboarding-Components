@@ -101,7 +101,7 @@ jobs:
     environment: dev
     needs: [build_api, build_eif]
     permissions:          
-      contents: read|write|none
+      contents: read
       pull-requests: write
     if: always() && github.actor != 'dependabot[bot]' # don't run for dependabot changes
     steps:
