@@ -111,7 +111,8 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           
       - name: Setup Pulumi CLI
-        uses: pulumi/setup-pulumi@v2.0.0            
+        uses: pulumi/setup-pulumi@v2.0.0       
+
       - run: npm install
         working-directory: infra
 
@@ -129,6 +130,7 @@ jobs:
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}     
                     
       - name: select stack
+        working-directory: infra
         run: pulumi stack select "footprint/${{ secrets.STACK_NAME }}"
 
       - name: "set api image version"
