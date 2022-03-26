@@ -1,90 +1,18 @@
-name: Deploy Stack
+name: Build Components
 
 on:
   push:
+    paths:
+      - 'infra/**'
     branches:
       - master
 
-jobs:
-  # build the main api image
-  build_api:
-    name: Build API container
-    runs-on: ubuntu-latest
-    environment: dev
-
-    steps:
-      - uses: actions/checkout@v2
-      
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-region: ${{ secrets.AWS_REGION }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}                        
-      
-      # package and push the api image
-      - run: make package-api
-  
-  # check if the enclave should be built and packaged
-  # we do this because building the EIF is SLOW!
-  check_enclave_changed:
-    name: Check if enclave changed
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: 2
-      - name: check enclave modified
-        id: check_enclave_modified
-        run: |
-          git diff --name-only HEAD~1 HEAD        
-          git diff --name-only HEAD~1 HEAD > files.txt
-          while IFS= read -r file
-          do
-            echo $file
-            if [[ $file != components/enclave/* ]]; then
-              echo "::set-output name=run_job::false"
-              break
-            else
-              echo "::set-output name=run_job::true"
-            fi
-          done < files.txt
-
-  # builds the eif enclave image if needed
-  build_eif:
-    name: Build Signed EIF
-    runs-on: eif-builder
-    environment: dev
-    needs: [check_enclave_changed]
-    if: needs.check_enclave_changed.outputs.run_job == 'true' && github.actor != 'dependabot[bot]'
-    steps:
-      - uses: actions/checkout@v2
-      
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-region: ${{ secrets.AWS_REGION }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}              
-                  
-      # install our signing credentials
-      # build, sign, package and push the eif image      
-      - name: build, sign and package        
-        run: |
-          echo "${{ secrets.ENCLAVE_SIGNING_KEY }}" > ../enclavekey.pem
-          echo "${{ secrets.ENCLAVE_SIGNING_CERT }}" > ../cert.pem
-          make build-eif
-          make package-enclave          
-      
-      # cleanup: remove keys
-      - run: rm -f ../enclavekey.pem
-
+jobs:  
   deploy_stack:    
-    name: Deploy Stack
+    name: Prepare stack to be deployed
     runs-on: ubuntu-latest
     environment: dev
-    needs: [build_api, build_eif]    
-    if: always() && github.actor != 'dependabot[bot]' # don't run for dependabot changes
+    if: github.actor != 'dependabot[bot]' # don't run for dependabot changes
     steps:
       - uses: actions/checkout@v2
             
@@ -116,24 +44,7 @@ jobs:
         id: extract_env_url
         env:
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}     
-
-                       
-      # set the container image versions
-      - name: extract named version
-        id: extract_container_version
-        run: |
-          vers="$(make get-named-commit)"
-          echo "##[set-output name=version;]$(echo ${vers})"
-
-      - name: "set api image version"
-        working-directory: infra
-        run: pulumi config set --stack "footprint/${{ secrets.STACK_NAME }}" --path constants.containers.apiVersion api:${{ steps.extract_container_version.outputs.version }}
-
-      - name: "set enclave image version"
-        working-directory: infra
-        if: needs.check_enclave_changed.outputs.run_job == 'true'
-        run: pulumi config set --stack "footprint/${{ secrets.STACK_NAME }}" --path constants.containers.enclaveVersion enclave_pkg:${{ steps.extract_container_version.outputs.version }}
-        
+                    
       # bring up the ephemeral stack
       - uses: pulumi/actions@v3
         with:

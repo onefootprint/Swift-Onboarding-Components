@@ -1,0 +1,163 @@
+name: Build Components
+
+on:
+  push:
+    paths:
+      - 'components/**'
+
+    branches:
+      - master
+
+jobs:  
+  # check if components changed and if we should build them!
+  check_components_changed:
+    name: Check if components changed
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 2
+      - name: check enclave modified
+        id: check_enclave_modified
+        run: |
+          git diff --name-only HEAD~1 HEAD        
+          git diff --name-only HEAD~1 HEAD > files.txt
+          while IFS= read -r file
+          do
+            echo $file
+            if [[ $file != components/enclave/* ]]; then
+              echo "::set-output name=build_enclave::false"
+              break
+            else
+              echo "::set-output name=build_enclave::true"
+            fi
+
+            if [[ $file != components/api/* ]]; then
+              echo "::set-output name=build_api::false"
+              break
+            else
+              echo "::set-output name=build_api::true"
+            fi
+          done < files.txt
+
+  # build the main api image
+  build_api:
+    name: Build API container
+    runs-on: ubuntu-latest
+    environment: dev
+    needs: [check_components_changed]
+    if: needs.check_components_changed.outputs.build_api == 'true' && github.actor != 'dependabot[bot]'
+
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-region: ${{ secrets.AWS_REGION }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}                        
+      
+      # package and push the api image
+      - run: make package-api
+
+  # builds the eif enclave image if needed
+  build_eif:
+    name: Build Signed EIF
+    runs-on: eif-builder
+    environment: dev
+    needs: [check_components_changed]
+    if: needs.check_components_changed.outputs.build_enclave == 'true' && github.actor != 'dependabot[bot]'
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-region: ${{ secrets.AWS_REGION }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}              
+                  
+      # install our signing credentials
+      # build, sign, package and push the eif image      
+      - name: build, sign and package        
+        run: |
+          echo "${{ secrets.ENCLAVE_SIGNING_KEY }}" > ../enclavekey.pem
+          echo "${{ secrets.ENCLAVE_SIGNING_CERT }}" > ../cert.pem
+          make build-eif
+          make package-enclave          
+      
+      # cleanup: remove keys
+      - run: rm -f ../enclavekey.pem
+
+  prepare_stack_deploy:    
+    name: Prepare stack to be deployed
+    runs-on: ubuntu-latest
+    environment: dev
+    needs: [build_api, build_eif]    
+    if: always() && github.actor != 'dependabot[bot]' # don't run for dependabot changes
+    steps:
+      - uses: actions/checkout@v2
+            
+      # pulumi setup
+      - uses: actions/setup-node@v2
+        with:
+          node-version: 14.x
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-region: ${{ secrets.AWS_REGION }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          
+      - name: Setup Pulumi CLI
+        uses: pulumi/setup-pulumi@v2.0.0            
+      - run: npm install
+        working-directory: infra
+
+      # get the url for the environment
+      - name: Extract env url
+        shell: bash
+        working-directory: infra
+        run: |
+          sub=$(pulumi config --stack footprint/${{ secrets.STACK_NAME }} get --path constants.cdnAppSubdomain)
+          root=$(pulumi config --stack footprint/${{ secrets.STACK_NAME }} get --path constants.rootDomain)
+          url="${sub}.${root}"
+          echo "##[set-output name=url;]$(echo ${url})"
+        id: extract_env_url
+        env:
+          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}     
+                    
+      - name: select stack
+        run: pulumi stack select "footprint/${{ secrets.STACK_NAME }}"
+
+      - name: "set api image version"
+        if: needs.check_enclave_changed.outputs.build_api == 'true'      
+        run: make set-api-version
+
+      - name: "set enclave image version"
+        if: needs.check_enclave_changed.outputs.build_enclave == 'true'
+        run: make set-enclave-version
+
+      - name: extract named version
+        id: extract_container_version
+        run: |
+          vers="$(make get-named-commit)"
+          echo "##[set-output name=version;]$(echo ${vers})"
+
+      # needed to trigger PR that runs workflow on the next step
+      - uses: tibdex/github-app-token@v1
+        id: generate-token
+        with:
+          app_id: ${{ secrets.APP_ID }}
+          private_key: ${{ secrets.APP_PRIVATE_KEY }}
+
+      - name: Create Deploy Pull Request
+        uses: peter-evans/create-pull-request@v4.0.0
+        with:
+          commit-message: deploy new build with updated components
+          title: Deploy stack ${{ secrets.STACK_NAME }} ${{ steps.extract_container_version.outputs.version }}
+          body: Update component versions in pulumi config
+          branch: deploy/${{ steps.extract_container_version.outputs.version }}
+          token: ${{ steps.generate-token.outputs.token }}
+          base: master

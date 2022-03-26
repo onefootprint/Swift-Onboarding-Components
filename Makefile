@@ -48,6 +48,10 @@ get-named-commit:
 get-friendly-branch-name:
 	@echo "$(branch)"
 
+	
+set-enclave-version:
+	@pulumi --cwd infra config set --path constants.containers.enclaveVersion enclave_pkg:$(commit)	
+
 package-enclave:	
 	@echo "using account $(account)"
 	@echo "create image tagged as $(commit)"
@@ -55,6 +59,9 @@ package-enclave:
 	@aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin $(account).dkr.ecr.us-east-1.amazonaws.com
 	@docker tag enclave_pkg:$(commit) $(account).dkr.ecr.us-east-1.amazonaws.com/enclave_pkg:$(commit)
 	@docker push $(account).dkr.ecr.us-east-1.amazonaws.com/enclave_pkg:$(commit) 
+
+set-api-version:
+	@pulumi --cwd infra config set --path constants.containers.apiVersion api:$(commit)
 
 package-api: api-release
 	@echo "using account $(account)"
