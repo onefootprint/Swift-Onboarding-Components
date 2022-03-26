@@ -25,18 +25,18 @@ jobs:
           while IFS= read -r file
           do
             echo $file
-            if [[ $file != components/enclave/* ]]; then
+            if [[ $file != components/enclave/** ]]; then
               echo "::set-output name=build_enclave::false"
-              break
             else
               echo "::set-output name=build_enclave::true"
+              break              
             fi
 
-            if [[ $file != components/api/* ]]; then
+            if [[ $file != components/api/** ]]; then
               echo "::set-output name=build_api::false"
-              break
             else
               echo "::set-output name=build_api::true"
+              break
             fi
           done < files.txt
 
@@ -146,13 +146,6 @@ jobs:
         run: |
           vers="$(make get-named-commit)"
           echo "##[set-output name=version;]$(echo ${vers})"
-
-      # needed to trigger PR that runs workflow on the next step
-      - uses: tibdex/github-app-token@v1
-        id: generate-token
-        with:
-          app_id: ${{ secrets.APP_ID }}
-          private_key: ${{ secrets.APP_PRIVATE_KEY }}
 
       - name: Create Deploy Pull Request
         uses: peter-evans/create-pull-request@v4.0.0
