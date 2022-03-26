@@ -13,12 +13,15 @@ jobs:
   check_components_changed:
     name: Check if components changed
     runs-on: ubuntu-latest
+    outputs:
+      build_enclave: ${{ steps.check_modified.outputs.build_enclave }}
+      build_api: ${{ steps.check_modified.outputs.build_api }}
     steps:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 2
       - name: check modified
-        id: check_enclave_modified
+        id: check_modified
         run: |
           git diff --name-only HEAD~1 HEAD        
           git diff --name-only HEAD~1 HEAD > files.txt
@@ -98,6 +101,7 @@ jobs:
     environment: dev
     needs: [build_api, build_eif]
     permissions:          
+      contents: read|write|none
       pull-requests: write
     if: always() && github.actor != 'dependabot[bot]' # don't run for dependabot changes
     steps:
