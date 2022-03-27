@@ -33,6 +33,7 @@ jobs:
             else
               echo "enclave component changed"
               echo "::set-output name=build_enclave::true"
+              echo "::set-output name=build_api::true"
               break              
             fi
 
@@ -159,6 +160,6 @@ jobs:
         uses: peter-evans/create-pull-request@v4.0.0
         with:
           commit-message: "deploy new build with updated components"
-          title: Update components for [ ${{ secrets.STACK_NAME }} ]  ${{ steps.extract_container_version.outputs.version }} deploy
+          title: Deploy to [ ${{ secrets.STACK_NAME }} ]: ${{ steps.extract_container_version.outputs.version }} 
           body: Update component versions
           branch: deploy/${{ steps.extract_container_version.outputs.version }}
