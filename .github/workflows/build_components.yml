@@ -158,7 +158,7 @@ jobs:
       - name: Create Deploy Pull Request
         uses: peter-evans/create-pull-request@v4.0.0
         with:
-          commit-message: deploy new build with updated components
-          title: [ ${{ secrets.STACK_NAME }} ] Update components ${{ steps.extract_container_version.outputs.version }} for deploy
-          body: Update component versions in pulumi config
+          commit-message: "deploy new build with updated components"
+          title: Update components for [ ${{ secrets.STACK_NAME }} ]  ${{ steps.extract_container_version.outputs.version }} deploy
+          body: Update component versions
           branch: deploy/${{ steps.extract_container_version.outputs.version }}
