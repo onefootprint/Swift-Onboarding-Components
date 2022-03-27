@@ -3,7 +3,7 @@
 
 account := $(shell aws sts get-caller-identity --query "Account" --output text)
 branch := $(shell git rev-parse --abbrev-ref HEAD | sed -r 's/\//-/g' | sed -r 's/_/-/g')
-commit := "$(branch)-$(shell git rev-list HEAD --count)-$(shell git rev-list HEAD -1 | head -c 6)"
+commit := "$(branch)-$(shell git rev-list HEAD -1 | head -c 6)"
 
 
 api-release:

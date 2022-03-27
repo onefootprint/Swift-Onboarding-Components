@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - 'components/**'
+      - '.github/workflows/build_components.yml'
 
     branches:
       - master
@@ -106,7 +107,7 @@ jobs:
     if: always() && github.actor != 'dependabot[bot]' # don't run for dependabot changes
     steps:
       - uses: actions/checkout@v2
-            
+          
       # pulumi setup
       - uses: actions/setup-node@v2
         with:
@@ -159,6 +160,6 @@ jobs:
         uses: peter-evans/create-pull-request@v4.0.0
         with:
           commit-message: deploy new build with updated components
-          title: Deploy stack ${{ secrets.STACK_NAME }} ${{ steps.extract_container_version.outputs.version }}
+          title: [${{ secrets.STACK_NAME }}] Update components ${{ steps.extract_container_version.outputs.version }} for deploy
           body: Update component versions in pulumi config
           branch: deploy/${{ steps.extract_container_version.outputs.version }}
