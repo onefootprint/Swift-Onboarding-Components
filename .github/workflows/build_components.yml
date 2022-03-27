@@ -4,7 +4,6 @@ on:
   push:
     paths:
       - 'components/**'
-      - '.github/workflows/build_components.yml'
 
     branches:
       - master
@@ -160,6 +159,6 @@ jobs:
         uses: peter-evans/create-pull-request@v4.0.0
         with:
           commit-message: deploy new build with updated components
-          title: [${{ secrets.STACK_NAME }}] Update components ${{ steps.extract_container_version.outputs.version }} for deploy
+          title: [ ${{ secrets.STACK_NAME }} ] Update components ${{ steps.extract_container_version.outputs.version }} for deploy
           body: Update component versions in pulumi config
           branch: deploy/${{ steps.extract_container_version.outputs.version }}
