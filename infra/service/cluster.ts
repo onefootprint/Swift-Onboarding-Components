@@ -44,6 +44,7 @@ export async function CreateCluster(clusterName: string, vpc: awsx.ec2.Vpc, cons
     const autoScaling = new aws.autoscaling.Group(`autoscale-group-${clusterName}`, {
         minSize: 1,
         maxSize: 2,
+        desiredCapacity: 1,
         launchTemplate: {
             id: launchTemplate.id,
             version: pulumi.output(launchTemplate.latestVersion).apply(v => `${v}`)

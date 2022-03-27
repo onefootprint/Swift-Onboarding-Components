@@ -7,7 +7,7 @@ jobs:
     name: Destroy Ephemeral Stack
     runs-on: ubuntu-latest
     environment: dev
-    if: github.actor != "dependabot[bot]"
+    if: github.actor != 'dependabot[bot]' # don't run for dependabot changes
     steps:
       - uses: actions/checkout@v2
             

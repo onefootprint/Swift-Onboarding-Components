@@ -104,7 +104,7 @@ jobs:
     permissions:          
       contents: write
       pull-requests: write      
-    if: always() && github.actor != 'dependabot[bot]' # don't run for dependabot changes
+    if: success() && github.actor != 'dependabot[bot]' # don't run for dependabot changes
     steps:
       - uses: actions/checkout@v2
           
