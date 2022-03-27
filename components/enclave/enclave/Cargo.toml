@@ -29,4 +29,3 @@ crypto = { path = "../crypto" }
 aws-types = { version = "0.8", optional = true }
 aws-config = { version = "0.8", optional = true }
 aws-sdk-kms = { version = "0.8", optional = true }
-

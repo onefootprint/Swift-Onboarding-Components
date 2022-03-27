@@ -160,6 +160,6 @@ jobs:
         uses: peter-evans/create-pull-request@v4.0.0
         with:
           commit-message: "deploy new build with updated components"
-          title: Deploy to [ ${{ secrets.STACK_NAME }} ]: ${{ steps.extract_container_version.outputs.version }} 
+          title: Deploy to [ ${{ secrets.STACK_NAME }} ] ${{ steps.extract_container_version.outputs.version }} 
           body: Update component versions
           branch: deploy/${{ steps.extract_container_version.outputs.version }}

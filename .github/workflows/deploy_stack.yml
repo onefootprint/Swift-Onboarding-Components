@@ -9,7 +9,7 @@ on:
 
 jobs:  
   deploy_stack:    
-    name: Prepare stack to be deployed
+    name: Deploy stack
     runs-on: ubuntu-latest
     environment: dev
     if: github.actor != 'dependabot[bot]' # don't run for dependabot changes
