@@ -23,8 +23,8 @@ jobs:
       - name: check modified
         id: check_modified
         run: |
-          git diff --name-only HEAD~1 HEAD        
-          git diff --name-only HEAD~1 HEAD > files.txt
+          git diff --name-only HEAD^ HEAD
+          git diff --name-only HEAD^ HEAD > files.txt
           while IFS= read -r file
           do
             echo $file
