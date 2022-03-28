@@ -30,7 +30,7 @@ jobs:
   build_api:
     name: Build API container
     runs-on: ubuntu-latest
-    environment: ${{ github.event.inputs.environment }}
+    environment: ${{ inputs.environment }}
     steps:
       - uses: actions/checkout@v2
       
@@ -48,7 +48,7 @@ jobs:
   build_eif:
     name: Build Signed EIF
     runs-on: eif-builder
-    environment: ${{ github.event.inputs.environment }}
+    environment: ${{ inputs.environment }}
     steps:
       - uses: actions/checkout@v2
       
@@ -74,7 +74,7 @@ jobs:
   deploy_stack:    
     name: deploy stack
     runs-on: ubuntu-latest
-    environment: ${{ github.event.inputs.environment }}
+    environment: ${{ inputs.environment }}
     needs: [build_api, build_eif]
     if: success()
     steps:
@@ -102,8 +102,8 @@ jobs:
         shell: bash
         working-directory: infra
         run: |
-          sub=$(pulumi config --stack footprint/${{ github.event.inputs.stackName }} get --path constants.cdnAppSubdomain)
-          root=$(pulumi config --stack footprint/${{ github.event.inputs.stackName }} get --path constants.rootDomain)
+          sub=$(pulumi config --stack footprint/${{ inputs.stackName }} get --path constants.cdnAppSubdomain)
+          root=$(pulumi config --stack footprint/${{ inputs.stackName }} get --path constants.rootDomain)
           url="${sub}.${root}"
           vers="$(make get-named-commit)"
           echo "##[set-output name=url;]$(echo ${url})"
@@ -114,17 +114,17 @@ jobs:
 
       # create our temp stack if needed
       - name: create emphemeral stack
-        if: ${{ github.event.inputs.stackName != github.event.secrets.STACK_NAME }}
+        if: ${{ inputs.stackName != secrets.STACK_NAME }}
         working-directory: infra
         run: |
-          pulumi stack init --secrets-provider ${{ secrets.AWS_SECRETS_PROVIDER }} --copy-config-from "footprint/${{secrets.STACK_NAME}}" "footprint/${{ github.event.inputs.stackName  }}" || true
-          cp Pulumi.${{secrets.STACK_NAME}}.yaml Pulumi.${{ github.event.inputs.stackName }}.yaml
+          pulumi stack init --secrets-provider ${{ secrets.AWS_SECRETS_PROVIDER }} --copy-config-from "footprint/${{secrets.STACK_NAME}}" "footprint/${{ inputs.stackName  }}" || true
+          cp Pulumi.${{secrets.STACK_NAME}}.yaml Pulumi.${{ inputs.stackName }}.yaml
         env:
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
                     
       - name: select stack
         working-directory: infra
-        run: pulumi stack select "footprint/${{ github.event.inputs.stackName }}"
+        run: pulumi stack select "footprint/${{ inputs.stackName }}"
 
       - name: "set api image version"
         run: make set-api-version
@@ -137,7 +137,7 @@ jobs:
         with:
           command: up
           work-dir: infra
-          stack-name: "footprint/${{ github.event.inputs.stackName }}"
+          stack-name: "footprint/${{ inputs.stackName }}"
           message: "Deployed to https://${{ steps.constants.outputs.url }} with component ${{ steps.constants.outputs.componentVersion }}"
         env:
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
