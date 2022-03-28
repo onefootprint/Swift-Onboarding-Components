@@ -4,8 +4,8 @@ on:
   workflow_call:
     inputs:
       environment:
-        type: environment
-        default: dev
+        type: string
+        default: "dev"
         required: true
       stackName:
         type: string
