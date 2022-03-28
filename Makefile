@@ -58,7 +58,7 @@ package-enclave:
 	@docker build -t enclave_pkg:$(commit) -f enclave_package.dockerfile .
 	@aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin $(account).dkr.ecr.us-east-1.amazonaws.com
 	@docker tag enclave_pkg:$(commit) $(account).dkr.ecr.us-east-1.amazonaws.com/enclave_pkg:$(commit)
-	@docker tag enclave_pkg:$(commit) enclave_pkg:latest
+	@docker tag enclave_pkg:$(commit) $(account).dkr.ecr.us-east-1.amazonaws.com/enclave_pkg:latest
 	@docker push $(account).dkr.ecr.us-east-1.amazonaws.com/enclave_pkg:$(commit) 
 	@docker push $(account).dkr.ecr.us-east-1.amazonaws.com/enclave_pkg:latest
 
@@ -71,6 +71,6 @@ package-api: api-release
 	@docker build -t api:$(commit) -f api.dockerfile .
 	@aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin $(account).dkr.ecr.us-east-1.amazonaws.com
 	@docker tag api:$(commit) $(account).dkr.ecr.us-east-1.amazonaws.com/api:$(commit)
-	@docker tag api:$(commit) api:latest
+	@docker tag api:$(commit) $(account).dkr.ecr.us-east-1.amazonaws.com/api:latest
 	@docker push $(account).dkr.ecr.us-east-1.amazonaws.com/api:$(commit) 	
 	@docker push $(account).dkr.ecr.us-east-1.amazonaws.com/api:latest
