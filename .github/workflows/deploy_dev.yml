@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: dev    
     steps:
-      - uses: actions/checkout@3
+      - uses: actions/checkout@2
 
       - uses: ./.github/workflows/build_and_deploy.yml
         with:
