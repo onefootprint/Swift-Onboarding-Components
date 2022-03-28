@@ -145,7 +145,7 @@ function createInstanceRole(region: Region, provider: pulumi.ProviderResource): 
 async function userData(clusterName: string, constants: Config, config: NitroEnclaveConfig): Promise<string> {
     const current = await aws.getCallerIdentity({});
     const ecrEndpoint = `${current.accountId}.dkr.ecr.us-east-1.amazonaws.com`;
-    const enclaveImage = `${current.accountId}.dkr.ecr.us-east-1.amazonaws.com/${constants.containers.enclaveVersion}`;
+    const enclaveImage = `${current.accountId}.dkr.ecr.us-east-1.amazonaws.com/enclave_pkg:${constants.containers.enclaveVersion}`;
 
     return `
     #!/bin/bash

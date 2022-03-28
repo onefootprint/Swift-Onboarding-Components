@@ -1,0 +1,27 @@
+name: Push Ephemeral Stack
+on:
+  pull_request:
+    types: [reopened, opened, synchronize, edited]
+
+jobs:
+  ephemeral_stack:    
+    name: Deploy ephemeral stack
+    runs-on: ubuntu-latest    
+    environment: dev
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Extract Constants
+        shell: bash
+        working-directory: infra
+        run: |
+          branch=$(make get-friendly-branch-name)
+          echo "##[set-output name=branch;]$(echo ${branch})"
+        id: constants
+
+      - uses: ./.github/workflows/build_and_deploy
+        with:
+          environment: dev
+          stackName: "${{secrets.STACK_NAME}}-${{ steps.constants.outputs.branch }}"
+
+

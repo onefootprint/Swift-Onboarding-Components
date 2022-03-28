@@ -50,7 +50,7 @@ get-friendly-branch-name:
 
 	
 set-enclave-version:
-	@pulumi --cwd infra config set --path constants.containers.enclaveVersion enclave_pkg:$(commit)	
+	@pulumi --cwd infra config set --path constants.containers.enclaveVersion $(commit)	
 
 package-enclave:	
 	@echo "using account $(account)"
@@ -58,10 +58,12 @@ package-enclave:
 	@docker build -t enclave_pkg:$(commit) -f enclave_package.dockerfile .
 	@aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin $(account).dkr.ecr.us-east-1.amazonaws.com
 	@docker tag enclave_pkg:$(commit) $(account).dkr.ecr.us-east-1.amazonaws.com/enclave_pkg:$(commit)
+	@docker tag enclave_pkg:$(commit) enclave_pkg:latest
 	@docker push $(account).dkr.ecr.us-east-1.amazonaws.com/enclave_pkg:$(commit) 
+	@docker push $(account).dkr.ecr.us-east-1.amazonaws.com/enclave_pkg:latest
 
 set-api-version:
-	@pulumi --cwd infra config set --path constants.containers.apiVersion api:$(commit)
+	@pulumi --cwd infra config set --path constants.containers.apiVersion $(commit)
 
 package-api: api-release
 	@echo "using account $(account)"
@@ -69,4 +71,6 @@ package-api: api-release
 	@docker build -t api:$(commit) -f api.dockerfile .
 	@aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin $(account).dkr.ecr.us-east-1.amazonaws.com
 	@docker tag api:$(commit) $(account).dkr.ecr.us-east-1.amazonaws.com/api:$(commit)
+	@docker tag api:$(commit) api:latest
 	@docker push $(account).dkr.ecr.us-east-1.amazonaws.com/api:$(commit) 	
+	@docker push $(account).dkr.ecr.us-east-1.amazonaws.com/api:latest

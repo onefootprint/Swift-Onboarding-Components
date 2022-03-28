@@ -1,9 +1,10 @@
-name: Destroy Ephemeral Env Stack
+name: Destroy Ephemeral Stack
 on:
   pull_request:
     types: [closed]
+
 jobs:
-  ephemeral_stack:    
+  destroy_ephemeral_stack:    
     name: Destroy Ephemeral Stack
     runs-on: ubuntu-latest
     environment: dev

@@ -15,7 +15,7 @@ export abstract class ServiceContainers {
         const otelCollector = ServiceContainers.createOtelCollector(secretsStore, constants);
 
         const current = await aws.getCallerIdentity({});
-        const image = `${current.accountId}.dkr.ecr.us-east-1.amazonaws.com/${constants.containers.apiVersion}`;
+        const image = `${current.accountId}.dkr.ecr.us-east-1.amazonaws.com/api:${constants.containers.apiVersion}`;
 
         const containerDef = pulumi.all([
             otelCollector,

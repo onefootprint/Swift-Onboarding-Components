@@ -1,0 +1,24 @@
+name: Build Components
+
+on:
+  push:
+    paths:
+      - 'infra/**'
+      - 'components/**'
+      
+    branches:
+      - master
+
+jobs:  
+  deploy_stack:    
+    name: Deploy stack
+    runs-on: ubuntu-latest
+    environment: dev
+    if: github.actor != 'dependabot[bot]' # don't run for dependabot changes
+    steps:
+      - uses: ./.github/workflows/build_and_deploy
+        with:
+          environment: dev
+          stackName: "${{secrets.STACK_NAME}}"
+
+

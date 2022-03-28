@@ -7,8 +7,8 @@ config:
     cdnAppSubdomain: api
     cdnProtectionHeaderName: X-Token-From-CloudFront
     containers:
-      apiVersion: api:master-6402b2
-      enclaveVersion: enclave_pkg:master-6402b2
+      apiVersion: latest
+      enclaveVersion: latest
     elastic:
       apiKey:
         secure: v1:lefOi07p1WAkmMbb:6IK3746SDP+nra5/Tpym+AisWeELd2cSzgcTNbdzxBcaSQ==
