@@ -10,28 +10,13 @@ on:
       stackName:
         type: string
         required: true
-    secrets:
-      AWS_ACCESS_KEY_ID:
-        required: true
-      AWS_REGION:
-        required: true
-      AWS_SECRET_ACCESS_KEY:
-        required: true
-      ENCLAVE_SIGNING_KEY:
-        required: true
-      ENCLAVE_SIGNING_CERT:
-        required: true
-      PULUMI_ACCESS_TOKEN:
-        required: true
-      STACK_NAME:
-        required: true
 
 jobs:  
   # build the main api image
   build_api:
     name: Build API container
     runs-on: ubuntu-latest
-    environment: ${{ github.event.inputs.environment }}
+    environment: dev
     steps:
       - uses: actions/checkout@v2
       
@@ -49,7 +34,7 @@ jobs:
   build_eif:
     name: Build Signed EIF
     runs-on: eif-builder
-    environment: ${{ github.event.inputs.environment }}
+    environment: dev
     steps:
       - uses: actions/checkout@v2
       
@@ -75,7 +60,7 @@ jobs:
   deploy_stack:    
     name: deploy stack
     runs-on: ubuntu-latest
-    environment: ${{ github.event.inputs.environment }}
+    environment: dev
     needs: [build_api, build_eif]
     if: success()
     steps:
