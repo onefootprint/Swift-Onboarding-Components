@@ -9,6 +9,10 @@ on:
       stackName:
         type: string
         required: true
+      ephemeral:
+        type: boolean
+        default: false
+        required: false        
     secrets:
       AWS_ACCESS_KEY_ID:
         required: true
@@ -114,7 +118,7 @@ jobs:
 
       # create our temp stack if needed
       - name: create emphemeral stack
-        if: ${{ inputs.stackName != secrets.STACK_NAME }}
+        if: ${{ inputs.ephemeral }}
         working-directory: infra
         run: |
           pulumi stack init --secrets-provider ${{ secrets.AWS_SECRETS_PROVIDER }} --copy-config-from "footprint/${{secrets.STACK_NAME}}" "footprint/${{ inputs.stackName  }}" || true
