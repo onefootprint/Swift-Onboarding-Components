@@ -5,7 +5,7 @@ on:
     paths:
       - 'infra/**'
       - 'components/**'
-      - '.github/workflow/**'
+      - '.github/workflows/**'
 
     branches:
       - master
