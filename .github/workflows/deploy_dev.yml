@@ -9,7 +9,7 @@ on:
 
     branches:
       - master
-
+environment: dev
 jobs:  
   deploy_stack:    
     name: Deploy stack
