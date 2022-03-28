@@ -30,7 +30,7 @@ jobs:
   build_api:
     name: Build API container
     runs-on: ubuntu-latest
-    environment: ${{ github.event.inputs.environment }}
+    environment: dev
     steps:
       - uses: actions/checkout@v2
       
@@ -48,7 +48,7 @@ jobs:
   build_eif:
     name: Build Signed EIF
     runs-on: eif-builder
-    environment: ${{ github.event.inputs.environment }}
+    environment: dev
     steps:
       - uses: actions/checkout@v2
       
@@ -74,7 +74,7 @@ jobs:
   deploy_stack:    
     name: deploy stack
     runs-on: ubuntu-latest
-    environment: ${{ github.event.inputs.environment }}
+    environment: dev
     needs: [build_api, build_eif]
     if: success()
     steps:
