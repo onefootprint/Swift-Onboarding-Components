@@ -16,8 +16,8 @@ jobs:
     runs-on: ubuntu-latest
     environment: dev    
     uses: ./.github/workflows/build_and_deploy.yml
-      with:
-        environment: dev
-        stackName: "${{secrets.STACK_NAME}}"
+    with:
+      environment: dev
+      stackName: "${{secrets.STACK_NAME}}"
 
 
