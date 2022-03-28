@@ -9,13 +9,13 @@ on:
 
     branches:
       - master
-environment: dev
+
 jobs:  
-  deploy_stack:    
-    name: Deploy stack
+  deploy_stack_dev:    
+    name: Deploy stack dev
     uses: ./.github/workflows/build_and_deploy.yml
     with:
       environment: dev
-      stackName: "${{secrets.STACK_NAME}}"
+      stackName: dev
 
 
