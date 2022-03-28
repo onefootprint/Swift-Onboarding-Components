@@ -11,13 +11,20 @@ on:
         type: string
         required: true
     secrets:
-      AWS_ACCESS_KEY_ID:        
+      AWS_ACCESS_KEY_ID:
+        required: true
       AWS_REGION:
+        required: true
       AWS_SECRET_ACCESS_KEY:
+        required: true
       ENCLAVE_SIGNING_KEY:
+        required: true
       ENCLAVE_SIGNING_CERT:
+        required: true
       PULUMI_ACCESS_TOKEN:
+        required: true
       STACK_NAME:
+        required: true
 
 jobs:  
   # build the main api image
