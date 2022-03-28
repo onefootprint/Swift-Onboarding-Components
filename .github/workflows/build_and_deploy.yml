@@ -100,7 +100,7 @@ jobs:
 
       # create our temp stack if needed
       - name: create emphemeral stack
-        if: ${{ github.event.inputs.stackName != secrets.STACK_NAME }}
+        if: ${{ github.event.inputs.stackName != github.event.inputs.environment }}
         working-directory: infra
         run: |
           pulumi stack init --secrets-provider ${{ secrets.AWS_SECRETS_PROVIDER }} --copy-config-from "footprint/${{secrets.STACK_NAME}}" "footprint/${{ github.event.inputs.stackName  }}" || true
