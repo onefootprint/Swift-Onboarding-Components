@@ -130,7 +130,7 @@ jobs:
           sub=$(pulumi --cwd infra config --stack footprint/${{ inputs.stackName }} get --path constants.cdnAppSubdomain)
           root=$(pulumi --cwd infra config --stack footprint/${{ inputs.stackName }} get --path constants.rootDomain)
           url="${sub}.${{ inputs.stackName }}.${root}"
-          branch="$(echo ${{ github.head_ref }} | sed -r 's/\//-/g' | sed -r 's/_/-/g')"
+          branch="$(echo ${{ github.head_ref || github.ref_name }} | sed -r 's/\//-/g' | sed -r 's/_/-/g')"
           version="${branch}-$(git rev-parse --short HEAD)"
           echo "##[set-output name=url;]$(echo ${url})"
           echo "##[set-output name=componentVersion;]$(echo ${version})"
