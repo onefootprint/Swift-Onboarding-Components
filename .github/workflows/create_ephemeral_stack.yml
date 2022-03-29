@@ -3,25 +3,45 @@ on:
   pull_request:
     types: [reopened, opened, synchronize, edited]
 
+concurrency: 
+  group: ${{ github.workflow }}-${{ github.head_ref }}
+  cancel-in-progress: true
+
 jobs:
-  ephemeral_stack:    
-    name: Deploy ephemeral stack
+  ephemeral_stack_name:    
+    name: Get ephemeral environment name
     runs-on: ubuntu-latest    
-    environment: dev
+    outputs:
+      stackName: ${{ steps.constants.outputs.branch }}
     steps:
-      - uses: actions/checkout@v2
-
+      - uses: actions/checkout@v2        
       - name: Extract Constants
-        shell: bash
-        working-directory: infra
-        run: |
-          branch=$(make get-friendly-branch-name)
-          echo "##[set-output name=branch;]$(echo ${branch})"
         id: constants
+        shell: bash
+        run: |          
+          branch_raw="${{ github.head_ref }}"
+          branch="$(echo ${branch_raw} | sed -r 's/\//-/g' | sed -r 's/_/-/g')"
+          echo "friendly branch name is ${branch}"
+          echo "::set-output name=branch::$(echo ${branch})"
 
-      - uses: ./.github/workflows/build_and_deploy
-        with:
-          environment: dev
-          stackName: "${{secrets.STACK_NAME}}-${{ steps.constants.outputs.branch }}"
-
+  deploy_ephemeral_stack:    
+    name: ephemeral
+    needs: [ephemeral_stack_name]
+    uses: ./.github/workflows/build_and_deploy.yml
+    permissions:
+      contents: write
+      pull-requests: write
+    with:
+      environment: dev      
+      baseStackName: dev      
+      ephemeral: true
+      stackName: "dev-${{ needs.ephemeral_stack_name.outputs.stackName }}"
+    secrets:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_REGION: ${{ secrets.AWS_REGION }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      ENCLAVE_SIGNING_KEY: ${{ secrets.ENCLAVE_SIGNING_KEY }}      
+      ENCLAVE_SIGNING_CERT: ${{ secrets.ENCLAVE_SIGNING_CERT }}        
+      PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
+      AWS_SECRETS_PROVIDER: ${{ secrets.AWS_SECRETS_PROVIDER }}
 

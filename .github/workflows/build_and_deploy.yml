@@ -4,15 +4,26 @@ on:
   workflow_call:
     inputs:
       environment:
+        description: "secrets environment to use"
         type: string
         required: true
+
+      baseStackName:
+        description: "base stack we're building, i.e. dev"
+        type: string
+        required: true      
+
       stackName:
+        description: "stack or possibly ephemeral stack name, i.e. dev or dev-feature-x"
         type: string
-        required: true
+        required: true       
+
       ephemeral:
+        description: "whether or not this stack is ephemeral"
         type: boolean
         default: false
-        required: false        
+        required: false
+
     secrets:
       AWS_ACCESS_KEY_ID:
         required: true
@@ -20,15 +31,14 @@ on:
         required: true
       AWS_SECRET_ACCESS_KEY:
         required: true
+      AWS_SECRETS_PROVIDER:
+        required: true
       ENCLAVE_SIGNING_KEY:
         required: true
       ENCLAVE_SIGNING_CERT:
         required: true
       PULUMI_ACCESS_TOKEN:
         required: true
-      STACK_NAME:
-        required: true
-
 jobs:  
   # build the main api image
   build_api:
@@ -78,7 +88,9 @@ jobs:
   deploy_stack:    
     name: deploy stack
     runs-on: ubuntu-latest
-    environment: ${{ inputs.environment }}
+    environment: 
+      name: ${{ inputs.environment }}
+      url: "https://${{ steps.constants.outputs.url }}"
     needs: [build_api, build_eif]
     if: success()
     steps:
@@ -101,40 +113,39 @@ jobs:
       - run: yarn install
         working-directory: infra
                   
-      # get environment constants
-      - name: Extract Constants
-        shell: bash
-        working-directory: infra
-        run: |
-          sub=$(pulumi config --stack footprint/${{ inputs.stackName }} get --path constants.cdnAppSubdomain)
-          root=$(pulumi config --stack footprint/${{ inputs.stackName }} get --path constants.rootDomain)
-          url="${sub}.${root}"
-          vers="$(make get-named-commit)"
-          echo "##[set-output name=url;]$(echo ${url})"
-          echo "##[set-output name=componentVersion;]$(echo ${vers})"
-        id: constants
-        env:
-          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}     
-
       # create our temp stack if needed
       - name: create emphemeral stack
         if: ${{ inputs.ephemeral }}
         working-directory: infra
         run: |
-          pulumi stack init --secrets-provider ${{ secrets.AWS_SECRETS_PROVIDER }} --copy-config-from "footprint/${{secrets.STACK_NAME}}" "footprint/${{ inputs.stackName  }}" || true
-          cp Pulumi.${{secrets.STACK_NAME}}.yaml Pulumi.${{ inputs.stackName }}.yaml
+          pulumi stack init --secrets-provider ${{ secrets.AWS_SECRETS_PROVIDER }} --copy-config-from "footprint/${{ inputs.baseStackName }}" "footprint/${{ inputs.stackName  }}" || true
+          cp Pulumi.${{ inputs.baseStackName }}.yaml Pulumi.${{ inputs.stackName }}.yaml
         env:
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
+
+      # get environment constants
+      - name: Extract Constants
+        shell: bash
+        run: |
+          sub=$(pulumi --cwd infra config --stack footprint/${{ inputs.stackName }} get --path constants.cdnAppSubdomain)
+          root=$(pulumi --cwd infra config --stack footprint/${{ inputs.stackName }} get --path constants.rootDomain)
+          url="${sub}.${{ inputs.stackName }}.${root}"
+          branch="$(echo ${{ github.head_ref }} | sed -r 's/\//-/g' | sed -r 's/_/-/g')"
+          version="${branch}-$(git rev-parse --short HEAD)"
+          echo "##[set-output name=url;]$(echo ${url})"
+          echo "##[set-output name=componentVersion;]$(echo ${version})"
+        id: constants
+        env:
+          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}     
                     
       - name: select stack
         working-directory: infra
         run: pulumi stack select "footprint/${{ inputs.stackName }}"
 
-      - name: "set api image version"
-        run: make set-api-version
-
-      - name: "set enclave image version"
-        run: make set-enclave-version
+      - name: "set api/enclave image version"
+        run: |
+          pulumi --cwd infra config set --path constants.containers.apiVersion ${{ steps.constants.outputs.componentVersion }}
+          pulumi --cwd infra config set --path constants.containers.enclaveVersion ${{ steps.constants.outputs.componentVersion }}
 
       # bring up the stack
       - uses: pulumi/actions@v3
@@ -145,3 +156,15 @@ jobs:
           message: "Deployed to https://${{ steps.constants.outputs.url }} with component ${{ steps.constants.outputs.componentVersion }}"
         env:
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
+
+      - name: Update deploy info on pull request
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v6
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: 'Deployed to https://${{ steps.constants.outputs.url }} with component tag `${{ steps.constants.outputs.componentVersion }}`'
+            })          

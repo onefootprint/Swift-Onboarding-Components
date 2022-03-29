@@ -42,9 +42,9 @@ export async function CreateCluster(clusterName: string, vpc: awsx.ec2.Vpc, cons
     }, { provider });
 
     const autoScaling = new aws.autoscaling.Group(`autoscale-group-${clusterName}`, {
-        minSize: 1,
-        maxSize: 2,
-        desiredCapacity: 1,
+        minSize: 2,
+        maxSize: 4,
+        desiredCapacity: 2,
         launchTemplate: {
             id: launchTemplate.id,
             version: pulumi.output(launchTemplate.latestVersion).apply(v => `${v}`)
@@ -158,7 +158,6 @@ async function userData(clusterName: string, constants: Config, config: NitroEnc
     sudo yum install aws-nitro-enclaves-cli-devel -y
     sudo yum install -y aws-cli
     sudo usermod -aG ne $USER
-
 
     aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${ecrEndpoint}
 

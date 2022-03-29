@@ -7,6 +7,7 @@ import { Config } from "../config";
 import { CreateCluster } from "./cluster";
 import { ServiceContainers } from "./containers";
 import { EnclaveKeyDescriptor } from "../enclave_key";
+import * as crypto from "crypto";
 
 export type ServiceLoadBalancer = {
     lb: awsx.elasticloadbalancingv2.LoadBalancer,
@@ -34,14 +35,15 @@ const ServicePort = 8000;
  */
 export async function Create(config: ServiceConfig, constants: Config, secretsStore: StaticSecrets, enclaveKeyDescriptor: EnclaveKeyDescriptor): Promise<ServiceLoadBalancer> {
     const region = config.region;
-    const provider = new aws.Provider(`provider-${config.serviceName}-${region}`, { region });
+    const serviceName = `${config.serviceName}-${pulumi.getStack()}-${region}`;
+    const provider = new aws.Provider(`provider-${serviceName}`, { region });
 
-    const vpc = new awsx.ec2.Vpc(`vpc-${config.serviceName}-${region}`, {
+    const vpc = new awsx.ec2.Vpc(`vpc-${serviceName}`, {
         numberOfAvailabilityZones: config.availabilityZones,
     }, { provider });
 
     // init our cluster
-    const cluster = await CreateCluster(`fpc-${pulumi.getStack()}-${region}`, vpc, constants, {
+    const cluster = await CreateCluster(`cluster-${serviceName}`, vpc, constants, {
         cid: 16,
         memory: 256,
         cpus: 2,
@@ -53,7 +55,7 @@ export async function Create(config: ServiceConfig, constants: Config, secretsSt
     // setup the task
     const taskExecRole = createTaskExecutionRole(secretsStore, region);
 
-    const taskDefinition = new aws.ecs.TaskDefinition(`task-${config.serviceName}-${region.toString()}`, {
+    const taskDefinition = new aws.ecs.TaskDefinition(`task-${serviceName}`, {
         memory: `${config.memoryMB}`,
         cpu: `${config.cpuUnits}`,
         networkMode: "awsvpc",
@@ -63,7 +65,7 @@ export async function Create(config: ServiceConfig, constants: Config, secretsSt
         containerDefinitions,
     }, { provider, dependsOn: [cluster] });
 
-    const serviceSecurityGroup = new awsx.ec2.SecurityGroup(`svc-${config.serviceName}-sg-${region}`, {
+    const serviceSecurityGroup = new awsx.ec2.SecurityGroup(`svcsg-${serviceName}`, {
         vpc,
         ingress: [{ protocol: "-1", fromPort: ServicePort, toPort: ServicePort, cidrBlocks: [vpc.vpc.cidrBlock] }],
         egress: [{ protocol: "-1", fromPort: 0, toPort: 0, cidrBlocks: ["0.0.0.0/0"] }],
@@ -73,7 +75,7 @@ export async function Create(config: ServiceConfig, constants: Config, secretsSt
     const loadBalancerTargetGroup = createCdnFrontedLoadBalancer(vpc, secretsStore, config, constants, provider);
 
     // build the cluster service
-    const service = new aws.ecs.Service(`svc-${config.serviceName}-${region.toString()}`, {
+    const service = new aws.ecs.Service(`svc-${serviceName}`, {
         cluster: cluster.cluster.arn,
         launchType: "EC2",
         desiredCount: config.instanceCount,
@@ -100,24 +102,28 @@ export async function Create(config: ServiceConfig, constants: Config, secretsSt
  */
 function createCdnFrontedLoadBalancer(vpc: awsx.ec2.Vpc, secretsStore: StaticSecrets, config: ServiceConfig, constants: Config, provider: pulumi.ProviderResource): awsx.elasticloadbalancingv2.TargetGroup {
     const region = config.region;
+    const serviceName = `${config.serviceName}-${pulumi.getStack()}-${region}`;
 
     // init our ALB
-    const loadBalancerSecurityGroup = new awsx.ec2.SecurityGroup(`app-${config.serviceName}-lb-sg-${region}`, {
+    const loadBalancerSecurityGroup = new awsx.ec2.SecurityGroup(`applbsg-${serviceName}`, {
         vpc,
         ingress: [{ protocol: "-1", fromPort: 0, toPort: 0, cidrBlocks: ["0.0.0.0/0"] }],
         egress: [{ protocol: "-1", fromPort: ServicePort, toPort: ServicePort, cidrBlocks: [vpc.vpc.cidrBlock] }],
     }, { provider });
 
 
+    // some names must be < 32 chars, so we hash the srvice name, take the first half
+    const serviceNameHash = crypto.createHash('sha256').update(serviceName).digest('base64url').substring(0, 16);
+
     const loadBalancer = new awsx.elasticloadbalancingv2.ApplicationLoadBalancer(
-        `app-${config.serviceName}-alb-${region}`, {
+        `applb-${serviceNameHash}`, {
         vpc,
         securityGroups: [loadBalancerSecurityGroup],
     }, { provider });
 
-    const loadBalancerTargetGroup = loadBalancer.createTargetGroup(`${config.serviceName}-alb-target-${region}`, { port: ServicePort, vpc });
+    const loadBalancerTargetGroup = loadBalancer.createTargetGroup(`alb-tg-${serviceNameHash}`, { port: ServicePort, vpc });
 
-    const web = loadBalancerTargetGroup.createListener(`app-${config.serviceName}-https-listener-${region.toString()}`, {
+    const web = loadBalancerTargetGroup.createListener(`alblisten-https-${serviceName}`, {
         external: true,
         certificateArn: config.certArn,
         protocol: "HTTPS",
@@ -134,7 +140,7 @@ function createCdnFrontedLoadBalancer(vpc: awsx.ec2.Vpc, secretsStore: StaticSec
     }, { provider });
 
     // ensure ALB requests are only coming from cloudfront
-    const rule = web.addListenerRule(`app-${config.serviceName}-cloudfront-token-rule-${region}`, {
+    const rule = web.addListenerRule(`alblisten-cdntoken-rule-${serviceName}`, {
         actions: [{ type: "forward", targetGroupArn: loadBalancerTargetGroup.targetGroup.arn }],
         conditions: [{
             httpHeader: {
@@ -145,7 +151,7 @@ function createCdnFrontedLoadBalancer(vpc: awsx.ec2.Vpc, secretsStore: StaticSec
     }, { provider });
 
     // redirect http to https
-    loadBalancer.createListener(`app-${config.serviceName}-alb-http-redirect-${region}`, {
+    loadBalancer.createListener(`alblisten-httpredir-${serviceName}`, {
         protocol: "HTTP",
         defaultAction: {
             type: "redirect",
@@ -156,11 +162,11 @@ function createCdnFrontedLoadBalancer(vpc: awsx.ec2.Vpc, secretsStore: StaticSec
         },
     }, { provider });
 
-    const record = new route53.Record(`record-app-${config.serviceName}-${region}`, {
+    const record = new route53.Record(`dnsrecord-alb-${serviceName}`, {
         zoneId: config.hostedZoneId,
         type: "A",
         name: config.domain,
-        setIdentifier: `app-record-set-id-${config.serviceName}-${region}`,
+        setIdentifier: `app-record-set-id-${serviceName}`,
         latencyRoutingPolicies: [{ region: region }],
         aliases: [{
             name: web.loadBalancer.loadBalancer.dnsName,
@@ -176,8 +182,8 @@ function createCdnFrontedLoadBalancer(vpc: awsx.ec2.Vpc, secretsStore: StaticSec
  * Create the task execution role we need to setup the tasks in our ECS service
  * needs to create logs, assume ecs-tasks service, and access static secrets for the containers
  */
-function createTaskExecutionRole(secretsStore: StaticSecrets, region: Region): aws.iam.Role {
-    const taskExecRole = new aws.iam.Role(`task-exec-role-${region}`, {
+function createTaskExecutionRole(secretsStore: StaticSecrets, serviceName: string): aws.iam.Role {
+    const taskExecRole = new aws.iam.Role(`task-exec-role-${serviceName}`, {
         assumeRolePolicy: {
             Version: "2012-10-17",
             Statement: [{
@@ -211,12 +217,12 @@ function createTaskExecutionRole(secretsStore: StaticSecrets, region: Region): a
         ]
     });
 
-    const _taskExecRolePolicyAttachment = new aws.iam.RolePolicyAttachment(`task-exec-${region}-policy`, {
+    const _taskExecRolePolicyAttachment = new aws.iam.RolePolicyAttachment(`task-exec-${serviceName}-policy`, {
         role: taskExecRole.name,
         policyArn: "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy",
     });
 
-    const _taskExecRolePolicyAttachmentSecrets = new aws.iam.RolePolicyAttachment(`task-exec-${region}-policy2`, {
+    const _taskExecRolePolicyAttachmentSecrets = new aws.iam.RolePolicyAttachment(`task-exec-${serviceName}-policy2`, {
         role: taskExecRole.name,
         policyArn: secretsStore.secretsPolicyArn,
     });
