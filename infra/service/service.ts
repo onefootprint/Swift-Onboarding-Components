@@ -121,7 +121,7 @@ function createCdnFrontedLoadBalancer(vpc: awsx.ec2.Vpc, secretsStore: StaticSec
         securityGroups: [loadBalancerSecurityGroup],
     }, { provider });
 
-    const loadBalancerTargetGroup = loadBalancer.createTargetGroup(`alb-tg-${serviceNameHash}`, { port: ServicePort, vpc });
+    const loadBalancerTargetGroup = loadBalancer.createTargetGroup(`albtg-${serviceNameHash}`, { port: ServicePort, vpc });
 
     const web = loadBalancerTargetGroup.createListener(`alblisten-https-${serviceName}`, {
         external: true,
