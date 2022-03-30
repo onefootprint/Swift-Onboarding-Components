@@ -165,6 +165,7 @@ async function userData(clusterName: string, constants: Config, config: NitroEnc
     docker run --rm -v $(pwd)/image:/shared ${enclaveImage}
     sudo chown $USER:$USER -R image/
 
+    
     sudo systemctl start nitro-enclaves-allocator.service && sudo systemctl enable nitro-enclaves-allocator.service
     sudo systemctl start nitro-enclaves-vsock-proxy.service && systemctl enable nitro-enclaves-vsock-proxy.service
 
