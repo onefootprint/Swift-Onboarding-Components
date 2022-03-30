@@ -166,7 +166,7 @@ function createCdnFrontedLoadBalancer(vpc: awsx.ec2.Vpc, secretsStore: StaticSec
         zoneId: config.hostedZoneId,
         type: "A",
         name: config.domain,
-        setIdentifier: `app-record-set-id-${serviceName}`,
+        setIdentifier: `app-record-setid-${serviceName}`,
         latencyRoutingPolicies: [{ region: region }],
         aliases: [{
             name: web.loadBalancer.loadBalancer.dnsName,
