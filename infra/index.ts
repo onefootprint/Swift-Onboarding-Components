@@ -38,7 +38,7 @@ export = async () => {
             availabilityZones: 2,
             cpuUnits: 256,
             memoryMB: 512,
-            instanceCount: 1,
+            instanceCount: 2,
             certArn: cert,
             domain: `${constants.internalAppSubdomain}.${stack}.${constants.rootDomain}`,
             serviceName: "fpc",

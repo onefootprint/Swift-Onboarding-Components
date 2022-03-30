@@ -11,7 +11,7 @@ export type NitroEnclaveConfig = {
 }
 
 
-export async function CreateCluster(clusterName: string, vpc: awsx.ec2.Vpc, constants: Config, nitroConfig: NitroEnclaveConfig, region: Region, provider: pulumi.ProviderResource): Promise<awsx.ecs.Cluster> {
+export async function CreateCluster(clusterName: string, vpc: awsx.ec2.Vpc, targetGroup: awsx.elasticloadbalancingv2.TargetGroup, constants: Config, nitroConfig: NitroEnclaveConfig, region: Region, provider: pulumi.ProviderResource): Promise<awsx.ecs.Cluster> {
     const instanceProfile = createInstanceRole(region, provider);
 
     // get our base image AMI
@@ -24,6 +24,11 @@ export async function CreateCluster(clusterName: string, vpc: awsx.ec2.Vpc, cons
         }]
     }, { provider });
 
+    const instanceSecurityGroup = new awsx.ec2.SecurityGroup(`instance-sg-${clusterName}`, {
+        vpc,
+        ingress: [{ protocol: "-1", fromPort: 0, toPort: 0, cidrBlocks: [vpc.vpc.cidrBlock] }],
+        egress: [{ protocol: "-1", fromPort: 0, toPort: 0, cidrBlocks: ["0.0.0.0/0"] }],
+    }, { provider });
 
     const launchTemplate = new aws.ec2.LaunchTemplate(`template-ec2-${clusterName}`, {
         instanceType: "c5a.xlarge",
@@ -37,7 +42,7 @@ export async function CreateCluster(clusterName: string, vpc: awsx.ec2.Vpc, cons
         },
         updateDefaultVersion: true,
         networkInterfaces: (await vpc.privateSubnets).map((sn, index) => {
-            return { subnetId: sn.id, deviceIndex: index, securityGroups: [] }
+            return { subnetId: sn.id, deviceIndex: index, securityGroups: [instanceSecurityGroup.id] }
         }),
     }, { provider });
 
@@ -49,6 +54,8 @@ export async function CreateCluster(clusterName: string, vpc: awsx.ec2.Vpc, cons
             id: launchTemplate.id,
             version: pulumi.output(launchTemplate.latestVersion).apply(v => `${v}`)
         },
+        healthCheckGracePeriod: 60,
+        targetGroupArns: [targetGroup.targetGroup.arn],
         vpcZoneIdentifiers: vpc.privateSubnetIds,
         protectFromScaleIn: false,
         instanceRefresh: {
@@ -165,7 +172,6 @@ async function userData(clusterName: string, constants: Config, config: NitroEnc
     docker run --rm -v $(pwd)/image:/shared ${enclaveImage}
     sudo chown $USER:$USER -R image/
 
-    
     sudo systemctl start nitro-enclaves-allocator.service && sudo systemctl enable nitro-enclaves-allocator.service
     sudo systemctl start nitro-enclaves-vsock-proxy.service && systemctl enable nitro-enclaves-vsock-proxy.service
 

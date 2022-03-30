@@ -42,8 +42,11 @@ export async function Create(config: ServiceConfig, constants: Config, secretsSt
         numberOfAvailabilityZones: config.availabilityZones,
     }, { provider });
 
+    // setup our load balancer and cloudfront CDN
+    const loadBalancerTargetGroup = createCdnFrontedLoadBalancer(vpc, secretsStore, config, constants, provider);
+
     // init our cluster
-    const cluster = await CreateCluster(`cluster-${serviceName}`, vpc, constants, {
+    const cluster = await CreateCluster(`cluster-${serviceName}`, vpc, loadBalancerTargetGroup, constants, {
         cid: 16,
         memory: 256,
         cpus: 2,
@@ -58,21 +61,12 @@ export async function Create(config: ServiceConfig, constants: Config, secretsSt
     const taskDefinition = new aws.ecs.TaskDefinition(`task-${serviceName}`, {
         memory: `${config.memoryMB}`,
         cpu: `${config.cpuUnits}`,
-        networkMode: "awsvpc",
+        networkMode: "bridge",
         requiresCompatibilities: ["EC2"],
         executionRoleArn: taskExecRole.arn,
         family: `${config.serviceName}-task-family`,
         containerDefinitions,
     }, { provider, dependsOn: [cluster] });
-
-    const serviceSecurityGroup = new awsx.ec2.SecurityGroup(`svcsg-${serviceName}`, {
-        vpc,
-        ingress: [{ protocol: "-1", fromPort: ServicePort, toPort: ServicePort, cidrBlocks: [vpc.vpc.cidrBlock] }],
-        egress: [{ protocol: "-1", fromPort: 0, toPort: 0, cidrBlocks: ["0.0.0.0/0"] }],
-    }, { provider });
-
-    // setup our load balancer
-    const loadBalancerTargetGroup = createCdnFrontedLoadBalancer(vpc, secretsStore, config, constants, provider);
 
     // build the cluster service
     const service = new aws.ecs.Service(`svc-${serviceName}`, {
@@ -80,10 +74,6 @@ export async function Create(config: ServiceConfig, constants: Config, secretsSt
         launchType: "EC2",
         desiredCount: config.instanceCount,
         taskDefinition: taskDefinition.arn,
-        networkConfiguration: {
-            subnets: vpc.privateSubnetIds,
-            securityGroups: [serviceSecurityGroup.id]
-        },
         loadBalancers: [{
             containerName: config.serviceName,
             containerPort: ServicePort,
@@ -121,7 +111,7 @@ function createCdnFrontedLoadBalancer(vpc: awsx.ec2.Vpc, secretsStore: StaticSec
         securityGroups: [loadBalancerSecurityGroup],
     }, { provider });
 
-    const loadBalancerTargetGroup = loadBalancer.createTargetGroup(`albtg-${serviceNameHash}`, { port: ServicePort, vpc });
+    const loadBalancerTargetGroup = loadBalancer.createTargetGroup(`albtg-${serviceNameHash}`, { port: ServicePort, vpc, targetType: "instance" });
 
     const web = loadBalancerTargetGroup.createListener(`alblisten-https-${serviceName}`, {
         external: true,
