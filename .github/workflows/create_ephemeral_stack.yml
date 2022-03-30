@@ -24,6 +24,7 @@ jobs:
           echo "friendly branch name is ${branch}"
           echo "::set-output name=branch::$(echo ${branch})"
 
+
   deploy_ephemeral_stack:    
     name: ephemeral
     needs: [ephemeral_stack_name]
