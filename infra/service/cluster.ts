@@ -27,7 +27,8 @@ export async function CreateCluster(clusterName: string, vpc: awsx.ec2.Vpc, targ
     const instanceSecurityGroup = new awsx.ec2.SecurityGroup(`instance-sg-${clusterName}`, {
         vpc,
         ingress: [
-            { protocol: "-1", fromPort: 0, toPort: 0, cidrBlocks: [vpc.vpc.cidrBlock], self: true },
+            { protocol: "-1", fromPort: 0, toPort: 0, cidrBlocks: [vpc.vpc.cidrBlock] },
+            { protocol: "-1", fromPort: 0, toPort: 0, self: true },
         ],
         egress: [{ protocol: "-1", fromPort: 0, toPort: 0, cidrBlocks: ["0.0.0.0/0"] }],
     }, { provider });
