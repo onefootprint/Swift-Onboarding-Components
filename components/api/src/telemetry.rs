@@ -4,6 +4,7 @@ use opentelemetry::global;
 use opentelemetry::sdk::metrics::selectors;
 use opentelemetry::sdk::metrics::PushController;
 use opentelemetry::sdk::propagation::TraceContextPropagator;
+use opentelemetry_otlp::WithExportConfig;
 use tracing::Span;
 use tracing_actix_web::root_span;
 use tracing_actix_web::DefaultRootSpanBuilder;
@@ -16,7 +17,7 @@ use tracing_subscriber::Registry;
 
 use crate::config::Config;
 
-pub fn init(_config: &Config) -> Result<PushController, Box<dyn std::error::Error>> {
+pub fn init(config: &Config) -> Result<PushController, Box<dyn std::error::Error>> {
     env_logger::init();
 
     global::set_text_map_propagator(TraceContextPropagator::new());
@@ -28,9 +29,17 @@ pub fn init(_config: &Config) -> Result<PushController, Box<dyn std::error::Erro
         std::io::stdout,
     );
 
+    let exporter = if let Some(otel_endpoint) = &config.otel_endpoint {
+        opentelemetry_otlp::new_exporter()
+            .tonic()
+            .with_endpoint(otel_endpoint)
+    } else {
+        opentelemetry_otlp::new_exporter().tonic()
+    };
+
     let tracer = opentelemetry_otlp::new_pipeline()
         .tracing()
-        .with_exporter(opentelemetry_otlp::new_exporter().tonic())
+        .with_exporter(exporter)
         .install_simple()?;
 
     // Initialize `tracing` using `opentelemetry-tracing` and configure logging

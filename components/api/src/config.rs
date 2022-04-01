@@ -28,6 +28,9 @@ pub struct Config {
 
     #[envconfig(from = "DISABLE_OTEL")]
     pub disable_otel: Option<String>,
+
+    #[envconfig(from = "OTEL_ENDPOINT")]
+    pub otel_endpoint: Option<String>,
 }
 
 impl Config {

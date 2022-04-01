@@ -65,7 +65,7 @@ export async function Create(config: ServiceConfig, constants: Config, secretsSt
         requiresCompatibilities: ["EC2"],
         executionRoleArn: taskExecRole.arn,
         family: `${config.serviceName}-task-family`,
-        containerDefinitions,
+        containerDefinitions,    
     }, { provider, dependsOn: [cluster] });
 
     // build the cluster service
@@ -78,7 +78,7 @@ export async function Create(config: ServiceConfig, constants: Config, secretsSt
             containerName: config.serviceName,
             containerPort: ServicePort,
             targetGroupArn: loadBalancerTargetGroup.targetGroup.arn,
-        }]
+        }],
     }, { provider, dependsOn: [loadBalancerTargetGroup] })
 
 

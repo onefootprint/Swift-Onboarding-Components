@@ -65,14 +65,19 @@ export abstract class ServiceContainers {
                         value: `${appPort}`
                     },
                     {
+                        name: "OTEL_ENDPOINT",
+                        value: "http://otelcollect:4317"
+                    },
+                    {
                         name: "OTEL_RESOURCE_ATTRIBUTES",
                         value: `service.name=fpc-api,service.version=1.0,deployment.environment=${pulumi.getStack()}`
                     }
                 ],
+                links: ["otelcollect:otelcollect"],
                 dependsOn: [{ containerName: otelCollector.name, condition: "START" }],
                 portMappings: [{
                     containerPort: appPort,
-                    hostPort: appPort,
+                    hostPort: 0,
                     protocol: "tcp"
                 }],
                 "logConfiguration": {
@@ -106,18 +111,25 @@ export abstract class ServiceContainers {
                 valueFrom: apiKey
             }
         ]).apply(secrets => {
-            return {
+            let def: aws.ecs.ContainerDefinition = {
                 name: "otelcollect",
                 image: "amazon/aws-otel-collector:latest",
                 essential: true,
                 secrets,
+                portMappings: [{
+                    containerPort: 4317,
+                    hostPort: 0,
+                    protocol: "tcp"
+                }],
                 environment: [
                     {
                         name: "ELASTIC_APM_SERVER_ENDPOINT",
                         value: constants.elastic.apmEndpoint
                     },
                 ]
-            }
+            };
+
+            return def;
         });
 
         return out;
