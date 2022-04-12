@@ -103,7 +103,7 @@ function createCdnFrontedLoadBalancer(vpc: awsx.ec2.Vpc, secretsStore: StaticSec
 
 
     // some names must be < 32 chars, so we hash the srvice name, take the first half
-    const serviceNameHash = crypto.createHash('sha256').update(serviceName).digest('base64url').substring(0, 16);
+    const serviceNameHash = crypto.createHash('sha256').update(serviceName).digest('base64url').substring(0, 16).replace('_', '-');
 
     const loadBalancer = new awsx.elasticloadbalancingv2.ApplicationLoadBalancer(
         `applb-${serviceNameHash}`, {
