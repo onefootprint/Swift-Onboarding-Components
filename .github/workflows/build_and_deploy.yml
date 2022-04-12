@@ -60,7 +60,7 @@ jobs:
           make api-release
           account="$(aws sts get-caller-identity --query "Account" --output text)"
           branch="$(echo ${{ github.head_ref || github.ref_name }} | sed -r 's/\//-/g' | sed -r 's/_/-/g')"
-          commit="$(branch)-$(shell git rev-parse --short HEAD)"
+          commit="$(branch)-$(git rev-parse --short HEAD)"
           echo "using account $(account)"
           echo "create image tagged as $(commit)"
           docker build -t api:$(commit) -f api.dockerfile .
@@ -94,7 +94,7 @@ jobs:
           make build-eif
           account="$(aws sts get-caller-identity --query "Account" --output text)"
           branch="$(echo ${{ github.head_ref || github.ref_name }} | sed -r 's/\//-/g' | sed -r 's/_/-/g')"
-          commit="$(branch)-$(shell git rev-parse --short HEAD)"
+          commit="$(branch)-$(git rev-parse --short HEAD)"
           aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin $(account).dkr.ecr.us-east-1.amazonaws.com
           docker tag enclave_pkg:$(commit) $(account).dkr.ecr.us-east-1.amazonaws.com/enclave_pkg:$(commit)
           docker tag enclave_pkg:$(commit) $(account).dkr.ecr.us-east-1.amazonaws.com/enclave_pkg:latest
