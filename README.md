@@ -7,7 +7,7 @@ If running Mac OSX, I recommend using [homebrew](https://brew.sh/) for package i
 2. Install [docker](https://docs.docker.com/desktop/mac/install/) With homebrew, `$ brew install docker`
 3. Install the [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html). With homebrew `$ brew install awscli`
 4. Generate your pulumi credentials in the AWS Console
-    - Log in to the AWS Management console via (Rippling)[https://www.rippling.com/] using Single Sign On for Amazon
+    - Log in to the AWS Management console via [Rippling](https://www.rippling.com/) using Single Sign On for Amazon
     b. Navigate to Services => Security, Identity, & Compliance => IAM 
     - Click "users" on the left hand sidebar
     - Generate a new pulumi user (yourname_pulumi). No need to add tags or anything, just copy the permissions from an existing user
@@ -32,7 +32,7 @@ If you want to develop and test a new feature, and need to build the infrastruct
 $ cp Pulumi.dev.yaml Pulumi.${{ stackName }}.yaml
 
 # Create new dev stack
-$ pulumi stack init --secrets-provider awskms://4e61ea01-1193-475e-82ee-e9639743efd6?region=us-east-1 \ --copy-config-from "footprint/dev" "footprint/${{ stackName }}"
+$ pulumi stack init --secrets-provider awskms://4e61ea01-1193-475e-82ee-e9639743efd6?region=us-east-1 --copy-config-from "footprint/dev" "footprint/${{ stackName }}"
 
 # Select your new dev stack for infra deployment
 $ pulumi stack select footprint/${{ stackName }}
