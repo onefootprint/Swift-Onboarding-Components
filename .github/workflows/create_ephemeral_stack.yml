@@ -2,6 +2,11 @@ name: Push Ephemeral Stack
 on:
   pull_request:
     types: [reopened, opened, synchronize, edited]
+    paths:
+      - 'components/**/*'
+      - 'infra/**/*'
+      - '.github/workflows/**/*'
+      - '*.dockerfile'
 
 concurrency: 
   group: ${{ github.workflow }}-${{ github.head_ref }}
