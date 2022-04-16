@@ -23,6 +23,12 @@ impl Config {
 
 impl crate::StreamConfig for Config {
     fn stream_type(&self) -> crate::StreamType {
+        #[cfg(not(feature = "vsock"))]
+        return crate::StreamType::Tcp {
+            address: format!("127.0.0.1:{}", self.enclave_port),
+        };
+
+        #[cfg(feature = "vsock")]
         if self.use_local.is_some() {
             crate::StreamType::Tcp {
                 address: format!("127.0.0.1:{}", self.enclave_port),

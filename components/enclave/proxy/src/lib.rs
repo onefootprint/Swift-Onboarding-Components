@@ -4,9 +4,9 @@ pub mod pool;
 use async_trait::async_trait;
 pub use bb8;
 pub use config::Config;
-pub use enclave::Error as EnclaveError;
-use enclave::WireMessage;
-pub use enclave::{
+pub use rpc::Error as EnclaveError;
+use rpc::WireMessage;
+pub use rpc::{
     DataTransform, EnclavePayload, EnclaveResponse, EnvelopeDecrypt, FnDecryption, KmsCredentials,
     RpcPayload, RpcRequest,
 };
@@ -15,12 +15,14 @@ use pool::{Stream, StreamConnection};
 
 use thiserror::Error;
 use tokio::io::AsyncWriteExt;
+
+#[cfg(feature = "vsock")]
 use tokio_vsock::VsockStream;
 
 #[derive(Error, Debug)]
 pub enum Error {
     #[error("enclave {0}")]
-    Enclave(#[from] enclave::Error),
+    EnclaveRpc(#[from] rpc::Error),
     #[error("io {0}")]
     Io(#[from] std::io::Error),
     #[error("unexpected enclave response payload")]
@@ -33,8 +35,15 @@ pub enum Error {
 
 #[derive(Debug, Clone)]
 pub enum StreamType {
-    Tcp { address: String },
-    Vsock { cid: u32, port: u32 },
+    Tcp {
+        address: String,
+    },
+
+    #[cfg(feature = "vsock")]
+    Vsock {
+        cid: u32,
+        port: u32,
+    },
 }
 
 pub trait StreamConfig {
@@ -58,6 +67,7 @@ where
                 log::info!("connected to LOCAL TCP based enclave");
                 Box::new(stream)
             }
+            #[cfg(feature = "vsock")]
             StreamType::Vsock { cid, port } => {
                 let stream = VsockStream::connect(cid, port).await?;
                 log::info!("connected to VSOCK based enclave");

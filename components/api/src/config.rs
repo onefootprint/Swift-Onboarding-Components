@@ -45,6 +45,7 @@ impl Config {
 }
 
 impl enclave_proxy::StreamConfig for Config {
+    #[cfg(feature = "vsock")]
     fn stream_type(&self) -> enclave_proxy::StreamType {
         if self.use_local.is_some() {
             enclave_proxy::StreamType::Tcp {
@@ -55,6 +56,12 @@ impl enclave_proxy::StreamConfig for Config {
                 cid: self.enclave_cid,
                 port: self.enclave_port,
             }
+        }
+    }
+    #[cfg(not(feature = "vsock"))]
+    fn stream_type(&self) -> enclave_proxy::StreamType {
+        enclave_proxy::StreamType::Tcp {
+            address: format!("127.0.0.1:{}", self.enclave_port),
         }
     }
 }

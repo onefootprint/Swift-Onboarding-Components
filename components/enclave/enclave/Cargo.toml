@@ -8,12 +8,12 @@ edition = "2021"
 [features]
 default = ["simulate", "nitro"]
 simulate = ["aws-types", "aws-config", "aws-sdk-kms"]
-nitro = []
+nitro = ["tokio-vsock"]
 
 
 [dependencies]
 tokio = { version = "1", features = ["full"] }
-tokio-vsock = "0.3"
+tokio-vsock = { version = "0.3", optional = true }
 futures = "0.3"
 libc = "0.2"
 envconfig = "0.10.0"
@@ -25,6 +25,7 @@ env_logger = "0.9"
 uuid = { version = "0.8.2", features = ["v4", "serde"] }
 thiserror = "1.0"
 crypto = { path = "../crypto" }
+rpc = { path = "../rpc" }
 
 aws-types = { version = "0.8", optional = true }
 aws-config = { version = "0.8", optional = true }

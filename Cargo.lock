@@ -1032,6 +1032,7 @@ dependencies = [
  "futures",
  "libc",
  "log",
+ "rpc",
  "serde",
  "serde_cbor",
  "thiserror",
@@ -1050,7 +1051,6 @@ dependencies = [
  "bb8",
  "byteorder",
  "dotenv",
- "enclave",
  "env_logger",
  "envconfig",
  "futures",
@@ -1059,6 +1059,7 @@ dependencies = [
  "log",
  "opentelemetry",
  "opentelemetry-otlp",
+ "rpc",
  "serde",
  "serde_cbor",
  "thiserror",
@@ -2184,6 +2185,21 @@ dependencies = [
  "untrusted",
  "web-sys",
  "winapi",
+]
+
+[[package]]
+name = "rpc"
+version = "0.1.0"
+dependencies = [
+ "byteorder",
+ "crypto",
+ "futures",
+ "log",
+ "serde",
+ "serde_cbor",
+ "thiserror",
+ "tokio",
+ "uuid",
 ]
 
 [[package]]

@@ -6,11 +6,14 @@ use config::Config;
 use enclave::{
     enclave::handle_fn_decrypt, EnclavePayload, EnclaveResponse, RpcPayload, WireMessage,
 };
+
 use futures::StreamExt as _;
 use tokio::{
     io::{AsyncRead, AsyncWrite, AsyncWriteExt},
     net::TcpListener,
 };
+
+#[cfg(feature = "nitro")]
 use tokio_vsock::VsockListener;
 
 #[tokio::main]
@@ -19,10 +22,18 @@ async fn main() -> std::io::Result<()> {
     let config = Config::load_from_env().expect("failed to load env");
 
     // for local development, use a local tcp socket instead of AF_VSOCK
-    if config.use_local.is_some() {
-        listen_tcp(&format!("127.0.0.1:{}", config.port)).await
-    } else {
-        listen_vsock(config.port as u32).await
+    #[cfg(not(feature = "nitro"))]
+    {
+        return listen_tcp(&format!("127.0.0.1:{}", config.port)).await;
+    }
+
+    #[cfg(feature = "nitro")]
+    {
+        if config.use_local.is_some() {
+            listen_tcp(&format!("127.0.0.1:{}", config.port)).await
+        } else {
+            listen_vsock(config.port as u32).await
+        }
     }
 }
 
@@ -37,6 +48,7 @@ async fn listen_tcp(address: &str) -> std::io::Result<()> {
     Ok(())
 }
 
+#[cfg(feature = "nitro")]
 async fn listen_vsock(port: u32) -> std::io::Result<()> {
     let listener = VsockListener::bind(libc::VMADDR_CID_ANY, port)?;
 

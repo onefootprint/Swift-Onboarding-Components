@@ -1,4 +1,10 @@
 {
     "git.ignoreLimitWarning": true,
-    "terminal.integrated.localEchoLatencyThreshold": 0
+    "terminal.integrated.localEchoLatencyThreshold": 0,
+    "cSpell.words": [
+        "actix",
+        "envconfig",
+        "thiserror",
+        "vsock"
+    ]
 }
