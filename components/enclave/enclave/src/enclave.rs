@@ -1,3 +1,4 @@
+use rpc::{EnvelopeHmacSign, HmacSignature};
 use thiserror::Error;
 
 #[cfg(feature = "simulate")]
@@ -47,6 +48,24 @@ pub async fn handle_fn_decrypt(request: EnvelopeDecrypt) -> Result<FnDecryption,
         data: result.0,
         transform,
     })
+}
+
+pub async fn handle_hmac_sign(request: EnvelopeHmacSign) -> Result<HmacSignature, Error> {
+    let EnvelopeHmacSign {
+        kms_creds,
+        sealed_key,
+        data,
+        scope,
+    } = request;
+
+    let root_signing_key = kms_decrypt(kms_creds, sealed_key).await?;
+    log::info!("decrypted signature hmac key",);
+
+    // our scoped key is SHA256(scope || root_signing_key)
+    let scoped_key = crypto::sha256(&vec![scope, root_signing_key].concat());
+    let signature = crypto::hmac_sha256_sign(&scoped_key, &data)?;
+
+    Ok(HmacSignature { signature })
 }
 
 #[allow(unreachable_code)]

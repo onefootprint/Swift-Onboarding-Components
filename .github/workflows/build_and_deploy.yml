@@ -11,12 +11,12 @@ on:
       baseStackName:
         description: "base stack we're building, i.e. dev"
         type: string
-        required: true      
+        required: true
 
       stackName:
         description: "stack or possibly ephemeral stack name, i.e. dev or dev-feature-x"
         type: string
-        required: true       
+        required: true
 
       ephemeral:
         description: "whether or not this stack is ephemeral"
@@ -39,7 +39,7 @@ on:
         required: true
       PULUMI_ACCESS_TOKEN:
         required: true
-jobs:  
+jobs:
   # build the main api image
   build_api:
     name: Build API container
@@ -47,14 +47,14 @@ jobs:
     environment: ${{ inputs.environment }}
     steps:
       - uses: actions/checkout@v2
-      
+
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-region: ${{ secrets.AWS_REGION }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}                        
-      
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
       # package and push the api image
       - run: |
           make api-release
@@ -77,17 +77,17 @@ jobs:
     environment: ${{ inputs.environment }}
     steps:
       - uses: actions/checkout@v2
-      
+
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-region: ${{ secrets.AWS_REGION }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}              
-                  
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
       # install our signing credentials
-      # build, sign, package and push the eif image      
-      - name: build, sign and package        
+      # build, sign, package and push the eif image
+      - name: build, sign and package
         run: |
           echo "${{ secrets.ENCLAVE_SIGNING_KEY }}" > ../enclavekey.pem
           echo "${{ secrets.ENCLAVE_SIGNING_CERT }}" > ../cert.pem
@@ -103,21 +103,21 @@ jobs:
           docker tag enclave_pkg:${commit} ${account}.dkr.ecr.us-east-1.amazonaws.com/enclave_pkg:latest
           docker push ${account}.dkr.ecr.us-east-1.amazonaws.com/enclave_pkg:${commit}
           docker push ${account}.dkr.ecr.us-east-1.amazonaws.com/enclave_pkg:latest
-      
+
       # cleanup: remove keys
       - run: rm -f ../enclavekey.pem
 
-  deploy_stack:    
+  deploy_stack:
     name: deploy stack
     runs-on: ubuntu-latest
-    environment: 
+    environment:
       name: ${{ inputs.environment }}
       url: "https://${{ steps.constants.outputs.url }}"
     needs: [build_api, build_eif]
     if: success()
     steps:
       - uses: actions/checkout@v2
-          
+
       # pulumi setup
       - uses: actions/setup-node@v2
         with:
@@ -128,13 +128,15 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-region: ${{ secrets.AWS_REGION }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          
+
       - name: Setup Pulumi CLI
-        uses: pulumi/setup-pulumi@v2.0.0       
+        uses: pulumi/setup-pulumi@v2.0.0
+        with:
+          pulumi-version: 3.30.0
 
       - run: yarn install
         working-directory: infra
-                  
+
       # create our temp stack if needed
       - name: create emphemeral stack
         if: ${{ inputs.ephemeral }}
@@ -158,8 +160,8 @@ jobs:
           echo "##[set-output name=componentVersion;]$(echo ${version})"
         id: constants
         env:
-          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}     
-                    
+          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
+
       - name: select stack
         working-directory: infra
         run: pulumi stack select "footprint/${{ inputs.stackName }}"
@@ -189,4 +191,4 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               body: 'Deployed to https://${{ steps.constants.outputs.url }} with component tag `${{ steps.constants.outputs.componentVersion }}`'
-            })          
+            })

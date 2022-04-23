@@ -4,7 +4,8 @@ use std::time::Duration;
 
 use config::Config;
 use enclave::{
-    enclave::handle_fn_decrypt, EnclavePayload, EnclaveResponse, RpcPayload, WireMessage,
+    enclave::handle_fn_decrypt, enclave::handle_hmac_sign, EnclavePayload, EnclaveResponse,
+    RpcPayload, WireMessage,
 };
 
 use futures::StreamExt as _;
@@ -119,6 +120,9 @@ async fn handle_stream<S: AsyncRead + AsyncWrite + Unpin + Send + 'static>(
 async fn handle_request(request: RpcPayload) -> Result<EnclavePayload, Box<dyn std::error::Error>> {
     let response = match request {
         RpcPayload::Ping(m) => EnclavePayload::Pong(m),
+        RpcPayload::HmacSign(sign_request) => {
+            EnclavePayload::HmacSignature(handle_hmac_sign(sign_request).await?)
+        }
         RpcPayload::FnDecrypt(decrypt_request) => {
             EnclavePayload::FnDecryption(handle_fn_decrypt(decrypt_request).await?)
         }

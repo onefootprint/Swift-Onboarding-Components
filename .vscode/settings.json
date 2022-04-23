@@ -3,7 +3,10 @@
     "terminal.integrated.localEchoLatencyThreshold": 0,
     "cSpell.words": [
         "actix",
+        "awsx",
         "envconfig",
+        "pulumi",
+        "sqlx",
         "thiserror",
         "vsock"
     ]

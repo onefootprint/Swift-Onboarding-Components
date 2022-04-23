@@ -4,13 +4,16 @@ use actix_web::{
 };
 use actix_web_opentelemetry::RequestMetrics;
 use aws_sdk_kms::{
-    error::GenerateDataKeyPairWithoutPlaintextError, model::DataKeyPairSpec, types::SdkError,
+    error::{GenerateDataKeyPairWithoutPlaintextError, GenerateDataKeyWithoutPlaintextError},
+    model::DataKeyPairSpec,
+    types::SdkError,
 };
 use config::Config;
 use crypto::{b64::Base64Data, seal::EciesP256Sha256AesGcmSealed};
+use db::DbPool;
 use enclave_proxy::{
-    bb8, pool, EnclavePayload, EnvelopeDecrypt, FnDecryption, KmsCredentials, RpcPayload,
-    StreamManager,
+    bb8, pool, EnclavePayload, EnvelopeDecrypt, EnvelopeHmacSign, FnDecryption, HmacSignature,
+    KmsCredentials, RpcPayload, StreamManager,
 };
 use futures_util::TryFutureExt;
 use telemetry::TelemetrySpanBuilder;
@@ -68,8 +71,10 @@ fn log_headers(headers: &Vec<String>) {
 
 #[derive(Debug, Error)]
 pub enum ApiError {
-    #[error("kms.generate {0}")]
-    Kms(#[from] SdkError<GenerateDataKeyPairWithoutPlaintextError>),
+    #[error("kms.datakeypair.generate {0}")]
+    KmsKeyPair(#[from] SdkError<GenerateDataKeyPairWithoutPlaintextError>),
+    #[error("kms.datakey.generate {0}")]
+    KmsDataKey(#[from] SdkError<GenerateDataKeyWithoutPlaintextError>),
     #[error("crypto {0}")]
     Crypto(#[from] crypto::Error),
     #[error("enclave_proxy {0}")]
@@ -78,12 +83,14 @@ pub enum ApiError {
     EnclaveConnection(#[from] bb8::RunError<enclave_proxy::Error>),
     #[error("enclave {0}")]
     Enclave(#[from] enclave_proxy::EnclaveError),
+    #[error("db error {0}")]
+    Db(String),
 }
 
 impl ResponseError for ApiError {}
 
 #[derive(Debug, Clone, serde::Deserialize)]
-struct DataEncryptionRequest {
+struct DataRequest {
     data: String,
 }
 
@@ -97,14 +104,14 @@ struct DataEncryptionResponse {
 #[post("/encrypt")]
 async fn encrypt(
     state: web::Data<State>,
-    request: web::Json<DataEncryptionRequest>,
+    request: web::Json<DataRequest>,
 ) -> actix_web::Result<impl Responder> {
     tracing::info!("in encrypt");
 
     let new_key_pair = state
         .kms_client
         .generate_data_key_pair_without_plaintext()
-        .key_id(&state.config.root_key_id)
+        .key_id(&state.config.enclave_root_key_id)
         .key_pair_spec(DataKeyPairSpec::EccNistP256)
         .send()
         .map_err(ApiError::from)
@@ -177,11 +184,77 @@ async fn decrypt(
     Ok(std::str::from_utf8(&response.data).unwrap().to_string())
 }
 
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+struct DataEnvelopeSignatureResponse {
+    hmac_sha256_signature: Base64Data,
+    sealed_key: Base64Data,
+}
+
+#[post("/sign")]
+async fn sign(
+    state: web::Data<State>,
+    request: web::Json<DataRequest>,
+) -> actix_web::Result<impl Responder> {
+    tracing::info!("in sign");
+
+    let new_data_key = state
+        .kms_client
+        .generate_data_key_without_plaintext()
+        .key_id(&state.config.enclave_root_key_id)
+        .key_spec(aws_sdk_kms::model::DataKeySpec::Aes256)
+        .send()
+        .map_err(ApiError::from)
+        .await?;
+
+    let sealed_key = new_data_key.ciphertext_blob.unwrap().into_inner();
+
+    let mut conn = state
+        .enclave_connection_pool
+        .get()
+        .await
+        .map_err(ApiError::from)?;
+
+    let req = enclave_proxy::RpcRequest::new(RpcPayload::HmacSign(EnvelopeHmacSign {
+        kms_creds: KmsCredentials {
+            key_id: state.config.enclave_aws_access_key_id.clone(),
+            region: state.config.aws_region.clone(),
+            secret_key: state.config.enclave_aws_secret_access_key.clone(),
+            session_token: None,
+        },
+        sealed_key: sealed_key.clone(),
+        data: request.data.as_bytes().to_vec(),
+        scope: b"test_scope".to_vec(),
+    }));
+
+    tracing::info!("sending request");
+    let response = enclave_proxy::send_rpc_request(&req, &mut conn)
+        .await
+        .map_err(ApiError::from)?;
+    tracing::info!("got response");
+
+    let response = HmacSignature::try_from(response).map_err(ApiError::from)?;
+
+    Ok(web::Json(DataEnvelopeSignatureResponse {
+        hmac_sha256_signature: Base64Data(response.signature),
+        sealed_key: Base64Data(sealed_key),
+    }))
+}
+
 #[derive(Clone)]
 pub struct State {
     config: Config,
     kms_client: aws_sdk_kms::Client,
     enclave_connection_pool: bb8::Pool<pool::StreamManager<StreamManager<Config>>>,
+    db_pool: DbPool,
+}
+
+#[tracing::instrument(name = "test_db", skip(state))]
+#[get("/test_db")]
+async fn test_db(state: web::Data<State>) -> actix_web::Result<impl Responder> {
+    let tenant = db::test(&state.db_pool)
+        .await
+        .map_err(|e| ApiError::Db(format!("{:?}", e)))?;
+    Ok(format!("got tenant id {}", tenant.id.to_string()))
 }
 
 #[actix_web::main]
@@ -209,10 +282,17 @@ async fn main() -> std::io::Result<()> {
         let shared_config = aws_config::from_env().load().await;
         let kms_client = aws_sdk_kms::Client::new(&shared_config);
 
+        // run migrations
+        let _ = db::run_migrations(&config.database_url).unwrap();
+
+        // then create the pool
+        let db_pool = db::init(&config.database_url).unwrap();
+
         State {
             config: config.clone(),
             enclave_connection_pool: pool,
             kms_client,
+            db_pool,
         }
     };
 
@@ -228,6 +308,8 @@ async fn main() -> std::io::Result<()> {
             .service(test)
             .service(encrypt)
             .service(decrypt)
+            .service(test_db)
+            .service(sign)
     })
     .bind(("0.0.0.0", config.port))?
     .run()

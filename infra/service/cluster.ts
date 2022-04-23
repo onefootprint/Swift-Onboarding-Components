@@ -44,9 +44,7 @@ export async function CreateCluster(clusterName: string, vpc: awsx.ec2.Vpc, targ
             arn: instanceProfile.arn,
         },
         updateDefaultVersion: true,
-        networkInterfaces: (await vpc.privateSubnets).map((sn, index) => {
-            return { subnetId: sn.id, deviceIndex: index, securityGroups: [instanceSecurityGroup.id] }
-        }),
+        vpcSecurityGroupIds: [instanceSecurityGroup.id],
     }, { provider });
 
     const autoScaling = new aws.autoscaling.Group(`autoscale-group-${clusterName}`, {

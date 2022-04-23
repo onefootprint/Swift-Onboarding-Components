@@ -11,8 +11,8 @@ export interface StaticSecrets {
     secretsPolicyArn: pulumi.Output<string>;
     elasticApiKey: aws.ssm.Parameter;
     otelConfig: aws.ssm.Parameter;
-    enclaveParentSecretKey: aws.ssm.Parameter;
     enclaveUserSecretKey: aws.ssm.Parameter;
+    dbPassword: pulumi.Output<string>;
 }
 
 interface SecretConstants {
@@ -40,27 +40,28 @@ export async function LoadSecrets(config: pulumi.Config, enclaveKeyDescriptor: E
         }),
     });
 
+    const auroraDbPassword = new random.RandomPassword("db_password", {
+        length: 44,
+        special: false,
+    });
+
     const secretConstants = config.requireSecretObject<SecretConstants>("constants");
 
     return {
         secretsPolicyArn: secretsPolicy.arn,
         cloudfrontSecret: pulumi.secret(cloudfrontSecret),
         elasticApiKey: createSecretParameter(`elasticApiKey-${stack}`, secretConstants.elastic.apiKey),
-        enclaveParentSecretKey: new aws.ssm.Parameter(`ssm-param-enclave-parent-key`, {
-            type: "String",
-            value: pulumi.secret(enclaveKeyDescriptor.enclaveParentCredentials.access_secret_key),
-            name: `/static_secrets/enclave-parent-${stack}`,
-        }),
         enclaveUserSecretKey: new aws.ssm.Parameter(`ssm-param-enclave-user-key`, {
-            type: "String",
+            type: "SecureString",
             value: pulumi.secret(enclaveKeyDescriptor.enclaveKmsCredentials.access_secret_key),
             name: `/static_secrets/enclave-user-${stack}`,
         }),
         otelConfig: new aws.ssm.Parameter(`ssm-param-otelconfig`, {
-            type: "String",
+            type: "SecureString",
             value: fs.readFileSync('./otel/config.yml', 'utf8'),
             name: `/static_secrets/otelconfig-${stack}`,
-        })
+        }),
+        dbPassword: pulumi.secret(auroraDbPassword.result),
     }
 }
 

@@ -25,6 +25,7 @@ impl RpcRequest {
 pub enum RpcPayload {
     Ping(String),
     FnDecrypt(EnvelopeDecrypt),
+    HmacSign(EnvelopeHmacSign),
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -34,6 +35,15 @@ pub struct EnvelopeDecrypt {
     pub transform: DataTransform,
     pub sealed_key: Vec<u8>,
     pub sealed_data: EciesP256Sha256AesGcmSealed,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub struct EnvelopeHmacSign {
+    pub kms_creds: KmsCredentials,
+    pub sealed_key: Vec<u8>,
+    pub data: Vec<u8>,
+    pub scope: Vec<u8>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -63,6 +73,7 @@ pub struct EnclaveResponse {
 pub enum EnclavePayload {
     Pong(String),
     FnDecryption(FnDecryption),
+    HmacSignature(HmacSignature),
     Error(String),
 }
 
@@ -80,11 +91,31 @@ impl TryFrom<EnclavePayload> for FnDecryption {
     }
 }
 
+impl TryFrom<EnclavePayload> for HmacSignature {
+    type Error = crate::Error;
+
+    fn try_from(value: EnclavePayload) -> Result<Self, Self::Error> {
+        if let EnclavePayload::HmacSignature(r) = value {
+            Ok(r)
+        } else if let EnclavePayload::Error(error) = value {
+            Err(crate::Error::EnclaveError(error))
+        } else {
+            Err(crate::Error::UnexpectedResponse)
+        }
+    }
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub struct FnDecryption {
     pub transform: DataTransform,
     pub data: Vec<u8>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub struct HmacSignature {
+    pub signature: Vec<u8>,
 }
 
 #[derive(Debug, Clone)]

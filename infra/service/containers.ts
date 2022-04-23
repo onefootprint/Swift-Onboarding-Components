@@ -5,10 +5,11 @@ import { StaticSecrets } from "../secrets";
 import { Config } from "../config";
 import { EnclaveKeyDescriptor } from "../enclave_key";
 import { Region } from "@pulumi/aws";
+import { DbOutput } from "../db";
 
 export abstract class ServiceContainers {
 
-    static async apiMain(appPort: number, constants: Config, secretsStore: StaticSecrets, enclaveKeyDescriptor: EnclaveKeyDescriptor, region: Region, parent: pulumi.Resource): Promise<pulumi.Output<string>> {
+    static async apiMain(appPort: number, constants: Config, secretsStore: StaticSecrets, enclaveKeyDescriptor: EnclaveKeyDescriptor, region: Region, parent: pulumi.Resource, database: DbOutput): Promise<pulumi.Output<string>> {
         const name = "fpc";
 
         // depends on otel
@@ -20,34 +21,29 @@ export abstract class ServiceContainers {
         const containerDef = pulumi.all([
             otelCollector,
             enclaveKeyDescriptor.rootKeyId,
-            enclaveKeyDescriptor.enclaveParentCredentials.access_key_id,
-            secretsStore.enclaveParentSecretKey.arn,
             enclaveKeyDescriptor.enclaveKmsCredentials.access_key_id,
-            secretsStore.enclaveUserSecretKey.arn
-        ]).apply(([otelCollector, rootKeyId, parentAccessKeyId, enclaveParentArn, enclaveAccessKeyId, enclaveUserArn]) => {
+            secretsStore.enclaveUserSecretKey.arn,
+            database.databaseUrlSecretParam.arn
+        ]).apply(([otelCollector, rootKeyId, enclaveAccessKeyId, enclaveUserArn, databaseUrlArn]) => {
             const def = [{
                 name,
                 image,
                 essential: true,
-                secrets: [
-                    {
-                        name: "AWS_SECRET_ACCESS_KEY",
-                        valueFrom: enclaveParentArn
-                    },
+                secrets: [                    
                     {
                         name: "ENCLAVE_AWS_SECRET_ACCESS_KEY",
                         valueFrom: enclaveUserArn
+                    },
+                    {
+                        name: "DATABASE_URL",
+                        valueFrom: databaseUrlArn
                     }
                 ],
                 environment: [
                     {
                         name: "AWS_REGION",
                         value: `${region}`
-                    },
-                    {
-                        name: "AWS_ACCESS_KEY_ID",
-                        value: parentAccessKeyId
-                    },
+                    },     
                     {
                         name: "AWS_ROOT_KEY_ID",
                         value: rootKeyId

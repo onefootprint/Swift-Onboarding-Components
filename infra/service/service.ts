@@ -8,6 +8,9 @@ import { CreateCluster } from "./cluster";
 import { ServiceContainers } from "./containers";
 import { EnclaveKeyDescriptor } from "../enclave_key";
 import * as crypto from "crypto";
+import { DbOutput } from "../db";
+import { VpcRegion } from "../vpc";
+import { HmacSigningKeyDescriptor } from "../hmac_key";
 
 export type ServiceLoadBalancer = {
     lb: awsx.elasticloadbalancingv2.LoadBalancer,
@@ -17,7 +20,6 @@ export type ServiceConfig = {
     region: Region,
     certArn: pulumi.Output<string>,
     instanceCount: number,
-    availabilityZones: number,
     memoryMB: number,
     cpuUnits: number,
     serviceName: string,
@@ -33,14 +35,11 @@ const ServicePort = 8000;
 /**
  * Create our service on ECS
  */
-export async function Create(config: ServiceConfig, constants: Config, secretsStore: StaticSecrets, enclaveKeyDescriptor: EnclaveKeyDescriptor): Promise<ServiceLoadBalancer> {
+export async function Create(vpcProvider: VpcRegion, config: ServiceConfig, constants: Config, secretsStore: StaticSecrets, enclaveKeyDescriptor: EnclaveKeyDescriptor, signingKeyDescriptor: HmacSigningKeyDescriptor, database: DbOutput): Promise<ServiceLoadBalancer> {
     const region = config.region;
     const serviceName = `${config.serviceName}-${pulumi.getStack()}-${region}`;
-    const provider = new aws.Provider(`provider-${serviceName}`, { region });
-
-    const vpc = new awsx.ec2.Vpc(`vpc-${serviceName}`, {
-        numberOfAvailabilityZones: config.availabilityZones,
-    }, { provider });
+    const vpc = vpcProvider.vpc;
+    const provider = vpcProvider.provider;
 
     // setup our load balancer and cloudfront CDN
     const loadBalancerTargetGroup = createCdnFrontedLoadBalancer(vpc, secretsStore, config, constants, provider);
@@ -53,19 +52,24 @@ export async function Create(config: ServiceConfig, constants: Config, secretsSt
     }, region, provider);
 
     // declare the containers we want to run
-    const containerDefinitions = await ServiceContainers.apiMain(ServicePort, constants, secretsStore, enclaveKeyDescriptor, region, cluster);
+    const containerDefinitions = await ServiceContainers.apiMain(ServicePort, constants, secretsStore, enclaveKeyDescriptor, region, cluster, database);
 
     // setup the task
-    const taskExecRole = createTaskExecutionRole(secretsStore, region);
+    const current = await aws.getCallerIdentity({});
+
+    const execRole = createTaskExecutionRole(secretsStore, serviceName);
+
+    const taskRoleRole = createTaskContainerRole(current.accountId, serviceName, enclaveKeyDescriptor, signingKeyDescriptor);
 
     const taskDefinition = new aws.ecs.TaskDefinition(`task-${serviceName}`, {
         memory: `${config.memoryMB}`,
         cpu: `${config.cpuUnits}`,
         networkMode: "bridge",
         requiresCompatibilities: ["EC2"],
-        executionRoleArn: taskExecRole.arn,
+        executionRoleArn: execRole.arn,
+        taskRoleArn: taskRoleRole.arn,
         family: `${config.serviceName}-task-family`,
-        containerDefinitions,    
+        containerDefinitions,
     }, { provider, dependsOn: [cluster] });
 
     // build the cluster service
@@ -103,7 +107,7 @@ function createCdnFrontedLoadBalancer(vpc: awsx.ec2.Vpc, secretsStore: StaticSec
 
 
     // some names must be < 32 chars, so we hash the srvice name, take the first half
-    const serviceNameHash = crypto.createHash('sha256').update(serviceName).digest('base64url').substring(0, 16).replace('_', '-');
+    const serviceNameHash = crypto.createHash('sha256').update(serviceName).digest('hex').substring(0, 16);
 
     const loadBalancer = new awsx.elasticloadbalancingv2.ApplicationLoadBalancer(
         `applb-${serviceNameHash}`, {
@@ -203,7 +207,7 @@ function createTaskExecutionRole(secretsStore: StaticSecrets, serviceName: strin
                     }],
                 }),
 
-            }
+            },
         ]
     });
 
@@ -218,4 +222,58 @@ function createTaskExecutionRole(secretsStore: StaticSecrets, serviceName: strin
     });
 
     return taskExecRole;
+}
+
+/**
+ * Create the task execution role we need to setup the tasks in our ECS service
+ * needs to create logs, assume ecs-tasks service, and access static secrets for the containers
+ */
+function createTaskContainerRole(account: string, serviceName: string, enclaveKeyDescriptor: EnclaveKeyDescriptor, signingKeyDescriptor: HmacSigningKeyDescriptor): pulumi.Output<aws.iam.Role> {
+
+    const role = pulumi.all([enclaveKeyDescriptor.rootKeyArn, signingKeyDescriptor.rootKeyArn]).apply(([enclaveRootKeyArn, signingRootKeyArn]) => {
+        return new aws.iam.Role(`task-container-role-${serviceName}`, {
+            assumeRolePolicy: {
+                Version: "2012-10-17",
+                Statement: [{
+                    Sid: "",
+                    Effect: "Allow",
+                    Principal: {
+                        Service: "ecs-tasks.amazonaws.com",
+                    },
+                    Action: "sts:AssumeRole",
+                    Condition: {
+                        "StringEquals": {
+                            "aws:SourceAccount": `${account}`
+                        }
+                    }
+                }],
+            },
+            inlinePolicies: [
+                {
+                    name: "enclave_key_generate_encrypted_key",
+                    policy: JSON.stringify({
+                        Version: "2012-10-17",
+                        Statement: [{
+                            Action: [
+                                "kms:GenerateDataKeyPairWithoutPlaintext",
+                                "kms:GenerateDataKeyWithoutPlaintext",
+                                "kms:DescribeKey"
+                            ],
+                            Effect: "Allow",
+                            Resource: enclaveRootKeyArn,
+                        },
+                        {
+                            Action: ["kms:GenerateMac", "kms:VerifyMac"],
+                            Effect: "Allow",
+                            Resource: signingRootKeyArn,
+                        }
+                        ],
+                    }),
+                }
+            ]
+        });
+    });
+
+
+    return role;
 }

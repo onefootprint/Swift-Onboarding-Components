@@ -5,7 +5,7 @@ import { Config } from "./config";
 
 export interface EnclaveKeyDescriptor {
     rootKeyId: pulumi.Output<string>;
-    enclaveParentCredentials: EnclaveKmsCredentials;
+    rootKeyArn: pulumi.Output<string>;
     enclaveKmsCredentials: EnclaveKmsCredentials;
 }
 
@@ -18,10 +18,9 @@ export async function Initialize(config: Config, replicaRegions: Region[]): Prom
 
     const current = await aws.getCallerIdentity({});
     // todo: change parent to be role!
-    const parentUser = new aws.iam.User(`enclave_parent`);
     const enclaveUser = new aws.iam.User(`enclave`);
 
-    const keyPolicy = pulumi.all([parentUser.arn, enclaveUser.arn]).apply(([parentArn, enclaveArn]) => {
+    const keyPolicy = pulumi.all([enclaveUser.arn]).apply(([enclaveArn]) => {
         const kp = JSON.stringify({
             Version: "2012-10-17",
             Statement: [
@@ -47,17 +46,6 @@ export async function Initialize(config: Config, replicaRegions: Region[]): Prom
                         }
                     }
                 },
-                {
-                    "Effect": "Allow",
-                    "Principal": {
-                        "AWS": parentArn
-                    },
-                    "Action": [
-                        "kms:GenerateDataKeyPairWithoutPlaintext",
-                        "kms:DescribeKey"
-                    ],
-                    "Resource": "*",
-                }
             ]
         });
         return kp;
@@ -84,16 +72,9 @@ export async function Initialize(config: Config, replicaRegions: Region[]): Prom
         user: enclaveUser.name
     });
 
-    const enclaveParentKey = new aws.iam.AccessKey(`enclave_parent_access_key`, {
-        user: parentUser.name
-    });
-
     return {
         rootKeyId: rootKey.id,
-        enclaveParentCredentials: {
-            access_key_id: enclaveParentKey.id,
-            access_secret_key: pulumi.secret(enclaveParentKey.secret),
-        },
+        rootKeyArn: rootKey.arn,
         enclaveKmsCredentials: {
             access_key_id: enclaveUserKey.id,
             access_secret_key: pulumi.secret(enclaveUserKey.secret),

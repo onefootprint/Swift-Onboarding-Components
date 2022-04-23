@@ -34,3 +34,4 @@ aws-sdk-kms = "0.8"
 thiserror = "1.0"   
 
 enclave_proxy = { path = "../enclave/proxy", default-features = false }
+db = { path = "../db" }

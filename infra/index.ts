@@ -10,6 +10,9 @@ import * as secrets from './secrets'
 import { Config } from './config'
 import * as svc from './service/service';
 import * as enclaveKey from './enclave_key';
+import * as db from './db';
+import * as vpcUtil from './vpc';
+import * as hmacSigningKey from './hmac_key';
 
 export = async () => {
     let config = new pulumi.Config();
@@ -24,18 +27,30 @@ export = async () => {
 
     // init the enclave key
     const enclaveKeyConfig = await enclaveKey.Initialize(constants, otherRegions);
+    const hmacSigningKeyConfig = await hmacSigningKey.Initialize(constants, otherRegions);
 
     // setup or secrets param store
     const secretsStore = await secrets.LoadSecrets(config, enclaveKeyConfig);
 
+    // setup our vpcs and region providers
+    const vpcProviders = regions.map(region => {
+        return vpcUtil.CreateRegionalVPC(region)
+    });
+
+    // setup database
+    const database = await db.CreateDB(vpcProviders[0], `db-${pulumi.getStack()}`, constants, secretsStore, {
+        protectDeletion: false,
+    });
+
     // launch of core service
-    const services = await Promise.all(regions.map(async region => {
+    const services = await Promise.all(regions.map(async (region, index) => {
+        const vpcAndProvider = vpcProviders[index];
+
         // mint a cert for this property
         const cert = await certs.CreateCertificate({ domain: `*.${stack}.${constants.rootDomain}`, region, hostedZoneId: hostedZone.id });
 
-        // create our fargate service
-        const service = await svc.Create({
-            availabilityZones: 2,
+        // create our ecs service
+        const service = await svc.Create(vpcAndProvider, {
             cpuUnits: 256,
             memoryMB: 512,
             instanceCount: 2,
@@ -44,7 +59,7 @@ export = async () => {
             serviceName: "fpc",
             region,
             hostedZoneId: hostedZone.zoneId,
-        }, constants, secretsStore, enclaveKeyConfig)
+        }, constants, secretsStore, enclaveKeyConfig, hmacSigningKeyConfig, database)
 
         return { service, cert, region }
     }));
@@ -61,6 +76,7 @@ export = async () => {
     return {
         domain: `${constants.cdnAppSubdomain}.${stack}.${constants.rootDomain}`,
         cdn: distribution.domainName,
-        appLBs: services.map(svc => { svc.service.lb.loadBalancer.dnsName })
+        appLBs: services.map(svc => { svc.service.lb.loadBalancer.dnsName }),
+        databaseUrl: database.databaseUrl,
     }
 };

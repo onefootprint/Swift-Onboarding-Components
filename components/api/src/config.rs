@@ -15,8 +15,10 @@ pub struct Config {
     pub use_local: Option<String>,
 
     #[envconfig(from = "AWS_ROOT_KEY_ID")]
-    pub root_key_id: String,
+    pub enclave_root_key_id: String,
 
+    // #[envconfig(from = "AWS_HMAC_SIGNING_ROOT_KEY_ID")]
+    // pub signing_root_key_id: String,
     #[envconfig(from = "AWS_REGION")]
     pub aws_region: String,
 
@@ -31,6 +33,9 @@ pub struct Config {
 
     #[envconfig(from = "OTEL_ENDPOINT")]
     pub otel_endpoint: Option<String>,
+
+    #[envconfig(from = "DATABASE_URL")]
+    pub database_url: String,
 }
 
 impl Config {

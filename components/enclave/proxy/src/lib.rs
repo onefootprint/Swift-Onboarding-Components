@@ -7,8 +7,8 @@ pub use config::Config;
 pub use rpc::Error as EnclaveError;
 use rpc::WireMessage;
 pub use rpc::{
-    DataTransform, EnclavePayload, EnclaveResponse, EnvelopeDecrypt, FnDecryption, KmsCredentials,
-    RpcPayload, RpcRequest,
+    DataTransform, EnclavePayload, EnclaveResponse, EnvelopeDecrypt, EnvelopeHmacSign,
+    FnDecryption, KmsCredentials, RpcPayload, RpcRequest, HmacSignature
 };
 
 use pool::{Stream, StreamConnection};
