@@ -7,7 +7,7 @@ use uuid::Uuid;
 
 // TODO add updated_at and created_at
 
-#[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
+#[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable, Identifiable)]
 #[table_name = "challenge"]
 pub struct Challenge {
     pub id: Uuid,

@@ -102,16 +102,6 @@ struct DataRequest {
     data: String,
 }
 
-#[derive(Debug, Clone, serde::Deserialize)]
-struct CreateTestChallengeRequest {
-    user_id: Uuid,
-}
-
-#[derive(Debug, Clone, serde::Deserialize)]
-struct CreateChallengeRequest {
-    kind: ChallengeKind,
-}
-
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 struct DataEncryptionResponse {
     sealed_data: String,
@@ -150,6 +140,11 @@ async fn add_user(
     Ok(web::Json(uuid))
 }
 
+#[derive(Debug, Clone, serde::Deserialize)]
+struct CreateTestChallengeRequest {
+    user_id: Uuid,
+}
+
 #[post("/add-challenge-test")]
 async fn add_test_challenge(
     state: web::Data<State>,
@@ -163,6 +158,11 @@ async fn add_test_challenge(
     } else {
         Err(ApiError::NoPhoneNumberForUser)
     }
+}
+
+#[derive(Debug, Clone, serde::Deserialize)]
+struct CreateChallengeRequest {
+    kind: ChallengeKind,
 }
 
 #[post("/vault/{user_id}/challenge")]
@@ -189,6 +189,24 @@ async fn create_challenge(
     } else {
         Err(ApiError::DataNotSetForUser(request.kind))
     }
+}
+
+#[derive(Debug, Clone, serde::Deserialize)]
+struct ChallengeVerificationRequest {
+    code: i32,
+}
+
+#[post("/vault/{user_id}/challenge/{challenge_id}/verify")]
+async fn verify_challenge(
+    state: web::Data<State>,
+    path: web::Path<(Uuid, Uuid)> ,
+    request: web::Json<ChallengeVerificationRequest>,
+) ->  actix_web::Result<impl Responder> {
+    let (user_id, challenge_id) = path.into_inner();
+    tracing::info!("in challenge verification with user_id {} challenge_id {}", user_id, challenge_id);
+
+    db::verify_challenge(&state.db_pool, challenge_id, user_id, request.code).await.map_err(ApiError::from)?;
+    Ok(web::Json(()))
 }
 
 #[post("/encrypt")]
@@ -387,6 +405,7 @@ async fn main() -> std::io::Result<()> {
             .service(add_user)
             .service(add_test_challenge)
             .service(create_challenge)
+            .service(verify_challenge)
     })
     .bind(("0.0.0.0", config.port))?
     .run()

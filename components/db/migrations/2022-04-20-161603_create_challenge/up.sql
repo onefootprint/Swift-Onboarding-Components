@@ -1,5 +1,5 @@
 CREATE TYPE challenge_kind as ENUM ('PhoneNumber', 'Email');
-CREATE TYPE challenge_state as ENUM ('AwaitingResponse', 'Expired', 'Validated`');
+CREATE TYPE challenge_state as ENUM ('AwaitingResponse', 'Expired', 'Validated');
 
 CREATE TABLE challenge (
     id uuid NOT NULL PRIMARY KEY DEFAULT uuid_generate_v4(),
