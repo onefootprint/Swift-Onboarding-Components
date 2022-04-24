@@ -6,9 +6,10 @@ on:
       - 'master'    
     paths:
       - 'components/**/*'
-      - 'infra/**/*'
-      - '.github/workflows/**/*'
+      - 'infra/**/*'      
       - '*.dockerfile'
+      - '.github/workflows/create_ephemeral_stack.yml'
+      - '.github/workflows/build_and_deploy.yml'
 
 concurrency: 
   group: ${{ github.workflow }}-${{ github.head_ref }}
