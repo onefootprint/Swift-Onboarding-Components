@@ -145,6 +145,7 @@ pub async fn expire_old_challenges(pool: &Pool, user_id: Uuid, kind: ChallengeKi
 pub async fn verify_challenge(pool: &Pool, challenge_id: Uuid, user_id: Uuid, code: i32) -> Result<(), DbError> {
     let conn = pool.get().await?;
 
+    // TODO write unit tests
     conn.interact(move |conn| {
         conn.build_transaction().run(|| {
             let challenge: Challenge = challenge::table
