@@ -2,16 +2,17 @@ name: Refresh Stack
 
 on:
   workflow_dispatch:
-    stackName:
-      description: 'Name of the stack to refresh'
-      required: true
-      type: string
-      default: "dev"
+    inputs:
+      stackName:
+        description: 'Name of the stack to refresh'
+        required: true
+        type: string
+        default: "dev"
 
-    environment:
-      description: 'Environment to run against'
-      type: environment
-      required: true         
+      environment:
+        description: 'Environment to run against'
+        type: environment
+        required: true         
 
 jobs:
   refresh_stack:
