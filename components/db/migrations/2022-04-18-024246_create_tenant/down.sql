@@ -1,1 +1,11 @@
-DROP TABLE tenants;
+DROP TABLE user_tenant_verification;
+DROP TRIGGER expire_temp_tenant_user_token ON temp_tenant_user_token;
+DROP FUNCTION token_expiry;
+DROP TABLE temp_tenant_user_token;
+DROP TABLE tenant;
+DROP INDEX fp_user_sh_ssn;
+DROP INDEX fp_user_sh_phone_number;
+DROP INDEX fp_user_sh_email;
+DROP TABLE fp_user;
+DROP TABLE tenant_publishable_api_key;
+DROP TYPE User_Status;

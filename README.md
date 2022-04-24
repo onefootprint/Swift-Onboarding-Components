@@ -18,9 +18,29 @@ If running Mac OSX, I recommend using [homebrew](https://brew.sh/) for package i
     $ cd infra
     $  npm install -g npm@latest
 ```
+7. Install the diesel CLI ` $ cargo install diesel_cli`
 7. You should be ready to start building this project!
 
-## Testing new features
+## Local development
+
+To develop this project locally on MacOSX, run
+
+` $ cd components/api/src`
+` $ cargo run -p footprint-core --no-default-features `
+
+Make sure that you have properly set your DATABASE_URL in necessary AWS Secrets in your .env file. 
+If you are developing using a local postgres instance, make sure you have run the necessary migrations
+by running:
+
+` $ diesel migration run`
+
+Once your local server is up, you can test API calls, results, and database modifications using curl. 
+An example request is below: 
+
+` $ curl https://localhost:8000/test `
+
+
+## Local infrastructure build
 
 If you want to develop and test a new feature, and need to build the infrastructure to do so, you have two options. 
 
@@ -44,7 +64,5 @@ $ pulumi up
 $ pulumi down
 
 ```
-
-## Building the enclave
 
 ## Accessing Logs & Metrics

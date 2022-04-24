@@ -32,6 +32,7 @@ crypto = { path = "../enclave/crypto" }
 aws-config = "0.8"
 aws-sdk-kms = "0.8"
 thiserror = "1.0"   
-
 enclave_proxy = { path = "../enclave/proxy", default-features = false }
 db = { path = "../db" }
+deadpool-diesel = { version = "0.3.1", features = ["postgres", "rt_tokio_1", "serde"] }
+anyhow = { version = "1.0" }

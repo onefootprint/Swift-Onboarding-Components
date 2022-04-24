@@ -8,6 +8,7 @@ use enclave::{
     RpcPayload, WireMessage,
 };
 
+#[allow(unused_imports)]
 use futures::StreamExt as _;
 use tokio::{
     io::{AsyncRead, AsyncWrite, AsyncWriteExt},

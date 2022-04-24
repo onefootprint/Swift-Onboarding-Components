@@ -69,12 +69,12 @@ pub async fn handle_hmac_sign(request: EnvelopeHmacSign) -> Result<HmacSignature
 }
 
 #[allow(unreachable_code)]
-pub async fn kms_decrypt(kms_creds: KmsCredentials, ciphertext: Vec<u8>) -> Result<Vec<u8>, Error> {
+pub async fn kms_decrypt(_kms_creds: KmsCredentials, _ciphertext: Vec<u8>) -> Result<Vec<u8>, Error> {
     #[cfg(feature = "nitro")]
-    return Ok(ne::kms_decrypt(kms_creds, ciphertext).await?);
+    return Ok(ne::kms_decrypt(_kms_creds, _ciphertext).await?);
 
     #[cfg(feature = "simulate")]
-    return Ok(simulated::kms_decrypt(kms_creds, ciphertext).await?);
+    return Ok(simulated::kms_decrypt(_kms_creds, _ciphertext).await?);
 
     unimplemented!()
 }
