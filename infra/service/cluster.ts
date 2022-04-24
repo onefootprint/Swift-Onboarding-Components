@@ -79,7 +79,7 @@ export async function CreateCluster(clusterName: string, vpc: awsx.ec2.Vpc, targ
     }, { provider });
 
     // create the cluster
-    const cluster = new awsx.ecs.Cluster(`cluster-${clusterName}`, {
+    const cluster = new awsx.ecs.Cluster(`${clusterName}`, {
         name: clusterName,
         vpc,
     }, { provider });
