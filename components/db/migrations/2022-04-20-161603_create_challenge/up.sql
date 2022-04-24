@@ -5,7 +5,7 @@ CREATE TABLE challenge (
     id uuid NOT NULL PRIMARY KEY DEFAULT uuid_generate_v4(),
     user_id uuid NOT NULL,
     sh_data BYTEA NOT NULL,
-    code int NOT NULL,
+    h_code BYTEA NOT NULL,
     kind challenge_kind NOT NULL,
     state challenge_state NOT NULL,
     validated_at timestamp,

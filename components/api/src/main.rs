@@ -6,7 +6,11 @@ use actix_web_opentelemetry::RequestMetrics;
 use aws_sdk_kms::{
     error::{GenerateDataKeyPairWithoutPlaintextError, GenerateDataKeyWithoutPlaintextError},
     model::DataKeyPairSpec,
-    types::SdkError,
+    types::SdkError as KmsSdkError,
+};
+use aws_sdk_pinpointsmsvoicev2::{
+    error::SendTextMessageError,
+    types::SdkError as SmsSdkError,
 };
 use config::Config;
 use crypto::{b64::Base64Data, seal::EciesP256Sha256AesGcmSealed};
@@ -23,6 +27,8 @@ use db::models::types::{ChallengeKind, Status};
 use db::{DbError, DbPool};
 use thiserror::Error;
 use uuid::Uuid;
+
+// TODO put IAM roles and permissions in pulumi
 
 #[tracing::instrument(name = "index", skip(req))]
 #[get("/")]
@@ -85,9 +91,9 @@ pub enum ApiError {
     #[error("Data {0:?} not set for user")]
     DataNotSetForUser(ChallengeKind),
     #[error("kms.datakeypair.generate {0}")]
-    KmsKeyPair(#[from] SdkError<GenerateDataKeyPairWithoutPlaintextError>),
+    KmsKeyPair(#[from] KmsSdkError<GenerateDataKeyPairWithoutPlaintextError>),
     #[error("kms.datakey.generate {0}")]
-    KmsDataKey(#[from] SdkError<GenerateDataKeyWithoutPlaintextError>),
+    KmsDataKey(#[from] KmsSdkError<GenerateDataKeyWithoutPlaintextError>),
     #[error("crypto {0}")]
     Crypto(#[from] crypto::Error),
     #[error("enclave_proxy {0}")]
@@ -100,6 +106,8 @@ pub enum ApiError {
     Database(#[from] DbError),
     #[error("dotenv {0}")]
     Dotenv(#[from] dotenv::Error),
+    #[error("send_text_message_error {0}")]
+    SendTextMEssageError(#[from] SmsSdkError<SendTextMessageError>),
 }
 
 impl ResponseError for ApiError {}
@@ -192,19 +200,34 @@ async fn create_challenge(
         ChallengeKind::Email => user.sh_email,
         ChallengeKind::PhoneNumber => user.sh_phone_number,
     };
-    if let Some(sh_data) = sh_data {
-        // TODO actually send email or SMS
-        let challenge =
-            db::create_challenge(&state.db_pool, user_id, sh_data, request.kind).await?;
-        Ok(web::Json(challenge))
-    } else {
-        Err(ApiError::DataNotSetForUser(request.kind))
-    }
+    let sh_data = match sh_data {
+        Some(sh_data) => sh_data,
+        None => return Err(ApiError::DataNotSetForUser(request.kind)),
+    };
+
+    let (challenge, code) =
+        db::create_challenge(&state.db_pool, user_id, sh_data, request.kind).await?;
+    match request.kind {
+        ChallengeKind::Email => {
+            // TODO send email
+        },
+        ChallengeKind::PhoneNumber => {
+            let output = state.sms_client.send_text_message()
+                // TODO decrypt phone number
+                .destination_phone_number("TODO")
+                .message_body(format!("Your Footprint verification code is {}. Don't share your code with anyone. We will never contact you to request this code.\n\n@onefootprint.com #{}", code, code))
+                .send()
+                .await?;
+            println!("output from text {:?}", output)
+        },
+    };
+
+    Ok(web::Json(challenge.id))
 }
 
 #[derive(Debug, Clone, serde::Deserialize)]
 struct ChallengeVerificationRequest {
-    code: i32,
+    code: String,
 }
 
 #[post("/vault/{user_id}/challenge/{challenge_id}/verify")]
@@ -212,7 +235,7 @@ async fn verify_challenge(
     state: web::Data<State>,
     path: web::Path<(Uuid, Uuid)>,
     request: web::Json<ChallengeVerificationRequest>,
-) -> actix_web::Result<impl Responder> {
+) -> Result<impl Responder, ApiError> {
     let (user_id, challenge_id) = path.into_inner();
     tracing::info!(
         "in challenge verification with user_id {} challenge_id {}",
@@ -220,10 +243,11 @@ async fn verify_challenge(
         challenge_id
     );
 
-    db::verify_challenge(&state.db_pool, challenge_id, user_id, request.code)
-        .await
-        .map_err(ApiError::from)?;
-    Ok(web::Json(()))
+    let request = request;
+    db::verify_challenge(&state.db_pool, challenge_id, user_id, request.into_inner().code)
+        .await?;
+    // TODO yield auth token if chalenge is successfully verified
+    Ok(web::Json("verified! one day this will have an auth token")) 
 }
 
 #[post("/encrypt")]
@@ -351,6 +375,7 @@ async fn sign(
 #[derive(Clone)]
 pub struct State {
     config: Config,
+    sms_client: aws_sdk_pinpointsmsvoicev2::Client,
     kms_client: aws_sdk_kms::Client,
     db_pool: DbPool,
     enclave_connection_pool: bb8::Pool<pool::StreamManager<StreamManager<Config>>>,
@@ -379,6 +404,7 @@ async fn main() -> std::io::Result<()> {
             .unwrap();
 
         let shared_config = aws_config::from_env().load().await;
+        let sms_client = aws_sdk_pinpointsmsvoicev2::Client::new(&shared_config);
         let kms_client = aws_sdk_kms::Client::new(&shared_config);
 
         // run migrations
@@ -392,6 +418,7 @@ async fn main() -> std::io::Result<()> {
         State {
             config: config.clone(),
             enclave_connection_pool: pool,
+            sms_client,
             kms_client,
             db_pool,
         }

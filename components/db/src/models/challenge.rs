@@ -13,7 +13,7 @@ pub struct Challenge {
     pub id: Uuid,
     pub user_id: Uuid,
     pub sh_data: Vec<u8>,
-    pub code: i32,
+    pub h_code: Vec<u8>,
     pub kind: ChallengeKind,
     pub state: ChallengeState,
     pub validated_at: Option<NaiveDateTime>,
@@ -24,7 +24,7 @@ pub struct Challenge {
 pub struct NewChallenge {
     pub user_id: Uuid,
     pub sh_data: Vec<u8>,
-    pub code: i32,
+    pub h_code: Vec<u8>,
     pub kind: ChallengeKind,
     pub state: ChallengeState,
 }

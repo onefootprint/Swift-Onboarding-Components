@@ -132,18 +132,27 @@ pub async fn get_user(pool: &Pool, user_id: Uuid) -> Result<FpUser, DbError> {
     Ok(user)
 }
 
+fn gen_code_and_hash() -> (String, [u8; 32]) {
+    let code: String = crypto::random::gen_rand_n_digit_code(6);
+    let h_code = crypto::sha256(code.as_bytes());
+    (code, h_code)
+}
+
 pub async fn create_challenge(
     pool: &Pool,
     user_id: Uuid,
     sh_data: Vec<u8>,
     kind: ChallengeKind,
-) -> Result<Uuid, DbError> {
+) -> Result<(Challenge, String), DbError> {
     let conn = pool.get().await?;
+
+    // TODO cryptographically random
+    let (code, h_code) = gen_code_and_hash();
 
     let new_challenge = NewChallenge {
         user_id: user_id,
         sh_data: sh_data,
-        code: 123456, // TODO random
+        h_code: h_code.to_vec(),
         kind: kind,
         state: ChallengeState::AwaitingResponse,
     };
@@ -155,7 +164,7 @@ pub async fn create_challenge(
         })
         .await??;
 
-    Ok(challenge.id)
+    Ok((challenge, code))
 }
 
 pub async fn expire_old_challenges(
@@ -185,7 +194,7 @@ pub async fn verify_challenge(
     pool: &Pool,
     challenge_id: Uuid,
     user_id: Uuid,
-    code: i32,
+    code: String,
 ) -> Result<(), DbError> {
     let conn = pool.get().await?;
 
@@ -216,7 +225,7 @@ pub async fn verify_challenge(
                 return Err(DbError::ChallengeDataMismatch);
             }
             // TODO only store a hash of the code and do a hash comparison of the code
-            if challenge.code != code {
+            if challenge.h_code != crypto::sha256(code.as_bytes()) {
                 return Err(DbError::ChallengeCodeMismatch);
             }
             // The code matches, and the sh_data on the challenge matches the user. Mark the challenge as validated

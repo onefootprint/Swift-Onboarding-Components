@@ -6,7 +6,7 @@ table! {
         id -> Uuid,
         user_id -> Uuid,
         sh_data -> Bytea,
-        code -> Int4,
+        h_code -> Bytea,
         kind -> Challenge_kind,
         state -> Challenge_state,
         validated_at -> Nullable<Timestamp>,

@@ -29,8 +29,9 @@ tokio = { version = "1.0", features = ["full"] }
 futures-util = { version = "0.3", default-features = false, features = ["std"] }
 serde = { version = "1.0", features = ["derive"]}
 crypto = { path = "../enclave/crypto" }
-aws-config = "0.8"
-aws-sdk-kms = "0.8"
+aws-config = "0.10.1"
+aws-sdk-kms = "0.10.1"
+aws-sdk-pinpointsmsvoicev2 = "0.10.1"
 thiserror = "1.0"   
 enclave_proxy = { path = "../enclave/proxy", default-features = false }
 db = { path = "../db" }
