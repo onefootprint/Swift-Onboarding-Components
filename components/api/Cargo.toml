@@ -32,6 +32,7 @@ crypto = { path = "../enclave/crypto" }
 aws-config = "0.10.1"
 aws-sdk-kms = "0.10.1"
 aws-sdk-pinpointsmsvoicev2 = "0.10.1"
+aws-sdk-pinpointemail = "0.10.1"
 thiserror = "1.0"   
 enclave_proxy = { path = "../enclave/proxy", default-features = false }
 db = { path = "../db" }

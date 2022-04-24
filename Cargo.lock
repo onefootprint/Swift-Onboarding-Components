@@ -507,6 +507,28 @@ dependencies = [
 ]
 
 [[package]]
+name = "aws-sdk-pinpointemail"
+version = "0.10.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2af56cd869992c64d58ae860967097f001578992dea468988151c6021bdfe6ec"
+dependencies = [
+ "aws-endpoint 0.10.1",
+ "aws-http 0.10.1",
+ "aws-sig-auth 0.10.1",
+ "aws-smithy-async 0.40.2",
+ "aws-smithy-client 0.40.2",
+ "aws-smithy-http 0.40.2",
+ "aws-smithy-http-tower 0.40.2",
+ "aws-smithy-json 0.40.2",
+ "aws-smithy-types 0.40.2",
+ "aws-types 0.10.1",
+ "bytes 1.1.0",
+ "http",
+ "tokio-stream",
+ "tower",
+]
+
+[[package]]
 name = "aws-sdk-pinpointsmsvoicev2"
 version = "0.10.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1622,6 +1644,7 @@ dependencies = [
  "anyhow",
  "aws-config 0.10.1",
  "aws-sdk-kms 0.10.1",
+ "aws-sdk-pinpointemail",
  "aws-sdk-pinpointsmsvoicev2",
  "crypto",
  "db",

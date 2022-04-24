@@ -12,6 +12,17 @@ use aws_sdk_pinpointsmsvoicev2::{
     error::SendTextMessageError,
     types::SdkError as SmsSdkError,
 };
+use aws_sdk_pinpointemail::{
+    model::{
+        Body as EmailBody,
+        Content as EmailStringContent,
+        Destination as EmailDestination,
+        Message as EmailMessage,
+        EmailContent,
+    },
+    error::SendEmailError,
+    types::SdkError as EmailSdkError,
+};
 use config::Config;
 use crypto::{b64::Base64Data, seal::EciesP256Sha256AesGcmSealed};
 use enclave_proxy::{
@@ -107,7 +118,9 @@ pub enum ApiError {
     #[error("dotenv {0}")]
     Dotenv(#[from] dotenv::Error),
     #[error("send_text_message_error {0}")]
-    SendTextMEssageError(#[from] SmsSdkError<SendTextMessageError>),
+    SendTextMessageError(#[from] SmsSdkError<SendTextMessageError>),
+    #[error("send_email_error {0}")]
+    SendEmailError(#[from] EmailSdkError<SendEmailError>),
 }
 
 impl ResponseError for ApiError {}
@@ -207,9 +220,33 @@ async fn create_challenge(
 
     let (challenge, code) =
         db::create_challenge(&state.db_pool, user_id, sh_data, request.kind).await?;
+
+    // We may want to end up doing this asynchronously - these can be latent operations
     match request.kind {
         ChallengeKind::Email => {
-            // TODO send email
+            let body_text = EmailStringContent::builder().data(format!("Hello from footprint!\n\nYour Footprint verification code is {}. Don't share your code with anyone. We will never contact you to request this code.\n\n@onefootprint.com #{}", code, code)).build();
+            let body_html = EmailStringContent::builder().data(format!("<h1>Hello from footprint!</h1><br><br>Your Footprint verification code is {}. Don't share your code with anyone. We will never contact you to request this code.<br><br>@onefootprint.com #{}", code, code)).build();
+            let body = EmailBody::builder()
+                .text(body_text)
+                .html(body_html)
+                .build();
+            let message = EmailMessage::builder()
+                .subject(EmailStringContent::builder().data("Hello from Footprint!").build())
+                .body(body)
+                .build();
+            let content = EmailContent::builder()
+                .simple(message)
+                .build();
+            let output = state.email_client.send_email()
+                // TODO decrypt email
+                .destination(EmailDestination::builder().to_addresses("TODO").build())
+                // TODO not my email
+                .from_email_address("elliott@onefootprint.com")
+                .content(content)
+                .send()
+                .await
+                .map_err(ApiError::from)?;
+            println!("output from sending email message {:?}", output)
         },
         ChallengeKind::PhoneNumber => {
             let output = state.sms_client.send_text_message()
@@ -218,7 +255,7 @@ async fn create_challenge(
                 .message_body(format!("Your Footprint verification code is {}. Don't share your code with anyone. We will never contact you to request this code.\n\n@onefootprint.com #{}", code, code))
                 .send()
                 .await?;
-            println!("output from text {:?}", output)
+            println!("output from sending text {:?}", output)
         },
     };
 
@@ -376,6 +413,7 @@ async fn sign(
 pub struct State {
     config: Config,
     sms_client: aws_sdk_pinpointsmsvoicev2::Client,
+    email_client: aws_sdk_pinpointemail::Client,
     kms_client: aws_sdk_kms::Client,
     db_pool: DbPool,
     enclave_connection_pool: bb8::Pool<pool::StreamManager<StreamManager<Config>>>,
@@ -405,6 +443,7 @@ async fn main() -> std::io::Result<()> {
 
         let shared_config = aws_config::from_env().load().await;
         let sms_client = aws_sdk_pinpointsmsvoicev2::Client::new(&shared_config);
+        let email_client = aws_sdk_pinpointemail::Client::new(&shared_config);
         let kms_client = aws_sdk_kms::Client::new(&shared_config);
 
         // run migrations
@@ -419,6 +458,7 @@ async fn main() -> std::io::Result<()> {
             config: config.clone(),
             enclave_connection_pool: pool,
             sms_client,
+            email_client,
             kms_client,
             db_pool,
         }
