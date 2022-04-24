@@ -1,7 +1,7 @@
 name: Push Ephemeral Stack
 on:
   pull_request:
-    types: [reopened, opened, synchronize, edited]
+    types: [labeled, reopened, opened, synchronize, edited]
     branches:    
       - 'master'    
     paths:
@@ -37,7 +37,8 @@ jobs:
     name: ephemeral
     needs: [ephemeral_stack_name]
     uses: ./.github/workflows/build_and_deploy.yml
-    if: github.actor != 'dependabot[bot]' # don't run for dependabot changes
+    # don't run for dependabot changes and only run when labeled ephemerla
+    if: github.actor != 'dependabot[bot]' && contains( github.event.pull_request.labels.*.name, 'ephemeral')
     permissions:
       contents: write
       pull-requests: write
