@@ -880,6 +880,7 @@ dependencies = [
  "hex",
  "hmac 0.12.1",
  "p256",
+ "rand",
  "rand_core",
  "sec1",
  "serde",

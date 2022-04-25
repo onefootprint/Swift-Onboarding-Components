@@ -1,6 +1,7 @@
 pub mod b64;
 pub mod conversion;
 pub mod seal;
+pub mod random;
 
 use hmac::Hmac;
 use sha2::{Digest, Sha256};
