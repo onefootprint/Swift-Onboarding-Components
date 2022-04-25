@@ -8,17 +8,18 @@ extern crate diesel_migrations;
 
 pub mod models;
 
+use deadpool::managed::BuildError;
 use deadpool_diesel::postgres::{Manager, Pool, Runtime};
 use diesel::prelude::*;
 use models::challenge::{Challenge, NewChallenge};
+use models::fp_user::{FpUser, NewFpUser};
+use models::tenant::{NewTenant, Tenant};
 use models::types::{ChallengeKind, ChallengeState};
-use models::fp_user::{NewFpUser, FpUser};
-use uuid::Uuid;
-use rand::{thread_rng, Rng};
 use rand::distributions::Alphanumeric;
-use deadpool::managed::BuildError;
+use rand::{thread_rng, Rng};
 use schema::{challenge, fp_user};
 use thiserror::Error;
+use uuid::Uuid;
 
 #[allow(unused_imports)]
 pub mod schema;
@@ -72,15 +73,37 @@ pub fn run_migrations(url: &str) -> Result<(), DbError> {
     Ok(())
 }
 
-pub async fn init_user_vault(pool: &Pool, user: NewFpUser) -> Result<(Uuid, TempUserVaultToken), DbError> {
+pub async fn health_check(pool: &Pool) -> Result<Tenant, DbError> {
+    let new_tenant = NewTenant {
+        name: format!("Test_{}", chrono::Utc::now().timestamp()),
+    };
+
+    let tenant = pool
+        .get()
+        .await?
+        .interact(move |conn| {
+            diesel::insert_into(schema::tenant::table)
+                .values(&new_tenant)
+                .get_result(conn)
+        })
+        .await??;
+
+    Ok(tenant)
+}
+
+pub async fn init_user_vault(
+    pool: &Pool,
+    user: NewFpUser,
+) -> Result<(Uuid, TempUserVaultToken), DbError> {
     let conn = pool.get().await?;
 
-    let user = conn.interact(move |conn| {
-        diesel::insert_into(schema::fp_user::table)
-            .values(&user)
-            .get_result::<FpUser>(conn)
-    })
-    .await??;
+    let user = conn
+        .interact(move |conn| {
+            diesel::insert_into(schema::fp_user::table)
+                .values(&user)
+                .get_result::<FpUser>(conn)
+        })
+        .await??;
 
     // TODO moce into crypto crate
     let temp_token = thread_rng()
@@ -98,51 +121,72 @@ pub async fn init_user_vault(pool: &Pool, user: NewFpUser) -> Result<(Uuid, Temp
 pub async fn get_user(pool: &Pool, user_id: Uuid) -> Result<FpUser, DbError> {
     let conn = pool.get().await.map_err(DbError::from)?;
 
-    let user: FpUser = conn.interact(move |conn| {
-        schema::fp_user::table.filter(schema::fp_user::id.eq(user_id)).first(conn)
-    })
-    .await??;
+    let user: FpUser = conn
+        .interact(move |conn| {
+            schema::fp_user::table
+                .filter(schema::fp_user::id.eq(user_id))
+                .first(conn)
+        })
+        .await??;
 
     Ok(user)
 }
 
-pub async fn create_challenge(pool: &Pool, user_id: Uuid, sh_data: Vec<u8>, kind: ChallengeKind) -> Result<Uuid, DbError> {
+pub async fn create_challenge(
+    pool: &Pool,
+    user_id: Uuid,
+    sh_data: Vec<u8>,
+    kind: ChallengeKind,
+) -> Result<Uuid, DbError> {
     let conn = pool.get().await?;
 
-    let new_challenge = NewChallenge{
+    let new_challenge = NewChallenge {
         user_id: user_id,
         sh_data: sh_data,
         code: 123456, // TODO random
         kind: kind,
         state: ChallengeState::AwaitingResponse,
     };
-    let challenge = conn.interact(move |conn| {
-        diesel::insert_into(challenge::table)
-            .values(&new_challenge)
-            .get_result::<Challenge>(conn)
-    })
-    .await??;
+    let challenge = conn
+        .interact(move |conn| {
+            diesel::insert_into(challenge::table)
+                .values(&new_challenge)
+                .get_result::<Challenge>(conn)
+        })
+        .await??;
 
     Ok(challenge.id)
 }
 
-pub async fn expire_old_challenges(pool: &Pool, user_id: Uuid, kind: ChallengeKind) -> Result<usize, DbError> {
+pub async fn expire_old_challenges(
+    pool: &Pool,
+    user_id: Uuid,
+    kind: ChallengeKind,
+) -> Result<usize, DbError> {
     let conn = pool.get().await?;
 
-    let num_updates = conn.interact(move |conn| {
-        diesel::update(challenge::table
-            .filter(challenge::user_id.eq(user_id))
-            .filter(challenge::kind.eq(kind)))
+    let num_updates = conn
+        .interact(move |conn| {
+            diesel::update(
+                challenge::table
+                    .filter(challenge::user_id.eq(user_id))
+                    .filter(challenge::kind.eq(kind)),
+            )
             .filter(challenge::state.eq(ChallengeState::AwaitingResponse))
             .set(challenge::state.eq(ChallengeState::Expired))
             .execute(conn)
-    })
-    .await??;
+        })
+        .await??;
 
     Ok(num_updates)
 }
 
-pub async fn verify_challenge(pool: &Pool, challenge_id: Uuid, user_id: Uuid, code: i32) -> Result<(), DbError> {
+pub async fn verify_challenge(
+    pool: &Pool,
+    challenge_id: Uuid,
+    user_id: Uuid,
+    code: i32,
+) -> Result<(), DbError> {
     let conn = pool.get().await?;
 
     // TODO write unit tests
@@ -154,7 +198,7 @@ pub async fn verify_challenge(pool: &Pool, challenge_id: Uuid, user_id: Uuid, co
                 .for_no_key_update()
                 .first(conn)?;
             if challenge.state != ChallengeState::AwaitingResponse {
-                return Err(DbError::ChallengeExpired)
+                return Err(DbError::ChallengeExpired);
             }
             let user: FpUser = schema::fp_user::table
                 .filter(schema::fp_user::id.eq(user_id))
@@ -178,7 +222,7 @@ pub async fn verify_challenge(pool: &Pool, challenge_id: Uuid, user_id: Uuid, co
             // The code matches, and the sh_data on the challenge matches the user. Mark the challenge as validated
             diesel::update(&challenge)
                 .set(challenge::state.eq(ChallengeState::Validated))
-                    // challenge::validated_at.eq(Some(chrono::offset::Utc::now())),
+                // challenge::validated_at.eq(Some(chrono::offset::Utc::now())),
                 .execute(conn)?;
             // Mark the piece of data on the user validated
             match challenge.kind {
@@ -186,12 +230,12 @@ pub async fn verify_challenge(pool: &Pool, challenge_id: Uuid, user_id: Uuid, co
                     diesel::update(&user)
                         .set(fp_user::is_phone_number_verified.eq(true))
                         .execute(conn)?;
-                },
+                }
                 ChallengeKind::Email => {
                     diesel::update(&user)
                         .set(fp_user::is_email_verified.eq(true))
                         .execute(conn)?;
-                },
+                }
             }
 
             Ok(())

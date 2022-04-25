@@ -18,11 +18,11 @@ use telemetry::TelemetrySpanBuilder;
 use tracing_actix_web::TracingLogger;
 mod config;
 mod telemetry;
-use thiserror::Error;
-use uuid::Uuid;
 use db::models::fp_user::NewFpUser;
 use db::models::types::{ChallengeKind, Status};
 use db::{DbError, DbPool};
+use thiserror::Error;
+use uuid::Uuid;
 
 #[tracing::instrument(name = "index", skip(req))]
 #[get("/")]
@@ -50,20 +50,27 @@ async fn index(req: HttpRequest) -> impl Responder {
 
 #[tracing::instrument(name = "test", skip(state))]
 #[get("/test")]
-async fn test(state: web::Data<State>) -> impl Responder {
-    let mut conn = state.enclave_connection_pool.get().await.unwrap();
-    let req = enclave_proxy::RpcRequest::new(RpcPayload::Ping("test".into()));
+async fn test(state: web::Data<State>) -> Result<impl Responder, ApiError> {
+    let enclave_health = {
+        let mut conn = state.enclave_connection_pool.get().await?;
+        let req = enclave_proxy::RpcRequest::new(RpcPayload::Ping("test".into()));
 
-    tracing::info!("sending request");
-    let response = enclave_proxy::send_rpc_request(&req, &mut conn)
-        .await
-        .unwrap();
+        tracing::info!("sending request");
+        let response = enclave_proxy::send_rpc_request(&req, &mut conn).await?;
 
-    if let EnclavePayload::Pong(response) = response {
-        response
-    } else {
-        "invalid response".to_string()
-    }
+        if let EnclavePayload::Pong(response) = response {
+            response
+        } else {
+            "invalid enclave response".to_string()
+        }
+    };
+
+    let db_health = db::health_check(&state.db_pool).await?.id.to_string();
+
+    Ok(format!(
+        "Enclave: got {}\nDB: got tenant {}",
+        enclave_health, db_health
+    ))
 }
 
 #[tracing::instrument(name = "log_headers")]
@@ -110,29 +117,26 @@ struct DataEncryptionResponse {
 }
 
 #[post("/add-user-test")]
-async fn add_user(
-    state: web::Data<State>
-) ->  Result<impl Responder, ApiError> {
-
-     let new_key_pair = state
+async fn add_user(state: web::Data<State>) -> Result<impl Responder, ApiError> {
+    let new_key_pair = state
         .kms_client
         .generate_data_key_pair_without_plaintext()
         .key_id(&state.config.enclave_root_key_id)
         .key_pair_spec(DataKeyPairSpec::EccNistP256)
         .send()
         .await?;
-    
+
     let der_public_key = new_key_pair.public_key.unwrap().into_inner();
     let ec_pk_uncompressed =
         crypto::conversion::public_key_der_to_raw_uncompressed(&der_public_key)?;
 
     let _pk = crypto::hex::encode(&ec_pk_uncompressed);
-    
+
     let user = NewFpUser {
         e_private_key: new_key_pair
-                .private_key_ciphertext_blob
-                .unwrap()
-                .into_inner(),
+            .private_key_ciphertext_blob
+            .unwrap()
+            .into_inner(),
         public_key: ec_pk_uncompressed,
         id_verified: Status::Incomplete,
     };
@@ -149,12 +153,18 @@ struct CreateTestChallengeRequest {
 async fn add_test_challenge(
     state: web::Data<State>,
     request: web::Json<CreateTestChallengeRequest>,
-) ->  Result<impl Responder, ApiError> {
+) -> Result<impl Responder, ApiError> {
     let user = db::get_user(&state.db_pool, request.user_id).await.unwrap();
 
     if let Some(sh_phone_number) = user.sh_phone_number {
-        let challenge = db::create_challenge(&state.db_pool, user.id, sh_phone_number, ChallengeKind::PhoneNumber).await?;
-        Ok(web::Json(challenge)) 
+        let challenge = db::create_challenge(
+            &state.db_pool,
+            user.id,
+            sh_phone_number,
+            ChallengeKind::PhoneNumber,
+        )
+        .await?;
+        Ok(web::Json(challenge))
     } else {
         Err(ApiError::NoPhoneNumberForUser)
     }
@@ -168,9 +178,9 @@ struct CreateChallengeRequest {
 #[post("/vault/{user_id}/challenge")]
 async fn create_challenge(
     state: web::Data<State>,
-    path: web::Path<Uuid> ,
+    path: web::Path<Uuid>,
     request: web::Json<CreateChallengeRequest>,
-) ->  Result<impl Responder, ApiError> {
+) -> Result<impl Responder, ApiError> {
     let user_id = path.into_inner();
     tracing::info!("in challenge with user_id {}", user_id);
     // TODO 404 if the user isn't found
@@ -184,8 +194,9 @@ async fn create_challenge(
     };
     if let Some(sh_data) = sh_data {
         // TODO actually send email or SMS
-        let challenge = db::create_challenge(&state.db_pool, user_id, sh_data, request.kind).await?;
-        Ok(web::Json(challenge)) 
+        let challenge =
+            db::create_challenge(&state.db_pool, user_id, sh_data, request.kind).await?;
+        Ok(web::Json(challenge))
     } else {
         Err(ApiError::DataNotSetForUser(request.kind))
     }
@@ -199,18 +210,24 @@ struct ChallengeVerificationRequest {
 #[post("/vault/{user_id}/challenge/{challenge_id}/verify")]
 async fn verify_challenge(
     state: web::Data<State>,
-    path: web::Path<(Uuid, Uuid)> ,
+    path: web::Path<(Uuid, Uuid)>,
     request: web::Json<ChallengeVerificationRequest>,
-) ->  actix_web::Result<impl Responder> {
+) -> actix_web::Result<impl Responder> {
     let (user_id, challenge_id) = path.into_inner();
-    tracing::info!("in challenge verification with user_id {} challenge_id {}", user_id, challenge_id);
+    tracing::info!(
+        "in challenge verification with user_id {} challenge_id {}",
+        user_id,
+        challenge_id
+    );
 
-    db::verify_challenge(&state.db_pool, challenge_id, user_id, request.code).await.map_err(ApiError::from)?;
+    db::verify_challenge(&state.db_pool, challenge_id, user_id, request.code)
+        .await
+        .map_err(ApiError::from)?;
     Ok(web::Json(()))
 }
 
 #[post("/encrypt")]
-async fn encrypt( 
+async fn encrypt(
     state: web::Data<State>,
     request: web::Json<DataRequest>,
 ) -> Result<impl Responder, ApiError> {
@@ -262,10 +279,7 @@ async fn decrypt(
     tracing::info!("in decrypt");
 
     let req = request.into_inner();
-    let mut conn = state
-        .enclave_connection_pool
-        .get()
-        .await?;
+    let mut conn = state.enclave_connection_pool.get().await?;
     let req = enclave_proxy::RpcRequest::new(RpcPayload::FnDecrypt(EnvelopeDecrypt {
         kms_creds: KmsCredentials {
             key_id: state.config.enclave_aws_access_key_id.clone(),
@@ -279,8 +293,7 @@ async fn decrypt(
     }));
 
     tracing::info!("sending request");
-    let response = enclave_proxy::send_rpc_request(&req, &mut conn)
-        .await?;
+    let response = enclave_proxy::send_rpc_request(&req, &mut conn).await?;
     tracing::info!("got response");
     let response = FnDecryption::try_from(response)?;
     Ok(std::str::from_utf8(&response.data).unwrap().to_string())
@@ -309,10 +322,7 @@ async fn sign(
 
     let sealed_key = new_data_key.ciphertext_blob.unwrap().into_inner();
 
-    let mut conn = state
-        .enclave_connection_pool
-        .get()
-        .await?;
+    let mut conn = state.enclave_connection_pool.get().await?;
 
     let req = enclave_proxy::RpcRequest::new(RpcPayload::HmacSign(EnvelopeHmacSign {
         kms_creds: KmsCredentials {
@@ -327,8 +337,7 @@ async fn sign(
     }));
 
     tracing::info!("sending request");
-    let response = enclave_proxy::send_rpc_request(&req, &mut conn)
-        .await?;
+    let response = enclave_proxy::send_rpc_request(&req, &mut conn).await?;
     tracing::info!("got response");
 
     let response = HmacSignature::try_from(response)?;
@@ -357,7 +366,6 @@ async fn main() -> std::io::Result<()> {
 
     let metrics = RequestMetrics::new(meter, Some(should_render_metrics), None);
 
-
     let state = {
         let manager = StreamManager {
             config: config.clone(),
@@ -370,7 +378,6 @@ async fn main() -> std::io::Result<()> {
             .await
             .unwrap();
 
-
         let shared_config = aws_config::from_env().load().await;
         let kms_client = aws_sdk_kms::Client::new(&shared_config);
 
@@ -379,7 +386,8 @@ async fn main() -> std::io::Result<()> {
 
         // then create the pool
         let db_pool = db::init(&config.database_url)
-                .map_err(ApiError::from).unwrap();
+            .map_err(ApiError::from)
+            .unwrap();
 
         State {
             config: config.clone(),

@@ -20,7 +20,7 @@ export type DbOutput = {
 /** TODO: 
     - private network for jump-box
     - check `applyImmediately`
-*/ 
+*/
 export async function CreateDB(vpcProvider: vpcUtil.VpcRegion, clusterName: string, constants: Config, secretsStore: StaticSecrets, dbConfig: DbConfig): Promise<DbOutput> {
     const user = "postgres";
 
@@ -35,7 +35,7 @@ export async function CreateDB(vpcProvider: vpcUtil.VpcRegion, clusterName: stri
         ingress: [{ protocol: "-1", fromPort: 5432, toPort: 5432, cidrBlocks: [auroraVpc.vpc.cidrBlock] }],
         egress: [{ protocol: "-1", fromPort: 0, toPort: 0, cidrBlocks: ["0.0.0.0/0"] }],
     });
-    
+
     const db = new aws.rds.Cluster(`aurora-${clusterName}`, {
         clusterIdentifier: `db-${clusterName}`,
         dbSubnetGroupName: dbSubnetGroup.name,
@@ -51,6 +51,7 @@ export async function CreateDB(vpcProvider: vpcUtil.VpcRegion, clusterName: stri
             autoPause: false,
             minCapacity: 2,
         },
+        snapshotIdentifier: await getSnapshotIdIfNeeded(),
         vpcSecurityGroupIds: [auroraVpcSecurityGroup.id],
         skipFinalSnapshot: !dbConfig.protectDeletion,
         deletionProtection: dbConfig.protectDeletion,
@@ -67,12 +68,25 @@ export async function CreateDB(vpcProvider: vpcUtil.VpcRegion, clusterName: stri
     });
 
     await createDbJumpBox(clusterName, constants, databaseUrl, auroraVpcSecurityGroup, auroraVpc);
-    
+
     return {
         databaseUrl,
         db,
         databaseUrlSecretParam
     };
+}
+
+async function getSnapshotIdIfNeeded(): Promise<pulumi.Output<string> | undefined> {
+    let config = new pulumi.Config();
+    let clusterName = config.get('restoreSnapshotFromClusterNamed');
+    if (clusterName === undefined) {
+        return undefined;
+    }
+
+    const parentCluster = await aws.rds.getCluster({ clusterIdentifier: `db-${clusterName}` });
+    const snapshot = new aws.rds.ClusterSnapshot(`branch-snapshot-${clusterName}`, { dbClusterIdentifier: parentCluster.clusterIdentifier, dbClusterSnapshotIdentifier: `branch-${clusterName}-${pulumi.getStack()}` });
+
+    return snapshot.id;
 }
 
 export type DbJump = {
@@ -83,9 +97,9 @@ export type DbJump = {
  * Aurora Serverless is not accessible so we need a jump box
  */
 async function createDbJumpBox(
-    clusterName: string, 
-    constants: Config, 
-    dbUrl: pulumi.Output<string>, 
+    clusterName: string,
+    constants: Config,
+    dbUrl: pulumi.Output<string>,
     securityGroup: awsx.ec2.SecurityGroup,
     vpc: awsx.ec2.Vpc
 ) {
@@ -100,7 +114,7 @@ async function createDbJumpBox(
         publicKey: constants.jumpBoxSSHPublicKey,
         keyNamePrefix: `jump-key-${clusterName}-sg`
     });
-    
+
     const dbSecretName = `/db-jump/db-url-${clusterName}`;
     const dbSecret = new aws.ssm.Parameter(`ssm-param-jump-url-${clusterName}`, {
         type: "SecureString",
@@ -108,7 +122,7 @@ async function createDbJumpBox(
         name: dbSecretName,
         overwrite: true
     });
-    
+
     const instanceRole = new aws.iam.Role(`jump-role-${clusterName}`, {
         assumeRolePolicy: {
             Version: "2012-10-17",
@@ -167,11 +181,11 @@ psql $(aws --region us-east-1 ssm get-parameter --name "${dbSecretName}" --with-
 EOF
 
 chmod +x connect_db.sh`;
-    
+
     const jumpbox = new aws.ec2.Instance(`jump-${clusterName}`, {
-        instanceType: size,   
+        instanceType: size,
         subnetId: (await vpc.publicSubnetIds)[0],
-        vpcSecurityGroupIds: [ securityGroup.id, jumpSg.id ],
+        vpcSecurityGroupIds: [securityGroup.id, jumpSg.id],
         ami: "ami-0f9fc25dd2506cf6d",
         userData: Buffer.from(userData).toString('base64'),
         keyName: keypair.keyName,

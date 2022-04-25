@@ -171,6 +171,12 @@ jobs:
           pulumi --cwd infra config set --path constants.containers.apiVersion ${{ steps.constants.outputs.componentVersion }}
           pulumi --cwd infra config set --path constants.containers.enclaveVersion ${{ steps.constants.outputs.componentVersion }}
 
+      - name: Set Ephemeral DB Restore Snapshot
+        if: ${{ inputs.ephemeral }}
+        working-directory: infra
+        run: |
+          pulumi config set restoreSnapshotFromClusterNamed "db-${{ inputs.baseStackName }}"
+      
       # bring up the stack
       - uses: pulumi/actions@v3
         with:
