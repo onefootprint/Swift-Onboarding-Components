@@ -196,7 +196,7 @@ struct CreateChallengeRequest {
     kind: ChallengeKind,
 }
 
-#[post("/vault/{user_id}/challenge")]
+#[post("/user/{user_id}/challenge")]
 async fn create_challenge(
     state: web::Data<State>,
     path: web::Path<Uuid>,
@@ -267,7 +267,7 @@ struct ChallengeVerificationRequest {
     code: String,
 }
 
-#[post("/vault/{user_id}/challenge/{challenge_id}/verify")]
+#[post("/user/{user_id}/challenge/{challenge_id}/verify")]
 async fn verify_challenge(
     state: web::Data<State>,
     path: web::Path<(Uuid, Uuid)>,
