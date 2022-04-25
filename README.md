@@ -44,7 +44,7 @@ An example request is below:
 
 If you want to develop and test a new feature, and need to build the infrastructure to do so, you have two options. 
 
-1. Open up a pull request against the footprint-core repo from your feature branch. When you PR the footprint-core repo, a [pulumi stack](https://www.pulumi.com/docs/intro/concepts/stack/) will be automatically spun up and infrastructure will be deployed there.
+1. Open up a pull request against the footprint-core repo from your feature branch. When you PR the footprint-core repo, you can add the `ephemeral` label to the PR in order to spin up a [pulumi stack](https://www.pulumi.com/docs/intro/concepts/stack/) - infrastructure will be deployed there.
 2. Run pulumi locally to build the test stack. After logging in to pulumi (see step 5 of prerequisites) you can manually build a new stack
 
 ```
@@ -63,6 +63,22 @@ $ pulumi up
 # Tear down infrastructure after use
 $ pulumi down
 
+```
+
+## Accessing dev DB
+
+The aurora DB cluster is not accessible to the public internet, but you may need to access it for some read-only querying or to migrate/wipe the DB. So, we've set up a [jumpbox to access the DB](./infra/db.ts).
+
+Here's how to get talking to the new DB:
+
+1. We'ved installed [tailscale](https://tailscale.com) on the jumpbox to make it accessible to your laptop. You'll need to install the macOS tailscale app from the app store. Sign into tailscale with Google and use your footprint email. Ping @Alex to give you access to the network.
+
+2. Once tailscale is installed, you'll see the logo in your macOS menu bar. Navigate to Network devices > Tagged devices > select jump-db-dev. This will copy the jump box's IP to your clipboard. You'll also see a jump box here for any ephemeral environments that you've spun up in GitHub PRs.
+
+3. Now, you need the credentials to ssh into jump box. The private key is [managed by pulumi](infra/Pulumi.dev.yaml). Make sure you've followed the steps above to log into pulumi locally, cd into the `infra` folder, and then run 
+```
+pulumi config get infra:jumpBoxSSHPrivateKey > .ssh/id_jumpbox
+pulumi config get infra:jumpBoxSSHPrivateKey > .ssh/id_jumpbox
 ```
 
 ## Accessing Logs & Metrics
