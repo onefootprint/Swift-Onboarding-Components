@@ -269,7 +269,36 @@ function createTaskContainerRole(account: string, serviceName: string, enclaveKe
                         }
                         ],
                     }),
-                }
+                },
+                {
+                    name: "pinpoint_sms_send_push",
+                    policy: JSON.stringify({
+                        Version: "2012-10-17",
+                        Statement: [
+                            {
+                                Effect: "Allow",
+                                Action: [
+                                    "sms-voice:SendVoiceMessage",
+                                    "sms-voice:SendTextMessage"
+                                ],
+                                Resource: "*"
+                            }
+                        ]
+                    }),
+                },
+                {
+                    name: "pinpoint_sms_send_email",
+                    policy: JSON.stringify({
+                        Version: "2012-10-17",
+                        Statement: [
+                            {
+                                "Effect": "Allow",
+                                "Action": "ses:SendEmail",
+                                "Resource": "*"
+                        }
+                    ]
+                    }),
+                },
             ]
         });
     });
