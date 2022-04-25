@@ -8,13 +8,7 @@ on:
       branchName:
         description: 'Name of the branch whose stack to delete'
         required: true
-        type: string
-        
-      environment:
-        description: 'Environment to run against'
-        type: environment
-        required: true             
-
+        type: string        
 jobs:
   destroy_ephemeral_stack:
     name: Destroy Ephemeral Stack
@@ -48,7 +42,6 @@ jobs:
       - uses: pulumi/actions@v3
         with:
           command: destroy
-          work-dir: infra
           stack-name: "footprint/dev-${{ steps.extract_branch.outputs.branch }}"
           message: "Destroyed ephemeral environment"
         env:
@@ -56,6 +49,5 @@ jobs:
 
       # rm our temp stack
       - run: pulumi stack --stack footprint/dev-${{ steps.extract_branch.outputs.branch }} rm -y
-        working-directory: infra
         env:
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
