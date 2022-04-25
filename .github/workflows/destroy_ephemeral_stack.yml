@@ -40,7 +40,7 @@ jobs:
       - name: Extract branch name
         shell: bash
         run: |
-          branch_raw="${{ github.event.inputs.branchName | github.head_ref }}"
+          branch_raw="${{ github.event.inputs.branchName || github.head_ref }}"
           branch="$(echo ${branch_raw} | sed -r 's/\//-/g' | sed -r 's/_/-/g')"          
           echo "##[set-output name=branch;]$(echo ${branch})"
         id: extract_branch
