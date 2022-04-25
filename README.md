@@ -69,16 +69,26 @@ $ pulumi down
 
 The aurora DB cluster is not accessible to the public internet, but you may need to access it for some read-only querying or to migrate/wipe the DB. So, we've set up a [jumpbox to access the DB](./infra/db.ts).
 
-Here's how to get talking to the new DB:
+Here's how to get talking to the DB:
 
-1. We'ved installed [tailscale](https://tailscale.com) on the jumpbox to make it accessible to your laptop. You'll need to install the macOS tailscale app from the app store. Sign into tailscale with Google and use your footprint email. Ping @Alex to give you access to the network.
+1. We'ved installed [Tailscale](https://tailscale.com) on the jumpbox to make it accessible to your laptop. You'll need to install the macOS Tailscale app from the app store. Sign into Tailscale with Google and use your footprint email. Ping @Alex to give you access to the network.
 
-2. Once tailscale is installed, you'll see the logo in your macOS menu bar. Navigate to Network devices > Tagged devices > select jump-db-dev. This will copy the jump box's IP to your clipboard. You'll also see a jump box here for any ephemeral environments that you've spun up in GitHub PRs.
+2. Once Tailscale is installed and you're added to the Tailscale team, you'll see the logo in your macOS menu bar. Navigate to Network devices > Tagged devices > select jump-db-dev. This will copy the jump box's IP to your clipboard. You'll also see a jump box here for any ephemeral environments that you've spun up in GitHub PRs.
 
 3. Now, you need the credentials to ssh into jump box. The private key is [managed by pulumi](infra/Pulumi.dev.yaml). Make sure you've followed the steps above to log into pulumi locally, cd into the `infra` folder, and then run 
+```bash
+pulumi stack select footprint/dev
+pulumi config get infra:jumpBoxSSHPrivateKey > .ssh/id_jumpbox
 ```
-pulumi config get infra:jumpBoxSSHPrivateKey > .ssh/id_jumpbox
-pulumi config get infra:jumpBoxSSHPrivateKey > .ssh/id_jumpbox
+
+4. Now, you have the credentials and the IP. Open a shell on the jumpbox with:
+```bash
+ssh ec2-user@{{ip}} -i ~/.ssh/id_jumpbox
+```
+
+5. There's a utility script on the jumpbox to help you connect to the DB:
+```bash
+/connect_db.sh
 ```
 
 ## Accessing Logs & Metrics
