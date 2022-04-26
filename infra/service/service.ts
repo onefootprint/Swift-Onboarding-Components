@@ -37,7 +37,9 @@ const ServicePort = 8000;
  */
 export async function Create(vpcProvider: VpcRegion, config: ServiceConfig, constants: Config, secretsStore: StaticSecrets, enclaveKeyDescriptor: EnclaveKeyDescriptor, signingKeyDescriptor: HmacSigningKeyDescriptor, database: DbOutput): Promise<ServiceLoadBalancer> {
     const region = config.region;
-    const serviceName = `${config.serviceName}-${pulumi.getStack()}-${region}`;
+    const serviceName = crypto.createHash('sha256').update(
+        `${config.serviceName}-${pulumi.getStack()}-${region}`).digest('hex').substring(0,16);
+
     const vpc = vpcProvider.vpc;
     const provider = vpcProvider.provider;
 

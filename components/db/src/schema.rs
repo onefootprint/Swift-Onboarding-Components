@@ -4,7 +4,7 @@ table! {
 
     challenge (id) {
         id -> Uuid,
-        user_id -> Uuid,
+        user_id -> Varchar,
         sh_data -> Bytea,
         h_code -> Bytea,
         kind -> Challenge_kind,
@@ -17,8 +17,58 @@ table! {
     use diesel::sql_types::*;
     use crate::models::types::*;
 
-    fp_user (id) {
-        id -> Uuid,
+    temp_tenant_user_tokens (h_token) {
+        h_token -> Varchar,
+        timestamp -> Timestamp,
+        user_id -> Varchar,
+        tenant_id -> Varchar,
+        tenant_user_id -> Varchar,
+    }
+}
+
+table! {
+    use diesel::sql_types::*;
+    use crate::models::types::*;
+
+    tenant_api_keys (api_key_id) {
+        api_key_id -> Varchar,
+        tenant_id -> Varchar,
+        name -> Varchar,
+        sh_api_key -> Bytea,
+        is_enabled -> Bool,
+        created_at -> Timestamp,
+        updated_at -> Timestamp,
+    }
+}
+
+table! {
+    use diesel::sql_types::*;
+    use crate::models::types::*;
+
+    tenants (id) {
+        id -> Varchar,
+        name -> Text,
+    }
+}
+
+table! {
+    use diesel::sql_types::*;
+    use crate::models::types::*;
+
+    user_tenant_verifications (tenant_user_id) {
+        tenant_user_id -> Varchar,
+        tenant_id -> Varchar,
+        user_id -> Varchar,
+        status -> User_status,
+    }
+}
+
+table! {
+    use diesel::sql_types::*;
+    use crate::models::types::*;
+
+    users (id) {
+        id -> Varchar,
         e_private_key -> Bytea,
         public_key -> Bytea,
         e_first_name -> Nullable<Bytea>,
@@ -39,62 +89,14 @@ table! {
     }
 }
 
-table! {
-    use diesel::sql_types::*;
-    use crate::models::types::*;
-
-    temp_tenant_user_token (token_hash) {
-        token_hash -> Varchar,
-        timestamp -> Timestamp,
-        user_id -> Uuid,
-        tenant_id -> Uuid,
-    }
-}
-
-table! {
-    use diesel::sql_types::*;
-    use crate::models::types::*;
-
-    tenant (id) {
-        id -> Uuid,
-        name -> Text,
-    }
-}
-
-table! {
-    use diesel::sql_types::*;
-    use crate::models::types::*;
-
-    tenant_publishable_api_key (tenant_id) {
-        tenant_id -> Uuid,
-        name -> Varchar,
-        api_key -> Varchar,
-        api_key_hash -> Nullable<Bytea>,
-        is_enabled -> Bool,
-        created_at -> Timestamp,
-        updated_at -> Timestamp,
-    }
-}
-
-table! {
-    use diesel::sql_types::*;
-    use crate::models::types::*;
-
-    user_tenant_verification (verification_id) {
-        verification_id -> Uuid,
-        tenant_id -> Uuid,
-        user_id -> Uuid,
-        status -> User_status,
-    }
-}
-
-joinable!(challenge -> fp_user (user_id));
+joinable!(challenge -> users (user_id));
+joinable!(temp_tenant_user_tokens -> user_tenant_verifications (tenant_user_id));
 
 allow_tables_to_appear_in_same_query!(
     challenge,
-    fp_user,
-    temp_tenant_user_token,
-    tenant,
-    tenant_publishable_api_key,
-    user_tenant_verification,
+    temp_tenant_user_tokens,
+    tenant_api_keys,
+    tenants,
+    user_tenant_verifications,
+    users,
 );

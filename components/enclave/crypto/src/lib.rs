@@ -11,6 +11,8 @@ use thiserror::Error;
 pub use hex;
 use hmac::Mac;
 
+pub use serde_cbor;
+
 #[derive(Error, Debug)]
 pub enum Error {
     #[error("Bad key")]

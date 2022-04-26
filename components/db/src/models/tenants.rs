@@ -1,17 +1,16 @@
-use crate::schema::tenant;
+use crate::schema::tenants;
 use diesel::{Insertable, Queryable};
 use serde::{Deserialize, Serialize};
-use uuid::Uuid;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
-#[table_name = "tenant"]
+#[table_name = "tenants"]
 pub struct Tenant {
-    pub id: Uuid,
+    pub id: String,
     pub name: String,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
-#[table_name = "tenant"]
+#[table_name = "tenants"]
 pub struct NewTenant {
     pub name: String,
 }

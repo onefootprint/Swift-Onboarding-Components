@@ -38,3 +38,4 @@ enclave_proxy = { path = "../enclave/proxy", default-features = false }
 db = { path = "../db" }
 deadpool-diesel = { version = "0.3.1", features = ["postgres", "rt_tokio_1", "serde"] }
 anyhow = { version = "1.0" }
+serde_with = { version = "1.0" }

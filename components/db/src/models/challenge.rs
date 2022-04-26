@@ -12,7 +12,7 @@ use uuid::Uuid;
 #[table_name = "challenge"]
 pub struct Challenge {
     pub id: Uuid,
-    pub user_id: Uuid,
+    pub user_id: String,
     pub sh_data: Vec<u8>,
     pub h_code: Vec<u8>,
     pub kind: ChallengeKind,
@@ -23,7 +23,7 @@ pub struct Challenge {
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
 #[table_name = "challenge"]
 pub struct NewChallenge {
-    pub user_id: Uuid,
+    pub user_id: String,
     pub sh_data: Vec<u8>,
     pub h_code: Vec<u8>,
     pub kind: ChallengeKind,
