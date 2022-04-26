@@ -1,9 +1,9 @@
 use actix_web::{
-    get, middleware::Logger, web, App, HttpRequest, HttpResponse, HttpServer, Responder,
+    middleware::Logger, web, App, HttpServer,
 };
 use actix_web_opentelemetry::RequestMetrics;
 use config::Config;
-use enclave_proxy::{bb8, pool, EnclavePayload, RpcPayload, StreamManager};
+use enclave_proxy::{bb8, pool, StreamManager};
 use telemetry::TelemetrySpanBuilder;
 use tracing_actix_web::TracingLogger;
 use db::DbPool;
@@ -16,60 +16,7 @@ use crate::errors::ApiError;
 
 // TODO put IAM roles and permissions in pulumi
 
-#[tracing::instrument(name = "index", skip(req))]
-#[get("/")]
-async fn index(req: HttpRequest) -> impl Responder {
-    let mut headers = req
-        .headers()
-        .iter()
-        .filter(|(name, _)| {
-            name.as_str().to_lowercase() != "X-Token-From-Cloudfront".to_lowercase()
-        })
-        .map(|(name, value)| {
-            let val = value.to_str().unwrap_or("?");
-            format!("{name} -> {val}")
-        })
-        .collect::<Vec<String>>();
-
-    headers.sort();
-
-    log_headers(&headers);
-
-    let headers = headers.join("\n");
-
-    HttpResponse::Ok().body(format!("{headers}"))
-}
-
-#[tracing::instrument(name = "health", skip(state))]
-#[get("/health")]
-async fn health(state: web::Data<State>) -> Result<impl Responder, ApiError> {
-    let enclave_health = {
-        let mut conn = state.enclave_connection_pool.get().await?;
-        let req = enclave_proxy::RpcRequest::new(RpcPayload::Ping("test".into()));
-
-        tracing::info!("sending request");
-        let response = enclave_proxy::send_rpc_request(&req, &mut conn).await?;
-
-        if let EnclavePayload::Pong(response) = response {
-            response
-        } else {
-            "invalid enclave response".to_string()
-        }
-    };
-
-    let db_health = db::health_check(&state.db_pool).await?.id.to_string();
-
-    Ok(format!(
-        "Enclave: got {}\nDB: got tenant {}",
-        enclave_health, db_health
-    ))
-}
-
-#[tracing::instrument(name = "log_headers")]
-fn log_headers(headers: &Vec<String>) {
-    tracing::info!("got headers");
-}
-
+mod index;
 mod tenant;
 mod challenge;
 mod user;
@@ -139,17 +86,17 @@ async fn main() -> std::io::Result<()> {
             .wrap(Logger::default())
             .wrap(TracingLogger::<TelemetrySpanBuilder>::new())
             .wrap(metrics.clone())
-            .service(index)
-            .service(health)
-            .service(enclave::encrypt)
-            .service(enclave::decrypt)
-            .service(enclave::sign)
-            .service(tenant::init)
-            .service(tenant::api_init)
-            .service(user::init)
-            .service(user::update)
-            .service(challenge::create)
-            .service(challenge::verify)
+            .service(index::index::handler)
+            .service(index::health::handler)
+            .service(enclave::encrypt::handler)
+            .service(enclave::decrypt::handler)
+            .service(enclave::sign::handler)
+            .service(tenant::init::handler)
+            .service(tenant::api_init::handler)
+            .service(user::init::handler)
+            .service(user::update::handler)
+            .service(challenge::initiate::handler)
+            .service(challenge::verify::handler)
     })
     .bind(("0.0.0.0", config.port))?
     .run()
