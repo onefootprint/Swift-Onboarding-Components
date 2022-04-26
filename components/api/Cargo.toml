@@ -10,15 +10,27 @@ default = ["vsock"]
 vsock = ["enclave_proxy/vsock"]
 
 [dependencies]
-actix-web = "4.0.0-rc.2"
+actix-web = "4.0.1"
 env_logger = "0.9.0"
 log = "0.4.14"
-opentelemetry = { version = "0.17", features = ["rt-tokio", "metrics", "serialize"] }
+opentelemetry = { version = "0.17", features = [
+    "rt-tokio",
+    "metrics",
+    "serialize",
+] }
 tracing-opentelemetry = "0.17"
 tracing = "0.1.30"
-tracing-actix-web = { version = "=0.5.0-rc.2", features = ["opentelemetry_0_17"]} 
-tracing-subscriber = { version = "0.3", features = ["json", "registry", "env-filter"] }
-actix-web-opentelemetry = { git = "https://github.com/OutThereLabs/actix-web-opentelemetry", rev = "2d2eb3d415f515ea71b0b15dcda4ccac41987a76", features = ["metrics"]}
+tracing-actix-web = { version = "0.5.1", features = [
+    "opentelemetry_0_17",
+] }
+tracing-subscriber = { version = "0.3", features = [
+    "json",
+    "registry",
+    "env-filter",
+] }
+actix-web-opentelemetry = { git = "https://github.com/OutThereLabs/actix-web-opentelemetry", rev = "2d2eb3d415f515ea71b0b15dcda4ccac41987a76", features = [
+    "metrics",
+] }
 uuid = { version = "0.8.2", features = ["v4"] }
 envconfig = "0.10.0"
 dotenv = "0.15.0"
@@ -27,15 +39,20 @@ tracing-error = "0.2.0"
 opentelemetry-otlp = { version = "0.10", features = ["tonic", "metrics"] }
 tokio = { version = "1.0", features = ["full"] }
 futures-util = { version = "0.3", default-features = false, features = ["std"] }
-serde = { version = "1.0", features = ["derive"]}
+serde = { version = "1.0", features = ["derive"] }
 crypto = { path = "../enclave/crypto" }
 aws-config = "0.10.1"
 aws-sdk-kms = "0.10.1"
 aws-sdk-pinpointsmsvoicev2 = "0.10.1"
 aws-sdk-pinpointemail = "0.10.1"
-thiserror = "1.0"   
+thiserror = "1.0"
 enclave_proxy = { path = "../enclave/proxy", default-features = false }
 db = { path = "../db" }
-deadpool-diesel = { version = "0.3.1", features = ["postgres", "rt_tokio_1", "serde"] }
+deadpool-diesel = { version = "0.3.1", features = [
+    "postgres",
+    "rt_tokio_1",
+    "serde",
+] }
 anyhow = { version = "1.0" }
 serde_with = { version = "1.0" }
+actix-cors = "0.6"

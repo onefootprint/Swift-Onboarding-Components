@@ -20,7 +20,7 @@ CREATE TABLE tenants (
 CREATE TYPE User_Status as ENUM ('Verified', 'Processing', 'Incomplete', 'Failed');
 
 CREATE TABLE users (
-    id VARCHAR(250) PRIMARY KEY DEFAULT prefixed_uid('uid_'),  
+    id VARCHAR(250) PRIMARY KEY DEFAULT prefixed_uid('uv_'),  
     e_private_key BYTEA NOT NULL,
     public_key BYTEA NOT NULL,
     e_first_name BYTEA,
@@ -46,7 +46,7 @@ CREATE INDEX IF NOT EXISTS users_sh_phone_number ON users(sh_phone_number);
 CREATE INDEX IF NOT EXISTS users_sh_email ON users(sh_email);
 
 CREATE TABLE user_tenant_verifications (
-    tenant_user_id VARCHAR(250) PRIMARY KEY DEFAULT prefixed_uid('org_scoped_uid_'),
+    tenant_user_id VARCHAR(250) PRIMARY KEY DEFAULT prefixed_uid('org_uv_'),
     tenant_id VARCHAR(250) NOT NULL,
     user_id VARCHAR(250) NOT NULL,
     status User_Status NOT NULL,
@@ -59,7 +59,7 @@ CREATE TABLE user_tenant_verifications (
 );
 
 CREATE TABLE tenant_api_keys (
-    api_key_id VARCHAR(250) PRIMARY KEY DEFAULT prefixed_uid('pub_key_'),
+    api_key_id VARCHAR(250) PRIMARY KEY DEFAULT prefixed_uid('pk_'),
     tenant_id VARCHAR(250) NOT NULL,
     name VARCHAR(250) NOT NULL,
     sh_api_key BYTEA NOT NULL,

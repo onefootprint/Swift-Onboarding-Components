@@ -17,6 +17,9 @@ use thiserror::Error;
 
 #[derive(Debug, Error)]
 pub enum ApiError {
+    #[error("Auth error: {0}")]
+    AuthError(#[from] crate::auth::AuthError),
+
     #[error("Data {0:?} not set for user")]
     DataNotSetForUser(ChallengeKind),
     #[error("kms.datakeypair.generate {0}")]

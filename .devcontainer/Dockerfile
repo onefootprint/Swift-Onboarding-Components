@@ -12,3 +12,5 @@ RUN git config --global alias.l "log --oneline --graph"
 
 RUN curl -fsSL https://get.pulumi.com | sh
 RUN source /root/.bashrc
+
+RUN cargo install diesel_cli --no-default-features --features postgres

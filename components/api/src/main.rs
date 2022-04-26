@@ -1,26 +1,25 @@
-use actix_web::{
-    middleware::Logger, web, App, HttpServer,
-};
+use actix_web::{middleware::Logger, web, App, HttpServer};
 use actix_web_opentelemetry::RequestMetrics;
 use config::Config;
+use db::DbPool;
 use enclave_proxy::{bb8, pool, StreamManager};
 use telemetry::TelemetrySpanBuilder;
 use tracing_actix_web::TracingLogger;
-use db::DbPool;
 
 mod config;
-mod telemetry;
 mod errors;
+mod telemetry;
 
 use crate::errors::ApiError;
 
 // TODO put IAM roles and permissions in pulumi
 
+mod auth;
+mod challenge;
+mod enclave;
 mod index;
 mod tenant;
-mod challenge;
 mod user;
-mod enclave;
 
 #[derive(Clone)]
 pub struct State {
@@ -42,7 +41,6 @@ async fn main() -> std::io::Result<()> {
 
     let metrics = RequestMetrics::new(meter, Some(should_render_metrics), None);
 
-
     let state = {
         let manager = StreamManager {
             config: config.clone(),
@@ -55,7 +53,6 @@ async fn main() -> std::io::Result<()> {
             .await
             .unwrap();
 
-
         let shared_config = aws_config::from_env().load().await;
         let sms_client = aws_sdk_pinpointsmsvoicev2::Client::new(&shared_config);
         let email_client = aws_sdk_pinpointemail::Client::new(&shared_config);
@@ -65,8 +62,9 @@ async fn main() -> std::io::Result<()> {
         let _ = db::run_migrations(&config.database_url).unwrap();
 
         // then create the pool
-        let db_pool = db::init(&config.database_url).map_err(ApiError::from)
-        .unwrap();
+        let db_pool = db::init(&config.database_url)
+            .map_err(ApiError::from)
+            .unwrap();
 
         State {
             config: config.clone(),
@@ -81,11 +79,20 @@ async fn main() -> std::io::Result<()> {
     log::info!("starting server on port {}", config.port);
 
     let res = HttpServer::new(move || {
+        let cors = actix_cors::Cors::default()
+            .allowed_origin_fn(|origin, _req_head| {
+                origin.as_bytes().ends_with(b".footprint.dev")
+                    || origin.as_bytes().ends_with(b".onefootprint.com")
+            })
+            .allowed_methods(vec!["GET", "POST", "PATCH", "PUT"])
+            .max_age(3600);
+
         App::new()
             .app_data(web::Data::new(state.clone()))
             .wrap(Logger::default())
             .wrap(TracingLogger::<TelemetrySpanBuilder>::new())
             .wrap(metrics.clone())
+            .wrap(cors)
             .service(index::index::handler)
             .service(index::health::handler)
             .service(enclave::encrypt::handler)

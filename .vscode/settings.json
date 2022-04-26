@@ -9,5 +9,6 @@
         "sqlx",
         "thiserror",
         "vsock"
-    ]
+    ],
+    "rust-analyzer.checkOnSave.command": "clippy",
 }
