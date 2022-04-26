@@ -2,18 +2,21 @@ use crate::schema;
 use diesel::prelude::*;
 use deadpool_diesel::postgres::Pool;
 use crate::models::user_tenant_verifications::*;
-use crate::models::temp_tenant_user_tokens::{NewTempTenantUserToken, TempTenantUserToken, PartialTempTenantUserToken};
+use crate::models::temp_tenant_user_tokens::{NewTempTenantUserToken, TempTenantUserToken};
 use crate::models::types::Status;
 use crate::models::users::*;
 use crate::errors::DbError;
-use crypto::{sha256, hex::ToHex};
+use crypto::{sha256, random::gen_random_alphanumeric_code, hex::ToHex};
 
-pub async fn init(pool: &Pool, user: NewUser, tenant: PartialTempTenantUserToken) -> Result<String, DbError> {
+pub async fn init(pool: &Pool, user: NewUser, tenant_id: String) -> Result<(UserTenantVerification, String), DbError> {
     let conn = pool.get().await?;
 
-    let temp_token =
+    let token = format!("vtok_{}", gen_random_alphanumeric_code(34));
+    let h_token = sha256(&token.as_bytes()).encode_hex();
+
+    let user_tenant_record =
         conn.interact(move |conn| {
-            conn.build_transaction().run(|| -> Result<TempTenantUserToken, DbError> {
+            conn.build_transaction().run(|| -> Result<UserTenantVerification, DbError> {
             // initialize new user vault
             let user : User = 
             diesel::insert_into(schema::users::table)
@@ -22,7 +25,7 @@ pub async fn init(pool: &Pool, user: NewUser, tenant: PartialTempTenantUserToken
 
             // associate new user with tenant
             let user_tenant = NewUserTenantVerification {
-                tenant_id: tenant.tenant_id.clone(),
+                tenant_id: tenant_id.clone(),
                 user_id: user.id.clone(),
                 status: Status::Incomplete
             };
@@ -33,20 +36,20 @@ pub async fn init(pool: &Pool, user: NewUser, tenant: PartialTempTenantUserToken
                     
             // grant temporary credentials to tenant to modify user
             let temp_tenant_user_token = NewTempTenantUserToken {
-                h_token: tenant.h_token,
+                h_token: h_token,
                 user_id: user.id,
-                tenant_id: tenant.tenant_id,
-                tenant_user_id: user_tenant_record.tenant_user_id
+                tenant_id: tenant_id,
+                tenant_user_id: user_tenant_record.tenant_user_id.clone(),
             };
-            let temp_token : TempTenantUserToken = diesel::insert_into(
+            diesel::insert_into(
                 schema::temp_tenant_user_tokens::table)
                     .values(&temp_tenant_user_token)
                     .get_result::<TempTenantUserToken>(conn)?;
 
-            Ok(temp_token)
+            Ok(user_tenant_record)
     })}).await??;
     // Return tenant-scoped user id
-    Ok(temp_token.tenant_user_id)
+    Ok((user_tenant_record, token))
 }
 
 pub async fn update(pool: &Pool, update: UpdateUser) -> Result<usize, DbError> {

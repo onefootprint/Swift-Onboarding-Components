@@ -7,14 +7,9 @@ use actix_web::{
 use aws_sdk_kms::model::DataKeyPairSpec;
 use db::models::{
     users::{NewUser, UpdateUser},
-    temp_tenant_user_tokens::{PartialTempTenantUserToken},
     types::{Status},
 };
-use crypto::{
-    random::gen_random_alphanumeric_code,
-    hex::ToHex,
-    sha256,
-};
+use crypto::{sha256};
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 struct UserInitResponse {
@@ -57,18 +52,11 @@ async fn init(
         id_verified: Status::Incomplete,
     };
 
-    let temp_token = "vtok_".to_owned() + &gen_random_alphanumeric_code(34);
-
-    let partial_temp_tenant_token = PartialTempTenantUserToken {
-        tenant_id: tenant_api_key.tenant_id,
-        h_token: sha256(&temp_token.as_bytes()).encode_hex()
-    };
-
-    let uuid = db::user::init(&state.db_pool, user, partial_temp_tenant_token).await?;
+    let (user_tenant_record, token) = db::user::init(&state.db_pool, user, tenant_api_key.tenant_id).await?;
 
     Ok(web::Json(UserInitResponse{
-        tenant_user_id: uuid,
-        tenant_user_auth_token: temp_token
+        tenant_user_id: user_tenant_record.tenant_user_id,
+        tenant_user_auth_token: token,
     }))
 }
 
