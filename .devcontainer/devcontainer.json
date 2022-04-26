@@ -47,7 +47,6 @@
   "containerEnv": {
     "GITHUB_TOKEN": "${localEnv:GITHUB_TOKEN}",
     "GITHUB_USER": "${localEnv:GITHUB_USER}",
-	"DATABASE_URL": "postgresql://postgres:postgres@localhost/postgres"
   },
 	// Add the IDs of extensions you want installed when the container is created.
 	"extensions": [
