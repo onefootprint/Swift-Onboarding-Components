@@ -1,11 +1,6 @@
 import React from 'react';
-import { Button, Typography } from 'ui';
+import { Typography } from 'ui';
 
-const Web = () => (
-  <>
-    <Typography>Lorem</Typography>
-    <Button />
-  </>
-);
+const Web = () => <Typography>Hello World</Typography>;
 
 export default Web;
