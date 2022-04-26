@@ -42,6 +42,10 @@ pub enum ApiError {
     SendTextMessageError(#[from] SmsSdkError<SendTextMessageError>),
     #[error("send_email_error {0}")]
     SendEmailError(#[from] EmailSdkError<SendEmailError>),
+    #[error("cannot_decode_utf8 {0}")]
+    CannotDecodeUtf8(#[from] std::str::Utf8Error),
+    #[error("user_data_not_populated")]
+    UserDataNotPopulated,
 }
 
 impl actix_web::ResponseError for ApiError {}

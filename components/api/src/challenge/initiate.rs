@@ -34,17 +34,25 @@ async fn handler(
     // TODO 404 if the user isn't found
     let user = db::user::get(&state.db_pool, user_id.clone()).await?;
 
+    tracing::info!("in challenge with user {:?}", user.clone());
+
     db::challenge::expire_old(&state.db_pool, user_id.clone(), request.kind).await?;
   
-    let sh_data = match request.kind {
-        ChallengeKind::Email => user.sh_email,
-        ChallengeKind::PhoneNumber => user.sh_phone_number,
+    let (sh_data, e_data) = match request.kind {
+        ChallengeKind::Email => (user.sh_email, user.e_email),
+        ChallengeKind::PhoneNumber => (user.sh_phone_number, user.e_phone_number),
     };
     
     let sh_data = match sh_data {
         Some(sh_data) => sh_data,
         None => return Err(ApiError::DataNotSetForUser(request.kind)),
     };
+    let e_data = e_data.ok_or_else(|| ApiError::UserDataNotPopulated)?;
+    tracing::info!("in challenge with e_data {:?}", e_data);
+
+    let decrypted_data = crate::enclave::lib::decrypt(&state, &e_data, user.e_private_key, enclave_proxy::DataTransform::Identity).await?;
+    tracing::info!("decrypted data {:?}", decrypted_data);
+    let decrypted_data = std::str::from_utf8(&decrypted_data)?;
 
     let (challenge, code) =
         db::challenge::create(&state.db_pool, user_id.clone(), sh_data, request.kind).await?;
@@ -66,8 +74,7 @@ async fn handler(
                 .simple(message)
                 .build();
             let output = state.email_client.send_email()
-                // TODO decrypt email
-                .destination(EmailDestination::builder().to_addresses("TODO").build())
+                .destination(EmailDestination::builder().to_addresses(decrypted_data).build())
                 // TODO not my email
                 .from_email_address("elliott@onefootprint.com")
                 .content(content)
@@ -77,8 +84,7 @@ async fn handler(
         },
         ChallengeKind::PhoneNumber => {
             let output = state.sms_client.send_text_message()
-                // TODO decrypt phone number
-                .destination_phone_number("TODO")
+                .destination_phone_number(decrypted_data)
                 .message_body(format!("Your Footprint verification code is {}. Don't share your code with anyone. We will never contact you to request this code.\n\n@onefootprint.com #{}", code, code))
                 .send()
                 .await?;
