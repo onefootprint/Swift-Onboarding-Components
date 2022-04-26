@@ -1,15 +1,18 @@
 {
 	"name": "Default FPC",
-	"build": {
-		"dockerfile": "Dockerfile",
-		"args": {
-			// Use the VARIANT arg to pick a Debian OS version: buster, bullseye
-			// Use bullseye when on local on arm64/Apple Silicon.
-			"VARIANT": "bullseye"
-		}
-	},
+	// "build": {
+	// 	"dockerfile": "Dockerfile",
+	// 	"args": {
+	// 		// Use the VARIANT arg to pick a Debian OS version: buster, bullseye
+	// 		// Use bullseye when on local on arm64/Apple Silicon.
+	// 		"VARIANT": "bullseye"
+	// 	}
+	// },
 	"runArgs": [ "--cap-add=SYS_PTRACE", "--security-opt", "seccomp=unconfined" ],
 
+	"dockerComposeFile": "docker-compose.yml",
+	"service": "app",
+  
 	// Set *default* container specific settings.json values on container create.
 	"settings": {
 		"lldb.executable": "/usr/bin/lldb",
@@ -18,20 +21,33 @@
 			"**/target/**": true
 		},
 		"rust-analyzer.checkOnSave.command": "clippy",
-    "terminal.integrated.localEchoLatencyThreshold": 0,
-    "cSpell.words": [
-        "actix",
-        "awsx",
-        "envconfig",
-        "pulumi",
-        "sqlx",
-        "thiserror",
-        "vsock"
-    ]
+    	"terminal.integrated.localEchoLatencyThreshold": 0,
+    	"cSpell.words": [
+			"actix",
+			"awsx",
+			"envconfig",
+			"pulumi",
+			"sqlx",
+			"thiserror",
+			"vsock"
+    	],
+		"sqltools.connections": [
+			{
+				"name": "Container database",
+				"driver": "PostgreSQL",
+				"previewLimit": 50,
+				"server": "localhost",
+				"port": 5432,
+				"database": "postgres",
+				"username": "postgres",
+				"password": "postgres"
+			}
+		],
 	},
   "containerEnv": {
     "GITHUB_TOKEN": "${localEnv:GITHUB_TOKEN}",
-    "GITHUB_USER": "${localEnv:GITHUB_USER}"
+    "GITHUB_USER": "${localEnv:GITHUB_USER}",
+	"DATABASE_URL": "postgresql://postgres:postgres@localhost/postgres"
   },
 	// Add the IDs of extensions you want installed when the container is created.
 	"extensions": [
@@ -40,11 +56,13 @@
 		"matklad.rust-analyzer",
 		"tamasfe.even-better-toml",
 		"serayuzgur.crates",    
-    "panicbit.cargo",
-    "bungcip.better-toml",
+    	"panicbit.cargo",
+    	"bungcip.better-toml",
+		"mtxr.sqltools",
+		"mtxr.sqltools-driver-pg",		
 	],
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
-	"forwardPorts": [8000],
+	"forwardPorts": [8000, 5432],
 
 }
