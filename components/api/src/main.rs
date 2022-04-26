@@ -38,7 +38,8 @@ use thiserror::Error;
 use uuid::Uuid;
 use db::models::{tenants::NewTenant, tenant_api_keys::PartialTenantApiKey, users::{NewUser, UpdateUser}, temp_tenant_user_tokens::{PartialTempTenantUserToken}};
 use db::models::types::{ChallengeKind, Status};
-use db::{DbError, DbPool};
+use db::DbPool;
+use db::errors::DbError;
 
 
 // TODO put IAM roles and permissions in pulumi
@@ -248,7 +249,7 @@ async fn tenant_init(
     path: web::Path<String> ,
 ) ->  actix_web::Result<impl Responder, ApiError> {
     let tenant = 
-        db::tenant_init(&state.db_pool, NewTenant {
+        db::tenant::init(&state.db_pool, NewTenant {
             name: path.into_inner(),
         }).await?;
 
@@ -268,7 +269,7 @@ async fn tenant_api_init(
     let api_key = format!("sk_{}", gen_random_alphanumeric_code(34)); 
 
     let tenant_api_key =
-        db::tenant_api_init(&state.db_pool, PartialTenantApiKey {
+        db::tenant::api_init(&state.db_pool, PartialTenantApiKey {
             tenant_id: tenant_id,
             name: key_name
         }, api_key.clone()).await?;
@@ -281,7 +282,7 @@ async fn tenant_api_init(
     }))
 }
 
-#[patch("/tenant/authz/{tenant_user_token}/user/{tenant_user_id}/update")]
+#[patch("/tenant/auth/{tenant_user_token}/user/{tenant_user_id}/update")]
 async fn user_update_field(
     state: web::Data<State>, 
     path: web::Path<(String, String)>,
@@ -291,7 +292,7 @@ async fn user_update_field(
     let (tenant_user_token, tenant_user_id) = path.into_inner();
 
     // look up real uuid from tenant scoped uuid
-    let user = db::tenant_user_lookup(
+    let user = db::user::lookup(
         &state.db_pool, tenant_user_token, tenant_user_id
     ).await?;
 
@@ -336,13 +337,13 @@ async fn user_update_field(
         id_verified: Status::Processing
     };
 
-    let size = db::user_vault_update(&state.db_pool, user_update).await?;
+    let size = db::user::update(&state.db_pool, user_update).await?;
 
     Ok(format!("Succesful update: total update size {}", size))
 
 }
 
-#[post("/tenant/authz/{tenant_pub_key}/user/init")]
+#[post("/tenant/auth/{tenant_pub_key}/user/init")]
 async fn user_init(
     state: web::Data<State>, 
     path: web::Path<String>
@@ -350,7 +351,7 @@ async fn user_init(
 
     let tenant_pub_key = path.into_inner();
 
-    let tenant_api_key = db::tenant_pub_auth_check(&state.db_pool, tenant_pub_key).await?;
+    let tenant_api_key = db::tenant::pub_auth_check(&state.db_pool, tenant_pub_key).await?;
 
     // TODO, add email & phone number to request & check against existing entries
 
@@ -385,7 +386,7 @@ async fn user_init(
         h_token: sha256(&temp_token.as_bytes()).encode_hex()
     };
 
-    let uuid = db::user_vault_init(&state.db_pool, user, partial_temp_tenant_token).await?;
+    let uuid = db::user::init(&state.db_pool, user, partial_temp_tenant_token).await?;
 
     Ok(web::Json(TenantUserAuthResponse{
         tenant_user_id: uuid,
@@ -403,9 +404,9 @@ async fn create_challenge(
     let user_id = path.into_inner();
     tracing::info!("in challenge with user_id {}", user_id.clone());
     // TODO 404 if the user isn't found
-    let user = db::user_get(&state.db_pool, user_id.clone()).await?;
+    let user = db::user::get(&state.db_pool, user_id.clone()).await?;
 
-    db::expire_old_challenges(&state.db_pool, user_id.clone(), request.kind).await?;
+    db::challenge::expire_old(&state.db_pool, user_id.clone(), request.kind).await?;
   
     let sh_data = match request.kind {
         ChallengeKind::Email => user.sh_email,
@@ -418,7 +419,7 @@ async fn create_challenge(
     };
 
     let (challenge, code) =
-        db::create_challenge(&state.db_pool, user_id.clone(), sh_data, request.kind).await?;
+        db::challenge::create(&state.db_pool, user_id.clone(), sh_data, request.kind).await?;
 
     // We may want to end up doing this asynchronously - these can be latent operations
     match request.kind {
@@ -480,7 +481,7 @@ async fn verify_challenge(
     );
 
     let request = request;
-    db::verify_challenge(&state.db_pool, challenge_id, user_id, request.into_inner().code)
+    db::challenge::verify(&state.db_pool, challenge_id, user_id, request.into_inner().code)
         .await?;
     // TODO yield auth token if chalenge is successfully verified
     Ok(web::Json("verified! one day this will have an auth token")) 
