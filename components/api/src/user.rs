@@ -40,8 +40,7 @@ async fn init(
         .key_id(&state.config.enclave_root_key_id)
         .key_pair_spec(DataKeyPairSpec::EccNistP256)
         .send()
-        .await
-        .map_err(ApiError::from)?;
+        .await?;
     
     let der_public_key = new_key_pair.public_key.unwrap().into_inner();
     let ec_pk_uncompressed =

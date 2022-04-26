@@ -71,8 +71,7 @@ async fn create(
                 .from_email_address("elliott@onefootprint.com")
                 .content(content)
                 .send()
-                .await
-                .map_err(ApiError::from)?;
+                .await?;
             println!("output from sending email message {:?}", output)
         },
         ChallengeKind::PhoneNumber => {
