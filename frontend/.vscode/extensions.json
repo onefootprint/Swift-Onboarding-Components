@@ -1,13 +1,12 @@
 {
   "recommendations": [
-      "steoates.autoimport",
-      "formulahendry.auto-rename-tag",
-      "streetsidesoftware.code-spell-checker",
-      "naumovs.color-highlight",
-      "dbaeumer.vscode-eslint",
-      "eamodio.gitlens",
-      "oderwat.indent-rainbow",
-      "esbenp.prettier-vscode",
-      "wayou.vscode-todo-highlight"
+    "steoates.autoimport",
+    "formulahendry.auto-rename-tag",
+    "streetsidesoftware.code-spell-checker",
+    "naumovs.color-highlight",
+    "dbaeumer.vscode-eslint",
+    "eamodio.gitlens",
+    "esbenp.prettier-vscode",
+    "wayou.vscode-todo-highlight"
   ]
 }
