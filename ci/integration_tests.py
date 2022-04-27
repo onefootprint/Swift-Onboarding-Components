@@ -54,7 +54,7 @@ def test_init_user(request):
 
 def test_user_patch(request): 
     path = "user"
-    data = {"phone_number": "+15555555555"}
+    data = {"phone_number": "+1 (555) 555-5555"}
     print(url(path))
     r = requests.patch(url(path), json=data, headers=_tenant_user_token_headers(request))
     print(r.content)

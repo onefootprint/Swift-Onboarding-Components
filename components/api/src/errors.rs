@@ -10,6 +10,10 @@ use aws_sdk_pinpointemail::{
     error::SendEmailError,
     types::SdkError as EmailSdkError,
 };
+use aws_sdk_pinpoint::{
+    error::PhoneNumberValidateError,
+    types::SdkError as PinpointSdkError,
+};
 use enclave_proxy::bb8;
 use db::errors::DbError;
 use db::models::types::{ChallengeKind};
@@ -28,6 +32,8 @@ pub enum ApiError {
     KmsKeyPair(#[from] KmsSdkError<GenerateDataKeyPairWithoutPlaintextError>),
     #[error("kms.datakey.generate {0}")]
     KmsDataKey(#[from] KmsSdkError<GenerateDataKeyWithoutPlaintextError>),
+    #[error("pinpoint.phonenumbervalidateerror {0}")]
+    PinpointPhoneNumberValidateError(#[from] PinpointSdkError<PhoneNumberValidateError>),
     #[error("crypto {0}")]
     Crypto(#[from] crypto::Error),
     #[error("enclave_proxy {0}")]
@@ -48,6 +54,8 @@ pub enum ApiError {
     CannotDecodeUtf8(#[from] std::str::Utf8Error),
     #[error("user_data_not_populated")]
     UserDataNotPopulated,
+    #[error("phone_number_validation_error")]
+    PhoneNumberValidationError
 }
 
 impl actix_web::ResponseError for ApiError {
@@ -57,6 +65,7 @@ impl actix_web::ResponseError for ApiError {
             ApiError::DataNotSetForUser(_) => actix_web::http::StatusCode::BAD_REQUEST,
             ApiError::KmsKeyPair(_) => actix_web::http::StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::KmsDataKey(_) => actix_web::http::StatusCode::INTERNAL_SERVER_ERROR,
+            ApiError::PinpointPhoneNumberValidateError(_) => actix_web::http::StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::Crypto(_) => actix_web::http::StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::EnclaveProxy(_) => actix_web::http::StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::EnclaveConnection(_) => actix_web::http::StatusCode::INTERNAL_SERVER_ERROR,
@@ -67,6 +76,7 @@ impl actix_web::ResponseError for ApiError {
             ApiError::SendEmailError(_) => actix_web::http::StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::CannotDecodeUtf8(_) => actix_web::http::StatusCode::BAD_REQUEST,
             ApiError::UserDataNotPopulated => actix_web::http::StatusCode::BAD_REQUEST,
+            ApiError::PhoneNumberValidationError => actix_web::http::StatusCode::BAD_REQUEST,
         }
     }
 

@@ -99,6 +99,18 @@ async fn handler(
             Some(Some(s)) => Some(sha256(s.as_bytes()).to_vec()),
         }
     }
+    let validated_phone_number = match &request.phone_number {
+        Some(Some(phone_number)) => {
+            let req = aws_sdk_pinpoint::model::NumberValidateRequest::builder().phone_number(phone_number).build();
+            let validated_phone_number = state.pinpoint_client.phone_number_validate()
+                .number_validate_request(req)
+                .send().await?
+                .number_validate_response.ok_or(ApiError::PhoneNumberValidationError)?
+                .cleansed_phone_number_e164.ok_or(ApiError::PhoneNumberValidationError)?;
+            Some(Some(validated_phone_number))
+        },
+        _ => request.phone_number.clone(),
+    };
 
     let user_update = UpdateUser {
         id: user.id.clone(),
@@ -116,12 +128,12 @@ async fn handler(
             _ => None,
         },
         sh_email: hash(request.email.clone()),
-        e_phone_number: seal(request.phone_number.clone()),
-        is_phone_number_verified: match request.phone_number {
+        e_phone_number: seal(validated_phone_number.clone()),
+        is_phone_number_verified: match validated_phone_number {
             Some(Some(_)) => Some(false),
             _ => None,
         },
-        sh_phone_number: hash(request.phone_number.clone()),
+        sh_phone_number: hash(validated_phone_number.clone()),
         id_verified: Status::Processing,
     };
 

@@ -25,6 +25,7 @@ mod response;
 #[derive(Clone)]
 pub struct State {
     config: Config,
+    pinpoint_client: aws_sdk_pinpoint::Client,
     sms_client: aws_sdk_pinpointsmsvoicev2::Client,
     email_client: aws_sdk_pinpointemail::Client,
     kms_client: aws_sdk_kms::Client,
@@ -55,6 +56,7 @@ async fn main() -> std::io::Result<()> {
             .unwrap();
 
         let shared_config = aws_config::from_env().load().await;
+        let pinpoint_client = aws_sdk_pinpoint::Client::new(&shared_config);
         let sms_client = aws_sdk_pinpointsmsvoicev2::Client::new(&shared_config);
         let email_client = aws_sdk_pinpointemail::Client::new(&shared_config);
         let kms_client = aws_sdk_kms::Client::new(&shared_config);
@@ -70,6 +72,7 @@ async fn main() -> std::io::Result<()> {
         State {
             config: config.clone(),
             enclave_connection_pool: pool,
+            pinpoint_client,
             sms_client,
             email_client,
             kms_client,

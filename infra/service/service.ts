@@ -289,13 +289,26 @@ function createTaskContainerRole(account: string, serviceName: string, enclaveKe
                     }),
                 },
                 {
-                    name: "pinpoint_sms_send_email",
+                    name: "pinpoint_send_email",
                     policy: JSON.stringify({
                         Version: "2012-10-17",
                         Statement: [
                             {
                                 "Effect": "Allow",
                                 "Action": "ses:SendEmail",
+                                "Resource": "*"
+                        }
+                    ]
+                    }),
+                },
+                {
+                    name: "pinpoint_validate_phone_number",
+                    policy: JSON.stringify({
+                        Version: "2012-10-17",
+                        Statement: [
+                            {
+                                "Effect": "Allow",
+                                "Action": "mobiletargeting:PhoneNumberValidate",
                                 "Resource": "*"
                         }
                     ]
