@@ -67,7 +67,7 @@ def test_challenge_create(request):
     print(url(path))
     data = {"kind": "phonenumber"}
     r = requests.post(url(path), json=data, headers=_tenant_auth_headers(request))
-    print(r)
+    print(r, r.content)
     assert(r.status_code == 200)  # TODO 201
 
 # TODO find a way to test challenge verify - may need to mock out sending/receiving SMS

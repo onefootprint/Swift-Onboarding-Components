@@ -12,18 +12,13 @@ struct ChallengeVerificationRequest {
     code: String,
 }
 
-#[derive(Debug, Clone, serde::Serialize)]
-struct ChallengeVerificationResponse {
-    tenant_user_auth_token: String,
-}
-
 #[post("/user/{tenant_user_id}/challenge/{challenge_id}/verify")]
 async fn handler(
     state: web::Data<State>,
     pub_tenant_auth: PublicTenantAuthContext,
     path: web::Path<(String, Uuid)>,
     request: web::Json<ChallengeVerificationRequest>,
-) -> Result<ApiResponseData<String>, ApiError> {
+) -> actix_web::Result<ApiResponseData<()>, ApiError> {
     let (tenant_user_id, challenge_id) = path.into_inner();
     tracing::info!(
         "in challenge verification with user_id {} challenge_id {}",
@@ -37,6 +32,6 @@ async fn handler(
         .await?;
     // TODO yield auth token in one-click flow, and probably create a new UserTenantVerification
     Ok(ApiResponseData{
-        data: "verified! one day this will have an auth token".to_string()
+        data: (),
     })
 }

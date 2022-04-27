@@ -15,11 +15,18 @@ use aws_sdk_pinpointemail::{
     },
 };
 use db::models::types::ChallengeKind;
+use uuid::Uuid;
 
 // TODO port onto auth
 #[derive(Debug, Clone, serde::Deserialize)]
 struct CreateChallengeRequest {
     kind: ChallengeKind,
+}
+
+#[derive(Debug, Clone, serde::Serialize)]
+struct CreateChallengeResponse {
+    kind: ChallengeKind,
+    id: Uuid,
 }
 
 // TODO Switch challenge APIs to use correct auth and tenant_user_id
@@ -30,7 +37,7 @@ async fn handler(
     pub_tenant_auth: PublicTenantAuthContext,
     path: web::Path<String>,
     request: web::Json<CreateChallengeRequest>,
-) -> Result<ApiResponseData<String>, ApiError> {
+) -> actix_web::Result<ApiResponseData<CreateChallengeResponse>, ApiError> {
     let tenant_user_id = path.into_inner();
     tracing::info!("in challenge with user_id {}", tenant_user_id.clone());
     // TODO 404 if the user isn't found
@@ -95,6 +102,9 @@ async fn handler(
     };
 
     Ok(ApiResponseData{
-        data: challenge.id.to_string()}
-    )
+        data: CreateChallengeResponse{
+            kind: request.kind,
+            id: challenge.id,
+        },
+    })
 }
