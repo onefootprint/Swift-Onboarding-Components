@@ -1,7 +1,7 @@
 import React from 'react';
 import { Story, ComponentMeta } from '@storybook/react';
 
-import { Button, ButtonProps } from 'ui';
+import Button, { ButtonProps } from './button';
 
 export default {
   title: 'Components/Button',
@@ -16,5 +16,5 @@ const Template: Story<ButtonProps> = ({ children }: ButtonProps) => (
 );
 export const Primary = Template.bind({});
 Primary.args = {
-  children: 'Button',
+  children: 'This is a button',
 };

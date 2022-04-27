@@ -10,7 +10,7 @@
     "build": "turbo run build",
     "build:website": "turbo run build --scope=website --no-deps --include-dependencies",
     "build:bifrost": "turbo run build --scope=bifrost --no-deps --include-dependencies",
-    "build:ui-docs": "turbo run build --scope=ui-docs --no-deps --include-dependencies",
+    "build:ui": "turbo run build --scope=ui --no-deps --include-dependencies",
     "dev": "turbo run dev --parallel",
     "lint": "turbo run lint",
     "test": "turbo run test",
