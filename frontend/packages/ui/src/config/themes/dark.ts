@@ -1,40 +1,14 @@
 import { DefaultTheme } from './types';
 
-const secondaryPalette = {
-  camelotLight: '#FEEFF3',
-  camelotBase: '#EECAD3',
-  camelotDark: '#E0A2B3',
-  camelotDarken: '#91364E',
-  pomegranateLight: '#FAC4BF',
-  pomegranateBase: '#F4766B',
-  pomegranateDark: '#F14F41',
-  pomegranateDarken: '#EF2917',
-  capriSunLight: '#FFEFD9',
-  capriSunBase: '#FFBE69',
-  capriSunDark: '#FFAB3E',
-  capriSunDarken: '#FF9914',
-  marinerLight: '#EBF7FB',
-  marinerBase: '#9FCEE9',
-  marinerDark: '#52AFE3',
-  marinerDarken: '#2370B7',
-  indigoLight: '#E8EEFD',
-  indigoBase: '#A1B2E0',
-  indigoDark: '#6C87CF',
-  indigoDarken: '#5046C2',
-  amethystLight: '#F4EAF8',
-  amethystBase: '#E4CAEE',
-  amethystDark: '#D0A3E1',
-  amethystDarken: '#B46CCF',
-};
-
 const themeUiStates = {
-  success: '#4FC366',
-  info: '#7FB0FA',
-  error: '#FF6C42',
+  success: '#6db59d',
+  info: '#6da7ee',
+  error: '#d9726c',
+  warning: '#fff2d9',
 };
 
-const darkTheme: DefaultTheme = {
-  illustrations: 'dark',
+const lightTheme: DefaultTheme = {
+  illustrations: 'light',
   overlay: 'rgba(0, 0, 0, 0.4)',
   breakpoints: {
     xs: '0px',
@@ -50,20 +24,18 @@ const darkTheme: DefaultTheme = {
     none: 0,
     round: 1000,
     base: 8,
-    large: 24,
+    large: 16,
   },
   backgroundColors: {
-    primary: '#1E1E1E',
-    secondary: '#4FC366',
-    elevated: '#2F2F32',
+    primary: '#161616',
+    secondary: '#212121',
+    tertiary: '#F4F6FC',
+    quaternary: '#372680',
+    quinary: '#187A2C',
   },
   borderColors: {
     none: 'none',
-    transparent: 'transparent',
-    primary: '#373737',
-    secondary: '#A8A8A8',
-    tertiary: '#4FC366',
-    quaternary: '#FFFFFF',
+    primary: '#404040',
     ...themeUiStates,
   },
   borderWidths: {
@@ -71,27 +43,14 @@ const darkTheme: DefaultTheme = {
     base: 1,
     large: 2,
   },
-  shapeFills: {
-    transparent: 'transparent',
-    primary: '#FFFFFF',
-    secondary: '#4FC366',
-    tertiary: '#A8A8A8',
-    quaternary: '#808080',
-    quinary: '#404040',
-    senary: '#1E1E1E',
-    septenary: '#FFFFFF',
-    ...themeUiStates,
-    ...secondaryPalette,
-  },
   colors: {
-    primary: '#FFFFFF',
-    secondary: '#FFFFFF',
-    tertiary: '#4FC366',
-    quaternary: '#A8A8A8',
-    quinary: '#808080',
-    senary: '#1E1E1E',
+    primary: '#F4F6FC',
+    secondary: '#E8E8E8',
+    tertiary: '#CCCCCC',
+    quaternary: '#161616',
+    quinary: '#372680',
+    senary: '#187A2C',
     ...themeUiStates,
-    ...secondaryPalette,
   },
   spacings: {
     none: 0,
@@ -218,4 +177,4 @@ const darkTheme: DefaultTheme = {
   },
 };
 
-export default darkTheme;
+export default lightTheme;

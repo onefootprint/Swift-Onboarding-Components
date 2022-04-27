@@ -11,7 +11,6 @@ export type {
   BoxShadows,
   BreakPoints,
   Colors,
-  ShapeFills,
   Spacings,
   Typographies,
   ZIndices,

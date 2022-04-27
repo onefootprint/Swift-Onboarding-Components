@@ -22,67 +22,28 @@ export type ThemeDisable = {
 export type ThemeBackgroundsColors = {
   primary: string;
   secondary: string;
-  elevated: string;
+  tertiary: string;
+  quaternary: string;
+  quinary: string;
+};
+
+export type ThemeUIStates = {
+  success: string;
+  warning: string;
+  error: string;
+  info: string;
 };
 
 export type ThemeBorderColors = {
   none: string;
-  transparent: string;
   primary: string;
-  secondary: string;
-  tertiary: string;
-  quaternary: string;
-  success: string;
-  info: string;
-  error: string;
-};
+} & ThemeUIStates;
 
 export type ThemeBorderWidths = {
   none: number;
   base: number;
   large: number;
 };
-
-export type ThemeSecondaryPalette = {
-  camelotLight: string;
-  camelotBase: string;
-  camelotDark: string;
-  camelotDarken: string;
-  pomegranateLight: string;
-  pomegranateBase: string;
-  pomegranateDark: string;
-  pomegranateDarken: string;
-  capriSunLight: string;
-  capriSunBase: string;
-  capriSunDark: string;
-  capriSunDarken: string;
-  marinerLight: string;
-  marinerBase: string;
-  marinerDark: string;
-  marinerDarken: string;
-  indigoLight: string;
-  indigoBase: string;
-  indigoDark: string;
-  indigoDarken: string;
-  amethystLight: string;
-  amethystBase: string;
-  amethystDark: string;
-  amethystDarken: string;
-};
-
-export type ThemeShapeFills = {
-  transparent: string;
-  primary: string;
-  secondary: string;
-  tertiary: string;
-  quaternary: string;
-  quinary: string;
-  senary: string;
-  septenary: string;
-  success: string;
-  info: string;
-  error: string;
-} & ThemeSecondaryPalette;
 
 export type ThemeColors = {
   primary: string;
@@ -91,10 +52,7 @@ export type ThemeColors = {
   quaternary: string;
   quinary: string;
   senary: string;
-  success: string;
-  info: string;
-  error: string;
-} & ThemeSecondaryPalette;
+} & ThemeUIStates;
 
 export type ThemeSpacings = {
   none: number;
@@ -153,8 +111,6 @@ export type Colors = keyof ThemeColors;
 
 export type Spacings = keyof ThemeSpacings;
 
-export type ShapeFills = keyof ThemeShapeFills;
-
 export type Typographies = ThemeTypographies;
 
 export type BorderRadius = keyof ThemeBorderRadius;
@@ -181,7 +137,6 @@ export type DefaultTheme = {
   colors: ThemeColors;
   borderColors: ThemeBorderColors;
   borderWidths: ThemeBorderWidths;
-  shapeFills: ThemeShapeFills;
   spacings: ThemeSpacings;
   boxShadows: ThemeBoxShadows;
   zIndices: ThemeZIndices;

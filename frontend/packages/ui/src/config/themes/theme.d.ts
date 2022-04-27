@@ -7,7 +7,6 @@ import {
   ThemeColors,
   ThemeBorderColors,
   ThemeBorderWidths,
-  ThemeShapeFills,
   ThemeSpacings,
   ThemeBoxShadows,
   ThemeTypographies,
@@ -26,7 +25,6 @@ declare module 'styled-components' {
     colors: ThemeColors;
     borderColors: ThemeBorderColors;
     borderWidths: ThemeBorderWidths;
-    shapeFills: ThemeShapeFills;
     spacings: ThemeSpacings;
     boxShadows: ThemeBoxShadows;
     zIndices: ThemeZIndices;
