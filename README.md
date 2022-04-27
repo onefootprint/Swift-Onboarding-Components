@@ -91,4 +91,31 @@ ssh ec2-user@{{ip}} -i ~/.ssh/id_jumpbox
 /connect_db.sh
 ```
 
+## Running integration tests
+We have [integration tests](./ci/integration_tests.py) for the most common API flows. They are written in python using pytest. They run consecutively and store some state variables in the `request.config`, which is passed from test to test - therefore, they are required to all be executed in series.
+
+These integration tests will run on every PR that builds an ephemeral environment. But, you can also run them locally!
+
+Let's get a python virtual environment with the correct version of python set up on your Mac.
+
+1. Install pyenv to help us easily control the python version. We'll use python 3.9.11. Inside of the footprint-core folder, pyenv will magically redirect the `python3` alias to run this version of python.
+```bash
+brew install pyenv
+pyenv install 3.9.11
+pyenv local 3.9.11
+```
+
+2. Now, let's make a virtual environment for the python requirements needed to run tests
+```bash
+pip3 install venv
+python3 -m venv ~/.virtualenvs/fpc
+source ~/.virtualenvs/fpc/bin/activate
+pip3 install -r ci/requirements.txt
+```
+
+3. Now, you're ready to run your integration tests locally! You can point them at either an ephemeral environment OR a server running locally. 
+```
+TEST_URL="http://localhost:8000" pytest -x ci/integration_tests.py
+```
+
 ## Accessing Logs & Metrics

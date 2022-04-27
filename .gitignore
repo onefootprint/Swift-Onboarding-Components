@@ -6,4 +6,3 @@ ci/__pycache__
 ci/venv/
 ci/*.html
 infra/Pulumi.dev-*.yaml
-.python-version
