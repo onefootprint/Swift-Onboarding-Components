@@ -1,6 +1,5 @@
 import React from 'react';
-import { Typography } from 'ui';
 
-const Root = () => <Typography>Bifrost!</Typography>;
+const Root = () => <h1>Bifrost!</h1>;
 
 export default Root;

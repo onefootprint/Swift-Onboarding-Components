@@ -1,6 +1,5 @@
 import React from 'react';
-import { Typography } from 'ui';
 
-const Web = () => <Typography>Identity Wallet</Typography>;
+const Web = () => <h1>Identity Wallet</h1>;
 
 export default Web;
