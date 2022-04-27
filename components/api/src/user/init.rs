@@ -1,9 +1,8 @@
-use crate::State;
+use crate::{State, enclave::lib::gen_keypair};
 use crate::{auth::pk_tenant::PublicTenantAuthContext, errors::ApiError};
 use crate::response::success::ApiResponseData;
 use actix_web::{post, web};
 
-use aws_sdk_kms::model::DataKeyPairSpec;
 use db::models::{types::Status, users::NewUser};
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
@@ -18,27 +17,11 @@ async fn handler(
     state: web::Data<State>,
 ) -> actix_web::Result<ApiResponseData<UserInitResponse>, ApiError> {
     // TODO, add email & phone number to request & check against existing entries
-
-    let new_key_pair = state
-        .kms_client
-        .generate_data_key_pair_without_plaintext()
-        .key_id(&state.config.enclave_root_key_id)
-        .key_pair_spec(DataKeyPairSpec::EccNistP256)
-        .send()
-        .await?;
-
-    let der_public_key = new_key_pair.public_key.unwrap().into_inner();
-    let ec_pk_uncompressed =
-        crypto::conversion::public_key_der_to_raw_uncompressed(&der_public_key)?;
-
-    let _pk = crypto::hex::encode(&ec_pk_uncompressed);
+    let (ec_pk_uncompressed, e_priv_key) = gen_keypair(&state).await?;
 
     let user = NewUser {
-        e_private_key: new_key_pair
-            .private_key_ciphertext_blob
-            .unwrap()
-            .into_inner(),
-        public_key: ec_pk_uncompressed,
+        e_private_key: e_priv_key.clone(),
+        public_key: ec_pk_uncompressed.clone(),
         id_verified: Status::Incomplete,
         is_phone_number_verified: false,
         is_email_verified: false,

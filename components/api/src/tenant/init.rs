@@ -1,4 +1,4 @@
-use crate::errors::ApiError;
+use crate::{errors::ApiError, enclave::lib::gen_keypair};
 use crate::response::success::ApiResponseData;
 use crate::State;
 use actix_web::{
@@ -21,9 +21,14 @@ async fn handler(
     state: web::Data<State>, 
     path: web::Path<String> ,
 ) ->  actix_web::Result<ApiResponseData<TenantAuthResponse>, ApiError> {
+
+    let (ec_pk_uncompressed, e_priv_key) = gen_keypair(&state).await?;
+
     let tenant = 
         db::tenant::init(&state.db_pool, NewTenant {
             name: path.into_inner(),
+            e_private_key: e_priv_key,
+            public_key: ec_pk_uncompressed,
         }).await?;
 
     Ok(ApiResponseData {

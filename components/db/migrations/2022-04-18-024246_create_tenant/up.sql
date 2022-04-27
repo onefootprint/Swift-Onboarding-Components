@@ -14,7 +14,9 @@ $$;
 
 CREATE TABLE tenants (
     id VARCHAR(250) PRIMARY KEY DEFAULT prefixed_uid('org_'),
-    name text NOT NULL
+    name text NOT NULL,
+    public_key BYTEA NOT NULL,
+    e_private_key BYTEA NOT NULL
 );
 
 CREATE TYPE User_Status as ENUM ('Verified', 'Processing', 'Incomplete', 'Failed');
@@ -66,6 +68,7 @@ CREATE TABLE tenant_api_keys (
     tenant_id VARCHAR(250) NOT NULL,
     name VARCHAR(250) NOT NULL,
     sh_api_key BYTEA NOT NULL,
+    e_api_key BYTEA NOT NULL,
     is_enabled BOOLEAN NOT NULL,
     created_at TIMESTAMP NOT NULL,
     updated_at TIMESTAMP NOT NULL

@@ -38,6 +38,8 @@ pub fn run_migrations(url: &str) -> Result<(), DbError> {
 pub async fn health_check(pool: &Pool) -> Result<Tenant, DbError> {
     let new_tenant = NewTenant {
         name: format!("Test_{}", chrono::Utc::now().timestamp()),
+        e_private_key: vec![],
+        public_key: vec![]
     };
 
     let tenant = pool

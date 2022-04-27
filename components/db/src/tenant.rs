@@ -21,10 +21,28 @@ pub async fn init(pool: &Pool, new_tenant: NewTenant) -> Result<Tenant, DbError>
     Ok(tenant)
 }
 
+pub async fn get_tenant(
+    pool: &Pool,
+    tenant_id: String
+) -> Result<Tenant, DbError> {
+    let conn = pool.get().await?;
+
+    let tenant: Tenant = conn
+        .interact(move |conn| {
+            schema::tenants::table
+                .filter(schema::tenants::id.eq(tenant_id))
+                .first(conn)
+        })
+        .await??;
+
+    Ok(tenant)
+}
+
 pub async fn api_init(
     pool: &Pool,
     tenant_api: PartialTenantApiKey,
     secret_api_key: String,
+    e_api_key: Vec<u8>,
 ) -> Result<TenantApiKey, DbError> {
     let conn = pool.get().await?;
 
@@ -40,6 +58,7 @@ pub async fn api_init(
         is_enabled: true,
         created_at: now,
         updated_at: now,
+        e_api_key: e_api_key
     };
     let tenant_api_key = conn
         .interact(move |conn| {

@@ -35,6 +35,7 @@ table! {
         tenant_id -> Varchar,
         name -> Varchar,
         sh_api_key -> Bytea,
+        e_api_key -> Bytea,
         is_enabled -> Bool,
         created_at -> Timestamp,
         updated_at -> Timestamp,
@@ -48,6 +49,8 @@ table! {
     tenants (id) {
         id -> Varchar,
         name -> Text,
+        public_key -> Bytea,
+        e_private_key -> Bytea,
     }
 }
 

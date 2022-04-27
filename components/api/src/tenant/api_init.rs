@@ -21,15 +21,23 @@ async fn handler(
     state: web::Data<State>, 
     path: web::Path<(String, String)> ,
 ) ->  Result<ApiResponseData<TenantApiInitResponse>, ApiError> {
+
     let (tenant_id, key_name) = path.into_inner();
 
     let api_key = format!("sk_{}", gen_random_alphanumeric_code(34)); 
+
+    let tenant = db::tenant::get_tenant(&state.db_pool, tenant_id.clone()).await?;
+
+    let e_api_key = crypto::seal::seal_ecies_p256_x963_sha256_aes_gcm(
+        &tenant.public_key, 
+        api_key.clone().into_bytes()
+    )?;
 
     let tenant_api_key =
         db::tenant::api_init(&state.db_pool, PartialTenantApiKey {
             tenant_id: tenant_id,
             name: key_name
-        }, api_key.clone()).await?;
+        }, api_key.clone(), e_api_key.to_vec()?).await?;
 
     Ok(ApiResponseData{
         data: TenantApiInitResponse {
