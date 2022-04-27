@@ -58,6 +58,9 @@ CREATE TABLE user_tenant_verifications (
         REFERENCES tenants(id)
 );
 
+CREATE INDEX IF NOT EXISTS user_tenant_verifications_user_id ON user_tenant_verifications(user_id);
+CREATE INDEX IF NOT EXISTS user_tenant_verifications_tenant_id ON user_tenant_verifications(tenant_id);
+
 CREATE TABLE tenant_api_keys (
     api_key_id VARCHAR(250) PRIMARY KEY DEFAULT prefixed_uid('pk_'),
     tenant_id VARCHAR(250) NOT NULL,

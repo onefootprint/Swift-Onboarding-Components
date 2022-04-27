@@ -40,8 +40,7 @@ def test_create_tenant_api_keys(request):
     request.config.cache.set("tenant_pub_key", tenant_pub_key)
 
 def test_init_user(request):
-    print(request.config.cache.get("tenant_pub_key", None))
-    path = "user/init".format()
+    path = "user/init"
     print(url(path))
     r = requests.post(url(path), headers=_tenant_auth_headers(request))
     print(r)
@@ -64,3 +63,15 @@ def test_user_patch(request):
     r = requests.patch(url(path), json=data, headers=headers)
     print(r.content)
     assert(r.status_code == 200)
+
+def test_challenge_create(request):
+    tenant_user_id = request.config.cache.get("tenant_user_id", None)
+    assert tenant_user_id, "Expected tenant_user_id to be set"
+    path = "user/{}/challenge".format(tenant_user_id)
+    print(url(path))
+    data = {"kind": "phonenumber"}
+    r = requests.post(url(path), json=data, headers=_tenant_auth_headers(request))
+    print(r)
+    assert(r.status_code == 200)  # TODO 201
+
+# TODO find a way to test challenge verify - may need to mock out sending/receiving SMS

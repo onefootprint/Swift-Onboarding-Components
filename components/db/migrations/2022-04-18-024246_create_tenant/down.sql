@@ -1,4 +1,6 @@
 DROP TABLE temp_tenant_user_tokens;
+DROP INDEX user_tenant_verifications_user_id;
+DROP INDEX user_tenant_verifications_tenant_id;
 DROP TABLE user_tenant_verifications;
 DROP FUNCTION token_expiry;
 DROP TABLE tenants;

@@ -90,6 +90,7 @@ pub async fn get_by_tenant_user_id(pool: &Pool, tenant_user_id: String, tenant_i
     Ok(user)
 }
 
+
 pub async fn get_token(pool: &Pool, auth_token: String) -> Result<TempTenantUserToken, DbError>  {
     let conn = pool.get().await?;
 

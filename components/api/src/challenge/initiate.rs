@@ -1,4 +1,4 @@
-use crate::errors::ApiError;
+use crate::{auth::pk_tenant::PublicTenantAuthContext, errors::ApiError};
 use crate::State;
 use actix_web::{
     post, web, Responder,
@@ -15,28 +15,29 @@ use aws_sdk_pinpointemail::{
 };
 use db::models::types::ChallengeKind;
 
+// TODO port onto auth
 #[derive(Debug, Clone, serde::Deserialize)]
 struct CreateChallengeRequest {
     kind: ChallengeKind,
-    tenant_pub_key: String,
 }
 
-#[post("/user/{user_id}/challenge")]
+// TODO Switch challenge APIs to use correct auth and tenant_user_id
+// TODO then switch user update to have a proper auth handler
+#[post("/user/{tenant_user_id}/challenge")]
 async fn handler(
     state: web::Data<State>,
+    pub_tenant_auth: PublicTenantAuthContext,
     path: web::Path<String>,
     request: web::Json<CreateChallengeRequest>,
 ) -> Result<impl Responder, ApiError> {
-    db::tenant::pub_auth_check(&state.db_pool, request.tenant_pub_key.clone()).await?;
-    
-    let user_id = path.into_inner();
-    tracing::info!("in challenge with user_id {}", user_id.clone());
+    let tenant_user_id = path.into_inner();
+    tracing::info!("in challenge with user_id {}", tenant_user_id.clone());
     // TODO 404 if the user isn't found
-    let user = db::user::get(&state.db_pool, user_id.clone()).await?;
+    let user = db::user::get_by_tenant_user_id(&state.db_pool, tenant_user_id, pub_tenant_auth.tenant().id.clone()).await?;
 
     tracing::info!("in challenge with user {:?}", user.clone());
 
-    db::challenge::expire_old(&state.db_pool, user_id.clone(), request.kind).await?;
+    db::challenge::expire_old(&state.db_pool, user.id.clone(), request.kind).await?;
   
     let (sh_data, e_data) = match request.kind {
         ChallengeKind::Email => (user.sh_email, user.e_email),
@@ -55,7 +56,7 @@ async fn handler(
     let decrypted_data = std::str::from_utf8(&decrypted_data)?;
 
     let (challenge, code) =
-        db::challenge::create(&state.db_pool, user_id.clone(), sh_data, request.kind).await?;
+        db::challenge::create(&state.db_pool, user.id.clone(), sh_data, request.kind).await?;
 
     // We may want to end up doing this asynchronously - these can be latent operations
     match request.kind {
