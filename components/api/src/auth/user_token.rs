@@ -1,7 +1,7 @@
 use std::pin::Pin;
 
 use actix_web::{web, FromRequest};
-use db::models::temp_tenant_user_tokens::TempTenantUserToken;
+use db::models::users::User;
 use futures_util::Future;
 
 use crate::State;
@@ -10,13 +10,13 @@ use super::AuthError;
 
 #[derive(Debug, Clone)]
 pub struct TenantUserTokenContext {
-    token: TempTenantUserToken,
+    // Can also store the TempTenantUserToken here if we need to access tenant info
+    user: User,
 }
 
 impl TenantUserTokenContext {
-    /// get tenant id for context
-    pub fn token(&self) -> &TempTenantUserToken {
-        &self.token
+    pub fn user(&self) -> &User {
+        &self.user
     }
 }
 
@@ -40,9 +40,9 @@ impl FromRequest for TenantUserTokenContext {
         let pool = req.app_data::<web::Data<State>>().unwrap().db_pool.clone();
 
         Box::pin(async move {
-            let token = db::user::get_token(&pool, auth_token?)
+            let (user, _) = db::user::get_by_token(&pool, auth_token?)
                 .await?;
-            Ok(Self { token })
+            Ok(Self { user })
         })
     }
 }

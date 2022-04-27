@@ -64,17 +64,6 @@ pub async fn update(pool: &Pool, update: UpdateUser) -> Result<usize, DbError> {
     Ok(size)
 }
 
-pub async fn get(pool: &Pool, user_id: String) -> Result<User, DbError> {
-    let conn = pool.get().await?;
-
-    let user: User = conn.interact(move |conn| {
-        schema::users::table.filter(schema::users::id.eq(user_id)).first(conn)
-    })
-    .await??;
-
-    Ok(user)
-}
-
 pub async fn get_by_tenant_user_id(pool: &Pool, tenant_user_id: String, tenant_id: String) -> Result<User, DbError> {
     let conn = pool.get().await?;
 
@@ -90,18 +79,18 @@ pub async fn get_by_tenant_user_id(pool: &Pool, tenant_user_id: String, tenant_i
     Ok(user)
 }
 
-
-pub async fn get_token(pool: &Pool, auth_token: String) -> Result<TempTenantUserToken, DbError>  {
+pub async fn get_by_token(pool: &Pool, auth_token: String) -> Result<(User, TempTenantUserToken), DbError>  {
     let conn = pool.get().await?;
 
     let hashed_token: String = sha256(auth_token.as_bytes()).encode_hex();
 
-    let token: TempTenantUserToken = conn.interact(move |conn| {
+    let (token, user): (TempTenantUserToken, User) = conn.interact(move |conn| {
         schema::temp_tenant_user_tokens::table
+            .inner_join(schema::users::table.on(schema::users::id.eq(schema::temp_tenant_user_tokens::user_id)))
             .filter(schema::temp_tenant_user_tokens::h_token.eq(hashed_token))
             .first(conn)
     })
     .await??;
 
-    Ok(token)
+    Ok((user, token))
 }

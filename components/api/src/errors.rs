@@ -48,8 +48,6 @@ pub enum ApiError {
     CannotDecodeUtf8(#[from] std::str::Utf8Error),
     #[error("user_data_not_populated")]
     UserDataNotPopulated,
-    #[error("invalid_tenant_user_auth_token")]
-    InvalidTenantUserAuthToken,
 }
 
 impl actix_web::ResponseError for ApiError {
@@ -69,7 +67,6 @@ impl actix_web::ResponseError for ApiError {
             ApiError::SendEmailError(_) => actix_web::http::StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::CannotDecodeUtf8(_) => actix_web::http::StatusCode::BAD_REQUEST,
             ApiError::UserDataNotPopulated => actix_web::http::StatusCode::BAD_REQUEST,
-            ApiError::InvalidTenantUserAuthToken => actix_web::http::StatusCode::BAD_REQUEST,
         }
     }
 

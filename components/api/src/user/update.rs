@@ -1,5 +1,4 @@
 use crate::{
-    auth::pk_tenant::PublicTenantAuthContext,
     auth::user_token::TenantUserTokenContext,
     errors::ApiError,
     response::success::ApiResponseData,
@@ -76,21 +75,10 @@ struct UserPatchResponse {
 #[patch("/user")]
 async fn handler(
     state: web::Data<State>,
-    pub_tenant_auth: PublicTenantAuthContext,
     tenant_user_token_auth: TenantUserTokenContext,
     request: web::Json<UserPatchRequest>,
 ) -> actix_web::Result<ApiResponseData<String>, ApiError> {
-    if tenant_user_token_auth.token().tenant_id != pub_tenant_auth.tenant().id {
-        // TODO this assertion feels like it should be done in an auth middleware
-        return Err(ApiError::InvalidTenantUserAuthToken)
-    }
-
-    // look up user from tenant-scoped id
-    let user = db::user::get_by_tenant_user_id(
-        &state.db_pool,
-        tenant_user_token_auth.token().tenant_user_id.clone(),
-        pub_tenant_auth.tenant().id.clone(),
-    ).await?;
+    let user = tenant_user_token_auth.user();
 
     let seal = |val: Option<Option<String>>| match val {
         None | Some(None) => None,
@@ -113,7 +101,7 @@ async fn handler(
     }
 
     let user_update = UpdateUser {
-        id: user.id,
+        id: user.id.clone(),
         e_first_name: seal(request.first_name.clone()),
         e_last_name: seal(request.last_name.clone()),
         e_dob: seal(request.dob.clone()),

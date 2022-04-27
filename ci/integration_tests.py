@@ -55,12 +55,8 @@ def test_init_user(request):
 def test_user_patch(request): 
     path = "user"
     data = {"phone_number": "+15555555555"}
-    headers = dict(
-        **_tenant_auth_headers(request),
-        **_tenant_user_token_headers(request),
-    )
     print(url(path))
-    r = requests.patch(url(path), json=data, headers=headers)
+    r = requests.patch(url(path), json=data, headers=_tenant_user_token_headers(request))
     print(r.content)
     assert(r.status_code == 200)
 
