@@ -20,6 +20,7 @@ mod enclave;
 mod index;
 mod tenant;
 mod user;
+mod response;
 
 #[derive(Clone)]
 pub struct State {

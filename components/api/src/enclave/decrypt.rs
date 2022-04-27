@@ -1,6 +1,11 @@
 use crate::errors::ApiError;
+use crate::response::success::ApiResponseData;
+
 use crate::State;
-use actix_web::{post, web, Responder};
+use actix_web::{
+    post, web
+};
+
 
 use crypto::b64::Base64Data;
 use enclave_proxy::DataTransform;
@@ -15,7 +20,7 @@ struct DataDecryptionRequest {
 async fn handler(
     state: web::Data<State>,
     request: web::Json<DataDecryptionRequest>,
-) -> Result<impl Responder, ApiError> {
+) -> Result<ApiResponseData<String>, ApiError> {
     tracing::info!("in decrypt");
     let req = request.into_inner();
 
@@ -26,5 +31,7 @@ async fn handler(
         DataTransform::Identity,
     )
     .await?;
-    Ok(std::str::from_utf8(&decrypted_result).unwrap().to_string())
+    Ok(ApiResponseData{
+        data: std::str::from_utf8(&decrypted_result).unwrap().to_string()
+    })
 }

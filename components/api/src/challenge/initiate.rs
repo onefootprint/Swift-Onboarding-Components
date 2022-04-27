@@ -1,7 +1,8 @@
 use crate::{auth::pk_tenant::PublicTenantAuthContext, errors::ApiError};
+use crate::response::success::ApiResponseData;
 use crate::State;
 use actix_web::{
-    post, web, Responder,
+    post, web
 };
 
 use aws_sdk_pinpointemail::{
@@ -29,7 +30,7 @@ async fn handler(
     pub_tenant_auth: PublicTenantAuthContext,
     path: web::Path<String>,
     request: web::Json<CreateChallengeRequest>,
-) -> Result<impl Responder, ApiError> {
+) -> Result<ApiResponseData<String>, ApiError> {
     let tenant_user_id = path.into_inner();
     tracing::info!("in challenge with user_id {}", tenant_user_id.clone());
     // TODO 404 if the user isn't found
@@ -93,5 +94,7 @@ async fn handler(
         },
     };
 
-    Ok(web::Json(challenge.id))
+    Ok(ApiResponseData{
+        data: challenge.id.to_string()}
+    )
 }

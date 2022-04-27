@@ -1,6 +1,7 @@
 use crate::State;
 use crate::{auth::pk_tenant::PublicTenantAuthContext, errors::ApiError};
-use actix_web::{post, web, Responder};
+use crate::response::success::ApiResponseData;
+use actix_web::{post, web};
 
 use aws_sdk_kms::model::DataKeyPairSpec;
 use db::models::{types::Status, users::NewUser};
@@ -15,7 +16,7 @@ struct UserInitResponse {
 async fn handler(
     pub_tenant_auth: PublicTenantAuthContext,
     state: web::Data<State>,
-) -> actix_web::Result<impl Responder, ApiError> {
+) -> actix_web::Result<ApiResponseData<UserInitResponse>, ApiError> {
     // TODO, add email & phone number to request & check against existing entries
 
     let new_key_pair = state
@@ -46,8 +47,10 @@ async fn handler(
     let (user_tenant_record, token) =
         db::user::init(&state.db_pool, user, pub_tenant_auth.tenant().id.clone()).await?;
 
-    Ok(web::Json(UserInitResponse {
-        tenant_user_id: user_tenant_record.tenant_user_id,
-        tenant_user_auth_token: token,
-    }))
+    Ok(ApiResponseData{
+        data: UserInitResponse {
+            tenant_user_id: user_tenant_record.tenant_user_id,
+            tenant_user_auth_token: token,
+        }
+    })
 }

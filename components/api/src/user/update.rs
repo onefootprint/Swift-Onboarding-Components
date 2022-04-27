@@ -2,9 +2,10 @@ use crate::{
     auth::pk_tenant::PublicTenantAuthContext,
     auth::user_token::TenantUserTokenContext,
     errors::ApiError,
+    response::success::ApiResponseData,
     State,
 };
-use actix_web::{patch, web, Responder};
+use actix_web::{patch, web};
 
 use crypto::sha256;
 use db::models::{types::Status, users::UpdateUser};
@@ -78,7 +79,7 @@ async fn handler(
     pub_tenant_auth: PublicTenantAuthContext,
     tenant_user_token_auth: TenantUserTokenContext,
     request: web::Json<UserPatchRequest>,
-) -> actix_web::Result<impl Responder, ApiError> {
+) -> actix_web::Result<ApiResponseData<String>, ApiError> {
     if tenant_user_token_auth.token().tenant_id != pub_tenant_auth.tenant().id {
         // TODO this assertion feels like it should be done in an auth middleware
         return Err(ApiError::InvalidTenantUserAuthToken)
@@ -138,5 +139,7 @@ async fn handler(
 
     let size = db::user::update(&state.db_pool, user_update).await?;
 
-    Ok(format!("Succesful update: total update size {}", size))
+    Ok(ApiResponseData{
+        data: format!("Succesful update: total update size {}", size)
+    })
 }

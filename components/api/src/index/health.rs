@@ -1,13 +1,13 @@
-use crate::errors::ApiError;
+use crate::{errors::ApiError, response::success::ApiResponseData};
 use crate::State;
 use actix_web::{
-    get, web, Responder,
+    get, web
 };
 use enclave_proxy::{EnclavePayload, RpcPayload};
 
 #[tracing::instrument(name = "health", skip(state))]
 #[get("/health")]
-async fn handler(state: web::Data<State>) -> Result<impl Responder, ApiError> {
+async fn handler(state: web::Data<State>) -> Result<ApiResponseData<String>, ApiError> {
     let enclave_health = {
         let mut conn = state.enclave_connection_pool.get().await?;
         let req = enclave_proxy::RpcRequest::new(RpcPayload::Ping("test".into()));
@@ -24,8 +24,7 @@ async fn handler(state: web::Data<State>) -> Result<impl Responder, ApiError> {
 
     let db_health = db::health_check(&state.db_pool).await?.id.to_string();
 
-    Ok(format!(
-        "Enclave: got {}\nDB: got tenant {}",
-        enclave_health, db_health
-    ))
+    Ok(ApiResponseData {
+        data: format!("Enclave: got {}\nDB: got tenant {}", enclave_health, db_health)
+    })
 }

@@ -1,12 +1,11 @@
 use crate::errors::ApiError;
 use crate::State;
 use actix_web::{
-    post, web, Responder,
+    post, web
 };
 
-use db::models::{
-    tenant_api_keys::PartialTenantApiKey,
-};
+use db::models::tenant_api_keys::PartialTenantApiKey;
+use crate::response::success::ApiResponseData;
 use crypto::random::gen_random_alphanumeric_code;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
@@ -21,7 +20,7 @@ struct TenantApiInitResponse {
 async fn handler(
     state: web::Data<State>, 
     path: web::Path<(String, String)> ,
-) ->  actix_web::Result<impl Responder, ApiError> {
+) ->  Result<ApiResponseData<TenantApiInitResponse>, ApiError> {
     let (tenant_id, key_name) = path.into_inner();
 
     let api_key = format!("sk_{}", gen_random_alphanumeric_code(34)); 
@@ -32,10 +31,12 @@ async fn handler(
             name: key_name
         }, api_key.clone()).await?;
 
-    Ok(web::Json(TenantApiInitResponse {
-        tenant_pub_key: tenant_api_key.api_key_id,
-        tenant_key_name: tenant_api_key.name,
-        tenant_id: tenant_api_key.tenant_id,
-        tenant_secret_key: api_key
-    }))
+    Ok(ApiResponseData{
+        data: TenantApiInitResponse {
+            tenant_pub_key: tenant_api_key.api_key_id,
+            tenant_key_name: tenant_api_key.name,
+            tenant_id: tenant_api_key.tenant_id,
+            tenant_secret_key: api_key
+        }
+    })
 }

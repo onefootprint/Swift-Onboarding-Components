@@ -1,7 +1,8 @@
 use crate::errors::ApiError;
+use crate::response::success::ApiResponseData;
 use crate::State;
 use actix_web::{
-    post, web, Responder,
+    post, web
 };
 
 use aws_sdk_kms::model::DataKeyPairSpec;
@@ -23,7 +24,7 @@ struct DataEncryptionResponse {
 async fn handler(
     state: web::Data<State>,
     request: web::Json<EncryptRequest>,
-) -> Result<impl Responder, ApiError> {
+) -> Result<ApiResponseData<DataEncryptionResponse>, ApiError> {
     tracing::info!("in encrypt");
 
     let new_key_pair = state
@@ -46,14 +47,16 @@ async fn handler(
         request.data.as_str().as_bytes().to_vec(),
     )?;
 
-    Ok(web::Json(DataEncryptionResponse {
-        sealed_data: sealed.to_string()?,
-        public_key: Base64Data(ec_pk_uncompressed),
-        sealed_private_key: Base64Data(
-            new_key_pair
-                .private_key_ciphertext_blob
-                .unwrap()
-                .into_inner(),
-        ),
-    }))
+    Ok(ApiResponseData{
+        data: DataEncryptionResponse {
+            sealed_data: sealed.to_string()?,
+            public_key: Base64Data(ec_pk_uncompressed),
+            sealed_private_key: Base64Data(
+                new_key_pair
+                    .private_key_ciphertext_blob
+                    .unwrap()
+                    .into_inner(),
+            ),
+        }
+    })
 }

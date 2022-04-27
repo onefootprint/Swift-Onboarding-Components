@@ -1,11 +1,12 @@
 use crate::errors::ApiError;
+use crate::response::success::ApiResponseData;
 use crate::State;
 use actix_web::{
-    post, web, Responder,
+    post, web,
 };
 
 use db::models::{
-    tenants::NewTenant,
+    tenants::{NewTenant},
 };
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
@@ -19,14 +20,16 @@ struct TenantAuthResponse {
 async fn handler(
     state: web::Data<State>, 
     path: web::Path<String> ,
-) ->  actix_web::Result<impl Responder, ApiError> {
+) ->  actix_web::Result<ApiResponseData<TenantAuthResponse>, ApiError> {
     let tenant = 
         db::tenant::init(&state.db_pool, NewTenant {
             name: path.into_inner(),
         }).await?;
 
-    Ok(web::Json(TenantAuthResponse {
-        tenant_id: tenant.id,
-        tenant_name: tenant.name
-    }))
+    Ok(ApiResponseData {
+        data: TenantAuthResponse {
+            tenant_id: tenant.id,
+            tenant_name: tenant.name
+        }
+    })
 }

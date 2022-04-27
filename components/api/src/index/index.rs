@@ -1,10 +1,13 @@
 use actix_web::{
-    get, Responder, HttpRequest, HttpResponse,
+    get, HttpRequest
 };
+use crate::response::success::ApiResponseData;
+use crate::ApiError;
+
 
 #[tracing::instrument(name = "index", skip(req))]
 #[get("/")]
-async fn handler(req: HttpRequest) -> impl Responder {
+async fn handler(req: HttpRequest) -> Result<ApiResponseData<String>, ApiError> {
     let mut headers = req
         .headers()
         .iter()
@@ -23,7 +26,9 @@ async fn handler(req: HttpRequest) -> impl Responder {
 
     let headers = headers.join("\n");
 
-    HttpResponse::Ok().body(format!("{headers}"))
+    Ok(ApiResponseData {
+        data: format!("{headers}")
+    })
 }
 
 #[tracing::instrument(name = "log_headers")]

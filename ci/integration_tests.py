@@ -27,7 +27,7 @@ def test_create_tenant(request):
     r = requests.post(url(path))
     assert(r.status_code == 200)
     # save tenant id
-    tenant_id = r.json()["tenant_id"]
+    tenant_id = r.json()["data"]["tenant_id"]
     request.config.cache.set("tenant_id", tenant_id)
 
 def test_create_tenant_api_keys(request):
@@ -36,7 +36,7 @@ def test_create_tenant_api_keys(request):
     r = requests.post(url(path))
     assert(r.status_code == 200)
     # save public api key
-    tenant_pub_key = r.json()["tenant_pub_key"]
+    tenant_pub_key = r.json()["data"]["tenant_pub_key"]
     request.config.cache.set("tenant_pub_key", tenant_pub_key)
 
 def test_init_user(request):
@@ -47,8 +47,8 @@ def test_init_user(request):
     print(r.content)
     assert(r.status_code == 200)
     # save temporary user token & user id
-    tenant_user_token = r.json()["tenant_user_auth_token"]
-    tenant_user_id = r.json()["tenant_user_id"]
+    tenant_user_token = r.json()["data"]["tenant_user_auth_token"]
+    tenant_user_id = r.json()["data"]["tenant_user_id"]
     request.config.cache.set("tenant_user_token", tenant_user_token)
     request.config.cache.set("tenant_user_id", tenant_user_id)
 

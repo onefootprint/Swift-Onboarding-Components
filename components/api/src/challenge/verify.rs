@@ -1,7 +1,8 @@
 use crate::{auth::pk_tenant::PublicTenantAuthContext, errors::ApiError};
+use crate::response::success::ApiResponseData;
 use crate::State;
 use actix_web::{
-    post, web, Responder,
+    post, web
 };
 use uuid::Uuid;
 
@@ -22,7 +23,7 @@ async fn handler(
     pub_tenant_auth: PublicTenantAuthContext,
     path: web::Path<(String, Uuid)>,
     request: web::Json<ChallengeVerificationRequest>,
-) -> Result<impl Responder, ApiError> {
+) -> Result<ApiResponseData<String>, ApiError> {
     let (tenant_user_id, challenge_id) = path.into_inner();
     tracing::info!(
         "in challenge verification with user_id {} challenge_id {}",
@@ -35,5 +36,7 @@ async fn handler(
     db::challenge::verify(&state.db_pool, challenge_id, user.id, request.into_inner().code)
         .await?;
     // TODO yield auth token in one-click flow, and probably create a new UserTenantVerification
-    Ok(web::Json("verified! one day this will have an auth token"))
+    Ok(ApiResponseData{
+        data: "verified! one day this will have an auth token".to_string()
+    })
 }

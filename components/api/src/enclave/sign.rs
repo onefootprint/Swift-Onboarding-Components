@@ -1,7 +1,8 @@
 use crate::errors::ApiError;
+use crate::response::success::ApiResponseData;
 use crate::State;
 use actix_web::{
-    post, web, Responder,
+    post, web
 };
 
 use enclave_proxy::{
@@ -24,7 +25,7 @@ struct DataEnvelopeSignatureResponse {
 async fn handler(
     state: web::Data<State>,
     request: web::Json<SignRequest>,
-) -> Result<impl Responder, ApiError> {
+) -> Result<ApiResponseData<DataEnvelopeSignatureResponse>, ApiError> {
     tracing::info!("in sign");
 
     let new_data_key = state
@@ -57,8 +58,10 @@ async fn handler(
 
     let response = HmacSignature::try_from(response)?;
 
-    Ok(web::Json(DataEnvelopeSignatureResponse {
-        hmac_sha256_signature: Base64Data(response.signature),
-        sealed_key: Base64Data(sealed_key),
-    }))
+    Ok(ApiResponseData{
+        data: DataEnvelopeSignatureResponse {
+            hmac_sha256_signature: Base64Data(response.signature),
+            sealed_key: Base64Data(sealed_key),
+        }
+    })
 }
