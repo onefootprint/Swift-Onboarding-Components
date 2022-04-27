@@ -48,10 +48,10 @@ async fn handler(
         Some(sh_data) => sh_data,
         None => return Err(ApiError::DataNotSetForUser(request.kind)),
     };
-    let e_data = e_data.ok_or_else(|| ApiError::UserDataNotPopulated)?;
+    let e_data = e_data.ok_or(ApiError::UserDataNotPopulated)?;
     tracing::info!("in challenge with e_data {:?}", e_data);
 
-    let decrypted_data = crate::enclave::lib::decrypt(&state, &e_data, user.e_private_key, enclave_proxy::DataTransform::Identity).await?;
+    let decrypted_data = crate::enclave::lib::decrypt_bytes(&state, &e_data, user.e_private_key, enclave_proxy::DataTransform::Identity).await?;
     tracing::info!("decrypted data {:?}", decrypted_data);
     let decrypted_data = std::str::from_utf8(&decrypted_data)?;
 
@@ -81,7 +81,7 @@ async fn handler(
                 .content(content)
                 .send()
                 .await?;
-            println!("output from sending email message {:?}", output)
+            log::info!("output from sending email message {:?}", output)
         },
         ChallengeKind::PhoneNumber => {
             let output = state.sms_client.send_text_message()
@@ -89,7 +89,7 @@ async fn handler(
                 .message_body(format!("Your Footprint verification code is {}. Don't share your code with anyone. We will never contact you to request this code.\n\n@onefootprint.com #{}", code, code))
                 .send()
                 .await?;
-            println!("output from sending text {:?}", output)
+            log::info!("output from sending text {:?}", output)
         },
     };
 

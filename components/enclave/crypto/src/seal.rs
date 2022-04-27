@@ -52,7 +52,6 @@ impl EciesP256Sha256AesGcmSealed {
     }
 }
 
-
 fn x963_kdf_sha256_32(shared_key: &[u8], shared_info: &[u8]) -> [u8; 32] {
     // we only need one round
     let counter: Vec<u8> = vec![0, 0, 0, 1];
@@ -64,6 +63,7 @@ fn x963_kdf_sha256_32(shared_key: &[u8], shared_info: &[u8]) -> [u8; 32] {
     output.into()
 }
 
+#[allow(clippy::module_inception)]
 pub mod seal {
     use super::*;
 
@@ -116,7 +116,7 @@ pub mod seal {
             ephemeral_public_key: ephemeral_public_key.as_ref().to_vec(),
             iv,
             ciphertext_and_tag,
-            version: EciesP256Sha256AesGcmSealed::VERSION
+            version: EciesP256Sha256AesGcmSealed::VERSION,
         })
     }
 }
@@ -140,7 +140,7 @@ pub mod unseal {
             ephemeral_public_key,
             iv,
             ciphertext_and_tag,
-            version: _
+            version: _,
         } = sealed;
 
         // init the peer public key
@@ -182,30 +182,37 @@ mod tests {
         dbg!(pk.len());
         dbg!(sk.to_be_bytes().to_vec().len());
 
+        let sk_hex = hex::encode(sk.to_be_bytes());
+        dbg!(sk_hex);
+
+        let pk_hex = hex::encode(pk.to_bytes());
+        dbg!(pk_hex);
+
         let message = b"hello world";
         let sealed =
             seal::seal_ecies_p256_x963_sha256_aes_gcm(pk.as_bytes(), message.to_vec()).unwrap();
-        dbg!(sealed.to_vec().unwrap());
+
         dbg!(sealed.ephemeral_public_key.len());
+        dbg!(sealed.to_string().unwrap());
         let unsealed =
-            unseal::unseal_ecies_p256_x963_sha256_aes_gcm(&sk.to_be_bytes(), sealed)
-                .unwrap();
+            unseal::unseal_ecies_p256_x963_sha256_aes_gcm(&sk.to_be_bytes(), sealed).unwrap();
 
         assert_eq!(unsealed.0, message.to_vec());
     }
 
     #[test]
     fn test_seal_unseal_static() {
-        // let sealed = "fp01o2NlcGuYQQQSGLMYrRjQGCIYwRhLGJwYbBjpGOUY3BjJEhj8GFYYWQcY_xjIGPIY1Bj7GPsYSBj4GN8Y1RiVGH8YVRiTExgaGH4YLhjKGGsYvBi3GJYYXBi9GOUY1xj7GIAYaRiUGEQYaxhoGJwYNBjXGFUTGBsYsBhNGFsY-w0CYml2jBgoGJ0YjxirGOgYQhhaGN8YVBioABjfYWOYGxg7GLwY5xgbGDMYnBjWGMIYawoJGEAYnhg6GJcUGGQY0BiiGOAYGBiYGOQYTRhSGDUYmA";
-        // let _pk = hex::decode("04b6b5fa75eb4d441a1aa67f7b1f38eee95e4f8c2bb7b203fba687a4c97833fecf1a6dd6ed3b3cc39f3af346df2bb0ac41037ae8b4ffcf992492a90e862353f23f").unwrap();
-        // let sk = hex::decode("85420d2c09045a9a13d5a6888026daf2b36716049be081d07faa43d4319f0ae6")
-        //     .unwrap();
+        let sealed = "pGF2AWNlcGuYQQQYwRjJGJ4YGxjmAxiBGJcY6hg9GJwY7A4YlhiZGJAYfBiQGNkYIhhxGO0Y9xj4GPIY_xg5Bxh_GPYYvxhwGD0YlxgxABjqABj2GG8RGPoYyxi2GMoGGIcYfRiLGF8GGN4YwhizGDIYyRgxGD8YvRijGDAYRxhnGJFiaXaMGK8Y_BiAFBi0GOUYMhi3GE4YYRigGD9hY5gbGOAYtRiZGIoYJBj6GIIAGIcY2hg_GJwYshjQDBgdGFEYpRiVGJEYgBi6GLMYqhjgGEUC";
 
-        // let unsealed = unseal::unseal_ecies_p256_x963_sha256_aes_gcm(
-        //     &sk,
-        //     EciesP256Sha256AesGcmSealed::from_str(sealed).unwrap(),
-        // )
-        // .unwrap();
-        // assert_eq!(unsealed.0, b"hello world".to_vec());
+        let _pk = hex::decode("0460f81c63e9bb142cc75091bf44ae979e707e0928785c84e4f936ca3e680d3c6029eb2844268aa117349277abf0c60c03dc6f1ae80530857f8438865ff5166321").unwrap();
+        let sk = hex::decode("fb9bd259890df88650a797e04e812fe5a6c60ce0377f293781ac407e6ffb90b1")
+            .unwrap();
+
+        let unsealed = unseal::unseal_ecies_p256_x963_sha256_aes_gcm(
+            &sk,
+            EciesP256Sha256AesGcmSealed::from_str(sealed).unwrap(),
+        )
+        .unwrap();
+        assert_eq!(unsealed.0, b"hello world".to_vec());
     }
 }

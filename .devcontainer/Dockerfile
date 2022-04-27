@@ -4,7 +4,7 @@ ARG VARIANT="bullseye"
 FROM mcr.microsoft.com/vscode/devcontainers/rust:1-bullseye
 
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
-    && apt-get -y install --no-install-recommends libssl-dev libpq-dev postgresql
+    && apt-get -y install --no-install-recommends curl gnupg ca-certificates libssl-dev libpq-dev postgresql
 
 RUN git config --global alias.s "status -s"
 RUN git config --global alias.pr "!git pull --rebase; git submodule update --init --recursive"
@@ -14,3 +14,6 @@ RUN curl -fsSL https://get.pulumi.com | sh
 RUN source /root/.bashrc
 
 RUN cargo install diesel_cli --no-default-features --features postgres
+
+RUN curl -L https://deb.nodesource.com/setup_16.x | bash && apt-get install -yq nodejs
+RUN npm install -g yarn

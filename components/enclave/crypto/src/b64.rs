@@ -4,13 +4,9 @@ use serde::{de, Deserialize, Deserializer, Serialize};
 
 const B64_CONFIG: base64::Config = base64::URL_SAFE_NO_PAD;
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Default, Clone, PartialEq, Eq, Hash)]
 pub struct Base64Data(pub Vec<u8>);
-impl Default for Base64Data {
-    fn default() -> Self {
-        Base64Data(Vec::default())
-    }
-}
+
 impl AsRef<[u8]> for Base64Data {
     fn as_ref(&self) -> &[u8] {
         self.0.as_slice()

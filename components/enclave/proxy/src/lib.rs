@@ -8,13 +8,15 @@ pub use rpc::Error as EnclaveError;
 use rpc::WireMessage;
 pub use rpc::{
     DataTransform, EnclavePayload, EnclaveResponse, EnvelopeDecrypt, EnvelopeHmacSign,
-    FnDecryption, KmsCredentials, RpcPayload, RpcRequest, HmacSignature
+    FnDecryption, HmacSignature, KmsCredentials, RpcPayload, RpcRequest,
 };
 
 use pool::{Stream, StreamConnection};
 
 use thiserror::Error;
 use tokio::io::AsyncWriteExt;
+
+pub type EnclaveConnectionPool = bb8::Pool<pool::StreamManager<StreamManager<Config>>>;
 
 #[cfg(feature = "vsock")]
 use tokio_vsock::VsockStream;

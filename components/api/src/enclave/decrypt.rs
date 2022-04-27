@@ -1,11 +1,9 @@
 use crate::errors::ApiError;
 use crate::State;
-use actix_web::{
-    post, web, Responder,
-};
+use actix_web::{post, web, Responder};
 
-use enclave_proxy::DataTransform;
 use crypto::b64::Base64Data;
+use enclave_proxy::DataTransform;
 
 #[derive(Debug, Clone, serde::Deserialize)]
 struct DataDecryptionRequest {
@@ -21,6 +19,12 @@ async fn handler(
     tracing::info!("in decrypt");
     let req = request.into_inner();
 
-    let decrypted_result = super::lib::decrypt(&state, &req.sealed_data.as_bytes().to_vec(), req.sealed_private_key.0, DataTransform::Identity).await?;
+    let decrypted_result = super::lib::decrypt_string(
+        &state,
+        &req.sealed_data,
+        req.sealed_private_key.0,
+        DataTransform::Identity,
+    )
+    .await?;
     Ok(std::str::from_utf8(&decrypted_result).unwrap().to_string())
 }

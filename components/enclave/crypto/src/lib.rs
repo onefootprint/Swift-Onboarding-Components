@@ -24,7 +24,7 @@ pub enum Error {
     #[error("Base64 Decoding Error")]
     Base64(#[from] base64::DecodeError),
 
-    #[error("JSON coding Error")]
+    #[error("CBOR coding Error")]
     Cbor(#[from] serde_cbor::Error),
 
     #[error("Invalid utf8")]
