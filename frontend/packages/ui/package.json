@@ -7,15 +7,28 @@
   "scripts": {
     "test": "jest --coverage",
     "test:watch": "jest --watch",
-    "lint": "eslint src --fix"
+    "lint": "eslint src --fix",
+    "storybook:dev": "start-storybook -p 6006",
+    "storybook:build": "build-storybook --no-dll"
   },
   "devDependencies": {
+    "@babel/core": "^7.17.9",
+    "@storybook/addon-actions": "^6.4.22",
+    "@storybook/addon-essentials": "^6.4.22",
+    "@storybook/addon-interactions": "^6.4.22",
+    "@storybook/addon-links": "^6.4.22",
+    "@storybook/builder-webpack5": "^6.4.22",
+    "@storybook/manager-webpack5": "^6.4.22",
+    "@storybook/react": "^6.4.22",
+    "@storybook/testing-library": "^0.0.11",
     "@types/react": "^17.0.37",
     "@types/react-dom": "^17.0.11",
+    "babel-loader": "^8.2.5",
     "config": "*",
     "react": "17.0.2",
     "react-dom": "17.0.2",
     "tsconfig": "*",
+    "webpack": "*",
     "typescript": "^4.5.3"
   }
 }
