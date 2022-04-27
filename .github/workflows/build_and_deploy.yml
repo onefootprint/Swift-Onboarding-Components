@@ -23,6 +23,11 @@ on:
         type: boolean
         default: false
         required: false
+    
+    outputs:
+        url:
+          description: "stack url"
+          value: ${{ jobs.deploy_stack.outputs.url }}
 
     secrets:
       AWS_ACCESS_KEY_ID:
@@ -106,10 +111,12 @@ jobs:
 
       # cleanup: remove keys
       - run: rm -f ../enclavekey.pem
-
+  
   deploy_stack:
     name: deploy stack
     runs-on: ubuntu-latest
+    outputs:
+      url: "https://${{ steps.constants.outputs.url }}"
     environment:
       name: ${{ inputs.environment }}
       url: "https://${{ steps.constants.outputs.url }}"
