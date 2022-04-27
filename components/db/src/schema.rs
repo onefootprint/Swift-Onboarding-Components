@@ -80,10 +80,10 @@ table! {
         e_city -> Nullable<Bytea>,
         e_state -> Nullable<Bytea>,
         e_email -> Nullable<Bytea>,
-        is_email_verified -> Nullable<Bool>,
+        is_email_verified -> Bool,
         sh_email -> Nullable<Bytea>,
         e_phone_number -> Nullable<Bytea>,
-        is_phone_number_verified -> Nullable<Bool>,
+        is_phone_number_verified -> Bool,
         sh_phone_number -> Nullable<Bytea>,
         id_verified -> User_status,
     }

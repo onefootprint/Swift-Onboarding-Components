@@ -122,12 +122,16 @@ async fn handler(
         e_city: seal(request.city.clone()),
         e_state: seal(request.state.clone()),
         e_email: seal(request.email.clone()),
-        // TODO set to false when email is provided
-        is_email_verified: None,
+        is_email_verified: match request.email {
+            Some(Some(_)) => Some(false),
+            _ => None,
+        },
         sh_email: hash(request.email.clone()),
         e_phone_number: seal(request.phone_number.clone()),
-        // TODO set to false when phone is provided
-        is_phone_number_verified: None,
+        is_phone_number_verified: match request.phone_number {
+            Some(Some(_)) => Some(false),
+            _ => None,
+        },
         sh_phone_number: hash(request.phone_number.clone()),
         id_verified: Status::Processing,
     };

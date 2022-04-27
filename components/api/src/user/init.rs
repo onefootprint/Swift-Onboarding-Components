@@ -39,6 +39,8 @@ async fn handler(
             .into_inner(),
         public_key: ec_pk_uncompressed,
         id_verified: Status::Incomplete,
+        is_phone_number_verified: false,
+        is_email_verified: false,
     };
 
     let (user_tenant_record, token) =

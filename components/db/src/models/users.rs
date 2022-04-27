@@ -18,10 +18,10 @@ pub struct User {
     pub e_city: Option<Vec<u8>>,
     pub e_state: Option<Vec<u8>>,
     pub e_email: Option<Vec<u8>>,
-    pub is_email_verified: Option<bool>,
+    pub is_email_verified: bool,
     pub sh_email: Option<Vec<u8>>,
     pub e_phone_number: Option<Vec<u8>>,
-    pub is_phone_number_verified: Option<bool>,
+    pub is_phone_number_verified: bool,
     pub sh_phone_number: Option<Vec<u8>>,
     pub id_verified: Status
 }
@@ -54,7 +54,9 @@ pub struct UpdateUser {
 pub struct NewUser {
     pub e_private_key: Vec<u8>,
     pub public_key: Vec<u8>,
-    pub id_verified: Status
+    pub id_verified: Status,
+    pub is_phone_number_verified: bool,
+    pub is_email_verified: bool,
 }
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
 #[table_name = "users"]

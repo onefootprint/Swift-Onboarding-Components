@@ -33,10 +33,10 @@ CREATE TABLE users (
     e_city BYTEA,
     e_state BYTEA,
     e_email BYTEA,
-    is_email_verified BOOLEAN,
+    is_email_verified BOOLEAN NOT NULL,
     sh_email BYTEA,
     e_phone_number BYTEA,
-    is_phone_number_verified BOOLEAN,
+    is_phone_number_verified BOOLEAN NOT NULL,
     sh_phone_number BYTEA,
     id_verified User_Status NOT NULL
 );
