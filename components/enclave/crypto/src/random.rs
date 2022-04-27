@@ -18,12 +18,12 @@ pub fn gen_rand_n_digit_code(length: usize) -> String {
 }
 
 pub fn gen_random_alphanumeric_code(length: usize) -> String {
-    let temp_token = thread_rng()
+    
+    thread_rng()
         .sample_iter(&Alphanumeric)
         .take(length)
         .map(char::from)
-        .collect();
-    temp_token
+        .collect()
 }
 
 #[cfg(test)]

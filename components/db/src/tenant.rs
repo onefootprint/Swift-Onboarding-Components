@@ -29,7 +29,7 @@ pub async fn api_init(
     let conn = pool.get().await?;
 
     // TODO, use hmac instead of sha256
-    let sh_api_key = sha256(&secret_api_key.as_bytes());
+    let sh_api_key = sha256(secret_api_key.as_bytes());
 
     let now = Utc::now().naive_utc();
 

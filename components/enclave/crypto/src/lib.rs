@@ -60,5 +60,5 @@ pub fn hmac_sha256_sign(key: &[u8], data: &[u8]) -> Result<Vec<u8>, Error> {
     mac.update(data);
     let result = mac.finalize();
     let code_bytes = result.into_bytes();
-    return Ok(code_bytes.to_vec());
+    Ok(code_bytes.to_vec())
 }

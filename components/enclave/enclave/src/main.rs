@@ -43,7 +43,7 @@ async fn listen_tcp(address: &str) -> std::io::Result<()> {
     let listener = TcpListener::bind(address).await?;
     log::info!("Listening for TCP connections at path: {address}");
 
-    while let Some((stream, _)) = listener.accept().await.ok() {
+    while let Ok((stream, _)) = listener.accept().await {
         stream_listen(stream)
     }
 

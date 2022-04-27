@@ -78,7 +78,7 @@ where
     }
 
     async fn ping(&self, stream: &mut Box<dyn Stream>) -> Result<(), Error> {
-        let request = RpcRequest::new(RpcPayload::Ping(format!("health_ping")));
+        let request = RpcRequest::new(RpcPayload::Ping("health_ping".to_string()));
         match send_rpc_request(&request, stream).await {
             Ok(EnclavePayload::Pong(_)) => Ok(()),
             Ok(_) => Err(Error::UnexpectedEnclaveResponse),

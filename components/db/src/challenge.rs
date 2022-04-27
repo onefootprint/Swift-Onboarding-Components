@@ -26,10 +26,10 @@ pub async fn create(
     let (code, h_code) = gen_code_and_hash();
 
     let new_challenge = NewChallenge {
-        user_id: user_id,
-        sh_data: sh_data,
+        user_id,
+        sh_data,
         h_code: h_code.to_vec(),
-        kind: kind,
+        kind,
         state: ChallengeState::AwaitingResponse,
     };
     let challenge = conn.interact(move |conn| {

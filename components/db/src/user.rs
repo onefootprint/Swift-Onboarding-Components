@@ -12,7 +12,7 @@ pub async fn init(pool: &Pool, user: NewUser, tenant_id: String) -> Result<(User
     let conn = pool.get().await?;
 
     let token = format!("vtok_{}", gen_random_alphanumeric_code(34));
-    let h_token = sha256(&token.as_bytes()).encode_hex();
+    let h_token = sha256(token.as_bytes()).encode_hex();
 
     let user_tenant_record =
         conn.interact(move |conn| {
@@ -36,9 +36,9 @@ pub async fn init(pool: &Pool, user: NewUser, tenant_id: String) -> Result<(User
                     
             // grant temporary credentials to tenant to modify user
             let temp_tenant_user_token = NewTempTenantUserToken {
-                h_token: h_token,
+                h_token,
                 user_id: user.id,
-                tenant_id: tenant_id,
+                tenant_id,
                 tenant_user_id: user_tenant_record.tenant_user_id.clone(),
             };
             diesel::insert_into(
@@ -78,7 +78,7 @@ pub async fn get(pool: &Pool, user_id: String) -> Result<User, DbError> {
 pub async fn lookup(pool: &Pool, auth_token: String, tenant_user_id: String) -> Result<PartialUser, DbError>  {
     let conn = pool.get().await?;
 
-    let hashed_token : String = sha256(&auth_token.as_bytes()).encode_hex();
+    let hashed_token : String = sha256(auth_token.as_bytes()).encode_hex();
 
     let tenant_user: TempTenantUserToken = conn.interact(move |conn| {
         schema::temp_tenant_user_tokens::table.filter(

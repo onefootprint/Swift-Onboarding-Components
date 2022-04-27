@@ -106,7 +106,7 @@ pub mod seal {
 
         let payload = Payload {
             msg: &message,
-            aad: &recipient_public_key,
+            aad: recipient_public_key,
         };
         let ciphertext_and_tag = cipher
             .encrypt(nonce, payload)
@@ -188,7 +188,7 @@ mod tests {
         dbg!(sealed.to_vec().unwrap());
         dbg!(sealed.ephemeral_public_key.len());
         let unsealed =
-            unseal::unseal_ecies_p256_x963_sha256_aes_gcm(&sk.to_be_bytes().to_vec(), sealed)
+            unseal::unseal_ecies_p256_x963_sha256_aes_gcm(&sk.to_be_bytes(), sealed)
                 .unwrap();
 
         assert_eq!(unsealed.0, message.to_vec());

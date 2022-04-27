@@ -58,7 +58,7 @@ mod ec_decode_helper {
         type Error = der::Error;
 
         fn try_from(bytes: &'a [u8]) -> Result<EcPrivateKeyWrapper<'a>, Self::Error> {
-            Ok(Self::from_der(bytes)?)
+            Self::from_der(bytes)
         }
     }
 
