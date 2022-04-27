@@ -2,6 +2,8 @@ import requests
 import os
 import pytest
 
+TENANT_AUTH_HEADER = "x-tenant-public-key"
+
 url = lambda path: "{}/{}".format(os.environ.get('TEST_URL'), path)
 
 def test_create_tenant(request):
@@ -24,9 +26,12 @@ def test_create_tenant_api_keys(request):
 
 def test_init_user(request):
     print(request.config.cache.get("tenant_pub_key", None))
-    path = "tenant/authz/{}/user/init".format(request.config.cache.get("tenant_pub_key", None))
+    path = "user/init".format()
     print(url(path))
-    r = requests.post(url(path))
+    headers = {
+        TENANT_AUTH_HEADER: request.config.cache.get("tenant_pub_key", None),
+    }
+    r = requests.post(url(path), headers=headers)
     print(r)
     assert(r.status_code == 200)
     # save temporary user token & user id
