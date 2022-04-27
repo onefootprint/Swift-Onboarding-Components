@@ -1,5 +1,10 @@
 import React from 'react';
+import { Typography } from 'ui';
 
-const Web = () => <h1>Hello World</h1>;
+const Root = () => (
+  <Typography variant="heading-1" color="primary">
+    Hello from Web
+  </Typography>
+);
 
-export default Web;
+export default Root;

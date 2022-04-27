@@ -8,7 +8,7 @@
     "test": "jest --coverage",
     "test:watch": "jest --watch",
     "lint": "eslint src --fix",
-    "dev": "start-storybook -p 6006",
+    "dev": "start-storybook",
     "build": "build-storybook"
   },
   "devDependencies": {
@@ -30,6 +30,7 @@
     "react-dom": "17.0.2",
     "storybook-addon-styled-component-theme": "^2.0.0",
     "styled-components": "^5.3.5",
+    "styled-reset": "^4.3.4",
     "tsconfig": "*",
     "typescript": "^4.5.3",
     "webpack": "*"

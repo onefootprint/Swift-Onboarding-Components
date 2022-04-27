@@ -32,7 +32,7 @@ const Typography = ({
     $variant={variant}
     as={variantMapping[variant]}
     data-testid={testID}
-    title={htmlTitle || undefined}
+    title={htmlTitle}
   >
     {children}
   </Text>

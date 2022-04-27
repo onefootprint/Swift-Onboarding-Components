@@ -1,5 +1,10 @@
 import React from 'react';
+import { Typography } from 'ui';
 
-const Web = () => <h1>Identity Wallet</h1>;
+const Root = () => (
+  <Typography variant="heading-1" color="primary">
+    Hello from Identity Wallet
+  </Typography>
+);
 
-export default Web;
+export default Root;
