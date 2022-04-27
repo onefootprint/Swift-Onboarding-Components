@@ -1,4 +1,9 @@
-use crate::{errors::ApiError, State};
+use crate::{
+    auth::pk_tenant::PublicTenantAuthContext,
+    auth::user_token::TenantUserTokenContext,
+    errors::ApiError,
+    State,
+};
 use actix_web::{patch, web, Responder};
 
 use crypto::sha256;
@@ -67,16 +72,24 @@ struct UserPatchResponse {
     tenant_user_id: String,
 }
 
-#[patch("/tenant/authz/{tenant_user_token}/user/{tenant_user_id}/update")]
+#[patch("/user")]
 async fn handler(
     state: web::Data<State>,
-    path: web::Path<(String, String)>,
+    pub_tenant_auth: PublicTenantAuthContext,
+    tenant_user_token_auth: TenantUserTokenContext,
     request: web::Json<UserPatchRequest>,
 ) -> actix_web::Result<impl Responder, ApiError> {
-    let (tenant_user_token, tenant_user_id) = path.into_inner();
+    if tenant_user_token_auth.token().tenant_id != pub_tenant_auth.tenant().id {
+        // TODO this assertion feels like it should be done in an auth middleware
+        return Err(ApiError::InvalidTenantUserAuthToken)
+    }
 
-    // look up real uuid from tenant scoped uuid
-    let user = db::user::lookup(&state.db_pool, tenant_user_token, tenant_user_id).await?;
+    // look up user from tenant-scoped id
+    let user = db::user::get_by_tenant_user_id(
+        &state.db_pool,
+        tenant_user_token_auth.token().tenant_user_id.clone(),
+        pub_tenant_auth.tenant().id.clone(),
+    ).await?;
 
     let seal = |val: Option<Option<String>>| match val {
         None | Some(None) => None,
@@ -109,9 +122,11 @@ async fn handler(
         e_city: seal(request.city.clone()),
         e_state: seal(request.state.clone()),
         e_email: seal(request.email.clone()),
+        // TODO set to false when email is provided
         is_email_verified: None,
         sh_email: hash(request.email.clone()),
         e_phone_number: seal(request.phone_number.clone()),
+        // TODO set to false when phone is provided
         is_phone_number_verified: None,
         sh_phone_number: hash(request.phone_number.clone()),
         id_verified: Status::Processing,

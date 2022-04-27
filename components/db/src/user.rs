@@ -75,27 +75,32 @@ pub async fn get(pool: &Pool, user_id: String) -> Result<User, DbError> {
     Ok(user)
 }
 
-pub async fn lookup(pool: &Pool, auth_token: String, tenant_user_id: String) -> Result<PartialUser, DbError>  {
+pub async fn get_by_tenant_user_id(pool: &Pool, tenant_user_id: String, tenant_id: String) -> Result<User, DbError> {
     let conn = pool.get().await?;
 
-    let hashed_token : String = sha256(auth_token.as_bytes()).encode_hex();
-
-    let tenant_user: TempTenantUserToken = conn.interact(move |conn| {
-        schema::temp_tenant_user_tokens::table.filter(
-            schema::temp_tenant_user_tokens::h_token.eq(hashed_token)).first(conn)
+    let (_, user): (UserTenantVerification, User) = conn.interact(move |conn| {
+        schema::user_tenant_verifications::table
+            .inner_join(schema::users::table.on(schema::users::id.eq(schema::user_tenant_verifications::user_id)))
+            .filter(schema::user_tenant_verifications::tenant_user_id.eq(tenant_user_id))
+            .filter(schema::user_tenant_verifications::tenant_id.eq(tenant_id))
+            .first(conn)
     })
     .await??;
 
-    if tenant_user.tenant_user_id != tenant_user_id {
-        return Err(DbError::InvalidTenantAuth())
-    }
+    Ok(user)
+}
 
-    let user = get(pool, tenant_user.user_id).await?;
+pub async fn get_token(pool: &Pool, auth_token: String) -> Result<TempTenantUserToken, DbError>  {
+    let conn = pool.get().await?;
 
-    let partial_user = PartialUser {
-        id: user.id,
-        public_key: user.public_key
-    };
+    let hashed_token: String = sha256(auth_token.as_bytes()).encode_hex();
 
-    Ok(partial_user)
+    let token: TempTenantUserToken = conn.interact(move |conn| {
+        schema::temp_tenant_user_tokens::table
+            .filter(schema::temp_tenant_user_tokens::h_token.eq(hashed_token))
+            .first(conn)
+    })
+    .await??;
+
+    Ok(token)
 }

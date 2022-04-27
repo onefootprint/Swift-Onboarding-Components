@@ -15,6 +15,7 @@ use db::errors::DbError;
 use db::models::types::{ChallengeKind};
 use thiserror::Error;
 
+// TODO map these to HTTP response codes
 #[derive(Debug, Error)]
 pub enum ApiError {
     #[error("Auth error: {0}")]
@@ -46,6 +47,8 @@ pub enum ApiError {
     CannotDecodeUtf8(#[from] std::str::Utf8Error),
     #[error("user_data_not_populated")]
     UserDataNotPopulated,
+    #[error("invalid_tenant_user_auth_token")]
+    InvalidTenantUserAuthToken,
 }
 
 impl actix_web::ResponseError for ApiError {}

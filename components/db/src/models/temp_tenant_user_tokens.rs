@@ -21,11 +21,3 @@ pub struct NewTempTenantUserToken {
     pub tenant_id: String,
     pub tenant_user_id: String
 }
-
-#[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
-#[table_name = "temp_tenant_user_tokens"]
-pub struct PartialTempTenantUserToken {
-    pub h_token: String,
-    pub tenant_id: String,
-}
-
