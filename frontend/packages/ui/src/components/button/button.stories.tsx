@@ -1,20 +1,89 @@
-import { ComponentMeta, Story } from '@storybook/react';
+import { Meta, Story } from '@storybook/react';
 import React from 'react';
 
 import Button, { ButtonProps } from './button';
 
 export default {
-  title: 'Components/Button',
   component: Button,
+  title: 'Components/Button',
   argTypes: {
-    backgroundColor: { control: 'color' },
+    children: { control: 'text' },
+    disabled: { control: 'boolean' },
+    fullWidth: { control: 'boolean' },
+    size: { control: 'select', options: ['default', 'compact'] },
+    testID: { control: 'text' },
+    type: { control: 'select', options: ['button', 'submit'] },
+    variant: { control: 'select', options: ['primary', 'secondary'] },
   },
-} as ComponentMeta<typeof Button>;
+} as Meta;
 
-const Template: Story<ButtonProps> = ({ children }: ButtonProps) => (
-  <Button>{children}</Button>
+const Template: Story<ButtonProps> = ({
+  children,
+  disabled,
+  fullWidth,
+  onPress,
+  size,
+  testID,
+  type,
+  variant,
+}: ButtonProps) => (
+  <Button
+    disabled={disabled}
+    fullWidth={fullWidth}
+    onPress={onPress}
+    size={size}
+    testID={testID}
+    type={type}
+    variant={variant}
+  >
+    {children}
+  </Button>
 );
-export const Primary = Template.bind({});
-Primary.args = {
-  children: 'This is a button',
+
+export const Base = Template.bind({});
+Base.args = {
+  children: 'Button',
+  disabled: false,
+  onPress: () => alert('I was pressed'),
+  size: 'default',
+  testID: 'button-test-id',
+  type: 'button',
+  variant: 'primary',
+};
+
+export const PrimaryDefault = Template.bind({});
+PrimaryDefault.args = {
+  children: 'Primary button',
+  variant: 'primary',
+};
+
+export const PrimaryCompact = Template.bind({});
+PrimaryCompact.args = {
+  children: 'Primary button compact',
+  size: 'compact',
+};
+
+export const SecondaryDefault = Template.bind({});
+SecondaryDefault.args = {
+  children: 'Secondary button',
+  variant: 'secondary',
+};
+
+export const SecondaryCompact = Template.bind({});
+SecondaryCompact.args = {
+  children: 'Secondary button compact',
+  variant: 'secondary',
+  size: 'compact',
+};
+
+export const FullWidth = Template.bind({});
+FullWidth.args = {
+  children: 'Lorem',
+  fullWidth: true,
+};
+
+export const Disabled = Template.bind({});
+Disabled.args = {
+  children: 'Disabled',
+  disabled: true,
 };

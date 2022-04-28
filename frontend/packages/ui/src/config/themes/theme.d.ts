@@ -5,10 +5,10 @@ import {
   ThemeBorderColors,
   ThemeBorderRadius,
   ThemeBorderWidths,
-  ThemeBoxShadows,
   ThemeBreakPoints,
   ThemeColors,
   ThemeDisable,
+  ThemeOverlay,
   ThemeSpacings,
   ThemeTypographies,
   ThemeTypography,
@@ -17,17 +17,16 @@ import {
 
 declare module 'styled-components' {
   export interface DefaultTheme {
-    illustrations: 'dark' | 'light';
-    overlay: string;
-    disable: ThemeDisable;
-    borderRadius: ThemeBorderRadius;
-    breakpoints: ThemeBreakPoints;
     backgroundColors: ThemeBackgroundsColors;
-    colors: ThemeColors;
     borderColors: ThemeBorderColors;
+    borderRadius: ThemeBorderRadius;
     borderWidths: ThemeBorderWidths;
+    breakpoints: ThemeBreakPoints;
+    colors: ThemeColors;
+    disable: ThemeDisable;
+    illustrations: 'dark' | 'light';
+    overlays: ThemeOverlay;
     spacings: ThemeSpacings;
-    boxShadows: ThemeBoxShadows;
     zIndices: ThemeZIndices;
     typographies: {
       [key in ThemeTypographies]: ThemeTypography;

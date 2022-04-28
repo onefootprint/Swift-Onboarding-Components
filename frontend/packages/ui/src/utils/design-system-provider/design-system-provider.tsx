@@ -11,7 +11,11 @@ export type BootstrapProps = {
 
 // TODO: Define
 // Ticket: https://github.com/onefootprint/frontend-monorepo/issues/25
-const GlobalStyle = createGlobalStyle``;
+const GlobalStyle = createGlobalStyle`
+  *, :after, :before {
+    box-sizing: border-box;
+  }
+`;
 
 const DesignSystemProvider = ({ children, theme }: BootstrapProps) => (
   <ThemeProvider theme={theme}>

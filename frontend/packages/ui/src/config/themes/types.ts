@@ -9,10 +9,10 @@ export type ThemeBreakPoints = {
 };
 
 export type ThemeBorderRadius = {
-  none: number;
-  round: number;
-  base: number;
-  large: number;
+  0: number;
+  1: number;
+  2: number;
+  3: number;
 };
 
 export type ThemeDisable = {
@@ -20,6 +20,7 @@ export type ThemeDisable = {
 };
 
 export type ThemeBackgroundsColors = {
+  transparent: string;
   primary: string;
   secondary: string;
   tertiary: string;
@@ -35,14 +36,15 @@ export type ThemeUIStates = {
 };
 
 export type ThemeBorderColors = {
-  none: string;
+  transparent: string;
   primary: string;
+  secondary: string;
 } & ThemeUIStates;
 
 export type ThemeBorderWidths = {
-  none: number;
-  base: number;
-  large: number;
+  0: number;
+  1: number;
+  2: number;
 };
 
 export type ThemeColors = {
@@ -55,25 +57,17 @@ export type ThemeColors = {
 } & ThemeUIStates;
 
 export type ThemeSpacings = {
-  none: number;
-  xTiny: number;
-  tiny: number;
-  xSmall: number;
-  small: number;
-  medium: number;
-  base: number;
-  large: number;
-  xLarge: number;
-  xxLarge: number;
-  xxxLarge: number;
-  xxxxLarge: number;
-};
-
-export type ThemeBoxShadows = {
-  none: string;
-  base: string;
-  dark: string;
-  darken: string;
+  0: number;
+  1: number;
+  2: number;
+  3: number;
+  4: number;
+  5: number;
+  6: number;
+  7: number;
+  8: number;
+  9: number;
+  10: number;
 };
 
 export type ThemeTypography = {
@@ -101,6 +95,17 @@ export type ThemeTypographies =
   | 'caption-1'
   | 'caption-2';
 
+export type ThemeOverlay = {
+  darken: {
+    1: string;
+    2: string;
+  };
+  lighten: {
+    1: string;
+    2: string;
+  };
+};
+
 export type ThemeZIndices = {
   bottomSheet: number;
   sticky: number;
@@ -119,17 +124,16 @@ export type BreakPoints = keyof ThemeBreakPoints;
 
 export type BackgroundsColors = keyof ThemeBackgroundsColors;
 
+export type Overlays = keyof ThemeOverlay;
+
 export type BorderWidths = keyof ThemeBorderWidths;
 
 export type BorderColors = keyof ThemeBorderColors;
-
-export type BoxShadows = keyof ThemeBoxShadows;
 
 export type ZIndices = keyof ThemeZIndices;
 
 export type DefaultTheme = {
   illustrations: 'dark' | 'light';
-  overlay: string;
   disable: ThemeDisable;
   borderRadius: ThemeBorderRadius;
   breakpoints: ThemeBreakPoints;
@@ -138,7 +142,7 @@ export type DefaultTheme = {
   borderColors: ThemeBorderColors;
   borderWidths: ThemeBorderWidths;
   spacings: ThemeSpacings;
-  boxShadows: ThemeBoxShadows;
+  overlays: ThemeOverlay;
   zIndices: ThemeZIndices;
   typographies: {
     [key in ThemeTypographies]: ThemeTypography;

@@ -8,7 +8,6 @@ export type {
   BorderColors,
   BorderRadius,
   BorderWidths,
-  BoxShadows,
   BreakPoints,
   Colors,
   Spacings,

@@ -1,15 +1,17 @@
-import { DefaultTheme } from './types';
+import { rgba } from 'polished';
+
+import { DefaultTheme } from '../types';
+import primitives from './primitives';
 
 const themeUiStates = {
-  success: '#6db59d',
-  info: '#6da7ee',
-  error: '#d9726c',
-  warning: '#fff2d9',
+  error: primitives.red500,
+  info: primitives.blue500,
+  success: primitives.green500,
+  warning: primitives.yellow700,
 };
 
-const lightTheme: DefaultTheme = {
+const theme: DefaultTheme = {
   illustrations: 'light',
-  overlay: 'rgba(0, 0, 0, 0.4)',
   breakpoints: {
     xs: '0px',
     sm: '600px',
@@ -21,56 +23,51 @@ const lightTheme: DefaultTheme = {
     opacity: 0.5,
   },
   borderRadius: {
-    none: 0,
-    round: 1000,
-    base: 8,
-    large: 16,
+    0: 0,
+    1: 6,
+    2: 24,
+    3: 1000,
   },
   backgroundColors: {
-    primary: '#161616',
-    secondary: '#212121',
-    tertiary: '#F4F6FC',
-    quaternary: '#372680',
-    quinary: '#187A2C',
+    transparent: 'transparent',
+    primary: primitives.gray0,
+    secondary: primitives.gray50,
+    tertiary: primitives.brandSleep,
+    quaternary: primitives.brandThink,
+    quinary: primitives.brandGo,
   },
   borderColors: {
-    none: 'none',
-    primary: '#404040',
+    transparent: 'transparent',
+    primary: primitives.gray150,
+    secondary: primitives.brandSleep,
     ...themeUiStates,
   },
   borderWidths: {
-    none: 0,
-    base: 1,
-    large: 2,
+    0: 0,
+    1: 1,
+    2: 2,
   },
   colors: {
-    primary: '#F4F6FC',
-    secondary: '#E8E8E8',
-    tertiary: '#CCCCCC',
-    quaternary: '#161616',
-    quinary: '#372680',
-    senary: '#187A2C',
+    primary: primitives.brandSleep,
+    secondary: primitives.gray800,
+    tertiary: primitives.gray400,
+    quaternary: primitives.gray0,
+    quinary: primitives.brandThink,
+    senary: primitives.brandGo,
     ...themeUiStates,
   },
   spacings: {
-    none: 0,
-    xTiny: 4,
-    tiny: 8,
-    xSmall: 12,
-    small: 16,
-    medium: 20,
-    base: 24,
-    large: 28,
-    xLarge: 32,
-    xxLarge: 40,
-    xxxLarge: 56,
-    xxxxLarge: 72,
-  },
-  boxShadows: {
-    none: 'none',
-    base: '0px 1px 6px rgba(0, 0, 0, 0.08)',
-    dark: '0px 1px 8px rgba(0, 0, 0, 0.14)',
-    darken: '0px 1px 10px rgba(0, 0, 0, 0.2)',
+    0: 0,
+    1: 2,
+    2: 4,
+    3: 8,
+    4: 12,
+    5: 16,
+    6: 20,
+    7: 24,
+    8: 32,
+    9: 40,
+    10: 64,
   },
   typographies: {
     'display-1': {
@@ -143,7 +140,7 @@ const lightTheme: DefaultTheme = {
       fontSize: 16,
       lineHeight: 24,
       fontFamily: 'DM Sans',
-      fontWeight: 600,
+      fontWeight: 500,
     },
     'label-3': {
       fontSize: 15,
@@ -170,6 +167,16 @@ const lightTheme: DefaultTheme = {
       fontWeight: 500,
     },
   },
+  overlays: {
+    lighten: {
+      1: rgba(primitives.gray0, 0.14),
+      2: rgba(primitives.gray0, 0.18),
+    },
+    darken: {
+      1: rgba(primitives.gray1000, 0.04),
+      2: rgba(primitives.gray1000, 0.08),
+    },
+  },
   zIndices: {
     sticky: 5,
     bottomSheet: 8,
@@ -177,4 +184,4 @@ const lightTheme: DefaultTheme = {
   },
 };
 
-export default lightTheme;
+export default theme;
