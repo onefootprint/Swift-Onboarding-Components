@@ -21,7 +21,7 @@ pub enum DbError {
     MigrationError(#[from] diesel_migrations::RunMigrationsError),
 
     #[error("invalid tenant auth")]
-    InvalidTenantAuth(),
+    InvalidTenantAuth,
 
     #[error("challenge_data_mismatch")]
     ChallengeDataMismatch,

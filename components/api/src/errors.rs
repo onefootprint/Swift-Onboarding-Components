@@ -58,6 +58,22 @@ pub enum ApiError {
     PhoneNumberValidationError
 }
 
+fn status_code_for_db_error(e: &DbError) -> actix_web::http::StatusCode {
+    match e {
+        DbError::DbInteract(_) => actix_web::http::StatusCode::INTERNAL_SERVER_ERROR,
+        DbError::DbError(_) => actix_web::http::StatusCode::INTERNAL_SERVER_ERROR,
+        DbError::PoolGet(_) => actix_web::http::StatusCode::INTERNAL_SERVER_ERROR,
+        DbError::PoolInit(_) => actix_web::http::StatusCode::INTERNAL_SERVER_ERROR,
+        DbError::ConnectionError(_) => actix_web::http::StatusCode::INTERNAL_SERVER_ERROR,
+        DbError::MigrationError(_) => actix_web::http::StatusCode::INTERNAL_SERVER_ERROR,
+        DbError::InvalidTenantAuth => actix_web::http::StatusCode::UNAUTHORIZED,
+        DbError::ChallengeDataMismatch => actix_web::http::StatusCode::BAD_REQUEST,
+        DbError::ChallengeCodeMismatch => actix_web::http::StatusCode::BAD_REQUEST,
+        DbError::ChallengeExpired => actix_web::http::StatusCode::BAD_REQUEST,
+        DbError::ChallengeInactive => actix_web::http::StatusCode::BAD_REQUEST,
+    }
+}
+
 impl actix_web::ResponseError for ApiError {
     fn status_code(&self) -> actix_web::http::StatusCode {
         match self {
@@ -70,7 +86,7 @@ impl actix_web::ResponseError for ApiError {
             ApiError::EnclaveProxy(_) => actix_web::http::StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::EnclaveConnection(_) => actix_web::http::StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::Enclave(_) => actix_web::http::StatusCode::INTERNAL_SERVER_ERROR,
-            ApiError::Database(_) => actix_web::http::StatusCode::INTERNAL_SERVER_ERROR,
+            ApiError::Database(e) => status_code_for_db_error(e),
             ApiError::Dotenv(_) => actix_web::http::StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::SendTextMessageError(_) => actix_web::http::StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::SendEmailError(_) => actix_web::http::StatusCode::INTERNAL_SERVER_ERROR,
