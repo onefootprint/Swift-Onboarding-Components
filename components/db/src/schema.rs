@@ -2,9 +2,9 @@ table! {
     use diesel::sql_types::*;
     use crate::models::types::*;
 
-    challenge (id) {
+    challenges (id) {
         id -> Uuid,
-        user_id -> Varchar,
+        user_vault_id -> Varchar,
         sh_data -> Bytea,
         h_code -> Bytea,
         kind -> Challenge_kind,
@@ -18,12 +18,25 @@ table! {
     use diesel::sql_types::*;
     use crate::models::types::*;
 
-    temp_tenant_user_tokens (h_token) {
+    onboarding_session_tokens (h_token) {
         h_token -> Varchar,
         timestamp -> Timestamp,
-        user_id -> Varchar,
+        user_vault_id -> Varchar,
         tenant_id -> Varchar,
-        tenant_user_id -> Varchar,
+        footprint_user_id -> Varchar,
+    }
+}
+
+table! {
+    use diesel::sql_types::*;
+    use crate::models::types::*;
+
+    onboardings (id) {
+        id -> Varchar,
+        tenant_id -> Varchar,
+        user_vault_id -> Varchar,
+        footprint_user_id -> Varchar,
+        status -> User_status,
     }
 }
 
@@ -59,19 +72,7 @@ table! {
     use diesel::sql_types::*;
     use crate::models::types::*;
 
-    user_tenant_verifications (tenant_user_id) {
-        tenant_user_id -> Varchar,
-        tenant_id -> Varchar,
-        user_id -> Varchar,
-        status -> User_status,
-    }
-}
-
-table! {
-    use diesel::sql_types::*;
-    use crate::models::types::*;
-
-    users (id) {
+    user_vaults (id) {
         id -> Varchar,
         e_private_key -> Bytea,
         public_key -> Bytea,
@@ -93,14 +94,13 @@ table! {
     }
 }
 
-joinable!(challenge -> users (user_id));
-joinable!(temp_tenant_user_tokens -> user_tenant_verifications (tenant_user_id));
+joinable!(challenges -> user_vaults (user_vault_id));
 
 allow_tables_to_appear_in_same_query!(
-    challenge,
-    temp_tenant_user_tokens,
+    challenges,
+    onboarding_session_tokens,
+    onboardings,
     tenant_api_keys,
     tenants,
-    user_tenant_verifications,
-    users,
+    user_vaults,
 );

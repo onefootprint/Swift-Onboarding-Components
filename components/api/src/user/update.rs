@@ -1,5 +1,5 @@
 use crate::{
-    auth::user_token::TenantUserTokenContext,
+    auth::onboarding_token::OnboardingSessionTokenContext,
     errors::ApiError,
     response::success::ApiResponseData,
     State,
@@ -7,10 +7,16 @@ use crate::{
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 
 use crypto::sha256;
-use db::models::{types::Status, users::UpdateUser};
+use db::models::{types::Status, user_vaults::UpdateUserVault};
 
 #[derive(Debug, Clone, serde::Deserialize, Apiv2Schema)]
 struct UserPatchRequest {
+    /// Key-value pairs of fields to update for the user
+    /// (all optional). Patch can be preformed in batch 
+    /// or all at once. *All fields are optional* & do 
+    /// not have to be represented in the request
+    /// for example {"email_address": "test@test.com"}
+    /// is a valid UserPatchRequest
     #[serde(
         default,
         skip_serializing_if = "Option::is_none",
@@ -67,19 +73,15 @@ struct UserPatchRequest {
     phone_number: Option<Option<String>>,
 }
 
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Apiv2Schema)]
-struct UserPatchResponse {
-    tenant_user_id: String,
-}
 
 #[api_v2_operation]
-#[post("/user")]
+#[post("/data")]
 async fn handler(
     state: web::Data<State>,
-    tenant_user_token_auth: TenantUserTokenContext,
+    onboarding_token_auth: OnboardingSessionTokenContext,
     request: web::Json<UserPatchRequest>,
 ) -> actix_web::Result<Json<ApiResponseData<String>>, ApiError> {
-    let user = tenant_user_token_auth.user();
+    let user = onboarding_token_auth.user_vault();
 
     let seal = |val: Option<Option<String>>| match val {
         None | Some(None) => None,
@@ -100,6 +102,7 @@ async fn handler(
             Some(Some(s)) => Some(sha256(s.as_bytes()).to_vec()),
         }
     }
+    
     let validated_phone_number = match &request.phone_number {
         Some(Some(phone_number)) => {
             let req = aws_sdk_pinpoint::model::NumberValidateRequest::builder().phone_number(phone_number).build();
@@ -113,7 +116,7 @@ async fn handler(
         _ => request.phone_number.clone(),
     };
 
-    let user_update = UpdateUser {
+    let user_update = UpdateUserVault {
         id: user.id.clone(),
         e_first_name: seal(request.first_name.clone()),
         e_last_name: seal(request.last_name.clone()),
@@ -138,7 +141,7 @@ async fn handler(
         id_verified: Status::Processing,
     };
 
-    let size = db::user::update(&state.db_pool, user_update).await?;
+    let size = db::user_vault::update(&state.db_pool, user_update).await?;
 
     Ok(Json(ApiResponseData {
         data: format!("Succesful update: total update size {}", size),

@@ -1,6 +1,6 @@
 use crate::response::success::ApiResponseData;
 use crate::State;
-use crate::{auth::pk_tenant::PublicTenantAuthContext, errors::ApiError};
+use crate::{auth::client_public_key::PublicTenantAuthContext, errors::ApiError};
 use actix_web::{post, web};
 
 use aws_sdk_pinpointemail::model::{
@@ -34,7 +34,7 @@ async fn handler(
     let tenant_user_id = path.into_inner();
     tracing::info!("in challenge with user_id {}", tenant_user_id.clone());
     // TODO 404 if the user isn't found
-    let user = db::user::get_by_tenant_user_id(
+    let user = db::user_vault::get_by_tenant_user_id(
         &state.db_pool,
         tenant_user_id,
         pub_tenant_auth.tenant().id.clone(),

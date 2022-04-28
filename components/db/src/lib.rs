@@ -57,4 +57,5 @@ pub async fn health_check(pool: &Pool) -> Result<Tenant, DbError> {
 
 pub mod challenge;
 pub mod tenant;
-pub mod user;
+pub mod user_vault;
+pub mod onboarding;

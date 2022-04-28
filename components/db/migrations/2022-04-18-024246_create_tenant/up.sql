@@ -21,7 +21,7 @@ CREATE TABLE tenants (
 
 CREATE TYPE User_Status as ENUM ('Verified', 'Processing', 'Incomplete', 'Failed');
 
-CREATE TABLE users (
+CREATE TABLE user_vaults (
     id VARCHAR(250) PRIMARY KEY DEFAULT prefixed_uid('uv_'),  
     e_private_key BYTEA NOT NULL,
     public_key BYTEA NOT NULL,
@@ -43,25 +43,26 @@ CREATE TABLE users (
     id_verified User_Status NOT NULL
 );
 
-CREATE INDEX IF NOT EXISTS users_sh_ssn ON users(sh_ssn);
-CREATE INDEX IF NOT EXISTS users_sh_phone_number ON users(sh_phone_number);
-CREATE INDEX IF NOT EXISTS users_sh_email ON users(sh_email);
+CREATE INDEX IF NOT EXISTS user_vaults_sh_ssn ON user_vaults(sh_ssn);
+CREATE INDEX IF NOT EXISTS user_vaults_sh_phone_number ON user_vaults(sh_phone_number);
+CREATE INDEX IF NOT EXISTS user_vaults_sh_email ON user_vaults(sh_email);
 
-CREATE TABLE user_tenant_verifications (
-    tenant_user_id VARCHAR(250) PRIMARY KEY DEFAULT prefixed_uid('org_uv_'),
+CREATE TABLE onboardings (
+    id VARCHAR(250) PRIMARY KEY DEFAULT prefixed_uid('ob_'),
     tenant_id VARCHAR(250) NOT NULL,
-    user_id VARCHAR(250) NOT NULL,
+    user_vault_id VARCHAR(250) NOT NULL,
+    footprint_user_id VARCHAR(250) UNIQUE NOT NULL DEFAULT prefixed_uid('fp_id_'),
     status User_Status NOT NULL,
     CONSTRAINT fk_user
-        FOREIGN KEY(user_id) 
-        REFERENCES users(id),
+        FOREIGN KEY(user_vault_id) 
+        REFERENCES user_vaults(id),
     CONSTRAINT fk_tenant
         FOREIGN KEY(tenant_id)
         REFERENCES tenants(id)
 );
 
-CREATE INDEX IF NOT EXISTS user_tenant_verifications_user_id ON user_tenant_verifications(user_id);
-CREATE INDEX IF NOT EXISTS user_tenant_verifications_tenant_id ON user_tenant_verifications(tenant_id);
+CREATE INDEX IF NOT EXISTS onboardings_fp_id ON onboardings(footprint_user_id);
+CREATE INDEX IF NOT EXISTS onboardings_tenant_id ON onboardings(tenant_id);
 
 CREATE TABLE tenant_api_keys (
     api_key_id VARCHAR(250) PRIMARY KEY DEFAULT prefixed_uid('pk_'),
@@ -74,32 +75,32 @@ CREATE TABLE tenant_api_keys (
     updated_at TIMESTAMP NOT NULL
 );
 
-CREATE TABLE temp_tenant_user_tokens (
+CREATE TABLE onboarding_session_tokens (
     h_token VARCHAR(250) PRIMARY KEY NOT NULL,
     timestamp timestamp NOT NULL DEFAULT NOW(),
-    user_id VARCHAR(250) NOT NULL,
+    user_vault_id VARCHAR(250) NOT NULL,
     tenant_id VARCHAR(250) NOT NULL,
-    tenant_user_id VARCHAR(250) NOT NULL, 
+    footprint_user_id VARCHAR(250) NOT NULL, 
     CONSTRAINT fk_user
-        FOREIGN KEY(user_id) 
-        REFERENCES users(id),
+        FOREIGN KEY(user_vault_id) 
+        REFERENCES user_vaults(id),
     CONSTRAINT fk_tenant
         FOREIGN KEY(tenant_id)
         REFERENCES tenants(id),
     CONSTRAINT fk_tenant_user_id
-        FOREIGN KEY(tenant_user_id)
-        REFERENCES user_tenant_verifications(tenant_user_id)
+        FOREIGN KEY(footprint_user_id)
+        REFERENCES onboardings(footprint_user_id)
 );
 
 CREATE FUNCTION token_expiry() RETURNS trigger
     LANGUAGE plpgsql
     AS $$
         BEGIN
-            DELETE FROM temp_tenant_user_tokens WHERE timestamp < NOW() - INTERVAL '4 hours';
+            DELETE FROM onboarding_session_tokens WHERE timestamp < NOW() - INTERVAL '4 hours';
              RETURN NEW;
         END;
     $$;
 
-CREATE TRIGGER expire_temp_tenant_user_token
-    AFTER INSERT ON temp_tenant_user_tokens
+CREATE TRIGGER expire_onboarding_token
+    AFTER INSERT ON onboarding_session_tokens
     EXECUTE PROCEDURE token_expiry();

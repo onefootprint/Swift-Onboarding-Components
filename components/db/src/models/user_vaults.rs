@@ -1,11 +1,11 @@
-use crate::schema::users;
+use crate::schema::user_vaults;
 use crate::models::types::Status;
 use diesel::{Insertable, Queryable};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable, Identifiable)]
-#[table_name = "users"]
-pub struct User {
+#[table_name = "user_vaults"]
+pub struct UserVault {
     pub id: String,
     pub e_private_key: Vec<u8>,
     pub public_key: Vec<u8>,
@@ -29,8 +29,8 @@ pub struct User {
 
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable, AsChangeset)]
-#[table_name = "users"]
-pub struct UpdateUser {
+#[table_name = "user_vaults"]
+pub struct UpdateUserVault {
     pub id: String,
     pub e_first_name: Option<Vec<u8>>,
     pub e_last_name: Option<Vec<u8>>,
@@ -50,8 +50,8 @@ pub struct UpdateUser {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
-#[table_name = "users"]
-pub struct NewUser {
+#[table_name = "user_vaults"]
+pub struct NewUserVault {
     pub e_private_key: Vec<u8>,
     pub public_key: Vec<u8>,
     pub id_verified: Status,
@@ -59,8 +59,8 @@ pub struct NewUser {
     pub is_email_verified: bool,
 }
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
-#[table_name = "users"]
-pub struct PartialUser {
+#[table_name = "user_vaults"]
+pub struct PartialUserVault {
     pub id: String,
     pub public_key: Vec<u8>,
 }

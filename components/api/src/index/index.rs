@@ -2,7 +2,6 @@ use crate::response::success::ApiResponseData;
 use crate::ApiError;
 use actix_web::HttpRequest;
 
-use actix_web::{HttpResponse, Responder};
 use paperclip::actix::{api_v2_operation, get};
 
 #[api_v2_operation]

@@ -1,8 +1,8 @@
 use crate::schema;
 use diesel::prelude::*;
 use deadpool_diesel::postgres::Pool;
-use crate::models::users::{User};
-use crate::models::challenge::{Challenge, NewChallenge};
+use crate::models::user_vaults::{UserVault};
+use crate::models::challenges::{Challenge, NewChallenge};
 use crate::models::types::{ChallengeKind, ChallengeState};
 use crate::errors::DbError;
 use uuid::Uuid;
@@ -16,7 +16,7 @@ fn gen_code_and_hash() -> (String, [u8; 32]) {
 
 pub async fn create(
     pool: &Pool,
-    user_id: String,
+    user_vault_id: String,
     sh_data: Vec<u8>,
     kind: ChallengeKind,
 ) -> Result<(Challenge, String), DbError> {
@@ -26,7 +26,7 @@ pub async fn create(
     let (code, h_code) = gen_code_and_hash();
 
     let new_challenge = NewChallenge {
-        user_id,
+        user_vault_id,
         sh_data,
         h_code: h_code.to_vec(),
         kind,
@@ -34,7 +34,7 @@ pub async fn create(
         expires_at: (chrono::Utc::now() + chrono::Duration::minutes(10)).naive_utc(),
     };
     let challenge = conn.interact(move |conn| {
-        diesel::insert_into(schema::challenge::table)
+        diesel::insert_into(schema::challenges::table)
             .values(&new_challenge)
             .get_result::<Challenge>(conn)
     })
@@ -43,15 +43,15 @@ pub async fn create(
     Ok((challenge, code))
 }
 
-pub async fn expire_old(pool: &Pool, user_id: String, kind: ChallengeKind) -> Result<usize, DbError> {
+pub async fn expire_old(pool: &Pool, user_vault_id: String, kind: ChallengeKind) -> Result<usize, DbError> {
     let conn = pool.get().await?;
 
     let num_updates = conn.interact(move |conn| {
-        diesel::update(schema::challenge::table
-            .filter(schema::challenge::user_id.eq(user_id))
-            .filter(schema::challenge::kind.eq(kind)))
-            .filter(schema::challenge::state.eq(ChallengeState::AwaitingResponse))
-            .set(schema::challenge::state.eq(ChallengeState::Expired))
+        diesel::update(schema::challenges::table
+            .filter(schema::challenges::user_vault_id.eq(user_vault_id))
+            .filter(schema::challenges::kind.eq(kind)))
+            .filter(schema::challenges::state.eq(ChallengeState::AwaitingResponse))
+            .set(schema::challenges::state.eq(ChallengeState::Expired))
             .execute(conn)
         })
         .await??;
@@ -62,7 +62,7 @@ pub async fn expire_old(pool: &Pool, user_id: String, kind: ChallengeKind) -> Re
 pub async fn verify(
     pool: &Pool,
     challenge_id: Uuid,
-    user_id: String,
+    user_vault_id: String,
     code: String,
 ) -> Result<(), DbError> {
     let conn = pool.get().await?;
@@ -70,9 +70,9 @@ pub async fn verify(
     // TODO write unit tests
     conn.interact(move |conn| {
         conn.build_transaction().run(|| {
-            let challenge: Challenge = schema::challenge::table
-                .filter(schema::challenge::id.eq(challenge_id))
-                .filter(schema::challenge::user_id.eq(&user_id))
+            let challenge: Challenge = schema::challenges::table
+                .filter(schema::challenges::id.eq(challenge_id))
+                .filter(schema::challenges::user_vault_id.eq(&user_vault_id))
                 .for_no_key_update()
                 .first(conn)?;
             if (challenge.expires_at - chrono::Utc::now().naive_utc()) < chrono::Duration::seconds(0) {
@@ -81,13 +81,13 @@ pub async fn verify(
             if challenge.state != ChallengeState::AwaitingResponse {
                 return Err(DbError::ChallengeInactive);
             }
-            let user: User = schema::users::table
-                .filter(schema::users::id.eq(&user_id))
+            let user_vault: UserVault = schema::user_vaults::table
+                .filter(schema::user_vaults::id.eq(&user_vault_id))
                 .for_no_key_update()
                 .first(conn)?;
             let expected_sh_data = match challenge.kind {
-                ChallengeKind::PhoneNumber => &user.sh_phone_number,
-                ChallengeKind::Email => &user.sh_email,
+                ChallengeKind::PhoneNumber => &user_vault.sh_phone_number,
+                ChallengeKind::Email => &user_vault.sh_email,
             };
             let expected_sh_data = match expected_sh_data {
                 Some(expected_sh_data) => expected_sh_data,
@@ -103,20 +103,20 @@ pub async fn verify(
             // The code matches, and the sh_data on the challenge matches the user. Mark the challenge as validated
             diesel::update(&challenge)
                 .set((
-                    schema::challenge::state.eq(ChallengeState::Validated),
-                    schema::challenge::validated_at.eq(diesel::dsl::now),
+                    schema::challenges::state.eq(ChallengeState::Validated),
+                    schema::challenges::validated_at.eq(diesel::dsl::now),
                 ))
                 .execute(conn)?;
             // Mark the piece of data on the user validated
             match challenge.kind {
                 ChallengeKind::PhoneNumber => {
-                    diesel::update(&user)
-                        .set(schema::users::is_phone_number_verified.eq(true))
+                    diesel::update(&user_vault)
+                        .set(schema::user_vaults::is_phone_number_verified.eq(true))
                         .execute(conn)?;
                 }
                 ChallengeKind::Email => {
-                    diesel::update(&user)
-                        .set(schema::users::is_email_verified.eq(true))
+                    diesel::update(&user_vault)
+                        .set(schema::user_vaults::is_email_verified.eq(true))
                         .execute(conn)?;
                 }
             }

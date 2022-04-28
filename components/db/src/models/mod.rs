@@ -1,7 +1,7 @@
-pub mod challenge;
+pub mod challenges;
 pub mod tenants;
 pub mod types;
-pub mod users;
-pub mod user_tenant_verifications;
+pub mod user_vaults;
+pub mod onboardings;
 pub mod tenant_api_keys;
-pub mod temp_tenant_user_tokens;
+pub mod onboarding_session_tokens;

@@ -6,19 +6,21 @@ use crypto::random::gen_random_alphanumeric_code;
 use db::models::tenant_api_keys::PartialTenantApiKey;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Apiv2Schema)]
-struct TenantApiInitResponse {
-    tenant_pub_key: String,
-    tenant_key_name: String,
-    tenant_secret_key: String,
-    tenant_id: String,
+struct ClientApiInitResponse {
+    /// Public key used to identify client
+    client_public_key: String,
+    /// Secret key, not yet used
+    client_secret_key: String,
+    /// Name of this keypair, i.e. "keypair-dev" or "keypair-prod"
+    client_keypair_name: String,
 }
 
 #[api_v2_operation]
-#[post("/tenant/{tenant_id}/api-key/init/{key_name}")]
+#[post("/client/{client_id}/api-key/init/{key_name}")]
 async fn handler(
     state: web::Data<State>,
     path: web::Path<(String, String)>,
-) -> Result<Json<ApiResponseData<TenantApiInitResponse>>, ApiError> {
+) -> Result<Json<ApiResponseData<ClientApiInitResponse>>, ApiError> {
     let (tenant_id, key_name) = path.into_inner();
 
     let api_key = format!("sk_{}", gen_random_alphanumeric_code(34));
@@ -42,11 +44,10 @@ async fn handler(
     .await?;
 
     Ok(Json(ApiResponseData {
-        data: TenantApiInitResponse {
-            tenant_pub_key: tenant_api_key.api_key_id,
-            tenant_key_name: tenant_api_key.name,
-            tenant_id: tenant_api_key.tenant_id,
-            tenant_secret_key: api_key,
+        data: ClientApiInitResponse {
+            client_public_key: tenant_api_key.api_key_id,
+            client_keypair_name: tenant_api_key.name,
+            client_secret_key: api_key,
         },
     }))
 }

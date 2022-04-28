@@ -1,4 +1,4 @@
-use crate::schema::challenge;
+use crate::schema::challenges;
 use crate::models::types::{ChallengeKind, ChallengeState};
 use chrono::NaiveDateTime;
 use diesel::{Insertable, Queryable};
@@ -9,10 +9,10 @@ use uuid::Uuid;
 // TODO add expires_at
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable, Identifiable)]
-#[table_name = "challenge"]
+#[table_name = "challenges"]
 pub struct Challenge {
     pub id: Uuid,
-    pub user_id: String,
+    pub user_vault_id: String,
     pub sh_data: Vec<u8>,
     pub h_code: Vec<u8>,
     pub kind: ChallengeKind,
@@ -22,9 +22,9 @@ pub struct Challenge {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
-#[table_name = "challenge"]
+#[table_name = "challenges"]
 pub struct NewChallenge {
-    pub user_id: String,
+    pub user_vault_id: String,
     pub sh_data: Vec<u8>,
     pub h_code: Vec<u8>,
     pub kind: ChallengeKind,

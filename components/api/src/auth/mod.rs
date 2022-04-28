@@ -1,13 +1,13 @@
 use thiserror::Error;
-pub mod pk_tenant;
-pub mod user_token;
+pub mod client_public_key;
+pub mod onboarding_token;
 
 #[derive(Debug, Error)]
 pub enum AuthError {
-    #[error("unknown tenant")]
-    UnknownTenant,
-    #[error("missing tenant auth header")]
-    MissingTenantAuthHeader,
-    #[error("missing tenant auth header")]
-    MissingTenantUserTokenAuthHeader,
+    #[error("Unkown client")]
+    UnknownClient,
+    #[error("missing X-Client-Public-Key")]
+    MissingClientAuthHeader,
+    #[error("missing X-Onboarding-Session-Token")]
+    MissingOnboardingSessionToken,
 }

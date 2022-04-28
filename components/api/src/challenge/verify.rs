@@ -1,4 +1,4 @@
-use crate::{auth::pk_tenant::PublicTenantAuthContext, errors::ApiError};
+use crate::{auth::client_public_key::PublicTenantAuthContext, errors::ApiError};
 use crate::response::success::ApiResponseData;
 use crate::State;
 use actix_web::{
@@ -27,7 +27,7 @@ async fn handler(
     );
 
     let request = request;
-    let user = db::user::get_by_tenant_user_id(&state.db_pool, tenant_user_id, pub_tenant_auth.tenant().id.clone()).await?;
+    let user = db::user_vault::get_by_tenant_user_id(&state.db_pool, tenant_user_id, pub_tenant_auth.tenant().id.clone()).await?;
     db::challenge::verify(&state.db_pool, challenge_id, user.id, request.into_inner().code)
         .await?;
     // TODO yield auth token in one-click flow, and probably create a new UserTenantVerification

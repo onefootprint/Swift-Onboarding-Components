@@ -21,7 +21,7 @@ pub struct PublicTenantAuthContext {
 }
 
 impl PublicTenantAuthContext {
-    /// get tenant id for context
+    // get tenant id for context
     pub fn tenant(&self) -> &Tenant {
         &self.tenant
     }
@@ -42,14 +42,14 @@ impl FromRequest for PublicTenantAuthContext {
             .headers()
             .get(HEADER_NAME)
             .and_then(|hv| hv.to_str().map(|s| s.to_string()).ok())
-            .ok_or(AuthError::MissingTenantAuthHeader);
+            .ok_or(AuthError::MissingClientAuthHeader);
 
         let pool = req.app_data::<web::Data<State>>().unwrap().db_pool.clone();
 
         Box::pin(async move {
             let tenant = db::tenant::pub_auth(&pool, tenant_pk?)
                 .await?
-                .ok_or(AuthError::UnknownTenant)?;
+                .ok_or(AuthError::UnknownClient)?;
             Ok(Self { tenant })
         })
     }

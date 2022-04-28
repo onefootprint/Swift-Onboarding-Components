@@ -1,9 +1,9 @@
 CREATE TYPE challenge_kind as ENUM ('PhoneNumber', 'Email');
 CREATE TYPE challenge_state as ENUM ('AwaitingResponse', 'Expired', 'Validated');
 
-CREATE TABLE challenge (
+CREATE TABLE challenges (
     id uuid NOT NULL PRIMARY KEY DEFAULT uuid_generate_v4(),
-    user_id VARCHAR(250) NOT NULL,
+    user_vault_id VARCHAR(250) NOT NULL,
     sh_data BYTEA NOT NULL,
     h_code BYTEA NOT NULL,
     kind challenge_kind NOT NULL,
@@ -11,7 +11,7 @@ CREATE TABLE challenge (
     expires_at timestamp NOT NULL,
     validated_at timestamp,
     CONSTRAINT challenge_user_id_fk
-      FOREIGN KEY(user_id) REFERENCES users(id)
+      FOREIGN KEY(user_vault_id) REFERENCES user_vaults(id)
 );
 
-CREATE INDEX IF NOT EXISTS challenge_user_id ON challenge(user_id);
+CREATE INDEX IF NOT EXISTS challenge_user_vault_id ON challenges(user_vault_id);
