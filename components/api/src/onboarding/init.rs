@@ -45,7 +45,7 @@ async fn handler(
         is_email_verified: false,
     };
 
-    let token  =
+    let (_, token) =
         db::user_vault::init(&state.db_pool, user, pub_tenant_auth.tenant().id.clone()).await?;
 
     Ok(Json(ApiResponseData {

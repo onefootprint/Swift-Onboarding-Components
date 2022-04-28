@@ -8,13 +8,13 @@ use crate::models::user_vaults::*;
 use crate::errors::DbError;
 use crypto::{sha256, random::gen_random_alphanumeric_code, hex::ToHex};
 
-pub async fn init(pool: &Pool, user: NewUserVault, tenant_id: String) -> Result<String, DbError> {
+pub async fn init(pool: &Pool, user: NewUserVault, tenant_id: String) -> Result<(Onboarding, String), DbError> {
     let conn = pool.get().await?;
 
     let token = format!("vtok_{}", gen_random_alphanumeric_code(34));
     let h_token = sha256(token.as_bytes()).encode_hex();
 
-    let _ =
+    let onboarding =
         conn.interact(move |conn| {
             conn.build_transaction().run(|| -> Result<Onboarding, DbError> {
             // initialize new user vault
@@ -48,8 +48,8 @@ pub async fn init(pool: &Pool, user: NewUserVault, tenant_id: String) -> Result<
 
             Ok(onboarding)
     })}).await??;
-    // Return tenant-scoped user id
-    Ok(token)
+    // Return onboarding_session_token
+    Ok((onboarding, token))
 }
 
 pub async fn update(pool: &Pool, update: UpdateUserVault) -> Result<usize, DbError> {

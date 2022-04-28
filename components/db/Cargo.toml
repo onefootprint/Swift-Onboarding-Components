@@ -22,3 +22,4 @@ chrono = { version = "0.4", features = ["serde"] }
 rand = { version = "0.8 "}
 thiserror = "1.0"   
 crypto = { path = "../enclave/crypto" }
+actix-rt = "*"

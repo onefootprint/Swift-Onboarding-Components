@@ -59,3 +59,4 @@ pub mod challenge;
 pub mod tenant;
 pub mod user_vault;
 pub mod onboarding;
+pub mod test;
