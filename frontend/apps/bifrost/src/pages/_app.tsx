@@ -1,5 +1,5 @@
 import React from 'react';
-import { themes, DesignSystemProvider } from 'ui';
+import { DesignSystemProvider, themes } from 'ui';
 
 type AppProps = {
   Component: React.FC;

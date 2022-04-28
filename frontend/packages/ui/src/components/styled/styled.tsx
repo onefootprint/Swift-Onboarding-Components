@@ -1,4 +1,5 @@
 import * as baseStyled from 'styled-components';
+
 import type { DefaultTheme } from '../../config/themes/types';
 
 export const {

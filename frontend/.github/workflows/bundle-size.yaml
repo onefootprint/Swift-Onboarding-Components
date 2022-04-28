@@ -1,4 +1,4 @@
-name: Bundle size
+name: Bundle size check
 
 on: [pull_request]
 

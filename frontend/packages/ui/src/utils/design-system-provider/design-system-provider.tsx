@@ -1,6 +1,7 @@
 import React from 'react';
 import { Reset } from 'styled-reset';
-import { ThemeProvider, createGlobalStyle } from '../../components/styled';
+
+import { createGlobalStyle, ThemeProvider } from '../../components/styled';
 import type { DefaultTheme } from '../../config/themes/types';
 
 export type BootstrapProps = {

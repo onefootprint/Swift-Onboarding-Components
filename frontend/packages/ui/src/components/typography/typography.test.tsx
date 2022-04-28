@@ -1,5 +1,6 @@
 import React from 'react';
 import { customRender, screen } from 'test-utils';
+
 import Typography from './typography';
 
 describe('<Typography />', () => {

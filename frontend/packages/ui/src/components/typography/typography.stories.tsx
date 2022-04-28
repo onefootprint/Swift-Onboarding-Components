@@ -1,8 +1,9 @@
+import { Meta, Story } from '@storybook/react';
 import React from 'react';
-import { Story, Meta } from '@storybook/react';
+
+import light from '../../config/themes/light';
 import Typography, { TypographyProps } from './typography';
 import variantMapping from './typography.constants';
-import light from '../../config/themes/light';
 
 export default {
   title: 'Components/Typography',

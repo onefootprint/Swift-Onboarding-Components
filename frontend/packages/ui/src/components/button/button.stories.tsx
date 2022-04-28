@@ -1,5 +1,5 @@
+import { ComponentMeta, Story } from '@storybook/react';
 import React from 'react';
-import { Story, ComponentMeta } from '@storybook/react';
 
 import Button, { ButtonProps } from './button';
 

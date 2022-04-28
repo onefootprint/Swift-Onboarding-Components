@@ -3,6 +3,9 @@ module.exports = {
     browser: true,
     node: true,
   },
+  parserOptions: {
+    sourceType: 'module',
+  },
   extends: [
     'next',
     'airbnb',
@@ -11,7 +14,7 @@ module.exports = {
     'plugin:import/typescript',
     'prettier',
   ],
-  plugins: ['@typescript-eslint', 'import'],
+  plugins: ['@typescript-eslint', 'simple-import-sort', 'import'],
   settings: {
     next: {
       rootDir: ['apps/*/', 'packages/*/'],
@@ -46,6 +49,11 @@ module.exports = {
         devDependencies: true,
       },
     ],
+    'simple-import-sort/imports': 'error',
+    'simple-import-sort/exports': 'error',
+    'import/first': 'error',
+    'import/newline-after-import': 'error',
+    'import/no-duplicates': 'error',
     '@next/next/no-html-link-for-pages': 'off',
   },
   overrides: [
