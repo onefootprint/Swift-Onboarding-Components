@@ -20,9 +20,7 @@ opentelemetry = { version = "0.17", features = [
 ] }
 tracing-opentelemetry = "0.17"
 tracing = "0.1.30"
-tracing-actix-web = { version = "0.5.1", features = [
-    "opentelemetry_0_17",
-] }
+tracing-actix-web = { version = "0.5.1", features = ["opentelemetry_0_17"] }
 tracing-subscriber = { version = "0.3", features = [
     "json",
     "registry",
@@ -57,3 +55,8 @@ deadpool-diesel = { version = "0.3.1", features = [
 anyhow = { version = "1.0" }
 serde_with = { version = "1.0" }
 actix-cors = "0.6"
+paperclip = { version = "0.7.0", features = [
+    "actix4",
+    "swagger-ui",
+    "actix4-validator",
+] }

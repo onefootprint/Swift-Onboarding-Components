@@ -1,10 +1,9 @@
 use crate::{errors::ApiError, response::success::ApiResponseData};
 use crate::State;
-use actix_web::{
-    get, web
-};
 use enclave_proxy::{EnclavePayload, RpcPayload};
+use paperclip::actix::{api_v2_operation, get, web};
 
+#[api_v2_operation]
 #[tracing::instrument(name = "health", skip(state))]
 #[get("/health")]
 async fn handler(state: web::Data<State>) -> Result<ApiResponseData<String>, ApiError> {

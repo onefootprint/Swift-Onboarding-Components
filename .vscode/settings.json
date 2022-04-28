@@ -3,6 +3,7 @@
     "terminal.integrated.localEchoLatencyThreshold": 0,
     "cSpell.words": [
         "actix",
+        "Apiv",
         "awsx",
         "envconfig",
         "pulumi",
@@ -11,4 +12,8 @@
         "vsock"
     ],
     "rust-analyzer.checkOnSave.command": "clippy",
+    "[rust]": {
+        "editor.defaultFormatter": "matklad.rust-analyzer",
+        "editor.semanticHighlighting.enabled": true
+    },
 }

@@ -3,12 +3,19 @@ use std::pin::Pin;
 use actix_web::{web, FromRequest};
 use db::models::users::User;
 use futures_util::Future;
+use paperclip::actix::Apiv2Security;
 
 use crate::State;
 
 use super::AuthError;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Apiv2Security)]
+#[openapi(
+    apiKey,
+    in = "header",
+    name = "X-Tenant-User-Token",
+    description = "The user vault token"
+)]
 pub struct TenantUserTokenContext {
     // Can also store the TempTenantUserToken here if we need to access tenant info
     user: User,

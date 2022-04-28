@@ -1,40 +1,40 @@
-use crate::{errors::ApiError, enclave::lib::gen_keypair};
 use crate::response::success::ApiResponseData;
 use crate::State;
-use actix_web::{
-    post, web,
-};
+use crate::{enclave::lib::gen_keypair, errors::ApiError};
 
-use db::models::{
-    tenants::{NewTenant},
-};
+use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+use db::models::tenants::NewTenant;
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Apiv2Schema)]
 struct TenantAuthResponse {
     tenant_id: String,
     tenant_name: String,
 }
 
+#[api_v2_operation]
 // TODO -- this endpoint will be private in prod
 #[post("/tenant/init/{name}")]
 async fn handler(
-    state: web::Data<State>, 
-    path: web::Path<String> ,
-) ->  actix_web::Result<ApiResponseData<TenantAuthResponse>, ApiError> {
-
+    state: web::Data<State>,
+    path: web::Path<String>,
+) -> actix_web::Result<Json<ApiResponseData<TenantAuthResponse>>, ApiError> {
     let (ec_pk_uncompressed, e_priv_key) = gen_keypair(&state).await?;
 
-    let tenant = 
-        db::tenant::init(&state.db_pool, NewTenant {
+    let tenant = db::tenant::init(
+        &state.db_pool,
+        NewTenant {
             name: path.into_inner(),
             e_private_key: e_priv_key,
             public_key: ec_pk_uncompressed,
-        }).await?;
+        },
+    )
+    .await?;
 
-    Ok(ApiResponseData {
+    Ok(Json(ApiResponseData {
         data: TenantAuthResponse {
             tenant_id: tenant.id,
-            tenant_name: tenant.name
-        }
-    })
+            tenant_name: tenant.name,
+        },
+    }))
 }

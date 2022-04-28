@@ -1,26 +1,23 @@
 use crate::errors::ApiError;
 use crate::response::success::ApiResponseData;
 use crate::State;
-use actix_web::{
-    post, web
-};
+use paperclip::actix::{api_v2_operation, post, web, Apiv2Schema};
 
-use enclave_proxy::{
-    EnvelopeHmacSign, HmacSignature, KmsCredentials, RpcPayload,
-};
-use crypto::{b64::Base64Data};
+use crypto::b64::Base64Data;
+use enclave_proxy::{EnvelopeHmacSign, HmacSignature, KmsCredentials, RpcPayload};
 
-#[derive(Debug, Clone, serde::Deserialize)]
+#[derive(Debug, Clone, serde::Deserialize, Apiv2Schema)]
 struct SignRequest {
     data: String,
 }
 
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Apiv2Schema)]
 struct DataEnvelopeSignatureResponse {
-    hmac_sha256_signature: Base64Data,
-    sealed_key: Base64Data,
+    hmac_sha256_signature: String,
+    sealed_key: String,
 }
 
+#[api_v2_operation]
 #[post("/sign")]
 async fn handler(
     state: web::Data<State>,
@@ -58,10 +55,10 @@ async fn handler(
 
     let response = HmacSignature::try_from(response)?;
 
-    Ok(ApiResponseData{
+    Ok(ApiResponseData {
         data: DataEnvelopeSignatureResponse {
-            hmac_sha256_signature: Base64Data(response.signature),
-            sealed_key: Base64Data(sealed_key),
-        }
+            hmac_sha256_signature: Base64Data(response.signature).to_string(),
+            sealed_key: Base64Data(sealed_key).to_string(),
+        },
     })
 }

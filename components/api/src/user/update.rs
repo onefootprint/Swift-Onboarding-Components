@@ -4,12 +4,12 @@ use crate::{
     response::success::ApiResponseData,
     State,
 };
-use actix_web::{patch, web};
+use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 
 use crypto::sha256;
 use db::models::{types::Status, users::UpdateUser};
 
-#[derive(Debug, Clone, serde::Deserialize)]
+#[derive(Debug, Clone, serde::Deserialize, Apiv2Schema)]
 struct UserPatchRequest {
     #[serde(
         default,
@@ -67,17 +67,18 @@ struct UserPatchRequest {
     phone_number: Option<Option<String>>,
 }
 
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Apiv2Schema)]
 struct UserPatchResponse {
     tenant_user_id: String,
 }
 
-#[patch("/user")]
+#[api_v2_operation]
+#[post("/user")]
 async fn handler(
     state: web::Data<State>,
     tenant_user_token_auth: TenantUserTokenContext,
     request: web::Json<UserPatchRequest>,
-) -> actix_web::Result<ApiResponseData<String>, ApiError> {
+) -> actix_web::Result<Json<ApiResponseData<String>>, ApiError> {
     let user = tenant_user_token_auth.user();
 
     let seal = |val: Option<Option<String>>| match val {
@@ -139,7 +140,7 @@ async fn handler(
 
     let size = db::user::update(&state.db_pool, user_update).await?;
 
-    Ok(ApiResponseData{
-        data: format!("Succesful update: total update size {}", size)
-    })
+    Ok(Json(ApiResponseData {
+        data: format!("Succesful update: total update size {}", size),
+    }))
 }

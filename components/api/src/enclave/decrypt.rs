@@ -1,21 +1,21 @@
+use std::str::FromStr;
+
 use crate::errors::ApiError;
 use crate::response::success::ApiResponseData;
 
 use crate::State;
-use actix_web::{
-    post, web
-};
-
 
 use crypto::b64::Base64Data;
 use enclave_proxy::DataTransform;
+use paperclip::actix::{api_v2_operation, post, web, Apiv2Schema};
 
-#[derive(Debug, Clone, serde::Deserialize)]
+#[derive(Debug, Clone, Apiv2Schema, serde::Serialize, serde::Deserialize)]
 struct DataDecryptionRequest {
     sealed_data: String,
-    sealed_private_key: Base64Data,
+    sealed_private_key: String,
 }
 
+#[api_v2_operation]
 #[post("/decrypt")]
 async fn handler(
     state: web::Data<State>,
@@ -23,11 +23,13 @@ async fn handler(
 ) -> Result<ApiResponseData<String>, ApiError> {
     tracing::info!("in decrypt");
     let req = request.into_inner();
+    let sealed_private_key =
+        Base64Data::from_str(&req.sealed_private_key).map_err(crypto::Error::from)?;
 
     let decrypted_result = super::lib::decrypt_string(
         &state,
         &req.sealed_data,
-        req.sealed_private_key.0,
+        sealed_private_key.0,
         DataTransform::Identity,
     )
     .await?;

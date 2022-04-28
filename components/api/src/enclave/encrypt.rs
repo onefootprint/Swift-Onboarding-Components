@@ -1,25 +1,24 @@
 use crate::errors::ApiError;
 use crate::response::success::ApiResponseData;
 use crate::State;
-use actix_web::{
-    post, web
-};
+use paperclip::actix::{api_v2_operation, post, web, Apiv2Schema};
 
 use aws_sdk_kms::model::DataKeyPairSpec;
-use crypto::{b64::Base64Data};
+use crypto::b64::Base64Data;
 
-#[derive(Debug, Clone, serde::Deserialize)]
+#[derive(Debug, Apiv2Schema, Clone, serde::Serialize, serde::Deserialize)]
 struct EncryptRequest {
     data: String,
 }
 
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Apiv2Schema)]
 struct DataEncryptionResponse {
     sealed_data: String,
-    public_key: Base64Data,
-    sealed_private_key: Base64Data,
+    public_key: String,
+    sealed_private_key: String,
 }
 
+#[api_v2_operation]
 #[post("/encrypt")]
 async fn handler(
     state: web::Data<State>,
@@ -47,16 +46,17 @@ async fn handler(
         request.data.as_str().as_bytes().to_vec(),
     )?;
 
-    Ok(ApiResponseData{
+    Ok(ApiResponseData {
         data: DataEncryptionResponse {
             sealed_data: sealed.to_string()?,
-            public_key: Base64Data(ec_pk_uncompressed),
+            public_key: Base64Data(ec_pk_uncompressed).to_string(),
             sealed_private_key: Base64Data(
                 new_key_pair
                     .private_key_ciphertext_blob
                     .unwrap()
                     .into_inner(),
-            ),
-        }
+            )
+            .to_string(),
+        },
     })
 }

@@ -1,4 +1,4 @@
-use actix_web::{middleware::Logger, web, App, HttpServer};
+use actix_web::{middleware::Logger, App, HttpServer};
 use actix_web_opentelemetry::RequestMetrics;
 use config::Config;
 use db::DbPool;
@@ -18,9 +18,11 @@ mod auth;
 mod challenge;
 mod enclave;
 mod index;
+mod response;
 mod tenant;
 mod user;
-mod response;
+
+use paperclip::actix::{web, OpenApiExt};
 
 #[derive(Clone)]
 pub struct State {
@@ -88,6 +90,7 @@ async fn main() -> std::io::Result<()> {
                 origin.as_bytes().ends_with(b".footprint.dev")
                     || origin.as_bytes().ends_with(b".onefootprint.com")
             })
+            .allowed_origin("http://localhost:8000")
             .allowed_methods(vec!["GET", "POST", "PATCH", "PUT"])
             .max_age(3600);
 
@@ -97,6 +100,7 @@ async fn main() -> std::io::Result<()> {
             .wrap(TracingLogger::<TelemetrySpanBuilder>::new())
             .wrap(metrics.clone())
             .wrap(cors)
+            .wrap_api()
             .service(index::index::handler)
             .service(index::health::handler)
             .service(enclave::encrypt::handler)
@@ -106,8 +110,11 @@ async fn main() -> std::io::Result<()> {
             .service(tenant::api_init::handler)
             .service(user::init::handler)
             .service(user::update::handler)
-            .service(challenge::initiate::handler)
-            .service(challenge::verify::handler)
+            // .service(challenge::initiate::handler)
+            // .service(challenge::verify::handler)
+            .with_json_spec_at("/open-api/spec")
+            .with_swagger_ui_at("/open-api/swagger")
+            .build()
     })
     .bind(("0.0.0.0", config.port))?
     .run()

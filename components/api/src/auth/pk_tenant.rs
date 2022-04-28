@@ -3,12 +3,19 @@ use std::pin::Pin;
 use actix_web::{web, FromRequest};
 use db::models::tenants::Tenant;
 use futures_util::Future;
+use paperclip::actix::Apiv2Security;
 
 use crate::State;
 
 use super::AuthError;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Apiv2Security)]
+#[openapi(
+    apiKey,
+    in = "header",
+    name = "X-Client-Public-Key",
+    description = "The client's publishable key"
+)]
 pub struct PublicTenantAuthContext {
     tenant: Tenant,
 }
@@ -20,7 +27,7 @@ impl PublicTenantAuthContext {
     }
 }
 
-const HEADER_NAME: &str = "X-Tenant-Public-Key";
+const HEADER_NAME: &str = "X-Client-Public-Key";
 
 impl FromRequest for PublicTenantAuthContext {
     type Error = crate::ApiError;

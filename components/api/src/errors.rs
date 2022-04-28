@@ -1,22 +1,15 @@
+use actix_web::http::StatusCode;
 use aws_sdk_kms::{
     error::{GenerateDataKeyPairWithoutPlaintextError, GenerateDataKeyWithoutPlaintextError},
     types::SdkError as KmsSdkError,
 };
-use aws_sdk_pinpointsmsvoicev2::{
-    error::SendTextMessageError,
-    types::SdkError as SmsSdkError,
-};
-use aws_sdk_pinpointemail::{
-    error::SendEmailError,
-    types::SdkError as EmailSdkError,
-};
-use aws_sdk_pinpoint::{
-    error::PhoneNumberValidateError,
-    types::SdkError as PinpointSdkError,
-};
-use enclave_proxy::bb8;
+use aws_sdk_pinpoint::{error::PhoneNumberValidateError, types::SdkError as PinpointSdkError};
+use aws_sdk_pinpointemail::{error::SendEmailError, types::SdkError as EmailSdkError};
+use aws_sdk_pinpointsmsvoicev2::{error::SendTextMessageError, types::SdkError as SmsSdkError};
 use db::errors::DbError;
-use db::models::types::{ChallengeKind};
+use db::models::types::ChallengeKind;
+use enclave_proxy::bb8;
+use paperclip::v2::schema::Apiv2Errors;
 use thiserror::Error;
 
 use crate::response::error::{ApiResponseError, ApiResponseErrorInfo};
@@ -55,7 +48,7 @@ pub enum ApiError {
     #[error("user_data_not_populated")]
     UserDataNotPopulated,
     #[error("phone_number_validation_error")]
-    PhoneNumberValidationError
+    PhoneNumberValidationError,
 }
 
 fn status_code_for_db_error(e: &DbError) -> actix_web::http::StatusCode {
@@ -81,7 +74,9 @@ impl actix_web::ResponseError for ApiError {
             ApiError::DataNotSetForUser(_) => actix_web::http::StatusCode::BAD_REQUEST,
             ApiError::KmsKeyPair(_) => actix_web::http::StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::KmsDataKey(_) => actix_web::http::StatusCode::INTERNAL_SERVER_ERROR,
-            ApiError::PinpointPhoneNumberValidateError(_) => actix_web::http::StatusCode::INTERNAL_SERVER_ERROR,
+            ApiError::PinpointPhoneNumberValidateError(_) => {
+                actix_web::http::StatusCode::INTERNAL_SERVER_ERROR
+            }
             ApiError::Crypto(_) => actix_web::http::StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::EnclaveProxy(_) => actix_web::http::StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::EnclaveConnection(_) => actix_web::http::StatusCode::INTERNAL_SERVER_ERROR,
@@ -101,7 +96,9 @@ impl actix_web::ResponseError for ApiError {
             error: ApiResponseErrorInfo {
                 status_code: self.status_code().as_u16(),
                 message: self.to_string(),
-        }};
+            },
+        };
         actix_web::HttpResponse::build(self.status_code()).json(response)
     }
 }
+impl Apiv2Errors for ApiError {}
