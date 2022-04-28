@@ -31,4 +31,7 @@ pub enum DbError {
 
     #[error("challenge_expired")]
     ChallengeExpired,
+
+    #[error("challenge_inactive")]
+    ChallengeInactive,
 }

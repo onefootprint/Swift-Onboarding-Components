@@ -34,6 +34,7 @@ def test_create_tenant_api_keys(request):
     test_api_key_name = "integration_test_api_key"
     path = "tenant/{}/api-key/init/{}".format(request.config.cache.get("tenant_id", None), test_api_key_name)
     r = requests.post(url(path))
+    print(r.content)
     assert(r.status_code == 200)
     # save public api key
     tenant_pub_key = r.json()["data"]["tenant_pub_key"]

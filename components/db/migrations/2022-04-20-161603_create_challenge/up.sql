@@ -8,6 +8,7 @@ CREATE TABLE challenge (
     h_code BYTEA NOT NULL,
     kind challenge_kind NOT NULL,
     state challenge_state NOT NULL,
+    expires_at timestamp NOT NULL,
     validated_at timestamp,
     CONSTRAINT challenge_user_id_fk
       FOREIGN KEY(user_id) REFERENCES users(id)

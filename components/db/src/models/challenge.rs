@@ -17,6 +17,7 @@ pub struct Challenge {
     pub h_code: Vec<u8>,
     pub kind: ChallengeKind,
     pub state: ChallengeState,
+    pub expires_at: NaiveDateTime,
     pub validated_at: Option<NaiveDateTime>,
 }
 
@@ -28,4 +29,5 @@ pub struct NewChallenge {
     pub h_code: Vec<u8>,
     pub kind: ChallengeKind,
     pub state: ChallengeState,
+    pub expires_at: NaiveDateTime,
 }

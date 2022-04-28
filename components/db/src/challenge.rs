@@ -31,6 +31,7 @@ pub async fn create(
         h_code: h_code.to_vec(),
         kind,
         state: ChallengeState::AwaitingResponse,
+        expires_at: (chrono::Utc::now() + chrono::Duration::minutes(10)).naive_utc(),
     };
     let challenge = conn.interact(move |conn| {
         diesel::insert_into(schema::challenge::table)
@@ -74,8 +75,11 @@ pub async fn verify(
                 .filter(schema::challenge::user_id.eq(&user_id))
                 .for_no_key_update()
                 .first(conn)?;
-            if challenge.state != ChallengeState::AwaitingResponse {
+            if (challenge.expires_at - chrono::Utc::now().naive_utc()) < chrono::Duration::seconds(0) {
                 return Err(DbError::ChallengeExpired);
+            }
+            if challenge.state != ChallengeState::AwaitingResponse {
+                return Err(DbError::ChallengeInactive);
             }
             let user: User = schema::users::table
                 .filter(schema::users::id.eq(&user_id))
@@ -98,8 +102,10 @@ pub async fn verify(
             }
             // The code matches, and the sh_data on the challenge matches the user. Mark the challenge as validated
             diesel::update(&challenge)
-                .set(schema::challenge::state.eq(ChallengeState::Validated))
-                // challenge::validated_at.eq(Some(chrono::offset::Utc::now())),
+                .set((
+                    schema::challenge::state.eq(ChallengeState::Validated),
+                    schema::challenge::validated_at.eq(diesel::dsl::now),
+                ))
                 .execute(conn)?;
             // Mark the piece of data on the user validated
             match challenge.kind {

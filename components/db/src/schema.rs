@@ -9,6 +9,7 @@ table! {
         h_code -> Bytea,
         kind -> Challenge_kind,
         state -> Challenge_state,
+        expires_at -> Timestamp,
         validated_at -> Nullable<Timestamp>,
     }
 }
