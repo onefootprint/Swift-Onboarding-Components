@@ -49,6 +49,8 @@ const Container = styled.button<{
   variant: 'primary' | 'secondary';
   fullWidth?: boolean;
 }>`
+  border: 0;
+
   ${({ theme, variant }) => css`
     background-color: ${theme.backgroundColors[backgroundColors[variant]]};
     border-radius: ${theme.borderRadius[1]}px;
