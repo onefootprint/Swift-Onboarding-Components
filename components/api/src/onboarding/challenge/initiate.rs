@@ -1,10 +1,7 @@
 use crate::response::success::ApiResponseData;
 use crate::State;
-use crate::{
-    auth::onboarding_token::OnboardingSessionTokenContext,
-    errors::ApiError,
-};
-use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
+use crate::{auth::onboarding_token::OnboardingSessionTokenContext, errors::ApiError};
+use paperclip::actix::{api_v2_operation, web, web::Json, Apiv2Schema};
 
 use aws_sdk_pinpointemail::model::{
     Body as EmailBody, Content as EmailStringContent, Destination as EmailDestination,
@@ -20,20 +17,19 @@ enum ChallengeKind {
 }
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
-struct CreateChallengeRequest {
+pub struct CreateChallengeRequest {
     kind: ChallengeKind,
 }
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Serialize)]
-struct CreateChallengeResponse {
+pub struct CreateChallengeResponse {
     id: Uuid,
 }
 
 // TODO Switch challenge APIs to use correct auth and tenant_user_id
 // TODO then switch user update to have a proper auth handler
 #[api_v2_operation]
-#[post("/init")]
-async fn handler(
+pub async fn handler(
     state: web::Data<State>,
     onboarding_token_auth: OnboardingSessionTokenContext,
     request: Json<CreateChallengeRequest>,
@@ -41,8 +37,16 @@ async fn handler(
     let user_vault = onboarding_token_auth.user_vault();
 
     let (db_kind, sh_data, e_data) = match request.kind {
-        ChallengeKind::Email => (db::models::types::ChallengeKind::Email, user_vault.sh_email.clone(), user_vault.e_email.clone()),
-        ChallengeKind::Sms => (db::models::types::ChallengeKind::PhoneNumber, user_vault.sh_phone_number.clone(), user_vault.e_phone_number.clone()),
+        ChallengeKind::Email => (
+            db::models::types::ChallengeKind::Email,
+            user_vault.sh_email.clone(),
+            user_vault.e_email.clone(),
+        ),
+        ChallengeKind::Sms => (
+            db::models::types::ChallengeKind::PhoneNumber,
+            user_vault.sh_phone_number.clone(),
+            user_vault.e_phone_number.clone(),
+        ),
     };
 
     db::challenge::expire_old(&state.db_pool, user_vault.id.clone(), db_kind).await?;
@@ -105,9 +109,7 @@ async fn handler(
         }
     };
 
-    Ok(Json(ApiResponseData{
-        data: CreateChallengeResponse{
-            id: challenge.id,
-        },
+    Ok(Json(ApiResponseData {
+        data: CreateChallengeResponse { id: challenge.id },
     }))
 }

@@ -1,20 +1,19 @@
 use crate::response::success::ApiResponseData;
 use crate::State;
 use crate::{auth::client_public_key::PublicTenantAuthContext, errors::ApiError};
-use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
+use paperclip::actix::{api_v2_operation, web, web::Json, Apiv2Schema};
 
 use aws_sdk_kms::model::DataKeyPairSpec;
-use db::models::{types::Status, user_vaults::{NewUserVault}};
+use db::models::{types::Status, user_vaults::NewUserVault};
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Apiv2Schema)]
-struct OnboardingResponse {
+pub struct OnboardingResponse {
     /// Temporary session token that grants access to modify user vault
     onboarding_session_token: String,
 }
 
 #[api_v2_operation]
-#[post("/init")]
-async fn handler(
+pub async fn handler(
     pub_tenant_auth: PublicTenantAuthContext,
     state: web::Data<State>,
 ) -> actix_web::Result<Json<ApiResponseData<OnboardingResponse>>, ApiError> {

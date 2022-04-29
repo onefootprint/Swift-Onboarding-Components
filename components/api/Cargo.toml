@@ -62,3 +62,4 @@ paperclip = { version = "0.7.0", features = [
     "actix4-validator",
     "uuid",
 ] }
+mime = "0.3.16"

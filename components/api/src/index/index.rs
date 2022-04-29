@@ -1,12 +1,12 @@
 use crate::ApiError;
 use actix_web::HttpRequest;
 
-use paperclip::actix::{api_v2_operation, get, web::Json};
+use paperclip::actix::{api_v2_operation, get};
 
 #[api_v2_operation]
 #[tracing::instrument(name = "index", skip(req))]
 #[get("/")]
-async fn handler(req: HttpRequest) -> Result<Json<String>, ApiError> {
+async fn handler(req: HttpRequest) -> Result<String, ApiError> {
     let mut headers = req
         .headers()
         .iter()
@@ -25,7 +25,7 @@ async fn handler(req: HttpRequest) -> Result<Json<String>, ApiError> {
 
     let headers = headers.join("\n");
 
-    Ok(Json(headers))
+    Ok(headers)
 }
 
 #[tracing::instrument(name = "log_headers")]

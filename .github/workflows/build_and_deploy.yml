@@ -23,11 +23,11 @@ on:
         type: boolean
         default: false
         required: false
-    
+
     outputs:
-        url:
-          description: "stack url"
-          value: ${{ jobs.deploy_stack.outputs.url }}
+      url:
+        description: "stack url"
+        value: ${{ jobs.deploy_stack.outputs.url }}
 
     secrets:
       AWS_ACCESS_KEY_ID:
@@ -53,8 +53,12 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Rust Cache
-        uses: Swatinem/rust-cache@v1.3.0
+      - name: Cache docker cargo cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            /var/lib/docker/volumes/cargo-cache
+          key: ${{ runner.os }}-cargo-cache-docker
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -114,7 +118,7 @@ jobs:
 
       # cleanup: remove keys
       - run: rm -f ../enclavekey.pem
-  
+
   deploy_stack:
     name: deploy stack
     runs-on: ubuntu-latest
@@ -186,7 +190,7 @@ jobs:
         working-directory: infra
         run: |
           pulumi config set restoreSnapshotFromClusterNamed "db-${{ inputs.baseStackName }}"
-      
+
       # bring up the stack
       - uses: pulumi/actions@v3
         with:

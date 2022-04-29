@@ -1,3 +1,4 @@
+use actix_web::error::JsonPayloadError;
 use aws_sdk_kms::{
     error::{GenerateDataKeyPairWithoutPlaintextError, GenerateDataKeyWithoutPlaintextError},
     types::SdkError as KmsSdkError,
@@ -47,6 +48,8 @@ pub enum ApiError {
     UserDataNotPopulated,
     #[error("phone_number_validation_error")]
     PhoneNumberValidationError,
+    #[error("Json body invalid: {0}")]
+    InvalidJsonBody(JsonPayloadError),
 }
 
 fn status_code_for_db_error(e: &DbError) -> actix_web::http::StatusCode {
@@ -87,6 +90,7 @@ impl actix_web::ResponseError for ApiError {
             ApiError::CannotDecodeUtf8(_) => actix_web::http::StatusCode::BAD_REQUEST,
             ApiError::UserDataNotPopulated => actix_web::http::StatusCode::BAD_REQUEST,
             ApiError::PhoneNumberValidationError => actix_web::http::StatusCode::BAD_REQUEST,
+            ApiError::InvalidJsonBody(_) => actix_web::http::StatusCode::BAD_REQUEST,
         }
     }
 

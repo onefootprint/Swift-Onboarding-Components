@@ -15,11 +15,11 @@ use crate::errors::ApiError;
 // TODO put IAM roles and permissions in pulumi
 
 mod auth;
+mod client;
 mod enclave;
 mod index;
-mod response;
-mod client;
 mod onboarding;
+mod response;
 
 use paperclip::actix::{web, OpenApiExt};
 
@@ -93,30 +93,33 @@ async fn main() -> std::io::Result<()> {
             .allowed_methods(vec!["GET", "POST", "PATCH", "PUT"])
             .max_age(3600);
 
+        // custom `Json` extractor configuration
+        let json_cfg = web::JsonConfig::default()
+            // limit request payload size
+            .limit(16_384)
+            // accept any content type
+            .content_type(|_| true)
+            // use custom error handler
+            .error_handler(|err, _req| actix_web::Error::from(ApiError::InvalidJsonBody(err)));
+
         App::new()
             .app_data(web::Data::new(state.clone()))
-            .wrap(actix_web::middleware::NormalizePath::default())
+            .wrap(actix_web::middleware::NormalizePath::trim())
             .wrap(Logger::default())
             .wrap(TracingLogger::<TelemetrySpanBuilder>::new())
             .wrap(metrics.clone())
             .wrap(cors)
+            .app_data(json_cfg)
             .wrap_api()
-            .service(web::scope("/private")
-                .service(client::init::handler)
-                .service(client::api_init::handler)
-                .service(enclave::encrypt::handler)
-                .service(enclave::decrypt::handler)
-                .service(enclave::sign::handler)
+            .service(
+                web::scope("/private")
+                    .service(client::init::handler)
+                    .service(client::api_init::handler)
+                    .service(enclave::encrypt::handler)
+                    .service(enclave::decrypt::handler)
+                    .service(enclave::sign::handler),
             )
-            .service(web::scope("/onboarding")
-                .service(onboarding::init::handler)
-                .service(onboarding::update::handler)
-                .service(onboarding::commit::handler)
-                .service(web::scope("/challenge")
-                    .service(onboarding::challenge::initiate::handler)
-                    .service(onboarding::challenge::verify::handler)
-                )
-            )
+            .service(onboarding::routes())
             .service(index::index::handler)
             .service(index::health::handler)
             .with_json_spec_at("/open-api/spec")
