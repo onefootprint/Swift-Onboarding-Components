@@ -1,5 +1,6 @@
 import { Meta, Story } from '@storybook/react';
 import React from 'react';
+import { withDesign } from 'storybook-addon-designs';
 
 import light from '../../config/themes/light';
 import Typography, { TypographyProps } from './typography';
@@ -17,6 +18,7 @@ export default {
     testID: { control: 'text' },
     variant: { control: 'select', options: Object.keys(variantMapping) },
   },
+  decorators: [withDesign],
 } as Meta;
 
 const Template: Story<TypographyProps> = ({
@@ -44,6 +46,13 @@ export const Display1 = Template.bind({});
 Display1.args = {
   variant: 'display-1',
   children: 'Footprint (display-1)',
+};
+
+Display1.parameters = {
+  design: {
+    type: 'figma',
+    url: 'https://www.figma.com/file/Orjo4h0SCkeI4YBu0cQkab/Foundations?node-id=0%3A1',
+  },
 };
 
 export const Display2 = Template.bind({});

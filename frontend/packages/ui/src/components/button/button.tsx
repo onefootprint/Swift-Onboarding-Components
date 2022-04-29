@@ -10,7 +10,7 @@ import {
 } from './button.constants';
 
 export type ButtonProps = {
-  children: string;
+  children: React.ReactNode;
   disabled?: boolean;
   fullWidth?: boolean;
   onPress?: (event: React.MouseEvent<HTMLButtonElement>) => void;
@@ -49,6 +49,9 @@ const Container = styled.button<{
   variant: 'primary' | 'secondary';
   fullWidth?: boolean;
 }>`
+  display: flex;
+  justify-content: center;
+  align-items: center;
   border: 0;
 
   ${({ theme, variant }) => css`

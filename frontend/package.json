@@ -16,7 +16,9 @@
     "format": "prettier --check \"**/*.{ts,tsx,md}\"",
     "lint": "turbo run lint",
     "prepare": "husky install",
-    "test": "turbo run test"
+    "test": "turbo run test",
+    "lint:fix": "eslint --fix \"**/*.{ts,tsx,md}\"",
+    "format:fix": "prettier --write \"**/*.{ts,tsx,md}\""
   },
   "devDependencies": {
     "@testing-library/dom": "^8.13.0",

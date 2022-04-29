@@ -1,3 +1,4 @@
 export * from './button';
 export * from './styled';
-export * from './typography';
+export type { TypographyProps } from './typography';
+export { default as Typography } from './typography';
