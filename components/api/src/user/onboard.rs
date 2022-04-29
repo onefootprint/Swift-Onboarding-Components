@@ -1,7 +1,7 @@
 use crate::response::success::ApiResponseData;
 use crate::State;
 use crate::{auth::client_public_key::PublicTenantAuthContext, errors::ApiError};
-use paperclip::actix::{api_v2_operation, post, web, Apiv2Schema};
+use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 
 use aws_sdk_kms::model::DataKeyPairSpec;
 use db::models::{types::Status, user_vaults::{NewUserVault}};
@@ -17,7 +17,7 @@ struct OnboardingResponse {
 async fn handler(
     pub_tenant_auth: PublicTenantAuthContext,
     state: web::Data<State>,
-) -> actix_web::Result<ApiResponseData<OnboardingResponse>, ApiError> {
+) -> actix_web::Result<Json<ApiResponseData<OnboardingResponse>>, ApiError> {
     // TODO, add email & phone number to request & check against existing entries
 
     let new_key_pair = state
@@ -48,9 +48,9 @@ async fn handler(
     let token  =
         db::user_vault::init(&state.db_pool, user, pub_tenant_auth.tenant().id.clone()).await?;
 
-    Ok(ApiResponseData {
+    Ok(Json(ApiResponseData {
         data: OnboardingResponse {
             onboarding_session_token: token,
         },
-    })
+    }))
 }

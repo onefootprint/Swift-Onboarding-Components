@@ -7,7 +7,7 @@ use crate::State;
 
 use crypto::b64::Base64Data;
 use enclave_proxy::DataTransform;
-use paperclip::actix::{api_v2_operation, post, web, Apiv2Schema};
+use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Serialize, serde::Deserialize)]
 struct DataDecryptionRequest {
@@ -19,8 +19,8 @@ struct DataDecryptionRequest {
 #[post("/decrypt")]
 async fn handler(
     state: web::Data<State>,
-    request: web::Json<DataDecryptionRequest>,
-) -> Result<ApiResponseData<String>, ApiError> {
+    request: Json<DataDecryptionRequest>,
+) -> Result<Json<ApiResponseData<String>>, ApiError> {
     tracing::info!("in decrypt");
     let req = request.into_inner();
     let sealed_private_key =
@@ -33,7 +33,7 @@ async fn handler(
         DataTransform::Identity,
     )
     .await?;
-    Ok(ApiResponseData{
+    Ok(Json(ApiResponseData{
         data: std::str::from_utf8(&decrypted_result).unwrap().to_string()
-    })
+    }))
 }

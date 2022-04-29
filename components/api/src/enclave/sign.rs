@@ -1,7 +1,7 @@
 use crate::errors::ApiError;
 use crate::response::success::ApiResponseData;
 use crate::State;
-use paperclip::actix::{api_v2_operation, post, web, Apiv2Schema};
+use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 
 use crypto::b64::Base64Data;
 use enclave_proxy::{EnvelopeHmacSign, HmacSignature, KmsCredentials, RpcPayload};
@@ -21,8 +21,8 @@ struct DataEnvelopeSignatureResponse {
 #[post("/sign")]
 async fn handler(
     state: web::Data<State>,
-    request: web::Json<SignRequest>,
-) -> Result<ApiResponseData<DataEnvelopeSignatureResponse>, ApiError> {
+    request: Json<SignRequest>,
+) -> Result<Json<ApiResponseData<DataEnvelopeSignatureResponse>>, ApiError> {
     tracing::info!("in sign");
 
     let new_data_key = state
@@ -55,10 +55,10 @@ async fn handler(
 
     let response = HmacSignature::try_from(response)?;
 
-    Ok(ApiResponseData {
+    Ok(Json(ApiResponseData {
         data: DataEnvelopeSignatureResponse {
             hmac_sha256_signature: Base64Data(response.signature).to_string(),
             sealed_key: Base64Data(sealed_key).to_string(),
         },
-    })
+    }))
 }

@@ -1,7 +1,7 @@
 use crate::errors::ApiError;
 use crate::response::success::ApiResponseData;
 use crate::State;
-use paperclip::actix::{api_v2_operation, post, web, Apiv2Schema};
+use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 
 use aws_sdk_kms::model::DataKeyPairSpec;
 use crypto::b64::Base64Data;
@@ -22,8 +22,8 @@ struct DataEncryptionResponse {
 #[post("/encrypt")]
 async fn handler(
     state: web::Data<State>,
-    request: web::Json<EncryptRequest>,
-) -> Result<ApiResponseData<DataEncryptionResponse>, ApiError> {
+    request: Json<EncryptRequest>,
+) -> Result<Json<ApiResponseData<DataEncryptionResponse>>, ApiError> {
     tracing::info!("in encrypt");
 
     let new_key_pair = state
@@ -46,7 +46,7 @@ async fn handler(
         request.data.as_str().as_bytes().to_vec(),
     )?;
 
-    Ok(ApiResponseData {
+    Ok(Json(ApiResponseData {
         data: DataEncryptionResponse {
             sealed_data: sealed.to_string()?,
             public_key: Base64Data(ec_pk_uncompressed).to_string(),
@@ -58,5 +58,5 @@ async fn handler(
             )
             .to_string(),
         },
-    })
+    }))
 }
