@@ -102,3 +102,16 @@ CREATE FUNCTION token_expiry() RETURNS trigger
 CREATE TRIGGER expire_onboarding_token
     AFTER INSERT ON onboarding_session_tokens
     EXECUTE PROCEDURE token_expiry();
+
+CREATE OR REPLACE FUNCTION refresh_updated_at()   
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at = now();
+    RETURN NEW;   
+END;
+$$ language 'plpgsql';
+
+CREATE TRIGGER refresh_updated_at_uv BEFORE UPDATE ON user_vaults FOR EACH ROW EXECUTE PROCEDURE  refresh_updated_at();
+CREATE TRIGGER refresh_updated_at_tenant BEFORE UPDATE ON tenants FOR EACH ROW EXECUTE PROCEDURE  refresh_updated_at();
+CREATE TRIGGER refresh_updated_at_api_keys BEFORE UPDATE ON tenant_api_keys FOR EACH ROW EXECUTE PROCEDURE  refresh_updated_at();
+CREATE TRIGGER refresh_updated_at_ob BEFORE UPDATE ON onboardings FOR EACH ROW EXECUTE PROCEDURE refresh_updated_at();
