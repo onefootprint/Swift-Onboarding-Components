@@ -64,21 +64,6 @@ pub async fn update(pool: &Pool, update: UpdateUserVault) -> Result<usize, DbErr
     Ok(size)
 }
 
-pub async fn get_by_tenant_user_id(pool: &Pool, footprint_user_id: String, tenant_id: String) -> Result<UserVault, DbError> {
-    let conn = pool.get().await?;
-
-    let (_, user_vault): (Onboarding, UserVault) = conn.interact(move |conn| {
-        schema::onboardings::table
-            .inner_join(schema::user_vaults::table.on(schema::user_vaults::id.eq(schema::onboardings::user_vault_id)))
-            .filter(schema::onboardings::footprint_user_id.eq(footprint_user_id))
-            .filter(schema::onboardings::tenant_id.eq(tenant_id))
-            .first(conn)
-    })
-    .await??;
-
-    Ok(user_vault)
-}
-
 pub async fn get_by_token(pool: &Pool, auth_token: String) -> Result<(UserVault, OnboardingSessionToken), DbError>  {
     let conn = pool.get().await?;
 
