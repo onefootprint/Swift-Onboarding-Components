@@ -54,9 +54,11 @@ deadpool-diesel = { version = "0.3.1", features = [
 ] }
 anyhow = { version = "1.0" }
 serde_with = { version = "1.0" }
+serde_json = { version = "1.0" }
 actix-cors = "0.6"
 paperclip = { version = "0.7.0", features = [
     "actix4",
     "swagger-ui",
     "actix4-validator",
+    "uuid",
 ] }

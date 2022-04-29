@@ -1738,6 +1738,7 @@ dependencies = [
  "opentelemetry-otlp",
  "paperclip",
  "serde",
+ "serde_json",
  "serde_with",
  "thiserror",
  "tokio",
@@ -2584,6 +2585,7 @@ dependencies = [
  "serde_json",
  "serde_yaml",
  "thiserror",
+ "uuid",
  "validator",
 ]
 

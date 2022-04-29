@@ -1,74 +1,69 @@
 use crate::response::success::ApiResponseData;
 use crate::State;
-use crate::{auth::client_public_key::PublicTenantAuthContext, errors::ApiError};
-use actix_web::{post, web};
+use crate::{
+    auth::onboarding_token::OnboardingSessionTokenContext,
+    errors::ApiError,
+};
+use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 
 use aws_sdk_pinpointemail::model::{
     Body as EmailBody, Content as EmailStringContent, Destination as EmailDestination,
     EmailContent, Message as EmailMessage,
 };
-use db::models::types::ChallengeKind;
 use uuid::Uuid;
 
-// TODO port onto auth
-#[derive(Debug, Clone, serde::Deserialize)]
+#[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
+#[serde(rename_all = "lowercase")]
+enum ChallengeKind {
+    Sms,
+    Email,
+}
+
+#[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
 struct CreateChallengeRequest {
     kind: ChallengeKind,
 }
 
-#[derive(Debug, Clone, serde::Serialize)]
+#[derive(Debug, Clone, Apiv2Schema, serde::Serialize)]
 struct CreateChallengeResponse {
-    kind: ChallengeKind,
     id: Uuid,
 }
 
 // TODO Switch challenge APIs to use correct auth and tenant_user_id
 // TODO then switch user update to have a proper auth handler
-#[post("/user/{tenant_user_id}/challenge")]
+#[api_v2_operation]
+#[post("/challenge")]
 async fn handler(
     state: web::Data<State>,
-    pub_tenant_auth: PublicTenantAuthContext,
-    path: web::Path<String>,
-    request: web::Json<CreateChallengeRequest>,
-) -> actix_web::Result<ApiResponseData<CreateChallengeResponse>, ApiError> {
-    let tenant_user_id = path.into_inner();
-    tracing::info!("in challenge with user_id {}", tenant_user_id.clone());
-    // TODO 404 if the user isn't found
-    let user = db::user_vault::get_by_tenant_user_id(
-        &state.db_pool,
-        tenant_user_id,
-        pub_tenant_auth.tenant().id.clone(),
-    )
-    .await?;
+    onboarding_token_auth: OnboardingSessionTokenContext,
+    request: Json<CreateChallengeRequest>,
+) -> actix_web::Result<Json<ApiResponseData<CreateChallengeResponse>>, ApiError> {
+    let user_vault = onboarding_token_auth.user_vault();
 
-    tracing::info!("in challenge with user {:?}", user.clone());
-
-    db::challenge::expire_old(&state.db_pool, user.id.clone(), request.kind).await?;
-
-    let (sh_data, e_data) = match request.kind {
-        ChallengeKind::Email => (user.sh_email, user.e_email),
-        ChallengeKind::PhoneNumber => (user.sh_phone_number, user.e_phone_number),
+    let (db_kind, sh_data, e_data) = match request.kind {
+        ChallengeKind::Email => (db::models::types::ChallengeKind::Email, user_vault.sh_email.clone(), user_vault.e_email.clone()),
+        ChallengeKind::Sms => (db::models::types::ChallengeKind::PhoneNumber, user_vault.sh_phone_number.clone(), user_vault.e_phone_number.clone()),
     };
+
+    db::challenge::expire_old(&state.db_pool, user_vault.id.clone(), db_kind).await?;
 
     let sh_data = match sh_data {
         Some(sh_data) => sh_data,
-        None => return Err(ApiError::DataNotSetForUser(request.kind)),
+        None => return Err(ApiError::DataNotSetForUser(db_kind)),
     };
     let e_data = e_data.ok_or(ApiError::UserDataNotPopulated)?;
-    tracing::info!("in challenge with e_data {:?}", e_data);
 
     let decrypted_data = crate::enclave::lib::decrypt_bytes(
         &state,
         &e_data,
-        user.e_private_key,
+        user_vault.e_private_key.clone(),
         enclave_proxy::DataTransform::Identity,
     )
     .await?;
-    tracing::info!("decrypted data {:?}", decrypted_data);
     let decrypted_data = std::str::from_utf8(&decrypted_data)?;
 
     let (challenge, code) =
-        db::challenge::create(&state.db_pool, user.id.clone(), sh_data, request.kind).await?;
+        db::challenge::create(&state.db_pool, user_vault.id.clone(), sh_data, db_kind).await?;
 
     // We may want to end up doing this asynchronously - these can be latent operations
     match request.kind {
@@ -100,7 +95,7 @@ async fn handler(
                 .await?;
             log::info!("output from sending email message {:?}", output)
         }
-        ChallengeKind::PhoneNumber => {
+        ChallengeKind::Sms => {
             let output = state.sms_client.send_text_message()
                 .destination_phone_number(decrypted_data)
                 .message_body(format!("Your Footprint verification code is {}. Don't share your code with anyone. We will never contact you to request this code.\n\n@onefootprint.com #{}", code, code))
@@ -110,10 +105,9 @@ async fn handler(
         }
     };
 
-    Ok(ApiResponseData{
+    Ok(Json(ApiResponseData{
         data: CreateChallengeResponse{
-            kind: request.kind,
             id: challenge.id,
         },
-    })
+    }))
 }

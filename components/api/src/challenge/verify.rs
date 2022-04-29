@@ -1,37 +1,37 @@
-use crate::{auth::client_public_key::PublicTenantAuthContext, errors::ApiError};
+use crate::{
+    auth::onboarding_token::OnboardingSessionTokenContext,
+    errors::ApiError,
+};
 use crate::response::success::ApiResponseData;
 use crate::State;
-use actix_web::{
-    post, web
-};
 use uuid::Uuid;
+use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 
 
-#[derive(Debug, Clone, serde::Deserialize)]
-struct ChallengeVerificationRequest {
+#[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
+struct ChallengeVerifyRequest {
     code: String,
 }
 
-#[post("/user/{tenant_user_id}/challenge/{challenge_id}/verify")]
+#[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
+struct ChallengeVerifyPath {
+    challenge_id: Uuid,
+}
+
+#[api_v2_operation]
+#[post("/challenge/{challenge_id}/verify")]
 async fn handler(
     state: web::Data<State>,
-    pub_tenant_auth: PublicTenantAuthContext,
-    path: web::Path<(String, Uuid)>,
-    request: web::Json<ChallengeVerificationRequest>,
-) -> actix_web::Result<ApiResponseData<()>, ApiError> {
-    let (tenant_user_id, challenge_id) = path.into_inner();
-    tracing::info!(
-        "in challenge verification with user_id {} challenge_id {}",
-        tenant_user_id.clone(),
-        challenge_id
-    );
-
-    let request = request;
-    let user = db::user_vault::get_by_tenant_user_id(&state.db_pool, tenant_user_id, pub_tenant_auth.tenant().id.clone()).await?;
-    db::challenge::verify(&state.db_pool, challenge_id, user.id, request.into_inner().code)
+    onboarding_token_auth: OnboardingSessionTokenContext,
+    path: web::Path<ChallengeVerifyPath>,
+    request: Json<ChallengeVerifyRequest>,
+) -> actix_web::Result<Json<ApiResponseData<()>>, ApiError> {
+    let ChallengeVerifyPath{challenge_id} = path.into_inner();
+    let user_vault = onboarding_token_auth.user_vault();
+    db::challenge::verify(&state.db_pool, challenge_id, user_vault.id.clone(), request.into_inner().code)
         .await?;
     // TODO yield auth token in one-click flow, and probably create a new UserTenantVerification
-    Ok(ApiResponseData{
+    Ok(Json(ApiResponseData{
         data: (),
-    })
+    }))
 }
