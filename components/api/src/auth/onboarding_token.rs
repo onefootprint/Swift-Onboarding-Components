@@ -17,7 +17,6 @@ use super::AuthError;
     description = "Session token that grants temporary access to onboard a user"
 )]
 pub struct OnboardingSessionTokenContext {
-    // Can also store the TempTenantUserToken here if we need to access tenant info
     user_vault: UserVault,
     onboarding: Onboarding,
 }

@@ -32,7 +32,7 @@ struct CreateChallengeResponse {
 // TODO Switch challenge APIs to use correct auth and tenant_user_id
 // TODO then switch user update to have a proper auth handler
 #[api_v2_operation]
-#[post("/challenge")]
+#[post("/init")]
 async fn handler(
     state: web::Data<State>,
     onboarding_token_auth: OnboardingSessionTokenContext,

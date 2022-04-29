@@ -13,7 +13,7 @@ struct OnboardingResponse {
 }
 
 #[api_v2_operation]
-#[post("/create")]
+#[post("/init")]
 async fn handler(
     pub_tenant_auth: PublicTenantAuthContext,
     state: web::Data<State>,

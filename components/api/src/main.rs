@@ -15,12 +15,11 @@ use crate::errors::ApiError;
 // TODO put IAM roles and permissions in pulumi
 
 mod auth;
-mod challenge;
 mod enclave;
 mod index;
 mod response;
-mod tenant;
-mod user;
+mod client;
+mod onboarding;
 
 use paperclip::actix::{web, OpenApiExt};
 
@@ -103,18 +102,20 @@ async fn main() -> std::io::Result<()> {
             .wrap(cors)
             .wrap_api()
             .service(web::scope("/private")
-                .service(tenant::init::handler)
-                .service(tenant::api_init::handler)
+                .service(client::init::handler)
+                .service(client::api_init::handler)
                 .service(enclave::encrypt::handler)
                 .service(enclave::decrypt::handler)
                 .service(enclave::sign::handler)
             )
             .service(web::scope("/onboarding")
-                .service(user::onboard::handler)
-                .service(user::update::handler)
-                .service(user::commit::handler)
-                .service(challenge::initiate::handler)
-                .service(challenge::verify::handler)
+                .service(onboarding::init::handler)
+                .service(onboarding::update::handler)
+                .service(onboarding::commit::handler)
+                .service(web::scope("/challenge")
+                    .service(onboarding::challenge::initiate::handler)
+                    .service(onboarding::challenge::verify::handler)
+                )
             )
             .service(index::index::handler)
             .service(index::health::handler)

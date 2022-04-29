@@ -16,6 +16,7 @@ async fn handler(
     onboarding_token_auth: OnboardingSessionTokenContext,
     _state: web::Data<State>,
 ) -> actix_web::Result<Json<ApiResponseData<CommitResponse>>, ApiError> {
+    // TODO validate that the whole user vault is filled out to the tenant's specifications
     let onboarding = onboarding_token_auth.onboarding();
 
     Ok(Json(ApiResponseData {

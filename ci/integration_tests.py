@@ -41,7 +41,7 @@ def test_create_tenant_api_keys(request):
     request.config.cache.set("client_public_key", client_public_key)
 
 def test_init_user(request):
-    path = "onboarding/create"
+    path = "onboarding/init"
     print(url(path))
     r = requests.post(url(path), headers=_client_pub_key_headers(request))
     print(r)
@@ -60,7 +60,7 @@ def test_user_patch(request):
     assert(r.status_code == 200)
 
 def test_challenge_create(request):
-    path = "onboarding/challenge"
+    path = "onboarding/challenge/init"
     print(url(path))
     data = {"kind": "sms"}
     r = requests.post(url(path), json=data, headers=_onboarding_session_token_headers(request))

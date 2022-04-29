@@ -19,7 +19,7 @@ struct ChallengeVerifyPath {
 }
 
 #[api_v2_operation]
-#[post("/challenge/{challenge_id}/verify")]
+#[post("/{challenge_id}/verify")]
 async fn handler(
     state: web::Data<State>,
     onboarding_token_auth: OnboardingSessionTokenContext,
