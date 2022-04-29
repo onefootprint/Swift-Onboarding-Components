@@ -62,6 +62,7 @@ fn status_code_for_db_error(e: &DbError) -> actix_web::http::StatusCode {
         DbError::ChallengeCodeMismatch => actix_web::http::StatusCode::BAD_REQUEST,
         DbError::ChallengeExpired => actix_web::http::StatusCode::BAD_REQUEST,
         DbError::ChallengeInactive => actix_web::http::StatusCode::BAD_REQUEST,
+        DbError::OnboardingTokenInactive => actix_web::http::StatusCode::UNAUTHORIZED,
     }
 }
 

@@ -36,7 +36,7 @@ async fn handler(
         &state.db_pool,
         PartialTenantApiKey {
             tenant_id: tenant_id,
-            name: key_name,
+            key_name: key_name,
         },
         api_key.clone(),
         e_api_key.to_vec()?,
@@ -45,8 +45,8 @@ async fn handler(
 
     Ok(Json(ApiResponseData {
         data: ClientApiInitResponse {
-            client_public_key: tenant_api_key.api_key_id,
-            client_keypair_name: tenant_api_key.name,
+            client_public_key: tenant_api_key.tenant_public_key,
+            client_keypair_name: tenant_api_key.key_name,
             client_secret_key: api_key,
         },
     }))

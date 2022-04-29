@@ -2,6 +2,7 @@ use crate::schema::user_vaults;
 use crate::models::types::Status;
 use diesel::{Insertable, Queryable};
 use serde::{Deserialize, Serialize};
+use chrono::NaiveDateTime;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable, Identifiable)]
 #[table_name = "user_vaults"]
@@ -23,7 +24,9 @@ pub struct UserVault {
     pub e_phone_number: Option<Vec<u8>>,
     pub is_phone_number_verified: bool,
     pub sh_phone_number: Option<Vec<u8>>,
-    pub id_verified: Status
+    pub id_verified: Status,
+    pub created_at: NaiveDateTime,
+    pub updated_at: NaiveDateTime
 }
 
 

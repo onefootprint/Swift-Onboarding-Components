@@ -20,10 +20,8 @@ table! {
 
     onboarding_session_tokens (h_token) {
         h_token -> Varchar,
-        timestamp -> Timestamp,
-        user_vault_id -> Varchar,
-        tenant_id -> Varchar,
-        footprint_user_id -> Varchar,
+        created_at -> Timestamp,
+        user_ob_id -> Varchar,
     }
 }
 
@@ -33,10 +31,12 @@ table! {
 
     onboardings (id) {
         id -> Varchar,
-        tenant_id -> Varchar,
+        user_ob_id -> Varchar,
         user_vault_id -> Varchar,
-        footprint_user_id -> Varchar,
+        tenant_id -> Varchar,
         status -> User_status,
+        created_at -> Timestamp,
+        updated_at -> Timestamp,
     }
 }
 
@@ -44,12 +44,12 @@ table! {
     use diesel::sql_types::*;
     use crate::models::types::*;
 
-    tenant_api_keys (api_key_id) {
-        api_key_id -> Varchar,
+    tenant_api_keys (tenant_public_key) {
+        tenant_public_key -> Varchar,
+        sh_secret_api_key -> Bytea,
+        e_secret_api_key -> Bytea,
         tenant_id -> Varchar,
-        name -> Varchar,
-        sh_api_key -> Bytea,
-        e_api_key -> Bytea,
+        key_name -> Varchar,
         is_enabled -> Bool,
         created_at -> Timestamp,
         updated_at -> Timestamp,
@@ -65,6 +65,8 @@ table! {
         name -> Text,
         public_key -> Bytea,
         e_private_key -> Bytea,
+        created_at -> Timestamp,
+        updated_at -> Timestamp,
     }
 }
 
@@ -91,10 +93,14 @@ table! {
         is_phone_number_verified -> Bool,
         sh_phone_number -> Nullable<Bytea>,
         id_verified -> User_status,
+        created_at -> Timestamp,
+        updated_at -> Timestamp,
     }
 }
 
 joinable!(challenges -> user_vaults (user_vault_id));
+joinable!(onboardings -> tenants (tenant_id));
+joinable!(onboardings -> user_vaults (user_vault_id));
 
 allow_tables_to_appear_in_same_query!(
     challenges,

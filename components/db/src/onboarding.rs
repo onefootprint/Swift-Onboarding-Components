@@ -13,7 +13,7 @@ pub async fn get_onboarding_by_token(pool: &Pool, hashed_token: String) -> Resul
     let (_, onboarding): (OnboardingSessionToken, Onboarding) = conn.interact(move |conn| {
         schema::onboarding_session_tokens::table
             .inner_join(schema::onboardings::table.on(
-                schema::onboardings::footprint_user_id.eq(schema::onboarding_session_tokens::footprint_user_id)))
+                schema::onboardings::user_ob_id.eq(schema::onboarding_session_tokens::user_ob_id)))
             .filter(schema::onboarding_session_tokens::h_token.eq(hashed_token))
             .first(conn)
     })

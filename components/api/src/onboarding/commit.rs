@@ -21,7 +21,7 @@ async fn handler(
 
     Ok(Json(ApiResponseData {
         data: CommitResponse {
-            footprint_user_id: onboarding.footprint_user_id.clone(),
+            footprint_user_id: onboarding.user_ob_id.clone(),
         },
     }))
 }

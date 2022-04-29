@@ -53,12 +53,12 @@ pub async fn api_init(
 
     let new_tenant_api_key = NewTenantApiKey {
         tenant_id: tenant_api.tenant_id,
-        name: tenant_api.name,
-        sh_api_key: sh_api_key.to_vec(),
+        key_name: tenant_api.key_name,
+        sh_secret_api_key: sh_api_key.to_vec(),
         is_enabled: true,
         created_at: now,
         updated_at: now,
-        e_api_key: e_api_key
+        e_secret_api_key: e_api_key
     };
     let tenant_api_key = conn
         .interact(move |conn| {
@@ -77,7 +77,7 @@ pub async fn pub_auth_check(pool: &Pool, tenant_pub_key: String) -> Result<Tenan
     let tenant_api_key: TenantApiKey = conn
         .interact(move |conn| {
             schema::tenant_api_keys::table
-                .filter(schema::tenant_api_keys::api_key_id.eq(tenant_pub_key))
+                .filter(schema::tenant_api_keys::tenant_public_key.eq(tenant_pub_key))
                 .first(conn)
         })
         .await??;
@@ -91,7 +91,7 @@ pub async fn pub_auth(pool: &Pool, tenant_pub_key: String) -> Result<Option<Tena
     let tenant = conn
         .interact(move |conn| -> Result<Option<Tenant>, DbError> {
             let tenant_api_key: Option<TenantApiKey> = schema::tenant_api_keys::table
-                .filter(schema::tenant_api_keys::api_key_id.eq(tenant_pub_key))
+                .filter(schema::tenant_api_keys::tenant_public_key.eq(tenant_pub_key))
                 .first(conn)
                 .optional()?;
 
