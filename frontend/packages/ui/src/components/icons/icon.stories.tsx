@@ -1,11 +1,11 @@
 import { ComponentMeta, ComponentStory } from '@storybook/react';
+import Icos from 'icons';
+import IcoChevronDown16 from 'icons/ico/ico-chevron-down-16';
 import React from 'react';
 import { withDesign } from 'storybook-addon-designs';
 
 import light from '../../config/themes/light';
 import Typography from '../typography';
-import Icos from './ico';
-import IcoChevronDown16 from './ico/ico-chevron-down-16';
 
 export default {
   title: 'Components/Icon',

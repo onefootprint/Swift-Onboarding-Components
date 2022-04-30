@@ -1,20 +1,18 @@
 import { Properties } from 'csstype';
 import React from 'react';
+import { Colors, useTheme } from 'styled';
 
-import type { Colors } from '../../../config/themes/types';
-import { useTheme } from '../../styled';
-
-export type IcoPlusBig24Props = {
+export type IcoArrowRightSmall24Props = {
   color?: Colors;
   style?: Properties;
   testID?: string;
 };
 
-const IcoPlusBig24 = ({
+const IcoArrowRightSmall24 = ({
   color = 'primary',
   style,
   testID,
-}: IcoPlusBig24Props) => {
+}: IcoArrowRightSmall24Props) => {
   const theme = useTheme();
   return (
     <svg
@@ -28,11 +26,11 @@ const IcoPlusBig24 = ({
       <path
         fillRule="evenodd"
         clipRule="evenodd"
-        d="M12.95 5.75a.75.75 0 0 0-1.5 0v5.5h-5.5a.75.75 0 0 0 0 1.5h5.5v5.5a.75.75 0 1 0 1.5 0v-5.5h5.5a.75.75 0 0 0 0-1.5h-5.5v-5.5Z"
+        d="M14.26 8.2a.75.75 0 1 0-1.02 1.1l2.1 1.95H6.75a.75.75 0 0 0 0 1.5h8.59l-2.1 1.95a.75.75 0 1 0 1.02 1.1l3.499-3.249a.748.748 0 0 0 0-1.102L14.26 8.2Z"
         fill={theme.colors[color]}
       />
     </svg>
   );
 };
 
-export default IcoPlusBig24;
+export default IcoArrowRightSmall24;

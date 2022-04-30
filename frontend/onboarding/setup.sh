@@ -14,18 +14,17 @@ if [[ $(command -v brew) == "" ]]; then
 fi
 
 # Useful packages
-brew tap homebrew/cask-versions
 brew update
-brew tap homebrew/cask
 brew install jq
 brew install wget
-brew install git-lfs
 brew install visual-studio-code
 brew install node@16
 
 # Yarn
 corepack enable
 npm install -g yarn
+
+brew install pnpm
 
 # Developer tools
 xcode-select --install

@@ -23,7 +23,6 @@ const Template: Story<FootprintButtonProps> = ({
   size,
   testID,
   type,
-  variant,
 }: FootprintButtonProps) => (
   <FootprintButton
     disabled={disabled}
@@ -32,7 +31,6 @@ const Template: Story<FootprintButtonProps> = ({
     size={size}
     testID={testID}
     type={type}
-    variant={variant}
   />
 );
 
@@ -44,27 +42,10 @@ Base.args = {
   size: 'default',
   testID: 'footprint-button-test-id',
   type: 'button',
-  variant: 'primary',
 };
 
-export const PrimaryDefault = Template.bind({});
-PrimaryDefault.args = {
-  variant: 'primary',
-};
-
-export const PrimaryCompact = Template.bind({});
-PrimaryCompact.args = {
-  size: 'compact',
-};
-
-export const SecondaryDefault = Template.bind({});
-SecondaryDefault.args = {
-  variant: 'secondary',
-};
-
-export const SecondaryCompact = Template.bind({});
-SecondaryCompact.args = {
-  variant: 'secondary',
+export const Compact = Template.bind({});
+Compact.args = {
   size: 'compact',
 };
 

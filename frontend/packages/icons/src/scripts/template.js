@@ -7,9 +7,7 @@ const template = (
   return tpl`
 import { Properties } from 'csstype';
 import React from 'react';
-import { useTheme } from '../../styled';
-
-import type { Colors } from '../../../config/themes/types';
+import { useTheme, Colors } from 'styled';
 
 export type ${componentType} = {
   color?: Colors;

@@ -1,7 +1,6 @@
 import React from 'react';
-import styled, { css } from 'styled-components';
+import styled, { Colors, css, Typographies } from 'styled';
 
-import type { Colors, Typographies } from '../../config/themes/types';
 import variantMapping from './typography.constants';
 
 export type TypographyProps = {

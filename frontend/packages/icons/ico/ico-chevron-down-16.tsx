@@ -1,8 +1,6 @@
 import { Properties } from 'csstype';
 import React from 'react';
-
-import type { Colors } from '../../../config/themes/types';
-import { useTheme } from '../../styled';
+import { Colors, useTheme } from 'styled';
 
 export type IcoChevronDown16Props = {
   color?: Colors;

@@ -1,20 +1,18 @@
 import { Properties } from 'csstype';
 import React from 'react';
+import { Colors, useTheme } from 'styled';
 
-import type { Colors } from '../../../config/themes/types';
-import { useTheme } from '../../styled';
-
-export type IcoSpinner24Props = {
+export type IcoPlusSmall24Props = {
   color?: Colors;
   style?: Properties;
   testID?: string;
 };
 
-const IcoSpinner24 = ({
+const IcoPlusSmall24 = ({
   color = 'primary',
   style,
   testID,
-}: IcoSpinner24Props) => {
+}: IcoPlusSmall24Props) => {
   const theme = useTheme();
   return (
     <svg
@@ -26,11 +24,13 @@ const IcoSpinner24 = ({
       style={style}
     >
       <path
-        d="M12 2a10 10 0 0 1 10 10h-2a7.999 7.999 0 0 0-8-8V2Z"
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M12.75 7a.75.75 0 0 0-1.5 0v4.25H7a.75.75 0 0 0 0 1.5h4.25V17a.75.75 0 0 0 1.5 0v-4.25H17a.75.75 0 0 0 0-1.5h-4.25V7Z"
         fill={theme.colors[color]}
       />
     </svg>
   );
 };
 
-export default IcoSpinner24;
+export default IcoPlusSmall24;

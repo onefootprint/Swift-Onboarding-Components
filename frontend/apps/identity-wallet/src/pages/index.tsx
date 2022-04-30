@@ -1,14 +1,13 @@
 import React from 'react';
-import { Typography } from 'ui';
-import Ico from 'ui/src/components/icons/ico/ico-chevron-right-24';
+import { Button, Typography } from 'ui';
 
 const Root = () => (
-  <div>
-    <Ico />
+  <>
+    <Button>Hello from Identity</Button>
     <Typography variant="heading-1" color="primary">
-      Hello from Identity Wallet
+      Hello from Identity
     </Typography>
-  </div>
+  </>
 );
 
 export default Root;

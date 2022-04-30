@@ -1,20 +1,18 @@
 import { Properties } from 'csstype';
 import React from 'react';
+import { Colors, useTheme } from 'styled';
 
-import type { Colors } from '../../../config/themes/types';
-import { useTheme } from '../../styled';
-
-export type IcoChevronLeft24Props = {
+export type IcoChevronDown24Props = {
   color?: Colors;
   style?: Properties;
   testID?: string;
 };
 
-const IcoChevronLeft24 = ({
+const IcoChevronDown24 = ({
   color = 'primary',
   style,
   testID,
-}: IcoChevronLeft24Props) => {
+}: IcoChevronDown24Props) => {
   const theme = useTheme();
   return (
     <svg
@@ -26,7 +24,7 @@ const IcoChevronLeft24 = ({
       style={style}
     >
       <path
-        d="M13.25 8.75 9.75 12l3.5 3.25"
+        d="M15.25 10.75 12 14.25l-3.25-3.5"
         stroke={theme.colors[color]}
         strokeWidth={1.5}
         strokeLinecap="round"
@@ -36,4 +34,4 @@ const IcoChevronLeft24 = ({
   );
 };
 
-export default IcoChevronLeft24;
+export default IcoChevronDown24;

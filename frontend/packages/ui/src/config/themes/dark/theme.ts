@@ -1,6 +1,6 @@
 import { rgba } from 'polished';
+import type { DefaultTheme } from 'styled';
 
-import { DefaultTheme } from '../types';
 import primitives from './primitives';
 
 const themeUiStates = {
