@@ -89,7 +89,7 @@ jobs:
           docker push ${account}.dkr.ecr.us-east-1.amazonaws.com/api:latest
 
       # workaround: move the cargo cache to somewhere it can be cached
-      # make api-release uses a docker image to build the binary (musl linux)
+      # make api-release uses a docker image to build the binary (rust on musl linux)
       - name: cache permissions
         run: |
           rm -rf ~/docker-cache
