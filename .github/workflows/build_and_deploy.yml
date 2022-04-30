@@ -56,7 +56,9 @@ jobs:
       - name: Cache docker cargo cache
         uses: actions/cache@v3
         with:
-          path: ~/docker-cache
+          path: |
+            ~/docker-cache
+            ./target
           key: ${{ runner.os }}-cargo-cache-docker
 
       - name: Restore docker cache
