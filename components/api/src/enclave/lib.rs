@@ -1,13 +1,13 @@
 use crate::errors::ApiError;
 use crate::State;
 
+use aws_sdk_kms::model::DataKeyPairSpec;
 use crypto::seal::EciesP256Sha256AesGcmSealed;
 use enclave_proxy::{DataTransform, EnvelopeDecrypt, FnDecryption, KmsCredentials, RpcPayload};
-use aws_sdk_kms::model::DataKeyPairSpec;
 
-
-pub async fn gen_keypair(state: &actix_web::web::Data<State>) -> Result<(Vec<u8>, Vec<u8>), ApiError>{
-
+pub async fn gen_keypair(
+    state: &actix_web::web::Data<State>,
+) -> Result<(Vec<u8>, Vec<u8>), ApiError> {
     let new_key_pair = state
         .kms_client
         .generate_data_key_pair_without_plaintext()
@@ -28,14 +28,16 @@ pub async fn gen_keypair(state: &actix_web::web::Data<State>) -> Result<(Vec<u8>
         .into_inner();
 
     Ok((ec_pk_uncompressed, e_priv_key))
-
 }
+
+#[allow(dead_code)]
 pub async fn decrypt_bytes(
     state: &actix_web::web::Data<State>,
     sealed_data: &[u8],
     sealed_key: Vec<u8>,
     transform: DataTransform,
 ) -> Result<Vec<u8>, ApiError> {
+    // TODO will be used in one-click flow
     let sealed_data = EciesP256Sha256AesGcmSealed::from_bytes(sealed_data)?;
     decrypt(state, sealed_data, sealed_key, transform).await
 }

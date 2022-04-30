@@ -1,5 +1,5 @@
-use crate::schema::challenges;
 use crate::models::types::{ChallengeKind, ChallengeState};
+use crate::schema::challenges;
 use chrono::NaiveDateTime;
 use diesel::{Insertable, Queryable};
 use serde::{Deserialize, Serialize};
@@ -13,6 +13,7 @@ use uuid::Uuid;
 pub struct Challenge {
     pub id: Uuid,
     pub user_vault_id: String,
+    pub e_data: Vec<u8>,
     pub sh_data: Vec<u8>,
     pub h_code: Vec<u8>,
     pub kind: ChallengeKind,
@@ -25,6 +26,7 @@ pub struct Challenge {
 #[table_name = "challenges"]
 pub struct NewChallenge {
     pub user_vault_id: String,
+    pub e_data: Vec<u8>,
     pub sh_data: Vec<u8>,
     pub h_code: Vec<u8>,
     pub kind: ChallengeKind,
