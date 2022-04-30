@@ -57,8 +57,12 @@ jobs:
         uses: actions/cache@v3
         with:
           path: |
-            /docker-cache
+            $HOME/docker-cache
           key: ${{ runner.os }}-cargo-cache-docker
+
+      - name: Restore docker cache
+        run: |
+          sudo mv $HOME/docker-cache /var/lib/docker/volumes/cargo-cache
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -86,8 +90,8 @@ jobs:
       # make api-release uses a docker image to build the binary
       - name: cache permissions
         run: |
-          sudo mv /var/lib/docker/volumes/cargo-cache /docker-cache
-          sudo chown -R 1001:1001 /docker-cache
+          sudo mv /var/lib/docker/volumes/cargo-cache $HOME/docker-cache
+          sudo chown -R 1001:1001 $HOME/docker-cache
 
   # builds the eif enclave image if needed
   build_eif:
