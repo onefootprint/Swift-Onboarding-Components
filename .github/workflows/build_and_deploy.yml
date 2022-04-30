@@ -92,6 +92,7 @@ jobs:
         run: |
           rm -rf ~/docker-cache
           sudo mv /var/lib/docker/volumes/cargo-cache ~/docker-cache
+          sudo chown -R 1001:1001 ~/docker-cache
 
   # builds the eif enclave image if needed
   build_eif:
