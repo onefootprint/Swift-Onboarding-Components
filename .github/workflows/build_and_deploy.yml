@@ -57,7 +57,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: |
-            /var/lib/docker/volumes/cargo-cache
+            /docker-cache
           key: ${{ runner.os }}-cargo-cache-docker
 
       - name: Configure AWS Credentials
@@ -81,6 +81,10 @@ jobs:
           docker tag api:${commit} ${account}.dkr.ecr.us-east-1.amazonaws.com/api:latest
           docker push ${account}.dkr.ecr.us-east-1.amazonaws.com/api:${commit}
           docker push ${account}.dkr.ecr.us-east-1.amazonaws.com/api:latest
+
+      # workaround: move the cargo cache to somewhere it can be cached
+      - run: |
+          sudo mv /var/lib/docker/volumes/cargo-cache /docker-cache
 
   # builds the eif enclave image if needed
   build_eif:
