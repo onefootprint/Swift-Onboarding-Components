@@ -83,8 +83,10 @@ jobs:
           docker push ${account}.dkr.ecr.us-east-1.amazonaws.com/api:latest
 
       # workaround: move the cargo cache to somewhere it can be cached
-      - run: |
+      - name: cache permissions
+        run: |
           sudo mv /var/lib/docker/volumes/cargo-cache /docker-cache
+          sudo chown -R 1001:1001 /docker-cache
 
   # builds the eif enclave image if needed
   build_eif:
