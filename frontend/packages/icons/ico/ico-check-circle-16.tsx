@@ -2,17 +2,17 @@ import { Properties } from 'csstype';
 import React from 'react';
 import { Colors, useTheme } from 'styled';
 
-export type IcoPlusSmall16Props = {
+export type IcoCheckCircle16Props = {
   color?: Colors;
   style?: Properties;
   testID?: string;
 };
 
-const IcoPlusSmall16 = ({
+const IcoCheckCircle16 = ({
   color = 'primary',
   style,
   testID,
-}: IcoPlusSmall16Props) => {
+}: IcoCheckCircle16Props) => {
   const theme = useTheme();
   return (
     <svg
@@ -26,11 +26,11 @@ const IcoPlusSmall16 = ({
       <path
         fillRule="evenodd"
         clipRule="evenodd"
-        d="M8.45 2.75a.7.7 0 1 0-1.4 0v4.3h-4.3a.7.7 0 1 0 0 1.4h4.3v4.3a.7.7 0 1 0 1.4 0v-4.3h4.3a.7.7 0 1 0 0-1.4h-4.3v-4.3Z"
+        d="M8.007 1.5a6.507 6.507 0 1 0 0 13.015 6.507 6.507 0 0 0 0-13.015ZM2.7 8.007a5.307 5.307 0 1 1 10.615 0 5.307 5.307 0 0 1-10.615 0Zm7.661-1.534a.6.6 0 0 0-1.04-.598L7.45 9.133a.215.215 0 0 1-.38-.016l-.354-.753a.6.6 0 0 0-1.086.51l.353.753c.487 1.036 1.939 1.096 2.508.103l1.87-3.257Z"
         fill={theme.colors[color]}
       />
     </svg>
   );
 };
 
-export default IcoPlusSmall16;
+export default IcoCheckCircle16;

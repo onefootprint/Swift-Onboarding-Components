@@ -2,17 +2,17 @@ import { Properties } from 'csstype';
 import React from 'react';
 import { Colors, useTheme } from 'styled';
 
-export type IcoPlusSmall16Props = {
+export type IcoArrowUpRight16Props = {
   color?: Colors;
   style?: Properties;
   testID?: string;
 };
 
-const IcoPlusSmall16 = ({
+const IcoArrowUpRight16 = ({
   color = 'primary',
   style,
   testID,
-}: IcoPlusSmall16Props) => {
+}: IcoArrowUpRight16Props) => {
   const theme = useTheme();
   return (
     <svg
@@ -26,11 +26,11 @@ const IcoPlusSmall16 = ({
       <path
         fillRule="evenodd"
         clipRule="evenodd"
-        d="M8.45 2.75a.7.7 0 1 0-1.4 0v4.3h-4.3a.7.7 0 1 0 0 1.4h4.3v4.3a.7.7 0 1 0 1.4 0v-4.3h4.3a.7.7 0 1 0 0-1.4h-4.3v-4.3Z"
+        d="M5.623 2.05a.7.7 0 1 0 0 1.4h4.53L3.665 9.938a.7.7 0 1 0 .99.99l6.488-6.488v4.53a.7.7 0 1 0 1.4 0V2.75a.7.7 0 0 0-.7-.7h-6.22Z"
         fill={theme.colors[color]}
       />
     </svg>
   );
 };
 
-export default IcoPlusSmall16;
+export default IcoArrowUpRight16;

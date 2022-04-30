@@ -5,7 +5,7 @@ const path = require('path');
 const { last, startCase } = require('lodash');
 const template = require('./template');
 
-const INPUT_SVG_PATH = path.join(__dirname, '../assets/icons/**/*.svg');
+const INPUT_SVG_PATH = path.join(__dirname, '../assets/ico/**/*.svg');
 const OUTPUT_PATH = path.join(__dirname, '../../ico');
 const MAIN_PATH = path.join(__dirname, '../');
 

@@ -2,17 +2,13 @@ import { Properties } from 'csstype';
 import React from 'react';
 import { Colors, useTheme } from 'styled';
 
-export type IcoPlusSmall16Props = {
+export type IcoEmail16Props = {
   color?: Colors;
   style?: Properties;
   testID?: string;
 };
 
-const IcoPlusSmall16 = ({
-  color = 'primary',
-  style,
-  testID,
-}: IcoPlusSmall16Props) => {
+const IcoEmail16 = ({ color = 'primary', style, testID }: IcoEmail16Props) => {
   const theme = useTheme();
   return (
     <svg
@@ -26,11 +22,11 @@ const IcoPlusSmall16 = ({
       <path
         fillRule="evenodd"
         clipRule="evenodd"
-        d="M8.45 2.75a.7.7 0 1 0-1.4 0v4.3h-4.3a.7.7 0 1 0 0 1.4h4.3v4.3a.7.7 0 1 0 1.4 0v-4.3h4.3a.7.7 0 1 0 0-1.4h-4.3v-4.3Z"
+        d="M3.655 2.13A2.355 2.355 0 0 0 1.3 4.485v7.035c0 1.3 1.054 2.355 2.355 2.355h8.69c1.3 0 2.355-1.055 2.355-2.355V4.485c0-1.3-1.054-2.355-2.355-2.355h-8.69ZM2.7 4.456v7.064c0 .527.428.955.955.955h8.69a.955.955 0 0 0 .955-.955V4.455L8.464 8.735a.7.7 0 0 1-.928 0L2.7 4.456Zm9.533-.926H3.767L8 7.275l4.233-3.745Z"
         fill={theme.colors[color]}
       />
     </svg>
   );
 };
 
-export default IcoPlusSmall16;
+export default IcoEmail16;
