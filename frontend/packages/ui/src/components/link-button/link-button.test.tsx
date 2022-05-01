@@ -54,7 +54,7 @@ describe('<LinkButton />', () => {
       expect(screen.getByLabelText('lorem')).toBeInTheDocument();
     });
 
-    it('should fire onPress when clicking', async () => {
+    it('should trigger onPress event when clicking', async () => {
       const onPressMockFn = jest.fn();
       renderLinkButton({ children: 'foo', onPress: onPressMockFn });
       await userEvent.click(screen.getByText('foo'));

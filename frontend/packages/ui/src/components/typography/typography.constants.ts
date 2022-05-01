@@ -12,12 +12,12 @@ const variantMapping: VariantMapping = {
   'body-1': 'p',
   'body-2': 'p',
   'body-3': 'p',
-  'label-1': 'div',
-  'label-2': 'div',
-  'label-3': 'div',
-  'label-4': 'div',
-  'caption-1': 'div',
-  'caption-2': 'div',
+  'label-1': 'p',
+  'label-2': 'p',
+  'label-3': 'p',
+  'label-4': 'p',
+  'caption-1': 'p',
+  'caption-2': 'p',
 };
 
 export default variantMapping;

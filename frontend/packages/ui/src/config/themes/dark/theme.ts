@@ -40,7 +40,7 @@ const theme: DefaultTheme = {
   borderColors: {
     transparent: 'transparent',
     primary: primitives.gray150,
-    secondary: primitives.gray300,
+    secondary: primitives.purple500,
     ...themeUiStates,
   },
   borderWidths: {
@@ -178,6 +178,12 @@ const theme: DefaultTheme = {
       1: rgba(primitives.gray0, 0.04),
       2: rgba(primitives.gray0, 0.08),
     },
+  },
+  elevations: {
+    0: 'none',
+    1: '0px 1px 4px rgba(0, 0, 0, 0.12)',
+    2: '0px 1px 8px rgba(0, 0, 0, 0.14)',
+    3: '0px 1px 12px rgba(0, 0, 0, 0.18)',
   },
   zIndices: {
     sticky: 5,

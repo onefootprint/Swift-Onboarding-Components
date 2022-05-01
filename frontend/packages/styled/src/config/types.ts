@@ -48,6 +48,13 @@ export type ThemeBorderWidths = {
   2: number;
 };
 
+export type ThemeElevations = {
+  0: string;
+  1: string;
+  2: string;
+  3: string;
+};
+
 export type ThemeColors = {
   primary: string;
   secondary: string;
@@ -129,21 +136,24 @@ export type Overlays = keyof ThemeOverlay;
 
 export type BorderWidths = keyof ThemeBorderWidths;
 
+export type Elevations = ThemeElevations;
+
 export type BorderColors = keyof ThemeBorderColors;
 
 export type ZIndices = keyof ThemeZIndices;
 
 export type DefaultTheme = {
-  illustrations: 'dark' | 'light';
-  disable: ThemeDisable;
-  borderRadius: ThemeBorderRadius;
-  breakpoints: ThemeBreakPoints;
   backgroundColors: ThemeBackgroundsColors;
-  colors: ThemeColors;
   borderColors: ThemeBorderColors;
+  borderRadius: ThemeBorderRadius;
   borderWidths: ThemeBorderWidths;
-  spacings: ThemeSpacings;
+  breakpoints: ThemeBreakPoints;
+  colors: ThemeColors;
+  disable: ThemeDisable;
+  elevations: ThemeElevations;
+  illustrations: 'dark' | 'light';
   overlays: ThemeOverlay;
+  spacings: ThemeSpacings;
   zIndices: ThemeZIndices;
   typographies: {
     [key in ThemeTypographies]: ThemeTypography;

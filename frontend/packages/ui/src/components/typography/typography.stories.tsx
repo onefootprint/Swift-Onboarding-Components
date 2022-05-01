@@ -10,6 +10,10 @@ export default {
   title: 'Components/Typography',
   component: Typography,
   argTypes: {
+    as: {
+      control: 'select',
+      options: ['p', 'a', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'label', 'span'],
+    },
     center: { control: 'boolean' },
     color: { control: 'select', options: Object.keys(light.colors) },
     ellipsis: { control: 'boolean' },
@@ -22,18 +26,22 @@ export default {
 } as Meta;
 
 const Template: Story<TypographyProps> = ({
+  as,
   center,
   children = 'lorem',
   color = 'primary',
   ellipsis,
+  htmlTitle,
   lineThrough,
   testID,
   variant = 'heading-1',
 }: Partial<TypographyProps>) => (
   <Typography
+    as={as}
     center={center}
     color={color}
     ellipsis={ellipsis}
+    htmlTitle={htmlTitle}
     lineThrough={lineThrough}
     testID={testID}
     variant={variant}
@@ -81,8 +89,15 @@ Heading2.args = {
 
 export const Heading3 = Template.bind({});
 Heading3.args = {
-  variant: 'heading-3',
+  as: 'p',
+  center: false,
   children: 'Footprint (heading-3)',
+  color: 'primary',
+  ellipsis: false,
+  htmlTitle: '',
+  lineThrough: false,
+  testID: 'typography-test-id',
+  variant: 'heading-3',
 };
 
 export const Body1 = Template.bind({});
