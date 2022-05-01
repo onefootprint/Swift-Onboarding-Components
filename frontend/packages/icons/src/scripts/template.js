@@ -1,27 +1,18 @@
 const template = (
   { imports, interfaces, componentName, props, jsx, exports },
   { tpl },
-) => {
-  const componentType = `${componentName}Props`;
-
-  return tpl`
-import { Properties } from 'csstype';
+) => tpl`
 import React from 'react';
-import { useTheme, Colors } from 'styled';
+import { useTheme } from 'styled';
 
-export type ${componentType} = {
-  color?: Colors;
-  style?: Properties;
-  testID?: string;
-}
+import type { IconProps } from '../src/types';
 
-const ${componentName} = ({ color = 'primary', style, testID }: ${componentType}) => {
+const ${componentName} = ({ color = 'primary', style, testID }: IconProps) => {
   const theme = useTheme();
   return ${jsx}
 }
  
 ${exports};
 `;
-};
 
 module.exports = template;

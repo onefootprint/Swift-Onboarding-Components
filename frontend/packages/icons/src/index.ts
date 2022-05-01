@@ -27,33 +27,6 @@ import IcoPlusSmall24 from '../ico/ico-plus-small-24';
 import IcoSpinner16 from '../ico/ico-spinner-16';
 import IcoSpinner24 from '../ico/ico-spinner-24';
 
-export type IcoNames =
-  | 'ico-arrow-right-small-16'
-  | 'ico-arrow-up-right-16'
-  | 'ico-check-16'
-  | 'ico-check-circle-16'
-  | 'ico-chevron-down-16'
-  | 'ico-chevron-left-16'
-  | 'ico-chevron-right-16'
-  | 'ico-email-16'
-  | 'ico-plus-big-16'
-  | 'ico-plus-small-16'
-  | 'ico-spinner-16'
-  | 'ico-arrow-right-small-24'
-  | 'ico-arrow-up-right-24'
-  | 'ico-check-24'
-  | 'ico-check-circle-24'
-  | 'ico-chevron-down-24'
-  | 'ico-chevron-left-24'
-  | 'ico-chevron-right-24'
-  | 'ico-close-24'
-  | 'ico-email-24'
-  | 'ico-footprint-24'
-  | 'ico-plus-big-24'
-  | 'ico-plus-small-24'
-  | 'ico-spinner-24'
-  | 'ico-check-circle-40';
-
 export default {
   IcoArrowRightSmall16,
   IcoArrowUpRight16,
@@ -81,3 +54,4 @@ export default {
   IcoSpinner24,
   IcoCheckCircle40,
 };
+export * from './types';

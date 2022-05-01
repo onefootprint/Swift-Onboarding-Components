@@ -1,6 +1,6 @@
 import 'styled-components';
 
-import {
+import type {
   ThemeBackgroundsColors,
   ThemeBorderColors,
   ThemeBorderRadius,
@@ -13,7 +13,7 @@ import {
   ThemeTypographies,
   ThemeTypography,
   ThemeZIndices,
-} from './types';
+} from 'styled';
 
 declare module 'styled-components' {
   export interface DefaultTheme {

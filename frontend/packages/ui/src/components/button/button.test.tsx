@@ -35,8 +35,7 @@ describe('<Button />', () => {
   it('should fire an event when pressing', async () => {
     const onPressMockFn = jest.fn();
     renderButton({ onPress: onPressMockFn, children: 'foo' });
-    const button = screen.getByText('foo');
-    await userEvent.click(button);
+    await userEvent.click(screen.getByText('foo'));
     expect(onPressMockFn).toHaveBeenCalled();
   });
 

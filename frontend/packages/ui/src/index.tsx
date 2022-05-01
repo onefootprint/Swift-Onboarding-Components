@@ -1,3 +1,6 @@
+import themes from './config/themes';
+
 export * from './components';
-export * from './config/themes';
 export * from './utils';
+
+export { themes };

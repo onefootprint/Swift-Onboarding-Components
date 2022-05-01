@@ -1,8 +1,7 @@
 import React from 'react';
+import type { DefaultTheme } from 'styled';
 import { createGlobalStyle, ThemeProvider } from 'styled';
 import { Reset } from 'styled-reset';
-
-import type { DefaultTheme } from '../../config/themes/types';
 
 export type BootstrapProps = {
   children: React.ReactNode;

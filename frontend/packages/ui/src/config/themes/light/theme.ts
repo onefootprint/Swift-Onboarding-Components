@@ -4,6 +4,7 @@ import type { DefaultTheme } from 'styled';
 import primitives from './primitives';
 
 const themeUiStates = {
+  accent: primitives.purple500,
   error: primitives.red500,
   info: primitives.blue500,
   success: primitives.green500,

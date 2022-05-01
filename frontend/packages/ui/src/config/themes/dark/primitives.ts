@@ -57,6 +57,16 @@ const primitives = {
   green200: '#0A6A4A',
   green100: '#074F37',
   green50: '#053525',
+  // purple
+  purple800: '#F5F2FC',
+  purple700: '#ebe7fb',
+  purple600: '#c3b6f3',
+  purple500: '#9b85eb',
+  purple400: '#7255e3',
+  purple300: '#4a24db',
+  purple200: '#3a1caa',
+  purple100: '#29147a',
+  purple50: '#231163',
   // static
   staticSleep: '#0e1438',
   staticThink: '#CBC1F6',

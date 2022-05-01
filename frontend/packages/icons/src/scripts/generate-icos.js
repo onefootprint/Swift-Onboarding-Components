@@ -52,12 +52,10 @@ const createIndexFile = async icoNames => {
             `import ${getComponentName(icoName)} from "../ico/${icoName}";\n`,
         )
         .join('')}
-      export type IcoNames = ${icoNames
-        .map(icoName => `"${icoName}"`)
-        .join(' | ')};\n
       export default {
         ${icoNames.map(icoName => `  ${getComponentName(icoName)},\n`).join('')}
         };
+      export * from './types';
     `,
   );
 };

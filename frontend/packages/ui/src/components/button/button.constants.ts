@@ -1,9 +1,4 @@
-import type {
-  BackgroundsColors,
-  BorderColors,
-  Colors,
-  Overlays,
-} from '../../config/themes/types';
+import type { BackgroundsColors, BorderColors, Colors, Overlays } from 'styled';
 
 export const backgroundColors: Record<string, BackgroundsColors> = {
   primary: 'tertiary',

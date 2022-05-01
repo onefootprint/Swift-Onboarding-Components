@@ -29,10 +29,11 @@ export type ThemeBackgroundsColors = {
 };
 
 export type ThemeUIStates = {
-  success: string;
-  warning: string;
+  accent: string;
   error: string;
   info: string;
+  success: string;
+  warning: string;
 };
 
 export type ThemeBorderColors = {

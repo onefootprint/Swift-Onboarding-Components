@@ -1,18 +1,9 @@
-import { Properties } from 'csstype';
 import React from 'react';
-import { Colors, useTheme } from 'styled';
+import { useTheme } from 'styled';
 
-export type IcoArrowUpRight16Props = {
-  color?: Colors;
-  style?: Properties;
-  testID?: string;
-};
+import type { IconProps } from '../src/types';
 
-const IcoArrowUpRight16 = ({
-  color = 'primary',
-  style,
-  testID,
-}: IcoArrowUpRight16Props) => {
+const IcoArrowUpRight16 = ({ color = 'primary', style, testID }: IconProps) => {
   const theme = useTheme();
   return (
     <svg

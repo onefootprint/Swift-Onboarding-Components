@@ -1,14 +1,9 @@
-import { Properties } from 'csstype';
 import React from 'react';
-import { Colors, useTheme } from 'styled';
+import { useTheme } from 'styled';
 
-export type IcoEmail24Props = {
-  color?: Colors;
-  style?: Properties;
-  testID?: string;
-};
+import type { IconProps } from '../src/types';
 
-const IcoEmail24 = ({ color = 'primary', style, testID }: IcoEmail24Props) => {
+const IcoEmail24 = ({ color = 'primary', style, testID }: IconProps) => {
   const theme = useTheme();
   return (
     <svg

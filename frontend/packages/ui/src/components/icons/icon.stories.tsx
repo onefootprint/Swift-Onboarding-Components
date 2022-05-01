@@ -34,7 +34,7 @@ export const AllIcons: ComponentStory<typeof IcoChevronDown16> = ({
               alignItems: 'center',
             }}
           >
-            <div style={{ width: '32px' }}>
+            <div style={{ minWidth: '32px' }}>
               <IcoComponent color={color} testID={testID} />
             </div>
             <Typography variant="body-2" color="primary">
