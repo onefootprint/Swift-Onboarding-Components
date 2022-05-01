@@ -84,9 +84,7 @@ pub async fn verify(
                 .filter(schema::challenges::user_vault_id.eq(&user_vault_id))
                 .for_no_key_update()
                 .first(conn)?;
-            if (challenge.expires_at - chrono::Utc::now().naive_utc())
-                < chrono::Duration::seconds(0)
-            {
+            if challenge.expires_at < chrono::Utc::now().naive_utc() {
                 return Err(DbError::ChallengeExpired);
             }
             if challenge.state != ChallengeState::AwaitingResponse {

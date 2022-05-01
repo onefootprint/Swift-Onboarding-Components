@@ -6,13 +6,13 @@ extern crate diesel;
 #[macro_use]
 extern crate diesel_migrations;
 
-pub mod models;
 pub mod errors;
+pub mod models;
 
+use crate::errors::DbError;
 use deadpool_diesel::postgres::{Manager, Pool, Runtime};
 use diesel::prelude::*;
 use models::tenants::*;
-use crate::errors::DbError;
 
 #[allow(unused_imports)]
 pub mod schema;
@@ -39,7 +39,7 @@ pub async fn health_check(pool: &Pool) -> Result<Tenant, DbError> {
     let new_tenant = NewTenant {
         name: format!("Test_{}", chrono::Utc::now().timestamp()),
         e_private_key: vec![],
-        public_key: vec![]
+        public_key: vec![],
     };
 
     let tenant = pool
@@ -56,7 +56,8 @@ pub async fn health_check(pool: &Pool) -> Result<Tenant, DbError> {
 }
 
 pub mod challenge;
-pub mod tenant;
-pub mod user_vault;
 pub mod onboarding;
+pub mod tenant;
+#[cfg(test)]
 pub mod test;
+pub mod user_vault;
