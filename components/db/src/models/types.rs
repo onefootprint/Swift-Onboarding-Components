@@ -13,7 +13,13 @@ pub enum Status {
     Verified,
     Processing,
     Incomplete,
-    Failed
+    Failed,
+}
+
+impl Default for Status {
+    fn default() -> Self {
+        Status::Incomplete
+    }
 }
 
 #[derive(Debug, DbEnum, PartialEq, Clone, Copy, Deserialize, Serialize)]
@@ -24,6 +30,7 @@ pub enum Status {
 pub enum ChallengeKind {
     PhoneNumber,
     Email,
+    // Biometric,
 }
 
 #[derive(Debug, DbEnum, PartialEq, Clone, Copy, Deserialize, Serialize)]

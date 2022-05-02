@@ -1,10 +1,9 @@
-CREATE TYPE challenge_kind as ENUM ('PhoneNumber', 'Email');
+CREATE TYPE challenge_kind as ENUM ('PhoneNumber', 'Email', 'Biometric');
 CREATE TYPE challenge_state as ENUM ('AwaitingResponse', 'Expired', 'Validated');
 
 CREATE TABLE challenges (
     id uuid NOT NULL PRIMARY KEY DEFAULT uuid_generate_v4(),
     user_vault_id VARCHAR(250) NOT NULL,
-    e_data BYTEA NOT NULL,
     sh_data BYTEA NOT NULL,
     h_code BYTEA NOT NULL,
     kind challenge_kind NOT NULL,

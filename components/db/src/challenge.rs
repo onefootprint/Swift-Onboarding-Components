@@ -1,6 +1,7 @@
 use crate::errors::DbError;
 use crate::models::challenges::{Challenge, NewChallenge};
 use crate::models::types::{ChallengeKind, ChallengeState};
+use crate::models::user_vaults::UserVault;
 use crate::schema;
 use crypto::sha256;
 use deadpool_diesel::postgres::Pool;
@@ -16,7 +17,6 @@ fn gen_code_and_hash() -> (String, [u8; 32]) {
 pub async fn create(
     pool: &Pool,
     user_vault_id: String,
-    e_data: Vec<u8>,
     sh_data: Vec<u8>,
     kind: ChallengeKind,
 ) -> Result<(Challenge, String), DbError> {
@@ -28,7 +28,6 @@ pub async fn create(
     let new_challenge = NewChallenge {
         user_vault_id,
         sh_data,
-        e_data,
         h_code: h_code.to_vec(),
         kind,
         state: ChallengeState::AwaitingResponse,
@@ -84,6 +83,21 @@ pub async fn verify(
                 .filter(schema::challenges::user_vault_id.eq(&user_vault_id))
                 .for_no_key_update()
                 .first(conn)?;
+            let user_vault: UserVault = schema::user_vaults::table
+                .filter(schema::user_vaults::id.eq(&user_vault_id))
+                .for_no_key_update()
+                .first(conn)?;
+            let expected_sh_data = match challenge.kind {
+                ChallengeKind::PhoneNumber => &user_vault.sh_phone_number,
+                ChallengeKind::Email => &user_vault.sh_email,
+            };
+            let expected_sh_data = match expected_sh_data {
+                Some(expected_sh_data) => expected_sh_data,
+                None => return Err(DbError::ChallengeDataMismatch),
+            };
+            if challenge.sh_data != *expected_sh_data {
+                return Err(DbError::ChallengeDataMismatch);
+            }
             if challenge.expires_at < chrono::Utc::now().naive_utc() {
                 return Err(DbError::ChallengeExpired);
             }
@@ -93,7 +107,7 @@ pub async fn verify(
             if challenge.h_code != crypto::sha256(code.as_bytes()) {
                 return Err(DbError::ChallengeCodeMismatch);
             }
-            // The code matches. Mark the challenge as validated and set the e_data and sh_data on the user vault
+            // The code matches. Mark the challenge as validated and set is_xxx_validate don the user vault
             diesel::update(&challenge)
                 .set((
                     schema::challenges::state.eq(ChallengeState::Validated),
@@ -107,10 +121,7 @@ pub async fn verify(
                         schema::user_vaults::table
                             .filter(schema::user_vaults::id.eq(user_vault_id)),
                     )
-                    .set((
-                        schema::user_vaults::e_phone_number.eq(challenge.e_data),
-                        schema::user_vaults::sh_phone_number.eq(challenge.sh_data),
-                    ))
+                    .set(schema::user_vaults::is_phone_number_verified.eq(true))
                     .execute(conn)?;
                 }
                 ChallengeKind::Email => {
@@ -118,10 +129,7 @@ pub async fn verify(
                         schema::user_vaults::table
                             .filter(schema::user_vaults::id.eq(user_vault_id)),
                     )
-                    .set((
-                        schema::user_vaults::e_email.eq(challenge.e_data),
-                        schema::user_vaults::sh_email.eq(challenge.sh_data),
-                    ))
+                    .set(schema::user_vaults::is_email_verified.eq(true))
                     .execute(conn)?;
                 }
             }

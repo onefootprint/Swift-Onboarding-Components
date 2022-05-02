@@ -20,14 +20,16 @@ pub struct UserVault {
     pub e_state: Option<Vec<u8>>,
     pub e_email: Option<Vec<u8>>,
     pub sh_email: Option<Vec<u8>>,
+    pub is_email_verified: bool,
     pub e_phone_number: Option<Vec<u8>>,
     pub sh_phone_number: Option<Vec<u8>>,
+    pub is_phone_number_verified: bool,
     pub id_verified: Status,
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, Insertable, AsChangeset)]
+#[derive(Debug, Default, Clone, Serialize, Deserialize, Insertable, AsChangeset)]
 #[table_name = "user_vaults"]
 pub struct UpdateUserVault {
     pub id: String,
@@ -40,6 +42,12 @@ pub struct UpdateUserVault {
     pub e_city: Option<Vec<u8>>,
     pub e_state: Option<Vec<u8>>,
     pub id_verified: Status,
+    pub e_phone_number: Option<Vec<u8>>,
+    pub sh_phone_number: Option<Vec<u8>>,
+    pub is_phone_number_verified: Option<bool>,
+    pub e_email: Option<Vec<u8>>,
+    pub sh_email: Option<Vec<u8>>,
+    pub is_email_verified: Option<bool>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]

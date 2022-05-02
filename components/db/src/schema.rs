@@ -5,7 +5,6 @@ table! {
     challenges (id) {
         id -> Uuid,
         user_vault_id -> Varchar,
-        e_data -> Bytea,
         sh_data -> Bytea,
         h_code -> Bytea,
         kind -> Challenge_kind,
@@ -89,8 +88,10 @@ table! {
         e_state -> Nullable<Bytea>,
         e_email -> Nullable<Bytea>,
         sh_email -> Nullable<Bytea>,
+        is_email_verified -> Bool,
         e_phone_number -> Nullable<Bytea>,
         sh_phone_number -> Nullable<Bytea>,
+        is_phone_number_verified -> Bool,
         id_verified -> User_status,
         created_at -> Timestamp,
         updated_at -> Timestamp,

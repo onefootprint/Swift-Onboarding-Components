@@ -56,6 +56,18 @@ struct UserPatchRequest {
         with = "::serde_with::rust::double_option"
     )]
     state: Option<Option<String>>,
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        with = "::serde_with::rust::double_option"
+    )]
+    email: Option<Option<String>>,
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        with = "::serde_with::rust::double_option"
+    )]
+    phone_number: Option<Option<String>>,
 }
 
 #[api_v2_operation]
@@ -85,16 +97,35 @@ async fn handler(
         }
     }
 
+    let validated_phone_number = match &request.phone_number {
+        Some(Some(raw_phone_number)) => Some(Some(
+            crate::onboarding::clean_phone_number(&state, raw_phone_number).await?,
+        )),
+        _ => None,
+    };
+
     let user_update = UpdateUserVault {
         id: user_vault.id.clone(),
-        e_first_name: seal(request.first_name.clone(), &user_vault)?,
-        e_last_name: seal(request.last_name.clone(), &user_vault)?,
-        e_dob: seal(request.dob.clone(), &user_vault)?,
-        e_ssn: seal(request.ssn.clone(), &user_vault)?,
+        e_first_name: seal(request.first_name.clone(), user_vault)?,
+        e_last_name: seal(request.last_name.clone(), user_vault)?,
+        e_dob: seal(request.dob.clone(), user_vault)?,
+        e_ssn: seal(request.ssn.clone(), user_vault)?,
         sh_ssn: hash(request.ssn.clone()),
-        e_street_address: seal(request.street_address.clone(), &user_vault)?,
-        e_city: seal(request.city.clone(), &user_vault)?,
-        e_state: seal(request.state.clone(), &user_vault)?,
+        e_street_address: seal(request.street_address.clone(), user_vault)?,
+        e_city: seal(request.city.clone(), user_vault)?,
+        e_state: seal(request.state.clone(), user_vault)?,
+        e_email: seal(request.email.clone(), user_vault)?,
+        is_email_verified: match request.email {
+            Some(Some(_)) => Some(false),
+            _ => None,
+        },
+        sh_email: hash(request.email.clone()),
+        e_phone_number: seal(validated_phone_number.clone(), user_vault)?,
+        is_phone_number_verified: match validated_phone_number {
+            Some(Some(_)) => Some(false),
+            _ => None,
+        },
+        sh_phone_number: hash(validated_phone_number.clone()),
         id_verified: Status::Processing,
     };
 

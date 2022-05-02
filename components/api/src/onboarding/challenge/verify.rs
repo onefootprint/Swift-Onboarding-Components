@@ -1,12 +1,8 @@
-use crate::{
-    auth::onboarding_token::OnboardingSessionTokenContext,
-    errors::ApiError,
-};
 use crate::response::success::ApiResponseData;
 use crate::State;
-use uuid::Uuid;
+use crate::{auth::onboarding_token::OnboardingSessionTokenContext, errors::ApiError};
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
-
+use uuid::Uuid;
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
 struct ChallengeVerifyRequest {
@@ -26,12 +22,14 @@ async fn handler(
     path: web::Path<ChallengeVerifyPath>,
     request: Json<ChallengeVerifyRequest>,
 ) -> actix_web::Result<Json<ApiResponseData<()>>, ApiError> {
-    let ChallengeVerifyPath{challenge_id} = path.into_inner();
+    let ChallengeVerifyPath { challenge_id } = path.into_inner();
     let user_vault = onboarding_token_auth.user_vault();
-    db::challenge::verify(&state.db_pool, challenge_id, user_vault.id.clone(), request.into_inner().code)
-        .await?;
-    // TODO yield auth token in one-click flow, and probably create a new UserTenantVerification
-    Ok(Json(ApiResponseData{
-        data: (),
-    }))
+    db::challenge::verify(
+        &state.db_pool,
+        challenge_id,
+        user_vault.id.clone(),
+        request.into_inner().code,
+    )
+    .await?;
+    Ok(Json(ApiResponseData { data: () }))
 }

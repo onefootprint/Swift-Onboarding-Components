@@ -1,4 +1,3 @@
-use crate::onboarding::hash;
 use crate::response::success::ApiResponseData;
 use crate::State;
 use crate::{auth::client_public_key::PublicTenantAuthContext, errors::ApiError};
@@ -29,14 +28,14 @@ pub async fn handler(
 ) -> actix_web::Result<Json<ApiResponseData<IdentifyResponse>>, ApiError> {
     let (challenge_kind, validated_data) =
         crate::onboarding::challenge::lib::validate(&state, request).await?;
-    let hash_validated_data = hash(validated_data.clone());
+    let sh_data = crate::onboarding::hash(validated_data.clone());
 
     let user_vault = match challenge_kind {
         ChallengeKind::PhoneNumber => {
-            db::user_vault::find_by_phone_number(&state.db_pool, hash_validated_data).await?
+            db::user_vault::find_by_phone_number(&state.db_pool, sh_data.clone()).await?
         }
         ChallengeKind::Email => {
-            db::user_vault::find_by_email(&state.db_pool, hash_validated_data).await?
+            db::user_vault::find_by_email(&state.db_pool, sh_data.clone()).await?
         }
     };
 
@@ -48,6 +47,7 @@ pub async fn handler(
                 &state,
                 &user_vault,
                 validated_data,
+                sh_data,
                 challenge_kind,
             )
             .await?;

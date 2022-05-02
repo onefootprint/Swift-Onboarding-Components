@@ -27,17 +27,24 @@ async fn test_db() {
     let (onboarding, onboarding_session_token) = crate::user_vault::init(&pool, user, tenant.id)
         .await
         .expect("couldnt init user vault");
-    let e_phone_number = crypto::random::gen_random_alphanumeric_code(16)
-        .as_bytes()
-        .to_vec();
 
     let sh_phone_number = crypto::random::gen_random_alphanumeric_code(16)
         .as_bytes()
         .to_vec();
+    crate::user_vault::update(
+        &pool,
+        crate::models::user_vaults::UpdateUserVault {
+            id: onboarding.user_vault_id.clone(),
+            sh_phone_number: Some(sh_phone_number.to_vec()),
+            id_verified: crate::models::types::Status::Processing,
+            ..Default::default()
+        },
+    )
+    .await
+    .expect("couldn't update user");
     let (challenge, code) = crate::challenge::create(
         &pool,
         onboarding.user_vault_id.clone(),
-        e_phone_number.clone(),
         sh_phone_number.clone(),
         crate::models::types::ChallengeKind::PhoneNumber,
     )
@@ -57,18 +64,7 @@ async fn test_db() {
     let (user_vault, _) = crate::user_vault::get_by_token(&pool, onboarding_session_token)
         .await
         .expect("couldn't fetch user by token");
-    assert_eq!(
-        user_vault
-            .sh_phone_number
-            .expect("expected sh_phone_number to be set"),
-        sh_phone_number,
-    );
-    assert_eq!(
-        user_vault
-            .e_phone_number
-            .expect("expected e_phone_number to be set"),
-        e_phone_number,
-    );
+    assert!(user_vault.is_phone_number_verified);
 
     // TODO find_by_phone_number and find_by_email
 }

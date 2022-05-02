@@ -5,6 +5,7 @@ pub mod init;
 pub mod update;
 
 use crate::errors::ApiError;
+use crate::State;
 use crypto::sha256;
 use db::models::user_vaults::UserVault;
 
@@ -20,6 +21,30 @@ fn seal(val: String, user_vault: &UserVault) -> Result<Vec<u8>, ApiError> {
 fn hash(val: String) -> Vec<u8> {
     // TODO hmac
     sha256(val.as_bytes()).to_vec()
+}
+
+pub async fn clean_phone_number(
+    state: &web::Data<State>,
+    raw_phone_number: &str,
+) -> Result<String, ApiError> {
+    let req = aws_sdk_pinpoint::model::NumberValidateRequest::builder()
+        .phone_number(raw_phone_number)
+        .build();
+    let validated_phone_number = state
+        .pinpoint_client
+        .phone_number_validate()
+        .number_validate_request(req)
+        .send()
+        .await?
+        .number_validate_response
+        .ok_or(ApiError::PhoneNumberValidationError)?
+        .cleansed_phone_number_e164
+        .ok_or(ApiError::PhoneNumberValidationError)?;
+    Ok(validated_phone_number)
+}
+
+pub fn clean_email(raw_email: String) -> String {
+    raw_email
 }
 
 use paperclip::actix::web;

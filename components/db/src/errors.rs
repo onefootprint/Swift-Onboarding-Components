@@ -26,6 +26,9 @@ pub enum DbError {
     #[error("onboarding_token_token")]
     OnboardingTokenInactive,
 
+    #[error("challenge_data_mismatch")]
+    ChallengeDataMismatch,
+
     #[error("challenge_code_mismatch")]
     ChallengeCodeMismatch,
 

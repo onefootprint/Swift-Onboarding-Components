@@ -19,30 +19,6 @@ pub struct CreateChallengeRequest {
     phone_number: Option<String>,
 }
 
-pub async fn clean_phone_number(
-    state: &web::Data<State>,
-    raw_phone_number: String,
-) -> Result<String, ApiError> {
-    let req = aws_sdk_pinpoint::model::NumberValidateRequest::builder()
-        .phone_number(raw_phone_number)
-        .build();
-    let validated_phone_number = state
-        .pinpoint_client
-        .phone_number_validate()
-        .number_validate_request(req)
-        .send()
-        .await?
-        .number_validate_response
-        .ok_or(ApiError::PhoneNumberValidationError)?
-        .cleansed_phone_number_e164
-        .ok_or(ApiError::PhoneNumberValidationError)?;
-    Ok(validated_phone_number)
-}
-
-pub fn clean_email(raw_email: String) -> String {
-    raw_email
-}
-
 pub async fn validate(
     state: &web::Data<State>,
     request: Json<CreateChallengeRequest>,
@@ -59,8 +35,10 @@ pub async fn validate(
     };
 
     let validated_data = match kind {
-        ChallengeKind::PhoneNumber => clean_phone_number(&state, raw_data).await?,
-        ChallengeKind::Email => clean_email(raw_data),
+        ChallengeKind::PhoneNumber => {
+            crate::onboarding::clean_phone_number(&state, &raw_data).await?
+        }
+        ChallengeKind::Email => crate::onboarding::clean_email(raw_data),
     };
     Ok((kind, validated_data))
 }
@@ -69,16 +47,14 @@ pub async fn initiate(
     state: &web::Data<State>,
     user_vault: &UserVault,
     validated_data: String,
+    sh_data: Vec<u8>,
     kind: ChallengeKind,
 ) -> Result<Uuid, ApiError> {
-    let sh_data = crate::onboarding::hash(validated_data.clone());
-    let e_data = crate::onboarding::seal(validated_data.clone(), &user_vault)?;
-
     // TODO only want to expire old challenges for this tenant - user should be allowed to have two challenges for different tenants
     db::challenge::expire_old(&state.db_pool, user_vault.id.clone(), kind).await?;
 
     let (challenge, code) =
-        db::challenge::create(&state.db_pool, user_vault.id.clone(), e_data, sh_data, kind).await?;
+        db::challenge::create(&state.db_pool, user_vault.id.clone(), sh_data, kind).await?;
 
     // We may want to end up doing this asynchronously - these can be latent operations
     match kind {
