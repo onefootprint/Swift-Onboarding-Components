@@ -1,5 +1,5 @@
 use crate::{
-    auth::onboarding_token::OnboardingSessionTokenContext, errors::ApiError,
+    auth::onboarding_session::OnboardingSessionContext, errors::ApiError,
     response::success::ApiResponseData, State,
 };
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
@@ -74,7 +74,7 @@ struct UserPatchRequest {
 #[post("/data")]
 async fn handler(
     state: web::Data<State>,
-    onboarding_token_auth: OnboardingSessionTokenContext,
+    onboarding_token_auth: OnboardingSessionContext,
     request: web::Json<UserPatchRequest>,
 ) -> actix_web::Result<Json<ApiResponseData<String>>, ApiError> {
     let user_vault = onboarding_token_auth.user_vault();

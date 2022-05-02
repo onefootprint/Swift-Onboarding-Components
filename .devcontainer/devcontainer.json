@@ -31,18 +31,18 @@
 			"thiserror",
 			"vsock"
     	],
-		"sqltools.connections": [
-			{
-				"name": "Container database",
-				"driver": "PostgreSQL",
-				"previewLimit": 50,
-				"server": "localhost",
-				"port": 5432,
-				"database": "postgres",
-				"username": "postgres",
-				"password": "postgres"
-			}
-		],
+		// "sqltools.connections": [
+		// 	{
+		// 		"name": "Container database",
+		// 		"driver": "PostgreSQL",
+		// 		"previewLimit": 50,
+		// 		"server": "localhost",
+		// 		"port": 5432,
+		// 		"database": "postgres",
+		// 		"username": "postgres",
+		// 		"password": "postgres"
+		// 	}
+		// ],
 	},
   "containerEnv": {
     "GITHUB_TOKEN": "${localEnv:GITHUB_TOKEN}",

@@ -4,7 +4,6 @@ import random
 import requests
 
 TENANT_AUTH_HEADER = "x-client-public-key"
-TENANT_USER_TOKEN_HEADER = "x-onboarding-session-token"
 
 url = lambda path: "{}/{}".format(os.environ.get('TEST_URL'), path)
 
@@ -16,13 +15,6 @@ def _client_pub_key_headers(request):
     assert "Expected client_public_key config to be set"
     return {
         TENANT_AUTH_HEADER: client_public_key,
-    }
-
-def _onboarding_session_token_headers(request):
-    onboarding_session_token = request.config.cache.get("onboarding_session_token", None)
-    assert "Expected onboarding_session_token config to be set"
-    return {
-        TENANT_USER_TOKEN_HEADER: onboarding_session_token,
     }
 
 def test_create_tenant(request):    
@@ -43,9 +35,9 @@ def test_init_user(request):
     print(r)
     print(r.content)
     assert(r.status_code == 200)
+
     # save temporary user token & user id
-    onboarding_session_token = r.json()["data"]["onboarding_session_token"]
-    request.config.cache.set("onboarding_session_token", onboarding_session_token)
+    request.config.cache.set("cookies", r.cookies.get_dict())
 
 def test_user_patch(request): 
     path = "onboarding/data"
@@ -54,7 +46,7 @@ def test_user_patch(request):
     fmt_phone_number = f"+1 (555) {random_phone_number[:3]}-{random_phone_number[3:]}"
     data = {"first_name": "Flerp", "phone_number": fmt_phone_number}
     print(url(path))
-    r = requests.post(url(path), json=data, headers=_onboarding_session_token_headers(request))
+    r = requests.post(url(path), json=data, cookies=request.config.cache.get("cookies", None))
     print(r.content)
     assert(r.status_code == 200)
 
@@ -62,7 +54,7 @@ def test_challenge_create(request):
     path = "onboarding/challenge"
     print(url(path))
     data = {"kind": "sms"}
-    r = requests.post(url(path), json=data, headers=_onboarding_session_token_headers(request))
+    r = requests.post(url(path), json=data, cookies=request.config.cache.get("cookies", None))
     print(r, r.content)
     assert(r.status_code == 200)  # TODO 201
 

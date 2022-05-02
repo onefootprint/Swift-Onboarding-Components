@@ -33,7 +33,7 @@ struct ClientKeysResponse {
 
 /// Create a new client (this endpoint will be private in prod TODO)
 #[api_v2_operation]
-#[post("/client/init")]
+#[post("/client")]
 async fn handler(
     request: web::Json<NewClientRequest>,
     state: web::Data<State>,

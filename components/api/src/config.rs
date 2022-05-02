@@ -36,6 +36,9 @@ pub struct Config {
 
     #[envconfig(from = "DATABASE_URL")]
     pub database_url: String,
+
+    #[envconfig(from = "COOKIE_SESSION_KEY")]
+    pub cookie_session_key_hex: Option<String>,
 }
 
 impl Config {

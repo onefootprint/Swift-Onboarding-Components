@@ -13,6 +13,7 @@ export interface StaticSecrets {
     otelConfig: aws.ssm.Parameter;
     enclaveUserSecretKey: aws.ssm.Parameter;
     dbPassword: pulumi.Output<string>;
+    cookieSessionKey: aws.ssm.Parameter;
 }
 
 interface SecretConstants {
@@ -25,6 +26,10 @@ interface ElasticSecrets {
 export async function LoadSecrets(config: pulumi.Config, enclaveKeyDescriptor: EnclaveKeyDescriptor): Promise<StaticSecrets> {
     const cloudfrontSecret = new random.RandomString("cf-alb-pass", { length: 44 }).result;
     const stack = pulumi.getStack();
+
+    const sessionKey = new random.RandomId("api-session-key", {
+        byteLength: 64,
+    });
 
     const secretsPolicy = new aws.iam.Policy("secrets_parameter_read_access", {
         policy: JSON.stringify({
@@ -62,6 +67,11 @@ export async function LoadSecrets(config: pulumi.Config, enclaveKeyDescriptor: E
             name: `/static_secrets/otelconfig-${stack}`,
         }),
         dbPassword: pulumi.secret(auroraDbPassword.result),
+        cookieSessionKey: new aws.ssm.Parameter(`ssm-param-api-cookie-session-key`, {
+            type: "SecureString",
+            value: pulumi.secret(sessionKey.hex),
+            name: `/static_secrets/api-session-key-${stack}`,
+        }),
     }
 }
 

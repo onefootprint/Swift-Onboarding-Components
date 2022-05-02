@@ -1,6 +1,6 @@
 use crate::response::success::ApiResponseData;
 use crate::State;
-use crate::{auth::onboarding_token::OnboardingSessionTokenContext, errors::ApiError};
+use crate::{auth::onboarding_session::OnboardingSessionContext, errors::ApiError};
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 use uuid::Uuid;
 
@@ -18,7 +18,7 @@ struct ChallengeVerifyPath {
 #[post("/{challenge_id}/verify")]
 async fn handler(
     state: web::Data<State>,
-    onboarding_token_auth: OnboardingSessionTokenContext,
+    onboarding_token_auth: OnboardingSessionContext,
     path: web::Path<ChallengeVerifyPath>,
     request: Json<ChallengeVerifyRequest>,
 ) -> actix_web::Result<Json<ApiResponseData<()>>, ApiError> {

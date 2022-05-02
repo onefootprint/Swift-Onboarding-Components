@@ -11,9 +11,10 @@ RUN git config --global alias.pr "!git pull --rebase; git submodule update --ini
 RUN git config --global alias.l "log --oneline --graph"
 
 RUN curl -fsSL https://get.pulumi.com | sh
-RUN source /root/.bashrc
 
 RUN cargo install diesel_cli --no-default-features --features postgres
 
 RUN curl -L https://deb.nodesource.com/setup_16.x | bash && apt-get install -yq nodejs
 RUN npm install -g yarn
+
+RUN sudo apt-get -y install python3-pip python3-venv

@@ -1,6 +1,6 @@
 use crate::response::success::ApiResponseData;
 use crate::State;
-use crate::{auth::onboarding_token::OnboardingSessionTokenContext, errors::ApiError};
+use crate::{auth::onboarding_session::OnboardingSessionContext, errors::ApiError};
 use paperclip::actix::{api_v2_operation, web, web::Json, Apiv2Schema};
 
 use uuid::Uuid;
@@ -26,7 +26,7 @@ pub struct CreateChallengeResponse {
 #[api_v2_operation]
 pub async fn handler(
     state: web::Data<State>,
-    onboarding_token_auth: OnboardingSessionTokenContext,
+    onboarding_token_auth: OnboardingSessionContext,
     request: Json<ChallengeInitRequest>,
 ) -> actix_web::Result<Json<ApiResponseData<CreateChallengeResponse>>, ApiError> {
     let user_vault = onboarding_token_auth.user_vault();

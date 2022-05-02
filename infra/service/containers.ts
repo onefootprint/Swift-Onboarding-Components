@@ -23,13 +23,14 @@ export abstract class ServiceContainers {
             enclaveKeyDescriptor.rootKeyId,
             enclaveKeyDescriptor.enclaveKmsCredentials.access_key_id,
             secretsStore.enclaveUserSecretKey.arn,
-            database.databaseUrlSecretParam.arn
-        ]).apply(([otelCollector, rootKeyId, enclaveAccessKeyId, enclaveUserArn, databaseUrlArn]) => {
+            database.databaseUrlSecretParam.arn,
+            secretsStore.cookieSessionKey.arn
+        ]).apply(([otelCollector, rootKeyId, enclaveAccessKeyId, enclaveUserArn, databaseUrlArn, cookieSessionKeyArn]) => {
             const def = [{
                 name,
                 image,
                 essential: true,
-                secrets: [                    
+                secrets: [
                     {
                         name: "ENCLAVE_AWS_SECRET_ACCESS_KEY",
                         valueFrom: enclaveUserArn
@@ -37,13 +38,17 @@ export abstract class ServiceContainers {
                     {
                         name: "DATABASE_URL",
                         valueFrom: databaseUrlArn
+                    },
+                    {
+                        name: "COOKIE_SESSION_KEY",
+                        valueFrom: cookieSessionKeyArn
                     }
                 ],
                 environment: [
                     {
                         name: "AWS_REGION",
                         value: `${region}`
-                    },     
+                    },
                     {
                         name: "AWS_ROOT_KEY_ID",
                         value: rootKeyId

@@ -1,7 +1,6 @@
+use rand::distributions::Alphanumeric;
 use rand::distributions::Uniform;
 use rand::prelude::*;
-use rand::distributions::Alphanumeric;
-
 
 const NUMBERS: [char; 10] = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
 
@@ -18,12 +17,19 @@ pub fn gen_rand_n_digit_code(length: usize) -> String {
 }
 
 pub fn gen_random_alphanumeric_code(length: usize) -> String {
-    
     thread_rng()
         .sample_iter(&Alphanumeric)
         .take(length)
         .map(char::from)
         .collect()
+}
+
+/// Generate a random symmetric key
+pub fn random_cookie_session_key_bytes() -> Vec<u8> {
+    let mut rng = rand::thread_rng();
+    let mut bytes = vec![0u8; 64];
+    rng.fill_bytes(&mut bytes);
+    bytes
 }
 
 #[cfg(test)]
