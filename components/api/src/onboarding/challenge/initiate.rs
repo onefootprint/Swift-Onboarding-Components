@@ -49,7 +49,7 @@ pub async fn handler(
         Some(sh_data) => sh_data,
         None => return Err(ApiError::UserDataNotPopulated(db_kind)),
     };
-    let e_data = e_data.ok_or_else(|| ApiError::UserDataNotPopulated(db_kind))?;
+    let e_data = e_data.ok_or(ApiError::UserDataNotPopulated(db_kind))?;
     let decrypted_data = crate::enclave::lib::decrypt_bytes(
         &state,
         &e_data,
