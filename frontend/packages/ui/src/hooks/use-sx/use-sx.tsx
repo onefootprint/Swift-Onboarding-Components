@@ -6,14 +6,14 @@ import {
   customPropNativeMapper,
   customPropStyles,
   customPropThemeMapper,
-} from './use-xs.constants';
-import type { CustomStyleProps, XSStyleProps, XSStyles } from './use-xs.types';
+} from './use-sx.constants';
+import type { CustomStyleProps, SXStyleProps, SXStyles } from './use-sx.types';
 
-const useXS = (xs: XSStyleProps = {}) => {
+const useSX = (sx: SXStyleProps = {}) => {
   const theme = useTheme();
-  const nativeCSSProperties = omit(xs, customPropStyles);
-  const customCSSProperties = pick(xs, customPropStyles);
-  const finalCSSProperties: XSStyles = { ...nativeCSSProperties };
+  const nativeCSSProperties = omit(sx, customPropStyles);
+  const customCSSProperties = pick(sx, customPropStyles);
+  const finalCSSProperties: SXStyles = { ...nativeCSSProperties };
   Object.entries(customCSSProperties).forEach(([propName, propValue]) => {
     const propNameCasted = propName as keyof CustomStyleProps;
     const themePropName = customPropThemeMapper[propNameCasted];
@@ -25,4 +25,4 @@ const useXS = (xs: XSStyleProps = {}) => {
   return finalCSSProperties;
 };
 
-export default useXS;
+export default useSX;

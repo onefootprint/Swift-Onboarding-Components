@@ -122,7 +122,7 @@ export type BaseStyleProps = Pick<
   | 'zIndex'
 >;
 
-export type XSStyles = BaseStyleProps &
+export type SXStyles = BaseStyleProps &
   Pick<
     CSS.Properties,
     | 'backgroundColor'
@@ -159,6 +159,6 @@ export type XSStyles = BaseStyleProps &
     | 'rowGap'
   >;
 
-export type XSStylesKeys = keyof XSStyles;
+export type SXStylesKeys = keyof SXStyles;
 
-export type XSStyleProps = BaseStyleProps & CustomStyleProps;
+export type SXStyleProps = BaseStyleProps & CustomStyleProps;

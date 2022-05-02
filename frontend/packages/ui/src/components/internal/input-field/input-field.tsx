@@ -86,7 +86,7 @@ const InputField = forwardRef(
           </InputMask>
         </InputContainer>
         {hintText && (
-          <Box xs={{ marginTop: 3 }}>
+          <Box sx={{ marginTop: 3 }}>
             <Typography
               as="p"
               color={error ? 'error' : 'tertiary'}

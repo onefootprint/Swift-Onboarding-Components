@@ -11,10 +11,10 @@ describe('<Box />', () => {
     children = 'some content',
     id,
     testID,
-    xs,
+    sx,
   }: Partial<BoxProps>) =>
     customRender(
-      <Box as={as} ariaLabel={ariaLabel} testID={testID} id={id} xs={xs}>
+      <Box as={as} ariaLabel={ariaLabel} testID={testID} id={id} sx={sx}>
         {children}
       </Box>,
     );
@@ -61,7 +61,7 @@ describe('<Box />', () => {
     it('should add the correct styles', () => {
       renderBox({
         children: 'foo',
-        xs: {
+        sx: {
           display: 'flex',
           backgroundColor: 'tertiary',
         },

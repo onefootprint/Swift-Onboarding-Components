@@ -1,7 +1,11 @@
+export type { BoxProps } from './box';
+export { default as Box } from './box';
 export type { ButtonProps } from './button';
 export { default as Button } from './button';
 export type { FootprintButtonProps } from './footprint-button';
 export { default as FootprintButton } from './footprint-button';
+export type { GridProps } from './grid';
+export { default as Grid } from './grid';
 export type { InputTextProps } from './input-text';
 export { default as InputText } from './input-text';
 export type { LinkButtonProps } from './link-button';

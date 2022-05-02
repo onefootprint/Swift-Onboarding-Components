@@ -1,6 +1,6 @@
 import type { ThemeKey } from 'styled';
 
-import type { CustomStyleProps, XSStylesKeys } from './use-xs.types';
+import type { CustomStyleProps, SXStylesKeys } from './use-sx.types';
 
 export const customPropStyles: Array<keyof CustomStyleProps> = [
   'backgroundColor',
@@ -80,7 +80,7 @@ export const customPropThemeMapper: Record<keyof CustomStyleProps, ThemeKey> = {
 
 export const customPropNativeMapper: Record<
   keyof CustomStyleProps,
-  XSStylesKeys[]
+  SXStylesKeys[]
 > = {
   backgroundColor: ['backgroundColor'],
   borderBottomColor: ['borderBottomColor'],

@@ -30,8 +30,8 @@ export default {
       control: 'text',
       description: 'Native ID HTML attribute',
     },
-    xs: {
-      control: 'xs',
+    sx: {
+      control: 'sx',
       description:
         'Custom object to customize the component using our guidelines',
     },
@@ -48,9 +48,9 @@ const Template: Story<BoxProps> = ({
   children,
   id,
   testID,
-  xs,
+  sx,
 }: Partial<BoxProps>) => (
-  <Box ariaLabel={ariaLabel} as={as} id={id} testID={testID} xs={xs}>
+  <Box ariaLabel={ariaLabel} as={as} id={id} testID={testID} sx={sx}>
     <Typography variant="body-1" color="quaternary">
       {children as string}
     </Typography>
@@ -64,7 +64,7 @@ Base.args = {
   children: 'Footprint',
   id: 'box-id',
   testID: 'box-test-id',
-  xs: {
+  sx: {
     alignItems: 'center',
     backgroundColor: 'tertiary',
     borderRadius: 2,

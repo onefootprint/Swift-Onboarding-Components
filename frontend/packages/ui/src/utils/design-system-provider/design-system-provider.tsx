@@ -14,6 +14,9 @@ const GlobalStyle = createGlobalStyle`
   *, :after, :before {
     box-sizing: border-box;
   }
+  body {
+    background-color: ${({ theme }) => theme.backgroundColors.secondary};
+  }
 `;
 
 const DesignSystemProvider = ({ children, theme }: BootstrapProps) => (

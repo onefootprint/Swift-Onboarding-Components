@@ -1,12 +1,12 @@
 import { renderHook, Wrapper } from 'test-utils';
 import { themes } from 'ui';
 
-import useXS from './use-xs';
+import useSX from './use-sx';
 
-describe('useXS', () => {
+describe('useSX', () => {
   describe('when the parameter is undefined', () => {
     it('should return an empty object', () => {
-      const { result } = renderHook(() => useXS(), { wrapper: Wrapper });
+      const { result } = renderHook(() => useSX(), { wrapper: Wrapper });
       expect(result.current).toMatchObject({});
     });
   });
@@ -15,7 +15,7 @@ describe('useXS', () => {
     it('should produce the expected style object', () => {
       const { result } = renderHook(
         () =>
-          useXS({ backgroundColor: 'primary', marginX: 3, display: 'flex' }),
+          useSX({ backgroundColor: 'primary', marginX: 3, display: 'flex' }),
         { wrapper: Wrapper },
       );
       expect(result.current).toMatchObject({

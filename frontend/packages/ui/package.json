@@ -14,6 +14,7 @@
     "build": "build-storybook"
   },
   "devDependencies": {
+    "@material-ui/core": "^4.12.4",
     "@storybook/addon-actions": "^6.4.22",
     "@storybook/addon-essentials": "^6.4.22",
     "@storybook/addon-interactions": "^6.4.22",
