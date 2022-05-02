@@ -20,6 +20,7 @@ mod enclave;
 mod index;
 mod onboarding;
 mod response;
+mod id;
 
 use paperclip::actix::{web, OpenApiExt};
 
@@ -114,7 +115,6 @@ async fn main() -> std::io::Result<()> {
             .service(
                 web::scope("/private")
                     .service(client::init::handler)
-                    .service(client::api_init::handler)
                     .service(enclave::encrypt::handler)
                     .service(enclave::decrypt::handler)
                     .service(enclave::sign::handler),

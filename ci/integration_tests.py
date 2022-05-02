@@ -25,23 +25,15 @@ def _onboarding_session_token_headers(request):
         TENANT_USER_TOKEN_HEADER: onboarding_session_token,
     }
 
-def test_create_tenant(request):
-    test_tenant_name = "integration_test_tenant"
-    path = "private/client/init/{}".format(test_tenant_name)
-    r = requests.post(url(path))
+def test_create_tenant(request):    
+    path = "private/client"
+    data = {"name": "integration_test_tenant"}
+    r = requests.post(url(path), json=data)
     assert(r.status_code == 200)
     # save tenant id
     client_id = r.json()["data"]["client_id"]
     request.config.cache.set("client_id", client_id)
-
-def test_create_tenant_api_keys(request):
-    test_api_key_name = "integration_test_api_key"
-    path = "private/client//{}/api-key/init/{}".format(request.config.cache.get("client_id", None), test_api_key_name)
-    r = requests.post(url(path))
-    print(r.content)
-    assert(r.status_code == 200)
-    # save public api key
-    client_public_key = r.json()["data"]["client_public_key"]
+    client_public_key = r.json()["data"]["keys"]["client_public_key"]
     request.config.cache.set("client_public_key", client_public_key)
 
 def test_init_user(request):
