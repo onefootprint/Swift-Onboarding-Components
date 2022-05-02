@@ -4,6 +4,7 @@ import InputMask from 'react-input-mask';
 import mergeRefs from 'react-merge-refs';
 import styled, { css } from 'styled';
 
+import Box from '../../box';
 import Typography from '../../typography';
 import Label from './components/label';
 import { InputFieldProps } from './input-field.types';
@@ -85,7 +86,7 @@ const InputField = forwardRef(
           </InputMask>
         </InputContainer>
         {hintText && (
-          <HintContainer>
+          <Box xs={{ marginTop: 3 }}>
             <Typography
               as="p"
               color={error ? 'error' : 'tertiary'}
@@ -93,7 +94,7 @@ const InputField = forwardRef(
             >
               {hintText}
             </Typography>
-          </HintContainer>
+          </Box>
         )}
       </>
     );
@@ -161,10 +162,6 @@ const Input = styled.input<{
       }
     `;
   }}
-`;
-
-const HintContainer = styled.div`
-  margin-top: ${({ theme }) => theme.spacings[3]}px;
 `;
 
 export default InputField;

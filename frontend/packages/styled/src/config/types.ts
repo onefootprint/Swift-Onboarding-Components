@@ -159,3 +159,5 @@ export type DefaultTheme = {
     [key in ThemeTypographies]: ThemeTypography;
   };
 };
+
+export type ThemeKey = keyof DefaultTheme;

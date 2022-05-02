@@ -64,9 +64,9 @@ describe('<InputText />', () => {
         placeholder: 'placeholder',
       });
       const input = screen.getByPlaceholderText('placeholder');
-      expect(input).toHaveStyle(
-        `border: 1px solid ${themes.light.borderColors.error}`,
-      );
+      expect(input).toHaveStyle({
+        border: `1px solid ${themes.light.borderColors.error}`,
+      });
     });
 
     it('should add an error border to the hint', () => {
@@ -75,7 +75,9 @@ describe('<InputText />', () => {
         hintText: 'Hint',
       });
       const hint = screen.getByText('Hint');
-      expect(hint).toHaveStyle(`color: ${themes.light.colors.error}`);
+      expect(hint).toHaveStyle({
+        color: themes.light.colors.error,
+      });
     });
   });
 

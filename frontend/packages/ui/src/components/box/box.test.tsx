@@ -1,0 +1,75 @@
+import React from 'react';
+import { customRender, screen } from 'test-utils';
+import { themes } from 'ui';
+
+import Box, { BoxProps } from './box';
+
+describe('<Box />', () => {
+  const renderBox = ({
+    ariaLabel,
+    as,
+    children = 'some content',
+    id,
+    testID,
+    xs,
+  }: Partial<BoxProps>) =>
+    customRender(
+      <Box as={as} ariaLabel={ariaLabel} testID={testID} id={id} xs={xs}>
+        {children}
+      </Box>,
+    );
+
+  describe('<Box />', () => {
+    it('should assign a testID', () => {
+      renderBox({
+        testID: 'box-test-id',
+      });
+      expect(screen.getByTestId('box-test-id')).toBeInTheDocument();
+    });
+
+    it('should assign a id', () => {
+      renderBox({
+        children: 'foo',
+        id: 'some-id',
+      });
+      expect(screen.getByText('foo').id).toBe('some-id');
+    });
+
+    it('should render the content', () => {
+      renderBox({
+        children: 'some content',
+      });
+      expect(screen.getByText('some content')).toBeInTheDocument();
+    });
+
+    it('should render the aria label', () => {
+      renderBox({
+        ariaLabel: 'lorem',
+        children: 'foo',
+      });
+      expect(screen.getByLabelText('lorem')).toBeInTheDocument();
+    });
+
+    it('should render as `section`', () => {
+      renderBox({
+        children: 'foo',
+        as: 'section',
+      });
+      expect(screen.getByText('foo').tagName).toBe('SECTION');
+    });
+
+    it('should add the correct styles', () => {
+      renderBox({
+        children: 'foo',
+        xs: {
+          display: 'flex',
+          backgroundColor: 'tertiary',
+        },
+      });
+      expect(screen.getByText('foo')).toHaveStyle({
+        display: 'flex',
+        backgroundColor: themes.light.backgroundColors.tertiary,
+      });
+    });
+  });
+});
