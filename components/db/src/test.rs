@@ -69,4 +69,6 @@ async fn test_db() {
             .expect("expected e_phone_number to be set"),
         e_phone_number,
     );
+
+    // TODO find_by_phone_number and find_by_email
 }

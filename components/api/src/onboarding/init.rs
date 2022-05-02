@@ -51,3 +51,4 @@ pub async fn handler(
         },
     }))
 }
+// TODO clean up empty user vaults

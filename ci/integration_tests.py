@@ -62,7 +62,7 @@ def test_user_patch(request):
 def test_challenge_create(request):
     path = "onboarding/challenge"
     print(url(path))
-    data = {"phone_number": "+1 (555) 555-5555"}
+    data = {"phone_number": "+1 (425) 984-4138"}
     r = requests.post(url(path), json=data, headers=_onboarding_session_token_headers(request))
     print(r, r.content)
     assert(r.status_code == 200)  # TODO 201
