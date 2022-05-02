@@ -137,10 +137,9 @@ const Input = styled.input<{
       }
 
       &:focus:enabled {
+        -webkit-appearance: none;
         border-color: ${theme.borderColors[focusBorderColor]};
         box-shadow: 0 0 0 4px
-          ${rgba(theme.borderColors[focusBorderColor], 0.16)};
-        -webkit-box-shadow: 0 0 0 4px
           ${rgba(theme.borderColors[focusBorderColor], 0.16)};
       }
 

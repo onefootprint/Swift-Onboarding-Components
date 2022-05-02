@@ -132,6 +132,7 @@ Base.args = {
   onChange: console.log,
   placeholder: 'your.email@email.com',
   testID: 'input-test-id',
+  type: 'email',
   value: '',
 };
 
