@@ -14,16 +14,16 @@ pub async fn init(
     pool: &Pool,
     user: NewUserVault,
     tenant_id: String,
-) -> Result<(Onboarding, String), DbError> {
+) -> Result<(UserVault, String), DbError> {
     let conn = pool.get().await?;
 
     let token = format!("vtok_{}", gen_random_alphanumeric_code(34));
     let h_session_id = sha256(token.as_bytes()).encode_hex();
 
-    let onboarding = conn
+    let user_vault = conn
         .interact(move |conn| {
             conn.build_transaction()
-                .run(|| -> Result<Onboarding, DbError> {
+                .run(|| -> Result<UserVault, DbError> {
                     // initialize new user vault
                     let user_vault: UserVault = diesel::insert_into(schema::user_vaults::table)
                         .values(&user)
@@ -32,7 +32,7 @@ pub async fn init(
                     // associate new user with tenant
                     let new_onboarding = NewOnboarding {
                         tenant_id: tenant_id.clone(),
-                        user_vault_id: user_vault.id,
+                        user_vault_id: user_vault.clone().id,
                         status: Status::Incomplete,
                     };
                     let onboarding: Onboarding = diesel::insert_into(schema::onboardings::table)
@@ -44,7 +44,7 @@ pub async fn init(
                         h_session_id,
                         session_data: crate::models::session_data::SessionState::OnboardingSession(
                             OnboardingSessionData {
-                                user_ob_id: onboarding.user_ob_id.clone(),
+                                user_ob_id: Some(onboarding.user_ob_id),
                                 challenge_data: ChallengeData::default(),
                             },
                         ),
@@ -53,12 +53,12 @@ pub async fn init(
                         .values(&temp_tenant_user_token)
                         .get_result::<Session>(conn)?;
 
-                    Ok(onboarding)
+                    Ok(user_vault)
                 })
         })
         .await??;
     // Return onboarding_session_token
-    Ok((onboarding, token))
+    Ok((user_vault, token))
 }
 
 pub async fn update(pool: &Pool, update: UpdateUserVault) -> Result<usize, DbError> {
@@ -138,6 +138,7 @@ pub async fn get_by_email(pool: &Pool, sh_email: Vec<u8>) -> Result<Option<UserV
             Ok(user)
         })
         .await??;
+
     Ok(user)
 }
 

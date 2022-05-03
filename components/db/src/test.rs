@@ -24,7 +24,7 @@ async fn test_db() {
         public_key: "public key".as_bytes().to_vec(),
         id_verified: crate::models::types::Status::Incomplete,
     };
-    let (onboarding, _) = crate::user_vault::init(&pool, user, tenant.id)
+    let (user_vault, _) = crate::user_vault::init(&pool, user, tenant.id)
         .await
         .expect("couldnt init user vault");
 
@@ -34,7 +34,7 @@ async fn test_db() {
     crate::user_vault::update(
         &pool,
         crate::models::user_vaults::UpdateUserVault {
-            id: onboarding.user_vault_id.clone(),
+            id: user_vault.id.clone(),
             sh_phone_number: Some(sh_phone_number.to_vec()),
             id_verified: crate::models::types::Status::Processing,
             ..Default::default()

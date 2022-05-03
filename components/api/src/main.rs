@@ -18,8 +18,8 @@ use crate::errors::ApiError;
 mod auth;
 mod client;
 mod enclave;
+mod identify;
 mod index;
-mod onboarding;
 mod response;
 use paperclip::actix::{web, OpenApiExt};
 
@@ -131,7 +131,6 @@ async fn main() -> std::io::Result<()> {
                     .service(enclave::decrypt::handler)
                     .service(enclave::sign::handler),
             )
-            .service(onboarding::routes())
             .service(index::index::handler)
             .service(index::health::handler)
             .with_json_spec_at("/open-api/spec")

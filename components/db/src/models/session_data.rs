@@ -20,12 +20,13 @@ pub enum SessionState {
 
 #[derive(Default, FromSqlRow, AsExpression, Serialize, Deserialize, Debug, Clone)]
 pub struct OnboardingSessionData {
-    pub user_ob_id: String,
+    pub user_ob_id: Option<String>,
     pub challenge_data: ChallengeData,
 }
 
 #[derive(FromSqlRow, AsExpression, Serialize, Deserialize, Debug, Clone)]
 pub struct ChallengeData {
+    pub tenant_id: String,
     pub challenge_type: ChallengeType,
     pub created_at: NaiveDateTime,
     pub h_challenge_code: Vec<u8>,
@@ -37,6 +38,7 @@ impl Default for ChallengeData {
     fn default() -> Self {
         Self {
             challenge_type: ChallengeType::default(),
+            tenant_id: "".to_string(),
             created_at: Utc::now().naive_utc(),
             h_challenge_code: sha256("".to_string().as_bytes()).to_vec(),
         }
@@ -46,8 +48,8 @@ impl Default for ChallengeData {
 #[derive(FromSqlRow, AsExpression, Serialize, Deserialize, Debug, Clone)]
 pub enum ChallengeType {
     NotSet,
-    Email(String),
-    PhoneNumber(String),
+    Email,
+    PhoneNumber,
 }
 
 impl Default for ChallengeType {

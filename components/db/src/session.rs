@@ -1,4 +1,4 @@
-use crate::models::sessions::Session;
+use crate::models::sessions::{NewSession, Session};
 use crate::schema;
 use crate::{errors::DbError, models::sessions::UpdateSession};
 use chrono::{Duration, Utc};
@@ -13,6 +13,20 @@ pub async fn get_by_session_id(pool: &Pool, session_id: String) -> Result<Sessio
         get_session_by_id_sync(conn, session_id)
     })
     .await?
+}
+
+pub async fn init(pool: &Pool, session: NewSession) -> Result<Session, DbError> {
+    let conn = pool.get().await?;
+
+    let session = conn
+        .interact(move |conn| {
+            diesel::insert_into(schema::sessions::table)
+                .values(&session)
+                .get_result::<Session>(conn)
+        })
+        .await??;
+
+    Ok(session)
 }
 
 pub async fn update(pool: &Pool, session: UpdateSession) -> Result<usize, DbError> {
