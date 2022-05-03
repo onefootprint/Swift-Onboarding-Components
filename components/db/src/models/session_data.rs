@@ -1,5 +1,4 @@
-use chrono::{NaiveDateTime, Utc};
-use crypto::sha256;
+use chrono::NaiveDateTime;
 use diesel::serialize::Output;
 use diesel::{
     pg::Pg,
@@ -14,14 +13,13 @@ use std::io::Write;
 #[sql_type = "Jsonb"]
 pub enum SessionState {
     Empty,
-    OnboardingSession(OnboardingSessionData),
+    LoggedInSession(LoggedInSessionData),
     IdentifySession(ChallengeData),
 }
 
 #[derive(Default, FromSqlRow, AsExpression, Serialize, Deserialize, Debug, Clone)]
-pub struct OnboardingSessionData {
+pub struct LoggedInSessionData {
     pub user_ob_id: Option<String>,
-    pub challenge_data: ChallengeData,
 }
 
 #[derive(FromSqlRow, AsExpression, Serialize, Deserialize, Debug, Clone)]
@@ -34,28 +32,10 @@ pub struct ChallengeData {
     // TODO add tennat_id for fun
 }
 
-impl Default for ChallengeData {
-    fn default() -> Self {
-        Self {
-            challenge_type: ChallengeType::default(),
-            tenant_id: "".to_string(),
-            created_at: Utc::now().naive_utc(),
-            h_challenge_code: sha256("".to_string().as_bytes()).to_vec(),
-        }
-    }
-}
-
 #[derive(FromSqlRow, AsExpression, Serialize, Deserialize, Debug, Clone)]
 pub enum ChallengeType {
-    NotSet,
     Email,
     PhoneNumber,
-}
-
-impl Default for ChallengeType {
-    fn default() -> Self {
-        Self::NotSet
-    }
 }
 
 impl Default for SessionState {

@@ -1,6 +1,6 @@
 use thiserror::Error;
 pub mod client_public_key;
-pub mod identify_session;
+pub mod session;
 
 #[derive(Debug, Error)]
 pub enum AuthError {
@@ -8,10 +8,14 @@ pub enum AuthError {
     UnknownClient,
     #[error("missing X-Client-Public-Key")]
     MissingClientAuthHeader,
-    #[error("missing X-Onboarding-Session-Token")]
-    MissingOnboardingSessionToken,
+    #[error("missing session token in cookie")]
+    MissingSessionTokenCookie,
+    #[error("missing user_identifier in cookie")]
+    MissingUserIdentifierCookie,
     #[error("error reading session: {0}")]
     SessionError(#[from] actix_web::Error),
+    #[error("incorrect session type auth")]
+    SessionTypeError,
     #[error("invalid json {0}")]
     InvalidSessionJson(serde_json::Error),
 }

@@ -131,6 +131,7 @@ async fn main() -> std::io::Result<()> {
                     .service(enclave::decrypt::handler)
                     .service(enclave::sign::handler),
             )
+            .service(identify::routes())
             .service(index::index::handler)
             .service(index::health::handler)
             .with_json_spec_at("/open-api/spec")

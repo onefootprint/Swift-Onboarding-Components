@@ -1,6 +1,6 @@
 use crate::errors::DbError;
 use crate::models::onboardings::{NewOnboarding, Onboarding};
-use crate::models::session_data::{OnboardingSessionData, SessionState};
+use crate::models::session_data::{LoggedInSessionData, SessionState};
 use crate::schema;
 use crate::session::get_session_by_id_sync;
 use deadpool_diesel::postgres::Pool;
@@ -50,11 +50,11 @@ pub(crate) fn get_onboarding_by_session_id_sync(
 pub(crate) fn get_onboarding_session_data_sync(
     conn: &mut PgConnection,
     session_id: String,
-) -> Result<OnboardingSessionData, DbError> {
+) -> Result<LoggedInSessionData, DbError> {
     let session = get_session_by_id_sync(conn, session_id)?;
 
     match session.session_data {
-        SessionState::OnboardingSession(s) => Ok(s),
+        SessionState::LoggedInSession(s) => Ok(s),
         _ => Err(DbError::InvalidSessionForOperation),
     }
 }

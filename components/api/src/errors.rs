@@ -45,8 +45,6 @@ pub enum ApiError {
     PhoneNumberValidationError,
     #[error("Json body invalid: {0}")]
     InvalidJsonBody(JsonPayloadError),
-    #[error("challenge_data_not_set")]
-    ChallengeDataNotSet,
     #[error("challenge_timeout_or_mismatch")]
     ChallengeNotValid,
 }
@@ -89,7 +87,6 @@ impl actix_web::ResponseError for ApiError {
             ApiError::CannotDecodeUtf8(_) => actix_web::http::StatusCode::BAD_REQUEST,
             ApiError::PhoneNumberValidationError => actix_web::http::StatusCode::BAD_REQUEST,
             ApiError::InvalidJsonBody(_) => actix_web::http::StatusCode::BAD_REQUEST,
-            ApiError::ChallengeDataNotSet => actix_web::http::StatusCode::BAD_REQUEST,
             ApiError::ChallengeNotValid => actix_web::http::StatusCode::BAD_REQUEST,
         }
     }

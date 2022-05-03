@@ -1,12 +1,9 @@
 use crate::errors::DbError;
 use crate::models::onboardings::*;
-use crate::models::session_data::{ChallengeData, OnboardingSessionData};
-use crate::models::sessions::{NewSession, Session};
 use crate::models::types::Status;
 use crate::models::user_vaults::*;
 use crate::onboarding::get_onboarding_by_session_id_sync;
 use crate::schema;
-use crypto::{hex::ToHex, random::gen_random_alphanumeric_code, sha256};
 use deadpool_diesel::postgres::Pool;
 use diesel::prelude::*;
 
@@ -14,16 +11,13 @@ pub async fn init(
     pool: &Pool,
     user: NewUserVault,
     tenant_id: String,
-) -> Result<(UserVault, String), DbError> {
+) -> Result<(UserVault, Onboarding), DbError> {
     let conn = pool.get().await?;
 
-    let token = format!("vtok_{}", gen_random_alphanumeric_code(34));
-    let h_session_id = sha256(token.as_bytes()).encode_hex();
-
-    let user_vault = conn
+    let (user_vault, onboarding) = conn
         .interact(move |conn| {
             conn.build_transaction()
-                .run(|| -> Result<UserVault, DbError> {
+                .run(|| -> Result<(UserVault, Onboarding), DbError> {
                     // initialize new user vault
                     let user_vault: UserVault = diesel::insert_into(schema::user_vaults::table)
                         .values(&user)
@@ -39,26 +33,11 @@ pub async fn init(
                         .values(&new_onboarding)
                         .get_result::<Onboarding>(conn)?;
 
-                    // grant temporary credentials to tenant to modify user
-                    let temp_tenant_user_token = NewSession {
-                        h_session_id,
-                        session_data: crate::models::session_data::SessionState::OnboardingSession(
-                            OnboardingSessionData {
-                                user_ob_id: Some(onboarding.user_ob_id),
-                                challenge_data: ChallengeData::default(),
-                            },
-                        ),
-                    };
-                    diesel::insert_into(schema::sessions::table)
-                        .values(&temp_tenant_user_token)
-                        .get_result::<Session>(conn)?;
-
-                    Ok(user_vault)
+                    Ok((user_vault, onboarding))
                 })
         })
         .await??;
-    // Return onboarding_session_token
-    Ok((user_vault, token))
+    Ok((user_vault, onboarding))
 }
 
 pub async fn update(pool: &Pool, update: UpdateUserVault) -> Result<usize, DbError> {
