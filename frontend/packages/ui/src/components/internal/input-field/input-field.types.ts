@@ -1,7 +1,7 @@
 import { InputHTMLAttributes } from 'react';
 
 export type InputFieldProps = {
-  error?: boolean;
+  hasError?: boolean;
   hintText?: string;
   label?: string;
   mask?: string | (string | RegExp)[];

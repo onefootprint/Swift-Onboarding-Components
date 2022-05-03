@@ -47,7 +47,7 @@ export default {
     },
     testID: {
       control: 'text',
-      description: 'data-testid for testing purposes',
+      description: 'Append an attribute data-testid for testing purposes',
     },
   },
 } as ComponentMeta<typeof LinkButton>;

@@ -6,7 +6,7 @@ import Typography from './typography';
 describe('<Typography />', () => {
   it('should render the content', () => {
     customRender(
-      <Typography variant="display-1" color="primary">
+      <Typography variant="caption-2" color="primary">
         foo
       </Typography>,
     );

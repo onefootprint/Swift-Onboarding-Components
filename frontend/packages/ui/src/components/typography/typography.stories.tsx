@@ -19,7 +19,10 @@ export default {
     ellipsis: { control: 'boolean' },
     htmlTitle: { control: 'text' },
     lineThrough: { control: 'boolean' },
-    testID: { control: 'text' },
+    testID: {
+      control: 'text',
+      description: 'Append an attribute data-testid for testing purposes',
+    },
     variant: { control: 'select', options: Object.keys(variantMapping) },
   },
   decorators: [withDesign],

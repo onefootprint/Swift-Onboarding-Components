@@ -7,7 +7,7 @@ import InputText, { InputTextProps } from './input-text';
 describe('<InputText />', () => {
   const renderInputText = ({
     disabled,
-    error,
+    hasError,
     hintText,
     label = 'label-text',
     mask,
@@ -20,7 +20,7 @@ describe('<InputText />', () => {
     customRender(
       <InputText
         disabled={disabled}
-        error={error}
+        hasError={hasError}
         hintText={hintText}
         label={label}
         mask={mask}
@@ -60,7 +60,7 @@ describe('<InputText />', () => {
   describe('when it has an error', () => {
     it('should add an error border to the input', () => {
       renderInputText({
-        error: true,
+        hasError: true,
         placeholder: 'placeholder',
       });
       const input = screen.getByPlaceholderText('placeholder');
@@ -71,7 +71,7 @@ describe('<InputText />', () => {
 
     it('should add an error border to the hint', () => {
       renderInputText({
-        error: true,
+        hasError: true,
         hintText: 'Hint',
       });
       const hint = screen.getByText('Hint');
@@ -118,6 +118,4 @@ describe('<InputText />', () => {
       });
     });
   });
-
-  describe('when it has a mask', () => {});
 });

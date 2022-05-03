@@ -4,9 +4,8 @@ import InputMask from 'react-input-mask';
 import mergeRefs from 'react-merge-refs';
 import styled, { css } from 'styled';
 
-import Box from '../../box';
-import Typography from '../../typography';
-import Label from './components/label';
+import Hint from '../hint';
+import Label from '../label';
 import { InputFieldProps } from './input-field.types';
 
 const InputField = forwardRef(
@@ -16,8 +15,9 @@ const InputField = forwardRef(
       autoComplete,
       defaultValue,
       disabled = false,
-      error = false,
+      hasError = false,
       hintText,
+      inputMode,
       label,
       mask = '',
       maskPlaceholder = null,
@@ -27,6 +27,8 @@ const InputField = forwardRef(
       onBlur,
       onChange,
       onChangeText,
+      onKeyDown,
+      onKeyUp,
       onFocus,
       placeholder,
       readOnly,
@@ -54,8 +56,8 @@ const InputField = forwardRef(
 
     return (
       <>
+        {label && <Label htmlFor={id}>{label}</Label>}
         <InputContainer>
-          {label && <Label htmlFor={id}>{label}</Label>}
           <InputMask
             alwaysShowMask={false}
             disabled={disabled}
@@ -64,16 +66,19 @@ const InputField = forwardRef(
             onBlur={onBlur}
             onChange={disabled ? undefined : handleChange}
             onFocus={onFocus}
+            onKeyDown={onKeyDown}
+            onKeyUp={onKeyUp}
             readOnly={readOnly}
             value={value}
           >
             <Input
-              $error={error}
+              $hasError={hasError}
               alt={alt}
               autoComplete={autoComplete}
               data-testid={testID}
               defaultValue={defaultValue}
               id={id}
+              inputMode={inputMode}
               maxLength={maxLength}
               minLength={minLength}
               name={name}
@@ -86,15 +91,7 @@ const InputField = forwardRef(
           </InputMask>
         </InputContainer>
         {hintText && (
-          <Box sx={{ marginTop: 3 }}>
-            <Typography
-              as="p"
-              color={error ? 'error' : 'tertiary'}
-              variant="caption-1"
-            >
-              {hintText}
-            </Typography>
-          </Box>
+          <Hint color={hasError ? 'error' : 'tertiary'}>{hintText}</Hint>
         )}
       </>
     );
@@ -104,17 +101,15 @@ const InputField = forwardRef(
 const InputContainer = styled.div`
   display: flex;
   flex-direction: column;
-  position: relative;
-  width: 100%;
 `;
 
 const Input = styled.input<{
-  $error: boolean;
+  $hasError: boolean;
 }>`
-  ${({ $error, theme }) => {
-    const defaultBorderColor = $error ? 'error' : 'primary';
-    const hoverBorderColor = $error ? 'error' : 'primary';
-    const focusBorderColor = $error ? 'error' : 'secondary';
+  ${({ $hasError, theme }) => {
+    const defaultBorderColor = $hasError ? 'error' : 'primary';
+    const hoverBorderColor = $hasError ? 'error' : 'primary';
+    const focusBorderColor = $hasError ? 'error' : 'secondary';
     return css`
       background-color: ${theme.backgroundColors.primary};
       border-radius: ${theme.borderRadius[1]}px;
@@ -124,9 +119,10 @@ const Input = styled.input<{
       font-family: ${theme.typographies['body-3'].fontFamily};
       font-size: ${theme.typographies['body-3'].fontSize}px;
       font-weight: ${theme.typographies['body-3'].fontWeight};
+      height: 40px;
       line-height: ${theme.typographies['body-3'].lineHeight}px;
       outline: none;
-      padding: ${theme.spacings[1] + theme.spacings[3]}px ${theme.spacings[5]}px;
+      padding: 0 ${theme.spacings[5]}px;
       width: 100%;
 
       &:hover:enabled {
@@ -139,8 +135,7 @@ const Input = styled.input<{
       &:focus:enabled {
         -webkit-appearance: none;
         border-color: ${theme.borderColors[focusBorderColor]};
-        box-shadow: 0 0 0 4px
-          ${rgba(theme.borderColors[focusBorderColor], 0.16)};
+        box-shadow: 0 0 0 4px ${rgba(theme.borderColors[focusBorderColor], 0.1)};
       }
 
       &:disabled {

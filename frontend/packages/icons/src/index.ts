@@ -16,14 +16,24 @@ import IcoChevronLeft16 from '../ico/ico-chevron-left-16';
 import IcoChevronLeft24 from '../ico/ico-chevron-left-24';
 import IcoChevronRight16 from '../ico/ico-chevron-right-16';
 import IcoChevronRight24 from '../ico/ico-chevron-right-24';
+import IcoClose16 from '../ico/ico-close-16';
 import IcoClose24 from '../ico/ico-close-24';
 import IcoEmail16 from '../ico/ico-email-16';
 import IcoEmail24 from '../ico/ico-email-24';
+import IcoFileText16 from '../ico/ico-file-text-16';
+import IcoFileText24 from '../ico/ico-file-text-24';
+import IcoFootprint16 from '../ico/ico-footprint-16';
 import IcoFootprint24 from '../ico/ico-footprint-24';
+import IcoLock16 from '../ico/ico-lock-16';
+import IcoLock24 from '../ico/ico-lock-24';
+import IcoPhone16 from '../ico/ico-phone-16';
+import IcoPhone24 from '../ico/ico-phone-24';
 import IcoPlusBig16 from '../ico/ico-plus-big-16';
 import IcoPlusBig24 from '../ico/ico-plus-big-24';
 import IcoPlusSmall16 from '../ico/ico-plus-small-16';
 import IcoPlusSmall24 from '../ico/ico-plus-small-24';
+import IcoShield16 from '../ico/ico-shield-16';
+import IcoShield24 from '../ico/ico-shield-24';
 import IcoSpinner16 from '../ico/ico-spinner-16';
 import IcoSpinner24 from '../ico/ico-spinner-24';
 
@@ -35,9 +45,15 @@ export default {
   IcoChevronDown16,
   IcoChevronLeft16,
   IcoChevronRight16,
+  IcoClose16,
   IcoEmail16,
+  IcoFileText16,
+  IcoFootprint16,
+  IcoLock16,
+  IcoPhone16,
   IcoPlusBig16,
   IcoPlusSmall16,
+  IcoShield16,
   IcoSpinner16,
   IcoArrowRightSmall24,
   IcoArrowUpRight24,
@@ -48,9 +64,13 @@ export default {
   IcoChevronRight24,
   IcoClose24,
   IcoEmail24,
+  IcoFileText24,
   IcoFootprint24,
+  IcoLock24,
+  IcoPhone24,
   IcoPlusBig24,
   IcoPlusSmall24,
+  IcoShield24,
   IcoSpinner24,
   IcoCheckCircle40,
 };

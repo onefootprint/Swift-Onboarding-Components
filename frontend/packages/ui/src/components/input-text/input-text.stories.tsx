@@ -13,7 +13,7 @@ export default {
       required: false,
       table: { defaultValue: { summary: 'false' } },
     },
-    error: {
+    hasError: {
       control: 'boolean',
       description: 'Gives an error state to the input and hint',
       required: false,
@@ -65,7 +65,7 @@ export default {
     },
     testID: {
       control: 'text',
-      description: 'data-testid for testing purposes',
+      description: 'Append an attribute data-testid for testing purposes',
     },
     type: {
       control: 'text',
@@ -81,7 +81,7 @@ export default {
 
 const Template: Story<InputTextProps> = ({
   disabled,
-  error,
+  hasError,
   hintText,
   label,
   mask,
@@ -103,7 +103,7 @@ const Template: Story<InputTextProps> = ({
   return (
     <InputText
       disabled={disabled}
-      error={error}
+      hasError={hasError}
       hintText={hintText}
       label={label}
       mask={mask}
@@ -154,7 +154,7 @@ WithoutLabel.args = {
 
 export const WithError = Template.bind({});
 WithError.args = {
-  error: true,
+  hasError: true,
   hintText: 'Hint',
   label: 'Address',
   onChange: console.log,
