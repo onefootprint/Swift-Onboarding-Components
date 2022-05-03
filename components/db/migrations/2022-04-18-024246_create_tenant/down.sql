@@ -1,12 +1,8 @@
-DROP TRIGGER refresh_updated_at_uv ON user_vaults;
-DROP TRIGGER refresh_updated_at_tenant ON tenants;
-DROP TRIGGER refresh_updated_at_api_keys ON tenant_api_keys;
-DROP TRIGGER refresh_updated_at_ob  ON onboardings;
-DROP TABLE onboarding_session_tokens;
+DROP TABLE sessions;
 DROP INDEX onboardings_fp_id;
 DROP INDEX onboardings_tenant_id;
 DROP TABLE onboardings;
-DROP FUNCTION token_expiry;
+DROP FUNCTION expire_sessions;
 DROP TABLE tenants;
 DROP INDEX user_vaults_sh_ssn;
 DROP INDEX user_vaults_sh_phone_number;

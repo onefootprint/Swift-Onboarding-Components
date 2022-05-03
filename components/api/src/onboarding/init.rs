@@ -18,8 +18,6 @@ pub async fn handler(
     session: Session,
     state: web::Data<State>,
 ) -> actix_web::Result<Json<ApiResponseData<Empty>>, ApiError> {
-    // TODO, add email & phone number to request & check against existing entries
-
     let new_key_pair = state
         .kms_client
         .generate_data_key_pair_without_plaintext()

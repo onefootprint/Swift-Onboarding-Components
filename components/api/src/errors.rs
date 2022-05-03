@@ -7,7 +7,6 @@ use aws_sdk_pinpoint::{error::PhoneNumberValidateError, types::SdkError as Pinpo
 use aws_sdk_pinpointemail::{error::SendEmailError, types::SdkError as EmailSdkError};
 use aws_sdk_pinpointsmsvoicev2::{error::SendTextMessageError, types::SdkError as SmsSdkError};
 use db::errors::DbError;
-use db::models::types::ChallengeKind;
 use enclave_proxy::bb8;
 use paperclip::v2::schema::Apiv2Errors;
 use thiserror::Error;
@@ -18,12 +17,6 @@ use crate::response::error::{ApiResponseError, ApiResponseErrorInfo};
 pub enum ApiError {
     #[error("Auth error: {0}")]
     AuthError(#[from] crate::auth::AuthError),
-    #[error("User data {0:?} not provided")]
-    UserDataNotPopulated(ChallengeKind),
-    #[error("Must specify email or phone number to initiate a challenge")]
-    MustSpecifyEmailOrPhone,
-    #[error("Cannot specify both email and phone number to initiate a challenge")]
-    CannotSpecifyBothEmailAndPhone,
     #[error("kms.datakeypair.generate {0}")]
     KmsKeyPair(#[from] KmsSdkError<GenerateDataKeyPairWithoutPlaintextError>),
     #[error("kms.datakey.generate {0}")]
@@ -52,6 +45,10 @@ pub enum ApiError {
     PhoneNumberValidationError,
     #[error("Json body invalid: {0}")]
     InvalidJsonBody(JsonPayloadError),
+    #[error("challenge_data_not_set")]
+    ChallengeDataNotSet,
+    #[error("challenge_timeout_or_mismatch")]
+    ChallengeNotValid,
 }
 
 fn status_code_for_db_error(e: &DbError) -> actix_web::http::StatusCode {
@@ -67,7 +64,8 @@ fn status_code_for_db_error(e: &DbError) -> actix_web::http::StatusCode {
         DbError::ChallengeCodeMismatch => actix_web::http::StatusCode::BAD_REQUEST,
         DbError::ChallengeExpired => actix_web::http::StatusCode::BAD_REQUEST,
         DbError::ChallengeInactive => actix_web::http::StatusCode::BAD_REQUEST,
-        DbError::OnboardingTokenInactive => actix_web::http::StatusCode::UNAUTHORIZED,
+        DbError::InvalidSessionForOperation => actix_web::http::StatusCode::UNAUTHORIZED,
+        DbError::SessionExpired => actix_web::http::StatusCode::UNAUTHORIZED,
     }
 }
 
@@ -75,9 +73,6 @@ impl actix_web::ResponseError for ApiError {
     fn status_code(&self) -> actix_web::http::StatusCode {
         match self {
             ApiError::AuthError(_) => actix_web::http::StatusCode::BAD_REQUEST,
-            ApiError::UserDataNotPopulated(_) => actix_web::http::StatusCode::BAD_REQUEST,
-            ApiError::MustSpecifyEmailOrPhone => actix_web::http::StatusCode::BAD_REQUEST,
-            ApiError::CannotSpecifyBothEmailAndPhone => actix_web::http::StatusCode::BAD_REQUEST,
             ApiError::KmsKeyPair(_) => actix_web::http::StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::KmsDataKey(_) => actix_web::http::StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::PinpointPhoneNumberValidateError(_) => {
@@ -94,6 +89,8 @@ impl actix_web::ResponseError for ApiError {
             ApiError::CannotDecodeUtf8(_) => actix_web::http::StatusCode::BAD_REQUEST,
             ApiError::PhoneNumberValidationError => actix_web::http::StatusCode::BAD_REQUEST,
             ApiError::InvalidJsonBody(_) => actix_web::http::StatusCode::BAD_REQUEST,
+            ApiError::ChallengeDataNotSet => actix_web::http::StatusCode::BAD_REQUEST,
+            ApiError::ChallengeNotValid => actix_web::http::StatusCode::BAD_REQUEST,
         }
     }
 

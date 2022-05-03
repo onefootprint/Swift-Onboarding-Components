@@ -20,11 +20,14 @@ pub enum DbError {
     #[error("migration_error: {0}")]
     MigrationError(#[from] diesel_migrations::RunMigrationsError),
 
+    #[error("invalid_session")]
+    InvalidSessionForOperation,
+
     #[error("invalid_tenant_auth")]
     InvalidTenantAuth,
 
-    #[error("onboarding_token_token")]
-    OnboardingTokenInactive,
+    #[error("session_expired")]
+    SessionExpired,
 
     #[error("challenge_data_mismatch")]
     ChallengeDataMismatch,

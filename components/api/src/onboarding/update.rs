@@ -74,10 +74,10 @@ struct UserPatchRequest {
 #[post("/data")]
 async fn handler(
     state: web::Data<State>,
-    onboarding_token_auth: OnboardingSessionContext,
+    session_context: OnboardingSessionContext,
     request: web::Json<UserPatchRequest>,
 ) -> actix_web::Result<Json<ApiResponseData<String>>, ApiError> {
-    let user_vault = onboarding_token_auth.user_vault();
+    let user_vault = session_context.user_vault();
 
     fn seal(
         val: Option<Option<String>>,
@@ -129,9 +129,9 @@ async fn handler(
         id_verified: Status::Processing,
     };
 
-    let size = db::user_vault::update(&state.db_pool, user_update).await?;
+    let _status = db::user_vault::update(&state.db_pool, user_update).await?;
 
     Ok(Json(ApiResponseData {
-        data: format!("Succesful update: total update size {}", size),
+        data: "Succesful update".to_string(),
     }))
 }

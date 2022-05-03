@@ -81,37 +81,30 @@ CREATE TABLE tenant_api_keys (
     updated_at timestamp NOT NULL DEFAULT NOW()
 );
 
-CREATE TABLE onboarding_session_tokens (
-    h_token VARCHAR(250) PRIMARY KEY NOT NULL,
+CREATE TABLE sessions (
+    h_session_id VARCHAR(250) PRIMARY KEY NOT NULL,
     created_at timestamp NOT NULL DEFAULT NOW(),
-    user_ob_id VARCHAR(250) NOT NULL, 
-    CONSTRAINT fk_user_ob_id
-        FOREIGN KEY(user_ob_id)
-        REFERENCES onboardings(user_ob_id)
+    updated_at timestamp NOT NULL DEFAULT NOW(),
+    session_data jsonb NOT NULL DEFAULT '{}'
 );
 
-CREATE FUNCTION token_expiry() RETURNS trigger
+CREATE FUNCTION expire_sessions() RETURNS trigger
     LANGUAGE plpgsql
     AS $$
         BEGIN
-            DELETE FROM onboarding_session_tokens WHERE created_at < NOW() - INTERVAL '4 hours';
+            DELETE FROM sessions WHERE created_at < NOW() - INTERVAL '1 hours';
              RETURN NEW;
         END;
     $$;
 
-CREATE TRIGGER expire_onboarding_token
-    AFTER INSERT ON onboarding_session_tokens
-    EXECUTE PROCEDURE token_expiry();
+CREATE TRIGGER expire_sessions
+    AFTER INSERT ON sessions
+    EXECUTE PROCEDURE expire_sessions();
+    
+SELECT diesel_manage_updated_at('user_vaults');
+SELECT diesel_manage_updated_at('tenants');
+SELECT diesel_manage_updated_at('onboardings');
+SELECT diesel_manage_updated_at('tenant_api_keys');
+SELECT diesel_manage_updated_at('sessions');
 
-CREATE OR REPLACE FUNCTION refresh_updated_at()   
-RETURNS TRIGGER AS $$
-BEGIN
-    NEW.updated_at = now();
-    RETURN NEW;   
-END;
-$$ language 'plpgsql';
 
-CREATE TRIGGER refresh_updated_at_uv BEFORE UPDATE ON user_vaults FOR EACH ROW EXECUTE PROCEDURE  refresh_updated_at();
-CREATE TRIGGER refresh_updated_at_tenant BEFORE UPDATE ON tenants FOR EACH ROW EXECUTE PROCEDURE  refresh_updated_at();
-CREATE TRIGGER refresh_updated_at_api_keys BEFORE UPDATE ON tenant_api_keys FOR EACH ROW EXECUTE PROCEDURE  refresh_updated_at();
-CREATE TRIGGER refresh_updated_at_ob BEFORE UPDATE ON onboardings FOR EACH ROW EXECUTE PROCEDURE refresh_updated_at();

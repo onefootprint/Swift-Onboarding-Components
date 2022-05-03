@@ -55,8 +55,8 @@ pub async fn health_check(pool: &Pool) -> Result<Tenant, DbError> {
     Ok(tenant)
 }
 
-pub mod challenge;
 pub mod onboarding;
+pub mod session;
 pub mod tenant;
 #[cfg(test)]
 pub mod test;

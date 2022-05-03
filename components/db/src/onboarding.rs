@@ -1,24 +1,41 @@
 use crate::errors::DbError;
-use crate::models::{
-    onboardings::Onboarding, 
-    onboarding_session_tokens::OnboardingSessionToken
-};
+use crate::models::onboardings::Onboarding;
+use crate::models::session_data::{OnboardingSessionData, SessionState};
 use crate::schema;
+use crate::session::get_session_by_id_sync;
 use deadpool_diesel::postgres::Pool;
 use diesel::prelude::*;
 
-pub async fn get_onboarding_by_token(pool: &Pool, hashed_token: String) -> Result<Onboarding, DbError> {
+pub async fn get_by_session_id(pool: &Pool, session_id: String) -> Result<Onboarding, DbError> {
     let conn = pool.get().await?;
 
-    let (_, onboarding): (OnboardingSessionToken, Onboarding) = conn.interact(move |conn| {
-        schema::onboarding_session_tokens::table
-            .inner_join(schema::onboardings::table.on(
-                schema::onboardings::user_ob_id.eq(schema::onboarding_session_tokens::user_ob_id)))
-            .filter(schema::onboarding_session_tokens::h_token.eq(hashed_token))
-            .first(conn)
+    conn.interact(move |conn| -> Result<Onboarding, DbError> {
+        get_onboarding_by_session_id_sync(conn, session_id)
     })
-    .await??;
+    .await?
+}
+
+pub(crate) fn get_onboarding_by_session_id_sync(
+    conn: &mut PgConnection,
+    session_id: String,
+) -> Result<Onboarding, DbError> {
+    let onboarding_session_data = get_onboarding_session_data_sync(conn, session_id)?;
+
+    let onboarding: Onboarding = schema::onboardings::table
+        .filter(schema::onboardings::user_ob_id.eq(&onboarding_session_data.user_ob_id))
+        .first(conn)?;
 
     Ok(onboarding)
 }
 
+pub(crate) fn get_onboarding_session_data_sync(
+    conn: &mut PgConnection,
+    session_id: String,
+) -> Result<OnboardingSessionData, DbError> {
+    let session = get_session_by_id_sync(conn, session_id)?;
+
+    match session.session_data {
+        SessionState::OnboardingSession(s) => Ok(s),
+        _ => Err(DbError::InvalidSessionForOperation),
+    }
+}

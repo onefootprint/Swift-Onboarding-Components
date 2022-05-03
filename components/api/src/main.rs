@@ -21,7 +21,6 @@ mod enclave;
 mod index;
 mod onboarding;
 mod response;
-
 use paperclip::actix::{web, OpenApiExt};
 
 #[derive(Clone)]

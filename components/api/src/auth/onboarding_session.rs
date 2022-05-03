@@ -20,11 +20,15 @@ use super::AuthError;
 pub struct OnboardingSessionContext {
     user_vault: UserVault,
     onboarding: Onboarding,
+    session_info: db::models::sessions::Session,
 }
 
 impl OnboardingSessionContext {
     pub const SESSION_TOKEN_NAME: &'static str = "ob_session_tok";
 
+    pub fn session_info(&self) -> &db::models::sessions::Session {
+        &self.session_info
+    }
     pub fn user_vault(&self) -> &UserVault {
         &self.user_vault
     }
@@ -53,17 +57,18 @@ impl FromRequest for OnboardingSessionContext {
         Box::pin(async move {
             let session = session.await.map_err(AuthError::SessionError)?;
 
-            let token: String = session
+            let session_id: String = session
                 .get(Self::SESSION_TOKEN_NAME)
                 .map_err(AuthError::InvalidSessionJson)?
                 .ok_or(AuthError::MissingOnboardingSessionToken)?;
 
-            let (user_vault, auth_token) = db::user_vault::get_by_token(&pool, token).await?;
-            let onboarding =
-                db::onboarding::get_onboarding_by_token(&pool, auth_token.h_token).await?;
+            let onboarding = db::onboarding::get_by_session_id(&pool, session_id.clone()).await?;
+            let user_vault = db::user_vault::get(&pool, onboarding.user_vault_id.clone()).await?;
+            let session_info = db::session::get_by_session_id(&pool, session_id.clone()).await?;
             Ok(Self {
                 user_vault,
                 onboarding,
+                session_info,
             })
         })
     }

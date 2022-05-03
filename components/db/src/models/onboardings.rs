@@ -1,8 +1,8 @@
-use crate::schema::onboardings;
 use crate::models::types::Status;
+use crate::schema::onboardings;
+use chrono::NaiveDateTime;
 use diesel::{Insertable, Queryable};
 use serde::{Deserialize, Serialize};
-use chrono::{NaiveDateTime};
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
 #[table_name = "onboardings"]
@@ -13,7 +13,7 @@ pub struct Onboarding {
     pub tenant_id: String,
     pub status: Status,
     pub created_at: NaiveDateTime,
-    pub updated_at: NaiveDateTime
+    pub updated_at: NaiveDateTime,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
@@ -21,5 +21,5 @@ pub struct Onboarding {
 pub struct NewOnboarding {
     pub user_vault_id: String,
     pub tenant_id: String,
-    pub status: Status
+    pub status: Status,
 }

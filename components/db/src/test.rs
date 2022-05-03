@@ -24,7 +24,7 @@ async fn test_db() {
         public_key: "public key".as_bytes().to_vec(),
         id_verified: crate::models::types::Status::Incomplete,
     };
-    let (onboarding, onboarding_session_token) = crate::user_vault::init(&pool, user, tenant.id)
+    let (onboarding, _) = crate::user_vault::init(&pool, user, tenant.id)
         .await
         .expect("couldnt init user vault");
 
@@ -42,29 +42,6 @@ async fn test_db() {
     )
     .await
     .expect("couldn't update user");
-    let (challenge, code) = crate::challenge::create(
-        &pool,
-        onboarding.user_vault_id.clone(),
-        sh_phone_number.clone(),
-        crate::models::types::ChallengeKind::PhoneNumber,
-    )
-    .await
-    .expect("couldn't create challenge");
-    crate::challenge::verify(
-        &pool,
-        challenge.id,
-        onboarding.user_vault_id.clone(),
-        "flerp bad code derp".to_owned(),
-    )
-    .await
-    .expect_err("challenge shouldn't succeed with incorrect code");
-    crate::challenge::verify(&pool, challenge.id, onboarding.user_vault_id.clone(), code)
-        .await
-        .expect("couldn't verify challenge");
-    let (user_vault, _) = crate::user_vault::get_by_token(&pool, onboarding_session_token)
-        .await
-        .expect("couldn't fetch user by token");
-    assert!(user_vault.is_phone_number_verified);
 
     // TODO find_by_phone_number and find_by_email
 }

@@ -3,7 +3,6 @@ use crate::State;
 use crate::{auth::onboarding_session::OnboardingSessionContext, errors::ApiError};
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 
-
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Apiv2Schema)]
 struct CommitResponse {
     /// Unique footprint user id
@@ -13,11 +12,11 @@ struct CommitResponse {
 #[api_v2_operation]
 #[post("/commit")]
 async fn handler(
-    onboarding_token_auth: OnboardingSessionContext,
+    session_context: OnboardingSessionContext,
     _state: web::Data<State>,
 ) -> actix_web::Result<Json<ApiResponseData<CommitResponse>>, ApiError> {
     // TODO validate that the whole user vault is filled out to the tenant's specifications
-    let onboarding = onboarding_token_auth.onboarding();
+    let onboarding = session_context.onboarding();
 
     Ok(Json(ApiResponseData {
         data: CommitResponse {

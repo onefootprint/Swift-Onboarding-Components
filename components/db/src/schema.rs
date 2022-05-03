@@ -2,33 +2,6 @@ table! {
     use diesel::sql_types::*;
     use crate::models::types::*;
 
-    challenges (id) {
-        id -> Uuid,
-        user_vault_id -> Varchar,
-        sh_data -> Bytea,
-        h_code -> Bytea,
-        kind -> Challenge_kind,
-        state -> Challenge_state,
-        expires_at -> Timestamp,
-        validated_at -> Nullable<Timestamp>,
-    }
-}
-
-table! {
-    use diesel::sql_types::*;
-    use crate::models::types::*;
-
-    onboarding_session_tokens (h_token) {
-        h_token -> Varchar,
-        created_at -> Timestamp,
-        user_ob_id -> Varchar,
-    }
-}
-
-table! {
-    use diesel::sql_types::*;
-    use crate::models::types::*;
-
     onboardings (id) {
         id -> Varchar,
         user_ob_id -> Varchar,
@@ -37,6 +10,18 @@ table! {
         status -> User_status,
         created_at -> Timestamp,
         updated_at -> Timestamp,
+    }
+}
+
+table! {
+    use diesel::sql_types::*;
+    use crate::models::types::*;
+
+    sessions (h_session_id) {
+        h_session_id -> Varchar,
+        created_at -> Timestamp,
+        updated_at -> Timestamp,
+        session_data -> Jsonb,
     }
 }
 
@@ -98,14 +83,12 @@ table! {
     }
 }
 
-joinable!(challenges -> user_vaults (user_vault_id));
 joinable!(onboardings -> tenants (tenant_id));
 joinable!(onboardings -> user_vaults (user_vault_id));
 
 allow_tables_to_appear_in_same_query!(
-    challenges,
-    onboarding_session_tokens,
     onboardings,
+    sessions,
     tenant_api_keys,
     tenants,
     user_vaults,
