@@ -47,7 +47,7 @@ pub async fn handler(
                 ChallengeType::Email(email.clone()),
                 UpdateUserVault {
                     id: user_vault.id.clone(),
-                    sh_phone_number: Some(crate::onboarding::hash(email.clone())),
+                    sh_email: Some(crate::onboarding::hash(email.clone())),
                     is_email_verified: Some(false),
                     e_email: Some(seal(email, user_vault)?),
                     ..Default::default()
