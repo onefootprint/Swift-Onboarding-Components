@@ -10,7 +10,7 @@ use paperclip::actix::{api_v2_operation, web, web::Json, Apiv2Schema};
 use uuid::Uuid;
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
-#[serde(rename_all = "lowercase")]
+#[serde(rename_all = "snake_case")]
 enum ChallengeKind {
     Sms,
     Email,
