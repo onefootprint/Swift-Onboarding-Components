@@ -1,5 +1,6 @@
 use crate::errors::ApiError;
 use crate::State;
+use chrono::Utc;
 use db::models::session_data::{ChallengeData, ChallengeType};
 use paperclip::actix::{web, Apiv2Schema};
 
@@ -15,14 +16,14 @@ pub enum CreateChallengeRequest {
     PhoneNumber(String),
 }
 
-pub async fn challenge(
+pub async fn initiate(
     state: &web::Data<State>,
-    data: ChallengeData,
-    code: String,
-) -> Result<(), ApiError> {
-    let _ = match data.challenge_type {
+    challenge_type: ChallengeType,
+) -> Result<ChallengeData, ApiError> {
+    let code: String = crypto::random::gen_rand_n_digit_code(6);
+    let _ = match &challenge_type {
         ChallengeType::Email(data) => {
-            let content = build_email_content_body(code);
+            let content = build_email_content_body(code.clone());
             let output = state
                 .email_client
                 .send_email()
@@ -38,16 +39,24 @@ pub async fn challenge(
         ChallengeType::PhoneNumber(data) => {
             let output = state.sms_client.send_text_message()
                 .destination_phone_number(data)
-                .message_body(format!("Your Footprint verification code is {}. Don't share your code with anyone. We will never contact you to request this code.\n\n@onefootprint.com #{}", code, code))
+                .message_body(format!("Your Footprint verification code is {}. Don't share your code with anyone. We will never contact you to request this code.\n\n@onefootprint.com #{}", code.clone(), code.clone()))
                 .send()
                 .await?;
             log::info!("output from sending phone {:?}", output);
             Ok(())
         }
+        // TODO we shouldn't get here - this is more an HTTP 500
         ChallengeType::NotSet => Err(ApiError::ChallengeDataNotSet),
     };
 
-    Ok(())
+    let h_code = crypto::sha256(code.as_bytes()).to_vec();
+    let challenge_data = ChallengeData {
+        challenge_type,
+        created_at: Utc::now().naive_utc(),
+        h_challenge_code: h_code,
+    };
+
+    Ok(challenge_data)
 }
 
 fn build_email_content_body(code: String) -> EmailContent {

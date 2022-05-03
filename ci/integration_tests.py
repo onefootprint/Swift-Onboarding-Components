@@ -53,7 +53,9 @@ def test_user_patch(request):
 def test_challenge_create(request):
     path = "onboarding/challenge"
     print(url(path))
-    data = {"kind": "sms", "data": request.config.cache.get("phone_number", None)}
+    phone_number = request.config.cache.get("phone_number", None)
+    fmt_phone_number = f"+1-555-{phone_number[:3]}-{phone_number[3:]}"
+    data = {"kind": "sms", "data": fmt_phone_number}
     r = requests.post(url(path), json=data, cookies=request.config.cache.get("cookies", None))
     print(r, r.content)
     assert(r.status_code == 200)  # TODO 201
@@ -67,6 +69,7 @@ def test_identify(request):
     r = requests.post(url(path), json=data, headers=_client_pub_key_headers(request))
     print(r, r.content)
     assert(r.status_code == 200)
+    assert r.json()["data"]["kind"] == "challenge_initiated"
 
     # Fingerprint of random phone number not found
     random_phone_number = _gen_random_phone_number()
@@ -75,6 +78,7 @@ def test_identify(request):
     r = requests.post(url(path), json=data, headers=_client_pub_key_headers(request))
     print(r, r.content)
     assert(r.status_code == 200)
+    assert r.json()["data"]["kind"] == "no_user_found"
 
 # Test identify endpoint
 

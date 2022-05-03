@@ -129,7 +129,7 @@ async fn handler(
         id_verified: Status::Processing,
     };
 
-    let _status = db::user_vault::update(&state.db_pool, user_update).await?;
+    let _: usize = db::user_vault::update(&state.db_pool, user_update).await?;
 
     Ok(Json(ApiResponseData {
         data: "Succesful update".to_string(),

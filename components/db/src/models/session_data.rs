@@ -29,6 +29,8 @@ pub struct ChallengeData {
     pub challenge_type: ChallengeType,
     pub created_at: NaiveDateTime,
     pub h_challenge_code: Vec<u8>,
+    // TODO add h_data
+    // TODO add tennat_id for fun
 }
 
 impl Default for ChallengeData {

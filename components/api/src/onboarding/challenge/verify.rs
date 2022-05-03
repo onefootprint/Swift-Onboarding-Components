@@ -22,7 +22,7 @@ async fn handler(
     let user_vault = session_context.user_vault();
     let session_data = session_context.session_info();
 
-    let (h_code, challenge_type, created_at) = match session_data.clone().session_data {
+    let (stored_h_code, challenge_type, created_at) = match session_data.clone().session_data {
         SessionState::OnboardingSession(s) => Ok((
             s.challenge_data.h_challenge_code,
             s.challenge_data.challenge_type,
@@ -33,21 +33,23 @@ async fn handler(
     }?;
 
     let now = Utc::now().naive_utc();
-    let stored_code = crypto::sha256(request.code.as_bytes()).to_vec();
+    let request_h_code = crypto::sha256(request.code.as_bytes()).to_vec();
 
-    match (h_code == stored_code) & (created_at.signed_duration_since(now) > Duration::minutes(5)) {
-        true => {
-            let update = create_user_vault_update(&challenge_type, user_vault);
-            let _size = db::user_vault::update(&state.db_pool, update);
-            Ok(Json(ApiResponseData {
-                data: "Challenge validated and information and published to user vault".to_string(),
-            }))
-        }
-        false => Err(ApiError::ChallengeNotValid),
+    if (stored_h_code == request_h_code)
+        & (created_at.signed_duration_since(now) > Duration::minutes(5))
+    {
+        let update = create_user_vault_update(&challenge_type, user_vault);
+        db::user_vault::update(&state.db_pool, update).await?;
+        Ok(Json(ApiResponseData {
+            data: "Challenge validated and information and published to user vault".to_string(),
+        }))
+    } else {
+        Err(ApiError::ChallengeNotValid)
     }
 }
 
 fn create_user_vault_update(t: &ChallengeType, vault: &UserVault) -> UpdateUserVault {
+    // TODO validate that we are verifying the same contact info on user vault
     UpdateUserVault {
         id: vault.id.clone(),
         is_email_verified: match t {
