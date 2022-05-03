@@ -1,7 +1,7 @@
 import React from 'react';
 import { customRender, screen, userEvent } from 'test-utils';
-import { themes } from 'ui';
 
+import themes from '../../config/themes';
 import InputText, { InputTextProps } from './input-text';
 
 describe('<InputText />', () => {

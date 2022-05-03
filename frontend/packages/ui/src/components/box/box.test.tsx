@@ -1,7 +1,7 @@
 import React from 'react';
 import { customRender, screen } from 'test-utils';
-import { themes } from 'ui';
 
+import themes from '../../config/themes';
 import Box, { BoxProps } from './box';
 
 describe('<Box />', () => {

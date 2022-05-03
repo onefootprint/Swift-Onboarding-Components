@@ -1,13 +1,15 @@
 import React from 'react';
 import { customRender, screen, userEvent } from 'test-utils';
-import { themes } from 'ui';
 
+import themes from '../../config/themes';
 import PinInput, { PinInputProps } from './pin-input';
 
 describe('<PinInput />', () => {
   const renderPinInput = ({
     hasError = false,
     hintText,
+    isLoading = false,
+    loadingTestID = 'loading-test-id',
     onComplete = jest.fn(),
     testID = 'pin-input-test-id',
   }: Partial<PinInputProps>) =>
@@ -15,6 +17,8 @@ describe('<PinInput />', () => {
       <PinInput
         hasError={hasError}
         hintText={hintText}
+        isLoading={isLoading}
+        loadingTestID={loadingTestID}
         onComplete={onComplete}
         testID={testID}
       />,
@@ -138,6 +142,13 @@ describe('<PinInput />', () => {
         await userEvent.paste('123R');
         expect(document.activeElement).toEqual(firstInput);
       });
+    });
+  });
+
+  describe('when is loading', () => {
+    it('should show a spinner', () => {
+      renderPinInput({ isLoading: true, loadingTestID: 'loading-test-id' });
+      expect(screen.getByTestId('loading-test-id')).toBeInTheDocument();
     });
   });
 });

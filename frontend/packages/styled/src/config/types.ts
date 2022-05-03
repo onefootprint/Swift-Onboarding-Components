@@ -136,7 +136,7 @@ export type Overlays = keyof ThemeOverlay;
 
 export type BorderWidths = keyof ThemeBorderWidths;
 
-export type Elevations = ThemeElevations;
+export type Elevations = keyof ThemeElevations;
 
 export type BorderColors = keyof ThemeBorderColors;
 

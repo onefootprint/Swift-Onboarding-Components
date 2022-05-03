@@ -1,20 +1,23 @@
-import { useRef } from 'react';
+import { createRef, MutableRefObject, useEffect, useState } from 'react';
 
-const usePinInputRefs = () => {
-  const pinInputRefs = useRef<HTMLInputElement[]>([]);
+const usePinInputRefs = (pinInputCount: number) => {
+  const [refs, setRefs] = useState<MutableRefObject<HTMLInputElement>[]>([]);
 
-  const previous = (referenceIndex: number): HTMLInputElement | null =>
-    pinInputRefs.current[referenceIndex - 1];
+  const previous = (referenceIndex: number): HTMLInputElement =>
+    refs[referenceIndex - 1].current;
 
   const next = (referenceIndex: number): HTMLInputElement | null =>
-    pinInputRefs.current[referenceIndex + 1];
+    refs[referenceIndex + 1].current;
 
-  const add = (ref: HTMLInputElement | null) => {
-    if (!ref) return;
-    pinInputRefs.current.push(ref);
-  };
+  useEffect(() => {
+    setRefs(elRefs =>
+      Array(pinInputCount)
+        .fill('')
+        .map((_, i) => elRefs[i] || createRef()),
+    );
+  }, [pinInputCount]);
 
-  return { add, previous, next };
+  return { refs, previous, next };
 };
 
 export default usePinInputRefs;

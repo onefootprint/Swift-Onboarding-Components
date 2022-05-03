@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 
 import Hint from '../internal/hint';
 import InputField from '../internal/input-field';
+import LoadingIndicator from '../loading-indicator';
 import usePinInputRefs from './hooks/use-pin-input-refs';
 import { INPUT_FIELDS_COUNT, pins } from './pin-input.constants';
 import * as S from './pin-input.styles';
@@ -14,6 +15,8 @@ const waitNextInputFieldGetDisabled = defer;
 export type PinInputProps = {
   hasError?: boolean;
   hintText?: string;
+  isLoading?: boolean;
+  loadingTestID?: string;
   onComplete: (value: string) => void;
   testID?: string;
 };
@@ -21,11 +24,13 @@ export type PinInputProps = {
 const PinInput = ({
   hasError = false,
   hintText,
+  isLoading = false,
+  loadingTestID,
   onComplete,
   testID,
 }: PinInputProps) => {
   const [enteredPin, setEnteredPin] = useState<string[]>([]);
-  const inputRefs = usePinInputRefs();
+  const pinInputs = usePinInputRefs(INPUT_FIELDS_COUNT);
 
   const updatePin = (nextValue: string, pinIndex: number) => {
     const nextValues = [...enteredPin];
@@ -35,12 +40,13 @@ const PinInput = ({
   };
 
   const moveToNextOrComplete = (pin: string, index: number) => {
-    const isCompleted =
+    const isLastIndex = index === INPUT_FIELDS_COUNT - 1;
+    const areAllTheFieldsFilled =
       pin.length === INPUT_FIELDS_COUNT && Array.from(pin).every(identity);
-    if (isCompleted) {
+    if (isLastIndex && areAllTheFieldsFilled) {
       onComplete(pin);
     } else {
-      const nextInput = inputRefs.next(index);
+      const nextInput = pinInputs.next(index);
       if (nextInput) {
         waitNextInputFieldGetDisabled(() => {
           nextInput.focus();
@@ -76,7 +82,7 @@ const PinInput = ({
   const handleKeyDown = (pinIndex: number) => (event: React.KeyboardEvent) => {
     const element = event.target as HTMLInputElement;
     if (event.key === 'Backspace' && element.value === '') {
-      const previousInput = inputRefs.previous(pinIndex);
+      const previousInput = pinInputs.previous(pinIndex);
       if (previousInput) {
         updatePin('', pinIndex - 1);
         previousInput.focus();
@@ -86,29 +92,35 @@ const PinInput = ({
 
   return (
     <S.Container data-testid={testID}>
-      <S.PinContainer>
-        {pins.map((pinPosition, pinIndex) => {
-          const key = pinIndex;
-          return (
-            <InputField
-              autoComplete="one-time-code"
-              disabled={pinIndex > enteredPin.length}
-              hasError={hasError}
-              inputMode="numeric"
-              key={key}
-              onChange={handleChange(pinIndex)}
-              onKeyDown={handleKeyDown(pinIndex)}
-              placeholder=""
-              ref={inputRefs.add}
-              required
-              type="tel"
-              value={enteredPin[pinIndex]}
-            />
-          );
-        })}
-      </S.PinContainer>
-      {!!hintText && (
-        <Hint color={hasError ? 'error' : 'primary'}>{hintText}</Hint>
+      {isLoading ? (
+        <LoadingIndicator testID={loadingTestID} />
+      ) : (
+        <>
+          <S.PinContainer>
+            {pins.map((pinPosition, pinIndex) => {
+              const key = pinIndex;
+              return (
+                <InputField
+                  autoComplete="one-time-code"
+                  disabled={pinIndex > enteredPin.length}
+                  hasError={hasError}
+                  inputMode="numeric"
+                  key={key}
+                  onChange={handleChange(pinIndex)}
+                  onKeyDown={handleKeyDown(pinIndex)}
+                  placeholder=""
+                  ref={pinInputs.refs[pinIndex]}
+                  required
+                  type="tel"
+                  value={enteredPin[pinIndex]}
+                />
+              );
+            })}
+          </S.PinContainer>
+          {!!hintText && (
+            <Hint color={hasError ? 'error' : 'primary'}>{hintText}</Hint>
+          )}
+        </>
       )}
     </S.Container>
   );

@@ -1,6 +1,9 @@
 import { ComponentMeta, Story } from '@storybook/react';
-import React from 'react';
+import React, { useState } from 'react';
 
+import Box from '../box';
+import LinkButton from '../link-button';
+import Typography from '../typography';
 import PinInput, { PinInputProps } from './pin-input';
 
 export default {
@@ -26,26 +29,80 @@ export default {
       control: 'text',
       description: 'Append an attribute data-testid for testing purposes',
     },
+    isLoading: {
+      control: 'boolean',
+      description: 'Append an attribute data-testid for testing purposes',
+    },
   },
 } as ComponentMeta<typeof PinInput>;
 
 const Template: Story<PinInputProps> = ({
-  hasError,
-  hintText,
+  hasError: baseHasError = false,
+  hintText: baseHintText,
+  isLoading: baseIsLoading = false,
+  loadingTestID,
   onComplete,
   testID,
-}: PinInputProps) => (
-  <PinInput
-    hasError={hasError}
-    hintText={hintText}
-    onComplete={onComplete}
-    testID={testID}
-  />
-);
+}: PinInputProps) => {
+  const [isLoading, setLoading] = useState(false);
+  const [hasError, setError] = useState(false);
+  const [hintText, setHintText] = useState('');
+
+  const handleComplete = (pin: string) => {
+    onComplete(pin);
+    setLoading(true);
+    setTimeout(() => {
+      setError(true);
+      setLoading(false);
+      setHintText('Incorrect verification code');
+    }, 1500);
+  };
+
+  return (
+    <Box
+      sx={{
+        alignItems: 'center',
+        borderRadius: 1,
+        display: 'flex',
+        elevation: 2,
+        flexDirection: 'column',
+        height: '240px',
+        justifyContent: 'center',
+        width: '500px',
+      }}
+    >
+      <Box sx={{ marginBottom: 3 }}>
+        <Typography variant="heading-2" color="primary">
+          Welcome back! 🎉
+        </Typography>
+      </Box>
+      <Box sx={{ marginBottom: 8 }}>
+        <Typography variant="body-2" color="secondary">
+          Enter the 6-digit code sent to your phone
+        </Typography>
+      </Box>
+      <Box sx={{ marginBottom: 8 }}>
+        <PinInput
+          hasError={baseHasError || hasError}
+          hintText={baseHintText || hintText}
+          isLoading={baseIsLoading || isLoading}
+          loadingTestID={loadingTestID}
+          onComplete={handleComplete}
+          testID={testID}
+        />
+      </Box>
+      <Box>
+        <LinkButton>Resend code</LinkButton>
+      </Box>
+    </Box>
+  );
+};
 
 export const Base = Template.bind({});
 Base.args = {
   hasError: false,
+  isLoading: false,
+  loadingTestID: '',
   hintText: '',
   onComplete: console.log,
   testID: 'pin-input-test-id',
@@ -56,5 +113,10 @@ WithError.args = {
   hasError: true,
   hintText: 'Incorrect verification code',
   onComplete: console.log,
-  testID: 'pin-input-test-id',
+};
+
+export const WithLoading = Template.bind({});
+WithLoading.args = {
+  isLoading: true,
+  onComplete: console.log,
 };
