@@ -1,8 +1,9 @@
 use crate::response::success::ApiResponseData;
 use crate::State;
-use crate::{auth::session::IdentifySessionContext, errors::ApiError};
+use crate::{auth::identify_session::IdentifySessionContext, errors::ApiError};
 use aws_sdk_kms::model::DataKeyPairSpec;
 use chrono::{Duration, Utc};
+use crypto::hex::ToHex;
 use db::models::onboardings::{NewOnboarding, Onboarding};
 use db::models::session_data::{ChallengeData, LoggedInSessionData};
 use db::models::session_data::{ChallengeType, SessionState};
@@ -37,20 +38,20 @@ async fn handler(
     session_context: IdentifySessionContext,
     request: Json<VerifyRequest>,
 ) -> actix_web::Result<Json<ApiResponseData<VerifyResponse>>, ApiError> {
-    let challenge_data = session_context.challenge_data();
-    let identifier = session_context.user_identifier();
+    let challenge_data = session_context.challenge_data;
+    let identifier = session_context.state.user_identifier;
     let request_h_code = crypto::sha256(request.code.as_bytes()).to_vec();
 
-    if !verify_code(request_h_code, challenge_data).await? {
+    if !verify_code(request_h_code, &challenge_data).await? {
         return Err(ApiError::ChallengeNotValid);
     }
 
     let (onboarding, kind) =
-        get_or_create_user_onboarding(&state, challenge_data, identifier.clone()).await?;
+        get_or_create_user_onboarding(&state, &challenge_data, identifier.clone()).await?;
 
     // Update the session to a logged in state
     let updated_session = UpdateSession {
-        h_session_id: session_context.h_session_id().to_string(),
+        h_session_id: crypto::sha256(session_context.state.session_id.as_bytes()).encode_hex(),
         session_data: SessionState::LoggedInSession(LoggedInSessionData {
             user_ob_id: Some(onboarding.user_ob_id),
         }),

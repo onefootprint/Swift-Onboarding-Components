@@ -1,4 +1,4 @@
-use crate::auth::session::{set_identifier_cookie, set_token_cookie};
+use crate::auth::identify_session::{IdentifySessionContext, IdentifySessionState};
 use crate::identify::{clean_email, clean_phone_number};
 use crate::response::success::ApiResponseData;
 use crate::State;
@@ -13,7 +13,7 @@ use crypto::hex::ToHex;
 use crypto::random::gen_random_alphanumeric_code;
 use db::models::{
     session_data::{ChallengeData, ChallengeType},
-    sessions::{NewSession, Session as DbSession},
+    sessions::NewSession,
 };
 use paperclip::actix::{api_v2_operation, web, web::Json, Apiv2Schema};
 
@@ -42,19 +42,20 @@ pub async fn handler(
     let h_session_id: String = crypto::sha256(token.as_bytes()).encode_hex();
 
     // initiate a challenge to given identifier & set session data in db
-    let _ = initiate(
+    let challenge_data = initiate(
         &state,
         cleaned_data.clone(),
         request.0.clone(),
-        h_session_id,
+        h_session_id.clone(),
         pub_tenant_auth.tenant().clone().id,
     )
     .await?;
 
-    // Set the session_id in the cookie returned to the client
-    set_token_cookie(&session, token.clone())?;
-    // Also pass the cleaned_data back to the client
-    set_identifier_cookie(&session, cleaned_data.clone())?;
+    IdentifySessionState {
+        session_id: token,
+        user_identifier: cleaned_data.clone(),
+    }
+    .set(&session)?;
 
     Ok(Json(ApiResponseData {
         data: "challenge initiated".to_string(),
@@ -67,7 +68,7 @@ pub async fn initiate(
     challenge_type: IdentifyRequest,
     h_session_id: String,
     tenant_id: String,
-) -> Result<DbSession, ApiError> {
+) -> Result<ChallengeData, ApiError> {
     // TODO: generate random 6 digit code
     let code: String = "123456".to_owned(); // crypto::random::gen_rand_n_digit_code(6);
 
@@ -75,11 +76,11 @@ pub async fn initiate(
     let _ = send_challenge(state, data, challenge_type.clone(), code.clone()).await?;
 
     // initiate session info
-    let session =
+    let challenge_data =
         init_session_for_challenge(state, code, challenge_type.clone(), h_session_id, tenant_id)
             .await?;
 
-    Ok(session)
+    Ok(challenge_data)
 }
 
 async fn send_challenge(
@@ -136,7 +137,7 @@ async fn init_session_for_challenge(
     challenge_type: IdentifyRequest,
     h_session_id: String,
     tenant_id: String,
-) -> Result<DbSession, ApiError> {
+) -> Result<ChallengeData, ApiError> {
     // create challenge & store in session
     let h_code = crypto::sha256(code.as_bytes()).to_vec();
     let challenge_data = ChallengeData {
@@ -158,7 +159,7 @@ async fn init_session_for_challenge(
         session_data,
     };
 
-    let session = db::session::init(&state.db_pool, session_info).await?;
+    let _ = db::session::init(&state.db_pool, session_info).await?;
 
-    Ok(session)
+    Ok(challenge_data)
 }
