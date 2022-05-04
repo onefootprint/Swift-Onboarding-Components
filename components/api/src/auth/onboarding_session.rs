@@ -55,7 +55,7 @@ impl FromRequest for OnboardingSessionContext {
 
             let session = db::session::get_by_session_id(&pool, session_id.clone()).await?;
             // Actually verify that the session is the correct type
-            if let SessionState::LoggedInSession(_) = session.session_data.clone() {
+            if let SessionState::OnboardingSession(_) = session.session_data.clone() {
                 Ok(())
             } else {
                 Err(AuthError::SessionTypeError)

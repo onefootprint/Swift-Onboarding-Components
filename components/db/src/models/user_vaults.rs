@@ -92,3 +92,28 @@ impl MissingFields for UserVault {
         empties
     }
 }
+
+impl MissingFields for UpdateUserVault {
+    fn missing_fields(&self) -> Vec<&str> {
+        let attrs = vec![
+            ("first_name", self.e_first_name.clone()),
+            ("last_name", self.e_last_name.clone()),
+            ("date_of_birth", self.e_dob.clone()),
+            ("ssn", self.e_ssn.clone()),
+            ("street_address", self.e_street_address.clone()),
+            ("city", self.e_city.clone()),
+            ("state", self.e_state.clone()),
+        ];
+
+        let empties = attrs.iter().fold(Vec::new(), |mut list, val| match val {
+            (name, None) => {
+                list.push(name.to_owned());
+                list
+            }
+            _ => list,
+        });
+
+        empties
+    }
+}
+

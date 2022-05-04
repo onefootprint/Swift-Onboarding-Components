@@ -5,11 +5,11 @@ use aws_sdk_kms::model::DataKeyPairSpec;
 use chrono::{Duration, Utc};
 use crypto::hex::ToHex;
 use db::models::onboardings::{NewOnboarding, Onboarding};
-use db::models::session_data::{ChallengeData, LoggedInSessionData};
+use db::models::session_data::{ChallengeData, OnboardingSessionData};
 use db::models::session_data::{ChallengeType, SessionState};
 use db::models::sessions::UpdateSession;
 use db::models::types::Status;
-use db::models::user_vaults::{NewUserVault, UpdateUserVault, UserVault};
+use db::models::user_vaults::{MissingFields, NewUserVault, UpdateUserVault, UserVault};
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 
 use super::{hash, seal};
@@ -29,6 +29,8 @@ enum VerifyKind {
 #[derive(Debug, Clone, Apiv2Schema, serde::Serialize)]
 struct VerifyResponse {
     kind: VerifyKind,
+    /// Attributes needed to successfully onbaord this user
+    missing_attributes: String,
 }
 
 #[api_v2_operation]
@@ -46,22 +48,23 @@ async fn handler(
         return Err(ApiError::ChallengeNotValid);
     }
 
-    let (onboarding, kind) =
+    let (onboarding, kind, missing_attributes) =
         get_or_create_user_onboarding(&state, &challenge_data, identifier.clone()).await?;
 
-    // Update the session to a logged in state
+    // Update the session to onboarding session
     let updated_session = UpdateSession {
         h_session_id: crypto::sha256(session_context.state.session_id.as_bytes()).encode_hex(),
-        session_data: SessionState::LoggedInSession(LoggedInSessionData {
+        session_data: SessionState::OnboardingSession(OnboardingSessionData {
             user_ob_id: Some(onboarding.user_ob_id),
         }),
     };
     let _: usize = db::session::update(&state.db_pool, updated_session).await?;
 
-    // TODO do we need to send the set-cookie header in every response? Probably not
-
     Ok(Json(ApiResponseData {
-        data: VerifyResponse { kind },
+        data: VerifyResponse {
+            kind,
+            missing_attributes,
+        },
     }))
 }
 
@@ -69,7 +72,7 @@ async fn get_or_create_user_onboarding(
     state: &web::Data<State>,
     challenge_data: &ChallengeData,
     identifier: String,
-) -> Result<(Onboarding, VerifyKind), ApiError> {
+) -> Result<(Onboarding, VerifyKind, String), ApiError> {
     let sh_data = hash(identifier.clone());
     let existing_user_vault = match &challenge_data.challenge_type {
         ChallengeType::Email => {
@@ -80,16 +83,17 @@ async fn get_or_create_user_onboarding(
         }
     };
 
-    if let Some(uv) = existing_user_vault {
-        Ok((
+    match existing_user_vault {
+        Some(uv) => Ok((
             onboard_existing_user(state, uv.clone(), challenge_data.tenant_id.clone()).await?,
             VerifyKind::UserInherited,
-        ))
-    } else {
-        Ok((
-            onboard_new_user(state, challenge_data, identifier.clone()).await?,
-            VerifyKind::UserCreated,
-        ))
+            MissingFields::missing_fields(&uv).join(","),
+        )),
+        _ => {
+            let (ob, missing_fields) =
+                onboard_new_user(state, challenge_data, identifier.clone()).await?;
+            Ok((ob, VerifyKind::UserCreated, missing_fields))
+        }
     }
 }
 
@@ -98,15 +102,13 @@ async fn onboard_existing_user(
     uv: UserVault,
     tenant_id: String,
 ) -> Result<Onboarding, ApiError> {
-    // TODO what do we do if there's already an onboarding for this tenant/user combo?
-    // Error out, or return the same footprint_user_id?
     let new_onboarding = NewOnboarding {
         tenant_id,
         user_vault_id: uv.id,
         status: uv.id_verified,
     };
 
-    let ob = db::onboarding::init(&state.db_pool, new_onboarding).await?;
+    let ob = db::onboarding::init_or_get_existing(&state.db_pool, new_onboarding).await?;
     Ok(ob)
 }
 
@@ -114,7 +116,7 @@ async fn onboard_new_user(
     state: &web::Data<State>,
     challenge_data: &ChallengeData,
     identifier: String,
-) -> Result<Onboarding, ApiError> {
+) -> Result<(Onboarding, String), ApiError> {
     // create new user vault
     let (user, onboarding) = init_new_user_vault(state, challenge_data.tenant_id.clone()).await?;
 
@@ -137,10 +139,11 @@ async fn onboard_new_user(
         },
     };
 
-    let _ = db::user_vault::update(&state.db_pool, user_vault).await?;
+    let _ = db::user_vault::update(&state.db_pool, user_vault.clone()).await?;
 
+    let missing_fields = MissingFields::missing_fields(&user_vault).join(",");
     // create new onboarding session data
-    Ok(onboarding)
+    Ok((onboarding, missing_fields))
 }
 
 async fn init_new_user_vault(

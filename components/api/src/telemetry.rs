@@ -84,7 +84,7 @@ impl RootSpanBuilder for TelemetrySpanBuilder {
         );
         let span = root_span!(request);
         tracing::info!("{}", route);
-        return span;
+        span
     }
 
     fn on_request_end<B>(

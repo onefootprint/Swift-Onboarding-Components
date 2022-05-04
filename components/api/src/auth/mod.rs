@@ -10,8 +10,6 @@ pub enum AuthError {
     MissingClientAuthHeader,
     #[error("missing session token in cookie")]
     MissingSessionTokenCookie,
-    #[error("missing user_identifier in cookie")]
-    MissingUserIdentifierCookie,
     #[error("error reading session: {0}")]
     SessionError(#[from] actix_web::Error),
     #[error("incorrect session type auth")]

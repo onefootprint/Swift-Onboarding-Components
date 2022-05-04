@@ -3,7 +3,6 @@ use crate::{errors::ApiError, State};
 use actix_session::Session;
 use actix_web::{web, FromRequest};
 use db::models::session_data::{ChallengeData, SessionState};
-use db::models::{onboardings::Onboarding, user_vaults::UserVault};
 use futures_util::Future;
 use paperclip::actix::Apiv2Security;
 use serde::{Deserialize, Serialize};

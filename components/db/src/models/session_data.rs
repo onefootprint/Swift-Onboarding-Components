@@ -13,12 +13,12 @@ use std::io::Write;
 #[sql_type = "Jsonb"]
 pub enum SessionState {
     Empty,
-    LoggedInSession(LoggedInSessionData),
+    OnboardingSession(OnboardingSessionData),
     IdentifySession(ChallengeData),
 }
 
 #[derive(Default, FromSqlRow, AsExpression, Serialize, Deserialize, Debug, Clone)]
-pub struct LoggedInSessionData {
+pub struct OnboardingSessionData {
     pub user_ob_id: Option<String>,
 }
 
@@ -28,8 +28,6 @@ pub struct ChallengeData {
     pub challenge_type: ChallengeType,
     pub created_at: NaiveDateTime,
     pub h_challenge_code: Vec<u8>,
-    // TODO add h_data
-    // TODO add tennat_id for fun
 }
 
 #[derive(FromSqlRow, AsExpression, Serialize, Deserialize, Debug, Clone)]

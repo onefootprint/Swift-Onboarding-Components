@@ -1,5 +1,5 @@
-use crate::{errors::ApiError, response::success::ApiResponseData};
 use crate::State;
+use crate::{errors::ApiError, response::success::ApiResponseData};
 use enclave_proxy::{EnclavePayload, RpcPayload};
 use paperclip::actix::{api_v2_operation, get, web, web::Json};
 
@@ -21,9 +21,12 @@ async fn handler(state: web::Data<State>) -> Result<Json<ApiResponseData<String>
         }
     };
 
-    let db_health = db::health_check(&state.db_pool).await?.id.to_string();
+    let db_health = db::health_check(&state.db_pool).await?.id;
 
     Ok(Json(ApiResponseData {
-        data: format!("Enclave: got {}\nDB: got tenant {}", enclave_health, db_health)
+        data: format!(
+            "Enclave: got {}\nDB: got tenant {}",
+            enclave_health, db_health
+        ),
     }))
 }

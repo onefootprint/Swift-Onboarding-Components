@@ -1,4 +1,4 @@
-use crate::auth::identify_session::{IdentifySessionContext, IdentifySessionState};
+use crate::auth::identify_session::IdentifySessionState;
 use crate::identify::{clean_email, clean_phone_number};
 use crate::response::success::ApiResponseData;
 use crate::State;
@@ -42,7 +42,7 @@ pub async fn handler(
     let h_session_id: String = crypto::sha256(token.as_bytes()).encode_hex();
 
     // initiate a challenge to given identifier & set session data in db
-    let challenge_data = initiate(
+    let _ = initiate(
         &state,
         cleaned_data.clone(),
         request.0.clone(),
