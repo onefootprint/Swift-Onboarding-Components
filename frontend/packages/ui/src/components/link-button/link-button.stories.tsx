@@ -42,12 +42,17 @@ export default {
     },
     Icon: {
       control: 'select',
-      description: 'Where the Icon should be placed',
+      description: 'Icon to be rendered',
       options: Object.keys(Icos),
     },
     testID: {
       control: 'text',
       description: 'Append an attribute data-testid for testing purposes',
+    },
+    onPress: {
+      control: 'object',
+      description: 'Callback function triggered upon click',
+      required: false,
     },
   },
 } as ComponentMeta<typeof LinkButton>;

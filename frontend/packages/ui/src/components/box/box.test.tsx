@@ -42,7 +42,7 @@ describe('<Box />', () => {
       expect(screen.getByText('some content')).toBeInTheDocument();
     });
 
-    it('should render the aria label', () => {
+    it('should assign an aria label', () => {
       renderBox({
         ariaLabel: 'lorem',
         children: 'foo',

@@ -1,0 +1,67 @@
+import type { Icon as TIcon } from 'icons';
+import React, { forwardRef } from 'react';
+import styled, { css } from 'styled';
+
+export type IconButtonProps = {
+  ariaLabel: string;
+  Icon: TIcon;
+  onClick?: () => void;
+  testID?: string;
+};
+
+const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
+  ({ ariaLabel, Icon, onClick, testID }: IconButtonProps, ref) => (
+    <Container
+      aria-label={ariaLabel}
+      data-testid={testID}
+      onClick={onClick}
+      ref={ref}
+      tabIndex={0}
+      type="button"
+    >
+      <Icon color="primary" />
+    </Container>
+  ),
+);
+
+const Container = styled.button`
+  align-items: center;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  height: 32px;
+  justify-content: center;
+  width: 32px;
+  margin: 0;
+  padding: 0;
+
+  ${({ theme }) => css`
+    background-color: ${theme.backgroundColors.primary};
+    box-shadow: ${theme.elevations[3]};
+    border-radius: ${theme.borderRadius[3]}px;
+
+    &:hover:enabled {
+      background: linear-gradient(
+          ${theme.overlays.darken[1]},
+          ${theme.overlays.darken[1]}
+        ),
+        linear-gradient(
+          ${theme.backgroundColors.primary},
+          ${theme.backgroundColors.primary}
+        );
+    }
+
+    &:active:enabled {
+      background: linear-gradient(
+          ${theme.overlays.darken[2]},
+          ${theme.overlays.darken[2]}
+        ),
+        linear-gradient(
+          ${theme.backgroundColors.primary},
+          ${theme.backgroundColors.primary}
+        );
+    }
+  `}
+`;
+
+export default IconButton;

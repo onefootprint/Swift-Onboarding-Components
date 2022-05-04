@@ -32,7 +32,7 @@ describe('<Button />', () => {
     expect(screen.getByText('Lorem')).toBeTruthy();
   });
 
-  it('should fire an event when pressing', async () => {
+  it('should trigger onPress when pressing', async () => {
     const onPressMockFn = jest.fn();
     renderButton({ onPress: onPressMockFn, children: 'foo' });
     await userEvent.click(screen.getByText('foo'));

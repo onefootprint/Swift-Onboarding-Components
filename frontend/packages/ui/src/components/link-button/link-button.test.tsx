@@ -46,7 +46,7 @@ describe('<LinkButton />', () => {
       expect(screen.getByText('foo')).toBeTruthy();
     });
 
-    it('should render the aria label', () => {
+    it('should assign an aria label', () => {
       renderLinkButton({
         ariaLabel: 'lorem',
         children: 'foo',
