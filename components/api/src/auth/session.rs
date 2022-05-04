@@ -75,7 +75,6 @@ impl FromRequest for IdentifySessionContext {
                 .map_err(AuthError::InvalidSessionJson)?
                 .ok_or(AuthError::MissingUserIdentifierCookie)?;
 
-            println!("IN IDENTIFY CONTEXT {}", session_id);
             let session = db::session::get_by_session_id(&pool, session_id.clone()).await?;
             // Actually verify that the session is the correct type
             let challenge_data = if let SessionState::IdentifySession(challenge_data) =
@@ -138,7 +137,6 @@ impl FromRequest for LoggedInSessionContext {
                 .map_err(AuthError::InvalidSessionJson)?
                 .ok_or(AuthError::MissingSessionTokenCookie)?;
 
-            println!("HELLO super before loading {}", session_id);
             let session = db::session::get_by_session_id(&pool, session_id.clone()).await?;
             // Actually verify that the session is the correct type
             if let SessionState::LoggedInSession(_) = session.session_data.clone() {
@@ -146,11 +144,8 @@ impl FromRequest for LoggedInSessionContext {
             } else {
                 Err(AuthError::SessionTypeError)
             }?;
-            println!("HELLO before loading");
             let onboarding = db::onboarding::get_by_session_id(&pool, session_id.clone()).await?;
-            println!("HELLO mid loading");
             let user_vault = db::user_vault::get(&pool, onboarding.user_vault_id.clone()).await?;
-            println!("HELLO after loading");
 
             Ok(Self {
                 user_vault,
