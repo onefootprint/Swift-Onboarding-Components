@@ -2,10 +2,10 @@ import React from 'react';
 import { customRender, screen, userEvent } from 'test-utils';
 
 import themes from '../../config/themes';
-import InputText, { InputTextProps } from './input-text';
+import TextInput, { TextInputProps } from './text-input';
 
-describe('<InputText />', () => {
-  const renderInputText = ({
+describe('<TextInput />', () => {
+  const renderTextInput = ({
     disabled,
     hasError,
     hintText,
@@ -16,9 +16,9 @@ describe('<InputText />', () => {
     placeholder = 'placeholder-text',
     testID = 'input-test-id',
     value = '',
-  }: Partial<InputTextProps>) =>
+  }: Partial<TextInputProps>) =>
     customRender(
-      <InputText
+      <TextInput
         disabled={disabled}
         hasError={hasError}
         hintText={hintText}
@@ -33,33 +33,33 @@ describe('<InputText />', () => {
     );
 
   it('should assign a test id', () => {
-    renderInputText({ testID: 'input-test-id' });
+    renderTextInput({ testID: 'input-test-id' });
     expect(screen.getByTestId('input-test-id')).toBeInTheDocument();
   });
 
   it('should render value', () => {
-    renderInputText({ value: '123' });
+    renderTextInput({ value: '123' });
     expect(screen.getByDisplayValue('123')).toBeInTheDocument();
   });
 
   it('should render the label', () => {
-    renderInputText({ label: 'some label' });
+    renderTextInput({ label: 'some label' });
     expect(screen.getByLabelText('some label')).toBeInTheDocument();
   });
 
   it('should render the placeholder', () => {
-    renderInputText({ placeholder: 'some placeholder' });
+    renderTextInput({ placeholder: 'some placeholder' });
     expect(screen.getByPlaceholderText('some placeholder')).toBeInTheDocument();
   });
 
   it('should render the hint text', () => {
-    renderInputText({ hintText: 'hint' });
+    renderTextInput({ hintText: 'hint' });
     expect(screen.getByText('hint')).toBeInTheDocument();
   });
 
   describe('when it has an error', () => {
     it('should add an error border to the input', () => {
-      renderInputText({
+      renderTextInput({
         hasError: true,
         placeholder: 'placeholder',
       });
@@ -70,7 +70,7 @@ describe('<InputText />', () => {
     });
 
     it('should add an error border to the hint', () => {
-      renderInputText({
+      renderTextInput({
         hasError: true,
         hintText: 'Hint',
       });
@@ -84,7 +84,7 @@ describe('<InputText />', () => {
   describe('when changing the value', () => {
     it('should trigger onChange event', async () => {
       const onChangeMockFn = jest.fn();
-      renderInputText({
+      renderTextInput({
         onChange: onChangeMockFn,
         placeholder: 'placeholder text',
       });
@@ -95,7 +95,7 @@ describe('<InputText />', () => {
 
     it('should trigger onChangeText event', async () => {
       const onChangeTextMockFn = jest.fn();
-      renderInputText({
+      renderTextInput({
         onChangeText: onChangeTextMockFn,
         testID: 'input-test-id',
       });
@@ -107,7 +107,7 @@ describe('<InputText />', () => {
     describe('when it is disabled', () => {
       it('should not trigger onChangeText event', () => {
         const onChangeTextMockFn = jest.fn();
-        renderInputText({
+        renderTextInput({
           disabled: true,
           onChangeText: onChangeTextMockFn,
           testID: 'input-test-id',

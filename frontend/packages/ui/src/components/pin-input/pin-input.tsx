@@ -2,8 +2,8 @@ import defer from 'lodash/defer';
 import identity from 'lodash/identity';
 import React, { useState } from 'react';
 
+import BaseInput from '../internal/base-input';
 import Hint from '../internal/hint';
-import InputField from '../internal/input-field';
 import LoadingIndicator from '../loading-indicator';
 import usePinInputRefs from './hooks/use-pin-input-refs';
 import { INPUT_FIELDS_COUNT, pins } from './pin-input.constants';
@@ -100,7 +100,7 @@ const PinInput = ({
             {pins.map((pinPosition, pinIndex) => {
               const key = pinIndex;
               return (
-                <InputField
+                <BaseInput
                   autoComplete="one-time-code"
                   disabled={pinIndex > enteredPin.length}
                   hasError={hasError}

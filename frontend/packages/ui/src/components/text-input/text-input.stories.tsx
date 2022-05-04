@@ -1,11 +1,11 @@
 import { Meta, Story } from '@storybook/react';
 import React, { useState } from 'react';
 
-import InputText, { InputTextProps } from './input-text';
+import TextInput, { TextInputProps } from './text-input';
 
 export default {
-  component: InputText,
-  title: 'Components/InputText',
+  component: TextInput,
+  title: 'Components/TextInput',
   argTypes: {
     disabled: {
       control: 'boolean',
@@ -79,7 +79,7 @@ export default {
   },
 } as Meta;
 
-const Template: Story<InputTextProps> = ({
+const Template: Story<TextInputProps> = ({
   disabled,
   hasError,
   hintText,
@@ -94,14 +94,14 @@ const Template: Story<InputTextProps> = ({
   testID,
   type,
   value: initialValue = '',
-}: InputTextProps) => {
+}: TextInputProps) => {
   const [value, setValue] = useState<string>(initialValue);
   const handleChangeText = (text: string) => {
     setValue(text);
     if (onChangeText) onChangeText(text);
   };
   return (
-    <InputText
+    <TextInput
       disabled={disabled}
       hasError={hasError}
       hintText={hintText}

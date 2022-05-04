@@ -1,6 +1,6 @@
 import { InputHTMLAttributes } from 'react';
 
-export type InputFieldProps = {
+export type BaseInputProps = {
   hasError?: boolean;
   hintText?: string;
   label?: string;

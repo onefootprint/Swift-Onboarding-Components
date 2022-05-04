@@ -6,9 +6,9 @@ import styled, { css } from 'styled';
 
 import Hint from '../hint';
 import Label from '../label';
-import { InputFieldProps } from './input-field.types';
+import { BaseInputProps } from './input-field.types';
 
-const InputField = forwardRef(
+const BaseInput = forwardRef(
   (
     {
       alt,
@@ -37,7 +37,7 @@ const InputField = forwardRef(
       testID,
       type,
       value = '',
-    }: InputFieldProps,
+    }: BaseInputProps,
     ref,
   ) => {
     // TODO: Migrate to useId once we migrate to react 18
@@ -55,45 +55,43 @@ const InputField = forwardRef(
     };
 
     return (
-      <>
+      <InputContainer>
         {label && <Label htmlFor={id}>{label}</Label>}
-        <InputContainer>
-          <InputMask
-            alwaysShowMask={false}
-            disabled={disabled}
-            mask={mask}
-            maskPlaceholder={maskPlaceholder}
-            onBlur={onBlur}
-            onChange={disabled ? undefined : handleChange}
-            onFocus={onFocus}
-            onKeyDown={onKeyDown}
-            onKeyUp={onKeyUp}
-            readOnly={readOnly}
-            value={value}
-          >
-            <Input
-              $hasError={hasError}
-              alt={alt}
-              autoComplete={autoComplete}
-              data-testid={testID}
-              defaultValue={defaultValue}
-              id={id}
-              inputMode={inputMode}
-              maxLength={maxLength}
-              minLength={minLength}
-              name={name}
-              placeholder={placeholder}
-              ref={mergeRefs([localRef, ref])}
-              required={required}
-              tabIndex={tabIndex}
-              type={type}
-            />
-          </InputMask>
-        </InputContainer>
+        <InputMask
+          alwaysShowMask={false}
+          disabled={disabled}
+          mask={mask}
+          maskPlaceholder={maskPlaceholder}
+          onBlur={onBlur}
+          onChange={disabled ? undefined : handleChange}
+          onFocus={onFocus}
+          onKeyDown={onKeyDown}
+          onKeyUp={onKeyUp}
+          readOnly={readOnly}
+          value={value}
+        >
+          <Input
+            $hasError={hasError}
+            alt={alt}
+            autoComplete={autoComplete}
+            data-testid={testID}
+            defaultValue={defaultValue}
+            id={id}
+            inputMode={inputMode}
+            maxLength={maxLength}
+            minLength={minLength}
+            name={name}
+            placeholder={placeholder}
+            ref={mergeRefs([localRef, ref])}
+            required={required}
+            tabIndex={tabIndex}
+            type={type}
+          />
+        </InputMask>
         {hintText && (
           <Hint color={hasError ? 'error' : 'tertiary'}>{hintText}</Hint>
         )}
-      </>
+      </InputContainer>
     );
   },
 );
@@ -158,4 +156,4 @@ const Input = styled.input<{
   }}
 `;
 
-export default InputField;
+export default BaseInput;
