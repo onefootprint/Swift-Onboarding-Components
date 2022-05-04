@@ -47,6 +47,8 @@ pub enum ApiError {
     InvalidJsonBody(JsonPayloadError),
     #[error("challenge_timeout_or_mismatch")]
     ChallengeNotValid,
+    #[error("missing_fields_required_for_user_signup {0}")]
+    UserMissingRequiredFields(String),
 }
 
 fn status_code_for_db_error(e: &DbError) -> actix_web::http::StatusCode {
@@ -88,6 +90,7 @@ impl actix_web::ResponseError for ApiError {
             ApiError::PhoneNumberValidationError => actix_web::http::StatusCode::BAD_REQUEST,
             ApiError::InvalidJsonBody(_) => actix_web::http::StatusCode::BAD_REQUEST,
             ApiError::ChallengeNotValid => actix_web::http::StatusCode::BAD_REQUEST,
+            ApiError::UserMissingRequiredFields(_) => actix_web::http::StatusCode::BAD_REQUEST,
         }
     }
 
