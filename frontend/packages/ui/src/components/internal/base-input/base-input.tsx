@@ -1,14 +1,25 @@
+/* eslint-disable react/jsx-props-no-spreading */
 import { darken, rgba } from 'polished';
-import React, { forwardRef, useRef } from 'react';
+import React, { forwardRef, InputHTMLAttributes } from 'react';
 import InputMask from 'react-input-mask';
-import mergeRefs from 'react-merge-refs';
 import styled, { css } from 'styled';
 
 import Hint from '../hint';
 import Label from '../label';
-import { BaseInputProps } from './input-field.types';
 
-const BaseInput = forwardRef(
+export type BaseInputProps = {
+  hasError?: boolean;
+  hintText?: string;
+  label?: string;
+  mask?: string | (string | RegExp)[];
+  maskPlaceholder?: string | null;
+  onChangeText?: (nextValue: string) => void;
+  placeholder: string;
+  testID?: string;
+  value?: string;
+} & InputHTMLAttributes<HTMLInputElement>;
+
+const BaseInput = forwardRef<HTMLInputElement, BaseInputProps>(
   (
     {
       alt,
@@ -24,6 +35,7 @@ const BaseInput = forwardRef(
       maxLength,
       minLength,
       name,
+      onClick,
       onBlur,
       onChange,
       onChangeText,
@@ -36,14 +48,15 @@ const BaseInput = forwardRef(
       tabIndex,
       testID,
       type,
+      id: baseID,
       value = '',
+      ...rest
     }: BaseInputProps,
     ref,
   ) => {
     // TODO: Migrate to useId once we migrate to react 18
     // https://github.com/onefootprint/frontend-monorepo/issues/61
-    const id = `input-${label || placeholder}`;
-    const localRef = useRef<HTMLInputElement>(null);
+    const id = baseID || `input-${label || placeholder}`;
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
       if (onChange) {
@@ -63,6 +76,7 @@ const BaseInput = forwardRef(
           mask={mask}
           maskPlaceholder={maskPlaceholder}
           onBlur={onBlur}
+          onClick={onClick}
           onChange={disabled ? undefined : handleChange}
           onFocus={onFocus}
           onKeyDown={onKeyDown}
@@ -71,8 +85,10 @@ const BaseInput = forwardRef(
           value={value}
         >
           <Input
+            ref={ref}
             $hasError={hasError}
             alt={alt}
+            aria-required={required}
             autoComplete={autoComplete}
             data-testid={testID}
             defaultValue={defaultValue}
@@ -82,10 +98,10 @@ const BaseInput = forwardRef(
             minLength={minLength}
             name={name}
             placeholder={placeholder}
-            ref={mergeRefs([localRef, ref])}
             required={required}
-            tabIndex={tabIndex}
+            tabIndex={disabled ? -1 : tabIndex}
             type={type}
+            {...rest}
           />
         </InputMask>
         {hintText && (
@@ -96,10 +112,7 @@ const BaseInput = forwardRef(
   },
 );
 
-const InputContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-`;
+const InputContainer = styled.div``;
 
 const Input = styled.input<{
   $hasError: boolean;

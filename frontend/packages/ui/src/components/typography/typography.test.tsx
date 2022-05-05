@@ -11,7 +11,7 @@ describe('<Typography />', () => {
       </Typography>,
     );
 
-    expect(screen.getByText('foo')).toBeTruthy();
+    expect(screen.getByText('foo')).toBeInTheDocument();
   });
 
   it('should assign a testID', () => {
@@ -25,6 +25,6 @@ describe('<Typography />', () => {
       </Typography>,
     );
 
-    expect(screen.getByTestId('typography-test-id')).toBeTruthy();
+    expect(screen.getByTestId('typography-test-id')).toBeInTheDocument();
   });
 });

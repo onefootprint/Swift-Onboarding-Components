@@ -15,6 +15,7 @@
   },
   "devDependencies": {
     "@material-ui/core": "^4.12.4",
+    "@popperjs/core": "^2.11.5",
     "@storybook/addon-actions": "^6.4.22",
     "@storybook/addon-essentials": "^6.4.22",
     "@storybook/addon-interactions": "^6.4.22",
@@ -23,6 +24,7 @@
     "@storybook/manager-webpack5": "^6.4.22",
     "@storybook/react": "^6.4.22",
     "@storybook/testing-library": "^0.0.11",
+    "@types/google.maps": "^3.48.7",
     "@types/lodash": "^4.14.182",
     "@types/react": "^17.0.37",
     "@types/react-dom": "^17.0.11",
@@ -30,11 +32,14 @@
     "@types/styled-components": "^5.1.25",
     "config": "*",
     "csstype": "^3.0.11",
+    "downshift": "^6.1.7",
+    "hooks": "*",
     "icons": "*",
     "lodash": "^4.17.21",
     "polished": "^4.2.2",
     "react": "17.0.2",
     "react-dom": "17.0.2",
+    "react-popper": "^2.3.0",
     "storybook-addon-designs": "^6.2.1",
     "storybook-addon-styled-component-theme": "^2.0.0",
     "styled": "*",
@@ -46,6 +51,7 @@
   },
   "dependencies": {
     "react-input-mask": "^3.0.0-alpha.2",
-    "react-merge-refs": "^1.1.0"
+    "react-merge-refs": "^1.1.0",
+    "use-places-autocomplete": "^2.0.0"
   }
 }

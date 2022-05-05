@@ -36,14 +36,14 @@ describe('<LinkButton />', () => {
       renderLinkButton({
         testID: 'link-button-test-id',
       });
-      expect(screen.getByTestId('link-button-test-id')).toBeTruthy();
+      expect(screen.getByTestId('link-button-test-id')).toBeInTheDocument();
     });
 
     it('should render the text', () => {
       renderLinkButton({
         children: 'foo',
       });
-      expect(screen.getByText('foo')).toBeTruthy();
+      expect(screen.getByText('foo')).toBeInTheDocument();
     });
 
     it('should assign an aria label', () => {

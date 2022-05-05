@@ -42,6 +42,10 @@ export type ThemeBorderColors = {
   secondary: string;
 } & ThemeUIStates;
 
+export type ThemeDividerColors = {
+  primary: string;
+};
+
 export type ThemeBorderWidths = {
   0: number;
   1: number;
@@ -115,7 +119,7 @@ export type ThemeOverlay = {
 };
 
 export type ThemeZIndices = {
-  bottomSheet: number;
+  dropdown: number;
   sticky: number;
   modal: number;
 };
@@ -140,6 +144,8 @@ export type Elevations = keyof ThemeElevations;
 
 export type BorderColors = keyof ThemeBorderColors;
 
+export type DividerColors = keyof ThemeDividerColors;
+
 export type ZIndices = keyof ThemeZIndices;
 
 export type DefaultTheme = {
@@ -150,6 +156,7 @@ export type DefaultTheme = {
   breakpoints: ThemeBreakPoints;
   colors: ThemeColors;
   disable: ThemeDisable;
+  dividerColors: ThemeDividerColors;
   elevations: ThemeElevations;
   illustrations: 'dark' | 'light';
   overlays: ThemeOverlay;

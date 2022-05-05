@@ -8,27 +8,21 @@ describe('<FootprintButton />', () => {
     disabled,
     onPress = jest.fn(),
     testID,
-    variant,
   }: Partial<FootprintButtonProps>) =>
     customRender(
-      <FootprintButton
-        disabled={disabled}
-        onPress={onPress}
-        testID={testID}
-        variant={variant}
-      />,
+      <FootprintButton disabled={disabled} onPress={onPress} testID={testID} />,
     );
 
   it('should assign a testID', () => {
     renderFootprintButton({ testID: 'footprint-button-test-id' });
-    expect(screen.getByTestId('footprint-button-test-id')).toBeTruthy();
+    expect(screen.getByTestId('footprint-button-test-id')).toBeInTheDocument();
   });
 
   it('should render the text', () => {
     renderFootprintButton({});
     expect(
       screen.getByText('Verify with Footprint', { exact: false }),
-    ).toBeTruthy();
+    ).toBeInTheDocument();
   });
 
   it('should fire an event when pressing', async () => {

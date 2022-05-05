@@ -43,6 +43,9 @@ const theme: DefaultTheme = {
     secondary: primitives.purple500,
     ...themeUiStates,
   },
+  dividerColors: {
+    primary: primitives.gray100,
+  },
   borderWidths: {
     0: 0,
     1: 1,
@@ -103,8 +106,8 @@ const theme: DefaultTheme = {
       fontWeight: 700,
     },
     'heading-3': {
-      fontSize: 17,
-      lineHeight: 24,
+      fontSize: 18,
+      lineHeight: 28,
       fontFamily: 'DM Sans',
       fontWeight: 700,
     },
@@ -187,8 +190,8 @@ const theme: DefaultTheme = {
   },
   zIndices: {
     sticky: 5,
-    bottomSheet: 8,
-    modal: 10,
+    dropdown: 10,
+    modal: 20,
   },
 };
 

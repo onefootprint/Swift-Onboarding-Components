@@ -1,2 +1,2 @@
-export { default } from './input-field';
-export type { BaseInputProps } from './input-field.types';
+export type { BaseInputProps } from './base-input';
+export { default } from './base-input';

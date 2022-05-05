@@ -1,3 +1,5 @@
+export * from './address-input';
+export { default as AddressInput } from './address-input';
 export * from './box';
 export { default as Box } from './box';
 export * from './button';
@@ -16,3 +18,5 @@ export * from './text-input';
 export { default as InputText } from './text-input';
 export * from './typography';
 export { default as Typography } from './typography';
+export * from './typography-highlight';
+export { default as TypographyHighlight } from './typography-highlight';

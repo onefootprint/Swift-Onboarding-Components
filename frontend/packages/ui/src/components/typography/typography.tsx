@@ -1,3 +1,4 @@
+import { Property } from 'csstype';
 import React from 'react';
 import styled, { Colors, css, Typographies } from 'styled';
 
@@ -16,6 +17,7 @@ type TypographyTag =
   | 'span';
 
 export type TypographyProps = {
+  display?: Property.Display;
   as?: TypographyTag;
   center?: boolean;
   children: React.ReactNode;
@@ -28,17 +30,17 @@ export type TypographyProps = {
 };
 
 const Typography = styled('p').attrs<TypographyProps>(
-  ({ as, id, variant, testID }) => ({
+  ({ as, variant, testID }) => ({
     'data-testid': testID,
     as: as || variantMapping[variant],
-    id,
   }),
 )<TypographyProps>`
   padding: 0;
   margin: 0;
-  ${({ theme, color, variant }) => {
+  ${({ theme, color, variant, display }) => {
     const font = theme.typographies[variant];
     return css`
+      display: ${display};
       color: ${theme.colors[color]};
       font-family: ${font?.fontFamily};
       font-size: ${font?.fontSize}px;

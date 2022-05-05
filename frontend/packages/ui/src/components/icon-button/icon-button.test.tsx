@@ -23,7 +23,7 @@ describe('<IconButton />', () => {
 
   it('should assign a testID', () => {
     renderIconButton({});
-    expect(screen.getByTestId('icon-button-test-id')).toBeTruthy();
+    expect(screen.getByTestId('icon-button-test-id')).toBeInTheDocument();
   });
 
   it('should assign an aria label', () => {

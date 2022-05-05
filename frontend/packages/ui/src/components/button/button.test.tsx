@@ -24,12 +24,12 @@ describe('<Button />', () => {
 
   it('should assign a testID', () => {
     renderButton({ testID: 'button-test-id' });
-    expect(screen.getByTestId('button-test-id')).toBeTruthy();
+    expect(screen.getByTestId('button-test-id')).toBeInTheDocument();
   });
 
   it('should render the text', () => {
     renderButton({ children: 'Lorem' });
-    expect(screen.getByText('Lorem')).toBeTruthy();
+    expect(screen.getByText('Lorem')).toBeInTheDocument();
   });
 
   it('should trigger onPress when pressing', async () => {

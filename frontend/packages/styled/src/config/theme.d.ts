@@ -8,6 +8,7 @@ import type {
   ThemeBreakPoints,
   ThemeColors,
   ThemeDisable,
+  ThemeDividerColors,
   ThemeOverlay,
   ThemeSpacings,
   ThemeTypographies,
@@ -24,6 +25,7 @@ declare module 'styled-components' {
     breakpoints: ThemeBreakPoints;
     colors: ThemeColors;
     disable: ThemeDisable;
+    dividerColors: ThemeDividerColors;
     illustrations: 'dark' | 'light';
     overlays: ThemeOverlay;
     spacings: ThemeSpacings;
