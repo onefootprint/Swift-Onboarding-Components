@@ -23,6 +23,8 @@ pub struct OnboardingSessionContext {
 }
 
 impl OnboardingSessionContext {
+    pub const SESSION_TOKEN_NAME: &'static str = "ob_session_tok";
+
     pub fn user_vault(&self) -> &UserVault {
         &self.user_vault
     }
@@ -30,9 +32,13 @@ impl OnboardingSessionContext {
     pub fn onboarding(&self) -> &Onboarding {
         &self.onboarding
     }
-}
 
-const SESSION_TOKEN_NAME: &str = "ob_session_tok";
+    pub fn set(session: &Session, token: String) -> Result<(), AuthError> {
+        session
+            .insert(Self::SESSION_TOKEN_NAME, token)
+            .map_err(AuthError::InvalidSessionJson)
+    }
+}
 
 impl FromRequest for OnboardingSessionContext {
     type Error = ApiError;
@@ -49,7 +55,7 @@ impl FromRequest for OnboardingSessionContext {
             let session = session.await.map_err(AuthError::SessionError)?;
 
             let session_id: String = session
-                .get(SESSION_TOKEN_NAME)
+                .get(Self::SESSION_TOKEN_NAME)
                 .map_err(AuthError::InvalidSessionJson)?
                 .ok_or(AuthError::MissingSessionTokenCookie)?;
 

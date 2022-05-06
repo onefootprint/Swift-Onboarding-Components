@@ -2,6 +2,7 @@ use thiserror::Error;
 pub mod client_public_key;
 pub mod identify_session;
 pub mod onboarding_session;
+
 #[derive(Debug, Error)]
 pub enum AuthError {
     #[error("Unkown client")]

@@ -1,10 +1,12 @@
+pub mod challenge;
 pub mod commit;
 pub mod data;
 pub mod init;
 pub mod verify;
-
-use crate::errors::ApiError;
+use crate::auth::identify_session::ChallengeState;
 use crate::State;
+use crate::{auth::identify_session::IdentifySessionState, errors::ApiError};
+use chrono::Utc;
 use crypto::sha256;
 use paperclip::actix::{web, Apiv2Schema};
 
@@ -50,12 +52,44 @@ pub async fn clean_phone_number(
 }
 
 pub fn clean_email(raw_email: String) -> String {
-    raw_email
+    raw_email.to_lowercase()
+}
+
+pub(crate) async fn send_challenge(
+    state: &web::Data<State>,
+    phone_number: String,
+    tenant_id: String,
+    email: String,
+) -> Result<IdentifySessionState, ApiError> {
+    // 555-01* numbers are reserved / not real, we use these for integration testing with a known code
+    let phone_number_digits: String = phone_number.clone().chars().skip(5).take(5).collect();
+    let code = match phone_number_digits.as_str() {
+        "55501" => "123456".to_owned(),
+        _ => crypto::random::gen_rand_n_digit_code(6),
+    };
+
+    // send challenge & set state
+    let _ = state.sms_client.send_text_message()
+            .destination_phone_number(phone_number.clone())
+            .message_body(format!("Your Footprint verification code is {}. Don't share your code with anyone. We will never contact you to request this code.\n\n@onefootprint.com #{}", code.clone(), code.clone()))
+            .send()
+            .await?;
+
+    Ok(IdentifySessionState {
+        tenant_id,
+        email,
+        challenge_state: Some(ChallengeState {
+            phone_number: phone_number.clone(),
+            challenge_code: code,
+            challenge_created_at: Utc::now().naive_utc(),
+        }),
+    })
 }
 
 pub fn routes() -> web::Scope {
     web::scope("/identify")
         .service(web::resource("").route(web::post().to(init::handler)))
+        .service(challenge::handler)
         .service(verify::handler)
         .service(data::handler)
         .service(commit::handler)

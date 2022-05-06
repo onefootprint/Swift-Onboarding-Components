@@ -39,9 +39,8 @@ CREATE TABLE user_vaults (
     e_email BYTEA,
     sh_email BYTEA UNIQUE,
     is_email_verified BOOLEAN NOT NULL DEFAULT FALSE,
-    e_phone_number BYTEA,
-    sh_phone_number BYTEA UNIQUE,
-    is_phone_number_verified BOOLEAN NOT NULL DEFAULT FALSE,
+    e_phone_number BYTEA NOT NULL,
+    sh_phone_number BYTEA NOT NULL UNIQUE,
     id_verified User_Status NOT NULL,
     created_at timestamp NOT NULL DEFAULT NOW(),
     updated_at timestamp NOT NULL DEFAULT NOW()

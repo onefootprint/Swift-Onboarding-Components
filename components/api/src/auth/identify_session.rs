@@ -1,8 +1,8 @@
 use super::AuthError;
-use crate::{errors::ApiError, State};
+use crate::errors::ApiError;
 use actix_session::Session;
-use actix_web::{web, FromRequest};
-use db::models::session_data::{ChallengeData, SessionState};
+use actix_web::FromRequest;
+use chrono::NaiveDateTime;
 use futures_util::Future;
 use paperclip::actix::Apiv2Security;
 use serde::{Deserialize, Serialize};
@@ -17,14 +17,21 @@ use std::pin::Pin;
 )]
 /// IdentifySessionContext extracts the ChallengeData from the session ID specified in the cookie sent by the client
 pub struct IdentifySessionContext {
-    pub challenge_data: ChallengeData,
     pub state: IdentifySessionState,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct IdentifySessionState {
-    pub session_id: String,
-    pub user_identifier: String,
+    pub email: String,
+    pub tenant_id: String,
+    pub challenge_state: Option<ChallengeState>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ChallengeState {
+    pub phone_number: String,
+    pub challenge_code: String,
+    pub challenge_created_at: NaiveDateTime,
 }
 
 impl IdentifySessionState {
@@ -53,23 +60,12 @@ impl FromRequest for IdentifySessionContext {
         _payload: &mut actix_web::dev::Payload,
     ) -> Self::Future {
         let session = Session::extract(req);
-        let pool = req.app_data::<web::Data<State>>().unwrap().db_pool.clone();
 
         Box::pin(async move {
             let session = session.await.map_err(AuthError::SessionError)?;
             let state = IdentifySessionState::get(&session)?;
 
-            let session = db::session::get_by_session_id(&pool, state.session_id.clone()).await?;
-            // Actually verify that the session is the correct type
-            let challenge_data = match session.session_data {
-                SessionState::IdentifySession(challenge_data) => Ok(challenge_data),
-                _ => Err(AuthError::SessionTypeError),
-            }?;
-
-            Ok(Self {
-                challenge_data,
-                state,
-            })
+            Ok(Self { state })
         })
     }
 }

@@ -21,9 +21,8 @@ pub struct UserVault {
     pub e_email: Option<Vec<u8>>,
     pub sh_email: Option<Vec<u8>>,
     pub is_email_verified: bool,
-    pub e_phone_number: Option<Vec<u8>>,
-    pub sh_phone_number: Option<Vec<u8>>,
-    pub is_phone_number_verified: bool,
+    pub e_phone_number: Vec<u8>,
+    pub sh_phone_number: Vec<u8>,
     pub id_verified: Status,
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
@@ -44,7 +43,6 @@ pub struct UpdateUserVault {
     pub id_verified: Status,
     pub e_phone_number: Option<Vec<u8>>,
     pub sh_phone_number: Option<Vec<u8>>,
-    pub is_phone_number_verified: Option<bool>,
     pub e_email: Option<Vec<u8>>,
     pub sh_email: Option<Vec<u8>>,
     pub is_email_verified: Option<bool>,
@@ -56,6 +54,10 @@ pub struct NewUserVault {
     pub e_private_key: Vec<u8>,
     pub public_key: Vec<u8>,
     pub id_verified: Status,
+    pub e_phone_number: Vec<u8>,
+    pub sh_phone_number: Vec<u8>,
+    pub e_email: Option<Vec<u8>>,
+    pub sh_email: Option<Vec<u8>>,
 }
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
 #[table_name = "user_vaults"]
@@ -116,4 +118,3 @@ impl MissingFields for UpdateUserVault {
         empties
     }
 }
-

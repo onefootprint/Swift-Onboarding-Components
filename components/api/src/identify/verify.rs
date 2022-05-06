@@ -1,15 +1,19 @@
+use crate::auth::identify_session::ChallengeState;
+use crate::auth::onboarding_session::OnboardingSessionContext;
 use crate::response::success::ApiResponseData;
 use crate::State;
 use crate::{auth::identify_session::IdentifySessionContext, errors::ApiError};
+use actix_session::Session;
 use aws_sdk_kms::model::DataKeyPairSpec;
 use chrono::{Duration, Utc};
 use crypto::hex::ToHex;
+use crypto::random::gen_random_alphanumeric_code;
 use db::models::onboardings::{NewOnboarding, Onboarding};
-use db::models::session_data::{ChallengeData, OnboardingSessionData};
-use db::models::session_data::{ChallengeType, SessionState};
-use db::models::sessions::UpdateSession;
+use db::models::session_data::OnboardingSessionData;
+use db::models::session_data::SessionState;
+use db::models::sessions::NewSession;
 use db::models::types::Status;
-use db::models::user_vaults::{MissingFields, NewUserVault, UpdateUserVault, UserVault};
+use db::models::user_vaults::{MissingFields, NewUserVault, UserVault};
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 
 use super::{hash, seal};
@@ -37,28 +41,61 @@ struct VerifyResponse {
 #[post("/verify")]
 async fn handler(
     state: web::Data<State>,
+    session: Session,
     session_context: IdentifySessionContext,
     request: Json<VerifyRequest>,
 ) -> actix_web::Result<Json<ApiResponseData<VerifyResponse>>, ApiError> {
-    let challenge_data = session_context.challenge_data;
-    let identifier = session_context.state.user_identifier;
-    let request_h_code = crypto::sha256(request.code.as_bytes()).to_vec();
+    let session_state = session_context.state;
+    let opt_challenge_data = session_state.challenge_state;
 
-    if !verify_code(request_h_code, &challenge_data).await? {
+    let challenge_data = match opt_challenge_data {
+        None => Err(ApiError::ChallengeNotValid),
+        Some(d) => Ok(d),
+    }?;
+
+    if !verify_code(request.code.clone(), &challenge_data).await? {
         return Err(ApiError::ChallengeNotValid);
     }
 
-    let (onboarding, kind, missing_attributes) =
-        get_or_create_user_onboarding(&state, &challenge_data, identifier.clone()).await?;
+    let phone_number = challenge_data.phone_number;
+    let sh_phone_number = hash(phone_number.clone());
+    let existing_user_vault =
+        db::user_vault::get_by_phone_number(&state.db_pool, sh_phone_number.clone()).await?;
+
+    let (onboarding, kind, missing_attributes) = match existing_user_vault {
+        Some(uv) => (
+            // User with this phone number exists. Onboard the existing user to this tenant
+            onboard_existing_user(&state, uv.clone(), session_state.tenant_id.clone()).await?,
+            VerifyKind::UserInherited,
+            MissingFields::missing_fields(&uv).join(","),
+        ),
+        None => {
+            // The user does not exist. Create a new user and onboard them to this tenant
+            let (ob, missing_fields) = onboard_new_user(
+                &state,
+                session_state.tenant_id.clone(),
+                phone_number.clone(),
+                session_state.email.clone(),
+            )
+            .await?;
+            (ob, VerifyKind::UserCreated, missing_fields)
+        }
+    };
 
     // Update the session to onboarding session
-    let updated_session = UpdateSession {
-        h_session_id: crypto::sha256(session_context.state.session_id.as_bytes()).encode_hex(),
+    // create a token to identify session for future lookup
+    let token = format!("vtok_{}", gen_random_alphanumeric_code(34));
+    let h_session_id: String = crypto::sha256(token.as_bytes()).encode_hex();
+
+    let new_session = NewSession {
+        h_session_id,
         session_data: SessionState::OnboardingSession(OnboardingSessionData {
             user_ob_id: Some(onboarding.user_ob_id),
         }),
     };
-    let _: usize = db::session::update(&state.db_pool, updated_session).await?;
+    let _ = db::session::init(&state.db_pool, new_session).await?;
+
+    OnboardingSessionContext::set(&session, token)?;
 
     Ok(Json(ApiResponseData {
         data: VerifyResponse {
@@ -66,35 +103,6 @@ async fn handler(
             missing_attributes,
         },
     }))
-}
-
-async fn get_or_create_user_onboarding(
-    state: &web::Data<State>,
-    challenge_data: &ChallengeData,
-    identifier: String,
-) -> Result<(Onboarding, VerifyKind, String), ApiError> {
-    let sh_data = hash(identifier.clone());
-    let existing_user_vault = match &challenge_data.challenge_type {
-        ChallengeType::Email => {
-            db::user_vault::get_by_email(&state.db_pool, sh_data.clone()).await?
-        }
-        ChallengeType::PhoneNumber => {
-            db::user_vault::get_by_phone_number(&state.db_pool, sh_data.clone()).await?
-        }
-    };
-
-    match existing_user_vault {
-        Some(uv) => Ok((
-            onboard_existing_user(state, uv.clone(), challenge_data.tenant_id.clone()).await?,
-            VerifyKind::UserInherited,
-            MissingFields::missing_fields(&uv).join(","),
-        )),
-        _ => {
-            let (ob, missing_fields) =
-                onboard_new_user(state, challenge_data, identifier.clone()).await?;
-            Ok((ob, VerifyKind::UserCreated, missing_fields))
-        }
-    }
 }
 
 async fn onboard_existing_user(
@@ -114,42 +122,10 @@ async fn onboard_existing_user(
 
 async fn onboard_new_user(
     state: &web::Data<State>,
-    challenge_data: &ChallengeData,
-    identifier: String,
-) -> Result<(Onboarding, String), ApiError> {
-    // create new user vault
-    let (user, onboarding) = init_new_user_vault(state, challenge_data.tenant_id.clone()).await?;
-
-    // update user vault with validated phone number
-    // TODO could combine into one query - only init a vault with a phone number / email
-    let user_vault = match challenge_data.challenge_type {
-        ChallengeType::Email => UpdateUserVault {
-            id: user.clone().id,
-            e_email: Some(seal(identifier.clone(), &user.public_key)?),
-            sh_email: Some(hash(identifier.clone())),
-            is_email_verified: Some(true),
-            ..Default::default()
-        },
-        ChallengeType::PhoneNumber => UpdateUserVault {
-            id: user.clone().id,
-            e_phone_number: Some(seal(identifier.clone(), &user.public_key)?),
-            sh_phone_number: Some(hash(identifier.clone())),
-            is_phone_number_verified: Some(true),
-            ..Default::default()
-        },
-    };
-
-    let _ = db::user_vault::update(&state.db_pool, user_vault.clone()).await?;
-
-    let missing_fields = MissingFields::missing_fields(&user_vault).join(",");
-    // create new onboarding session data
-    Ok((onboarding, missing_fields))
-}
-
-async fn init_new_user_vault(
-    state: &web::Data<State>,
     tenant_id: String,
-) -> Result<(UserVault, Onboarding), ApiError> {
+    phone_number: String,
+    email: String,
+) -> Result<(Onboarding, String), ApiError> {
     let new_key_pair = state
         .kms_client
         .generate_data_key_pair_without_plaintext()
@@ -164,25 +140,39 @@ async fn init_new_user_vault(
 
     let _pk = crypto::hex::encode(&ec_pk_uncompressed);
 
+    let (e_email, sh_email) = (
+        Some(seal(email.clone(), &ec_pk_uncompressed)?),
+        Some(hash(email)),
+    );
     let user = NewUserVault {
         e_private_key: new_key_pair
             .private_key_ciphertext_blob
             .unwrap()
             .into_inner(),
-        public_key: ec_pk_uncompressed,
+        public_key: ec_pk_uncompressed.clone(),
+        e_phone_number: seal(phone_number.clone(), &ec_pk_uncompressed)?,
+        sh_phone_number: hash(phone_number.clone()),
+        e_email,
+        sh_email,
         id_verified: Status::Incomplete,
     };
 
     let (user, onboarding) = db::user_vault::init(&state.db_pool, user.clone(), tenant_id).await?;
-    Ok((user, onboarding))
+
+    let missing_fields = MissingFields::missing_fields(&user).join(",");
+    // create new onboarding session data
+    Ok((onboarding, missing_fields))
 }
 
 async fn verify_code(
-    request_h_code: Vec<u8>,
-    challenge_data: &ChallengeData,
+    request_code: String,
+    challenge_data: &ChallengeState,
 ) -> Result<bool, ApiError> {
     let now = Utc::now().naive_utc();
 
-    Ok((challenge_data.h_challenge_code == request_h_code)
-        & (challenge_data.created_at.signed_duration_since(now) < Duration::minutes(15)))
+    Ok((challenge_data.challenge_code == request_code)
+        & (challenge_data
+            .challenge_created_at
+            .signed_duration_since(now)
+            < Duration::minutes(15)))
 }

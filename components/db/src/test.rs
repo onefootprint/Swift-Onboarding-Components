@@ -23,6 +23,10 @@ async fn test_db() {
         e_private_key: "private key".as_bytes().to_vec(),
         public_key: "public key".as_bytes().to_vec(),
         id_verified: crate::models::types::Status::Incomplete,
+        e_phone_number: "".as_bytes().to_vec(),
+        sh_phone_number: "".as_bytes().to_vec(),
+        e_email: None,
+        sh_email: None,
     };
     let (user_vault, _) = crate::user_vault::init(&pool, user, tenant.id)
         .await

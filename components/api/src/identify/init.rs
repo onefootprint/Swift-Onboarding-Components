@@ -1,27 +1,28 @@
-use crate::auth::identify_session::IdentifySessionState;
-use crate::identify::{clean_email, clean_phone_number};
+use crate::identify::clean_email;
 use crate::response::success::ApiResponseData;
 use crate::State;
-use crate::{auth::client_public_key::PublicTenantAuthContext, errors::ApiError};
+use crate::{
+    auth::client_public_key::PublicTenantAuthContext, auth::identify_session::IdentifySessionState,
+    errors::ApiError,
+};
 use actix_session::Session;
 use aws_sdk_pinpointemail::model::{
     Body as EmailBody, Content as EmailStringContent, Destination as EmailDestination,
     EmailContent, Message as EmailMessage,
 };
-use chrono::Utc;
-use crypto::hex::ToHex;
-use crypto::random::gen_random_alphanumeric_code;
-use db::models::{
-    session_data::{ChallengeData, ChallengeType},
-    sessions::NewSession,
-};
 use paperclip::actix::{api_v2_operation, web, web::Json, Apiv2Schema};
+
+use super::send_challenge;
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
 #[serde(rename_all = "snake_case")]
-pub enum IdentifyRequest {
-    Email(String),
-    PhoneNumber(String),
+pub struct IdentifyRequest {
+    email: String,
+}
+
+#[derive(Debug, Clone, Apiv2Schema, serde::Serialize)]
+pub struct IdentifyResponse {
+    phone_number_last_two: String,
 }
 
 #[api_v2_operation]
@@ -30,93 +31,78 @@ pub async fn handler(
     session: Session,
     pub_tenant_auth: PublicTenantAuthContext,
     state: web::Data<State>,
-) -> actix_web::Result<Json<ApiResponseData<String>>, ApiError> {
-    // clean data
-    let cleaned_data = match request.0.clone() {
-        IdentifyRequest::Email(s) => clean_email(s),
-        IdentifyRequest::PhoneNumber(p) => clean_phone_number(&state, &p).await?,
-    };
+) -> actix_web::Result<Json<ApiResponseData<IdentifyResponse>>, ApiError> {
+    // clean email & look up existing user vault
+    let req = request.into_inner();
+    let cleaned_email = clean_email(req.email);
+    let sh_email = super::hash(cleaned_email.clone());
+    let existing_user_vault = db::user_vault::get_by_email(&state.db_pool, sh_email).await?;
 
-    // create a token to identify session for future lookup
-    let token = format!("vtok_{}", gen_random_alphanumeric_code(34));
-    let h_session_id: String = crypto::sha256(token.as_bytes()).encode_hex();
+    // see if user vault has an associated phone number. if not, set session state to info we currently have &
+    // return error that the email isn't registered
+    let phone_number = match existing_user_vault {
+        Some(vault) => {
+            let decrypted_data = crate::enclave::lib::decrypt_bytes(
+                &state,
+                &vault.e_phone_number,
+                vault.e_private_key.clone(),
+                enclave_proxy::DataTransform::Identity,
+            )
+            .await?;
+            Ok(std::str::from_utf8(&decrypted_data)?.to_string())
+        }
+        None => {
+            IdentifySessionState {
+                tenant_id: pub_tenant_auth.tenant().id.clone(),
+                email: cleaned_email.clone(),
+                challenge_state: None,
+            }
+            .set(&session)?;
+            Err(ApiError::EmailAddressNotRegistered)
+        }
+    }?;
 
-    // initiate a challenge to given identifier & set session data in db
-    let _ = initiate(
+    // send challenge & set state
+    let identity_session_state = send_challenge(
         &state,
-        cleaned_data.clone(),
-        request.0.clone(),
-        h_session_id.clone(),
-        pub_tenant_auth.tenant().clone().id,
+        phone_number.clone(),
+        pub_tenant_auth.tenant().id.clone(),
+        cleaned_email.clone(),
     )
     .await?;
-
-    IdentifySessionState {
-        session_id: token,
-        user_identifier: cleaned_data.clone(),
-    }
-    .set(&session)?;
+    identity_session_state.set(&session)?;
 
     Ok(Json(ApiResponseData {
-        data: "challenge initiated".to_string(),
+        data: IdentifyResponse {
+            phone_number_last_two: phone_number.chars().skip(10).take(2).collect(),
+        },
     }))
 }
 
-pub async fn initiate(
+async fn _send_email(
     state: &web::Data<State>,
-    data: String,
-    challenge_type: IdentifyRequest,
-    h_session_id: String,
-    tenant_id: String,
-) -> Result<ChallengeData, ApiError> {
-    // TODO: generate random 6 digit code
-    let code: String = "123456".to_owned(); // crypto::random::gen_rand_n_digit_code(6);
-
-    // send challenge
-    let _ = send_challenge(state, data, challenge_type.clone(), code.clone()).await?;
-
-    // initiate session info
-    let challenge_data =
-        init_session_for_challenge(state, code, challenge_type.clone(), h_session_id, tenant_id)
-            .await?;
-
-    Ok(challenge_data)
-}
-
-async fn send_challenge(
-    state: &web::Data<State>,
-    data: String,
-    challenge_type: IdentifyRequest,
+    email_address: String,
     code: String,
 ) -> Result<(), ApiError> {
-    match challenge_type {
-        IdentifyRequest::Email(_) => {
-            let content = build_email_content_body(code.clone());
-            let output = state
-                .email_client
-                .send_email()
-                .destination(EmailDestination::builder().to_addresses(data).build())
-                // TODO not my email
-                .from_email_address("elliott@onefootprint.com")
-                .content(content)
-                .send()
-                .await?;
-            log::info!("output from sending email message {:?}", output);
-            Ok(())
-        }
-        IdentifyRequest::PhoneNumber(_) => {
-            let output = state.sms_client.send_text_message()
-                .destination_phone_number(data)
-                .message_body(format!("Your Footprint verification code is {}. Don't share your code with anyone. We will never contact you to request this code.\n\n@onefootprint.com #{}", code.clone(), code.clone()))
-                .send()
-                .await?;
-            log::info!("output from sending phone {:?}", output);
-            Ok(())
-        }
-    }
+    // TODO use this util to send the email verification link
+    let content = _build_email_content_body(code.clone());
+    let _output = state
+        .email_client
+        .send_email()
+        .destination(
+            EmailDestination::builder()
+                .to_addresses(email_address)
+                .build(),
+        )
+        // TODO not my email
+        .from_email_address("elliott@onefootprint.com")
+        .content(content)
+        .send()
+        .await?;
+    Ok(())
 }
 
-fn build_email_content_body(code: String) -> EmailContent {
+fn _build_email_content_body(code: String) -> EmailContent {
     let body_text = EmailStringContent::builder().data(format!("Hello from footprint!\n\nYour Footprint verification code is {}. Don't share your code with anyone. We will never contact you to request this code.\n\n@onefootprint.com #{}", code, code)).build();
     let body_html = EmailStringContent::builder().data(format!("<h1>Hello from footprint!</h1><br><br>Your Footprint verification code is {}. Don't share your code with anyone. We will never contact you to request this code.<br><br>@onefootprint.com #{}", code, code)).build();
     let body = EmailBody::builder().text(body_text).html(body_html).build();
@@ -129,37 +115,4 @@ fn build_email_content_body(code: String) -> EmailContent {
         .body(body)
         .build();
     EmailContent::builder().simple(message).build()
-}
-
-async fn init_session_for_challenge(
-    state: &web::Data<State>,
-    code: String,
-    challenge_type: IdentifyRequest,
-    h_session_id: String,
-    tenant_id: String,
-) -> Result<ChallengeData, ApiError> {
-    // create challenge & store in session
-    let h_code = crypto::sha256(code.as_bytes()).to_vec();
-    let challenge_data = ChallengeData {
-        tenant_id,
-        challenge_type: match challenge_type {
-            IdentifyRequest::PhoneNumber(_) => ChallengeType::PhoneNumber,
-            IdentifyRequest::Email(_) => ChallengeType::Email,
-        },
-        created_at: Utc::now().naive_utc(),
-        h_challenge_code: h_code,
-    };
-
-    // set relavent session state depending on if user vault exists
-    let session_data =
-        db::models::session_data::SessionState::IdentifySession(challenge_data.clone());
-
-    let session_info = NewSession {
-        h_session_id: h_session_id.clone(),
-        session_data,
-    };
-
-    let _ = db::session::init(&state.db_pool, session_info).await?;
-
-    Ok(challenge_data)
 }

@@ -1,7 +1,6 @@
 use crate::response::success::ApiResponseData;
 use crate::State;
 use crate::{auth::onboarding_session::OnboardingSessionContext, errors::ApiError};
-use db::models::user_vaults::UserVault;
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Apiv2Schema)]
