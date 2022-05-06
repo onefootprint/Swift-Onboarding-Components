@@ -13,9 +13,9 @@ use std::pin::Pin;
     apiKey,
     in = "header",
     name = "Cookie",
-    description = "Session state cookie"
+    description = "Identify session state cookie, set by calls to /identify"
 )]
-/// IdentifySessionContext extracts the ChallengeData from the session ID specified in the cookie sent by the client
+/// IdentifySessionContext stores encrpyted state for the challenge issued to the user
 pub struct IdentifySessionContext {
     pub state: IdentifySessionState,
 }

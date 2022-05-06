@@ -19,7 +19,9 @@ pub struct ChallengeResponse {
 
 #[api_v2_operation]
 #[post("/challenge")]
-/// You must have attempted to identify by email address before initiating this challenge for a phone number
+/// Issues a text message challenge to a given phone_number. In order to call this endpoint, you must have
+/// already attempted to identify by email address via a call to /identify. The call to /identify
+/// sets relavent state for issuing the challenge (see IdentifySessionState)
 pub async fn handler(
     request: Json<ChallengeRequest>,
     session: Session,

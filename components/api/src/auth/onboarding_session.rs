@@ -13,10 +13,10 @@ use std::pin::Pin;
     apiKey,
     in = "header",
     name = "Cookie",
-    description = "Session state cookie"
+    description = "Onboarding session state cookie, set by successful call to /verify"
 )]
-/// LoggedInSessionContext extracts the UserVault and Onboarding from the session ID specified in the cookie sent by the client.
-/// Only a LoggedInSession is attached to a UserVault and an Onboarding
+/// Onboarding session context sets encrpyted state that authenticates the client and allows hte
+/// server to quickly look up the relavant user information
 pub struct OnboardingSessionContext {
     user_vault: UserVault,
     onboarding: Onboarding,

@@ -16,7 +16,7 @@ use db::models::types::Status;
 use db::models::user_vaults::{MissingFields, NewUserVault, UserVault};
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 
-use super::{hash, seal};
+use super::{hash, seal, send_email_challenge};
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
 struct VerifyRequest {
@@ -39,6 +39,8 @@ struct VerifyResponse {
 
 #[api_v2_operation]
 #[post("/verify")]
+/// Verify an SMS challenge sent to a user. If successful, this endpoint sets relavent cookies
+/// that allow the client to update the user vault (/identify/data) and finalize user onboarding (/identify/commit)
 async fn handler(
     state: web::Data<State>,
     session: Session,
@@ -142,8 +144,18 @@ async fn onboard_new_user(
 
     let (e_email, sh_email) = (
         Some(seal(email.clone(), &ec_pk_uncompressed)?),
-        Some(hash(email)),
+        Some(hash(email.clone())),
     );
+
+    // send async email challenge
+    send_email_challenge(
+        state,
+        ec_pk_uncompressed.clone(),
+        email.clone(),
+        sh_email.clone().unwrap(),
+    )
+    .await?;
+
     let user = NewUserVault {
         e_private_key: new_key_pair
             .private_key_ciphertext_blob

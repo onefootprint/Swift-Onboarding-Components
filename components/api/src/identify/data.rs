@@ -59,6 +59,8 @@ struct UserPatchRequest {
 
 #[api_v2_operation]
 #[post("/data")]
+/// Operates as a PATCH request to update data in the user vault. Client is authenticated
+/// via state set upon successful call to /identify/verify endpont (see OnboardingSessionState).
 async fn handler(
     state: web::Data<State>,
     session_context: OnboardingSessionContext,

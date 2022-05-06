@@ -13,7 +13,7 @@ def _gen_random_n_digit_number(n):
     return "".join([str(random.randint(0, 9)) for _ in range(n)])
 
 def _gen_random_email():
-    return f"user_{_gen_random_n_digit_number(7)}@gmail.com"
+    return f"user_{_gen_random_n_digit_number(7)}@onefootprint.com"
 
 def _gen_random_ssn():
     return _gen_random_n_digit_number(9)

@@ -26,6 +26,10 @@ pub struct IdentifyResponse {
 }
 
 #[api_v2_operation]
+/// Identify a user by email address. If identification is successful, this endpoint issues a text
+/// challenge to the user's phone number & returns HTTP 200 with an IdentifyResponse. If the endpoint
+/// fails to look up a user (the user does not exist), it will error. The client can continue user registration
+/// with a call to the /identify/verify endpoint and the user's phone #.
 pub async fn handler(
     request: Json<IdentifyRequest>,
     session: Session,

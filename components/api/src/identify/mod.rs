@@ -1,20 +1,33 @@
 pub mod challenge;
 pub mod commit;
 pub mod data;
+pub mod email_verify;
 pub mod init;
 pub mod verify;
 use crate::auth::identify_session::ChallengeState;
 use crate::State;
 use crate::{auth::identify_session::IdentifySessionState, errors::ApiError};
-use chrono::Utc;
+use aws_sdk_pinpointemail::model::{
+    Body as EmailBody, Content as EmailStringContent, Destination as EmailDestination,
+    EmailContent, Message as EmailMessage,
+};
+use chrono::{NaiveDateTime, Utc};
+use crypto::b64::Base64Data;
+use crypto::seal::EciesP256Sha256AesGcmSealed;
 use crypto::sha256;
 use paperclip::actix::{web, Apiv2Schema};
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
 #[serde(rename_all = "snake_case")]
-pub enum CreateChallengeRequest {
+pub(crate) enum CreateChallengeRequest {
     Email(String),
     PhoneNumber(String),
+}
+
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
+pub struct EmailVerifyChallenge {
+    pub expires_at: NaiveDateTime,
+    pub email: String,
 }
 
 fn hash(val: String) -> Vec<u8> {
@@ -22,6 +35,13 @@ fn hash(val: String) -> Vec<u8> {
     sha256(val.as_bytes()).to_vec()
 }
 
+fn seal_untyped(val: String, pub_key: &[u8]) -> Result<EciesP256Sha256AesGcmSealed, ApiError> {
+    let val = crypto::seal::seal_ecies_p256_x963_sha256_aes_gcm(
+        pub_key,
+        val.as_str().as_bytes().to_vec(),
+    )?;
+    Ok(val)
+}
 fn seal(val: String, pub_key: &[u8]) -> Result<Vec<u8>, ApiError> {
     let val = crypto::seal::seal_ecies_p256_x963_sha256_aes_gcm(
         pub_key,
@@ -31,7 +51,7 @@ fn seal(val: String, pub_key: &[u8]) -> Result<Vec<u8>, ApiError> {
     Ok(val)
 }
 
-pub async fn clean_phone_number(
+pub(crate) async fn clean_phone_number(
     state: &web::Data<State>,
     raw_phone_number: &str,
 ) -> Result<String, ApiError> {
@@ -86,6 +106,66 @@ pub(crate) async fn send_challenge(
     })
 }
 
+pub(crate) async fn send_email_challenge(
+    state: &web::Data<State>,
+    public_key: Vec<u8>,
+    email_address: String,
+    sh_email: Vec<u8>,
+) -> Result<(), ApiError> {
+    let now = chrono::Utc::now().naive_utc();
+    let email_challenge_data = EmailVerifyChallenge {
+        expires_at: now + chrono::Duration::days(1),
+        email: email_address.clone(),
+    };
+    let email_challenge_data_str =
+        serde_json::to_string::<EmailVerifyChallenge>(&email_challenge_data)
+            .map_err(|_| ApiError::ChallengeNotValid)?;
+    let e_email_challenge =
+        seal_untyped(email_challenge_data_str.clone(), &public_key)?.to_string()?;
+
+    let curl_request_str = format!(
+        "curl localhost:8000/identify/email/verify -X POST -H 'content-type application/json' -d '{{\"sh_email\": \"{}\", \"e_email_challenge\": \"{}\"}}'",
+        Base64Data(sh_email), e_email_challenge,
+    );
+    let content = build_email_challenge_content_body(curl_request_str);
+    let _output = state
+        .email_client
+        .send_email()
+        .destination(
+            EmailDestination::builder()
+                .to_addresses(email_address)
+                .build(),
+        )
+        // TODO not my email
+        .from_email_address("elliott@onefootprint.com")
+        .content(content)
+        .send()
+        .await?;
+    Ok(())
+}
+
+fn build_email_challenge_content_body(contents: String) -> EmailContent {
+    let body_text = EmailStringContent::builder()
+        .data(format!("Hello from footprint!\nYou can issue this curl request to mark your email as verified:\n\n{}", contents))
+        .build();
+    let body_html = EmailStringContent::builder()
+        .data(format!(
+            "<h1>Hello from footprint!</h1><br>You can issue this curl request to mark your email as verified:<br><br><tt>{}</tt>",
+            contents,
+        ))
+        .build();
+    let body = EmailBody::builder().text(body_text).html(body_html).build();
+    let message = EmailMessage::builder()
+        .subject(
+            EmailStringContent::builder()
+                .data("Hello from Footprint!")
+                .build(),
+        )
+        .body(body)
+        .build();
+    EmailContent::builder().simple(message).build()
+}
+
 pub fn routes() -> web::Scope {
     web::scope("/identify")
         .service(web::resource("").route(web::post().to(init::handler)))
@@ -93,4 +173,5 @@ pub fn routes() -> web::Scope {
         .service(verify::handler)
         .service(data::handler)
         .service(commit::handler)
+        .service(email_verify::handler)
 }
