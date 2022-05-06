@@ -57,8 +57,8 @@ def test_identify_init(tenant1, request):
         headers=_client_pub_key_headers(tenant1),
     )
     print(r, r.content)
-    assert r.status_code == 500
-    assert r.json()["error"]["message"] == "email_not_registered"
+    assert r.status_code == 200
+    assert r.json()["data"] == "user_not_found"
     cookies = r.cookies.get_dict()
     assert cookies, "Set-Cookie response header should be provided"
     request.config.cache.set("cookies", cookies)

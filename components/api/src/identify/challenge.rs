@@ -33,7 +33,7 @@ pub async fn handler(
     let phone_number = clean_phone_number(&state, &req.phone_number).await?;
 
     // send challenge & set state
-    let identity_session_state = send_challenge(
+    let (identity_session_state, last_two) = send_challenge(
         &state,
         phone_number.clone(),
         session_context.state.tenant_id.clone(),
@@ -44,7 +44,7 @@ pub async fn handler(
 
     Ok(Json(ApiResponseData {
         data: ChallengeResponse {
-            phone_number_last_two: phone_number.chars().skip(10).take(2).collect(),
+            phone_number_last_two: last_two,
         },
     }))
 }

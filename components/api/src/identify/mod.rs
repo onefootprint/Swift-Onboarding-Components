@@ -15,6 +15,7 @@ use chrono::{NaiveDateTime, Utc};
 use crypto::b64::Base64Data;
 use crypto::seal::EciesP256Sha256AesGcmSealed;
 use crypto::sha256;
+use db::models::user_vaults::UserVault;
 use paperclip::actix::{web, Apiv2Schema};
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
@@ -75,12 +76,30 @@ pub fn clean_email(raw_email: String) -> String {
     raw_email.to_lowercase()
 }
 
+async fn decrypt_and_send_challenge(
+    state: &web::Data<State>,
+    vault: UserVault,
+    tenant_id: String,
+    email: String,
+) -> Result<(IdentifySessionState, String), ApiError> {
+    let decrypted_data = crate::enclave::lib::decrypt_bytes(
+        &state,
+        &vault.e_phone_number,
+        vault.e_private_key.clone(),
+        enclave_proxy::DataTransform::Identity,
+    )
+    .await?;
+    // send challenge & set state
+    let phone_number = std::str::from_utf8(&decrypted_data)?.to_string();
+    send_challenge(&state, phone_number.clone(), tenant_id, email).await
+}
+
 pub(crate) async fn send_challenge(
     state: &web::Data<State>,
     phone_number: String,
     tenant_id: String,
     email: String,
-) -> Result<IdentifySessionState, ApiError> {
+) -> Result<(IdentifySessionState, String), ApiError> {
     // 555-01* numbers are reserved / not real, we use these for integration testing with a known code
     let phone_number_digits: String = phone_number.clone().chars().skip(5).take(5).collect();
     let code = match phone_number_digits.as_str() {
@@ -95,15 +114,18 @@ pub(crate) async fn send_challenge(
             .send()
             .await?;
 
-    Ok(IdentifySessionState {
-        tenant_id,
-        email,
-        challenge_state: Some(ChallengeState {
-            phone_number: phone_number.clone(),
-            challenge_code: code,
-            challenge_created_at: Utc::now().naive_utc(),
-        }),
-    })
+    Ok((
+        IdentifySessionState {
+            tenant_id,
+            email,
+            challenge_state: Some(ChallengeState {
+                phone_number: phone_number.clone(),
+                challenge_code: code,
+                challenge_created_at: Utc::now().naive_utc(),
+            }),
+        },
+        phone_number.chars().skip(10).take(2).collect(),
+    ))
 }
 
 pub(crate) async fn send_email_challenge(
