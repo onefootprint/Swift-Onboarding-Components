@@ -3,8 +3,8 @@ pub mod commit;
 pub mod data;
 pub mod email_verify;
 pub mod init;
-pub mod verify;
 mod livecheck;
+pub mod verify;
 
 use crate::auth::identify_session::ChallengeState;
 use crate::State;
@@ -148,8 +148,9 @@ pub(crate) async fn send_email_challenge(
         seal_untyped(email_challenge_data_str.clone(), &public_key)?.to_string()?;
 
     let curl_request_str = format!(
-        "curl localhost:8000/identify/email/verify -X POST -H 'content-type application/json' -d '{{\"sh_email\": \"{}\", \"e_email_challenge\": \"{}\"}}'",
-        Base64Data(sh_email), e_email_challenge,
+        "https://verify.ui.footprint.dev/?sh_email={}&e_email_challenge={}",
+        Base64Data(sh_email),
+        e_email_challenge,
     );
     let content = build_email_challenge_content_body(curl_request_str);
     let _output = state
