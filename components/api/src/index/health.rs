@@ -6,8 +6,9 @@ use paperclip::actix::{api_v2_operation, get, web, web::Json};
 #[api_v2_operation]
 #[tracing::instrument(name = "health", skip(state))]
 #[get("/health")]
-async fn handler(state: web::Data<State>) -> Result<Json<ApiResponseData<String>>, ApiError> {
-    let enclave_health = {
+async fn handler(state: web::Data<State>) -> Result<String, ApiError> {
+    let before_enclave = chrono::Utc::now().timestamp_millis();
+    let _ = {
         let mut conn = state.enclave_connection_pool.get().await?;
         let req = enclave_proxy::RpcRequest::new(RpcPayload::Ping("test".into()));
 
@@ -20,13 +21,15 @@ async fn handler(state: web::Data<State>) -> Result<Json<ApiResponseData<String>
             "invalid enclave response".to_string()
         }
     };
+    let after_enclave = chrono::Utc::now().timestamp_millis();
 
-    let db_health = db::health_check(&state.db_pool).await?.id;
+    let before_db = chrono::Utc::now().timestamp_millis();
+    let _ = db::health_check(&state.db_pool).await?;
+    let after_db = chrono::Utc::now().timestamp_millis();
 
-    Ok(Json(ApiResponseData {
-        data: format!(
-            "Enclave: got {}\nDB: got tenant {}",
-            enclave_health, db_health
-        ),
-    }))
+    Ok(format!(
+        "Enclave: healthy RT {}ms\nDB: healthy RT {}ms",
+        after_enclave - before_enclave,
+        after_db - before_db
+    ))
 }

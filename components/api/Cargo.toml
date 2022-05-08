@@ -66,3 +66,5 @@ paperclip = { version = "0.7.0", features = [
 mime = "0.3.16"
 actix-session = { version = "0.6.2", features = ["cookie-session"] }
 chrono = {version = "0.4"}
+webauthn-rs = "0.3.2"
+url = "2.2.2"

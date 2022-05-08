@@ -20,7 +20,9 @@ mod client;
 mod enclave;
 mod identify;
 mod index;
+mod liveness;
 mod response;
+
 use paperclip::actix::{web, OpenApiExt};
 
 #[derive(Clone)]
@@ -91,13 +93,15 @@ async fn main() -> std::io::Result<()> {
         crypto::random::random_cookie_session_key_bytes()
     };
 
+    let is_https = config.use_local.is_none();
+    let cookie_domain = format!(".{}", &config.cookie_domain);
+
     let res = HttpServer::new(move || {
         let cors = actix_cors::Cors::default()
-            .allowed_origin_fn(|origin, _req_head| {
-                origin.as_bytes().ends_with(b".footprint.dev")
-                    || origin.as_bytes().ends_with(b".onefootprint.com")
-            })
-            .allowed_origin("http://localhost:8000")
+            .allow_any_origin()
+            .allow_any_header()
+            .allow_any_method()
+            .supports_credentials()
             .allowed_methods(vec!["GET", "POST", "PATCH", "PUT"])
             .max_age(3600);
 
@@ -112,6 +116,11 @@ async fn main() -> std::io::Result<()> {
 
         let session_middleware =
             SessionMiddleware::builder(CookieSessionStore::default(), Key::from(&session_key))
+                .cookie_path("/".to_string())
+                .cookie_secure(is_https)
+                .cookie_content_security(actix_session::CookieContentSecurity::Private)
+                .cookie_same_site(actix_web::cookie::SameSite::Lax)
+                .cookie_domain(Some(cookie_domain.clone()))
                 .build();
 
         App::new()
@@ -132,6 +141,7 @@ async fn main() -> std::io::Result<()> {
                     .service(enclave::sign::handler),
             )
             .service(identify::routes())
+            .service(liveness::routes())
             .service(index::index::handler)
             .service(index::health::handler)
             .with_json_spec_at("/open-api/spec")

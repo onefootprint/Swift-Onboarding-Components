@@ -5,12 +5,17 @@
         "actix",
         "Apiv",
         "awsx",
+        "cbor",
+        "chrono",
         "envconfig",
+        "livecheck",
+        "openapi",
         "pinpointemail",
         "pulumi",
         "sqlx",
         "thiserror",
-        "vsock"
+        "vsock",
+        "webauthn"
     ],
     "rust-analyzer.checkOnSave.command": "clippy",
     "[rust]": {

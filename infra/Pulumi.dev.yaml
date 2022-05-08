@@ -16,6 +16,7 @@ config:
     internalAppSubdomain: api-internal
     jumpBoxSSHPublicKey: ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIA/XaCZkbkXLPM+buT9s/2Y+2Mur1erjX/OP/mN7yRPn
     rootDomain: infra.footprint.dev
+    rpId: footprint.dev
   infra:jumpBoxSSHPrivateKey:
     secure: v1:NBzKv4tkQfZUrlcV:7UTaoa0u16GLio6PD+2/i0ibcGxt1xDyjhC0tTDF1n5o0eMyC+75X8QXxaj0tVTRzbJdcLytqhy+Z7Zu0NXZuqgDMQgyJay3Di3jASelCbV7WvNIy/b9/vC9pO579OhmvukOn+F5RtUw1NNBfbze9ZskEG0Xw1lkKjawkn8jos20MDfYZykecDsoaJVXeUtX6x2aiHcvkLpwY4g4soJRx7hMyTtpKE8Tf/Y9u32iTEgGLMW4iYokf1KeGbLFsKB4IXd8eeq+nqD+hDNs/BwpVe+B8/9ScxlysqbmySqpyavtQU14mmfA3ypVpwq7aR+JQXVUHKd+LeeMKK4ZIy98spiYNVGZQF0BwOgfTGlbFvezRFifgYCO+xVQn/fpLQS/alvY19A5vpJ1dXk6jHVaUlbj0xh+Q9oS9h+oS4QXcLq0JpgnmFyR1Uu34U1YF3XJu9adX+9/0R6h6tkXe63Yqrwh2xZezmJ+CtdP13jk3NuzcKJO79DSiaHTntrOb1XBL4jx7GoRk2UrQ4gydE7tIm+tzMCwdPrwYsoid5zXHb4mgXkaoLC7D4BS
   infra:tailscaleKey:

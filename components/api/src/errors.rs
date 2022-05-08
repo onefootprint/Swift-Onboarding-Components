@@ -1,4 +1,5 @@
 use actix_web::error::JsonPayloadError;
+use actix_web::http::StatusCode;
 use aws_sdk_kms::{
     error::{GenerateDataKeyPairWithoutPlaintextError, GenerateDataKeyWithoutPlaintextError},
     types::SdkError as KmsSdkError,
@@ -55,39 +56,41 @@ pub enum ApiError {
     EmailChallengeDecryptionError,
     #[error("email_challenge_expired")]
     EmailChallengeExpired,
+    #[error("webauthn error: {0}")]
+    WebAuthn(#[from] webauthn_rs::error::WebauthnError),
+    #[error("json error: {0}")]
+    Serde(#[from] serde_json::Error),
 }
 
-fn status_code_for_db_error(e: &DbError) -> actix_web::http::StatusCode {
+fn status_code_for_db_error(e: &DbError) -> StatusCode {
     match e {
-        DbError::DbInteract(_) => actix_web::http::StatusCode::INTERNAL_SERVER_ERROR,
-        DbError::DbError(_) => actix_web::http::StatusCode::INTERNAL_SERVER_ERROR,
-        DbError::PoolGet(_) => actix_web::http::StatusCode::INTERNAL_SERVER_ERROR,
-        DbError::PoolInit(_) => actix_web::http::StatusCode::INTERNAL_SERVER_ERROR,
-        DbError::ConnectionError(_) => actix_web::http::StatusCode::INTERNAL_SERVER_ERROR,
-        DbError::MigrationError(_) => actix_web::http::StatusCode::INTERNAL_SERVER_ERROR,
-        DbError::InvalidTenantAuth => actix_web::http::StatusCode::UNAUTHORIZED,
-        DbError::ChallengeDataMismatch => actix_web::http::StatusCode::BAD_REQUEST,
-        DbError::ChallengeCodeMismatch => actix_web::http::StatusCode::BAD_REQUEST,
-        DbError::ChallengeExpired => actix_web::http::StatusCode::BAD_REQUEST,
-        DbError::ChallengeInactive => actix_web::http::StatusCode::BAD_REQUEST,
-        DbError::InvalidSessionForOperation => actix_web::http::StatusCode::UNAUTHORIZED,
-        DbError::SessionExpired => actix_web::http::StatusCode::UNAUTHORIZED,
+        DbError::DbInteract(_) => StatusCode::INTERNAL_SERVER_ERROR,
+        DbError::DbError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+        DbError::PoolGet(_) => StatusCode::INTERNAL_SERVER_ERROR,
+        DbError::PoolInit(_) => StatusCode::INTERNAL_SERVER_ERROR,
+        DbError::ConnectionError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+        DbError::MigrationError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+        DbError::InvalidTenantAuth => StatusCode::UNAUTHORIZED,
+        DbError::ChallengeDataMismatch => StatusCode::BAD_REQUEST,
+        DbError::ChallengeCodeMismatch => StatusCode::BAD_REQUEST,
+        DbError::ChallengeExpired => StatusCode::BAD_REQUEST,
+        DbError::ChallengeInactive => StatusCode::BAD_REQUEST,
+        DbError::InvalidSessionForOperation => StatusCode::UNAUTHORIZED,
+        DbError::SessionExpired => StatusCode::UNAUTHORIZED,
     }
 }
 
 impl actix_web::ResponseError for ApiError {
-    fn status_code(&self) -> actix_web::http::StatusCode {
+    fn status_code(&self) -> StatusCode {
         match self {
-            ApiError::AuthError(_) => actix_web::http::StatusCode::BAD_REQUEST,
-            ApiError::KmsKeyPair(_) => actix_web::http::StatusCode::INTERNAL_SERVER_ERROR,
-            ApiError::KmsDataKey(_) => actix_web::http::StatusCode::INTERNAL_SERVER_ERROR,
-            ApiError::PinpointPhoneNumberValidateError(_) => {
-                actix_web::http::StatusCode::INTERNAL_SERVER_ERROR
-            }
-            ApiError::Crypto(_) => actix_web::http::StatusCode::INTERNAL_SERVER_ERROR,
-            ApiError::EnclaveProxy(_) => actix_web::http::StatusCode::INTERNAL_SERVER_ERROR,
-            ApiError::EnclaveConnection(_) => actix_web::http::StatusCode::INTERNAL_SERVER_ERROR,
-            ApiError::Enclave(_) => actix_web::http::StatusCode::INTERNAL_SERVER_ERROR,
+            ApiError::AuthError(_) => StatusCode::BAD_REQUEST,
+            ApiError::KmsKeyPair(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            ApiError::KmsDataKey(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            ApiError::PinpointPhoneNumberValidateError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            ApiError::Crypto(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            ApiError::EnclaveProxy(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            ApiError::EnclaveConnection(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            ApiError::Enclave(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::Database(e) => status_code_for_db_error(e),
             ApiError::Dotenv(_) => actix_web::http::StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::SendTextMessageError(_) => actix_web::http::StatusCode::INTERNAL_SERVER_ERROR,
@@ -100,6 +103,8 @@ impl actix_web::ResponseError for ApiError {
             ApiError::UserDoesntExistForEmailChallenge => actix_web::http::StatusCode::BAD_REQUEST,
             ApiError::EmailChallengeDecryptionError => actix_web::http::StatusCode::BAD_REQUEST,
             ApiError::EmailChallengeExpired => actix_web::http::StatusCode::BAD_REQUEST,
+            ApiError::WebAuthn(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            ApiError::Serde(_) => StatusCode::BAD_REQUEST,
         }
     }
 

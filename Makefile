@@ -74,3 +74,12 @@ package-api: api-release
 	@docker tag api:$(commit) $(account).dkr.ecr.us-east-1.amazonaws.com/api:latest
 	@docker push $(account).dkr.ecr.us-east-1.amazonaws.com/api:$(commit) 	
 	@docker push $(account).dkr.ecr.us-east-1.amazonaws.com/api:latest
+
+
+stop-local:
+	@killall enclave || echo "no enclave running"
+	@killall footprint-core || echo "no fpc running"
+
+run-local: stop-local
+	@cargo run -p enclave --no-default-features --features simulate & echo "starting enclave..."
+	@cargo run -p footprint-core --no-default-features

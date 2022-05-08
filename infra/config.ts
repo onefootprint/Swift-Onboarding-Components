@@ -7,6 +7,7 @@ export interface Config {
     enclaveCertPCR8: string;
     containers: Containers;
     jumpBoxSSHPublicKey: string;
+    rpId: string;
 }
 
 export interface Elastic {

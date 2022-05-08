@@ -19,7 +19,8 @@ pub enum SessionState {
 
 #[derive(Default, FromSqlRow, AsExpression, Serialize, Deserialize, Debug, Clone)]
 pub struct OnboardingSessionData {
-    pub user_ob_id: Option<String>,
+    pub user_ob_id: String,
+    pub user_vault_id: String,
 }
 
 #[derive(FromSqlRow, AsExpression, Serialize, Deserialize, Debug, Clone)]

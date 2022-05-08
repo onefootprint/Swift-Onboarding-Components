@@ -39,6 +39,12 @@ pub struct Config {
 
     #[envconfig(from = "COOKIE_SESSION_KEY")]
     pub cookie_session_key_hex: Option<String>,
+
+    #[envconfig(from = "RELYING_PARTY_ID", default = "localhost")]
+    pub rp_id: String,
+
+    #[envconfig(from = "COOKIE_DOMAIN", default = "localhost")]
+    pub cookie_domain: String,
 }
 
 impl Config {

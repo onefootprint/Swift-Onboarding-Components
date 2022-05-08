@@ -92,7 +92,8 @@ async fn handler(
     let new_session = NewSession {
         h_session_id,
         session_data: SessionState::OnboardingSession(OnboardingSessionData {
-            user_ob_id: Some(onboarding.user_ob_id),
+            user_ob_id: onboarding.user_ob_id,
+            user_vault_id: onboarding.user_vault_id,
         }),
     };
     let _ = db::session::init(&state.db_pool, new_session).await?;

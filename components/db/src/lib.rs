@@ -11,7 +11,7 @@ pub mod models;
 
 use crate::errors::DbError;
 use deadpool_diesel::postgres::{Manager, Pool, Runtime};
-use diesel::prelude::*;
+use diesel::{prelude::*, sql_types::Text};
 use models::tenants::*;
 
 #[allow(unused_imports)]
@@ -35,24 +35,14 @@ pub fn run_migrations(url: &str) -> Result<(), DbError> {
     Ok(())
 }
 
-pub async fn health_check(pool: &Pool) -> Result<Tenant, DbError> {
-    let new_tenant = NewTenant {
-        name: format!("Test_{}", chrono::Utc::now().timestamp()),
-        e_private_key: vec![],
-        public_key: vec![],
-    };
-
-    let tenant = pool
+pub async fn health_check(pool: &Pool) -> Result<(), DbError> {
+    let _ = pool
         .get()
         .await?
-        .interact(move |conn| {
-            diesel::insert_into(schema::tenants::table)
-                .values(&new_tenant)
-                .get_result(conn)
-        })
+        .interact(move |conn| diesel::sql_query("SELECT 1").execute(conn))
         .await??;
 
-    Ok(tenant)
+    Ok(())
 }
 
 pub mod onboarding;

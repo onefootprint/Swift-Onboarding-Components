@@ -2,10 +2,15 @@ use actix_web::Responder;
 use paperclip::actix::Apiv2Schema;
 use serde::Serialize;
 
-
 #[derive(Debug, Clone, serde::Serialize, Apiv2Schema)]
 pub struct ApiResponseData<T> {
     pub data: T,
+}
+
+impl<T> ApiResponseData<T> {
+    pub fn ok(data: T) -> Self {
+        Self { data }
+    }
 }
 
 impl<T> Responder for ApiResponseData<T>

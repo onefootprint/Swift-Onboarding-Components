@@ -117,13 +117,14 @@ function createCdnFrontedLoadBalancer(vpc: awsx.ec2.Vpc, secretsStore: StaticSec
         securityGroups: [loadBalancerSecurityGroup],
     }, { provider });
 
-    const loadBalancerTargetGroup = loadBalancer.createTargetGroup(`albtg-${serviceNameHash}`, { port: ServicePort, vpc, targetType: "instance" });
+    const loadBalancerTargetGroup = loadBalancer.createTargetGroup(`albtg-${serviceNameHash}`, {
+         port: ServicePort, vpc, targetType: "instance", healthCheck: { path: "/health"}  });
 
     const web = loadBalancerTargetGroup.createListener(`alblisten-https-${serviceName}`, {
         external: true,
         certificateArn: config.certArn,
         protocol: "HTTPS",
-        sslPolicy: "ELBSecurityPolicy-2016-08",
+        sslPolicy: "ELBSecurityPolicy-2016-08",        
         // ensure the default is an error
         defaultAction: {
             type: "fixed-response",

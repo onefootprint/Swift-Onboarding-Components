@@ -82,8 +82,25 @@ table! {
     }
 }
 
+table! {
+    use diesel::sql_types::*;
+    use crate::models::types::*;
+
+    webauthn_credentials (id) {
+        id -> Uuid,
+        user_vault_id -> Varchar,
+        credential_id -> Bytea,
+        public_key -> Bytea,
+        counter -> Int4,
+        attestation_data -> Bytea,
+        created_at -> Timestamp,
+        updated_at -> Timestamp,
+    }
+}
+
 joinable!(onboardings -> tenants (tenant_id));
 joinable!(onboardings -> user_vaults (user_vault_id));
+joinable!(webauthn_credentials -> user_vaults (user_vault_id));
 
 allow_tables_to_appear_in_same_query!(
     onboardings,
@@ -91,4 +108,5 @@ allow_tables_to_appear_in_same_query!(
     tenant_api_keys,
     tenants,
     user_vaults,
+    webauthn_credentials,
 );

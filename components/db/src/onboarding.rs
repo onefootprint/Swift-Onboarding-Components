@@ -54,10 +54,7 @@ pub(crate) fn get_onboarding_by_session_id_sync(
 ) -> Result<Onboarding, DbError> {
     let onboarding_session_data = get_onboarding_session_data_sync(conn, session_id)?;
 
-    let id = match onboarding_session_data.user_ob_id {
-        None => Err(DbError::InvalidSessionForOperation),
-        Some(i) => Ok(i),
-    }?;
+    let id = onboarding_session_data.user_ob_id;
 
     let onboarding: Onboarding = schema::onboardings::table
         .filter(schema::onboardings::user_ob_id.eq(id))

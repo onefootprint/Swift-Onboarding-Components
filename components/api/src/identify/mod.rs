@@ -4,6 +4,8 @@ pub mod data;
 pub mod email_verify;
 pub mod init;
 pub mod verify;
+mod livecheck;
+
 use crate::auth::identify_session::ChallengeState;
 use crate::State;
 use crate::{auth::identify_session::IdentifySessionState, errors::ApiError};
@@ -195,4 +197,5 @@ pub fn routes() -> web::Scope {
         .service(data::handler)
         .service(commit::handler)
         .service(email_verify::handler)
+        .service(livecheck::handler)
 }

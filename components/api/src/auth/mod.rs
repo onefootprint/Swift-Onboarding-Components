@@ -17,4 +17,6 @@ pub enum AuthError {
     SessionTypeError,
     #[error("invalid json {0}")]
     InvalidSessionJson(serde_json::Error),
+    #[error("invalid session state")]
+    InvalidSessionState
 }

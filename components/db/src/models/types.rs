@@ -30,7 +30,6 @@ impl Default for Status {
 pub enum ChallengeKind {
     PhoneNumber,
     Email,
-    // Biometric,
 }
 
 #[derive(Debug, DbEnum, PartialEq, Clone, Copy, Deserialize, Serialize)]

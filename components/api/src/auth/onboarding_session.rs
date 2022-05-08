@@ -20,6 +20,7 @@ use std::pin::Pin;
 pub struct OnboardingSessionContext {
     user_vault: UserVault,
     onboarding: Onboarding,
+    pub session_id: String,
 }
 
 impl OnboardingSessionContext {
@@ -72,6 +73,7 @@ impl FromRequest for OnboardingSessionContext {
             Ok(Self {
                 user_vault,
                 onboarding,
+                session_id,
             })
         })
     }

@@ -70,6 +70,14 @@ export abstract class ServiceContainers {
                         value: "http://otelcollect:4317"
                     },
                     {
+                        name: "RELYING_PARTY_ID",
+                        value: constants.rpId
+                    },
+                    {
+                        name: "COOKIE_DOMAIN",
+                        value: constants.rpId
+                    },
+                    {
                         name: "OTEL_RESOURCE_ATTRIBUTES",
                         value: `service.name=fpc-api,service.version=1.0,deployment.environment=${pulumi.getStack()}`
                     }
