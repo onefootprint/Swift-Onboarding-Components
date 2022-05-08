@@ -1,4 +1,4 @@
-use crate::auth::identify_session::{IdentifySessionContext, IdentifySessionState};
+use crate::auth::identify_session::IdentifySessionContext;
 use crate::errors::ApiError;
 use crate::identify::{clean_phone_number, send_challenge};
 use crate::response::success::ApiResponseData;
