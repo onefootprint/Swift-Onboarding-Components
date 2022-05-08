@@ -158,8 +158,7 @@ pub(crate) async fn send_email_challenge(
                 .to_addresses(email_address)
                 .build(),
         )
-        // TODO not my email
-        .from_email_address("elliott@onefootprint.com")
+        .from_email_address("noreply@infra.footprint.dev")
         .content(content)
         .send()
         .await?;
