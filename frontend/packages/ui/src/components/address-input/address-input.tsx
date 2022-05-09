@@ -1,6 +1,7 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import { useCombobox } from 'downshift';
 import usePlacesAutocomplete from 'hooks';
+import take from 'lodash/take';
 import React, { forwardRef } from 'react';
 import mergeRefs from 'react-merge-refs';
 
@@ -11,6 +12,8 @@ import type { Item } from './adress-input.types';
 import AddressDropdownFooter from './components/address-dropdown-footer';
 import AddressDropdownItem from './components/address-dropdown-item';
 import usePopper from './hooks/use-popper';
+
+const MAX_OF_RESULTS = 5;
 
 export type AddressInputProps = Pick<
   BaseInputProps,
@@ -51,7 +54,7 @@ const AddressInput = forwardRef<HTMLInputElement, AddressInputProps>(
   ) => {
     const { setReferenceElement, setPopperElement, popper } = usePopper();
     const {
-      suggestions: { data: items },
+      suggestions: { data },
       setValue,
     } = usePlacesAutocomplete({
       requestOptions: {
@@ -61,6 +64,7 @@ const AddressInput = forwardRef<HTMLInputElement, AddressInputProps>(
       },
       debounce: 300,
     });
+    const options = take(data, MAX_OF_RESULTS);
     const {
       getComboboxProps,
       getInputProps,
@@ -71,7 +75,7 @@ const AddressInput = forwardRef<HTMLInputElement, AddressInputProps>(
       highlightedIndex,
       isOpen: downShiftIsOpen,
     } = useCombobox({
-      items,
+      items: options,
       itemToString: item => (item ? item.structured_formatting.main_text : ''),
       inputValue: value,
       onSelectedItemChange: ({ selectedItem }) => {
@@ -88,7 +92,7 @@ const AddressInput = forwardRef<HTMLInputElement, AddressInputProps>(
     const toggleButtonProps = getToggleButtonProps();
     const inputProps = getInputProps();
     const menuProps = getMenuProps({}, { suppressRefError: true });
-    const hasResults = items.length > 0;
+    const hasResults = options.length > 0;
     const hasTypedMinimumRequired = value.length > 1;
     const isDropdownOpen =
       downShiftIsOpen && hasTypedMinimumRequired && hasResults;
@@ -132,21 +136,21 @@ const AddressInput = forwardRef<HTMLInputElement, AddressInputProps>(
               style={popper.styles.popper}
             >
               <>
-                {items.map((item, index) => {
-                  const itemProps = getItemProps({ item, index });
+                {options.map((option, index) => {
+                  const optionProps = getItemProps({ item: option, index });
                   return (
                     <AddressDropdownItem
-                      ariaSelected={itemProps['aria-selected']}
+                      ariaSelected={optionProps['aria-selected']}
                       disableHoverStyles={highlightedIndex !== -1}
                       highlighted={highlightedIndex === index}
-                      id={itemProps.id}
-                      key={item.place_id}
-                      matchedText={item.matched_substrings}
-                      onClick={itemProps.onClick}
-                      onMouseMove={itemProps.onMouseMove}
-                      ref={itemProps.ref}
-                      subtitle={item.structured_formatting.secondary_text}
-                      title={item.structured_formatting.main_text}
+                      id={optionProps.id}
+                      key={option.place_id}
+                      matchedText={option.matched_substrings}
+                      onClick={optionProps.onClick}
+                      onMouseMove={optionProps.onMouseMove}
+                      ref={optionProps.ref}
+                      subtitle={option.structured_formatting.secondary_text}
+                      title={option.structured_formatting.main_text}
                     />
                   );
                 })}
