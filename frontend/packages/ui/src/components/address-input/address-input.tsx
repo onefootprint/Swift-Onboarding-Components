@@ -5,7 +5,6 @@ import React, { forwardRef } from 'react';
 import mergeRefs from 'react-merge-refs';
 
 import BaseInput, { BaseInputProps } from '../internal/base-input';
-import Dropdown from '../internal/dropdown';
 import Label from '../internal/label';
 import S from './address-input.styles';
 import type { Item } from './adress-input.types';
@@ -126,7 +125,7 @@ const AddressInput = forwardRef<HTMLInputElement, AddressInputProps>(
             value={value}
           />
           {isDropdownOpen ? (
-            <Dropdown
+            <S.Dropdown
               {...menuProps}
               ref={mergeRefs([menuProps.ref, setPopperElement])}
               {...popper.attributes.popper}
@@ -153,7 +152,7 @@ const AddressInput = forwardRef<HTMLInputElement, AddressInputProps>(
                 })}
                 <AddressDropdownFooter />
               </>
-            </Dropdown>
+            </S.Dropdown>
           ) : null}
         </S.Container>
       </>
