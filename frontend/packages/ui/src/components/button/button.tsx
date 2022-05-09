@@ -49,21 +49,21 @@ const Container = styled.button<{
   variant: 'primary' | 'secondary';
   fullWidth?: boolean;
 }>`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  border: 0;
-
   ${({ theme, variant }) => css`
+    align-items: center;
     background-color: ${theme.backgroundColors[backgroundColors[variant]]};
     border-radius: ${theme.borderRadius[1]}px;
+    border: 0;
     box-shadow: 0 ${theme.borderWidths[1]}px ${theme.borderWidths[1]}px
         rgb(0 0 0 / 0%),
       0 0 0 ${theme.borderWidths[1]}px
         ${theme.borderColors[borderColors[variant]]};
     color: ${theme.colors[colors[variant]]};
     cursor: pointer;
+    display: flex;
+    justify-content: center;
     text-decoration: none;
+    user-select: none;
   `}
 
   ${({ theme, size }) =>
