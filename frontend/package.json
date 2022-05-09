@@ -39,7 +39,7 @@
     "webpack": "^5.72.0"
   },
   "lint-staged": {
-    "*.{ts,tsx,jsx,jsx}": [
+    "*.{jsx,js,ts,tsx}": [
       "eslint --fix",
       "prettier --write"
     ],

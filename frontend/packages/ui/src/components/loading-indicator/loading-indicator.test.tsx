@@ -14,7 +14,7 @@ describe('<LoadingIndicator />', () => {
       <LoadingIndicator testID={testID} color={color} size={size} />,
     );
 
-  it('should assign a test id', () => {
+  it('should add a test id attribute', () => {
     renderLoadingIndicator({ testID: 'loading-indicator-test-id' });
     expect(screen.getByTestId('loading-indicator-test-id')).toBeInTheDocument();
   });

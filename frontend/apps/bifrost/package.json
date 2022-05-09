@@ -11,16 +11,18 @@
   },
   "dependencies": {
     "icons": "*",
-    "next": "12.1.5",
+    "next": "12.1.6",
     "react": "17.0.2",
     "react-dom": "17.0.2",
     "styled": "*",
+    "styled-components": "^5.3.5",
     "ui": "*"
   },
   "devDependencies": {
-    "@types/node": "^17.0.12",
-    "@types/react": "17.0.37",
-    "@types/react-dom": "^17.0.11",
+    "@types/node": "^17.0.31",
+    "@types/react": "^18.0.9",
+    "@types/react-dom": "^18.0.3",
+    "@types/styled-components": "^5.1.25",
     "config": "*",
     "eslint": "7.32.0",
     "next-transpile-modules": "9.0.0",

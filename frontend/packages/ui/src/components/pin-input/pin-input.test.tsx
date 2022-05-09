@@ -24,7 +24,7 @@ describe('<PinInput />', () => {
       />,
     );
 
-  it('should assign a test id', () => {
+  it('should add a test id attribute', () => {
     renderPinInput({ testID: 'pin-input-test-id' });
     expect(screen.getByTestId('pin-input-test-id')).toBeInTheDocument();
   });

@@ -88,7 +88,7 @@ const AddressInput = forwardRef<HTMLInputElement, AddressInputProps>(
     const comboBoxProps = getComboboxProps();
     const toggleButtonProps = getToggleButtonProps();
     const inputProps = getInputProps();
-    const dropdownProps = getMenuProps({}, { suppressRefError: true });
+    const menuProps = getMenuProps({}, { suppressRefError: true });
     const hasResults = items.length > 0;
     const hasTypedMinimumRequired = value.length > 1;
     const isDropdownOpen =
@@ -127,10 +127,8 @@ const AddressInput = forwardRef<HTMLInputElement, AddressInputProps>(
           />
           {isDropdownOpen ? (
             <Dropdown
-              aria-labelledby={dropdownProps['aria-labelledby']}
-              id={dropdownProps.id}
-              onMouseLeave={dropdownProps.onMouseLeave}
-              ref={mergeRefs([dropdownProps.ref, setPopperElement])}
+              {...menuProps}
+              ref={mergeRefs([menuProps.ref, setPopperElement])}
               {...popper.attributes.popper}
               style={popper.styles.popper}
             >

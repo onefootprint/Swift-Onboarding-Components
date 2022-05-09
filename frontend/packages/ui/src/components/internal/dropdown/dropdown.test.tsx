@@ -7,8 +7,13 @@ describe('<Dropdown />', () => {
   const renderDropdown = ({
     children = 'some content',
     testID,
+    maxHeight,
   }: Partial<DropdownProps>) =>
-    customRender(<Dropdown testID={testID}>{children}</Dropdown>);
+    customRender(
+      <Dropdown testID={testID} maxHeight={maxHeight}>
+        {children}
+      </Dropdown>,
+    );
 
   describe('<Dropdown />', () => {
     it('should assign a testID', () => {
@@ -23,6 +28,19 @@ describe('<Dropdown />', () => {
         children: 'foo',
       });
       expect(screen.getByText('foo')).toBeInTheDocument();
+    });
+
+    describe('when it has a maxHeight defined', () => {
+      it('should apply the maxHeight css', () => {
+        renderDropdown({
+          children: 'foo',
+          maxHeight: '330px',
+        });
+        const container = screen.getByText('foo');
+        expect(container).toHaveStyle({
+          maxHeight: '330px',
+        });
+      });
     });
   });
 });

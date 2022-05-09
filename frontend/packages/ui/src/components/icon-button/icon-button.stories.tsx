@@ -12,7 +12,7 @@ export default {
     ariaLabel: {
       control: 'text',
       description: 'Aria Label for accessibility',
-      name: 'aria-label',
+      name: 'ariaLabel *',
       required: true,
     },
     onClick: {
@@ -23,6 +23,7 @@ export default {
       control: 'select',
       description: 'Icon to be rendered',
       options: Object.keys(Icos),
+      name: 'Icon *',
     },
     testID: {
       control: 'text',

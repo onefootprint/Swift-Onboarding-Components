@@ -32,7 +32,7 @@ describe('<TextInput />', () => {
       />,
     );
 
-  it('should assign a test id', () => {
+  it('should add a test id attribute', () => {
     renderTextInput({ testID: 'input-test-id' });
     expect(screen.getByTestId('input-test-id')).toBeInTheDocument();
   });
