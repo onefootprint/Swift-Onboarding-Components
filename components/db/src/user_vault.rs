@@ -2,7 +2,7 @@ use crate::errors::DbError;
 use crate::models::onboardings::*;
 use crate::models::types::Status;
 use crate::models::user_vaults::*;
-use crate::onboarding::get_onboarding_by_session_id_sync;
+use crate::onboarding::{get_for_tenant, get_onboarding_by_session_id_sync};
 use crate::schema;
 use deadpool_diesel::postgres::Pool;
 use diesel::prelude::*;
@@ -66,6 +66,27 @@ pub async fn get(pool: &Pool, uv_id: String) -> Result<UserVault, DbError> {
     Ok(user)
 }
 
+pub async fn get_by_tenant_and_onboarding(
+    pool: &Pool,
+    tenant_id: String,
+    footprint_user_id: String,
+) -> Result<Option<UserVault>, DbError> {
+    let conn = pool.get().await?;
+
+    let vault: Option<UserVault> = conn
+        .interact(move |conn| -> Result<Option<UserVault>, DbError> {
+            let onboarding: Option<Onboarding> =
+                get_for_tenant(conn, tenant_id, footprint_user_id)?;
+
+            match onboarding {
+                Some(ob) => Ok(Some(get_sync(conn, ob.user_vault_id)?)),
+                None => Ok(None),
+            }
+        })
+        .await??;
+
+    Ok(vault)
+}
 pub async fn get_by_session_id(pool: &Pool, session_cookie: String) -> Result<UserVault, DbError> {
     let conn = pool.get().await?;
 

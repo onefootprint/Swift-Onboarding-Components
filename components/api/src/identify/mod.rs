@@ -85,7 +85,7 @@ async fn decrypt_and_send_challenge(
     email: String,
 ) -> Result<(IdentifySessionState, String), ApiError> {
     let decrypted_data = crate::enclave::lib::decrypt_bytes(
-        &state,
+        state,
         &vault.e_phone_number,
         vault.e_private_key.clone(),
         enclave_proxy::DataTransform::Identity,
@@ -93,7 +93,7 @@ async fn decrypt_and_send_challenge(
     .await?;
     // send challenge & set state
     let phone_number = std::str::from_utf8(&decrypted_data)?.to_string();
-    send_challenge(&state, phone_number.clone(), tenant_id, email).await
+    send_challenge(state, phone_number.clone(), tenant_id, email).await
 }
 
 pub(crate) async fn send_challenge(

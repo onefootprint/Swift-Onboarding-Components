@@ -56,6 +56,8 @@ pub enum ApiError {
     EmailChallengeDecryptionError,
     #[error("email_challenge_expired")]
     EmailChallengeExpired,
+    #[error("invalid_tenant_skey_or_footprint_user_id")]
+    InvalidTenantKeyOrUserId,
     #[error("webauthn error: {0}")]
     WebAuthn(#[from] webauthn_rs::error::WebauthnError),
     #[error("json error: {0}")]
@@ -103,6 +105,7 @@ impl actix_web::ResponseError for ApiError {
             ApiError::UserDoesntExistForEmailChallenge => actix_web::http::StatusCode::BAD_REQUEST,
             ApiError::EmailChallengeDecryptionError => actix_web::http::StatusCode::BAD_REQUEST,
             ApiError::EmailChallengeExpired => actix_web::http::StatusCode::BAD_REQUEST,
+            ApiError::InvalidTenantKeyOrUserId => actix_web::http::StatusCode::BAD_REQUEST,
             ApiError::WebAuthn(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::Serde(_) => StatusCode::BAD_REQUEST,
         }

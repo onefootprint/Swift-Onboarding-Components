@@ -22,6 +22,7 @@ mod identify;
 mod index;
 mod liveness;
 mod response;
+mod vault;
 
 use paperclip::actix::{web, OpenApiExt};
 
@@ -141,6 +142,7 @@ async fn main() -> std::io::Result<()> {
                     .service(enclave::sign::handler),
             )
             .service(identify::routes())
+            .service(vault::routes())
             .service(liveness::routes())
             .service(index::index::handler)
             .service(index::health::handler)

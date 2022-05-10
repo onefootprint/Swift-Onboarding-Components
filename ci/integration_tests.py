@@ -6,6 +6,8 @@ import requests
 # TODO make some utils to reduce duplication
 
 TENANT_AUTH_HEADER = "x-client-public-key"
+TENANT_SECRET_HEADER = "x-client-secret-key"
+
 
 url = lambda path: "{}/{}".format(os.environ.get('TEST_URL'), path)
 
@@ -23,6 +25,11 @@ def _client_pub_key_headers(client_public_key):
         TENANT_AUTH_HEADER: client_public_key,
     }
 
+def _client_priv_key_headers(client_priv_key):
+    return {
+        TENANT_SECRET_HEADER: client_priv_key,
+    }
+
 @pytest.fixture(scope="module")
 def tenant1():
     path = "private/client"
@@ -30,8 +37,12 @@ def tenant1():
     r = requests.post(url(path), json=data)
     assert(r.status_code == 200)
     client_public_key = r.json()["data"]["keys"]["client_public_key"]
+    client_secret_key = r.json()["data"]["keys"]["client_secret_key"]
     print(client_public_key)
-    return client_public_key
+    return {
+        "pk": client_public_key,
+        "sk": client_secret_key
+    }
 
 @pytest.fixture(scope="module")
 def tenant2():
@@ -40,7 +51,11 @@ def tenant2():
     r = requests.post(url(path), json=data)
     assert(r.status_code == 200)
     client_public_key = r.json()["data"]["keys"]["client_public_key"]
-    return client_public_key
+    client_secret_key = r.json()["data"]["keys"]["client_secret_key"]
+    return {
+        "pk": client_public_key,
+        "sk": client_secret_key
+    }
 
 def test_identify_init(tenant1, request):
     path = "identify"
@@ -54,7 +69,7 @@ def test_identify_init(tenant1, request):
         url(path),
         json=data,
         cookies=request.config.cache.get("cookies", None),
-        headers=_client_pub_key_headers(tenant1),
+        headers=_client_pub_key_headers(tenant1["pk"]),
     )
     print(r, r.content)
     assert r.status_code == 200
@@ -140,7 +155,7 @@ def test_identify_repeat_customer_via_email(request, tenant2):
         url(path),
         json=data,
         cookies=request.config.cache.get("cookies", None),
-        headers=_client_pub_key_headers(tenant2),
+        headers=_client_pub_key_headers(tenant2["pk"]),
     )
     print(r, r.content)
     assert r.status_code == 200
@@ -173,3 +188,22 @@ def test_identify_commit_repeat_customer(request):
     assert old_fp_user_id != fp_user_id, "Different tenants should have different fp_user_ids"
     cookies = r.cookies.get_dict()
     assert not cookies, "Set-Cookie response header should not be provided"
+
+def test_decrypt(request, tenant1):
+    path = "vault/decrypt"
+    print(url(path))
+    data = {
+        "footprint_user_id": request.config.cache.get("fp_user_id", None),
+        "attributes": ["first_name"]
+    }
+    print(data)
+    r = requests.post(url(path),
+        cookies=request.config.cache.get("cookies", None),        
+        headers=_client_priv_key_headers(tenant1["sk"]),  
+        json=data
+    )
+    print(r.content)
+    assert r.status_code == 200
+    first_name = r.json()["data"]["attributes"]["first_name"]
+    assert first_name
+    assert first_name == "Flerp"

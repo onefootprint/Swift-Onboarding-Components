@@ -21,10 +21,7 @@ pub async fn init(pool: &Pool, new_tenant: NewTenant) -> Result<Tenant, DbError>
     Ok(tenant)
 }
 
-pub async fn get_tenant(
-    pool: &Pool,
-    tenant_id: String
-) -> Result<Tenant, DbError> {
+pub async fn get_tenant(pool: &Pool, tenant_id: String) -> Result<Tenant, DbError> {
     let conn = pool.get().await?;
 
     let tenant: Tenant = conn
@@ -58,7 +55,7 @@ pub async fn api_init(
         is_enabled: true,
         created_at: now,
         updated_at: now,
-        e_secret_api_key: e_api_key
+        e_secret_api_key: e_api_key,
     };
     let tenant_api_key = conn
         .interact(move |conn| {
@@ -92,6 +89,36 @@ pub async fn pub_auth(pool: &Pool, tenant_pub_key: String) -> Result<Option<Tena
         .interact(move |conn| -> Result<Option<Tenant>, DbError> {
             let tenant_api_key: Option<TenantApiKey> = schema::tenant_api_keys::table
                 .filter(schema::tenant_api_keys::tenant_public_key.eq(tenant_pub_key))
+                .first(conn)
+                .optional()?;
+
+            if let Some(tenant_api_key) = tenant_api_key {
+                let tenant: Tenant = schema::tenants::table
+                    .find(tenant_api_key.tenant_id)
+                    .first(conn)?;
+
+                Ok(Some(tenant))
+            } else {
+                Ok(None)
+            }
+        })
+        .await??;
+
+    Ok(tenant)
+}
+
+pub async fn secret_auth(
+    pool: &Pool,
+    tenant_secret_key: String,
+) -> Result<Option<Tenant>, DbError> {
+    let conn = pool.get().await?;
+
+    let sh_api_key = crypto::sha256(tenant_secret_key.as_bytes()).to_vec();
+
+    let tenant = conn
+        .interact(move |conn| -> Result<Option<Tenant>, DbError> {
+            let tenant_api_key: Option<TenantApiKey> = schema::tenant_api_keys::table
+                .filter(schema::tenant_api_keys::sh_secret_api_key.eq(sh_api_key))
                 .first(conn)
                 .optional()?;
 

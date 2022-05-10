@@ -216,6 +216,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "actix-web-httpauth"
+version = "0.6.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "08c25a48b4684f90520183cd1a688e5f4f7e9905835fa75d02c0fe4f60fcdbe6"
+dependencies = [
+ "actix-service",
+ "actix-utils",
+ "actix-web",
+ "base64",
+ "futures-core",
+ "futures-util",
+ "pin-project-lite",
+]
+
+[[package]]
 name = "actix-web-opentelemetry"
 version = "0.11.0-beta.8"
 source = "git+https://github.com/OutThereLabs/actix-web-opentelemetry?rev=2d2eb3d415f515ea71b0b15dcda4ccac41987a76#2d2eb3d415f515ea71b0b15dcda4ccac41987a76"
@@ -1748,6 +1763,7 @@ dependencies = [
  "actix-cors",
  "actix-session",
  "actix-web",
+ "actix-web-httpauth",
  "actix-web-opentelemetry",
  "anyhow",
  "aws-config 0.10.1",
@@ -1772,6 +1788,7 @@ dependencies = [
  "serde",
  "serde_json",
  "serde_with",
+ "strum_macros",
  "thiserror",
  "tokio",
  "tracing",

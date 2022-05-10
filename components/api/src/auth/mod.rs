@@ -1,5 +1,6 @@
 use thiserror::Error;
 pub mod client_public_key;
+pub mod client_secret_key;
 pub mod identify_session;
 pub mod onboarding_session;
 
@@ -18,5 +19,5 @@ pub enum AuthError {
     #[error("invalid json {0}")]
     InvalidSessionJson(serde_json::Error),
     #[error("invalid session state")]
-    InvalidSessionState
+    InvalidSessionState,
 }
