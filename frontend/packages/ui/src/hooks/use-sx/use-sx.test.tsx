@@ -19,10 +19,10 @@ describe('useSX', () => {
         { wrapper: Wrapper },
       );
       expect(result.current).toMatchObject({
-        backgroundColor: themes.light.backgroundColors.primary,
+        backgroundColor: themes.light.backgroundColor.primary,
         display: 'flex',
-        marginLeft: themes.light.spacings[3],
-        marginRight: themes.light.spacings[3],
+        marginLeft: themes.light.spacing[3],
+        marginRight: themes.light.spacing[3],
       });
     });
   });

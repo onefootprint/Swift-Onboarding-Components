@@ -1,8 +1,8 @@
 import { Properties } from 'csstype';
-import type { Colors } from 'styled';
+import type { Color } from 'styled';
 
 export type IconProps = {
-  color?: Colors;
+  color?: Color;
   style?: Properties;
   testID?: string;
 };

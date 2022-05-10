@@ -18,7 +18,7 @@ const IcoPlusBig16 = ({ color = 'primary', style, testID }: IconProps) => {
         fillRule="evenodd"
         clipRule="evenodd"
         d="M8.75 1.75a.75.75 0 0 0-1.5 0v5.5h-5.5a.75.75 0 0 0 0 1.5h5.5v5.5a.75.75 0 0 0 1.5 0v-5.5h5.5a.75.75 0 0 0 0-1.5h-5.5v-5.5Z"
-        fill={theme.colors[color]}
+        fill={theme.color[color]}
       />
     </svg>
   );

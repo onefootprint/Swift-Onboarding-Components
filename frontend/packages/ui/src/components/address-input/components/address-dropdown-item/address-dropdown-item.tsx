@@ -1,18 +1,18 @@
 import React, { forwardRef } from 'react';
-import styled, { css } from 'styled';
+import Highlighter from 'react-highlight-words';
+import styled, { css, useTheme } from 'styled';
 
 import Typography from '../../../typography';
-import TypographyHighlight from '../../../typography-highlight';
 
 export type AddressDropdownItemProps = {
   ariaSelected: boolean;
   disableHoverStyles: boolean;
   highlighted: boolean;
   id?: string;
-  matchedText: { length: number; offset: number }[];
   onClick: (event: React.MouseEvent<HTMLLIElement>) => void;
   onKeyDown?: (event: React.KeyboardEvent<HTMLLIElement>) => void;
   onMouseMove: (event: React.MouseEvent<HTMLLIElement>) => void;
+  searchWords: string[];
   subtitle: string;
   title: string;
 };
@@ -24,34 +24,45 @@ const AddressDropdownItem = forwardRef<HTMLLIElement, AddressDropdownItemProps>(
       disableHoverStyles,
       highlighted,
       id,
-      matchedText,
       onClick,
       onKeyDown,
       onMouseMove,
+      searchWords,
       subtitle,
       title,
     }: AddressDropdownItemProps,
     ref,
-  ) => (
-    <Container
-      aria-selected={ariaSelected}
-      disableHoverStyles={disableHoverStyles}
-      highlighted={highlighted}
-      id={id}
-      onClick={onClick}
-      onKeyDown={onKeyDown}
-      onMouseMove={onMouseMove}
-      ref={ref}
-      role="option"
-    >
-      <TypographyHighlight matchedText={matchedText}>
-        {title}
-      </TypographyHighlight>
-      <Typography variant="body-3" color="tertiary">
-        {subtitle}
-      </Typography>
-    </Container>
-  ),
+  ) => {
+    const theme = useTheme();
+    return (
+      <Container
+        aria-selected={ariaSelected}
+        disableHoverStyles={disableHoverStyles}
+        highlighted={highlighted}
+        id={id}
+        onClick={onClick}
+        onKeyDown={onKeyDown}
+        onMouseMove={onMouseMove}
+        ref={ref}
+        role="option"
+      >
+        <Typography variant="body-3" color="primary">
+          <Highlighter
+            searchWords={searchWords}
+            textToHighlight={title}
+            highlightStyle={{
+              background: 'none',
+              color: theme.color.primary,
+              fontWeight: theme.typography['label-3'].fontWeight,
+            }}
+          />
+        </Typography>
+        <Typography variant="body-3" color="tertiary">
+          {subtitle}
+        </Typography>
+      </Container>
+    );
+  },
 );
 
 const Container = styled.li<{
@@ -59,13 +70,13 @@ const Container = styled.li<{
   disableHoverStyles: boolean;
 }>`
   ${({ theme }) => css`
-    background: ${theme.backgroundColors.primary};
+    background: ${theme.backgroundColor.primary};
     cursor: pointer;
-    margin-bottom: ${theme.spacings[2]}px;
-    padding: ${theme.spacings[2]}px ${theme.spacings[5]}px;
+    margin-bottom: ${theme.spacing[2]}px;
+    padding: ${theme.spacing[2]}px ${theme.spacing[5]}px;
 
     > p:first-child {
-      margin-bottom: ${theme.spacings[2]}px;
+      margin-bottom: ${theme.spacing[2]}px;
     }
   `}
 
@@ -74,12 +85,12 @@ const Container = styled.li<{
     css`
       &:hover {
         background: linear-gradient(
-            ${theme.overlays.darken[1]},
-            ${theme.overlays.darken[1]}
+            ${theme.overlay.darken[1]},
+            ${theme.overlay.darken[1]}
           ),
           linear-gradient(
-            ${theme.backgroundColors.primary},
-            ${theme.backgroundColors.primary}
+            ${theme.backgroundColor.primary},
+            ${theme.backgroundColor.primary}
           );
       }
     `}
@@ -88,12 +99,12 @@ const Container = styled.li<{
     highlighted &&
     css`
       background: linear-gradient(
-          ${theme.overlays.darken[1]},
-          ${theme.overlays.darken[1]}
+          ${theme.overlay.darken[1]},
+          ${theme.overlay.darken[1]}
         ),
         linear-gradient(
-          ${theme.backgroundColors.primary},
-          ${theme.backgroundColors.primary}
+          ${theme.backgroundColor.primary},
+          ${theme.backgroundColor.primary}
         );
     `}
 `;

@@ -18,7 +18,7 @@ const IcoArrowUpRight16 = ({ color = 'primary', style, testID }: IconProps) => {
         fillRule="evenodd"
         clipRule="evenodd"
         d="M5.623 2.05a.7.7 0 1 0 0 1.4h4.53L3.665 9.938a.7.7 0 1 0 .99.99l6.488-6.488v4.53a.7.7 0 1 0 1.4 0V2.75a.7.7 0 0 0-.7-.7h-6.22Z"
-        fill={theme.colors[color]}
+        fill={theme.color[color]}
       />
     </svg>
   );

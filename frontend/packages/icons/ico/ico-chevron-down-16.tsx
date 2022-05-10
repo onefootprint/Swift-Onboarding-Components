@@ -16,7 +16,7 @@ const IcoChevronDown16 = ({ color = 'primary', style, testID }: IconProps) => {
     >
       <path
         d="M11.25 6.25 8 9.75l-3.25-3.5"
-        stroke={theme.colors[color]}
+        stroke={theme.color[color]}
         strokeWidth={1.5}
         strokeLinecap="round"
         strokeLinejoin="round"

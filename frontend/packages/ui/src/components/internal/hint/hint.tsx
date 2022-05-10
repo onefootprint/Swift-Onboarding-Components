@@ -1,12 +1,12 @@
 import React from 'react';
-import type { Colors } from 'styled';
+import type { Color } from 'styled';
 
 import Box from '../../box';
 import Typography from '../../typography';
 
 export type HintProps = {
   children: string;
-  color: Colors;
+  color: Color;
 };
 
 const Hint = ({ children, color }: HintProps) => (

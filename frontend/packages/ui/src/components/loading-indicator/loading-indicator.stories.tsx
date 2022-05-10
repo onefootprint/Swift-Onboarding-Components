@@ -17,7 +17,7 @@ export default {
     color: {
       control: 'select',
       description: 'Color of the icon',
-      options: Object.keys(light.colors),
+      options: Object.keys(light.color),
       table: { defaultValue: { summary: 'primary' } },
     },
     testID: {

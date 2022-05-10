@@ -15,10 +15,8 @@ export default {
       options: ['p', 'a', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'label', 'span'],
     },
     center: { control: 'boolean' },
-    color: { control: 'select', options: Object.keys(light.colors) },
-    ellipsis: { control: 'boolean' },
+    color: { control: 'select', options: Object.keys(light.color) },
     htmlTitle: { control: 'text' },
-    lineThrough: { control: 'boolean' },
     testID: {
       control: 'text',
       description: 'Append an attribute data-testid for testing purposes',
@@ -33,9 +31,7 @@ const Template: Story<TypographyProps> = ({
   center,
   children = 'lorem',
   color = 'primary',
-  ellipsis,
   htmlTitle,
-  lineThrough,
   testID,
   variant = 'heading-1',
 }: Partial<TypographyProps>) => (
@@ -43,9 +39,7 @@ const Template: Story<TypographyProps> = ({
     as={as}
     center={center}
     color={color}
-    ellipsis={ellipsis}
     htmlTitle={htmlTitle}
-    lineThrough={lineThrough}
     testID={testID}
     variant={variant}
   >
@@ -96,9 +90,7 @@ Heading3.args = {
   center: false,
   children: 'Footprint (heading-3)',
   color: 'primary',
-  ellipsis: false,
   htmlTitle: '',
-  lineThrough: false,
   testID: 'typography-test-id',
   variant: 'heading-3',
 };

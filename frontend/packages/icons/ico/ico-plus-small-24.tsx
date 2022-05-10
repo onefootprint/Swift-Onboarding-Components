@@ -18,7 +18,7 @@ const IcoPlusSmall24 = ({ color = 'primary', style, testID }: IconProps) => {
         fillRule="evenodd"
         clipRule="evenodd"
         d="M12.75 7a.75.75 0 0 0-1.5 0v4.25H7a.75.75 0 0 0 0 1.5h4.25V17a.75.75 0 0 0 1.5 0v-4.25H17a.75.75 0 0 0 0-1.5h-4.25V7Z"
-        fill={theme.colors[color]}
+        fill={theme.color[color]}
       />
     </svg>
   );

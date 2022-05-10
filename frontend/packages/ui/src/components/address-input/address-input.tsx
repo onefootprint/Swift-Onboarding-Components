@@ -145,10 +145,10 @@ const AddressInput = forwardRef<HTMLInputElement, AddressInputProps>(
                       highlighted={highlightedIndex === index}
                       id={optionProps.id}
                       key={option.place_id}
-                      matchedText={option.matched_substrings}
                       onClick={optionProps.onClick}
                       onMouseMove={optionProps.onMouseMove}
                       ref={optionProps.ref}
+                      searchWords={value.split(' ')}
                       subtitle={option.structured_formatting.secondary_text}
                       title={option.structured_formatting.main_text}
                     />

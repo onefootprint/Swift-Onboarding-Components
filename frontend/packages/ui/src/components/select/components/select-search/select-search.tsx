@@ -56,18 +56,17 @@ const SelectSearch = ({
 const Container = styled.div`
   ${({ theme }) => css`
     height: 44px;
-    border-bottom: ${theme.borderWidths[1]}px solid
-      ${theme.dividerColors.primary};
+    border-bottom: ${theme.borderWidth[1]}px solid ${theme.borderColor.tertiary};
 
     svg {
-      left: ${theme.spacings[5]}px;
+      left: ${theme.spacing[5]}px;
       pointer-events: none;
       position: absolute;
-      top: ${theme.spacings[4] + theme.spacings[1]}px;
+      top: ${theme.spacing[4] + theme.spacing[1]}px;
     }
 
     + ul {
-      padding-top: ${theme.spacings[2]}px;
+      padding-top: ${theme.spacing[2]}px;
     }
   `}
 `;
@@ -79,22 +78,22 @@ const InputContainer = styled.div`
 
 const Input = styled.input`
   ${({ theme }) => css`
-    background: ${theme.backgroundColors.primary};
+    background: ${theme.backgroundColor.primary};
     border-top-left-radius: ${theme.borderRadius[1]}px;
     border-top-right-radius: ${theme.borderRadius[1]}px;
     border: none;
-    color: ${theme.colors.primary};
-    font-family: ${theme.typographies['body-3'].fontFamily};
-    font-size: ${theme.typographies['body-3'].fontSize}px;
-    font-weight: ${theme.typographies['body-3'].fontWeight};
+    color: ${theme.color.primary};
+    font-family: ${theme.typography['body-3'].fontFamily};
+    font-size: ${theme.typography['body-3'].fontSize}px;
+    font-weight: ${theme.typography['body-3'].fontWeight};
     height: 100%;
-    line-height: ${theme.typographies['body-3'].lineHeight}px;
+    line-height: ${theme.typography['body-3'].lineHeight}px;
     outline: none;
-    padding-left: ${theme.spacings[9]}px;
+    padding-left: ${theme.spacing[9]}px;
     width: 100%;
 
     ::placeholder {
-      color: ${theme.colors.tertiary};
+      color: ${theme.color.tertiary};
     }
   `}
 `;

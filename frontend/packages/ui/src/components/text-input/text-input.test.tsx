@@ -65,7 +65,7 @@ describe('<TextInput />', () => {
       });
       const input = screen.getByPlaceholderText('placeholder');
       expect(input).toHaveStyle({
-        border: `1px solid ${themes.light.borderColors.error}`,
+        border: `1px solid ${themes.light.borderColor.error}`,
       });
     });
 
@@ -76,7 +76,7 @@ describe('<TextInput />', () => {
       });
       const hint = screen.getByText('Hint');
       expect(hint).toHaveStyle({
-        color: themes.light.colors.error,
+        color: themes.light.color.error,
       });
     });
   });

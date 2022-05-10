@@ -68,7 +68,7 @@ describe('<Box />', () => {
       });
       expect(screen.getByText('foo')).toHaveStyle({
         display: 'flex',
-        backgroundColor: themes.light.backgroundColors.tertiary,
+        backgroundColor: themes.light.backgroundColor.tertiary,
       });
     });
   });

@@ -1,10 +1,10 @@
 import IcoSpinner16 from 'icons/ico/ico-spinner-16';
 import IcoSpinner24 from 'icons/ico/ico-spinner-24';
 import React from 'react';
-import styled, { Colors, keyframes } from 'styled';
+import styled, { Color, keyframes } from 'styled';
 
 export type LoadingIndicatorProps = {
-  color?: Colors;
+  color?: Color;
   size?: 'default' | 'compact';
   testID?: string;
 };

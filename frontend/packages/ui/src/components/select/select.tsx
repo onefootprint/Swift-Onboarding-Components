@@ -162,9 +162,8 @@ const Select = ({
                           textToHighlight={option.label}
                           highlightStyle={{
                             background: 'none',
-                            color: theme.colors.primary,
-                            fontWeight:
-                              theme.typographies['label-3'].fontWeight,
+                            color: theme.color.primary,
+                            fontWeight: theme.typography['label-3'].fontWeight,
                           }}
                         >
                           {option.label}

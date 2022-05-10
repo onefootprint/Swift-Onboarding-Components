@@ -17,7 +17,7 @@ const IcoSpinner16 = ({ color = 'primary', style, testID }: IconProps) => {
       <g clipPath="url(#prefix__a)">
         <path
           d="M8 0a8 8 0 0 1 8 8h-1.6A6.399 6.399 0 0 0 8 1.6V0Z"
-          fill={theme.colors[color]}
+          fill={theme.color[color]}
         />
       </g>
       <defs>

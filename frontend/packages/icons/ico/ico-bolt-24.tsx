@@ -16,7 +16,7 @@ const IcoBolt24 = ({ color = 'primary', style, testID }: IconProps) => {
     >
       <path
         d="M10.75 13.25h-4l6.5-8.5v6h4l-6.5 8.5v-6Z"
-        stroke={theme.colors[color]}
+        stroke={theme.color[color]}
         strokeWidth={1.5}
         strokeLinecap="round"
         strokeLinejoin="round"

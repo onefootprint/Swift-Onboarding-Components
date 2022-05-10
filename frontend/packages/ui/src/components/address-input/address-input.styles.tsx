@@ -9,13 +9,13 @@ const Dropdown = styled.ul<{
   maxHeight?: Property.MaxHeight;
 }>`
   ${({ theme, maxHeight = 330 }) => css`
-    background: ${theme.backgroundColors.primary};
+    background: ${theme.backgroundColor.primary};
     border-radius: ${theme.borderRadius[1]}px;
-    border: ${theme.borderWidths[1]}px solid ${theme.borderColors.primary};
-    box-shadow: ${theme.elevations[2]};
+    border: ${theme.borderWidth[1]}px solid ${theme.borderColor.primary};
+    box-shadow: ${theme.elevation[2]};
     max-height: ${maxHeight};
     outline: none;
-    padding: ${theme.spacings[3]}px 0 0;
+    padding: ${theme.spacing[3]}px 0 0;
     width: 100%;
   `}
 `;

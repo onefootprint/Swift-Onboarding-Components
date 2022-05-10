@@ -14,7 +14,7 @@ export type BoxProps = {
   sx?: SXStyleProps;
 };
 
-const Box = forwardRef(
+const Box = forwardRef<HTMLElement, BoxProps>(
   ({ ariaLabel, as = 'div', id, sx, children, testID }: BoxProps, ref: any) => {
     const sxStyles = useSX(sx);
     return (

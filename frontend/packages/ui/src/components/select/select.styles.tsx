@@ -1,5 +1,5 @@
 import { darken, rgba } from 'polished';
-import styled, { Colors, css } from 'styled';
+import styled, { Color, css } from 'styled';
 
 const Container = styled.div`
   position: relative;
@@ -7,17 +7,17 @@ const Container = styled.div`
 
 const DropdownContainer = styled.div<{ withPaddingTop: boolean }>`
   ${({ theme }) => css`
-    background: ${theme.backgroundColors.primary};
+    background: ${theme.backgroundColor.primary};
     border-radius: ${theme.borderRadius[1]}px;
-    border: ${theme.borderWidths[1]}px solid ${theme.borderColors.primary};
-    box-shadow: ${theme.elevations[2]};
+    border: ${theme.borderWidth[1]}px solid ${theme.borderColor.primary};
+    box-shadow: ${theme.elevation[2]};
     width: 100%;
   `}
 
   ${({ withPaddingTop, theme }) =>
     withPaddingTop &&
     css`
-      padding: ${theme.spacings[2]}px 0 0;
+      padding: ${theme.spacing[2]}px 0 0;
     `}
 `;
 
@@ -33,7 +33,7 @@ const Dropdown = styled.ul`
 const Button = styled.button<{
   hasError: boolean;
   isActive: boolean;
-  color: Colors;
+  color: Color;
 }>`
   ${({ color, hasError, theme }) => {
     const defaultBorderColor = hasError ? 'error' : 'primary';
@@ -41,39 +41,39 @@ const Button = styled.button<{
     const focusBorderColor = hasError ? 'error' : 'secondary';
     return css`
       align-items: center;
-      background-color: ${theme.backgroundColors.primary};
+      background-color: ${theme.backgroundColor.primary};
       border-radius: ${theme.borderRadius[1]}px;
-      border: ${theme.borderWidths[1]}px solid
-        ${theme.borderColors[defaultBorderColor]};
-      color: ${theme.colors[color]};
+      border: ${theme.borderWidth[1]}px solid
+        ${theme.borderColor[defaultBorderColor]};
+      color: ${theme.color[color]};
       cursor: pointer;
       display: flex;
-      font-family: ${theme.typographies['body-3'].fontFamily};
-      font-size: ${theme.typographies['body-3'].fontSize}px;
-      font-weight: ${theme.typographies['body-3'].fontWeight};
+      font-family: ${theme.typography['body-3'].fontFamily};
+      font-size: ${theme.typography['body-3'].fontSize}px;
+      font-weight: ${theme.typography['body-3'].fontWeight};
       height: 40px;
       justify-content: space-between;
-      line-height: ${theme.typographies['body-3'].lineHeight}px;
+      line-height: ${theme.typography['body-3'].lineHeight}px;
       outline: none;
-      padding: 0 ${theme.spacings[5]}px;
+      padding: 0 ${theme.spacing[5]}px;
       text-align: left;
       width: 100%;
 
       &:hover:enabled {
         border-color: ${hoverBorderColor === 'error'
-          ? darken(0.1, theme.borderColors[hoverBorderColor])
-          : darken(0.32, theme.borderColors[hoverBorderColor])};
+          ? darken(0.1, theme.borderColor[hoverBorderColor])
+          : darken(0.32, theme.borderColor[hoverBorderColor])};
       }
 
       &:focus:enabled {
         -webkit-appearance: none;
-        border-color: ${theme.borderColors[focusBorderColor]};
-        box-shadow: 0 0 0 4px ${rgba(theme.borderColors[focusBorderColor], 0.1)};
+        border-color: ${theme.borderColor[focusBorderColor]};
+        box-shadow: 0 0 0 4px ${rgba(theme.borderColor[focusBorderColor], 0.1)};
       }
 
       &:disabled {
-        background: ${theme.backgroundColors.secondary};
-        color: ${theme.colors.tertiary};
+        background: ${theme.backgroundColor.secondary};
+        color: ${theme.color.tertiary};
         cursor: not-allowed;
       }
     `;
@@ -85,11 +85,11 @@ const Button = styled.button<{
       isActive &&
       css`
         -webkit-appearance: none;
-        border-color: ${theme.borderColors[focusBorderColor]};
-        box-shadow: 0 0 0 4px ${rgba(theme.borderColors[focusBorderColor], 0.1)};
+        border-color: ${theme.borderColor[focusBorderColor]};
+        box-shadow: 0 0 0 4px ${rgba(theme.borderColor[focusBorderColor], 0.1)};
 
         &:hover:enabled {
-          border-color: ${theme.borderColors[focusBorderColor]};
+          border-color: ${theme.borderColor[focusBorderColor]};
         }
       `
     );
@@ -98,13 +98,13 @@ const Button = styled.button<{
 
 const EmptyState = styled.div`
   ${({ theme }) => css`
-    color: ${theme.colors.tertiary};
-    font-family: ${theme.typographies['body-3'].fontFamily};
-    font-size: ${theme.typographies['body-3'].fontSize}px;
-    font-weight: ${theme.typographies['body-3'].fontWeight};
-    line-height: ${theme.typographies['body-3'].lineHeight}px;
-    margin: ${theme.spacings[3]}px 0;
-    padding: ${theme.spacings[3]}px ${theme.spacings[5]}px;
+    color: ${theme.color.tertiary};
+    font-family: ${theme.typography['body-3'].fontFamily};
+    font-size: ${theme.typography['body-3'].fontSize}px;
+    font-weight: ${theme.typography['body-3'].fontWeight};
+    line-height: ${theme.typography['body-3'].lineHeight}px;
+    margin: ${theme.spacing[3]}px 0;
+    padding: ${theme.spacing[3]}px ${theme.spacing[5]}px;
   `}
 `;
 
@@ -115,17 +115,17 @@ const DefaultOption = styled('li')<{
 }>`
   ${({ theme }) => css`
     align-items: center;
-    background: ${theme.backgroundColors.primary};
-    color: ${theme.colors.secondary};
+    background: ${theme.backgroundColor.primary};
+    color: ${theme.color.secondary};
     cursor: pointer;
     display: flex;
-    font-family: ${theme.typographies['body-3'].fontFamily};
-    font-size: ${theme.typographies['body-3'].fontSize}px;
-    font-weight: ${theme.typographies['body-3'].fontWeight};
+    font-family: ${theme.typography['body-3'].fontFamily};
+    font-size: ${theme.typography['body-3'].fontSize}px;
+    font-weight: ${theme.typography['body-3'].fontWeight};
     justify-content: space-between;
-    line-height: ${theme.typographies['body-3'].lineHeight}px;
-    margin-bottom: ${theme.spacings[2]}px;
-    padding: ${theme.spacings[3]}px ${theme.spacings[5]}px;
+    line-height: ${theme.typography['body-3'].lineHeight}px;
+    margin-bottom: ${theme.spacing[2]}px;
+    padding: ${theme.spacing[3]}px ${theme.spacing[5]}px;
   `}
 
   ${({ theme, disableHoverStyles }) =>
@@ -133,12 +133,12 @@ const DefaultOption = styled('li')<{
     css`
       &:hover {
         background: linear-gradient(
-            ${theme.overlays.darken[1]},
-            ${theme.overlays.darken[1]}
+            ${theme.overlay.darken[1]},
+            ${theme.overlay.darken[1]}
           ),
           linear-gradient(
-            ${theme.backgroundColors.primary},
-            ${theme.backgroundColors.primary}
+            ${theme.backgroundColor.primary},
+            ${theme.backgroundColor.primary}
           );
       }
     `}
@@ -147,12 +147,12 @@ const DefaultOption = styled('li')<{
     highlighted &&
     css`
       background: linear-gradient(
-          ${theme.overlays.darken[1]},
-          ${theme.overlays.darken[1]}
+          ${theme.overlay.darken[1]},
+          ${theme.overlay.darken[1]}
         ),
         linear-gradient(
-          ${theme.backgroundColors.primary},
-          ${theme.backgroundColors.primary}
+          ${theme.backgroundColor.primary},
+          ${theme.backgroundColor.primary}
         );
     `}
 `;

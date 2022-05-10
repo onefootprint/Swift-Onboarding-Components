@@ -122,41 +122,41 @@ const Input = styled.input<{
     const hoverBorderColor = $hasError ? 'error' : 'primary';
     const focusBorderColor = $hasError ? 'error' : 'secondary';
     return css`
-      background-color: ${theme.backgroundColors.primary};
+      background-color: ${theme.backgroundColor.primary};
       border-radius: ${theme.borderRadius[1]}px;
-      border: ${theme.borderWidths[1]}px solid
-        ${theme.borderColors[defaultBorderColor]};
-      color: ${theme.colors.primary};
-      font-family: ${theme.typographies['body-3'].fontFamily};
-      font-size: ${theme.typographies['body-3'].fontSize}px;
-      font-weight: ${theme.typographies['body-3'].fontWeight};
+      border: ${theme.borderWidth[1]}px solid
+        ${theme.borderColor[defaultBorderColor]};
+      color: ${theme.color.primary};
+      font-family: ${theme.typography['body-3'].fontFamily};
+      font-size: ${theme.typography['body-3'].fontSize}px;
+      font-weight: ${theme.typography['body-3'].fontWeight};
       height: 40px;
-      line-height: ${theme.typographies['body-3'].lineHeight}px;
+      line-height: ${theme.typography['body-3'].lineHeight}px;
       outline: none;
-      padding: 0 ${theme.spacings[5]}px;
+      padding: 0 ${theme.spacing[5]}px;
       width: 100%;
 
       &:hover:enabled {
-        border: ${theme.borderWidths[1]}px solid
+        border: ${theme.borderWidth[1]}px solid
           ${hoverBorderColor === 'error'
-            ? darken(0.1, theme.borderColors[hoverBorderColor])
-            : darken(0.32, theme.borderColors[hoverBorderColor])};
+            ? darken(0.1, theme.borderColor[hoverBorderColor])
+            : darken(0.32, theme.borderColor[hoverBorderColor])};
       }
 
       &:focus:enabled {
         -webkit-appearance: none;
-        border-color: ${theme.borderColors[focusBorderColor]};
-        box-shadow: 0 0 0 4px ${rgba(theme.borderColors[focusBorderColor], 0.1)};
+        border-color: ${theme.borderColor[focusBorderColor]};
+        box-shadow: 0 0 0 4px ${rgba(theme.borderColor[focusBorderColor], 0.1)};
       }
 
       &:disabled {
-        background: ${theme.backgroundColors.secondary};
-        color: ${theme.colors.tertiary};
+        background: ${theme.backgroundColor.secondary};
+        color: ${theme.color.tertiary};
         cursor: not-allowed;
       }
 
       ::placeholder {
-        color: ${theme.colors.tertiary};
+        color: ${theme.color.tertiary};
       }
 
       ::-webkit-credentials-auto-fill-button {

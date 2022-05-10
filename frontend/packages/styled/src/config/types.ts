@@ -1,34 +1,6 @@
 import 'styled-components';
 
-export type ThemeBreakPoints = {
-  xs: string;
-  sm: string;
-  md: string;
-  lg: string;
-  xl: string;
-};
-
-export type ThemeBorderRadius = {
-  0: number;
-  1: number;
-  2: number;
-  3: number;
-};
-
-export type ThemeDisable = {
-  opacity: number;
-};
-
-export type ThemeBackgroundsColors = {
-  transparent: string;
-  primary: string;
-  secondary: string;
-  tertiary: string;
-  quaternary: string;
-  quinary: string;
-};
-
-export type ThemeUIStates = {
+export type UIStates = {
   accent: string;
   error: string;
   info: string;
@@ -36,63 +8,20 @@ export type ThemeUIStates = {
   warning: string;
 };
 
-export type ThemeBorderColors = {
-  transparent: string;
-  primary: string;
-  secondary: string;
-} & ThemeUIStates;
-
-export type ThemeDividerColors = {
-  primary: string;
-};
-
-export type ThemeBorderWidths = {
-  0: number;
-  1: number;
-  2: number;
-};
-
-export type ThemeElevations = {
-  0: string;
-  1: string;
-  2: string;
-  3: string;
-};
-
-export type ThemeColors = {
-  primary: string;
-  secondary: string;
-  tertiary: string;
-  quaternary: string;
-  quinary: string;
-  senary: string;
-} & ThemeUIStates;
-
-export type ThemeSpacings = {
-  0: number;
-  1: number;
-  2: number;
-  3: number;
-  4: number;
-  5: number;
-  6: number;
-  7: number;
-  8: number;
-  9: number;
-  10: number;
-};
-
-export type ThemeTypography = {
+export type Typography = {
   fontSize: number;
   lineHeight: number;
   fontWeight: number;
   fontFamily: any;
 };
 
-export type ThemeTypographies =
+export type Typographies = Record<FontFamily, Typography>;
+
+export type FontFamily =
   | 'display-1'
   | 'display-2'
   | 'display-3'
+  | 'display-4'
   | 'heading-1'
   | 'heading-2'
   | 'heading-3'
@@ -107,7 +36,7 @@ export type ThemeTypographies =
   | 'caption-1'
   | 'caption-2';
 
-export type ThemeOverlay = {
+export type Overlays = {
   darken: {
     1: string;
     2: string;
@@ -118,53 +47,122 @@ export type ThemeOverlay = {
   };
 };
 
-export type ThemeZIndices = {
+export type Colors = {
+  primary: string;
+  secondary: string;
+  tertiary: string;
+  quaternary: string;
+  quinary: string;
+  senary: string;
+} & UIStates;
+
+export type Color = keyof Colors;
+
+export type Spacings = {
+  0: number;
+  1: number;
+  2: number;
+  3: number;
+  4: number;
+  5: number;
+  6: number;
+  7: number;
+  8: number;
+  9: number;
+  10: number;
+};
+
+export type Spacing = keyof Spacings;
+
+export type BorderRadiuses = {
+  0: number;
+  1: number;
+  2: number;
+  3: number;
+};
+
+export type BorderRadius = keyof BorderRadiuses;
+
+export type Breakpoints = {
+  lg: number;
+  md: number;
+  sm: number;
+  xl: number;
+  xs: number;
+};
+
+export type Breakpoint = keyof Breakpoints;
+
+type Size = {
+  [key in Breakpoint]: number;
+};
+
+export type Grid = {
+  gridColumns: number;
+  col: { gutterSize: Size };
+  container: { margin: Size; maxWidth: Size };
+};
+
+export type BackgroundColors = {
+  transparent: string;
+  primary: string;
+  secondary: string;
+  tertiary: string;
+  quaternary: string;
+  quinary: string;
+};
+
+export type BackgroundsColor = keyof BackgroundColors;
+
+export type Overlay = keyof Overlays;
+
+export type BorderWidths = {
+  0: number;
+  1: number;
+  2: number;
+};
+
+export type BorderWidth = keyof BorderWidths;
+
+export type Elevations = {
+  0: string;
+  1: string;
+  2: string;
+  3: string;
+};
+
+export type Elevation = keyof Elevations;
+
+export type BorderColors = {
+  transparent: string;
+  primary: string;
+  secondary: string;
+  tertiary: string;
+} & UIStates;
+
+export type BorderColor = keyof BorderColors;
+
+export type ZIndexes = {
   dropdown: number;
   sticky: number;
   modal: number;
 };
 
-export type Colors = keyof ThemeColors;
-
-export type Spacings = keyof ThemeSpacings;
-
-export type Typographies = ThemeTypographies;
-
-export type BorderRadius = keyof ThemeBorderRadius;
-
-export type BreakPoints = keyof ThemeBreakPoints;
-
-export type BackgroundsColors = keyof ThemeBackgroundsColors;
-
-export type Overlays = keyof ThemeOverlay;
-
-export type BorderWidths = keyof ThemeBorderWidths;
-
-export type Elevations = keyof ThemeElevations;
-
-export type BorderColors = keyof ThemeBorderColors;
-
-export type DividerColors = keyof ThemeDividerColors;
-
-export type ZIndices = keyof ThemeZIndices;
+export type ZIndex = keyof ZIndexes;
 
 export type DefaultTheme = {
-  backgroundColors: ThemeBackgroundsColors;
-  borderColors: ThemeBorderColors;
-  borderRadius: ThemeBorderRadius;
-  borderWidths: ThemeBorderWidths;
-  breakpoints: ThemeBreakPoints;
-  colors: ThemeColors;
-  disable: ThemeDisable;
-  dividerColors: ThemeDividerColors;
-  elevations: ThemeElevations;
-  illustrations: 'dark' | 'light';
-  overlays: ThemeOverlay;
-  spacings: ThemeSpacings;
-  zIndices: ThemeZIndices;
-  typographies: {
-    [key in ThemeTypographies]: ThemeTypography;
-  };
+  backgroundColor: BackgroundColors;
+  borderColor: BorderColors;
+  borderRadius: BorderRadiuses;
+  borderWidth: BorderWidths;
+  breakpoint: Breakpoints;
+  color: Colors;
+  elevation: Elevations;
+  grid: Grid;
+  overlay: Overlays;
+  spacing: Spacings;
+  typography: Typographies;
+  zIndex: ZIndexes;
 };
 
 export type ThemeKey = keyof DefaultTheme;

@@ -68,17 +68,17 @@ export const LinkButtonStyled = styled.a.attrs<{
     align-items: center;
     background: transparent;
     border: none;
-    color: ${theme.colors.accent};
+    color: ${theme.color.accent};
     cursor: pointer;
     display: flex;
-    font-family: ${theme.typographies[fontSize[size]].fontFamily};
-    font-size: ${theme.typographies[fontSize[size]].fontSize}px;
-    font-weight: ${theme.typographies[fontSize[size]].fontWeight};
-    line-height: ${theme.typographies[fontSize[size]].lineHeight}px;
+    font-family: ${theme.typography[fontSize[size]].fontFamily};
+    font-size: ${theme.typography[fontSize[size]].fontSize}px;
+    font-weight: ${theme.typography[fontSize[size]].fontWeight};
+    line-height: ${theme.typography[fontSize[size]].lineHeight}px;
 
     span + svg,
     svg + span {
-      margin-left: ${theme.spacings[2]}px;
+      margin-left: ${theme.spacing[2]}px;
     }
   `}
 `;

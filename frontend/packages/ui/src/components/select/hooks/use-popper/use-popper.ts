@@ -7,9 +7,7 @@ const usePopper = () => {
   const [referenceElement, setReferenceElement] = useState(null);
   const [popperElement, setPopperElement] = useState(null);
   const popper = useBasePopper(referenceElement, popperElement, {
-    modifiers: [
-      { name: 'offset', options: { offset: [0, theme.spacings[3]] } },
-    ],
+    modifiers: [{ name: 'offset', options: { offset: [0, theme.spacing[3]] } }],
   });
 
   return {

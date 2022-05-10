@@ -16,7 +16,7 @@ const IcoSearch16 = ({ color = 'primary', style, testID }: IconProps) => {
     >
       <path
         d="m14 14-3.103-3.103M2 7.172a5.172 5.172 0 1 1 10.345 0A5.172 5.172 0 0 1 2 7.172Z"
-        stroke={theme.colors[color]}
+        stroke={theme.color[color]}
         strokeWidth={1.2}
         strokeLinecap="round"
         strokeLinejoin="round"

@@ -4,11 +4,11 @@ import type { DefaultTheme } from '../../config/types';
 
 const {
   default: styled,
-  css,
   createGlobalStyle,
+  css,
   keyframes,
-  ThemeProvider,
   ServerStyleSheet,
+  ThemeProvider,
   useTheme,
 } = styledComponents as styledComponents.ThemedStyledComponentsModule<DefaultTheme>;
 

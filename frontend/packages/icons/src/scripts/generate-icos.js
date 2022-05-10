@@ -24,7 +24,7 @@ const createIcoComponent = async icoPath => {
       typescript: true,
       expandProps: false,
       template,
-      replaceAttrValues: { '#0E1438': '{theme.colors[color]}' },
+      replaceAttrValues: { '#0E1438': '{theme.color[color]}' },
       svgProps: { 'data-testid': '{testID}', style: '{style}' },
       plugins: [
         '@svgr/plugin-svgo',

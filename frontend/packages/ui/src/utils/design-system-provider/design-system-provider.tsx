@@ -15,7 +15,7 @@ const GlobalStyle = createGlobalStyle`
     box-sizing: border-box;
   }
   body {
-    background-color: ${({ theme }) => theme.backgroundColors.secondary};
+    background-color: ${({ theme }) => theme.backgroundColor.secondary};
   }
 `;
 

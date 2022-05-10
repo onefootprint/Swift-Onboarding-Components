@@ -1,12 +1,11 @@
-import { Property } from 'csstype';
-import React from 'react';
-import styled, { Colors, css, Typographies } from 'styled';
+import React, { forwardRef } from 'react';
+import styled, { Color, css, FontFamily } from 'styled';
 
+import useSX, { SXStyleProps, SXStyles } from '../../hooks/use-sx';
 import variantMapping from './typography.constants';
 
 type TypographyTag =
   | 'p'
-  | 'a'
   | 'h1'
   | 'h2'
   | 'h3'
@@ -17,58 +16,58 @@ type TypographyTag =
   | 'span';
 
 export type TypographyProps = {
-  display?: Property.Display;
   as?: TypographyTag;
-  center?: boolean;
   children: React.ReactNode;
-  color: Colors;
-  ellipsis?: boolean;
-  htmlTitle?: string;
-  lineThrough?: boolean;
+  color?: Color;
   testID?: string;
-  variant: Typographies;
+  variant: FontFamily;
+  sx?: SXStyleProps;
 };
 
-const Typography = styled('p').attrs<TypographyProps>(
-  ({ as, variant, testID }) => ({
-    'data-testid': testID,
-    as: as || variantMapping[variant],
-  }),
-)<TypographyProps>`
-  padding: 0;
-  margin: 0;
-  ${({ theme, color, variant, display }) => {
-    const font = theme.typographies[variant];
+const Typography = forwardRef<HTMLElement, TypographyProps>(
+  (
+    {
+      as = 'p',
+      children,
+      color = 'primary',
+      sx,
+      testID,
+      variant,
+    }: TypographyProps,
+    ref,
+  ) => {
+    const sxStyles = useSX(sx);
+    return (
+      <StyledTypography
+        as={as || variantMapping[variant]}
+        color={color}
+        data-testid={testID}
+        ref={ref}
+        sx={sxStyles}
+        variant={variant}
+      >
+        {children}
+      </StyledTypography>
+    );
+  },
+);
+
+const StyledTypography = styled.p<{
+  color: Color;
+  sx: SXStyles;
+  variant: FontFamily;
+}>`
+  ${({ theme, color, variant, sx }) => {
+    const font = theme.typography[variant];
     return css`
-      display: ${display};
-      color: ${theme.colors[color]};
+      color: ${theme.color[color]};
       font-family: ${font?.fontFamily};
       font-size: ${font?.fontSize}px;
       font-weight: ${font?.fontWeight};
       line-height: ${font?.lineHeight}px;
+      ${sx};
     `;
   }}
-
-  ${({ theme, color, lineThrough }) =>
-    lineThrough &&
-    css`
-      text-decoration-color: ${theme.colors[color]};
-      text-decoration: line-through;
-    `}
-
-  ${({ center }) =>
-    center &&
-    css`
-      text-align: center;
-    `}
-
-  ${({ ellipsis }) =>
-    ellipsis &&
-    css`
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    `}
 `;
 
 export default Typography;

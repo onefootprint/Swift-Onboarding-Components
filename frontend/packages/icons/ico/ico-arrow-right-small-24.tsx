@@ -22,7 +22,7 @@ const IcoArrowRightSmall24 = ({
         fillRule="evenodd"
         clipRule="evenodd"
         d="M14.26 8.2a.75.75 0 1 0-1.02 1.1l2.1 1.95H6.75a.75.75 0 0 0 0 1.5h8.59l-2.1 1.95a.75.75 0 1 0 1.02 1.1l3.499-3.249a.748.748 0 0 0 0-1.102L14.26 8.2Z"
-        fill={theme.colors[color]}
+        fill={theme.color[color]}
       />
     </svg>
   );

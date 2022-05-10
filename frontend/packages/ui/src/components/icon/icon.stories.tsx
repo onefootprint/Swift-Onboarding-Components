@@ -11,7 +11,7 @@ export default {
   title: 'Components/Icon',
   component: IcoChevronDown16,
   argTypes: {
-    color: { control: 'select', options: Object.keys(light.colors) },
+    color: { control: 'select', options: Object.keys(light.color) },
     testID: { control: 'text' },
   },
   decorators: [withDesign],

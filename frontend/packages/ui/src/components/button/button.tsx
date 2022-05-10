@@ -51,14 +51,14 @@ const Container = styled.button<{
 }>`
   ${({ theme, variant }) => css`
     align-items: center;
-    background-color: ${theme.backgroundColors[backgroundColors[variant]]};
+    background-color: ${theme.backgroundColor[backgroundColors[variant]]};
     border-radius: ${theme.borderRadius[1]}px;
     border: 0;
-    box-shadow: 0 ${theme.borderWidths[1]}px ${theme.borderWidths[1]}px
+    box-shadow: 0 ${theme.borderWidth[1]}px ${theme.borderWidth[1]}px
         rgb(0 0 0 / 0%),
-      0 0 0 ${theme.borderWidths[1]}px
-        ${theme.borderColors[borderColors[variant]]};
-    color: ${theme.colors[colors[variant]]};
+      0 0 0 ${theme.borderWidth[1]}px
+        ${theme.borderColor[borderColors[variant]]};
+    color: ${theme.color[colors[variant]]};
     cursor: pointer;
     display: flex;
     justify-content: center;
@@ -69,21 +69,21 @@ const Container = styled.button<{
   ${({ theme, size }) =>
     size === 'default' &&
     css`
-      font-family: ${theme.typographies['label-2'].fontFamily};
-      font-size: ${theme.typographies['label-2'].fontSize}px;
-      font-weight: ${theme.typographies['label-2'].fontWeight};
-      line-height: ${theme.typographies['label-2'].lineHeight}px;
-      padding: ${theme.spacings[4]}px ${theme.spacings[7]}px;
+      font-family: ${theme.typography['label-2'].fontFamily};
+      font-size: ${theme.typography['label-2'].fontSize}px;
+      font-weight: ${theme.typography['label-2'].fontWeight};
+      line-height: ${theme.typography['label-2'].lineHeight}px;
+      padding: ${theme.spacing[4]}px ${theme.spacing[7]}px;
     `}
 
   ${({ theme, size }) =>
     size === 'compact' &&
     css`
-      font-family: ${theme.typographies['label-3'].fontFamily};
-      font-size: ${theme.typographies['label-3'].fontSize}px;
-      font-weight: ${theme.typographies['label-3'].fontWeight};
-      line-height: ${theme.typographies['label-3'].lineHeight}px;
-      padding: ${theme.spacings[1] + theme.spacings[3]}px ${theme.spacings[7]}px;
+      font-family: ${theme.typography['label-3'].fontFamily};
+      font-size: ${theme.typography['label-3'].fontSize}px;
+      font-weight: ${theme.typography['label-3'].fontWeight};
+      line-height: ${theme.typography['label-3'].lineHeight}px;
+      padding: ${theme.spacing[1] + theme.spacing[3]}px ${theme.spacing[7]}px;
     `}
 
   ${({ fullWidth }) =>
@@ -100,24 +100,24 @@ const Container = styled.button<{
   &:hover:enabled {
     ${({ variant, theme }) => css`
       background: linear-gradient(
-          ${theme.overlays[hoverBackgroundColor[variant]][1]},
-          ${theme.overlays[hoverBackgroundColor[variant]][1]}
+          ${theme.overlay[hoverBackgroundColor[variant]][1]},
+          ${theme.overlay[hoverBackgroundColor[variant]][1]}
         ),
         linear-gradient(
-          ${theme.backgroundColors[backgroundColors[variant]]},
-          ${theme.backgroundColors[backgroundColors[variant]]}
+          ${theme.backgroundColor[backgroundColors[variant]]},
+          ${theme.backgroundColor[backgroundColors[variant]]}
         );
     `}
 
   &:active:enabled {
     ${({ variant, theme }) => css`
       background: linear-gradient(
-          ${theme.overlays[activeBackgroundColor[variant]][2]},
-          ${theme.overlays[activeBackgroundColor[variant]][2]}
+          ${theme.overlay[activeBackgroundColor[variant]][2]},
+          ${theme.overlay[activeBackgroundColor[variant]][2]}
         ),
         linear-gradient(
-          ${theme.backgroundColors[backgroundColors[variant]]},
-          ${theme.backgroundColors[backgroundColors[variant]]}
+          ${theme.backgroundColor[backgroundColors[variant]]},
+          ${theme.backgroundColor[backgroundColors[variant]]}
         );
     `}
 `;

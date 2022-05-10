@@ -1,50 +1,50 @@
 import * as CSS from 'csstype';
 import type {
-  BackgroundsColors,
-  BorderColors,
+  BackgroundsColor,
+  BorderColor,
   BorderRadius,
-  BorderWidths,
-  Colors,
+  BorderWidth,
+  Color,
   Elevations,
-  Spacings,
+  Spacing,
 } from 'styled';
 
 export type CustomStyleProps = {
-  backgroundColor?: BackgroundsColors;
-  borderBottomColor?: BorderColors;
+  backgroundColor?: BackgroundsColor;
+  borderBottomColor?: BorderColor;
   borderBottomLeftRadius?: BorderRadius;
   borderBottomRightRadius?: BorderRadius;
-  borderBottomWidth?: BorderWidths;
-  borderColor?: BorderColors;
-  borderLeftColor?: BorderColors;
-  borderLeftWidth?: BorderWidths;
+  borderBottomWidth?: BorderWidth;
+  borderColor?: BorderColor;
+  borderLeftColor?: BorderColor;
+  borderLeftWidth?: BorderWidth;
   borderRadius?: BorderRadius;
-  borderRightColor?: BorderColors;
-  borderRightWidth?: BorderWidths;
-  borderTopColor?: BorderColors;
+  borderRightColor?: BorderColor;
+  borderRightWidth?: BorderWidth;
+  borderTopColor?: BorderColor;
   borderTopLeftRadius?: BorderRadius;
   borderTopRightRadius?: BorderRadius;
-  borderTopWidth?: BorderWidths;
-  borderWidth?: BorderWidths;
+  borderTopWidth?: BorderWidth;
+  borderWidth?: BorderWidth;
   elevation?: Elevations;
-  color?: Colors;
-  columnGap?: Spacings;
-  gap?: Spacings;
-  margin?: Spacings;
-  marginBottom?: Spacings;
-  marginLeft?: Spacings;
-  marginRight?: Spacings;
-  marginTop?: Spacings;
-  marginX?: Spacings;
-  marginY?: Spacings;
-  padding?: Spacings;
-  paddingBottom?: Spacings;
-  paddingLeft?: Spacings;
-  paddingRight?: Spacings;
-  paddingTop?: Spacings;
-  paddingX?: Spacings;
-  paddingY?: Spacings;
-  rowGap?: Spacings;
+  color?: Color;
+  columnGap?: Spacing;
+  gap?: Spacing;
+  margin?: Spacing;
+  marginBottom?: Spacing;
+  marginLeft?: Spacing;
+  marginRight?: Spacing;
+  marginTop?: Spacing;
+  marginX?: Spacing;
+  marginY?: Spacing;
+  padding?: Spacing;
+  paddingBottom?: Spacing;
+  paddingLeft?: Spacing;
+  paddingRight?: Spacing;
+  paddingTop?: Spacing;
+  paddingX?: Spacing;
+  paddingY?: Spacing;
+  rowGap?: Spacing;
 };
 
 export type BaseStyleProps = Pick<

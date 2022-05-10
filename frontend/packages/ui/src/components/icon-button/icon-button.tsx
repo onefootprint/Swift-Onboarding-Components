@@ -36,29 +36,29 @@ const Container = styled.button`
   padding: 0;
 
   ${({ theme }) => css`
-    background-color: ${theme.backgroundColors.primary};
-    box-shadow: ${theme.elevations[3]};
+    background-color: ${theme.backgroundColor.primary};
+    box-shadow: ${theme.elevation[3]};
     border-radius: ${theme.borderRadius[3]}px;
 
     &:hover:enabled {
       background: linear-gradient(
-          ${theme.overlays.darken[1]},
-          ${theme.overlays.darken[1]}
+          ${theme.overlay.darken[1]},
+          ${theme.overlay.darken[1]}
         ),
         linear-gradient(
-          ${theme.backgroundColors.primary},
-          ${theme.backgroundColors.primary}
+          ${theme.backgroundColor.primary},
+          ${theme.backgroundColor.primary}
         );
     }
 
     &:active:enabled {
       background: linear-gradient(
-          ${theme.overlays.darken[2]},
-          ${theme.overlays.darken[2]}
+          ${theme.overlay.darken[2]},
+          ${theme.overlay.darken[2]}
         ),
         linear-gradient(
-          ${theme.backgroundColors.primary},
-          ${theme.backgroundColors.primary}
+          ${theme.backgroundColor.primary},
+          ${theme.backgroundColor.primary}
         );
     }
   `}

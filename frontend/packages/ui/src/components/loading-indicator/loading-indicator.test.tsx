@@ -22,7 +22,7 @@ describe('<LoadingIndicator />', () => {
   it('should assign the right color', () => {
     renderLoadingIndicator({ color: 'error' });
     const icon = document.getElementsByTagName('path')[0];
-    expect(icon.getAttribute('fill')).toEqual(themes.light.colors.error);
+    expect(icon.getAttribute('fill')).toEqual(themes.light.color.error);
   });
 
   it('should render with the correct size', () => {

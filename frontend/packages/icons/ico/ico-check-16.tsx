@@ -16,7 +16,7 @@ const IcoCheck16 = ({ color = 'primary', style, testID }: IconProps) => {
     >
       <path
         d="m3 8.703 2.072 2.838a1.6 1.6 0 0 0 2.608-.034L13 3.81"
-        stroke={theme.colors[color]}
+        stroke={theme.color[color]}
         strokeWidth={1.5}
         strokeLinecap="round"
         strokeLinejoin="round"
