@@ -12,6 +12,8 @@ const spacings: Spacings = {
   8: 32,
   9: 40,
   10: 64,
+  11: 128,
+  12: 264,
 };
 
 export default spacings;

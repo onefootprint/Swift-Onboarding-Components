@@ -5,9 +5,9 @@ const Label = styled.label`
     color: ${theme.color.primary};
     display: inline-block;
     font-family: ${theme.typography['body-3'].fontFamily};
-    font-size: ${theme.typography['body-3'].fontSize}px;
+    font-size: ${theme.typography['body-3'].fontSize};
     font-weight: ${theme.typography['body-3'].fontWeight};
-    line-height: ${theme.typography['body-3'].lineHeight}px;
+    line-height: ${theme.typography['body-3'].lineHeight};
     margin-bottom: ${theme.spacing[3]}px;
   `}
 `;

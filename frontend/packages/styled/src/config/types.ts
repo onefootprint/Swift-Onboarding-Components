@@ -1,5 +1,3 @@
-import 'styled-components';
-
 export type UIStates = {
   accent: string;
   error: string;
@@ -9,8 +7,8 @@ export type UIStates = {
 };
 
 export type Typography = {
-  fontSize: number;
-  lineHeight: number;
+  fontSize: string;
+  lineHeight: string;
   fontWeight: number;
   fontFamily: any;
 };
@@ -70,6 +68,8 @@ export type Spacings = {
   8: number;
   9: number;
   10: number;
+  11: number;
+  12: number;
 };
 
 export type Spacing = keyof Spacings;

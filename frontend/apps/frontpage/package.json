@@ -5,19 +5,21 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "build:analyze": "ANALYZE=true yarn build",
     "start": "next start",
     "lint": "eslint src --fix"
   },
   "dependencies": {
+    "hooks": "*",
     "icons": "*",
     "next": "12.1.5",
     "react": "17.0.2",
     "react-dom": "17.0.2",
     "styled": "*",
-    "ui": "*",
-    "hooks": "*"
+    "ui": "*"
   },
   "devDependencies": {
+    "@next/bundle-analyzer": "^12.1.6",
     "@popperjs/core": "^2.11.5",
     "@types/lodash": "^4.14.182",
     "@types/node": "^17.0.12",
@@ -26,6 +28,7 @@
     "config": "*",
     "eslint": "7.32.0",
     "lodash": "^4.17.21",
+    "next-compose-plugins": "^2.2.1",
     "next-transpile-modules": "9.0.0",
     "tsconfig": "*",
     "typescript": "^4.5.3"

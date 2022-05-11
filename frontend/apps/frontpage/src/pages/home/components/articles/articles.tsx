@@ -2,25 +2,21 @@ import React from 'react';
 import styled, { css } from 'styled';
 import { Container, media, Typography } from 'ui';
 
-import type { Characteristic } from './characteristics.types';
-import CharacteristicItem from './components/characteristic-item';
+import type { Article } from './articles.types';
+import ArticleItem from './components/article-item';
 
-type CharacteristicsProps = {
+type ArticleProps = {
   titleText: string;
   subtitleText: string;
-  articles: Characteristic[];
+  items: Article[];
 };
 
-const Characteristics = ({
-  titleText,
-  subtitleText,
-  articles,
-}: CharacteristicsProps) => (
+const Articles = ({ titleText, subtitleText, items }: ArticleProps) => (
   <Container as="section">
     <Typography
-      color="tertiary"
-      variant="heading-3"
-      as="h4"
+      color="secondary"
+      variant="label-1"
+      as="h3"
       sx={{ marginBottom: 5 }}
     >
       {subtitleText}
@@ -28,18 +24,19 @@ const Characteristics = ({
     <Typography
       color="primary"
       variant="display-2"
-      as="h3"
-      sx={{ marginBottom: 9, maxWidth: '500px' }}
+      as="h4"
+      sx={{ marginBottom: 9, maxWidth: '580px' }}
     >
       {titleText}
     </Typography>
     <Grid>
-      {articles.map(article => (
-        <CharacteristicItem
-          descriptionText={article.descriptionText}
-          imageAltText={article.imageAltText}
-          imagePath={article.imagePath}
-          titleText={article.titleText}
+      {items.map(item => (
+        <ArticleItem
+          descriptionText={item.descriptionText}
+          imageAltText={item.imageAltText}
+          imagePath={item.imagePath}
+          key={item.titleText}
+          titleText={item.titleText}
         />
       ))}
     </Grid>
@@ -82,4 +79,4 @@ const Grid = styled.ul`
   `}
 `;
 
-export default Characteristics;
+export default Articles;

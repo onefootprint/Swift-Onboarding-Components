@@ -1,7 +1,7 @@
 import IcoShield24 from 'icons/ico/ico-shield-24';
 import React from 'react';
 import styled, { css } from 'styled';
-import { Typography } from 'ui';
+import { media, Typography } from 'ui';
 
 type OverlappingTextProps = {
   titleText: string;
@@ -30,12 +30,13 @@ const Container = styled.div`
   align-items: center;
   display: flex;
   flex-direction: column;
-  height: 100%;
-  justify-content: center;
   pointer-events: none;
   position: absolute;
-  top: 0;
-  width: 100%;
+  text-align: center;
+
+  ${media.between('xs', 'sm')`
+    max-width: 50%;
+  `}
 `;
 
 const IconContainer = styled.div`

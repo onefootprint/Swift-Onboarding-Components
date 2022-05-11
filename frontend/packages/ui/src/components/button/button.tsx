@@ -70,9 +70,9 @@ const Container = styled.button<{
     size === 'default' &&
     css`
       font-family: ${theme.typography['label-2'].fontFamily};
-      font-size: ${theme.typography['label-2'].fontSize}px;
+      font-size: ${theme.typography['label-2'].fontSize};
       font-weight: ${theme.typography['label-2'].fontWeight};
-      line-height: ${theme.typography['label-2'].lineHeight}px;
+      line-height: ${theme.typography['label-2'].lineHeight};
       padding: ${theme.spacing[4]}px ${theme.spacing[7]}px;
     `}
 
@@ -80,9 +80,9 @@ const Container = styled.button<{
     size === 'compact' &&
     css`
       font-family: ${theme.typography['label-3'].fontFamily};
-      font-size: ${theme.typography['label-3'].fontSize}px;
+      font-size: ${theme.typography['label-3'].fontSize};
       font-weight: ${theme.typography['label-3'].fontWeight};
-      line-height: ${theme.typography['label-3'].lineHeight}px;
+      line-height: ${theme.typography['label-3'].lineHeight};
       padding: ${theme.spacing[1] + theme.spacing[3]}px ${theme.spacing[7]}px;
     `}
 

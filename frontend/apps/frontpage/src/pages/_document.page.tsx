@@ -39,8 +39,32 @@ export default class MyDocument extends Document {
 
   render() {
     return (
-      <Html>
+      <Html lang="en">
         <Head>
+          <meta
+            property="description"
+            content="The last identity verification you'll ever need"
+          />
+          <meta
+            name="keywords"
+            content="footprint,foot,print,id,onefootprint,identity,kyc,verify,security"
+          />
+          <meta property="og:type" content="website" />
+          <meta property="og:url" content="https://onefootprint.com" />
+          <meta property="og:title" content="Footprint" />
+          <meta
+            property="og:description"
+            content="The last identity verification you'll ever need"
+          />
+          <meta property="og:site_name" content="Footprint" />
+          <meta property="og:locale" content="en_US" />
+          <meta name="twitter:card" content="summary" />
+          <meta name="twitter:creator" content="@onefootprintid" />
+          <meta name="twitter:title" content="Footprint" />
+          <meta
+            name="twitter:description"
+            content="The last identity verification you'll ever need"
+          />
           <LoadFonts />
         </Head>
         <body>

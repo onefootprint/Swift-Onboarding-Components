@@ -36,6 +36,7 @@ import IcoPlusBig16 from '../ico/ico-plus-big-16';
 import IcoPlusBig24 from '../ico/ico-plus-big-24';
 import IcoPlusSmall16 from '../ico/ico-plus-small-16';
 import IcoPlusSmall24 from '../ico/ico-plus-small-24';
+import IcoQuote40 from '../ico/ico-quote-40';
 import IcoSearch16 from '../ico/ico-search-16';
 import IcoSearch24 from '../ico/ico-search-24';
 import IcoShield16 from '../ico/ico-shield-16';
@@ -85,5 +86,6 @@ export default {
   IcoShield24,
   IcoSpinner24,
   IcoCheckCircle40,
+  IcoQuote40,
 };
 export * from './types';

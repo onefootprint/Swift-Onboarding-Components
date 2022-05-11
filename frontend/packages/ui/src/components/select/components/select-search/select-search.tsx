@@ -84,10 +84,10 @@ const Input = styled.input`
     border: none;
     color: ${theme.color.primary};
     font-family: ${theme.typography['body-3'].fontFamily};
-    font-size: ${theme.typography['body-3'].fontSize}px;
+    font-size: ${theme.typography['body-3'].fontSize};
     font-weight: ${theme.typography['body-3'].fontWeight};
     height: 100%;
-    line-height: ${theme.typography['body-3'].lineHeight}px;
+    line-height: ${theme.typography['body-3'].lineHeight};
     outline: none;
     padding-left: ${theme.spacing[9]}px;
     width: 100%;

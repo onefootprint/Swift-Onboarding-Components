@@ -72,9 +72,9 @@ export const LinkButtonStyled = styled.a.attrs<{
     cursor: pointer;
     display: flex;
     font-family: ${theme.typography[fontSize[size]].fontFamily};
-    font-size: ${theme.typography[fontSize[size]].fontSize}px;
+    font-size: ${theme.typography[fontSize[size]].fontSize};
     font-weight: ${theme.typography[fontSize[size]].fontWeight};
-    line-height: ${theme.typography[fontSize[size]].lineHeight}px;
+    line-height: ${theme.typography[fontSize[size]].lineHeight};
 
     span + svg,
     svg + span {

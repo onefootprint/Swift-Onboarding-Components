@@ -3,36 +3,36 @@ import React from 'react';
 import styled, { css } from 'styled';
 import { Typography } from 'ui';
 
-import type { Characteristic } from '../../characteristics.types';
+import type { Article } from '../../articles.types';
 
-type CharacteristicItemProps = Characteristic;
+type ArticleItemProps = Article;
 
-const Characteristics = ({
+const ArticleItem = ({
   titleText,
   imageAltText,
   imagePath,
   descriptionText,
-}: CharacteristicItemProps) => (
+}: ArticleItemProps) => (
   <Container>
     <ImageContainer>
       <Image
         alt={imageAltText}
-        height={200}
+        height={160}
         layout="responsive"
         src={imagePath}
-        width={365}
+        width={336}
       />
     </ImageContainer>
     <Content>
       <Typography
         color="primary"
         variant="heading-2"
-        as="h5"
+        as="div"
         sx={{ marginBottom: 5 }}
       >
         {titleText}
       </Typography>
-      <Typography color="secondary" variant="body-2" as="p">
+      <Typography color="secondary" variant="body-1" as="p">
         {descriptionText}
       </Typography>
     </Content>
@@ -60,4 +60,4 @@ const Content = styled.div`
   `}
 `;
 
-export default Characteristics;
+export default ArticleItem;

@@ -13,6 +13,7 @@ type TypographyTag =
   | 'h5'
   | 'h6'
   | 'label'
+  | 'div'
   | 'span';
 
 export type TypographyProps = {
@@ -62,9 +63,9 @@ const StyledTypography = styled.p<{
     return css`
       color: ${theme.color[color]};
       font-family: ${font?.fontFamily};
-      font-size: ${font?.fontSize}px;
+      font-size: ${font?.fontSize};
       font-weight: ${font?.fontWeight};
-      line-height: ${font?.lineHeight}px;
+      line-height: ${font?.lineHeight};
       ${sx};
     `;
   }}

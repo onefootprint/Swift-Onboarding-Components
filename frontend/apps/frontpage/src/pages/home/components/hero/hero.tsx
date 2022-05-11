@@ -1,7 +1,11 @@
-import Image from 'next/image';
+import dynamic from 'next/dynamic';
 import React from 'react';
 import styled, { css } from 'styled';
 import { Button, Container, Typography } from 'ui';
+
+const HeroImage = dynamic(() => import('./components/hero-image'), {
+  ssr: false,
+});
 
 type HeroProps = {
   titleText: string;
@@ -39,15 +43,7 @@ const Hero = ({
       </Typography>
       <Button>{ctaText}</Button>
     </Inner>
-    <Image
-      alt={imageAltText}
-      height={682}
-      layout="responsive"
-      priority
-      quality={100}
-      src="/images/hero.png"
-      width={1280}
-    />
+    <HeroImage altText={imageAltText} />
   </Container>
 );
 

@@ -1,4 +1,5 @@
-import styled from 'styled';
+import styled, { css } from 'styled';
+import { media } from 'ui';
 
 const HeaderGradient = styled.section`
   background: linear-gradient(
@@ -16,16 +17,30 @@ const HeaderGradient = styled.section`
   );
 `;
 
+const FooterContainer = styled.div`
+  ${({ theme }) => css`
+    background: ${theme.backgroundColor.tertiary};
+  `}
+`;
+
 const SectionSpacing = styled.div`
-  padding-bottom: 300px;
+  position: relative;
+
+  ${media.between('xs', 'sm')`
+    padding-bottom: 100px;
+  `}
+
+  ${media.between('sm', 'lg')`
+    padding-bottom: 150px;
+  `}
+
+  ${media.between('lg', 'xl')`
+    padding-bottom: 200px;
+  `}
+
+  ${media.greaterThan('xl')`
+    padding-bottom: 290px;
+  `}
 `;
 
-export const WhyGradient = styled.div`
-  background: linear-gradient(
-    0deg,
-    rgba(118, 251, 143, 0.4) 0%,
-    rgba(118, 251, 143, 0) 100%
-  );
-`;
-
-export default { HeaderGradient, SectionSpacing };
+export default { HeaderGradient, SectionSpacing, FooterContainer };

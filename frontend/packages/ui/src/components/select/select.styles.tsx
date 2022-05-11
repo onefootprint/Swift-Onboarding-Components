@@ -49,11 +49,11 @@ const Button = styled.button<{
       cursor: pointer;
       display: flex;
       font-family: ${theme.typography['body-3'].fontFamily};
-      font-size: ${theme.typography['body-3'].fontSize}px;
+      font-size: ${theme.typography['body-3'].fontSize};
       font-weight: ${theme.typography['body-3'].fontWeight};
       height: 40px;
       justify-content: space-between;
-      line-height: ${theme.typography['body-3'].lineHeight}px;
+      line-height: ${theme.typography['body-3'].lineHeight};
       outline: none;
       padding: 0 ${theme.spacing[5]}px;
       text-align: left;
@@ -100,9 +100,9 @@ const EmptyState = styled.div`
   ${({ theme }) => css`
     color: ${theme.color.tertiary};
     font-family: ${theme.typography['body-3'].fontFamily};
-    font-size: ${theme.typography['body-3'].fontSize}px;
+    font-size: ${theme.typography['body-3'].fontSize};
     font-weight: ${theme.typography['body-3'].fontWeight};
-    line-height: ${theme.typography['body-3'].lineHeight}px;
+    line-height: ${theme.typography['body-3'].lineHeight};
     margin: ${theme.spacing[3]}px 0;
     padding: ${theme.spacing[3]}px ${theme.spacing[5]}px;
   `}
@@ -120,10 +120,10 @@ const DefaultOption = styled('li')<{
     cursor: pointer;
     display: flex;
     font-family: ${theme.typography['body-3'].fontFamily};
-    font-size: ${theme.typography['body-3'].fontSize}px;
+    font-size: ${theme.typography['body-3'].fontSize};
     font-weight: ${theme.typography['body-3'].fontWeight};
     justify-content: space-between;
-    line-height: ${theme.typography['body-3'].lineHeight}px;
+    line-height: ${theme.typography['body-3'].lineHeight};
     margin-bottom: ${theme.spacing[2]}px;
     padding: ${theme.spacing[3]}px ${theme.spacing[5]}px;
   `}

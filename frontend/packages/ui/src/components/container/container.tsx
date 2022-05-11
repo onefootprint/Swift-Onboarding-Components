@@ -7,15 +7,22 @@ import media from '../../utils/media';
 export type ContainerProps = {
   as?: 'div' | 'section' | 'main' | 'article' | 'nav' | 'header' | 'footer';
   children: React.ReactNode;
-  testID?: string;
+  id?: string;
   sx?: SXStyleProps;
+  testID?: string;
 };
 
 const Container = forwardRef<HTMLElement, ContainerProps>(
-  ({ as = 'div', sx, children, testID }: ContainerProps, ref) => {
+  ({ id, as = 'div', sx, children, testID }: ContainerProps, ref) => {
     const sxStyles = useSX(sx);
     return (
-      <StyledContainer as={as} data-testid={testID} ref={ref} sx={sxStyles}>
+      <StyledContainer
+        as={as}
+        data-testid={testID}
+        id={id}
+        ref={ref}
+        sx={sxStyles}
+      >
         {children}
       </StyledContainer>
     );
@@ -24,7 +31,6 @@ const Container = forwardRef<HTMLElement, ContainerProps>(
 
 const StyledContainer = styled.div<{ sx: SXStyles }>`
   ${({ theme, sx }) => css`
-    box-sizing: border-box;
     margin-left: auto;
     margin-right: auto;
     ${sx};
