@@ -95,6 +95,7 @@ async fn main() -> std::io::Result<()> {
     };
 
     let is_https = config.use_local.is_none();
+    let cookie_domain = format!(".{}", &config.cookie_domain);
 
     let res = HttpServer::new(move || {
         let cors = actix_cors::Cors::default()
@@ -114,17 +115,14 @@ async fn main() -> std::io::Result<()> {
             // use custom error handler
             .error_handler(|err, _req| actix_web::Error::from(ApiError::InvalidJsonBody(err)));
 
-        let mut session_middleware =
+        let session_middleware =
             SessionMiddleware::builder(CookieSessionStore::default(), Key::from(&session_key))
                 .cookie_path("/".to_string())
                 .cookie_secure(is_https)
                 .cookie_content_security(actix_session::CookieContentSecurity::Private)
-                .cookie_same_site(actix_web::cookie::SameSite::Lax);
-        if let Some(cookie_domain) = &config.cookie_domain {
-            session_middleware =
-                session_middleware.cookie_domain(Some(format!(".{}", cookie_domain)));
-        }
-        let session_middleware = session_middleware.build();
+                .cookie_same_site(actix_web::cookie::SameSite::Lax)
+                .cookie_domain(Some(cookie_domain.clone()))
+                .build();
 
         App::new()
             .app_data(web::Data::new(state.clone()))

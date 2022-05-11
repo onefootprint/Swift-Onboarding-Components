@@ -43,8 +43,8 @@ pub struct Config {
     #[envconfig(from = "RELYING_PARTY_ID", default = "localhost")]
     pub rp_id: String,
 
-    #[envconfig(from = "COOKIE_DOMAIN")]
-    pub cookie_domain: Option<String>,
+    #[envconfig(from = "COOKIE_DOMAIN", default = "localhost")]
+    pub cookie_domain: String,
 }
 
 impl Config {
