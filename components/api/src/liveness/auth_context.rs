@@ -2,7 +2,6 @@ use std::pin::Pin;
 
 use actix_session::Session;
 use actix_web::{web, FromRequest};
-use db::models::{onboardings::Onboarding, user_vaults::UserVault};
 use futures_util::Future;
 use paperclip::actix::Apiv2Security;
 use serde::{Deserialize, Serialize};
@@ -63,7 +62,7 @@ pub enum RegisterState {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum AuthState {
     NotStarted,
-    AuthChallenge,
+    AuthChallenge(webauthn_rs::AuthenticationState),
     AuthSuccess,
 }
 

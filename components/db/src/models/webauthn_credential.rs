@@ -1,6 +1,10 @@
-use crate::{schema::webauthn_credentials, DbPool};
+use crate::diesel::ExpressionMethods;
+use crate::{
+    schema::{self, webauthn_credentials},
+    DbPool,
+};
 use chrono::NaiveDateTime;
-use diesel::{Insertable, PgConnection, Queryable, RunQueryDsl};
+use diesel::{Insertable, PgConnection, QueryDsl, Queryable, RunQueryDsl};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
@@ -16,6 +20,19 @@ pub struct WebauthnCredential {
 
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
+}
+
+impl WebauthnCredential {
+    pub fn get_for_user_vault(
+        conn: &PgConnection,
+        user_vault_id: &str,
+    ) -> Result<Vec<Self>, crate::DbError> {
+        let creds = schema::webauthn_credentials::table
+            .filter(schema::webauthn_credentials::user_vault_id.eq(user_vault_id))
+            .get_results(conn)?;
+
+        Ok(creds)
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]

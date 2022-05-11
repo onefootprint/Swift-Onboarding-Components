@@ -7,16 +7,13 @@ use crate::{
 };
 use actix_session::Session;
 use db::models::webauthn_credential::NewWebauthnCredential;
-use paperclip::{
-    actix::{api_v2_operation, get, post, web, web::Json, Apiv2Schema},
-    v2::schema::Apiv2Schema,
-};
+use paperclip::actix::{api_v2_operation, get, post, web, web::Json, Apiv2Schema};
 use serde::{Deserialize, Serialize};
-use webauthn_rs::{proto::UserVerificationPolicy, WebauthnConfig};
+use webauthn_rs::proto::UserVerificationPolicy;
 
 use super::auth_context::{LivenessVerificationAuthContext, RegisterState, WebAuthnState};
 
-/// Contains the payload for the frontend to communicate to the device via webauthm
+/// Contains the payload for the frontend to communicate to the device via webauthn
 #[derive(Debug, Clone, Deserialize, Serialize, Apiv2Schema)]
 pub struct GetWebauthnRegisterChallengeResponse {
     challenge_json: String,

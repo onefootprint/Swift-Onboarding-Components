@@ -1,5 +1,6 @@
 mod auth_context;
 mod register;
+mod verify;
 
 use crate::{
     auth::AuthError,
@@ -15,13 +16,15 @@ use webauthn_rs::{
     WebauthnConfig,
 };
 
-use self::auth_context::{RegisterState, WebAuthnCookieSessionState, WebAuthnState};
+use self::auth_context::{AuthState, RegisterState, WebAuthnCookieSessionState, WebAuthnState};
 
 pub fn routes() -> web::Scope {
     web::scope("/liveness")
         .service(web::resource("").route(web::post().to(start)))
         .service(register::get_register_challenge)
         .service(register::post_register_challenge)
+        .service(verify::get_verify_challenge)
+        .service(verify::post_verify_challenge)
 }
 
 /// The data in this request is sent to a mobile device via sms/email
@@ -48,26 +51,31 @@ async fn start(
     let pool = &state.db_pool;
     let session_info = db::session::get_by_session_id(pool, session_id.clone()).await?;
 
-    // TODO: add auth state
-    let user_vault_id = match session_info.session_data {
+    let (user_vault_id, state) = match session_info.session_data {
         SessionState::OnboardingSession(OnboardingSessionData {
             user_vault_id,
             user_ob_id: _,
-        }) => user_vault_id,
+        }) => (
+            user_vault_id,
+            WebAuthnState::Register(RegisterState::NotStarted),
+        ),
+        SessionState::IdentifySession(identify_session) => (
+            identify_session.user_vault_id,
+            WebAuthnState::Auth(AuthState::NotStarted),
+        ),
         _ => return Err(AuthError::InvalidSessionState.into()),
     };
 
     WebAuthnCookieSessionState {
         session_id,
         user_vault_id,
-        state: WebAuthnState::Register(RegisterState::NotStarted),
+        state,
     }
     .set(&session)?;
 
     Ok(Json(ApiResponseData::ok(Empty)))
 }
 
-//TODO: all this needs to be setup correctly
 pub struct LivenessWebauthnConfig {
     url: url::Url,
     rp_id: String,

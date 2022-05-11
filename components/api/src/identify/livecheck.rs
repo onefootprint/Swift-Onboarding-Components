@@ -1,7 +1,7 @@
 use crate::auth::onboarding_session::OnboardingSessionContext;
 use crate::errors::ApiError;
 use crate::response::success::ApiResponseData;
-use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
+use paperclip::actix::{api_v2_operation, post, web::Json, Apiv2Schema};
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Serialize)]
 pub struct LivecheckResponse {

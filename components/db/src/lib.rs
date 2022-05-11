@@ -11,8 +11,7 @@ pub mod models;
 
 use crate::errors::DbError;
 use deadpool_diesel::postgres::{Manager, Pool, Runtime};
-use diesel::{prelude::*, sql_types::Text};
-use models::tenants::*;
+use diesel::prelude::*;
 
 #[allow(unused_imports)]
 pub mod schema;

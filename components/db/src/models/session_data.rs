@@ -26,6 +26,7 @@ pub struct OnboardingSessionData {
 #[derive(FromSqlRow, AsExpression, Serialize, Deserialize, Debug, Clone)]
 pub struct ChallengeData {
     pub tenant_id: String,
+    pub user_vault_id: String,
     pub challenge_type: ChallengeType,
     pub created_at: NaiveDateTime,
     pub h_challenge_code: Vec<u8>,
