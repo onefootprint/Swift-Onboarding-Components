@@ -30,6 +30,18 @@ def _client_priv_key_headers(client_priv_key):
         TENANT_SECRET_HEADER: client_priv_key,
     }
 
+def _parse_cookies(response):
+    # TODO the requests library should do this for us, but it gets angry when we send a `Domain=.localhost` in the set-cookie header
+    # This is very hacky and might break
+    set_cookie_h = response.headers.get("set-cookie", None)
+    if not set_cookie_h:
+        return dict()
+    all_cookies = set_cookie_h.split(";")[0]
+    id_cookie = all_cookies.split("id=")[1]
+    return {
+        "id": id_cookie,
+    }
+
 @pytest.fixture(scope="module")
 def tenant1():
     path = "private/client"
@@ -68,13 +80,12 @@ def test_identify_init(tenant1, request):
     r = requests.post(
         url(path),
         json=data,
-        cookies=request.config.cache.get("cookies", None),
         headers=_client_pub_key_headers(tenant1["pk"]),
     )
     print(r, r.content)
     assert r.status_code == 200
     assert r.json()["data"] == "user_not_found"
-    cookies = r.cookies.get_dict()
+    cookies = _parse_cookies(r)
     assert cookies, "Set-Cookie response header should be provided"
     request.config.cache.set("cookies", cookies)
 
@@ -93,7 +104,7 @@ def test_challenge(request):
     print(r, r.content)
     assert r.status_code == 200
     assert r.json()["data"]["phone_number_last_two"] == last_two
-    cookies = r.cookies.get_dict()
+    cookies = _parse_cookies(r)
     assert cookies, "Set-Cookie response header should be provided"
     request.config.cache.set("cookies", cookies)
     print(cookies)
@@ -107,7 +118,7 @@ def test_identify_verify(request):
     assert r.status_code == 200
     print(r.cookies.get_dict())
     assert r.json()["data"]["kind"] == "user_created"
-    cookies = r.cookies.get_dict()
+    cookies = _parse_cookies(r)
     request.config.cache.set("cookies", cookies)
     assert cookies, "Set-Cookie response header should be provided"
     
@@ -127,7 +138,7 @@ def test_identify_data(request):
     print(r.content)
     assert r.status_code == 200
     print(r.cookies.get_dict())
-    cookies = r.cookies.get_dict()
+    cookies = _parse_cookies(r)
     assert not cookies, "Set-Cookie response header should not be provided"
 
 def test_identify_commit(request): 
@@ -140,7 +151,7 @@ def test_identify_commit(request):
     assert fp_user_id
     request.config.cache.set("cookies", r.cookies.get_dict())
     request.config.cache.set("fp_user_id", fp_user_id)
-    cookies = r.cookies.get_dict()
+    cookies = _parse_cookies(r)
     assert not cookies, "Set-Cookie response header should not be provided"
 
 def test_identify_repeat_customer_via_email(request, tenant2):
@@ -160,7 +171,7 @@ def test_identify_repeat_customer_via_email(request, tenant2):
     print(r, r.content)
     assert r.status_code == 200
     assert r.json()["data"]["phone_number_last_two"] == phone_number[-2:]
-    cookies = r.cookies.get_dict()
+    cookies = _parse_cookies(r)
     assert cookies, "Set-Cookie response header should be provided"
     request.config.cache.set("cookies", cookies)
 
@@ -172,7 +183,7 @@ def test_identify_verify_repeat_customer(request):
     print(r, r.content)
     assert r.status_code == 200
     assert r.json()["data"]["kind"] == "user_inherited"
-    cookies = r.cookies.get_dict()
+    cookies = _parse_cookies(r)
     assert cookies, "Set-Cookie response header should be provided"
     request.config.cache.set("cookies", cookies)
 
@@ -186,7 +197,7 @@ def test_identify_commit_repeat_customer(request):
     assert fp_user_id
     old_fp_user_id = request.config.cache.get("fp_user_id", None)
     assert old_fp_user_id != fp_user_id, "Different tenants should have different fp_user_ids"
-    cookies = r.cookies.get_dict()
+    cookies = _parse_cookies(r)
     assert not cookies, "Set-Cookie response header should not be provided"
 
 def test_decrypt(request, tenant1):
