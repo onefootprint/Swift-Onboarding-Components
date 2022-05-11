@@ -87,6 +87,7 @@ jobs:
           COMMENT="$(awk '{printf "%s\\n", $0}' report.md)"
           comments_url=$(curl -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/onefootprint/footprint-core/pulls/$PR_NUMBER" | jq '._links.comments.href' | sed 's/\"//g')
           curl -X POST -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" "$comments_url" -d "{\"body\": \"$COMMENT\" }"
+        if: ${{ always() }}
       - name: Upload pytest test results
         uses: actions/upload-artifact@v3
         with:
