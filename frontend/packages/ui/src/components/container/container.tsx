@@ -36,13 +36,13 @@ const StyledContainer = styled.div<{ sx: SXStyles }>`
     `}
 
     ${media.between('sm', 'md')`
-      width: 100%;
+      width: ${theme.grid.container.maxWidth.sm}px;
       padding-left: ${theme.grid.container.margin.sm}px;
       padding-right: ${theme.grid.container.margin.sm}px;
     `}
 
     ${media.between('md', 'lg')`
-      width: 100%;
+      width: ${theme.grid.container.maxWidth.md}px;
       padding-left: ${theme.grid.container.margin.md}px;
       padding-right: ${theme.grid.container.margin.md}px;
     `}

@@ -1,9 +1,9 @@
 import { generateMedia } from 'styled-media-query';
 
 export default generateMedia({
-  xs: '375px',
-  sm: '626px',
-  md: '1024px',
-  lg: '1240px',
+  xs: '0px',
+  sm: '600px',
+  md: '900px',
+  lg: '1200px',
   xl: '1440px',
 });

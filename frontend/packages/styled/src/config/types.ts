@@ -98,7 +98,7 @@ type Size = {
 };
 
 export type Grid = {
-  gridColumns: number;
+  columns: number;
   col: { gutterSize: Size };
   container: { margin: Size; maxWidth: Size };
 };

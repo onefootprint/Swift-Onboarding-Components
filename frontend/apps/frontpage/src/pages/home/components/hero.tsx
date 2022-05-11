@@ -33,7 +33,7 @@ const Hero = ({
         as="h2"
         color="secondary"
         sx={{ marginBottom: 9 }}
-        variant="body-1"
+        variant="display-4"
       >
         {subtitleText}
       </Typography>
@@ -58,7 +58,7 @@ const Inner = styled.div`
     flex-direction: column;
     justify-content: center;
     margin: 0 auto ${theme.spacing[10]}px;
-    max-width: 780px;
+    max-width: 781px;
     text-align: center;
   `}
 `;

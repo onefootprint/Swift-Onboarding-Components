@@ -8,14 +8,9 @@ export type BootstrapProps = {
   theme: DefaultTheme;
 };
 
-// TODO: Define
-// Ticket: https://github.com/onefootprint/frontend-monorepo/issues/25
 const GlobalStyle = createGlobalStyle`
   *, :after, :before {
     box-sizing: border-box;
-  }
-  body {
-    background-color: ${({ theme }) => theme.backgroundColor.secondary};
   }
 `;
 

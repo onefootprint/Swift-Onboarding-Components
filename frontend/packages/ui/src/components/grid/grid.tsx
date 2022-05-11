@@ -1,4 +1,9 @@
-import Grid, { GridProps } from '@material-ui/core/Grid';
+import Column from './grid-column';
+import Row from './grid-row';
 
-export default Grid;
-export type { GridProps };
+export type { GridColumnProps } from './grid-column';
+
+export default {
+  Column,
+  Row,
+};

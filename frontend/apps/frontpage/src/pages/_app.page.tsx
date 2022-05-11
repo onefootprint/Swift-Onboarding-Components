@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-props-no-spreading */
 import React from 'react';
 import { DesignSystemProvider, themes } from 'ui';
 
@@ -8,7 +9,6 @@ type AppProps = {
 
 const App = ({ Component, pageProps }: AppProps) => (
   <DesignSystemProvider theme={themes.light}>
-    {/* eslint-disable-next-line react/jsx-props-no-spreading */}
     <Component {...pageProps} />
   </DesignSystemProvider>
 );

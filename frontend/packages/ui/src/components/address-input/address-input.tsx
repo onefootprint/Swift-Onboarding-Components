@@ -1,6 +1,6 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import { useCombobox } from 'downshift';
-import usePlacesAutocomplete from 'hooks';
+import { usePlacesAutocomplete } from 'hooks';
 import take from 'lodash/take';
 import React, { forwardRef } from 'react';
 import mergeRefs from 'react-merge-refs';
