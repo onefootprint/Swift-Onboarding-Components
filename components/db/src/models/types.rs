@@ -42,3 +42,20 @@ pub enum ChallengeState {
     Expired,
     Validated,
 }
+
+#[derive(Debug, DbEnum, PartialEq, Clone, Copy, Deserialize, Serialize)]
+#[serde(rename_all = "snake_case")]
+#[PgType = "data_kind"]
+#[DieselType = "Data_kind"]
+#[DbValueStyle = "verbatim"]
+pub enum DataKind {
+    FirstName,
+    LastName,
+    Dob,
+    Ssn,
+    StreetAddress,
+    City,
+    State,
+    Email,
+    PhoneNumber,
+}

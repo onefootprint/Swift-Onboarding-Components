@@ -1,3 +1,4 @@
+pub mod access_events;
 pub mod onboardings;
 pub mod session_data;
 pub mod sessions;

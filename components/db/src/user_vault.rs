@@ -70,22 +70,24 @@ pub async fn get_by_tenant_and_onboarding(
     pool: &Pool,
     tenant_id: String,
     footprint_user_id: String,
-) -> Result<Option<UserVault>, DbError> {
+) -> Result<Option<(UserVault, Onboarding)>, DbError> {
     let conn = pool.get().await?;
 
-    let vault: Option<UserVault> = conn
-        .interact(move |conn| -> Result<Option<UserVault>, DbError> {
-            let onboarding: Option<Onboarding> =
-                get_for_tenant(conn, tenant_id, footprint_user_id)?;
+    let result: Option<(UserVault, Onboarding)> = conn
+        .interact(
+            move |conn| -> Result<Option<(UserVault, Onboarding)>, DbError> {
+                let onboarding: Option<Onboarding> =
+                    get_for_tenant(conn, tenant_id, footprint_user_id)?;
 
-            match onboarding {
-                Some(ob) => Ok(Some(get_sync(conn, ob.user_vault_id)?)),
-                None => Ok(None),
-            }
-        })
+                match onboarding {
+                    Some(ob) => Ok(Some((get_sync(conn, ob.user_vault_id.clone())?, ob))),
+                    None => Ok(None),
+                }
+            },
+        )
         .await??;
 
-    Ok(vault)
+    Ok(result)
 }
 pub async fn get_by_session_id(pool: &Pool, session_cookie: String) -> Result<UserVault, DbError> {
     let conn = pool.get().await?;

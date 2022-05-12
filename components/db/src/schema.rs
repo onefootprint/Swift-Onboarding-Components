@@ -2,6 +2,20 @@ table! {
     use diesel::sql_types::*;
     use crate::models::types::*;
 
+    access_events (id) {
+        id -> Uuid,
+        onboarding_id -> Varchar,
+        data_kind -> Nullable<Data_kind>,
+        timestamp -> Timestamp,
+        created_at -> Timestamp,
+        updated_at -> Timestamp,
+    }
+}
+
+table! {
+    use diesel::sql_types::*;
+    use crate::models::types::*;
+
     onboardings (id) {
         id -> Varchar,
         user_ob_id -> Varchar,
@@ -98,11 +112,13 @@ table! {
     }
 }
 
+joinable!(access_events -> onboardings (onboarding_id));
 joinable!(onboardings -> tenants (tenant_id));
 joinable!(onboardings -> user_vaults (user_vault_id));
 joinable!(webauthn_credentials -> user_vaults (user_vault_id));
 
 allow_tables_to_appear_in_same_query!(
+    access_events,
     onboardings,
     sessions,
     tenant_api_keys,
