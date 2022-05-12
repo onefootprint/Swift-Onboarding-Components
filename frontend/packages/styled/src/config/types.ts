@@ -110,7 +110,7 @@ export type BackgroundColors = {
   tertiary: string;
   quaternary: string;
   quinary: string;
-};
+} & UIStates;
 
 export type BackgroundsColor = keyof BackgroundColors;
 

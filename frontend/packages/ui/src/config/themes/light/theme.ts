@@ -33,6 +33,7 @@ const theme: DefaultTheme = {
     tertiary: primitives.brandSleep,
     quaternary: primitives.brandThink,
     quinary: primitives.brandGo,
+    ...themeUiStates,
   },
   borderColor: {
     transparent: 'transparent',

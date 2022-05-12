@@ -5,15 +5,15 @@ import { Container, Typography } from 'ui';
 const currentYear = new Date().getFullYear();
 
 type FooterProps = {
-  copyrightText: string;
+  copyright: string;
   links: { text: string; href: string }[];
 };
 
-const Footer = ({ copyrightText, links }: FooterProps) => (
+const Footer = ({ copyright, links }: FooterProps) => (
   <Container as="footer">
     <Inner>
       <Typography variant="body-3" color="quinary">
-        © {currentYear} {copyrightText}
+        © {currentYear} {copyright}
       </Typography>
       <LinksList>
         {links.map(link => (

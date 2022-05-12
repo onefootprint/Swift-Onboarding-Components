@@ -2,13 +2,17 @@ import React from 'react';
 import styled, { css } from 'styled';
 import { Button, Container, Typography } from 'ui';
 
-type GetStartedProps = {
-  ctaText: string;
-  subtitleText: string;
-  titleText: string;
+type GetStartedSectionProps = {
+  cta: string;
+  subtitle: string;
+  title: string;
 };
 
-const GetStarted = ({ titleText, subtitleText, ctaText }: GetStartedProps) => (
+const GetStartedSection = ({
+  cta,
+  subtitle,
+  title,
+}: GetStartedSectionProps) => (
   <Container id="get-started" as="section">
     <Inner>
       <Typography
@@ -17,7 +21,7 @@ const GetStarted = ({ titleText, subtitleText, ctaText }: GetStartedProps) => (
         sx={{ marginBottom: 5 }}
         variant="display-2"
       >
-        {titleText}
+        {title}
       </Typography>
       <Typography
         as="p"
@@ -25,9 +29,9 @@ const GetStarted = ({ titleText, subtitleText, ctaText }: GetStartedProps) => (
         sx={{ marginBottom: 9 }}
         variant="body-1"
       >
-        {subtitleText}
+        {subtitle}
       </Typography>
-      <Button variant="secondary">{ctaText}</Button>
+      <Button variant="secondary">{cta}</Button>
     </Inner>
   </Container>
 );
@@ -42,4 +46,4 @@ const Inner = styled.div`
   `}
 `;
 
-export default GetStarted;
+export default GetStartedSection;

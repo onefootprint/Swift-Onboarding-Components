@@ -4,34 +4,34 @@ import React from 'react';
 import styled from 'styled';
 import { Container, Typography } from 'ui';
 
-type HeroProps = {
+type TestimonialSectionProps = {
   author: {
     name: string;
-    pictureAltText: string;
-    pictureSrc: string;
+    imgAlt: string;
+    imgSrc: string;
     role: string;
   };
-  contentText: string;
+  content: string;
 };
 
-const Hero = ({ author, contentText }: HeroProps) => (
+const TestimonialSection = ({ author, content }: TestimonialSectionProps) => (
   <Container id="testimonial" as="section" sx={{ marginY: 11 }}>
     <Inner>
-      <IcoQuote40 />
+      <IcoQuote40 color="accent" />
       <Typography
         as="p"
         color="primary"
         sx={{ marginY: 9 }}
         variant="display-4"
       >
-        {contentText}
+        {content}
       </Typography>
       <AuthorContainer>
         <Image
-          alt={author.pictureAltText}
+          alt={author.imgAlt}
           height={48}
           layout="fixed"
-          src={author.pictureSrc}
+          src={author.imgSrc}
           width={48}
         />
         <AuthorContentContainer>
@@ -66,4 +66,4 @@ const AuthorContentContainer = styled.div`
   text-align: left;
 `;
 
-export default Hero;
+export default TestimonialSection;

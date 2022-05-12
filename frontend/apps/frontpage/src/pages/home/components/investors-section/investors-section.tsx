@@ -3,17 +3,19 @@ import React from 'react';
 import styled, { css } from 'styled';
 import { Container, Typography } from 'ui';
 
-type InvestorsProps = {
-  altImageText: string;
-  subtitleText: string;
-  titleText: string;
+type InvestorsSectionProps = {
+  imgAlt: string;
+  imgSrc: string;
+  subtitle: string;
+  title: string;
 };
 
-const Investors = ({
-  altImageText,
-  subtitleText,
-  titleText,
-}: InvestorsProps) => (
+const InvestorsSection = ({
+  imgAlt,
+  imgSrc,
+  subtitle,
+  title,
+}: InvestorsSectionProps) => (
   <Container id="investors" as="section">
     <ContentContainer>
       <Typography
@@ -22,7 +24,7 @@ const Investors = ({
         sx={{ marginBottom: 5 }}
         variant="label-1"
       >
-        {titleText}
+        {title}
       </Typography>
       <Typography
         as="p"
@@ -30,16 +32,16 @@ const Investors = ({
         sx={{ marginBottom: 10, maxWidth: '510px' }}
         variant="display-2"
       >
-        {subtitleText}
+        {subtitle}
       </Typography>
     </ContentContainer>
     <ImageContainer>
       <Image
-        alt={altImageText}
+        alt={imgAlt}
         height={225}
-        src="/images/investors-logo.png"
-        width={700}
         layout="responsive"
+        src={imgSrc}
+        width={700}
       />
     </ImageContainer>
   </Container>
@@ -63,4 +65,4 @@ const ImageContainer = styled.div`
   `}
 `;
 
-export default Investors;
+export default InvestorsSection;
