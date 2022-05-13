@@ -44,7 +44,7 @@ impl FromRequest for PublicTenantAuthContext {
             .headers()
             .get(HEADER_NAME)
             .and_then(|hv| hv.to_str().map(|s| s.to_string()).ok())
-            .ok_or(AuthError::MissingClientAuthHeader);
+            .ok_or(AuthError::MissingClientPublicAuthHeader);
 
         let pool = req.app_data::<web::Data<State>>().unwrap().db_pool.clone();
 

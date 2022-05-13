@@ -12,7 +12,9 @@ pub enum AuthError {
     #[error("Unkown client")]
     UnknownClient,
     #[error("missing X-Client-Public-Key")]
-    MissingClientAuthHeader,
+    MissingClientPublicAuthHeader,
+    #[error("missing X-Client-Secret-Key")]
+    MissingClientSecretAuthHeader,
     #[error("missing session token in cookie")]
     MissingSessionTokenCookie,
     #[error("error reading session: {0}")]
