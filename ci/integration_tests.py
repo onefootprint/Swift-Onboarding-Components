@@ -43,15 +43,28 @@ def _parse_cookies(response):
         "id": id_cookie,
     }
 
+def _set_cookies(request, response):
+    cookies = _parse_cookies(response)
+    assert cookies, "Set-Cookie response header should be provided"
+    request.config.cache.set("cookies", cookies)
+
+def _assert_no_cookies(response):
+    cookies = _parse_cookies(response)
+    assert not cookies, "Set-Cookie response header should not be provided"
+
+def _assert_response(response, status_code=200, msg="Incorrect status code"):
+    print(response.content)
+    assert response.status_code == status_code, msg
+    return response.json()
+
 @pytest.fixture(scope="module")
 def tenant1():
     path = "private/client"
     data = {"name": "integration_test_tenant1"}
     r = requests.post(url(path), json=data)
-    assert(r.status_code == 200)
-    client_public_key = r.json()["data"]["keys"]["client_public_key"]
-    client_secret_key = r.json()["data"]["keys"]["client_secret_key"]
-    print(client_public_key)
+    body = _assert_response(r)
+    client_public_key = body["data"]["keys"]["client_public_key"]
+    client_secret_key = body["data"]["keys"]["client_secret_key"]
     return {
         "pk": client_public_key,
         "sk": client_secret_key
@@ -62,9 +75,9 @@ def tenant2():
     path = "private/client"
     data = {"name": "integration_test_tenant2"}
     r = requests.post(url(path), json=data)
-    assert(r.status_code == 200)
-    client_public_key = r.json()["data"]["keys"]["client_public_key"]
-    client_secret_key = r.json()["data"]["keys"]["client_secret_key"]
+    body = _assert_response(r)
+    client_public_key = body["data"]["keys"]["client_public_key"]
+    client_secret_key = body["data"]["keys"]["client_secret_key"]
     return {
         "pk": client_public_key,
         "sk": client_secret_key
@@ -83,9 +96,8 @@ def test_identify_init(tenant1, request):
         json=data,
         headers=_client_pub_key_headers(tenant1["pk"]),
     )
-    print(r, r.content)
-    assert r.status_code == 200
-    assert r.json()["data"] == "user_not_found"
+    body = _assert_response(r)
+    assert body["data"] == "user_not_found"
 
 
 def test_challenge(request, tenant1):
@@ -99,13 +111,9 @@ def test_challenge(request, tenant1):
         json=data,
         headers=_client_pub_key_headers(tenant1["pk"]),
     )
-    print(r, r.content)
-    assert r.status_code == 200
-    assert r.json()["data"]["phone_number_last_two"] == last_two
-    cookies = _parse_cookies(r)
-    assert cookies, "Set-Cookie response header should be provided"
-    request.config.cache.set("cookies", cookies)
-    print(cookies)
+    body = _assert_response(r)
+    assert body["data"]["phone_number_last_two"] == last_two
+    _set_cookies(request, r)
 
 def test_identify_verify(request, tenant1):
     path = "identify/verify"
@@ -121,13 +129,9 @@ def test_identify_verify(request, tenant1):
         cookies=request.config.cache.get("cookies", None),
         headers=_client_pub_key_headers(tenant1["pk"]),
     )
-    print(r, r.content)
-    assert r.status_code == 200
-    print(r.cookies.get_dict())
-    assert r.json()["data"]["kind"] == "user_created"
-    cookies = _parse_cookies(r)
-    request.config.cache.set("cookies", cookies)
-    assert cookies, "Set-Cookie response header should be provided"
+    body = _assert_response(r)
+    assert body["data"]["kind"] == "user_created"
+    _set_cookies(request, r)
     
 def test_identify_data(request, tenant1): 
     path = "identify/data"
@@ -147,11 +151,8 @@ def test_identify_data(request, tenant1):
         cookies=request.config.cache.get("cookies", None),
         headers=_client_pub_key_headers(tenant1["pk"]),
     )
-    print(r.content)
-    assert r.status_code == 200
-    print(r.cookies.get_dict())
-    cookies = _parse_cookies(r)
-    assert not cookies, "Set-Cookie response header should not be provided"
+    _assert_response(r)
+    _assert_no_cookies(r)
     
 def test_identify_data_wrong_tenant(request, tenant2):
     path = "identify/data"
@@ -163,8 +164,7 @@ def test_identify_data_wrong_tenant(request, tenant2):
         # Purposefuly auth as tenant 2 - since the user isn't onboarded onto tenant2, this should fail
         headers=_client_pub_key_headers(tenant2["pk"]),
     )
-    print(r.content)
-    assert r.status_code == 401, "Shouldn't be able to update user vault unless user is onboarded to tenant"
+    _assert_response(r, status_code=401, msg="Shouldn't be able to update user vault unless user is onboarded to tenant")
 
 def test_identify_commit(request, tenant1): 
     path = "identify/commit"
@@ -174,14 +174,11 @@ def test_identify_commit(request, tenant1):
         cookies=request.config.cache.get("cookies", None),
         headers=_client_pub_key_headers(tenant1["pk"]),
     )
-    print(r.content)
-    assert r.status_code == 200
-    fp_user_id = r.json()["data"]["footprint_user_id"]
+    body = _assert_response(r)
+    fp_user_id = body["data"]["footprint_user_id"]
     assert fp_user_id
-    request.config.cache.set("cookies", r.cookies.get_dict())
     request.config.cache.set("fp_user_id", fp_user_id)
-    cookies = _parse_cookies(r)
-    assert not cookies, "Set-Cookie response header should not be provided"
+    _assert_no_cookies(r)
 
 def test_identify_repeat_customer_via_email(request, tenant2):
     # Identify the user by email
@@ -197,12 +194,9 @@ def test_identify_repeat_customer_via_email(request, tenant2):
         cookies=request.config.cache.get("cookies", None),
         headers=_client_pub_key_headers(tenant2["pk"]),
     )
-    print(r, r.content)
-    assert r.status_code == 200
-    assert r.json()["data"]["phone_number_last_two"] == phone_number[-2:]
-    cookies = _parse_cookies(r)
-    assert cookies, "Set-Cookie response header should be provided"
-    request.config.cache.set("cookies", cookies)
+    body = _assert_response(r)
+    assert body["data"]["phone_number_last_two"] == phone_number[-2:]
+    _set_cookies(request, r)
 
 def test_identify_verify_repeat_customer(request, tenant2):
     path = "identify/verify"
@@ -218,12 +212,9 @@ def test_identify_verify_repeat_customer(request, tenant2):
         cookies=request.config.cache.get("cookies", None),
         headers=_client_pub_key_headers(tenant2["pk"]),
     )
-    print(r, r.content)
-    assert r.status_code == 200
-    assert r.json()["data"]["kind"] == "user_inherited"
-    cookies = _parse_cookies(r)
-    assert cookies, "Set-Cookie response header should be provided"
-    request.config.cache.set("cookies", cookies)
+    body = _assert_response(r)
+    assert body["data"]["kind"] == "user_inherited"
+    _set_cookies(request, r)
 
 def test_identify_commit_repeat_customer(request, tenant2):
     path = "identify/commit"
@@ -233,15 +224,14 @@ def test_identify_commit_repeat_customer(request, tenant2):
         cookies=request.config.cache.get("cookies", None),
         headers=_client_pub_key_headers(tenant2["pk"]),
     )
-    print(r.content)
-    assert r.status_code == 200
-    fp_user_id = r.json()["data"]["footprint_user_id"]
+    body = _assert_response(r)
+    fp_user_id = body["data"]["footprint_user_id"]
     assert fp_user_id
     old_fp_user_id = request.config.cache.get("fp_user_id", None)
     assert old_fp_user_id != fp_user_id, "Different tenants should have different fp_user_ids"
     cookies = _parse_cookies(r)
-    assert not cookies, "Set-Cookie response header should not be provided"
-
+    _assert_no_cookies(r)
+    
 def test_decrypt(request, tenant1):
     path = "vault/decrypt"
     print(url(path))
@@ -255,11 +245,11 @@ def test_decrypt(request, tenant1):
         headers=_client_priv_key_headers(tenant1["sk"]),  
         json=data
     )
-    print(r.content)
-    assert r.status_code == 200
-    data = r.json()["data"]["attributes"]
-    assert data["first_name"] == "Flerp"
-    assert data["email"] == request.config.cache.get("email", None)
+    body = _assert_response(r)
+    attributes = body["data"]["attributes"]
+    assert attributes["first_name"] == "Flerp"
+    assert attributes["email"] == request.config.cache.get("email", None)
+    _assert_no_cookies(r)
 
 def test_access_events_list(request, tenant1):
     fp_user_id = request.config.cache.get("fp_user_id", None)
@@ -270,11 +260,11 @@ def test_access_events_list(request, tenant1):
         cookies=request.config.cache.get("cookies", None),        
         headers=_client_priv_key_headers(tenant1["sk"]),  
     )
-    print(r.content)
-    assert r.status_code == 200
-    access_events = r.json()["data"]["events"]
+    body = _assert_response(r)
+    access_events = body["data"]["events"]
     assert len(access_events) == 2
     assert set(i["data_kind"] for i in access_events) == {"first_name", "email"}
+    _assert_no_cookies(r)
 
     # Test filtering on kind
     path = f"vault/access_events?footprint_user_id={fp_user_id}&data_kind=email"
@@ -283,11 +273,11 @@ def test_access_events_list(request, tenant1):
         cookies=request.config.cache.get("cookies", None),
         headers=_client_priv_key_headers(tenant1["sk"]),
     )
-    print(r.content)
-    assert r.status_code == 200
-    access_events = r.json()["data"]["events"]
+    body = _assert_response(r)
+    access_events = body["data"]["events"]
     assert len(access_events) == 1
     assert access_events[0]["data_kind"] == "email"
+    _assert_no_cookies(r)
 
 def test_login(request):
     # Initiate the login challenge. Could initiate with email too
@@ -298,30 +288,30 @@ def test_login(request):
         url(path),
         json=dict(phone_number=phone_number),
     )
-    print(r.content)
-    assert r.status_code == 200
-    assert r.json()["data"]["phone_number_last_two"] == phone_number[-2:]
+    body = _assert_response(r)
+    assert body["data"]["phone_number_last_two"] == phone_number[-2:]
+    _set_cookies(request, r)
 
     # Respond to the login challenge
     path = f"user/login/verify"
     print(url(path))
     r = requests.post(
         url(path),
-        cookies=_parse_cookies(r),
+        cookies=request.config.cache.get("cookies", None),
         json=dict(code=TEST_CHALLENGE_CODE),
     )
-    print(r.content)
-    assert r.status_code == 200
+    _assert_response(r)
+    _set_cookies(request, r)
 
+def test_logged_in_user_detail(request):
     # Get the user detail using the logged in context
     path = f"user"
     print(url(path))
     r = requests.get(
         url(path),
-        cookies=_parse_cookies(r),
+        cookies=request.config.cache.get("cookies", None),
     )
-    print(r.content)
-    assert r.status_code == 200
-    user = r.json()["data"]
+    body = _assert_response(r)
+    user = body["data"]
     assert user["first_name"] == "Flerp"
     assert user["last_name"] == "Derp"
