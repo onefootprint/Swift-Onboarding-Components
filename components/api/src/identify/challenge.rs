@@ -1,4 +1,5 @@
-use crate::auth::identify_session::{IdentifySessionContext, IdentifySessionState};
+use crate::auth::client_public_key::PublicTenantAuthContext;
+use crate::auth::login_session::LoginSessionState;
 use crate::errors::ApiError;
 use crate::identify::{clean_phone_number, phone_number_last_two, send_phone_challenge};
 use crate::response::success::ApiResponseData;
@@ -19,32 +20,29 @@ pub struct ChallengeResponse {
 
 #[api_v2_operation]
 #[post("/challenge")]
-/// Issues a text message challenge to a given phone_number. In order to call this endpoint, you must have
-/// already attempted to identify by email address via a call to /identify. The call to /identify
-/// sets relevant state for issuing the challenge (see IdentifySessionState)
+/// Issues a text message challenge to a given phone_number.
 pub async fn handler(
     request: Json<ChallengeRequest>,
     session: Session,
-    session_context: IdentifySessionContext,
+    _tenant_auth: PublicTenantAuthContext,
     state: web::Data<State>,
 ) -> actix_web::Result<Json<ApiResponseData<ChallengeResponse>>, ApiError> {
     // clean phone number
     let req = request.into_inner();
     let phone_number = clean_phone_number(&state, &req.phone_number).await?;
 
-    // send challenge & set state
-    let challenge_state = send_phone_challenge(&state, phone_number.clone()).await?;
+    // Send the log in challenge to the provided phone number
+    let challenge_data = send_phone_challenge(&state, phone_number.clone()).await?;
 
-    IdentifySessionState {
-        tenant_id: session_context.state.tenant_id.clone(),
-        email: session_context.state.email.clone(),
-        challenge_state: Some(challenge_state.clone()),
+    // Save the challenge state in the session
+    LoginSessionState {
+        challenge_state: challenge_data.clone(),
     }
     .set(&session)?;
 
     Ok(Json(ApiResponseData {
         data: ChallengeResponse {
-            phone_number_last_two: phone_number_last_two(challenge_state.phone_number),
+            phone_number_last_two: phone_number_last_two(challenge_data.phone_number),
         },
     }))
 }

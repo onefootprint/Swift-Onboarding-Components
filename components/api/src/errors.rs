@@ -64,6 +64,8 @@ pub enum ApiError {
     WebAuthn(#[from] webauthn_rs::error::WebauthnError),
     #[error("json error: {0}")]
     Serde(#[from] serde_json::Error),
+    #[error("Onboarding for tenant, user pair does not exist")]
+    OnboardingForTenantDoesNotExist,
 }
 
 fn status_code_for_db_error(e: &DbError) -> StatusCode {
@@ -111,6 +113,7 @@ impl actix_web::ResponseError for ApiError {
             ApiError::InvalidTenantKeyOrUserId => actix_web::http::StatusCode::BAD_REQUEST,
             ApiError::WebAuthn(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::Serde(_) => StatusCode::BAD_REQUEST,
+            ApiError::OnboardingForTenantDoesNotExist => StatusCode::UNAUTHORIZED,
         }
     }
 

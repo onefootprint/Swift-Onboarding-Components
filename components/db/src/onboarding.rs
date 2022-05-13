@@ -1,8 +1,6 @@
 use crate::errors::DbError;
 use crate::models::onboardings::{NewOnboarding, Onboarding};
-use crate::models::session_data::{OnboardingSessionData, SessionState};
 use crate::schema;
-use crate::session::get_session_by_id_sync;
 use deadpool_diesel::postgres::Pool;
 use diesel::prelude::*;
 
@@ -39,42 +37,6 @@ pub async fn init_or_get_existing(
     Ok(ob)
 }
 
-pub async fn get_by_session_id(pool: &Pool, session_id: String) -> Result<Onboarding, DbError> {
-    let conn = pool.get().await?;
-
-    conn.interact(move |conn| -> Result<Onboarding, DbError> {
-        get_onboarding_by_session_id_sync(conn, session_id)
-    })
-    .await?
-}
-
-pub(crate) fn get_onboarding_by_session_id_sync(
-    conn: &mut PgConnection,
-    session_id: String,
-) -> Result<Onboarding, DbError> {
-    let onboarding_session_data = get_onboarding_session_data_sync(conn, session_id)?;
-
-    let id = onboarding_session_data.user_ob_id;
-
-    let onboarding: Onboarding = schema::onboardings::table
-        .filter(schema::onboardings::user_ob_id.eq(id))
-        .first(conn)?;
-
-    Ok(onboarding)
-}
-
-pub(crate) fn get_onboarding_session_data_sync(
-    conn: &mut PgConnection,
-    session_id: String,
-) -> Result<OnboardingSessionData, DbError> {
-    let session = get_session_by_id_sync(conn, session_id)?;
-
-    match session.session_data {
-        SessionState::OnboardingSession(s) => Ok(s),
-        _ => Err(DbError::InvalidSessionForOperation),
-    }
-}
-
 pub(crate) fn get_for_tenant(
     conn: &mut PgConnection,
     tenant_id: String,
@@ -85,5 +47,25 @@ pub(crate) fn get_for_tenant(
         .filter(schema::onboardings::user_ob_id.eq(footprint_user_id))
         .first(conn)
         .optional()?;
+    Ok(ob)
+}
+
+pub async fn get(
+    pool: &Pool,
+    tenant_id: String,
+    user_vault_id: String,
+) -> Result<Option<Onboarding>, DbError> {
+    let conn = pool.get().await?;
+
+    let ob = conn
+        .interact(|conn| -> Result<Option<Onboarding>, DbError> {
+            let ob = schema::onboardings::table
+                .filter(schema::onboardings::tenant_id.eq(tenant_id))
+                .filter(schema::onboardings::user_vault_id.eq(user_vault_id))
+                .first(conn)
+                .optional()?;
+            Ok(ob)
+        })
+        .await??;
     Ok(ob)
 }

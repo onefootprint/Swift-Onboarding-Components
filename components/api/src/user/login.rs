@@ -96,7 +96,7 @@ async fn verify(
     })
     .create(&state.db_pool)
     .await?;
-    // Set the cookie that identifies this as an OnboardingSession and attaches it to the DB state
+    // Set the cookie that identifies this as a LoggedInSession and attaches it to the DB state
     LoggedInSessionContext::set(&session, token)?;
 
     Ok(Json(ApiResponseData { data: () }))

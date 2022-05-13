@@ -1,7 +1,10 @@
-use crate::auth::onboarding_session::OnboardingSessionContext;
+use crate::auth::client_public_key::PublicTenantAuthContext;
+use crate::auth::get_onboarding_for_tenant;
+use crate::auth::logged_in_session::LoggedInSessionContext;
 use crate::errors::ApiError;
 use crate::response::success::ApiResponseData;
-use paperclip::actix::{api_v2_operation, post, web::Json, Apiv2Schema};
+use crate::State;
+use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Serialize)]
 pub struct LivecheckResponse {
@@ -12,11 +15,14 @@ pub struct LivecheckResponse {
 #[api_v2_operation]
 #[post("/livecheck")]
 pub async fn handler(
-    session_context: OnboardingSessionContext,
+    user_auth: LoggedInSessionContext,
+    tenant_auth: PublicTenantAuthContext,
+    state: web::Data<State>,
 ) -> actix_web::Result<Json<ApiResponseData<LivecheckResponse>>, ApiError> {
+    get_onboarding_for_tenant(&state.db_pool, &user_auth, &tenant_auth).await?;
     Ok(Json(ApiResponseData {
         data: LivecheckResponse {
-            session_id: session_context.session_id,
+            session_id: user_auth.session_id,
         },
     }))
 }

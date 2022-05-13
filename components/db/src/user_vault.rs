@@ -3,7 +3,7 @@ use crate::models::onboardings::*;
 use crate::models::session_data::SessionState;
 use crate::models::types::Status;
 use crate::models::user_vaults::*;
-use crate::onboarding::{get_for_tenant, get_onboarding_by_session_id_sync};
+use crate::onboarding::get_for_tenant;
 use crate::schema;
 use crate::session::get_session_by_id_sync;
 use deadpool_diesel::postgres::Pool;
@@ -110,27 +110,6 @@ pub async fn get_by_tenant_and_onboarding(
         .await??;
 
     Ok(result)
-}
-
-pub async fn get_by_session_id(pool: &Pool, session_cookie: String) -> Result<UserVault, DbError> {
-    let conn = pool.get().await?;
-
-    let user = conn
-        .interact(move |conn| -> Result<UserVault, DbError> {
-            let onboarding: Onboarding = get_onboarding_by_session_id_sync(conn, session_cookie)?;
-
-            let (_, user): (Onboarding, UserVault) = schema::onboardings::table
-                .inner_join(
-                    schema::user_vaults::table
-                        .on(schema::user_vaults::id.eq(schema::onboardings::user_vault_id)),
-                )
-                .filter(schema::user_vaults::id.eq(onboarding.user_vault_id))
-                .first(conn)?;
-            Ok(user)
-        })
-        .await??;
-
-    Ok(user)
 }
 
 pub async fn get_by_phone_number(

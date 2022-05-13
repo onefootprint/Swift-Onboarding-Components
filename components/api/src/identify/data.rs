@@ -1,7 +1,7 @@
-use crate::{
-    auth::onboarding_session::OnboardingSessionContext, errors::ApiError,
-    response::success::ApiResponseData, State,
-};
+use crate::auth::client_public_key::PublicTenantAuthContext;
+use crate::auth::get_onboarding_for_tenant;
+use crate::auth::logged_in_session::LoggedInSessionContext;
+use crate::{errors::ApiError, response::success::ApiResponseData, State};
 use db::models::{types::Status, user_vaults::UpdateUserVault};
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 
@@ -60,13 +60,15 @@ struct UserPatchRequest {
 #[api_v2_operation]
 #[post("/data")]
 /// Operates as a PATCH request to update data in the user vault. Client is authenticated
-/// via state set upon successful call to /identify/verify endpont (see OnboardingSessionState).
+/// via state set upon successful call to /identify/verify endpoint (see OnboardingSessionState).
 async fn handler(
     state: web::Data<State>,
-    session_context: OnboardingSessionContext,
+    user_auth: LoggedInSessionContext,
+    tenant_auth: PublicTenantAuthContext,
     request: web::Json<UserPatchRequest>,
 ) -> actix_web::Result<Json<ApiResponseData<String>>, ApiError> {
-    let user_vault = session_context.user_vault();
+    get_onboarding_for_tenant(&state.db_pool, &user_auth, &tenant_auth).await?;
+    let user_vault = user_auth.user_vault();
     fn seal(
         val: Option<Option<String>>,
         user_vault: &db::models::user_vaults::UserVault,

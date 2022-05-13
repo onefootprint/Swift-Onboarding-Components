@@ -1,10 +1,9 @@
+use crate::auth::client_public_key::PublicTenantAuthContext;
+use crate::auth::login_session::LoginSessionState;
+use crate::errors::ApiError;
 use crate::identify::clean_email;
 use crate::response::success::ApiResponseData;
 use crate::State;
-use crate::{
-    auth::client_public_key::PublicTenantAuthContext, auth::identify_session::IdentifySessionState,
-    errors::ApiError,
-};
 use actix_session::Session;
 use paperclip::actix::{api_v2_operation, web, web::Json, Apiv2Schema};
 
@@ -30,35 +29,37 @@ pub enum IdentifyResponse {
 pub async fn handler(
     request: Json<IdentifyRequest>,
     session: Session,
-    pub_tenant_auth: PublicTenantAuthContext,
+    _tenant_auth: PublicTenantAuthContext,
     state: web::Data<State>,
 ) -> actix_web::Result<Json<ApiResponseData<IdentifyResponse>>, ApiError> {
     // clean email & look up existing user vault
     let req = request.into_inner();
     let cleaned_email = clean_email(req.email);
     let sh_email = super::hash(cleaned_email.clone());
-    let existing_user_vault = db::user_vault::get_by_email(&state.db_pool, sh_email).await?;
+    let existing_user = db::user_vault::get_by_email(&state.db_pool, sh_email).await?;
 
     // see if user vault has an associated phone number. if not, set session state to info we currently have &
     // return user not found
-    let (challenge_state, response) = match existing_user_vault {
-        Some(vault) => {
-            let challenge_state = send_phone_challenge_to_user(&state, vault).await?;
-            (
-                Some(challenge_state.clone()),
-                IdentifyResponse::PhoneNumberLastTwo(phone_number_last_two(
-                    challenge_state.phone_number,
-                )),
-            )
-        }
-        None => (None, IdentifyResponse::UserNotFound),
+    let existing_user = if let Some(existing_user) = existing_user {
+        existing_user
+    } else {
+        return Ok(Json(ApiResponseData {
+            data: IdentifyResponse::UserNotFound,
+        }));
     };
-    IdentifySessionState {
-        tenant_id: pub_tenant_auth.tenant().id.clone(),
-        email: cleaned_email.clone(),
-        challenge_state,
+
+    // Send the log in challenge to the user's phone number
+    let challenge_data = send_phone_challenge_to_user(&state, existing_user).await?;
+
+    // Save the challenge state in the session
+    LoginSessionState {
+        challenge_state: challenge_data.clone(),
     }
     .set(&session)?;
 
-    Ok(Json(ApiResponseData { data: response }))
+    Ok(Json(ApiResponseData {
+        data: IdentifyResponse::PhoneNumberLastTwo(phone_number_last_two(
+            challenge_data.phone_number,
+        )),
+    }))
 }

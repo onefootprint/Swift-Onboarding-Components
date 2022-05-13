@@ -1,12 +1,14 @@
 use super::validate_challenge;
-use crate::auth::onboarding_session::OnboardingSessionContext;
+use crate::auth::client_public_key::PublicTenantAuthContext;
+use crate::auth::logged_in_session::LoggedInSessionContext;
+use crate::auth::login_session::LoginSessionContext;
+use crate::errors::ApiError;
 use crate::response::success::ApiResponseData;
 use crate::State;
-use crate::{auth::identify_session::IdentifySessionContext, errors::ApiError};
 use actix_session::Session;
 use aws_sdk_kms::model::DataKeyPairSpec;
 use db::models::onboardings::{NewOnboarding, Onboarding};
-use db::models::session_data::{OnboardingSessionData, SessionState as DbSessionState};
+use db::models::session_data::{LoggedInSessionData, SessionState as DbSessionState};
 use db::models::types::Status;
 use db::models::user_vaults::{MissingFields, NewUserVault, UserVault};
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
@@ -15,6 +17,7 @@ use super::{hash, seal, send_email_challenge};
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
 struct VerifyRequest {
+    email: String,
     code: String,
 }
 
@@ -39,16 +42,11 @@ struct VerifyResponse {
 async fn handler(
     state: web::Data<State>,
     session: Session,
-    session_context: IdentifySessionContext,
+    tenant_auth: PublicTenantAuthContext,
+    user_auth: LoginSessionContext,
     request: Json<VerifyRequest>,
 ) -> actix_web::Result<Json<ApiResponseData<VerifyResponse>>, ApiError> {
-    let session_state = session_context.state;
-    let opt_challenge_data = session_state.challenge_state;
-
-    let challenge_data = match opt_challenge_data {
-        None => Err(ApiError::ChallengeNotValid),
-        Some(d) => Ok(d),
-    }?;
+    let challenge_data = user_auth.state.challenge_state;
 
     if !validate_challenge(request.code.clone(), &challenge_data).await? {
         return Err(ApiError::ChallengeNotValid);
@@ -62,7 +60,7 @@ async fn handler(
     let (onboarding, kind, missing_attributes) = match existing_user_vault {
         Some(uv) => (
             // User with this phone number exists. Onboard the existing user to this tenant
-            onboard_existing_user(&state, uv.clone(), session_state.tenant_id.clone()).await?,
+            onboard_existing_user(&state, uv.clone(), tenant_auth.tenant().id.clone()).await?,
             VerifyKind::UserInherited,
             MissingFields::missing_fields(&uv).join(","),
         ),
@@ -70,24 +68,23 @@ async fn handler(
             // The user does not exist. Create a new user and onboard them to this tenant
             let (ob, missing_fields) = onboard_new_user(
                 &state,
-                session_state.tenant_id.clone(),
+                tenant_auth.tenant().id.clone(),
                 phone_number.clone(),
-                session_state.email.clone(),
+                request.email.clone(),
             )
             .await?;
             (ob, VerifyKind::UserCreated, missing_fields)
         }
     };
 
-    // Save onboarding session data into the DB
-    let (_, token) = DbSessionState::OnboardingSession(OnboardingSessionData {
-        user_ob_id: onboarding.user_ob_id,
+    // Save logged in session data into the DB
+    let (_, token) = DbSessionState::LoggedInSession(LoggedInSessionData {
         user_vault_id: onboarding.user_vault_id,
     })
     .create(&state.db_pool)
     .await?;
-    // Set the cookie that identifies this as an OnboardingSession and attaches it to the DB state
-    OnboardingSessionContext::set(&session, token)?;
+    // Set the cookie that identifies this as a LoggedInSession and attaches it to the DB state
+    LoggedInSessionContext::set(&session, token)?;
 
     Ok(Json(ApiResponseData {
         data: VerifyResponse {

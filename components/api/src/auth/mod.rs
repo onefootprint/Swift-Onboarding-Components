@@ -1,10 +1,11 @@
+use db::models::onboardings::Onboarding;
 use thiserror::Error;
+
+use crate::errors::ApiError;
 pub mod client_public_key;
 pub mod client_secret_key;
-pub mod identify_session;
 pub mod logged_in_session;
 pub mod login_session;
-pub mod onboarding_session;
 
 #[derive(Debug, Error)]
 pub enum AuthError {
@@ -22,4 +23,22 @@ pub enum AuthError {
     InvalidSessionJson(serde_json::Error),
     #[error("invalid session state")]
     InvalidSessionState,
+}
+
+/// For endpoints that take both a user_auth and tenant_auth, this helps to assert that the authenticated user
+/// has been onboarded to the provided tenant by fetching the Onboarding for this (user, tenant) pair.
+pub async fn get_onboarding_for_tenant(
+    db_pool: &db::DbPool,
+    user_auth: &logged_in_session::LoggedInSessionContext,
+    tenant_auth: &client_public_key::PublicTenantAuthContext,
+) -> Result<Onboarding, ApiError> {
+    let onboarding = db::onboarding::get(
+        db_pool,
+        tenant_auth.tenant().id.clone(),
+        user_auth.user_vault().id.clone(),
+    )
+    .await?
+    .ok_or(ApiError::OnboardingForTenantDoesNotExist)?;
+
+    Ok(onboarding)
 }

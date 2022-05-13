@@ -86,12 +86,9 @@ def test_identify_init(tenant1, request):
     print(r, r.content)
     assert r.status_code == 200
     assert r.json()["data"] == "user_not_found"
-    cookies = _parse_cookies(r)
-    assert cookies, "Set-Cookie response header should be provided"
-    request.config.cache.set("cookies", cookies)
 
 
-def test_challenge(request):
+def test_challenge(request, tenant1):
     path = "identify/challenge"
     last_two = _gen_random_n_digit_number(2)
     phone_number = f"+1 (555) 555-01{last_two}"
@@ -100,7 +97,7 @@ def test_challenge(request):
     r = requests.post(
         url(path),
         json=data,
-        cookies=request.config.cache.get("cookies", None),
+        headers=_client_pub_key_headers(tenant1["pk"]),
     )
     print(r, r.content)
     assert r.status_code == 200
@@ -110,11 +107,20 @@ def test_challenge(request):
     request.config.cache.set("cookies", cookies)
     print(cookies)
 
-def test_identify_verify(request):
+def test_identify_verify(request, tenant1):
     path = "identify/verify"
     print(url(path))
-    data = {"code": TEST_CHALLENGE_CODE}
-    r = requests.post(url(path), json=data, cookies=request.config.cache.get("cookies", None))
+    data = {
+        "code": TEST_CHALLENGE_CODE,
+        # TODO we could instead trigger the async email verification in identify/data
+        "email": request.config.cache.get("email", None),
+    }
+    r = requests.post(
+        url(path),
+        json=data,
+        cookies=request.config.cache.get("cookies", None),
+        headers=_client_pub_key_headers(tenant1["pk"]),
+    )
     print(r, r.content)
     assert r.status_code == 200
     print(r.cookies.get_dict())
@@ -123,7 +129,7 @@ def test_identify_verify(request):
     request.config.cache.set("cookies", cookies)
     assert cookies, "Set-Cookie response header should be provided"
     
-def test_identify_data(request): 
+def test_identify_data(request, tenant1): 
     path = "identify/data"
     data = {
         "first_name": "Flerp",
@@ -135,17 +141,39 @@ def test_identify_data(request):
         "state": "NY",
     }
     print(url(path))
-    r = requests.post(url(path), json=data, cookies=request.config.cache.get("cookies", None))
+    r = requests.post(
+        url(path),
+        json=data,
+        cookies=request.config.cache.get("cookies", None),
+        headers=_client_pub_key_headers(tenant1["pk"]),
+    )
     print(r.content)
     assert r.status_code == 200
     print(r.cookies.get_dict())
     cookies = _parse_cookies(r)
     assert not cookies, "Set-Cookie response header should not be provided"
+    
+def test_identify_data_wrong_tenant(request, tenant2):
+    path = "identify/data"
+    print(url(path))
+    r = requests.post(
+        url(path),
+        json=dict(),
+        cookies=request.config.cache.get("cookies", None),
+        # Purposefuly auth as tenant 2 - since the user isn't onboarded onto tenant2, this should fail
+        headers=_client_pub_key_headers(tenant2["pk"]),
+    )
+    print(r.content)
+    assert r.status_code == 401, "Shouldn't be able to update user vault unless user is onboarded to tenant"
 
-def test_identify_commit(request): 
+def test_identify_commit(request, tenant1): 
     path = "identify/commit"
     print(url(path))
-    r = requests.post(url(path), cookies=request.config.cache.get("cookies", None))
+    r = requests.post(
+        url(path),
+        cookies=request.config.cache.get("cookies", None),
+        headers=_client_pub_key_headers(tenant1["pk"]),
+    )
     print(r.content)
     assert r.status_code == 200
     fp_user_id = r.json()["data"]["footprint_user_id"]
@@ -176,11 +204,20 @@ def test_identify_repeat_customer_via_email(request, tenant2):
     assert cookies, "Set-Cookie response header should be provided"
     request.config.cache.set("cookies", cookies)
 
-def test_identify_verify_repeat_customer(request):
+def test_identify_verify_repeat_customer(request, tenant2):
     path = "identify/verify"
     print(url(path))
-    data = {"code": "123456"}
-    r = requests.post(url(path), json=data, cookies=request.config.cache.get("cookies", None))
+    data = {
+        "code": "123456",
+        # TODO this won't be used in this branch - another reason why we should move the email update into /identify/data
+        "email": request.config.cache.get("email", None),
+    }
+    r = requests.post(
+        url(path),
+        json=data,
+        cookies=request.config.cache.get("cookies", None),
+        headers=_client_pub_key_headers(tenant2["pk"]),
+    )
     print(r, r.content)
     assert r.status_code == 200
     assert r.json()["data"]["kind"] == "user_inherited"
@@ -188,10 +225,14 @@ def test_identify_verify_repeat_customer(request):
     assert cookies, "Set-Cookie response header should be provided"
     request.config.cache.set("cookies", cookies)
 
-def test_identify_commit_repeat_customer(request):
+def test_identify_commit_repeat_customer(request, tenant2):
     path = "identify/commit"
     print(url(path))
-    r = requests.post(url(path), cookies=request.config.cache.get("cookies", None))
+    r = requests.post(
+        url(path),
+        cookies=request.config.cache.get("cookies", None),
+        headers=_client_pub_key_headers(tenant2["pk"]),
+    )
     print(r.content)
     assert r.status_code == 200
     fp_user_id = r.json()["data"]["footprint_user_id"]
@@ -219,7 +260,6 @@ def test_decrypt(request, tenant1):
     data = r.json()["data"]["attributes"]
     assert data["first_name"] == "Flerp"
     assert data["email"] == request.config.cache.get("email", None)
-
 
 def test_access_events_list(request, tenant1):
     fp_user_id = request.config.cache.get("fp_user_id", None)

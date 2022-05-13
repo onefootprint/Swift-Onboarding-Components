@@ -45,11 +45,10 @@ impl ApiUser {
 #[api_v2_operation]
 /// Issues a text message challenge to an existing user, identified by either phone number or email.
 pub async fn handler(
-    session_context: LoggedInSessionContext,
+    user_auth: LoggedInSessionContext,
     state: web::Data<State>,
 ) -> actix_web::Result<Json<ApiResponseData<ApiUser>>, ApiError> {
-    let existing_user = session_context.user_vault();
-
+    let existing_user = user_auth.user_vault();
     Ok(Json(ApiResponseData {
         data: ApiUser::from(existing_user, &state).await?,
     }))
