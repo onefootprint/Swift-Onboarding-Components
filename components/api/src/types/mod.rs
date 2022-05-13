@@ -2,6 +2,7 @@ use paperclip::actix::Apiv2Schema;
 
 pub mod access_event;
 pub mod error;
+pub mod onboarding;
 pub mod success;
 
 /// empty data

@@ -238,16 +238,29 @@ def test_decrypt(request, tenant1):
         "attributes": ["first_name", "email"]
     }
     print(data)
-    r = requests.post(url(path),
-        cookies=request.config.cache.get("cookies", None),        
+    r = requests.post(
+        url(path),
         headers=_client_priv_key_headers(tenant1["sk"]),  
-        json=data
+        json=data,
     )
     body = _assert_response(r)
     attributes = body["data"]["attributes"]
     assert attributes["first_name"] == "Flerp"
     assert attributes["email"] == request.config.cache.get("email", None)
     _assert_no_cookies(r)
+    
+def test_onboardings_list(request, tenant1):
+    path = "tenant/onboardings"
+    print(url(path))
+    r = requests.get(
+        url(path),
+        headers=_client_priv_key_headers(tenant1["sk"]),  
+    )
+    body = _assert_response(r)
+    onboardings = body["data"]["onboardings"]
+    assert len(onboardings) == 1
+    old_fp_user_id = request.config.cache.get("fp_user_id", None)
+    assert onboardings[0]["fp_user_id"] == old_fp_user_id
 
 def test_access_events_list(request, tenant1):
     fp_user_id = request.config.cache.get("fp_user_id", None)
