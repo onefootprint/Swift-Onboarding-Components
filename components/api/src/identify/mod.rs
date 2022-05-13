@@ -79,11 +79,8 @@ pub async fn validate_challenge(
 ) -> Result<bool, ApiError> {
     let now = Utc::now().naive_utc();
 
-    Ok((challenge_data.challenge_code == request_code)
-        & (challenge_data
-            .challenge_created_at
-            .signed_duration_since(now)
-            < Duration::minutes(15)))
+    Ok((challenge_data.h_code == hash(request_code))
+        & (challenge_data.created_at.signed_duration_since(now) < Duration::minutes(15)))
 }
 
 pub fn clean_email(raw_email: String) -> String {
@@ -126,9 +123,8 @@ pub(crate) async fn send_phone_challenge(
 
     Ok(ChallengeState {
         phone_number,
-        // TODO only store the h_code in the session
-        challenge_code: code,
-        challenge_created_at: Utc::now().naive_utc(),
+        h_code: hash(code),
+        created_at: Utc::now().naive_utc(),
     })
 }
 

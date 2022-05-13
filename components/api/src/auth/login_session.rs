@@ -24,8 +24,8 @@ pub struct LoginSessionContext {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ChallengeState {
     pub phone_number: String,
-    pub challenge_code: String,
-    pub challenge_created_at: NaiveDateTime,
+    pub h_code: Vec<u8>,
+    pub created_at: NaiveDateTime,
 }
 
 impl ChallengeState {
