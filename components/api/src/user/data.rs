@@ -77,18 +77,13 @@ async fn handler(
         val: Option<Option<String>>,
         user_vault: &db::models::user_vaults::UserVault,
     ) -> Result<Option<Vec<u8>>, ApiError> {
-        let val = match val {
-            None | Some(None) => None,
-            Some(Some(s)) => Some(super::seal(s, &user_vault.public_key)?),
-        };
-        Ok(val)
+        val.flatten()
+            .map(|s| crate::identify::seal(s, &user_vault.public_key))
+            .transpose()
     }
 
     fn hash(val: Option<Option<String>>) -> Option<Vec<u8>> {
-        match val {
-            None | Some(None) => None,
-            Some(Some(s)) => Some(super::hash(s)),
-        }
+        val.flatten().map(crate::identify::hash)
     }
 
     let cleaned_email = if let Some(Some(email)) = request.email.clone() {
@@ -112,17 +107,13 @@ async fn handler(
         e_state: seal(request.state.clone(), user_vault)?,
         e_email: seal(cleaned_email.clone(), user_vault)?,
         sh_email: hash(cleaned_email.clone()),
-        is_email_verified: match cleaned_email {
-            // Mark email as unverified if we're setting a new email
-            Some(Some(_)) => Some(false),
-            _ => None,
-        },
+        is_email_verified: cleaned_email.flatten().map(|_| false),
         ..Default::default()
     };
 
     let _: usize = db::user_vault::update(&state.db_pool, user_update).await?;
 
     Ok(Json(ApiResponseData {
-        data: "Succesful update".to_string(),
+        data: "Successful update".to_string(),
     }))
 }

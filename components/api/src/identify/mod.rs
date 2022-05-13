@@ -1,7 +1,5 @@
 pub mod commit;
-pub mod data;
 pub mod email;
-pub mod email_verify;
 mod livecheck;
 pub mod phone;
 pub mod verify;
@@ -34,6 +32,7 @@ pub struct EmailVerifyChallenge {
     pub email: String,
 }
 
+// TODO move these utils somewhere else
 pub fn hash(val: String) -> Vec<u8> {
     // TODO hmac
     sha256(val.as_bytes()).to_vec()
@@ -46,7 +45,7 @@ fn seal_untyped(val: String, pub_key: &[u8]) -> Result<EciesP256Sha256AesGcmSeal
     )?;
     Ok(val)
 }
-fn seal(val: String, pub_key: &[u8]) -> Result<Vec<u8>, ApiError> {
+pub fn seal(val: String, pub_key: &[u8]) -> Result<Vec<u8>, ApiError> {
     let val = crypto::seal::seal_ecies_p256_x963_sha256_aes_gcm(
         pub_key,
         val.as_str().as_bytes().to_vec(),
@@ -205,8 +204,6 @@ pub fn routes() -> web::Scope {
         .service(email::handler)
         .service(phone::handler)
         .service(verify::handler)
-        .service(data::handler)
         .service(commit::handler)
-        .service(email_verify::handler)
         .service(livecheck::handler)
 }

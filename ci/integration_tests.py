@@ -127,8 +127,8 @@ def test_identify_verify(request, tenant1):
     assert body["data"]["kind"] == "user_created"
     _set_cookies(request, r)
     
-def test_identify_data(request, tenant1): 
-    path = "identify/data"
+def test_user_data(request, tenant1): 
+    path = "user/data"
     data = {
         "first_name": "Flerp",
         "last_name": "Derp",
