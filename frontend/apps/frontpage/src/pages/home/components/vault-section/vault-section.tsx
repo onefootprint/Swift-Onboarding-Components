@@ -1,3 +1,4 @@
+import type { StaticImageData } from 'next/image';
 import Image from 'next/image';
 import React from 'react';
 import styled, { css } from 'styled';
@@ -11,7 +12,7 @@ type VaultSectionProps = {
   mainArticle: {
     content: string;
     imgAlt: string;
-    imgSrc: string;
+    imgSrc: StaticImageData;
     title: string;
   };
   subtitle: string;
@@ -25,7 +26,7 @@ const VaultSection = ({
   subtitle,
   title,
 }: VaultSectionProps) => (
-  <Container as="section" id="vault" sx={{ marginY: 11 }}>
+  <Container as="section" id="vault">
     <Inner>
       <Header>
         <Typography
@@ -38,7 +39,7 @@ const VaultSection = ({
         <Typography
           variant="display-1"
           color="primary"
-          sx={{ maxWidth: '620px', marginBottom: 9 }}
+          sx={{ maxWidth: '620px', marginBottom: 7 }}
         >
           {title}
         </Typography>
@@ -55,6 +56,7 @@ const VaultSection = ({
           alt={mainArticle.imgAlt}
           height={391}
           layout="responsive"
+          placeholder="blur"
           src={mainArticle.imgSrc}
           width={484}
         />
@@ -85,7 +87,11 @@ const Inner = styled.div`
     justify-content: center;
     margin: 0 auto;
     max-width: 960px;
-    padding-top: ${theme.spacing[11]}px;
+    padding: ${theme.spacing[10]}px 0;
+
+    ${media.greaterThan('lg')`
+      padding: ${theme.spacing[11]}px 0;
+    `}
   `}
 `;
 
@@ -116,6 +122,7 @@ const MainArticle = styled(Article)`
   ${({ theme }) => css`
     display: inline-grid;
     margin-bottom: ${theme.spacing[5]}px;
+    row-gap: ${theme.spacing[9]}px;
 
     ${media.greaterThan('lg')`
       column-gap: ${theme.spacing[9]}px;

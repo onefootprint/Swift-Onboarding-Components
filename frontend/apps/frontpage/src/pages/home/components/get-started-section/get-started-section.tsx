@@ -1,6 +1,10 @@
+import Image from 'next/image';
 import React from 'react';
 import styled, { css } from 'styled';
-import { Button, Container, Typography } from 'ui';
+import { Button, Container, media, Typography } from 'ui';
+
+import footprintLogo from '../../../../../public/images/footer/footprint-circle.png';
+import lighting from '../../../../../public/images/footer/lightning.png';
 
 type GetStartedSectionProps = {
   cta: string;
@@ -15,34 +19,117 @@ const GetStartedSection = ({
 }: GetStartedSectionProps) => (
   <Container id="get-started" as="section">
     <Inner>
-      <Typography
-        as="p"
-        color="quaternary"
-        sx={{ marginBottom: 5 }}
-        variant="display-2"
-      >
-        {title}
-      </Typography>
-      <Typography
-        as="p"
-        color="quaternary"
-        sx={{ marginBottom: 9 }}
-        variant="body-1"
-      >
-        {subtitle}
-      </Typography>
-      <Button variant="secondary">{cta}</Button>
+      <LogoContainer>
+        <Image
+          width={170}
+          height={155}
+          src={footprintLogo}
+          placeholder="blur"
+        />
+      </LogoContainer>
+      <ContentContainer>
+        <TitleContainer>
+          <Typography
+            as="h5"
+            color="primary"
+            sx={{ marginBottom: 5 }}
+            variant="display-2"
+          >
+            {title}
+          </Typography>
+          <TitleImageContainer>
+            <Image width={44} height={60} src={lighting} />
+          </TitleImageContainer>
+        </TitleContainer>
+        <Typography
+          as="div"
+          color="primary"
+          sx={{ marginBottom: 9 }}
+          variant="display-4"
+        >
+          {subtitle}
+        </Typography>
+        <Button size="large">{cta}</Button>
+      </ContentContainer>
     </Inner>
   </Container>
 );
 
 const Inner = styled.div`
   ${({ theme }) => css`
-    align-items: center;
+    background-color: ${theme.backgroundColor.quaternary};
+    border-radius: ${theme.borderRadius[1]}px;
+    margin-bottom: ${theme.spacing[10]}px;
+    padding: ${theme.spacing[9]}px ${theme.spacing[8]}px;
     display: flex;
     flex-direction: column;
-    padding-bottom: ${theme.spacing[11]}px;
-    text-align: center;
+    align-items: center;
+
+    ${media.greaterThan('md')`
+      display: flex;
+      flex-direction: row-reverse;
+      padding: ${theme.spacing[10]}px;
+    `}
+
+    ${media.greaterThan('lg')`
+      margin-bottom: ${theme.spacing[11]}px;
+    `}
+  `}
+`;
+
+const LogoContainer = styled.div`
+  ${({ theme }) => css`
+    margin-bottom: ${theme.spacing[9]}px;
+    width: 118px;
+    height: 107px;
+
+    ${media.greaterThan('md')`
+      flex: 1;
+      height: unset;
+      margin-bottom: unset;
+      text-align: right;
+      width: unset;
+    `}
+  `}
+`;
+
+const ContentContainer = styled.div`
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+
+  img {
+    display: none;
+  }
+
+  ${media.greaterThan('md')`
+    text-align: left;
+    align-items: start;
+  `}
+
+  ${media.between('md', 'lg')`
+    flex: 1.5;
+  `}
+
+  ${media.greaterThan('lg')`
+    flex: 1.2;
+  `}
+`;
+
+const TitleContainer = styled.div`
+  ${media.greaterThan('md')`
+    display: flex;
+  `}
+`;
+
+const TitleImageContainer = styled.div`
+  display: none;
+
+  ${media.greaterThan('md')`
+    margin-left: ${({ theme }) => theme.spacing[5]}px;
+    display: block;
   `}
 `;
 

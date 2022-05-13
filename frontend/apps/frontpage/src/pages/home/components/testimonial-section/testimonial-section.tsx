@@ -1,21 +1,22 @@
 import IcoQuote40 from 'icons/ico/ico-quote-40';
+import type { StaticImageData } from 'next/image';
 import Image from 'next/image';
 import React from 'react';
-import styled from 'styled';
-import { Container, Typography } from 'ui';
+import styled, { css } from 'styled';
+import { Container, media, Typography } from 'ui';
 
 type TestimonialSectionProps = {
   author: {
     name: string;
     imgAlt: string;
-    imgSrc: string;
+    imgSrc: StaticImageData;
     role: string;
   };
   content: string;
 };
 
 const TestimonialSection = ({ author, content }: TestimonialSectionProps) => (
-  <Container id="testimonial" as="section" sx={{ marginY: 11 }}>
+  <Container id="testimonial" as="section">
     <Inner>
       <IcoQuote40 color="accent" />
       <Typography
@@ -33,6 +34,7 @@ const TestimonialSection = ({ author, content }: TestimonialSectionProps) => (
           layout="fixed"
           src={author.imgSrc}
           width={48}
+          placeholder="blur"
         />
         <AuthorContentContainer>
           <Typography variant="heading-3" color="primary" as="div">
@@ -48,12 +50,19 @@ const TestimonialSection = ({ author, content }: TestimonialSectionProps) => (
 );
 
 const Inner = styled.div`
-  align-items: center;
-  display: flex;
-  flex-direction: column;
-  margin: 0 auto;
-  max-width: 800px;
-  text-align: center;
+  ${({ theme }) => css`
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    margin: 0 auto;
+    max-width: 800px;
+    padding: ${theme.spacing[10]}px 0;
+    text-align: center;
+
+    ${media.greaterThan('lg')`
+      padding: ${theme.spacing[11]}px 0;
+    `}
+  `}
 `;
 
 const AuthorContainer = styled.div`

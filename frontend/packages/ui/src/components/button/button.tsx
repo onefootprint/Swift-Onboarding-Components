@@ -14,7 +14,7 @@ export type ButtonProps = {
   disabled?: boolean;
   fullWidth?: boolean;
   onPress?: (event: React.MouseEvent<HTMLButtonElement>) => void;
-  size?: 'default' | 'compact';
+  size?: 'default' | 'compact' | 'large';
   testID?: string;
   type?: 'button' | 'submit';
   variant?: 'primary' | 'secondary';
@@ -45,7 +45,7 @@ const Button = ({
 );
 
 const Container = styled.button<{
-  size: 'default' | 'compact';
+  size: 'default' | 'compact' | 'large';
   variant: 'primary' | 'secondary';
   fullWidth?: boolean;
 }>`
@@ -85,6 +85,16 @@ const Container = styled.button<{
       line-height: ${theme.typography['label-3'].lineHeight};
       padding: ${theme.spacing[1] + theme.spacing[3]}px ${theme.spacing[7]}px;
     `}
+
+    ${({ theme, size }) =>
+      size === 'large' &&
+      css`
+        font-family: ${theme.typography['label-1'].fontFamily};
+        font-size: ${theme.typography['label-1'].fontSize};
+        font-weight: ${theme.typography['label-1'].fontWeight};
+        line-height: ${theme.typography['label-1'].lineHeight};
+        padding: ${theme.spacing[5]}px ${theme.spacing[7]}px;
+      `}
 
   ${({ fullWidth }) =>
     fullWidth &&

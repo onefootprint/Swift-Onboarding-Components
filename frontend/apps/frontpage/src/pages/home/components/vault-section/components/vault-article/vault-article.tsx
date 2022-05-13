@@ -17,7 +17,7 @@ const VaultArticle = ({ title, content }: VaultArticleProps) => (
     <Typography
       as="p"
       color="primary"
-      sx={{ marginBottom: 4 }}
+      sx={{ marginBottom: 5 }}
       variant="heading-3"
     >
       {title}
@@ -30,7 +30,7 @@ const VaultArticle = ({ title, content }: VaultArticleProps) => (
 
 const CircleContainer = styled.div`
   ${({ theme }) => css`
-    padding-bottom: ${theme.spacing[7]}px;
+    margin-bottom: ${theme.spacing[8]}px;
   `}
 `;
 

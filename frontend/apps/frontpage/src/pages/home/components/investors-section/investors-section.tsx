@@ -1,11 +1,12 @@
+import type { StaticImageData } from 'next/image';
 import Image from 'next/image';
 import React from 'react';
 import styled, { css } from 'styled';
-import { Container, Typography } from 'ui';
+import { Container, media, Typography } from 'ui';
 
 type InvestorsSectionProps = {
   imgAlt: string;
-  imgSrc: string;
+  imgSrc: StaticImageData;
   subtitle: string;
   title: string;
 };
@@ -29,7 +30,7 @@ const InvestorsSection = ({
       <Typography
         as="p"
         color="quaternary"
-        sx={{ marginBottom: 10, maxWidth: '510px' }}
+        sx={{ maxWidth: '510px' }}
         variant="display-2"
       >
         {subtitle}
@@ -40,6 +41,7 @@ const InvestorsSection = ({
         alt={imgAlt}
         height={225}
         layout="responsive"
+        placeholder="blur"
         src={imgSrc}
         width={700}
       />
@@ -48,20 +50,23 @@ const InvestorsSection = ({
 );
 
 const ContentContainer = styled.div`
-  ${({ theme }) => css`
-    align-items: center;
-    display: flex;
-    flex-direction: column;
-    padding-top: ${theme.spacing[11]}px;
-    text-align: center;
-  `}
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  text-align: center;
 `;
 
 const ImageContainer = styled.div`
   ${({ theme }) => css`
     margin: 0 auto;
+    margin-top: ${theme.spacing[9]}px;
+    margin-bottom: ${theme.spacing[10]}px;
     max-width: 700px;
-    padding-bottom: ${theme.spacing[12]}px;
+
+    ${media.greaterThan('lg')`
+      margin-top: ${theme.spacing[10]}px;
+      margin-bottom: ${theme.spacing[11]}px;
+    `}
   `}
 `;
 

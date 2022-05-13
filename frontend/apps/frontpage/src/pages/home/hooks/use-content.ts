@@ -1,9 +1,95 @@
+import article1 from '../../../../public/images/article-1.png';
+import article2 from '../../../../public/images/article-2.png';
+import article3 from '../../../../public/images/article-3.png';
+import article4 from '../../../../public/images/article-4.png';
+import article5 from '../../../../public/images/article-5.png';
+import article6 from '../../../../public/images/article-6.png';
+import vaultMainArticle from '../../../../public/images/article-vault.png';
+import investors from '../../../../public/images/investors-logo.png';
+import testimonialAuthor from '../../../../public/images/testimonial-author.png';
+
 const useContent = () => ({
+  hero: {
+    title: 'Frictionless Identity. High Integrity.',
+    subtitle:
+      'Footprint is a unified platform bringing together one-click KYC and a PII Vault.',
+    cta: 'Join the waitlist',
+  },
+  playground: {
+    title: 'Bringing back trust.',
+    subtitle: 'Why Footprint?',
+    tooltips: [
+      'We got you covered! 😎',
+      'We got you covered! 😎',
+      'We got you covered! 😎',
+      'We got you covered! 😎',
+      'We got you covered! 😎',
+      'We got you covered! 😎',
+      'We got you covered! 😎',
+      'We got you covered! 😎',
+      'We got you covered! 😎',
+      'We got you covered! 😎',
+    ],
+  },
+  qualities: {
+    title: 'Accurate, portable, and secure user verification',
+    subtitle: 'A better, more secure experience',
+    items: [
+      {
+        content:
+          'Footprint’s privacy-preserving technology lets you satisfy KYC without needing to ever touch PII through our architecture. Utilize our PII vault which by default uses secure enclaves to protect data instead of building your own.',
+        imgAlt: '',
+        imgSrc: article1,
+        title: 'Best-in-class security',
+      },
+      {
+        content:
+          'Footprint’s ecosystem creates a feedback loop on actors to increase accuracy through peer-to-peer verification, and our liveness scanning ensures only real people are applying. We use the most cutting edge biometric scans to ensure real people are making accounts',
+        imgAlt: '',
+        imgSrc: article2,
+        title: 'Unprecedented accuracy',
+      },
+      {
+        content:
+          'Footprint’s technology combines storage and verification. Our solution is up to 2x cheaper than traditional methods to verify and store PII because we are able to condense what today requires multiple tools into one.',
+        imgAlt: '',
+        imgSrc: article3,
+        title: 'More functionality, less dollars',
+      },
+    ],
+  },
+  advantages: {
+    title: 'A new, comprehensive approach to KYC & PII storage',
+    subtitle: 'Our advantages',
+    items: [
+      {
+        content:
+          'Our one-click flow increases conversion by dramatically reducing time to account creation.',
+        imgAlt: '',
+        imgSrc: article4,
+        title: '12x faster',
+      },
+      {
+        content:
+          "With three lines of code, you'll have KYC and PII Vaulting running in less than a day. It's that simple.",
+        imgAlt: '',
+        imgSrc: article5,
+        title: '10x developer experience',
+      },
+      {
+        content:
+          'Say goodbye to needing separate KYC and Tokenization tools. We do both in-one, and pass along the savings.',
+        imgAlt: '',
+        imgSrc: article6,
+        title: '2x cheaper',
+      },
+    ],
+  },
   testimonial: {
     author: {
       name: 'Joshua Browder',
       imgAlt: 'Picture of Joshua Browder',
-      imgSrc: '/images/testimonial-author.png',
+      imgSrc: testimonialAuthor,
       role: 'Founder & CEO of DoNotPay',
     },
     content:
@@ -17,7 +103,7 @@ const useContent = () => ({
     articles: {
       main: {
         imgAlt: 'Image of a system',
-        imgSrc: '/images/article-vault.png',
+        imgSrc: vaultMainArticle,
         title: "Privacy and security at your engineering team's fingertips",
         content:
           "Instead of building or buying your own data vaulting system, use Footprint's integrated vaulting to achieve strong cryptographic data protection for your most sensitive data.",
@@ -43,7 +129,7 @@ const useContent = () => ({
   },
   investors: {
     imgAlt: 'An image with all the investors',
-    imgSrc: '/images/investors-logo.png',
+    imgSrc: investors,
     subtitle: 'Backed by the best founders & investors',
     title: 'Our investors',
   },

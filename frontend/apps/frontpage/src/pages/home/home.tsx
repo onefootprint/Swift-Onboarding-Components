@@ -1,21 +1,19 @@
-import dynamic from 'next/dynamic';
 import Head from 'next/head';
 import React from 'react';
 import styled, { css } from 'styled';
-import { Box } from 'ui';
+import { media } from 'ui';
 
-import Articles from './components/articles';
 import Footer from './components/footer';
 import GetStartedSection from './components/get-started-section';
-import Hero from './components/hero';
+import Hero from './components/hero-section';
+import HighlightsGradient from './components/highlights-gradient';
+import HighlightsSection from './components/highlights-section';
 import InvestorsSection from './components/investors-section';
 import Navbar from './components/navbar';
+import PlaygroundSection from './components/playground-section';
 import TestimonialSection from './components/testimonial-section';
 import VaultSection from './components/vault-section';
-import S from './home.styles';
 import useContent from './hooks/use-content';
-
-const Why = dynamic(() => import('./components/why'));
 
 const Home = () => {
   const content = useContent();
@@ -24,78 +22,34 @@ const Home = () => {
       <Head>
         <title>Footprint</title>
       </Head>
-      <S.SectionSpacing>
-        <S.HeaderGradient>
-          <Navbar ctaText="Join the waitlist" logoAltText="Footprint Logo's" />
-          <Hero
-            ctaText="Join the waitlist"
-            imageAltText="An image of Footprint System"
-            subtitleText="Footprint is a unified platform bringing together one-click KYC and a PII Vault."
-            titleText="Frictionless Identity. High Integrity."
-          />
-        </S.HeaderGradient>
-      </S.SectionSpacing>
-      <S.SectionSpacing>
-        <Why titleText="Bringing back trust." subtitleText="Why Footprint?" />
-      </S.SectionSpacing>
-      <Box sx={{ marginBottom: 11 }}>
-        <Articles
-          titleText="Accurate, portable, and secure user verification"
-          subtitleText="A better, more secure experience"
-          items={[
-            {
-              titleText: 'Best-in-class security',
-              descriptionText:
-                'Footprint’s privacy-preserving technology lets you satisfy KYC without needing to ever touch PII through our architecture. Utilize our PII vault which by default uses secure enclaves to protect data instead of building your own.',
-              imageAltText: '',
-              imagePath: '/images/article-1.png',
-            },
-            {
-              titleText: 'Unprecedented accuracy',
-              descriptionText:
-                'Footprint’s ecosystem creates a feedback loop on actors to increase accuracy through peer-to-peer verification, and our liveness scanning ensures only real people are applying. We use the most cutting edge biometric scans to ensure real people are making accounts',
-              imageAltText: '',
-              imagePath: '/images/article-2.png',
-            },
-            {
-              titleText: 'More functionality, less dollars',
-              descriptionText:
-                'Footprint’s technology combines storage and verification. Our solution is up to 2x cheaper than traditional methods to verify and store PII because we are able to condense what today requires multiple tools into one.',
-              imageAltText: '',
-              imagePath: '/images/article-3.png',
-            },
-          ]}
+      <HeaderContainer>
+        <Navbar ctaText="Join the waitlist" logoAltText="Footprint Logo's" />
+        <Hero
+          cta={content.hero.cta}
+          imgAlt="An image of Footprint System"
+          subtitle={content.hero.subtitle}
+          title={content.hero.title}
         />
-      </Box>
-      <Box sx={{ marginBottom: 12 }}>
-        <Articles
-          titleText="A new, comprehensive approach to KYC & PII storage"
-          subtitleText="Our advantages"
-          items={[
-            {
-              titleText: '12x faster',
-              descriptionText:
-                'Our one-click flow increases conversion by dramatically reducing time to account creation.',
-              imageAltText: '',
-              imagePath: '/images/article-4.png',
-            },
-            {
-              titleText: '10x developer experience',
-              descriptionText:
-                "With three lines of code, you'll have KYC and PII Vaulting running in less than a day. It's that simple.",
-              imageAltText: '',
-              imagePath: '/images/article-5.png',
-            },
-            {
-              titleText: '2x cheaper',
-              descriptionText:
-                'Say goodbye to needing separate KYC and Tokenization tools. We do both in-one, and pass along the savings.',
-              imageAltText: '',
-              imagePath: '/images/article-6.png',
-            },
-          ]}
+      </HeaderContainer>
+      <WhyContainer>
+        <PlaygroundSection
+          title={content.playground.title}
+          subtitle={content.playground.subtitle}
         />
-      </Box>
+      </WhyContainer>
+      <HighlightsContainer>
+        <HighlightsGradient />
+        <HighlightsSection
+          items={content.qualities.items}
+          subtitle={content.qualities.subtitle}
+          title={content.qualities.title}
+        />
+        <HighlightsSection
+          items={content.advantages.items}
+          subtitle={content.advantages.subtitle}
+          title={content.advantages.title}
+        />
+      </HighlightsContainer>
       <TestimonialSection
         author={content.testimonial.author}
         content={content.testimonial.content}
@@ -128,9 +82,69 @@ const Home = () => {
   );
 };
 
+const HeaderContainer = styled.div`
+  ${({ theme }) => css`
+    position: relative;
+    padding-bottom: ${theme.spacing[11]}px;
+    background: linear-gradient(
+      180deg,
+      #e1ddf9 0%,
+      #e4e1fa 11.11%,
+      #e8e4fa 22.22%,
+      #ebe8fb 33.33%,
+      #eeecfc 44.44%,
+      #f2f0fc 55.56%,
+      #f5f4fd 66.67%,
+      #f8f7fe 77.78%,
+      #fcfbfe 88.89%,
+      #ffffff 100%
+    );
+    ${media.greaterThan('lg')`
+      padding-bottom: ${theme.spacing[12]}px;
+    `}
+  `}
+`;
+
+const WhyContainer = styled.div`
+  position: relative;
+  padding-bottom: 100px;
+
+  ${media.between('sm', 'lg')`
+    padding-bottom: 150px;
+  `}
+
+  ${media.between('lg', 'xl')`
+    padding-bottom: 200px;
+  `}
+
+  ${media.greaterThan('xl')`
+    padding-bottom: 290px;
+  `}
+`;
+
+const HighlightsContainer = styled.div`
+  ${({ theme }) => css`
+    background: ${theme.backgroundColor.secondary};
+    display: grid;
+    padding: ${theme.spacing[10]}px 0;
+    position: relative;
+    row-gap: ${theme.spacing[10]}px;
+
+    ${media.greaterThan('lg')`
+      padding: ${theme.spacing[11]}px 0;
+      row-gap: ${theme.spacing[11]}px;
+    `}
+  `}
+`;
+
 const FooterContainer = styled.div`
   ${({ theme }) => css`
+    padding-top: ${theme.spacing[10]}px;
     background: ${theme.backgroundColor.tertiary};
+
+    ${media.greaterThan('lg')`
+      padding-top: ${theme.spacing[11]}px;
+    `}
   `}
 `;
 
