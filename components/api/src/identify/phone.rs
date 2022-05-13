@@ -1,4 +1,3 @@
-use crate::auth::client_public_key::PublicTenantAuthContext;
 use crate::auth::login_session::LoginSessionState;
 use crate::errors::ApiError;
 use crate::identify::{clean_phone_number, phone_number_last_two, send_phone_challenge};
@@ -19,12 +18,11 @@ pub struct ChallengeResponse {
 }
 
 #[api_v2_operation]
-#[post("/challenge")]
+#[post("/phone")]
 /// Issues a text message challenge to a given phone_number.
 pub async fn handler(
     request: Json<ChallengeRequest>,
     session: Session,
-    _tenant_auth: PublicTenantAuthContext,
     state: web::Data<State>,
 ) -> actix_web::Result<Json<ApiResponseData<ChallengeResponse>>, ApiError> {
     // clean phone number

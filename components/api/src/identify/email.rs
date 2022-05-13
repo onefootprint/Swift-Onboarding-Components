@@ -1,11 +1,10 @@
-use crate::auth::client_public_key::PublicTenantAuthContext;
 use crate::auth::login_session::LoginSessionState;
 use crate::errors::ApiError;
 use crate::identify::clean_email;
 use crate::types::success::ApiResponseData;
 use crate::State;
 use actix_session::Session;
-use paperclip::actix::{api_v2_operation, web, web::Json, Apiv2Schema};
+use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 
 use super::{phone_number_last_two, send_phone_challenge_to_user};
 
@@ -23,13 +22,13 @@ pub enum IdentifyResponse {
 }
 
 #[api_v2_operation]
+#[post("/email")]
 /// Identify a user by email address. If identification is successful, this endpoint issues a text
 /// challenge to the user's phone number & returns HTTP 200 with an IdentifyResponse of the last
 /// two digits of the user's phone #. If the user is not found, returns IdentifyResponse of user_not_found
 pub async fn handler(
     request: Json<IdentifyRequest>,
     session: Session,
-    _tenant_auth: PublicTenantAuthContext,
     state: web::Data<State>,
 ) -> actix_web::Result<Json<ApiResponseData<IdentifyResponse>>, ApiError> {
     // clean email & look up existing user vault

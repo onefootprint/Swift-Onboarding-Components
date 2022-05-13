@@ -1,9 +1,9 @@
-pub mod challenge;
 pub mod commit;
 pub mod data;
+pub mod email;
 pub mod email_verify;
-pub mod init;
 mod livecheck;
+pub mod phone;
 pub mod verify;
 
 use crate::auth::login_session::ChallengeState;
@@ -202,8 +202,8 @@ fn build_email_challenge_content_body(contents: String) -> EmailContent {
 
 pub fn routes() -> web::Scope {
     web::scope("/identify")
-        .service(web::resource("").route(web::post().to(init::handler)))
-        .service(challenge::handler)
+        .service(email::handler)
+        .service(phone::handler)
         .service(verify::handler)
         .service(data::handler)
         .service(commit::handler)

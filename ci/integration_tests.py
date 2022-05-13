@@ -83,8 +83,8 @@ def tenant2():
         "sk": client_secret_key
     }
 
-def test_identify_init(tenant1, request):
-    path = "identify"
+def test_identify_email(request):
+    path = "identify/email"
     print(url(path))
     email = _gen_random_email()
     request.config.cache.set("email", email)
@@ -94,14 +94,13 @@ def test_identify_init(tenant1, request):
     r = requests.post(
         url(path),
         json=data,
-        headers=_client_pub_key_headers(tenant1["pk"]),
     )
     body = _assert_response(r)
     assert body["data"] == "user_not_found"
 
 
-def test_challenge(request, tenant1):
-    path = "identify/challenge"
+def test_identify_phone(request):
+    path = "identify/phone"
     last_two = _gen_random_n_digit_number(2)
     phone_number = f"+1 (555) 555-01{last_two}"
     request.config.cache.set("phone_number", phone_number)
@@ -109,7 +108,6 @@ def test_challenge(request, tenant1):
     r = requests.post(
         url(path),
         json=data,
-        headers=_client_pub_key_headers(tenant1["pk"]),
     )
     body = _assert_response(r)
     assert body["data"]["phone_number_last_two"] == last_two
@@ -183,7 +181,7 @@ def test_identify_commit(request, tenant1):
 def test_identify_repeat_customer_via_email(request, tenant2):
     # Identify the user by email
     request.config.cache.set("cookies", None)  # Remove cookies from previous test
-    path = "identify"
+    path = "identify/email"
     print(url(path))
     email = request.config.cache.get("email", None)
     phone_number = request.config.cache.get("phone_number", None)
