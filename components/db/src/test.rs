@@ -16,21 +16,19 @@ async fn test_db() {
         public_key: "".as_bytes().to_vec(),
         e_private_key: "".as_bytes().to_vec(),
     };
-    let tenant = crate::tenant::init(&pool, tenant)
+    let _tenant = crate::tenant::init(&pool, tenant)
         .await
         .expect("couldn't create tenant");
-    let user = crate::models::user_vaults::NewUserVault {
+    let user_vault = crate::models::user_vaults::NewUserVault {
         e_private_key: "private key".as_bytes().to_vec(),
         public_key: "public key".as_bytes().to_vec(),
         id_verified: crate::models::types::Status::Incomplete,
         e_phone_number: "".as_bytes().to_vec(),
         sh_phone_number: "".as_bytes().to_vec(),
-        e_email: None,
-        sh_email: None,
-    };
-    let (user_vault, _) = crate::user_vault::init(&pool, user, tenant.id)
-        .await
-        .expect("couldnt init user vault");
+    }
+    .save(&pool)
+    .await
+    .expect("couldn't init user vault");
 
     let sh_phone_number = crypto::random::gen_random_alphanumeric_code(16)
         .as_bytes()
@@ -40,7 +38,6 @@ async fn test_db() {
         crate::models::user_vaults::UpdateUserVault {
             id: user_vault.id.clone(),
             sh_phone_number: Some(sh_phone_number.to_vec()),
-            id_verified: crate::models::types::Status::Processing,
             ..Default::default()
         },
     )
