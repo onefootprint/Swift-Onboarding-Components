@@ -44,6 +44,7 @@ pub async fn health_check(pool: &Pool) -> Result<(), DbError> {
     Ok(())
 }
 
+pub mod access_event;
 pub mod onboarding;
 pub mod session;
 pub mod tenant;

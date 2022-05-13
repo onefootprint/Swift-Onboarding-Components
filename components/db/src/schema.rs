@@ -5,7 +5,7 @@ table! {
     access_events (id) {
         id -> Uuid,
         onboarding_id -> Varchar,
-        data_kind -> Nullable<Data_kind>,
+        data_kind -> Data_kind,
         timestamp -> Timestamp,
         created_at -> Timestamp,
         updated_at -> Timestamp,

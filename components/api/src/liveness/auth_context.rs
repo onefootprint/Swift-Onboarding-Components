@@ -18,7 +18,7 @@ use crate::auth::AuthError;
     description = "Session state cookie"
 )]
 pub struct LivenessVerificationAuthContext {
-    session_info: db::models::sessions::Session,
+    _session_info: db::models::sessions::Session,
     pub local_state: WebAuthnCookieSessionState,
 }
 
@@ -85,7 +85,7 @@ impl FromRequest for LivenessVerificationAuthContext {
                 db::session::get_by_session_id(&pool, local_state.session_id.clone()).await?;
 
             Ok(Self {
-                session_info,
+                _session_info: session_info,
                 local_state,
             })
         })

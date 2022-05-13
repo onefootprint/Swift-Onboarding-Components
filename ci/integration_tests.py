@@ -205,7 +205,7 @@ def test_decrypt(request, tenant1):
     print(url(path))
     data = {
         "footprint_user_id": request.config.cache.get("fp_user_id", None),
-        "attributes": ["first_name"]
+        "attributes": ["first_name", "email"]
     }
     print(data)
     r = requests.post(url(path),
@@ -215,6 +215,35 @@ def test_decrypt(request, tenant1):
     )
     print(r.content)
     assert r.status_code == 200
-    first_name = r.json()["data"]["attributes"]["first_name"]
-    assert first_name
-    assert first_name == "Flerp"
+    data = r.json()["data"]["attributes"]
+    assert data["first_name"] == "Flerp"
+    assert data["email"] == request.config.cache.get("email", None)
+
+
+def test_access_events_list(request, tenant1):
+    fp_user_id = request.config.cache.get("fp_user_id", None)
+    path = f"vault/access_events?footprint_user_id={fp_user_id}"
+    print(url(path))
+    r = requests.get(
+        url(path),
+        cookies=request.config.cache.get("cookies", None),        
+        headers=_client_priv_key_headers(tenant1["sk"]),  
+    )
+    print(r.content)
+    assert r.status_code == 200
+    access_events = r.json()["data"]["events"]
+    assert len(access_events) == 2
+    assert set(i["data_kind"] for i in access_events) == {"first_name", "email"}
+
+    # Test filtering on kind
+    path = f"vault/access_events?footprint_user_id={fp_user_id}&data_kind=email"
+    r = requests.get(
+        url(path),
+        cookies=request.config.cache.get("cookies", None),
+        headers=_client_priv_key_headers(tenant1["sk"]),
+    )
+    print(r.content)
+    assert r.status_code == 200
+    access_events = r.json()["data"]["events"]
+    assert len(access_events) == 1
+    assert access_events[0]["data_kind"] == "email"

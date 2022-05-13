@@ -61,6 +61,7 @@ paperclip = { version = "0.7.0", features = [
     "swagger-ui",
     "actix4-validator",
     "uuid",
+    "chrono",
     "actix-session",
 ] }
 mime = "0.3.16"

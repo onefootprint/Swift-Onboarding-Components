@@ -1,50 +1,11 @@
 use crate::response::success::ApiResponseData;
+use crate::vault::types::UserVaultFieldKind;
 use crate::State;
 use crate::{auth::client_secret_key::SecretTenantAuthContext, errors::ApiError};
 use db::models::access_events::NewAccessEvent;
-use db::models::types::DataKind;
 use db::models::user_vaults::UserVault;
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 use std::collections::{HashMap, HashSet};
-use strum_macros::{self, Display};
-
-#[derive(
-    Debug,
-    Clone,
-    Apiv2Schema,
-    serde::Deserialize,
-    serde::Serialize,
-    Eq,
-    PartialEq,
-    Hash,
-    Ord,
-    PartialOrd,
-    Display,
-)]
-#[serde(rename_all = "snake_case")]
-pub enum UserVaultFieldKind {
-    FirstName,
-    LastName,
-    Ssn,
-    Dob,
-    StreetAddress,
-    City,
-    State,
-}
-
-impl Into<DataKind> for UserVaultFieldKind {
-    fn into(self) -> DataKind {
-        match self {
-            UserVaultFieldKind::FirstName => DataKind::FirstName,
-            UserVaultFieldKind::LastName => DataKind::LastName,
-            UserVaultFieldKind::Ssn => DataKind::Ssn,
-            UserVaultFieldKind::Dob => DataKind::Dob,
-            UserVaultFieldKind::StreetAddress => DataKind::StreetAddress,
-            UserVaultFieldKind::City => DataKind::City,
-            UserVaultFieldKind::State => DataKind::State,
-        }
-    }
-}
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
@@ -103,6 +64,8 @@ async fn decrypt_field(
         UserVaultFieldKind::StreetAddress => vault.e_street_address,
         UserVaultFieldKind::City => vault.e_city,
         UserVaultFieldKind::State => vault.e_state,
+        UserVaultFieldKind::Email => vault.e_email,
+        UserVaultFieldKind::PhoneNumber => Some(vault.e_phone_number),
     };
     // Create an AccessEvent log showing that the tenant accessed the vault
     NewAccessEvent {
