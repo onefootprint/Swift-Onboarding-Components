@@ -50,8 +50,6 @@ pub enum ApiError {
     ChallengeNotValid,
     #[error("missing_fields_required_for_user_signup {0}")]
     UserMissingRequiredFields(String),
-    #[error("user_does_not_exist")]
-    UserDoesntExist,
     #[error("user_does_not_exist_for_email_challenge")]
     UserDoesntExistForEmailChallenge,
     #[error("email_challenge_decrpytion_error")]
@@ -106,7 +104,6 @@ impl actix_web::ResponseError for ApiError {
             ApiError::InvalidJsonBody(_) => actix_web::http::StatusCode::BAD_REQUEST,
             ApiError::ChallengeNotValid => actix_web::http::StatusCode::BAD_REQUEST,
             ApiError::UserMissingRequiredFields(_) => actix_web::http::StatusCode::BAD_REQUEST,
-            ApiError::UserDoesntExist => actix_web::http::StatusCode::BAD_REQUEST,
             ApiError::UserDoesntExistForEmailChallenge => actix_web::http::StatusCode::BAD_REQUEST,
             ApiError::EmailChallengeDecryptionError => actix_web::http::StatusCode::BAD_REQUEST,
             ApiError::EmailChallengeExpired => actix_web::http::StatusCode::BAD_REQUEST,

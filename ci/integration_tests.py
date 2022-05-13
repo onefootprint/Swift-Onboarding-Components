@@ -113,7 +113,7 @@ def test_identify_phone(request):
     assert body["data"]["phone_number_last_two"] == last_two
     _set_cookies(request, r)
 
-def test_identify_verify(request, tenant1):
+def test_identify_verify(request):
     path = "identify/verify"
     print(url(path))
     data = {"code": TEST_CHALLENGE_CODE}
@@ -138,7 +138,7 @@ def test_onboard_init(request, tenant1):
     assert set(body["data"]["missing_attributes"]) == {"first_name", "last_name", "date_of_birth", "ssn", "street_address", "city", "state"}
     _assert_no_cookies(r)
     
-def test_user_data(request, tenant1): 
+def test_user_data(request):
     path = "user/data"
     data = {
         "first_name": "Flerp",
@@ -276,30 +276,6 @@ def test_access_events_list(request, tenant1):
     assert len(access_events) == 1
     assert access_events[0]["data_kind"] == "email"
     _assert_no_cookies(r)
-
-def test_login(request):
-    # Initiate the login challenge. Could initiate with email too
-    phone_number = request.config.cache.get("phone_number", None)
-    path = f"user/login"
-    print(url(path))
-    r = requests.post(
-        url(path),
-        json=dict(phone_number=phone_number),
-    )
-    body = _assert_response(r)
-    assert body["data"]["phone_number_last_two"] == phone_number[-2:]
-    _set_cookies(request, r)
-
-    # Respond to the login challenge
-    path = f"user/login/verify"
-    print(url(path))
-    r = requests.post(
-        url(path),
-        cookies=request.config.cache.get("cookies", None),
-        json=dict(code=TEST_CHALLENGE_CODE),
-    )
-    _assert_response(r)
-    _set_cookies(request, r)
 
 def test_logged_in_user_detail(request):
     # Get the user detail using the logged in context
