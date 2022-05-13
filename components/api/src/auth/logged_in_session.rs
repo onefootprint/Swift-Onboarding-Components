@@ -15,8 +15,7 @@ use std::pin::Pin;
     name = "Cookie",
     description = "Logged in session state cookie, set by successful call to /verify"
 )]
-/// Logged in session context sets encrypted state that authenticates the client and allows hte
-/// server to quickly look up the relevant user information
+/// Logged in session context sets encrypted state that authenticates the client as a user.
 pub struct LoggedInSessionContext {
     user_vault: UserVault,
     pub session_id: String,

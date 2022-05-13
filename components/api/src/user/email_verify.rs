@@ -21,8 +21,9 @@ pub struct EmailVerifyChallenge {
 
 #[api_v2_operation]
 #[post("/email/verify")]
-/// Async verification of user email address. This endpoint will not be used by the client and instead
-/// will be accessed via a user to validate their email
+/// Used to asynchronously verify a user's email address.
+/// Requires the hash of the email and the encrypted email challenge, which are sent to the user's
+/// email.
 async fn handler(
     state: web::Data<State>,
     request: Json<EmailVerifyRequest>,

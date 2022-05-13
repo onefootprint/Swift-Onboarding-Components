@@ -19,7 +19,9 @@ pub struct ChallengeResponse {
 
 #[api_v2_operation]
 #[post("/phone")]
-/// Issues a text message challenge to a given phone_number.
+/// Initiates a log in for a user with the provided phone number. Can be used regardless of
+/// whether a user vault exists with this phone number. Sends a challenge to the phone number
+/// and returns an HTTP 200.
 pub async fn handler(
     request: Json<ChallengeRequest>,
     session: Session,

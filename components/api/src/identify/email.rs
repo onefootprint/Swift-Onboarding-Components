@@ -23,9 +23,9 @@ pub enum IdentifyResponse {
 
 #[api_v2_operation]
 #[post("/email")]
-/// Identify a user by email address. If identification is successful, this endpoint issues a text
-/// challenge to the user's phone number & returns HTTP 200 with an IdentifyResponse of the last
-/// two digits of the user's phone #. If the user is not found, returns IdentifyResponse of user_not_found
+/// Attempt to log a user in by email address. Only if there already exists a user vault with this email,
+/// sends a challenge to the user's phone number and returns HTTP 200 with an IdentifyResponse including
+/// the last two digits of the user's phone number. If the user is not found, returns IdentifyResponse of user_not_found
 pub async fn handler(
     request: Json<IdentifyRequest>,
     session: Session,

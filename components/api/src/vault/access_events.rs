@@ -23,6 +23,9 @@ struct AccessEventResponse {
 
 #[api_v2_operation]
 #[get("/access_events")]
+/// Allows a tenant to view a list of AccessEvent logs for a specific user's data. Optionally
+/// allows filtering on data_kind.
+/// Requires tenant secret key auth.
 fn handler(
     state: web::Data<State>,
     request: web::Query<AccessEventRequest>,

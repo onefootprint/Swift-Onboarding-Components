@@ -21,6 +21,9 @@ struct AccessEventResponse {
 
 #[api_v2_operation]
 #[get("/access_events")]
+/// Returns a list of AccessEvent logs that show which tenants have viewed the logged-in user's
+/// data. Optionally allows filtering on data_kind
+/// Requires user authentication sent in the cookie after a successful /identify/verify call
 fn handler(
     state: web::Data<State>,
     request: web::Query<AccessEventRequest>,

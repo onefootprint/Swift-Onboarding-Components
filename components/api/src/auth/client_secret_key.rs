@@ -16,6 +16,8 @@ use super::AuthError;
     name = "X-Client-Secret-Key",
     description = "The client's secret key"
 )]
+/// SecretTenantAuthContext extracts a tenant's public key from the X-Client-Secret-Key header
+/// which authenticates the client as a tenant.
 pub struct SecretTenantAuthContext {
     tenant: Tenant,
 }

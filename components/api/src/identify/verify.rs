@@ -32,8 +32,11 @@ struct VerifyResponse {
 
 #[api_v2_operation]
 #[post("/verify")]
-/// Verify an SMS challenge sent to a user. If successful, this endpoint sets relevant cookies
-/// that allow the client to update the user vault (/identify/data) and finalize user onboarding (/identify/commit)
+/// Used to verify the two-factor challenge sent to a phone number. If the challenge code matches
+/// what was sent to the phone number, we will get or create the user vault associated with this
+/// phone number. Returns an HTTP 200 and specifies whether a user was created or inherited. Also
+/// sets some session state in the cookie that allows the client to update the logged-in user vault
+/// and onboard the user vault onto new tenants.
 async fn handler(
     state: web::Data<State>,
     session: Session,

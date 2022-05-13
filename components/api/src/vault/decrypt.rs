@@ -21,6 +21,9 @@ struct UserDecryptResponse {
 
 #[api_v2_operation]
 #[post("/decrypt")]
+/// Allows a tenant to decrypt a specific user's data. The user requested must be onboarded onto
+/// the requesting tenant.
+/// Requires tenant secret key auth.
 fn handler(
     state: web::Data<State>,
     auth: SecretTenantAuthContext,

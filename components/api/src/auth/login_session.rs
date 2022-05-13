@@ -8,7 +8,6 @@ use paperclip::actix::Apiv2Security;
 use serde::{Deserialize, Serialize};
 use std::pin::Pin;
 
-// TODO combine this with IdentifySession by having the client re-send tenant auth + email
 #[derive(Debug, Clone, Apiv2Security)]
 #[openapi(
     apiKey,
@@ -16,7 +15,8 @@ use std::pin::Pin;
     name = "Cookie",
     description = "Identify session state cookie, set by calls to /identify"
 )]
-/// LoginSessionContext stores encrypted state for the challenge issued to the user
+/// LoginSessionContext stores encrypted state for the challenge issued to the user during the
+/// process of logging them in.
 pub struct LoginSessionContext {
     pub state: LoginSessionState,
 }

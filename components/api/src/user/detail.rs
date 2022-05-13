@@ -43,7 +43,8 @@ impl ApiUser {
 }
 
 #[api_v2_operation]
-/// Issues a text message challenge to an existing user, identified by either phone number or email.
+/// Returns a decrypted profile for the logged-in user.
+/// Requires user authentication sent in the cookie after a successful /identify/verify call
 pub async fn handler(
     user_auth: LoggedInSessionContext,
     state: web::Data<State>,
