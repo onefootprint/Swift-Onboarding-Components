@@ -231,7 +231,7 @@ def test_identify_repeat_customer_via_email(request, tenant2):
     _assert_no_cookies(r)
     
 def test_decrypt(request, tenant1):
-    path = "vault/decrypt"
+    path = "tenant/decrypt"
     print(url(path))
     data = {
         "footprint_user_id": request.config.cache.get("fp_user_id", None),
@@ -251,7 +251,7 @@ def test_decrypt(request, tenant1):
 
 def test_access_events_list(request, tenant1):
     fp_user_id = request.config.cache.get("fp_user_id", None)
-    path = f"vault/access_events?footprint_user_id={fp_user_id}"
+    path = f"tenant/access_events?footprint_user_id={fp_user_id}"
     print(url(path))
     r = requests.get(
         url(path),
@@ -265,7 +265,7 @@ def test_access_events_list(request, tenant1):
     _assert_no_cookies(r)
 
     # Test filtering on kind
-    path = f"vault/access_events?footprint_user_id={fp_user_id}&data_kind=email"
+    path = f"tenant/access_events?footprint_user_id={fp_user_id}&data_kind=email"
     r = requests.get(
         url(path),
         cookies=request.config.cache.get("cookies", None),

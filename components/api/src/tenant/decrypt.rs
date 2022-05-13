@@ -1,5 +1,5 @@
+use crate::tenant::types::UserVaultFieldKind;
 use crate::types::success::ApiResponseData;
-use crate::vault::types::UserVaultFieldKind;
 use crate::State;
 use crate::{auth::client_secret_key::SecretTenantAuthContext, errors::ApiError};
 use db::models::access_events::NewAccessEvent;

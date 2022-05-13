@@ -4,7 +4,7 @@ pub mod types;
 use paperclip::actix::web;
 
 pub fn routes() -> web::Scope {
-    web::scope("/vault")
+    web::scope("/tenant")
         .service(decrypt::handler)
         .service(access_events::handler)
 }

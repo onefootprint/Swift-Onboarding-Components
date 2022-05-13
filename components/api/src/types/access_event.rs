@@ -1,4 +1,4 @@
-use crate::vault::types::UserVaultFieldKind;
+use crate::tenant::types::UserVaultFieldKind;
 use db::models::access_events::AccessEvent;
 use db::models::onboardings::Onboarding;
 use paperclip::actix::Apiv2Schema;

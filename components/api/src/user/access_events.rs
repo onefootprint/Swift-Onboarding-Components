@@ -1,8 +1,8 @@
 use crate::auth::logged_in_session::LoggedInSessionContext;
 use crate::errors::ApiError;
+use crate::tenant::types::UserVaultFieldKind;
 use crate::types::access_event::ApiAccessEvent;
 use crate::types::success::ApiResponseData;
-use crate::vault::types::UserVaultFieldKind;
 use crate::State;
 use db::models::types::DataKind;
 use paperclip::actix::{api_v2_operation, get, web, web::Json, Apiv2Schema};
