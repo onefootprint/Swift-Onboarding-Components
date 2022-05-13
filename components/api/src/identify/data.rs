@@ -1,8 +1,7 @@
-use crate::auth::client_public_key::PublicTenantAuthContext;
-use crate::auth::get_onboarding_for_tenant;
 use crate::auth::logged_in_session::LoggedInSessionContext;
+use crate::identify::{clean_email, send_email_challenge};
 use crate::{errors::ApiError, types::success::ApiResponseData, State};
-use db::models::{types::Status, user_vaults::UpdateUserVault};
+use db::models::user_vaults::UpdateUserVault;
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 
 #[derive(Debug, Clone, serde::Deserialize, Apiv2Schema)]
@@ -55,6 +54,12 @@ struct UserPatchRequest {
         with = "::serde_with::rust::double_option"
     )]
     state: Option<Option<String>>,
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        with = "::serde_with::rust::double_option"
+    )]
+    email: Option<Option<String>>,
 }
 
 #[api_v2_operation]
@@ -64,10 +69,9 @@ struct UserPatchRequest {
 async fn handler(
     state: web::Data<State>,
     user_auth: LoggedInSessionContext,
-    tenant_auth: PublicTenantAuthContext,
     request: web::Json<UserPatchRequest>,
 ) -> actix_web::Result<Json<ApiResponseData<String>>, ApiError> {
-    get_onboarding_for_tenant(&state.db_pool, &user_auth, &tenant_auth).await?;
+    // TODO don't allow updating every field if the user vault is already verified
     let user_vault = user_auth.user_vault();
     fn seal(
         val: Option<Option<String>>,
@@ -87,6 +91,15 @@ async fn handler(
         }
     }
 
+    let cleaned_email = if let Some(Some(email)) = request.email.clone() {
+        let cleaned_email = clean_email(email);
+        // If we're updating the email address, send an async challenge to the new email address
+        send_email_challenge(&state, user_vault.public_key.clone(), cleaned_email.clone()).await?;
+        Some(Some(cleaned_email))
+    } else {
+        None
+    };
+
     let user_update = UpdateUserVault {
         id: user_vault.id.clone(),
         e_first_name: seal(request.first_name.clone(), user_vault)?,
@@ -97,7 +110,13 @@ async fn handler(
         e_street_address: seal(request.street_address.clone(), user_vault)?,
         e_city: seal(request.city.clone(), user_vault)?,
         e_state: seal(request.state.clone(), user_vault)?,
-        id_verified: Status::Processing,
+        e_email: seal(cleaned_email.clone(), user_vault)?,
+        sh_email: hash(cleaned_email.clone()),
+        is_email_verified: match cleaned_email {
+            // Mark email as unverified if we're setting a new email
+            Some(Some(_)) => Some(false),
+            _ => None,
+        },
         ..Default::default()
     };
 

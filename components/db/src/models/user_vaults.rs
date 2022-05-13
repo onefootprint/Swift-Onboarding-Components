@@ -40,7 +40,6 @@ pub struct UpdateUserVault {
     pub e_street_address: Option<Vec<u8>>,
     pub e_city: Option<Vec<u8>>,
     pub e_state: Option<Vec<u8>>,
-    pub id_verified: Status,
     pub e_phone_number: Option<Vec<u8>>,
     pub sh_phone_number: Option<Vec<u8>>,
     pub e_email: Option<Vec<u8>>,
@@ -56,8 +55,6 @@ pub struct NewUserVault {
     pub id_verified: Status,
     pub e_phone_number: Vec<u8>,
     pub sh_phone_number: Vec<u8>,
-    pub e_email: Option<Vec<u8>>,
-    pub sh_email: Option<Vec<u8>>,
 }
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
 #[table_name = "user_vaults"]

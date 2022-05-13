@@ -13,11 +13,10 @@ use db::models::types::Status;
 use db::models::user_vaults::{MissingFields, NewUserVault, UserVault};
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 
-use super::{hash, seal, send_email_challenge};
+use super::{hash, seal};
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
 struct VerifyRequest {
-    email: String,
     code: String,
 }
 
@@ -70,7 +69,6 @@ async fn handler(
                 &state,
                 tenant_auth.tenant().id.clone(),
                 phone_number.clone(),
-                request.email.clone(),
             )
             .await?;
             (ob, VerifyKind::UserCreated, missing_fields)
@@ -113,7 +111,6 @@ async fn onboard_new_user(
     state: &web::Data<State>,
     tenant_id: String,
     phone_number: String,
-    email: String,
 ) -> Result<(Onboarding, String), ApiError> {
     let new_key_pair = state
         .kms_client
@@ -129,20 +126,6 @@ async fn onboard_new_user(
 
     let _pk = crypto::hex::encode(&ec_pk_uncompressed);
 
-    let (e_email, sh_email) = (
-        Some(seal(email.clone(), &ec_pk_uncompressed)?),
-        Some(hash(email.clone())),
-    );
-
-    // send async email challenge
-    send_email_challenge(
-        state,
-        ec_pk_uncompressed.clone(),
-        email.clone(),
-        sh_email.clone().unwrap(),
-    )
-    .await?;
-
     let user = NewUserVault {
         e_private_key: new_key_pair
             .private_key_ciphertext_blob
@@ -151,8 +134,6 @@ async fn onboard_new_user(
         public_key: ec_pk_uncompressed.clone(),
         e_phone_number: seal(phone_number.clone(), &ec_pk_uncompressed)?,
         sh_phone_number: hash(phone_number.clone()),
-        e_email,
-        sh_email,
         id_verified: Status::Incomplete,
     };
 

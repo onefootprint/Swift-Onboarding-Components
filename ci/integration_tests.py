@@ -116,11 +116,7 @@ def test_identify_phone(request):
 def test_identify_verify(request, tenant1):
     path = "identify/verify"
     print(url(path))
-    data = {
-        "code": TEST_CHALLENGE_CODE,
-        # TODO we could instead trigger the async email verification in identify/data
-        "email": request.config.cache.get("email", None),
-    }
+    data = {"code": TEST_CHALLENGE_CODE}
     r = requests.post(
         url(path),
         json=data,
@@ -141,6 +137,7 @@ def test_identify_data(request, tenant1):
         "street_address": "1 Footprint Way",
         "city": "Enclave",
         "state": "NY",
+        "email": request.config.cache.get("email", None),
     }
     print(url(path))
     r = requests.post(
@@ -151,18 +148,6 @@ def test_identify_data(request, tenant1):
     )
     _assert_response(r)
     _assert_no_cookies(r)
-    
-def test_identify_data_wrong_tenant(request, tenant2):
-    path = "identify/data"
-    print(url(path))
-    r = requests.post(
-        url(path),
-        json=dict(),
-        cookies=request.config.cache.get("cookies", None),
-        # Purposefuly auth as tenant 2 - since the user isn't onboarded onto tenant2, this should fail
-        headers=_client_pub_key_headers(tenant2["pk"]),
-    )
-    _assert_response(r, status_code=401, msg="Shouldn't be able to update user vault unless user is onboarded to tenant")
 
 def test_identify_commit(request, tenant1): 
     path = "identify/commit"
@@ -199,11 +184,7 @@ def test_identify_repeat_customer_via_email(request, tenant2):
 def test_identify_verify_repeat_customer(request, tenant2):
     path = "identify/verify"
     print(url(path))
-    data = {
-        "code": "123456",
-        # TODO this won't be used in this branch - another reason why we should move the email update into /identify/data
-        "email": request.config.cache.get("email", None),
-    }
+    data = {"code": "123456"}
     r = requests.post(
         url(path),
         json=data,

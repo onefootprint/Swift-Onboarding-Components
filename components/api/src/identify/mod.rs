@@ -144,8 +144,8 @@ pub(crate) async fn send_email_challenge(
     state: &web::Data<State>,
     public_key: Vec<u8>,
     email_address: String,
-    sh_email: Vec<u8>,
 ) -> Result<(), ApiError> {
+    let sh_email = hash(email_address.clone());
     let now = chrono::Utc::now().naive_utc();
     let email_challenge_data = EmailVerifyChallenge {
         expires_at: now + chrono::Duration::days(1),
