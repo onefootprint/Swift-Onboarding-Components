@@ -1,13 +1,14 @@
-use super::login_session::ChallengeState;
 use super::AuthError;
 use crate::errors::ApiError;
 use actix_session::Session;
 use actix_web::FromRequest;
+use chrono::NaiveDateTime;
 use futures_util::Future;
 use paperclip::actix::Apiv2Security;
 use serde::{Deserialize, Serialize};
 use std::pin::Pin;
 
+// TODO combine this with IdentifySession by having the client re-send tenant auth + email
 #[derive(Debug, Clone, Apiv2Security)]
 #[openapi(
     apiKey,
@@ -15,20 +16,25 @@ use std::pin::Pin;
     name = "Cookie",
     description = "Identify session state cookie, set by calls to /identify"
 )]
-/// IdentifySessionContext stores encrpyted state for the challenge issued to the user
-pub struct IdentifySessionContext {
-    pub state: IdentifySessionState,
+/// LoginSessionContext stores encrypted state for the challenge issued to the user
+pub struct LoginSessionContext {
+    pub state: LoginSessionState,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct IdentifySessionState {
-    pub email: String,
-    pub tenant_id: String,
-    pub challenge_state: Option<ChallengeState>,
+pub struct LoginSessionState {
+    pub challenge_state: ChallengeState,
 }
 
-impl IdentifySessionState {
-    pub const COOKIE_NAME: &'static str = "identify_session";
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ChallengeState {
+    pub phone_number: String,
+    pub challenge_code: String,
+    pub challenge_created_at: NaiveDateTime,
+}
+
+impl LoginSessionState {
+    pub const COOKIE_NAME: &'static str = "login_session";
 
     pub fn get(session: &Session) -> Result<Self, AuthError> {
         session
@@ -44,7 +50,7 @@ impl IdentifySessionState {
     }
 }
 
-impl FromRequest for IdentifySessionContext {
+impl FromRequest for LoginSessionContext {
     type Error = ApiError;
     type Future = Pin<Box<dyn Future<Output = Result<Self, Self::Error>>>>;
 
@@ -56,7 +62,7 @@ impl FromRequest for IdentifySessionContext {
 
         Box::pin(async move {
             let session = session.await.map_err(AuthError::SessionError)?;
-            let state = IdentifySessionState::get(&session)?;
+            let state = LoginSessionState::get(&session)?;
 
             Ok(Self { state })
         })

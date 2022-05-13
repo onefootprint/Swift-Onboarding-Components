@@ -22,6 +22,7 @@ mod identify;
 mod index;
 mod liveness;
 mod response;
+mod user;
 mod vault;
 
 use paperclip::actix::{web, OpenApiExt};
@@ -144,6 +145,7 @@ async fn main() -> std::io::Result<()> {
             .service(identify::routes())
             .service(vault::routes())
             .service(liveness::routes())
+            .service(user::routes())
             .service(index::index::handler)
             .service(index::health::handler)
             .with_json_spec_at("/open-api/spec")

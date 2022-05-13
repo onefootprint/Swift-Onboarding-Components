@@ -7,6 +7,7 @@ import requests
 
 TENANT_AUTH_HEADER = "x-client-public-key"
 TENANT_SECRET_HEADER = "x-client-secret-key"
+TEST_CHALLENGE_CODE = "123456"
 
 
 url = lambda path: "{}/{}".format(os.environ.get('TEST_URL'), path)
@@ -112,7 +113,7 @@ def test_challenge(request):
 def test_identify_verify(request):
     path = "identify/verify"
     print(url(path))
-    data = {"code": "123456"}
+    data = {"code": TEST_CHALLENGE_CODE}
     r = requests.post(url(path), json=data, cookies=request.config.cache.get("cookies", None))
     print(r, r.content)
     assert r.status_code == 200
@@ -247,3 +248,28 @@ def test_access_events_list(request, tenant1):
     access_events = r.json()["data"]["events"]
     assert len(access_events) == 1
     assert access_events[0]["data_kind"] == "email"
+
+def test_login(request):
+    # Initiate the login challenge. Could initiate with email too
+    phone_number = request.config.cache.get("phone_number", None)
+    path = f"user/login"
+    print(url(path))
+    r = requests.post(
+        url(path),
+        json=dict(phone_number=phone_number),
+    )
+    print(r.content)
+    assert r.status_code == 200
+    assert r.json()["data"]["phone_number_last_two"] == phone_number[-2:]
+
+    # Respond to the login challenge
+    path = f"user/login/verify"
+    print(url(path))
+    r = requests.post(
+        url(path),
+        cookies=_parse_cookies(r),
+        json=dict(code=TEST_CHALLENGE_CODE),
+    )
+    print(r.content)
+    assert r.status_code == 200
+    # TODO do something with the auth token provided in the cookie to make sure we are logged in

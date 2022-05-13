@@ -2,6 +2,8 @@ use thiserror::Error;
 pub mod client_public_key;
 pub mod client_secret_key;
 pub mod identify_session;
+pub mod logged_in_session;
+pub mod login_session;
 pub mod onboarding_session;
 
 #[derive(Debug, Error)]

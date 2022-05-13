@@ -1,17 +1,12 @@
-use crate::auth::identify_session::ChallengeState;
+use super::validate_challenge;
 use crate::auth::onboarding_session::OnboardingSessionContext;
 use crate::response::success::ApiResponseData;
 use crate::State;
 use crate::{auth::identify_session::IdentifySessionContext, errors::ApiError};
 use actix_session::Session;
 use aws_sdk_kms::model::DataKeyPairSpec;
-use chrono::{Duration, Utc};
-use crypto::hex::ToHex;
-use crypto::random::gen_random_alphanumeric_code;
 use db::models::onboardings::{NewOnboarding, Onboarding};
-use db::models::session_data::OnboardingSessionData;
-use db::models::session_data::SessionState;
-use db::models::sessions::NewSession;
+use db::models::session_data::{OnboardingSessionData, SessionState as DbSessionState};
 use db::models::types::Status;
 use db::models::user_vaults::{MissingFields, NewUserVault, UserVault};
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
@@ -33,13 +28,13 @@ enum VerifyKind {
 #[derive(Debug, Clone, Apiv2Schema, serde::Serialize)]
 struct VerifyResponse {
     kind: VerifyKind,
-    /// Attributes needed to successfully onbaord this user
+    /// Attributes needed to successfully onboard this user
     missing_attributes: String,
 }
 
 #[api_v2_operation]
 #[post("/verify")]
-/// Verify an SMS challenge sent to a user. If successful, this endpoint sets relavent cookies
+/// Verify an SMS challenge sent to a user. If successful, this endpoint sets relevant cookies
 /// that allow the client to update the user vault (/identify/data) and finalize user onboarding (/identify/commit)
 async fn handler(
     state: web::Data<State>,
@@ -55,7 +50,7 @@ async fn handler(
         Some(d) => Ok(d),
     }?;
 
-    if !verify_code(request.code.clone(), &challenge_data).await? {
+    if !validate_challenge(request.code.clone(), &challenge_data).await? {
         return Err(ApiError::ChallengeNotValid);
     }
 
@@ -84,20 +79,14 @@ async fn handler(
         }
     };
 
-    // Update the session to onboarding session
-    // create a token to identify session for future lookup
-    let token = format!("vtok_{}", gen_random_alphanumeric_code(34));
-    let h_session_id: String = crypto::sha256(token.as_bytes()).encode_hex();
-
-    let new_session = NewSession {
-        h_session_id,
-        session_data: SessionState::OnboardingSession(OnboardingSessionData {
-            user_ob_id: onboarding.user_ob_id,
-            user_vault_id: onboarding.user_vault_id,
-        }),
-    };
-    let _ = db::session::init(&state.db_pool, new_session).await?;
-
+    // Save onboarding session data into the DB
+    let (_, token) = DbSessionState::OnboardingSession(OnboardingSessionData {
+        user_ob_id: onboarding.user_ob_id,
+        user_vault_id: onboarding.user_vault_id,
+    })
+    .create(&state.db_pool)
+    .await?;
+    // Set the cookie that identifies this as an OnboardingSession and attaches it to the DB state
     OnboardingSessionContext::set(&session, token)?;
 
     Ok(Json(ApiResponseData {
@@ -175,17 +164,4 @@ async fn onboard_new_user(
     let missing_fields = MissingFields::missing_fields(&user).join(",");
     // create new onboarding session data
     Ok((onboarding, missing_fields))
-}
-
-async fn verify_code(
-    request_code: String,
-    challenge_data: &ChallengeState,
-) -> Result<bool, ApiError> {
-    let now = Utc::now().naive_utc();
-
-    Ok((challenge_data.challenge_code == request_code)
-        & (challenge_data
-            .challenge_created_at
-            .signed_duration_since(now)
-            < Duration::minutes(15)))
 }

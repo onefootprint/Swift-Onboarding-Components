@@ -16,7 +16,7 @@ use webauthn_rs::{
     WebauthnConfig,
 };
 
-use self::auth_context::{AuthState, RegisterState, WebAuthnCookieSessionState, WebAuthnState};
+use self::auth_context::{RegisterState, WebAuthnCookieSessionState, WebAuthnState};
 
 pub fn routes() -> web::Scope {
     web::scope("/liveness")
@@ -58,10 +58,6 @@ async fn start(
         }) => (
             user_vault_id,
             WebAuthnState::Register(RegisterState::NotStarted),
-        ),
-        SessionState::IdentifySession(identify_session) => (
-            identify_session.user_vault_id,
-            WebAuthnState::Auth(AuthState::NotStarted),
         ),
         _ => return Err(AuthError::InvalidSessionState.into()),
     };

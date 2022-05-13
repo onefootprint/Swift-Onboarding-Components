@@ -6,14 +6,15 @@ pub mod init;
 mod livecheck;
 pub mod verify;
 
-use crate::auth::identify_session::ChallengeState;
-use crate::State;
-use crate::{auth::identify_session::IdentifySessionState, errors::ApiError};
+use crate::auth::login_session::ChallengeState;
+use crate::{errors::ApiError, State};
 use aws_sdk_pinpointemail::model::{
     Body as EmailBody, Content as EmailStringContent, Destination as EmailDestination,
     EmailContent, Message as EmailMessage,
 };
-use chrono::{NaiveDateTime, Utc};
+use aws_sdk_pinpointsmsvoicev2::output::SendTextMessageOutput;
+use chrono::NaiveDateTime;
+use chrono::{Duration, Utc};
 use crypto::b64::Base64Data;
 use crypto::seal::EciesP256Sha256AesGcmSealed;
 use crypto::sha256;
@@ -33,7 +34,7 @@ pub struct EmailVerifyChallenge {
     pub email: String,
 }
 
-fn hash(val: String) -> Vec<u8> {
+pub fn hash(val: String) -> Vec<u8> {
     // TODO hmac
     sha256(val.as_bytes()).to_vec()
 }
@@ -74,16 +75,27 @@ pub(crate) async fn clean_phone_number(
     Ok(validated_phone_number)
 }
 
+pub async fn validate_challenge(
+    request_code: String,
+    challenge_data: &ChallengeState,
+) -> Result<bool, ApiError> {
+    let now = Utc::now().naive_utc();
+
+    Ok((challenge_data.challenge_code == request_code)
+        & (challenge_data
+            .challenge_created_at
+            .signed_duration_since(now)
+            < Duration::minutes(15)))
+}
+
 pub fn clean_email(raw_email: String) -> String {
     raw_email.to_lowercase()
 }
 
-async fn decrypt_and_send_challenge(
+pub(crate) async fn send_phone_challenge_to_user(
     state: &web::Data<State>,
     vault: UserVault,
-    tenant_id: String,
-    email: String,
-) -> Result<(IdentifySessionState, String), ApiError> {
+) -> Result<ChallengeState, ApiError> {
     let decrypted_data = crate::enclave::lib::decrypt_bytes(
         state,
         &vault.e_phone_number,
@@ -91,17 +103,15 @@ async fn decrypt_and_send_challenge(
         enclave_proxy::DataTransform::Identity,
     )
     .await?;
-    // send challenge & set state
     let phone_number = std::str::from_utf8(&decrypted_data)?.to_string();
-    send_challenge(state, phone_number.clone(), tenant_id, email).await
+    // send challenge & set state
+    send_phone_challenge(state, phone_number).await
 }
 
-pub(crate) async fn send_challenge(
+pub(crate) async fn send_phone_challenge(
     state: &web::Data<State>,
     phone_number: String,
-    tenant_id: String,
-    email: String,
-) -> Result<(IdentifySessionState, String), ApiError> {
+) -> Result<ChallengeState, ApiError> {
     // 555-01* numbers are reserved / not real, we use these for integration testing with a known code
     let phone_number_digits: String = phone_number.clone().chars().skip(5).take(5).collect();
     let code = match phone_number_digits.as_str() {
@@ -110,24 +120,24 @@ pub(crate) async fn send_challenge(
     };
 
     // send challenge & set state
-    let _ = state.sms_client.send_text_message()
+    let _: SendTextMessageOutput = state.sms_client.send_text_message()
             .destination_phone_number(phone_number.clone())
             .message_body(format!("Your Footprint verification code is {}. Don't share your code with anyone. We will never contact you to request this code.\n\n@onefootprint.com #{}", code.clone(), code.clone()))
             .send()
             .await?;
 
-    Ok((
-        IdentifySessionState {
-            tenant_id,
-            email,
-            challenge_state: Some(ChallengeState {
-                phone_number: phone_number.clone(),
-                challenge_code: code,
-                challenge_created_at: Utc::now().naive_utc(),
-            }),
-        },
-        phone_number.chars().skip(10).take(2).collect(),
-    ))
+    Ok(ChallengeState {
+        phone_number,
+        // TODO only store the h_code in the session
+        challenge_code: code,
+        challenge_created_at: Utc::now().naive_utc(),
+    })
+}
+
+pub(crate) fn phone_number_last_two(phone_number: String) -> String {
+    let mut phone_number = phone_number;
+    let len = phone_number.len();
+    phone_number.drain((len - 2)..len).into_iter().collect()
 }
 
 pub(crate) async fn send_email_challenge(

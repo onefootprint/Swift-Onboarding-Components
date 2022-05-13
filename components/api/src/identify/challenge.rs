@@ -1,6 +1,6 @@
-use crate::auth::identify_session::IdentifySessionContext;
+use crate::auth::identify_session::{IdentifySessionContext, IdentifySessionState};
 use crate::errors::ApiError;
-use crate::identify::{clean_phone_number, send_challenge};
+use crate::identify::{clean_phone_number, phone_number_last_two, send_phone_challenge};
 use crate::response::success::ApiResponseData;
 use crate::State;
 use actix_session::Session;
@@ -21,7 +21,7 @@ pub struct ChallengeResponse {
 #[post("/challenge")]
 /// Issues a text message challenge to a given phone_number. In order to call this endpoint, you must have
 /// already attempted to identify by email address via a call to /identify. The call to /identify
-/// sets relavent state for issuing the challenge (see IdentifySessionState)
+/// sets relevant state for issuing the challenge (see IdentifySessionState)
 pub async fn handler(
     request: Json<ChallengeRequest>,
     session: Session,
@@ -33,18 +33,18 @@ pub async fn handler(
     let phone_number = clean_phone_number(&state, &req.phone_number).await?;
 
     // send challenge & set state
-    let (identity_session_state, last_two) = send_challenge(
-        &state,
-        phone_number.clone(),
-        session_context.state.tenant_id.clone(),
-        session_context.state.email.clone(),
-    )
-    .await?;
-    identity_session_state.set(&session)?;
+    let challenge_state = send_phone_challenge(&state, phone_number.clone()).await?;
+
+    IdentifySessionState {
+        tenant_id: session_context.state.tenant_id.clone(),
+        email: session_context.state.email.clone(),
+        challenge_state: Some(challenge_state.clone()),
+    }
+    .set(&session)?;
 
     Ok(Json(ApiResponseData {
         data: ChallengeResponse {
-            phone_number_last_two: last_two,
+            phone_number_last_two: phone_number_last_two(challenge_state.phone_number),
         },
     }))
 }

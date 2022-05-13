@@ -8,7 +8,7 @@ use crate::{
 use actix_session::Session;
 use paperclip::actix::{api_v2_operation, web, web::Json, Apiv2Schema};
 
-use super::decrypt_and_send_challenge;
+use super::{phone_number_last_two, send_phone_challenge_to_user};
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
 #[serde(rename_all = "snake_case")]
@@ -41,28 +41,24 @@ pub async fn handler(
 
     // see if user vault has an associated phone number. if not, set session state to info we currently have &
     // return user not found
-    let response: Result<IdentifyResponse, ApiError> = match existing_user_vault {
+    let (challenge_state, response) = match existing_user_vault {
         Some(vault) => {
-            let (identity_session_state, last_two_digits) = decrypt_and_send_challenge(
-                &state,
-                vault,
-                pub_tenant_auth.tenant().id.clone(),
-                cleaned_email,
+            let challenge_state = send_phone_challenge_to_user(&state, vault).await?;
+            (
+                Some(challenge_state.clone()),
+                IdentifyResponse::PhoneNumberLastTwo(phone_number_last_two(
+                    challenge_state.phone_number,
+                )),
             )
-            .await?;
-            identity_session_state.set(&session)?;
-            Ok(IdentifyResponse::PhoneNumberLastTwo(last_two_digits))
         }
-        None => {
-            IdentifySessionState {
-                tenant_id: pub_tenant_auth.tenant().id.clone(),
-                email: cleaned_email.clone(),
-                challenge_state: None,
-            }
-            .set(&session)?;
-            Ok(IdentifyResponse::UserNotFound)
-        }
+        None => (None, IdentifyResponse::UserNotFound),
     };
+    IdentifySessionState {
+        tenant_id: pub_tenant_auth.tenant().id.clone(),
+        email: cleaned_email.clone(),
+        challenge_state,
+    }
+    .set(&session)?;
 
-    Ok(Json(ApiResponseData { data: response? }))
+    Ok(Json(ApiResponseData { data: response }))
 }

@@ -1,4 +1,3 @@
-use chrono::NaiveDateTime;
 use diesel::serialize::Output;
 use diesel::{
     pg::Pg,
@@ -13,8 +12,8 @@ use std::io::Write;
 #[sql_type = "Jsonb"]
 pub enum SessionState {
     Empty,
-    OnboardingSession(OnboardingSessionData),
-    IdentifySession(ChallengeData),
+    OnboardingSession(OnboardingSessionData), // Used for tenant- and user-specific auth
+    LoggedInSession(LoggedInSessionData),     // Used for user-specific auth
 }
 
 #[derive(Default, FromSqlRow, AsExpression, Serialize, Deserialize, Debug, Clone)]
@@ -23,19 +22,9 @@ pub struct OnboardingSessionData {
     pub user_vault_id: String,
 }
 
-#[derive(FromSqlRow, AsExpression, Serialize, Deserialize, Debug, Clone)]
-pub struct ChallengeData {
-    pub tenant_id: String,
+#[derive(Default, FromSqlRow, AsExpression, Serialize, Deserialize, Debug, Clone)]
+pub struct LoggedInSessionData {
     pub user_vault_id: String,
-    pub challenge_type: ChallengeType,
-    pub created_at: NaiveDateTime,
-    pub h_challenge_code: Vec<u8>,
-}
-
-#[derive(FromSqlRow, AsExpression, Serialize, Deserialize, Debug, Clone)]
-pub enum ChallengeType {
-    Email,
-    PhoneNumber,
 }
 
 impl Default for SessionState {
