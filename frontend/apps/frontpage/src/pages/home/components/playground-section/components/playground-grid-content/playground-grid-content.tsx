@@ -40,9 +40,10 @@ const Container = styled.div`
   pointer-events: none;
   position: absolute;
   text-align: center;
+  max-width: 90%;
 
-  ${media.between('xs', 'sm')`
-    max-width: 50%;
+  ${media.greaterThan('md')`
+    max-width: unset;
   `}
 `;
 

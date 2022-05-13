@@ -1,31 +1,43 @@
 import React from 'react';
-import { Box, Container } from 'ui';
+import styled, { css } from 'styled';
+import { Container, media } from 'ui';
 
 import PlaygroundGradient from './components/playground-gradient';
 import PlaygroundGrid from './components/playground-grid';
 import PlaygroundGrigContent from './components/playground-grid-content';
 
-type PlaygroundProps = {
+type PlaygroundSectionProps = {
   title: string;
   subtitle: string;
+  tooltips: string[];
 };
 
-const Why = ({ title, subtitle }: PlaygroundProps) => (
+const PlaygroundSection = ({
+  title,
+  subtitle,
+  tooltips,
+}: PlaygroundSectionProps) => (
   <Container as="section" id="playground">
-    <Box
-      sx={{
-        position: 'relative',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        width: 'inherit',
-      }}
-    >
+    <Inner>
       <PlaygroundGradient />
-      <PlaygroundGrid />
+      <PlaygroundGrid tooltips={tooltips} />
       <PlaygroundGrigContent subtitle={subtitle} title={title} />
-    </Box>
+    </Inner>
   </Container>
 );
 
-export default Why;
+const Inner = styled.div`
+  ${({ theme }) => css`
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    padding: ${theme.spacing[11]}px 0;
+    position: relative;
+
+    ${media.greaterThan('lg')`
+      padding: ${theme.spacing[12]}px 0;
+    `}
+  `}
+`;
+
+export default PlaygroundSection;

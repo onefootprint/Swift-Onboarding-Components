@@ -1,1 +1,1 @@
-export { default } from './square';
+export { default } from './playground-square';

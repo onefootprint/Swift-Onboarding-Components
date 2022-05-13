@@ -10,7 +10,7 @@ type HeroSectionProps = {
 };
 
 const HeroSection = ({ title, subtitle, cta, imgAlt }: HeroSectionProps) => (
-  <Container as="section" id="section">
+  <Container as="section" id="hero">
     <ContentContainer>
       <Typography
         as="h1"
@@ -37,25 +37,25 @@ const HeroSection = ({ title, subtitle, cta, imgAlt }: HeroSectionProps) => (
       <picture>
         <source
           height={371}
-          media="(min-width: 0px) and (max-width: 360)"
+          media="(min-width: 0px) and (max-width: 599px)"
           srcSet="/images/hero-xs.png"
           width={320}
         />
         <source
           height={303}
-          media="(min-width: 600px) and (max-width: 900px)"
+          media="(min-width: 600px) and (max-width: 899px)"
           srcSet="/images/hero-sm.png"
           width={552}
         />
         <source
           height={469}
-          media="(min-width: 900px) and (max-width: 1200px)"
+          media="(min-width: 900px) and (max-width: 1199px)"
           srcSet="/images/hero-md.png"
           width={852}
         />
         <source
           height={627}
-          media="(min-width: 1200) and (max-width: 1440)"
+          media="(min-width: 1200px) and (max-width: 1439px)"
           srcSet="/images/hero-lg.png"
           width={1120}
         />
