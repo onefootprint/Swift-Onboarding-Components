@@ -29,7 +29,7 @@ const HighlightItem = ({
         as="div"
         color="primary"
         sx={{ marginBottom: 5 }}
-        variant="heading-2"
+        variant="heading-3"
       >
         {title}
       </Typography>

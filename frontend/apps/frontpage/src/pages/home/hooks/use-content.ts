@@ -13,7 +13,7 @@ const useContent = () => ({
     title: 'Frictionless Identity. High Integrity.',
     subtitle:
       'Footprint is a unified platform bringing together one-click KYC and a PII Vault.',
-    cta: 'Join the waitlist',
+    cta: 'Join our waitlist',
   },
   playground: {
     title: 'Bringing back trust.',
@@ -134,9 +134,9 @@ const useContent = () => ({
     title: 'Our investors',
   },
   getStarted: {
-    cta: 'Join the waitlist',
+    cta: 'Join our waitlist',
     subtitle:
-      'Join our waitlist to be one of the first to get access to Footprint private beta.',
+      'Join our waitlist to get a chance at 1,000 free verifications when we launch out of private beta.',
     title: 'Ready to get started?',
   },
   footer: {

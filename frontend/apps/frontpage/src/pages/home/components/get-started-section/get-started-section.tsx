@@ -5,6 +5,7 @@ import { Button, Container, media, Typography } from 'ui';
 
 import footprintLogo from '../../../../../public/images/footer/footprint-circle.png';
 import lighting from '../../../../../public/images/footer/lightning.png';
+import CircleBackground from './components/circle-background';
 
 type GetStartedSectionProps = {
   cta: string;
@@ -17,7 +18,7 @@ const GetStartedSection = ({
   subtitle,
   title,
 }: GetStartedSectionProps) => (
-  <Container id="get-started" as="section">
+  <Container id="get-started" as="section" sx={{ position: 'relative' }}>
     <Inner>
       <LogoContainer>
         <Image
@@ -52,27 +53,22 @@ const GetStartedSection = ({
         <Button size="large">{cta}</Button>
       </ContentContainer>
     </Inner>
+    <CircleBackground />
   </Container>
 );
 
 const Inner = styled.div`
   ${({ theme }) => css`
+    align-items: center;
     background-color: ${theme.backgroundColor.quaternary};
     border-radius: ${theme.borderRadius[1]}px;
-    margin-bottom: ${theme.spacing[10]}px;
-    padding: ${theme.spacing[9]}px ${theme.spacing[8]}px;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    padding: ${theme.spacing[9]}px ${theme.spacing[8]}px;
 
     ${media.greaterThan('md')`
-      display: flex;
       flex-direction: row-reverse;
       padding: ${theme.spacing[10]}px;
-    `}
-
-    ${media.greaterThan('lg')`
-      margin-bottom: ${theme.spacing[11]}px;
     `}
   `}
 `;
@@ -99,6 +95,7 @@ const ContentContainer = styled.div`
   flex-direction: column;
   justify-content: center;
   text-align: center;
+  z-index: 1;
 
   img {
     display: none;

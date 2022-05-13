@@ -1,6 +1,6 @@
 import React from 'react';
 import styled, { css } from 'styled';
-import { Container, Typography } from 'ui';
+import { Container, media, Typography } from 'ui';
 
 const currentYear = new Date().getFullYear();
 
@@ -35,6 +35,11 @@ const Inner = styled.div`
     display: flex;
     justify-content: space-between;
     padding: ${theme.spacing[6]}px 0;
+    margin-top: ${theme.spacing[10]}px;
+
+    ${media.greaterThan('lg')`
+      margin-top: ${theme.spacing[11]}px;
+    `}
   `}
 `;
 
