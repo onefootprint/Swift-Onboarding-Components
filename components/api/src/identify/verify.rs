@@ -3,7 +3,7 @@ use crate::auth::client_public_key::PublicTenantAuthContext;
 use crate::auth::logged_in_session::LoggedInSessionContext;
 use crate::auth::login_session::LoginSessionContext;
 use crate::errors::ApiError;
-use crate::response::success::ApiResponseData;
+use crate::types::success::ApiResponseData;
 use crate::State;
 use actix_session::Session;
 use aws_sdk_kms::model::DataKeyPairSpec;

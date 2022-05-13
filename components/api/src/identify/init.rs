@@ -2,7 +2,7 @@ use crate::auth::client_public_key::PublicTenantAuthContext;
 use crate::auth::login_session::LoginSessionState;
 use crate::errors::ApiError;
 use crate::identify::clean_email;
-use crate::response::success::ApiResponseData;
+use crate::types::success::ApiResponseData;
 use crate::State;
 use actix_session::Session;
 use paperclip::actix::{api_v2_operation, web, web::Json, Apiv2Schema};

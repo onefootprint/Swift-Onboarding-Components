@@ -12,7 +12,7 @@ use enclave_proxy::bb8;
 use paperclip::v2::schema::Apiv2Errors;
 use thiserror::Error;
 
-use crate::response::error::{ApiResponseError, ApiResponseErrorInfo};
+use crate::types::error::{ApiResponseError, ApiResponseErrorInfo};
 
 #[derive(Debug, Error)]
 pub enum ApiError {

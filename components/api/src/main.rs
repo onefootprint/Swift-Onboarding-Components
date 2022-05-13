@@ -21,7 +21,7 @@ mod enclave;
 mod identify;
 mod index;
 mod liveness;
-mod response;
+mod types;
 mod user;
 mod vault;
 

@@ -315,3 +315,18 @@ def test_logged_in_user_detail(request):
     user = body["data"]
     assert user["first_name"] == "Flerp"
     assert user["last_name"] == "Derp"
+    _assert_no_cookies(r)
+
+def test_logged_in_access_events(request):
+    # Get the user detail using the logged in context
+    path = f"user/access_events"
+    print(url(path))
+    r = requests.get(
+        url(path),
+        cookies=request.config.cache.get("cookies", None),
+    )
+    body = _assert_response(r)
+    access_events = body["data"]["events"]
+    assert len(access_events) == 2
+    assert set(i["data_kind"] for i in access_events) == {"first_name", "email"}
+    _assert_no_cookies(r)

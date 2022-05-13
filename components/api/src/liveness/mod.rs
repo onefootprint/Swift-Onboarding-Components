@@ -5,7 +5,7 @@ mod verify;
 use crate::{
     auth::AuthError,
     errors::ApiError,
-    response::{success::ApiResponseData, Empty},
+    types::{success::ApiResponseData, Empty},
     State,
 };
 use actix_session::Session;

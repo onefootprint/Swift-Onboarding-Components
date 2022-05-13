@@ -1,7 +1,7 @@
 use std::str::FromStr;
 
 use crate::errors::ApiError;
-use crate::response::success::ApiResponseData;
+use crate::types::success::ApiResponseData;
 
 use crate::State;
 
@@ -33,7 +33,7 @@ async fn handler(
         DataTransform::Identity,
     )
     .await?;
-    Ok(Json(ApiResponseData{
-        data: std::str::from_utf8(&decrypted_result).unwrap().to_string()
+    Ok(Json(ApiResponseData {
+        data: std::str::from_utf8(&decrypted_result).unwrap().to_string(),
     }))
 }

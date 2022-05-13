@@ -5,7 +5,7 @@ use crate::identify::{
     clean_email, clean_phone_number, hash, phone_number_last_two, send_phone_challenge_to_user,
     validate_challenge,
 };
-use crate::response::success::ApiResponseData;
+use crate::types::success::ApiResponseData;
 use crate::State;
 use actix_session::Session;
 use db::models::session_data::{LoggedInSessionData, SessionState as DbSessionState};

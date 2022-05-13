@@ -1,4 +1,4 @@
-use crate::response::success::ApiResponseData;
+use crate::types::success::ApiResponseData;
 use crate::State;
 use crate::{enclave::lib::gen_keypair, errors::ApiError};
 

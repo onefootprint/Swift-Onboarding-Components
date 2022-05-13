@@ -1,5 +1,5 @@
 use crate::errors::ApiError;
-use crate::response::success::ApiResponseData;
+use crate::types::success::ApiResponseData;
 use crate::State;
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 

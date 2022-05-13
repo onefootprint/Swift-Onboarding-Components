@@ -1,7 +1,7 @@
 use crate::auth::client_public_key::PublicTenantAuthContext;
 use crate::auth::get_onboarding_for_tenant;
 use crate::auth::logged_in_session::LoggedInSessionContext;
-use crate::{errors::ApiError, response::success::ApiResponseData, State};
+use crate::{errors::ApiError, types::success::ApiResponseData, State};
 use db::models::{types::Status, user_vaults::UpdateUserVault};
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 

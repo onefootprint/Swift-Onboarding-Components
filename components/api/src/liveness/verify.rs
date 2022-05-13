@@ -2,7 +2,7 @@ use crate::{
     auth::AuthError,
     errors::ApiError,
     liveness::{auth_context::AuthState, LivenessWebauthnConfig},
-    response::{success::ApiResponseData, Empty},
+    types::{success::ApiResponseData, Empty},
     State,
 };
 use actix_session::Session;

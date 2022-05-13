@@ -1,7 +1,7 @@
 use std::str::FromStr;
 
 use crate::errors::ApiError;
-use crate::response::success::ApiResponseData;
+use crate::types::success::ApiResponseData;
 use crate::State;
 use chrono::{NaiveDateTime, Utc};
 use crypto::b64::Base64Data;
