@@ -1,4 +1,3 @@
-use crate::auth::login_session::LoginSessionState;
 use crate::errors::ApiError;
 use crate::identify::clean_email;
 use crate::types::success::ApiResponseData;
@@ -51,10 +50,7 @@ pub async fn handler(
     let challenge_data = send_phone_challenge_to_user(&state, existing_user).await?;
 
     // Save the challenge state in the session
-    LoginSessionState {
-        challenge_state: challenge_data.clone(),
-    }
-    .set(&session)?;
+    challenge_data.clone().set(&session)?;
 
     Ok(Json(ApiResponseData {
         data: IdentifyResponse::PhoneNumberLastTwo(phone_number_last_two(

@@ -18,11 +18,6 @@ use std::pin::Pin;
 /// LoginSessionContext stores encrypted state for the challenge issued to the user during the
 /// process of logging them in.
 pub struct LoginSessionContext {
-    pub state: LoginSessionState,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct LoginSessionState {
     pub challenge_state: ChallengeState,
 }
 
@@ -33,7 +28,7 @@ pub struct ChallengeState {
     pub challenge_created_at: NaiveDateTime,
 }
 
-impl LoginSessionState {
+impl ChallengeState {
     pub const COOKIE_NAME: &'static str = "login_session";
 
     pub fn get(session: &Session) -> Result<Self, AuthError> {
@@ -62,9 +57,9 @@ impl FromRequest for LoginSessionContext {
 
         Box::pin(async move {
             let session = session.await.map_err(AuthError::SessionError)?;
-            let state = LoginSessionState::get(&session)?;
+            let challenge_state = ChallengeState::get(&session)?;
 
-            Ok(Self { state })
+            Ok(Self { challenge_state })
         })
     }
 }

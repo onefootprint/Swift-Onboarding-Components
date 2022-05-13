@@ -43,7 +43,7 @@ async fn handler(
     user_auth: LoginSessionContext,
     request: Json<VerifyRequest>,
 ) -> actix_web::Result<Json<ApiResponseData<VerifyResponse>>, ApiError> {
-    let challenge_data = user_auth.state.challenge_state;
+    let challenge_data = user_auth.challenge_state;
 
     if !validate_challenge(request.code.clone(), &challenge_data).await? {
         return Err(ApiError::ChallengeNotValid);
