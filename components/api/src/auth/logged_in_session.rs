@@ -18,15 +18,15 @@ use std::pin::Pin;
 /// Logged in session context sets encrypted state that authenticates the client and allows hte
 /// server to quickly look up the relevant user information
 pub struct LoggedInSessionContext {
-    _user_vault: UserVault,
+    user_vault: UserVault,
     pub session_id: String,
 }
 
 impl LoggedInSessionContext {
     pub const SESSION_TOKEN_NAME: &'static str = "ob_session_tok";
 
-    pub fn _user_vault(&self) -> &UserVault {
-        &self._user_vault
+    pub fn user_vault(&self) -> &UserVault {
+        &self.user_vault
     }
 
     pub fn set(session: &Session, token: String) -> Result<(), AuthError> {
@@ -66,7 +66,7 @@ impl FromRequest for LoggedInSessionContext {
                 db::user_vault::get_by_logged_in_session(&pool, session_id.clone()).await?;
 
             Ok(Self {
-                _user_vault: user_vault,
+                user_vault,
                 session_id,
             })
         })

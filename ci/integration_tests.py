@@ -272,4 +272,16 @@ def test_login(request):
     )
     print(r.content)
     assert r.status_code == 200
-    # TODO do something with the auth token provided in the cookie to make sure we are logged in
+
+    # Get the user detail using the logged in context
+    path = f"user"
+    print(url(path))
+    r = requests.get(
+        url(path),
+        cookies=_parse_cookies(r),
+    )
+    print(r.content)
+    assert r.status_code == 200
+    user = r.json()["data"]
+    assert user["first_name"] == "Flerp"
+    assert user["last_name"] == "Derp"
