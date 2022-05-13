@@ -1,5 +1,6 @@
-use crate::models::types::Status;
+use crate::diesel::RunQueryDsl;
 use crate::schema::user_vaults;
+use crate::{models::types::Status, DbPool};
 use chrono::NaiveDateTime;
 use diesel::{Insertable, Queryable};
 use serde::{Deserialize, Serialize};
@@ -56,20 +57,29 @@ pub struct NewUserVault {
     pub e_phone_number: Vec<u8>,
     pub sh_phone_number: Vec<u8>,
 }
-#[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
-#[table_name = "user_vaults"]
-pub struct PartialUserVault {
-    pub id: String,
-    pub public_key: Vec<u8>,
+
+impl NewUserVault {
+    pub async fn save(self, pool: &DbPool) -> Result<UserVault, crate::DbError> {
+        let user_vault = pool
+            .get()
+            .await?
+            .interact(move |conn| {
+                diesel::insert_into(user_vaults::table)
+                    .values(self)
+                    .get_result::<UserVault>(conn)
+            })
+            .await??;
+        Ok(user_vault)
+    }
 }
 
 pub trait MissingFields {
     // returns vector of missing attributes
-    fn missing_fields(&self) -> Vec<&str>;
+    fn missing_fields(&self) -> Vec<String>;
 }
 
 impl MissingFields for UserVault {
-    fn missing_fields(&self) -> Vec<&str> {
+    fn missing_fields(&self) -> Vec<String> {
         let attrs = vec![
             ("first_name", self.e_first_name.clone()),
             ("last_name", self.e_last_name.clone()),
@@ -79,39 +89,10 @@ impl MissingFields for UserVault {
             ("city", self.e_city.clone()),
             ("state", self.e_state.clone()),
         ];
-
-        let empties = attrs.iter().fold(Vec::new(), |mut list, val| match val {
-            (name, None) => {
-                list.push(name.to_owned());
-                list
-            }
-            _ => list,
-        });
-
-        empties
-    }
-}
-
-impl MissingFields for UpdateUserVault {
-    fn missing_fields(&self) -> Vec<&str> {
-        let attrs = vec![
-            ("first_name", self.e_first_name.clone()),
-            ("last_name", self.e_last_name.clone()),
-            ("date_of_birth", self.e_dob.clone()),
-            ("ssn", self.e_ssn.clone()),
-            ("street_address", self.e_street_address.clone()),
-            ("city", self.e_city.clone()),
-            ("state", self.e_state.clone()),
-        ];
-
-        let empties = attrs.iter().fold(Vec::new(), |mut list, val| match val {
-            (name, None) => {
-                list.push(name.to_owned());
-                list
-            }
-            _ => list,
-        });
-
-        empties
+        attrs
+            .iter()
+            .filter(|(_, val)| val.is_none())
+            .map(|(name, _)| name.to_owned().to_owned())
+            .collect()
     }
 }

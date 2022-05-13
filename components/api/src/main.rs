@@ -21,6 +21,7 @@ mod enclave;
 mod identify;
 mod index;
 mod liveness;
+mod onboarding;
 mod types;
 mod user;
 mod vault;
@@ -145,6 +146,7 @@ async fn main() -> std::io::Result<()> {
             .service(identify::routes())
             .service(vault::routes())
             .service(liveness::routes())
+            .service(onboarding::routes())
             .service(user::routes())
             .service(index::index::handler)
             .service(index::health::handler)

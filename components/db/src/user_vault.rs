@@ -1,46 +1,12 @@
 use crate::errors::DbError;
 use crate::models::onboardings::*;
 use crate::models::session_data::SessionState;
-use crate::models::types::Status;
 use crate::models::user_vaults::*;
 use crate::onboarding::get_for_tenant;
 use crate::schema;
 use crate::session::get_session_by_id_sync;
 use deadpool_diesel::postgres::Pool;
 use diesel::prelude::*;
-
-pub async fn init(
-    pool: &Pool,
-    user: NewUserVault,
-    tenant_id: String,
-) -> Result<(UserVault, Onboarding), DbError> {
-    let conn = pool.get().await?;
-
-    let (user_vault, onboarding) = conn
-        .interact(move |conn| {
-            conn.build_transaction()
-                .run(|| -> Result<(UserVault, Onboarding), DbError> {
-                    // initialize new user vault
-                    let user_vault: UserVault = diesel::insert_into(schema::user_vaults::table)
-                        .values(&user)
-                        .get_result::<UserVault>(conn)?;
-
-                    // associate new user with tenant
-                    let new_onboarding = NewOnboarding {
-                        tenant_id: tenant_id.clone(),
-                        user_vault_id: user_vault.clone().id,
-                        status: Status::Incomplete,
-                    };
-                    let onboarding: Onboarding = diesel::insert_into(schema::onboardings::table)
-                        .values(&new_onboarding)
-                        .get_result::<Onboarding>(conn)?;
-
-                    Ok((user_vault, onboarding))
-                })
-        })
-        .await??;
-    Ok((user_vault, onboarding))
-}
 
 pub async fn update(pool: &Pool, update: UpdateUserVault) -> Result<usize, DbError> {
     let conn = pool.get().await?;

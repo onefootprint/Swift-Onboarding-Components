@@ -1,4 +1,3 @@
-pub mod commit;
 pub mod email;
 mod livecheck;
 pub mod phone;
@@ -204,6 +203,5 @@ pub fn routes() -> web::Scope {
         .service(email::handler)
         .service(phone::handler)
         .service(verify::handler)
-        .service(commit::handler)
         .service(livecheck::handler)
 }

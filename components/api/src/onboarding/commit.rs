@@ -16,7 +16,7 @@ struct CommitResponse {
 #[post("/commit")]
 /// Finish onboarding the user. Returns the footprint_user_id for login. If any necessary
 /// attributes were not set, returns an error with the list of missing fields.
-async fn handler(
+fn handler(
     user_auth: LoggedInSessionContext,
     tenant_auth: PublicTenantAuthContext,
     state: web::Data<State>,

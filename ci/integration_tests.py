@@ -121,11 +121,22 @@ def test_identify_verify(request, tenant1):
         url(path),
         json=data,
         cookies=request.config.cache.get("cookies", None),
-        headers=_client_pub_key_headers(tenant1["pk"]),
     )
     body = _assert_response(r)
     assert body["data"]["kind"] == "user_created"
     _set_cookies(request, r)
+
+def test_onboard_init(request, tenant1):
+    path = "onboarding"
+    print(url(path))
+    r = requests.post(
+        url(path),
+        cookies=request.config.cache.get("cookies", None),
+        headers=_client_pub_key_headers(tenant1["pk"]),
+    )
+    body = _assert_response(r)
+    assert set(body["data"]["missing_attributes"]) == {"first_name", "last_name", "date_of_birth", "ssn", "street_address", "city", "state"}
+    _assert_no_cookies(r)
     
 def test_user_data(request, tenant1): 
     path = "user/data"
@@ -144,13 +155,12 @@ def test_user_data(request, tenant1):
         url(path),
         json=data,
         cookies=request.config.cache.get("cookies", None),
-        headers=_client_pub_key_headers(tenant1["pk"]),
     )
     _assert_response(r)
     _assert_no_cookies(r)
 
-def test_identify_commit(request, tenant1): 
-    path = "identify/commit"
+def test_onboarding_commit(request, tenant1): 
+    path = "onboarding/commit"
     print(url(path))
     r = requests.post(
         url(path),
@@ -175,13 +185,12 @@ def test_identify_repeat_customer_via_email(request, tenant2):
         url(path),
         json=data,
         cookies=request.config.cache.get("cookies", None),
-        headers=_client_pub_key_headers(tenant2["pk"]),
     )
     body = _assert_response(r)
     assert body["data"]["phone_number_last_two"] == phone_number[-2:]
     _set_cookies(request, r)
 
-def test_identify_verify_repeat_customer(request, tenant2):
+    # Log in as the user
     path = "identify/verify"
     print(url(path))
     data = {"code": "123456"}
@@ -189,14 +198,25 @@ def test_identify_verify_repeat_customer(request, tenant2):
         url(path),
         json=data,
         cookies=request.config.cache.get("cookies", None),
-        headers=_client_pub_key_headers(tenant2["pk"]),
     )
     body = _assert_response(r)
     assert body["data"]["kind"] == "user_inherited"
     _set_cookies(request, r)
 
-def test_identify_commit_repeat_customer(request, tenant2):
-    path = "identify/commit"
+    # Start onboarding for user
+    path = "onboarding"
+    print(url(path))
+    r = requests.post(
+        url(path),
+        cookies=request.config.cache.get("cookies", None),
+        headers=_client_pub_key_headers(tenant2["pk"]),
+    )
+    body = _assert_response(r)
+    assert not body["data"]["missing_attributes"]
+    _assert_no_cookies(r)
+
+    # Commit onboarding for user
+    path = "onboarding/commit"
     print(url(path))
     r = requests.post(
         url(path),
@@ -208,7 +228,6 @@ def test_identify_commit_repeat_customer(request, tenant2):
     assert fp_user_id
     old_fp_user_id = request.config.cache.get("fp_user_id", None)
     assert old_fp_user_id != fp_user_id, "Different tenants should have different fp_user_ids"
-    cookies = _parse_cookies(r)
     _assert_no_cookies(r)
     
 def test_decrypt(request, tenant1):
