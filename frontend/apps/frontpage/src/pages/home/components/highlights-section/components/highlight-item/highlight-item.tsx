@@ -43,10 +43,10 @@ const HighlightItem = ({
 const Container = styled.article`
   ${({ theme }) => css`
     z-index: 5;
-    backdrop-filter: blur(1px);
-    background: rgba(255, 255, 255, 0.6);
     border-radius: ${theme.borderRadius[1]}px;
     border: ${theme.borderWidth[1]}px solid ${theme.borderColor.tertiary};
+    backdrop-filter: blur(1px);
+    background: rgba(255, 255, 255, 0.6);
   `}
 `;
 

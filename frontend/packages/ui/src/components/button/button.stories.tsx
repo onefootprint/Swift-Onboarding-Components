@@ -10,7 +10,7 @@ export default {
     children: { control: 'text' },
     disabled: { control: 'boolean' },
     fullWidth: { control: 'boolean' },
-    size: { control: 'select', options: ['default', 'compact'] },
+    size: { control: 'select', options: ['default', 'compact', 'large'] },
     testID: {
       control: 'text',
       description: 'Append an attribute data-testid for testing purposes',

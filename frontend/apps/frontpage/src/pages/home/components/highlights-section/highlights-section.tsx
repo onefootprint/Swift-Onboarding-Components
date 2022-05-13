@@ -16,7 +16,7 @@ const HighlightSection = ({
   subtitle,
   items,
 }: HighlightSectionProps) => (
-  <Container as="section">
+  <Container as="section" sx={{ zIndex: 1 }}>
     <Typography
       color="secondary"
       variant="label-1"
@@ -33,7 +33,7 @@ const HighlightSection = ({
     >
       {title}
     </Typography>
-    <ArticlesContainer>
+    <ItemsContainer>
       {items.map(item => (
         <HighlightItem
           content={item.content}
@@ -43,12 +43,13 @@ const HighlightSection = ({
           title={item.title}
         />
       ))}
-    </ArticlesContainer>
+    </ItemsContainer>
   </Container>
 );
 
-const ArticlesContainer = styled.div`
+const ItemsContainer = styled.div`
   ${({ theme }) => css`
+    z-index: 1;
     display: inline-grid;
     grid-template-columns: repeat(1, 1fr);
     grid-template-rows: 3 1fr;

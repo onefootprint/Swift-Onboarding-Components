@@ -17,7 +17,7 @@ const BaseGradient = styled.div`
 `;
 
 const TopPurple = styled(BaseGradient)`
-  background: #e2defa;
+  background: #cec6ff;
   height: 348px;
   left: 157px;
   top: 427px;
@@ -25,7 +25,7 @@ const TopPurple = styled(BaseGradient)`
 `;
 
 const TopGreen = styled(BaseGradient)`
-  background: rgba(118, 251, 143, 0.17);
+  background: #d0ffd9;
   height: 318px;
   left: 767px;
   top: 277px;
@@ -33,7 +33,7 @@ const TopGreen = styled(BaseGradient)`
 `;
 
 const BottomGreen = styled(BaseGradient)`
-  background: rgba(118, 251, 143, 0.17);
+  background: #d0ffd9;
   height: 263px;
   left: 325px;
   top: 1152px;
@@ -41,7 +41,7 @@ const BottomGreen = styled(BaseGradient)`
 `;
 
 const BottomPurple = styled(BaseGradient)`
-  background: #e2defa;
+  background: #cec6ff;
   height: 236px;
   left: 788px;
   top: 1057px;

@@ -12,7 +12,6 @@ const PlaygroundGradient = styled.div`
   width: 1128px;
   height: 323px;
   left: 0;
-  /* top: 160px; */
 `;
 
 export default PlaygroundGradient;

@@ -41,8 +41,9 @@ export default class MyDocument extends Document {
     return (
       <Html lang="en">
         <Head>
+          <meta name="robots" content="index,follow" />
           <meta
-            property="description"
+            name="description"
             content="The last identity verification you'll ever need"
           />
           <meta

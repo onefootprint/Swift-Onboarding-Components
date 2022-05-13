@@ -22,10 +22,12 @@ const GetStartedSection = ({
     <Inner>
       <LogoContainer>
         <Image
-          width={170}
-          height={155}
+          width={118}
+          height={107}
           src={footprintLogo}
+          layout="fixed"
           placeholder="blur"
+          alt="Footprint logo"
         />
       </LogoContainer>
       <ContentContainer>
@@ -39,7 +41,12 @@ const GetStartedSection = ({
             {title}
           </Typography>
           <TitleImageContainer>
-            <Image width={44} height={60} src={lighting} />
+            <Image
+              width={44}
+              height={60}
+              src={lighting}
+              alt="A thunder to illustrate that we are fast"
+            />
           </TitleImageContainer>
         </TitleContainer>
         <Typography
@@ -76,15 +83,11 @@ const Inner = styled.div`
 const LogoContainer = styled.div`
   ${({ theme }) => css`
     margin-bottom: ${theme.spacing[9]}px;
-    width: 118px;
-    height: 107px;
 
     ${media.greaterThan('md')`
       flex: 1;
-      height: unset;
       margin-bottom: unset;
       text-align: right;
-      width: unset;
     `}
   `}
 `;

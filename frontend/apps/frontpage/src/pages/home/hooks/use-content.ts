@@ -9,15 +9,22 @@ import investors from '../../../../public/images/investors-logo.png';
 import testimonialAuthor from '../../../../public/images/testimonial-author.png';
 
 const useContent = () => ({
+  title: 'Footprint',
+  navbar: {
+    cta: 'Join the waitlist',
+    logoAlt: "Footprint Logo's",
+  },
   hero: {
     title: 'Frictionless Identity. High Integrity.',
     subtitle:
       'Footprint is a unified platform bringing together one-click KYC and a PII Vault.',
     cta: 'Join our waitlist',
+    imgAlt: 'An image of Footprint System',
   },
   playground: {
     title: 'Bringing back trust.',
     subtitle: 'Why Footprint?',
+    instructions: 'Hover the boxes, will ya? 😎',
     tooltips: [
       'Focus on your company, we’ll handle the PII',
       'KYC should be quicker than tying your shoes',

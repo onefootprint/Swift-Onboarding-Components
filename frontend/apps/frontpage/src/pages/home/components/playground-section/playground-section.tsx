@@ -9,18 +9,20 @@ import PlaygroundGrigContent from './components/playground-grid-content';
 type PlaygroundSectionProps = {
   title: string;
   subtitle: string;
+  instructions: string;
   tooltips: string[];
 };
 
 const PlaygroundSection = ({
   title,
   subtitle,
+  instructions,
   tooltips,
 }: PlaygroundSectionProps) => (
   <Container as="section" id="playground">
     <Inner>
       <PlaygroundGradient />
-      <PlaygroundGrid tooltips={tooltips} />
+      <PlaygroundGrid tooltips={tooltips} instructions={instructions} />
       <PlaygroundGrigContent subtitle={subtitle} title={title} />
     </Inner>
   </Container>
