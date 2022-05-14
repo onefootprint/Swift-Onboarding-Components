@@ -2,6 +2,7 @@ use paperclip::actix::web;
 
 pub mod access_events;
 pub mod data;
+pub mod decrypt;
 pub mod detail;
 pub mod email_verify;
 
@@ -10,5 +11,6 @@ pub fn routes() -> web::Scope {
         .service(web::resource("").route(web::get().to(detail::handler)))
         .service(data::handler)
         .service(email_verify::handler)
+        .service(decrypt::handler)
         .service(access_events::handler)
 }

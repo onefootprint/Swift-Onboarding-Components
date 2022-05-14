@@ -230,7 +230,7 @@ def test_identify_repeat_customer_via_email(request, tenant2):
     assert old_fp_user_id != fp_user_id, "Different tenants should have different fp_user_ids"
     _assert_no_cookies(r)
     
-def test_decrypt(request, tenant1):
+def test_tenant_decrypt(request, tenant1):
     path = "tenant/decrypt"
     print(url(path))
     data = {
@@ -316,4 +316,22 @@ def test_logged_in_access_events(request):
     access_events = body["data"]["events"]
     assert len(access_events) == 2
     assert set(i["data_kind"] for i in access_events) == {"first_name", "email"}
+    _assert_no_cookies(r)
+
+def test_logged_in_decrypt(request, tenant1):
+    path = "user/decrypt"
+    print(url(path))
+    data = {
+        "attributes": ["phone_number", "email"]
+    }
+    print(data)
+    r = requests.post(
+        url(path),
+        cookies=request.config.cache.get("cookies", None),
+        json=data,
+    )
+    body = _assert_response(r)
+    attributes = body["data"]["attributes"]
+    assert attributes["phone_number"][-4:] == request.config.cache.get("phone_number", None)[-4:]
+    assert attributes["email"] == request.config.cache.get("email", None)
     _assert_no_cookies(r)

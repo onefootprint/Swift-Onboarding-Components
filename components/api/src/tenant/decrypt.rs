@@ -16,7 +16,7 @@ struct UserDecryptRequest {
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
 struct UserDecryptResponse {
-    pub attributes: HashMap<UserVaultFieldKind, String>,
+    pub attributes: HashMap<UserVaultFieldKind, Option<String>>,
 }
 
 #[api_v2_operation]
@@ -42,10 +42,17 @@ fn handler(
     .ok_or(ApiError::InvalidTenantKeyOrUserId)?;
 
     let mut map = HashMap::new();
-    // TODO create batch enclave decrypt operation since RTT is ~100ms
-    for attr in request.attributes.clone() {
-        let val = decrypt_field(&state, attr.clone(), vault.clone(), onboarding.id.clone()).await?;
-        map.insert(attr, val);
+    for attr in &request.attributes {
+        let val = decrypt_field(&state, attr, vault.clone()).await?;
+        map.insert(attr.to_owned(), val);
+
+        // Create an AccessEvent log showing that the tenant accessed the vault
+        NewAccessEvent {
+            onboarding_id: onboarding.id.clone(),
+            data_kind: attr.to_owned().into(),
+        }
+        .save(&state.db_pool)
+        .await?;
     }
 
     Ok(Json(ApiResponseData {
@@ -53,13 +60,13 @@ fn handler(
     }))
 }
 
-async fn decrypt_field(
+// TODO create batch enclave decrypt operation since RTT is ~100ms
+pub async fn decrypt_field(
     state: &web::Data<State>,
-    field_kind: UserVaultFieldKind,
+    field_kind: &UserVaultFieldKind,
     vault: UserVault,
-    onboarding_id: String,
-) -> Result<String, ApiError> {
-    let val = match field_kind {
+) -> Result<Option<String>, ApiError> {
+    let value = match field_kind {
         UserVaultFieldKind::FirstName => vault.e_first_name,
         UserVaultFieldKind::LastName => vault.e_last_name,
         UserVaultFieldKind::Ssn => vault.e_ssn,
@@ -70,28 +77,16 @@ async fn decrypt_field(
         UserVaultFieldKind::Email => vault.e_email,
         UserVaultFieldKind::PhoneNumber => Some(vault.e_phone_number),
     };
-    // Create an AccessEvent log showing that the tenant accessed the vault
-    NewAccessEvent {
-        onboarding_id,
-        data_kind: field_kind.into(),
+    if let Some(value) = value {
+        let decrypted = crate::enclave::lib::decrypt_bytes(
+            state,
+            &value,
+            vault.e_private_key,
+            enclave_proxy::DataTransform::Identity,
+        )
+        .await?;
+        Ok(Some(std::str::from_utf8(&decrypted)?.to_string()))
+    } else {
+        return Ok(None);
     }
-    .save(&state.db_pool)
-    .await?;
-    decrypt_vault_value(state, val, vault.e_private_key.clone()).await
-}
-
-async fn decrypt_vault_value(
-    state: &web::Data<State>,
-    value: Option<Vec<u8>>,
-    private_key: Vec<u8>,
-) -> Result<String, ApiError> {
-    let val = value.unwrap_or_default();
-    let decrypted = crate::enclave::lib::decrypt_bytes(
-        state,
-        &val,
-        private_key,
-        enclave_proxy::DataTransform::Identity,
-    )
-    .await?;
-    Ok(std::str::from_utf8(&decrypted)?.to_string())
 }
