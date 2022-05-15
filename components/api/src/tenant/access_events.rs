@@ -1,16 +1,15 @@
-use crate::tenant::types::UserVaultFieldKind;
 use crate::types::access_event::ApiAccessEvent;
 use crate::types::success::ApiResponseData;
 use crate::State;
 use crate::{auth::client_secret_key::SecretTenantAuthContext, errors::ApiError};
-use db::models::types::DataKind;
+use newtypes::{DataKind, FootprintUserId};
 use paperclip::actix::{api_v2_operation, get, web, web::Json, Apiv2Schema};
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
 struct AccessEventRequest {
-    footprint_user_id: Option<String>,
-    data_kind: Option<UserVaultFieldKind>,
+    footprint_user_id: Option<FootprintUserId>,
+    data_kind: Option<DataKind>,
 }
 
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize, Apiv2Schema)]

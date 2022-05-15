@@ -1,15 +1,18 @@
 use crate::errors::DbError;
 use crate::models::access_events::AccessEvent;
 use crate::models::onboardings::*;
-use crate::models::types::DataKind;
 use crate::schema;
 use crate::DbPool;
 use diesel::prelude::*;
+use newtypes::DataKind;
+use newtypes::FootprintUserId;
+use newtypes::TenantId;
+use newtypes::UserVaultId;
 
 pub async fn list_for_tenant(
     pool: &DbPool,
-    tenant_id: String,
-    fp_user_id: Option<String>,
+    tenant_id: TenantId,
+    fp_user_id: Option<FootprintUserId>,
     kind: Option<DataKind>,
 ) -> Result<Vec<(AccessEvent, Onboarding)>, DbError> {
     let conn = pool.get().await?;
@@ -37,7 +40,7 @@ pub async fn list_for_tenant(
 
 pub async fn list(
     pool: &DbPool,
-    user_vault_id: String,
+    user_vault_id: UserVaultId,
     kind: Option<DataKind>,
 ) -> Result<Vec<(AccessEvent, Onboarding)>, DbError> {
     let conn = pool.get().await?;

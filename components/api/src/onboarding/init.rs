@@ -4,8 +4,8 @@ use crate::errors::ApiError;
 use crate::types::success::ApiResponseData;
 use crate::State;
 use db::models::onboardings::{NewOnboarding, Onboarding};
-use db::models::types::Status;
 use db::models::user_vaults::MissingFields;
+use newtypes::Status;
 use paperclip::actix::{api_v2_operation, web, web::Json, Apiv2Schema};
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Serialize)]

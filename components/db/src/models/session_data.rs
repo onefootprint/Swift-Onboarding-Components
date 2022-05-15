@@ -4,6 +4,7 @@ use diesel::{
     sql_types::Jsonb,
     types::{FromSql, ToSql},
 };
+use newtypes::{FootprintUserId, UserVaultId};
 use serde::{Deserialize, Serialize};
 use serde_json;
 use std::io::Write;
@@ -18,13 +19,13 @@ pub enum SessionState {
 
 #[derive(Default, FromSqlRow, AsExpression, Serialize, Deserialize, Debug, Clone)]
 pub struct OnboardingSessionData {
-    pub user_ob_id: String,
-    pub user_vault_id: String,
+    pub user_ob_id: FootprintUserId,
+    pub user_vault_id: UserVaultId,
 }
 
 #[derive(Default, FromSqlRow, AsExpression, Serialize, Deserialize, Debug, Clone)]
 pub struct LoggedInSessionData {
-    pub user_vault_id: String,
+    pub user_vault_id: UserVaultId,
 }
 
 impl Default for SessionState {

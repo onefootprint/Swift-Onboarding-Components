@@ -1,13 +1,13 @@
 use crate::errors::DbError;
 use crate::models::onboardings::Onboarding;
-use crate::models::types::Status;
 use crate::schema;
 use deadpool_diesel::postgres::Pool;
 use diesel::prelude::*;
+use newtypes::{FootprintUserId, Status, TenantId, UserVaultId};
 
 pub async fn list_for_tenant(
     pool: &Pool,
-    tenant_id: String,
+    tenant_id: TenantId,
     status: Option<Status>,
 ) -> Result<Vec<Onboarding>, DbError> {
     let conn = pool.get().await?;
@@ -33,8 +33,8 @@ pub async fn list_for_tenant(
 
 pub(crate) fn get_for_tenant(
     conn: &mut PgConnection,
-    tenant_id: String,
-    footprint_user_id: String,
+    tenant_id: TenantId,
+    footprint_user_id: FootprintUserId,
 ) -> Result<Option<Onboarding>, DbError> {
     let ob = schema::onboardings::table
         .filter(schema::onboardings::tenant_id.eq(tenant_id))
@@ -46,8 +46,8 @@ pub(crate) fn get_for_tenant(
 
 pub async fn get(
     pool: &Pool,
-    tenant_id: String,
-    user_vault_id: String,
+    tenant_id: TenantId,
+    user_vault_id: UserVaultId,
 ) -> Result<Option<Onboarding>, DbError> {
     let conn = pool.get().await?;
 

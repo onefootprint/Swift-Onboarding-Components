@@ -4,23 +4,33 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-serde = { version = "1.0", features = ["derive"]}
+serde = { version = "1.0", features = ["derive"] }
 tokio = { version = "1.0", features = ["full"] }
 dotenv = "0.15"
 anyhow = "1.0"
 uuid = { version = "0.8", features = ["serde", "v4"] }
-deadpool-diesel = { version = "0.3.1", features = ["postgres", "rt_tokio_1", "serde"] }
-diesel = { version = "1.4.8", features = ["chrono", "postgres", "uuidv07", "serde_json"] }
-diesel-derive-newtype = "0.1.2"
-diesel-derive-enum = {version = "1.1.2", features=["postgres"]}
+deadpool-diesel = { version = "0.3.1", features = [
+    "postgres",
+    "rt_tokio_1",
+    "serde",
+] }
+diesel = { version = "1.4.8", features = [
+    "chrono",
+    "postgres",
+    "uuidv07",
+    "serde_json",
+] }
+diesel-derive-newtype = "1.0.0"
+diesel-derive-enum = { version = "1.1.2", features = ["postgres"] }
 diesel_migrations = "1.4.0"
 openssl = "0.10.38"
-deadpool = {version = "0.9"}
-strum_macros = { version = "0.24"}
-strum = { version = "0.24"}
+deadpool = { version = "0.9" }
+strum_macros = { version = "0.24" }
+strum = { version = "0.24" }
 chrono = { version = "0.4", features = ["serde"] }
-rand = { version = "0.8 "}
-thiserror = "1.0"   
+rand = { version = "0.8 " }
+thiserror = "1.0"
 crypto = { path = "../enclave/crypto" }
 actix-rt = { version = "2.7" }
-serde_json = { version = "1.0"}
+serde_json = { version = "1.0" }
+newtypes = { path = "../newtypes" }

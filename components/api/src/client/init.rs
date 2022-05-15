@@ -4,6 +4,7 @@ use crate::{enclave::lib::gen_keypair, errors::ApiError};
 
 use crypto::random::gen_random_alphanumeric_code;
 use db::models::tenant_api_keys::PartialTenantApiKey;
+use newtypes::{TenantId, TenantPublicKey};
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 
 use db::models::tenants::{NewTenant, Tenant};
@@ -16,7 +17,7 @@ struct NewClientRequest {
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Apiv2Schema)]
 struct NewClientResponse {
     /// unique identifier for this client
-    client_id: String,
+    client_id: TenantId,
     /// keys for authenticating as this client
     keys: ClientKeysResponse,
 }
@@ -24,7 +25,7 @@ struct NewClientResponse {
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Apiv2Schema)]
 struct ClientKeysResponse {
     /// Public key used to identify client
-    client_public_key: String,
+    client_public_key: TenantPublicKey,
     /// Secret key, not yet used
     client_secret_key: String,
     /// Name of this keypair, i.e. "keypair-dev" or "keypair-prod"

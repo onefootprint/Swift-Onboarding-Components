@@ -36,10 +36,15 @@ pub async fn get_register_challenge(
 
     // generate the challenge and return it
     let webauthn = webauthn_rs::Webauthn::new(LivenessWebauthnConfig::new(&state));
-    let user_id = auth.local_state.user_vault_id.as_bytes();
+    let user_id = auth
+        .local_state
+        .user_vault_id
+        .to_string()
+        .as_bytes()
+        .to_vec();
     // TODO: fix usernames here
     let (challenge, reg_state) = webauthn.generate_challenge_register_options(
-        user_id.to_vec(),
+        user_id,
         "Footprint".into(),
         "Footprint".into(),
         None,

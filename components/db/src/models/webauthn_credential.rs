@@ -5,6 +5,7 @@ use crate::{
 };
 use chrono::NaiveDateTime;
 use diesel::{Insertable, PgConnection, QueryDsl, Queryable, RunQueryDsl};
+use newtypes::UserVaultId;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
@@ -12,7 +13,7 @@ use uuid::Uuid;
 #[table_name = "webauthn_credentials"]
 pub struct WebauthnCredential {
     pub id: Uuid,
-    pub user_vault_id: String,
+    pub user_vault_id: UserVaultId,
     pub credential_id: Vec<u8>,
     pub public_key: Vec<u8>,
     pub counter: i32,
@@ -25,7 +26,7 @@ pub struct WebauthnCredential {
 impl WebauthnCredential {
     pub fn get_for_user_vault(
         conn: &PgConnection,
-        user_vault_id: &str,
+        user_vault_id: &UserVaultId,
     ) -> Result<Vec<Self>, crate::DbError> {
         let creds = schema::webauthn_credentials::table
             .filter(schema::webauthn_credentials::user_vault_id.eq(user_vault_id))
@@ -38,7 +39,7 @@ impl WebauthnCredential {
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
 #[table_name = "webauthn_credentials"]
 pub struct NewWebauthnCredential {
-    pub user_vault_id: String,
+    pub user_vault_id: UserVaultId,
     pub credential_id: Vec<u8>,
     pub public_key: Vec<u8>,
     pub attestation_data: Vec<u8>,

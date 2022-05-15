@@ -1,17 +1,18 @@
 use crate::schema::onboardings;
-use crate::{models::types::Status, DbPool};
+use crate::DbPool;
 use chrono::NaiveDateTime;
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
+use newtypes::{FootprintUserId, OnboardingId, Status, TenantId, UserVaultId};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
 #[table_name = "onboardings"]
 pub struct Onboarding {
-    pub id: String,
-    pub user_ob_id: String,
-    pub user_vault_id: String,
-    pub tenant_id: String,
+    pub id: OnboardingId,
+    pub user_ob_id: FootprintUserId,
+    pub user_vault_id: UserVaultId,
+    pub tenant_id: TenantId,
     pub status: Status,
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
@@ -20,8 +21,8 @@ pub struct Onboarding {
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
 #[table_name = "onboardings"]
 pub struct NewOnboarding {
-    pub user_vault_id: String,
-    pub tenant_id: String,
+    pub user_vault_id: UserVaultId,
+    pub tenant_id: TenantId,
     pub status: Status,
 }
 

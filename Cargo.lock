@@ -1409,6 +1409,7 @@ dependencies = [
  "diesel-derive-newtype",
  "diesel_migrations",
  "dotenv",
+ "newtypes",
  "openssl",
  "rand",
  "serde",
@@ -1515,11 +1516,10 @@ dependencies = [
 
 [[package]]
 name = "diesel-derive-newtype"
-version = "0.1.2"
+version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e844e8e6f65dcf27aa0b97d4234f974d93dfbf56816033d71b5e0c7eb701709f"
+checksum = "6f5e96f584cab47f91f47a496e33cb35558f63d375f374282421dcccaa9f7ef5"
 dependencies = [
- "diesel",
  "proc-macro2 0.4.30",
  "quote 0.6.13",
  "syn 0.14.9",
@@ -1782,6 +1782,7 @@ dependencies = [
  "futures-util",
  "log",
  "mime",
+ "newtypes",
  "opentelemetry",
  "opentelemetry-otlp",
  "paperclip",
@@ -2414,6 +2415,19 @@ name = "multimap"
 version = "0.8.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e5ce46fe64a9d73be07dcbe690a38ce1b293be448fd8ce1e6c1b8062c9f72c6a"
+
+[[package]]
+name = "newtypes"
+version = "0.1.0"
+dependencies = [
+ "derive_more",
+ "diesel",
+ "diesel-derive-enum",
+ "diesel-derive-newtype",
+ "paperclip",
+ "serde",
+ "serde_json",
+]
 
 [[package]]
 name = "nix"

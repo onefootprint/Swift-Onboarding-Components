@@ -4,12 +4,13 @@ use crate::auth::logged_in_session::LoggedInSessionContext;
 use crate::errors::ApiError;
 use crate::types::success::ApiResponseData;
 use crate::State;
+use newtypes::FootprintUserId;
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Apiv2Schema)]
 struct CommitResponse {
     /// Unique footprint user id
-    footprint_user_id: String,
+    footprint_user_id: FootprintUserId,
 }
 
 #[api_v2_operation]

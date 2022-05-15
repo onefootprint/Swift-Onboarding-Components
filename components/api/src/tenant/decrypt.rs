@@ -1,22 +1,22 @@
-use crate::tenant::types::UserVaultFieldKind;
 use crate::types::success::ApiResponseData;
 use crate::State;
 use crate::{auth::client_secret_key::SecretTenantAuthContext, errors::ApiError};
 use db::models::access_events::NewAccessEvent;
 use db::models::user_vaults::UserVault;
+use newtypes::{DataKind, FootprintUserId};
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 use std::collections::{HashMap, HashSet};
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
 struct UserDecryptRequest {
-    footprint_user_id: String,
-    attributes: HashSet<UserVaultFieldKind>,
+    footprint_user_id: FootprintUserId,
+    attributes: HashSet<DataKind>,
 }
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
 struct UserDecryptResponse {
-    pub attributes: HashMap<UserVaultFieldKind, Option<String>>,
+    pub attributes: HashMap<DataKind, Option<String>>,
 }
 
 #[api_v2_operation]
@@ -63,19 +63,19 @@ fn handler(
 // TODO create batch enclave decrypt operation since RTT is ~100ms
 pub async fn decrypt_field(
     state: &web::Data<State>,
-    field_kind: &UserVaultFieldKind,
+    field_kind: &DataKind,
     vault: UserVault,
 ) -> Result<Option<String>, ApiError> {
     let value = match field_kind {
-        UserVaultFieldKind::FirstName => vault.e_first_name,
-        UserVaultFieldKind::LastName => vault.e_last_name,
-        UserVaultFieldKind::Ssn => vault.e_ssn,
-        UserVaultFieldKind::Dob => vault.e_dob,
-        UserVaultFieldKind::StreetAddress => vault.e_street_address,
-        UserVaultFieldKind::City => vault.e_city,
-        UserVaultFieldKind::State => vault.e_state,
-        UserVaultFieldKind::Email => vault.e_email,
-        UserVaultFieldKind::PhoneNumber => Some(vault.e_phone_number),
+        DataKind::FirstName => vault.e_first_name,
+        DataKind::LastName => vault.e_last_name,
+        DataKind::Ssn => vault.e_ssn,
+        DataKind::Dob => vault.e_dob,
+        DataKind::StreetAddress => vault.e_street_address,
+        DataKind::City => vault.e_city,
+        DataKind::State => vault.e_state,
+        DataKind::Email => vault.e_email,
+        DataKind::PhoneNumber => Some(vault.e_phone_number),
     };
     if let Some(value) = value {
         let decrypted = crate::enclave::lib::decrypt_bytes(

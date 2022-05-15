@@ -7,6 +7,7 @@ use crate::schema;
 use crate::session::get_session_by_id_sync;
 use deadpool_diesel::postgres::Pool;
 use diesel::prelude::*;
+use newtypes::{FootprintUserId, TenantId, UserVaultId};
 
 pub async fn update(pool: &Pool, update: UpdateUserVault) -> Result<usize, DbError> {
     let conn = pool.get().await?;
@@ -24,7 +25,7 @@ pub async fn update(pool: &Pool, update: UpdateUserVault) -> Result<usize, DbErr
     Ok(size)
 }
 
-pub async fn get(pool: &Pool, uv_id: String) -> Result<UserVault, DbError> {
+pub async fn get(pool: &Pool, uv_id: UserVaultId) -> Result<UserVault, DbError> {
     let conn = pool.get().await?;
 
     let user = conn
@@ -56,8 +57,8 @@ pub async fn get_by_logged_in_session(
 
 pub async fn get_by_tenant_and_onboarding(
     pool: &Pool,
-    tenant_id: String,
-    footprint_user_id: String,
+    tenant_id: TenantId,
+    footprint_user_id: FootprintUserId,
 ) -> Result<Option<(UserVault, Onboarding)>, DbError> {
     let conn = pool.get().await?;
 
@@ -112,7 +113,7 @@ pub async fn get_by_email(pool: &Pool, sh_email: Vec<u8>) -> Result<Option<UserV
     Ok(user)
 }
 
-pub fn get_sync(conn: &mut PgConnection, uv_id: String) -> Result<UserVault, DbError> {
+pub fn get_sync(conn: &mut PgConnection, uv_id: UserVaultId) -> Result<UserVault, DbError> {
     let user = schema::user_vaults::table
         .filter(schema::user_vaults::id.eq(uv_id))
         .first(conn)?;

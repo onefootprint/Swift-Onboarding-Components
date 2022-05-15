@@ -1,4 +1,5 @@
 use diesel::{Connection, PgConnection};
+use newtypes::Status;
 
 #[actix_rt::test]
 async fn test_db() {
@@ -22,7 +23,7 @@ async fn test_db() {
     let user_vault = crate::models::user_vaults::NewUserVault {
         e_private_key: "private key".as_bytes().to_vec(),
         public_key: "public key".as_bytes().to_vec(),
-        id_verified: crate::models::types::Status::Incomplete,
+        id_verified: Status::Incomplete,
         e_phone_number: "".as_bytes().to_vec(),
         sh_phone_number: "".as_bytes().to_vec(),
     }

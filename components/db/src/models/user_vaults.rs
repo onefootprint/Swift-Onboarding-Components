@@ -1,14 +1,15 @@
 use crate::diesel::RunQueryDsl;
 use crate::schema::user_vaults;
-use crate::{models::types::Status, DbPool};
+use crate::DbPool;
 use chrono::NaiveDateTime;
 use diesel::{Insertable, Queryable};
+use newtypes::{Status, UserVaultId};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable, Identifiable)]
 #[table_name = "user_vaults"]
 pub struct UserVault {
-    pub id: String,
+    pub id: UserVaultId,
     pub e_private_key: Vec<u8>,
     pub public_key: Vec<u8>,
     pub e_first_name: Option<Vec<u8>>,
@@ -32,7 +33,7 @@ pub struct UserVault {
 #[derive(Debug, Default, Clone, Serialize, Deserialize, Insertable, AsChangeset)]
 #[table_name = "user_vaults"]
 pub struct UpdateUserVault {
-    pub id: String,
+    pub id: UserVaultId,
     pub e_first_name: Option<Vec<u8>>,
     pub e_last_name: Option<Vec<u8>>,
     pub e_dob: Option<Vec<u8>>,

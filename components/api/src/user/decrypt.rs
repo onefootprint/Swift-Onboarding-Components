@@ -1,20 +1,20 @@
 use crate::auth::logged_in_session::LoggedInSessionContext;
 use crate::errors::ApiError;
-use crate::tenant::types::UserVaultFieldKind;
 use crate::types::success::ApiResponseData;
 use crate::State;
+use newtypes::DataKind;
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 use std::collections::{HashMap, HashSet};
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
 struct UserDecryptRequest {
-    attributes: HashSet<UserVaultFieldKind>,
+    attributes: HashSet<DataKind>,
 }
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
 struct UserDecryptResponse {
-    pub attributes: HashMap<UserVaultFieldKind, Option<String>>,
+    attributes: HashMap<DataKind, Option<String>>,
 }
 
 #[api_v2_operation]

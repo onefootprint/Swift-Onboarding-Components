@@ -1,8 +1,8 @@
-use crate::models::types::DataKind;
 use crate::schema::access_events;
 use crate::DbPool;
 use chrono::NaiveDateTime;
 use diesel::{Insertable, Queryable, RunQueryDsl};
+use newtypes::{DataKind, OnboardingId};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
@@ -10,7 +10,7 @@ use uuid::Uuid;
 #[table_name = "access_events"]
 pub struct AccessEvent {
     pub id: Uuid,
-    pub onboarding_id: String,
+    pub onboarding_id: OnboardingId,
     pub data_kind: DataKind,
     pub timestamp: NaiveDateTime,
     pub created_at: NaiveDateTime,
@@ -20,7 +20,7 @@ pub struct AccessEvent {
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
 #[table_name = "access_events"]
 pub struct NewAccessEvent {
-    pub onboarding_id: String,
+    pub onboarding_id: OnboardingId,
     pub data_kind: DataKind,
 }
 

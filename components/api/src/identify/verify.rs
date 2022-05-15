@@ -7,8 +7,8 @@ use crate::State;
 use actix_session::Session;
 use aws_sdk_kms::model::DataKeyPairSpec;
 use db::models::session_data::{LoggedInSessionData, SessionState as DbSessionState};
-use db::models::types::Status;
 use db::models::user_vaults::{NewUserVault, UserVault};
+use newtypes::Status;
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 
 use super::{hash, seal};

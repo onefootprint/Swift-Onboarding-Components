@@ -6,6 +6,7 @@ use chrono::Utc;
 use crypto::sha256;
 use deadpool_diesel::postgres::Pool;
 use diesel::prelude::*;
+use newtypes::TenantId;
 
 pub async fn init(pool: &Pool, new_tenant: NewTenant) -> Result<Tenant, DbError> {
     let conn = pool.get().await?;
@@ -21,7 +22,7 @@ pub async fn init(pool: &Pool, new_tenant: NewTenant) -> Result<Tenant, DbError>
     Ok(tenant)
 }
 
-pub async fn get_tenant(pool: &Pool, tenant_id: String) -> Result<Tenant, DbError> {
+pub async fn get_tenant(pool: &Pool, tenant_id: TenantId) -> Result<Tenant, DbError> {
     let conn = pool.get().await?;
 
     let tenant: Tenant = conn

@@ -3,6 +3,7 @@ use std::pin::Pin;
 use actix_session::Session;
 use actix_web::{web, FromRequest};
 use futures_util::Future;
+use newtypes::UserVaultId;
 use paperclip::actix::Apiv2Security;
 use serde::{Deserialize, Serialize};
 
@@ -25,7 +26,7 @@ pub struct LivenessVerificationAuthContext {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct WebAuthnCookieSessionState {
     pub session_id: String,
-    pub user_vault_id: String,
+    pub user_vault_id: UserVaultId,
     pub state: WebAuthnState,
 }
 

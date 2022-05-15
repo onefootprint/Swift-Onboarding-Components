@@ -1,6 +1,6 @@
 table! {
     use diesel::sql_types::*;
-    use crate::models::types::*;
+    use newtypes::db_types::*;
 
     access_events (id) {
         id -> Uuid,
@@ -14,7 +14,7 @@ table! {
 
 table! {
     use diesel::sql_types::*;
-    use crate::models::types::*;
+    use newtypes::db_types::*;
 
     onboardings (id) {
         id -> Varchar,
@@ -29,7 +29,7 @@ table! {
 
 table! {
     use diesel::sql_types::*;
-    use crate::models::types::*;
+    use newtypes::db_types::*;
 
     sessions (h_session_id) {
         h_session_id -> Varchar,
@@ -41,7 +41,7 @@ table! {
 
 table! {
     use diesel::sql_types::*;
-    use crate::models::types::*;
+    use newtypes::db_types::*;
 
     tenant_api_keys (tenant_public_key) {
         tenant_public_key -> Varchar,
@@ -57,7 +57,7 @@ table! {
 
 table! {
     use diesel::sql_types::*;
-    use crate::models::types::*;
+    use newtypes::db_types::*;
 
     tenants (id) {
         id -> Varchar,
@@ -71,7 +71,7 @@ table! {
 
 table! {
     use diesel::sql_types::*;
-    use crate::models::types::*;
+    use newtypes::db_types::*;
 
     user_vaults (id) {
         id -> Varchar,
@@ -98,7 +98,7 @@ table! {
 
 table! {
     use diesel::sql_types::*;
-    use crate::models::types::*;
+    use newtypes::db_types::*;
 
     webauthn_credentials (id) {
         id -> Uuid,
