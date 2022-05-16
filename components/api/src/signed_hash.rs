@@ -1,4 +1,5 @@
 use aws_sdk_kms::types::Blob;
+use crypto::sha256;
 
 use crate::errors::ApiError;
 
@@ -24,6 +25,9 @@ impl SignedHashClient {
     }
 
     pub async fn signed_hash(&self, data: &[u8]) -> Result<Vec<u8>, ApiError> {
+        // hash the data before sending it to aws
+        let data = sha256(data).to_vec();
+
         let result = self
             .client
             .generate_mac()
