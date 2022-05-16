@@ -26,9 +26,6 @@ pub enum DbError {
     #[error("invalid_tenant_auth")]
     InvalidTenantAuth,
 
-    #[error("session_expired")]
-    SessionExpired,
-
     #[error("challenge_data_mismatch")]
     ChallengeDataMismatch,
 

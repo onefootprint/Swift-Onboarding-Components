@@ -1,9 +1,9 @@
-use crate::diesel::RunQueryDsl;
 use crate::models::session_data::SessionState;
 use crate::schema::sessions;
 use crate::DbPool;
 use chrono::NaiveDateTime;
 use crypto::{hex::ToHex, random::gen_random_alphanumeric_code};
+use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
 use serde::{Deserialize, Serialize};
 
@@ -13,13 +13,6 @@ pub struct Session {
     pub h_session_id: String,
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
-    pub session_data: SessionState,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize, Insertable, AsChangeset)]
-#[table_name = "sessions"]
-pub struct UpdateSession {
-    pub h_session_id: String,
     pub session_data: SessionState,
 }
 
@@ -40,20 +33,23 @@ impl SessionState {
             h_session_id,
             session_data: self,
         }
-        .save(pool)
+        .update_or_create(pool)
         .await?;
         Ok((session, token))
     }
 }
 
 impl NewSession {
-    async fn save(self, pool: &DbPool) -> Result<Session, crate::DbError> {
+    pub async fn update_or_create(self, pool: &DbPool) -> Result<Session, crate::DbError> {
         let session = pool
             .get()
             .await?
             .interact(move |conn| {
                 diesel::insert_into(sessions::table)
-                    .values(self)
+                    .values(self.clone())
+                    .on_conflict(sessions::h_session_id)
+                    .do_update()
+                    .set(sessions::session_data.eq(self.session_data))
                     .get_result::<Session>(conn)
             })
             .await??;

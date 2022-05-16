@@ -54,7 +54,9 @@ impl FromRequest for LoggedInSessionContext {
                 .map_err(AuthError::InvalidSessionJson)?
                 .ok_or(AuthError::MissingSessionTokenCookie)?;
 
-            let session = db::session::get_by_session_id(&pool, session_id.clone()).await?;
+            let session = db::session::get_by_session_id(&pool, session_id.clone())
+                .await?
+                .ok_or(AuthError::NoSessionFound)?;
             // Actually verify that the session is the correct type
             if let SessionState::LoggedInSession(_) = session.session_data.clone() {
                 Ok(())

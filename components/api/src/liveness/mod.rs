@@ -56,7 +56,9 @@ async fn start(
 ) -> actix_web::Result<Json<ApiResponseData<Empty>>, ApiError> {
     let session_id = request.into_inner().session_id;
     let pool = &state.db_pool;
-    let session_info = db::session::get_by_session_id(pool, session_id.clone()).await?;
+    let session_info = db::session::get_by_session_id(pool, session_id.clone())
+        .await?
+        .ok_or(AuthError::NoSessionFound)?;
 
     let (user_vault_id, state) = match session_info.session_data {
         SessionState::OnboardingSession(OnboardingSessionData {

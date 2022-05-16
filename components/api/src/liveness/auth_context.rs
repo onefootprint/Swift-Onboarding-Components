@@ -83,7 +83,9 @@ impl FromRequest for LivenessVerificationAuthContext {
             let local_state = WebAuthnCookieSessionState::get(&session)?;
 
             let session_info =
-                db::session::get_by_session_id(&pool, local_state.session_id.clone()).await?;
+                db::session::get_by_session_id(&pool, local_state.session_id.clone())
+                    .await?
+                    .ok_or(AuthError::NoSessionFound)?;
 
             Ok(Self {
                 _session_info: session_info,

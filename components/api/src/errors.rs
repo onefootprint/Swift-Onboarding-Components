@@ -91,7 +91,6 @@ fn status_code_for_db_error(e: &DbError) -> StatusCode {
         DbError::ChallengeExpired => StatusCode::BAD_REQUEST,
         DbError::ChallengeInactive => StatusCode::BAD_REQUEST,
         DbError::InvalidSessionForOperation => StatusCode::UNAUTHORIZED,
-        DbError::SessionExpired => StatusCode::UNAUTHORIZED,
     }
 }
 

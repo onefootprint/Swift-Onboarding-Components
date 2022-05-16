@@ -25,6 +25,8 @@ pub enum AuthError {
     InvalidSessionJson(serde_json::Error),
     #[error("invalid session state")]
     InvalidSessionState,
+    #[error("no session found")]
+    NoSessionFound,
 }
 
 /// For endpoints that take both a user_auth and tenant_auth, this helps to assert that the authenticated user

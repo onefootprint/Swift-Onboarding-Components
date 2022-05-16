@@ -43,7 +43,8 @@ pub async fn get_by_logged_in_session(
 
     let user = conn
         .interact(move |conn| -> Result<UserVault, DbError> {
-            let session = get_session_by_id_sync(conn, session_id)?;
+            let session = get_session_by_id_sync(conn, session_id)?
+                .ok_or(DbError::InvalidSessionForOperation)?;
             let logged_in_data = match session.session_data {
                 SessionState::LoggedInSession(s) => Ok(s),
                 _ => Err(DbError::InvalidSessionForOperation),
