@@ -35,7 +35,7 @@ fn handler(
         &state.db_pool,
         tenant.id.clone(),
         request.footprint_user_id.clone(),
-        request.data_kind.clone().map(DataKind::from),
+        request.data_kind.map(DataKind::from),
     )
     .await?
     .into_iter()

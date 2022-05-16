@@ -19,58 +19,62 @@ use crate::types::error::{ApiResponseError, ApiResponseErrorInfo};
 
 #[derive(Debug, Error)]
 pub enum ApiError {
-    #[error("Auth error: {0}")]
+    #[error("auth error: {0}")]
     AuthError(#[from] crate::auth::AuthError),
-    #[error("kms.datakeypair.generate {0}")]
+    #[error("kms datakeypair generate error: {0}")]
     KmsKeyPair(#[from] KmsSdkError<GenerateDataKeyPairWithoutPlaintextError>),
-    #[error("kms.datakey.generate {0}")]
+    #[error("kms datakey generate error: {0}")]
     KmsDataKey(#[from] KmsSdkError<GenerateDataKeyWithoutPlaintextError>),
-    #[error("kms.hmac.sign {0}")]
+    #[error("kms hmac sign error: {0}")]
     KmsSignMacError(#[from] KmsSdkError<GenerateMacError>),
-    #[error("kms.hmac.verify {0}")]
+    #[error("kms hmac verify error: {0}")]
     KmsVerifyMacError(#[from] KmsSdkError<VerifyMacError>),
-    #[error("pinpoint.phonenumbervalidateerror {0}")]
+    #[error("pinpoint phone number validate error: {0}")]
     PinpointPhoneNumberValidateError(#[from] PinpointSdkError<PhoneNumberValidateError>),
-    #[error("crypto {0}")]
+    #[error("crypto error: {0}")]
     Crypto(#[from] crypto::Error),
-    #[error("enclave_proxy {0}")]
+    #[error("enclave proxy error: {0}")]
     EnclaveProxy(#[from] enclave_proxy::Error),
-    #[error("enclave_conn {0}")]
+    #[error("enclave conn error: {0}")]
     EnclaveConnection(#[from] bb8::RunError<enclave_proxy::Error>),
-    #[error("enclave {0}")]
+    #[error("enclave error: {0}")]
     Enclave(#[from] enclave_proxy::EnclaveError),
-    #[error("database_result {0}")]
+    #[error("database error: {0}")]
     Database(#[from] DbError),
-    #[error("dotenv {0}")]
+    #[error("dotenv error: {0}")]
     Dotenv(#[from] dotenv::Error),
-    #[error("send_text_message_error {0}")]
+    #[error("send text message error: {0}")]
     SendTextMessageError(#[from] SmsSdkError<SendTextMessageError>),
-    #[error("send_email_error {0}")]
+    #[error("send email error: {0}")]
     SendEmailError(#[from] EmailSdkError<SendEmailError>),
-    #[error("cannot_decode_utf8 {0}")]
+    #[error("decode utf8 error: {0}")]
     CannotDecodeUtf8(#[from] std::str::Utf8Error),
-    #[error("phone_number_validation_error")]
+    #[error("phone number validation error")]
     PhoneNumberValidationError,
-    #[error("Json body invalid: {0}")]
+    #[error("json body invalid: {0}")]
     InvalidJsonBody(JsonPayloadError),
-    #[error("challenge_timeout_or_mismatch")]
+    #[error("challenge timeout or mismatch")]
     ChallengeNotValid,
-    #[error("missing_fields_required_for_user_signup {0}")]
+    #[error("missing fields required for user signup: {0}")]
     UserMissingRequiredFields(String),
-    #[error("user_does_not_exist_for_email_challenge")]
+    #[error("user does not exist for email challenge")]
     UserDoesntExistForEmailChallenge,
-    #[error("email_challenge_decrpytion_error")]
+    #[error("email challenge decrpytion error")]
     EmailChallengeDecryptionError,
-    #[error("email_challenge_expired")]
+    #[error("email challenge expired")]
     EmailChallengeExpired,
-    #[error("invalid_tenant_skey_or_footprint_user_id")]
+    #[error("invalid tenant skey or footprint user id")]
     InvalidTenantKeyOrUserId,
     #[error("webauthn error: {0}")]
-    WebAuthn(#[from] webauthn_rs::error::WebauthnError),
+    Webauthn(#[from] webauthn_rs::error::WebauthnError),
     #[error("json error: {0}")]
     Serde(#[from] serde_json::Error),
-    #[error("Onboarding for tenant, user pair does not exist")]
+    #[error("onboarding for tenant, user pair does not exist")]
     OnboardingForTenantDoesNotExist,
+    #[error("webauthn credential not set")]
+    WebauthnCredentialsNotSet,
+    #[error("webauthn credential not set, and missing fields required for user: {0}")]
+    UserMissingWebauthnAndFields(String),
 }
 
 fn status_code_for_db_error(e: &DbError) -> StatusCode {
@@ -115,11 +119,13 @@ impl actix_web::ResponseError for ApiError {
             ApiError::EmailChallengeDecryptionError => actix_web::http::StatusCode::BAD_REQUEST,
             ApiError::EmailChallengeExpired => actix_web::http::StatusCode::BAD_REQUEST,
             ApiError::InvalidTenantKeyOrUserId => actix_web::http::StatusCode::BAD_REQUEST,
-            ApiError::WebAuthn(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            ApiError::Webauthn(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::Serde(_) => StatusCode::BAD_REQUEST,
             ApiError::OnboardingForTenantDoesNotExist => StatusCode::UNAUTHORIZED,
             ApiError::KmsSignMacError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::KmsVerifyMacError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            ApiError::WebauthnCredentialsNotSet => StatusCode::BAD_REQUEST,
+            ApiError::UserMissingWebauthnAndFields(_) => StatusCode::BAD_REQUEST,
         }
     }
 

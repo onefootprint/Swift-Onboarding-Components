@@ -1,13 +1,12 @@
 use crate::{
     auth::AuthError,
     errors::ApiError,
-    liveness::{auth_context::AuthState, LivenessWebauthnConfig},
+    liveness::{auth_context::AuthState, get_opt_webauthn_creds, LivenessWebauthnConfig},
     types::{success::ApiResponseData, Empty},
     State,
 };
 use actix_session::Session;
 use crypto::serde_cbor;
-use db::{errors::DbError, models::webauthn_credential::WebauthnCredential};
 use paperclip::actix::{api_v2_operation, get, post, web, web::Json, Apiv2Schema};
 use serde::{Deserialize, Serialize};
 use webauthn_rs::proto::{Credential, UserVerificationPolicy};
@@ -37,15 +36,9 @@ pub async fn get_verify_challenge(
 
     // look up webauthn credentials
     let user_vault_id = auth.local_state.user_vault_id.clone();
-    let creds = state
-        .db_pool
-        .get()
-        .await
-        .map_err(DbError::from)?
-        .interact(move |conn| WebauthnCredential::get_for_user_vault(conn, &user_vault_id))
-        .await
-        .map_err(DbError::from)??;
-
+    let creds = get_opt_webauthn_creds(&state, user_vault_id)
+        .await?
+        .ok_or(ApiError::WebauthnCredentialsNotSet)?;
     // convert these creds to webauthn rs type
     let creds = creds
         .into_iter()

@@ -1,9 +1,9 @@
-use crate::auth::client_public_key::PublicTenantAuthContext;
 use crate::auth::get_onboarding_for_tenant;
 use crate::auth::logged_in_session::LoggedInSessionContext;
 use crate::errors::ApiError;
 use crate::types::success::ApiResponseData;
 use crate::State;
+use crate::{auth::client_public_key::PublicTenantAuthContext, liveness::get_opt_webauthn_creds};
 use newtypes::FootprintUserId;
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 
@@ -24,16 +24,22 @@ fn handler(
 ) -> actix_web::Result<Json<ApiResponseData<CommitResponse>>, ApiError> {
     let onboarding = get_onboarding_for_tenant(&state.db_pool, &user_auth, &tenant_auth).await?;
     let uv = user_auth.user_vault();
+    let uv_id = uv.id.clone();
 
     let missing_fields = db::models::user_vaults::MissingFields::missing_fields(uv);
+    let webauthn_creds = get_opt_webauthn_creds(&state, uv_id).await?;
 
-    match missing_fields.len() {
-        0 => Ok(Json(ApiResponseData {
+    match (missing_fields.len(), webauthn_creds) {
+        (0, Some(_)) => Ok(Json(ApiResponseData {
             data: CommitResponse {
-                footprint_user_id: onboarding.user_ob_id,
+                footprint_user_id: onboarding.user_ob_id.clone(),
             },
         })),
-        _ => Err(ApiError::UserMissingRequiredFields(
+        (0, None) => Err(ApiError::WebauthnCredentialsNotSet),
+        (_, Some(_)) => Err(ApiError::UserMissingRequiredFields(
+            missing_fields.join(","),
+        )),
+        _ => Err(ApiError::UserMissingWebauthnAndFields(
             missing_fields.join(","),
         )),
     }

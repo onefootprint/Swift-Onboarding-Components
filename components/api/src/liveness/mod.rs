@@ -9,7 +9,14 @@ use crate::{
     State,
 };
 use actix_session::Session;
-use db::models::session_data::{OnboardingSessionData, SessionState};
+use db::{
+    errors::DbError,
+    models::{
+        session_data::{OnboardingSessionData, SessionState},
+        webauthn_credential::WebauthnCredential,
+    },
+};
+use newtypes::UserVaultId;
 use paperclip::actix::{api_v2_operation, web, web::Json, Apiv2Schema};
 use webauthn_rs::{
     proto::{AttestationConveyancePreference, AuthenticatorAttachment, ParsedAttestationData},
@@ -139,4 +146,18 @@ impl WebauthnConfig for LivenessWebauthnConfig {
             ParsedAttestationData::Uncertain => Err(()),
         }
     }
+}
+
+pub async fn get_opt_webauthn_creds(
+    state: &web::Data<State>,
+    user_vault_id: UserVaultId,
+) -> Result<Option<Vec<WebauthnCredential>>, DbError> {
+    state
+        .db_pool
+        .get()
+        .await
+        .map_err(DbError::from)?
+        .interact(move |conn| WebauthnCredential::get_opt_for_user_vault(conn, user_vault_id))
+        .await
+        .map_err(DbError::from)?
 }

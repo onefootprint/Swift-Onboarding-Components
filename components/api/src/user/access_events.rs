@@ -32,7 +32,7 @@ fn handler(
     let results = db::access_event::list(
         &state.db_pool,
         user_auth.user_vault().id.clone(),
-        request.data_kind.clone().map(DataKind::from),
+        request.data_kind.map(DataKind::from),
     )
     .await?
     .into_iter()

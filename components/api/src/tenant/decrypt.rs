@@ -49,7 +49,7 @@ fn handler(
         // Create an AccessEvent log showing that the tenant accessed the vault
         NewAccessEvent {
             onboarding_id: onboarding.id.clone(),
-            data_kind: attr.to_owned().into(),
+            data_kind: attr.to_owned(),
         }
         .save(&state.db_pool)
         .await?;
@@ -87,6 +87,6 @@ pub async fn decrypt_field(
         .await?;
         Ok(Some(std::str::from_utf8(&decrypted)?.to_string()))
     } else {
-        return Ok(None);
+        Ok(None)
     }
 }
