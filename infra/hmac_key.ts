@@ -2,6 +2,7 @@ import * as pulumi from "@pulumi/pulumi"
 import * as aws from "@pulumi/aws";
 import { Region } from "@pulumi/aws";
 import { Config } from "./config";
+import * as aws_native from "@pulumi/aws-native";
 
 export interface HmacSigningKeyDescriptor {
     rootKeyId: pulumi.Output<string>;
@@ -26,19 +27,22 @@ export async function Initialize(config: Config, replicaRegions: Region[]): Prom
         ]
     });
 
-    const rootKey = new aws.kms.Key(`hmac_signing_master_root_key`, {
+
+
+    const rootKey = new aws_native.kms.Key(`hmac_signing_master_root_key`, {
         multiRegion: true,
-        customerMasterKeySpec: "SYMMETRIC_DEFAULT", // TODO: change to HMAC_512
-        keyUsage: "ENCRYPT_DECRYPT", // TODO: change to GENERATE_VERIFY
-        policy: keyPolicy
+        keySpec: "HMAC_512",
+        keyUsage: "GENERATE_VERIFY_MAC",
+        keyPolicy: keyPolicy,
+        description: `HMAC signing key for ${pulumi.getStack()}-default-region`
     });
 
     const replicas = replicaRegions.map(region => {
-        const provider = new aws.Provider(`kms-hmac-provider-${region}`, { region });
-        return new aws.kms.ReplicaKey(`hmac_signing_root_key_replica-${region}`, {
-            description: "replica region key",
-            policy: JSON.stringify(keyPolicy),
+        const provider = new aws_native.Provider(`kms-hmac-provider-${region}`, { region });
+        return new aws_native.kms.ReplicaKey(`hmac_signing_root_key_replica-${region}`, {
+            keyPolicy: JSON.stringify(keyPolicy),
             primaryKeyArn: rootKey.arn,
+            description: `HMAC signing key (replica) for ${pulumi.getStack()}-${region}`
         }, { provider });
     });
 

@@ -13,7 +13,7 @@ struct AccessEventRequest {
 
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize, Apiv2Schema)]
 struct OnboardingItem {
-    pub id: FootprintUserId,
+    pub footprint_user_id: FootprintUserId,
     pub status: Status,
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
@@ -42,7 +42,7 @@ fn handler(
             .await?
             .into_iter()
             .map(|ob| OnboardingItem {
-                id: ob.user_ob_id,
+                footprint_user_id: ob.user_ob_id,
                 status: ob.status,
                 created_at: ob.created_at,
                 updated_at: ob.updated_at,

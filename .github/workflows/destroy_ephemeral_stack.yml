@@ -2,14 +2,14 @@ name: Destroy Ephemeral Stack
 on:
   pull_request:
     types: [closed]
-    
+
   workflow_dispatch:
     inputs:
       branchName:
-        description: 'Name of the branch whose stack to delete. DEV ONLY'
+        description: "Name of the branch whose stack to delete. DEV ONLY"
         required: true
         type: string
-        
+
 jobs:
   destroy_ephemeral_stack:
     name: Destroy Ephemeral Stack
@@ -33,7 +33,7 @@ jobs:
       - name: Setup Pulumi CLI
         uses: pulumi/setup-pulumi@v2.0.0
         with:
-          pulumi-version: 3.30.0
+          pulumi-version: 3.32.1
 
       - run: npm install
         working-directory: infra

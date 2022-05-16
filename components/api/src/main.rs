@@ -4,11 +4,13 @@ use actix_web_opentelemetry::RequestMetrics;
 use config::Config;
 use db::DbPool;
 use enclave_proxy::{bb8, pool, StreamManager};
+use signed_hash::SignedHashClient;
 use telemetry::TelemetrySpanBuilder;
 use tracing_actix_web::TracingLogger;
 
 mod config;
 mod errors;
+mod signed_hash;
 mod telemetry;
 
 use crate::errors::ApiError;
@@ -35,6 +37,7 @@ pub struct State {
     sms_client: aws_sdk_pinpointsmsvoicev2::Client,
     email_client: aws_sdk_pinpointemail::Client,
     kms_client: aws_sdk_kms::Client,
+    hmac_client: SignedHashClient,
     db_pool: DbPool,
     enclave_connection_pool: bb8::Pool<pool::StreamManager<StreamManager<Config>>>,
 }
@@ -66,6 +69,16 @@ async fn main() -> std::io::Result<()> {
         let sms_client = aws_sdk_pinpointsmsvoicev2::Client::new(&shared_config);
         let email_client = aws_sdk_pinpointemail::Client::new(&shared_config);
         let kms_client = aws_sdk_kms::Client::new(&shared_config);
+        let hmac_client = SignedHashClient {
+            client: kms_client.clone(),
+            key_id: config.signing_root_key_id.clone(),
+        };
+
+        // let out = hmac_client
+        //     .signed_hash(&vec![0xde, 0xad, 0xbe, 0xef])
+        //     .await
+        //     .unwrap();
+        // dbg!(crypto::hex::encode(&out));
 
         // run migrations
         let _ = db::run_migrations(&config.database_url).unwrap();
@@ -82,6 +95,7 @@ async fn main() -> std::io::Result<()> {
             sms_client,
             email_client,
             kms_client,
+            hmac_client,
             db_pool,
         }
     };

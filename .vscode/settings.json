@@ -10,6 +10,7 @@
         "creds",
         "deadpool",
         "envconfig",
+        "hmac",
         "livecheck",
         "newtype",
         "newtypes",

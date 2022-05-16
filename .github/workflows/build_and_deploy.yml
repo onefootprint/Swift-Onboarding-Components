@@ -162,7 +162,7 @@ jobs:
       - name: Setup Pulumi CLI
         uses: pulumi/setup-pulumi@v2.0.0
         with:
-          pulumi-version: 3.30.0
+          pulumi-version: 3.32.1
 
       - run: yarn install
         working-directory: infra

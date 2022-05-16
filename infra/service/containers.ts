@@ -1,3 +1,4 @@
+import { HmacSigningKeyDescriptor } from './../hmac_key';
 import * as awsx from "@pulumi/awsx";
 import * as aws from "@pulumi/aws";
 import * as pulumi from "@pulumi/pulumi"
@@ -9,7 +10,7 @@ import { DbOutput } from "../db";
 
 export abstract class ServiceContainers {
 
-    static async apiMain(appPort: number, constants: Config, secretsStore: StaticSecrets, enclaveKeyDescriptor: EnclaveKeyDescriptor, region: Region, parent: pulumi.Resource, database: DbOutput): Promise<pulumi.Output<string>> {
+    static async apiMain(appPort: number, constants: Config, secretsStore: StaticSecrets, enclaveKeyDescriptor: EnclaveKeyDescriptor, signingKeyDescriptor:HmacSigningKeyDescriptor, region: Region, parent: pulumi.Resource, database: DbOutput): Promise<pulumi.Output<string>> {
         const name = "fpc";
 
         // depends on otel
@@ -24,8 +25,9 @@ export abstract class ServiceContainers {
             enclaveKeyDescriptor.enclaveKmsCredentials.access_key_id,
             secretsStore.enclaveUserSecretKey.arn,
             database.databaseUrlSecretParam.arn,
-            secretsStore.cookieSessionKey.arn
-        ]).apply(([otelCollector, rootKeyId, enclaveAccessKeyId, enclaveUserArn, databaseUrlArn, cookieSessionKeyArn]) => {
+            secretsStore.cookieSessionKey.arn,
+            signingKeyDescriptor.rootKeyId
+        ]).apply(([otelCollector, rootKeyId, enclaveAccessKeyId, enclaveUserArn, databaseUrlArn, cookieSessionKeyArn, signingKeyId]) => {
             const def = [{
                 name,
                 image,
@@ -56,6 +58,10 @@ export abstract class ServiceContainers {
                     {
                         name: "ENCLAVE_AWS_ACCESS_KEY_ID",
                         value: enclaveAccessKeyId
+                    },
+                    {
+                        name: "AWS_HMAC_SIGNING_ROOT_KEY_ID",
+                        value: signingKeyId
                     },
                     {
                         name: "RUST_LOG",

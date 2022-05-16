@@ -260,7 +260,7 @@ def test_onboardings_list(request, tenant1):
     onboardings = body["data"]["onboardings"]
     assert len(onboardings) == 1
     old_fp_user_id = request.config.cache.get("fp_user_id", None)
-    assert onboardings[0]["fp_user_id"] == old_fp_user_id
+    assert onboardings[0]["footprint_user_id"] == old_fp_user_id
 
 def test_access_events_list(request, tenant1):
     fp_user_id = request.config.cache.get("fp_user_id", None)

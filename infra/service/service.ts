@@ -54,7 +54,7 @@ export async function Create(vpcProvider: VpcRegion, config: ServiceConfig, cons
     }, region, provider);
 
     // declare the containers we want to run
-    const containerDefinitions = await ServiceContainers.apiMain(ServicePort, constants, secretsStore, enclaveKeyDescriptor, region, cluster, database);
+    const containerDefinitions = await ServiceContainers.apiMain(ServicePort, constants, secretsStore, enclaveKeyDescriptor, signingKeyDescriptor, region, cluster, database);
 
     // setup the task
     const current = await aws.getCallerIdentity({});

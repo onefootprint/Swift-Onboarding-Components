@@ -56,13 +56,14 @@ export async function Initialize(config: Config, replicaRegions: Region[]): Prom
         multiRegion: true,
         customerMasterKeySpec: "SYMMETRIC_DEFAULT",
         keyUsage: "ENCRYPT_DECRYPT",
-        policy: keyPolicy
+        policy: keyPolicy,
+        description: `enclave master root key for ${pulumi.getStack()}-default-region`
     });
 
     const replicas = replicaRegions.map(region => {
         const provider = new aws.Provider(`kms-provider-${region}`, { region });
         return new aws.kms.ReplicaKey(`enclave_root_key_replica-${region}`, {
-            description: "replica region key",
+            description: `enclave master root key (replica) for ${pulumi.getStack()}-${region}`,
             policy: JSON.stringify(keyPolicy),
             primaryKeyArn: rootKey.arn,
         }, { provider });

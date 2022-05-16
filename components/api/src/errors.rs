@@ -1,7 +1,10 @@
 use actix_web::error::JsonPayloadError;
 use actix_web::http::StatusCode;
 use aws_sdk_kms::{
-    error::{GenerateDataKeyPairWithoutPlaintextError, GenerateDataKeyWithoutPlaintextError},
+    error::{
+        GenerateDataKeyPairWithoutPlaintextError, GenerateDataKeyWithoutPlaintextError,
+        GenerateMacError, VerifyMacError,
+    },
     types::SdkError as KmsSdkError,
 };
 use aws_sdk_pinpoint::{error::PhoneNumberValidateError, types::SdkError as PinpointSdkError};
@@ -22,6 +25,10 @@ pub enum ApiError {
     KmsKeyPair(#[from] KmsSdkError<GenerateDataKeyPairWithoutPlaintextError>),
     #[error("kms.datakey.generate {0}")]
     KmsDataKey(#[from] KmsSdkError<GenerateDataKeyWithoutPlaintextError>),
+    #[error("kms.hmac.sign {0}")]
+    KmsSignMacError(#[from] KmsSdkError<GenerateMacError>),
+    #[error("kms.hmac.verify {0}")]
+    KmsVerifyMacError(#[from] KmsSdkError<VerifyMacError>),
     #[error("pinpoint.phonenumbervalidateerror {0}")]
     PinpointPhoneNumberValidateError(#[from] PinpointSdkError<PhoneNumberValidateError>),
     #[error("crypto {0}")]
@@ -111,6 +118,8 @@ impl actix_web::ResponseError for ApiError {
             ApiError::WebAuthn(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::Serde(_) => StatusCode::BAD_REQUEST,
             ApiError::OnboardingForTenantDoesNotExist => StatusCode::UNAUTHORIZED,
+            ApiError::KmsSignMacError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            ApiError::KmsVerifyMacError(_) => StatusCode::INTERNAL_SERVER_ERROR,
         }
     }
 
