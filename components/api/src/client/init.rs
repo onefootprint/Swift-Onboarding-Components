@@ -67,13 +67,15 @@ async fn init_api_keys(state: &State, tenant: &Tenant) -> Result<ClientKeysRespo
         api_key.clone().into_bytes(),
     )?;
 
+    let sh_api_key = state.hmac_client.signed_hash(api_key.as_bytes()).await?;
+
     let tenant_keys = db::tenant::api_init(
         &state.db_pool,
         PartialTenantApiKey {
             tenant_id: tenant.id.clone(),
             key_name: "default".to_string(),
         },
-        api_key.clone(),
+        sh_api_key,
         e_api_key.to_vec()?,
     )
     .await?;

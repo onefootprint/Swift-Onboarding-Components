@@ -3,7 +3,6 @@ use crate::models::tenant_api_keys::*;
 use crate::models::tenants::*;
 use crate::schema;
 use chrono::Utc;
-use crypto::sha256;
 use deadpool_diesel::postgres::Pool;
 use diesel::prelude::*;
 use newtypes::TenantId;
@@ -39,20 +38,17 @@ pub async fn get_tenant(pool: &Pool, tenant_id: TenantId) -> Result<Tenant, DbEr
 pub async fn api_init(
     pool: &Pool,
     tenant_api: PartialTenantApiKey,
-    secret_api_key: String,
+    sh_api_key: Vec<u8>,
     e_api_key: Vec<u8>,
 ) -> Result<TenantApiKey, DbError> {
     let conn = pool.get().await?;
-
-    // TODO, use hmac instead of sha256
-    let sh_api_key = sha256(secret_api_key.as_bytes());
 
     let now = Utc::now().naive_utc();
 
     let new_tenant_api_key = NewTenantApiKey {
         tenant_id: tenant_api.tenant_id,
         key_name: tenant_api.key_name,
-        sh_secret_api_key: sh_api_key.to_vec(),
+        sh_secret_api_key: sh_api_key,
         is_enabled: true,
         created_at: now,
         updated_at: now,
@@ -108,13 +104,8 @@ pub async fn pub_auth(pool: &Pool, tenant_pub_key: String) -> Result<Option<Tena
     Ok(tenant)
 }
 
-pub async fn secret_auth(
-    pool: &Pool,
-    tenant_secret_key: String,
-) -> Result<Option<Tenant>, DbError> {
+pub async fn secret_auth(pool: &Pool, sh_api_key: Vec<u8>) -> Result<Option<Tenant>, DbError> {
     let conn = pool.get().await?;
-
-    let sh_api_key = crypto::sha256(tenant_secret_key.as_bytes()).to_vec();
 
     let tenant = conn
         .interact(move |conn| -> Result<Option<Tenant>, DbError> {

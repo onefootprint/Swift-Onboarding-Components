@@ -33,7 +33,7 @@ pub async fn handler(
     // clean email & look up existing user vault
     let req = request.into_inner();
     let cleaned_email = clean_email(req.email);
-    let sh_email = super::hash(cleaned_email.clone());
+    let sh_email = super::signed_hash(&state, cleaned_email.clone()).await?;
     let existing_user = db::user_vault::get_by_email(&state.db_pool, sh_email).await?;
 
     // see if user vault has an associated phone number. if not, set session state to info we currently have &

@@ -4,6 +4,7 @@ pub mod phone;
 pub mod verify;
 
 use crate::auth::login_session::ChallengeState;
+use crate::signed_hash;
 use crate::{errors::ApiError, State};
 use aws_sdk_pinpointemail::model::{
     Body as EmailBody, Content as EmailStringContent, Destination as EmailDestination,
@@ -32,9 +33,8 @@ pub struct EmailVerifyChallenge {
 }
 
 // TODO move these utils somewhere else
-pub fn hash(val: String) -> Vec<u8> {
-    // TODO hmac
-    sha256(val.as_bytes()).to_vec()
+pub async fn signed_hash(state: &web::Data<State>, val: String) -> Result<Vec<u8>, ApiError> {
+    state.hmac_client.signed_hash(val.as_bytes()).await
 }
 
 fn seal_untyped(val: String, pub_key: &[u8]) -> Result<EciesP256Sha256AesGcmSealed, ApiError> {
@@ -79,8 +79,10 @@ pub async fn validate_challenge(
 ) -> Result<bool, ApiError> {
     let now = Utc::now().naive_utc();
 
-    Ok((challenge_data.h_code == hash(request_code))
-        & (challenge_data.created_at.signed_duration_since(now) < Duration::minutes(15)))
+    Ok(
+        (challenge_data.h_code == sha256(request_code.as_bytes()).to_vec())
+            & (challenge_data.created_at.signed_duration_since(now) < Duration::minutes(15)),
+    )
 }
 
 pub fn clean_email(raw_email: String) -> String {
@@ -123,7 +125,7 @@ pub(crate) async fn send_phone_challenge(
 
     Ok(ChallengeState {
         phone_number,
-        h_code: hash(code),
+        h_code: sha256(code.as_bytes()).to_vec(),
         created_at: Utc::now().naive_utc(),
     })
 }
@@ -139,7 +141,7 @@ pub(crate) async fn send_email_challenge(
     public_key: Vec<u8>,
     email_address: String,
 ) -> Result<(), ApiError> {
-    let sh_email = hash(email_address.clone());
+    let sh_email = signed_hash(state, email_address.clone()).await?;
     let now = chrono::Utc::now().naive_utc();
     let email_challenge_data = EmailVerifyChallenge {
         expires_at: now + chrono::Duration::days(1),

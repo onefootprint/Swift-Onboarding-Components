@@ -46,10 +46,14 @@ impl FromRequest for SecretTenantAuthContext {
             .and_then(|hv| hv.to_str().map(|s| s.to_string()).ok())
             .ok_or(AuthError::MissingClientSecretAuthHeader);
 
-        let pool = req.app_data::<web::Data<State>>().unwrap().db_pool.clone();
+        let state = req.app_data::<web::Data<State>>().unwrap();
+        let pool = state.db_pool.clone();
+        let hmac_client = state.hmac_client.clone();
 
         Box::pin(async move {
-            let tenant = db::tenant::secret_auth(&pool, tenant_pk?)
+            let sh_api_key = hmac_client.signed_hash(tenant_pk?.as_bytes()).await?;
+
+            let tenant = db::tenant::secret_auth(&pool, sh_api_key)
                 .await?
                 .ok_or(AuthError::UnknownClient)?;
             Ok(Self { tenant })

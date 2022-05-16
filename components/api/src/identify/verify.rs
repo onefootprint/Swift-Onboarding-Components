@@ -2,6 +2,7 @@ use super::validate_challenge;
 use crate::auth::logged_in_session::LoggedInSessionContext;
 use crate::auth::login_session::LoginSessionContext;
 use crate::errors::ApiError;
+use crate::identify::signed_hash;
 use crate::types::success::ApiResponseData;
 use crate::State;
 use actix_session::Session;
@@ -11,7 +12,7 @@ use db::models::user_vaults::{NewUserVault, UserVault};
 use newtypes::Status;
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 
-use super::{hash, seal};
+use super::seal;
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
 struct VerifyRequest {
@@ -50,7 +51,7 @@ async fn handler(
     }
 
     let phone_number = challenge_data.phone_number;
-    let sh_phone_number = hash(phone_number.clone());
+    let sh_phone_number = signed_hash(&state, phone_number.clone()).await?;
     let existing_user =
         db::user_vault::get_by_phone_number(&state.db_pool, sh_phone_number.clone()).await?;
 
@@ -101,7 +102,7 @@ async fn create_new_user_vault(
             .into_inner(),
         public_key: ec_pk_uncompressed.clone(),
         e_phone_number: seal(phone_number.clone(), &ec_pk_uncompressed)?,
-        sh_phone_number: hash(phone_number.clone()),
+        sh_phone_number: signed_hash(state, phone_number.clone()).await?,
         id_verified: Status::Incomplete,
     }
     .save(&state.db_pool)

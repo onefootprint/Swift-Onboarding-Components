@@ -82,8 +82,15 @@ async fn handler(
             .transpose()
     }
 
-    fn hash(val: Option<Option<String>>) -> Option<Vec<u8>> {
-        val.flatten().map(crate::identify::hash)
+    async fn signed_hash(
+        state: &web::Data<State>,
+        val: Option<Option<String>>,
+    ) -> Result<Option<Vec<u8>>, ApiError> {
+        let res = match val {
+            None | Some(None) => None,
+            Some(Some(val)) => Some(crate::identify::signed_hash(&state, val).await?),
+        };
+        Ok(res)
     }
 
     let cleaned_email = if let Some(Some(email)) = request.email.clone() {
@@ -101,12 +108,12 @@ async fn handler(
         e_last_name: seal(request.last_name.clone(), user_vault)?,
         e_dob: seal(request.dob.clone(), user_vault)?,
         e_ssn: seal(request.ssn.clone(), user_vault)?,
-        sh_ssn: hash(request.ssn.clone()),
+        sh_ssn: signed_hash(&state, request.ssn.clone()).await?,
         e_street_address: seal(request.street_address.clone(), user_vault)?,
         e_city: seal(request.city.clone(), user_vault)?,
         e_state: seal(request.state.clone(), user_vault)?,
         e_email: seal(cleaned_email.clone(), user_vault)?,
-        sh_email: hash(cleaned_email.clone()),
+        sh_email: signed_hash(&state, cleaned_email.clone()).await?,
         is_email_verified: cleaned_email.flatten().map(|_| false),
         ..Default::default()
     };
