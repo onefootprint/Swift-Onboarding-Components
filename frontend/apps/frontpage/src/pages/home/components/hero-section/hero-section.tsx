@@ -1,6 +1,7 @@
+import Image from 'next/image';
 import React from 'react';
 import styled, { css } from 'styled';
-import { Button, Container, Typography } from 'ui';
+import { Button, Container, media, Typography } from 'ui';
 
 type HeroSectionProps = {
   title: string;
@@ -34,33 +35,24 @@ const HeroSection = ({ title, subtitle, cta, imgAlt }: HeroSectionProps) => (
       <Button size="large">{cta}</Button>
     </ContentContainer>
     <ImageContainer>
-      <picture>
-        <source
+      <SmallImageContainer>
+        <Image
+          alt={imgAlt}
           height={371}
-          media="(min-width: 0px) and (max-width: 599px)"
-          srcSet="/images/hero-xs.png"
+          layout="fixed"
+          src="/images/hero-xs.png"
           width={320}
         />
-        <source
-          height={303}
-          media="(min-width: 600px) and (max-width: 899px)"
-          srcSet="/images/hero-sm.png"
-          width={552}
+      </SmallImageContainer>
+      <LargeImageContainer>
+        <Image
+          alt={imgAlt}
+          height={682}
+          layout="responsive"
+          src="/images/hero.png"
+          width={1280}
         />
-        <source
-          height={469}
-          media="(min-width: 900px) and (max-width: 1199px)"
-          srcSet="/images/hero-md.png"
-          width={852}
-        />
-        <source
-          height={627}
-          media="(min-width: 1200px) and (max-width: 1439px)"
-          srcSet="/images/hero-lg.png"
-          width={1120}
-        />
-        <img src="/images/hero.png" alt={imgAlt} height={682} width={1280} />
-      </picture>
+      </LargeImageContainer>
     </ImageContainer>
   </Container>
 );
@@ -83,6 +75,20 @@ const ImageContainer = styled.div`
     width: 100%;
     object-fit: contain;
   }
+`;
+
+const SmallImageContainer = styled.div`
+  ${media.greaterThan('sm')`
+    display: none;
+  `}
+`;
+
+const LargeImageContainer = styled.div`
+  display: none;
+
+  ${media.greaterThan('sm')`
+    display: block;
+  `}
 `;
 
 export default HeroSection;

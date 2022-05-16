@@ -87,14 +87,14 @@ const Container = styled.button<{
     `}
 
     ${({ theme, size }) =>
-      size === 'large' &&
-      css`
-        font-family: ${theme.typography['label-1'].fontFamily};
-        font-size: ${theme.typography['label-1'].fontSize};
-        font-weight: ${theme.typography['label-1'].fontWeight};
-        line-height: ${theme.typography['label-1'].lineHeight};
-        padding: ${theme.spacing[5]}px ${theme.spacing[7]}px;
-      `}
+    size === 'large' &&
+    css`
+      font-family: ${theme.typography['label-1'].fontFamily};
+      font-size: ${theme.typography['label-1'].fontSize};
+      font-weight: ${theme.typography['label-1'].fontWeight};
+      line-height: ${theme.typography['label-1'].lineHeight};
+      padding: ${theme.spacing[5]}px ${theme.spacing[7]}px;
+    `}
 
   ${({ fullWidth }) =>
     fullWidth &&
@@ -118,6 +118,7 @@ const Container = styled.button<{
           ${theme.backgroundColor[backgroundColors[variant]]}
         );
     `}
+  }
 
   &:active:enabled {
     ${({ variant, theme }) => css`
@@ -130,6 +131,7 @@ const Container = styled.button<{
           ${theme.backgroundColor[backgroundColors[variant]]}
         );
     `}
+  }
 `;
 
 export default Button;

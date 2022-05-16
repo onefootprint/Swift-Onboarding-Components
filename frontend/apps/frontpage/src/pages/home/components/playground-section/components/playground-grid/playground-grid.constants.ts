@@ -1,6 +1,6 @@
-export const selectedSquares = [16, 54, 170, 195, 227, 333, 380, 390, 460, 512];
+export const selectedSquares = [1, 16, 83, 131, 170, 193, 203, 282, 300, 333];
 
-const rows = 14;
+const rows = 12;
 const columns = 28;
 const itemsCount = rows * columns;
 const lastColumnsIndex = itemsCount - rows - 1;

@@ -41,7 +41,6 @@ const InvestorsSection = ({
         alt={imgAlt}
         height={225}
         layout="responsive"
-        placeholder="blur"
         src={imgSrc}
         width={700}
       />

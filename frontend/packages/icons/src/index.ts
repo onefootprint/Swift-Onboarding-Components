@@ -22,8 +22,12 @@ import IcoClose16 from '../ico/ico-close-16';
 import IcoClose24 from '../ico/ico-close-24';
 import IcoCrosshair16 from '../ico/ico-crosshair-16';
 import IcoCrosshair24 from '../ico/ico-crosshair-24';
+import IcoDatabase16 from '../ico/ico-database-16';
+import IcoDatabase24 from '../ico/ico-database-24';
 import IcoEmail16 from '../ico/ico-email-16';
 import IcoEmail24 from '../ico/ico-email-24';
+import IcoEye16 from '../ico/ico-eye-16';
+import IcoEye24 from '../ico/ico-eye-24';
 import IcoFileText16 from '../ico/ico-file-text-16';
 import IcoFileText24 from '../ico/ico-file-text-24';
 import IcoFootprint16 from '../ico/ico-footprint-16';
@@ -55,7 +59,9 @@ export default {
   IcoChevronRight16,
   IcoClose16,
   IcoCrosshair16,
+  IcoDatabase16,
   IcoEmail16,
+  IcoEye16,
   IcoFileText16,
   IcoFootprint16,
   IcoLock16,
@@ -75,7 +81,9 @@ export default {
   IcoChevronRight24,
   IcoClose24,
   IcoCrosshair24,
+  IcoDatabase24,
   IcoEmail24,
+  IcoEye24,
   IcoFileText24,
   IcoFootprint24,
   IcoLock24,

@@ -26,8 +26,8 @@ const PlaygroundSquare = ({
 const Square = styled.li<{ lastColumn: boolean; isSelected: boolean }>`
   ${({ theme }) => css`
     align-items: center;
-    border-bottom: ${theme.borderWidth[1]}px dashed #c2cbc3;
-    border-right: ${theme.borderWidth[1]}px dashed #c2cbc3;
+    border-bottom: ${theme.borderWidth[1]}px dashed #a2d3aa;
+    border-right: ${theme.borderWidth[1]}px dashed #a2d3aa;
     display: flex;
     justify-content: center;
     position: relative;
@@ -41,15 +41,15 @@ const Square = styled.li<{ lastColumn: boolean; isSelected: boolean }>`
       border-bottom-right-radius: ${theme.borderRadius[1]}px;
     }
 
-    &:nth-child(14) {
+    &:nth-child(12) {
       border-bottom-left-radius: ${theme.borderRadius[1]}px;
     }
 
-    &:nth-child(505) {
+    &:nth-child(325) {
       border-top-right-radius: ${theme.borderRadius[1]}px;
     }
 
-    &:nth-child(14n) {
+    &:nth-child(12n) {
       border-bottom: none;
     }
   `}
@@ -61,13 +61,13 @@ const Square = styled.li<{ lastColumn: boolean; isSelected: boolean }>`
     `}
 
   &:hover {
-    background: #c2cbc3;
+    background: #a2d3aa;
   }
 
   ${({ isSelected }) =>
     isSelected &&
     css`
-      background: #c2cbc3;
+      background: #a2d3aa;
       cursor: crosshair;
     `}
 

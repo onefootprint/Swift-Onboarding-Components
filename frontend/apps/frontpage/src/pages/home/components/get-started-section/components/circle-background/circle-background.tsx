@@ -29,45 +29,57 @@ const Circle = styled.div`
 `;
 
 const InnerCircle = styled(Circle)`
-  width: 418px;
-  height: 418px;
+  width: 95%;
+  height: 348px;
   background: rgba(255, 255, 255, 0.25);
   top: 364px;
 
   ${media.greaterThan('md')`
-    height: 468px;
-    top: 296px;
-    width: 468px;
+    height: 488px;
+    width: 488px;
+    top: 386px;
+  `}
+
+  ${media.greaterThan('lg')`
+    top: 346px;
   `}
 `;
 
 const MiddleCircle = styled(Circle)`
   position: absolute;
-  width: 458px;
-  height: 458px;
+  width: 97.5%;
+  height: 378px;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.2);
   top: 334px;
 
   ${media.greaterThan('md')`
     height: 488px;
-    top: 254px;
+    top: 356px;
     width: 488px;
+  `}
+
+  ${media.greaterThan('lg')`
+    top: 316px;
   `}
 `;
 
 const OuterCircle = styled(Circle)`
-  position: absolute;
-  width: 458px;
-  height: 458px;
-  border-radius: 50%;
   background: rgba(255, 255, 255, 0.15);
+  border-radius: 50%;
+  height: 378px;
+  position: absolute;
   top: 304px;
+  width: 100%;
 
   ${media.greaterThan('md')`
-    height: 488px;
-    top: 224px;
-    width: 488px;
+    height: 508px;
+    top: 326px;
+    width: 508px;
+  `}
+
+  ${media.greaterThan('lg')`
+    top: 286px;
   `}
 `;
 

@@ -6,7 +6,6 @@ import { media } from 'ui';
 import Footer from './components/footer';
 import GetStartedSection from './components/get-started-section';
 import Hero from './components/hero-section';
-import HighlightsGradient from './components/highlights-gradient';
 import HighlightsSection from './components/highlights-section';
 import InvestorsSection from './components/investors-section';
 import Navbar from './components/navbar';
@@ -37,8 +36,7 @@ const Home = () => {
         tooltips={content.playground.tooltips}
         instructions={content.playground.instructions}
       />
-      <HighlightsContainer>
-        <HighlightsGradient />
+      <HighlightsContainer id="highlights">
         <HighlightsSection
           items={content.qualities.items}
           subtitle={content.qualities.subtitle}
@@ -82,7 +80,7 @@ const Home = () => {
   );
 };
 
-const HeaderContainer = styled.div`
+const HeaderContainer = styled.section`
   ${({ theme }) => css`
     padding-top: ${theme.spacing[11]}px;
     background: linear-gradient(
@@ -101,9 +99,15 @@ const HeaderContainer = styled.div`
   `}
 `;
 
-const HighlightsContainer = styled.div`
+const HighlightsContainer = styled.section`
   ${({ theme }) => css`
-    background: ${theme.backgroundColor.secondary};
+    background-color: ${theme.backgroundColor.secondary};
+    background: url('/images/purple-blur-01.svg'),
+      url('/images/green-blur-01.svg'), url('/images/green-blur-02.svg'),
+      url('/images/purple-blur-02.svg');
+    background-position: top left, top right, bottom left, bottom right;
+    background-repeat: no-repeat;
+
     display: grid;
     padding: ${theme.spacing[10]}px 0;
     position: relative;
@@ -116,7 +120,7 @@ const HighlightsContainer = styled.div`
   `}
 `;
 
-const FooterContainer = styled.div`
+const FooterContainer = styled.section`
   ${({ theme }) => css`
     padding-top: ${theme.spacing[10]}px;
     background: ${theme.backgroundColor.tertiary};

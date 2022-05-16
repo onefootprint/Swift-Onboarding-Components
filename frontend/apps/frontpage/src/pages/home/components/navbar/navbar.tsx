@@ -11,7 +11,7 @@ type NavbarProps = {
 const Navbar = ({ logoAlt, cta }: NavbarProps) => {
   const [hasScroll, setHasScroll] = useState(false);
   const handleScroll = useCallback(() => {
-    setHasScroll(!!window.scrollY);
+    setHasScroll(window.scrollY > 0);
   }, []);
 
   useEffect(() => {
@@ -20,10 +20,10 @@ const Navbar = ({ logoAlt, cta }: NavbarProps) => {
     return () => {
       window.removeEventListener('scroll', handleScroll);
     };
-  }, []);
+  }, [handleScroll]);
 
   return (
-    <Header floating={hasScroll}>
+    <Header isFloating={hasScroll}>
       <Container
         as="nav"
         sx={{
@@ -47,16 +47,16 @@ const Navbar = ({ logoAlt, cta }: NavbarProps) => {
   );
 };
 
-const Header = styled.header<{ floating: boolean }>`
+const Header = styled.header<{ isFloating: boolean }>`
   left: 0;
   position: fixed;
   right: 0;
   top: 0;
-  z-index: 20;
   transition: background 200ms ease 0s;
+  z-index: 20;
 
-  ${({ theme, floating }) =>
-    floating &&
+  ${({ theme, isFloating }) =>
+    isFloating &&
     css`
       backdrop-filter: blur(15px) saturate(125%);
       background-color: rgba(255, 255, 255, 0.75);

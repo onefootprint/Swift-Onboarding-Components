@@ -3,8 +3,8 @@ import React from 'react';
 import styled, { css } from 'styled';
 import { Button, Container, media, Typography } from 'ui';
 
-import footprintLogo from '../../../../../public/images/footer/footprint-circle.png';
-import lighting from '../../../../../public/images/footer/lightning.png';
+import footprintLogo from '../../../../../public/images/footprint-circle.png';
+import lighting from '../../../../../public/images/lightning.png';
 import CircleBackground from './components/circle-background';
 
 type GetStartedSectionProps = {
@@ -18,60 +18,68 @@ const GetStartedSection = ({
   subtitle,
   title,
 }: GetStartedSectionProps) => (
-  <Container id="get-started" as="section" sx={{ position: 'relative' }}>
+  <Container id="get-started" as="section">
     <Inner>
-      <LogoContainer>
-        <Image
-          width={118}
-          height={107}
-          src={footprintLogo}
-          layout="fixed"
-          placeholder="blur"
-          alt="Footprint logo"
-        />
-      </LogoContainer>
-      <ContentContainer>
-        <TitleContainer>
+      <Content>
+        <LogoContainer>
+          <Image
+            alt="Footprint logo"
+            height={107}
+            layout="fixed"
+            src={footprintLogo}
+            width={118}
+          />
+        </LogoContainer>
+        <TextContent>
+          <TitleContainer>
+            <Typography
+              as="h5"
+              color="primary"
+              sx={{ marginBottom: 5 }}
+              variant="display-2"
+            >
+              {title}
+            </Typography>
+            <TitleImageContainer>
+              <Image
+                alt="A thunder to illustrate that we are fast"
+                height={60}
+                src={lighting}
+                width={44}
+              />
+            </TitleImageContainer>
+          </TitleContainer>
           <Typography
-            as="h5"
+            as="div"
             color="primary"
-            sx={{ marginBottom: 5 }}
-            variant="display-2"
+            sx={{ marginBottom: 9 }}
+            variant="display-4"
           >
-            {title}
+            {subtitle}
           </Typography>
-          <TitleImageContainer>
-            <Image
-              width={44}
-              height={60}
-              src={lighting}
-              alt="A thunder to illustrate that we are fast"
-            />
-          </TitleImageContainer>
-        </TitleContainer>
-        <Typography
-          as="div"
-          color="primary"
-          sx={{ marginBottom: 9 }}
-          variant="display-4"
-        >
-          {subtitle}
-        </Typography>
-        <Button size="large">{cta}</Button>
-      </ContentContainer>
+          <Button size="large">{cta}</Button>
+        </TextContent>
+      </Content>
+      <CircleBackground />
     </Inner>
-    <CircleBackground />
   </Container>
 );
 
 const Inner = styled.div`
   ${({ theme }) => css`
-    align-items: center;
     background-color: ${theme.backgroundColor.quaternary};
     border-radius: ${theme.borderRadius[1]}px;
+    padding: ${theme.spacing[9]}px ${theme.spacing[8]}px;
+    position: relative;
+    overflow: hidden;
+  `}
+`;
+
+const Content = styled.div`
+  ${({ theme }) => css`
+    align-items: center;
     display: flex;
     flex-direction: column;
-    padding: ${theme.spacing[9]}px ${theme.spacing[8]}px;
 
     ${media.greaterThan('md')`
       flex-direction: row-reverse;
@@ -92,7 +100,7 @@ const LogoContainer = styled.div`
   `}
 `;
 
-const ContentContainer = styled.div`
+const TextContent = styled.div`
   align-items: center;
   display: flex;
   flex-direction: column;

@@ -1,18 +1,19 @@
-import IcoLock24 from 'icons/ico/ico-lock-24';
+import type { Icon as TIcon } from 'icons';
 import React from 'react';
 import CircleIcon from 'src/components/circle-icon';
 import styled, { css } from 'styled';
 import { Typography } from 'ui';
 
 type VaultArticleProps = {
-  title: string;
   content: string;
+  Icon: TIcon;
+  title: string;
 };
 
-const VaultArticle = ({ title, content }: VaultArticleProps) => (
+const VaultArticle = ({ content, Icon, title }: VaultArticleProps) => (
   <>
     <CircleContainer>
-      <CircleIcon Icon={IcoLock24} />
+      <CircleIcon Icon={Icon} />
     </CircleContainer>
     <Typography
       as="p"

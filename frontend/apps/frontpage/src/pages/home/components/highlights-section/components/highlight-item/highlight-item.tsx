@@ -19,7 +19,6 @@ const HighlightItem = ({
         alt={imgAlt}
         height={160}
         layout="responsive"
-        placeholder="blur"
         src={imgSrc}
         width={336}
       />

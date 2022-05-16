@@ -1,3 +1,4 @@
+import type { Icon as TIcon } from 'icons';
 import type { StaticImageData } from 'next/image';
 import Image from 'next/image';
 import React from 'react';
@@ -7,10 +8,11 @@ import { Container, media, Typography } from 'ui';
 import VaultArticle from './components/vault-article';
 
 type VaultSectionProps = {
-  articles: { title: string; content: string }[];
+  articles: { title: string; content: string; Icon: TIcon }[];
   description: string;
   mainArticle: {
     content: string;
+    Icon: TIcon;
     imgAlt: string;
     imgSrc: StaticImageData;
     title: string;
@@ -56,21 +58,25 @@ const VaultSection = ({
           alt={mainArticle.imgAlt}
           height={391}
           layout="responsive"
-          placeholder="blur"
           src={mainArticle.imgSrc}
           width={484}
         />
         <MainArticleInner>
           <VaultArticle
-            title={mainArticle.title}
             content={mainArticle.content}
+            Icon={mainArticle.Icon}
+            title={mainArticle.title}
           />
         </MainArticleInner>
       </MainArticle>
       <SecondaryArticles>
         {articles.map(article => (
           <Article key={article.title}>
-            <VaultArticle content={article.content} title={article.title} />
+            <VaultArticle
+              content={article.content}
+              Icon={article.Icon}
+              title={article.title}
+            />
           </Article>
         ))}
       </SecondaryArticles>

@@ -34,7 +34,6 @@ const TestimonialSection = ({ author, content }: TestimonialSectionProps) => (
           layout="fixed"
           src={author.imgSrc}
           width={48}
-          placeholder="blur"
         />
         <AuthorContentContainer>
           <Typography variant="heading-3" color="primary" as="div">

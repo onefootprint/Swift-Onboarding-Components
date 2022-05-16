@@ -1,3 +1,8 @@
+import IcoDatabase24 from 'icons/ico/ico-database-24';
+import IcoEye24 from 'icons/ico/ico-eye-24';
+import IcoLock24 from 'icons/ico/ico-lock-24';
+import IcoShield24 from 'icons/ico/ico-shield-24';
+
 import article1 from '../../../../public/images/article-1.png';
 import article2 from '../../../../public/images/article-2.png';
 import article3 from '../../../../public/images/article-3.png';
@@ -15,10 +20,10 @@ const useContent = () => ({
     logoAlt: "Footprint Logo's",
   },
   hero: {
-    title: 'Frictionless Identity. High Integrity.',
+    title: 'Frictionless Identity Verification',
     subtitle:
-      'Footprint is a unified platform bringing together one-click KYC and a PII Vault.',
-    cta: 'Join our waitlist',
+      'Footprint is a unified platform bringing together one-click KYC and PII Vaulting to produce the fastest way for your users to open accounts.',
+    cta: 'Join the waitlist',
     imgAlt: 'An image of Footprint System',
   },
   playground: {
@@ -31,12 +36,12 @@ const useContent = () => ({
       'Faster than Persona',
       'We got you covered 😇',
       'Privacy is a human right',
-      'Better dev experience than Alloy Automation',
       'Get more good actors in',
+      'More secure than VGS',
       'Fraud detection should not be a moment in time',
       'Without biometrics, how do you know who you’re letting in?',
       'Accuracy and friction should not be a toggle',
-      'More secure than VGS',
+      'Better dev experience than Alloy Automation',
     ],
   },
   qualities: {
@@ -110,6 +115,7 @@ const useContent = () => ({
       "Our advanced PII vaults are built on top of secure Nitro Enclaves. Your customer's data is always end-to-end encrypted and can only be decrypted inside of the secure enclave.",
     articles: {
       main: {
+        Icon: IcoLock24,
         imgAlt: 'Image of a system',
         imgSrc: vaultMainArticle,
         title: "Privacy and security at your engineering team's fingertips",
@@ -118,16 +124,19 @@ const useContent = () => ({
       },
       secondaries: [
         {
+          Icon: IcoEye24,
           title: 'Zero-trust by design',
           content:
             "Our permissioned API ensures only the right parties can access the data they're allowed to see. PII data is never stored in plaintext.",
         },
         {
+          Icon: IcoDatabase24,
           title: 'Granular data access',
           content:
             'Limit the exposure, only access the bare minimum data you need. Nothing else leaves our enclave-backed vaults.',
         },
         {
+          Icon: IcoShield24,
           title: 'Secure enclave backed',
           content:
             'Our system guarantees that all PII data is always encrypted to our network gapped, storage / cpu / memory isolated Nitro Enclaves.',
