@@ -84,6 +84,7 @@ CREATE TABLE sessions (
     h_session_id VARCHAR(250) PRIMARY KEY NOT NULL,
     created_at timestamp NOT NULL DEFAULT NOW(),
     updated_at timestamp NOT NULL DEFAULT NOW(),
+    expires_at timestamp NOT NULL,
     session_data jsonb NOT NULL DEFAULT '{}'
 );
 
@@ -91,8 +92,9 @@ CREATE FUNCTION expire_sessions() RETURNS trigger
     LANGUAGE plpgsql
     AS $$
         BEGIN
-            DELETE FROM sessions WHERE created_at < NOW() - INTERVAL '1 hours';
-             RETURN NEW;
+            -- Delete rows in the sessions table that have been expired for 30 minutes
+            DELETE FROM sessions WHERE expires_at < NOW() - INTERVAL '30 minutes';
+            RETURN NEW;
         END;
     $$;
 

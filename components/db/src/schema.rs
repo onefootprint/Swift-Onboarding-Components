@@ -35,6 +35,7 @@ table! {
         h_session_id -> Varchar,
         created_at -> Timestamp,
         updated_at -> Timestamp,
+        expires_at -> Timestamp,
         session_data -> Jsonb,
     }
 }

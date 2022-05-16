@@ -7,6 +7,7 @@ use crate::types::success::ApiResponseData;
 use crate::State;
 use actix_session::Session;
 use aws_sdk_kms::model::DataKeyPairSpec;
+use chrono::{Duration, Utc};
 use db::models::session_data::{LoggedInSessionData, SessionState as DbSessionState};
 use db::models::user_vaults::{NewUserVault, UserVault};
 use newtypes::Status;
@@ -65,10 +66,11 @@ async fn handler(
     };
 
     // Save logged in session data into the DB
+    let login_expires_at = Utc::now().naive_utc() + Duration::minutes(15);
     let (_, token) = DbSessionState::LoggedInSession(LoggedInSessionData {
         user_vault_id: user.id,
     })
-    .create(&state.db_pool)
+    .create(&state.db_pool, login_expires_at)
     .await?;
     // Set the cookie that identifies this as a LoggedInSession and attaches it to the DB state
     LoggedInSessionContext::set(&session, token)?;

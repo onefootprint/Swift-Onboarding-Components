@@ -13,6 +13,7 @@ pub struct Session {
     pub h_session_id: String,
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
+    pub expires_at: NaiveDateTime,
     pub session_data: SessionState,
 }
 
@@ -21,10 +22,15 @@ pub struct Session {
 pub struct NewSession {
     pub h_session_id: String,
     pub session_data: SessionState,
+    pub expires_at: NaiveDateTime,
 }
 
 impl SessionState {
-    pub async fn create(self, pool: &DbPool) -> Result<(Session, String), crate::DbError> {
+    pub async fn create(
+        self,
+        pool: &DbPool,
+        expires_at: NaiveDateTime,
+    ) -> Result<(Session, String), crate::DbError> {
         // create a token to identify session for future lookup
         let token = format!("vtok_{}", gen_random_alphanumeric_code(34));
         let h_session_id: String = crypto::sha256(token.as_bytes()).encode_hex();
@@ -32,6 +38,7 @@ impl SessionState {
         let session = NewSession {
             h_session_id,
             session_data: self,
+            expires_at,
         }
         .update_or_create(pool)
         .await?;
@@ -49,7 +56,10 @@ impl NewSession {
                     .values(self.clone())
                     .on_conflict(sessions::h_session_id)
                     .do_update()
-                    .set(sessions::session_data.eq(self.session_data))
+                    .set((
+                        sessions::session_data.eq(self.session_data),
+                        sessions::expires_at.eq(self.expires_at),
+                    ))
                     .get_result::<Session>(conn)
             })
             .await??;
