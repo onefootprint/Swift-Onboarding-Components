@@ -115,7 +115,9 @@ pub(crate) async fn send_phone_challenge(
     let is_test_phone_number = phone_number_digits.as_str() == "55501";
 
     // Limit how frequently we send a phone challenge to the same number
-    let h_phone_number = Base64Data(hash(phone_number.clone() + "_sms_challenge")).to_string();
+    let h_phone_number =
+        Base64Data(sha256((phone_number.clone() + "_sms_challenge").as_bytes()).to_vec())
+            .to_string();
     let now = Utc::now().naive_utc();
     let time_between_challenges = state.config.time_s_between_sms_challenges;
     if !is_test_phone_number {
