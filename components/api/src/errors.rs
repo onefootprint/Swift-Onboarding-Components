@@ -75,6 +75,8 @@ pub enum ApiError {
     WebauthnCredentialsNotSet,
     #[error("webauthn credential not set, and missing fields required for user: {0}")]
     UserMissingWebauthnAndFields(String),
+    #[error("Please wait {0} seconds between sending SMS challenges")]
+    WaitToSendChallenge(i64),
 }
 
 fn status_code_for_db_error(e: &DbError) -> StatusCode {
@@ -125,6 +127,7 @@ impl actix_web::ResponseError for ApiError {
             ApiError::KmsVerifyMacError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::WebauthnCredentialsNotSet => StatusCode::BAD_REQUEST,
             ApiError::UserMissingWebauthnAndFields(_) => StatusCode::BAD_REQUEST,
+            ApiError::WaitToSendChallenge(_) => StatusCode::BAD_REQUEST,
         }
     }
 

@@ -13,8 +13,10 @@ use std::io::Write;
 #[sql_type = "Jsonb"]
 pub enum SessionState {
     Empty,
+    // TODO remove onboarding session
     OnboardingSession(OnboardingSessionData), // Used for tenant- and user-specific auth
     LoggedInSession(LoggedInSessionData),     // Used for user-specific auth
+    ChallengeLastSent(ChallengeLastSentData), // Used to rate limit challenges sent to phone number
 }
 
 #[derive(Default, FromSqlRow, AsExpression, Serialize, Deserialize, Debug, Clone)]
@@ -26,6 +28,11 @@ pub struct OnboardingSessionData {
 #[derive(Default, FromSqlRow, AsExpression, Serialize, Deserialize, Debug, Clone)]
 pub struct LoggedInSessionData {
     pub user_vault_id: UserVaultId,
+}
+
+#[derive(FromSqlRow, AsExpression, Serialize, Deserialize, Debug, Clone)]
+pub struct ChallengeLastSentData {
+    pub sent_at: chrono::NaiveDateTime,
 }
 
 impl Default for SessionState {

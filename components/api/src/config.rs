@@ -46,6 +46,9 @@ pub struct Config {
 
     #[envconfig(from = "COOKIE_DOMAIN", default = "localhost")]
     pub cookie_domain: String,
+
+    #[envconfig(from = "TIME_S_BETWEEN_SMS_CHALLENGES", default = "15")]
+    pub time_s_between_sms_challenges: i64,
 }
 
 impl Config {

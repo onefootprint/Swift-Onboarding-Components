@@ -6,6 +6,23 @@ use crypto::{hex::ToHex, sha256};
 use deadpool_diesel::postgres::Pool;
 use diesel::prelude::*;
 
+pub async fn get_by_h_session_id(
+    pool: &Pool,
+    h_session_id: String,
+) -> Result<Option<Session>, DbError> {
+    let conn = pool.get().await?;
+
+    conn.interact(move |conn| -> Result<Option<Session>, DbError> {
+        let session: Option<Session> = schema::sessions::table
+            .filter(schema::sessions::h_session_id.eq(h_session_id))
+            .first(conn)
+            .optional()?;
+
+        Ok(session)
+    })
+    .await?
+}
+
 pub async fn get_by_session_id(
     pool: &Pool,
     session_id: String,
