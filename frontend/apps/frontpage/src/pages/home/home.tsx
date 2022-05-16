@@ -102,16 +102,19 @@ const HeaderContainer = styled.section`
 const HighlightsContainer = styled.section`
   ${({ theme }) => css`
     background-color: ${theme.backgroundColor.secondary};
-    background: url('/images/purple-blur-01.svg'),
+    background-image: url('/images/purple-blur-01.svg'),
       url('/images/green-blur-01.svg'), url('/images/green-blur-02.svg'),
       url('/images/purple-blur-02.svg');
-    background-position: top left, top right, bottom left, bottom right;
+    background-position: 35% 35%, 30% -2%, 0% 74%, 90% 105%;
     background-repeat: no-repeat;
-
     display: grid;
     padding: ${theme.spacing[10]}px 0;
     position: relative;
     row-gap: ${theme.spacing[10]}px;
+
+    ${media.greaterThan('sm')`
+      background-position: -15% 15%, top right, bottom left, 100% 120%;
+    `}
 
     ${media.greaterThan('lg')`
       padding: ${theme.spacing[11]}px 0;

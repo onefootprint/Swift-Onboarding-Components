@@ -22,7 +22,7 @@ const useContent = () => ({
   hero: {
     title: 'Frictionless Identity Verification',
     subtitle:
-      'Footprint is a unified platform bringing together one-click KYC and PII Vaulting to produce the fastest way for your users to open accounts.',
+      "Onboard users with the click of a button. Offload handling sensitive data. Grow your user base quickly and securely with Footprint's one-click KYC and secure data vault.",
     cta: 'Join the waitlist',
     imgAlt: 'An image of Footprint System',
   },
@@ -46,18 +46,18 @@ const useContent = () => ({
   },
   qualities: {
     title: 'Accurate, portable, and secure user verification',
-    subtitle: 'A better, more secure experience',
+    subtitle: 'An enhanced experience',
     items: [
       {
         content:
-          'Footprint’s privacy-preserving technology lets you satisfy KYC without needing to ever touch PII through our architecture. Utilize our PII vault which by default uses secure enclaves to protect data instead of building your own.',
+          "Footprint’s privacy-preserving technology lets you satisfy KYC without needing to ever touch PII. Our secure PII vault protects your user's data while saving you time and money.",
         imgAlt: '',
         imgSrc: article1,
         title: 'Best-in-class security',
       },
       {
         content:
-          'Footprint’s ecosystem creates a feedback loop on actors to increase accuracy through peer-to-peer verification, and our liveness scanning ensures only real people are applying. We use the most cutting edge biometric scans to ensure real people are making accounts',
+          'Footprint leverages cutting-edge biometric scans, liveness checks, and peer-to-peer verification to validate real people in real time. Our ecosystem keeps bad actors out while creating a seamless experience for real users.',
         imgAlt: '',
         imgSrc: article2,
         title: 'Unprecedented accuracy',
@@ -80,21 +80,21 @@ const useContent = () => ({
           'Our one-click flow increases conversion by dramatically reducing time to account creation.',
         imgAlt: '',
         imgSrc: article4,
-        title: '12x faster',
+        title: 'Increased conversion',
       },
       {
         content:
-          "With three lines of code, you'll have KYC and PII Vaulting running in less than a day. It's that simple.",
+          "With a few lines of code, you'll have KYC and PII Vaulting running in less than a day. It's that simple.",
         imgAlt: '',
         imgSrc: article5,
-        title: '10x developer experience',
+        title: 'Enhanced dev experience',
       },
       {
         content:
           'Say goodbye to needing separate KYC and Tokenization tools. We do both in-one, and pass along the savings.',
         imgAlt: '',
         imgSrc: article6,
-        title: '2x cheaper',
+        title: 'Decreased cost',
       },
     ],
   },
@@ -112,7 +112,7 @@ const useContent = () => ({
     title: 'Own the data, disown the risk.',
     subtitle: 'PII vault',
     description:
-      "Our advanced PII vaults are built on top of secure Nitro Enclaves. Your customer's data is always end-to-end encrypted and can only be decrypted inside of the secure enclave.",
+      "Our advanced PII vaults are built on top of secure Nitro Enclaves. Your customer's data is end-to-end encrypted: it can only be processed and read within our secure environment.",
     articles: {
       main: {
         Icon: IcoLock24,
@@ -120,7 +120,7 @@ const useContent = () => ({
         imgSrc: vaultMainArticle,
         title: "Privacy and security at your engineering team's fingertips",
         content:
-          "Instead of building or buying your own data vaulting system, use Footprint's integrated vaulting to achieve strong cryptographic data protection for your most sensitive data.",
+          "Instead of building or buying your own data vaulting system, use Footprint's integrated vaulting to achieve strong cryptographic protection for your most sensitive data.",
       },
       secondaries: [
         {

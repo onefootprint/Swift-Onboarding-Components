@@ -27,7 +27,7 @@ const HeroSection = ({ title, subtitle, cta, imgAlt }: HeroSectionProps) => (
       <Typography
         as="h2"
         color="secondary"
-        sx={{ marginBottom: 9 }}
+        sx={{ marginBottom: 9, maxWidth: '830px' }}
         variant="display-4"
       >
         {subtitle}
@@ -63,7 +63,6 @@ const ContentContainer = styled.div`
     display: flex;
     flex-direction: column;
     margin: 0 auto ${theme.spacing[10]}px;
-    max-width: 781px;
     text-align: center;
   `}
 `;
