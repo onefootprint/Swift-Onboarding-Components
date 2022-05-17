@@ -52,8 +52,12 @@ export default class MyDocument extends Document {
             name="keywords"
             content="footprint,foot,print,id,onefootprint,identity,kyc,verify,security"
           />
-          <meta property="og:image" content="/cover.png" />
-          <meta property="og:type" content="website" />
+          <link rel="canonical" href="https://www.onefootprint.com" />
+          <meta
+            property="og:image"
+            content="https://onefootprint.com/cover.png"
+          />
+          <meta property="og:type" content="product" />
           <meta property="og:url" content="https://onefootprint.com" />
           <meta property="og:title" content="Footprint" />
           <meta
@@ -62,12 +66,17 @@ export default class MyDocument extends Document {
           />
           <meta property="og:site_name" content="Footprint" />
           <meta property="og:locale" content="en_US" />
-          <meta name="twitter:card" content="summary" />
+          <meta name="twitter:card" content="photo" />
+          <meta name="twitter:site" content="@onefootprintid" />
           <meta name="twitter:creator" content="@onefootprintid" />
           <meta name="twitter:title" content="Footprint" />
           <meta
             name="twitter:description"
             content="The last identity verification you'll ever need"
+          />
+          <meta
+            name="twitter:description"
+            content="https://onefootprint.com/cover.png"
           />
           <link
             rel="apple-touch-icon"
