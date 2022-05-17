@@ -7,7 +7,7 @@ mod simulated;
 #[cfg(feature = "nitro")]
 mod ne;
 
-use crate::{EnvelopeDecrypt, FnDecryption, KmsCredentials};
+use crate::{EnvelopeDecrypt, FnDecryption, FnDecryptionSingle, KmsCredentials};
 
 #[derive(Error, Debug)]
 pub enum Error {
@@ -26,9 +26,8 @@ pub enum Error {
 pub async fn handle_fn_decrypt(request: EnvelopeDecrypt) -> Result<FnDecryption, Error> {
     let EnvelopeDecrypt {
         kms_creds,
-        transform,
         sealed_key,
-        sealed_data,
+        requests,
     } = request;
 
     let private_key_der = kms_decrypt(kms_creds, sealed_key).await?;
@@ -39,15 +38,23 @@ pub async fn handle_fn_decrypt(request: EnvelopeDecrypt) -> Result<FnDecryption,
 
     log::info!("converted private key from DER");
 
-    let result =
-        crypto::seal::unseal::unseal_ecies_p256_x963_sha256_aes_gcm(&private_key_raw, sealed_data)?;
+    let results: Vec<FnDecryptionSingle> = requests
+        .iter()
+        .map(|r| {
+            let result = crypto::seal::unseal::unseal_ecies_p256_x963_sha256_aes_gcm(
+                &private_key_raw,
+                r.sealed_data.clone(),
+            )?;
+            Ok(FnDecryptionSingle {
+                data: result.0,
+                transform: r.transform.clone(),
+            })
+        })
+        .collect::<Result<Vec<FnDecryptionSingle>, Error>>()?;
 
     log::info!("unsealed ciphertext");
 
-    Ok(FnDecryption {
-        data: result.0,
-        transform,
-    })
+    Ok(FnDecryption { results })
 }
 
 pub async fn handle_hmac_sign(request: EnvelopeHmacSign) -> Result<HmacSignature, Error> {
@@ -69,7 +76,10 @@ pub async fn handle_hmac_sign(request: EnvelopeHmacSign) -> Result<HmacSignature
 }
 
 #[allow(unreachable_code)]
-pub async fn kms_decrypt(_kms_creds: KmsCredentials, _ciphertext: Vec<u8>) -> Result<Vec<u8>, Error> {
+pub async fn kms_decrypt(
+    _kms_creds: KmsCredentials,
+    _ciphertext: Vec<u8>,
+) -> Result<Vec<u8>, Error> {
     #[cfg(feature = "nitro")]
     return Ok(ne::kms_decrypt(_kms_creds, _ciphertext).await?);
 

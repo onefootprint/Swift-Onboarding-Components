@@ -32,9 +32,15 @@ pub enum RpcPayload {
 #[serde(rename_all = "snake_case")]
 pub struct EnvelopeDecrypt {
     pub kms_creds: KmsCredentials,
-    pub transform: DataTransform,
     pub sealed_key: Vec<u8>,
+    pub requests: Vec<DecryptRequest>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub struct DecryptRequest {
     pub sealed_data: EciesP256Sha256AesGcmSealed,
+    pub transform: DataTransform,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -108,6 +114,12 @@ impl TryFrom<EnclavePayload> for HmacSignature {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub struct FnDecryption {
+    pub results: Vec<FnDecryptionSingle>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub struct FnDecryptionSingle {
     pub transform: DataTransform,
     pub data: Vec<u8>,
 }

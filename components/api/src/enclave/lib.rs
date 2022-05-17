@@ -3,7 +3,9 @@ use crate::State;
 
 use aws_sdk_kms::model::DataKeyPairSpec;
 use crypto::seal::EciesP256Sha256AesGcmSealed;
-use enclave_proxy::{DataTransform, EnvelopeDecrypt, FnDecryption, KmsCredentials, RpcPayload};
+use enclave_proxy::{
+    DataTransform, DecryptRequest, EnvelopeDecrypt, FnDecryption, KmsCredentials, RpcPayload,
+};
 
 pub async fn gen_keypair(
     state: &actix_web::web::Data<State>,
@@ -67,13 +69,15 @@ pub async fn decrypt(
             secret_key: state.config.enclave_aws_secret_access_key.clone(),
             session_token: None,
         },
-        sealed_data,
         sealed_key,
-        transform,
+        requests: vec![DecryptRequest {
+            sealed_data,
+            transform,
+        }],
     }));
     tracing::info!("sending request");
     let response = enclave_proxy::send_rpc_request(&req, &mut conn).await?;
     tracing::info!("got response");
     let response = FnDecryption::try_from(response)?;
-    Ok(response.data)
+    Ok(response.results[0].data.clone())
 }
