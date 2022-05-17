@@ -49,7 +49,7 @@ const HeroSection = ({
           alt={imgAlt}
           height={371}
           layout="responsive"
-          src="/images/hero-xs.png"
+          src="/images/hero/hero-mobile.png"
           width={320}
           priority
         />
@@ -59,7 +59,7 @@ const HeroSection = ({
           alt={imgAlt}
           height={682}
           layout="responsive"
-          src="/images/hero.png"
+          src="/images/hero/hero-desktop.png"
           width={1280}
           priority
         />
