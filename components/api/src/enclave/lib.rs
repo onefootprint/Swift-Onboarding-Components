@@ -38,8 +38,7 @@ pub async fn decrypt_bytes(
     sealed_data: &[u8],
     sealed_key: Vec<u8>,
     transform: DataTransform,
-) -> Result<Vec<u8>, ApiError> {
-    // TODO will be used in one-click flow
+) -> Result<String, ApiError> {
     let sealed_data = EciesP256Sha256AesGcmSealed::from_bytes(sealed_data)?;
     decrypt(state, sealed_data, sealed_key, transform).await
 }
@@ -49,7 +48,7 @@ pub async fn decrypt_string(
     sealed_data: &str,
     sealed_key: Vec<u8>,
     transform: DataTransform,
-) -> Result<Vec<u8>, ApiError> {
+) -> Result<String, ApiError> {
     let sealed_data = EciesP256Sha256AesGcmSealed::from_str(sealed_data)?;
     decrypt(state, sealed_data, sealed_key, transform).await
 }
@@ -59,7 +58,7 @@ pub async fn decrypt(
     sealed_data: EciesP256Sha256AesGcmSealed,
     sealed_key: Vec<u8>,
     transform: DataTransform,
-) -> Result<Vec<u8>, ApiError> {
+) -> Result<String, ApiError> {
     let mut conn = state.enclave_connection_pool.get().await?;
 
     let req = enclave_proxy::RpcRequest::new(RpcPayload::FnDecrypt(EnvelopeDecrypt {
@@ -79,5 +78,6 @@ pub async fn decrypt(
     let response = enclave_proxy::send_rpc_request(&req, &mut conn).await?;
     tracing::info!("got response");
     let response = FnDecryption::try_from(response)?;
-    Ok(response.results[0].data.clone())
+    let decoded_data = std::str::from_utf8(&response.results[0].data)?.to_string();
+    Ok(decoded_data)
 }

@@ -25,8 +25,7 @@ async fn decrypt_field(
             enclave_proxy::DataTransform::Identity,
         )
         .await?;
-        let decoded_data = std::str::from_utf8(&decrypted_data)?.to_string();
-        Ok(Some(decoded_data))
+        Ok(Some(decrypted_data))
     } else {
         Ok(None)
     }

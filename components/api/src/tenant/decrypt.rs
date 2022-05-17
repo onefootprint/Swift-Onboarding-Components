@@ -85,7 +85,7 @@ pub async fn decrypt_field(
             enclave_proxy::DataTransform::Identity,
         )
         .await?;
-        Ok(Some(std::str::from_utf8(&decrypted)?.to_string()))
+        Ok(Some(decrypted))
     } else {
         Ok(None)
     }

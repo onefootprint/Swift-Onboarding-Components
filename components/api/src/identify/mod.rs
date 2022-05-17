@@ -94,14 +94,13 @@ pub(crate) async fn send_phone_challenge_to_user(
     state: &web::Data<State>,
     vault: UserVault,
 ) -> Result<ChallengeState, ApiError> {
-    let decrypted_data = crate::enclave::lib::decrypt_bytes(
+    let phone_number = crate::enclave::lib::decrypt_bytes(
         state,
         &vault.e_phone_number,
         vault.e_private_key.clone(),
         enclave_proxy::DataTransform::Identity,
     )
     .await?;
-    let phone_number = std::str::from_utf8(&decrypted_data)?.to_string();
     // send challenge & set state
     send_phone_challenge(state, phone_number).await
 }

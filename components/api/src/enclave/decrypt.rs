@@ -34,6 +34,6 @@ async fn handler(
     )
     .await?;
     Ok(Json(ApiResponseData {
-        data: std::str::from_utf8(&decrypted_result).unwrap().to_string(),
+        data: decrypted_result,
     }))
 }
