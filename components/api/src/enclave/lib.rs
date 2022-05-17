@@ -40,7 +40,15 @@ pub async fn decrypt_bytes(
     transform: DataTransform,
 ) -> Result<String, ApiError> {
     let sealed_data = EciesP256Sha256AesGcmSealed::from_bytes(sealed_data)?;
-    decrypt(state, sealed_data, sealed_key, transform).await
+    let requests = vec![DecryptRequest {
+        sealed_data,
+        transform,
+    }];
+    let results = decrypt(state, requests, sealed_key).await?;
+    Ok(results
+        .into_iter()
+        .next()
+        .ok_or(ApiError::InvalidEnclaveDecryptResponse)?)
 }
 
 pub async fn decrypt_string(
@@ -50,15 +58,22 @@ pub async fn decrypt_string(
     transform: DataTransform,
 ) -> Result<String, ApiError> {
     let sealed_data = EciesP256Sha256AesGcmSealed::from_str(sealed_data)?;
-    decrypt(state, sealed_data, sealed_key, transform).await
+    let requests = vec![DecryptRequest {
+        sealed_data,
+        transform,
+    }];
+    let results = decrypt(state, requests, sealed_key).await?;
+    Ok(results
+        .into_iter()
+        .next()
+        .ok_or(ApiError::InvalidEnclaveDecryptResponse)?)
 }
 
 pub async fn decrypt(
     state: &actix_web::web::Data<State>,
-    sealed_data: EciesP256Sha256AesGcmSealed,
+    requests: Vec<DecryptRequest>,
     sealed_key: Vec<u8>,
-    transform: DataTransform,
-) -> Result<String, ApiError> {
+) -> Result<Vec<String>, ApiError> {
     let mut conn = state.enclave_connection_pool.get().await?;
 
     let req = enclave_proxy::RpcRequest::new(RpcPayload::FnDecrypt(EnvelopeDecrypt {
@@ -69,15 +84,16 @@ pub async fn decrypt(
             session_token: None,
         },
         sealed_key,
-        requests: vec![DecryptRequest {
-            sealed_data,
-            transform,
-        }],
+        requests,
     }));
     tracing::info!("sending request");
     let response = enclave_proxy::send_rpc_request(&req, &mut conn).await?;
     tracing::info!("got response");
     let response = FnDecryption::try_from(response)?;
-    let decoded_data = std::str::from_utf8(&response.results[0].data)?.to_string();
-    Ok(decoded_data)
+    let decrypted_results = response
+        .results
+        .into_iter()
+        .map(|r| Ok(std::str::from_utf8(&r.data)?.to_string()))
+        .collect::<Result<Vec<String>, ApiError>>()?;
+    Ok(decrypted_results)
 }

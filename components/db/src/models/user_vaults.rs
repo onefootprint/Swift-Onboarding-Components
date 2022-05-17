@@ -3,7 +3,7 @@ use crate::schema::user_vaults;
 use crate::DbPool;
 use chrono::NaiveDateTime;
 use diesel::{Insertable, Queryable};
-use newtypes::{Status, UserVaultId};
+use newtypes::{DataKind, Status, UserVaultId};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable, Identifiable)]
@@ -28,6 +28,23 @@ pub struct UserVault {
     pub id_verified: Status,
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
+}
+
+impl UserVault {
+    pub fn get_field(&self, field_kind: DataKind) -> Option<&[u8]> {
+        match field_kind {
+            DataKind::FirstName => self.e_first_name.as_ref(),
+            DataKind::LastName => self.e_last_name.as_ref(),
+            DataKind::Ssn => self.e_ssn.as_ref(),
+            DataKind::Dob => self.e_dob.as_ref(),
+            DataKind::StreetAddress => self.e_street_address.as_ref(),
+            DataKind::City => self.e_city.as_ref(),
+            DataKind::State => self.e_state.as_ref(),
+            DataKind::Email => self.e_email.as_ref(),
+            DataKind::PhoneNumber => Some(&self.e_phone_number),
+        }
+        .map(Vec::as_slice)
+    }
 }
 
 #[derive(Debug, Default, Clone, Serialize, Deserialize, Insertable, AsChangeset)]

@@ -39,6 +39,8 @@ pub enum ApiError {
     EnclaveConnection(#[from] bb8::RunError<enclave_proxy::Error>),
     #[error("enclave error: {0}")]
     Enclave(#[from] enclave_proxy::EnclaveError),
+    #[error("Invalid enclave decrypt response")]
+    InvalidEnclaveDecryptResponse,
     #[error("database error: {0}")]
     Database(#[from] DbError),
     #[error("dotenv error: {0}")]
@@ -107,6 +109,7 @@ impl actix_web::ResponseError for ApiError {
             ApiError::EnclaveProxy(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::EnclaveConnection(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::Enclave(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            ApiError::InvalidEnclaveDecryptResponse => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::Database(e) => status_code_for_db_error(e),
             ApiError::Dotenv(_) => actix_web::http::StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::SendTextMessageError(_) => actix_web::http::StatusCode::INTERNAL_SERVER_ERROR,

@@ -24,14 +24,16 @@ pub struct NewAccessEvent {
     pub data_kind: DataKind,
 }
 
-impl NewAccessEvent {
-    pub async fn save(self, pool: &DbPool) -> Result<(), crate::DbError> {
+pub struct NewAccessEventBatch(pub Vec<NewAccessEvent>);
+
+impl NewAccessEventBatch {
+    pub async fn bulk_insert(self, pool: &DbPool) -> Result<(), crate::DbError> {
         let _ = pool
             .get()
             .await?
             .interact(move |conn| {
                 diesel::insert_into(crate::schema::access_events::table)
-                    .values(self)
+                    .values(self.0)
                     .execute(conn)
             })
             .await??;

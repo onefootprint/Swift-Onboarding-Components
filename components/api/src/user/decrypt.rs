@@ -1,20 +1,23 @@
-use crate::auth::logged_in_session::LoggedInSessionContext;
 use crate::errors::ApiError;
+use crate::tenant::decrypt::decrypt_fields;
 use crate::types::success::ApiResponseData;
 use crate::State;
+use crate::{
+    auth::logged_in_session::LoggedInSessionContext, tenant::decrypt::DecryptFieldsResult,
+};
 use newtypes::DataKind;
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
-use std::collections::{HashMap, HashSet};
+use std::collections::HashMap;
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
 struct UserDecryptRequest {
-    attributes: HashSet<DataKind>,
+    attributes: Vec<DataKind>,
 }
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
 struct UserDecryptResponse {
-    attributes: HashMap<DataKind, Option<String>>,
+    attributes: HashMap<DataKind, String>,
 }
 
 #[api_v2_operation]
@@ -28,13 +31,14 @@ fn handler(
 ) -> actix_web::Result<Json<ApiResponseData<UserDecryptResponse>>, ApiError> {
     let vault = user_auth.user_vault();
 
-    let mut map = HashMap::new();
-    for attr in &request.attributes {
-        let val = crate::tenant::decrypt::decrypt_field(&state, attr, vault.clone()).await?;
-        map.insert(attr.to_owned(), val);
-    }
+    let DecryptFieldsResult {
+        fields_to_decrypt: _,
+        result_map,
+    } = decrypt_fields(&state, request.attributes.clone(), vault).await?;
 
     Ok(Json(ApiResponseData {
-        data: UserDecryptResponse { attributes: map },
+        data: UserDecryptResponse {
+            attributes: result_map,
+        },
     }))
 }

@@ -1,22 +1,24 @@
 use crate::types::success::ApiResponseData;
 use crate::State;
 use crate::{auth::client_secret_key::SecretTenantAuthContext, errors::ApiError};
-use db::models::access_events::NewAccessEvent;
+use crypto::seal::EciesP256Sha256AesGcmSealed;
+use db::models::access_events::{NewAccessEvent, NewAccessEventBatch};
 use db::models::user_vaults::UserVault;
+use enclave_proxy::{DataTransform, DecryptRequest};
 use newtypes::{DataKind, FootprintUserId};
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
-use std::collections::{HashMap, HashSet};
+use std::collections::HashMap;
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
 struct UserDecryptRequest {
     footprint_user_id: FootprintUserId,
-    attributes: HashSet<DataKind>,
+    attributes: Vec<DataKind>,
 }
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
 struct UserDecryptResponse {
-    pub attributes: HashMap<DataKind, Option<String>>,
+    pub attributes: HashMap<DataKind, String>,
 }
 
 #[api_v2_operation]
@@ -41,52 +43,68 @@ fn handler(
     .await?
     .ok_or(ApiError::InvalidTenantKeyOrUserId)?;
 
-    let mut map = HashMap::new();
-    for attr in &request.attributes {
-        let val = decrypt_field(&state, attr, vault.clone()).await?;
-        map.insert(attr.to_owned(), val);
+    let DecryptFieldsResult {
+        fields_to_decrypt,
+        result_map,
+    } = decrypt_fields(&state, request.attributes.clone(), &vault).await?;
 
-        // Create an AccessEvent log showing that the tenant accessed the vault
-        NewAccessEvent {
+    // Create an AccessEvent logs showing that the tenant accessed these fields
+    let events = fields_to_decrypt
+        .iter()
+        .map(|data_kind| NewAccessEvent {
             onboarding_id: onboarding.id.clone(),
-            data_kind: attr.to_owned(),
-        }
-        .save(&state.db_pool)
+            data_kind: *data_kind,
+        })
+        .collect();
+    NewAccessEventBatch(events)
+        .bulk_insert(&state.db_pool)
         .await?;
-    }
 
     Ok(Json(ApiResponseData {
-        data: UserDecryptResponse { attributes: map },
+        data: UserDecryptResponse {
+            attributes: result_map,
+        },
     }))
 }
 
-// TODO create batch enclave decrypt operation since RTT is ~100ms
-pub async fn decrypt_field(
+pub struct DecryptFieldsResult {
+    pub fields_to_decrypt: Vec<DataKind>,
+    pub result_map: HashMap<DataKind, String>,
+}
+
+pub async fn decrypt_fields(
     state: &web::Data<State>,
-    field_kind: &DataKind,
-    vault: UserVault,
-) -> Result<Option<String>, ApiError> {
-    let value = match field_kind {
-        DataKind::FirstName => vault.e_first_name,
-        DataKind::LastName => vault.e_last_name,
-        DataKind::Ssn => vault.e_ssn,
-        DataKind::Dob => vault.e_dob,
-        DataKind::StreetAddress => vault.e_street_address,
-        DataKind::City => vault.e_city,
-        DataKind::State => vault.e_state,
-        DataKind::Email => vault.e_email,
-        DataKind::PhoneNumber => Some(vault.e_phone_number),
-    };
-    if let Some(value) = value {
-        let decrypted = crate::enclave::lib::decrypt_bytes(
-            state,
-            &value,
-            vault.e_private_key,
-            enclave_proxy::DataTransform::Identity,
-        )
-        .await?;
-        Ok(Some(decrypted))
-    } else {
-        Ok(None)
+    fields: Vec<DataKind>,
+    vault: &UserVault,
+) -> Result<DecryptFieldsResult, ApiError> {
+    // Filter out fields that don't have values set on the user vault
+    let (fields_to_decrypt, values_to_decrypt): (Vec<DataKind>, Vec<&[u8]>) = fields
+        .into_iter()
+        .filter_map(|field_kind| Some((field_kind, vault.get_field(field_kind)?)))
+        .unzip();
+
+    // Actually decrypt the fields
+    let requests = values_to_decrypt
+        .into_iter()
+        .map(|sealed_data| {
+            Ok(DecryptRequest {
+                sealed_data: EciesP256Sha256AesGcmSealed::from_bytes(sealed_data)?,
+                transform: DataTransform::Identity,
+            })
+        })
+        .collect::<Result<Vec<DecryptRequest>, crypto::Error>>()?;
+    let decrypt_response =
+        crate::enclave::lib::decrypt(state, requests, vault.e_private_key.clone()).await?;
+    if decrypt_response.len() != fields_to_decrypt.len() {
+        return Err(ApiError::InvalidEnclaveDecryptResponse);
     }
+    let result_map: HashMap<DataKind, String> = decrypt_response
+        .into_iter()
+        .enumerate()
+        .map(|(i, result)| (fields_to_decrypt[i], result))
+        .collect();
+    Ok(DecryptFieldsResult {
+        fields_to_decrypt,
+        result_map,
+    })
 }
