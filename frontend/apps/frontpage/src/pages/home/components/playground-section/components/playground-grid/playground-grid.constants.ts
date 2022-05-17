@@ -1,4 +1,4 @@
-export const selectedSquares = [1, 16, 83, 131, 170, 193, 203, 282, 300, 333];
+export const selectedSquares = [1, 16, 83, 131, 170, 193, 203, 282, 301, 333];
 
 const rows = 12;
 const columns = 28;
