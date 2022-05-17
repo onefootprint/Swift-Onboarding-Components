@@ -42,6 +42,8 @@ export default class MyDocument extends Document {
       <Html lang="en">
         <Head>
           <meta name="robots" content="index,follow" />
+          <meta charSet="utf-8" />
+          <link rel="shortcut icon" href="/favicon.ico" />
           <meta
             name="description"
             content="The last identity verification you'll ever need"
@@ -50,6 +52,7 @@ export default class MyDocument extends Document {
             name="keywords"
             content="footprint,foot,print,id,onefootprint,identity,kyc,verify,security"
           />
+          <meta property="og:image" content="/cover.png" />
           <meta property="og:type" content="website" />
           <meta property="og:url" content="https://onefootprint.com" />
           <meta property="og:title" content="Footprint" />
@@ -66,6 +69,30 @@ export default class MyDocument extends Document {
             name="twitter:description"
             content="The last identity verification you'll ever need"
           />
+          <link
+            rel="apple-touch-icon"
+            sizes="180x180"
+            href="/apple-touch-icon.png"
+          />
+          <link
+            rel="icon"
+            type="image/png"
+            sizes="32x32"
+            href="/favicon-32x32.png"
+          />
+          <link
+            rel="icon"
+            type="image/png"
+            sizes="16x16"
+            href="/favicon-16x16.png"
+          />
+          <link rel="manifest" href="/site.webmanifest" />
+          <link
+            rel="preload"
+            as="document"
+            href="https://form.typeform.com/to/COZNk70C"
+          />
+
           <LoadFonts />
         </Head>
         <body>

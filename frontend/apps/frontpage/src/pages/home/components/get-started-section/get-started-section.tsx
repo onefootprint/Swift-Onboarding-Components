@@ -11,12 +11,14 @@ type GetStartedSectionProps = {
   cta: string;
   subtitle: string;
   title: string;
+  onCtaClick: () => void;
 };
 
 const GetStartedSection = ({
   cta,
   subtitle,
   title,
+  onCtaClick,
 }: GetStartedSectionProps) => (
   <Container id="get-started" as="section">
     <Inner>
@@ -57,7 +59,9 @@ const GetStartedSection = ({
           >
             {subtitle}
           </Typography>
-          <Button size="large">{cta}</Button>
+          <Button size="large" onPress={onCtaClick}>
+            {cta}
+          </Button>
         </TextContent>
       </Content>
       <CircleBackground />

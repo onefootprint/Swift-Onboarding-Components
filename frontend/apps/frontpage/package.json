@@ -20,7 +20,7 @@
   },
   "devDependencies": {
     "@next/bundle-analyzer": "^12.1.6",
-    "@popperjs/core": "^2.11.5",
+    "@typeform/embed": "^1.35.1",
     "@types/lodash": "^4.14.182",
     "@types/node": "^17.0.12",
     "@types/react": "17.0.37",

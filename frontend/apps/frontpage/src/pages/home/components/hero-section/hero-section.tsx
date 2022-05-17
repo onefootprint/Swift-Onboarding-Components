@@ -8,9 +8,16 @@ type HeroSectionProps = {
   subtitle: string;
   cta: string;
   imgAlt: string;
+  onCtaClick: () => void;
 };
 
-const HeroSection = ({ title, subtitle, cta, imgAlt }: HeroSectionProps) => (
+const HeroSection = ({
+  title,
+  subtitle,
+  cta,
+  imgAlt,
+  onCtaClick,
+}: HeroSectionProps) => (
   <Container as="section" id="hero">
     <ContentContainer>
       <Typography
@@ -32,16 +39,19 @@ const HeroSection = ({ title, subtitle, cta, imgAlt }: HeroSectionProps) => (
       >
         {subtitle}
       </Typography>
-      <Button size="large">{cta}</Button>
+      <Button size="large" onPress={onCtaClick}>
+        {cta}
+      </Button>
     </ContentContainer>
     <ImageContainer>
       <SmallImageContainer>
         <Image
           alt={imgAlt}
           height={371}
-          layout="fixed"
+          layout="responsive"
           src="/images/hero-xs.png"
           width={320}
+          priority
         />
       </SmallImageContainer>
       <LargeImageContainer>
@@ -51,6 +61,7 @@ const HeroSection = ({ title, subtitle, cta, imgAlt }: HeroSectionProps) => (
           layout="responsive"
           src="/images/hero.png"
           width={1280}
+          priority
         />
       </LargeImageContainer>
     </ImageContainer>

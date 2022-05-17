@@ -4,11 +4,12 @@ import styled, { css } from 'styled';
 import { Button, Container } from 'ui';
 
 type NavbarProps = {
-  logoAlt: string;
   cta: string;
+  logoAlt: string;
+  onCtaClick: () => void;
 };
 
-const Navbar = ({ logoAlt, cta }: NavbarProps) => {
+const Navbar = ({ logoAlt, cta, onCtaClick }: NavbarProps) => {
   const [hasScroll, setHasScroll] = useState(false);
   const handleScroll = useCallback(() => {
     setHasScroll(window.scrollY > 0);
@@ -41,7 +42,9 @@ const Navbar = ({ logoAlt, cta }: NavbarProps) => {
           src="/images/nav-logo.png"
           width={115}
         />
-        <Button size="compact">{cta}</Button>
+        <Button size="compact" onPress={onCtaClick}>
+          {cta}
+        </Button>
       </Container>
     </Header>
   );

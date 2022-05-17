@@ -9,9 +9,7 @@ type AppProps = {
 };
 
 const GlobalStyle = createGlobalStyle`
-  html, body {
-    overflow-x: hidden;
-  }
+
 `;
 
 const App = ({ Component, pageProps }: AppProps) => (

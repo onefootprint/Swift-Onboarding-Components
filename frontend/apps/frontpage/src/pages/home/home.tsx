@@ -1,3 +1,6 @@
+import '@typeform/embed/build/css/popup.css';
+
+import { createPopup } from '@typeform/embed';
 import Head from 'next/head';
 import React from 'react';
 import styled, { css } from 'styled';
@@ -14,18 +17,26 @@ import TestimonialSection from './components/testimonial-section';
 import VaultSection from './components/vault-section';
 import useContent from './hooks/use-content';
 
+const { toggle: toggleTypeform } = createPopup('COZNk70C');
+
 const Home = () => {
   const content = useContent();
+
   return (
     <>
       <Head>
         <title>{content.title}</title>
       </Head>
       <HeaderContainer>
-        <Navbar cta={content.navbar.cta} logoAlt={content.navbar.logoAlt} />
+        <Navbar
+          cta={content.navbar.cta}
+          logoAlt={content.navbar.logoAlt}
+          onCtaClick={toggleTypeform}
+        />
         <Hero
           cta={content.hero.cta}
           imgAlt={content.hero.imgAlt}
+          onCtaClick={toggleTypeform}
           subtitle={content.hero.subtitle}
           title={content.hero.title}
         />
@@ -68,6 +79,7 @@ const Home = () => {
         />
         <GetStartedSection
           cta={content.getStarted.cta}
+          onCtaClick={toggleTypeform}
           subtitle={content.getStarted.subtitle}
           title={content.getStarted.title}
         />

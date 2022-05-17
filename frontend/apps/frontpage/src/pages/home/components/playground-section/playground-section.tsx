@@ -19,7 +19,7 @@ const PlaygroundSection = ({
   tooltips,
 }: PlaygroundSectionProps) => (
   <Gradient id="playground">
-    <Container>
+    <Container sx={{ overflow: 'hidden' }}>
       <Inner>
         <PlaygroundGrid tooltips={tooltips} instructions={instructions} />
         <PlaygroundGrigContent subtitle={subtitle} title={title} />
