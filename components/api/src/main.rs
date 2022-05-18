@@ -137,6 +137,7 @@ async fn main() -> std::io::Result<()> {
                 .cookie_secure(is_https)
                 .cookie_content_security(actix_session::CookieContentSecurity::Private)
                 .cookie_same_site(actix_web::cookie::SameSite::Lax)
+                .cookie_domain(Some(cookie_domain.clone()))
                 .build();
 
         App::new()
