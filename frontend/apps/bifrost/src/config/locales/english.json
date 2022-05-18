@@ -1,0 +1,10 @@
+{
+  "global": {
+    "errors": {}
+  },
+  "pages": {
+    "flow": {
+      "title": "Hello world!"
+    }
+  }
+}
