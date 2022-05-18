@@ -26,8 +26,8 @@ struct OnboardingResponse {
 
 #[api_v2_operation]
 #[get("/onboardings")]
-/// Allows a tenant to view a list of AccessEvent logs for a specific user's data. Optionally
-/// allows filtering on data_kind.
+/// Allows a tenant to view a list of their Onboardings, effectively showing all users that have
+/// started the onboarding process for the tenant. Optionally allows filtering on Onboarding status.
 /// Requires tenant secret key auth.
 fn handler(
     state: web::Data<State>,
