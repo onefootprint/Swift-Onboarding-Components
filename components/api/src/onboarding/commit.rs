@@ -4,6 +4,7 @@ use crate::errors::ApiError;
 use crate::types::success::ApiResponseData;
 use crate::State;
 use crate::{auth::client_public_key::PublicTenantAuthContext, liveness::get_opt_webauthn_creds};
+use db::models::user_vaults::UserVaultWrapper;
 use newtypes::FootprintUserId;
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 
@@ -26,7 +27,12 @@ fn handler(
     let uv = user_auth.user_vault();
     let uv_id = uv.id.clone();
 
-    let missing_fields = db::models::user_vaults::MissingFields::missing_fields(uv);
+    let uvw = UserVaultWrapper::from(&state.db_pool, uv).await?;
+    let missing_fields = uvw
+        .missing_fields()
+        .into_iter()
+        .map(|x| x.to_string())
+        .collect::<Vec<String>>();
     let webauthn_creds = get_opt_webauthn_creds(&state, uv_id).await?;
 
     match (missing_fields.len(), webauthn_creds) {

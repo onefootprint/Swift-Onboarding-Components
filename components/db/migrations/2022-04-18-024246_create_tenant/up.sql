@@ -36,9 +36,6 @@ CREATE TABLE user_vaults (
     e_street_address BYTEA,
     e_city BYTEA,
     e_state BYTEA,
-    e_email BYTEA,
-    sh_email BYTEA UNIQUE,
-    is_email_verified BOOLEAN NOT NULL DEFAULT FALSE,
     e_phone_number BYTEA NOT NULL,
     sh_phone_number BYTEA NOT NULL UNIQUE,
     id_verified User_Status NOT NULL,
@@ -46,9 +43,26 @@ CREATE TABLE user_vaults (
     updated_at timestamp NOT NULL DEFAULT NOW()
 );
 
+CREATE TYPE data_kind as ENUM ('FirstName', 'LastName', 'Dob', 'Ssn', 'StreetAddress', 'City', 'State', 'Email', 'PhoneNumber');
+
 CREATE INDEX IF NOT EXISTS user_vaults_sh_ssn ON user_vaults(sh_ssn);
 CREATE INDEX IF NOT EXISTS user_vaults_sh_phone_number ON user_vaults(sh_phone_number);
-CREATE INDEX IF NOT EXISTS user_vaults_sh_email ON user_vaults(sh_email);
+
+CREATE TABLE user_data (
+    id VARCHAR(250) PRIMARY KEY DEFAULT prefixed_uid('ud_'),
+    user_vault_id VARCHAR(250) NOT NULL,
+    data_kind data_kind NOT NULL,
+    e_data BYTEA NOT NULL,
+    sh_data BYTEA NOT NULL, -- TODO this table may only be for "fingerprinted" data.
+    is_verified BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at timestamp NOT NULL DEFAULT NOW(),
+    updated_at timestamp NOT NULL DEFAULT NOW(),
+    CONSTRAINT fk_user_valt
+        FOREIGN KEY(user_vault_id) 
+        REFERENCES user_vaults(id)
+);
+CREATE UNIQUE INDEX IF NOT EXISTS user_data_kind_fingerprint ON user_data(data_kind, sh_data) WHERE is_verified = TRUE;
+CREATE INDEX IF NOT EXISTS user_data_user_vault_id_data_kind ON user_data(user_vault_id, data_kind);
 
 CREATE TABLE onboardings (
     id VARCHAR(250) PRIMARY KEY DEFAULT prefixed_uid('ob_'),
@@ -103,6 +117,7 @@ CREATE TRIGGER expire_sessions
     EXECUTE PROCEDURE expire_sessions();
     
 SELECT diesel_manage_updated_at('user_vaults');
+SELECT diesel_manage_updated_at('user_data');
 SELECT diesel_manage_updated_at('tenants');
 SELECT diesel_manage_updated_at('onboardings');
 SELECT diesel_manage_updated_at('tenant_api_keys');

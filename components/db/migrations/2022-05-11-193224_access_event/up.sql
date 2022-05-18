@@ -1,6 +1,3 @@
--- TODO this could be used in future UserVaultData table
-CREATE TYPE data_kind as ENUM ('FirstName', 'LastName', 'Dob', 'Ssn', 'StreetAddress', 'City', 'State', 'Email', 'PhoneNumber');
-
 CREATE TABLE access_events (
     id uuid NOT NULL PRIMARY KEY DEFAULT uuid_generate_v4(),
     onboarding_id VARCHAR(250) NOT NULL,

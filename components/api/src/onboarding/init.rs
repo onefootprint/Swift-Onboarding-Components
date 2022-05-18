@@ -4,14 +4,14 @@ use crate::errors::ApiError;
 use crate::types::success::ApiResponseData;
 use crate::State;
 use db::models::onboardings::{NewOnboarding, Onboarding};
-use db::models::user_vaults::MissingFields;
-use newtypes::Status;
+use db::models::user_vaults::UserVaultWrapper;
+use newtypes::{DataKind, Status};
 use paperclip::actix::{api_v2_operation, web, web::Json, Apiv2Schema};
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Serialize)]
 pub struct OnboardingResponse {
     /// Attributes needed to successfully onboard this user
-    missing_attributes: Vec<String>,
+    missing_attributes: Vec<DataKind>,
 }
 
 #[api_v2_operation]
@@ -31,9 +31,10 @@ pub fn handler(
     .get_or_create(&state.db_pool)
     .await?;
 
+    let uvw = UserVaultWrapper::from(&state.db_pool, uv).await?;
     Ok(Json(ApiResponseData {
         data: OnboardingResponse {
-            missing_attributes: MissingFields::missing_fields(uv),
+            missing_attributes: uvw.missing_fields(),
         },
     }))
 }

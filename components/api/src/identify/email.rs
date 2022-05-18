@@ -34,7 +34,11 @@ pub async fn handler(
     let req = request.into_inner();
     let cleaned_email = clean_email(req.email);
     let sh_email = super::signed_hash(&state, cleaned_email.clone()).await?;
-    let existing_user = db::user_vault::get_by_email(&state.db_pool, sh_email).await?;
+    // TODO we should only look for verified emails, but this will break integration tests
+    // since we don't verify the email in tests
+    let existing_user = db::user_vault::get_by_email(&state.db_pool, sh_email, false)
+        .await?
+        .map(|x| x.0);
 
     // see if user vault has an associated phone number. if not, set session state to info we currently have &
     // return user not found

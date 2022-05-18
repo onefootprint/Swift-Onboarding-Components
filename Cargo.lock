@@ -1409,6 +1409,7 @@ dependencies = [
  "diesel-derive-newtype",
  "diesel_migrations",
  "dotenv",
+ "itertools",
  "newtypes",
  "openssl",
  "rand",

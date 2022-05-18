@@ -50,4 +50,5 @@ pub mod session;
 pub mod tenant;
 #[cfg(test)]
 pub mod test;
+pub mod user_data;
 pub mod user_vault;

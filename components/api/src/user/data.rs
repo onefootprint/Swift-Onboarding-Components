@@ -1,7 +1,9 @@
 use crate::auth::logged_in_session::LoggedInSessionContext;
 use crate::identify::{clean_email, send_email_challenge};
 use crate::{errors::ApiError, types::success::ApiResponseData, State};
+use db::models::user_data::NewUserData;
 use db::models::user_vaults::UpdateUserVault;
+use newtypes::DataKind;
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 
 #[derive(Debug, Clone, serde::Deserialize, Apiv2Schema)]
@@ -93,14 +95,19 @@ async fn handler(
         Ok(res)
     }
 
-    let cleaned_email = if let Some(Some(email)) = request.email.clone() {
+    if let Some(email) = request.email.clone().flatten() {
         let cleaned_email = clean_email(email);
         // If we're updating the email address, send an async challenge to the new email address
         send_email_challenge(&state, user_vault.public_key.clone(), cleaned_email.clone()).await?;
-        Some(Some(cleaned_email))
-    } else {
-        None
-    };
+        NewUserData {
+            user_vault_id: user_vault.id.clone(),
+            data_kind: DataKind::Email,
+            e_data: crate::identify::seal(cleaned_email.clone(), &user_vault.public_key)?,
+            sh_data: crate::identify::signed_hash(&state, cleaned_email).await?,
+        }
+        .save(&state.db_pool)
+        .await?;
+    }
 
     let user_update = UpdateUserVault {
         id: user_vault.id.clone(),
@@ -112,9 +119,6 @@ async fn handler(
         e_street_address: seal(request.street_address.clone(), user_vault)?,
         e_city: seal(request.city.clone(), user_vault)?,
         e_state: seal(request.state.clone(), user_vault)?,
-        e_email: seal(cleaned_email.clone(), user_vault)?,
-        sh_email: signed_hash(&state, cleaned_email.clone()).await?,
-        is_email_verified: cleaned_email.flatten().map(|_| false),
         ..Default::default()
     };
 

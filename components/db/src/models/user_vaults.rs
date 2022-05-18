@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use crate::diesel::RunQueryDsl;
 use crate::schema::user_vaults;
 use crate::DbPool;
@@ -5,6 +7,8 @@ use chrono::NaiveDateTime;
 use diesel::{Insertable, Queryable};
 use newtypes::{DataKind, Status, UserVaultId};
 use serde::{Deserialize, Serialize};
+
+use super::user_data::UserData;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable, Identifiable)]
 #[table_name = "user_vaults"]
@@ -20,31 +24,11 @@ pub struct UserVault {
     pub e_street_address: Option<Vec<u8>>,
     pub e_city: Option<Vec<u8>>,
     pub e_state: Option<Vec<u8>>,
-    pub e_email: Option<Vec<u8>>,
-    pub sh_email: Option<Vec<u8>>,
-    pub is_email_verified: bool,
     pub e_phone_number: Vec<u8>,
     pub sh_phone_number: Vec<u8>,
     pub id_verified: Status,
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
-}
-
-impl UserVault {
-    pub fn get_field(&self, field_kind: DataKind) -> Option<&[u8]> {
-        match field_kind {
-            DataKind::FirstName => self.e_first_name.as_ref(),
-            DataKind::LastName => self.e_last_name.as_ref(),
-            DataKind::Ssn => self.e_ssn.as_ref(),
-            DataKind::Dob => self.e_dob.as_ref(),
-            DataKind::StreetAddress => self.e_street_address.as_ref(),
-            DataKind::City => self.e_city.as_ref(),
-            DataKind::State => self.e_state.as_ref(),
-            DataKind::Email => self.e_email.as_ref(),
-            DataKind::PhoneNumber => Some(&self.e_phone_number),
-        }
-        .map(Vec::as_slice)
-    }
 }
 
 #[derive(Debug, Default, Clone, Serialize, Deserialize, Insertable, AsChangeset)]
@@ -61,9 +45,6 @@ pub struct UpdateUserVault {
     pub e_state: Option<Vec<u8>>,
     pub e_phone_number: Option<Vec<u8>>,
     pub sh_phone_number: Option<Vec<u8>>,
-    pub e_email: Option<Vec<u8>>,
-    pub sh_email: Option<Vec<u8>>,
-    pub is_email_verified: Option<bool>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
@@ -91,26 +72,51 @@ impl NewUserVault {
     }
 }
 
-pub trait MissingFields {
-    // returns vector of missing attributes
-    fn missing_fields(&self) -> Vec<String>;
+pub struct UserVaultWrapper<'a> {
+    user_vault: &'a UserVault,
+    user_data: HashMap<DataKind, Vec<UserData>>,
 }
 
-impl MissingFields for UserVault {
-    fn missing_fields(&self) -> Vec<String> {
-        let attrs = vec![
-            ("first_name", self.e_first_name.clone()),
-            ("last_name", self.e_last_name.clone()),
-            ("date_of_birth", self.e_dob.clone()),
-            ("ssn", self.e_ssn.clone()),
-            ("street_address", self.e_street_address.clone()),
-            ("city", self.e_city.clone()),
-            ("state", self.e_state.clone()),
-        ];
-        attrs
-            .iter()
-            .filter(|(_, val)| val.is_none())
-            .map(|(name, _)| name.to_owned().to_owned())
-            .collect()
+impl<'a> UserVaultWrapper<'a> {
+    pub async fn from(
+        pool: &DbPool,
+        user_vault: &'a UserVault,
+    ) -> Result<UserVaultWrapper<'a>, crate::DbError> {
+        Ok(Self {
+            user_data: crate::user_data::list(pool, user_vault.id.clone()).await?,
+            user_vault,
+        })
+    }
+
+    pub fn get_field(&self, data_kind: DataKind) -> Option<&[u8]> {
+        match data_kind {
+            DataKind::FirstName => self.user_vault.e_first_name.as_ref(),
+            DataKind::LastName => self.user_vault.e_last_name.as_ref(),
+            DataKind::Ssn => self.user_vault.e_ssn.as_ref(),
+            DataKind::Dob => self.user_vault.e_dob.as_ref(),
+            DataKind::StreetAddress => self.user_vault.e_street_address.as_ref(),
+            DataKind::City => self.user_vault.e_city.as_ref(),
+            DataKind::State => self.user_vault.e_state.as_ref(),
+            DataKind::Email => Some(&self.user_data.get(&data_kind)?.get(0)?.e_data),
+            DataKind::PhoneNumber => Some(&self.user_vault.e_phone_number),
+        }
+        .map(Vec::as_slice)
+    }
+
+    pub fn missing_fields(&self) -> Vec<DataKind> {
+        vec![
+            DataKind::FirstName,
+            DataKind::LastName,
+            DataKind::Dob,
+            DataKind::Ssn,
+            DataKind::StreetAddress,
+            DataKind::City,
+            DataKind::State,
+            DataKind::Email,
+            DataKind::PhoneNumber,
+        ]
+        .into_iter()
+        .filter(|data_kind| self.get_field(*data_kind).is_none())
+        .collect()
     }
 }

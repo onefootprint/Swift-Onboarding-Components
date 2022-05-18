@@ -33,9 +33,11 @@ async fn handler(
     // 1. if the email associated with the user has changed, we won't be able to look it up (prevents swapping emails)
     // 2. bad data / a different sh email will not properly decrypt
     let sh_email = Base64Data::from_str(&request.sh_email).map_err(crypto::Error::from)?;
-    let existing_user_vault = db::user_vault::get_by_email(&state.db_pool, sh_email.0)
-        .await?
-        .ok_or(ApiError::UserDoesntExistForEmailChallenge)?;
+    // TODO what happens if multiple user vaults have this email?
+    let (existing_user_vault, email_user_data) =
+        db::user_vault::get_by_email(&state.db_pool, sh_email.0.clone(), false)
+            .await?
+            .ok_or(ApiError::UserDoesntExistForEmailChallenge)?;
     let decrypted_challenge = crate::enclave::lib::decrypt_string(
         &state,
         &request.e_email_challenge,
@@ -52,17 +54,9 @@ async fn handler(
     }
 
     // Challenge is valid, let's mark the email as valid in user vault
-    let updates = db::user_vault::update(
-        &state.db_pool,
-        db::models::user_vaults::UpdateUserVault {
-            id: existing_user_vault.id.clone(),
-            is_email_verified: Some(true),
-            ..Default::default()
-        },
-    )
-    .await?;
+    email_user_data.mark_verified(&state.db_pool).await?;
 
     Ok(Json(ApiResponseData {
-        data: format!("updated {} rows", updates),
+        data: "updated successfully".to_owned(),
     }))
 }

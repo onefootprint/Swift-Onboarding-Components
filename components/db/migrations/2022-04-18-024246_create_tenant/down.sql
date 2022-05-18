@@ -10,4 +10,5 @@ DROP INDEX user_vaults_sh_email;
 DROP TABLE user_vaults;
 DROP TABLE tenant_api_keys;
 DROP TYPE User_Status;
+DROP TYPE data_kind;
 DROP FUNCTION prefixed_uid;

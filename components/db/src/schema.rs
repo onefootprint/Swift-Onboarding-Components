@@ -74,6 +74,22 @@ table! {
     use diesel::sql_types::*;
     use newtypes::db_types::*;
 
+    user_data (id) {
+        id -> Varchar,
+        user_vault_id -> Varchar,
+        data_kind -> Data_kind,
+        e_data -> Bytea,
+        sh_data -> Bytea,
+        is_verified -> Bool,
+        created_at -> Timestamp,
+        updated_at -> Timestamp,
+    }
+}
+
+table! {
+    use diesel::sql_types::*;
+    use newtypes::db_types::*;
+
     user_vaults (id) {
         id -> Varchar,
         e_private_key -> Bytea,
@@ -86,9 +102,6 @@ table! {
         e_street_address -> Nullable<Bytea>,
         e_city -> Nullable<Bytea>,
         e_state -> Nullable<Bytea>,
-        e_email -> Nullable<Bytea>,
-        sh_email -> Nullable<Bytea>,
-        is_email_verified -> Bool,
         e_phone_number -> Bytea,
         sh_phone_number -> Bytea,
         id_verified -> User_status,
@@ -116,6 +129,7 @@ table! {
 joinable!(access_events -> onboardings (onboarding_id));
 joinable!(onboardings -> tenants (tenant_id));
 joinable!(onboardings -> user_vaults (user_vault_id));
+joinable!(user_data -> user_vaults (user_vault_id));
 joinable!(webauthn_credentials -> user_vaults (user_vault_id));
 
 allow_tables_to_appear_in_same_query!(
@@ -124,6 +138,7 @@ allow_tables_to_appear_in_same_query!(
     sessions,
     tenant_api_keys,
     tenants,
+    user_data,
     user_vaults,
     webauthn_credentials,
 );

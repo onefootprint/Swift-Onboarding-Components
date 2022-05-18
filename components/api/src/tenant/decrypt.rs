@@ -3,7 +3,7 @@ use crate::State;
 use crate::{auth::client_secret_key::SecretTenantAuthContext, errors::ApiError};
 use crypto::seal::EciesP256Sha256AesGcmSealed;
 use db::models::access_events::{NewAccessEvent, NewAccessEventBatch};
-use db::models::user_vaults::UserVault;
+use db::models::user_vaults::{UserVault, UserVaultWrapper};
 use enclave_proxy::{DataTransform, DecryptRequest};
 use newtypes::{DataKind, FootprintUserId};
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
@@ -77,10 +77,11 @@ pub async fn decrypt_fields(
     fields: Vec<DataKind>,
     vault: &UserVault,
 ) -> Result<DecryptFieldsResult, ApiError> {
+    let uvw = UserVaultWrapper::from(&state.db_pool, vault).await?;
     // Filter out fields that don't have values set on the user vault
     let (fields_to_decrypt, values_to_decrypt): (Vec<DataKind>, Vec<&[u8]>) = fields
         .into_iter()
-        .filter_map(|field_kind| Some((field_kind, vault.get_field(field_kind)?)))
+        .filter_map(|field_kind| Some((field_kind, uvw.get_field(field_kind)?)))
         .unzip();
 
     // Actually decrypt the fields

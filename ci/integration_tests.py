@@ -135,7 +135,7 @@ def test_onboard_init(request, tenant1):
         headers=_client_pub_key_headers(tenant1["pk"]),
     )
     body = _assert_response(r)
-    assert set(body["data"]["missing_attributes"]) == {"first_name", "last_name", "date_of_birth", "ssn", "street_address", "city", "state"}
+    assert set(body["data"]["missing_attributes"]) == {"first_name", "last_name", "dob", "ssn", "street_address", "city", "state", "email"}
     _assert_no_cookies(r)
     
 def test_user_data(request):

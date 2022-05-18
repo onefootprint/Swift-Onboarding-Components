@@ -1,13 +1,13 @@
-use crate::errors::DbError;
 use crate::models::onboardings::*;
 use crate::models::session_data::SessionState;
 use crate::models::user_vaults::*;
 use crate::onboarding::get_for_tenant;
 use crate::schema;
 use crate::session::get_session_by_id_sync;
+use crate::{errors::DbError, models::user_data::UserData};
 use deadpool_diesel::postgres::Pool;
 use diesel::prelude::*;
-use newtypes::{FootprintUserId, TenantId, UserVaultId};
+use newtypes::{DataKind, FootprintUserId, TenantId, UserVaultId};
 
 pub async fn update(pool: &Pool, update: UpdateUserVault) -> Result<usize, DbError> {
     let conn = pool.get().await?;
@@ -98,20 +98,31 @@ pub async fn get_by_phone_number(
     Ok(user)
 }
 
-pub async fn get_by_email(pool: &Pool, sh_email: Vec<u8>) -> Result<Option<UserVault>, DbError> {
-    let conn = pool.get().await?;
-
-    let user = conn
-        .interact(move |conn| -> Result<Option<UserVault>, DbError> {
-            let user = schema::user_vaults::table
-                .filter(schema::user_vaults::sh_email.eq(sh_email))
-                .first(conn)
-                .optional()?;
-            Ok(user)
-        })
+pub async fn get_by_email(
+    pool: &Pool,
+    sh_email: Vec<u8>,
+    require_verified: bool,
+) -> Result<Option<(UserVault, UserData)>, DbError> {
+    let result = pool
+        .get()
+        .await?
+        .interact(
+            move |conn| -> Result<Option<(UserVault, UserData)>, DbError> {
+                let mut result = schema::user_vaults::table
+                    .inner_join(schema::user_data::table)
+                    .filter(schema::user_data::data_kind.eq(DataKind::Email))
+                    .filter(schema::user_data::sh_data.eq(sh_email))
+                    .into_boxed();
+                if require_verified {
+                    result = result.filter(schema::user_data::is_verified.eq(true));
+                }
+                let result = result.first(conn).optional()?;
+                Ok(result)
+            },
+        )
         .await??;
 
-    Ok(user)
+    Ok(result)
 }
 
 pub fn get_sync(conn: &mut PgConnection, uv_id: UserVaultId) -> Result<UserVault, DbError> {

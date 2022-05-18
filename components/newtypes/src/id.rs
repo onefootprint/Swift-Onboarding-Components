@@ -30,6 +30,7 @@ macro_rules! define_newtype_id {
 // define our raw ids here
 define_newtype_id!(TenantId, "Identifier for a Tenant");
 define_newtype_id!(TenantPublicKey, "A publishable api key for a tenant");
+define_newtype_id!(UserDataId, "Identifier for a User Data");
 define_newtype_id!(UserVaultId, "Identifier for a User Vault");
 define_newtype_id!(OnboardingId, "Identifier for an Onboarding");
 define_newtype_id!(FootprintUserId, "Identifier for a an onboarding");
