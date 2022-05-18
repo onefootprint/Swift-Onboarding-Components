@@ -1,13 +1,14 @@
 /* eslint-disable react/jsx-props-no-spreading */
+import { Property } from 'csstype';
 import { useCombobox } from 'downshift';
 import { usePlacesAutocomplete } from 'hooks';
 import take from 'lodash/take';
 import React, { forwardRef } from 'react';
 import mergeRefs from 'react-merge-refs';
+import styled, { css } from 'styled';
 
 import BaseInput, { BaseInputProps } from '../internal/base-input';
 import Label from '../internal/label';
-import S from './address-input.styles';
 import type { Item } from './adress-input.types';
 import AddressDropdownFooter from './components/address-dropdown-footer';
 import AddressDropdownItem from './components/address-dropdown-item';
@@ -100,7 +101,7 @@ const AddressInput = forwardRef<HTMLInputElement, AddressInputProps>(
     return (
       <>
         {label ? <Label {...getLabelProps()}>{label}</Label> : null}
-        <S.Container
+        <Container
           aria-expanded={comboBoxProps['aria-expanded']}
           aria-haspopup={comboBoxProps['aria-haspopup']}
           aria-owns={comboBoxProps['aria-owns']}
@@ -129,7 +130,7 @@ const AddressInput = forwardRef<HTMLInputElement, AddressInputProps>(
             value={value}
           />
           {isDropdownOpen ? (
-            <S.Dropdown
+            <Dropdown
               {...menuProps}
               ref={mergeRefs([menuProps.ref, setPopperElement])}
               {...popper.attributes.popper}
@@ -156,12 +157,31 @@ const AddressInput = forwardRef<HTMLInputElement, AddressInputProps>(
                 })}
                 <AddressDropdownFooter />
               </>
-            </S.Dropdown>
+            </Dropdown>
           ) : null}
-        </S.Container>
+        </Container>
       </>
     );
   },
 );
+
+const Container = styled.div`
+  position: relative;
+`;
+
+const Dropdown = styled.ul<{
+  maxHeight?: Property.MaxHeight;
+}>`
+  ${({ theme, maxHeight = 330 }) => css`
+    background: ${theme.backgroundColor.primary};
+    border-radius: ${theme.borderRadius[1]}px;
+    border: ${theme.borderWidth[1]}px solid ${theme.borderColor.primary};
+    box-shadow: ${theme.elevation[2]};
+    max-height: ${maxHeight};
+    outline: none;
+    padding: ${theme.spacing[3]}px 0 0;
+    width: 100%;
+  `}
+`;
 
 export default AddressInput;
