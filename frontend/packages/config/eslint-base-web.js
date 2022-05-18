@@ -30,6 +30,12 @@ module.exports = {
     },
   },
   rules: {
+    'react/jsx-props-no-spreading': [
+      'error',
+      {
+        exceptions: ['TextInput', 'Component', 'App'],
+      },
+    ],
     'no-use-before-define': 'off',
     '@typescript-eslint/no-use-before-define': 'off',
     'react/display-name': 'off',

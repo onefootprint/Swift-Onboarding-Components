@@ -9,7 +9,7 @@ export type FootprintButtonProps = Omit<ButtonProps, 'children' | 'variant'>;
 const FootprintButton = ({
   disabled = false,
   fullWidth,
-  onPress,
+  onClick,
   size = 'default',
   testID,
   type = 'button',
@@ -17,7 +17,7 @@ const FootprintButton = ({
   <Button
     disabled={disabled}
     fullWidth={fullWidth}
-    onPress={onPress}
+    onClick={onClick}
     size={size}
     testID={testID}
     type={type}

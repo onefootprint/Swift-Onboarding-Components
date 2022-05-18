@@ -3,11 +3,12 @@ import { createRef, MutableRefObject, useEffect, useState } from 'react';
 const usePinInputRefs = (pinInputCount: number) => {
   const [refs, setRefs] = useState<MutableRefObject<HTMLInputElement>[]>([]);
 
-  const previous = (referenceIndex: number): HTMLInputElement =>
-    refs[referenceIndex - 1].current;
+  const previous = (
+    referenceIndex: number,
+  ): HTMLInputElement | null | undefined => refs[referenceIndex - 1]?.current;
 
-  const next = (referenceIndex: number): HTMLInputElement | null =>
-    refs[referenceIndex + 1].current;
+  const next = (referenceIndex: number): HTMLInputElement | null | undefined =>
+    refs[referenceIndex + 1]?.current;
 
   useEffect(() => {
     setRefs(elRefs =>

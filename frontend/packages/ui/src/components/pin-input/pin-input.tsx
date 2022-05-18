@@ -1,13 +1,13 @@
 import defer from 'lodash/defer';
 import identity from 'lodash/identity';
 import React, { useState } from 'react';
+import styled from 'styled';
 
 import BaseInput from '../internal/base-input';
 import Hint from '../internal/hint';
 import LoadingIndicator from '../loading-indicator';
 import usePinInputRefs from './hooks/use-pin-input-refs';
 import { INPUT_FIELDS_COUNT, pins } from './pin-input.constants';
-import * as S from './pin-input.styles';
 import { getNextValue, isNumber } from './pin-input.utils';
 
 const waitNextInputFieldGetDisabled = defer;
@@ -91,12 +91,12 @@ const PinInput = ({
   };
 
   return (
-    <S.Container data-testid={testID}>
+    <Container data-testid={testID}>
       {isLoading ? (
         <LoadingIndicator testID={loadingTestID} />
       ) : (
         <>
-          <S.PinContainer>
+          <PinContainer>
             {pins.map((pinPosition, pinIndex) => {
               const key = pinIndex;
               return (
@@ -112,18 +112,32 @@ const PinInput = ({
                   ref={pinInputs.refs[pinIndex]}
                   required
                   type="tel"
-                  value={enteredPin[pinIndex]}
+                  value={enteredPin[pinIndex] || ''}
                 />
               );
             })}
-          </S.PinContainer>
+          </PinContainer>
           {!!hintText && (
             <Hint color={hasError ? 'error' : 'primary'}>{hintText}</Hint>
           )}
         </>
       )}
-    </S.Container>
+    </Container>
   );
 };
+
+const Container = styled.div``;
+
+export const PinContainer = styled.div`
+  display: flex;
+  gap: ${({ theme }) => theme.spacing[3]}px;
+
+  input {
+    height: 44px;
+    padding: 0;
+    text-align: center;
+    width: 40px;
+  }
+`;
 
 export default PinInput;

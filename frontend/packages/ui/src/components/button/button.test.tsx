@@ -7,14 +7,14 @@ describe('<Button />', () => {
   const renderButton = ({
     children = 'Foo',
     disabled,
-    onPress = jest.fn(),
+    onClick = jest.fn(),
     testID,
     variant,
   }: Partial<ButtonProps>) =>
     customRender(
       <Button
         disabled={disabled}
-        onPress={onPress}
+        onClick={onClick}
         testID={testID}
         variant={variant}
       >
@@ -32,19 +32,19 @@ describe('<Button />', () => {
     expect(screen.getByText('Lorem')).toBeInTheDocument();
   });
 
-  it('should trigger onPress when pressing', async () => {
-    const onPressMockFn = jest.fn();
-    renderButton({ onPress: onPressMockFn, children: 'foo' });
+  it('should trigger onClick when pressing', async () => {
+    const onClickMockFn = jest.fn();
+    renderButton({ onClick: onClickMockFn, children: 'foo' });
     await userEvent.click(screen.getByText('foo'));
-    expect(onPressMockFn).toHaveBeenCalled();
+    expect(onClickMockFn).toHaveBeenCalled();
   });
 
   describe('when the button is disabled', () => {
     it('should NOT fire an event when pressing', () => {
-      const onPressMockFn = jest.fn();
-      renderButton({ onPress: onPressMockFn, children: 'foo', disabled: true });
+      const onClickMockFn = jest.fn();
+      renderButton({ onClick: onClickMockFn, children: 'foo', disabled: true });
       userEvent.click(screen.getByText('foo'));
-      expect(onPressMockFn).not.toHaveBeenCalled();
+      expect(onClickMockFn).not.toHaveBeenCalled();
     });
   });
 });

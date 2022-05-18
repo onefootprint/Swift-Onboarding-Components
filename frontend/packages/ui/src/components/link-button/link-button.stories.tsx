@@ -49,7 +49,7 @@ export default {
       control: 'text',
       description: 'Append an attribute data-testid for testing purposes',
     },
-    onPress: {
+    onClick: {
       control: 'object',
       description: 'Callback function triggered upon click',
       required: false,
@@ -63,7 +63,7 @@ const Template: Story<LinkButtonProps> = ({
   href,
   Icon,
   iconPosition,
-  onPress,
+  onClick,
   size,
   target,
   testID,
@@ -75,7 +75,7 @@ const Template: Story<LinkButtonProps> = ({
       href={href}
       Icon={SelectedIcon}
       iconPosition={iconPosition}
-      onPress={onPress}
+      onClick={onClick}
       size={size}
       target={target}
       testID={testID}
@@ -100,35 +100,35 @@ AsLink.args = {
 export const Base = Template.bind({});
 Base.args = {
   children: 'Link button',
-  onPress: () => alert('I was pressed'),
+  onClick: () => alert('I was pressed'),
   size: 'default',
 };
 
 export const BaseSize1 = Template.bind({});
 BaseSize1.args = {
   children: 'Link button',
-  onPress: () => alert('I was pressed'),
+  onClick: () => alert('I was pressed'),
   size: 'compact',
 };
 
 export const BaseSize2 = Template.bind({});
 BaseSize2.args = {
   children: 'Link button',
-  onPress: () => alert('I was pressed'),
+  onClick: () => alert('I was pressed'),
   size: 'tiny',
 };
 
 export const BaseSize3 = Template.bind({});
 BaseSize3.args = {
   children: 'Link button',
-  onPress: () => alert('I was pressed'),
+  onClick: () => alert('I was pressed'),
   size: 'xTiny',
 };
 
 export const BaseSize4 = Template.bind({});
 BaseSize4.args = {
   children: 'Link button',
-  onPress: () => alert('I was pressed'),
+  onClick: () => alert('I was pressed'),
   size: 'xxTiny',
 };
 
@@ -137,7 +137,7 @@ WithIconLeft.args = {
   children: 'Link button',
   Icon: IcoPlusSmall24,
   iconPosition: 'left',
-  onPress: () => alert('I was pressed'),
+  onClick: () => alert('I was pressed'),
   size: 'default',
 };
 
@@ -146,6 +146,6 @@ WithIconRight.args = {
   children: 'Link button',
   Icon: IcoPlusSmall24,
   iconPosition: 'right',
-  onPress: () => alert('I was pressed'),
+  onClick: () => alert('I was pressed'),
   size: 'default',
 };

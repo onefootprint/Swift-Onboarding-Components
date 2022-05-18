@@ -11,7 +11,7 @@ describe('<LinkButton />', () => {
     href,
     Icon,
     iconPosition,
-    onPress,
+    onClick,
     size = 'default',
     target,
     testID,
@@ -22,7 +22,7 @@ describe('<LinkButton />', () => {
         href={href}
         Icon={Icon}
         iconPosition={iconPosition}
-        onPress={onPress}
+        onClick={onClick}
         size={size}
         target={target}
         testID={testID}
@@ -54,11 +54,11 @@ describe('<LinkButton />', () => {
       expect(screen.getByLabelText('lorem')).toBeInTheDocument();
     });
 
-    it('should trigger onPress event when clicking', async () => {
-      const onPressMockFn = jest.fn();
-      renderLinkButton({ children: 'foo', onPress: onPressMockFn });
+    it('should trigger onClick event when clicking', async () => {
+      const onClickMockFn = jest.fn();
+      renderLinkButton({ children: 'foo', onClick: onClickMockFn });
       await userEvent.click(screen.getByText('foo'));
-      expect(onPressMockFn).toHaveBeenCalledTimes(1);
+      expect(onClickMockFn).toHaveBeenCalledTimes(1);
     });
 
     describe('when the href prop is present', () => {

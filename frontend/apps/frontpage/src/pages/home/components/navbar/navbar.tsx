@@ -42,7 +42,7 @@ const Navbar = ({ logoAlt, cta, onCtaClick }: NavbarProps) => {
           src="/images/nav-logo.png"
           width={115}
         />
-        <Button size="compact" onPress={onCtaClick}>
+        <Button size="compact" onClick={onCtaClick}>
           {cta}
         </Button>
       </Container>

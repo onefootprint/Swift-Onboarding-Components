@@ -11,7 +11,7 @@ export type LinkButtonProps = {
   href?: string;
   Icon?: TIcon;
   iconPosition?: 'left' | 'right';
-  onPress?: (
+  onClick?: (
     event:
       | React.KeyboardEvent<HTMLAnchorElement>
       | React.KeyboardEvent<HTMLButtonElement>
@@ -29,7 +29,7 @@ const LinkButton = ({
   href,
   Icon,
   iconPosition = 'right',
-  onPress,
+  onClick,
   size = 'default',
   target,
   testID,
@@ -40,7 +40,7 @@ const LinkButton = ({
       aria-label={ariaLabel}
       data-testid={testID}
       href={href}
-      onClick={onPress}
+      onClick={onClick}
       rel={target === '_blank' ? 'noopener noreferrer' : undefined}
       size={size}
       tabIndex={0}

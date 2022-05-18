@@ -13,7 +13,7 @@ export type ButtonProps = {
   children: React.ReactNode;
   disabled?: boolean;
   fullWidth?: boolean;
-  onPress?: (event: React.MouseEvent<HTMLButtonElement>) => void;
+  onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
   size?: 'default' | 'compact' | 'large';
   testID?: string;
   type?: 'button' | 'submit';
@@ -24,7 +24,7 @@ const Button = ({
   children,
   disabled = false,
   fullWidth,
-  onPress,
+  onClick,
   size = 'default',
   testID,
   type = 'button',
@@ -34,7 +34,7 @@ const Button = ({
     data-testid={testID}
     disabled={disabled}
     fullWidth={fullWidth}
-    onClick={onPress}
+    onClick={onClick}
     size={size}
     tabIndex={0}
     type={type}

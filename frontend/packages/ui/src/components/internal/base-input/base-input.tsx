@@ -1,7 +1,6 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import { darken, rgba } from 'polished';
 import React, { forwardRef, InputHTMLAttributes } from 'react';
-import InputMask from 'react-input-mask';
 import styled, { css } from 'styled';
 
 import Hint from '../hint';
@@ -11,8 +10,6 @@ export type BaseInputProps = {
   hasError?: boolean;
   hintText?: string;
   label?: string;
-  mask?: string | (string | RegExp)[];
-  maskPlaceholder?: string | null;
   onChangeText?: (nextValue: string) => void;
   placeholder: string;
   testID?: string;
@@ -30,18 +27,12 @@ const BaseInput = forwardRef<HTMLInputElement, BaseInputProps>(
       hintText,
       inputMode,
       label,
-      mask = '',
-      maskPlaceholder = null,
       maxLength,
       minLength,
       name,
       onClick,
-      onBlur,
       onChange,
       onChangeText,
-      onKeyDown,
-      onKeyUp,
-      onFocus,
       placeholder,
       readOnly,
       required,
@@ -49,7 +40,7 @@ const BaseInput = forwardRef<HTMLInputElement, BaseInputProps>(
       testID,
       type,
       id: baseID,
-      value = '',
+      value,
       ...rest
     }: BaseInputProps,
     ref,
@@ -70,40 +61,27 @@ const BaseInput = forwardRef<HTMLInputElement, BaseInputProps>(
     return (
       <InputContainer>
         {label && <Label htmlFor={id}>{label}</Label>}
-        <InputMask
-          alwaysShowMask={false}
-          disabled={disabled}
-          mask={mask}
-          maskPlaceholder={maskPlaceholder}
-          onBlur={onBlur}
-          onClick={onClick}
-          onChange={disabled ? undefined : handleChange}
-          onFocus={onFocus}
-          onKeyDown={onKeyDown}
-          onKeyUp={onKeyUp}
-          readOnly={readOnly}
+        <Input
+          $hasError={hasError}
+          alt={alt}
+          aria-required={required}
+          autoComplete={autoComplete}
+          data-testid={testID}
+          defaultValue={defaultValue}
+          id={id}
+          inputMode={inputMode}
+          maxLength={maxLength}
+          minLength={minLength}
+          name={name}
+          placeholder={placeholder}
+          ref={ref}
+          required={required}
+          tabIndex={disabled ? -1 : tabIndex}
+          type={type}
           value={value}
-        >
-          <Input
-            ref={ref}
-            $hasError={hasError}
-            alt={alt}
-            aria-required={required}
-            autoComplete={autoComplete}
-            data-testid={testID}
-            defaultValue={defaultValue}
-            id={id}
-            inputMode={inputMode}
-            maxLength={maxLength}
-            minLength={minLength}
-            name={name}
-            placeholder={placeholder}
-            required={required}
-            tabIndex={disabled ? -1 : tabIndex}
-            type={type}
-            {...rest}
-          />
-        </InputMask>
+          {...rest}
+          onChange={handleChange}
+        />
         {hintText && (
           <Hint color={hasError ? 'error' : 'tertiary'}>{hintText}</Hint>
         )}

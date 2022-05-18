@@ -10,7 +10,6 @@ describe('<TextInput />', () => {
     hasError,
     hintText,
     label = 'label-text',
-    mask,
     onChange = jest.fn(),
     onChangeText = jest.fn(),
     placeholder = 'placeholder-text',
@@ -23,7 +22,6 @@ describe('<TextInput />', () => {
         hasError={hasError}
         hintText={hintText}
         label={label}
-        mask={mask}
         onChange={onChange}
         onChangeText={onChangeText}
         placeholder={placeholder}

@@ -6,11 +6,11 @@ import FootprintButton, { FootprintButtonProps } from './footprint-button';
 describe('<FootprintButton />', () => {
   const renderFootprintButton = ({
     disabled,
-    onPress = jest.fn(),
+    onClick = jest.fn(),
     testID,
   }: Partial<FootprintButtonProps>) =>
     customRender(
-      <FootprintButton disabled={disabled} onPress={onPress} testID={testID} />,
+      <FootprintButton disabled={disabled} onClick={onClick} testID={testID} />,
     );
 
   it('should assign a testID', () => {
@@ -26,22 +26,22 @@ describe('<FootprintButton />', () => {
   });
 
   it('should fire an event when pressing', async () => {
-    const onPressMockFn = jest.fn();
-    renderFootprintButton({ onPress: onPressMockFn });
+    const onClickMockFn = jest.fn();
+    renderFootprintButton({ onClick: onClickMockFn });
     const button = screen.getByText('Verify with Footprint');
     await userEvent.click(button);
-    expect(onPressMockFn).toHaveBeenCalled();
+    expect(onClickMockFn).toHaveBeenCalled();
   });
 
   describe('when the button is disabled', () => {
     it('should NOT fire an event when pressing', () => {
-      const onPressMockFn = jest.fn();
+      const onClickMockFn = jest.fn();
       renderFootprintButton({
-        onPress: onPressMockFn,
+        onClick: onClickMockFn,
         disabled: true,
       });
       userEvent.click(screen.getByText('Verify with Footprint'));
-      expect(onPressMockFn).not.toHaveBeenCalled();
+      expect(onClickMockFn).not.toHaveBeenCalled();
     });
   });
 });

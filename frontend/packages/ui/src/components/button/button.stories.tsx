@@ -24,7 +24,7 @@ const Template: Story<ButtonProps> = ({
   children,
   disabled,
   fullWidth,
-  onPress,
+  onClick,
   size,
   testID,
   type,
@@ -33,7 +33,7 @@ const Template: Story<ButtonProps> = ({
   <Button
     disabled={disabled}
     fullWidth={fullWidth}
-    onPress={onPress}
+    onClick={onClick}
     size={size}
     testID={testID}
     type={type}
@@ -48,7 +48,7 @@ Base.args = {
   children: 'Button',
   disabled: false,
   fullWidth: false,
-  onPress: () => alert('I was pressed'),
+  onClick: () => alert('I was pressed'),
   size: 'default',
   testID: 'button-test-id',
   type: 'button',

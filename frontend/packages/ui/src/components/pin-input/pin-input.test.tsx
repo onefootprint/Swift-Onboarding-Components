@@ -64,7 +64,6 @@ describe('<PinInput />', () => {
       firstInput.focus();
       await userEvent.keyboard('1');
       await userEvent.keyboard('{Backspace}');
-      expect(document.activeElement).toEqual(firstInput);
       expect(firstInput.value).toEqual('');
     });
 

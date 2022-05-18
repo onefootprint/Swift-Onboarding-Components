@@ -29,24 +29,14 @@ export default {
       description: 'Displays a label text, above the input',
       required: false,
     },
-    mask: {
-      control: 'text',
-      description: 'Format text upon typing on the input field',
-      required: false,
-    },
-    maskPlaceholder: {
-      control: 'text',
-      description: 'Placeholder to cover unfilled parts of the mask',
-      required: false,
-    },
     maxLength: {
       control: 'number',
-      description: 'Mask length of the text',
+      description: 'Max length of the text',
       required: false,
     },
     minLength: {
       control: 'number',
-      description: 'Mask length of the text',
+      description: 'Max length of the text',
       required: false,
     },
     onChange: {
@@ -84,8 +74,6 @@ const Template: Story<TextInputProps> = ({
   hasError,
   hintText,
   label,
-  mask,
-  maskPlaceholder,
   maxLength,
   minLength,
   onChange,
@@ -106,8 +94,6 @@ const Template: Story<TextInputProps> = ({
       hasError={hasError}
       hintText={hintText}
       label={label}
-      mask={mask}
-      maskPlaceholder={maskPlaceholder}
       maxLength={maxLength}
       minLength={minLength}
       onChange={onChange}
@@ -125,8 +111,6 @@ Base.args = {
   disabled: false,
   hintText: '',
   label: 'Email',
-  mask: '',
-  maskPlaceholder: '',
   maxLength: 100,
   minLength: 0,
   onChange: console.log,
@@ -159,16 +143,6 @@ WithError.args = {
   label: 'Address',
   onChange: console.log,
   placeholder: 'Placeholder',
-  value: '',
-};
-
-export const WithMask = Template.bind({});
-WithMask.args = {
-  label: 'Day of birthday',
-  mask: '99/99/9999',
-  onChange: console.log,
-  onChangeText: console.log,
-  placeholder: 'MM/DD/YYYY',
   value: '',
 };
 

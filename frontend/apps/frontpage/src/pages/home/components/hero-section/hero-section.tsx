@@ -39,7 +39,7 @@ const HeroSection = ({
       >
         {subtitle}
       </Typography>
-      <Button size="large" onPress={onCtaClick}>
+      <Button size="large" onClick={onCtaClick}>
         {cta}
       </Button>
     </ContentContainer>

@@ -1,4 +1,3 @@
-/* eslint-disable react/jsx-props-no-spreading */
 import React from 'react';
 import { createGlobalStyle } from 'styled';
 import { DesignSystemProvider, themes } from 'ui';
@@ -8,9 +7,7 @@ type AppProps = {
   pageProps: Record<string, any>;
 };
 
-const GlobalStyle = createGlobalStyle`
-
-`;
+const GlobalStyle = createGlobalStyle``;
 
 const App = ({ Component, pageProps }: AppProps) => (
   <DesignSystemProvider theme={themes.light}>
