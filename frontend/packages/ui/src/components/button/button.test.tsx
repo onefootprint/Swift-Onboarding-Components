@@ -7,6 +7,8 @@ describe('<Button />', () => {
   const renderButton = ({
     children = 'Foo',
     disabled,
+    loading,
+    loadingAriaLabel,
     onClick = jest.fn(),
     testID,
     variant,
@@ -14,6 +16,8 @@ describe('<Button />', () => {
     customRender(
       <Button
         disabled={disabled}
+        loading={loading}
+        loadingAriaLabel={loadingAriaLabel}
         onClick={onClick}
         testID={testID}
         variant={variant}
@@ -45,6 +49,19 @@ describe('<Button />', () => {
       renderButton({ onClick: onClickMockFn, children: 'foo', disabled: true });
       userEvent.click(screen.getByText('foo'));
       expect(onClickMockFn).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('when the button is loading', () => {
+    it('should show the loading spinner', () => {
+      renderButton({ loading: true, loadingAriaLabel: 'Loading...' });
+      expect(screen.getByLabelText('Loading...')).toBeInTheDocument();
+    });
+
+    it('should disable the button', () => {
+      renderButton({ loading: true, testID: 'button-test-id' });
+      const button = screen.getByTestId('button-test-id') as HTMLButtonElement;
+      expect(button.disabled).toBeTruthy();
     });
   });
 });

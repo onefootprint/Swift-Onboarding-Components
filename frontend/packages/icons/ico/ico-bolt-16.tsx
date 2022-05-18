@@ -13,6 +13,7 @@ const IcoBolt16 = ({ color = 'primary', style, testID }: IconProps) => {
       xmlns="http://www.w3.org/2000/svg"
       data-testid={testID}
       style={style}
+      aria-hidden="true"
     >
       <path
         d="M6.97 9.034H3.66L9.04 2v4.966h3.31L6.97 14V9.034Z"

@@ -13,6 +13,7 @@ const IcoChevronLeft16 = ({ color = 'primary', style, testID }: IconProps) => {
       xmlns="http://www.w3.org/2000/svg"
       data-testid={testID}
       style={style}
+      aria-hidden="true"
     >
       <path
         d="m9.75 5-3.5 3.25 3.5 3.25"

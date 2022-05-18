@@ -1,6 +1,7 @@
 import React from 'react';
 import styled, { css } from 'styled';
 
+import LoadingIndicator from '../loading-indicator';
 import {
   activeBackgroundColor,
   backgroundColors,
@@ -13,10 +14,12 @@ export type ButtonProps = {
   children: React.ReactNode;
   disabled?: boolean;
   fullWidth?: boolean;
+  loading?: boolean;
+  loadingAriaLabel?: string;
   onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
   size?: 'default' | 'compact' | 'large';
   testID?: string;
-  type?: 'button' | 'submit';
+  type?: 'button' | 'submit' | 'reset';
   variant?: 'primary' | 'secondary';
 };
 
@@ -24,6 +27,8 @@ const Button = ({
   children,
   disabled = false,
   fullWidth,
+  loading,
+  loadingAriaLabel,
   onClick,
   size = 'default',
   testID,
@@ -32,7 +37,7 @@ const Button = ({
 }: ButtonProps) => (
   <Container
     data-testid={testID}
-    disabled={disabled}
+    disabled={disabled || loading}
     fullWidth={fullWidth}
     onClick={onClick}
     size={size}
@@ -40,7 +45,11 @@ const Button = ({
     type={type}
     variant={variant}
   >
-    {children}
+    {loading ? (
+      <LoadingIndicator aria-label={loadingAriaLabel} color="quaternary" />
+    ) : (
+      children
+    )}
   </Container>
 );
 

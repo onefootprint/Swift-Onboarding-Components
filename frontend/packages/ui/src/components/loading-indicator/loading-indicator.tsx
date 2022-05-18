@@ -4,17 +4,19 @@ import React from 'react';
 import styled, { Color, keyframes } from 'styled';
 
 export type LoadingIndicatorProps = {
+  'aria-label'?: string;
   color?: Color;
   size?: 'default' | 'compact';
   testID?: string;
 };
 
 const LoadingIndicator = ({
+  'aria-label': ariaLabel = 'Loading...',
   color = 'primary',
   size = 'default',
   testID,
 }: LoadingIndicatorProps) => (
-  <Container data-testid={testID}>
+  <Container data-testid={testID} aria-label={ariaLabel}>
     {size === 'default' ? (
       <IcoSpinner24 color={color} />
     ) : (

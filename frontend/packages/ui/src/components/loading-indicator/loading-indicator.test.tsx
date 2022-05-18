@@ -6,13 +6,24 @@ import LoadingIndicator, { LoadingIndicatorProps } from './loading-indicator';
 
 describe('<LoadingIndicator />', () => {
   const renderLoadingIndicator = ({
+    'aria-label': ariaLabel,
     testID,
     size,
     color,
   }: Partial<LoadingIndicatorProps>) =>
     customRender(
-      <LoadingIndicator testID={testID} color={color} size={size} />,
+      <LoadingIndicator
+        aria-label={ariaLabel}
+        testID={testID}
+        color={color}
+        size={size}
+      />,
     );
+
+  it('should add an aria label', () => {
+    renderLoadingIndicator({ 'aria-label': 'loading' });
+    expect(screen.getByLabelText('loading')).toBeInTheDocument();
+  });
 
   it('should add a test id attribute', () => {
     renderLoadingIndicator({ testID: 'loading-indicator-test-id' });

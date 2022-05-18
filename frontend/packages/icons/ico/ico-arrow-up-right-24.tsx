@@ -13,6 +13,7 @@ const IcoArrowUpRight24 = ({ color = 'primary', style, testID }: IconProps) => {
       xmlns="http://www.w3.org/2000/svg"
       data-testid={testID}
       style={style}
+      aria-hidden="true"
     >
       <path
         fillRule="evenodd"

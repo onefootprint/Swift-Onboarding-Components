@@ -13,6 +13,7 @@ const IcoChevronDown24 = ({ color = 'primary', style, testID }: IconProps) => {
       xmlns="http://www.w3.org/2000/svg"
       data-testid={testID}
       style={style}
+      aria-hidden="true"
     >
       <path
         d="M15.25 10.75 12 14.25l-3.25-3.5"
