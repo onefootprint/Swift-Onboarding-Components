@@ -1,1 +1,1 @@
-DROP TABLE access_events;
+DROP TABLE IF EXISTS access_events;
