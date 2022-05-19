@@ -16,6 +16,8 @@ export * from './link-button';
 export { default as LinkButton } from './link-button';
 export * from './pin-input';
 export { default as PinInput } from './pin-input';
+export * from './progress-indicator';
+export { default as ProgressIndicator } from './progress-indicator';
 export * from './text-input';
 export { default as TextInput } from './text-input';
 export * from './typography';
