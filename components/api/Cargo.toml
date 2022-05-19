@@ -72,3 +72,4 @@ strum_macros = { version = "0.24" }
 webauthn-rs = "0.3.2"
 url = "2.2.2"
 newtypes = { path = "../newtypes" }
+awc = { version = "3.0", features = ["rustls"]}

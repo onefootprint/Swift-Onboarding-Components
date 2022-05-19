@@ -16,6 +16,7 @@ async fn test_db() {
         name: "test_tenant".to_owned(),
         public_key: "".as_bytes().to_vec(),
         e_private_key: "".as_bytes().to_vec(),
+        workos_id: "test".to_owned(),
     };
     let _tenant = crate::tenant::init(&pool, tenant)
         .await

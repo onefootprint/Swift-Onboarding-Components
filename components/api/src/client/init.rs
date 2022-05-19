@@ -47,6 +47,7 @@ async fn handler(
             name: request.into_inner().name,
             e_private_key: e_priv_key,
             public_key: ec_pk_uncompressed,
+            workos_id: "TODO, seperate out endpoints".to_owned(),
         },
     )
     .await?;

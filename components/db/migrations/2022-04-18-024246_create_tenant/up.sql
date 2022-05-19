@@ -17,9 +17,12 @@ CREATE TABLE tenants (
     name text NOT NULL,
     public_key BYTEA NOT NULL,
     e_private_key BYTEA NOT NULL,
+    workos_id VARCHAR(250) NOT NULL,
     created_at timestamp NOT NULL DEFAULT NOW(),
     updated_at timestamp NOT NULL DEFAULT NOW()
 );
+
+CREATE INDEX IF NOT EXISTS tenants_workos_id ON tenants(workos_id);
 
 CREATE TYPE User_Status as ENUM ('Verified', 'Processing', 'Incomplete', 'Failed');
 

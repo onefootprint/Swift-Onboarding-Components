@@ -14,7 +14,7 @@ mod errors;
 mod signed_hash;
 mod telemetry;
 
-use crate::errors::ApiError;
+use crate::{errors::ApiError, tenant::workos::WorkOSClient};
 
 // TODO put IAM roles and permissions in pulumi
 
@@ -40,6 +40,7 @@ pub struct State {
     email_client: aws_sdk_pinpointemail::Client,
     kms_client: aws_sdk_kms::Client,
     hmac_client: SignedHashClient,
+    workos_client: WorkOSClient,
     db_pool: DbPool,
     enclave_connection_pool: bb8::Pool<pool::StreamManager<StreamManager<Config>>>,
     session_sealing_key: ScopedSealingKey,
@@ -77,6 +78,13 @@ async fn main() -> std::io::Result<()> {
             key_id: config.signing_root_key_id.clone(),
         };
 
+        let workos_client = WorkOSClient {
+            client_id: config.workos_client_id.clone(),
+            client_secret: config.workos_api_key.clone(),
+            callback_uri: format!("{}/workos/callback", config.application_uri.clone()),
+            default_org: config.workos_default_org.clone(),
+        };
+
         // let out = hmac_client
         //     .signed_hash(&vec![0xde, 0xad, 0xbe, 0xef])
         //     .await
@@ -110,6 +118,7 @@ async fn main() -> std::io::Result<()> {
             email_client,
             kms_client,
             hmac_client,
+            workos_client,
             db_pool,
             session_sealing_key,
         }
@@ -168,6 +177,7 @@ async fn main() -> std::io::Result<()> {
             .service(
                 web::scope("/private")
                     .service(client::init::handler)
+                    .service(client::workos_init::handler)
                     .service(enclave::encrypt::handler)
                     .service(enclave::decrypt::handler)
                     .service(enclave::sign::handler),
@@ -177,6 +187,7 @@ async fn main() -> std::io::Result<()> {
             .service(liveness::routes())
             .service(onboarding::routes())
             .service(user::routes())
+            .service(tenant::workos::routes())
             .service(index::index::handler)
             .service(index::health::handler)
             .with_json_spec_at("/open-api/spec")

@@ -65,6 +65,7 @@ table! {
         name -> Text,
         public_key -> Bytea,
         e_private_key -> Bytea,
+        workos_id -> Varchar,
         created_at -> Timestamp,
         updated_at -> Timestamp,
     }

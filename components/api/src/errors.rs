@@ -81,6 +81,16 @@ pub enum ApiError {
     UserMissingWebauthnAndFields(String),
     #[error("Please wait {0} seconds between sending SMS challenges")]
     WaitToSendChallenge(i64),
+    #[error("workos error: {0}")]
+    WorkOS(#[from] awc::error::SendRequestError),
+    #[error("workos decode error: {0}")]
+    WorkOsDecode(#[from] awc::error::JsonPayloadError),
+    #[error("workos payload error: {0}")]
+    WorkOsPayload(#[from] actix_web::error::PayloadError),
+    #[error("invalid redirect header returned")]
+    WorkOsError(#[from] actix_web::http::header::ToStrError),
+    #[error("invalid response from WorkOS")]
+    WorkOSError,
 }
 
 fn status_code_for_db_error(e: &DbError) -> StatusCode {
@@ -134,6 +144,11 @@ impl actix_web::ResponseError for ApiError {
             ApiError::WebauthnCredentialsNotSet => StatusCode::BAD_REQUEST,
             ApiError::UserMissingWebauthnAndFields(_) => StatusCode::BAD_REQUEST,
             ApiError::WaitToSendChallenge(_) => StatusCode::BAD_REQUEST,
+            ApiError::WorkOS(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            ApiError::WorkOsDecode(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            ApiError::WorkOsPayload(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            ApiError::WorkOsError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            ApiError::WorkOSError => StatusCode::INTERNAL_SERVER_ERROR,
         }
     }
 

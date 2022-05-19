@@ -5,6 +5,7 @@ import * as aws from "@pulumi/aws";
 import { Output } from "@pulumi/pulumi";
 import * as fs from 'fs';
 import { EnclaveKeyDescriptor } from "./enclave_key";
+import { ApplicationSubComponentTypeConfigurationSubComponentType } from "@pulumi/aws-native/applicationinsights";
 
 export interface StaticSecrets {
     cloudfrontSecret: pulumi.Output<string>;
@@ -14,15 +15,26 @@ export interface StaticSecrets {
     enclaveUserSecretKey: aws.ssm.Parameter;
     dbPassword: pulumi.Output<string>;
     cookieSessionKey: aws.ssm.Parameter;
+    workosClientId: aws.ssm.Parameter;
+    workosSecretKey: aws.ssm.Parameter;
+    workosDefaultOrg: aws.ssm.Parameter;
 }
 
 interface SecretConstants {
-    elastic: ElasticSecrets
+    elastic: ElasticSecrets;
+    workos: Workos
 }
 
 interface ElasticSecrets {
     apiKey: string
 }
+
+interface Workos {
+    clientId: string;
+    secretKey: string;
+    defaultOrg: string;
+}
+
 export async function LoadSecrets(config: pulumi.Config, enclaveKeyDescriptor: EnclaveKeyDescriptor): Promise<StaticSecrets> {
     const cloudfrontSecret = new random.RandomString("cf-alb-pass", { length: 44 }).result;
     const stack = pulumi.getStack();
@@ -52,6 +64,7 @@ export async function LoadSecrets(config: pulumi.Config, enclaveKeyDescriptor: E
 
     const secretConstants = config.requireSecretObject<SecretConstants>("constants");
 
+    const applicationURI = `https://api.${stack}.infra.footprint.dev`;
     return {
         secretsPolicyArn: secretsPolicy.arn,
         cloudfrontSecret: pulumi.secret(cloudfrontSecret),
@@ -72,6 +85,9 @@ export async function LoadSecrets(config: pulumi.Config, enclaveKeyDescriptor: E
             value: pulumi.secret(sessionKey.hex),
             name: `/static_secrets/api-session-key-${stack}`,
         }),
+        workosClientId: createSecretParameter(`workosClientId-${stack}`, secretConstants.workos.clientId),
+        workosSecretKey: createSecretParameter(`workosSecretKey-${stack}`, secretConstants.workos.secretKey),
+        workosDefaultOrg: createSecretParameter(`workosDefaultOrg-${stack}`, secretConstants.workos.secretKey),
     }
 }
 

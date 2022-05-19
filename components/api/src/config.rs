@@ -38,8 +38,20 @@ pub struct Config {
     #[envconfig(from = "DATABASE_URL")]
     pub database_url: String,
 
+    #[envconfig(from = "WORKOS_API_KEY")]
+    pub workos_api_key: String,
+
+    #[envconfig(from = "WORKOS_CLIENT_ID")]
+    pub workos_client_id: String,
+
+    #[envconfig(from = "WORKOS_DEFAULT_ORG")]
+    pub workos_default_org: String,
+
     #[envconfig(from = "COOKIE_SESSION_KEY")]
     pub cookie_session_key_hex: Option<String>,
+
+    #[envconfig(from = "APPLICATION_URI", default = "http://localhost:8000")]
+    pub application_uri: String,
 
     #[envconfig(from = "RELYING_PARTY_ID", default = "localhost")]
     pub rp_id: String,

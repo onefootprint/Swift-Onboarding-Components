@@ -19,96 +19,115 @@ export abstract class ServiceContainers {
         const current = await aws.getCallerIdentity({});
         const image = `${current.accountId}.dkr.ecr.us-east-1.amazonaws.com/api:${constants.containers.apiVersion}`;
 
-        const containerDef = pulumi.all([
-            otelCollector,
-            enclaveKeyDescriptor.rootKeyId,
-            enclaveKeyDescriptor.enclaveKmsCredentials.access_key_id,
-            secretsStore.enclaveUserSecretKey.arn,
-            database.databaseUrlSecretParam.arn,
-            secretsStore.cookieSessionKey.arn,
-            signingKeyDescriptor.rootKeyId
-        ]).apply(([otelCollector, rootKeyId, enclaveAccessKeyId, enclaveUserArn, databaseUrlArn, cookieSessionKeyArn, signingKeyId]) => {
-            const def = [{
-                name,
-                image,
-                essential: true,
-                secrets: [
-                    {
-                        name: "ENCLAVE_AWS_SECRET_ACCESS_KEY",
-                        valueFrom: enclaveUserArn
-                    },
-                    {
-                        name: "DATABASE_URL",
-                        valueFrom: databaseUrlArn
-                    },
-                    {
-                        name: "COOKIE_SESSION_KEY",
-                        valueFrom: cookieSessionKeyArn
+        const containerDef = pulumi.all([otelCollector]).apply(([otelCollector]) => {
+            return pulumi.all([
+                enclaveKeyDescriptor.rootKeyId,
+                enclaveKeyDescriptor.enclaveKmsCredentials.access_key_id,
+                secretsStore.enclaveUserSecretKey.arn,
+                database.databaseUrlSecretParam.arn,
+                secretsStore.cookieSessionKey.arn,
+                signingKeyDescriptor.rootKeyId,
+                secretsStore.workosClientId.arn,
+                secretsStore.workosSecretKey.arn,
+                secretsStore.workosDefaultOrg.arn,
+            ]).apply(([rootKeyId, enclaveAccessKeyId, enclaveUserArn, databaseUrlArn, cookieSessionKeyArn, signingKeyId, workosClientId, workosSecretKey, workosDefaultOrg]) => {
+                const def = [{
+                    name,
+                    image,
+                    essential: true,
+                    secrets: [
+                        {
+                            name: "ENCLAVE_AWS_SECRET_ACCESS_KEY",
+                            valueFrom: enclaveUserArn
+                        },
+                        {
+                            name: "DATABASE_URL",
+                            valueFrom: databaseUrlArn
+                        },
+                        {
+                            name: "COOKIE_SESSION_KEY",
+                            valueFrom: cookieSessionKeyArn
+                        },
+                        {
+                            name: "WORKOS_CLIENT_ID",
+                            valueFrom: workosClientId
+                        },
+                        {
+                            name: "WORKOS_API_KEY",
+                            valueFrom: workosSecretKey
+                        },
+                        {
+                            name: "WORKOS_DEFAULT_ORG",
+                            valueFrom: workosDefaultOrg
+                        }
+                    ],
+                    environment: [
+                        {
+                            name: "AWS_REGION",
+                            value: `${region}`
+                        },
+                        {
+                            name: "AWS_ROOT_KEY_ID",
+                            value: rootKeyId
+                        },
+                        {
+                            name: "ENCLAVE_AWS_ACCESS_KEY_ID",
+                            value: enclaveAccessKeyId
+                        },
+                        {
+                            name: "AWS_HMAC_SIGNING_ROOT_KEY_ID",
+                            value: signingKeyId
+                        },
+                        {
+                            name: "RUST_LOG",
+                            value: "INFO"
+                        },
+                        {
+                            name: "PORT",
+                            value: `${appPort}`
+                        },
+                        {
+                            name: "OTEL_ENDPOINT",
+                            value: "http://otelcollect:4317"
+                        },
+                        {
+                            name: "RELYING_PARTY_ID",
+                            value: constants.rpId
+                        },
+                        {
+                            name: "COOKIE_DOMAIN",
+                            value: constants.rpId
+                        },
+                        {
+                            name: "OTEL_RESOURCE_ATTRIBUTES",
+                            value: `service.name=fpc-api,service.version=1.0,deployment.environment=${pulumi.getStack()}`
+                        },
+                        {
+                            name: "APPLICATION_URI",
+                            value: `https://api.${pulumi.getStack()}.infra.footprint.dev`
+                        }
+                    ],
+                    links: ["otelcollect:otelcollect"],
+                    dependsOn: [{ containerName: otelCollector.name, condition: "START" }],
+                    portMappings: [{
+                        containerPort: appPort,
+                        hostPort: 0,
+                        protocol: "tcp"
+                    }],
+                    "logConfiguration": {
+                        "logDriver": "awslogs",
+                        "options": {
+                            "awslogs-group": `/ecs/${name}_logs`,
+                            "awslogs-region": `${region}`,
+                            "awslogs-create-group": "true",
+                            "awslogs-stream-prefix": "ecs",
+                        }
                     }
-                ],
-                environment: [
-                    {
-                        name: "AWS_REGION",
-                        value: `${region}`
-                    },
-                    {
-                        name: "AWS_ROOT_KEY_ID",
-                        value: rootKeyId
-                    },
-                    {
-                        name: "ENCLAVE_AWS_ACCESS_KEY_ID",
-                        value: enclaveAccessKeyId
-                    },
-                    {
-                        name: "AWS_HMAC_SIGNING_ROOT_KEY_ID",
-                        value: signingKeyId
-                    },
-                    {
-                        name: "RUST_LOG",
-                        value: "INFO"
-                    },
-                    {
-                        name: "PORT",
-                        value: `${appPort}`
-                    },
-                    {
-                        name: "OTEL_ENDPOINT",
-                        value: "http://otelcollect:4317"
-                    },
-                    {
-                        name: "RELYING_PARTY_ID",
-                        value: constants.rpId
-                    },
-                    {
-                        name: "COOKIE_DOMAIN",
-                        value: constants.rpId
-                    },
-                    {
-                        name: "OTEL_RESOURCE_ATTRIBUTES",
-                        value: `service.name=fpc-api,service.version=1.0,deployment.environment=${pulumi.getStack()}`
-                    }
-                ],
-                links: ["otelcollect:otelcollect"],
-                dependsOn: [{ containerName: otelCollector.name, condition: "START" }],
-                portMappings: [{
-                    containerPort: appPort,
-                    hostPort: 0,
-                    protocol: "tcp"
-                }],
-                "logConfiguration": {
-                    "logDriver": "awslogs",
-                    "options": {
-                        "awslogs-group": `/ecs/${name}_logs`,
-                        "awslogs-region": `${region}`,
-                        "awslogs-create-group": "true",
-                        "awslogs-stream-prefix": "ecs",
-                    }
-                }
-            }, otelCollector];
-
-            return JSON.stringify(def);
-        });
-
+                }, otelCollector];
+    
+                return JSON.stringify(def);
+            });
+        })
         return containerDef;
     }
 

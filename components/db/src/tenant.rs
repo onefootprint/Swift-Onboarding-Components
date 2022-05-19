@@ -21,6 +21,20 @@ pub async fn init(pool: &Pool, new_tenant: NewTenant) -> Result<Tenant, DbError>
     Ok(tenant)
 }
 
+pub async fn get_by_workos_id(pool: &Pool, workos_id: String) -> Result<Tenant, DbError> {
+    let conn = pool.get().await?;
+
+    let tenant: Tenant = conn
+        .interact(move |conn| {
+            schema::tenants::table
+                .filter(schema::tenants::workos_id.eq(workos_id))
+                .first(conn)
+        })
+        .await??;
+
+    Ok(tenant)
+}
+
 pub async fn get_tenant(pool: &Pool, tenant_id: TenantId) -> Result<Tenant, DbError> {
     let conn = pool.get().await?;
 
