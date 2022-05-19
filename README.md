@@ -49,6 +49,21 @@ $ pulumi up
 $ pulumi down
 ```
 
+## Adding pulumi secrets
+We use pulumi secrets to help us manage sensitive information we need to run our application. For instance, we have various AWS credentials stored in pulumi secrets, that are then added to our application environment for use.
+
+To add a secret to pulumi, do the following:
+```
+$ cd infra/
+$ pulumi config set --secret SECRET_NAME SECRET_VALUE
+// open Pulumi.dev.yaml & move the generated secret value to whatever block is appropriate, following the existing structure
+```
+
+To add the secret to the container environment, first edit secrets.ts to add your new secret to StaticSecrets. Then, go to container.ts in the /infra/service directory and add your new secret following the existing structure to the containerDef.
+
+When pulumi runs, it will now add your secrets to the container environment! To read them in to the application, you get edit config.rs and main.rs in the api crate.
+
+
 ## Codespaces development
 On the repo, open `code -> new codespace`. You can develop in the browser or open in vscode locally. **This environment has all that you need to do development locally (including secrets)**. If you want to do pulumi/infra work make sure you set your personal pulumi creds in settings -> codespaces -> secrets so they are installed on the machine.
 
