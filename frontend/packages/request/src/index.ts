@@ -5,7 +5,7 @@ export type RequestError = AxiosError;
 
 export type RequestResponse<T> = AxiosResponse<T>;
 
-export type ApiResponse<T> = {
+export type RequestSuccess<T> = {
   data: T;
 };
 

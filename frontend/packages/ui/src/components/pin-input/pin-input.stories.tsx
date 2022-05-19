@@ -29,7 +29,7 @@ export default {
       control: 'text',
       description: 'Append an attribute data-testid for testing purposes',
     },
-    isLoading: {
+    loading: {
       control: 'boolean',
       description: 'Append an attribute data-testid for testing purposes',
     },
@@ -39,12 +39,12 @@ export default {
 const Template: Story<PinInputProps> = ({
   hasError: baseHasError = false,
   hintText: baseHintText,
-  isLoading: baseIsLoading = false,
+  loading: baseLoading = false,
   loadingTestID,
   onComplete,
   testID,
 }: PinInputProps) => {
-  const [isLoading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [hasError, setError] = useState(false);
   const [hintText, setHintText] = useState('');
 
@@ -85,7 +85,7 @@ const Template: Story<PinInputProps> = ({
         <PinInput
           hasError={baseHasError || hasError}
           hintText={baseHintText || hintText}
-          isLoading={baseIsLoading || isLoading}
+          loading={baseLoading || loading}
           loadingTestID={loadingTestID}
           onComplete={handleComplete}
           testID={testID}
@@ -101,7 +101,7 @@ const Template: Story<PinInputProps> = ({
 export const Base = Template.bind({});
 Base.args = {
   hasError: false,
-  isLoading: false,
+  loading: false,
   loadingTestID: '',
   hintText: '',
   onComplete: console.log,
@@ -117,6 +117,6 @@ WithError.args = {
 
 export const WithLoading = Template.bind({});
 WithLoading.args = {
-  isLoading: true,
+  loading: true,
   onComplete: console.log,
 };

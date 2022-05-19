@@ -14,6 +14,8 @@ export * from './icon-button';
 export { default as IconButton } from './icon-button';
 export * from './link-button';
 export { default as LinkButton } from './link-button';
+export * from './loading-indicator';
+export { default as LoadingIndicator } from './loading-indicator';
 export * from './pin-input';
 export { default as PinInput } from './pin-input';
 export * from './progress-indicator';

@@ -3,7 +3,7 @@
     "errors": {}
   },
   "pages": {
-    "flow": {
+    "email-identification": {
       "title": "Hello world!"
     }
   }

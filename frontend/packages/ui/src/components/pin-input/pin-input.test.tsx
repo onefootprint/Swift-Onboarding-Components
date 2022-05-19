@@ -8,7 +8,7 @@ describe('<PinInput />', () => {
   const renderPinInput = ({
     hasError = false,
     hintText,
-    isLoading = false,
+    loading = false,
     loadingTestID = 'loading-test-id',
     onComplete = jest.fn(),
     testID = 'pin-input-test-id',
@@ -17,7 +17,7 @@ describe('<PinInput />', () => {
       <PinInput
         hasError={hasError}
         hintText={hintText}
-        isLoading={isLoading}
+        loading={loading}
         loadingTestID={loadingTestID}
         onComplete={onComplete}
         testID={testID}
@@ -146,7 +146,7 @@ describe('<PinInput />', () => {
 
   describe('when is loading', () => {
     it('should show a spinner', () => {
-      renderPinInput({ isLoading: true, loadingTestID: 'loading-test-id' });
+      renderPinInput({ loading: true, loadingTestID: 'loading-test-id' });
       expect(screen.getByTestId('loading-test-id')).toBeInTheDocument();
     });
   });

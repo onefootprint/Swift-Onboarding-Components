@@ -15,7 +15,7 @@ const waitNextInputFieldGetDisabled = defer;
 export type PinInputProps = {
   hasError?: boolean;
   hintText?: string;
-  isLoading?: boolean;
+  loading?: boolean;
   loadingTestID?: string;
   onComplete: (value: string) => void;
   testID?: string;
@@ -24,7 +24,7 @@ export type PinInputProps = {
 const PinInput = ({
   hasError = false,
   hintText,
-  isLoading = false,
+  loading = false,
   loadingTestID,
   onComplete,
   testID,
@@ -92,7 +92,7 @@ const PinInput = ({
 
   return (
     <Container data-testid={testID}>
-      {isLoading ? (
+      {loading ? (
         <LoadingIndicator testID={loadingTestID} />
       ) : (
         <>
