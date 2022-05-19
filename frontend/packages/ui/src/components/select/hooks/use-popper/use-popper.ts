@@ -4,8 +4,10 @@ import { useTheme } from 'styled';
 
 const usePopper = () => {
   const theme = useTheme();
-  const [referenceElement, setReferenceElement] = useState(null);
-  const [popperElement, setPopperElement] = useState(null);
+  const [referenceElement, setReferenceElement] = useState<HTMLElement | null>(
+    null,
+  );
+  const [popperElement, setPopperElement] = useState<HTMLElement | null>(null);
   const popper = useBasePopper(referenceElement, popperElement, {
     modifiers: [{ name: 'offset', options: { offset: [0, theme.spacing[3]] } }],
   });
