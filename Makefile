@@ -83,3 +83,20 @@ stop-local:
 run-local: stop-local
 	@cargo run -p enclave --no-default-features --features simulate & echo "starting enclave..."
 	@cargo run -p footprint-core --no-default-features
+
+
+update-dot-env:
+	@AWS_REGION=us-east-1 aws kms encrypt --key-id 4e61ea01-1193-475e-82ee-e9639743efd6 \
+		--plaintext fileb://.env \
+		--output text \
+		--query CiphertextBlob > encrypted.env
+
+set-dot-env:
+	@cat encrypted.env | base64 --decode > /tmp/encrypted.env.bin
+	@AWS_REGION=us-east-1 aws kms decrypt --key-id 4e61ea01-1193-475e-82ee-e9639743efd6 \
+		--ciphertext-blob fileb:///tmp/encrypted.env.bin \
+		--output text \
+		--query Plaintext | base64 --decode > .env
+	@rm /tmp/encrypted.env.bin
+	@echo "created .env:\n"
+	@cat .env
