@@ -22,10 +22,8 @@ pub enum AuthError {
     SessionTypeError,
     #[error("no session found")]
     NoSessionFound,
-    #[error("invalid ssession json")]
-    InvalidSessionJson(serde_json::Error),
-    #[error("missing cookie")]
-    MissingCookie,
+    #[error("missing X-Fp-Dashboard-Authorization")]
+    MissingFpDashboardHeader,
 }
 
 /// For endpoints that take both a user_auth and tenant_auth, this helps to assert that the authenticated user

@@ -11,10 +11,10 @@ use std::pin::Pin;
 #[openapi(
     apiKey,
     in = "header",
-    name = "X-Fp-Dashbaord-Authorization",
+    name = "X-Fp-Dashboard-Authorization",
     description = "Footprint user auth token, issued by /identify/verify"
 )]
-/// Logged in session context sets encrypted state that authenticates the client as a user.
+/// Authentication token given by logging in via workOS
 pub struct DashboardSessionContext {
     tenant: Tenant,
     _metadata: TenantDashboardSessionData,
@@ -51,7 +51,7 @@ pub async fn from_request_inner(
         .headers()
         .get(HEADER_NAME)
         .and_then(|hv| hv.to_str().map(|s| s.to_string()).ok())
-        .ok_or(AuthError::MissingFpuserAuthHeader)?;
+        .ok_or(AuthError::MissingFpDashboardHeader)?;
 
     let session = db::session::get_by_session_id(&pool, auth_token.clone())
         .await?
