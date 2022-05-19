@@ -172,6 +172,7 @@ pub(crate) async fn send_phone_challenge(
         crypto::random::gen_rand_n_digit_code(6)
     };
     let _: SendTextMessageOutput = state.sms_client.send_text_message()
+            .origination_identity("+17655634600".to_owned())
             .destination_phone_number(phone_number.clone())
             .message_body(format!("Your Footprint verification code is {}. Don't share your code with anyone. We will never contact you to request this code.\n\n@onefootprint.com #{}", code.clone(), code.clone()))
             .send()
