@@ -1,7 +1,8 @@
 use super::validate_challenge;
 use crate::errors::ApiError;
-use crate::identify::{signed_hash, ChallengeState};
+use crate::identify::{signed_hash, PhoneChallengeState};
 use crate::types::success::ApiResponseData;
+use crate::utils::challenge::Challenge;
 use crate::State;
 use aws_sdk_kms::model::DataKeyPairSpec;
 use chrono::{Duration, Utc};
@@ -15,7 +16,7 @@ use super::seal;
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
 struct VerifyRequest {
     code: String,
-    e_challenge_data: String, // Sealed ChallengeState
+    challenge_token: String, // Sealed Challenge<PhoneChallengeState>
 }
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Serialize)]
@@ -42,13 +43,16 @@ async fn handler(
     state: web::Data<State>,
     request: Json<VerifyRequest>,
 ) -> actix_web::Result<Json<ApiResponseData<VerifyResponse>>, ApiError> {
-    let challenge_data = ChallengeState::unseal(&request.e_challenge_data, &state)?;
+    let challenge_data = Challenge::<PhoneChallengeState>::unseal(
+        &state.session_sealing_key,
+        &request.challenge_token,
+    )?;
 
     if !validate_challenge(request.code.clone(), &challenge_data).await? {
         return Err(ApiError::ChallengeNotValid);
     }
 
-    let phone_number = challenge_data.phone_number;
+    let phone_number = challenge_data.data.phone_number;
     let sh_phone_number = signed_hash(&state, phone_number.clone()).await?;
     let existing_user =
         db::user_vault::get_by_phone_number(&state.db_pool, sh_phone_number.clone()).await?;

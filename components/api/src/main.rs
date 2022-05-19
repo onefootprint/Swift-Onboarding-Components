@@ -28,6 +28,7 @@ mod onboarding;
 mod tenant;
 mod types;
 mod user;
+mod utils;
 
 use paperclip::actix::{web, OpenApiExt};
 
@@ -41,7 +42,7 @@ pub struct State {
     hmac_client: SignedHashClient,
     db_pool: DbPool,
     enclave_connection_pool: bb8::Pool<pool::StreamManager<StreamManager<Config>>>,
-    session_sealing_key: ScopedSealingKey
+    session_sealing_key: ScopedSealingKey,
 }
 
 #[actix_web::main]
@@ -90,7 +91,6 @@ async fn main() -> std::io::Result<()> {
             .map_err(ApiError::from)
             .unwrap();
 
-            
         // our session key
         let session_sealing_key = {
             let key = if let Some(hex_key) = &config.cookie_session_key_hex {
@@ -101,7 +101,7 @@ async fn main() -> std::io::Result<()> {
             };
             ScopedSealingKey::new(key, "SESSION_SEALING").expect("invalid cookie session key")
         };
-        
+
         State {
             config: config.clone(),
             enclave_connection_pool: pool,
@@ -111,7 +111,7 @@ async fn main() -> std::io::Result<()> {
             kms_client,
             hmac_client,
             db_pool,
-            session_sealing_key
+            session_sealing_key,
         }
     };
 

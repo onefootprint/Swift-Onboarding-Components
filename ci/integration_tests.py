@@ -97,7 +97,7 @@ def test_identify_phone(request):
     )
     body = _assert_response(r)
     assert body["data"]["phone_number_last_two"] == last_two
-    request.config.cache.set("e_challenge_data", body["data"]["e_challenge_data"])
+    request.config.cache.set("challenge_token", body["data"]["challenge_token"])
 
 
 def test_identify_verify(request):
@@ -105,7 +105,7 @@ def test_identify_verify(request):
     print(url(path))
     data = {
         "code": TEST_CHALLENGE_CODE,
-        "e_challenge_data": request.config.cache.get("e_challenge_data", None),
+        "challenge_token": request.config.cache.get("challenge_token", None),
     }
     r = requests.post(
         url(path),
@@ -179,7 +179,7 @@ def test_identify_repeat_customer_via_email(request, tenant2):
     print(url(path))
     data = {
         "code": TEST_CHALLENGE_CODE,
-        "e_challenge_data": body["data"]["challenge_data"]["e_challenge_data"],
+        "challenge_token": body["data"]["challenge_data"]["challenge_token"],
     }
     r = requests.post(
         url(path),

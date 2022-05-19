@@ -2,9 +2,8 @@ pub mod email;
 pub mod phone;
 pub mod verify;
 
-use std::str::FromStr;
-
 use crate::signed_hash;
+use crate::utils::challenge::Challenge;
 use crate::{errors::ApiError, State};
 use aws_sdk_pinpointemail::model::{
     Body as EmailBody, Content as EmailStringContent, Destination as EmailDestination,
@@ -13,6 +12,7 @@ use aws_sdk_pinpointemail::model::{
 use aws_sdk_pinpointsmsvoicev2::output::SendTextMessageOutput;
 use chrono::NaiveDateTime;
 use chrono::{Duration, Utc};
+use crypto::aead::ScopedSealingKey;
 use crypto::b64::Base64Data;
 use crypto::seal::EciesP256Sha256AesGcmSealed;
 use crypto::sha256;
@@ -34,33 +34,30 @@ pub struct EmailVerifyChallenge {
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
-pub struct ChallengeState {
+pub struct PhoneChallengeState {
     pub phone_number: String,
     pub h_code: Vec<u8>,
-    pub created_at: NaiveDateTime,
-}
-
-impl ChallengeState {
-    pub fn seal(self, _state: &web::Data<State>) -> Result<String, ApiError> {
-        // TODO encrypt or sign
-        let serialized = serde_json::to_string(&self)?;
-        let encoded = Base64Data(serialized.as_bytes().to_vec()).to_string();
-        Ok(encoded)
-    }
-
-    pub fn unseal(sealed: &str, _state: &web::Data<State>) -> Result<Self, ApiError> {
-        // TODO decrypt or verify signature
-        let decoded = Base64Data::from_str(sealed).map_err(crypto::Error::from)?;
-        let decoded = std::str::from_utf8(&decoded.0)?.to_string();
-        let deserialized = serde_json::from_str(&decoded)?;
-        Ok(deserialized)
-    }
 }
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Serialize)]
 pub struct ChallengeResponse {
     phone_number_last_two: String,
-    e_challenge_data: String, // Sealed ChallengeState
+    challenge_token: String, // Sealed Challenge<PhoneChallengeState>
+}
+
+impl ChallengeResponse {
+    fn new(
+        challenge: Challenge<PhoneChallengeState>,
+        key: &ScopedSealingKey,
+    ) -> Result<Self, ApiError> {
+        let mut phone_number = challenge.data.phone_number.clone();
+        let len = phone_number.len();
+        let last_two = phone_number.drain((len - 2)..len).into_iter().collect();
+        Ok(Self {
+            challenge_token: challenge.seal(key)?,
+            phone_number_last_two: last_two,
+        })
+    }
 }
 
 // TODO move these utils somewhere else
@@ -106,13 +103,13 @@ pub(crate) async fn clean_phone_number(
 
 pub async fn validate_challenge(
     request_code: String,
-    challenge_data: &ChallengeState,
+    challenge_data: &Challenge<PhoneChallengeState>,
 ) -> Result<bool, ApiError> {
     let now = Utc::now().naive_utc();
 
     Ok(
-        (challenge_data.h_code == sha256(request_code.as_bytes()).to_vec())
-            & (challenge_data.created_at.signed_duration_since(now) < Duration::minutes(15)),
+        (challenge_data.data.h_code == sha256(request_code.as_bytes()).to_vec())
+            & (challenge_data.expires_at > now), // TODO don't need to check here
     )
 }
 
@@ -123,7 +120,7 @@ pub fn clean_email(raw_email: String) -> String {
 pub(crate) async fn send_phone_challenge_to_user(
     state: &web::Data<State>,
     vault: UserVault,
-) -> Result<ChallengeState, ApiError> {
+) -> Result<Challenge<PhoneChallengeState>, ApiError> {
     let phone_number = crate::enclave::lib::decrypt_bytes(
         state,
         &vault.e_phone_number,
@@ -138,7 +135,7 @@ pub(crate) async fn send_phone_challenge_to_user(
 pub(crate) async fn send_phone_challenge(
     state: &web::Data<State>,
     phone_number: String,
-) -> Result<ChallengeState, ApiError> {
+) -> Result<Challenge<PhoneChallengeState>, ApiError> {
     // 555-01* numbers are reserved / not real, we use these for integration testing with a known code
     let phone_number_digits: String = phone_number.clone().chars().skip(5).take(5).collect();
     let is_test_phone_number = phone_number_digits.as_str() == "55501";
@@ -180,17 +177,13 @@ pub(crate) async fn send_phone_challenge(
             .send()
             .await?;
 
-    Ok(ChallengeState {
-        phone_number,
-        h_code: sha256(code.as_bytes()).to_vec(),
-        created_at: Utc::now().naive_utc(),
+    Ok(Challenge {
+        expires_at: Utc::now().naive_utc() + Duration::minutes(15),
+        data: PhoneChallengeState {
+            phone_number,
+            h_code: sha256(code.as_bytes()).to_vec(),
+        },
     })
-}
-
-pub(crate) fn phone_number_last_two(phone_number: String) -> String {
-    let mut phone_number = phone_number;
-    let len = phone_number.len();
-    phone_number.drain((len - 2)..len).into_iter().collect()
 }
 
 pub(crate) async fn send_email_challenge(

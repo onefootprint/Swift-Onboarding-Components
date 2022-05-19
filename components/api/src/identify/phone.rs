@@ -1,5 +1,5 @@
 use crate::errors::ApiError;
-use crate::identify::{clean_phone_number, phone_number_last_two, send_phone_challenge};
+use crate::identify::{clean_phone_number, send_phone_challenge};
 use crate::types::success::ApiResponseData;
 use crate::State;
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
@@ -24,12 +24,9 @@ pub async fn handler(
     let phone_number = clean_phone_number(&state, &req.phone_number).await?;
 
     // Send the log in challenge to the provided phone number
-    let challenge_data = send_phone_challenge(&state, phone_number.clone()).await?;
+    let challenge = send_phone_challenge(&state, phone_number.clone()).await?;
 
     Ok(Json(ApiResponseData {
-        data: super::ChallengeResponse {
-            phone_number_last_two: phone_number_last_two(challenge_data.phone_number.clone()),
-            e_challenge_data: challenge_data.seal(&state)?,
-        },
+        data: super::ChallengeResponse::new(challenge, &state.session_sealing_key)?,
     }))
 }

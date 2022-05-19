@@ -57,6 +57,8 @@ pub enum ApiError {
     InvalidJsonBody(JsonPayloadError),
     #[error("challenge timeout or mismatch")]
     ChallengeNotValid,
+    #[error("Challenge is expired")]
+    ChallengeExpired,
     #[error("missing fields required for user signup: {0}")]
     UserMissingRequiredFields(String),
     #[error("user does not exist for email challenge")]
@@ -118,6 +120,7 @@ impl actix_web::ResponseError for ApiError {
             ApiError::PhoneNumberValidationError => actix_web::http::StatusCode::BAD_REQUEST,
             ApiError::InvalidJsonBody(_) => actix_web::http::StatusCode::BAD_REQUEST,
             ApiError::ChallengeNotValid => actix_web::http::StatusCode::BAD_REQUEST,
+            ApiError::ChallengeExpired => actix_web::http::StatusCode::BAD_REQUEST,
             ApiError::UserMissingRequiredFields(_) => actix_web::http::StatusCode::BAD_REQUEST,
             ApiError::UserDoesntExistForEmailChallenge => actix_web::http::StatusCode::BAD_REQUEST,
             ApiError::EmailChallengeDecryptionError => actix_web::http::StatusCode::BAD_REQUEST,

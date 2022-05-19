@@ -4,7 +4,7 @@ use crate::types::success::ApiResponseData;
 use crate::State;
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 
-use super::{phone_number_last_two, send_phone_challenge_to_user};
+use super::send_phone_challenge_to_user;
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
 #[serde(rename_all = "snake_case")]
@@ -48,13 +48,13 @@ pub async fn handler(
     // see if user vault has an associated phone number.
     let response = if let Some(existing_user) = existing_user {
         // The user vault exists. Send the log in challenge to the user's phone number
-        let challenge_data = send_phone_challenge_to_user(&state, existing_user).await?;
+        let challenge = send_phone_challenge_to_user(&state, existing_user).await?;
         IdentifyResponse {
             status: IdentifyResponseStatus::UserFound,
-            challenge_data: Some(super::ChallengeResponse {
-                phone_number_last_two: phone_number_last_two(challenge_data.phone_number.clone()),
-                e_challenge_data: challenge_data.seal(&state)?,
-            }),
+            challenge_data: Some(super::ChallengeResponse::new(
+                challenge,
+                &state.session_sealing_key,
+            )?),
         }
     } else {
         // The user vault doesn't exist. Just return that the challenge data wasn't found

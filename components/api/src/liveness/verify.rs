@@ -1,14 +1,13 @@
-use std::str::FromStr;
-
 use crate::{
     errors::ApiError,
     identify::{clean_email, signed_hash},
     liveness::{get_opt_webauthn_creds, LivenessWebauthnConfig},
     types::success::ApiResponseData,
+    utils::challenge::Challenge,
     State,
 };
 use chrono::{Duration, Utc};
-use crypto::{b64::Base64Data, serde_cbor};
+use crypto::serde_cbor;
 use db::models::session_data::LoggedInSessionData;
 use db::models::session_data::SessionState as DbSessionState;
 use newtypes::UserVaultId;
@@ -23,32 +22,13 @@ use webauthn_rs::{
 #[derive(Debug, Clone, Deserialize, Serialize, Apiv2Schema)]
 pub struct WebAuthnInitResponse {
     challenge_json: String,
-    e_challenge_data: String,
+    challenge_token: String,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
-pub struct WebauthnChallengeState {
+pub struct LoginChallengeState {
     pub state: AuthenticationState,
     pub user_vault_id: UserVaultId,
-    // TODO do we need a created_at/expiration time?
-}
-
-// TODO base implementation for anything serializable
-impl WebauthnChallengeState {
-    pub fn seal(self, _state: &web::Data<State>) -> Result<String, ApiError> {
-        // TODO encrypt
-        let serialized = serde_json::to_string(&self)?;
-        let encoded = Base64Data(serialized.as_bytes().to_vec()).to_string();
-        Ok(encoded)
-    }
-
-    pub fn unseal(sealed: &str, _state: &web::Data<State>) -> Result<Self, ApiError> {
-        // TODO decrypt
-        let decoded = Base64Data::from_str(sealed).map_err(crypto::Error::from)?;
-        let decoded = std::str::from_utf8(&decoded.0)?.to_string();
-        let deserialized = serde_json::from_str(&decoded)?;
-        Ok(deserialized)
-    }
 }
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
@@ -95,13 +75,16 @@ pub async fn init(
 
     let (challenge, auth_state) = webauthn.generate_challenge_authenticate_options(creds, None)?;
 
-    let response = ApiResponseData::ok(WebAuthnInitResponse {
-        challenge_json: serde_json::to_string(&challenge)?,
-        e_challenge_data: WebauthnChallengeState {
+    let challenge_data = Challenge {
+        expires_at: Utc::now().naive_utc() + Duration::minutes(5),
+        data: LoginChallengeState {
             state: auth_state,
             user_vault_id: existing_user.id,
-        }
-        .seal(&state)?,
+        },
+    };
+    let response = ApiResponseData::ok(WebAuthnInitResponse {
+        challenge_json: serde_json::to_string(&challenge)?,
+        challenge_token: challenge_data.seal(&state.session_sealing_key)?,
     });
 
     Ok(Json(response))
@@ -111,7 +94,7 @@ pub async fn init(
 #[derive(Debug, Clone, Deserialize, Serialize, Apiv2Schema)]
 struct WebauthnVerifyRequest {
     device_response_json: String,
-    e_challenge_data: String,
+    challenge_token: String,
 }
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Serialize)]
@@ -125,19 +108,22 @@ async fn complete(
     request: Json<WebauthnVerifyRequest>,
     state: web::Data<State>,
 ) -> actix_web::Result<Json<ApiResponseData<VerifyResponse>>, ApiError> {
-    let challenge_data = WebauthnChallengeState::unseal(&request.e_challenge_data, &state)?;
-    let auth_state = challenge_data.state;
+    let challenge = Challenge::<LoginChallengeState>::unseal(
+        &state.session_sealing_key,
+        &request.challenge_token,
+    )?;
 
     // generate the challenge and return it
     let webauthn = webauthn_rs::Webauthn::new(super::LivenessWebauthnConfig::new(&state));
 
     let auth_resp = serde_json::from_str(&request.device_response_json)?;
-    let (_, _authenticator_data) = webauthn.authenticate_credential(&auth_resp, &auth_state)?;
+    let (_, _authenticator_data) =
+        webauthn.authenticate_credential(&auth_resp, &challenge.data.state)?;
 
     // Save logged in session data into the DB
     let login_expires_at = Utc::now().naive_utc() + Duration::minutes(15);
     let (_, auth_token) = DbSessionState::LoggedInSession(LoggedInSessionData {
-        user_vault_id: challenge_data.user_vault_id,
+        user_vault_id: challenge.data.user_vault_id,
     })
     .create(&state.db_pool, login_expires_at)
     .await?;
