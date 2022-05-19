@@ -12,10 +12,16 @@ import primitives from './primitives';
 
 const themeUiStates = {
   accent: primitives.purple500,
-  error: primitives.red500,
-  info: primitives.blue500,
-  success: primitives.green500,
-  warning: primitives.yellow700,
+  error: primitives.red800,
+  info: primitives.blue600,
+  success: primitives.green700,
+  warning: primitives.yellow800,
+  neutral: primitives.gray900,
+  errorBackground: primitives.red100,
+  infoBackground: primitives.blue100,
+  successBackground: primitives.green100,
+  warningBackground: primitives.yellow100,
+  neutralBackground: primitives.gray100,
 };
 
 const theme: DefaultTheme = {

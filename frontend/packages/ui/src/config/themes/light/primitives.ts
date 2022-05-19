@@ -35,7 +35,7 @@ const primitives = {
   red400: '#CC433B',
   red300: '#D9726C',
   red200: '#E5A19D',
-  red100: '#F2D0CE',
+  red100: '#EDD0CE',
   red50: '#FFF8F7',
   // yellow
   yellow800: '#9B4E00',

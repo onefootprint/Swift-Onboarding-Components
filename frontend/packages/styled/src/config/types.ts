@@ -4,6 +4,10 @@ export type UIStates = {
   info: string;
   success: string;
   warning: string;
+  warningBackground: string;
+  errorBackground: string;
+  infoBackground: string;
+  neutralBackground: string;
 };
 
 export type Typography = {
