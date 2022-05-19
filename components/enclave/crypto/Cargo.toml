@@ -19,3 +19,4 @@ aead = "0.4.3"
 sec1 = "0.2.1"
 hmac = "0.12.1"
 rand = { version = "0.8"}
+chacha20poly1305 = "0.9.0"

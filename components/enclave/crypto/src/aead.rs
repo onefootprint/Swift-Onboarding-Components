@@ -1,0 +1,159 @@
+use std::fmt::Debug;
+
+use aead::Payload;
+use chacha20poly1305::aead::{Aead, NewAead};
+use chacha20poly1305::{Key, XNonce, XChaCha20Poly1305};
+use rand_core::{OsRng, RngCore};
+use serde::de::DeserializeOwned;
+use serde::{Serialize, Deserialize};
+
+#[derive(Clone)]
+pub struct ScopedSealingKey {
+    scope: &'static str,
+    key: Vec<u8>,
+}
+
+// hide the key from debug prints
+impl Debug for ScopedSealingKey {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str("{ <hidden> }")
+    }
+}
+
+impl ScopedSealingKey {
+    pub fn new(bytes: Vec<u8>, scope: &'static str) -> Self {
+        Self { key: bytes, scope }
+    }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+struct SealedBytes {
+    #[serde(rename = "n")]
+    iv: Vec<u8>,
+    #[serde(rename = "c")]
+    cipher_text_and_tag: Vec<u8> 
+}
+
+/// seal_aead_scoped_with_nonce with a random nonce
+fn seal_aead_scoped(
+    key: &[u8],
+    data: &[u8],
+    scope: &'static str,
+) -> Result<Vec<u8>, crate::Error> {
+    let mut nonce = [0u8; 24];
+    OsRng.fill_bytes(&mut nonce);
+    seal_aead_scoped_with_nonce(key, data, scope, &nonce)
+}
+
+/// We use XChaCha20Poly1305 to here instead of AESGCM to help against nonce resuse attacks
+/// The scope is used as AAD to prevent against confused deputy attacks
+fn seal_aead_scoped_with_nonce(
+    key: &[u8],
+    data: &[u8],
+    scope: &'static str,
+    iv: &[u8],
+) -> Result<Vec<u8>, crate::Error> {
+    let key = Key::from_slice(key);
+    let cipher = XChaCha20Poly1305::new(key);
+    let nonce = XNonce::from_slice(iv);
+
+    let payload = Payload {
+        msg: data,
+        aad: scope.as_bytes(),
+    };
+    let cipher_text_and_tag = cipher.encrypt(nonce, payload).map_err(|_| crate::Error::AeadEncrypt)?;    
+    
+    let sealed = SealedBytes {
+        iv: iv.to_vec(),
+        cipher_text_and_tag
+    };
+    Ok(serde_cbor::to_vec(&sealed)?)
+}
+
+fn unseal_aead_scoped(
+    key: &[u8],
+    sealed: &[u8],
+    scope: &'static str,
+) -> Result<Vec<u8>, crate::Error> {
+    let sealed_bytes:SealedBytes = serde_cbor::from_slice(sealed)?;
+
+    let key = Key::from_slice(key);
+    let cipher = XChaCha20Poly1305::new(key);
+    let nonce = XNonce::from_slice(&sealed_bytes.iv);
+
+    let payload = Payload {
+        msg: &sealed_bytes.cipher_text_and_tag,
+        aad: scope.as_bytes(),
+    };
+
+    let plaintext = cipher.decrypt(nonce, payload).map_err(|_| crate::Error::AeadEncrypt)?; 
+
+    Ok(plaintext)
+}
+
+impl ScopedSealingKey {
+    pub fn seal<S: Serialize>(&self, object: &S) -> Result<Vec<u8>, crate::Error> {
+        let data = serde_cbor::to_vec(object)?;
+        seal_aead_scoped(&self.key, &data, self.scope)
+    }
+
+    pub fn unseal<D: DeserializeOwned>(&self, sealed: &[u8]) -> Result<D, crate::Error> {
+        let plain = unseal_aead_scoped(&self.key, sealed, self.scope)?;
+        Ok(serde_cbor::from_slice(&plain)?)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    const TEST_SCOPE:&str = "test_scope";
+
+    fn random_key() -> [u8;32] {
+        let mut key = [0u8; 32];
+        OsRng.fill_bytes(&mut key);
+        key
+    }
+
+    #[test]
+    fn test_seal_unseal_random() {
+        let key = random_key();
+        let data = b"hello world";
+        let sealed = seal_aead_scoped(&key, data, TEST_SCOPE).unwrap();
+        // dbg!(hex::encode(&key));
+        // dbg!(hex::encode(&sealed));
+
+        let plain = unseal_aead_scoped(&key, &sealed, TEST_SCOPE).unwrap();
+
+        assert_eq!(&plain, &data);
+    }
+
+    #[test]
+    fn test_seal_unseal_fixed() {
+        let key = hex::decode("1c65ee85c88211b4aa323bfc6ef22f68d3ab99b940b35bed84c16c68843c43c5").unwrap();
+        let data = b"hello world";
+        let sealed = hex::decode("a2616e981818f118b41831184f18ca1866187f1898183f18571835001826185718a818fd184d1826189d12186f18a318ff18686163981b18e118df17187f18d0187918d9186718951888186a18a7188018be1318b91893188118ba18c618b6186718d018ed18f718a11856").unwrap();
+
+        let plain = unseal_aead_scoped(&key, &sealed, TEST_SCOPE).unwrap();
+        assert_eq!(&plain, &data);
+    }
+
+    #[test]
+    fn test_seal_unseal_object() {
+        let key = ScopedSealingKey::new(random_key().to_vec(), TEST_SCOPE);
+        
+        #[derive(Debug, Serialize, Deserialize, PartialEq)]
+        struct Object {
+            x: String,
+            y: u64
+        }
+
+        let obj = Object { x: "blah".to_string(), y: 42};
+
+        let sealed = key.seal(&obj).unwrap();
+        let unsealed: Object = key.unseal(&sealed).unwrap();
+
+        assert_eq!(unsealed, obj);
+    }
+
+}

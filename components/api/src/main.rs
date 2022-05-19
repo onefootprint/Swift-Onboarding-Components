@@ -2,6 +2,7 @@ use actix_session::{storage::CookieSessionStore, SessionMiddleware};
 use actix_web::{cookie::Key, middleware::Logger, App, HttpServer};
 use actix_web_opentelemetry::RequestMetrics;
 use config::Config;
+use crypto::aead::ScopedSealingKey;
 use db::DbPool;
 use enclave_proxy::{bb8, pool, StreamManager};
 use signed_hash::SignedHashClient;
@@ -40,6 +41,7 @@ pub struct State {
     hmac_client: SignedHashClient,
     db_pool: DbPool,
     enclave_connection_pool: bb8::Pool<pool::StreamManager<StreamManager<Config>>>,
+    session_sealing_key: ScopedSealingKey
 }
 
 #[actix_web::main]
@@ -88,6 +90,18 @@ async fn main() -> std::io::Result<()> {
             .map_err(ApiError::from)
             .unwrap();
 
+            
+        // our session key
+        let session_sealing_key = {
+            let key = if let Some(hex_key) = &config.cookie_session_key_hex {
+                crypto::hex::decode(hex_key).expect("invalid session cookie key")
+            } else {
+                log::error!("WARNING GENERATING RANDOM SESSION KEY");
+                crypto::random::random_cookie_session_key_bytes()
+            };
+            ScopedSealingKey::new(key, "SESSION_SEALING")
+        };
+        
         State {
             config: config.clone(),
             enclave_connection_pool: pool,
@@ -97,6 +111,7 @@ async fn main() -> std::io::Result<()> {
             kms_client,
             hmac_client,
             db_pool,
+            session_sealing_key
         }
     };
 

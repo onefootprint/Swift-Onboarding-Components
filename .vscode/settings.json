@@ -6,6 +6,7 @@
         "Apiv",
         "awsx",
         "cbor",
+        "chacha",
         "chrono",
         "creds",
         "deadpool",
