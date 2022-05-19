@@ -24,8 +24,8 @@ const Template: Story<SelectProps> = ({
   onSearchChangeText,
   onSelect,
   options = defaultOptions,
-  placeholderText,
-  searchPlaceholderText,
+  placeholder,
+  searchPlaceholder,
   testID,
 }: SelectProps) => {
   const [selectedOption, setSelectedOption] = useState<
@@ -77,8 +77,8 @@ const Template: Story<SelectProps> = ({
           onSearchChangeText={onSearchChangeText}
           onSelect={handleSelect}
           options={options}
-          placeholderText={placeholderText}
-          searchPlaceholderText={searchPlaceholderText}
+          placeholder={placeholder}
+          searchPlaceholder={searchPlaceholder}
           selectedOption={selectedOption}
           testID={testID}
         />
@@ -102,8 +102,8 @@ Base.args = {
   onSearchChangeText: console.log,
   onSelect: console.log,
   options: defaultOptions,
-  placeholderText: 'Select...',
-  searchPlaceholderText: 'Search',
+  placeholder: 'Select...',
+  searchPlaceholder: 'Search',
   selectedOption: null,
   testID: 'select-test-id',
 };
@@ -127,8 +127,8 @@ WithoutSearch.args = {
     { value: 'Option 5', label: 'Option 5' },
     { value: 'Option 6', label: 'Option 6' },
   ],
-  placeholderText: 'Select...',
-  searchPlaceholderText: 'Search',
+  placeholder: 'Select...',
+  searchPlaceholder: 'Search',
   selectedOption: null,
   testID: 'select-test-id',
 };

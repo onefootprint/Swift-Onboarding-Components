@@ -29,8 +29,8 @@ describe('<Select />', () => {
     onSearchChangeText,
     onSelect = jest.fn(),
     options = defaultOptions,
-    placeholderText = 'Select...',
-    searchPlaceholderText,
+    placeholder = 'Select...',
+    searchPlaceholder,
     selectedOption,
     testID = 'select-test-id',
   }: Partial<SelectProps>) =>
@@ -46,8 +46,8 @@ describe('<Select />', () => {
         onSearchChangeText={onSearchChangeText}
         onSelect={onSelect}
         options={options}
-        placeholderText={placeholderText}
-        searchPlaceholderText={searchPlaceholderText}
+        placeholder={placeholder}
+        searchPlaceholder={searchPlaceholder}
         selectedOption={selectedOption}
         testID={testID}
       />,
@@ -65,7 +65,7 @@ describe('<Select />', () => {
 
   describe('when there is NO item selected', () => {
     it('should render the placeholder', () => {
-      renderSelect({ placeholderText: 'placeholder' });
+      renderSelect({ placeholder: 'placeholder' });
       expect(screen.getByText('placeholder')).toBeInTheDocument();
     });
   });
@@ -78,7 +78,7 @@ describe('<Select />', () => {
       ];
       const [selectedOption] = options;
       renderSelect({
-        placeholderText: 'placeholder',
+        placeholder: 'placeholder',
         options,
         selectedOption,
       });
@@ -117,7 +117,7 @@ describe('<Select />', () => {
         { value: 'foo', label: 'foo' },
         { value: 'bar', label: 'bar' },
       ];
-      renderSelect({ options, placeholderText: 'placeholder' });
+      renderSelect({ options, placeholder: 'placeholder' });
       await userEvent.click(screen.getByText('placeholder'));
       options.forEach(option => {
         expect(screen.getByText(option.label)).toBeInTheDocument();
@@ -146,7 +146,7 @@ describe('<Select />', () => {
   describe('search', () => {
     describe('when theres is more or equal than 10 options', () => {
       it('should display a search', async () => {
-        renderSelect({ searchPlaceholderText: 'Search now' });
+        renderSelect({ searchPlaceholder: 'Search now' });
         await userEvent.click(screen.getByText('Select...'));
         const search = screen.getByPlaceholderText('Search now');
         expect(search).toBeInTheDocument();

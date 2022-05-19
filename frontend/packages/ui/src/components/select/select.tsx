@@ -29,8 +29,8 @@ export type SelectProps = {
   onSearchChangeText?: (nextValue: string) => void;
   onSelect: (option?: SelectOption | null) => void;
   options: SelectOption[];
-  placeholderText?: string;
-  searchPlaceholderText?: string;
+  placeholder?: string;
+  searchPlaceholder?: string;
   selectedOption?: SelectOption | null;
   testID?: string;
 };
@@ -46,15 +46,15 @@ const Select = ({
   onSearchChangeText,
   onSelect,
   options,
-  placeholderText = 'Select',
-  searchPlaceholderText = 'Search',
+  placeholder = 'Select',
+  searchPlaceholder = 'Search',
   selectedOption,
   testID,
 }: SelectProps) => {
   const theme = useTheme();
   // TODO: Migrate to useId once we migrate to react 18
   // https://github.com/onefootprint/frontend-monorepo/issues/61
-  const id = baseID || `input-${label || placeholderText}`;
+  const id = baseID || `input-${label || placeholder}`;
   const { setReferenceElement, setPopperElement, popper } = usePopper();
   const [searchValue, setSearchValue] = useState('');
   const searchValueAsArray = useMemo(
@@ -106,7 +106,7 @@ const Select = ({
               isActive={isOpen}
               ref={mergeRefs([setReferenceElement, togglerProps.ref])}
             >
-              {selectedOption ? selectedOption.label : placeholderText}
+              {selectedOption ? selectedOption.label : placeholder}
               <IcoChevronDown16 />
             </S.Button>
             {hintText && (
@@ -128,7 +128,7 @@ const Select = ({
                     autoComplete={inputProps.autoComplete}
                     id={inputProps.id}
                     onChangeText={handleSearchChangeText}
-                    placeholder={searchPlaceholderText}
+                    placeholder={searchPlaceholder}
                     value={searchValue}
                   />
                 )}
