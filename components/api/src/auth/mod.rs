@@ -16,16 +16,10 @@ pub enum AuthError {
     MissingClientSecretAuthHeader,
     #[error("missing X-Fpuser-Authorization")]
     MissingFpuserAuthHeader,
-    #[error("missing session token in cookie")]
-    MissingSessionTokenCookie,
     #[error("error reading session: {0}")]
     SessionError(#[from] actix_web::Error),
     #[error("incorrect session type auth")]
     SessionTypeError,
-    #[error("invalid json {0}")]
-    InvalidSessionJson(serde_json::Error),
-    #[error("invalid session state")]
-    InvalidSessionState,
     #[error("no session found")]
     NoSessionFound,
 }

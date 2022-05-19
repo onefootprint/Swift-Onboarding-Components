@@ -1,42 +1,77 @@
+use std::str::FromStr;
+
 use crate::{
-    auth::AuthError,
     errors::ApiError,
-    liveness::{auth_context::AuthState, get_opt_webauthn_creds, LivenessWebauthnConfig},
-    types::{success::ApiResponseData, Empty},
+    identify::{clean_email, signed_hash},
+    liveness::{get_opt_webauthn_creds, LivenessWebauthnConfig},
+    types::success::ApiResponseData,
     State,
 };
-use actix_session::Session;
-use crypto::serde_cbor;
-use paperclip::actix::{api_v2_operation, get, post, web, web::Json, Apiv2Schema};
+use chrono::{Duration, Utc};
+use crypto::{b64::Base64Data, serde_cbor};
+use db::models::session_data::LoggedInSessionData;
+use db::models::session_data::SessionState as DbSessionState;
+use newtypes::UserVaultId;
+use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 use serde::{Deserialize, Serialize};
-use webauthn_rs::proto::{Credential, UserVerificationPolicy};
-
-use super::auth_context::{LivenessVerificationAuthContext, WebAuthnState};
+use webauthn_rs::{
+    proto::{Credential, UserVerificationPolicy},
+    AuthenticationState,
+};
 
 /// Contains the payload for the frontend to communicate to the device via webauthn
 #[derive(Debug, Clone, Deserialize, Serialize, Apiv2Schema)]
-pub struct GetWebauthnChallengeResponse {
+pub struct WebAuthnInitResponse {
     challenge_json: String,
+    e_challenge_data: String,
 }
 
-/// Get a registration challenge
-#[api_v2_operation]
-#[get("/verify")]
-pub async fn get_verify_challenge(
-    mut auth: LivenessVerificationAuthContext,
-    session: Session,
-    state: web::Data<State>,
-) -> actix_web::Result<Json<ApiResponseData<GetWebauthnChallengeResponse>>, ApiError> {
-    // ensure we're in allowed state
-    match auth.local_state.state {
-        WebAuthnState::Auth(AuthState::NotStarted)
-        | WebAuthnState::Auth(AuthState::AuthChallenge(_)) => {}
-        _ => return Err(AuthError::InvalidSessionState.into()),
-    };
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct WebauthnChallengeState {
+    pub state: AuthenticationState,
+    pub user_vault_id: UserVaultId,
+    // TODO do we need a created_at/expiration time?
+}
 
+// TODO base implementation for anything serializable
+impl WebauthnChallengeState {
+    pub fn seal(self, _state: &web::Data<State>) -> Result<String, ApiError> {
+        // TODO encrypt
+        let serialized = serde_json::to_string(&self)?;
+        let encoded = Base64Data(serialized.as_bytes().to_vec()).to_string();
+        Ok(encoded)
+    }
+
+    pub fn unseal(sealed: &str, _state: &web::Data<State>) -> Result<Self, ApiError> {
+        // TODO decrypt
+        let decoded = Base64Data::from_str(sealed).map_err(crypto::Error::from)?;
+        let decoded = std::str::from_utf8(&decoded.0)?.to_string();
+        let deserialized = serde_json::from_str(&decoded)?;
+        Ok(deserialized)
+    }
+}
+
+#[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub struct LoginRequest {
+    email: String,
+}
+
+#[api_v2_operation]
+#[post("/login/init")]
+pub async fn init(
+    request: Json<LoginRequest>,
+    state: web::Data<State>,
+) -> actix_web::Result<Json<ApiResponseData<WebAuthnInitResponse>>, ApiError> {
+    let cleaned_email = clean_email(request.email.clone());
+    let sh_email = signed_hash(&state, cleaned_email.clone()).await?;
+    // TODO only look up by verified email
+    let existing_user = db::user_vault::get_by_email(&state.db_pool, sh_email, false)
+        .await?
+        .map(|x| x.0)
+        .ok_or(ApiError::UserDoesntExistForEmailChallenge)?;
     // look up webauthn credentials
-    let user_vault_id = auth.local_state.user_vault_id.clone();
-    let creds = get_opt_webauthn_creds(&state, user_vault_id)
+    let creds = get_opt_webauthn_creds(&state, existing_user.id.clone())
         .await?
         .ok_or(ApiError::WebauthnCredentialsNotSet)?;
     // convert these creds to webauthn rs type
@@ -60,12 +95,13 @@ pub async fn get_verify_challenge(
 
     let (challenge, auth_state) = webauthn.generate_challenge_authenticate_options(creds, None)?;
 
-    // store the local state in our cookie
-    auth.local_state.state = WebAuthnState::Auth(AuthState::AuthChallenge(auth_state));
-    auth.local_state.set(&session)?;
-
-    let response = ApiResponseData::ok(GetWebauthnChallengeResponse {
+    let response = ApiResponseData::ok(WebAuthnInitResponse {
         challenge_json: serde_json::to_string(&challenge)?,
+        e_challenge_data: WebauthnChallengeState {
+            state: auth_state,
+            user_vault_id: existing_user.id,
+        }
+        .seal(&state)?,
     });
 
     Ok(Json(response))
@@ -75,22 +111,22 @@ pub async fn get_verify_challenge(
 #[derive(Debug, Clone, Deserialize, Serialize, Apiv2Schema)]
 struct WebauthnVerifyRequest {
     device_response_json: String,
+    e_challenge_data: String,
 }
 
-/// Response to a registration challenge
+#[derive(Debug, Clone, Apiv2Schema, serde::Serialize)]
+struct VerifyResponse {
+    auth_token: String,
+}
+
 #[api_v2_operation]
-#[post("/verify")]
-async fn post_verify_challenge(
+#[post("/login")]
+async fn complete(
     request: Json<WebauthnVerifyRequest>,
-    mut auth: LivenessVerificationAuthContext,
-    session: Session,
     state: web::Data<State>,
-) -> actix_web::Result<Json<ApiResponseData<Empty>>, ApiError> {
-    // ensure we're in the right state
-    let auth_state = match auth.local_state.state {
-        WebAuthnState::Auth(AuthState::AuthChallenge(auth_state)) => auth_state,
-        _ => return Err(AuthError::InvalidSessionState.into()),
-    };
+) -> actix_web::Result<Json<ApiResponseData<VerifyResponse>>, ApiError> {
+    let challenge_data = WebauthnChallengeState::unseal(&request.e_challenge_data, &state)?;
+    let auth_state = challenge_data.state;
 
     // generate the challenge and return it
     let webauthn = webauthn_rs::Webauthn::new(super::LivenessWebauthnConfig::new(&state));
@@ -98,8 +134,15 @@ async fn post_verify_challenge(
     let auth_resp = serde_json::from_str(&request.device_response_json)?;
     let (_, _authenticator_data) = webauthn.authenticate_credential(&auth_resp, &auth_state)?;
 
-    auth.local_state.state = WebAuthnState::Auth(AuthState::AuthSuccess);
-    auth.local_state.set(&session)?;
+    // Save logged in session data into the DB
+    let login_expires_at = Utc::now().naive_utc() + Duration::minutes(15);
+    let (_, auth_token) = DbSessionState::LoggedInSession(LoggedInSessionData {
+        user_vault_id: challenge_data.user_vault_id,
+    })
+    .create(&state.db_pool, login_expires_at)
+    .await?;
 
-    Ok(Json(ApiResponseData::ok(Empty)))
+    Ok(Json(ApiResponseData {
+        data: VerifyResponse { auth_token },
+    }))
 }

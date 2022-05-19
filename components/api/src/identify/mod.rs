@@ -1,5 +1,4 @@
 pub mod email;
-mod livecheck;
 pub mod phone;
 pub mod verify;
 
@@ -259,5 +258,4 @@ pub fn routes() -> web::Scope {
         .service(email::handler)
         .service(phone::handler)
         .service(verify::handler)
-        .service(livecheck::handler)
 }
