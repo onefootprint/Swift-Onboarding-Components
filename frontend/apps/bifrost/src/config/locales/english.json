@@ -21,6 +21,28 @@
           },
           "cta": "Continue"
         }
+      },
+      "basic-information": {
+        "title": "Ok, now to the fun stuff!",
+        "subtitle": "No, really. We're legally required to collect some information about you. Let's get started.",
+        "form": {
+          "first-name": {
+            "label": "First name",
+            "placeholder": "John",
+            "error": "First name cannot be empty or is invalid"
+          },
+          "last-name": {
+            "label": "Last name",
+            "placeholder": "Doe",
+            "error": "Last name cannot be empty or is invalid"
+          },
+          "dob": {
+            "label": "Date of Birth",
+            "placeholder": "MM/DD/YYYY",
+            "error": "Date of birth cannot be empty or is invalid"
+          },
+          "cta": "Continue"
+        }
       }
     }
   }

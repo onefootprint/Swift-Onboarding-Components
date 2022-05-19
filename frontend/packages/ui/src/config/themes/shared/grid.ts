@@ -4,9 +4,9 @@ const grid: Grid = {
   columns: 12,
   col: {
     gutterSize: {
-      xl: 24,
-      lg: 24,
-      md: 24,
+      xl: 16,
+      lg: 16,
+      md: 16,
       sm: 16,
       xs: 12,
     },

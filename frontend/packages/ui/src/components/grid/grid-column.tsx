@@ -19,33 +19,28 @@ const GridColumn = styled.div<GridColumnProps>`
     ${createColumnStyles(theme.grid.columns, props.col)}
 
     ${media.between('xs', 'sm')`
-      padding-left: ${theme.grid.col.gutterSize.xs / 2}px;
-      padding-right: ${theme.grid.col.gutterSize.xs / 2}px;
-      ${createColumnStyles(theme.grid.columns, props.xs)}
+      ${createColumnStyles(theme.grid.columns, props.xs)};
+      ${createGutterStyles(theme.grid.col.gutterSize.xs / 2)};
     `}
 
     ${media.between('sm', 'md')`
-      padding-left: ${theme.grid.col.gutterSize.sm / 2}px;
-      padding-right: ${theme.grid.col.gutterSize.sm / 2}px;
-      ${createColumnStyles(theme.grid.columns, props.sm)}
+      ${createColumnStyles(theme.grid.columns, props.sm)};
+      ${createGutterStyles(theme.grid.col.gutterSize.xs / 2)};
     `}
 
     ${media.between('md', 'lg')`
-      padding-left: ${theme.grid.col.gutterSize.md / 2}px;
-      padding-right: ${theme.grid.col.gutterSize.md / 2}px;
-      ${createColumnStyles(theme.grid.columns, props.md)}
+      ${createColumnStyles(theme.grid.columns, props.md)};
+      ${createGutterStyles(theme.grid.col.gutterSize.xs / 2)};
     `}
 
     ${media.between('lg', 'xl')`
-      padding-left: ${theme.grid.col.gutterSize.lg / 2}px;
-      padding-right: ${theme.grid.col.gutterSize.lg / 2}px;
-      ${createColumnStyles(theme.grid.columns, props.lg)}
+      ${createColumnStyles(theme.grid.columns, props.lg)};
+      ${createGutterStyles(theme.grid.col.gutterSize.xs / 2)};
     `}
 
     ${media.greaterThan('xl')`
-      padding-left: ${theme.grid.col.gutterSize.xl / 2}px;
-      padding-right: ${theme.grid.col.gutterSize.xl / 2}px;
-      ${createColumnStyles(theme.grid.columns, props.xl)}
+      ${createColumnStyles(theme.grid.columns, props.xl)};
+      ${createGutterStyles(theme.grid.col.gutterSize.xs / 2)};
     `}
   `}
 `;
@@ -59,5 +54,15 @@ const createColumnStyles = (gridColumns: number, columns?: ColumnSize) => {
     max-width: ${colFlexBasis}%;
   `;
 };
+
+const createGutterStyles = (gutter: number) => `
+  &:not(:first-child) {
+    padding-left: ${gutter}px;
+  }
+
+  :not(:last-child) {
+    padding-right: ${gutter}px;
+  }
+`;
 
 export default GridColumn;

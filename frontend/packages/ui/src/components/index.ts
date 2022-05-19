@@ -8,7 +8,6 @@ export * from './container';
 export { default as Container } from './container';
 export * from './footprint-button';
 export { default as FootprintButton } from './footprint-button';
-export * from './grid';
 export { default as Grid } from './grid';
 export * from './icon-button';
 export { default as IconButton } from './icon-button';
