@@ -15,15 +15,8 @@ pub struct IdentifyRequest {
 #[derive(Debug, Clone, Apiv2Schema, serde::Serialize)]
 #[serde(rename_all = "snake_case")]
 pub struct IdentifyResponse {
-    status: IdentifyResponseStatus,
+    user_found: bool,
     challenge_data: Option<super::ChallengeResponse>,
-}
-
-#[derive(Debug, Clone, Apiv2Schema, serde::Serialize)]
-#[serde(rename_all = "snake_case")]
-pub enum IdentifyResponseStatus {
-    UserFound,
-    UserNotFound,
 }
 
 #[api_v2_operation]
@@ -50,7 +43,7 @@ pub async fn handler(
         // The user vault exists. Send the log in challenge to the user's phone number
         let challenge = send_phone_challenge_to_user(&state, existing_user).await?;
         IdentifyResponse {
-            status: IdentifyResponseStatus::UserFound,
+            user_found: true,
             challenge_data: Some(super::ChallengeResponse::new(
                 challenge,
                 &state.session_sealing_key,
@@ -59,7 +52,7 @@ pub async fn handler(
     } else {
         // The user vault doesn't exist. Just return that the challenge data wasn't found
         IdentifyResponse {
-            status: IdentifyResponseStatus::UserNotFound,
+            user_found: false,
             challenge_data: None,
         }
     };

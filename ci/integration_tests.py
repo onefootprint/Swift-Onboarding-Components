@@ -85,7 +85,7 @@ def test_identify_email(request):
         json=data,
     )
     body = _assert_response(r)
-    assert body["data"]["status"] == "user_not_found"
+    assert not body["data"]["user_found"]
     assert not body["data"].get("challenge_data", dict())
 
 
@@ -174,7 +174,7 @@ def test_identify_repeat_customer_via_email(request, tenant2):
         json=data,
     )
     body = _assert_response(r)
-    assert body["data"]["status"] == "user_found"
+    assert body["data"]["user_found"]
     assert body["data"]["challenge_data"]["phone_number_last_two"] == phone_number[-2:]
 
     # Log in as the user
