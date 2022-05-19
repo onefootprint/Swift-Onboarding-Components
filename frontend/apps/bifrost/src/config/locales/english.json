@@ -5,6 +5,23 @@
   "pages": {
     "email-identification": {
       "title": "Hello world!"
+    },
+    "registration": {
+      "phone-registration": {
+        "title": "Let's verify your identity! 😊",
+        "subtitle": "Enter your phone number to proceed.",
+        "email-card": {
+          "cta": "Change"
+        },
+        "form": {
+          "phone-input": {
+            "label": "Phone number",
+            "placeholder": "(123) 123-1234",
+            "error": "Phone number cannot be empty or is invalid"
+          },
+          "cta": "Continue"
+        }
+      }
     }
   }
 }

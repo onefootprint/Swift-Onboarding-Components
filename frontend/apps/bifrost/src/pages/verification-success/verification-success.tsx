@@ -1,12 +1,15 @@
 import React from 'react';
+import Header from 'src/components/header';
 import styled, { css } from 'styled';
 import { Box, LinkButton, Typography } from 'ui';
 
 const VerificationSuccess = () => (
   <Container>
     <Box>
-      <Typography variant="heading-2">You&#39;re all set! 😎</Typography>
-      <Typography variant="body-2">Identity successfully verified</Typography>
+      <Header
+        title="You&#39;re all set! 😎"
+        subtitle="Identity successfully verified"
+      />
     </Box>
     <Typography variant="body-1">
       Your identity was verified in 1.32 seconds. Enjoy!
