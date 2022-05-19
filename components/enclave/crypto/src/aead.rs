@@ -21,8 +21,18 @@ impl Debug for ScopedSealingKey {
 }
 
 impl ScopedSealingKey {
-    pub fn new(bytes: Vec<u8>, scope: &'static str) -> Self {
-        Self { key: bytes, scope }
+    pub fn new(mut bytes: Vec<u8>, scope: &'static str) -> Result<Self, crate::Error> {
+        // reject keys with too little entropy
+        if bytes.len() < 32 {
+            return Err(crate::Error::InvalidKey)
+        }
+
+        // accept longer keys, but shorten them via sha256 to 32 bytes
+        if bytes.len() > 32 {
+            bytes = crate::sha256(&bytes).to_vec();
+        }
+
+        Ok(Self { key: bytes, scope })
     }
 }
 
@@ -140,7 +150,7 @@ mod tests {
 
     #[test]
     fn test_seal_unseal_object() {
-        let key = ScopedSealingKey::new(random_key().to_vec(), TEST_SCOPE);
+        let key = ScopedSealingKey::new(random_key().to_vec(), TEST_SCOPE).unwrap();
         
         #[derive(Debug, Serialize, Deserialize, PartialEq)]
         struct Object {

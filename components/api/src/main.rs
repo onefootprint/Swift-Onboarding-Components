@@ -99,7 +99,7 @@ async fn main() -> std::io::Result<()> {
                 log::error!("WARNING GENERATING RANDOM SESSION KEY");
                 crypto::random::random_cookie_session_key_bytes()
             };
-            ScopedSealingKey::new(key, "SESSION_SEALING")
+            ScopedSealingKey::new(key, "SESSION_SEALING").expect("invalid cookie session key")
         };
         
         State {
