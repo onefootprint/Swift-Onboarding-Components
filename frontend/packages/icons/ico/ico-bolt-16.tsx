@@ -16,9 +16,9 @@ const IcoBolt16 = ({ color = 'primary', style, testID }: IconProps) => {
       aria-hidden="true"
     >
       <path
-        d="M6.97 9.034H3.66L9.04 2v4.966h3.31L6.97 14V9.034Z"
+        d="M6.886 9.12H3.3L9.128 1.5v5.38h3.586L6.886 14.5V9.12Z"
         stroke={theme.color[color]}
-        strokeWidth={1.2}
+        strokeWidth={1.3}
         strokeLinecap="round"
         strokeLinejoin="round"
       />

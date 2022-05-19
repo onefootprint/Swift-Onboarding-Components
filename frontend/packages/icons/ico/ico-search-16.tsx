@@ -16,9 +16,9 @@ const IcoSearch16 = ({ color = 'primary', style, testID }: IconProps) => {
       aria-hidden="true"
     >
       <path
-        d="m14 14-3.103-3.103M2 7.172a5.172 5.172 0 1 1 10.345 0A5.172 5.172 0 0 1 2 7.172Z"
+        d="m14.5 14.5-3.362-3.362M1.5 7.103a5.603 5.603 0 1 1 11.207 0 5.603 5.603 0 0 1-11.207 0Z"
         stroke={theme.color[color]}
-        strokeWidth={1.2}
+        strokeWidth={1.4}
         strokeLinecap="round"
         strokeLinejoin="round"
       />

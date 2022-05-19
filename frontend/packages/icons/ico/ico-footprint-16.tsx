@@ -16,7 +16,7 @@ const IcoFootprint16 = ({ color = 'primary', style, testID }: IconProps) => {
       aria-hidden="true"
     >
       <path
-        d="M10 9.5h2V7.73a2 2 0 1 1 0-3.46V2H4v12h3.5v-2A2.5 2.5 0 0 1 10 9.5Z"
+        d="M10.67 10h2.666V7.64a2.666 2.666 0 1 1 0-4.614V0H2.67v16h4.667v-2.666A3.333 3.333 0 0 1 10.67 10Z"
         fill={theme.color[color]}
       />
     </svg>

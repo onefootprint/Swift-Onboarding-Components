@@ -16,7 +16,7 @@ const IcoCheck16 = ({ color = 'primary', style, testID }: IconProps) => {
       aria-hidden="true"
     >
       <path
-        d="m3 8.703 2.072 2.838a1.6 1.6 0 0 0 2.608-.034L13 3.81"
+        d="m2 8.832 2.486 3.405a1.92 1.92 0 0 0 3.13-.04L14 2.96"
         stroke={theme.color[color]}
         strokeWidth={1.5}
         strokeLinecap="round"
