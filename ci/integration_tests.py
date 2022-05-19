@@ -19,6 +19,10 @@ def _gen_random_n_digit_number(n):
 def _gen_random_email():
     return f"user_{_gen_random_n_digit_number(7)}@onefootprint.com"
 
+def _gen_random_phone_number():
+    last_two = _gen_random_n_digit_number(2)
+    return f"+1 (555) 555-01{last_two}"
+
 def _gen_random_ssn():
     return _gen_random_n_digit_number(9)
 
@@ -87,8 +91,7 @@ def test_identify_email(request):
 
 def test_identify_phone(request):
     path = "identify/phone"
-    last_two = _gen_random_n_digit_number(2)
-    phone_number = f"+1 (555) 555-01{last_two}"
+    phone_number = _gen_random_phone_number()
     request.config.cache.set("phone_number", phone_number)
     data = {"phone_number": phone_number}
     r = requests.post(
@@ -96,7 +99,7 @@ def test_identify_phone(request):
         json=data,
     )
     body = _assert_response(r)
-    assert body["data"]["phone_number_last_two"] == last_two
+    assert body["data"]["phone_number_last_two"] == phone_number[-2:]
     request.config.cache.set("challenge_token", body["data"]["challenge_token"])
 
 
