@@ -9,12 +9,14 @@ pub mod login_session;
 
 #[derive(Debug, Error)]
 pub enum AuthError {
-    #[error("Unkown client")]
+    #[error("Unknown client")]
     UnknownClient,
     #[error("missing X-Client-Public-Key")]
     MissingClientPublicAuthHeader,
     #[error("missing X-Client-Secret-Key")]
     MissingClientSecretAuthHeader,
+    #[error("missing X-Fpuser-Authorization")]
+    MissingFpuserAuthHeader,
     #[error("missing session token in cookie")]
     MissingSessionTokenCookie,
     #[error("error reading session: {0}")]

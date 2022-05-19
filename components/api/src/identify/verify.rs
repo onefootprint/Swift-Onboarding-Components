@@ -1,11 +1,9 @@
 use super::validate_challenge;
-use crate::auth::logged_in_session::LoggedInSessionContext;
 use crate::auth::login_session::LoginSessionContext;
 use crate::errors::ApiError;
 use crate::identify::signed_hash;
 use crate::types::success::ApiResponseData;
 use crate::State;
-use actix_session::Session;
 use aws_sdk_kms::model::DataKeyPairSpec;
 use chrono::{Duration, Utc};
 use db::models::session_data::{LoggedInSessionData, SessionState as DbSessionState};
@@ -30,6 +28,7 @@ enum VerifyKind {
 #[derive(Debug, Clone, Apiv2Schema, serde::Serialize)]
 struct VerifyResponse {
     kind: VerifyKind,
+    auth_token: String,
 }
 
 #[api_v2_operation]
@@ -41,7 +40,6 @@ struct VerifyResponse {
 /// and onboard the user vault onto new tenants.
 async fn handler(
     state: web::Data<State>,
-    session: Session,
     user_auth: LoginSessionContext,
     request: Json<VerifyRequest>,
 ) -> actix_web::Result<Json<ApiResponseData<VerifyResponse>>, ApiError> {
@@ -67,16 +65,14 @@ async fn handler(
 
     // Save logged in session data into the DB
     let login_expires_at = Utc::now().naive_utc() + Duration::minutes(15);
-    let (_, token) = DbSessionState::LoggedInSession(LoggedInSessionData {
+    let (_, auth_token) = DbSessionState::LoggedInSession(LoggedInSessionData {
         user_vault_id: user.id,
     })
     .create(&state.db_pool, login_expires_at)
     .await?;
-    // Set the cookie that identifies this as a LoggedInSession and attaches it to the DB state
-    LoggedInSessionContext::set(&session, token)?;
 
     Ok(Json(ApiResponseData {
-        data: VerifyResponse { kind },
+        data: VerifyResponse { kind, auth_token },
     }))
 }
 

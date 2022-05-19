@@ -7,6 +7,7 @@ import requests
 
 TENANT_AUTH_HEADER = "x-client-public-key"
 TENANT_SECRET_HEADER = "x-client-secret-key"
+FPUSER_AUTH_HEADER = "x-fpuser-authorization"
 TEST_CHALLENGE_CODE = "123456"
 
 
@@ -29,6 +30,11 @@ def _client_pub_key_headers(client_public_key):
 def _client_priv_key_headers(client_priv_key):
     return {
         TENANT_SECRET_HEADER: client_priv_key,
+    }
+
+def _fpuser_auth_headers(request):
+    return {
+        FPUSER_AUTH_HEADER: request.config.cache.get("fpuser_auth_token", None),
     }
 
 def _parse_cookies(response):
@@ -124,15 +130,16 @@ def test_identify_verify(request):
     )
     body = _assert_response(r)
     assert body["data"]["kind"] == "user_created"
-    _set_cookies(request, r)
+    auth_token = body["data"]["auth_token"]
+    request.config.cache.set("fpuser_auth_token", auth_token)
+    _assert_no_cookies(r)
 
 def test_onboard_init(request, tenant1):
     path = "onboarding"
     print(url(path))
     r = requests.post(
         url(path),
-        cookies=request.config.cache.get("cookies", None),
-        headers=_client_pub_key_headers(tenant1["pk"]),
+        headers=dict(**_client_pub_key_headers(tenant1["pk"]), **_fpuser_auth_headers(request)),
     )
     body = _assert_response(r)
     assert set(body["data"]["missing_attributes"]) == {"first_name", "last_name", "dob", "ssn", "street_address", "city", "state", "email"}
@@ -154,7 +161,7 @@ def test_user_data(request):
     r = requests.post(
         url(path),
         json=data,
-        cookies=request.config.cache.get("cookies", None),
+        headers=_fpuser_auth_headers(request),
     )
     _assert_response(r)
     _assert_no_cookies(r)
@@ -164,8 +171,7 @@ def test_onboarding_commit(request, tenant1):
     print(url(path))
     r = requests.post(
         url(path),
-        cookies=request.config.cache.get("cookies", None),
-        headers=_client_pub_key_headers(tenant1["pk"]),
+        headers=dict(**_client_pub_key_headers(tenant1["pk"]), **_fpuser_auth_headers(request)),
     )
     body = _assert_response(r)
     fp_user_id = body["data"]["footprint_user_id"]
@@ -175,7 +181,7 @@ def test_onboarding_commit(request, tenant1):
 
 def test_identify_repeat_customer_via_email(request, tenant2):
     # Identify the user by email
-    request.config.cache.set("cookies", None)  # Remove cookies from previous test
+    request.config.cache.set("fpuser_auth_token", None)  # Remove fpuser_auth_token from previous test
     path = "identify/email"
     print(url(path))
     email = request.config.cache.get("email", None)
@@ -184,7 +190,6 @@ def test_identify_repeat_customer_via_email(request, tenant2):
     r = requests.post(
         url(path),
         json=data,
-        cookies=request.config.cache.get("cookies", None),
     )
     body = _assert_response(r)
     assert body["data"]["phone_number_last_two"] == phone_number[-2:]
@@ -201,15 +206,16 @@ def test_identify_repeat_customer_via_email(request, tenant2):
     )
     body = _assert_response(r)
     assert body["data"]["kind"] == "user_inherited"
-    _set_cookies(request, r)
+    auth_token = body["data"]["auth_token"]
+    request.config.cache.set("fpuser_auth_token", auth_token)
+    _assert_no_cookies(r)
 
     # Start onboarding for user
     path = "onboarding"
     print(url(path))
     r = requests.post(
         url(path),
-        cookies=request.config.cache.get("cookies", None),
-        headers=_client_pub_key_headers(tenant2["pk"]),
+        headers=dict(**_client_pub_key_headers(tenant2["pk"]), **_fpuser_auth_headers(request)),
     )
     body = _assert_response(r)
     assert not body["data"]["missing_attributes"]
@@ -220,8 +226,7 @@ def test_identify_repeat_customer_via_email(request, tenant2):
     print(url(path))
     r = requests.post(
         url(path),
-        cookies=request.config.cache.get("cookies", None),
-        headers=_client_pub_key_headers(tenant2["pk"]),
+        headers=dict(**_client_pub_key_headers(tenant2["pk"]), **_fpuser_auth_headers(request)),
     )
     body = _assert_response(r)
     fp_user_id = body["data"]["footprint_user_id"]
@@ -268,7 +273,6 @@ def test_access_events_list(request, tenant1):
     print(url(path))
     r = requests.get(
         url(path),
-        cookies=request.config.cache.get("cookies", None),        
         headers=_client_priv_key_headers(tenant1["sk"]),  
     )
     body = _assert_response(r)
@@ -281,7 +285,6 @@ def test_access_events_list(request, tenant1):
     path = f"tenant/access_events?footprint_user_id={fp_user_id}&data_kind=email"
     r = requests.get(
         url(path),
-        cookies=request.config.cache.get("cookies", None),
         headers=_client_priv_key_headers(tenant1["sk"]),
     )
     body = _assert_response(r)
@@ -296,7 +299,7 @@ def test_logged_in_user_detail(request):
     print(url(path))
     r = requests.get(
         url(path),
-        cookies=request.config.cache.get("cookies", None),
+        headers=_fpuser_auth_headers(request),
     )
     body = _assert_response(r)
     user = body["data"]
@@ -310,7 +313,7 @@ def test_logged_in_access_events(request):
     print(url(path))
     r = requests.get(
         url(path),
-        cookies=request.config.cache.get("cookies", None),
+        headers=_fpuser_auth_headers(request),
     )
     body = _assert_response(r)
     access_events = body["data"]["events"]
@@ -327,7 +330,7 @@ def test_logged_in_decrypt(request, tenant1):
     print(data)
     r = requests.post(
         url(path),
-        cookies=request.config.cache.get("cookies", None),
+        headers=_fpuser_auth_headers(request),
         json=data,
     )
     body = _assert_response(r)

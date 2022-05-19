@@ -11,6 +11,7 @@
         "creds",
         "deadpool",
         "envconfig",
+        "Fpuser",
         "hmac",
         "livecheck",
         "newtype",

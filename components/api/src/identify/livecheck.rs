@@ -8,7 +8,7 @@ use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Serialize)]
 pub struct LivecheckResponse {
-    session_id: String,
+    auth_token: String,
 }
 
 /// Challenge via biometrics + liveness
@@ -22,7 +22,7 @@ pub async fn handler(
     get_onboarding_for_tenant(&state.db_pool, &user_auth, &tenant_auth).await?;
     Ok(Json(ApiResponseData {
         data: LivecheckResponse {
-            session_id: user_auth.session_id,
+            auth_token: user_auth.auth_token,
         },
     }))
 }

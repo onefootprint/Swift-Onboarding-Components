@@ -1,6 +1,5 @@
 use super::AuthError;
 use crate::{errors::ApiError, State};
-use actix_session::Session;
 use actix_web::{web, FromRequest};
 use db::models::session_data::SessionState;
 use db::models::user_vaults::UserVault;
@@ -8,30 +7,24 @@ use futures_util::Future;
 use paperclip::actix::Apiv2Security;
 use std::pin::Pin;
 
+const HEADER_NAME: &str = "X-Fpuser-Authorization";
+
 #[derive(Debug, Clone, Apiv2Security)]
 #[openapi(
     apiKey,
     in = "header",
-    name = "Cookie",
-    description = "Logged in session state cookie, set by successful call to /verify"
+    name = "X-Fpuser-Authorization",
+    description = "Footprint user auth token, issued by /identify/verify"
 )]
 /// Logged in session context sets encrypted state that authenticates the client as a user.
 pub struct LoggedInSessionContext {
     user_vault: UserVault,
-    pub session_id: String,
+    pub auth_token: String,
 }
 
 impl LoggedInSessionContext {
-    pub const SESSION_TOKEN_NAME: &'static str = "ob_session_tok";
-
     pub fn user_vault(&self) -> &UserVault {
         &self.user_vault
-    }
-
-    pub fn set(session: &Session, token: String) -> Result<(), AuthError> {
-        session
-            .insert(Self::SESSION_TOKEN_NAME, token)
-            .map_err(AuthError::InvalidSessionJson)
     }
 }
 
@@ -43,18 +36,18 @@ impl FromRequest for LoggedInSessionContext {
         req: &actix_web::HttpRequest,
         _payload: &mut actix_web::dev::Payload,
     ) -> Self::Future {
-        let session = Session::extract(req);
         let pool = req.app_data::<web::Data<State>>().unwrap().db_pool.clone();
 
+        let auth_token = req
+            .headers()
+            .get(HEADER_NAME)
+            .and_then(|hv| hv.to_str().map(|s| s.to_string()).ok())
+            .ok_or(AuthError::MissingFpuserAuthHeader);
+
         Box::pin(async move {
-            let session = session.await.map_err(AuthError::SessionError)?;
+            let auth_token = auth_token?;
 
-            let session_id: String = session
-                .get(Self::SESSION_TOKEN_NAME)
-                .map_err(AuthError::InvalidSessionJson)?
-                .ok_or(AuthError::MissingSessionTokenCookie)?;
-
-            let session = db::session::get_by_session_id(&pool, session_id.clone())
+            let session = db::session::get_by_session_id(&pool, auth_token.clone())
                 .await?
                 .ok_or(AuthError::NoSessionFound)?;
             // Actually verify that the session is the correct type
@@ -64,11 +57,11 @@ impl FromRequest for LoggedInSessionContext {
                 Err(AuthError::SessionTypeError)
             }?;
             let user_vault =
-                db::user_vault::get_by_logged_in_session(&pool, session_id.clone()).await?;
+                db::user_vault::get_by_logged_in_session(&pool, auth_token.clone()).await?;
 
             Ok(Self {
                 user_vault,
-                session_id,
+                auth_token,
             })
         })
     }
