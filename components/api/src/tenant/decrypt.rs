@@ -1,6 +1,7 @@
+use crate::errors::ApiError;
+use crate::tenant::AuthContext;
 use crate::types::success::ApiResponseData;
 use crate::State;
-use crate::{auth::client_secret_key::SecretTenantAuthContext, errors::ApiError};
 use crypto::seal::EciesP256Sha256AesGcmSealed;
 use db::models::access_events::{NewAccessEvent, NewAccessEventBatch};
 use db::models::user_vaults::{UserVault, UserVaultWrapper};
@@ -28,7 +29,7 @@ struct UserDecryptResponse {
 /// Requires tenant secret key auth.
 fn handler(
     state: web::Data<State>,
-    auth: SecretTenantAuthContext,
+    auth: AuthContext,
     request: Json<UserDecryptRequest>,
 ) -> actix_web::Result<Json<ApiResponseData<UserDecryptResponse>>, ApiError> {
     // grab tenant secret key from header
@@ -49,6 +50,7 @@ fn handler(
     } = decrypt_fields(&state, request.attributes.clone(), &vault).await?;
 
     // Create an AccessEvent logs showing that the tenant accessed these fields
+    // TODO potentially log encrypted email as well attributing it to specific person
     let events = fields_to_decrypt
         .iter()
         .map(|data_kind| NewAccessEvent {

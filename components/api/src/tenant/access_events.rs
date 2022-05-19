@@ -1,7 +1,8 @@
+use crate::errors::ApiError;
+use crate::tenant::AuthContext;
 use crate::types::access_event::ApiAccessEvent;
 use crate::types::success::ApiResponseData;
 use crate::State;
-use crate::{auth::client_secret_key::SecretTenantAuthContext, errors::ApiError};
 use newtypes::{DataKind, FootprintUserId};
 use paperclip::actix::{api_v2_operation, get, web, web::Json, Apiv2Schema};
 
@@ -26,11 +27,12 @@ struct AccessEventResponse {
 fn handler(
     state: web::Data<State>,
     request: web::Query<AccessEventRequest>,
-    auth: SecretTenantAuthContext,
+    auth: AuthContext,
 ) -> actix_web::Result<Json<ApiResponseData<AccessEventResponse>>, ApiError> {
     // TODO paginate the response when there are too many results
     let tenant = auth.tenant();
 
+    // TODO potentially retrieve unencrypted email for who performed the access event
     let results = db::access_event::list_for_tenant(
         &state.db_pool,
         tenant.id.clone(),

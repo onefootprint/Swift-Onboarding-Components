@@ -1,8 +1,9 @@
-use crate::tenant::workos::auth_context::WorkOSAuthMetadata;
 use crate::tenant::workos::WorkOSProfile;
 use crate::State;
 use crate::{errors::ApiError, types::success::ApiResponseData};
 use actix_session::Session;
+use chrono::{Duration, Utc};
+use db::models::session_data::{SessionState, TenantDashboardSessionData};
 use paperclip::actix::Apiv2Schema;
 use paperclip::actix::{api_v2_operation, get, web, web::Json};
 
@@ -11,14 +12,20 @@ struct Code {
     code: String,
 }
 
+#[derive(serde::Serialize, Apiv2Schema)]
+struct DashboardAuthorization {
+    authorization: String,
+    profile: WorkOSProfile,
+}
+
 #[api_v2_operation]
 #[get("/callback")]
 /// Callback function for WorkOS API
 fn handler(
     state: web::Data<State>,
-    session: Session,
+    _session: Session,
     code: web::Query<Code>,
-) -> actix_web::Result<Json<ApiResponseData<WorkOSProfile>>, ApiError> {
+) -> actix_web::Result<Json<ApiResponseData<DashboardAuthorization>>, ApiError> {
     let code = &code.code;
 
     let client = awc::Client::default();
@@ -36,15 +43,22 @@ fn handler(
         .organization_id
         .unwrap_or_else(|| state.workos_client.default_org.clone());
 
-    // Set the session -- tenant info is extracted based on org
-    WorkOSAuthMetadata {
-        email: profile.clone().email,
-        org_id,
-    }
-    .set(&session)?;
+    // Save logged in session data into the DB
+    let login_expires_at = Utc::now().naive_utc() + Duration::minutes(15);
+    let (_, auth_token) = SessionState::TenantDashboardSession(TenantDashboardSessionData {
+        email: profile.email.clone(),
+        first_name: profile.first_name.clone(),
+        last_name: profile.last_name.clone(),
+        workos_id: org_id.clone(),
+    })
+    .create(&state.db_pool, login_expires_at)
+    .await?;
 
     // TODO: Redirect to the home page :)
     Ok(Json(ApiResponseData {
-        data: profile.clone(),
+        data: DashboardAuthorization {
+            profile: profile.clone(),
+            authorization: auth_token,
+        },
     }))
 }

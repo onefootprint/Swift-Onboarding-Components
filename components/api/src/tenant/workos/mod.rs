@@ -5,10 +5,10 @@ use awc::Client;
 use paperclip::actix::web;
 use paperclip::actix::Apiv2Schema;
 
-pub mod auth_context;
 pub mod callback;
 pub mod magic_auth;
 pub mod oauth;
+pub mod workos_dashboard_auth;
 
 pub fn routes() -> web::Scope {
     web::scope("/workos")

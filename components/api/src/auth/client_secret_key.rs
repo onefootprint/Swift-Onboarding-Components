@@ -5,7 +5,7 @@ use db::models::tenants::Tenant;
 use futures_util::Future;
 use paperclip::actix::Apiv2Security;
 
-use crate::State;
+use crate::{errors::ApiError, State};
 
 use super::AuthError;
 
@@ -29,7 +29,7 @@ impl SecretTenantAuthContext {
     }
 }
 
-const HEADER_NAME: &str = "X-Client-Secret-Key";
+pub const HEADER_NAME: &str = "X-Client-Secret-Key";
 
 impl FromRequest for SecretTenantAuthContext {
     type Error = crate::ApiError;
@@ -39,24 +39,29 @@ impl FromRequest for SecretTenantAuthContext {
         req: &actix_web::HttpRequest,
         _payload: &mut actix_web::dev::Payload,
     ) -> Self::Future {
-        // get the tenant header
-        let tenant_pk = req
-            .headers()
-            .get(HEADER_NAME)
-            .and_then(|hv| hv.to_str().map(|s| s.to_string()).ok())
-            .ok_or(AuthError::MissingClientSecretAuthHeader);
-
-        let state = req.app_data::<web::Data<State>>().unwrap();
-        let pool = state.db_pool.clone();
-        let hmac_client = state.hmac_client.clone();
-
-        Box::pin(async move {
-            let sh_api_key = hmac_client.signed_hash(tenant_pk?.as_bytes()).await?;
-
-            let tenant = db::tenant::secret_auth(&pool, sh_api_key)
-                .await?
-                .ok_or(AuthError::UnknownClient)?;
-            Ok(Self { tenant })
-        })
+        let static_req = req.clone();
+        Box::pin(async move { from_request_inner(&static_req).await })
     }
+}
+
+pub async fn from_request_inner(
+    req: &actix_web::HttpRequest,
+) -> Result<SecretTenantAuthContext, ApiError> {
+    // get the tenant header
+    let tenant_pk = req
+        .headers()
+        .get(HEADER_NAME)
+        .and_then(|hv| hv.to_str().map(|s| s.to_string()).ok())
+        .ok_or(AuthError::MissingClientSecretAuthHeader)?;
+
+    let state = req.app_data::<web::Data<State>>().unwrap();
+    let pool = state.db_pool.clone();
+    let hmac_client = state.hmac_client.clone();
+
+    let sh_api_key = hmac_client.signed_hash(tenant_pk.as_bytes()).await?;
+
+    let tenant = db::tenant::secret_auth(&pool, sh_api_key)
+        .await?
+        .ok_or(AuthError::UnknownClient)?;
+    Ok(SecretTenantAuthContext { tenant })
 }

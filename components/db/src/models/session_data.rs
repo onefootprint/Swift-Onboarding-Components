@@ -17,12 +17,21 @@ pub enum SessionState {
     OnboardingSession(OnboardingSessionData), // Used for tenant- and user-specific auth
     LoggedInSession(LoggedInSessionData),     // Used for user-specific auth
     ChallengeLastSent(ChallengeLastSentData), // Used to rate limit challenges sent to phone number
+    TenantDashboardSession(TenantDashboardSessionData), // Used for auth to tenant dashboard
 }
 
 #[derive(Default, FromSqlRow, AsExpression, Serialize, Deserialize, Debug, Clone)]
 pub struct OnboardingSessionData {
     pub user_ob_id: FootprintUserId,
     pub user_vault_id: UserVaultId,
+}
+
+#[derive(Default, FromSqlRow, AsExpression, Serialize, Deserialize, Debug, Clone)]
+pub struct TenantDashboardSessionData {
+    pub email: String,
+    pub first_name: Option<String>,
+    pub last_name: Option<String>,
+    pub workos_id: String,
 }
 
 #[derive(Default, FromSqlRow, AsExpression, Serialize, Deserialize, Debug, Clone)]
