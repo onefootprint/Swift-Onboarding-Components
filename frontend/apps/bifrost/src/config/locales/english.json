@@ -79,6 +79,32 @@
           },
           "cta": "Continue"
         }
+      },
+      "ssn": {
+        "title": "What's your Social Security Number?",
+        "subtitle": "We're legally required to collect this information.",
+        "disclaimer": {
+          "security": {
+            "title": "Military-grade security",
+            "description": "Your SSN is encrypted & stored in a secure environment."
+          },
+          "privacy": {
+            "title": "Even Footprint can't see your data",
+            "description": "Your SSN will only be accessed in Footprint if required by law, and you will be made aware each time."
+          },
+          "credit-score": {
+            "title": "Your credit score won't change",
+            "description": "We use your SSN to verify your identity, not to run a credit check."
+          }
+        },
+        "form": {
+          "ssn": {
+            "label": "Social Security Number (SSN)",
+            "placeholder": "XXX-XX-XXXX",
+            "error": "SSN cannot be empty or is invalid"
+          },
+          "cta": "Complete"
+        }
       }
     }
   }
