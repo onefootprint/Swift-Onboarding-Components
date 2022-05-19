@@ -1,7 +1,6 @@
 use super::validate_challenge;
-use crate::auth::login_session::LoginSessionContext;
 use crate::errors::ApiError;
-use crate::identify::signed_hash;
+use crate::identify::{signed_hash, ChallengeState};
 use crate::types::success::ApiResponseData;
 use crate::State;
 use aws_sdk_kms::model::DataKeyPairSpec;
@@ -16,6 +15,7 @@ use super::seal;
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
 struct VerifyRequest {
     code: String,
+    e_challenge_data: String, // Sealed ChallengeState
 }
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Serialize)]
@@ -40,10 +40,9 @@ struct VerifyResponse {
 /// and onboard the user vault onto new tenants.
 async fn handler(
     state: web::Data<State>,
-    user_auth: LoginSessionContext,
     request: Json<VerifyRequest>,
 ) -> actix_web::Result<Json<ApiResponseData<VerifyResponse>>, ApiError> {
-    let challenge_data = user_auth.challenge_state;
+    let challenge_data = ChallengeState::unseal(&request.e_challenge_data, &state)?;
 
     if !validate_challenge(request.code.clone(), &challenge_data).await? {
         return Err(ApiError::ChallengeNotValid);

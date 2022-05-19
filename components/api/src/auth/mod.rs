@@ -5,7 +5,6 @@ use crate::errors::ApiError;
 pub mod client_public_key;
 pub mod client_secret_key;
 pub mod logged_in_session;
-pub mod login_session;
 
 #[derive(Debug, Error)]
 pub enum AuthError {

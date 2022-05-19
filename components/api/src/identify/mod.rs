@@ -3,7 +3,8 @@ mod livecheck;
 pub mod phone;
 pub mod verify;
 
-use crate::auth::login_session::ChallengeState;
+use std::str::FromStr;
+
 use crate::signed_hash;
 use crate::{errors::ApiError, State};
 use aws_sdk_pinpointemail::model::{
@@ -31,6 +32,36 @@ pub(crate) enum CreateChallengeRequest {
 pub struct EmailVerifyChallenge {
     pub expires_at: NaiveDateTime,
     pub email: String,
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct ChallengeState {
+    pub phone_number: String,
+    pub h_code: Vec<u8>,
+    pub created_at: NaiveDateTime,
+}
+
+impl ChallengeState {
+    pub fn seal(self, _state: &web::Data<State>) -> Result<String, ApiError> {
+        // TODO encrypt or sign
+        let serialized = serde_json::to_string(&self)?;
+        let encoded = Base64Data(serialized.as_bytes().to_vec()).to_string();
+        Ok(encoded)
+    }
+
+    pub fn unseal(sealed: &str, _state: &web::Data<State>) -> Result<Self, ApiError> {
+        // TODO decrypt or verify signature
+        let decoded = Base64Data::from_str(sealed).map_err(crypto::Error::from)?;
+        let decoded = std::str::from_utf8(&decoded.0)?.to_string();
+        let deserialized = serde_json::from_str(&decoded)?;
+        Ok(deserialized)
+    }
+}
+
+#[derive(Debug, Clone, Apiv2Schema, serde::Serialize)]
+pub struct ChallengeResponse {
+    phone_number_last_two: String,
+    e_challenge_data: String, // Sealed ChallengeState
 }
 
 // TODO move these utils somewhere else

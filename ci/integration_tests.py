@@ -37,27 +37,6 @@ def _fpuser_auth_headers(request):
         FPUSER_AUTH_HEADER: request.config.cache.get("fpuser_auth_token", None),
     }
 
-def _parse_cookies(response):
-    # TODO the requests library should do this for us, but it gets angry when we send a `Domain=.localhost` in the set-cookie header
-    # This is very hacky and might break
-    set_cookie_h = response.headers.get("set-cookie", None)
-    if not set_cookie_h:
-        return dict()
-    all_cookies = set_cookie_h.split(";")[0]
-    id_cookie = all_cookies.split("id=")[1]
-    return {
-        "id": id_cookie,
-    }
-
-def _set_cookies(request, response):
-    cookies = _parse_cookies(response)
-    assert cookies, "Set-Cookie response header should be provided"
-    request.config.cache.set("cookies", cookies)
-
-def _assert_no_cookies(response):
-    cookies = _parse_cookies(response)
-    assert not cookies, "Set-Cookie response header should not be provided"
-
 def _assert_response(response, status_code=200, msg="Incorrect status code"):
     print(response.content)
     assert response.status_code == status_code, msg
@@ -102,7 +81,8 @@ def test_identify_email(request):
         json=data,
     )
     body = _assert_response(r)
-    assert body["data"] == "user_not_found"
+    assert body["data"]["status"] == "user_not_found"
+    assert not body["data"].get("challenge_data", dict())
 
 
 def test_identify_phone(request):
@@ -117,22 +97,24 @@ def test_identify_phone(request):
     )
     body = _assert_response(r)
     assert body["data"]["phone_number_last_two"] == last_two
-    _set_cookies(request, r)
+    request.config.cache.set("e_challenge_data", body["data"]["e_challenge_data"])
+
 
 def test_identify_verify(request):
     path = "identify/verify"
     print(url(path))
-    data = {"code": TEST_CHALLENGE_CODE}
+    data = {
+        "code": TEST_CHALLENGE_CODE,
+        "e_challenge_data": request.config.cache.get("e_challenge_data", None),
+    }
     r = requests.post(
         url(path),
         json=data,
-        cookies=request.config.cache.get("cookies", None),
     )
     body = _assert_response(r)
     assert body["data"]["kind"] == "user_created"
     auth_token = body["data"]["auth_token"]
     request.config.cache.set("fpuser_auth_token", auth_token)
-    _assert_no_cookies(r)
 
 def test_onboard_init(request, tenant1):
     path = "onboarding"
@@ -143,7 +125,6 @@ def test_onboard_init(request, tenant1):
     )
     body = _assert_response(r)
     assert set(body["data"]["missing_attributes"]) == {"first_name", "last_name", "dob", "ssn", "street_address", "city", "state", "email"}
-    _assert_no_cookies(r)
     
 def test_user_data(request):
     path = "user/data"
@@ -164,7 +145,6 @@ def test_user_data(request):
         headers=_fpuser_auth_headers(request),
     )
     _assert_response(r)
-    _assert_no_cookies(r)
 
 def test_onboarding_commit(request, tenant1): 
     path = "onboarding/commit"
@@ -177,7 +157,6 @@ def test_onboarding_commit(request, tenant1):
     fp_user_id = body["data"]["footprint_user_id"]
     assert fp_user_id
     request.config.cache.set("fp_user_id", fp_user_id)
-    _assert_no_cookies(r)
 
 def test_identify_repeat_customer_via_email(request, tenant2):
     # Identify the user by email
@@ -192,23 +171,24 @@ def test_identify_repeat_customer_via_email(request, tenant2):
         json=data,
     )
     body = _assert_response(r)
-    assert body["data"]["phone_number_last_two"] == phone_number[-2:]
-    _set_cookies(request, r)
+    assert body["data"]["status"] == "user_found"
+    assert body["data"]["challenge_data"]["phone_number_last_two"] == phone_number[-2:]
 
     # Log in as the user
     path = "identify/verify"
     print(url(path))
-    data = {"code": "123456"}
+    data = {
+        "code": TEST_CHALLENGE_CODE,
+        "e_challenge_data": body["data"]["challenge_data"]["e_challenge_data"],
+    }
     r = requests.post(
         url(path),
         json=data,
-        cookies=request.config.cache.get("cookies", None),
     )
     body = _assert_response(r)
     assert body["data"]["kind"] == "user_inherited"
     auth_token = body["data"]["auth_token"]
     request.config.cache.set("fpuser_auth_token", auth_token)
-    _assert_no_cookies(r)
 
     # Start onboarding for user
     path = "onboarding"
@@ -219,7 +199,6 @@ def test_identify_repeat_customer_via_email(request, tenant2):
     )
     body = _assert_response(r)
     assert not body["data"]["missing_attributes"]
-    _assert_no_cookies(r)
 
     # Commit onboarding for user
     path = "onboarding/commit"
@@ -233,7 +212,6 @@ def test_identify_repeat_customer_via_email(request, tenant2):
     assert fp_user_id
     old_fp_user_id = request.config.cache.get("fp_user_id", None)
     assert old_fp_user_id != fp_user_id, "Different tenants should have different fp_user_ids"
-    _assert_no_cookies(r)
     
 def test_tenant_decrypt(request, tenant1):
     path = "tenant/decrypt"
@@ -252,7 +230,6 @@ def test_tenant_decrypt(request, tenant1):
     attributes = body["data"]["attributes"]
     assert attributes["first_name"] == "Flerp"
     assert attributes["email"] == request.config.cache.get("email", None)
-    _assert_no_cookies(r)
     
 def test_onboardings_list(request, tenant1):
     path = "tenant/onboardings"
@@ -279,7 +256,6 @@ def test_access_events_list(request, tenant1):
     access_events = body["data"]["events"]
     assert len(access_events) == 2
     assert set(i["data_kind"] for i in access_events) == {"first_name", "email"}
-    _assert_no_cookies(r)
 
     # Test filtering on kind
     path = f"tenant/access_events?footprint_user_id={fp_user_id}&data_kind=email"
@@ -291,7 +267,6 @@ def test_access_events_list(request, tenant1):
     access_events = body["data"]["events"]
     assert len(access_events) == 1
     assert access_events[0]["data_kind"] == "email"
-    _assert_no_cookies(r)
 
 def test_logged_in_user_detail(request):
     # Get the user detail using the logged in context
@@ -305,7 +280,6 @@ def test_logged_in_user_detail(request):
     user = body["data"]
     assert user["first_name"] == "Flerp"
     assert user["last_name"] == "Derp"
-    _assert_no_cookies(r)
 
 def test_logged_in_access_events(request):
     # Get the user detail using the logged in context
@@ -319,7 +293,6 @@ def test_logged_in_access_events(request):
     access_events = body["data"]["events"]
     assert len(access_events) == 2
     assert set(i["data_kind"] for i in access_events) == {"first_name", "email"}
-    _assert_no_cookies(r)
 
 def test_logged_in_decrypt(request, tenant1):
     path = "user/decrypt"
@@ -337,4 +310,3 @@ def test_logged_in_decrypt(request, tenant1):
     attributes = body["data"]["attributes"]
     assert attributes["phone_number"][-4:] == request.config.cache.get("phone_number", None)[-4:]
     assert attributes["email"] == request.config.cache.get("email", None)
-    _assert_no_cookies(r)
