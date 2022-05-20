@@ -4,9 +4,11 @@ export type UIStates = {
   info: string;
   success: string;
   warning: string;
-  warningBackground: string;
+  neutral: string;
   errorBackground: string;
   infoBackground: string;
+  successBackground: string;
+  warningBackground: string;
   neutralBackground: string;
 };
 
