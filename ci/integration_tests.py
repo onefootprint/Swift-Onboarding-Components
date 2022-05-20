@@ -262,7 +262,7 @@ def test_access_events_list(request, tenant1):
     body = _assert_response(r)
     access_events = body["data"]["events"]
     assert len(access_events) == 4
-    assert set(i["data_kind"] for i in access_events) == {"first_name", "email"}
+    assert set(i["data_kind"] for i in access_events) == {"first_name", "email", "zip", "country"}
 
     # Test filtering on kind
     path = f"tenant/access_events?footprint_user_id={fp_user_id}&data_kind=email"
@@ -299,7 +299,7 @@ def test_logged_in_access_events(request):
     body = _assert_response(r)
     access_events = body["data"]["events"]
     assert len(access_events) == 4
-    assert set(i["data_kind"] for i in access_events) == {"first_name", "email"}
+    assert set(i["data_kind"] for i in access_events) == {"first_name", "email", "zip", "country"}
 
 def test_logged_in_decrypt(request, tenant1):
     path = "user/decrypt"
