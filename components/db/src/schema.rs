@@ -103,6 +103,8 @@ table! {
         e_street_address -> Nullable<Bytea>,
         e_city -> Nullable<Bytea>,
         e_state -> Nullable<Bytea>,
+        e_zip -> Nullable<Bytea>,
+        e_country -> Nullable<Bytea>,
         e_phone_number -> Bytea,
         sh_phone_number -> Bytea,
         id_verified -> User_status,

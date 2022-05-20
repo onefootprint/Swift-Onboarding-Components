@@ -61,6 +61,18 @@ struct UserPatchRequest {
         skip_serializing_if = "Option::is_none",
         with = "::serde_with::rust::double_option"
     )]
+    zip: Option<Option<String>>,
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        with = "::serde_with::rust::double_option"
+    )]
+    country: Option<Option<String>>,
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        with = "::serde_with::rust::double_option"
+    )]
     email: Option<Option<String>>,
 }
 
@@ -119,6 +131,8 @@ async fn handler(
         e_street_address: seal(request.street_address.clone(), user_vault)?,
         e_city: seal(request.city.clone(), user_vault)?,
         e_state: seal(request.state.clone(), user_vault)?,
+        e_zip: seal(request.zip.clone(), user_vault)?,
+        e_country: seal(request.country.clone(), user_vault)?,
         ..Default::default()
     };
 

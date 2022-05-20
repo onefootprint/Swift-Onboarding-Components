@@ -127,7 +127,7 @@ def test_onboard_init(request, tenant1):
         headers=dict(**_client_pub_key_headers(tenant1["pk"]), **_fpuser_auth_headers(request)),
     )
     body = _assert_response(r)
-    assert set(body["data"]["missing_attributes"]) == {"first_name", "last_name", "dob", "ssn", "street_address", "city", "state", "email"}
+    assert set(body["data"]["missing_attributes"]) == {"first_name", "last_name", "dob", "ssn", "street_address", "city", "state", "zip", "country", "email"}
     
 def test_user_data(request):
     path = "user/data"
@@ -139,6 +139,8 @@ def test_user_data(request):
         "street_address": "1 Footprint Way",
         "city": "Enclave",
         "state": "NY",
+        "zip": "10009",
+        "country": "USA",
         "email": request.config.cache.get("email", None),
     }
     print(url(path))
@@ -221,7 +223,7 @@ def test_tenant_decrypt(request, tenant1):
     print(url(path))
     data = {
         "footprint_user_id": request.config.cache.get("fp_user_id", None),
-        "attributes": ["first_name", "email"]
+        "attributes": ["first_name", "email", "zip", "country"]
     }
     print(data)
     r = requests.post(
@@ -232,6 +234,8 @@ def test_tenant_decrypt(request, tenant1):
     body = _assert_response(r)
     attributes = body["data"]["attributes"]
     assert attributes["first_name"] == "Flerp"
+    assert attributes["zip"] == "10009"
+    assert attributes["country"] == "USA"
     assert attributes["email"] == request.config.cache.get("email", None)
     
 def test_onboardings_list(request, tenant1):
@@ -257,7 +261,7 @@ def test_access_events_list(request, tenant1):
     )
     body = _assert_response(r)
     access_events = body["data"]["events"]
-    assert len(access_events) == 2
+    assert len(access_events) == 4
     assert set(i["data_kind"] for i in access_events) == {"first_name", "email"}
 
     # Test filtering on kind
@@ -294,7 +298,7 @@ def test_logged_in_access_events(request):
     )
     body = _assert_response(r)
     access_events = body["data"]["events"]
-    assert len(access_events) == 2
+    assert len(access_events) == 4
     assert set(i["data_kind"] for i in access_events) == {"first_name", "email"}
 
 def test_logged_in_decrypt(request, tenant1):

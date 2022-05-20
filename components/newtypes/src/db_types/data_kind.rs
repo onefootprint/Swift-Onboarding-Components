@@ -31,6 +31,8 @@ pub enum DataKind {
     StreetAddress,
     City,
     State,
+    Zip,
+    Country,
     Email,
     PhoneNumber,
 }

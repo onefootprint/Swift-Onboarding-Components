@@ -39,6 +39,8 @@ CREATE TABLE user_vaults (
     e_street_address BYTEA,
     e_city BYTEA,
     e_state BYTEA,
+    e_zip BYTEA,
+    e_country BYTEA,
     e_phone_number BYTEA NOT NULL,
     sh_phone_number BYTEA NOT NULL UNIQUE,
     id_verified User_Status NOT NULL,
@@ -46,7 +48,7 @@ CREATE TABLE user_vaults (
     updated_at timestamp NOT NULL DEFAULT NOW()
 );
 
-CREATE TYPE data_kind as ENUM ('FirstName', 'LastName', 'Dob', 'Ssn', 'StreetAddress', 'City', 'State', 'Email', 'PhoneNumber');
+CREATE TYPE data_kind as ENUM ('FirstName', 'LastName', 'Dob', 'Ssn', 'StreetAddress', 'City', 'State', 'Zip', 'Country', 'Email', 'PhoneNumber');
 
 CREATE INDEX IF NOT EXISTS user_vaults_sh_ssn ON user_vaults(sh_ssn);
 CREATE INDEX IF NOT EXISTS user_vaults_sh_phone_number ON user_vaults(sh_phone_number);

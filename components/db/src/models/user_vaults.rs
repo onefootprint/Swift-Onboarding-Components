@@ -24,6 +24,8 @@ pub struct UserVault {
     pub e_street_address: Option<Vec<u8>>,
     pub e_city: Option<Vec<u8>>,
     pub e_state: Option<Vec<u8>>,
+    pub e_zip: Option<Vec<u8>>,
+    pub e_country: Option<Vec<u8>>,
     pub e_phone_number: Vec<u8>,
     pub sh_phone_number: Vec<u8>,
     pub id_verified: Status,
@@ -43,6 +45,8 @@ pub struct UpdateUserVault {
     pub e_street_address: Option<Vec<u8>>,
     pub e_city: Option<Vec<u8>>,
     pub e_state: Option<Vec<u8>>,
+    pub e_zip: Option<Vec<u8>>,
+    pub e_country: Option<Vec<u8>>,
     pub e_phone_number: Option<Vec<u8>>,
     pub sh_phone_number: Option<Vec<u8>>,
 }
@@ -97,6 +101,8 @@ impl<'a> UserVaultWrapper<'a> {
             DataKind::StreetAddress => self.user_vault.e_street_address.as_ref(),
             DataKind::City => self.user_vault.e_city.as_ref(),
             DataKind::State => self.user_vault.e_state.as_ref(),
+            DataKind::Zip => self.user_vault.e_zip.as_ref(),
+            DataKind::Country => self.user_vault.e_country.as_ref(),
             DataKind::Email => Some(&self.user_data.get(&data_kind)?.get(0)?.e_data),
             DataKind::PhoneNumber => Some(&self.user_vault.e_phone_number),
         }
@@ -112,6 +118,8 @@ impl<'a> UserVaultWrapper<'a> {
             DataKind::StreetAddress,
             DataKind::City,
             DataKind::State,
+            DataKind::Zip,
+            DataKind::Country,
             DataKind::Email,
             DataKind::PhoneNumber,
         ]
