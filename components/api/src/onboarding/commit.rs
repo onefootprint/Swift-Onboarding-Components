@@ -3,7 +3,7 @@ use crate::auth::logged_in_session::LoggedInSessionContext;
 use crate::errors::ApiError;
 use crate::types::success::ApiResponseData;
 use crate::State;
-use crate::{auth::client_public_key::PublicTenantAuthContext, liveness::get_opt_webauthn_creds};
+use crate::{auth::client_public_key::PublicTenantAuthContext, liveness::get_webauthn_creds};
 use db::models::user_vaults::UserVaultWrapper;
 use newtypes::FootprintUserId;
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
@@ -12,6 +12,8 @@ use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 struct CommitResponse {
     /// Unique footprint user id
     footprint_user_id: FootprintUserId,
+    /// Boolean true / false if webauthn set
+    missing_webauthn_credentials: bool,
 }
 
 #[api_v2_operation]
@@ -33,20 +35,18 @@ fn handler(
         .into_iter()
         .map(|x| x.to_string())
         .collect::<Vec<String>>();
-    let webauthn_creds = get_opt_webauthn_creds(&state, uv_id).await?;
+    let webauthn_creds = get_webauthn_creds(&state, uv_id).await?;
 
-    match (missing_fields.len(), webauthn_creds) {
-        (0, Some(_)) => Ok(Json(ApiResponseData {
+    if missing_fields.is_empty() {
+        Ok(Json(ApiResponseData {
             data: CommitResponse {
                 footprint_user_id: onboarding.user_ob_id.clone(),
+                missing_webauthn_credentials: webauthn_creds.is_empty(),
             },
-        })),
-        (0, None) => Err(ApiError::WebauthnCredentialsNotSet),
-        (_, Some(_)) => Err(ApiError::UserMissingRequiredFields(
+        }))
+    } else {
+        Err(ApiError::UserMissingRequiredFields(
             missing_fields.join(","),
-        )),
-        _ => Err(ApiError::UserMissingWebauthnAndFields(
-            missing_fields.join(","),
-        )),
+        ))
     }
 }

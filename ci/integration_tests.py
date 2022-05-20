@@ -128,6 +128,7 @@ def test_onboard_init(request, tenant1):
     )
     body = _assert_response(r)
     assert set(body["data"]["missing_attributes"]) == {"first_name", "last_name", "dob", "ssn", "street_address", "city", "state", "zip", "country", "email"}
+    assert body["data"]["missing_webauthn_credentials"] == True
     
 def test_user_data(request):
     path = "user/data"
@@ -151,6 +152,7 @@ def test_user_data(request):
     )
     _assert_response(r)
 
+
 def test_onboarding_commit(request, tenant1): 
     path = "onboarding/commit"
     print(url(path))
@@ -160,6 +162,7 @@ def test_onboarding_commit(request, tenant1):
     )
     body = _assert_response(r)
     fp_user_id = body["data"]["footprint_user_id"]
+    assert body["data"]["missing_webauthn_credentials"] == True
     assert fp_user_id
     request.config.cache.set("fp_user_id", fp_user_id)
 

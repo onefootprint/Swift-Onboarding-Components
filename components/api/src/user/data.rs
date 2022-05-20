@@ -102,7 +102,7 @@ async fn handler(
     ) -> Result<Option<Vec<u8>>, ApiError> {
         let res = match val {
             None | Some(None) => None,
-            Some(Some(val)) => Some(crate::identify::signed_hash(&state, val).await?),
+            Some(Some(val)) => Some(crate::identify::signed_hash(state, val).await?),
         };
         Ok(res)
     }

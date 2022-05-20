@@ -24,14 +24,13 @@ pub struct WebauthnCredential {
 }
 
 impl WebauthnCredential {
-    pub fn get_opt_for_user_vault(
+    pub fn get_for_user_vault(
         conn: &PgConnection,
         user_vault_id: UserVaultId,
-    ) -> Result<Option<Vec<Self>>, crate::DbError> {
+    ) -> Result<Vec<Self>, crate::DbError> {
         let creds = schema::webauthn_credentials::table
             .filter(schema::webauthn_credentials::user_vault_id.eq(user_vault_id))
-            .get_results(conn)
-            .optional()?;
+            .get_results(conn)?;
 
         Ok(creds)
     }

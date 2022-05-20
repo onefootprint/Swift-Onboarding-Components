@@ -1,6 +1,7 @@
 use crate::auth::client_public_key::PublicTenantAuthContext;
 use crate::auth::logged_in_session::LoggedInSessionContext;
 use crate::errors::ApiError;
+use crate::liveness::get_webauthn_creds;
 use crate::types::success::ApiResponseData;
 use crate::State;
 use db::models::onboardings::{NewOnboarding, Onboarding};
@@ -12,6 +13,8 @@ use paperclip::actix::{api_v2_operation, web, web::Json, Apiv2Schema};
 pub struct OnboardingResponse {
     /// Attributes needed to successfully onboard this user
     missing_attributes: Vec<DataKind>,
+    /// Whether or not webauthn credentials are needed for this user
+    missing_webauthn_credentials: bool,
 }
 
 #[api_v2_operation]
@@ -31,10 +34,13 @@ pub fn handler(
     .get_or_create(&state.db_pool)
     .await?;
 
+    let webauthn_creds = get_webauthn_creds(&state, uv.id.clone()).await?;
+
     let uvw = UserVaultWrapper::from(&state.db_pool, uv).await?;
     Ok(Json(ApiResponseData {
         data: OnboardingResponse {
             missing_attributes: uvw.missing_fields(),
+            missing_webauthn_credentials: webauthn_creds.is_empty(),
         },
     }))
 }

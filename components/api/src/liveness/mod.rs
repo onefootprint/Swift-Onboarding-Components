@@ -87,16 +87,16 @@ impl WebauthnConfig for LivenessWebauthnConfig {
     }
 }
 
-pub async fn get_opt_webauthn_creds(
+pub async fn get_webauthn_creds(
     state: &web::Data<State>,
     user_vault_id: UserVaultId,
-) -> Result<Option<Vec<WebauthnCredential>>, DbError> {
+) -> Result<Vec<WebauthnCredential>, DbError> {
     state
         .db_pool
         .get()
         .await
         .map_err(DbError::from)?
-        .interact(move |conn| WebauthnCredential::get_opt_for_user_vault(conn, user_vault_id))
+        .interact(move |conn| WebauthnCredential::get_for_user_vault(conn, user_vault_id))
         .await
         .map_err(DbError::from)?
 }

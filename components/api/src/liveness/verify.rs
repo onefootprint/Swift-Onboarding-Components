@@ -1,7 +1,7 @@
 use crate::{
     errors::ApiError,
     identify::{clean_email, signed_hash},
-    liveness::{get_opt_webauthn_creds, LivenessWebauthnConfig},
+    liveness::{get_webauthn_creds, LivenessWebauthnConfig},
     types::success::ApiResponseData,
     utils::challenge::Challenge,
     State,
@@ -51,9 +51,12 @@ pub async fn init(
         .map(|x| x.0)
         .ok_or(ApiError::UserDoesntExistForEmailChallenge)?;
     // look up webauthn credentials
-    let creds = get_opt_webauthn_creds(&state, existing_user.id.clone())
-        .await?
-        .ok_or(ApiError::WebauthnCredentialsNotSet)?;
+    let creds = get_webauthn_creds(&state, existing_user.id.clone()).await?;
+
+    if creds.is_empty() {
+        return Err(ApiError::WebauthnCredentialsNotSet);
+    }
+
     // convert these creds to webauthn rs type
     let creds = creds
         .into_iter()
