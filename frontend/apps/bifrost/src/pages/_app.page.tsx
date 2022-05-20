@@ -5,6 +5,7 @@ import FootprintFooter from 'src/components/footprint-footer/footprint-footer';
 import styled, { createGlobalStyle, css } from 'styled';
 import { Container, DesignSystemProvider, IconButton, themes } from 'ui';
 
+import { BifrostMachineProvider } from '../components/bifrost-machine-provider';
 import configureReactI18next from '../config/initializers/react-i18next';
 import queryClient from '../config/initializers/react-query';
 import configureSentry from '../config/initializers/sentry';
@@ -19,16 +20,18 @@ type AppProps = {
 
 const App = ({ Component, pageProps }: AppProps) => (
   <QueryClientProvider client={queryClient}>
-    <DesignSystemProvider theme={themes.light}>
-      <GlobalStyle />
-      <Container>
-        <Header>
-          <IconButton Icon={IcoClose24} ariaLabel="Close window" />
-        </Header>
-        <Component {...pageProps} />
-        <FootprintFooter />
-      </Container>
-    </DesignSystemProvider>
+    <BifrostMachineProvider>
+      <DesignSystemProvider theme={themes.light}>
+        <GlobalStyle />
+        <Container>
+          <Header>
+            <IconButton Icon={IcoClose24} ariaLabel="Close window" />
+          </Header>
+          <Component {...pageProps} />
+          <FootprintFooter />
+        </Container>
+      </DesignSystemProvider>
+    </BifrostMachineProvider>
   </QueryClientProvider>
 );
 

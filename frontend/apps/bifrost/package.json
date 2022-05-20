@@ -32,6 +32,7 @@
     "@types/styled-components": "^5.1.25",
     "@xstate/react": "^3.0.0",
     "config": "*",
+    "constate": "^3.3.2",
     "eslint": "7.32.0",
     "i18next": "^21.8.3",
     "lodash": "^4.17.21",

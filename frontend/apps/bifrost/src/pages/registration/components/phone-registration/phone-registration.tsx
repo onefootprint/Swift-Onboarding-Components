@@ -1,8 +1,10 @@
+import { Events } from '@src/types/bifrost-machine';
 import { useTranslation } from 'hooks';
 import IcoEmail24 from 'icons/ico/ico-email-24';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import Header from 'src/components/header';
+import useBifrostMachine from 'src/hooks/use-bifrost-machine';
 import styled, { css } from 'styled';
 import { Button, LinkButton, TextInput, Typography } from 'ui';
 
@@ -11,6 +13,7 @@ type FormData = {
 };
 
 const PhoneRegistration = () => {
+  const [state, send] = useBifrostMachine();
   const { t } = useTranslation('pages.registration.phone-registration');
   const {
     register,
@@ -19,7 +22,7 @@ const PhoneRegistration = () => {
   } = useForm<FormData>();
 
   const handleChangeEmail = () => {
-    // TODO: Understand what needs to be done
+    send({ type: Events.changeEmail });
   };
 
   const onSubmit = (formData: FormData) => {
@@ -34,7 +37,7 @@ const PhoneRegistration = () => {
       <EmailCard>
         <IcoEmail24 />
         <Typography variant="label-3" color="primary" sx={{ flexGrow: 1 }}>
-          john.doe@gmail.com
+          {state.context.registration.email}
         </Typography>
         <LinkButton size="tiny" onClick={handleChangeEmail}>
           {t('email-card.cta')}

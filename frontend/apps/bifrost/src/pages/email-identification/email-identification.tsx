@@ -1,5 +1,7 @@
+import { Events } from '@src/types/bifrost-machine';
 import React from 'react';
 import { useForm } from 'react-hook-form';
+import useBifrostMachine from 'src/hooks/use-bifrost-machine';
 import useIdentifyEmail, {
   IdentifyEmailRequest,
   IdentifyEmailResponse,
@@ -12,6 +14,8 @@ type FormData = {
 };
 
 const EmailIdentification = () => {
+  const [, send] = useBifrostMachine();
+
   const identifyEmailMutation = useIdentifyEmail();
   const {
     register,
@@ -20,13 +24,28 @@ const EmailIdentification = () => {
   } = useForm<FormData>();
 
   const onSubmit = (formData: FormData) => {
-    const payload: IdentifyEmailRequest = {
-      email: formData.email,
+    const { email } = formData;
+    const request: IdentifyEmailRequest = {
+      email,
     };
-    identifyEmailMutation.mutate(payload, {
+    identifyEmailMutation.mutate(request, {
       onSuccess({ userFound, challengeData }: IdentifyEmailResponse) {
-        console.log('userFound', userFound);
-        console.log('challengeData', challengeData);
+        if (userFound && challengeData) {
+          send({
+            type: Events.userFound,
+            payload: {
+              email,
+              ...challengeData,
+            },
+          });
+        } else {
+          send({
+            type: Events.userNotFound,
+            payload: {
+              email,
+            },
+          });
+        }
       },
     });
   };

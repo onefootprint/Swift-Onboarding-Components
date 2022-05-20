@@ -1,4 +1,5 @@
 import React from 'react';
+import useBifrostMachine from 'src/hooks/use-bifrost-machine';
 import useIdentifyEmail, {
   IdentifyEmailRequest,
 } from 'src/hooks/use-identify-email';
@@ -8,28 +9,19 @@ import { Box, LinkButton, LoadingIndicator, PinInput, Typography } from 'ui';
 import useVerifyPhone, {
   VerifyPhoneRequest,
   VerifyPhoneResponse,
-  VerifyPhoneResponseKind,
+  // VerifyPhoneResponseKind,
 } from './hooks/use-verify-phone';
 
-type PhoneVerificationProps = {
-  email: string;
-  challengeToken: string; // API token received after email-identification
-  phoneLastTwoDigits: string;
-  onVerifyUser?: (authToken: string) => void;
-  onCreateUser?: (authToken: string) => void;
-};
-
-const PhoneVerification = ({
-  email,
-  challengeToken,
-  phoneLastTwoDigits,
-  onVerifyUser,
-  onCreateUser,
-}: PhoneVerificationProps) => {
+const PhoneVerification = () => {
+  const [state] = useBifrostMachine();
+  const { email, phoneLastTwoDigits, challengeToken } =
+    state.context.identification;
   const identifyEmailMutation = useIdentifyEmail();
   const verifyPhoneMutation = useVerifyPhone();
 
   const resendVerification = () => {
+    // TODO: ADJUST
+    // @ts-ignore
     const payload: IdentifyEmailRequest = { email };
     identifyEmailMutation.mutate(payload);
   };
@@ -37,15 +29,19 @@ const PhoneVerification = ({
   const validatePin = (pin: string) => {
     const payload: VerifyPhoneRequest = {
       code: pin,
+      // TODO: ADJUST
+      // @ts-ignore
       challengeToken,
     };
     verifyPhoneMutation.mutate(payload, {
       onSuccess: ({ authToken, kind }: VerifyPhoneResponse) => {
-        if (kind === VerifyPhoneResponseKind.UserCreated) {
-          onCreateUser?.(authToken);
-        } else if (kind === VerifyPhoneResponseKind.UserFound) {
-          onVerifyUser?.(authToken);
-        }
+        console.log(kind);
+        console.log(authToken);
+        // if (kind === VerifyPhoneResponseKind.UserCreated) {
+        // onCreateUser?.(authToken);
+        // } else if (kind === VerifyPhoneResponseKind.UserFound) {
+        // onVerifyUser?.(authToken);
+        // }
       },
       onError(error) {
         // TODO: handle errors better
