@@ -1,6 +1,7 @@
 import IcoClose24 from 'icons/ico/ico-close-24';
 import React from 'react';
 import { QueryClientProvider } from 'react-query';
+import FootprintFooter from 'src/components/footprint-footer/footprint-footer';
 import styled, { createGlobalStyle, css } from 'styled';
 import { Container, DesignSystemProvider, IconButton, themes } from 'ui';
 
@@ -23,8 +24,9 @@ const App = ({ Component, pageProps }: AppProps) => (
       <Container>
         <Header>
           <IconButton Icon={IcoClose24} ariaLabel="Close window" />
-          <Component {...pageProps} />
         </Header>
+        <Component {...pageProps} />
+        <FootprintFooter />
       </Container>
     </DesignSystemProvider>
   </QueryClientProvider>
