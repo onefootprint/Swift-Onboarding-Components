@@ -1,29 +1,33 @@
 import { useMutation } from 'react-query';
-import request from 'request';
+import request, { RequestError, RequestResponse } from 'request';
 
-export interface IdentifyEmailRequest {
+export type IdentifyEmailRequest = {
   email: string;
-}
+};
 
-export enum IdentifyEmailResponseKind {
-  UserNotFound = 'user_not_found',
-}
+export type IdentifyEmailChallenge = {
+  challengeToken: string;
+  phoneNumberLastTwo: string;
+};
 
-export interface IdentifyEmailResponse {
-  data: {
-    data:
-      | IdentifyEmailResponseKind
-      | {
-          phone_number_last_two: string;
-        };
-  };
-}
+export type IdentifyEmailResponse = {
+  userFound: boolean;
+  challengeData: IdentifyEmailChallenge | null;
+};
 
-const identifyEmailRequest = (payload: IdentifyEmailRequest) =>
-  request({ method: 'POST', url: '/identify/email', data: payload });
+const identifyEmailRequest = async (payload: IdentifyEmailRequest) => {
+  const { data: response } = await request<
+    RequestResponse<IdentifyEmailResponse>
+  >({
+    method: 'POST',
+    url: '/identify/email',
+    data: payload,
+  });
+  return response.data;
+};
 
 const useIdentifyEmail = () =>
-  useMutation<IdentifyEmailResponse, any, IdentifyEmailRequest>(
+  useMutation<IdentifyEmailResponse, RequestError, IdentifyEmailRequest>(
     identifyEmailRequest,
   );
 

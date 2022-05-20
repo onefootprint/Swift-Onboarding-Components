@@ -1,25 +1,35 @@
 import { useMutation } from 'react-query';
-import request from 'request';
+import request, { RequestError, RequestResponse } from 'request';
 
-export interface VerifyPhoneRequest {
+export type VerifyPhoneRequest = {
+  challengeToken: string; // Challenge token received after email-identification
   code: string; // 6 digit challenge that was sent to user's phone number
-}
+};
 
 export enum VerifyPhoneResponseKind {
   UserCreated = 'user_created', // Created a new user vault
   UserFound = 'user_inherited', // Found an existing user vault
 }
 
-export interface VerifyPhoneResponse {
-  data: {
-    data: VerifyPhoneResponseKind;
-  };
-}
+export type VerifyPhoneResponse = {
+  authToken: string;
+  kind: VerifyPhoneResponseKind;
+};
 
-const verifyPhoneRequest = (payload: VerifyPhoneRequest) =>
-  request({ method: 'POST', url: '/identify/verify', data: payload });
+const verifyPhoneRequest = async (payload: VerifyPhoneRequest) => {
+  const { data: response } = await request<
+    RequestResponse<VerifyPhoneResponse>
+  >({
+    method: 'POST',
+    url: '/identify/verify',
+    data: payload,
+  });
+  return response.data;
+};
 
 const useVerifyPhone = () =>
-  useMutation<VerifyPhoneResponse, any, VerifyPhoneRequest>(verifyPhoneRequest);
+  useMutation<VerifyPhoneResponse, RequestError, VerifyPhoneRequest>(
+    verifyPhoneRequest,
+  );
 
 export default useVerifyPhone;

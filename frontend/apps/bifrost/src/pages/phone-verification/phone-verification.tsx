@@ -11,16 +11,20 @@ import useVerifyPhone, {
   VerifyPhoneResponseKind,
 } from './hooks/use-verify-phone';
 
-interface PhoneVerificationProps {
+type PhoneVerificationProps = {
   email: string;
+  challengeToken: string; // API token received after email-identification
   phoneLastTwoDigits: string;
-  onVerifyUser: () => void;
-}
+  onVerifyUser?: (authToken: string) => void;
+  onCreateUser?: (authToken: string) => void;
+};
 
 const PhoneVerification = ({
   email,
+  challengeToken,
   phoneLastTwoDigits,
   onVerifyUser,
+  onCreateUser,
 }: PhoneVerificationProps) => {
   const identifyEmailMutation = useIdentifyEmail();
   const verifyPhoneMutation = useVerifyPhone();
@@ -31,15 +35,21 @@ const PhoneVerification = ({
   };
 
   const validatePin = (pin: string) => {
-    const payload: VerifyPhoneRequest = { code: pin };
+    const payload: VerifyPhoneRequest = {
+      code: pin,
+      challengeToken,
+    };
     verifyPhoneMutation.mutate(payload, {
-      onSuccess: (response: VerifyPhoneResponse) => {
-        const responseData = response.data.data;
-        if (responseData === VerifyPhoneResponseKind.UserFound) {
-          onVerifyUser();
-        } else {
-          // TODO: handle this case better
+      onSuccess: ({ authToken, kind }: VerifyPhoneResponse) => {
+        if (kind === VerifyPhoneResponseKind.UserCreated) {
+          onCreateUser?.(authToken);
+        } else if (kind === VerifyPhoneResponseKind.UserFound) {
+          onVerifyUser?.(authToken);
         }
+      },
+      onError(error) {
+        // TODO: handle errors better
+        console.log(error);
       },
     });
   };

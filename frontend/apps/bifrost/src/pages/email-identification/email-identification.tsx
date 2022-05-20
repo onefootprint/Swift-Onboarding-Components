@@ -1,6 +1,9 @@
 import React from 'react';
 import { useForm } from 'react-hook-form';
-import useIdentifyEmail from 'src/hooks/use-identify-email';
+import useIdentifyEmail, {
+  IdentifyEmailRequest,
+  IdentifyEmailResponse,
+} from 'src/hooks/use-identify-email';
 import styled, { css } from 'styled';
 import { Button, TextInput, Typography } from 'ui';
 
@@ -17,8 +20,15 @@ const EmailIdentification = () => {
   } = useForm<FormData>();
 
   const onSubmit = (formData: FormData) => {
-    // TODO:
-    console.log(formData);
+    const payload: IdentifyEmailRequest = {
+      email: formData.email,
+    };
+    identifyEmailMutation.mutate(payload, {
+      onSuccess({ userFound, challengeData }: IdentifyEmailResponse) {
+        console.log('userFound', userFound);
+        console.log('challengeData', challengeData);
+      },
+    });
   };
 
   return (
