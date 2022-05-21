@@ -7,8 +7,8 @@ use crate::State;
 use aws_sdk_kms::model::DataKeyPairSpec;
 use chrono::{Duration, Utc};
 use db::models::session_data::{LoggedInSessionData, SessionState as DbSessionState};
-use db::models::user_vaults::{NewUserVault, UserVault};
-use newtypes::Status;
+use db::models::user_vaults::{NewUserVaultReq, UserVault};
+use newtypes::{Status, DataKind};
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 
 use super::seal;
@@ -54,8 +54,13 @@ async fn handler(
 
     let phone_number = challenge_data.data.phone_number;
     let sh_phone_number = signed_hash(&state, phone_number.clone()).await?;
-    let existing_user =
-        db::user_vault::get_by_phone_number(&state.db_pool, sh_phone_number.clone()).await?;
+    let existing_user = db::user_vault::get_by_fingerprint(
+        &state.db_pool,
+        DataKind::PhoneNumber,
+        sh_phone_number.clone(),
+        true,
+    )
+    .await?.map(|x| x.0);
 
     let (user, kind) = match existing_user {
         Some(uv) => (uv, VerifyKind::UserInherited),
@@ -96,18 +101,17 @@ async fn create_new_user_vault(
         crypto::conversion::public_key_der_to_raw_uncompressed(&der_public_key)?;
     let _pk = crypto::hex::encode(&ec_pk_uncompressed);
 
-    let user = NewUserVault {
+    let new_user = NewUserVaultReq {
         e_private_key: new_key_pair
             .private_key_ciphertext_blob
             .unwrap()
             .into_inner(),
         public_key: ec_pk_uncompressed.clone(),
+        id_verified: Status::Incomplete,
         e_phone_number: seal(phone_number.clone(), &ec_pk_uncompressed)?,
         sh_phone_number: signed_hash(state, phone_number.clone()).await?,
-        id_verified: Status::Incomplete,
-    }
-    .save(&state.db_pool)
-    .await?;
+    };
+    let user = db::user_vault::create(&state.db_pool, new_user).await?;
 
     Ok(user)
 }

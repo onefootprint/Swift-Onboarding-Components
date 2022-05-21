@@ -1,5 +1,6 @@
 use crate::models::onboardings::*;
 use crate::models::session_data::SessionState;
+use crate::models::user_data::NewUserData;
 use crate::models::user_vaults::*;
 use crate::onboarding::get_for_tenant;
 use crate::schema;
@@ -8,6 +9,39 @@ use crate::{errors::DbError, models::user_data::UserData};
 use deadpool_diesel::postgres::Pool;
 use diesel::prelude::*;
 use newtypes::{DataKind, FootprintUserId, TenantId, UserVaultId};
+
+pub async fn create(pool: &Pool, new_user: NewUserVaultReq) -> Result<UserVault, crate::DbError> {
+    let user_vault = pool
+        .get()
+        .await?
+        .interact(move |conn| {
+            conn.build_transaction()
+                .run(|| -> Result<UserVault, DbError> {
+                    let new_user_vault = NewUserVault {
+                        e_private_key: new_user.e_private_key,
+                        public_key: new_user.public_key,
+                        id_verified: new_user.id_verified,
+                    };
+                    let user_vault = diesel::insert_into(schema::user_vaults::table)
+                        .values(new_user_vault)
+                        .get_result::<UserVault>(conn)?;
+                    let phone_number_data = NewUserData {
+                        user_vault_id: user_vault.id.clone(),
+                        data_kind: DataKind::PhoneNumber,
+                        e_data: new_user.e_phone_number,
+                        sh_data: Some(new_user.sh_phone_number),
+                        // Phone numbers are always created as verified
+                        is_verified: true,
+                    };
+                    diesel::insert_into(schema::user_data::table)
+                        .values(phone_number_data)
+                        .get_result::<UserData>(conn)?;
+                    Ok(user_vault)
+                })
+        })
+        .await??;
+    Ok(user_vault)
+}
 
 pub async fn get(pool: &Pool, uv_id: UserVaultId) -> Result<UserVault, DbError> {
     let conn = pool.get().await?;
@@ -64,27 +98,10 @@ pub async fn get_by_tenant_and_onboarding(
     Ok(result)
 }
 
-pub async fn get_by_phone_number(
+pub async fn get_by_fingerprint(
     pool: &Pool,
-    sh_phone_number: Vec<u8>,
-) -> Result<Option<UserVault>, DbError> {
-    let conn = pool.get().await?;
-
-    let user = conn
-        .interact(move |conn| -> Result<Option<UserVault>, DbError> {
-            let user = schema::user_vaults::table
-                .filter(schema::user_vaults::sh_phone_number.eq(sh_phone_number))
-                .first(conn)
-                .optional()?;
-            Ok(user)
-        })
-        .await??;
-    Ok(user)
-}
-
-pub async fn get_by_email(
-    pool: &Pool,
-    sh_email: Vec<u8>,
+    data_kind: DataKind,
+    sh_data: Vec<u8>,
     require_verified: bool,
 ) -> Result<Option<(UserVault, UserData)>, DbError> {
     let result = pool
@@ -94,8 +111,8 @@ pub async fn get_by_email(
             move |conn| -> Result<Option<(UserVault, UserData)>, DbError> {
                 let mut result = schema::user_vaults::table
                     .inner_join(schema::user_data::table)
-                    .filter(schema::user_data::data_kind.eq(DataKind::Email))
-                    .filter(schema::user_data::sh_data.eq(sh_email))
+                    .filter(schema::user_data::data_kind.eq(data_kind))
+                    .filter(schema::user_data::sh_data.eq(Some(sh_data)))
                     .into_boxed();
                 if require_verified {
                     result = result.filter(schema::user_data::is_verified.eq(true));

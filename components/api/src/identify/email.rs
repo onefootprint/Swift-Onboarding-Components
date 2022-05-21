@@ -2,6 +2,7 @@ use crate::errors::ApiError;
 use crate::identify::clean_email;
 use crate::types::success::ApiResponseData;
 use crate::State;
+use newtypes::DataKind;
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 
 use super::send_phone_challenge_to_user;
@@ -34,9 +35,10 @@ pub async fn handler(
     let sh_email = super::signed_hash(&state, cleaned_email.clone()).await?;
     // TODO we should only look for verified emails, but this will break integration tests
     // since we don't verify the email in tests
-    let existing_user = db::user_vault::get_by_email(&state.db_pool, sh_email, false)
-        .await?
-        .map(|x| x.0);
+    let existing_user =
+        db::user_vault::get_by_fingerprint(&state.db_pool, DataKind::Email, sh_email, false)
+            .await?
+            .map(|x| x.0);
 
     // see if user vault has an associated phone number.
     let response = if let Some(existing_user) = existing_user {

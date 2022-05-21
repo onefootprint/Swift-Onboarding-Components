@@ -10,7 +10,7 @@ use chrono::{Duration, Utc};
 use crypto::serde_cbor;
 use db::models::session_data::LoggedInSessionData;
 use db::models::session_data::SessionState as DbSessionState;
-use newtypes::UserVaultId;
+use newtypes::{UserVaultId, DataKind};
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 use serde::{Deserialize, Serialize};
 use webauthn_rs::{
@@ -46,10 +46,13 @@ pub async fn init(
     let cleaned_email = clean_email(request.email.clone());
     let sh_email = signed_hash(&state, cleaned_email.clone()).await?;
     // TODO only look up by verified email
-    let existing_user = db::user_vault::get_by_email(&state.db_pool, sh_email, false)
-        .await?
-        .map(|x| x.0)
-        .ok_or(ApiError::UserDoesntExistForEmailChallenge)?;
+
+    let existing_user =
+        db::user_vault::get_by_fingerprint(&state.db_pool, DataKind::Email, sh_email, false)
+            .await?
+            .map(|x| x.0)
+            .ok_or(ApiError::UserDoesntExistForEmailChallenge)?;
+
     // look up webauthn credentials
     let creds = get_webauthn_creds(&state, existing_user.id.clone()).await?;
 

@@ -42,21 +42,7 @@ pub struct NewUserData {
     pub data_kind: DataKind,
     pub e_data: Vec<u8>,
     pub sh_data: Option<Vec<u8>>,
-}
-
-impl NewUserData {
-    pub async fn save(self, pool: &DbPool) -> Result<UserData, crate::DbError> {
-        let user_data = pool
-            .get()
-            .await?
-            .interact(move |conn| {
-                diesel::insert_into(user_data::table)
-                    .values(self)
-                    .get_result::<UserData>(conn)
-            })
-            .await??;
-        Ok(user_data)
-    }
+    pub is_verified: bool,
 }
 
 pub struct NewUserDataBatch(pub Vec<NewUserData>);

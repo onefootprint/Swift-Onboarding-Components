@@ -5,6 +5,7 @@ use crate::types::success::ApiResponseData;
 use crate::State;
 use chrono::{NaiveDateTime, Utc};
 use crypto::b64::Base64Data;
+use newtypes::DataKind;
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
@@ -35,9 +36,10 @@ async fn handler(
     let sh_email = Base64Data::from_str(&request.sh_email).map_err(crypto::Error::from)?;
     // TODO what happens if multiple user vaults have this email?
     let (existing_user_vault, email_user_data) =
-        db::user_vault::get_by_email(&state.db_pool, sh_email.0.clone(), false)
+        db::user_vault::get_by_fingerprint(&state.db_pool, DataKind::Email, sh_email.0, false)
             .await?
             .ok_or(ApiError::UserDoesntExistForEmailChallenge)?;
+
     let decrypted_challenge = crate::enclave::lib::decrypt_string(
         &state,
         &request.e_email_challenge,

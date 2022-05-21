@@ -78,6 +78,7 @@ async fn handler(
             data_kind,
             e_data: crate::identify::seal(data_str, &user_vault.public_key)?,
             sh_data,
+            is_verified: false,
         });
     }
     NewUserDataBatch(uds).bulk_insert(&state.db_pool).await?;

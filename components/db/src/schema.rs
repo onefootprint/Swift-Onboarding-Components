@@ -95,8 +95,6 @@ table! {
         id -> Varchar,
         e_private_key -> Bytea,
         public_key -> Bytea,
-        e_phone_number -> Bytea,
-        sh_phone_number -> Bytea,
         id_verified -> User_status,
         created_at -> Timestamp,
         updated_at -> Timestamp,

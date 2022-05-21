@@ -91,6 +91,8 @@ pub enum ApiError {
     WorkOsError(#[from] actix_web::http::header::ToStrError),
     #[error("invalid response from WorkOS")]
     WorkOSError,
+    #[error("no phone number for vault")]
+    NoPhoneNumberForVault,
 }
 
 fn status_code_for_db_error(e: &DbError) -> StatusCode {
@@ -149,6 +151,8 @@ impl actix_web::ResponseError for ApiError {
             ApiError::WorkOsPayload(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::WorkOsError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::WorkOSError => StatusCode::INTERNAL_SERVER_ERROR,
+            // This invariant should never be broken
+            ApiError::NoPhoneNumberForVault => StatusCode::INTERNAL_SERVER_ERROR,
         }
     }
 

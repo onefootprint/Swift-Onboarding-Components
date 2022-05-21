@@ -318,6 +318,5 @@ def test_logged_in_decrypt(request, tenant1):
     )
     body = _assert_response(r)
     attributes = body["data"]["attributes"]
-    # TODO fix phone number once we store it in UserData rather than user vault
-    # assert attributes["phone_number"][-4:] == request.config.cache.get("phone_number", None)[-4:]
+    assert attributes["phone_number"][-4:] == request.config.cache.get("phone_number", None)[-4:]
     assert attributes["email"] == request.config.cache.get("email", None)

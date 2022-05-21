@@ -30,8 +30,6 @@ CREATE TABLE user_vaults (
     id VARCHAR(250) PRIMARY KEY DEFAULT prefixed_uid('uv_'),  
     e_private_key BYTEA NOT NULL,
     public_key BYTEA NOT NULL,
-    e_phone_number BYTEA NOT NULL,
-    sh_phone_number BYTEA NOT NULL UNIQUE,
     id_verified User_Status NOT NULL,
     created_at timestamp NOT NULL DEFAULT NOW(),
     updated_at timestamp NOT NULL DEFAULT NOW()
@@ -39,15 +37,13 @@ CREATE TABLE user_vaults (
 
 CREATE TYPE data_kind as ENUM ('FirstName', 'LastName', 'Dob', 'Ssn', 'StreetAddress', 'City', 'State', 'Zip', 'Country', 'Email', 'PhoneNumber');
 
-CREATE INDEX IF NOT EXISTS user_vaults_sh_phone_number ON user_vaults(sh_phone_number);
-
 CREATE TABLE user_data (
     id VARCHAR(250) PRIMARY KEY DEFAULT prefixed_uid('ud_'),
     user_vault_id VARCHAR(250) NOT NULL,
     data_kind data_kind NOT NULL,
     e_data BYTEA NOT NULL,
     sh_data BYTEA,
-    is_verified BOOLEAN NOT NULL DEFAULT FALSE,
+    is_verified BOOLEAN NOT NULL,
     created_at timestamp NOT NULL DEFAULT NOW(),
     updated_at timestamp NOT NULL DEFAULT NOW(),
     CONSTRAINT fk_user_valt
@@ -59,7 +55,7 @@ CREATE TABLE user_data (
         OR ((sh_data IS NULL) AND (data_kind NOT IN ('Ssn', 'PhoneNumber', 'Email')))
     )
 );
-CREATE UNIQUE INDEX IF NOT EXISTS user_data_kind_fingerprint ON user_data(data_kind, sh_data) WHERE is_verified = TRUE;
+CREATE UNIQUE INDEX IF NOT EXISTS user_data_kind_fingerprint ON user_data(data_kind, sh_data) WHERE is_verified = TRUE AND data_kind IN ('Ssn', 'PhoneNumber', 'Email');
 CREATE INDEX IF NOT EXISTS user_data_user_vault_id_data_kind ON user_data(user_vault_id, data_kind);
 
 CREATE TABLE onboardings (

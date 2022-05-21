@@ -17,7 +17,8 @@ use crypto::b64::Base64Data;
 use crypto::seal::EciesP256Sha256AesGcmSealed;
 use crypto::sha256;
 use db::models::session_data::{ChallengeLastSentData, SessionState};
-use db::models::user_vaults::UserVault;
+use db::models::user_vaults::{UserVault, UserVaultWrapper};
+use newtypes::DataKind;
 use paperclip::actix::{web, Apiv2Schema};
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
@@ -121,9 +122,11 @@ pub(crate) async fn send_phone_challenge_to_user(
     state: &web::Data<State>,
     vault: UserVault,
 ) -> Result<Challenge<PhoneChallengeState>, ApiError> {
+    let uvw = UserVaultWrapper::from(&state.db_pool, &vault).await?;
+    let e_phone_number = uvw.get_field(DataKind::PhoneNumber).ok_or(ApiError::NoPhoneNumberForVault)?;
     let phone_number = crate::enclave::lib::decrypt_bytes(
         state,
-        &vault.e_phone_number,
+        &e_phone_number,
         vault.e_private_key.clone(),
         enclave_proxy::DataTransform::Identity,
     )

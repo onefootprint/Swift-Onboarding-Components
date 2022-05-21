@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 
-use crate::diesel::RunQueryDsl;
 use crate::schema::user_vaults;
 use crate::DbPool;
 use chrono::NaiveDateTime;
@@ -16,9 +15,6 @@ pub struct UserVault {
     pub id: UserVaultId,
     pub e_private_key: Vec<u8>,
     pub public_key: Vec<u8>,
-    // TODO remove these
-    pub e_phone_number: Vec<u8>,
-    pub sh_phone_number: Vec<u8>,
     pub id_verified: Status,
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
@@ -30,28 +26,19 @@ pub struct NewUserVault {
     pub e_private_key: Vec<u8>,
     pub public_key: Vec<u8>,
     pub id_verified: Status,
-    // TODO remove these
+}
+
+pub struct NewUserVaultReq {
+    pub e_private_key: Vec<u8>,
+    pub public_key: Vec<u8>,
+    pub id_verified: Status,
+    // Note: these aren't actual columns on the table -
     pub e_phone_number: Vec<u8>,
     pub sh_phone_number: Vec<u8>,
 }
 
-impl NewUserVault {
-    pub async fn save(self, pool: &DbPool) -> Result<UserVault, crate::DbError> {
-        let user_vault = pool
-            .get()
-            .await?
-            .interact(move |conn| {
-                diesel::insert_into(user_vaults::table)
-                    .values(self)
-                    .get_result::<UserVault>(conn)
-            })
-            .await??;
-        Ok(user_vault)
-    }
-}
-
 pub struct UserVaultWrapper<'a> {
-    user_vault: &'a UserVault,
+    _user_vault: &'a UserVault,
     user_data: HashMap<DataKind, Vec<UserData>>,
 }
 
@@ -62,17 +49,13 @@ impl<'a> UserVaultWrapper<'a> {
     ) -> Result<UserVaultWrapper<'a>, crate::DbError> {
         Ok(Self {
             user_data: crate::user_data::list(pool, user_vault.id.clone()).await?,
-            user_vault,
+            _user_vault: user_vault,
         })
     }
 
     pub fn get_field(&self, data_kind: DataKind) -> Option<&[u8]> {
         // TODO handle multiple values for the same field
-        match data_kind {
-            DataKind::PhoneNumber => Some(&self.user_vault.e_phone_number),
-            _ => Some(&self.user_data.get(&data_kind)?.get(0)?.e_data),
-        }
-        .map(Vec::as_slice)
+        Some(self.user_data.get(&data_kind)?.get(0)?.e_data.as_slice())
     }
 
     pub fn missing_fields(&self) -> Vec<DataKind> {
