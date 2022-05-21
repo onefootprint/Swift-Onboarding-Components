@@ -2,6 +2,7 @@ use crate::errors::DbError;
 use crate::models::user_data::UserData;
 use crate::schema;
 use crate::DbPool;
+use diesel::dsl::any;
 use diesel::prelude::*;
 use itertools::Itertools;
 use newtypes::DataKind;
@@ -32,5 +33,27 @@ pub async fn list(
         .into_iter()
         .map(|g| (g.0, g.1.collect()))
         .collect();
+    Ok(result)
+}
+
+pub async fn filter(
+    pool: &DbPool,
+    user_vault_id: UserVaultId,
+    data_kinds: Vec<DataKind>,
+) -> Result<Vec<UserData>, DbError> {
+    use schema::user_data;
+
+    let result: Vec<UserData> = pool
+        .get()
+        .await?
+        .interact(move |conn| {
+            user_data::table
+                .filter(user_data::user_vault_id.eq(user_vault_id))
+                .filter(user_data::data_kind.eq(any(data_kinds)))
+                // TODO filter on active data
+                .load(conn)
+        })
+        .await??;
+
     Ok(result)
 }

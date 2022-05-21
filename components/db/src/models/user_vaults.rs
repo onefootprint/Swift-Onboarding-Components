@@ -16,39 +16,12 @@ pub struct UserVault {
     pub id: UserVaultId,
     pub e_private_key: Vec<u8>,
     pub public_key: Vec<u8>,
-    pub e_first_name: Option<Vec<u8>>,
-    pub e_last_name: Option<Vec<u8>>,
-    pub e_dob: Option<Vec<u8>>,
-    pub e_ssn: Option<Vec<u8>>,
-    pub sh_ssn: Option<Vec<u8>>,
-    pub e_street_address: Option<Vec<u8>>,
-    pub e_city: Option<Vec<u8>>,
-    pub e_state: Option<Vec<u8>>,
-    pub e_zip: Option<Vec<u8>>,
-    pub e_country: Option<Vec<u8>>,
+    // TODO remove these
     pub e_phone_number: Vec<u8>,
     pub sh_phone_number: Vec<u8>,
     pub id_verified: Status,
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
-}
-
-#[derive(Debug, Default, Clone, Serialize, Deserialize, Insertable, AsChangeset)]
-#[table_name = "user_vaults"]
-pub struct UpdateUserVault {
-    pub id: UserVaultId,
-    pub e_first_name: Option<Vec<u8>>,
-    pub e_last_name: Option<Vec<u8>>,
-    pub e_dob: Option<Vec<u8>>,
-    pub e_ssn: Option<Vec<u8>>,
-    pub sh_ssn: Option<Vec<u8>>,
-    pub e_street_address: Option<Vec<u8>>,
-    pub e_city: Option<Vec<u8>>,
-    pub e_state: Option<Vec<u8>>,
-    pub e_zip: Option<Vec<u8>>,
-    pub e_country: Option<Vec<u8>>,
-    pub e_phone_number: Option<Vec<u8>>,
-    pub sh_phone_number: Option<Vec<u8>>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
@@ -57,6 +30,7 @@ pub struct NewUserVault {
     pub e_private_key: Vec<u8>,
     pub public_key: Vec<u8>,
     pub id_verified: Status,
+    // TODO remove these
     pub e_phone_number: Vec<u8>,
     pub sh_phone_number: Vec<u8>,
 }
@@ -93,18 +67,10 @@ impl<'a> UserVaultWrapper<'a> {
     }
 
     pub fn get_field(&self, data_kind: DataKind) -> Option<&[u8]> {
+        // TODO handle multiple values for the same field
         match data_kind {
-            DataKind::FirstName => self.user_vault.e_first_name.as_ref(),
-            DataKind::LastName => self.user_vault.e_last_name.as_ref(),
-            DataKind::Ssn => self.user_vault.e_ssn.as_ref(),
-            DataKind::Dob => self.user_vault.e_dob.as_ref(),
-            DataKind::StreetAddress => self.user_vault.e_street_address.as_ref(),
-            DataKind::City => self.user_vault.e_city.as_ref(),
-            DataKind::State => self.user_vault.e_state.as_ref(),
-            DataKind::Zip => self.user_vault.e_zip.as_ref(),
-            DataKind::Country => self.user_vault.e_country.as_ref(),
-            DataKind::Email => Some(&self.user_data.get(&data_kind)?.get(0)?.e_data),
             DataKind::PhoneNumber => Some(&self.user_vault.e_phone_number),
+            _ => Some(&self.user_data.get(&data_kind)?.get(0)?.e_data),
         }
         .map(Vec::as_slice)
     }

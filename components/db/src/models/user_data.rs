@@ -14,7 +14,7 @@ pub struct UserData {
     pub user_vault_id: UserVaultId,
     pub data_kind: DataKind,
     pub e_data: Vec<u8>,
-    pub sh_data: Vec<u8>,
+    pub sh_data: Option<Vec<u8>>,
     pub is_verified: bool,
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
@@ -41,7 +41,7 @@ pub struct NewUserData {
     pub user_vault_id: UserVaultId,
     pub data_kind: DataKind,
     pub e_data: Vec<u8>,
-    pub sh_data: Vec<u8>,
+    pub sh_data: Option<Vec<u8>>,
 }
 
 impl NewUserData {
@@ -56,5 +56,22 @@ impl NewUserData {
             })
             .await??;
         Ok(user_data)
+    }
+}
+
+pub struct NewUserDataBatch(pub Vec<NewUserData>);
+
+impl NewUserDataBatch {
+    pub async fn bulk_insert(self, pool: &DbPool) -> Result<(), crate::DbError> {
+        let _ = pool
+            .get()
+            .await?
+            .interact(move |conn| {
+                diesel::insert_into(user_data::table)
+                    .values(self.0)
+                    .execute(conn)
+            })
+            .await??;
+        Ok(())
     }
 }

@@ -30,17 +30,6 @@ CREATE TABLE user_vaults (
     id VARCHAR(250) PRIMARY KEY DEFAULT prefixed_uid('uv_'),  
     e_private_key BYTEA NOT NULL,
     public_key BYTEA NOT NULL,
-    e_first_name BYTEA,
-    e_last_name BYTEA,
-    -- TODO: should we store dob as day, month, year separately?
-    e_dob BYTEA,
-    e_ssn BYTEA,
-    sh_ssn BYTEA UNIQUE,
-    e_street_address BYTEA,
-    e_city BYTEA,
-    e_state BYTEA,
-    e_zip BYTEA,
-    e_country BYTEA,
     e_phone_number BYTEA NOT NULL,
     sh_phone_number BYTEA NOT NULL UNIQUE,
     id_verified User_Status NOT NULL,
@@ -50,7 +39,6 @@ CREATE TABLE user_vaults (
 
 CREATE TYPE data_kind as ENUM ('FirstName', 'LastName', 'Dob', 'Ssn', 'StreetAddress', 'City', 'State', 'Zip', 'Country', 'Email', 'PhoneNumber');
 
-CREATE INDEX IF NOT EXISTS user_vaults_sh_ssn ON user_vaults(sh_ssn);
 CREATE INDEX IF NOT EXISTS user_vaults_sh_phone_number ON user_vaults(sh_phone_number);
 
 CREATE TABLE user_data (
@@ -58,13 +46,18 @@ CREATE TABLE user_data (
     user_vault_id VARCHAR(250) NOT NULL,
     data_kind data_kind NOT NULL,
     e_data BYTEA NOT NULL,
-    sh_data BYTEA NOT NULL, -- TODO this table may only be for "fingerprinted" data.
+    sh_data BYTEA,
     is_verified BOOLEAN NOT NULL DEFAULT FALSE,
     created_at timestamp NOT NULL DEFAULT NOW(),
     updated_at timestamp NOT NULL DEFAULT NOW(),
     CONSTRAINT fk_user_valt
         FOREIGN KEY(user_vault_id) 
-        REFERENCES user_vaults(id)
+        REFERENCES user_vaults(id),
+    -- Only allow sh_data to be null for fields other than Ssn, PhoneNumber, Email
+    CONSTRAINT check_sh_data CHECK (
+        ((sh_data IS NOT NULL) AND (data_kind IN ('Ssn', 'PhoneNumber', 'Email')))
+        OR ((sh_data IS NULL) AND (data_kind NOT IN ('Ssn', 'PhoneNumber', 'Email')))
+    )
 );
 CREATE UNIQUE INDEX IF NOT EXISTS user_data_kind_fingerprint ON user_data(data_kind, sh_data) WHERE is_verified = TRUE;
 CREATE INDEX IF NOT EXISTS user_data_user_vault_id_data_kind ON user_data(user_vault_id, data_kind);

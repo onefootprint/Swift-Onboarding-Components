@@ -32,19 +32,5 @@ async fn test_db() {
     .await
     .expect("couldn't init user vault");
 
-    let sh_phone_number = crypto::random::gen_random_alphanumeric_code(16)
-        .as_bytes()
-        .to_vec();
-    crate::user_vault::update(
-        &pool,
-        crate::models::user_vaults::UpdateUserVault {
-            id: user_vault.id.clone(),
-            sh_phone_number: Some(sh_phone_number.to_vec()),
-            ..Default::default()
-        },
-    )
-    .await
-    .expect("couldn't update user");
-
     // TODO find_by_phone_number and find_by_email
 }

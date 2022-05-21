@@ -9,22 +9,6 @@ use deadpool_diesel::postgres::Pool;
 use diesel::prelude::*;
 use newtypes::{DataKind, FootprintUserId, TenantId, UserVaultId};
 
-pub async fn update(pool: &Pool, update: UpdateUserVault) -> Result<usize, DbError> {
-    let conn = pool.get().await?;
-
-    let size = conn
-        .interact(move |conn| {
-            diesel::update(
-                schema::user_vaults::table.filter(schema::user_vaults::id.eq(update.id.clone())),
-            )
-            .set(update)
-            .execute(conn)
-        })
-        .await??;
-
-    Ok(size)
-}
-
 pub async fn get(pool: &Pool, uv_id: UserVaultId) -> Result<UserVault, DbError> {
     let conn = pool.get().await?;
 

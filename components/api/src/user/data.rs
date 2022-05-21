@@ -1,8 +1,7 @@
 use crate::auth::logged_in_session::LoggedInSessionContext;
 use crate::identify::{clean_email, send_email_challenge};
 use crate::{errors::ApiError, types::success::ApiResponseData, State};
-use db::models::user_data::NewUserData;
-use db::models::user_vaults::UpdateUserVault;
+use db::models::user_data::{NewUserData, NewUserDataBatch};
 use newtypes::DataKind;
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 
@@ -14,66 +13,16 @@ struct UserPatchRequest {
     /// not have to be represented in the request
     /// for example {"email_address": "test@test.com"}
     /// is a valid UserPatchRequest
-    #[serde(
-        default,
-        skip_serializing_if = "Option::is_none",
-        with = "::serde_with::rust::double_option"
-    )]
-    first_name: Option<Option<String>>,
-    #[serde(
-        default,
-        skip_serializing_if = "Option::is_none",
-        with = "::serde_with::rust::double_option"
-    )]
-    last_name: Option<Option<String>>,
-    #[serde(
-        default,
-        skip_serializing_if = "Option::is_none",
-        with = "::serde_with::rust::double_option"
-    )]
-    dob: Option<Option<String>>,
-    #[serde(
-        default,
-        skip_serializing_if = "Option::is_none",
-        with = "::serde_with::rust::double_option"
-    )]
-    ssn: Option<Option<String>>,
-    #[serde(
-        default,
-        skip_serializing_if = "Option::is_none",
-        with = "::serde_with::rust::double_option"
-    )]
-    street_address: Option<Option<String>>,
-    #[serde(
-        default,
-        skip_serializing_if = "Option::is_none",
-        with = "::serde_with::rust::double_option"
-    )]
-    city: Option<Option<String>>,
-    #[serde(
-        default,
-        skip_serializing_if = "Option::is_none",
-        with = "::serde_with::rust::double_option"
-    )]
-    state: Option<Option<String>>,
-    #[serde(
-        default,
-        skip_serializing_if = "Option::is_none",
-        with = "::serde_with::rust::double_option"
-    )]
-    zip: Option<Option<String>>,
-    #[serde(
-        default,
-        skip_serializing_if = "Option::is_none",
-        with = "::serde_with::rust::double_option"
-    )]
-    country: Option<Option<String>>,
-    #[serde(
-        default,
-        skip_serializing_if = "Option::is_none",
-        with = "::serde_with::rust::double_option"
-    )]
-    email: Option<Option<String>>,
+    first_name: Option<String>,
+    last_name: Option<String>,
+    dob: Option<String>,
+    ssn: Option<String>,
+    street_address: Option<String>,
+    city: Option<String>,
+    state: Option<String>,
+    zip: Option<String>,
+    country: Option<String>,
+    email: Option<String>,
 }
 
 #[api_v2_operation]
@@ -86,57 +35,58 @@ async fn handler(
     request: web::Json<UserPatchRequest>,
 ) -> actix_web::Result<Json<ApiResponseData<String>>, ApiError> {
     // TODO don't allow updating every field if the user vault is already verified
+    // TODO only allow adding duplicate UserData rows for certain types of data (like email/phone)
     let user_vault = user_auth.user_vault();
-    fn seal(
-        val: Option<Option<String>>,
-        user_vault: &db::models::user_vaults::UserVault,
-    ) -> Result<Option<Vec<u8>>, ApiError> {
-        val.flatten()
-            .map(|s| crate::identify::seal(s, &user_vault.public_key))
-            .transpose()
-    }
 
-    async fn signed_hash(
-        state: &web::Data<State>,
-        val: Option<Option<String>>,
-    ) -> Result<Option<Vec<u8>>, ApiError> {
-        let res = match val {
-            None | Some(None) => None,
-            Some(Some(val)) => Some(crate::identify::signed_hash(state, val).await?),
-        };
-        Ok(res)
-    }
-
-    if let Some(email) = request.email.clone().flatten() {
-        let cleaned_email = clean_email(email);
-        // If we're updating the email address, send an async challenge to the new email address
-        send_email_challenge(&state, user_vault.public_key.clone(), cleaned_email.clone()).await?;
-        NewUserData {
-            user_vault_id: user_vault.id.clone(),
-            data_kind: DataKind::Email,
-            e_data: crate::identify::seal(cleaned_email.clone(), &user_vault.public_key)?,
-            sh_data: crate::identify::signed_hash(&state, cleaned_email).await?,
+    let data_to_insert: Vec<(DataKind, String)> = vec![
+        (DataKind::FirstName, request.first_name.clone()),
+        (DataKind::LastName, request.last_name.clone()),
+        (DataKind::Dob, request.dob.clone()),
+        (DataKind::Ssn, request.ssn.clone()),
+        (DataKind::StreetAddress, request.street_address.clone()),
+        (DataKind::City, request.city.clone()),
+        (DataKind::State, request.state.clone()),
+        (DataKind::Zip, request.zip.clone()),
+        (DataKind::Country, request.country.clone()),
+        (DataKind::Email, request.email.clone()),
+    ]
+    .into_iter()
+    .filter_map(|(data_kind, data_str)| {
+        if let Some(data_str) = data_str {
+            // Clean/validate data
+            let data_str = match data_kind {
+                DataKind::Email => clean_email(data_str),
+                _ => data_str,
+            };
+            Some((data_kind, data_str))
+        } else {
+            None
         }
-        .save(&state.db_pool)
-        .await?;
+    })
+    .collect();
+
+    let mut uds = Vec::<NewUserData>::new();
+    for (data_kind, data_str) in data_to_insert {
+        let sh_data = match data_kind {
+            DataKind::Ssn | DataKind::Email | DataKind::PhoneNumber => {
+                Some(crate::identify::signed_hash(&state, data_str.clone()).await?)
+            }
+            _ => None,
+        };
+        uds.push(NewUserData {
+            user_vault_id: user_vault.id.clone(),
+            data_kind,
+            e_data: crate::identify::seal(data_str, &user_vault.public_key)?,
+            sh_data,
+        });
     }
+    NewUserDataBatch(uds).bulk_insert(&state.db_pool).await?;
 
-    let user_update = UpdateUserVault {
-        id: user_vault.id.clone(),
-        e_first_name: seal(request.first_name.clone(), user_vault)?,
-        e_last_name: seal(request.last_name.clone(), user_vault)?,
-        e_dob: seal(request.dob.clone(), user_vault)?,
-        e_ssn: seal(request.ssn.clone(), user_vault)?,
-        sh_ssn: signed_hash(&state, request.ssn.clone()).await?,
-        e_street_address: seal(request.street_address.clone(), user_vault)?,
-        e_city: seal(request.city.clone(), user_vault)?,
-        e_state: seal(request.state.clone(), user_vault)?,
-        e_zip: seal(request.zip.clone(), user_vault)?,
-        e_country: seal(request.country.clone(), user_vault)?,
-        ..Default::default()
-    };
-
-    let _: usize = db::user_vault::update(&state.db_pool, user_update).await?;
+    // If we're updating the email address, send an async challenge to the new email address
+    if let Some(email) = request.email.clone() {
+        let cleaned_email = clean_email(email);
+        send_email_challenge(&state, user_vault.public_key.clone(), cleaned_email).await?;
+    }
 
     Ok(Json(ApiResponseData {
         data: "Successful update".to_string(),
