@@ -7,26 +7,50 @@ This is footprint's core backend monorepo. This houses our main backend API crat
 ## Dependencies
 You'll need `openssl` and `postgres` to run the code locally.
 
-## Getting Pulumi + AWS credentials setup for deploying ephemeral stacks
-1. Install [pulumi](https://www.pulumi.com/docs/get-started/install/). With homebrew, run `$ brew install pulumi`
-2. Install [docker](https://docs.docker.com/desktop/mac/install/) With homebrew, `$ brew install docker`
-3. Install the [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html). With homebrew `$ brew install awscli`
-4. Generate your pulumi credentials in the AWS Console
+## Get AWS credentials 
+AWS creds are used along with Pulumi (see below) and also for encrypting/decrypting the local development .env file
+1. You'll need the [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html). With homebrew `$ brew install awscli`
+2. Generate your credentials in the AWS Console
     - Log in to the AWS Management console via [Rippling](https://www.rippling.com/) using Single Sign On for Amazon
     b. Navigate to Services => Security, Identity, & Compliance => IAM 
     - Click "users" on the left hand sidebar
-    - Generate a new pulumi user (yourname_pulumi). No need to add tags or anything, just copy the permissions from an existing user
+    - Generate a new user (yourname). No need to add tags or anything, just copy the permissions from an existing user
     - Run `$ aws configure` and enter your access key and secret access key to configure your aws profile. Pulumi had trouble reading credentials I configured using the aws CLI, so I would also recommend setting your AWS_ACCESS_KEY_ID annd AWS_SECRET_KEY environment variables
-5. Log in to [pulumi](pulumi.com) with github (make sure to use the account linked to the footprint organization). Generate an access token under your profile picture -> settings -> access tokens. Then run `$ pulumi login` and paste in the access token you generated to authenticate 
-6. Make sure you've upgraded node, then:
+
+## Local development
+First, get your .env file setup. This is stored encrypted in git. To decrypt it, make sure you have AWS creds above, and run:
+
+```sh
+make set-dot-env
+```
+
+Next, ensure your postgres is running at you set your `DATABASE_URL` env. 
+
+To run the core api crate:
+```
+# starts up the local simulated enclave for encryption/decryption
+$ cargo run -p enclave --no-default-features --features simulate
+
+# runs the api crate
+$ cargo run -p footprint-core --no-default-features
+```
+
+## Getting Pulumi setup
+Pulumi is our infra-as-code framework. All of the pulumi code is in /infra. For development, you'll interact with pulumi directly if you're adding/modifying config variables or secrets, if you're modifying infrastructure, or if you're building an ephemeral environment/stack.
+
+1. Install [pulumi](https://www.pulumi.com/docs/get-started/install/). With homebrew, run `$ brew install pulumi`
+2. Install [docker](https://docs.docker.com/desktop/mac/install/) With homebrew, `$ brew install docker`
+3. Ensure you have completed the AWS credentials setup above
+4. Log in to [pulumi](pulumi.com) with github (make sure to use the account linked to the footprint organization). Generate an access token under your profile picture -> settings -> access tokens. Then run `$ pulumi login` and paste in the access token you generated to authenticate 
+5. Make sure you've upgraded node, then:
 ``` 
     $ cd infra
     $ npm install -g yarn
 ```
-7. `cd infra && yarn install`
+6. `cd infra && yarn install`
 You now should be able to deploy ephemeral environments of the entire stack!
 
-## Local infrastructure build
+### Local ephemeral infrastructure build
 If you want to develop and test a new feature, and need to build the infrastructure to do so, you have two options. 
 
 1. Open up a pull request against the footprint-core repo from your feature branch. When you PR the footprint-core repo, you can add the `ephemeral` label to the PR in order to spin up a [pulumi stack](https://www.pulumi.com/docs/intro/concepts/stack/) - infrastructure will be deployed there.
@@ -49,7 +73,7 @@ $ pulumi up
 $ pulumi down
 ```
 
-## Adding pulumi secrets
+### Adding pulumi secrets
 We use pulumi secrets to help us manage sensitive information we need to run our application. For instance, we have various AWS credentials stored in pulumi secrets, that are then added to our application environment for use.
 
 To add a secret to pulumi, do the following:
@@ -66,19 +90,6 @@ When pulumi runs, it will now add your secrets to the container environment! To 
 
 ## Codespaces development
 On the repo, open `code -> new codespace`. You can develop in the browser or open in vscode locally. **This environment has all that you need to do development locally (including secrets)**. If you want to do pulumi/infra work make sure you set your personal pulumi creds in settings -> codespaces -> secrets so they are installed on the machine.
-
-## Local development
-First, ask another engineer for their `.env` file. It contains AWS secrets to simulate certain parts of the stack deployed app.
-Next, ensure your postgres is running at you set your `DATABASE_URL` env. 
-
-To run the core api crate:
-```
-# starts up the local simulated enclave for encryption/decryption
-$ cargo run -p enclave --no-default-features --features simulate
-
-# runs the api crate
-$ cargo run -p footprint-core --no-default-features
-```
 
 ## Database Schema + Migrations
 First, install diesel CLI:
