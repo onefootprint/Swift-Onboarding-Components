@@ -8,6 +8,7 @@
   ],
   "scripts": {
     "build:bifrost": "turbo run build --scope=bifrost --no-deps --include-dependencies",
+    "build:dashboard": "turbo run build --scope=dashboard --no-deps --include-dependencies",
     "build:identity-wallet": "turbo run build --scope=identity-wallet --no-deps --include-dependencies",
     "build:ui": "turbo run build --scope=ui --no-deps --include-dependencies",
     "build:frontpage": "turbo run build --scope=frontpage --no-deps --include-dependencies",
