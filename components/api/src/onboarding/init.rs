@@ -36,7 +36,7 @@ pub fn handler(
 
     let webauthn_creds = get_webauthn_creds(&state, uv.id.clone()).await?;
 
-    let uvw = UserVaultWrapper::from(&state.db_pool, uv).await?;
+    let uvw = UserVaultWrapper::from(&state.db_pool, uv.clone()).await?;
     Ok(Json(ApiResponseData {
         data: OnboardingResponse {
             missing_attributes: uvw.missing_fields(),

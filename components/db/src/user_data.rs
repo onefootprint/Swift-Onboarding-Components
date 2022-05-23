@@ -9,21 +9,16 @@ use newtypes::DataKind;
 use newtypes::UserVaultId;
 use std::collections::HashMap;
 
-pub async fn list(
-    pool: &DbPool,
+pub fn list(
+    conn: &PgConnection,
     user_vault_id: UserVaultId,
 ) -> Result<HashMap<DataKind, Vec<UserData>>, DbError> {
-    let result: Vec<UserData> = pool
-        .get()
-        .await?
-        .interact(move |conn| {
-            schema::user_data::table
-                .filter(schema::user_data::user_vault_id.eq(user_vault_id))
-                // Needed for group_by. Fast with the DB index
-                .order_by(schema::user_data::data_kind)
-                .load(conn)
-        })
-        .await??;
+    let result: Vec<UserData> =
+        schema::user_data::table
+            .filter(schema::user_data::user_vault_id.eq(user_vault_id))
+            // Needed for group_by. Fast with the DB index
+            .order_by(schema::user_data::data_kind)
+            .load(conn)?;
 
     // Turn the Vec of UserData into a hashmap of grouped DataKind -> Vec<UserData>
     // group_by only groups adjacent items, so this requires that the vec is sorted by data_kind
@@ -50,7 +45,6 @@ pub async fn filter(
             user_data::table
                 .filter(user_data::user_vault_id.eq(user_vault_id))
                 .filter(user_data::data_kind.eq(any(data_kinds)))
-                // TODO filter on active data
                 .load(conn)
         })
         .await??;

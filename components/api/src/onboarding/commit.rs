@@ -29,7 +29,7 @@ fn handler(
     let uv = user_auth.user_vault();
     let uv_id = uv.id.clone();
 
-    let uvw = UserVaultWrapper::from(&state.db_pool, uv).await?;
+    let uvw = UserVaultWrapper::from(&state.db_pool, uv.clone()).await?;
     let missing_fields = uvw
         .missing_fields()
         .into_iter()

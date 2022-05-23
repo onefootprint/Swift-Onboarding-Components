@@ -34,17 +34,17 @@ async fn decrypt_field(
 
 impl ApiUser {
     async fn from(uv: &UserVault, state: &web::Data<State>) -> Result<Self, ApiError> {
-        let uvw = UserVaultWrapper::from(&state.db_pool, uv).await?;
+        let uvw = UserVaultWrapper::from(&state.db_pool, uv.clone()).await?;
         let api_user = Self {
             first_name: decrypt_field(
                 state,
-                uvw.get_field(DataKind::FirstName),
+                uvw.get_e_field(DataKind::FirstName),
                 uv.e_private_key.clone(),
             )
             .await?,
             last_name: decrypt_field(
                 state,
-                uvw.get_field(DataKind::LastName),
+                uvw.get_e_field(DataKind::LastName),
                 uv.e_private_key.clone(),
             )
             .await?,

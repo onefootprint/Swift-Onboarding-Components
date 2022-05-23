@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use crate::schema::user_vaults;
 use crate::DbPool;
 use chrono::NaiveDateTime;
-use diesel::{Insertable, Queryable};
+use diesel::{Insertable, Queryable, PgConnection};
 use newtypes::{DataKind, Status, UserVaultId};
 use serde::{Deserialize, Serialize};
 
@@ -37,25 +37,44 @@ pub struct NewUserVaultReq {
     pub sh_phone_number: Vec<u8>,
 }
 
-pub struct UserVaultWrapper<'a> {
-    _user_vault: &'a UserVault,
+pub struct UserVaultWrapper {
+    _user_vault: UserVault,
     user_data: HashMap<DataKind, Vec<UserData>>,
 }
 
-impl<'a> UserVaultWrapper<'a> {
+impl UserVaultWrapper {
     pub async fn from(
         pool: &DbPool,
-        user_vault: &'a UserVault,
-    ) -> Result<UserVaultWrapper<'a>, crate::DbError> {
+        user_vault: UserVault,
+    ) -> Result<UserVaultWrapper, crate::DbError> {
+        let result: UserVaultWrapper = pool
+            .get()
+            .await?
+            .interact(move |conn| {
+                Self::from_conn(conn, user_vault)
+            })
+            .await??;
+        Ok(result)
+    }
+
+    pub fn from_conn(
+        conn: &mut PgConnection,
+        user_vault: UserVault,
+    ) -> Result<UserVaultWrapper, crate::DbError> {
         Ok(Self {
-            user_data: crate::user_data::list(pool, user_vault.id.clone()).await?,
+            user_data: crate::user_data::list(conn, user_vault.id.clone())?,
             _user_vault: user_vault,
         })
     }
 
-    pub fn get_field(&self, data_kind: DataKind) -> Option<&[u8]> {
+    pub fn get_data(&self, data_kind: DataKind) -> Option<&UserData> {
         // TODO handle multiple values for the same field
-        Some(self.user_data.get(&data_kind)?.get(0)?.e_data.as_slice())
+        self.user_data.get(&data_kind)?.get(0)
+    }
+
+    pub fn get_e_field(&self, data_kind: DataKind) -> Option<&[u8]> {
+        // TODO handle multiple values for the same field
+        Some(self.get_data(data_kind)?.e_data.as_slice())
     }
 
     pub fn missing_fields(&self) -> Vec<DataKind> {
@@ -73,7 +92,7 @@ impl<'a> UserVaultWrapper<'a> {
             DataKind::PhoneNumber,
         ]
         .into_iter()
-        .filter(|data_kind| self.get_field(*data_kind).is_none())
+        .filter(|data_kind| self.get_e_field(*data_kind).is_none())
         .collect()
     }
 }

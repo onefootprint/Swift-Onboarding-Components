@@ -122,12 +122,13 @@ pub(crate) async fn send_phone_challenge_to_user(
     state: &web::Data<State>,
     vault: UserVault,
 ) -> Result<Challenge<PhoneChallengeState>, ApiError> {
-    let uvw = UserVaultWrapper::from(&state.db_pool, &vault).await?;
-    let e_phone_number = uvw.get_field(DataKind::PhoneNumber).ok_or(ApiError::NoPhoneNumberForVault)?;
+    let e_private_key = vault.e_private_key.clone();
+    let uvw = UserVaultWrapper::from(&state.db_pool, vault).await?;
+    let e_phone_number = uvw.get_e_field(DataKind::PhoneNumber).ok_or(ApiError::NoPhoneNumberForVault)?;
     let phone_number = crate::enclave::lib::decrypt_bytes(
         state,
         &e_phone_number,
-        vault.e_private_key.clone(),
+        e_private_key,
         enclave_proxy::DataTransform::Identity,
     )
     .await?;
