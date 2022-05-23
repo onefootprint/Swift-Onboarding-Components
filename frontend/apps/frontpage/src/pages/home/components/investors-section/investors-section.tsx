@@ -21,7 +21,7 @@ const InvestorsSection = ({
     <ContentContainer>
       <Typography
         as="h5"
-        color="senary"
+        color="septenary"
         sx={{ marginBottom: 5 }}
         variant="label-1"
       >
@@ -29,7 +29,7 @@ const InvestorsSection = ({
       </Typography>
       <Typography
         as="p"
-        color="quaternary"
+        color="quinary"
         sx={{ maxWidth: '510px' }}
         variant="display-2"
       >

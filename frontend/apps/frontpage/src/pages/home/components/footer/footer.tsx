@@ -12,14 +12,14 @@ type FooterProps = {
 const Footer = ({ copyright, links }: FooterProps) => (
   <Container as="footer">
     <Inner>
-      <Typography variant="body-3" color="quinary">
+      <Typography variant="body-3" color="senary">
         © {currentYear} {copyright}
       </Typography>
       <LinksList>
         {links.map(link => (
           <li key={link.text}>
             <a href={link.href} rel="noopener noreferrer" target="_blank">
-              <Typography variant="body-3" color="quinary">
+              <Typography variant="body-3" color="senary">
                 {link.text}
               </Typography>
             </a>

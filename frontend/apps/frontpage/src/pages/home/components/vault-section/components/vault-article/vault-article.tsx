@@ -13,7 +13,7 @@ type VaultArticleProps = {
 const VaultArticle = ({ content, Icon, title }: VaultArticleProps) => (
   <>
     <CircleContainer>
-      <CircleIcon Icon={Icon} />
+      <CircleIcon Icon={Icon} color="quinary" />
     </CircleContainer>
     <Typography
       as="p"
