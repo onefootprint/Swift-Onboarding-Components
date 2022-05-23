@@ -1,3 +1,4 @@
+import { Events } from '@src/types/bifrost-machine';
 import { useTranslation } from 'hooks';
 import IcoFileText24 from 'icons/ico/ico-file-text-24';
 import IcoLock24 from 'icons/ico/ico-lock-24';
@@ -5,9 +6,11 @@ import IcoShield24 from 'icons/ico/ico-shield-24';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import Header from 'src/components/header';
+import useBifrostMachine from 'src/hooks/use-bifrost-machine';
 import styled, { css } from 'styled';
 import { Button, TextInput } from 'ui';
 
+import useUserData, { UserDataRequest } from '../../hooks/use-user-data';
 import Disclaimer from './components/disclaimer';
 
 type FormData = {
@@ -15,6 +18,8 @@ type FormData = {
 };
 
 const SSN = () => {
+  const [state, send] = useBifrostMachine();
+  const userDataMutation = useUserData();
   const { t } = useTranslation('pages.registration.ssn');
   const {
     register,
@@ -23,7 +28,50 @@ const SSN = () => {
   } = useForm<FormData>();
 
   const onSubmit = (formData: FormData) => {
-    console.log(formData);
+    // SSN is the last step in the registration, go ahead and send the data
+    const {
+      firstName,
+      lastName,
+      dob,
+      email,
+      streetAddress,
+      city,
+      state: residentialState,
+      country,
+      zipCode,
+    } = state.context.registration;
+
+    const { authToken } = state.context;
+    if (!authToken) {
+      return;
+    }
+
+    const request: UserDataRequest = {
+      data: {
+        ssn: formData.ssn,
+        firstName,
+        lastName,
+        dob,
+        email,
+        streetAddress,
+        city,
+        state: residentialState,
+        country,
+        zipCode,
+      },
+      authToken,
+    };
+
+    userDataMutation.mutate(request, {
+      onSuccess() {
+        send({
+          type: Events.ssnSubmitted,
+          payload: {
+            ssn: formData.ssn,
+          },
+        });
+      },
+    });
   };
 
   return (

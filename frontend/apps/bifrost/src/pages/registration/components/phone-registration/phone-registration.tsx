@@ -8,6 +8,11 @@ import useBifrostMachine from 'src/hooks/use-bifrost-machine';
 import styled, { css } from 'styled';
 import { Button, LinkButton, TextInput, Typography } from 'ui';
 
+import useIdentifyPhone, {
+  IdentifyPhoneRequest,
+  IdentifyPhoneResponse,
+} from './hooks/use-identify-phone';
+
 type FormData = {
   phone: string;
 };
@@ -20,15 +25,27 @@ const PhoneRegistration = () => {
     handleSubmit,
     formState: { errors },
   } = useForm<FormData>();
+  const identifyPhoneMutation = useIdentifyPhone();
 
   const handleChangeEmail = () => {
     send({ type: Events.changeEmail });
   };
 
   const onSubmit = (formData: FormData) => {
-    // TODO: Integrate with backend
-    // https://github.com/onefootprint/frontend-monorepo/issues/148
-    console.log(formData);
+    const payload: IdentifyPhoneRequest = {
+      phoneNumber: formData.phone,
+    };
+    identifyPhoneMutation.mutate(payload, {
+      onSuccess({ challengeToken, phoneNumberLastTwo }: IdentifyPhoneResponse) {
+        send({
+          type: Events.phoneSubmitted,
+          payload: {
+            challengeToken,
+            phoneNumberLastTwo,
+          },
+        });
+      },
+    });
   };
 
   return (

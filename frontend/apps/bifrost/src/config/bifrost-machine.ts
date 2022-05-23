@@ -3,20 +3,20 @@ import { assign, createMachine } from 'xstate';
 
 type Identification = Partial<{
   email: string;
-  phoneLastTwoDigits: string;
+  phoneNumberLastTwo: string;
   challengeToken: string;
 }>;
 
 type Registration = Partial<{
-  city: string;
-  country: string;
-  dob: string;
-  email: string;
   firstName: string;
   lastName: string;
+  dob: string;
+  email: string;
   ssn: string;
-  state: string;
   streetAddress: string;
+  city: string;
+  state: string;
+  country: string;
   zipCode: string;
 }>;
 
@@ -32,24 +32,29 @@ const initialIdentificationContext = {};
 
 const initialRegistrationContext = {};
 
+const initialAuthTokenContext = undefined;
+
 const bifrostMachine = createMachine<
   {
     identification: Identification;
     registration: Registration;
+    authToken?: string;
   },
   | {
       type: Events.userFound;
-      payload: {
-        phoneNumberLastTwo: string;
-        challengeToken: string;
-        email: string;
-      };
+      payload: Identification;
     }
   | { type: Events.userNotFound; payload: { email: string } }
   | { type: Events.changeEmail }
-  | { type: Events.userCreated }
-  | { type: Events.userInherited }
-  | { type: Events.phoneSubmitted }
+  | { type: Events.userCreated; payload: { authToken: string } }
+  | { type: Events.userInherited; payload: { authToken: string } }
+  | {
+      type: Events.phoneSubmitted;
+      payload: {
+        phoneNumberLastTwo: string;
+        challengeToken: string;
+      };
+    }
   | {
       type: Events.basicInformationSubmitted;
       payload: {
@@ -70,6 +75,7 @@ const bifrostMachine = createMachine<
   context: {
     identification: initialIdentificationContext,
     registration: initialRegistrationContext,
+    authToken: initialAuthTokenContext,
   },
   states: {
     [States.emailIdentification]: {
@@ -101,69 +107,75 @@ const bifrostMachine = createMachine<
           }),
         },
         [Events.phoneSubmitted]: {
-          target: States.emailIdentification,
+          target: States.phoneVerification,
+          actions: assign((context, { payload }) => ({
+            ...context,
+            identification: payload,
+          })),
         },
       },
     },
     [States.phoneVerification]: {
       on: {
         [Events.userCreated]: {
-          target: 'registration',
+          target: States.basicInformation,
+          actions: assign((context, { payload }) => ({
+            ...context,
+            authToken: payload.authToken,
+          })),
         },
         [Events.userInherited]: {
           target: States.verificationSuccess,
+          actions: assign((context, { payload }) => ({
+            ...context,
+            authToken: payload.authToken,
+          })),
         },
       },
     },
-    registration: {
-      type: 'compound',
-      initial: States.basicInformation,
-      states: {
-        [States.basicInformation]: {
-          on: {
-            [Events.basicInformationSubmitted]: {
-              target: States.residentialAddress,
-              actions: assign((context, { payload }) => {
-                context.registration = {
-                  ...context.registration,
-                  ...payload.basicInformation,
-                };
-                return context;
-              }),
-            },
-          },
-        },
-        [States.residentialAddress]: {
-          on: {
-            [Events.residentialAddressSubmitted]: {
-              target: States.ssn,
-              actions: assign((context, { payload }) => {
-                context.registration = {
-                  ...context.registration,
-                  ...payload.residentialAddress,
-                };
-                return context;
-              }),
-            },
-          },
-        },
-        [States.ssn]: {
-          on: {
-            [Events.ssnSubmitted]: {
-              target: States.registrationSuccess,
-              actions: assign((context, { payload }) => {
-                context.registration.ssn = payload.ssn;
-                return context;
-              }),
-            },
-          },
-        },
-        [States.registrationSuccess]: {
-          type: 'final',
+    [States.basicInformation]: {
+      on: {
+        [Events.basicInformationSubmitted]: {
+          target: States.residentialAddress,
+          actions: assign((context, { payload }) => {
+            context.registration = {
+              ...context.registration,
+              ...payload.basicInformation,
+            };
+            return context;
+          }),
         },
       },
     },
-    verificationSuccess: {
+    [States.residentialAddress]: {
+      on: {
+        [Events.residentialAddressSubmitted]: {
+          target: States.ssn,
+          actions: assign((context, { payload }) => {
+            context.registration = {
+              ...context.registration,
+              ...payload.residentialAddress,
+            };
+            return context;
+          }),
+        },
+      },
+    },
+    [States.ssn]: {
+      on: {
+        [Events.ssnSubmitted]: {
+          target: States.registrationSuccess,
+          actions: assign((context, { payload }) => {
+            context.registration.ssn = payload.ssn;
+            return context;
+          }),
+        },
+      },
+    },
+    [States.registrationSuccess]: {
+      type: 'final',
+    },
+    [States.verificationSuccess]: {
       type: 'final',
     },
   },

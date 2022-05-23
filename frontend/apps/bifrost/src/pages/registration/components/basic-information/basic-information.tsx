@@ -1,7 +1,9 @@
+import { Events } from '@src/types/bifrost-machine';
 import { useTranslation } from 'hooks';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import Header from 'src/components/header';
+import useBifrostMachine from 'src/hooks/use-bifrost-machine';
 import styled, { css } from 'styled';
 import { Button, Grid, TextInput } from 'ui';
 
@@ -12,6 +14,7 @@ type FormData = {
 };
 
 const BasicInformation = () => {
+  const [, send] = useBifrostMachine();
   const { t } = useTranslation('pages.registration.basic-information');
   const {
     register,
@@ -20,8 +23,16 @@ const BasicInformation = () => {
   } = useForm<FormData>();
 
   const onSubmit = (formData: FormData) => {
-    // TODO:
-    console.log(formData);
+    send({
+      type: Events.basicInformationSubmitted,
+      payload: {
+        basicInformation: {
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          dob: formData.dob,
+        },
+      },
+    });
   };
 
   return (

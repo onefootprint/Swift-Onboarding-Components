@@ -2,6 +2,8 @@ import { useTranslation } from 'hooks';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import Header from 'src/components/header';
+import useBifrostMachine from 'src/hooks/use-bifrost-machine';
+import { Events } from 'src/types/bifrost-machine';
 import styled, { css } from 'styled';
 import { Button, Grid, Select, TextInput } from 'ui';
 
@@ -9,10 +11,13 @@ type FormData = {
   addressLine1: string;
   addressLine2: string;
   city: string;
+  state: string;
+  country: string;
   zipCode: string;
 };
 
 const ResidentialAddress = () => {
+  const [, send] = useBifrostMachine();
   const { t } = useTranslation('pages.registration.residential-address');
   const {
     register,
@@ -21,8 +26,18 @@ const ResidentialAddress = () => {
   } = useForm<FormData>();
 
   const onSubmit = (formData: FormData) => {
-    // TODO: Integrate with backend
-    console.log(formData);
+    send({
+      type: Events.residentialAddressSubmitted,
+      payload: {
+        residentialAddress: {
+          streetAddress: `${formData.addressLine1}\n${formData.addressLine2}`,
+          city: formData.city,
+          zipCode: formData.zipCode,
+          country: formData.country,
+          state: formData.state,
+        },
+      },
+    });
   };
 
   return (

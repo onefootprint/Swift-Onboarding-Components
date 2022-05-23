@@ -7,8 +7,8 @@ export type VerifyPhoneRequest = {
 };
 
 export enum VerifyPhoneResponseKind {
-  UserCreated = 'user_created', // Created a new user vault
-  UserFound = 'user_inherited', // Found an existing user vault
+  userCreated = 'user_created', // Created a new user vault
+  userInherited = 'user_inherited', // Found an existing user vault
 }
 
 export type VerifyPhoneResponse = {

@@ -3,49 +3,59 @@ import useBifrostMachine from 'src/hooks/use-bifrost-machine';
 import useIdentifyEmail, {
   IdentifyEmailRequest,
 } from 'src/hooks/use-identify-email';
+import { Events } from 'src/types/bifrost-machine';
 import styled, { css } from 'styled';
 import { Box, LinkButton, LoadingIndicator, PinInput, Typography } from 'ui';
 
 import useVerifyPhone, {
   VerifyPhoneRequest,
   VerifyPhoneResponse,
-  // VerifyPhoneResponseKind,
+  VerifyPhoneResponseKind,
 } from './hooks/use-verify-phone';
 
 const PhoneVerification = () => {
-  const [state] = useBifrostMachine();
-  const { email, phoneLastTwoDigits, challengeToken } =
+  const [state, send] = useBifrostMachine();
+  const { email, phoneNumberLastTwo, challengeToken } =
     state.context.identification;
   const identifyEmailMutation = useIdentifyEmail();
   const verifyPhoneMutation = useVerifyPhone();
 
   const resendVerification = () => {
-    // TODO: ADJUST
-    // @ts-ignore
+    if (!email) {
+      return;
+    }
     const payload: IdentifyEmailRequest = { email };
     identifyEmailMutation.mutate(payload);
   };
 
   const validatePin = (pin: string) => {
+    if (!challengeToken) {
+      return;
+    }
     const payload: VerifyPhoneRequest = {
       code: pin,
-      // TODO: ADJUST
-      // @ts-ignore
       challengeToken,
     };
     verifyPhoneMutation.mutate(payload, {
       onSuccess: ({ authToken, kind }: VerifyPhoneResponse) => {
-        console.log(kind);
-        console.log(authToken);
-        // if (kind === VerifyPhoneResponseKind.UserCreated) {
-        // onCreateUser?.(authToken);
-        // } else if (kind === VerifyPhoneResponseKind.UserFound) {
-        // onVerifyUser?.(authToken);
-        // }
-      },
-      onError(error) {
-        // TODO: handle errors better
-        console.log(error);
+        if (!authToken) {
+          return;
+        }
+        if (kind === VerifyPhoneResponseKind.userCreated) {
+          send({
+            type: Events.userCreated,
+            payload: {
+              authToken,
+            },
+          });
+        } else if (kind === VerifyPhoneResponseKind.userInherited) {
+          send({
+            type: Events.userInherited,
+            payload: {
+              authToken,
+            },
+          });
+        }
       },
     });
   };
@@ -70,7 +80,7 @@ const PhoneVerification = () => {
         </Typography>
         <Typography variant="body-2" color="secondary">
           Enter the 6-digit code sent to (•••) ••• ••
-          {phoneLastTwoDigits}.
+          {phoneNumberLastTwo}.
         </Typography>
       </Box>
       {input}
