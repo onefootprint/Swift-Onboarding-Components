@@ -16,7 +16,7 @@ export const activeBackgroundColor: Record<string, Overlay> = {
 };
 
 export const colors: Record<string, Color> = {
-  primary: 'quaternary',
+  primary: 'quinary',
   secondary: 'primary',
 };
 
