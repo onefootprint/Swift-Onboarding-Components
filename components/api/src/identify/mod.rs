@@ -2,6 +2,8 @@ pub mod email;
 pub mod phone;
 pub mod verify;
 
+use std::str::FromStr;
+
 use crate::signed_hash;
 use crate::utils::challenge::Challenge;
 use crate::{errors::ApiError, State};
@@ -15,7 +17,7 @@ use chrono::{Duration, Utc};
 use crypto::aead::ScopedSealingKey;
 use crypto::b64::Base64Data;
 use crypto::seal::EciesP256Sha256AesGcmSealed;
-use crypto::sha256;
+use crypto::{sha256, serde_cbor};
 use db::models::session_data::{ChallengeLastSentData, SessionState};
 use db::models::user_vaults::{UserVault, UserVaultWrapper};
 use newtypes::DataKind;
@@ -66,13 +68,6 @@ pub async fn signed_hash(state: &web::Data<State>, val: String) -> Result<Vec<u8
     state.hmac_client.signed_hash(val.as_bytes()).await
 }
 
-fn seal_untyped(val: String, pub_key: &[u8]) -> Result<EciesP256Sha256AesGcmSealed, ApiError> {
-    let val = crypto::seal::seal_ecies_p256_x963_sha256_aes_gcm(
-        pub_key,
-        val.as_str().as_bytes().to_vec(),
-    )?;
-    Ok(val)
-}
 pub fn seal(val: String, pub_key: &[u8]) -> Result<Vec<u8>, ApiError> {
     let val = crypto::seal::seal_ecies_p256_x963_sha256_aes_gcm(
         pub_key,
@@ -191,27 +186,44 @@ pub(crate) async fn send_phone_challenge(
     })
 }
 
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
+pub struct EmailVerifyData {
+    pub sh_email: Vec<u8>,
+    pub e_email_challenge: Vec<u8>,
+}
+
+impl EmailVerifyData {
+    pub fn serialize(&self) -> Result<String, ApiError> {
+        let email_verify_data = serde_cbor::to_vec(self).map_err(crypto::Error::from)?;
+        Ok(Base64Data(email_verify_data).to_string())
+    }
+
+    pub fn deserialize(data: String) -> Result<EmailVerifyData, ApiError> {
+        let data_slice = Base64Data::from_str(&data).map_err(crypto::Error::from)?.0;
+        let email_verify_data: EmailVerifyData = serde_cbor::from_slice(&data_slice).map_err(crypto::Error::from)?;
+        Ok(email_verify_data)
+    }
+}
+
 pub(crate) async fn send_email_challenge(
     state: &web::Data<State>,
     public_key: Vec<u8>,
     email_address: String,
 ) -> Result<(), ApiError> {
-    let sh_email = signed_hash(state, email_address.clone()).await?;
-    let now = chrono::Utc::now().naive_utc();
-    let email_challenge_data = EmailVerifyChallenge {
-        expires_at: now + chrono::Duration::days(1),
+    let email_challenge = EmailVerifyChallenge {
+        expires_at: chrono::Utc::now().naive_utc() + chrono::Duration::days(1),
         email: email_address.clone(),
     };
-    let email_challenge_data_str =
-        serde_json::to_string::<EmailVerifyChallenge>(&email_challenge_data)
+    let email_challenge =
+        serde_json::to_string::<EmailVerifyChallenge>(&email_challenge)
             .map_err(|_| ApiError::ChallengeNotValid)?;
-    let e_email_challenge =
-        seal_untyped(email_challenge_data_str.clone(), &public_key)?.to_string()?;
+    let email_verify_data = EmailVerifyData{
+        sh_email: signed_hash(state, email_address.clone()).await?,
+        e_email_challenge: seal(email_challenge, &public_key)?,
+    }.serialize()?;
 
     let curl_request_str = format!(
-        "https://verify.ui.footprint.dev/?sh_email={}&e_email_challenge={}",
-        Base64Data(sh_email),
-        e_email_challenge,
+        "https://verify.ui.footprint.dev/#{}", email_verify_data,
     );
     let content = build_email_challenge_content_body(curl_request_str);
     let _output = state

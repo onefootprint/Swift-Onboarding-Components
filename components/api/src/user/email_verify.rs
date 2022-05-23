@@ -1,17 +1,13 @@
-use std::str::FromStr;
-
-use crate::errors::ApiError;
+use crate::{errors::ApiError, identify::EmailVerifyData};
 use crate::types::success::ApiResponseData;
 use crate::State;
 use chrono::{NaiveDateTime, Utc};
-use crypto::b64::Base64Data;
 use newtypes::DataKind;
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
 struct EmailVerifyRequest {
-    sh_email: String,
-    e_email_challenge: String,
+    data: String,
 }
 
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
@@ -33,16 +29,16 @@ async fn handler(
     // Note that we get nice security guarantees from this model:
     // 1. if the email associated with the user has changed, we won't be able to look it up (prevents swapping emails)
     // 2. bad data / a different sh email will not properly decrypt
-    let sh_email = Base64Data::from_str(&request.sh_email).map_err(crypto::Error::from)?;
+    let EmailVerifyData{sh_email, e_email_challenge} = EmailVerifyData::deserialize(request.into_inner().data)?;
     // TODO what happens if multiple user vaults have this email?
     let (existing_user_vault, email_user_data) =
-        db::user_vault::get_by_fingerprint(&state.db_pool, DataKind::Email, sh_email.0, false)
+        db::user_vault::get_by_fingerprint(&state.db_pool, DataKind::Email, sh_email, false)
             .await?
             .ok_or(ApiError::UserDoesntExistForEmailChallenge)?;
 
-    let decrypted_challenge = crate::enclave::lib::decrypt_string(
+    let decrypted_challenge = crate::enclave::lib::decrypt_bytes(
         &state,
-        &request.e_email_challenge,
+        &e_email_challenge,
         existing_user_vault.e_private_key.clone(),
         enclave_proxy::DataTransform::Identity,
     )
