@@ -21,14 +21,13 @@ async fn test_db() {
     let _tenant = crate::tenant::init(&pool, tenant)
         .await
         .expect("couldn't create tenant");
-    let user_vault = crate::models::user_vaults::NewUserVault {
+    crate::user_vault::create(&pool, crate::models::user_vaults::NewUserVaultReq {
         e_private_key: "private key".as_bytes().to_vec(),
         public_key: "public key".as_bytes().to_vec(),
         id_verified: Status::Incomplete,
-        e_phone_number: "".as_bytes().to_vec(),
-        sh_phone_number: "".as_bytes().to_vec(),
-    }
-    .save(&pool)
+        e_phone_number: "blah".as_bytes().to_vec(),
+        sh_phone_number: "blah".as_bytes().to_vec()
+    })
     .await
     .expect("couldn't init user vault");
 
