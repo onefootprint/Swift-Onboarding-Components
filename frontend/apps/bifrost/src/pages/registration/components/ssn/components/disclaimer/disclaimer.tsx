@@ -10,7 +10,7 @@ type DisclaimerProps = {
 const Disclaimer = ({ items }: DisclaimerProps) => (
   <Container>
     {items.map(({ title, description, Icon }) => (
-      <Item title={title}>
+      <Item title={title} key={title}>
         <Box>
           <Icon color="primary" />
         </Box>

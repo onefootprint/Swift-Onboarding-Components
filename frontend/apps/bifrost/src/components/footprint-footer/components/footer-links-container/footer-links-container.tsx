@@ -16,7 +16,7 @@ const FooterLinksContainer = ({ links }: FooterLinksContainerProps) => {
 
   links.forEach((l: FooterLink, i: number) => {
     content.push(
-      <li>
+      <li key={l.label}>
         <LinkButton size="tiny" href={l.link}>
           {l.label}
         </LinkButton>
