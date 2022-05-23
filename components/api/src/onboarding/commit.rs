@@ -36,6 +36,7 @@ fn handler(
         .map(|x| x.to_string())
         .collect::<Vec<String>>();
     let webauthn_creds = get_webauthn_creds(&state, uv_id).await?;
+    // TODO kick off user verification with data vendors
 
     if missing_fields.is_empty() {
         Ok(Json(ApiResponseData {
