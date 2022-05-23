@@ -58,6 +58,7 @@ export type Colors = {
   quaternary: string;
   quinary: string;
   senary: string;
+  septenary: string;
 } & UIStates;
 
 export type Color = keyof Colors;
