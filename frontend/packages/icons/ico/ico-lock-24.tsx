@@ -3,7 +3,7 @@ import { useTheme } from 'styled';
 
 import type { IconProps } from '../src/types';
 
-const IcoLock24 = ({ color = 'primary', style, testID }: IconProps) => {
+const IcoLock24 = ({ color = 'primary', className, testID }: IconProps) => {
   const theme = useTheme();
   return (
     <svg
@@ -12,7 +12,7 @@ const IcoLock24 = ({ color = 'primary', style, testID }: IconProps) => {
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       data-testid={testID}
-      style={style}
+      className={className}
       aria-hidden="true"
     >
       <path

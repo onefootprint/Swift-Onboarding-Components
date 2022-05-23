@@ -7,7 +7,7 @@ import { useTheme } from 'styled';
 
 import type { IconProps } from '../src/types';
 
-const ${componentName} = ({ color = 'primary', style, testID }: IconProps) => {
+const ${componentName} = ({ color = 'primary', className, testID }: IconProps) => {
   const theme = useTheme();
   return ${jsx}
 }

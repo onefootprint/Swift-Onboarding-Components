@@ -1,11 +1,11 @@
 import IcoFootprint24 from 'icons/ico/ico-footprint-24';
 import React from 'react';
+import styled, { css } from 'styled';
 
 import Button, { ButtonProps } from '../button';
 
 export type FootprintButtonProps = Omit<ButtonProps, 'children' | 'variant'>;
 
-// TODO: Adjust margin right, using theme properties using `xs`
 const FootprintButton = ({
   disabled = false,
   fullWidth,
@@ -23,9 +23,15 @@ const FootprintButton = ({
     type={type}
     variant="primary"
   >
-    <IcoFootprint24 color="senary" style={{ marginRight: '8px' }} />
+    <StyledIcoFootprint color="senary" />
     Verify with Footprint
   </Button>
 );
+
+const StyledIcoFootprint = styled(IcoFootprint24)`
+  ${({ theme }) => css`
+    margin-right: ${theme.spacing[3]}px;
+  `}
+`;
 
 export default FootprintButton;

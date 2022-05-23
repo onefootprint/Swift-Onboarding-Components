@@ -5,7 +5,7 @@ import type { IconProps } from '../src/types';
 
 const IcoArrowRightSmall24 = ({
   color = 'primary',
-  style,
+  className,
   testID,
 }: IconProps) => {
   const theme = useTheme();
@@ -16,7 +16,7 @@ const IcoArrowRightSmall24 = ({
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       data-testid={testID}
-      style={style}
+      className={className}
       aria-hidden="true"
     >
       <path
