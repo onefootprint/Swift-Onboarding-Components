@@ -1,14 +1,13 @@
 /* eslint-disable react/jsx-props-no-spreading */
-import { Property } from 'csstype';
 import { useCombobox } from 'downshift';
 import { usePlacesAutocomplete } from 'hooks';
+import noop from 'lodash/noop';
 import take from 'lodash/take';
-import React, { forwardRef } from 'react';
+import React, { forwardRef, useRef } from 'react';
 import mergeRefs from 'react-merge-refs';
 import styled, { css } from 'styled';
 
 import BaseInput, { BaseInputProps } from '../internal/base-input';
-import Label from '../internal/label';
 import type { Item } from './adress-input.types';
 import AddressDropdownFooter from './components/address-dropdown-footer';
 import AddressDropdownItem from './components/address-dropdown-item';
@@ -16,43 +15,26 @@ import usePopper from './hooks/use-popper';
 
 const MAX_OF_RESULTS = 5;
 
-export type AddressInputProps = Pick<
-  BaseInputProps,
-  | 'disabled'
-  | 'hasError'
-  | 'hintText'
-  | 'label'
-  | 'name'
-  | 'onChangeText'
-  | 'placeholder'
-  | 'required'
-  | 'tabIndex'
-  | 'testID'
-  | 'value'
-> & {
-  onSelect: (item?: Item | null) => void;
-  country: string;
+export type AddressInputProps = BaseInputProps & {
+  onSelect?: (item?: Item | null) => void;
+  country?: string;
 };
 
 const AddressInput = forwardRef<HTMLInputElement, AddressInputProps>(
   (
     {
       country = 'US',
-      disabled,
-      hasError,
-      hintText,
-      label,
-      name,
+      onBlur = noop,
+      onChange = noop,
       onChangeText,
-      onSelect,
-      placeholder,
-      required,
-      tabIndex,
-      testID,
-      value = '',
+      onKeyDown = noop,
+      onSelect = noop,
+      ...rest
     }: AddressInputProps,
     ref,
   ) => {
+    const isUncontrolled = rest.value === undefined;
+    const localInputRef = useRef<HTMLInputElement>(null);
     const { setReferenceElement, setPopperElement, popper } = usePopper();
     const {
       suggestions: { data },
@@ -70,21 +52,25 @@ const AddressInput = forwardRef<HTMLInputElement, AddressInputProps>(
       getComboboxProps,
       getInputProps,
       getItemProps,
-      getLabelProps,
       getMenuProps,
       getToggleButtonProps,
       highlightedIndex,
+      inputValue: value,
       isOpen: downShiftIsOpen,
     } = useCombobox({
       items: options,
       itemToString: item => (item ? item.structured_formatting.main_text : ''),
-      inputValue: value,
       onSelectedItemChange: ({ selectedItem }) => {
         onChangeText?.(selectedItem?.structured_formatting.main_text || '');
         onSelect(selectedItem);
+        const hasToTriggerChangeEvent = isUncontrolled && localInputRef.current;
+        if (hasToTriggerChangeEvent) {
+          const event = new window.Event('change', { bubbles: true });
+          localInputRef.current.dispatchEvent(event);
+        }
       },
-      onInputValueChange: ({ inputValue }) => {
-        const nextValue = inputValue || '';
+      onInputValueChange: ({ inputValue = '' }) => {
+        const nextValue = inputValue;
         onChangeText?.(nextValue);
         setValue(nextValue);
       },
@@ -94,73 +80,69 @@ const AddressInput = forwardRef<HTMLInputElement, AddressInputProps>(
     const inputProps = getInputProps();
     const menuProps = getMenuProps({}, { suppressRefError: true });
     const hasResults = options.length > 0;
-    const hasTypedMinimumRequired = value.length > 1;
-    const isDropdownOpen =
-      downShiftIsOpen && hasTypedMinimumRequired && hasResults;
+    const isDropdownOpen = downShiftIsOpen && hasResults;
+
+    const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+      inputProps.onChange(event);
+      onChange(event);
+    };
+
+    const handleBlur = (event: React.FocusEvent<HTMLInputElement>) => {
+      inputProps.onBlur(event);
+      onBlur(event);
+    };
+
+    const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+      inputProps.onKeyDown(event);
+      onKeyDown(event);
+    };
+
+    const renderAddressItem = (item: Item, index: number) => {
+      const itemProps = getItemProps({ item, index });
+      return (
+        <AddressDropdownItem
+          disableHoverStyles={highlightedIndex !== -1}
+          highlighted={highlightedIndex === index}
+          key={item.place_id}
+          searchWords={value.split(' ')}
+          subtitle={item.structured_formatting.secondary_text}
+          title={item.structured_formatting.main_text}
+          {...itemProps}
+        />
+      );
+    };
 
     return (
-      <>
-        {label ? <Label {...getLabelProps()}>{label}</Label> : null}
-        <Container
-          aria-expanded={comboBoxProps['aria-expanded']}
-          aria-haspopup={comboBoxProps['aria-haspopup']}
-          aria-owns={comboBoxProps['aria-owns']}
-          ref={comboBoxProps.ref}
-          role={comboBoxProps.role}
-        >
-          <BaseInput
-            aria-autocomplete={inputProps['aria-autocomplete']}
-            aria-controls={inputProps['aria-controls']}
-            aria-labelledby={inputProps['aria-labelledby']}
-            autoComplete={inputProps.autoComplete}
-            disabled={disabled}
-            hasError={hasError}
-            hintText={hintText}
-            id={inputProps.id}
-            name={name}
-            onBlur={inputProps.onBlur}
-            onChange={inputProps.onChange}
-            onClick={toggleButtonProps.onClick}
-            onKeyDown={inputProps.onKeyDown}
-            placeholder={placeholder}
-            ref={mergeRefs([ref, setReferenceElement, inputProps.ref])}
-            required={required}
-            tabIndex={tabIndex}
-            testID={testID}
-            value={value}
-          />
-          {isDropdownOpen ? (
-            <Dropdown
-              {...menuProps}
-              ref={mergeRefs([menuProps.ref, setPopperElement])}
-              {...popper.attributes.popper}
-              style={popper.styles.popper}
-            >
-              <>
-                {options.map((option, index) => {
-                  const optionProps = getItemProps({ item: option, index });
-                  return (
-                    <AddressDropdownItem
-                      ariaSelected={optionProps['aria-selected']}
-                      disableHoverStyles={highlightedIndex !== -1}
-                      highlighted={highlightedIndex === index}
-                      id={optionProps.id}
-                      key={option.place_id}
-                      onClick={optionProps.onClick}
-                      onMouseMove={optionProps.onMouseMove}
-                      ref={optionProps.ref}
-                      searchWords={value.split(' ')}
-                      subtitle={option.structured_formatting.secondary_text}
-                      title={option.structured_formatting.main_text}
-                    />
-                  );
-                })}
-                <AddressDropdownFooter />
-              </>
-            </Dropdown>
-          ) : null}
-        </Container>
-      </>
+      <Container {...comboBoxProps}>
+        <BaseInput
+          {...rest}
+          {...toggleButtonProps}
+          {...inputProps}
+          onBlur={handleBlur}
+          onChange={handleChange}
+          onKeyDown={handleKeyDown}
+          ref={mergeRefs([
+            localInputRef,
+            ref,
+            setReferenceElement,
+            inputProps.ref,
+            toggleButtonProps.ref,
+          ])}
+        />
+        {isDropdownOpen ? (
+          <Dropdown
+            {...menuProps}
+            {...popper.attributes.popper}
+            ref={mergeRefs([menuProps.ref, setPopperElement])}
+            style={popper.styles.popper}
+          >
+            <>
+              {options.map(renderAddressItem)}
+              <AddressDropdownFooter />
+            </>
+          </Dropdown>
+        ) : null}
+      </Container>
     );
   },
 );
@@ -169,18 +151,17 @@ const Container = styled.div`
   position: relative;
 `;
 
-const Dropdown = styled.ul<{
-  maxHeight?: Property.MaxHeight;
-}>`
-  ${({ theme, maxHeight = 330 }) => css`
+const Dropdown = styled.ul`
+  ${({ theme }) => css`
     background: ${theme.backgroundColor.primary};
     border-radius: ${theme.borderRadius[1]}px;
     border: ${theme.borderWidth[1]}px solid ${theme.borderColor.primary};
     box-shadow: ${theme.elevation[2]};
-    max-height: ${maxHeight};
+    max-height: 330px;
     outline: none;
     padding: ${theme.spacing[3]}px 0 0;
     width: 100%;
+    z-index: ${theme.zIndex.dropdown};
   `}
 `;
 

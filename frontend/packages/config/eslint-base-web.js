@@ -33,7 +33,15 @@ module.exports = {
     'react/jsx-props-no-spreading': [
       'error',
       {
-        exceptions: ['TextInput', 'Component', 'App'],
+        exceptions: [
+          'TextInput',
+          'BaseInput',
+          'AddressInput',
+          'PinInput',
+          'Select',
+          'Component',
+          'App',
+        ],
       },
     ],
     'no-use-before-define': 'off',

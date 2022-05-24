@@ -30,7 +30,6 @@ const BaseInput = forwardRef<HTMLInputElement, BaseInputProps>(
       maxLength,
       minLength,
       name,
-      onClick,
       onChange,
       onChangeText,
       placeholder,
@@ -79,8 +78,8 @@ const BaseInput = forwardRef<HTMLInputElement, BaseInputProps>(
           tabIndex={disabled ? -1 : tabIndex}
           type={type}
           value={value}
-          {...rest}
           onChange={handleChange}
+          {...rest}
         />
         {hintText && (
           <Hint color={hasError ? 'error' : 'tertiary'}>{hintText}</Hint>

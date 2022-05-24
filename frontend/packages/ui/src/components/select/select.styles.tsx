@@ -7,6 +7,7 @@ const Container = styled.div`
 
 const DropdownContainer = styled.div<{ withPaddingTop: boolean }>`
   ${({ theme }) => css`
+    z-index: ${theme.zIndex.dropdown};
     background: ${theme.backgroundColor.primary};
     border-radius: ${theme.borderRadius[1]}px;
     border: ${theme.borderWidth[1]}px solid ${theme.borderColor.primary};
