@@ -29,6 +29,7 @@ pub enum DataKind {
     Dob,
     Ssn,
     StreetAddress,
+    StreetAddress2,
     City,
     State,
     Zip,

@@ -35,7 +35,7 @@ CREATE TABLE user_vaults (
     updated_at timestamp NOT NULL DEFAULT NOW()
 );
 
-CREATE TYPE data_kind as ENUM ('FirstName', 'LastName', 'Dob', 'Ssn', 'StreetAddress', 'City', 'State', 'Zip', 'Country', 'Email', 'PhoneNumber');
+CREATE TYPE data_kind as ENUM ('FirstName', 'LastName', 'Dob', 'Ssn', 'StreetAddress', 'StreetAddress2', 'City', 'State', 'Zip', 'Country', 'Email', 'PhoneNumber');
 CREATE TYPE data_priority as ENUM ('Primary', 'Secondary');
 
 CREATE TABLE user_data (

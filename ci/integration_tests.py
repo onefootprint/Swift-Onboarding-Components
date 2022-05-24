@@ -138,6 +138,7 @@ def test_user_data(request):
         "dob": "12-25-1995",
         "ssn": _gen_random_ssn(),
         "street_address": "1 Footprint Way",
+        "street_address2": "",
         "city": "Enclave",
         "state": "NY",
         "zip": "10009",
