@@ -165,8 +165,8 @@ def test_user_data(request):
     )
     _assert_response(r)
 
-def test_onboarding_commit(request, tenant1): 
-    path = "onboarding/commit"
+def test_onboarding_complete(request, tenant1): 
+    path = "onboarding/complete"
     print(url(path))
     r = requests.post(
         url(path),
@@ -220,8 +220,8 @@ def test_identify_repeat_customer_via_email(request, tenant2):
     body = _assert_response(r)
     assert not body["data"]["missing_attributes"]
 
-    # Commit onboarding for user
-    path = "onboarding/commit"
+    # complete onboarding for user
+    path = "onboarding/complete"
     print(url(path))
     r = requests.post(
         url(path),
@@ -234,7 +234,7 @@ def test_identify_repeat_customer_via_email(request, tenant2):
     assert old_fp_user_id != fp_user_id, "Different tenants should have different fp_user_ids"
     
 def test_tenant_decrypt(request, tenant1):
-    path = "tenant/decrypt"
+    path = "org/decrypt"
     print(url(path))
     data = {
         "footprint_user_id": request.config.cache.get("fp_user_id", None),
@@ -254,7 +254,7 @@ def test_tenant_decrypt(request, tenant1):
     assert attributes["email"] == request.config.cache.get("email", None)
     
 def test_onboardings_list(request, tenant1):
-    path = "tenant/onboardings"
+    path = "org/onboardings"
     print(url(path))
     r = requests.get(
         url(path),
@@ -268,7 +268,7 @@ def test_onboardings_list(request, tenant1):
 
 def test_access_events_list(request, tenant1):
     fp_user_id = request.config.cache.get("fp_user_id", None)
-    path = f"tenant/access_events?footprint_user_id={fp_user_id}"
+    path = f"org/access_events?footprint_user_id={fp_user_id}"
     print(url(path))
     r = requests.get(
         url(path),
@@ -280,7 +280,7 @@ def test_access_events_list(request, tenant1):
     assert set(i["data_kind"] for i in access_events) == {"first_name", "email", "zip", "country"}
 
     # Test filtering on kind
-    path = f"tenant/access_events?footprint_user_id={fp_user_id}&data_kind=email"
+    path = f"org/access_events?footprint_user_id={fp_user_id}&data_kind=email"
     r = requests.get(
         url(path),
         headers=_client_priv_key_headers(tenant1["sk"]),

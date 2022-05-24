@@ -18,7 +18,7 @@ struct DashboardAuthorization {
     profile: WorkOSProfile,
 }
 
-#[api_v2_operation]
+#[api_v2_operation(tags(Private, WorkOS))]
 #[get("/callback")]
 /// Callback function for WorkOS API
 fn handler(

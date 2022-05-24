@@ -19,7 +19,7 @@ struct UserDecryptRequest {
 
 type UserDecryptResponse = HashMap<DataKind, String>;
 
-#[api_v2_operation]
+#[api_v2_operation(tags(Org))]
 #[post("/decrypt")]
 /// Allows a tenant to decrypt a specific user's data. The user requested must be onboarded onto
 /// the requesting tenant.
@@ -93,7 +93,7 @@ pub async fn decrypt_fields(
         })
         .collect::<Result<Vec<DecryptRequest>, crypto::Error>>()?;
     let decrypt_response =
-        crate::enclave::lib::decrypt(state, requests, vault.e_private_key.clone()).await?;
+        crate::enclave::decrypt(state, requests, vault.e_private_key.clone()).await?;
     if decrypt_response.len() != fields_to_decrypt.len() {
         return Err(ApiError::InvalidEnclaveDecryptResponse);
     }

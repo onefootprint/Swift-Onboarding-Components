@@ -77,8 +77,6 @@ pub enum ApiError {
     OnboardingForTenantDoesNotExist,
     #[error("webauthn credential not set")]
     WebauthnCredentialsNotSet,
-    #[error("webauthn credential not set, and missing fields required for user: {0}")]
-    UserMissingWebauthnAndFields(String),
     #[error("Please wait {0} seconds between sending SMS challenges")]
     WaitToSendChallenge(i64),
     #[error("workos error: {0}")]
@@ -145,7 +143,6 @@ impl actix_web::ResponseError for ApiError {
             ApiError::KmsSignMacError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::KmsVerifyMacError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::WebauthnCredentialsNotSet => StatusCode::BAD_REQUEST,
-            ApiError::UserMissingWebauthnAndFields(_) => StatusCode::BAD_REQUEST,
             ApiError::WaitToSendChallenge(_) => StatusCode::BAD_REQUEST,
             ApiError::WorkOS(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::WorkOsDecode(_) => StatusCode::INTERNAL_SERVER_ERROR,

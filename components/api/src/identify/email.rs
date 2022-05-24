@@ -20,7 +20,7 @@ pub struct IdentifyResponse {
     challenge_data: Option<super::ChallengeResponse>,
 }
 
-#[api_v2_operation]
+#[api_v2_operation(tags(Identify))]
 #[post("/email")]
 /// Attempt to log a user in by email address. Only if there already exists a user vault with this email,
 /// sends a challenge to the user's phone number and returns HTTP 200 with an IdentifyResponse including

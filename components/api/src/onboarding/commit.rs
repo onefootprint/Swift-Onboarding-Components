@@ -16,8 +16,8 @@ struct CommitResponse {
     missing_webauthn_credentials: bool,
 }
 
-#[api_v2_operation]
-#[post("/commit")]
+#[api_v2_operation(tags(Onboarding))]
+#[post("/complete")]
 /// Finish onboarding the user. Returns the footprint_user_id for login. If any necessary
 /// attributes were not set, returns an error with the list of missing fields.
 fn handler(

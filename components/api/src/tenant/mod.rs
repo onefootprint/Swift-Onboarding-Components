@@ -66,7 +66,7 @@ impl FromRequest for AuthContext {
 }
 
 pub fn routes() -> web::Scope {
-    web::scope("/tenant")
+    web::scope("/org")
         .service(access_events::handler)
         .service(decrypt::handler)
         .service(onboardings::handler)

@@ -22,7 +22,7 @@ struct OnboardingItem {
 
 type OnboardingResponse = Vec<OnboardingItem>;
 
-#[api_v2_operation]
+#[api_v2_operation(tags(Org))]
 #[get("/onboardings")]
 /// Allows a tenant to view a list of their Onboardings, effectively showing all users that have
 /// started the onboarding process for the tenant. Optionally allows filtering on Onboarding status.

@@ -3,7 +3,7 @@ use crate::State;
 use actix_web::HttpResponse;
 use paperclip::actix::{api_v2_operation, get, web};
 
-#[api_v2_operation]
+#[api_v2_operation(tags(Private, WorkOS))]
 #[get("/oauth")]
 /// Request to authenticate via Google OAuth. We will have to manually add domains to our
 /// service.

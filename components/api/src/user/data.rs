@@ -59,7 +59,7 @@ impl UserPatchRequest {
     }
 }
 
-#[api_v2_operation]
+#[api_v2_operation(tags(User))]
 #[post("/data")]
 /// Operates as a PATCH request to update data in the user vault. Requires user authentication
 /// sent in the cookie after a successful /identify/verify call.

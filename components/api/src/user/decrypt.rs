@@ -17,7 +17,7 @@ struct UserDecryptRequest {
 
 type UserDecryptResponse = HashMap<DataKind, String>;
 
-#[api_v2_operation]
+#[api_v2_operation(tags(User))]
 #[post("/decrypt")]
 /// Allows a user to decrypt their own data.
 /// Requires user auth provided in the cookie.

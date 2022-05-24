@@ -17,7 +17,7 @@ pub struct OnboardingResponse {
     missing_webauthn_credentials: bool,
 }
 
-#[api_v2_operation]
+#[api_v2_operation(tags(Onboarding))]
 /// Gets or creates the onboarding for this (user, tenant) pair. Returns the list of fields
 /// required to complete the onboarding for this tenant.
 pub fn handler(

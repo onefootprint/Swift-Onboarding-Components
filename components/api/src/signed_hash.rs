@@ -10,6 +10,7 @@ pub struct SignedHashClient {
 }
 
 impl SignedHashClient {
+    #[allow(dead_code)]
     pub async fn verify_mac(&self, data: &[u8], signature: &[u8]) -> Result<bool, ApiError> {
         let result = self
             .client

@@ -16,7 +16,7 @@ pub struct EmailVerifyChallenge {
     pub email: String,
 }
 
-#[api_v2_operation]
+#[api_v2_operation(tags(User))]
 #[post("/email/verify")]
 /// Used to asynchronously verify a user's email address.
 /// Requires the hash of the email and the encrypted email challenge, which are sent to the user's
@@ -36,7 +36,7 @@ async fn handler(
             .await?
             .ok_or(ApiError::UserDoesntExistForEmailChallenge)?;
 
-    let decrypted_challenge = crate::enclave::lib::decrypt_bytes(
+    let decrypted_challenge = crate::enclave::decrypt_bytes(
         &state,
         &e_email_challenge,
         existing_user_vault.e_private_key.clone(),

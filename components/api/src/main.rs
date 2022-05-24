@@ -1,10 +1,12 @@
+use std::time::Duration;
+
 use actix_session::{storage::CookieSessionStore, SessionMiddleware};
 use actix_web::{cookie::Key, middleware::Logger, App, HttpServer};
 use actix_web_opentelemetry::RequestMetrics;
 use config::Config;
 use crypto::aead::ScopedSealingKey;
 use db::DbPool;
-use enclave_proxy::{bb8, pool, StreamManager};
+use enclave_proxy::{bb8::{self, ErrorSink}, pool, StreamManager};
 use signed_hash::SignedHashClient;
 use telemetry::TelemetrySpanBuilder;
 use tracing_actix_web::TracingLogger;
@@ -46,6 +48,19 @@ pub struct State {
     session_sealing_key: ScopedSealingKey,
 }
 
+/// Record errors that occur from enclave pool connections
+#[derive(Debug, Clone)]
+struct EnclavePoolErrorSink;
+impl ErrorSink<enclave_proxy::Error> for EnclavePoolErrorSink {    
+    fn sink(&self, error: enclave_proxy::Error) {
+        tracing::error!(target: "enclave_pool_error", error=?error, "enclave connection pool error");
+    }
+
+    fn boxed_clone(&self) -> Box<(dyn ErrorSink<enclave_proxy::Error> + 'static)> {
+        Box::new(self.clone())
+    }
+}
+
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     let config = config::Config::load_from_env().expect("failed to load config");
@@ -64,6 +79,9 @@ async fn main() -> std::io::Result<()> {
         let pool = bb8::Pool::builder()
             .min_idle(Some(3))
             .max_size(5)
+            .connection_timeout(Duration::from_secs(10))
+            .test_on_check_out(false)
+            .error_sink(Box::new(EnclavePoolErrorSink))
             .build(pool::StreamManager(manager))
             .await
             .unwrap();
@@ -177,10 +195,7 @@ async fn main() -> std::io::Result<()> {
             .service(
                 web::scope("/private")
                     .service(client::init::handler)
-                    .service(client::workos_init::handler)
-                    .service(enclave::encrypt::handler)
-                    .service(enclave::decrypt::handler)
-                    .service(enclave::sign::handler),
+                    .service(client::workos_init::handler)                    
             )
             .service(identify::routes())
             .service(tenant::routes())

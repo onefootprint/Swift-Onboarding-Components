@@ -10,7 +10,7 @@ pub struct ChallengeRequest {
     phone_number: String,
 }
 
-#[api_v2_operation]
+#[api_v2_operation(tags(Identify))]
 #[post("/phone")]
 /// Initiates a log in for a user with the provided phone number. Can be used regardless of
 /// whether a user vault exists with this phone number. Sends a challenge to the phone number

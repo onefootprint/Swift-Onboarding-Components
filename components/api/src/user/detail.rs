@@ -19,7 +19,7 @@ async fn decrypt_field(
     e_private_key: Vec<u8>,
 ) -> Result<Option<String>, ApiError> {
     if let Some(e_data) = e_data {
-        let decrypted_data = crate::enclave::lib::decrypt_bytes(
+        let decrypted_data = crate::enclave::decrypt_bytes(
             state,
             e_data,
             e_private_key,
@@ -53,7 +53,7 @@ impl ApiUser {
     }
 }
 
-#[api_v2_operation]
+#[api_v2_operation(tags(User))]
 /// Returns a decrypted profile for the logged-in user.
 /// Requires user authentication sent in the cookie after a successful /identify/verify call
 pub async fn handler(

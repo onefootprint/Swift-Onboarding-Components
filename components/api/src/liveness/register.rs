@@ -21,7 +21,7 @@ pub struct WebAuthnInitResponse {
 }
 
 /// Get a registration challenge
-#[api_v2_operation]
+#[api_v2_operation(tags(Liveness))]
 #[post("/register/init")]
 pub fn init(
     // TODO only allow registering webauthn credentials if you have no previous credentials OR if
@@ -63,7 +63,7 @@ struct WebauthnRegisterRequest {
 }
 
 /// Response to a registration challenge
-#[api_v2_operation]
+#[api_v2_operation(tags(Liveness))]
 #[post("/register")]
 async fn complete(
     request: Json<WebauthnRegisterRequest>,

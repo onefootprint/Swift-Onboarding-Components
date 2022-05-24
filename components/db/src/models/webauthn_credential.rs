@@ -4,7 +4,7 @@ use crate::{
     DbPool,
 };
 use chrono::NaiveDateTime;
-use diesel::{Insertable, OptionalExtension, PgConnection, QueryDsl, Queryable, RunQueryDsl};
+use diesel::{Insertable, PgConnection, QueryDsl, Queryable, RunQueryDsl};
 use newtypes::UserVaultId;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;

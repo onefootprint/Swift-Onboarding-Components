@@ -32,7 +32,7 @@ struct VerifyResponse {
     auth_token: String,
 }
 
-#[api_v2_operation]
+#[api_v2_operation(tags(Identify))]
 #[post("/verify")]
 /// Used to verify the two-factor challenge sent to a phone number. If the challenge code matches
 /// what was sent to the phone number, we will get or create the user vault associated with this

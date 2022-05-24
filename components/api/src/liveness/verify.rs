@@ -37,7 +37,7 @@ pub struct LoginRequest {
     email: String,
 }
 
-#[api_v2_operation]
+#[api_v2_operation(tags(Liveness))]
 #[post("/login/init")]
 pub async fn init(
     request: Json<LoginRequest>,
@@ -108,7 +108,7 @@ struct VerifyResponse {
     auth_token: String,
 }
 
-#[api_v2_operation]
+#[api_v2_operation(tags(Liveness))]
 #[post("/login")]
 async fn complete(
     request: Json<WebauthnVerifyRequest>,

@@ -16,7 +16,6 @@ use chrono::NaiveDateTime;
 use chrono::{Duration, Utc};
 use crypto::aead::ScopedSealingKey;
 use crypto::b64::Base64Data;
-use crypto::seal::EciesP256Sha256AesGcmSealed;
 use crypto::{sha256, serde_cbor};
 use db::models::session_data::{ChallengeLastSentData, SessionState};
 use db::models::user_vaults::{UserVault, UserVaultWrapper};
@@ -120,7 +119,7 @@ pub(crate) async fn send_phone_challenge_to_user(
     let e_private_key = vault.e_private_key.clone();
     let uvw = UserVaultWrapper::from(&state.db_pool, vault).await?;
     let e_phone_number = uvw.get_e_field(DataKind::PhoneNumber).ok_or(ApiError::NoPhoneNumberForVault)?;
-    let phone_number = crate::enclave::lib::decrypt_bytes(
+    let phone_number = crate::enclave::decrypt_bytes(
         state,
         e_phone_number,
         e_private_key,

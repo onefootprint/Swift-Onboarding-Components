@@ -1,6 +1,6 @@
 use crate::types::success::ApiResponseData;
 use crate::State;
-use crate::{enclave::lib::gen_keypair, errors::ApiError};
+use crate::{enclave::gen_keypair, errors::ApiError};
 
 use crypto::random::gen_random_alphanumeric_code;
 use db::models::tenant_api_keys::PartialTenantApiKey;
@@ -33,7 +33,7 @@ struct ClientKeysResponse {
 }
 
 /// Create a new client (this endpoint will be private in prod TODO)
-#[api_v2_operation]
+#[api_v2_operation(tags(Private))]
 #[post("/client")]
 async fn handler(
     request: web::Json<NewClientRequest>,
