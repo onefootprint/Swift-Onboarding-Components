@@ -37,4 +37,7 @@ pub enum DbError {
 
     #[error("challenge_inactive")]
     ChallengeInactive,
+
+    #[error("Incorrect number of rows updated")]
+    IncorrectNumberOfRowsUpdated,
 }

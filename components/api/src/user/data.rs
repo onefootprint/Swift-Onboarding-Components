@@ -2,7 +2,8 @@ use crate::auth::logged_in_session::LoggedInSessionContext;
 use crate::identify::{clean_email, send_email_challenge};
 use crate::{errors::ApiError, types::success::ApiResponseData, State};
 use db::models::user_data::{NewUserData, NewUserDataBatch};
-use newtypes::DataKind;
+use db::models::user_vaults::{UserVault, UserVaultWrapper};
+use newtypes::{DataKind, DataPriority, UserVaultId, UserDataId};
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 
 #[derive(Debug, Clone, serde::Deserialize, Apiv2Schema)]
@@ -25,6 +26,36 @@ struct UserPatchRequest {
     email: Option<String>,
 }
 
+impl UserPatchRequest {
+    fn to_vec(self) -> Vec<(DataKind, String)> {
+        let Self{
+            first_name,
+            last_name,
+            dob,
+            ssn,
+            street_address,
+            city,
+            state,
+            zip,
+            country,
+            email,
+        } = self;
+
+        vec![
+            (DataKind::FirstName, first_name),
+            (DataKind::LastName, last_name),
+            (DataKind::Dob, dob),
+            (DataKind::Ssn, ssn),
+            (DataKind::StreetAddress, street_address),
+            (DataKind::City, city),
+            (DataKind::State, state),
+            (DataKind::Zip, zip),
+            (DataKind::Country, country),
+            (DataKind::Email, email),
+        ].into_iter().filter_map(|(data_kind, d)| d.map(|d| (data_kind, d))).collect()
+    }
+}
+
 #[api_v2_operation]
 #[post("/data")]
 /// Operates as a PATCH request to update data in the user vault. Requires user authentication
@@ -34,62 +65,92 @@ async fn handler(
     user_auth: LoggedInSessionContext,
     request: web::Json<UserPatchRequest>,
 ) -> actix_web::Result<Json<ApiResponseData<String>>, ApiError> {
-    // TODO don't allow updating every field if the user vault is already verified
-    // TODO only allow adding duplicate UserData rows for certain types of data (like email/phone)
-    let user_vault = user_auth.user_vault();
-
-    let data_to_insert: Vec<(DataKind, String)> = vec![
-        (DataKind::FirstName, request.first_name.clone()),
-        (DataKind::LastName, request.last_name.clone()),
-        (DataKind::Dob, request.dob.clone()),
-        (DataKind::Ssn, request.ssn.clone()),
-        (DataKind::StreetAddress, request.street_address.clone()),
-        (DataKind::City, request.city.clone()),
-        (DataKind::State, request.state.clone()),
-        (DataKind::Zip, request.zip.clone()),
-        (DataKind::Country, request.country.clone()),
-        (DataKind::Email, request.email.clone()),
-    ]
-    .into_iter()
-    .filter_map(|(data_kind, data_str)| {
-        if let Some(data_str) = data_str {
-            // Clean/validate data
-            let data_str = match data_kind {
-                DataKind::Email => clean_email(data_str),
-                _ => data_str,
-            };
-            Some((data_kind, data_str))
-        } else {
-            None
-        }
-    })
-    .collect();
-
-    let mut uds = Vec::<NewUserData>::new();
-    for (data_kind, data_str) in data_to_insert {
+    let mut data_to_insert = Vec::<DataUpdateRequest>::new();
+    let email = request.email.clone();
+    for (data_kind, data_str) in request.into_inner().to_vec() {
+        // Clean/validate data
+        let data_str = match data_kind {
+            DataKind::Email => clean_email(data_str),
+            _ => data_str,
+        };
         let sh_data = match data_kind {
             DataKind::Ssn | DataKind::Email | DataKind::PhoneNumber => {
                 Some(crate::identify::signed_hash(&state, data_str.clone()).await?)
             }
             _ => None,
         };
-        uds.push(NewUserData {
-            user_vault_id: user_vault.id.clone(),
-            data_kind,
-            e_data: crate::identify::seal(data_str, &user_vault.public_key)?,
-            sh_data,
-            is_verified: false,
-        });
+        let e_data = crate::identify::seal(data_str, &user_auth.user_vault().public_key)?;
+        data_to_insert.push(DataUpdateRequest(data_kind, e_data, sh_data))
     }
-    NewUserDataBatch(uds).bulk_insert(&state.db_pool).await?;
+
+    // Atomically lock the user, insert the new UserData rows, and optionally deactivate the old
+    // rows
+    let user_vault_id = user_auth.user_vault().id.clone();
+    let _: () = state.db_pool.get().await.map_err(db::DbError::from)?.interact(move |conn| {
+        conn.build_transaction().run(|| {
+            process_data_update_request(conn, user_vault_id, data_to_insert)
+        })
+    }).await.map_err(db::DbError::from)??;
 
     // If we're updating the email address, send an async challenge to the new email address
-    if let Some(email) = request.email.clone() {
+    if let Some(email) = email {
         let cleaned_email = clean_email(email);
-        send_email_challenge(&state, user_vault.public_key.clone(), cleaned_email).await?;
+        send_email_challenge(&state, user_auth.user_vault().public_key.clone(), cleaned_email).await?;
     }
 
     Ok(Json(ApiResponseData {
         data: "Successful update".to_string(),
     }))
+}
+
+struct DataUpdateRequest(DataKind, Vec<u8>, Option<Vec<u8>>);
+
+fn process_data_update_request(
+    conn: &db::PgConnection,
+    user_vault_id: UserVaultId,
+    data_to_insert: Vec<DataUpdateRequest>
+) -> Result<(), db::DbError> {
+    // TODO don't allow updating every field if the user vault is already verified
+    if data_to_insert.is_empty() {
+        return Ok(());
+    }
+
+    // Lock the user vault to prevent someone else from editing the data while we're editing it
+    let user_vault = UserVault::lock(conn, user_vault_id.clone())?;
+    let uvw = UserVaultWrapper::from_conn(conn, user_vault)?;
+
+    let (uds, uds_to_deactivate): (Vec<NewUserData>, Vec<Option<UserDataId>>) = data_to_insert
+    .into_iter()
+    .map(|DataUpdateRequest(data_kind, e_data, sh_data)| {
+        let (data_priority, ud_id_to_deactivate) = match uvw.get_data(data_kind) {
+            Some(existing_user_data) => {
+                // There's an existing piece of data with this kind
+                if data_kind.allow_multiple() {
+                    // Multiple pieces of data are allowed for this kind. We assume there's already
+                    // a primary, so we make this a secondary piece of data
+                    (DataPriority::Secondary, None)
+                } else {
+                    // We're only allowed to have one piece of data with this kind. Deactivate the
+                    // last piece of data
+                    (DataPriority::Primary, Some(existing_user_data.id.clone()))
+                }
+            },
+            None => (DataPriority::Primary, None),
+        };
+        let new_ud = NewUserData {
+            user_vault_id: user_vault_id.clone(),
+            data_kind,
+            data_priority,
+            e_data,
+            sh_data,
+            is_verified: false,
+        };
+        Ok((new_ud, ud_id_to_deactivate))
+    }).collect::<Result<Vec<_>, db::DbError>>()?.into_iter().unzip();
+
+    let uds_to_deactivate = uds_to_deactivate.into_iter().flatten().collect();
+
+    db::user_data::bulk_deactivate(conn, uds_to_deactivate)?;
+    NewUserDataBatch(uds).bulk_insert(conn)?;
+    Ok(())
 }

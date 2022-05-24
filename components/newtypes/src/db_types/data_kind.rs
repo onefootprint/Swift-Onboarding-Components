@@ -36,3 +36,11 @@ pub enum DataKind {
     Email,
     PhoneNumber,
 }
+
+impl DataKind {
+    /// Returns true if a user vault is allowed to have more than one active piece of data for this
+    /// kind.
+    pub fn allow_multiple(&self) -> bool {
+        return matches!(self, DataKind::PhoneNumber | DataKind::Email)
+    }
+}

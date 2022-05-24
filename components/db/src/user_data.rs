@@ -2,11 +2,12 @@ use crate::errors::DbError;
 use crate::models::user_data::UserData;
 use crate::schema;
 use crate::DbPool;
+use chrono::Utc;
 use diesel::dsl::any;
 use diesel::prelude::*;
 use itertools::Itertools;
 use newtypes::DataKind;
-use newtypes::UserVaultId;
+use newtypes::{UserVaultId, UserDataId};
 use std::collections::HashMap;
 
 pub fn list(
@@ -16,6 +17,7 @@ pub fn list(
     let result: Vec<UserData> =
         schema::user_data::table
             .filter(schema::user_data::user_vault_id.eq(user_vault_id))
+            .filter(schema::user_data::deactivated_at.is_null())
             // Needed for group_by. Fast with the DB index
             .order_by(schema::user_data::data_kind)
             .load(conn)?;
@@ -28,6 +30,7 @@ pub fn list(
         .into_iter()
         .map(|g| (g.0, g.1.collect()))
         .collect();
+
     Ok(result)
 }
 
@@ -45,9 +48,29 @@ pub async fn filter(
             user_data::table
                 .filter(user_data::user_vault_id.eq(user_vault_id))
                 .filter(user_data::data_kind.eq(any(data_kinds)))
+                .filter(schema::user_data::deactivated_at.is_null())
                 .load(conn)
         })
         .await??;
 
     Ok(result)
+}
+
+pub fn bulk_deactivate(
+    conn: &PgConnection,
+    user_data_ids: Vec<UserDataId>,
+) -> Result<usize, DbError> {
+    use schema::user_data;
+
+    let expected_num_rows_updated = user_data_ids.len();
+    let now = Utc::now().naive_utc();
+    let num_rows_updated =
+        diesel::update(user_data::table)
+            .filter(user_data::id.eq(any(user_data_ids)))
+            .set(user_data::deactivated_at.eq(now))
+            .execute(conn)?;
+    if num_rows_updated != expected_num_rows_updated {
+        return Err(DbError::IncorrectNumberOfRowsUpdated);
+    }
+    Ok(num_rows_updated)
 }

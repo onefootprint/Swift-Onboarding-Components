@@ -36,6 +36,7 @@ CREATE TABLE user_vaults (
 );
 
 CREATE TYPE data_kind as ENUM ('FirstName', 'LastName', 'Dob', 'Ssn', 'StreetAddress', 'City', 'State', 'Zip', 'Country', 'Email', 'PhoneNumber');
+CREATE TYPE data_priority as ENUM ('Primary', 'Secondary');
 
 CREATE TABLE user_data (
     id VARCHAR(250) PRIMARY KEY DEFAULT prefixed_uid('ud_'),
@@ -44,6 +45,8 @@ CREATE TABLE user_data (
     e_data BYTEA NOT NULL,
     sh_data BYTEA,
     is_verified BOOLEAN NOT NULL,
+    data_priority data_priority NOT NULL,
+    deactivated_at timestamp,
     created_at timestamp NOT NULL DEFAULT NOW(),
     updated_at timestamp NOT NULL DEFAULT NOW(),
     CONSTRAINT fk_user_valt
@@ -55,7 +58,10 @@ CREATE TABLE user_data (
         OR ((sh_data IS NULL) AND (data_kind NOT IN ('Ssn', 'PhoneNumber', 'Email')))
     )
 );
-CREATE UNIQUE INDEX IF NOT EXISTS user_data_kind_fingerprint ON user_data(data_kind, sh_data) WHERE is_verified = TRUE AND data_kind IN ('Ssn', 'PhoneNumber', 'Email');
+-- Don't allow multiple verified UserData rows to exist with the same Ssn, PhoneNumber, or Email fingerprint
+CREATE UNIQUE INDEX IF NOT EXISTS user_data_unique_kind_fingerprint ON user_data(data_kind, sh_data) WHERE is_verified = TRUE AND data_kind IN ('Ssn', 'PhoneNumber', 'Email');
+-- Don't allow more than one Primary, active UserData row to exist for each (user, data_kind)
+CREATE UNIQUE INDEX IF NOT EXISTS user_data_unique_primary_data ON user_data(user_vault_id, data_kind) WHERE deactivated_at IS NULL AND data_priority = 'Primary';
 CREATE INDEX IF NOT EXISTS user_data_user_vault_id_data_kind ON user_data(user_vault_id, data_kind);
 
 CREATE TABLE onboardings (

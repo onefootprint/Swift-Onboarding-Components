@@ -36,7 +36,7 @@ pub async fn get_by_session_id(
 }
 
 pub(crate) fn get_session_by_id_sync(
-    conn: &mut PgConnection,
+    conn: &PgConnection,
     session_id: String,
 ) -> Result<Option<Session>, DbError> {
     let h_session_id: String = sha256(session_id.as_bytes()).encode_hex();

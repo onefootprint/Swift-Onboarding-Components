@@ -1,9 +1,11 @@
 use std::collections::HashMap;
 
+use crate::errors::DbError;
 use crate::schema::user_vaults;
 use crate::DbPool;
 use chrono::NaiveDateTime;
-use diesel::{Insertable, Queryable, PgConnection};
+use diesel::prelude::*;
+use diesel::{Insertable, Queryable, PgConnection, QueryDsl};
 use newtypes::{DataKind, Status, UserVaultId};
 use serde::{Deserialize, Serialize};
 
@@ -18,6 +20,16 @@ pub struct UserVault {
     pub id_verified: Status,
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
+}
+
+impl UserVault {
+    pub fn lock(conn: &PgConnection, id: UserVaultId) -> Result<Self, DbError> {
+        let user = user_vaults::table
+            .for_no_key_update()
+            .filter(user_vaults::id.eq(id))
+            .first(conn)?;
+        Ok(user)
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
@@ -58,7 +70,7 @@ impl UserVaultWrapper {
     }
 
     pub fn from_conn(
-        conn: &mut PgConnection,
+        conn: &PgConnection,
         user_vault: UserVault,
     ) -> Result<UserVaultWrapper, crate::DbError> {
         Ok(Self {

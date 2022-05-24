@@ -82,6 +82,8 @@ table! {
         e_data -> Bytea,
         sh_data -> Nullable<Bytea>,
         is_verified -> Bool,
+        data_priority -> Data_priority,
+        deactivated_at -> Nullable<Timestamp>,
         created_at -> Timestamp,
         updated_at -> Timestamp,
     }

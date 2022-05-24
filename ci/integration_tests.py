@@ -152,6 +152,18 @@ def test_user_data(request):
     )
     _assert_response(r)
 
+    # Issue a second POST /user/data request to update some fields
+    data = {
+        "first_name": "Flerp2",
+        "last_name": "Derp2",
+    }
+    print(url(path))
+    r = requests.post(
+        url(path),
+        json=data,
+        headers=_fpuser_auth_headers(request),
+    )
+    _assert_response(r)
 
 def test_onboarding_commit(request, tenant1): 
     path = "onboarding/commit"
@@ -236,7 +248,7 @@ def test_tenant_decrypt(request, tenant1):
     )
     body = _assert_response(r)
     attributes = body["data"]["attributes"]
-    assert attributes["first_name"] == "Flerp"
+    assert attributes["first_name"] == "Flerp2"
     assert attributes["zip"] == "10009"
     assert attributes["country"] == "USA"
     assert attributes["email"] == request.config.cache.get("email", None)
@@ -288,8 +300,8 @@ def test_logged_in_user_detail(request):
     )
     body = _assert_response(r)
     user = body["data"]
-    assert user["first_name"] == "Flerp"
-    assert user["last_name"] == "Derp"
+    assert user["first_name"] == "Flerp2"
+    assert user["last_name"] == "Derp2"
 
 def test_logged_in_access_events(request):
     # Get the user detail using the logged in context

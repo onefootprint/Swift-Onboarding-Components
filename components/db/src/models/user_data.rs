@@ -4,7 +4,7 @@ use crate::DbPool;
 use chrono::NaiveDateTime;
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
-use newtypes::{DataKind, UserDataId, UserVaultId};
+use newtypes::{DataKind, UserDataId, UserVaultId, DataPriority};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable, Identifiable)]
@@ -16,6 +16,8 @@ pub struct UserData {
     pub e_data: Vec<u8>,
     pub sh_data: Option<Vec<u8>>,
     pub is_verified: bool,
+    pub data_priority: DataPriority,
+    pub deactivated_at: Option<NaiveDateTime>,
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
 }
@@ -40,6 +42,7 @@ impl UserData {
 pub struct NewUserData {
     pub user_vault_id: UserVaultId,
     pub data_kind: DataKind,
+    pub data_priority: DataPriority,
     pub e_data: Vec<u8>,
     pub sh_data: Option<Vec<u8>>,
     pub is_verified: bool,
@@ -48,16 +51,10 @@ pub struct NewUserData {
 pub struct NewUserDataBatch(pub Vec<NewUserData>);
 
 impl NewUserDataBatch {
-    pub async fn bulk_insert(self, pool: &DbPool) -> Result<(), crate::DbError> {
-        let _ = pool
-            .get()
-            .await?
-            .interact(move |conn| {
-                diesel::insert_into(user_data::table)
-                    .values(self.0)
-                    .execute(conn)
-            })
-            .await??;
+    pub fn bulk_insert(self, conn: &PgConnection) -> Result<(), crate::DbError> {
+        let _: usize = diesel::insert_into(user_data::table)
+            .values(self.0)
+            .execute(conn)?;
         Ok(())
     }
 }

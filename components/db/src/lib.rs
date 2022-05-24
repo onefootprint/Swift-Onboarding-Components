@@ -9,9 +9,10 @@ extern crate diesel_migrations;
 pub mod errors;
 pub mod models;
 
-use crate::errors::DbError;
+pub use crate::errors::DbError;
 use deadpool_diesel::postgres::{Manager, Pool, Runtime};
 use diesel::prelude::*;
+pub use diesel::prelude::PgConnection;
 
 #[allow(unused_imports)]
 pub mod schema;

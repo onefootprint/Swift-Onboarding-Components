@@ -32,7 +32,7 @@ pub async fn list_for_tenant(
 }
 
 pub(crate) fn get_for_tenant(
-    conn: &mut PgConnection,
+    conn: &PgConnection,
     tenant_id: TenantId,
     footprint_user_id: FootprintUserId,
 ) -> Result<Option<Onboarding>, DbError> {

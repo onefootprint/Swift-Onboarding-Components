@@ -8,7 +8,7 @@ use crate::session::get_session_by_id_sync;
 use crate::{errors::DbError, models::user_data::UserData};
 use deadpool_diesel::postgres::Pool;
 use diesel::prelude::*;
-use newtypes::{DataKind, FootprintUserId, TenantId, UserVaultId};
+use newtypes::{DataKind, FootprintUserId, TenantId, UserVaultId, DataPriority};
 
 pub async fn create(pool: &Pool, new_user: NewUserVaultReq) -> Result<UserVault, crate::DbError> {
     let user_vault = pool
@@ -28,6 +28,7 @@ pub async fn create(pool: &Pool, new_user: NewUserVaultReq) -> Result<UserVault,
                     let phone_number_data = NewUserData {
                         user_vault_id: user_vault.id.clone(),
                         data_kind: DataKind::PhoneNumber,
+                        data_priority: DataPriority::Primary,
                         e_data: new_user.e_phone_number,
                         sh_data: Some(new_user.sh_phone_number),
                         // Phone numbers are always created as verified
@@ -126,7 +127,7 @@ pub async fn get_by_fingerprint(
     Ok(result)
 }
 
-pub fn get_sync(conn: &mut PgConnection, uv_id: UserVaultId) -> Result<UserVault, DbError> {
+pub fn get_sync(conn: &PgConnection, uv_id: UserVaultId) -> Result<UserVault, DbError> {
     let user = schema::user_vaults::table
         .filter(schema::user_vaults::id.eq(uv_id))
         .first(conn)?;
