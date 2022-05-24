@@ -14,11 +14,8 @@ use std::collections::HashMap;
 struct UserDecryptRequest {
     attributes: Vec<DataKind>,
 }
-#[derive(Debug, Clone, serde::Deserialize, serde::Serialize, Apiv2Schema)]
-#[serde(rename_all = "snake_case")]
-struct UserDecryptResponse {
-    attributes: HashMap<DataKind, String>,
-}
+
+type UserDecryptResponse = HashMap<DataKind, String>;
 
 #[api_v2_operation]
 #[post("/decrypt")]
@@ -37,8 +34,6 @@ fn handler(
     } = decrypt_fields(&state, request.attributes.clone(), vault).await?;
 
     Ok(Json(ApiResponseData {
-        data: UserDecryptResponse {
-            attributes: result_map,
-        },
+        data: result_map,
     }))
 }

@@ -16,11 +16,8 @@ struct UserDecryptRequest {
     footprint_user_id: FootprintUserId,
     attributes: Vec<DataKind>,
 }
-#[derive(Debug, Clone, serde::Deserialize, serde::Serialize, Apiv2Schema)]
-#[serde(rename_all = "snake_case")]
-struct UserDecryptResponse {
-    pub attributes: HashMap<DataKind, String>,
-}
+
+type UserDecryptResponse = HashMap<DataKind, String>;
 
 #[api_v2_operation]
 #[post("/decrypt")]
@@ -63,9 +60,7 @@ fn handler(
         .await?;
 
     Ok(Json(ApiResponseData {
-        data: UserDecryptResponse {
-            attributes: result_map,
-        },
+        data: result_map,
     }))
 }
 

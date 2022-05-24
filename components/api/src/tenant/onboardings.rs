@@ -20,10 +20,7 @@ struct OnboardingItem {
     pub updated_at: NaiveDateTime,
 }
 
-#[derive(Debug, Clone, serde::Deserialize, serde::Serialize, Apiv2Schema)]
-struct OnboardingResponse {
-    pub onboardings: Vec<OnboardingItem>,
-}
+type OnboardingResponse = Vec<OnboardingItem>;
 
 #[api_v2_operation]
 #[get("/onboardings")]
@@ -51,8 +48,6 @@ fn handler(
             .collect();
 
     Ok(Json(ApiResponseData {
-        data: OnboardingResponse {
-            onboardings: results,
-        },
+        data: results,
     }))
 }

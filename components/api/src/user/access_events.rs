@@ -12,11 +12,7 @@ struct AccessEventRequest {
     data_kind: Option<DataKind>,
 }
 
-#[derive(Debug, Clone, serde::Deserialize, serde::Serialize, Apiv2Schema)]
-#[serde(rename_all = "snake_case")]
-struct AccessEventResponse {
-    pub events: Vec<ApiAccessEvent>,
-}
+type AccessEventResponse = Vec<ApiAccessEvent>;
 
 #[api_v2_operation]
 #[get("/access_events")]
@@ -40,6 +36,6 @@ fn handler(
     .collect();
 
     Ok(Json(ApiResponseData {
-        data: AccessEventResponse { events: results },
+        data: results,
     }))
 }
