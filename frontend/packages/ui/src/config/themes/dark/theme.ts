@@ -10,20 +10,6 @@ import typography from '../shared/typography';
 import zIndex from '../shared/z-index';
 import primitives from './primitives';
 
-const themeUiStates = {
-  accent: primitives.purple500,
-  error: primitives.red600,
-  info: primitives.blue600,
-  success: primitives.green600,
-  warning: primitives.yellow800,
-  neutral: primitives.gray900,
-  errorBackground: primitives.red100,
-  infoBackground: primitives.blue100,
-  successBackground: primitives.green100,
-  warningBackground: primitives.yellow100,
-  neutralBackground: primitives.gray100,
-};
-
 const theme: DefaultTheme = {
   grid,
   typography,
@@ -39,14 +25,19 @@ const theme: DefaultTheme = {
     tertiary: primitives.brandSleep,
     quaternary: primitives.brandThink,
     quinary: primitives.brandGo,
-    ...themeUiStates,
+    accent: primitives.purple500,
+    error: primitives.red100,
+    info: primitives.blue100,
+    success: primitives.green100,
+    warning: primitives.yellow100,
+    neutral: primitives.gray100,
   },
   borderColor: {
     transparent: 'transparent',
     primary: primitives.gray150,
     secondary: primitives.purple500,
     tertiary: primitives.gray100,
-    ...themeUiStates,
+    error: primitives.red500,
   },
   color: {
     primary: primitives.brandSleep,
@@ -56,23 +47,28 @@ const theme: DefaultTheme = {
     quinary: primitives.gray0,
     senary: primitives.brandThink,
     septenary: primitives.brandGo,
-    ...themeUiStates,
-  },
-  overlay: {
-    lighten: {
-      1: rgba(primitives.gray1000, 0.14),
-      2: rgba(primitives.gray1000, 0.18),
-    },
-    darken: {
-      1: rgba(primitives.gray0, 0.04),
-      2: rgba(primitives.gray0, 0.08),
-    },
+    accent: primitives.purple600,
+    error: primitives.red600,
+    info: primitives.blue600,
+    success: primitives.green600,
+    warning: primitives.yellow800,
+    neutral: primitives.gray800,
   },
   elevation: {
     0: 'none',
     1: '0px 1px 4px rgba(0, 0, 0, 0.12)',
     2: '0px 1px 8px rgba(0, 0, 0, 0.14)',
     3: '0px 1px 12px rgba(0, 0, 0, 0.18)',
+  },
+  overlay: {
+    lighten: {
+      1: rgba(primitives.gray0, 0.14),
+      2: rgba(primitives.gray0, 0.18),
+    },
+    darken: {
+      1: rgba(primitives.gray1000, 0.04),
+      2: rgba(primitives.gray1000, 0.08),
+    },
   },
 };
 

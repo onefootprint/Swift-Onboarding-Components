@@ -2,14 +2,9 @@ export type UIStates = {
   accent: string;
   error: string;
   info: string;
+  neutral: string;
   success: string;
   warning: string;
-  neutral: string;
-  errorBackground: string;
-  infoBackground: string;
-  successBackground: string;
-  warningBackground: string;
-  neutralBackground: string;
 };
 
 export type Typography = {
@@ -145,7 +140,8 @@ export type BorderColors = {
   primary: string;
   secondary: string;
   tertiary: string;
-} & UIStates;
+  error: string;
+};
 
 export type BorderColor = keyof BorderColors;
 
@@ -173,3 +169,5 @@ export type DefaultTheme = {
 };
 
 export type ThemeKey = keyof DefaultTheme;
+
+export type UIState = keyof UIStates;
