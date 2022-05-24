@@ -248,7 +248,7 @@ def test_tenant_decrypt(request, tenant1):
         json=data,
     )
     body = _assert_response(r)
-    attributes = body["data"]["attributes"]
+    attributes = body["data"]
     assert attributes["first_name"] == "Flerp2"
     assert attributes["zip"] == "10009"
     assert attributes["country"] == "USA"
@@ -262,7 +262,7 @@ def test_onboardings_list(request, tenant1):
         headers=_client_priv_key_headers(tenant1["sk"]),  
     )
     body = _assert_response(r)
-    onboardings = body["data"]["onboardings"]
+    onboardings = body["data"]
     assert len(onboardings) == 1
     old_fp_user_id = request.config.cache.get("fp_user_id", None)
     assert onboardings[0]["footprint_user_id"] == old_fp_user_id
@@ -276,7 +276,7 @@ def test_access_events_list(request, tenant1):
         headers=_client_priv_key_headers(tenant1["sk"]),  
     )
     body = _assert_response(r)
-    access_events = body["data"]["events"]
+    access_events = body["data"]
     assert len(access_events) == 4
     assert set(i["data_kind"] for i in access_events) == {"first_name", "email", "zip", "country"}
 
@@ -287,7 +287,7 @@ def test_access_events_list(request, tenant1):
         headers=_client_priv_key_headers(tenant1["sk"]),
     )
     body = _assert_response(r)
-    access_events = body["data"]["events"]
+    access_events = body["data"]
     assert len(access_events) == 1
     assert access_events[0]["data_kind"] == "email"
 
@@ -313,7 +313,7 @@ def test_logged_in_access_events(request):
         headers=_fpuser_auth_headers(request),
     )
     body = _assert_response(r)
-    access_events = body["data"]["events"]
+    access_events = body["data"]
     assert len(access_events) == 4
     assert set(i["data_kind"] for i in access_events) == {"first_name", "email", "zip", "country"}
 
@@ -330,6 +330,6 @@ def test_logged_in_decrypt(request, tenant1):
         json=data,
     )
     body = _assert_response(r)
-    attributes = body["data"]["attributes"]
+    attributes = body["data"]
     assert attributes["phone_number"][-4:] == request.config.cache.get("phone_number", None)[-4:]
     assert attributes["email"] == request.config.cache.get("email", None)
