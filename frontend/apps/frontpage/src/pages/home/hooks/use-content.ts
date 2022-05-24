@@ -3,15 +3,15 @@ import IcoEye24 from 'icons/ico/ico-eye-24';
 import IcoLock24 from 'icons/ico/ico-lock-24';
 import IcoShield24 from 'icons/ico/ico-shield-24';
 
-import article1 from '../../../../public/images/article-1.png';
-import article2 from '../../../../public/images/article-2.png';
-import article3 from '../../../../public/images/article-3.png';
-import article4 from '../../../../public/images/article-4.png';
-import article5 from '../../../../public/images/article-5.png';
-import article6 from '../../../../public/images/article-6.png';
-import vaultMainArticle from '../../../../public/images/article-vault.png';
+import article1 from '../../../../public/highlights/article-1.png';
+import article2 from '../../../../public/highlights/article-2.png';
+import article3 from '../../../../public/highlights/article-3.png';
+import article4 from '../../../../public/highlights/article-4.png';
+import article5 from '../../../../public/highlights/article-5.png';
+import article6 from '../../../../public/highlights/article-6.png';
 import investors from '../../../../public/images/investors-logo.png';
 import testimonialAuthor from '../../../../public/images/testimonial-author.png';
+import vaultMainArticle from '../../../../public/vault/article-vault.png';
 
 const useContent = () => ({
   title: 'Footprint',
