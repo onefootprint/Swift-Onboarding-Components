@@ -31,13 +31,13 @@ const Container = styled.button`
   display: flex;
   height: 32px;
   justify-content: center;
-  width: 32px;
   margin: 0;
   padding: 0;
+  width: 32px;
+  background: none;
+  border: none;
 
   ${({ theme }) => css`
-    background-color: ${theme.backgroundColor.primary};
-    box-shadow: ${theme.elevation[3]};
     border-radius: ${theme.borderRadius[3]}px;
 
     &:hover:enabled {
