@@ -9,6 +9,7 @@ export type UserDataRequest = {
     email?: string;
     ssn?: string;
     streetAddress?: string;
+    streetAddress2?: string;
     city?: string;
     state?: string;
     country?: string;
@@ -17,7 +18,7 @@ export type UserDataRequest = {
   authToken: string;
 };
 
-export type UserDataResponse = RequestResponse<{ data: string }>;
+export type UserDataResponse = { data: string };
 
 const userDataRequest = async (payload: UserDataRequest) => {
   const { data: response } = await request<RequestResponse<UserDataResponse>>({

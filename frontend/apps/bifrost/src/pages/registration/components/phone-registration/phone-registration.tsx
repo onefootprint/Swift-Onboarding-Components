@@ -1,8 +1,8 @@
-import { Events } from '@src/types/bifrost-machine';
 import { useTranslation } from 'hooks';
 import IcoEmail24 from 'icons/ico/ico-email-24';
 import React from 'react';
 import { useForm } from 'react-hook-form';
+import { Events } from 'src/bifrost-machine/types';
 import Header from 'src/components/header';
 import useBifrostMachine from 'src/hooks/use-bifrost-machine';
 import styled, { css } from 'styled';
@@ -54,7 +54,7 @@ const PhoneRegistration = () => {
       <EmailCard>
         <IcoEmail24 />
         <Typography variant="label-3" color="primary" sx={{ flexGrow: 1 }}>
-          {state.context.registration.email}
+          {state.context.registration.data.email}
         </Typography>
         <LinkButton size="tiny" onClick={handleChangeEmail}>
           {t('email-card.cta')}

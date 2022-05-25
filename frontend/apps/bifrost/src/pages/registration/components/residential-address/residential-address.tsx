@@ -1,9 +1,9 @@
 import { useTranslation } from 'hooks';
 import React from 'react';
 import { useForm } from 'react-hook-form';
+import { Events } from 'src/bifrost-machine/types';
 import Header from 'src/components/header';
 import useBifrostMachine from 'src/hooks/use-bifrost-machine';
-import { Events } from 'src/types/bifrost-machine';
 import styled, { css } from 'styled';
 import { AddressInput, Button, Grid, Select, TextInput } from 'ui';
 
@@ -32,7 +32,8 @@ const ResidentialAddress = () => {
       type: Events.residentialAddressSubmitted,
       payload: {
         residentialAddress: {
-          streetAddress: `${formData.addressLine1}\n${formData.addressLine2}`,
+          streetAddress: formData.addressLine1,
+          streetAddress2: formData.addressLine2,
           city: formData.city,
           zipCode: formData.zipCode,
           country: formData.country,

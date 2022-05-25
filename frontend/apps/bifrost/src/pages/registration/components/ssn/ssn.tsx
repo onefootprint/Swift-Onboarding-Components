@@ -1,10 +1,10 @@
-import { Events } from '@src/types/bifrost-machine';
 import { useTranslation } from 'hooks';
 import IcoFileText24 from 'icons/ico/ico-file-text-24';
 import IcoLock24 from 'icons/ico/ico-lock-24';
 import IcoShield24 from 'icons/ico/ico-shield-24';
 import React from 'react';
 import { useForm } from 'react-hook-form';
+import { Events } from 'src/bifrost-machine/types';
 import Header from 'src/components/header';
 import useBifrostMachine from 'src/hooks/use-bifrost-machine';
 import styled, { css } from 'styled';
@@ -35,11 +35,12 @@ const SSN = () => {
       dob,
       email,
       streetAddress,
+      streetAddress2,
       city,
       state: residentialState,
       country,
       zipCode,
-    } = state.context.registration;
+    } = state.context.registration.data;
 
     const { authToken } = state.context;
     if (!authToken) {
@@ -54,6 +55,7 @@ const SSN = () => {
         dob,
         email,
         streetAddress,
+        streetAddress2,
         city,
         state: residentialState,
         country,

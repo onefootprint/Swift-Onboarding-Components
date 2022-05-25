@@ -1,12 +1,16 @@
 import React from 'react';
+import { Events } from 'src/bifrost-machine/types';
 import useBifrostMachine from 'src/hooks/use-bifrost-machine';
 import useIdentifyEmail, {
   IdentifyEmailRequest,
 } from 'src/hooks/use-identify-email';
-import { Events } from 'src/types/bifrost-machine';
 import styled, { css } from 'styled';
 import { Box, LinkButton, LoadingIndicator, PinInput, Typography } from 'ui';
 
+import useOnboarding, {
+  OnboardingRequest,
+  OnboardingResponse,
+} from './hooks/use-onboarding';
 import useVerifyPhone, {
   VerifyPhoneRequest,
   VerifyPhoneResponse,
@@ -17,8 +21,10 @@ const PhoneVerification = () => {
   const [state, send] = useBifrostMachine();
   const { email, phoneNumberLastTwo, challengeToken } =
     state.context.identification;
+
   const identifyEmailMutation = useIdentifyEmail();
   const verifyPhoneMutation = useVerifyPhone();
+  const onboardingMutation = useOnboarding();
 
   const resendVerification = () => {
     if (!email) {
@@ -32,30 +38,41 @@ const PhoneVerification = () => {
     if (!challengeToken) {
       return;
     }
-    const payload: VerifyPhoneRequest = {
+    const verifyPhonePayload: VerifyPhoneRequest = {
       code: pin,
       challengeToken,
     };
-    verifyPhoneMutation.mutate(payload, {
+    verifyPhoneMutation.mutate(verifyPhonePayload, {
       onSuccess: ({ authToken, kind }: VerifyPhoneResponse) => {
         if (!authToken) {
           return;
         }
-        if (kind === VerifyPhoneResponseKind.userCreated) {
-          send({
-            type: Events.userCreated,
-            payload: {
-              authToken,
-            },
-          });
-        } else if (kind === VerifyPhoneResponseKind.userInherited) {
-          send({
-            type: Events.userInherited,
-            payload: {
-              authToken,
-            },
-          });
-        }
+
+        const onboardingPayload: OnboardingRequest = {
+          authToken,
+        };
+        // TODO: handle errors better
+        onboardingMutation.mutate(onboardingPayload, {
+          onSuccess({ missingAttributes }: OnboardingResponse) {
+            if (kind === VerifyPhoneResponseKind.userCreated) {
+              send({
+                type: Events.userCreated,
+                payload: {
+                  authToken,
+                  missingAttributes: new Set(missingAttributes),
+                },
+              });
+            } else if (kind === VerifyPhoneResponseKind.userInherited) {
+              send({
+                type: Events.userInherited,
+                payload: {
+                  authToken,
+                  missingAttributes: new Set(missingAttributes),
+                },
+              });
+            }
+          },
+        });
       },
     });
   };

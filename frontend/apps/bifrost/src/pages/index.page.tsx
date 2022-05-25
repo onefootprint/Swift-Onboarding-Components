@@ -1,7 +1,7 @@
 import has from 'lodash/has';
 import React from 'react';
+import { States } from 'src/bifrost-machine/types';
 import useBifrostMachine from 'src/hooks/use-bifrost-machine';
-import { States } from 'src/types/bifrost-machine';
 
 import EmailIdentification from './email-identification';
 import PhoneVerification from './phone-verification';

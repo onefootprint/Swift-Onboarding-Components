@@ -1,6 +1,6 @@
-import { Events } from '@src/types/bifrost-machine';
 import React from 'react';
 import { useForm } from 'react-hook-form';
+import { Events } from 'src/bifrost-machine/types';
 import useBifrostMachine from 'src/hooks/use-bifrost-machine';
 import useIdentifyEmail, {
   IdentifyEmailRequest,
