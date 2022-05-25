@@ -99,7 +99,7 @@ async fn main() -> std::io::Result<()> {
         let workos_client = WorkOSClient {
             client_id: config.workos_client_id.clone(),
             client_secret: config.workos_api_key.clone(),
-            callback_uri: format!("{}/workos/callback", config.application_uri.clone()),
+            callback_uri: format!("{}/auth/callback", config.application_uri.clone()),
             default_org: config.workos_default_org.clone(),
         };
 
