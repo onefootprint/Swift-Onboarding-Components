@@ -11,7 +11,7 @@ pub mod oauth;
 pub mod workos_dashboard_auth;
 
 pub fn routes() -> web::Scope {
-    web::scope("/workos")
+    web::scope("/auth")
         .service(callback::handler)
         .service(magic_auth::handler)
         .service(oauth::handler)

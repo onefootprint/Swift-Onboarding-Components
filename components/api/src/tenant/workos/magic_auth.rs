@@ -10,7 +10,7 @@ struct LinkAuthRequest {
 }
 
 #[api_v2_operation(tags(Private, WorkOS))]
-#[post("/magic_auth")]
+#[post("/magic_link")]
 /// Request to authenticate a user email. WorkOS will send the email a link to login.
 /// Once the user clicks the magic link, WorkOs will call the /workos/callback endpoint,
 /// at which point we authenticate the user
