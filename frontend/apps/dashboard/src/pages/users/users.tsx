@@ -107,7 +107,7 @@ const UsersFilter = () => {
     // TODO this should be much simpler... can the selectedOption be just a value rather than
     // a SelectOption?
     const currentStatus =
-      query.status && (query.status as string) in statusToDisplayText
+      query.status && query.status in statusToDisplayText
         ? ({
             value: query.status,
             label: statusToDisplayText[query.status as OnboardingStatus],
@@ -179,6 +179,14 @@ const Users = () => {
   const decryptUserMutation = useDecryptUser();
   const getOnboardings = useGetOnboardings();
 
+  const { query, setFilter } = useFilters();
+  const [searchText, setSearchText] = useState<string>();
+
+  // Bind the contents of the search text box to the querystring
+  useEffect(() => {
+    setSearchText(query.fingerprint || '');
+  }, [query]);
+
   // Join the onboarding list results with any decrypted user data
   const users = useJoinUsers(getOnboardings.data, decryptedUsers);
 
@@ -200,6 +208,12 @@ const Users = () => {
         placeholder="Search (exact match)..."
         prefixElement={<IcoSearchContainer />}
         suffixElement={<UsersFilter />}
+        value={searchText}
+        onChangeText={(text: string) =>
+          setFilter({
+            fingerprint: text,
+          })
+        }
       />
       <Table
         items={users}
