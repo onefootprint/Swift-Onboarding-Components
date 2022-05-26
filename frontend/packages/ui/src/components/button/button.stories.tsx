@@ -2,6 +2,7 @@ import { Meta, Story } from '@storybook/react';
 import React from 'react';
 
 import Button, { ButtonProps } from './button';
+import { buttonSizes } from './button.constants';
 
 export default {
   component: Button,
@@ -29,7 +30,7 @@ export default {
     },
     size: {
       control: 'select',
-      options: ['default', 'compact', 'large'],
+      options: buttonSizes,
       description: 'Button size',
     },
     testID: {
@@ -83,7 +84,7 @@ Base.args = {
   loading: false,
   loadingAriaLabel: 'Loading',
   fullWidth: false,
-  onClick: () => alert('I was pressed'),
+  onClick: () => alert('I was clicked'),
   size: 'default',
   testID: 'button-test-id',
   type: 'button',

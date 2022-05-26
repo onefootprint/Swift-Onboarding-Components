@@ -1,5 +1,7 @@
 import type { BackgroundsColor, BorderColor, Color, Overlay } from 'styled';
 
+export const buttonSizes = ['default', 'small', 'compact', 'large'];
+
 export const backgroundColors: Record<string, BackgroundsColor> = {
   primary: 'tertiary',
   secondary: 'primary',

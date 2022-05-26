@@ -1,0 +1,41 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<Button /> when is set the size compact should render with the correct styles 1`] = `
+<button
+  class="sc-crXcEl gFtlTW"
+  tabindex="0"
+  type="button"
+>
+  Button content
+</button>
+`;
+
+exports[`<Button /> when is set the size default should render with the correct styles 1`] = `
+<button
+  class="sc-crXcEl gFtlTW"
+  tabindex="0"
+  type="button"
+>
+  Button content
+</button>
+`;
+
+exports[`<Button /> when is set the size large should render with the correct styles 1`] = `
+<button
+  class="sc-crXcEl gFtlTW"
+  tabindex="0"
+  type="button"
+>
+  Button content
+</button>
+`;
+
+exports[`<Button /> when is set the size small should render with the correct styles 1`] = `
+<button
+  class="sc-crXcEl gFtlTW"
+  tabindex="0"
+  type="button"
+>
+  Button content
+</button>
+`;

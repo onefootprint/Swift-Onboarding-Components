@@ -1,10 +1,4 @@
-Resolves: [REPLACE_ME](https://github.com/onefootprint/frontend-monorepo/issues/REPLACE_ME)
-
 # What does this pull request do?
-
-<!--- A brief description of what the intended result of the PR will be and/or what problem it solves. -->
-
-# What's new?
 
 <!--- An in-depth description of the changes made by this PR. Technical details and possible side effects.
 
@@ -30,7 +24,3 @@ Example:
 - Does this change add any new dependencies?
 - Does this change require any other modifications to be made to the repository?
 - Could this change impact execution of existing code? -->
-
-# Interested parties
-
-<!-- Tag (@ mention) interested parties -->
