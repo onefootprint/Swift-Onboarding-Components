@@ -23,8 +23,8 @@
         }
       },
       "basic-information": {
-        "title": "Ok, now to the fun stuff!",
-        "subtitle": "No, really. We're legally required to collect some information about you. Let's get started.",
+        "title": "Basic Data",
+        "subtitle": "We're legally required to collect this information.",
         "form": {
           "first-name": {
             "label": "First name",
