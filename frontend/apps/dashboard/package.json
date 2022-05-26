@@ -11,15 +11,16 @@
     "lint": "eslint src --fix"
   },
   "dependencies": {
+    "global-constants": "*",
+    "hooks": "*",
     "icons": "*",
     "next": "12.1.5",
     "react": "17.0.2",
     "react-dom": "17.0.2",
+    "request": "*",
     "styled": "*",
     "ui": "*",
-    "hooks": "*",
-    "global-constants": "*",
-    "request": "*"
+    "usehooks-ts": "^2.5.3"
   },
   "devDependencies": {
     "@next/bundle-analyzer": "^12.1.6",

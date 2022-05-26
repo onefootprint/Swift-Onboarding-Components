@@ -11,14 +11,16 @@ export type TableProps<T> = {
   renderHeader: () => JSX.Element;
   renderRow: (row: Row<T>) => JSX.Element;
   getKeyForRow: (item: T) => any;
+  onRowClick: (item: T) => void;
   items?: Array<T>;
   isLoading?: boolean;
 };
 
-const Table = <T,>({
+export const Table = <T,>({
   renderHeader,
   renderRow,
   getKeyForRow,
+  onRowClick,
   items,
   isLoading,
 }: TableProps<T>) => (
@@ -32,7 +34,9 @@ const Table = <T,>({
       ) : (
         items &&
         items.map((item: T, i: Number) => (
-          <Tr key={getKeyForRow(item)}>{renderRow({ i, item })}</Tr>
+          <Tr onClick={() => onRowClick(item)} key={getKeyForRow(item)}>
+            {renderRow({ i, item })}
+          </Tr>
         ))
       )}
     </tbody>
@@ -44,6 +48,7 @@ export default Table;
 const TableContainer = styled.table`
   width: 100%;
   border-collapse: separate;
+  table-layout: fixed;
   ${({ theme }) => css`
     border-radius: ${theme.borderRadius[2]}px;
   `};
@@ -68,6 +73,7 @@ const TableContainer = styled.table`
     td {
       border-bottom: 1px solid ${theme.borderColor.tertiary};
       padding: ${theme.spacing[4]}px ${theme.spacing[6]}px;
+      overflow: hidden;
     }
   `}
 `;
