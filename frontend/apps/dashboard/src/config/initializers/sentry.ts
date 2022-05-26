@@ -1,6 +1,6 @@
 import * as Sentry from '@sentry/browser';
 
-import { COMMIT_SHA, SENTRY_DSN } from '../../constants';
+import { COMMIT_SHA, SENTRY_DSN } from '../constants';
 
 const configureSentry = () => {
   if (SENTRY_DSN) {
