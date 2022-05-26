@@ -87,28 +87,40 @@ const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
           ],
           [Events.userInherited]: [
             {
-              target: States.basicInformation,
+              target: States.additionalInfoRequired,
               actions: [Actions.assignAuthTokenWithMissingAttributes],
               cond: (context, event) =>
-                isMissingBasicAttribute(event.payload.missingAttributes),
-            },
-            {
-              target: States.residentialAddress,
-              actions: [Actions.assignAuthTokenWithMissingAttributes],
-              cond: (context, event) =>
-                isMissingResidentialAttribute(event.payload.missingAttributes),
-            },
-            {
-              target: States.ssn,
-              actions: [Actions.assignAuthTokenWithMissingAttributes],
-              cond: (context, event) =>
-                isMissingSsnAttribute(event.payload.missingAttributes),
+                hasMissingAttributes(event.payload.missingAttributes),
             },
             {
               target: States.verificationSuccess,
               actions: [Actions.assignAuthTokenWithMissingAttributes],
-              cond: (context, event) =>
-                !hasMissingAttributes(event.payload.missingAttributes),
+            },
+          ],
+        },
+      },
+      [States.additionalInfoRequired]: {
+        on: {
+          [Events.collectAdditionalInfo]: [
+            {
+              target: States.basicInformation,
+              actions: [Actions.assignAuthTokenWithMissingAttributes],
+              cond: context =>
+                isMissingBasicAttribute(context.registration.missingAttributes),
+            },
+            {
+              target: States.residentialAddress,
+              actions: [Actions.assignAuthTokenWithMissingAttributes],
+              cond: context =>
+                isMissingResidentialAttribute(
+                  context.registration.missingAttributes,
+                ),
+            },
+            {
+              target: States.ssn,
+              actions: [Actions.assignAuthTokenWithMissingAttributes],
+              cond: context =>
+                isMissingSsnAttribute(context.registration.missingAttributes),
             },
           ],
         },

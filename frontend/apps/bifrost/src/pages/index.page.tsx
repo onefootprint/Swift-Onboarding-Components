@@ -5,6 +5,7 @@ import useBifrostMachine from 'src/hooks/use-bifrost-machine';
 
 import EmailIdentification from './email-identification';
 import PhoneVerification from './phone-verification';
+import AdditionalInfoRequired from './registration/components/additional-info-required';
 import BasicInformation from './registration/components/basic-information';
 import PhoneRegistration from './registration/components/phone-registration';
 import ResidentialAddress from './registration/components/residential-address';
@@ -19,6 +20,7 @@ const Root = () => {
     [States.emailIdentification]: EmailIdentification,
     [States.phoneVerification]: PhoneVerification,
     [States.verificationSuccess]: VerificationSuccess,
+    [States.additionalInfoRequired]: AdditionalInfoRequired,
     [States.phoneRegistration]: PhoneRegistration,
     [States.basicInformation]: BasicInformation,
     [States.residentialAddress]: ResidentialAddress,

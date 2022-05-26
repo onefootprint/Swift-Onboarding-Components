@@ -3,6 +3,7 @@ export enum States {
   basicInformation = 'basicInformation',
   phoneVerification = 'phoneVerification',
   verificationSuccess = 'verificationSuccess',
+  additionalInfoRequired = 'additionalInfoRequired',
   phoneRegistration = 'phoneRegistration',
   residentialAddress = 'residentialAddress',
   ssn = 'ssn',
@@ -16,6 +17,7 @@ export enum Events {
   phoneSubmitted = 'phoneSubmitted',
   userCreated = 'userCreated',
   userInherited = 'userInherited',
+  collectAdditionalInfo = 'collectAdditionalInfo',
   basicInformationSubmitted = 'basicInformationSubmitted',
   residentialAddressSubmitted = 'residentialAddressSubmitted',
   ssnSubmitted = 'ssnSubmitted',
@@ -112,6 +114,9 @@ export type BifrostEvent =
   | {
       type: Events.userInherited;
       payload: { authToken: string; missingAttributes: Set<UserDataAttribute> };
+    }
+  | {
+      type: Events.collectAdditionalInfo;
     }
   | {
       type: Events.phoneSubmitted;
