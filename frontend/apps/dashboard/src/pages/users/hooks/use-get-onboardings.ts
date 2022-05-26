@@ -1,5 +1,9 @@
 import { useQuery } from 'react-query';
 import request, { RequestError, RequestResponse } from 'request';
+import {
+  OnboardingsListRequest,
+  useFilters,
+} from 'src/pages/users/hooks/use-filters';
 
 export enum OnboardingStatus {
   verified = 'verified',
@@ -17,21 +21,26 @@ export type Onboarding = {
 };
 
 // TODO pagination
-const getOnboardingsRequest = async () => {
+const getOnboardingsRequest = async (query: OnboardingsListRequest) => {
   const { data: response } = await request<RequestResponse<Onboarding[]>>({
     method: 'GET',
-    url: 'http://localhost:8000/org/onboardings',
+    url: `http://localhost:8000/org/onboardings`,
+    params: query,
     headers: { 'x-client-secret-key': 'sk_hsSPWQe1TjZ9k9fWZbuOva0AZ7MHVfpscJ' },
   });
   return response.data;
 };
 
-const useGetOnboardings = () =>
-  useQuery<Onboarding[], RequestError>(
-    ['paginatedOnboardings'],
-    () => getOnboardingsRequest(),
+const useGetOnboardings = () => {
+  const { query } = useFilters();
+
+  return useQuery<Onboarding[], RequestError>(
+    ['paginatedOnboardings', query],
+    () => getOnboardingsRequest(query),
     {
       retry: false,
     },
   );
+};
+
 export default useGetOnboardings;

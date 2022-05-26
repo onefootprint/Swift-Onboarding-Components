@@ -14,6 +14,11 @@
   "dependencies": {
     "hooks": "*",
     "icons": "*",
+    "lodash": "^4.17.21",
+    "next": "12.1.5",
+    "polished": "^4.2.2",
+    "react": "17.0.2",
+    "react-dom": "17.0.2",
     "request": "*",
     "styled": "*",
     "ui": "*"
