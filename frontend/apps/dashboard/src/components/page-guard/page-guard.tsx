@@ -9,13 +9,13 @@ import {
 import useSessionUser from '../../hooks/use-session-user';
 
 export type PageGuardProps = {
-  children: React.ReactNode;
+  children: JSX.Element;
 };
 
 const PageGuard = ({ children }: PageGuardProps) => {
   const { isLoggedIn } = useSessionUser();
   const router = useRouter();
-  const isLoggedOutRoute = LOGGED_OUT_ROUTES.includes(router.asPath);
+  const isLoggedOutRoute = LOGGED_OUT_ROUTES.includes(router.pathname);
   const isLoggedInRoute = !isLoggedOutRoute;
   const hasAccessToThePage =
     (isLoggedInRoute && isLoggedIn) || (isLoggedOutRoute && !isLoggedIn);
@@ -28,7 +28,7 @@ const PageGuard = ({ children }: PageGuardProps) => {
     }
   }, [hasAccessToThePage, isLoggedIn, router]);
 
-  return hasAccessToThePage ? children : null;
+  return hasAccessToThePage ? children : <div />;
 };
 
 export default PageGuard;

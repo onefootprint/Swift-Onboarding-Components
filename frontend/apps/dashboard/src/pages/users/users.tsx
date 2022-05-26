@@ -15,7 +15,7 @@ import useGetOnboardings, {
 } from 'src/pages/users/hooks/use-get-onboardings';
 import useJoinUsers, { User } from 'src/pages/users/hooks/use-join-users';
 import styled, { css, UIState } from 'styled';
-import { Badge, Container, TextInput, Typography } from 'ui';
+import { Badge, TextInput, Typography } from 'ui';
 import { useMap } from 'usehooks-ts';
 
 const statusToBadgeVariant: Record<OnboardingStatus, UIState> = {
@@ -69,7 +69,10 @@ const Users = () => {
   };
 
   return (
-    <Container>
+    <>
+      <HeaderContainer>
+        <Typography variant="heading-2">Users</Typography>
+      </HeaderContainer>
       <SearchTextInput
         placeholder="Search (exact match)..."
         prefixElement={<IcoSearchContainer />}
@@ -126,9 +129,15 @@ const Users = () => {
           </>
         )}
       />
-    </Container>
+    </>
   );
 };
+
+const HeaderContainer = styled.div`
+  ${({ theme }) => css`
+    margin-bottom: ${theme.spacing[5]}px;
+  `};
+`;
 
 const SearchTextInput = styled(TextInput)`
   border-bottom-left-radius: 0;

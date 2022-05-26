@@ -26,6 +26,7 @@ export const useStore = create<UserSessionState>()(
 const useSessionUser = () => {
   const { data, logIn, logOut } = useStore(state => state);
   const isLoggedIn = !!data;
+
   return { data, isLoggedIn, logIn, logOut };
 };
 

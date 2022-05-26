@@ -1,5 +1,6 @@
 import React from 'react';
 import { QueryClientProvider } from 'react-query';
+import PageGuard from 'src/components/page-guard';
 import { createGlobalStyle } from 'styled';
 import { DesignSystemProvider, themes } from 'ui';
 
@@ -20,9 +21,11 @@ const App = ({ Component, pageProps }: AppProps) => (
   <QueryClientProvider client={queryClient}>
     <DesignSystemProvider theme={themes.light}>
       <GlobalStyle />
-      <Layout>
-        <Component {...pageProps} />
-      </Layout>
+      <PageGuard>
+        <Layout>
+          <Component {...pageProps} />
+        </Layout>
+      </PageGuard>
     </DesignSystemProvider>
   </QueryClientProvider>
 );
