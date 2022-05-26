@@ -1,0 +1,28 @@
+import { useMutation } from 'react-query';
+import request, { RequestError, RequestResponse } from 'request';
+
+export type EmailLoginRequest = {
+  emailAddress: string;
+};
+
+export type EmailLoginResponse = {
+  success: boolean;
+};
+
+const loginEmailRequest = async (payload: EmailLoginRequest) => {
+  const { data: response } = await request<RequestResponse<EmailLoginResponse>>(
+    {
+      method: 'POST',
+      url: '/auth/magic_link',
+      data: payload,
+    },
+  );
+  return response.data;
+};
+
+const useLoginEmail = () =>
+  useMutation<EmailLoginResponse, RequestError, EmailLoginRequest>(
+    loginEmailRequest,
+  );
+
+export default useLoginEmail;
