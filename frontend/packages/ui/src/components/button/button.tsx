@@ -17,7 +17,7 @@ export type ButtonProps = {
   loading?: boolean;
   loadingAriaLabel?: string;
   onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
-  size?: 'default' | 'compact' | 'large';
+  size?: 'default' | 'compact' | 'small' | 'large';
   testID?: string;
   type?: 'button' | 'submit' | 'reset';
   variant?: 'primary' | 'secondary';
@@ -54,7 +54,7 @@ const Button = ({
 );
 
 const Container = styled.button<{
-  size: 'default' | 'compact' | 'large';
+  size: 'default' | 'compact' | 'small' | 'large';
   variant: 'primary' | 'secondary';
   fullWidth?: boolean;
 }>`
@@ -93,6 +93,16 @@ const Container = styled.button<{
       font-weight: ${theme.typography['label-3'].fontWeight};
       line-height: ${theme.typography['label-3'].lineHeight};
       padding: ${theme.spacing[1] + theme.spacing[3]}px ${theme.spacing[7]}px;
+    `}
+
+    ${({ theme, size }) =>
+    size === 'small' &&
+    css`
+      font-family: ${theme.typography['label-4'].fontFamily};
+      font-size: ${theme.typography['label-4'].fontSize};
+      font-weight: ${theme.typography['label-4'].fontWeight};
+      line-height: ${theme.typography['label-4'].lineHeight};
+      padding: ${theme.spacing[2]}px ${theme.spacing[4]}px;
     `}
 
     ${({ theme, size }) =>

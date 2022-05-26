@@ -14,6 +14,8 @@ export type BaseInputProps = {
   placeholder: string;
   testID?: string;
   value?: string;
+  prefixElement?: JSX.Element;
+  suffixElement?: JSX.Element;
 } & InputHTMLAttributes<HTMLInputElement>;
 
 const BaseInput = forwardRef<HTMLInputElement, BaseInputProps>(
@@ -40,6 +42,8 @@ const BaseInput = forwardRef<HTMLInputElement, BaseInputProps>(
       type,
       id: baseID,
       value,
+      prefixElement,
+      suffixElement,
       ...rest
     }: BaseInputProps,
     ref,
@@ -58,8 +62,9 @@ const BaseInput = forwardRef<HTMLInputElement, BaseInputProps>(
     };
 
     return (
-      <InputContainer>
+      <InputContainer hasPrefix={!!prefixElement}>
         {label && <Label htmlFor={id}>{label}</Label>}
+        {prefixElement && <PrefixContainer>{prefixElement}</PrefixContainer>}
         <Input
           $hasError={hasError}
           alt={alt}
@@ -84,12 +89,42 @@ const BaseInput = forwardRef<HTMLInputElement, BaseInputProps>(
         {hintText && (
           <Hint color={hasError ? 'error' : 'tertiary'}>{hintText}</Hint>
         )}
+        {suffixElement && <SuffixContainer>{suffixElement}</SuffixContainer>}
       </InputContainer>
     );
   },
 );
 
-const InputContainer = styled.div``;
+const InputContainer = styled.div<{
+  hasPrefix: boolean;
+}>`
+  position: relative;
+  input {
+    ${({ theme, hasPrefix }) =>
+      hasPrefix &&
+      css`
+        padding-left: ${theme.spacing[9] + theme.spacing[2]}px;
+      `}
+  }
+`;
+
+const PrefixContainer = styled.div`
+  position: absolute;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+const SuffixContainer = styled.div`
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
 
 const Input = styled.input<{
   $hasError: boolean;
