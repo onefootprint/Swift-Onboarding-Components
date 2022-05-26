@@ -22,6 +22,8 @@ export type TypographyProps = {
   color?: Color;
   testID?: string;
   variant: FontFamily;
+  center?: boolean;
+  noSelect?: boolean;
   sx?: SXStyleProps;
 };
 
@@ -33,6 +35,8 @@ const Typography = forwardRef<HTMLElement, TypographyProps>(
       color = 'primary',
       sx,
       testID,
+      center,
+      noSelect,
       variant,
     }: TypographyProps,
     ref,
@@ -45,6 +49,8 @@ const Typography = forwardRef<HTMLElement, TypographyProps>(
         data-testid={testID}
         ref={ref}
         sx={sxStyles}
+        center={center}
+        noSelect={noSelect}
         variant={variant}
       >
         {children}
@@ -56,6 +62,8 @@ const Typography = forwardRef<HTMLElement, TypographyProps>(
 const StyledTypography = styled.p<{
   color: Color;
   sx: SXStyles;
+  center?: boolean;
+  noSelect?: boolean;
   variant: FontFamily;
 }>`
   ${({ theme, color, variant, sx }) => {
@@ -69,6 +77,16 @@ const StyledTypography = styled.p<{
       ${sx};
     `;
   }}
+  ${({ center }) =>
+    center &&
+    css`
+      text-align: center;
+    `};
+  ${({ noSelect }) =>
+    noSelect &&
+    css`
+      user-select: none;
+    `};
 `;
 
 export default Typography;

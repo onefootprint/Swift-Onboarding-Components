@@ -1,6 +1,7 @@
 import IcoLock16 from 'icons/ico/ico-lock-16';
 import IcoSearch16 from 'icons/ico/ico-search-16';
-import React from 'react';
+import React, { useState } from 'react';
+import Modal, { ModalCloseEvent } from 'src/components/modal';
 import { Row, Table, Th } from 'src/components/table';
 import useDecryptUser, {
   DecryptedUserAttributes,
@@ -11,7 +12,7 @@ import useGetOnboardings, {
 } from 'src/pages/users/hooks/use-get-onboardings';
 import useJoinUsers, { User } from 'src/pages/users/hooks/use-join-users';
 import styled, { css, UIState } from 'styled';
-import { Badge, Button, TextInput, Typography } from 'ui';
+import { Badge, Button, Select, SelectOption, TextInput, Typography } from 'ui';
 import { useMap } from 'usehooks-ts';
 
 const statusToBadgeVariant: Record<OnboardingStatus, UIState> = {
@@ -33,37 +34,37 @@ const statusToDisplayText = {
 const TableHeader = () => (
   <>
     <Th style={{ width: '100px' }}>
-      <Typography variant="caption-2" color="secondary">
+      <Typography variant="caption-2" color="secondary" noSelect>
         NAME
       </Typography>
     </Th>
     <Th style={{ width: '130px' }}>
-      <Typography variant="caption-2" color="secondary">
+      <Typography variant="caption-2" color="secondary" noSelect>
         FOOTPRINT TOKEN
       </Typography>
     </Th>
     <Th style={{ width: '120px' }}>
-      <Typography variant="caption-2" color="secondary">
+      <Typography variant="caption-2" color="secondary" noSelect>
         STATUS
       </Typography>
     </Th>
     <Th style={{ width: '180px' }}>
-      <Typography variant="caption-2" color="secondary">
+      <Typography variant="caption-2" color="secondary" noSelect>
         EMAIL
       </Typography>
     </Th>
     <Th style={{ width: '90px' }}>
-      <Typography variant="caption-2" color="secondary">
+      <Typography variant="caption-2" color="secondary" noSelect>
         SSN
       </Typography>
     </Th>
     <Th style={{ width: '120px' }}>
-      <Typography variant="caption-2" color="secondary">
+      <Typography variant="caption-2" color="secondary" noSelect>
         PHONE NUMBER
       </Typography>
     </Th>
     <Th style={{ width: '160px' }}>
-      <Typography variant="caption-2" color="secondary">
+      <Typography variant="caption-2" color="secondary" noSelect>
         DATE
       </Typography>
     </Th>
@@ -73,7 +74,7 @@ const TableHeader = () => (
 const EncryptedCell = () => (
   <>
     <IcoLockContainer />
-    <Typography variant="body-3" color="primary">
+    <Typography variant="body-3" color="primary" noSelect>
       •••••••••
     </Typography>
   </>
@@ -91,6 +92,57 @@ const FieldOrPlaceholder = ({ value }: FieldOrPlaceholderProps) =>
   ) : (
     <EncryptedCell />
   );
+
+const UsersFilter = () => {
+  const [selectedOption, setSelectedOption] = useState<
+    SelectOption | null | undefined
+  >(null);
+
+  const [showModal, setShowModal] = useState(false);
+
+  const handleCloseModal = (type: ModalCloseEvent) => {
+    console.log(type);
+    setShowModal(false);
+  };
+
+  return (
+    <>
+      {showModal && (
+        <Modal
+          size="compact"
+          headerText="Filters"
+          primaryButtonText="Apply"
+          secondaryButtonText="Clear"
+          onClose={handleCloseModal}
+        >
+          <Select
+            label="Status"
+            options={[
+              { label: 'Verified', value: OnboardingStatus.verified },
+              { label: 'Incomplete', value: OnboardingStatus.incomplete },
+              { label: 'Manual review', value: OnboardingStatus.manualReview },
+              { label: 'Processing', value: OnboardingStatus.processing },
+              { label: 'Failed', value: OnboardingStatus.failed },
+            ]}
+            selectedOption={selectedOption}
+            onSelect={option => {
+              setSelectedOption(option);
+            }}
+          />
+        </Modal>
+      )}
+      <FilterButtonContainer>
+        <Button
+          size="small"
+          variant="secondary"
+          onClick={() => setShowModal(true)}
+        >
+          Filters
+        </Button>
+      </FilterButtonContainer>
+    </>
+  );
+};
 
 const Users = () => {
   const [decryptedUsers, { set: setDecryptedUser }] = useMap<
@@ -120,13 +172,7 @@ const Users = () => {
       <SearchTextInput
         placeholder="Search (exact match)..."
         prefixElement={<IcoSearchContainer />}
-        suffixElement={
-          <FilterButtonContainer>
-            <Button size="small" variant="secondary">
-              Filters
-            </Button>
-          </FilterButtonContainer>
-        }
+        suffixElement={<UsersFilter />}
       />
       <Table
         items={users}
