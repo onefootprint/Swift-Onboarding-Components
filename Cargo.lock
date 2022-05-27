@@ -1499,6 +1499,7 @@ dependencies = [
  "strum_macros",
  "thiserror",
  "tokio",
+ "tracing",
  "uuid",
 ]
 

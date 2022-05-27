@@ -24,11 +24,9 @@
         "vsock",
         "webauthn"
     ],
-    "rust-analyzer.checkOnSave.command": "clippy",
     "[rust]": {
-        "editor.defaultFormatter": "matklad.rust-analyzer",
+        "editor.defaultFormatter": "statiolake.vscode-rustfmt",
         "editor.semanticHighlighting.enabled": true,
         "editor.formatOnSave": true
     },
-    "rust-analyzer.cargo.noDefaultFeatures": true
 }

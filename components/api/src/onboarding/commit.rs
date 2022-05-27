@@ -2,8 +2,10 @@ use crate::auth::get_onboarding_for_tenant;
 use crate::auth::logged_in_session::LoggedInSessionContext;
 use crate::errors::ApiError;
 use crate::types::success::ApiResponseData;
+use crate::utils::insight_headers::InsightHeaders;
 use crate::State;
 use crate::{auth::client_public_key::PublicTenantAuthContext, liveness::get_webauthn_creds};
+use db::models::insight_event::CreateInsightEvent;
 use db::models::user_vaults::UserVaultWrapper;
 use newtypes::FootprintUserId;
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
@@ -24,6 +26,7 @@ fn handler(
     user_auth: LoggedInSessionContext,
     tenant_auth: PublicTenantAuthContext,
     state: web::Data<State>,
+    insights: InsightHeaders,
 ) -> actix_web::Result<Json<ApiResponseData<CommitResponse>>, ApiError> {
     let onboarding = get_onboarding_for_tenant(&state.db_pool, &user_auth, &tenant_auth).await?;
     let uv = user_auth.user_vault();
@@ -39,6 +42,12 @@ fn handler(
     // TODO kick off user verification with data vendors
 
     if missing_fields.is_empty() {
+        // record the insight for this onboarding
+        CreateInsightEvent::from(insights)
+            .insert(&state.db_pool)
+            .await?;
+        // TODO add it to the onboarding table
+
         Ok(Json(ApiResponseData {
             data: CommitResponse {
                 footprint_user_id: onboarding.user_ob_id.clone(),

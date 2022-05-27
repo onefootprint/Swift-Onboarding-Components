@@ -9,6 +9,27 @@ table! {
         timestamp -> Timestamp,
         created_at -> Timestamp,
         updated_at -> Timestamp,
+        insight_event_id -> Nullable<Uuid>,
+    }
+}
+
+table! {
+    use diesel::sql_types::*;
+    use newtypes::db_types::*;
+
+    insight_events (id) {
+        id -> Uuid,
+        timestamp -> Timestamp,
+        ip_address -> Nullable<Varchar>,
+        country -> Nullable<Varchar>,
+        region -> Nullable<Varchar>,
+        region_name -> Nullable<Varchar>,
+        latitude -> Nullable<Float8>,
+        longitude -> Nullable<Float8>,
+        metro_code -> Nullable<Varchar>,
+        postal_code -> Nullable<Varchar>,
+        time_zone -> Nullable<Varchar>,
+        user_agent -> Nullable<Varchar>,
     }
 }
 
@@ -24,6 +45,8 @@ table! {
         status -> User_status,
         created_at -> Timestamp,
         updated_at -> Timestamp,
+        start_insight_event_id -> Nullable<Uuid>,
+        liveness_insight_event_id -> Nullable<Uuid>,
     }
 }
 
@@ -119,6 +142,7 @@ table! {
     }
 }
 
+joinable!(access_events -> insight_events (insight_event_id));
 joinable!(access_events -> onboardings (onboarding_id));
 joinable!(onboardings -> tenants (tenant_id));
 joinable!(onboardings -> user_vaults (user_vault_id));
@@ -127,6 +151,7 @@ joinable!(webauthn_credentials -> user_vaults (user_vault_id));
 
 allow_tables_to_appear_in_same_query!(
     access_events,
+    insight_events,
     onboardings,
     sessions,
     tenant_api_keys,

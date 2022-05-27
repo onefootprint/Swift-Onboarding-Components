@@ -3,8 +3,10 @@ use crate::auth::logged_in_session::LoggedInSessionContext;
 use crate::errors::ApiError;
 use crate::liveness::get_webauthn_creds;
 use crate::types::success::ApiResponseData;
+use crate::utils::insight_headers::InsightHeaders;
 use crate::State;
-use db::models::onboardings::{NewOnboarding, Onboarding};
+use db::models::insight_event::CreateInsightEvent;
+use db::models::onboardings::NewOnboarding;
 use db::models::user_vaults::UserVaultWrapper;
 use newtypes::{DataKind, Status};
 use paperclip::actix::{api_v2_operation, web, web::Json, Apiv2Schema};
@@ -24,14 +26,17 @@ pub fn handler(
     state: web::Data<State>,
     tenant_auth: PublicTenantAuthContext,
     user_auth: LoggedInSessionContext,
+    insights: InsightHeaders,
 ) -> actix_web::Result<Json<ApiResponseData<OnboardingResponse>>, ApiError> {
     let uv = user_auth.user_vault();
-    let _: Onboarding = NewOnboarding {
-        tenant_id: tenant_auth.tenant().id.clone(),
-        user_vault_id: uv.id.clone(),
-        status: Status::Processing,
-    }
-    .get_or_create(&state.db_pool)
+
+    NewOnboarding::get_or_create(
+        &state.db_pool,
+        uv.id.clone(),
+        tenant_auth.tenant().id.clone(),
+        Status::Processing,
+        CreateInsightEvent::from(insights),
+    )
     .await?;
 
     let webauthn_creds = get_webauthn_creds(&state, uv.id.clone()).await?;

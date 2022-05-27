@@ -1,9 +1,11 @@
 use crate::errors::ApiError;
 use crate::tenant::AuthContext;
 use crate::types::success::ApiResponseData;
+use crate::utils::insight_headers::InsightHeaders;
 use crate::State;
 use crypto::seal::EciesP256Sha256AesGcmSealed;
 use db::models::access_events::{NewAccessEvent, NewAccessEventBatch};
+use db::models::insight_event::CreateInsightEvent;
 use db::models::user_vaults::UserVault;
 use enclave_proxy::{DataTransform, DecryptRequest};
 use newtypes::{DataKind, FootprintUserId};
@@ -28,6 +30,7 @@ fn handler(
     state: web::Data<State>,
     auth: AuthContext,
     request: Json<UserDecryptRequest>,
+    insights: InsightHeaders,
 ) -> actix_web::Result<Json<ApiResponseData<UserDecryptResponse>>, ApiError> {
     // grab tenant secret key from header
     let tenant = auth.tenant();
@@ -55,13 +58,14 @@ fn handler(
             data_kind: *data_kind,
         })
         .collect();
-    NewAccessEventBatch(events)
-        .bulk_insert(&state.db_pool)
-        .await?;
+    NewAccessEventBatch {
+        events,
+        insight: CreateInsightEvent::from(insights),
+    }
+    .bulk_insert(&state.db_pool)
+    .await?;
 
-    Ok(Json(ApiResponseData {
-        data: result_map,
-    }))
+    Ok(Json(ApiResponseData { data: result_map }))
 }
 
 pub struct DecryptFieldsResult {

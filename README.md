@@ -29,10 +29,19 @@ Next, ensure your postgres is running at you set your `DATABASE_URL` env.
 To run the core api crate:
 ```
 # starts up the local simulated enclave for encryption/decryption
-$ cargo run -p enclave --no-default-features --features simulate
+$ cargo run -p enclave
 
 # runs the api crate
-$ cargo run -p footprint-core --no-default-features
+$ cargo run -p footprint-core
+```
+
+Note: the enclave in production is a Nitro Enclave and is only reachable via `VSOCK` -- secure linux tunnels. If testing on an EC2 machine with the enclave loaded into the Nitro Enclave, test locally by adding the `vsock` feature for `footprint-core` and the `nitro` feature for `enclave`:
+```
+# build the enclave for use within the Nitro Enclave
+$ cargo build -p enclave --features nitro
+
+# runs the api crate in vsock mode, assuming the binary in the previous step is loaded into the Nitro Enclave
+$ cargo run -p footprint-core --features vsock
 ```
 
 ## Getting Pulumi setup

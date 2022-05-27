@@ -11,7 +11,7 @@ async fn test_db() {
     let conn = PgConnection::establish(&db_url).expect("couldn't open connection to DB");
     crate::embedded_migrations::run(&conn).expect("couldn't run migrations on DB");
 
-    let pool = crate::init(&db_url).expect("coudln't initiate DB pool");
+    let pool = crate::init(&db_url).expect("couldn't initiate DB pool");
     let tenant = crate::models::tenants::NewTenant {
         name: "test_tenant".to_owned(),
         public_key: "".as_bytes().to_vec(),

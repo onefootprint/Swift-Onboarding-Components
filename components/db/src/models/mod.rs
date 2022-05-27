@@ -7,3 +7,4 @@ pub mod tenants;
 pub mod user_data;
 pub mod user_vaults;
 pub mod webauthn_credential;
+pub mod insight_event;

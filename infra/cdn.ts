@@ -47,6 +47,7 @@ export async function Create(config: CdnConfig): Promise<aws.cloudfront.Distribu
 
     const cachePolicy = new aws.cloudfront.CachePolicy("app-cdn-origin-cache-policy", {
         defaultTtl: 10,
+        maxTtl: 10,
         parametersInCacheKeyAndForwardedToOrigin: {
             cookiesConfig: { cookieBehavior: "all" },
             headersConfig: { headerBehavior: "whitelist", headers: { items: ["x-forwarded-for"] } },
@@ -75,13 +76,14 @@ export async function Create(config: CdnConfig): Promise<aws.cloudfront.Distribu
         }],
         viewerCertificate: {
             acmCertificateArn: config.certArn,
+            minimumProtocolVersion: "TLSv1.2_2021",
             sslSupportMethod: "sni-only"
         },
         defaultCacheBehavior: {
             targetOriginId: config.origin,
             viewerProtocolPolicy: "redirect-to-https",
             allowedMethods: ["GET", "HEAD", "OPTIONS", "POST", "PUT", "DELETE", "PATCH"],
-            cachedMethods: ["HEAD", "GET", "OPTIONS"],
+            cachedMethods: ["HEAD", "OPTIONS"],
             originRequestPolicyId: requestPolicy.id,
             cachePolicyId: cachePolicy.id,
         },

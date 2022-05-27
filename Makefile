@@ -8,12 +8,12 @@ commit := "$(branch)-$(shell git rev-parse --short HEAD)"
 
 api-release:
 	@echo "building release mode"
-	@docker run -v "cargo-cache:/root/.cargo/registry" -v "${PWD}:/volume" --rm -t clux/muslrust:stable cargo build -p footprint-core --release
+	@docker run -v "cargo-cache:/root/.cargo/registry" -v "${PWD}:/volume" --rm -t clux/muslrust:stable cargo build -p footprint-core --features vsock --release
 	@cp ./target/x86_64-unknown-linux-musl/release/footprint-core ./out/footprint-core
 
 api-debug:
 	@echo "building debug mode"
-	@docker run -v "cargo-cache:/root/.cargo/registry" -v "${PWD}:/volume" --rm -t clux/muslrust:stable cargo build -p footprint-core
+	@docker run -v "cargo-cache:/root/.cargo/registry" -v "${PWD}:/volume" --rm -t clux/muslrust:stable cargo build -p footprint-core --features vsock
 	@cp ./target/x86_64-unknown-linux-musl/debug/footprint-core ./out/footprint-core
 
 build-enclave-docker:
@@ -81,8 +81,8 @@ stop-local:
 	@killall footprint-core || echo "no fpc running"
 
 run-local: stop-local
-	@cargo run -p enclave --no-default-features --features simulate & echo "starting enclave..."
-	@cargo run -p footprint-core --no-default-features
+	@cargo run -p enclave simulate & echo "starting enclave..."
+	@cargo run -p footprint-core
 
 
 update-dot-env:

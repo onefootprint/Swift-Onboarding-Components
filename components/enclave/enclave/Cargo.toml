@@ -6,7 +6,7 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [features]
-default = ["simulate", "nitro"]
+default = ["simulate"]
 simulate = ["aws-types", "aws-config", "aws-sdk-kms"]
 nitro = ["tokio-vsock"]
 
