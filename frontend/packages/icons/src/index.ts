@@ -13,6 +13,8 @@ import IcoArrowUpRight16 from '../ico/ico-arrow-up-right-16';
 import IcoArrowUpRight24 from '../ico/ico-arrow-up-right-24';
 import IcoBolt16 from '../ico/ico-bolt-16';
 import IcoBolt24 from '../ico/ico-bolt-24';
+import IcoBuilding16 from '../ico/ico-building-16';
+import IcoBuilding24 from '../ico/ico-building-24';
 import IcoCheck16 from '../ico/ico-check-16';
 import IcoCheck24 from '../ico/ico-check-24';
 import IcoCheckCircle16 from '../ico/ico-check-circle-16';
@@ -28,6 +30,8 @@ import IcoChevronLeftBig16 from '../ico/ico-chevron-left-big-16';
 import IcoChevronLeftBig24 from '../ico/ico-chevron-left-big-24';
 import IcoChevronRight16 from '../ico/ico-chevron-right-16';
 import IcoChevronRight24 from '../ico/ico-chevron-right-24';
+import IcoClipboard16 from '../ico/ico-clipboard-16';
+import IcoClipboard24 from '../ico/ico-clipboard-24';
 import IcoClose16 from '../ico/ico-close-16';
 import IcoClose24 from '../ico/ico-close-24';
 import IcoCode16 from '../ico/ico-code-16';
@@ -42,6 +46,8 @@ import IcoEmail16 from '../ico/ico-email-16';
 import IcoEmail24 from '../ico/ico-email-24';
 import IcoEye16 from '../ico/ico-eye-16';
 import IcoEye24 from '../ico/ico-eye-24';
+import IcoFileText216 from '../ico/ico-file-text-2-16';
+import IcoFileText224 from '../ico/ico-file-text-2-24';
 import IcoFileText16 from '../ico/ico-file-text-16';
 import IcoFileText24 from '../ico/ico-file-text-24';
 import IcoFootprint16 from '../ico/ico-footprint-16';
@@ -81,6 +87,7 @@ export default {
   IcoArrowUp16,
   IcoArrowUpRight16,
   IcoBolt16,
+  IcoBuilding16,
   IcoCheck16,
   IcoCheckCircle16,
   IcoCheckSmall16,
@@ -88,6 +95,7 @@ export default {
   IcoChevronLeft16,
   IcoChevronLeftBig16,
   IcoChevronRight16,
+  IcoClipboard16,
   IcoClose16,
   IcoCode16,
   IcoCrosshair16,
@@ -96,6 +104,7 @@ export default {
   IcoEmail16,
   IcoEye16,
   IcoFileText16,
+  IcoFileText216,
   IcoFootprint16,
   IcoGoogleColored16,
   IcoLock16,
@@ -116,6 +125,7 @@ export default {
   IcoArrowUp24,
   IcoArrowUpRight24,
   IcoBolt24,
+  IcoBuilding24,
   IcoCheck24,
   IcoCheckCircle24,
   IcoCheckSmall24,
@@ -123,6 +133,7 @@ export default {
   IcoChevronLeft24,
   IcoChevronLeftBig24,
   IcoChevronRight24,
+  IcoClipboard24,
   IcoClose24,
   IcoCode24,
   IcoCrosshair24,
@@ -130,6 +141,7 @@ export default {
   IcoDotsHorizontal24,
   IcoEmail24,
   IcoEye24,
+  IcoFileText224,
   IcoFileText24,
   IcoFootprint24,
   IcoGoogleColored24,
