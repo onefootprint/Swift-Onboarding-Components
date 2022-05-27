@@ -1,3 +1,4 @@
+import { useTranslation } from 'hooks';
 import React from 'react';
 import styled, { css } from 'styled';
 import { Container, media } from 'ui';
@@ -5,28 +6,22 @@ import { Container, media } from 'ui';
 import PlaygroundGrid from './components/playground-grid';
 import PlaygroundGrigContent from './components/playground-grid-content';
 
-type PlaygroundSectionProps = {
-  title: string;
-  subtitle: string;
-  instructions: string;
-  tooltips: string[];
+const PlaygroundSection = () => {
+  const { t } = useTranslation('pages.home.playground');
+  return (
+    <Gradient id="playground">
+      <Container sx={{ overflow: 'hidden' }}>
+        <Inner>
+          <PlaygroundGrid
+            tooltips={t('tooltips') as unknown as string[]}
+            instructions={t('instructions')}
+          />
+          <PlaygroundGrigContent subtitle={t('subtitle')} title={t('title')} />
+        </Inner>
+      </Container>
+    </Gradient>
+  );
 };
-
-const PlaygroundSection = ({
-  title,
-  subtitle,
-  instructions,
-  tooltips,
-}: PlaygroundSectionProps) => (
-  <Gradient id="playground">
-    <Container sx={{ overflow: 'hidden' }}>
-      <Inner>
-        <PlaygroundGrid tooltips={tooltips} instructions={instructions} />
-        <PlaygroundGrigContent subtitle={subtitle} title={title} />
-      </Inner>
-    </Container>
-  </Gradient>
-);
 
 const Gradient = styled.section`
   background: url('/images/grid-blur.svg') no-repeat;

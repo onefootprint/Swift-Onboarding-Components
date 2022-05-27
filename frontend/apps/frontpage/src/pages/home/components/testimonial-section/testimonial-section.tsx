@@ -1,52 +1,45 @@
+import { useTranslation } from 'hooks';
 import IcoQuote40 from 'icons/ico/ico-quote-40';
-import type { StaticImageData } from 'next/image';
 import Image from 'next/image';
 import React from 'react';
 import styled, { css } from 'styled';
 import { Container, media, Typography } from 'ui';
 
-type TestimonialSectionProps = {
-  author: {
-    name: string;
-    imgAlt: string;
-    imgSrc: StaticImageData;
-    role: string;
-  };
-  content: string;
+const TestimonialSection = () => {
+  const { t } = useTranslation('pages.home.testimonial');
+  return (
+    <Container id="testimonial" as="section">
+      <Inner>
+        <IcoQuote40 color="accent" />
+        <Typography
+          as="p"
+          color="primary"
+          sx={{ marginY: 9 }}
+          variant="display-4"
+        >
+          {t('quote')}
+        </Typography>
+        <AuthorContainer>
+          <Image
+            alt={t('author.img-alt')}
+            height={48}
+            layout="fixed"
+            src="/testimonial/author.png"
+            width={48}
+          />
+          <AuthorContentContainer>
+            <Typography variant="heading-3" color="primary" as="div">
+              {t('author.name')}
+            </Typography>
+            <Typography variant="body-2" color="secondary" as="div">
+              {t('author.role')}
+            </Typography>
+          </AuthorContentContainer>
+        </AuthorContainer>
+      </Inner>
+    </Container>
+  );
 };
-
-const TestimonialSection = ({ author, content }: TestimonialSectionProps) => (
-  <Container id="testimonial" as="section">
-    <Inner>
-      <IcoQuote40 color="accent" />
-      <Typography
-        as="p"
-        color="primary"
-        sx={{ marginY: 9 }}
-        variant="display-4"
-      >
-        {content}
-      </Typography>
-      <AuthorContainer>
-        <Image
-          alt={author.imgAlt}
-          height={48}
-          layout="fixed"
-          src={author.imgSrc}
-          width={48}
-        />
-        <AuthorContentContainer>
-          <Typography variant="heading-3" color="primary" as="div">
-            {author.name}
-          </Typography>
-          <Typography variant="body-2" color="secondary" as="div">
-            {author.role}
-          </Typography>
-        </AuthorContentContainer>
-      </AuthorContainer>
-    </Inner>
-  </Container>
-);
 
 const Inner = styled.div`
   ${({ theme }) => css`

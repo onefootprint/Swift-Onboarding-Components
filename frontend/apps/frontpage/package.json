@@ -10,28 +10,32 @@
     "lint": "eslint src --fix"
   },
   "dependencies": {
+    "@typeform/embed": "^1.35.1",
     "hooks": "*",
     "icons": "*",
-    "next": "12.1.5",
+    "lodash": "^4.17.21",
+    "next": "12.1.6",
     "react": "17.0.2",
     "react-dom": "17.0.2",
+    "react-use": "^17.3.2",
     "styled": "*",
     "ui": "*"
   },
   "devDependencies": {
+    "@mdx-js/loader": "^2.1.1",
+    "@mdx-js/react": "^2.1.1",
     "@next/bundle-analyzer": "^12.1.6",
-    "@typeform/embed": "^1.35.1",
+    "@next/mdx": "^12.1.6",
     "@types/lodash": "^4.14.182",
     "@types/node": "^17.0.12",
-    "@types/react": "17.0.37",
     "@types/react-dom": "^17.0.11",
     "config": "*",
     "csstype": "^3.0.11",
     "eslint": "7.32.0",
-    "lodash": "^4.17.21",
+    "i18next": "^21.8.4",
     "next-compose-plugins": "^2.2.1",
     "next-transpile-modules": "9.0.0",
-    "react-use": "^17.3.2",
+    "react-i18next": "^11.16.9",
     "tsconfig": "*",
     "typescript": "^4.5.3"
   }

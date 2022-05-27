@@ -6,7 +6,7 @@ const currentYear = new Date().getFullYear();
 
 type FooterProps = {
   copyright: string;
-  links: { text: string; href: string }[];
+  links: { text: string; href: string; newWindow: boolean }[];
 };
 
 const Footer = ({ copyright, links }: FooterProps) => (
@@ -18,7 +18,11 @@ const Footer = ({ copyright, links }: FooterProps) => (
       <LinksList>
         {links.map(link => (
           <li key={link.text}>
-            <a href={link.href} rel="noopener noreferrer" target="_blank">
+            <a
+              href={link.href}
+              rel="noopener noreferrer"
+              target={link.newWindow ? '_blank' : undefined}
+            >
               <Typography variant="body-3" color="senary">
                 {link.text}
               </Typography>

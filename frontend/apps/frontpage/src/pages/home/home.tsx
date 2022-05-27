@@ -1,114 +1,100 @@
-import '@typeform/embed/build/css/popup.css';
-
 import { createPopup } from '@typeform/embed';
+import { useTranslation } from 'hooks';
 import Head from 'next/head';
 import React from 'react';
 import styled, { css } from 'styled';
 import { media } from 'ui';
 
-import Footer from './components/footer';
-import GetStartedSection from './components/get-started-section';
-import Hero from './components/hero-section';
+import HeroSection from './components/hero-section';
 import HighlightsSection from './components/highlights-section';
-import InvestorsSection from './components/investors-section';
-import Navbar from './components/navbar';
 import PlaygroundSection from './components/playground-section';
 import TestimonialSection from './components/testimonial-section';
 import VaultSection from './components/vault-section';
-import useContent from './hooks/use-content';
 
 const { toggle: toggleTypeform } = createPopup('COZNk70C');
 
 const Home = () => {
-  const content = useContent();
+  const { t } = useTranslation('pages.home');
 
   return (
     <>
       <Head>
-        <title>{content.title}</title>
+        <title>{t('html-title')}</title>
       </Head>
       <HeaderContainer>
-        <Navbar
-          cta={content.navbar.cta}
-          logoAlt={content.navbar.logoAlt}
-          onCtaClick={toggleTypeform}
-        />
-        <Hero
-          cta={content.hero.cta}
-          imgAlt={content.hero.imgAlt}
-          onCtaClick={toggleTypeform}
-          subtitle={content.hero.subtitle}
-          title={content.hero.title}
-        />
+        <HeroSection onCtaClick={toggleTypeform} />
       </HeaderContainer>
-      <PlaygroundSection
-        title={content.playground.title}
-        subtitle={content.playground.subtitle}
-        tooltips={content.playground.tooltips}
-        instructions={content.playground.instructions}
-      />
+      <PlaygroundSection />
       <HighlightsContainer id="highlights">
         <HighlightsSection
-          items={content.qualities.items}
-          subtitle={content.qualities.subtitle}
-          title={content.qualities.title}
+          items={[
+            {
+              title: t('qualities.items.security.title'),
+              content: t('qualities.items.security.content'),
+              imgAlt: t('qualities.items.security.img-alt'),
+              imgSrc: '/highlights/security.png',
+            },
+            {
+              title: t('qualities.items.accuracy.title'),
+              content: t('qualities.items.accuracy.content'),
+              imgAlt: t('qualities.items.accuracy.img-alt'),
+              imgSrc: '/highlights/accuracy.png',
+            },
+            {
+              title: t('qualities.items.cheaper.title'),
+              content: t('qualities.items.cheaper.content'),
+              imgAlt: t('qualities.items.cheaper.img-alt'),
+              imgSrc: '/highlights/cheaper.png',
+            },
+          ]}
+          subtitle={t('qualities.subtitle')}
+          title={t('qualities.title')}
         />
         <HighlightsSection
-          items={content.advantages.items}
-          subtitle={content.advantages.subtitle}
-          title={content.advantages.title}
+          items={[
+            {
+              title: t('advantages.items.conversion.title'),
+              content: t('advantages.items.conversion.content'),
+              imgAlt: t('advantages.items.conversion.img-alt'),
+              imgSrc: '/highlights/conversion.png',
+            },
+            {
+              title: t('advantages.items.dev.title'),
+              content: t('advantages.items.dev.content'),
+              imgAlt: t('advantages.items.dev.img-alt'),
+              imgSrc: '/highlights/dev.png',
+            },
+            {
+              title: t('advantages.items.cost.title'),
+              content: t('advantages.items.cost.content'),
+              imgAlt: t('advantages.items.cost.img-alt'),
+              imgSrc: '/highlights/cost.png',
+            },
+          ]}
+          subtitle={t('advantages.subtitle')}
+          title={t('advantages.title')}
         />
       </HighlightsContainer>
-      <TestimonialSection
-        author={content.testimonial.author}
-        content={content.testimonial.content}
-      />
-      <VaultSection
-        articles={content.vault.articles.secondaries}
-        description={content.vault.description}
-        mainArticle={content.vault.articles.main}
-        subtitle={content.vault.subtitle}
-        title={content.vault.title}
-      />
-      <FooterContainer>
-        <InvestorsSection
-          imgAlt={content.investors.imgAlt}
-          imgSrc={content.investors.imgSrc}
-          subtitle={content.investors.subtitle}
-          title={content.investors.title}
-        />
-        <GetStartedSection
-          cta={content.getStarted.cta}
-          onCtaClick={toggleTypeform}
-          subtitle={content.getStarted.subtitle}
-          title={content.getStarted.title}
-        />
-        <Footer
-          copyright={content.footer.copyright}
-          links={content.footer.links}
-        />
-      </FooterContainer>
+      <TestimonialSection />
+      <VaultSection />
     </>
   );
 };
 
 const HeaderContainer = styled.section`
-  ${({ theme }) => css`
-    padding-top: ${theme.spacing[11]}px;
-    background: linear-gradient(
-      180deg,
-      #e1ddf9 0%,
-      #e4e1fa 11.11%,
-      #e8e4fa 22.22%,
-      #ebe8fb 33.33%,
-      #eeecfc 44.44%,
-      #f2f0fc 55.56%,
-      #f5f4fd 66.67%,
-      #f8f7fe 77.78%,
-      #fcfbfe 88.89%,
-      #ffffff 100%
-    );
-  `}
+  background: linear-gradient(
+    180deg,
+    #e1ddf9 0%,
+    #e4e1fa 11.11%,
+    #e8e4fa 22.22%,
+    #ebe8fb 33.33%,
+    #eeecfc 44.44%,
+    #f2f0fc 55.56%,
+    #f5f4fd 66.67%,
+    #f8f7fe 77.78%,
+    #fcfbfe 88.89%,
+    #ffffff 100%
+  );
 `;
 
 const HighlightsContainer = styled.section`
@@ -131,17 +117,6 @@ const HighlightsContainer = styled.section`
     ${media.greaterThan('lg')`
       padding: ${theme.spacing[11]}px 0;
       row-gap: ${theme.spacing[11]}px;
-    `}
-  `}
-`;
-
-const FooterContainer = styled.section`
-  ${({ theme }) => css`
-    padding-top: ${theme.spacing[10]}px;
-    background: ${theme.backgroundColor.tertiary};
-
-    ${media.greaterThan('lg')`
-      padding-top: ${theme.spacing[11]}px;
     `}
   `}
 `;

@@ -1,5 +1,8 @@
-import type { Icon as TIcon } from 'icons';
-import type { StaticImageData } from 'next/image';
+import { useTranslation } from 'hooks';
+import IcoDatabase24 from 'icons/ico/ico-database-24';
+import IcoEye24 from 'icons/ico/ico-eye-24';
+import IcoLock24 from 'icons/ico/ico-lock-24';
+import IcoShield24 from 'icons/ico/ico-shield-24';
 import Image from 'next/image';
 import React from 'react';
 import styled, { css } from 'styled';
@@ -7,82 +10,83 @@ import { Container, media, Typography } from 'ui';
 
 import VaultArticle from './components/vault-article';
 
-type VaultSectionProps = {
-  articles: { title: string; content: string; Icon: TIcon }[];
-  description: string;
-  mainArticle: {
-    content: string;
-    Icon: TIcon;
-    imgAlt: string;
-    imgSrc: StaticImageData;
-    title: string;
-  };
-  subtitle: string;
-  title: string;
-};
+const VaultSection = () => {
+  const { t } = useTranslation('pages.home.vault');
+  const articles = [
+    {
+      title: t('articles.secondaries.trust.title'),
+      content: t('articles.secondaries.trust.content'),
+      Icon: IcoEye24,
+    },
+    {
+      title: t('articles.secondaries.access.title'),
+      content: t('articles.secondaries.access.content'),
+      Icon: IcoDatabase24,
+    },
+    {
+      title: t('articles.secondaries.secure.title'),
+      content: t('articles.secondaries.secure.content'),
+      Icon: IcoShield24,
+    },
+  ];
 
-const VaultSection = ({
-  articles,
-  description,
-  mainArticle,
-  subtitle,
-  title,
-}: VaultSectionProps) => (
-  <Container as="section" id="vault">
-    <Inner>
-      <Header>
-        <Typography
-          variant="label-1"
-          color="secondary"
-          sx={{ marginBottom: 5 }}
-        >
-          {subtitle}
-        </Typography>
-        <Typography
-          variant="display-1"
-          color="primary"
-          sx={{ maxWidth: '620px', marginBottom: 7 }}
-        >
-          {title}
-        </Typography>
-        <Typography
-          variant="display-4"
-          color="secondary"
-          sx={{ marginBottom: 9, maxWidth: '720px' }}
-        >
-          {description}
-        </Typography>
-      </Header>
-      <MainArticle>
-        <Image
-          alt={mainArticle.imgAlt}
-          height={391}
-          layout="responsive"
-          src={mainArticle.imgSrc}
-          width={484}
-        />
-        <MainArticleInner>
-          <VaultArticle
-            content={mainArticle.content}
-            Icon={mainArticle.Icon}
-            title={mainArticle.title}
+  return (
+    <Container as="section" id="vault">
+      <Inner>
+        <Header>
+          <Typography
+            variant="label-1"
+            color="secondary"
+            sx={{ marginBottom: 5 }}
+          >
+            {t('subtitle')}
+          </Typography>
+          <Typography
+            variant="display-1"
+            color="primary"
+            sx={{ maxWidth: '620px', marginBottom: 7 }}
+          >
+            {t('title')}
+          </Typography>
+          <Typography
+            variant="display-4"
+            color="secondary"
+            sx={{ marginBottom: 9, maxWidth: '720px' }}
+          >
+            {t('description')}
+          </Typography>
+        </Header>
+        <MainArticle>
+          <Image
+            alt={t('articles.main.alt-img')}
+            height={391}
+            layout="responsive"
+            src="/vault/main-article.png"
+            width={484}
           />
-        </MainArticleInner>
-      </MainArticle>
-      <SecondaryArticles>
-        {articles.map(article => (
-          <Article key={article.title}>
+          <MainArticleInner>
             <VaultArticle
-              content={article.content}
-              Icon={article.Icon}
-              title={article.title}
+              content={t('articles.main.content')}
+              Icon={IcoLock24}
+              title={t('articles.main.title')}
             />
-          </Article>
-        ))}
-      </SecondaryArticles>
-    </Inner>
-  </Container>
-);
+          </MainArticleInner>
+        </MainArticle>
+        <SecondaryArticles>
+          {articles.map(article => (
+            <Article key={article.title}>
+              <VaultArticle
+                content={article.content}
+                Icon={article.Icon}
+                title={article.title}
+              />
+            </Article>
+          ))}
+        </SecondaryArticles>
+      </Inner>
+    </Container>
+  );
+};
 
 const Inner = styled.div`
   ${({ theme }) => css`

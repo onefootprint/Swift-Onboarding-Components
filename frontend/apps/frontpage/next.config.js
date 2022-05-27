@@ -12,8 +12,18 @@ const withTM = require('next-transpile-modules')([
   'styled',
 ]);
 
-module.exports = withPlugins([withTM, withBundleAnalyzer], {
-  pageExtensions: ['page.tsx', 'page.ts', 'page.jsx', 'page.js'],
+const withMDX = require('@next/mdx')({
+  pageExtensions: ['ts', 'tsx', 'js', 'jsx', 'md', 'mdx'],
+  extension: /\.mdx?$/,
+  options: {
+    providerImportSource: '@mdx-js/react',
+    remarkPlugins: [],
+    rehypePlugins: [],
+  },
+});
+
+module.exports = withPlugins([withTM, withMDX, withBundleAnalyzer], {
+  pageExtensions: ['page.tsx', 'page.ts', 'page.jsx', 'page.js', 'page.mdx'],
   reactStrictMode: true,
   compiler: {
     styledComponents: true,

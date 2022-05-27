@@ -1,4 +1,3 @@
-import type { StaticImageData } from 'next/image';
 import Image from 'next/image';
 import React from 'react';
 import styled, { css } from 'styled';
@@ -6,7 +5,7 @@ import { Container, media, Typography } from 'ui';
 
 type InvestorsSectionProps = {
   imgAlt: string;
-  imgSrc: StaticImageData;
+  imgSrc: string;
   subtitle: string;
   title: string;
 };

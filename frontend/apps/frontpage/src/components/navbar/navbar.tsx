@@ -1,9 +1,10 @@
 import Image from 'next/image';
+import Link from 'next/link';
 import React, { useCallback, useEffect, useState } from 'react';
 import styled, { css } from 'styled';
 import { Button, Container } from 'ui';
 
-type NavbarProps = {
+export type NavbarProps = {
   cta: string;
   logoAlt: string;
   onCtaClick: () => void;
@@ -34,14 +35,18 @@ const Navbar = ({ logoAlt, cta, onCtaClick }: NavbarProps) => {
           paddingY: 4,
         }}
       >
-        <Image
-          alt={logoAlt}
-          height={24}
-          layout="fixed"
-          priority
-          src="/images/nav-logo.png"
-          width={115}
-        />
+        <Link href="/">
+          <a href="/" aria-label="Go to Footprint's main page">
+            <Image
+              alt={logoAlt}
+              height={24}
+              layout="fixed"
+              priority
+              src="/images/nav-logo.png"
+              width={115}
+            />
+          </a>
+        </Link>
         <Button size="compact" onClick={onCtaClick}>
           {cta}
         </Button>
