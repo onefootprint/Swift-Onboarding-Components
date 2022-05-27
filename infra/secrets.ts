@@ -87,7 +87,7 @@ export async function LoadSecrets(config: pulumi.Config, enclaveKeyDescriptor: E
         }),
         workosClientId: createSecretParameter(`workosClientId-${stack}`, secretConstants.workos.clientId),
         workosSecretKey: createSecretParameter(`workosSecretKey-${stack}`, secretConstants.workos.secretKey),
-        workosDefaultOrg: createSecretParameter(`workosDefaultOrg-${stack}`, secretConstants.workos.secretKey),
+        workosDefaultOrg: createSecretParameter(`workosDefaultOrg-${stack}`, secretConstants.workos.defaultOrg),
     }
 }
 
