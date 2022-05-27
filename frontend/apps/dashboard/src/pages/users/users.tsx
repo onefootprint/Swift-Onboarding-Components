@@ -1,8 +1,10 @@
-import IcoLock16 from 'icons/ico/ico-lock-16';
 import IcoSearch16 from 'icons/ico/ico-search-16';
 import React, { useEffect, useState } from 'react';
-import Modal, { ModalCloseEvent } from 'src/components/modal';
 import { Row, Table } from 'src/components/table';
+import FieldOrPlaceholder from 'src/pages/users/components/field-or-placeholder';
+import UsersFilter, {
+  statusToDisplayText,
+} from 'src/pages/users/components/users-filter';
 import useDecryptUser, {
   DecryptedUserAttributes,
   DecryptUserRequest,
@@ -13,16 +15,7 @@ import useGetOnboardings, {
 } from 'src/pages/users/hooks/use-get-onboardings';
 import useJoinUsers, { User } from 'src/pages/users/hooks/use-join-users';
 import styled, { css, UIState } from 'styled';
-import {
-  Badge,
-  Box,
-  Button,
-  Container,
-  Select,
-  SelectOption,
-  TextInput,
-  Typography,
-} from 'ui';
+import { Badge, Container, TextInput, Typography } from 'ui';
 import { useMap } from 'usehooks-ts';
 
 const statusToBadgeVariant: Record<OnboardingStatus, UIState> = {
@@ -31,14 +24,6 @@ const statusToBadgeVariant: Record<OnboardingStatus, UIState> = {
   [OnboardingStatus.manualReview]: 'error',
   [OnboardingStatus.incomplete]: 'warning',
   [OnboardingStatus.failed]: 'error',
-};
-
-const statusToDisplayText = {
-  [OnboardingStatus.verified]: 'Verified',
-  [OnboardingStatus.processing]: 'Processing',
-  [OnboardingStatus.manualReview]: 'Manual review',
-  [OnboardingStatus.incomplete]: 'Incomplete',
-  [OnboardingStatus.failed]: 'Failed',
 };
 
 const columns = [
@@ -50,104 +35,6 @@ const columns = [
   { text: 'Phone Number', width: '12.5%' },
   { text: 'Date', width: '17.5%' },
 ];
-
-const EncryptedCell = () => (
-  <Box sx={{ display: 'flex' }}>
-    <IcoLockContainer />
-    <Typography variant="body-3" color="primary" noSelect>
-      •••••••••
-    </Typography>
-  </Box>
-);
-
-type FieldOrPlaceholderProps = {
-  value: string | undefined;
-};
-
-const FieldOrPlaceholder = ({ value }: FieldOrPlaceholderProps) =>
-  value ? (
-    <Typography variant="body-3" color="primary" noWrap>
-      {value}
-    </Typography>
-  ) : (
-    <EncryptedCell />
-  );
-
-const UsersFilter = () => {
-  const { query, setFilter } = useFilters();
-  const [selectedOption, setSelectedOption] = useState<
-    SelectOption | null | undefined
-  >(undefined);
-  const [showModal, setShowModal] = useState(false);
-
-  // Any time the modal is opened, recompute what the currently displayed status should be based
-  // on the querystring
-  useEffect(() => {
-    // TODO this should be much simpler... can the selectedOption be just a value rather than
-    // a SelectOption?
-    const currentStatus =
-      query.status && query.status in statusToDisplayText
-        ? ({
-            value: query.status,
-            label: statusToDisplayText[query.status as OnboardingStatus],
-          } as SelectOption)
-        : undefined;
-    setSelectedOption(currentStatus);
-  }, [query, showModal]);
-
-  const handleCloseModal = (type: ModalCloseEvent) => {
-    if (type === ModalCloseEvent.Primary) {
-      setFilter({
-        status: selectedOption?.value as string,
-      });
-    } else if (type === ModalCloseEvent.Secondary) {
-      // Clear the filter
-      setFilter({
-        status: undefined,
-      });
-    }
-    setShowModal(false);
-  };
-
-  return (
-    <>
-      {showModal && (
-        <Modal
-          size="compact"
-          headerText="Filters"
-          primaryButtonText="Apply"
-          secondaryButtonText="Clear"
-          onClose={handleCloseModal}
-        >
-          <Select
-            label="Status"
-            options={[
-              // TODO share these with the enum values we define
-              { label: 'Verified', value: OnboardingStatus.verified },
-              { label: 'Incomplete', value: OnboardingStatus.incomplete },
-              { label: 'Manual review', value: OnboardingStatus.manualReview },
-              { label: 'Processing', value: OnboardingStatus.processing },
-              { label: 'Failed', value: OnboardingStatus.failed },
-            ]}
-            selectedOption={selectedOption}
-            onSelect={option => {
-              setSelectedOption(option);
-            }}
-          />
-        </Modal>
-      )}
-      <FilterButtonContainer>
-        <Button
-          size="small"
-          variant="secondary"
-          onClick={() => setShowModal(true)}
-        >
-          Filters
-        </Button>
-      </FilterButtonContainer>
-    </>
-  );
-};
 
 const Users = () => {
   const [decryptedUsers, { set: setDecryptedUser }] = useMap<
@@ -253,21 +140,9 @@ const SearchTextInput = styled(TextInput)`
   `};
 `;
 
-const IcoLockContainer = styled(IcoLock16)`
-  ${({ theme }) => css`
-    margin-right: ${theme.spacing[2]}px;
-  `};
-`;
-
 const IcoSearchContainer = styled(IcoSearch16)`
   ${({ theme }) => css`
     margin-left: ${theme.spacing[6]}px;
-  `};
-`;
-
-const FilterButtonContainer = styled.div`
-  ${({ theme }) => css`
-    margin-right: ${theme.spacing[6]}px;
   `};
 `;
 
