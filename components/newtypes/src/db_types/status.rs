@@ -6,14 +6,15 @@ use serde::{Deserialize, Serialize};
 ///
 /// Custom indicates that there is no other integration.
 #[derive(Debug, DbEnum, Clone, Copy, Deserialize, Serialize, Apiv2Schema, PartialEq, Eq)]
-#[serde(rename_all = "lowercase")]
-#[PgType = "User_Status"]
+#[serde(rename_all = "snake_case")]
+#[PgType = "user_status"]
 #[DieselType = "User_status"]
 #[DbValueStyle = "verbatim"]
 pub enum Status {
     Verified,
     Processing,
     Incomplete,
+    ManualReview,
     Failed,
 }
 

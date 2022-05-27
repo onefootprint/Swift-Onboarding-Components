@@ -24,13 +24,13 @@ CREATE TABLE tenants (
 
 CREATE INDEX IF NOT EXISTS tenants_workos_id ON tenants(workos_id);
 
-CREATE TYPE User_Status as ENUM ('Verified', 'Processing', 'Incomplete', 'Failed');
+CREATE TYPE user_status as ENUM ('Verified', 'Processing', 'Incomplete', 'Failed', 'ManualReview');
 
 CREATE TABLE user_vaults (
     id VARCHAR(250) PRIMARY KEY DEFAULT prefixed_uid('uv_'),  
     e_private_key BYTEA NOT NULL,
     public_key BYTEA NOT NULL,
-    id_verified User_Status NOT NULL,
+    id_verified user_status NOT NULL,
     created_at timestamp NOT NULL DEFAULT NOW(),
     updated_at timestamp NOT NULL DEFAULT NOW()
 );
@@ -69,7 +69,7 @@ CREATE TABLE onboardings (
     user_ob_id VARCHAR(250) UNIQUE NOT NULL DEFAULT prefixed_uid('fp_id_'),
     user_vault_id VARCHAR(250) NOT NULL,
     tenant_id VARCHAR(250) NOT NULL,
-    status User_Status NOT NULL,
+    status user_status NOT NULL,
     created_at timestamp NOT NULL DEFAULT NOW(),
     updated_at timestamp NOT NULL DEFAULT NOW(),
     CONSTRAINT fk_user
