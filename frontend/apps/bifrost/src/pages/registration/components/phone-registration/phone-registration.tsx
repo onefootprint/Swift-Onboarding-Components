@@ -8,9 +8,7 @@ import useBifrostMachine from 'src/hooks/use-bifrost-machine';
 import styled, { css } from 'styled';
 import { Button, LinkButton, TextInput, Typography } from 'ui';
 
-import useIdentifyPhone, {
-  IdentifyPhoneResponse,
-} from './hooks/use-identify-phone';
+import useIdentifyPhone from './hooks/use-identify-phone';
 
 type FormData = {
   phone: string;
@@ -34,10 +32,7 @@ const PhoneRegistration = () => {
     identifyPhoneMutation.mutate(
       { phoneNumber: formData.phone },
       {
-        onSuccess({
-          challengeToken,
-          phoneNumberLastTwo,
-        }: IdentifyPhoneResponse) {
+        onSuccess({ challengeToken, phoneNumberLastTwo }) {
           send({
             type: Events.phoneSubmitted,
             payload: {
@@ -69,7 +64,7 @@ const PhoneRegistration = () => {
         placeholder={t('form.phone-input.placeholder')}
         {...register('phone', { required: true })}
       />
-      <Button type="submit" fullWidth>
+      <Button type="submit" fullWidth loading={identifyPhoneMutation.isLoading}>
         {t('form.cta')}
       </Button>
     </Form>
