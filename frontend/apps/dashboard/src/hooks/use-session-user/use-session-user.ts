@@ -2,9 +2,8 @@ import create from 'zustand';
 import { persist } from 'zustand/middleware';
 
 export type UserSession = {
-  id: string;
-  firstName: string;
-  lastName: string;
+  auth: string;
+  email: string;
 };
 
 type UserSessionState = {

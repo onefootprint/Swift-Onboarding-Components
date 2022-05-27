@@ -1,3 +1,4 @@
+import useSessionUser from '@src/hooks/use-session-user';
 import { useQuery } from 'react-query';
 import request, { RequestError, RequestResponse } from 'request';
 import {
@@ -21,22 +22,27 @@ export type Onboarding = {
 };
 
 // TODO pagination
-const getOnboardingsRequest = async (query: OnboardingsListRequest) => {
+const getOnboardingsRequest = async (
+  { status, fingerprint }: OnboardingsListRequest,
+  auth: string | undefined,
+) => {
   const { data: response } = await request<RequestResponse<Onboarding[]>>({
     method: 'GET',
     url: '/org/onboardings',
-    params: query,
-    headers: { 'x-client-secret-key': 'sk_vdqop4RZd8fmSavmWPAUZx7rlF6C04cy7R' },
+    params: { status, fingerprint },
+    headers: { 'x-fp-dashboard-authorization': auth as string },
   });
   return response.data;
 };
 
 const useGetOnboardings = () => {
-  const { query } = useFilters();
+  const session = useSessionUser();
+  const auth = session.data?.auth;
 
+  const { query } = useFilters();
   return useQuery<Onboarding[], RequestError>(
-    ['paginatedOnboardings', query],
-    () => getOnboardingsRequest(query),
+    ['paginatedOnboardings', query, auth],
+    () => getOnboardingsRequest(query, auth),
     {
       retry: false,
     },

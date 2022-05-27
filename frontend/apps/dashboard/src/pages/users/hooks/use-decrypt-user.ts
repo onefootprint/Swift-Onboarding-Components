@@ -1,3 +1,5 @@
+import useSessionUser from '@src/hooks/use-session-user';
+import { partial } from 'lodash';
 import { useMutation } from 'react-query';
 import request, { RequestError, RequestResponse } from 'request';
 
@@ -14,24 +16,30 @@ export type DecryptedUserAttributes = {
   phoneNumber?: string;
 };
 
-const decryptUserRequest = async (payload: DecryptUserRequest) => {
+const decryptUserRequest = async (
+  auth: string | undefined,
+  { footprintUserId, attributes }: DecryptUserRequest,
+) => {
   const { data: response } = await request<
     RequestResponse<DecryptedUserAttributes>
   >({
     method: 'POST',
     url: '/org/decrypt',
-    data: payload,
+    data: { footprintUserId, attributes },
     headers: {
-      'x-client-secret-key': 'sk_vdqop4RZd8fmSavmWPAUZx7rlF6C04cy7R',
+      'x-fp-dashboard-authorization': auth as string,
     },
   });
 
   return response.data;
 };
 
-const useDecryptUser = () =>
-  useMutation<DecryptedUserAttributes, RequestError, DecryptUserRequest>(
-    decryptUserRequest,
-  );
+const useDecryptUser = () => {
+  const { data } = useSessionUser();
+  const auth = data?.auth;
 
+  return useMutation<DecryptedUserAttributes, RequestError, DecryptUserRequest>(
+    partial(decryptUserRequest, auth),
+  );
+};
 export default useDecryptUser;

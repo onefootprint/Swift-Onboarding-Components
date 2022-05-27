@@ -20,5 +20,9 @@ export const useFilters = () => {
       shallow: true,
     });
   };
-  return { query: router.query as OnboardingsListRequest, setFilter };
+  const { status, fingerprint } = router.query;
+  return {
+    query: { status, fingerprint } as OnboardingsListRequest,
+    setFilter,
+  };
 };

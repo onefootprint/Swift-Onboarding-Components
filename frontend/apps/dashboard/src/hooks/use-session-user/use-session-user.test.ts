@@ -14,9 +14,8 @@ describe('useSessionUser', () => {
     it('should indicate the user is logged in and return the user data', () => {
       const { result } = renderHook(() => useSessionUser());
       const nextData = {
-        id: '1',
-        firstName: 'lorem',
-        lastName: 'dolor',
+        auth: '1',
+        email: 'lorem',
       };
       act(() => {
         result.current.logIn(nextData);
@@ -30,9 +29,8 @@ describe('useSessionUser', () => {
     it('Should clear the state and indicate that the user is not logged in anymore', () => {
       const { result } = renderHook(() => useSessionUser());
       const nextData = {
-        id: '1',
-        firstName: 'lorem',
-        lastName: 'dolor',
+        auth: '1',
+        email: 'lorem',
       };
       act(() => {
         result.current.logIn(nextData);
