@@ -1,7 +1,9 @@
 import IcoClose24 from 'icons/ico/ico-close-24';
+import Script from 'next/script';
 import React from 'react';
 import { QueryClientProvider } from 'react-query';
 import FootprintFooter from 'src/components/footprint-footer/footprint-footer';
+import { GOOGLE_MAPS_KEY } from 'src/constants';
 import styled, { createGlobalStyle, css } from 'styled';
 import { Container, DesignSystemProvider, IconButton, themes } from 'ui';
 
@@ -19,20 +21,26 @@ type AppProps = {
 };
 
 const App = ({ Component, pageProps }: AppProps) => (
-  <QueryClientProvider client={queryClient}>
-    <BifrostMachineProvider>
-      <DesignSystemProvider theme={themes.light}>
-        <GlobalStyle />
-        <Container>
-          <Header>
-            <IconButton Icon={IcoClose24} ariaLabel="Close window" />
-          </Header>
-          <Component {...pageProps} />
-          <FootprintFooter />
-        </Container>
-      </DesignSystemProvider>
-    </BifrostMachineProvider>
-  </QueryClientProvider>
+  <>
+    <Script
+      src={`https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_KEY}&libraries=places`}
+      strategy="lazyOnload"
+    />
+    <QueryClientProvider client={queryClient}>
+      <BifrostMachineProvider>
+        <DesignSystemProvider theme={themes.light}>
+          <GlobalStyle />
+          <Container>
+            <Header>
+              <IconButton Icon={IcoClose24} ariaLabel="Close window" />
+            </Header>
+            <Component {...pageProps} />
+            <FootprintFooter />
+          </Container>
+        </DesignSystemProvider>
+      </BifrostMachineProvider>
+    </QueryClientProvider>
+  </>
 );
 
 const Header = styled.header`
