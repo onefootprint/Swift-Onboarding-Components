@@ -10,6 +10,7 @@ use paperclip::actix::{api_v2_operation, get, web, web::Json, Apiv2Schema};
 #[serde(rename_all = "snake_case")]
 struct AccessEventRequest {
     status: Option<Status>,
+    fingerprint: Option<String>,
 }
 
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize, Apiv2Schema)]
@@ -35,8 +36,23 @@ fn handler(
     // TODO paginate the response when there are too many results
     let tenant = auth.tenant();
 
+    let AccessEventRequest {
+        status,
+        fingerprint,
+    } = request.into_inner();
+
+    // TODO clean phone number or email
+    let fingerprint = match fingerprint {
+        Some(fingerprint) => {
+            let cleaned_data = crate::user::clean_for_fingerprint(fingerprint);
+            let fingerprint = crate::identify::signed_hash(&state, cleaned_data).await?;
+            Some(fingerprint)
+        }
+        None => None,
+    };
+
     let results =
-        db::onboarding::list_for_tenant(&state.db_pool, tenant.id.clone(), request.status)
+        db::onboarding::list_for_tenant(&state.db_pool, tenant.id.clone(), status, fingerprint)
             .await?
             .into_iter()
             .map(|ob| OnboardingItem {
@@ -47,7 +63,5 @@ fn handler(
             })
             .collect();
 
-    Ok(Json(ApiResponseData {
-        data: results,
-    }))
+    Ok(Json(ApiResponseData { data: results }))
 }

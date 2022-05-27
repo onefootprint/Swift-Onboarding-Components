@@ -9,21 +9,33 @@ pub async fn list_for_tenant(
     pool: &Pool,
     tenant_id: TenantId,
     status: Option<Status>,
+    fingerprint: Option<Vec<u8>>,
 ) -> Result<Vec<Onboarding>, DbError> {
     let conn = pool.get().await?;
 
     let onboardings = conn
         .interact(move |conn| -> Result<Vec<Onboarding>, DbError> {
-            let mut onboardings = schema::onboardings::table
-                .filter(schema::onboardings::tenant_id.eq(tenant_id))
-                .order_by(schema::onboardings::created_at.desc())
-                .into_boxed();
+            let mut onboardings =
+                schema::onboardings::table
+                    .left_join(schema::user_data::table.on(
+                        schema::user_data::user_vault_id.eq(schema::onboardings::user_vault_id),
+                    ))
+                    .filter(schema::onboardings::tenant_id.eq(tenant_id))
+                    .order_by(schema::onboardings::created_at.desc())
+                    .into_boxed();
 
             if let Some(status) = status {
                 onboardings = onboardings.filter(schema::onboardings::status.eq(status))
             }
 
-            let onboardings = onboardings.load(conn)?;
+            if let Some(fingerprint) = fingerprint {
+                onboardings = onboardings.filter(schema::user_data::sh_data.eq(fingerprint))
+            }
+
+            let onboardings = onboardings
+                .select(schema::onboardings::all_columns)
+                .distinct()
+                .load(conn)?;
             Ok(onboardings)
         })
         .await??;
