@@ -24,9 +24,9 @@ export type Onboarding = {
 const getOnboardingsRequest = async (query: OnboardingsListRequest) => {
   const { data: response } = await request<RequestResponse<Onboarding[]>>({
     method: 'GET',
-    url: `http://localhost:8000/org/onboardings`,
+    url: '/org/onboardings',
     params: query,
-    headers: { 'x-client-secret-key': 'sk_hsSPWQe1TjZ9k9fWZbuOva0AZ7MHVfpscJ' },
+    headers: { 'x-client-secret-key': 'sk_vdqop4RZd8fmSavmWPAUZx7rlF6C04cy7R' },
   });
   return response.data;
 };

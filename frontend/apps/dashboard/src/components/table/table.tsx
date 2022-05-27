@@ -1,95 +1,132 @@
+import { Property } from 'csstype';
 import React from 'react';
 import styled, { css } from 'styled';
-import { LoadingIndicator } from 'ui';
+import { LoadingIndicator, media, Typography } from 'ui';
 
 export type Row<T> = {
   item: T;
-  i: Number;
+  index: Number;
 };
 
 export type TableProps<T> = {
-  renderHeader: () => JSX.Element;
-  renderRow: (row: Row<T>) => JSX.Element;
-  getKeyForRow: (item: T) => any;
+  columns: { text: string; width?: Property.Width }[];
+  renderTr: (row: Row<T>) => JSX.Element;
+  getKeyForRow: (item: T) => string;
   onRowClick: (item: T) => void;
   items?: Array<T>;
   isLoading?: boolean;
+  emptyStateText?: string;
 };
 
-export const Table = <T,>({
-  renderHeader,
-  renderRow,
+const Table = <T,>({
+  columns,
+  renderTr,
   getKeyForRow,
   onRowClick,
   items,
   isLoading,
-}: TableProps<T>) => (
-  <TableContainer>
-    <thead>
-      <Tr>{renderHeader()}</Tr>
-    </thead>
-    <tbody>
-      {isLoading ? (
-        <LoadingIndicator />
-      ) : (
-        items &&
-        items.map((item: T, i: Number) => (
-          <Tr onClick={() => onRowClick(item)} key={getKeyForRow(item)}>
-            {renderRow({ i, item })}
-          </Tr>
-        ))
-      )}
-    </tbody>
-  </TableContainer>
-);
+  emptyStateText = 'No results',
+}: TableProps<T>) => {
+  const shouldShowEmptyState = !isLoading && !items?.length;
+  const shouldShowData = !isLoading && items;
 
-export default Table;
+  return (
+    <TableContainer>
+      <thead>
+        <tr>
+          {columns.map(column => (
+            <th key={column.text} style={{ width: column.width || undefined }}>
+              <Typography variant="caption-2" color="secondary">
+                {column.text}
+              </Typography>
+            </th>
+          ))}
+        </tr>
+      </thead>
+      <tbody>
+        {isLoading && (
+          <EmptyTr>
+            <td colSpan={columns.length}>
+              <LoadingIndicator />
+            </td>
+          </EmptyTr>
+        )}
+        {shouldShowEmptyState && (
+          <EmptyTr>
+            <td colSpan={columns.length}>
+              <Typography variant="caption-2">{emptyStateText}</Typography>
+            </td>
+          </EmptyTr>
+        )}
+        {shouldShowData &&
+          items.map((item: T, index: Number) => (
+            <tr onClick={() => onRowClick(item)} key={getKeyForRow(item)}>
+              {renderTr({ index, item })}
+            </tr>
+          ))}
+      </tbody>
+    </TableContainer>
+  );
+};
 
 const TableContainer = styled.table`
-  width: 100%;
-  border-collapse: separate;
-  table-layout: fixed;
   ${({ theme }) => css`
-    border-radius: ${theme.borderRadius[2]}px;
-  `};
+    width: 100%;
+    border-collapse: separate;
+    min-width: 100%;
+    text-align: left;
+    border: 1px solid ${theme.borderColor.tertiary};
+    border-top: none;
+    border-radius: 0 0 ${theme.borderRadius[1]}px ${theme.borderRadius[1]}px;
+
+    ${media.greaterThan('md')`
+    table-layout: fixed;
+    `}
+  `}
 
   ${({ theme }) => css`
-    tbody tr:last-child td:first-child {
-      border-bottom-left-radius: ${theme.borderRadius[1]}px;
-    }
-
-    tbody tr:last-child td:last-child {
-      border-bottom-right-radius: ${theme.borderRadius[1]}px;
-    }
-
-    tr td:first-child {
-      border-left: 1px solid ${theme.borderColor.tertiary};
-    }
-
-    tr td:last-child {
-      border-right: 1px solid ${theme.borderColor.tertiary};
-    }
-
     td {
-      border-bottom: 1px solid ${theme.borderColor.tertiary};
       padding: ${theme.spacing[4]}px ${theme.spacing[6]}px;
-      overflow: hidden;
+    }
+
+    tr:not(:last-child) td,
+    th {
+      border-bottom: 1px solid ${theme.borderColor.tertiary};
     }
   `}
-`;
 
-const Tr = styled.tr`
-  transition: 0.1s;
-  ${({ theme }) => css`
-    :hover {
+  th {
+    ${({ theme }) => css`
+      user-select: none;
+      text-transform: uppercase;
+      padding: ${theme.spacing[4]}px ${theme.spacing[6]}px;
       background-color: ${theme.backgroundColor.secondary};
-    }
-  `}
+    `}
+  }
+
+  tr {
+    transition: 0.1s;
+    ${({ theme }) => css`
+      :hover {
+        background-color: ${theme.backgroundColor.secondary};
+      }
+    `}
+  }
+
+  p {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 `;
 
-export const Th = styled.td`
-  ${({ theme }) => css`
-    padding: ${theme.spacing[4]}px ${theme.spacing[6]}px;
-    background-color: ${theme.backgroundColor.secondary};
-  `}
+const EmptyTr = styled.tr`
+  width: 100%;
+  justify-content: center;
+
+  td {
+    user-select: none;
+    text-align: center;
+  }
 `;
+
+export default Table;

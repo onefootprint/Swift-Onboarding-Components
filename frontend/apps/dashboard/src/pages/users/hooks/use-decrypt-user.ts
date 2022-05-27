@@ -19,10 +19,10 @@ const decryptUserRequest = async (payload: DecryptUserRequest) => {
     RequestResponse<DecryptedUserAttributes>
   >({
     method: 'POST',
-    url: 'http://localhost:8000/org/decrypt',
+    url: '/org/decrypt',
     data: payload,
     headers: {
-      'x-client-secret-key': 'sk_hsSPWQe1TjZ9k9fWZbuOva0AZ7MHVfpscJ',
+      'x-client-secret-key': 'sk_vdqop4RZd8fmSavmWPAUZx7rlF6C04cy7R',
     },
   });
 

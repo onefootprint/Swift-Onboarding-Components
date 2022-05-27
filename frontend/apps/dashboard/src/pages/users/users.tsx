@@ -2,7 +2,7 @@ import IcoLock16 from 'icons/ico/ico-lock-16';
 import IcoSearch16 from 'icons/ico/ico-search-16';
 import React, { useEffect, useState } from 'react';
 import Modal, { ModalCloseEvent } from 'src/components/modal';
-import { Row, Table, Th } from 'src/components/table';
+import { Row, Table } from 'src/components/table';
 import useDecryptUser, {
   DecryptedUserAttributes,
   DecryptUserRequest,
@@ -13,7 +13,16 @@ import useGetOnboardings, {
 } from 'src/pages/users/hooks/use-get-onboardings';
 import useJoinUsers, { User } from 'src/pages/users/hooks/use-join-users';
 import styled, { css, UIState } from 'styled';
-import { Badge, Button, Select, SelectOption, TextInput, Typography } from 'ui';
+import {
+  Badge,
+  Box,
+  Button,
+  Container,
+  Select,
+  SelectOption,
+  TextInput,
+  Typography,
+} from 'ui';
 import { useMap } from 'usehooks-ts';
 
 const statusToBadgeVariant: Record<OnboardingStatus, UIState> = {
@@ -32,53 +41,23 @@ const statusToDisplayText = {
   [OnboardingStatus.failed]: 'Failed',
 };
 
-const TableHeader = () => (
-  <>
-    <Th style={{ width: '100px' }}>
-      <Typography variant="caption-2" color="secondary" noSelect>
-        NAME
-      </Typography>
-    </Th>
-    <Th style={{ width: '130px' }}>
-      <Typography variant="caption-2" color="secondary" noSelect>
-        FOOTPRINT TOKEN
-      </Typography>
-    </Th>
-    <Th style={{ width: '120px' }}>
-      <Typography variant="caption-2" color="secondary" noSelect>
-        STATUS
-      </Typography>
-    </Th>
-    <Th style={{ width: '180px' }}>
-      <Typography variant="caption-2" color="secondary" noSelect>
-        EMAIL
-      </Typography>
-    </Th>
-    <Th style={{ width: '90px' }}>
-      <Typography variant="caption-2" color="secondary" noSelect>
-        SSN
-      </Typography>
-    </Th>
-    <Th style={{ width: '120px' }}>
-      <Typography variant="caption-2" color="secondary" noSelect>
-        PHONE NUMBER
-      </Typography>
-    </Th>
-    <Th style={{ width: '160px' }}>
-      <Typography variant="caption-2" color="secondary" noSelect>
-        DATE
-      </Typography>
-    </Th>
-  </>
-);
+const columns = [
+  { text: 'Name', width: '12.5%' },
+  { text: 'Footprint Token', width: '20%' },
+  { text: 'Status', width: '12.5%' },
+  { text: 'Email', width: '12.5%' },
+  { text: 'SSN', width: '12.5%' },
+  { text: 'Phone Number', width: '12.5%' },
+  { text: 'Date', width: '17.5%' },
+];
 
 const EncryptedCell = () => (
-  <>
+  <Box sx={{ display: 'flex' }}>
     <IcoLockContainer />
     <Typography variant="body-3" color="primary" noSelect>
       •••••••••
     </Typography>
-  </>
+  </Box>
 );
 
 type FieldOrPlaceholderProps = {
@@ -87,7 +66,7 @@ type FieldOrPlaceholderProps = {
 
 const FieldOrPlaceholder = ({ value }: FieldOrPlaceholderProps) =>
   value ? (
-    <Typography variant="body-3" color="primary">
+    <Typography variant="body-3" color="primary" noWrap>
       {value}
     </Typography>
   ) : (
@@ -203,7 +182,7 @@ const Users = () => {
   };
 
   return (
-    <>
+    <Container>
       <SearchTextInput
         placeholder="Search (exact match)..."
         prefixElement={<IcoSearchContainer />}
@@ -222,59 +201,45 @@ const Users = () => {
         onRowClick={(item: User) => {
           loadEncryptedAttributes(item.footprintUserId);
         }}
-        renderHeader={() => <TableHeader />}
-        renderRow={({ item }: Row<User>) => (
+        columns={columns}
+        renderTr={({ item }: Row<User>) => (
           <>
             <td>
-              <TableCell>
-                <FieldOrPlaceholder value={item.name} />
-              </TableCell>
+              <FieldOrPlaceholder value={item.name} />
             </td>
             <td>
-              <TableCell>
-                <Typography variant="body-3">{item.footprintUserId}</Typography>
-              </TableCell>
+              <Typography variant="body-3">{item.footprintUserId}</Typography>
             </td>
             <td>
-              <TableCell>
-                <Badge variant={statusToBadgeVariant[item.status]}>
-                  {statusToDisplayText[item.status]}
-                </Badge>
-              </TableCell>
+              <Badge variant={statusToBadgeVariant[item.status]}>
+                {statusToDisplayText[item.status]}
+              </Badge>
             </td>
             <td>
-              <TableCell>
-                <FieldOrPlaceholder value={item.email} />
-              </TableCell>
+              <FieldOrPlaceholder value={item.email} />
             </td>
             <td>
-              <TableCell>
-                <FieldOrPlaceholder value={item.ssn} />
-              </TableCell>
+              <FieldOrPlaceholder value={item.ssn} />
             </td>
             <td>
-              <TableCell>
-                <FieldOrPlaceholder value={item.phoneNumber} />
-              </TableCell>
+              <FieldOrPlaceholder value={item.phoneNumber} />
             </td>
             <td>
-              <TableCell>
-                <Typography variant="body-3" color="primary">
-                  {/* TODO better formatting utils */}
-                  {new Date(item.initiatedAt).toLocaleString('en-us', {
-                    month: 'long',
-                    day: 'numeric',
-                    year: 'numeric',
-                    hour: 'numeric',
-                    minute: 'numeric',
-                  })}
-                </Typography>
-              </TableCell>
+              <Typography variant="body-3" color="primary">
+                {/* TODO better formatting utils */}
+                {new Date(item.initiatedAt).toLocaleString('en-us', {
+                  month: 'long',
+                  day: 'numeric',
+                  year: 'numeric',
+                  hour: 'numeric',
+                  minute: 'numeric',
+                })}
+              </Typography>
             </td>
           </>
         )}
       />
-    </>
+    </Container>
   );
 };
 
@@ -304,10 +269,6 @@ const FilterButtonContainer = styled.div`
   ${({ theme }) => css`
     margin-right: ${theme.spacing[6]}px;
   `};
-`;
-
-const TableCell = styled.div`
-  display: flex;
 `;
 
 export default Users;
