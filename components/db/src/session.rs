@@ -46,10 +46,10 @@ pub(crate) fn get_session_by_id_sync(
         .first(conn)
         .optional()?;
 
-    // check cookie expiration every time we get session
+    //check cookie expiration every time we get session
     if let Some(session) = &session {
         let now = Utc::now().naive_utc();
-        if session.expires_at >= now  {
+        if session.expires_at <= now {
             return Ok(None);
         }
     }
