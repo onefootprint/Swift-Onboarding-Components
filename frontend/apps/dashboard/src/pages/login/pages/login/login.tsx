@@ -1,6 +1,5 @@
 import { useRouter } from 'next/router';
 import React from 'react';
-import useSessionUser from 'src/hooks/use-session-user';
 import styled, { css } from 'styled';
 import { Button, GoogleButton, LinkButton, Typography } from 'ui';
 
@@ -10,7 +9,6 @@ import useLoginGoogle, { GoogleLoginResponse } from './hooks/use-login-google';
 const Login = () => {
   const router = useRouter();
   const loginGoogle = useLoginGoogle();
-  const { logIn } = useSessionUser();
 
   const handleGoggleButtonClick = () => {
     loginGoogle.mutate(undefined, {
@@ -38,16 +36,6 @@ const Login = () => {
           fullWidth
         >
           Continue with email
-        </Button>
-        <Button
-          onClick={() => {
-            logIn({ firstName: 'Flerp', lastName: 'Derp', id: 'derpflerp' });
-            router.push('/users');
-          }}
-          variant="secondary"
-          fullWidth
-        >
-          Break in
         </Button>
         <TextContainer>
           <Typography variant="caption-2" color="tertiary">
