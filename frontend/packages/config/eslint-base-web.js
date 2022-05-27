@@ -34,6 +34,8 @@ module.exports = {
       'error',
       {
         exceptions: [
+          'Field',
+          'StyledField',
           'TextInput',
           'BaseInput',
           'AddressInput',

@@ -7,7 +7,7 @@ import React, { forwardRef, useRef } from 'react';
 import mergeRefs from 'react-merge-refs';
 import styled, { css } from 'styled';
 
-import BaseInput, { BaseInputProps } from '../internal/base-input';
+import Input, { InputProps } from '../internal/input';
 import type { Item } from './adress-input.types';
 import AddressDropdownFooter from './components/address-dropdown-footer';
 import AddressDropdownItem from './components/address-dropdown-item';
@@ -15,7 +15,7 @@ import usePopper from './hooks/use-popper';
 
 const MAX_OF_RESULTS = 5;
 
-export type AddressInputProps = BaseInputProps & {
+export type AddressInputProps = InputProps & {
   onSelect?: (item?: Item | null) => void;
   country?: string;
 };
@@ -114,7 +114,7 @@ const AddressInput = forwardRef<HTMLInputElement, AddressInputProps>(
 
     return (
       <Container {...comboBoxProps}>
-        <BaseInput
+        <Input
           {...rest}
           {...toggleButtonProps}
           {...inputProps}

@@ -64,17 +64,4 @@ describe('<Button />', () => {
       expect(button.disabled).toBeTruthy();
     });
   });
-
-  const sizes: { size: ButtonProps['size'] }[] = [
-    { size: 'default' },
-    { size: 'large' },
-    { size: 'small' },
-    { size: 'compact' },
-  ];
-  describe.each(sizes)('when is set the size $size', ({ size }) => {
-    it('should render with the correct styles', () => {
-      renderButton({ children: 'Button content', size });
-      expect(screen.getByText('Button content')).toMatchSnapshot();
-    });
-  });
 });
