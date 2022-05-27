@@ -77,17 +77,18 @@ const PhoneVerification = () => {
     });
   };
 
-  const input = verifyPhoneMutation.isLoading ? (
-    <>
-      <LoadingIndicator />
-      <Typography variant="label-3">Verifying...</Typography>
-    </>
-  ) : (
-    <>
-      <PinInput onComplete={validatePin} />
-      <LinkButton onClick={resendVerification}>Resend code</LinkButton>
-    </>
-  );
+  const input =
+    verifyPhoneMutation.isLoading || onboardingMutation.isLoading ? (
+      <>
+        <LoadingIndicator />
+        <Typography variant="label-3">Verifying...</Typography>
+      </>
+    ) : (
+      <>
+        <PinInput onComplete={validatePin} />
+        <LinkButton onClick={resendVerification}>Resend code</LinkButton>
+      </>
+    );
 
   return (
     <Form>
