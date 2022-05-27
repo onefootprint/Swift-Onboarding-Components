@@ -2,7 +2,7 @@ import IcoClose24 from 'icons/ico/ico-close-16';
 import { rgba } from 'polished';
 import React, { useEffect } from 'react';
 import styled, { css } from 'styled';
-import { Button, IconButton, Typography } from 'ui';
+import { Button, IconButton, LinkButton, Typography } from 'ui';
 
 export enum ModalCloseEvent {
   Close = 'close',
@@ -15,6 +15,7 @@ export type ModalProps = {
   headerText: String;
   primaryButtonText: string;
   secondaryButtonText?: string;
+  secondaryButtonVariant?: 'link' | 'default';
   children?: JSX.Element;
   onClose: (event: ModalCloseEvent) => void;
 };
@@ -24,6 +25,7 @@ const Modal = ({
   headerText,
   primaryButtonText,
   secondaryButtonText,
+  secondaryButtonVariant = 'default',
   children,
   onClose,
 }: ModalProps) => {
@@ -72,21 +74,31 @@ const Modal = ({
         </Header>
         <Children>{children}</Children>
         <Footer>
-          {secondaryButtonText && (
-            <Button
+          {secondaryButtonText && secondaryButtonVariant === 'link' && (
+            <LinkButton
               size="compact"
-              variant="secondary"
               onClick={() => onClose(ModalCloseEvent.Secondary)}
             >
               {secondaryButtonText}
-            </Button>
+            </LinkButton>
           )}
-          <Button
-            size="compact"
-            onClick={() => onClose(ModalCloseEvent.Primary)}
-          >
-            {primaryButtonText}
-          </Button>
+          <FooterRight>
+            {secondaryButtonText && secondaryButtonVariant === 'default' && (
+              <Button
+                size="compact"
+                variant="secondary"
+                onClick={() => onClose(ModalCloseEvent.Secondary)}
+              >
+                {secondaryButtonText}
+              </Button>
+            )}
+            <Button
+              size="compact"
+              onClick={() => onClose(ModalCloseEvent.Primary)}
+            >
+              {primaryButtonText}
+            </Button>
+          </FooterRight>
         </Footer>
       </Content>
     </Mask>
@@ -172,11 +184,25 @@ const Children = styled.div`
 `;
 
 const Footer = styled.div`
+  position: relative;
+  width: 100%;
   display: flex;
-  flex-direction: row;
-  justify-content: right;
+  align-items: center;
   ${({ theme }) => css`
     height: 72px;
+    padding: ${theme.spacing[5]}px ${theme.spacing[7]}px;
+  `}
+`;
+
+const FooterRight = styled.div`
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  ${({ theme }) => css`
     padding: ${theme.spacing[5]}px ${theme.spacing[7]}px;
     gap: ${theme.spacing[4]}px;
   `}

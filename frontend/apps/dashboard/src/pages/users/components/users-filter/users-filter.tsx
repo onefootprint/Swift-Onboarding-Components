@@ -57,6 +57,7 @@ const UsersFilter = () => {
           headerText="Filters"
           primaryButtonText="Apply"
           secondaryButtonText="Clear"
+          secondaryButtonVariant="link"
           onClose={handleCloseModal}
         >
           <Select
