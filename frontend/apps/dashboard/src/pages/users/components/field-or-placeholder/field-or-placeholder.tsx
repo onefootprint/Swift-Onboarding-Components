@@ -8,7 +8,7 @@ type FieldOrPlaceholderProps = {
 
 const FieldOrPlaceholder = ({ value }: FieldOrPlaceholderProps) =>
   value ? (
-    <Typography variant="body-3" color="primary" noWrap>
+    <Typography variant="body-3" color="primary" sx={{ whiteSpace: 'nowrap' }}>
       {value}
     </Typography>
   ) : (

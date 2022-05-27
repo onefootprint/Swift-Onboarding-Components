@@ -6,7 +6,7 @@ import { Box, Typography } from 'ui';
 const EncryptedCell = () => (
   <Box sx={{ display: 'flex' }}>
     <IcoLockContainer />
-    <Typography variant="body-3" color="primary" noSelect>
+    <Typography variant="body-3" color="primary" sx={{ userSelect: 'none' }}>
       •••••••••
     </Typography>
   </Box>

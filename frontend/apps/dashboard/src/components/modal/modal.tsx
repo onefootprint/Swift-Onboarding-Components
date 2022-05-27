@@ -62,7 +62,10 @@ const Modal = ({
             />
           </CloseContainer>
           <HeaderContainer>
-            <Typography variant="label-2" center noSelect>
+            <Typography
+              variant="label-2"
+              sx={{ textAlign: 'center', userSelect: 'none' }}
+            >
               {headerText}
             </Typography>
           </HeaderContainer>
