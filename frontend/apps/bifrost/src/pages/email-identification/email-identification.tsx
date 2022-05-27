@@ -1,17 +1,14 @@
 import React from 'react';
 import { useForm } from 'react-hook-form';
-import { Events } from 'src/bifrost-machine/types';
+import { Events, UserData, UserDataAttribute } from 'src/bifrost-machine/types';
 import useBifrostMachine from 'src/hooks/use-bifrost-machine';
 import useIdentifyEmail, {
-  IdentifyEmailRequest,
   IdentifyEmailResponse,
 } from 'src/hooks/use-identify-email';
 import styled, { css } from 'styled';
 import { Button, TextInput, Typography } from 'ui';
 
-type FormData = {
-  email: string;
-};
+type FormData = Required<Pick<UserData, UserDataAttribute.email>>;
 
 const EmailIdentification = () => {
   const [, send] = useBifrostMachine();
@@ -25,29 +22,29 @@ const EmailIdentification = () => {
 
   const onSubmit = (formData: FormData) => {
     const { email } = formData;
-    const request: IdentifyEmailRequest = {
-      email,
-    };
-    identifyEmailMutation.mutate(request, {
-      onSuccess({ userFound, challengeData }: IdentifyEmailResponse) {
-        if (userFound && challengeData) {
-          send({
-            type: Events.userFound,
-            payload: {
-              email,
-              ...challengeData,
-            },
-          });
-        } else {
-          send({
-            type: Events.userNotFound,
-            payload: {
-              email,
-            },
-          });
-        }
+    identifyEmailMutation.mutate(
+      { email },
+      {
+        onSuccess({ userFound, challengeData }: IdentifyEmailResponse) {
+          if (userFound && challengeData) {
+            send({
+              type: Events.userFound,
+              payload: {
+                email,
+                ...challengeData,
+              },
+            });
+          } else {
+            send({
+              type: Events.userNotFound,
+              payload: {
+                email,
+              },
+            });
+          }
+        },
       },
-    });
+    );
   };
 
   return (

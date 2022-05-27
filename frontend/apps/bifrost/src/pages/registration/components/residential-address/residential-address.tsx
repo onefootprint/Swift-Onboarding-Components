@@ -1,25 +1,30 @@
 import { useTranslation } from 'hooks';
 import React from 'react';
 import { useForm } from 'react-hook-form';
-import { Events } from 'src/bifrost-machine/types';
+import { Events, UserData, UserDataAttribute } from 'src/bifrost-machine/types';
 import Header from 'src/components/header';
 import useBifrostMachine from 'src/hooks/use-bifrost-machine';
 import styled, { css } from 'styled';
 import { AddressInput, Button, Grid, Select, TextInput } from 'ui';
 
+import useSyncData from '../../hooks/use-sync-data';
 import LoadGoogleMaps from './components/load-google-maps';
 
-type FormData = {
-  addressLine1: string;
-  addressLine2: string;
-  city: string;
-  state: string;
-  country: string;
-  zipCode: string;
-};
+type FormData = Required<
+  Pick<
+    UserData,
+    | UserDataAttribute.streetAddress
+    | UserDataAttribute.streetAddress2
+    | UserDataAttribute.city
+    | UserDataAttribute.state
+    | UserDataAttribute.country
+    | UserDataAttribute.zipCode
+  >
+>;
 
 const ResidentialAddress = () => {
   const [, send] = useBifrostMachine();
+  const syncDataMutation = useSyncData();
   const { t } = useTranslation('pages.registration.residential-address');
   const {
     register,
@@ -28,19 +33,21 @@ const ResidentialAddress = () => {
   } = useForm<FormData>();
 
   const onSubmit = (formData: FormData) => {
+    const residentialAddress = {
+      streetAddress: formData.streetAddress,
+      streetAddress2: formData.streetAddress2,
+      city: formData.city,
+      zipCode: formData.zipCode,
+      country: formData.country,
+      state: formData.state,
+    };
     send({
       type: Events.residentialAddressSubmitted,
       payload: {
-        residentialAddress: {
-          streetAddress: formData.addressLine1,
-          streetAddress2: formData.addressLine2,
-          city: formData.city,
-          zipCode: formData.zipCode,
-          country: formData.country,
-          state: formData.state,
-        },
+        residentialAddress,
       },
     });
+    syncDataMutation(residentialAddress);
   };
 
   return (
@@ -54,16 +61,16 @@ const ResidentialAddress = () => {
           placeholder={t('form.country.placeholder')}
         />
         <AddressInput
-          hasError={!!errors.addressLine1}
-          hintText={errors.addressLine1 && t('form.address-line-1.error')}
+          hasError={!!errors.streetAddress}
+          hintText={errors.streetAddress && t('form.address-line-1.error')}
           label={t('form.address-line-1.label')}
           placeholder={t('form.address-line-1.placeholder')}
-          {...register('addressLine1', { required: true })}
+          {...register('streetAddress', { required: true })}
         />
         <TextInput
           label={t('form.address-line-2.label')}
           placeholder={t('form.address-line-2.placeholder')}
-          {...register('addressLine2')}
+          {...register('streetAddress2')}
         />
         <Grid.Row>
           <Grid.Column col={6}>

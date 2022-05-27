@@ -1,20 +1,26 @@
 import { useTranslation } from 'hooks';
 import React from 'react';
 import { useForm } from 'react-hook-form';
-import { Events } from 'src/bifrost-machine/types';
+import { Events, UserData, UserDataAttribute } from 'src/bifrost-machine/types';
 import Header from 'src/components/header';
 import useBifrostMachine from 'src/hooks/use-bifrost-machine';
 import styled, { css } from 'styled';
 import { Button, Grid, TextInput } from 'ui';
 
-type FormData = {
-  firstName: string;
-  lastName: string;
-  dob: string;
-};
+import useSyncData from '../../hooks/use-sync-data';
+
+type FormData = Required<
+  Pick<
+    UserData,
+    | UserDataAttribute.firstName
+    | UserDataAttribute.lastName
+    | UserDataAttribute.dob
+  >
+>;
 
 const BasicInformation = () => {
   const [, send] = useBifrostMachine();
+  const syncDataMutation = useSyncData();
   const { t } = useTranslation('pages.registration.basic-information');
   const {
     register,
@@ -23,16 +29,18 @@ const BasicInformation = () => {
   } = useForm<FormData>();
 
   const onSubmit = (formData: FormData) => {
+    const basicInformation = {
+      firstName: formData.firstName,
+      lastName: formData.lastName,
+      dob: formData.dob,
+    };
     send({
       type: Events.basicInformationSubmitted,
       payload: {
-        basicInformation: {
-          firstName: formData.firstName,
-          lastName: formData.lastName,
-          dob: formData.dob,
-        },
+        basicInformation,
       },
     });
+    syncDataMutation(basicInformation);
   };
 
   return (

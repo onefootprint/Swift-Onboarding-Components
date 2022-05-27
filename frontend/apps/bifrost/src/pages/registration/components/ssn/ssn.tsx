@@ -4,22 +4,20 @@ import IcoLock24 from 'icons/ico/ico-lock-24';
 import IcoShield24 from 'icons/ico/ico-shield-24';
 import React from 'react';
 import { useForm } from 'react-hook-form';
-import { Events } from 'src/bifrost-machine/types';
+import { Events, UserData, UserDataAttribute } from 'src/bifrost-machine/types';
 import Header from 'src/components/header';
 import useBifrostMachine from 'src/hooks/use-bifrost-machine';
 import styled, { css } from 'styled';
 import { Button, TextInput } from 'ui';
 
-import useUserData, { UserDataRequest } from '../../hooks/use-user-data';
+import useSyncData from '../../hooks/use-sync-data';
 import Disclaimer from './components/disclaimer';
 
-type FormData = {
-  ssn: string;
-};
+type FormData = Required<Pick<UserData, UserDataAttribute.ssn>>;
 
 const SSN = () => {
-  const [state, send] = useBifrostMachine();
-  const userDataMutation = useUserData();
+  const [, send] = useBifrostMachine();
+  const syncDataMutation = useSyncData();
   const { t } = useTranslation('pages.registration.ssn');
   const {
     register,
@@ -28,52 +26,16 @@ const SSN = () => {
   } = useForm<FormData>();
 
   const onSubmit = (formData: FormData) => {
-    // SSN is the last step in the registration, go ahead and send the data
-    const {
-      firstName,
-      lastName,
-      dob,
-      email,
-      streetAddress,
-      streetAddress2,
-      city,
-      state: residentialState,
-      country,
-      zipCode,
-    } = state.context.registration.data;
-
-    const { authToken } = state.context;
-    if (!authToken) {
-      return;
-    }
-
-    const request: UserDataRequest = {
-      data: {
-        ssn: formData.ssn,
-        firstName,
-        lastName,
-        dob,
-        email,
-        streetAddress,
-        streetAddress2,
-        city,
-        state: residentialState,
-        country,
-        zipCode,
-      },
-      authToken,
+    const ssn: UserData = {
+      ssn: formData.ssn,
     };
-
-    userDataMutation.mutate(request, {
-      onSuccess() {
-        send({
-          type: Events.ssnSubmitted,
-          payload: {
-            ssn: formData.ssn,
-          },
-        });
+    send({
+      type: Events.ssnSubmitted,
+      payload: {
+        ssn: formData.ssn,
       },
     });
+    syncDataMutation(ssn);
   };
 
   return (

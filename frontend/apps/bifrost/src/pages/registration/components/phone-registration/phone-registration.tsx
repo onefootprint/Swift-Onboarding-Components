@@ -9,7 +9,6 @@ import styled, { css } from 'styled';
 import { Button, LinkButton, TextInput, Typography } from 'ui';
 
 import useIdentifyPhone, {
-  IdentifyPhoneRequest,
   IdentifyPhoneResponse,
 } from './hooks/use-identify-phone';
 
@@ -32,20 +31,23 @@ const PhoneRegistration = () => {
   };
 
   const onSubmit = (formData: FormData) => {
-    const payload: IdentifyPhoneRequest = {
-      phoneNumber: formData.phone,
-    };
-    identifyPhoneMutation.mutate(payload, {
-      onSuccess({ challengeToken, phoneNumberLastTwo }: IdentifyPhoneResponse) {
-        send({
-          type: Events.phoneSubmitted,
-          payload: {
-            challengeToken,
-            phoneNumberLastTwo,
-          },
-        });
+    identifyPhoneMutation.mutate(
+      { phoneNumber: formData.phone },
+      {
+        onSuccess({
+          challengeToken,
+          phoneNumberLastTwo,
+        }: IdentifyPhoneResponse) {
+          send({
+            type: Events.phoneSubmitted,
+            payload: {
+              challengeToken,
+              phoneNumberLastTwo,
+            },
+          });
+        },
       },
-    });
+    );
   };
 
   return (

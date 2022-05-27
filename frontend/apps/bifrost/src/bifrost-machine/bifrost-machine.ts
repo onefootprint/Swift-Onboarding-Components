@@ -9,6 +9,7 @@ import {
   UserDataAttribute,
 } from './types';
 import {
+  cleanMissingAttributes,
   hasMissingAttributes,
   isMissingBasicAttribute,
   isMissingResidentialAttribute,
@@ -208,10 +209,11 @@ const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
         if (event.type !== Events.changeEmail) {
           return context;
         }
-        context.identification = initialIdentificationContext;
-        context.registration = initialRegistrationContext;
-        context.authToken = initialAuthTokenContext;
-        return context;
+        return {
+          identification: initialIdentificationContext,
+          registration: initialRegistrationContext,
+          authToken: initialAuthTokenContext,
+        };
       }),
       [Actions.assignAuthTokenWithMissingAttributes]: assign(
         (context, event) => {
@@ -235,20 +237,28 @@ const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
         if (event.type !== Events.basicInformationSubmitted) {
           return context;
         }
-        context.registration = {
-          ...context.registration,
+        context.registration.data = {
+          ...context.registration.data,
           ...event.payload.basicInformation,
         };
+        cleanMissingAttributes(
+          context.registration.missingAttributes,
+          context.registration.data,
+        );
         return context;
       }),
       [Actions.assignResidentialAddress]: assign((context, event) => {
         if (event.type !== Events.residentialAddressSubmitted) {
           return context;
         }
-        context.registration = {
-          ...context.registration,
+        context.registration.data = {
+          ...context.registration.data,
           ...event.payload.residentialAddress,
         };
+        cleanMissingAttributes(
+          context.registration.missingAttributes,
+          context.registration.data,
+        );
         return context;
       }),
       [Actions.assignSsn]: assign((context, event) => {
@@ -256,6 +266,10 @@ const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
           return context;
         }
         context.registration.data.ssn = event.payload.ssn;
+        cleanMissingAttributes(
+          context.registration.missingAttributes,
+          context.registration.data,
+        );
         return context;
       }),
     },

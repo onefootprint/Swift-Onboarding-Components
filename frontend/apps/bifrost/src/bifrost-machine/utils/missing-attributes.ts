@@ -1,3 +1,5 @@
+import { UserData } from 'src/bifrost-machine/types';
+
 import { UserDataAttribute } from '../types/types';
 
 export const isMissingBasicAttribute = (attributes: Set<UserDataAttribute>) =>
@@ -20,3 +22,14 @@ export const isMissingSsnAttribute = (attributes: Set<UserDataAttribute>) =>
 
 export const hasMissingAttributes = (attributes: Set<UserDataAttribute>) =>
   attributes.size > 0;
+
+export const cleanMissingAttributes = (
+  attributes: Set<UserDataAttribute>,
+  filledData: UserData,
+) => {
+  Object.entries(filledData).forEach((entry: [string, string]) => {
+    if (entry[1]) {
+      attributes.delete(entry[0] as UserDataAttribute);
+    }
+  });
+};
