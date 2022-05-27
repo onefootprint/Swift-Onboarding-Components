@@ -78,9 +78,9 @@ async fn handler(
         // Clean/validate data
         let data_str = clean_for_storage(data_kind, data_str);
         let sh_data = if data_kind.is_fingerprintable() {
-                let cleaned_data = clean_for_fingerprint(data_str.clone());
-                Some(crate::identify::signed_hash(&state, cleaned_data).await?)
-       else { 
+            let cleaned_data = clean_for_fingerprint(data_str.clone());
+            Some(crate::identify::signed_hash(&state, cleaned_data).await?)
+        } else {
              None
         };
         let e_data = crate::identify::seal(data_str, &user_auth.user_vault().public_key)?;
