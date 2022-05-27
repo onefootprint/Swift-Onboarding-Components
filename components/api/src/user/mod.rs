@@ -1,3 +1,5 @@
+use crate::identify::clean_email;
+use newtypes::DataKind;
 use paperclip::actix::web;
 
 pub mod access_events;
@@ -13,4 +15,15 @@ pub fn routes() -> web::Scope {
         .service(email_verify::handler)
         .service(decrypt::handler)
         .service(access_events::handler)
+}
+
+pub fn clean_for_storage(data_kind: DataKind, data_str: String) -> String {
+    match data_kind {
+        DataKind::Email => clean_email(data_str),
+        _ => data_str,
+    }
+}
+
+pub fn clean_for_fingerprint(data_str: String) -> String {
+    data_str.to_lowercase().trim().to_string()
 }

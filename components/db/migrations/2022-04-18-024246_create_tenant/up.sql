@@ -54,8 +54,8 @@ CREATE TABLE user_data (
         REFERENCES user_vaults(id),
     -- Only allow sh_data to be null for fields other than Ssn, PhoneNumber, Email
     CONSTRAINT check_sh_data CHECK (
-        ((sh_data IS NOT NULL) AND (data_kind IN ('Ssn', 'PhoneNumber', 'Email')))
-        OR ((sh_data IS NULL) AND (data_kind NOT IN ('Ssn', 'PhoneNumber', 'Email')))
+        ((sh_data IS NOT NULL) AND (data_kind IN ('Ssn', 'PhoneNumber', 'Email', 'FirstName', 'LastName')))
+        OR ((sh_data IS NULL) AND (data_kind NOT IN ('Ssn', 'PhoneNumber', 'Email', 'FirstName', 'LastName')))
     )
 );
 -- Don't allow multiple verified UserData rows to exist with the same Ssn, PhoneNumber, or Email fingerprint
@@ -63,6 +63,7 @@ CREATE UNIQUE INDEX IF NOT EXISTS user_data_unique_kind_fingerprint ON user_data
 -- Don't allow more than one Primary, active UserData row to exist for each (user, data_kind)
 CREATE UNIQUE INDEX IF NOT EXISTS user_data_unique_primary_data ON user_data(user_vault_id, data_kind) WHERE deactivated_at IS NULL AND data_priority = 'Primary';
 CREATE INDEX IF NOT EXISTS user_data_user_vault_id_data_kind ON user_data(user_vault_id, data_kind);
+CREATE INDEX IF NOT EXISTS user_data_fingerprint ON user_data(sh_data) WHERE sh_data IS NOT NULL;
 
 CREATE TABLE onboardings (
     id VARCHAR(250) PRIMARY KEY DEFAULT prefixed_uid('ob_'),
