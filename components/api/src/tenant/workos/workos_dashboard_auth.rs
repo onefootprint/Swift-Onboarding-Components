@@ -56,14 +56,17 @@ pub async fn from_request_inner(
     let session = db::session::get_by_session_id(&pool, auth_token.clone())
         .await?
         .ok_or(AuthError::NoSessionFound)?;
-    // Actually verify that the session is the correct type
 
+    // Actually verify that the session is the correct type
     let metadata = match session.session_data.clone() {
         SessionState::TenantDashboardSession(metadata) => Ok(metadata),
-        _ => Err(AuthError::SessionTypeError),
+        _ => Err(AuthError::SessionTypeError)
     }?;
 
-    let tenant = db::tenant::get_by_workos_id(&pool, metadata.workos_id.clone()).await?;
+    let tenant = db::tenant::get_opt_by_workos_id(&pool, 
+        metadata.workos_id.clone())
+        .await?
+        .ok_or(AuthError::UnknownClient)?;
 
     Ok(DashboardSessionContext {
         tenant,

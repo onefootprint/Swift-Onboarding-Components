@@ -47,11 +47,9 @@ pub(crate) fn get_session_by_id_sync(
         .optional()?;
 
     // check cookie expiration every time we get session
-    // TODO set an expires_at timestamp rather than relying on created_at or updated_at
-    // If we ever have sessions that are updated, we'll want to refresh their expiry
     if let Some(session) = &session {
         let now = Utc::now().naive_utc();
-        if session.updated_at.signed_duration_since(now) > Duration::minutes(15) {
+        if session.expires_at >= now  {
             return Ok(None);
         }
     }

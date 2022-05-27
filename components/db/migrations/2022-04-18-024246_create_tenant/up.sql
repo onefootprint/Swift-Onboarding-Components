@@ -14,10 +14,11 @@ $$;
 
 CREATE TABLE tenants (
     id VARCHAR(250) PRIMARY KEY DEFAULT prefixed_uid('org_'),
-    name text NOT NULL,
+    name text NOT NULL UNIQUE,
     public_key BYTEA NOT NULL,
     e_private_key BYTEA NOT NULL,
-    workos_id VARCHAR(250) NOT NULL,
+    workos_id VARCHAR(250) NOT NULL UNIQUE,
+    email_domain VARCHAR(250) NOT NULL UNIQUE,
     created_at timestamp NOT NULL DEFAULT NOW(),
     updated_at timestamp NOT NULL DEFAULT NOW()
 );

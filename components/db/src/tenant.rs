@@ -7,30 +7,47 @@ use deadpool_diesel::postgres::Pool;
 use diesel::prelude::*;
 use newtypes::TenantId;
 
-pub async fn init(pool: &Pool, new_tenant: NewTenant) -> Result<Tenant, DbError> {
+pub async fn init_or_get(pool: &Pool, new_tenant: NewTenant) -> Result<Tenant, DbError> {
+    
+    let conn = pool.get().await?;
+    let workos_id = new_tenant.workos_id.clone();
+    let tenant = conn.interact(move |conn| {
+        get_opt_by_workos_id_sync(conn, workos_id)
+    })
+    .await??;
+
+    match tenant {
+        Some(tenant) => Ok(tenant),
+        _ => {
+            let tenant = conn
+                .interact(move |conn| {
+                    diesel::insert_into(schema::tenants::table)
+                        .values(&new_tenant)
+                        .get_result::<Tenant>(conn)
+                })
+            .await??;
+            Ok(tenant)
+        }
+    }
+}
+
+pub async fn get_opt_by_workos_id(pool: &Pool, workos_id: String) -> Result<Option<Tenant>, DbError> {
     let conn = pool.get().await?;
 
-    let tenant = conn
-        .interact(move |conn| {
-            diesel::insert_into(schema::tenants::table)
-                .values(&new_tenant)
-                .get_result::<Tenant>(conn)
-        })
-        .await??;
+    let tenant = conn.interact(move |conn| {
+        get_opt_by_workos_id_sync(conn, workos_id)
+    })
+    .await??;
 
     Ok(tenant)
 }
 
-pub async fn get_by_workos_id(pool: &Pool, workos_id: String) -> Result<Tenant, DbError> {
-    let conn = pool.get().await?;
+pub(crate) fn get_opt_by_workos_id_sync(conn: &PgConnection, workos_id: String) -> Result<Option<Tenant>, DbError> {
 
-    let tenant: Tenant = conn
-        .interact(move |conn| {
-            schema::tenants::table
-                .filter(schema::tenants::workos_id.eq(workos_id))
-                .first(conn)
-        })
-        .await??;
+    let tenant : Option<Tenant> = schema::tenants::table
+        .filter(schema::tenants::workos_id.eq(workos_id))
+        .first(conn)
+        .optional()?;
 
     Ok(tenant)
 }

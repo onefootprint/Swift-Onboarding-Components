@@ -9,10 +9,10 @@ TENANT_AUTH_HEADER = "x-client-public-key"
 TENANT_SECRET_HEADER = "x-client-secret-key"
 FPUSER_AUTH_HEADER = "x-fpuser-authorization"
 TEST_CHALLENGE_CODE = "123456"
+WORKOS_ORG_ID = "org_01G39KR1V1E52JEZV6BYNG590J"
 
 
 url = lambda path: "{}/{}".format(os.environ.get('TEST_URL'), path)
-
 def _gen_random_n_digit_number(n):
     return "".join([str(random.randint(0, 9)) for _ in range(n)])
 
@@ -47,9 +47,9 @@ def _assert_response(response, status_code=200, msg="Incorrect status code"):
     return response.json()
 
 @pytest.fixture(scope="module")
-def tenant1():
+def workos_tenant():
     path = "private/client"
-    data = {"name": "integration_test_tenant1"}
+    data = {"name": "workos_tenant", "workos_org_id": WORKOS_ORG_ID, "email_domain": "onefootprint.com"}
     r = requests.post(url(path), json=data)
     body = _assert_response(r)
     client_public_key = body["data"]["keys"]["client_public_key"]
@@ -60,9 +60,9 @@ def tenant1():
     }
 
 @pytest.fixture(scope="module")
-def tenant2():
+def foo_tenant():
     path = "private/client"
-    data = {"name": "integration_test_tenant2"}
+    data = {"name": "foo", "workos_org_id": "bar", "email_domain": "foo.bar"}
     r = requests.post(url(path), json=data)
     body = _assert_response(r)
     client_public_key = body["data"]["keys"]["client_public_key"]
@@ -119,12 +119,12 @@ def test_identify_verify(request):
     auth_token = body["data"]["auth_token"]
     request.config.cache.set("fpuser_auth_token", auth_token)
 
-def test_onboard_init(request, tenant1):
+def test_onboard_init(request, workos_tenant):
     path = "onboarding"
     print(url(path))
     r = requests.post(
         url(path),
-        headers=dict(**_client_pub_key_headers(tenant1["pk"]), **_fpuser_auth_headers(request)),
+        headers=dict(**_client_pub_key_headers(workos_tenant["pk"]), **_fpuser_auth_headers(request)),
     )
     body = _assert_response(r)
     assert set(body["data"]["missing_attributes"]) == {"first_name", "last_name", "dob", "ssn", "street_address", "city", "state", "zip", "country", "email"}
@@ -165,12 +165,12 @@ def test_user_data(request):
     )
     _assert_response(r)
 
-def test_onboarding_complete(request, tenant1): 
+def test_onboarding_complete(request, workos_tenant): 
     path = "onboarding/complete"
     print(url(path))
     r = requests.post(
         url(path),
-        headers=dict(**_client_pub_key_headers(tenant1["pk"]), **_fpuser_auth_headers(request)),
+        headers=dict(**_client_pub_key_headers(workos_tenant["pk"]), **_fpuser_auth_headers(request)),
     )
     body = _assert_response(r)
     fp_user_id = body["data"]["footprint_user_id"]
@@ -178,7 +178,7 @@ def test_onboarding_complete(request, tenant1):
     assert fp_user_id
     request.config.cache.set("fp_user_id", fp_user_id)
 
-def test_identify_repeat_customer_via_email(request, tenant2):
+def test_identify_repeat_customer_via_email(request, foo_tenant):
     # Identify the user by email
     request.config.cache.set("fpuser_auth_token", None)  # Remove fpuser_auth_token from previous test
     path = "identify/email"
@@ -215,7 +215,7 @@ def test_identify_repeat_customer_via_email(request, tenant2):
     print(url(path))
     r = requests.post(
         url(path),
-        headers=dict(**_client_pub_key_headers(tenant2["pk"]), **_fpuser_auth_headers(request)),
+        headers=dict(**_client_pub_key_headers(foo_tenant["pk"]), **_fpuser_auth_headers(request)),
     )
     body = _assert_response(r)
     assert not body["data"]["missing_attributes"]
@@ -225,7 +225,7 @@ def test_identify_repeat_customer_via_email(request, tenant2):
     print(url(path))
     r = requests.post(
         url(path),
-        headers=dict(**_client_pub_key_headers(tenant2["pk"]), **_fpuser_auth_headers(request)),
+        headers=dict(**_client_pub_key_headers(foo_tenant["pk"]), **_fpuser_auth_headers(request)),
     )
     body = _assert_response(r)
     fp_user_id = body["data"]["footprint_user_id"]
@@ -233,7 +233,7 @@ def test_identify_repeat_customer_via_email(request, tenant2):
     old_fp_user_id = request.config.cache.get("fp_user_id", None)
     assert old_fp_user_id != fp_user_id, "Different tenants should have different fp_user_ids"
     
-def test_tenant_decrypt(request, tenant1):
+def test_tenant_decrypt(request, workos_tenant):
     path = "org/decrypt"
     print(url(path))
     data = {
@@ -243,7 +243,7 @@ def test_tenant_decrypt(request, tenant1):
     print(data)
     r = requests.post(
         url(path),
-        headers=_client_priv_key_headers(tenant1["sk"]),  
+        headers=_client_priv_key_headers(workos_tenant["sk"]),  
         json=data,
     )
     body = _assert_response(r)
@@ -253,26 +253,26 @@ def test_tenant_decrypt(request, tenant1):
     assert attributes["country"] == "USA"
     assert attributes["email"] == request.config.cache.get("email", None)
     
-def test_onboardings_list(request, tenant1):
+def test_onboardings_list(request, workos_tenant):
     path = "org/onboardings"
     print(url(path))
     r = requests.get(
         url(path),
-        headers=_client_priv_key_headers(tenant1["sk"]),  
+        headers=_client_priv_key_headers(workos_tenant["sk"]),  
     )
     body = _assert_response(r)
     onboardings = body["data"]
-    assert len(onboardings) == 1
+    assert len(onboardings)
     old_fp_user_id = request.config.cache.get("fp_user_id", None)
     assert onboardings[0]["footprint_user_id"] == old_fp_user_id
 
-def test_access_events_list(request, tenant1):
+def test_access_events_list(request, workos_tenant):
     fp_user_id = request.config.cache.get("fp_user_id", None)
     path = f"org/access_events?footprint_user_id={fp_user_id}"
     print(url(path))
     r = requests.get(
         url(path),
-        headers=_client_priv_key_headers(tenant1["sk"]),  
+        headers=_client_priv_key_headers(workos_tenant["sk"]),  
     )
     body = _assert_response(r)
     access_events = body["data"]
@@ -283,7 +283,7 @@ def test_access_events_list(request, tenant1):
     path = f"org/access_events?footprint_user_id={fp_user_id}&data_kind=email"
     r = requests.get(
         url(path),
-        headers=_client_priv_key_headers(tenant1["sk"]),
+        headers=_client_priv_key_headers(workos_tenant["sk"]),
     )
     body = _assert_response(r)
     access_events = body["data"]
@@ -316,7 +316,7 @@ def test_logged_in_access_events(request):
     assert len(access_events) == 4
     assert set(i["data_kind"] for i in access_events) == {"first_name", "email", "zip", "country"}
 
-def test_logged_in_decrypt(request, tenant1):
+def test_logged_in_decrypt(request):
     path = "user/decrypt"
     print(url(path))
     data = {

@@ -2,6 +2,7 @@ use crate::tenant::workos::WorkOSProfile;
 use crate::State;
 use crate::{errors::ApiError, types::success::ApiResponseData};
 use actix_session::Session;
+use actix_web::HttpResponse;
 use chrono::{Duration, Utc};
 use db::models::session_data::{SessionState, TenantDashboardSessionData};
 use paperclip::actix::Apiv2Schema;
@@ -25,7 +26,7 @@ fn handler(
     state: web::Data<State>,
     _session: Session,
     code: web::Query<Code>,
-) -> actix_web::Result<Json<ApiResponseData<DashboardAuthorization>>, ApiError> {
+) -> actix_web::Result<HttpResponse, ApiError> {
     let code = &code.code;
 
     let client = awc::Client::default();
@@ -53,12 +54,15 @@ fn handler(
     })
     .create(&state.db_pool, login_expires_at)
     .await?;
+    
+    let redirect_url = format!
+        ("{}/auth?auth={}&email={}", 
+        &state.fe_redirect_uri,
+        auth_token,
+        profile.email
+    );
+    Ok(HttpResponse::TemporaryRedirect()
+    .append_header((actix_web::http::header::LOCATION, redirect_url))
+    .finish())
 
-    // TODO: Redirect to the home page :)
-    Ok(Json(ApiResponseData {
-        data: DashboardAuthorization {
-            profile: profile.clone(),
-            authorization: auth_token,
-        },
-    }))
 }

@@ -89,6 +89,7 @@ table! {
         public_key -> Bytea,
         e_private_key -> Bytea,
         workos_id -> Varchar,
+        email_domain -> Varchar,
         created_at -> Timestamp,
         updated_at -> Timestamp,
     }

@@ -12,6 +12,7 @@ pub struct Tenant {
     pub public_key: Vec<u8>,
     pub e_private_key: Vec<u8>,
     pub workos_id: String,
+    pub email_domain: String,
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
 }
@@ -23,4 +24,5 @@ pub struct NewTenant {
     pub public_key: Vec<u8>,
     pub e_private_key: Vec<u8>,
     pub workos_id: String,
+    pub email_domain: String,
 }

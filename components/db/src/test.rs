@@ -17,8 +17,9 @@ async fn test_db() {
         public_key: "".as_bytes().to_vec(),
         e_private_key: "".as_bytes().to_vec(),
         workos_id: "test".to_owned(),
+        email_domain: "dbtest.com".to_owned(),
     };
-    let _tenant = crate::tenant::init(&pool, tenant)
+    let _tenant = crate::tenant::init_or_get(&pool, tenant)
         .await
         .expect("couldn't create tenant");
     crate::user_vault::create(&pool, crate::models::user_vaults::NewUserVaultReq {

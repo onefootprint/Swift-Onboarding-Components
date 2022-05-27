@@ -46,6 +46,7 @@ pub struct State {
     db_pool: DbPool,
     enclave_connection_pool: bb8::Pool<pool::StreamManager<StreamManager<Config>>>,
     session_sealing_key: ScopedSealingKey,
+    fe_redirect_uri: String,
 }
 
 /// Record errors that occur from enclave pool connections
@@ -128,6 +129,12 @@ async fn main() -> std::io::Result<()> {
             ScopedSealingKey::new(key, "SESSION_SEALING").expect("invalid cookie session key")
         };
 
+        let fe_redirect_uri = if config.application_uri.contains("localhost") {        
+            config.application_uri.replace("8000", "3000")
+        } else {
+            "https://dashboard.ui.footprint.dev".to_string()
+        };
+
         State {
             config: config.clone(),
             enclave_connection_pool: pool,
@@ -139,6 +146,7 @@ async fn main() -> std::io::Result<()> {
             workos_client,
             db_pool,
             session_sealing_key,
+            fe_redirect_uri
         }
     };
 
@@ -195,7 +203,6 @@ async fn main() -> std::io::Result<()> {
             .service(
                 web::scope("/private")
                     .service(client::init::handler)
-                    .service(client::workos_init::handler)                    
             )
             .service(identify::routes())
             .service(tenant::routes())

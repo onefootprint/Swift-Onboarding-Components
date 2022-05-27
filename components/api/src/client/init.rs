@@ -12,6 +12,10 @@ use db::models::tenants::{NewTenant, Tenant};
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Apiv2Schema)]
 struct NewClientRequest {
     name: String,
+    workos_org_id: String,
+    /// example: onefootprint.com, gmail.com
+    /// used for login gating
+    email_domain: String,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Apiv2Schema)]
@@ -41,13 +45,14 @@ async fn handler(
 ) -> actix_web::Result<Json<ApiResponseData<NewClientResponse>>, ApiError> {
     let (ec_pk_uncompressed, e_priv_key) = gen_keypair(&state).await?;
 
-    let tenant = db::tenant::init(
+    let tenant = db::tenant::init_or_get(
         &state.db_pool,
         NewTenant {
-            name: request.into_inner().name,
+            name: request.name.clone(),
             e_private_key: e_priv_key,
             public_key: ec_pk_uncompressed,
-            workos_id: "TODO, seperate out endpoints".to_owned(),
+            workos_id: request.workos_org_id.clone(),
+            email_domain: request.email_domain.clone(),
         },
     )
     .await?;
