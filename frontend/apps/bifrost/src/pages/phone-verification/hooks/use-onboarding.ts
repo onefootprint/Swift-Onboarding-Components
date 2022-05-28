@@ -23,7 +23,7 @@ const missingAttributesLabels: Record<string, UserDataAttribute> = {
   city: UserDataAttribute.city,
   state: UserDataAttribute.state,
   country: UserDataAttribute.country,
-  zip: UserDataAttribute.zipCode,
+  zip: UserDataAttribute.zip,
 };
 
 const onboardingRequest = async (payload: OnboardingRequest) => {

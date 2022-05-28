@@ -51,7 +51,7 @@ export enum UserDataAttribute {
   city = 'city',
   state = 'state',
   country = 'country',
-  zipCode = 'zipCode',
+  zip = 'zip',
 }
 
 export type UserData = Partial<{
@@ -65,7 +65,7 @@ export type UserData = Partial<{
   [UserDataAttribute.city]: string;
   [UserDataAttribute.state]: string;
   [UserDataAttribute.country]: string;
-  [UserDataAttribute.zipCode]: string;
+  [UserDataAttribute.zip]: string;
 }>;
 
 export type Registration = {
@@ -89,7 +89,7 @@ export type ResidentialAddress = Required<
     | UserDataAttribute.streetAddress
     | UserDataAttribute.streetAddress2
     | UserDataAttribute.city
-    | UserDataAttribute.zipCode
+    | UserDataAttribute.zip
     | UserDataAttribute.state
   >
 >;

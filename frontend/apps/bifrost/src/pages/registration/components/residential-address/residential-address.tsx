@@ -17,7 +17,7 @@ type FormData = Required<
     | UserDataAttribute.city
     | UserDataAttribute.state
     | UserDataAttribute.country
-    | UserDataAttribute.zipCode
+    | UserDataAttribute.zip
   >
 >;
 
@@ -36,9 +36,9 @@ const ResidentialAddress = () => {
       streetAddress: formData.streetAddress,
       streetAddress2: formData.streetAddress2,
       city: formData.city,
-      zipCode: formData.zipCode,
-      country: formData.country,
-      state: formData.state,
+      zip: formData.zip,
+      country: 'United States', // formData.country,
+      state: 'CA', // formData.state,
     };
     send({
       type: Events.residentialAddressSubmitted,
@@ -82,11 +82,11 @@ const ResidentialAddress = () => {
         </Grid.Column>
         <Grid.Column col={6}>
           <TextInput
-            hasError={!!errors.zipCode}
-            hintText={errors.zipCode && t('form.zipCode.error')}
+            hasError={!!errors.zip}
+            hintText={errors.zip && t('form.zipCode.error')}
             label={t('form.zipCode.label')}
             placeholder={t('form.zipCode.placeholder')}
-            {...register(UserDataAttribute.zipCode, { required: true })}
+            {...register(UserDataAttribute.zip, { required: true })}
           />
         </Grid.Column>
       </Grid.Row>

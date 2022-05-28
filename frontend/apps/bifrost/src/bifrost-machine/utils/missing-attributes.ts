@@ -15,7 +15,7 @@ export const isMissingResidentialAttribute = (
   attributes.has(UserDataAttribute.city) ||
   attributes.has(UserDataAttribute.state) ||
   attributes.has(UserDataAttribute.country) ||
-  attributes.has(UserDataAttribute.zipCode);
+  attributes.has(UserDataAttribute.zip);
 
 export const isMissingSsnAttribute = (attributes: Set<UserDataAttribute>) =>
   attributes.has(UserDataAttribute.ssn);

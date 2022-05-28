@@ -13,7 +13,7 @@ export type UserDataRequest = {
     city?: string;
     state?: string;
     country?: string;
-    zipCode?: string;
+    zip?: string;
   };
   authToken: string;
 };
