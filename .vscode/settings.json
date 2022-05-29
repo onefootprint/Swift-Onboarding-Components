@@ -11,6 +11,7 @@
         "creds",
         "deadpool",
         "envconfig",
+        "fingerprintable",
         "Fpuser",
         "hmac",
         "livecheck",
