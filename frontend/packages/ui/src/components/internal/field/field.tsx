@@ -1,4 +1,7 @@
+import { CleaveOptions } from 'cleave.js/options';
+import Cleave from 'cleave.js/react';
 import { darken, rgba } from 'polished';
+import React from 'react';
 import styled, { css } from 'styled';
 
 export type FieldProps = {
@@ -10,15 +13,19 @@ export type FieldProps = {
   testID?: string;
 };
 
-const Field = styled('div').attrs<{ as?: 'textarea' | 'input' }>(
-  ({ as = 'input' }) => ({
-    as,
-  }),
-)<{ hasError?: boolean }>`
-  ${({ hasError, theme }) => {
-    const defaultBorderColor = hasError ? 'error' : 'primary';
-    const hoverBorderColor = hasError ? 'error' : 'primary';
-    const focusBorderColor = hasError ? 'error' : 'secondary';
+type FieldInternalProps = {
+  htmlRef?: React.ForwardedRef<HTMLInputElement>;
+  $hasError?: boolean;
+  options?: CleaveOptions;
+};
+
+const Field = styled(Cleave).attrs<{ as?: 'textarea' | 'input' }>(({ as }) => ({
+  as,
+}))<FieldInternalProps>`
+  ${({ $hasError, theme }) => {
+    const defaultBorderColor = $hasError ? 'error' : 'primary';
+    const hoverBorderColor = $hasError ? 'error' : 'primary';
+    const focusBorderColor = $hasError ? 'error' : 'secondary';
     return css`
       background-color: ${theme.backgroundColor.primary};
       border-radius: ${theme.borderRadius[1]}px;

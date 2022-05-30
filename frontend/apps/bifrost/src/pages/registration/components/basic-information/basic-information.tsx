@@ -1,4 +1,4 @@
-import { useTranslation } from 'hooks';
+import { useInputMask, useTranslation } from 'hooks';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { Events, UserData, UserDataAttribute } from 'src/bifrost-machine/types';
@@ -19,6 +19,7 @@ type FormData = Required<
 >;
 
 const BasicInformation = () => {
+  const inputMasks = useInputMask('en');
   const [, send] = useBifrostMachine();
   const syncDataMutation = useSyncData();
   const { t } = useTranslation('pages.registration.basic-information');
@@ -70,6 +71,7 @@ const BasicInformation = () => {
         hasError={!!errors.dob}
         hintText={errors.dob && t('form.dob.error')}
         label={t('form.dob.label')}
+        mask={inputMasks.dob}
         placeholder={t('form.dob.placeholder')}
         {...register('dob', { required: true })}
       />

@@ -13,7 +13,6 @@ const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
   (
     {
       testID,
-      disabled,
       hasError,
       hintText,
       id: baseID,
@@ -22,7 +21,6 @@ const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
       onChangeText,
       placeholder,
       required,
-      tabIndex,
       ...remainingProps
     }: TextAreaProps,
     ref,
@@ -42,16 +40,14 @@ const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
         {label && <Label htmlFor={id}>{label}</Label>}
         <StyledField
           {...remainingProps}
+          $hasError={hasError}
           aria-required={required}
           as="textarea"
           data-testid={testID}
-          disabled={disabled}
-          hasError={hasError}
           id={id}
           onChange={handleChange}
           placeholder={placeholder}
           ref={ref}
-          tabIndex={disabled ? -1 : tabIndex}
         />
         {hintText && (
           <Hint color={hasError ? 'error' : 'tertiary'}>{hintText}</Hint>

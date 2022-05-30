@@ -7,6 +7,12 @@ export default {
   component: TextInput,
   title: 'Components/TextInput',
   argTypes: {
+    mask: {
+      control: 'object',
+      description:
+        'Specify a mask using Cleave.js (https://github.com/nosir/cleave.js/tree/master/doc)',
+      required: false,
+    },
     disabled: {
       control: 'boolean',
       description: 'Specifies that the input element should be disabled',
@@ -74,6 +80,7 @@ const Template: Story<TextInputProps> = ({
   hasError,
   hintText,
   label,
+  mask,
   maxLength,
   minLength,
   onChange,
@@ -94,6 +101,7 @@ const Template: Story<TextInputProps> = ({
       hasError={hasError}
       hintText={hintText}
       label={label}
+      mask={mask}
       maxLength={maxLength}
       minLength={minLength}
       onChange={onChange}
@@ -108,6 +116,7 @@ const Template: Story<TextInputProps> = ({
 
 export const Base = Template.bind({});
 Base.args = {
+  mask: undefined,
   disabled: false,
   hintText: '',
   label: 'Email',
@@ -120,37 +129,13 @@ Base.args = {
   value: '',
 };
 
-export const WithHint = Template.bind({});
-WithHint.args = {
-  hintText: 'Hint',
-  label: 'Name',
-  onChange: console.log,
-  placeholder: 'Placeholder',
-  value: '',
-};
-
-export const WithoutLabel = Template.bind({});
-WithoutLabel.args = {
-  onChange: console.log,
-  placeholder: 'Placeholder',
-  value: '',
-};
-
-export const WithError = Template.bind({});
-WithError.args = {
-  hasError: true,
-  hintText: 'Hint',
-  label: 'Address',
-  onChange: console.log,
-  placeholder: 'Placeholder',
-  value: '',
-};
-
-export const Disabled = Template.bind({});
-Disabled.args = {
-  disabled: true,
-  label: 'Placeholder',
-  onChange: console.log,
-  placeholder: 'Text',
-  value: '',
+export const WithMask = Template.bind({});
+WithMask.args = {
+  label: 'Date of birth',
+  placeholder: 'MM/DD/YYYY',
+  mask: {
+    date: true,
+    delimiter: '/',
+    datePattern: ['m', 'd', 'Y'],
+  },
 };

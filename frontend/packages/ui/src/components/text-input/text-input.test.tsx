@@ -10,6 +10,7 @@ describe('<TextInput />', () => {
     hasError,
     hintText,
     label = 'label-text',
+    mask,
     onChange = jest.fn(),
     onChangeText = jest.fn(),
     placeholder = 'placeholder-text',
@@ -22,6 +23,7 @@ describe('<TextInput />', () => {
         hasError={hasError}
         hintText={hintText}
         label={label}
+        mask={mask}
         onChange={onChange}
         onChangeText={onChangeText}
         placeholder={placeholder}
@@ -103,7 +105,7 @@ describe('<TextInput />', () => {
     });
 
     describe('when it is disabled', () => {
-      it('should not trigger onChangeText event', () => {
+      it('should not trigger onChangeText event', async () => {
         const onChangeTextMockFn = jest.fn();
         renderTextInput({
           disabled: true,
@@ -111,9 +113,27 @@ describe('<TextInput />', () => {
           testID: 'input-test-id',
         });
         const input = screen.getByTestId('input-test-id');
-        userEvent.type(input, 'foo');
+        await userEvent.type(input, 'foo');
         expect(onChangeTextMockFn).not.toHaveBeenCalled();
       });
+    });
+  });
+
+  describe('when it has a mask', () => {
+    it('should format the data correctly', async () => {
+      const onChangeTextMockFn = jest.fn();
+      renderTextInput({
+        onChangeText: onChangeTextMockFn,
+        placeholder: 'placeholder-text',
+        mask: {
+          date: true,
+          delimiter: '/',
+          datePattern: ['m', 'd', 'Y'],
+        },
+      });
+      const input = screen.getByPlaceholderText('placeholder-text');
+      await userEvent.type(input, '01011980');
+      expect(onChangeTextMockFn).toHaveBeenLastCalledWith('01/01/1980');
     });
   });
 });

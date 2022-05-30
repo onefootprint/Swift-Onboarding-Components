@@ -1,3 +1,4 @@
+import { CleaveOptions } from 'cleave.js/options';
 import React, { forwardRef, InputHTMLAttributes } from 'react';
 import styled, { css } from 'styled';
 
@@ -8,26 +9,25 @@ import Label from '../label';
 export type InputProps = FieldProps & {
   prefixElement?: JSX.Element;
   suffixElement?: JSX.Element;
+  mask?: CleaveOptions;
 } & InputHTMLAttributes<HTMLInputElement>;
 
 const BaseInput = forwardRef<HTMLInputElement, InputProps>(
   (
     {
       autoComplete,
-      disabled = false,
       hasError = false,
       hintText,
+      id: baseID,
       label,
-      name,
+      mask,
       onChange,
       onChangeText,
       placeholder,
-      required,
-      tabIndex,
-      testID,
-      id: baseID,
       prefixElement,
+      required,
       suffixElement,
+      testID,
       ...remainingProps
     }: InputProps,
     ref,
@@ -50,19 +50,19 @@ const BaseInput = forwardRef<HTMLInputElement, InputProps>(
         {label && <Label htmlFor={id}>{label}</Label>}
         {prefixElement && <PrefixContainer>{prefixElement}</PrefixContainer>}
         <StyledField
+          {...remainingProps}
+          $hasError={hasError}
           aria-required={required}
-          as="input"
+          as={mask ? undefined : 'input'}
           autoComplete={autoComplete}
           data-testid={testID}
-          hasError={hasError}
+          htmlRef={ref}
           id={id}
-          name={name}
           onChange={handleChange}
+          options={mask}
           placeholder={placeholder}
           ref={ref}
           required={required}
-          tabIndex={disabled ? -1 : tabIndex}
-          {...remainingProps}
         />
         {hintText && (
           <Hint color={hasError ? 'error' : 'tertiary'}>{hintText}</Hint>
