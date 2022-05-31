@@ -2,6 +2,7 @@ import type { Icon as TIcon } from 'icons';
 import React, { HTMLAttributeAnchorTarget } from 'react';
 import styled, { css } from 'styled';
 
+import { createFontStyles } from '../../utils/mixins';
 import fontSize from './link-button.constants';
 import type { LinkButtonSize } from './link-button.types';
 
@@ -65,16 +66,13 @@ export const LinkButtonStyled = styled.a.attrs<{
   as: href ? 'a' : 'button',
 }))<LinkButtonStyleProps>`
   ${({ theme, size }) => css`
+    ${createFontStyles(fontSize[size])};
     align-items: center;
     background: transparent;
     border: none;
     color: ${theme.color.accent};
     cursor: pointer;
     display: flex;
-    font-family: ${theme.typography[fontSize[size]].fontFamily};
-    font-size: ${theme.typography[fontSize[size]].fontSize};
-    font-weight: ${theme.typography[fontSize[size]].fontWeight};
-    line-height: ${theme.typography[fontSize[size]].lineHeight};
 
     span + svg,
     svg + span {

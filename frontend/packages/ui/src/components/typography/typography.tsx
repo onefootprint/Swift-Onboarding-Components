@@ -1,7 +1,8 @@
 import React, { forwardRef } from 'react';
-import styled, { Color, css, FontFamily } from 'styled';
+import styled, { Color, css, FontVariant } from 'styled';
 
 import useSX, { SXStyleProps, SXStyles } from '../../hooks/use-sx';
+import { createFontStyles } from '../../utils/mixins';
 import variantMapping from './typography.constants';
 
 type TypographyTag =
@@ -21,7 +22,7 @@ export type TypographyProps = {
   children: React.ReactNode;
   color?: Color;
   testID?: string;
-  variant: FontFamily;
+  variant: FontVariant;
   sx?: SXStyleProps;
 };
 
@@ -56,19 +57,13 @@ const Typography = forwardRef<HTMLElement, TypographyProps>(
 const StyledTypography = styled.p<{
   color: Color;
   sx: SXStyles;
-  variant: FontFamily;
+  variant: FontVariant;
 }>`
-  ${({ theme, color, variant, sx }) => {
-    const font = theme.typography[variant];
-    return css`
-      color: ${theme.color[color]};
-      font-family: ${font?.fontFamily};
-      font-size: ${font?.fontSize};
-      font-weight: ${font?.fontWeight};
-      line-height: ${font?.lineHeight};
-      ${sx};
-    `;
-  }}
+  ${({ theme, color, variant, sx }) => css`
+    ${createFontStyles(variant)}
+    color: ${theme.color[color]};
+    ${sx};
+  `}
 `;
 
 export default Typography;

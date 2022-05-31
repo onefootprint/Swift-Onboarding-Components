@@ -2,6 +2,8 @@ import type { Icon as TIcon } from 'icons';
 import React, { forwardRef } from 'react';
 import styled, { css } from 'styled';
 
+import { createOverlayBackground } from '../../utils/mixins';
+
 export type IconButtonProps = {
   ariaLabel: string;
   Icon: TIcon;
@@ -41,25 +43,11 @@ const Container = styled.button`
     border-radius: ${theme.borderRadius[3]}px;
 
     &:hover:enabled {
-      background: linear-gradient(
-          ${theme.overlay.darken[1]},
-          ${theme.overlay.darken[1]}
-        ),
-        linear-gradient(
-          ${theme.backgroundColor.primary},
-          ${theme.backgroundColor.primary}
-        );
+      ${createOverlayBackground('darken-1', 'primary')};
     }
 
     &:active:enabled {
-      background: linear-gradient(
-          ${theme.overlay.darken[2]},
-          ${theme.overlay.darken[2]}
-        ),
-        linear-gradient(
-          ${theme.backgroundColor.primary},
-          ${theme.backgroundColor.primary}
-        );
+      ${createOverlayBackground('darken-2', 'primary')};
     }
   `}
 `;

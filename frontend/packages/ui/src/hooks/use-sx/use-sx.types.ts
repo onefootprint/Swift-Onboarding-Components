@@ -1,6 +1,6 @@
 import * as CSS from 'csstype';
 import type {
-  BackgroundsColor,
+  BackgroundColor,
   BorderColor,
   BorderRadius,
   BorderWidth,
@@ -10,7 +10,7 @@ import type {
 } from 'styled';
 
 export type CustomStyleProps = {
-  backgroundColor?: BackgroundsColor;
+  backgroundColor?: BackgroundColor;
   borderBottomColor?: BorderColor;
   borderBottomLeftRadius?: BorderRadius;
   borderBottomRightRadius?: BorderRadius;

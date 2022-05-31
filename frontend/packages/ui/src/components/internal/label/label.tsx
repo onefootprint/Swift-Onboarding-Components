@@ -1,6 +1,8 @@
 import React from 'react';
 import styled, { css } from 'styled';
 
+import { createFontStyles } from '../../../utils/mixins';
+
 export type LabelProps = {
   children: string;
   htmlFor: string;
@@ -23,11 +25,8 @@ const Container = styled.div`
 
 const StyledLabel = styled.label`
   ${({ theme }) => css`
+    ${createFontStyles('body-3')};
     color: ${theme.color.primary};
-    font-family: ${theme.typography['body-3'].fontFamily};
-    font-size: ${theme.typography['body-3'].fontSize};
-    font-weight: ${theme.typography['body-3'].fontWeight};
-    line-height: ${theme.typography['body-3'].lineHeight};
   `}
 `;
 

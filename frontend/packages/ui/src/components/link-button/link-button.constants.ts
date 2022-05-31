@@ -1,8 +1,8 @@
-import type { FontFamily } from 'styled';
+import type { FontVariant } from 'styled';
 
 import type { LinkButtonSize } from './link-button.types';
 
-const fontSize: Record<LinkButtonSize, FontFamily> = {
+const fontSize: Record<LinkButtonSize, FontVariant> = {
   default: 'label-2',
   compact: 'label-3',
   tiny: 'label-4',

@@ -1,20 +1,20 @@
-import type { BackgroundsColor, BorderColor, Color, Overlay } from 'styled';
+import type { BackgroundColor, BorderColor, Color, Overlay } from 'styled';
 
 export const buttonSizes = ['default', 'small', 'compact', 'large'];
 
-export const backgroundColors: Record<string, BackgroundsColor> = {
+export const backgroundColors: Record<string, BackgroundColor> = {
   primary: 'tertiary',
   secondary: 'primary',
 };
 
 export const hoverBackgroundColor: Record<string, Overlay> = {
-  primary: 'lighten',
-  secondary: 'darken',
+  primary: 'lighten-1',
+  secondary: 'darken-1',
 };
 
 export const activeBackgroundColor: Record<string, Overlay> = {
-  primary: 'lighten',
-  secondary: 'darken',
+  primary: 'lighten-2',
+  secondary: 'darken-2',
 };
 
 export const colors: Record<string, Color> = {

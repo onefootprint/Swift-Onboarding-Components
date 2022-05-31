@@ -4,6 +4,8 @@ import { darken, rgba } from 'polished';
 import React from 'react';
 import styled, { css } from 'styled';
 
+import { createFontStyles } from '../../../utils/mixins';
+
 export type FieldProps = {
   hasError?: boolean;
   hintText?: string;
@@ -27,16 +29,13 @@ const Field = styled(Cleave).attrs<{ as?: 'textarea' | 'input' }>(({ as }) => ({
     const hoverBorderColor = $hasError ? 'error' : 'primary';
     const focusBorderColor = $hasError ? 'error' : 'secondary';
     return css`
+      ${createFontStyles('body-3')};
       background-color: ${theme.backgroundColor.primary};
       border-radius: ${theme.borderRadius[1]}px;
       border: ${theme.borderWidth[1]}px solid
         ${theme.borderColor[defaultBorderColor]};
       color: ${theme.color.primary};
-      font-family: ${theme.typography['body-3'].fontFamily};
-      font-size: ${theme.typography['body-3'].fontSize};
-      font-weight: ${theme.typography['body-3'].fontWeight};
       height: 40px;
-      line-height: ${theme.typography['body-3'].lineHeight};
       outline: none;
       width: 100%;
 

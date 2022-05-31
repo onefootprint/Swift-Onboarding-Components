@@ -93,7 +93,7 @@ const PillTabContainer = styled.li<{
 
   :hover {
     ${({ theme }) => css`
-      background-color: ${theme.overlay.darken[2]};
+      background-color: ${theme.overlay['darken-2']};
       p {
         color: ${theme.color.primary};
       }

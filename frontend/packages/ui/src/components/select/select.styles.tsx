@@ -1,6 +1,8 @@
 import { darken, rgba } from 'polished';
 import styled, { Color, css } from 'styled';
 
+import { createFontStyles, createOverlayBackground } from '../../utils/mixins';
+
 const Container = styled.div`
   position: relative;
 `;
@@ -41,6 +43,7 @@ const Button = styled.button<{
     const hoverBorderColor = hasError ? 'error' : 'primary';
     const focusBorderColor = hasError ? 'error' : 'secondary';
     return css`
+      ${createFontStyles('body-3')}
       align-items: center;
       background-color: ${theme.backgroundColor.primary};
       border-radius: ${theme.borderRadius[1]}px;
@@ -49,12 +52,8 @@ const Button = styled.button<{
       color: ${theme.color[color]};
       cursor: pointer;
       display: flex;
-      font-family: ${theme.typography['body-3'].fontFamily};
-      font-size: ${theme.typography['body-3'].fontSize};
-      font-weight: ${theme.typography['body-3'].fontWeight};
       height: 40px;
       justify-content: space-between;
-      line-height: ${theme.typography['body-3'].lineHeight};
       outline: none;
       padding: 0 ${theme.spacing[5]}px;
       text-align: left;
@@ -99,11 +98,8 @@ const Button = styled.button<{
 
 const EmptyState = styled.div`
   ${({ theme }) => css`
+    ${createFontStyles('body-3')};
     color: ${theme.color.tertiary};
-    font-family: ${theme.typography['body-3'].fontFamily};
-    font-size: ${theme.typography['body-3'].fontSize};
-    font-weight: ${theme.typography['body-3'].fontWeight};
-    line-height: ${theme.typography['body-3'].lineHeight};
     margin: ${theme.spacing[3]}px 0;
     padding: ${theme.spacing[3]}px ${theme.spacing[5]}px;
   `}
@@ -115,46 +111,29 @@ const DefaultOption = styled('li')<{
   highlighted: boolean;
 }>`
   ${({ theme }) => css`
+    ${createFontStyles('body-3')};
     align-items: center;
     background: ${theme.backgroundColor.primary};
     color: ${theme.color.secondary};
     cursor: pointer;
     display: flex;
-    font-family: ${theme.typography['body-3'].fontFamily};
-    font-size: ${theme.typography['body-3'].fontSize};
-    font-weight: ${theme.typography['body-3'].fontWeight};
     justify-content: space-between;
-    line-height: ${theme.typography['body-3'].lineHeight};
     margin-bottom: ${theme.spacing[2]}px;
     padding: ${theme.spacing[3]}px ${theme.spacing[5]}px;
   `}
 
-  ${({ theme, disableHoverStyles }) =>
+  ${({ disableHoverStyles }) =>
     !disableHoverStyles &&
     css`
       &:hover {
-        background: linear-gradient(
-            ${theme.overlay.darken[1]},
-            ${theme.overlay.darken[1]}
-          ),
-          linear-gradient(
-            ${theme.backgroundColor.primary},
-            ${theme.backgroundColor.primary}
-          );
+        ${createOverlayBackground('darken-1', 'primary')}
       }
     `}
 
-  ${({ theme, highlighted }) =>
+  ${({ highlighted }) =>
     highlighted &&
     css`
-      background: linear-gradient(
-          ${theme.overlay.darken[1]},
-          ${theme.overlay.darken[1]}
-        ),
-        linear-gradient(
-          ${theme.backgroundColor.primary},
-          ${theme.backgroundColor.primary}
-        );
+      ${createOverlayBackground('darken-1', 'primary')}
     `}
 `;
 

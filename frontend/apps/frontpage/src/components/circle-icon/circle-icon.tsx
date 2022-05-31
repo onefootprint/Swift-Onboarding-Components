@@ -1,10 +1,10 @@
 import { Property } from 'csstype';
 import type { Icon as TIcon } from 'icons';
 import React from 'react';
-import styled, { BackgroundsColor, Color, css } from 'styled';
+import styled, { BackgroundColor, Color, css } from 'styled';
 
 type CircleIconProps = {
-  backgroundColor?: BackgroundsColor;
+  backgroundColor?: BackgroundColor;
   color?: Color;
   Icon: TIcon;
   size?: Property.Width<'string'>;
@@ -22,7 +22,7 @@ const CircleIcon = ({
 );
 
 const IconContainer = styled.div<{
-  backgroundColor: BackgroundsColor;
+  backgroundColor: BackgroundColor;
   size: Property.Width<'string'>;
 }>`
   ${({ theme, backgroundColor, size }) => css`

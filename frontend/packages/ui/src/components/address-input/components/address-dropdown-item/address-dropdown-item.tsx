@@ -2,6 +2,7 @@ import React, { forwardRef } from 'react';
 import Highlighter from 'react-highlight-words';
 import styled, { css, useTheme } from 'styled';
 
+import { createOverlayBackground } from '../../../../utils/mixins';
 import Typography from '../../../typography';
 
 export type AddressDropdownItemProps = {
@@ -80,32 +81,18 @@ const Container = styled.li<{
     }
   `}
 
-  ${({ theme, disableHoverStyles }) =>
+  ${({ disableHoverStyles }) =>
     !disableHoverStyles &&
     css`
       &:hover {
-        background: linear-gradient(
-            ${theme.overlay.darken[1]},
-            ${theme.overlay.darken[1]}
-          ),
-          linear-gradient(
-            ${theme.backgroundColor.primary},
-            ${theme.backgroundColor.primary}
-          );
+        ${createOverlayBackground('darken-1', 'primary')};
       }
     `}
 
-  ${({ theme, highlighted }) =>
+  ${({ highlighted }) =>
     highlighted &&
     css`
-      background: linear-gradient(
-          ${theme.overlay.darken[1]},
-          ${theme.overlay.darken[1]}
-        ),
-        linear-gradient(
-          ${theme.backgroundColor.primary},
-          ${theme.backgroundColor.primary}
-        );
+      ${createOverlayBackground('darken-1', 'primary')};
     `}
 `;
 

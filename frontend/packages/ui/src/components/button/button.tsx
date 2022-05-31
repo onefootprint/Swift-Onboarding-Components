@@ -1,6 +1,7 @@
 import React from 'react';
 import styled, { css } from 'styled';
 
+import { createFontStyles, createOverlayBackground } from '../../utils/mixins';
 import LoadingIndicator from '../loading-indicator';
 import {
   activeBackgroundColor,
@@ -78,40 +79,28 @@ const Container = styled.button<{
   ${({ theme, size }) =>
     size === 'default' &&
     css`
-      font-family: ${theme.typography['label-2'].fontFamily};
-      font-size: ${theme.typography['label-2'].fontSize};
-      font-weight: ${theme.typography['label-2'].fontWeight};
-      line-height: ${theme.typography['label-2'].lineHeight};
+      ${createFontStyles('label-2')};
       padding: ${theme.spacing[4]}px ${theme.spacing[7]}px;
     `}
 
   ${({ theme, size }) =>
     size === 'compact' &&
     css`
-      font-family: ${theme.typography['label-3'].fontFamily};
-      font-size: ${theme.typography['label-3'].fontSize};
-      font-weight: ${theme.typography['label-3'].fontWeight};
-      line-height: ${theme.typography['label-3'].lineHeight};
+      ${createFontStyles('label-3')};
       padding: ${theme.spacing[1] + theme.spacing[3]}px ${theme.spacing[7]}px;
     `}
 
     ${({ theme, size }) =>
     size === 'small' &&
     css`
-      font-family: ${theme.typography['label-4'].fontFamily};
-      font-size: ${theme.typography['label-4'].fontSize};
-      font-weight: ${theme.typography['label-4'].fontWeight};
-      line-height: ${theme.typography['label-4'].lineHeight};
+      ${createFontStyles('label-4')};
       padding: ${theme.spacing[2]}px ${theme.spacing[4]}px;
     `}
 
     ${({ theme, size }) =>
     size === 'large' &&
     css`
-      font-family: ${theme.typography['label-1'].fontFamily};
-      font-size: ${theme.typography['label-1'].fontSize};
-      font-weight: ${theme.typography['label-1'].fontWeight};
-      line-height: ${theme.typography['label-1'].lineHeight};
+      ${createFontStyles('label-1')};
       padding: ${theme.spacing[5]}px ${theme.spacing[7]}px;
     `}
 
@@ -127,28 +116,20 @@ const Container = styled.button<{
   }
 
   &:hover:enabled {
-    ${({ variant, theme }) => css`
-      background: linear-gradient(
-          ${theme.overlay[hoverBackgroundColor[variant]][1]},
-          ${theme.overlay[hoverBackgroundColor[variant]][1]}
-        ),
-        linear-gradient(
-          ${theme.backgroundColor[backgroundColors[variant]]},
-          ${theme.backgroundColor[backgroundColors[variant]]}
-        );
+    ${({ variant }) => css`
+      ${createOverlayBackground(
+        hoverBackgroundColor[variant],
+        backgroundColors[variant],
+      )}
     `}
   }
 
   &:active:enabled {
-    ${({ variant, theme }) => css`
-      background: linear-gradient(
-          ${theme.overlay[activeBackgroundColor[variant]][2]},
-          ${theme.overlay[activeBackgroundColor[variant]][2]}
-        ),
-        linear-gradient(
-          ${theme.backgroundColor[backgroundColors[variant]]},
-          ${theme.backgroundColor[backgroundColors[variant]]}
-        );
+    ${({ variant }) => css`
+      ${createOverlayBackground(
+        activeBackgroundColor[variant],
+        backgroundColors[variant],
+      )}
     `}
   }
 `;

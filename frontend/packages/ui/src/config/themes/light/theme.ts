@@ -61,14 +61,10 @@ const theme: DefaultTheme = {
     3: '0px 1px 12px rgba(0, 0, 0, 0.18)',
   },
   overlay: {
-    lighten: {
-      1: rgba(primitives.gray0, 0.14),
-      2: rgba(primitives.gray0, 0.18),
-    },
-    darken: {
-      1: rgba(primitives.gray1000, 0.04),
-      2: rgba(primitives.gray1000, 0.08),
-    },
+    'lighten-1': rgba(primitives.gray0, 0.14),
+    'lighten-2': rgba(primitives.gray0, 0.18),
+    'darken-1': rgba(primitives.gray1000, 0.04),
+    'darken-2': rgba(primitives.gray1000, 0.08),
   },
 };
 

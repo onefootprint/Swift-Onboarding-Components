@@ -2,6 +2,8 @@ import IcoSearch16 from 'icons/ico/ico-search-16';
 import React from 'react';
 import styled, { css } from 'styled';
 
+import { createFontStyles } from '../../../../utils/mixins';
+
 export type SelectSearchProps = {
   'aria-activedescendant'?: string;
   'aria-autocomplete'?: 'list' | 'none' | 'inline' | 'both';
@@ -78,16 +80,13 @@ const InputContainer = styled.div`
 
 const Input = styled.input`
   ${({ theme }) => css`
+    ${createFontStyles('body-3')};
     background: ${theme.backgroundColor.primary};
     border-top-left-radius: ${theme.borderRadius[1]}px;
     border-top-right-radius: ${theme.borderRadius[1]}px;
     border: none;
     color: ${theme.color.primary};
-    font-family: ${theme.typography['body-3'].fontFamily};
-    font-size: ${theme.typography['body-3'].fontSize};
-    font-weight: ${theme.typography['body-3'].fontWeight};
     height: 100%;
-    line-height: ${theme.typography['body-3'].lineHeight};
     outline: none;
     padding-left: ${theme.spacing[9]}px;
     width: 100%;

@@ -7,16 +7,7 @@ export type UIStates = {
   warning: string;
 };
 
-export type Typography = {
-  fontSize: string;
-  lineHeight: string;
-  fontWeight: number;
-  fontFamily: any;
-};
-
-export type Typographies = Record<FontFamily, Typography>;
-
-export type FontFamily =
+export type FontVariant =
   | 'display-1'
   | 'display-2'
   | 'display-3'
@@ -35,15 +26,20 @@ export type FontFamily =
   | 'caption-1'
   | 'caption-2';
 
+export type Typography = {
+  fontSize: string;
+  lineHeight: string;
+  fontWeight: number;
+  fontFamily: any;
+};
+
+export type Typographies = Record<FontVariant, Typography>;
+
 export type Overlays = {
-  darken: {
-    1: string;
-    2: string;
-  };
-  lighten: {
-    1: string;
-    2: string;
-  };
+  'lighten-1': string;
+  'lighten-2': string;
+  'darken-1': string;
+  'darken-2': string;
 };
 
 export type Colors = {
@@ -114,7 +110,7 @@ export type BackgroundColors = {
   quinary: string;
 } & UIStates;
 
-export type BackgroundsColor = keyof BackgroundColors;
+export type BackgroundColor = keyof BackgroundColors;
 
 export type Overlay = keyof Overlays;
 
