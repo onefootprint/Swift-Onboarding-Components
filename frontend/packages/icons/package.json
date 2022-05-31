@@ -6,7 +6,9 @@
   "types": "./index.ts",
   "scripts": {
     "lint": "eslint src --fix",
-    "generate:icos": "node ./src/scripts/generate-icos.js && eslint --fix \"./**/*.{ts,tsx,md}\" && prettier --write \"./**/*.{ts,tsx,md}\""
+    "generate:icos": "node ./src/scripts/icos/generate.js",
+    "generate:flags": "node ./src/scripts/flags/generate.js",
+    "generate": "yarn generate:icos && yarn generate:flags && prettier --write \"./**/*.{ts,tsx,md}\" && eslint --fix \"./**/*.{ts,tsx,md}\""
   },
   "devDependencies": {
     "@svgr/core": "^6.2.1",

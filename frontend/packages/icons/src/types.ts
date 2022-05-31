@@ -7,3 +7,10 @@ export type IconProps = {
 };
 
 export type Icon = (props: IconProps) => JSX.Element;
+
+export type FlagProps = {
+  className?: string;
+  testID?: string;
+};
+
+export type Flag = (props: FlagProps) => JSX.Element;

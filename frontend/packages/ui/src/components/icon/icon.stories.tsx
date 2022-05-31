@@ -1,10 +1,11 @@
 import { ComponentMeta, ComponentStory } from '@storybook/react';
-import Icos from 'icons';
+import { flags, icos } from 'icons';
 import IcoChevronDown16 from 'icons/ico/ico-chevron-down-16';
 import React from 'react';
 import { withDesign } from 'storybook-addon-designs';
 
 import light from '../../config/themes/light';
+import Box from '../box';
 import Typography from '../typography';
 
 export default {
@@ -21,31 +22,64 @@ export const AllIcons: ComponentStory<typeof IcoChevronDown16> = ({
   color,
   testID,
 }) => (
-  <>
-    {Object.keys(Icos).map(iconName => {
-      // @ts-ignore
-      const IcoComponent = Icos[iconName];
-      return (
-        <>
-          <div
-            style={{
-              display: 'flex',
-              marginBottom: '4px',
-              alignItems: 'center',
-            }}
-          >
-            <div style={{ minWidth: '32px' }}>
-              <IcoComponent color={color} testID={testID} />
-            </div>
-            <Typography variant="body-2" color="primary">
-              {iconName}
-            </Typography>
-          </div>
-          <hr />
-        </>
-      );
-    })}
-  </>
+  <Box>
+    <Box sx={{ marginBottom: 10 }}>
+      <Typography color="primary" variant="heading-2" sx={{ marginBottom: 3 }}>
+        Icos
+      </Typography>
+      {Object.keys(icos).map(iconName => {
+        // @ts-ignore
+        const IcoComponent = icos[iconName];
+        return (
+          <>
+            <Box
+              sx={{
+                display: 'flex',
+                marginBottom: 2,
+                alignItems: 'center',
+              }}
+            >
+              <Box sx={{ minWidth: '32px' }}>
+                <IcoComponent color={color} testID={testID} />
+              </Box>
+              <Typography variant="body-2" color="primary">
+                {iconName}
+              </Typography>
+            </Box>
+            <hr />
+          </>
+        );
+      })}
+    </Box>
+    <Box>
+      <Typography color="primary" variant="heading-2" sx={{ marginBottom: 3 }}>
+        Flags
+      </Typography>
+      {Object.keys(flags).map(flagName => {
+        // @ts-ignore
+        const IcoComponent = flags[flagName];
+        return (
+          <>
+            <Box
+              sx={{
+                display: 'flex',
+                marginBottom: 2,
+                alignItems: 'center',
+              }}
+            >
+              <Box sx={{ minWidth: '32px' }}>
+                <IcoComponent color={color} testID={testID} />
+              </Box>
+              <Typography variant="body-2" color="primary">
+                {flagName}
+              </Typography>
+            </Box>
+            <hr />
+          </>
+        );
+      })}
+    </Box>
+  </Box>
 );
 
 AllIcons.parameters = {
