@@ -29,7 +29,7 @@ const Layout = ({ children }: LayoutProps) => {
       <FooterContainer>
         <InvestorsSection
           imgAlt={t('investors.img-alt')}
-          imgSrc="/investors/logo.png"
+          imgSrc="/footer/investors.png"
           subtitle={t('investors.subtitle')}
           title={t('investors.title')}
         />

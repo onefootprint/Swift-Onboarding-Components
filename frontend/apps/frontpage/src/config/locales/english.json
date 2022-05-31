@@ -86,17 +86,17 @@
           "conversion": {
             "content": "Our one-click flow increases conversion by dramatically reducing time to account creation.",
             "img-alt": "",
-            "title": "Increased conversion"
+            "title": "12x faster"
           },
           "dev": {
             "content": "With a few lines of code, you'll have KYC and PII Vaulting running in less than a day. It's that simple.",
             "img-alt": "",
-            "title": "Enhanced dev experience"
+            "title": "10x dev experience"
           },
           "cost": {
             "content": "Say goodbye to needing separate KYC and Tokenization tools. We do both in-one, and pass along the savings.",
             "img-alt": "",
-            "title": "Decreased cost"
+            "title": "2x cheaper"
           }
         }
       },

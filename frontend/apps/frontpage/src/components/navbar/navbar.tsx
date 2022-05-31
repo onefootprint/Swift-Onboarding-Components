@@ -42,7 +42,7 @@ const Navbar = ({ logoAlt, cta, onCtaClick }: NavbarProps) => {
               height={24}
               layout="fixed"
               priority
-              src="/images/nav-logo.png"
+              src="/navbar/navbar-logo.png"
               width={115}
             />
           </a>

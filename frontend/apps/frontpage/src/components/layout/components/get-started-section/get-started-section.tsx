@@ -3,8 +3,6 @@ import React from 'react';
 import styled, { css } from 'styled';
 import { Button, Container, media, Typography } from 'ui';
 
-import footprintLogo from '../../../../../public/images/footprint-circle.png';
-import lighting from '../../../../../public/images/lightning.png';
 import CircleBackground from './components/circle-background';
 
 type GetStartedSectionProps = {
@@ -28,7 +26,7 @@ const GetStartedSection = ({
             alt="Footprint logo"
             height={107}
             layout="fixed"
-            src={footprintLogo}
+            src="/footer/footprint-circle.png"
             width={118}
           />
         </LogoContainer>
@@ -46,7 +44,7 @@ const GetStartedSection = ({
               <Image
                 alt="A thunder to illustrate that we are fast"
                 height={60}
-                src={lighting}
+                src="/footer/lightning.png"
                 width={44}
               />
             </TitleImageContainer>

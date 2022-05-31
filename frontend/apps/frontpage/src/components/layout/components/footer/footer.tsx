@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import React from 'react';
 import styled, { css } from 'styled';
 import { Container, media, Typography } from 'ui';
@@ -15,21 +16,30 @@ const Footer = ({ copyright, links }: FooterProps) => (
       <Typography variant="body-3" color="senary">
         © {currentYear} {copyright}
       </Typography>
-      <LinksList>
-        {links.map(link => (
-          <li key={link.text}>
-            <a
-              href={link.href}
-              rel="noopener noreferrer"
-              target={link.newWindow ? '_blank' : undefined}
-            >
-              <Typography variant="body-3" color="senary">
-                {link.text}
-              </Typography>
-            </a>
-          </li>
-        ))}
-      </LinksList>
+      <NavContainer>
+        <Nav>
+          {links.map(link => (
+            <li key={link.text}>
+              <a
+                href={link.href}
+                rel="noopener noreferrer"
+                target={link.newWindow ? '_blank' : undefined}
+              >
+                <Typography variant="body-3" color="senary">
+                  {link.text}
+                </Typography>
+              </a>
+            </li>
+          ))}
+        </Nav>
+        <Image
+          height={40}
+          width={40}
+          layout="fixed"
+          alt="SOC 2 badge"
+          src="/footer/soc-2-badge.png"
+        />
+      </NavContainer>
     </Inner>
   </Container>
 );
@@ -37,24 +47,46 @@ const Footer = ({ copyright, links }: FooterProps) => (
 const Inner = styled.div`
   ${({ theme }) => css`
     display: flex;
-    justify-content: space-between;
-    padding: ${theme.spacing[6]}px 0;
+    flex-direction: column;
+    gap: ${theme.spacing[5]}px;
     margin-top: ${theme.spacing[10]}px;
+    padding: ${theme.spacing[6]}px 0 ${theme.spacing[9]}px;
+    text-align: center;
+    align-items: center;
 
-    ${media.greaterThan('lg')`
+    ${media.greaterThan('md')`
+      flex-direction: row;
+      justify-content: space-between;
       margin-top: ${theme.spacing[11]}px;
+      padding: ${theme.spacing[6]}px 0;
+      text-align: unset;
     `}
   `}
 `;
 
-const LinksList = styled.ul`
+const NavContainer = styled.nav`
+  ${({ theme }) => css`
+    ${media.greaterThan('md')`
+      display: flex;
+      align-items: center;
+      gap: ${theme.spacing[5]}px;
+    `}
+  `}
+`;
+
+const Nav = styled.ul`
   ${({ theme }) => css`
     display: flex;
-    flex-direction: row;
+    justify-content: center;
+    gap: ${theme.spacing[5]}px;
+    margin-bottom: ${theme.spacing[7]}px;
+
+    ${media.greaterThan('md')`
+      margin-bottom: unset;
+    `}
 
     li {
       list-style: none;
-      margin-left: ${theme.spacing[4]}px;
     }
 
     a {
