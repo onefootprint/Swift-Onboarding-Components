@@ -3,7 +3,7 @@ use crate::{
     errors::ApiError,
     liveness::LivenessWebauthnConfig,
     types::{success::ApiResponseData, Empty},
-    utils::challenge::Challenge,
+    utils::challenge::{Challenge, ChallengeToken},
     State,
 };
 use chrono::{Duration, Utc};
@@ -17,7 +17,7 @@ use webauthn_rs::{proto::UserVerificationPolicy, RegistrationState};
 pub struct WebAuthnInitResponse {
     // TODO do we have to explicitly convert this to JSON?
     challenge_json: String,
-    challenge_token: String,
+    challenge_token: ChallengeToken,
 }
 
 /// Get a registration challenge
@@ -59,7 +59,7 @@ pub fn init(
 #[derive(Debug, Clone, Deserialize, Serialize, Apiv2Schema)]
 struct WebauthnRegisterRequest {
     device_response_json: String,
-    challenge_token: String,
+    challenge_token: ChallengeToken,
 }
 
 /// Response to a registration challenge

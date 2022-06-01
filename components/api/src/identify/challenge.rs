@@ -1,6 +1,7 @@
 use crate::errors::ApiError;
 use crate::identify::{clean_phone_number, send_phone_challenge};
 use crate::types::success::ApiResponseData;
+use crate::utils::challenge::ChallengeToken;
 use crate::State;
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 
@@ -11,7 +12,7 @@ pub struct ChallengeRequest {
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Serialize)]
 pub struct ChallengeResponse {
-    challenge_token: String, // Sealed Challenge<PhoneChallengeState>
+    challenge_token: ChallengeToken, // Sealed Challenge<PhoneChallengeState>
 }
 
 #[api_v2_operation(tags(Identify))]

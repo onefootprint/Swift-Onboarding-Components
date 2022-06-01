@@ -1,7 +1,7 @@
 use crate::identify::clean_email;
 use crate::liveness::LivenessWebauthnConfig;
 use crate::types::success::ApiResponseData;
-use crate::utils::challenge::Challenge;
+use crate::utils::challenge::{Challenge, ChallengeToken};
 use crate::State;
 use crate::{errors::ApiError, liveness::get_webauthn_creds};
 use chrono::{Duration, Utc};
@@ -39,7 +39,7 @@ pub struct IdentifyResponse {
 #[serde(rename_all = "snake_case")]
 pub struct UserChallengeData {
     challenge_kind: ChallengeKind,
-    challenge_token: String,
+    challenge_token: ChallengeToken,
     phone_number_last_two: String,
     biometric_challenge_json: Option<String>,
 }
@@ -155,7 +155,7 @@ async fn initiate_biometric_challenge_for_user(
     state: &web::Data<State>,
     user_id: &UserVaultId,
     creds: Vec<WebauthnCredential>,
-) -> Result<(String, String), ApiError> {
+) -> Result<(ChallengeToken, String), ApiError> {
     if creds.is_empty() {
         return Err(ApiError::WebauthnCredentialsNotSet);
     }

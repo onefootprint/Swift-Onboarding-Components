@@ -5,7 +5,7 @@ pub mod verify;
 use std::str::FromStr;
 
 use crate::signed_hash;
-use crate::utils::challenge::Challenge;
+use crate::utils::challenge::{Challenge, ChallengeToken};
 use crate::{errors::ApiError, State};
 use aws_sdk_pinpointemail::model::{
     Body as EmailBody, Content as EmailStringContent, Destination as EmailDestination,
@@ -17,8 +17,7 @@ use chrono::{Duration, Utc};
 use crypto::b64::Base64Data;
 use crypto::{serde_cbor, sha256};
 use db::models::session_data::{ChallengeLastSentData, SessionState};
-use db::models::user_vaults::{UserVault, UserVaultWrapper};
-use newtypes::{DataKind, UserVaultId};
+use newtypes::UserVaultId;
 use paperclip::actix::{web, Apiv2Schema};
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
@@ -94,7 +93,7 @@ pub fn clean_email(raw_email: String) -> String {
 pub(crate) async fn send_phone_challenge(
     state: &web::Data<State>,
     phone_number: String,
-) -> Result<String, ApiError> {
+) -> Result<ChallengeToken, ApiError> {
     // 555-01* numbers are reserved / not real, we use these for integration testing with a known code
     let phone_number_digits: String = phone_number.clone().chars().skip(5).take(5).collect();
     let is_test_phone_number = phone_number_digits.as_str() == "55501";

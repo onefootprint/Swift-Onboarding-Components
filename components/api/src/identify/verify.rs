@@ -3,7 +3,7 @@ use crate::errors::ApiError;
 use crate::identify::{signed_hash, BiometricChallengeState, PhoneChallengeState};
 use crate::liveness::LivenessWebauthnConfig;
 use crate::types::success::ApiResponseData;
-use crate::utils::challenge::Challenge;
+use crate::utils::challenge::{Challenge, ChallengeToken};
 use crate::State;
 use aws_sdk_kms::model::DataKeyPairSpec;
 use chrono::{Duration, Utc};
@@ -17,7 +17,7 @@ use super::seal;
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
 struct VerifyRequest {
-    challenge_token: String, // Sealed Challenge<PhoneChallengeState>
+    challenge_token: ChallengeToken, // Sealed Challenge<PhoneChallengeState>
     challenge_kind: ChallengeKind,
     challenge_response: String,
 }
@@ -76,12 +76,12 @@ async fn handler(
 
 fn validate_biometric_challenge(
     state: &web::Data<State>,
-    challenge_token: &str,
+    challenge_token: &ChallengeToken,
     challenge_response: &str,
 ) -> Result<(UserVaultId, VerifyKind), ApiError> {
     // Decode and validate the response to the biometric challenge
     let challenge =
-        Challenge::<BiometricChallengeState>::unseal(&state.session_sealing_key, &challenge_token)?;
+        Challenge::<BiometricChallengeState>::unseal(&state.session_sealing_key, challenge_token)?;
     let webauthn = webauthn_rs::Webauthn::new(LivenessWebauthnConfig::new(&state));
     let auth_resp = serde_json::from_str(challenge_response)?;
     let (_, _authenticator_data) = webauthn
@@ -93,7 +93,7 @@ fn validate_biometric_challenge(
 
 async fn validate_sms_challenge(
     state: &web::Data<State>,
-    challenge_token: &str,
+    challenge_token: &ChallengeToken,
     challenge_response: &str,
 ) -> Result<(UserVaultId, VerifyKind), ApiError> {
     // Decode and validate the response to the SMS challenge
