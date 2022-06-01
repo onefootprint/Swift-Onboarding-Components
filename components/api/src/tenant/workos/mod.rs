@@ -21,7 +21,6 @@ pub fn routes() -> web::Scope {
 pub struct WorkOSClient {
     pub client_id: String,
     pub client_secret: String,
-    pub callback_uri: String,
     pub default_org: String,
 }
 
@@ -87,9 +86,10 @@ impl WorkOSClient {
         &self,
         client: &Client,
         provider: String,
+        redirect_url: String,
     ) -> Result<String, ApiError> {
-        let (client_id, redirect_uri) = (self.client_id.clone(), self.callback_uri.clone());
-        let auth_url = format!("https://api.workos.com/sso/authorize?response_type=code&client_id={client_id}&redirect_uri={redirect_uri}&provider={provider}");
+        let client_id = self.client_id.clone();
+        let auth_url = format!("https://api.workos.com/sso/authorize?response_type=code&client_id={client_id}&redirect_uri={redirect_url}&provider={provider}");
         let auth_response = client
             .get(auth_url)
             .send()

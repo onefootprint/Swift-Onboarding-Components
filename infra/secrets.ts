@@ -15,9 +15,7 @@ export interface StaticSecrets {
     enclaveUserSecretKey: aws.ssm.Parameter;
     dbPassword: pulumi.Output<string>;
     cookieSessionKey: aws.ssm.Parameter;
-    workosClientId: aws.ssm.Parameter;
     workosSecretKey: aws.ssm.Parameter;
-    workosDefaultOrg: aws.ssm.Parameter;
 }
 
 interface SecretConstants {
@@ -30,9 +28,7 @@ interface ElasticSecrets {
 }
 
 interface Workos {
-    clientId: string;
     secretKey: string;
-    defaultOrg: string;
 }
 
 export async function LoadSecrets(config: pulumi.Config, enclaveKeyDescriptor: EnclaveKeyDescriptor): Promise<StaticSecrets> {
@@ -85,9 +81,7 @@ export async function LoadSecrets(config: pulumi.Config, enclaveKeyDescriptor: E
             value: pulumi.secret(sessionKey.hex),
             name: `/static_secrets/api-session-key-${stack}`,
         }),
-        workosClientId: createSecretParameter(`workosClientId-${stack}`, secretConstants.workos.clientId),
         workosSecretKey: createSecretParameter(`workosSecretKey-${stack}`, secretConstants.workos.secretKey),
-        workosDefaultOrg: createSecretParameter(`workosDefaultOrg-${stack}`, secretConstants.workos.defaultOrg),
     }
 }
 

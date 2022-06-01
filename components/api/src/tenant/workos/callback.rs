@@ -2,7 +2,6 @@ use crate::tenant::workos::WorkOSProfile;
 use crate::State;
 use crate::{errors::ApiError, types::success::ApiResponseData};
 use actix_session::Session;
-use actix_web::HttpResponse;
 use chrono::{Duration, Utc};
 use db::models::session_data::{SessionState, TenantDashboardSessionData};
 use paperclip::actix::Apiv2Schema;
@@ -19,14 +18,23 @@ struct DashboardAuthorization {
     profile: WorkOSProfile,
 }
 
+#[derive(serde::Serialize, Apiv2Schema)]
+struct DashboardAuthorizationResponse {
+    email: String,
+    auth: String,
+    first_name: Option<String>,
+    last_name: Option<String>,
+}
+
 #[api_v2_operation(tags(Private, WorkOS))]
-#[get("/callback")]
-/// Callback function for WorkOS API
+#[get("/login")]
+/// Called from the front-end with the WorkOS code. Returns
+/// the authorization token needed for future requests as well as user information
 fn handler(
     state: web::Data<State>,
     _session: Session,
     code: web::Query<Code>,
-) -> actix_web::Result<HttpResponse, ApiError> {
+) -> actix_web::Result<Json<ApiResponseData<DashboardAuthorizationResponse>>, ApiError> {
     let code = &code.code;
 
     let client = awc::Client::default();
@@ -45,7 +53,7 @@ fn handler(
         .unwrap_or_else(|| state.workos_client.default_org.clone());
 
     // Save logged in session data into the DB
-    let login_expires_at = Utc::now().naive_utc() + Duration::minutes(15);
+    let login_expires_at = Utc::now().naive_utc() + Duration::minutes(60);
     let (_, auth_token) = SessionState::TenantDashboardSession(TenantDashboardSessionData {
         email: profile.email.clone(),
         first_name: profile.first_name.clone(),
@@ -54,15 +62,13 @@ fn handler(
     })
     .create(&state.db_pool, login_expires_at)
     .await?;
-    
-    let redirect_url = format!
-        ("{}/auth?auth={}&email={}", 
-        &state.fe_redirect_uri,
-        auth_token,
-        profile.email
-    );
-    Ok(HttpResponse::TemporaryRedirect()
-    .append_header((actix_web::http::header::LOCATION, redirect_url))
-    .finish())
 
+    Ok(Json(ApiResponseData {
+        data: DashboardAuthorizationResponse {
+            email: profile.email.clone(),
+            auth: auth_token,
+            first_name: profile.first_name.clone(),
+            last_name: profile.last_name.clone(),
+        },
+    }))
 }

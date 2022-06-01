@@ -50,9 +50,6 @@ pub struct Config {
     #[envconfig(from = "COOKIE_SESSION_KEY")]
     pub cookie_session_key_hex: Option<String>,
 
-    #[envconfig(from = "APPLICATION_URI", default = "http://localhost:8000")]
-    pub application_uri: String,
-
     #[envconfig(from = "RELYING_PARTY_ID", default = "localhost")]
     pub rp_id: String,
 

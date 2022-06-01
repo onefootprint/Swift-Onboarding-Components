@@ -8,6 +8,7 @@ export interface Config {
     containers: Containers;
     jumpBoxSSHPublicKey: string;
     rpId: string;
+    workos: Workos;
 }
 
 export interface Elastic {
@@ -17,4 +18,9 @@ export interface Elastic {
 export interface Containers {
     apiVersion: string;
     enclaveVersion: string;
+}
+
+export interface Workos {
+    defaultOrg: string,
+    clientId: string,
 }

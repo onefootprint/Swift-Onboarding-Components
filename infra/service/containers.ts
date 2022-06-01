@@ -27,10 +27,8 @@ export abstract class ServiceContainers {
                 database.databaseUrlSecretParam.arn,
                 secretsStore.cookieSessionKey.arn,
                 signingKeyDescriptor.rootKeyId,
-                secretsStore.workosClientId.arn,
                 secretsStore.workosSecretKey.arn,
-                secretsStore.workosDefaultOrg.arn,
-            ]).apply(([rootKeyId, enclaveAccessKeyId, enclaveUserArn, databaseUrlArn, cookieSessionKeyArn, signingKeyId, workosClientId, workosSecretKey, workosDefaultOrg]) => {
+            ]).apply(([rootKeyId, enclaveAccessKeyId, enclaveUserArn, databaseUrlArn, cookieSessionKeyArn, signingKeyId, workosSecretKey]) => {
                 const def = [{
                     name,
                     image,
@@ -49,16 +47,8 @@ export abstract class ServiceContainers {
                             valueFrom: cookieSessionKeyArn
                         },
                         {
-                            name: "WORKOS_CLIENT_ID",
-                            valueFrom: workosClientId
-                        },
-                        {
                             name: "WORKOS_API_KEY",
                             valueFrom: workosSecretKey
-                        },
-                        {
-                            name: "WORKOS_DEFAULT_ORG",
-                            valueFrom: workosDefaultOrg
                         }
                     ],
                     environment: [
@@ -103,8 +93,12 @@ export abstract class ServiceContainers {
                             value: `service.name=fpc-api,service.version=1.0,deployment.environment=${pulumi.getStack()}`
                         },
                         {
-                            name: "APPLICATION_URI",
-                            value: `https://api.${pulumi.getStack()}.infra.footprint.dev`
+                            name: "WORKOS_CLIENT_ID",
+                            value: constants.workos.clientId
+                        },
+                        {
+                            name: "WORKOS_DEFAULT_ORG",
+                            value: constants.workos.defaultOrg
                         }
                     ],
                     links: ["otelcollect:otelcollect"],

@@ -6,7 +6,10 @@ use actix_web_opentelemetry::RequestMetrics;
 use config::Config;
 use crypto::aead::ScopedSealingKey;
 use db::DbPool;
-use enclave_proxy::{bb8::{self, ErrorSink}, pool, StreamManager};
+use enclave_proxy::{
+    bb8::{self, ErrorSink},
+    pool, StreamManager,
+};
 use signed_hash::SignedHashClient;
 use telemetry::TelemetrySpanBuilder;
 use tracing_actix_web::TracingLogger;
@@ -46,13 +49,12 @@ pub struct State {
     db_pool: DbPool,
     enclave_connection_pool: bb8::Pool<pool::StreamManager<StreamManager<Config>>>,
     session_sealing_key: ScopedSealingKey,
-    fe_redirect_uri: String,
 }
 
 /// Record errors that occur from enclave pool connections
 #[derive(Debug, Clone)]
 struct EnclavePoolErrorSink;
-impl ErrorSink<enclave_proxy::Error> for EnclavePoolErrorSink {    
+impl ErrorSink<enclave_proxy::Error> for EnclavePoolErrorSink {
     fn sink(&self, error: enclave_proxy::Error) {
         tracing::error!(target: "enclave_pool_error", error=?error, "enclave connection pool error");
     }
@@ -100,7 +102,6 @@ async fn main() -> std::io::Result<()> {
         let workos_client = WorkOSClient {
             client_id: config.workos_client_id.clone(),
             client_secret: config.workos_api_key.clone(),
-            callback_uri: format!("{}/auth/callback", config.application_uri.clone()),
             default_org: config.workos_default_org.clone(),
         };
 
@@ -129,12 +130,6 @@ async fn main() -> std::io::Result<()> {
             ScopedSealingKey::new(key, "SESSION_SEALING").expect("invalid cookie session key")
         };
 
-        let fe_redirect_uri = if config.application_uri.contains("localhost") {        
-            config.application_uri.replace("8000", "3000")
-        } else {
-            "https://dashboard.ui.footprint.dev".to_string()
-        };
-
         State {
             config: config.clone(),
             enclave_connection_pool: pool,
@@ -146,7 +141,6 @@ async fn main() -> std::io::Result<()> {
             workos_client,
             db_pool,
             session_sealing_key,
-            fe_redirect_uri
         }
     };
 
@@ -200,10 +194,7 @@ async fn main() -> std::io::Result<()> {
             .app_data(json_cfg)
             .wrap(session_middleware)
             .wrap_api()
-            .service(
-                web::scope("/private")
-                    .service(client::init::handler)
-            )
+            .service(web::scope("/private").service(client::init::handler))
             .service(identify::routes())
             .service(tenant::routes())
             .service(liveness::routes())
