@@ -15,6 +15,7 @@ export type DbOutput = {
     databaseUrl: pulumi.Output<string>;
     databaseUrlSecretParam: aws.ssm.Parameter;
     db: aws.rds.Cluster;
+    jumpKeypairName: pulumi.Output<string>;
 }
 
 /** TODO: 
@@ -41,7 +42,8 @@ export async function CreateDB(vpcProvider: vpcUtil.VpcRegion, clusterName: stri
         dbSubnetGroupName: dbSubnetGroup.name,
         databaseName: "footprint_db",
         storageEncrypted: true,
-        engineVersion: "10.14",
+        engineVersion: "10.18",
+        allowMajorVersionUpgrade: false,
         engine: "aurora-postgresql",
         engineMode: "serverless",
         masterPassword: secretsStore.dbPassword,
@@ -67,12 +69,13 @@ export async function CreateDB(vpcProvider: vpcUtil.VpcRegion, clusterName: stri
         name: `/static_secrets/db-url-${clusterName}`,
     });
 
-    await createDbJumpBox(clusterName, constants, databaseUrl, auroraVpcSecurityGroup, auroraVpc);
+    const jump = await createDbJumpBox(clusterName, constants, databaseUrl, auroraVpcSecurityGroup, auroraVpc);
 
     return {
         databaseUrl,
         db,
-        databaseUrlSecretParam
+        databaseUrlSecretParam,
+        jumpKeypairName: jump.keyName
     };
 }
 
@@ -102,7 +105,7 @@ async function createDbJumpBox(
     dbUrl: pulumi.Output<string>,
     securityGroup: awsx.ec2.SecurityGroup,
     vpc: awsx.ec2.Vpc
-) {
+): Promise<aws.ec2.Instance> {
     const size = "t2.micro";
 
     const jumpSg = new awsx.ec2.SecurityGroup(`jump-${clusterName}-sg`, {
@@ -192,4 +195,6 @@ chmod +x connect_db.sh`;
         associatePublicIpAddress: true,
         iamInstanceProfile,
     });
+
+    return jumpbox;
 }
