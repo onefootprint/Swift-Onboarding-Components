@@ -1,7 +1,7 @@
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { Events, UserData, UserDataAttribute } from 'src/bifrost-machine/types';
-import useBifrostMachine from 'src/hooks/use-bifrost-machine';
+import useBifrostMachine from 'src/hooks/bifrost/use-bifrost-machine';
 import useIdentifyEmail, {
   IdentifyEmailResponse,
 } from 'src/hooks/use-identify-email';

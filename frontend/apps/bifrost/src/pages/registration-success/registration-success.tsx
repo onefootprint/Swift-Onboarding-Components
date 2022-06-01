@@ -1,5 +1,5 @@
-import SuccessMessage from '@src/components/success-message';
 import React from 'react';
+import SuccessMessage from 'src/components/success-message';
 import { Typography } from 'ui';
 
 const RegistrationSuccess = () => {

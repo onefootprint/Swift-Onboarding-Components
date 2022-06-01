@@ -1,6 +1,6 @@
 import React from 'react';
 import { Events } from 'src/bifrost-machine/types';
-import useBifrostMachine from 'src/hooks/use-bifrost-machine';
+import useBifrostMachine from 'src/hooks/bifrost/use-bifrost-machine';
 import useIdentifyEmail from 'src/hooks/use-identify-email';
 import styled, { css } from 'styled';
 import { Box, LinkButton, LoadingIndicator, PinInput, Typography } from 'ui';
