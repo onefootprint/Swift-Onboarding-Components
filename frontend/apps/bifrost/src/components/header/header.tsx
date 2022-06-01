@@ -2,12 +2,12 @@ import React from 'react';
 import styled from 'styled';
 import { Typography } from 'ui';
 
-export type HeaderTitleProps = {
+export type HeaderProps = {
   title: string;
   subtitle: string;
 };
 
-const HeaderTitle = ({ title, subtitle }: HeaderTitleProps) => (
+const Header = ({ title, subtitle }: HeaderProps) => (
   <Container>
     <Typography variant="heading-2" color="primary" sx={{ marginBottom: 3 }}>
       {title}
@@ -22,4 +22,4 @@ const Container = styled.header`
   text-align: center;
 `;
 
-export default HeaderTitle;
+export default Header;

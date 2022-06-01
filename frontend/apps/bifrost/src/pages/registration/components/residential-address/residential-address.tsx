@@ -2,7 +2,7 @@ import { useTranslation } from 'hooks';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { Events, UserData, UserDataAttribute } from 'src/bifrost-machine/types';
-import Header from 'src/components/header-title';
+import Header from 'src/components/header';
 import useBifrostMachine from 'src/hooks/use-bifrost-machine';
 import styled, { css } from 'styled';
 import { AddressInput, Button, Grid, Select, TextInput } from 'ui';

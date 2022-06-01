@@ -1,14 +1,14 @@
 import React from 'react';
 import { customRender, screen } from 'test-utils';
 
-import HeaderTitle, { HeaderTitleProps } from './header-title';
+import Header, { HeaderProps } from './header';
 
-describe('<HeaderTitle />', () => {
+describe('<Header />', () => {
   const renderTitle = ({
     title = 'title',
     subtitle = 'subtitle',
-  }: Partial<HeaderTitleProps>) =>
-    customRender(<HeaderTitle title={title} subtitle={subtitle} />);
+  }: Partial<HeaderProps>) =>
+    customRender(<Header title={title} subtitle={subtitle} />);
 
   it('should render the title', () => {
     renderTitle({ title: 'Verify your phone number' });
