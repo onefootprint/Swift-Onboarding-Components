@@ -2,7 +2,7 @@ import React from 'react';
 
 import type { FlagProps } from '../src/types';
 
-const FlagGbEng = ({ className, testID }: FlagProps) => (
+const FlagGb = ({ className, testID }: FlagProps) => (
   <svg
     width={20}
     height={15}
@@ -34,4 +34,4 @@ const FlagGbEng = ({ className, testID }: FlagProps) => (
   </svg>
 );
 
-export default FlagGbEng;
+export default FlagGb;

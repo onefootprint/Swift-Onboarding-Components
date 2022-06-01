@@ -30,9 +30,6 @@ import FlagBl from '../flag/flag-bl';
 import FlagBm from '../flag/flag-bm';
 import FlagBn from '../flag/flag-bn';
 import FlagBo from '../flag/flag-bo';
-import FlagBqBo from '../flag/flag-bq-bo';
-import FlagBqSa from '../flag/flag-bq-sa';
-import FlagBqSe from '../flag/flag-bq-se';
 import FlagBr from '../flag/flag-br';
 import FlagBs from '../flag/flag-bs';
 import FlagBt from '../flag/flag-bt';
@@ -79,7 +76,7 @@ import FlagFm from '../flag/flag-fm';
 import FlagFo from '../flag/flag-fo';
 import FlagFr from '../flag/flag-fr';
 import FlagGa from '../flag/flag-ga';
-import FlagGbEng from '../flag/flag-gb-eng';
+import FlagGb from '../flag/flag-gb';
 import FlagGbNir from '../flag/flag-gb-nir';
 import FlagGbSct from '../flag/flag-gb-sct';
 import FlagGbUkm from '../flag/flag-gb-ukm';
@@ -257,7 +254,7 @@ import FlagZa from '../flag/flag-za';
 import FlagZm from '../flag/flag-zm';
 import FlagZw from '../flag/flag-zw';
 
-export default {
+const flags = {
   FlagAd,
   FlagAe,
   FlagAf,
@@ -287,9 +284,6 @@ export default {
   FlagBm,
   FlagBn,
   FlagBo,
-  FlagBqBo,
-  FlagBqSa,
-  FlagBqSe,
   FlagBr,
   FlagBs,
   FlagBt,
@@ -336,7 +330,7 @@ export default {
   FlagFo,
   FlagFr,
   FlagGa,
-  FlagGbEng,
+  FlagGb,
   FlagGbNir,
   FlagGbSct,
   FlagGbUkm,
@@ -514,3 +508,5 @@ export default {
   FlagZm,
   FlagZw,
 };
+
+export default flags;
