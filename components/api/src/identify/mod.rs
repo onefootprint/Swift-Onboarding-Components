@@ -1,5 +1,5 @@
-pub mod email;
-pub mod phone;
+pub mod challenge;
+pub mod identify;
 pub mod verify;
 
 use std::str::FromStr;
@@ -14,7 +14,6 @@ use aws_sdk_pinpointemail::model::{
 use aws_sdk_pinpointsmsvoicev2::output::SendTextMessageOutput;
 use chrono::NaiveDateTime;
 use chrono::{Duration, Utc};
-use crypto::aead::ScopedSealingKey;
 use crypto::b64::Base64Data;
 use crypto::{sha256, serde_cbor};
 use db::models::session_data::{ChallengeLastSentData, SessionState};
@@ -29,6 +28,13 @@ pub(crate) enum CreateChallengeRequest {
     PhoneNumber(String),
 }
 
+#[derive(Debug, Clone, Apiv2Schema, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub(crate) enum ChallengeKind {
+    Sms,
+    Biometric,
+}
+
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 pub struct EmailVerifyChallenge {
     pub expires_at: NaiveDateTime,
@@ -39,27 +45,6 @@ pub struct EmailVerifyChallenge {
 pub struct PhoneChallengeState {
     pub phone_number: String,
     pub h_code: Vec<u8>,
-}
-
-#[derive(Debug, Clone, Apiv2Schema, serde::Serialize)]
-pub struct ChallengeResponse {
-    phone_number_last_two: String,
-    challenge_token: String, // Sealed Challenge<PhoneChallengeState>
-}
-
-impl ChallengeResponse {
-    fn new(
-        challenge: Challenge<PhoneChallengeState>,
-        key: &ScopedSealingKey,
-    ) -> Result<Self, ApiError> {
-        let mut phone_number = challenge.data.phone_number.clone();
-        let len = phone_number.len();
-        let last_two = phone_number.drain((len - 2)..len).into_iter().collect();
-        Ok(Self {
-            challenge_token: challenge.seal(key)?,
-            phone_number_last_two: last_two,
-        })
-    }
 }
 
 // TODO move these utils somewhere else
@@ -264,7 +249,7 @@ fn build_email_challenge_content_body(contents: String) -> EmailContent {
 
 pub fn routes() -> web::Scope {
     web::scope("/identify")
-        .service(email::handler)
-        .service(phone::handler)
+        .service(web::resource("").route(web::post().to(identify::handler)))
+        .service(challenge::handler)
         .service(verify::handler)
 }

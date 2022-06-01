@@ -73,11 +73,12 @@ def foo_tenant():
     }
 
 def test_identify_email(request):
-    path = "identify/email"
+    path = "identify"
     print(url(path))
     email = _gen_random_email()
     request.config.cache.set("email", email)
-    data = {"email": email}
+    identifier = {"email": email}
+    data = {"identifier": identifier, "preferred_challenge_kind": "sms"}
 
     # First try identifying with an email. The user won't exist
     r = requests.post(
@@ -90,16 +91,32 @@ def test_identify_email(request):
 
 
 def test_identify_phone(request):
-    path = "identify/phone"
+    path = "identify"
+    print(url(path))
     phone_number = _gen_random_phone_number()
     request.config.cache.set("phone_number", phone_number)
+    identifier = {"phone_number": phone_number}
+    data = {"identifier": identifier, "preferred_challenge_kind": "sms"}
+
+    # First try identifying with an email. The user won't exist
+    r = requests.post(
+        url(path),
+        json=data,
+    )
+    body = _assert_response(r)
+    assert not body["data"]["user_found"]
+    assert not body["data"].get("challenge_data", dict())
+
+
+def test_identify_challenge(request):
+    path = "identify/challenge"
+    phone_number = request.config.cache.get("phone_number", None)
     data = {"phone_number": phone_number}
     r = requests.post(
         url(path),
         json=data,
     )
     body = _assert_response(r)
-    assert body["data"]["phone_number_last_two"] == phone_number[-2:]
     request.config.cache.set("challenge_token", body["data"]["challenge_token"])
 
 
@@ -178,14 +195,26 @@ def test_onboarding_complete(request, workos_tenant):
     assert fp_user_id
     request.config.cache.set("fp_user_id", fp_user_id)
 
-def test_identify_repeat_customer_via_email(request, foo_tenant):
+def test_identify_repeat_customer(request, foo_tenant):
     # Identify the user by email
     request.config.cache.set("fpuser_auth_token", None)  # Remove fpuser_auth_token from previous test
-    path = "identify/email"
+
+    path = "identify"
     print(url(path))
     email = request.config.cache.get("email", None)
     phone_number = request.config.cache.get("phone_number", None)
-    data = {"email": email}
+    identifier = {"email": email}
+    data = {"identifier": identifier, "preferred_challenge_kind": "sms"}
+    r = requests.post(
+        url(path),
+        json=data,
+    )
+    body = _assert_response(r)
+    assert body["data"]["user_found"]
+    assert body["data"]["challenge_data"]["phone_number_last_two"] == phone_number[-2:]
+
+    identifier = {"phone_number": phone_number}
+    data = {"identifier": identifier, "preferred_challenge_kind": "sms"}
     r = requests.post(
         url(path),
         json=data,

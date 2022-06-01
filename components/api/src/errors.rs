@@ -91,6 +91,8 @@ pub enum ApiError {
     WorkOSError,
     #[error("no phone number for vault")]
     NoPhoneNumberForVault,
+    #[error("not implemented")]
+    NotImplemented,
 }
 
 fn status_code_for_db_error(e: &DbError) -> StatusCode {
@@ -151,6 +153,7 @@ impl actix_web::ResponseError for ApiError {
             ApiError::WorkOSError => StatusCode::INTERNAL_SERVER_ERROR,
             // This invariant should never be broken
             ApiError::NoPhoneNumberForVault => StatusCode::INTERNAL_SERVER_ERROR,
+            ApiError::NotImplemented => StatusCode::INTERNAL_SERVER_ERROR,
         }
     }
 
