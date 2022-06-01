@@ -28,7 +28,6 @@ mod client;
 mod enclave;
 mod identify;
 mod index;
-mod liveness;
 mod onboarding;
 mod tenant;
 mod types;
@@ -197,7 +196,6 @@ async fn main() -> std::io::Result<()> {
             .service(web::scope("/private").service(client::init::handler))
             .service(identify::routes())
             .service(tenant::routes())
-            .service(liveness::routes())
             .service(onboarding::routes())
             .service(user::routes())
             .service(tenant::workos::routes())

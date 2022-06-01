@@ -1,19 +1,8 @@
-mod register;
-
 use crate::State;
-use db::{errors::DbError, models::webauthn_credential::WebauthnCredential};
-use newtypes::UserVaultId;
-use paperclip::actix::web;
 use webauthn_rs::{
     proto::{AttestationConveyancePreference, AuthenticatorAttachment, ParsedAttestationData},
     WebauthnConfig,
 };
-
-pub fn routes() -> web::Scope {
-    web::scope("/liveness")
-        .service(register::init)
-        .service(register::complete)
-}
 
 pub struct LivenessWebauthnConfig {
     url: url::Url,
@@ -82,18 +71,4 @@ impl WebauthnConfig for LivenessWebauthnConfig {
             ParsedAttestationData::Uncertain => Err(()),
         }
     }
-}
-
-pub async fn get_webauthn_creds(
-    state: &web::Data<State>,
-    user_vault_id: UserVaultId,
-) -> Result<Vec<WebauthnCredential>, DbError> {
-    state
-        .db_pool
-        .get()
-        .await
-        .map_err(DbError::from)?
-        .interact(move |conn| WebauthnCredential::get_for_user_vault(conn, user_vault_id))
-        .await
-        .map_err(DbError::from)?
 }

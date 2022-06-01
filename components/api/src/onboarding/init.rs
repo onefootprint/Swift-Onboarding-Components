@@ -1,13 +1,12 @@
 use crate::auth::client_public_key::PublicTenantAuthContext;
 use crate::auth::logged_in_session::LoggedInSessionContext;
 use crate::errors::ApiError;
-use crate::liveness::get_webauthn_creds;
 use crate::types::success::ApiResponseData;
 use crate::utils::insight_headers::InsightHeaders;
 use crate::State;
-use db::models::insight_event::CreateInsightEvent;
 use db::models::onboardings::NewOnboarding;
 use db::models::user_vaults::UserVaultWrapper;
+use db::{models::insight_event::CreateInsightEvent, webauthn_credentials::get_webauthn_creds};
 use newtypes::{DataKind, Status};
 use paperclip::actix::{api_v2_operation, web, web::Json, Apiv2Schema};
 
@@ -39,7 +38,7 @@ pub fn handler(
     )
     .await?;
 
-    let webauthn_creds = get_webauthn_creds(&state, uv.id.clone()).await?;
+    let webauthn_creds = get_webauthn_creds(&state.db_pool, uv.id.clone()).await?;
 
     let uvw = UserVaultWrapper::from(&state.db_pool, uv.clone()).await?;
     Ok(Json(ApiResponseData {

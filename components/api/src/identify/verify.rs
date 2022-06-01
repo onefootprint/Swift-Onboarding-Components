@@ -1,9 +1,9 @@
 use super::ChallengeKind;
 use crate::errors::ApiError;
 use crate::identify::{signed_hash, BiometricChallengeState, PhoneChallengeState};
-use crate::liveness::LivenessWebauthnConfig;
 use crate::types::success::ApiResponseData;
 use crate::utils::challenge::{Challenge, ChallengeToken};
+use crate::utils::liveness::LivenessWebauthnConfig;
 use crate::State;
 use aws_sdk_kms::model::DataKeyPairSpec;
 use chrono::{Duration, Utc};

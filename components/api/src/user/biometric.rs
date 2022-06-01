@@ -1,9 +1,11 @@
 use crate::{
     auth::logged_in_session::LoggedInSessionContext,
     errors::ApiError,
-    liveness::LivenessWebauthnConfig,
     types::{success::ApiResponseData, Empty},
-    utils::challenge::{Challenge, ChallengeToken},
+    utils::{
+        challenge::{Challenge, ChallengeToken},
+        liveness::LivenessWebauthnConfig,
+    },
     State,
 };
 use chrono::{Duration, Utc};
@@ -22,7 +24,7 @@ pub struct WebAuthnInitResponse {
 
 /// Get a registration challenge
 #[api_v2_operation(tags(Liveness))]
-#[post("/register/init")]
+#[post("/biometric/init")]
 pub fn init(
     // TODO only allow registering webauthn credentials if you have no previous credentials OR if
     // you logged into this session via webauthn. Otherwise, someone who SIM swaps you can register
@@ -64,7 +66,7 @@ struct WebauthnRegisterRequest {
 
 /// Response to a registration challenge
 #[api_v2_operation(tags(Liveness))]
-#[post("/register")]
+#[post("/biometric")]
 async fn complete(
     request: Json<WebauthnRegisterRequest>,
     user_auth: LoggedInSessionContext,

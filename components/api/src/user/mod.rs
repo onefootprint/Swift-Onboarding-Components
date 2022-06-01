@@ -3,6 +3,7 @@ use newtypes::DataKind;
 use paperclip::actix::web;
 
 pub mod access_events;
+pub mod biometric;
 pub mod data;
 pub mod decrypt;
 pub mod detail;
@@ -15,6 +16,8 @@ pub fn routes() -> web::Scope {
         .service(email_verify::handler)
         .service(decrypt::handler)
         .service(access_events::handler)
+        .service(biometric::init)
+        .service(biometric::complete)
 }
 
 pub fn clean_for_storage(data_kind: DataKind, data_str: String) -> String {

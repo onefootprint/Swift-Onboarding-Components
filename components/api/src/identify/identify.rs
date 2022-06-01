@@ -1,13 +1,14 @@
+use crate::errors::ApiError;
 use crate::identify::clean_email;
-use crate::liveness::LivenessWebauthnConfig;
 use crate::types::success::ApiResponseData;
 use crate::utils::challenge::{Challenge, ChallengeToken};
+use crate::utils::liveness::LivenessWebauthnConfig;
 use crate::State;
-use crate::{errors::ApiError, liveness::get_webauthn_creds};
 use chrono::{Duration, Utc};
 use crypto::serde_cbor;
 use db::models::user_vaults::{UserVault, UserVaultWrapper};
 use db::models::webauthn_credential::WebauthnCredential;
+use db::webauthn_credentials::get_webauthn_creds;
 use newtypes::{DataKind, UserVaultId};
 use paperclip::actix::{api_v2_operation, web, web::Json, Apiv2Schema};
 use webauthn_rs::proto::{Credential, UserVerificationPolicy};
@@ -78,7 +79,7 @@ pub async fn handler(
     let (challenge_kind, challenge_token, biometric_challenge_json) = match preferred_challenge_kind
     {
         ChallengeKind::Biometric => {
-            let creds = get_webauthn_creds(&state, user_id.clone()).await?;
+            let creds = get_webauthn_creds(&state.db_pool, user_id.clone()).await?;
             if !creds.is_empty() {
                 let (challenge_token, json) =
                     initiate_biometric_challenge_for_user(&state, &user_id, creds).await?;

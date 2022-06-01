@@ -1,12 +1,12 @@
+use crate::auth::client_public_key::PublicTenantAuthContext;
 use crate::auth::get_onboarding_for_tenant;
 use crate::auth::logged_in_session::LoggedInSessionContext;
 use crate::errors::ApiError;
 use crate::types::success::ApiResponseData;
 use crate::utils::insight_headers::InsightHeaders;
 use crate::State;
-use crate::{auth::client_public_key::PublicTenantAuthContext, liveness::get_webauthn_creds};
-use db::models::insight_event::CreateInsightEvent;
 use db::models::user_vaults::UserVaultWrapper;
+use db::{models::insight_event::CreateInsightEvent, webauthn_credentials::get_webauthn_creds};
 use newtypes::FootprintUserId;
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 
@@ -38,7 +38,7 @@ fn handler(
         .into_iter()
         .map(|x| x.to_string())
         .collect::<Vec<String>>();
-    let webauthn_creds = get_webauthn_creds(&state, uv_id).await?;
+    let webauthn_creds = get_webauthn_creds(&state.db_pool, uv_id).await?;
     // TODO kick off user verification with data vendors
 
     if missing_fields.is_empty() {
