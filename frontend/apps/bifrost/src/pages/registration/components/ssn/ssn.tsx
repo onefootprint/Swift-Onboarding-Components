@@ -1,4 +1,4 @@
-import { useTranslation } from 'hooks';
+import { useInputMask, useTranslation } from 'hooks';
 import IcoFileText24 from 'icons/ico/ico-file-text-24';
 import IcoLock24 from 'icons/ico/ico-lock-24';
 import IcoShield24 from 'icons/ico/ico-shield-24';
@@ -16,6 +16,7 @@ import Disclaimer from './components/disclaimer';
 type FormData = Required<Pick<UserData, UserDataAttribute.ssn>>;
 
 const SSN = () => {
+  const inputMasks = useInputMask('en');
   const [, send] = useBifrostMachine();
   const syncDataMutation = useSyncData();
   const { t } = useTranslation('pages.registration.ssn');
@@ -45,8 +46,10 @@ const SSN = () => {
         hasError={!!errors.ssn}
         hintText={errors.ssn && t('form.ssn.error')}
         label={t('form.ssn.label')}
+        mask={inputMasks.ssn}
         placeholder={t('form.ssn.placeholder')}
-        {...register('ssn', { required: true })}
+        type="tel"
+        {...register('ssn', { required: true, maxLength: 11 })}
       />
       <Disclaimer
         items={[
