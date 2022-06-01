@@ -1,5 +1,5 @@
 import { ComponentMeta, Story } from '@storybook/react';
-import Icos from 'icons';
+import { icos } from 'icons';
 import IcoClose24 from 'icons/ico/ico-close-24';
 import React from 'react';
 
@@ -22,7 +22,7 @@ export default {
     Icon: {
       control: 'select',
       description: 'Icon to be rendered',
-      options: Object.keys(Icos),
+      options: Object.keys(icos),
       name: 'Icon *',
     },
     testID: {
@@ -38,7 +38,7 @@ const Template: Story<IconButtonProps> = ({
   onClick,
   testID,
 }: IconButtonProps) => {
-  const SelectedIcon = typeof Icon === 'string' ? Icos[Icon] : Icon;
+  const SelectedIcon = typeof Icon === 'string' ? icos[Icon] : Icon;
   return (
     <IconButton
       ariaLabel={ariaLabel}

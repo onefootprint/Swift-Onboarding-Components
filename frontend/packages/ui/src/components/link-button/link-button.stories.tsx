@@ -1,5 +1,5 @@
 import { ComponentMeta, Story } from '@storybook/react';
-import Icos from 'icons';
+import { icos } from 'icons';
 import IcoArrowRightSmall24 from 'icons/ico/ico-arrow-right-small-24';
 import IcoPlusSmall24 from 'icons/ico/ico-plus-small-24';
 import React from 'react';
@@ -43,7 +43,7 @@ export default {
     Icon: {
       control: 'select',
       description: 'Icon to be rendered',
-      options: Object.keys(Icos),
+      options: Object.keys(icos),
     },
     testID: {
       control: 'text',
@@ -68,7 +68,7 @@ const Template: Story<LinkButtonProps> = ({
   target,
   testID,
 }: LinkButtonProps) => {
-  const SelectedIcon = typeof Icon === 'string' ? Icos[Icon] : Icon;
+  const SelectedIcon = typeof Icon === 'string' ? icos[Icon] : Icon;
   return (
     <LinkButton
       ariaLabel={ariaLabel}
