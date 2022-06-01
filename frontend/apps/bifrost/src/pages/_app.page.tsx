@@ -1,4 +1,5 @@
 import IcoClose24 from 'icons/ico/ico-close-24';
+import Head from 'next/head';
 import Script from 'next/script';
 import React from 'react';
 import { QueryClientProvider } from 'react-query';
@@ -22,10 +23,12 @@ type AppProps = {
 
 const App = ({ Component, pageProps }: AppProps) => (
   <>
-    <Script
-      src={`https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_KEY}&libraries=places`}
-      strategy="lazyOnload"
-    />
+    <Head>
+      <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+      />
+    </Head>
     <QueryClientProvider client={queryClient}>
       <BifrostMachineProvider>
         <DesignSystemProvider theme={themes.light}>
@@ -40,6 +43,10 @@ const App = ({ Component, pageProps }: AppProps) => (
         </DesignSystemProvider>
       </BifrostMachineProvider>
     </QueryClientProvider>
+    <Script
+      src={`https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_KEY}&libraries=places`}
+      strategy="lazyOnload"
+    />
   </>
 );
 
