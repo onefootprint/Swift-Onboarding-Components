@@ -5,7 +5,7 @@ import IcoShield24 from 'icons/ico/ico-shield-24';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { Events, UserData, UserDataAttribute } from 'src/bifrost-machine/types';
-import Header from 'src/components/header';
+import Header from 'src/components/header-title';
 import useBifrostMachine from 'src/hooks/use-bifrost-machine';
 import styled, { css } from 'styled';
 import { Button, TextInput } from 'ui';

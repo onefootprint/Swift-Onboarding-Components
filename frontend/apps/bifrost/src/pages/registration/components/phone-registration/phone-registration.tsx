@@ -3,7 +3,7 @@ import IcoEmail24 from 'icons/ico/ico-email-24';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { Events } from 'src/bifrost-machine/types';
-import Header from 'src/components/header';
+import Header from 'src/components/header-title';
 import useBifrostMachine from 'src/hooks/use-bifrost-machine';
 import styled, { css } from 'styled';
 import { Button, LinkButton, TextInput, Typography } from 'ui';
