@@ -27,6 +27,8 @@ export * from './progress-indicator';
 export { default as ProgressIndicator } from './progress-indicator';
 export * from './select';
 export { default as Select } from './select';
+export * from './tab';
+export { default as Tab } from './tab';
 export * from './text-area';
 export { default as Textarea } from './text-area';
 export * from './text-input';

@@ -14,7 +14,7 @@ const BackButton = () => {
     <Container>
       <LinkButton
         size="compact"
-        Icon={IcoChevronLeft16}
+        iconComponent={IcoChevronLeft16}
         iconPosition="left"
         onClick={handleClick}
       >

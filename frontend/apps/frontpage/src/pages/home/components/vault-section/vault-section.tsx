@@ -67,7 +67,7 @@ const VaultSection = () => {
           <MainArticleInner>
             <VaultArticle
               content={t('articles.main.content')}
-              Icon={IcoLock24}
+              iconComponent={IcoLock24}
               title={t('articles.main.title')}
             />
           </MainArticleInner>
@@ -77,7 +77,7 @@ const VaultSection = () => {
             <Article key={article.title}>
               <VaultArticle
                 content={article.content}
-                Icon={article.Icon}
+                iconComponent={article.Icon}
                 title={article.title}
               />
             </Article>

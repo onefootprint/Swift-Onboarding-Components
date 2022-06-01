@@ -1,4 +1,4 @@
-import type { Icon as TIcon } from 'icons';
+import type { Icon } from 'icons';
 import React, { forwardRef } from 'react';
 import styled, { css } from 'styled';
 
@@ -6,13 +6,16 @@ import { createOverlayBackground } from '../../utils/mixins';
 
 export type IconButtonProps = {
   ariaLabel: string;
-  Icon: TIcon;
+  iconComponent: Icon;
   onClick?: () => void;
   testID?: string;
 };
 
 const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
-  ({ ariaLabel, Icon, onClick, testID }: IconButtonProps, ref) => (
+  (
+    { ariaLabel, iconComponent: Icon, onClick, testID }: IconButtonProps,
+    ref,
+  ) => (
     <Container
       aria-label={ariaLabel}
       data-testid={testID}

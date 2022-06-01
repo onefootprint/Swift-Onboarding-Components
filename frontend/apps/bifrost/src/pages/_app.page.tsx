@@ -32,7 +32,7 @@ const App = ({ Component, pageProps }: AppProps) => (
           <GlobalStyle />
           <Container>
             <Header>
-              <IconButton Icon={IcoClose24} ariaLabel="Close window" />
+              <IconButton iconComponent={IcoClose24} ariaLabel="Close window" />
             </Header>
             <Component {...pageProps} />
             <FootprintFooter />

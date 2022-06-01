@@ -33,7 +33,7 @@ export default {
 } as ComponentMeta<typeof IconButton>;
 
 const Template: Story<IconButtonProps> = ({
-  Icon,
+  iconComponent: Icon,
   ariaLabel,
   onClick,
   testID,
@@ -42,7 +42,7 @@ const Template: Story<IconButtonProps> = ({
   return (
     <IconButton
       ariaLabel={ariaLabel}
-      Icon={SelectedIcon}
+      iconComponent={SelectedIcon}
       onClick={onClick}
       testID={testID}
     />
@@ -52,7 +52,7 @@ const Template: Story<IconButtonProps> = ({
 export const Base = Template.bind({});
 Base.args = {
   ariaLabel: 'Close',
-  Icon: IcoClose24,
+  iconComponent: IcoClose24,
   onClick: console.log,
   testID: 'icon-button-test-id',
 };

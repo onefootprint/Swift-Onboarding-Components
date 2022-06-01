@@ -22,7 +22,7 @@ const PlaygroundGridContent = ({
       <CircleIcon
         backgroundColor="tertiary"
         color="quinary"
-        Icon={IcoShield24}
+        iconComponent={IcoShield24}
         size="28px"
       />
       {subtitle}

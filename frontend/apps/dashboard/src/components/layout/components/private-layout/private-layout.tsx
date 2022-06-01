@@ -1,16 +1,30 @@
+import IcoCode16 from 'icons/ico/ico-code-16';
+import IcoFileText16 from 'icons/ico/ico-file-text-16';
 import IcoFootprint24 from 'icons/ico/ico-footprint-24';
+import IcoSettings16 from 'icons/ico/ico-settings-16';
 import IcoUser24 from 'icons/ico/ico-user-24';
+import IcoUsers16 from 'icons/ico/ico-users-16';
+import Link from 'next/link';
+import { useRouter } from 'next/router';
 import React from 'react';
 import styled, { css } from 'styled';
-import { Container, IconButton, Typography } from 'ui';
+import { Container, IconButton, Tab, Typography } from 'ui';
 
 import useSessionUser from '../../../../hooks/use-session-user';
+
+const routes = [
+  { href: '/users', Icon: IcoUsers16, text: 'Users' },
+  { href: '/security-logs', Icon: IcoFileText16, text: 'Security Logs' },
+  { href: '/developers', Icon: IcoCode16, text: 'Developers' },
+  { href: '/settings', Icon: IcoSettings16, text: 'Settings' },
+];
 
 type PrivateLayoutProps = {
   children: React.ReactNode;
 };
 
 const PrivateLayout = ({ children }: PrivateLayoutProps) => {
+  const router = useRouter();
   const { logOut } = useSessionUser();
   return (
     <div data-testid="private-layout">
@@ -23,25 +37,30 @@ const PrivateLayout = ({ children }: PrivateLayoutProps) => {
             <Typography variant="display-4">Footprint</Typography>
             <SuffixContainer>
               <IconButton
-                Icon={IcoUser24}
+                iconComponent={IcoUser24}
                 onClick={logOut}
                 ariaLabel="account"
               />
             </SuffixContainer>
           </Footprint>
         </Container>
-        <NavContainer>
+        <Nav>
           <Container>
-            <nav>
-              <NavList>
-                <PillTab text="Users" selected />
-                <PillTab text="Access logs" />
-                <PillTab text="Developers" />
-                <PillTab text="Settings" />
-              </NavList>
-            </nav>
+            <Tab.List>
+              {routes.map(({ href, Icon, text }) => (
+                <Link href={href} key={text}>
+                  <Tab.Item
+                    href={href}
+                    iconComponent={Icon}
+                    selected={router.pathname === href}
+                  >
+                    {text}
+                  </Tab.Item>
+                </Link>
+              ))}
+            </Tab.List>
           </Container>
-        </NavContainer>
+        </Nav>
       </header>
       <section>
         <Container>{children}</Container>
@@ -49,57 +68,6 @@ const PrivateLayout = ({ children }: PrivateLayoutProps) => {
     </div>
   );
 };
-
-type PillTabProps = {
-  text: string;
-  selected?: boolean;
-};
-
-// TODO migrate to PillTab component from component library
-const PillTab = ({ text, selected }: PillTabProps) => {
-  const textColor = selected ? 'quinary' : 'primary';
-  return (
-    <PillTabContainer selected={selected}>
-      <Typography
-        variant="label-4"
-        color={textColor}
-        sx={{ userSelect: 'none' }}
-      >
-        {text}
-      </Typography>
-    </PillTabContainer>
-  );
-};
-
-const PillTabContainer = styled.li<{
-  selected?: boolean;
-}>`
-  cursor: pointer;
-  transition: 0.1s;
-  p {
-    transition: 0.1s;
-  }
-
-  ${({ theme }) => css`
-    padding: ${theme.spacing[2]}px ${theme.spacing[4]}px;
-    border-radius: ${theme.borderRadius[3]}px;
-    background-color: transparent;
-  `};
-  ${({ theme, selected }) =>
-    selected &&
-    css`
-      background-color: ${theme.backgroundColor.accent};
-    `};
-
-  :hover {
-    ${({ theme }) => css`
-      background-color: ${theme.overlay['darken-2']};
-      p {
-        color: ${theme.color.primary};
-      }
-    `};
-  }
-`;
 
 const Footprint = styled.div`
   position: relative;
@@ -126,22 +94,13 @@ const SuffixContainer = styled.div`
   align-items: center;
 `;
 
-const NavContainer = styled.div`
-  height: 44px;
+const Nav = styled.nav`
   ${({ theme }) => css`
     border-top: 1px solid ${theme.borderColor.tertiary};
     border-bottom: 1px solid ${theme.borderColor.tertiary};
     background-color: ${theme.backgroundColor.secondary};
-    margin-bottom: ${theme.spacing[7]}px;
-  `};
-`;
-
-const NavList = styled.ul`
-  display: inline-flex;
-  flex-direction: row;
-  ${({ theme }) => css`
     padding: ${theme.spacing[3]}px 0;
-    column-gap: ${theme.spacing[4]}px;
+    margin-bottom: ${theme.spacing[7]}px;
   `};
 `;
 

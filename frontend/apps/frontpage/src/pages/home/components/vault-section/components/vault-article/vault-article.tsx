@@ -1,4 +1,4 @@
-import type { Icon as TIcon } from 'icons';
+import type { Icon } from 'icons';
 import React from 'react';
 import CircleIcon from 'src/components/circle-icon';
 import styled, { css } from 'styled';
@@ -6,14 +6,18 @@ import { Typography } from 'ui';
 
 type VaultArticleProps = {
   content: string;
-  Icon: TIcon;
+  iconComponent: Icon;
   title: string;
 };
 
-const VaultArticle = ({ content, Icon, title }: VaultArticleProps) => (
+const VaultArticle = ({
+  content,
+  iconComponent: Icon,
+  title,
+}: VaultArticleProps) => (
   <>
     <CircleContainer>
-      <CircleIcon Icon={Icon} color="quinary" />
+      <CircleIcon iconComponent={Icon} color="quinary" />
     </CircleContainer>
     <Typography
       as="p"

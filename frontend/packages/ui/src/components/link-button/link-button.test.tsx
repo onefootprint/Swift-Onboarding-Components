@@ -9,7 +9,7 @@ describe('<LinkButton />', () => {
     ariaLabel,
     children = 'some content',
     href,
-    Icon,
+    iconComponent: Icon,
     iconPosition,
     onClick,
     size = 'default',
@@ -20,7 +20,7 @@ describe('<LinkButton />', () => {
       <LinkButton
         ariaLabel={ariaLabel}
         href={href}
-        Icon={Icon}
+        iconComponent={Icon}
         iconPosition={iconPosition}
         onClick={onClick}
         size={size}
@@ -114,7 +114,7 @@ describe('<LinkButton />', () => {
       it('should render the Icon', () => {
         renderLinkButton({
           children: 'foo',
-          Icon: IcoArrowRightSmall24,
+          iconComponent: IcoArrowRightSmall24,
         });
         expect(screen.getByRole('button', { name: 'foo' })).toContainHTML(
           'svg',

@@ -1,19 +1,19 @@
 import { Property } from 'csstype';
-import type { Icon as TIcon } from 'icons';
+import type { Icon } from 'icons';
 import React from 'react';
 import styled, { BackgroundColor, Color, css } from 'styled';
 
 type CircleIconProps = {
   backgroundColor?: BackgroundColor;
   color?: Color;
-  Icon: TIcon;
+  iconComponent: Icon;
   size?: Property.Width<'string'>;
 };
 
 const CircleIcon = ({
   backgroundColor = 'accent',
   color = 'quaternary',
-  Icon,
+  iconComponent: Icon,
   size = '40px',
 }: CircleIconProps) => (
   <IconContainer backgroundColor={backgroundColor} size={size}>

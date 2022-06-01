@@ -59,7 +59,7 @@ const Modal = ({
           <CloseContainer>
             <IconButton
               ariaLabel="Close"
-              Icon={IcoClose24}
+              iconComponent={IcoClose24}
               onClick={() => onClose(ModalCloseEvent.Close)}
             />
           </CloseContainer>

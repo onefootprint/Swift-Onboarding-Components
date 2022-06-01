@@ -7,14 +7,14 @@ import IconButton, { IconButtonProps } from './icon-button';
 describe('<IconButton />', () => {
   const renderIconButton = ({
     ariaLabel = 'close',
-    Icon = IcoClose24,
+    iconComponent: Icon = IcoClose24,
     onClick,
     testID = 'icon-button-test-id',
   }: Partial<IconButtonProps>) => {
     customRender(
       <IconButton
         ariaLabel={ariaLabel}
-        Icon={Icon}
+        iconComponent={Icon}
         onClick={onClick}
         testID={testID}
       />,

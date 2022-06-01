@@ -1,1 +1,2 @@
-export * from './render';
+export * from './spies';
+export * from './utils/render';

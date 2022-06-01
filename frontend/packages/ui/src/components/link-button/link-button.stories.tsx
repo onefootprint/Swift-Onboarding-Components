@@ -61,7 +61,7 @@ const Template: Story<LinkButtonProps> = ({
   ariaLabel,
   children,
   href,
-  Icon,
+  iconComponent: Icon,
   iconPosition,
   onClick,
   size,
@@ -73,7 +73,7 @@ const Template: Story<LinkButtonProps> = ({
     <LinkButton
       ariaLabel={ariaLabel}
       href={href}
-      Icon={SelectedIcon}
+      iconComponent={SelectedIcon}
       iconPosition={iconPosition}
       onClick={onClick}
       size={size}
@@ -90,7 +90,7 @@ AsLink.args = {
   ariaLabel: 'Link button',
   children: 'Link button',
   href: 'https://onefootprint.com',
-  Icon: IcoArrowRightSmall24,
+  iconComponent: IcoArrowRightSmall24,
   iconPosition: 'right',
   size: 'default',
   target: '_blank',
@@ -135,7 +135,7 @@ BaseSize4.args = {
 export const WithIconLeft = Template.bind({});
 WithIconLeft.args = {
   children: 'Link button',
-  Icon: IcoPlusSmall24,
+  iconComponent: IcoPlusSmall24,
   iconPosition: 'left',
   onClick: () => alert('I was pressed'),
   size: 'default',
@@ -144,7 +144,7 @@ WithIconLeft.args = {
 export const WithIconRight = Template.bind({});
 WithIconRight.args = {
   children: 'Link button',
-  Icon: IcoPlusSmall24,
+  iconComponent: IcoPlusSmall24,
   iconPosition: 'right',
   onClick: () => alert('I was pressed'),
   size: 'default',

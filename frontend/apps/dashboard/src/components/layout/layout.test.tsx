@@ -1,12 +1,18 @@
 import React from 'react';
-import { customRender, screen } from 'test-utils';
+import { createUseRouterSpy, customRender, screen } from 'test-utils';
 
 import { useStore } from '../../hooks/use-session-user';
 import Layout, { LayoutProps } from './layout';
 
 const originalState = useStore.getState();
 
+const useRouterSpy = createUseRouterSpy();
+
 describe('<Layout />', () => {
+  beforeEach(() => {
+    useRouterSpy({ pathname: '/lorem' });
+  });
+
   const renderLayout = ({ children = 'Foo' }: Partial<LayoutProps>) =>
     customRender(<Layout>{children}</Layout>);
 
@@ -24,7 +30,7 @@ describe('<Layout />', () => {
   describe('when the user is logged', () => {
     beforeEach(() => {
       useStore.setState({
-        data: { id: '1', firstName: 'lorem', lastName: 'dolor' },
+        data: { auth: '1', email: 'lorem' },
       });
     });
     it('should render the private layout', () => {

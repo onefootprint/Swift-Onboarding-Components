@@ -5,6 +5,8 @@ import React from 'react';
 import { ThemeProvider } from 'styled-components';
 import { themes } from 'ui';
 
+import throwOnConsoleErrors from './console-error';
+
 const { light } = themes;
 
 type WrapperProps = {
@@ -15,8 +17,10 @@ export const Wrapper = ({ children }: WrapperProps) => (
   <ThemeProvider theme={light}>{children}</ThemeProvider>
 );
 
-export const customRender = (Component: JSX.Element) =>
-  render(<Wrapper>{Component}</Wrapper>);
+export const customRender = (Component: JSX.Element) => {
+  throwOnConsoleErrors();
+  return render(<Wrapper>{Component}</Wrapper>);
+};
 
 export * from '@testing-library/react';
 export { renderHook } from '@testing-library/react-hooks';

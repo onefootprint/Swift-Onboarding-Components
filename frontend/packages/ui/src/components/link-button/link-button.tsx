@@ -1,4 +1,4 @@
-import type { Icon as TIcon } from 'icons';
+import type { Icon } from 'icons';
 import React, { HTMLAttributeAnchorTarget } from 'react';
 import styled, { css } from 'styled';
 
@@ -10,7 +10,7 @@ export type LinkButtonProps = {
   ariaLabel?: string;
   children: string;
   href?: string;
-  Icon?: TIcon;
+  iconComponent?: Icon;
   iconPosition?: 'left' | 'right';
   onClick?: (
     event:
@@ -28,7 +28,7 @@ const LinkButton = ({
   ariaLabel,
   children,
   href,
-  Icon,
+  iconComponent: Icon,
   iconPosition = 'right',
   onClick,
   size = 'default',

@@ -131,7 +131,7 @@ const Users = () => {
           </>
         )}
       />
-      <DecryptDataDialog open onClose={() => {}} />
+      <DecryptDataDialog open={false} onClose={() => {}} />
     </>
   );
 };
