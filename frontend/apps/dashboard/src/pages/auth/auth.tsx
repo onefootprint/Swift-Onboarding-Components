@@ -1,30 +1,29 @@
+import useLogin, { LoginResponse } from '@src/hooks/login/login';
 import useSessionUser from '@src/hooks/use-session-user';
-import { NextRouter, useRouter } from 'next/router';
+import { useRouter } from 'next/router';
 import React, { useEffect } from 'react';
 
-// TODO: this page will be obsolete once we refactor flow from workOS,
-// but for now gets us working authentication
 const Auth = () => {
   const router = useRouter();
   const session = useSessionUser();
-
-  // https://github.com/vercel/next.js/issues/8259
-  function isRouterReady(nextRouter: NextRouter) {
-    return nextRouter.asPath !== nextRouter.route;
-  }
+  const login = useLogin();
+  const {
+    query: { code },
+    isReady,
+  } = router;
 
   useEffect(() => {
-    if (isRouterReady(router)) {
-      const { auth, email } = router.query;
-      const loginInfoSet =
-        auth && email && !Array.isArray(auth) && !Array.isArray(email);
-      if (loginInfoSet) {
+    if (!isReady || !code || Array.isArray(code)) {
+      return;
+    }
+    login.mutate(code, {
+      onSuccess({ auth, email }: LoginResponse) {
         session.logIn({ auth, email });
         router.push('/users');
-      }
-    }
+      },
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [router]);
+  }, [isReady, code, router]);
 
   return <div />;
 };

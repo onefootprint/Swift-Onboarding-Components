@@ -11,6 +11,7 @@ const loginGoogle = async () => {
   >({
     method: 'GET',
     url: '/auth/google_oauth',
+    params: { redirect_url: `${process.env.NEXT_PUBLIC_URL}/auth` },
   });
   return response.data;
 };
