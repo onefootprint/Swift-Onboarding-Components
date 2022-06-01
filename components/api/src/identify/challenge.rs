@@ -27,11 +27,9 @@ pub async fn handler(
     let phone_number = clean_phone_number(&state, &req.phone_number).await?;
 
     // Send the log in challenge to the provided phone number
-    let challenge = send_phone_challenge(&state, phone_number.clone()).await?;
+    let challenge_token = send_phone_challenge(&state, phone_number.clone()).await?;
 
     Ok(Json(ApiResponseData {
-        data: ChallengeResponse {
-            challenge_token: challenge.seal(&state.session_sealing_key)?,
-        },
+        data: ChallengeResponse { challenge_token },
     }))
 }

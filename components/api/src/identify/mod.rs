@@ -15,10 +15,10 @@ use aws_sdk_pinpointsmsvoicev2::output::SendTextMessageOutput;
 use chrono::NaiveDateTime;
 use chrono::{Duration, Utc};
 use crypto::b64::Base64Data;
-use crypto::{sha256, serde_cbor};
+use crypto::{serde_cbor, sha256};
 use db::models::session_data::{ChallengeLastSentData, SessionState};
 use db::models::user_vaults::{UserVault, UserVaultWrapper};
-use newtypes::DataKind;
+use newtypes::{DataKind, UserVaultId};
 use paperclip::actix::{web, Apiv2Schema};
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
@@ -45,6 +45,12 @@ pub struct EmailVerifyChallenge {
 pub struct PhoneChallengeState {
     pub phone_number: String,
     pub h_code: Vec<u8>,
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct BiometricChallengeState {
+    pub state: webauthn_rs::AuthenticationState,
+    pub user_vault_id: UserVaultId,
 }
 
 // TODO move these utils somewhere else
@@ -85,28 +91,10 @@ pub fn clean_email(raw_email: String) -> String {
     raw_email.to_lowercase()
 }
 
-pub(crate) async fn send_phone_challenge_to_user(
-    state: &web::Data<State>,
-    vault: UserVault,
-) -> Result<Challenge<PhoneChallengeState>, ApiError> {
-    let e_private_key = vault.e_private_key.clone();
-    let uvw = UserVaultWrapper::from(&state.db_pool, vault).await?;
-    let e_phone_number = uvw.get_e_field(DataKind::PhoneNumber).ok_or(ApiError::NoPhoneNumberForVault)?;
-    let phone_number = crate::enclave::decrypt_bytes(
-        state,
-        e_phone_number,
-        e_private_key,
-        enclave_proxy::DataTransform::Identity,
-    )
-    .await?;
-    // send challenge & set state
-    send_phone_challenge(state, phone_number).await
-}
-
 pub(crate) async fn send_phone_challenge(
     state: &web::Data<State>,
     phone_number: String,
-) -> Result<Challenge<PhoneChallengeState>, ApiError> {
+) -> Result<String, ApiError> {
     // 555-01* numbers are reserved / not real, we use these for integration testing with a known code
     let phone_number_digits: String = phone_number.clone().chars().skip(5).take(5).collect();
     let is_test_phone_number = phone_number_digits.as_str() == "55501";
@@ -149,13 +137,15 @@ pub(crate) async fn send_phone_challenge(
             .send()
             .await?;
 
-    Ok(Challenge {
+    let challenge = Challenge {
         expires_at: Utc::now().naive_utc() + Duration::minutes(15),
         data: PhoneChallengeState {
             phone_number,
             h_code: sha256(code.as_bytes()).to_vec(),
         },
-    })
+    };
+    let challenge_token = challenge.seal(&state.session_sealing_key)?;
+    Ok(challenge_token)
 }
 
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
@@ -172,7 +162,8 @@ impl EmailVerifyData {
 
     pub fn deserialize(data: String) -> Result<EmailVerifyData, ApiError> {
         let data_slice = Base64Data::from_str(&data).map_err(crypto::Error::from)?.0;
-        let email_verify_data: EmailVerifyData = serde_cbor::from_slice(&data_slice).map_err(crypto::Error::from)?;
+        let email_verify_data: EmailVerifyData =
+            serde_cbor::from_slice(&data_slice).map_err(crypto::Error::from)?;
         Ok(email_verify_data)
     }
 }
@@ -186,17 +177,15 @@ pub(crate) async fn send_email_challenge(
         expires_at: chrono::Utc::now().naive_utc() + chrono::Duration::days(1),
         email: email_address.clone(),
     };
-    let email_challenge =
-        serde_json::to_string::<EmailVerifyChallenge>(&email_challenge)
-            .map_err(|_| ApiError::ChallengeNotValid)?;
-    let email_verify_data = EmailVerifyData{
+    let email_challenge = serde_json::to_string::<EmailVerifyChallenge>(&email_challenge)
+        .map_err(|_| ApiError::ChallengeNotValid)?;
+    let email_verify_data = EmailVerifyData {
         sh_email: signed_hash(state, email_address.clone()).await?,
         e_email_challenge: seal(email_challenge, &public_key)?,
-    }.serialize()?;
+    }
+    .serialize()?;
 
-    let curl_request_str = format!(
-        "https://verify.ui.footprint.dev/#{}", email_verify_data,
-    );
+    let curl_request_str = format!("https://verify.ui.footprint.dev/#{}", email_verify_data,);
     let content = build_email_challenge_content_body(curl_request_str);
     let _output = state
         .email_client

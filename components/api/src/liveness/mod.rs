@@ -1,5 +1,4 @@
 mod register;
-mod verify;
 
 use crate::State;
 use db::{errors::DbError, models::webauthn_credential::WebauthnCredential};
@@ -14,8 +13,6 @@ pub fn routes() -> web::Scope {
     web::scope("/liveness")
         .service(register::init)
         .service(register::complete)
-        .service(verify::init)
-        .service(verify::complete)
 }
 
 pub struct LivenessWebauthnConfig {

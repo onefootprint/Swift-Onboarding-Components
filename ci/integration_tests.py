@@ -197,9 +197,9 @@ def test_onboarding_complete(request, workos_tenant):
     request.config.cache.set("fp_user_id", fp_user_id)
 
 def test_identify_repeat_customer(request, foo_tenant):
-    # Identify the user by email
     request.config.cache.set("fpuser_auth_token", None)  # Remove fpuser_auth_token from previous test
 
+    # Identify the user by email
     path = "identify"
     print(url(path))
     email = request.config.cache.get("email", None)
@@ -213,9 +213,12 @@ def test_identify_repeat_customer(request, foo_tenant):
     body = _assert_response(r)
     assert body["data"]["user_found"]
     assert body["data"]["challenge_data"]["phone_number_last_two"] == phone_number[-2:]
+    assert body["data"]["challenge_data"]["challenge_kind"] == "sms"
 
+    # Now test identifying the user by phone number. Ask for a biometric challenge, which should
+    # fall through to an SMS challenge since the user doesn't have webauthn credentials
     identifier = {"phone_number": phone_number}
-    data = {"identifier": identifier, "preferred_challenge_kind": "sms"}
+    data = {"identifier": identifier, "preferred_challenge_kind": "biometric"}
     r = requests.post(
         url(path),
         json=data,
@@ -223,6 +226,7 @@ def test_identify_repeat_customer(request, foo_tenant):
     body = _assert_response(r)
     assert body["data"]["user_found"]
     assert body["data"]["challenge_data"]["phone_number_last_two"] == phone_number[-2:]
+    assert body["data"]["challenge_data"]["challenge_kind"] == "sms"
 
     # Log in as the user
     path = "identify/verify"
