@@ -11,11 +11,14 @@
     "lint": "eslint src --fix"
   },
   "dependencies": {
+    "@types/ua-parser-js": "^0.7.36",
+    "base64url": "^3.0.1",
     "global-constants": "*",
     "hooks": "*",
     "icons": "*",
     "request": "*",
     "styled": "*",
+    "ua-parser-js": "^1.0.2",
     "ui": "*"
   },
   "devDependencies": {
