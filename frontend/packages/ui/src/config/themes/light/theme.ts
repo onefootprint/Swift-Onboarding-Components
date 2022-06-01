@@ -25,6 +25,7 @@ const theme: DefaultTheme = {
     tertiary: primitives.brandSleep,
     quaternary: primitives.brandThink,
     quinary: primitives.brandGo,
+    senary: primitives.gray100,
     accent: primitives.purple500,
     error: primitives.red100,
     info: primitives.blue100,
@@ -65,6 +66,8 @@ const theme: DefaultTheme = {
     'lighten-2': rgba(primitives.gray0, 0.18),
     'darken-1': rgba(primitives.gray1000, 0.04),
     'darken-2': rgba(primitives.gray1000, 0.08),
+    'error-1': rgba(primitives.red500, 0.07),
+    'error-2': rgba(primitives.red500, 0.15),
   },
 };
 

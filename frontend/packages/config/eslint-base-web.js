@@ -34,6 +34,7 @@ module.exports = {
       'error',
       {
         exceptions: [
+          'Checkbox',
           'Field',
           'StyledField',
           'TextInput',

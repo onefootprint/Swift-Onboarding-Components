@@ -1,20 +1,34 @@
 import React from 'react';
-import type { Color } from 'styled';
+import styled, { Color, css, FontVariant } from 'styled';
 
-import Box from '../../box';
 import Typography from '../../typography';
 
 export type HintProps = {
   children: string;
+  className?: string;
   color: Color;
+  id?: string;
+  variant?: FontVariant;
 };
 
-const Hint = ({ children, color }: HintProps) => (
-  <Box sx={{ marginTop: 3 }}>
-    <Typography as="p" color={color} variant="caption-1">
+const Hint = ({
+  children,
+  className,
+  color,
+  id,
+  variant = 'caption-2',
+}: HintProps) => (
+  <Container id={id} className={className}>
+    <Typography as="p" color={color} variant={variant}>
       {children}
     </Typography>
-  </Box>
+  </Container>
 );
+
+const Container = styled.div`
+  ${({ theme }) => css`
+    margin-top: ${theme.spacing[3]}px;
+  `}
+`;
 
 export default Hint;

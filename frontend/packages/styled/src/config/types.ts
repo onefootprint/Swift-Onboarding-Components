@@ -40,6 +40,8 @@ export type Overlays = {
   'lighten-2': string;
   'darken-1': string;
   'darken-2': string;
+  'error-1': string;
+  'error-2': string;
 };
 
 export type Colors = {
@@ -108,6 +110,7 @@ export type BackgroundColors = {
   tertiary: string;
   quaternary: string;
   quinary: string;
+  senary: string;
 } & UIStates;
 
 export type BackgroundColor = keyof BackgroundColors;

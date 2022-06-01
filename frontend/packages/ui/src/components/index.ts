@@ -6,6 +6,8 @@ export * from './box';
 export { default as Box } from './box';
 export * from './button';
 export { default as Button } from './button';
+export * from './checkbox';
+export { default as Checkbox } from './checkbox';
 export * from './container';
 export { default as Container } from './container';
 export * from './footprint-button';

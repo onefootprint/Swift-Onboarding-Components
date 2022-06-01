@@ -18,6 +18,8 @@ import styled, { css, UIState } from 'styled';
 import { Badge, TextInput, Typography } from 'ui';
 import { useMap } from 'usehooks-ts';
 
+import DecryptDataDialog from './components/decrypt-data-dialog';
+
 const statusToBadgeVariant: Record<OnboardingStatus, UIState> = {
   [OnboardingStatus.verified]: 'success',
   [OnboardingStatus.processing]: 'neutral',
@@ -129,6 +131,7 @@ const Users = () => {
           </>
         )}
       />
+      <DecryptDataDialog open onClose={() => {}} />
     </>
   );
 };
