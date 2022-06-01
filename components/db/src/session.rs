@@ -1,7 +1,7 @@
 use crate::errors::DbError;
 use crate::models::sessions::Session;
 use crate::schema;
-use chrono::{Duration, Utc};
+use chrono::Utc;
 use crypto::{hex::ToHex, sha256};
 use deadpool_diesel::postgres::Pool;
 use diesel::prelude::*;

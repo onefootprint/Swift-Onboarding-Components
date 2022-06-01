@@ -4,7 +4,7 @@ use diesel::{
     sql_types::Jsonb,
     types::{FromSql, ToSql},
 };
-use newtypes::{FootprintUserId, UserVaultId};
+use newtypes::UserVaultId;
 use serde::{Deserialize, Serialize};
 use serde_json;
 use std::io::Write;
