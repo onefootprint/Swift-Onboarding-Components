@@ -81,18 +81,6 @@ pub(crate) async fn clean_phone_number(
     Ok(validated_phone_number)
 }
 
-pub async fn validate_challenge(
-    request_code: String,
-    challenge_data: &Challenge<PhoneChallengeState>,
-) -> Result<bool, ApiError> {
-    let now = Utc::now().naive_utc();
-
-    Ok(
-        (challenge_data.data.h_code == sha256(request_code.as_bytes()).to_vec())
-            & (challenge_data.expires_at > now), // TODO don't need to check here
-    )
-}
-
 pub fn clean_email(raw_email: String) -> String {
     raw_email.to_lowercase()
 }

@@ -1,4 +1,4 @@
-use super::validate_challenge;
+use super::ChallengeKind;
 use crate::errors::ApiError;
 use crate::identify::{signed_hash, PhoneChallengeState};
 use crate::types::success::ApiResponseData;
@@ -6,17 +6,19 @@ use crate::utils::challenge::Challenge;
 use crate::State;
 use aws_sdk_kms::model::DataKeyPairSpec;
 use chrono::{Duration, Utc};
+use crypto::sha256;
 use db::models::session_data::{LoggedInSessionData, SessionState as DbSessionState};
 use db::models::user_vaults::{NewUserVaultReq, UserVault};
-use newtypes::{Status, DataKind};
+use newtypes::{DataKind, Status};
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 
 use super::seal;
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
 struct VerifyRequest {
-    code: String,
     challenge_token: String, // Sealed Challenge<PhoneChallengeState>
+    challenge_kind: ChallengeKind,
+    challenge_response: String,
 }
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Serialize)]
@@ -34,40 +36,48 @@ struct VerifyResponse {
 
 #[api_v2_operation(tags(Identify))]
 #[post("/verify")]
-/// Used to verify the two-factor challenge sent to a phone number. If the challenge code matches
-/// what was sent to the phone number, we will get or create the user vault associated with this
-/// phone number. Returns an HTTP 200 and specifies whether a user was created or inherited. Also
-/// sets some session state in the cookie that allows the client to update the logged-in user vault
-/// and onboard the user vault onto new tenants.
+/// Verifies the response to either an SMS or biometric challenge.
+/// When the challenge response is verified, we will return an auth token for the user.
+/// If no user exists (which may only happen after a phone challenge), we will create a new user
+/// with the provided phone number
 async fn handler(
     state: web::Data<State>,
     request: Json<VerifyRequest>,
 ) -> actix_web::Result<Json<ApiResponseData<VerifyResponse>>, ApiError> {
-    let challenge_data = Challenge::<PhoneChallengeState>::unseal(
-        &state.session_sealing_key,
-        &request.challenge_token,
-    )?;
+    let (user, kind) = match request.challenge_kind {
+        ChallengeKind::Biometric => {
+            return Err(ApiError::NotImplemented);
+        }
+        ChallengeKind::Sms => {
+            // Decode and validate the response to the SMS challenge
+            let challenge_data = Challenge::<PhoneChallengeState>::unseal(
+                &state.session_sealing_key,
+                &request.challenge_token,
+            )?;
 
-    if !validate_challenge(request.code.clone(), &challenge_data).await? {
-        return Err(ApiError::ChallengeNotValid);
-    }
+            if !validate_sms_challenge(request.challenge_response.clone(), &challenge_data).await? {
+                return Err(ApiError::ChallengeNotValid);
+            }
 
-    let phone_number = challenge_data.data.phone_number;
-    let sh_phone_number = signed_hash(&state, phone_number.clone()).await?;
-    let existing_user = db::user_vault::get_by_fingerprint(
-        &state.db_pool,
-        DataKind::PhoneNumber,
-        sh_phone_number.clone(),
-        true,
-    )
-    .await?.map(|x| x.0);
-
-    let (user, kind) = match existing_user {
-        Some(uv) => (uv, VerifyKind::UserInherited),
-        None => {
-            // The user does not exist. Create a new user vault
-            let user = create_new_user_vault(&state, phone_number.clone()).await?;
-            (user, VerifyKind::UserCreated)
+            // Fetch the user associated with this phone number
+            let phone_number = challenge_data.data.phone_number;
+            let sh_phone_number = signed_hash(&state, phone_number.clone()).await?;
+            let existing_user = db::user_vault::get_by_fingerprint(
+                &state.db_pool,
+                DataKind::PhoneNumber,
+                sh_phone_number.clone(),
+                true,
+            )
+            .await?
+            .map(|x| x.0);
+            match existing_user {
+                Some(uv) => (uv, VerifyKind::UserInherited),
+                None => {
+                    // The user does not exist. Create a new user vault
+                    let user = create_new_user_vault(&state, phone_number.clone()).await?;
+                    (user, VerifyKind::UserCreated)
+                }
+            }
         }
     };
 
@@ -114,4 +124,16 @@ async fn create_new_user_vault(
     let user = db::user_vault::create(&state.db_pool, new_user).await?;
 
     Ok(user)
+}
+
+pub async fn validate_sms_challenge(
+    request_code: String,
+    challenge_data: &Challenge<PhoneChallengeState>,
+) -> Result<bool, ApiError> {
+    let now = Utc::now().naive_utc();
+
+    Ok(
+        (challenge_data.data.h_code == sha256(request_code.as_bytes()).to_vec())
+            & (challenge_data.expires_at > now), // TODO don't need to check here
+    )
 }

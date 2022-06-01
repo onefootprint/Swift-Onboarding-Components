@@ -124,7 +124,8 @@ def test_identify_verify(request):
     path = "identify/verify"
     print(url(path))
     data = {
-        "code": TEST_CHALLENGE_CODE,
+        "challenge_response": TEST_CHALLENGE_CODE,
+        "challenge_kind": "sms",
         "challenge_token": request.config.cache.get("challenge_token", None),
     }
     r = requests.post(
@@ -227,7 +228,8 @@ def test_identify_repeat_customer(request, foo_tenant):
     path = "identify/verify"
     print(url(path))
     data = {
-        "code": TEST_CHALLENGE_CODE,
+        "challenge_response": TEST_CHALLENGE_CODE,
+        "challenge_kind": "sms",
         "challenge_token": body["data"]["challenge_data"]["challenge_token"],
     }
     r = requests.post(
