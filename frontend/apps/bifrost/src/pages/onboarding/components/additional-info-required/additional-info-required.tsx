@@ -1,7 +1,7 @@
 import React from 'react';
 import { Events } from 'src/bifrost-machine/types';
 import HeaderTitle from 'src/components/header-title';
-import useBifrostMachine from 'src/hooks/bifrost/use-bifrost-machine';
+import useBifrostMachine from 'src/hooks/bifrost-machine';
 import styled, { css } from 'styled';
 import { Button } from 'ui';
 

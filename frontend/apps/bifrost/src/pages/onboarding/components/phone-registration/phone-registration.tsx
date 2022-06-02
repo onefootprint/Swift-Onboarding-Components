@@ -4,7 +4,7 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import { ChallengeKind, Events } from 'src/bifrost-machine/types';
 import HeaderTitle from 'src/components/header-title';
-import useBifrostMachine from 'src/hooks/bifrost/use-bifrost-machine';
+import useBifrostMachine from 'src/hooks/bifrost-machine';
 import useIdentify from 'src/hooks/identify/use-identify';
 import useIdentifyChallenge, {
   IdentifyChallengeResponse,

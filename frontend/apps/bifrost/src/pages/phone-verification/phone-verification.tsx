@@ -1,6 +1,6 @@
 import React from 'react';
 import { ChallengeKind, Events } from 'src/bifrost-machine/types';
-import useBifrostMachine from 'src/hooks/bifrost/use-bifrost-machine';
+import useBifrostMachine from 'src/hooks/bifrost-machine';
 import useIdentify, { IdentifyResponse } from 'src/hooks/identify/use-identify';
 import useIdentifyVerify, {
   IdentifyVerifyResponse,
@@ -15,6 +15,10 @@ const PhoneVerification = () => {
   const identifyMutation = useIdentify();
   const identifyVerifyMutation = useIdentifyVerify();
   const onboardingMutation = useOnboarding();
+  const shouldShowLoading =
+    identifyMutation.isLoading ||
+    identifyVerifyMutation.isLoading ||
+    onboardingMutation.isLoading;
 
   const resendVerification = () => {
     const { email } = state.context;
@@ -36,6 +40,29 @@ const PhoneVerification = () => {
     );
   };
 
+  const handlePinValidationSucceeded = ({
+    authToken,
+  }: IdentifyVerifyResponse) => {
+    onboardingMutation.mutate(
+      { authToken },
+      {
+        onSuccess({
+          missingAttributes,
+          missingWebauthnCredentials,
+        }: OnboardingResponse) {
+          send({
+            type: Events.challengeSucceeded,
+            payload: {
+              authToken,
+              missingAttributes,
+              missingWebauthnCredentials,
+            },
+          });
+        },
+      },
+    );
+  };
+
   const validatePin = (pin: string) => {
     const { challenge } = state.context;
     if (!challenge) {
@@ -49,44 +76,10 @@ const PhoneVerification = () => {
         challengeToken,
       },
       {
-        onSuccess: ({ authToken }: IdentifyVerifyResponse) => {
-          onboardingMutation.mutate(
-            { authToken },
-            {
-              onSuccess({
-                missingAttributes,
-                missingWebauthnCredentials,
-              }: OnboardingResponse) {
-                send({
-                  type: Events.challengeSucceeded,
-                  payload: {
-                    authToken,
-                    missingAttributes,
-                    missingWebauthnCredentials,
-                  },
-                });
-              },
-            },
-          );
-        },
+        onSuccess: handlePinValidationSucceeded,
       },
     );
   };
-
-  const input =
-    identifyMutation.isLoading ||
-    identifyVerifyMutation.isLoading ||
-    onboardingMutation.isLoading ? (
-      <>
-        <LoadingIndicator />
-        <Typography variant="label-3">Verifying...</Typography>
-      </>
-    ) : (
-      <>
-        <PinInput onComplete={validatePin} />
-        <LinkButton onClick={resendVerification}>Resend code</LinkButton>
-      </>
-    );
 
   return (
     <Form>
@@ -101,7 +94,17 @@ const PhoneVerification = () => {
           {state.context.challenge?.phoneNumberLastTwo}.
         </Typography>
       </Box>
-      {input}
+      {shouldShowLoading ? (
+        <>
+          <LoadingIndicator />
+          <Typography variant="label-3">Verifying...</Typography>
+        </>
+      ) : (
+        <>
+          <PinInput onComplete={validatePin} />
+          <LinkButton onClick={resendVerification}>Resend code</LinkButton>
+        </>
+      )}
     </Form>
   );
 };

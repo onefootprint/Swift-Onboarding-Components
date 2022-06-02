@@ -6,7 +6,7 @@ import {
   UserData,
   UserDataAttribute,
 } from 'src/bifrost-machine/types';
-import useBifrostMachine from 'src/hooks/bifrost/use-bifrost-machine';
+import useBifrostMachine from 'src/hooks/bifrost-machine';
 import useIdentify, { IdentifyResponse } from 'src/hooks/identify/use-identify';
 import styled, { css } from 'styled';
 import { Button, TextInput, Typography } from 'ui';

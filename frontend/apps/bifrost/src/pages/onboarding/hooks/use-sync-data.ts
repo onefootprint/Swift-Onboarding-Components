@@ -1,4 +1,4 @@
-import useBifrostMachine from 'src/hooks/bifrost/use-bifrost-machine';
+import useBifrostMachine from 'src/hooks/bifrost-machine';
 
 import { UserData } from '../../../bifrost-machine/types';
 import useOnboardingComplete from './use-onboarding-complete';
