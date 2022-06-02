@@ -1,2 +1,2 @@
-export const API_BASE_URL = 'https://api.dev.infra.footprint.dev';
+export const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 export const API_TIMEOUT = 60000;
