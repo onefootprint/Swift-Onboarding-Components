@@ -1,24 +1,44 @@
 import React from 'react';
 import { customRender, screen } from 'test-utils';
 
-import Header, { HeaderProps } from './header';
+import Header, { HeaderButtonType, HeaderProps } from './header';
 
 describe('<Header />', () => {
-  const renderTitle = ({
-    title = 'title',
-    subtitle = 'subtitle',
-  }: Partial<HeaderProps>) =>
-    customRender(<Header title={title} subtitle={subtitle} />);
+  const renderHeader = ({
+    buttonType,
+    progressIndicatorProps,
+    onPrev,
+    onClose,
+  }: HeaderProps) =>
+    customRender(
+      <Header
+        buttonType={buttonType}
+        progressIndicatorProps={progressIndicatorProps}
+        onPrev={onPrev}
+        onClose={onClose}
+      />,
+    );
 
-  it('should render the title', () => {
-    renderTitle({ title: 'Verify your phone number' });
-    expect(screen.getByText('Verify your phone number')).toBeInTheDocument();
+  it('should render close button', () => {
+    renderHeader({
+      buttonType: HeaderButtonType.close,
+    });
+    expect(screen.getByLabelText('Close window')).toBeInTheDocument();
   });
 
-  it('should render the subtitle', () => {
-    renderTitle({ subtitle: 'Enter your phone number to proceed.' });
-    expect(
-      screen.getByText('Enter your phone number to proceed.'),
-    ).toBeInTheDocument();
+  it('should render prev button', () => {
+    renderHeader({
+      buttonType: HeaderButtonType.prev,
+    });
+    expect(screen.getByLabelText('Previous window')).toBeInTheDocument();
+  });
+
+  it('should render progress indicator', () => {
+    renderHeader({
+      buttonType: HeaderButtonType.prev,
+      progressIndicatorProps: { max: 3, value: 2 },
+    });
+    expect(screen.getByRole('progressbar')).toBeInTheDocument();
+    expect(screen.getByLabelText('Previous window')).toBeInTheDocument();
   });
 });

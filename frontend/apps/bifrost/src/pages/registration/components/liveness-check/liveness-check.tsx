@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import Header from 'src/components/header';
+import HeaderTitle from 'src/components/header-title';
 import styled, { css } from 'styled';
 import { Button } from 'ui';
 
@@ -29,7 +29,7 @@ const LivenessCheck = () => {
 
   return (
     <Container>
-      <Header title={headerTitle} subtitle={headerSubtitle} />
+      <HeaderTitle title={headerTitle} subtitle={headerSubtitle} />
       <Button onClick={handleClick} fullWidth>
         {buttonLabel}
       </Button>

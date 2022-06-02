@@ -5,7 +5,7 @@ import IcoShield24 from 'icons/ico/ico-shield-24';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { Events, UserData, UserDataAttribute } from 'src/bifrost-machine/types';
-import Header from 'src/components/header';
+import HeaderTitle from 'src/components/header-title';
 import useBifrostMachine from 'src/hooks/bifrost/use-bifrost-machine';
 import styled, { css } from 'styled';
 import { Button, TextInput } from 'ui';
@@ -41,7 +41,7 @@ const SSN = () => {
 
   return (
     <Form onSubmit={handleSubmit(onSubmit)}>
-      <Header title={t('title')} subtitle={t('subtitle')} />
+      <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
       <TextInput
         hasError={!!errors.ssn}
         hintText={errors.ssn && t('form.ssn.error')}

@@ -2,7 +2,7 @@ import { useTranslation } from 'hooks';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { Events, UserData, UserDataAttribute } from 'src/bifrost-machine/types';
-import Header from 'src/components/header';
+import HeaderTitle from 'src/components/header-title';
 import useBifrostMachine from 'src/hooks/bifrost/use-bifrost-machine';
 import styled, { css } from 'styled';
 import { AddressInput, Button, Grid, Select, TextInput } from 'ui';
@@ -51,7 +51,7 @@ const ResidentialAddress = () => {
 
   return (
     <Form onSubmit={handleSubmit(onSubmit)}>
-      <Header title={t('title')} subtitle={t('subtitle')} />
+      <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
       <Select
         label={t('form.country.label')}
         onSelect={() => {}}

@@ -1,5 +1,5 @@
 import React from 'react';
-import Header from 'src/components/header';
+import HeaderTitle from 'src/components/header-title';
 import styled, { css } from 'styled';
 import { Box, LinkButton } from 'ui';
 
@@ -10,7 +10,7 @@ export type SuccessMessageProps = {
 const SuccessMessage = ({ body }: SuccessMessageProps) => (
   <Container>
     <Box>
-      <Header
+      <HeaderTitle
         title="You&#39;re all set! 😎"
         subtitle="Identity successfully verified"
       />

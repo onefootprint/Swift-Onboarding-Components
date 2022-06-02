@@ -3,7 +3,7 @@ import IcoEmail24 from 'icons/ico/ico-email-24';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { Events } from 'src/bifrost-machine/types';
-import Header from 'src/components/header';
+import HeaderTitle from 'src/components/header-title';
 import useBifrostMachine from 'src/hooks/bifrost/use-bifrost-machine';
 import styled, { css } from 'styled';
 import { Button, LinkButton, TextInput, Typography } from 'ui';
@@ -47,7 +47,7 @@ const PhoneRegistration = () => {
 
   return (
     <Form onSubmit={handleSubmit(onSubmit)}>
-      <Header title={t('title')} subtitle={t('subtitle')} />
+      <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
       <EmailCard>
         <IcoEmail24 />
         <Typography variant="label-3" color="primary" sx={{ flexGrow: 1 }}>

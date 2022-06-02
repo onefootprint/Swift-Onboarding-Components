@@ -1,6 +1,6 @@
 import React from 'react';
 import { Events } from 'src/bifrost-machine/types';
-import Header from 'src/components/header';
+import HeaderTitle from 'src/components/header-title';
 import useBifrostMachine from 'src/hooks/bifrost/use-bifrost-machine';
 import styled, { css } from 'styled';
 import { Button } from 'ui';
@@ -16,7 +16,7 @@ const AdditionalInfoRequired = () => {
 
   return (
     <Container>
-      <Header
+      <HeaderTitle
         title="Additional data is required"
         subtitle={`In addition to the data we already have on you, ${tenantName} requires
           some more information to verify your identity.`}
