@@ -92,7 +92,9 @@ const PhoneVerification = () => {
     <Form>
       <Box>
         <Typography variant="heading-2" color="primary">
-          Welcome back! 🎉
+          {state.context.userFound
+            ? 'Welcome back! 🎉'
+            : "Let's verify your identity!"}
         </Typography>
         <Typography variant="body-2" color="secondary">
           Enter the 6-digit code sent to (•••) ••• ••
