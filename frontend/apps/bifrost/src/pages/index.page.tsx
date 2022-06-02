@@ -4,12 +4,12 @@ import { States } from 'src/bifrost-machine/types';
 import useBifrostMachine from 'src/hooks/bifrost/use-bifrost-machine';
 
 import EmailIdentification from './email-identification';
+import AdditionalInfoRequired from './onboarding/components/additional-info-required';
+import BasicInformation from './onboarding/components/basic-information';
+import PhoneRegistration from './onboarding/components/phone-registration';
+import ResidentialAddress from './onboarding/components/residential-address';
+import SSN from './onboarding/components/ssn';
 import PhoneVerification from './phone-verification';
-import AdditionalInfoRequired from './registration/components/additional-info-required';
-import BasicInformation from './registration/components/basic-information';
-import PhoneRegistration from './registration/components/phone-registration';
-import ResidentialAddress from './registration/components/residential-address';
-import SSN from './registration/components/ssn';
 import RegistrationSuccess from './registration-success/registration-success';
 import VerificationSuccess from './verification-success';
 
