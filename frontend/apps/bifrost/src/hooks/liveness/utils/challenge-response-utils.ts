@@ -7,7 +7,23 @@ export type LivenessChallengeJson = {
   attestationData: string[];
 };
 
-export const parseChallenge = async (challenge: string) => {
+export const createPublicKeyCredential = async (challenge: string) => {
+  const publicKey = parseChallenge(challenge);
+  const publicKeyCredential = (await window.navigator.credentials.create({
+    publicKey,
+  })) as PublicKeyCredential;
+  return publicKeyCredential;
+};
+
+export const getPublicKeyCredential = async (challenge: string) => {
+  const publicKey = parseChallenge(challenge);
+  const publicKeyCredential = (await window.navigator.credentials.get({
+    publicKey,
+  })) as PublicKeyCredential;
+  return publicKeyCredential;
+};
+
+const parseChallenge = (challenge: string) => {
   const challengeJson = JSON.parse(challenge) as LivenessChallengeJson;
   const { publicKey } = challengeJson;
   publicKey.challenge = base64url.toBuffer(
@@ -16,10 +32,7 @@ export const parseChallenge = async (challenge: string) => {
   publicKey.user.id = base64url.toBuffer(
     publicKey.user.id as unknown as string,
   );
-  const publicKeyCredential = (await window.navigator.credentials.create({
-    publicKey,
-  })) as PublicKeyCredential;
-  return publicKeyCredential;
+  return publicKey;
 };
 
 export const generateDeviceResponse = (

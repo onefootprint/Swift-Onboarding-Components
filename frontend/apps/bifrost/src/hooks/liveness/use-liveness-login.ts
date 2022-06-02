@@ -3,7 +3,7 @@ import request, { RequestError, RequestResponse } from 'request';
 
 import {
   generateDeviceResponse,
-  parseChallenge,
+  getPublicKeyCredential,
 } from './utils/challenge-response-utils';
 
 export type LivenessLoginRequest = {
@@ -26,7 +26,7 @@ const livenessLogin = async (payload: LivenessLoginRequest) => {
     data: payload,
   });
 
-  const publicKeyCredential = await parseChallenge(
+  const publicKeyCredential = await getPublicKeyCredential(
     initResponse.data.challengeJson,
   );
   const { challengeToken } = initResponse.data;

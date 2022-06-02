@@ -56,6 +56,8 @@ const PhoneRegistration = () => {
 
   const onSubmit = (formData: FormData) => {
     const { phone } = formData;
+    // When onboarding a new user, always ask for an SMS challenge, we will register
+    // biometrics in another step if needed
     identifyMutation.mutate(
       {
         identifier: { phoneNumber: phone },

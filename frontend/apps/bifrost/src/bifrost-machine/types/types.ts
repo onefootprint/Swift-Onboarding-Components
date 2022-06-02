@@ -102,7 +102,7 @@ export type ResidentialAddress = Required<
 
 export enum ChallengeKind {
   sms = 'sms',
-  biometrics = 'biometric',
+  biometric = 'biometric',
 }
 
 export type ChallengeData = {

@@ -2,8 +2,8 @@ import { useMutation } from 'react-query';
 import request, { RequestError, RequestResponse } from 'request';
 
 import {
+  createPublicKeyCredential,
   generateDeviceResponse,
-  parseChallenge,
 } from './utils/challenge-response-utils';
 
 export type LivenessRegisterRequest = {
@@ -30,7 +30,7 @@ const livenessRegister = async (payload: LivenessRegisterRequest) => {
     },
   });
 
-  const publicKeyCredential = await parseChallenge(
+  const publicKeyCredential = await createPublicKeyCredential(
     initResponse.data.challengeJson,
   );
   const { challengeToken } = initResponse.data;
