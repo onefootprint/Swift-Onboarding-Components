@@ -72,6 +72,8 @@ async fn handler(
     user_auth: LoggedInSessionContext,
     request: web::Json<UserPatchRequest>,
 ) -> actix_web::Result<Json<ApiResponseData<String>>, ApiError> {
+    // TODO scoped addition based on auth context
+
     let mut data_to_insert = Vec::<DataUpdateRequest>::new();
     let email = request.email.clone();
     for (data_kind, data_str) in request.into_inner().to_vec() {
@@ -81,7 +83,7 @@ async fn handler(
             let cleaned_data = clean_for_fingerprint(data_str.clone());
             Some(crate::identify::signed_hash(&state, cleaned_data).await?)
         } else {
-             None
+            None
         };
         let e_data = crate::identify::seal(data_str, &user_auth.user_vault().public_key)?;
         data_to_insert.push(DataUpdateRequest(data_kind, e_data, sh_data))

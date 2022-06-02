@@ -1,7 +1,7 @@
 use crate::schema::tenants;
 use chrono::NaiveDateTime;
 use diesel::{Insertable, Queryable};
-use newtypes::TenantId;
+use newtypes::{DataKind, TenantId};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
@@ -15,6 +15,7 @@ pub struct Tenant {
     pub email_domain: String,
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
+    pub required_data: Vec<DataKind>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]

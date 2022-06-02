@@ -1,0 +1,1 @@
+alter table tenants drop required_data;

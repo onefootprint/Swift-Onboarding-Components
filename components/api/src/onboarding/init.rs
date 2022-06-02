@@ -40,6 +40,7 @@ pub fn handler(
 
     let webauthn_creds = get_webauthn_creds(&state.db_pool, uv.id.clone()).await?;
 
+    // TODO: Tenant-scoped missing attributes
     let uvw = UserVaultWrapper::from(&state.db_pool, uv.clone()).await?;
     Ok(Json(ApiResponseData {
         data: OnboardingResponse {

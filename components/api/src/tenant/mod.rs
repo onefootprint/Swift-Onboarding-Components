@@ -18,6 +18,7 @@ use self::workos::workos_dashboard_auth::{self, DashboardSessionContext};
 pub mod access_events;
 pub mod decrypt;
 pub mod onboardings;
+pub mod required_data;
 pub mod workos;
 
 #[derive(Debug, Clone, Apiv2Schema)]
@@ -70,4 +71,6 @@ pub fn routes() -> web::Scope {
         .service(access_events::handler)
         .service(decrypt::handler)
         .service(onboardings::handler)
+        .service(required_data::set)
+        .service(required_data::get)
 }

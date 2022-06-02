@@ -10,9 +10,22 @@ TENANT_SECRET_HEADER = "x-client-secret-key"
 FPUSER_AUTH_HEADER = "x-fpuser-authorization"
 TEST_CHALLENGE_CODE = "123456"
 WORKOS_ORG_ID = "org_01G39KR1V1E52JEZV6BYNG590J"
-
-
+DEFAULT_ATTRIBUTES = {
+        'first_name', 
+        'last_name', 
+        'dob', 
+        'ssn', 
+        'street_address', 
+        'street_address2', 
+        'city', 
+        'state', 
+        'zip', 
+        'country', 
+        'email', 
+        'phone_number'
+    }
 url = lambda path: "{}/{}".format(os.environ.get('TEST_URL'), path)
+
 def _gen_random_n_digit_number(n):
     return "".join([str(random.randint(0, 9)) for _ in range(n)])
 
@@ -367,3 +380,44 @@ def test_logged_in_decrypt(request):
     attributes = body["data"]
     assert attributes["phone_number"][-4:] == request.config.cache.get("phone_number", None)[-4:]
     assert attributes["email"] == request.config.cache.get("email", None)
+
+def test_default_attributes(request, workos_tenant):
+    path = "org/required_data"
+    r = requests.get(
+        url(path),
+        headers=_client_priv_key_headers(workos_tenant["sk"]), 
+    )
+    body = _assert_response(r)
+    attributes = set(body["data"])
+    print(attributes)
+    assert attributes == DEFAULT_ATTRIBUTES
+
+def test_change_attributes(request, workos_tenant):
+    path = "org/required_data"
+    attributes = ["first_name", "last_name", "phone_number", "email"]
+    data = {
+        "attributes": attributes
+    }
+    r = requests.post(
+        url(path),
+        headers=_client_priv_key_headers(workos_tenant["sk"]), 
+        json=data,
+    )
+    body = _assert_response(r)
+    # make sure we changed
+    r = requests.get(
+        url(path),
+        headers=_client_priv_key_headers(workos_tenant["sk"]), 
+    )
+    body = _assert_response(r)
+    assert set(body["data"]) == set(attributes)
+    # change back
+    r = requests.post(
+        url(path),
+        headers=_client_priv_key_headers(workos_tenant["sk"]), 
+        json={
+            "attributes": list(DEFAULT_ATTRIBUTES)
+        }
+    )
+    _assert_response(r)
+

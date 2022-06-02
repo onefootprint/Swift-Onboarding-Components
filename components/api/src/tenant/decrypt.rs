@@ -10,13 +10,13 @@ use db::models::user_vaults::UserVault;
 use enclave_proxy::{DataTransform, DecryptRequest};
 use newtypes::{DataKind, FootprintUserId};
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
 struct UserDecryptRequest {
     footprint_user_id: FootprintUserId,
-    attributes: Vec<DataKind>,
+    attributes: HashSet<DataKind>,
 }
 
 type UserDecryptResponse = HashMap<DataKind, String>;
@@ -35,6 +35,8 @@ fn handler(
     // grab tenant secret key from header
     let tenant = auth.tenant();
 
+    // TODO: check that we're authorized to decrypt these attributes
+
     // look up tenant & user vault
     let (vault, onboarding) = db::user_vault::get_by_tenant_and_onboarding(
         &state.db_pool,
@@ -47,7 +49,12 @@ fn handler(
     let DecryptFieldsResult {
         fields_to_decrypt,
         result_map,
-    } = decrypt_fields(&state, request.attributes.clone(), &vault).await?;
+    } = decrypt_fields(
+        &state,
+        request.attributes.clone().into_iter().collect(),
+        &vault,
+    )
+    .await?;
 
     // Create an AccessEvent logs showing that the tenant accessed these fields
     // TODO potentially log encrypted email as well attributing it to specific person

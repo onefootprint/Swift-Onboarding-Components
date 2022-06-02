@@ -92,6 +92,7 @@ table! {
         email_domain -> Varchar,
         created_at -> Timestamp,
         updated_at -> Timestamp,
+        required_data -> Array<Data_kind>,
     }
 }
 
