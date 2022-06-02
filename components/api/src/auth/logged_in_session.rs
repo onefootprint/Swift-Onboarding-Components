@@ -1,7 +1,7 @@
 use super::AuthError;
 use crate::{errors::ApiError, State};
 use actix_web::{web, FromRequest};
-use db::models::session_data::SessionState;
+use db::models::session_data::{LoggedInSessionData, SessionState};
 use db::models::user_vaults::UserVault;
 use futures_util::Future;
 use paperclip::actix::Apiv2Security;
@@ -19,12 +19,17 @@ const HEADER_NAME: &str = "X-Fpuser-Authorization";
 /// Logged in session context sets encrypted state that authenticates the client as a user.
 pub struct LoggedInSessionContext {
     user_vault: UserVault,
+    session_data: LoggedInSessionData,
     pub auth_token: String,
 }
 
 impl LoggedInSessionContext {
     pub fn user_vault(&self) -> &UserVault {
         &self.user_vault
+    }
+
+    pub fn session_data(&self) -> &LoggedInSessionData {
+        &self.session_data
     }
 }
 
@@ -51,16 +56,18 @@ impl FromRequest for LoggedInSessionContext {
                 .await?
                 .ok_or(AuthError::NoSessionFound)?;
             // Actually verify that the session is the correct type
-            if let SessionState::LoggedInSession(_) = session.session_data.clone() {
-                Ok(())
-            } else {
-                Err(AuthError::SessionTypeError)
-            }?;
+            let session_data =
+                if let SessionState::LoggedInSession(session_data) = session.session_data.clone() {
+                    Ok(session_data)
+                } else {
+                    Err(AuthError::SessionTypeError)
+                }?;
             let user_vault =
                 db::user_vault::get_by_logged_in_session(&pool, auth_token.clone()).await?;
 
             Ok(Self {
                 user_vault,
+                session_data,
                 auth_token,
             })
         })

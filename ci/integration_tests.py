@@ -50,8 +50,11 @@ def _client_priv_key_headers(client_priv_key):
     }
 
 def _fpuser_auth_headers(request):
+    return _fpuser_auth_header_raw(request.config.cache.get("fpuser_auth_token", None))
+
+def _fpuser_auth_header_raw(value):
     return {
-        FPUSER_AUTH_HEADER: request.config.cache.get("fpuser_auth_token", None),
+        FPUSER_AUTH_HEADER: value
     }
 
 def _assert_response(response, status_code=200, msg="Incorrect status code"):
@@ -196,13 +199,13 @@ def test_user_data(request):
     )
     _assert_response(r)
 
-def test_d2p(request, workos_tenant):
+def test_d2p(request):
     # Get new auth token in d2p/generate endpoint
     path = "onboarding/d2p/generate"
     print(url(path))
     r = requests.post(
         url(path),
-        headers=dict(**_fpuser_auth_headers(request)),
+        headers=_fpuser_auth_headers(request),
     )
     body = _assert_response(r)
     temp_auth_token = body["data"]["auth_token"]
@@ -211,10 +214,19 @@ def test_d2p(request, workos_tenant):
     print(url(path))
     r = requests.post(
         url(path),
-        headers={FPUSER_AUTH_HEADER: temp_auth_token},
+        headers=_fpuser_auth_header_raw(temp_auth_token),
     )
     body = _assert_response(r)
     assert body["data"]["challenge_token"]
+
+    path = "onboarding/d2p/status"
+    print(url(path))
+    r = requests.get(
+        url(path),
+        headers=_fpuser_auth_header_raw(temp_auth_token),
+    )
+    body = _assert_response(r)
+    assert body["data"]["status"] == "waiting"
 
 def test_onboarding_complete(request, workos_tenant): 
     path = "onboarding/complete"
