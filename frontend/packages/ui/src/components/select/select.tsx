@@ -1,24 +1,20 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import Downshift from 'downshift';
-import IcoCheck16 from 'icons/ico/ico-check-16';
-import IcoChevronDown16 from 'icons/ico/ico-chevron-down-16';
 import unary from 'lodash/unary';
-import React, { useMemo, useState } from 'react';
-import Highlighter from 'react-highlight-words';
-import mergeRefs from 'react-merge-refs';
-import { useTheme } from 'styled';
+import React, { Fragment, useMemo, useState } from 'react';
 
+import DefaultOption from '../internal/default-option';
 import Hint from '../internal/hint';
 import Label from '../internal/label';
 import SelectSearch from './components/select-search';
+import TriggerButton from './components/trigger-button';
 import usePopper from './hooks/use-popper';
+import MIN_NUMBER_OF_OPTIONS_TO_SHOW_SEARCH from './select.constants';
 import S from './select.styles';
 import type { SelectOption } from './select.types';
 import filterValues from './select.utils';
 
-const MIN_NUMBER_OF_OPTIONS_TO_SHOW_SEARCH = 10;
-
-export type SelectProps = {
+export type SelectProps<Option extends SelectOption = SelectOption> = {
   disabled?: boolean;
   emptyStateTestID?: string;
   emptyStateText?: string;
@@ -27,15 +23,26 @@ export type SelectProps = {
   id?: string;
   label: string;
   onSearchChangeText?: (nextValue: string) => void;
-  onSelect: (option?: SelectOption | null) => void;
-  options: SelectOption[];
+  onSelect: (option?: Option | null) => void;
+  options: Option[];
   placeholder?: string;
+  renderOption?: (option: {
+    disableHoverStyles: boolean;
+    highlighted: boolean;
+    label: Option['label'];
+    onClick: React.MouseEventHandler<HTMLLIElement>;
+    onMouseDown: React.MouseEventHandler<HTMLLIElement>;
+    onMouseMove: React.MouseEventHandler<HTMLLIElement>;
+    searchWords: string[];
+    selected: boolean;
+    value: Option['value'];
+  }) => React.ReactNode;
   searchPlaceholder?: string;
-  selectedOption?: SelectOption | null;
+  selectedOption?: Option | null;
   testID?: string;
 };
 
-const Select = ({
+const Select = <T extends SelectOption = SelectOption>({
   disabled = false,
   emptyStateTestID,
   emptyStateText = 'No results found.',
@@ -50,17 +57,25 @@ const Select = ({
   searchPlaceholder = 'Search',
   selectedOption,
   testID,
-}: SelectProps) => {
-  const theme = useTheme();
+  renderOption = option => (
+    <DefaultOption
+      label={option.label}
+      disableHoverStyles={option.disableHoverStyles}
+      highlighted={option.highlighted}
+      onClick={option.onClick}
+      onMouseDown={option.onMouseDown}
+      onMouseMove={option.onMouseMove}
+      searchWords={option.searchWords}
+      selected={option.selected}
+    />
+  ),
+}: SelectProps<T>) => {
   // TODO: Migrate to useId once we migrate to react 18
   // https://github.com/onefootprint/frontend-monorepo/issues/61
   const id = baseID || `input-${label || placeholder}`;
   const { setReferenceElement, setPopperElement, popper } = usePopper();
   const [searchValue, setSearchValue] = useState('');
-  const searchValueAsArray = useMemo(
-    () => searchValue.split(' '),
-    [searchValue],
-  );
+  const searchWords = useMemo(() => searchValue.split(' '), [searchValue]);
   const filteredOptions = useMemo(
     () => filterValues(options, searchValue),
     [searchValue, options],
@@ -76,7 +91,10 @@ const Select = ({
 
   return (
     <Downshift
-      selectedItem={selectedOption}
+      // This is necessary because of the type getItemProps, which doesn't account for the
+      // constraint we have defined on our generic type.
+      // It won't produce any side effects, given the rest is protected
+      selectedItem={selectedOption as any}
       itemToString={item => (item ? item.label : '')}
       onSelect={unary(onSelect)}
       inputValue={searchValue}
@@ -91,24 +109,23 @@ const Select = ({
         highlightedIndex,
         isOpen,
       }) => {
-        const togglerProps = getToggleButtonProps({ disabled });
         const menuProps = getMenuProps({}, { suppressRefError: true });
         const inputProps = getInputProps();
 
         return (
           <S.Container {...getRootProps()} data-testid={testID}>
             <Label {...getLabelProps({ htmlFor: id })}>{label}</Label>
-            <S.Button
-              {...togglerProps}
+            <TriggerButton
               color={selectedOption ? 'primary' : 'tertiary'}
+              disabled={disabled}
+              getToggleButtonProps={getToggleButtonProps}
               hasError={hasError}
               id={id}
-              isActive={isOpen}
-              ref={mergeRefs([setReferenceElement, togglerProps.ref])}
+              isOpen={isOpen}
+              ref={setReferenceElement}
             >
               {selectedOption ? selectedOption.label : placeholder}
-              <IcoChevronDown16 />
-            </S.Button>
+            </TriggerButton>
             {hintText && (
               <Hint color={hasError ? 'error' : 'tertiary'}>{hintText}</Hint>
             )}
@@ -145,33 +162,21 @@ const Select = ({
                 >
                   {filteredOptions.map((option, index) => {
                     const optionProps = getItemProps({ item: option, index });
+                    const valueInString = option.value.toString();
                     return (
-                      <S.DefaultOption
-                        aria-selected={optionProps['aria-selected']}
-                        disableHoverStyles={highlightedIndex !== -1}
-                        highlighted={highlightedIndex === index}
-                        id={optionProps.id}
-                        key={option.value.toString()}
-                        onClick={optionProps.onClick}
-                        onMouseDown={optionProps.onMouseDown}
-                        onMouseMove={optionProps.onMouseMove}
-                        role={optionProps.role}
-                      >
-                        <Highlighter
-                          searchWords={searchValueAsArray}
-                          textToHighlight={option.label}
-                          highlightStyle={{
-                            background: 'none',
-                            color: theme.color.primary,
-                            fontWeight: theme.typography['label-3'].fontWeight,
-                          }}
-                        >
-                          {option.label}
-                        </Highlighter>
-                        {selectedOption?.value === option.value && (
-                          <IcoCheck16 color="primary" />
-                        )}
-                      </S.DefaultOption>
+                      <Fragment key={valueInString}>
+                        {renderOption({
+                          value: option.value,
+                          disableHoverStyles: highlightedIndex !== -1,
+                          highlighted: highlightedIndex === index,
+                          label: option.label,
+                          onClick: optionProps.onClick,
+                          onMouseDown: optionProps.onMouseDown,
+                          onMouseMove: optionProps.onMouseMove,
+                          searchWords,
+                          selected: selectedOption?.value === option.value,
+                        })}
+                      </Fragment>
                     );
                   })}
                 </S.Dropdown>

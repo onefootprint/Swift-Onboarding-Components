@@ -30,6 +30,7 @@ describe('<Select />', () => {
     onSelect = jest.fn(),
     options = defaultOptions,
     placeholder = 'Select...',
+    renderOption,
     searchPlaceholder,
     selectedOption,
     testID = 'select-test-id',
@@ -47,6 +48,7 @@ describe('<Select />', () => {
         onSelect={onSelect}
         options={options}
         placeholder={placeholder}
+        renderOption={renderOption}
         searchPlaceholder={searchPlaceholder}
         selectedOption={selectedOption}
         testID={testID}
@@ -61,6 +63,15 @@ describe('<Select />', () => {
   it('should render the label', () => {
     renderSelect({ label: 'some label text' });
     expect(screen.getByText('some label text')).toBeInTheDocument();
+  });
+
+  it('should render using a custom renderOption function', async () => {
+    const [firstOption] = defaultOptions;
+    const renderOption = (option: any) => <div>custom-{option.label}</div>;
+    renderSelect({ label: 'label text', renderOption });
+    const trigger = screen.getByText('label text');
+    await userEvent.click(trigger);
+    expect(screen.getByText(`custom-${firstOption.label}`)).toBeInTheDocument();
   });
 
   describe('when there is NO item selected', () => {

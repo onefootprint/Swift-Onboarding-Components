@@ -1,5 +1,4 @@
-import { darken, rgba } from 'polished';
-import styled, { Color, css } from 'styled';
+import styled, { css } from 'styled';
 
 import { createFontStyles, createOverlayBackground } from '../../utils/mixins';
 
@@ -31,69 +30,6 @@ const Dropdown = styled.ul`
     max-height: 180px;
     overflow: auto;
   `}
-`;
-
-const Button = styled.button<{
-  hasError: boolean;
-  isActive: boolean;
-  color: Color;
-}>`
-  ${({ color, hasError, theme }) => {
-    const defaultBorderColor = hasError ? 'error' : 'primary';
-    const hoverBorderColor = hasError ? 'error' : 'primary';
-    const focusBorderColor = hasError ? 'error' : 'secondary';
-    return css`
-      ${createFontStyles('body-3')}
-      align-items: center;
-      background-color: ${theme.backgroundColor.primary};
-      border-radius: ${theme.borderRadius[1]}px;
-      border: ${theme.borderWidth[1]}px solid
-        ${theme.borderColor[defaultBorderColor]};
-      color: ${theme.color[color]};
-      cursor: pointer;
-      display: flex;
-      height: 40px;
-      justify-content: space-between;
-      outline: none;
-      padding: 0 ${theme.spacing[5]}px;
-      text-align: left;
-      width: 100%;
-
-      &:hover:enabled {
-        border-color: ${hoverBorderColor === 'error'
-          ? darken(0.1, theme.borderColor[hoverBorderColor])
-          : darken(0.32, theme.borderColor[hoverBorderColor])};
-      }
-
-      &:focus:enabled {
-        -webkit-appearance: none;
-        border-color: ${theme.borderColor[focusBorderColor]};
-        box-shadow: 0 0 0 4px ${rgba(theme.borderColor[focusBorderColor], 0.1)};
-      }
-
-      &:disabled {
-        background: ${theme.backgroundColor.secondary};
-        color: ${theme.color.tertiary};
-        cursor: not-allowed;
-      }
-    `;
-  }}
-
-  ${({ hasError, isActive, theme }) => {
-    const focusBorderColor = hasError ? 'error' : 'secondary';
-    return (
-      isActive &&
-      css`
-        -webkit-appearance: none;
-        border-color: ${theme.borderColor[focusBorderColor]};
-        box-shadow: 0 0 0 4px ${rgba(theme.borderColor[focusBorderColor], 0.1)};
-
-        &:hover:enabled {
-          border-color: ${theme.borderColor[focusBorderColor]};
-        }
-      `
-    );
-  }}
 `;
 
 const EmptyState = styled.div`
@@ -138,7 +74,6 @@ const DefaultOption = styled('li')<{
 `;
 
 export default {
-  Button,
   Container,
   DropdownContainer,
   Dropdown,
