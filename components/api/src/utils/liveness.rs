@@ -11,13 +11,13 @@ pub struct LivenessWebauthnConfig {
 
 impl LivenessWebauthnConfig {
     pub fn new(state: &State) -> Self {
-        let (scheme, port) = if state.config.rp_id.as_str() == "localhost" {
-            ("http", ":3000")
+        let scheme = if state.config.rp_id.as_str() == "localhost" {
+            "http"
         } else {
-            ("https", "")
+            "https"
         };
 
-        let url = format!("{scheme}://{}{port}", &state.config.rp_id);
+        let url = format!("{scheme}://{}", &state.config.rp_id);
 
         Self {
             url: url::Url::parse(&url).unwrap(),
