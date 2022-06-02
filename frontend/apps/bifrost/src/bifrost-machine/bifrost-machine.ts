@@ -15,12 +15,13 @@ import {
   isMissingSsnAttribute,
 } from './utils/missing-attributes';
 
-const initialContext = {
+const initialContext: BifrostContext = {
   email: '',
   phone: undefined,
   authToken: undefined,
   userFound: false,
   challenge: undefined,
+  deviceHasWebAuthnSupport: undefined,
   onboarding: {
     missingAttributes: [],
     data: {},
@@ -33,6 +34,15 @@ const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
     id: 'bifrostMachine',
     initial: States.emailIdentification,
     context: initialContext,
+    on: {
+      [Events.deviceSupportForWebAuthnIdentified]: {
+        meta: {
+          description:
+            'Emitted once we detect whether the device has support for WebAuthn',
+        },
+        actions: [Actions.assignSupportForWebAuthn],
+      },
+    },
     states: {
       [States.emailIdentification]: {
         on: {
@@ -319,6 +329,12 @@ const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
       [Actions.assignAuthToken]: assign((context, event) => {
         if (event.type === Events.challengeSucceeded) {
           context.authToken = event.payload.authToken;
+        }
+        return context;
+      }),
+      [Actions.assignSupportForWebAuthn]: assign((context, event) => {
+        if (event.type === Events.deviceSupportForWebAuthnIdentified) {
+          context.deviceHasWebAuthnSupport = event.payload.hasSupport;
         }
         return context;
       }),

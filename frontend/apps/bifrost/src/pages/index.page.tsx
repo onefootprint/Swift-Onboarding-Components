@@ -2,6 +2,7 @@ import has from 'lodash/has';
 import React from 'react';
 import { States } from 'src/bifrost-machine/types';
 import useBifrostMachine from 'src/hooks/bifrost-machine';
+import useDeviceHasWebAuthnSupport from 'src/hooks/webauthn-support';
 
 import EmailIdentification from './email-identification';
 import AdditionalInfoRequired from './onboarding/components/additional-info-required';
@@ -15,6 +16,7 @@ import VerificationSuccess from './verification-success';
 
 const Root = () => {
   const [state] = useBifrostMachine();
+  useDeviceHasWebAuthnSupport();
   const valueCasted = state.value as keyof typeof States as States;
   const pages: Record<States, () => JSX.Element> = {
     // Identify

@@ -4,7 +4,7 @@ import request, { RequestError, RequestResponse } from 'request';
 import {
   createPublicKeyCredential,
   generateDeviceResponse,
-} from './utils/challenge-response-utils';
+} from '../../utils/biometric/challenge-response';
 
 export type LivenessRegisterRequest = {
   authToken: string;
@@ -23,7 +23,7 @@ const livenessRegister = async (payload: LivenessRegisterRequest) => {
     }>
   >({
     method: 'POST',
-    url: '/liveness/register/init',
+    url: '/user/biometric/init',
     data: payload,
     headers: {
       'X-Fpuser-Authorization': authToken,
@@ -40,7 +40,7 @@ const livenessRegister = async (payload: LivenessRegisterRequest) => {
     RequestResponse<LivenessRegisterResponse>
   >({
     method: 'POST',
-    url: '/liveness/register',
+    url: '/user/biometric',
     data: {
       deviceResponseJson,
       challengeToken,
