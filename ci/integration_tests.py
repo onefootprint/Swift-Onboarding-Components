@@ -196,6 +196,26 @@ def test_user_data(request):
     )
     _assert_response(r)
 
+def test_d2p(request, workos_tenant):
+    # Get new auth token in d2p/generate endpoint
+    path = "onboarding/d2p/generate"
+    print(url(path))
+    r = requests.post(
+        url(path),
+        headers=dict(**_fpuser_auth_headers(request)),
+    )
+    body = _assert_response(r)
+    temp_auth_token = body["data"]["auth_token"]
+
+    path = "user/biometric/init"
+    print(url(path))
+    r = requests.post(
+        url(path),
+        headers={FPUSER_AUTH_HEADER: temp_auth_token},
+    )
+    body = _assert_response(r)
+    assert body["data"]["challenge_token"]
+
 def test_onboarding_complete(request, workos_tenant): 
     path = "onboarding/complete"
     print(url(path))
