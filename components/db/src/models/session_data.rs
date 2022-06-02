@@ -4,7 +4,7 @@ use diesel::{
     sql_types::Jsonb,
     types::{FromSql, ToSql},
 };
-use newtypes::UserVaultId;
+use newtypes::{D2pSessionStatus, UserVaultId};
 use serde::{Deserialize, Serialize};
 use serde_json;
 use std::io::Write;
@@ -26,9 +26,21 @@ pub struct TenantDashboardSessionData {
     pub workos_id: String,
 }
 
-#[derive(Default, FromSqlRow, AsExpression, Serialize, Deserialize, Debug, Clone)]
+#[derive(FromSqlRow, AsExpression, Serialize, Deserialize, Debug, Clone)]
 pub struct LoggedInSessionData {
     pub user_vault_id: UserVaultId,
+    pub kind: LoggedInSessionKind,
+}
+
+#[derive(FromSqlRow, AsExpression, Serialize, Deserialize, Debug, Clone)]
+pub enum LoggedInSessionKind {
+    Normal,
+    D2pSession(D2pSessionData),
+}
+
+#[derive(Default, FromSqlRow, AsExpression, Serialize, Deserialize, Debug, Clone)]
+pub struct D2pSessionData {
+    pub status: D2pSessionStatus,
 }
 
 #[derive(FromSqlRow, AsExpression, Serialize, Deserialize, Debug, Clone)]

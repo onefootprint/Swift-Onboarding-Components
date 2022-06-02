@@ -3,7 +3,9 @@ use crate::errors::ApiError;
 use crate::types::success::ApiResponseData;
 use crate::State;
 use chrono::{Duration, Utc};
-use db::models::session_data::{LoggedInSessionData, SessionState as DbSessionState};
+use db::models::session_data::{
+    D2pSessionData, LoggedInSessionData, LoggedInSessionKind, SessionState as DbSessionState,
+};
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Serialize)]
@@ -25,6 +27,7 @@ pub fn handler(
     let temp_token_expires_at = Utc::now().naive_utc() + Duration::minutes(3);
     let (_, auth_token) = DbSessionState::LoggedInSession(LoggedInSessionData {
         user_vault_id: uv.id.clone(),
+        kind: LoggedInSessionKind::D2pSession(D2pSessionData::default()),
     })
     .create(&state.db_pool, temp_token_expires_at)
     .await?;

@@ -8,7 +8,9 @@ use crate::State;
 use aws_sdk_kms::model::DataKeyPairSpec;
 use chrono::{Duration, Utc};
 use crypto::sha256;
-use db::models::session_data::{LoggedInSessionData, SessionState as DbSessionState};
+use db::models::session_data::{
+    LoggedInSessionData, LoggedInSessionKind, SessionState as DbSessionState,
+};
 use db::models::user_vaults::{NewUserVaultReq, UserVault};
 use newtypes::{DataKind, Status, UserVaultId};
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
@@ -65,6 +67,7 @@ async fn handler(
     let login_expires_at = Utc::now().naive_utc() + Duration::minutes(15);
     let (_, auth_token) = DbSessionState::LoggedInSession(LoggedInSessionData {
         user_vault_id: user_vault_id,
+        kind: LoggedInSessionKind::Normal,
     })
     .create(&state.db_pool, login_expires_at)
     .await?;
