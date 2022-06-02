@@ -3,7 +3,7 @@ import HeaderTitle from 'src/components/header-title';
 import styled, { css } from 'styled';
 import { Button } from 'ui';
 
-const LivenessCheck = () => {
+const BiometricCheck = () => {
   const [retryCount, setRetryCount] = useState<number>(0);
 
   const handleClick = () => {
@@ -44,4 +44,4 @@ const Container = styled.form`
   `}
 `;
 
-export default LivenessCheck;
+export default BiometricCheck;

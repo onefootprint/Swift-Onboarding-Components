@@ -1,6 +1,6 @@
 import base64url from 'base64url';
 
-export type LivenessChallengeJson = {
+export type BiometricChallengeJson = {
   userVaultId: string;
   credentialId: string;
   publicKey: PublicKeyCredentialCreationOptions;
@@ -24,7 +24,7 @@ export const getPublicKeyCredential = async (challenge: string) => {
 };
 
 const parseChallenge = (challenge: string) => {
-  const challengeJson = JSON.parse(challenge) as LivenessChallengeJson;
+  const challengeJson = JSON.parse(challenge) as BiometricChallengeJson;
   const { publicKey } = challengeJson;
   publicKey.challenge = base64url.toBuffer(
     publicKey.challenge as unknown as string,
