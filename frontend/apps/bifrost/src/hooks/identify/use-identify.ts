@@ -1,13 +1,12 @@
 import { useMutation } from 'react-query';
 import request, { RequestError, RequestResponse } from 'request';
-
-export enum ChallengeKind {
-  sms = 'sms',
-  biometrics = 'biometric',
-}
+import { ChallengeKind } from 'src/bifrost-machine/types';
 
 export type IdentifyRequest = {
-  identifier: string; // email or phone number
+  identifier: {
+    email?: string;
+    phoneNumber?: string;
+  };
   preferredChallengeKind: ChallengeKind;
 };
 

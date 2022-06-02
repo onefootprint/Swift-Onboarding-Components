@@ -2,7 +2,7 @@ import React from 'react';
 import SuccessMessage from 'src/components/success-message';
 import { Typography } from 'ui';
 
-const RegistrationSuccess = () => {
+const OnboardingSuccess = () => {
   const body = (
     <>
       <Typography variant="body-1">
@@ -18,4 +18,4 @@ const RegistrationSuccess = () => {
   return <SuccessMessage body={body} />;
 };
 
-export default RegistrationSuccess;
+export default OnboardingSuccess;

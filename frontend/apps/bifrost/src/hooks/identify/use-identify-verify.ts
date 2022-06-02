@@ -1,6 +1,6 @@
 import { useMutation } from 'react-query';
 import request, { RequestError, RequestResponse } from 'request';
-import { ChallengeKind } from 'src/hooks/identify/use-identify';
+import { ChallengeKind } from 'src/bifrost-machine/types';
 
 export type IdentifyVerifyRequest = {
   challengeKind: ChallengeKind;

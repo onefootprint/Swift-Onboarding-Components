@@ -9,7 +9,7 @@ const AdditionalInfoRequired = () => {
   const [, send] = useBifrostMachine();
   const handleClick = () => {
     send({
-      type: Events.collectAdditionalInfo,
+      type: Events.additionalInfoRequired,
     });
   };
   const tenantName = 'AcmeBank'; // TODO: for now use a placeholder for tenant name.

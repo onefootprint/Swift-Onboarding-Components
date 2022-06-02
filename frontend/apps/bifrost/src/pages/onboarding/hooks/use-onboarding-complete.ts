@@ -7,7 +7,7 @@ export type OnboardingCompleteRequest = {
 
 export type OnboardingCompleteResponse = {
   footprintUserId: string;
-  missingWebAuthnCredentials: boolean;
+  missingWebauthnCredentials: boolean;
 };
 
 const onboardingCompleteRequest = async (

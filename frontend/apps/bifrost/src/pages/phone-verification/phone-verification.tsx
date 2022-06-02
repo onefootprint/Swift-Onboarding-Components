@@ -1,69 +1,70 @@
 import React from 'react';
-import { Events } from 'src/bifrost-machine/types';
+import { ChallengeKind, Events } from 'src/bifrost-machine/types';
 import useBifrostMachine from 'src/hooks/bifrost/use-bifrost-machine';
-import useIdentifyEmail from 'src/hooks/use-identify-email';
+import useIdentify, { IdentifyResponse } from 'src/hooks/identify/use-identify';
+import useIdentifyVerify, {
+  IdentifyVerifyResponse,
+} from 'src/hooks/identify/use-identify-verify';
 import styled, { css } from 'styled';
 import { Box, LinkButton, LoadingIndicator, PinInput, Typography } from 'ui';
 
 import useOnboarding, { OnboardingResponse } from './hooks/use-onboarding';
-import useVerifyPhone, {
-  VerifyPhoneResponse,
-  VerifyPhoneResponseKind,
-} from './hooks/use-verify-phone';
 
 const PhoneVerification = () => {
   const [state, send] = useBifrostMachine();
-  const { email, phoneNumberLastTwo, challengeToken } =
-    state.context.identification;
-
-  const identifyEmailMutation = useIdentifyEmail();
-  const verifyPhoneMutation = useVerifyPhone();
+  const identifyMutation = useIdentify();
+  const identifyVerifyMutation = useIdentifyVerify();
   const onboardingMutation = useOnboarding();
 
   const resendVerification = () => {
-    if (!email) {
-      return;
-    }
-    identifyEmailMutation.mutate({ email });
+    const { email } = state.context;
+    identifyMutation.mutate(
+      { identifier: { email }, preferredChallengeKind: ChallengeKind.sms },
+      {
+        onSuccess({ challengeData: newChallenge }: IdentifyResponse) {
+          if (!newChallenge) {
+            return;
+          }
+          send({
+            type: Events.smsChallengeResent,
+            payload: {
+              challenge: newChallenge,
+            },
+          });
+        },
+      },
+    );
   };
 
   const validatePin = (pin: string) => {
-    if (!challengeToken) {
+    const { challenge } = state.context;
+    if (!challenge) {
       return;
     }
-    verifyPhoneMutation.mutate(
+    const { challengeToken, challengeKind } = challenge;
+    identifyVerifyMutation.mutate(
       {
-        code: pin,
+        challengeKind,
+        challengeResponse: pin,
         challengeToken,
       },
       {
-        onSuccess: ({ authToken, kind }: VerifyPhoneResponse) => {
-          if (!authToken) {
-            return;
-          }
-
-          // TODO: handle errors better
+        onSuccess: ({ authToken }: IdentifyVerifyResponse) => {
           onboardingMutation.mutate(
             { authToken },
             {
-              onSuccess({ missingAttributes }: OnboardingResponse) {
-                if (kind === VerifyPhoneResponseKind.userCreated) {
-                  send({
-                    type: Events.userCreated,
-                    payload: {
-                      authToken,
-                      missingAttributes: new Set(missingAttributes),
-                    },
-                  });
-                } else if (kind === VerifyPhoneResponseKind.userInherited) {
-                  send({
-                    type: Events.userInherited,
-                    payload: {
-                      authToken,
-                      missingAttributes: new Set(missingAttributes),
-                    },
-                  });
-                }
+              onSuccess({
+                missingAttributes,
+                missingWebauthnCredentials,
+              }: OnboardingResponse) {
+                send({
+                  type: Events.challengeSucceeded,
+                  payload: {
+                    authToken,
+                    missingAttributes,
+                    missingWebauthnCredentials,
+                  },
+                });
               },
             },
           );
@@ -73,7 +74,9 @@ const PhoneVerification = () => {
   };
 
   const input =
-    verifyPhoneMutation.isLoading || onboardingMutation.isLoading ? (
+    identifyMutation.isLoading ||
+    identifyVerifyMutation.isLoading ||
+    onboardingMutation.isLoading ? (
       <>
         <LoadingIndicator />
         <Typography variant="label-3">Verifying...</Typography>
@@ -93,7 +96,7 @@ const PhoneVerification = () => {
         </Typography>
         <Typography variant="body-2" color="secondary">
           Enter the 6-digit code sent to (•••) ••• ••
-          {phoneNumberLastTwo}.
+          {state.context.challenge?.phoneNumberLastTwo}.
         </Typography>
       </Box>
       {input}

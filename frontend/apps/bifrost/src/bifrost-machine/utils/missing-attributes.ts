@@ -1,35 +1,78 @@
-import { UserData } from 'src/bifrost-machine/types';
+import { UserData, UserDataAttribute } from '../types';
 
-import { UserDataAttribute } from '../types/types';
+const BASIC_ATTRIBUTES = new Set([
+  UserDataAttribute.firstName,
+  UserDataAttribute.lastName,
+  UserDataAttribute.dob,
+]);
 
-export const isMissingBasicAttribute = (attributes: Set<UserDataAttribute>) =>
-  attributes.has(UserDataAttribute.firstName) ||
-  attributes.has(UserDataAttribute.lastName) ||
-  attributes.has(UserDataAttribute.dob);
+const RESIDENTIAL_ATTRIBUTES = new Set([
+  UserDataAttribute.streetAddress,
+  UserDataAttribute.streetAddress2,
+  UserDataAttribute.city,
+  UserDataAttribute.state,
+  UserDataAttribute.country,
+  UserDataAttribute.zip,
+]);
+
+export const isMissingBasicAttribute = (
+  missingAttributes: readonly UserDataAttribute[],
+  data?: UserData,
+) => {
+  if (!missingAttributes.length) {
+    return false;
+  }
+  if (!data) {
+    return true;
+  }
+  // Find out if there are any missing basic info attributes that haven't been filled in data yet
+  return missingAttributes.some(
+    (attribute: UserDataAttribute) =>
+      BASIC_ATTRIBUTES.has(attribute) && !data[attribute],
+  );
+};
 
 export const isMissingResidentialAttribute = (
-  attributes: Set<UserDataAttribute>,
-) =>
-  attributes.has(UserDataAttribute.streetAddress) ||
-  attributes.has(UserDataAttribute.streetAddress2) ||
-  attributes.has(UserDataAttribute.city) ||
-  attributes.has(UserDataAttribute.state) ||
-  attributes.has(UserDataAttribute.country) ||
-  attributes.has(UserDataAttribute.zip);
-
-export const isMissingSsnAttribute = (attributes: Set<UserDataAttribute>) =>
-  attributes.has(UserDataAttribute.ssn);
-
-export const hasMissingAttributes = (attributes: Set<UserDataAttribute>) =>
-  attributes.size > 0;
-
-export const cleanMissingAttributes = (
-  attributes: Set<UserDataAttribute>,
-  filledData: UserData,
+  missingAttributes: readonly UserDataAttribute[],
+  data?: UserData,
 ) => {
-  Object.entries(filledData).forEach((entry: [string, string]) => {
-    if (entry[1]) {
-      attributes.delete(entry[0] as UserDataAttribute);
-    }
-  });
+  if (!missingAttributes.length) {
+    return false;
+  }
+  if (!data) {
+    return true;
+  }
+  // Find out if there are any missing residential info attributes that haven't been filled in data yet
+  return missingAttributes.some(
+    (attribute: UserDataAttribute) =>
+      RESIDENTIAL_ATTRIBUTES.has(attribute) && !data[attribute],
+  );
+};
+
+export const isMissingSsnAttribute = (
+  missingAttributes: readonly UserDataAttribute[],
+  data?: UserData,
+) => {
+  if (!missingAttributes.length) {
+    return false;
+  }
+  if (!data || missingAttributes.indexOf(UserDataAttribute.ssn) === -1) {
+    return true;
+  }
+  return !data[UserDataAttribute.ssn];
+};
+
+export const hasMissingAttributes = (
+  missingAttributes: readonly UserDataAttribute[],
+  data?: UserData,
+) => {
+  if (!missingAttributes.length) {
+    return false;
+  }
+  if (!data) {
+    return true;
+  }
+  return missingAttributes.some(
+    (attribute: UserDataAttribute) => !data[attribute],
+  );
 };

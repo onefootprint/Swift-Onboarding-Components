@@ -2,13 +2,15 @@ import { useTranslation } from 'hooks';
 import IcoEmail24 from 'icons/ico/ico-email-24';
 import React from 'react';
 import { useForm } from 'react-hook-form';
-import { Events } from 'src/bifrost-machine/types';
+import { ChallengeKind, Events } from 'src/bifrost-machine/types';
 import HeaderTitle from 'src/components/header-title';
 import useBifrostMachine from 'src/hooks/bifrost/use-bifrost-machine';
+import useIdentify from 'src/hooks/identify/use-identify';
+import useIdentifyChallenge, {
+  IdentifyChallengeResponse,
+} from 'src/hooks/identify/use-identify-challenge';
 import styled, { css } from 'styled';
 import { Button, LinkButton, TextInput, Typography } from 'ui';
-
-import useIdentifyPhone from './hooks/use-identify-phone';
 
 type FormData = {
   phone: string;
@@ -22,24 +24,59 @@ const PhoneRegistration = () => {
     handleSubmit,
     formState: { errors },
   } = useForm<FormData>();
-  const identifyPhoneMutation = useIdentifyPhone();
+  const identifyMutation = useIdentify();
+  const identifyChallengeMutation = useIdentifyChallenge();
 
   const handleChangeEmail = () => {
-    send({ type: Events.changeEmail });
+    send({ type: Events.emailChangeRequested });
+  };
+
+  const sendSmsChallenge = (phoneNumber: string, userFound: boolean) => {
+    identifyChallengeMutation.mutate(
+      {
+        phoneNumber,
+      },
+      {
+        onSuccess({ challengeToken }: IdentifyChallengeResponse) {
+          send({
+            type: Events.userIdentifiedByPhone,
+            payload: {
+              phone: phoneNumber,
+              userFound,
+              challengeData: {
+                challengeKind: ChallengeKind.sms,
+                challengeToken,
+              },
+            },
+          });
+        },
+      },
+    );
   };
 
   const onSubmit = (formData: FormData) => {
-    identifyPhoneMutation.mutate(
-      { phoneNumber: formData.phone },
+    const { phone } = formData;
+    identifyMutation.mutate(
       {
-        onSuccess({ challengeToken, phoneNumberLastTwo }) {
-          send({
-            type: Events.phoneSubmitted,
-            payload: {
-              challengeToken,
-              phoneNumberLastTwo,
-            },
-          });
+        identifier: { phoneNumber: phone },
+        preferredChallengeKind: ChallengeKind.sms,
+      },
+      {
+        onSuccess({ userFound, challengeData }) {
+          // userFound=true when we found an account associated with this phone
+          // even though we didn't recognize the email in the email-identification page
+          if (userFound && challengeData) {
+            send({
+              type: Events.userIdentifiedByPhone,
+              payload: {
+                phone,
+                userFound,
+                challengeData,
+              },
+            });
+          }
+          // If this is a new user/phone, send an SMS challenge
+          sendSmsChallenge(phone, userFound);
         },
       },
     );
@@ -51,7 +88,7 @@ const PhoneRegistration = () => {
       <EmailCard>
         <IcoEmail24 />
         <Typography variant="label-3" color="primary" sx={{ flexGrow: 1 }}>
-          {state.context.registration.data.email}
+          {state.context.email}
         </Typography>
         <LinkButton size="tiny" onClick={handleChangeEmail}>
           {t('email-card.cta')}
@@ -64,7 +101,13 @@ const PhoneRegistration = () => {
         placeholder={t('form.phone-input.placeholder')}
         {...register('phone', { required: true })}
       />
-      <Button type="submit" fullWidth loading={identifyPhoneMutation.isLoading}>
+      <Button
+        type="submit"
+        fullWidth
+        loading={
+          identifyMutation.isLoading || identifyChallengeMutation.isLoading
+        }
+      >
         {t('form.cta')}
       </Button>
     </Form>

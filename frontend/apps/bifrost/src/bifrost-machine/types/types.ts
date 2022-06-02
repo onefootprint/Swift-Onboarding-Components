@@ -1,45 +1,56 @@
 export enum States {
+  // Identify
   emailIdentification = 'emailIdentification',
-  basicInformation = 'basicInformation',
-  phoneVerification = 'phoneVerification',
   verificationSuccess = 'verificationSuccess',
-  additionalInfoRequired = 'additionalInfoRequired',
-  phoneRegistration = 'phoneRegistration',
+  phoneRegistration = 'phoneRegistration', // Email not associated with an existing user, asking for phone
+
+  // Challenge
+  phoneVerification = 'phoneVerification', // Existing user phone gets pin code
+
+  // Onboarding
+  additionalDataRequired = 'additionalDataRequired',
+  basicInformation = 'basicInformation',
   residentialAddress = 'residentialAddress',
   ssn = 'ssn',
-  registrationSuccess = 'registrationSuccess',
+  onboardingSuccess = 'registrationSuccess',
 }
 
 export enum Events {
-  userFound = 'userFound',
-  userNotFound = 'userNotFound',
-  changeEmail = 'changeEmail',
-  phoneSubmitted = 'phoneSubmitted',
-  userCreated = 'userCreated',
-  userInherited = 'userInherited',
-  collectAdditionalInfo = 'collectAdditionalInfo',
+  // Identify
+  emailChangeRequested = 'emailChangeRequested',
+  userIdentifiedByEmail = 'userIdentifiedByEmail',
+  userIdentifiedByPhone = 'userIdentifiedByPhone',
+  userNotIdentified = 'userNotIdentified',
+
+  // Biometric Challenge
+  smsChallengeResent = 'smsChallengeResent',
+  challengeSucceeded = 'challengeSucceeded',
+
+  // Onboarding Events
+  additionalInfoRequired = 'additionalInfoRequired',
   basicInformationSubmitted = 'basicInformationSubmitted',
   residentialAddressSubmitted = 'residentialAddressSubmitted',
   ssnSubmitted = 'ssnSubmitted',
-  registrationCompleted = 'registrationCompleted',
 }
 
 export enum Actions {
-  assignIdentification = 'assignIdentification',
+  // Identify & Challenge
   assignEmail = 'assignEmail',
+  assignPhone = 'assignPhone',
   resetContext = 'resetContext',
-  assignAuthTokenWithMissingAttributes = 'assignTokenWithMissingAttributes',
+  assignUserFound = 'assignUserFound',
+  assignAuthToken = 'assignAuthToken',
+  assignChallenge = 'assignChallengeData',
+
+  // Onboarding
+  assignMissingAttributes = 'assignMissingAttributes',
+  assignMissingWebauthnCredentials = 'assignMissingWebAuthnCredentials',
   assignBasicInformation = 'assignBasicInformation',
   assignResidentialAddress = 'assignResidentialAddress',
   assignSsn = 'assignSsn',
 }
 
-export type Identification = Partial<{
-  email: string;
-  phoneNumberLastTwo: string;
-  challengeToken: string;
-}>;
-
+// TODO: do we put phone number here? or last two?
 export enum UserDataAttribute {
   firstName = 'firstName',
   lastName = 'lastName',
@@ -68,11 +79,6 @@ export type UserData = Partial<{
   [UserDataAttribute.zip]: string;
 }>;
 
-export type Registration = {
-  missingAttributes: Set<UserDataAttribute>;
-  data: UserData;
-};
-
 export type BasicInformation = Required<
   Pick<
     UserData,
@@ -94,48 +100,78 @@ export type ResidentialAddress = Required<
   >
 >;
 
+export enum ChallengeKind {
+  sms = 'sms',
+  biometrics = 'biometric',
+}
+
+export type ChallengeData = {
+  challengeToken: string;
+  challengeKind: ChallengeKind;
+  phoneNumberLastTwo?: string;
+  biometricChallengeJson?: string;
+};
+
+export type OnboardingData = {
+  missingWebauthnCredentials: boolean;
+  missingAttributes: readonly UserDataAttribute[]; // Initial set of attributes received from /onboarding
+  data: UserData; // Filled user data
+};
+
 export type BifrostContext = {
-  identification: Identification;
-  registration: Registration;
+  email: string;
+  phone?: string;
+  userFound: boolean;
   authToken?: string;
+  challenge?: ChallengeData;
+  onboarding: OnboardingData;
 };
 
 export type BifrostEvent =
+  | { type: Events.emailChangeRequested }
   | {
-      type: Events.userFound;
-      payload: Identification;
-    }
-  | { type: Events.userNotFound; payload: { email: string } }
-  | { type: Events.changeEmail }
-  | {
-      type: Events.userCreated;
-      payload: { authToken: string; missingAttributes: Set<UserDataAttribute> };
-    }
-  | {
-      type: Events.userInherited;
-      payload: { authToken: string; missingAttributes: Set<UserDataAttribute> };
-    }
-  | {
-      type: Events.collectAdditionalInfo;
-    }
-  | {
-      type: Events.phoneSubmitted;
+      type: Events.userIdentifiedByEmail;
       payload: {
-        phoneNumberLastTwo: string;
-        challengeToken: string;
+        email: string;
+        userFound: boolean;
+        challengeData?: ChallengeData; // only if user found
       };
     }
+  | {
+      type: Events.userIdentifiedByPhone;
+      payload: {
+        phone: string;
+        userFound: boolean;
+        challengeData?: ChallengeData; // only if user found
+      };
+    }
+  | {
+      type: Events.userNotIdentified;
+      payload: {
+        email?: string;
+        phone?: string;
+        userFound: boolean;
+      };
+    }
+  | {
+      type: Events.smsChallengeResent;
+      payload: { challenge: ChallengeData };
+    }
+  | {
+      type: Events.challengeSucceeded;
+      payload: {
+        authToken: string;
+        missingAttributes: readonly UserDataAttribute[];
+        missingWebauthnCredentials: boolean;
+      };
+    }
+  | { type: Events.additionalInfoRequired }
   | {
       type: Events.basicInformationSubmitted;
-      payload: {
-        basicInformation: BasicInformation;
-      };
+      payload: { basicInformation: BasicInformation };
     }
   | {
       type: Events.residentialAddressSubmitted;
-      payload: {
-        residentialAddress: ResidentialAddress;
-      };
+      payload: { residentialAddress: ResidentialAddress };
     }
-  | { type: Events.ssnSubmitted; payload: { ssn: string } }
-  | { type: Events.registrationCompleted };
+  | { type: Events.ssnSubmitted; payload: { [UserDataAttribute.ssn]: string } };

@@ -9,23 +9,28 @@ import BasicInformation from './onboarding/components/basic-information';
 import PhoneRegistration from './onboarding/components/phone-registration';
 import ResidentialAddress from './onboarding/components/residential-address';
 import SSN from './onboarding/components/ssn';
+import OnboardingSuccess from './onboarding-success/onboarding-success';
 import PhoneVerification from './phone-verification';
-import RegistrationSuccess from './registration-success/registration-success';
 import VerificationSuccess from './verification-success';
 
 const Root = () => {
   const [state] = useBifrostMachine();
-  const valueCasted = state.value as keyof typeof States;
+  const valueCasted = state.value as keyof typeof States as States;
   const pages: Record<States, () => JSX.Element> = {
+    // Identify
     [States.emailIdentification]: EmailIdentification,
-    [States.phoneVerification]: PhoneVerification,
     [States.verificationSuccess]: VerificationSuccess,
-    [States.additionalInfoRequired]: AdditionalInfoRequired,
     [States.phoneRegistration]: PhoneRegistration,
+
+    // Challenge
+    [States.phoneVerification]: PhoneVerification,
+
+    // Onboarding
+    [States.additionalDataRequired]: AdditionalInfoRequired,
     [States.basicInformation]: BasicInformation,
     [States.residentialAddress]: ResidentialAddress,
     [States.ssn]: SSN,
-    [States.registrationSuccess]: RegistrationSuccess,
+    [States.onboardingSuccess]: OnboardingSuccess,
   };
   if (has(pages, valueCasted)) {
     const Page = pages[valueCasted];

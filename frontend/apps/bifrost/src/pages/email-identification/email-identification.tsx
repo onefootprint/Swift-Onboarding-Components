@@ -1,10 +1,13 @@
 import React from 'react';
 import { useForm } from 'react-hook-form';
-import { Events, UserData, UserDataAttribute } from 'src/bifrost-machine/types';
+import {
+  ChallengeKind,
+  Events,
+  UserData,
+  UserDataAttribute,
+} from 'src/bifrost-machine/types';
 import useBifrostMachine from 'src/hooks/bifrost/use-bifrost-machine';
-import useIdentifyEmail, {
-  IdentifyEmailResponse,
-} from 'src/hooks/use-identify-email';
+import useIdentify, { IdentifyResponse } from 'src/hooks/identify/use-identify';
 import styled, { css } from 'styled';
 import { Button, TextInput, Typography } from 'ui';
 
@@ -13,7 +16,7 @@ type FormData = Required<Pick<UserData, UserDataAttribute.email>>;
 const EmailIdentification = () => {
   const [, send] = useBifrostMachine();
 
-  const identifyEmailMutation = useIdentifyEmail();
+  const identifyMutation = useIdentify();
   const {
     register,
     handleSubmit,
@@ -22,26 +25,28 @@ const EmailIdentification = () => {
 
   const onSubmit = (formData: FormData) => {
     const { email } = formData;
-    identifyEmailMutation.mutate(
-      { email },
+    identifyMutation.mutate(
+      { identifier: { email }, preferredChallengeKind: ChallengeKind.sms },
       {
-        onSuccess({ userFound, challengeData }: IdentifyEmailResponse) {
-          if (userFound && challengeData) {
+        onSuccess({ userFound, challengeData }: IdentifyResponse) {
+          if (userFound) {
             send({
-              type: Events.userFound,
+              type: Events.userIdentifiedByEmail,
               payload: {
                 email,
-                ...challengeData,
+                challengeData,
+                userFound,
               },
             });
-          } else {
-            send({
-              type: Events.userNotFound,
-              payload: {
-                email,
-              },
-            });
+            return;
           }
+          send({
+            type: Events.userNotIdentified,
+            payload: {
+              email,
+              userFound,
+            },
+          });
         },
       },
     );
@@ -65,7 +70,7 @@ const EmailIdentification = () => {
         type="email"
         {...register('email', { required: true })}
       />
-      <Button fullWidth type="submit" loading={identifyEmailMutation.isLoading}>
+      <Button fullWidth type="submit" loading={identifyMutation.isLoading}>
         Continue
       </Button>
     </Form>

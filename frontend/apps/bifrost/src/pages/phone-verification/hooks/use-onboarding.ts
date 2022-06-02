@@ -8,7 +8,7 @@ export type OnboardingRequest = {
 
 export type OnboardingResponse = {
   missingAttributes: UserDataAttribute[];
-  missingWebAuthnCredentials: boolean;
+  missingWebauthnCredentials: boolean;
 };
 
 // Labels sent from the backend for each attribute
