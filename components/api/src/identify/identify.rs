@@ -4,10 +4,11 @@ use crate::utils::challenge::{Challenge, ChallengeToken};
 use crate::utils::crypto::signed_hash;
 use crate::utils::email::clean_email;
 use crate::utils::liveness::LivenessWebauthnConfig;
+use crate::utils::user_vault_wrapper::UserVaultWrapper;
 use crate::State;
 use chrono::{Duration, Utc};
 use crypto::serde_cbor;
-use db::models::user_vaults::{UserVault, UserVaultWrapper};
+use db::models::user_vaults::UserVault;
 use db::models::webauthn_credential::WebauthnCredential;
 use db::webauthn_credentials::get_webauthn_creds;
 use newtypes::{DataKind, UserVaultId};
@@ -75,7 +76,11 @@ pub async fn handler(
 
     // The user vault exists. Extract the phone number for the user
     let user_id = existing_user.id.clone();
-    let phone_number = get_phone_number_for_user(&state, existing_user).await?;
+    let uvw = UserVaultWrapper::from(&state.db_pool, existing_user).await?;
+    let phone_number = uvw
+        .get_decrypted_field(&state, DataKind::PhoneNumber)
+        .await?
+        .ok_or(ApiError::NoPhoneNumberForVault)?;
 
     // Initiate the challenge of the requested type
     let (challenge_kind, challenge_token, biometric_challenge_json) = match preferred_challenge_kind
@@ -132,26 +137,6 @@ async fn get_user_by_identifier(
             .await?
             .map(|x| x.0);
     Ok(existing_user)
-}
-
-// TODO create a get_decrypted_field() fn on UserVaultWrapper
-async fn get_phone_number_for_user(
-    state: &web::Data<State>,
-    vault: UserVault,
-) -> Result<String, ApiError> {
-    let e_private_key = vault.e_private_key.clone();
-    let uvw = UserVaultWrapper::from(&state.db_pool, vault).await?;
-    let e_phone_number = uvw
-        .get_e_field(DataKind::PhoneNumber)
-        .ok_or(ApiError::NoPhoneNumberForVault)?;
-    let phone_number = crate::enclave::decrypt_bytes(
-        state,
-        e_phone_number,
-        e_private_key,
-        enclave_proxy::DataTransform::Identity,
-    )
-    .await?;
-    Ok(phone_number)
 }
 
 async fn initiate_biometric_challenge_for_user(

@@ -1,9 +1,10 @@
 use super::{clean_for_fingerprint, clean_for_storage};
 use crate::auth::logged_in_session::LoggedInSessionContext;
 use crate::utils::email::{clean_email, send_email_challenge};
+use crate::utils::user_vault_wrapper::UserVaultWrapper;
 use crate::{errors::ApiError, types::success::ApiResponseData, State};
 use db::models::user_data::{NewUserData, NewUserDataBatch};
-use db::models::user_vaults::{UserVault, UserVaultWrapper};
+use db::models::user_vaults::UserVault;
 use newtypes::{DataKind, DataPriority, UserDataId, UserVaultId};
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 

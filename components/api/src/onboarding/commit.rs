@@ -1,11 +1,12 @@
-use crate::auth::client_public_key::PublicTenantAuthContext;
 use crate::auth::get_onboarding_for_tenant;
 use crate::auth::logged_in_session::LoggedInSessionContext;
 use crate::errors::ApiError;
 use crate::types::success::ApiResponseData;
 use crate::utils::insight_headers::InsightHeaders;
 use crate::State;
-use db::models::user_vaults::UserVaultWrapper;
+use crate::{
+    auth::client_public_key::PublicTenantAuthContext, utils::user_vault_wrapper::UserVaultWrapper,
+};
 use db::{models::insight_event::CreateInsightEvent, webauthn_credentials::get_webauthn_creds};
 use newtypes::FootprintUserId;
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
