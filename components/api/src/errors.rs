@@ -93,6 +93,8 @@ pub enum ApiError {
     NoPhoneNumberForVault,
     #[error("not implemented")]
     NotImplemented,
+    #[error("cannot transition status backwards")]
+    InvalidStatusTransition,
 }
 
 fn status_code_for_db_error(e: &DbError) -> StatusCode {
@@ -154,6 +156,7 @@ impl actix_web::ResponseError for ApiError {
             // This invariant should never be broken
             ApiError::NoPhoneNumberForVault => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::NotImplemented => StatusCode::INTERNAL_SERVER_ERROR,
+            ApiError::InvalidStatusTransition => StatusCode::BAD_REQUEST,
         }
     }
 

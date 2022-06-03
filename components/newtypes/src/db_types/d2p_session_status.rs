@@ -6,8 +6,21 @@ use serde::{Deserialize, Serialize};
 pub enum D2pSessionStatus {
     Waiting,
     InProgress,
+    Canceled,
     Failed,
     Completed,
+}
+
+impl D2pSessionStatus {
+    pub fn priority(&self) -> usize {
+        match self {
+            D2pSessionStatus::Waiting => 0,
+            D2pSessionStatus::InProgress => 1,
+            D2pSessionStatus::Canceled => 2,
+            D2pSessionStatus::Failed => 2,
+            D2pSessionStatus::Completed => 2,
+        }
+    }
 }
 
 impl Default for D2pSessionStatus {

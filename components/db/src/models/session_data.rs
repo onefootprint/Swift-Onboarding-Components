@@ -32,6 +32,15 @@ pub struct LoggedInSessionData {
     pub kind: LoggedInSessionKind,
 }
 
+impl LoggedInSessionData {
+    pub fn replace(&self, kind: LoggedInSessionKind) -> LoggedInSessionData {
+        Self {
+            user_vault_id: self.user_vault_id.clone(),
+            kind,
+        }
+    }
+}
+
 #[derive(FromSqlRow, AsExpression, Serialize, Deserialize, Debug, Clone)]
 pub enum LoggedInSessionKind {
     Normal,
@@ -41,6 +50,12 @@ pub enum LoggedInSessionKind {
 #[derive(Default, FromSqlRow, AsExpression, Serialize, Deserialize, Debug, Clone)]
 pub struct D2pSessionData {
     pub status: D2pSessionStatus,
+}
+
+impl From<D2pSessionStatus> for LoggedInSessionKind {
+    fn from(status: D2pSessionStatus) -> Self {
+        Self::D2pSession(D2pSessionData { status })
+    }
 }
 
 #[derive(FromSqlRow, AsExpression, Serialize, Deserialize, Debug, Clone)]

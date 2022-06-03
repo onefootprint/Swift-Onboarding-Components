@@ -1,9 +1,11 @@
 use crate::auth::{logged_in_session::LoggedInSessionContext, AuthError};
 use crate::errors::ApiError;
 use crate::types::success::ApiResponseData;
-use db::models::session_data::LoggedInSessionKind;
+use crate::types::Empty;
+use crate::State;
+use db::models::session_data::{LoggedInSessionKind, SessionState};
 use newtypes::D2pSessionStatus;
-use paperclip::actix::{api_v2_operation, get, web::Json, Apiv2Schema};
+use paperclip::actix::{api_v2_operation, get, post, web, web::Json, Apiv2Schema};
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Serialize)]
 pub struct StatusResponse {
@@ -13,7 +15,7 @@ pub struct StatusResponse {
 #[api_v2_operation(tags(D2p))]
 #[get("status")]
 /// Gets the status of the provided d2p session. Requires the d2p session token as the auth header.
-pub fn handler(
+pub fn get(
     user_auth: LoggedInSessionContext,
 ) -> actix_web::Result<Json<ApiResponseData<StatusResponse>>, ApiError> {
     let d2p_session_data = match &user_auth.session_data().kind {
@@ -23,7 +25,37 @@ pub fn handler(
 
     Ok(Json(ApiResponseData {
         data: StatusResponse {
-            status: d2p_session_data.status,
+            status: d2p_session_data.status.clone(),
         },
     }))
+}
+
+#[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
+pub struct UpdateStatusRequest {
+    status: D2pSessionStatus,
+}
+
+#[api_v2_operation(tags(D2p))]
+#[post("status")]
+/// Update the status of the provided d2p session. Only allows updating to certain statuses
+pub fn post(
+    user_auth: LoggedInSessionContext,
+    request: Json<UpdateStatusRequest>,
+    state: web::Data<State>,
+) -> actix_web::Result<Json<ApiResponseData<Empty>>, ApiError> {
+    let d2p_session_data = match &user_auth.session_data().kind {
+        LoggedInSessionKind::D2pSession(d2p_session_data) => d2p_session_data,
+        _ => return Err(AuthError::SessionTypeError).map_err(ApiError::from),
+    };
+
+    let UpdateStatusRequest { status } = request.into_inner();
+    if status.priority() <= d2p_session_data.status.priority() {
+        return Err(ApiError::InvalidStatusTransition);
+    }
+
+    SessionState::LoggedInSession(user_auth.session_data().clone().replace(status.into()))
+        .update(&state.db_pool, user_auth.auth_token)
+        .await?;
+
+    Ok(Json(ApiResponseData { data: Empty }))
 }

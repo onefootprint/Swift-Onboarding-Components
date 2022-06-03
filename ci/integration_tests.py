@@ -210,6 +210,7 @@ def test_d2p(request):
     body = _assert_response(r)
     temp_auth_token = body["data"]["auth_token"]
 
+    # Make sure the auth token can be used to add a biometric credential
     path = "user/biometric/init"
     print(url(path))
     r = requests.post(
@@ -219,6 +220,7 @@ def test_d2p(request):
     body = _assert_response(r)
     assert body["data"]["challenge_token"]
 
+    # Use the auth token to check the status of the d2p session
     path = "onboarding/d2p/status"
     print(url(path))
     r = requests.get(
@@ -227,6 +229,34 @@ def test_d2p(request):
     )
     body = _assert_response(r)
     assert body["data"]["status"] == "waiting"
+
+    # Update the status of the d2p session
+    print(url(path))
+    r = requests.post(
+        url(path),
+        headers=_fpuser_auth_header_raw(temp_auth_token),
+        json=dict(status="completed"),
+    )
+    body = _assert_response(r)
+
+    # Check that the status is updated
+    path = "onboarding/d2p/status"
+    print(url(path))
+    r = requests.get(
+        url(path),
+        headers=_fpuser_auth_header_raw(temp_auth_token),
+    )
+    body = _assert_response(r)
+    assert body["data"]["status"] == "completed"
+
+    # Don't allow transitioning the status backwards
+    print(url(path))
+    r = requests.post(
+        url(path),
+        headers=_fpuser_auth_header_raw(temp_auth_token),
+        json=dict(status="canceled"),
+    )
+    body = _assert_response(r, status_code=400)
 
 def test_onboarding_complete(request, workos_tenant): 
     path = "onboarding/complete"

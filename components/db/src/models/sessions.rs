@@ -25,6 +25,13 @@ pub struct NewSession {
     pub expires_at: NaiveDateTime,
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
+#[table_name = "sessions"]
+pub struct UpdateSession {
+    pub h_session_id: String,
+    pub session_data: SessionState,
+}
+
 impl SessionState {
     pub async fn create(
         self,
@@ -44,6 +51,22 @@ impl SessionState {
         .await?;
         Ok((session, token))
     }
+
+    pub async fn update(
+        self,
+        pool: &DbPool,
+        token: String,
+    ) -> Result<(Session, String), crate::DbError> {
+        let h_session_id: String = crypto::sha256(token.as_bytes()).encode_hex();
+
+        let session = UpdateSession {
+            h_session_id,
+            session_data: self,
+        }
+        .update(pool)
+        .await?;
+        Ok((session, token))
+    }
 }
 
 impl NewSession {
@@ -60,6 +83,22 @@ impl NewSession {
                         sessions::session_data.eq(self.session_data),
                         sessions::expires_at.eq(self.expires_at),
                     ))
+                    .get_result::<Session>(conn)
+            })
+            .await??;
+        Ok(session)
+    }
+}
+
+impl UpdateSession {
+    pub async fn update(self, pool: &DbPool) -> Result<Session, crate::DbError> {
+        let session = pool
+            .get()
+            .await?
+            .interact(move |conn| {
+                diesel::update(sessions::table)
+                    .filter(sessions::h_session_id.eq(self.h_session_id))
+                    .set(sessions::session_data.eq(self.session_data))
                     .get_result::<Session>(conn)
             })
             .await??;
