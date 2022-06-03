@@ -221,6 +221,16 @@ def test_d2p(request):
     assert body["data"]["challenge_token"]
 
     # Use the auth token to check the status of the d2p session
+    path = "onboarding/d2p/sms"
+    print(url(path))
+    r = requests.post(
+        url(path),
+        headers=_fpuser_auth_header_raw(temp_auth_token),
+        json=dict(base_url="https://onefootprint.com/"),
+    )
+    _assert_response(r)
+
+    # Use the auth token to check the status of the d2p session
     path = "onboarding/d2p/status"
     print(url(path))
     r = requests.get(
@@ -237,7 +247,7 @@ def test_d2p(request):
         headers=_fpuser_auth_header_raw(temp_auth_token),
         json=dict(status="completed"),
     )
-    body = _assert_response(r)
+    _assert_response(r)
 
     # Check that the status is updated
     path = "onboarding/d2p/status"
@@ -256,7 +266,7 @@ def test_d2p(request):
         headers=_fpuser_auth_header_raw(temp_auth_token),
         json=dict(status="canceled"),
     )
-    body = _assert_response(r, status_code=400)
+    _assert_response(r, status_code=400)
 
 def test_onboarding_complete(request, workos_tenant): 
     path = "onboarding/complete"

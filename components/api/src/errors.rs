@@ -118,7 +118,7 @@ fn status_code_for_db_error(e: &DbError) -> StatusCode {
 impl actix_web::ResponseError for ApiError {
     fn status_code(&self) -> StatusCode {
         match self {
-            ApiError::AuthError(_) => StatusCode::BAD_REQUEST,
+            ApiError::AuthError(_) => StatusCode::UNAUTHORIZED,
             ApiError::KmsKeyPair(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::KmsDataKey(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::PinpointPhoneNumberValidateError(_) => StatusCode::INTERNAL_SERVER_ERROR,
