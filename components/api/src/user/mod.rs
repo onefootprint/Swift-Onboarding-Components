@@ -1,4 +1,4 @@
-use crate::identify::clean_email;
+use crate::utils::email::clean_email;
 use newtypes::DataKind;
 use paperclip::actix::web;
 

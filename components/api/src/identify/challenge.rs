@@ -1,7 +1,8 @@
 use crate::errors::ApiError;
-use crate::identify::{clean_phone_number, send_phone_challenge};
+use crate::identify::send_phone_challenge;
 use crate::types::success::ApiResponseData;
 use crate::utils::challenge::ChallengeToken;
+use crate::utils::phone::clean_phone_number;
 use crate::State;
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 

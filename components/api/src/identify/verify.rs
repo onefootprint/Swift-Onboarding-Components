@@ -1,8 +1,8 @@
-use super::ChallengeKind;
+use super::{BiometricChallengeState, ChallengeKind, PhoneChallengeState};
 use crate::errors::ApiError;
-use crate::identify::{signed_hash, BiometricChallengeState, PhoneChallengeState};
 use crate::types::success::ApiResponseData;
 use crate::utils::challenge::{Challenge, ChallengeToken};
+use crate::utils::crypto::{seal_to_vault_pkey, signed_hash};
 use crate::utils::liveness::LivenessWebauthnConfig;
 use crate::State;
 use aws_sdk_kms::model::DataKeyPairSpec;
@@ -14,8 +14,6 @@ use db::models::session_data::{
 use db::models::user_vaults::{NewUserVaultReq, UserVault};
 use newtypes::{DataKind, Status, UserVaultId};
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
-
-use super::seal;
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
 struct VerifyRequest {
@@ -157,7 +155,7 @@ async fn create_new_user_vault(
             .into_inner(),
         public_key: ec_pk_uncompressed.clone(),
         id_verified: Status::Incomplete,
-        e_phone_number: seal(phone_number.clone(), &ec_pk_uncompressed)?,
+        e_phone_number: seal_to_vault_pkey(phone_number.clone(), &ec_pk_uncompressed)?,
         sh_phone_number: signed_hash(state, phone_number.clone()).await?,
     };
     let user = db::user_vault::create(&state.db_pool, new_user).await?;

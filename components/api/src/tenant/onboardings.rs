@@ -45,7 +45,7 @@ fn handler(
     let fingerprint = match fingerprint {
         Some(fingerprint) => {
             let cleaned_data = crate::user::clean_for_fingerprint(fingerprint);
-            let fingerprint = crate::identify::signed_hash(&state, cleaned_data).await?;
+            let fingerprint = crate::utils::crypto::signed_hash(&state, cleaned_data).await?;
             Some(fingerprint)
         }
         None => None,

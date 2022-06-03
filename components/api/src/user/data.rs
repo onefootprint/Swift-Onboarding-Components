@@ -1,6 +1,6 @@
 use super::{clean_for_fingerprint, clean_for_storage};
 use crate::auth::logged_in_session::LoggedInSessionContext;
-use crate::identify::{clean_email, send_email_challenge};
+use crate::utils::email::{clean_email, send_email_challenge};
 use crate::{errors::ApiError, types::success::ApiResponseData, State};
 use db::models::user_data::{NewUserData, NewUserDataBatch};
 use db::models::user_vaults::{UserVault, UserVaultWrapper};
@@ -81,11 +81,12 @@ async fn handler(
         let data_str = clean_for_storage(data_kind, data_str);
         let sh_data = if data_kind.is_fingerprintable() {
             let cleaned_data = clean_for_fingerprint(data_str.clone());
-            Some(crate::identify::signed_hash(&state, cleaned_data).await?)
+            Some(crate::utils::crypto::signed_hash(&state, cleaned_data).await?)
         } else {
             None
         };
-        let e_data = crate::identify::seal(data_str, &user_auth.user_vault().public_key)?;
+        let e_data =
+            crate::utils::crypto::seal_to_vault_pkey(data_str, &user_auth.user_vault().public_key)?;
         data_to_insert.push(DataUpdateRequest(data_kind, e_data, sh_data))
     }
 

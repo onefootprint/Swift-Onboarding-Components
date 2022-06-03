@@ -1,6 +1,6 @@
-use crate::{errors::ApiError, identify::EmailVerifyData};
 use crate::types::success::ApiResponseData;
 use crate::State;
+use crate::{errors::ApiError, utils::email::EmailVerifyData};
 use chrono::{NaiveDateTime, Utc};
 use newtypes::DataKind;
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
@@ -29,7 +29,10 @@ async fn handler(
     // Note that we get nice security guarantees from this model:
     // 1. if the email associated with the user has changed, we won't be able to look it up (prevents swapping emails)
     // 2. bad data / a different sh email will not properly decrypt
-    let EmailVerifyData{sh_email, e_email_challenge} = EmailVerifyData::deserialize(request.into_inner().data)?;
+    let EmailVerifyData {
+        sh_email,
+        e_email_challenge,
+    } = EmailVerifyData::deserialize(request.into_inner().data)?;
     // TODO what happens if multiple user vaults have this email?
     let (existing_user_vault, email_user_data) =
         db::user_vault::get_by_fingerprint(&state.db_pool, DataKind::Email, sh_email, false)

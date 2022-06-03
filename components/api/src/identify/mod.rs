@@ -2,20 +2,12 @@ pub mod challenge;
 pub mod identify;
 pub mod verify;
 
-use std::str::FromStr;
-
-use crate::signed_hash;
 use crate::utils::challenge::{Challenge, ChallengeToken};
+use crate::utils::phone::send_sms;
 use crate::{errors::ApiError, State};
-use aws_sdk_pinpointemail::model::{
-    Body as EmailBody, Content as EmailStringContent, Destination as EmailDestination,
-    EmailContent, Message as EmailMessage,
-};
-use aws_sdk_pinpointsmsvoicev2::output::SendTextMessageOutput;
-use chrono::NaiveDateTime;
 use chrono::{Duration, Utc};
 use crypto::b64::Base64Data;
-use crypto::{serde_cbor, sha256};
+use crypto::sha256;
 use db::models::session_data::{ChallengeLastSentData, SessionState};
 use newtypes::UserVaultId;
 use paperclip::actix::{web, Apiv2Schema};
@@ -34,12 +26,6 @@ pub(crate) enum ChallengeKind {
     Biometric,
 }
 
-#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
-pub struct EmailVerifyChallenge {
-    pub expires_at: NaiveDateTime,
-    pub email: String,
-}
-
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct PhoneChallengeState {
     pub phone_number: String,
@@ -50,44 +36,6 @@ pub struct PhoneChallengeState {
 pub struct BiometricChallengeState {
     pub state: webauthn_rs::AuthenticationState,
     pub user_vault_id: UserVaultId,
-}
-
-// TODO move these utils somewhere else
-pub async fn signed_hash(state: &web::Data<State>, val: String) -> Result<Vec<u8>, ApiError> {
-    state.hmac_client.signed_hash(val.as_bytes()).await
-}
-
-pub fn seal(val: String, pub_key: &[u8]) -> Result<Vec<u8>, ApiError> {
-    let val = crypto::seal::seal_ecies_p256_x963_sha256_aes_gcm(
-        pub_key,
-        val.as_str().as_bytes().to_vec(),
-    )?
-    .to_vec()?;
-    Ok(val)
-}
-
-pub(crate) async fn clean_phone_number(
-    state: &web::Data<State>,
-    raw_phone_number: &str,
-) -> Result<String, ApiError> {
-    let req = aws_sdk_pinpoint::model::NumberValidateRequest::builder()
-        .phone_number(raw_phone_number)
-        .build();
-    let validated_phone_number = state
-        .pinpoint_client
-        .phone_number_validate()
-        .number_validate_request(req)
-        .send()
-        .await?
-        .number_validate_response
-        .ok_or(ApiError::PhoneNumberValidationError)?
-        .cleansed_phone_number_e164
-        .ok_or(ApiError::PhoneNumberValidationError)?;
-    Ok(validated_phone_number)
-}
-
-pub fn clean_email(raw_email: String) -> String {
-    raw_email.to_lowercase()
 }
 
 pub(crate) async fn send_phone_challenge(
@@ -129,12 +77,9 @@ pub(crate) async fn send_phone_challenge(
     } else {
         crypto::random::gen_rand_n_digit_code(6)
     };
-    let _: SendTextMessageOutput = state.sms_client.send_text_message()
-            .origination_identity("+17655634600".to_owned())
-            .destination_phone_number(phone_number.clone())
-            .message_body(format!("Your Footprint verification code is {}. Don't share your code with anyone. We will never contact you to request this code.\n\n@onefootprint.com #{}", code.clone(), code.clone()))
-            .send()
-            .await?;
+    let message_body = format!("Your Footprint verification code is {}. Don't share your code with anyone. We will never contact you to request this code.\n\n@onefootprint.com #{}", code.clone(), code.clone());
+
+    send_sms(state, phone_number.clone(), message_body).await?;
 
     let challenge = Challenge {
         expires_at: Utc::now().naive_utc() + Duration::minutes(15),
@@ -145,82 +90,6 @@ pub(crate) async fn send_phone_challenge(
     };
     let challenge_token = challenge.seal(&state.session_sealing_key)?;
     Ok(challenge_token)
-}
-
-#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
-pub struct EmailVerifyData {
-    pub sh_email: Vec<u8>,
-    pub e_email_challenge: Vec<u8>,
-}
-
-impl EmailVerifyData {
-    pub fn serialize(&self) -> Result<String, ApiError> {
-        let email_verify_data = serde_cbor::to_vec(self).map_err(crypto::Error::from)?;
-        Ok(Base64Data(email_verify_data).to_string())
-    }
-
-    pub fn deserialize(data: String) -> Result<EmailVerifyData, ApiError> {
-        let data_slice = Base64Data::from_str(&data).map_err(crypto::Error::from)?.0;
-        let email_verify_data: EmailVerifyData =
-            serde_cbor::from_slice(&data_slice).map_err(crypto::Error::from)?;
-        Ok(email_verify_data)
-    }
-}
-
-pub(crate) async fn send_email_challenge(
-    state: &web::Data<State>,
-    public_key: Vec<u8>,
-    email_address: String,
-) -> Result<(), ApiError> {
-    let email_challenge = EmailVerifyChallenge {
-        expires_at: chrono::Utc::now().naive_utc() + chrono::Duration::days(1),
-        email: email_address.clone(),
-    };
-    let email_challenge = serde_json::to_string::<EmailVerifyChallenge>(&email_challenge)
-        .map_err(|_| ApiError::ChallengeNotValid)?;
-    let email_verify_data = EmailVerifyData {
-        sh_email: signed_hash(state, email_address.clone()).await?,
-        e_email_challenge: seal(email_challenge, &public_key)?,
-    }
-    .serialize()?;
-
-    let curl_request_str = format!("https://verify.ui.footprint.dev/#{}", email_verify_data,);
-    let content = build_email_challenge_content_body(curl_request_str);
-    let _output = state
-        .email_client
-        .send_email()
-        .destination(
-            EmailDestination::builder()
-                .to_addresses(email_address)
-                .build(),
-        )
-        .from_email_address("noreply@infra.footprint.dev")
-        .content(content)
-        .send()
-        .await?;
-    Ok(())
-}
-
-fn build_email_challenge_content_body(contents: String) -> EmailContent {
-    let body_text = EmailStringContent::builder()
-        .data(format!("Hello from footprint!\nYou can issue this curl request to mark your email as verified:\n\n{}", contents))
-        .build();
-    let body_html = EmailStringContent::builder()
-        .data(format!(
-            "<h1>Hello from footprint!</h1><br>You can issue this curl request to mark your email as verified:<br><br><tt>{}</tt>",
-            contents,
-        ))
-        .build();
-    let body = EmailBody::builder().text(body_text).html(body_html).build();
-    let message = EmailMessage::builder()
-        .subject(
-            EmailStringContent::builder()
-                .data("Hello from Footprint!")
-                .build(),
-        )
-        .body(body)
-        .build();
-    EmailContent::builder().simple(message).build()
 }
 
 pub fn routes() -> web::Scope {

@@ -1,7 +1,8 @@
 use crate::errors::ApiError;
-use crate::identify::clean_email;
 use crate::types::success::ApiResponseData;
 use crate::utils::challenge::{Challenge, ChallengeToken};
+use crate::utils::crypto::signed_hash;
+use crate::utils::email::clean_email;
 use crate::utils::liveness::LivenessWebauthnConfig;
 use crate::State;
 use chrono::{Duration, Utc};
@@ -13,7 +14,8 @@ use newtypes::{DataKind, UserVaultId};
 use paperclip::actix::{api_v2_operation, web, web::Json, Apiv2Schema};
 use webauthn_rs::proto::{Credential, UserVerificationPolicy};
 
-use super::{clean_phone_number, send_phone_challenge, BiometricChallengeState, ChallengeKind};
+use super::{send_phone_challenge, BiometricChallengeState, ChallengeKind};
+use crate::utils::phone::clean_phone_number;
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
 #[serde(rename_all = "snake_case")]
@@ -123,7 +125,7 @@ async fn get_user_by_identifier(
             (DataKind::Email, email)
         }
     };
-    let sh_data = super::signed_hash(&state, data).await?;
+    let sh_data = signed_hash(&state, data).await?;
     // TODO should we only look for verified emails?
     let existing_user =
         db::user_vault::get_by_fingerprint(&state.db_pool, data_kind, sh_data, false)
