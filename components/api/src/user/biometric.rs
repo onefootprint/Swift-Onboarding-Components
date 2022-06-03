@@ -1,5 +1,5 @@
 use crate::{
-    auth::logged_in_session::LoggedInSessionContext,
+    auth::{logged_in_session::LoggedInSessionContext, AuthError},
     errors::ApiError,
     types::{success::ApiResponseData, Empty},
     utils::{
@@ -9,7 +9,8 @@ use crate::{
     State,
 };
 use chrono::{Duration, Utc};
-use db::models::webauthn_credential::NewWebauthnCredential;
+use db::models::{session_data::LoggedInSessionKind, webauthn_credential::NewWebauthnCredential};
+use newtypes::D2pSessionStatus;
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 use serde::{Deserialize, Serialize};
 use webauthn_rs::{proto::UserVerificationPolicy, RegistrationState};
@@ -32,6 +33,18 @@ pub fn init(
     user_auth: LoggedInSessionContext,
     state: web::Data<State>,
 ) -> actix_web::Result<Json<ApiResponseData<WebAuthnInitResponse>>, ApiError> {
+    // TODO use better generic auth classes for this
+    let has_permissions = match &user_auth.session_data().kind {
+        LoggedInSessionKind::Normal => true,
+        LoggedInSessionKind::D2pSession(data) => {
+            matches!(data.status, D2pSessionStatus::InProgress)
+        }
+        #[allow(unreachable_patterns)]
+        _ => false,
+    };
+    if !has_permissions {
+        return Err(AuthError::SessionTypeError).map_err(ApiError::from);
+    }
     // generate the challenge and return it
     let webauthn = webauthn_rs::Webauthn::new(LivenessWebauthnConfig::new(&state));
     let user_id = user_auth.user_vault().id.to_string().as_bytes().to_vec();

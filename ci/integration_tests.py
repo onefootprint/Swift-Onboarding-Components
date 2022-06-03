@@ -210,17 +210,7 @@ def test_d2p(request):
     body = _assert_response(r)
     temp_auth_token = body["data"]["auth_token"]
 
-    # Make sure the auth token can be used to add a biometric credential
-    path = "user/biometric/init"
-    print(url(path))
-    r = requests.post(
-        url(path),
-        headers=_fpuser_auth_header_raw(temp_auth_token),
-    )
-    body = _assert_response(r)
-    assert body["data"]["challenge_token"]
-
-    # Use the auth token to check the status of the d2p session
+    # Send the d2p token to the user via SMS
     path = "onboarding/d2p/sms"
     print(url(path))
     r = requests.post(
@@ -230,43 +220,56 @@ def test_d2p(request):
     )
     _assert_response(r)
 
-    # Use the auth token to check the status of the d2p session
-    path = "onboarding/d2p/status"
-    print(url(path))
-    r = requests.get(
-        url(path),
-        headers=_fpuser_auth_header_raw(temp_auth_token),
-    )
-    body = _assert_response(r)
-    assert body["data"]["status"] == "waiting"
+    def _update_status(status, status_code=200):
+        path = "onboarding/d2p/status"
+        print(url(path))
+        r = requests.post(
+            url(path),
+            headers=_fpuser_auth_header_raw(temp_auth_token),
+            json=dict(status=status),
+        )
+        _assert_response(r, status_code=status_code)
 
-    # Update the status of the d2p session
+    def _assert_get_status(expected_status):
+        path = "onboarding/d2p/status"
+        print(url(path))
+        r = requests.get(
+            url(path),
+            headers=_fpuser_auth_header_raw(temp_auth_token),
+        )
+        body = _assert_response(r)
+        assert body["data"]["status"] == expected_status
+
+    # Use the auth token to check the status of the d2p session
+    _assert_get_status("waiting")
+
+    # Make sure the auth token can be used to add a biometric credential
+    _update_status("in_progress")
+
+    path = "user/biometric/init"
     print(url(path))
     r = requests.post(
         url(path),
         headers=_fpuser_auth_header_raw(temp_auth_token),
-        json=dict(status="completed"),
     )
-    _assert_response(r)
+    body = _assert_response(r)
+    assert body["data"]["challenge_token"]
 
     # Check that the status is updated
-    path = "onboarding/d2p/status"
-    print(url(path))
-    r = requests.get(
-        url(path),
-        headers=_fpuser_auth_header_raw(temp_auth_token),
-    )
-    body = _assert_response(r)
-    assert body["data"]["status"] == "completed"
+    _update_status("completed")
+    _assert_get_status("completed")
 
     # Don't allow transitioning the status backwards
+    _update_status("canceled", status_code=400)
+
+    # Shouldn't be able to use the auth token to add a biometric unless it's in in_progress
+    path = "user/biometric/init"
     print(url(path))
     r = requests.post(
         url(path),
         headers=_fpuser_auth_header_raw(temp_auth_token),
-        json=dict(status="canceled"),
     )
-    _assert_response(r, status_code=400)
+    _assert_response(r, status_code=401)
 
 def test_onboarding_complete(request, workos_tenant): 
     path = "onboarding/complete"
