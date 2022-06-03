@@ -92,7 +92,10 @@ const Container = styled('li')<{
     `}
 `;
 
-const Content = styled.div``;
+const Content = styled.div`
+  display: flex;
+  align-items: center;
+`;
 
 export default memo(DefaultOption, (prevProps, nextProps) => {
   if (prevProps.highlighted !== nextProps.highlighted) return false;
