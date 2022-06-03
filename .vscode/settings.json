@@ -30,4 +30,5 @@
         "editor.semanticHighlighting.enabled": true,
         "editor.formatOnSave": true
     },
+    "rust-analyzer.checkOnSave.command": "clippy"
 }
