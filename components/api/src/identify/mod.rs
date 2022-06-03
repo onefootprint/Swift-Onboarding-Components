@@ -3,12 +3,10 @@ pub mod identify;
 pub mod verify;
 
 use crate::utils::challenge::{Challenge, ChallengeToken};
-use crate::utils::phone::send_sms;
+use crate::utils::phone::{rate_limit, send_sms};
 use crate::{errors::ApiError, State};
 use chrono::{Duration, Utc};
-use crypto::b64::Base64Data;
 use crypto::sha256;
-use db::models::session_data::{ChallengeLastSentData, SessionState};
 use newtypes::UserVaultId;
 use paperclip::actix::{web, Apiv2Schema};
 
@@ -47,29 +45,9 @@ pub(crate) async fn send_phone_challenge(
     let is_test_phone_number = phone_number_digits.as_str() == "55501";
 
     // Limit how frequently we send a phone challenge to the same number
-    let h_phone_number =
-        Base64Data(sha256((phone_number.clone() + "_sms_challenge").as_bytes()).to_vec())
-            .to_string();
-    let now = Utc::now().naive_utc();
-    let time_between_challenges = state.config.time_s_between_sms_challenges;
     if !is_test_phone_number {
-        let session =
-            db::session::get_by_h_session_id(&state.db_pool, h_phone_number.clone()).await?;
-        if let Some(session) = session {
-            if let SessionState::ChallengeLastSent(data) = session.session_data {
-                if (now - data.sent_at) < chrono::Duration::seconds(time_between_challenges) {
-                    return Err(ApiError::WaitToSendChallenge(time_between_challenges));
-                }
-            }
-        }
+        rate_limit(state, phone_number.clone(), "sms_challenge").await?;
     }
-    db::models::sessions::NewSession {
-        h_session_id: h_phone_number.clone(),
-        session_data: SessionState::ChallengeLastSent(ChallengeLastSentData { sent_at: now }),
-        expires_at: now + Duration::seconds(time_between_challenges),
-    }
-    .update_or_create(&state.db_pool)
-    .await?;
 
     // send challenge & set state
     let code = if is_test_phone_number {

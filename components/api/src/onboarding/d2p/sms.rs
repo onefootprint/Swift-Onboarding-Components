@@ -2,7 +2,7 @@ use crate::auth::{logged_in_session::LoggedInSessionContext, AuthError};
 use crate::errors::ApiError;
 use crate::types::success::ApiResponseData;
 use crate::types::Empty;
-use crate::utils::phone::send_sms;
+use crate::utils::phone::{rate_limit, send_sms};
 use crate::utils::user_vault_wrapper::UserVaultWrapper;
 use crate::State;
 use db::models::session_data::LoggedInSessionKind;
@@ -34,6 +34,9 @@ pub fn handler(
         .get_decrypted_field(&state, DataKind::PhoneNumber)
         .await?
         .ok_or(ApiError::NoPhoneNumberForVault)?;
+
+    rate_limit(&state, phone_number.clone(), "d2p_session").await?;
+
     let message_body = format!(
         "Hello from Footprint! Continue signing up for your account here: {}/biometric#{}",
         request.base_url, user_auth.auth_token
