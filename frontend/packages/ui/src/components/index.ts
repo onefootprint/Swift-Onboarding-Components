@@ -10,6 +10,7 @@ export * from './checkbox';
 export { default as Checkbox } from './checkbox';
 export * from './container';
 export { default as Container } from './container';
+export { default as Divider } from './divider';
 export * from './footprint-button';
 export { default as FootprintButton } from './footprint-button';
 export * from './google-button';

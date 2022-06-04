@@ -6,6 +6,8 @@ export enum States {
 
   // Challenge
   phoneVerification = 'phoneVerification', // Existing user phone gets pin code
+  livenessRegister = 'livenessRegister',
+  livenessRegisterSucceeded = 'livenessRegisterSucceeded',
 
   // Onboarding
   additionalDataRequired = 'additionalDataRequired',
@@ -24,8 +26,8 @@ export enum Events {
 
   // Biometric Challenge
   smsChallengeResent = 'smsChallengeResent',
-  challengeSucceeded = 'challengeSucceeded',
-  deviceSupportForWebAuthnIdentified = 'deviceSupportForWebAuthnIdentified',
+  smsChallengeSucceeded = 'smsChallengeSucceeded',
+  deviceInfoIdentified = 'deviceInfoIdentified',
 
   // Onboarding Events
   additionalInfoRequired = 'additionalInfoRequired',
@@ -42,7 +44,7 @@ export enum Actions {
   assignUserFound = 'assignUserFound',
   assignAuthToken = 'assignAuthToken',
   assignChallenge = 'assignChallengeData',
-  assignSupportForWebAuthn = 'assignSupportForWebAuthn',
+  assignDeviceInfo = 'assignDeviceInfo',
 
   // Onboarding
   assignMissingAttributes = 'assignMissingAttributes',
@@ -125,7 +127,10 @@ export type BifrostContext = {
   phone?: string;
   userFound: boolean;
   authToken?: string;
-  deviceHasWebAuthnSupport?: boolean;
+  device: {
+    hasSupportForWebAuthn: boolean;
+    type: string;
+  };
   challenge?: ChallengeData;
   onboarding: OnboardingData;
 };
@@ -161,11 +166,14 @@ export type BifrostEvent =
       payload: { challenge: ChallengeData };
     }
   | {
-      type: Events.deviceSupportForWebAuthnIdentified;
-      payload: { hasSupport: boolean };
+      type: Events.deviceInfoIdentified;
+      payload: {
+        hasSupportForWebAuthn: boolean;
+        type: string;
+      };
     }
   | {
-      type: Events.challengeSucceeded;
+      type: Events.smsChallengeSucceeded;
       payload: {
         authToken: string;
         missingAttributes: readonly UserDataAttribute[];

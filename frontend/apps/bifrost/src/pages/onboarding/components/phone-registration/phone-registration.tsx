@@ -2,13 +2,15 @@ import { useTranslation } from 'hooks';
 import IcoEmail24 from 'icons/ico/ico-email-24';
 import React from 'react';
 import { useForm } from 'react-hook-form';
-import { ChallengeKind, Events } from 'src/bifrost-machine/types';
 import HeaderTitle from 'src/components/header-title';
-import useBifrostMachine from 'src/hooks/bifrost-machine';
 import useIdentify from 'src/hooks/identify/use-identify';
 import useIdentifyChallenge, {
   IdentifyChallengeResponse,
 } from 'src/hooks/identify/use-identify-challenge';
+import useBifrostMachine, {
+  ChallengeKind,
+  Events,
+} from 'src/hooks/use-bifrost-machine';
 import styled, { css } from 'styled';
 import { Button, LinkButton, TextInput, Typography } from 'ui';
 

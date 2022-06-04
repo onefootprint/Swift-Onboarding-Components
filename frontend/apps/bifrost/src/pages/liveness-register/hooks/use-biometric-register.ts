@@ -1,20 +1,19 @@
 import { useMutation } from 'react-query';
 import request, { RequestError, RequestResponse } from 'request';
-
 import {
   createPublicKeyCredential,
   generateDeviceResponse,
-} from '../../utils/biometric/challenge-response';
+} from 'src/utils/biometric/challenge-response';
 
-export type LivenessRegisterRequest = {
+export type BiometricRegisterRequest = {
   authToken: string;
 };
 
-export type LivenessRegisterResponse = {
+export type BiometricRegisterResponse = {
   data: string;
 };
 
-const livenessRegister = async (payload: LivenessRegisterRequest) => {
+const biometricRegister = async (payload: BiometricRegisterRequest) => {
   const { authToken } = payload;
   const { data: initResponse } = await request<
     RequestResponse<{
@@ -37,7 +36,7 @@ const livenessRegister = async (payload: LivenessRegisterRequest) => {
   const deviceResponseJson = generateDeviceResponse(publicKeyCredential);
 
   const { data: response } = await request<
-    RequestResponse<LivenessRegisterResponse>
+    RequestResponse<BiometricRegisterResponse>
   >({
     method: 'POST',
     url: '/user/biometric',
@@ -52,9 +51,11 @@ const livenessRegister = async (payload: LivenessRegisterRequest) => {
   return response.data;
 };
 
-const useLivenessRegister = () =>
-  useMutation<LivenessRegisterResponse, RequestError, LivenessRegisterRequest>(
-    livenessRegister,
-  );
+const useBiometricRegister = () =>
+  useMutation<
+    BiometricRegisterResponse,
+    RequestError,
+    BiometricRegisterRequest
+  >(biometricRegister);
 
-export default useLivenessRegister;
+export default useBiometricRegister;

@@ -1,5 +1,6 @@
 import { assign, createMachine } from 'xstate';
 
+import createLivenessRegisterMachine from '../liveness-register';
 import {
   Actions,
   BifrostContext,
@@ -21,7 +22,10 @@ const initialContext: BifrostContext = {
   authToken: undefined,
   userFound: false,
   challenge: undefined,
-  deviceHasWebAuthnSupport: undefined,
+  device: {
+    type: 'mobile',
+    hasSupportForWebAuthn: false,
+  },
   onboarding: {
     missingAttributes: [],
     data: {},
@@ -35,12 +39,8 @@ const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
     initial: States.emailIdentification,
     context: initialContext,
     on: {
-      [Events.deviceSupportForWebAuthnIdentified]: {
-        meta: {
-          description:
-            'Emitted once we detect whether the device has support for WebAuthn',
-        },
-        actions: [Actions.assignSupportForWebAuthn],
+      [Events.deviceInfoIdentified]: {
+        actions: [Actions.assignDeviceInfo],
       },
     },
     states: {
@@ -97,7 +97,7 @@ const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
               actions: [Actions.assignChallenge],
             },
           ],
-          [Events.challengeSucceeded]: [
+          [Events.smsChallengeSucceeded]: [
             {
               description:
                 'Show the verification success page if there were no missing attributes for existing user',
@@ -121,11 +121,22 @@ const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
                 Actions.assignMissingWebauthnCredentials,
               ],
               cond: (context, event) =>
-                context.userFound &&
-                hasMissingAttributes(
-                  event.payload.missingAttributes,
-                  context.onboarding.data,
-                ),
+                (context.userFound &&
+                  hasMissingAttributes(
+                    event.payload.missingAttributes,
+                    context.onboarding.data,
+                  )) ||
+                context.onboarding.missingWebauthnCredentials,
+            },
+            {
+              target: States.livenessRegister,
+              actions: [
+                Actions.assignAuthToken,
+                Actions.assignMissingAttributes,
+                Actions.assignMissingWebauthnCredentials,
+              ],
+              cond: (context, event) =>
+                !context.userFound && event.payload.missingWebauthnCredentials,
             },
             {
               target: States.basicInformation,
@@ -185,9 +196,56 @@ const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
           ],
         },
       },
+      [States.livenessRegister]: {
+        invoke: {
+          id: 'livenessRegister',
+          src: context =>
+            createLivenessRegisterMachine(context.device, context.authToken),
+          onDone: [
+            {
+              target: States.basicInformation,
+              cond: context =>
+                isMissingBasicAttribute(
+                  context.onboarding.missingAttributes,
+                  context.onboarding.data,
+                ),
+            },
+            {
+              target: States.residentialAddress,
+              cond: context =>
+                isMissingResidentialAttribute(
+                  context.onboarding.missingAttributes,
+                  context.onboarding.data,
+                ),
+            },
+            {
+              target: States.ssn,
+              cond: context =>
+                isMissingSsnAttribute(
+                  context.onboarding.missingAttributes,
+                  context.onboarding.data,
+                ),
+            },
+            {
+              target: States.onboardingSuccess,
+              cond: context =>
+                !hasMissingAttributes(
+                  context.onboarding.missingAttributes,
+                  context.onboarding.data,
+                ),
+            },
+          ],
+        },
+      },
       [States.additionalDataRequired]: {
         on: {
           [Events.additionalInfoRequired]: [
+            {
+              target: States.livenessRegister,
+              cond: context =>
+                !context.userFound &&
+                context.onboarding.missingWebauthnCredentials,
+            },
             {
               target: States.basicInformation,
               cond: context =>
@@ -327,14 +385,17 @@ const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
         return context;
       }),
       [Actions.assignAuthToken]: assign((context, event) => {
-        if (event.type === Events.challengeSucceeded) {
+        if (event.type === Events.smsChallengeSucceeded) {
           context.authToken = event.payload.authToken;
         }
         return context;
       }),
-      [Actions.assignSupportForWebAuthn]: assign((context, event) => {
-        if (event.type === Events.deviceSupportForWebAuthnIdentified) {
-          context.deviceHasWebAuthnSupport = event.payload.hasSupport;
+      [Actions.assignDeviceInfo]: assign((context, event) => {
+        if (event.type === Events.deviceInfoIdentified) {
+          context.device = {
+            type: event.payload.type,
+            hasSupportForWebAuthn: event.payload.hasSupportForWebAuthn,
+          };
         }
         return context;
       }),
@@ -348,7 +409,7 @@ const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
         return context;
       }),
       [Actions.assignMissingAttributes]: assign((context, event) => {
-        if (event.type === Events.challengeSucceeded) {
+        if (event.type === Events.smsChallengeSucceeded) {
           context.onboarding.missingAttributes = [
             ...event.payload.missingAttributes,
           ];
@@ -356,7 +417,7 @@ const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
         return context;
       }),
       [Actions.assignMissingWebauthnCredentials]: assign((context, event) => {
-        if (event.type === Events.challengeSucceeded) {
+        if (event.type === Events.smsChallengeSucceeded) {
           context.onboarding.missingWebauthnCredentials =
             event.payload.missingWebauthnCredentials;
         }

@@ -1,10 +1,12 @@
 import React from 'react';
-import { ChallengeKind, Events } from 'src/bifrost-machine/types';
-import useBifrostMachine from 'src/hooks/bifrost-machine';
 import useIdentify, { IdentifyResponse } from 'src/hooks/identify/use-identify';
 import useIdentifyVerify, {
   IdentifyVerifyResponse,
 } from 'src/hooks/identify/use-identify-verify';
+import useBifrostMachine, {
+  ChallengeKind,
+  Events,
+} from 'src/hooks/use-bifrost-machine';
 import styled, { css } from 'styled';
 import { Box, LinkButton, LoadingIndicator, PinInput, Typography } from 'ui';
 
@@ -51,7 +53,7 @@ const PhoneVerification = () => {
           missingWebauthnCredentials,
         }: OnboardingResponse) {
           send({
-            type: Events.challengeSucceeded,
+            type: Events.smsChallengeSucceeded,
             payload: {
               authToken,
               missingAttributes,

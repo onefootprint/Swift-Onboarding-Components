@@ -1,13 +1,12 @@
 import React from 'react';
 import { useForm } from 'react-hook-form';
-import {
+import useIdentify, { IdentifyResponse } from 'src/hooks/identify/use-identify';
+import useBifrostMachine, {
   ChallengeKind,
   Events,
   UserData,
   UserDataAttribute,
-} from 'src/bifrost-machine/types';
-import useBifrostMachine from 'src/hooks/bifrost-machine';
-import useIdentify, { IdentifyResponse } from 'src/hooks/identify/use-identify';
+} from 'src/hooks/use-bifrost-machine';
 import styled, { css } from 'styled';
 import { Button, TextInput, Typography } from 'ui';
 
