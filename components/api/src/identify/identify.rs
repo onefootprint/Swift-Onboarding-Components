@@ -15,8 +15,9 @@ use newtypes::{DataKind, UserVaultId};
 use paperclip::actix::{api_v2_operation, web, web::Json, Apiv2Schema};
 use webauthn_rs::proto::{Credential, UserVerificationPolicy};
 
-use super::{send_phone_challenge, BiometricChallengeState, ChallengeKind};
 use crate::utils::phone::clean_phone_number;
+
+use super::{send_phone_challenge, BiometricChallengeState, ChallengeKind};
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
 #[serde(rename_all = "snake_case")]
@@ -61,18 +62,17 @@ pub async fn handler(
     } = request.into_inner();
 
     // Look up existing user vault by identifier
-    let existing_user =
-        if let Some(existing_user) = get_user_by_identifier(&state, identifier).await? {
-            existing_user
-        } else {
-            // The user vault doesn't exist. Just return that the user wasn't found
-            return Ok(Json(ApiResponseData {
-                data: IdentifyResponse {
-                    user_found: false,
-                    challenge_data: None,
-                },
-            }));
-        };
+    let existing_user = if let Some(existing_user) = get_user_by_identifier(&state, identifier).await? {
+        existing_user
+    } else {
+        // The user vault doesn't exist. Just return that the user wasn't found
+        return Ok(Json(ApiResponseData {
+            data: IdentifyResponse {
+                user_found: false,
+                challenge_data: None,
+            },
+        }));
+    };
 
     // The user vault exists. Extract the phone number for the user
     let user_id = existing_user.id.clone();
@@ -83,8 +83,7 @@ pub async fn handler(
         .ok_or(ApiError::NoPhoneNumberForVault)?;
 
     // Initiate the challenge of the requested type
-    let (challenge_kind, challenge_token, biometric_challenge_json) = match preferred_challenge_kind
-    {
+    let (challenge_kind, challenge_token, biometric_challenge_json) = match preferred_challenge_kind {
         ChallengeKind::Biometric => {
             let creds = get_webauthn_creds(&state.db_pool, user_id.clone()).await?;
             if !creds.is_empty() {
@@ -110,7 +109,7 @@ pub async fn handler(
                 challenge_kind,
                 challenge_token,
                 phone_number_last_two: phone_number_last_two(phone_number),
-                biometric_challenge_json: biometric_challenge_json,
+                biometric_challenge_json,
             }),
         },
     }))
@@ -132,10 +131,9 @@ async fn get_user_by_identifier(
     };
     let sh_data = signed_hash(&state, data).await?;
     // TODO should we only look for verified emails?
-    let existing_user =
-        db::user_vault::get_by_fingerprint(&state.db_pool, data_kind, sh_data, false)
-            .await?
-            .map(|x| x.0);
+    let existing_user = db::user_vault::get_by_fingerprint(&state.db_pool, data_kind, sh_data, false)
+        .await?
+        .map(|x| x.0);
     Ok(existing_user)
 }
 

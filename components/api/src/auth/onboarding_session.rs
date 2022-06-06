@@ -1,7 +1,8 @@
-use super::AuthError;
+use super::{AuthError, UserVaultPermissions};
 use crate::{errors::ApiError, State};
 use actix_web::{web, FromRequest};
-use db::models::session_data::{LoggedInSessionData, SessionState};
+use db::models::session_data::onboarding::{OnboardingSessionData, OnboardingSessionKind};
+use db::models::session_data::SessionState;
 use db::models::user_vaults::UserVault;
 use futures_util::Future;
 use paperclip::actix::Apiv2Security;
@@ -17,23 +18,23 @@ const HEADER_NAME: &str = "X-Fpuser-Authorization";
     description = "Footprint user auth token, issued by /identify/verify"
 )]
 /// Logged in session context sets encrypted state that authenticates the client as a user.
-pub struct LoggedInSessionContext {
+pub struct OnboardingSessionContext {
     user_vault: UserVault,
-    session_data: LoggedInSessionData,
+    session_data: OnboardingSessionData,
     pub auth_token: String,
 }
 
-impl LoggedInSessionContext {
+impl OnboardingSessionContext {
     pub fn user_vault(&self) -> &UserVault {
         &self.user_vault
     }
 
-    pub fn session_data(&self) -> &LoggedInSessionData {
+    pub fn session_data(&self) -> &OnboardingSessionData {
         &self.session_data
     }
 }
 
-impl FromRequest for LoggedInSessionContext {
+impl FromRequest for OnboardingSessionContext {
     type Error = ApiError;
     type Future = Pin<Box<dyn Future<Output = Result<Self, Self::Error>>>>;
 
@@ -56,12 +57,13 @@ impl FromRequest for LoggedInSessionContext {
                 .await?
                 .ok_or(AuthError::NoSessionFound)?;
             // Actually verify that the session is the correct type
-            let session_data =
-                if let SessionState::LoggedInSession(session_data) = session.session_data.clone() {
-                    Ok(session_data)
-                } else {
-                    Err(AuthError::SessionTypeError)
-                }?;
+            let session_data = if let SessionState::OnboardingSession(session_data) =
+                session.session_data.clone()
+            {
+                Ok(session_data)
+            } else {
+                Err(AuthError::SessionTypeError)
+            }?;
             let user_vault =
                 db::user_vault::get_by_logged_in_session(&pool, auth_token.clone()).await?;
 
@@ -71,5 +73,19 @@ impl FromRequest for LoggedInSessionContext {
                 auth_token,
             })
         })
+    }
+}
+
+impl UserVaultPermissions for OnboardingSessionContext {
+    fn can_decrypt(&self, _data_kinds: Vec<newtypes::DataKind>) -> bool {
+        false
+    }
+
+    // TODO -- scope based off of what types the tenant is authorized for
+    fn can_modify(&self, _data_kinds: Vec<newtypes::DataKind>) -> bool {
+        match self.session_data().kind {
+            OnboardingSessionKind::Normal => true,
+            OnboardingSessionKind::D2pSession(_) => false,
+        }
     }
 }

@@ -1,13 +1,11 @@
 use crate::errors::ApiError;
 use crate::tenant::AuthContext;
 use crate::types::success::ApiResponseData;
+use crate::user::{decrypt, DecryptFieldsResult};
 use crate::utils::insight_headers::InsightHeaders;
 use crate::State;
-use crypto::seal::EciesP256Sha256AesGcmSealed;
 use db::models::access_events::{NewAccessEvent, NewAccessEventBatch};
 use db::models::insight_event::CreateInsightEvent;
-use db::models::user_vaults::UserVault;
-use enclave_proxy::{DataTransform, DecryptRequest};
 use newtypes::{DataKind, FootprintUserId};
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 use std::collections::{HashMap, HashSet};
@@ -35,8 +33,6 @@ fn handler(
     // grab tenant secret key from header
     let tenant = auth.tenant();
 
-    // TODO: check that we're authorized to decrypt these attributes
-
     // look up tenant & user vault
     let (vault, onboarding) = db::user_vault::get_by_tenant_and_onboarding(
         &state.db_pool,
@@ -49,10 +45,11 @@ fn handler(
     let DecryptFieldsResult {
         fields_to_decrypt,
         result_map,
-    } = decrypt_fields(
+    } = decrypt(
+        auth,
         &state,
+        vault,
         request.attributes.clone().into_iter().collect(),
-        &vault,
     )
     .await?;
 
@@ -73,48 +70,4 @@ fn handler(
     .await?;
 
     Ok(Json(ApiResponseData { data: result_map }))
-}
-
-pub struct DecryptFieldsResult {
-    pub fields_to_decrypt: Vec<DataKind>,
-    pub result_map: HashMap<DataKind, String>,
-}
-
-pub async fn decrypt_fields(
-    state: &web::Data<State>,
-    fields: Vec<DataKind>,
-    vault: &UserVault,
-) -> Result<DecryptFieldsResult, ApiError> {
-    // Filter out fields that don't have values set on the user vault
-    let (fields_to_decrypt, values_to_decrypt): (Vec<DataKind>, Vec<Vec<u8>>) =
-        db::user_data::filter(&state.db_pool, vault.id.clone(), fields)
-            .await?
-            .into_iter()
-            .map(|user_data| (user_data.data_kind, user_data.e_data))
-            .unzip();
-
-    // Actually decrypt the fields
-    let requests = values_to_decrypt
-        .into_iter()
-        .map(|sealed_data| {
-            Ok(DecryptRequest {
-                sealed_data: EciesP256Sha256AesGcmSealed::from_bytes(&sealed_data)?,
-                transform: DataTransform::Identity,
-            })
-        })
-        .collect::<Result<Vec<DecryptRequest>, crypto::Error>>()?;
-    let decrypt_response =
-        crate::enclave::decrypt(state, requests, vault.e_private_key.clone()).await?;
-    if decrypt_response.len() != fields_to_decrypt.len() {
-        return Err(ApiError::InvalidEnclaveDecryptResponse);
-    }
-    let result_map: HashMap<DataKind, String> = decrypt_response
-        .into_iter()
-        .enumerate()
-        .map(|(i, result)| (fields_to_decrypt[i], result))
-        .collect();
-    Ok(DecryptFieldsResult {
-        fields_to_decrypt,
-        result_map,
-    })
 }

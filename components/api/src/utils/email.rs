@@ -1,6 +1,6 @@
 use aws_sdk_pinpointemail::model::{
-    Body as EmailBody, Content as EmailStringContent, Destination as EmailDestination,
-    EmailContent, Message as EmailMessage,
+    Body as EmailBody, Content as EmailStringContent, Destination as EmailDestination, EmailContent,
+    Message as EmailMessage,
 };
 use chrono::NaiveDateTime;
 use crypto::b64::Base64Data;
@@ -64,11 +64,7 @@ pub(crate) async fn send_email_challenge(
     let _output = state
         .email_client
         .send_email()
-        .destination(
-            EmailDestination::builder()
-                .to_addresses(email_address)
-                .build(),
-        )
+        .destination(EmailDestination::builder().to_addresses(email_address).build())
         .from_email_address("noreply@infra.footprint.dev")
         .content(content)
         .send()
@@ -78,7 +74,10 @@ pub(crate) async fn send_email_challenge(
 
 fn build_email_challenge_content_body(contents: String) -> EmailContent {
     let body_text = EmailStringContent::builder()
-        .data(format!("Hello from footprint!\nYou can issue this curl request to mark your email as verified:\n\n{}", contents))
+        .data(format!(
+            "Hello from footprint!\nYou can issue this curl request to mark your email as verified:\n\n{}",
+            contents
+        ))
         .build();
     let body_html = EmailStringContent::builder()
         .data(format!(

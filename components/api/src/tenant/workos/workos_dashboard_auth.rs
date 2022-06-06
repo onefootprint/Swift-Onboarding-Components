@@ -1,7 +1,8 @@
 use crate::auth::AuthError;
 use crate::{errors::ApiError, State};
 use actix_web::{web, FromRequest};
-use db::models::session_data::{SessionState, TenantDashboardSessionData};
+use db::models::session_data::dashboard::TenantDashboardSessionData;
+use db::models::session_data::SessionState;
 use db::models::tenants::Tenant;
 use futures_util::Future;
 use paperclip::actix::Apiv2Security;
@@ -60,11 +61,10 @@ pub async fn from_request_inner(
     // Actually verify that the session is the correct type
     let metadata = match session.session_data.clone() {
         SessionState::TenantDashboardSession(metadata) => Ok(metadata),
-        _ => Err(AuthError::SessionTypeError)
+        _ => Err(AuthError::SessionTypeError),
     }?;
 
-    let tenant = db::tenant::get_opt_by_workos_id(&pool, 
-        metadata.workos_id.clone())
+    let tenant = db::tenant::get_opt_by_workos_id(&pool, metadata.workos_id.clone())
         .await?
         .ok_or(AuthError::UnknownClient)?;
 

@@ -1,5 +1,5 @@
 use crate::auth::client_public_key::PublicTenantAuthContext;
-use crate::auth::logged_in_session::LoggedInSessionContext;
+use crate::auth::onboarding_session::OnboardingSessionContext;
 use crate::errors::ApiError;
 use crate::types::success::ApiResponseData;
 use crate::utils::insight_headers::InsightHeaders;
@@ -24,7 +24,7 @@ pub struct OnboardingResponse {
 pub fn handler(
     state: web::Data<State>,
     tenant_auth: PublicTenantAuthContext,
-    user_auth: LoggedInSessionContext,
+    user_auth: OnboardingSessionContext,
     insights: InsightHeaders,
 ) -> actix_web::Result<Json<ApiResponseData<OnboardingResponse>>, ApiError> {
     let uv = user_auth.user_vault();

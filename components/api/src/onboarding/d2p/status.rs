@@ -1,9 +1,10 @@
-use crate::auth::{logged_in_session::LoggedInSessionContext, AuthError};
+use crate::auth::{onboarding_session::OnboardingSessionContext, AuthError};
 use crate::errors::ApiError;
 use crate::types::success::ApiResponseData;
 use crate::types::Empty;
 use crate::State;
-use db::models::session_data::{LoggedInSessionKind, SessionState};
+use db::models::session_data::onboarding::OnboardingSessionKind;
+use db::models::session_data::SessionState;
 use newtypes::D2pSessionStatus;
 use paperclip::actix::{api_v2_operation, get, post, web, web::Json, Apiv2Schema};
 
@@ -16,10 +17,10 @@ pub struct StatusResponse {
 #[get("status")]
 /// Gets the status of the provided d2p session. Requires the d2p session token as the auth header.
 pub fn get(
-    user_auth: LoggedInSessionContext,
+    user_auth: OnboardingSessionContext,
 ) -> actix_web::Result<Json<ApiResponseData<StatusResponse>>, ApiError> {
     let d2p_session_data = match &user_auth.session_data().kind {
-        LoggedInSessionKind::D2pSession(d2p_session_data) => d2p_session_data,
+        OnboardingSessionKind::D2pSession(d2p_session_data) => d2p_session_data,
         _ => return Err(AuthError::SessionTypeError).map_err(ApiError::from),
     };
 
@@ -39,12 +40,12 @@ pub struct UpdateStatusRequest {
 #[post("status")]
 /// Update the status of the provided d2p session. Only allows updating to certain statuses
 pub fn post(
-    user_auth: LoggedInSessionContext,
+    user_auth: OnboardingSessionContext,
     request: Json<UpdateStatusRequest>,
     state: web::Data<State>,
 ) -> actix_web::Result<Json<ApiResponseData<Empty>>, ApiError> {
     let d2p_session_data = match &user_auth.session_data().kind {
-        LoggedInSessionKind::D2pSession(d2p_session_data) => d2p_session_data,
+        OnboardingSessionKind::D2pSession(d2p_session_data) => d2p_session_data,
         _ => return Err(AuthError::SessionTypeError).map_err(ApiError::from),
     };
 
@@ -53,7 +54,7 @@ pub fn post(
         return Err(ApiError::InvalidStatusTransition);
     }
 
-    SessionState::LoggedInSession(user_auth.session_data().clone().replace(status.into()))
+    SessionState::OnboardingSession(user_auth.session_data().clone().replace(status.into()))
         .update(&state.db_pool, user_auth.auth_token)
         .await?;
 

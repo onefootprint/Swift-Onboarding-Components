@@ -1,5 +1,5 @@
 use crate::{
-    auth::{logged_in_session::LoggedInSessionContext, AuthError},
+    auth::{onboarding_session::OnboardingSessionContext, AuthError},
     errors::ApiError,
     types::{success::ApiResponseData, Empty},
     utils::{
@@ -9,7 +9,9 @@ use crate::{
     State,
 };
 use chrono::{Duration, Utc};
-use db::models::{session_data::LoggedInSessionKind, webauthn_credential::NewWebauthnCredential};
+use db::models::{
+    session_data::onboarding::OnboardingSessionKind, webauthn_credential::NewWebauthnCredential,
+};
 use newtypes::D2pSessionStatus;
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 use serde::{Deserialize, Serialize};
@@ -30,13 +32,13 @@ pub fn init(
     // TODO only allow registering webauthn credentials if you have no previous credentials OR if
     // you logged into this session via webauthn. Otherwise, someone who SIM swaps you can register
     // their own webauthn creds
-    user_auth: LoggedInSessionContext,
+    user_auth: OnboardingSessionContext,
     state: web::Data<State>,
 ) -> actix_web::Result<Json<ApiResponseData<WebAuthnInitResponse>>, ApiError> {
     // TODO use better generic auth classes for this
     let has_permissions = match &user_auth.session_data().kind {
-        LoggedInSessionKind::Normal => true,
-        LoggedInSessionKind::D2pSession(data) => {
+        OnboardingSessionKind::Normal => true,
+        OnboardingSessionKind::D2pSession(data) => {
             matches!(data.status, D2pSessionStatus::InProgress)
         }
         #[allow(unreachable_patterns)]
@@ -82,21 +84,18 @@ struct WebauthnRegisterRequest {
 #[post("/biometric")]
 async fn complete(
     request: Json<WebauthnRegisterRequest>,
-    user_auth: LoggedInSessionContext,
+    user_auth: OnboardingSessionContext,
     state: web::Data<State>,
 ) -> actix_web::Result<Json<ApiResponseData<Empty>>, ApiError> {
-    let challenge_data = Challenge::<RegistrationState>::unseal(
-        &state.session_sealing_key,
-        &request.challenge_token,
-    )?;
+    let challenge_data =
+        Challenge::<RegistrationState>::unseal(&state.session_sealing_key, &request.challenge_token)?;
     let reg_state = challenge_data.data;
 
     // generate the challenge and return it
     let webauthn = webauthn_rs::Webauthn::new(LivenessWebauthnConfig::new(&state));
 
     let reg = serde_json::from_str(&request.device_response_json)?;
-    let (cred, _authenticator_data) =
-        webauthn.register_credential(&reg, &reg_state, |_| Ok(false))?;
+    let (cred, _authenticator_data) = webauthn.register_credential(&reg, &reg_state, |_| Ok(false))?;
 
     NewWebauthnCredential {
         user_vault_id: user_auth.user_vault().id.clone(),

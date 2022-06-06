@@ -1,6 +1,16 @@
-use crate::utils::email::clean_email;
+use crate::{
+    auth::{AuthError, UserVaultPermissions},
+    errors::ApiError,
+    State,
+};
+use crypto::seal::EciesP256Sha256AesGcmSealed;
+use db::models::user_vaults::UserVault;
+use enclave_proxy::{DataTransform, DecryptRequest};
 use newtypes::DataKind;
 use paperclip::actix::web;
+use std::collections::HashMap;
+
+use crate::utils::email::clean_email;
 
 pub mod access_events;
 pub mod biometric;
@@ -29,4 +39,51 @@ pub fn clean_for_storage(data_kind: DataKind, data_str: String) -> String {
 
 pub fn clean_for_fingerprint(data_str: String) -> String {
     data_str.to_lowercase().trim().to_string()
+}
+
+pub struct DecryptFieldsResult {
+    pub fields_to_decrypt: Vec<DataKind>,
+    pub result_map: HashMap<DataKind, String>,
+}
+
+pub async fn decrypt<C: UserVaultPermissions>(
+    context: C,
+    state: &web::Data<State>,
+    user_vault: UserVault,
+    data_kinds: Vec<DataKind>,
+) -> Result<DecryptFieldsResult, ApiError> {
+    if !context.can_decrypt(data_kinds.clone()) {
+        Err(AuthError::UnauthorizedOperation)?
+    }
+    // Filter out fields that don't have values set on the user vault
+    let (fields_to_decrypt, values_to_decrypt): (Vec<DataKind>, Vec<Vec<u8>>) =
+        db::user_data::filter(&state.db_pool, user_vault.id.clone(), data_kinds.clone())
+            .await?
+            .into_iter()
+            .map(|user_data| (user_data.data_kind, user_data.e_data))
+            .unzip();
+
+    // Actually decrypt the fields
+    let requests = values_to_decrypt
+        .into_iter()
+        .map(|sealed_data| {
+            Ok(DecryptRequest {
+                sealed_data: EciesP256Sha256AesGcmSealed::from_bytes(&sealed_data)?,
+                transform: DataTransform::Identity,
+            })
+        })
+        .collect::<Result<Vec<DecryptRequest>, crypto::Error>>()?;
+    let decrypt_response = crate::enclave::decrypt(state, requests, user_vault.e_private_key.clone()).await?;
+    if decrypt_response.len() != fields_to_decrypt.len() {
+        return Err(ApiError::InvalidEnclaveDecryptResponse);
+    }
+    let result_map: HashMap<DataKind, String> = decrypt_response
+        .into_iter()
+        .enumerate()
+        .map(|(i, result)| (fields_to_decrypt[i], result))
+        .collect();
+    Ok(DecryptFieldsResult {
+        fields_to_decrypt,
+        result_map,
+    })
 }

@@ -3,7 +3,8 @@ use crate::State;
 use crate::{errors::ApiError, types::success::ApiResponseData};
 use actix_session::Session;
 use chrono::{Duration, Utc};
-use db::models::session_data::{SessionState, TenantDashboardSessionData};
+use db::models::session_data::dashboard::TenantDashboardSessionData;
+use db::models::session_data::SessionState;
 use paperclip::actix::Apiv2Schema;
 use paperclip::actix::{api_v2_operation, get, web, web::Json};
 

@@ -25,10 +25,7 @@ impl UserVaultWrapper {
         Ok(result)
     }
 
-    pub fn from_conn(
-        conn: &PgConnection,
-        user_vault: UserVault,
-    ) -> Result<UserVaultWrapper, DbError> {
+    pub fn from_conn(conn: &PgConnection, user_vault: UserVault) -> Result<UserVaultWrapper, DbError> {
         Ok(Self {
             user_data: db::user_data::list(conn, user_vault.id.clone())?,
             _user_vault: user_vault,

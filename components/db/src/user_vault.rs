@@ -8,7 +8,7 @@ use crate::session::get_session_by_id_sync;
 use crate::{errors::DbError, models::user_data::UserData};
 use deadpool_diesel::postgres::Pool;
 use diesel::prelude::*;
-use newtypes::{DataKind, FootprintUserId, TenantId, UserVaultId, DataPriority};
+use newtypes::{DataKind, DataPriority, FootprintUserId, TenantId, UserVaultId};
 
 pub async fn create(pool: &Pool, new_user: NewUserVaultReq) -> Result<UserVault, crate::DbError> {
     let user_vault = pool
@@ -65,7 +65,7 @@ pub async fn get_by_logged_in_session(
             let session = get_session_by_id_sync(conn, session_id)?
                 .ok_or(DbError::InvalidSessionForOperation)?;
             let logged_in_data = match session.session_data {
-                SessionState::LoggedInSession(s) => Ok(s),
+                SessionState::OnboardingSession(s) => Ok(s),
                 _ => Err(DbError::InvalidSessionForOperation),
             }?;
             get_sync(conn, logged_in_data.user_vault_id)

@@ -48,8 +48,8 @@ async fn handler(
     .await?;
 
     // Decrypt the challenge & check validity
-    let challenge_data: EmailVerifyChallenge = serde_json::from_str(&decrypted_challenge)
-        .map_err(|_| ApiError::EmailChallengeDecryptionError)?;
+    let challenge_data: EmailVerifyChallenge =
+        serde_json::from_str(&decrypted_challenge).map_err(|_| ApiError::EmailChallengeDecryptionError)?;
     if challenge_data.expires_at < Utc::now().naive_utc() {
         return Err(ApiError::EmailChallengeExpired);
     }

@@ -1,4 +1,4 @@
-use crate::auth::logged_in_session::LoggedInSessionContext;
+use crate::auth::onboarding_session::OnboardingSessionContext;
 use crate::errors::ApiError;
 use crate::types::access_event::ApiAccessEvent;
 use crate::types::success::ApiResponseData;
@@ -22,7 +22,7 @@ type AccessEventResponse = Vec<ApiAccessEvent>;
 fn handler(
     state: web::Data<State>,
     request: web::Query<AccessEventRequest>,
-    user_auth: LoggedInSessionContext,
+    user_auth: OnboardingSessionContext,
 ) -> actix_web::Result<Json<ApiResponseData<AccessEventResponse>>, ApiError> {
     // TODO paginate the response when there are too many results
     let results = db::access_event::list(
@@ -35,7 +35,5 @@ fn handler(
     .map(ApiAccessEvent::from)
     .collect();
 
-    Ok(Json(ApiResponseData {
-        data: results,
-    }))
+    Ok(Json(ApiResponseData { data: results }))
 }

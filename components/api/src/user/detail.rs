@@ -1,9 +1,8 @@
+use crate::auth::onboarding_session::OnboardingSessionContext;
 use crate::errors::ApiError;
 use crate::types::success::ApiResponseData;
+use crate::utils::user_vault_wrapper::UserVaultWrapper;
 use crate::State;
-use crate::{
-    auth::logged_in_session::LoggedInSessionContext, utils::user_vault_wrapper::UserVaultWrapper,
-};
 use db::models::user_vaults::UserVault;
 use newtypes::DataKind;
 use paperclip::actix::{api_v2_operation, web, web::Json, Apiv2Schema};
@@ -59,7 +58,7 @@ impl ApiUser {
 /// Returns a decrypted profile for the logged-in user.
 /// Requires user authentication sent in the cookie after a successful /identify/verify call
 pub async fn handler(
-    user_auth: LoggedInSessionContext,
+    user_auth: OnboardingSessionContext,
     state: web::Data<State>,
 ) -> actix_web::Result<Json<ApiResponseData<ApiUser>>, ApiError> {
     let existing_user = user_auth.user_vault();

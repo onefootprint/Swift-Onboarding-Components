@@ -1,5 +1,5 @@
 use crate::auth::get_onboarding_for_tenant;
-use crate::auth::logged_in_session::LoggedInSessionContext;
+use crate::auth::onboarding_session::OnboardingSessionContext;
 use crate::errors::ApiError;
 use crate::types::success::ApiResponseData;
 use crate::utils::insight_headers::InsightHeaders;
@@ -24,7 +24,7 @@ struct CommitResponse {
 /// Finish onboarding the user. Returns the footprint_user_id for login. If any necessary
 /// attributes were not set, returns an error with the list of missing fields.
 fn handler(
-    user_auth: LoggedInSessionContext,
+    user_auth: OnboardingSessionContext,
     tenant_auth: PublicTenantAuthContext,
     state: web::Data<State>,
     insights: InsightHeaders,

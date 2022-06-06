@@ -1,10 +1,11 @@
-use crate::auth::logged_in_session::LoggedInSessionContext;
+use crate::auth::onboarding_session::OnboardingSessionContext;
 use crate::errors::ApiError;
 use crate::types::success::ApiResponseData;
 use crate::State;
 use chrono::{Duration, Utc};
 use db::models::session_data::{
-    D2pSessionData, LoggedInSessionData, LoggedInSessionKind, SessionState as DbSessionState,
+    onboarding::{D2pSessionData, OnboardingSessionData, OnboardingSessionKind},
+    SessionState as DbSessionState,
 };
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 
@@ -20,21 +21,19 @@ pub struct GenerateResponse {
 /// and desktop.
 pub fn handler(
     state: web::Data<State>,
-    user_auth: LoggedInSessionContext,
+    user_auth: OnboardingSessionContext,
 ) -> actix_web::Result<Json<ApiResponseData<GenerateResponse>>, ApiError> {
     let uv = user_auth.user_vault();
 
     let temp_token_expires_at = Utc::now().naive_utc() + Duration::minutes(3);
-    let (_, auth_token) = DbSessionState::LoggedInSession(LoggedInSessionData {
+    let (_, auth_token) = DbSessionState::OnboardingSession(OnboardingSessionData {
         user_vault_id: uv.id.clone(),
-        kind: LoggedInSessionKind::D2pSession(D2pSessionData::default()),
+        kind: OnboardingSessionKind::D2pSession(D2pSessionData::default()),
     })
     .create(&state.db_pool, temp_token_expires_at)
     .await?;
 
     Ok(Json(ApiResponseData {
-        data: GenerateResponse {
-            auth_token: auth_token,
-        },
+        data: GenerateResponse { auth_token },
     }))
 }

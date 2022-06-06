@@ -1,11 +1,12 @@
-use crate::auth::{logged_in_session::LoggedInSessionContext, AuthError};
+use crate::auth::onboarding_session::OnboardingSessionContext;
+use crate::auth::AuthError;
 use crate::errors::ApiError;
 use crate::types::success::ApiResponseData;
 use crate::types::Empty;
 use crate::utils::phone::{rate_limit, send_sms};
 use crate::utils::user_vault_wrapper::UserVaultWrapper;
 use crate::State;
-use db::models::session_data::LoggedInSessionKind;
+use db::models::session_data::onboarding::OnboardingSessionKind;
 use newtypes::DataKind;
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 
@@ -18,13 +19,13 @@ pub struct D2pSmsRequest {
 #[post("sms")]
 /// Send an SMS with a link to the phone onboarding page
 pub fn handler(
-    user_auth: LoggedInSessionContext,
+    user_auth: OnboardingSessionContext,
     request: Json<D2pSmsRequest>,
     state: web::Data<State>,
 ) -> actix_web::Result<Json<ApiResponseData<Empty>>, ApiError> {
     if !matches!(
         user_auth.session_data().kind,
-        LoggedInSessionKind::D2pSession(_),
+        OnboardingSessionKind::D2pSession(_),
     ) {
         return Err(AuthError::SessionTypeError).map_err(ApiError::from);
     }

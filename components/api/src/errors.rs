@@ -2,8 +2,8 @@ use actix_web::error::JsonPayloadError;
 use actix_web::http::StatusCode;
 use aws_sdk_kms::{
     error::{
-        GenerateDataKeyPairWithoutPlaintextError, GenerateDataKeyWithoutPlaintextError,
-        GenerateMacError, VerifyMacError,
+        GenerateDataKeyPairWithoutPlaintextError, GenerateDataKeyWithoutPlaintextError, GenerateMacError,
+        VerifyMacError,
     },
     types::SdkError as KmsSdkError,
 };

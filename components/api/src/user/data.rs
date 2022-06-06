@@ -1,12 +1,23 @@
-use super::{clean_for_fingerprint, clean_for_storage};
-use crate::auth::logged_in_session::LoggedInSessionContext;
-use crate::utils::email::{clean_email, send_email_challenge};
-use crate::utils::user_vault_wrapper::UserVaultWrapper;
-use crate::{errors::ApiError, types::success::ApiResponseData, State};
-use db::models::user_data::{NewUserData, NewUserDataBatch};
-use db::models::user_vaults::UserVault;
+use crate::auth::onboarding_session::OnboardingSessionContext;
+use crate::types::success::ApiResponseData;
+use crate::{
+    auth::{AuthError, UserVaultPermissions},
+    errors::ApiError,
+    user::{clean_for_fingerprint, clean_for_storage},
+    utils::{
+        crypto::seal_to_vault_pkey,
+        email::{clean_email, send_email_challenge},
+        user_vault_wrapper::UserVaultWrapper,
+    },
+    State,
+};
+use db::models::{
+    user_data::{NewUserData, NewUserDataBatch},
+    user_vaults::UserVault,
+};
 use newtypes::{DataKind, DataPriority, UserDataId, UserVaultId};
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
+use std::collections::HashMap;
 
 #[derive(Debug, Clone, serde::Deserialize, Apiv2Schema)]
 struct UserPatchRequest {
@@ -70,14 +81,39 @@ impl UserPatchRequest {
 /// sent in the cookie after a successful /identify/verify call.
 async fn handler(
     state: web::Data<State>,
-    user_auth: LoggedInSessionContext,
+    user_auth: OnboardingSessionContext,
     request: web::Json<UserPatchRequest>,
 ) -> actix_web::Result<Json<ApiResponseData<String>>, ApiError> {
-    // TODO scoped addition based on auth context
+    let _ = update(
+        user_auth.clone(),
+        &state,
+        request.into_inner().to_vec().into_iter().collect(),
+        user_auth.user_vault().clone(),
+    )
+    .await?;
 
+    Ok(Json(ApiResponseData {
+        data: "Successful update".to_string(),
+    }))
+}
+
+struct DataUpdateRequest(DataKind, Vec<u8>, Option<Vec<u8>>);
+
+pub async fn update<C: UserVaultPermissions>(
+    context: C,
+    state: &web::Data<State>,
+    values: HashMap<DataKind, String>,
+    user_vault: UserVault,
+) -> Result<(), ApiError> {
+    let data_kinds: Vec<DataKind> = values.clone().into_keys().collect();
+    if !context.can_modify(data_kinds.clone()) {
+        Err(AuthError::UnauthorizedOperation)?
+    }
     let mut data_to_insert = Vec::<DataUpdateRequest>::new();
-    let email = request.email.clone();
-    for (data_kind, data_str) in request.into_inner().to_vec() {
+    let v = values.clone();
+    let email = v.get(&DataKind::Email);
+
+    for (data_kind, data_str) in values {
         // Clean/validate data
         let data_str = clean_for_storage(data_kind, data_str);
         let sh_data = if data_kind.is_fingerprintable() {
@@ -86,14 +122,10 @@ async fn handler(
         } else {
             None
         };
-        let e_data =
-            crate::utils::crypto::seal_to_vault_pkey(data_str, &user_auth.user_vault().public_key)?;
+        let e_data = seal_to_vault_pkey(data_str, &user_vault.public_key)?;
         data_to_insert.push(DataUpdateRequest(data_kind, e_data, sh_data))
     }
 
-    // Atomically lock the user, insert the new UserData rows, and optionally deactivate the old
-    // rows
-    let user_vault_id = user_auth.user_vault().id.clone();
     let _: () = state
         .db_pool
         .get()
@@ -101,28 +133,18 @@ async fn handler(
         .map_err(db::DbError::from)?
         .interact(move |conn| {
             conn.build_transaction()
-                .run(|| process_data_update_request(conn, user_vault_id, data_to_insert))
+                .run(|| process_data_update_request(conn, user_vault.id, data_to_insert))
         })
         .await
         .map_err(db::DbError::from)??;
 
     // If we're updating the email address, send an async challenge to the new email address
     if let Some(email) = email {
-        let cleaned_email = clean_email(email);
-        send_email_challenge(
-            &state,
-            user_auth.user_vault().public_key.clone(),
-            cleaned_email,
-        )
-        .await?;
+        let cleaned_email = clean_email(email.to_owned());
+        send_email_challenge(&state, user_vault.public_key.clone(), cleaned_email).await?;
     }
-
-    Ok(Json(ApiResponseData {
-        data: "Successful update".to_string(),
-    }))
+    Ok(())
 }
-
-struct DataUpdateRequest(DataKind, Vec<u8>, Option<Vec<u8>>);
 
 fn process_data_update_request(
     conn: &db::PgConnection,

@@ -8,7 +8,7 @@ use paperclip::actix::{web, Apiv2Schema};
 use crate::{
     auth::{
         client_secret_key::{self, SecretTenantAuthContext},
-        AuthError,
+        AuthError, UserVaultPermissions,
     },
     errors::ApiError,
 };
@@ -63,6 +63,16 @@ impl FromRequest for AuthContext {
         } else {
             Box::pin(async move { Err(ApiError::from(AuthError::UnknownClient)) })
         }
+    }
+}
+
+impl UserVaultPermissions for AuthContext {
+    fn can_decrypt(&self, _data_kinds: Vec<newtypes::DataKind>) -> bool {
+        true
+    }
+
+    fn can_modify(&self, _data_kinds: Vec<newtypes::DataKind>) -> bool {
+        true
     }
 }
 

@@ -1,19 +1,20 @@
-use super::{BiometricChallengeState, ChallengeKind, PhoneChallengeState};
 use crate::errors::ApiError;
 use crate::types::success::ApiResponseData;
 use crate::utils::challenge::{Challenge, ChallengeToken};
-use crate::utils::crypto::{seal_to_vault_pkey, signed_hash};
+use crate::utils::crypto::seal_to_vault_pkey;
+use crate::utils::crypto::signed_hash;
 use crate::utils::liveness::LivenessWebauthnConfig;
 use crate::State;
 use aws_sdk_kms::model::DataKeyPairSpec;
 use chrono::{Duration, Utc};
 use crypto::sha256;
-use db::models::session_data::{
-    LoggedInSessionData, LoggedInSessionKind, SessionState as DbSessionState,
-};
+use db::models::session_data::onboarding::{OnboardingSessionData, OnboardingSessionKind};
+use db::models::session_data::SessionState as DbSessionState;
 use db::models::user_vaults::{NewUserVaultReq, UserVault};
 use newtypes::{DataKind, Status, UserVaultId};
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
+
+use super::{BiometricChallengeState, ChallengeKind, PhoneChallengeState};
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
 struct VerifyRequest {
@@ -46,26 +47,19 @@ async fn handler(
     request: Json<VerifyRequest>,
 ) -> actix_web::Result<Json<ApiResponseData<VerifyResponse>>, ApiError> {
     let (user_vault_id, kind) = match request.challenge_kind {
-        ChallengeKind::Biometric => validate_biometric_challenge(
-            &state,
-            &request.challenge_token,
-            &request.challenge_response,
-        )?,
+        ChallengeKind::Biometric => {
+            validate_biometric_challenge(&state, &request.challenge_token, &request.challenge_response)?
+        }
         ChallengeKind::Sms => {
-            validate_sms_challenge(
-                &state,
-                &request.challenge_token,
-                &request.challenge_response,
-            )
-            .await?
+            validate_sms_challenge(&state, &request.challenge_token, &request.challenge_response).await?
         }
     };
 
     // Save logged in session data into the DB
     let login_expires_at = Utc::now().naive_utc() + Duration::minutes(15);
-    let (_, auth_token) = DbSessionState::LoggedInSession(LoggedInSessionData {
-        user_vault_id: user_vault_id,
-        kind: LoggedInSessionKind::Normal,
+    let (_, auth_token) = DbSessionState::OnboardingSession(OnboardingSessionData {
+        user_vault_id,
+        kind: OnboardingSessionKind::Normal,
     })
     .create(&state.db_pool, login_expires_at)
     .await?;
@@ -144,15 +138,11 @@ async fn create_new_user_vault(
         .await?;
 
     let der_public_key = new_key_pair.public_key.unwrap().into_inner();
-    let ec_pk_uncompressed =
-        crypto::conversion::public_key_der_to_raw_uncompressed(&der_public_key)?;
+    let ec_pk_uncompressed = crypto::conversion::public_key_der_to_raw_uncompressed(&der_public_key)?;
     let _pk = crypto::hex::encode(&ec_pk_uncompressed);
 
     let new_user = NewUserVaultReq {
-        e_private_key: new_key_pair
-            .private_key_ciphertext_blob
-            .unwrap()
-            .into_inner(),
+        e_private_key: new_key_pair.private_key_ciphertext_blob.unwrap().into_inner(),
         public_key: ec_pk_uncompressed.clone(),
         id_verified: Status::Incomplete,
         e_phone_number: seal_to_vault_pkey(phone_number.clone(), &ec_pk_uncompressed)?,

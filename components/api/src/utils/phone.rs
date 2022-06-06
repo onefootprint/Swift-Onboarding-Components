@@ -1,7 +1,7 @@
 use aws_sdk_pinpointsmsvoicev2::output::SendTextMessageOutput;
 use chrono::{Duration, Utc};
 use crypto::{b64::Base64Data, sha256};
-use db::models::session_data::{ChallengeLastSentData, SessionState};
+use db::models::session_data::{challenge::ChallengeLastSentData, SessionState};
 use paperclip::actix::web;
 
 use crate::{errors::ApiError, State};

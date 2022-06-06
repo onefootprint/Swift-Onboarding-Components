@@ -1,13 +1,10 @@
-use std::pin::Pin;
-
+use super::{AuthError, UserVaultPermissions};
+use crate::{errors::ApiError, State};
 use actix_web::{web, FromRequest};
 use db::models::tenants::Tenant;
 use futures_util::Future;
 use paperclip::actix::Apiv2Security;
-
-use crate::{errors::ApiError, State};
-
-use super::AuthError;
+use std::pin::Pin;
 
 #[derive(Debug, Clone, Apiv2Security)]
 #[openapi(
@@ -64,4 +61,15 @@ pub async fn from_request_inner(
         .await?
         .ok_or(AuthError::UnknownClient)?;
     Ok(SecretTenantAuthContext { tenant })
+}
+
+impl UserVaultPermissions for SecretTenantAuthContext {
+    // TODO -- scope based off of what types the tenant is authorized for
+    fn can_decrypt(&self, _data_kinds: Vec<newtypes::DataKind>) -> bool {
+        true
+    }
+
+    fn can_modify(&self, _data_kinds: Vec<newtypes::DataKind>) -> bool {
+        false
+    }
 }

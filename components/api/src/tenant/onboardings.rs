@@ -36,10 +36,7 @@ fn handler(
     // TODO paginate the response when there are too many results
     let tenant = auth.tenant();
 
-    let AccessEventRequest {
-        status,
-        fingerprint,
-    } = request.into_inner();
+    let AccessEventRequest { status, fingerprint } = request.into_inner();
 
     // TODO clean phone number or email
     let fingerprint = match fingerprint {
@@ -51,17 +48,16 @@ fn handler(
         None => None,
     };
 
-    let results =
-        db::onboarding::list_for_tenant(&state.db_pool, tenant.id.clone(), status, fingerprint)
-            .await?
-            .into_iter()
-            .map(|ob| OnboardingItem {
-                footprint_user_id: ob.user_ob_id,
-                status: ob.status,
-                created_at: ob.created_at,
-                updated_at: ob.updated_at,
-            })
-            .collect();
+    let results = db::onboarding::list_for_tenant(&state.db_pool, tenant.id.clone(), status, fingerprint)
+        .await?
+        .into_iter()
+        .map(|ob| OnboardingItem {
+            footprint_user_id: ob.user_ob_id,
+            status: ob.status,
+            created_at: ob.created_at,
+            updated_at: ob.updated_at,
+        })
+        .collect();
 
     Ok(Json(ApiResponseData { data: results }))
 }
