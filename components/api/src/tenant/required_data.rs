@@ -1,6 +1,6 @@
 use std::collections::HashSet;
 
-use crate::tenant::AuthContext;
+use crate::tenant::TenantAuthContext;
 use crate::types::success::ApiResponseData;
 use crate::State;
 use crate::{errors::ApiError, types::Empty};
@@ -19,7 +19,7 @@ struct SetDataRequest {
 fn set(
     state: web::Data<State>,
     request: Json<SetDataRequest>,
-    auth: AuthContext,
+    auth: TenantAuthContext,
 ) -> actix_web::Result<Json<ApiResponseData<Empty>>, ApiError> {
     let tenant = auth.tenant();
 
@@ -42,7 +42,7 @@ fn set(
 /// Get the attributes the tenant requires of the client (name, SSN, etc.)
 fn get(
     _state: web::Data<State>,
-    auth: AuthContext,
+    auth: TenantAuthContext,
 ) -> actix_web::Result<Json<ApiResponseData<Vec<DataKind>>>, ApiError> {
     let tenant = auth.tenant();
 

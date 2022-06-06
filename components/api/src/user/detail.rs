@@ -55,7 +55,7 @@ impl ApiUser {
 }
 
 #[api_v2_operation(tags(User))]
-/// Returns a decrypted profile for the logged-in user.
+/// Returns a decrypted profile for the logged-in user
 /// Requires user authentication sent in the cookie after a successful /identify/verify call
 pub async fn handler(
     user_auth: OnboardingSessionContext,

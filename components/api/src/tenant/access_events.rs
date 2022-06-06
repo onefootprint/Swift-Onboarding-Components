@@ -1,5 +1,5 @@
 use crate::errors::ApiError;
-use crate::tenant::AuthContext;
+use crate::tenant::TenantAuthContext;
 use crate::types::access_event::ApiAccessEvent;
 use crate::types::success::ApiResponseData;
 use crate::State;
@@ -23,7 +23,7 @@ type AccessEventResponse = Vec<ApiAccessEvent>;
 fn handler(
     state: web::Data<State>,
     request: web::Query<AccessEventRequest>,
-    auth: AuthContext,
+    auth: TenantAuthContext,
 ) -> actix_web::Result<Json<ApiResponseData<AccessEventResponse>>, ApiError> {
     // TODO paginate the response when there are too many results
     let tenant = auth.tenant();
@@ -40,7 +40,5 @@ fn handler(
     .map(ApiAccessEvent::from)
     .collect();
 
-    Ok(Json(ApiResponseData {
-        data: results,
-    }))
+    Ok(Json(ApiResponseData { data: results }))
 }

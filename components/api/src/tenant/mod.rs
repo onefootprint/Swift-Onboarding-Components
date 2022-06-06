@@ -22,41 +22,35 @@ pub mod required_data;
 pub mod workos;
 
 #[derive(Debug, Clone, Apiv2Schema)]
-pub enum AuthContext {
+pub enum TenantAuthContext {
     UserSessionContext(DashboardSessionContext),
     ApiSessionContext(SecretTenantAuthContext),
 }
 
-impl AuthContext {
+impl TenantAuthContext {
     pub fn tenant(&self) -> &Tenant {
         match self {
-            AuthContext::UserSessionContext(context) => context.tenant(),
-            AuthContext::ApiSessionContext(context) => context.tenant(),
+            TenantAuthContext::UserSessionContext(context) => context.tenant(),
+            TenantAuthContext::ApiSessionContext(context) => context.tenant(),
         }
     }
 }
 
-impl FromRequest for AuthContext {
+impl FromRequest for TenantAuthContext {
     type Error = ApiError;
     type Future = Pin<Box<dyn Future<Output = Result<Self, Self::Error>>>>;
 
-    fn from_request(
-        req: &actix_web::HttpRequest,
-        _payload: &mut actix_web::dev::Payload,
-    ) -> Self::Future {
+    fn from_request(req: &actix_web::HttpRequest, _payload: &mut actix_web::dev::Payload) -> Self::Future {
         let static_req = req.clone();
-        if req
-            .headers()
-            .contains_key(workos_dashboard_auth::HEADER_NAME)
-        {
+        if req.headers().contains_key(workos_dashboard_auth::HEADER_NAME) {
             Box::pin(async move {
-                Ok(AuthContext::UserSessionContext(
+                Ok(TenantAuthContext::UserSessionContext(
                     workos_dashboard_auth::from_request_inner(&static_req).await?,
                 ))
             })
         } else if req.headers().contains_key(client_secret_key::HEADER_NAME) {
             Box::pin(async move {
-                Ok(AuthContext::ApiSessionContext(
+                Ok(TenantAuthContext::ApiSessionContext(
                     client_secret_key::from_request_inner(&static_req).await?,
                 ))
             })
@@ -66,7 +60,7 @@ impl FromRequest for AuthContext {
     }
 }
 
-impl UserVaultPermissions for AuthContext {
+impl UserVaultPermissions for TenantAuthContext {
     fn can_decrypt(&self, _data_kinds: Vec<newtypes::DataKind>) -> bool {
         true
     }

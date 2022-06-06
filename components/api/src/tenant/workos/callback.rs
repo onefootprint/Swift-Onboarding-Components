@@ -40,10 +40,7 @@ fn handler(
 
     let client = awc::Client::default();
 
-    let profile = &state
-        .workos_client
-        .get_profile(&client, code.to_owned())
-        .await?;
+    let profile = &state.workos_client.get_profile(&client, code.to_owned()).await?;
 
     // Magic link auth isn't actually associated with an org, so manually
     // set it to Footprint org identifier doesn't exist for now
@@ -53,7 +50,7 @@ fn handler(
         .organization_id
         .unwrap_or_else(|| state.workos_client.default_org.clone());
 
-    // Save logged in session data into the DB
+    // Save tenant login in session data into the DB
     let login_expires_at = Utc::now().naive_utc() + Duration::minutes(60);
     let (_, auth_token) = SessionState::TenantDashboardSession(TenantDashboardSessionData {
         email: profile.email.clone(),

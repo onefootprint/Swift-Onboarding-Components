@@ -1,5 +1,5 @@
 use crate::errors::ApiError;
-use crate::tenant::AuthContext;
+use crate::tenant::TenantAuthContext;
 use crate::types::success::ApiResponseData;
 use crate::State;
 use chrono::NaiveDateTime;
@@ -31,7 +31,7 @@ type OnboardingResponse = Vec<OnboardingItem>;
 fn handler(
     state: web::Data<State>,
     request: web::Query<AccessEventRequest>,
-    auth: AuthContext,
+    auth: TenantAuthContext,
 ) -> actix_web::Result<Json<ApiResponseData<OnboardingResponse>>, ApiError> {
     // TODO paginate the response when there are too many results
     let tenant = auth.tenant();

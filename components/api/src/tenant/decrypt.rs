@@ -1,5 +1,5 @@
 use crate::errors::ApiError;
-use crate::tenant::AuthContext;
+use crate::tenant::TenantAuthContext;
 use crate::types::success::ApiResponseData;
 use crate::user::{decrypt, DecryptFieldsResult};
 use crate::utils::insight_headers::InsightHeaders;
@@ -26,7 +26,7 @@ type UserDecryptResponse = HashMap<DataKind, String>;
 /// Requires tenant secret key auth.
 fn handler(
     state: web::Data<State>,
-    auth: AuthContext,
+    auth: TenantAuthContext,
     request: Json<UserDecryptRequest>,
     insights: InsightHeaders,
 ) -> actix_web::Result<Json<ApiResponseData<UserDecryptResponse>>, ApiError> {

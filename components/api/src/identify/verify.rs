@@ -55,7 +55,7 @@ async fn handler(
         }
     };
 
-    // Save logged in session data into the DB
+    // Save onboarding in session data into the DB
     let login_expires_at = Utc::now().naive_utc() + Duration::minutes(15);
     let (_, auth_token) = DbSessionState::OnboardingSession(OnboardingSessionData {
         user_vault_id,

@@ -38,10 +38,7 @@ impl FromRequest for OnboardingSessionContext {
     type Error = ApiError;
     type Future = Pin<Box<dyn Future<Output = Result<Self, Self::Error>>>>;
 
-    fn from_request(
-        req: &actix_web::HttpRequest,
-        _payload: &mut actix_web::dev::Payload,
-    ) -> Self::Future {
+    fn from_request(req: &actix_web::HttpRequest, _payload: &mut actix_web::dev::Payload) -> Self::Future {
         let pool = req.app_data::<web::Data<State>>().unwrap().db_pool.clone();
 
         let auth_token = req
@@ -57,15 +54,13 @@ impl FromRequest for OnboardingSessionContext {
                 .await?
                 .ok_or(AuthError::NoSessionFound)?;
             // Actually verify that the session is the correct type
-            let session_data = if let SessionState::OnboardingSession(session_data) =
-                session.session_data.clone()
-            {
-                Ok(session_data)
-            } else {
-                Err(AuthError::SessionTypeError)
-            }?;
-            let user_vault =
-                db::user_vault::get_by_logged_in_session(&pool, auth_token.clone()).await?;
+            let session_data =
+                if let SessionState::OnboardingSession(session_data) = session.session_data.clone() {
+                    Ok(session_data)
+                } else {
+                    Err(AuthError::SessionTypeError)
+                }?;
+            let user_vault = db::user_vault::get_by_onboarding_session(&pool, auth_token.clone()).await?;
 
             Ok(Self {
                 user_vault,
