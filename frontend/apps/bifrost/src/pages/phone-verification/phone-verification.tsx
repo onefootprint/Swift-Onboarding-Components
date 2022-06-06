@@ -3,10 +3,8 @@ import useIdentify, { IdentifyResponse } from 'src/hooks/identify/use-identify';
 import useIdentifyVerify, {
   IdentifyVerifyResponse,
 } from 'src/hooks/identify/use-identify-verify';
-import useBifrostMachine, {
-  ChallengeKind,
-  Events,
-} from 'src/hooks/use-bifrost-machine';
+import useBifrostMachine, { Events } from 'src/hooks/use-bifrost-machine';
+import { ChallengeKind } from 'src/utils/state-machine/types';
 import styled, { css } from 'styled';
 import { Box, LinkButton, LoadingIndicator, PinInput, Typography } from 'ui';
 

@@ -1,4 +1,4 @@
-import { UserDataAttribute } from '../types';
+import { UserDataAttribute } from '../../types';
 import {
   hasMissingAttributes,
   isMissingBasicAttribute,

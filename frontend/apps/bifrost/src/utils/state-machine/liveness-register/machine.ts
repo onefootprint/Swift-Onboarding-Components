@@ -1,25 +1,24 @@
+import { DeviceInfo } from 'src/utils/state-machine/types';
 import { createMachine } from 'xstate';
 
 import { Events, MachineContext, MachineEvents, States } from './types';
 
 const createLivenessRegisterMachine = (
-  initialDevice: MachineContext['device'],
-  authToken?: MachineContext['authToken'],
+  device: DeviceInfo,
+  authToken?: string,
 ) =>
   createMachine<MachineContext, MachineEvents>({
     id: 'livenessRegister',
-    initial: States.biometricRegister,
+    initial: States.init,
     context: {
       authToken,
-      device: {
-        hasSupportForWebAuthn: initialDevice.hasSupportForWebAuthn,
-        type: initialDevice.type,
-      },
+      device,
     },
     states: {
       [States.init]: {
         on: {
-          [Events.livenessRegisterStarted]: [
+          // Immediate transition on init state based on conds
+          '': [
             {
               target: States.biometricRegister,
               cond: context =>
@@ -43,9 +42,6 @@ const createLivenessRegisterMachine = (
         on: {
           [Events.biometricRegisterSucceeded]: {
             target: States.livenessRegisterCompleted,
-          },
-          [Events.biometricRegisterFailed]: {
-            target: States.biometricRegisterFailure,
           },
         },
       },

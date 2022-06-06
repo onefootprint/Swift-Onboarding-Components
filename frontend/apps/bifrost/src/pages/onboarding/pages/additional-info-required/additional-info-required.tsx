@@ -1,11 +1,13 @@
 import React from 'react';
 import HeaderTitle from 'src/components/header-title';
-import useBifrostMachine, { Events } from 'src/hooks/use-bifrost-machine';
+import { Events } from 'src/utils/state-machine/onboarding';
 import styled, { css } from 'styled';
 import { Button } from 'ui';
 
+import useOnboardingMachine from '../../hooks/use-onboarding-machine';
+
 const AdditionalInfoRequired = () => {
-  const [, send] = useBifrostMachine();
+  const [, send] = useOnboardingMachine();
   const handleClick = () => {
     send({
       type: Events.additionalInfoRequired,

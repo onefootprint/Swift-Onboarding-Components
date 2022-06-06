@@ -1,20 +1,18 @@
 import { Events } from '@src/utils/state-machine/liveness-register';
 import React from 'react';
 import HeaderTitle from 'src/components/header-title';
-import useBifrostMachine from 'src/hooks/use-bifrost-machine';
 import styled, { css } from 'styled';
 import { Button } from 'ui';
 
 import useBiometricRegister from '../../hooks/use-biometric-register';
-import useLivenessRegisterMachine from '../../hooks/use-liveness-check';
+import useLivenessRegisterMachine from '../../hooks/use-liveness-register';
 
 const BiometricRegister = () => {
-  const [bifrostState] = useBifrostMachine();
-  const [, send] = useLivenessRegisterMachine();
+  const [state, send] = useLivenessRegisterMachine();
   const biometricRegisterMutation = useBiometricRegister();
 
   const handleClick = () => {
-    const { authToken } = bifrostState.context;
+    const { authToken } = state.context;
     if (!authToken) {
       return;
     }

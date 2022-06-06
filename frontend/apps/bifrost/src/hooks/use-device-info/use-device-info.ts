@@ -4,10 +4,10 @@ import UAParser from 'ua-parser-js';
 
 import useBifrostMachine from '../use-bifrost-machine';
 
-// UAParser device type has can have an undefined type, because
+// UAParser device type can have an undefined type, because
 // it could get executed on the server side. We assign a default
 // device, just to avoid to make a lot of ifs
-const DEFAULT_DEVICE_TYPE = 'mobile';
+const DEFAULT_DEVICE_TYPE = 'unknown';
 
 const checkWebAuthnSupport = async () => {
   if (!window.PublicKeyCredential) {

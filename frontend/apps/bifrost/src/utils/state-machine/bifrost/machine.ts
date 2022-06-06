@@ -1,20 +1,8 @@
+import { ChallengeKind } from 'src/utils/state-machine/types';
 import { assign, createMachine } from 'xstate';
 
-import createLivenessRegisterMachine from '../liveness-register';
-import {
-  Actions,
-  BifrostContext,
-  BifrostEvent,
-  ChallengeKind,
-  Events,
-  States,
-} from './types';
-import {
-  hasMissingAttributes,
-  isMissingBasicAttribute,
-  isMissingResidentialAttribute,
-  isMissingSsnAttribute,
-} from './utils/missing-attributes';
+import createOnboardingMachine from '../onboarding';
+import { Actions, BifrostContext, BifrostEvent, Events, States } from './types';
 
 const initialContext: BifrostContext = {
   email: '',
@@ -28,8 +16,8 @@ const initialContext: BifrostContext = {
   },
   onboarding: {
     missingAttributes: [],
-    data: {},
     missingWebauthnCredentials: true,
+    data: {},
   },
 };
 
@@ -109,225 +97,35 @@ const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
               ],
               cond: (context, event) =>
                 context.userFound &&
-                event.payload.missingAttributes.length === 0,
+                event.payload.missingAttributes.length === 0 &&
+                !event.payload.missingWebauthnCredentials,
             },
             {
               description:
                 'For an existing user, show the intermediate additionalDataRequired page before the onboarding pages',
-              target: States.additionalDataRequired,
+              target: States.onboarding,
               actions: [
                 Actions.assignAuthToken,
                 Actions.assignMissingAttributes,
                 Actions.assignMissingWebauthnCredentials,
               ],
-              cond: (context, event) =>
-                (context.userFound &&
-                  hasMissingAttributes(
-                    event.payload.missingAttributes,
-                    context.onboarding.data,
-                  )) ||
-                context.onboarding.missingWebauthnCredentials,
-            },
-            {
-              target: States.livenessRegister,
-              actions: [
-                Actions.assignAuthToken,
-                Actions.assignMissingAttributes,
-                Actions.assignMissingWebauthnCredentials,
-              ],
-              cond: (context, event) =>
-                !context.userFound && event.payload.missingWebauthnCredentials,
-            },
-            {
-              target: States.basicInformation,
-              actions: [
-                Actions.assignAuthToken,
-                Actions.assignMissingAttributes,
-                Actions.assignMissingWebauthnCredentials,
-              ],
-              cond: (context, event) =>
-                !context.userFound &&
-                isMissingBasicAttribute(
-                  event.payload.missingAttributes,
-                  context.onboarding.data,
-                ),
-            },
-            {
-              target: States.residentialAddress,
-              actions: [
-                Actions.assignAuthToken,
-                Actions.assignMissingAttributes,
-                Actions.assignMissingWebauthnCredentials,
-              ],
-              cond: (context, event) =>
-                !context.userFound &&
-                isMissingResidentialAttribute(
-                  event.payload.missingAttributes,
-                  context.onboarding.data,
-                ),
-            },
-            {
-              target: States.ssn,
-              actions: [
-                Actions.assignAuthToken,
-                Actions.assignMissingAttributes,
-                Actions.assignMissingWebauthnCredentials,
-              ],
-              cond: (context, event) =>
-                !context.userFound &&
-                isMissingSsnAttribute(
-                  event.payload.missingAttributes,
-                  context.onboarding.data,
-                ),
-            },
-            {
-              description:
-                "For completeness only. If the new user doesn't have missing attributes, take them to onboarding success directly",
-              target: States.onboardingSuccess,
-              actions: [
-                Actions.assignAuthToken,
-                Actions.assignMissingAttributes,
-                Actions.assignMissingWebauthnCredentials,
-              ],
-              cond: (context, event) =>
-                !context.userFound &&
-                event.payload.missingAttributes.length === 0,
             },
           ],
         },
       },
-      [States.livenessRegister]: {
+      [States.onboarding]: {
         invoke: {
-          id: 'livenessRegister',
+          id: 'onboarding',
           src: context =>
-            createLivenessRegisterMachine(context.device, context.authToken),
-          onDone: [
-            {
-              target: States.basicInformation,
-              cond: context =>
-                isMissingBasicAttribute(
-                  context.onboarding.missingAttributes,
-                  context.onboarding.data,
-                ),
-            },
-            {
-              target: States.residentialAddress,
-              cond: context =>
-                isMissingResidentialAttribute(
-                  context.onboarding.missingAttributes,
-                  context.onboarding.data,
-                ),
-            },
-            {
-              target: States.ssn,
-              cond: context =>
-                isMissingSsnAttribute(
-                  context.onboarding.missingAttributes,
-                  context.onboarding.data,
-                ),
-            },
-            {
-              target: States.onboardingSuccess,
-              cond: context =>
-                !hasMissingAttributes(
-                  context.onboarding.missingAttributes,
-                  context.onboarding.data,
-                ),
-            },
-          ],
-        },
-      },
-      [States.additionalDataRequired]: {
-        on: {
-          [Events.additionalInfoRequired]: [
-            {
-              target: States.livenessRegister,
-              cond: context =>
-                !context.userFound &&
-                context.onboarding.missingWebauthnCredentials,
-            },
-            {
-              target: States.basicInformation,
-              cond: context =>
-                isMissingBasicAttribute(
-                  context.onboarding.missingAttributes,
-                  context.onboarding.data,
-                ),
-            },
-            {
-              target: States.residentialAddress,
-              cond: context =>
-                isMissingResidentialAttribute(
-                  context.onboarding.missingAttributes,
-                  context.onboarding.data,
-                ),
-            },
-            {
-              target: States.ssn,
-              cond: context =>
-                isMissingSsnAttribute(
-                  context.onboarding.missingAttributes,
-                  context.onboarding.data,
-                ),
-            },
-          ],
-        },
-      },
-      [States.basicInformation]: {
-        on: {
-          [Events.basicInformationSubmitted]: [
-            {
-              target: States.residentialAddress,
-              actions: [Actions.assignBasicInformation],
-              cond: context =>
-                isMissingResidentialAttribute(
-                  context.onboarding.missingAttributes,
-                  context.onboarding.data,
-                ),
-            },
-            {
-              target: States.ssn,
-              actions: [Actions.assignBasicInformation],
-              cond: context =>
-                isMissingSsnAttribute(
-                  context.onboarding.missingAttributes,
-                  context.onboarding.data,
-                ),
-            },
-            {
-              target: States.onboardingSuccess,
-              actions: [Actions.assignBasicInformation],
-            },
-          ],
-        },
-      },
-      [States.residentialAddress]: {
-        on: {
-          [Events.residentialAddressSubmitted]: [
-            {
-              target: States.ssn,
-              actions: [Actions.assignResidentialAddress],
-              cond: context =>
-                isMissingSsnAttribute(
-                  context.onboarding.missingAttributes,
-                  context.onboarding.data,
-                ),
-            },
-            {
-              target: States.onboardingSuccess,
-              actions: [Actions.assignResidentialAddress],
-            },
-          ],
-        },
-      },
-      [States.ssn]: {
-        on: {
-          [Events.ssnSubmitted]: [
-            {
-              target: States.onboardingSuccess,
-              actions: [Actions.assignSsn],
-            },
-          ],
+            createOnboardingMachine({
+              userFound: context.userFound,
+              onboarding: context.onboarding,
+              device: context.device,
+              authToken: context.authToken,
+            }),
+          onDone: {
+            target: States.onboardingSuccess,
+          },
         },
       },
       [States.onboardingSuccess]: {
@@ -421,31 +219,6 @@ const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
           context.onboarding.missingWebauthnCredentials =
             event.payload.missingWebauthnCredentials;
         }
-        return context;
-      }),
-      [Actions.assignBasicInformation]: assign((context, event) => {
-        if (event.type === Events.basicInformationSubmitted) {
-          context.onboarding.data = {
-            ...context.onboarding.data,
-            ...event.payload.basicInformation,
-          };
-        }
-        return context;
-      }),
-      [Actions.assignResidentialAddress]: assign((context, event) => {
-        if (event.type === Events.residentialAddressSubmitted) {
-          context.onboarding.data = {
-            ...context.onboarding.data,
-            ...event.payload.residentialAddress,
-          };
-        }
-        return context;
-      }),
-      [Actions.assignSsn]: assign((context, event) => {
-        if (event.type !== Events.ssnSubmitted) {
-          return context;
-        }
-        context.onboarding.data.ssn = event.payload.ssn;
         return context;
       }),
     },

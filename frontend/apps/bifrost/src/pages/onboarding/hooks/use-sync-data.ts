@@ -1,6 +1,6 @@
 import useBifrostMachine from 'src/hooks/use-bifrost-machine';
+import { UserData } from 'src/utils/state-machine/types';
 
-import { UserData } from '../../../utils/state-machine/bifrost';
 import useOnboardingComplete from './use-onboarding-complete';
 import useUserData from './use-user-data';
 

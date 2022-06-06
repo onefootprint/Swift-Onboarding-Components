@@ -5,7 +5,7 @@ import styled, { css } from 'styled';
 import { Box, Button } from 'ui';
 
 import useBiometricRegister from '../../hooks/use-biometric-register';
-import useLivenessRegisterMachine from '../../hooks/use-liveness-check';
+import useLivenessRegisterMachine from '../../hooks/use-liveness-register';
 
 const BiometricRegisterFailure = () => {
   const [state, send] = useLivenessRegisterMachine();

@@ -4,7 +4,7 @@ import HeaderTitle from 'src/components/header-title';
 import styled, { css } from 'styled';
 import { Button, Divider, Typography } from 'ui';
 
-import useLivenessRegisterMachine from '../../hooks/use-liveness-check';
+import useLivenessRegisterMachine from '../../hooks/use-liveness-register';
 
 const QRRegister = () => {
   const [, send] = useLivenessRegisterMachine();

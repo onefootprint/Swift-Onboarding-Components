@@ -5,14 +5,12 @@ import IcoShield24 from 'icons/ico/ico-shield-24';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import HeaderTitle from 'src/components/header-title';
-import useBifrostMachine, {
-  Events,
-  UserData,
-  UserDataAttribute,
-} from 'src/hooks/use-bifrost-machine';
+import { Events } from 'src/utils/state-machine/onboarding';
+import { UserData, UserDataAttribute } from 'src/utils/state-machine/types';
 import styled, { css } from 'styled';
 import { Button, TextInput } from 'ui';
 
+import useOnboardingMachine from '../../hooks/use-onboarding-machine';
 import useSyncData from '../../hooks/use-sync-data';
 import Disclaimer from './components/disclaimer';
 
@@ -20,7 +18,7 @@ type FormData = Required<Pick<UserData, UserDataAttribute.ssn>>;
 
 const SSN = () => {
   const inputMasks = useInputMask('en');
-  const [, send] = useBifrostMachine();
+  const [, send] = useOnboardingMachine();
   const syncDataMutation = useSyncData();
   const { t } = useTranslation('pages.registration.ssn');
   const {

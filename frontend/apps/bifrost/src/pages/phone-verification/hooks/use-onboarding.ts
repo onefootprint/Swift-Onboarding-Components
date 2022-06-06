@@ -1,6 +1,6 @@
 import { useMutation } from 'react-query';
 import request, { RequestError, RequestResponse } from 'request';
-import { UserDataAttribute } from 'src/utils/state-machine/bifrost';
+import { UserDataAttribute } from 'src/utils/state-machine/types';
 
 export type OnboardingRequest = {
   authToken: string;

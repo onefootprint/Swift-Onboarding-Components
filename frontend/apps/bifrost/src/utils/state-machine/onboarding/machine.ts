@@ -1,0 +1,256 @@
+import {
+  hasMissingAttributes,
+  isMissingBasicAttribute,
+  isMissingResidentialAttribute,
+  isMissingSsnAttribute,
+} from '@src/utils/state-machine/onboarding/utils/missing-attributes';
+import createLivenessRegisterMachine from 'src/utils/state-machine/liveness-register';
+import { DeviceInfo, OnboardingData } from 'src/utils/state-machine/types';
+import { assign, createMachine } from 'xstate';
+
+import {
+  Actions,
+  Events,
+  MachineContext,
+  MachineEvents,
+  States,
+} from './types';
+
+export type OnboardingMachineArgs = {
+  userFound: boolean;
+  onboarding: OnboardingData;
+  device: DeviceInfo;
+  authToken?: string;
+};
+
+const createOnboardingMachine = ({
+  userFound,
+  onboarding,
+  device,
+  authToken,
+}: OnboardingMachineArgs) =>
+  createMachine<MachineContext, MachineEvents>(
+    {
+      id: 'onboarding',
+      initial: States.init,
+      context: {
+        userFound,
+        missingAttributes: [...onboarding.missingAttributes],
+        missingWebauthnCredentials: onboarding.missingWebauthnCredentials,
+        data: onboarding.data || {},
+        device,
+        authToken,
+      },
+      states: {
+        [States.init]: {
+          on: {
+            // Immediate transition on init state based on conds
+            '': [
+              {
+                cond: () =>
+                  userFound &&
+                  (onboarding.missingAttributes.length > 0 ||
+                    onboarding.missingWebauthnCredentials),
+                target: States.additionalDataRequired,
+              },
+              {
+                target: States.livenessRegister,
+                cond: context => context.missingWebauthnCredentials,
+              },
+              {
+                target: States.basicInformation,
+                cond: context =>
+                  !userFound ||
+                  isMissingBasicAttribute(
+                    context.missingAttributes,
+                    context.data,
+                  ),
+              },
+              {
+                target: States.residentialAddress,
+                cond: context =>
+                  isMissingResidentialAttribute(
+                    context.missingAttributes,
+                    context.data,
+                  ),
+              },
+              {
+                target: States.ssn,
+                cond: context =>
+                  isMissingSsnAttribute(
+                    context.missingAttributes,
+                    context.data,
+                  ),
+              },
+            ],
+          },
+        },
+        [States.additionalDataRequired]: {
+          on: {
+            [Events.additionalInfoRequired]: [
+              {
+                target: States.livenessRegister,
+                cond: context => context.missingWebauthnCredentials,
+              },
+              {
+                target: States.basicInformation,
+                cond: context =>
+                  isMissingBasicAttribute(
+                    context.missingAttributes,
+                    context.data,
+                  ),
+              },
+              {
+                target: States.residentialAddress,
+                cond: context =>
+                  isMissingResidentialAttribute(
+                    context.missingAttributes,
+                    context.data,
+                  ),
+              },
+              {
+                target: States.ssn,
+                cond: context =>
+                  isMissingSsnAttribute(
+                    context.missingAttributes,
+                    context.data,
+                  ),
+              },
+            ],
+          },
+        },
+        [States.livenessRegister]: {
+          invoke: {
+            id: 'livenessRegister',
+            src: context =>
+              createLivenessRegisterMachine(context.device, context.authToken),
+            onDone: [
+              {
+                target: States.basicInformation,
+                cond: context =>
+                  isMissingBasicAttribute(
+                    context.missingAttributes,
+                    context.data,
+                  ),
+              },
+              {
+                target: States.residentialAddress,
+                cond: context =>
+                  isMissingResidentialAttribute(
+                    context.missingAttributes,
+                    context.data,
+                  ),
+              },
+              {
+                target: States.ssn,
+                cond: context =>
+                  isMissingSsnAttribute(
+                    context.missingAttributes,
+                    context.data,
+                  ),
+              },
+              {
+                target: States.onboardingSuccess,
+                cond: context =>
+                  !hasMissingAttributes(
+                    context.missingAttributes,
+                    context.data,
+                  ),
+              },
+            ],
+          },
+        },
+        [States.basicInformation]: {
+          on: {
+            [Events.basicInformationSubmitted]: [
+              {
+                target: States.residentialAddress,
+                actions: [Actions.assignBasicInformation],
+                cond: context =>
+                  isMissingResidentialAttribute(
+                    context.missingAttributes,
+                    context.data,
+                  ),
+              },
+              {
+                target: States.ssn,
+                actions: [Actions.assignBasicInformation],
+                cond: context =>
+                  isMissingSsnAttribute(
+                    context.missingAttributes,
+                    context.data,
+                  ),
+              },
+              {
+                target: States.onboardingSuccess,
+                actions: [Actions.assignBasicInformation],
+              },
+            ],
+          },
+        },
+        [States.residentialAddress]: {
+          on: {
+            [Events.residentialAddressSubmitted]: [
+              {
+                target: States.ssn,
+                actions: [Actions.assignResidentialAddress],
+                cond: context =>
+                  isMissingSsnAttribute(
+                    context.missingAttributes,
+                    context.data,
+                  ),
+              },
+              {
+                target: States.onboardingSuccess,
+                actions: [Actions.assignResidentialAddress],
+              },
+            ],
+          },
+        },
+        [States.ssn]: {
+          on: {
+            [Events.ssnSubmitted]: [
+              {
+                target: States.onboardingSuccess,
+                actions: [Actions.assignSsn],
+              },
+            ],
+          },
+        },
+        [States.onboardingSuccess]: {
+          type: 'final',
+        },
+      },
+    },
+    {
+      actions: {
+        [Actions.assignBasicInformation]: assign((context, event) => {
+          if (event.type === Events.basicInformationSubmitted) {
+            context.data = {
+              ...context.data,
+              ...event.payload.basicInformation,
+            };
+          }
+          return context;
+        }),
+        [Actions.assignResidentialAddress]: assign((context, event) => {
+          if (event.type === Events.residentialAddressSubmitted) {
+            context.data = {
+              ...context.data,
+              ...event.payload.residentialAddress,
+            };
+          }
+          return context;
+        }),
+        [Actions.assignSsn]: assign((context, event) => {
+          if (event.type !== Events.ssnSubmitted) {
+            return context;
+          }
+          context.data.ssn = event.payload.ssn;
+          return context;
+        }),
+      },
+    },
+  );
+
+export default createOnboardingMachine;

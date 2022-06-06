@@ -2,14 +2,12 @@ import { useTranslation } from 'hooks';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import HeaderTitle from 'src/components/header-title';
-import useBifrostMachine, {
-  Events,
-  UserData,
-  UserDataAttribute,
-} from 'src/hooks/use-bifrost-machine';
+import { Events } from 'src/utils/state-machine/onboarding';
+import { UserData, UserDataAttribute } from 'src/utils/state-machine/types';
 import styled, { css } from 'styled';
 import { AddressInput, Button, Grid, Select, TextInput } from 'ui';
 
+import useOnboardingMachine from '../../hooks/use-onboarding-machine';
 import useSyncData from '../../hooks/use-sync-data';
 
 type FormData = Required<
@@ -25,7 +23,7 @@ type FormData = Required<
 >;
 
 const ResidentialAddress = () => {
-  const [, send] = useBifrostMachine();
+  const [, send] = useOnboardingMachine();
   const syncDataMutation = useSyncData();
   const { t } = useTranslation('pages.registration.residential-address');
   const {

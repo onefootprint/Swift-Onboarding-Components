@@ -1,4 +1,4 @@
-import { UserData, UserDataAttribute } from '../types';
+import { UserData, UserDataAttribute } from '../../types';
 
 const BASIC_ATTRIBUTES = new Set([
   UserDataAttribute.firstName,

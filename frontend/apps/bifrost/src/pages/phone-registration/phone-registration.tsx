@@ -7,10 +7,8 @@ import useIdentify from 'src/hooks/identify/use-identify';
 import useIdentifyChallenge, {
   IdentifyChallengeResponse,
 } from 'src/hooks/identify/use-identify-challenge';
-import useBifrostMachine, {
-  ChallengeKind,
-  Events,
-} from 'src/hooks/use-bifrost-machine';
+import useBifrostMachine, { Events } from 'src/hooks/use-bifrost-machine';
+import { ChallengeKind } from 'src/utils/state-machine/types';
 import styled, { css } from 'styled';
 import { Button, LinkButton, TextInput, Typography } from 'ui';
 
