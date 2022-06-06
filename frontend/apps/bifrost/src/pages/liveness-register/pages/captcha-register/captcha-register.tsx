@@ -28,11 +28,11 @@ const CaptchaCheck = () => {
   );
 };
 
-export default CaptchaCheck;
-
 const Container = styled.form`
   ${({ theme }) => css`
     display: grid;
     row-gap: ${theme.spacing[7]}px;
   `}
 `;
+
+export default CaptchaCheck;

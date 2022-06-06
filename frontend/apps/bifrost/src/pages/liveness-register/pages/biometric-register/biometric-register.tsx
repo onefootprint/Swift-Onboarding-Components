@@ -44,8 +44,6 @@ const BiometricRegister = () => {
   );
 };
 
-export default BiometricRegister;
-
 const Container = styled.form`
   ${({ theme }) => css`
     display: grid;
@@ -53,3 +51,5 @@ const Container = styled.form`
     text-align: center;
   `}
 `;
+
+export default BiometricRegister;

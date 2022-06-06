@@ -40,8 +40,6 @@ const QRRegister = () => {
   );
 };
 
-export default QRRegister;
-
 const Container = styled.form`
   ${({ theme }) => css`
     display: grid;
@@ -49,3 +47,5 @@ const Container = styled.form`
     text-align: center;
   `}
 `;
+
+export default QRRegister;

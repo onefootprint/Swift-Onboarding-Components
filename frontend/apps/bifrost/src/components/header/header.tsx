@@ -47,8 +47,6 @@ const Header = ({
   </Container>
 );
 
-export default Header;
-
 const ProgressIndicatorContainer = styled.div`
   display: flex;
   flex-grow: 1;
@@ -64,3 +62,5 @@ const Container = styled.header`
     align-items: center;
   `}
 `;
+
+export default Header;
