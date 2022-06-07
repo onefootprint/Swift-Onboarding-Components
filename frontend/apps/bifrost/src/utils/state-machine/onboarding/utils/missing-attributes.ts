@@ -1,4 +1,5 @@
 import { UserData, UserDataAttribute } from '../../types';
+import { States } from '../types';
 
 const BASIC_ATTRIBUTES = new Set([
   UserDataAttribute.firstName,
@@ -23,7 +24,9 @@ export const isMissingBasicAttribute = (
     return false;
   }
   if (!data) {
-    return true;
+    return missingAttributes.some((attribute: UserDataAttribute) =>
+      BASIC_ATTRIBUTES.has(attribute),
+    );
   }
   // Find out if there are any missing basic info attributes that haven't been filled in data yet
   return missingAttributes.some(
@@ -40,7 +43,9 @@ export const isMissingResidentialAttribute = (
     return false;
   }
   if (!data) {
-    return true;
+    return missingAttributes.some((attribute: UserDataAttribute) =>
+      RESIDENTIAL_ATTRIBUTES.has(attribute),
+    );
   }
   // Find out if there are any missing residential info attributes that haven't been filled in data yet
   return missingAttributes.some(
@@ -56,7 +61,10 @@ export const isMissingSsnAttribute = (
   if (!missingAttributes.length) {
     return false;
   }
-  if (!data || missingAttributes.indexOf(UserDataAttribute.ssn) === -1) {
+  if (missingAttributes.indexOf(UserDataAttribute.ssn) === -1) {
+    return false;
+  }
+  if (!data) {
     return true;
   }
   return !data[UserDataAttribute.ssn];
@@ -75,4 +83,52 @@ export const hasMissingAttributes = (
   return missingAttributes.some(
     (attribute: UserDataAttribute) => !data[attribute],
   );
+};
+
+export const getMaxStepFromMissingAttributes = (
+  attributes: readonly UserDataAttribute[],
+) => {
+  if (!hasMissingAttributes(attributes)) {
+    return 0;
+  }
+  let maxStep = 0;
+  if (isMissingBasicAttribute(attributes)) {
+    maxStep += 1;
+  }
+  if (isMissingResidentialAttribute(attributes)) {
+    maxStep += 1;
+  }
+  if (isMissingSsnAttribute(attributes)) {
+    maxStep += 1;
+  }
+  return maxStep;
+};
+
+export const getCurrentStepFromMissingAttributes = (
+  attributes: readonly UserDataAttribute[],
+  state: States,
+) => {
+  if (!hasMissingAttributes(attributes)) {
+    return 0;
+  }
+  let currentStep = 0;
+  if (isMissingBasicAttribute(attributes)) {
+    currentStep += 1;
+    if (state === States.basicInformation) {
+      return currentStep;
+    }
+  }
+  if (isMissingResidentialAttribute(attributes)) {
+    currentStep += 1;
+    if (state === States.residentialAddress) {
+      return currentStep;
+    }
+  }
+  if (isMissingSsnAttribute(attributes)) {
+    currentStep += 1;
+    if (state === States.ssn) {
+      return currentStep;
+    }
+  }
+  return currentStep;
 };

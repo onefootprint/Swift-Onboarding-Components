@@ -1,5 +1,8 @@
 import { UserDataAttribute } from '../../types';
+import { States } from '../types';
 import {
+  getCurrentStepFromMissingAttributes,
+  getMaxStepFromMissingAttributes,
   hasMissingAttributes,
   isMissingBasicAttribute,
   isMissingResidentialAttribute,
@@ -130,6 +133,80 @@ describe('MissingAttributesUtils', () => {
           },
         ),
       ).toEqual(true);
+    });
+  });
+
+  describe('getMaxStepFromMissingAttributes', () => {
+    it('returns 0 when there are no missing attributes', () => {
+      expect(getMaxStepFromMissingAttributes([])).toEqual(0);
+    });
+
+    it('returns correct max step', () => {
+      expect(
+        getMaxStepFromMissingAttributes([UserDataAttribute.firstName]),
+      ).toEqual(1);
+
+      expect(
+        getMaxStepFromMissingAttributes([
+          UserDataAttribute.firstName,
+          UserDataAttribute.lastName,
+        ]),
+      ).toEqual(1);
+
+      expect(
+        getMaxStepFromMissingAttributes([
+          UserDataAttribute.firstName,
+          UserDataAttribute.ssn,
+        ]),
+      ).toEqual(2);
+
+      expect(
+        getMaxStepFromMissingAttributes([
+          UserDataAttribute.firstName,
+          UserDataAttribute.city,
+        ]),
+      ).toEqual(2);
+
+      expect(
+        getMaxStepFromMissingAttributes([
+          UserDataAttribute.firstName,
+          UserDataAttribute.city,
+          UserDataAttribute.ssn,
+        ]),
+      ).toEqual(3);
+    });
+  });
+
+  describe('getCurrentStepFromMissingAttributes', () => {
+    it('returns 0 when there are no missing attributes', () => {
+      expect(
+        getCurrentStepFromMissingAttributes([], States.basicInformation),
+      ).toEqual(0);
+    });
+
+    it('returns 1 if showing the page with only missing attribute', () => {
+      expect(
+        getCurrentStepFromMissingAttributes(
+          [UserDataAttribute.city],
+          States.residentialAddress,
+        ),
+      ).toEqual(1);
+    });
+
+    it('calculates correctly with multiple missing attributes and pages', () => {
+      expect(
+        getCurrentStepFromMissingAttributes(
+          [UserDataAttribute.firstName, UserDataAttribute.city],
+          States.basicInformation,
+        ),
+      ).toEqual(1);
+
+      expect(
+        getCurrentStepFromMissingAttributes(
+          [UserDataAttribute.firstName, UserDataAttribute.city],
+          States.residentialAddress,
+        ),
+      ).toEqual(2);
     });
   });
 });
