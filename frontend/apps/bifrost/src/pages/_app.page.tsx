@@ -1,13 +1,14 @@
-import IcoClose24 from 'icons/ico/ico-close-24';
+import FootprintProvider from 'footprint-provider';
 import Head from 'next/head';
 import Script from 'next/script';
 import React from 'react';
 import { QueryClientProvider } from 'react-query';
-import FootprintFooter from 'src/components/footprint-footer/footprint-footer';
 import { GOOGLE_MAPS_KEY } from 'src/constants';
-import styled, { createGlobalStyle, css } from 'styled';
-import { Container, DesignSystemProvider, IconButton, themes } from 'ui';
+import { createGlobalStyle } from 'styled';
+import { Container, DesignSystemProvider, themes } from 'ui';
 
+import FootprintFooter from '../components/footprint-footer';
+import Header from '../components/header';
 import MachineProvider from '../components/machine-provider';
 import configureReactI18next from '../config/initializers/react-i18next';
 import queryClient from '../config/initializers/react-query';
@@ -31,16 +32,16 @@ const App = ({ Component, pageProps }: AppProps) => (
     </Head>
     <QueryClientProvider client={queryClient}>
       <MachineProvider>
-        <DesignSystemProvider theme={themes.light}>
-          <GlobalStyle />
-          <Container>
-            <Header>
-              <IconButton iconComponent={IcoClose24} ariaLabel="Close window" />
-            </Header>
-            <Component {...pageProps} />
-            <FootprintFooter />
-          </Container>
-        </DesignSystemProvider>
+        <FootprintProvider>
+          <DesignSystemProvider theme={themes.light}>
+            <GlobalStyle />
+            <Container>
+              <Header />
+              <Component {...pageProps} />
+              <FootprintFooter />
+            </Container>
+          </DesignSystemProvider>
+        </FootprintProvider>
       </MachineProvider>
     </QueryClientProvider>
     <Script
@@ -49,12 +50,6 @@ const App = ({ Component, pageProps }: AppProps) => (
     />
   </>
 );
-
-const Header = styled.header`
-  ${({ theme }) => css`
-    margin: ${theme.spacing[5]}px 0 ${theme.spacing[3]}px;
-  `}
-`;
 
 const GlobalStyle = createGlobalStyle``;
 

@@ -20,7 +20,8 @@
     "request": "*",
     "styled": "*",
     "ua-parser-js": "^1.0.2",
-    "ui": "*"
+    "ui": "*",
+    "footprint-provider": "*"
   },
   "devDependencies": {
     "@next/bundle-analyzer": "^12.1.6",

@@ -1,3 +1,4 @@
+import { useFootprintJs } from 'footprint-provider';
 import IcoArrowLeftSmall24 from 'icons/ico/ico-arrow-left-small-24';
 import IcoClose24 from 'icons/ico/ico-close-24';
 import React from 'react';
@@ -10,42 +11,48 @@ export enum HeaderButtonType {
 }
 
 export type HeaderProps = {
-  buttonType: HeaderButtonType;
+  buttonType?: HeaderButtonType;
   progressIndicatorProps?: ProgressIndicatorProps;
   onPrev?: () => void;
-  onClose?: () => void;
 };
 
 const Header = ({
-  buttonType,
+  buttonType = HeaderButtonType.close,
   progressIndicatorProps,
   onPrev,
-  onClose,
-}: HeaderProps) => (
-  <Container>
-    {buttonType === HeaderButtonType.prev ? (
-      <IconButton
-        iconComponent={IcoArrowLeftSmall24}
-        ariaLabel="Previous window"
-        onClick={onPrev}
-      />
-    ) : (
-      <IconButton
-        iconComponent={IcoClose24}
-        ariaLabel="Close window"
-        onClick={onClose}
-      />
-    )}
-    {progressIndicatorProps ? (
-      <ProgressIndicatorContainer>
-        <ProgressIndicator
-          max={progressIndicatorProps.max}
-          value={progressIndicatorProps.value}
+}: HeaderProps) => {
+  const footprint = useFootprintJs();
+
+  const handleCloseClick = () => {
+    footprint.emit('closed');
+  };
+
+  return (
+    <Container>
+      {buttonType === HeaderButtonType.prev ? (
+        <IconButton
+          iconComponent={IcoArrowLeftSmall24}
+          ariaLabel="Previous window"
+          onClick={onPrev}
         />
-      </ProgressIndicatorContainer>
-    ) : null}
-  </Container>
-);
+      ) : (
+        <IconButton
+          iconComponent={IcoClose24}
+          ariaLabel="Close window"
+          onClick={handleCloseClick}
+        />
+      )}
+      {progressIndicatorProps ? (
+        <ProgressIndicatorContainer>
+          <ProgressIndicator
+            max={progressIndicatorProps.max}
+            value={progressIndicatorProps.value}
+          />
+        </ProgressIndicatorContainer>
+      ) : null}
+    </Container>
+  );
+};
 
 const ProgressIndicatorContainer = styled.div`
   display: flex;
