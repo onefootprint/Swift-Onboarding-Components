@@ -12,6 +12,7 @@
     "build:identity-wallet": "turbo run build --scope=identity-wallet --no-deps --include-dependencies",
     "build:ui": "turbo run build --scope=ui --no-deps --include-dependencies",
     "build:frontpage": "turbo run build --scope=frontpage --no-deps --include-dependencies",
+    "build:demo": "turbo run build --scope=demo --no-deps --include-dependencies",
     "build": "turbo run build",
     "predev": "yarn install",
     "dev": "turbo run dev --parallel",
