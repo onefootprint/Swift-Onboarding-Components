@@ -43,47 +43,41 @@ const createOnboardingMachine = ({
       },
       states: {
         [States.init]: {
-          on: {
-            // Immediate transition on init state based on conds
-            '': [
-              {
-                cond: () =>
-                  userFound &&
-                  (onboarding.missingAttributes.length > 0 ||
-                    onboarding.missingWebauthnCredentials),
-                target: States.additionalDataRequired,
-              },
-              {
-                target: States.livenessRegister,
-                cond: context => context.missingWebauthnCredentials,
-              },
-              {
-                target: States.basicInformation,
-                cond: context =>
-                  !userFound ||
-                  isMissingBasicAttribute(
-                    context.missingAttributes,
-                    context.data,
-                  ),
-              },
-              {
-                target: States.residentialAddress,
-                cond: context =>
-                  isMissingResidentialAttribute(
-                    context.missingAttributes,
-                    context.data,
-                  ),
-              },
-              {
-                target: States.ssn,
-                cond: context =>
-                  isMissingSsnAttribute(
-                    context.missingAttributes,
-                    context.data,
-                  ),
-              },
-            ],
-          },
+          always: [
+            {
+              cond: () =>
+                userFound &&
+                (onboarding.missingAttributes.length > 0 ||
+                  onboarding.missingWebauthnCredentials),
+              target: States.additionalDataRequired,
+            },
+            {
+              target: States.livenessRegister,
+              cond: context => context.missingWebauthnCredentials,
+            },
+            {
+              target: States.basicInformation,
+              cond: context =>
+                !userFound ||
+                isMissingBasicAttribute(
+                  context.missingAttributes,
+                  context.data,
+                ),
+            },
+            {
+              target: States.residentialAddress,
+              cond: context =>
+                isMissingResidentialAttribute(
+                  context.missingAttributes,
+                  context.data,
+                ),
+            },
+            {
+              target: States.ssn,
+              cond: context =>
+                isMissingSsnAttribute(context.missingAttributes, context.data),
+            },
+          ],
         },
         [States.additionalDataRequired]: {
           on: {

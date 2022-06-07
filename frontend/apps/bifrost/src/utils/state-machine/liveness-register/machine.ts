@@ -16,27 +16,24 @@ const createLivenessRegisterMachine = (
     },
     states: {
       [States.init]: {
-        on: {
-          // Immediate transition on init state based on conds
-          '': [
-            {
-              target: States.biometricRegister,
-              cond: context =>
-                context.device.hasSupportForWebAuthn &&
-                context.device.type === 'mobile',
-            },
-            {
-              target: States.captchaRegister,
-              cond: context =>
-                context.device.type === 'mobile' &&
-                !context.device.hasSupportForWebAuthn,
-            },
-            {
-              target: States.qrRegister,
-              cond: context => context.device.type !== 'mobile',
-            },
-          ],
-        },
+        always: [
+          {
+            target: States.biometricRegister,
+            cond: context =>
+              context.device.hasSupportForWebAuthn &&
+              context.device.type === 'mobile',
+          },
+          {
+            target: States.captchaRegister,
+            cond: context =>
+              context.device.type === 'mobile' &&
+              !context.device.hasSupportForWebAuthn,
+          },
+          {
+            target: States.qrRegister,
+            cond: context => context.device.type !== 'mobile',
+          },
+        ],
       },
       [States.biometricRegister]: {
         on: {
