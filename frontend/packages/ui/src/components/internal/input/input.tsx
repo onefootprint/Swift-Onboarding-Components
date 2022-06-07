@@ -15,7 +15,6 @@ export type InputProps = FieldProps & {
 const BaseInput = forwardRef<HTMLInputElement, InputProps>(
   (
     {
-      autoComplete,
       hasError = false,
       hintText,
       id: baseID,
@@ -54,15 +53,16 @@ const BaseInput = forwardRef<HTMLInputElement, InputProps>(
           $hasError={hasError}
           aria-required={required}
           as={mask ? undefined : 'input'}
-          autoComplete={autoComplete}
           data-testid={testID}
-          htmlRef={ref}
           id={id}
           onChange={handleChange}
           options={mask}
           placeholder={placeholder}
-          ref={ref}
           required={required}
+          // We use Cleave.js for mask, and cleave uses htmlRef instead of ref
+          // These conditions are important in order to work with react-hook-forms
+          ref={mask ? undefined : ref}
+          htmlRef={mask ? ref : undefined}
         />
         {hintText && (
           <Hint color={hasError ? 'error' : 'tertiary'}>{hintText}</Hint>
