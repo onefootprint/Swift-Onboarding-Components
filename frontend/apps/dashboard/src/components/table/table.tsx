@@ -12,7 +12,7 @@ export type TableProps<T> = {
   columns: { text: string; width?: Property.Width }[];
   renderTr: (row: Row<T>) => JSX.Element;
   getKeyForRow: (item: T) => string;
-  onRowClick: (item: T) => void;
+  onRowClick?: (item: T) => void;
   items?: Array<T>;
   isLoading?: boolean;
   emptyStateText?: string;
@@ -31,7 +31,7 @@ const Table = <T,>({
   const shouldShowData = !isLoading && items;
 
   return (
-    <TableContainer>
+    <TableContainer isRowClickable={!!onRowClick}>
       <thead>
         <tr>
           {columns.map(column => (
@@ -60,7 +60,10 @@ const Table = <T,>({
         )}
         {shouldShowData &&
           items.map((item: T, index: Number) => (
-            <tr onClick={() => onRowClick(item)} key={getKeyForRow(item)}>
+            <tr
+              onClick={onRowClick && (() => onRowClick(item))}
+              key={getKeyForRow(item)}
+            >
               {renderTr({ index, item })}
             </tr>
           ))}
@@ -69,7 +72,9 @@ const Table = <T,>({
   );
 };
 
-const TableContainer = styled.table`
+const TableContainer = styled.table<{
+  isRowClickable: boolean;
+}>`
   ${({ theme }) => css`
     width: 100%;
     border-collapse: separate;
@@ -106,11 +111,14 @@ const TableContainer = styled.table`
 
   tr {
     transition: 0.1s;
-    ${({ theme }) => css`
-      :hover {
-        background-color: ${theme.backgroundColor.secondary};
-      }
-    `}
+    ${({ theme, isRowClickable }) =>
+      isRowClickable &&
+      css`
+        cursor: pointer;
+        :hover {
+          background-color: ${theme.backgroundColor.secondary};
+        }
+      `}
   }
 
   p {
