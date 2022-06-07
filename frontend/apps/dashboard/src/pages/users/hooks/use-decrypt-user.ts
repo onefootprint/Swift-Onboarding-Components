@@ -12,8 +12,15 @@ export type DecryptedUserAttributes = {
   firstName?: string;
   lastName?: string;
   email?: string;
-  ssn?: string;
   phoneNumber?: string;
+  ssn?: string;
+  dob?: string;
+  streetAddress?: string;
+  streetAddress2?: string;
+  city?: string;
+  state?: string;
+  zip?: string;
+  country?: string;
 };
 
 const decryptUserRequest = async (

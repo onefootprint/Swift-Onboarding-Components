@@ -1,33 +1,21 @@
 import IcoSearch16 from 'icons/ico/ico-search-16';
+import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { Row, Table } from 'src/components/table';
 import FieldOrPlaceholder from 'src/pages/users/components/field-or-placeholder';
-import UsersFilter, {
-  statusToDisplayText,
-} from 'src/pages/users/components/users-filter';
-import useDecryptUser, {
-  DecryptedUserAttributes,
-  DecryptUserRequest,
-} from 'src/pages/users/hooks/use-decrypt-user';
+import { DecryptedUserAttributes } from 'src/pages/users/hooks/use-decrypt-user';
 import { useFilters } from 'src/pages/users/hooks/use-filters';
 import useGetOnboardings, {
-  OnboardingStatus,
+  statusToBadgeVariant,
+  statusToDisplayText,
 } from 'src/pages/users/hooks/use-get-onboardings';
 import useJoinUsers, { User } from 'src/pages/users/hooks/use-join-users';
 import styled, { css } from 'styled-components';
-import type { UIState } from 'themes';
 import { Badge, TextInput, Typography } from 'ui';
 import { useMap } from 'usehooks-ts';
 
 import DecryptDataDialog from './components/decrypt-data-dialog';
-
-const statusToBadgeVariant: Record<OnboardingStatus, UIState> = {
-  [OnboardingStatus.verified]: 'success',
-  [OnboardingStatus.processing]: 'neutral',
-  [OnboardingStatus.manualReview]: 'error',
-  [OnboardingStatus.incomplete]: 'warning',
-  [OnboardingStatus.failed]: 'error',
-};
+import UsersFilter from './components/users-filter';
 
 const columns = [
   { text: 'Name', width: '12.5%' },
@@ -40,36 +28,22 @@ const columns = [
 ];
 
 const Users = () => {
-  const [decryptedUsers, { set: setDecryptedUser }] = useMap<
-    String,
-    DecryptedUserAttributes
-  >(new Map());
-
-  const decryptUserMutation = useDecryptUser();
   const getOnboardings = useGetOnboardings();
 
   const { query, setFilter } = useFilters();
   const [searchText, setSearchText] = useState<string>();
+
+  const router = useRouter();
 
   // Bind the contents of the search text box to the querystring
   useEffect(() => {
     setSearchText(query.fingerprint || '');
   }, [query]);
 
+  // TODO rm
+  const [decryptedUsers] = useMap<String, DecryptedUserAttributes>(new Map());
   // Join the onboarding list results with any decrypted user data
   const users = useJoinUsers(getOnboardings.data, decryptedUsers);
-
-  const loadEncryptedAttributes = (footprintUserId: string) => {
-    const decryptUserRequest: DecryptUserRequest = {
-      footprintUserId,
-      attributes: ['first_name', 'last_name', 'phone_number', 'email', 'ssn'],
-    };
-    decryptUserMutation
-      .mutateAsync(decryptUserRequest)
-      .then((decryptedUserAttributes: DecryptedUserAttributes) => {
-        setDecryptedUser(footprintUserId, decryptedUserAttributes);
-      });
-  };
 
   return (
     <>
@@ -92,7 +66,10 @@ const Users = () => {
         isLoading={getOnboardings.isLoading}
         getKeyForRow={(item: User) => item.footprintUserId}
         onRowClick={(item: User) => {
-          loadEncryptedAttributes(item.footprintUserId);
+          router.push({
+            pathname: 'users/detail',
+            query: { footprint_user_id: item.footprintUserId },
+          });
         }}
         columns={columns}
         renderTr={({ item }: Row<User>) => (
@@ -121,9 +98,9 @@ const Users = () => {
               <Typography variant="body-3" color="primary">
                 {/* TODO better formatting utils */}
                 {new Date(item.initiatedAt).toLocaleString('en-us', {
-                  month: 'long',
+                  month: 'numeric',
                   day: 'numeric',
-                  year: 'numeric',
+                  year: '2-digit',
                   hour: 'numeric',
                   minute: 'numeric',
                 })}

@@ -52,7 +52,7 @@ const PrivateLayout = ({ children }: PrivateLayoutProps) => {
                   <Tab.Item
                     href={href}
                     iconComponent={Icon}
-                    selected={router.pathname === href}
+                    selected={router.pathname.startsWith(href)}
                   >
                     {text}
                   </Tab.Item>

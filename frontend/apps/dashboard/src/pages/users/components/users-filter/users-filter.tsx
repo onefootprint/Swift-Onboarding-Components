@@ -1,17 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import Modal, { ModalCloseEvent } from 'src/components/modal';
 import { useFilters } from 'src/pages/users/hooks/use-filters';
-import { OnboardingStatus } from 'src/pages/users/hooks/use-get-onboardings';
+import {
+  OnboardingStatus,
+  statusToDisplayText,
+} from 'src/pages/users/hooks/use-get-onboardings';
 import styled, { css } from 'styled-components';
 import { Button, Select, SelectOption } from 'ui';
-
-export const statusToDisplayText = {
-  [OnboardingStatus.verified]: 'Verified',
-  [OnboardingStatus.processing]: 'Processing',
-  [OnboardingStatus.manualReview]: 'Manual review',
-  [OnboardingStatus.incomplete]: 'Incomplete',
-  [OnboardingStatus.failed]: 'Failed',
-};
 
 const UsersFilter = () => {
   const { query, setFilter } = useFilters();

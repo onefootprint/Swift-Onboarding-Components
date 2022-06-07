@@ -9,8 +9,15 @@ export type User = {
   initiatedAt: string;
   name?: string;
   email?: string;
-  ssn?: string;
   phoneNumber?: string;
+  ssn?: string;
+  dob?: string;
+  streetAddress?: string;
+  streetAddress2?: string;
+  city?: string;
+  state?: string;
+  zip?: string;
+  country?: string;
 };
 
 type DecryptedUsersMap = Omit<
@@ -33,13 +40,11 @@ const useJoinUsers = (
             ? `${decryptedUserData?.firstName} ${decryptedUserData?.lastName}`
             : undefined;
         return {
+          ...decryptedUserData,
           footprintUserId: onboarding.footprintUserId,
           status: onboarding.status,
           initiatedAt: onboarding.createdAt,
           name,
-          email: decryptedUserData?.email,
-          phoneNumber: decryptedUserData?.phoneNumber,
-          ssn: decryptedUserData?.ssn,
         };
       }),
     [decryptedUsers, onboardings],

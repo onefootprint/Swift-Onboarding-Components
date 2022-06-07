@@ -2,6 +2,7 @@ import { omitBy } from 'lodash';
 import { useRouter } from 'next/router';
 
 export type OnboardingsListRequest = {
+  footprint_user_id?: string;
   status?: string;
   // Filter via secure hash of a piece of data belonging to a user.
   // By filtering on fingerprint, we select users that have a piece of data whose secure hash

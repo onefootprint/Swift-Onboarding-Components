@@ -5,6 +5,7 @@ import {
   OnboardingsListRequest,
   useFilters,
 } from 'src/pages/users/hooks/use-filters';
+import { UIState } from 'themes';
 
 export enum OnboardingStatus {
   verified = 'verified',
@@ -13,6 +14,22 @@ export enum OnboardingStatus {
   incomplete = 'incomplete',
   failed = 'failed',
 }
+
+export const statusToBadgeVariant: Record<OnboardingStatus, UIState> = {
+  [OnboardingStatus.verified]: 'success',
+  [OnboardingStatus.processing]: 'neutral',
+  [OnboardingStatus.manualReview]: 'error',
+  [OnboardingStatus.incomplete]: 'warning',
+  [OnboardingStatus.failed]: 'error',
+};
+
+export const statusToDisplayText = {
+  [OnboardingStatus.verified]: 'Verified',
+  [OnboardingStatus.processing]: 'Processing',
+  [OnboardingStatus.manualReview]: 'Manual review',
+  [OnboardingStatus.incomplete]: 'Incomplete',
+  [OnboardingStatus.failed]: 'Failed',
+};
 
 export type Onboarding = {
   footprintUserId: string;
@@ -23,13 +40,13 @@ export type Onboarding = {
 
 // TODO pagination
 const getOnboardingsRequest = async (
-  { status, fingerprint }: OnboardingsListRequest,
+  params: OnboardingsListRequest,
   auth: string | undefined,
 ) => {
   const { data: response } = await request<RequestResponse<Onboarding[]>>({
     method: 'GET',
     url: '/org/onboardings',
-    params: { status, fingerprint },
+    params,
     headers: { 'x-fp-dashboard-authorization': auth as string },
   });
   return response.data;

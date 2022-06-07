@@ -1,1 +1,1 @@
-export { default, statusToDisplayText } from './users-filter';
+export { default } from './users-filter';
