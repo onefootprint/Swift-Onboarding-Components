@@ -1,7 +1,13 @@
+import Timeline from '@src/components/timeline';
+import UserHeader from '@src/pages/users/pages/detail/components/user-header';
+import IcoBuilding16 from 'icons/ico/ico-building-16';
+import IcoCheck16 from 'icons/ico/ico-check-16';
+import IcoFootprint16 from 'icons/ico/ico-footprint-16';
+import IcoUserCircle16 from 'icons/ico/ico-user-circle-16';
 import React from 'react';
 import useGetOnboardings from 'src/pages/users/hooks/use-get-onboardings';
 import styled, { css } from 'styled-components';
-import { Divider, Typography } from 'ui';
+import { Box, Divider, Typography } from 'ui';
 import { useMap } from 'usehooks-ts';
 
 import useDecryptUser, {
@@ -10,7 +16,6 @@ import useDecryptUser, {
 } from '../../hooks/use-decrypt-user';
 import useJoinUsers from '../../hooks/use-join-users';
 import BasicInfo from './components/basic-info';
-import UserHeader from './components/user-header';
 
 const Detail = () => {
   const getOnboardings = useGetOnboardings();
@@ -76,11 +81,109 @@ const Detail = () => {
           />
           <PaddedDivider />
           <BasicInfo user={user} />
+          <Box sx={{ height: '40px' }}>&nbsp;</Box>
+          <Typography variant="heading-2" sx={{ userSelect: 'none' }}>
+            Audit trail
+          </Typography>
+          <PaddedDivider />
+          <Timeline
+            items={[
+              {
+                timestamp: '2022-06-02 22:24:41',
+                ItemIcon: IcoCheck16,
+                headerComponent: (
+                  <Typography variant="label-3">
+                    Liveness checks succeeded
+                  </Typography>
+                ),
+                bodyComponent: (
+                  <>
+                    <Typography variant="body-3" color="secondary">
+                      •&nbsp;&nbsp;&nbsp;&nbsp;Attested by Apple & Footprint
+                    </Typography>
+                    <Typography variant="body-3" color="secondary">
+                      •&nbsp;&nbsp;&nbsp;&nbsp;iPhone 13 Pro Max, iOS 15.5
+                    </Typography>
+                    <Typography variant="body-3" color="secondary">
+                      •&nbsp;&nbsp;&nbsp;&nbsp;34.36.156.118 (IP address)
+                    </Typography>
+                    <Typography variant="body-3" color="secondary">
+                      •&nbsp;&nbsp;&nbsp;&nbsp;San Francisco, California
+                    </Typography>
+                  </>
+                ),
+              },
+              {
+                timestamp: '2022-06-02 22:24:41',
+                ItemIcon: IcoUserCircle16,
+                headerComponent: (
+                  <Typography variant="body-3">
+                    <FieldTag>Name</FieldTag>
+                    ,&nbsp;
+                    <FieldTag>Date of birth</FieldTag> verified by Experian
+                  </Typography>
+                ),
+              },
+              {
+                timestamp: '2022-06-02 22:25:41',
+                ItemIcon: IcoBuilding16,
+                headerComponent: (
+                  <Typography variant="body-3">
+                    <FieldTag>Country</FieldTag>
+                    ,&nbsp;
+                    <FieldTag>State</FieldTag> verified by Socure
+                  </Typography>
+                ),
+              },
+              {
+                timestamp: '2022-06-02 22:25:41',
+                ItemIcon: IcoBuilding16,
+                headerComponent: (
+                  <Typography variant="body-3">
+                    <FieldTag>Address line 1</FieldTag>
+                    ,&nbsp;
+                    <FieldTag>Address line 2</FieldTag>
+                    ,&nbsp;
+                    <FieldTag>City</FieldTag>
+                    ,&nbsp;
+                    <FieldTag>Zip code</FieldTag> verified by Socure
+                  </Typography>
+                ),
+              },
+              {
+                timestamp: '2022-06-02 22:25:41',
+                ItemIcon: IcoUserCircle16,
+                headerComponent: (
+                  <Typography variant="body-3">
+                    <FieldTag>Ssn</FieldTag> verified by LexisNexis
+                  </Typography>
+                ),
+              },
+              {
+                timestamp: '2022-06-02 22:26:41',
+                ItemIcon: IcoFootprint16,
+                headerComponent: (
+                  <Typography variant="label-3" color="success">
+                    Verified by Footprint
+                  </Typography>
+                ),
+              },
+            ]}
+          />
         </>
       )}
     </>
   );
 };
+
+const FieldTag = styled(Typography).attrs({ as: 'span', variant: 'label-4' })`
+  ${({ theme }) => css`
+    color: ${theme.color.neutral};
+    background-color: ${theme.backgroundColor.neutral};
+    padding: ${theme.spacing[1]}px ${theme.spacing[2]}px;
+    border-radius: 4px; // TODO put in design library
+  `};
+`;
 
 const HeaderContainer = styled.div`
   ${({ theme }) => css`
