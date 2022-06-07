@@ -1,7 +1,8 @@
 import React from 'react';
 import { QueryClientProvider } from 'react-query';
-import { createGlobalStyle } from 'styled';
-import { DesignSystemProvider, themes } from 'ui';
+import { createGlobalStyle } from 'styled-components';
+import themes from 'themes';
+import { DesignSystemProvider } from 'ui';
 
 import configureReactI18next from '../config/initializers/react-i18next';
 import queryClient from '../config/initializers/react-query';

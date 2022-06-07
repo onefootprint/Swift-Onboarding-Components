@@ -1,7 +1,7 @@
 import React from 'react';
 import { customRender, screen, userEvent } from 'test-utils';
+import themes from 'themes';
 
-import themes from '../../config/themes';
 import TextArea, { TextAreaProps } from './text-area';
 
 describe('<TextArea />', () => {

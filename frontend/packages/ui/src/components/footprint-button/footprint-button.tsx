@@ -1,6 +1,6 @@
 import IcoFootprint24 from 'icons/ico/ico-footprint-24';
 import React from 'react';
-import styled, { css } from 'styled';
+import styled, { css } from 'styled-components';
 
 import Button, { ButtonProps } from '../button';
 

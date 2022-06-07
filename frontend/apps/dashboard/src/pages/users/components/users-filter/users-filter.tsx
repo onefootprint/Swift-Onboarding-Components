@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Modal, { ModalCloseEvent } from 'src/components/modal';
 import { useFilters } from 'src/pages/users/hooks/use-filters';
 import { OnboardingStatus } from 'src/pages/users/hooks/use-get-onboardings';
-import styled, { css } from 'styled';
+import styled, { css } from 'styled-components';
 import { Button, Select, SelectOption } from 'ui';
 
 export const statusToDisplayText = {

@@ -1,6 +1,6 @@
 import React from 'react';
 import HeaderTitle from 'src/components/header-title';
-import styled, { css } from 'styled';
+import styled, { css } from 'styled-components';
 import { Box, LinkButton } from 'ui';
 
 export type SuccessMessageProps = {

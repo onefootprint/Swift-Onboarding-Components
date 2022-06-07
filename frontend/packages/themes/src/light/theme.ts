@@ -1,5 +1,5 @@
 import { rgba } from 'polished';
-import type { DefaultTheme } from 'styled';
+import type { DefaultTheme } from 'styled-components';
 
 import borderRadius from '../shared/border-radius';
 import borderWidth from '../shared/border-width';

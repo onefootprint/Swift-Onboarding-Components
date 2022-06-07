@@ -7,7 +7,7 @@ import IcoUsers16 from 'icons/ico/ico-users-16';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React from 'react';
-import styled, { css } from 'styled';
+import styled, { css } from 'styled-components';
 import { Container, IconButton, Tab, Typography } from 'ui';
 
 import useSessionUser from '../../../../hooks/use-session-user';

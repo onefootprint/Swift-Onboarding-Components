@@ -1,7 +1,7 @@
 import React from 'react';
 import { customRender, screen, userEvent } from 'test-utils';
+import themes from 'themes';
 
-import themes from '../../config/themes';
 import Select, { CountrySelectProps, options } from './country-select';
 
 describe('<CountrySelect />', () => {

@@ -1,6 +1,7 @@
 import json2mq from 'json2mq';
 import useMedia from 'react-use/lib/useMedia';
-import { Breakpoint, useTheme } from 'styled';
+import { useTheme } from 'styled-components';
+import type { Breakpoint } from 'themes';
 
 const FALLBACK_BREAKPOINT = 'xs';
 

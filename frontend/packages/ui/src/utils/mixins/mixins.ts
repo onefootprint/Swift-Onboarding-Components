@@ -1,4 +1,5 @@
-import { BackgroundColor, css, FontVariant, Overlay } from 'styled';
+import { css } from 'styled-components';
+import { BackgroundColor, FontVariant, Overlay } from 'themes';
 
 export const createFontStyles = (variant: FontVariant) => css`
   ${({ theme }) => css`

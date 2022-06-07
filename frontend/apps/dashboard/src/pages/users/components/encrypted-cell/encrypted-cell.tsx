@@ -1,6 +1,6 @@
 import IcoLock16 from 'icons/ico/ico-lock-16';
 import React from 'react';
-import styled, { css } from 'styled';
+import styled, { css } from 'styled-components';
 import { Box, Typography } from 'ui';
 
 const EncryptedCell = () => (

@@ -1,6 +1,6 @@
 import type { Icon } from 'icons';
 import React, { HTMLAttributeAnchorTarget } from 'react';
-import styled, { css } from 'styled';
+import styled, { css } from 'styled-components';
 
 import { createFontStyles } from '../../utils/mixins';
 import fontSize from './link-button.constants';

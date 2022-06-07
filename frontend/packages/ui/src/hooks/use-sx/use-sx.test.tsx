@@ -1,6 +1,6 @@
 import { renderHook, Wrapper } from 'test-utils';
+import themes from 'themes';
 
-import themes from '../../config/themes';
 import useSX from './use-sx';
 
 describe('useSX', () => {

@@ -5,7 +5,7 @@ import useIdentifyVerify, {
 } from 'src/hooks/identify/use-identify-verify';
 import useBifrostMachine, { Events } from 'src/hooks/use-bifrost-machine';
 import { ChallengeKind } from 'src/utils/state-machine/types';
-import styled, { css } from 'styled';
+import styled, { css } from 'styled-components';
 import { Box, LinkButton, LoadingIndicator, PinInput, Typography } from 'ui';
 
 import useOnboarding, { OnboardingResponse } from './hooks/use-onboarding';

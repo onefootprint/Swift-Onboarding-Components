@@ -1,4 +1,4 @@
-import type { Spacings } from 'styled';
+import type { Spacings } from '../types';
 
 const spacings: Spacings = {
   0: 0,

@@ -7,7 +7,7 @@ import { useForm } from 'react-hook-form';
 import HeaderTitle from 'src/components/header-title';
 import { Events } from 'src/utils/state-machine/onboarding';
 import { UserData, UserDataAttribute } from 'src/utils/state-machine/types';
-import styled, { css } from 'styled';
+import styled, { css } from 'styled-components';
 import { Button, TextInput } from 'ui';
 
 import useOnboardingMachine from '../../hooks/use-onboarding-machine';

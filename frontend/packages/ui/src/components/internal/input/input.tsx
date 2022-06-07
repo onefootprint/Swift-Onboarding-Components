@@ -1,6 +1,6 @@
 import { CleaveOptions } from 'cleave.js/options';
 import React, { forwardRef, InputHTMLAttributes } from 'react';
-import styled, { css } from 'styled';
+import styled, { css } from 'styled-components';
 
 import Field, { FieldProps } from '../field';
 import Hint from '../hint';

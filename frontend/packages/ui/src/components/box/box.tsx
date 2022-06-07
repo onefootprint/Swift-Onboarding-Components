@@ -1,5 +1,5 @@
 import React, { forwardRef } from 'react';
-import styled, { css } from 'styled';
+import styled, { css } from 'styled-components';
 
 import useSX, { SXStyleProps, SXStyles } from '../../hooks/use-sx';
 

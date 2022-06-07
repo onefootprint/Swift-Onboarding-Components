@@ -1,7 +1,7 @@
 import { createPopup } from '@typeform/embed';
 import { useTranslation } from 'hooks';
 import React from 'react';
-import styled, { css } from 'styled';
+import styled, { css } from 'styled-components';
 import { media } from 'ui';
 
 import Navbar from '../navbar';

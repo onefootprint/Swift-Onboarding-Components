@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import React from 'react';
-import styled, { css } from 'styled';
+import styled, { css } from 'styled-components';
 import { Button, Container, media, Typography } from 'ui';
 
 import CircleBackground from './components/circle-background';

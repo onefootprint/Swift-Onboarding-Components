@@ -1,7 +1,7 @@
 import footprint from 'footprint';
 import Image from 'next/image';
 import React from 'react';
-import styled from 'styled';
+import styled from 'styled-components';
 import { Box, Container, FootprintButton, media, Typography } from 'ui';
 
 const footprintInstance = footprint.init({ publicKey: 'lorem' });

@@ -5,9 +5,9 @@ import type {
   BorderRadius,
   BorderWidth,
   Color,
-  Elevations,
+  Elevation,
   Spacing,
-} from 'styled';
+} from 'themes';
 
 export type CustomStyleProps = {
   backgroundColor?: BackgroundColor;
@@ -26,7 +26,7 @@ export type CustomStyleProps = {
   borderTopRightRadius?: BorderRadius;
   borderTopWidth?: BorderWidth;
   borderWidth?: BorderWidth;
-  elevation?: Elevations;
+  elevation?: Elevation;
   color?: Color;
   columnGap?: Spacing;
   gap?: Spacing;

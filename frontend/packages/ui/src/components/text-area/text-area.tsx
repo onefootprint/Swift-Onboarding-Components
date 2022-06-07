@@ -1,5 +1,5 @@
 import React, { forwardRef, TextareaHTMLAttributes } from 'react';
-import styled, { css } from 'styled';
+import styled, { css } from 'styled-components';
 
 import Box from '../box';
 import Field, { FieldProps } from '../internal/field';

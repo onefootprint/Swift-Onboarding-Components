@@ -9,7 +9,7 @@ const withTM = require('next-transpile-modules')([
   'hooks',
   'request',
   'global-constants',
-  'styled',
+  'themes',
 ]);
 
 const withMDX = require('@next/mdx')({

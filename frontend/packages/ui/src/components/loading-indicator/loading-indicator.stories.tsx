@@ -1,7 +1,7 @@
 import { ComponentMeta, Story } from '@storybook/react';
 import React from 'react';
+import themes from 'themes';
 
-import light from '../../config/themes/light';
 import LoadingIndicator, { LoadingIndicatorProps } from './loading-indicator';
 
 export default {
@@ -17,7 +17,7 @@ export default {
     color: {
       control: 'select',
       description: 'Color of the icon',
-      options: Object.keys(light.color),
+      options: Object.keys(themes.light.color),
       table: { defaultValue: { summary: 'primary' } },
     },
     testID: {

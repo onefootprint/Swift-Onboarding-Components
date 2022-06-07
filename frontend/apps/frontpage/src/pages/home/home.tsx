@@ -2,7 +2,7 @@ import { createPopup } from '@typeform/embed';
 import { useTranslation } from 'hooks';
 import Head from 'next/head';
 import React from 'react';
-import styled, { css } from 'styled';
+import styled, { css } from 'styled-components';
 import { media } from 'ui';
 
 import HeroSection from './components/hero-section';

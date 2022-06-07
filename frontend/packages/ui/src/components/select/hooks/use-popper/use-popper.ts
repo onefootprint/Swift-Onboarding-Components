@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { usePopper as useBasePopper } from 'react-popper';
-import { useTheme } from 'styled';
+import { useTheme } from 'styled-components';
 
 const usePopper = () => {
   const theme = useTheme();

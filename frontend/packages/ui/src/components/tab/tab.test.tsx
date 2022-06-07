@@ -1,8 +1,8 @@
 import IcoCode16 from 'icons/ico/ico-code-16';
 import React from 'react';
 import { customRender, screen, userEvent } from 'test-utils';
+import themes from 'themes';
 
-import themes from '../../config/themes';
 import TabItem from './tab-item';
 import TabList, { TabListProps } from './tab-list';
 

@@ -1,6 +1,6 @@
 import IcoFootprint16 from 'icons/ico/ico-footprint-16';
 import React from 'react';
-import styled, { css } from 'styled';
+import styled, { css } from 'styled-components';
 import { Typography } from 'ui';
 
 const SecuredByFootprint = () => (

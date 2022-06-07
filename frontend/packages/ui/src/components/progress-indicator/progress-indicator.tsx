@@ -1,6 +1,6 @@
 import times from 'lodash/times';
 import React from 'react';
-import styled, { css } from 'styled';
+import styled, { css } from 'styled-components';
 
 export type ProgressIndicatorProps = {
   max: number;

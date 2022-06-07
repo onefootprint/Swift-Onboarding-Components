@@ -2,7 +2,7 @@ import { CleaveOptions } from 'cleave.js/options';
 import Cleave from 'cleave.js/react';
 import { darken, rgba } from 'polished';
 import React from 'react';
-import styled, { css } from 'styled';
+import styled, { css } from 'styled-components';
 
 import { createFontStyles } from '../../../utils/mixins';
 

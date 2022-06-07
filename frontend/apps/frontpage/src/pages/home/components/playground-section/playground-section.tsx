@@ -1,6 +1,6 @@
 import { useTranslation } from 'hooks';
 import React from 'react';
-import styled, { css } from 'styled';
+import styled, { css } from 'styled-components';
 import { Container, media } from 'ui';
 
 import PlaygroundGrid from './components/playground-grid';

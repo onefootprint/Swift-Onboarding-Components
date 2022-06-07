@@ -1,4 +1,4 @@
-import type { ThemeKey } from 'styled';
+import type { ThemeKey } from 'themes';
 
 import type { CustomStyleProps, SXStylesKeys } from './use-sx.types';
 

@@ -14,7 +14,8 @@ import useGetOnboardings, {
   OnboardingStatus,
 } from 'src/pages/users/hooks/use-get-onboardings';
 import useJoinUsers, { User } from 'src/pages/users/hooks/use-join-users';
-import styled, { css, UIState } from 'styled';
+import styled, { css } from 'styled-components';
+import type { UIState } from 'themes';
 import { Badge, TextInput, Typography } from 'ui';
 import { useMap } from 'usehooks-ts';
 

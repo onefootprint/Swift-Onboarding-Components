@@ -1,6 +1,6 @@
-import type { Grid } from 'styled';
+import type { Grids } from '../types';
 
-const grid: Grid = {
+const grid: Grids = {
   columns: 12,
   col: {
     gutterSize: {

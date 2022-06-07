@@ -7,7 +7,7 @@ import Document, {
   NextScript,
 } from 'next/document';
 import React, { Fragment } from 'react';
-import { ServerStyleSheet } from 'styled';
+import { ServerStyleSheet } from 'styled-components';
 import { LoadFonts } from 'ui';
 
 export default class MyDocument extends Document {

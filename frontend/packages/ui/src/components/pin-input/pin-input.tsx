@@ -1,7 +1,7 @@
 import defer from 'lodash/defer';
 import identity from 'lodash/identity';
 import React, { useState } from 'react';
-import styled from 'styled';
+import styled from 'styled-components';
 
 import Hint from '../internal/hint';
 import Input from '../internal/input';

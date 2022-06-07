@@ -1,8 +1,7 @@
 import React from 'react';
-import type { UIState } from 'styled';
 import { customRender, screen } from 'test-utils';
+import themes, { UIState } from 'themes';
 
-import themes from '../../config/themes';
 import Badge, { BadgeProps } from './badge';
 
 describe('<Badge />', () => {

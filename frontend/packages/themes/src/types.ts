@@ -26,7 +26,7 @@ export type FontVariant =
   | 'caption-1'
   | 'caption-2';
 
-export type Typography = {
+type Typography = {
   fontSize: string;
   lineHeight: string;
   fontWeight: number;
@@ -44,7 +44,7 @@ export type Overlays = {
   'error-2': string;
 };
 
-export type Colors = {
+type Colors = {
   primary: string;
   secondary: string;
   tertiary: string;
@@ -97,13 +97,13 @@ type Size = {
   [key in Breakpoint]: number;
 };
 
-export type Grid = {
+export type Grids = {
   columns: number;
   col: { gutterSize: Size };
   container: { margin: Size; maxWidth: Size };
 };
 
-export type BackgroundColors = {
+type BackgroundColors = {
   transparent: string;
   primary: string;
   secondary: string;
@@ -125,7 +125,7 @@ export type BorderWidths = {
 
 export type BorderWidth = keyof BorderWidths;
 
-export type Elevations = {
+type Elevations = {
   0: string;
   1: string;
   2: string;
@@ -134,7 +134,7 @@ export type Elevations = {
 
 export type Elevation = keyof Elevations;
 
-export type BorderColors = {
+type BorderColors = {
   transparent: string;
   primary: string;
   secondary: string;
@@ -150,9 +150,7 @@ export type ZIndexes = {
   modal: number;
 };
 
-export type ZIndex = keyof ZIndexes;
-
-export type DefaultTheme = {
+export type Theme = {
   backgroundColor: BackgroundColors;
   borderColor: BorderColors;
   borderRadius: BorderRadiuses;
@@ -160,13 +158,13 @@ export type DefaultTheme = {
   breakpoint: Breakpoints;
   color: Colors;
   elevation: Elevations;
-  grid: Grid;
+  grid: Grids;
   overlay: Overlays;
   spacing: Spacings;
   typography: Typographies;
   zIndex: ZIndexes;
 };
 
-export type ThemeKey = keyof DefaultTheme;
+export type ThemeKey = keyof Theme;
 
 export type UIState = keyof UIStates;

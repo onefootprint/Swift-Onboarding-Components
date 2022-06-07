@@ -1,5 +1,6 @@
 import React from 'react';
-import styled, { Color, css, FontVariant } from 'styled';
+import styled, { css } from 'styled-components';
+import type { Color, FontVariant } from 'themes';
 
 import Typography from '../../typography';
 

@@ -1,4 +1,5 @@
-import { BackgroundColor, Color, css, Overlay } from 'styled';
+import { css } from 'styled-components';
+import type { BackgroundColor, Color, Overlay } from 'themes';
 
 import { createOverlayBackground } from '../../utils/mixins';
 

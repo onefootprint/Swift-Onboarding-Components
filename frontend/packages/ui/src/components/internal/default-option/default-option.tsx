@@ -1,7 +1,7 @@
 import IcoCheck16 from 'icons/ico/ico-check-16';
 import React, { memo } from 'react';
 import Highlighter from 'react-highlight-words';
-import styled, { css, useTheme } from 'styled';
+import styled, { css, useTheme } from 'styled-components';
 
 import {
   createFontStyles,

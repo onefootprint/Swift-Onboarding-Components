@@ -2,7 +2,8 @@ import { GetToggleButtonPropsOptions } from 'downshift';
 import IcoChevronDown16 from 'icons/ico/ico-chevron-down-16';
 import { darken, rgba } from 'polished';
 import React, { forwardRef } from 'react';
-import styled, { Color, css } from 'styled';
+import styled, { css } from 'styled-components';
+import type { Color } from 'themes';
 
 import { createFontStyles } from '../../../../utils/mixins';
 

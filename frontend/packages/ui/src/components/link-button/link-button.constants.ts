@@ -1,4 +1,4 @@
-import type { FontVariant } from 'styled';
+import type { FontVariant } from 'themes';
 
 import type { LinkButtonSize } from './link-button.types';
 

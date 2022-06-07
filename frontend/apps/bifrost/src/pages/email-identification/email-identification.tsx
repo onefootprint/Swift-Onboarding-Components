@@ -1,7 +1,7 @@
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { UserData, UserDataAttribute } from 'src/utils/state-machine/types';
-import styled, { css } from 'styled';
+import styled, { css } from 'styled-components';
 import { Button, TextInput, Typography } from 'ui';
 
 import useEmailIdentify from './hooks/use-email-identify';

@@ -1,6 +1,6 @@
 import React, { forwardRef } from 'react';
 import Highlighter from 'react-highlight-words';
-import styled, { css, useTheme } from 'styled';
+import styled, { css, useTheme } from 'styled-components';
 
 import { createOverlayBackground } from '../../../../utils/mixins';
 import Typography from '../../../typography';

@@ -1,4 +1,4 @@
-import type { Typographies } from 'styled';
+import type { Typographies } from '../types';
 
 const baseFontFamily = 'DM Sans';
 

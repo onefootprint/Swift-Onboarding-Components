@@ -1,6 +1,6 @@
 import React from 'react';
-import type { DefaultTheme } from 'styled';
-import { createGlobalStyle, ThemeProvider } from 'styled';
+import type { DefaultTheme } from 'styled-components';
+import { createGlobalStyle, ThemeProvider } from 'styled-components';
 import { Reset } from 'styled-reset';
 
 import media from '../media';

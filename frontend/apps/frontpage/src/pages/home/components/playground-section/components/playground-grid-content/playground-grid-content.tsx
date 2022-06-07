@@ -1,7 +1,7 @@
 import IcoShield24 from 'icons/ico/ico-shield-24';
 import React from 'react';
 import CircleIcon from 'src/components/circle-icon';
-import styled from 'styled';
+import styled from 'styled-components';
 import { media, Typography } from 'ui';
 
 type PlaygroundGridContentProps = {

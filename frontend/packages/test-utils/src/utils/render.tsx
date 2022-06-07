@@ -4,7 +4,7 @@ import { render } from '@testing-library/react';
 import FootprintProvider from 'footprint-provider';
 import React from 'react';
 import { ThemeProvider } from 'styled-components';
-import { themes } from 'ui';
+import themes from 'themes';
 
 import throwOnConsoleErrors from './console-error';
 

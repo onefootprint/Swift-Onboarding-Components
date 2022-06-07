@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@typeform/embed": "^1.35.1",
+    "global-constants": "*",
     "hooks": "*",
     "icons": "*",
     "lodash": "^4.17.21",
@@ -18,9 +19,9 @@
     "react": "17.0.2",
     "react-dom": "17.0.2",
     "react-use": "^17.3.2",
-    "styled": "*",
+    "styled-components": "^5.3.5",
     "ui": "*",
-    "global-constants": "*"
+    "themes": "*"
   },
   "devDependencies": {
     "@mdx-js/loader": "^2.1.1",
@@ -30,6 +31,7 @@
     "@types/lodash": "^4.14.182",
     "@types/node": "^17.0.12",
     "@types/react-dom": "^17.0.11",
+    "@types/styled-components": "^5.1.25",
     "config": "*",
     "csstype": "^3.0.11",
     "eslint": "7.32.0",

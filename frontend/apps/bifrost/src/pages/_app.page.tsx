@@ -4,8 +4,9 @@ import Script from 'next/script';
 import React from 'react';
 import { QueryClientProvider } from 'react-query';
 import { GOOGLE_MAPS_KEY } from 'src/constants';
-import { createGlobalStyle } from 'styled';
-import { Container, DesignSystemProvider, themes } from 'ui';
+import { createGlobalStyle } from 'styled-components';
+import themes from 'themes';
+import { Container, DesignSystemProvider } from 'ui';
 
 import FootprintFooter from '../components/footprint-footer';
 import Header from '../components/header';

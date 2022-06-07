@@ -1,8 +1,9 @@
 import React from 'react';
 import { QueryClientProvider } from 'react-query';
 import PageGuard from 'src/components/page-guard';
-import { createGlobalStyle } from 'styled';
-import { DesignSystemProvider, themes } from 'ui';
+import { createGlobalStyle } from 'styled-components';
+import themes from 'themes';
+import { DesignSystemProvider } from 'ui';
 
 import Layout from '../components/layout';
 import configureReactI18next from '../config/initializers/react-i18next';

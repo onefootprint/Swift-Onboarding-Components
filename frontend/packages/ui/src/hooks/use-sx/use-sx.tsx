@@ -1,6 +1,6 @@
 import omit from 'lodash/omit';
 import pick from 'lodash/pick';
-import { useTheme } from 'styled';
+import { useTheme } from 'styled-components';
 
 import {
   customPropNativeMapper,

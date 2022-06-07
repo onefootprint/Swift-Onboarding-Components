@@ -1,5 +1,5 @@
 import React from 'react';
-import styled, { css } from 'styled';
+import styled, { css } from 'styled-components';
 
 import FooterLinksContainer from './components/footer-links-container';
 import SecuredByFootprint from './components/secured-by-footprint';

@@ -1,7 +1,7 @@
 import React from 'react';
 import { customRender, screen, userEvent } from 'test-utils';
+import themes from 'themes';
 
-import themes from '../../config/themes';
 import PinInput, { PinInputProps } from './pin-input';
 
 describe('<PinInput />', () => {

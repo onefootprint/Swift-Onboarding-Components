@@ -1,7 +1,7 @@
 import React from 'react';
 import HeaderTitle from 'src/components/header-title';
 import { Events } from 'src/utils/state-machine/liveness-register';
-import styled, { css } from 'styled';
+import styled, { css } from 'styled-components';
 import { Button } from 'ui';
 
 import useBiometricRegister from '../../hooks/use-biometric-register';

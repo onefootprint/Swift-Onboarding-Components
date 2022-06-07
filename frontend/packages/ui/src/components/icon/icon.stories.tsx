@@ -3,8 +3,8 @@ import { flags, icos } from 'icons';
 import IcoChevronDown16 from 'icons/ico/ico-chevron-down-16';
 import React from 'react';
 import { withDesign } from 'storybook-addon-designs';
+import themes from 'themes';
 
-import light from '../../config/themes/light';
 import Box from '../box';
 import Typography from '../typography';
 
@@ -12,7 +12,7 @@ export default {
   title: 'Components/Icon',
   component: IcoChevronDown16,
   argTypes: {
-    color: { control: 'select', options: Object.keys(light.color) },
+    color: { control: 'select', options: Object.keys(themes.light.color) },
     testID: { control: 'text' },
   },
   decorators: [withDesign],

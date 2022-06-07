@@ -1,4 +1,4 @@
-import type { Color } from 'styled';
+import { Color } from 'themes';
 
 export type IconProps = {
   color?: Color;

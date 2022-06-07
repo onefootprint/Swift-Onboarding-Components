@@ -1,7 +1,7 @@
 import React from 'react';
 import { customRender, screen } from 'test-utils';
+import themes from 'themes';
 
-import themes from '../../config/themes';
 import LoadingIndicator, { LoadingIndicatorProps } from './loading-indicator';
 
 describe('<LoadingIndicator />', () => {

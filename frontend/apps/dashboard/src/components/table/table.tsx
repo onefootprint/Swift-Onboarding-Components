@@ -1,6 +1,6 @@
 import { Property } from 'csstype';
 import React from 'react';
-import styled, { css } from 'styled';
+import styled, { css } from 'styled-components';
 import { LoadingIndicator, media, Typography } from 'ui';
 
 export type Row<T> = {

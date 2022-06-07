@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import React from 'react';
-import styled from 'styled';
+import styled from 'styled-components';
 import { Typography } from 'ui';
 
 export type LogoAndTextProps = {

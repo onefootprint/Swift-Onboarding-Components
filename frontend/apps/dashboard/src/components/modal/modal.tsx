@@ -1,7 +1,7 @@
 import IcoClose24 from 'icons/ico/ico-close-16';
 import { rgba } from 'polished';
 import React, { useEffect } from 'react';
-import styled, { css } from 'styled';
+import styled, { css } from 'styled-components';
 import { Button, IconButton, LinkButton, Typography } from 'ui';
 
 export enum ModalCloseEvent {

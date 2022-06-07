@@ -2,7 +2,7 @@ import { useFootprintJs } from 'footprint-provider';
 import IcoArrowLeftSmall24 from 'icons/ico/ico-arrow-left-small-24';
 import IcoClose24 from 'icons/ico/ico-close-24';
 import React from 'react';
-import styled, { css } from 'styled';
+import styled, { css } from 'styled-components';
 import { IconButton, ProgressIndicator, ProgressIndicatorProps } from 'ui';
 
 export enum HeaderButtonType {

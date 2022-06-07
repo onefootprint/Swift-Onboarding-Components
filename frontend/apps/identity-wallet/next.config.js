@@ -9,7 +9,7 @@ const withTM = require('next-transpile-modules')([
   'hooks',
   'request',
   'global-constants',
-  'styled',
+  'themes',
 ]);
 
 module.exports = withPlugins([withTM, withBundleAnalyzer], {

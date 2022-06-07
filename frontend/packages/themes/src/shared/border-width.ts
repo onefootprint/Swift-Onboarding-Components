@@ -1,4 +1,4 @@
-import type { BorderWidths } from 'styled';
+import type { BorderWidths } from '../types';
 
 const borderWidths: BorderWidths = {
   0: 0,

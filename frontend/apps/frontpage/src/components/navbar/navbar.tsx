@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import React, { useCallback, useEffect, useState } from 'react';
-import styled, { css } from 'styled';
+import styled, { css } from 'styled-components';
 import { Button, Container } from 'ui';
 
 export type NavbarProps = {

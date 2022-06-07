@@ -1,4 +1,4 @@
-import type { BackgroundColor, BorderColor, Color, Overlay } from 'styled';
+import type { BackgroundColor, BorderColor, Color, Overlay } from 'themes';
 
 export const buttonSizes = ['default', 'small', 'compact', 'large'];
 

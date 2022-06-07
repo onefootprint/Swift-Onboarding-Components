@@ -1,7 +1,7 @@
 import IcoChevronLeft16 from 'icons/ico/ico-chevron-left-16';
 import { useRouter } from 'next/router';
 import React from 'react';
-import styled, { css } from 'styled';
+import styled, { css } from 'styled-components';
 import { LinkButton } from 'ui';
 
 const BackButton = () => {

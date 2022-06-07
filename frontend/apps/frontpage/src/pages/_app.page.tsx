@@ -3,8 +3,9 @@ import '@typeform/embed/build/css/popup.css';
 import { IS_PROD } from 'global-constants';
 import Script from 'next/script';
 import React from 'react';
-import { createGlobalStyle } from 'styled';
-import { DesignSystemProvider, themes } from 'ui';
+import { createGlobalStyle } from 'styled-components';
+import themes from 'themes';
+import { DesignSystemProvider } from 'ui';
 
 import Layout from '../components/layout';
 import MDXProvider from '../components/mdx-provider';

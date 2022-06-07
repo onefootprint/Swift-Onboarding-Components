@@ -1,4 +1,4 @@
-import type { BorderRadiuses } from 'styled';
+import type { BorderRadiuses } from '../types';
 
 const borderRadius: BorderRadiuses = {
   0: 0,

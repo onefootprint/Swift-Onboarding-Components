@@ -1,8 +1,8 @@
 import { Meta, Story } from '@storybook/react';
 import React from 'react';
 import { withDesign } from 'storybook-addon-designs';
+import themes from 'themes';
 
-import light from '../../config/themes/light';
 import Typography, { TypographyProps } from './typography';
 import variantMapping from './typography.constants';
 
@@ -15,7 +15,7 @@ export default {
       options: ['p', 'a', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'label', 'span'],
     },
     center: { control: 'boolean' },
-    color: { control: 'select', options: Object.keys(light.color) },
+    color: { control: 'select', options: Object.keys(themes.light.color) },
     htmlTitle: { control: 'text' },
     testID: {
       control: 'text',

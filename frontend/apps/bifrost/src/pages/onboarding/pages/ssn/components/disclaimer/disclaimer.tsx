@@ -1,6 +1,6 @@
 import type { Icon as TIcon } from 'icons';
 import React from 'react';
-import styled, { css } from 'styled';
+import styled, { css } from 'styled-components';
 import { Box, Typography } from 'ui';
 
 type DisclaimerProps = {

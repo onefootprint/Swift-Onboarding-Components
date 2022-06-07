@@ -1,4 +1,4 @@
-import type { Breakpoints } from 'styled';
+import type { Breakpoints } from '../types';
 
 const breakpoint: Breakpoints = {
   xs: 0,

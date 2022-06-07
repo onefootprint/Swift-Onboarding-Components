@@ -1,6 +1,6 @@
 import type { Icon } from 'icons';
 import React, { forwardRef } from 'react';
-import styled, { css } from 'styled';
+import styled, { css } from 'styled-components';
 
 export type TabItemPros = {
   children: string;

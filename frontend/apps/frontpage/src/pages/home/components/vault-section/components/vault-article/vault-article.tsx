@@ -1,7 +1,7 @@
 import type { Icon } from 'icons';
 import React from 'react';
 import CircleIcon from 'src/components/circle-icon';
-import styled, { css } from 'styled';
+import styled, { css } from 'styled-components';
 import { Typography } from 'ui';
 
 type VaultArticleProps = {

@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import React from 'react';
-import styled, { css } from 'styled';
+import styled, { css } from 'styled-components';
 import { Typography } from 'ui';
 
 import type { Highlight } from '../../highlight-section.types';

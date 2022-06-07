@@ -1,7 +1,8 @@
 import { Property } from 'csstype';
 import type { Icon } from 'icons';
 import React from 'react';
-import styled, { BackgroundColor, Color, css } from 'styled';
+import styled, { css } from 'styled-components';
+import type { BackgroundColor, Color } from 'themes';
 
 type CircleIconProps = {
   backgroundColor?: BackgroundColor;

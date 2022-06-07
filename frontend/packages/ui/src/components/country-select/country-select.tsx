@@ -1,6 +1,6 @@
 import { COUNTRIES as options } from 'global-constants';
 import React from 'react';
-import styled, { css } from 'styled';
+import styled, { css } from 'styled-components';
 
 import DefaultOption from '../internal/default-option';
 import Flag from '../internal/flag';

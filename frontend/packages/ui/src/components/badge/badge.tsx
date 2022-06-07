@@ -1,5 +1,6 @@
 import React from 'react';
-import styled, { css, UIState } from 'styled';
+import styled, { css } from 'styled-components';
+import type { UIState } from 'themes';
 
 import { createFontStyles } from '../../utils/mixins';
 

@@ -5,7 +5,7 @@ import noop from 'lodash/noop';
 import take from 'lodash/take';
 import React, { forwardRef, useRef } from 'react';
 import mergeRefs from 'react-merge-refs';
-import styled, { css } from 'styled';
+import styled, { css } from 'styled-components';
 
 import Input, { InputProps } from '../internal/input';
 import type { Item } from './adress-input.types';

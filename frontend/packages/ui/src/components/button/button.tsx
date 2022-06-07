@@ -1,5 +1,5 @@
 import React from 'react';
-import styled, { css } from 'styled';
+import styled, { css } from 'styled-components';
 
 import { createFontStyles, createOverlayBackground } from '../../utils/mixins';
 import LoadingIndicator from '../loading-indicator';
