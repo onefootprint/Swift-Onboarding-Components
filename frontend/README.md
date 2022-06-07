@@ -1,50 +1,62 @@
-# Turborepo starter
-
-This is an official Yarn v1 starter turborepo.
-
-## What's inside?
-
-This turborepo uses [Yarn](https://classic.yarnpkg.com/lang/en/) as a package manager. It includes the following packages/apps:
-
-### Apps and Packages
-
-- `docs`: a [Next.js](https://nextjs.org) app
-- `web`: another [Next.js](https://nextjs.org) app
-- `ui`: a stub React component library shared by both `web` and `docs` applications
-- `config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `tsconfig`: `tsconfig.json`s used throughout the monorepo
-
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
-
-### Utilities
-
-This turborepo has some additional tools already setup for you:
-
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
+# Footprint monorepo
 
 ## Setup
 
-This repository is used in the `npx create-turbo` command, and selected when choosing which package manager you wish to use with your monorepo (Yarn).
-
-### Build
-
-To build all apps and packages, run the following command:
+If you have a brand new computer, just run:
 
 ```
-cd my-turborepo
-yarn run build
+sh onboarding/setup.sh
 ```
+
+This script will install all the dependencies required to run the project locally. After this, in order to install all the project npm modules, run:
+
+```
+yarn install
+```
+
+We only use `yarn`, so make sure to use it instead of `npm`.
+
+### Structure
+
+The monorepo is divided into two main folders:
+
+- `apps`: any frontend application that someone could use, e.g dashboard, landing-page
+- `packages`: internal and external modules, used across our apps, e.g design system, eslint/ts config
 
 ### Develop
 
-To develop all apps and packages, run the following command:
+To run a specific app, just run:
 
 ```
-cd my-turborepo
-yarn run dev
+cd apps/desired-app
+yarn dev
 ```
+
+If you prefer, you can also run `yarn dev` from the root folder. This will run a development server for each app we have.
+
+### Ports
+
+The last command described above, `yarn dev`, will try to bootstrap a new server using an available port. To have more predictability, as well as
+to enforce more constraints on WebAuthn, each app has its own port:
+
+| App             | Port |
+| --------------- | ---- |
+| Bifrost         | 3000 |
+| Dashboard       | 3001 |
+| Demo            | 3002 |
+| Frontpage       | 3003 |
+| Identity Wallet | 3004 |
+
+### Build
+
+To build a specific app, run the following command:
+
+```
+cd apps/desired-app
+yarn build
+```
+
+If you prefer, you can also run `yarn build` from the root folder. This will build all the apps.
 
 ### Remote Caching
 
