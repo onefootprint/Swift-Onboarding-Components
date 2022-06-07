@@ -1,6 +1,7 @@
 import '@testing-library/jest-dom';
 
 import { render } from '@testing-library/react';
+import FootprintProvider from 'footprint-provider';
 import React from 'react';
 import { ThemeProvider } from 'styled-components';
 import { themes } from 'ui';
@@ -14,7 +15,9 @@ type WrapperProps = {
 };
 
 export const Wrapper = ({ children }: WrapperProps) => (
-  <ThemeProvider theme={light}>{children}</ThemeProvider>
+  <FootprintProvider>
+    <ThemeProvider theme={light}>{children}</ThemeProvider>
+  </FootprintProvider>
 );
 
 export const customRender = (Component: JSX.Element) => {

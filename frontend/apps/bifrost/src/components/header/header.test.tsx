@@ -8,14 +8,12 @@ describe('<Header />', () => {
     buttonType,
     progressIndicatorProps,
     onPrev,
-    onClose,
   }: HeaderProps) =>
     customRender(
       <Header
         buttonType={buttonType}
         progressIndicatorProps={progressIndicatorProps}
         onPrev={onPrev}
-        onClose={onClose}
       />,
     );
 
