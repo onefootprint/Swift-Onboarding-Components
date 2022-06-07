@@ -1,21 +1,16 @@
 import React from 'react';
 import { useForm } from 'react-hook-form';
-import useIdentify, { IdentifyResponse } from 'src/hooks/identify/use-identify';
-import useBifrostMachine, { Events } from 'src/hooks/use-bifrost-machine';
-import {
-  ChallengeKind,
-  UserData,
-  UserDataAttribute,
-} from 'src/utils/state-machine/types';
+import { UserData, UserDataAttribute } from 'src/utils/state-machine/types';
 import styled, { css } from 'styled';
 import { Button, TextInput, Typography } from 'ui';
+
+import useEmailIdentify from './hooks/use-email-identify';
 
 type FormData = Required<Pick<UserData, UserDataAttribute.email>>;
 
 const EmailIdentification = () => {
-  const [, send] = useBifrostMachine();
+  const { identifyEmail, isLoading } = useEmailIdentify();
 
-  const identifyMutation = useIdentify();
   const {
     register,
     handleSubmit,
@@ -24,31 +19,7 @@ const EmailIdentification = () => {
 
   const onSubmit = (formData: FormData) => {
     const { email } = formData;
-    identifyMutation.mutate(
-      { identifier: { email }, preferredChallengeKind: ChallengeKind.sms },
-      {
-        onSuccess({ userFound, challengeData }: IdentifyResponse) {
-          if (userFound) {
-            send({
-              type: Events.userIdentifiedByEmail,
-              payload: {
-                email,
-                challengeData,
-                userFound,
-              },
-            });
-            return;
-          }
-          send({
-            type: Events.userNotIdentified,
-            payload: {
-              email,
-              userFound,
-            },
-          });
-        },
-      },
-    );
+    identifyEmail(email);
   };
 
   return (
@@ -69,7 +40,7 @@ const EmailIdentification = () => {
         type="email"
         {...register('email', { required: true })}
       />
-      <Button fullWidth type="submit" loading={identifyMutation.isLoading}>
+      <Button fullWidth type="submit" loading={isLoading()}>
         Continue
       </Button>
     </Form>

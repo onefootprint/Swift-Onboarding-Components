@@ -12,6 +12,8 @@ export enum States {
   phoneRegistration = 'phoneRegistration', // Email not associated with an existing user, asking for phone
 
   // Challenge
+  qrLogin = 'qrLogin',
+  biometricLoginRetry = 'biometricLoginRetry',
   phoneVerification = 'phoneVerification', // Existing user phone gets pin code
   livenessRegister = 'livenessRegister',
   livenessRegisterSucceeded = 'livenessRegisterSucceeded',
@@ -28,10 +30,13 @@ export enum Events {
   userIdentifiedByPhone = 'userIdentifiedByPhone',
   userNotIdentified = 'userNotIdentified',
 
-  // Biometric Challenge
+  // Liveness Challenge
+  smsChallengeInitiated = 'smsChallengeInitiated',
   smsChallengeResent = 'smsChallengeResent',
   smsChallengeSucceeded = 'smsChallengeSucceeded',
   deviceInfoIdentified = 'deviceInfoIdentified',
+  biometricLoginSucceeded = 'biometricLoginSucceeded',
+  biometricLoginFailed = 'livenessLoginFailed',
 }
 
 export enum Actions {
@@ -67,6 +72,29 @@ export type BifrostEvent =
         email: string;
         userFound: boolean;
         challengeData?: ChallengeData; // only if user found
+      };
+    }
+  | {
+      type: Events.biometricLoginSucceeded;
+      payload: {
+        email: string;
+        userFound: boolean;
+        authToken: string;
+        missingAttributes: readonly UserDataAttribute[];
+        missingWebauthnCredentials: boolean;
+      };
+    }
+  | {
+      type: Events.biometricLoginFailed;
+      payload: {
+        email: string;
+        userFound: boolean;
+      };
+    }
+  | {
+      type: Events.smsChallengeInitiated;
+      payload: {
+        challengeData: ChallengeData;
       };
     }
   | {

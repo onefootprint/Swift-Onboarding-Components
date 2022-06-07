@@ -5,6 +5,8 @@ import useDevice from 'src/hooks/use-device-info';
 import { States } from 'src/utils/state-machine/bifrost';
 
 import EmailIdentification from './email-identification';
+import BiometricLoginRetry from './liveness-login/biometric-login-retry';
+import QRLogin from './liveness-login/qr-login';
 import Onboarding from './onboarding';
 import OnboardingSuccess from './onboarding-success/onboarding-success';
 import PhoneRegistration from './phone-registration';
@@ -24,6 +26,10 @@ const Root = () => {
     [States.verificationSuccess]: VerificationSuccess,
     [States.phoneRegistration]: PhoneRegistration,
     [States.phoneVerification]: PhoneVerification,
+    [States.biometricLoginRetry]: BiometricLoginRetry,
+    [States.qrLogin]: QRLogin,
+
+    // Onboarding
     [States.onboarding]: Onboarding,
     [States.onboardingSuccess]: OnboardingSuccess,
   };

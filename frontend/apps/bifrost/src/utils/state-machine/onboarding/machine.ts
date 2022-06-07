@@ -1,10 +1,10 @@
+import createLivenessRegisterMachine from 'src/utils/state-machine/liveness-register';
 import {
   hasMissingAttributes,
   isMissingBasicAttribute,
   isMissingResidentialAttribute,
   isMissingSsnAttribute,
-} from '@src/utils/state-machine/onboarding/utils/missing-attributes';
-import createLivenessRegisterMachine from 'src/utils/state-machine/liveness-register';
+} from 'src/utils/state-machine/onboarding/utils/missing-attributes';
 import { DeviceInfo, OnboardingData } from 'src/utils/state-machine/types';
 import { assign, createMachine } from 'xstate';
 
