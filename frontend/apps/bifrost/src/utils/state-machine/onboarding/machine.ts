@@ -199,6 +199,13 @@ const createOnboardingMachine = ({
                 actions: [Actions.assignResidentialAddress],
               },
             ],
+            [Events.navigatedToPrevPage]: [
+              {
+                target: States.basicInformation,
+                cond: context =>
+                  isMissingBasicAttribute(context.missingAttributes),
+              },
+            ],
           },
         },
         [States.ssn]: {
@@ -207,6 +214,18 @@ const createOnboardingMachine = ({
               {
                 target: States.onboardingSuccess,
                 actions: [Actions.assignSsn],
+              },
+            ],
+            [Events.navigatedToPrevPage]: [
+              {
+                target: States.residentialAddress,
+                cond: context =>
+                  isMissingResidentialAttribute(context.missingAttributes),
+              },
+              {
+                target: States.basicInformation,
+                cond: context =>
+                  isMissingBasicAttribute(context.missingAttributes),
               },
             ],
           },

@@ -26,6 +26,8 @@ export * from './loading-indicator';
 export { default as LoadingIndicator } from './loading-indicator';
 export * from './pin-input';
 export { default as PinInput } from './pin-input';
+export * from './portal';
+export { default as Portal } from './portal';
 export * from './progress-indicator';
 export { default as ProgressIndicator } from './progress-indicator';
 export * from './select';

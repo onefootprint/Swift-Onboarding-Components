@@ -16,6 +16,7 @@ import {
   TextInput,
 } from 'ui';
 
+import ProgressHeader from '../../components/progress-header';
 import useOnboardingMachine from '../../hooks/use-onboarding-machine';
 import useSyncData from '../../hooks/use-sync-data';
 
@@ -32,21 +33,30 @@ type FormData = Required<
 >;
 
 const ResidentialAddress = () => {
-  const [, send] = useOnboardingMachine();
+  const [state, send] = useOnboardingMachine();
   const syncDataMutation = useSyncData();
+  const { data } = state.context;
   const { t } = useTranslation('pages.registration.residential-address');
   const {
+    watch,
     control,
     register,
     handleSubmit,
     resetField,
     formState: { errors },
-    watch,
   } = useForm<FormData>({
     defaultValues: {
-      [UserDataAttribute.country]: DEFAULT_COUNTRY.value,
+      [UserDataAttribute.country]:
+        data[UserDataAttribute.country] || DEFAULT_COUNTRY.value,
+      [UserDataAttribute.state]: data[UserDataAttribute.state],
+      [UserDataAttribute.city]: data[UserDataAttribute.city],
+      [UserDataAttribute.zip]: data[UserDataAttribute.zip],
+      [UserDataAttribute.streetAddress]: data[UserDataAttribute.streetAddress],
+      [UserDataAttribute.streetAddress2]:
+        data[UserDataAttribute.streetAddress2],
     },
   });
+
   const country = watch('country');
   const shouldDisplayStateSelect = country === DEFAULT_COUNTRY.value;
 
@@ -69,84 +79,87 @@ const ResidentialAddress = () => {
   };
 
   return (
-    <Form onSubmit={handleSubmit(onSubmit)}>
-      <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
-      <Controller
-        control={control}
-        name={UserDataAttribute.country}
-        render={({ field: { onChange, value } }) => (
-          <CountrySelect
-            label={t('form.country.label')}
-            onChange={(nextSelectedOption: CountrySelectOption | null) => {
-              resetField(UserDataAttribute.state);
-              onChange(nextSelectedOption?.value);
-            }}
-            placeholder={t('form.country.placeholder')}
-            value={value}
-          />
-        )}
-      />
-      <AddressInput
-        hasError={!!errors.streetAddress}
-        hintText={errors.streetAddress && t('form.address-line-1.error')}
-        label={t('form.address-line-1.label')}
-        placeholder={t('form.address-line-1.placeholder')}
-        {...register(UserDataAttribute.streetAddress, { required: true })}
-      />
-      <TextInput
-        label={t('form.address-line-2.label')}
-        placeholder={t('form.address-line-2.placeholder')}
-        {...register(UserDataAttribute.streetAddress2)}
-      />
-      <Grid.Row>
-        <Grid.Column col={6}>
-          <TextInput
-            hasError={!!errors.city}
-            hintText={errors.city && t('form.city.error')}
-            label={t('form.city.label')}
-            placeholder={t('form.city.placeholder')}
-            {...register(UserDataAttribute.city, { required: true })}
-          />
-        </Grid.Column>
-        <Grid.Column col={6}>
-          <TextInput
-            hasError={!!errors.zip}
-            hintText={errors.zip && t('form.zipCode.error')}
-            label={t('form.zipCode.label')}
-            placeholder={t('form.zipCode.placeholder')}
-            {...register(UserDataAttribute.zip, { required: true })}
-          />
-        </Grid.Column>
-      </Grid.Row>
-      {shouldDisplayStateSelect ? (
+    <>
+      <ProgressHeader />
+      <Form onSubmit={handleSubmit(onSubmit)}>
+        <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
         <Controller
           control={control}
-          name={UserDataAttribute.state}
-          render={({ field: { value, onChange } }) => (
-            <Select
-              label={t('form.state.label')}
-              onChange={nextSelectedOption => {
+          name={UserDataAttribute.country}
+          render={({ field: { onChange, value } }) => (
+            <CountrySelect
+              label={t('form.country.label')}
+              onChange={(nextSelectedOption: CountrySelectOption | null) => {
+                resetField(UserDataAttribute.state);
                 onChange(nextSelectedOption?.value);
               }}
-              options={STATES}
-              placeholder={t('form.state.placeholder')}
+              placeholder={t('form.country.placeholder')}
               value={value}
             />
           )}
         />
-      ) : (
-        <TextInput
-          hasError={!!errors.state}
-          hintText={errors.state && t('form.state.error')}
-          label={t('form.state.label')}
-          placeholder={t('form.state.placeholder')}
-          {...register(UserDataAttribute.state)}
+        <AddressInput
+          hasError={!!errors.streetAddress}
+          hintText={errors.streetAddress && t('form.address-line-1.error')}
+          label={t('form.address-line-1.label')}
+          placeholder={t('form.address-line-1.placeholder')}
+          {...register(UserDataAttribute.streetAddress, { required: true })}
         />
-      )}
-      <Button type="submit" fullWidth>
-        {t('form.cta')}
-      </Button>
-    </Form>
+        <TextInput
+          label={t('form.address-line-2.label')}
+          placeholder={t('form.address-line-2.placeholder')}
+          {...register(UserDataAttribute.streetAddress2)}
+        />
+        <Grid.Row>
+          <Grid.Column col={6}>
+            <TextInput
+              hasError={!!errors.city}
+              hintText={errors.city && t('form.city.error')}
+              label={t('form.city.label')}
+              placeholder={t('form.city.placeholder')}
+              {...register(UserDataAttribute.city, { required: true })}
+            />
+          </Grid.Column>
+          <Grid.Column col={6}>
+            <TextInput
+              hasError={!!errors.zip}
+              hintText={errors.zip && t('form.zipCode.error')}
+              label={t('form.zipCode.label')}
+              placeholder={t('form.zipCode.placeholder')}
+              {...register(UserDataAttribute.zip, { required: true })}
+            />
+          </Grid.Column>
+        </Grid.Row>
+        {shouldDisplayStateSelect ? (
+          <Controller
+            control={control}
+            name={UserDataAttribute.state}
+            render={({ field: { value, onChange } }) => (
+              <Select
+                label={t('form.state.label')}
+                onChange={nextSelectedOption => {
+                  onChange(nextSelectedOption?.value);
+                }}
+                options={STATES}
+                placeholder={t('form.state.placeholder')}
+                value={value}
+              />
+            )}
+          />
+        ) : (
+          <TextInput
+            hasError={!!errors.state}
+            hintText={errors.state && t('form.state.error')}
+            label={t('form.state.label')}
+            placeholder={t('form.state.placeholder')}
+            {...register(UserDataAttribute.state)}
+          />
+        )}
+        <Button type="submit" fullWidth>
+          {t('form.cta')}
+        </Button>
+      </Form>
+    </>
   );
 };
 

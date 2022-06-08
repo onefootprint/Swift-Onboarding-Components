@@ -10,6 +10,7 @@ import { UserData, UserDataAttribute } from 'src/utils/state-machine/types';
 import styled, { css } from 'styled-components';
 import { Button, TextInput } from 'ui';
 
+import ProgressHeader from '../../components/progress-header';
 import useOnboardingMachine from '../../hooks/use-onboarding-machine';
 import useSyncData from '../../hooks/use-sync-data';
 import Disclaimer from './components/disclaimer';
@@ -41,40 +42,43 @@ const SSN = () => {
   };
 
   return (
-    <Form onSubmit={handleSubmit(onSubmit)}>
-      <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
-      <TextInput
-        hasError={!!errors.ssn}
-        hintText={errors.ssn && t('form.ssn.error')}
-        label={t('form.ssn.label')}
-        mask={inputMasks.ssn}
-        placeholder={t('form.ssn.placeholder')}
-        type="tel"
-        {...register('ssn', { required: true, maxLength: 11 })}
-      />
-      <Disclaimer
-        items={[
-          {
-            title: t('disclaimer.security.title'),
-            description: t('disclaimer.security.description'),
-            Icon: IcoShield24,
-          },
-          {
-            title: t('disclaimer.privacy.title'),
-            description: t('disclaimer.privacy.description'),
-            Icon: IcoLock24,
-          },
-          {
-            title: t('disclaimer.credit-score.title'),
-            description: t('disclaimer.credit-score.description'),
-            Icon: IcoFileText24,
-          },
-        ]}
-      />
-      <Button type="submit" fullWidth>
-        {t('form.cta')}
-      </Button>
-    </Form>
+    <>
+      <ProgressHeader />
+      <Form onSubmit={handleSubmit(onSubmit)}>
+        <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
+        <TextInput
+          hasError={!!errors.ssn}
+          hintText={errors.ssn && t('form.ssn.error')}
+          label={t('form.ssn.label')}
+          mask={inputMasks.ssn}
+          placeholder={t('form.ssn.placeholder')}
+          type="tel"
+          {...register('ssn', { required: true, maxLength: 11 })}
+        />
+        <Disclaimer
+          items={[
+            {
+              title: t('disclaimer.security.title'),
+              description: t('disclaimer.security.description'),
+              Icon: IcoShield24,
+            },
+            {
+              title: t('disclaimer.privacy.title'),
+              description: t('disclaimer.privacy.description'),
+              Icon: IcoLock24,
+            },
+            {
+              title: t('disclaimer.credit-score.title'),
+              description: t('disclaimer.credit-score.description'),
+              Icon: IcoFileText24,
+            },
+          ]}
+        />
+        <Button type="submit" fullWidth>
+          {t('form.cta')}
+        </Button>
+      </Form>
+    </>
   );
 };
 

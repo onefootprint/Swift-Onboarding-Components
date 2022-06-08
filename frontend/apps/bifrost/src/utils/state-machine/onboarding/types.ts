@@ -31,6 +31,7 @@ export enum Events {
   basicInformationSubmitted = 'basicInformationSubmitted',
   residentialAddressSubmitted = 'residentialAddressSubmitted',
   ssnSubmitted = 'ssnSubmitted',
+  navigatedToPrevPage = 'navigatedToPrevPage',
 }
 
 export enum Actions {
@@ -50,4 +51,5 @@ export type MachineEvents =
       type: Events.residentialAddressSubmitted;
       payload: { residentialAddress: ResidentialAddress };
     }
-  | { type: Events.ssnSubmitted; payload: { [UserDataAttribute.ssn]: string } };
+  | { type: Events.ssnSubmitted; payload: { [UserDataAttribute.ssn]: string } }
+  | { type: Events.navigatedToPrevPage };

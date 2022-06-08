@@ -1,7 +1,8 @@
 import React from 'react';
+import CloseButton from 'src/components/close-button';
 import HeaderTitle from 'src/components/header-title';
 import styled, { css } from 'styled-components';
-import { Box, LinkButton } from 'ui';
+import { Box, LinkButton, Portal } from 'ui';
 
 export type SuccessMessageProps = {
   body: React.ReactNode;
@@ -9,6 +10,9 @@ export type SuccessMessageProps = {
 
 const SuccessMessage = ({ body }: SuccessMessageProps) => (
   <Container>
+    <Portal selector="#main-header" removeContent>
+      <CloseButton />
+    </Portal>
     <Box>
       <HeaderTitle
         title="You&#39;re all set! 😎"
