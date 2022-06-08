@@ -54,7 +54,7 @@ impl NewAccessEventBatch {
                         .map(|ev| NewAccessEventWithInsight {
                             data_kind: ev.data_kind,
                             onboarding_id: ev.onboarding_id,
-                            insight_event_id: insight_ev.id.clone(),
+                            insight_event_id: insight_ev.id,
                         })
                         .collect::<Vec<NewAccessEventWithInsight>>();
 

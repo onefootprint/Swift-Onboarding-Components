@@ -71,7 +71,10 @@ actix-session = { version = "0.6.2", features = ["cookie-session"] }
 actix-web-httpauth = { version = "0.6" }
 chrono = { version = "0.4" }
 strum_macros = { version = "0.24" }
-webauthn-rs = "0.3.2"
+
+webauthn-rs-core = { git = "https://github.com/onefootprint/webauthn-rs", rev = "262f65515a45fea7c37681caaf4246889e00f6e3"}
+webauthn-rs-proto = { git = "https://github.com/onefootprint/webauthn-rs", rev = "262f65515a45fea7c37681caaf4246889e00f6e3"}
+
 url = "2.2.2"
 newtypes = { path = "../newtypes" }
 awc = { version = "3.0", features = ["rustls"]}

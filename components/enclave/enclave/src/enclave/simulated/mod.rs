@@ -7,6 +7,7 @@ use thiserror::Error;
 
 use crate::KmsCredentials;
 
+#[allow(clippy::large_enum_variant)]
 #[derive(Debug, Error)]
 pub enum Error {
     #[error("decrypt {0}")]
@@ -26,9 +27,9 @@ pub async fn kms_decrypt(kms_creds: KmsCredentials, ciphertext: Vec<u8>) -> Resu
     );
     let mut config = Config::builder();
     config.set_region(Region::new(kms_creds.region));
-    config.set_credentials_provider(Some(
-        aws_types::credentials::SharedCredentialsProvider::new(creds),
-    ));
+    config.set_credentials_provider(Some(aws_types::credentials::SharedCredentialsProvider::new(
+        creds,
+    )));
     let config = config.build();
     let kms_client = aws_sdk_kms::Client::new(&config);
 

@@ -22,7 +22,7 @@ pub fn init(config: &Config) -> Result<PushController, Box<dyn std::error::Error
 
     global::set_text_map_propagator(TraceContextPropagator::new());
 
-    let env_filter = EnvFilter::try_from_default_env().unwrap_or(EnvFilter::new("info"));
+    let env_filter = EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::new("info"));
     let _formatting_layer = BunyanFormattingLayer::new(
         "fcm".into(),
         // Output the formatted spans to stdout.

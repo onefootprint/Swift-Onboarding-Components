@@ -36,7 +36,7 @@ pub fn init(url: &str) -> Result<Pool, DbError> {
         .post_create(Hook::sync_fn(move |_, metrics| {
             let created = metrics
                 .created
-                .duration_since(init_instant.clone())
+                .duration_since(init_instant)
                 .as_secs();
 
             tracing::info!(db.pool.created_secs_ago = created, "db_pool.post_create");
@@ -45,12 +45,12 @@ pub fn init(url: &str) -> Result<Pool, DbError> {
         .post_recycle(Hook::sync_fn(move |_, metrics| {
             let recycled = metrics
                 .created
-                .duration_since(init_instant.clone())
+                .duration_since(init_instant)
                 .as_secs();
 
             let created = metrics
                 .created
-                .duration_since(init_instant.clone())
+                .duration_since(init_instant)
                 .as_secs();
 
             tracing::debug!(

@@ -4,6 +4,7 @@ use crate::utils::challenge::{Challenge, ChallengeToken};
 use crate::utils::crypto::signed_hash;
 use crate::utils::email::clean_email;
 use crate::utils::liveness::LivenessWebauthnConfig;
+use crate::utils::phone::clean_phone_number;
 use crate::utils::user_vault_wrapper::UserVaultWrapper;
 use crate::State;
 use chrono::{Duration, Utc};
@@ -13,9 +14,8 @@ use db::models::webauthn_credential::WebauthnCredential;
 use db::webauthn_credentials::get_webauthn_creds;
 use newtypes::{DataKind, UserVaultId};
 use paperclip::actix::{api_v2_operation, web, web::Json, Apiv2Schema};
-use webauthn_rs::proto::{Credential, UserVerificationPolicy};
-
-use crate::utils::phone::clean_phone_number;
+use webauthn_rs_core::proto::{Base64UrlSafeData, Credential, ParsedAttestationData};
+use webauthn_rs_proto::{RegisteredExtensions, UserVerificationPolicy};
 
 use super::{send_phone_challenge, BiometricChallengeState, ChallengeKind};
 
@@ -121,7 +121,7 @@ async fn get_user_by_identifier(
 ) -> Result<Option<UserVault>, ApiError> {
     let (data_kind, data) = match identifier {
         Identifier::PhoneNumber(phone_number) => {
-            let phone_number = clean_phone_number(&state, &phone_number).await?;
+            let phone_number = clean_phone_number(state, &phone_number).await?;
             (DataKind::PhoneNumber, phone_number)
         }
         Identifier::Email(email) => {
@@ -129,7 +129,7 @@ async fn get_user_by_identifier(
             (DataKind::Email, email)
         }
     };
-    let sh_data = signed_hash(&state, data).await?;
+    let sh_data = signed_hash(state, data).await?;
     // TODO should we only look for verified emails?
     let existing_user = db::user_vault::get_by_fingerprint(&state.db_pool, data_kind, sh_data, false)
         .await?
@@ -153,18 +153,25 @@ async fn initiate_biometric_challenge_for_user(
             serde_cbor::from_slice(&cred.public_key)
                 .map(|public_key| Credential {
                     counter: 0,
-                    cred_id: cred.credential_id,
+                    cred_id: Base64UrlSafeData(cred.credential_id),
                     registration_policy: UserVerificationPolicy::Required,
-                    verified: true,
+                    user_verified: true,
                     cred: public_key,
+                    backup_eligible: cred.backup_eligible,
+                    backup_state: false, // ignore
+                    extensions: RegisteredExtensions::none(),
+                    attestation: ParsedAttestationData::None, // this doesn't matter for auth now
+                    attestation_format: None,                 // also doesnt matter for auth
                 })
                 .map_err(crypto::Error::from)
         })
         .collect::<Result<Vec<Credential>, crypto::Error>>()?;
 
     // generate the challenge and return it
-    let webauthn = webauthn_rs::Webauthn::new(LivenessWebauthnConfig::new(&state));
-    let (challenge, auth_state) = webauthn.generate_challenge_authenticate_options(creds, None)?;
+    let webauthn = LivenessWebauthnConfig::new(state);
+    let (challenge, auth_state) = webauthn
+        .webauthn()
+        .generate_challenge_authenticate_options(creds, None)?;
 
     let challenge_data = Challenge {
         expires_at: Utc::now().naive_utc() + Duration::minutes(5),

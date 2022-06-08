@@ -2,8 +2,12 @@ import os
 import pytest
 import random
 import requests
+from webauthn_simulator import SoftWebauthnDevice
+import json
+import base64
 
 # TODO make some utils to reduce duplication
+WEBAUTHN_DEVICE = SoftWebauthnDevice()
 
 TENANT_AUTH_HEADER = "x-client-public-key"
 TENANT_SECRET_HEADER = "x-client-secret-key"
@@ -70,6 +74,18 @@ def _assert_response(response, status_code=200, msg="Incorrect status code"):
     print(response.content)
     assert response.status_code == status_code, msg
     return response.json()
+
+def _pretty_print_json_str(o):
+    print(_pretty_print_json(json.loads(o)))
+
+def _pretty_print_json(o):
+    print(json.dumps(o, indent=4, sort_keys=True))
+
+def _b64_decode(v):
+    return base64.urlsafe_b64decode(v + '=' * (-len(v) % 4))
+
+def _b64_encode(v):
+    return base64.urlsafe_b64encode(v).decode('ascii').rstrip('=')
 
 @pytest.fixture(scope="module")
 def workos_tenant():
@@ -208,6 +224,44 @@ def test_user_data(request):
     )
     _assert_response(r)
 
+def test_user_biometric(request):    
+    # get challenge
+    path = "user/biometric/init"
+    print(url(path))
+    r = requests.post(
+        url(path),
+        headers=_fpuser_auth_headers(request),
+    )    
+    body = _assert_response(r)
+    chal_token = body["data"]["challenge_token"];   
+    chal_json = body["data"]["challenge_json"];   
+ 
+    chal = json.loads(chal_json)
+    _pretty_print_json(chal)
+
+    # override attestation here
+    chal["publicKey"]["attestation"] = 'none';
+    chal["publicKey"]["challenge"] = _b64_decode(chal["publicKey"]["challenge"])
+    chal["publicKey"]["user"]["id"] = _b64_decode(chal["publicKey"]["user"]["id"])
+
+    attestation = WEBAUTHN_DEVICE.create(chal, os.environ.get('TEST_URL'))
+    attestation["rawId"] = _b64_encode(attestation["rawId"])
+    attestation["id"] = _b64_encode(attestation["id"])
+    attestation["response"]["clientDataJSON"] = _b64_encode(attestation["response"]["clientDataJSON"])
+    attestation["response"]["attestationObject"] = _b64_encode(attestation["response"]["attestationObject"])
+
+    _pretty_print_json(attestation)
+    
+    # get challenge
+    path = "user/biometric"
+    print(url(path))
+    r = requests.post(
+        url(path),
+        headers=_fpuser_auth_headers(request),
+        json=dict(challenge_token=chal_token, device_response_json=json.dumps(attestation)),
+    )    
+    _assert_response(r)
+
 def test_d2p(request):
     # Get new auth token in d2p/generate endpoint
     path = "onboarding/d2p/generate"
@@ -289,9 +343,63 @@ def test_onboarding_complete(request, workos_tenant):
     )
     body = _assert_response(r)
     fp_user_id = body["data"]["footprint_user_id"]
-    assert body["data"]["missing_webauthn_credentials"] == True
+    assert body["data"]["missing_webauthn_credentials"] == False
     assert fp_user_id
     request.config.cache.set("fp_user_id", fp_user_id)
+
+def test_identify_login_repeat_customer_biometric(request, foo_tenant):
+    request.config.cache.set("fpuser_auth_token", None)  # Remove fpuser_auth_token from previous test
+
+    # Identify the user by email
+    path = "identify"
+    print(url(path))
+    email = request.config.cache.get("email", None)
+    phone_number = request.config.cache.get("phone_number", None)
+    identifier = {"email": email}
+    data = {"identifier": identifier, "preferred_challenge_kind": "biometric"}
+    r = requests.post(
+        url(path),
+        json=data,
+    )
+    body = _assert_response(r)
+    assert body["data"]["user_found"]
+    assert body["data"]["challenge_data"]["phone_number_last_two"] == phone_number[-2:]
+    assert body["data"]["challenge_data"]["challenge_kind"] == "biometric"
+    assert body["data"]["challenge_data"]["biometric_challenge_json"]
+  
+    # do webauthn
+    chal = json.loads(body["data"]["challenge_data"]["biometric_challenge_json"])
+    _pretty_print_json(chal)
+
+    # override chal here
+    chal["publicKey"]["challenge"] = _b64_decode(chal["publicKey"]["challenge"])
+
+    attestation = WEBAUTHN_DEVICE.get(chal, os.environ.get('TEST_URL'))
+    attestation["rawId"] = _b64_encode(attestation["rawId"])
+    attestation["id"] = _b64_encode(attestation["id"])
+    attestation["response"]["authenticatorData"] = _b64_encode(attestation["response"]["authenticatorData"] )
+    attestation["response"]["signature"] = _b64_encode(attestation["response"]["signature"] )
+    attestation["response"]["userHandle"] = _b64_encode(attestation["response"]["userHandle"] )
+    attestation["response"]["clientDataJSON"] = _b64_encode(attestation["response"]["clientDataJSON"] )
+
+    print(attestation)
+    _pretty_print_json(attestation)
+
+    # Log in as the user
+    path = "identify/verify"
+    print(url(path))
+    data = {
+        "challenge_response": json.dumps(attestation),
+        "challenge_kind": "biometric",
+        "challenge_token": body["data"]["challenge_data"]["challenge_token"],
+    }
+    r = requests.post(
+        url(path),
+        json=data,
+    )
+    body = _assert_response(r)
+    assert body["data"]["kind"] == "user_inherited"
+
 
 def test_identify_repeat_customer(request, foo_tenant):
     request.config.cache.set("fpuser_auth_token", None)  # Remove fpuser_auth_token from previous test
@@ -303,19 +411,6 @@ def test_identify_repeat_customer(request, foo_tenant):
     phone_number = request.config.cache.get("phone_number", None)
     identifier = {"email": email}
     data = {"identifier": identifier, "preferred_challenge_kind": "sms"}
-    r = requests.post(
-        url(path),
-        json=data,
-    )
-    body = _assert_response(r)
-    assert body["data"]["user_found"]
-    assert body["data"]["challenge_data"]["phone_number_last_two"] == phone_number[-2:]
-    assert body["data"]["challenge_data"]["challenge_kind"] == "sms"
-
-    # Now test identifying the user by phone number. Ask for a biometric challenge, which should
-    # fall through to an SMS challenge since the user doesn't have webauthn credentials
-    identifier = {"phone_number": phone_number}
-    data = {"identifier": identifier, "preferred_challenge_kind": "biometric"}
     r = requests.post(
         url(path),
         json=data,
@@ -341,6 +436,7 @@ def test_identify_repeat_customer(request, foo_tenant):
     assert body["data"]["kind"] == "user_inherited"
     auth_token = body["data"]["auth_token"]
     request.config.cache.set("fpuser_auth_token", auth_token)
+
 
     # Start onboarding for user
     path = "onboarding"

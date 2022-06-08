@@ -12,9 +12,9 @@ use aws_sdk_pinpointemail::{error::SendEmailError, types::SdkError as EmailSdkEr
 use aws_sdk_pinpointsmsvoicev2::{error::SendTextMessageError, types::SdkError as SmsSdkError};
 use db::errors::DbError;
 use enclave_proxy::bb8;
-use newtypes::TypeError;
 use paperclip::v2::schema::Apiv2Errors;
 use thiserror::Error;
+use webauthn_rs_core::error::WebauthnError;
 
 use crate::types::error::{ApiResponseError, ApiResponseErrorInfo};
 
@@ -71,7 +71,7 @@ pub enum ApiError {
     #[error("invalid tenant skey or footprint user id")]
     InvalidTenantKeyOrUserId,
     #[error("webauthn error: {0}")]
-    Webauthn(#[from] webauthn_rs::error::WebauthnError),
+    Webauthn(#[from] WebauthnError),
     #[error("json error: {0}")]
     Serde(#[from] serde_json::Error),
     #[error("onboarding for tenant, user pair does not exist")]

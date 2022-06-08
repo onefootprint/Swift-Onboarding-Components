@@ -9,6 +9,7 @@ mod ne;
 
 use crate::{EnvelopeDecrypt, FnDecryption, FnDecryptionSingle, KmsCredentials};
 
+#[allow(clippy::large_enum_variant)]
 #[derive(Error, Debug)]
 pub enum Error {
     #[cfg(feature = "simulate")]
@@ -33,8 +34,7 @@ pub async fn handle_fn_decrypt(request: EnvelopeDecrypt) -> Result<FnDecryption,
     let private_key_der = kms_decrypt(kms_creds, sealed_key).await?;
     log::info!("decrypted vault private key",);
 
-    let private_key_raw =
-        crypto::conversion::private_key_der_to_raw_uncompressed(&private_key_der)?;
+    let private_key_raw = crypto::conversion::private_key_der_to_raw_uncompressed(&private_key_der)?;
 
     log::info!("converted private key from DER");
 
@@ -76,10 +76,7 @@ pub async fn handle_hmac_sign(request: EnvelopeHmacSign) -> Result<HmacSignature
 }
 
 #[allow(unreachable_code)]
-pub async fn kms_decrypt(
-    _kms_creds: KmsCredentials,
-    _ciphertext: Vec<u8>,
-) -> Result<Vec<u8>, Error> {
+pub async fn kms_decrypt(_kms_creds: KmsCredentials, _ciphertext: Vec<u8>) -> Result<Vec<u8>, Error> {
     #[cfg(feature = "nitro")]
     return Ok(ne::kms_decrypt(_kms_creds, _ciphertext).await?);
 

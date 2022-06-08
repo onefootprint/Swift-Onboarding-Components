@@ -141,10 +141,12 @@ table! {
         attestation_data -> Bytea,
         created_at -> Timestamp,
         updated_at -> Timestamp,
+        backup_eligible -> Bool,
+        attestation_type -> Attestation_type,
+        insight_event_id -> Nullable<Uuid>,
     }
 }
 
-joinable!(access_events -> insight_events (insight_event_id));
 joinable!(access_events -> onboardings (onboarding_id));
 joinable!(onboardings -> tenants (tenant_id));
 joinable!(onboardings -> user_vaults (user_vault_id));

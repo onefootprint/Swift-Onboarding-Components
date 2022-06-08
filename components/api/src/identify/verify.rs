@@ -73,11 +73,11 @@ fn validate_biometric_challenge(
     // Decode and validate the response to the biometric challenge
     let challenge =
         Challenge::<BiometricChallengeState>::unseal(&state.session_sealing_key, challenge_token)?;
-    let webauthn = webauthn_rs::Webauthn::new(LivenessWebauthnConfig::new(&state));
+    let webauthn = LivenessWebauthnConfig::new(state);
     let auth_resp = serde_json::from_str(challenge_response)?;
-    let (_, _authenticator_data) = webauthn
-        .authenticate_credential(&auth_resp, &challenge.data.state)
-        .map_err(|_| ApiError::ChallengeNotValid)?;
+    let _ = webauthn
+        .webauthn()
+        .authenticate_credential(&auth_resp, &challenge.data.state)?;
 
     Ok((challenge.data.user_vault_id, VerifyKind::UserInherited))
 }

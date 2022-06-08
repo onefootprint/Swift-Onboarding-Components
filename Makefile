@@ -81,7 +81,7 @@ stop-local:
 	@killall footprint-core || echo "no fpc running"
 
 run-local: stop-local
-	@cargo run -p enclave simulate & echo "starting enclave..."
+	@cargo run -p enclave --features simulate & echo "starting enclave..."
 	@cargo run -p footprint-core
 
 

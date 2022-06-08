@@ -1,1 +1,1 @@
-alter table tenants drop required_data;
+alter table tenants drop COLUMN required_data;

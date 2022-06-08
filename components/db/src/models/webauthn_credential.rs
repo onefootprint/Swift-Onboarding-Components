@@ -5,7 +5,7 @@ use crate::{
 };
 use chrono::NaiveDateTime;
 use diesel::{Insertable, PgConnection, QueryDsl, Queryable, RunQueryDsl};
-use newtypes::UserVaultId;
+use newtypes::{AttestationType, UserVaultId};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
@@ -21,6 +21,10 @@ pub struct WebauthnCredential {
 
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
+
+    pub backup_eligible: bool,
+    pub attestation_type: AttestationType,
+    pub insight_event_id: Option<Uuid>,
 }
 
 impl WebauthnCredential {
@@ -42,6 +46,9 @@ pub struct NewWebauthnCredential {
     pub credential_id: Vec<u8>,
     pub public_key: Vec<u8>,
     pub attestation_data: Vec<u8>,
+    pub backup_eligible: bool,
+    pub attestation_type: AttestationType,
+    pub insight_event_id: Uuid,
 }
 
 impl NewWebauthnCredential {

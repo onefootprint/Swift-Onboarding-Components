@@ -28,14 +28,18 @@ pub struct EciesP256Sha256AesGcmSealed {
     ciphertext_and_tag: Vec<u8>,
 }
 
-impl EciesP256Sha256AesGcmSealed {
-    /// Protocol Version
-    pub const VERSION: u8 = 1;
+impl FromStr for EciesP256Sha256AesGcmSealed {
+    type Err = crate::Error;
 
-    pub fn from_str(input: &str) -> Result<Self, crate::Error> {
+    fn from_str(input: &str) -> Result<Self, crate::Error> {
         let base64data = Base64Data::from_str(input)?;
         Ok(serde_cbor::from_slice(base64data.as_ref())?)
     }
+}
+
+impl EciesP256Sha256AesGcmSealed {
+    /// Protocol Version
+    pub const VERSION: u8 = 1;
 
     pub fn to_string(&self) -> Result<String, crate::Error> {
         let encoded = serde_cbor::to_vec(&self)?;
@@ -148,8 +152,7 @@ pub mod unseal {
 
         // ecdh
         let shared_key = {
-            let pre_shared =
-                diffie_hellman(private_key.to_nonzero_scalar(), peer_public_key.as_affine());
+            let pre_shared = diffie_hellman(private_key.to_nonzero_scalar(), peer_public_key.as_affine());
             x963_kdf_sha256_32(pre_shared.as_bytes(), &ephemeral_public_key)
         };
 
@@ -189,13 +192,11 @@ mod tests {
         dbg!(pk_hex);
 
         let message = b"hello world";
-        let sealed =
-            seal::seal_ecies_p256_x963_sha256_aes_gcm(pk.as_bytes(), message.to_vec()).unwrap();
+        let sealed = seal::seal_ecies_p256_x963_sha256_aes_gcm(pk.as_bytes(), message.to_vec()).unwrap();
 
         dbg!(sealed.ephemeral_public_key.len());
         dbg!(sealed.to_string().unwrap());
-        let unsealed =
-            unseal::unseal_ecies_p256_x963_sha256_aes_gcm(&sk.to_be_bytes(), sealed).unwrap();
+        let unsealed = unseal::unseal_ecies_p256_x963_sha256_aes_gcm(&sk.to_be_bytes(), sealed).unwrap();
 
         assert_eq!(unsealed.0, message.to_vec());
     }
@@ -205,8 +206,7 @@ mod tests {
         let sealed = "pGF2AWNlcGuYQQQYwRjJGJ4YGxjmAxiBGJcY6hg9GJwY7A4YlhiZGJAYfBiQGNkYIhhxGO0Y9xj4GPIY_xg5Bxh_GPYYvxhwGD0YlxgxABjqABj2GG8RGPoYyxi2GMoGGIcYfRiLGF8GGN4YwhizGDIYyRgxGD8YvRijGDAYRxhnGJFiaXaMGK8Y_BiAFBi0GOUYMhi3GE4YYRigGD9hY5gbGOAYtRiZGIoYJBj6GIIAGIcY2hg_GJwYshjQDBgdGFEYpRiVGJEYgBi6GLMYqhjgGEUC";
 
         let _pk = hex::decode("0460f81c63e9bb142cc75091bf44ae979e707e0928785c84e4f936ca3e680d3c6029eb2844268aa117349277abf0c60c03dc6f1ae80530857f8438865ff5166321").unwrap();
-        let sk = hex::decode("fb9bd259890df88650a797e04e812fe5a6c60ce0377f293781ac407e6ffb90b1")
-            .unwrap();
+        let sk = hex::decode("fb9bd259890df88650a797e04e812fe5a6c60ce0377f293781ac407e6ffb90b1").unwrap();
 
         let unsealed = unseal::unseal_ecies_p256_x963_sha256_aes_gcm(
             &sk,

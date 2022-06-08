@@ -1,4 +1,5 @@
 pub mod challenge;
+#[allow(clippy::module_inception)]
 pub mod identify;
 pub mod verify;
 
@@ -9,6 +10,7 @@ use chrono::{Duration, Utc};
 use crypto::sha256;
 use newtypes::UserVaultId;
 use paperclip::actix::{web, Apiv2Schema};
+use webauthn_rs_core::proto::AuthenticationState;
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
 #[serde(rename_all = "snake_case")]
@@ -32,7 +34,7 @@ pub struct PhoneChallengeState {
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct BiometricChallengeState {
-    pub state: webauthn_rs::AuthenticationState,
+    pub state: AuthenticationState,
     pub user_vault_id: UserVaultId,
 }
 

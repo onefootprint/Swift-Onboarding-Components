@@ -42,7 +42,7 @@ struct UserPatchRequest {
 }
 
 impl UserPatchRequest {
-    fn to_vec(self) -> Vec<(DataKind, String)> {
+    fn into_vec(self) -> Vec<(DataKind, String)> {
         let Self {
             first_name,
             last_name,
@@ -88,7 +88,7 @@ async fn handler(
     let _ = update(
         user_auth.data.clone(),
         &state,
-        request.into_inner().to_vec().into_iter().collect(),
+        request.into_inner().into_vec().into_iter().collect(),
         user_auth.user_vault(&state.db_pool).await?,
     )
     .await?;
@@ -118,7 +118,7 @@ pub async fn update<C: UserVaultPermissions>(
         let data_str = clean_for_storage(data_kind, data_str);
         let sh_data = if data_kind.is_fingerprintable() {
             let cleaned_data = clean_for_fingerprint(data_str.clone());
-            Some(crate::utils::crypto::signed_hash(&state, cleaned_data).await?)
+            Some(crate::utils::crypto::signed_hash(state, cleaned_data).await?)
         } else {
             None
         };
@@ -141,7 +141,7 @@ pub async fn update<C: UserVaultPermissions>(
     // If we're updating the email address, send an async challenge to the new email address
     if let Some(email) = email {
         let cleaned_email = clean_email(email.to_owned());
-        send_email_challenge(&state, user_vault.public_key.clone(), cleaned_email).await?;
+        send_email_challenge(state, user_vault.public_key.clone(), cleaned_email).await?;
     }
     Ok(())
 }

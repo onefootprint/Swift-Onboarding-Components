@@ -51,7 +51,7 @@ impl Either<SessionContext<D2pSession>, SessionContext<OnboardingSession>> {
     pub fn is_valid_biometric_session(&self) -> bool {
         match self {
             Either::Left(s) => matches!(s.data.status, D2pSessionStatus::InProgress),
-            Either::Right(s) => true,
+            Either::Right(_) => true,
         }
     }
 
