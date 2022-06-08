@@ -30,7 +30,7 @@ const QRRegister = () => {
           send({
             type: Events.scopedAuthTokenGenerated,
             payload: {
-              scopedAuthToken,
+              scopedAuthToken: scopedToken,
             },
           });
         },

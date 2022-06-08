@@ -51,6 +51,9 @@ const createLivenessRegisterMachine = (
         },
         [States.qrRegister]: {
           on: {
+            [Events.scopedAuthTokenGenerated]: {
+              actions: [Actions.assignScopedAuthToken],
+            },
             [Events.qrCodeLinkSentViaSms]: {
               target: States.qrCodeSent,
             },
