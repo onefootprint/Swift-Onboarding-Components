@@ -38,7 +38,6 @@ const createLivenessRegisterMachine = (
             },
             {
               target: States.qrRegister,
-              cond: context => context.device.type !== 'mobile',
             },
           ],
         },
