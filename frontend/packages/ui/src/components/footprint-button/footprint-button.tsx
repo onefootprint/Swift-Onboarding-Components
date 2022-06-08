@@ -23,7 +23,7 @@ const FootprintButton = ({
     type={type}
     variant="primary"
   >
-    <StyledIcoFootprint color="senary" />
+    <StyledIcoFootprint color="septenary" />
     Verify with Footprint
   </Button>
 );

@@ -14,16 +14,18 @@ const Root = () => {
   return (
     <Container>
       <Inner>
-        <Typography
-          color="accent"
-          variant="heading-1"
-          sx={{ marginBottom: 10 }}
-        >
-          ACME BANK
-        </Typography>
+        <Box sx={{ marginBottom: 10 }}>
+          <Image
+            src="/logo-acme-bank.png"
+            width={187}
+            height={40}
+            layout="fixed"
+            priority
+          />
+        </Box>
         <Box sx={{ marginBottom: 9 }}>
           <Image
-            src="/logo.png"
+            src="/puzzle.gif"
             width={332}
             height={249}
             layout="fixed"

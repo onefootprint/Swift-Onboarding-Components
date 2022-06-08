@@ -1,6 +1,9 @@
 /**
  * THIS IS AN AUTO-GENERATED FILE, DO NOT EDIT MANUALLY
  */
+import IcoAppleColored16 from '../ico/ico-apple-colored-16';
+import IcoAppleColored24 from '../ico/ico-apple-colored-24';
+import IcoAppleColored40 from '../ico/ico-apple-colored-40';
 import IcoArrowDown16 from '../ico/ico-arrow-down-16';
 import IcoArrowDown24 from '../ico/ico-arrow-down-24';
 import IcoArrowLeftSmall16 from '../ico/ico-arrow-left-small-16';
@@ -34,6 +37,8 @@ import IcoClipboard16 from '../ico/ico-clipboard-16';
 import IcoClipboard24 from '../ico/ico-clipboard-24';
 import IcoClose16 from '../ico/ico-close-16';
 import IcoClose24 from '../ico/ico-close-24';
+import IcoCloseSmall16 from '../ico/ico-close-small-16';
+import IcoCloseSmall24 from '../ico/ico-close-small-24';
 import IcoCode16 from '../ico/ico-code-16';
 import IcoCode24 from '../ico/ico-code-24';
 import IcoCrosshair16 from '../ico/ico-crosshair-16';
@@ -54,6 +59,8 @@ import IcoFootprint16 from '../ico/ico-footprint-16';
 import IcoFootprint24 from '../ico/ico-footprint-24';
 import IcoGoogleColored16 from '../ico/ico-google-colored-16';
 import IcoGoogleColored24 from '../ico/ico-google-colored-24';
+import IcoInfo16 from '../ico/ico-info-16';
+import IcoInfo24 from '../ico/ico-info-24';
 import IcoLock16 from '../ico/ico-lock-16';
 import IcoLock24 from '../ico/ico-lock-24';
 import IcoLogOut16 from '../ico/ico-log-out-16';
@@ -67,6 +74,8 @@ import IcoPlusSmall24 from '../ico/ico-plus-small-24';
 import IcoQuote40 from '../ico/ico-quote-40';
 import IcoSearch16 from '../ico/ico-search-16';
 import IcoSearch24 from '../ico/ico-search-24';
+import IcoSearchSmall16 from '../ico/ico-search-small-16';
+import IcoSearchSmall24 from '../ico/ico-search-small-24';
 import IcoSettings16 from '../ico/ico-settings-16';
 import IcoSettings24 from '../ico/ico-settings-24';
 import IcoShield16 from '../ico/ico-shield-16';
@@ -81,6 +90,7 @@ import IcoUsers16 from '../ico/ico-users-16';
 import IcoUsers24 from '../ico/ico-users-24';
 
 export default {
+  IcoAppleColored16,
   IcoArrowDown16,
   IcoArrowLeftSmall16,
   IcoArrowRightSmall16,
@@ -97,6 +107,7 @@ export default {
   IcoChevronRight16,
   IcoClipboard16,
   IcoClose16,
+  IcoCloseSmall16,
   IcoCode16,
   IcoCrosshair16,
   IcoDatabase16,
@@ -107,18 +118,21 @@ export default {
   IcoFileText216,
   IcoFootprint16,
   IcoGoogleColored16,
+  IcoInfo16,
   IcoLock16,
   IcoLogOut16,
   IcoPhone16,
   IcoPlusBig16,
   IcoPlusSmall16,
   IcoSearch16,
+  IcoSearchSmall16,
   IcoSettings16,
   IcoShield16,
   IcoSpinner16,
   IcoUser16,
   IcoUserCircle16,
   IcoUsers16,
+  IcoAppleColored24,
   IcoArrowDown24,
   IcoArrowLeftSmall24,
   IcoArrowRightSmall24,
@@ -135,6 +149,7 @@ export default {
   IcoChevronRight24,
   IcoClipboard24,
   IcoClose24,
+  IcoCloseSmall24,
   IcoCode24,
   IcoCrosshair24,
   IcoDatabase24,
@@ -145,18 +160,21 @@ export default {
   IcoFileText24,
   IcoFootprint24,
   IcoGoogleColored24,
+  IcoInfo24,
   IcoLock24,
   IcoLogOut24,
   IcoPhone24,
   IcoPlusBig24,
   IcoPlusSmall24,
   IcoSearch24,
+  IcoSearchSmall24,
   IcoSettings24,
   IcoShield24,
   IcoSpinner24,
   IcoUser24,
   IcoUserCircle24,
   IcoUsers24,
+  IcoAppleColored40,
   IcoCheckCircle40,
   IcoQuote40,
 };
