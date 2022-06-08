@@ -6,7 +6,7 @@ import VanillaAdapter from './ui-manager/vanilla-adapter';
 const iframeUrl =
   process.env.NODE_ENV === 'development'
     ? 'http://localhost:3000'
-    : 'bifrost.ui.footprint.dev';
+    : 'https://bifrost.ui.footprint.dev';
 
 const postmateAdapter = new PostmateAdapter(iframeUrl);
 const footprint = new Footprint(new VanillaAdapter(postmateAdapter));
