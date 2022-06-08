@@ -25,7 +25,6 @@ const Onboarding = () => {
     [States.basicInformation]: BasicInformation,
     [States.residentialAddress]: ResidentialAddress,
     [States.ssn]: SSN,
-    [States.livenessRegister]: LivenessRegister,
   };
   if (has(pages, valueCasted)) {
     const Page = pages[valueCasted];

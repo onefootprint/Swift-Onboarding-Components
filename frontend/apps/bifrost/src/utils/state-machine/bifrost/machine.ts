@@ -58,6 +58,70 @@ const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
               Actions.assignUserFound,
             ],
           },
+          [Events.biometricLoginSucceeded]: [
+            {
+              target: States.onboarding,
+              actions: [
+                Actions.assignAuthToken,
+                Actions.assignEmail,
+                Actions.assignUserFound,
+                Actions.assignMissingAttributes,
+                Actions.assignMissingWebauthnCredentials,
+              ],
+              cond: (context, event) =>
+                event.payload.missingAttributes.length > 0 ||
+                event.payload.missingWebauthnCredentials ||
+                !event.payload.userFound,
+            },
+            {
+              target: States.verificationSuccess,
+              actions: [
+                Actions.assignAuthToken,
+                Actions.assignEmail,
+                Actions.assignUserFound,
+                Actions.assignMissingAttributes,
+                Actions.assignMissingWebauthnCredentials,
+              ],
+            },
+          ],
+          [Events.biometricLoginFailed]: {
+            target: States.biometricLoginRetry,
+            actions: [Actions.assignEmail, Actions.assignUserFound],
+          },
+        },
+      },
+      [States.biometricLoginRetry]: {
+        on: {
+          [Events.biometricLoginSucceeded]: [
+            {
+              target: States.onboarding,
+              actions: [
+                Actions.assignAuthToken,
+                Actions.assignEmail,
+                Actions.assignUserFound,
+                Actions.assignMissingAttributes,
+                Actions.assignMissingWebauthnCredentials,
+              ],
+              cond: (context, event) =>
+                event.payload.missingAttributes.length > 0 ||
+                event.payload.missingWebauthnCredentials ||
+                !event.payload.userFound,
+            },
+            {
+              target: States.verificationSuccess,
+              actions: [
+                Actions.assignAuthToken,
+                Actions.assignEmail,
+                Actions.assignUserFound,
+                Actions.assignMissingAttributes,
+                Actions.assignMissingWebauthnCredentials,
+              ],
+            },
+          ],
+          [Events.smsChallengeInitiated]: {
+            target: States.phoneVerification,
+            actions: [Actions.assignChallenge],
+          },
         },
       },
       [States.phoneRegistration]: {
@@ -101,8 +165,6 @@ const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
                 !event.payload.missingWebauthnCredentials,
             },
             {
-              description:
-                'For an existing user, show the intermediate additionalDataRequired page before the onboarding pages',
               target: States.onboarding,
               actions: [
                 Actions.assignAuthToken,
@@ -141,7 +203,9 @@ const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
       [Actions.assignEmail]: assign((context, event) => {
         if (
           (event.type === Events.userIdentifiedByEmail ||
-            event.type === Events.userNotIdentified) &&
+            event.type === Events.userNotIdentified ||
+            event.type === Events.biometricLoginFailed ||
+            event.type === Events.biometricLoginSucceeded) &&
           event.payload.email
         ) {
           context.email = event.payload.email;
@@ -176,14 +240,19 @@ const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
         if (
           event.type === Events.userIdentifiedByPhone ||
           event.type === Events.userIdentifiedByEmail ||
-          event.type === Events.userNotIdentified
+          event.type === Events.userNotIdentified ||
+          event.type === Events.biometricLoginFailed ||
+          event.type === Events.biometricLoginSucceeded
         ) {
           context.userFound = event.payload.userFound;
         }
         return context;
       }),
       [Actions.assignAuthToken]: assign((context, event) => {
-        if (event.type === Events.smsChallengeSucceeded) {
+        if (
+          event.type === Events.smsChallengeSucceeded ||
+          event.type === Events.biometricLoginSucceeded
+        ) {
           context.authToken = event.payload.authToken;
         }
         return context;
@@ -200,14 +269,19 @@ const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
       [Actions.assignChallenge]: assign((context, event) => {
         if (
           event.type === Events.userIdentifiedByEmail ||
-          event.type === Events.userIdentifiedByPhone
+          event.type === Events.userIdentifiedByPhone ||
+          event.type === Events.smsChallengeInitiated ||
+          event.type === Events.smsChallengeResent
         ) {
           context.challenge = event.payload.challengeData;
         }
         return context;
       }),
       [Actions.assignMissingAttributes]: assign((context, event) => {
-        if (event.type === Events.smsChallengeSucceeded) {
+        if (
+          event.type === Events.smsChallengeSucceeded ||
+          event.type === Events.biometricLoginSucceeded
+        ) {
           context.onboarding.missingAttributes = [
             ...event.payload.missingAttributes,
           ];
@@ -215,7 +289,10 @@ const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
         return context;
       }),
       [Actions.assignMissingWebauthnCredentials]: assign((context, event) => {
-        if (event.type === Events.smsChallengeSucceeded) {
+        if (
+          event.type === Events.smsChallengeSucceeded ||
+          event.type === Events.biometricLoginSucceeded
+        ) {
           context.onboarding.missingWebauthnCredentials =
             event.payload.missingWebauthnCredentials;
         }

@@ -1,9 +1,6 @@
 import { useMutation } from 'react-query';
 import request, { RequestError, RequestResponse } from 'request';
-import {
-  createPublicKeyCredential,
-  generateDeviceResponse,
-} from 'src/utils/biometric/challenge-response';
+import generateRegisterDeviceResponse from 'src/utils/biometric/register-challenge-response';
 
 export type BiometricRegisterRequest = {
   authToken: string;
@@ -29,11 +26,10 @@ const biometricRegister = async (payload: BiometricRegisterRequest) => {
     },
   });
 
-  const publicKeyCredential = await createPublicKeyCredential(
+  const deviceResponseJson = await generateRegisterDeviceResponse(
     initResponse.data.challengeJson,
   );
   const { challengeToken } = initResponse.data;
-  const deviceResponseJson = generateDeviceResponse(publicKeyCredential);
 
   const { data: response } = await request<
     RequestResponse<BiometricRegisterResponse>

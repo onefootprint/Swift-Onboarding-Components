@@ -6,10 +6,7 @@ import useBifrostMachine, { Events } from 'src/hooks/use-bifrost-machine';
 import useOnboarding, {
   OnboardingResponse,
 } from 'src/pages/phone-verification/hooks/use-onboarding';
-import {
-  generateDeviceResponse,
-  getPublicKeyCredential,
-} from 'src/utils/biometric/challenge-response';
+import generateLoginDeviceResponse from 'src/utils/biometric/login-challenge-response';
 import { ChallengeData, ChallengeKind } from 'src/utils/state-machine/types';
 
 const useEmailIdentify = () => {
@@ -79,8 +76,9 @@ const useEmailIdentify = () => {
     if (!biometricChallengeJson) {
       return;
     }
-    const pkCredential = await getPublicKeyCredential(biometricChallengeJson);
-    const challengeResponse = generateDeviceResponse(pkCredential);
+    const challengeResponse = await generateLoginDeviceResponse(
+      biometricChallengeJson,
+    );
     identifyVerifyMutation.mutate(
       {
         challengeKind: ChallengeKind.biometric,

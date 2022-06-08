@@ -32,7 +32,7 @@ const PhoneVerification = () => {
           send({
             type: Events.smsChallengeResent,
             payload: {
-              challenge: newChallenge,
+              challengeData: newChallenge,
             },
           });
         },

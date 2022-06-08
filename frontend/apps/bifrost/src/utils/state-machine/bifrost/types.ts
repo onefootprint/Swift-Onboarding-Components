@@ -115,7 +115,7 @@ export type BifrostEvent =
     }
   | {
       type: Events.smsChallengeResent;
-      payload: { challenge: ChallengeData };
+      payload: { challengeData: ChallengeData };
     }
   | {
       type: Events.deviceInfoIdentified;
