@@ -46,6 +46,7 @@ to enforce more constraints on WebAuthn, each app has its own port:
 | Demo            | 3002 |
 | Frontpage       | 3003 |
 | Identity Wallet | 3004 |
+| D2P Mobile      | 3005 |
 
 ### Build
 

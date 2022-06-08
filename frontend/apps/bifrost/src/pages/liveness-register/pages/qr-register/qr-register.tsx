@@ -3,6 +3,7 @@ import useD2PSms from '@src/hooks/d2p/use-d2p-sms';
 import { QRCodeSVG } from 'qrcode.react';
 import React, { useEffect, useState } from 'react';
 import HeaderTitle from 'src/components/header-title';
+import { D2P_BASE_URL } from 'src/constants';
 import useLivenessRegisterMachine from 'src/pages/liveness-register/hooks/use-liveness-register';
 import {
   Events,
@@ -69,7 +70,7 @@ const QRRegister = () => {
         <LoadingIndicator />
       ) : (
         <QRCodeContainer>
-          <QRCodeSVG value={`biometric.onefootprint.com#${scopedAuthToken}`} />
+          <QRCodeSVG value={`${D2P_BASE_URL}#${scopedAuthToken}`} />
         </QRCodeContainer>
       )}
       <Typography variant="body-4" color="tertiary">

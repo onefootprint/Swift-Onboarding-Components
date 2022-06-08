@@ -57,6 +57,9 @@ const d2pMachine = createMachine<D2PContext, D2PEvent>(
           },
         },
       },
+      [States.biometricCanceled]: {
+        type: 'final',
+      },
       [States.biometricUnavailable]: {
         type: 'final',
       },

@@ -1,10 +1,11 @@
 import React from 'react';
 import { QueryClientProvider } from 'react-query';
-import Header from 'src/components/header';
 import { createGlobalStyle } from 'styled-components';
 import themes from 'themes';
 import { Container, DesignSystemProvider } from 'ui';
 
+import Header from '../components/header';
+import MachineProvider from '../components/machine-provider';
 import configureReactI18next from '../config/initializers/react-i18next';
 import queryClient from '../config/initializers/react-query';
 import configureSentry from '../config/initializers/sentry';
@@ -19,13 +20,15 @@ type AppProps = {
 
 const App = ({ Component, pageProps }: AppProps) => (
   <QueryClientProvider client={queryClient}>
-    <DesignSystemProvider theme={themes.light}>
-      <GlobalStyle />
-      <Container>
-        <Header />
-        <Component {...pageProps} />
-      </Container>
-    </DesignSystemProvider>
+    <MachineProvider>
+      <DesignSystemProvider theme={themes.light}>
+        <GlobalStyle />
+        <Container>
+          <Header />
+          <Component {...pageProps} />
+        </Container>
+      </DesignSystemProvider>
+    </MachineProvider>
   </QueryClientProvider>
 );
 
