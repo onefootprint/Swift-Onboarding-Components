@@ -4,9 +4,9 @@ import Script from 'next/script';
 import React from 'react';
 import { QueryClientProvider } from 'react-query';
 import { GOOGLE_MAPS_KEY } from 'src/constants';
-import { createGlobalStyle } from 'styled-components';
+import styled, { css } from 'styled-components';
 import themes from 'themes';
-import { Container, DesignSystemProvider } from 'ui';
+import { DesignSystemProvider } from 'ui';
 
 import FootprintFooter from '../components/footprint-footer';
 import Header from '../components/header';
@@ -35,7 +35,6 @@ const App = ({ Component, pageProps }: AppProps) => (
       <MachineProvider>
         <FootprintProvider>
           <DesignSystemProvider theme={themes.light}>
-            <GlobalStyle />
             <Container>
               <Header />
               <Component {...pageProps} />
@@ -52,6 +51,12 @@ const App = ({ Component, pageProps }: AppProps) => (
   </>
 );
 
-const GlobalStyle = createGlobalStyle``;
+const Container = styled.div`
+  ${({ theme }) => css`
+    margin: 0 auto;
+    max-width: 500px;
+    padding-inline: ${theme.spacing[5]}px;
+  `}
+`;
 
 export default App;
