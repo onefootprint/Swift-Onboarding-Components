@@ -36,6 +36,7 @@ const QRRegister = () => {
         },
       },
     );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleSendLinkToPhone = () => {
@@ -71,7 +72,7 @@ const QRRegister = () => {
           <QRCodeSVG value={`biometric.onefootprint.com#${scopedAuthToken}`} />
         </QRCodeContainer>
       )}
-      <Typography variant="body-4" color="secondary">
+      <Typography variant="body-4" color="tertiary">
         Make sure the QR code is clearly visible on your device&apos;s screen.
         When authenticated, this page automatically updates.
       </Typography>

@@ -4,12 +4,14 @@ export enum States {
   biometricRegisterRetry = 'biometricRegisterRetry',
   biometricUnavailable = 'biometricUnavailable',
   biometricSuccess = 'biometricSuccess',
+  biometricCanceled = 'biometricCanceled',
 }
 
 export enum Events {
   deviceInfoIdentified = 'deviceInfoIdentified',
   biometricRegisterFailed = 'biometricRegisterFailed',
   biometricRegisterSucceeded = 'biometricRegisterSucceeded',
+  biometricCanceled = 'biometricCanceled',
 }
 
 export enum Actions {
@@ -35,4 +37,5 @@ export type D2PEvent =
       };
     }
   | { type: Events.biometricRegisterFailed }
-  | { type: Events.biometricRegisterSucceeded };
+  | { type: Events.biometricRegisterSucceeded }
+  | { type: Events.biometricCanceled };

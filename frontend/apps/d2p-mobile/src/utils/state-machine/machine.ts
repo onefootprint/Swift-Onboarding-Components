@@ -42,12 +42,18 @@ const d2pMachine = createMachine<D2PContext, D2PEvent>(
           [Events.biometricRegisterSucceeded]: {
             target: States.biometricSuccess,
           },
+          [Events.biometricCanceled]: {
+            target: States.biometricCanceled,
+          },
         },
       },
       [States.biometricRegisterRetry]: {
         on: {
           [Events.biometricRegisterSucceeded]: {
             target: States.biometricSuccess,
+          },
+          [Events.biometricCanceled]: {
+            target: States.biometricCanceled,
           },
         },
       },

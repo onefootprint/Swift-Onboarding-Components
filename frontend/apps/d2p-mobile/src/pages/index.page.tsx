@@ -4,6 +4,7 @@ import useD2PMobileMachine from 'src/hooks/use-d2p-mobile-machine';
 import useDeviceInfo from 'src/hooks/use-device-info';
 import { States } from 'src/utils/state-machine';
 
+import BiometricCanceled from './biometric-canceled';
 import BiometricRegister from './biometric-register';
 import BiometricRegisterRetry from './biometric-register-retry';
 import BiometricSuccess from './biometric-success';
@@ -22,6 +23,7 @@ const Root = () => {
     [States.biometricRegisterRetry]: BiometricRegisterRetry,
     [States.biometricUnavailable]: BiometricUnavailable,
     [States.biometricSuccess]: BiometricSuccess,
+    [States.biometricCanceled]: BiometricCanceled,
   };
   if (has(pages, valueCasted)) {
     const Page = pages[valueCasted];
