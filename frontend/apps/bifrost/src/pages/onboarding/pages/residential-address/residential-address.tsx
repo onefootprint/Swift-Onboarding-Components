@@ -1,11 +1,20 @@
+import { DEFAULT_COUNTRY, STATES } from 'global-constants';
 import { useTranslation } from 'hooks';
 import React from 'react';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import HeaderTitle from 'src/components/header-title';
 import { Events } from 'src/utils/state-machine/onboarding';
 import { UserData, UserDataAttribute } from 'src/utils/state-machine/types';
 import styled, { css } from 'styled-components';
-import { AddressInput, Button, Grid, Select, TextInput } from 'ui';
+import {
+  AddressInput,
+  Button,
+  CountrySelect,
+  CountrySelectOption,
+  Grid,
+  Select,
+  TextInput,
+} from 'ui';
 
 import useOnboardingMachine from '../../hooks/use-onboarding-machine';
 import useSyncData from '../../hooks/use-sync-data';
@@ -27,10 +36,19 @@ const ResidentialAddress = () => {
   const syncDataMutation = useSyncData();
   const { t } = useTranslation('pages.registration.residential-address');
   const {
+    control,
     register,
     handleSubmit,
+    resetField,
     formState: { errors },
-  } = useForm<FormData>();
+    watch,
+  } = useForm<FormData>({
+    defaultValues: {
+      [UserDataAttribute.country]: DEFAULT_COUNTRY.value,
+    },
+  });
+  const country = watch('country');
+  const shouldDisplayStateSelect = country === DEFAULT_COUNTRY.value;
 
   const onSubmit = (formData: FormData) => {
     const residentialAddress = {
@@ -38,8 +56,8 @@ const ResidentialAddress = () => {
       streetAddress2: formData.streetAddress2,
       city: formData.city,
       zip: formData.zip,
-      country: 'United States', // formData.country,
-      state: 'CA', // formData.state,
+      country: formData.country,
+      state: formData.state,
     };
     send({
       type: Events.residentialAddressSubmitted,
@@ -53,11 +71,20 @@ const ResidentialAddress = () => {
   return (
     <Form onSubmit={handleSubmit(onSubmit)}>
       <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
-      <Select
-        label={t('form.country.label')}
-        onSelect={() => {}}
-        options={[{ label: 'United States', value: 'US' }]}
-        placeholder={t('form.country.placeholder')}
+      <Controller
+        control={control}
+        name={UserDataAttribute.country}
+        render={({ field: { onChange, value } }) => (
+          <CountrySelect
+            label={t('form.country.label')}
+            onChange={(nextSelectedOption: CountrySelectOption | null) => {
+              resetField(UserDataAttribute.state);
+              onChange(nextSelectedOption?.value);
+            }}
+            placeholder={t('form.country.placeholder')}
+            value={value}
+          />
+        )}
       />
       <AddressInput
         hasError={!!errors.streetAddress}
@@ -91,12 +118,31 @@ const ResidentialAddress = () => {
           />
         </Grid.Column>
       </Grid.Row>
-      <Select
-        label={t('form.state.label')}
-        onSelect={() => {}}
-        options={[{ label: 'California', value: 'CA' }]}
-        placeholder={t('form.state.placeholder')}
-      />
+      {shouldDisplayStateSelect ? (
+        <Controller
+          control={control}
+          name={UserDataAttribute.state}
+          render={({ field: { value, onChange } }) => (
+            <Select
+              label={t('form.state.label')}
+              onChange={nextSelectedOption => {
+                onChange(nextSelectedOption?.value);
+              }}
+              options={STATES}
+              placeholder={t('form.state.placeholder')}
+              value={value}
+            />
+          )}
+        />
+      ) : (
+        <TextInput
+          hasError={!!errors.state}
+          hintText={errors.state && t('form.state.error')}
+          label={t('form.state.label')}
+          placeholder={t('form.state.placeholder')}
+          {...register(UserDataAttribute.state)}
+        />
+      )}
       <Button type="submit" fullWidth>
         {t('form.cta')}
       </Button>

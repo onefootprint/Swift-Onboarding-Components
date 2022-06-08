@@ -983,4 +983,6 @@ export const COUNTRIES: { value: CountryCode; label: string }[] = [
   },
 ];
 
+export const [DEFAULT_COUNTRY] = COUNTRIES;
+
 export const BANNED_COUNTRIES = [];

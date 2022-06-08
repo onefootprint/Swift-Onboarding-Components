@@ -23,13 +23,17 @@ const DropdownContainer = styled.div<{ withPaddingTop: boolean }>`
     `}
 `;
 
-const Dropdown = styled.ul`
+const ListContainer = styled.div`
   ${({ theme }) => css`
-    border-bottom-left-radius: ${theme.borderRadius[1]}px;
-    border-bottom-right-radius: ${theme.borderRadius[1]}px;
+    border-radius: ${theme.borderRadius[1]}px;
     max-height: 180px;
     overflow: auto;
   `}
+`;
+
+const List = styled.ul`
+  position: relative;
+  width: 100%;
 `;
 
 const EmptyState = styled.div`
@@ -76,7 +80,8 @@ const DefaultOption = styled('li')<{
 export default {
   Container,
   DropdownContainer,
-  Dropdown,
+  List,
+  ListContainer,
   EmptyState,
   DefaultOption,
 };

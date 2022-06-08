@@ -12,7 +12,7 @@ const UsersFilter = () => {
   const { query, setFilter } = useFilters();
   const [selectedOption, setSelectedOption] = useState<
     SelectOption | null | undefined
-  >(undefined);
+  >();
   const [showModal, setShowModal] = useState(false);
 
   // Any time the modal is opened, recompute what the currently displayed status should be based
@@ -65,8 +65,8 @@ const UsersFilter = () => {
               { label: 'Processing', value: OnboardingStatus.processing },
               { label: 'Failed', value: OnboardingStatus.failed },
             ]}
-            selectedOption={selectedOption}
-            onSelect={option => {
+            value={selectedOption ? selectedOption.value : null}
+            onChange={option => {
               setSelectedOption(option);
             }}
           />

@@ -58,7 +58,7 @@ export default {
       required: false,
       table: { defaultValue: { summary: 'Select' } },
     },
-    selectedOption: {
+    value: {
       control: 'object',
       description: 'Selected option',
       required: false,
@@ -72,7 +72,7 @@ export default {
       description: 'Event when the search text changes',
       required: false,
     },
-    onSelect: {
+    onChange: {
       description: 'Event called after selecting an option',
       required: true,
     },
@@ -88,7 +88,7 @@ const Template: Story<CountrySelectProps> = ({
   id,
   label,
   onSearchChangeText,
-  onSelect,
+  onChange,
   placeholder,
   searchPlaceholder,
   testID,
@@ -97,9 +97,11 @@ const Template: Story<CountrySelectProps> = ({
     CountrySelectOption | null | undefined
   >(null);
 
-  const handleSelect = (nextOption?: CountrySelectOption | null) => {
+  const handleSelect = (nextOption: CountrySelectOption | null) => {
     setSelectedOption(nextOption);
-    onSelect(nextOption);
+    if (onChange) {
+      onChange(nextOption);
+    }
   };
 
   return (
@@ -112,10 +114,10 @@ const Template: Story<CountrySelectProps> = ({
       id={id}
       label={label}
       onSearchChangeText={onSearchChangeText}
-      onSelect={handleSelect}
+      onChange={handleSelect}
       placeholder={placeholder}
       searchPlaceholder={searchPlaceholder}
-      selectedOption={selectedOption}
+      value={selectedOption ? selectedOption.value : null}
       testID={testID}
     />
   );
@@ -131,9 +133,9 @@ Base.args = {
   id: 'select-field',
   label: 'Country',
   onSearchChangeText: console.log,
-  onSelect: console.log,
+  onChange: console.log,
   placeholder: 'Select...',
   searchPlaceholder: 'Search',
-  selectedOption: null,
+  value: null,
   testID: 'select-test-id',
 };

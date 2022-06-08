@@ -27,12 +27,12 @@ describe('<Select />', () => {
     id = 'some id',
     label = 'label text',
     onSearchChangeText,
-    onSelect = jest.fn(),
+    onChange = jest.fn(),
     options = defaultOptions,
     placeholder = 'Select...',
     renderOption,
     searchPlaceholder,
-    selectedOption,
+    value,
     testID = 'select-test-id',
   }: Partial<SelectProps>) =>
     customRender(
@@ -45,12 +45,12 @@ describe('<Select />', () => {
         id={id}
         label={label}
         onSearchChangeText={onSearchChangeText}
-        onSelect={onSelect}
+        onChange={onChange}
         options={options}
         placeholder={placeholder}
         renderOption={renderOption}
         searchPlaceholder={searchPlaceholder}
-        selectedOption={selectedOption}
+        value={value}
         testID={testID}
       />,
     );
@@ -91,7 +91,7 @@ describe('<Select />', () => {
       renderSelect({
         placeholder: 'placeholder',
         options,
-        selectedOption,
+        value: selectedOption.value,
       });
       expect(screen.queryByText('placeholder')).toBeNull();
     });
@@ -102,7 +102,7 @@ describe('<Select />', () => {
         { value: 'bar', label: 'bar' },
       ];
       const [selectedOption] = options;
-      renderSelect({ options, selectedOption });
+      renderSelect({ options, value: selectedOption.value });
       expect(screen.getByText(selectedOption.label)).toBeInTheDocument();
     });
 
@@ -112,7 +112,7 @@ describe('<Select />', () => {
         { value: 'bar', label: 'bar' },
       ];
       const [selectedOption] = options;
-      renderSelect({ options, selectedOption });
+      renderSelect({ options, value: selectedOption.value });
       const trigger = screen.getByText(selectedOption.label);
       await userEvent.click(trigger);
       const listOption = screen.getByRole('option', {
@@ -137,20 +137,20 @@ describe('<Select />', () => {
   });
 
   describe('when selecting an option', () => {
-    it('should trigger onSelect with the selected option', async () => {
-      const onSelectMockFn = jest.fn();
+    it('should trigger onChange with the selected option', async () => {
+      const onChangeMockFn = jest.fn();
       const options = [
         { value: 'foo', label: 'foo' },
         { value: 'bar', label: 'bar' },
       ];
       renderSelect({
         options,
-        onSelect: onSelectMockFn,
+        onChange: onChangeMockFn,
       });
       await userEvent.click(screen.getByText('Select...'));
       const [firstOption] = options;
       await userEvent.click(screen.getByText(firstOption.label));
-      expect(onSelectMockFn).toHaveBeenCalledWith(firstOption);
+      expect(onChangeMockFn).toHaveBeenCalledWith(firstOption);
     });
   });
 

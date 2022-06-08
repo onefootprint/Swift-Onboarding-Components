@@ -22,7 +22,7 @@ const Template: Story<SelectProps> = ({
   id,
   label,
   onSearchChangeText,
-  onSelect,
+  onChange,
   options = defaultOptions,
   placeholder,
   searchPlaceholder,
@@ -32,9 +32,11 @@ const Template: Story<SelectProps> = ({
     SelectOption | null | undefined
   >(null);
 
-  const handleSelect = (nextOption?: SelectOption | null) => {
-    setSelectedOption(nextOption);
-    onSelect(nextOption);
+  const handleSelect = (nextSelectedOption: SelectOption | null) => {
+    setSelectedOption(nextSelectedOption);
+    if (onChange) {
+      onChange(nextSelectedOption);
+    }
   };
 
   return (
@@ -75,11 +77,11 @@ const Template: Story<SelectProps> = ({
           id={id}
           label={label}
           onSearchChangeText={onSearchChangeText}
-          onSelect={handleSelect}
+          onChange={handleSelect}
           options={options}
           placeholder={placeholder}
           searchPlaceholder={searchPlaceholder}
-          selectedOption={selectedOption}
+          value={selectedOption ? selectedOption.value : null}
           testID={testID}
         />
       </Box>
@@ -100,11 +102,11 @@ Base.args = {
   id: 'select-field',
   label: 'State',
   onSearchChangeText: console.log,
-  onSelect: console.log,
+  onChange: console.log,
   options: defaultOptions,
   placeholder: 'Select...',
   searchPlaceholder: 'Search',
-  selectedOption: null,
+  value: null,
   testID: 'select-test-id',
 };
 
@@ -118,7 +120,7 @@ WithoutSearch.args = {
   id: 'select-field',
   label: 'Initial',
   onSearchChangeText: console.log,
-  onSelect: console.log,
+  onChange: console.log,
   options: [
     { value: 'Option 1', label: 'Option 1' },
     { value: 'Option 2', label: 'Option 2' },
@@ -129,6 +131,6 @@ WithoutSearch.args = {
   ],
   placeholder: 'Select...',
   searchPlaceholder: 'Search',
-  selectedOption: null,
+  value: null,
   testID: 'select-test-id',
 };

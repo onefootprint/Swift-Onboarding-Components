@@ -1,3 +1,4 @@
+import { Properties } from 'csstype';
 import IcoCheck16 from 'icons/ico/ico-check-16';
 import React, { memo } from 'react';
 import Highlighter from 'react-highlight-words';
@@ -15,9 +16,10 @@ export type DefaultOptionProps = {
   onClick?: React.MouseEventHandler<HTMLElement>;
   onMouseDown?: React.MouseEventHandler<HTMLElement>;
   onMouseMove?: React.MouseEventHandler<HTMLElement>;
+  prefixComponent?: React.ReactNode;
   searchWords: string[];
   selected: boolean;
-  prefixComponent?: React.ReactNode;
+  style?: Properties;
 };
 
 const DefaultOption = ({
@@ -30,6 +32,7 @@ const DefaultOption = ({
   searchWords,
   selected,
   prefixComponent: PrefixComponent,
+  style,
 }: DefaultOptionProps) => {
   const theme = useTheme();
   return (
@@ -41,6 +44,7 @@ const DefaultOption = ({
       onMouseDown={onMouseDown}
       onMouseMove={onMouseMove}
       role="option"
+      style={style}
     >
       <Content>
         {PrefixComponent}
@@ -73,8 +77,12 @@ const Container = styled('li')<{
     cursor: pointer;
     display: flex;
     justify-content: space-between;
+    left: 0;
     margin-bottom: ${theme.spacing[2]}px;
     padding: ${theme.spacing[3]}px ${theme.spacing[5]}px;
+    position: absolute;
+    top: 0;
+    width: 100%;
   `}
 
   ${({ disableHoverStyles }) =>

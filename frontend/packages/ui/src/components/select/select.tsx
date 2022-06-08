@@ -1,7 +1,10 @@
 /* eslint-disable react/jsx-props-no-spreading */
+import { useVirtualizer } from '@tanstack/react-virtual';
+import { Properties } from 'csstype';
 import Downshift from 'downshift';
+import noop from 'lodash/noop';
 import unary from 'lodash/unary';
-import React, { Fragment, useMemo, useState } from 'react';
+import React, { Fragment, useCallback, useMemo, useRef, useState } from 'react';
 
 import DefaultOption from '../internal/default-option';
 import Hint from '../internal/hint';
@@ -12,7 +15,7 @@ import usePopper from './hooks/use-popper';
 import MIN_NUMBER_OF_OPTIONS_TO_SHOW_SEARCH from './select.constants';
 import S from './select.styles';
 import type { SelectOption } from './select.types';
-import filterValues from './select.utils';
+import { filterValues, getItem } from './select.utils';
 
 export type SelectProps<Option extends SelectOption = SelectOption> = {
   disabled?: boolean;
@@ -22,8 +25,8 @@ export type SelectProps<Option extends SelectOption = SelectOption> = {
   hintText?: string;
   id?: string;
   label: string;
+  onChange?: (option: Option | null) => void;
   onSearchChangeText?: (nextValue: string) => void;
-  onSelect: (option?: Option | null) => void;
   options: Option[];
   placeholder?: string;
   renderOption?: (option: {
@@ -35,10 +38,11 @@ export type SelectProps<Option extends SelectOption = SelectOption> = {
     onMouseMove: React.MouseEventHandler<HTMLLIElement>;
     searchWords: string[];
     selected: boolean;
+    style?: Properties;
     value: Option['value'];
   }) => React.ReactNode;
   searchPlaceholder?: string;
-  selectedOption?: Option | null;
+  value?: string | number | null;
   testID?: string;
 };
 
@@ -51,11 +55,11 @@ const Select = <T extends SelectOption = SelectOption>({
   id: baseID,
   label,
   onSearchChangeText,
-  onSelect,
+  onChange = noop,
   options,
   placeholder = 'Select',
   searchPlaceholder = 'Search',
-  selectedOption,
+  value = null,
   testID,
   renderOption = option => (
     <DefaultOption
@@ -67,12 +71,14 @@ const Select = <T extends SelectOption = SelectOption>({
       onMouseMove={option.onMouseMove}
       searchWords={option.searchWords}
       selected={option.selected}
+      style={option.style}
     />
   ),
 }: SelectProps<T>) => {
   // TODO: Migrate to useId once we migrate to react 18
   // https://github.com/onefootprint/frontend-monorepo/issues/61
   const id = baseID || `input-${label || placeholder}`;
+  const parentRef = useRef<HTMLDivElement>(null);
   const { setReferenceElement, setPopperElement, popper } = usePopper();
   const [searchValue, setSearchValue] = useState('');
   const searchWords = useMemo(() => searchValue.split(' '), [searchValue]);
@@ -83,6 +89,13 @@ const Select = <T extends SelectOption = SelectOption>({
   const shouldShowEmptyState = filteredOptions.length === 0;
   const shouldShowTheSearch =
     options.length >= MIN_NUMBER_OF_OPTIONS_TO_SHOW_SEARCH;
+  const selectedItem = useMemo(() => getItem(options, value), [options, value]);
+  const rowVirtualizer = useVirtualizer({
+    count: filteredOptions.length,
+    getScrollElement: () => parentRef.current,
+    estimateSize: useCallback(() => 36, []),
+    overscan: 6,
+  });
 
   const handleSearchChangeText = (nextValue: string) => {
     setSearchValue(nextValue);
@@ -91,13 +104,9 @@ const Select = <T extends SelectOption = SelectOption>({
 
   return (
     <Downshift
-      // This is necessary because of the type getItemProps, which doesn't account for the
-      // constraint we have defined on our generic type.
-      // It won't produce any side effects, given the rest is protected
-      selectedItem={selectedOption as any}
+      selectedItem={selectedItem as any}
       itemToString={item => (item ? item.label : '')}
-      onSelect={unary(onSelect)}
-      inputValue={searchValue}
+      onChange={unary(onChange)}
     >
       {({
         getLabelProps,
@@ -116,7 +125,7 @@ const Select = <T extends SelectOption = SelectOption>({
           <S.Container {...getRootProps()} data-testid={testID}>
             <Label {...getLabelProps({ htmlFor: id })}>{label}</Label>
             <TriggerButton
-              color={selectedOption ? 'primary' : 'tertiary'}
+              color={selectedItem ? 'primary' : 'tertiary'}
               disabled={disabled}
               getToggleButtonProps={getToggleButtonProps}
               hasError={hasError}
@@ -124,7 +133,7 @@ const Select = <T extends SelectOption = SelectOption>({
               isOpen={isOpen}
               ref={setReferenceElement}
             >
-              {selectedOption ? selectedOption.label : placeholder}
+              {selectedItem ? selectedItem.label : placeholder}
             </TriggerButton>
             {hintText && (
               <Hint color={hasError ? 'error' : 'tertiary'}>{hintText}</Hint>
@@ -149,37 +158,51 @@ const Select = <T extends SelectOption = SelectOption>({
                     value={searchValue}
                   />
                 )}
-                {shouldShowEmptyState && (
+                {shouldShowEmptyState ? (
                   <S.EmptyState data-testid={emptyStateTestID}>
                     {emptyStateText}
                   </S.EmptyState>
+                ) : (
+                  <S.ListContainer ref={parentRef}>
+                    <S.List
+                      aria-labelledby={menuProps['aria-labelledby']}
+                      id={menuProps.id}
+                      ref={menuProps.ref}
+                      role={menuProps.role}
+                      style={{
+                        height: rowVirtualizer.getTotalSize(),
+                      }}
+                    >
+                      {rowVirtualizer.getVirtualItems().map(virtualItem => {
+                        const option = filteredOptions[virtualItem.index];
+                        const { index } = virtualItem;
+                        const optionProps = getItemProps({
+                          item: option,
+                          index,
+                        });
+                        return (
+                          <Fragment key={virtualItem.key}>
+                            {renderOption({
+                              disableHoverStyles: highlightedIndex !== -1,
+                              highlighted: highlightedIndex === index,
+                              label: option.label,
+                              onClick: optionProps.onClick,
+                              onMouseDown: optionProps.onMouseDown,
+                              onMouseMove: optionProps.onMouseMove,
+                              searchWords,
+                              selected: value === option.value,
+                              value: option.value,
+                              style: {
+                                height: `${virtualItem.size}px`,
+                                transform: `translateY(${virtualItem.start}px)`,
+                              },
+                            })}
+                          </Fragment>
+                        );
+                      })}
+                    </S.List>
+                  </S.ListContainer>
                 )}
-                <S.Dropdown
-                  aria-labelledby={menuProps['aria-labelledby']}
-                  id={menuProps.id}
-                  ref={menuProps.ref}
-                  role={menuProps.role}
-                >
-                  {filteredOptions.map((option, index) => {
-                    const optionProps = getItemProps({ item: option, index });
-                    const valueInString = option.value.toString();
-                    return (
-                      <Fragment key={valueInString}>
-                        {renderOption({
-                          value: option.value,
-                          disableHoverStyles: highlightedIndex !== -1,
-                          highlighted: highlightedIndex === index,
-                          label: option.label,
-                          onClick: optionProps.onClick,
-                          onMouseDown: optionProps.onMouseDown,
-                          onMouseMove: optionProps.onMouseMove,
-                          searchWords,
-                          selected: selectedOption?.value === option.value,
-                        })}
-                      </Fragment>
-                    );
-                  })}
-                </S.Dropdown>
               </S.DropdownContainer>
             )}
           </S.Container>

@@ -1,6 +1,9 @@
 import type { SelectOption } from './select.types';
 
-const filterValues = (options: SelectOption[], search: string | null) => {
+export const filterValues = (
+  options: SelectOption[],
+  search: string | null,
+) => {
   if (!search) return options;
   const searchLowerCased = search.toLowerCase();
   return options.filter(
@@ -10,4 +13,10 @@ const filterValues = (options: SelectOption[], search: string | null) => {
   );
 };
 
-export default filterValues;
+export const getItem = (
+  options: SelectOption[],
+  value?: string | number | null,
+) => {
+  if (!value) return null;
+  return options.find(option => option.value === value);
+};

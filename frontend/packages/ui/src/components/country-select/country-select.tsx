@@ -7,8 +7,6 @@ import Flag from '../internal/flag';
 import Select, { SelectProps } from '../select';
 import type { CountrySelectOption } from './country-select.types';
 
-export { options };
-
 export type CountrySelectProps = Omit<
   SelectProps<CountrySelectOption>,
   'options' | 'renderOption'
@@ -23,10 +21,10 @@ const CountrySelect = ({
   id,
   label,
   onSearchChangeText,
-  onSelect,
+  onChange,
   placeholder,
   searchPlaceholder,
-  selectedOption,
+  value,
   testID,
 }: CountrySelectProps) => (
   <Select<CountrySelectOption>
@@ -37,13 +35,13 @@ const CountrySelect = ({
     hintText={hintText}
     id={id}
     label={label}
+    onChange={onChange}
     onSearchChangeText={onSearchChangeText}
-    onSelect={onSelect}
     options={options}
     placeholder={placeholder}
     searchPlaceholder={searchPlaceholder}
-    selectedOption={selectedOption}
     testID={testID}
+    value={value}
     renderOption={option => (
       <DefaultOption
         disableHoverStyles={option.disableHoverStyles}
@@ -55,6 +53,7 @@ const CountrySelect = ({
         prefixComponent={<StyledFlag code={option.value} />}
         searchWords={option.searchWords}
         selected={option.selected}
+        style={option.style}
       />
     )}
   />
@@ -65,5 +64,7 @@ const StyledFlag = styled(Flag)`
     margin-right: ${theme.spacing[3]}px;
   `}
 `;
+
+export { options };
 
 export default CountrySelect;

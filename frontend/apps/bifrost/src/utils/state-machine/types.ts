@@ -1,3 +1,5 @@
+import type { CountryCode } from 'types';
+
 export enum UserDataAttribute {
   firstName = 'firstName',
   lastName = 'lastName',
@@ -22,7 +24,7 @@ export type UserData = Partial<{
   [UserDataAttribute.streetAddress2]: string;
   [UserDataAttribute.city]: string;
   [UserDataAttribute.state]: string;
-  [UserDataAttribute.country]: string;
+  [UserDataAttribute.country]: CountryCode;
   [UserDataAttribute.zip]: string;
 }>;
 

@@ -1,3 +1,4 @@
+import take from 'lodash/take';
 import React from 'react';
 import { customRender, screen, userEvent } from 'test-utils';
 import themes from 'themes';
@@ -14,10 +15,10 @@ describe('<CountrySelect />', () => {
     id = 'some id',
     label = 'label text',
     onSearchChangeText,
-    onSelect = jest.fn(),
+    onChange = jest.fn(),
     placeholder = 'Select...',
     searchPlaceholder,
-    selectedOption,
+    value,
     testID = 'select-test-id',
   }: Partial<CountrySelectProps>) =>
     customRender(
@@ -30,10 +31,10 @@ describe('<CountrySelect />', () => {
         id={id}
         label={label}
         onSearchChangeText={onSearchChangeText}
-        onSelect={onSelect}
+        onChange={onChange}
         placeholder={placeholder}
         searchPlaceholder={searchPlaceholder}
-        selectedOption={selectedOption}
+        value={value}
         testID={testID}
       />,
     );
@@ -60,20 +61,20 @@ describe('<CountrySelect />', () => {
       const [selectedOption] = options;
       renderCountrySelect({
         placeholder: 'placeholder',
-        selectedOption,
+        value: selectedOption.value,
       });
       expect(screen.queryByText('placeholder')).toBeNull();
     });
 
     it('should render the label of the selected item', () => {
       const [selectedOption] = options;
-      renderCountrySelect({ selectedOption });
+      renderCountrySelect({ value: selectedOption.value });
       expect(screen.getByText(selectedOption.label)).toBeInTheDocument();
     });
 
     it('should render a check icon in the list option', async () => {
       const [selectedOption] = options;
-      renderCountrySelect({ selectedOption });
+      renderCountrySelect({ value: selectedOption.value });
       const trigger = screen.getByText(selectedOption.label);
       await userEvent.click(trigger);
       const listOption = screen.getByRole('option', {
@@ -87,22 +88,24 @@ describe('<CountrySelect />', () => {
     it('should display the list of options', async () => {
       renderCountrySelect({ placeholder: 'placeholder' });
       await userEvent.click(screen.getByText('placeholder'));
-      options.forEach(option => {
+      const firstFive = take(options, 5);
+
+      firstFive.forEach(option => {
         expect(screen.getByText(option.label)).toBeInTheDocument();
       });
     });
   });
 
   describe('when selecting an option', () => {
-    it('should trigger onSelect with the selected option', async () => {
-      const onSelectMockFn = jest.fn();
+    it('should trigger onChange with the selected option', async () => {
+      const onChangeMockFn = jest.fn();
       renderCountrySelect({
-        onSelect: onSelectMockFn,
+        onChange: onChangeMockFn,
       });
       await userEvent.click(screen.getByText('Select...'));
       const [firstOption] = options;
       await userEvent.click(screen.getByText(firstOption.label));
-      expect(onSelectMockFn).toHaveBeenCalledWith(firstOption);
+      expect(onChangeMockFn).toHaveBeenCalledWith(firstOption);
     });
   });
 
