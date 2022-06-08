@@ -1,9 +1,12 @@
 use std::collections::HashSet;
 
-use crate::tenant::TenantAuthContext;
+use crate::auth::client_secret_key::SecretTenantAuthContext;
+use crate::auth::either::Either;
+use crate::auth::session_context::SessionContext;
 use crate::types::success::ApiResponseData;
 use crate::State;
 use crate::{errors::ApiError, types::Empty};
+use newtypes::tenant::workos::WorkOsSession;
 use newtypes::DataKind;
 use paperclip::actix::{api_v2_operation, get, post, web, web::Json, Apiv2Schema};
 
@@ -19,9 +22,9 @@ struct SetDataRequest {
 fn set(
     state: web::Data<State>,
     request: Json<SetDataRequest>,
-    auth: TenantAuthContext,
+    auth: Either<SessionContext<WorkOsSession>, SecretTenantAuthContext>,
 ) -> actix_web::Result<Json<ApiResponseData<Empty>>, ApiError> {
-    let tenant = auth.tenant();
+    let tenant = auth.tenant(&state.db_pool).await?;
 
     // TODO --
     // 1. checks on minimally required data? (do we always need first + last name)
@@ -41,10 +44,10 @@ fn set(
 #[get("/required_data")]
 /// Get the attributes the tenant requires of the client (name, SSN, etc.)
 fn get(
-    _state: web::Data<State>,
-    auth: TenantAuthContext,
+    state: web::Data<State>,
+    auth: Either<SessionContext<WorkOsSession>, SecretTenantAuthContext>,
 ) -> actix_web::Result<Json<ApiResponseData<Vec<DataKind>>>, ApiError> {
-    let tenant = auth.tenant();
+    let tenant = auth.tenant(&state.db_pool).await?;
 
-    Ok(Json(ApiResponseData::ok(tenant.required_data.clone())))
+    Ok(Json(ApiResponseData::ok(tenant.required_data)))
 }

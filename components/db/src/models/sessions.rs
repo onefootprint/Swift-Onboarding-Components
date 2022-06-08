@@ -1,10 +1,10 @@
-use crate::models::session_data::SessionState;
 use crate::schema::sessions;
 use crate::DbPool;
 use chrono::NaiveDateTime;
 use crypto::{hex::ToHex, random::gen_random_alphanumeric_code};
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
+use newtypes::ServerSession;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
@@ -14,14 +14,14 @@ pub struct Session {
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
     pub expires_at: NaiveDateTime,
-    pub session_data: SessionState,
+    pub session_data: ServerSession,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
 #[table_name = "sessions"]
 pub struct NewSession {
     pub h_session_id: String,
-    pub session_data: SessionState,
+    pub session_data: ServerSession,
     pub expires_at: NaiveDateTime,
 }
 
@@ -29,13 +29,13 @@ pub struct NewSession {
 #[table_name = "sessions"]
 pub struct UpdateSession {
     pub h_session_id: String,
-    pub session_data: SessionState,
+    pub session_data: ServerSession,
 }
 
-impl SessionState {
+impl Session {
     pub async fn create(
-        self,
         pool: &DbPool,
+        session_data: ServerSession,
         expires_at: NaiveDateTime,
     ) -> Result<(Session, String), crate::DbError> {
         // create a token to identify session for future lookup
@@ -44,7 +44,7 @@ impl SessionState {
 
         let session = NewSession {
             h_session_id,
-            session_data: self,
+            session_data,
             expires_at,
         }
         .update_or_create(pool)
@@ -53,15 +53,15 @@ impl SessionState {
     }
 
     pub async fn update(
-        self,
         pool: &DbPool,
+        session_data: ServerSession,
         token: String,
     ) -> Result<(Session, String), crate::DbError> {
         let h_session_id: String = crypto::sha256(token.as_bytes()).encode_hex();
 
         let session = UpdateSession {
             h_session_id,
-            session_data: self,
+            session_data,
         }
         .update(pool)
         .await?;

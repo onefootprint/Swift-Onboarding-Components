@@ -1,10 +1,13 @@
+use self::{client_public_key::PublicTenantAuthContext, session_context::SessionContext};
 use crate::errors::ApiError;
 use db::models::onboardings::Onboarding;
-use newtypes::DataKind;
+use newtypes::user::onboarding::OnboardingSession;
 use thiserror::Error;
+
 pub mod client_public_key;
 pub mod client_secret_key;
-pub mod onboarding_session;
+pub mod either;
+pub mod session_context;
 
 #[derive(Debug, Error)]
 pub enum AuthError {
@@ -22,28 +25,23 @@ pub enum AuthError {
     SessionTypeError,
     #[error("no session found")]
     NoSessionFound,
-    #[error("missing X-Fp-Dashboard-Authorization")]
-    MissingFpDashboardHeader,
+    #[error("missing header: {0}")]
+    MissingHeader(String),
     #[error("unauthorized operation")]
     UnauthorizedOperation,
-}
-
-pub trait UserVaultPermissions {
-    fn can_decrypt(&self, data_kinds: Vec<DataKind>) -> bool;
-    fn can_modify(&self, data_kinds: Vec<DataKind>) -> bool;
 }
 
 /// For endpoints that take both a user_auth and tenant_auth, this helps to assert that the authenticated user
 /// has been onboarded to the provided tenant by fetching the Onboarding for this (user, tenant) pair.
 pub async fn get_onboarding_for_tenant(
     db_pool: &db::DbPool,
-    user_auth: &onboarding_session::OnboardingSessionContext,
-    tenant_auth: &client_public_key::PublicTenantAuthContext,
+    user_auth: &SessionContext<OnboardingSession>,
+    tenant_auth: &PublicTenantAuthContext,
 ) -> Result<Onboarding, ApiError> {
     let onboarding = db::onboarding::get(
         db_pool,
         tenant_auth.tenant().id.clone(),
-        user_auth.user_vault().id.clone(),
+        user_auth.to_owned().data.user_vault_id,
     )
     .await?
     .ok_or(ApiError::OnboardingForTenantDoesNotExist)?;

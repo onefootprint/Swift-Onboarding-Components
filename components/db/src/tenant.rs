@@ -49,10 +49,7 @@ pub async fn set_required_data(
     Ok(size)
 }
 
-pub async fn get_opt_by_workos_id(
-    pool: &Pool,
-    workos_id: String,
-) -> Result<Option<Tenant>, DbError> {
+pub async fn get_opt_by_workos_id(pool: &Pool, workos_id: String) -> Result<Option<Tenant>, DbError> {
     let conn = pool.get().await?;
 
     let tenant = conn

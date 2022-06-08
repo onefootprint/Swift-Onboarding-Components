@@ -1,4 +1,5 @@
 pub use derive_more::{Add, Display, From, FromStr, Into};
+use diesel::AsExpression;
 use paperclip::actix::Apiv2Schema;
 use serde::{Deserialize, Serialize};
 
@@ -7,6 +8,7 @@ macro_rules! define_newtype_id {
     ($name: ident, $doc: literal) => {
         #[doc = $doc]
         #[derive(
+            AsExpression,
             DieselNewType,
             Debug,
             Clone,

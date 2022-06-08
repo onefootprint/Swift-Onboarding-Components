@@ -1,5 +1,5 @@
 use crate::auth::client_public_key::PublicTenantAuthContext;
-use crate::auth::onboarding_session::OnboardingSessionContext;
+use crate::auth::session_context::SessionContext;
 use crate::errors::ApiError;
 use crate::types::success::ApiResponseData;
 use crate::utils::insight_headers::InsightHeaders;
@@ -7,6 +7,7 @@ use crate::utils::user_vault_wrapper::UserVaultWrapper;
 use crate::State;
 use db::models::onboardings::NewOnboarding;
 use db::{models::insight_event::CreateInsightEvent, webauthn_credentials::get_webauthn_creds};
+use newtypes::user::onboarding::OnboardingSession;
 use newtypes::{DataKind, Status};
 use paperclip::actix::{api_v2_operation, web, web::Json, Apiv2Schema};
 
@@ -24,24 +25,25 @@ pub struct OnboardingResponse {
 pub fn handler(
     state: web::Data<State>,
     tenant_auth: PublicTenantAuthContext,
-    user_auth: OnboardingSessionContext,
+    user_auth: SessionContext<OnboardingSession>,
     insights: InsightHeaders,
 ) -> actix_web::Result<Json<ApiResponseData<OnboardingResponse>>, ApiError> {
-    let uv = user_auth.user_vault();
+    let uv = user_auth.user_vault(&state.db_pool).await?;
+    let uv_id = user_auth.data.user_vault_id;
 
     NewOnboarding::get_or_create(
         &state.db_pool,
-        uv.id.clone(),
+        uv_id.clone(),
         tenant_auth.tenant().id.clone(),
         Status::Processing,
         CreateInsightEvent::from(insights),
     )
     .await?;
 
-    let webauthn_creds = get_webauthn_creds(&state.db_pool, uv.id.clone()).await?;
+    let webauthn_creds = get_webauthn_creds(&state.db_pool, uv_id.clone()).await?;
 
     // TODO: Tenant-scoped missing attributes
-    let uvw = UserVaultWrapper::from(&state.db_pool, uv.clone()).await?;
+    let uvw = UserVaultWrapper::from(&state.db_pool, uv).await?;
     Ok(Json(ApiResponseData {
         data: OnboardingResponse {
             missing_attributes: uvw.missing_fields(),

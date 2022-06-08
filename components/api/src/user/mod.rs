@@ -1,12 +1,8 @@
-use crate::{
-    auth::{AuthError, UserVaultPermissions},
-    errors::ApiError,
-    State,
-};
+use crate::{auth::AuthError, errors::ApiError, State};
 use crypto::seal::EciesP256Sha256AesGcmSealed;
 use db::models::user_vaults::UserVault;
 use enclave_proxy::{DataTransform, DecryptRequest};
-use newtypes::DataKind;
+use newtypes::{DataKind, UserVaultPermissions};
 use paperclip::actix::web;
 use std::collections::HashMap;
 
@@ -47,12 +43,12 @@ pub struct DecryptFieldsResult {
 }
 
 pub async fn decrypt<C: UserVaultPermissions>(
-    context: C,
+    session: C,
     state: &web::Data<State>,
     user_vault: UserVault,
     data_kinds: Vec<DataKind>,
 ) -> Result<DecryptFieldsResult, ApiError> {
-    if !context.can_decrypt(data_kinds.clone()) {
+    if !session.can_decrypt() {
         Err(AuthError::UnauthorizedOperation)?
     }
     // Filter out fields that don't have values set on the user vault

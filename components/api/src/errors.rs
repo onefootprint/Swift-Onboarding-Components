@@ -12,6 +12,7 @@ use aws_sdk_pinpointemail::{error::SendEmailError, types::SdkError as EmailSdkEr
 use aws_sdk_pinpointsmsvoicev2::{error::SendTextMessageError, types::SdkError as SmsSdkError};
 use db::errors::DbError;
 use enclave_proxy::bb8;
+use newtypes::TypeError;
 use paperclip::v2::schema::Apiv2Errors;
 use thiserror::Error;
 
@@ -89,12 +90,16 @@ pub enum ApiError {
     WorkOsError(#[from] actix_web::http::header::ToStrError),
     #[error("invalid response from WorkOS")]
     WorkOSError,
+    #[error("workos profile not associated with client")]
+    WorkOsProfileInvalid,
     #[error("no phone number for vault")]
     NoPhoneNumberForVault,
     #[error("not implemented")]
     NotImplemented,
     #[error("cannot transition status backwards")]
     InvalidStatusTransition,
+    #[error("invalid token for header")]
+    InvalidTokenForHeader,
 }
 
 fn status_code_for_db_error(e: &DbError) -> StatusCode {
@@ -157,6 +162,8 @@ impl actix_web::ResponseError for ApiError {
             ApiError::NoPhoneNumberForVault => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::NotImplemented => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::InvalidStatusTransition => StatusCode::BAD_REQUEST,
+            ApiError::InvalidTokenForHeader => StatusCode::BAD_REQUEST,
+            ApiError::WorkOsProfileInvalid => StatusCode::INTERNAL_SERVER_ERROR,
         }
     }
 

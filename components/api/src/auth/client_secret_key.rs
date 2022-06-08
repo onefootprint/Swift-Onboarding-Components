@@ -1,4 +1,4 @@
-use super::{AuthError, UserVaultPermissions};
+use super::AuthError;
 use crate::{errors::ApiError, State};
 use actix_web::{web, FromRequest};
 use db::models::tenants::Tenant;
@@ -32,18 +32,13 @@ impl FromRequest for SecretTenantAuthContext {
     type Error = crate::ApiError;
     type Future = Pin<Box<dyn Future<Output = Result<Self, Self::Error>>>>;
 
-    fn from_request(
-        req: &actix_web::HttpRequest,
-        _payload: &mut actix_web::dev::Payload,
-    ) -> Self::Future {
+    fn from_request(req: &actix_web::HttpRequest, _payload: &mut actix_web::dev::Payload) -> Self::Future {
         let static_req = req.clone();
         Box::pin(async move { from_request_inner(&static_req).await })
     }
 }
 
-pub async fn from_request_inner(
-    req: &actix_web::HttpRequest,
-) -> Result<SecretTenantAuthContext, ApiError> {
+pub async fn from_request_inner(req: &actix_web::HttpRequest) -> Result<SecretTenantAuthContext, ApiError> {
     // get the tenant header
     let tenant_pk = req
         .headers()
@@ -61,15 +56,4 @@ pub async fn from_request_inner(
         .await?
         .ok_or(AuthError::UnknownClient)?;
     Ok(SecretTenantAuthContext { tenant })
-}
-
-impl UserVaultPermissions for SecretTenantAuthContext {
-    // TODO -- scope based off of what types the tenant is authorized for
-    fn can_decrypt(&self, _data_kinds: Vec<newtypes::DataKind>) -> bool {
-        true
-    }
-
-    fn can_modify(&self, _data_kinds: Vec<newtypes::DataKind>) -> bool {
-        false
-    }
 }

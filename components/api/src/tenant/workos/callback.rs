@@ -3,8 +3,10 @@ use crate::State;
 use crate::{errors::ApiError, types::success::ApiResponseData};
 use actix_session::Session;
 use chrono::{Duration, Utc};
-use db::models::session_data::dashboard::TenantDashboardSessionData;
-use db::models::session_data::SessionState;
+use db::models::sessions::Session as DbSession;
+use db::tenant::get_opt_by_workos_id;
+use newtypes::tenant::workos::WorkOsSession;
+use newtypes::ServerSession;
 use paperclip::actix::Apiv2Schema;
 use paperclip::actix::{api_v2_operation, get, web, web::Json};
 
@@ -50,16 +52,20 @@ fn handler(
         .organization_id
         .unwrap_or_else(|| state.workos_client.default_org.clone());
 
+    // TODO change error
+    let tenant = get_opt_by_workos_id(&state.db_pool, org_id.clone())
+        .await?
+        .ok_or(ApiError::WorkOsProfileInvalid)?;
+
     // Save tenant login in session data into the DB
     let login_expires_at = Utc::now().naive_utc() + Duration::minutes(60);
-    let (_, auth_token) = SessionState::TenantDashboardSession(TenantDashboardSessionData {
+    let session_data = ServerSession::WorkOs(WorkOsSession {
         email: profile.email.clone(),
         first_name: profile.first_name.clone(),
         last_name: profile.last_name.clone(),
-        workos_id: org_id.clone(),
-    })
-    .create(&state.db_pool, login_expires_at)
-    .await?;
+        tenant_id: tenant.id,
+    });
+    let (_, auth_token) = DbSession::create(&state.db_pool, session_data, login_expires_at).await?;
 
     Ok(Json(ApiResponseData {
         data: DashboardAuthorizationResponse {

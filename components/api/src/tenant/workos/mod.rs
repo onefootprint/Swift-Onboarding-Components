@@ -8,7 +8,6 @@ use paperclip::actix::Apiv2Schema;
 pub mod callback;
 pub mod magic_auth;
 pub mod oauth;
-pub mod workos_dashboard_auth;
 
 pub fn routes() -> web::Scope {
     web::scope("/auth")
@@ -25,11 +24,7 @@ pub struct WorkOSClient {
 }
 
 impl WorkOSClient {
-    pub async fn get_profile(
-        &self,
-        client: &Client,
-        code: String,
-    ) -> Result<WorkOSProfile, ApiError> {
+    pub async fn get_profile(&self, client: &Client, code: String) -> Result<WorkOSProfile, ApiError> {
         let (client_id, client_secret) = (self.client_id.clone(), self.client_secret.clone());
         let url = format!("https://api.workos.com/sso/token?client_id={client_id}&client_secret={client_secret}&grant_type=authorization_code&code={code}");
 
@@ -60,11 +55,7 @@ impl WorkOSClient {
         Ok(session.id)
     }
 
-    pub async fn post_send_link(
-        &self,
-        client: &Client,
-        id: String,
-    ) -> Result<LinkAuthResponse, ApiError> {
+    pub async fn post_send_link(&self, client: &Client, id: String) -> Result<LinkAuthResponse, ApiError> {
         // Send link to user email
         let link_url = format!("https://api.workos.com/passwordless/sessions/{id}/send");
         let mut send_link_response = client
@@ -90,11 +81,7 @@ impl WorkOSClient {
     ) -> Result<String, ApiError> {
         let client_id = self.client_id.clone();
         let auth_url = format!("https://api.workos.com/sso/authorize?response_type=code&client_id={client_id}&redirect_uri={redirect_url}&provider={provider}");
-        let auth_response = client
-            .get(auth_url)
-            .send()
-            .await
-            .map_err(ApiError::WorkOS)?;
+        let auth_response = client.get(auth_url).send().await.map_err(ApiError::WorkOS)?;
 
         let mut header = auth_response.headers().to_owned();
 
@@ -144,16 +131,9 @@ pub struct WorkOSPasswordlessSession {
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize, Apiv2Schema)]
 #[serde(untagged)]
 pub enum LinkAuthResponse {
-    Failure {
-        message: String,
-        errors: Vec<ErrorItem>,
-    },
-    Success {
-        success: bool,
-    },
-    Message {
-        message: String,
-    },
+    Failure { message: String, errors: Vec<ErrorItem> },
+    Success { success: bool },
+    Message { message: String },
 }
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize, Apiv2Schema)]

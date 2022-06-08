@@ -1,5 +1,4 @@
 import os
-from platformdirs import user_cache_dir
 import pytest
 import random
 import requests
@@ -9,6 +8,7 @@ import requests
 TENANT_AUTH_HEADER = "x-client-public-key"
 TENANT_SECRET_HEADER = "x-client-secret-key"
 FPUSER_AUTH_HEADER = "x-fpuser-authorization"
+D2P_AUTH_HEADER = "x-d2p-authorization"
 TEST_CHALLENGE_CODE = "123456"
 WORKOS_ORG_ID = "org_01G39KR1V1E52JEZV6BYNG590J"
 DEFAULT_ATTRIBUTES = {
@@ -53,9 +53,17 @@ def _client_priv_key_headers(client_priv_key):
 def _fpuser_auth_headers(request):
     return _fpuser_auth_header_raw(request.config.cache.get("fpuser_auth_token", None))
 
+def _d2p_auth_headers(request):
+    return d2p_auth_header_raw(request.config.cache.get("d2p_auth_token", None))
+
 def _fpuser_auth_header_raw(value):
     return {
         FPUSER_AUTH_HEADER: value
+    }
+
+def _d2p_auth_header_raw(value):
+    return {
+        D2P_AUTH_HEADER: value
     }
 
 def _assert_response(response, status_code=200, msg="Incorrect status code"):
@@ -216,7 +224,7 @@ def test_d2p(request):
     print(url(path))
     r = requests.post(
         url(path),
-        headers=_fpuser_auth_header_raw(temp_auth_token),
+        headers=_d2p_auth_header_raw(temp_auth_token),
         json=dict(base_url="https://onefootprint.com/"),
     )
     _assert_response(r)
@@ -226,7 +234,7 @@ def test_d2p(request):
         print(url(path))
         r = requests.post(
             url(path),
-            headers=_fpuser_auth_header_raw(temp_auth_token),
+            headers=_d2p_auth_header_raw(temp_auth_token),
             json=dict(status=status),
         )
         _assert_response(r, status_code=status_code)
@@ -236,7 +244,7 @@ def test_d2p(request):
         print(url(path))
         r = requests.get(
             url(path),
-            headers=_fpuser_auth_header_raw(temp_auth_token),
+            headers=_d2p_auth_header_raw(temp_auth_token),
         )
         body = _assert_response(r)
         assert body["data"]["status"] == expected_status
@@ -251,7 +259,7 @@ def test_d2p(request):
     print(url(path))
     r = requests.post(
         url(path),
-        headers=_fpuser_auth_header_raw(temp_auth_token),
+        headers=_d2p_auth_header_raw(temp_auth_token)
     )
     body = _assert_response(r)
     assert body["data"]["challenge_token"]
@@ -268,7 +276,7 @@ def test_d2p(request):
     print(url(path))
     r = requests.post(
         url(path),
-        headers=_fpuser_auth_header_raw(temp_auth_token),
+        headers=_d2p_auth_header_raw(temp_auth_token),
     )
     _assert_response(r, status_code=401)
 

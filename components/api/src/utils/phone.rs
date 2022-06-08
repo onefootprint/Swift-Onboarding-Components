@@ -1,7 +1,7 @@
 use aws_sdk_pinpointsmsvoicev2::output::SendTextMessageOutput;
 use chrono::{Duration, Utc};
 use crypto::{b64::Base64Data, sha256};
-use db::models::session_data::{challenge::ChallengeLastSentData, SessionState};
+use newtypes::ServerSession;
 use paperclip::actix::web;
 
 use crate::{errors::ApiError, State};
@@ -37,9 +37,9 @@ pub(crate) async fn rate_limit(
     let time_between_challenges = Duration::seconds(state.config.time_s_between_sms_challenges);
 
     let session = db::session::get_by_h_session_id(&state.db_pool, session_key.clone()).await?;
-    if let Some(SessionState::ChallengeLastSent(data)) = session.map(|s| s.session_data) {
+    if let Some(ServerSession::ChallengeLastSent { sent_at }) = session.map(|s| s.session_data) {
         // TODO change name from ChallengeLastSent to something more generic for rate limiting
-        let time_since_last_sent = now - data.sent_at;
+        let time_since_last_sent = now - sent_at;
         if time_since_last_sent < time_between_challenges {
             let time_remaining = (time_between_challenges - time_since_last_sent).num_seconds();
             return Err(ApiError::RateLimited(time_remaining));
@@ -48,7 +48,7 @@ pub(crate) async fn rate_limit(
 
     db::models::sessions::NewSession {
         h_session_id: session_key,
-        session_data: SessionState::ChallengeLastSent(ChallengeLastSentData { sent_at: now }),
+        session_data: ServerSession::ChallengeLastSent { sent_at: now },
         expires_at: now + time_between_challenges,
     }
     .update_or_create(&state.db_pool)

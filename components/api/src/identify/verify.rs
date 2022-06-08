@@ -8,16 +8,16 @@ use crate::State;
 use aws_sdk_kms::model::DataKeyPairSpec;
 use chrono::{Duration, Utc};
 use crypto::sha256;
-use db::models::session_data::onboarding::{OnboardingSessionData, OnboardingSessionKind};
-use db::models::session_data::SessionState as DbSessionState;
+use db::models::sessions::Session;
 use db::models::user_vaults::{NewUserVaultReq, UserVault};
-use newtypes::{DataKind, Status, UserVaultId};
+use newtypes::user::onboarding::OnboardingSession;
+use newtypes::{DataKind, ServerSession, Status, UserVaultId};
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 
 use super::{BiometricChallengeState, ChallengeKind, PhoneChallengeState};
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
-struct VerifyRequest {
+pub struct VerifyRequest {
     challenge_token: ChallengeToken, // Sealed Challenge<PhoneChallengeState>
     challenge_kind: ChallengeKind,
     challenge_response: String,
@@ -25,13 +25,13 @@ struct VerifyRequest {
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Serialize)]
 #[serde(rename_all = "snake_case")]
-enum VerifyKind {
+pub enum VerifyKind {
     UserCreated,
     UserInherited,
 }
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Serialize)]
-struct VerifyResponse {
+pub struct VerifyResponse {
     kind: VerifyKind,
     auth_token: String,
 }
@@ -42,7 +42,7 @@ struct VerifyResponse {
 /// When the challenge response is verified, we will return an auth token for the user.
 /// If no user exists (which may only happen after a phone challenge), we will create a new user
 /// with the provided phone number
-async fn handler(
+pub async fn handler(
     state: web::Data<State>,
     request: Json<VerifyRequest>,
 ) -> actix_web::Result<Json<ApiResponseData<VerifyResponse>>, ApiError> {
@@ -57,12 +57,8 @@ async fn handler(
 
     // Save onboarding in session data into the DB
     let login_expires_at = Utc::now().naive_utc() + Duration::minutes(15);
-    let (_, auth_token) = DbSessionState::OnboardingSession(OnboardingSessionData {
-        user_vault_id,
-        kind: OnboardingSessionKind::Normal,
-    })
-    .create(&state.db_pool, login_expires_at)
-    .await?;
+    let session_data = ServerSession::Onboarding(OnboardingSession { user_vault_id });
+    let (_, auth_token) = Session::create(&state.db_pool, session_data, login_expires_at).await?;
 
     Ok(Json(ApiResponseData {
         data: VerifyResponse { kind, auth_token },
@@ -105,7 +101,7 @@ async fn validate_sms_challenge(
 
     // Fetch the user associated with this phone number
     let phone_number = challenge_data.data.phone_number;
-    let sh_phone_number = signed_hash(&state, phone_number.clone()).await?;
+    let sh_phone_number = signed_hash(state, phone_number.clone()).await?;
     let existing_user = db::user_vault::get_by_fingerprint(
         &state.db_pool,
         DataKind::PhoneNumber,
@@ -118,7 +114,7 @@ async fn validate_sms_challenge(
         Some(uv) => (uv.id, VerifyKind::UserInherited),
         None => {
             // The user does not exist. Create a new user vault
-            let user = create_new_user_vault(&state, phone_number.clone()).await?;
+            let user = create_new_user_vault(state, phone_number.clone()).await?;
             (user.id, VerifyKind::UserCreated)
         }
     };

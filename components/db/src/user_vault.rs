@@ -1,10 +1,8 @@
 use crate::models::onboardings::*;
-use crate::models::session_data::SessionState;
 use crate::models::user_data::NewUserData;
 use crate::models::user_vaults::*;
 use crate::onboarding::get_for_tenant;
 use crate::schema;
-use crate::session::get_session_by_id_sync;
 use crate::{errors::DbError, models::user_data::UserData};
 use deadpool_diesel::postgres::Pool;
 use diesel::prelude::*;
@@ -48,24 +46,6 @@ pub async fn get(pool: &Pool, uv_id: UserVaultId) -> Result<UserVault, DbError> 
 
     let user = conn
         .interact(move |conn| -> Result<UserVault, DbError> { get_sync(conn, uv_id) })
-        .await??;
-
-    Ok(user)
-}
-
-pub async fn get_by_onboarding_session(pool: &Pool, session_id: String) -> Result<UserVault, DbError> {
-    let conn = pool.get().await?;
-
-    let user = conn
-        .interact(move |conn| -> Result<UserVault, DbError> {
-            let session =
-                get_session_by_id_sync(conn, session_id)?.ok_or(DbError::InvalidSessionForOperation)?;
-            let logged_in_data = match session.session_data {
-                SessionState::OnboardingSession(s) => Ok(s),
-                _ => Err(DbError::InvalidSessionForOperation),
-            }?;
-            get_sync(conn, logged_in_data.user_vault_id)
-        })
         .await??;
 
     Ok(user)

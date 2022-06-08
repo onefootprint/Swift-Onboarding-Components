@@ -1,9 +1,9 @@
-use crate::auth::onboarding_session::OnboardingSessionContext;
+use crate::auth::session_context::SessionContext;
 use crate::errors::ApiError;
 use crate::types::access_event::ApiAccessEvent;
 use crate::types::success::ApiResponseData;
 use crate::State;
-use newtypes::DataKind;
+use newtypes::{user::onboarding::OnboardingSession, DataKind};
 use paperclip::actix::{api_v2_operation, get, web, web::Json, Apiv2Schema};
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize, Apiv2Schema)]
@@ -22,12 +22,13 @@ type AccessEventResponse = Vec<ApiAccessEvent>;
 fn handler(
     state: web::Data<State>,
     request: web::Query<AccessEventRequest>,
-    user_auth: OnboardingSessionContext,
+    // TODO -- why is this an onboarding session
+    user_auth: SessionContext<OnboardingSession>,
 ) -> actix_web::Result<Json<ApiResponseData<AccessEventResponse>>, ApiError> {
     // TODO paginate the response when there are too many results
     let results = db::access_event::list(
         &state.db_pool,
-        user_auth.user_vault().id.clone(),
+        user_auth.data.user_vault_id,
         request.data_kind.map(DataKind::from),
     )
     .await?

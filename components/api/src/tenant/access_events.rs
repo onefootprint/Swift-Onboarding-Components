@@ -1,9 +1,10 @@
-use crate::errors::ApiError;
-use crate::tenant::TenantAuthContext;
+use crate::auth::client_secret_key::SecretTenantAuthContext;
+use crate::auth::either::Either;
 use crate::types::access_event::ApiAccessEvent;
 use crate::types::success::ApiResponseData;
 use crate::State;
-use newtypes::{DataKind, FootprintUserId};
+use crate::{auth::session_context::SessionContext, errors::ApiError};
+use newtypes::{tenant::workos::WorkOsSession, DataKind, FootprintUserId};
 use paperclip::actix::{api_v2_operation, get, web, web::Json, Apiv2Schema};
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize, Apiv2Schema)]
@@ -23,12 +24,10 @@ type AccessEventResponse = Vec<ApiAccessEvent>;
 fn handler(
     state: web::Data<State>,
     request: web::Query<AccessEventRequest>,
-    auth: TenantAuthContext,
+    auth: Either<SessionContext<WorkOsSession>, SecretTenantAuthContext>,
 ) -> actix_web::Result<Json<ApiResponseData<AccessEventResponse>>, ApiError> {
-    // TODO paginate the response when there are too many results
-    let tenant = auth.tenant();
-
-    // TODO potentially retrieve unencrypted email for who performed the access event
+    // TODO potentially retrieve decrypted email for who performed the access event
+    let tenant = auth.tenant(&state.db_pool).await?;
     let results = db::access_event::list_for_tenant(
         &state.db_pool,
         tenant.id.clone(),

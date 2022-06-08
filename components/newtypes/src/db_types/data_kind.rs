@@ -2,6 +2,7 @@ pub use derive_more::Display;
 use diesel_derive_enum::DbEnum;
 use paperclip::actix::Apiv2Schema;
 use serde::{Deserialize, Serialize};
+use strum_macros::EnumIter;
 
 /// The type of data attribute
 #[derive(
@@ -18,6 +19,7 @@ use serde::{Deserialize, Serialize};
     Deserialize,
     Serialize,
     Apiv2Schema,
+    EnumIter,
 )]
 #[serde(rename_all = "snake_case")]
 #[PgType = "data_kind"]

@@ -1,13 +1,12 @@
-use crate::auth::get_onboarding_for_tenant;
-use crate::auth::onboarding_session::OnboardingSessionContext;
+use crate::auth::session_context::SessionContext;
+use crate::auth::{client_public_key::PublicTenantAuthContext, get_onboarding_for_tenant};
 use crate::errors::ApiError;
 use crate::types::success::ApiResponseData;
 use crate::utils::insight_headers::InsightHeaders;
+use crate::utils::user_vault_wrapper::UserVaultWrapper;
 use crate::State;
-use crate::{
-    auth::client_public_key::PublicTenantAuthContext, utils::user_vault_wrapper::UserVaultWrapper,
-};
 use db::{models::insight_event::CreateInsightEvent, webauthn_credentials::get_webauthn_creds};
+use newtypes::user::onboarding::OnboardingSession;
 use newtypes::FootprintUserId;
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 
@@ -24,13 +23,14 @@ struct CommitResponse {
 /// Finish onboarding the user. Returns the footprint_user_id for login. If any necessary
 /// attributes were not set, returns an error with the list of missing fields.
 fn handler(
-    user_auth: OnboardingSessionContext,
+    user_auth: SessionContext<OnboardingSession>,
     tenant_auth: PublicTenantAuthContext,
     state: web::Data<State>,
     insights: InsightHeaders,
 ) -> actix_web::Result<Json<ApiResponseData<CommitResponse>>, ApiError> {
     let onboarding = get_onboarding_for_tenant(&state.db_pool, &user_auth, &tenant_auth).await?;
-    let uv = user_auth.user_vault();
+    let uv = user_auth.user_vault(&state.db_pool).await?;
+
     let uv_id = uv.id.clone();
 
     let uvw = UserVaultWrapper::from(&state.db_pool, uv.clone()).await?;
@@ -44,9 +44,7 @@ fn handler(
 
     if missing_fields.is_empty() {
         // record the insight for this onboarding
-        CreateInsightEvent::from(insights)
-            .insert(&state.db_pool)
-            .await?;
+        CreateInsightEvent::from(insights).insert(&state.db_pool).await?;
         // TODO add it to the onboarding table
 
         Ok(Json(ApiResponseData {
@@ -56,8 +54,6 @@ fn handler(
             },
         }))
     } else {
-        Err(ApiError::UserMissingRequiredFields(
-            missing_fields.join(","),
-        ))
+        Err(ApiError::UserMissingRequiredFields(missing_fields.join(",")))
     }
 }

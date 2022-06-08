@@ -1,11 +1,14 @@
+use crate::auth::client_secret_key::SecretTenantAuthContext;
+use crate::auth::either::Either;
+use crate::auth::session_context::SessionContext;
 use crate::errors::ApiError;
-use crate::tenant::TenantAuthContext;
 use crate::types::success::ApiResponseData;
 use crate::user::{decrypt, DecryptFieldsResult};
 use crate::utils::insight_headers::InsightHeaders;
 use crate::State;
 use db::models::access_events::{NewAccessEvent, NewAccessEventBatch};
 use db::models::insight_event::CreateInsightEvent;
+use newtypes::tenant::workos::WorkOsSession;
 use newtypes::{DataKind, FootprintUserId};
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 use std::collections::{HashMap, HashSet};
@@ -26,13 +29,11 @@ type UserDecryptResponse = HashMap<DataKind, String>;
 /// Requires tenant secret key auth.
 fn handler(
     state: web::Data<State>,
-    auth: TenantAuthContext,
+    auth: Either<SessionContext<WorkOsSession>, SecretTenantAuthContext>,
     request: Json<UserDecryptRequest>,
     insights: InsightHeaders,
 ) -> actix_web::Result<Json<ApiResponseData<UserDecryptResponse>>, ApiError> {
-    // grab tenant secret key from header
-    let tenant = auth.tenant();
-
+    let tenant = auth.tenant(&state.db_pool).await?;
     // look up tenant & user vault
     let (vault, onboarding) = db::user_vault::get_by_tenant_and_onboarding(
         &state.db_pool,

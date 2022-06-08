@@ -1,8 +1,10 @@
-use crate::errors::ApiError;
-use crate::tenant::TenantAuthContext;
+use crate::auth::client_secret_key::SecretTenantAuthContext;
+use crate::auth::either::Either;
 use crate::types::success::ApiResponseData;
 use crate::State;
+use crate::{auth::session_context::SessionContext, errors::ApiError};
 use chrono::NaiveDateTime;
+use newtypes::tenant::workos::WorkOsSession;
 use newtypes::{FootprintUserId, Status};
 use paperclip::actix::{api_v2_operation, get, web, web::Json, Apiv2Schema};
 
@@ -31,10 +33,10 @@ type OnboardingResponse = Vec<OnboardingItem>;
 fn handler(
     state: web::Data<State>,
     request: web::Query<AccessEventRequest>,
-    auth: TenantAuthContext,
+    auth: Either<SessionContext<WorkOsSession>, SecretTenantAuthContext>,
 ) -> actix_web::Result<Json<ApiResponseData<OnboardingResponse>>, ApiError> {
     // TODO paginate the response when there are too many results
-    let tenant = auth.tenant();
+    let tenant = auth.tenant(&state.db_pool).await?;
 
     let AccessEventRequest { status, fingerprint } = request.into_inner();
 

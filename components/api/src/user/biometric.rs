@@ -1,5 +1,5 @@
 use crate::{
-    auth::{onboarding_session::OnboardingSessionContext, AuthError},
+    auth::{either::Either, session_context::SessionContext, AuthError},
     errors::ApiError,
     types::{success::ApiResponseData, Empty},
     utils::{
@@ -9,10 +9,8 @@ use crate::{
     State,
 };
 use chrono::{Duration, Utc};
-use db::models::{
-    session_data::onboarding::OnboardingSessionKind, webauthn_credential::NewWebauthnCredential,
-};
-use newtypes::D2pSessionStatus;
+use db::models::webauthn_credential::NewWebauthnCredential;
+use newtypes::user::{d2p::D2pSession, onboarding::OnboardingSession};
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 use serde::{Deserialize, Serialize};
 use webauthn_rs::{proto::UserVerificationPolicy, RegistrationState};
@@ -32,24 +30,16 @@ pub fn init(
     // TODO only allow registering webauthn credentials if you have no previous credentials OR if
     // you logged into this session via webauthn. Otherwise, someone who SIM swaps you can register
     // their own webauthn creds
-    user_auth: OnboardingSessionContext,
+    user_auth: Either<SessionContext<D2pSession>, SessionContext<OnboardingSession>>,
     state: web::Data<State>,
 ) -> actix_web::Result<Json<ApiResponseData<WebAuthnInitResponse>>, ApiError> {
-    // TODO use better generic auth classes for this
-    let has_permissions = match &user_auth.session_data().kind {
-        OnboardingSessionKind::Normal => true,
-        OnboardingSessionKind::D2pSession(data) => {
-            matches!(data.status, D2pSessionStatus::InProgress)
-        }
-        #[allow(unreachable_patterns)]
-        _ => false,
-    };
-    if !has_permissions {
+    // checks if we're either in a d2p session & it's in progress, or it's an onboarding session
+    if !user_auth.is_valid_biometric_session() {
         return Err(AuthError::SessionTypeError).map_err(ApiError::from);
-    }
+    };
     // generate the challenge and return it
     let webauthn = webauthn_rs::Webauthn::new(LivenessWebauthnConfig::new(&state));
-    let user_id = user_auth.user_vault().id.to_string().as_bytes().to_vec();
+    let user_id = user_auth.user_vault_id().to_string().as_bytes().to_vec();
     // TODO: fix usernames here
     let (challenge, reg_state) = webauthn.generate_challenge_register_options(
         user_id,
@@ -84,7 +74,7 @@ struct WebauthnRegisterRequest {
 #[post("/biometric")]
 async fn complete(
     request: Json<WebauthnRegisterRequest>,
-    user_auth: OnboardingSessionContext,
+    user_auth: Either<SessionContext<D2pSession>, SessionContext<OnboardingSession>>,
     state: web::Data<State>,
 ) -> actix_web::Result<Json<ApiResponseData<Empty>>, ApiError> {
     let challenge_data =
@@ -98,7 +88,7 @@ async fn complete(
     let (cred, _authenticator_data) = webauthn.register_credential(&reg, &reg_state, |_| Ok(false))?;
 
     NewWebauthnCredential {
-        user_vault_id: user_auth.user_vault().id.clone(),
+        user_vault_id: user_auth.user_vault_id(),
         credential_id: cred.cred_id,
         public_key: crypto::serde_cbor::to_vec(&cred.cred).map_err(crypto::Error::Cbor)?,
         attestation_data: Vec::new(), // TODO
