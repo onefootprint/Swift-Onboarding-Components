@@ -14,4 +14,4 @@ export const parameters = {
   },
 };
 
-addDecorator(withThemesProvider(themes), ThemeProvider);
+addDecorator(withThemesProvider([themes.light, themes.dark]), ThemeProvider);
