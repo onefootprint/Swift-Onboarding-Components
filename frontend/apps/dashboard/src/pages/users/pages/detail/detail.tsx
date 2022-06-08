@@ -82,7 +82,7 @@ const Detail = () => {
           <PaddedDivider />
           <BasicInfo user={user} />
           <Box sx={{ height: '40px' }}>&nbsp;</Box>
-          <Typography variant="heading-2" sx={{ userSelect: 'none' }}>
+          <Typography variant="heading-3" sx={{ userSelect: 'none' }}>
             Audit trail
           </Typography>
           <PaddedDivider />

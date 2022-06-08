@@ -17,8 +17,8 @@ const UserHeader = ({ user, onDecryptButtonClick }: BasicInfoProps) => {
   return (
     <HeaderContainer>
       <RowContainer>
-        <Typography variant="heading-2" sx={{ userSelect: 'none' }}>
-          User details
+        <Typography variant="heading-3" sx={{ userSelect: 'none' }}>
+          User info
         </Typography>
         <Badge variant={statusToBadgeVariant[user.status]}>
           {statusToDisplayText[user.status]}
