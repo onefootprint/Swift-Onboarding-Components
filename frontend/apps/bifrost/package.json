@@ -14,14 +14,15 @@
   "dependencies": {
     "@types/ua-parser-js": "^0.7.36",
     "base64url": "^3.0.1",
+    "footprint-provider": "*",
     "global-constants": "*",
     "hooks": "*",
     "icons": "*",
+    "qrcode.react": "^3.0.2",
     "request": "*",
     "themes": "*",
     "ua-parser-js": "^1.0.2",
-    "ui": "*",
-    "footprint-provider": "*"
+    "ui": "*"
   },
   "devDependencies": {
     "@next/bundle-analyzer": "^12.1.6",

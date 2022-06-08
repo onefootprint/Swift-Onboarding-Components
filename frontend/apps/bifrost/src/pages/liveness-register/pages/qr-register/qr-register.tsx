@@ -1,17 +1,58 @@
-import React from 'react';
+import useD2PGenerate from '@src/hooks/d2p/use-d2p-generate';
+import useD2PSms from '@src/hooks/d2p/use-d2p-sms';
+import { QRCodeSVG } from 'qrcode.react';
+import React, { useEffect, useState } from 'react';
 import HeaderTitle from 'src/components/header-title';
-import { Events } from 'src/utils/state-machine/liveness-register';
+import useLivenessRegisterMachine from 'src/pages/liveness-register/hooks/use-liveness-register';
+import {
+  Events,
+  MachineContext,
+} from 'src/utils/state-machine/liveness-register';
 import styled, { css } from 'styled-components';
-import { Button, Divider, Typography } from 'ui';
-
-import useLivenessRegisterMachine from '../../hooks/use-liveness-register';
+import { Button, Divider, LoadingIndicator, Typography } from 'ui';
 
 const QRRegister = () => {
-  const [, send] = useLivenessRegisterMachine();
+  const [state, send] = useLivenessRegisterMachine();
+  const d2pGenerateMutation = useD2PGenerate();
+  const d2pSmsMutation = useD2PSms();
+  const { authToken } = state.context as MachineContext;
+  const [scopedAuthToken, setScopedAuthToken] = useState<string>('');
+
+  useEffect(() => {
+    if (!authToken || scopedAuthToken) {
+      return;
+    }
+    d2pGenerateMutation.mutate(
+      { authToken },
+      {
+        onSuccess({ authToken: scopedToken }) {
+          setScopedAuthToken(scopedToken);
+          send({
+            type: Events.scopedAuthTokenGenerated,
+            payload: {
+              scopedAuthToken,
+            },
+          });
+        },
+      },
+    );
+  }, []);
+
   const handleSendLinkToPhone = () => {
-    // TODO: implement
-    send({ type: Events.qrRegisterSucceeded });
+    if (!scopedAuthToken) {
+      return;
+    }
+    d2pSmsMutation.mutate(
+      { authToken: scopedAuthToken },
+      {
+        onSuccess() {
+          send({ type: Events.qrCodeLinkSentViaSms });
+        },
+      },
+    );
   };
+
+  // TODO: start polling status, see if it changes
 
   return (
     <Container>
@@ -23,7 +64,13 @@ const QRRegister = () => {
         Use your camera app or QR code reader on your mobile device and
         we&apos;ll use biometrics to verify it.
       </Typography>
-      {/* TODO: QR CODE HERE */}
+      {d2pGenerateMutation.isLoading || !scopedAuthToken ? (
+        <LoadingIndicator />
+      ) : (
+        <QRCodeContainer>
+          <QRCodeSVG value={`biometric.onefootprint.com#${scopedAuthToken}`} />
+        </QRCodeContainer>
+      )}
       <Typography variant="body-4" color="secondary">
         Make sure the QR code is clearly visible on your device&apos;s screen.
         When authenticated, this page automatically updates.
@@ -39,6 +86,12 @@ const QRRegister = () => {
     </Container>
   );
 };
+
+const QRCodeContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
 
 const Container = styled.form`
   ${({ theme }) => css`

@@ -8,6 +8,8 @@ import useLivenessRegisterMachine from './hooks/use-liveness-register';
 import BiometricRegister from './pages/biometric-register';
 import BiometricRegisterFailure from './pages/biometric-register-failure';
 import CaptchaRegister from './pages/captcha-register';
+import QRCodeScanned from './pages/qr-code-scanned';
+import QRCodeSent from './pages/qr-code-sent';
 import QRRegister from './pages/qr-register';
 
 type Page = {
@@ -22,6 +24,8 @@ const LivenessRegister = () => {
     [States.biometricRegisterFailure]: BiometricRegisterFailure,
     [States.captchaRegister]: CaptchaRegister,
     [States.qrRegister]: QRRegister,
+    [States.qrCodeScanned]: QRCodeScanned,
+    [States.qrCodeSent]: QRCodeSent,
   };
   if (has(pages, valueCasted)) {
     const Page = pages[valueCasted];

@@ -4,6 +4,8 @@ export enum States {
   biometricRegisterFailure = 'biometricRegisterFailure',
   captchaRegister = 'captchaRegister',
   qrRegister = 'qrRegister',
+  qrCodeScanned = 'qrCodeScanned',
+  qrCodeSent = 'qrCodeSent',
   livenessRegisterCompleted = 'livenessRegisterCompleted',
 }
 
@@ -13,6 +15,7 @@ export type MachineContext = {
     type: string;
   };
   authToken?: string;
+  scopedAuthToken?: string;
 };
 
 export enum Events {
@@ -20,13 +23,30 @@ export enum Events {
   biometricRegisterSucceeded = 'biometricRegisterSucceeded',
   biometricRegisterFailed = 'biometricRegisterFailed',
   captchaRegisterSucceeded = 'captchaRegisterSucceeded',
+  scopedAuthTokenGenerated = 'scopedAuthTokenGenerated',
+  qrCodeLinkSentViaSms = 'qrCodeLinkSentViaSms',
+  qrCodeScanned = 'qrCodeScanned',
+  qrCodeCanceled = 'qrCodeCanceled',
   qrRegisterSucceeded = 'qrRegisterSucceeded',
+}
+
+export enum Actions {
+  assignScopedAuthToken = 'assignScopedAuthToken',
 }
 
 export type MachineEvents =
   | { type: Events.livenessRegisterStarted }
   | { type: Events.biometricRegisterSucceeded }
   | { type: Events.biometricRegisterFailed }
+  | {
+      type: Events.scopedAuthTokenGenerated;
+      payload: {
+        scopedAuthToken: string;
+      };
+    }
+  | { type: Events.qrCodeCanceled }
+  | { type: Events.qrCodeLinkSentViaSms }
+  | { type: Events.qrCodeScanned }
   | { type: Events.qrRegisterSucceeded }
   | { type: Events.captchaRegisterSucceeded }
   | { type: Events.biometricRegisterSucceeded };
