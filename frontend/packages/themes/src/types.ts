@@ -24,7 +24,9 @@ export type FontVariant =
   | 'label-3'
   | 'label-4'
   | 'caption-1'
-  | 'caption-2';
+  | 'caption-2'
+  | 'snippet-1'
+  | 'snippet-2';
 
 type Typography = {
   fontSize: string;

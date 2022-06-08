@@ -105,6 +105,18 @@ const typographies: Typographies = {
     fontFamily: 'DM Sans',
     fontWeight: 500,
   },
+  'snippet-1': {
+    fontSize: '16px',
+    lineHeight: '24px',
+    fontFamily: 'Source Code Pro',
+    fontWeight: 400,
+  },
+  'snippet-2': {
+    fontSize: '14px',
+    lineHeight: '20px',
+    fontFamily: 'Source Code Pro',
+    fontWeight: 400,
+  },
 };
 
 export default typographies;

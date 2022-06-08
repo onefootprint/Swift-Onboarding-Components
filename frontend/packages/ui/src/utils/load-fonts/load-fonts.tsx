@@ -1,7 +1,7 @@
 import React from 'react';
 
 const GOOGLE_FONTS_HREF =
-  'https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap';
+  'https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Source+Code+Pro&display=swap';
 
 const LoadFonts = () => (
   <>
