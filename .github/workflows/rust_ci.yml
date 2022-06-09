@@ -52,3 +52,105 @@ jobs:
       run: cargo test --all --no-default-features --features simulate  
       env:
         DATABASE_URL: postgresql://postgres:postgres@localhost/postgres
+
+  integration_tests:
+    name: run local integration tests
+    runs-on: ubuntu-latest
+    environment: dev
+    strategy:
+      matrix:
+        python-version: ["3.9"]
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_PASSWORD: postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost/postgres
+      PR_NUMBER: ${{ github.event.number }}
+      TEST_URL: "http://localhost:8000"
+    if: success()
+    steps:
+      - name: Install libpq + libssl
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libssl-dev libpq-dev
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-region: ${{ secrets.AWS_REGION }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - uses: actions/checkout@v3
+
+      - name: Set dot env
+        run: make set-dot-env
+
+      - name: rust-toolchain
+        uses: actions-rs/toolchain@v1.0.6
+        with:
+          toolchain: stable
+
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v1.3.0
+
+      - name: Setup Python # Set Python version
+        uses: actions/setup-python@v3
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install python deps
+        working-directory: ci
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      
+      - name: Build
+        run: cargo build --all --no-default-features --features simulate
+
+      - name: Run local integration tests
+        run: |
+          make run-local &
+          server_pid=$!
+
+          attempt_counter=0
+          max_attempts=24
+
+          until $(curl --output /dev/null --silent --fail http://localhost:8000); do
+              if [ ${attempt_counter} -eq ${max_attempts} ];then
+                echo "Max attempts reached"
+                exit 1
+              fi
+
+              printf '.'
+              attempt_counter=$(($attempt_counter+1))
+              sleep 10
+          done
+          cd ci
+          pytest -q integration_tests.py --emoji -v --md report.md --html report.html --self-contained-html > /dev/null && kill $server_pid
+
+      - name: Comment markdown on PR
+        working-directory: ci
+        run: |
+          COMMENT="$(awk '{printf "%s\\n", $0}' report.md)"
+          comments_url=$(curl -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/onefootprint/footprint-core/pulls/$PR_NUMBER" | jq '._links.comments.href' | sed 's/\"//g')
+          curl -X POST -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" "$comments_url" -d "{\"body\": \"$COMMENT\" }"
+        if: ${{ always() }}
+
+      - name: Upload pytest test results
+        uses: actions/upload-artifact@v3
+        with:
+          name: integ-tests-results-${{ matrix.python-version }}
+          path: ci/report.html
+        # Use always() to always run this step to publish test results when there are test failures
+        if: ${{ always() }}
+

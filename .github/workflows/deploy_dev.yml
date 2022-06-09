@@ -33,7 +33,7 @@ jobs:
       PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
       AWS_SECRETS_PROVIDER: ${{ secrets.AWS_SECRETS_PROVIDER }}
   run_integration_tests:
-    name: Run integration tests
+    name: Run dev integration tests
     runs-on: ubuntu-latest
     strategy:
       matrix:

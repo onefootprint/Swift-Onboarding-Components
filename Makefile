@@ -99,4 +99,3 @@ set-dot-env:
 		--query Plaintext | base64 --decode > .env
 	@rm /tmp/encrypted.env.bin
 	@echo "created .env:\n"
-	@cat .env

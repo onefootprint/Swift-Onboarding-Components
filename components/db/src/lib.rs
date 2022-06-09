@@ -42,7 +42,6 @@ pub fn init(url: &str) -> Result<Pool, DbError> {
             let recycled = metrics.created.duration_since(init_instant.clone()).as_secs();
             let created = metrics.created.duration_since(init_instant.clone()).as_secs();
 
-
             tracing::debug!(
                 db.pool.recycle_count = metrics.recycle_count,
                 db.pool.created_secs_ago = created,
