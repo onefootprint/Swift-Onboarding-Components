@@ -15,14 +15,17 @@ import useDecryptUser, {
   DecryptedUserAttributes,
   DecryptUserRequest,
 } from '../../hooks/use-decrypt-user';
-import useJoinUsers from '../../hooks/use-join-users';
+import useJoinUsers, {
+  DecryptedAttributes,
+  UserData,
+} from '../../hooks/use-join-users';
 import BasicInfo from './components/basic-info';
 
 const Detail = () => {
   const getOnboardings = useGetOnboardings();
   const [decryptedUsers, { set: setDecryptedUser }] = useMap<
     String,
-    DecryptedUserAttributes
+    DecryptedAttributes
   >(new Map());
 
   const decryptUserMutation = useDecryptUser();
@@ -33,16 +36,42 @@ const Detail = () => {
   // https://linear.app/footprint/issue/FP-202
   const user = users?.[0]!;
 
-  const loadEncryptedAttributes = (fieldsToDecrypt: DataKind[]) => {
+  const loadEncryptedAttributes = (
+    fieldsToDecrypt: (keyof typeof DataKind)[],
+  ) => {
     const decryptUserRequest: DecryptUserRequest = {
       footprintUserId: user.footprintUserId,
-      attributes: fieldsToDecrypt,
+      attributes: fieldsToDecrypt.map(x => DataKind[x]),
     };
+
+    // Immediately set these attributes as loading
+    const loadingUserAttributes = Object.fromEntries(
+      fieldsToDecrypt.map(x => [x, { isLoading: true }]),
+    );
+    const currentDecryptedUser =
+      decryptedUsers.get(user.footprintUserId) || ({} as DecryptedAttributes);
+    setDecryptedUser(user.footprintUserId, {
+      ...currentDecryptedUser,
+      ...loadingUserAttributes,
+    });
+
+    // Trigger the mutation to decrypt the data. Upon completion, update these attributes with the
+    // decrypted values
     decryptUserMutation
       .mutateAsync(decryptUserRequest)
       .then((decryptedUserAttributes: DecryptedUserAttributes) => {
-        // TODO we'll want to not clobber previous decrypt requests when we repeatedly decrypt fields
-        setDecryptedUser(user.footprintUserId, decryptedUserAttributes);
+        // Map from string values to UserData values that contain isLoading: false
+        const newAttrs = Object.fromEntries(
+          Object.entries(decryptedUserAttributes).map(x => [
+            x[0],
+            { value: x[1], isLoading: false } as UserData,
+          ]),
+        );
+        // TODO https://linear.app/footprint/issue/FP-256/create-new-hook-for-updating-decrypted-fields
+        setDecryptedUser(user.footprintUserId, {
+          ...currentDecryptedUser,
+          ...newAttrs,
+        });
       });
   };
 

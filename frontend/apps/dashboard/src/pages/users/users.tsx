@@ -3,13 +3,16 @@ import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { Row, Table } from 'src/components/table';
 import FieldOrPlaceholder from 'src/pages/users/components/field-or-placeholder';
-import { DecryptedUserAttributes } from 'src/pages/users/hooks/use-decrypt-user';
 import { useFilters } from 'src/pages/users/hooks/use-filters';
 import useGetOnboardings, {
   statusToBadgeVariant,
   statusToDisplayText,
 } from 'src/pages/users/hooks/use-get-onboardings';
-import useJoinUsers, { User } from 'src/pages/users/hooks/use-join-users';
+import useJoinUsers, {
+  DecryptedAttributes,
+  nameData,
+  User,
+} from 'src/pages/users/hooks/use-join-users';
 import styled, { css } from 'styled-components';
 import { Badge, TextInput, Typography } from 'ui';
 import { useMap } from 'usehooks-ts';
@@ -41,7 +44,7 @@ const Users = () => {
   }, [query]);
 
   // TODO rm
-  const [decryptedUsers] = useMap<String, DecryptedUserAttributes>(new Map());
+  const [decryptedUsers] = useMap<String, DecryptedAttributes>(new Map());
   // Join the onboarding list results with any decrypted user data
   const users = useJoinUsers(getOnboardings.data, decryptedUsers);
 
@@ -75,7 +78,9 @@ const Users = () => {
         renderTr={({ item }: Row<User>) => (
           <>
             <td>
-              <FieldOrPlaceholder value={item.name} />
+              <FieldOrPlaceholder
+                value={nameData(item.decryptedAttributes)?.value}
+              />
             </td>
             <td>
               <Typography variant="body-3">{item.footprintUserId}</Typography>
@@ -86,13 +91,17 @@ const Users = () => {
               </Badge>
             </td>
             <td>
-              <FieldOrPlaceholder value={item.email} />
+              <FieldOrPlaceholder
+                value={item.decryptedAttributes?.email.value}
+              />
             </td>
             <td>
-              <FieldOrPlaceholder value={item.ssn} />
+              <FieldOrPlaceholder value={item.decryptedAttributes?.ssn.value} />
             </td>
             <td>
-              <FieldOrPlaceholder value={item.phoneNumber} />
+              <FieldOrPlaceholder
+                value={item.decryptedAttributes?.phoneNumber.value}
+              />
             </td>
             <td>
               <Typography variant="body-3" color="primary">

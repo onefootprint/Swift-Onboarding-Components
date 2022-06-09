@@ -4,15 +4,19 @@ import { Typography } from 'ui';
 
 type FieldOrPlaceholderProps = {
   value: string | undefined;
+  isLoading?: boolean;
 };
 
-const FieldOrPlaceholder = ({ value }: FieldOrPlaceholderProps) =>
+const FieldOrPlaceholder = ({
+  value,
+  isLoading = false,
+}: FieldOrPlaceholderProps) =>
   value ? (
     <Typography variant="body-3" color="primary" sx={{ whiteSpace: 'nowrap' }}>
       {value}
     </Typography>
   ) : (
-    <EncryptedCell />
+    <EncryptedCell isLoading={isLoading} />
   );
 
 export default FieldOrPlaceholder;

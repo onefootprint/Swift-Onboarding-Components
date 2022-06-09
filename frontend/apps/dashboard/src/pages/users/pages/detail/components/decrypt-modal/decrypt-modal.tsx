@@ -1,12 +1,14 @@
 import Modal, { ModalCloseEvent } from '@src/components/modal';
 import { DataKind } from '@src/pages/users/hooks/use-decrypt-user';
 import React, { ChangeEvent, useState } from 'react';
+import { User } from 'src/pages/users/hooks/use-join-users';
 import styled, { css } from 'styled-components';
 import { Box, Button, Checkbox, Divider, Typography } from 'ui';
 import { SXStyles } from 'ui/src/hooks/use-sx';
 
 type DecryptModalProps = {
-  onDecrypt: (fieldsToDecrypt: DataKind[]) => void;
+  user: User;
+  onDecrypt: (fieldsToDecrypt: (keyof typeof DataKind)[]) => void;
 };
 
 type SelectedFields = Record<keyof typeof DataKind, boolean>;
@@ -26,7 +28,7 @@ const ALL_FIELDS: (keyof typeof DataKind)[] = [
   'state',
 ];
 
-const DecryptModal = ({ onDecrypt }: DecryptModalProps) => {
+const DecryptModal = ({ user, onDecrypt }: DecryptModalProps) => {
   const [showModal, setShowModal] = useState(false);
   const [modalHasError, setModalHasError] = useState(false);
   // TODO: https://linear.app/footprint/issue/FP-240/migrate-to-react-form
@@ -39,7 +41,8 @@ const DecryptModal = ({ onDecrypt }: DecryptModalProps) => {
       // Decrypt all of the fields when the user closes the modal
       const fieldsToDecrypt = Object.entries(selectedFields)
         .filter(x => x[1])
-        .map(x => DataKind[x[0] as keyof typeof DataKind]);
+        .filter(x => !isFieldDisabled(x[0] as keyof typeof DataKind))
+        .map(x => x[0] as keyof typeof DataKind);
       if (!fieldsToDecrypt.length) {
         // No fields selected, display validation error
         setModalHasError(true);
@@ -57,6 +60,9 @@ const DecryptModal = ({ onDecrypt }: DecryptModalProps) => {
     setShowModal(true);
   };
 
+  const isFieldDisabled = (...kinds: (keyof typeof DataKind)[]) =>
+    kinds.every(kind => !!user.decryptedAttributes?.[kind]);
+
   const setFieldFor =
     (...kinds: (keyof typeof DataKind)[]) =>
     (e: ChangeEvent<HTMLInputElement>) => {
@@ -68,7 +74,7 @@ const DecryptModal = ({ onDecrypt }: DecryptModalProps) => {
     };
 
   const isFieldSelected = (...kinds: (keyof typeof DataKind)[]) =>
-    kinds.every(kind => selectedFields[kind]);
+    kinds.every(kind => selectedFields[kind] || isFieldDisabled(kind));
 
   return (
     <>
@@ -91,6 +97,7 @@ const DecryptModal = ({ onDecrypt }: DecryptModalProps) => {
           <Box sx={{ marginTop: 7, marginBottom: 7 }}>
             <Checkbox
               label="All"
+              disabled={isFieldDisabled(...ALL_FIELDS)}
               checked={isFieldSelected(...ALL_FIELDS)}
               onChange={setFieldFor(...ALL_FIELDS)}
             />
@@ -104,16 +111,19 @@ const DecryptModal = ({ onDecrypt }: DecryptModalProps) => {
               </Typography>
               <Checkbox
                 label="Name"
+                disabled={isFieldDisabled('firstName', 'lastName')}
                 checked={isFieldSelected('firstName', 'lastName')}
                 onChange={setFieldFor('firstName', 'lastName')}
               />
               <Checkbox
                 label="Email"
+                disabled={isFieldDisabled('email')}
                 checked={isFieldSelected('email')}
                 onChange={setFieldFor('email')}
               />
               <Checkbox
                 label="Phone number"
+                disabled={isFieldDisabled('phoneNumber')}
                 checked={isFieldSelected('phoneNumber')}
                 onChange={setFieldFor('phoneNumber')}
               />
@@ -124,11 +134,13 @@ const DecryptModal = ({ onDecrypt }: DecryptModalProps) => {
               </Typography>
               <Checkbox
                 label="SSN"
+                disabled={isFieldDisabled('ssn')}
                 checked={isFieldSelected('ssn')}
                 onChange={setFieldFor('ssn')}
               />
               <Checkbox
                 label="Date of birth"
+                disabled={isFieldDisabled('dob')}
                 checked={isFieldSelected('dob')}
                 onChange={setFieldFor('dob')}
               />
@@ -139,31 +151,37 @@ const DecryptModal = ({ onDecrypt }: DecryptModalProps) => {
               </Typography>
               <Checkbox
                 label="Country"
+                disabled={isFieldDisabled('country')}
                 checked={isFieldSelected('country')}
                 onChange={setFieldFor('country')}
               />
               <Checkbox
                 label="Address line 1"
+                disabled={isFieldDisabled('streetAddress')}
                 checked={isFieldSelected('streetAddress')}
                 onChange={setFieldFor('streetAddress')}
               />
               <Checkbox
                 label="Address line 2"
+                disabled={isFieldDisabled('streetAddress2')}
                 checked={isFieldSelected('streetAddress2')}
                 onChange={setFieldFor('streetAddress2')}
               />
               <Checkbox
                 label="City"
+                disabled={isFieldDisabled('city')}
                 checked={isFieldSelected('city')}
                 onChange={setFieldFor('city')}
               />
               <Checkbox
                 label="Zip code"
+                disabled={isFieldDisabled('zip')}
                 checked={isFieldSelected('zip')}
                 onChange={setFieldFor('zip')}
               />
               <Checkbox
                 label="State"
+                disabled={isFieldDisabled('state')}
                 checked={isFieldSelected('state')}
                 onChange={setFieldFor('state')}
               />

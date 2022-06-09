@@ -39,7 +39,6 @@ const decryptUserRequest = async (
       'x-fp-dashboard-authorization': auth as string,
     },
   });
-
   return response.data;
 };
 

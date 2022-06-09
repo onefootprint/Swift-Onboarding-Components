@@ -12,7 +12,7 @@ import DecryptModal from '../decrypt-modal';
 
 type BasicInfoProps = {
   user: User;
-  onDecrypt: (fieldsToDecrypt: DataKind[]) => void;
+  onDecrypt: (fieldsToDecrypt: (keyof typeof DataKind)[]) => void;
 };
 
 const UserHeader = ({ user, onDecrypt }: BasicInfoProps) => {
@@ -44,7 +44,7 @@ const UserHeader = ({ user, onDecrypt }: BasicInfoProps) => {
           </Typography>
           <Code>{footprintUserId}</Code>
         </RowContainer>
-        <DecryptModal onDecrypt={onDecrypt} />
+        <DecryptModal user={user} onDecrypt={onDecrypt} />
       </SplitRow>
     </HeaderContainer>
   );

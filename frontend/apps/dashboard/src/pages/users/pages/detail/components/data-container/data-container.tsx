@@ -1,3 +1,4 @@
+import { UserData } from '@src/pages/users/hooks/use-join-users';
 import { Icon } from 'icons';
 import React from 'react';
 import FieldOrPlaceholder from 'src/pages/users/components/field-or-placeholder';
@@ -7,7 +8,7 @@ import useSX, { SXStyleProps, SXStyles } from 'ui/src/hooks/use-sx';
 
 export type DataRow = {
   title: string;
-  value?: string;
+  data?: UserData;
 };
 
 type DataContainerProps = {
@@ -42,7 +43,10 @@ const DataContainer = ({
             >
               {item.title}
             </Typography>
-            <FieldOrPlaceholder value={item.value} />
+            <FieldOrPlaceholder
+              value={item.data?.value}
+              isLoading={item.data?.isLoading}
+            />
           </Row>
         ))}
       </RowContainer>

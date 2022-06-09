@@ -1,27 +1,36 @@
 import { useMemo } from 'react';
 
-import { DecryptedUserAttributes } from './use-decrypt-user';
+import { DataKind } from './use-decrypt-user';
 import { Onboarding, OnboardingStatus } from './use-get-onboardings';
 
 export type User = {
   footprintUserId: string;
   status: OnboardingStatus;
   initiatedAt: string;
-  name?: string;
-  email?: string;
-  phoneNumber?: string;
-  ssn?: string;
-  dob?: string;
-  streetAddress?: string;
-  streetAddress2?: string;
-  city?: string;
-  state?: string;
-  zip?: string;
-  country?: string;
+  decryptedAttributes?: DecryptedAttributes;
 };
 
+export type UserData = {
+  value?: string;
+  isLoading: boolean;
+};
+
+export type DecryptedAttributes = Record<keyof typeof DataKind, UserData>;
+
+// Create a custom UserData for name since it's two separate attributes joined
+export const nameData = (decryptedAttributes?: DecryptedAttributes) =>
+  decryptedAttributes && {
+    value:
+      decryptedAttributes?.firstName?.value &&
+      decryptedAttributes?.lastName?.value &&
+      `${decryptedAttributes?.firstName?.value} ${decryptedAttributes?.lastName?.value}`,
+    isLoading:
+      decryptedAttributes?.firstName?.isLoading ||
+      decryptedAttributes?.lastName?.isLoading,
+  };
+
 type DecryptedUsersMap = Omit<
-  Map<String, DecryptedUserAttributes>,
+  Map<String, DecryptedAttributes>,
   'set' | 'clear' | 'delete'
 >;
 
@@ -31,22 +40,12 @@ const useJoinUsers = (
 ) =>
   useMemo<User[] | undefined>(
     () =>
-      onboardings?.map((onboarding: Onboarding) => {
-        const decryptedUserData = decryptedUsers.get(
-          onboarding.footprintUserId,
-        );
-        const name =
-          decryptedUserData?.firstName && decryptedUserData?.lastName
-            ? `${decryptedUserData?.firstName} ${decryptedUserData?.lastName}`
-            : undefined;
-        return {
-          ...decryptedUserData,
-          footprintUserId: onboarding.footprintUserId,
-          status: onboarding.status,
-          initiatedAt: onboarding.createdAt,
-          name,
-        };
-      }),
+      onboardings?.map((onboarding: Onboarding) => ({
+        footprintUserId: onboarding.footprintUserId,
+        status: onboarding.status,
+        initiatedAt: onboarding.createdAt,
+        decryptedAttributes: decryptedUsers.get(onboarding.footprintUserId),
+      })),
     [decryptedUsers, onboardings],
   );
 
