@@ -13,9 +13,7 @@ import Header from '../components/header';
 import MachineProvider from '../components/machine-provider';
 import configureReactI18next from '../config/initializers/react-i18next';
 import queryClient from '../config/initializers/react-query';
-import configureSentry from '../config/initializers/sentry';
 
-configureSentry();
 configureReactI18next();
 
 type AppProps = {
