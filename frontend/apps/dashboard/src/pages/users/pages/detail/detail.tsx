@@ -11,6 +11,7 @@ import { Box, Divider, Typography } from 'ui';
 import { useMap } from 'usehooks-ts';
 
 import useDecryptUser, {
+  DataKind,
   DecryptedUserAttributes,
   DecryptUserRequest,
 } from '../../hooks/use-decrypt-user';
@@ -32,27 +33,15 @@ const Detail = () => {
   // https://linear.app/footprint/issue/FP-202
   const user = users?.[0]!;
 
-  const loadEncryptedAttributes = () => {
+  const loadEncryptedAttributes = (fieldsToDecrypt: DataKind[]) => {
     const decryptUserRequest: DecryptUserRequest = {
       footprintUserId: user.footprintUserId,
-      attributes: [
-        'first_name',
-        'last_name',
-        'phone_number',
-        'email',
-        'ssn',
-        'dob',
-        'country',
-        'street_address',
-        'street_address2',
-        'city',
-        'zip',
-        'state',
-      ],
+      attributes: fieldsToDecrypt,
     };
     decryptUserMutation
       .mutateAsync(decryptUserRequest)
       .then((decryptedUserAttributes: DecryptedUserAttributes) => {
+        // TODO we'll want to not clobber previous decrypt requests when we repeatedly decrypt fields
         setDecryptedUser(user.footprintUserId, decryptedUserAttributes);
       });
   };
@@ -75,10 +64,7 @@ const Detail = () => {
       </HeaderContainer>
       {user && (
         <>
-          <UserHeader
-            user={user}
-            onDecryptButtonClick={() => loadEncryptedAttributes()}
-          />
+          <UserHeader user={user} onDecrypt={loadEncryptedAttributes} />
           <PaddedDivider />
           <BasicInfo user={user} />
           <Box sx={{ height: '40px' }}>&nbsp;</Box>

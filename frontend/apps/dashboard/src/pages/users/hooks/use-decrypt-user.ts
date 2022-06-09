@@ -8,20 +8,22 @@ export type DecryptUserRequest = {
   attributes: string[];
 };
 
-export type DecryptedUserAttributes = {
-  firstName?: string;
-  lastName?: string;
-  email?: string;
-  phoneNumber?: string;
-  ssn?: string;
-  dob?: string;
-  streetAddress?: string;
-  streetAddress2?: string;
-  city?: string;
-  state?: string;
-  zip?: string;
-  country?: string;
-};
+export enum DataKind {
+  firstName = 'first_name',
+  lastName = 'last_name',
+  email = 'email',
+  phoneNumber = 'phone_number',
+  ssn = 'ssn',
+  dob = 'dob',
+  streetAddress = 'street_address',
+  streetAddress2 = 'street_address2',
+  city = 'city',
+  state = 'state',
+  zip = 'zip',
+  country = 'country',
+}
+
+export type DecryptedUserAttributes = Record<keyof typeof DataKind, string>;
 
 const decryptUserRequest = async (
   auth: string | undefined,

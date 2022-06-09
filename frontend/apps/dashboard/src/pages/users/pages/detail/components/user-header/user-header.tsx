@@ -1,3 +1,4 @@
+import { DataKind } from '@src/pages/users/hooks/use-decrypt-user';
 import {
   statusToBadgeVariant,
   statusToDisplayText,
@@ -5,14 +6,16 @@ import {
 import React from 'react';
 import { User } from 'src/pages/users/hooks/use-join-users';
 import styled, { css } from 'styled-components';
-import { Badge, Button, Typography } from 'ui';
+import { Badge, Typography } from 'ui';
+
+import DecryptModal from '../decrypt-modal';
 
 type BasicInfoProps = {
   user: User;
-  onDecryptButtonClick: () => void;
+  onDecrypt: (fieldsToDecrypt: DataKind[]) => void;
 };
 
-const UserHeader = ({ user, onDecryptButtonClick }: BasicInfoProps) => {
+const UserHeader = ({ user, onDecrypt }: BasicInfoProps) => {
   const { footprintUserId } = user;
   return (
     <HeaderContainer>
@@ -41,10 +44,7 @@ const UserHeader = ({ user, onDecryptButtonClick }: BasicInfoProps) => {
           </Typography>
           <Code>{footprintUserId}</Code>
         </RowContainer>
-        {/* TODO: implement filter modal */}
-        <Button size="small" variant="secondary" onClick={onDecryptButtonClick}>
-          Decrypt data
-        </Button>
+        <DecryptModal onDecrypt={onDecrypt} />
       </SplitRow>
     </HeaderContainer>
   );

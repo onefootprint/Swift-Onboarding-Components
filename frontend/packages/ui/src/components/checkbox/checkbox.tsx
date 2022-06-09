@@ -13,7 +13,7 @@ export type CheckboxProps = {
   id?: string;
   label: string;
   name?: string;
-  onBlur: (event: React.FocusEvent<HTMLInputElement>) => void;
+  onBlur?: (event: React.FocusEvent<HTMLInputElement>) => void;
   onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
   readOnly?: boolean;
   required?: boolean;

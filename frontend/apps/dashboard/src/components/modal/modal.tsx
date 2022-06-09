@@ -16,7 +16,7 @@ export type ModalProps = {
   primaryButtonText: string;
   secondaryButtonText?: string;
   secondaryButtonVariant?: 'link' | 'default';
-  children?: JSX.Element;
+  children?: React.ReactNode;
   onClose: (event: ModalCloseEvent) => void;
 };
 
