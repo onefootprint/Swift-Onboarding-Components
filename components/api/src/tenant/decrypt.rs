@@ -18,6 +18,7 @@ use std::collections::{HashMap, HashSet};
 struct UserDecryptRequest {
     footprint_user_id: FootprintUserId,
     attributes: HashSet<DataKind>,
+    reason: String,
 }
 
 type UserDecryptResponse = HashMap<DataKind, String>;
@@ -61,6 +62,7 @@ fn handler(
         .map(|data_kind| NewAccessEvent {
             onboarding_id: onboarding.id.clone(),
             data_kind: *data_kind,
+            reason: request.reason.clone(),
         })
         .collect();
     NewAccessEventBatch {

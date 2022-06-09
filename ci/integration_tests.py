@@ -470,7 +470,8 @@ def test_tenant_decrypt(request, workos_tenant):
     print(url(path))
     data = {
         "footprint_user_id": request.config.cache.get("fp_user_id", None),
-        "attributes": ["first_name", "email", "zip", "country", "last_four_ssn"]
+        "attributes": ["first_name", "email", "zip", "country", "last_four_ssn"],
+        "reason": "Doing a hecking decrypt",
     }
     print(data)
     r = requests.post(

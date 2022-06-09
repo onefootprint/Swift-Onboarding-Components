@@ -18,12 +18,14 @@ pub struct AccessEvent {
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
     pub insight_event_id: Option<Uuid>,
+    pub reason: String,
 }
 
 #[derive(Debug, Clone)]
 pub struct NewAccessEvent {
     pub onboarding_id: OnboardingId,
     pub data_kind: DataKind,
+    pub reason: String,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
@@ -32,6 +34,7 @@ struct NewAccessEventWithInsight {
     onboarding_id: OnboardingId,
     data_kind: DataKind,
     insight_event_id: Uuid,
+    reason: String,
 }
 
 pub struct NewAccessEventBatch {
@@ -55,6 +58,7 @@ impl NewAccessEventBatch {
                             data_kind: ev.data_kind,
                             onboarding_id: ev.onboarding_id,
                             insight_event_id: insight_ev.id,
+                            reason: ev.reason,
                         })
                         .collect::<Vec<NewAccessEventWithInsight>>();
 
