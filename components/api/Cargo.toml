@@ -78,3 +78,6 @@ webauthn-rs-proto = { git = "https://github.com/onefootprint/webauthn-rs", rev =
 url = "2.2.2"
 newtypes = { path = "../newtypes" }
 awc = { version = "3.0", features = ["rustls"]}
+
+sentry = "0.26.0"
+sentry-actix = "0.26.0"

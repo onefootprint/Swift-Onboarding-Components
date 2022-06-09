@@ -19,6 +19,8 @@ export abstract class ServiceContainers {
         const current = await aws.getCallerIdentity({});
         const image = `${current.accountId}.dkr.ecr.us-east-1.amazonaws.com/api:${constants.containers.apiVersion}`;
 
+        const serviceEnvironment = pulumi.getStack();
+
         const containerDef = pulumi.all([otelCollector]).apply(([otelCollector]) => {
             return pulumi.all([
                 enclaveKeyDescriptor.rootKeyId,
@@ -90,7 +92,7 @@ export abstract class ServiceContainers {
                         },
                         {
                             name: "OTEL_RESOURCE_ATTRIBUTES",
-                            value: `service.name=fpc-api,service.version=1.0,deployment.environment=${pulumi.getStack()}`
+                            value: `service.name=fpc-api,service.version=1.0,deployment.environment=${serviceEnvironment}`
                         },
                         {
                             name: "WORKOS_CLIENT_ID",
@@ -99,6 +101,14 @@ export abstract class ServiceContainers {
                         {
                             name: "WORKOS_DEFAULT_ORG",
                             value: constants.workos.defaultOrg
+                        },
+                        {
+                            name: "SENTRY_URL",
+                            value: constants.sentryUrl
+                        },
+                        {
+                            name: "SERVICE_ENVIRONMENT",
+                            value: serviceEnvironment
                         }
                     ],
                     links: ["otelcollect:otelcollect"],

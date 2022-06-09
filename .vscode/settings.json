@@ -21,6 +21,7 @@
         "newtype",
         "newtypes",
         "openapi",
+        "opentelemetry",
         "pinpointemail",
         "pulumi",
         "sqlx",

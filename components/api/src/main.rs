@@ -1,4 +1,4 @@
-use std::time::Duration;
+use std::{borrow::Cow, time::Duration};
 
 use actix_session::{storage::CookieSessionStore, SessionMiddleware};
 use actix_web::{cookie::Key, middleware::Logger, App, HttpServer};
@@ -67,11 +67,21 @@ impl ErrorSink<enclave_proxy::Error> for EnclavePoolErrorSink {
 async fn main() -> std::io::Result<()> {
     let config = config::Config::load_from_env().expect("failed to load config");
 
+    // telemetry
     let _started = telemetry::init(&config).expect("failed to init telemetry layers");
-
     let meter = opentelemetry::global::meter("actix_web");
-
     let metrics = RequestMetrics::new(meter, Some(should_render_metrics), None);
+
+    // sentry
+    let _guard = sentry::init((
+        config.sentry_url.as_str(),
+        sentry::ClientOptions {
+            release: sentry::release_name!(),
+            environment: Some(Cow::Owned(config.service_environment.clone())),
+            ..Default::default()
+        },
+    ));
+    std::env::set_var("RUST_BACKTRACE", "1");
 
     let state = {
         let manager = StreamManager {
@@ -114,9 +124,7 @@ async fn main() -> std::io::Result<()> {
         let _ = db::run_migrations(&config.database_url).unwrap();
 
         // then create the pool
-        let db_pool = db::init(&config.database_url)
-            .map_err(ApiError::from)
-            .unwrap();
+        let db_pool = db::init(&config.database_url).map_err(ApiError::from).unwrap();
 
         // our session key
         let session_sealing_key = {
@@ -185,6 +193,7 @@ async fn main() -> std::io::Result<()> {
 
         App::new()
             .app_data(web::Data::new(state.clone()))
+            .wrap(sentry_actix::Sentry::new())
             .wrap(actix_web::middleware::NormalizePath::trim())
             .wrap(Logger::default())
             .wrap(TracingLogger::<TelemetrySpanBuilder>::new())
@@ -193,14 +202,13 @@ async fn main() -> std::io::Result<()> {
             .app_data(json_cfg)
             .wrap(session_middleware)
             .wrap_api()
+            .configure(index::routes)
             .service(web::scope("/private").service(client::init::handler))
             .service(identify::routes())
             .service(tenant::routes())
             .service(onboarding::routes())
             .service(user::routes())
             .service(tenant::workos::routes())
-            .service(index::index::handler)
-            .service(index::health::handler)
             .with_json_spec_at("/open-api/spec")
             .with_swagger_ui_at("/open-api/swagger")
             .build()

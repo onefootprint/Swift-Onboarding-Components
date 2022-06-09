@@ -5,7 +5,6 @@ use crate::schema;
 use chrono::Utc;
 use deadpool_diesel::postgres::Pool;
 use diesel::prelude::*;
-use newtypes::DataKind;
 use newtypes::TenantId;
 
 pub async fn init_or_get(pool: &Pool, new_tenant: NewTenant) -> Result<Tenant, DbError> {

@@ -9,6 +9,7 @@ export interface Config {
     jumpBoxSSHPublicKey: string;
     rpId: string;
     workos: Workos;
+    sentryUrl: string;
 }
 
 export interface Elastic {

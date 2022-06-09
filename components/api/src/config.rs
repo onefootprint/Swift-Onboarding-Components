@@ -2,6 +2,9 @@ use envconfig::Envconfig;
 
 #[derive(Envconfig, Clone)]
 pub struct Config {
+    #[envconfig(from = "SERVICE_ENVIRONMENT", default = "local")]
+    pub service_environment: String,
+
     #[envconfig(from = "PORT", default = "8000")]
     pub port: u16,
 
@@ -58,6 +61,9 @@ pub struct Config {
 
     #[envconfig(from = "TIME_S_BETWEEN_SMS_CHALLENGES", default = "15")]
     pub time_s_between_sms_challenges: i64,
+
+    #[envconfig(from = "SENTRY_URL")]
+    pub sentry_url: String,
 }
 
 impl Config {

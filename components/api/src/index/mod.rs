@@ -1,3 +1,13 @@
-pub mod health;
+use paperclip::actix::web::ServiceConfig;
+
+mod health;
 #[allow(clippy::module_inception)]
-pub mod index;
+mod index;
+
+pub fn routes(config: &mut ServiceConfig) {
+    config
+        .service(index::handler)
+        .service(health::handler)
+        .service(health::panic_handler)
+        .service(health::fail_handler);
+}

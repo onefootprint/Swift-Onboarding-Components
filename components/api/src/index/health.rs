@@ -33,3 +33,19 @@ async fn handler(state: web::Data<State>) -> Result<String, ApiError> {
         after_db - before_db
     ))
 }
+
+#[api_v2_operation]
+#[tracing::instrument(name = "panic")]
+#[get("/panic")]
+async fn panic_handler() -> &'static str {
+    tracing::debug!("about to panic");
+    panic!("at the disco");
+}
+
+#[api_v2_operation]
+#[tracing::instrument(name = "fail")]
+#[get("/fail")]
+async fn fail_handler() -> Result<&'static str, ApiError> {
+    tracing::debug!("about to fail");
+    Err(ApiError::NotImplemented)
+}

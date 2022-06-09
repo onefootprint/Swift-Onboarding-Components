@@ -1,7 +1,7 @@
 use crate::schema::tenants;
 use chrono::NaiveDateTime;
 use diesel::{Insertable, Queryable};
-use newtypes::{DataKind, TenantId};
+use newtypes::TenantId;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
