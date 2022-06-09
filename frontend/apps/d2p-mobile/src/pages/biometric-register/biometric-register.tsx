@@ -1,6 +1,6 @@
-import useBiometricRegister from '@src/hooks/use-biometric-register';
 import React from 'react';
 import HeaderTitle from 'src/components/header-title';
+import useBiometricRegister from 'src/hooks/use-biometric-register';
 import useD2pMobileMachine, { Events } from 'src/hooks/use-d2p-mobile-machine';
 import styled, { css } from 'styled-components';
 import { Button } from 'ui';

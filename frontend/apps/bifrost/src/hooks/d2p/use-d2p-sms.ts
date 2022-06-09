@@ -14,7 +14,7 @@ const d2pSms = async (payload: D2PSmsRequest) => {
       baseUrl: D2P_BASE_URL,
     },
     headers: {
-      'X-Fpuser-Authorization': payload.authToken,
+      'x-d2p-authorization': payload.authToken,
     },
   });
   return response.data;

@@ -1,9 +1,9 @@
-import useD2PGenerate from '@src/hooks/d2p/use-d2p-generate';
-import useD2PSms from '@src/hooks/d2p/use-d2p-sms';
 import { QRCodeSVG } from 'qrcode.react';
 import React, { useEffect, useState } from 'react';
 import HeaderTitle from 'src/components/header-title';
 import { D2P_BASE_URL } from 'src/constants';
+import useD2PGenerate from 'src/hooks/d2p/use-d2p-generate';
+import useD2PSms from 'src/hooks/d2p/use-d2p-sms';
 import useLivenessRegisterMachine from 'src/pages/liveness-register/hooks/use-liveness-register';
 import {
   Events,
