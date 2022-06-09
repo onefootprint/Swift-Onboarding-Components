@@ -37,6 +37,6 @@ alter table user_data add constraint check_sh_data CHECK (
         OR ((sh_data IS NULL) AND (data_kind NOT IN ('Ssn', 'PhoneNumber', 'Email', 'FirstName', 'LastName', 'LastFourSsn')))
     );
 create unique index if not exists user_data_unique_kind_fingerprint on user_data(data_kind, sh_data) where is_verified = TRUE and data_kind in ('Ssn', 'PhoneNumber', 'Email');
-create unique index if not exists user_data_unique_primary_data on user_data(user_vault_id, data_kind) where deactivated_at is not null and data_priority = 'Primary';
+create unique index if not exists user_data_unique_primary_data on user_data(user_vault_id, data_kind) where deactivated_at is null and data_priority = 'Primary';
 create index if not exists user_data_user_vault_id_data_kind on user_data(user_vault_id, data_kind);
 create index if not exists user_data_fingerprint on user_data(sh_data) where sh_data is not null;
