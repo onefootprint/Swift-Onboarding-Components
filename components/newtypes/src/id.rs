@@ -36,6 +36,7 @@ define_newtype_id!(UserDataId, "Identifier for a User Data");
 define_newtype_id!(UserVaultId, "Identifier for a User Vault");
 define_newtype_id!(OnboardingId, "Identifier for an Onboarding");
 define_newtype_id!(FootprintUserId, "Identifier for a an onboarding");
+define_newtype_id!(ObConfigurationId, "Identifier for a an onboarding configuration");
 
 #[cfg(test)]
 mod tests {

@@ -39,6 +39,7 @@ struct UserPatchRequest {
     zip: Option<String>,
     country: Option<String>,
     email: Option<String>,
+    last_four_ssn: Option<String>,
 }
 
 impl UserPatchRequest {
@@ -55,6 +56,7 @@ impl UserPatchRequest {
             zip,
             country,
             email,
+            last_four_ssn,
         } = self;
 
         vec![
@@ -69,6 +71,7 @@ impl UserPatchRequest {
             (DataKind::Zip, zip),
             (DataKind::Country, country),
             (DataKind::Email, email),
+            (DataKind::LastFourSsn, last_four_ssn),
         ]
         .into_iter()
         .filter_map(|(data_kind, d)| d.map(|d| (data_kind, d)))
@@ -110,10 +113,20 @@ pub async fn update<C: UserVaultPermissions>(
         Err(AuthError::UnauthorizedOperation)?
     }
     let mut data_to_insert = Vec::<DataUpdateRequest>::new();
-    let v = values.clone();
-    let email = v.get(&DataKind::Email);
+    let email = values.get(&DataKind::Email);
+    let ssn = values.get(&DataKind::Ssn);
+    let mut v = values.clone();
+    // if we've added the ssn, go ahead and add last four digits
+    // TODO -- if we have a last four update request, validate it matches current ssn
+    if let Some(ssn) = ssn {
+        let len = ssn.len();
+        v.insert(
+            DataKind::LastFourSsn,
+            ssn.to_owned().drain((len - 4)..len).into_iter().collect(),
+        );
+    }
 
-    for (data_kind, data_str) in values {
+    for (data_kind, data_str) in v {
         // Clean/validate data
         let data_str = clean_for_storage(data_kind, data_str);
         let sh_data = if data_kind.is_fingerprintable() {

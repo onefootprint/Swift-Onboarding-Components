@@ -30,25 +30,6 @@ pub async fn init_or_get(pool: &Pool, new_tenant: NewTenant) -> Result<Tenant, D
     }
 }
 
-pub async fn set_required_data(
-    pool: &Pool,
-    tenant_id: TenantId,
-    data: Vec<DataKind>,
-) -> Result<usize, DbError> {
-    let conn = pool.get().await?;
-
-    let size = conn
-        .interact(move |conn| {
-            diesel::update(schema::tenants::table)
-                .filter(schema::tenants::id.eq(&tenant_id))
-                .set(schema::tenants::required_data.eq(&data))
-                .execute(conn)
-        })
-        .await??;
-
-    Ok(size)
-}
-
 pub async fn get_opt_by_workos_id(pool: &Pool, workos_id: String) -> Result<Option<Tenant>, DbError> {
     let conn = pool.get().await?;
 

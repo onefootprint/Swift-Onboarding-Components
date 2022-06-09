@@ -3,8 +3,9 @@ use crate::State;
 use crate::{enclave::gen_keypair, errors::ApiError};
 
 use crypto::random::gen_random_alphanumeric_code;
+use db::models::ob_configuration::NewOnboardingConfiguration;
 use db::models::tenant_api_keys::PartialTenantApiKey;
-use newtypes::{TenantId, TenantPublicKey};
+use newtypes::{ObConfigurationId, TenantId, TenantPublicKey};
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 
 use db::models::tenants::{NewTenant, Tenant};
@@ -22,6 +23,8 @@ struct NewClientRequest {
 struct NewClientResponse {
     /// unique identifier for this client
     client_id: TenantId,
+    /// onboarding settings id for this client
+    configuration_id: ObConfigurationId,
     /// keys for authenticating as this client
     keys: ClientKeysResponse,
 }
@@ -57,9 +60,12 @@ async fn handler(
     )
     .await?;
 
+    let obc = NewOnboardingConfiguration::default(&state.db_pool, tenant.id.clone()).await?;
+
     Ok(Json(ApiResponseData {
         data: NewClientResponse {
             keys: init_api_keys(&state, &tenant).await?,
+            configuration_id: obc.id,
             client_id: tenant.id,
         },
     }))
@@ -68,10 +74,8 @@ async fn handler(
 async fn init_api_keys(state: &State, tenant: &Tenant) -> Result<ClientKeysResponse, ApiError> {
     let api_key = format!("sk_{}", gen_random_alphanumeric_code(34));
 
-    let e_api_key = crypto::seal::seal_ecies_p256_x963_sha256_aes_gcm(
-        &tenant.public_key,
-        api_key.clone().into_bytes(),
-    )?;
+    let e_api_key =
+        crypto::seal::seal_ecies_p256_x963_sha256_aes_gcm(&tenant.public_key, api_key.clone().into_bytes())?;
 
     let sh_api_key = state.hmac_client.signed_hash(api_key.as_bytes()).await?;
 

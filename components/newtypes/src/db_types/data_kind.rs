@@ -38,6 +38,7 @@ pub enum DataKind {
     Country,
     Email,
     PhoneNumber,
+    LastFourSsn,
 }
 
 impl DataKind {
@@ -56,6 +57,7 @@ impl DataKind {
                 | DataKind::Ssn
                 | DataKind::FirstName
                 | DataKind::LastName
+                | DataKind::LastFourSsn
         )
     }
 }

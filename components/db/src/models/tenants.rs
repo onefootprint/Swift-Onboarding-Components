@@ -15,7 +15,6 @@ pub struct Tenant {
     pub email_domain: String,
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
-    pub required_data: Vec<DataKind>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]

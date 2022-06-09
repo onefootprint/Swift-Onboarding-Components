@@ -97,7 +97,8 @@ def workos_tenant():
     client_secret_key = body["data"]["keys"]["client_secret_key"]
     return {
         "pk": client_public_key,
-        "sk": client_secret_key
+        "sk": client_secret_key,
+        "configuration_id": body["data"]["configuration_id"]
     }
 
 @pytest.fixture(scope="module")
@@ -110,7 +111,8 @@ def foo_tenant():
     client_secret_key = body["data"]["keys"]["client_secret_key"]
     return {
         "pk": client_public_key,
-        "sk": client_secret_key
+        "sk": client_secret_key,
+        "configuration_id": body["data"]["configuration_id"]
     }
 
 def test_identify_email(request):
@@ -190,12 +192,14 @@ def test_onboard_init(request, workos_tenant):
     assert body["data"]["missing_webauthn_credentials"] == True
     
 def test_user_data(request):
+    ssn = _gen_random_ssn()
+    request.config.cache.set("ssn", ssn)
     path = "user/data"
     data = {
         "first_name": "Flerp",
         "last_name": "Derp",
         "dob": "12-25-1995",
-        "ssn": _gen_random_ssn(),
+        "ssn": ssn,
         "street_address": "1 Footprint Way",
         "city": "Enclave",
         "state": "NY",
@@ -466,7 +470,7 @@ def test_tenant_decrypt(request, workos_tenant):
     print(url(path))
     data = {
         "footprint_user_id": request.config.cache.get("fp_user_id", None),
-        "attributes": ["first_name", "email", "zip", "country"]
+        "attributes": ["first_name", "email", "zip", "country", "last_four_ssn"]
     }
     print(data)
     r = requests.post(
@@ -476,8 +480,11 @@ def test_tenant_decrypt(request, workos_tenant):
     )
     body = _assert_response(r)
     attributes = body["data"]
+    print(attributes)
+    print(request.config.cache.get("ssn", None))
     assert attributes["first_name"] == "Flerp2"
     assert attributes["zip"] == "10009"
+    assert attributes["last_four_ssn"] == request.config.cache.get("ssn", None)[-4:]
     assert attributes["country"] == "USA"
     assert attributes["email"] == request.config.cache.get("email", None)
     
@@ -504,8 +511,8 @@ def test_access_events_list(request, workos_tenant):
     )
     body = _assert_response(r)
     access_events = body["data"]
-    assert len(access_events) == 4
-    assert set(i["data_kind"] for i in access_events) == {"first_name", "email", "zip", "country"}
+    assert len(access_events) == 5
+    assert set(i["data_kind"] for i in access_events) == {"first_name", "email", "zip", "country", "last_four_ssn"}
 
     # Test filtering on kind
     path = f"org/access_events?footprint_user_id={fp_user_id}&data_kind=email"
@@ -541,8 +548,8 @@ def test_logged_in_access_events(request):
     )
     body = _assert_response(r)
     access_events = body["data"]
-    assert len(access_events) == 4
-    assert set(i["data_kind"] for i in access_events) == {"first_name", "email", "zip", "country"}
+    assert len(access_events) == 5
+    assert set(i["data_kind"] for i in access_events) == {"first_name", "email", "zip", "country", "last_four_ssn"}
 
 '''TODO: user log in token is different from token tenant receives on behalf of the user 
 -- this request receives a 401 because the tenant is not able to decrypt attributes within
@@ -567,10 +574,15 @@ an onboarding session
 
 def test_default_attributes(request, workos_tenant):
     path = "org/required_data"
+    data = {
+            "configuration_id": workos_tenant["configuration_id"]
+    }
     r = requests.get(
         url(path),
         headers=_client_priv_key_headers(workos_tenant["sk"]), 
+        json=data
     )
+    print(workos_tenant["configuration_id"])
     body = _assert_response(r)
     attributes = set(body["data"])
     print(attributes)
@@ -580,7 +592,8 @@ def test_change_attributes(request, workos_tenant):
     path = "org/required_data"
     attributes = ["first_name", "last_name", "phone_number", "email"]
     data = {
-        "attributes": attributes
+        "attributes": attributes,
+        "configuration_id": workos_tenant["configuration_id"]
     }
     r = requests.post(
         url(path),
@@ -592,6 +605,9 @@ def test_change_attributes(request, workos_tenant):
     r = requests.get(
         url(path),
         headers=_client_priv_key_headers(workos_tenant["sk"]), 
+        json={
+            "configuration_id": workos_tenant["configuration_id"]
+        }
     )
     body = _assert_response(r)
     assert set(body["data"]) == set(attributes)
@@ -599,7 +615,8 @@ def test_change_attributes(request, workos_tenant):
     r = requests.post(
         url(path),
         headers=_client_priv_key_headers(workos_tenant["sk"]), 
-        json={
+        json= {
+            "configuration_id": workos_tenant["configuration_id"],
             "attributes": list(DEFAULT_ATTRIBUTES)
         }
     )

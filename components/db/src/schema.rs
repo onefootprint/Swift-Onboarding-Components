@@ -37,6 +37,22 @@ table! {
     use diesel::sql_types::*;
     use newtypes::db_types::*;
 
+    ob_configurations (id) {
+        id -> Varchar,
+        name -> Varchar,
+        description -> Nullable<Varchar>,
+        tenant_id -> Varchar,
+        created_at -> Timestamp,
+        updated_at -> Timestamp,
+        required_user_data -> Array<Data_kind>,
+        settings -> Jsonb,
+    }
+}
+
+table! {
+    use diesel::sql_types::*;
+    use newtypes::db_types::*;
+
     onboardings (id) {
         id -> Varchar,
         user_ob_id -> Varchar,
@@ -92,7 +108,6 @@ table! {
         email_domain -> Varchar,
         created_at -> Timestamp,
         updated_at -> Timestamp,
-        required_data -> Array<Data_kind>,
     }
 }
 
@@ -148,6 +163,7 @@ table! {
 }
 
 joinable!(access_events -> onboardings (onboarding_id));
+joinable!(ob_configurations -> tenants (tenant_id));
 joinable!(onboardings -> tenants (tenant_id));
 joinable!(onboardings -> user_vaults (user_vault_id));
 joinable!(user_data -> user_vaults (user_vault_id));
@@ -156,6 +172,7 @@ joinable!(webauthn_credentials -> user_vaults (user_vault_id));
 allow_tables_to_appear_in_same_query!(
     access_events,
     insight_events,
+    ob_configurations,
     onboardings,
     sessions,
     tenant_api_keys,
