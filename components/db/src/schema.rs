@@ -11,6 +11,7 @@ table! {
         updated_at -> Timestamp,
         insight_event_id -> Nullable<Uuid>,
         reason -> Varchar,
+        principal -> Nullable<Varchar>,
     }
 }
 

@@ -1,0 +1,1 @@
+ALTER TABLE access_events ADD COLUMN principal VARCHAR(250);

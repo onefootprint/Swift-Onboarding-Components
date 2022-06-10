@@ -39,3 +39,18 @@ impl UserVaultPermissions for WorkOsSession {
         false
     }
 }
+
+impl WorkOsSession {
+    pub fn format_principal(&self) -> String {
+        // Show "Name (email)" as the principal if the name is set, otherwise just email
+        let name = match (&self.first_name, &self.last_name) {
+            (Some(first_name), Some(last_name)) => Some(format!("{} {}", first_name, last_name)),
+            (Some(name), None) | (None, Some(name)) => Some(name.clone()),
+            (None, None) => None,
+        };
+        match name {
+            Some(name) => format!("{} ({})", name, self.email),
+            None => self.email.clone(),
+        }
+    }
+}

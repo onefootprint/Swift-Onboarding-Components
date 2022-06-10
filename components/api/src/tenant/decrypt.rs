@@ -44,6 +44,14 @@ fn handler(
     .await?
     .ok_or(ApiError::InvalidTenantKeyOrUserId)?;
 
+    let principal = if let Either::Left(workos) = auth.clone() {
+        // A user in admin dashboard is decrypting - log the user's name and email
+        Some(workos.data.format_principal())
+    } else {
+        // A secret key is decrypting via API - this is designated as None for now
+        None
+    };
+
     let DecryptFieldsResult {
         fields_to_decrypt,
         result_map,
@@ -63,6 +71,7 @@ fn handler(
             onboarding_id: onboarding.id.clone(),
             data_kind: *data_kind,
             reason: request.reason.clone(),
+            principal: principal.clone(),
         })
         .collect();
     NewAccessEventBatch {
