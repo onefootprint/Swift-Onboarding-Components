@@ -49,16 +49,17 @@ fn set(
 }
 
 #[api_v2_operation(tags(Org))]
-#[get("/required_data")]
+#[get("/required_data/{configuration_id}")]
 /// Get the attributes the tenant requires of the client (name, SSN, etc.)
 fn get(
     state: web::Data<State>,
-    req: Json<GetDataRequest>,
+    path: web::Path<ObConfigurationId>,
     auth: Either<SessionContext<WorkOsSession>, SecretTenantAuthContext>,
 ) -> actix_web::Result<Json<ApiResponseData<Vec<DataKind>>>, ApiError> {
     let tenant = auth.tenant(&state.db_pool).await?;
+    let configuration_id = path.into_inner();
 
-    let obc = ObConfiguration::get(&state.db_pool, req.configuration_id.clone(), tenant.id).await?;
+    let obc = ObConfiguration::get(&state.db_pool, configuration_id, tenant.id).await?;
 
     Ok(Json(ApiResponseData {
         data: obc.required_user_data,

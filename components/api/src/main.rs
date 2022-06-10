@@ -29,6 +29,7 @@ mod enclave;
 mod identify;
 mod index;
 mod onboarding;
+mod private;
 mod tenant;
 mod types;
 mod user;
@@ -203,7 +204,11 @@ async fn main() -> std::io::Result<()> {
             .wrap(session_middleware)
             .wrap_api()
             .configure(index::routes)
-            .service(web::scope("/private").service(client::init::handler))
+            .service(
+                web::scope("/private")
+                    .service(client::init::handler)
+                    .service(private::cleanup::post),
+            )
             .service(identify::routes())
             .service(tenant::routes())
             .service(onboarding::routes())

@@ -16,6 +16,9 @@ use deadpool::managed::Hook;
 use deadpool_diesel::postgres::{Manager, Pool, Runtime};
 pub use diesel::prelude::PgConnection;
 use diesel::prelude::*;
+use models::onboardings::Onboarding;
+use newtypes::DataKind;
+use user_vault::get_by_fingerprint;
 
 #[allow(unused_imports)]
 pub mod schema;
@@ -69,6 +72,53 @@ pub async fn health_check(pool: &Pool) -> Result<(), DbError> {
         .interact(move |conn| diesel::sql_query("SELECT 1").execute(conn))
         .await??;
 
+    Ok(())
+}
+
+pub async fn private_cleanup_integration_tests(pool: &Pool, sh_data: Vec<u8>) -> Result<(), DbError> {
+    // we register users within our integration tests. to avoid filling up our database with fake information,
+    // we clean up afterwards.
+    let uv = get_by_fingerprint(pool, DataKind::PhoneNumber, sh_data, false).await?;
+    if uv.is_none() {
+        return Ok(());
+    }
+    let (uv, _) = uv.unwrap();
+
+    let conn = pool.get().await?;
+
+    conn.interact(move |conn| -> Result<(), DbError> {
+        // delete user data
+        diesel::delete(schema::user_data::table.filter(schema::user_data::user_vault_id.eq(&uv.id)))
+            .execute(conn)?;
+
+        // grab onboardings, delete access events
+        let obs: Vec<Onboarding> = schema::onboardings::table
+            .filter(schema::onboardings::user_vault_id.eq(&uv.id))
+            .get_results(conn)?;
+        for ob in obs {
+            diesel::delete(
+                schema::access_events::table.filter(schema::access_events::onboarding_id.eq(&ob.id)),
+            )
+            .execute(conn)?;
+        }
+
+        // delete onboardings
+        diesel::delete(schema::onboardings::table.filter(schema::onboardings::user_vault_id.eq(&uv.id)))
+            .execute(conn)?;
+
+        // delete webauthn
+        diesel::delete(
+            schema::webauthn_credentials::table
+                .filter(schema::webauthn_credentials::user_vault_id.eq(&uv.id)),
+        )
+        .execute(conn)?;
+
+        // delete user vault
+        diesel::delete(schema::user_vaults::table.filter(schema::user_vaults::id.eq(&uv.id)))
+            .execute(conn)?;
+        Ok(())
+    })
+    .await??;
     Ok(())
 }
 

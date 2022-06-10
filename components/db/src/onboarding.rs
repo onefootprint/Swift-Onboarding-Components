@@ -15,14 +15,14 @@ pub async fn list_for_tenant(
 
     let onboardings = conn
         .interact(move |conn| -> Result<Vec<Onboarding>, DbError> {
-            let mut onboardings =
-                schema::onboardings::table
-                    .left_join(schema::user_data::table.on(
-                        schema::user_data::user_vault_id.eq(schema::onboardings::user_vault_id),
-                    ))
-                    .filter(schema::onboardings::tenant_id.eq(tenant_id))
-                    .order_by(schema::onboardings::created_at.desc())
-                    .into_boxed();
+            let mut onboardings = schema::onboardings::table
+                .left_join(
+                    schema::user_data::table
+                        .on(schema::user_data::user_vault_id.eq(schema::onboardings::user_vault_id)),
+                )
+                .filter(schema::onboardings::tenant_id.eq(tenant_id))
+                .order_by(schema::onboardings::created_at.desc())
+                .into_boxed();
 
             if let Some(status) = status {
                 onboardings = onboardings.filter(schema::onboardings::status.eq(status))

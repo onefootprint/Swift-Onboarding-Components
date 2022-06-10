@@ -30,16 +30,13 @@ DEFAULT_ATTRIBUTES = {
         'phone_number'
     }
 url = lambda path: "{}/{}".format(os.environ.get('TEST_URL'), path)
+PHONE_NUMBER = "+1 (555) 555-0101"
 
 def _gen_random_n_digit_number(n):
     return "".join([str(random.randint(0, 9)) for _ in range(n)])
 
 def _gen_random_email():
     return f"user_{_gen_random_n_digit_number(7)}@onefootprint.com"
-
-def _gen_random_phone_number():
-    last_two = _gen_random_n_digit_number(2)
-    return f"+1 (555) 555-01{last_two}"
 
 def _gen_random_ssn():
     return _gen_random_n_digit_number(9)
@@ -57,8 +54,6 @@ def _client_priv_key_headers(client_priv_key):
 def _fpuser_auth_headers(request):
     return _fpuser_auth_header_raw(request.config.cache.get("fpuser_auth_token", None))
 
-def _d2p_auth_headers(request):
-    return d2p_auth_header_raw(request.config.cache.get("d2p_auth_token", None))
 
 def _fpuser_auth_header_raw(value):
     return {
@@ -115,6 +110,15 @@ def foo_tenant():
         "configuration_id": body["data"]["configuration_id"]
     }
 
+# cleanup before running in the case something crashed in the middle of execution
+def test_cleanup_integration_tests_prior(request):
+    path = "private/cleanup"
+    r = requests.post(
+        url(path),
+    )
+    _assert_response(r)
+
+
 def test_identify_email(request):
     path = "identify"
     print(url(path))
@@ -136,8 +140,7 @@ def test_identify_email(request):
 def test_identify_phone(request):
     path = "identify"
     print(url(path))
-    phone_number = _gen_random_phone_number()
-    request.config.cache.set("phone_number", phone_number)
+    phone_number = PHONE_NUMBER
     identifier = {"phone_number": phone_number}
     data = {"identifier": identifier, "preferred_challenge_kind": "sms"}
 
@@ -153,8 +156,7 @@ def test_identify_phone(request):
 
 def test_identify_challenge(request):
     path = "identify/challenge"
-    phone_number = request.config.cache.get("phone_number", None)
-    data = {"phone_number": phone_number}
+    data = {"phone_number": PHONE_NUMBER}
     r = requests.post(
         url(path),
         json=data,
@@ -358,7 +360,6 @@ def test_identify_login_repeat_customer_biometric(request, foo_tenant):
     path = "identify"
     print(url(path))
     email = request.config.cache.get("email", None)
-    phone_number = request.config.cache.get("phone_number", None)
     identifier = {"email": email}
     data = {"identifier": identifier, "preferred_challenge_kind": "biometric"}
     r = requests.post(
@@ -367,7 +368,7 @@ def test_identify_login_repeat_customer_biometric(request, foo_tenant):
     )
     body = _assert_response(r)
     assert body["data"]["user_found"]
-    assert body["data"]["challenge_data"]["phone_number_last_two"] == phone_number[-2:]
+    assert body["data"]["challenge_data"]["phone_number_last_two"] == PHONE_NUMBER[-2:]
     assert body["data"]["challenge_data"]["challenge_kind"] == "biometric"
     assert body["data"]["challenge_data"]["biometric_challenge_json"]
   
@@ -412,7 +413,6 @@ def test_identify_repeat_customer(request, foo_tenant):
     path = "identify"
     print(url(path))
     email = request.config.cache.get("email", None)
-    phone_number = request.config.cache.get("phone_number", None)
     identifier = {"email": email}
     data = {"identifier": identifier, "preferred_challenge_kind": "sms"}
     r = requests.post(
@@ -421,7 +421,7 @@ def test_identify_repeat_customer(request, foo_tenant):
     )
     body = _assert_response(r)
     assert body["data"]["user_found"]
-    assert body["data"]["challenge_data"]["phone_number_last_two"] == phone_number[-2:]
+    assert body["data"]["challenge_data"]["phone_number_last_two"] == PHONE_NUMBER[-2:]
     assert body["data"]["challenge_data"]["challenge_kind"] == "sms"
 
     # Log in as the user
@@ -573,14 +573,11 @@ an onboarding session
 #     assert attributes["email"] == request.config.cache.get("email", None)
 
 def test_default_attributes(request, workos_tenant):
-    path = "org/required_data"
-    data = {
-            "configuration_id": workos_tenant["configuration_id"]
-    }
+    config_id = workos_tenant["configuration_id"]
+    path = "org/required_data/{}".format(config_id)
     r = requests.get(
         url(path),
         headers=_client_priv_key_headers(workos_tenant["sk"]), 
-        json=data
     )
     print(workos_tenant["configuration_id"])
     body = _assert_response(r)
@@ -589,11 +586,12 @@ def test_default_attributes(request, workos_tenant):
     assert attributes == DEFAULT_ATTRIBUTES
 
 def test_change_attributes(request, workos_tenant):
+    config_id = workos_tenant["configuration_id"]
     path = "org/required_data"
     attributes = ["first_name", "last_name", "phone_number", "email"]
     data = {
         "attributes": attributes,
-        "configuration_id": workos_tenant["configuration_id"]
+        "configuration_id": config_id
     }
     r = requests.post(
         url(path),
@@ -602,12 +600,10 @@ def test_change_attributes(request, workos_tenant):
     )
     body = _assert_response(r)
     # make sure we changed
+    get_path = path + "/" + config_id
     r = requests.get(
-        url(path),
+        url(get_path),
         headers=_client_priv_key_headers(workos_tenant["sk"]), 
-        json={
-            "configuration_id": workos_tenant["configuration_id"]
-        }
     )
     body = _assert_response(r)
     assert set(body["data"]) == set(attributes)
@@ -616,9 +612,15 @@ def test_change_attributes(request, workos_tenant):
         url(path),
         headers=_client_priv_key_headers(workos_tenant["sk"]), 
         json= {
-            "configuration_id": workos_tenant["configuration_id"],
+            "configuration_id": config_id,
             "attributes": list(DEFAULT_ATTRIBUTES)
         }
     )
     _assert_response(r)
 
+def test_cleanup_integration_tests(request):
+    path = "private/cleanup"
+    r = requests.post(
+        url(path),
+    )
+    _assert_response(r)
