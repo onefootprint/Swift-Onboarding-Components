@@ -1,3 +1,4 @@
+import FieldTag from '@src/components/field-tag';
 import Timeline from '@src/components/timeline';
 import UserHeader from '@src/pages/users/pages/detail/components/user-header';
 import IcoBuilding16 from 'icons/ico/ico-building-16';
@@ -107,7 +108,7 @@ const Detail = () => {
             items={[
               {
                 timestamp: '2022-06-02 22:24:41',
-                ItemIcon: IcoCheck16,
+                iconComponent: <IcoCheck16 />,
                 headerComponent: (
                   <Typography variant="label-3">
                     Liveness checks succeeded
@@ -132,53 +133,53 @@ const Detail = () => {
               },
               {
                 timestamp: '2022-06-02 22:24:41',
-                ItemIcon: IcoUserCircle16,
+                iconComponent: <IcoUserCircle16 />,
                 headerComponent: (
                   <Typography variant="body-3">
-                    <FieldTag>Name</FieldTag>
+                    <FieldTag dataKind={DataKind.firstName} />
                     ,&nbsp;
-                    <FieldTag>Date of birth</FieldTag> verified by Experian
+                    <FieldTag dataKind={DataKind.dob} />
                   </Typography>
                 ),
               },
               {
                 timestamp: '2022-06-02 22:25:41',
-                ItemIcon: IcoBuilding16,
+                iconComponent: <IcoBuilding16 />,
                 headerComponent: (
                   <Typography variant="body-3">
-                    <FieldTag>Country</FieldTag>
+                    <FieldTag dataKind={DataKind.country} />
                     ,&nbsp;
-                    <FieldTag>State</FieldTag> verified by Socure
+                    <FieldTag dataKind={DataKind.state} /> verified by Socure
                   </Typography>
                 ),
               },
               {
                 timestamp: '2022-06-02 22:25:41',
-                ItemIcon: IcoBuilding16,
+                iconComponent: <IcoBuilding16 />,
                 headerComponent: (
                   <Typography variant="body-3">
-                    <FieldTag>Address line 1</FieldTag>
+                    <FieldTag dataKind={DataKind.streetAddress} />
                     ,&nbsp;
-                    <FieldTag>Address line 2</FieldTag>
+                    <FieldTag dataKind={DataKind.streetAddress2} />
                     ,&nbsp;
-                    <FieldTag>City</FieldTag>
+                    <FieldTag dataKind={DataKind.city} />
                     ,&nbsp;
-                    <FieldTag>Zip code</FieldTag> verified by Socure
+                    <FieldTag dataKind={DataKind.zip} /> verified by Socure
                   </Typography>
                 ),
               },
               {
                 timestamp: '2022-06-02 22:25:41',
-                ItemIcon: IcoUserCircle16,
+                iconComponent: <IcoUserCircle16 />,
                 headerComponent: (
                   <Typography variant="body-3">
-                    <FieldTag>Ssn</FieldTag> verified by LexisNexis
+                    <FieldTag dataKind={DataKind.ssn} /> verified by LexisNexis
                   </Typography>
                 ),
               },
               {
                 timestamp: '2022-06-02 22:26:41',
-                ItemIcon: IcoFootprint16,
+                iconComponent: <IcoFootprint16 />,
                 headerComponent: (
                   <Typography variant="label-3" color="success">
                     Verified by Footprint
@@ -192,15 +193,6 @@ const Detail = () => {
     </>
   );
 };
-
-const FieldTag = styled(Typography).attrs({ as: 'span', variant: 'label-4' })`
-  ${({ theme }) => css`
-    color: ${theme.color.neutral};
-    background-color: ${theme.backgroundColor.neutral};
-    padding: ${theme.spacing[1]}px ${theme.spacing[2]}px;
-    border-radius: 4px; // TODO put in design library
-  `};
-`;
 
 const HeaderContainer = styled.div`
   ${({ theme }) => css`

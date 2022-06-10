@@ -1,11 +1,10 @@
-import { Icon } from 'icons';
 import React from 'react';
 import styled, { css } from 'styled-components';
 import { Typography } from 'ui';
 
 type TimelineItem = {
   timestamp: string;
-  ItemIcon: Icon;
+  iconComponent: React.ReactNode;
   headerComponent: React.ReactNode;
   bodyComponent?: React.ReactNode;
 };
@@ -31,9 +30,7 @@ const Timeline = ({ items }: TimelineProps) => (
             minute: 'numeric',
           })}
         </Typography>
-        <IconContainer>
-          <item.ItemIcon />
-        </IconContainer>
+        <IconContainer>{item.iconComponent}</IconContainer>
         <HeaderContainer>{item.headerComponent}</HeaderContainer>
         {(i !== items.length - 1 || !!item.bodyComponent) && <Connector />}
         <BodyContainer>
