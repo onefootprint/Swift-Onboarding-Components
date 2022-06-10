@@ -194,7 +194,12 @@ async fn main() -> std::io::Result<()> {
 
         App::new()
             .app_data(web::Data::new(state.clone()))
-            .wrap(sentry_actix::Sentry::new())
+            .wrap(
+                sentry_actix::Sentry::builder()
+                    .capture_server_errors(true)
+                    .start_transaction(true)
+                    .finish(),
+            )
             .wrap(actix_web::middleware::NormalizePath::trim())
             .wrap(Logger::default())
             .wrap(TracingLogger::<TelemetrySpanBuilder>::new())
