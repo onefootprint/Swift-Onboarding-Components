@@ -1,6 +1,7 @@
 import { useQuery } from 'react-query';
 import request, { RequestError, RequestResponse } from 'request';
 import { useLivenessRegisterMachine } from 'src/pages/liveness-register/components/machine-provider';
+import { MachineContext } from 'src/utils/state-machine/liveness-register';
 
 const D2P_STATUS_FETCH_INTERVAL = 1000;
 
@@ -33,12 +34,14 @@ const getD2PStatus = async (payload: GetD2PRequest) => {
 
 const useGetD2PStatus = () => {
   const [state] = useLivenessRegisterMachine();
-  const { scopedAuthToken } = state.context;
-  return useQuery<GetD2PResponse, RequestError>(
+  const { scopedAuthToken } = state.context as MachineContext;
+  return useQuery<GetD2PResponse | undefined, RequestError>(
     [scopedAuthToken],
-    () => getD2PStatus({ scopedAuthToken }),
+    // If scopedAuthToken hasn't been set yet, return undefined
+    () => (scopedAuthToken ? getD2PStatus({ scopedAuthToken }) : undefined),
     {
       refetchInterval: D2P_STATUS_FETCH_INTERVAL,
+      enabled: !!scopedAuthToken,
     },
   );
 };

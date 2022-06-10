@@ -62,6 +62,9 @@ const createLivenessRegisterMachine = (
             [Events.qrRegisterSucceeded]: {
               target: States.livenessRegisterCompleted,
             },
+            [Events.qrRegisterFailed]: {
+              target: States.livenessRegisterCompleted,
+            },
           },
         },
         [States.qrCodeScanned]: {

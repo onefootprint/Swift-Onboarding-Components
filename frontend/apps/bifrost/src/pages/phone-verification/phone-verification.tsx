@@ -91,7 +91,9 @@ const PhoneVerification = () => {
         </Typography>
         <Typography variant="body-2" color="secondary">
           Enter the 6-digit code sent to (•••) ••• ••
-          {state.context.challenge?.phoneNumberLastTwo}.
+          {state.context.challenge?.phoneNumberLastTwo ??
+            state.context.phone?.slice(-2)}
+          .
         </Typography>
       </Box>
       {shouldShowLoading ? (

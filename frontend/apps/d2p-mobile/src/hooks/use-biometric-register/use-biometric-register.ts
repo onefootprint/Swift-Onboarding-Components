@@ -26,15 +26,12 @@ const generateDeviceResponse = async (challenge: string) => {
   publicKey.user.id = base64url.toBuffer(
     publicKey.user.id as unknown as string,
   );
-  const attestationObject = base64url.encode(
-    // @ts-ignore
-    publicKey.response.attestationObject as Buffer,
-  );
-
   const publicKeyCredential = (await window.navigator.credentials.create({
     publicKey,
   })) as PublicKeyCredential;
-
+  const attestationObject = base64url.encode(
+    (publicKeyCredential.response as any).attestationObject as Buffer,
+  );
   const clientDataJSON = base64url.encode(
     publicKeyCredential.response.clientDataJSON as Buffer,
   );
@@ -62,12 +59,12 @@ const biometricRegister = async (payload: BiometricRegisterRequest) => {
     url: '/user/biometric/init',
     data: payload,
     headers: {
-      'X-Fpuser-Authorization': authToken,
+      'x-d2p-authorization': authToken,
     },
   });
 
   const { challengeToken } = initResponse.data;
-  const deviceResponseJson = generateDeviceResponse(
+  const deviceResponseJson = await generateDeviceResponse(
     initResponse.data.challengeJson,
   );
 
@@ -81,7 +78,7 @@ const biometricRegister = async (payload: BiometricRegisterRequest) => {
       challengeToken,
     },
     headers: {
-      'X-Fpuser-Authorization': authToken,
+      'x-d2p-authorization': authToken,
     },
   });
   return response.data;

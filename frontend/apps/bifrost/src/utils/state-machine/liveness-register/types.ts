@@ -28,6 +28,7 @@ export enum Events {
   qrCodeScanned = 'qrCodeScanned',
   qrCodeCanceled = 'qrCodeCanceled',
   qrRegisterSucceeded = 'qrRegisterSucceeded',
+  qrRegisterFailed = 'qrRegisterFailed',
 }
 
 export enum Actions {
@@ -48,5 +49,6 @@ export type MachineEvents =
   | { type: Events.qrCodeLinkSentViaSms }
   | { type: Events.qrCodeScanned }
   | { type: Events.qrRegisterSucceeded }
+  | { type: Events.qrRegisterFailed }
   | { type: Events.captchaRegisterSucceeded }
   | { type: Events.biometricRegisterSucceeded };

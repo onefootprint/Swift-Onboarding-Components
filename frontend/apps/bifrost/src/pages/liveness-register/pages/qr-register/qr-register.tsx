@@ -4,6 +4,7 @@ import HeaderTitle from 'src/components/header-title';
 import { D2P_BASE_URL } from 'src/constants';
 import useD2PGenerate from 'src/hooks/d2p/use-d2p-generate';
 import useD2PSms from 'src/hooks/d2p/use-d2p-sms';
+import useGetD2PStatus, { D2PStatus } from 'src/hooks/d2p/use-get-d2p-status';
 import useLivenessRegisterMachine from 'src/pages/liveness-register/hooks/use-liveness-register';
 import {
   Events,
@@ -16,6 +17,7 @@ const QRRegister = () => {
   const [state, send] = useLivenessRegisterMachine();
   const d2pGenerateMutation = useD2PGenerate();
   const d2pSmsMutation = useD2PSms();
+  const statusResponse = useGetD2PStatus();
   const { authToken } = state.context as MachineContext;
   const [scopedAuthToken, setScopedAuthToken] = useState<string>('');
 
@@ -40,6 +42,24 @@ const QRRegister = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  useEffect(() => {
+    const status = statusResponse?.data?.status;
+    if (status === D2PStatus.completed) {
+      send({
+        type: Events.qrRegisterSucceeded,
+      });
+    } else if (status === D2PStatus.canceled || status === D2PStatus.failed) {
+      send({ type: Events.qrRegisterFailed });
+    } else if (status === D2PStatus.inProgress) {
+      // If the user pressed "send link via sms", we already sent the Events.qrCodeSent and transitioned to another page
+      // The only way to get this status while still on this page is if the user scanned the qr code
+      send({
+        type: Events.qrCodeScanned,
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [statusResponse?.data?.status]);
+
   const handleSendLinkToPhone = () => {
     if (!scopedAuthToken) {
       return;
@@ -53,8 +73,6 @@ const QRRegister = () => {
       },
     );
   };
-
-  // TODO: start polling status, see if it changes
 
   return (
     <Container>

@@ -2,37 +2,37 @@ import { assign, createMachine } from 'xstate';
 
 import { Actions, D2PContext, D2PEvent, Events, States } from './types';
 
-const initialContext: D2PContext = {
-  device: {
-    type: 'mobile',
-    hasSupportForWebAuthn: false,
-  },
-  authToken: 'PLACEHOLDER_AUTH_TOKEN', // TODO: fill this later
-};
-
-const d2pMachine = createMachine<D2PContext, D2PEvent>(
+const d2pMobileMachine = createMachine<D2PContext, D2PEvent>(
   {
     id: 'd2pMachine',
     initial: States.init,
-    context: initialContext,
-    on: {
-      [Events.deviceInfoIdentified]: {
-        actions: [Actions.assignDeviceInfo],
+    context: {
+      device: {
+        type: 'mobile',
+        hasSupportForWebAuthn: false,
       },
+      authToken: '',
     },
     states: {
       [States.init]: {
-        always: [
-          {
-            target: States.biometricRegister,
-            cond: context =>
-              context.device.type === 'mobile' &&
-              context.device.hasSupportForWebAuthn,
+        on: {
+          [Events.authTokenIdentified]: {
+            actions: [Actions.assignAuthToken],
           },
-          {
-            target: States.biometricUnavailable,
-          },
-        ],
+          [Events.deviceInfoIdentified]: [
+            {
+              target: States.biometricRegister,
+              cond: (context, event) =>
+                event.payload.type === 'mobile' &&
+                event.payload.hasSupportForWebAuthn,
+              actions: [Actions.assignDeviceInfo],
+            },
+            {
+              target: States.biometricUnavailable,
+              actions: [Actions.assignDeviceInfo],
+            },
+          ],
+        },
       },
       [States.biometricRegister]: {
         on: {
@@ -79,8 +79,14 @@ const d2pMachine = createMachine<D2PContext, D2PEvent>(
         }
         return context;
       }),
+      [Actions.assignAuthToken]: assign((context, event) => {
+        if (event.type === Events.authTokenIdentified) {
+          context.authToken = event.payload.authToken;
+        }
+        return context;
+      }),
     },
   },
 );
 
-export default d2pMachine;
+export default d2pMobileMachine;

@@ -8,6 +8,7 @@ export enum States {
 }
 
 export enum Events {
+  authTokenIdentified = 'authTokenIdentified',
   deviceInfoIdentified = 'deviceInfoIdentified',
   biometricRegisterFailed = 'biometricRegisterFailed',
   biometricRegisterSucceeded = 'biometricRegisterSucceeded',
@@ -16,6 +17,7 @@ export enum Events {
 
 export enum Actions {
   assignDeviceInfo = 'assignDeviceInfo',
+  assignAuthToken = 'assignAuthToken',
 }
 
 export type DeviceInfo = {
@@ -29,6 +31,7 @@ export type D2PContext = {
 };
 
 export type D2PEvent =
+  | { type: Events.authTokenIdentified; payload: { authToken: string } }
   | {
       type: Events.deviceInfoIdentified;
       payload: {
