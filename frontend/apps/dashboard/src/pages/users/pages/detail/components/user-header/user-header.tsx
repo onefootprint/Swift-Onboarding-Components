@@ -6,7 +6,7 @@ import {
 import React from 'react';
 import { User } from 'src/pages/users/hooks/use-join-users';
 import styled, { css } from 'styled-components';
-import { Badge, Typography } from 'ui';
+import { Badge, Code, Typography } from 'ui';
 
 import DecryptModal from '../decrypt-modal';
 
@@ -74,22 +74,6 @@ const SplitRow = styled.div`
   display: flex;
   flex-direction: column wrap;
   justify-content: space-between;
-`;
-
-// TODO migrate to real component from design library
-// https://linear.app/footprint/issue/FP-204
-const Code = styled.span`
-  ${({ theme }) => css`
-    background-color: ${theme.backgroundColor.secondary};
-    border: 1px solid ${theme.borderColor.tertiary};
-    border-radius: ${theme.spacing[2]}px;
-    padding: ${theme.spacing[2]}px ${theme.spacing[2]}px;
-    color: ${theme.color.error};
-    font-family: MONOSPACE;
-    font-style: normal;
-    font-weight: 400;
-    font-size: 14px;
-  `};
 `;
 
 export default UserHeader;

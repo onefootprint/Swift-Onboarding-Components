@@ -8,6 +8,8 @@ export * from './button';
 export { default as Button } from './button';
 export * from './checkbox';
 export { default as Checkbox } from './checkbox';
+export * from './code';
+export { default as Code } from './code';
 export * from './container';
 export { default as Container } from './container';
 export * from './country-select';

@@ -9,7 +9,7 @@ export type CodeProps = {
 
 const Code = styled.span.attrs<CodeProps>(({ testID }) => ({
   'data-testid': testID,
-  as: 'span',
+  as: 'p',
 }))<CodeProps>`
   ${({ theme }) => css`
     ${createFontStyles('snippet-2')};

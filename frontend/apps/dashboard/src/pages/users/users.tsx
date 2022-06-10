@@ -14,20 +14,20 @@ import useJoinUsers, {
   User,
 } from 'src/pages/users/hooks/use-join-users';
 import styled, { css } from 'styled-components';
-import { Badge, TextInput, Typography } from 'ui';
+import { Badge, Code, TextInput, Typography } from 'ui';
 import { useMap } from 'usehooks-ts';
 
 import DecryptDataDialog from './components/decrypt-data-dialog';
 import UsersFilter from './components/users-filter';
 
 const columns = [
-  { text: 'Name', width: '12.5%' },
-  { text: 'Footprint Token', width: '20%' },
+  { text: 'Name', width: '15%' },
+  { text: 'Footprint Token', width: '12.5%' },
   { text: 'Status', width: '12.5%' },
-  { text: 'Email', width: '12.5%' },
+  { text: 'Email', width: '15%' },
   { text: 'SSN', width: '12.5%' },
-  { text: 'Phone Number', width: '12.5%' },
-  { text: 'Date', width: '17.5%' },
+  { text: 'Phone Number', width: '15%' },
+  { text: 'Date', width: '15%' },
 ];
 
 const Users = () => {
@@ -83,7 +83,7 @@ const Users = () => {
               />
             </td>
             <td>
-              <Typography variant="body-3">{item.footprintUserId}</Typography>
+              <Code>{item.footprintUserId}</Code>
             </td>
             <td>
               <Badge variant={statusToBadgeVariant[item.status]}>
