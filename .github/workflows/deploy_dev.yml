@@ -53,6 +53,10 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+        # sleep for 30s to make sure we've deployed new containers before running integration tests
+        # TODO: get actual status from amazon?
+      - name: Sleep for 30s
+        run: sleep 30
       - name: Integration testing
         working-directory: ci
         run: pytest -q integration_tests.py --emoji -v --md report.md --html report.html --self-contained-html
