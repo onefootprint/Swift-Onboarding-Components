@@ -31,6 +31,14 @@ So when making style comments, let's make sure they are using our own consistent
   - 1 module for 1 url path segment (multiple http methods in same module)
   - name handlers `[method]`, for example `user::biometric::init::post` corresponds to `POST /user/biometric/init`
   - request/response structs in the same module above the handler or in a `types.rs` if they are going to be used in more places
+- DB tables:
+  - Make table names plural and snake_case
+  - When writing foreign keys, point to the primary key of the referenced table unless there's a good reason
+  - Every table should have `_created_at` and `_updated_at` timestamp columns tracked by the DB, _for debugging purposes only_
+    - These columns should not be exposed externally since they can very frequently be unintentionally changed. If you want to expose the time at which a specific action occurred, create explicit timestamp column for that purpose. For example, it's not save to assume that the `_updated_at` timestamp on an Onboarding row is the exact time at which its status transitioned to the most recent status
+  - Favor normalized data over denormalized columns. Denormalized data is hard to keep synchronized. it is okay to denormalize a piece of data under two conditions:
+    - The data being denormalized is static and isn't frequently changed
+    - Denormalizing the data will drastically reduce complexity in code and save lots of JOINs. For example, if you have tables A foreign keys to B foreign keys to C, and you very frequently need to fetch data on JOINed rows from A and C, you may be joining _through_ table B without ever reading data from table B. This is a case when it may be worthwhile to denormalize a foreign key from A to C
 - Newtypes:
   - anything returned by our API and used inside the Database model should be a Newtype
   - use Newtypes to represent structured primitives (like a String that represents an encrypted token for example)
