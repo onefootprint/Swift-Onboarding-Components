@@ -59,7 +59,7 @@ const Field = styled(Cleave).attrs<{ as?: 'textarea' | 'input' }>(({ as }) => ({
       }
 
       ::placeholder {
-        color: ${theme.color.tertiary};
+        color: ${theme.color.quaternary};
       }
 
       ::-webkit-credentials-auto-fill-button {

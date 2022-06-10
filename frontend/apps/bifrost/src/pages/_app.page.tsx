@@ -53,7 +53,7 @@ const Container = styled.div`
   ${({ theme }) => css`
     margin: 0 auto;
     max-width: 500px;
-    padding-inline: ${theme.spacing[5]}px;
+    padding-inline: ${theme.spacing[6]}px;
   `}
 `;
 
