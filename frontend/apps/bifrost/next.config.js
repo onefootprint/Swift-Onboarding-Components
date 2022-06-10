@@ -15,10 +15,20 @@ const withTM = require('next-transpile-modules')([
   'themes',
 ]);
 
-module.exports = withPlugins([withTM, withBundleAnalyzer, withSentryConfig], {
+const nextConfig = {
   pageExtensions: ['page.tsx', 'page.ts', 'page.jsx', 'page.js'],
   reactStrictMode: true,
   compiler: {
     styledComponents: true,
   },
-});
+};
+
+const sentryOptions = {
+  silent: true,
+};
+
+// Workaround https://github.com/cyrilwanner/next-compose-plugins/issues/50
+module.exports = withSentryConfig(
+  withPlugins([withTM, withBundleAnalyzer], nextConfig),
+  sentryOptions,
+);
