@@ -38,10 +38,12 @@ const Detail = () => {
 
   const loadEncryptedAttributes = (
     fieldsToDecrypt: (keyof typeof DataKind)[],
+    reason: string,
   ) => {
     const decryptUserRequest: DecryptUserRequest = {
       footprintUserId: user.footprintUserId,
       attributes: fieldsToDecrypt.map(x => DataKind[x]),
+      reason,
     };
 
     // Immediately set these attributes as loading

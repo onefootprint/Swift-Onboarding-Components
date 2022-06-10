@@ -12,7 +12,10 @@ import DecryptModal from '../decrypt-modal';
 
 type BasicInfoProps = {
   user: User;
-  onDecrypt: (fieldsToDecrypt: (keyof typeof DataKind)[]) => void;
+  onDecrypt: (
+    fieldsToDecrypt: (keyof typeof DataKind)[],
+    reason: string,
+  ) => void;
 };
 
 const UserHeader = ({ user, onDecrypt }: BasicInfoProps) => {

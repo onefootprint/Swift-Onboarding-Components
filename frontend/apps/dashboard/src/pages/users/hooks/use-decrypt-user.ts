@@ -6,6 +6,7 @@ import request, { RequestError, RequestResponse } from 'request';
 export type DecryptUserRequest = {
   footprintUserId: string;
   attributes: string[];
+  reason: string;
 };
 
 export enum DataKind {
@@ -27,14 +28,14 @@ export type DecryptedUserAttributes = Record<keyof typeof DataKind, string>;
 
 const decryptUserRequest = async (
   auth: string | undefined,
-  { footprintUserId, attributes }: DecryptUserRequest,
+  data: DecryptUserRequest,
 ) => {
   const { data: response } = await request<
     RequestResponse<DecryptedUserAttributes>
   >({
     method: 'POST',
     url: '/org/decrypt',
-    data: { footprintUserId, attributes },
+    data,
     headers: {
       'x-fp-dashboard-authorization': auth as string,
     },
