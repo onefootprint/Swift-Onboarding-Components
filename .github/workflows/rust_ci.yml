@@ -117,7 +117,7 @@ jobs:
       - name: Run local integration tests
         run: |
           cargo build -p enclave
-          cargo build -p api
+          cargo build -p footprint-core
                     
           make run-local &
           server_pid=$!
