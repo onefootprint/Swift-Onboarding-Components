@@ -114,11 +114,11 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
       
-      - name: Build
-        run: cargo build --all --no-default-features --features simulate
-
       - name: Run local integration tests
         run: |
+          cargo build -p enclave
+          cargo build -p api
+                    
           make run-local &
           server_pid=$!
 
