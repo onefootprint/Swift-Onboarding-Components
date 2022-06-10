@@ -8,6 +8,7 @@ on:
       - "*.dockerfile"
       - ".github/workflows/create_ephemeral_stack.yml"
       - ".github/workflows/build_and_deploy.yml"
+      - ".github/workflows/deploy_dev.yml"
 
     branches:
       - master
