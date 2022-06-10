@@ -14,7 +14,7 @@ use db::models::webauthn_credential::WebauthnCredential;
 use db::webauthn_credentials::get_webauthn_creds;
 use newtypes::{DataKind, UserVaultId};
 use paperclip::actix::{api_v2_operation, web, web::Json, Apiv2Schema};
-use webauthn_rs_core::proto::{Base64UrlSafeData, Credential, ParsedAttestationData};
+use webauthn_rs_core::proto::{Base64UrlSafeData, Credential, ParsedAttestation, ParsedAttestationData};
 use webauthn_rs_proto::{RegisteredExtensions, UserVerificationPolicy};
 
 use super::{send_phone_challenge, BiometricChallengeState, ChallengeKind};
@@ -160,8 +160,11 @@ async fn initiate_biometric_challenge_for_user(
                     backup_eligible: cred.backup_eligible,
                     backup_state: false, // ignore
                     extensions: RegisteredExtensions::none(),
-                    attestation: ParsedAttestationData::None, // this doesn't matter for auth now
-                    attestation_format: None,                 // also doesnt matter for auth
+                    attestation: ParsedAttestation {
+                        data: ParsedAttestationData::None,
+                        metadata: webauthn_rs_core::proto::AttestationMetadata::None,
+                    }, // this doesn't matter for auth now
+                    attestation_format: webauthn_rs_core::AttestationFormat::None, // also doesn't matter for auth
                 })
                 .map_err(crypto::Error::from)
         })

@@ -101,15 +101,16 @@ async fn complete(
         .register_credential(&reg, &reg_state, Some(&cas))?;
 
     let attestation_type = match cred.attestation_format {
-        None => AttestationType::Unknown,
-        Some(format) => match format {
-            AttestationFormat::AppleAnonymous => AttestationType::Apple,
-            AttestationFormat::AndroidKey => AttestationType::AndroidKey,
-            AttestationFormat::AndroidSafetyNet => AttestationType::AndroidSafetyNet,
-            AttestationFormat::None => AttestationType::None,
-            _ => AttestationType::Unknown,
-        },
+        AttestationFormat::AppleAnonymous => AttestationType::Apple,
+        AttestationFormat::AndroidKey => AttestationType::AndroidKey,
+        AttestationFormat::AndroidSafetyNet => AttestationType::AndroidSafetyNet,
+        AttestationFormat::None => AttestationType::None,
+        _ => AttestationType::Unknown,
     };
+
+    tracing::info!(attestation=?cred.attestation.metadata, "attestation details");
+
+    let attestation_data = serde_json::to_vec(&cred.attestation)?;
 
     let insight_event = CreateInsightEvent::from(insights).insert(&state.db_pool).await?;
 
@@ -117,7 +118,7 @@ async fn complete(
         user_vault_id: user_auth.user_vault_id(),
         credential_id: cred.cred_id.0,
         public_key: crypto::serde_cbor::to_vec(&cred.cred).map_err(crypto::Error::Cbor)?,
-        attestation_data: Vec::new(), // TODO
+        attestation_data,
         backup_eligible: cred.backup_eligible,
         attestation_type,
         insight_event_id: insight_event.id,

@@ -17,7 +17,7 @@ impl LivenessWebauthnConfig {
         let url = format!("{scheme}://{}", &state.config.rp_id);
         let url = url::Url::parse(&url).unwrap();
         Self {
-            webauthn: WebauthnCore::new(
+            webauthn: WebauthnCore::new_unsafe_experts_only(
                 "Footprint",
                 &state.config.rp_id,
                 &url,
