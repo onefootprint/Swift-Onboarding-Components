@@ -25,6 +25,7 @@
         "pinpointemail",
         "pulumi",
         "sqlx",
+        "Tailscale",
         "thiserror",
         "vsock",
         "webauthn"

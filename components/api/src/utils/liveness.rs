@@ -23,7 +23,7 @@ impl LivenessWebauthnConfig {
                 &url,
                 Some(120),
                 Some(true),
-                Some(state.config.rp_id.as_str() == "localhost"),
+                Some(true),
             ),
         }
     }

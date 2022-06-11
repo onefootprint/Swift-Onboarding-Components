@@ -2,12 +2,16 @@ name: Rust Check & Test
 
 on:
   push:
-    branches: [ master ]
+    branches: [master]
   pull_request:
-    branches: [ master ]
+    branches: [master]
 
 env:
   CARGO_TERM_COLOR: always
+
+concurrency:
+  group: ${{ github.workflow }}-ci-check-test
+  cancel-in-progress: true
 
 jobs:
   check_test:
@@ -25,33 +29,33 @@ jobs:
           --health-retries 5
         ports:
           - 5432:5432
-    
-    steps:
-    - name: install deps
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y libssl-dev libpq-dev
-        
-    - uses: actions/checkout@v3
 
-    - name: rust-toolchain
-      uses: actions-rs/toolchain@v1.0.6
-      with:
-        toolchain: stable
-        
-    - name: Rust Cache
-      uses: Swatinem/rust-cache@v1.3.0
-        
-    - name: Check
-      run: cargo check --all --no-default-features --features simulate  
-      
-    - name: Build
-      run: cargo build --all --no-default-features --features simulate  
-      
-    - name: Run tests
-      run: cargo test --all --no-default-features --features simulate  
-      env:
-        DATABASE_URL: postgresql://postgres:postgres@localhost/postgres
+    steps:
+      - name: install deps
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libssl-dev libpq-dev
+
+      - uses: actions/checkout@v3
+
+      - name: rust-toolchain
+        uses: actions-rs/toolchain@v1.0.6
+        with:
+          toolchain: stable
+
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v1.3.0
+
+      - name: Check
+        run: cargo check --all --no-default-features --features simulate
+
+      - name: Build
+        run: cargo build --all --no-default-features --features simulate
+
+      - name: Run tests
+        run: cargo test --all --no-default-features --features simulate
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost/postgres
 
   integration_tests:
     name: run local integration tests
@@ -64,8 +68,8 @@ jobs:
       postgres:
         image: postgres
         env:
-          POSTGRES_USER: 'runner'
-          POSTGRES_HOST_AUTH_METHOD: 'trust'
+          POSTGRES_USER: "runner"
+          POSTGRES_HOST_AUTH_METHOD: "trust"
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -89,9 +93,9 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-region: ${{ secrets.AWS_REGION }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      
+
       - name: Create footprint db
-        run: | 
+        run: |
           psql -h localhost -c 'create database footprint_db;'
 
       - uses: actions/checkout@v3
@@ -117,7 +121,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-      
+
       - name: Run local integration tests
         run: |
           cargo build -p enclave
@@ -158,4 +162,3 @@ jobs:
           path: ci/report.html
         # Use always() to always run this step to publish test results when there are test failures
         if: ${{ always() }}
-
