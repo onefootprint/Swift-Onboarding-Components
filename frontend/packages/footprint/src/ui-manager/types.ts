@@ -17,7 +17,6 @@ export type UIManager = {
   createContainer(): HTMLElement;
   hideOverlay(): void;
   on(eventName: Event, callback: () => void): void;
-  resize(size: { width: number; height: number }): void;
   show(option?: OpenOptions): Promise<void>;
-  showOverlay(): void;
+  showOverlay(container: HTMLElement): void;
 };

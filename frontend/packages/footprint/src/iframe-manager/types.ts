@@ -13,15 +13,14 @@ export type OpenOptions = {
   userData?: UserData;
 };
 
-export type PrivateEvent = 'closed' | 'resized';
+export type PrivateEvent = 'closed';
 
 export type PublicEvent = 'completed' | 'failed' | 'userCanceled';
 
 export type Event = PrivateEvent | PublicEvent;
 
 export type IframeManager = {
-  render(container: HTMLElement): void;
+  render(container: HTMLElement, iframeClassList?: string[]): void;
   destroy(): void;
   on(eventName: Event, callback: (data?: any) => void): void;
-  resize(width: number, height: number): void;
 };

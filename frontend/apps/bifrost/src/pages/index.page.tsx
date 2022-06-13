@@ -19,6 +19,7 @@ type Page = {
 
 const Root = () => {
   useDevice();
+
   const [state] = useBifrostMachine();
   const valueCasted = state.value as States;
   const pages: Page = {

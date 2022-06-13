@@ -4,20 +4,27 @@ const createCSSClasses = () => {
   const style = document.createElement('style');
   style.type = 'text/css';
   style.innerHTML = `
-    .footprint-modal {
-      position: absolute;
-      left: calc(50% - 250px);
-      top: 40px;
-      width: 500px;
-      height: 373px;
-      border-radius: 6px;
-      background: #FFF;
-      box-shadow: 0px 1px 8px rgba(0, 0, 0, 0.14);
-    }
-    
     .footprint-overlay {
+      align-items: center;
+      background: rgba(0, 0, 0, 0.3);
+      display: flex;
+      height: 100%;
+      justify-content: center;
+      left: 0;
       overflow-y: hidden;
-      background: rgba(0,0,0, 0.3);
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 50000;
+    }
+
+    .footprint-modal {
+      height: 100%;
+      left: 0;
+      position: absolute;
+      top: 0;
+      width: 100%;
+      z-index: 50001;
     }
   `;
   document.getElementsByTagName('head')[0].appendChild(style);

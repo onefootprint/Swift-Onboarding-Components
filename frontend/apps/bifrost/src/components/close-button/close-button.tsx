@@ -7,7 +7,7 @@ const CloseButton = () => {
   const footprint = useFootprintJs();
 
   const handleCloseClick = () => {
-    footprint.emit('closed');
+    footprint.close();
   };
 
   return (

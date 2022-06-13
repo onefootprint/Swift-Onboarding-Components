@@ -11,7 +11,7 @@ const Header = () => (
 
 const Container = styled.header`
   ${({ theme }) => css`
-    margin: ${theme.spacing[5]}px 0 ${theme.spacing[3]}px;
+    padding: ${theme.spacing[5]}px 0 ${theme.spacing[3]}px;
     display: flex;
     align-items: center;
   `}

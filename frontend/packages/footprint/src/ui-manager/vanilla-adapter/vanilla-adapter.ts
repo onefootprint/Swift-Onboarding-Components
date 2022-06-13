@@ -3,6 +3,7 @@ import { OpenOptions, UIManager } from '../types';
 import createCSSClasses from './vanilla-adapter.utils';
 
 const containerId = 'footprint-container';
+const overlayId = 'footprint-overlay';
 const isSSR = typeof window === 'undefined';
 
 class VanillaAdapter implements UIManager {
@@ -17,18 +18,13 @@ class VanillaAdapter implements UIManager {
     // https://linear.app/footprint/issue/FP-180/fooprintjs-inject-data
     console.log('options', options);
     const container = this.createContainer();
-    this.showOverlay();
-    await this.iframeManager.render(container);
+    this.showOverlay(container);
+    await this.iframeManager.render(container, ['footprint-modal']);
     this.iframeManager.on('closed', () => this.close());
-    this.iframeManager.on('resized', size => this.resize(size));
   }
 
   on(eventName: PublicEvent, callback: () => void) {
     this.iframeManager.on(eventName, callback);
-  }
-
-  resize(size: { width: number; height: number }) {
-    this.iframeManager.resize(size.width, size.height);
   }
 
   close() {
@@ -36,12 +32,18 @@ class VanillaAdapter implements UIManager {
     this.iframeManager.destroy();
   }
 
-  showOverlay() {
-    document.body.classList.add('footprint-overlay');
+  showOverlay(container: HTMLElement) {
+    const overlay = document.createElement('div');
+    overlay.setAttribute('id', overlayId);
+    overlay.classList.add('footprint-overlay');
+    container.appendChild(overlay);
   }
 
   hideOverlay() {
-    document.body.classList.remove('footprint-overlay');
+    const overlay = document.getElementById(overlayId);
+    if (overlay) {
+      overlay.remove();
+    }
   }
 
   createContainer(): HTMLElement {

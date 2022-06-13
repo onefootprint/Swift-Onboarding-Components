@@ -1,3 +1,4 @@
+import Head from 'next/head';
 import React from 'react';
 import { QueryClientProvider } from 'react-query';
 import { createGlobalStyle } from 'styled-components';
@@ -17,12 +18,20 @@ type AppProps = {
 };
 
 const App = ({ Component, pageProps }: AppProps) => (
-  <QueryClientProvider client={queryClient}>
-    <DesignSystemProvider theme={themes.light}>
-      <GlobalStyle />
-      <Component {...pageProps} />
-    </DesignSystemProvider>
-  </QueryClientProvider>
+  <>
+    <Head>
+      <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+      />
+    </Head>
+    <QueryClientProvider client={queryClient}>
+      <DesignSystemProvider theme={themes.light}>
+        <GlobalStyle />
+        <Component {...pageProps} />
+      </DesignSystemProvider>
+    </QueryClientProvider>
+  </>
 );
 
 const GlobalStyle = createGlobalStyle``;

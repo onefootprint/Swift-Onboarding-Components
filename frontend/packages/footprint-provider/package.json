@@ -11,11 +11,13 @@
     "@types/postmate": "^1.5.2",
     "@types/react-dom": "17.0.11",
     "config": "*",
-    "constate": "^3.3.2",
-    "postmate": "^1.5.2",
-    "react": "17.0.2",
-    "react-dom": "17.0.2",
     "tsconfig": "*",
     "typescript": "^4.5.3"
+  },
+  "dependencies": {
+    "react": "17.0.2",
+    "postmate": "^1.5.2",
+    "react-dom": "17.0.2",
+    "constate": "^3.3.2"
   }
 }

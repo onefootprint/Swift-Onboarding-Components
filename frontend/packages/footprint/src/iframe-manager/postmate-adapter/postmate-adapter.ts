@@ -2,27 +2,23 @@ import Postmate from 'postmate';
 
 import { Event, IframeManager } from '../types';
 
+const iframeName = 'footprint-iframe';
+
 class PostmateAdapter implements IframeManager {
   child: Postmate.ParentAPI | null = null;
 
   constructor(private iframeUrl: string) {}
 
-  async render(container: HTMLElement) {
+  async render(container: HTMLElement, iframeClassList = []) {
     const child = await new Postmate({
       container,
       url: this.iframeUrl,
-      name: 'footprint-iframe',
-      classListArray: ['footprint-modal'],
+      name: iframeName,
+      classListArray: iframeClassList,
     });
+    const iframe = document.querySelector(`[name=${iframeName}]`);
+    iframe?.setAttribute('allow', 'publickey-credentials-get *');
     this.child = child;
-  }
-
-  resize(width: number, height: number) {
-    if (this.child) {
-      this.child.frame.style.width = `${width}px`;
-      this.child.frame.style.height = `${height}px`;
-      this.child.frame.style.left = `calc(50% - ${height / 2}px)`;
-    }
   }
 
   destroy() {

@@ -6,7 +6,7 @@ import { QueryClientProvider } from 'react-query';
 import { GOOGLE_MAPS_KEY } from 'src/constants';
 import styled, { createGlobalStyle, css } from 'styled-components';
 import themes from 'themes';
-import { DesignSystemProvider } from 'ui';
+import { DesignSystemProvider, media } from 'ui';
 
 import FootprintFooter from '../components/footprint-footer';
 import Header from '../components/header';
@@ -31,16 +31,16 @@ const App = ({ Component, pageProps }: AppProps) => (
     </Head>
     <QueryClientProvider client={queryClient}>
       <MachineProvider>
-        <FootprintProvider>
-          <DesignSystemProvider theme={themes.light}>
-            <GlobalStyle />
+        <DesignSystemProvider theme={themes.light}>
+          <GlobalStyle />
+          <FootprintProvider>
             <Content>
               <Header />
               <Component {...pageProps} />
             </Content>
             <FootprintFooter />
-          </DesignSystemProvider>
-        </FootprintProvider>
+          </FootprintProvider>
+        </DesignSystemProvider>
       </MachineProvider>
     </QueryClientProvider>
     <Script
@@ -51,21 +51,46 @@ const App = ({ Component, pageProps }: AppProps) => (
 );
 
 const GlobalStyle = createGlobalStyle`
-  html, body, #__next {
-    height: 100%;
-  }
+  ${({ theme }) => css`
+    html,
+    body,
+    #__next {
+      height: 100%;
+      width: 100%;
+    }
 
-  #__next {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-  }
+    body {
+      background: transparent;
+    }
+
+    #__next {
+      max-width: 500px;
+      overflow: hidden;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      background-color: ${theme.backgroundColor.primary};
+
+      ${media.greaterThan('md')`
+        background-color: unset;
+        display: block;
+        margin: ${theme.spacing[9]}px auto 0;
+      `}
+    }
+  `}
+ 
 `;
 
-const Content = styled.section`
+const Content = styled.div`
   ${({ theme }) => css`
+    border-radius: ${theme.borderRadius[1]}px ${theme.borderRadius[1]}px 0 0;
     flex: 1 0 auto;
-    padding: 0 ${theme.spacing[6]}px;
+    padding: ${theme.spacing[5]}px;
+
+    ${media.greaterThan('md')`
+      background-color: ${theme.backgroundColor.primary};
+      padding: 0 ${theme.spacing[7]}px ${theme.spacing[8]}px;
+    `}
   `}
 `;
 

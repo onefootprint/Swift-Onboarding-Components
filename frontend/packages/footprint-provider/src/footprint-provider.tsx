@@ -1,8 +1,8 @@
 import constate from 'constate';
 
-import usePostmate from './use-postmate';
+import useLocalFootprint from './use-footprint';
 
-const [Provider, useFootprintJs] = constate(usePostmate);
+const [Provider, useFootprintJs] = constate(useLocalFootprint);
 
 export default Provider;
 
