@@ -1,7 +1,7 @@
 import { QRCodeSVG } from 'qrcode.react';
 import React, { useEffect, useState } from 'react';
 import HeaderTitle from 'src/components/header-title';
-import { D2P_BASE_URL } from 'src/constants';
+import { D2P_BASE_URL } from 'src/config/constants';
 import useD2PGenerate from 'src/hooks/d2p/use-d2p-generate';
 import useD2PSms from 'src/hooks/d2p/use-d2p-sms';
 import useGetD2PStatus, { D2PStatus } from 'src/hooks/d2p/use-get-d2p-status';

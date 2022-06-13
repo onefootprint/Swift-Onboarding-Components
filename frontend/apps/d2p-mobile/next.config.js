@@ -13,6 +13,7 @@ const withTM = require('next-transpile-modules')([
 ]);
 
 module.exports = withPlugins([withTM, withBundleAnalyzer], {
+  productionBrowserSourceMaps: true,
   pageExtensions: ['page.tsx', 'page.ts', 'page.jsx', 'page.js'],
   reactStrictMode: true,
   compiler: {

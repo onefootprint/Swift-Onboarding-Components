@@ -3,7 +3,6 @@ import Head from 'next/head';
 import Script from 'next/script';
 import React from 'react';
 import { QueryClientProvider } from 'react-query';
-import { GOOGLE_MAPS_KEY } from 'src/constants';
 import styled, { createGlobalStyle, css } from 'styled-components';
 import themes from 'themes';
 import { DesignSystemProvider, media } from 'ui';
@@ -11,9 +10,12 @@ import { DesignSystemProvider, media } from 'ui';
 import FootprintFooter from '../components/footprint-footer';
 import Header from '../components/header';
 import MachineProvider from '../components/machine-provider';
+import { GOOGLE_MAPS_KEY } from '../config/constants';
 import configureReactI18next from '../config/initializers/react-i18next';
 import queryClient from '../config/initializers/react-query';
+import configureSentry from '../config/initializers/sentry';
 
+configureSentry();
 configureReactI18next();
 
 type AppProps = {
