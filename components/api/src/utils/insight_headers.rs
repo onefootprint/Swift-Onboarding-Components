@@ -9,6 +9,7 @@ use paperclip::actix::Apiv2Schema;
 #[derive(Debug, Clone, Apiv2Schema)]
 pub struct InsightHeaders {
     pub ip_address: Option<String>,
+    pub city: Option<String>,
     pub country: Option<String>,
     pub region: Option<String>,
     pub region_name: Option<String>,
@@ -25,16 +26,14 @@ impl FromRequest for InsightHeaders {
     type Error = crate::ApiError;
     type Future = Pin<Box<dyn Future<Output = Result<Self, Self::Error>>>>;
 
-    fn from_request(
-        req: &actix_web::HttpRequest,
-        _payload: &mut actix_web::dev::Payload,
-    ) -> Self::Future {
+    fn from_request(req: &actix_web::HttpRequest, _payload: &mut actix_web::dev::Payload) -> Self::Future {
         let ip_address = get_header("cloudfront-viewer-address", req)
             .and_then(|s| s.parse::<SocketAddr>().map(|s| s.ip().to_string()).ok());
 
         let cloudfront = InsightHeaders {
             ip_address,
-            country: get_header("cloudfront-viewer-city", req),
+            city: get_header("cloudfront-viewer-city", req),
+            country: get_header("cloudfront-viewer-country", req),
             region: get_header("cloudfront-viewer-region", req),
             region_name: get_header("cloudfront-viewer-region-name", req),
             latitude: get_header("cloudfront-viewer-latitude", req),
@@ -61,6 +60,7 @@ impl From<InsightHeaders> for CreateInsightEvent {
     fn from(i: InsightHeaders) -> CreateInsightEvent {
         let InsightHeaders {
             ip_address,
+            city,
             country,
             region,
             region_name,
@@ -79,6 +79,7 @@ impl From<InsightHeaders> for CreateInsightEvent {
         CreateInsightEvent {
             timestamp,
             ip_address,
+            city,
             country,
             region,
             region_name,

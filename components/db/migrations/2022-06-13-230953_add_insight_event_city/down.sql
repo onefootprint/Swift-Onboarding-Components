@@ -1,0 +1,1 @@
+ALTER TABLE insight_events DROP COLUMN city;

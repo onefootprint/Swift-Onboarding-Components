@@ -32,6 +32,7 @@ table! {
         postal_code -> Nullable<Varchar>,
         time_zone -> Nullable<Varchar>,
         user_agent -> Nullable<Varchar>,
+        city -> Nullable<Varchar>,
     }
 }
 

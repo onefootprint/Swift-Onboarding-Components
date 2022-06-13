@@ -20,6 +20,7 @@ pub struct InsightEvent {
     pub postal_code: Option<String>,
     pub time_zone: Option<String>,
     pub user_agent: Option<String>,
+    pub city: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
@@ -36,13 +37,11 @@ pub struct CreateInsightEvent {
     pub postal_code: Option<String>,
     pub time_zone: Option<String>,
     pub user_agent: Option<String>,
+    pub city: Option<String>,
 }
 
 impl CreateInsightEvent {
-    pub fn insert_with_conn(
-        self,
-        conn: &PgConnection,
-    ) -> Result<InsightEvent, diesel::result::Error> {
+    pub fn insert_with_conn(self, conn: &PgConnection) -> Result<InsightEvent, diesel::result::Error> {
         let ev = diesel::insert_into(crate::schema::insight_events::table)
             .values(self)
             .get_result(conn)?;

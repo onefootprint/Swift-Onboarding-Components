@@ -6,6 +6,7 @@ pub struct ApiInsightEvent {
     // TODO id?
     pub timestamp: chrono::NaiveDateTime,
     pub ip_address: Option<String>,
+    pub city: Option<String>,
     pub country: Option<String>,
     pub region: Option<String>,
     pub region_name: Option<String>,
@@ -21,6 +22,7 @@ impl From<InsightEvent> for ApiInsightEvent {
     fn from(e: InsightEvent) -> Self {
         let InsightEvent {
             id: _,
+            city,
             timestamp,
             ip_address,
             country,
@@ -36,6 +38,7 @@ impl From<InsightEvent> for ApiInsightEvent {
         ApiInsightEvent {
             timestamp,
             ip_address,
+            city,
             country,
             region,
             region_name,
