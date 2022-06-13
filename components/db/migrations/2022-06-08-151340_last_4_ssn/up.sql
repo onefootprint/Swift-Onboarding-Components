@@ -18,14 +18,14 @@ create type data_kind as ENUM(
     'Dob', 
     'Ssn', 
     'StreetAddress',
-     'StreetAddress2', 
-     'City', 
-     'State', 
-     'Zip', 
-     'Country', 
-     'Email', 
-     'PhoneNumber',
-     'LastFourSsn'
+    'StreetAddress2', 
+    'City', 
+    'State', 
+    'Zip', 
+    'Country', 
+    'Email', 
+    'PhoneNumber',
+    'LastFourSsn'
 );
 alter table user_data alter column data_kind type data_kind using data_kind::data_kind;
 alter table access_events alter column data_kind type data_kind using data_kind::data_kind;
