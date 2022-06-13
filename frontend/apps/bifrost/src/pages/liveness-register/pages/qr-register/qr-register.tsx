@@ -78,7 +78,7 @@ const QRRegister = () => {
     <Container>
       <HeaderTitle
         title="Liveness check"
-        subtitle="We need to verify that you're a real person, but unfortunately your device doesn't support biometric authentication. Please fill out a captcha to continue."
+        subtitle="We need to verify that you're a real person."
       />
       <Typography variant="body-2" color="secondary">
         Use your camera app or QR code reader on your mobile device and
