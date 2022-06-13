@@ -6,7 +6,7 @@ import styled, { css } from 'styled-components';
 import { Box, LinkButton, Portal } from 'ui';
 
 type SuccessMessageProps = {
-  body: React.ReactNode;
+  body?: React.ReactNode;
 };
 
 const SuccessMessage = ({ body }: SuccessMessageProps) => {
@@ -24,7 +24,7 @@ const SuccessMessage = ({ body }: SuccessMessageProps) => {
       <Box>
         <HeaderTitle
           title="You&#39;re all set! 😎"
-          subtitle="Identity successfully verified"
+          subtitle="Identity successfully verified."
         />
       </Box>
       {body}
