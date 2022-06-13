@@ -7,7 +7,10 @@ import { Box, Button, Code, Divider, SearchInput, Typography } from 'ui';
 import { DataKind } from '../users/hooks/use-decrypt-user';
 import Dot from './components/dot';
 import FieldTagList from './components/field-tag-list';
-import useGetAccessEvents, { AccessEvent } from './hooks/use-get-access-events';
+import useGetAccessEvents, {
+  AccessEvent,
+  InsightEvent,
+} from './hooks/use-get-access-events';
 
 const getKey = (e: AccessEvent) => Object.values(omit(e, 'dataKind'));
 
@@ -17,7 +20,8 @@ type AggregatedAccessEvent = {
   reason: string;
   tenantId: string;
   timestamp: string;
-  principal: string;
+  principal?: string;
+  insightEvent: InsightEvent;
 };
 
 const SecurityLogs = () => {
@@ -65,7 +69,7 @@ const SecurityLogs = () => {
             <Typography variant="body-3">
               <FieldTagList dataKinds={item.dataKinds} />{' '}
               {item.dataKinds.length > 1 ? 'were' : 'was'} accessed by{' '}
-              {item.principal}
+              {item.principal || 'an automated process'}
             </Typography>
           );
 
@@ -82,36 +86,54 @@ const SecurityLogs = () => {
                   </CodeContainer>
                 </DataGrid>
               </div>
-              <div>
-                {/* TODO https://linear.app/footprint/issue/FP-250/use-real-backend-metadata-for-access-event */}
-                <Typography variant="label-3">Metadata</Typography>
-                <DataGrid>
-                  <Typography variant="label-3" color="tertiary">
-                    IP Address
-                  </Typography>
-                  <Typography variant="body-3">154.143.204.131</Typography>
-                  <Typography variant="label-3" color="tertiary">
-                    Zip code
-                  </Typography>
-                  <Typography variant="body-3">27513</Typography>
-                  <Typography variant="label-3" color="tertiary">
-                    City, State
-                  </Typography>
-                  <Typography variant="body-3">
-                    Raleigh, North Carolina
-                  </Typography>
-                  <Typography variant="label-3" color="tertiary">
-                    Device/OS
-                  </Typography>
-                  <Typography variant="body-3">
-                    Macintosh; Intel Mac OS X 10_15_7
-                  </Typography>
-                  <Typography variant="label-3" color="tertiary">
-                    Country
-                  </Typography>
-                  <Typography variant="body-3">United States</Typography>
-                </DataGrid>
-              </div>
+              {item.insightEvent && (
+                <div>
+                  <Typography variant="label-3">Metadata</Typography>
+                  <DataGrid>
+                    <Typography variant="label-3" color="tertiary">
+                      Zip code
+                    </Typography>
+                    <Typography variant="body-3">
+                      {item.insightEvent.postalCode || '-'}
+                    </Typography>
+                    <Typography variant="label-3" color="tertiary">
+                      IP Address
+                    </Typography>
+                    <Typography variant="body-3">
+                      {item.insightEvent.ipAddress || '-'}
+                    </Typography>
+                    <Typography variant="label-3" color="tertiary">
+                      City, State
+                    </Typography>
+                    <Typography variant="body-3">
+                      {item.insightEvent.city && item.insightEvent.region
+                        ? `${item.insightEvent.city}, ${item.insightEvent.region}`
+                        : item.insightEvent.city ||
+                          item.insightEvent.region ||
+                          '-'}
+                    </Typography>
+                    <Typography variant="label-3" color="tertiary">
+                      Device/OS
+                    </Typography>
+                    <Box
+                      sx={{
+                        overflow: 'hidden',
+                        gridArea: '2 / 4 / span 2 / span 1',
+                      }}
+                    >
+                      <Typography variant="body-3" sx={{ overflow: 'hidden' }}>
+                        {item.insightEvent.userAgent || '-'}
+                      </Typography>
+                    </Box>
+                    <Typography variant="label-3" color="tertiary">
+                      Country
+                    </Typography>
+                    <Typography variant="body-3">
+                      {item.insightEvent.country || '-'}
+                    </Typography>
+                  </DataGrid>
+                </div>
+              )}
               <div>
                 <Box sx={{ marginBottom: 5 }}>
                   <Typography variant="label-3">Reason</Typography>

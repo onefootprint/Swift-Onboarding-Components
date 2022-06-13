@@ -8,13 +8,29 @@ import { DASHBOARD_AUTHORIZATION_HEADER } from '../../../config/constants';
 
 type AccessEventsRequest = {};
 
+export type InsightEvent = {
+  city?: string;
+  country?: string;
+  ipAddress?: string;
+  latitude?: string;
+  longitude?: string;
+  metroCode?: string;
+  postalCode?: string;
+  region?: string;
+  regionName?: string;
+  timeZone?: string;
+  timestamp: string;
+  userAgent?: string;
+};
+
 export type AccessEvent = {
   dataKind: DataKind;
   fpUserId: string;
   reason: string;
   tenantId: string;
   timestamp: string;
-  principal: string;
+  principal?: string;
+  insightEvent?: InsightEvent;
 };
 
 // TODO pagination
