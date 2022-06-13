@@ -1,5 +1,6 @@
 import { useQuery } from 'react-query';
 import request, { RequestError, RequestResponse } from 'request';
+import { BIFROST_D2P_SCOPED_AUTH_HEADER } from 'src/config/constants';
 import { useLivenessRegisterMachine } from 'src/pages/liveness-register/components/machine-provider';
 import { MachineContext } from 'src/utils/state-machine/liveness-register';
 
@@ -26,7 +27,7 @@ const getD2PStatus = async (payload: GetD2PRequest) => {
     method: 'GET',
     url: '/onboarding/d2p/status',
     headers: {
-      'x-d2p-authorization': payload.scopedAuthToken,
+      [BIFROST_D2P_SCOPED_AUTH_HEADER]: payload.scopedAuthToken,
     },
   });
   return response.data;

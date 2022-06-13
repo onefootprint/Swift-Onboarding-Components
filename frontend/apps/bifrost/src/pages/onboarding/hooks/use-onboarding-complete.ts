@@ -1,5 +1,6 @@
 import { useMutation } from 'react-query';
 import request, { RequestError, RequestResponse } from 'request';
+import { BIFROST_AUTH_HEADER } from 'src/config/constants';
 
 export type OnboardingCompleteRequest = {
   authToken: string;
@@ -19,7 +20,7 @@ const onboardingCompleteRequest = async (
     method: 'POST',
     url: '/user/data',
     headers: {
-      'X-Fpuser-Authorization': payload.authToken,
+      [BIFROST_AUTH_HEADER]: payload.authToken,
     },
   });
   return response.data;

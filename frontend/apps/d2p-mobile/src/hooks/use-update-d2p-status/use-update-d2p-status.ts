@@ -1,5 +1,6 @@
 import { useMutation } from 'react-query';
 import request, { RequestError, RequestResponse } from 'request';
+import { D2P_AUTH_HEADER } from 'src/config/constants';
 
 export enum D2PStatusUpdate {
   inProgress = 'in_progress',
@@ -19,7 +20,7 @@ const updateD2PStatus = async (payload: UpdateD2PStatusRequest) => {
     url: '/onboarding/d2p/status',
     data: payload,
     headers: {
-      'x-d2p-authorization': payload.authToken,
+      [D2P_AUTH_HEADER]: payload.authToken,
     },
   });
   return response.data;

@@ -1,5 +1,6 @@
 import { useMutation } from 'react-query';
 import request, { RequestError, RequestResponse } from 'request';
+import { BIFROST_AUTH_HEADER } from 'src/config/constants';
 
 export type UserDataRequest = {
   data: {
@@ -26,7 +27,7 @@ const userDataRequest = async (payload: UserDataRequest) => {
     url: '/user/data',
     data: payload.data,
     headers: {
-      'X-Fpuser-Authorization': payload.authToken,
+      [BIFROST_AUTH_HEADER]: payload.authToken,
     },
   });
   return response.data;

@@ -1,5 +1,6 @@
 import { useMutation } from 'react-query';
 import request, { RequestError, RequestResponse } from 'request';
+import { BIFROST_AUTH_HEADER } from 'src/config/constants';
 
 export type D2PGenerateRequest = {
   authToken: string;
@@ -20,7 +21,7 @@ const d2pGenerate = async (payload: D2PGenerateRequest) => {
     url: '/onboarding/d2p/generate',
     data: payload,
     headers: {
-      'X-Fpuser-Authorization': payload.authToken,
+      [BIFROST_AUTH_HEADER]: payload.authToken,
     },
   });
   return response.data;

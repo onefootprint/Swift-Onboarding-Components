@@ -1,5 +1,10 @@
 import { useMutation } from 'react-query';
 import request, { RequestError, RequestResponse } from 'request';
+import {
+  BIFROST_AUTH_HEADER,
+  CLIENT_PUBLIC_KEY,
+  CLIENT_PUBLIC_KEY_HEADER,
+} from 'src/config/constants';
 import { UserDataAttribute } from 'src/utils/state-machine/types';
 
 export type OnboardingRequest = {
@@ -32,8 +37,8 @@ const onboardingRequest = async (payload: OnboardingRequest) => {
       method: 'POST',
       url: '/onboarding',
       headers: {
-        'X-Fpuser-Authorization': payload.authToken,
-        'x-Client-Public-Key': 'ob_config_pk_YuK0vExl4Lty1yLG5aHrH2', // TODO: Placeholder tenant ID for now
+        [BIFROST_AUTH_HEADER]: payload.authToken,
+        [CLIENT_PUBLIC_KEY_HEADER]: CLIENT_PUBLIC_KEY,
       },
     },
   );

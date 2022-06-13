@@ -1,5 +1,6 @@
 import { useMutation } from 'react-query';
 import request, { RequestError, RequestResponse } from 'request';
+import { BIFROST_AUTH_HEADER } from 'src/config/constants';
 import generateRegisterDeviceResponse from 'src/utils/biometric/register-challenge-response';
 
 export type BiometricRegisterRequest = {
@@ -22,7 +23,7 @@ const biometricRegister = async (payload: BiometricRegisterRequest) => {
     url: '/user/biometric/init',
     data: payload,
     headers: {
-      'X-Fpuser-Authorization': authToken,
+      [BIFROST_AUTH_HEADER]: authToken,
     },
   });
 
@@ -41,7 +42,7 @@ const biometricRegister = async (payload: BiometricRegisterRequest) => {
       challengeToken,
     },
     headers: {
-      'X-Fpuser-Authorization': authToken,
+      [BIFROST_AUTH_HEADER]: authToken,
     },
   });
   return response.data;
