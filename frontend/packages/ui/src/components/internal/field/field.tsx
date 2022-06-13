@@ -3,6 +3,7 @@ import Cleave from 'cleave.js/react';
 import { darken, rgba } from 'polished';
 import React from 'react';
 import styled, { css } from 'styled-components';
+import { FontVariant } from 'themes';
 
 import { createFontStyles } from '../../../utils/mixins';
 
@@ -19,17 +20,18 @@ type FieldInternalProps = {
   htmlRef?: React.ForwardedRef<HTMLInputElement>;
   $hasError?: boolean;
   options?: CleaveOptions;
+  fontVariant?: FontVariant;
 };
 
 const Field = styled(Cleave).attrs<{ as?: 'textarea' | 'input' }>(({ as }) => ({
   as,
 }))<FieldInternalProps>`
-  ${({ $hasError, theme }) => {
+  ${({ $hasError, theme, fontVariant }) => {
     const defaultBorderColor = $hasError ? 'error' : 'primary';
     const hoverBorderColor = $hasError ? 'error' : 'primary';
     const focusBorderColor = $hasError ? 'error' : 'secondary';
     return css`
-      ${createFontStyles('body-3')};
+      ${createFontStyles(fontVariant || 'body-3')};
       background-color: ${theme.backgroundColor.primary};
       border-radius: ${theme.borderRadius[1]}px;
       border: ${theme.borderWidth[1]}px solid

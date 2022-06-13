@@ -1,4 +1,3 @@
-import IcoSearch16 from 'icons/ico/ico-search-16';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { Row, Table } from 'src/components/table';
@@ -14,7 +13,7 @@ import useJoinUsers, {
   User,
 } from 'src/pages/users/hooks/use-join-users';
 import styled, { css } from 'styled-components';
-import { Badge, Code, TextInput, Typography } from 'ui';
+import { Badge, Code, SearchInput, Typography } from 'ui';
 import { useMap } from 'usehooks-ts';
 
 import DecryptDataDialog from './components/decrypt-data-dialog';
@@ -53,11 +52,12 @@ const Users = () => {
       <HeaderContainer>
         <Typography variant="heading-2">Users</Typography>
       </HeaderContainer>
-      <SearchTextInput
+      {/* TODO make even large input size */}
+      <StyledSearchInput
         placeholder="Search (exact match)..."
-        prefixElement={<IcoSearchContainer />}
         suffixElement={<UsersFilter />}
         value={searchText}
+        inputSize="large"
         onChangeText={(text: string) =>
           setFilter({
             fingerprint: text,
@@ -129,20 +129,9 @@ const HeaderContainer = styled.div`
   `};
 `;
 
-const SearchTextInput = styled(TextInput)`
+const StyledSearchInput = styled(SearchInput)`
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
-  height: 100%;
-  ${({ theme }) => css`
-    padding-top: ${theme.spacing[5]}px;
-    padding-bottom: ${theme.spacing[5]}px;
-  `};
-`;
-
-const IcoSearchContainer = styled(IcoSearch16)`
-  ${({ theme }) => css`
-    margin-left: ${theme.spacing[6]}px;
-  `};
 `;
 
 export default Users;

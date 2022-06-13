@@ -32,6 +32,8 @@ export * from './portal';
 export { default as Portal } from './portal';
 export * from './progress-indicator';
 export { default as ProgressIndicator } from './progress-indicator';
+export * from './search-input';
+export { default as SearchInput } from './search-input';
 export * from './select';
 export { default as Select } from './select';
 export * from './tab';

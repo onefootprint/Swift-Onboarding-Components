@@ -1,18 +1,27 @@
 import { CleaveOptions } from 'cleave.js/options';
 import React, { forwardRef, InputHTMLAttributes } from 'react';
 import styled, { css } from 'styled-components';
+import { FontVariant } from 'themes';
 
+import useSx, { SXStyleProps, SXStyles } from '../../../hooks/use-sx';
 import Field, { FieldProps } from '../field';
 import Hint from '../hint';
 import Label from '../label';
 
+export type InternalInputProps = {
+  prefixElement?: React.ReactNode;
+  suffixElement?: React.ReactNode;
+  sx?: SXStyleProps;
+  fontVariant?: FontVariant;
+};
+
 export type InputProps = FieldProps & {
-  prefixElement?: JSX.Element;
-  suffixElement?: JSX.Element;
   mask?: CleaveOptions;
 } & InputHTMLAttributes<HTMLInputElement>;
 
-const BaseInput = forwardRef<HTMLInputElement, InputProps>(
+type AllInputProps = InputProps & InternalInputProps;
+
+const BaseInput = forwardRef<HTMLInputElement, AllInputProps>(
   (
     {
       hasError = false,
@@ -27,13 +36,16 @@ const BaseInput = forwardRef<HTMLInputElement, InputProps>(
       required,
       suffixElement,
       testID,
+      sx,
+      fontVariant = 'body-3',
       ...remainingProps
-    }: InputProps,
+    }: AllInputProps,
     ref,
   ) => {
     // TODO: Migrate to useId once we migrate to react 18
     // https://github.com/onefootprint/frontend-monorepo/issues/61
     const id = baseID || `input-${label || placeholder}`;
+    const sxStyles = useSx(sx);
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
       if (onChange) {
@@ -45,11 +57,13 @@ const BaseInput = forwardRef<HTMLInputElement, InputProps>(
     };
 
     return (
-      <InputContainer hasPrefix={!!prefixElement}>
+      <InputContainer>
         {label && <Label htmlFor={id}>{label}</Label>}
-        {prefixElement && <PrefixContainer>{prefixElement}</PrefixContainer>}
+        {prefixElement}
         <StyledField
           {...remainingProps}
+          sx={sxStyles}
+          fontVariant={fontVariant}
           $hasError={hasError}
           aria-required={required}
           as={mask ? undefined : 'input'}
@@ -73,31 +87,19 @@ const BaseInput = forwardRef<HTMLInputElement, InputProps>(
   },
 );
 
-const InputContainer = styled.div<{
-  hasPrefix: boolean;
-}>`
+const InputContainer = styled.div`
   position: relative;
-  input {
-    ${({ theme, hasPrefix }) =>
-      hasPrefix &&
-      css`
-        padding-left: ${theme.spacing[9] + theme.spacing[2]}px;
-      `}
-  }
 `;
 
-const StyledField = styled(Field)<InputProps>`
+const StyledField = styled(Field)<{ sx: SXStyles }>`
   ${({ theme }) => css`
-    padding: 0 ${theme.spacing[5]}px;
+    padding-left: ${theme.spacing[5]}px;
+    padding-right: ${theme.spacing[5]}px;
   `}
-`;
-
-const PrefixContainer = styled.div`
-  position: absolute;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  ${({ sx }) =>
+    css`
+      ${sx};
+    `}
 `;
 
 const SuffixContainer = styled.div`
