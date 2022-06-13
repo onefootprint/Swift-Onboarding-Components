@@ -3,6 +3,7 @@ alter table user_data drop constraint check_sh_data;
 drop index user_data_unique_kind_fingerprint;
 drop index user_data_unique_primary_data;
 drop index user_data_user_vault_id_data_kind;
+drop index user_data_fingerprint;
 
 /* cast existing tables that use data kind to text */
 alter table user_data alter column data_kind type text;
