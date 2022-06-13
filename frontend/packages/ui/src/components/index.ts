@@ -26,6 +26,8 @@ export * from './link-button';
 export { default as LinkButton } from './link-button';
 export * from './loading-indicator';
 export { default as LoadingIndicator } from './loading-indicator';
+export * from './phone-input';
+export { default as PhoneInput } from './phone-input';
 export * from './pin-input';
 export { default as PinInput } from './pin-input';
 export * from './portal';
