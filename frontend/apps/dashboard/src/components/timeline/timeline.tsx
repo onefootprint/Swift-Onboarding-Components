@@ -33,9 +33,7 @@ const Timeline = ({ items, connectorVariant = 'default' }: TimelineProps) => (
         </Typography>
         <IconContainer>{item.iconComponent}</IconContainer>
         <HeaderContainer>{item.headerComponent}</HeaderContainer>
-        {(i !== items.length - 1 || !!item.bodyComponent) && (
-          <Connector variant={connectorVariant} />
-        )}
+        {i !== items.length - 1 && <Connector variant={connectorVariant} />}
         <BodyContainer>
           {item.bodyComponent && item.bodyComponent}
         </BodyContainer>
