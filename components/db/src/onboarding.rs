@@ -3,8 +3,9 @@ use crate::models::onboardings::Onboarding;
 use crate::schema;
 use deadpool_diesel::postgres::Pool;
 use diesel::prelude::*;
-use newtypes::{FootprintUserId, Status, TenantId, UserVaultId};
+use newtypes::{FootprintUserId, ObConfigurationId, Status, TenantId, UserVaultId};
 
+// lists all onboardings across all configurations
 pub async fn list_for_tenant(
     pool: &Pool,
     tenant_id: TenantId,
@@ -43,7 +44,7 @@ pub async fn list_for_tenant(
     Ok(onboardings)
 }
 
-pub(crate) fn get_for_tenant(
+pub(crate) fn get_for_fp_id(
     conn: &PgConnection,
     tenant_id: TenantId,
     footprint_user_id: FootprintUserId,
@@ -58,7 +59,7 @@ pub(crate) fn get_for_tenant(
 
 pub async fn get(
     pool: &Pool,
-    tenant_id: TenantId,
+    id: ObConfigurationId,
     user_vault_id: UserVaultId,
 ) -> Result<Option<Onboarding>, DbError> {
     let conn = pool.get().await?;
@@ -66,7 +67,7 @@ pub async fn get(
     let ob = conn
         .interact(|conn| -> Result<Option<Onboarding>, DbError> {
             let ob = schema::onboardings::table
-                .filter(schema::onboardings::tenant_id.eq(tenant_id))
+                .filter(schema::onboardings::ob_config_id.eq(id))
                 .filter(schema::onboardings::user_vault_id.eq(user_vault_id))
                 .first(conn)
                 .optional()?;

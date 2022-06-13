@@ -9,6 +9,7 @@ use newtypes::FootprintUserId;
 use newtypes::TenantId;
 use newtypes::UserVaultId;
 
+// lists all access events across all configurations
 pub async fn list_for_tenant(
     pool: &DbPool,
     tenant_id: TenantId,

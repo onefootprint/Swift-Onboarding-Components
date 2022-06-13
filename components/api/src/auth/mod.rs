@@ -40,7 +40,7 @@ pub async fn get_onboarding_for_tenant(
 ) -> Result<Onboarding, ApiError> {
     let onboarding = db::onboarding::get(
         db_pool,
-        tenant_auth.tenant().id.clone(),
+        tenant_auth.ob_config.id.clone(),
         user_auth.to_owned().data.user_vault_id,
     )
     .await?

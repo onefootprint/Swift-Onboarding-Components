@@ -1,1 +1,0 @@
-drop table ob_configurations;

@@ -1,11 +1,11 @@
-use std::pin::Pin;
+use std::{marker::PhantomData, pin::Pin};
 
 use actix_web::{web, FromRequest};
-use db::models::tenants::Tenant;
+use db::models::{ob_configurations::ObConfiguration, tenants::Tenant};
 use futures_util::Future;
 use paperclip::actix::Apiv2Security;
 
-use crate::State;
+use crate::{errors::ApiError, State};
 
 use super::AuthError;
 
@@ -19,14 +19,9 @@ use super::AuthError;
 /// SecretTenantAuthContext extracts a tenant's public key from the X-Client-Public-Key header
 /// which authenticates the client as a tenant.
 pub struct PublicTenantAuthContext {
-    tenant: Tenant,
-}
-
-impl PublicTenantAuthContext {
-    // get tenant id for context
-    pub fn tenant(&self) -> &Tenant {
-        &self.tenant
-    }
+    pub tenant: Tenant,
+    pub ob_config: ObConfiguration,
+    phantom: PhantomData<()>,
 }
 
 const HEADER_NAME: &str = "X-Client-Public-Key";
@@ -37,7 +32,7 @@ impl FromRequest for PublicTenantAuthContext {
 
     fn from_request(req: &actix_web::HttpRequest, _payload: &mut actix_web::dev::Payload) -> Self::Future {
         // get the tenant header
-        let tenant_pk = req
+        let config_key = req
             .headers()
             .get(HEADER_NAME)
             .and_then(|hv| hv.to_str().map(|s| s.to_string()).ok())
@@ -46,10 +41,14 @@ impl FromRequest for PublicTenantAuthContext {
         let pool = req.app_data::<web::Data<State>>().unwrap().db_pool.clone();
 
         Box::pin(async move {
-            let tenant = db::tenant::pub_auth(&pool, tenant_pk?)
-                .await?
-                .ok_or(AuthError::UnknownClient)?;
-            Ok(Self { tenant })
+            let config_key = newtypes::ObConfigurationKey::try_from(config_key?)
+                .map_err(|_| ApiError::InvalidTokenForHeader)?;
+            let (ob_config, tenant) = ObConfiguration::get_with_tenant(&pool, config_key).await?;
+            Ok(Self {
+                tenant,
+                ob_config,
+                phantom: PhantomData,
+            })
         })
     }
 }

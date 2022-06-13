@@ -6,22 +6,22 @@ use crate::auth::session_context::SessionContext;
 use crate::types::success::ApiResponseData;
 use crate::State;
 use crate::{errors::ApiError, types::Empty};
-use db::models::ob_configuration::{ObConfiguration, UpdateOnboardingConfiguration};
+use db::models::ob_configurations::{ObConfiguration, UpdateObConfiguration};
 use newtypes::tenant::workos::WorkOsSession;
-use newtypes::{DataKind, ObConfigurationId};
+use newtypes::{DataKind, ObConfigurationKey};
 use paperclip::actix::{api_v2_operation, get, post, web, web::Json, Apiv2Schema};
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
 struct SetDataRequest {
-    configuration_id: ObConfigurationId,
+    configuration_key: ObConfigurationKey,
     attributes: HashSet<DataKind>,
 }
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
 struct GetDataRequest {
-    configuration_id: ObConfigurationId,
+    configuration_key: ObConfigurationKey,
 }
 
 #[api_v2_operation(tags(Org))]
@@ -35,10 +35,10 @@ fn set(
 ) -> actix_web::Result<Json<ApiResponseData<Empty>>, ApiError> {
     let tenant = auth.tenant(&state.db_pool).await?;
 
-    let _ = UpdateOnboardingConfiguration {
+    let _ = UpdateObConfiguration {
         required_user_data: Some(request.attributes.clone().into_iter().collect()),
         tenant_id: tenant.id.clone(),
-        id: request.configuration_id.clone(),
+        key: request.configuration_key.clone(),
         description: None,
         settings: None,
         name: None,
@@ -49,17 +49,17 @@ fn set(
 }
 
 #[api_v2_operation(tags(Org))]
-#[get("/required_data/{configuration_id}")]
+#[get("/required_data/{configuration_key}")]
 /// Get the attributes the tenant requires of the client (name, SSN, etc.)
 fn get(
     state: web::Data<State>,
-    path: web::Path<ObConfigurationId>,
+    path: web::Path<ObConfigurationKey>,
     auth: Either<SessionContext<WorkOsSession>, SecretTenantAuthContext>,
 ) -> actix_web::Result<Json<ApiResponseData<Vec<DataKind>>>, ApiError> {
     let tenant = auth.tenant(&state.db_pool).await?;
-    let configuration_id = path.into_inner();
+    let configuration_key = path.into_inner();
 
-    let obc = ObConfiguration::get(&state.db_pool, configuration_id, tenant.id).await?;
+    let obc = ObConfiguration::get_for_tenant(&state.db_pool, configuration_key, tenant.id).await?;
 
     Ok(Json(ApiResponseData {
         data: obc.required_user_data,

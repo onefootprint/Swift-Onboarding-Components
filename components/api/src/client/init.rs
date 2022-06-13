@@ -3,9 +3,9 @@ use crate::State;
 use crate::{enclave::gen_keypair, errors::ApiError};
 
 use crypto::random::gen_random_alphanumeric_code;
-use db::models::ob_configuration::NewOnboardingConfiguration;
+use db::models::ob_configurations::NewObConfiguration;
 use db::models::tenant_api_keys::PartialTenantApiKey;
-use newtypes::{ObConfigurationId, TenantId, TenantPublicKey};
+use newtypes::{ObConfigurationId, ObConfigurationKey, TenantId};
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 
 use db::models::tenants::{NewTenant, Tenant};
@@ -32,7 +32,7 @@ struct NewClientResponse {
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Apiv2Schema)]
 struct ClientKeysResponse {
     /// Public key used to identify client
-    client_public_key: TenantPublicKey,
+    client_public_key: ObConfigurationKey,
     /// Secret key, not yet used
     client_secret_key: String,
     /// Name of this keypair, i.e. "keypair-dev" or "keypair-prod"
@@ -60,18 +60,22 @@ async fn handler(
     )
     .await?;
 
-    let obc = NewOnboardingConfiguration::default(&state.db_pool, tenant.id.clone()).await?;
+    let obc = NewObConfiguration::default(&state.db_pool, tenant.id.clone()).await?;
 
     Ok(Json(ApiResponseData {
         data: NewClientResponse {
-            keys: init_api_keys(&state, &tenant).await?,
+            keys: init_api_keys(&state, &tenant, obc.key.clone()).await?,
             configuration_id: obc.id,
             client_id: tenant.id,
         },
     }))
 }
 
-async fn init_api_keys(state: &State, tenant: &Tenant) -> Result<ClientKeysResponse, ApiError> {
+async fn init_api_keys(
+    state: &State,
+    tenant: &Tenant,
+    key_id: ObConfigurationKey,
+) -> Result<ClientKeysResponse, ApiError> {
     let api_key = format!("sk_{}", gen_random_alphanumeric_code(34));
 
     let e_api_key =
@@ -91,7 +95,7 @@ async fn init_api_keys(state: &State, tenant: &Tenant) -> Result<ClientKeysRespo
     .await?;
 
     Ok(ClientKeysResponse {
-        client_public_key: tenant_keys.tenant_public_key,
+        client_public_key: key_id,
         client_secret_key: api_key,
         key_name: tenant_keys.key_name,
     })

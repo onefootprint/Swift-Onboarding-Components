@@ -3,7 +3,7 @@ use std::io::Write;
 use crate::diesel::ExpressionMethods;
 use crate::diesel::QueryDsl;
 use crate::diesel::RunQueryDsl;
-use crate::schema::ob_configurations;
+use crate::schema::{ob_configurations, tenants};
 use crate::DbPool;
 use chrono::NaiveDateTime;
 use diesel::pg::Pg;
@@ -13,13 +13,16 @@ use diesel::{
     types::{FromSql, ToSql},
 };
 use diesel::{Insertable, Queryable};
-use newtypes::{DataKind, ObConfigurationId, TenantId};
+use newtypes::{DataKind, ObConfigurationId, ObConfigurationKey, TenantId};
 use serde::{Deserialize, Serialize};
+
+use super::tenants::Tenant;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
 #[table_name = "ob_configurations"]
 pub struct ObConfiguration {
     pub id: ObConfigurationId,
+    pub key: ObConfigurationKey,
     pub name: String,
     pub description: Option<String>,
     pub tenant_id: TenantId,
@@ -27,6 +30,7 @@ pub struct ObConfiguration {
     pub updated_at: NaiveDateTime,
     pub required_user_data: Vec<DataKind>,
     pub settings: ObConfigurationSettings,
+    pub is_disabled: bool,
 }
 
 #[derive(FromSqlRow, AsExpression, Serialize, Deserialize, Debug, Clone)]
@@ -53,7 +57,7 @@ impl ToSql<Jsonb, Pg> for ObConfigurationSettings {
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
 #[table_name = "ob_configurations"]
-pub struct NewOnboardingConfiguration {
+pub struct NewObConfiguration {
     pub name: String,
     pub description: Option<String>,
     pub tenant_id: TenantId,
@@ -62,8 +66,8 @@ pub struct NewOnboardingConfiguration {
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable, AsChangeset)]
 #[table_name = "ob_configurations"]
-pub struct UpdateOnboardingConfiguration {
-    pub id: ObConfigurationId,
+pub struct UpdateObConfiguration {
+    pub key: ObConfigurationKey,
     pub tenant_id: TenantId,
     pub name: Option<String>,
     pub description: Option<String>,
@@ -71,7 +75,7 @@ pub struct UpdateOnboardingConfiguration {
     pub settings: Option<ObConfigurationSettings>,
 }
 
-impl NewOnboardingConfiguration {
+impl NewObConfiguration {
     pub async fn default(pool: &DbPool, tenant_id: TenantId) -> Result<ObConfiguration, crate::DbError> {
         let default = Self {
             name: "Default".to_string(),
@@ -92,7 +96,7 @@ impl NewOnboardingConfiguration {
     }
 }
 
-impl UpdateOnboardingConfiguration {
+impl UpdateObConfiguration {
     pub async fn update(self, pool: &DbPool) -> Result<(), crate::DbError> {
         let _ = pool
             .get()
@@ -100,7 +104,7 @@ impl UpdateOnboardingConfiguration {
             .interact(move |conn| -> Result<(), crate::DbError> {
                 let _ = diesel::update(
                     ob_configurations::table
-                        .filter(ob_configurations::id.eq(self.id.clone()))
+                        .filter(ob_configurations::key.eq(self.key.clone()))
                         .filter(ob_configurations::tenant_id.eq(self.tenant_id.clone())),
                 )
                 .set(self)
@@ -113,9 +117,43 @@ impl UpdateOnboardingConfiguration {
 }
 
 impl ObConfiguration {
-    pub async fn get(
+    pub async fn get(pool: &DbPool, key: ObConfigurationKey) -> Result<ObConfiguration, crate::DbError> {
+        let id = pool
+            .get()
+            .await?
+            .interact(move |conn| -> Result<ObConfiguration, crate::DbError> {
+                let obc = ob_configurations::table
+                    .filter(ob_configurations::key.eq(key))
+                    .first(conn)?;
+                Ok(obc)
+            })
+            .await??;
+        Ok(id)
+    }
+
+    pub async fn get_with_tenant(
         pool: &DbPool,
-        id: ObConfigurationId,
+        key: ObConfigurationKey,
+    ) -> Result<(ObConfiguration, Tenant), crate::DbError> {
+        let id = pool
+            .get()
+            .await?
+            .interact(move |conn| -> Result<(ObConfiguration, Tenant), crate::DbError> {
+                let obc: ObConfiguration = ob_configurations::table
+                    .filter(ob_configurations::key.eq(key))
+                    .first(conn)?;
+                let tenant: Tenant = tenants::table
+                    .filter(tenants::id.eq(&obc.tenant_id))
+                    .first(conn)?;
+                Ok((obc, tenant))
+            })
+            .await??;
+        Ok(id)
+    }
+
+    pub async fn get_for_tenant(
+        pool: &DbPool,
+        key: ObConfigurationKey,
         tenant_id: TenantId,
     ) -> Result<ObConfiguration, crate::DbError> {
         let id = pool
@@ -123,7 +161,7 @@ impl ObConfiguration {
             .await?
             .interact(move |conn| -> Result<ObConfiguration, crate::DbError> {
                 let obc = ob_configurations::table
-                    .filter(ob_configurations::id.eq(id))
+                    .filter(ob_configurations::key.eq(key))
                     .filter(ob_configurations::tenant_id.eq(tenant_id))
                     .first(conn)?;
                 Ok(obc)

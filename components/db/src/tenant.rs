@@ -95,45 +95,6 @@ pub async fn api_init(
     Ok(tenant_api_key)
 }
 
-pub async fn pub_auth_check(pool: &Pool, tenant_pub_key: String) -> Result<TenantApiKey, DbError> {
-    let conn = pool.get().await?;
-
-    let tenant_api_key: TenantApiKey = conn
-        .interact(move |conn| {
-            schema::tenant_api_keys::table
-                .filter(schema::tenant_api_keys::tenant_public_key.eq(tenant_pub_key))
-                .first(conn)
-        })
-        .await??;
-
-    Ok(tenant_api_key)
-}
-
-pub async fn pub_auth(pool: &Pool, tenant_pub_key: String) -> Result<Option<Tenant>, DbError> {
-    let conn = pool.get().await?;
-
-    let tenant = conn
-        .interact(move |conn| -> Result<Option<Tenant>, DbError> {
-            let tenant_api_key: Option<TenantApiKey> = schema::tenant_api_keys::table
-                .filter(schema::tenant_api_keys::tenant_public_key.eq(tenant_pub_key))
-                .first(conn)
-                .optional()?;
-
-            if let Some(tenant_api_key) = tenant_api_key {
-                let tenant: Tenant = schema::tenants::table
-                    .find(tenant_api_key.tenant_id)
-                    .first(conn)?;
-
-                Ok(Some(tenant))
-            } else {
-                Ok(None)
-            }
-        })
-        .await??;
-
-    Ok(tenant)
-}
-
 pub async fn secret_auth(pool: &Pool, sh_api_key: Vec<u8>) -> Result<Option<Tenant>, DbError> {
     let conn = pool.get().await?;
 

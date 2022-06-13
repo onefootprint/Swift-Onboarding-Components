@@ -41,6 +41,7 @@ table! {
 
     ob_configurations (id) {
         id -> Varchar,
+        key -> Varchar,
         name -> Varchar,
         description -> Nullable<Varchar>,
         tenant_id -> Varchar,
@@ -48,6 +49,7 @@ table! {
         updated_at -> Timestamp,
         required_user_data -> Array<Data_kind>,
         settings -> Jsonb,
+        is_disabled -> Bool,
     }
 }
 
@@ -59,6 +61,7 @@ table! {
         id -> Varchar,
         user_ob_id -> Varchar,
         user_vault_id -> Varchar,
+        ob_config_id -> Varchar,
         tenant_id -> Varchar,
         status -> User_status,
         created_at -> Timestamp,
@@ -85,8 +88,8 @@ table! {
     use diesel::sql_types::*;
     use newtypes::db_types::*;
 
-    tenant_api_keys (tenant_public_key) {
-        tenant_public_key -> Varchar,
+    tenant_api_keys (id) {
+        id -> Varchar,
         sh_secret_api_key -> Bytea,
         e_secret_api_key -> Bytea,
         tenant_id -> Varchar,
@@ -165,8 +168,7 @@ table! {
 }
 
 joinable!(access_events -> onboardings (onboarding_id));
-joinable!(ob_configurations -> tenants (tenant_id));
-joinable!(onboardings -> tenants (tenant_id));
+joinable!(onboardings -> ob_configurations (ob_config_id));
 joinable!(onboardings -> user_vaults (user_vault_id));
 joinable!(user_data -> user_vaults (user_vault_id));
 joinable!(webauthn_credentials -> user_vaults (user_vault_id));

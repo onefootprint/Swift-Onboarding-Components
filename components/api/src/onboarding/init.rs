@@ -34,7 +34,8 @@ pub fn handler(
     NewOnboarding::get_or_create(
         &state.db_pool,
         uv_id.clone(),
-        tenant_auth.tenant().id.clone(),
+        tenant_auth.tenant.id.clone(),
+        tenant_auth.ob_config.id.clone(),
         Status::Processing,
         CreateInsightEvent::from(insights),
     )
@@ -42,11 +43,14 @@ pub fn handler(
 
     let webauthn_creds = get_webauthn_creds(&state.db_pool, uv_id.clone()).await?;
 
-    // TODO: Tenant-scoped missing attributes
     let uvw = UserVaultWrapper::from(&state.db_pool, uv).await?;
     Ok(Json(ApiResponseData {
         data: OnboardingResponse {
-            missing_attributes: uvw.missing_fields(),
+            missing_attributes: uvw
+                .missing_fields()
+                .into_iter()
+                .filter(|x| tenant_auth.ob_config.required_user_data.contains(x))
+                .collect(),
             missing_webauthn_credentials: webauthn_creds.is_empty(),
         },
     }))

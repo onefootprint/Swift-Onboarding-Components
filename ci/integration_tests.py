@@ -574,8 +574,8 @@ an onboarding session
 #     assert attributes["email"] == request.config.cache.get("email", None)
 
 def test_default_attributes(request, workos_tenant):
-    config_id = workos_tenant["configuration_id"]
-    path = "org/required_data/{}".format(config_id)
+    config_key = workos_tenant["pk"]
+    path = "org/required_data/{}".format(config_key)
     r = requests.get(
         url(path),
         headers=_client_priv_key_headers(workos_tenant["sk"]), 
@@ -587,12 +587,12 @@ def test_default_attributes(request, workos_tenant):
     assert attributes == DEFAULT_ATTRIBUTES
 
 def test_change_attributes(request, workos_tenant):
-    config_id = workos_tenant["configuration_id"]
+    config_key = workos_tenant["pk"]
     path = "org/required_data"
     attributes = ["first_name", "last_name", "phone_number", "email"]
     data = {
         "attributes": attributes,
-        "configuration_id": config_id
+        "configuration_key": config_key
     }
     r = requests.post(
         url(path),
@@ -601,7 +601,7 @@ def test_change_attributes(request, workos_tenant):
     )
     body = _assert_response(r)
     # make sure we changed
-    get_path = path + "/" + config_id
+    get_path = path + "/" + config_key
     r = requests.get(
         url(get_path),
         headers=_client_priv_key_headers(workos_tenant["sk"]), 
@@ -613,7 +613,7 @@ def test_change_attributes(request, workos_tenant):
         url(path),
         headers=_client_priv_key_headers(workos_tenant["sk"]), 
         json= {
-            "configuration_id": config_id,
+            "configuration_key": config_key,
             "attributes": list(DEFAULT_ATTRIBUTES)
         }
     )

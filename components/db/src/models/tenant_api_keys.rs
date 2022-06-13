@@ -1,13 +1,13 @@
 use crate::schema::tenant_api_keys;
 use chrono::NaiveDateTime;
 use diesel::{Insertable, Queryable};
-use newtypes::{TenantId, TenantPublicKey};
+use newtypes::{TenantApiKeyId, TenantId};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
 #[table_name = "tenant_api_keys"]
 pub struct TenantApiKey {
-    pub tenant_public_key: TenantPublicKey,
+    pub id: TenantApiKeyId,
     pub sh_secret_api_key: Vec<u8>,
     pub e_secret_api_key: Vec<u8>,
     pub tenant_id: TenantId,

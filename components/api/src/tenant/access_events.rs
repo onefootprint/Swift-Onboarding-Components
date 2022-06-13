@@ -37,7 +37,7 @@ fn handler(
     .await?
     .into_iter()
     .map(ApiAccessEvent::from)
-    .collect();
+    .collect::<Vec<ApiAccessEvent>>();
 
     Ok(Json(ApiResponseData { data: results }))
 }

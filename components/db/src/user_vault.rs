@@ -1,7 +1,7 @@
 use crate::models::onboardings::*;
 use crate::models::user_data::NewUserData;
 use crate::models::user_vaults::*;
-use crate::onboarding::get_for_tenant;
+use crate::onboarding::get_for_fp_id;
 use crate::schema;
 use crate::{errors::DbError, models::user_data::UserData};
 use deadpool_diesel::postgres::Pool;
@@ -60,7 +60,7 @@ pub async fn get_by_tenant_and_onboarding(
 
     let result: Option<(UserVault, Onboarding)> = conn
         .interact(move |conn| -> Result<Option<(UserVault, Onboarding)>, DbError> {
-            let onboarding: Option<Onboarding> = get_for_tenant(conn, tenant_id, footprint_user_id)?;
+            let onboarding: Option<Onboarding> = get_for_fp_id(conn, tenant_id, footprint_user_id)?;
 
             match onboarding {
                 Some(ob) => Ok(Some((get_sync(conn, ob.user_vault_id.clone())?, ob))),

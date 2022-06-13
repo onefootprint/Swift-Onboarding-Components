@@ -66,34 +66,76 @@ CREATE UNIQUE INDEX IF NOT EXISTS user_data_unique_primary_data ON user_data(use
 CREATE INDEX IF NOT EXISTS user_data_user_vault_id_data_kind ON user_data(user_vault_id, data_kind);
 CREATE INDEX IF NOT EXISTS user_data_fingerprint ON user_data(sh_data) WHERE sh_data IS NOT NULL;
 
+create table ob_configurations (
+    id varchar(250) primary key default prefixed_uid('ob_config_id_'),
+    key varchar(250) unique not null default prefixed_uid('ob_config_pk_'),
+    name varchar(250) not null,
+    description varchar(250),
+    tenant_id varchar(250) not null,
+    created_at timestamp not null default now(),
+    updated_at timestamp not null default now(),
+    required_user_data data_kind [] not null default ARRAY[
+        'FirstName', 
+        'LastName', 
+        'Dob', 
+        'Ssn', 
+        'StreetAddress', 
+        'StreetAddress2', 
+        'City', 
+        'State', 
+        'Zip', 
+        'Country', 
+        'Email', 
+        'PhoneNumber'
+    ]::data_kind[],
+    /* abstract configuration data for flexibility? */
+    settings jsonb not null default '{}',
+    is_disabled boolean not null default false,
+    CONSTRAINT fk_tenant_id
+        FOREIGN KEY(tenant_id) 
+        REFERENCES tenants(id)
+);
+
+CREATE INDEX IF NOT EXISTS ob_configurations_key ON ob_configurations(key);
+CREATE INDEX IF NOT EXISTS ob_configurations_tenant ON ob_configurations(tenant_id);
+
 CREATE TABLE onboardings (
     id VARCHAR(250) PRIMARY KEY DEFAULT prefixed_uid('ob_'),
     user_ob_id VARCHAR(250) UNIQUE NOT NULL DEFAULT prefixed_uid('fp_id_'),
     user_vault_id VARCHAR(250) NOT NULL,
+    ob_config_id VARCHAR(250) NOT NULL,
     tenant_id VARCHAR(250) NOT NULL,
     status user_status NOT NULL,
     created_at timestamp NOT NULL DEFAULT NOW(),
     updated_at timestamp NOT NULL DEFAULT NOW(),
+    CONSTRAINT fk_tenant_id
+        FOREIGN KEY(tenant_id) 
+        REFERENCES tenants(id),
+    CONSTRAINT fk_ob_config_id
+        FOREIGN KEY(ob_config_id) 
+        REFERENCES ob_configurations(id),
     CONSTRAINT fk_user
         FOREIGN KEY(user_vault_id) 
-        REFERENCES user_vaults(id),
-    CONSTRAINT fk_tenant
-        FOREIGN KEY(tenant_id)
-        REFERENCES tenants(id)
+        REFERENCES user_vaults(id)
 );
 
+-- Don't allow users to onboard to the same configuration multiple times
+CREATE UNIQUE INDEX IF NOT EXISTS user_unique_onboarding_configs ON onboardings(user_vault_id, ob_config_id);
+
 CREATE INDEX IF NOT EXISTS onboardings_fp_id ON onboardings(user_ob_id);
-CREATE INDEX IF NOT EXISTS onboardings_tenant_id ON onboardings(tenant_id);
 
 CREATE TABLE tenant_api_keys (
-    tenant_public_key VARCHAR(250) PRIMARY KEY DEFAULT prefixed_uid('pk_'),
+    id VARCHAR(250) PRIMARY KEY DEFAULT prefixed_uid('key_id_'),
     sh_secret_api_key BYTEA NOT NULL,
     e_secret_api_key BYTEA NOT NULL,
     tenant_id VARCHAR(250) NOT NULL,
     key_name VARCHAR(250) NOT NULL,
     is_enabled BOOLEAN NOT NULL,
     created_at timestamp NOT NULL DEFAULT NOW(),
-    updated_at timestamp NOT NULL DEFAULT NOW()
+    updated_at timestamp NOT NULL DEFAULT NOW(),
+    CONSTRAINT fk_tenant_id
+        FOREIGN KEY(tenant_id) 
+        REFERENCES tenants(id)
 );
 
 CREATE TABLE sessions (
@@ -124,5 +166,6 @@ SELECT diesel_manage_updated_at('tenants');
 SELECT diesel_manage_updated_at('onboardings');
 SELECT diesel_manage_updated_at('tenant_api_keys');
 SELECT diesel_manage_updated_at('sessions');
+SELECT diesel_manage_updated_at('ob_configurations');
 
 

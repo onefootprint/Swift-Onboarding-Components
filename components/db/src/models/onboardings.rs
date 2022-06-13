@@ -1,9 +1,9 @@
-use crate::schema::onboardings;
+use crate::schema::{ob_configurations, onboardings};
 use crate::DbPool;
 use chrono::NaiveDateTime;
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
-use newtypes::{FootprintUserId, OnboardingId, Status, TenantId, UserVaultId};
+use newtypes::{FootprintUserId, ObConfigurationId, OnboardingId, Status, TenantId, UserVaultId};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
@@ -15,6 +15,7 @@ pub struct Onboarding {
     pub id: OnboardingId,
     pub user_ob_id: FootprintUserId,
     pub user_vault_id: UserVaultId,
+    pub ob_config_id: ObConfigurationId,
     pub tenant_id: TenantId,
     pub status: Status,
     pub created_at: NaiveDateTime,
@@ -27,6 +28,7 @@ pub struct Onboarding {
 #[table_name = "onboardings"]
 pub struct NewOnboarding {
     pub user_vault_id: UserVaultId,
+    pub ob_config_id: ObConfigurationId,
     pub tenant_id: TenantId,
     pub status: Status,
     pub start_insight_event_id: Option<Uuid>,
@@ -37,6 +39,7 @@ impl NewOnboarding {
         pool: &DbPool,
         user_vault_id: UserVaultId,
         tenant_id: TenantId,
+        ob_config_id: ObConfigurationId,
         status: Status,
         insight_event: CreateInsightEvent,
     ) -> Result<Onboarding, crate::DbError> {
@@ -45,8 +48,13 @@ impl NewOnboarding {
             .await?
             .interact(move |conn| -> Result<Onboarding, crate::DbError> {
                 let existing_ob = onboardings::table
-                    .filter(onboardings::tenant_id.eq(&tenant_id))
+                    // Check to see if the user already has any enabled onboarding for this tenant
                     .filter(onboardings::user_vault_id.eq(&user_vault_id))
+                    .filter(onboardings::ob_config_id.eq(&ob_config_id))
+                    .filter(onboardings::tenant_id.eq(&tenant_id))
+                    .left_join(ob_configurations::table.on(onboardings::ob_config_id.eq(ob_configurations::id)))
+                    .filter(ob_configurations::is_disabled.eq(false))
+                    .select(onboardings::all_columns)
                     .first(conn)
                     .optional()?;
                 match existing_ob {
@@ -56,6 +64,7 @@ impl NewOnboarding {
 
                         let new = NewOnboarding {
                             user_vault_id,
+                            ob_config_id,
                             tenant_id,
                             status,
                             start_insight_event_id: Some(insight_event.id),

@@ -37,6 +37,8 @@ fn handler(
     let missing_fields = uvw
         .missing_fields()
         .into_iter()
+        // check if we're missing something that's required
+        .filter(|x| tenant_auth.ob_config.required_user_data.contains(x))
         .map(|x| x.to_string())
         .collect::<Vec<String>>();
     let webauthn_creds = get_webauthn_creds(&state.db_pool, uv_id).await?;

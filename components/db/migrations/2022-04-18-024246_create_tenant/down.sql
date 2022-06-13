@@ -1,6 +1,9 @@
 DROP TABLE IF EXISTS sessions;
 DROP INDEX IF EXISTS onboardings_fp_id;
-DROP INDEX IF EXISTS onboardings_tenant_id;
+DROP INDEX IF EXISTS ob_configurations_key;
+DROP INDEX IF EXISTS ob_configurations_tenant;
+DROP INDEX IF EXISTS user_unique_onboarding_configs;
+DROP TABLE IF EXISTS onboarding_configurations;
 DROP TABLE IF EXISTS onboardings;
 DROP FUNCTION IF EXISTS expire_sessions;
 DROP TABLE IF EXISTS tenants;
