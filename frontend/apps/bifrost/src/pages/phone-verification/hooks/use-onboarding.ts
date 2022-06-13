@@ -33,7 +33,7 @@ const onboardingRequest = async (payload: OnboardingRequest) => {
       url: '/onboarding',
       headers: {
         'X-Fpuser-Authorization': payload.authToken,
-        'x-Client-Public-Key': 'pk_F6VdDhQSDD9cK3q509Kn2', // TODO: Placeholder tenant ID for now
+        'x-Client-Public-Key': 'ob_config_pk_YuK0vExl4Lty1yLG5aHrH2', // TODO: Placeholder tenant ID for now
       },
     },
   );
