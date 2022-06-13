@@ -1,0 +1,17 @@
+name: Tag Ephemeral Environment
+
+on:
+  pull_request:
+    branches: [ master ]
+    paths:
+      - 'infra/**'
+
+jobs:
+  tag-ephemeral:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: tag ephemeral environment
+      uses: andymckay/labeler@master
+      with:
+        add-labels: "ephemeral"
