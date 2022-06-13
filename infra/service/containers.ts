@@ -19,7 +19,14 @@ export abstract class ServiceContainers {
         const current = await aws.getCallerIdentity({});
         const image = `${current.accountId}.dkr.ecr.us-east-1.amazonaws.com/api:${constants.containers.apiVersion}`;
 
-        const serviceEnvironment = pulumi.getStack();
+        let serviceEnvironment:string;
+        if (pulumi.getStack().startsWith("dev-")) {
+            serviceEnvironment = "preview";            
+        } else if (pulumi.getStack() === "dev") {
+            serviceEnvironment = "development";
+        } else {
+            serviceEnvironment = pulumi.getStack();
+        }
 
         const containerDef = pulumi.all([otelCollector]).apply(([otelCollector]) => {
             return pulumi.all([
@@ -92,7 +99,7 @@ export abstract class ServiceContainers {
                         },
                         {
                             name: "OTEL_RESOURCE_ATTRIBUTES",
-                            value: `service.name=fpc-api,service.version=1.0,deployment.environment=${serviceEnvironment}`
+                            value: `service.name=fpc-api,service.version=1.0,deployment.environment=${pulumi.getStack()}`
                         },
                         {
                             name: "WORKOS_CLIENT_ID",

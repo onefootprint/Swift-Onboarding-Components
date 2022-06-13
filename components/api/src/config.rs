@@ -2,8 +2,8 @@ use envconfig::Envconfig;
 
 #[derive(Envconfig, Clone)]
 pub struct Config {
-    #[envconfig(from = "SERVICE_ENVIRONMENT", default = "local")]
-    pub service_environment: String,
+    #[envconfig(from = "SERVICE_ENVIRONMENT")]
+    pub service_environment: Option<String>,
 
     #[envconfig(from = "PORT", default = "8000")]
     pub port: u16,

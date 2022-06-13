@@ -1,7 +1,6 @@
 use std::{borrow::Cow, time::Duration};
 
-use actix_session::{storage::CookieSessionStore, SessionMiddleware};
-use actix_web::{cookie::Key, middleware::Logger, App, HttpServer};
+use actix_web::{middleware::Logger, App, HttpServer};
 use actix_web_opentelemetry::RequestMetrics;
 use config::Config;
 use crypto::aead::ScopedSealingKey;
@@ -74,14 +73,19 @@ async fn main() -> std::io::Result<()> {
     let metrics = RequestMetrics::new(meter, Some(should_render_metrics), None);
 
     // sentry
-    let _guard = sentry::init((
-        config.sentry_url.as_str(),
-        sentry::ClientOptions {
-            release: sentry::release_name!(),
-            environment: Some(Cow::Owned(config.service_environment.clone())),
-            ..Default::default()
-        },
-    ));
+    let _guard = if let Some(env) = config.service_environment.clone() {
+        Some(sentry::init((
+            config.sentry_url.as_str(),
+            sentry::ClientOptions {
+                release: sentry::release_name!(),
+                environment: Some(Cow::Owned(env)),
+                ..Default::default()
+            },
+        )))
+    } else {
+        None
+    };
+
     std::env::set_var("RUST_BACKTRACE", "1");
 
     let state = {
@@ -154,17 +158,6 @@ async fn main() -> std::io::Result<()> {
 
     log::info!("starting server on port {}", config.port);
 
-    // our session key
-    let session_key = if let Some(hex_key) = config.cookie_session_key_hex {
-        crypto::hex::decode(hex_key).expect("invalid session cookie key")
-    } else {
-        log::error!("WARNING GENERATING RANDOM SESSION KEY");
-        crypto::random::random_cookie_session_key_bytes()
-    };
-
-    let is_https = config.use_local.is_none();
-    let cookie_domain = format!(".{}", &config.cookie_domain);
-
     let res = HttpServer::new(move || {
         let cors = actix_cors::Cors::default()
             .allow_any_origin()
@@ -177,20 +170,11 @@ async fn main() -> std::io::Result<()> {
         // custom `Json` extractor configuration
         let json_cfg = web::JsonConfig::default()
             // limit request payload size
-            .limit(16_384)
+            .limit(32_768)
             // accept any content type
             .content_type(|_| true)
             // use custom error handler
             .error_handler(|err, _req| actix_web::Error::from(ApiError::InvalidJsonBody(err)));
-
-        let session_middleware =
-            SessionMiddleware::builder(CookieSessionStore::default(), Key::from(&session_key))
-                .cookie_path("/".to_string())
-                .cookie_secure(is_https)
-                .cookie_content_security(actix_session::CookieContentSecurity::Private)
-                .cookie_same_site(actix_web::cookie::SameSite::Lax)
-                .cookie_domain(Some(cookie_domain.clone()))
-                .build();
 
         App::new()
             .app_data(web::Data::new(state.clone()))
@@ -206,7 +190,6 @@ async fn main() -> std::io::Result<()> {
             .wrap(metrics.clone())
             .wrap(cors)
             .app_data(json_cfg)
-            .wrap(session_middleware)
             .wrap_api()
             .configure(index::routes)
             .service(
