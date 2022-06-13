@@ -10,7 +10,7 @@ import useIdentifyChallenge, {
 import useBifrostMachine, { Events } from 'src/hooks/use-bifrost-machine';
 import { ChallengeKind } from 'src/utils/state-machine/types';
 import styled, { css } from 'styled-components';
-import { Button, LinkButton, PhoneInput, Typography } from 'ui';
+import { Button, LinkButton, TextInput, Typography } from 'ui';
 
 type FormData = {
   phone: string;
@@ -96,7 +96,7 @@ const PhoneRegistration = () => {
           {t('email-card.cta')}
         </LinkButton>
       </EmailCard>
-      <PhoneInput
+      <TextInput
         hasError={!!errors.phone}
         hintText={errors.phone && t('form.phone-input.error')}
         label={t('form.phone-input.label')}
