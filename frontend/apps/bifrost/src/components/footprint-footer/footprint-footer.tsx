@@ -1,42 +1,37 @@
+import { useDeviceType } from 'hooks';
 import React from 'react';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
-import FooterLinksContainer from './components/footer-links-container';
-import SecuredByFootprint from './components/secured-by-footprint';
+import DesktopFooter from './components/desktop-footer';
+import MobileFooter from './components/mobile-footer';
+import type { Link } from './footprint-footer.types';
 
 const FootprintFooter = () => {
-  const links = [
+  const deviceType = useDeviceType();
+  const links: Link[] = [
     {
       label: "What's this?",
-      link: 'https://www.onefootprint.com',
+      href: 'https://www.onefootprint.com',
     },
     {
       label: 'Privacy',
-      link: 'https://www.onefootprint.com/privacy-policy',
-    },
-    {
-      label: 'Terms',
-      link: 'https://www.onefootprint.com/terms',
+      href: 'https://www.onefootprint.com/privacy-policy',
     },
   ];
 
   return (
-    <FooterContainer>
-      <SecuredByFootprint />
-      <FooterLinksContainer links={links} />
-    </FooterContainer>
+    <Container>
+      {deviceType === 'mobile' ? (
+        <MobileFooter links={links} />
+      ) : (
+        <DesktopFooter links={links} />
+      )}
+    </Container>
   );
 };
 
-const FooterContainer = styled.footer`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-
-  ${({ theme }) => css`
-    margin-top: ${theme.spacing[7]}px;
-  `}
+const Container = styled.footer`
+  flex-shrink: 0;
 `;
 
 export default FootprintFooter;

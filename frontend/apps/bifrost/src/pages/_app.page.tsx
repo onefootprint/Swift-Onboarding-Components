@@ -4,7 +4,7 @@ import Script from 'next/script';
 import React from 'react';
 import { QueryClientProvider } from 'react-query';
 import { GOOGLE_MAPS_KEY } from 'src/constants';
-import styled, { css } from 'styled-components';
+import styled, { createGlobalStyle, css } from 'styled-components';
 import themes from 'themes';
 import { DesignSystemProvider } from 'ui';
 
@@ -33,11 +33,12 @@ const App = ({ Component, pageProps }: AppProps) => (
       <MachineProvider>
         <FootprintProvider>
           <DesignSystemProvider theme={themes.light}>
-            <Container>
+            <GlobalStyle />
+            <Content>
               <Header />
               <Component {...pageProps} />
-              <FootprintFooter />
-            </Container>
+            </Content>
+            <FootprintFooter />
           </DesignSystemProvider>
         </FootprintProvider>
       </MachineProvider>
@@ -49,11 +50,22 @@ const App = ({ Component, pageProps }: AppProps) => (
   </>
 );
 
-const Container = styled.div`
+const GlobalStyle = createGlobalStyle`
+  html, body, #__next {
+    height: 100%;
+  }
+
+  #__next {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+`;
+
+const Content = styled.section`
   ${({ theme }) => css`
-    margin: 0 auto;
-    max-width: 500px;
-    padding-inline: ${theme.spacing[6]}px;
+    flex: 1 0 auto;
+    padding: 0 ${theme.spacing[6]}px;
   `}
 `;
 

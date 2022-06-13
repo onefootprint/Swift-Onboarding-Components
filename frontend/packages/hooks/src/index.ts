@@ -1,3 +1,4 @@
+export { default as useDeviceType } from './use-device-type';
 export { default as useInputMask } from './use-input-mask';
 export { default as usePlacesAutocomplete } from './use-places-autocomplete';
 export * from './use-places-autocomplete';
