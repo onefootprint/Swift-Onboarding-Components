@@ -1,6 +1,6 @@
-import useSessionUser from '@src/hooks/use-session-user';
 import { useQuery } from 'react-query';
 import request, { RequestError, RequestResponse } from 'request';
+import useSessionUser from 'src/hooks/use-session-user';
 import {
   OnboardingsListRequest,
   useFilters,

@@ -1,7 +1,7 @@
-import useLogin, { LoginResponse } from '@src/hooks/login/login';
-import useSessionUser from '@src/hooks/use-session-user';
 import { useRouter } from 'next/router';
 import React, { useEffect } from 'react';
+import useLogin, { LoginResponse } from 'src/hooks/login/login';
+import useSessionUser from 'src/hooks/use-session-user';
 
 const Auth = () => {
   const router = useRouter();

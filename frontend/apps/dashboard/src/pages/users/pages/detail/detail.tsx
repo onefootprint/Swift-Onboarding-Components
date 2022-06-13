@@ -1,12 +1,12 @@
-import FieldTag from '@src/components/field-tag';
-import Timeline from '@src/components/timeline';
-import UserHeader from '@src/pages/users/pages/detail/components/user-header';
 import IcoBuilding16 from 'icons/ico/ico-building-16';
 import IcoCheck16 from 'icons/ico/ico-check-16';
 import IcoFootprint16 from 'icons/ico/ico-footprint-16';
 import IcoUserCircle16 from 'icons/ico/ico-user-circle-16';
 import React from 'react';
+import FieldTag from 'src/components/field-tag';
+import Timeline from 'src/components/timeline';
 import useGetOnboardings from 'src/pages/users/hooks/use-get-onboardings';
+import UserHeader from 'src/pages/users/pages/detail/components/user-header';
 import styled, { css } from 'styled-components';
 import { Box, Divider, Typography } from 'ui';
 import { useMap } from 'usehooks-ts';

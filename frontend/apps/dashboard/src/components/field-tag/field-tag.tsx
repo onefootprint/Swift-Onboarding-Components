@@ -1,5 +1,5 @@
-import { DataKind } from '@src/pages/users/hooks/use-decrypt-user';
 import React from 'react';
+import { DataKind } from 'src/pages/users/hooks/use-decrypt-user';
 import styled, { css } from 'styled-components';
 import { Typography } from 'ui';
 

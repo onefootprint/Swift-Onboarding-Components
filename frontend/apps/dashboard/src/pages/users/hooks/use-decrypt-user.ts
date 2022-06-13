@@ -1,7 +1,7 @@
-import useSessionUser from '@src/hooks/use-session-user';
 import { partial } from 'lodash';
 import { useMutation } from 'react-query';
 import request, { RequestError, RequestResponse } from 'request';
+import useSessionUser from 'src/hooks/use-session-user';
 
 import { DASHBOARD_AUTHORIZATION_HEADER } from '../../../config/constants';
 

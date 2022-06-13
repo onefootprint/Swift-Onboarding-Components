@@ -1,5 +1,5 @@
-import useSessionUser from '@src/hooks/use-session-user';
 import React, { useEffect } from 'react';
+import useSessionUser from 'src/hooks/use-session-user';
 import { Typography } from 'ui';
 
 const Logout = () => {

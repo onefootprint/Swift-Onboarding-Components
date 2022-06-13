@@ -1,6 +1,6 @@
-import Modal, { ModalCloseEvent } from '@src/components/modal';
-import { DataKind } from '@src/pages/users/hooks/use-decrypt-user';
 import React, { ChangeEvent, useState } from 'react';
+import Modal, { ModalCloseEvent } from 'src/components/modal';
+import { DataKind } from 'src/pages/users/hooks/use-decrypt-user';
 import { User } from 'src/pages/users/hooks/use-join-users';
 import styled, { css } from 'styled-components';
 import { Box, Button, Checkbox, Divider, TextArea, Typography } from 'ui';

@@ -1,9 +1,9 @@
-import { DataKind } from '@src/pages/users/hooks/use-decrypt-user';
+import React from 'react';
+import { DataKind } from 'src/pages/users/hooks/use-decrypt-user';
 import {
   statusToBadgeVariant,
   statusToDisplayText,
-} from '@src/pages/users/hooks/use-get-onboardings';
-import React from 'react';
+} from 'src/pages/users/hooks/use-get-onboardings';
 import { User } from 'src/pages/users/hooks/use-join-users';
 import styled, { css } from 'styled-components';
 import { Badge, Code, Typography } from 'ui';
