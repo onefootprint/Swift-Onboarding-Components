@@ -8,5 +8,6 @@ export const LOGGED_OUT_ROUTES = [
 ];
 export const DEFAULT_LOGGED_IN_ROUTE = '/users';
 export const DEFAULT_LOGGED_OUT_ROUTE = '/login';
+export const DASHBOARD_AUTHORIZATION_HEADER = 'x-fp-dashboard-authorization';
 
 export const GOOGLE_REDIRECT_URL = process.env.NEXT_PUBLIC_URL;

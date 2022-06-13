@@ -7,6 +7,8 @@ import {
 } from 'src/pages/users/hooks/use-filters';
 import { UIState } from 'themes';
 
+import { DASHBOARD_AUTHORIZATION_HEADER } from '../../../config/constants';
+
 export enum OnboardingStatus {
   verified = 'verified',
   manualReview = 'manual_review',
@@ -47,7 +49,7 @@ const getOnboardingsRequest = async (
     method: 'GET',
     url: '/org/onboardings',
     params,
-    headers: { 'x-fp-dashboard-authorization': auth as string },
+    headers: { [DASHBOARD_AUTHORIZATION_HEADER]: auth as string },
   });
   return response.data;
 };

@@ -3,6 +3,8 @@ import { partial } from 'lodash';
 import { useMutation } from 'react-query';
 import request, { RequestError, RequestResponse } from 'request';
 
+import { DASHBOARD_AUTHORIZATION_HEADER } from '../../../config/constants';
+
 export type DecryptUserRequest = {
   footprintUserId: string;
   attributes: string[];
@@ -15,6 +17,7 @@ export enum DataKind {
   email = 'email',
   phoneNumber = 'phone_number',
   ssn = 'ssn',
+  lastFourSsn = 'last_four_ssn',
   dob = 'dob',
   streetAddress = 'street_address',
   streetAddress2 = 'street_address2',
@@ -36,9 +39,7 @@ const decryptUserRequest = async (
     method: 'POST',
     url: '/org/decrypt',
     data,
-    headers: {
-      'x-fp-dashboard-authorization': auth as string,
-    },
+    headers: { [DASHBOARD_AUTHORIZATION_HEADER]: auth as string },
   });
   return response.data;
 };

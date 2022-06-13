@@ -14,7 +14,7 @@ import useSessionUser from '../../../../hooks/use-session-user';
 
 const routes = [
   { href: '/users', Icon: IcoUsers16, text: 'Users' },
-  { href: '/security-logs', Icon: IcoFileText16, text: 'Security Logs' },
+  { href: '/security-logs', Icon: IcoFileText16, text: 'Security logs' },
   { href: '/developers', Icon: IcoCode16, text: 'Developers' },
   { href: '/settings', Icon: IcoSettings16, text: 'Settings' },
 ];

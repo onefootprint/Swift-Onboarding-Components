@@ -9,6 +9,7 @@ const dataKindToDisplayName: Record<DataKind, String> = {
   [DataKind.email]: 'Email',
   [DataKind.phoneNumber]: 'Phone number',
   [DataKind.ssn]: 'SSN',
+  [DataKind.lastFourSsn]: 'SSN last four',
   [DataKind.dob]: 'Date of birth',
   [DataKind.streetAddress]: 'Address line 1',
   [DataKind.streetAddress2]: 'Address line 2',

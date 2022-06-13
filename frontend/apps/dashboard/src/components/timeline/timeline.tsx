@@ -11,9 +11,10 @@ type TimelineItem = {
 
 type TimelineProps = {
   items: TimelineItem[];
+  connectorVariant?: 'default' | 'tight';
 };
 
-const Timeline = ({ items }: TimelineProps) => (
+const Timeline = ({ items, connectorVariant = 'default' }: TimelineProps) => (
   <TimelineContainer>
     {items.map((item: TimelineItem, i: number) => (
       <>
@@ -32,7 +33,9 @@ const Timeline = ({ items }: TimelineProps) => (
         </Typography>
         <IconContainer>{item.iconComponent}</IconContainer>
         <HeaderContainer>{item.headerComponent}</HeaderContainer>
-        {(i !== items.length - 1 || !!item.bodyComponent) && <Connector />}
+        {(i !== items.length - 1 || !!item.bodyComponent) && (
+          <Connector variant={connectorVariant} />
+        )}
         <BodyContainer>
           {item.bodyComponent && item.bodyComponent}
         </BodyContainer>
@@ -56,7 +59,9 @@ const IconContainer = styled.div`
   align-items: center;
 `;
 
-const Connector = styled.div`
+const Connector = styled.div<{
+  variant: 'default' | 'tight';
+}>`
   grid-column-start: 3;
   width: 2px;
   min-height: 24px;
@@ -66,6 +71,13 @@ const Connector = styled.div`
     background-color: ${theme.backgroundColor.senary};
     border-radius: ${theme.borderRadius[1]}px;
   `};
+  ${({ theme, variant }) =>
+    variant === 'tight' &&
+    css`
+      // Help to fill empty space when the iconComponents are smaller
+      margin-top: -${theme.spacing[3]}px;
+      margin-bottom: -${theme.spacing[3]}px;
+    `};
 `;
 
 const HeaderContainer = styled.div`
