@@ -86,6 +86,9 @@ const UsersFilter = () => {
 };
 
 const FilterButtonContainer = styled.div`
+  height: 100%;
+  display: flex;
+  align-items: center;
   ${({ theme }) => css`
     margin-right: ${theme.spacing[6]}px;
   `};

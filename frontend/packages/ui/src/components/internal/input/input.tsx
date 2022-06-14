@@ -57,38 +57,52 @@ const BaseInput = forwardRef<HTMLInputElement, AllInputProps>(
     };
 
     return (
-      <InputContainer>
+      <>
         {label && <Label htmlFor={id}>{label}</Label>}
-        {prefixElement}
-        <StyledField
-          {...remainingProps}
-          sx={sxStyles}
-          fontVariant={fontVariant}
-          $hasError={hasError}
-          aria-required={required}
-          as={mask ? undefined : 'input'}
-          data-testid={testID}
-          id={id}
-          onChange={handleChange}
-          options={mask}
-          placeholder={placeholder}
-          required={required}
-          // We use Cleave.js for mask, and cleave uses htmlRef instead of ref
-          // These conditions are important in order to work with react-hook-forms
-          ref={mask ? undefined : ref}
-          htmlRef={mask ? ref : undefined}
-        />
+        <InputContainer>
+          {prefixElement && <PrefixContainer>{prefixElement}</PrefixContainer>}
+          <StyledField
+            {...remainingProps}
+            sx={sxStyles}
+            fontVariant={fontVariant}
+            $hasError={hasError}
+            aria-required={required}
+            as={mask ? undefined : 'input'}
+            data-testid={testID}
+            id={id}
+            onChange={handleChange}
+            options={mask}
+            placeholder={placeholder}
+            required={required}
+            // We use Cleave.js for mask, and cleave uses htmlRef instead of ref
+            // These conditions are important in order to work with react-hook-forms
+            ref={mask ? undefined : ref}
+            htmlRef={mask ? ref : undefined}
+          />
+          {suffixElement && <SuffixContainer>{suffixElement}</SuffixContainer>}
+        </InputContainer>
         {hintText && (
           <Hint color={hasError ? 'error' : 'tertiary'}>{hintText}</Hint>
         )}
-        {suffixElement && <SuffixContainer>{suffixElement}</SuffixContainer>}
-      </InputContainer>
+      </>
     );
   },
 );
 
 const InputContainer = styled.div`
   position: relative;
+`;
+
+const PrefixContainer = styled.div`
+  position: absolute;
+  height: 100%;
+`;
+
+const SuffixContainer = styled.div`
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 100%;
 `;
 
 const StyledField = styled(Field)<{ sx: SXStyles }>`
@@ -100,16 +114,6 @@ const StyledField = styled(Field)<{ sx: SXStyles }>`
     css`
       ${sx};
     `}
-`;
-
-const SuffixContainer = styled.div`
-  position: absolute;
-  top: 0;
-  right: 0;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 `;
 
 export default BaseInput;

@@ -50,10 +50,9 @@ const SecurityLogs = () => {
       <Typography variant="heading-2">Security logs</Typography>
       <SearchAndFilterContainer>
         <SearchInput
-          placeholder="Search..."
           inputSize="compact"
+          onChangeText={setSearchText}
           value={searchText}
-          onChangeText={(text: string) => setSearchText(text)}
         />
         <Button size="small" variant="secondary">
           Filters

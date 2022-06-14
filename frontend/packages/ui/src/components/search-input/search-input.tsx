@@ -1,65 +1,85 @@
-import IcoSearch16 from 'icons/ico/ico-search-16';
-import React from 'react';
-import styled, { css } from 'styled-components';
-import { Spacings } from 'themes';
+import React, { forwardRef } from 'react';
 
 import Input, { InputProps } from '../internal/input';
+import ClearButton from './components/clear-button';
+import SearchIcon from './components/search-icon';
+import { sizeToHeight, sizeToInputPadding } from './search-input.constants';
+import type { Size } from './search-input.types';
 
-export type SearchInputProps = InputProps & {
-  inputSize?: InputSize;
+type BaseProps = Omit<
+  InputProps,
+  | 'disabled'
+  | 'hasError'
+  | 'hintText'
+  | 'label'
+  | 'mask'
+  | 'placeholder'
+  | 'type'
+>;
+
+export type SearchInputProps = BaseProps & {
+  clearButtonAriaLabel?: string;
+  inputSize?: Size;
+  onReset?: () => void;
+  placeholder?: string;
   suffixElement?: React.ReactNode;
 };
 
-type InputSize = 'default' | 'large' | 'compact';
+const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
+  (
+    {
+      clearButtonAriaLabel = 'Reset',
+      inputSize = 'default',
+      onChange,
+      onChangeText,
+      onReset,
+      placeholder = 'Search...',
+      suffixElement: SuffixElement,
+      value,
+      ...remainingProps
+    }: SearchInputProps,
+    ref,
+  ) => {
+    const handleClearInput = () => {
+      onChangeText?.('');
+      onReset?.();
+    };
 
-const sizeToHeight: Record<InputSize, string> = {
-  default: '40px',
-  large: '48px',
-  compact: '32px',
-};
+    const renderSuffix = () => {
+      if (SuffixElement) {
+        return SuffixElement;
+      }
+      if (value) {
+        return (
+          <ClearButton
+            size={inputSize}
+            onClick={handleClearInput}
+            aria-label={clearButtonAriaLabel}
+          />
+        );
+      }
+      return undefined;
+    };
 
-const sizeToIconMargin: Record<InputSize, keyof Spacings> = {
-  default: 5,
-  large: 5,
-  compact: 4,
-};
-
-const sizeToInputPadding: Record<InputSize, keyof Spacings> = {
-  default: 9,
-  large: 9,
-  compact: 8,
-};
-
-const SearchInput = ({
-  inputSize = 'default',
-  ...remainingProps
-}: SearchInputProps) => (
-  <Input
-    // eslint-disable-next-line react/jsx-props-no-spreading
-    {...remainingProps}
-    fontVariant={inputSize === 'compact' ? 'body-4' : 'body-3'}
-    sx={{
-      paddingLeft: sizeToInputPadding[inputSize],
-      height: sizeToHeight[inputSize],
-    }}
-    prefixElement={
-      <PrefixContainer inputSize={inputSize}>
-        {/* TODO make search logo 11px instead of 13px for compact */}
-        <IcoSearch16 />
-      </PrefixContainer>
-    }
-  />
+    return (
+      <Input
+        {...remainingProps}
+        placeholder={placeholder}
+        fontVariant={inputSize === 'compact' ? 'body-4' : 'body-3'}
+        onChange={onChange}
+        onChangeText={onChangeText}
+        prefixElement={<SearchIcon size={inputSize} />}
+        ref={ref}
+        suffixElement={renderSuffix()}
+        sx={{
+          paddingLeft: sizeToInputPadding[inputSize],
+          height: sizeToHeight[inputSize],
+        }}
+        type="text"
+        value={value}
+      />
+    );
+  },
 );
-
-const PrefixContainer = styled.div<{ inputSize: InputSize }>`
-  position: absolute;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  ${({ theme, inputSize }) => css`
-    height: ${sizeToHeight[inputSize]};
-    margin-left: ${theme.spacing[sizeToIconMargin[inputSize]]}px;
-  `};
-`;
 
 export default SearchInput;

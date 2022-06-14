@@ -52,7 +52,6 @@ const Users = () => {
       <HeaderContainer>
         <Typography variant="heading-2">Users</Typography>
       </HeaderContainer>
-      {/* TODO make even large input size */}
       <StyledSearchInput
         placeholder="Search (exact match)..."
         suffixElement={<UsersFilter />}
@@ -132,6 +131,7 @@ const HeaderContainer = styled.div`
 const StyledSearchInput = styled(SearchInput)`
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
+  height: 52px;
 `;
 
 export default Users;

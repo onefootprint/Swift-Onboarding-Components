@@ -37,6 +37,7 @@ module.exports = {
           'Checkbox',
           'Field',
           'StyledField',
+          'Input',
           'TextInput',
           'BaseInput',
           'AddressInput',
