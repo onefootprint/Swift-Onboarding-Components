@@ -10,4 +10,10 @@ export const DEFAULT_LOGGED_IN_ROUTE = '/users';
 export const DEFAULT_LOGGED_OUT_ROUTE = '/login';
 export const DASHBOARD_AUTHORIZATION_HEADER = 'x-fp-dashboard-authorization';
 
-export const GOOGLE_REDIRECT_URL = process.env.NEXT_PUBLIC_URL;
+// When running as a vercel preview build, use the URL of the preview deployment as the redirect
+// URL. Otherwise, use the user-specified NEXT_PUBLIC_URL
+export const GOOGLE_REDIRECT_URL =
+  process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview' &&
+  process.env.NEXT_PUBLIC_VERCEL_URL
+    ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`
+    : process.env.NEXT_PUBLIC_URL;
