@@ -172,9 +172,22 @@ sudo yum install postgresql jq yum-utils -y
 
 # setup tailscale
 sudo yum-config-manager --add-repo https://pkgs.tailscale.com/stable/centos/7/tailscale.repo
-sudo yum install tailscale -y
+sudo yum install tailscale nc -y
 sudo systemctl enable --now tailscaled
 sudo tailscale up --authkey "${tailscaleAuthKey}" --advertise-exit-node --hostname "${jumpHostname}" --advertise-routes=10.0.0.0/24,10.0.1.0/24 --accept-dns=false
+
+# setup tunnel helper
+cat <<'EOF' > db_proxy.sh
+#!/bin/sh
+export DB_SECRET_NAME="${dbSecretName}"
+export DATABASE_URL="$(aws --region us-east-1 ssm get-parameter --name "${dbSecretName}" --with-decryption | jq -r ".Parameter.Value")"
+export DATABASE_HOST="$(echo $DATABASE_URL | cut -d "@" -f2)"
+echo "database=$DATABASE_HOST"
+echo "password=$(echo $DATABASE_URL | cut -d "@" -f1 | cut -d ":" -f3)"
+ncat -l 0.0.0.0 5432 --sh-exec "ncat $DATABASE_HOST 5432"
+EOF
+
+chmod +x db_proxy.sh
 
 # setup db connect script
 cat <<'EOF' > connect_db.sh
