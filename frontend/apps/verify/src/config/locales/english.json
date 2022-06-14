@@ -1,0 +1,15 @@
+{
+  "pages": {
+    "verify": {
+      "logo-alt": "Footprint logo",
+      "success": {
+        "title": "Email verified!",
+        "description": "Thanks for verifying your email. You're all set!"
+      },
+      "error": {
+        "title": "Email verification failed.",
+        "description": "Please open the link we've originally sent to your email to try again."
+      }
+    }
+  }
+}

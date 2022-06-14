@@ -14,6 +14,7 @@
     "build:ui": "turbo run build --scope=ui --no-deps --include-dependencies",
     "build:frontpage": "turbo run build --scope=frontpage --no-deps --include-dependencies",
     "build:demo": "turbo run build --scope=demo --no-deps --include-dependencies",
+    "build:verify": "turbo run build --scope=verify --no-deps --include-dependencies",
     "build": "turbo run build",
     "predev": "yarn install",
     "dev": "turbo run dev --parallel",
