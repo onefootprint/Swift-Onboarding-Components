@@ -74,6 +74,14 @@ export const LinkButtonStyled = styled.a.attrs<{
     cursor: pointer;
     display: flex;
 
+    &:hover {
+      opacity: 0.7;
+    }
+
+    &:active {
+      opacity: 0.85;
+    }
+
     span + svg,
     svg + span {
       margin-left: ${theme.spacing[2]}px;

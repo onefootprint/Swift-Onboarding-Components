@@ -102,6 +102,7 @@ const PinInput = ({
               return (
                 <Input
                   autoComplete="one-time-code"
+                  autoFocus={pinIndex === 0}
                   disabled={pinIndex > enteredPin.length}
                   hasError={hasError}
                   inputMode="numeric"

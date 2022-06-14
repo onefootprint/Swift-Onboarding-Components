@@ -30,7 +30,7 @@ const Container = styled.div`
   ${({ theme }) => css`
     background-color: ${theme.backgroundColor.secondary};
     border-radius: 0 0 ${theme.borderRadius[1]}px ${theme.borderRadius[1]}px;
-    border-top: ${theme.borderWidth[1]}px solid ${theme.borderColor.primary};
+    border-top: ${theme.borderWidth[1]}px solid ${theme.borderColor.tertiary};
     display: flex;
     flex-direction: row;
     justify-content: space-between;
