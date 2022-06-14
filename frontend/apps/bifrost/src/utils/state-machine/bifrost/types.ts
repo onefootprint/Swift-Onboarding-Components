@@ -29,6 +29,7 @@ export enum Events {
   userIdentifiedByEmail = 'userIdentifiedByEmail',
   userIdentifiedByPhone = 'userIdentifiedByPhone',
   userNotIdentified = 'userNotIdentified',
+  navigatedToPrevPage = 'navigatedToPrevPage',
 
   // Liveness Challenge
   smsChallengeInitiated = 'smsChallengeInitiated',
@@ -74,6 +75,7 @@ export type BifrostEvent =
         challengeData?: ChallengeData; // only if user found
       };
     }
+  | { type: Events.navigatedToPrevPage }
   | {
       type: Events.biometricLoginSucceeded;
       payload: {

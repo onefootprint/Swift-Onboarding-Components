@@ -8,6 +8,7 @@ import { ChallengeKind } from 'src/utils/state-machine/types';
 import styled, { css } from 'styled-components';
 import { Box, LinkButton, LoadingIndicator, PinInput, Typography } from 'ui';
 
+import PrevHeader from './components/prev-header';
 import useOnboarding, { OnboardingResponse } from './hooks/use-onboarding';
 
 const PhoneVerification = () => {
@@ -82,32 +83,35 @@ const PhoneVerification = () => {
   };
 
   return (
-    <Form>
-      <Box>
-        <Typography variant="heading-2" color="primary">
-          {state.context.userFound
-            ? 'Welcome back! 🎉'
-            : "Let's verify your identity!"}
-        </Typography>
-        <Typography variant="body-2" color="secondary">
-          Enter the 6-digit code sent to (•••) ••• ••
-          {state.context.challenge?.phoneNumberLastTwo ??
-            state.context.phone?.slice(-2)}
-          .
-        </Typography>
-      </Box>
-      {shouldShowLoading ? (
-        <>
-          <LoadingIndicator />
-          <Typography variant="label-3">Verifying...</Typography>
-        </>
-      ) : (
-        <>
-          <PinInput onComplete={validatePin} />
-          <LinkButton onClick={resendVerification}>Resend code</LinkButton>
-        </>
-      )}
-    </Form>
+    <>
+      <PrevHeader />
+      <Form>
+        <Box>
+          <Typography variant="heading-2" color="primary">
+            {state.context.userFound
+              ? 'Welcome back! 🎉'
+              : "Let's verify your identity!"}
+          </Typography>
+          <Typography variant="body-2" color="secondary">
+            Enter the 6-digit code sent to (•••) ••• ••
+            {state.context.challenge?.phoneNumberLastTwo ??
+              state.context.phone?.slice(-2)}
+            .
+          </Typography>
+        </Box>
+        {shouldShowLoading ? (
+          <>
+            <LoadingIndicator />
+            <Typography variant="label-3">Verifying...</Typography>
+          </>
+        ) : (
+          <>
+            <PinInput onComplete={validatePin} />
+            <LinkButton onClick={resendVerification}>Resend code</LinkButton>
+          </>
+        )}
+      </Form>
+    </>
   );
 };
 

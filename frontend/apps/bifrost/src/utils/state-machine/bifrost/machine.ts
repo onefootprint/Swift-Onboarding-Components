@@ -144,6 +144,15 @@ const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
       },
       [States.phoneVerification]: {
         on: {
+          [Events.navigatedToPrevPage]: [
+            {
+              target: States.phoneRegistration,
+              cond: context => !context.userFound || !!context.phone,
+            },
+            {
+              target: States.emailIdentification,
+            },
+          ],
           [Events.smsChallengeResent]: [
             {
               actions: [Actions.assignChallenge],

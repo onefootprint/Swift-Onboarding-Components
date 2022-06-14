@@ -1,9 +1,9 @@
-import IcoArrowLeftSmall24 from 'icons/ico/ico-arrow-left-small-24';
 import React from 'react';
 import CloseButton from 'src/components/close-button';
+import PrevButton from 'src/components/prev-button';
 import { Events } from 'src/utils/state-machine/onboarding';
 import styled from 'styled-components';
-import { IconButton, Portal, ProgressIndicator } from 'ui';
+import { Portal, ProgressIndicator } from 'ui';
 
 import useOnboardingMachine from '../../hooks/use-onboarding-machine';
 import {
@@ -29,11 +29,7 @@ const ProgressHeader = () => {
       {shouldShowCloseButton ? (
         <CloseButton />
       ) : (
-        <IconButton
-          iconComponent={IcoArrowLeftSmall24}
-          ariaLabel="Previous window"
-          onClick={handleBackButtonClick}
-        />
+        <PrevButton onClick={handleBackButtonClick} />
       )}
       <ProgressIndicatorContainer>
         <ProgressIndicator max={max} value={value} />
