@@ -27,6 +27,21 @@ export enum DataKind {
   country = 'country',
 }
 
+export const ALL_FIELDS: (keyof typeof DataKind)[] = [
+  'firstName',
+  'lastName',
+  'email',
+  'phoneNumber',
+  'ssn',
+  'dob',
+  'country',
+  'streetAddress',
+  'streetAddress2',
+  'city',
+  'zip',
+  'state',
+];
+
 export type DecryptedUserAttributes = Record<keyof typeof DataKind, string>;
 
 const decryptUserRequest = async (
