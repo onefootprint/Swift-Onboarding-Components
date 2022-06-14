@@ -12,8 +12,6 @@ import useGetAccessEvents, {
   InsightEvent,
 } from './hooks/use-get-access-events';
 
-const getKey = (e: AccessEvent) => Object.values(omit(e, 'dataKind'));
-
 type AggregatedAccessEvent = {
   dataKinds: DataKind[];
   fpUserId: string;
@@ -23,6 +21,8 @@ type AggregatedAccessEvent = {
   principal?: string;
   insightEvent: InsightEvent;
 };
+
+const getKey = (e: AccessEvent) => Object.values(omit(e, 'dataKind'));
 
 const SecurityLogs = () => {
   const [searchText, setSearchText] = useState('');
