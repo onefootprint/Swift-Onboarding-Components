@@ -57,7 +57,7 @@ pub(crate) async fn send_phone_challenge(
     } else {
         crypto::random::gen_rand_n_digit_code(6)
     };
-    let message_body = format!("Your Footprint verification code is {}. Don't share your code with anyone. We will never contact you to request this code.", &code);
+    let message_body = format!("Your Footprint verification code is {}. Don't share your code with anyone. We will never contact you to request this code.\n\n@{}\t#{}", &code, &state.config.rp_id, &code);
 
     send_sms(state, phone_number.clone(), message_body).await?;
 
