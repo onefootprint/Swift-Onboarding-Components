@@ -11,7 +11,7 @@ export type User = {
 };
 
 export type UserData = {
-  value?: string;
+  value: string | null;
   isLoading: boolean;
 };
 

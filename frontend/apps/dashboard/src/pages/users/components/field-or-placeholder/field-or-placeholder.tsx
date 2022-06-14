@@ -3,7 +3,7 @@ import EncryptedCell from 'src/pages/users/components/encrypted-cell';
 import { Typography } from 'ui';
 
 type FieldOrPlaceholderProps = {
-  value: string | undefined;
+  value?: string | null;
   isLoading?: boolean;
 };
 
@@ -11,12 +11,12 @@ const FieldOrPlaceholder = ({
   value,
   isLoading = false,
 }: FieldOrPlaceholderProps) =>
-  value ? (
-    <Typography variant="body-3" color="primary" sx={{ whiteSpace: 'nowrap' }}>
-      {value}
-    </Typography>
-  ) : (
+  value === undefined ? (
     <EncryptedCell isLoading={isLoading} />
+  ) : (
+    <Typography variant="body-3" color="primary" sx={{ whiteSpace: 'nowrap' }}>
+      {value || '-'}
+    </Typography>
   );
 
 export default FieldOrPlaceholder;
