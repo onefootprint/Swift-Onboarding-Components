@@ -37,6 +37,19 @@ $ cargo build -p enclave --features nitro
 
 # runs the api crate in vsock mode, assuming the binary in the previous step is loaded into the Nitro Enclave
 $ cargo run -p footprint-core --features vsock
+
+### Faster local development
+If you'd like to not have to manually restart the server process when you make changes, you can use this fancy [cargo-watch](https://crates.io/crates/cargo-watch) crate.
+
+Install it with
+```bash
+cargo install cargo-watch
+```
+
+Then, you can start a watcher that will continuously compile and restart your server process as you make code changes.
+
+```bash
+cargo watch -x 'run -p footprint-core'
 ```
 
 ## Getting Pulumi setup
