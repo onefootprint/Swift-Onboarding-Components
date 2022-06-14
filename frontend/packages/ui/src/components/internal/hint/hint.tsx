@@ -29,6 +29,7 @@ const Hint = ({
 const Container = styled.div`
   ${({ theme }) => css`
     margin-top: ${theme.spacing[3]}px;
+    text-align: left;
   `}
 `;
 

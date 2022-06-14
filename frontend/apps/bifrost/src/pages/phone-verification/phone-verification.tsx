@@ -1,86 +1,24 @@
 import React from 'react';
-import useIdentify, { IdentifyResponse } from 'src/hooks/identify/use-identify';
-import useIdentifyVerify, {
-  IdentifyVerifyResponse,
-} from 'src/hooks/identify/use-identify-verify';
-import useBifrostMachine, { Events } from 'src/hooks/use-bifrost-machine';
-import { ChallengeKind } from 'src/utils/state-machine/types';
+import useIdentifyVerify from 'src/hooks/identify/use-identify-verify';
+import useBifrostMachine from 'src/hooks/use-bifrost-machine';
 import styled, { css } from 'styled-components';
-import { Box, LinkButton, LoadingIndicator, PinInput, Typography } from 'ui';
+import { Box, Typography } from 'ui';
 
+import Loading from './components/loading';
+import PinForm from './components/pin-form';
 import PrevHeader from './components/prev-header';
-import useOnboarding, { OnboardingResponse } from './hooks/use-onboarding';
+import Success from './components/success';
+import useOnboarding from './hooks/use-onboarding';
 
 const PhoneVerification = () => {
-  const [state, send] = useBifrostMachine();
-  const identifyMutation = useIdentify();
-  const identifyVerifyMutation = useIdentifyVerify();
+  const [state] = useBifrostMachine();
+  const verifyMutation = useIdentifyVerify();
   const onboardingMutation = useOnboarding();
+
+  const shouldShowForm = verifyMutation.isIdle || verifyMutation.isError;
   const shouldShowLoading =
-    identifyMutation.isLoading ||
-    identifyVerifyMutation.isLoading ||
-    onboardingMutation.isLoading;
-
-  const resendVerification = () => {
-    const { email } = state.context;
-    identifyMutation.mutate(
-      { identifier: { email }, preferredChallengeKind: ChallengeKind.sms },
-      {
-        onSuccess({ challengeData: newChallenge }: IdentifyResponse) {
-          if (!newChallenge) {
-            return;
-          }
-          send({
-            type: Events.smsChallengeResent,
-            payload: {
-              challengeData: newChallenge,
-            },
-          });
-        },
-      },
-    );
-  };
-
-  const handlePinValidationSucceeded = ({
-    authToken,
-  }: IdentifyVerifyResponse) => {
-    onboardingMutation.mutate(
-      { authToken },
-      {
-        onSuccess({
-          missingAttributes,
-          missingWebauthnCredentials,
-        }: OnboardingResponse) {
-          send({
-            type: Events.smsChallengeSucceeded,
-            payload: {
-              authToken,
-              missingAttributes,
-              missingWebauthnCredentials,
-            },
-          });
-        },
-      },
-    );
-  };
-
-  const validatePin = (pin: string) => {
-    const { challenge } = state.context;
-    if (!challenge) {
-      return;
-    }
-    const { challengeToken, challengeKind } = challenge;
-    identifyVerifyMutation.mutate(
-      {
-        challengeKind,
-        challengeResponse: pin,
-        challengeToken,
-      },
-      {
-        onSuccess: handlePinValidationSucceeded,
-      },
-    );
-  };
+    verifyMutation.isLoading || onboardingMutation.isLoading;
+  const shouldShowSuccess = onboardingMutation.isSuccess;
 
   return (
     <>
@@ -99,17 +37,14 @@ const PhoneVerification = () => {
             .
           </Typography>
         </Box>
-        {shouldShowLoading ? (
-          <>
-            <LoadingIndicator />
-            <Typography variant="label-3">Verifying...</Typography>
-          </>
-        ) : (
-          <>
-            <PinInput onComplete={validatePin} />
-            <LinkButton onClick={resendVerification}>Resend code</LinkButton>
-          </>
+        {shouldShowForm && (
+          <PinForm
+            verifyMutation={verifyMutation}
+            onboardingMutation={onboardingMutation}
+          />
         )}
+        {shouldShowLoading && <Loading />}
+        {shouldShowSuccess && <Success />}
       </Form>
     </>
   );
