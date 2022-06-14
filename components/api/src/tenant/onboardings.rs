@@ -4,8 +4,9 @@ use crate::types::success::ApiResponseData;
 use crate::State;
 use crate::{auth::session_context::SessionContext, errors::ApiError};
 use chrono::NaiveDateTime;
+use db::DbError;
 use newtypes::tenant::workos::WorkOsSession;
-use newtypes::{FootprintUserId, Status};
+use newtypes::{DataKind, FootprintUserId, Status};
 use paperclip::actix::{api_v2_operation, get, web, web::Json, Apiv2Schema};
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize, Apiv2Schema)]
@@ -19,6 +20,7 @@ struct AccessEventRequest {
 struct OnboardingItem {
     pub footprint_user_id: FootprintUserId,
     pub status: Status,
+    pub populated_data_kinds: Vec<DataKind>,
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
 }
@@ -50,16 +52,27 @@ fn handler(
         None => None,
     };
 
-    let results = db::onboarding::list_for_tenant(&state.db_pool, tenant.id.clone(), status, fingerprint)
-        .await?
-        .into_iter()
-        .map(|ob| OnboardingItem {
-            footprint_user_id: ob.user_ob_id,
-            status: ob.status,
-            created_at: ob.created_at,
-            updated_at: ob.updated_at,
-        })
-        .collect();
+    let conn = state.db_pool.get().await.map_err(DbError::from)?;
+    let onboardings = conn
+        .interact(move |conn| -> Result<Vec<OnboardingItem>, DbError> {
+            let onboardings = db::onboarding::list_for_tenant(conn, tenant.id.clone(), status, fingerprint)?;
+            let user_vault_ids = onboardings.iter().map(|ob| ob.user_vault_id.clone()).collect();
+            let user_to_kinds = db::user_data::bulk_fetch_populated_kinds(conn, user_vault_ids)?;
 
-    Ok(Json(ApiResponseData { data: results }))
+            let results = onboardings
+                .into_iter()
+                .map(|ob| OnboardingItem {
+                    footprint_user_id: ob.user_ob_id,
+                    status: ob.status,
+                    populated_data_kinds: user_to_kinds.get(&ob.user_vault_id).unwrap_or(&vec![]).clone(),
+                    created_at: ob.created_at,
+                    updated_at: ob.updated_at,
+                })
+                .collect();
+            Ok(results)
+        })
+        .await
+        .map_err(DbError::from)??;
+
+    Ok(Json(ApiResponseData { data: onboardings }))
 }

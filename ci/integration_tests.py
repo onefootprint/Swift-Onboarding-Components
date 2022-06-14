@@ -501,6 +501,7 @@ def test_onboardings_list(request, workos_tenant):
     assert len(onboardings)
     old_fp_user_id = request.config.cache.get("fp_user_id", None)
     assert onboardings[0]["footprint_user_id"] == old_fp_user_id
+    assert ["first_name", "last_name"] < onboardings[0]["populated_data_kinds"]
 
 def test_access_events_list(request, workos_tenant):
     fp_user_id = request.config.cache.get("fp_user_id", None)
