@@ -17,7 +17,10 @@ class PostmateAdapter implements IframeManager {
       classListArray: iframeClassList,
     });
     const iframe = document.querySelector(`[name=${iframeName}]`);
-    iframe?.setAttribute('allow', 'publickey-credentials-get *');
+    iframe?.setAttribute(
+      'allow',
+      'otp-credentials; publickey-credentials-get *',
+    );
     this.child = child;
   }
 
