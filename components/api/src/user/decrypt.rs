@@ -15,7 +15,7 @@ struct UserDecryptRequest {
     attributes: Vec<DataKind>,
 }
 
-type UserDecryptResponse = HashMap<DataKind, String>;
+type UserDecryptResponse = HashMap<DataKind, Option<String>>;
 
 #[api_v2_operation(tags(User))]
 #[post("/decrypt")]

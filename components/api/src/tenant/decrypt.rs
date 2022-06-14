@@ -21,7 +21,7 @@ struct UserDecryptRequest {
     reason: String,
 }
 
-type UserDecryptResponse = HashMap<DataKind, String>;
+type UserDecryptResponse = HashMap<DataKind, Option<String>>;
 
 #[api_v2_operation(tags(Org))]
 #[post("/decrypt")]

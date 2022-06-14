@@ -39,7 +39,7 @@ pub fn clean_for_fingerprint(data_str: String) -> String {
 
 pub struct DecryptFieldsResult {
     pub fields_to_decrypt: Vec<DataKind>,
-    pub result_map: HashMap<DataKind, String>,
+    pub result_map: HashMap<DataKind, Option<String>>,
 }
 
 pub async fn decrypt<C: UserVaultPermissions>(
@@ -73,10 +73,15 @@ pub async fn decrypt<C: UserVaultPermissions>(
     if decrypt_response.len() != fields_to_decrypt.len() {
         return Err(ApiError::InvalidEnclaveDecryptResponse);
     }
-    let result_map: HashMap<DataKind, String> = decrypt_response
+    let decrypted_data: HashMap<DataKind, String> = decrypt_response
         .into_iter()
         .enumerate()
         .map(|(i, result)| (fields_to_decrypt[i], result))
+        .collect();
+    let result_map: HashMap<DataKind, Option<String>> = data_kinds
+        .into_iter()
+        .enumerate()
+        .map(|(_, data_kind)| (data_kind, decrypted_data.get(&data_kind).cloned()))
         .collect();
     Ok(DecryptFieldsResult {
         fields_to_decrypt,
