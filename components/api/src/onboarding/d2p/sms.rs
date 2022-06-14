@@ -32,7 +32,7 @@ pub fn handler(
     rate_limit(&state, phone_number.clone(), "d2p_session").await?;
 
     let message_body = format!(
-        "Hello from Footprint! Continue signing up for your account here: {}/biometric#{}",
+        "Hello from Footprint! Continue signing up for your account here: {}#{}",
         request.base_url, user_auth.auth_token
     );
     send_sms(&state, phone_number, message_body).await?;
