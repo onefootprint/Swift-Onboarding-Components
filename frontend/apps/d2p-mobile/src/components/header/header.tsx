@@ -20,6 +20,7 @@ const Container = styled.header`
     margin: ${theme.spacing[6]}px;
     display: flex;
     align-items: center;
+    justify-content: center;
   `}
 `;
 

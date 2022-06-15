@@ -5,6 +5,7 @@ export enum States {
   unavailable = 'unavailable',
   success = 'success',
   canceled = 'canceled',
+  expired = 'expired',
 }
 
 export enum Events {
@@ -13,6 +14,7 @@ export enum Events {
   registerFailed = 'registerFailed',
   registerSucceeded = 'registerSucceeded',
   canceled = 'canceled',
+  statusPollingErrored = 'statusPollingErrored',
 }
 
 export enum Actions {
@@ -41,4 +43,5 @@ export type D2PEvent =
     }
   | { type: Events.registerFailed }
   | { type: Events.registerSucceeded }
-  | { type: Events.canceled };
+  | { type: Events.canceled }
+  | { type: Events.statusPollingErrored };

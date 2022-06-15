@@ -65,6 +65,10 @@ const createLivenessRegisterMachine = (
             [Events.qrRegisterFailed]: {
               target: States.livenessRegisterCompleted,
             },
+            [Events.statusPollingErrored]: {
+              target: States.qrRegister,
+              actions: [Actions.clearScopedAuthToken],
+            },
           },
         },
         [States.qrCodeScanned]: {
@@ -75,6 +79,10 @@ const createLivenessRegisterMachine = (
             [Events.qrRegisterSucceeded]: {
               target: States.livenessRegisterCompleted,
             },
+            [Events.statusPollingErrored]: {
+              target: States.qrRegister,
+              actions: [Actions.clearScopedAuthToken],
+            },
           },
         },
         [States.qrCodeSent]: {
@@ -84,6 +92,10 @@ const createLivenessRegisterMachine = (
             },
             [Events.qrRegisterSucceeded]: {
               target: States.livenessRegisterCompleted,
+            },
+            [Events.statusPollingErrored]: {
+              target: States.qrRegister,
+              actions: [Actions.clearScopedAuthToken],
             },
           },
         },
@@ -104,6 +116,12 @@ const createLivenessRegisterMachine = (
         [Actions.assignScopedAuthToken]: assign((context, event) => {
           if (event.type === Events.scopedAuthTokenGenerated) {
             context.scopedAuthToken = event.payload.scopedAuthToken;
+          }
+          return context;
+        }),
+        [Actions.clearScopedAuthToken]: assign((context, event) => {
+          if (event.type === Events.statusPollingErrored) {
+            context.scopedAuthToken = undefined;
           }
           return context;
         }),

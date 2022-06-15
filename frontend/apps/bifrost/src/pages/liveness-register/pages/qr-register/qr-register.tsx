@@ -1,15 +1,13 @@
 import { QRCodeSVG } from 'qrcode.react';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import HeaderTitle from 'src/components/header-title';
 import { D2P_BASE_URL } from 'src/config/constants';
 import useD2PGenerate from 'src/hooks/d2p/use-d2p-generate';
 import useD2PSms from 'src/hooks/d2p/use-d2p-sms';
 import useGetD2PStatus, { D2PStatus } from 'src/hooks/d2p/use-get-d2p-status';
+import useGenerateScopedAuthToken from 'src/pages/liveness-register/hooks/use-generate-scoped-auth-token';
 import useLivenessRegisterMachine from 'src/pages/liveness-register/hooks/use-liveness-register';
-import {
-  Events,
-  MachineContext,
-} from 'src/utils/state-machine/liveness-register';
+import { Events } from 'src/utils/state-machine/liveness-register';
 import styled, { css } from 'styled-components';
 import { Button, Divider, LoadingIndicator, Typography } from 'ui';
 
@@ -18,29 +16,22 @@ const QRRegister = () => {
   const d2pGenerateMutation = useD2PGenerate();
   const d2pSmsMutation = useD2PSms();
   const statusResponse = useGetD2PStatus();
-  const { authToken } = state.context as MachineContext;
-  const [scopedAuthToken, setScopedAuthToken] = useState<string>('');
+  const generateScopedAuthToken = useGenerateScopedAuthToken();
 
   useEffect(() => {
-    if (!authToken || scopedAuthToken) {
+    if (state.context.scopedAuthToken) {
       return;
     }
-    d2pGenerateMutation.mutate(
-      { authToken },
-      {
-        onSuccess({ authToken: scopedToken }) {
-          setScopedAuthToken(scopedToken);
-          send({
-            type: Events.scopedAuthTokenGenerated,
-            payload: {
-              scopedAuthToken: scopedToken,
-            },
-          });
-        },
-      },
-    );
+    generateScopedAuthToken();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    if (statusResponse.error) {
+      generateScopedAuthToken();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [statusResponse.error]);
 
   useEffect(() => {
     const status = statusResponse?.data?.status;
@@ -61,11 +52,12 @@ const QRRegister = () => {
   }, [statusResponse?.data?.status]);
 
   const handleSendLinkToPhone = () => {
-    if (!scopedAuthToken) {
+    const { authToken } = state.context;
+    if (!authToken) {
       return;
     }
     d2pSmsMutation.mutate(
-      { authToken: scopedAuthToken },
+      { authToken },
       {
         onSuccess() {
           send({ type: Events.qrCodeLinkSentViaSms });
@@ -84,11 +76,13 @@ const QRRegister = () => {
         Use your camera app or QR code reader on your mobile device and
         we&apos;ll use biometrics to verify it.
       </Typography>
-      {d2pGenerateMutation.isLoading || !scopedAuthToken ? (
+      {d2pGenerateMutation.isLoading || !state.context.scopedAuthToken ? (
         <LoadingIndicator />
       ) : (
         <QRCodeContainer>
-          <QRCodeSVG value={`${D2P_BASE_URL}#${scopedAuthToken}`} />
+          <QRCodeSVG
+            value={`${D2P_BASE_URL}#${state.context.scopedAuthToken}`}
+          />
         </QRCodeContainer>
       )}
       <Typography variant="body-4" color="tertiary">

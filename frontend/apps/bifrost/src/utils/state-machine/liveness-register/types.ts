@@ -29,10 +29,12 @@ export enum Events {
   qrCodeCanceled = 'qrCodeCanceled',
   qrRegisterSucceeded = 'qrRegisterSucceeded',
   qrRegisterFailed = 'qrRegisterFailed',
+  statusPollingErrored = 'statusPollingErrored',
 }
 
 export enum Actions {
   assignScopedAuthToken = 'assignScopedAuthToken',
+  clearScopedAuthToken = 'clearScopedAuthToken',
 }
 
 export type MachineEvents =
@@ -50,5 +52,6 @@ export type MachineEvents =
   | { type: Events.qrCodeScanned }
   | { type: Events.qrRegisterSucceeded }
   | { type: Events.qrRegisterFailed }
+  | { type: Events.statusPollingErrored }
   | { type: Events.captchaRegisterSucceeded }
   | { type: Events.biometricRegisterSucceeded };

@@ -24,6 +24,15 @@ const Register = () => {
   }, []);
 
   useEffect(() => {
+    if (statusResponse.error) {
+      send({
+        type: Events.statusPollingErrored,
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [statusResponse.error]);
+
+  useEffect(() => {
     const status = statusResponse?.data?.status;
     if (status === D2PStatus.canceled) {
       send({ type: Events.canceled });

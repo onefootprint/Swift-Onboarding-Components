@@ -45,6 +45,15 @@ const QRCodeScanned = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [statusResponse?.data?.status]);
 
+  useEffect(() => {
+    if (statusResponse.error) {
+      send({
+        type: Events.statusPollingErrored,
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [statusResponse.error]);
+
   return (
     <Container>
       <HeaderTitle

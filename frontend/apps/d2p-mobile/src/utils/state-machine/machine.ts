@@ -45,6 +45,9 @@ const d2pMobileMachine = createMachine<D2PContext, D2PEvent>(
           [Events.canceled]: {
             target: States.canceled,
           },
+          [Events.statusPollingErrored]: {
+            target: States.expired,
+          },
         },
       },
       [States.registerRetry]: {
@@ -55,6 +58,9 @@ const d2pMobileMachine = createMachine<D2PContext, D2PEvent>(
           [Events.canceled]: {
             target: States.canceled,
           },
+          [Events.statusPollingErrored]: {
+            target: States.expired,
+          },
         },
       },
       [States.canceled]: {
@@ -64,6 +70,9 @@ const d2pMobileMachine = createMachine<D2PContext, D2PEvent>(
         type: 'final',
       },
       [States.success]: {
+        type: 'final',
+      },
+      [States.expired]: {
         type: 'final',
       },
     },

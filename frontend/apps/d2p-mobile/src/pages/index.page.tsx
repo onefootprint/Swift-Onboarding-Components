@@ -4,6 +4,7 @@ import useD2PMobileMachine from 'src/hooks/use-d2p-mobile-machine';
 import { States } from 'src/utils/state-machine';
 
 import Canceled from './canceled';
+import Expired from './expired';
 import Init from './init';
 import Register from './register';
 import RegisterRetry from './register-retry';
@@ -24,6 +25,7 @@ const Root = () => {
     [States.unavailable]: Unavailable,
     [States.success]: Success,
     [States.canceled]: Canceled,
+    [States.expired]: Expired,
   };
   if (has(pages, valueCasted)) {
     const Page = pages[valueCasted];
