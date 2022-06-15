@@ -3,12 +3,12 @@ import React from 'react';
 import useD2PMobileMachine from 'src/hooks/use-d2p-mobile-machine';
 import { States } from 'src/utils/state-machine';
 
-import BiometricCanceled from './biometric-canceled';
-import BiometricRegister from './biometric-register';
-import BiometricRegisterRetry from './biometric-register-retry';
-import BiometricSuccess from './biometric-success';
-import BiometricUnavailable from './biometric-unavailable';
+import Canceled from './canceled';
 import Init from './init';
+import Register from './register';
+import RegisterRetry from './register-retry';
+import Success from './success';
+import Unavailable from './unavailable';
 
 type Page = {
   [page in States]?: () => JSX.Element;
@@ -19,11 +19,11 @@ const Root = () => {
   const valueCasted = state.value as States;
   const pages: Page = {
     [States.init]: Init,
-    [States.biometricRegister]: BiometricRegister,
-    [States.biometricRegisterRetry]: BiometricRegisterRetry,
-    [States.biometricUnavailable]: BiometricUnavailable,
-    [States.biometricSuccess]: BiometricSuccess,
-    [States.biometricCanceled]: BiometricCanceled,
+    [States.register]: Register,
+    [States.registerRetry]: RegisterRetry,
+    [States.unavailable]: Unavailable,
+    [States.success]: Success,
+    [States.canceled]: Canceled,
   };
   if (has(pages, valueCasted)) {
     const Page = pages[valueCasted];

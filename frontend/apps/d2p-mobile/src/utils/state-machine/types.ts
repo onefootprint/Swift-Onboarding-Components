@@ -1,18 +1,18 @@
 export enum States {
   init = 'init',
-  biometricRegister = 'biometricRegister',
-  biometricRegisterRetry = 'biometricRegisterRetry',
-  biometricUnavailable = 'biometricUnavailable',
-  biometricSuccess = 'biometricSuccess',
-  biometricCanceled = 'biometricCanceled',
+  register = 'register',
+  registerRetry = 'registerRetry',
+  unavailable = 'unavailable',
+  success = 'success',
+  canceled = 'canceled',
 }
 
 export enum Events {
   authTokenIdentified = 'authTokenIdentified',
   deviceInfoIdentified = 'deviceInfoIdentified',
-  biometricRegisterFailed = 'biometricRegisterFailed',
-  biometricRegisterSucceeded = 'biometricRegisterSucceeded',
-  biometricCanceled = 'biometricCanceled',
+  registerFailed = 'registerFailed',
+  registerSucceeded = 'registerSucceeded',
+  canceled = 'canceled',
 }
 
 export enum Actions {
@@ -39,6 +39,6 @@ export type D2PEvent =
         type: string;
       };
     }
-  | { type: Events.biometricRegisterFailed }
-  | { type: Events.biometricRegisterSucceeded }
-  | { type: Events.biometricCanceled };
+  | { type: Events.registerFailed }
+  | { type: Events.registerSucceeded }
+  | { type: Events.canceled };

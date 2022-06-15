@@ -2,7 +2,7 @@ import React from 'react';
 import HeaderTitle from 'src/components/header-title';
 import styled from 'styled-components';
 
-const BiometricSuccess = () => (
+const Success = () => (
   <Container>
     <HeaderTitle
       title="Successfully authenticated!"
@@ -17,4 +17,4 @@ const Container = styled.div`
   align-items: center;
 `;
 
-export default BiometricSuccess;
+export default Success;

@@ -1,36 +1,36 @@
 import React, { useEffect } from 'react';
 import HeaderTitle from 'src/components/header-title';
-import useBiometricRegister from 'src/hooks/use-biometric-register';
 import useD2pMobileMachine, { Events } from 'src/hooks/use-d2p-mobile-machine';
 import useGetD2PStatus, { D2PStatus } from 'src/hooks/use-get-d2p-status';
+import useRegister from 'src/hooks/use-register';
 import useUpdateD2pStatus, {
   D2PStatusUpdate,
 } from 'src/hooks/use-update-d2p-status';
 import styled, { css } from 'styled-components';
 import { Button } from 'ui';
 
-const BiometricRegisterRetry = () => {
+const RegisterRetry = () => {
   const [state, send] = useD2pMobileMachine();
-  const biometricRegisterMutation = useBiometricRegister();
+  const registerMutation = useRegister();
   const updateD2PStatusMutation = useUpdateD2pStatus();
   const statusResponse = useGetD2PStatus();
 
   useEffect(() => {
     const status = statusResponse?.data?.status;
     if (status === D2PStatus.canceled) {
-      send({ type: Events.biometricCanceled });
+      send({ type: Events.canceled });
     } else if (status === D2PStatus.completed) {
-      send({ type: Events.biometricRegisterSucceeded });
+      send({ type: Events.registerSucceeded });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [statusResponse?.data?.status]);
 
-  const handleBiometricRegister = () => {
+  const handleRegister = () => {
     const { authToken } = state.context;
     if (!authToken) {
       return;
     }
-    biometricRegisterMutation.mutate(
+    registerMutation.mutate(
       { authToken },
       {
         onSuccess() {
@@ -38,7 +38,7 @@ const BiometricRegisterRetry = () => {
             authToken: state.context.authToken,
             status: D2PStatusUpdate.completed,
           });
-          send({ type: Events.biometricRegisterSucceeded });
+          send({ type: Events.registerSucceeded });
         },
       },
     );
@@ -50,7 +50,7 @@ const BiometricRegisterRetry = () => {
         title="Biometrics not recognized"
         subtitle="Please try again."
       />
-      <Button onClick={handleBiometricRegister} fullWidth>
+      <Button onClick={handleRegister} fullWidth>
         Try again
       </Button>
     </Container>
@@ -64,4 +64,4 @@ const Container = styled.form`
   `}
 `;
 
-export default BiometricRegisterRetry;
+export default RegisterRetry;

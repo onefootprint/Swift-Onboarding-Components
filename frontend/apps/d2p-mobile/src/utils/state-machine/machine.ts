@@ -21,49 +21,49 @@ const d2pMobileMachine = createMachine<D2PContext, D2PEvent>(
           },
           [Events.deviceInfoIdentified]: [
             {
-              target: States.biometricRegister,
+              target: States.register,
               cond: (context, event) =>
                 event.payload.type === 'mobile' &&
                 event.payload.hasSupportForWebAuthn,
               actions: [Actions.assignDeviceInfo],
             },
             {
-              target: States.biometricUnavailable,
+              target: States.unavailable,
               actions: [Actions.assignDeviceInfo],
             },
           ],
         },
       },
-      [States.biometricRegister]: {
+      [States.register]: {
         on: {
-          [Events.biometricRegisterFailed]: {
-            target: States.biometricRegisterRetry,
+          [Events.registerFailed]: {
+            target: States.registerRetry,
           },
-          [Events.biometricRegisterSucceeded]: {
-            target: States.biometricSuccess,
+          [Events.registerSucceeded]: {
+            target: States.success,
           },
-          [Events.biometricCanceled]: {
-            target: States.biometricCanceled,
+          [Events.canceled]: {
+            target: States.canceled,
           },
         },
       },
-      [States.biometricRegisterRetry]: {
+      [States.registerRetry]: {
         on: {
-          [Events.biometricRegisterSucceeded]: {
-            target: States.biometricSuccess,
+          [Events.registerSucceeded]: {
+            target: States.success,
           },
-          [Events.biometricCanceled]: {
-            target: States.biometricCanceled,
+          [Events.canceled]: {
+            target: States.canceled,
           },
         },
       },
-      [States.biometricCanceled]: {
+      [States.canceled]: {
         type: 'final',
       },
-      [States.biometricUnavailable]: {
+      [States.unavailable]: {
         type: 'final',
       },
-      [States.biometricSuccess]: {
+      [States.success]: {
         type: 'final',
       },
     },

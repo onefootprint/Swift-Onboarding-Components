@@ -2,7 +2,7 @@ import React from 'react';
 import HeaderTitle from 'src/components/header-title';
 import styled from 'styled-components';
 
-const BiometricCanceled = () => (
+const Canceled = () => (
   <Container>
     <HeaderTitle
       title="Liveness check canceled"
@@ -17,4 +17,4 @@ const Container = styled.div`
   align-items: center;
 `;
 
-export default BiometricCanceled;
+export default Canceled;

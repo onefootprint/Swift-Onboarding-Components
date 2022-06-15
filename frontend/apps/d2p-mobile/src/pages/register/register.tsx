@@ -1,6 +1,6 @@
+import useBiometricRegister from '@src/hooks/use-register';
 import React, { useEffect } from 'react';
 import HeaderTitle from 'src/components/header-title';
-import useBiometricRegister from 'src/hooks/use-biometric-register';
 import useD2pMobileMachine, { Events } from 'src/hooks/use-d2p-mobile-machine';
 import useGetD2PStatus, { D2PStatus } from 'src/hooks/use-get-d2p-status';
 import useUpdateD2pStatus, {
@@ -9,7 +9,7 @@ import useUpdateD2pStatus, {
 import styled, { css } from 'styled-components';
 import { Button } from 'ui';
 
-const BiometricRegister = () => {
+const Register = () => {
   const [state, send] = useD2pMobileMachine();
   const biometricRegisterMutation = useBiometricRegister();
   const updateD2PStatusMutation = useUpdateD2pStatus();
@@ -26,9 +26,9 @@ const BiometricRegister = () => {
   useEffect(() => {
     const status = statusResponse?.data?.status;
     if (status === D2PStatus.canceled) {
-      send({ type: Events.biometricCanceled });
+      send({ type: Events.canceled });
     } else if (status === D2PStatus.completed) {
-      send({ type: Events.biometricRegisterSucceeded });
+      send({ type: Events.registerSucceeded });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [statusResponse?.data?.status]);
@@ -46,10 +46,10 @@ const BiometricRegister = () => {
             authToken: state.context.authToken,
             status: D2PStatusUpdate.completed,
           });
-          send({ type: Events.biometricRegisterSucceeded });
+          send({ type: Events.registerSucceeded });
         },
         onError() {
-          send({ type: Events.biometricRegisterFailed });
+          send({ type: Events.registerFailed });
         },
       },
     );
@@ -75,4 +75,4 @@ const Container = styled.form`
   `}
 `;
 
-export default BiometricRegister;
+export default Register;

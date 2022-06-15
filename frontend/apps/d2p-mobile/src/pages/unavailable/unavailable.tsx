@@ -6,7 +6,7 @@ import useUpdateD2pStatus, {
 } from 'src/hooks/use-update-d2p-status';
 import styled from 'styled-components';
 
-const BiometricUnavailable = () => {
+const Unavailable = () => {
   const [state] = useD2PMobileMachine();
   const updateD2PStatusMutation = useUpdateD2pStatus();
   useEffect(() => {
@@ -33,4 +33,4 @@ const Container = styled.div`
   align-items: center;
 `;
 
-export default BiometricUnavailable;
+export default Unavailable;

@@ -3,15 +3,15 @@ import { useMutation } from 'react-query';
 import request, { RequestError, RequestResponse } from 'request';
 import { D2P_AUTH_HEADER } from 'src/config/constants';
 
-export type BiometricRegisterRequest = {
+export type RegisterRequest = {
   authToken: string;
 };
 
-export type BiometricRegisterResponse = {
+export type RegisterResponse = {
   data: string;
 };
 
-type BiometricChallengeJson = {
+type ChallengeJson = {
   userVaultId: string;
   credentialId: string;
   publicKey: PublicKeyCredentialCreationOptions;
@@ -19,7 +19,7 @@ type BiometricChallengeJson = {
 };
 
 const generateDeviceResponse = async (challenge: string) => {
-  const challengeJson = JSON.parse(challenge) as BiometricChallengeJson;
+  const challengeJson = JSON.parse(challenge) as ChallengeJson;
   const { publicKey } = challengeJson;
   publicKey.challenge = base64url.toBuffer(
     publicKey.challenge as unknown as string,
@@ -48,7 +48,7 @@ const generateDeviceResponse = async (challenge: string) => {
   return JSON.stringify(pk);
 };
 
-const biometricRegister = async (payload: BiometricRegisterRequest) => {
+const register = async (payload: RegisterRequest) => {
   const { authToken } = payload;
   const { data: initResponse } = await request<
     RequestResponse<{
@@ -69,9 +69,7 @@ const biometricRegister = async (payload: BiometricRegisterRequest) => {
     initResponse.data.challengeJson,
   );
 
-  const { data: response } = await request<
-    RequestResponse<BiometricRegisterResponse>
-  >({
+  const { data: response } = await request<RequestResponse<RegisterResponse>>({
     method: 'POST',
     url: '/user/biometric',
     data: {
@@ -85,11 +83,7 @@ const biometricRegister = async (payload: BiometricRegisterRequest) => {
   return response.data;
 };
 
-const useBiometricRegister = () =>
-  useMutation<
-    BiometricRegisterResponse,
-    RequestError,
-    BiometricRegisterRequest
-  >(biometricRegister);
+const useRegister = () =>
+  useMutation<RegisterResponse, RequestError, RegisterRequest>(register);
 
-export default useBiometricRegister;
+export default useRegister;
