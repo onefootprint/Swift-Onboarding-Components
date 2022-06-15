@@ -11,11 +11,10 @@ import useJoinUsers, {
 import { statusToBadgeVariant, statusToDisplayText } from 'src/types';
 import styled, { css } from 'styled-components';
 import { Badge, Code, SearchInput, Typography } from 'ui';
-import { useMap } from 'usehooks-ts';
 
 import DecryptDataDialog from './components/decrypt-data-dialog';
 import UsersFilter from './components/users-filter';
-import { UserAttributes } from './hooks/use-user-data';
+import useDecryptUser from './hooks/use-decrypt-user';
 
 const columns = [
   { text: 'Name', width: '15%' },
@@ -29,6 +28,9 @@ const columns = [
 
 const Users = () => {
   const getOnboardings = useGetOnboardings();
+  const { decryptedUsers } = useDecryptUser();
+  // Join the onboarding list results with any decrypted user data
+  const users = useJoinUsers(getOnboardings.data, decryptedUsers);
 
   const { query, setFilter } = useFilters();
   const [searchText, setSearchText] = useState<string>();
@@ -39,11 +41,6 @@ const Users = () => {
   useEffect(() => {
     setSearchText(query.fingerprint || '');
   }, [query]);
-
-  // TODO rm
-  const [decryptedUsers] = useMap<String, UserAttributes>(new Map());
-  // Join the onboarding list results with any decrypted user data
-  const users = useJoinUsers(getOnboardings.data, decryptedUsers);
 
   return (
     <>

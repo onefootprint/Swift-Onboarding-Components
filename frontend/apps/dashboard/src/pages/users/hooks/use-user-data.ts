@@ -1,3 +1,4 @@
+import { singletonHook } from 'react-singleton-hook';
 import { DataKindType, DecryptedUserAttributes } from 'src/types';
 import { useMap } from 'usehooks-ts';
 
@@ -10,7 +11,7 @@ export type UserData = {
 export type UserAttributes = Record<DataKindType, UserData>;
 
 // Hook with utilities for maintaining state on decrypted user attributes
-const useUserData = () => {
+const useUserDataImpl = () => {
   const [decryptedUsers, { set: setDecryptedUser }] = useMap<
     String,
     UserAttributes
@@ -56,4 +57,14 @@ const useUserData = () => {
   };
 };
 
+// Create a singleton of this hook that is reused by all invocations. This allows data to be shared
+// across multiple invocations of this hook.
+const useUserData = singletonHook(
+  {
+    decryptedUsers: new Map<String, UserAttributes>(),
+    updateDecryptedUser: () => {},
+    setLoading: () => {},
+  },
+  useUserDataImpl,
+);
 export default useUserData;
