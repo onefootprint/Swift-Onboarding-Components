@@ -5,6 +5,7 @@ pub mod decrypt;
 pub mod onboardings;
 pub mod required_data;
 pub mod workos;
+pub mod config;
 
 pub fn routes() -> web::Scope {
     web::scope("/org")
@@ -13,4 +14,5 @@ pub fn routes() -> web::Scope {
         .service(onboardings::handler)
         .service(required_data::set)
         .service(required_data::get)
+        .service(config::get)
 }
