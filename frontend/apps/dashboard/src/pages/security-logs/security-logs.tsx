@@ -1,16 +1,13 @@
-import Timeline from '@src/components/timeline';
 import { groupBy, omit } from 'lodash';
 import React, { useMemo, useState } from 'react';
+import Timeline from 'src/components/timeline';
+import { AccessEvent, DataKind, InsightEvent } from 'src/types';
 import styled, { css } from 'styled-components';
 import { Box, Button, Code, Divider, SearchInput, Typography } from 'ui';
 
-import { DataKind } from '../users/hooks/use-decrypt-user';
 import Dot from './components/dot';
 import FieldTagList from './components/field-tag-list';
-import useGetAccessEvents, {
-  AccessEvent,
-  InsightEvent,
-} from './hooks/use-get-access-events';
+import useGetAccessEvents from './hooks/use-get-access-events';
 
 type AggregatedAccessEvent = {
   dataKinds: DataKind[];

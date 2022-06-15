@@ -1,7 +1,7 @@
 import React, { useReducer, useState } from 'react';
 import Modal, { ModalCloseEvent } from 'src/components/modal';
-import { ALL_FIELDS, DataKind } from 'src/pages/users/hooks/use-decrypt-user';
 import { User } from 'src/pages/users/hooks/use-join-users';
+import { ALL_FIELDS, DataKindType } from 'src/types';
 import { Button } from 'ui';
 
 import AttributesScreen, {
@@ -11,10 +11,7 @@ import ReasonScreen from './components/reason-screen';
 
 type DecryptModalProps = {
   user: User;
-  onDecrypt: (
-    fieldsToDecrypt: (keyof typeof DataKind)[],
-    reason: string,
-  ) => void;
+  onDecrypt: (fieldsToDecrypt: DataKindType[], reason: string) => void;
 };
 
 const initialFields = Object.fromEntries(
@@ -37,7 +34,7 @@ const DecryptModal = ({ user, onDecrypt }: DecryptModalProps) => {
   );
   const [reason, setReason] = useState('');
 
-  const isFieldDisabled = (...kinds: (keyof typeof DataKind)[]) =>
+  const isFieldDisabled = (...kinds: DataKindType[]) =>
     // Don't allow requesting to decrypt a field that is either already decrypted OR explicitly null
     kinds.every(kind => user.decryptedAttributes?.[kind] !== undefined);
 
@@ -49,8 +46,8 @@ const DecryptModal = ({ user, onDecrypt }: DecryptModalProps) => {
 
     const fieldsToDecrypt = Object.entries(selectedFields)
       .filter(x => x[1])
-      .filter(x => !isFieldDisabled(x[0] as keyof typeof DataKind))
-      .map(x => x[0] as keyof typeof DataKind);
+      .filter(x => !isFieldDisabled(x[0] as DataKindType))
+      .map(x => x[0] as DataKindType);
     if (modalScreen === 'attributes') {
       // Currently on the attributes screen
       // Decrypt all of the fields when the user closes the modal

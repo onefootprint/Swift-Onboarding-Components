@@ -1,37 +1,12 @@
-import useSessionUser from '@src/hooks/use-session-user';
-import { DataKind } from '@src/pages/users/hooks/use-decrypt-user';
 import { useQuery } from 'react-query';
 import request, { RequestError, RequestResponse } from 'request';
+import useSessionUser from 'src/hooks/use-session-user';
 import { useFilters } from 'src/pages/users/hooks/use-filters';
+import { AccessEvent } from 'src/types';
 
 import { DASHBOARD_AUTHORIZATION_HEADER } from '../../../config/constants';
 
 type AccessEventsRequest = {};
-
-export type InsightEvent = {
-  city?: string;
-  country?: string;
-  ipAddress?: string;
-  latitude?: string;
-  longitude?: string;
-  metroCode?: string;
-  postalCode?: string;
-  region?: string;
-  regionName?: string;
-  timeZone?: string;
-  timestamp: string;
-  userAgent?: string;
-};
-
-export type AccessEvent = {
-  dataKind: DataKind;
-  fpUserId: string;
-  reason: string;
-  tenantId: string;
-  timestamp: string;
-  principal?: string;
-  insightEvent?: InsightEvent;
-};
 
 // TODO pagination
 const getAccessEventsRequest = async (

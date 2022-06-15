@@ -3,15 +3,13 @@ import React, { useEffect, useState } from 'react';
 import { Row, Table } from 'src/components/table';
 import FieldOrPlaceholder from 'src/pages/users/components/field-or-placeholder';
 import { useFilters } from 'src/pages/users/hooks/use-filters';
-import useGetOnboardings, {
-  statusToBadgeVariant,
-  statusToDisplayText,
-} from 'src/pages/users/hooks/use-get-onboardings';
+import useGetOnboardings from 'src/pages/users/hooks/use-get-onboardings';
 import useJoinUsers, {
   DecryptedAttributes,
   nameData,
   User,
 } from 'src/pages/users/hooks/use-join-users';
+import { statusToBadgeVariant, statusToDisplayText } from 'src/types';
 import styled, { css } from 'styled-components';
 import { Badge, Code, SearchInput, Typography } from 'ui';
 import { useMap } from 'usehooks-ts';

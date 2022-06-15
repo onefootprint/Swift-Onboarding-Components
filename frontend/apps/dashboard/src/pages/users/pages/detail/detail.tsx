@@ -7,13 +7,12 @@ import FieldTag from 'src/components/field-tag';
 import Timeline from 'src/components/timeline';
 import useGetOnboardings from 'src/pages/users/hooks/use-get-onboardings';
 import UserHeader from 'src/pages/users/pages/detail/components/user-header';
+import { DataKind, DataKindType, DecryptedUserAttributes } from 'src/types';
 import styled, { css } from 'styled-components';
 import { Box, Divider, Typography } from 'ui';
 import { useMap } from 'usehooks-ts';
 
 import useDecryptUser, {
-  DataKind,
-  DecryptedUserAttributes,
   DecryptUserRequest,
 } from '../../hooks/use-decrypt-user';
 import useJoinUsers, {
@@ -38,7 +37,7 @@ const Detail = () => {
   const user = users?.[0]!;
 
   const loadEncryptedAttributes = (
-    fieldsToDecrypt: (keyof typeof DataKind)[],
+    fieldsToDecrypt: DataKindType[],
     reason: string,
   ) => {
     const decryptUserRequest: DecryptUserRequest = {

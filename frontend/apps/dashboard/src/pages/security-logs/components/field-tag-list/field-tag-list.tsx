@@ -1,6 +1,6 @@
-import FieldTag from '@src/components/field-tag';
-import { DataKind } from '@src/pages/users/hooks/use-decrypt-user';
 import React from 'react';
+import FieldTag from 'src/components/field-tag';
+import { DataKind } from 'src/types';
 
 type FieldTagListProps = {
   dataKinds: DataKind[];

@@ -1,7 +1,5 @@
 import { useMemo } from 'react';
-
-import { DataKind } from './use-decrypt-user';
-import { Onboarding, OnboardingStatus } from './use-get-onboardings';
+import { DataKindType, Onboarding, OnboardingStatus } from 'src/types';
 
 export type User = {
   footprintUserId: string;
@@ -15,7 +13,7 @@ export type UserData = {
   isLoading: boolean;
 };
 
-export type DecryptedAttributes = Record<keyof typeof DataKind, UserData>;
+export type DecryptedAttributes = Record<DataKindType, UserData>;
 
 // Create a custom UserData for name since it's two separate attributes joined
 export const nameData = (decryptedAttributes?: DecryptedAttributes) =>

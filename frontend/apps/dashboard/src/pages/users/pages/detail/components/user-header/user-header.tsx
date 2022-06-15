@@ -1,10 +1,10 @@
 import React from 'react';
-import { DataKind } from 'src/pages/users/hooks/use-decrypt-user';
+import { User } from 'src/pages/users/hooks/use-join-users';
 import {
+  DataKindType,
   statusToBadgeVariant,
   statusToDisplayText,
-} from 'src/pages/users/hooks/use-get-onboardings';
-import { User } from 'src/pages/users/hooks/use-join-users';
+} from 'src/types';
 import styled, { css } from 'styled-components';
 import { Badge, Code, Typography } from 'ui';
 
@@ -12,10 +12,7 @@ import DecryptModal from '../decrypt-modal';
 
 type BasicInfoProps = {
   user: User;
-  onDecrypt: (
-    fieldsToDecrypt: (keyof typeof DataKind)[],
-    reason: string,
-  ) => void;
+  onDecrypt: (fieldsToDecrypt: DataKindType[], reason: string) => void;
 };
 
 const UserHeader = ({ user, onDecrypt }: BasicInfoProps) => {

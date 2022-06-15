@@ -1,16 +1,16 @@
+import { ALL_FIELDS, DataKindType } from '@src/types';
 import React, { ChangeEvent } from 'react';
-import { ALL_FIELDS, DataKind } from 'src/pages/users/hooks/use-decrypt-user';
 import styled, { css } from 'styled-components';
 import { Box, Checkbox, Divider, Typography } from 'ui';
 import { SXStyles } from 'ui/src/hooks/use-sx';
 
-export type SelectedFields = Record<keyof typeof DataKind, boolean>;
+export type SelectedFields = Record<DataKindType, boolean>;
 
 type AttributesScreenProps = {
   hasError: boolean;
   selectedFields: SelectedFields;
   updateSelectedFields: (fields: SelectedFields) => void;
-  isFieldDisabled: (...kinds: (keyof typeof DataKind)[]) => boolean;
+  isFieldDisabled: (...kinds: DataKindType[]) => boolean;
 };
 
 const AttributesScreen = ({
@@ -20,7 +20,7 @@ const AttributesScreen = ({
   isFieldDisabled,
 }: AttributesScreenProps) => {
   const setFieldFor =
-    (...kinds: (keyof typeof DataKind)[]) =>
+    (...kinds: DataKindType[]) =>
     (e: ChangeEvent<HTMLInputElement>) => {
       // Overwrite the selectedFields to match the checkbox value for all of the respective data kinds
       updateSelectedFields(
@@ -30,7 +30,7 @@ const AttributesScreen = ({
       );
     };
 
-  const isFieldSelected = (...kinds: (keyof typeof DataKind)[]) =>
+  const isFieldSelected = (...kinds: DataKindType[]) =>
     kinds.every(kind => selectedFields[kind] || isFieldDisabled(kind));
   return (
     <>

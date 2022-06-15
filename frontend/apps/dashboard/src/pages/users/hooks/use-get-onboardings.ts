@@ -5,40 +5,9 @@ import {
   OnboardingsListRequest,
   useFilters,
 } from 'src/pages/users/hooks/use-filters';
-import { UIState } from 'themes';
+import { Onboarding } from 'src/types';
 
 import { DASHBOARD_AUTHORIZATION_HEADER } from '../../../config/constants';
-
-export enum OnboardingStatus {
-  verified = 'verified',
-  manualReview = 'manual_review',
-  processing = 'processing',
-  incomplete = 'incomplete',
-  failed = 'failed',
-}
-
-export const statusToBadgeVariant: Record<OnboardingStatus, UIState> = {
-  [OnboardingStatus.verified]: 'success',
-  [OnboardingStatus.processing]: 'neutral',
-  [OnboardingStatus.manualReview]: 'error',
-  [OnboardingStatus.incomplete]: 'warning',
-  [OnboardingStatus.failed]: 'error',
-};
-
-export const statusToDisplayText = {
-  [OnboardingStatus.verified]: 'Verified',
-  [OnboardingStatus.processing]: 'Processing',
-  [OnboardingStatus.manualReview]: 'Manual review',
-  [OnboardingStatus.incomplete]: 'Incomplete',
-  [OnboardingStatus.failed]: 'Failed',
-};
-
-export type Onboarding = {
-  footprintUserId: string;
-  status: OnboardingStatus;
-  createdAt: string; // TODO rename this initiatedAt
-  updatedAt: string;
-};
 
 // TODO pagination
 const getOnboardingsRequest = async (

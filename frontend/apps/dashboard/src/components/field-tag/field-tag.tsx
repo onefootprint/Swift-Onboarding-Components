@@ -1,23 +1,7 @@
 import React from 'react';
-import { DataKind } from 'src/pages/users/hooks/use-decrypt-user';
+import { DataKind, dataKindToDisplayName } from 'src/types';
 import styled, { css } from 'styled-components';
 import { Typography } from 'ui';
-
-const dataKindToDisplayName: Record<DataKind, String> = {
-  [DataKind.firstName]: 'First name',
-  [DataKind.lastName]: 'Last name',
-  [DataKind.email]: 'Email',
-  [DataKind.phoneNumber]: 'Phone number',
-  [DataKind.ssn]: 'SSN',
-  [DataKind.lastFourSsn]: 'SSN last four',
-  [DataKind.dob]: 'Date of birth',
-  [DataKind.streetAddress]: 'Address line 1',
-  [DataKind.streetAddress2]: 'Address line 2',
-  [DataKind.city]: 'City',
-  [DataKind.state]: 'State',
-  [DataKind.zip]: 'Zip code',
-  [DataKind.country]: 'Country',
-};
 
 type FieldTagProps = {
   dataKind: DataKind;
