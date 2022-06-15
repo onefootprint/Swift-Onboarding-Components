@@ -8,6 +8,12 @@ export default {
   component: LoadingIndicator,
   title: 'Components/LoadingIndicator',
   argTypes: {
+    'aria-label': {
+      control: 'string',
+      description:
+        'The accessible, human friendly label to use for screen readers.',
+      table: { required: false, defaultValue: { summary: '-' } },
+    },
     size: {
       control: 'select',
       description: 'Size of the loading',

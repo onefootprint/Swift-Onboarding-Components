@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { forwardRef } from 'react';
 import styled, { css } from 'styled-components';
 
 import { createFontStyles, createOverlayBackground } from '../../utils/mixins';
@@ -24,37 +24,43 @@ export type ButtonProps = {
   variant?: 'primary' | 'secondary';
 };
 
-const Button = ({
-  children,
-  disabled = false,
-  fullWidth,
-  loading,
-  loadingAriaLabel,
-  onClick,
-  size = 'default',
-  testID,
-  type = 'button',
-  variant = 'primary',
-}: ButtonProps) => (
-  <Container
-    data-testid={testID}
-    disabled={disabled || loading}
-    fullWidth={fullWidth}
-    onClick={onClick}
-    size={size}
-    tabIndex={0}
-    type={type}
-    variant={variant}
-  >
-    {loading ? (
-      <LoadingIndicator aria-label={loadingAriaLabel} color="quaternary" />
-    ) : (
-      children
-    )}
-  </Container>
+const Button = forwardRef<HTMLButtonElement, ButtonProps>(
+  (
+    {
+      children,
+      disabled = false,
+      fullWidth,
+      loading,
+      loadingAriaLabel,
+      onClick,
+      size = 'default',
+      testID,
+      type = 'button',
+      variant = 'primary',
+    }: ButtonProps,
+    ref,
+  ) => (
+    <ButtonContainer
+      ref={ref}
+      data-testid={testID}
+      disabled={disabled || loading}
+      fullWidth={fullWidth}
+      onClick={onClick}
+      size={size}
+      tabIndex={0}
+      type={type}
+      variant={variant}
+    >
+      {loading ? (
+        <LoadingIndicator aria-label={loadingAriaLabel} color="quaternary" />
+      ) : (
+        children
+      )}
+    </ButtonContainer>
+  ),
 );
 
-const Container = styled.button<{
+const ButtonContainer = styled.button<{
   size: 'default' | 'compact' | 'small' | 'large';
   variant: 'primary' | 'secondary';
   fullWidth?: boolean;
