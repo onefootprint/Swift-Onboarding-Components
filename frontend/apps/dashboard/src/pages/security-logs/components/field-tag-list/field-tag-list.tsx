@@ -9,10 +9,11 @@ type FieldTagListProps = {
 const FieldTagList = ({ dataKinds }: FieldTagListProps) => (
   <>
     {dataKinds.map((dataKind: DataKind, i: number) => (
-      <>
-        <FieldTag dataKind={dataKind} key={dataKind} />
+      // eslint-disable-next-line react/no-array-index-key
+      <span key={`${dataKind}-${i}`}>
+        <FieldTag dataKind={dataKind} />
         {i !== dataKinds.length - 1 && <span>, </span>}
-      </>
+      </span>
     ))}
   </>
 );

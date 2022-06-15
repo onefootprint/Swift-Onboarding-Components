@@ -35,7 +35,7 @@ const DataContainer = ({
       </Header>
       <RowContainer>
         {rows.map((item: DataRow) => (
-          <Row>
+          <Row key={item.title}>
             <Typography
               variant="label-3"
               color="tertiary"

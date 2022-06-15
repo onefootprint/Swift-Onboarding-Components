@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import styled, { css } from 'styled-components';
 import { Typography } from 'ui';
 
@@ -17,7 +17,8 @@ type TimelineProps = {
 const Timeline = ({ items, connectorVariant = 'default' }: TimelineProps) => (
   <TimelineContainer>
     {items.map((item: TimelineItem, i: number) => (
-      <>
+      // eslint-disable-next-line react/no-array-index-key
+      <Fragment key={`${item.timestamp}-${i}`}>
         <Typography variant="label-3" color="tertiary">
           {new Date(item.timestamp).toLocaleString('en-us', {
             month: 'numeric',
@@ -37,7 +38,7 @@ const Timeline = ({ items, connectorVariant = 'default' }: TimelineProps) => (
         <BodyContainer>
           {item.bodyComponent && item.bodyComponent}
         </BodyContainer>
-      </>
+      </Fragment>
     ))}
   </TimelineContainer>
 );
