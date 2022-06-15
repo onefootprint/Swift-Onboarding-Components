@@ -15,8 +15,9 @@ pub fn list_for_tenant(
 ) -> Result<Vec<Onboarding>, DbError> {
     let mut onboardings = schema::onboardings::table
         .left_join(
-            schema::user_data::table
-                .on(schema::user_data::user_vault_id.eq(schema::onboardings::user_vault_id)),
+            schema::user_data::table.on(schema::user_data::user_vault_id
+                .eq(schema::onboardings::user_vault_id)
+                .and(schema::user_data::deactivated_at.is_null())),
         )
         .filter(schema::onboardings::tenant_id.eq(tenant_id))
         .order_by(schema::onboardings::created_at.desc())
