@@ -11,9 +11,10 @@ use paperclip::actix::{api_v2_operation, get, web, web::Json, Apiv2Schema};
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
-struct AccessEventRequest {
+struct OnboardingRequest {
     status: Option<Status>,
     fingerprint: Option<String>,
+    footprint_user_id: Option<FootprintUserId>,
 }
 
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize, Apiv2Schema)]
@@ -34,13 +35,17 @@ type OnboardingResponse = Vec<OnboardingItem>;
 /// Requires tenant secret key auth.
 fn handler(
     state: web::Data<State>,
-    request: web::Query<AccessEventRequest>,
+    request: web::Query<OnboardingRequest>,
     auth: Either<SessionContext<WorkOsSession>, SecretTenantAuthContext>,
 ) -> actix_web::Result<Json<ApiResponseData<OnboardingResponse>>, ApiError> {
     // TODO paginate the response when there are too many results
     let tenant = auth.tenant(&state.db_pool).await?;
 
-    let AccessEventRequest { status, fingerprint } = request.into_inner();
+    let OnboardingRequest {
+        status,
+        fingerprint,
+        footprint_user_id,
+    } = request.into_inner();
 
     // TODO clean phone number or email
     let fingerprint = match fingerprint {
@@ -55,7 +60,13 @@ fn handler(
     let conn = state.db_pool.get().await.map_err(DbError::from)?;
     let onboardings = conn
         .interact(move |conn| -> Result<Vec<OnboardingItem>, DbError> {
-            let onboardings = db::onboarding::list_for_tenant(conn, tenant.id.clone(), status, fingerprint)?;
+            let onboardings = db::onboarding::list_for_tenant(
+                conn,
+                tenant.id.clone(),
+                status,
+                fingerprint,
+                footprint_user_id,
+            )?;
             let user_vault_ids = onboardings.iter().map(|ob| ob.user_vault_id.clone()).collect();
             let user_to_kinds = db::user_data::bulk_fetch_populated_kinds(conn, user_vault_ids)?;
 

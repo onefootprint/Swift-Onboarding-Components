@@ -11,6 +11,7 @@ pub fn list_for_tenant(
     tenant_id: TenantId,
     status: Option<Status>,
     fingerprint: Option<Vec<u8>>,
+    footprint_user_id: Option<FootprintUserId>,
 ) -> Result<Vec<Onboarding>, DbError> {
     let mut onboardings = schema::onboardings::table
         .left_join(
@@ -27,6 +28,10 @@ pub fn list_for_tenant(
 
     if let Some(fingerprint) = fingerprint {
         onboardings = onboardings.filter(schema::user_data::sh_data.eq(fingerprint))
+    }
+
+    if let Some(footprint_user_id) = footprint_user_id {
+        onboardings = onboardings.filter(schema::onboardings::user_ob_id.eq(footprint_user_id))
     }
 
     let onboardings = onboardings
