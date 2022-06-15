@@ -21,7 +21,7 @@ impl LivenessWebauthnConfig {
                 "Footprint",
                 &state.config.rp_id,
                 &url,
-                Some(120),
+                Some(120 * 1000),
                 Some(true),
                 Some(true),
             ),
