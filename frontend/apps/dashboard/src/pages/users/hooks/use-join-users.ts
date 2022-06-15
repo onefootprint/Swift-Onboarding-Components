@@ -1,22 +1,17 @@
 import { useMemo } from 'react';
-import { DataKindType, Onboarding, OnboardingStatus } from 'src/types';
+import { Onboarding, OnboardingStatus } from 'src/types';
+
+import { UserAttributes } from './use-user-data';
 
 export type User = {
   footprintUserId: string;
   status: OnboardingStatus;
   initiatedAt: string;
-  decryptedAttributes?: DecryptedAttributes;
+  decryptedAttributes?: UserAttributes;
 };
-
-export type UserData = {
-  value: string | null;
-  isLoading: boolean;
-};
-
-export type DecryptedAttributes = Record<DataKindType, UserData>;
 
 // Create a custom UserData for name since it's two separate attributes joined
-export const nameData = (decryptedAttributes?: DecryptedAttributes) =>
+export const nameData = (decryptedAttributes?: UserAttributes) =>
   decryptedAttributes && {
     value:
       decryptedAttributes?.firstName?.value &&
@@ -28,7 +23,7 @@ export const nameData = (decryptedAttributes?: DecryptedAttributes) =>
   };
 
 type DecryptedUsersMap = Omit<
-  Map<String, DecryptedAttributes>,
+  Map<String, UserAttributes>,
   'set' | 'clear' | 'delete'
 >;
 

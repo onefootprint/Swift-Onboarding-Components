@@ -2,80 +2,29 @@ import IcoBuilding16 from 'icons/ico/ico-building-16';
 import IcoCheck16 from 'icons/ico/ico-check-16';
 import IcoFootprint16 from 'icons/ico/ico-footprint-16';
 import IcoUserCircle16 from 'icons/ico/ico-user-circle-16';
+import { partial } from 'lodash';
 import React from 'react';
 import FieldTag from 'src/components/field-tag';
 import Timeline from 'src/components/timeline';
 import useGetOnboardings from 'src/pages/users/hooks/use-get-onboardings';
 import UserHeader from 'src/pages/users/pages/detail/components/user-header';
-import { DataKind, DataKindType, DecryptedUserAttributes } from 'src/types';
+import { DataKind } from 'src/types';
 import styled, { css } from 'styled-components';
 import { Box, Divider, Typography } from 'ui';
-import { useMap } from 'usehooks-ts';
 
-import useDecryptUser, {
-  DecryptUserRequest,
-} from '../../hooks/use-decrypt-user';
-import useJoinUsers, {
-  DecryptedAttributes,
-  UserData,
-} from '../../hooks/use-join-users';
+import useDecryptUser from '../../hooks/use-decrypt-user';
+import useJoinUsers from '../../hooks/use-join-users';
 import BasicInfo from './components/basic-info';
 
 const Detail = () => {
   const getOnboardings = useGetOnboardings();
-  const [decryptedUsers, { set: setDecryptedUser }] = useMap<
-    String,
-    DecryptedAttributes
-  >(new Map());
-
-  const decryptUserMutation = useDecryptUser();
+  const { decryptedUsers, loadEncryptedAttributes } = useDecryptUser();
 
   // Join the onboarding list results with any decrypted user data
   const users = useJoinUsers(getOnboardings.data, decryptedUsers);
   // TODO error handling when this data is empty
   // https://linear.app/footprint/issue/FP-202
   const user = users?.[0]!;
-
-  const loadEncryptedAttributes = (
-    fieldsToDecrypt: DataKindType[],
-    reason: string,
-  ) => {
-    const decryptUserRequest: DecryptUserRequest = {
-      footprintUserId: user.footprintUserId,
-      attributes: fieldsToDecrypt.map(x => DataKind[x]),
-      reason,
-    };
-
-    // Immediately set these attributes as loading
-    const loadingUserAttributes = Object.fromEntries(
-      fieldsToDecrypt.map(x => [x, { isLoading: true }]),
-    );
-    const currentDecryptedUser =
-      decryptedUsers.get(user.footprintUserId) || ({} as DecryptedAttributes);
-    setDecryptedUser(user.footprintUserId, {
-      ...currentDecryptedUser,
-      ...loadingUserAttributes,
-    });
-
-    // Trigger the mutation to decrypt the data. Upon completion, update these attributes with the
-    // decrypted values
-    decryptUserMutation
-      .mutateAsync(decryptUserRequest)
-      .then((decryptedUserAttributes: DecryptedUserAttributes) => {
-        // Map from string values to UserData values that contain isLoading: false
-        const newAttrs = Object.fromEntries(
-          Object.entries(decryptedUserAttributes).map(x => [
-            x[0],
-            { value: x[1], isLoading: false } as UserData,
-          ]),
-        );
-        // TODO https://linear.app/footprint/issue/FP-256/create-new-hook-for-updating-decrypted-fields
-        setDecryptedUser(user.footprintUserId, {
-          ...currentDecryptedUser,
-          ...newAttrs,
-        });
-      });
-  };
 
   return (
     <>
@@ -95,7 +44,10 @@ const Detail = () => {
       </HeaderContainer>
       {user && (
         <>
-          <UserHeader user={user} onDecrypt={loadEncryptedAttributes} />
+          <UserHeader
+            user={user}
+            onDecrypt={partial(loadEncryptedAttributes, user.footprintUserId)}
+          />
           <PaddedDivider />
           <BasicInfo user={user} />
           <Box sx={{ height: '40px' }}>&nbsp;</Box>

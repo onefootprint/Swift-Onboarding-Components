@@ -5,7 +5,6 @@ import FieldOrPlaceholder from 'src/pages/users/components/field-or-placeholder'
 import { useFilters } from 'src/pages/users/hooks/use-filters';
 import useGetOnboardings from 'src/pages/users/hooks/use-get-onboardings';
 import useJoinUsers, {
-  DecryptedAttributes,
   nameData,
   User,
 } from 'src/pages/users/hooks/use-join-users';
@@ -16,6 +15,7 @@ import { useMap } from 'usehooks-ts';
 
 import DecryptDataDialog from './components/decrypt-data-dialog';
 import UsersFilter from './components/users-filter';
+import { UserAttributes } from './hooks/use-user-data';
 
 const columns = [
   { text: 'Name', width: '15%' },
@@ -41,7 +41,7 @@ const Users = () => {
   }, [query]);
 
   // TODO rm
-  const [decryptedUsers] = useMap<String, DecryptedAttributes>(new Map());
+  const [decryptedUsers] = useMap<String, UserAttributes>(new Map());
   // Join the onboarding list results with any decrypted user data
   const users = useJoinUsers(getOnboardings.data, decryptedUsers);
 
