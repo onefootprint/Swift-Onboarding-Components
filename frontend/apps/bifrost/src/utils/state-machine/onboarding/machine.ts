@@ -45,15 +45,12 @@ const createOnboardingMachine = ({
         [States.init]: {
           always: [
             {
-              cond: () =>
-                userFound &&
-                (onboarding.missingAttributes.length > 0 ||
-                  onboarding.missingWebauthnCredentials),
+              cond: () => userFound && onboarding.missingAttributes.length > 0,
               target: States.additionalDataRequired,
             },
             {
               target: States.livenessRegister,
-              cond: context => context.missingWebauthnCredentials,
+              cond: context => !userFound && context.missingWebauthnCredentials,
             },
             {
               target: States.basicInformation,
@@ -82,10 +79,6 @@ const createOnboardingMachine = ({
         [States.additionalDataRequired]: {
           on: {
             [Events.additionalInfoRequired]: [
-              {
-                target: States.livenessRegister,
-                cond: context => context.missingWebauthnCredentials,
-              },
               {
                 target: States.basicInformation,
                 cond: context =>
