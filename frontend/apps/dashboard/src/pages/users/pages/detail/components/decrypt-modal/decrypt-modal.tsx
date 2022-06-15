@@ -36,7 +36,9 @@ const DecryptModal = ({ user, onDecrypt }: DecryptModalProps) => {
 
   const isFieldDisabled = (...kinds: DataKindType[]) =>
     // Don't allow requesting to decrypt a field that is either already decrypted OR explicitly null
-    kinds.every(kind => user.decryptedAttributes?.[kind] !== undefined);
+    kinds.every(
+      kind => user.attributes[kind]?.value || !user.attributes[kind]?.exists,
+    );
 
   const handleModalButtonClick = (type: ModalCloseEvent) => {
     if (type !== ModalCloseEvent.Primary) {

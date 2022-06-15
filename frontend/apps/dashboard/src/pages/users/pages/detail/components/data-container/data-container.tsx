@@ -1,14 +1,14 @@
-import { UserData } from '@src/pages/users/hooks/use-user-data';
 import { Icon } from 'icons';
 import React from 'react';
 import FieldOrPlaceholder from 'src/pages/users/components/field-or-placeholder';
+import { UserData } from 'src/pages/users/hooks/use-user-data';
 import styled, { css } from 'styled-components';
 import { Typography } from 'ui';
 import useSX, { SXStyleProps, SXStyles } from 'ui/src/hooks/use-sx';
 
 export type DataRow = {
   title: string;
-  data?: UserData;
+  data: UserData;
 };
 
 type DataContainerProps = {
@@ -43,10 +43,7 @@ const DataContainer = ({
             >
               {item.title}
             </Typography>
-            <FieldOrPlaceholder
-              value={item.data?.value}
-              isLoading={item.data?.isLoading}
-            />
+            <FieldOrPlaceholder data={item.data} />
           </Row>
         ))}
       </RowContainer>

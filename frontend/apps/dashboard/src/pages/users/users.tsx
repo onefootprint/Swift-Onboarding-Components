@@ -75,9 +75,7 @@ const Users = () => {
         renderTr={({ item }: Row<User>) => (
           <>
             <td>
-              <FieldOrPlaceholder
-                value={nameData(item.decryptedAttributes)?.value}
-              />
+              <FieldOrPlaceholder data={nameData(item.attributes)} />
             </td>
             <td>
               <Code>{item.footprintUserId}</Code>
@@ -88,17 +86,13 @@ const Users = () => {
               </Badge>
             </td>
             <td>
-              <FieldOrPlaceholder
-                value={item.decryptedAttributes?.email.value}
-              />
+              <FieldOrPlaceholder data={item.attributes.email} />
             </td>
             <td>
-              <FieldOrPlaceholder value={item.decryptedAttributes?.ssn.value} />
+              <FieldOrPlaceholder data={item.attributes.ssn} />
             </td>
             <td>
-              <FieldOrPlaceholder
-                value={item.decryptedAttributes?.phoneNumber.value}
-              />
+              <FieldOrPlaceholder data={item.attributes.phoneNumber} />
             </td>
             <td>
               <Typography variant="body-3" color="primary">

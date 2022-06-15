@@ -2,20 +2,18 @@ import React from 'react';
 import EncryptedCell from 'src/pages/users/components/encrypted-cell';
 import { Typography } from 'ui';
 
+import { UserData } from '../../hooks/use-user-data';
+
 type FieldOrPlaceholderProps = {
-  value?: string | null;
-  isLoading?: boolean;
+  data: UserData;
 };
 
-const FieldOrPlaceholder = ({
-  value,
-  isLoading = false,
-}: FieldOrPlaceholderProps) =>
-  value === undefined ? (
-    <EncryptedCell isLoading={isLoading} />
+const FieldOrPlaceholder = ({ data }: FieldOrPlaceholderProps) =>
+  data.exists && data.value === undefined ? (
+    <EncryptedCell isLoading={data.isLoading} />
   ) : (
     <Typography variant="body-3" color="primary" sx={{ whiteSpace: 'nowrap' }}>
-      {value || '-'}
+      {data.value || '-'}
     </Typography>
   );
 

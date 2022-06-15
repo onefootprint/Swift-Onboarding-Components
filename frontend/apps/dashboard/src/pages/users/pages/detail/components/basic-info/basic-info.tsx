@@ -11,7 +11,7 @@ type BasicInfoProps = {
 };
 
 const BasicInfo = ({ user }: BasicInfoProps) => {
-  const userData = user.decryptedAttributes;
+  const userAttributes = user.attributes;
   return (
     <DataGrid>
       {/* TODO: distinguish between un-populated data and encrypted data */}
@@ -21,11 +21,11 @@ const BasicInfo = ({ user }: BasicInfoProps) => {
         HeaderIcon={IcoFileText224}
         header="Basic data"
         rows={[
-          { title: 'Name', data: nameData(userData) },
-          { title: 'Email', data: userData?.email },
+          { title: 'Name', data: nameData(userAttributes) },
+          { title: 'Email', data: userAttributes.email },
           {
             title: 'Phone number',
-            data: userData?.phoneNumber,
+            data: userAttributes.phoneNumber,
           },
         ]}
       />
@@ -34,8 +34,8 @@ const BasicInfo = ({ user }: BasicInfoProps) => {
         HeaderIcon={IcoUserCircle24}
         header="Identity data"
         rows={[
-          { title: 'SSN', data: userData?.ssn },
-          { title: 'Date of birth', data: userData?.dob },
+          { title: 'SSN', data: userAttributes.ssn },
+          { title: 'Date of birth', data: userAttributes.dob },
         ]}
       />
       <DataContainer
@@ -43,18 +43,18 @@ const BasicInfo = ({ user }: BasicInfoProps) => {
         HeaderIcon={IcoBuilding24}
         header="Address"
         rows={[
-          { title: 'Country', data: userData?.country },
+          { title: 'Country', data: userAttributes.country },
           {
             title: 'Address line 1',
-            data: userData?.streetAddress,
+            data: userAttributes.streetAddress,
           },
           {
             title: 'Address line 2',
-            data: userData?.streetAddress2,
+            data: userAttributes.streetAddress2,
           },
-          { title: 'City', data: userData?.city },
-          { title: 'Zip code', data: userData?.zip },
-          { title: 'State', data: userData?.state },
+          { title: 'City', data: userAttributes.city },
+          { title: 'Zip code', data: userAttributes.zip },
+          { title: 'State', data: userAttributes.state },
         ]}
       />
     </DataGrid>
