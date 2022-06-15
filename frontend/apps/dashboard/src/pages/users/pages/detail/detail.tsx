@@ -6,22 +6,16 @@ import { partial } from 'lodash';
 import React from 'react';
 import FieldTag from 'src/components/field-tag';
 import Timeline from 'src/components/timeline';
-import useGetOnboardings from 'src/pages/users/hooks/use-get-onboardings';
 import UserHeader from 'src/pages/users/pages/detail/components/user-header';
 import { DataKind } from 'src/types';
 import styled, { css } from 'styled-components';
 import { Box, Divider, Typography } from 'ui';
 
-import useDecryptUser from '../../hooks/use-decrypt-user';
-import useJoinUsers from '../../hooks/use-join-users';
+import useGetUsers from '../../hooks/use-get-users';
 import BasicInfo from './components/basic-info';
 
 const Detail = () => {
-  const getOnboardings = useGetOnboardings();
-  const { decryptedUsers, loadEncryptedAttributes } = useDecryptUser();
-
-  // Join the onboarding list results with any decrypted user data
-  const users = useJoinUsers(getOnboardings.data, decryptedUsers);
+  const { users, loadEncryptedAttributes } = useGetUsers();
   // TODO error handling when this data is empty
   // https://linear.app/footprint/issue/FP-202
   const user = users?.[0]!;

@@ -2,19 +2,14 @@ import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { Row, Table } from 'src/components/table';
 import FieldOrPlaceholder from 'src/pages/users/components/field-or-placeholder';
-import { useFilters } from 'src/pages/users/hooks/use-filters';
-import useGetOnboardings from 'src/pages/users/hooks/use-get-onboardings';
-import useJoinUsers, {
-  nameData,
-  User,
-} from 'src/pages/users/hooks/use-join-users';
+import { nameData, User } from 'src/pages/users/hooks/use-join-users';
 import { statusToBadgeVariant, statusToDisplayText } from 'src/types';
 import styled, { css } from 'styled-components';
 import { Badge, Code, SearchInput, Typography } from 'ui';
 
 import DecryptDataDialog from './components/decrypt-data-dialog';
 import UsersFilter from './components/users-filter';
-import useDecryptUser from './hooks/use-decrypt-user';
+import useGetUsers from './hooks/use-get-users';
 
 const columns = [
   { text: 'Name', width: '15%' },
@@ -27,12 +22,8 @@ const columns = [
 ];
 
 const Users = () => {
-  const getOnboardings = useGetOnboardings();
-  const { decryptedUsers } = useDecryptUser();
-  // Join the onboarding list results with any decrypted user data
-  const users = useJoinUsers(getOnboardings.data, decryptedUsers);
+  const { users, isLoading, query, setFilter } = useGetUsers();
 
-  const { query, setFilter } = useFilters();
   const [searchText, setSearchText] = useState<string>();
 
   const router = useRouter();
@@ -60,7 +51,7 @@ const Users = () => {
       />
       <Table
         items={users}
-        isLoading={getOnboardings.isLoading}
+        isLoading={isLoading}
         getKeyForRow={(item: User) => item.footprintUserId}
         onRowClick={(item: User) => {
           router.push({
