@@ -33,7 +33,7 @@ impl FromRequest for InsightHeaders {
         let cloudfront = InsightHeaders {
             ip_address,
             city: get_header("cloudfront-viewer-city", req),
-            country: get_header("cloudfront-viewer-country", req),
+            country: get_header("cloudfront-viewer-country-name", req),
             region: get_header("cloudfront-viewer-country-region", req),
             region_name: get_header("cloudfront-viewer-country-region-name", req),
             latitude: get_header("cloudfront-viewer-latitude", req),
