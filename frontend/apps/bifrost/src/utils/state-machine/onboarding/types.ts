@@ -2,6 +2,7 @@ import {
   BasicInformation,
   DeviceInfo,
   ResidentialAddress,
+  TenantInfo,
   UserData,
   UserDataAttribute,
 } from 'src/utils/state-machine/types';
@@ -21,6 +22,7 @@ export type MachineContext = {
   missingWebauthnCredentials: boolean;
   missingAttributes: readonly UserDataAttribute[]; // Initial set of attributes received from /onboarding
   data: UserData; // Filled user data
+  tenant: TenantInfo;
   device: DeviceInfo;
   authToken?: string;
 };

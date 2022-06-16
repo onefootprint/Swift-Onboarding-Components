@@ -2,6 +2,7 @@ import {
   ChallengeData,
   DeviceInfo,
   OnboardingData,
+  TenantInfo,
   UserDataAttribute,
 } from 'src/utils/state-machine/types';
 
@@ -36,6 +37,7 @@ export enum Events {
   smsChallengeResent = 'smsChallengeResent',
   smsChallengeSucceeded = 'smsChallengeSucceeded',
   deviceInfoIdentified = 'deviceInfoIdentified',
+  tenantInfoIdentified = 'tenantInfoIdentified',
   biometricLoginSucceeded = 'biometricLoginSucceeded',
   biometricLoginFailed = 'livenessLoginFailed',
 }
@@ -49,6 +51,7 @@ export enum Actions {
   assignAuthToken = 'assignAuthToken',
   assignChallenge = 'assignChallengeData',
   assignDeviceInfo = 'assignDeviceInfo',
+  assignTenantInfo = 'assignTenantInfo',
 
   // Onboarding
   assignMissingAttributes = 'assignMissingAttributes',
@@ -63,6 +66,7 @@ export type BifrostContext = {
   device: DeviceInfo;
   challenge?: ChallengeData;
   onboarding: OnboardingData;
+  tenant: TenantInfo;
 };
 
 export type BifrostEvent =
@@ -124,6 +128,13 @@ export type BifrostEvent =
       payload: {
         hasSupportForWebAuthn: boolean;
         type: string;
+      };
+    }
+  | {
+      type: Events.tenantInfoIdentified;
+      payload: {
+        name: string;
+        requiredUserData: UserDataAttribute[];
       };
     }
   | {

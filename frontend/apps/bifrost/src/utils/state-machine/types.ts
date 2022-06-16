@@ -14,6 +14,21 @@ export enum UserDataAttribute {
   zip = 'zip',
 }
 
+// Labels sent from the backend for each attribute
+export const UserDataAttributeLabels: Record<string, UserDataAttribute> = {
+  first_name: UserDataAttribute.firstName,
+  last_name: UserDataAttribute.lastName,
+  dob: UserDataAttribute.dob,
+  email: UserDataAttribute.email,
+  ssn: UserDataAttribute.ssn,
+  street_address: UserDataAttribute.streetAddress,
+  street_address2: UserDataAttribute.streetAddress2,
+  city: UserDataAttribute.city,
+  state: UserDataAttribute.state,
+  country: UserDataAttribute.country,
+  zip: UserDataAttribute.zip,
+};
+
 export type UserData = Partial<{
   [UserDataAttribute.firstName]: string;
   [UserDataAttribute.lastName]: string;
@@ -70,4 +85,9 @@ export type OnboardingData = {
 export type DeviceInfo = {
   hasSupportForWebAuthn: boolean;
   type: string;
+};
+
+export type TenantInfo = {
+  name: string;
+  requiredUserData: UserDataAttribute[];
 };

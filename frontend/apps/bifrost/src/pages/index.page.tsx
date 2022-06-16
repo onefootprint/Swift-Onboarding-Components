@@ -1,7 +1,9 @@
+import { CLIENT_PUBLIC_KEY } from '@src/config/constants';
+import useTenantInfo from '@src/hooks/use-tenant-info';
 import has from 'lodash/has';
 import React from 'react';
 import useBifrostMachine from 'src/hooks/use-bifrost-machine';
-import useDevice from 'src/hooks/use-device-info';
+import useDeviceInfo from 'src/hooks/use-device-info';
 import { States } from 'src/utils/state-machine/bifrost';
 
 import EmailIdentification from './email-identification';
@@ -18,7 +20,8 @@ type Page = {
 };
 
 const Root = () => {
-  useDevice();
+  useDeviceInfo();
+  useTenantInfo(CLIENT_PUBLIC_KEY);
 
   const [state] = useBifrostMachine();
   const valueCasted = state.value as States;

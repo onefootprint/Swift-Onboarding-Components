@@ -14,6 +14,10 @@ const initialContext: BifrostContext = {
     type: 'mobile',
     hasSupportForWebAuthn: false,
   },
+  tenant: {
+    name: '',
+    requiredUserData: [],
+  },
   onboarding: {
     missingAttributes: [],
     missingWebauthnCredentials: true,
@@ -29,6 +33,9 @@ const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
     on: {
       [Events.deviceInfoIdentified]: {
         actions: [Actions.assignDeviceInfo],
+      },
+      [Events.tenantInfoIdentified]: {
+        actions: [Actions.assignTenantInfo],
       },
     },
     states: {
@@ -193,6 +200,7 @@ const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
               onboarding: context.onboarding,
               device: context.device,
               authToken: context.authToken,
+              tenant: context.tenant,
             }),
           onDone: {
             target: States.onboardingSuccess,
@@ -271,6 +279,15 @@ const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
           context.device = {
             type: event.payload.type,
             hasSupportForWebAuthn: event.payload.hasSupportForWebAuthn,
+          };
+        }
+        return context;
+      }),
+      [Actions.assignTenantInfo]: assign((context, event) => {
+        if (event.type === Events.tenantInfoIdentified) {
+          context.tenant = {
+            name: event.payload.name,
+            requiredUserData: [...event.payload.requiredUserData],
           };
         }
         return context;

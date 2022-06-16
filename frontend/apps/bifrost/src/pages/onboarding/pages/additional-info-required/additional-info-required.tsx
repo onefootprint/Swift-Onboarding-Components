@@ -1,25 +1,25 @@
 import React from 'react';
 import HeaderTitle from 'src/components/header-title';
-import { Events } from 'src/utils/state-machine/onboarding';
+import { Events, MachineContext } from 'src/utils/state-machine/onboarding';
 import styled, { css } from 'styled-components';
 import { Button } from 'ui';
 
 import useOnboardingMachine from '../../hooks/use-onboarding-machine';
 
 const AdditionalInfoRequired = () => {
-  const [, send] = useOnboardingMachine();
+  const [state, send] = useOnboardingMachine();
+  const context = state.context as MachineContext;
   const handleClick = () => {
     send({
       type: Events.additionalInfoRequired,
     });
   };
-  const tenantName = 'AcmeBank'; // TODO: for now use a placeholder for tenant name.
 
   return (
     <Container>
       <HeaderTitle
         title="Additional data is required"
-        subtitle={`In addition to the data we already have on you, ${tenantName} requires
+        subtitle={`In addition to the data we already have on you, ${context.tenant.name} requires
           some more information to verify your identity.`}
       />
       <Button fullWidth onClick={handleClick}>

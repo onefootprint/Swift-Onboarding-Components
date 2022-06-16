@@ -5,7 +5,11 @@ import {
   isMissingResidentialAttribute,
   isMissingSsnAttribute,
 } from 'src/utils/state-machine/onboarding/utils/missing-attributes';
-import { DeviceInfo, OnboardingData } from 'src/utils/state-machine/types';
+import {
+  DeviceInfo,
+  OnboardingData,
+  TenantInfo,
+} from 'src/utils/state-machine/types';
 import { assign, createMachine } from 'xstate';
 
 import {
@@ -20,6 +24,7 @@ export type OnboardingMachineArgs = {
   userFound: boolean;
   onboarding: OnboardingData;
   device: DeviceInfo;
+  tenant: TenantInfo;
   authToken?: string;
 };
 
@@ -28,6 +33,7 @@ const createOnboardingMachine = ({
   onboarding,
   device,
   authToken,
+  tenant,
 }: OnboardingMachineArgs) =>
   createMachine<MachineContext, MachineEvents>(
     {
@@ -40,6 +46,7 @@ const createOnboardingMachine = ({
         data: onboarding.data || {},
         device,
         authToken,
+        tenant,
       },
       states: {
         [States.init]: {

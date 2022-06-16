@@ -5,7 +5,10 @@ import {
   CLIENT_PUBLIC_KEY,
   CLIENT_PUBLIC_KEY_HEADER,
 } from 'src/config/constants';
-import { UserDataAttribute } from 'src/utils/state-machine/types';
+import {
+  UserDataAttribute,
+  UserDataAttributeLabels,
+} from 'src/utils/state-machine/types';
 
 export type OnboardingRequest = {
   authToken: string;
@@ -14,21 +17,6 @@ export type OnboardingRequest = {
 export type OnboardingResponse = {
   missingAttributes: UserDataAttribute[];
   missingWebauthnCredentials: boolean;
-};
-
-// Labels sent from the backend for each attribute
-const missingAttributesLabels: Record<string, UserDataAttribute> = {
-  first_name: UserDataAttribute.firstName,
-  last_name: UserDataAttribute.lastName,
-  dob: UserDataAttribute.dob,
-  email: UserDataAttribute.email,
-  ssn: UserDataAttribute.ssn,
-  street_address: UserDataAttribute.streetAddress,
-  street_address2: UserDataAttribute.streetAddress2,
-  city: UserDataAttribute.city,
-  state: UserDataAttribute.state,
-  country: UserDataAttribute.country,
-  zip: UserDataAttribute.zip,
 };
 
 const onboardingRequest = async (payload: OnboardingRequest) => {
@@ -45,7 +33,7 @@ const onboardingRequest = async (payload: OnboardingRequest) => {
   return {
     ...response.data,
     missingAttributes: response.data.missingAttributes.map(
-      (attr: string) => missingAttributesLabels[attr],
+      (attr: string) => UserDataAttributeLabels[attr],
     ),
   };
 };
