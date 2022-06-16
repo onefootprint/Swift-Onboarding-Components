@@ -62,16 +62,16 @@ const Detail = () => {
                 bodyComponent: (
                   <>
                     <Typography variant="body-3" color="secondary">
-                      •&nbsp;&nbsp;&nbsp;&nbsp;Attested by Apple & Footprint
+                      •{'    '}Attested by Apple & Footprint
                     </Typography>
                     <Typography variant="body-3" color="secondary">
-                      •&nbsp;&nbsp;&nbsp;&nbsp;iPhone 13 Pro Max, iOS 15.5
+                      •{'    '}iPhone 13 Pro Max, iOS 15.5
                     </Typography>
                     <Typography variant="body-3" color="secondary">
-                      •&nbsp;&nbsp;&nbsp;&nbsp;34.36.156.118 (IP address)
+                      •{'    '}34.36.156.118 (IP address)
                     </Typography>
                     <Typography variant="body-3" color="secondary">
-                      •&nbsp;&nbsp;&nbsp;&nbsp;San Francisco, California
+                      •{'    '}San Francisco, California
                     </Typography>
                   </>
                 ),
@@ -81,9 +81,11 @@ const Detail = () => {
                 iconComponent: <IcoUserCircle16 />,
                 headerComponent: (
                   <Typography variant="body-3">
-                    <FieldTag dataKind={DataKind.firstName} />
-                    ,&nbsp;
-                    <FieldTag dataKind={DataKind.dob} />
+                    <FieldTag dataKind={DataKind.firstName} />,{' '}
+                    <FieldTag dataKind={DataKind.dob} /> verified by{' '}
+                    <Typography variant="label-3" as="span">
+                      Experian
+                    </Typography>
                   </Typography>
                 ),
               },
@@ -92,9 +94,11 @@ const Detail = () => {
                 iconComponent: <IcoBuilding16 />,
                 headerComponent: (
                   <Typography variant="body-3">
-                    <FieldTag dataKind={DataKind.country} />
-                    ,&nbsp;
-                    <FieldTag dataKind={DataKind.state} /> verified by Socure
+                    <FieldTag dataKind={DataKind.country} />,{' '}
+                    <FieldTag dataKind={DataKind.state} /> verified by{' '}
+                    <Typography variant="label-3" as="span">
+                      Socure
+                    </Typography>
                   </Typography>
                 ),
               },
@@ -109,7 +113,10 @@ const Detail = () => {
                     ,&nbsp;
                     <FieldTag dataKind={DataKind.city} />
                     ,&nbsp;
-                    <FieldTag dataKind={DataKind.zip} /> verified by Socure
+                    <FieldTag dataKind={DataKind.zip} /> verified by{' '}
+                    <Typography variant="label-3" as="span">
+                      Socure
+                    </Typography>
                   </Typography>
                 ),
               },
@@ -118,7 +125,10 @@ const Detail = () => {
                 iconComponent: <IcoUserCircle16 />,
                 headerComponent: (
                   <Typography variant="body-3">
-                    <FieldTag dataKind={DataKind.ssn} /> verified by LexisNexis
+                    <FieldTag dataKind={DataKind.ssn} /> verified by{' '}
+                    <Typography variant="label-3" as="span">
+                      LexisNexis
+                    </Typography>
                   </Typography>
                 ),
               },
