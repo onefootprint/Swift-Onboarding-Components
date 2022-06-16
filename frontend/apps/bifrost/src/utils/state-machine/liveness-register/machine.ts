@@ -79,6 +79,9 @@ const createLivenessRegisterMachine = (
             [Events.qrRegisterSucceeded]: {
               target: States.livenessRegisterCompleted,
             },
+            [Events.qrRegisterFailed]: {
+              target: States.livenessRegisterCompleted,
+            },
             [Events.statusPollingErrored]: {
               target: States.qrRegister,
               actions: [Actions.clearScopedAuthToken],
@@ -91,6 +94,9 @@ const createLivenessRegisterMachine = (
               target: States.qrRegister, // TODO: is this right?
             },
             [Events.qrRegisterSucceeded]: {
+              target: States.livenessRegisterCompleted,
+            },
+            [Events.qrRegisterFailed]: {
               target: States.livenessRegisterCompleted,
             },
             [Events.statusPollingErrored]: {
