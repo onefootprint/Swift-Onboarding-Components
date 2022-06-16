@@ -35,7 +35,7 @@ pub async fn list_for_tenant(
             }
 
             if let Some(kind) = kind {
-                results = results.filter(schema::access_events::data_kind.eq(kind));
+                results = results.filter(schema::access_events::data_kinds.contains(vec![kind]));
             }
 
             results.load(conn)
@@ -63,7 +63,7 @@ pub async fn list(
                     .into_boxed();
 
             if let Some(kind) = kind {
-                results = results.filter(schema::access_events::data_kind.eq(kind));
+                results = results.filter(schema::access_events::data_kinds.contains(vec![kind]));
             }
 
             results.load(conn)

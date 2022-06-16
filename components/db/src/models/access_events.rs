@@ -13,61 +13,52 @@ use super::insight_event::CreateInsightEvent;
 pub struct AccessEvent {
     pub id: Uuid,
     pub onboarding_id: OnboardingId,
-    pub data_kind: DataKind,
     pub timestamp: NaiveDateTime,
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
     pub insight_event_id: Option<Uuid>,
     pub reason: String,
     pub principal: Option<String>,
+    pub data_kinds: Vec<DataKind>,
 }
 
 #[derive(Debug, Clone)]
 pub struct NewAccessEvent {
     pub onboarding_id: OnboardingId,
-    pub data_kind: DataKind,
+    pub data_kinds: Vec<DataKind>,
     pub reason: String,
     pub principal: Option<String>,
+    pub insight: CreateInsightEvent,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
 #[table_name = "access_events"]
 struct NewAccessEventWithInsight {
     onboarding_id: OnboardingId,
-    data_kind: DataKind,
+    data_kinds: Vec<DataKind>,
     insight_event_id: Uuid,
     reason: String,
     principal: Option<String>,
 }
 
-pub struct NewAccessEventBatch {
-    pub events: Vec<NewAccessEvent>,
-    pub insight: CreateInsightEvent,
-}
-
-impl NewAccessEventBatch {
-    pub async fn bulk_insert(self, pool: &DbPool) -> Result<(), crate::DbError> {
+impl NewAccessEvent {
+    pub async fn save(self, pool: &DbPool) -> Result<(), crate::DbError> {
         let _ = pool
             .get()
             .await?
             .interact(move |conn| {
                 conn.transaction(|| {
                     let insight_ev = self.insight.insert_with_conn(conn)?;
-
-                    let events = self
-                        .events
-                        .into_iter()
-                        .map(|ev| NewAccessEventWithInsight {
-                            data_kind: ev.data_kind,
-                            onboarding_id: ev.onboarding_id,
-                            insight_event_id: insight_ev.id,
-                            reason: ev.reason,
-                            principal: ev.principal,
-                        })
-                        .collect::<Vec<NewAccessEventWithInsight>>();
+                    let event = NewAccessEventWithInsight {
+                        data_kinds: self.data_kinds,
+                        onboarding_id: self.onboarding_id,
+                        insight_event_id: insight_ev.id,
+                        reason: self.reason,
+                        principal: self.principal,
+                    };
 
                     diesel::insert_into(crate::schema::access_events::table)
-                        .values(events)
+                        .values(event)
                         .execute(conn)
                 })
             })

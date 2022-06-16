@@ -5,13 +5,13 @@ table! {
     access_events (id) {
         id -> Uuid,
         onboarding_id -> Varchar,
-        data_kind -> Data_kind,
         timestamp -> Timestamp,
         created_at -> Timestamp,
         updated_at -> Timestamp,
         insight_event_id -> Nullable<Uuid>,
         reason -> Varchar,
         principal -> Nullable<Varchar>,
+        data_kinds -> Array<Data_kind>,
     }
 }
 

@@ -6,7 +6,7 @@ use crate::types::success::ApiResponseData;
 use crate::user::{decrypt, DecryptFieldsResult};
 use crate::utils::insight_headers::InsightHeaders;
 use crate::State;
-use db::models::access_events::{NewAccessEvent, NewAccessEventBatch};
+use db::models::access_events::NewAccessEvent;
 use db::models::insight_event::CreateInsightEvent;
 use newtypes::tenant::workos::WorkOsSession;
 use newtypes::{DataKind, FootprintUserId};
@@ -63,22 +63,15 @@ fn handler(
     )
     .await?;
 
-    // Create an AccessEvent logs showing that the tenant accessed these fields
-    // TODO potentially log encrypted email as well attributing it to specific person
-    let events = fields_to_decrypt
-        .iter()
-        .map(|data_kind| NewAccessEvent {
-            onboarding_id: onboarding.id.clone(),
-            data_kind: *data_kind,
-            reason: request.reason.clone(),
-            principal: principal.clone(),
-        })
-        .collect();
-    NewAccessEventBatch {
-        events,
+    // Create an AccessEvent log showing that the tenant accessed these fields
+    NewAccessEvent {
+        onboarding_id: onboarding.id.clone(),
+        data_kinds: fields_to_decrypt.clone(),
+        reason: request.reason.clone(),
+        principal: principal.clone(),
         insight: CreateInsightEvent::from(insights),
     }
-    .bulk_insert(&state.db_pool)
+    .save(&state.db_pool)
     .await?;
 
     Ok(Json(ApiResponseData { data: result_map }))

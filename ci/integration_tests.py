@@ -522,8 +522,8 @@ def test_access_events_list(request, workos_tenant):
     )
     body = _assert_response(r)
     access_events = body["data"]
-    assert len(access_events) == 5
-    assert set(i["data_kind"] for i in access_events) == {"first_name", "email", "zip", "country", "last_four_ssn"}
+    assert len(access_events) == 1
+    assert set(access_events[0]["data_kinds"]) == {"first_name", "email", "zip", "country", "last_four_ssn"}
 
     # Test filtering on kind
     path = f"org/access_events?footprint_user_id={fp_user_id}&data_kind=email"
@@ -534,7 +534,7 @@ def test_access_events_list(request, workos_tenant):
     body = _assert_response(r)
     access_events = body["data"]
     assert len(access_events) == 1
-    assert access_events[0]["data_kind"] == "email"
+    assert "email" in set(access_events[0]["data_kinds"])
 
 def test_logged_in_user_detail(request):
     # Get the user detail using the logged in context
@@ -559,8 +559,8 @@ def test_logged_in_access_events(request):
     )
     body = _assert_response(r)
     access_events = body["data"]
-    assert len(access_events) == 5
-    assert set(i["data_kind"] for i in access_events) == {"first_name", "email", "zip", "country", "last_four_ssn"}
+    assert len(access_events) == 1
+    assert set(access_events[0]["data_kinds"]) == {"first_name", "email", "zip", "country", "last_four_ssn"}
 
 '''TODO: user log in token is different from token tenant receives on behalf of the user 
 -- this request receives a 401 because the tenant is not able to decrypt attributes within
