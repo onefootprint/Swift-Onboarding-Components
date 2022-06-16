@@ -123,7 +123,7 @@ def foo_tenant():
 
 # cleanup before running in the case something crashed in the middle of execution
 def test_cleanup_integration_tests_prior(request):
-    path = "private/cleanup"
+    path = "private/cleanup?phone_number={0}".format(PHONE_NUMBER)
     r = requests.post(
         url(path),
     )
@@ -670,7 +670,7 @@ def test_change_attributes(request, workos_tenant):
     _assert_response(r)
 
 def test_cleanup_integration_tests(request):
-    path = "private/cleanup"
+    path = "private/cleanup?phone_number={0}".format(PHONE_NUMBER)
     r = requests.post(
         url(path),
     )
