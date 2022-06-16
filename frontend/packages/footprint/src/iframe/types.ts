@@ -19,8 +19,14 @@ export type PublicEvent = 'completed' | 'failed' | 'userCanceled';
 
 export type Event = PrivateEvent | PublicEvent;
 
+export type RenderOptions = {
+  container: HTMLElement;
+  classList?: string[];
+  urlHash: string;
+};
+
 export type IframeManager = {
-  render(container: HTMLElement, iframeClassList?: string[]): void;
+  render(options: RenderOptions): void;
   destroy(): void;
   on(eventName: Event, callback: (data?: any) => void): void;
 };

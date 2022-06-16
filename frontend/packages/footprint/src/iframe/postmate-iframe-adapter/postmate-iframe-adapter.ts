@@ -1,26 +1,28 @@
 import Postmate from 'postmate';
 
-import { Event, IframeManager } from '../types';
+import { Event, IframeManager, RenderOptions } from '../types';
 
 const iframeName = 'footprint-iframe';
 
-class PostmateAdapter implements IframeManager {
-  child: Postmate.ParentAPI | null = null;
+class PostmateIframeAdapter implements IframeManager {
+  private child: Postmate.ParentAPI | null = null;
 
   constructor(private iframeUrl: string) {}
 
-  async render(container: HTMLElement, iframeClassList = []) {
+  async render({ container, classList, urlHash }: RenderOptions) {
     const child = await new Postmate({
+      classListArray: classList,
       container,
-      url: this.iframeUrl,
       name: iframeName,
-      classListArray: iframeClassList,
+      url: `${this.iframeUrl}#${urlHash}`,
     });
     const iframe = document.querySelector(`[name=${iframeName}]`);
-    iframe?.setAttribute(
-      'allow',
-      'otp-credentials; publickey-credentials-get *',
-    );
+    if (iframe) {
+      iframe.setAttribute(
+        'allow',
+        'otp-credentials; publickey-credentials-get *',
+      );
+    }
     this.child = child;
   }
 
@@ -40,4 +42,4 @@ class PostmateAdapter implements IframeManager {
   }
 }
 
-export default PostmateAdapter;
+export default PostmateIframeAdapter;

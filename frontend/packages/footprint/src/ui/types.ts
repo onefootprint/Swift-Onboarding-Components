@@ -1,4 +1,4 @@
-import { Event } from '../iframe-manager';
+import { Event } from '../iframe';
 
 export enum Appearance {
   dark = 'dark',
@@ -10,6 +10,7 @@ export type OpenOptions = {
   appearance?: Appearance;
   locale?: 'EN';
   tracking?: Record<string, string | number | boolean>;
+  urlHash: string;
 };
 
 export type UIManager = {

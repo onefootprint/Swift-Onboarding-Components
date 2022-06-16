@@ -1,6 +1,6 @@
 import Footprint from './footprint';
-import PostmateAdapter from './iframe-manager/postmate-adapter';
-import VanillaAdapter from './ui-manager/vanilla-adapter';
+import PostmateAdapter from './iframe/postmate-iframe-adapter';
+import VanillaAdapter from './ui/vanilla-ui-adapter.ts';
 
 // TODO: AJUST
 const iframeUrl =

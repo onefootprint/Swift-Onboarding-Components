@@ -1,4 +1,4 @@
-import { OpenOptions } from '../ui-manager';
+import { OpenOptions } from '../ui';
 
 export type InitOptions = {
   publicKey: string;

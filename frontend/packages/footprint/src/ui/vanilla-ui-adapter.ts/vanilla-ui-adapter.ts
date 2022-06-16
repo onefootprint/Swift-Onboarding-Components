@@ -1,25 +1,26 @@
-import { IframeManager, PublicEvent } from '../../iframe-manager';
+import { IframeManager, PublicEvent } from '../../iframe';
 import { OpenOptions, UIManager } from '../types';
-import createCSSClasses from './vanilla-adapter.utils';
+import createCSSClasses from './vanilla-ui-adapter.utils';
 
 const containerId = 'footprint-container';
 const overlayId = 'footprint-overlay';
 const isSSR = typeof window === 'undefined';
 
-class VanillaAdapter implements UIManager {
+class VanillaUiAdapter implements UIManager {
   constructor(private iframeManager: IframeManager) {
     if (!isSSR) {
       createCSSClasses();
     }
   }
 
-  async show(options?: OpenOptions) {
-    // TODO: Implement
-    // https://linear.app/footprint/issue/FP-180/fooprintjs-inject-data
-    console.log('options', options);
+  async show({ urlHash }: OpenOptions) {
     const container = this.createContainer();
     this.showOverlay(container);
-    await this.iframeManager.render(container, ['footprint-modal']);
+    await this.iframeManager.render({
+      container,
+      classList: ['footprint-modal'],
+      urlHash,
+    });
     this.iframeManager.on('closed', () => this.close());
   }
 
@@ -58,4 +59,4 @@ class VanillaAdapter implements UIManager {
   }
 }
 
-export default VanillaAdapter;
+export default VanillaUiAdapter;
