@@ -13,6 +13,7 @@ pub struct ApiAccessEvent {
     pub reason: String,
     pub principal: Option<String>,
     pub timestamp: chrono::NaiveDateTime,
+    pub ordering_id: i64,
     pub insight_event: Option<ApiInsightEvent>,
 }
 
@@ -25,6 +26,7 @@ impl From<(AccessEvent, Onboarding, Option<InsightEvent>)> for ApiAccessEvent {
             reason: s.0.reason,
             principal: s.0.principal,
             timestamp: s.0.timestamp,
+            ordering_id: s.0.ordering_id,
             insight_event: s.2.map(ApiInsightEvent::from),
         }
     }

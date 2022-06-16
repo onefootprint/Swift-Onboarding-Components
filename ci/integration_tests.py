@@ -498,30 +498,43 @@ def test_identify_repeat_customer(request, foo_tenant):
     assert fp_user_id
     old_fp_user_id = request.config.cache.get("fp_user_id", None)
     assert old_fp_user_id != fp_user_id, "Different tenants should have different fp_user_ids"
+
+FIELDS_TO_DECRYPT = [
+    ["last_name", "ssn"],
+    ["street_address"],
+    ["first_name", "email", "zip", "country", "last_four_ssn"],
+]
     
 def test_tenant_decrypt(request, workos_tenant):
     path = "org/decrypt"
     print(url(path))
-    data = {
-        "footprint_user_id": request.config.cache.get("fp_user_id", None),
-        "attributes": ["first_name", "email", "zip", "country", "last_four_ssn"],
-        "reason": "Doing a hecking decrypt",
-    }
-    print(data)
-    r = requests.post(
-        url(path),
-        headers=_client_priv_key_headers(workos_tenant["sk"]),  
-        json=data,
+    expected_data = dict(
+        first_name="Flerp2",
+        last_name="Derp2",
+        email=request.config.cache.get("email", None),
+        street_address="1 Footprint Way",
+        zip="10009",
+        country="USA",
+        ssn=request.config.cache.get("ssn", None),
+        last_four_ssn=request.config.cache.get("ssn", None)[-4:],
     )
-    body = _assert_response(r)
-    attributes = body["data"]
-    print(attributes)
-    print(request.config.cache.get("ssn", None))
-    assert attributes["first_name"] == "Flerp2"
-    assert attributes["zip"] == "10009"
-    assert attributes["last_four_ssn"] == request.config.cache.get("ssn", None)[-4:]
-    assert attributes["country"] == "USA"
-    assert attributes["email"] == request.config.cache.get("email", None)
+    for attributes in FIELDS_TO_DECRYPT:
+        data = {
+            "footprint_user_id": request.config.cache.get("fp_user_id", None),
+            "attributes": attributes,
+            "reason": "Doing a hecking decrypt",
+        }
+        print(data)
+        r = requests.post(
+            url(path),
+            headers=_client_priv_key_headers(workos_tenant["sk"]),
+            json=data,
+        )
+        body = _assert_response(r)
+        print(body)
+        attributes = body["data"]
+        for data_kind, value in attributes.items():
+            assert expected_data[data_kind] == value
     
 def test_onboardings_list(request, workos_tenant):
     path = "org/onboardings"
@@ -547,8 +560,9 @@ def test_access_events_list(request, workos_tenant):
     )
     body = _assert_response(r)
     access_events = body["data"]
-    assert len(access_events) == 1
-    assert set(access_events[0]["data_kinds"]) == {"first_name", "email", "zip", "country", "last_four_ssn"}
+    assert len(access_events) == len(FIELDS_TO_DECRYPT)
+    for i, expected_fields in enumerate(FIELDS_TO_DECRYPT[-1:0]):
+        assert set(access_events[i]["data_kinds"]) == set(expected_fields)
 
     # Test filtering on kind
     path = f"org/access_events?footprint_user_id={fp_user_id}&data_kind=email"
@@ -584,8 +598,9 @@ def test_logged_in_access_events(request):
     )
     body = _assert_response(r)
     access_events = body["data"]
-    assert len(access_events) == 1
-    assert set(access_events[0]["data_kinds"]) == {"first_name", "email", "zip", "country", "last_four_ssn"}
+    assert len(access_events) == len(FIELDS_TO_DECRYPT)
+    for i, expected_fields in enumerate(FIELDS_TO_DECRYPT[-1:0]):
+        assert set(access_events[i]["data_kinds"]) == set(expected_fields)
 
 '''TODO: user log in token is different from token tenant receives on behalf of the user 
 -- this request receives a 401 because the tenant is not able to decrypt attributes within

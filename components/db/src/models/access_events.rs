@@ -20,6 +20,7 @@ pub struct AccessEvent {
     pub reason: String,
     pub principal: Option<String>,
     pub data_kinds: Vec<DataKind>,
+    pub ordering_id: i64,
 }
 
 #[derive(Debug, Clone)]

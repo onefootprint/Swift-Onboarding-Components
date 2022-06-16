@@ -23,3 +23,27 @@ where
         actix_web::HttpResponse::build(actix_web::http::StatusCode::OK).json(self)
     }
 }
+
+#[derive(Debug, Clone, serde::Serialize, Apiv2Schema)]
+pub struct ApiPaginatedResponseData<T, C> {
+    pub data: T,
+    pub next: Option<C>,
+}
+
+impl<T, C> ApiPaginatedResponseData<T, C> {
+    pub fn ok(data: T, next: Option<C>) -> Self {
+        Self { data, next }
+    }
+}
+
+impl<T, C> Responder for ApiPaginatedResponseData<T, C>
+where
+    T: Serialize,
+    C: Serialize,
+{
+    type Body = actix_web::body::BoxBody;
+
+    fn respond_to(self, _req: &actix_web::HttpRequest) -> actix_web::HttpResponse<Self::Body> {
+        actix_web::HttpResponse::build(actix_web::http::StatusCode::OK).json(self)
+    }
+}

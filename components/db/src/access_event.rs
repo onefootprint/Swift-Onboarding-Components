@@ -16,6 +16,8 @@ pub async fn list_for_tenant(
     tenant_id: TenantId,
     fp_user_id: Option<FootprintUserId>,
     kind: Option<DataKind>,
+    cursor: Option<i64>,
+    page_size: i64,
 ) -> Result<Vec<(AccessEvent, Onboarding, Option<InsightEvent>)>, DbError> {
     let conn = pool.get().await?;
     let result = conn
@@ -26,8 +28,9 @@ pub async fn list_for_tenant(
                     schema::insight_events::table
                         .on(schema::access_events::insight_event_id.eq(schema::insight_events::id)),
                 )
-                .order_by(schema::access_events::timestamp.desc())
+                .order_by(schema::access_events::ordering_id.desc())
                 .filter(schema::onboardings::tenant_id.eq(tenant_id))
+                .limit(page_size)
                 .into_boxed();
 
             if let Some(fp_user_id) = fp_user_id {
@@ -36,6 +39,10 @@ pub async fn list_for_tenant(
 
             if let Some(kind) = kind {
                 results = results.filter(schema::access_events::data_kinds.contains(vec![kind]));
+            }
+
+            if let Some(cursor) = cursor {
+                results = results.filter(schema::access_events::ordering_id.le(cursor));
             }
 
             results.load(conn)

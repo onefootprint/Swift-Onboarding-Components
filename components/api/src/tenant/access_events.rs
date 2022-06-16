@@ -1,7 +1,7 @@
 use crate::auth::client_secret_key::SecretTenantAuthContext;
 use crate::auth::either::Either;
 use crate::types::access_event::ApiAccessEvent;
-use crate::types::success::ApiResponseData;
+use crate::types::success::ApiPaginatedResponseData;
 use crate::State;
 use crate::{auth::session_context::SessionContext, errors::ApiError};
 use newtypes::{tenant::workos::WorkOsSession, DataKind, FootprintUserId};
@@ -12,6 +12,8 @@ use paperclip::actix::{api_v2_operation, get, web, web::Json, Apiv2Schema};
 struct AccessEventRequest {
     footprint_user_id: Option<FootprintUserId>,
     data_kind: Option<DataKind>,
+    cursor: Option<i64>,
+    page_size: Option<usize>,
 }
 
 type AccessEventResponse = Vec<ApiAccessEvent>;
@@ -25,19 +27,41 @@ fn handler(
     state: web::Data<State>,
     request: web::Query<AccessEventRequest>,
     auth: Either<SessionContext<WorkOsSession>, SecretTenantAuthContext>,
-) -> actix_web::Result<Json<ApiResponseData<AccessEventResponse>>, ApiError> {
-    // TODO potentially retrieve decrypted email for who performed the access event
+) -> actix_web::Result<Json<ApiPaginatedResponseData<AccessEventResponse, i64>>, ApiError> {
+    let AccessEventRequest {
+        footprint_user_id,
+        data_kind,
+        cursor,
+        page_size,
+    } = request.into_inner();
+    let page_size = if let Some(page_size) = page_size {
+        page_size
+    } else {
+        state.config.default_page_size
+    };
+
     let tenant = auth.tenant(&state.db_pool).await?;
     let results = db::access_event::list_for_tenant(
         &state.db_pool,
         tenant.id.clone(),
-        request.footprint_user_id.clone(),
-        request.data_kind.map(DataKind::from),
+        footprint_user_id.clone(),
+        data_kind,
+        cursor,
+        (page_size + 1).try_into().unwrap(),
     )
-    .await?
-    .into_iter()
-    .map(ApiAccessEvent::from)
-    .collect::<Vec<ApiAccessEvent>>();
+    .await?;
 
-    Ok(Json(ApiResponseData { data: results }))
+    // If there are more than page_size results, we should tell the client there's another page
+    let cursor = if results.len() > page_size {
+        results.last().map(|x| x.0.ordering_id)
+    } else {
+        None
+    };
+
+    let response = results
+        .into_iter()
+        .take(page_size)
+        .map(ApiAccessEvent::from)
+        .collect::<Vec<ApiAccessEvent>>();
+    Ok(Json(ApiPaginatedResponseData::ok(response, cursor)))
 }

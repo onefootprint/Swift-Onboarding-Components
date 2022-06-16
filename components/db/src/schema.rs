@@ -12,6 +12,7 @@ table! {
         reason -> Varchar,
         principal -> Nullable<Varchar>,
         data_kinds -> Array<Data_kind>,
+        ordering_id -> Int8,
     }
 }
 

@@ -1,0 +1,1 @@
+ALTER TABLE access_events ADD COLUMN ordering_id BIGSERIAL NOT NULL;

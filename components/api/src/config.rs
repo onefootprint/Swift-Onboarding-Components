@@ -80,6 +80,9 @@ pub struct Config {
 
     #[envconfig(from = "SENTRY_URL")]
     pub sentry_url: String,
+
+    #[envconfig(from = "DEFAULT_PAGE_SIZE", default = "10")]
+    pub default_page_size: usize,
 }
 
 impl Config {
