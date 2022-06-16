@@ -57,9 +57,8 @@
     "tsconfig": "*",
     "typescript": "^4.5.3",
     "use-places-autocomplete": "^2.0.0",
-    "webpack": "*"
-  },
-  "dependencies": {
-    "@tanstack/virtual-core": "^3.0.0-alpha.1"
+    "webpack": "*",
+    "@tanstack/virtual-core": "^3.0.0-alpha.1",
+    "focus-trap-react": "^9.0.1"
   }
 }

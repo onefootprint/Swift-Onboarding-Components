@@ -81,46 +81,39 @@ const ButtonContainer = styled.button<{
     text-decoration: none;
     user-select: none;
   `}
-
   ${({ theme, size }) =>
     size === 'default' &&
     css`
       ${createFontStyles('label-2')};
       padding: ${theme.spacing[4]}px ${theme.spacing[7]}px;
     `}
-
   ${({ theme, size }) =>
     size === 'compact' &&
     css`
       ${createFontStyles('label-3')};
       padding: ${theme.spacing[1] + theme.spacing[3]}px ${theme.spacing[7]}px;
     `}
-
     ${({ theme, size }) =>
     size === 'small' &&
     css`
       ${createFontStyles('label-4')};
       padding: ${theme.spacing[2]}px ${theme.spacing[4]}px;
     `}
-
     ${({ theme, size }) =>
     size === 'large' &&
     css`
       ${createFontStyles('label-1')};
       padding: ${theme.spacing[5]}px ${theme.spacing[7]}px;
     `}
-
   ${({ fullWidth }) =>
     fullWidth &&
     css`
       width: 100%;
     `}
-
   &:disabled {
     cursor: not-allowed;
     opacity: 0.5;
   }
-
   &:hover:enabled {
     ${({ variant }) => css`
       ${createOverlayBackground(
@@ -129,7 +122,6 @@ const ButtonContainer = styled.button<{
       )}
     `}
   }
-
   &:active:enabled {
     ${({ variant }) => css`
       ${createOverlayBackground(

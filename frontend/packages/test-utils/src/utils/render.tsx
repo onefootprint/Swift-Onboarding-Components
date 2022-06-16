@@ -11,7 +11,7 @@ import throwOnConsoleErrors from './console-error';
 const { light } = themes;
 
 type WrapperProps = {
-  children: JSX.Element;
+  children: React.ReactNode;
 };
 
 export const Wrapper = ({ children }: WrapperProps) => (
@@ -20,9 +20,14 @@ export const Wrapper = ({ children }: WrapperProps) => (
   </FootprintProvider>
 );
 
-export const customRender = (Component: JSX.Element) => {
+export const customRender = (Component: React.ReactNode) => {
   throwOnConsoleErrors();
-  return render(<Wrapper>{Component}</Wrapper>);
+  return render(
+    <Wrapper>
+      <div id="footprint-portal" />
+      {Component}
+    </Wrapper>,
+  );
 };
 
 export * from '@testing-library/react';

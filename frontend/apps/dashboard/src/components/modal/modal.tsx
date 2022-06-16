@@ -117,7 +117,7 @@ const Mask = styled.div`
   height: 100%;
 
   ${({ theme }) => css`
-    z-index: ${theme.zIndex.modal};
+    z-index: ${theme.zIndex.dialog};
     background-color: ${rgba(theme.backgroundColor.tertiary, 0.5)};
   `}
 `;

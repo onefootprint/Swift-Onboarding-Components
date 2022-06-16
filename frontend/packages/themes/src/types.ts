@@ -149,7 +149,8 @@ export type BorderColor = keyof BorderColors;
 export type ZIndexes = {
   dropdown: number;
   sticky: number;
-  modal: number;
+  dialog: number;
+  overlay: number;
 };
 
 export type Theme = {
