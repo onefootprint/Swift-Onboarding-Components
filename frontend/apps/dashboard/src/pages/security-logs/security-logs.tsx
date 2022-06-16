@@ -1,7 +1,5 @@
-import { groupBy, omit } from 'lodash';
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import Timeline from 'src/components/timeline';
-import { AccessEvent, DataKind, InsightEvent } from 'src/types';
 import styled, { css } from 'styled-components';
 import { Box, Button, Code, Divider, SearchInput, Typography } from 'ui';
 
@@ -9,39 +7,10 @@ import Dot from './components/dot';
 import FieldTagList from './components/field-tag-list';
 import useGetAccessEvents from './hooks/use-get-access-events';
 
-type AggregatedAccessEvent = {
-  dataKinds: DataKind[];
-  fpUserId: string;
-  reason: string;
-  tenantId: string;
-  timestamp: string;
-  principal?: string;
-  insightEvent: InsightEvent;
-};
-
-const getKey = (e: AccessEvent) => Object.values(omit(e, 'dataKind'));
-
 const SecurityLogs = () => {
   const [searchText, setSearchText] = useState('');
   const getAccessEvents = useGetAccessEvents();
-
-  const aggregatedAccessEvents = useMemo(() => {
-    // If multiple pieces of data were decrypted at the same time, there will be one access event
-    // for each field decrypted.
-    // Aggregate events for the same user with temporal locality and display them in a single row.
-    const accessEvents = getAccessEvents.data || [];
-    return Object.values(groupBy(accessEvents, getKey)).map(events => {
-      const dataKinds = events.reduce(
-        (kinds: DataKind[], event: AccessEvent) => [...kinds, event.dataKind],
-        [],
-      );
-      return {
-        ...omit(events[0], 'dataKind'),
-        dataKinds,
-      } as AggregatedAccessEvent;
-    });
-  }, [getAccessEvents.data]);
-
+  const accessEvents = getAccessEvents.data || [];
   return (
     <>
       <Typography variant="heading-2">Security logs</Typography>
@@ -60,7 +29,7 @@ const SecurityLogs = () => {
       </Box>
       <Timeline
         connectorVariant="tight"
-        items={aggregatedAccessEvents.map(item => {
+        items={accessEvents.map(item => {
           const headerComponent = (
             <Typography variant="body-3">
               <FieldTagList dataKinds={item.dataKinds} />{' '}
