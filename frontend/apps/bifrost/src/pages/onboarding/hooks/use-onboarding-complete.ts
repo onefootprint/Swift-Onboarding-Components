@@ -18,7 +18,7 @@ const onboardingCompleteRequest = async (
     RequestResponse<OnboardingCompleteResponse>
   >({
     method: 'POST',
-    url: '/user/data',
+    url: '/onboarding/complete',
     headers: {
       [BIFROST_AUTH_HEADER]: payload.authToken,
     },

@@ -1,4 +1,5 @@
 import useBifrostMachine from 'src/hooks/use-bifrost-machine';
+import { hasMissingAttributes } from 'src/utils/state-machine/onboarding/utils/missing-attributes';
 import { UserData } from 'src/utils/state-machine/types';
 
 import useOnboardingComplete from './use-onboarding-complete';
@@ -11,23 +12,17 @@ const useSyncData = () => {
   const userDataMutation = useUserData();
   const onboardingCompleteMutation = useOnboardingComplete();
 
-  const hasMissingAttributes = () => {
-    const { missingAttributes } = state.context.onboarding;
-    return missingAttributes.length > 0;
-  };
-
-  const getAuthToken = () => state.context.authToken;
-
   const completeOnboarding = () => {
-    const authToken = getAuthToken();
-    if (!hasMissingAttributes() || !authToken) {
+    const { authToken } = state.context;
+    const { missingAttributes, data } = state.context.onboarding;
+    if (hasMissingAttributes(missingAttributes, data) || !authToken) {
       return;
     }
     onboardingCompleteMutation.mutate({ authToken });
   };
 
   return (data: UserData) => {
-    const authToken = getAuthToken();
+    const { authToken } = state.context;
     if (!authToken) {
       return;
     }
