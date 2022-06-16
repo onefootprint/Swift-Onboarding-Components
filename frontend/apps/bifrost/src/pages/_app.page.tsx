@@ -91,7 +91,7 @@ const Content = styled.div`
 
     ${media.greaterThan('md')`
       background-color: ${theme.backgroundColor.primary};
-      padding: 0 ${theme.spacing[7]}px ${theme.spacing[8]}px;
+      padding: 0 ${theme.spacing[7]}px ${theme.spacing[7]}px;
     `}
   `}
 `;

@@ -57,7 +57,7 @@ const BaseInput = forwardRef<HTMLInputElement, AllInputProps>(
     };
 
     return (
-      <>
+      <div>
         {label && <Label htmlFor={id}>{label}</Label>}
         <InputContainer>
           {prefixElement && <PrefixContainer>{prefixElement}</PrefixContainer>}
@@ -84,7 +84,7 @@ const BaseInput = forwardRef<HTMLInputElement, AllInputProps>(
         {hintText && (
           <Hint color={hasError ? 'error' : 'tertiary'}>{hintText}</Hint>
         )}
-      </>
+      </div>
     );
   },
 );

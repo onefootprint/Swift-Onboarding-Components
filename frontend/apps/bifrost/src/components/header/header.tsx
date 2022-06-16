@@ -4,16 +4,21 @@ import styled, { css } from 'styled-components';
 import CloseButton from '../close-button';
 
 const Header = () => (
-  <Container id="main-header">
+  <HeaderContainer id="main-header">
     <CloseButton />
-  </Container>
+  </HeaderContainer>
 );
 
-const Container = styled.header`
+const HeaderContainer = styled.header`
   ${({ theme }) => css`
     padding: ${theme.spacing[5]}px 0 ${theme.spacing[3]}px;
     display: flex;
     align-items: center;
+
+    button {
+      position: relative;
+      left: -${theme.spacing[3]}px;
+    }
   `}
 `;
 

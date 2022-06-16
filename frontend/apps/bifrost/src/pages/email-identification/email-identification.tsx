@@ -2,8 +2,9 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import { UserData, UserDataAttribute } from 'src/utils/state-machine/types';
 import styled, { css } from 'styled-components';
-import { Button, TextInput, Typography } from 'ui';
+import { Button, TextInput } from 'ui';
 
+import HeaderTitle from '../../components/header-title';
 import useEmailIdentify from './hooks/use-email-identify';
 
 type FormData = Required<Pick<UserData, UserDataAttribute.email>>;
@@ -24,14 +25,10 @@ const EmailIdentification = () => {
 
   return (
     <Form onSubmit={handleSubmit(onSubmit)}>
-      <TextContainer>
-        <Typography variant="heading-2" color="primary">
-          Hey there! 👋
-        </Typography>
-        <Typography variant="body-2" color="secondary">
-          Enter your email to get started.
-        </Typography>
-      </TextContainer>
+      <HeaderTitle
+        title="Hey there! 👋"
+        subtitle="Enter your email to get started."
+      />
       <TextInput
         hasError={!!errors.email}
         hintText={errors.email && 'Email is required'}
@@ -52,10 +49,6 @@ const Form = styled.form`
     display: grid;
     row-gap: ${theme.spacing[7]}px;
   `}
-`;
-
-const TextContainer = styled.div`
-  text-align: center;
 `;
 
 export default EmailIdentification;

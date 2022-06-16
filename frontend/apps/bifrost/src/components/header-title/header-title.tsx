@@ -9,10 +9,15 @@ export type HeaderTitleProps = {
 
 const HeaderTitle = ({ title, subtitle }: HeaderTitleProps) => (
   <Container>
-    <Typography variant="heading-2" color="primary" sx={{ marginBottom: 3 }}>
+    <Typography
+      variant="heading-3"
+      color="primary"
+      sx={{ marginBottom: 2 }}
+      as="h2"
+    >
       {title}
     </Typography>
-    <Typography variant="body-2" color="secondary">
+    <Typography variant="body-2" color="secondary" as="h3">
       {subtitle}
     </Typography>
   </Container>
