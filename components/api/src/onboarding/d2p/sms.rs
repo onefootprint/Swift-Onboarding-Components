@@ -1,13 +1,13 @@
-use crate::auth::session_context::SessionContext;
 use crate::errors::ApiError;
 use crate::types::success::ApiResponseData;
 use crate::types::Empty;
-use crate::utils::phone::{rate_limit, send_sms};
 use crate::utils::user_vault_wrapper::UserVaultWrapper;
 use crate::State;
+use crate::{auth::session_context::SessionContext};
 use newtypes::user::d2p::D2pSession;
-use newtypes::DataKind;
+use newtypes::{DataKind, PhoneNumber};
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
+use std::str::FromStr;
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
 pub struct D2pSmsRequest {
@@ -29,13 +29,20 @@ pub fn handler(
         .await?
         .ok_or(ApiError::NoPhoneNumberForVault)?;
 
-    rate_limit(&state, phone_number.clone(), "d2p_session").await?;
+    let client = awc::Client::default();
+    let twilio_client = &state.twilio_client;
+    let phone_number: PhoneNumber = PhoneNumber::from_str(phone_number.as_str()).map_err(ApiError::TypeDeserializationError)?;
+    let phone_number = twilio_client.standardize(&client, phone_number).await?;
+    twilio_client
+        .send_d2p(
+            &client,
+            &state.db_pool,
+            phone_number,
+            request.base_url.clone(),
+            user_auth.auth_token,
+        )
+        .await?;
 
-    let message_body = format!(
-        "Hello from Footprint! Continue signing up for your account here: {}#{}",
-        request.base_url, user_auth.auth_token
-    );
-    send_sms(&state, phone_number, message_body).await?;
 
     Ok(Json(ApiResponseData { data: Empty }))
 }

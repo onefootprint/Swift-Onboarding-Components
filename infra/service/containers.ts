@@ -37,7 +37,9 @@ export abstract class ServiceContainers {
                 secretsStore.cookieSessionKey.arn,
                 signingKeyDescriptor.rootKeyId,
                 secretsStore.workosSecretKey.arn,
-            ]).apply(([rootKeyId, enclaveAccessKeyId, enclaveUserArn, databaseUrlArn, cookieSessionKeyArn, signingKeyId, workosSecretKey]) => {
+                secretsStore.twilioApiKey.arn,
+                secretsStore.twilioApiKeySecret.arn,
+            ]).apply(([rootKeyId, enclaveAccessKeyId, enclaveUserArn, databaseUrlArn, cookieSessionKeyArn, signingKeyId, workosSecretKey, twilioApiKey, twilioApiKeySecret]) => {
                 const def = [{
                     name,
                     image,
@@ -58,7 +60,16 @@ export abstract class ServiceContainers {
                         {
                             name: "WORKOS_API_KEY",
                             valueFrom: workosSecretKey
-                        }
+                        },
+                        {
+                            name: "TWILIO_API_KEY",
+                            valueFrom: twilioApiKey
+                        },
+                        {
+                            name: "TWILIO_API_KEY_SECRET",
+                            valueFrom: twilioApiKeySecret
+                        },
+
                     ],
                     environment: [
                         {
@@ -116,7 +127,20 @@ export abstract class ServiceContainers {
                         {
                             name: "SERVICE_ENVIRONMENT",
                             value: serviceEnvironment
-                        }
+                        },
+                        {
+                            name: "TWILIO_ACCOUNT_SID",
+                            value: constants.twilio.accountSid
+                        },
+                        {
+                            name: "TWILIO_PHONE_NUMBER",
+                            value: constants.twilio.phoneNumber
+                        },
+                        {
+                            name: "INTEGRATION_TEST_PHONE_NUMBER",
+                            value: constants.twilio.integrationTestPhoneNumber
+                        },
+
                     ],
                     links: ["otelcollect:otelcollect"],
                     dependsOn: [{ containerName: otelCollector.name, condition: "START" }],

@@ -1,4 +1,5 @@
 use envconfig::Envconfig;
+use newtypes::PhoneNumber;
 
 #[derive(Envconfig, Clone)]
 pub struct Config {
@@ -62,8 +63,20 @@ pub struct Config {
     #[envconfig(from = "TIME_S_BETWEEN_SMS_CHALLENGES", default = "15")]
     pub time_s_between_sms_challenges: i64,
 
-    #[envconfig(from = "INTEGRATION_TEST_PHONE_NUMBER", default = "+1 (555) 555-0101")]
-    pub integration_test_phone_number: String,
+    #[envconfig(from = "INTEGRATION_TEST_PHONE_NUMBER", default = "+1 339 331 1410")]
+    pub integration_test_phone_number: PhoneNumber,
+
+    #[envconfig(from = "TWILIO_API_KEY")]
+    pub twilio_api_key: String,
+
+    #[envconfig(from = "TWILIO_ACCOUNT_SID")]
+    pub twilio_acount_sid: String,
+
+    #[envconfig(from = "TWILIO_API_KEY_SECRET")]
+    pub twilio_api_key_secret: String,
+
+    #[envconfig(from = "TWILIO_PHONE_NUMBER")]
+    pub twilio_phone_number: String,
 
     #[envconfig(from = "SENTRY_URL")]
     pub sentry_url: String,

@@ -17,13 +17,21 @@ config:
     jumpBoxSSHPublicKey: ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIA/XaCZkbkXLPM+buT9s/2Y+2Mur1erjX/OP/mN7yRPn
     rootDomain: infra.footprint.dev
     rpId: footprint.dev
+    sentryUrl:
+      secure: v1:Ppt53FIYgHl6OQN8:eV5cnm9Eqlo1XPMv/nXYd7V7HqgeizALAvdntlpsutbGsFln9Di1hnf8kMogZJj6JVw8ECgFDbo3WUYScuXlKfI6zmp7tjwYG5lO2M8/ycL1qBbJV+teR3zL
+    twilio:
+      accountSid: AC675cd7f6557fb29b4fd3483fe49f6ff0
+      apiKey: 
+        secure: v1:TddbkBlhZ7cYtOFN:ZsI5nrIil+wAJHlVffj8YcI8sn82QZuLxbb8E2ekbBg4TUAqffmXMvNoahef/hyzKnc=
+      apiKeySecret: 
+        secure: v1:Mj1lvo0d2hHkitB4:bc7qwKQOSkoIe0WhqEJ3nRIqGK4Zht2klh96woc9EL3HNBp8R9GAcmxuE2TbVJYt
+      integrationTestPhoneNumber: "+13393311410"
+      phoneNumber: "+15105883668"
     workos:
       clientId: client_01G371B7G8Y43RETQKQ0D63F88
       defaultOrg: org_01G39KR1V1E52JEZV6BYNG590J
       secretKey:
         secure: v1:UrxmsAzi5youwRK1:Jlywwi1ZR82IGh3ZSJe58HQmEni8yL5+Ff/3DPQbcMbN5qE2wTJ1Yuye4vhADlRDaCaZf5kBhZGWC3Uxx4SZ47wmg8b+C123NVk8K1ieVGqO6IYF4HTKNI8KsQFyv6MA3QbD
-    sentryUrl:
-      secure: v1:Ppt53FIYgHl6OQN8:eV5cnm9Eqlo1XPMv/nXYd7V7HqgeizALAvdntlpsutbGsFln9Di1hnf8kMogZJj6JVw8ECgFDbo3WUYScuXlKfI6zmp7tjwYG5lO2M8/ycL1qBbJV+teR3zL
   infra:jumpBoxSSHPrivateKey:
     secure: v1:NBzKv4tkQfZUrlcV:7UTaoa0u16GLio6PD+2/i0ibcGxt1xDyjhC0tTDF1n5o0eMyC+75X8QXxaj0tVTRzbJdcLytqhy+Z7Zu0NXZuqgDMQgyJay3Di3jASelCbV7WvNIy/b9/vC9pO579OhmvukOn+F5RtUw1NNBfbze9ZskEG0Xw1lkKjawkn8jos20MDfYZykecDsoaJVXeUtX6x2aiHcvkLpwY4g4soJRx7hMyTtpKE8Tf/Y9u32iTEgGLMW4iYokf1KeGbLFsKB4IXd8eeq+nqD+hDNs/BwpVe+B8/9ScxlysqbmySqpyavtQU14mmfA3ypVpwq7aR+JQXVUHKd+LeeMKK4ZIy98spiYNVGZQF0BwOgfTGlbFvezRFifgYCO+xVQn/fpLQS/alvY19A5vpJ1dXk6jHVaUlbj0xh+Q9oS9h+oS4QXcLq0JpgnmFyR1Uu34U1YF3XJu9adX+9/0R6h6tkXe63Yqrwh2xZezmJ+CtdP13jk3NuzcKJO79DSiaHTntrOb1XBL4jx7GoRk2UrQ4gydE7tIm+tzMCwdPrwYsoid5zXHb4mgXkaoLC7D4BS
   infra:tailscaleKey:

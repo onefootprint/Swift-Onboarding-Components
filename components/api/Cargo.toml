@@ -11,6 +11,7 @@ vsock = ["enclave_proxy/vsock"]
 
 [dependencies]
 actix-web = "4.0.1"
+async-trait = "0.1"
 env_logger = "0.9.0"
 log = "0.4.14"
 opentelemetry = { version = "0.17", features = [

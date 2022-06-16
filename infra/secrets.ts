@@ -16,11 +16,14 @@ export interface StaticSecrets {
     dbPassword: pulumi.Output<string>;
     cookieSessionKey: aws.ssm.Parameter;
     workosSecretKey: aws.ssm.Parameter;
+    twilioApiKey: aws.ssm.Parameter;
+    twilioApiKeySecret: aws.ssm.Parameter;
 }
 
 interface SecretConstants {
     elastic: ElasticSecrets;
-    workos: Workos
+    workos: Workos;
+    twilio: Twilio
 }
 
 interface ElasticSecrets {
@@ -30,6 +33,12 @@ interface ElasticSecrets {
 interface Workos {
     secretKey: string;
 }
+
+interface Twilio {
+    apiKey: string;
+    apiKeySecret: string;
+}
+
 
 export async function LoadSecrets(config: pulumi.Config, enclaveKeyDescriptor: EnclaveKeyDescriptor): Promise<StaticSecrets> {
     const cloudfrontSecret = new random.RandomString("cf-alb-pass", { length: 44 }).result;
@@ -82,6 +91,8 @@ export async function LoadSecrets(config: pulumi.Config, enclaveKeyDescriptor: E
             name: `/static_secrets/api-session-key-${stack}`,
         }),
         workosSecretKey: createSecretParameter(`workosSecretKey-${stack}`, secretConstants.workos.secretKey),
+        twilioApiKey: createSecretParameter(`twilioApiKey-${stack}`, secretConstants.twilio.apiKey),
+        twilioApiKeySecret: createSecretParameter(`twilioApiSecretKey-${stack}`, secretConstants.twilio.apiKeySecret),
     }
 }
 

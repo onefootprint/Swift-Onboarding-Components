@@ -80,14 +80,14 @@ pub enum ApiError {
     WebauthnCredentialsNotSet,
     #[error("Please wait {0} more seconds")]
     RateLimited(i64),
-    #[error("workos error: {0}")]
-    WorkOS(#[from] awc::error::SendRequestError),
-    #[error("workos decode error: {0}")]
-    WorkOsDecode(#[from] awc::error::JsonPayloadError),
+    #[error("error from workos: {0}")]
+    WorkOsError(String),
+    #[error("deserialization from external api error: {0}")]
+    DeserializationError(#[from] awc::error::JsonPayloadError),
     #[error("workos payload error: {0}")]
     WorkOsPayload(#[from] actix_web::error::PayloadError),
     #[error("invalid redirect header returned")]
-    WorkOsError(#[from] actix_web::http::header::ToStrError),
+    WorkOsRedirectError(#[from] actix_web::http::header::ToStrError),
     #[error("invalid response from WorkOS")]
     WorkOSError,
     #[error("workos profile not associated with client")]
@@ -100,6 +100,12 @@ pub enum ApiError {
     InvalidStatusTransition,
     #[error("invalid token for header")]
     InvalidTokenForHeader,
+    #[error("no area code set for phone number")]
+    CouldNotSanitizePhoneNumber,
+    #[error("twilio error creating message: {0}")]
+    TwilioError(String),
+    #[error("error deserializing type: {0}")]
+    TypeDeserializationError(String)
 }
 
 fn status_code_for_db_error(e: &DbError) -> StatusCode {
@@ -153,10 +159,10 @@ impl actix_web::ResponseError for ApiError {
             ApiError::KmsVerifyMacError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::WebauthnCredentialsNotSet => StatusCode::BAD_REQUEST,
             ApiError::RateLimited(_) => StatusCode::BAD_REQUEST,
-            ApiError::WorkOS(_) => StatusCode::INTERNAL_SERVER_ERROR,
-            ApiError::WorkOsDecode(_) => StatusCode::INTERNAL_SERVER_ERROR,
-            ApiError::WorkOsPayload(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::WorkOsError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            ApiError::DeserializationError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            ApiError::WorkOsPayload(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            ApiError::WorkOsRedirectError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::WorkOSError => StatusCode::INTERNAL_SERVER_ERROR,
             // This invariant should never be broken
             ApiError::NoPhoneNumberForVault => StatusCode::INTERNAL_SERVER_ERROR,
@@ -164,6 +170,9 @@ impl actix_web::ResponseError for ApiError {
             ApiError::InvalidStatusTransition => StatusCode::BAD_REQUEST,
             ApiError::InvalidTokenForHeader => StatusCode::BAD_REQUEST,
             ApiError::WorkOsProfileInvalid => StatusCode::INTERNAL_SERVER_ERROR,
+            ApiError::CouldNotSanitizePhoneNumber => StatusCode::BAD_REQUEST,
+            ApiError::TwilioError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            ApiError::TypeDeserializationError(_) => StatusCode::INTERNAL_SERVER_ERROR
         }
     }
 

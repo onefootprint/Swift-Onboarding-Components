@@ -1,3 +1,4 @@
+use super::{BiometricChallengeState, ChallengeKind, PhoneChallengeState};
 use crate::errors::ApiError;
 use crate::types::success::ApiResponseData;
 use crate::utils::challenge::{Challenge, ChallengeToken};
@@ -13,8 +14,6 @@ use db::models::user_vaults::{NewUserVaultReq, UserVault};
 use newtypes::user::onboarding::OnboardingSession;
 use newtypes::{DataKind, ServerSession, Status, UserVaultId};
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
-
-use super::{BiometricChallengeState, ChallengeKind, PhoneChallengeState};
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
 pub struct VerifyRequest {
@@ -99,9 +98,9 @@ async fn validate_sms_challenge(
         return Err(ApiError::ChallengeNotValid);
     }
 
-    // Fetch the user associated with this phone number
+
     let phone_number = challenge_data.data.phone_number;
-    let sh_phone_number = signed_hash(state, phone_number.clone()).await?;
+    let sh_phone_number = signed_hash(state, phone_number.e164.clone()).await?;
     let existing_user = db::user_vault::get_by_fingerprint(
         &state.db_pool,
         DataKind::PhoneNumber,
@@ -114,7 +113,7 @@ async fn validate_sms_challenge(
         Some(uv) => (uv.id, VerifyKind::UserInherited),
         None => {
             // The user does not exist. Create a new user vault
-            let user = create_new_user_vault(state, phone_number.clone()).await?;
+            let user = create_new_user_vault(state, phone_number.e164.clone()).await?;
             (user.id, VerifyKind::UserCreated)
         }
     };

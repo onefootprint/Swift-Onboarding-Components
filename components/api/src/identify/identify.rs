@@ -1,10 +1,13 @@
+use std::str::FromStr;
+
+use super::{BiometricChallengeState, ChallengeKind};
 use crate::errors::ApiError;
 use crate::types::success::ApiResponseData;
 use crate::utils::challenge::{Challenge, ChallengeToken};
 use crate::utils::crypto::signed_hash;
 use crate::utils::email::clean_email;
 use crate::utils::liveness::LivenessWebauthnConfig;
-use crate::utils::phone::clean_phone_number;
+use crate::utils::twilio::{TwilioClient};
 use crate::utils::user_vault_wrapper::UserVaultWrapper;
 use crate::State;
 use chrono::{Duration, Utc};
@@ -12,12 +15,10 @@ use crypto::serde_cbor;
 use db::models::user_vaults::UserVault;
 use db::models::webauthn_credential::WebauthnCredential;
 use db::webauthn_credentials::get_webauthn_creds;
-use newtypes::{DataKind, UserVaultId};
+use newtypes::{DataKind, UserVaultId, PhoneNumber};
 use paperclip::actix::{api_v2_operation, web, web::Json, Apiv2Schema};
 use webauthn_rs_core::proto::{Base64UrlSafeData, Credential, ParsedAttestation, ParsedAttestationData};
 use webauthn_rs_proto::{RegisteredExtensions, UserVerificationPolicy};
-
-use super::{send_phone_challenge, BiometricChallengeState, ChallengeKind};
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
 #[serde(rename_all = "snake_case")]
@@ -30,7 +31,7 @@ pub struct IdentifyRequest {
 #[serde(rename_all = "snake_case")]
 pub enum Identifier {
     Email(String),
-    PhoneNumber(String),
+    PhoneNumber(PhoneNumber),
 }
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Serialize)]
@@ -61,8 +62,12 @@ pub async fn handler(
         preferred_challenge_kind,
     } = request.into_inner();
 
+    // Fall back to SMS if the user requested webauthn but doesn't have any creds
+    let twilio_client = &state.twilio_client;
+    let client = awc::Client::default();
+
     // Look up existing user vault by identifier
-    let existing_user = if let Some(existing_user) = get_user_by_identifier(&state, identifier).await? {
+    let existing_user = if let Some(existing_user) = get_user_by_identifier(&state, identifier, &client, twilio_client).await? {
         existing_user
     } else {
         // The user vault doesn't exist. Just return that the user wasn't found
@@ -81,6 +86,10 @@ pub async fn handler(
         .get_decrypted_field(&state, DataKind::PhoneNumber)
         .await?
         .ok_or(ApiError::NoPhoneNumberForVault)?;
+    let sanitized_phone_number : PhoneNumber = PhoneNumber::from_str(phone_number.as_str()).map_err(ApiError::TypeDeserializationError)?;
+    let e164_phone_number = twilio_client.standardize(&client, sanitized_phone_number).await?;
+
+
 
     // Initiate the challenge of the requested type
     let (challenge_kind, challenge_token, biometric_challenge_json) = match preferred_challenge_kind {
@@ -91,13 +100,27 @@ pub async fn handler(
                     initiate_biometric_challenge_for_user(&state, &user_id, creds).await?;
                 (ChallengeKind::Biometric, challenge_token, Some(json))
             } else {
-                // Fall back to SMS if the user requested webauthn but doesn't have any creds
-                let challenge_token = send_phone_challenge(&state, phone_number.clone()).await?;
+                let challenge_token = twilio_client
+                    .send_challenge(
+                        &client,
+                        &state.db_pool,
+                        e164_phone_number,
+                        &state.session_sealing_key,
+                    )
+                    .await?;
                 (ChallengeKind::Sms, challenge_token, None)
             }
         }
         ChallengeKind::Sms => {
-            let challenge_token = send_phone_challenge(&state, phone_number.clone()).await?;
+            // Fall back to SMS if the user requested webauthn but doesn't have any creds
+            let challenge_token = twilio_client
+                .send_challenge(
+                    &client,
+                    &state.db_pool,
+                    e164_phone_number,
+                    &state.session_sealing_key,
+                )
+                .await?;
             (ChallengeKind::Sms, challenge_token, None)
         }
     };
@@ -118,11 +141,13 @@ pub async fn handler(
 async fn get_user_by_identifier(
     state: &web::Data<State>,
     identifier: Identifier,
+    client: &awc::Client,
+    twilio_client: &TwilioClient
 ) -> Result<Option<UserVault>, ApiError> {
     let (data_kind, data) = match identifier {
         Identifier::PhoneNumber(phone_number) => {
-            let phone_number = clean_phone_number(state, &phone_number).await?;
-            (DataKind::PhoneNumber, phone_number)
+            let phone_number = twilio_client.standardize(client, phone_number).await?;
+            (DataKind::PhoneNumber, phone_number.e164)
         }
         Identifier::Email(email) => {
             let email = clean_email(email);

@@ -1,13 +1,13 @@
 use crate::types::success::ApiResponseData;
 use crate::utils::challenge::ChallengeToken;
-use crate::utils::phone::clean_phone_number;
 use crate::State;
-use crate::{errors::ApiError, identify::send_phone_challenge};
+use crate::{errors::ApiError};
+use newtypes::PhoneNumber;
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
 pub struct ChallengeRequest {
-    phone_number: String,
+    phone_number: PhoneNumber,
 }
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Serialize)]
@@ -25,10 +25,21 @@ pub async fn handler(
 ) -> actix_web::Result<Json<ApiResponseData<ChallengeResponse>>, ApiError> {
     // clean phone number
     let req = request.into_inner();
-    let phone_number = clean_phone_number(&state, &req.phone_number).await?;
 
-    // Send the log in challenge to the provided phone number
-    let challenge_token = send_phone_challenge(&state, phone_number.clone()).await?;
+    let client = awc::Client::default();
+
+    let twilio_client = &state.twilio_client;
+
+    let phone_number = twilio_client.standardize(&client, req.phone_number).await?;
+
+    let challenge_token = twilio_client
+        .send_challenge(
+            &client,
+            &state.db_pool,
+            phone_number,
+            &state.session_sealing_key,
+        )
+        .await?;
 
     Ok(Json(ApiResponseData {
         data: ChallengeResponse { challenge_token },

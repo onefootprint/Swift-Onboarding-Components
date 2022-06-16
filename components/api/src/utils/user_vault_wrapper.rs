@@ -61,6 +61,7 @@ impl UserVaultWrapper {
             enclave_proxy::DataTransform::Identity,
         )
         .await?;
+        
         Ok(Some(decrypted_data))
     }
 

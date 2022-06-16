@@ -5,6 +5,12 @@ import requests
 from webauthn_simulator import SoftWebauthnDevice
 import json
 import base64
+from dotenv import load_dotenv
+from twilio.rest import Client
+import re
+import time
+
+load_dotenv()
 
 # TODO make some utils to reduce duplication
 WEBAUTHN_DEVICE = SoftWebauthnDevice()
@@ -13,7 +19,6 @@ TENANT_AUTH_HEADER = "x-client-public-key"
 TENANT_SECRET_HEADER = "x-client-secret-key"
 FPUSER_AUTH_HEADER = "x-fpuser-authorization"
 D2P_AUTH_HEADER = "x-d2p-authorization"
-TEST_CHALLENGE_CODE = "123456"
 WORKOS_ORG_ID = "org_01G39KR1V1E52JEZV6BYNG590J"
 DEFAULT_ATTRIBUTES = {
         'first_name', 
@@ -30,7 +35,13 @@ DEFAULT_ATTRIBUTES = {
         'phone_number'
     }
 url = lambda path: "{}/{}".format(os.environ.get('TEST_URL'), path)
-PHONE_NUMBER = "+1 (555) 555-0101"
+
+TWILIO_API_KEY = os.getenv('TWILIO_API_KEY')
+TWILIO_ACCOUNT_SID = os.getenv('TWILIO_ACCOUNT_SID')
+TWILIO_API_KEY_SECRET = os.getenv('TWILIO_API_KEY_SECRET')
+PHONE_NUMBER = os.getenv('INTEGRATION_TEST_PHONE_NUMBER')
+
+twilio_client = Client(TWILIO_API_KEY, TWILIO_API_KEY_SECRET, TWILIO_ACCOUNT_SID)
 
 def _gen_random_n_digit_number(n):
     return "".join([str(random.randint(0, 9)) for _ in range(n)])
@@ -153,7 +164,6 @@ def test_identify_phone(request):
     identifier = {"phone_number": phone_number}
     data = {"identifier": identifier, "preferred_challenge_kind": "sms"}
 
-    # First try identifying with an email. The user won't exist
     r = requests.post(
         url(path),
         json=data,
@@ -166,6 +176,7 @@ def test_identify_phone(request):
 def test_identify_challenge(request):
     path = "identify/challenge"
     data = {"phone_number": PHONE_NUMBER}
+    print(PHONE_NUMBER)
     r = requests.post(
         url(path),
         json=data,
@@ -175,10 +186,15 @@ def test_identify_challenge(request):
 
 
 def test_identify_verify(request):
+    # todo -- race conditions here
+    message = twilio_client.messages.list(to=PHONE_NUMBER)[0]
+    print(PHONE_NUMBER)
+    code = str(re.search("\d{6}", message.body).group(0))
+    print(code)
     path = "identify/verify"
     print(url(path))
     data = {
-        "challenge_response": TEST_CHALLENGE_CODE,
+        "challenge_response": code,
         "challenge_kind": "sms",
         "challenge_token": request.config.cache.get("challenge_token", None),
     }
@@ -424,6 +440,9 @@ def test_identify_repeat_customer(request, foo_tenant):
     email = request.config.cache.get("email", None)
     identifier = {"email": email}
     data = {"identifier": identifier, "preferred_challenge_kind": "sms"}
+
+    # avoid rate-limit error
+    time.sleep(20)
     r = requests.post(
         url(path),
         json=data,
@@ -435,9 +454,15 @@ def test_identify_repeat_customer(request, foo_tenant):
 
     # Log in as the user
     path = "identify/verify"
+    # todo -- race conditions here
+    time.sleep(5)
+    message = twilio_client.messages.list(to=PHONE_NUMBER)[0]
+    print(message.body)
+    code = str(re.search("\d{6}", message.body).group(0))
+    print(code)
     print(url(path))
     data = {
-        "challenge_response": TEST_CHALLENGE_CODE,
+        "challenge_response": code,
         "challenge_kind": "sms",
         "challenge_token": body["data"]["challenge_data"]["challenge_token"],
     }

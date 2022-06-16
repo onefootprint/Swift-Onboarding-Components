@@ -18,7 +18,7 @@ mod errors;
 mod signed_hash;
 mod telemetry;
 
-use crate::{errors::ApiError, tenant::workos::WorkOSClient};
+use crate::{errors::ApiError, tenant::workos::WorkOSClient, utils::twilio::TwilioClient};
 
 // TODO put IAM roles and permissions in pulumi
 
@@ -39,12 +39,11 @@ use paperclip::actix::{web, OpenApiExt};
 #[derive(Clone)]
 pub struct State {
     config: Config,
-    pinpoint_client: aws_sdk_pinpoint::Client,
-    sms_client: aws_sdk_pinpointsmsvoicev2::Client,
     email_client: aws_sdk_pinpointemail::Client,
     kms_client: aws_sdk_kms::Client,
     hmac_client: SignedHashClient,
     workos_client: WorkOSClient,
+    twilio_client: TwilioClient,
     db_pool: DbPool,
     enclave_connection_pool: bb8::Pool<pool::StreamManager<StreamManager<Config>>>,
     session_sealing_key: ScopedSealingKey,
@@ -104,8 +103,6 @@ async fn main() -> std::io::Result<()> {
             .unwrap();
 
         let shared_config = aws_config::from_env().load().await;
-        let pinpoint_client = aws_sdk_pinpoint::Client::new(&shared_config);
-        let sms_client = aws_sdk_pinpointsmsvoicev2::Client::new(&shared_config);
         let email_client = aws_sdk_pinpointemail::Client::new(&shared_config);
         let kms_client = aws_sdk_kms::Client::new(&shared_config);
         let hmac_client = SignedHashClient {
@@ -117,6 +114,15 @@ async fn main() -> std::io::Result<()> {
             client_id: config.workos_client_id.clone(),
             client_secret: config.workos_api_key.clone(),
             default_org: config.workos_default_org.clone(),
+        };
+
+        let twilio_client = TwilioClient {
+            account_sid: config.twilio_acount_sid.clone(),
+            api_key: config.twilio_api_key.clone(),
+            api_secret: config.twilio_api_key_secret.clone(),
+            source_phone_number: config.twilio_phone_number.clone(),
+            rp_id: config.rp_id.clone(),
+            time_s_between_challenges: config.time_s_between_sms_challenges,
         };
 
         // let out = hmac_client
@@ -145,12 +151,11 @@ async fn main() -> std::io::Result<()> {
         State {
             config: config.clone(),
             enclave_connection_pool: pool,
-            pinpoint_client,
-            sms_client,
             email_client,
             kms_client,
             hmac_client,
             workos_client,
+            twilio_client,
             db_pool,
             session_sealing_key,
         }

@@ -28,12 +28,16 @@ impl WorkOSClient {
         let (client_id, client_secret) = (self.client_id.clone(), self.client_secret.clone());
         let url = format!("https://api.workos.com/sso/token?client_id={client_id}&client_secret={client_secret}&grant_type=authorization_code&code={code}");
 
-        let mut response = client.post(url).send().await.map_err(ApiError::WorkOS)?;
+        let mut response = client
+            .post(url)
+            .send()
+            .await
+            .map_err(|x| ApiError::WorkOsError(x.to_string()))?;
 
         // let str = std::str::from_utf8(response.body().await?.as_ref())?.to_string();
         // log::error!("{:?}", str);
 
-        let profile_and_token = response.json::<WorkOSProfileAndToken>().await?;
+        let profile_and_token = response.json::<WorkOSProfileAndToken>().await.map_err(ApiError::DeserializationError)?;
 
         Ok(profile_and_token.profile)
     }
@@ -50,8 +54,8 @@ impl WorkOSClient {
             .content_type("application/json")
             .send_json(&request)
             .await
-            .map_err(ApiError::WorkOS)?;
-        let session = session_response.json::<WorkOSPasswordlessSession>().await?;
+            .map_err(|x| ApiError::WorkOsError(x.to_string()))?;
+        let session = session_response.json::<WorkOSPasswordlessSession>().await.map_err(ApiError::DeserializationError)?;
         Ok(session.id)
     }
 
@@ -63,12 +67,12 @@ impl WorkOSClient {
             .bearer_auth(self.client_secret.clone())
             .send()
             .await
-            .map_err(ApiError::WorkOS)?;
+            .map_err(|x| ApiError::WorkOsError(x.to_string()))?;
 
         // let str = std::str::from_utf8(send_link_response.body().await?.as_ref())?.to_string();
         // log::error!("{:?}", str);
 
-        let auth_response = send_link_response.json::<LinkAuthResponse>().await?;
+        let auth_response = send_link_response.json::<LinkAuthResponse>().await.map_err(ApiError::DeserializationError)?;
 
         Ok(auth_response)
     }
@@ -81,7 +85,11 @@ impl WorkOSClient {
     ) -> Result<String, ApiError> {
         let client_id = self.client_id.clone();
         let auth_url = format!("https://api.workos.com/sso/authorize?response_type=code&client_id={client_id}&redirect_uri={redirect_url}&provider={provider}");
-        let auth_response = client.get(auth_url).send().await.map_err(ApiError::WorkOS)?;
+        let auth_response = client
+            .get(auth_url)
+            .send()
+            .await
+            .map_err(|x| ApiError::WorkOsError(x.to_string()))?;
 
         let mut header = auth_response.headers().to_owned();
 

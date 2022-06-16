@@ -15,3 +15,5 @@ thiserror = {version = "1.0"}
 chrono = {version = "0.4",  features = ["serde"] }
 strum_macros = { version = "0.24" }
 strum = { version = "0.24" }
+serde_derive = { version = "1.0"}
+anyhow = { version = "1.0" }

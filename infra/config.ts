@@ -9,6 +9,7 @@ export interface Config {
     jumpBoxSSHPublicKey: string;
     rpId: string;
     workos: Workos;
+    twilio: Twilio;
     sentryUrl: string;
 }
 
@@ -24,4 +25,10 @@ export interface Containers {
 export interface Workos {
     defaultOrg: string,
     clientId: string,
+}
+
+export interface Twilio {
+    accountSid: string,
+    phoneNumber: string,
+    integrationTestPhoneNumber: string,
 }
