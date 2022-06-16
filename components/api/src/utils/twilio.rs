@@ -214,7 +214,7 @@ impl TwilioClient {
         auth_token: String,
     ) -> Result<(), ApiError> {
         let message_body = format!(
-            "Hello from {}! Continue signing up for your account here: {}/biometric#{}",
+            "Hello from {}! Continue signing up for your account here: {}#{}",
             self.rp_id, base_url, auth_token
         );
         self.send_message(client, destination.clone(), message_body)
