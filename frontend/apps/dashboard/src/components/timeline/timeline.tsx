@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react';
 import styled, { css } from 'styled-components';
-import { Typography } from 'ui';
+import { LoadingIndicator, Typography } from 'ui';
 
 type TimelineItem = {
   timestamp: string;
@@ -11,36 +11,48 @@ type TimelineItem = {
 
 type TimelineProps = {
   items: TimelineItem[];
+  isLoading?: boolean;
   connectorVariant?: 'default' | 'tight';
 };
 
-const Timeline = ({ items, connectorVariant = 'default' }: TimelineProps) => (
-  <TimelineContainer>
-    {items.map((item: TimelineItem, i: number) => (
-      // eslint-disable-next-line react/no-array-index-key
-      <Fragment key={`${item.timestamp}-${i}`}>
-        <Typography variant="label-3" color="tertiary">
-          {new Date(item.timestamp).toLocaleString('en-us', {
-            month: 'numeric',
-            day: 'numeric',
-            year: '2-digit',
-          })}
-        </Typography>
-        <Typography variant="label-3" color="tertiary">
-          {new Date(item.timestamp).toLocaleString('en-us', {
-            hour: 'numeric',
-            minute: 'numeric',
-          })}
-        </Typography>
-        <IconContainer>{item.iconComponent}</IconContainer>
-        <HeaderContainer>{item.headerComponent}</HeaderContainer>
-        {i !== items.length - 1 && <Connector variant={connectorVariant} />}
-        <BodyContainer>
-          {item.bodyComponent && item.bodyComponent}
-        </BodyContainer>
-      </Fragment>
-    ))}
-  </TimelineContainer>
+const Timeline = ({
+  items,
+  isLoading,
+  connectorVariant = 'default',
+}: TimelineProps) => (
+  <>
+    <TimelineContainer>
+      {items.map((item: TimelineItem, i: number) => (
+        // eslint-disable-next-line react/no-array-index-key
+        <Fragment key={`${item.timestamp}-${i}`}>
+          <Typography variant="label-3" color="tertiary">
+            {new Date(item.timestamp).toLocaleString('en-us', {
+              month: 'numeric',
+              day: 'numeric',
+              year: '2-digit',
+            })}
+          </Typography>
+          <Typography variant="label-3" color="tertiary">
+            {new Date(item.timestamp).toLocaleString('en-us', {
+              hour: 'numeric',
+              minute: 'numeric',
+            })}
+          </Typography>
+          <IconContainer>{item.iconComponent}</IconContainer>
+          <HeaderContainer>{item.headerComponent}</HeaderContainer>
+          {i !== items.length - 1 && <Connector variant={connectorVariant} />}
+          <BodyContainer>
+            {item.bodyComponent && item.bodyComponent}
+          </BodyContainer>
+        </Fragment>
+      ))}
+    </TimelineContainer>
+    {isLoading && (
+      <LoadingContainer>
+        <LoadingIndicator />
+      </LoadingContainer>
+    )}
+  </>
 );
 
 const TimelineContainer = styled.div`
@@ -90,6 +102,12 @@ const BodyContainer = styled.div`
   grid-column-start: 4;
   ${({ theme }) => css`
     margin-left: ${theme.spacing[2] + theme.spacing[5]}px;
+    margin-bottom: ${theme.spacing[4]}px;
+  `};
+`;
+
+const LoadingContainer = styled.div`
+  ${({ theme }) => css`
     margin-bottom: ${theme.spacing[4]}px;
   `};
 `;

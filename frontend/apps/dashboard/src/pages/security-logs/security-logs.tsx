@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import { AccessEvent } from '@src/types';
+import React, { useEffect, useState } from 'react';
 import Timeline from 'src/components/timeline';
 import styled, { css } from 'styled-components';
 import { Box, Button, Divider, SearchInput, Typography } from 'ui';
@@ -11,7 +12,11 @@ import useGetAccessEvents from './hooks/use-get-access-events';
 const SecurityLogs = () => {
   const [searchText, setSearchText] = useState('');
   const getAccessEvents = useGetAccessEvents();
-  const accessEvents = getAccessEvents.data || [];
+  const accessEvents =
+    (getAccessEvents.data?.pages || []).reduce(
+      (allPages, page) => [...allPages, ...page.data],
+      [] as AccessEvent[],
+    ) || [];
 
   const items = accessEvents.map(item => ({
     timestamp: item.timestamp,
@@ -19,6 +24,26 @@ const SecurityLogs = () => {
     headerComponent: <SecurityLogHeader accessEvent={item} />,
     bodyComponent: <SecurityLogBody accessEvent={item} />,
   }));
+
+  const handleScroll = () => {
+    // Just before reaching the bottom of the page, start loading the next page of data
+    const almostBottom = window.innerHeight * 0.3;
+    const reachedBottom =
+      window.innerHeight + window.scrollY >=
+      document.body.offsetHeight - almostBottom;
+    if (reachedBottom) {
+      if (!getAccessEvents.isFetchingNextPage && getAccessEvents.hasNextPage) {
+        getAccessEvents.fetchNextPage();
+      }
+    }
+  };
+
+  useEffect(() => {
+    window.addEventListener('scroll', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  });
 
   return (
     <>
@@ -36,7 +61,13 @@ const SecurityLogs = () => {
       <Box sx={{ marginTop: 5, marginBottom: 5 }}>
         <Divider />
       </Box>
-      <Timeline connectorVariant="tight" items={items} />
+      <Timeline
+        connectorVariant="tight"
+        items={items}
+        isLoading={
+          getAccessEvents.isLoading || getAccessEvents.isFetchingNextPage
+        }
+      />
     </>
   );
 };
