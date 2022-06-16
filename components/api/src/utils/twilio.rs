@@ -1,19 +1,18 @@
-use std::{marker::PhantomData};
+use std::marker::PhantomData;
 
+use crate::{errors::ApiError, identify::PhoneChallengeState};
 use awc::Client;
 use chrono::{Duration, Utc};
 use crypto::{aead::ScopedSealingKey, b64::Base64Data, sha256};
 use db::DbPool;
-use newtypes::{ServerSession, PhoneNumber};
-use crate::{errors::ApiError, identify::PhoneChallengeState};
+use newtypes::{PhoneNumber, ServerSession};
 
 use super::challenge::{Challenge, ChallengeToken};
-
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct ValidatedPhoneNumber {
     pub e164: String,
-    phantom: PhantomData<()>
+    phantom: PhantomData<()>,
 }
 
 #[derive(Clone)]
@@ -96,10 +95,12 @@ enum TwilioResponse<T> {
     Error(TwilioError),
 }
 
-
 impl TwilioClient {
-
-    pub async fn standardize(&self, client: &Client, phone_number: PhoneNumber) -> Result<ValidatedPhoneNumber, ApiError> {
+    pub async fn standardize(
+        &self,
+        client: &Client,
+        phone_number: PhoneNumber,
+    ) -> Result<ValidatedPhoneNumber, ApiError> {
         let TwilioClient {
             account_sid: _,
             api_key,
@@ -117,17 +118,20 @@ impl TwilioClient {
             .send()
             .await
             .map_err(|err| ApiError::TwilioError(err.to_string()))?;
-        
-        let twilio_response = response.json::<TwilioResponse<TwilioLookupResopnse>>().await.map_err(ApiError::DeserializationError)?;
+
+        let twilio_response = response
+            .json::<TwilioResponse<TwilioLookupResopnse>>()
+            .await
+            .map_err(ApiError::DeserializationError)?;
 
         let e164 = match twilio_response {
-            TwilioResponse::Success(resp) => Ok(resp.national_format),
+            TwilioResponse::Success(resp) => Ok(resp.phone_number),
             TwilioResponse::Error(e) => Err(ApiError::TwilioError(e.message)),
         }?;
 
         Ok(ValidatedPhoneNumber {
             e164,
-            phantom: PhantomData
+            phantom: PhantomData,
         })
     }
 
@@ -163,12 +167,15 @@ impl TwilioClient {
         // let str = std::str::from_utf8(response.body().await?.as_ref())?.to_string();
         // log::error!("{:?}", str);
 
-        let twilio_response = response.json::<TwilioResponse<TwilioMessageResponse>>().await.map_err(ApiError::DeserializationError)?;
+        let twilio_response = response
+            .json::<TwilioResponse<TwilioMessageResponse>>()
+            .await
+            .map_err(ApiError::DeserializationError)?;
 
         match twilio_response {
             TwilioResponse::Success(resp) => Ok(resp),
             TwilioResponse::Error(e) => Err(ApiError::TwilioError(e.message)),
-        }    
+        }
     }
 
     pub async fn send_challenge(
@@ -178,9 +185,8 @@ impl TwilioClient {
         destination: ValidatedPhoneNumber,
         session_sealing_key: &ScopedSealingKey,
     ) -> Result<ChallengeToken, ApiError> {
-        
         let code = crypto::random::gen_rand_n_digit_code(6);
-        let message_body = format!("Your Footprint verification code is {}. Don't share your code with anyone. We will never contact you to request this code.\n\n@{} #{}", &code, self.rp_id, &code);
+        let message_body = format!("Your {} verification code is {}. Don't share your code with anyone. We will never contact you to request this code.", &self.rp_id, &code);
 
         self.rate_limit(db_pool, destination.clone(), "sms_challenge".to_string())
             .await?;
@@ -207,10 +213,9 @@ impl TwilioClient {
         base_url: String,
         auth_token: String,
     ) -> Result<(), ApiError> {
-
         let message_body = format!(
-            "Hello from Footprint! Continue signing up for your account here: {}/biometric#{}",
-            base_url, auth_token
+            "Hello from {}! Continue signing up for your account here: {}/biometric#{}",
+            self.rp_id, base_url, auth_token
         );
         self.send_message(client, destination.clone(), message_body)
             .await?;
@@ -226,10 +231,8 @@ impl TwilioClient {
         phone_number: ValidatedPhoneNumber,
         scope: String,
     ) -> Result<(), ApiError> {
-
         let session_key =
-            Base64Data(sha256(format!("{}:{}", phone_number.e164, scope).as_bytes()).to_vec())
-                .to_string();
+            Base64Data(sha256(format!("{}:{}", phone_number.e164, scope).as_bytes()).to_vec()).to_string();
         let now = Utc::now().naive_utc();
         let time_between_challenges = Duration::seconds(self.time_s_between_challenges);
 

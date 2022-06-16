@@ -1,26 +1,12 @@
 pub use derive_more::{Add, Display, From, FromStr, Into};
 use paperclip::actix::Apiv2Schema;
-use serde::{Deserialize, Serialize, Deserializer};
+use serde::{Deserialize, Deserializer, Serialize};
 use std::str::FromStr;
 
 #[doc = "Phone number -- must be between 10-15 digits per e164 standard"]
-#[derive(
-    Debug,
-    Clone,
-    Hash,
-    PartialEq,
-    Eq,
-    Display,
-    From,
-    Into,
-    Serialize,
-    Default,
-    Apiv2Schema,
-)]
+#[derive(Debug, Clone, Hash, PartialEq, Eq, Display, From, Into, Serialize, Default, Apiv2Schema)]
 #[serde(transparent)]
-pub struct PhoneNumber(
-    String
-);
+pub struct PhoneNumber(String);
 
 impl FromStr for PhoneNumber {
     type Err = String;
@@ -39,16 +25,15 @@ impl FromStr for PhoneNumber {
     }
 }
 
-
 impl<'de> Deserialize<'de> for PhoneNumber {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-        where D: Deserializer<'de>
+    where
+        D: Deserializer<'de>,
     {
         let s = String::deserialize(deserializer)?;
         FromStr::from_str(&s).map_err(serde::de::Error::custom)
     }
 }
-
 
 #[cfg(test)]
 mod tests {
@@ -59,7 +44,7 @@ mod tests {
     fn test_id() {
         #[derive(Eq, Debug, PartialEq, Serialize, Deserialize)]
         struct Test {
-            pub phone_number: PhoneNumber
+            pub phone_number: PhoneNumber,
         }
         let example = "{\"phone_number\": \"123-456-7890\"}";
         let bad_example = "{\"phone_number\": \"12345\"}";
@@ -67,9 +52,18 @@ mod tests {
         let deserialized: Test = serde_json::from_str(example).unwrap();
         let bad_example: Result<Test, _> = serde_json::from_str(bad_example);
         assert!(bad_example.is_err());
-        assert_eq!(deserialized, Test {phone_number: PhoneNumber("11234567890".to_owned())});
+        assert_eq!(
+            deserialized,
+            Test {
+                phone_number: PhoneNumber("11234567890".to_owned())
+            }
+        );
 
         let test_bad_str = "12345";
-        assert!(PhoneNumber::from_str(test_bad_str).is_err())
+        assert!(PhoneNumber::from_str(test_bad_str).is_err());
+
+        let test_bad_str2 = "+49 17629716301";
+        let val = PhoneNumber::from_str(test_bad_str2).unwrap();
+        assert!(val == PhoneNumber("4917629716301".to_owned()))
     }
 }
