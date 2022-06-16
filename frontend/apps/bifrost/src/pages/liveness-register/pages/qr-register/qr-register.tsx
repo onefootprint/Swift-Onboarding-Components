@@ -52,7 +52,7 @@ const QRRegister = () => {
   }, [statusResponse?.data?.status]);
 
   const handleSendLinkToPhone = () => {
-    const { authToken } = state.context;
+    const { scopedAuthToken: authToken } = state.context;
     if (!authToken) {
       return;
     }
