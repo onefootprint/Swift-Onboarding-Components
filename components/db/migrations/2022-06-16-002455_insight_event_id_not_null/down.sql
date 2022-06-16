@@ -1,0 +1,1 @@
+ALTER TABLE access_events ALTER COLUMN insight_event_id DROP NOT NULL;

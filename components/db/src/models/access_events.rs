@@ -16,7 +16,7 @@ pub struct AccessEvent {
     pub timestamp: NaiveDateTime,
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
-    pub insight_event_id: Option<Uuid>,
+    pub insight_event_id: Uuid,
     pub reason: String,
     pub principal: Option<String>,
     pub data_kinds: Vec<DataKind>,

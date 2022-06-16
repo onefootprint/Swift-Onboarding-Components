@@ -8,7 +8,7 @@ table! {
         timestamp -> Timestamp,
         created_at -> Timestamp,
         updated_at -> Timestamp,
-        insight_event_id -> Nullable<Uuid>,
+        insight_event_id -> Uuid,
         reason -> Varchar,
         principal -> Nullable<Varchar>,
         data_kinds -> Array<Data_kind>,
