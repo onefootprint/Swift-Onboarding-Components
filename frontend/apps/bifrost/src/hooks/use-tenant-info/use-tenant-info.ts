@@ -43,6 +43,7 @@ const useTenantInfo = (tenantPk: string) => {
         send({
           type: Events.tenantInfoIdentified,
           payload: {
+            pk: tenantPk,
             name,
             requiredUserData: requiredUserData.map(
               (attr: string) => UserDataAttributeLabels[attr],

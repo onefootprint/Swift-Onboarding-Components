@@ -7,5 +7,3 @@ export const D2P_BASE_URL = process.env.NEXT_PUBLIC_D2P_BASE_URL;
 export const BIFROST_AUTH_HEADER = 'X-Fpuser-Authorization';
 export const BIFROST_D2P_SCOPED_AUTH_HEADER = 'X-d2p-Authorization';
 export const CLIENT_PUBLIC_KEY_HEADER = 'X-Client-Public-Key';
-
-export const CLIENT_PUBLIC_KEY = 'ob_config_pk_YuK0vExl4Lty1yLG5aHrH2'; // TODO: replace this placeholder tenant pk with footprint.js pk

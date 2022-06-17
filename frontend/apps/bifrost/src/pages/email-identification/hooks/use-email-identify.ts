@@ -44,8 +44,9 @@ const useEmailIdentify = () => {
   };
 
   const startOnboarding = (email: string, authToken: string) => {
+    const tenantPk = state.context.tenant.pk;
     onboardingMutation.mutate(
-      { authToken },
+      { authToken, tenantPk },
       {
         onSuccess({
           missingAttributes,

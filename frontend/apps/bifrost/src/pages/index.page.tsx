@@ -1,4 +1,3 @@
-import { CLIENT_PUBLIC_KEY } from '@src/config/constants';
 import useTenantInfo from '@src/hooks/use-tenant-info';
 import has from 'lodash/has';
 import React from 'react';
@@ -6,6 +5,7 @@ import useBifrostMachine from 'src/hooks/use-bifrost-machine';
 import useDeviceInfo from 'src/hooks/use-device-info';
 import { States } from 'src/utils/state-machine/bifrost';
 
+import useTenantPublicKey from '../hooks/use-tenant-public-key';
 import EmailIdentification from './email-identification';
 import BiometricLoginRetry from './liveness-login/biometric-login-retry';
 import QRLogin from './liveness-login/qr-login';
@@ -20,8 +20,9 @@ type Page = {
 };
 
 const Root = () => {
+  const tenantPk = useTenantPublicKey();
   useDeviceInfo();
-  useTenantInfo(CLIENT_PUBLIC_KEY);
+  useTenantInfo(tenantPk);
 
   const [state] = useBifrostMachine();
   const valueCasted = state.value as States;

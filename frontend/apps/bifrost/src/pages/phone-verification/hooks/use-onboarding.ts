@@ -2,7 +2,6 @@ import { useMutation } from 'react-query';
 import request, { RequestError, RequestResponse } from 'request';
 import {
   BIFROST_AUTH_HEADER,
-  CLIENT_PUBLIC_KEY,
   CLIENT_PUBLIC_KEY_HEADER,
 } from 'src/config/constants';
 import {
@@ -12,6 +11,7 @@ import {
 
 export type OnboardingRequest = {
   authToken: string;
+  tenantPk: string;
 };
 
 export type OnboardingResponse = {
@@ -26,7 +26,7 @@ const onboardingRequest = async (payload: OnboardingRequest) => {
       url: '/onboarding',
       headers: {
         [BIFROST_AUTH_HEADER]: payload.authToken,
-        [CLIENT_PUBLIC_KEY_HEADER]: CLIENT_PUBLIC_KEY,
+        [CLIENT_PUBLIC_KEY_HEADER]: payload.tenantPk,
       },
     },
   );

@@ -135,6 +135,7 @@ export type BifrostEvent =
       payload: {
         name: string;
         requiredUserData: UserDataAttribute[];
+        pk: string;
       };
     }
   | {

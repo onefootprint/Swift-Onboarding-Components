@@ -48,8 +48,9 @@ const useBiometricLoginRetry = () => {
   };
 
   const startOnboarding = (authToken: string) => {
+    const tenantPk = state.context.tenant.pk;
     onboardingMutation.mutate(
-      { authToken },
+      { authToken, tenantPk },
       {
         onSuccess({
           missingAttributes,

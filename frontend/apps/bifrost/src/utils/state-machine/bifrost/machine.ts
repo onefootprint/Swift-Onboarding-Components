@@ -15,6 +15,7 @@ const initialContext: BifrostContext = {
     hasSupportForWebAuthn: false,
   },
   tenant: {
+    pk: '',
     name: '',
     requiredUserData: [],
   },
@@ -286,6 +287,7 @@ const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
       [Actions.assignTenantInfo]: assign((context, event) => {
         if (event.type === Events.tenantInfoIdentified) {
           context.tenant = {
+            pk: event.payload.pk,
             name: event.payload.name,
             requiredUserData: [...event.payload.requiredUserData],
           };
