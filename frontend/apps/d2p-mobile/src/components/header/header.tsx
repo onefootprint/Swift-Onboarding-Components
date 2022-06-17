@@ -1,17 +1,10 @@
-import Image from 'next/image';
 import React from 'react';
 import styled, { css } from 'styled-components';
+import { FootprintLogo } from 'ui';
 
 const Header = () => (
   <Container>
-    <Image
-      alt="Footprint"
-      height={26}
-      layout="fixed"
-      priority
-      src="/images/logo.png"
-      width={120}
-    />
+    <FootprintLogo />
   </Container>
 );
 

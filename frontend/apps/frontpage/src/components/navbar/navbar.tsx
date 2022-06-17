@@ -1,8 +1,7 @@
-import Image from 'next/image';
 import Link from 'next/link';
 import React, { useCallback, useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
-import { Button, Container } from 'ui';
+import { Button, Container, FootprintLogo } from 'ui';
 
 export type NavbarProps = {
   cta: string;
@@ -37,14 +36,7 @@ const Navbar = ({ logoAlt, cta, onCtaClick }: NavbarProps) => {
       >
         <Link href="/">
           <a href="/" aria-label="Go to Footprint's main page">
-            <Image
-              alt={logoAlt}
-              height={24}
-              layout="fixed"
-              priority
-              src="/navbar/navbar-logo.png"
-              width={115}
-            />
+            <FootprintLogo alt={logoAlt} height={24} width={115} />
           </a>
         </Link>
         <Button size="compact" onClick={onCtaClick}>

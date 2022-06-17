@@ -1,10 +1,9 @@
 import { useTranslation } from 'hooks';
 import isString from 'lodash/isString';
-import Image from 'next/image';
 import { useRouter } from 'next/router';
 import React, { useEffect } from 'react';
 import styled from 'styled-components';
-import { Box } from 'ui';
+import { Box, FootprintLogo } from 'ui';
 
 import VerifyError from './components/verify-error';
 import VerifyLoading from './components/verify-loading';
@@ -21,19 +20,14 @@ const Verify = () => {
     if (isString(challenge)) {
       verifyMutation.mutate({ data: challenge });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [challenge]);
 
   return (
     <Container>
       <Inner>
         <Box sx={{ marginBottom: 8 }}>
-          <Image
-            alt={t('logo-alt')}
-            height={26}
-            layout="fixed"
-            src="/logo.png"
-            width={122}
-          />
+          <FootprintLogo height={26} width={122} alt={t('logo-alt')} />
         </Box>
         {verifyMutation.isLoading && <VerifyLoading />}
         {verifyMutation.isSuccess && <VerifySuccess />}
