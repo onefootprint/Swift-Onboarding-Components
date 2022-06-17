@@ -20,4 +20,5 @@ export type UIManager = {
   on(eventName: Event, callback: () => void): void;
   show(option?: OpenOptions): Promise<void>;
   showOverlay(container: HTMLElement): void;
+  onIframeShown(): void;
 };
