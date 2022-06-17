@@ -3609,13 +3609,6 @@
   dependencies:
     "@types/react" "^17"
 
-"@types/react-dom@^18.0.3":
-  version "18.0.5"
-  resolved "https://registry.yarnpkg.com/@types/react-dom/-/react-dom-18.0.5.tgz#330b2d472c22f796e5531446939eacef8378444a"
-  integrity sha512-OWPWTUrY/NIrjsAPkAk1wW9LZeIjSvkXRhclsFO8CZcZGCOg2G0YZy4ft+rOyYxy8B7ui5iZzi9OkDebZ7/QSA==
-  dependencies:
-    "@types/react" "*"
-
 "@types/react-highlight-words@^0.16.4":
   version "0.16.4"
   resolved "https://registry.yarnpkg.com/@types/react-highlight-words/-/react-highlight-words-0.16.4.tgz#441b6f05c27ce6ab76833803a84bc385f0a1e8f2"
@@ -3630,7 +3623,7 @@
   dependencies:
     "@types/react" "*"
 
-"@types/react@*", "@types/react@>=16", "@types/react@^18.0.9":
+"@types/react@*", "@types/react@>=16":
   version "18.0.12"
   resolved "https://registry.yarnpkg.com/@types/react/-/react-18.0.12.tgz#cdaa209d0a542b3fcf69cf31a03976ec4cdd8840"
   integrity sha512-duF1OTASSBQtcigUvhuiTB1Ya3OvSy+xORCiEf20H0P0lzx+/KeVsA99U5UjLXSbyo1DRJDlLKqTeM1ngosqtg==
