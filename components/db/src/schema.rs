@@ -70,6 +70,7 @@ table! {
         updated_at -> Timestamp,
         start_insight_event_id -> Nullable<Uuid>,
         liveness_insight_event_id -> Nullable<Uuid>,
+        ordering_id -> Int8,
     }
 }
 

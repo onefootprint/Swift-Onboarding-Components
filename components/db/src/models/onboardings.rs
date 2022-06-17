@@ -22,6 +22,7 @@ pub struct Onboarding {
     pub updated_at: NaiveDateTime,
     pub start_insight_event_id: Option<Uuid>,
     pub liveness_insight_event_id: Option<Uuid>,
+    pub ordering_id: i64,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]

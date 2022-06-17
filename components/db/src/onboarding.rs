@@ -12,6 +12,8 @@ pub fn list_for_tenant(
     status: Option<Status>,
     fingerprint: Option<Vec<u8>>,
     footprint_user_id: Option<FootprintUserId>,
+    cursor: Option<i64>,
+    page_size: i64,
 ) -> Result<Vec<Onboarding>, DbError> {
     let mut onboardings = schema::onboardings::table
         .left_join(
@@ -20,7 +22,8 @@ pub fn list_for_tenant(
                 .and(schema::user_data::deactivated_at.is_null())),
         )
         .filter(schema::onboardings::tenant_id.eq(tenant_id))
-        .order_by(schema::onboardings::created_at.desc())
+        .order_by(schema::onboardings::ordering_id.desc())
+        .limit(page_size)
         .into_boxed();
 
     if let Some(status) = status {
@@ -33,6 +36,10 @@ pub fn list_for_tenant(
 
     if let Some(footprint_user_id) = footprint_user_id {
         onboardings = onboardings.filter(schema::onboardings::user_ob_id.eq(footprint_user_id))
+    }
+
+    if let Some(cursor) = cursor {
+        onboardings = onboardings.filter(schema::onboardings::ordering_id.le(cursor));
     }
 
     let onboardings = onboardings

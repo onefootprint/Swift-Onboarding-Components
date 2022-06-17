@@ -47,7 +47,7 @@ fn handler(
         footprint_user_id.clone(),
         data_kind,
         cursor,
-        (page_size + 1).try_into().unwrap(),
+        (page_size + 1) as i64,
     )
     .await?;
 
