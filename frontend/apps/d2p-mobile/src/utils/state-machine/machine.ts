@@ -73,7 +73,11 @@ const d2pMobileMachine = createMachine<D2PContext, D2PEvent>(
         type: 'final',
       },
       [States.expired]: {
-        type: 'final',
+        on: {
+          [Events.authTokenIdentified]: {
+            actions: [Actions.assignAuthToken],
+          },
+        },
       },
     },
   },
