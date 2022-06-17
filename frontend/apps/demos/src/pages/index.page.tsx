@@ -54,6 +54,7 @@ const Inner = styled.div`
   margin: 0 auto;
   text-align: center;
   max-width: 480px;
+  padding: 0 16px;
   height: 100vh;
   background-color: #fff;
 

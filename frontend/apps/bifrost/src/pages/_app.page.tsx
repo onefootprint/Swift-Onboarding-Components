@@ -55,10 +55,10 @@ const App = ({ Component, pageProps }: AppProps) => (
 const GlobalStyle = createGlobalStyle`
   ${({ theme }) => css`
     html,
-    body,
-    #__next {
+    body {
       height: 100%;
       width: 100%;
+      overflow: hidden;
     }
 
     body {
@@ -66,17 +66,18 @@ const GlobalStyle = createGlobalStyle`
     }
 
     #__next {
-      max-width: 500px;
-      overflow: hidden;
-      margin: 0 auto;
+      background-color: ${theme.backgroundColor.primary};
       display: flex;
       flex-direction: column;
-      background-color: ${theme.backgroundColor.primary};
+      height: 100vh;
+      max-width: 480px;
+      margin: 0 auto;
 
       ${media.greaterThan('md')`
         background-color: unset;
         display: block;
         margin: ${theme.spacing[9]}px auto 0;
+        width: 100%;
       `}
     }
   `}

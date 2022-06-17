@@ -4,6 +4,10 @@ const createCSSClasses = () => {
   const style = document.createElement('style');
   style.type = 'text/css';
   style.innerHTML = `
+    .footprint-body-locked {
+      overflow: hidden;
+    }
+
     .footprint-overlay {
       align-items: center;
       background: rgba(0, 0, 0, 0.3);
@@ -21,7 +25,7 @@ const createCSSClasses = () => {
     .footprint-modal {
       height: 100%;
       left: 0;
-      position: absolute;
+      position: fixed;
       top: 0;
       width: 100%;
       z-index: 50001;

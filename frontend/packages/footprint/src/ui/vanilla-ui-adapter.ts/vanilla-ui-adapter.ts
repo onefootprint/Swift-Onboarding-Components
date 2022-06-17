@@ -34,6 +34,7 @@ class VanillaUiAdapter implements UIManager {
   }
 
   showOverlay(container: HTMLElement) {
+    document.body.classList.add('footprint-body-locked');
     const overlay = document.createElement('div');
     overlay.setAttribute('id', overlayId);
     overlay.classList.add('footprint-overlay');
@@ -41,6 +42,7 @@ class VanillaUiAdapter implements UIManager {
   }
 
   hideOverlay() {
+    document.body.classList.add('footprint-body-locked');
     const overlay = document.getElementById(overlayId);
     if (overlay) {
       overlay.remove();
