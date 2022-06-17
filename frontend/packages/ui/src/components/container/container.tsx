@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-props-no-spreading */
 import React, { forwardRef } from 'react';
 import styled, { css } from 'styled-components';
 
@@ -13,7 +14,10 @@ export type ContainerProps = {
 };
 
 const Container = forwardRef<HTMLElement, ContainerProps>(
-  ({ id, as = 'div', sx, children, testID }: ContainerProps, ref) => {
+  (
+    { id, as = 'div', sx, children, testID, ...remainingProps }: ContainerProps,
+    ref,
+  ) => {
     const sxStyles = useSX(sx);
     return (
       <StyledContainer
@@ -22,6 +26,7 @@ const Container = forwardRef<HTMLElement, ContainerProps>(
         id={id}
         ref={ref}
         sx={sxStyles}
+        {...remainingProps}
       >
         {children}
       </StyledContainer>

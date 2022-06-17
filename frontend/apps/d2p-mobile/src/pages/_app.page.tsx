@@ -1,8 +1,8 @@
 import React from 'react';
 import { QueryClientProvider } from 'react-query';
-import { createGlobalStyle } from 'styled-components';
+import styled, { createGlobalStyle, css } from 'styled-components';
 import themes from 'themes';
-import { Container, DesignSystemProvider } from 'ui';
+import { DesignSystemProvider } from 'ui';
 
 import Header from '../components/header';
 import MachineProvider from '../components/machine-provider';
@@ -23,15 +23,49 @@ const App = ({ Component, pageProps }: AppProps) => (
     <MachineProvider>
       <DesignSystemProvider theme={themes.light}>
         <GlobalStyle />
-        <Container>
+        <Content>
           <Header />
-          <Component {...pageProps} />
-        </Container>
+          <ComponentContainer>
+            <Component {...pageProps} />
+          </ComponentContainer>
+        </Content>
       </DesignSystemProvider>
     </MachineProvider>
   </QueryClientProvider>
 );
 
-const GlobalStyle = createGlobalStyle``;
+const ComponentContainer = styled.div`
+  flex: 1 0 auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+
+const Content = styled.div`
+  ${({ theme }) => css`
+    display: flex;
+    flex-direction: column;
+    flex: 1 0 auto;
+    padding: ${theme.spacing[5]}px;
+  `}
+`;
+
+const GlobalStyle = createGlobalStyle`
+${({ theme }) => css`
+  html,
+  body,
+  #__next {
+    height: 100%;
+    width: 100%;
+  }
+
+  #__next {
+    overflow: hidden;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    background-color: ${theme.backgroundColor.primary};
+  }
+`}`;
 
 export default App;
