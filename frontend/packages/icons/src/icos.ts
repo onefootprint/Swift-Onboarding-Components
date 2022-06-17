@@ -18,6 +18,8 @@ import IcoBolt16 from '../ico/ico-bolt-16';
 import IcoBolt24 from '../ico/ico-bolt-24';
 import IcoBuilding16 from '../ico/ico-building-16';
 import IcoBuilding24 from '../ico/ico-building-24';
+import IcoCake16 from '../ico/ico-cake-16';
+import IcoCake24 from '../ico/ico-cake-24';
 import IcoCheck16 from '../ico/ico-check-16';
 import IcoCheck24 from '../ico/ico-check-24';
 import IcoCheckCircle16 from '../ico/ico-check-circle-16';
@@ -57,6 +59,7 @@ import IcoFileText16 from '../ico/ico-file-text-16';
 import IcoFileText24 from '../ico/ico-file-text-24';
 import IcoFootprint16 from '../ico/ico-footprint-16';
 import IcoFootprint24 from '../ico/ico-footprint-24';
+import IcoFootprint40 from '../ico/ico-footprint-40';
 import IcoGoogleColored16 from '../ico/ico-google-colored-16';
 import IcoGoogleColored24 from '../ico/ico-google-colored-24';
 import IcoInfo16 from '../ico/ico-info-16';
@@ -65,6 +68,8 @@ import IcoLock16 from '../ico/ico-lock-16';
 import IcoLock24 from '../ico/ico-lock-24';
 import IcoLogOut16 from '../ico/ico-log-out-16';
 import IcoLogOut24 from '../ico/ico-log-out-24';
+import IcoMenu16 from '../ico/ico-menu-16';
+import IcoMenu24 from '../ico/ico-menu-24';
 import IcoPhone16 from '../ico/ico-phone-16';
 import IcoPhone24 from '../ico/ico-phone-24';
 import IcoPlusBig16 from '../ico/ico-plus-big-16';
@@ -98,6 +103,7 @@ export default {
   IcoArrowUpRight16,
   IcoBolt16,
   IcoBuilding16,
+  IcoCake16,
   IcoCheck16,
   IcoCheckCircle16,
   IcoCheckSmall16,
@@ -121,6 +127,7 @@ export default {
   IcoInfo16,
   IcoLock16,
   IcoLogOut16,
+  IcoMenu16,
   IcoPhone16,
   IcoPlusBig16,
   IcoPlusSmall16,
@@ -140,6 +147,7 @@ export default {
   IcoArrowUpRight24,
   IcoBolt24,
   IcoBuilding24,
+  IcoCake24,
   IcoCheck24,
   IcoCheckCircle24,
   IcoCheckSmall24,
@@ -163,6 +171,7 @@ export default {
   IcoInfo24,
   IcoLock24,
   IcoLogOut24,
+  IcoMenu24,
   IcoPhone24,
   IcoPlusBig24,
   IcoPlusSmall24,
@@ -176,5 +185,6 @@ export default {
   IcoUsers24,
   IcoAppleColored40,
   IcoCheckCircle40,
+  IcoFootprint40,
   IcoQuote40,
 };
