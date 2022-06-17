@@ -32,7 +32,7 @@ const ProgressIndicatorStep = styled.div<{
 }>`
   ${({ theme }) => css`
     background: ${theme.backgroundColor.tertiary};
-    border-radius: ${theme.borderRadius[3]}px;
+    border-radius: ${theme.borderRadius[4]}px;
     width: 24px;
     height: 4px;
 

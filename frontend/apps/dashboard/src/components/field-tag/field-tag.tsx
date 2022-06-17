@@ -19,7 +19,7 @@ const StyledFieldTag = styled(Typography).attrs({
     color: ${theme.color.neutral};
     background-color: ${theme.backgroundColor.neutral};
     padding: ${theme.spacing[1]}px ${theme.spacing[2]}px;
-    border-radius: 4px; // TODO put in design library
+    border-radius: ${theme.borderRadius[1]}px;
   `};
 `;
 

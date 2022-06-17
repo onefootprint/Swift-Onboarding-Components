@@ -85,7 +85,7 @@ const GlobalStyle = createGlobalStyle`
 
 const Content = styled.div`
   ${({ theme }) => css`
-    border-radius: ${theme.borderRadius[1]}px ${theme.borderRadius[1]}px 0 0;
+    border-radius: ${theme.borderRadius[2]}px ${theme.borderRadius[2]}px 0 0;
     flex: 1 0 auto;
     padding: ${theme.spacing[5]}px;
 

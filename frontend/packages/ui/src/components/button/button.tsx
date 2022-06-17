@@ -68,7 +68,7 @@ const ButtonContainer = styled.button<{
   ${({ theme, variant }) => css`
     align-items: center;
     background-color: ${theme.backgroundColor[backgroundColors[variant]]};
-    border-radius: ${theme.borderRadius[1]}px;
+    border-radius: ${theme.borderRadius[2]}px;
     border: 0;
     box-shadow: 0 ${theme.borderWidth[1]}px ${theme.borderWidth[1]}px
         rgb(0 0 0 / 0%),

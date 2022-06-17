@@ -127,7 +127,7 @@ const EmailCard = styled.div`
   ${({ theme }) => css`
     align-items: center;
     background: ${theme.backgroundColor.secondary};
-    border-radius: ${theme.borderRadius[1]}px;
+    border-radius: ${theme.borderRadius[2]}px;
     display: flex;
     gap: ${theme.spacing[4]}px;
     padding: ${theme.spacing[5]}px;

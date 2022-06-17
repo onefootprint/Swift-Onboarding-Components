@@ -43,7 +43,7 @@ const Container = styled.button`
   border: none;
 
   ${({ theme }) => css`
-    border-radius: ${theme.borderRadius[3]}px;
+    border-radius: ${theme.borderRadius[4]}px;
 
     &:hover:enabled {
       ${createOverlayBackground('darken-1', 'primary')};

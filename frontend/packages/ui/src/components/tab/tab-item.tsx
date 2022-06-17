@@ -43,7 +43,7 @@ const Anchor = styled.a<{ selected: boolean }>`
       // TODO: Define this on the design system level
       // https://linear.app/footprint/issue/FP-122/define-standards-for-transitions
       transition: 0.1s background-color;
-      border-radius: ${theme.borderRadius[2]}px;
+      border-radius: ${theme.borderRadius[3]}px;
       color: ${theme.color.primary};
       cursor: pointer;
       display: flex;

@@ -130,7 +130,7 @@ const Content = styled.div<{
   ${({ theme }) => css`
     background-color: ${theme.backgroundColor.primary};
     border: 1px solid ${theme.borderColor.primary};
-    border-radius: ${theme.borderRadius[1]}px;
+    border-radius: ${theme.borderRadius[2]}px;
   `}
   ${({ size }) => {
     let width;

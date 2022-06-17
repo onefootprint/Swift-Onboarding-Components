@@ -80,7 +80,7 @@ const Connector = styled.div<{
   margin-right: auto;
   ${({ theme }) => css`
     background-color: ${theme.backgroundColor.senary};
-    border-radius: ${theme.borderRadius[1]}px;
+    border-radius: ${theme.borderRadius[2]}px;
   `};
   ${({ theme, variant }) =>
     variant === 'tight' &&

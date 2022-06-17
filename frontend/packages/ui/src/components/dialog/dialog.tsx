@@ -138,7 +138,7 @@ const DialogContainer = styled.div<{
 }>`
   ${({ theme }) => css`
     background-color: ${theme.backgroundColor.primary};
-    border-radius: ${theme.borderRadius[1]}px;
+    border-radius: ${theme.borderRadius[2]}px;
     box-shadow: ${theme.elevation[3]};
     z-index: ${theme.zIndex.dialog};
   `}

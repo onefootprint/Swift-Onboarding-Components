@@ -81,6 +81,7 @@ export type BorderRadiuses = {
   1: number;
   2: number;
   3: number;
+  4: number;
 };
 
 export type BorderRadius = keyof BorderRadiuses;

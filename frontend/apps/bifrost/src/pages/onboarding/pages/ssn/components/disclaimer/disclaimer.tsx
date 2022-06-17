@@ -34,7 +34,7 @@ const Disclaimer = ({ items }: DisclaimerProps) => (
 const Container = styled.ul`
   ${({ theme }) => css`
     background: ${theme.backgroundColor.secondary};
-    border-radius: ${theme.borderRadius[1]}px;
+    border-radius: ${theme.borderRadius[2]}px;
     display: grid;
     gap: ${theme.spacing[7]}px;
     padding: ${theme.spacing[5]}px;

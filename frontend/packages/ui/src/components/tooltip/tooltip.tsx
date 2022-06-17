@@ -79,7 +79,7 @@ const TooltipContainer = styled.div<{ size: Size }>`
   ${({ theme, size }) => css`
     ${createFontStyles(size === 'default' ? 'body-4' : 'caption-2')};
     background: ${theme.backgroundColor.tertiary};
-    border-radius: ${theme.borderRadius[1]}px;
+    border-radius: ${theme.borderRadius[2]}px;
     box-shadow: ${theme.elevation[2]};
     color: ${theme.color.quinary};
     padding: ${theme.spacing[2]}px ${theme.spacing[3]}px;

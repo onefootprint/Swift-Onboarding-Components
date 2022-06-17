@@ -29,7 +29,7 @@ const DesktopFooter = ({ links }: DesktopFooterProps) => (
 const Container = styled.div`
   ${({ theme }) => css`
     background-color: ${theme.backgroundColor.secondary};
-    border-radius: 0 0 ${theme.borderRadius[1]}px ${theme.borderRadius[1]}px;
+    border-radius: 0 0 ${theme.borderRadius[2]}px ${theme.borderRadius[2]}px;
     border-top: ${theme.borderWidth[1]}px solid ${theme.borderColor.tertiary};
     display: flex;
     flex-direction: row;

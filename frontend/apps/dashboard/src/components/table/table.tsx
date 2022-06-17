@@ -82,7 +82,7 @@ const TableContainer = styled.table<{
     text-align: left;
     border: 1px solid ${theme.borderColor.tertiary};
     border-top: none;
-    border-radius: 0 0 ${theme.borderRadius[1]}px ${theme.borderRadius[1]}px;
+    border-radius: 0 0 ${theme.borderRadius[2]}px ${theme.borderRadius[2]}px;
 
     ${media.greaterThan('md')`
     table-layout: fixed;

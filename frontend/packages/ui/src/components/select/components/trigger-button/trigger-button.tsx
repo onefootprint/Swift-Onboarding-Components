@@ -81,7 +81,7 @@ const Button = styled.button<{
       ${createFontStyles('body-3')}
       align-items: center;
       background-color: ${theme.backgroundColor.primary};
-      border-radius: ${theme.borderRadius[1]}px;
+      border-radius: ${theme.borderRadius[2]}px;
       border: ${theme.borderWidth[1]}px solid
         ${theme.borderColor[defaultBorderColor]};
       color: ${theme.color[color]};
