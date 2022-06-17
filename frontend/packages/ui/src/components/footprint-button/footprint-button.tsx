@@ -4,7 +4,9 @@ import styled, { css } from 'styled-components';
 
 import Button, { ButtonProps } from '../button';
 
-export type FootprintButtonProps = Omit<ButtonProps, 'children' | 'variant'>;
+export type FootprintButtonProps = Omit<ButtonProps, 'children' | 'variant'> & {
+  text?: string;
+};
 
 const FootprintButton = ({
   disabled = false,
@@ -13,6 +15,7 @@ const FootprintButton = ({
   size = 'default',
   testID,
   type = 'button',
+  text = 'Verify with Footprint',
 }: FootprintButtonProps) => (
   <Button
     disabled={disabled}
@@ -24,7 +27,7 @@ const FootprintButton = ({
     variant="primary"
   >
     <StyledIcoFootprint color="septenary" />
-    Verify with Footprint
+    {text}
   </Button>
 );
 

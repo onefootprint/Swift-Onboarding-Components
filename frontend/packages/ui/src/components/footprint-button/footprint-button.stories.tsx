@@ -9,6 +9,7 @@ export default {
   argTypes: {
     disabled: { control: 'boolean' },
     fullWidth: { control: 'boolean' },
+    text: { control: 'text' },
     size: { control: 'select', options: ['default', 'compact'] },
     testID: {
       control: 'text',
@@ -26,6 +27,7 @@ const Template: Story<FootprintButtonProps> = ({
   size,
   testID,
   type,
+  text,
 }: FootprintButtonProps) => (
   <FootprintButton
     disabled={disabled}
@@ -34,6 +36,7 @@ const Template: Story<FootprintButtonProps> = ({
     size={size}
     testID={testID}
     type={type}
+    text={text}
   />
 );
 

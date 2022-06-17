@@ -9,6 +9,7 @@ import {
 export enum States {
   // Identify
   emailIdentification = 'emailIdentification',
+  confirmation = 'confirmation',
   verificationSuccess = 'verificationSuccess',
   phoneRegistration = 'phoneRegistration', // Email not associated with an existing user, asking for phone
 
@@ -31,6 +32,7 @@ export enum Events {
   userIdentifiedByPhone = 'userIdentifiedByPhone',
   userNotIdentified = 'userNotIdentified',
   navigatedToPrevPage = 'navigatedToPrevPage',
+  sharedDataConfirmed = 'sharedDataConfirmed',
 
   // Liveness Challenge
   smsChallengeInitiated = 'smsChallengeInitiated',
@@ -145,4 +147,5 @@ export type BifrostEvent =
         missingAttributes: readonly UserDataAttribute[];
         missingWebauthnCredentials: boolean;
       };
-    };
+    }
+  | { type: Events.sharedDataConfirmed };

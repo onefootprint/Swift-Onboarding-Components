@@ -78,11 +78,10 @@ const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
               ],
               cond: (context, event) =>
                 event.payload.missingAttributes.length > 0 ||
-                event.payload.missingWebauthnCredentials ||
                 !event.payload.userFound,
             },
             {
-              target: States.verificationSuccess,
+              target: States.confirmation,
               actions: [
                 Actions.assignAuthToken,
                 Actions.assignEmail,
@@ -112,11 +111,10 @@ const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
               ],
               cond: (context, event) =>
                 event.payload.missingAttributes.length > 0 ||
-                event.payload.missingWebauthnCredentials ||
                 !event.payload.userFound,
             },
             {
-              target: States.verificationSuccess,
+              target: States.confirmation,
               actions: [
                 Actions.assignAuthToken,
                 Actions.assignEmail,
@@ -129,6 +127,13 @@ const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
           [Events.smsChallengeInitiated]: {
             target: States.phoneVerification,
             actions: [Actions.assignChallenge],
+          },
+        },
+      },
+      [States.confirmation]: {
+        on: {
+          [Events.sharedDataConfirmed]: {
+            target: States.verificationSuccess,
           },
         },
       },
@@ -168,21 +173,20 @@ const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
           ],
           [Events.smsChallengeSucceeded]: [
             {
-              description:
-                'Show the verification success page if there were no missing attributes for existing user',
-              target: States.verificationSuccess,
+              target: States.onboarding,
               actions: [
                 Actions.assignAuthToken,
                 Actions.assignMissingAttributes,
                 Actions.assignMissingWebauthnCredentials,
               ],
               cond: (context, event) =>
-                context.userFound &&
-                event.payload.missingAttributes.length === 0 &&
-                !event.payload.missingWebauthnCredentials,
+                !context.userFound ||
+                event.payload.missingAttributes.length > 0,
             },
             {
-              target: States.onboarding,
+              description:
+                'Show the confirmation page if there were no missing attributes for existing user',
+              target: States.confirmation,
               actions: [
                 Actions.assignAuthToken,
                 Actions.assignMissingAttributes,

@@ -16,7 +16,7 @@ import {
 } from '../../hooks/use-onboarding';
 
 // Once verification succeeds, delay the transition to next page while you show a success message
-const SUCCESS_EVENT_DELAY_MS = 2000;
+const SUCCESS_EVENT_DELAY_MS = 1500;
 
 type PinFormProps = {
   verifyMutation: UseMutationResult<

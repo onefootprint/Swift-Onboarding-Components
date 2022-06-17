@@ -6,6 +6,7 @@ import useDeviceInfo from 'src/hooks/use-device-info';
 import { States } from 'src/utils/state-machine/bifrost';
 
 import useTenantPublicKey from '../hooks/use-tenant-public-key';
+import Confirmation from './confirmation';
 import EmailIdentification from './email-identification';
 import BiometricLoginRetry from './liveness-login/biometric-login-retry';
 import QRLogin from './liveness-login/qr-login';
@@ -28,6 +29,7 @@ const Root = () => {
   const valueCasted = state.value as States;
   const pages: Page = {
     [States.emailIdentification]: EmailIdentification,
+    [States.confirmation]: Confirmation,
     [States.verificationSuccess]: VerificationSuccess,
     [States.phoneRegistration]: PhoneRegistration,
     [States.phoneVerification]: PhoneVerification,
