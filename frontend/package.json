@@ -39,7 +39,7 @@
     "jest-watch-typeahead": "^1.1.0",
     "lint-staged": "^12.4.0",
     "msw": "^0.39.2",
-    "prettier": "latest",
+    "prettier": "^2.7.1",
     "turbo": "latest",
     "webpack": "^5.72.0"
   },

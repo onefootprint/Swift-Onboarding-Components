@@ -35,7 +35,7 @@
     "config": "*",
     "constate": "^3.3.2",
     "eslint": "7.32.0",
-    "i18next": "^21.8.3",
+    "i18next": "^21.8.10",
     "lodash": "^4.17.21",
     "next": "12.1.6",
     "next-compose-plugins": "^2.2.1",
@@ -47,7 +47,7 @@
     "react-query": "^3.39.0",
     "styled-components": "^5.3.5",
     "tsconfig": "*",
-    "typescript": "^4.5.3",
+    "typescript": "^4.7.3",
     "xstate": "^4.32.1"
   }
 }
