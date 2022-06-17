@@ -213,6 +213,9 @@ impl TwilioClient {
         base_url: String,
         auth_token: String,
     ) -> Result<(), ApiError> {
+        self.rate_limit(db_pool, destination.clone(), "d2p_session".to_string())
+            .await?;
+
         let message_body = format!(
             "Hello from {}! Continue signing up for your account here: {}#{}",
             self.rp_id, base_url, auth_token
@@ -220,11 +223,9 @@ impl TwilioClient {
         self.send_message(client, destination.clone(), message_body)
             .await?;
 
-        self.rate_limit(db_pool, destination.clone(), "d2p_session".to_string())
-            .await?;
-
         Ok(())
     }
+
     async fn rate_limit(
         &self,
         db_pool: &DbPool,
