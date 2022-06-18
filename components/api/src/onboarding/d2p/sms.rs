@@ -1,9 +1,9 @@
+use crate::auth::session_context::SessionContext;
 use crate::errors::ApiError;
 use crate::types::success::ApiResponseData;
 use crate::types::Empty;
 use crate::utils::user_vault_wrapper::UserVaultWrapper;
 use crate::State;
-use crate::{auth::session_context::SessionContext};
 use newtypes::user::d2p::D2pSession;
 use newtypes::{DataKind, PhoneNumber};
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
@@ -29,20 +29,18 @@ pub fn handler(
         .await?
         .ok_or(ApiError::NoPhoneNumberForVault)?;
 
-    let client = awc::Client::default();
     let twilio_client = &state.twilio_client;
-    let phone_number: PhoneNumber = PhoneNumber::from_str(phone_number.as_str()).map_err(ApiError::TypeDeserializationError)?;
-    let phone_number = twilio_client.standardize(&client, phone_number).await?;
+    let phone_number: PhoneNumber =
+        PhoneNumber::from_str(phone_number.as_str()).map_err(ApiError::TypeDeserializationError)?;
+    let phone_number = twilio_client.standardize(phone_number).await?;
     twilio_client
         .send_d2p(
-            &client,
             &state.db_pool,
             phone_number,
             request.base_url.clone(),
             user_auth.auth_token,
         )
         .await?;
-
 
     Ok(Json(ApiResponseData { data: Empty }))
 }

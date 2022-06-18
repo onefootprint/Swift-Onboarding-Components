@@ -40,9 +40,7 @@ fn handler(
 ) -> actix_web::Result<Json<ApiResponseData<DashboardAuthorizationResponse>>, ApiError> {
     let code = &code.code;
 
-    let client = awc::Client::default();
-
-    let profile = &state.workos_client.get_profile(&client, code.to_owned()).await?;
+    let profile = &state.workos_client.get_profile(code.to_owned()).await?;
 
     // Magic link auth isn't actually associated with an org, so manually
     // set it to Footprint org identifier doesn't exist for now

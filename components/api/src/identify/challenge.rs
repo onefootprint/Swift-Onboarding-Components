@@ -1,7 +1,7 @@
+use crate::errors::ApiError;
 use crate::types::success::ApiResponseData;
 use crate::utils::challenge::ChallengeToken;
 use crate::State;
-use crate::{errors::ApiError};
 use newtypes::PhoneNumber;
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 
@@ -26,19 +26,12 @@ pub async fn handler(
     // clean phone number
     let req = request.into_inner();
 
-    let client = awc::Client::default();
-
     let twilio_client = &state.twilio_client;
 
-    let phone_number = twilio_client.standardize(&client, req.phone_number).await?;
+    let phone_number = twilio_client.standardize(req.phone_number).await?;
 
     let challenge_token = twilio_client
-        .send_challenge(
-            &client,
-            &state.db_pool,
-            phone_number,
-            &state.session_sealing_key,
-        )
+        .send_challenge(&state.db_pool, phone_number, &state.session_sealing_key)
         .await?;
 
     Ok(Json(ApiResponseData {

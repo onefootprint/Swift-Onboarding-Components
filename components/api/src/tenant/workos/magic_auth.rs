@@ -22,15 +22,8 @@ fn handler(
     let email = &request.email_address;
 
     // initialize WorkOS session & send link to user via email
-    let client = awc::Client::default();
-    let session_id = &state
-        .workos_client
-        .post_session(&client, email.to_owned())
-        .await?;
-    let link_auth_response = &state
-        .workos_client
-        .post_send_link(&client, session_id.to_owned())
-        .await?;
+    let session_id = &state.workos_client.post_session(email.to_owned()).await?;
+    let link_auth_response = &state.workos_client.post_send_link(session_id.to_owned()).await?;
 
     Ok(Json(ApiResponseData {
         data: link_auth_response.to_owned(),

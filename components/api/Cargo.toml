@@ -78,7 +78,7 @@ webauthn-rs-proto = { git = "https://github.com/kanidm/webauthn-rs", rev = "6f8c
 
 url = "2.2.2"
 newtypes = { path = "../newtypes" }
-awc = { version = "3.0", features = ["rustls"]}
+reqwest = "0.11"
 
 sentry = "0.26.0"
 sentry-actix = "0.26.0"

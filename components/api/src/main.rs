@@ -12,7 +12,6 @@ use enclave_proxy::{
 use signed_hash::SignedHashClient;
 use telemetry::TelemetrySpanBuilder;
 use tracing_actix_web::TracingLogger;
-
 mod config;
 mod errors;
 mod signed_hash;
@@ -110,20 +109,20 @@ async fn main() -> std::io::Result<()> {
             key_id: config.signing_root_key_id.clone(),
         };
 
-        let workos_client = WorkOSClient {
-            client_id: config.workos_client_id.clone(),
-            client_secret: config.workos_api_key.clone(),
-            default_org: config.workos_default_org.clone(),
-        };
+        let workos_client = WorkOSClient::new(
+            config.workos_client_id.clone(),
+            config.workos_default_org.clone(),
+            config.workos_api_key.clone(),
+        );
 
-        let twilio_client = TwilioClient {
-            account_sid: config.twilio_acount_sid.clone(),
-            api_key: config.twilio_api_key.clone(),
-            api_secret: config.twilio_api_key_secret.clone(),
-            source_phone_number: config.twilio_phone_number.clone(),
-            rp_id: config.rp_id.clone(),
-            time_s_between_challenges: config.time_s_between_sms_challenges,
-        };
+        let twilio_client = TwilioClient::new(
+            config.twilio_acount_sid.clone(),
+            config.twilio_api_key.clone(),
+            config.twilio_api_key_secret.clone(),
+            config.twilio_phone_number.clone(),
+            config.time_s_between_sms_challenges,
+            config.rp_id.clone(),
+        );
 
         // let out = hmac_client
         //     .signed_hash(&vec![0xde, 0xad, 0xbe, 0xef])

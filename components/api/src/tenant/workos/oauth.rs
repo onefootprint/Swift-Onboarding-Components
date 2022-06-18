@@ -25,13 +25,9 @@ fn handler(
 
     let provider = "GoogleOAuth";
 
-    // Important -- disable redirects on the client, otherwise we can't return the proper
-    // redirect ourselves
-    let client = awc::Client::builder().disable_redirects().finish();
-
     let redirect_url = &state
         .workos_client
-        .get_authorization_url(&client, provider.to_owned(), redirect_url.to_owned())
+        .get_authorization_url(provider.to_owned(), redirect_url.to_owned())
         .await?;
 
     Ok(Json(ApiResponseData {

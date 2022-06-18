@@ -1,7 +1,6 @@
 use std::collections::HashMap;
 
 use crate::errors::ApiError;
-use awc::Client;
 use paperclip::actix::web;
 use paperclip::actix::Apiv2Schema;
 
@@ -19,16 +18,30 @@ pub fn routes() -> web::Scope {
 #[derive(Debug, Clone)]
 pub struct WorkOSClient {
     pub client_id: String,
-    pub client_secret: String,
     pub default_org: String,
+    client: reqwest::Client,
+    client_secret: String,
 }
 
 impl WorkOSClient {
-    pub async fn get_profile(&self, client: &Client, code: String) -> Result<WorkOSProfile, ApiError> {
+    pub fn new(client_id: String, default_org: String, client_secret: String) -> Self {
+        let client = reqwest::Client::builder()
+            .redirect(reqwest::redirect::Policy::none())
+            .build()
+            .unwrap();
+        Self {
+            client_id,
+            default_org,
+            client_secret,
+            client,
+        }
+    }
+    pub async fn get_profile(&self, code: String) -> Result<WorkOSProfile, ApiError> {
         let (client_id, client_secret) = (self.client_id.clone(), self.client_secret.clone());
         let url = format!("https://api.workos.com/sso/token?client_id={client_id}&client_secret={client_secret}&grant_type=authorization_code&code={code}");
 
-        let mut response = client
+        let response = self
+            .client
             .post(url)
             .send()
             .await
@@ -37,65 +50,61 @@ impl WorkOSClient {
         // let str = std::str::from_utf8(response.body().await?.as_ref())?.to_string();
         // log::error!("{:?}", str);
 
-        let profile_and_token = response.json::<WorkOSProfileAndToken>().await.map_err(ApiError::DeserializationError)?;
+        let profile_and_token = response.json::<WorkOSProfileAndToken>().await?;
 
         Ok(profile_and_token.profile)
     }
 
-    pub async fn post_session(&self, client: &Client, email: String) -> Result<String, ApiError> {
+    pub async fn post_session(&self, email: String) -> Result<String, ApiError> {
         let session_url = "https://api.workos.com/passwordless/sessions";
         let request = serde_json::json!({
             "email": email,
             "type": "MagicLink",
         });
-        let mut session_response = client
+        let session_response = self
+            .client
             .post(session_url)
             .bearer_auth(self.client_secret.clone())
-            .content_type("application/json")
-            .send_json(&request)
+            .header("content-type", "application/json")
+            .json(&request)
+            .send()
             .await
             .map_err(|x| ApiError::WorkOsError(x.to_string()))?;
-        let session = session_response.json::<WorkOSPasswordlessSession>().await.map_err(ApiError::DeserializationError)?;
+        let session = session_response.json::<WorkOSPasswordlessSession>().await?;
         Ok(session.id)
     }
 
-    pub async fn post_send_link(&self, client: &Client, id: String) -> Result<LinkAuthResponse, ApiError> {
+    pub async fn post_send_link(&self, id: String) -> Result<LinkAuthResponse, ApiError> {
         // Send link to user email
         let link_url = format!("https://api.workos.com/passwordless/sessions/{id}/send");
-        let mut send_link_response = client
+        let send_link_response = self
+            .client
             .post(link_url)
             .bearer_auth(self.client_secret.clone())
             .send()
             .await
             .map_err(|x| ApiError::WorkOsError(x.to_string()))?;
 
-        // let str = std::str::from_utf8(send_link_response.body().await?.as_ref())?.to_string();
-        // log::error!("{:?}", str);
-
-        let auth_response = send_link_response.json::<LinkAuthResponse>().await.map_err(ApiError::DeserializationError)?;
+        let auth_response = send_link_response.json::<LinkAuthResponse>().await?;
 
         Ok(auth_response)
     }
 
     pub async fn get_authorization_url(
         &self,
-        client: &Client,
         provider: String,
         redirect_url: String,
     ) -> Result<String, ApiError> {
         let client_id = self.client_id.clone();
         let auth_url = format!("https://api.workos.com/sso/authorize?response_type=code&client_id={client_id}&redirect_uri={redirect_url}&provider={provider}");
-        let auth_response = client
+        let auth_response = self
+            .client
             .get(auth_url)
             .send()
             .await
             .map_err(|x| ApiError::WorkOsError(x.to_string()))?;
 
         let mut header = auth_response.headers().to_owned();
-
-        // for (k, v) in header.drain() {
-        //     log::error!("{:?}, {:?}", k, v);
-        // }
 
         let location = header.get_mut(actix_web::http::header::LOCATION);
 

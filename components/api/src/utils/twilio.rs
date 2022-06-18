@@ -1,7 +1,6 @@
 use std::marker::PhantomData;
 
 use crate::{errors::ApiError, identify::PhoneChallengeState};
-use awc::Client;
 use chrono::{Duration, Utc};
 use crypto::{aead::ScopedSealingKey, b64::Base64Data, sha256};
 use db::DbPool;
@@ -15,14 +14,23 @@ pub struct ValidatedPhoneNumber {
     phantom: PhantomData<()>,
 }
 
+impl ValidatedPhoneNumber {
+    pub fn from_str_unsafe(e164: String) -> Self {
+        return Self {
+            e164,
+            phantom: PhantomData,
+        };
+    }
+}
 #[derive(Clone)]
 pub struct TwilioClient {
     pub account_sid: String,
-    pub api_key: String,
-    pub api_secret: String,
     pub source_phone_number: String,
     pub time_s_between_challenges: i64,
     pub rp_id: String,
+    api_key: String,
+    api_secret: String,
+    client: reqwest::Client,
 }
 
 impl std::fmt::Debug for TwilioClient {
@@ -96,33 +104,39 @@ enum TwilioResponse<T> {
 }
 
 impl TwilioClient {
-    pub async fn standardize(
-        &self,
-        client: &Client,
-        phone_number: PhoneNumber,
-    ) -> Result<ValidatedPhoneNumber, ApiError> {
-        let TwilioClient {
-            account_sid: _,
+    pub fn new(
+        account_sid: String,
+        api_key: String,
+        api_secret: String,
+        source_phone_number: String,
+        time_s_between_challenges: i64,
+        rp_id: String,
+    ) -> Self {
+        let client = reqwest::Client::new();
+        Self {
+            account_sid,
             api_key,
             api_secret,
-            source_phone_number: _,
-            time_s_between_challenges: _,
-            rp_id: _,
-        } = self;
+            source_phone_number,
+            time_s_between_challenges,
+            rp_id,
+            client,
+        }
+    }
+
+    pub async fn standardize(&self, phone_number: PhoneNumber) -> Result<ValidatedPhoneNumber, ApiError> {
         let sanitized = phone_number.to_string();
         let url = format!("https://lookups.twilio.com/v1/PhoneNumbers/{sanitized}");
 
-        let mut response = client
+        let response = self
+            .client
             .get(url)
-            .basic_auth(api_key, api_secret)
+            .basic_auth(self.api_key.clone(), Some(self.api_secret.clone()))
             .send()
             .await
             .map_err(|err| ApiError::TwilioError(err.to_string()))?;
 
-        let twilio_response = response
-            .json::<TwilioResponse<TwilioLookupResopnse>>()
-            .await
-            .map_err(ApiError::DeserializationError)?;
+        let twilio_response = response.json::<TwilioResponse<TwilioLookupResopnse>>().await?;
 
         let e164 = match twilio_response {
             TwilioResponse::Success(resp) => Ok(resp.phone_number),
@@ -137,40 +151,28 @@ impl TwilioClient {
 
     async fn send_message(
         &self,
-        client: &Client,
         destination: ValidatedPhoneNumber,
         body: String,
     ) -> Result<TwilioMessageResponse, ApiError> {
-        let TwilioClient {
-            account_sid,
-            api_key,
-            api_secret,
-            source_phone_number,
-            time_s_between_challenges: _,
-            rp_id: _,
-        } = self;
+        let account_sid = self.account_sid.clone();
         let url = format!("https://api.twilio.com/2010-04-01/Accounts/{account_sid}/Messages.json");
 
         let params = [
             ("Body", body),
             ("To", destination.e164),
-            ("From", source_phone_number.to_string()),
+            ("From", self.source_phone_number.to_string()),
         ];
 
-        let mut response = client
+        let response = self
+            .client
             .post(url)
-            .basic_auth(api_key, api_secret)
-            .send_form(&params)
+            .basic_auth(self.api_key.clone(), Some(self.api_secret.clone()))
+            .form(&params)
+            .send()
             .await
             .map_err(|err| ApiError::TwilioError(err.to_string()))?;
 
-        // let str = std::str::from_utf8(response.body().await?.as_ref())?.to_string();
-        // log::error!("{:?}", str);
-
-        let twilio_response = response
-            .json::<TwilioResponse<TwilioMessageResponse>>()
-            .await
-            .map_err(ApiError::DeserializationError)?;
+        let twilio_response = response.json::<TwilioResponse<TwilioMessageResponse>>().await?;
 
         match twilio_response {
             TwilioResponse::Success(resp) => Ok(resp),
@@ -180,7 +182,6 @@ impl TwilioClient {
 
     pub async fn send_challenge(
         &self,
-        client: &Client,
         db_pool: &DbPool,
         destination: ValidatedPhoneNumber,
         session_sealing_key: &ScopedSealingKey,
@@ -191,8 +192,7 @@ impl TwilioClient {
         self.rate_limit(db_pool, destination.clone(), "sms_challenge".to_string())
             .await?;
 
-        self.send_message(client, destination.clone(), message_body)
-            .await?;
+        self.send_message(destination.clone(), message_body).await?;
 
         let challenge = Challenge {
             expires_at: Utc::now().naive_utc() + Duration::minutes(15),
@@ -207,7 +207,6 @@ impl TwilioClient {
 
     pub async fn send_d2p(
         &self,
-        client: &Client,
         db_pool: &DbPool,
         destination: ValidatedPhoneNumber,
         base_url: String,
@@ -220,8 +219,7 @@ impl TwilioClient {
             "Hello from {}! Continue signing up for your account here: {}#{}",
             self.rp_id, base_url, auth_token
         );
-        self.send_message(client, destination.clone(), message_body)
-            .await?;
+        self.send_message(destination.clone(), message_body).await?;
 
         Ok(())
     }

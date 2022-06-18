@@ -82,8 +82,6 @@ pub enum ApiError {
     RateLimited(i64),
     #[error("error from workos: {0}")]
     WorkOsError(String),
-    #[error("deserialization from external api error: {0}")]
-    DeserializationError(#[from] awc::error::JsonPayloadError),
     #[error("workos payload error: {0}")]
     WorkOsPayload(#[from] actix_web::error::PayloadError),
     #[error("invalid redirect header returned")]
@@ -105,7 +103,9 @@ pub enum ApiError {
     #[error("twilio error creating message: {0}")]
     TwilioError(String),
     #[error("error deserializing type: {0}")]
-    TypeDeserializationError(String)
+    TypeDeserializationError(String),
+    #[error("external request error: {0}")]
+    ReqwestError(#[from] reqwest::Error),
 }
 
 fn status_code_for_db_error(e: &DbError) -> StatusCode {
@@ -160,7 +160,6 @@ impl actix_web::ResponseError for ApiError {
             ApiError::WebauthnCredentialsNotSet => StatusCode::BAD_REQUEST,
             ApiError::RateLimited(_) => StatusCode::BAD_REQUEST,
             ApiError::WorkOsError(_) => StatusCode::INTERNAL_SERVER_ERROR,
-            ApiError::DeserializationError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::WorkOsPayload(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::WorkOsRedirectError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::WorkOSError => StatusCode::INTERNAL_SERVER_ERROR,
@@ -172,7 +171,8 @@ impl actix_web::ResponseError for ApiError {
             ApiError::WorkOsProfileInvalid => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::CouldNotSanitizePhoneNumber => StatusCode::BAD_REQUEST,
             ApiError::TwilioError(_) => StatusCode::INTERNAL_SERVER_ERROR,
-            ApiError::TypeDeserializationError(_) => StatusCode::INTERNAL_SERVER_ERROR
+            ApiError::TypeDeserializationError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            ApiError::ReqwestError(_) => StatusCode::INTERNAL_SERVER_ERROR,
         }
     }
 
