@@ -8,12 +8,19 @@ export type IconButtonProps = {
   ariaLabel: string;
   iconComponent: Icon;
   onClick?: () => void;
+  disabled?: boolean;
   testID?: string;
 };
 
 const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
   (
-    { ariaLabel, iconComponent: Icon, onClick, testID }: IconButtonProps,
+    {
+      ariaLabel,
+      iconComponent: Icon,
+      onClick,
+      disabled,
+      testID,
+    }: IconButtonProps,
     ref,
   ) => (
     <Container
@@ -23,6 +30,7 @@ const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
       ref={ref}
       tabIndex={0}
       type="button"
+      disabled={disabled}
     >
       <Icon color="primary" />
     </Container>
@@ -40,19 +48,23 @@ const Container = styled.button`
   padding: 0;
   width: 32px;
   background: none;
-  border: none;
 
   ${({ theme }) => css`
     border-radius: ${theme.borderRadius[4]}px;
-
-    &:hover:enabled {
-      ${createOverlayBackground('darken-1', 'primary')};
-    }
-
-    &:active:enabled {
-      ${createOverlayBackground('darken-2', 'primary')};
-    }
   `}
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  &:hover:enabled {
+    ${createOverlayBackground('darken-1', 'primary')};
+  }
+
+  &:active:enabled {
+    ${createOverlayBackground('darken-2', 'primary')};
+  }
 `;
 
 export default IconButton;

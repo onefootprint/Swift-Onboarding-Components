@@ -25,6 +25,10 @@ export default {
       options: Object.keys(icos),
       name: 'Icon *',
     },
+    disabled: {
+      control: 'boolean',
+      description: 'Disable the button',
+    },
     testID: {
       control: 'text',
       description: 'Append an attribute data-testid for testing purposes',
@@ -36,6 +40,7 @@ const Template: Story<IconButtonProps> = ({
   iconComponent: Icon,
   ariaLabel,
   onClick,
+  disabled,
   testID,
 }: IconButtonProps) => {
   const SelectedIcon = typeof Icon === 'string' ? icos[Icon] : Icon;
@@ -44,6 +49,7 @@ const Template: Story<IconButtonProps> = ({
       ariaLabel={ariaLabel}
       iconComponent={SelectedIcon}
       onClick={onClick}
+      disabled={disabled}
       testID={testID}
     />
   );
