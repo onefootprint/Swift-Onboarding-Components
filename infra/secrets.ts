@@ -18,12 +18,14 @@ export interface StaticSecrets {
     workosSecretKey: aws.ssm.Parameter;
     twilioApiKey: aws.ssm.Parameter;
     twilioApiKeySecret: aws.ssm.Parameter;
+    sendgridApiKey: aws.ssm.Parameter;
 }
 
 interface SecretConstants {
     elastic: ElasticSecrets;
     workos: Workos;
-    twilio: Twilio
+    twilio: Twilio;
+    sendgrid: Sendgrid
 }
 
 interface ElasticSecrets {
@@ -37,6 +39,10 @@ interface Workos {
 interface Twilio {
     apiKey: string;
     apiKeySecret: string;
+}
+
+interface Sendgrid {
+    apiKey: string;
 }
 
 
@@ -93,6 +99,7 @@ export async function LoadSecrets(config: pulumi.Config, enclaveKeyDescriptor: E
         workosSecretKey: createSecretParameter(`workosSecretKey-${stack}`, secretConstants.workos.secretKey),
         twilioApiKey: createSecretParameter(`twilioApiKey-${stack}`, secretConstants.twilio.apiKey),
         twilioApiKeySecret: createSecretParameter(`twilioApiSecretKey-${stack}`, secretConstants.twilio.apiKeySecret),
+        sendgridApiKey: createSecretParameter(`sendgridApiKey-${stack}`, secretConstants.sendgrid.apiKey),
     }
 }
 

@@ -17,13 +17,17 @@ config:
     jumpBoxSSHPublicKey: ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIA/XaCZkbkXLPM+buT9s/2Y+2Mur1erjX/OP/mN7yRPn
     rootDomain: infra.footprint.dev
     rpId: footprint.dev
+    sendgrid:
+      apiKey:
+        secure: v1:rcN9jM7uB9KA3jjQ:H49idM5tdoD3IoVXyA2T5rSIbr5xvjxqJJXHYh7jCtKefwzpE7VakZc2VzMeAC3kAX4W0uRTdvI9iSKycCMFDAXYaLH5P715BhcWm9lr739sJ849wg==
+      fromEmail: footprint.dev@em8529.noreply.onefootprint.com
     sentryUrl:
       secure: v1:Ppt53FIYgHl6OQN8:eV5cnm9Eqlo1XPMv/nXYd7V7HqgeizALAvdntlpsutbGsFln9Di1hnf8kMogZJj6JVw8ECgFDbo3WUYScuXlKfI6zmp7tjwYG5lO2M8/ycL1qBbJV+teR3zL
     twilio:
       accountSid: AC675cd7f6557fb29b4fd3483fe49f6ff0
-      apiKey: 
+      apiKey:
         secure: v1:TddbkBlhZ7cYtOFN:ZsI5nrIil+wAJHlVffj8YcI8sn82QZuLxbb8E2ekbBg4TUAqffmXMvNoahef/hyzKnc=
-      apiKeySecret: 
+      apiKeySecret:
         secure: v1:Mj1lvo0d2hHkitB4:bc7qwKQOSkoIe0WhqEJ3nRIqGK4Zht2klh96woc9EL3HNBp8R9GAcmxuE2TbVJYt
       integrationTestPhoneNumber: "+13393311410"
       phoneNumber: "+15105883668"

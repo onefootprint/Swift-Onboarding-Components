@@ -16,10 +16,10 @@ pub struct ValidatedPhoneNumber {
 
 impl ValidatedPhoneNumber {
     pub fn from_str_unsafe(e164: String) -> Self {
-        return Self {
+        Self {
             e164,
             phantom: PhantomData,
-        };
+        }
     }
 }
 #[derive(Clone)]

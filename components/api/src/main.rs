@@ -12,6 +12,7 @@ use enclave_proxy::{
 use signed_hash::SignedHashClient;
 use telemetry::TelemetrySpanBuilder;
 use tracing_actix_web::TracingLogger;
+use utils::email::SendgridClient;
 mod config;
 mod errors;
 mod signed_hash;
@@ -38,11 +39,11 @@ use paperclip::actix::{web, OpenApiExt};
 #[derive(Clone)]
 pub struct State {
     config: Config,
-    email_client: aws_sdk_pinpointemail::Client,
     kms_client: aws_sdk_kms::Client,
     hmac_client: SignedHashClient,
     workos_client: WorkOSClient,
     twilio_client: TwilioClient,
+    sendgrid_client: SendgridClient,
     db_pool: DbPool,
     enclave_connection_pool: bb8::Pool<pool::StreamManager<StreamManager<Config>>>,
     session_sealing_key: ScopedSealingKey,
@@ -102,7 +103,6 @@ async fn main() -> std::io::Result<()> {
             .unwrap();
 
         let shared_config = aws_config::from_env().load().await;
-        let email_client = aws_sdk_pinpointemail::Client::new(&shared_config);
         let kms_client = aws_sdk_kms::Client::new(&shared_config);
         let hmac_client = SignedHashClient {
             client: kms_client.clone(),
@@ -122,6 +122,12 @@ async fn main() -> std::io::Result<()> {
             config.twilio_phone_number.clone(),
             config.time_s_between_sms_challenges,
             config.rp_id.clone(),
+        );
+
+        let sendgrid_client = SendgridClient::new(
+            config.sendgrid_api_key.clone(),
+            config.sendgrid_from_email.clone(),
+            config.sendgrid_challenge_template_id.clone(),
         );
 
         // let out = hmac_client
@@ -150,11 +156,11 @@ async fn main() -> std::io::Result<()> {
         State {
             config: config.clone(),
             enclave_connection_pool: pool,
-            email_client,
             kms_client,
             hmac_client,
             workos_client,
             twilio_client,
+            sendgrid_client,
             db_pool,
             session_sealing_key,
         }

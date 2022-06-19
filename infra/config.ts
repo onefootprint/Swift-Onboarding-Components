@@ -10,6 +10,7 @@ export interface Config {
     rpId: string;
     workos: Workos;
     twilio: Twilio;
+    sendgrid: Sendgrid;
     sentryUrl: string;
 }
 
@@ -31,4 +32,8 @@ export interface Twilio {
     accountSid: string,
     phoneNumber: string,
     integrationTestPhoneNumber: string,
+}
+
+export interface Sendgrid {
+    fromEmail: string
 }

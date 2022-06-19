@@ -39,7 +39,8 @@ export abstract class ServiceContainers {
                 secretsStore.workosSecretKey.arn,
                 secretsStore.twilioApiKey.arn,
                 secretsStore.twilioApiKeySecret.arn,
-            ]).apply(([rootKeyId, enclaveAccessKeyId, enclaveUserArn, databaseUrlArn, cookieSessionKeyArn, signingKeyId, workosSecretKey, twilioApiKey, twilioApiKeySecret]) => {
+                secretsStore.sendgridApiKey.arn,
+            ]).apply(([rootKeyId, enclaveAccessKeyId, enclaveUserArn, databaseUrlArn, cookieSessionKeyArn, signingKeyId, workosSecretKey, twilioApiKey, twilioApiKeySecret, sendgridApiKey]) => {
                 const def = [{
                     name,
                     image,
@@ -69,7 +70,10 @@ export abstract class ServiceContainers {
                             name: "TWILIO_API_KEY_SECRET",
                             valueFrom: twilioApiKeySecret
                         },
-
+                        {
+                            name: "SENDGRID_API_KEY",
+                            valueFrom: sendgridApiKey
+                        },
                     ],
                     environment: [
                         {
@@ -135,6 +139,10 @@ export abstract class ServiceContainers {
                         {
                             name: "TWILIO_PHONE_NUMBER",
                             value: constants.twilio.phoneNumber
+                        },
+                        {
+                            name: "SENDGRID_FROM_EMAIL",
+                            value: constants.sendgrid.fromEmail
                         },
                         {
                             name: "INTEGRATION_TEST_PHONE_NUMBER",

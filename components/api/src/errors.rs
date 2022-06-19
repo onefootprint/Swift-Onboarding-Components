@@ -106,6 +106,8 @@ pub enum ApiError {
     TypeDeserializationError(String),
     #[error("external request error: {0}")]
     ReqwestError(#[from] reqwest::Error),
+    #[error("error from sendgrid api: {0}")]
+    SendgridError(String),
 }
 
 fn status_code_for_db_error(e: &DbError) -> StatusCode {
@@ -173,6 +175,7 @@ impl actix_web::ResponseError for ApiError {
             ApiError::TwilioError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::TypeDeserializationError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::ReqwestError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            ApiError::SendgridError(_) => StatusCode::INTERNAL_SERVER_ERROR,
         }
     }
 

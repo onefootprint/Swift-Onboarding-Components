@@ -78,6 +78,18 @@ pub struct Config {
     #[envconfig(from = "TWILIO_PHONE_NUMBER")]
     pub twilio_phone_number: String,
 
+    #[envconfig(from = "SENDGRID_API_KEY")]
+    pub sendgrid_api_key: String,
+
+    #[envconfig(from = "SENDGRID_FROM_EMAIL")]
+    pub sendgrid_from_email: String,
+
+    #[envconfig(
+        from = "SENDGRID_CHALLENGE_TEMPLATE_ID",
+        default = "d-c558e640dad04726a31e6710c7ffc57c"
+    )]
+    pub sendgrid_challenge_template_id: String,
+
     #[envconfig(from = "SENTRY_URL")]
     pub sentry_url: String,
 

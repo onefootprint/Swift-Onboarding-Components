@@ -1,16 +1,110 @@
-use aws_sdk_pinpointemail::model::{
-    Body as EmailBody, Content as EmailStringContent, Destination as EmailDestination, EmailContent,
-    Message as EmailMessage,
-};
+use crate::errors::ApiError;
+use crate::utils::crypto::{seal_to_vault_pkey, signed_hash};
+use crate::State;
 use chrono::NaiveDateTime;
 use crypto::b64::Base64Data;
 use crypto::serde_cbor;
 use paperclip::actix::web;
+use reqwest::StatusCode;
+use std::collections::HashMap;
 use std::str::FromStr;
 
-use crate::errors::ApiError;
-use crate::utils::crypto::{seal_to_vault_pkey, signed_hash};
-use crate::State;
+#[derive(Debug, Clone)]
+pub struct SendgridClient {
+    pub from_email: String,
+    // id of email template for challenges
+    pub challenge_template_id: String,
+    api_key: String,
+    client: reqwest::Client,
+}
+
+#[derive(Debug, Clone, serde::Serialize)]
+struct SendgridRequest {
+    personalizations: Vec<SendgridPersonalization>,
+    from: SendgridEmail,
+    subject: String,
+    content: Vec<SendgridContent>,
+}
+
+#[derive(Debug, Clone, serde::Serialize)]
+struct SendgridTemplateRequest {
+    personalizations: Vec<SendgridPersonalization>,
+    from: SendgridEmail,
+    template_id: String,
+}
+
+#[derive(Debug, Clone, serde::Serialize)]
+struct SendgridPersonalization {
+    to: Vec<SendgridEmail>,
+    dynamic_template_data: HashMap<String, String>,
+}
+
+#[derive(Debug, Clone, serde::Serialize)]
+struct SendgridEmail {
+    email: String,
+}
+
+#[derive(Debug, Clone, serde::Serialize)]
+struct SendgridContent {
+    #[serde(rename(serialize = "type"))]
+    type_: String,
+    value: String,
+}
+
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
+pub struct SendgridErrors {
+    errors: Vec<SendgridErrorFieldAndMessage>,
+}
+
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
+struct SendgridErrorFieldAndMessage {
+    field: Option<String>,
+    message: String,
+}
+
+impl SendgridClient {
+    pub fn new(api_key: String, from_email: String, challenge_template_id: String) -> Self {
+        let client = reqwest::Client::new();
+        Self {
+            api_key,
+            from_email,
+            challenge_template_id,
+            client,
+        }
+    }
+
+    pub async fn send_with_challenge_template(
+        &self,
+        to_email: String,
+        curl_url: String,
+    ) -> Result<(), ApiError> {
+        let req = SendgridTemplateRequest {
+            personalizations: vec![SendgridPersonalization {
+                to: vec![SendgridEmail { email: to_email }],
+                dynamic_template_data: HashMap::from([("curl_request".to_string(), curl_url)]),
+            }],
+            from: SendgridEmail {
+                email: self.from_email.clone(),
+            },
+            template_id: self.challenge_template_id.to_string(),
+        };
+        let res = self
+            .client
+            .post("https://api.sendgrid.com/v3/mail/send")
+            .bearer_auth(self.api_key.clone())
+            .header("content-type", "application/json")
+            .json(&req)
+            .send()
+            .await?;
+
+        if res.status().eq(&StatusCode::ACCEPTED) {
+            return Ok(());
+        }
+
+        let err = &res.text().await?;
+        Err(ApiError::SendgridError(err.to_owned()))
+    }
+}
 
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 pub struct EmailVerifyChallenge {
@@ -60,39 +154,9 @@ pub(crate) async fn send_email_challenge(
     .serialize()?;
 
     let curl_request_str = format!("https://verify.ui.footprint.dev/#{}", email_verify_data,);
-    let content = build_email_challenge_content_body(curl_request_str);
     let _output = state
-        .email_client
-        .send_email()
-        .destination(EmailDestination::builder().to_addresses(email_address).build())
-        .from_email_address("noreply@infra.footprint.dev")
-        .content(content)
-        .send()
+        .sendgrid_client
+        .send_with_challenge_template(email_address, curl_request_str)
         .await?;
     Ok(())
-}
-
-fn build_email_challenge_content_body(contents: String) -> EmailContent {
-    let body_text = EmailStringContent::builder()
-        .data(format!(
-            "Hello from footprint!\nYou can issue this curl request to mark your email as verified:\n\n{}",
-            contents
-        ))
-        .build();
-    let body_html = EmailStringContent::builder()
-        .data(format!(
-            "<h1>Hello from footprint!</h1><br>You can issue this curl request to mark your email as verified:<br><br><tt>{}</tt>",
-            contents,
-        ))
-        .build();
-    let body = EmailBody::builder().text(body_text).html(body_html).build();
-    let message = EmailMessage::builder()
-        .subject(
-            EmailStringContent::builder()
-                .data("Hello from Footprint!")
-                .build(),
-        )
-        .body(body)
-        .build();
-    EmailContent::builder().simple(message).build()
 }
