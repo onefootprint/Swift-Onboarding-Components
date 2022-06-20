@@ -1,10 +1,11 @@
 use std::{fmt::Display, str::FromStr};
 
+use paperclip::actix::Apiv2Schema;
 use serde::{de, Deserialize, Deserializer, Serialize};
 
 const B64_CONFIG: base64::Config = base64::URL_SAFE_NO_PAD;
 
-#[derive(Debug, Default, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Default, Clone, PartialEq, Eq, Hash, Apiv2Schema)]
 pub struct Base64Data(pub Vec<u8>);
 
 impl AsRef<[u8]> for Base64Data {

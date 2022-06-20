@@ -1,5 +1,4 @@
 pub mod aead;
-pub mod b64;
 pub mod conversion;
 pub mod random;
 pub mod seal;

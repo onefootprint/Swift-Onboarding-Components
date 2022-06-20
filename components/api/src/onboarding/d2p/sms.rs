@@ -30,9 +30,8 @@ pub fn handler(
         .ok_or(ApiError::NoPhoneNumberForVault)?;
 
     let twilio_client = &state.twilio_client;
-    let phone_number: PhoneNumber =
-        PhoneNumber::from_str(phone_number.as_str()).map_err(ApiError::TypeDeserializationError)?;
-    let phone_number = twilio_client.standardize(phone_number).await?;
+    let phone_number: PhoneNumber = PhoneNumber::from_str(phone_number.as_str())?;
+    let phone_number = twilio_client.standardize(&phone_number).await?;
     twilio_client
         .send_d2p(
             &state.db_pool,

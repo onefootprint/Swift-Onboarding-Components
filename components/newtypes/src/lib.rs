@@ -8,3 +8,12 @@ pub use self::phone_number::*;
 
 pub mod db_types;
 pub use db_types::*;
+
+mod b64;
+pub use b64::Base64Data;
+
+#[derive(Debug, Clone, thiserror::Error)]
+pub enum Error {
+    #[error("invalid phone number")]
+    InvalidPhoneNumber,
+}

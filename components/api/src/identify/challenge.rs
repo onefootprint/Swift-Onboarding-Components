@@ -28,7 +28,7 @@ pub async fn handler(
 
     let twilio_client = &state.twilio_client;
 
-    let phone_number = twilio_client.standardize(req.phone_number).await?;
+    let phone_number = twilio_client.standardize(&req.phone_number).await?;
 
     let challenge_token = twilio_client
         .send_challenge(&state.db_pool, phone_number, &state.session_sealing_key)

@@ -73,7 +73,9 @@ pub enum ApiError {
     #[error("webauthn error: {0}")]
     Webauthn(#[from] WebauthnError),
     #[error("json error: {0}")]
-    Serde(#[from] serde_json::Error),
+    SerdeJson(#[from] serde_json::Error),
+    #[error("cbor error: {0}")]
+    SerdeCbor(#[from] serde_cbor::Error),
     #[error("onboarding for tenant, user pair does not exist")]
     OnboardingForTenantDoesNotExist,
     #[error("webauthn credential not set")]
@@ -102,12 +104,12 @@ pub enum ApiError {
     CouldNotSanitizePhoneNumber,
     #[error("twilio error creating message: {0}")]
     TwilioError(String),
-    #[error("error deserializing type: {0}")]
-    TypeDeserializationError(String),
     #[error("external request error: {0}")]
     ReqwestError(#[from] reqwest::Error),
     #[error("error from sendgrid api: {0}")]
     SendgridError(String),
+    #[error("invalid parameter: {0}")]
+    NewtypeError(#[from] newtypes::Error),
 }
 
 fn status_code_for_db_error(e: &DbError) -> StatusCode {
@@ -155,7 +157,8 @@ impl actix_web::ResponseError for ApiError {
             ApiError::EmailChallengeExpired => actix_web::http::StatusCode::BAD_REQUEST,
             ApiError::InvalidTenantKeyOrUserId => actix_web::http::StatusCode::BAD_REQUEST,
             ApiError::Webauthn(_) => StatusCode::INTERNAL_SERVER_ERROR,
-            ApiError::Serde(_) => StatusCode::BAD_REQUEST,
+            ApiError::SerdeCbor(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            ApiError::SerdeJson(_) => StatusCode::BAD_REQUEST,
             ApiError::OnboardingForTenantDoesNotExist => StatusCode::UNAUTHORIZED,
             ApiError::KmsSignMacError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::KmsVerifyMacError(_) => StatusCode::INTERNAL_SERVER_ERROR,
@@ -173,9 +176,9 @@ impl actix_web::ResponseError for ApiError {
             ApiError::WorkOsProfileInvalid => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::CouldNotSanitizePhoneNumber => StatusCode::BAD_REQUEST,
             ApiError::TwilioError(_) => StatusCode::INTERNAL_SERVER_ERROR,
-            ApiError::TypeDeserializationError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::ReqwestError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::SendgridError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            ApiError::NewtypeError(_) => StatusCode::BAD_REQUEST,
         }
     }
 

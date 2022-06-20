@@ -2,10 +2,14 @@
     "git.ignoreLimitWarning": true,
     "terminal.integrated.localEchoLatencyThreshold": 0,
     "cSpell.words": [
+        "aaguid",
         "actix",
         "algs",
         "Apiv",
+        "appattest",
+        "appattestdevelop",
         "awsx",
+        "byteorder",
         "cbor",
         "chacha",
         "chal",
@@ -13,6 +17,7 @@
         "COSE",
         "creds",
         "deadpool",
+        "ecies",
         "envconfig",
         "fingerprintable",
         "Fpuser",
@@ -20,10 +25,12 @@
         "livecheck",
         "newtype",
         "newtypes",
+        "octetstring",
         "openapi",
         "opentelemetry",
         "pinpointemail",
         "pulumi",
+        "repr",
         "sqlx",
         "Tailscale",
         "thiserror",
@@ -35,5 +42,6 @@
         "editor.semanticHighlighting.enabled": true,
         "editor.formatOnSave": true
     },
-    "rust-analyzer.checkOnSave.command": "clippy"
+    "rust-analyzer.checkOnSave.command": "clippy",
+    "cSpell.diagnosticLevel": "Hint",
 }

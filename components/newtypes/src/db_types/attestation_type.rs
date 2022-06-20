@@ -11,6 +11,7 @@ pub enum AttestationType {
     None,
     Unknown,
     Apple,
+    AppleApp,
     AndroidKey,
     AndroidSafetyNet,
 }

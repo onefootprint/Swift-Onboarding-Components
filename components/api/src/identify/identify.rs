@@ -130,7 +130,7 @@ async fn get_user_by_identifier(
 ) -> Result<Option<UserVault>, ApiError> {
     let (data_kind, data) = match identifier {
         Identifier::PhoneNumber(phone_number) => {
-            let phone_number = twilio_client.standardize(phone_number).await?;
+            let phone_number = twilio_client.standardize(&phone_number).await?;
             (DataKind::PhoneNumber, phone_number.e164)
         }
         Identifier::Email(email) => {

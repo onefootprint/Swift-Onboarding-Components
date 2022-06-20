@@ -9,17 +9,17 @@ use std::str::FromStr;
 pub struct PhoneNumber(String);
 
 impl FromStr for PhoneNumber {
-    type Err = String;
+    type Err = crate::Error;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         // sanitize by removing excess chars + checking length
-        let numer = s.chars().filter(|char| char.is_digit(10)).collect::<String>();
-        let sanitized = match numer.len() {
+        let number = s.chars().filter(|char| char.is_digit(10)).collect::<String>();
+        let sanitized = match number.len() {
             // assume if the # is too short, we intended a u.s. country code
-            10 => Ok("1".to_owned() + numer.as_str()),
+            10 => Ok("1".to_owned() + number.as_str()),
             // valid e.164 lengths
-            11 | 12 | 13 | 14 | 15 => Ok(numer),
-            _ => Err("Invalid length phone number provided"),
+            11 | 12 | 13 | 14 | 15 => Ok(number),
+            _ => Err(crate::Error::InvalidPhoneNumber),
         }?;
         Ok(PhoneNumber(sanitized))
     }

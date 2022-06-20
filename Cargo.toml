@@ -8,4 +8,5 @@ members = [
     "components/enclave/rpc",
     "components/db",
     "components/newtypes",
+    "components/app_attest",
 ]

@@ -368,6 +368,23 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "159bb86af3a200e19a068f4224eae4c8bb2d0fa054c7e5d1cacd5cef95e684cd"
 
 [[package]]
+name = "app-attest"
+version = "0.1.0"
+dependencies = [
+ "base64",
+ "byteorder 1.4.3",
+ "cbor",
+ "hex",
+ "openssl",
+ "serde",
+ "serde_bytes",
+ "serde_cbor",
+ "serde_json",
+ "thiserror",
+ "x509-parser",
+]
+
+[[package]]
 name = "asn1-rs"
 version = "0.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1197,6 +1214,12 @@ checksum = "a4a45a46ab1f2412e53d3a0ade76ffad2025804294569aae387231a0cd6e0899"
 
 [[package]]
 name = "byteorder"
+version = "0.5.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0fc10e8cc6b2580fda3f36eb6dc5316657f812a3df879a44a66fc9f0fdbc4855"
+
+[[package]]
+name = "byteorder"
 version = "1.4.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "14c189c53d098945499cdfa7ecc63567cf3886b3332b312a5b4585d8d3a6a610"
@@ -1207,7 +1230,7 @@ version = "0.4.12"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "206fdffcfa2df7cbe15601ef46c813fce0965eb3286db6b56c583b814b51c81c"
 dependencies = [
- "byteorder",
+ "byteorder 1.4.3",
  "iovec",
 ]
 
@@ -1234,6 +1257,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "90706ba19e97b90786e19dc0d5e2abd80008d99d4c0c5d1ad0b5e72cec7c494d"
 dependencies = [
  "bytes 1.1.0",
+]
+
+[[package]]
+name = "cbor"
+version = "0.4.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e56053652b4b5c0ded5ae6183c7cd547ad2dd6bcce149658bef052a4995533bd"
+dependencies = [
+ "byteorder 0.5.3",
+ "rustc-serialize",
 ]
 
 [[package]]
@@ -1676,7 +1709,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b28135ecf6b7d446b43e27e225622a038cc4e2930a1022f51cdb97ada19b8e4d"
 dependencies = [
  "bitflags",
- "byteorder",
+ "byteorder 1.4.3",
  "chrono",
  "diesel_derives",
  "pq-sys",
@@ -1819,7 +1852,7 @@ dependencies = [
  "aws-config 0.8.0",
  "aws-sdk-kms 0.8.0",
  "aws-types 0.8.0",
- "byteorder",
+ "byteorder 1.4.3",
  "crypto",
  "env_logger",
  "envconfig",
@@ -1843,7 +1876,7 @@ dependencies = [
  "actix-web-opentelemetry",
  "async-trait",
  "bb8",
- "byteorder",
+ "byteorder 1.4.3",
  "dotenv",
  "env_logger",
  "envconfig",
@@ -1969,6 +2002,7 @@ dependencies = [
  "actix-web-httpauth",
  "actix-web-opentelemetry",
  "anyhow",
+ "app-attest",
  "async-trait",
  "aws-config 0.12.0",
  "aws-sdk-kms 0.12.0",
@@ -1996,7 +2030,9 @@ dependencies = [
  "sentry",
  "sentry-actix",
  "serde",
+ "serde_cbor",
  "serde_json",
+ "serde_repr",
  "serde_with",
  "strum_macros",
  "thiserror",
@@ -2769,6 +2805,7 @@ name = "newtypes"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "base64",
  "chrono",
  "derive_more",
  "diesel",
@@ -2833,7 +2870,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4547ee5541c18742396ae2c895d0717d0f886d8823b8399cdaf7b07d63ad0480"
 dependencies = [
  "autocfg 0.1.8",
- "byteorder",
+ "byteorder 1.4.3",
  "lazy_static",
  "libm",
  "num-integer",
@@ -3600,7 +3637,7 @@ dependencies = [
 name = "rpc"
 version = "0.1.0"
 dependencies = [
- "byteorder",
+ "byteorder 1.4.3",
  "crypto",
  "futures",
  "log",
@@ -3617,7 +3654,7 @@ version = "0.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e05c2603e2823634ab331437001b411b9ed11660fbc4066f3908c84a9439260d"
 dependencies = [
- "byteorder",
+ "byteorder 1.4.3",
  "digest 0.9.0",
  "lazy_static",
  "num-bigint-dig",
@@ -3636,6 +3673,12 @@ name = "rustc-demangle"
 version = "0.1.21"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7ef03e0a2b150c7a90d01faf6254c9c48a41e95fb2a8c2ac1c6f0d2b9aefc342"
+
+[[package]]
+name = "rustc-serialize"
+version = "0.3.24"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "dcf128d1287d2ea9d80910b5f1120d0b8eede3fbf1abe91c40d39ea7d51e6fda"
 
 [[package]]
 name = "rustc_version"
@@ -3879,6 +3922,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "serde_bytes"
+version = "0.11.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "212e73464ebcde48d723aa02eb270ba62eff38a9b732df31f33f1b4e145f3a54"
+dependencies = [
+ "serde",
+]
+
+[[package]]
 name = "serde_cbor"
 version = "0.11.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3921,6 +3973,17 @@ dependencies = [
  "percent-encoding",
  "serde",
  "thiserror",
+]
+
+[[package]]
+name = "serde_repr"
+version = "0.1.8"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a2ad84e47328a31223de7fed7a4f5087f2d6ddfe586cf3ca25b7a165bc0a5aed"
+dependencies = [
+ "proc-macro2 1.0.36",
+ "quote 1.0.15",
+ "syn 1.0.86",
 ]
 
 [[package]]

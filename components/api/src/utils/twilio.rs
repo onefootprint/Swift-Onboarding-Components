@@ -2,9 +2,9 @@ use std::marker::PhantomData;
 
 use crate::{errors::ApiError, identify::PhoneChallengeState};
 use chrono::{Duration, Utc};
-use crypto::{aead::ScopedSealingKey, b64::Base64Data, sha256};
+use crypto::{aead::ScopedSealingKey, sha256};
 use db::DbPool;
-use newtypes::{PhoneNumber, ServerSession};
+use newtypes::{Base64Data, PhoneNumber, ServerSession};
 
 use super::challenge::{Challenge, ChallengeToken};
 
@@ -55,7 +55,7 @@ struct TwilioMessageResponse {
     num_media: String,
     num_segments: String,
     price: Option<String>,
-    prive_unit: Option<String>,
+    price_unit: Option<String>,
     sid: String,
     status: String,
     subresource_uris: Option<SubResourceUri>,
@@ -64,7 +64,7 @@ struct TwilioMessageResponse {
 }
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
-struct TwilioLookupResopnse {
+struct TwilioLookupResponse {
     caller_name: Option<String>,
     carrier: Option<TwilioCarrierInformation>,
     country_code: Option<String>,
@@ -124,7 +124,7 @@ impl TwilioClient {
         }
     }
 
-    pub async fn standardize(&self, phone_number: PhoneNumber) -> Result<ValidatedPhoneNumber, ApiError> {
+    pub async fn standardize(&self, phone_number: &PhoneNumber) -> Result<ValidatedPhoneNumber, ApiError> {
         let sanitized = phone_number.to_string();
         let url = format!("https://lookups.twilio.com/v1/PhoneNumbers/{sanitized}");
 
@@ -136,7 +136,7 @@ impl TwilioClient {
             .await
             .map_err(|err| ApiError::TwilioError(err.to_string()))?;
 
-        let twilio_response = response.json::<TwilioResponse<TwilioLookupResopnse>>().await?;
+        let twilio_response = response.json::<TwilioResponse<TwilioLookupResponse>>().await?;
 
         let e164 = match twilio_response {
             TwilioResponse::Success(resp) => Ok(resp.phone_number),

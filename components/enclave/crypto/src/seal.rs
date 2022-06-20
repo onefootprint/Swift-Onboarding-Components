@@ -7,8 +7,6 @@ use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use std::str::FromStr;
 
-use crate::b64::Base64Data;
-
 pub use self::seal::seal_ecies_p256_x963_sha256_aes_gcm;
 pub use self::unseal::unseal_ecies_p256_x963_sha256_aes_gcm;
 
@@ -32,7 +30,7 @@ impl FromStr for EciesP256Sha256AesGcmSealed {
     type Err = crate::Error;
 
     fn from_str(input: &str) -> Result<Self, crate::Error> {
-        let base64data = Base64Data::from_str(input)?;
+        let base64data = base64::decode_config(input, Self::BASE64_CONFIG)?;
         Ok(serde_cbor::from_slice(base64data.as_ref())?)
     }
 }
@@ -41,9 +39,11 @@ impl EciesP256Sha256AesGcmSealed {
     /// Protocol Version
     pub const VERSION: u8 = 1;
 
+    const BASE64_CONFIG: base64::Config = base64::URL_SAFE_NO_PAD;
+
     pub fn to_string(&self) -> Result<String, crate::Error> {
         let encoded = serde_cbor::to_vec(&self)?;
-        let base64 = Base64Data(encoded).to_string();
+        let base64 = base64::encode_config(encoded, Self::BASE64_CONFIG);
         Ok(base64)
     }
 
