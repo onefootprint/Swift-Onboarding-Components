@@ -28,11 +28,12 @@ where
 pub struct ApiPaginatedResponseData<T, C> {
     pub data: T,
     pub next: Option<C>,
+    pub count: Option<i64>,
 }
 
 impl<T, C> ApiPaginatedResponseData<T, C> {
-    pub fn ok(data: T, next: Option<C>) -> Self {
-        Self { data, next }
+    pub fn ok(data: T, next: Option<C>, count: Option<i64>) -> Self {
+        Self { data, next, count }
     }
 }
 

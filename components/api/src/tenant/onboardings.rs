@@ -74,14 +74,20 @@ fn handler(
         fingerprint,
         footprint_user_id,
     };
-    let (onboardings, user_to_kinds) = conn
+    let (onboardings, user_to_kinds, count) = conn
         .interact(move |conn| -> Result<_, DbError> {
             let onboardings =
-                db::onboarding::list_for_tenant(conn, query_params, cursor, (page_size + 1) as i64)?;
+                db::onboarding::list_for_tenant(conn, query_params.clone(), cursor, (page_size + 1) as i64)?;
+            // If no cursor is provided, we're on the first page, so we should return the total
+            // count of results matching this query.
+            let count = match cursor {
+                Some(_) => None,
+                None => Some(db::onboarding::count_for_tenant(conn, query_params)?),
+            };
             let user_vault_ids = onboardings.iter().map(|ob| ob.user_vault_id.clone()).collect();
             let user_to_kinds = db::user_data::bulk_fetch_populated_kinds(conn, user_vault_ids)?;
 
-            Ok((onboardings, user_to_kinds))
+            Ok((onboardings, user_to_kinds, count))
         })
         .await
         .map_err(DbError::from)??;
@@ -106,5 +112,5 @@ fn handler(
         })
         .collect();
 
-    Ok(Json(ApiPaginatedResponseData::ok(onboardings, cursor)))
+    Ok(Json(ApiPaginatedResponseData::ok(onboardings, cursor, count)))
 }

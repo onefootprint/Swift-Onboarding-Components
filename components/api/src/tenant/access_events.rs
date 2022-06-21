@@ -66,5 +66,5 @@ fn handler(
         .take(page_size)
         .map(ApiAccessEvent::from)
         .collect::<Vec<ApiAccessEvent>>();
-    Ok(Json(ApiPaginatedResponseData::ok(response, cursor)))
+    Ok(Json(ApiPaginatedResponseData::ok(response, cursor, None)))
 }

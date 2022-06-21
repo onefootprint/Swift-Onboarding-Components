@@ -7,6 +7,7 @@ use diesel::pg::Pg;
 use diesel::prelude::*;
 use newtypes::{FootprintUserId, ObConfigurationId, Status, TenantId, UserVaultId};
 
+#[derive(Clone)]
 pub struct OnboardingListQueryParams {
     pub tenant_id: TenantId,
     pub status: Option<Status>,
@@ -38,6 +39,11 @@ pub fn list_for_tenant_query<'a>(params: OnboardingListQueryParams) -> BoxedQuer
     }
 
     query
+}
+
+pub fn count_for_tenant(conn: &PgConnection, params: OnboardingListQueryParams) -> Result<i64, DbError> {
+    let count = list_for_tenant_query(params).count().get_result(conn)?;
+    Ok(count)
 }
 
 // lists all onboardings across all configurations
