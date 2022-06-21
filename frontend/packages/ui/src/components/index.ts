@@ -40,6 +40,8 @@ export * from './search-input';
 export { default as SearchInput } from './search-input';
 export * from './select';
 export { default as Select } from './select';
+export * from './shimmer';
+export { default as Shimmer } from './shimmer';
 export * from './stepper';
 export { default as Stepper } from './stepper';
 export * from './tab';

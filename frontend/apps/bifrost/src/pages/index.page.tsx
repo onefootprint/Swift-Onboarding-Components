@@ -1,19 +1,18 @@
-import useTenantInfo from '@src/hooks/use-tenant-info';
 import has from 'lodash/has';
 import React from 'react';
 import useBifrostMachine from 'src/hooks/use-bifrost-machine';
-import useDeviceInfo from 'src/hooks/use-device-info';
 import { States } from 'src/utils/state-machine/bifrost';
 
-import useTenantPublicKey from '../hooks/use-tenant-public-key';
 import Confirmation from './confirmation';
 import EmailIdentification from './email-identification';
+import Init from './init';
 import BiometricLoginRetry from './liveness-login/biometric-login-retry';
 import QRLogin from './liveness-login/qr-login';
 import Onboarding from './onboarding';
 import OnboardingSuccess from './onboarding-success/onboarding-success';
 import PhoneRegistration from './phone-registration';
 import PhoneVerification from './phone-verification';
+import TenantInvalid from './tenant-invalid';
 import VerificationSuccess from './verification-success';
 
 type Page = {
@@ -21,13 +20,12 @@ type Page = {
 };
 
 const Root = () => {
-  const tenantPk = useTenantPublicKey();
-  useDeviceInfo();
-  useTenantInfo(tenantPk);
-
   const [state] = useBifrostMachine();
   const valueCasted = state.value as States;
   const pages: Page = {
+    [States.init]: Init,
+    [States.tenantInvalid]: TenantInvalid,
+
     [States.emailIdentification]: EmailIdentification,
     [States.confirmation]: Confirmation,
     [States.verificationSuccess]: VerificationSuccess,

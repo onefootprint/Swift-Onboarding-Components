@@ -7,6 +7,11 @@ import {
 } from 'src/utils/state-machine/types';
 
 export enum States {
+  init = 'Init',
+
+  // tenant
+  tenantInvalid = 'tenantInvalid',
+
   // Identify
   emailIdentification = 'emailIdentification',
   confirmation = 'confirmation',
@@ -26,6 +31,10 @@ export enum States {
 }
 
 export enum Events {
+  // Tenant
+  tenantInfoRequestSucceeded = 'tenantInfoRequestSucceeded',
+  tenantInfoRequestFailed = 'tenantInfoRequestFailed',
+
   // Identify
   emailChangeRequested = 'emailChangeRequested',
   userIdentifiedByEmail = 'userIdentifiedByEmail',
@@ -39,7 +48,6 @@ export enum Events {
   smsChallengeResent = 'smsChallengeResent',
   smsChallengeSucceeded = 'smsChallengeSucceeded',
   deviceInfoIdentified = 'deviceInfoIdentified',
-  tenantInfoIdentified = 'tenantInfoIdentified',
   biometricLoginSucceeded = 'biometricLoginSucceeded',
   biometricLoginFailed = 'livenessLoginFailed',
 }
@@ -72,6 +80,17 @@ export type BifrostContext = {
 };
 
 export type BifrostEvent =
+  | {
+      type: Events.tenantInfoRequestSucceeded;
+      payload: {
+        pk: string;
+        name: string;
+        requiredUserData: UserDataAttribute[];
+      };
+    }
+  | {
+      type: Events.tenantInfoRequestFailed;
+    }
   | { type: Events.emailChangeRequested }
   | {
       type: Events.userIdentifiedByEmail;
@@ -130,14 +149,6 @@ export type BifrostEvent =
       payload: {
         hasSupportForWebAuthn: boolean;
         type: string;
-      };
-    }
-  | {
-      type: Events.tenantInfoIdentified;
-      payload: {
-        name: string;
-        requiredUserData: UserDataAttribute[];
-        pk: string;
       };
     }
   | {

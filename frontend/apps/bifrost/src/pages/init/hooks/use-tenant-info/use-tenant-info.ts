@@ -3,11 +3,10 @@ import request, { RequestError, RequestResponse } from 'request';
 import { CLIENT_PUBLIC_KEY_HEADER } from 'src/config/constants';
 import useBifrostMachine from 'src/hooks/use-bifrost-machine';
 import { Events } from 'src/utils/state-machine/bifrost';
-
 import {
   UserDataAttribute,
   UserDataAttributeLabels,
-} from '../../utils/state-machine/types';
+} from 'src/utils/state-machine/types';
 
 type TenantInfoRequest = {
   tenantPk: string;
@@ -41,7 +40,7 @@ const useTenantInfo = (tenantPk: string) => {
       enabled: !!tenantPk,
       onSuccess: ({ name, requiredUserData }) => {
         send({
-          type: Events.tenantInfoIdentified,
+          type: Events.tenantInfoRequestSucceeded,
           payload: {
             pk: tenantPk,
             name,
@@ -49,6 +48,11 @@ const useTenantInfo = (tenantPk: string) => {
               (attr: string) => UserDataAttributeLabels[attr],
             ),
           },
+        });
+      },
+      onError: () => {
+        send({
+          type: Events.tenantInfoRequestFailed,
         });
       },
     },

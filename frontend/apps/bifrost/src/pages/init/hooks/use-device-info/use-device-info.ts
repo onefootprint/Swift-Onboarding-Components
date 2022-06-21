@@ -1,8 +1,7 @@
 import { useEffect } from 'react';
+import useBifrostMachine from 'src/hooks/use-bifrost-machine';
 import { Events } from 'src/utils/state-machine/bifrost';
 import UAParser from 'ua-parser-js';
-
-import useBifrostMachine from '../use-bifrost-machine';
 
 // UAParser device type can have an undefined type, because
 // it could get executed on the server side. We assign a default

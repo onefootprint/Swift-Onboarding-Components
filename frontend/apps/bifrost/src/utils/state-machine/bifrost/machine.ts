@@ -29,17 +29,26 @@ const initialContext: BifrostContext = {
 const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
   {
     id: 'bifrostMachine',
-    initial: States.emailIdentification,
+    initial: States.init,
     context: initialContext,
-    on: {
-      [Events.deviceInfoIdentified]: {
-        actions: [Actions.assignDeviceInfo],
-      },
-      [Events.tenantInfoIdentified]: {
-        actions: [Actions.assignTenantInfo],
-      },
-    },
     states: {
+      [States.init]: {
+        on: {
+          [Events.deviceInfoIdentified]: {
+            actions: [Actions.assignDeviceInfo],
+          },
+          [Events.tenantInfoRequestSucceeded]: {
+            target: States.emailIdentification,
+            actions: [Actions.assignTenantInfo],
+          },
+          [Events.tenantInfoRequestFailed]: {
+            target: States.tenantInvalid,
+          },
+        },
+      },
+      [States.tenantInvalid]: {
+        type: 'final',
+      },
       [States.emailIdentification]: {
         on: {
           [Events.userIdentifiedByEmail]: {
@@ -289,7 +298,7 @@ const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
         return context;
       }),
       [Actions.assignTenantInfo]: assign((context, event) => {
-        if (event.type === Events.tenantInfoIdentified) {
+        if (event.type === Events.tenantInfoRequestSucceeded) {
           context.tenant = {
             pk: event.payload.pk,
             name: event.payload.name,
