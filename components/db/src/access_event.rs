@@ -4,7 +4,6 @@ use crate::models::insight_event::InsightEvent;
 use crate::models::onboardings::*;
 use crate::schema;
 use crate::DbPool;
-use diesel::dsl::any;
 use diesel::prelude::*;
 use newtypes::DataKind;
 use newtypes::FootprintUserId;
