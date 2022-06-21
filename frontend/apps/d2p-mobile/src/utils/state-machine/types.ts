@@ -20,6 +20,7 @@ export enum Events {
 export enum Actions {
   assignDeviceInfo = 'assignDeviceInfo',
   assignAuthToken = 'assignAuthToken',
+  clearAuthToken = 'clearAuthToken',
 }
 
 export type DeviceInfo = {

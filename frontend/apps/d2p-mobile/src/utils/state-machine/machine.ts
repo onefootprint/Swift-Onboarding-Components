@@ -47,6 +47,7 @@ const d2pMobileMachine = createMachine<D2PContext, D2PEvent>(
           },
           [Events.statusPollingErrored]: {
             target: States.expired,
+            actions: [Actions.clearAuthToken],
           },
         },
       },
@@ -60,6 +61,7 @@ const d2pMobileMachine = createMachine<D2PContext, D2PEvent>(
           },
           [Events.statusPollingErrored]: {
             target: States.expired,
+            actions: [Actions.clearAuthToken],
           },
         },
       },
@@ -75,6 +77,7 @@ const d2pMobileMachine = createMachine<D2PContext, D2PEvent>(
       [States.expired]: {
         on: {
           [Events.authTokenIdentified]: {
+            target: States.register,
             actions: [Actions.assignAuthToken],
           },
         },
@@ -95,6 +98,12 @@ const d2pMobileMachine = createMachine<D2PContext, D2PEvent>(
       [Actions.assignAuthToken]: assign((context, event) => {
         if (event.type === Events.authTokenIdentified) {
           context.authToken = event.payload.authToken;
+        }
+        return context;
+      }),
+      [Actions.clearAuthToken]: assign((context, event) => {
+        if (event.type === Events.statusPollingErrored) {
+          context.authToken = '';
         }
         return context;
       }),
