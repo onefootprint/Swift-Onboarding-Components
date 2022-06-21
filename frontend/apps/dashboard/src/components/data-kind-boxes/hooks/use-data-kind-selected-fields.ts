@@ -15,8 +15,12 @@ const useDataKindSelectedFields = () => {
     }),
     initialFields,
   );
-  const clearSelectedFields = () => {
-    updateSelectedFields(initialFields);
+  const clearSelectedFields = (initialSetValues?: DataKindType[]) => {
+    // Clear values, but set some initial fields to true
+    const initialSetValuesObj = Object.fromEntries(
+      (initialSetValues || []).map(x => [x, true]),
+    ) as SelectedFields;
+    updateSelectedFields({ ...initialFields, ...initialSetValuesObj });
   };
   const setFieldFor =
     (...kinds: DataKindType[]) =>

@@ -2,9 +2,10 @@ import { AccessEvent } from '@src/types';
 import React, { useEffect, useState } from 'react';
 import Timeline from 'src/components/timeline';
 import styled, { css } from 'styled-components';
-import { Box, Button, Divider, SearchInput, Typography } from 'ui';
+import { Box, Divider, SearchInput, Typography } from 'ui';
 
 import Dot from './components/dot';
+import FilterDialog from './components/filter-dialog';
 import SecurityLogBody from './components/security-log-body';
 import SecurityLogHeader from './components/security-log-header';
 import useGetAccessEvents from './hooks/use-get-access-events';
@@ -54,9 +55,7 @@ const SecurityLogs = () => {
           onChangeText={setSearchText}
           value={searchText}
         />
-        <Button size="small" variant="secondary">
-          Filters
-        </Button>
+        <FilterDialog />
       </SearchAndFilterContainer>
       <Box sx={{ marginTop: 5, marginBottom: 5 }}>
         <Divider />

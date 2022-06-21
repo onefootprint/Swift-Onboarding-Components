@@ -16,6 +16,10 @@ export enum DataKind {
 
 export type DataKindType = keyof typeof DataKind;
 
+export const dataKindToType = Object.fromEntries(
+  Object.entries(DataKind).map(x => [x[1], x[0]]),
+) as Record<DataKind, DataKindType>;
+
 export const ALL_FIELDS: DataKindType[] = [
   'firstName',
   'lastName',
