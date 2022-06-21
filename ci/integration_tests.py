@@ -561,16 +561,18 @@ def test_access_events_list(request, workos_tenant):
     for i, expected_fields in enumerate(FIELDS_TO_DECRYPT[-1:0]):
         assert set(access_events[i]["data_kinds"]) == set(expected_fields)
 
-    # Test filtering on kind
-    path = f"org/access_events?footprint_user_id={fp_user_id}&data_kind=email"
+    # Test filtering on kinds. We provide two different kinds, and we should get all access events
+    # that contain at least one of these fields
+    path = f"org/access_events?footprint_user_id={fp_user_id}&data_kinds=email,street_address"
     r = requests.get(
         url(path),
         headers=_client_priv_key_headers(workos_tenant["sk"]),
     )
     body = _assert_response(r)
     access_events = body["data"]
-    assert len(access_events) == 1
+    assert len(access_events) == 2
     assert "email" in set(access_events[0]["data_kinds"])
+    assert "street_address" in set(access_events[1]["data_kinds"])
 
 def test_logged_in_user_detail(request):
     # Get the user detail using the logged in context

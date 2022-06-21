@@ -4,6 +4,7 @@ use crate::models::insight_event::InsightEvent;
 use crate::models::onboardings::*;
 use crate::schema;
 use crate::DbPool;
+use diesel::dsl::any;
 use diesel::prelude::*;
 use newtypes::DataKind;
 use newtypes::FootprintUserId;
@@ -15,7 +16,7 @@ pub async fn list_for_tenant(
     pool: &DbPool,
     tenant_id: TenantId,
     fp_user_id: Option<FootprintUserId>,
-    kind: Option<DataKind>,
+    kinds: Vec<DataKind>,
     cursor: Option<i64>,
     page_size: i64,
 ) -> Result<Vec<(AccessEvent, Onboarding, Option<InsightEvent>)>, DbError> {
@@ -37,8 +38,8 @@ pub async fn list_for_tenant(
                 results = results.filter(schema::onboardings::user_ob_id.eq(fp_user_id))
             }
 
-            if let Some(kind) = kind {
-                results = results.filter(schema::access_events::data_kinds.contains(vec![kind]));
+            if !kinds.is_empty() {
+                results = results.filter(schema::access_events::data_kinds.overlaps_with(kinds));
             }
 
             if let Some(cursor) = cursor {

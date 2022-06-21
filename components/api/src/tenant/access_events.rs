@@ -2,6 +2,7 @@ use crate::auth::client_secret_key::SecretTenantAuthContext;
 use crate::auth::either::Either;
 use crate::types::access_event::ApiAccessEvent;
 use crate::types::success::ApiPaginatedResponseData;
+use crate::utils::querystring::deserialize_stringified_list;
 use crate::State;
 use crate::{auth::session_context::SessionContext, errors::ApiError};
 use newtypes::{tenant::workos::WorkOsSession, DataKind, FootprintUserId};
@@ -11,7 +12,9 @@ use paperclip::actix::{api_v2_operation, get, web, web::Json, Apiv2Schema};
 #[serde(rename_all = "snake_case")]
 struct AccessEventRequest {
     footprint_user_id: Option<FootprintUserId>,
-    data_kind: Option<DataKind>,
+    #[serde(default)]
+    #[serde(deserialize_with = "deserialize_stringified_list")]
+    data_kinds: Vec<DataKind>,
     cursor: Option<i64>,
     page_size: Option<usize>,
 }
@@ -30,7 +33,7 @@ fn handler(
 ) -> actix_web::Result<Json<ApiPaginatedResponseData<AccessEventResponse, i64>>, ApiError> {
     let AccessEventRequest {
         footprint_user_id,
-        data_kind,
+        data_kinds,
         cursor,
         page_size,
     } = request.into_inner();
@@ -39,13 +42,14 @@ fn handler(
     } else {
         state.config.default_page_size
     };
+    println!("Data kinds {:?}", data_kinds);
 
     let tenant = auth.tenant(&state.db_pool).await?;
     let results = db::access_event::list_for_tenant(
         &state.db_pool,
         tenant.id.clone(),
         footprint_user_id.clone(),
-        data_kind,
+        data_kinds,
         cursor,
         (page_size + 1) as i64,
     )
