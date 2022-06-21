@@ -1,17 +1,7 @@
-import createLivenessRegisterMachine from 'src/utils/state-machine/liveness-register';
-import {
-  hasMissingAttributes,
-  isMissingBasicAttribute,
-  isMissingResidentialAttribute,
-  isMissingSsnAttribute,
-} from 'src/utils/state-machine/onboarding/utils/missing-attributes';
-import {
-  DeviceInfo,
-  OnboardingData,
-  TenantInfo,
-} from 'src/utils/state-machine/types';
 import { assign, createMachine } from 'xstate';
 
+import createLivenessRegisterMachine from '../liveness-register';
+import { DeviceInfo, OnboardingData, TenantInfo } from '../types';
 import {
   Actions,
   Events,
@@ -19,6 +9,12 @@ import {
   MachineEvents,
   States,
 } from './types';
+import {
+  hasMissingAttributes,
+  isMissingBasicAttribute,
+  isMissingResidentialAttribute,
+  isMissingSsnAttribute,
+} from './utils/missing-attributes';
 
 export type OnboardingMachineArgs = {
   userFound: boolean;
@@ -81,11 +77,23 @@ const createOnboardingMachine = ({
               cond: context =>
                 isMissingSsnAttribute(context.missingAttributes, context.data),
             },
+            {
+              target: States.onboardingSuccess,
+            },
           ],
         },
         [States.additionalDataRequired]: {
           on: {
             [Events.additionalInfoRequired]: [
+              {
+                target: States.livenessRegister,
+                description:
+                  'If there are other attributes missing in addition to webauthn for an existing user, take them to liveness register, since the user likely abandoned onboarding early.',
+                cond: context =>
+                  userFound &&
+                  context.missingWebauthnCredentials &&
+                  hasMissingAttributes(context.missingAttributes, context.data),
+              },
               {
                 target: States.basicInformation,
                 cond: context =>
@@ -109,6 +117,9 @@ const createOnboardingMachine = ({
                     context.missingAttributes,
                     context.data,
                   ),
+              },
+              {
+                target: States.onboardingSuccess,
               },
             ],
           },
@@ -145,11 +156,6 @@ const createOnboardingMachine = ({
               },
               {
                 target: States.onboardingSuccess,
-                cond: context =>
-                  !hasMissingAttributes(
-                    context.missingAttributes,
-                    context.data,
-                  ),
               },
             ],
           },
