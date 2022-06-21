@@ -40,14 +40,11 @@ TWILIO_API_KEY = os.getenv('TWILIO_API_KEY')
 TWILIO_ACCOUNT_SID = os.getenv('TWILIO_ACCOUNT_SID')
 TWILIO_API_KEY_SECRET = os.getenv('TWILIO_API_KEY_SECRET')
 PHONE_NUMBER = os.getenv('INTEGRATION_TEST_PHONE_NUMBER')
-
+EMAIL = "footprint.user.dev@gmail.com"
 twilio_client = Client(TWILIO_API_KEY, TWILIO_API_KEY_SECRET, TWILIO_ACCOUNT_SID)
 
 def _gen_random_n_digit_number(n):
     return "".join([str(random.randint(0, 9)) for _ in range(n)])
-
-def _gen_random_email():
-    return f"user_{_gen_random_n_digit_number(7)}@onefootprint.com"
 
 def _gen_random_ssn():
     return _gen_random_n_digit_number(9)
@@ -142,7 +139,7 @@ def test_get_org_config(request, workos_tenant):
 def test_identify_email(request):
     path = "identify"
     print(url(path))
-    email = _gen_random_email()
+    email = EMAIL
     request.config.cache.set("email", email)
     identifier = {"email": email}
     data = {"identifier": identifier, "preferred_challenge_kind": "sms"}

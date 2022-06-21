@@ -15,6 +15,7 @@ use db::models::{
     user_data::{NewUserData, NewUserDataBatch},
     user_vaults::UserVault,
 };
+use db::user_vault::get_by_fingerprint;
 use newtypes::user::onboarding::OnboardingSession;
 use newtypes::{DataKind, DataPriority, UserDataId, UserVaultId, UserVaultPermissions};
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
@@ -126,6 +127,18 @@ pub async fn update<C: UserVaultPermissions>(
         );
     }
 
+    // If we're updating the email address, send an async challenge to the new email address
+    if let Some(email) = email {
+        let cleaned_email = clean_email(email.to_owned());
+        let sh_email = crate::utils::crypto::signed_hash(state, cleaned_email.clone()).await?;
+        let uv_data_for_email = get_by_fingerprint(&state.db_pool, DataKind::Email, sh_email, false).await?;
+        // only send a verification email if it's new
+        // TODO: edge case where a user may want to re-send email that isn't verified?
+        if uv_data_for_email.is_none() {
+            send_email_challenge(state, user_vault.public_key.clone(), cleaned_email).await?;
+        }
+    }
+
     for (data_kind, data_str) in v {
         // Clean/validate data
         let data_str = clean_for_storage(data_kind, data_str);
@@ -151,11 +164,6 @@ pub async fn update<C: UserVaultPermissions>(
         .await
         .map_err(db::DbError::from)??;
 
-    // If we're updating the email address, send an async challenge to the new email address
-    if let Some(email) = email {
-        let cleaned_email = clean_email(email.to_owned());
-        send_email_challenge(state, user_vault.public_key.clone(), cleaned_email).await?;
-    }
     Ok(())
 }
 
