@@ -1,5 +1,5 @@
 import { CleaveOptions } from 'cleave.js/options';
-import React, { forwardRef, InputHTMLAttributes } from 'react';
+import React, { forwardRef, InputHTMLAttributes, useId } from 'react';
 import styled, { css } from 'styled-components';
 import { FontVariant } from 'themes';
 
@@ -26,25 +26,23 @@ const BaseInput = forwardRef<HTMLInputElement, AllInputProps>(
     {
       hasError = false,
       hintText,
-      id: baseID,
       label,
       mask,
       onChange,
       onChangeText,
-      placeholder,
       prefixElement,
       required,
       suffixElement,
       testID,
       sx,
+      id: baseID,
       fontVariant = 'body-3',
       ...remainingProps
     }: AllInputProps,
     ref,
   ) => {
-    // TODO: Migrate to useId once we migrate to react 18
-    // https://github.com/onefootprint/frontend-monorepo/issues/61
-    const id = baseID || `input-${label || placeholder}`;
+    const fallbackId = useId();
+    const id = baseID || fallbackId;
     const sxStyles = useSx(sx);
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -69,11 +67,10 @@ const BaseInput = forwardRef<HTMLInputElement, AllInputProps>(
             aria-required={required}
             as={mask ? undefined : 'input'}
             data-testid={testID}
-            id={id}
             onChange={handleChange}
             options={mask}
-            placeholder={placeholder}
             required={required}
+            id={id}
             // We use Cleave.js for mask, and cleave uses htmlRef instead of ref
             // These conditions are important in order to work with react-hook-forms
             ref={mask ? undefined : ref}

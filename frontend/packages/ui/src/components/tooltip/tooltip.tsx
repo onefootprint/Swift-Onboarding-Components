@@ -1,5 +1,5 @@
 import type { Placement } from '@popperjs/core';
-import React, { useState } from 'react';
+import React, { useId, useState } from 'react';
 import { usePopper } from 'react-popper';
 import styled, { css, useTheme } from 'styled-components';
 
@@ -26,9 +26,7 @@ const Tooltip = ({
   testID,
   text,
 }: TooltipProps) => {
-  // TODO: Migrate to useId once we migrate to react 18
-  // https://github.com/onefootprint/frontend-monorepo/issues/61
-  const id = text;
+  const id = useId();
   const theme = useTheme();
   const [refElement, setRefElement] = useState<HTMLElement | null>(null);
   const [popperElement, setPopperElement] = useState<HTMLElement | null>(null);
