@@ -59,13 +59,5 @@ describe('<GoogleButton />', () => {
       renderGoogleButton({ loading: true, loadingAriaLabel: 'Loading...' });
       expect(screen.getByLabelText('Loading...')).toBeInTheDocument();
     });
-
-    it('should disable the button', () => {
-      renderGoogleButton({ loading: true, testID: 'google-button-test-id' });
-      const button = screen.getByTestId(
-        'google-button-test-id',
-      ) as HTMLButtonElement;
-      expect(button.disabled).toBeTruthy();
-    });
   });
 });

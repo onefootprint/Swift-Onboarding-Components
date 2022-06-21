@@ -43,7 +43,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     <ButtonContainer
       ref={ref}
       data-testid={testID}
-      disabled={disabled || loading}
+      disabled={disabled}
       fullWidth={fullWidth}
       onClick={onClick}
       size={size}
@@ -52,7 +52,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       variant={variant}
     >
       {loading ? (
-        <LoadingIndicator aria-label={loadingAriaLabel} color="quaternary" />
+        <LoadingIndicator aria-label={loadingAriaLabel} color="quinary" />
       ) : (
         children
       )}
@@ -64,6 +64,7 @@ const ButtonContainer = styled.button<{
   size: 'default' | 'compact' | 'small' | 'large';
   variant: 'primary' | 'secondary';
   fullWidth?: boolean;
+  loading?: boolean;
 }>`
   ${({ theme, variant }) => css`
     align-items: center;
@@ -110,10 +111,18 @@ const ButtonContainer = styled.button<{
     css`
       width: 100%;
     `}
+  
+  ${({ loading }) =>
+    loading &&
+    css`
+      pointer-events: none;
+    `}
+
   &:disabled {
     cursor: not-allowed;
     opacity: 0.5;
   }
+
   &:hover:enabled {
     ${({ variant }) => css`
       ${createOverlayBackground(
@@ -122,6 +131,7 @@ const ButtonContainer = styled.button<{
       )}
     `}
   }
+
   &:active:enabled {
     ${({ variant }) => css`
       ${createOverlayBackground(

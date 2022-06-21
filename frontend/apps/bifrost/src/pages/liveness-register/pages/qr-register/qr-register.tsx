@@ -94,7 +94,11 @@ const QRRegister = () => {
         Alternatively, we can send you a link to your phone and you can continue
         from there.
       </Typography>
-      <Button onClick={handleSendLinkToPhone} fullWidth>
+      <Button
+        fullWidth
+        loading={d2pSmsMutation.isLoading}
+        onClick={handleSendLinkToPhone}
+      >
         Send a link to phone
       </Button>
     </Container>

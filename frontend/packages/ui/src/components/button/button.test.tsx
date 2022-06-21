@@ -57,11 +57,5 @@ describe('<Button />', () => {
       renderButton({ loading: true, loadingAriaLabel: 'Loading...' });
       expect(screen.getByLabelText('Loading...')).toBeInTheDocument();
     });
-
-    it('should disable the button', () => {
-      renderButton({ loading: true, testID: 'button-test-id' });
-      const button = screen.getByTestId('button-test-id') as HTMLButtonElement;
-      expect(button.disabled).toBeTruthy();
-    });
   });
 });
