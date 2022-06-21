@@ -2,32 +2,32 @@ import times from 'lodash/times';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-export type ProgressIndicatorProps = {
+export type StepperProps = {
   max: number;
   value: number;
 };
 
-const ProgressIndicator = ({ max, value = 0 }: ProgressIndicatorProps) => {
+const Stepper = ({ max, value = 0 }: StepperProps) => {
   const activeCount = Math.min(max, value);
   return (
-    <Container
+    <StepperContainer
       aria-valuemax={max}
       aria-valuemin={0}
       aria-valuenow={activeCount}
       role="progressbar"
     >
       {times(max).map(index => (
-        <ProgressIndicatorStep key={index} active={index < activeCount} />
+        <Step key={index} active={index < activeCount} />
       ))}
-    </Container>
+    </StepperContainer>
   );
 };
 
-const Container = styled.div`
+const StepperContainer = styled.div`
   display: flex;
 `;
 
-const ProgressIndicatorStep = styled.div<{
+const Step = styled.div<{
   active?: boolean;
 }>`
   ${({ theme }) => css`
@@ -48,4 +48,4 @@ const ProgressIndicatorStep = styled.div<{
     `}
 `;
 
-export default ProgressIndicator;
+export default Stepper;

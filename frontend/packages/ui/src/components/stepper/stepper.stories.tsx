@@ -1,13 +1,11 @@
 import { Meta, Story } from '@storybook/react';
 import React from 'react';
 
-import ProgressIndicator, {
-  ProgressIndicatorProps,
-} from './progress-indicator';
+import Stepper, { StepperProps } from './stepper';
 
 export default {
-  component: ProgressIndicator,
-  title: 'Components/ProgressIndicator',
+  component: Stepper,
+  title: 'Components/Stepper',
   argTypes: {
     max: {
       control: 'number',
@@ -20,10 +18,9 @@ export default {
   },
 } as Meta;
 
-const Template: Story<ProgressIndicatorProps> = ({
-  max,
-  value,
-}: ProgressIndicatorProps) => <ProgressIndicator max={max} value={value} />;
+const Template: Story<StepperProps> = ({ max, value }: StepperProps) => (
+  <Stepper max={max} value={value} />
+);
 
 export const Base = Template.bind({});
 Base.args = {

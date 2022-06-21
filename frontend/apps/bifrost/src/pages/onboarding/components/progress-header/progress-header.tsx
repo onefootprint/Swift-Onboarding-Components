@@ -3,7 +3,7 @@ import CloseButton from 'src/components/close-button';
 import PrevButton from 'src/components/prev-button';
 import { Events } from 'src/utils/state-machine/onboarding';
 import styled from 'styled-components';
-import { Portal, ProgressIndicator } from 'ui';
+import { Portal, Stepper } from 'ui';
 
 import useOnboardingMachine from '../../hooks/use-onboarding-machine';
 import {
@@ -31,14 +31,14 @@ const ProgressHeader = () => {
       ) : (
         <PrevButton onClick={handleBackButtonClick} />
       )}
-      <ProgressIndicatorContainer>
-        <ProgressIndicator max={max} value={value} />
-      </ProgressIndicatorContainer>
+      <StepperContainer>
+        <Stepper max={max} value={value} />
+      </StepperContainer>
     </Portal>
   );
 };
 
-const ProgressIndicatorContainer = styled.div`
+const StepperContainer = styled.div`
   display: flex;
   flex-grow: 1;
   justify-content: center;
