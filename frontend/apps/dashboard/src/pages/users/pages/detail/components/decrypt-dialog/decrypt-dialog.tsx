@@ -1,21 +1,16 @@
-import React, { useReducer, useState } from 'react';
+import React, { useState } from 'react';
+import useDataKindSelectedFields from 'src/components/data-kind-boxes/hooks/use-data-kind-selected-fields';
 import { User } from 'src/pages/users/hooks/use-join-users';
-import { ALL_FIELDS, DataKindType } from 'src/types';
+import { DataKindType } from 'src/types';
 import { Button, Dialog } from 'ui';
 
-import AttributesScreen, {
-  SelectedFields,
-} from './components/attributes-screen';
+import AttributesScreen from './components/attributes-screen';
 import ReasonScreen from './components/reason-screen';
 
 type DecryptDialogProps = {
   user: User;
   onDecrypt: (fieldsToDecrypt: DataKindType[], reason: string) => void;
 };
-
-const initialFields = Object.fromEntries(
-  ALL_FIELDS.map(x => [x, false]),
-) as SelectedFields;
 
 const DecryptDialog = ({ user, onDecrypt }: DecryptDialogProps) => {
   // TODO: https://linear.app/footprint/issue/FP-240/migrate-to-react-form
@@ -24,14 +19,12 @@ const DecryptDialog = ({ user, onDecrypt }: DecryptDialogProps) => {
   const [dialogScreen, setDialogScreen] = useState<'attributes' | 'reason'>(
     'attributes',
   );
-  const [selectedFields, updateSelectedFields] = useReducer(
-    (oldState: SelectedFields, updates: SelectedFields) => ({
-      ...oldState,
-      ...updates,
-    }),
-    initialFields,
-  );
   const [reason, setReason] = useState('');
+  const { selectedFields, setFieldFor, clearSelectedFields } =
+    useDataKindSelectedFields();
+
+  const isFieldSelected = (...kinds: DataKindType[]) =>
+    kinds.every(kind => selectedFields[kind] || isFieldDisabled(kind));
 
   const isFieldDisabled = (...kinds: DataKindType[]) =>
     // Don't allow requesting to decrypt a field that is either already decrypted OR explicitly null
@@ -41,7 +34,7 @@ const DecryptDialog = ({ user, onDecrypt }: DecryptDialogProps) => {
 
   const openDialog = () => {
     // Refresh the state of the dialog and open it
-    updateSelectedFields(initialFields);
+    clearSelectedFields();
     setReason('');
     setDialogHasError(false);
     setDialogScreen('attributes');
@@ -93,8 +86,8 @@ const DecryptDialog = ({ user, onDecrypt }: DecryptDialogProps) => {
         {dialogScreen === 'attributes' && (
           <AttributesScreen
             hasError={dialogHasError}
-            selectedFields={selectedFields}
-            updateSelectedFields={updateSelectedFields}
+            isFieldSelected={isFieldSelected}
+            setFieldFor={setFieldFor}
             isFieldDisabled={isFieldDisabled}
           />
         )}
