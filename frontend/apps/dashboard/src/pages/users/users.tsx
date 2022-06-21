@@ -1,3 +1,5 @@
+import IcoChevronLeft16 from 'icons/ico/ico-chevron-left-16';
+import IcoChevronRight16 from 'icons/ico/ico-chevron-right-16';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { Row, Table } from 'src/components/table';
@@ -5,7 +7,7 @@ import FieldOrPlaceholder from 'src/pages/users/components/field-or-placeholder'
 import { nameData, User } from 'src/pages/users/hooks/use-join-users';
 import { statusToBadgeVariant, statusToDisplayText } from 'src/types';
 import styled, { css } from 'styled-components';
-import { Badge, Code, SearchInput, Typography } from 'ui';
+import { Badge, Code, IconButton, SearchInput, Typography } from 'ui';
 
 import DecryptDataDialog from './components/decrypt-data-dialog';
 import UsersFilter from './components/users-filter';
@@ -19,10 +21,20 @@ const columns = [
   { text: 'SSN', width: '12.5%' },
   { text: 'Phone Number', width: '15%' },
   { text: 'Date', width: '15%' },
+  { text: 'ID', width: '6%' },
 ];
 
 const Users = () => {
-  const { users, isLoading, query, setFilter } = useGetUsers();
+  const {
+    users,
+    isLoading,
+    loadNextPage,
+    loadPrevPage,
+    hasNextPage,
+    hasPrevPage,
+    query,
+    setFilter,
+  } = useGetUsers();
 
   const [searchText, setSearchText] = useState<string>();
 
@@ -94,9 +106,26 @@ const Users = () => {
                 })}
               </Typography>
             </td>
+            <td>
+              <Typography variant="body-3">{item.orderingId}</Typography>
+            </td>
           </>
         )}
       />
+      <PaginationContainer>
+        <IconButton
+          disabled={!hasPrevPage}
+          iconComponent={IcoChevronLeft16}
+          ariaLabel="Previous page"
+          onClick={loadPrevPage}
+        />
+        <IconButton
+          iconComponent={IcoChevronRight16}
+          disabled={!hasNextPage}
+          ariaLabel="Next page"
+          onClick={loadNextPage}
+        />
+      </PaginationContainer>
       <DecryptDataDialog open={false} onClose={() => {}} />
     </>
   );
@@ -112,6 +141,16 @@ const StyledSearchInput = styled(SearchInput)`
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
   height: 52px;
+`;
+
+const PaginationContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: right;
+  ${({ theme }) => css`
+    margin-top: ${theme.spacing[5]}px;
+    gap: ${theme.spacing[2]}px;
+  `};
 `;
 
 export default Users;

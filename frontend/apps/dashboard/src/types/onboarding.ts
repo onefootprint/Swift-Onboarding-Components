@@ -7,4 +7,5 @@ export type Onboarding = {
   populatedDataKinds: DataKind[];
   createdAt: string; // TODO rename this initiatedAt
   updatedAt: string;
+  orderingId: string;
 };

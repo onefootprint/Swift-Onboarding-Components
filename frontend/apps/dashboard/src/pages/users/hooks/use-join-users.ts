@@ -13,6 +13,7 @@ export type User = {
   footprintUserId: string;
   status: OnboardingStatus;
   initiatedAt: string;
+  orderingId: string;
   attributes: UserAttributes;
 };
 
@@ -66,6 +67,7 @@ const useJoinUsers = (
         return {
           footprintUserId: onboarding.footprintUserId,
           status: onboarding.status,
+          orderingId: onboarding.orderingId,
           initiatedAt: onboarding.createdAt,
           attributes,
         } as User;

@@ -1,7 +1,7 @@
 import { omitBy } from 'lodash';
 import { useRouter } from 'next/router';
 
-export type OnboardingsListRequest = {
+export type OnboardingListFilters = {
   footprint_user_id?: string;
   status?: string;
   // Filter via secure hash of a piece of data belonging to a user.
@@ -9,11 +9,14 @@ export type OnboardingsListRequest = {
   // _exactly_ matches the hash of this fingerprint.
   // For example, this can be used to filter exactly on name or email.
   fingerprint?: string;
+  // JSON serialized list of the cursors for all of the previous pages that have been visited.
+  // When asking the backend for results, we use the cursor most recently put on the stack
+  cursors?: string;
 };
 
 export const useFilters = () => {
   const router = useRouter();
-  const setFilter = (newQuery: OnboardingsListRequest) => {
+  const setFilter = (newQuery: OnboardingListFilters) => {
     // Merge newQuery with the existing filters extracted from the current router querystring.
     // Also clean up query params if values are empty
     const mergedQuery = omitBy({ ...router.query, ...newQuery }, x => !x);
@@ -22,7 +25,7 @@ export const useFilters = () => {
     });
   };
   return {
-    query: router.query as OnboardingsListRequest,
+    query: router.query as OnboardingListFilters,
     setFilter,
   };
 };
