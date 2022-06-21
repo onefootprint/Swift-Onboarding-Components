@@ -50,5 +50,6 @@ export * from './text-area';
 export { default as TextArea } from './text-area';
 export * from './text-input';
 export { default as TextInput } from './text-input';
+export { useToast } from './toast/toast-provider';
 export * from './typography';
 export { default as Typography } from './typography';

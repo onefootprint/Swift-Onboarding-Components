@@ -3,6 +3,7 @@ import type { DefaultTheme } from 'styled-components';
 import { createGlobalStyle, ThemeProvider } from 'styled-components';
 import { Reset } from 'styled-reset';
 
+import ToastProvider from '../../components/toast/toast-provider';
 import ConfirmationDialogProvider from '../confirmation-dialog-provider';
 import media from '../media';
 
@@ -28,10 +29,12 @@ const GlobalStyle = createGlobalStyle`
 const DesignSystemProvider = ({ children, theme }: BootstrapProps) => (
   <ThemeProvider theme={theme}>
     <ConfirmationDialogProvider>
-      <Reset />
-      <GlobalStyle />
-      {children}
-      <div id="footprint-portal" />
+      <ToastProvider>
+        <Reset />
+        <GlobalStyle />
+        {children}
+        <div id="footprint-portal" />
+      </ToastProvider>
     </ConfirmationDialogProvider>
   </ThemeProvider>
 );

@@ -152,6 +152,7 @@ export type ZIndexes = {
   sticky: number;
   dialog: number;
   overlay: number;
+  toast: number;
 };
 
 export type Theme = {

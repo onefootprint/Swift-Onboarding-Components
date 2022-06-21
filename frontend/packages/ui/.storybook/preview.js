@@ -1,8 +1,6 @@
 import React from 'react';
-import { addDecorator } from '@storybook/react';
-import { withThemesProvider } from 'storybook-addon-styled-component-theme';
-import { ThemeProvider } from 'styled-components';
 import themes from 'themes';
+import { DesignSystemProvider } from '../src/utils/design-system-provider';
 
 export const parameters = {
   actions: { argTypesRegex: '^on[A-Z].*' },
@@ -14,4 +12,10 @@ export const parameters = {
   },
 };
 
-addDecorator(withThemesProvider([themes.light, themes.dark]), ThemeProvider);
+export const decorators = [
+  Story => (
+    <DesignSystemProvider theme={themes.light}>
+      <Story />
+    </DesignSystemProvider>
+  ),
+];

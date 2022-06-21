@@ -22,7 +22,7 @@ export const Wrapper = ({ children }: WrapperProps) => (
   </React.StrictMode>
 );
 
-export const customRender = (Component: React.ReactNode) => {
+export const customRender = (Component?: React.ReactNode) => {
   throwOnConsoleErrors();
   return render(
     <Wrapper>
