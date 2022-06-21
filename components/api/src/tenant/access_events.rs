@@ -42,7 +42,6 @@ fn handler(
     } else {
         state.config.default_page_size
     };
-    println!("Data kinds {:?}", data_kinds);
 
     let tenant = auth.tenant(&state.db_pool).await?;
     let results = db::access_event::list_for_tenant(

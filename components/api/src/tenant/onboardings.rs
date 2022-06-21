@@ -4,6 +4,7 @@ use crate::types::success::ApiPaginatedResponseData;
 use crate::State;
 use crate::{auth::session_context::SessionContext, errors::ApiError};
 use chrono::NaiveDateTime;
+use db::onboarding::OnboardingListQueryParams;
 use db::DbError;
 use newtypes::tenant::workos::WorkOsSession;
 use newtypes::{DataKind, FootprintUserId, Status};
@@ -67,17 +68,16 @@ fn handler(
     };
 
     let conn = state.db_pool.get().await.map_err(DbError::from)?;
+    let query_params = OnboardingListQueryParams {
+        tenant_id: tenant.id.clone(),
+        status,
+        fingerprint,
+        footprint_user_id,
+    };
     let (onboardings, user_to_kinds) = conn
         .interact(move |conn| -> Result<_, DbError> {
-            let onboardings = db::onboarding::list_for_tenant(
-                conn,
-                tenant.id.clone(),
-                status,
-                fingerprint,
-                footprint_user_id,
-                cursor,
-                (page_size + 1) as i64,
-            )?;
+            let onboardings =
+                db::onboarding::list_for_tenant(conn, query_params, cursor, (page_size + 1) as i64)?;
             let user_vault_ids = onboardings.iter().map(|ob| ob.user_vault_id.clone()).collect();
             let user_to_kinds = db::user_data::bulk_fetch_populated_kinds(conn, user_vault_ids)?;
 

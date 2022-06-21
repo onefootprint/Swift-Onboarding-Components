@@ -1,51 +1,59 @@
-use crate::errors::DbError;
 use crate::models::onboardings::Onboarding;
 use crate::schema;
+use crate::{errors::DbError, schema::onboardings::BoxedQuery};
 use deadpool_diesel::postgres::Pool;
+use diesel::dsl::any;
+use diesel::pg::Pg;
 use diesel::prelude::*;
 use newtypes::{FootprintUserId, ObConfigurationId, Status, TenantId, UserVaultId};
+
+pub struct OnboardingListQueryParams {
+    pub tenant_id: TenantId,
+    pub status: Option<Status>,
+    pub fingerprint: Option<Vec<u8>>,
+    pub footprint_user_id: Option<FootprintUserId>,
+}
+
+pub fn list_for_tenant_query<'a>(params: OnboardingListQueryParams) -> BoxedQuery<'a, Pg> {
+    let mut query = schema::onboardings::table
+        .filter(schema::onboardings::tenant_id.eq(params.tenant_id))
+        .into_boxed();
+
+    if let Some(status) = params.status {
+        query = query.filter(schema::onboardings::status.eq(status))
+    }
+
+    if let Some(footprint_user_id) = params.footprint_user_id {
+        query = query.filter(schema::onboardings::user_ob_id.eq(footprint_user_id))
+    }
+
+    if let Some(fingerprint) = params.fingerprint {
+        let matching_uv_ids = schema::user_data::table
+            .filter(schema::user_data::user_vault_id.eq(schema::onboardings::user_vault_id))
+            .filter(schema::user_data::deactivated_at.is_null())
+            .filter(schema::user_data::sh_data.eq(fingerprint))
+            .select(schema::user_data::user_vault_id)
+            .distinct();
+        query = query.filter(schema::onboardings::user_vault_id.eq(any(matching_uv_ids)))
+    }
+
+    query
+}
 
 // lists all onboardings across all configurations
 pub fn list_for_tenant(
     conn: &PgConnection,
-    tenant_id: TenantId,
-    status: Option<Status>,
-    fingerprint: Option<Vec<u8>>,
-    footprint_user_id: Option<FootprintUserId>,
+    params: OnboardingListQueryParams,
     cursor: Option<i64>,
     page_size: i64,
 ) -> Result<Vec<Onboarding>, DbError> {
-    let mut onboardings = schema::onboardings::table
-        .left_join(
-            schema::user_data::table.on(schema::user_data::user_vault_id
-                .eq(schema::onboardings::user_vault_id)
-                .and(schema::user_data::deactivated_at.is_null())),
-        )
-        .filter(schema::onboardings::tenant_id.eq(tenant_id))
-        .order_by(schema::onboardings::ordering_id.desc())
-        .limit(page_size)
-        .into_boxed();
-
-    if let Some(status) = status {
-        onboardings = onboardings.filter(schema::onboardings::status.eq(status))
-    }
-
-    if let Some(fingerprint) = fingerprint {
-        onboardings = onboardings.filter(schema::user_data::sh_data.eq(fingerprint))
-    }
-
-    if let Some(footprint_user_id) = footprint_user_id {
-        onboardings = onboardings.filter(schema::onboardings::user_ob_id.eq(footprint_user_id))
-    }
+    let mut onboardings = list_for_tenant_query(params).order_by(schema::onboardings::ordering_id.desc());
 
     if let Some(cursor) = cursor {
         onboardings = onboardings.filter(schema::onboardings::ordering_id.le(cursor));
     }
 
-    let onboardings = onboardings
-        .select(schema::onboardings::all_columns)
-        .distinct()
-        .load(conn)?;
+    let onboardings = onboardings.limit(page_size).load(conn)?;
     Ok(onboardings)
 }
 
