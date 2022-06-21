@@ -134,7 +134,12 @@ describe('Onboarding Machine Tests', () => {
       machine.start();
 
       // Onboarding for a new user starts with liveness register
-      expect(machine.state.value).toEqual(States.livenessRegister);
+      const { state } = machine;
+      const { context } = state;
+      expect(context.userFound).toEqual(false);
+      expect(context.missingWebauthnCredentials).toEqual(true);
+      // When done liveness register machine transitions to residential address directly since basic info data is collected
+      expect(machine.state.value).toEqual(States.residentialAddress);
     });
 
     it('User found and not missing any data are set correctly in context', () => {

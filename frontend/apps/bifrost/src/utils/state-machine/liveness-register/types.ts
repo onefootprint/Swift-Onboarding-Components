@@ -6,7 +6,8 @@ export enum States {
   qrRegister = 'qrRegister',
   qrCodeScanned = 'qrCodeScanned',
   qrCodeSent = 'qrCodeSent',
-  livenessRegisterCompleted = 'livenessRegisterCompleted',
+  livenessRegisterSucceeded = 'livenessRegisterSucceeded',
+  livenessRegisterFailed = 'livenessRegisterFailed',
 }
 
 export type MachineContext = {

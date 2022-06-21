@@ -9,10 +9,15 @@ import {
   States,
 } from './types';
 
-const createLivenessRegisterMachine = (
-  device: DeviceInfo,
-  authToken?: string,
-) =>
+export type LivenessRegisterMachineArgs = {
+  device: DeviceInfo;
+  authToken?: string;
+};
+
+const createLivenessRegisterMachine = ({
+  device,
+  authToken,
+}: LivenessRegisterMachineArgs) =>
   createMachine<MachineContext, MachineEvents>(
     {
       id: 'livenessRegister',
@@ -27,11 +32,11 @@ const createLivenessRegisterMachine = (
             {
               target: States.biometricRegister,
               cond: context =>
-                context.device.hasSupportForWebAuthn &&
-                context.device.type === 'mobile',
+                context.device.type === 'mobile' &&
+                context.device.hasSupportForWebAuthn,
             },
             {
-              target: States.captchaRegister,
+              target: States.livenessRegisterFailed,
               cond: context =>
                 context.device.type === 'mobile' &&
                 !context.device.hasSupportForWebAuthn,
@@ -44,7 +49,7 @@ const createLivenessRegisterMachine = (
         [States.biometricRegister]: {
           on: {
             [Events.biometricRegisterSucceeded]: {
-              target: States.livenessRegisterCompleted,
+              target: States.livenessRegisterSucceeded,
             },
           },
         },
@@ -60,13 +65,12 @@ const createLivenessRegisterMachine = (
               target: States.qrCodeScanned,
             },
             [Events.qrRegisterSucceeded]: {
-              target: States.livenessRegisterCompleted,
+              target: States.livenessRegisterSucceeded,
             },
             [Events.qrRegisterFailed]: {
-              target: States.livenessRegisterCompleted,
+              target: States.livenessRegisterFailed,
             },
             [Events.statusPollingErrored]: {
-              target: States.qrRegister,
               actions: [Actions.clearScopedAuthToken],
             },
           },
@@ -74,13 +78,14 @@ const createLivenessRegisterMachine = (
         [States.qrCodeScanned]: {
           on: {
             [Events.qrCodeCanceled]: {
-              target: States.qrRegister, // TODO: is this right?
+              target: States.qrRegister,
+              actions: [Actions.clearScopedAuthToken],
             },
             [Events.qrRegisterSucceeded]: {
-              target: States.livenessRegisterCompleted,
+              target: States.livenessRegisterSucceeded,
             },
             [Events.qrRegisterFailed]: {
-              target: States.livenessRegisterCompleted,
+              target: States.livenessRegisterFailed,
             },
             [Events.statusPollingErrored]: {
               target: States.qrRegister,
@@ -91,13 +96,14 @@ const createLivenessRegisterMachine = (
         [States.qrCodeSent]: {
           on: {
             [Events.qrCodeCanceled]: {
-              target: States.qrRegister, // TODO: is this right?
+              target: States.qrRegister,
+              actions: [Actions.clearScopedAuthToken],
             },
             [Events.qrRegisterSucceeded]: {
-              target: States.livenessRegisterCompleted,
+              target: States.livenessRegisterSucceeded,
             },
             [Events.qrRegisterFailed]: {
-              target: States.livenessRegisterCompleted,
+              target: States.livenessRegisterFailed,
             },
             [Events.statusPollingErrored]: {
               target: States.qrRegister,
@@ -105,14 +111,10 @@ const createLivenessRegisterMachine = (
             },
           },
         },
-        [States.captchaRegister]: {
-          on: {
-            [Events.captchaRegisterSucceeded]: {
-              target: States.livenessRegisterCompleted,
-            },
-          },
+        [States.livenessRegisterSucceeded]: {
+          type: 'final',
         },
-        [States.livenessRegisterCompleted]: {
+        [States.livenessRegisterFailed]: {
           type: 'final',
         },
       },
@@ -126,7 +128,10 @@ const createLivenessRegisterMachine = (
           return context;
         }),
         [Actions.clearScopedAuthToken]: assign((context, event) => {
-          if (event.type === Events.statusPollingErrored) {
+          if (
+            event.type === Events.statusPollingErrored ||
+            event.type === Events.qrCodeCanceled
+          ) {
             context.scopedAuthToken = undefined;
           }
           return context;

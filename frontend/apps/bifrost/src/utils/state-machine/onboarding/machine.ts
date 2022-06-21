@@ -128,7 +128,10 @@ const createOnboardingMachine = ({
           invoke: {
             id: 'livenessRegister',
             src: context =>
-              createLivenessRegisterMachine(context.device, context.authToken),
+              createLivenessRegisterMachine({
+                device: context.device,
+                authToken: context.authToken,
+              }),
             onDone: [
               {
                 target: States.basicInformation,
