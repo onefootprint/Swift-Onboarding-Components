@@ -9,7 +9,7 @@ type ReasonScreenProps = {
 
 const ReasonScreen = ({ reason, setReason, hasError }: ReasonScreenProps) => (
   <>
-    <Typography variant="label-1" sx={{ marginTop: 5, marginBottom: 7 }}>
+    <Typography variant="label-1" sx={{ marginBottom: 7 }}>
       Briefly describe why you need to decrypt this data.
     </Typography>
     <TextArea

@@ -8,7 +8,7 @@ import {
 import styled, { css } from 'styled-components';
 import { Badge, Code, Typography } from 'ui';
 
-import DecryptModal from '../decrypt-modal';
+import DecryptDialog from '../decrypt-dialog';
 
 type BasicInfoProps = {
   user: User;
@@ -44,7 +44,7 @@ const UserHeader = ({ user, onDecrypt }: BasicInfoProps) => {
           </Typography>
           <Code>{footprintUserId}</Code>
         </RowContainer>
-        <DecryptModal user={user} onDecrypt={onDecrypt} />
+        <DecryptDialog user={user} onDecrypt={onDecrypt} />
       </SplitRow>
     </HeaderContainer>
   );

@@ -34,7 +34,7 @@ const AttributesScreen = ({
     kinds.every(kind => selectedFields[kind] || isFieldDisabled(kind));
   return (
     <>
-      <Typography variant="label-1" sx={{ marginTop: 5 }}>
+      <Typography variant="label-1">
         What data would you like to decrypt?
       </Typography>
       {hasError && (

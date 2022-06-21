@@ -14,6 +14,8 @@ export * from './container';
 export { default as Container } from './container';
 export * from './country-select';
 export { default as CountrySelect } from './country-select';
+export * from './dialog';
+export { default as Dialog } from './dialog';
 export { default as Divider } from './divider';
 export * from './footprint-button';
 export { default as FootprintButton } from './footprint-button';
