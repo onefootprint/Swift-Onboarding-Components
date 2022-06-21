@@ -3,6 +3,7 @@ import { QueryFunctionContext, QueryKey, useQuery } from 'react-query';
 import request, { RequestError, RequestResponse } from 'request';
 import useSessionUser from 'src/hooks/use-session-user';
 import {
+  getCursors,
   OnboardingListFilters,
   useFilters,
 } from 'src/pages/users/hooks/use-filters';
@@ -25,14 +26,10 @@ const getOnboardingsRequest = async ({
 
   // cursors is a stack of cursors for all pages visited. Use the cursor on the top of the stack
   // (the current page) when asking the backend for results
-  const currentCursors = JSON.parse(params.cursors || '[]');
-  const cursor = currentCursors
-    ? currentCursors[currentCursors.length - 1]
-    : undefined;
-
+  const cursors = getCursors(params);
   const req = {
     ...omit(params, 'cursors'),
-    cursor,
+    cursor: cursors[cursors.length - 1],
     pageSize: 5, // TODO
   };
   const { data: response } = await request<RequestResponse<Onboarding[]>>({

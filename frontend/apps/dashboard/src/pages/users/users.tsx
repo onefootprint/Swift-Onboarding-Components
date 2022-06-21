@@ -1,5 +1,3 @@
-import IcoChevronLeft16 from 'icons/ico/ico-chevron-left-16';
-import IcoChevronRight16 from 'icons/ico/ico-chevron-right-16';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { Row, Table } from 'src/components/table';
@@ -7,10 +5,11 @@ import FieldOrPlaceholder from 'src/pages/users/components/field-or-placeholder'
 import { nameData, User } from 'src/pages/users/hooks/use-join-users';
 import { statusToBadgeVariant, statusToDisplayText } from 'src/types';
 import styled, { css } from 'styled-components';
-import { Badge, Code, IconButton, SearchInput, Typography } from 'ui';
+import { Badge, Code, SearchInput, Typography } from 'ui';
 
 import UsersFilter from './components/users-filter';
 import useGetUsers from './hooks/use-get-users';
+import Pagination from './pages/detail/components/pagination';
 
 const columns = [
   { text: 'Name', width: '15%' },
@@ -111,20 +110,12 @@ const Users = () => {
           </>
         )}
       />
-      <PaginationContainer>
-        <IconButton
-          disabled={!hasPrevPage}
-          iconComponent={IcoChevronLeft16}
-          ariaLabel="Previous page"
-          onClick={loadPrevPage}
-        />
-        <IconButton
-          iconComponent={IcoChevronRight16}
-          disabled={!hasNextPage}
-          ariaLabel="Next page"
-          onClick={loadNextPage}
-        />
-      </PaginationContainer>
+      <Pagination
+        onNextPage={loadNextPage}
+        onPrevPage={loadPrevPage}
+        hasNextPage={hasNextPage}
+        hasPrevPage={hasPrevPage}
+      />
     </>
   );
 };
@@ -139,16 +130,6 @@ const StyledSearchInput = styled(SearchInput)`
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
   height: 52px;
-`;
-
-const PaginationContainer = styled.div`
-  display: flex;
-  flex-direction: row;
-  justify-content: right;
-  ${({ theme }) => css`
-    margin-top: ${theme.spacing[5]}px;
-    gap: ${theme.spacing[2]}px;
-  `};
 `;
 
 export default Users;
