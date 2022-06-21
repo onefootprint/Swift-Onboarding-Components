@@ -43,7 +43,7 @@ export default class MyDocument extends Document {
           <LoadFonts />
           <meta
             name="apple-itunes-app"
-            content="app-id=1630183534, app-clip-bundle-id=C246BC89CJ.in.alexgr.FootprintVerify.Clip, app-clip-display=card"
+            content="app-id=1630183534, app-clip-bundle-id=in.alexgr.FootprintVerify.Clip, app-clip-display=card"
           />
         </Head>
         <body>
