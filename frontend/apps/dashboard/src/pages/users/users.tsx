@@ -9,7 +9,6 @@ import { statusToBadgeVariant, statusToDisplayText } from 'src/types';
 import styled, { css } from 'styled-components';
 import { Badge, Code, IconButton, SearchInput, Typography } from 'ui';
 
-import DecryptDataDialog from './components/decrypt-data-dialog';
 import UsersFilter from './components/users-filter';
 import useGetUsers from './hooks/use-get-users';
 
@@ -126,7 +125,6 @@ const Users = () => {
           onClick={loadNextPage}
         />
       </PaginationContainer>
-      <DecryptDataDialog open={false} onClose={() => {}} />
     </>
   );
 };
