@@ -34,6 +34,8 @@ export * from './pin-input';
 export { default as PinInput } from './pin-input';
 export * from './portal';
 export { default as Portal } from './portal';
+export * from './radio-input';
+export { default as RadioInput } from './radio-input';
 export * from './search-input';
 export { default as SearchInput } from './search-input';
 export * from './select';
