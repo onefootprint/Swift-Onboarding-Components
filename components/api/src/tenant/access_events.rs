@@ -54,8 +54,8 @@ fn handler(
     let params = AccessEventListQueryParams {
         tenant_id: tenant.id.clone(),
         fp_user_id: footprint_user_id.clone(),
-        timestamp_lte: timestamp_lte.map(|x| x.naive_utc()),
-        timestamp_gte: timestamp_gte.map(|x| x.naive_utc()),
+        timestamp_lte: timestamp_lte.as_ref().map(DateTime::naive_utc),
+        timestamp_gte: timestamp_gte.as_ref().map(DateTime::naive_utc),
         kinds: data_kinds,
     };
     let results =
