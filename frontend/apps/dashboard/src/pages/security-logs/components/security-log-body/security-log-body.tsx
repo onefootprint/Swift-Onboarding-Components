@@ -10,7 +10,7 @@ type SecurityLogBodyProps = {
 const SecurityLogBody = ({ accessEvent }: SecurityLogBodyProps) => (
   <AccessEventBodyContainer>
     <div>
-      <Typography variant="label-3">accessEvent</Typography>
+      <Typography variant="label-3">User</Typography>
       <DataGrid>
         <Typography variant="label-3" color="tertiary">
           Footprint token
@@ -25,10 +25,14 @@ const SecurityLogBody = ({ accessEvent }: SecurityLogBodyProps) => (
         <Typography variant="label-3">Metadata</Typography>
         <DataGrid>
           <Typography variant="label-3" color="tertiary">
-            Zip code
+            Region
           </Typography>
           <Typography variant="body-3">
-            {accessEvent.insightEvent.postalCode || '-'}
+            {accessEvent.insightEvent.city && accessEvent.insightEvent.region
+              ? `${accessEvent.insightEvent.city}, ${accessEvent.insightEvent.region}`
+              : accessEvent.insightEvent.city ||
+                accessEvent.insightEvent.region ||
+                '-'}
           </Typography>
           <Typography variant="label-3" color="tertiary">
             IP Address
@@ -37,14 +41,10 @@ const SecurityLogBody = ({ accessEvent }: SecurityLogBodyProps) => (
             {accessEvent.insightEvent.ipAddress || '-'}
           </Typography>
           <Typography variant="label-3" color="tertiary">
-            City, State
+            Country
           </Typography>
           <Typography variant="body-3">
-            {accessEvent.insightEvent.city && accessEvent.insightEvent.region
-              ? `${accessEvent.insightEvent.city}, ${accessEvent.insightEvent.region}`
-              : accessEvent.insightEvent.city ||
-                accessEvent.insightEvent.region ||
-                '-'}
+            {accessEvent.insightEvent.country || '-'}
           </Typography>
           <Typography variant="label-3" color="tertiary">
             Device/OS
@@ -60,10 +60,10 @@ const SecurityLogBody = ({ accessEvent }: SecurityLogBodyProps) => (
             </Typography>
           </Box>
           <Typography variant="label-3" color="tertiary">
-            Country
+            Zip code
           </Typography>
           <Typography variant="body-3">
-            {accessEvent.insightEvent.country || '-'}
+            {accessEvent.insightEvent.postalCode || '-'}
           </Typography>
         </DataGrid>
       </div>
