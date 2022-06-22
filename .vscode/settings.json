@@ -38,7 +38,7 @@
         "webauthn"
     ],
     "[rust]": {
-        "editor.defaultFormatter": "statiolake.vscode-rustfmt",
+        "editor.defaultFormatter": "rust-lang.rust-analyzer",
         "editor.semanticHighlighting.enabled": true,
         "editor.formatOnSave": true
     },

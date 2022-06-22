@@ -4,8 +4,8 @@ use std::time::Duration;
 
 use config::Config;
 use enclave::{
-    enclave::handle_fn_decrypt, enclave::handle_hmac_sign, EnclavePayload, EnclaveResponse,
-    RpcPayload, WireMessage,
+    enclave::handle_fn_decrypt, enclave::handle_hmac_sign, EnclavePayload, EnclaveResponse, RpcPayload,
+    WireMessage,
 };
 
 #[allow(unused_imports)]
@@ -54,14 +54,14 @@ async fn listen_tcp(address: &str) -> std::io::Result<()> {
 async fn listen_vsock(port: u32) -> std::io::Result<()> {
     let listener = VsockListener::bind(libc::VMADDR_CID_ANY, port)?;
 
-    eprintln!("Listening for VSOCK connections on port: {}", port);
+    log::debug!("Listening for VSOCK connections on port: {}", port);
 
     let mut incoming = listener.incoming();
     while let Some(result) = incoming.next().await {
         match result {
             Ok(stream) => stream_listen(stream),
             Err(e) => {
-                eprintln!("Got error accepting connection: {:?}", e);
+                log::debug!("Got error accepting connection: {:?}", e);
                 return Err(e);
             }
         }
@@ -71,14 +71,14 @@ async fn listen_vsock(port: u32) -> std::io::Result<()> {
 }
 
 fn stream_listen<S: AsyncRead + AsyncWrite + Unpin + Send + 'static>(stream: S) {
-    eprintln!("= new stream open =");
+    log::debug!("= new stream open =");
     tokio::spawn(async move {
         let mut stream = stream;
         loop {
             match handle_stream(&mut stream).await {
                 Ok(_) => tokio::time::sleep(Duration::from_millis(100)).await,
                 Err(e) => {
-                    eprintln!("handle stream error: {:?}", e);
+                    log::error!("handle stream error: {:?}", e);
                     return;
                 }
             }
@@ -91,17 +91,17 @@ async fn handle_stream<S: AsyncRead + AsyncWrite + Unpin + Send + 'static>(
 ) -> Result<(), enclave::Error> {
     let message = WireMessage::from_stream(stream).await?;
     let request = message.request()?;
-    eprintln!("got request {request:?}");
+    log::debug!("got request {request:?}");
 
     let response_payload = match handle_request(request.payload).await {
         Ok(response) => response,
         Err(error) => {
-            eprintln!("got error handling request: {error:?}");
+            log::error!("got error handling request: {error:?}");
             EnclavePayload::Error(format!("{error:?}"))
         }
     };
 
-    eprintln!("successfully created response payload");
+    log::debug!("successfully created response payload");
 
     let response = EnclaveResponse {
         payload: response_payload,
@@ -113,7 +113,7 @@ async fn handle_stream<S: AsyncRead + AsyncWrite + Unpin + Send + 'static>(
     stream.write_all(&out).await?;
     stream.flush().await?;
 
-    eprintln!("wrote stream");
+    log::debug!("wrote stream");
 
     Ok(())
 }

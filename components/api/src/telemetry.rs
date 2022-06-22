@@ -17,17 +17,21 @@ use tracing_subscriber::Registry;
 
 use crate::config::Config;
 
-pub fn init(config: &Config) -> Result<PushController, Box<dyn std::error::Error>> {
+pub fn init(config: &Config) -> Result<Option<PushController>, Box<dyn std::error::Error>> {
     env_logger::init();
+    let env_filter = EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::new("info"));
 
     global::set_text_map_propagator(TraceContextPropagator::new());
 
-    let env_filter = EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::new("info"));
-    let _formatting_layer = BunyanFormattingLayer::new(
-        "fcm".into(),
-        // Output the formatted spans to stdout.
-        std::io::stdout,
-    );
+    // don't setup the exporter
+    if config.disable_otel.is_some() {
+        let sub = Registry::default()
+            .with(env_filter)
+            .with(tracing_subscriber::fmt::layer().pretty());
+
+        tracing::subscriber::set_global_default(sub)?;
+        return Ok(None);
+    }
 
     let exporter = if let Some(otel_endpoint) = &config.otel_endpoint {
         opentelemetry_otlp::new_exporter()
@@ -62,7 +66,7 @@ pub fn init(config: &Config) -> Result<PushController, Box<dyn std::error::Error
         .with_aggregator_selector(selectors::simple::Selector::Exact)
         .build()?;
 
-    Ok(metrics)
+    Ok(Some(metrics))
 }
 
 #[allow(unused)]
@@ -76,21 +80,14 @@ impl RootSpanBuilder for TelemetrySpanBuilder {
         let route = format!(
             "{} {}",
             request.method().as_str(),
-            request
-                .uri()
-                .path_and_query()
-                .map(|p| p.as_str())
-                .unwrap_or("")
+            request.uri().path_and_query().map(|p| p.as_str()).unwrap_or("")
         );
         let span = root_span!(request);
         tracing::info!("{}", route);
         span
     }
 
-    fn on_request_end<B>(
-        span: Span,
-        outcome: &Result<actix_web::dev::ServiceResponse<B>, actix_web::Error>,
-    ) {
+    fn on_request_end<B>(span: Span, outcome: &Result<actix_web::dev::ServiceResponse<B>, actix_web::Error>) {
         DefaultRootSpanBuilder::on_request_end(span, outcome)
     }
 }

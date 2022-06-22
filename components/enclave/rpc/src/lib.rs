@@ -1,3 +1,5 @@
+use std::fmt::Debug;
+
 use byteorder::{BigEndian, ByteOrder, WriteBytesExt};
 use crypto::seal::EciesP256Sha256AesGcmSealed;
 use serde::{Deserialize, Serialize};
@@ -28,7 +30,7 @@ pub enum RpcPayload {
     HmacSign(EnvelopeHmacSign),
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Clone, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub struct EnvelopeDecrypt {
     pub kms_creds: KmsCredentials,
@@ -36,14 +38,32 @@ pub struct EnvelopeDecrypt {
     pub requests: Vec<DecryptRequest>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+impl Debug for EnvelopeDecrypt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("EnvelopeDecrypt")
+            .field("kms_creds", &"<omitted>")
+            .field("sealed_key", &"<omitted>")
+            .field("requests", &self.requests)
+            .finish()
+    }
+}
+
+#[derive(Clone, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub struct DecryptRequest {
     pub sealed_data: EciesP256Sha256AesGcmSealed,
     pub transform: DataTransform,
 }
+impl Debug for DecryptRequest {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("DecryptRequest")
+            .field("sealed_data", &"<omitted>")
+            .field("transform", &self.transform)
+            .finish()
+    }
+}
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Clone, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub struct EnvelopeHmacSign {
     pub kms_creds: KmsCredentials,
@@ -52,12 +72,33 @@ pub struct EnvelopeHmacSign {
     pub scope: Vec<u8>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+impl Debug for EnvelopeHmacSign {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("EnvelopeHmacSign")
+            .field("kms_creds", &self.kms_creds)
+            .field("sealed_key", &"<omitted>")
+            .field("data", &"<omitted>")
+            .field("scope", &self.scope)
+            .finish()
+    }
+}
+
+#[derive(Clone, Serialize, Deserialize)]
 pub struct KmsCredentials {
     pub region: String,
     pub key_id: String,
     pub secret_key: String,
     pub session_token: Option<String>,
+}
+impl Debug for KmsCredentials {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("KmsCredentials")
+            .field("region", &self.region)
+            .field("key_id", &self.key_id)
+            .field("secret_key", &"<omitted>")
+            .field("session_token", &"<omitted>")
+            .finish()
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -117,17 +158,32 @@ pub struct FnDecryption {
     pub results: Vec<FnDecryptionSingle>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Clone, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub struct FnDecryptionSingle {
     pub transform: DataTransform,
     pub data: Vec<u8>,
 }
+impl Debug for FnDecryptionSingle {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("FnDecryptionSingle")
+            .field("transform", &self.transform)
+            .field("data", &"<omitted>")
+            .finish()
+    }
+}
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Clone, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub struct HmacSignature {
     pub signature: Vec<u8>,
+}
+impl Debug for HmacSignature {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("HmacSignature")
+            .field("signature", &"<omitted>")
+            .finish()
+    }
 }
 
 #[derive(Debug, Clone)]

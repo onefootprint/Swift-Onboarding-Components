@@ -144,16 +144,16 @@ jobs:
               sleep 10
           done
           cd ci
-          pytest -q integration_tests.py --emoji -v --md report.md --html report.html --self-contained-html > /dev/null && kill $server_pid
+          pytest -q integration_tests.py --emoji -v --md report.md --html report.html --self-contained-html && kill $server_pid
 
       - name: Comment markdown on PR
         working-directory: ci
         run: |
           COMMENT="$(awk '{printf "%s\\n", $0}' report.md)"
           comments_url=$(curl -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/onefootprint/footprint-core/pulls/$PR_NUMBER" | jq '._links.comments.href' | sed 's/\"//g')
-          curl -X POST -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" "$comments_url" -d "{\"body\": \"$COMMENT\" }"
+          curl -X POST -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" "$comments_url" -d "{\"body\": \" $COMMENT \" }"
         # only run on PRs
-        if: github.ref != 'refs/heads/master'
+        if: ${{ github.ref != 'refs/heads/master' && (success() || failure()) }}
 
       - name: Upload pytest test results
         uses: actions/upload-artifact@v3
@@ -162,7 +162,7 @@ jobs:
           path: ci/report.html
         # Use always() to always run this step to publish test results when there are test failures
         if: ${{ always() }}
-      
+
       - name: Install diesel cli
         run: cargo install diesel_cli --no-default-features --features postgres
 

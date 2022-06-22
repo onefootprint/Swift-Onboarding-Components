@@ -1,7 +1,6 @@
 use std::{borrow::Cow, time::Duration};
 
 use actix_web::{middleware::Logger, App, HttpServer};
-use actix_web_opentelemetry::RequestMetrics;
 use config::Config;
 use crypto::aead::ScopedSealingKey;
 use db::DbPool;
@@ -67,9 +66,7 @@ async fn main() -> std::io::Result<()> {
     let config = config::Config::load_from_env().expect("failed to load config");
 
     // telemetry
-    let _started = telemetry::init(&config).expect("failed to init telemetry layers");
-    let meter = opentelemetry::global::meter("actix_web");
-    let metrics = RequestMetrics::new(meter, Some(should_render_metrics), None);
+    let _controller = telemetry::init(&config).expect("failed to init telemetry layers");
 
     // sentry
     let _guard = if let Some(env) = config.service_environment.clone() {
@@ -197,7 +194,6 @@ async fn main() -> std::io::Result<()> {
             .wrap(actix_web::middleware::NormalizePath::trim())
             .wrap(Logger::default())
             .wrap(TracingLogger::<TelemetrySpanBuilder>::new())
-            .wrap(metrics.clone())
             .wrap(cors)
             .app_data(json_cfg)
             .wrap_api()
@@ -222,8 +218,4 @@ async fn main() -> std::io::Result<()> {
 
     // telemetry::shutdown();
     res
-}
-
-fn should_render_metrics(_: &actix_web::dev::ServiceRequest) -> bool {
-    false
 }
