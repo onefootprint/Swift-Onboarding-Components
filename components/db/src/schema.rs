@@ -71,6 +71,7 @@ table! {
         start_insight_event_id -> Nullable<Uuid>,
         liveness_insight_event_id -> Nullable<Uuid>,
         ordering_id -> Int8,
+        start_timestamp -> Timestamp,
     }
 }
 

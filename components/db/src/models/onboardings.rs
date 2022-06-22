@@ -23,6 +23,7 @@ pub struct Onboarding {
     pub start_insight_event_id: Option<Uuid>,
     pub liveness_insight_event_id: Option<Uuid>,
     pub ordering_id: i64,
+    pub start_timestamp: NaiveDateTime,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
@@ -33,6 +34,7 @@ pub struct NewOnboarding {
     pub tenant_id: TenantId,
     pub status: Status,
     pub start_insight_event_id: Option<Uuid>,
+    pub start_timestamp: NaiveDateTime,
 }
 
 impl NewOnboarding {
@@ -69,6 +71,7 @@ impl NewOnboarding {
                             tenant_id,
                             status,
                             start_insight_event_id: Some(insight_event.id),
+                            start_timestamp: chrono::Utc::now().naive_utc(),
                         };
 
                         let new_ob = diesel::insert_into(onboardings::table)
