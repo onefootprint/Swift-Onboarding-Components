@@ -35,13 +35,17 @@ const useUserDataImpl = () => {
     });
   };
 
-  const setLoading = (userId: string, loadingAttributes: DataKindType[]) => {
+  const setLoading = (
+    userId: string,
+    loadingAttributes: DataKindType[],
+    value = true,
+  ) => {
     const currentDecryptedUser =
       decryptedUsers.get(userId) || ({} as UserAttributes);
     const newAttrs = Object.fromEntries(
       loadingAttributes.map(x => [
         x,
-        { ...currentDecryptedUser[x], isLoading: true },
+        { ...currentDecryptedUser[x], isLoading: value },
       ]),
     );
     setDecryptedUser(userId, {

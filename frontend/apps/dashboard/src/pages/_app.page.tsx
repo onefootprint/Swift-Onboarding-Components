@@ -1,13 +1,12 @@
 import React from 'react';
-import { QueryClientProvider } from 'react-query';
 import PageGuard from 'src/components/page-guard';
 import { createGlobalStyle } from 'styled-components';
 import themes from 'themes';
 import { DesignSystemProvider } from 'ui';
 
 import Layout from '../components/layout';
+import DashboardQueryClientProvider from '../config/initializers/dashboard-query-client-provider';
 import configureReactI18next from '../config/initializers/react-i18next';
-import queryClient from '../config/initializers/react-query';
 import configureSentry from '../config/initializers/sentry';
 import { UserDataProvider } from './users/hooks/use-user-data';
 
@@ -20,8 +19,8 @@ type AppProps = {
 };
 
 const App = ({ Component, pageProps }: AppProps) => (
-  <QueryClientProvider client={queryClient}>
-    <DesignSystemProvider theme={themes.light}>
+  <DesignSystemProvider theme={themes.light}>
+    <DashboardQueryClientProvider>
       <UserDataProvider>
         <GlobalStyle />
         <PageGuard>
@@ -30,8 +29,8 @@ const App = ({ Component, pageProps }: AppProps) => (
           </Layout>
         </PageGuard>
       </UserDataProvider>
-    </DesignSystemProvider>
-  </QueryClientProvider>
+    </DashboardQueryClientProvider>
+  </DesignSystemProvider>
 );
 
 const GlobalStyle = createGlobalStyle``;

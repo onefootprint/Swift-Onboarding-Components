@@ -1,16 +1,19 @@
-import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
+import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
 import applyCaseMiddleware from 'axios-case-converter';
 import { API_BASE_URL, API_TIMEOUT } from 'global-constants';
 
-export type RequestError = {
-  error: { message?: string };
-};
+export type RequestError = AxiosError<{
+  error: { message: string };
+}>;
 
 export type RequestResponse<T> = AxiosResponse<T>;
 
 export type RequestSuccess<T> = {
   data: T;
 };
+
+export const isFootprintError = (error: unknown): error is RequestError =>
+  (error as RequestError).response?.data.error.message !== undefined;
 
 const request = <TData = any>(requestConfig: AxiosRequestConfig = {}) => {
   const client = applyCaseMiddleware(axios.create());

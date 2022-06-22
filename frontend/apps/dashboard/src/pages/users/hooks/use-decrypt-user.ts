@@ -61,7 +61,8 @@ const useDecryptUser = () => {
       .mutateAsync(req)
       .then((decryptedUserAttributes: DecryptedUserAttributes) => {
         updateDecryptedUser(userId, decryptedUserAttributes);
-      });
+      })
+      .catch(() => setLoading(userId, fieldsToDecrypt, false));
   };
 
   return {
