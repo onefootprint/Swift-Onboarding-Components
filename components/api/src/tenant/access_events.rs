@@ -5,6 +5,8 @@ use crate::types::success::ApiPaginatedResponseData;
 use crate::utils::querystring::deserialize_stringified_list;
 use crate::State;
 use crate::{auth::session_context::SessionContext, errors::ApiError};
+use chrono::{DateTime, Utc};
+use db::access_event::AccessEventListQueryParams;
 use newtypes::{tenant::workos::WorkOsSession, DataKind, FootprintUserId};
 use paperclip::actix::{api_v2_operation, get, web, web::Json, Apiv2Schema};
 
@@ -15,6 +17,9 @@ struct AccessEventRequest {
     #[serde(default)]
     #[serde(deserialize_with = "deserialize_stringified_list")]
     data_kinds: Vec<DataKind>,
+    // Accept timezones with a timestamp, but translate them to naive utc representation
+    timestamp_lte: Option<DateTime<Utc>>,
+    timestamp_gte: Option<DateTime<Utc>>,
     cursor: Option<i64>,
     page_size: Option<usize>,
 }
@@ -34,6 +39,8 @@ fn handler(
     let AccessEventRequest {
         footprint_user_id,
         data_kinds,
+        timestamp_lte,
+        timestamp_gte,
         cursor,
         page_size,
     } = request.into_inner();
@@ -44,15 +51,15 @@ fn handler(
     };
 
     let tenant = auth.tenant(&state.db_pool).await?;
-    let results = db::access_event::list_for_tenant(
-        &state.db_pool,
-        tenant.id.clone(),
-        footprint_user_id.clone(),
-        data_kinds,
-        cursor,
-        (page_size + 1) as i64,
-    )
-    .await?;
+    let params = AccessEventListQueryParams {
+        tenant_id: tenant.id.clone(),
+        fp_user_id: footprint_user_id.clone(),
+        timestamp_lte: timestamp_lte.map(|x| x.naive_utc()),
+        timestamp_gte: timestamp_gte.map(|x| x.naive_utc()),
+        kinds: data_kinds,
+    };
+    let results =
+        db::access_event::list_for_tenant(&state.db_pool, params, cursor, (page_size + 1) as i64).await?;
 
     // If there are more than page_size results, we should tell the client there's another page
     let cursor = if results.len() > page_size {

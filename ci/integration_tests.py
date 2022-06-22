@@ -1,3 +1,4 @@
+import arrow
 import os
 import pytest
 import random
@@ -564,6 +565,7 @@ def test_access_events_list(request, workos_tenant):
     # Test filtering on kinds. We provide two different kinds, and we should get all access events
     # that contain at least one of these fields
     path = f"org/access_events?footprint_user_id={fp_user_id}&data_kinds=email,street_address"
+    print(url(path))
     r = requests.get(
         url(path),
         headers=_client_priv_key_headers(workos_tenant["sk"]),
@@ -573,6 +575,16 @@ def test_access_events_list(request, workos_tenant):
     assert len(access_events) == 2
     assert "email" in set(access_events[0]["data_kinds"])
     assert "street_address" in set(access_events[1]["data_kinds"])
+
+    # Test filtering on timestamp - if we filter for events in the future, there shouldn't be any
+    path = f"org/access_events?timestamp_gte={arrow.now().shift(days=1).isoformat()}"
+    print(url(path))
+    r = requests.get(
+        url(path),
+        headers=_client_priv_key_headers(workos_tenant["sk"]),
+    )
+    body = _assert_response(r)
+    assert not body["data"]
 
 def test_logged_in_user_detail(request):
     # Get the user detail using the logged in context

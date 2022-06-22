@@ -82,8 +82,8 @@ fn handler(
         statuses,
         fingerprint,
         footprint_user_id,
-        timestamp_lte: timestamp_lte.map(DateTime::naive_utc),
-        timestamp_gte: timestamp_gte.map(DateTime::naive_utc),
+        timestamp_lte: timestamp_lte.map(|x| x.naive_utc()),
+        timestamp_gte: timestamp_gte.map(|x| x.naive_utc()),
     };
     let (onboardings, user_to_kinds, count) = conn
         .interact(move |conn| -> Result<_, DbError> {
