@@ -18,6 +18,7 @@ export type CheckboxProps = {
   readOnly?: boolean;
   required?: boolean;
   testID?: string;
+  value?: any;
 };
 
 const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
@@ -35,6 +36,7 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
       readOnly,
       required,
       testID,
+      value,
     }: CheckboxProps,
     ref,
   ) => {
@@ -62,6 +64,7 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
             ref={ref}
             required={required}
             tabIndex={disabled ? undefined : 0}
+            value={value}
             type="checkbox"
           />
           {label}
