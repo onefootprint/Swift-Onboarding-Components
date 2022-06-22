@@ -21,11 +21,11 @@ const Toast = ({
     <Box sx={{ flexGrow: 1 }}>
       <Typography
         color={variant === 'error' ? 'error' : 'primary'}
-        variant="label-4"
+        variant="label-3"
       >
         {title}
       </Typography>
-      <Typography color="tertiary" variant="body-4">
+      <Typography color="tertiary" variant="body-3">
         {description}
       </Typography>
     </Box>
@@ -40,29 +40,24 @@ const Toast = ({
   </ToastContainer>
 );
 
-const openAnimation = keyframes`
-  from {
-    opacity: 0;
-    transform: translateX(-12.5%);
-  }
+const slideIn = keyframes`
   to {
     transform: translateX(0);
   }
 `;
 
-const closeAnimation = keyframes`
- from {
-    opacity: 1;
+const slideOut = keyframes`
+  from {
     transform: translateX(0);
   }
   to {
-    opacity: 0;
-    transform: translateX(-12.5%);
+    transform: translateX(320px);
   }
 `;
 
 const ToastContainer = styled.div<{ leaving: boolean }>`
   ${({ theme, leaving }) => css`
+    transform: translateX(320px);
     width: 320px;
     align-items: flex-start;
     background: ${theme.backgroundColor.primary};
@@ -73,13 +68,14 @@ const ToastContainer = styled.div<{ leaving: boolean }>`
     flex-direction: row;
     gap: ${theme.spacing[3]}px;
     padding: ${theme.spacing[4]}px;
-    animation: ${leaving ? closeAnimation : openAnimation} 300ms
-      cubic-bezier(0.175, 0.885, 0.32, 1.175) both;
+    animation: ${leaving ? slideOut : slideIn} 200ms forwards;
 
     button {
       background: none;
       border: none;
       cursor: pointer;
+      margin: 0;
+      padding: 0;
     }
   `}
 `;
