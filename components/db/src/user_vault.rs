@@ -72,6 +72,34 @@ pub async fn get_by_tenant_and_onboarding(
     Ok(result)
 }
 
+pub async fn get_by_fingerprint_and_uv_id(
+    pool: &Pool,
+    data_kind: DataKind,
+    uv_id: UserVaultId,
+    sh_data: Vec<u8>,
+    require_verified: bool,
+) -> Result<Option<(UserVault, UserData)>, DbError> {
+    let result = pool
+        .get()
+        .await?
+        .interact(move |conn| -> Result<Option<(UserVault, UserData)>, DbError> {
+            let mut result = schema::user_vaults::table
+                .inner_join(schema::user_data::table)
+                .filter(schema::user_data::data_kind.eq(data_kind))
+                .filter(schema::user_data::sh_data.eq(Some(sh_data)))
+                .filter(schema::user_vaults::id.eq(uv_id))
+                .into_boxed();
+            if require_verified {
+                result = result.filter(schema::user_data::is_verified.eq(true));
+            }
+            let result = result.first(conn).optional()?;
+            Ok(result)
+        })
+        .await??;
+
+    Ok(result)
+}
+
 pub async fn get_by_fingerprint(
     pool: &Pool,
     data_kind: DataKind,

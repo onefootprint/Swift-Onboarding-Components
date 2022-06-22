@@ -47,7 +47,7 @@ pub fn post(
         user_vault_id: user_auth.data.user_vault_id,
         status,
     });
-    Session::update(&state.db_pool, session_data, user_auth.auth_token).await?;
+    Session::update(&state.db_pool, Some(session_data), user_auth.auth_token, None).await?;
 
     Ok(Json(ApiResponseData { data: Empty }))
 }

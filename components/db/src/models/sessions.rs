@@ -25,11 +25,12 @@ pub struct NewSession {
     pub expires_at: NaiveDateTime,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
+#[derive(Debug, Clone, Serialize, Deserialize, Insertable, AsChangeset)]
 #[table_name = "sessions"]
 pub struct UpdateSession {
     pub h_session_id: String,
-    pub session_data: ServerSession,
+    pub session_data: Option<ServerSession>,
+    pub expires_at: Option<NaiveDateTime>,
 }
 
 impl Session {
@@ -54,18 +55,36 @@ impl Session {
 
     pub async fn update(
         pool: &DbPool,
-        session_data: ServerSession,
+        session_data: Option<ServerSession>,
         token: String,
+        expires_at: Option<NaiveDateTime>,
     ) -> Result<(Session, String), crate::DbError> {
         let h_session_id: String = crypto::sha256(token.as_bytes()).encode_hex();
 
         let session = UpdateSession {
             h_session_id,
             session_data,
+            expires_at,
         }
         .update(pool)
         .await?;
         Ok((session, token))
+    }
+
+    pub async fn update_for_h_session_id(
+        pool: &DbPool,
+        session_data: Option<ServerSession>,
+        h_session_id: String,
+        expires_at: Option<NaiveDateTime>,
+    ) -> Result<Session, crate::DbError> {
+        let session = UpdateSession {
+            h_session_id,
+            session_data,
+            expires_at,
+        }
+        .update(pool)
+        .await?;
+        Ok(session)
     }
 }
 
@@ -97,8 +116,8 @@ impl UpdateSession {
             .await?
             .interact(move |conn| {
                 diesel::update(sessions::table)
-                    .filter(sessions::h_session_id.eq(self.h_session_id))
-                    .set(sessions::session_data.eq(self.session_data))
+                    .filter(sessions::h_session_id.eq(self.h_session_id.clone()))
+                    .set(self)
                     .get_result::<Session>(conn)
             })
             .await??;

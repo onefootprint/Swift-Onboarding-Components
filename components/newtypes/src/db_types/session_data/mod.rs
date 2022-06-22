@@ -1,4 +1,5 @@
 use self::{
+    email::email_verify::EmailVerifySession,
     tenant::workos::WorkOsSession,
     user::{d2p::D2pSession, my_fp::MyFootprintSession, onboarding::OnboardingSession},
 };
@@ -14,6 +15,7 @@ use serde::{Deserialize, Serialize};
 use serde_json;
 use std::io::Write;
 use thiserror::Error;
+pub mod email;
 pub mod tenant;
 pub mod user;
 
@@ -35,6 +37,7 @@ pub enum ServerSession {
     D2p(D2pSession),                 // desktop 2 phone transfer session
     // Misc
     ChallengeLastSent { sent_at: chrono::NaiveDateTime }, // Used to rate limit challenges sent to phone number
+    EmailVerify(EmailVerifySession),                      // Used for validating email challenges
 }
 
 pub enum ApiAccessType {

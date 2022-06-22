@@ -64,8 +64,8 @@ pub enum ApiError {
     UserMissingRequiredFields(String),
     #[error("user does not exist for email challenge")]
     UserDoesntExistForEmailChallenge,
-    #[error("email challenge decrpytion error")]
-    EmailChallengeDecryptionError,
+    #[error("token invalid or not found")]
+    EmailVerificationTokenInvalidOrNotFound,
     #[error("email challenge expired")]
     EmailChallengeExpired,
     #[error("invalid tenant skey or footprint user id")]
@@ -153,7 +153,6 @@ impl actix_web::ResponseError for ApiError {
             ApiError::ChallengeExpired => actix_web::http::StatusCode::BAD_REQUEST,
             ApiError::UserMissingRequiredFields(_) => actix_web::http::StatusCode::BAD_REQUEST,
             ApiError::UserDoesntExistForEmailChallenge => actix_web::http::StatusCode::BAD_REQUEST,
-            ApiError::EmailChallengeDecryptionError => actix_web::http::StatusCode::BAD_REQUEST,
             ApiError::EmailChallengeExpired => actix_web::http::StatusCode::BAD_REQUEST,
             ApiError::InvalidTenantKeyOrUserId => actix_web::http::StatusCode::BAD_REQUEST,
             ApiError::Webauthn(_) => StatusCode::INTERNAL_SERVER_ERROR,
@@ -179,6 +178,7 @@ impl actix_web::ResponseError for ApiError {
             ApiError::ReqwestError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::SendgridError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::NewtypeError(_) => StatusCode::BAD_REQUEST,
+            ApiError::EmailVerificationTokenInvalidOrNotFound => StatusCode::BAD_REQUEST,
         }
     }
 

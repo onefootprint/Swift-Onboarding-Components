@@ -135,7 +135,7 @@ pub async fn update<C: UserVaultPermissions>(
         // only send a verification email if it's new
         // TODO: edge case where a user may want to re-send email that isn't verified?
         if uv_data_for_email.is_none() {
-            send_email_challenge(state, user_vault.public_key.clone(), cleaned_email).await?;
+            send_email_challenge(state, user_vault.id.clone(), cleaned_email).await?;
         }
     }
 

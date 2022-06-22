@@ -1,13 +1,12 @@
 use crate::errors::ApiError;
-use crate::utils::crypto::{seal_to_vault_pkey, signed_hash};
+use crate::utils::crypto::signed_hash;
 use crate::State;
-use chrono::NaiveDateTime;
-use crypto::serde_cbor;
-use newtypes::Base64Data;
+use crypto::random::gen_random_alphanumeric_code;
+use newtypes::email::email_verify::EmailVerifySession;
+use newtypes::{ServerSession, UserVaultId};
 use paperclip::actix::web;
 use reqwest::StatusCode;
 use std::collections::HashMap;
-use std::str::FromStr;
 
 #[derive(Debug, Clone)]
 pub struct SendgridClient {
@@ -106,54 +105,31 @@ impl SendgridClient {
     }
 }
 
-#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
-pub struct EmailVerifyChallenge {
-    pub expires_at: NaiveDateTime,
-    pub email: String,
-}
-
 pub fn clean_email(raw_email: String) -> String {
     raw_email.to_lowercase()
 }
 
-#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
-pub struct EmailVerifyData {
-    pub sh_email: Vec<u8>,
-    pub e_email_challenge: Vec<u8>,
-}
-
-impl EmailVerifyData {
-    pub fn serialize(&self) -> Result<String, ApiError> {
-        let email_verify_data = serde_cbor::to_vec(self).map_err(crypto::Error::from)?;
-        Ok(Base64Data(email_verify_data).to_string())
-    }
-
-    pub fn deserialize(data: String) -> Result<EmailVerifyData, ApiError> {
-        let data_slice = Base64Data::from_str(&data).map_err(crypto::Error::from)?.0;
-        let email_verify_data: EmailVerifyData =
-            serde_cbor::from_slice(&data_slice).map_err(crypto::Error::from)?;
-        Ok(email_verify_data)
-    }
-}
-
 pub(crate) async fn send_email_challenge(
     state: &web::Data<State>,
-    public_key: Vec<u8>,
+    uv_id: UserVaultId,
     email_address: String,
 ) -> Result<(), ApiError> {
-    let email_challenge = EmailVerifyChallenge {
-        expires_at: chrono::Utc::now().naive_utc() + chrono::Duration::days(1),
-        email: email_address.clone(),
-    };
-    let email_challenge = serde_json::to_string::<EmailVerifyChallenge>(&email_challenge)
-        .map_err(|_| ApiError::ChallengeNotValid)?;
-    let email_verify_data = EmailVerifyData {
+    let session_data = ServerSession::EmailVerify(EmailVerifySession {
+        uv_id,
         sh_email: signed_hash(state, email_address.clone()).await?,
-        e_email_challenge: seal_to_vault_pkey(email_challenge, &public_key)?,
-    }
-    .serialize()?;
+    });
 
-    let curl_request_str = format!("https://verify.ui.footprint.dev/#{}", email_verify_data,);
+    // create new session
+    let (_, token) = db::models::sessions::Session::create(
+        &state.db_pool,
+        session_data,
+        chrono::Utc::now().naive_utc() + chrono::Duration::days(1),
+    )
+    .await?;
+
+    // add unique url query param to avoid incorrect caching by browser/client
+    let unique_param = gen_random_alphanumeric_code(5);
+    let curl_request_str = format!("https://verify.ui.footprint.dev/?v={}#{}", unique_param, token);
     let _output = state
         .sendgrid_client
         .send_with_challenge_template(email_address, curl_request_str)
