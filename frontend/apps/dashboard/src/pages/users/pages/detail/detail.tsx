@@ -15,7 +15,7 @@ import useGetUsers from '../../hooks/use-get-users';
 import BasicInfo from './components/basic-info';
 
 const Detail = () => {
-  const { users, loadEncryptedAttributes } = useGetUsers();
+  const { users, loadEncryptedAttributes } = useGetUsers(1);
   // TODO error handling when this data is empty
   // https://linear.app/footprint/issue/FP-202
   const user = users?.[0]!;

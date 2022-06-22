@@ -4,25 +4,30 @@ import request, { RequestError, RequestResponse } from 'request';
 import useSessionUser from 'src/hooks/use-session-user';
 import {
   getCursors,
-  OnboardingListFilters,
+  OnboardingListQuerystring,
   useFilters,
 } from 'src/pages/users/hooks/use-filters';
 import { Onboarding } from 'src/types';
 
 import { DASHBOARD_AUTHORIZATION_HEADER } from '../../../config/constants';
 
-type OnboardingsListQueryKey = [string, OnboardingListFilters, string];
+type OnboardingsListQueryKey = [
+  string,
+  OnboardingListQuerystring,
+  string,
+  number,
+];
 
 type OnboardingsListResponse = {
   data: Onboarding[];
   next?: string;
-  prev?: string;
+  count?: number;
 };
 
 const getOnboardingsRequest = async ({
   queryKey,
 }: QueryFunctionContext<QueryKey, string>) => {
-  const [, params, auth] = queryKey as OnboardingsListQueryKey;
+  const [, params, auth, pageSize] = queryKey as OnboardingsListQueryKey;
 
   // cursors is a stack of cursors for all pages visited. Use the cursor on the top of the stack
   // (the current page) when asking the backend for results
@@ -30,7 +35,7 @@ const getOnboardingsRequest = async ({
   const req = {
     ...omit(params, 'cursors'),
     cursor: cursors[cursors.length - 1],
-    pageSize: 5, // TODO
+    pageSize,
   };
   const { data: response } = await request<RequestResponse<Onboarding[]>>({
     method: 'GET',
@@ -41,13 +46,13 @@ const getOnboardingsRequest = async ({
   return response;
 };
 
-const useGetOnboardings = () => {
+const useGetOnboardings = (pageSize: number) => {
   const session = useSessionUser();
   const auth = session.data?.auth;
   const { query } = useFilters();
 
   return useQuery<OnboardingsListResponse, RequestError>(
-    ['paginatedOnboardings', query, auth],
+    ['paginatedOnboardings', query, auth, pageSize],
     getOnboardingsRequest,
     {
       retry: false,

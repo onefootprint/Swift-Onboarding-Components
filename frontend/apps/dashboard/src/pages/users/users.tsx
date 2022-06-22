@@ -22,9 +22,13 @@ const columns = [
   { text: 'ID', width: '6%' },
 ];
 
+const PAGE_SIZE = 10;
+
 const Users = () => {
   const {
     users,
+    totalNumResults,
+    pageIndex,
     isLoading,
     loadNextPage,
     loadPrevPage,
@@ -32,7 +36,7 @@ const Users = () => {
     hasPrevPage,
     query,
     setFilter,
-  } = useGetUsers();
+  } = useGetUsers(PAGE_SIZE);
 
   const [searchText, setSearchText] = useState<string>();
 
@@ -111,6 +115,9 @@ const Users = () => {
         )}
       />
       <Pagination
+        totalNumResults={totalNumResults}
+        pageSize={PAGE_SIZE}
+        pageIndex={pageIndex}
         onNextPage={loadNextPage}
         onPrevPage={loadPrevPage}
         hasNextPage={hasNextPage}

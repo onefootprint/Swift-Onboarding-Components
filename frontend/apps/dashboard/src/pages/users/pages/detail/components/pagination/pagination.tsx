@@ -1,8 +1,11 @@
 import React from 'react';
 import styled, { css } from 'styled-components';
-import { Button } from 'ui';
+import { Box, Button, Typography } from 'ui';
 
 type PaginationProps = {
+  totalNumResults: number;
+  pageSize: number;
+  pageIndex: number;
   onPrevPage: () => void;
   onNextPage: () => void;
   hasPrevPage: boolean;
@@ -10,38 +13,61 @@ type PaginationProps = {
 };
 
 const Pagination = ({
+  totalNumResults,
+  pageSize,
+  pageIndex,
   onPrevPage,
   onNextPage,
   hasPrevPage,
   hasNextPage,
-}: PaginationProps) => (
-  <PaginationContainer>
-    <Button
-      disabled={!hasPrevPage}
-      onClick={onPrevPage}
-      variant="secondary"
-      size="small"
+}: PaginationProps) => {
+  const lowerBoundShownResults = pageIndex * pageSize + 1;
+  const upperBoundShownResults = Math.min(
+    (pageIndex + 1) * pageSize,
+    totalNumResults,
+  );
+  return (
+    <Box
+      sx={{ display: 'flex', justifyContent: 'space-between', marginTop: 5 }}
     >
-      Previous
-    </Button>
-    <Button
-      disabled={!hasNextPage}
-      onClick={onNextPage}
-      variant="secondary"
-      size="small"
-    >
-      Next
-    </Button>
-  </PaginationContainer>
-);
+      <Box sx={{ display: 'flex', alignItems: 'center' }}>
+        {totalNumResults ? (
+          <Typography variant="label-3">
+            Showing {lowerBoundShownResults} to {upperBoundShownResults} of{' '}
+            {totalNumResults} results
+          </Typography>
+        ) : (
+          <Typography variant="label-3">No results</Typography>
+        )}
+      </Box>
+      <ButtonContainer>
+        <Button
+          disabled={!hasPrevPage}
+          onClick={onPrevPage}
+          variant="secondary"
+          size="small"
+        >
+          Previous
+        </Button>
+        <Button
+          disabled={!hasNextPage}
+          onClick={onNextPage}
+          variant="secondary"
+          size="small"
+        >
+          Next
+        </Button>
+      </ButtonContainer>
+    </Box>
+  );
+};
 
-const PaginationContainer = styled.div`
+const ButtonContainer = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: right;
   ${({ theme }) => css`
-    margin-top: ${theme.spacing[5]}px;
-    gap: ${theme.spacing[4]}px;
+    gap: ${theme.spacing[3]}px;
   `};
 `;
 
