@@ -9,6 +9,7 @@ import Layout from '../components/layout';
 import configureReactI18next from '../config/initializers/react-i18next';
 import queryClient from '../config/initializers/react-query';
 import configureSentry from '../config/initializers/sentry';
+import { UserDataProvider } from './users/hooks/use-user-data';
 
 configureSentry();
 configureReactI18next();
@@ -21,12 +22,14 @@ type AppProps = {
 const App = ({ Component, pageProps }: AppProps) => (
   <QueryClientProvider client={queryClient}>
     <DesignSystemProvider theme={themes.light}>
-      <GlobalStyle />
-      <PageGuard>
-        <Layout>
-          <Component {...pageProps} />
-        </Layout>
-      </PageGuard>
+      <UserDataProvider>
+        <GlobalStyle />
+        <PageGuard>
+          <Layout>
+            <Component {...pageProps} />
+          </Layout>
+        </PageGuard>
+      </UserDataProvider>
     </DesignSystemProvider>
   </QueryClientProvider>
 );

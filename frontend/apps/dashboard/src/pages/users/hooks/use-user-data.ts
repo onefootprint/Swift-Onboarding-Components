@@ -1,4 +1,4 @@
-import { singletonHook } from 'react-singleton-hook';
+import constate from 'constate';
 import { DataKindType, DecryptedUserAttributes } from 'src/types';
 import { useMap } from 'usehooks-ts';
 
@@ -59,12 +59,6 @@ const useUserDataImpl = () => {
 
 // Create a singleton of this hook that is reused by all invocations. This allows data to be shared
 // across multiple invocations of this hook.
-const useUserData = singletonHook(
-  {
-    decryptedUsers: new Map<String, UserAttributes>(),
-    updateDecryptedUser: () => {},
-    setLoading: () => {},
-  },
-  useUserDataImpl,
-);
+const [Provider, useUserData] = constate(useUserDataImpl);
 export default useUserData;
+export const UserDataProvider = Provider;
