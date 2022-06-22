@@ -68,7 +68,7 @@ const useJoinUsers = (
           footprintUserId: onboarding.footprintUserId,
           status: onboarding.status,
           orderingId: onboarding.orderingId,
-          initiatedAt: onboarding.createdAt,
+          initiatedAt: onboarding.startTimestamp,
           attributes,
         } as User;
       }),

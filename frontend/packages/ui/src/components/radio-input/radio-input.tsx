@@ -19,6 +19,7 @@ export type RadioInputProps = {
   readOnly?: boolean;
   required?: boolean;
   testID?: string;
+  value?: any;
 };
 
 const RadioInput = forwardRef<HTMLInputElement, RadioInputProps>(
@@ -37,6 +38,7 @@ const RadioInput = forwardRef<HTMLInputElement, RadioInputProps>(
       readOnly,
       required,
       testID,
+      value,
     }: RadioInputProps,
     ref,
   ) => {
@@ -66,6 +68,7 @@ const RadioInput = forwardRef<HTMLInputElement, RadioInputProps>(
             required={required}
             tabIndex={disabled ? undefined : 0}
             type="radio"
+            value={value}
           />
           {label}
         </Label>

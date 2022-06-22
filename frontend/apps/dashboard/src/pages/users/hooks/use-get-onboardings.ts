@@ -4,10 +4,11 @@ import request, { RequestError, RequestResponse } from 'request';
 import useSessionUser from 'src/hooks/use-session-user';
 import {
   getCursors,
+  getDateRange,
   OnboardingListQuerystring,
   useFilters,
 } from 'src/pages/users/hooks/use-filters';
-import { Onboarding } from 'src/types';
+import { dateRangeToFilterParams, Onboarding } from 'src/types';
 
 import { DASHBOARD_AUTHORIZATION_HEADER } from '../../../config/constants';
 
@@ -28,12 +29,13 @@ const getOnboardingsRequest = async ({
   queryKey,
 }: QueryFunctionContext<QueryKey, string>) => {
   const [, params, auth, pageSize] = queryKey as OnboardingsListQueryKey;
-
+  const dateRangeFilters = dateRangeToFilterParams(getDateRange(params));
   // cursors is a stack of cursors for all pages visited. Use the cursor on the top of the stack
   // (the current page) when asking the backend for results
   const cursors = getCursors(params);
   const req = {
-    ...omit(params, 'cursors'),
+    ...omit(params, 'cursors', 'dateRange'),
+    ...dateRangeFilters,
     cursor: cursors[cursors.length - 1],
     pageSize,
   };

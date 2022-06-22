@@ -5,7 +5,6 @@ export type Onboarding = {
   footprintUserId: string;
   status: OnboardingStatus;
   populatedDataKinds: DataKind[];
-  createdAt: string; // TODO rename this initiatedAt
-  updatedAt: string;
+  startTimestamp: string;
   orderingId: string;
 };
