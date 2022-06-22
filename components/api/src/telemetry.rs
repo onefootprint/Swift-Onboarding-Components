@@ -9,7 +9,6 @@ use tracing::Span;
 use tracing_actix_web::root_span;
 use tracing_actix_web::DefaultRootSpanBuilder;
 use tracing_actix_web::RootSpanBuilder;
-use tracing_bunyan_formatter::BunyanFormattingLayer;
 use tracing_bunyan_formatter::JsonStorageLayer;
 use tracing_subscriber::prelude::*;
 use tracing_subscriber::EnvFilter;
