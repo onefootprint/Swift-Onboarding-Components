@@ -10,7 +10,7 @@ use newtypes::{FootprintUserId, ObConfigurationId, Status, TenantId, UserVaultId
 #[derive(Clone)]
 pub struct OnboardingListQueryParams {
     pub tenant_id: TenantId,
-    pub status: Option<Status>,
+    pub statuses: Vec<Status>,
     pub fingerprint: Option<Vec<u8>>,
     pub footprint_user_id: Option<FootprintUserId>,
 }
@@ -20,8 +20,8 @@ pub fn list_for_tenant_query<'a>(params: OnboardingListQueryParams) -> BoxedQuer
         .filter(schema::onboardings::tenant_id.eq(params.tenant_id))
         .into_boxed();
 
-    if let Some(status) = params.status {
-        query = query.filter(schema::onboardings::status.eq(status))
+    if !params.statuses.is_empty() {
+        query = query.filter(schema::onboardings::status.eq(any(params.statuses)))
     }
 
     if let Some(footprint_user_id) = params.footprint_user_id {

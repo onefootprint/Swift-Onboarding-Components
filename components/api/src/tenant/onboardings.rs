@@ -1,6 +1,7 @@
 use crate::auth::client_secret_key::SecretTenantAuthContext;
 use crate::auth::either::Either;
 use crate::types::success::ApiPaginatedResponseData;
+use crate::utils::querystring::deserialize_stringified_list;
 use crate::State;
 use crate::{auth::session_context::SessionContext, errors::ApiError};
 use chrono::NaiveDateTime;
@@ -13,7 +14,9 @@ use paperclip::actix::{api_v2_operation, get, web, web::Json, Apiv2Schema};
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
 struct OnboardingRequest {
-    status: Option<Status>,
+    #[serde(default)]
+    #[serde(deserialize_with = "deserialize_stringified_list")]
+    statuses: Vec<Status>,
     fingerprint: Option<String>,
     footprint_user_id: Option<FootprintUserId>,
     cursor: Option<i64>,
@@ -45,7 +48,7 @@ fn handler(
     let tenant = auth.tenant(&state.db_pool).await?;
 
     let OnboardingRequest {
-        status,
+        statuses,
         fingerprint,
         footprint_user_id,
         cursor,
@@ -70,7 +73,7 @@ fn handler(
     let conn = state.db_pool.get().await.map_err(DbError::from)?;
     let query_params = OnboardingListQueryParams {
         tenant_id: tenant.id.clone(),
-        status,
+        statuses,
         fingerprint,
         footprint_user_id,
     };
