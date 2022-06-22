@@ -1,3 +1,4 @@
+from urllib.parse import urlencode
 import arrow
 import os
 import pytest
@@ -548,7 +549,7 @@ def test_onboardings_list(request, workos_tenant):
     onboardings = body["data"]
     assert len(onboardings)
     assert onboardings[0]["footprint_user_id"] == old_fp_user_id
-    assert ["first_name", "last_name"] < onboardings[0]["populated_data_kinds"]
+    assert set(["first_name", "last_name"]) < set(onboardings[0]["populated_data_kinds"])
 
 def test_access_events_list(request, workos_tenant):
     fp_user_id = request.config.cache.get("fp_user_id", None)
@@ -579,7 +580,10 @@ def test_access_events_list(request, workos_tenant):
     assert "street_address" in set(access_events[1]["data_kinds"])
 
     # Test filtering on timestamp - if we filter for events in the future, there shouldn't be any
-    path = f"org/access_events?timestamp_gte={arrow.now().shift(days=1).isoformat()}"
+    params = dict(
+        timestamp_gte=arrow.utcnow().shift(days=1).isoformat()
+    )
+    path = f"org/access_events?{urlencode(params)}"
     print(url(path))
     r = requests.get(
         url(path),
