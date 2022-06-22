@@ -49,3 +49,7 @@ export const dateRangeToFilterParams = (dateRange: DateRange) => {
       return {};
   }
 };
+
+// Serialize allTime date range as nothing for a cleaner querystring
+export const serializeDateRange = (dateRange: DateRange) =>
+  dateRange === DateRange.allTime ? undefined : dateRange;

@@ -5,6 +5,7 @@ import {
   DateRange,
   dateRangeToDisplayText,
   OnboardingStatus,
+  serializeDateRange,
   statusToDisplayText,
 } from 'src/types';
 import styled, { css } from 'styled-components';
@@ -32,13 +33,9 @@ const UsersFilter = () => {
   };
 
   const handleApplyClick = () => {
-    const dateRange = getValues('dateRange');
-    // Serialize allTime date range as nothing for a cleaner querystring
-    const cleanedDateRange =
-      dateRange === DateRange.allTime ? undefined : dateRange;
     setFilter({
       statuses: getValues('onboardingStatuses').join(','),
-      dateRange: cleanedDateRange,
+      dateRange: serializeDateRange(getValues('dateRange')),
     });
     setShowDialog(false);
   };

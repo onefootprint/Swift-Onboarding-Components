@@ -3,9 +3,10 @@ import request, { RequestError, RequestResponse } from 'request';
 import useSessionUser from 'src/hooks/use-session-user';
 import {
   AccessEventFilters,
+  getDateRange,
   useFilters,
 } from 'src/pages/security-logs/hooks/use-filters';
-import { AccessEvent } from 'src/types';
+import { AccessEvent, dateRangeToFilterParams } from 'src/types';
 
 import { DASHBOARD_AUTHORIZATION_HEADER } from '../../../config/constants';
 
@@ -21,9 +22,11 @@ const getAccessEventsRequest = async ({
   pageParam,
 }: QueryFunctionContext<QueryKey, string>) => {
   const [, filters, auth] = queryKey as AccessEventQueryKey;
+  const dateRangeFilters = dateRangeToFilterParams(getDateRange(filters));
   // Join filter request args with the pageParam
   const params = {
     ...filters,
+    ...dateRangeFilters,
     cursor: pageParam,
   };
   const { data: response } = await request<RequestResponse<AccessEvent[]>>({
