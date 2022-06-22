@@ -4,7 +4,7 @@ use crate::types::success::ApiPaginatedResponseData;
 use crate::utils::querystring::deserialize_stringified_list;
 use crate::State;
 use crate::{auth::session_context::SessionContext, errors::ApiError};
-use chrono::NaiveDateTime;
+use chrono::{DateTime, NaiveDateTime, Utc};
 use db::onboarding::OnboardingListQueryParams;
 use db::DbError;
 use newtypes::tenant::workos::WorkOsSession;
@@ -19,6 +19,9 @@ struct OnboardingRequest {
     statuses: Vec<Status>,
     fingerprint: Option<String>,
     footprint_user_id: Option<FootprintUserId>,
+    // Accept timezones with a timestamp, but translate them to naive utc representation
+    timestamp_lte: Option<DateTime<Utc>>,
+    timestamp_gte: Option<DateTime<Utc>>,
     cursor: Option<i64>,
     page_size: Option<usize>,
 }
@@ -30,6 +33,7 @@ struct OnboardingItem {
     pub populated_data_kinds: Vec<DataKind>,
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
+    pub start_timestamp: NaiveDateTime,
     pub ordering_id: i64,
 }
 
@@ -51,6 +55,8 @@ fn handler(
         statuses,
         fingerprint,
         footprint_user_id,
+        timestamp_lte,
+        timestamp_gte,
         cursor,
         page_size,
     } = request.into_inner();
@@ -76,6 +82,8 @@ fn handler(
         statuses,
         fingerprint,
         footprint_user_id,
+        timestamp_lte: timestamp_lte.map(DateTime::naive_utc),
+        timestamp_gte: timestamp_gte.map(DateTime::naive_utc),
     };
     let (onboardings, user_to_kinds, count) = conn
         .interact(move |conn| -> Result<_, DbError> {
@@ -111,6 +119,7 @@ fn handler(
             populated_data_kinds: user_to_kinds.get(&ob.user_vault_id).unwrap_or(&vec![]).clone(),
             created_at: ob.created_at,
             updated_at: ob.updated_at,
+            start_timestamp: ob.start_timestamp,
             ordering_id: ob.ordering_id,
         })
         .collect();

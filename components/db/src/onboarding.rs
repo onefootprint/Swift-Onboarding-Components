@@ -1,6 +1,7 @@
 use crate::models::onboardings::Onboarding;
 use crate::schema;
 use crate::{errors::DbError, schema::onboardings::BoxedQuery};
+use chrono::NaiveDateTime;
 use deadpool_diesel::postgres::Pool;
 use diesel::dsl::any;
 use diesel::pg::Pg;
@@ -13,6 +14,8 @@ pub struct OnboardingListQueryParams {
     pub statuses: Vec<Status>,
     pub fingerprint: Option<Vec<u8>>,
     pub footprint_user_id: Option<FootprintUserId>,
+    pub timestamp_lte: Option<NaiveDateTime>,
+    pub timestamp_gte: Option<NaiveDateTime>,
 }
 
 pub fn list_for_tenant_query<'a>(params: OnboardingListQueryParams) -> BoxedQuery<'a, Pg> {
@@ -26,6 +29,14 @@ pub fn list_for_tenant_query<'a>(params: OnboardingListQueryParams) -> BoxedQuer
 
     if let Some(footprint_user_id) = params.footprint_user_id {
         query = query.filter(schema::onboardings::user_ob_id.eq(footprint_user_id))
+    }
+
+    if let Some(timestamp_lte) = params.timestamp_lte {
+        query = query.filter(schema::onboardings::start_timestamp.le(timestamp_lte))
+    }
+
+    if let Some(timestamp_gte) = params.timestamp_gte {
+        query = query.filter(schema::onboardings::start_timestamp.ge(timestamp_gte))
     }
 
     if let Some(fingerprint) = params.fingerprint {
