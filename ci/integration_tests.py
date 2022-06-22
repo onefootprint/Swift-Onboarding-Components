@@ -535,7 +535,10 @@ def test_tenant_decrypt(request, workos_tenant):
             assert expected_data[data_kind] == value
     
 def test_onboardings_list(request, workos_tenant):
-    path = "org/onboardings"
+    # TODO don't filter on fp_user_id in this test. We only do it to ensure it doesn't flake in dev
+    # https://linear.app/footprint/issue/FP-390/integration-tests-for-onboarding-list-break-in-dev
+    old_fp_user_id = request.config.cache.get("fp_user_id", None)
+    path = "org/onboardings?fp_user_id={old_fp_user_id}"
     print(url(path))
     r = requests.get(
         url(path),
@@ -544,7 +547,6 @@ def test_onboardings_list(request, workos_tenant):
     body = _assert_response(r)
     onboardings = body["data"]
     assert len(onboardings)
-    old_fp_user_id = request.config.cache.get("fp_user_id", None)
     assert onboardings[0]["footprint_user_id"] == old_fp_user_id
     assert ["first_name", "last_name"] < onboardings[0]["populated_data_kinds"]
 
