@@ -15,6 +15,7 @@ use newtypes::UserVaultId;
 pub struct AccessEventListQueryParams {
     pub tenant_id: TenantId,
     pub fp_user_id: Option<FootprintUserId>,
+    pub search: Option<String>,
     pub timestamp_lte: Option<NaiveDateTime>,
     pub timestamp_gte: Option<NaiveDateTime>,
     pub kinds: Vec<DataKind>,
@@ -43,6 +44,14 @@ pub async fn list_for_tenant(
 
             if let Some(fp_user_id) = params.fp_user_id {
                 results = results.filter(schema::onboardings::user_ob_id.eq(fp_user_id))
+            }
+
+            if let Some(search) = params.search {
+                results = results.filter(
+                    schema::access_events::reason
+                        .ilike(format!("%{}%", search))
+                        .or(schema::access_events::principal.ilike(format!("%{}%", search))),
+                )
             }
 
             if let Some(timestamp_lte) = params.timestamp_lte {

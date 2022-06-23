@@ -17,6 +17,7 @@ struct AccessEventRequest {
     #[serde(default)]
     #[serde(deserialize_with = "deserialize_stringified_list")]
     data_kinds: Vec<DataKind>,
+    search: Option<String>,
     // Accept timezones with a timestamp, but translate them to naive utc representation
     timestamp_lte: Option<DateTime<Utc>>,
     timestamp_gte: Option<DateTime<Utc>>,
@@ -39,6 +40,7 @@ fn handler(
     let AccessEventRequest {
         footprint_user_id,
         data_kinds,
+        search,
         timestamp_lte,
         timestamp_gte,
         cursor,
@@ -54,6 +56,7 @@ fn handler(
     let params = AccessEventListQueryParams {
         tenant_id: tenant.id.clone(),
         fp_user_id: footprint_user_id.clone(),
+        search,
         timestamp_lte: timestamp_lte.as_ref().map(DateTime::naive_utc),
         timestamp_gte: timestamp_gte.as_ref().map(DateTime::naive_utc),
         kinds: data_kinds,
