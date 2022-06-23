@@ -12,13 +12,13 @@ const createRandomId = () => Math.random().toString(36).substring(2, 15);
 const useToast = () => {
   const [toasts, setToasts] = useState<ToastProps[]>([]);
 
-  const open = (nextToast: NextToast) => {
+  const open = (nextToast: NextToast, closeTimeoutMs = CLOSE_TIMEOUT) => {
     const id = createRandomId();
     setToasts(currentToasts => [
       ...currentToasts,
       { ...nextToast, id, leaving: false },
     ]);
-    scheduleToClose(id);
+    scheduleToClose(id, closeTimeoutMs);
     return id;
   };
 
