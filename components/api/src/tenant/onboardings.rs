@@ -1,14 +1,15 @@
 use crate::auth::client_secret_key::SecretTenantAuthContext;
 use crate::auth::either::Either;
+use crate::types::onboarding::ApiOnboarding;
 use crate::types::success::ApiPaginatedResponseData;
 use crate::utils::querystring::deserialize_stringified_list;
 use crate::State;
 use crate::{auth::session_context::SessionContext, errors::ApiError};
-use chrono::{DateTime, NaiveDateTime, Utc};
+use chrono::{DateTime, Utc};
 use db::onboarding::OnboardingListQueryParams;
 use db::DbError;
 use newtypes::tenant::workos::WorkOsSession;
-use newtypes::{DataKind, FootprintUserId, Status};
+use newtypes::{FootprintUserId, Status};
 use paperclip::actix::{api_v2_operation, get, web, web::Json, Apiv2Schema};
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize, Apiv2Schema)]
@@ -26,18 +27,7 @@ struct OnboardingRequest {
     page_size: Option<usize>,
 }
 
-#[derive(Debug, Clone, serde::Deserialize, serde::Serialize, Apiv2Schema)]
-struct OnboardingItem {
-    pub footprint_user_id: FootprintUserId,
-    pub status: Status,
-    pub populated_data_kinds: Vec<DataKind>,
-    pub created_at: NaiveDateTime,
-    pub updated_at: NaiveDateTime,
-    pub start_timestamp: NaiveDateTime,
-    pub ordering_id: i64,
-}
-
-type OnboardingResponse = Vec<OnboardingItem>;
+type OnboardingResponse = Vec<ApiOnboarding>;
 
 #[api_v2_operation(tags(Org))]
 #[get("/onboardings")]
@@ -95,7 +85,7 @@ fn handler(
                 Some(_) => None,
                 None => Some(db::onboarding::count_for_tenant(conn, query_params)?),
             };
-            let user_vault_ids = onboardings.iter().map(|ob| ob.user_vault_id.clone()).collect();
+            let user_vault_ids = onboardings.iter().map(|ob| ob.0.user_vault_id.clone()).collect();
             let user_to_kinds = db::user_data::bulk_fetch_populated_kinds(conn, user_vault_ids)?;
 
             Ok((onboardings, user_to_kinds, count))
@@ -105,7 +95,7 @@ fn handler(
 
     // If there are more than page_size results, we should tell the client there's another page
     let cursor = if onboardings.len() > page_size {
-        onboardings.last().map(|x| x.ordering_id)
+        onboardings.last().map(|x| x.0.ordering_id)
     } else {
         None
     };
@@ -113,15 +103,14 @@ fn handler(
     let onboardings = onboardings
         .into_iter()
         .take(page_size)
-        .map(|ob| OnboardingItem {
-            footprint_user_id: ob.user_ob_id,
-            status: ob.status,
-            populated_data_kinds: user_to_kinds.get(&ob.user_vault_id).unwrap_or(&vec![]).clone(),
-            created_at: ob.created_at,
-            updated_at: ob.updated_at,
-            start_timestamp: ob.start_timestamp,
-            ordering_id: ob.ordering_id,
+        .map(|x| {
+            (
+                user_to_kinds.get(&x.0.user_vault_id).unwrap_or(&vec![]).clone(),
+                x.0,
+                x.1,
+            )
         })
+        .map(ApiOnboarding::from)
         .collect();
 
     Ok(Json(ApiPaginatedResponseData::ok(onboardings, cursor, count)))
