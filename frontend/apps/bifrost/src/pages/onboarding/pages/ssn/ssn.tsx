@@ -53,7 +53,10 @@ const SSN = () => {
           mask={inputMasks.ssn}
           placeholder={t('form.ssn.placeholder')}
           type="tel"
-          {...register('ssn', { required: true, maxLength: 11 })}
+          {...register('ssn', {
+            required: true,
+            pattern: /^(?!(000|666|9))(\d{3}-?(?!(00))\d{2}-?(?!(0000))\d{4})$/,
+          })}
         />
         <Disclaimer
           items={[
