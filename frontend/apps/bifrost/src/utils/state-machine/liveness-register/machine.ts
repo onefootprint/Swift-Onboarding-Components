@@ -30,7 +30,7 @@ const createLivenessRegisterMachine = ({
         [States.init]: {
           always: [
             {
-              target: States.biometricRegister,
+              target: States.newTabRequest,
               cond: context =>
                 context.device.type === 'mobile' &&
                 context.device.hasSupportForWebAuthn,
@@ -45,13 +45,6 @@ const createLivenessRegisterMachine = ({
               target: States.qrRegister,
             },
           ],
-        },
-        [States.biometricRegister]: {
-          on: {
-            [Events.biometricRegisterSucceeded]: {
-              target: States.livenessRegisterSucceeded,
-            },
-          },
         },
         [States.qrRegister]: {
           on: {
@@ -111,6 +104,34 @@ const createLivenessRegisterMachine = ({
             },
           },
         },
+        [States.newTabRequest]: {
+          on: {
+            [Events.scopedAuthTokenGenerated]: {
+              actions: [Actions.assignScopedAuthToken],
+            },
+            [Events.newTabOpened]: {
+              target: States.newTabProcessing,
+              actions: [Actions.assignTab],
+            },
+          },
+        },
+        [States.newTabProcessing]: {
+          on: {
+            [Events.newTabRegisterCanceled]: {
+              target: States.newTabRequest,
+            },
+            [Events.newTabRegisterSucceeded]: {
+              target: States.livenessRegisterSucceeded,
+            },
+            [Events.newTabRegisterFailed]: {
+              target: States.livenessRegisterFailed,
+            },
+            [Events.statusPollingErrored]: {
+              target: States.newTabRequest,
+              actions: [Actions.clearScopedAuthToken],
+            },
+          },
+        },
         [States.livenessRegisterSucceeded]: {
           type: 'final',
         },
@@ -124,6 +145,18 @@ const createLivenessRegisterMachine = ({
         [Actions.assignScopedAuthToken]: assign((context, event) => {
           if (event.type === Events.scopedAuthTokenGenerated) {
             context.scopedAuthToken = event.payload.scopedAuthToken;
+          }
+          return context;
+        }),
+        [Actions.assignTab]: assign((context, event) => {
+          if (event.type === Events.newTabOpened) {
+            context.tab = event.payload.tab;
+          }
+          return context;
+        }),
+        [Actions.clearTab]: assign((context, event) => {
+          if (event.type === Events.newTabRegisterCanceled) {
+            context.tab = undefined;
           }
           return context;
         }),

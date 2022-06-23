@@ -1,15 +1,20 @@
-import useBiometricRegister from '@src/hooks/use-register';
+import { useTranslation } from 'hooks';
 import React, { useEffect } from 'react';
-import HeaderTitle from 'src/components/header-title';
-import useD2pMobileMachine, { Events } from 'src/hooks/use-d2p-mobile-machine';
-import useGetD2PStatus, { D2PStatus } from 'src/hooks/use-get-d2p-status';
-import useUpdateD2pStatus, {
-  D2PStatusUpdate,
-} from 'src/hooks/use-update-d2p-status';
 import styled, { css } from 'styled-components';
 import { Button } from 'ui';
 
+import HeaderTitle from '../../components/header-title';
+import useD2pMobileMachine, {
+  Events,
+} from '../../hooks/use-d2p-mobile-machine';
+import useGetD2PStatus, { D2PStatus } from '../../hooks/use-get-d2p-status';
+import useBiometricRegister from '../../hooks/use-register';
+import useUpdateD2pStatus, {
+  D2PStatusUpdate,
+} from '../../hooks/use-update-d2p-status';
+
 const Register = () => {
+  const { t } = useTranslation('pages.register');
   const [state, send] = useD2pMobileMachine();
   const biometricRegisterMutation = useBiometricRegister();
   const updateD2PStatusMutation = useUpdateD2pStatus();
@@ -66,12 +71,9 @@ const Register = () => {
 
   return (
     <Container>
-      <HeaderTitle
-        title="Liveness check"
-        subtitle="We need to verify that you're a real person."
-      />
+      <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
       <Button onClick={handleBiometricRegister} fullWidth>
-        Launch Face ID
+        {t('cta')}
       </Button>
     </Container>
   );

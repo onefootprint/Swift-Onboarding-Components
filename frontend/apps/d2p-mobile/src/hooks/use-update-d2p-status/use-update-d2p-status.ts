@@ -1,6 +1,7 @@
 import { useMutation } from 'react-query';
 import request, { RequestError, RequestResponse } from 'request';
-import { D2P_AUTH_HEADER } from 'src/config/constants';
+
+import { D2P_AUTH_HEADER } from '../../config/constants';
 
 export enum D2PStatusUpdate {
   inProgress = 'in_progress',

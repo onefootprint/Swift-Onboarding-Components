@@ -1,15 +1,25 @@
+import { useTranslation } from 'hooks';
 import React from 'react';
-import HeaderTitle from 'src/components/header-title';
 import styled from 'styled-components';
 
-const Canceled = () => (
-  <Container>
-    <HeaderTitle
-      title="Liveness check canceled"
-      subtitle="Please go back to your computer."
-    />
-  </Container>
-);
+import HeaderTitle from '../../components/header-title';
+import useOpener from '../../hooks/use-opener';
+
+const Canceled = () => {
+  const { t } = useTranslation('pages.canceled');
+  const opener = useOpener();
+
+  return (
+    <Container>
+      <HeaderTitle
+        title={t('title')}
+        subtitle={
+          opener === 'mobile' ? t('subtitle.mobile') : t('subtitle.desktop')
+        }
+      />
+    </Container>
+  );
+};
 
 const Container = styled.div`
   display: flex;

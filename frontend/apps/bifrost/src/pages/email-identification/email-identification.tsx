@@ -30,7 +30,6 @@ const EmailIdentification = () => {
         subtitle="Enter your email to get started."
       />
       <TextInput
-        autoFocus
         hasError={!!errors.email}
         hintText={errors.email && 'Email is required'}
         label="Email"

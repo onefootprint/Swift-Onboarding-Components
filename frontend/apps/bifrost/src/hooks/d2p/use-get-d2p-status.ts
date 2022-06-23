@@ -2,7 +2,6 @@ import { useQuery } from 'react-query';
 import request, { RequestError, RequestResponse } from 'request';
 import { BIFROST_D2P_SCOPED_AUTH_HEADER } from 'src/config/constants';
 import { useLivenessRegisterMachine } from 'src/pages/liveness-register/components/machine-provider';
-import { MachineContext } from 'src/utils/state-machine/liveness-register';
 
 const D2P_STATUS_FETCH_INTERVAL = 1000;
 
@@ -33,16 +32,23 @@ const getD2PStatus = async (payload: GetD2PRequest) => {
   return response.data;
 };
 
-const useGetD2PStatus = () => {
+const useGetD2PStatus = (
+  options: {
+    onSuccess?: (data: GetD2PResponse) => void;
+    onError?: (error: RequestError) => void;
+  } = {},
+) => {
   const [state] = useLivenessRegisterMachine();
-  const { scopedAuthToken } = state.context as MachineContext;
-  return useQuery<GetD2PResponse | undefined, RequestError>(
-    [scopedAuthToken],
-    // If scopedAuthToken hasn't been set yet, return undefined
-    () => (scopedAuthToken ? getD2PStatus({ scopedAuthToken }) : undefined),
+  const scopedAuthToken = state.context.scopedAuthToken || '';
+
+  return useQuery<GetD2PResponse, RequestError>(
+    ['d2p-status', scopedAuthToken],
+    () => getD2PStatus({ scopedAuthToken }),
     {
       refetchInterval: D2P_STATUS_FETCH_INTERVAL,
       enabled: !!scopedAuthToken,
+      onSuccess: options.onSuccess,
+      onError: options.onError,
     },
   );
 };

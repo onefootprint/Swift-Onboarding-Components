@@ -48,7 +48,7 @@ const theme: DefaultTheme = {
     quinary: primitives.gray0,
     senary: primitives.brandThink,
     septenary: primitives.brandGo,
-    accent: primitives.purple600,
+    accent: primitives.purple500,
     error: primitives.red600,
     info: primitives.blue600,
     success: primitives.green600,

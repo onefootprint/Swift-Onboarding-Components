@@ -73,6 +73,8 @@ export const LinkButtonStyled = styled.a.attrs<{
     color: ${theme.color.accent};
     cursor: pointer;
     display: flex;
+    margin: 0;
+    padding: 0;
 
     &:hover {
       opacity: 0.7;

@@ -1,5 +1,5 @@
 import { useFootprintJs } from 'footprint-provider';
-import IcoClose16 from 'icons/ico/ico-close-16';
+import IcoClose24 from 'icons/ico/ico-close-24';
 import React from 'react';
 import { IconButton, useConfirmationDialog } from 'ui';
 
@@ -23,7 +23,7 @@ const CloseButton = () => {
 
   return (
     <IconButton
-      iconComponent={IcoClose16}
+      iconComponent={IcoClose24}
       ariaLabel="Close window"
       onClick={handleCloseClick}
     />

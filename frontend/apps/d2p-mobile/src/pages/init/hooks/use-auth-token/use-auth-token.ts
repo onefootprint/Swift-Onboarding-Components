@@ -11,13 +11,13 @@ const useAuthToken = () => {
   useEffect(() => {
     if (authToken) {
       send({
-        type: Events.authTokenIdentified,
+        type: Events.authTokenGotten,
         payload: {
           authToken,
         },
       });
     }
-  }, [authToken, send]);
+  }, [send, authToken]);
 };
 
 export default useAuthToken;

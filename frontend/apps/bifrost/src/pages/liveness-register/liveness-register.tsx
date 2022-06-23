@@ -5,9 +5,8 @@ import withProvider from 'src/utils/with-provider';
 
 import MachineProvider from './components/machine-provider';
 import useLivenessRegisterMachine from './hooks/use-liveness-register';
-import BiometricRegister from './pages/biometric-register';
-import BiometricRegisterFailure from './pages/biometric-register-failure';
-import CaptchaRegister from './pages/captcha-register';
+import newTabProcessing from './pages/new-tab-processing';
+import newTabRequest from './pages/new-tab-request';
 import QRCodeScanned from './pages/qr-code-scanned';
 import QRCodeSent from './pages/qr-code-sent';
 import QRRegister from './pages/qr-register';
@@ -20,12 +19,11 @@ const LivenessRegister = () => {
   const [state] = useLivenessRegisterMachine();
   const valueCasted = state.value as States;
   const pages: Page = {
-    [States.biometricRegister]: BiometricRegister,
-    [States.biometricRegisterFailure]: BiometricRegisterFailure,
-    [States.captchaRegister]: CaptchaRegister,
-    [States.qrRegister]: QRRegister,
+    [States.newTabProcessing]: newTabProcessing,
+    [States.newTabRequest]: newTabRequest,
     [States.qrCodeScanned]: QRCodeScanned,
     [States.qrCodeSent]: QRCodeSent,
+    [States.qrRegister]: QRRegister,
   };
   if (has(pages, valueCasted)) {
     const Page = pages[valueCasted];

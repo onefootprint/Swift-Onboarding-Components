@@ -4,119 +4,150 @@ import createLivenessRegisterMachine from './machine';
 import { Events, States } from './types';
 
 describe('LivenessRegister Machine Tests', () => {
-  describe('Correctly initializes & transitions out of init state', () => {
-    it('When mobile has support for webauthn, context is correct', () => {
-      const authToken = 'testAuthToken';
-      const type = 'mobile';
-      const machine = interpret(
-        createLivenessRegisterMachine({
-          device: {
-            type,
-            hasSupportForWebAuthn: true,
-          },
-          authToken,
-        }),
-      );
-      machine.start();
-
-      // Check that the initial context was set correctly from the args
-      const { state } = machine;
-      const { context } = state;
-      expect(context.authToken).toEqual(authToken);
-      expect(context.device.hasSupportForWebAuthn).toEqual(true);
-      expect(context.device.type).toEqual(type);
-      expect(state.value).toEqual(States.biometricRegister);
+  describe('when is using a mobile device', () => {
+    describe('when everything goes well', () => {
+      it('should open a new tab, and once it succeeds, it should finish the flow', () => {
+        const authToken = 'testAuthToken';
+        const type = 'mobile';
+        const machine = interpret(
+          createLivenessRegisterMachine({
+            device: {
+              type,
+              hasSupportForWebAuthn: true,
+            },
+            authToken,
+          }),
+        );
+        machine.start();
+        let { state } = machine;
+        expect(state.value).toEqual(States.newTabRequest);
+        state = machine.send({
+          type: Events.newTabOpened,
+          payload: { tab: window },
+        });
+        expect(state.value).toEqual(States.newTabProcessing);
+        state = machine.send({
+          type: Events.newTabRegisterSucceeded,
+        });
+        expect(state.value).toEqual(States.livenessRegisterSucceeded);
+      });
     });
 
-    it('When mobile device lacks webauthn support, context is correct', () => {
-      const authToken = 'testAuthToken';
-      const type = 'mobile';
-      const machine = interpret(
-        createLivenessRegisterMachine({
-          device: {
-            type,
-            hasSupportForWebAuthn: false,
-          },
-          authToken,
-        }),
-      );
-      machine.start();
-
-      // Check that the initial context was set correctly from the args
-      const { state } = machine;
-      const { context } = state;
-      expect(context.authToken).toEqual(authToken);
-      expect(context.device.hasSupportForWebAuthn).toEqual(false);
-      expect(context.device.type).toEqual(type);
-      expect(state.value).toEqual(States.livenessRegisterFailed);
+    describe('when the user cancels the flow', () => {
+      it('should open a new tab, and once its cancelled, it should return to the new tab request state', () => {
+        const authToken = 'testAuthToken';
+        const type = 'mobile';
+        const machine = interpret(
+          createLivenessRegisterMachine({
+            device: {
+              type,
+              hasSupportForWebAuthn: true,
+            },
+            authToken,
+          }),
+        );
+        machine.start();
+        let { state } = machine;
+        expect(state.value).toEqual(States.newTabRequest);
+        state = machine.send({
+          type: Events.newTabOpened,
+          payload: { tab: window },
+        });
+        expect(state.value).toEqual(States.newTabProcessing);
+        state = machine.send({
+          type: Events.newTabRegisterCanceled,
+        });
+        expect(state.value).toEqual(States.newTabRequest);
+      });
     });
 
-    it('When non-mobile device has webauthn support, context is correct', () => {
-      const authToken = 'testAuthToken';
-      const type = 'tablet';
-      const machine = interpret(
-        createLivenessRegisterMachine({
-          device: {
-            type,
-            hasSupportForWebAuthn: true,
-          },
-          authToken,
-        }),
-      );
-      machine.start();
-
-      // Check that the initial context was set correctly from the args
-      const { state } = machine;
-      const { context } = state;
-      expect(context.authToken).toEqual(authToken);
-      expect(context.device.hasSupportForWebAuthn).toEqual(true);
-      expect(context.device.type).toEqual(type);
-      expect(state.value).toEqual(States.qrRegister);
+    describe('when the scoped token expires', () => {
+      it('should open a new tab, and once the token expires, it should return to the new tab request state', () => {
+        const authToken = 'testAuthToken';
+        const type = 'mobile';
+        const machine = interpret(
+          createLivenessRegisterMachine({
+            device: {
+              type,
+              hasSupportForWebAuthn: true,
+            },
+            authToken,
+          }),
+        );
+        machine.start();
+        let { state } = machine;
+        expect(state.value).toEqual(States.newTabRequest);
+        state = machine.send({
+          type: Events.newTabOpened,
+          payload: { tab: window },
+        });
+        expect(state.value).toEqual(States.newTabProcessing);
+        state = machine.send({
+          type: Events.statusPollingErrored,
+        });
+        expect(state.value).toEqual(States.newTabRequest);
+      });
     });
 
-    it('When non-mobile device lacks webauthn support, context is correct', () => {
-      const authToken = 'testAuthToken';
-      const type = 'tablet';
-      const machine = interpret(
-        createLivenessRegisterMachine({
-          device: {
-            type,
-            hasSupportForWebAuthn: false,
-          },
-          authToken,
-        }),
-      );
-      machine.start();
+    describe('when something goes wrong', () => {
+      it('should open a new tab, and once something goes wrong, it should finish the flow', () => {
+        const authToken = 'testAuthToken';
+        const type = 'mobile';
+        const machine = interpret(
+          createLivenessRegisterMachine({
+            device: {
+              type,
+              hasSupportForWebAuthn: true,
+            },
+            authToken,
+          }),
+        );
+        machine.start();
+        let { state } = machine;
+        expect(state.value).toEqual(States.newTabRequest);
+        state = machine.send({
+          type: Events.newTabOpened,
+          payload: { tab: window },
+        });
+        expect(state.value).toEqual(States.newTabProcessing);
+        state = machine.send({
+          type: Events.newTabRegisterFailed,
+        });
+        expect(state.value).toEqual(States.livenessRegisterFailed);
+      });
+    });
 
-      // Check that the initial context was set correctly from the args
-      const { state } = machine;
-      const { context } = state;
-      expect(context.authToken).toEqual(authToken);
-      expect(context.device.hasSupportForWebAuthn).toEqual(false);
-      expect(context.device.type).toEqual(type);
-      expect(state.value).toEqual(States.qrRegister);
+    describe('when the device does not support webauthn', () => {
+      it('should finish the flow', () => {
+        const authToken = 'testAuthToken';
+        const type = 'mobile';
+        const machine = interpret(
+          createLivenessRegisterMachine({
+            device: {
+              type,
+              hasSupportForWebAuthn: false,
+            },
+            authToken,
+          }),
+        );
+        machine.start();
+
+        // Check that the initial context was set correctly from the args
+        const { state } = machine;
+        const { context } = state;
+        expect(context.authToken).toEqual(authToken);
+        expect(context.device.hasSupportForWebAuthn).toEqual(false);
+        expect(context.device.type).toEqual(type);
+        expect(state.value).toEqual(States.livenessRegisterFailed);
+      });
     });
   });
+});
 
-  describe('Successfully completes biometric register', () => {
-    it('Biometric register is successful', () => {
-      const machine = createLivenessRegisterMachine({
-        device: {
-          type: 'mobile',
-          hasSupportForWebAuthn: true,
-        },
-        authToken: 'testAuthToken',
-      });
-
-      // Succeeds at biometric register
-      const state = machine.transition(States.biometricRegister, {
-        type: Events.biometricRegisterSucceeded,
-      });
-      expect(state.value).toBe(States.livenessRegisterSucceeded);
-    });
-  });
-
-  describe('Transitions from States.qrRegister', () => {
+// TODO: Make tests a bit more simple
+// https://linear.app/footprint/issue/FP-412/make-tests-abit-simpler
+describe('transitions from init state', () => {
+  describe('transitions from qrRegister state', () => {
     const createMachine = () =>
       createLivenessRegisterMachine({
         device: {
@@ -173,7 +204,7 @@ describe('LivenessRegister Machine Tests', () => {
       expect(state.value).toEqual(States.livenessRegisterFailed);
     });
 
-    it('Polling error should clear scoped auth token and not change state.', () => {
+    it('Polling error should clear scoped auth token and not change state', () => {
       const machine = createMachine();
       const state = machine.transition(States.qrRegister, {
         type: Events.statusPollingErrored,
@@ -195,7 +226,7 @@ describe('LivenessRegister Machine Tests', () => {
     });
   });
 
-  describe('Transitions from States.qrCodeScanned', () => {
+  describe('transitions from qrCodeScanned state', () => {
     const createMachine = () =>
       createLivenessRegisterMachine({
         device: {
@@ -205,7 +236,7 @@ describe('LivenessRegister Machine Tests', () => {
         authToken: 'testAuthToken',
       });
 
-    it('Canceling QR code transitions to States.qrRegister', () => {
+    it('Canceling QR code transitions to qrRegister state', () => {
       const machine = createMachine();
       const state = machine.transition(States.qrCodeScanned, {
         type: Events.qrCodeCanceled,
@@ -248,7 +279,7 @@ describe('LivenessRegister Machine Tests', () => {
     });
   });
 
-  describe('Transitions from States.qrCodeSent', () => {
+  describe('transitions from qrCodeSent state', () => {
     const createMachine = () =>
       createLivenessRegisterMachine({
         device: {

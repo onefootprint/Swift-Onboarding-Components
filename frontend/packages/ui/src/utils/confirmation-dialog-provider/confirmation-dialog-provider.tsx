@@ -45,7 +45,11 @@ const ConfirmationDialog = ({ children }: ConfirmationDialogProps) => {
             ),
           }}
         >
-          <Typography variant="body-2" color="secondary">
+          <Typography
+            variant="body-2"
+            color="secondary"
+            sx={{ textAlign: 'center' }}
+          >
             {confirmationDialog.description}
           </Typography>
         </Dialog>

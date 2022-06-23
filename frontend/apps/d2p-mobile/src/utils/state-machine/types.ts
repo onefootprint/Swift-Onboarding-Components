@@ -9,7 +9,7 @@ export enum States {
 }
 
 export enum Events {
-  authTokenIdentified = 'authTokenIdentified',
+  authTokenGotten = 'authTokenGotten',
   deviceInfoIdentified = 'deviceInfoIdentified',
   registerFailed = 'registerFailed',
   registerSucceeded = 'registerSucceeded',
@@ -34,7 +34,7 @@ export type D2PContext = {
 };
 
 export type D2PEvent =
-  | { type: Events.authTokenIdentified; payload: { authToken: string } }
+  | { type: Events.authTokenGotten; payload: { authToken: string } }
   | {
       type: Events.deviceInfoIdentified;
       payload: {

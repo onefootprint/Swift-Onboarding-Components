@@ -92,7 +92,7 @@ const PhoneRegistration = () => {
         <Typography variant="label-3" color="primary" sx={{ flexGrow: 1 }}>
           {state.context.email}
         </Typography>
-        <LinkButton size="tiny" onClick={handleChangeEmail}>
+        <LinkButton size="compact" onClick={handleChangeEmail}>
           {t('email-card.cta')}
         </LinkButton>
       </EmailCard>

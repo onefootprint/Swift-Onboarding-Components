@@ -42,9 +42,14 @@ const QRCodeSent = () => {
       send({
         type: Events.qrRegisterSucceeded,
       });
-    } else if (status === D2PStatus.canceled || status === D2PStatus.failed) {
+    }
+    if (status === D2PStatus.failed) {
       send({ type: Events.qrRegisterFailed });
-    } else if (status === D2PStatus.inProgress) {
+    }
+    if (status === D2PStatus.canceled) {
+      send({ type: Events.qrCodeCanceled });
+    }
+    if (status === D2PStatus.inProgress) {
       // If the user pressed "send link via sms", we already sent the Events.qrCodeSent and transitioned to another page
       // The only way to get this status while still on this page is if the user scanned the qr code
       send({

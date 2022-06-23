@@ -1,15 +1,20 @@
+import { useTranslation } from 'hooks';
 import React, { useEffect } from 'react';
-import HeaderTitle from 'src/components/header-title';
-import useD2pMobileMachine, { Events } from 'src/hooks/use-d2p-mobile-machine';
-import useGetD2PStatus, { D2PStatus } from 'src/hooks/use-get-d2p-status';
-import useRegister from 'src/hooks/use-register';
-import useUpdateD2pStatus, {
-  D2PStatusUpdate,
-} from 'src/hooks/use-update-d2p-status';
 import styled, { css } from 'styled-components';
 import { Button } from 'ui';
 
+import HeaderTitle from '../../components/header-title';
+import useD2pMobileMachine, {
+  Events,
+} from '../../hooks/use-d2p-mobile-machine';
+import useGetD2PStatus, { D2PStatus } from '../../hooks/use-get-d2p-status';
+import useRegister from '../../hooks/use-register';
+import useUpdateD2pStatus, {
+  D2PStatusUpdate,
+} from '../../hooks/use-update-d2p-status';
+
 const RegisterRetry = () => {
+  const { t } = useTranslation('pages.register-retry');
   const [state, send] = useD2pMobileMachine();
   const registerMutation = useRegister();
   const updateD2PStatusMutation = useUpdateD2pStatus();
@@ -55,12 +60,9 @@ const RegisterRetry = () => {
 
   return (
     <Container>
-      <HeaderTitle
-        title="Biometrics not recognized"
-        subtitle="Please try again."
-      />
+      <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
       <Button onClick={handleRegister} fullWidth>
-        Try again
+        {t('cta')}
       </Button>
     </Container>
   );

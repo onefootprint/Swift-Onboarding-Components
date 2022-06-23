@@ -1,8 +1,7 @@
 export enum States {
   init = 'init',
-  biometricRegister = 'biometricRegister',
-  biometricRegisterFailure = 'biometricRegisterFailure',
-  captchaRegister = 'captchaRegister',
+  newTabRequest = 'newTabRequest',
+  newTabProcessing = 'newTabProcessing',
   qrRegister = 'qrRegister',
   qrCodeScanned = 'qrCodeScanned',
   qrCodeSent = 'qrCodeSent',
@@ -17,31 +16,38 @@ export type MachineContext = {
   };
   authToken?: string;
   scopedAuthToken?: string;
+  tab?: Window;
 };
 
 export enum Events {
   livenessRegisterStarted = 'livenessRegisterStarted',
-  biometricRegisterSucceeded = 'biometricRegisterSucceeded',
-  biometricRegisterFailed = 'biometricRegisterFailed',
-  captchaRegisterSucceeded = 'captchaRegisterSucceeded',
   scopedAuthTokenGenerated = 'scopedAuthTokenGenerated',
+
+  // Desktop to phone verification
   qrCodeLinkSentViaSms = 'qrCodeLinkSentViaSms',
   qrCodeScanned = 'qrCodeScanned',
   qrCodeCanceled = 'qrCodeCanceled',
   qrRegisterSucceeded = 'qrRegisterSucceeded',
   qrRegisterFailed = 'qrRegisterFailed',
+
+  // New tab verification
+  newTabOpened = 'newTabOpened',
+  newTabRegisterSucceeded = 'newTabRegisterSucceeded',
+  newTabRegisterFailed = 'newTabRegisterFailed',
+  newTabRegisterCanceled = 'newTabRegisterCanceled',
+
   statusPollingErrored = 'statusPollingErrored',
 }
 
 export enum Actions {
+  assignTab = 'assignTab',
+  clearTab = 'clearTab',
   assignScopedAuthToken = 'assignScopedAuthToken',
   clearScopedAuthToken = 'clearScopedAuthToken',
 }
 
 export type MachineEvents =
   | { type: Events.livenessRegisterStarted }
-  | { type: Events.biometricRegisterSucceeded }
-  | { type: Events.biometricRegisterFailed }
   | {
       type: Events.scopedAuthTokenGenerated;
       payload: {
@@ -54,5 +60,12 @@ export type MachineEvents =
   | { type: Events.qrRegisterSucceeded }
   | { type: Events.qrRegisterFailed }
   | { type: Events.statusPollingErrored }
-  | { type: Events.captchaRegisterSucceeded }
-  | { type: Events.biometricRegisterSucceeded };
+  | {
+      type: Events.newTabOpened;
+      payload: {
+        tab: Window;
+      };
+    }
+  | { type: Events.newTabRegisterFailed }
+  | { type: Events.newTabRegisterSucceeded }
+  | { type: Events.newTabRegisterCanceled };

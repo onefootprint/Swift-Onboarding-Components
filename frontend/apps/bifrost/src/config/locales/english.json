@@ -3,6 +3,16 @@
     "errors": {}
   },
   "pages": {
+    "new-tab-requested": {
+      "title": "New browser window",
+      "subtitle": "To continue, we need to open a new browser window. Please tap the button below.",
+      "cta": "Open new browser tab"
+    },
+    "new-tab-processing": {
+      "title": "Liveness check pending",
+      "subtitle": "We opened a new browser tab on this device. Please complete your liveness check in there.",
+      "cancel": "Cancel"
+    },
     "tenant-invalid": {
       "title": "Integration incorrectly configured",
       "subtitle": "It seems like the Verify with Footprint integration is using an invalid integration key. Please contact the owner of this website."

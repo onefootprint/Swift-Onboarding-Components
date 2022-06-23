@@ -43,7 +43,6 @@ const SelectSearch = ({
           autoCapitalize="off"
           autoComplete={autoComplete}
           autoCorrect="off"
-          autoFocus
           id={id}
           onChange={handleChange}
           placeholder={placeholder}

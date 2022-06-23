@@ -1,34 +1,34 @@
 import { QRCodeSVG } from 'qrcode.react';
 import React, { useEffect } from 'react';
 import HeaderTitle from 'src/components/header-title';
-import { D2P_BASE_URL } from 'src/config/constants';
 import useD2PGenerate from 'src/hooks/d2p/use-d2p-generate';
 import useD2PSms from 'src/hooks/d2p/use-d2p-sms';
 import useGetD2PStatus, { D2PStatus } from 'src/hooks/d2p/use-get-d2p-status';
 import useGenerateScopedAuthToken from 'src/pages/liveness-register/hooks/use-generate-scoped-auth-token';
 import useLivenessRegisterMachine from 'src/pages/liveness-register/hooks/use-liveness-register';
+import createBiometricUrl from 'src/utils/create-biometric-url';
 import { Events } from 'src/utils/state-machine/liveness-register';
 import styled, { css } from 'styled-components';
 import { Button, Divider, LoadingIndicator, Typography } from 'ui';
 
 const QRRegister = () => {
   const [state, send] = useLivenessRegisterMachine();
+  const { authToken, scopedAuthToken } = state.context;
   const d2pGenerateMutation = useD2PGenerate();
   const d2pSmsMutation = useD2PSms();
   const statusResponse = useGetD2PStatus();
   const generateScopedAuthToken = useGenerateScopedAuthToken();
 
   useEffect(() => {
-    if (state.context.scopedAuthToken) {
-      return;
+    if (authToken) {
+      generateScopedAuthToken(authToken);
     }
-    generateScopedAuthToken();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [authToken]);
 
   useEffect(() => {
     if (statusResponse.error) {
-      generateScopedAuthToken();
+      generateScopedAuthToken(authToken);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [statusResponse.error]);
@@ -52,12 +52,11 @@ const QRRegister = () => {
   }, [statusResponse?.data?.status]);
 
   const handleSendLinkToPhone = () => {
-    const { scopedAuthToken: authToken } = state.context;
-    if (!authToken) {
+    if (!scopedAuthToken) {
       return;
     }
     d2pSmsMutation.mutate(
-      { authToken },
+      { authToken: scopedAuthToken },
       {
         onSuccess() {
           send({ type: Events.qrCodeLinkSentViaSms });
@@ -81,7 +80,7 @@ const QRRegister = () => {
       ) : (
         <QRCodeContainer>
           <QRCodeSVG
-            value={`${D2P_BASE_URL}#${state.context.scopedAuthToken}`}
+            value={createBiometricUrl(state.context.scopedAuthToken)}
           />
         </QRCodeContainer>
       )}

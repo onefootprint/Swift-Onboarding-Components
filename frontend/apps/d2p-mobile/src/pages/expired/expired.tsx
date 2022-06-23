@@ -1,25 +1,41 @@
+import { useTranslation } from 'hooks';
 import React from 'react';
-import HeaderTitle from 'src/components/header-title';
-import useAuthToken from 'src/hooks/use-auth-token';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
+import { Button } from 'ui';
+
+import HeaderTitle from '../../components/header-title';
+import useOpener from '../../hooks/use-opener';
 
 const Expired = () => {
-  useAuthToken();
+  const { t } = useTranslation('pages.expired');
+  const opener = useOpener();
+
+  const handleClick = () => {
+    window.close();
+  };
 
   return (
     <Container>
       <HeaderTitle
-        title="Liveness check expired"
-        subtitle="For security reasons, this link has timed out. Please return to your desktop to use a new one."
+        title={t('title')}
+        subtitle={
+          opener === 'mobile' ? t('subtitle.mobile') : t('subtitle.desktop')
+        }
       />
+      {opener === 'mobile' && (
+        <Button onClick={handleClick} fullWidth>
+          {t('cta')}
+        </Button>
+      )}
     </Container>
   );
 };
 
-const Container = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
+const Container = styled.form`
+  ${({ theme }) => css`
+    display: grid;
+    row-gap: ${theme.spacing[8]}px;
+  `}
 `;
 
 export default Expired;
