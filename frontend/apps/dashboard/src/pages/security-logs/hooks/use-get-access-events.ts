@@ -7,6 +7,7 @@ import {
   useFilters,
 } from 'src/pages/security-logs/hooks/use-filters';
 import { AccessEvent, dateRangeToFilterParams } from 'src/types';
+import { useDebounce } from 'usehooks-ts';
 
 import { DASHBOARD_AUTHORIZATION_HEADER } from '../../../config/constants';
 
@@ -41,10 +42,12 @@ const getAccessEventsRequest = async ({
 const useGetAccessEvents = () => {
   const session = useSessionUser();
   const auth = session.data?.auth;
-
   const { filters } = useFilters();
+
+  const debouncedFilters = useDebounce(filters, 500);
+
   return useInfiniteQuery<AccessEventsResponse, RequestError>(
-    ['paginatedAccessEvents', filters, auth] as AccessEventQueryKey,
+    ['paginatedAccessEvents', debouncedFilters, auth] as AccessEventQueryKey,
     getAccessEventsRequest,
     {
       retry: false,

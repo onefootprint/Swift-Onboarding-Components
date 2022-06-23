@@ -6,6 +6,7 @@ export type AccessEventFilters = {
   // Need to store this as a stringified string in the query
   dataKinds?: string;
   dateRange?: string;
+  search?: string;
 };
 
 export const getDateRange = (req: AccessEventFilters) => {
