@@ -1,6 +1,5 @@
 import { useTranslation } from 'hooks';
 import React, { useEffect } from 'react';
-import styled from 'styled-components';
 
 import HeaderTitle from '../../components/header-title';
 import useD2PMobileMachine from '../../hooks/use-d2p-mobile-machine';
@@ -20,17 +19,7 @@ const Unavailable = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  return (
-    <Container>
-      <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
-    </Container>
-  );
+  return <HeaderTitle title={t('title')} subtitle={t('subtitle')} />;
 };
-
-const Container = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-`;
 
 export default Unavailable;

@@ -1,6 +1,5 @@
 import { useTranslation } from 'hooks';
 import React from 'react';
-import styled from 'styled-components';
 
 import HeaderTitle from '../../components/header-title';
 import useOpener from '../../hooks/use-opener';
@@ -16,23 +15,15 @@ const Success = () => {
   });
 
   return (
-    <Container>
-      <HeaderTitle
-        title={t('title')}
-        subtitle={
-          shouldShowCounter
-            ? t('subtitle.with-countdown', { seconds })
-            : t('subtitle.without-countdown')
-        }
-      />
-    </Container>
+    <HeaderTitle
+      title={t('title')}
+      subtitle={
+        shouldShowCounter
+          ? t('subtitle.with-countdown', { seconds })
+          : t('subtitle.without-countdown')
+      }
+    />
   );
 };
-
-const Container = styled.div`
-  align-items: center;
-  display: flex;
-  justify-content: center;
-`;
 
 export default Success;
