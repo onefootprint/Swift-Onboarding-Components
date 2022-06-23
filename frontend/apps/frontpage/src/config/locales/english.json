@@ -4,11 +4,11 @@
   },
   "components": {
     "navbar": {
-      "cta": "Join the waitlist",
+      "cta": "Request early access",
       "img-alt": "Footprint Logo's"
     },
     "get-started": {
-      "cta": "Join our waitlist",
+      "cta": "Request early access",
       "subtitle": "Join our waitlist to get a chance at 1,000 free verifications when we launch out of private beta.",
       "title": "Ready to get started?"
     },
@@ -37,7 +37,7 @@
       "hero": {
         "title": "Frictionless Identity Verification",
         "subtitle": "Onboard users with the click of a button. Offload handling sensitive data. Grow your user base quickly and securely with Footprint's one-click KYC and secure data vault.",
-        "cta": "Join the waitlist",
+        "cta": "Request early access",
         "img-alt": "An image of Footprint System"
       },
       "playground": {

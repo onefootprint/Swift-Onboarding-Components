@@ -1,7 +1,7 @@
 import IcoBuilding24 from 'icons/ico/ico-building-24';
+import IcoCake24 from 'icons/ico/ico-cake-24';
 import IcoEmail24 from 'icons/ico/ico-email-24';
 import IcoFileText24 from 'icons/ico/ico-file-text-24';
-import IcoInfo24 from 'icons/ico/ico-info-24';
 import IcoPhone24 from 'icons/ico/ico-phone-24';
 import IcoUserCircle24 from 'icons/ico/ico-user-circle-24';
 import React from 'react';
@@ -47,7 +47,7 @@ const IconsByUserDataAttributes: Record<
   [UserDataAttributeCategory.email]: <IcoEmail24 />,
   [UserDataAttributeCategory.phoneNumber]: <IcoPhone24 />,
   [UserDataAttributeCategory.ssn]: <IcoFileText24 />,
-  [UserDataAttributeCategory.dob]: <IcoInfo24 />, // TODO: replace with cake icon
+  [UserDataAttributeCategory.dob]: <IcoCake24 />,
   [UserDataAttributeCategory.address]: <IcoBuilding24 />,
 };
 
@@ -70,7 +70,7 @@ const Confirmation = () => {
     <Container>
       <HeaderTitle
         title="Confirm & Authorize"
-        subtitle={`The following data will be shared with ${state.context.tenant.name}:`}
+        subtitle={`${state.context.tenant.name} will be able to securely view the following data:`}
       />
       <CategoriesContainer>
         {requiredCategories.map((category: UserDataAttributeCategory) => (

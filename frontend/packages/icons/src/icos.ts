@@ -1,6 +1,8 @@
 /**
  * THIS IS AN AUTO-GENERATED FILE, DO NOT EDIT MANUALLY
  */
+import IcoAndroidColored16 from '../ico/ico-android-colored-16';
+import IcoAndroidColored24 from '../ico/ico-android-colored-24';
 import IcoAppleColored16 from '../ico/ico-apple-colored-16';
 import IcoAppleColored24 from '../ico/ico-apple-colored-24';
 import IcoAppleColored40 from '../ico/ico-apple-colored-40';
@@ -62,6 +64,8 @@ import IcoFootprint24 from '../ico/ico-footprint-24';
 import IcoFootprint40 from '../ico/ico-footprint-40';
 import IcoGoogleColored16 from '../ico/ico-google-colored-16';
 import IcoGoogleColored24 from '../ico/ico-google-colored-24';
+import IcoHelp16 from '../ico/ico-help-16';
+import IcoHelp24 from '../ico/ico-help-24';
 import IcoInfo16 from '../ico/ico-info-16';
 import IcoInfo24 from '../ico/ico-info-24';
 import IcoLock16 from '../ico/ico-lock-16';
@@ -95,6 +99,7 @@ import IcoUsers16 from '../ico/ico-users-16';
 import IcoUsers24 from '../ico/ico-users-24';
 
 export default {
+  IcoAndroidColored16,
   IcoAppleColored16,
   IcoArrowDown16,
   IcoArrowLeftSmall16,
@@ -124,6 +129,7 @@ export default {
   IcoFileText216,
   IcoFootprint16,
   IcoGoogleColored16,
+  IcoHelp16,
   IcoInfo16,
   IcoLock16,
   IcoLogOut16,
@@ -139,6 +145,7 @@ export default {
   IcoUser16,
   IcoUserCircle16,
   IcoUsers16,
+  IcoAndroidColored24,
   IcoAppleColored24,
   IcoArrowDown24,
   IcoArrowLeftSmall24,
@@ -168,6 +175,7 @@ export default {
   IcoFileText24,
   IcoFootprint24,
   IcoGoogleColored24,
+  IcoHelp24,
   IcoInfo24,
   IcoLock24,
   IcoLogOut24,
