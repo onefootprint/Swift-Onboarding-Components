@@ -20,7 +20,7 @@ pub struct Onboarding {
     pub status: Status,
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
-    pub start_insight_event_id: Option<Uuid>,
+    pub start_insight_event_id: Uuid,
     pub liveness_insight_event_id: Option<Uuid>,
     pub ordering_id: i64,
     pub start_timestamp: NaiveDateTime,
@@ -33,7 +33,7 @@ pub struct NewOnboarding {
     pub ob_config_id: ObConfigurationId,
     pub tenant_id: TenantId,
     pub status: Status,
-    pub start_insight_event_id: Option<Uuid>,
+    pub start_insight_event_id: Uuid,
     pub start_timestamp: NaiveDateTime,
 }
 
@@ -70,7 +70,7 @@ impl NewOnboarding {
                             ob_config_id,
                             tenant_id,
                             status,
-                            start_insight_event_id: Some(insight_event.id),
+                            start_insight_event_id: insight_event.id,
                             start_timestamp: chrono::Utc::now().naive_utc(),
                         };
 

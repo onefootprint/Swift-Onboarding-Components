@@ -1,0 +1,1 @@
+ALTER TABLE onboardings ALTER COLUMN start_insight_event_id SET NOT NULL;

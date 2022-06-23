@@ -68,7 +68,7 @@ table! {
         status -> User_status,
         created_at -> Timestamp,
         updated_at -> Timestamp,
-        start_insight_event_id -> Nullable<Uuid>,
+        start_insight_event_id -> Uuid,
         liveness_insight_event_id -> Nullable<Uuid>,
         ordering_id -> Int8,
         start_timestamp -> Timestamp,
