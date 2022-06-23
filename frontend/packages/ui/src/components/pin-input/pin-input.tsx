@@ -1,4 +1,3 @@
-import defer from 'lodash/defer';
 import identity from 'lodash/identity';
 import React, { useState } from 'react';
 import styled from 'styled-components';
@@ -9,8 +8,6 @@ import LoadingIndicator from '../loading-indicator';
 import usePinInputRefs from './hooks/use-pin-input-refs';
 import { INPUT_FIELDS_COUNT, pins } from './pin-input.constants';
 import { getNextValue, isNumber } from './pin-input.utils';
-
-const waitNextInputFieldGetDisabled = defer;
 
 export type PinInputProps = {
   hasError?: boolean;
@@ -48,10 +45,8 @@ const PinInput = ({
     } else {
       const nextInput = pinInputs.next(index);
       if (nextInput) {
-        waitNextInputFieldGetDisabled(() => {
-          nextInput.focus();
-          nextInput.select();
-        });
+        nextInput.focus();
+        nextInput.select();
       }
     }
   };
@@ -99,17 +94,23 @@ const PinInput = ({
           <PinContainer>
             {pins.map((pinPosition, pinIndex) => {
               const key = pinIndex;
+              const isDisabled = pinIndex > enteredPin.length;
               return (
                 <Input
                   autoComplete="one-time-code"
-                  autoFocus={pinIndex === 0}
-                  disabled={pinIndex > enteredPin.length}
                   hasError={hasError}
                   inputMode="numeric"
                   key={key}
                   onChange={handleChange(pinIndex)}
                   onKeyDown={handleKeyDown(pinIndex)}
                   placeholder=""
+                  sx={{
+                    height: '44px',
+                    padding: 0,
+                    pointerEvents: isDisabled ? 'none' : undefined,
+                    textAlign: 'center',
+                    width: '40px',
+                  }}
                   ref={pinInputs.refs[pinIndex]}
                   required
                   type="tel"
@@ -132,13 +133,6 @@ const Container = styled.div``;
 export const PinContainer = styled.div`
   display: flex;
   gap: ${({ theme }) => theme.spacing[3]}px;
-
-  input {
-    height: 44px;
-    padding: 0;
-    text-align: center;
-    width: 40px;
-  }
 `;
 
 export default PinInput;
