@@ -54,7 +54,7 @@ class VanillaUiAdapter implements UIManager {
   }
 
   hideOverlay() {
-    document.body.classList.add('footprint-body-locked');
+    document.body.classList.remove('footprint-body-locked');
     const overlay = document.getElementById(OVERLAY_ID);
     if (overlay) {
       overlay.remove();
