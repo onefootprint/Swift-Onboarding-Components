@@ -15,11 +15,9 @@ type WrapperProps = {
 };
 
 export const Wrapper = ({ children }: WrapperProps) => (
-  <React.StrictMode>
-    <FootprintProvider>
-      <ThemeProvider theme={light}>{children}</ThemeProvider>
-    </FootprintProvider>
-  </React.StrictMode>
+  <FootprintProvider>
+    <ThemeProvider theme={light}>{children}</ThemeProvider>
+  </FootprintProvider>
 );
 
 export const customRender = (Component?: React.ReactNode) => {
@@ -33,4 +31,5 @@ export const customRender = (Component?: React.ReactNode) => {
 };
 
 export * from '@testing-library/react';
+export { renderHook } from '@testing-library/react-hooks';
 export { default as userEvent } from '@testing-library/user-event';

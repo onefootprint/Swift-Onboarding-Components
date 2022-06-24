@@ -8,6 +8,7 @@
     "lint": "eslint src --fix"
   },
   "devDependencies": {
+    "@types/axios": "^0.14.0",
     "axios": "^0.27.2",
     "axios-case-converter": "^0.9.0",
     "config": "*",

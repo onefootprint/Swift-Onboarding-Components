@@ -4,14 +4,7 @@ import { Properties } from 'csstype';
 import Downshift from 'downshift';
 import noop from 'lodash/noop';
 import unary from 'lodash/unary';
-import React, {
-  Fragment,
-  useCallback,
-  useId,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import React, { Fragment, useCallback, useMemo, useRef, useState } from 'react';
 
 import DefaultOption from '../internal/default-option';
 import Hint from '../internal/hint';
@@ -82,8 +75,9 @@ const Select = <T extends SelectOption = SelectOption>({
     />
   ),
 }: SelectProps<T>) => {
-  const fallbackId = useId();
-  const id = baseID || fallbackId;
+  // TODO: Migrate to useId once we migrate to react 18
+  // https://github.com/onefootprint/frontend-monorepo/issues/61
+  const id = baseID || `input-${label || placeholder}`;
   const parentRef = useRef<HTMLDivElement>(null);
   const { setReferenceElement, setPopperElement, popper } = usePopper();
   const [searchValue, setSearchValue] = useState('');
