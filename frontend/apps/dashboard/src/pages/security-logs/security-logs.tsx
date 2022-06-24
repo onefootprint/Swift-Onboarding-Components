@@ -52,6 +52,7 @@ const SecurityLogs = () => {
       <Typography variant="heading-2">Security logs</Typography>
       <SearchAndFilterContainer>
         <SearchInput
+          sx={{ width: '300px' }}
           inputSize="compact"
           onChangeText={value => setFilter({ search: value })}
           value={filters.search || ''}

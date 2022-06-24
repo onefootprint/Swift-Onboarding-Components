@@ -36,6 +36,7 @@ const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
       placeholder = 'Search...',
       suffixElement: SuffixElement,
       value,
+      sx,
       ...remainingProps
     }: SearchInputProps,
     ref,
@@ -74,6 +75,7 @@ const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
         sx={{
           paddingLeft: sizeToInputPadding[inputSize],
           height: sizeToHeight[inputSize],
+          ...sx,
         }}
         type="text"
         value={value}

@@ -11,12 +11,12 @@ import Label from '../label';
 export type InternalInputProps = {
   prefixElement?: React.ReactNode;
   suffixElement?: React.ReactNode;
-  sx?: SXStyleProps;
   fontVariant?: FontVariant;
 };
 
 export type InputProps = FieldProps & {
   mask?: CleaveOptions;
+  sx?: SXStyleProps;
 } & InputHTMLAttributes<HTMLInputElement>;
 
 type AllInputProps = InputProps & InternalInputProps;
