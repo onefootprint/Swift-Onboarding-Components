@@ -1,6 +1,5 @@
 import { omit, omitBy } from 'lodash';
 import { useRouter } from 'next/router';
-import { DateRange } from 'src/types';
 
 export type OnboardingListFilters = {
   footprint_user_id?: string;
@@ -21,13 +20,6 @@ export type OnboardingListQuerystring = OnboardingListFilters & {
 
 export const getCursors = (req: OnboardingListQuerystring) =>
   req.cursors ? req.cursors.split(',') : [];
-
-export const getDateRange = (req: OnboardingListQuerystring) => {
-  const dateRangeStr = req.dateRange || '';
-  return dateRangeStr in DateRange
-    ? (dateRangeStr as DateRange)
-    : DateRange.allTime;
-};
 
 export const useFilters = () => {
   const router = useRouter();

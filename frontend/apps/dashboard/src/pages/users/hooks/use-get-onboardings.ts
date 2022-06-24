@@ -4,7 +4,6 @@ import request, { RequestError, RequestResponse } from 'request';
 import useSessionUser from 'src/hooks/use-session-user';
 import {
   getCursors,
-  getDateRange,
   OnboardingListQuerystring,
   useFilters,
 } from 'src/pages/users/hooks/use-filters';
@@ -29,7 +28,7 @@ const getOnboardingsRequest = async ({
   queryKey,
 }: QueryFunctionContext<QueryKey, string>) => {
   const [, params, auth, pageSize] = queryKey as OnboardingsListQueryKey;
-  const dateRangeFilters = dateRangeToFilterParams(getDateRange(params));
+  const dateRangeFilters = dateRangeToFilterParams(params);
   // cursors is a stack of cursors for all pages visited. Use the cursor on the top of the stack
   // (the current page) when asking the backend for results
   const cursors = getCursors(params);

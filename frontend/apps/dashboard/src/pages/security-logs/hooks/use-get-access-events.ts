@@ -3,7 +3,6 @@ import request, { RequestError, RequestResponse } from 'request';
 import useSessionUser from 'src/hooks/use-session-user';
 import {
   AccessEventFilters,
-  getDateRange,
   useFilters,
 } from 'src/pages/security-logs/hooks/use-filters';
 import { AccessEvent, dateRangeToFilterParams } from 'src/types';
@@ -23,7 +22,7 @@ const getAccessEventsRequest = async ({
   pageParam,
 }: QueryFunctionContext<QueryKey, string>) => {
   const [, filters, auth] = queryKey as AccessEventQueryKey;
-  const dateRangeFilters = dateRangeToFilterParams(getDateRange(filters));
+  const dateRangeFilters = dateRangeToFilterParams(filters);
   // Join filter request args with the pageParam
   const params = {
     ...filters,

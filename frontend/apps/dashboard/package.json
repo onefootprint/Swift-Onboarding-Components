@@ -12,6 +12,7 @@
     "lint": "eslint src --fix"
   },
   "dependencies": {
+    "@hookform/resolvers": "^2.9.2",
     "@sentry/browser": "^6.19.7",
     "constate": "^3.3.2",
     "csstype": "^3.1.0",
@@ -32,6 +33,7 @@
     "themes": "*",
     "ui": "*",
     "usehooks-ts": "^2.5.3",
+    "yup": "^0.32.11",
     "zustand": "^4.0.0-rc.1"
   },
   "devDependencies": {

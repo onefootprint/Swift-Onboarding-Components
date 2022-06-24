@@ -8,12 +8,13 @@ import {
   DataKindType,
   DateRange,
   dateRangeToDisplayText,
+  getDateRange,
   serializeDateRange,
 } from 'src/types';
 import { Box, Button, Dialog, Divider, Typography } from 'ui';
 import RadioInput from 'ui/src/components/radio-input';
 
-import { getDateRange, useFilters } from '../../hooks/use-filters';
+import { useFilters } from '../../hooks/use-filters';
 
 // TODO move checkboxes to useForm
 type FormValues = {
@@ -54,7 +55,9 @@ const FilterDialog = () => {
       dataKindsStr.length ? dataKindsStr.split(',') : []
     ).map(x => dataKindToType[x as DataKind]);
     clearSelectedFields(initialSelectedFields);
-    setValue('dateRange', getDateRange(filters));
+    // TODO custom date range
+    const [dateRange] = getDateRange(filters);
+    setValue('dateRange', dateRange);
     setShowDialog(true);
   };
 
