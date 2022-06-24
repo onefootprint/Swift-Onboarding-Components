@@ -50,7 +50,8 @@ pub async fn list_for_tenant(
                 results = results.filter(
                     schema::access_events::reason
                         .ilike(format!("%{}%", search))
-                        .or(schema::access_events::principal.ilike(format!("%{}%", search))),
+                        .or(schema::access_events::principal.ilike(format!("%{}%", search)))
+                        .or(schema::onboardings::user_ob_id.eq(search)),
                 )
             }
 
