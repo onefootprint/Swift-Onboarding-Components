@@ -17,7 +17,9 @@ const Toast = ({
   variant = 'default',
 }: ToastProps) => (
   <ToastContainer role="alert" leaving={leaving} data-testid={testID}>
-    <StyledIcoInfo16 color={variant === 'error' ? 'error' : undefined} />
+    <Box>
+      <StyledIcoInfo16 color={variant === 'error' ? 'error' : undefined} />
+    </Box>
     <Box sx={{ flexGrow: 1 }}>
       <Typography
         color={variant === 'error' ? 'error' : 'primary'}
