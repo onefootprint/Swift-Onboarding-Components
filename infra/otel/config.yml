@@ -44,20 +44,30 @@ exporters:
     endpoint: "${ELASTIC_APM_SERVER_ENDPOINT}"  
     headers:
       # Elastic APM Server secret token
-      Authorization: "Bearer ${ELASTIC_APM_API_KEY}"  
-
+      Authorization: "Bearer ${ELASTIC_APM_API_KEY}"
+      
+  otlphttp:
+    endpoint: "https://collect.observeinc.com/v1/otel"
+    headers:
+      'Authorization': 'Bearer 189225732777 ds1CdgeCvHzZp3oRu7Rc:s3PHTK91XmE7_ykZ7vk1J-BsLl6jWg0Y'
+      
+  prometheusremotewrite:
+    endpoint: "https://collect.observeinc.com/v1/prometheus"
+    headers:
+      'Authorization': 'Bearer 189225732777 ds1CdgeCvHzZp3oRu7Rc:s3PHTK91XmE7_ykZ7vk1J-BsLl6jWg0Y'
+      
 service:
   pipelines:
     traces:
       receivers: [otlp]
       processors: [batch/traces]
-      exporters: [logging, otlp/elastic]
+      exporters: [logging, otlp/elastic, otlphttp]
     metrics/application:
       receivers: [otlp]
       processors: [batch/metrics]
-      exporters: [logging, otlp/elastic]
+      exporters: [logging, otlp/elastic, prometheusremotewrite]
     metrics/performance:
       receivers: [awsecscontainermetrics ]
       processors: [filter]
-      exporters: [ logging, otlp/elastic ]
+      exporters: [ logging, otlp/elastic, prometheusremotewrite]
   extensions: [health_check]
