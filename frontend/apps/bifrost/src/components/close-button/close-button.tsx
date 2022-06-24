@@ -24,7 +24,7 @@ const CloseButton = () => {
   return (
     <IconButton
       iconComponent={IcoClose24}
-      ariaLabel="Close window"
+      aria-label="Close window"
       onClick={handleCloseClick}
     />
   );

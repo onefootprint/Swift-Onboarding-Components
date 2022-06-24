@@ -9,7 +9,7 @@ type PrevButtonProps = {
 const PrevButton = ({ onClick }: PrevButtonProps) => (
   <IconButton
     iconComponent={IcoArrowLeftSmall24}
-    ariaLabel="Previous window"
+    aria-label="Previous window"
     onClick={onClick}
   />
 );

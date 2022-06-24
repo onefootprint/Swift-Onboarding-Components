@@ -85,7 +85,7 @@ const Dialog = ({
             <Header>
               <CloseContainer>
                 <IconButton
-                  ariaLabel={closeAriaLabel}
+                  aria-label={closeAriaLabel}
                   iconComponent={IcoClose24}
                   onClick={onClose}
                 />

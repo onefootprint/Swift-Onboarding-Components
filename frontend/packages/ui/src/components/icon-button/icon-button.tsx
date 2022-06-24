@@ -5,7 +5,7 @@ import styled, { css } from 'styled-components';
 import { createOverlayBackground } from '../../utils/mixins';
 
 export type IconButtonProps = {
-  ariaLabel: string;
+  'aria-label': string;
   iconComponent: Icon;
   onClick?: () => void;
   disabled?: boolean;
@@ -15,7 +15,7 @@ export type IconButtonProps = {
 const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
   (
     {
-      ariaLabel,
+      'aria-label': ariaLabel,
       iconComponent: Icon,
       onClick,
       disabled,

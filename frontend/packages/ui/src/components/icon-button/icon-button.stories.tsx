@@ -9,7 +9,7 @@ export default {
   component: IconButton,
   title: 'Components/IconButton',
   argTypes: {
-    ariaLabel: {
+    'aria-label': {
       control: 'text',
       description: 'Aria Label for accessibility',
       name: 'ariaLabel *',
@@ -38,7 +38,7 @@ export default {
 
 const Template: Story<IconButtonProps> = ({
   iconComponent: Icon,
-  ariaLabel,
+  'aria-label': ariaLabel,
   onClick,
   disabled,
   testID,
@@ -46,7 +46,7 @@ const Template: Story<IconButtonProps> = ({
   const SelectedIcon = typeof Icon === 'string' ? icos[Icon] : Icon;
   return (
     <IconButton
-      ariaLabel={ariaLabel}
+      aria-label={ariaLabel}
       iconComponent={SelectedIcon}
       onClick={onClick}
       disabled={disabled}
@@ -57,7 +57,7 @@ const Template: Story<IconButtonProps> = ({
 
 export const Base = Template.bind({});
 Base.args = {
-  ariaLabel: 'Close',
+  'aria-label': 'Close',
   iconComponent: IcoClose24,
   onClick: console.log,
   testID: 'icon-button-test-id',

@@ -1,19 +1,19 @@
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { Row, Table } from 'src/components/table';
-import FieldOrPlaceholder from 'src/pages/users/components/field-or-placeholder';
-import { nameData, User } from 'src/pages/users/hooks/use-join-users';
 import { statusToBadgeVariant, statusToDisplayText } from 'src/types';
 import styled, { css } from 'styled-components';
 import { Badge, Code, SearchInput, Typography } from 'ui';
 
+import FieldOrPlaceholder from './components/field-or-placeholder';
 import UsersFilter from './components/users-filter';
 import useGetUsers from './hooks/use-get-users';
+import { nameData, User } from './hooks/use-join-users';
 import Pagination from './pages/detail/components/pagination';
 
 const columns = [
-  { text: 'Name', width: '15%' },
-  { text: 'Footprint Token', width: '12.5%' },
+  { text: 'Name', width: '12.5%' },
+  { text: 'Footprint Token', width: '15%' },
   { text: 'Status', width: '12.5%' },
   { text: 'Email', width: '15%' },
   { text: 'SSN', width: '12.5%' },
@@ -80,7 +80,9 @@ const Users = () => {
               <FieldOrPlaceholder data={nameData(item.attributes)} />
             </td>
             <td>
-              <Code>{item.footprintUserId}</Code>
+              <CodeContainer>
+                <Code>{item.footprintUserId}</Code>
+              </CodeContainer>
             </td>
             <td>
               <Badge variant={statusToBadgeVariant[item.status]}>
@@ -137,6 +139,12 @@ const StyledSearchInput = styled(SearchInput)`
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
   height: 52px;
+`;
+
+const CodeContainer = styled.div`
+  button {
+    width: 100%;
+  }
 `;
 
 export default Users;

@@ -39,7 +39,7 @@ const PrivateLayout = ({ children }: PrivateLayoutProps) => {
               <IconButton
                 iconComponent={IcoUser24}
                 onClick={logOut}
-                ariaLabel="account"
+                aria-label="account"
               />
             </SuffixContainer>
           </Footprint>

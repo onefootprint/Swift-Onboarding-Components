@@ -10,6 +10,7 @@ import useVisibility from './hooks/use-visibility';
 type Size = 'default' | 'compact';
 
 export type TooltipProps = {
+  disabled?: boolean;
   'aria-label'?: string;
   children: React.ReactElement;
   placement?: Placement;
@@ -19,6 +20,7 @@ export type TooltipProps = {
 };
 
 const Tooltip = ({
+  disabled,
   'aria-label': ariaLabel,
   children,
   placement = 'bottom',
@@ -48,12 +50,13 @@ const Tooltip = ({
     ],
   });
   const isVisible = useVisibility(refElement);
+  const shouldShowTooltip = isVisible && !disabled;
   const clonedChildren = useGetElementRef(children, id, setRefElement);
 
   return (
     <>
       {clonedChildren}
-      {isVisible && (
+      {shouldShowTooltip && (
         <TooltipContainer
           aria-label={ariaLabel}
           data-popper-escaped={popper && popper['data-popper-escaped']}
@@ -75,7 +78,7 @@ const Tooltip = ({
   );
 };
 
-const TooltipContainer = styled.div<{ size: Size }>`
+const TooltipContainer = styled.span<{ size: Size }>`
   ${({ theme, size }) => css`
     ${createFontStyles(size === 'default' ? 'body-4' : 'caption-2')};
     background: ${theme.backgroundColor.tertiary};

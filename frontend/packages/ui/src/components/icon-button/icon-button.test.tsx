@@ -6,14 +6,14 @@ import IconButton, { IconButtonProps } from './icon-button';
 
 describe('<IconButton />', () => {
   const renderIconButton = ({
-    ariaLabel = 'close',
+    'aria-label': ariaLabel = 'Close',
     iconComponent: Icon = IcoClose24,
     onClick,
     testID = 'icon-button-test-id',
   }: Partial<IconButtonProps>) => {
     customRender(
       <IconButton
-        ariaLabel={ariaLabel}
+        aria-label={ariaLabel}
         iconComponent={Icon}
         onClick={onClick}
         testID={testID}
@@ -28,14 +28,14 @@ describe('<IconButton />', () => {
 
   it('should assign an aria label', () => {
     renderIconButton({
-      ariaLabel: 'lorem',
+      'aria-label': 'lorem',
     });
     expect(screen.getByLabelText('lorem')).toBeInTheDocument();
   });
 
   it('should trigger onClick when pressing', async () => {
     const onClickMockFn = jest.fn();
-    renderIconButton({ ariaLabel: 'lorem', onClick: onClickMockFn });
+    renderIconButton({ 'aria-label': 'lorem', onClick: onClickMockFn });
     await userEvent.click(screen.getByLabelText('lorem'));
     expect(onClickMockFn).toHaveBeenCalled();
   });
