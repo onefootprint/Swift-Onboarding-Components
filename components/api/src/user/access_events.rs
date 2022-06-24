@@ -1,9 +1,9 @@
-use crate::auth::session_context::SessionContext;
+use crate::auth::{session_context::SessionContext, session_data::user::my_fp::My1fpBasicSession};
 use crate::errors::ApiError;
 use crate::types::access_event::ApiAccessEvent;
 use crate::types::success::ApiResponseData;
 use crate::State;
-use newtypes::{user::onboarding::OnboardingSession, DataKind};
+use newtypes::DataKind;
 use paperclip::actix::{api_v2_operation, get, web, web::Json, Apiv2Schema};
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize, Apiv2Schema)]
@@ -22,8 +22,7 @@ type AccessEventResponse = Vec<ApiAccessEvent>;
 fn handler(
     state: web::Data<State>,
     request: web::Query<AccessEventRequest>,
-    // TODO -- why is this an onboarding session
-    user_auth: SessionContext<OnboardingSession>,
+    user_auth: SessionContext<My1fpBasicSession>,
 ) -> actix_web::Result<Json<ApiResponseData<AccessEventResponse>>, ApiError> {
     // TODO paginate the response when there are too many results
     let results = db::access_event::list(

@@ -1,4 +1,8 @@
-use crate::auth::session_context::SessionContext;
+use crate::auth::either::EitherSession;
+use crate::auth::session_context::HasUserVaultId;
+use crate::auth::session_data::user::my_fp::My1fpBasicSession;
+use crate::auth::session_data::user::onboarding::OnboardingSession;
+use crate::auth::session_data::UserVaultPermissions;
 use crate::types::success::ApiResponseData;
 use crate::{
     auth::AuthError,
@@ -16,8 +20,7 @@ use db::models::{
     user_vaults::UserVault,
 };
 use db::user_vault::get_by_fingerprint;
-use newtypes::user::onboarding::OnboardingSession;
-use newtypes::{DataKind, DataPriority, UserDataId, UserVaultId, UserVaultPermissions};
+use newtypes::{DataKind, DataPriority, UserDataId, UserVaultId};
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 use std::collections::HashMap;
 
@@ -86,11 +89,11 @@ impl UserPatchRequest {
 /// sent in the cookie after a successful /identify/verify call.
 async fn handler(
     state: web::Data<State>,
-    user_auth: SessionContext<OnboardingSession>,
+    user_auth: EitherSession<OnboardingSession, My1fpBasicSession>,
     request: web::Json<UserPatchRequest>,
 ) -> actix_web::Result<Json<ApiResponseData<String>>, ApiError> {
     let _ = update(
-        user_auth.data.clone(),
+        &user_auth,
         &state,
         request.into_inner().into_vec().into_iter().collect(),
         user_auth.user_vault(&state.db_pool).await?,
@@ -105,12 +108,13 @@ async fn handler(
 struct DataUpdateRequest(DataKind, Vec<u8>, Option<Vec<u8>>);
 
 pub async fn update<C: UserVaultPermissions>(
-    context: C,
+    context: &C,
     state: &web::Data<State>,
     values: HashMap<DataKind, String>,
     user_vault: UserVault,
 ) -> Result<(), ApiError> {
-    if !context.can_modify() {
+    // TODO: distinguish between UPDATE and CREATE (for onboarding vs modification)
+    if !context.can_update() {
         Err(AuthError::UnauthorizedOperation)?
     }
     let mut data_to_insert = Vec::<DataUpdateRequest>::new();

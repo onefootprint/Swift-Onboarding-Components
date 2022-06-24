@@ -1,5 +1,9 @@
 use crate::{
-    auth::{either::Either, session_context::SessionContext, AuthError},
+    auth::{
+        either::{Either, EitherSession3},
+        session_context::HasUserVaultId,
+        AuthError, session_data::user::{d2p::D2pSession, onboarding::OnboardingSession, my_fp::My1fpBasicSession},
+    },
     errors::ApiError,
     types::{success::ApiResponseData, Empty},
     utils::{
@@ -14,11 +18,10 @@ use chrono::{Duration, Utc};
 use crypto::sha256;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::webauthn_credential::NewWebauthnCredential;
-use newtypes::AttestationType;
 use newtypes::{
-    user::{d2p::D2pSession, onboarding::OnboardingSession},
     Base64Data,
 };
+use newtypes::{AttestationType, D2pSessionStatus};
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 use serde::{Deserialize, Serialize};
 use serde_repr::{Deserialize_repr, Serialize_repr};
@@ -46,13 +49,17 @@ pub fn init(
     // TODO only allow registering webauthn credentials if you have no previous credentials OR if
     // you logged into this session via webauthn. Otherwise, someone who SIM swaps you can register
     // their own webauthn creds
-    user_auth: Either<SessionContext<D2pSession>, SessionContext<OnboardingSession>>,
+    user_auth: EitherSession3<D2pSession, OnboardingSession, My1fpBasicSession>,
     state: web::Data<State>,
 ) -> actix_web::Result<Json<ApiResponseData<WebAuthnInitResponse>>, ApiError> {
     // checks if we're either in a d2p session & it's in progress, or it's an onboarding session
-    if !user_auth.is_valid_biometric_session() {
+    if !match &user_auth {
+        Either::Left(s) => s.data.status == D2pSessionStatus::InProgress,
+        Either::Right(_) => true,
+    } {
         return Err(AuthError::SessionTypeError).map_err(ApiError::from);
-    };
+    }
+
     // generate the challenge and return it
     let webauthn = LivenessWebauthnConfig::new(&state);
     let user_id = user_auth.user_vault_id();
@@ -76,7 +83,7 @@ pub fn init(
     };
     let response = ApiResponseData::ok(WebAuthnInitResponse {
         challenge_json: serde_json::to_string(&challenge)?,
-        challenge_token: challenge_data.seal(&state.session_sealing_key)?,
+        challenge_token: challenge_data.seal(&state.challenge_sealing_key)?,
     });
 
     Ok(Json(response))
@@ -106,11 +113,11 @@ enum LocationMatchType {
 #[post("/biometric")]
 async fn complete(
     request: Json<WebauthnRegisterRequest>,
-    user_auth: Either<SessionContext<D2pSession>, SessionContext<OnboardingSession>>,
+    user_auth: EitherSession3<D2pSession, OnboardingSession, My1fpBasicSession>,
     insights: InsightHeaders,
     state: web::Data<State>,
 ) -> actix_web::Result<Json<ApiResponseData<Empty>>, ApiError> {
-    let challenge_data = Challenge::unseal(&state.session_sealing_key, &request.challenge_token)?;
+    let challenge_data = Challenge::unseal(&state.challenge_sealing_key, &request.challenge_token)?;
     let reg_state = challenge_data.data;
 
     // generate the challenge and return it

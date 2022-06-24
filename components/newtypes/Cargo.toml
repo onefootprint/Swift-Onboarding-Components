@@ -18,3 +18,5 @@ strum = { version = "0.24" }
 serde_derive = { version = "1.0"}
 anyhow = { version = "1.0" }
 base64 = "0.13"
+async-trait = "0.1"
+crypto = { path = "../enclave/crypto" }

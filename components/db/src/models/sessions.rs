@@ -1,10 +1,9 @@
 use crate::schema::sessions;
 use crate::DbPool;
 use chrono::NaiveDateTime;
-use crypto::{hex::ToHex, random::gen_random_alphanumeric_code};
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
-use newtypes::ServerSession;
+use newtypes::{SealedSessionBytes, SessionAuthToken};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
@@ -14,14 +13,14 @@ pub struct Session {
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
     pub expires_at: NaiveDateTime,
-    pub session_data: ServerSession,
+    pub sealed_session_data: SealedSessionBytes,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
 #[table_name = "sessions"]
 pub struct NewSession {
     pub h_session_id: String,
-    pub session_data: ServerSession,
+    pub sealed_session_data: SealedSessionBytes,
     pub expires_at: NaiveDateTime,
 }
 
@@ -29,23 +28,22 @@ pub struct NewSession {
 #[table_name = "sessions"]
 pub struct UpdateSession {
     pub h_session_id: String,
-    pub session_data: Option<ServerSession>,
+    pub sealed_session_data: Option<SealedSessionBytes>,
     pub expires_at: Option<NaiveDateTime>,
 }
 
 impl Session {
     pub async fn create(
         pool: &DbPool,
-        session_data: ServerSession,
+        sealed_session_data: SealedSessionBytes,
         expires_at: NaiveDateTime,
-    ) -> Result<(Session, String), crate::DbError> {
+    ) -> Result<(Session, SessionAuthToken), crate::DbError> {
         // create a token to identify session for future lookup
-        let token = format!("vtok_{}", gen_random_alphanumeric_code(34));
-        let h_session_id: String = crypto::sha256(token.as_bytes()).encode_hex();
+        let token = SessionAuthToken::generate();
 
         let session = NewSession {
-            h_session_id,
-            session_data,
+            h_session_id: token.id(),
+            sealed_session_data,
             expires_at,
         }
         .update_or_create(pool)
@@ -55,31 +53,13 @@ impl Session {
 
     pub async fn update(
         pool: &DbPool,
-        session_data: Option<ServerSession>,
-        token: String,
-        expires_at: Option<NaiveDateTime>,
-    ) -> Result<(Session, String), crate::DbError> {
-        let h_session_id: String = crypto::sha256(token.as_bytes()).encode_hex();
-
-        let session = UpdateSession {
-            h_session_id,
-            session_data,
-            expires_at,
-        }
-        .update(pool)
-        .await?;
-        Ok((session, token))
-    }
-
-    pub async fn update_for_h_session_id(
-        pool: &DbPool,
-        session_data: Option<ServerSession>,
-        h_session_id: String,
+        sealed_session_data: Option<SealedSessionBytes>,
+        token: &SessionAuthToken,
         expires_at: Option<NaiveDateTime>,
     ) -> Result<Session, crate::DbError> {
         let session = UpdateSession {
-            h_session_id,
-            session_data,
+            h_session_id: token.id(),
+            sealed_session_data,
             expires_at,
         }
         .update(pool)
@@ -99,7 +79,7 @@ impl NewSession {
                     .on_conflict(sessions::h_session_id)
                     .do_update()
                     .set((
-                        sessions::session_data.eq(self.session_data),
+                        sessions::sealed_session_data.eq(self.sealed_session_data),
                         sessions::expires_at.eq(self.expires_at),
                     ))
                     .get_result::<Session>(conn)

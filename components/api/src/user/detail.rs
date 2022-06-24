@@ -1,9 +1,10 @@
+use crate::auth::session_context::HasUserVaultId;
+use crate::auth::session_data::user::my_fp::My1fpBasicSession;
 use crate::types::success::ApiResponseData;
 use crate::utils::user_vault_wrapper::UserVaultWrapper;
 use crate::State;
 use crate::{auth::session_context::SessionContext, errors::ApiError};
 use db::models::user_vaults::UserVault;
-use newtypes::user::onboarding::OnboardingSession;
 use newtypes::DataKind;
 use paperclip::actix::{api_v2_operation, web, web::Json, Apiv2Schema};
 
@@ -59,7 +60,7 @@ impl ApiUser {
 /// Requires user authentication sent in the cookie after a successful /identify/verify call
 pub async fn handler(
     // todo, this should take 1fp
-    user_auth: SessionContext<OnboardingSession>,
+    user_auth: SessionContext<My1fpBasicSession>,
     state: web::Data<State>,
 ) -> actix_web::Result<Json<ApiResponseData<ApiUser>>, ApiError> {
     let existing_user = user_auth.user_vault(&state.db_pool).await?;

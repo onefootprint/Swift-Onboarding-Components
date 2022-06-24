@@ -1,8 +1,9 @@
-use super::AuthError;
+use super::{AuthError, session_data::UserVaultPermissions};
 use crate::{errors::ApiError, State};
 use actix_web::{web, FromRequest};
 use db::models::tenants::Tenant;
 use futures_util::Future;
+
 use paperclip::actix::Apiv2Security;
 use std::pin::Pin;
 
@@ -56,4 +57,14 @@ pub async fn from_request_inner(req: &actix_web::HttpRequest) -> Result<SecretTe
         .await?
         .ok_or(AuthError::UnknownClient)?;
     Ok(SecretTenantAuthContext { tenant })
+}
+
+impl UserVaultPermissions for SecretTenantAuthContext {
+    fn can_decrypt(&self) -> bool {
+        true
+    }
+
+    fn can_update(&self) -> bool {
+        false
+    }
 }

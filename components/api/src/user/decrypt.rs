@@ -1,10 +1,12 @@
-use crate::auth::session_context::SessionContext;
+use crate::auth::either::EitherSession;
+use crate::auth::session_context::HasUserVaultId;
+use crate::auth::session_data::user::my_fp::My1fpBasicSession;
+use crate::auth::session_data::user::onboarding::OnboardingSession;
 use crate::errors::ApiError;
 use crate::types::success::ApiResponseData;
 use crate::user::decrypt;
 use crate::user::DecryptFieldsResult;
 use crate::State;
-use newtypes::user::onboarding::OnboardingSession;
 use newtypes::DataKind;
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 use std::collections::HashMap;
@@ -23,15 +25,14 @@ type UserDecryptResponse = HashMap<DataKind, Option<String>>;
 /// Requires user auth provided in the cookie.
 fn handler(
     state: web::Data<State>,
-    // todo, this should take 1fp
-    user_auth: SessionContext<OnboardingSession>,
+    user_auth: EitherSession<OnboardingSession, My1fpBasicSession>,
     request: Json<UserDecryptRequest>,
 ) -> actix_web::Result<Json<ApiResponseData<UserDecryptResponse>>, ApiError> {
     let DecryptFieldsResult {
         fields_to_decrypt: _,
         result_map,
     } = decrypt(
-        user_auth.data.clone(),
+        &user_auth,
         &state,
         user_auth.user_vault(&state.db_pool).await?,
         request.attributes.clone(),

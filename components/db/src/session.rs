@@ -2,11 +2,14 @@ use crate::errors::DbError;
 use crate::models::sessions::Session;
 use crate::schema;
 use chrono::Utc;
-use crypto::{hex::ToHex, sha256};
 use deadpool_diesel::postgres::Pool;
 use diesel::prelude::*;
+use newtypes::SessionAuthToken;
 
-pub async fn get_by_h_session_id(pool: &Pool, h_session_id: String) -> Result<Option<Session>, DbError> {
+pub async fn get_session_by_primary_key(
+    pool: &Pool,
+    h_session_id: String,
+) -> Result<Option<Session>, DbError> {
     let conn = pool.get().await?;
 
     conn.interact(move |conn| -> Result<Option<Session>, DbError> {
@@ -20,23 +23,24 @@ pub async fn get_by_h_session_id(pool: &Pool, h_session_id: String) -> Result<Op
     .await?
 }
 
-pub async fn get_by_session_id(pool: &Pool, session_id: String) -> Result<Option<Session>, DbError> {
+pub async fn get_session_by_auth_token(
+    pool: &Pool,
+    auth_token: SessionAuthToken,
+) -> Result<Option<Session>, DbError> {
     let conn = pool.get().await?;
 
     conn.interact(move |conn| -> Result<Option<Session>, DbError> {
-        get_session_by_id_sync(conn, session_id)
+        get_session_by_auth_token_sync(conn, auth_token)
     })
     .await?
 }
 
-pub(crate) fn get_session_by_id_sync(
+pub(crate) fn get_session_by_auth_token_sync(
     conn: &PgConnection,
-    session_id: String,
+    auth_token: SessionAuthToken,
 ) -> Result<Option<Session>, DbError> {
-    let h_session_id: String = sha256(session_id.as_bytes()).encode_hex();
-
     let session: Option<Session> = schema::sessions::table
-        .filter(schema::sessions::h_session_id.eq(h_session_id))
+        .filter(schema::sessions::h_session_id.eq(auth_token.id()))
         .first(conn)
         .optional()?;
 

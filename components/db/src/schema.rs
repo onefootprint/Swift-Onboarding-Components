@@ -84,7 +84,7 @@ table! {
         created_at -> Timestamp,
         updated_at -> Timestamp,
         expires_at -> Timestamp,
-        session_data -> Jsonb,
+        sealed_session_data -> Bytea,
     }
 }
 

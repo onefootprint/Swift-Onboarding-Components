@@ -1,5 +1,7 @@
 use crate::auth::client_secret_key::SecretTenantAuthContext;
 use crate::auth::either::Either;
+use crate::auth::session_context::HasTenant;
+use crate::auth::session_data::tenant::workos::WorkOsSession;
 use crate::types::onboarding::ApiOnboarding;
 use crate::types::success::ApiPaginatedResponseData;
 use crate::utils::querystring::deserialize_stringified_list;
@@ -8,7 +10,6 @@ use crate::{auth::session_context::SessionContext, errors::ApiError};
 use chrono::{DateTime, Utc};
 use db::onboarding::OnboardingListQueryParams;
 use db::DbError;
-use newtypes::tenant::workos::WorkOsSession;
 use newtypes::{FootprintUserId, Status};
 use paperclip::actix::{api_v2_operation, get, web, web::Json, Apiv2Schema};
 

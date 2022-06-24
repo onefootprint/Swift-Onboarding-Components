@@ -1,4 +1,6 @@
-use super::{BiometricChallengeState, ChallengeKind};
+use super::{
+    BiometricChallengeState, ChallengeKind, IdentifyChallengeData, IdentifyChallengeState, IdentifyType,
+};
 use crate::errors::ApiError;
 use crate::types::success::ApiResponseData;
 use crate::utils::challenge::{Challenge, ChallengeToken};
@@ -8,7 +10,6 @@ use crate::utils::liveness::LivenessWebauthnConfig;
 use crate::utils::twilio::{TwilioClient, ValidatedPhoneNumber};
 use crate::utils::user_vault_wrapper::UserVaultWrapper;
 use crate::State;
-use chrono::{Duration, Utc};
 use crypto::serde_cbor;
 use db::models::user_vaults::UserVault;
 use db::models::webauthn_credential::WebauthnCredential;
@@ -23,6 +24,8 @@ use webauthn_rs_proto::{RegisteredExtensions, UserVerificationPolicy};
 pub struct IdentifyRequest {
     identifier: Identifier,
     preferred_challenge_kind: ChallengeKind,
+    #[serde(default)]
+    identify_type: IdentifyType,
 }
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
@@ -58,6 +61,7 @@ pub async fn handler(
     let IdentifyRequest {
         identifier,
         preferred_challenge_kind,
+        identify_type,
     } = request.into_inner();
 
     // Fall back to SMS if the user requested webauthn but doesn't have any creds
@@ -87,28 +91,50 @@ pub async fn handler(
     let e164_phone_number = ValidatedPhoneNumber::from_str_unsafe(phone_number.clone());
 
     // Initiate the challenge of the requested type
-    let (challenge_kind, challenge_token, biometric_challenge_json) = match preferred_challenge_kind {
+    let (challenge_kind, challenge_state_data, biometric_challenge_json) = match preferred_challenge_kind {
         ChallengeKind::Biometric => {
             let creds = get_webauthn_creds(&state.db_pool, user_id.clone()).await?;
             if !creds.is_empty() {
-                let (challenge_token, json) =
-                    initiate_biometric_challenge_for_user(&state, &user_id, creds).await?;
-                (ChallengeKind::Biometric, challenge_token, Some(json))
+                let challenge = initiate_biometric_challenge_for_user(&state, &user_id, creds).await?;
+                (
+                    ChallengeKind::Biometric,
+                    IdentifyChallengeData::Biometric(challenge.state),
+                    Some(challenge.challenge_json),
+                )
             } else {
-                let challenge_token = twilio_client
-                    .send_challenge(&state.db_pool, e164_phone_number, &state.session_sealing_key)
+                let challenge_state = twilio_client
+                    .send_challenge(&state, e164_phone_number)
                     .await?;
-                (ChallengeKind::Sms, challenge_token, None)
+                (
+                    ChallengeKind::Sms,
+                    IdentifyChallengeData::Sms(challenge_state),
+                    None,
+                )
             }
         }
         ChallengeKind::Sms => {
             // Fall back to SMS if the user requested webauthn but doesn't have any creds
-            let challenge_token = twilio_client
-                .send_challenge(&state.db_pool, e164_phone_number, &state.session_sealing_key)
+            let challenge_state = twilio_client
+                .send_challenge(&state, e164_phone_number)
                 .await?;
-            (ChallengeKind::Sms, challenge_token, None)
+            (
+                ChallengeKind::Sms,
+                IdentifyChallengeData::Sms(challenge_state),
+                None,
+            )
         }
     };
+
+    let challenge_state = IdentifyChallengeState {
+        identify_type,
+        data: challenge_state_data,
+    };
+
+    let challenge_token = Challenge {
+        expires_at: challenge_state.expires_at(),
+        data: challenge_state,
+    }
+    .seal(&state.challenge_sealing_key)?;
 
     Ok(Json(ApiResponseData {
         data: IdentifyResponse {
@@ -146,11 +172,16 @@ async fn get_user_by_identifier(
     Ok(existing_user)
 }
 
+struct BiometricChallenge {
+    state: BiometricChallengeState,
+    challenge_json: String,
+}
+
 async fn initiate_biometric_challenge_for_user(
     state: &web::Data<State>,
     user_id: &UserVaultId,
     creds: Vec<WebauthnCredential>,
-) -> Result<(ChallengeToken, String), ApiError> {
+) -> Result<BiometricChallenge, ApiError> {
     if creds.is_empty() {
         return Err(ApiError::WebauthnCredentialsNotSet);
     }
@@ -185,17 +216,13 @@ async fn initiate_biometric_challenge_for_user(
         .webauthn()
         .generate_challenge_authenticate_options(creds, None)?;
 
-    let challenge_data = Challenge {
-        expires_at: Utc::now().naive_utc() + Duration::minutes(5),
-        data: BiometricChallengeState {
+    Ok(BiometricChallenge {
+        state: BiometricChallengeState {
             state: auth_state,
             user_vault_id: user_id.clone(),
         },
-    };
-    let challenge_token = challenge_data.seal(&state.session_sealing_key)?;
-    let challenge_json = serde_json::to_string(&challenge)?;
-
-    Ok((challenge_token, challenge_json))
+        challenge_json: serde_json::to_string(&challenge)?,
+    })
 }
 
 fn phone_number_last_two(phone_number: String) -> String {

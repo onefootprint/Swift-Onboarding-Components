@@ -1,12 +1,15 @@
 use std::marker::PhantomData;
 
-use crate::{errors::ApiError, identify::PhoneChallengeState};
+use crate::{
+    errors::ApiError,
+    identify::PhoneChallengeState,
+    State,
+};
 use chrono::{Duration, Utc};
-use crypto::{aead::ScopedSealingKey, sha256};
-use db::DbPool;
-use newtypes::{Base64Data, PhoneNumber, ServerSession};
+use crypto::sha256;
+use newtypes::{Base64Data, PhoneNumber, SealedSessionBytes, SessionAuthToken};
 
-use super::challenge::{Challenge, ChallengeToken};
+use self::rate_limit::RateLimitRecord;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct ValidatedPhoneNumber {
@@ -103,6 +106,16 @@ enum TwilioResponse<T> {
     Error(TwilioError),
 }
 
+mod rate_limit {
+    pub const D2P_LINK: &str = "d2p_session";
+    pub const SMS_CHALLENGE: &str = "sms_challenge";
+
+    #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+    pub struct RateLimitRecord {
+        pub sent_at: chrono::NaiveDateTime,
+    }
+}
+
 impl TwilioClient {
     pub fn new(
         account_sid: String,
@@ -182,37 +195,31 @@ impl TwilioClient {
 
     pub async fn send_challenge(
         &self,
-        db_pool: &DbPool,
+        state: &State,
         destination: ValidatedPhoneNumber,
-        session_sealing_key: &ScopedSealingKey,
-    ) -> Result<ChallengeToken, ApiError> {
+    ) -> Result<PhoneChallengeState, ApiError> {
         let code = crypto::random::gen_rand_n_digit_code(6);
         let message_body = format!("Your {} verification code is {}. Don't share your code with anyone. We will never contact you to request this code.", &self.rp_id, &code);
 
-        self.rate_limit(db_pool, destination.clone(), "sms_challenge".to_string())
+        self.rate_limit(state, destination.clone(), rate_limit::SMS_CHALLENGE)
             .await?;
 
         self.send_message(destination.clone(), message_body).await?;
 
-        let challenge = Challenge {
-            expires_at: Utc::now().naive_utc() + Duration::minutes(15),
-            data: PhoneChallengeState {
-                phone_number: destination,
-                h_code: sha256(code.as_bytes()).to_vec(),
-            },
-        };
-        let challenge_token = challenge.seal(session_sealing_key)?;
-        Ok(challenge_token)
+        Ok(PhoneChallengeState {
+            phone_number: destination,
+            h_code: sha256(code.as_bytes()).to_vec(),
+        })
     }
 
     pub async fn send_d2p(
         &self,
-        db_pool: &DbPool,
+        state: &State,
         destination: ValidatedPhoneNumber,
         base_url: String,
-        auth_token: String,
+        auth_token: SessionAuthToken,
     ) -> Result<(), ApiError> {
-        self.rate_limit(db_pool, destination.clone(), "d2p_session".to_string())
+        self.rate_limit(state, destination.clone(), rate_limit::D2P_LINK)
             .await?;
 
         let message_body = format!(
@@ -226,31 +233,36 @@ impl TwilioClient {
 
     async fn rate_limit(
         &self,
-        db_pool: &DbPool,
+        state: &State,
         phone_number: ValidatedPhoneNumber,
-        scope: String,
+        scope: &str,
     ) -> Result<(), ApiError> {
-        let session_key =
+        let h_session_id =
             Base64Data(sha256(format!("{}:{}", phone_number.e164, scope).as_bytes()).to_vec()).to_string();
+
         let now = Utc::now().naive_utc();
         let time_between_challenges = Duration::seconds(self.time_s_between_challenges);
 
-        let session = db::session::get_by_h_session_id(db_pool, session_key.clone()).await?;
-        if let Some(ServerSession::ChallengeLastSent { sent_at }) = session.map(|s| s.session_data) {
-            // TODO change name from ChallengeLastSent to something more generic for rate limiting
-            let time_since_last_sent = now - sent_at;
-            if time_since_last_sent < time_between_challenges {
-                let time_remaining = (time_between_challenges - time_since_last_sent).num_seconds();
-                return Err(ApiError::RateLimited(time_remaining));
+        if let Some(session) =
+            db::session::get_session_by_primary_key(&state.db_pool, h_session_id.clone()).await?
+        {
+            if let Ok(RateLimitRecord { sent_at }) =
+                serde_json::from_slice(session.sealed_session_data.as_ref())
+            {
+                let time_since_last_sent = now - sent_at;
+                if time_since_last_sent < time_between_challenges {
+                    let time_remaining = (time_between_challenges - time_since_last_sent).num_seconds();
+                    return Err(ApiError::RateLimited(time_remaining));
+                }
             }
         }
 
         db::models::sessions::NewSession {
-            h_session_id: session_key,
-            session_data: ServerSession::ChallengeLastSent { sent_at: now },
+            h_session_id,
+            sealed_session_data: SealedSessionBytes(serde_json::to_vec(&RateLimitRecord { sent_at: now })?),
             expires_at: now + time_between_challenges,
         }
-        .update_or_create(db_pool)
+        .update_or_create(&state.db_pool)
         .await?;
         Ok(())
     }

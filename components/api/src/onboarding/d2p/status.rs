@@ -1,10 +1,10 @@
+use crate::auth::session_data::user::d2p::D2pSession;
+use crate::auth::session_data::SessionData;
 use crate::types::success::ApiResponseData;
 use crate::types::Empty;
 use crate::State;
 use crate::{auth::session_context::SessionContext, errors::ApiError};
-use db::models::sessions::Session;
-use newtypes::user::d2p::D2pSession;
-use newtypes::{D2pSessionStatus, ServerSession};
+use newtypes::D2pSessionStatus;
 use paperclip::actix::{api_v2_operation, get, post, web, web::Json, Apiv2Schema};
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Serialize)]
@@ -43,11 +43,15 @@ pub fn post(
         return Err(ApiError::InvalidStatusTransition);
     }
 
-    let session_data = ServerSession::D2p(D2pSession {
-        user_vault_id: user_auth.data.user_vault_id,
-        status,
-    });
-    Session::update(&state.db_pool, Some(session_data), user_auth.auth_token, None).await?;
+    user_auth
+        .update_session_data(
+            &state,
+            SessionData::D2p(D2pSession {
+                user_vault_id: user_auth.data.user_vault_id.clone(),
+                status,
+            }),
+        )
+        .await?;
 
     Ok(Json(ApiResponseData { data: Empty }))
 }

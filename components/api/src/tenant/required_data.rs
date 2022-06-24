@@ -2,12 +2,12 @@ use std::collections::HashSet;
 
 use crate::auth::client_secret_key::SecretTenantAuthContext;
 use crate::auth::either::Either;
-use crate::auth::session_context::SessionContext;
+use crate::auth::session_context::{SessionContext, HasTenant};
+use crate::auth::session_data::tenant::workos::WorkOsSession;
 use crate::types::success::ApiResponseData;
 use crate::State;
 use crate::{errors::ApiError, types::Empty};
 use db::models::ob_configurations::{ObConfiguration, UpdateObConfiguration};
-use newtypes::tenant::workos::WorkOsSession;
 use newtypes::{DataKind, ObConfigurationKey};
 use paperclip::actix::{api_v2_operation, get, post, web, web::Json, Apiv2Schema};
 

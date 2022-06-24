@@ -1,13 +1,18 @@
-use crate::errors::ApiError;
+use crate::identify::IdentifyChallengeData;
 use crate::types::success::ApiResponseData;
-use crate::utils::challenge::ChallengeToken;
+use crate::utils::challenge::{Challenge, ChallengeToken};
 use crate::State;
+use crate::{errors::ApiError, identify::IdentifyChallengeState};
 use newtypes::PhoneNumber;
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
+
+use super::IdentifyType;
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
 pub struct ChallengeRequest {
     phone_number: PhoneNumber,
+    #[serde(default)]
+    identify_type: IdentifyType,
 }
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Serialize)]
@@ -30,9 +35,18 @@ pub async fn handler(
 
     let phone_number = twilio_client.standardize(&req.phone_number).await?;
 
-    let challenge_token = twilio_client
-        .send_challenge(&state.db_pool, phone_number, &state.session_sealing_key)
-        .await?;
+    let challenge_state_data = twilio_client.send_challenge(&state, phone_number).await?;
+
+    let challenge_state = IdentifyChallengeState {
+        identify_type: req.identify_type,
+        data: IdentifyChallengeData::Sms(challenge_state_data),
+    };
+
+    let challenge_token = Challenge {
+        expires_at: challenge_state.expires_at(),
+        data: challenge_state,
+    }
+    .seal(&state.challenge_sealing_key)?;
 
     Ok(Json(ApiResponseData {
         data: ChallengeResponse { challenge_token },

@@ -1,11 +1,16 @@
 use crate::{
-    db_types::session_data::{HeaderName, ServerSession, TypeError, UserVaultPermissions},
-    TenantId,
+    auth::{
+        session_data::{HeaderName, SessionData, UserVaultPermissions},
+        AuthError, session_context::HasTenant,
+    },
+    errors::ApiError,
 };
-use diesel::{AsExpression, FromSqlRow};
+use async_trait::async_trait;
+use db::{DbPool, models::tenants::Tenant};
+use newtypes::TenantId;
 use paperclip::actix::Apiv2Schema;
 
-#[derive(FromSqlRow, AsExpression, serde::Serialize, serde::Deserialize, Debug, Clone, Apiv2Schema)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, Apiv2Schema)]
 pub struct WorkOsSession {
     pub email: String,
     pub first_name: Option<String>,
@@ -13,13 +18,13 @@ pub struct WorkOsSession {
     pub tenant_id: TenantId,
 }
 
-impl TryFrom<ServerSession> for WorkOsSession {
-    type Error = TypeError;
+impl TryFrom<SessionData> for WorkOsSession {
+    type Error = ApiError;
 
-    fn try_from(value: ServerSession) -> Result<Self, Self::Error> {
+    fn try_from(value: SessionData) -> Result<Self, Self::Error> {
         match value {
-            ServerSession::WorkOs(data) => Ok(data),
-            _ => Err(TypeError::BadSessionType),
+            SessionData::WorkOs(data) => Ok(data),
+            _ => Err(AuthError::SessionTypeError)?,
         }
     }
 }
@@ -35,8 +40,19 @@ impl UserVaultPermissions for WorkOsSession {
         true
     }
 
-    fn can_modify(&self) -> bool {
+    fn can_update(&self) -> bool {
         false
+    }
+}
+
+#[async_trait]
+impl HasTenant for WorkOsSession {
+    fn tenant_id(&self) -> TenantId {
+        self.tenant_id.clone()
+    }
+
+    async fn tenant(&self, pool: &DbPool) -> Result<Tenant, ApiError> {
+        Ok(db::tenant::get_tenant(pool, self.tenant_id.clone()).await?)
     }
 }
 

@@ -1,6 +1,7 @@
 use crate::auth::client_secret_key::SecretTenantAuthContext;
 use crate::auth::either::Either;
-use crate::auth::session_context::SessionContext;
+use crate::auth::session_context::{SessionContext, HasTenant};
+use crate::auth::session_data::tenant::workos::WorkOsSession;
 use crate::errors::ApiError;
 use crate::types::success::ApiResponseData;
 use crate::user::{decrypt, DecryptFieldsResult};
@@ -8,7 +9,6 @@ use crate::utils::insight_headers::InsightHeaders;
 use crate::State;
 use db::models::access_events::NewAccessEvent;
 use db::models::insight_event::CreateInsightEvent;
-use newtypes::tenant::workos::WorkOsSession;
 use newtypes::{DataKind, FootprintUserId};
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 use std::collections::{HashMap, HashSet};
@@ -56,7 +56,7 @@ fn handler(
         fields_to_decrypt,
         result_map,
     } = decrypt(
-        auth,
+        &auth,
         &state,
         vault,
         request.attributes.clone().into_iter().collect(),

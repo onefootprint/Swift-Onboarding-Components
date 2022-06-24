@@ -1,18 +1,18 @@
 use std::pin::Pin;
 
 use actix_web::FromRequest;
+use async_trait::async_trait;
 use db::{models::tenants::Tenant, DbPool};
 use futures_util::Future;
-use newtypes::{
-    tenant::workos::WorkOsSession,
-    user::{d2p::D2pSession, onboarding::OnboardingSession},
-    D2pSessionStatus, UserVaultId, UserVaultPermissions,
-};
+use newtypes::{TenantId, UserVaultId};
 use paperclip::actix::Apiv2Security;
 
 use crate::errors::ApiError;
 
-use super::{client_secret_key::SecretTenantAuthContext, session_context::SessionContext, AuthError};
+use super::{
+    session_context::{HasTenant, HasUserVaultId, SessionContext},
+    AuthError, session_data::UserVaultPermissions,
+};
 
 #[derive(Debug, Clone, Apiv2Security)]
 #[openapi(apiKey)]
@@ -24,8 +24,8 @@ pub enum Either<A, B> {
 
 impl<A, B> FromRequest for Either<A, B>
 where
-    A: FromRequest + 'static,
-    B: FromRequest + 'static,
+    A: FromRequest<Error = ApiError> + 'static,
+    B: FromRequest<Error = ApiError> + 'static,
 {
     type Error = ApiError;
     type Future = Pin<Box<dyn Future<Output = Result<Self, Self::Error>>>>;
@@ -41,43 +41,89 @@ where
             match out {
                 (Ok(a), _) => Ok(Either::Left(a)),
                 (_, Ok(b)) => Ok(Either::Right(b)),
-                _ => Err(AuthError::MissingHeader("missing a valid header".to_string()))?,
+
+                // The goal here is to produce a better error message
+                // as it's possible there's a real auth error or some headers are missing
+                (Err(e1), Err(e2)) => {
+                    match (e1, e2) {
+                        // if both headers are missing
+                        (
+                            ApiError::AuthError(AuthError::MissingHeader(h1)),
+                            ApiError::AuthError(AuthError::MissingHeader(h2)),
+                        ) => Err(ApiError::AuthError(AuthError::MissingHeader(format!(
+                            "{} or {}",
+                            h1, h2
+                        )))),
+
+                        // if there's a non missing header error on one side, pick that one
+                        (ApiError::AuthError(AuthError::MissingHeader(_)), e)
+                        | (e, ApiError::AuthError(AuthError::MissingHeader(_))) => Err(e),
+
+                        (e1, e2) => {
+                            tracing::warn!(error1=?e1, error2=?e2, "Got dual error in Either FromRequest");
+                            // arbitrarily choose the first one
+                            Err(e1)
+                        }
+                    }
+                }
             }
         })
     }
 }
 
-impl Either<SessionContext<D2pSession>, SessionContext<OnboardingSession>> {
-    pub fn is_valid_biometric_session(&self) -> bool {
-        match self {
-            Either::Left(s) => matches!(s.data.status, D2pSessionStatus::InProgress),
-            Either::Right(_) => true,
-        }
-    }
+pub type EitherSession<A, B> = Either<SessionContext<A>, SessionContext<B>>;
+pub type EitherSession3<A, B, C> = Either<SessionContext<A>, EitherSession<B, C>>;
 
-    pub fn user_vault_id(&self) -> UserVaultId {
+impl<A, B> HasUserVaultId for Either<A, B>
+where
+    A: HasUserVaultId,
+    B: HasUserVaultId,
+{
+    fn user_vault_id(&self) -> UserVaultId {
         match self {
-            Either::Left(s) => s.data.user_vault_id.clone(),
-            Either::Right(s) => s.data.user_vault_id.clone(),
-        }
-    }
-}
-
-impl Either<SessionContext<WorkOsSession>, SecretTenantAuthContext> {
-    pub async fn tenant(&self, pool: &DbPool) -> Result<Tenant, ApiError> {
-        match self {
-            Either::Left(s) => Ok(s.tenant(pool).await?),
-            Either::Right(s) => Ok(s.tenant().clone()),
+            Either::Left(l) => l.user_vault_id(),
+            Either::Right(r) => r.user_vault_id(),
         }
     }
 }
 
-impl UserVaultPermissions for Either<SessionContext<WorkOsSession>, SecretTenantAuthContext> {
+impl<A, B> UserVaultPermissions for Either<A, B>
+where
+    A: UserVaultPermissions,
+    B: UserVaultPermissions,
+{
     fn can_decrypt(&self) -> bool {
-        true
+        match self {
+            Either::Left(l) => l.can_decrypt(),
+            Either::Right(r) => r.can_decrypt(),
+        }
     }
 
-    fn can_modify(&self) -> bool {
-        false
+    fn can_update(&self) -> bool {
+        match self {
+            Either::Left(l) => l.can_update(),
+            Either::Right(r) => r.can_update(),
+        }
+    }
+}
+
+#[async_trait]
+impl<A, B> HasTenant for Either<A, B>
+where
+    A: HasTenant + Sync,
+    B: HasTenant + Sync,
+{
+    fn tenant_id(&self) -> TenantId {
+        match self {
+            Either::Left(s) => s.tenant_id(),
+            Either::Right(s) => s.tenant_id(),
+        }
+    }
+
+    async fn tenant(&self, pool: &DbPool) -> Result<Tenant, ApiError> {
+        match self {
+            Either::Left(s) => s.tenant(pool).await,
+            Either::Right(s) => s.tenant(pool).await,
+        }
     }
 }

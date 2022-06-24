@@ -21,6 +21,8 @@ TENANT_AUTH_HEADER = "x-client-public-key"
 TENANT_SECRET_HEADER = "x-client-secret-key"
 FPUSER_AUTH_HEADER = "x-fpuser-authorization"
 D2P_AUTH_HEADER = "x-d2p-authorization"
+MY1FP_AUTH_HEADER = "X-My1fp-Authorization"
+
 WORKOS_ORG_ID = "org_01G39KR1V1E52JEZV6BYNG590J"
 DEFAULT_ATTRIBUTES = {
         'first_name', 
@@ -64,10 +66,16 @@ def _client_priv_key_headers(client_priv_key):
 def _fpuser_auth_headers(request):
     return _fpuser_auth_header_raw(request.config.cache.get("fpuser_auth_token", None))
 
+def _my1fp_auth_headers(request):
+    return _my1fp_auth_header_raw(request.config.cache.get("my1fp_auth_token", None))
 
 def _fpuser_auth_header_raw(value):
     return {
         FPUSER_AUTH_HEADER: value
+    }
+def _my1fp_auth_header_raw(value):
+    return {
+        MY1FP_AUTH_HEADER: value
     }
 
 def _d2p_auth_header_raw(value):
@@ -209,6 +217,7 @@ def test_identify_verify(request):
 def test_onboard_init(request, workos_tenant):
     path = "onboarding"
     print(url(path))
+    print(_fpuser_auth_headers(request))
     r = requests.post(
         url(path),
         headers=dict(**_client_pub_key_headers(workos_tenant["pk"]), **_fpuser_auth_headers(request)),
@@ -592,13 +601,56 @@ def test_access_events_list(request, workos_tenant):
     body = _assert_response(r)
     assert not body["data"]
 
+def test_my1fp_basic_auth(request):
+    request.config.cache.set("my1fp_auth_token", None) 
+
+    # Identify the user by email
+    path = "identify"
+    print(url(path))
+    email = request.config.cache.get("email", None)
+    identifier = {"email": email}
+    data = {"identifier": identifier, "preferred_challenge_kind": "sms", "identify_type": "my1fp"}
+
+    # avoid rate-limit error
+    time.sleep(20)
+    r = requests.post(
+        url(path),
+        json=data,
+    )
+    body = _assert_response(r)
+    assert body["data"]["user_found"]
+    assert body["data"]["challenge_data"]["phone_number_last_two"] == PHONE_NUMBER[-2:]
+    assert body["data"]["challenge_data"]["challenge_kind"] == "sms"
+
+    # Log in as the user
+    path = "identify/verify"
+    # todo -- race conditions here
+    time.sleep(5)
+    message = twilio_client.messages.list(to=PHONE_NUMBER)[0]
+    print(message.body)
+    code = str(re.search("\d{6}", message.body).group(0))
+    print(code)
+    print(url(path))
+    data = {
+        "challenge_response": code,
+        "challenge_token": body["data"]["challenge_data"]["challenge_token"],
+    }
+    r = requests.post(
+        url(path),
+        json=data,
+    )
+    body = _assert_response(r)
+    assert body["data"]["kind"] == "user_inherited"
+    auth_token = body["data"]["auth_token"]
+    request.config.cache.set("my1fp_auth_token", auth_token)
+
 def test_logged_in_user_detail(request):
     # Get the user detail using the logged in context
     path = f"user"
     print(url(path))
     r = requests.get(
         url(path),
-        headers=_fpuser_auth_headers(request),
+        headers=_my1fp_auth_headers(request),
     )
     body = _assert_response(r)
     user = body["data"]
@@ -611,7 +663,7 @@ def test_logged_in_access_events(request):
     print(url(path))
     r = requests.get(
         url(path),
-        headers=_fpuser_auth_headers(request),
+        headers=_my1fp_auth_headers(request),
     )
     body = _assert_response(r)
     access_events = body["data"]

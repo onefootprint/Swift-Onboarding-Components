@@ -1,9 +1,10 @@
+use crate::auth::session_data::email::email_verify::EmailVerifySession;
+use crate::auth::session_data::{ServerSession, SessionData};
 use crate::errors::ApiError;
 use crate::utils::crypto::signed_hash;
 use crate::State;
 use crypto::random::gen_random_alphanumeric_code;
-use newtypes::email::email_verify::EmailVerifySession;
-use newtypes::{ServerSession, UserVaultId};
+use newtypes::UserVaultId;
 use paperclip::actix::web;
 use reqwest::StatusCode;
 use std::collections::HashMap;
@@ -114,18 +115,13 @@ pub(crate) async fn send_email_challenge(
     uv_id: UserVaultId,
     email_address: String,
 ) -> Result<(), ApiError> {
-    let session_data = ServerSession::EmailVerify(EmailVerifySession {
+    let session_data = SessionData::EmailVerify(EmailVerifySession {
         uv_id,
         sh_email: signed_hash(state, email_address.clone()).await?,
     });
 
     // create new session
-    let (_, token) = db::models::sessions::Session::create(
-        &state.db_pool,
-        session_data,
-        chrono::Utc::now().naive_utc() + chrono::Duration::days(1),
-    )
-    .await?;
+    let token = ServerSession::create(state, session_data, chrono::Duration::days(1)).await?;
 
     // add unique url query param to avoid incorrect caching by browser/client
     let unique_param = gen_random_alphanumeric_code(5);

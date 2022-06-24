@@ -45,6 +45,7 @@ pub struct State {
     sendgrid_client: SendgridClient,
     db_pool: DbPool,
     enclave_connection_pool: bb8::Pool<pool::StreamManager<StreamManager<Config>>>,
+    challenge_sealing_key: ScopedSealingKey,
     session_sealing_key: ScopedSealingKey,
 }
 
@@ -140,14 +141,17 @@ async fn main() -> std::io::Result<()> {
         let db_pool = db::init(&config.database_url).map_err(ApiError::from).unwrap();
 
         // our session key
-        let session_sealing_key = {
+        let (challenge_sealing_key, session_sealing_key) = {
             let key = if let Some(hex_key) = &config.cookie_session_key_hex {
                 crypto::hex::decode(hex_key).expect("invalid session cookie key")
             } else {
                 log::error!("WARNING GENERATING RANDOM SESSION KEY");
                 crypto::random::random_cookie_session_key_bytes()
             };
-            ScopedSealingKey::new(key, "SESSION_SEALING").expect("invalid cookie session key")
+            (
+                ScopedSealingKey::new(key.clone(), "CHALLENGE_SEALING").expect("invalid master session key"),
+                ScopedSealingKey::new(key, "SESSION_SEALING").expect("invalid master session key"),
+            )
         };
 
         State {
@@ -159,6 +163,7 @@ async fn main() -> std::io::Result<()> {
             twilio_client,
             sendgrid_client,
             db_pool,
+            challenge_sealing_key,
             session_sealing_key,
         }
     };

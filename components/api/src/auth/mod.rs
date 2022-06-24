@@ -1,13 +1,13 @@
-use self::{client_public_key::PublicTenantAuthContext, session_context::SessionContext};
+use self::{client_public_key::PublicTenantAuthContext, session_context::SessionContext, session_data::user::onboarding::OnboardingSession};
 use crate::errors::ApiError;
 use db::models::onboardings::Onboarding;
-use newtypes::user::onboarding::OnboardingSession;
 use thiserror::Error;
 
 pub mod client_public_key;
 pub mod client_secret_key;
 pub mod either;
 pub mod session_context;
+pub mod session_data;
 
 #[derive(Debug, Error)]
 pub enum AuthError {
@@ -29,6 +29,9 @@ pub enum AuthError {
     MissingHeader(String),
     #[error("unauthorized operation")]
     UnauthorizedOperation,
+    #[error("session expired")]
+    SessionExpired,
+
 }
 
 /// For endpoints that take both a user_auth and tenant_auth, this helps to assert that the authenticated user

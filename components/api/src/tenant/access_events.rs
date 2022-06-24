@@ -1,5 +1,7 @@
 use crate::auth::client_secret_key::SecretTenantAuthContext;
 use crate::auth::either::Either;
+use crate::auth::session_context::HasTenant;
+use crate::auth::session_data::tenant::workos::WorkOsSession;
 use crate::types::access_event::ApiAccessEvent;
 use crate::types::success::ApiPaginatedResponseData;
 use crate::utils::querystring::deserialize_stringified_list;
@@ -7,7 +9,7 @@ use crate::State;
 use crate::{auth::session_context::SessionContext, errors::ApiError};
 use chrono::{DateTime, Utc};
 use db::access_event::AccessEventListQueryParams;
-use newtypes::{tenant::workos::WorkOsSession, DataKind, FootprintUserId};
+use newtypes::{DataKind, FootprintUserId};
 use paperclip::actix::{api_v2_operation, get, web, web::Json, Apiv2Schema};
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize, Apiv2Schema)]

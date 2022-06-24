@@ -2,7 +2,8 @@ pub mod challenge;
 #[allow(clippy::module_inception)]
 pub mod identify;
 pub mod verify;
-use newtypes::{UserVaultId};
+use chrono::{Duration, Utc};
+use newtypes::UserVaultId;
 use paperclip::actix::{web, Apiv2Schema};
 use webauthn_rs_core::proto::AuthenticationState;
 
@@ -39,4 +40,40 @@ pub fn routes() -> web::Scope {
         .service(web::resource("").route(web::post().to(identify::handler)))
         .service(challenge::handler)
         .service(verify::handler)
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct IdentifyChallengeState {
+    identify_type: IdentifyType,
+    data: IdentifyChallengeData,
+}
+
+#[derive(Debug, serde::Serialize, serde::Deserialize, PartialEq, Clone, Copy, Apiv2Schema)]
+#[serde(rename_all = "snake_case")]
+pub enum IdentifyType {
+    Onboarding,
+    My1fp,
+}
+
+impl Default for IdentifyType {
+    fn default() -> Self {
+        Self::Onboarding
+    }
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub enum IdentifyChallengeData {
+    Sms(PhoneChallengeState),
+    Biometric(BiometricChallengeState),
+}
+
+impl IdentifyChallengeState {
+    pub fn expires_at(&self) -> chrono::NaiveDateTime {
+        let ttl = match &self.data {
+            IdentifyChallengeData::Sms(_) => Duration::minutes(5),
+            IdentifyChallengeData::Biometric(_) => Duration::minutes(5),
+        };
+
+        Utc::now().naive_utc() + ttl
+    }
 }

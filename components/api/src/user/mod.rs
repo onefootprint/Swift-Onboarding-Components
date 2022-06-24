@@ -1,8 +1,12 @@
-use crate::{auth::AuthError, errors::ApiError, State};
+use crate::{
+    auth::{session_data::UserVaultPermissions, AuthError},
+    errors::ApiError,
+    State,
+};
 use crypto::seal::EciesP256Sha256AesGcmSealed;
 use db::models::user_vaults::UserVault;
 use enclave_proxy::{DataTransform, DecryptRequest};
-use newtypes::{DataKind, UserVaultPermissions};
+use newtypes::DataKind;
 use paperclip::actix::web;
 use std::collections::HashMap;
 
@@ -43,7 +47,7 @@ pub struct DecryptFieldsResult {
 }
 
 pub async fn decrypt<C: UserVaultPermissions>(
-    session: C,
+    session: &C,
     state: &web::Data<State>,
     user_vault: UserVault,
     data_kinds: Vec<DataKind>,

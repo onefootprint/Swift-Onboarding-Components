@@ -1,13 +1,15 @@
-use crate::errors::ApiError;
+use crate::auth::session_data::SessionData;
 use crate::types::success::ApiResponseData;
 use crate::State;
+use crate::{auth::session_data::ServerSession, errors::ApiError};
 use chrono::Utc;
-use newtypes::{DataKind, ServerSession};
+use newtypes::{DataKind, SessionAuthToken};
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
 struct EmailVerifyRequest {
-    data: String,
+    /// The token data in the email link fragment
+    data: SessionAuthToken,
 }
 
 #[api_v2_operation(tags(User))]
@@ -18,11 +20,13 @@ async fn handler(
     state: web::Data<State>,
     request: Json<EmailVerifyRequest>,
 ) -> actix_web::Result<Json<ApiResponseData<String>>, ApiError> {
-    let session = db::session::get_by_session_id(&state.db_pool, request.data.clone())
+    let session = db::session::get_session_by_auth_token(&state.db_pool, request.into_inner().data)
         .await?
         .ok_or(ApiError::EmailVerificationTokenInvalidOrNotFound)?;
 
-    let data = if let ServerSession::EmailVerify(data) = session.session_data {
+    let session = ServerSession::unseal(&state.session_sealing_key, &session.sealed_session_data)?;
+
+    let data = if let SessionData::EmailVerify(data) = session.data {
         Ok(data)
     } else {
         Err(ApiError::EmailVerificationTokenInvalidOrNotFound)

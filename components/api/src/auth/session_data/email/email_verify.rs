@@ -1,4 +1,4 @@
-use crate::UserVaultId;
+use newtypes::UserVaultId;
 
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 pub struct EmailVerifySession {

@@ -1,5 +1,6 @@
 use crate::auth::client_public_key::PublicTenantAuthContext;
-use crate::auth::session_context::SessionContext;
+use crate::auth::session_context::{HasUserVaultId, SessionContext};
+use crate::auth::session_data::user::onboarding::OnboardingSession;
 use crate::errors::ApiError;
 use crate::types::success::ApiResponseData;
 use crate::utils::insight_headers::InsightHeaders;
@@ -7,7 +8,6 @@ use crate::utils::user_vault_wrapper::UserVaultWrapper;
 use crate::State;
 use db::models::onboardings::NewOnboarding;
 use db::{models::insight_event::CreateInsightEvent, webauthn_credentials::get_webauthn_creds};
-use newtypes::user::onboarding::OnboardingSession;
 use newtypes::{DataKind, Status};
 use paperclip::actix::{api_v2_operation, web, web::Json, Apiv2Schema};
 

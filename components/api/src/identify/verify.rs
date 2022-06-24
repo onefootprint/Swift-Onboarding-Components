@@ -1,5 +1,9 @@
-use super::{BiometricChallengeState, ChallengeKind, PhoneChallengeState};
+use super::{BiometricChallengeState, PhoneChallengeState};
+use crate::auth::session_data::user::my_fp::{My1fpBasicSession, UserAuthMethod};
+use crate::auth::session_data::user::onboarding::OnboardingSession;
+use crate::auth::session_data::{ServerSession, SessionData};
 use crate::errors::ApiError;
+use crate::identify::{IdentifyChallengeData, IdentifyChallengeState, IdentifyType};
 use crate::types::success::ApiResponseData;
 use crate::utils::challenge::{Challenge, ChallengeToken};
 use crate::utils::crypto::seal_to_vault_pkey;
@@ -7,18 +11,16 @@ use crate::utils::crypto::signed_hash;
 use crate::utils::liveness::LivenessWebauthnConfig;
 use crate::State;
 use aws_sdk_kms::model::DataKeyPairSpec;
-use chrono::{Duration, Utc};
+use chrono::Duration;
 use crypto::sha256;
-use db::models::sessions::Session;
 use db::models::user_vaults::{NewUserVaultReq, UserVault};
-use newtypes::user::onboarding::OnboardingSession;
-use newtypes::{DataKind, ServerSession, Status, UserVaultId};
+use newtypes::{DataKind, SessionAuthToken, Status, UserVaultId};
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
 pub struct VerifyRequest {
-    challenge_token: ChallengeToken, // Sealed Challenge<PhoneChallengeState>
-    challenge_kind: ChallengeKind,
+    /// Opaque challenge state token
+    challenge_token: ChallengeToken,
     challenge_response: String,
 }
 
@@ -32,7 +34,7 @@ pub enum VerifyKind {
 #[derive(Debug, Clone, Apiv2Schema, serde::Serialize)]
 pub struct VerifyResponse {
     kind: VerifyKind,
-    auth_token: String,
+    auth_token: SessionAuthToken,
 }
 
 #[api_v2_operation(tags(Identify))]
@@ -45,61 +47,72 @@ pub async fn handler(
     state: web::Data<State>,
     request: Json<VerifyRequest>,
 ) -> actix_web::Result<Json<ApiResponseData<VerifyResponse>>, ApiError> {
-    let (user_vault_id, kind) = match request.challenge_kind {
-        ChallengeKind::Biometric => {
-            validate_biometric_challenge(&state, &request.challenge_token, &request.challenge_response)?
+    let challenge_state =
+        Challenge::<IdentifyChallengeState>::unseal(&state.challenge_sealing_key, &request.challenge_token)?
+            .data;
+
+    let (user_vault_id, user_kind, user_auth_method) = match challenge_state.data {
+        IdentifyChallengeData::Sms(challenge_state) => {
+            let (uv_id, user_kind) =
+                validate_sms_challenge(&state, challenge_state, &request.challenge_response).await?;
+
+            (uv_id, user_kind, UserAuthMethod::SmsOnly)
         }
-        ChallengeKind::Sms => {
-            validate_sms_challenge(&state, &request.challenge_token, &request.challenge_response).await?
+        IdentifyChallengeData::Biometric(challenge_state) => {
+            let (uv_id, user_kind) =
+                validate_biometric_challenge(&state, challenge_state, &request.challenge_response)?;
+            (uv_id, user_kind, UserAuthMethod::BiometricsOnly)
         }
     };
 
-    // Save onboarding in session data into the DB
-    let login_expires_at = Utc::now().naive_utc() + Duration::minutes(15);
-    let session_data = ServerSession::Onboarding(OnboardingSession { user_vault_id });
-    let (_, auth_token) = Session::create(&state.db_pool, session_data, login_expires_at).await?;
+    // create the session and token
+    let auth_token = match challenge_state.identify_type {
+        IdentifyType::Onboarding => {
+            let data = SessionData::Onboarding(OnboardingSession { user_vault_id });
+            ServerSession::create(&state, data, Duration::minutes(15)).await?
+        }
+        IdentifyType::My1fp => {
+            let data = SessionData::My1fp(My1fpBasicSession {
+                user_vault_id,
+                auth_method: user_auth_method,
+            });
+            ServerSession::create(&state, data, Duration::hours(24)).await?
+        }
+    };
 
     Ok(Json(ApiResponseData {
-        data: VerifyResponse { kind, auth_token },
+        data: VerifyResponse {
+            kind: user_kind,
+            auth_token,
+        },
     }))
 }
 
 fn validate_biometric_challenge(
     state: &web::Data<State>,
-    challenge_token: &ChallengeToken,
+    challenge_state: BiometricChallengeState,
     challenge_response: &str,
 ) -> Result<(UserVaultId, VerifyKind), ApiError> {
     // Decode and validate the response to the biometric challenge
-    let challenge =
-        Challenge::<BiometricChallengeState>::unseal(&state.session_sealing_key, challenge_token)?;
     let webauthn = LivenessWebauthnConfig::new(state);
     let auth_resp = serde_json::from_str(challenge_response)?;
     let _ = webauthn
         .webauthn()
-        .authenticate_credential(&auth_resp, &challenge.data.state)?;
+        .authenticate_credential(&auth_resp, &challenge_state.state)?;
 
-    Ok((challenge.data.user_vault_id, VerifyKind::UserInherited))
+    Ok((challenge_state.user_vault_id, VerifyKind::UserInherited))
 }
 
 async fn validate_sms_challenge(
     state: &web::Data<State>,
-    challenge_token: &ChallengeToken,
+    challenge_state: PhoneChallengeState,
     challenge_response: &str,
 ) -> Result<(UserVaultId, VerifyKind), ApiError> {
-    // Decode and validate the response to the SMS challenge
-    let challenge_data =
-        Challenge::<PhoneChallengeState>::unseal(&state.session_sealing_key, challenge_token)?;
-
-    let now = Utc::now().naive_utc();
-    // TODO don't need to check expiry time here
-    if (challenge_data.data.h_code != sha256(challenge_response.as_bytes()).to_vec())
-        || (challenge_data.expires_at < now)
-    {
+    if challenge_state.h_code != sha256(challenge_response.as_bytes()).to_vec() {
         return Err(ApiError::ChallengeNotValid);
     }
 
-
-    let phone_number = challenge_data.data.phone_number;
+    let phone_number = challenge_state.phone_number;
     let sh_phone_number = signed_hash(state, phone_number.e164.clone()).await?;
     let existing_user = db::user_vault::get_by_fingerprint(
         &state.db_pool,
