@@ -33,6 +33,12 @@ const getTenantInfo = async (payload: TenantInfoRequest) => {
 const useTenantInfo = (tenantPk: string) => {
   const [, send] = useBifrostMachine();
 
+  if (!tenantPk) {
+    send({
+      type: Events.tenantInfoRequestFailed,
+    });
+  }
+
   useQuery<TenantInfoResponse, RequestError>(
     ['tenantInfo', tenantPk],
     () => getTenantInfo({ tenantPk }),
