@@ -1,3 +1,5 @@
+import { useFootprintJs } from 'footprint-provider';
+import { useTranslation } from 'hooks';
 import IcoBuilding24 from 'icons/ico/ico-building-24';
 import IcoCake24 from 'icons/ico/ico-cake-24';
 import IcoEmail24 from 'icons/ico/ico-email-24';
@@ -8,6 +10,7 @@ import React from 'react';
 import HeaderTitle from 'src/components/header-title';
 import { useBifrostMachine } from 'src/components/machine-provider';
 import { Events } from 'src/hooks/use-bifrost-machine';
+import useOnboardingComplete from 'src/hooks/use-onboarding-complete';
 import { UserDataAttribute } from 'src/utils/state-machine/types';
 import styled, { css } from 'styled-components';
 import { FootprintButton, Typography } from 'ui';
@@ -52,11 +55,29 @@ const IconsByUserDataAttributes: Record<
 };
 
 const Confirmation = () => {
+  const { t } = useTranslation('pages.confirmation');
+  const footprint = useFootprintJs();
+  const completeOnboardingMutation = useOnboardingComplete();
   const [state, send] = useBifrostMachine();
+
   const handleClick = () => {
-    send({
-      type: Events.sharedDataConfirmed,
-    });
+    const { authToken, tenant } = state.context;
+    if (authToken) {
+      completeOnboardingMutation.mutate(
+        { authToken, tenantPk: tenant.pk },
+        {
+          onSuccess: ({ footprintUserId }) => {
+            footprint.onCompleted(footprintUserId);
+            send({
+              type: Events.sharedDataConfirmed,
+            });
+          },
+          onError: () => {
+            // TODO: https://linear.app/footprint/issue/FP-429/handle-confirmation-error
+          },
+        },
+      );
+    }
   };
 
   const requiredData = state.context.tenant.requiredUserData.map(
@@ -69,8 +90,8 @@ const Confirmation = () => {
   return (
     <Container>
       <HeaderTitle
-        title="Confirm & Authorize"
-        subtitle={`${state.context.tenant.name} will be able to securely view the following data:`}
+        title={t('title')}
+        subtitle={t('subtitle', { tenantName: state.context.tenant.name })}
       />
       <CategoriesContainer>
         {requiredCategories.map((category: UserDataAttributeCategory) => (
@@ -80,7 +101,12 @@ const Confirmation = () => {
           </Category>
         ))}
       </CategoriesContainer>
-      <FootprintButton onClick={handleClick} fullWidth text="Authorize" />
+      <FootprintButton
+        fullWidth
+        loading={completeOnboardingMutation.isLoading}
+        onClick={handleClick}
+        text={t('cta')}
+      />
     </Container>
   );
 };

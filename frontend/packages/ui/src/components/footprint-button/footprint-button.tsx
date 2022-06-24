@@ -16,10 +16,14 @@ const FootprintButton = ({
   testID,
   type = 'button',
   text = 'Verify with Footprint',
+  loading,
+  loadingAriaLabel,
 }: FootprintButtonProps) => (
   <Button
     disabled={disabled}
     fullWidth={fullWidth}
+    loading={loading}
+    loadingAriaLabel={loadingAriaLabel}
     onClick={onClick}
     size={size}
     testID={testID}

@@ -3,6 +3,11 @@
     "errors": {}
   },
   "pages": {
+    "confirmation": {
+      "title": "Confirm & Authorize",
+      "subtitle": "{{tenantName}} will be able to securely view the following data:",
+      "cta": "Authorize"
+    },
     "new-tab-requested": {
       "title": "New browser window",
       "subtitle": "To continue, we need to open a new browser window. Please tap the button below.",

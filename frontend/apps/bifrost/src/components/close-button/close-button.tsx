@@ -13,7 +13,9 @@ const CloseButton = () => {
       description: 'Leaving this flow will not save your data.',
       primaryButton: {
         label: 'Yes',
-        onClick: footprint.close,
+        onClick: () => {
+          footprint.closed();
+        },
       },
       secondaryButton: {
         label: 'No',

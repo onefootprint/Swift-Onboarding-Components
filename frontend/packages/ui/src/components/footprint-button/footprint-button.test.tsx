@@ -8,9 +8,17 @@ describe('<FootprintButton />', () => {
     disabled,
     onClick = jest.fn(),
     testID,
+    loading,
+    loadingAriaLabel,
   }: Partial<FootprintButtonProps>) =>
     customRender(
-      <FootprintButton disabled={disabled} onClick={onClick} testID={testID} />,
+      <FootprintButton
+        disabled={disabled}
+        onClick={onClick}
+        testID={testID}
+        loading={loading}
+        loadingAriaLabel={loadingAriaLabel}
+      />,
     );
 
   it('should assign a testID', () => {
@@ -42,6 +50,13 @@ describe('<FootprintButton />', () => {
       });
       userEvent.click(screen.getByText('Verify with Footprint'));
       expect(onClickMockFn).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('when the button is loading', () => {
+    it('should show the loading spinner', () => {
+      renderFootprintButton({ loading: true, loadingAriaLabel: 'Loading...' });
+      expect(screen.getByLabelText('Loading...')).toBeInTheDocument();
     });
   });
 });

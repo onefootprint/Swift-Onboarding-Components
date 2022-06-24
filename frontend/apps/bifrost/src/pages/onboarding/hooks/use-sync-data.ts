@@ -1,24 +1,36 @@
-import useBifrostMachine from 'src/hooks/use-bifrost-machine';
+import { useFootprintJs } from 'footprint-provider';
+import useOnboardingComplete from 'src/hooks/use-onboarding-complete';
 import { hasMissingAttributes } from 'src/utils/state-machine/onboarding/utils/missing-attributes';
 import { UserData } from 'src/utils/state-machine/types';
 
-import useOnboardingComplete from './use-onboarding-complete';
+import useOnboardingMachine from './use-onboarding-machine';
 import useUserData from './use-user-data';
 
-// Calls use-user-data to send new data to backend
-// Calls use-onboarding-complete if all of the missingAttributes are now filled
 const useSyncData = () => {
-  const [state] = useBifrostMachine();
+  const [state] = useOnboardingMachine();
   const userDataMutation = useUserData();
   const onboardingCompleteMutation = useOnboardingComplete();
+  const footprint = useFootprintJs();
 
   const completeOnboarding = () => {
-    const { authToken } = state.context;
-    const { missingAttributes, data } = state.context.onboarding;
-    if (hasMissingAttributes(missingAttributes, data) || !authToken) {
-      return;
+    const { authToken, tenant } = state.context;
+    if (authToken) {
+      onboardingCompleteMutation.mutate(
+        { authToken, tenantPk: tenant.pk },
+        {
+          onSuccess: ({ footprintUserId }) => {
+            footprint.onCompleted(footprintUserId);
+          },
+        },
+      );
     }
-    onboardingCompleteMutation.mutate({ authToken });
+  };
+
+  const handleSyncDataSucceeded = () => {
+    const { missingAttributes, data } = state.context;
+    if (!hasMissingAttributes(missingAttributes, data)) {
+      completeOnboarding();
+    }
   };
 
   return (data: UserData) => {
@@ -29,12 +41,14 @@ const useSyncData = () => {
     userDataMutation.mutate(
       {
         data: {
-          ...state.context.onboarding.data,
+          ...state.context.data,
           ...data,
         },
         authToken,
       },
-      { onSuccess: completeOnboarding },
+      {
+        onSuccess: handleSyncDataSucceeded,
+      },
     );
   };
 };

@@ -69,14 +69,14 @@ export enum Actions {
 }
 
 export type BifrostContext = {
-  email: string;
-  phone?: string;
-  userFound: boolean;
   authToken?: string;
-  device: DeviceInfo;
   challenge?: ChallengeData;
+  device: DeviceInfo;
+  email: string;
   onboarding: OnboardingData;
+  phone?: string;
   tenant: TenantInfo;
+  userFound: boolean;
 };
 
 export type BifrostEvent =
