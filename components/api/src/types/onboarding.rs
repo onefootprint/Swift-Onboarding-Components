@@ -14,7 +14,7 @@ pub struct ApiOnboarding {
     pub updated_at: NaiveDateTime,
     pub start_timestamp: NaiveDateTime,
     pub ordering_id: i64,
-    pub start_insight_event: ApiInsightEvent,
+    pub insight_event: ApiInsightEvent,
 }
 
 impl From<(Vec<DataKind>, Onboarding, InsightEvent)> for ApiOnboarding {
@@ -36,7 +36,7 @@ impl From<(Vec<DataKind>, Onboarding, InsightEvent)> for ApiOnboarding {
             updated_at,
             start_timestamp,
             ordering_id,
-            start_insight_event: ApiInsightEvent::from(s.2),
+            insight_event: ApiInsightEvent::from(s.2),
         }
     }
 }

@@ -68,7 +68,7 @@ pub fn list_for_tenant(
     let mut onboardings = list_for_tenant_query(params)
         .inner_join(
             schema::insight_events::table
-                .on(schema::insight_events::id.eq(schema::onboardings::start_insight_event_id)),
+                .on(schema::insight_events::id.eq(schema::onboardings::insight_event_id)),
         )
         .select((
             schema::onboardings::all_columns,

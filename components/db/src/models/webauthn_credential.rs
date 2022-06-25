@@ -24,7 +24,7 @@ pub struct WebauthnCredential {
 
     pub backup_eligible: bool,
     pub attestation_type: AttestationType,
-    pub insight_event_id: Option<Uuid>,
+    pub insight_event_id: Uuid,
 }
 
 impl WebauthnCredential {

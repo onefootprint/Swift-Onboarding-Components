@@ -68,8 +68,7 @@ table! {
         status -> User_status,
         created_at -> Timestamp,
         updated_at -> Timestamp,
-        start_insight_event_id -> Uuid,
-        liveness_insight_event_id -> Nullable<Uuid>,
+        insight_event_id -> Uuid,
         ordering_id -> Int8,
         start_timestamp -> Timestamp,
     }
@@ -167,7 +166,7 @@ table! {
         updated_at -> Timestamp,
         backup_eligible -> Bool,
         attestation_type -> Attestation_type,
-        insight_event_id -> Nullable<Uuid>,
+        insight_event_id -> Uuid,
     }
 }
 
