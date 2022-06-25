@@ -560,6 +560,19 @@ def test_onboardings_list(request, workos_tenant):
     assert onboardings[0]["footprint_user_id"] == old_fp_user_id
     assert set(["first_name", "last_name"]) < set(onboardings[0]["populated_data_kinds"])
 
+def test_liveness_list(request, workos_tenant):
+    old_fp_user_id = request.config.cache.get("fp_user_id", None)
+    path = f"org/liveness?footprint_user_id={old_fp_user_id}"
+    print(url(path))
+    r = requests.get(
+        url(path),
+        headers=_client_priv_key_headers(workos_tenant["sk"]),
+    )
+    body = _assert_response(r)
+    creds = body["data"]
+    assert len(creds)
+    assert creds[0]["insight_event"]
+
 def test_access_events_list(request, workos_tenant):
     fp_user_id = request.config.cache.get("fp_user_id", None)
     path = f"org/access_events?footprint_user_id={fp_user_id}"
