@@ -14,8 +14,8 @@ use paperclip::actix::Apiv2Security;
 use crate::{errors::ApiError, State};
 
 use super::{
-    client_secret_key::SecretTenantAuthContext,
-    session_data::{HeaderName, ServerSession, SessionData, UserVaultPermissions},
+    session_data::{tenant::secret_key::SecretTenantAuthContext, HeaderName, ServerSession, SessionData},
+    uv_permission::{HasVaultPermission, VaultPermission},
     AuthError,
 };
 
@@ -95,16 +95,12 @@ where
     }
 }
 
-impl<C> UserVaultPermissions for SessionContext<C>
+impl<C> HasVaultPermission for SessionContext<C>
 where
-    C: UserVaultPermissions,
+    C: HasVaultPermission,
 {
-    fn can_decrypt(&self) -> bool {
-        self.data.can_decrypt()
-    }
-
-    fn can_update(&self) -> bool {
-        self.data.can_update()
+    fn has_permission(&self, permission: VaultPermission) -> bool {
+        self.data.has_permission(permission)
     }
 }
 

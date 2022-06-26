@@ -7,9 +7,6 @@ use aws_sdk_kms::{
     },
     types::SdkError as KmsSdkError,
 };
-use aws_sdk_pinpoint::{error::PhoneNumberValidateError, types::SdkError as PinpointSdkError};
-use aws_sdk_pinpointemail::{error::SendEmailError, types::SdkError as EmailSdkError};
-use aws_sdk_pinpointsmsvoicev2::{error::SendTextMessageError, types::SdkError as SmsSdkError};
 use db::errors::DbError;
 use enclave_proxy::bb8;
 use paperclip::v2::schema::Apiv2Errors;
@@ -30,8 +27,6 @@ pub enum ApiError {
     KmsSignMacError(#[from] KmsSdkError<GenerateMacError>),
     #[error("kms hmac verify error: {0}")]
     KmsVerifyMacError(#[from] KmsSdkError<VerifyMacError>),
-    #[error("pinpoint phone number validate error: {0}")]
-    PinpointPhoneNumberValidateError(#[from] PinpointSdkError<PhoneNumberValidateError>),
     #[error("crypto error: {0}")]
     Crypto(#[from] crypto::Error),
     #[error("enclave proxy error: {0}")]
@@ -46,10 +41,6 @@ pub enum ApiError {
     Database(#[from] DbError),
     #[error("dotenv error: {0}")]
     Dotenv(#[from] dotenv::Error),
-    #[error("send text message error: {0}")]
-    SendTextMessageError(#[from] SmsSdkError<SendTextMessageError>),
-    #[error("send email error: {0}")]
-    SendEmailError(#[from] EmailSdkError<SendEmailError>),
     #[error("decode utf8 error: {0}")]
     CannotDecodeUtf8(#[from] std::str::Utf8Error),
     #[error("phone number validation error")]
@@ -136,7 +127,6 @@ impl actix_web::ResponseError for ApiError {
             ApiError::AuthError(_) => StatusCode::UNAUTHORIZED,
             ApiError::KmsKeyPair(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::KmsDataKey(_) => StatusCode::INTERNAL_SERVER_ERROR,
-            ApiError::PinpointPhoneNumberValidateError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::Crypto(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::EnclaveProxy(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::EnclaveConnection(_) => StatusCode::INTERNAL_SERVER_ERROR,
@@ -144,8 +134,6 @@ impl actix_web::ResponseError for ApiError {
             ApiError::InvalidEnclaveDecryptResponse => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::Database(e) => status_code_for_db_error(e),
             ApiError::Dotenv(_) => actix_web::http::StatusCode::INTERNAL_SERVER_ERROR,
-            ApiError::SendTextMessageError(_) => actix_web::http::StatusCode::INTERNAL_SERVER_ERROR,
-            ApiError::SendEmailError(_) => actix_web::http::StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::CannotDecodeUtf8(_) => actix_web::http::StatusCode::BAD_REQUEST,
             ApiError::PhoneNumberValidationError => actix_web::http::StatusCode::BAD_REQUEST,
             ApiError::InvalidJsonBody(_) => actix_web::http::StatusCode::BAD_REQUEST,

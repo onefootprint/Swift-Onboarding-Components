@@ -59,7 +59,6 @@ impl ApiUser {
 /// Returns a decrypted profile for the logged-in user
 /// Requires user authentication sent in the cookie after a successful /identify/verify call
 pub async fn handler(
-    // todo, this should take 1fp
     user_auth: SessionContext<My1fpBasicSession>,
     state: web::Data<State>,
 ) -> actix_web::Result<Json<ApiResponseData<ApiUser>>, ApiError> {

@@ -99,3 +99,11 @@ set-dot-env:
 		--query Plaintext | base64 --decode > .env
 	@rm /tmp/encrypted.env.bin
 	@echo "created .env:\n"
+
+setup-integration-tests:
+	@python3 -m venv ~/.virtualenvs/fpc
+	@source ~/.virtualenvs/fpc/bin/activate
+	@pip3 install -r ci/requirements.txt
+
+run-integration-tests:
+	TEST_URL="http://localhost:8000" pytest -x ci/integration_tests.py	

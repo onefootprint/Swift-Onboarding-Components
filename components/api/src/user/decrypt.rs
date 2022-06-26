@@ -1,7 +1,6 @@
-use crate::auth::either::EitherSession;
 use crate::auth::session_context::HasUserVaultId;
+use crate::auth::session_context::SessionContext;
 use crate::auth::session_data::user::my_fp::My1fpBasicSession;
-use crate::auth::session_data::user::onboarding::OnboardingSession;
 use crate::errors::ApiError;
 use crate::types::success::ApiResponseData;
 use crate::user::decrypt;
@@ -25,7 +24,7 @@ type UserDecryptResponse = HashMap<DataKind, Option<String>>;
 /// Requires user auth provided in the cookie.
 fn handler(
     state: web::Data<State>,
-    user_auth: EitherSession<OnboardingSession, My1fpBasicSession>,
+    user_auth: SessionContext<My1fpBasicSession>, // TODO: require stepup m1fp session here
     request: Json<UserDecryptRequest>,
 ) -> actix_web::Result<Json<ApiResponseData<UserDecryptResponse>>, ApiError> {
     let DecryptFieldsResult {

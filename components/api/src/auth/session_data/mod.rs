@@ -91,12 +91,7 @@ pub enum SessionData {
     EmailVerify(EmailVerifySession),
 }
 
+/// Associates an HTTP header name with type
 pub trait HeaderName {
     fn header_name() -> String;
-}
-
-/// Determines what a principal can do on a UserVault
-pub trait UserVaultPermissions {
-    fn can_decrypt(&self) -> bool;
-    fn can_update(&self) -> bool;
 }

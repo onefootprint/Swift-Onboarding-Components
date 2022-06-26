@@ -1,12 +1,14 @@
 use crate::{
     auth::{
-        session_data::{HeaderName, SessionData, UserVaultPermissions},
-        AuthError, session_context::HasTenant,
+        session_context::HasTenant,
+        session_data::{HeaderName, SessionData},
+        uv_permission::{HasVaultPermission, VaultPermission},
+        AuthError,
     },
     errors::ApiError,
 };
 use async_trait::async_trait;
-use db::{DbPool, models::tenants::Tenant};
+use db::{models::tenants::Tenant, DbPool};
 use newtypes::TenantId;
 use paperclip::actix::Apiv2Schema;
 
@@ -35,13 +37,9 @@ impl HeaderName for WorkOsSession {
     }
 }
 
-impl UserVaultPermissions for WorkOsSession {
-    fn can_decrypt(&self) -> bool {
-        true
-    }
-
-    fn can_update(&self) -> bool {
-        false
+impl HasVaultPermission for WorkOsSession {
+    fn has_permission(&self, permission: VaultPermission) -> bool {
+        matches!(permission, VaultPermission::Decrypt(_))
     }
 }
 

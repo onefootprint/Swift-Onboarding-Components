@@ -1,4 +1,4 @@
-use crate::auth::client_secret_key::SecretTenantAuthContext;
+use crate::auth::session_data::tenant::secret_key::SecretTenantAuthContext;
 use crate::auth::either::Either;
 use crate::auth::session_context::{SessionContext, HasTenant};
 use crate::auth::session_data::tenant::workos::WorkOsSession;

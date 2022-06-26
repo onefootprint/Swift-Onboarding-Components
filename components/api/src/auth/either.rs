@@ -11,7 +11,8 @@ use crate::errors::ApiError;
 
 use super::{
     session_context::{HasTenant, HasUserVaultId, SessionContext},
-    AuthError, session_data::UserVaultPermissions,
+    uv_permission::{HasVaultPermission, VaultPermission},
+    AuthError,
 };
 
 #[derive(Debug, Clone, Apiv2Security)]
@@ -87,22 +88,15 @@ where
     }
 }
 
-impl<A, B> UserVaultPermissions for Either<A, B>
+impl<A, B> HasVaultPermission for Either<A, B>
 where
-    A: UserVaultPermissions,
-    B: UserVaultPermissions,
+    A: HasVaultPermission,
+    B: HasVaultPermission,
 {
-    fn can_decrypt(&self) -> bool {
+    fn has_permission(&self, permission: VaultPermission) -> bool {
         match self {
-            Either::Left(l) => l.can_decrypt(),
-            Either::Right(r) => r.can_decrypt(),
-        }
-    }
-
-    fn can_update(&self) -> bool {
-        match self {
-            Either::Left(l) => l.can_update(),
-            Either::Right(r) => r.can_update(),
+            Either::Left(l) => l.has_permission(permission),
+            Either::Right(r) => r.has_permission(permission),
         }
     }
 }

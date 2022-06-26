@@ -1,4 +1,5 @@
-use super::{AuthError, session_data::UserVaultPermissions};
+use crate::auth::uv_permission::{HasVaultPermission, VaultPermission};
+use crate::auth::AuthError;
 use crate::{errors::ApiError, State};
 use actix_web::{web, FromRequest};
 use db::models::tenants::Tenant;
@@ -59,12 +60,8 @@ pub async fn from_request_inner(req: &actix_web::HttpRequest) -> Result<SecretTe
     Ok(SecretTenantAuthContext { tenant })
 }
 
-impl UserVaultPermissions for SecretTenantAuthContext {
-    fn can_decrypt(&self) -> bool {
-        true
-    }
-
-    fn can_update(&self) -> bool {
-        false
+impl HasVaultPermission for SecretTenantAuthContext {
+    fn has_permission(&self, permission: VaultPermission) -> bool {
+        matches!(permission, VaultPermission::Decrypt(_))
     }
 }

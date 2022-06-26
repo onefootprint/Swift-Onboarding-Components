@@ -1,8 +1,10 @@
 use crate::{
     auth::{
-        either::{Either, EitherSession3},
+        either::EitherSession3,
         session_context::HasUserVaultId,
-        AuthError, session_data::user::{d2p::D2pSession, onboarding::OnboardingSession, my_fp::My1fpBasicSession},
+        session_data::user::{d2p::D2pSession, my_fp::My1fpBasicSession, onboarding::OnboardingSession},
+        uv_permission::{HasVaultPermission, VaultPermission},
+        AuthError,
     },
     errors::ApiError,
     types::{success::ApiResponseData, Empty},
@@ -18,10 +20,8 @@ use chrono::{Duration, Utc};
 use crypto::sha256;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::webauthn_credential::NewWebauthnCredential;
-use newtypes::{
-    Base64Data,
-};
-use newtypes::{AttestationType, D2pSessionStatus};
+use newtypes::AttestationType;
+use newtypes::Base64Data;
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 use serde::{Deserialize, Serialize};
 use serde_repr::{Deserialize_repr, Serialize_repr};
@@ -52,12 +52,8 @@ pub fn init(
     user_auth: EitherSession3<D2pSession, OnboardingSession, My1fpBasicSession>,
     state: web::Data<State>,
 ) -> actix_web::Result<Json<ApiResponseData<WebAuthnInitResponse>>, ApiError> {
-    // checks if we're either in a d2p session & it's in progress, or it's an onboarding session
-    if !match &user_auth {
-        Either::Left(s) => s.data.status == D2pSessionStatus::InProgress,
-        Either::Right(_) => true,
-    } {
-        return Err(AuthError::SessionTypeError).map_err(ApiError::from);
+    if !user_auth.has_permission(VaultPermission::AddBiometrics) {
+        return Err(AuthError::SessionTypeError)?;
     }
 
     // generate the challenge and return it
@@ -117,6 +113,10 @@ async fn complete(
     insights: InsightHeaders,
     state: web::Data<State>,
 ) -> actix_web::Result<Json<ApiResponseData<Empty>>, ApiError> {
+    if !user_auth.has_permission(VaultPermission::AddBiometrics) {
+        return Err(AuthError::SessionTypeError)?;
+    }
+
     let challenge_data = Challenge::unseal(&state.challenge_sealing_key, &request.challenge_token)?;
     let reg_state = challenge_data.data;
 

@@ -1,6 +1,7 @@
 use crate::auth::session_context::{HasUserVaultId, SessionContext};
+use crate::auth::session_data::tenant::ob_public_key::PublicTenantAuthContext;
 use crate::auth::session_data::user::onboarding::OnboardingSession;
-use crate::auth::{client_public_key::PublicTenantAuthContext, get_onboarding_for_tenant};
+use crate::auth::{ get_onboarding_for_tenant};
 use crate::errors::ApiError;
 use crate::types::success::ApiResponseData;
 use crate::utils::insight_headers::InsightHeaders;

@@ -2,6 +2,9 @@ name: Rust Check & Test
 
 on:
   push:
+    branches:
+      - master
+
   pull_request:
 
 env:

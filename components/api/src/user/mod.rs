@@ -1,5 +1,5 @@
 use crate::{
-    auth::{session_data::UserVaultPermissions, AuthError},
+    auth::{uv_permission::HasVaultPermission, AuthError},
     errors::ApiError,
     State,
 };
@@ -46,13 +46,13 @@ pub struct DecryptFieldsResult {
     pub result_map: HashMap<DataKind, Option<String>>,
 }
 
-pub async fn decrypt<C: UserVaultPermissions>(
+pub async fn decrypt<C: HasVaultPermission>(
     session: &C,
     state: &web::Data<State>,
     user_vault: UserVault,
     data_kinds: Vec<DataKind>,
 ) -> Result<DecryptFieldsResult, ApiError> {
-    if !session.can_decrypt() {
+    if !session.can_decrypt(&data_kinds) {
         Err(AuthError::UnauthorizedOperation)?
     }
     // Filter out fields that don't have values set on the user vault

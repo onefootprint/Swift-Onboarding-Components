@@ -2,7 +2,7 @@ use crate::auth::either::EitherSession;
 use crate::auth::session_context::HasUserVaultId;
 use crate::auth::session_data::user::my_fp::My1fpBasicSession;
 use crate::auth::session_data::user::onboarding::OnboardingSession;
-use crate::auth::session_data::UserVaultPermissions;
+use crate::auth::uv_permission::HasVaultPermission;
 use crate::types::success::ApiResponseData;
 use crate::{
     auth::AuthError,
@@ -107,16 +107,18 @@ async fn handler(
 
 struct DataUpdateRequest(DataKind, Vec<u8>, Option<Vec<u8>>);
 
-pub async fn update<C: UserVaultPermissions>(
+pub async fn update<C: HasVaultPermission>(
     context: &C,
     state: &web::Data<State>,
     values: HashMap<DataKind, String>,
     user_vault: UserVault,
 ) -> Result<(), ApiError> {
     // TODO: distinguish between UPDATE and CREATE (for onboarding vs modification)
-    if !context.can_update() {
+    let data_kinds: Vec<DataKind> = values.keys().copied().collect();
+    if !context.can_update(&data_kinds) {
         Err(AuthError::UnauthorizedOperation)?
     }
+
     let mut data_to_insert = Vec::<DataUpdateRequest>::new();
     let email = values.get(&DataKind::Email);
     let ssn = values.get(&DataKind::Ssn);

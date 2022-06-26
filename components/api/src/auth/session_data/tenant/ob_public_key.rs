@@ -5,9 +5,7 @@ use db::models::{ob_configurations::ObConfiguration, tenants::Tenant};
 use futures_util::Future;
 use paperclip::actix::Apiv2Security;
 
-use crate::{errors::ApiError, State};
-
-use super::AuthError;
+use crate::{errors::ApiError, State, auth::AuthError};
 
 #[derive(Debug, Clone, Apiv2Security)]
 #[openapi(

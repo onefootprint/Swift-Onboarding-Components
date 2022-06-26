@@ -1,4 +1,4 @@
-use crate::auth::client_public_key::PublicTenantAuthContext;
+use crate::auth::session_data::tenant::ob_public_key::PublicTenantAuthContext;
 use crate::types::success::ApiResponseData;
 use crate::State;
 use crate::{errors::ApiError};

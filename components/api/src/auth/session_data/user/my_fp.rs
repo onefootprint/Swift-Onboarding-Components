@@ -1,10 +1,11 @@
-use newtypes::UserVaultId;
+use newtypes::{DataKind, UserVaultId};
 use paperclip::actix::Apiv2Schema;
 
 use crate::{
     auth::{
         session_context::HasUserVaultId,
-        session_data::{HeaderName, SessionData, UserVaultPermissions},
+        session_data::{HeaderName, SessionData},
+        uv_permission::{HasVaultPermission, VaultPermission},
         AuthError,
     },
     errors::ApiError,
@@ -34,13 +35,16 @@ impl HeaderName for My1fpBasicSession {
     }
 }
 
-impl UserVaultPermissions for My1fpBasicSession {
-    fn can_decrypt(&self) -> bool {
-        false
-    }
+impl HasVaultPermission for My1fpBasicSession {
+    fn has_permission(&self, permission: VaultPermission) -> bool {
+        use DataKind::*;
+        use VaultPermission::*;
 
-    fn can_update(&self) -> bool {
-        true
+        match permission {
+            Decrypt(data) => matches!(data, FirstName | LastName | Email | PhoneNumber),
+            AddBiometrics => true,
+            _ => false,
+        }
     }
 }
 

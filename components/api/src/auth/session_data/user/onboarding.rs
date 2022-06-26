@@ -1,7 +1,9 @@
 use crate::{
     auth::{
-        session_data::{HeaderName, SessionData, UserVaultPermissions},
-        AuthError, session_context::HasUserVaultId,
+        session_context::HasUserVaultId,
+        session_data::{HeaderName, SessionData},
+        uv_permission::{HasVaultPermission, VaultPermission},
+        AuthError,
     },
     errors::ApiError,
 };
@@ -30,13 +32,11 @@ impl HeaderName for OnboardingSession {
     }
 }
 
-impl UserVaultPermissions for OnboardingSession {
-    fn can_decrypt(&self) -> bool {
-        false
-    }
-
-    fn can_update(&self) -> bool {
-        true
+impl HasVaultPermission for OnboardingSession {
+    fn has_permission(&self, permission: VaultPermission) -> bool {
+        use VaultPermission::*;
+        // TODO: disable this once we support the 'Add only' permission!
+        matches!(permission, Update(_) | AddBiometrics)
     }
 }
 

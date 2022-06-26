@@ -3,8 +3,10 @@ use paperclip::actix::Apiv2Schema;
 
 use crate::{
     auth::{
+        session_context::HasUserVaultId,
         session_data::{HeaderName, SessionData},
-        AuthError, session_context::HasUserVaultId,
+        uv_permission::{HasVaultPermission, VaultPermission},
+        AuthError,
     },
     errors::ApiError,
 };
@@ -35,5 +37,12 @@ impl HeaderName for D2pSession {
 impl HasUserVaultId for D2pSession {
     fn user_vault_id(&self) -> UserVaultId {
         self.user_vault_id.clone()
+    }
+}
+
+impl HasVaultPermission for D2pSession {
+    fn has_permission(&self, permission: VaultPermission) -> bool {
+        matches!(self.status, D2pSessionStatus::InProgress)
+            && matches!(permission, VaultPermission::AddBiometrics)
     }
 }
