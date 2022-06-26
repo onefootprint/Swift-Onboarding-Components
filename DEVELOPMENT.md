@@ -148,17 +148,18 @@ Here's how to get talking to the DB:
 
 2. Once Tailscale is installed and you're added to the Tailscale team, you'll see the logo in your macOS menu bar. Navigate to Network devices > Tagged devices > select jump-db-dev. This will copy the jump box's IP to your clipboard. You'll also see a jump box here for any ephemeral environments that you've spun up in GitHub PRs.
 
-3. Now, you need the credentials to ssh into jump box. The private key is [managed by pulumi](infra/Pulumi.dev.yaml). Make sure you've followed the steps above to log into pulumi locally, cd into the `infra` folder, and then run
-
-```bash
-pulumi stack select footprint/dev
-pulumi config get infra:jumpBoxSSHPrivateKey > .ssh/id_jumpbox
-```
-
+3. We use Tailscale SSH so you need no credentials aside from your tailscale login!
+   
 4. Now, you have the credentials and the IP. Open a shell on the jumpbox with and pop a psql shell:
 
 ```bash
-ssh -i ~/.ssh/id_jumpbox -t ec2-user@100.123.36.143 "/connect_db.sh"
+ssh ec2-user@100.123.36.143 "/connect_db.sh"
+```
+
+you can also do it via hostname:
+
+```bash
+ssh ec2-user@jump-db-{<ENVIRONMENT GOES HERE>} "/connect_db.sh"
 ```
 
 Note the IP address above you should get from tailscale

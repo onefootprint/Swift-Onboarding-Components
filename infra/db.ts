@@ -113,10 +113,6 @@ async function createDbJumpBox(
         egress: [{ protocol: "-1", fromPort: 0, toPort: 0, cidrBlocks: ["0.0.0.0/0"] }],
     });
 
-    const keypair = new aws.ec2.KeyPair(`jump-key-${clusterName}-sg`, {
-        publicKey: constants.jumpBoxSSHPublicKey,
-        keyNamePrefix: `jump-key-${clusterName}-sg`
-    });
 
     const dbSecretName = `/db-jump/db-url-${clusterName}`;
     const dbSecret = new aws.ssm.Parameter(`ssm-param-jump-url-${clusterName}`, {
@@ -174,7 +170,7 @@ sudo yum install postgresql jq yum-utils -y
 sudo yum-config-manager --add-repo https://pkgs.tailscale.com/stable/centos/7/tailscale.repo
 sudo yum install tailscale nc -y
 sudo systemctl enable --now tailscaled
-sudo tailscale up --authkey "${tailscaleAuthKey}" --advertise-exit-node --hostname "${jumpHostname}" --advertise-routes=10.0.0.0/24,10.0.1.0/24 --accept-dns=false
+sudo tailscale up --authkey "${tailscaleAuthKey}" --advertise-exit-node --hostname "${jumpHostname}" --advertise-routes=10.0.0.0/24,10.0.1.0/24 --accept-dns=false --ssh
 
 # setup tunnel helper
 cat <<'EOF' > db_proxy.sh
@@ -204,7 +200,6 @@ chmod +x connect_db.sh`;
         vpcSecurityGroupIds: [securityGroup.id, jumpSg.id],
         ami: "ami-0f9fc25dd2506cf6d",
         userData: Buffer.from(userData).toString('base64'),
-        keyName: keypair.keyName,
         associatePublicIpAddress: true,
         iamInstanceProfile,
     });

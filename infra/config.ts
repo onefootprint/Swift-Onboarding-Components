@@ -6,7 +6,6 @@ export interface Config {
     elastic: Elastic;
     enclaveCertPCR8: string;
     containers: Containers;
-    jumpBoxSSHPublicKey: string;
     rpId: string;
     workos: Workos;
     twilio: Twilio;

@@ -14,7 +14,6 @@ config:
       apmEndpoint: 66e04f7b644c4d1c98e26e58b75de669.apm.us-east-2.aws.elastic-cloud.com:443
     enclaveCertPCR8: 48cb393ec504192fb147ffb2818c2a00c8e2d74659b509cc449a48ffe1c257a266b6a9f9ac356c4cd38a6c11825dd600
     internalAppSubdomain: api-internal
-    jumpBoxSSHPublicKey: ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIA/XaCZkbkXLPM+buT9s/2Y+2Mur1erjX/OP/mN7yRPn
     rootDomain: infra.footprint.dev
     rpId: footprint.dev
     sendgrid:
@@ -36,7 +35,5 @@ config:
       defaultOrg: org_01G39KR1V1E52JEZV6BYNG590J
       secretKey:
         secure: v1:UrxmsAzi5youwRK1:Jlywwi1ZR82IGh3ZSJe58HQmEni8yL5+Ff/3DPQbcMbN5qE2wTJ1Yuye4vhADlRDaCaZf5kBhZGWC3Uxx4SZ47wmg8b+C123NVk8K1ieVGqO6IYF4HTKNI8KsQFyv6MA3QbD
-  infra:jumpBoxSSHPrivateKey:
-    secure: v1:NBzKv4tkQfZUrlcV:7UTaoa0u16GLio6PD+2/i0ibcGxt1xDyjhC0tTDF1n5o0eMyC+75X8QXxaj0tVTRzbJdcLytqhy+Z7Zu0NXZuqgDMQgyJay3Di3jASelCbV7WvNIy/b9/vC9pO579OhmvukOn+F5RtUw1NNBfbze9ZskEG0Xw1lkKjawkn8jos20MDfYZykecDsoaJVXeUtX6x2aiHcvkLpwY4g4soJRx7hMyTtpKE8Tf/Y9u32iTEgGLMW4iYokf1KeGbLFsKB4IXd8eeq+nqD+hDNs/BwpVe+B8/9ScxlysqbmySqpyavtQU14mmfA3ypVpwq7aR+JQXVUHKd+LeeMKK4ZIy98spiYNVGZQF0BwOgfTGlbFvezRFifgYCO+xVQn/fpLQS/alvY19A5vpJ1dXk6jHVaUlbj0xh+Q9oS9h+oS4QXcLq0JpgnmFyR1Uu34U1YF3XJu9adX+9/0R6h6tkXe63Yqrwh2xZezmJ+CtdP13jk3NuzcKJO79DSiaHTntrOb1XBL4jx7GoRk2UrQ4gydE7tIm+tzMCwdPrwYsoid5zXHb4mgXkaoLC7D4BS
   infra:tailscaleKey:
     secure: v1:NFf2LBsLI6bd0Qta:tedTb71dFLRiqgPNwqQuyeQCsWhBi7kVcVS+1dtClHmKMAhUGgDv0hGQZex6wmCnyejvwplXun8=
