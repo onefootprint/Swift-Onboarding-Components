@@ -51,7 +51,7 @@ export async function Create(vpcProvider: VpcRegion, config: ServiceConfig, cons
         cid: 16,
         memory: 256,
         cpus: 2,
-    }, database.jumpKeypairName, region, provider);
+    }, region, provider);
 
     // declare the containers we want to run
     const containerDefinitions = await ServiceContainers.apiMain(ServicePort, constants, secretsStore, enclaveKeyDescriptor, signingKeyDescriptor, region, cluster, database);

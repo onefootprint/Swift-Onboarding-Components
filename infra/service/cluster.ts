@@ -11,7 +11,7 @@ export type NitroEnclaveConfig = {
 }
 
 
-export async function CreateCluster(clusterName: string, vpc: awsx.ec2.Vpc, targetGroup: awsx.elasticloadbalancingv2.TargetGroup, constants: Config, nitroConfig: NitroEnclaveConfig,jumpKeypairName: pulumi.Output<string>, region: Region, provider: pulumi.ProviderResource): Promise<awsx.ecs.Cluster> {
+export async function CreateCluster(clusterName: string, vpc: awsx.ec2.Vpc, targetGroup: awsx.elasticloadbalancingv2.TargetGroup, constants: Config, nitroConfig: NitroEnclaveConfig, region: Region, provider: pulumi.ProviderResource): Promise<awsx.ecs.Cluster> {
     const instanceProfile = createInstanceRole(region, provider);
 
     // get our base image AMI
@@ -43,7 +43,7 @@ export async function CreateCluster(clusterName: string, vpc: awsx.ec2.Vpc, targ
         iamInstanceProfile: {
             arn: instanceProfile.arn,
         },
-        keyName: pulumi.getStack().startsWith("dev") ? jumpKeypairName : undefined,
+        // keyName: pulumi.getStack().startsWith("dev") ? jumpKeypairName : undefined,
         updateDefaultVersion: true,
         vpcSecurityGroupIds: [instanceSecurityGroup.id],
     }, { provider });

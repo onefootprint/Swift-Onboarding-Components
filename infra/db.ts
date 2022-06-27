@@ -15,7 +15,6 @@ export type DbOutput = {
     databaseUrl: pulumi.Output<string>;
     databaseUrlSecretParam: aws.ssm.Parameter;
     db: aws.rds.Cluster;
-    jumpKeypairName: pulumi.Output<string>;
 }
 
 /** TODO: 
@@ -75,7 +74,6 @@ export async function CreateDB(vpcProvider: vpcUtil.VpcRegion, clusterName: stri
         databaseUrl,
         db,
         databaseUrlSecretParam,
-        jumpKeypairName: jump.keyName
     };
 }
 
