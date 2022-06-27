@@ -158,7 +158,7 @@ async function createDbJumpBox(
     let config = new pulumi.Config();
     let tailscaleAuthKey = config.get('tailscaleKey');
 
-    let jumpHostname = `jump-${clusterName}`;
+    let jumpHostname = `jumpbox-${pulumi.getStack()}`;
 
     const userData = `
 #!/bin/bash
@@ -170,7 +170,7 @@ sudo yum install postgresql jq yum-utils -y
 sudo yum-config-manager --add-repo https://pkgs.tailscale.com/stable/centos/7/tailscale.repo
 sudo yum install tailscale nc -y
 sudo systemctl enable --now tailscaled
-sudo tailscale up --ssh --authkey "${tailscaleAuthKey}" --advertise-exit-node --hostname "${jumpHostname}" --advertise-routes=10.0.0.0/24,10.0.1.0/24 --accept-dns=false
+sudo tailscale up --authkey "${tailscaleAuthKey}" --advertise-exit-node --hostname "${jumpHostname}" --advertise-routes=10.0.0.0/24,10.0.1.0/24 --accept-dns=false --ssh
 
 # setup tunnel helper
 cat <<'EOF' > db_proxy.sh
@@ -194,7 +194,7 @@ EOF
 
 chmod +x connect_db.sh`;
 
-    const jumpbox = new aws.ec2.Instance(`jump-${clusterName}`, {
+    const jumpbox = new aws.ec2.Instance(`jumpbox-${clusterName}`, {
         instanceType: size,
         subnetId: (await vpc.publicSubnetIds)[0],
         vpcSecurityGroupIds: [securityGroup.id, jumpSg.id],
