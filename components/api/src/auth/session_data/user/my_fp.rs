@@ -43,6 +43,7 @@ impl HasVaultPermission for My1fpBasicSession {
         match permission {
             Decrypt(data) => matches!(data, FirstName | LastName | Email | PhoneNumber),
             AddBiometrics => true,
+            Update(data) if data == Email => true,
             _ => false,
         }
     }
