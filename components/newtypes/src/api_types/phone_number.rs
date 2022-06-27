@@ -1,12 +1,20 @@
 pub use derive_more::{Add, Display, From, FromStr, Into};
 use paperclip::actix::Apiv2Schema;
 use serde::{Deserialize, Deserializer, Serialize};
+use std::fmt::{Debug, Display};
 use std::str::FromStr;
 
-#[doc = "Phone number -- must be between 10-15 digits per e164 standard"]
-#[derive(Debug, Clone, Hash, PartialEq, Eq, Display, From, Into, Serialize, Default, Apiv2Schema)]
+#[doc = "Phone number -- must be between 7-15 digits per e164 standard and include a country code"]
+#[derive(Clone, Hash, PartialEq, Eq, Serialize, Default, Apiv2Schema)]
 #[serde(transparent)]
+/// Phone number string. Must be valid e164 length and include a country code
 pub struct PhoneNumber(String);
+
+impl PhoneNumber {
+    pub fn leak_to_string(self) -> String {
+        self.0
+    }
+}
 
 impl FromStr for PhoneNumber {
     type Err = crate::Error;
@@ -15,10 +23,7 @@ impl FromStr for PhoneNumber {
         // sanitize by removing excess chars + checking length
         let number = s.chars().filter(|char| char.is_digit(10)).collect::<String>();
         let sanitized = match number.len() {
-            // assume if the # is too short, we intended a u.s. country code
-            10 => Ok("1".to_owned() + number.as_str()),
-            // valid e.164 lengths
-            11 | 12 | 13 | 14 | 15 => Ok(number),
+            7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 => Ok(number),
             _ => Err(crate::Error::InvalidPhoneNumber),
         }?;
         Ok(PhoneNumber(sanitized))
@@ -35,18 +40,44 @@ impl<'de> Deserialize<'de> for PhoneNumber {
     }
 }
 
+fn phone_fmt(phone: &PhoneNumber) -> String {
+    let mut fmt_str = String::from("");
+    let len = phone.0.len();
+    for (idx, char) in phone.0.char_indices() {
+        // only display last two digits -- helpful for debugging against twilio
+        if idx == (len - 1) || idx == (len - 2) {
+            fmt_str.push(char);
+        } else {
+            fmt_str.push('*')
+        }
+    }
+    fmt_str
+}
+
+impl Display for PhoneNumber {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", phone_fmt(self))
+    }
+}
+
+impl Debug for PhoneNumber {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", phone_fmt(self))
+    }
+}
+
 #[cfg(test)]
 mod tests {
 
     use super::*;
 
     #[test]
-    fn test_id() {
+    fn test_number() {
         #[derive(Eq, Debug, PartialEq, Serialize, Deserialize)]
         struct Test {
             pub phone_number: PhoneNumber,
         }
-        let example = "{\"phone_number\": \"123-456-7890\"}";
+        let example = "{\"phone_number\": \"1-123-456-7890\"}";
         let bad_example = "{\"phone_number\": \"12345\"}";
 
         let deserialized: Test = serde_json::from_str(example).unwrap();
@@ -64,6 +95,8 @@ mod tests {
 
         let test_bad_str2 = "+49 17629716301";
         let val = PhoneNumber::from_str(test_bad_str2).unwrap();
-        assert!(val == PhoneNumber("4917629716301".to_owned()))
+        assert!(val == PhoneNumber("4917629716301".to_owned()));
+
+        assert_eq!(format!("{:#?}", deserialized.phone_number), "*********90");
     }
 }

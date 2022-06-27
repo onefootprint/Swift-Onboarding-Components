@@ -1,10 +1,6 @@
 use std::marker::PhantomData;
 
-use crate::{
-    errors::ApiError,
-    identify::PhoneChallengeState,
-    State,
-};
+use crate::{errors::ApiError, identify::PhoneChallengeState, State};
 use chrono::{Duration, Utc};
 use crypto::sha256;
 use newtypes::{Base64Data, PhoneNumber, SealedSessionBytes, SessionAuthToken};
@@ -138,7 +134,7 @@ impl TwilioClient {
     }
 
     pub async fn standardize(&self, phone_number: &PhoneNumber) -> Result<ValidatedPhoneNumber, ApiError> {
-        let sanitized = phone_number.to_string();
+        let sanitized = phone_number.clone().leak_to_string();
         let url = format!("https://lookups.twilio.com/v1/PhoneNumbers/{sanitized}");
 
         let response = self

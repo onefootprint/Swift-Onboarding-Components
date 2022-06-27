@@ -1,4 +1,3 @@
-
 use diesel::serialize::Output;
 use diesel::{
     pg::Pg,
@@ -10,7 +9,6 @@ use paperclip::actix::Apiv2Schema;
 use serde::{Deserialize, Serialize};
 use serde_json;
 use std::io::Write;
-
 
 #[derive(FromSqlRow, AsExpression, Eq, PartialEq, Serialize, Deserialize, Debug, Clone, Apiv2Schema)]
 #[sql_type = "Jsonb"]
