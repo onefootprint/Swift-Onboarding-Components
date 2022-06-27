@@ -153,38 +153,31 @@ Here's how to get talking to the DB:
 4. Now, you have the credentials and the IP. Open a shell on the jumpbox with and pop a psql shell:
 
 ```bash
-ssh ec2-user@100.123.36.143 "/connect_db.sh"
+$ ssh ec2-user@jumpbox-dev
+$ /connect_db.sh
 ```
 
-you can also do it via hostname:
-
-```bash
-ssh ec2-user@jump-db-{<ENVIRONMENT GOES HERE>} "/connect_db.sh"
-```
-
-Note the IP address above you should get from tailscale
+Note: replace `jumpbox-dev` with `jumpbox-<ENV_NAME_HERE>`
 
 ## Using Diesel CLI on dev/dev-ephemeral DB
 
 You may want to run local diesel commands against a deployed db environment.
-In this case you need to do two things: 1) get the proper DATABASE_URL and 2) tunnel your network packets through tailscale through the db-jump box.
+In this case you need to do two things: 1) get the proper DATABASE_URL and 2) tunnel your network packets through tailscale through the jumpbox box.
 We provide helper script installed on the jumpbox to make this easy.
 
-1. Get the IP of your target DB jumpbox (via tailscale)
-
-2. Open a tunnel and setup port forwarding (note replace `<JUMPBOX_IP>`):
+1. Open a tunnel and setup port forwarding:
 
 ```sh
-ssh -L 5432:localhost:5432 -i ~/.ssh/id_jumpbox ec2-user@<JUMPBOX_IP> /db_proxy.sh
+ssh -L 5432:localhost:5432 ec2-user@jumpbox-dev /db_proxy.sh
 ```
 
-3. In a new terminal, check that `psql` works locally (using the password above):
+2. In a new terminal, check that `psql` works locally (using the password above):
 
 ```sh
 psql postgresql://postgres:<PASSWORD>@<JUMPBOX_IP>
 ```
 
-4. Finally use diesel as desired, for example
+3. Finally use diesel as desired, for example
 
 ```sh
 diesel --database-url postgresql://postgres:<PASSWORD>@<JUMPBOX_IP> print-schema
