@@ -12,7 +12,7 @@ const SuccessMessage = ({ children }: SuccessMessageProps) => {
   const footprint = useFootprintJs();
 
   const handleClose = () => {
-    footprint.closed();
+    footprint.onClose();
   };
 
   return (

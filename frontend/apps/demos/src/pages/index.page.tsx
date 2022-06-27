@@ -4,13 +4,14 @@ import React from 'react';
 import styled from 'styled-components';
 import { Box, FootprintButton, media, Typography } from 'ui';
 
-footprint.init({
-  publicKey: 'ob_config_pk_YuK0vExl4Lty1yLG5aHrH2',
-});
+footprint.init({ publicKey: 'ob_config_pk_YuK0vExl4Lty1yLG5aHrH2' });
 
 const Root = () => {
   const handleClick = async () => {
     await footprint.show();
+    footprint.onCompleted(footprintUserId => {
+      alert(`footprint user id: ${footprintUserId}`);
+    });
   };
 
   return (

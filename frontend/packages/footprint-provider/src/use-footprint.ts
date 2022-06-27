@@ -20,12 +20,16 @@ const useFootprint = () => {
     postmate.emit(eventName, data);
   };
 
-  const closed = () => {
+  const onClose = () => {
     sendEvent('closed');
   };
 
-  const onCompleted = (footprintUserId: string) => {
-    sendEvent('completed', { footprintUserId });
+  const onComplete = (footprintUserId: string) => {
+    sendEvent('completed', footprintUserId);
+  };
+
+  const onUserCancel = () => {
+    sendEvent('userCanceled');
   };
 
   useEffect(() => {
@@ -34,8 +38,9 @@ const useFootprint = () => {
 
   return {
     isReady,
-    onCompleted,
-    closed,
+    onComplete,
+    onClose,
+    onUserCancel,
   };
 };
 

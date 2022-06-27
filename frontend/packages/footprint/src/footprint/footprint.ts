@@ -1,10 +1,10 @@
-import { UIManager } from '../ui';
-import { Footprint, InitOptions } from './types';
+import type { UIManager } from './types';
+import { Events, Footprint, InitOptions } from './types';
 
 export default class implements Footprint {
-  private publicKey: string = '';
+  private publicKey: string | null = null;
 
-  constructor(private uiManager: UIManager) {}
+  constructor(private bifrostUrl: string, private uiManager: UIManager) {}
 
   init({ publicKey }: InitOptions) {
     if (!publicKey) {
@@ -15,26 +15,26 @@ export default class implements Footprint {
   }
 
   async show() {
-    await this.uiManager.show({ urlHash: this.publicKey });
+    await this.uiManager.show({ url: `${this.bifrostUrl}#${this.publicKey}` });
   }
 
-  createButton(target: HTMLElement): HTMLButtonElement {
-    // TODO: Implement
-    // https://linear.app/footprint/issue/FP-177/fooprintjs-createbutton-method
-    const button = document.createElement('button');
-    target.appendChild(button);
-    return button;
+  createButton(container: HTMLElement) {
+    return this.uiManager.createButton(container);
   }
 
-  onCompleted(callback: () => void) {
-    this.uiManager.on('completed', callback);
+  onCompleted(callback: (footprintUserId: string) => void) {
+    this.uiManager.on(Events.completed, (data: any) => {
+      if (data && typeof data === 'string') {
+        callback(data);
+      }
+    });
   }
 
   onFailed(callback: () => void) {
-    this.uiManager.on('failed', callback);
+    this.uiManager.on(Events.failed, callback);
   }
 
   onUserCanceled(callback: () => void) {
-    this.uiManager.on('userCanceled', callback);
+    this.uiManager.on(Events.userCanceled, callback);
   }
 }

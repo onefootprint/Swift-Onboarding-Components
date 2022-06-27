@@ -19,7 +19,7 @@ const useSyncData = () => {
         { authToken, tenantPk: tenant.pk },
         {
           onSuccess: ({ footprintUserId }) => {
-            footprint.onCompleted(footprintUserId);
+            footprint.onComplete(footprintUserId);
           },
         },
       );

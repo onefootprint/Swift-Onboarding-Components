@@ -67,7 +67,7 @@ const Confirmation = () => {
         { authToken, tenantPk: tenant.pk },
         {
           onSuccess: ({ footprintUserId }) => {
-            footprint.onCompleted(footprintUserId);
+            footprint.onComplete(footprintUserId);
             send({
               type: Events.sharedDataConfirmed,
             });

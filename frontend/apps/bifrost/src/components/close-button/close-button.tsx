@@ -14,7 +14,8 @@ const CloseButton = () => {
       primaryButton: {
         label: 'Yes',
         onClick: () => {
-          footprint.closed();
+          footprint.onUserCancel();
+          footprint.onClose();
         },
       },
       secondaryButton: {

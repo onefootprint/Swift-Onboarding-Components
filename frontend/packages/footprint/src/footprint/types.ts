@@ -1,5 +1,3 @@
-import { OpenOptions } from '../ui';
-
 export type InitOptions = {
   publicKey: string;
 };
@@ -7,8 +5,37 @@ export type InitOptions = {
 export type Footprint = {
   init(options: InitOptions): Footprint;
   show(options?: OpenOptions): void;
-  createButton(target: HTMLElement): HTMLButtonElement;
-  onCompleted(callback: () => void): void;
+  createButton(container: HTMLElement): HTMLButtonElement;
+  onCompleted(callback: (footprintUserId: string) => void): void;
   onFailed(callback: () => void): void;
   onUserCanceled(callback: () => void): void;
 };
+
+export enum Appearance {
+  dark = 'dark',
+  light = 'light',
+  auto = 'auto',
+}
+
+export type OpenOptions = {
+  appearance?: Appearance;
+  locale?: 'EN';
+  tracking?: Record<string, string | number | boolean>;
+  url: string;
+};
+
+export type UIManager = {
+  createButton(container: HTMLElement): HTMLButtonElement;
+  on(eventName: Event, callback: (data?: any) => void): void;
+  show(option?: OpenOptions): Promise<void>;
+  hide(option?: OpenOptions): void;
+};
+
+export enum Events {
+  closed = 'closed',
+  completed = 'completed',
+  failed = 'failed',
+  userCanceled = 'userCanceled',
+}
+
+export type Event = Events;
