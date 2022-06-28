@@ -57,7 +57,7 @@ const Detail = () => {
           <Timeline
             items={[
               {
-                timestamp: '2022-06-02 22:24:41',
+                timestamp: '2022-06-02T22:24:41',
                 iconComponent: <IcoCheck16 />,
                 headerComponent: (
                   <Typography variant="label-3">
@@ -82,7 +82,7 @@ const Detail = () => {
                 ),
               },
               {
-                timestamp: '2022-06-02 22:24:41',
+                timestamp: '2022-06-02T22:24:41',
                 iconComponent: <IcoUserCircle16 />,
                 headerComponent: (
                   <Typography variant="body-3">
@@ -95,7 +95,7 @@ const Detail = () => {
                 ),
               },
               {
-                timestamp: '2022-06-02 22:25:41',
+                timestamp: '2022-06-02T22:25:41',
                 iconComponent: <IcoBuilding16 />,
                 headerComponent: (
                   <Typography variant="body-3">
@@ -108,7 +108,7 @@ const Detail = () => {
                 ),
               },
               {
-                timestamp: '2022-06-02 22:25:41',
+                timestamp: '2022-06-02T22:25:41',
                 iconComponent: <IcoBuilding16 />,
                 headerComponent: (
                   <Typography variant="body-3">
@@ -126,7 +126,7 @@ const Detail = () => {
                 ),
               },
               {
-                timestamp: '2022-06-02 22:25:41',
+                timestamp: '2022-06-02T22:25:41',
                 iconComponent: <IcoUserCircle16 />,
                 headerComponent: (
                   <Typography variant="body-3">
@@ -138,7 +138,7 @@ const Detail = () => {
                 ),
               },
               {
-                timestamp: '2022-06-02 22:26:41',
+                timestamp: '2022-06-02T22:26:41',
                 iconComponent: <IcoFootprint16 />,
                 headerComponent: (
                   <Typography variant="label-3" color="success">
