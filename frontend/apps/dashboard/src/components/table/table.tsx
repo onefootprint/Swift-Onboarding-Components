@@ -31,7 +31,7 @@ const Table = <T,>({
   const shouldShowData = !isLoading && items;
 
   return (
-    <TableContainer isRowClickable={!!onRowClick}>
+    <TableContainer>
       <thead>
         <tr>
           {columns.map(column => (
@@ -60,21 +60,20 @@ const Table = <T,>({
         )}
         {shouldShowData &&
           items.map((item: T, index: Number) => (
-            <tr
+            <Tr
               onClick={onRowClick && (() => onRowClick(item))}
               key={getKeyForRow(item)}
+              isRowClickable={!!onRowClick}
             >
               {renderTr({ index, item })}
-            </tr>
+            </Tr>
           ))}
       </tbody>
     </TableContainer>
   );
 };
 
-const TableContainer = styled.table<{
-  isRowClickable: boolean;
-}>`
+const TableContainer = styled.table`
   ${({ theme }) => css`
     width: 100%;
     border-collapse: separate;
@@ -109,22 +108,24 @@ const TableContainer = styled.table<{
     `}
   }
 
-  tr {
-    transition: 0.1s;
-    ${({ theme, isRowClickable }) =>
-      isRowClickable &&
-      css`
-        cursor: pointer;
-        :hover {
-          background-color: ${theme.backgroundColor.secondary};
-        }
-      `}
-  }
-
   p {
     overflow: hidden;
     text-overflow: ellipsis;
   }
+`;
+
+const Tr = styled.tr<{
+  isRowClickable: boolean;
+}>`
+  transition: 0.1s;
+  ${({ theme, isRowClickable }) =>
+    isRowClickable &&
+    css`
+      cursor: pointer;
+      :hover {
+        background-color: ${theme.backgroundColor.secondary};
+      }
+    `}
 `;
 
 const EmptyTr = styled.tr`
