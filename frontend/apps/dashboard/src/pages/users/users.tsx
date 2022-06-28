@@ -19,7 +19,6 @@ const columns = [
   { text: 'SSN', width: '12.5%' },
   { text: 'Phone Number', width: '15%' },
   { text: 'Date', width: '15%' },
-  { text: 'ID', width: '6%' },
 ];
 
 const PAGE_SIZE = 10;
@@ -109,9 +108,6 @@ const Users = () => {
                   minute: 'numeric',
                 })}
               </Typography>
-            </td>
-            <td>
-              <Typography variant="body-3">{item.orderingId}</Typography>
             </td>
           </>
         )}
