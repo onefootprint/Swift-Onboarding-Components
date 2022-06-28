@@ -10,7 +10,7 @@ const useGetUsers = (pageSize: number) => {
   const getOnboardings = useGetOnboardings(pageSize);
   const [totalNumResults, setTotalNumResults] = useState(0);
   const { decryptedUsers, loadEncryptedAttributes } = useDecryptUser();
-  const { query, setFilter, setCursors } = useFilters();
+  const { filters, setFilter, setCursors } = useFilters();
 
   useEffect(() => {
     // Only update total count of results when it is sent from the server
@@ -21,7 +21,7 @@ const useGetUsers = (pageSize: number) => {
 
   // The backend only supports paginating forward, so we will keep a stack of the previous pages
   // we've visited in order to paginate backwards
-  const cursors = getCursors(query);
+  const cursors = getCursors(filters);
 
   // Add the new cursor onto the stack
   const loadNextPage = () =>
@@ -43,7 +43,7 @@ const useGetUsers = (pageSize: number) => {
     loadPrevPage,
     hasNextPage: !!getOnboardings.data?.next,
     hasPrevPage: cursors.length > 0,
-    query,
+    filters,
     setFilter,
     loadEncryptedAttributes,
   };

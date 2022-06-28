@@ -34,7 +34,7 @@ const Users = () => {
     loadPrevPage,
     hasNextPage,
     hasPrevPage,
-    query,
+    filters,
     setFilter,
   } = useGetUsers(PAGE_SIZE);
 
@@ -44,8 +44,8 @@ const Users = () => {
 
   // Bind the contents of the search text box to the querystring
   useEffect(() => {
-    setSearchText(query.fingerprint || '');
-  }, [query]);
+    setSearchText(filters.fingerprint || '');
+  }, [filters]);
 
   return (
     <>

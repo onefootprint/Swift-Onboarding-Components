@@ -39,7 +39,7 @@ export const useFilters = () => {
     setQuerystring({ ...router.query, cursors: cursors.join(',') });
   };
   return {
-    query: router.query as OnboardingListQuerystring,
+    filters: router.query as OnboardingListQuerystring,
     setFilter,
     setCursors,
   };

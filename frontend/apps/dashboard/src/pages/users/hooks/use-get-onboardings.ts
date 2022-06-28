@@ -50,10 +50,10 @@ const getOnboardingsRequest = async ({
 const useGetOnboardings = (pageSize: number) => {
   const session = useSessionUser();
   const auth = session.data?.auth;
-  const { query } = useFilters();
+  const { filters } = useFilters();
 
   return useQuery<OnboardingsListResponse, RequestError>(
-    ['paginatedOnboardings', query, auth, pageSize],
+    ['paginatedOnboardings', filters, auth, pageSize],
     getOnboardingsRequest,
     {
       retry: false,

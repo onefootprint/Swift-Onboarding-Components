@@ -58,7 +58,7 @@ const formSchema = yup
   .required();
 
 const UsersFilter = () => {
-  const { query, setFilter } = useFilters();
+  const { filters, setFilter } = useFilters();
 
   const [showDialog, setShowDialog] = useState(false);
   const { getValues, register, setValue, watch, trigger, formState } =
@@ -69,10 +69,10 @@ const UsersFilter = () => {
 
   const openDialog = () => {
     // Update the state of the dialog to represent what's in the querystring, then open it
-    const statusesStr = query.statuses || '';
+    const statusesStr = filters.statuses || '';
     const selectedFields = statusesStr ? statusesStr.split(',') : [];
     setValue('onboardingStatuses', selectedFields as OnboardingStatus[]);
-    const [dateRange, customDateStart, customDateEnd] = getDateRange(query);
+    const [dateRange, customDateStart, customDateEnd] = getDateRange(filters);
     setValue('dateRange', dateRange);
     setValue('customDateStart', customDateStart);
     setValue('customDateEnd', customDateEnd);
