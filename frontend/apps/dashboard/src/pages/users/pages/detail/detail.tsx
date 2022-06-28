@@ -13,6 +13,7 @@ import { Box, Divider, Typography } from 'ui';
 
 import useGetUsers from '../../hooks/use-get-users';
 import BasicInfo from './components/basic-info';
+import Insights from './components/insights';
 
 const Detail = () => {
   const { users, loadEncryptedAttributes } = useGetUsers(1);
@@ -42,13 +43,17 @@ const Detail = () => {
             user={user}
             onDecrypt={partial(loadEncryptedAttributes, user.footprintUserId)}
           />
-          <PaddedDivider />
+          <Box sx={{ marginTop: 5, marginBottom: 5 }}>
+            <Divider />
+          </Box>
           <BasicInfo user={user} />
           <Box sx={{ height: '40px' }}>&nbsp;</Box>
           <Typography variant="heading-3" sx={{ userSelect: 'none' }}>
             Audit trail
           </Typography>
-          <PaddedDivider />
+          <Box sx={{ marginTop: 5, marginBottom: 5 }}>
+            <Divider />
+          </Box>
           <Timeline
             items={[
               {
@@ -143,6 +148,9 @@ const Detail = () => {
               },
             ]}
           />
+          <Box sx={{ height: '40px' }}>&nbsp;</Box>
+          <Insights user={user} />
+          <Box sx={{ height: '72px' }}>&nbsp;</Box>
         </>
       )}
     </>
@@ -154,12 +162,6 @@ const HeaderContainer = styled.div`
     margin-bottom: ${theme.spacing[7]}px;
     display: flex;
     flex-direction: row;
-  `};
-`;
-
-const PaddedDivider = styled(Divider)`
-  ${({ theme }) => css`
-    margin: ${theme.spacing[5]}px 0;
   `};
 `;
 

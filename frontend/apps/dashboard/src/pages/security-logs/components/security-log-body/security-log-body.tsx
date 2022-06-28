@@ -1,5 +1,5 @@
 import React from 'react';
-import { AccessEvent } from 'src/types';
+import { AccessEvent, getRegionForInsightEvent } from 'src/types';
 import styled, { css } from 'styled-components';
 import { Box, Code, Typography } from 'ui';
 
@@ -28,11 +28,7 @@ const SecurityLogBody = ({ accessEvent }: SecurityLogBodyProps) => (
             Region
           </Typography>
           <Typography variant="body-3">
-            {accessEvent.insightEvent.city && accessEvent.insightEvent.region
-              ? `${accessEvent.insightEvent.city}, ${accessEvent.insightEvent.region}`
-              : accessEvent.insightEvent.city ||
-                accessEvent.insightEvent.region ||
-                '-'}
+            {getRegionForInsightEvent(accessEvent.insightEvent) || '-'}
           </Typography>
           <Typography variant="label-3" color="tertiary">
             IP Address

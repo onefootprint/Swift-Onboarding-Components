@@ -3,6 +3,7 @@ import {
   ALL_FIELDS,
   DataKind,
   DataKindType,
+  InsightEvent,
   Onboarding,
   OnboardingStatus,
 } from 'src/types';
@@ -15,6 +16,7 @@ export type User = {
   initiatedAt: string;
   orderingId: string;
   attributes: UserAttributes;
+  insightEvent?: InsightEvent;
 };
 
 // Create a custom UserData for name since it's two separate attributes joined
@@ -70,6 +72,7 @@ const useJoinUsers = (
           orderingId: onboarding.orderingId,
           initiatedAt: onboarding.startTimestamp,
           attributes,
+          insightEvent: onboarding.insightEvent,
         } as User;
       }),
     [decryptedUsers, onboardings],

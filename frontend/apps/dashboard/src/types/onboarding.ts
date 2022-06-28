@@ -1,4 +1,5 @@
 import { DataKind } from './data-kind';
+import { InsightEvent } from './insight-event';
 import { OnboardingStatus } from './onboarding-status';
 
 export type Onboarding = {
@@ -7,4 +8,5 @@ export type Onboarding = {
   populatedDataKinds: DataKind[];
   startTimestamp: string;
   orderingId: string;
+  insightEvent?: InsightEvent;
 };
