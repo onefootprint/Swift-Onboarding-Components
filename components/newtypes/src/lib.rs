@@ -34,6 +34,8 @@ pub enum Error {
     InvalidEmail,
     #[error("dob error: {0}")]
     DobError(#[from] DobError),
+    #[error("address error: {0}")]
+    AddressError(#[from] AddressError),
 }
 
 #[derive(Debug, Clone, thiserror::Error)]
@@ -46,4 +48,16 @@ pub enum DobError {
     InvalidMonth(u32),
     #[error("invalid year for dob: {0}, must not be born in the future or be impossibly old")]
     InvalidYear(i32),
+}
+
+#[derive(Debug, Clone, thiserror::Error)]
+pub enum AddressError {
+    #[error("invalid zip code, zip code must be alphanumeric: {0}")]
+    InvalidZip(String),
+    #[error("invalid country code: {0}, country code must be 2-digit ISO 3166-1 Alpha 2")]
+    InvalidCountry(String),
+    #[error("invalid address provided: {0}, address must not contain special characters other than #")]
+    InvalidAddressCharacters(String),
+    #[error("invalid characters provided: {0}, city and/or state must not contain special characters")]
+    InvalidCharacters(String),
 }
