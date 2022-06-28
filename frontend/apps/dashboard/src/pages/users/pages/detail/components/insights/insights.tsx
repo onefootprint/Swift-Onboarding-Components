@@ -1,28 +1,74 @@
 import GoogleMapReact from 'google-map-react';
+import IcoAndroidColored24 from 'icons/ico/ico-android-colored-24';
 import IcoAppleColored24 from 'icons/ico/ico-apple-colored-24';
+import IcoCode24 from 'icons/ico/ico-code-24';
+import IcoPhone24 from 'icons/ico/ico-phone-24';
+import IcoUser24 from 'icons/ico/ico-user-24';
 import React from 'react';
 import { User } from 'src/pages/users/hooks/use-join-users';
 import { getRegionForInsightEvent } from 'src/types';
 import styled, { css } from 'styled-components';
-import { Box, Divider, Typography } from 'ui';
+import UAParser from 'ua-parser-js';
+import { Box, Divider, LoadingIndicator, Typography } from 'ui';
 
 import MapMarker from './components/map-marker';
+import useGetLiveness from './hooks/use-get-liveness';
 import mapStyles from './insight.styles';
+
+const isBot = (userAgent: UAParser.IResult) =>
+  userAgent.ua?.toLowerCase().includes('python');
+
+const icoForUserAgent = (userAgent: UAParser.IResult) => {
+  if (
+    userAgent.os.name?.toLowerCase() === 'ios' ||
+    userAgent.device.vendor?.toLowerCase() === 'apple'
+  ) {
+    return <IcoAppleColored24 />;
+  }
+  if (userAgent.os.name?.toLowerCase() === 'android') {
+    return <IcoAndroidColored24 />;
+  }
+  if (userAgent.device.type?.toLowerCase() === 'mobile') {
+    return <IcoPhone24 />;
+  }
+  if (isBot(userAgent)) {
+    return <IcoCode24 />;
+  }
+  return <IcoUser24 />;
+};
+
+const displayForUserAgent = (userAgent: UAParser.IResult) => {
+  if (isBot(userAgent)) {
+    return 'A robot';
+  }
+  const device = `${userAgent.device.vendor || ''} ${
+    userAgent.device.model || ''
+  }`.trim();
+  const os = `${userAgent.os.name || ''} ${userAgent.os.version || ''}`.trim();
+  if (device && os) {
+    return `${device}, ${os}`;
+  }
+  return device || os || '-';
+};
 
 type InsightsProps = {
   user: User;
 };
 
 const Insights = ({ user }: InsightsProps) => {
-  const insightEvent =
-    user.insightEvent?.latitude !== undefined &&
-    user.insightEvent?.longitude !== undefined &&
-    user.insightEvent;
+  const getLiveness = useGetLiveness(user.footprintUserId);
 
-  if (!insightEvent) {
-    // eslint-disable-next-line react/jsx-no-useless-fragment
-    return <></>;
+  const biometricCred = getLiveness.data?.[0];
+
+  if (getLiveness.isLoading) {
+    return <LoadingIndicator />;
   }
+
+  // If there's a biometric credential, use the insight event from it since it will most likely be the mobile device.
+  // If there's no biometric credential, use the insight event from the onboarding, which may be mobile or desktop.
+  // We only show `Biometric: Verified` if the user has a biometric credential
+  const insightEvent = biometricCred?.insightEvent || user.insightEvent;
+  const userAgent = UAParser(insightEvent.userAgent || '');
 
   return (
     <>
@@ -71,10 +117,9 @@ const Insights = ({ user }: InsightsProps) => {
           />
         </GoogleMapReact>
         <FloatingBox>
-          <IcoAppleColored24 />
-          {/* TODO https://linear.app/footprint/issue/FP-438/show-insight-event-from-webauthn-credential */}
+          {icoForUserAgent(userAgent)}
           <Typography variant="label-2" sx={{ marginBottom: 5 }}>
-            iPhone 13 Pro Max, iOS 15.5
+            {displayForUserAgent(userAgent)}
           </Typography>
           {insightEvent.ipAddress && (
             <Row>
@@ -88,8 +133,9 @@ const Insights = ({ user }: InsightsProps) => {
             <Typography variant="label-3" color="tertiary">
               Biometric
             </Typography>
-            {/* TODO https://linear.app/footprint/issue/FP-438/show-insight-event-from-webauthn-credential */}
-            <Typography variant="body-3">Verified</Typography>
+            <Typography variant="body-3">
+              {biometricCred ? 'Verified' : 'Not verified'}
+            </Typography>
           </Row>
           {getRegionForInsightEvent(insightEvent) && (
             <Row>

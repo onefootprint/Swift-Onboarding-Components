@@ -32,6 +32,7 @@
     "request": "*",
     "styled-components": "^5.3.5",
     "themes": "*",
+    "ua-parser-js": "^1.0.2",
     "ui": "*",
     "usehooks-ts": "^2.5.3",
     "yup": "^0.32.11",

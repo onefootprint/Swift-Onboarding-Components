@@ -16,7 +16,7 @@ export type User = {
   initiatedAt: string;
   orderingId: string;
   attributes: UserAttributes;
-  insightEvent?: InsightEvent;
+  insightEvent: InsightEvent;
 };
 
 // Create a custom UserData for name since it's two separate attributes joined

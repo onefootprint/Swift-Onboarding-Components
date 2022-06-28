@@ -8,5 +8,5 @@ export type Onboarding = {
   populatedDataKinds: DataKind[];
   startTimestamp: string;
   orderingId: string;
-  insightEvent?: InsightEvent;
+  insightEvent: InsightEvent;
 };
