@@ -68,6 +68,8 @@ import IcoHelp16 from '../ico/ico-help-16';
 import IcoHelp24 from '../ico/ico-help-24';
 import IcoInfo16 from '../ico/ico-info-16';
 import IcoInfo24 from '../ico/ico-info-24';
+import IcoLaptop16 from '../ico/ico-laptop-16';
+import IcoLaptop24 from '../ico/ico-laptop-24';
 import IcoLock16 from '../ico/ico-lock-16';
 import IcoLock24 from '../ico/ico-lock-24';
 import IcoLogOut16 from '../ico/ico-log-out-16';
@@ -131,6 +133,7 @@ export default {
   IcoGoogleColored16,
   IcoHelp16,
   IcoInfo16,
+  IcoLaptop16,
   IcoLock16,
   IcoLogOut16,
   IcoMenu16,
@@ -177,6 +180,7 @@ export default {
   IcoGoogleColored24,
   IcoHelp24,
   IcoInfo24,
+  IcoLaptop24,
   IcoLock24,
   IcoLogOut24,
   IcoMenu24,
