@@ -6,7 +6,7 @@ import styled, { css } from 'styled-components';
 import { Badge, Code, SearchInput, Typography } from 'ui';
 
 import FieldOrPlaceholder from './components/field-or-placeholder';
-import UsersFilter from './components/users-filter';
+import UsersFilter from './components/filter-dialog';
 import useGetUsers from './hooks/use-get-users';
 import { nameData, User } from './hooks/use-join-users';
 import Pagination from './pages/detail/components/pagination';
