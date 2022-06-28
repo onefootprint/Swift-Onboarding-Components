@@ -1,10 +1,9 @@
 use crate::auth::session_data::email::email_verify::EmailVerifySession;
 use crate::auth::session_data::{ServerSession, SessionData};
 use crate::errors::ApiError;
-use crate::utils::crypto::signed_hash;
 use crate::State;
 use crypto::random::gen_random_alphanumeric_code;
-use newtypes::UserVaultId;
+use newtypes::{DataKind, Fingerprinter, UserVaultId};
 use paperclip::actix::web;
 use reqwest::StatusCode;
 use std::collections::HashMap;
@@ -117,7 +116,7 @@ pub(crate) async fn send_email_challenge(
 ) -> Result<(), ApiError> {
     let session_data = SessionData::EmailVerify(EmailVerifySession {
         uv_id,
-        sh_email: signed_hash(state, email_address.clone()).await?,
+        sh_email: state.compute_fingerprint(DataKind::Email, &email_address).await?,
     });
 
     // create new session

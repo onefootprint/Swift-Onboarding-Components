@@ -7,13 +7,13 @@ use deadpool_diesel::postgres::Pool;
 use diesel::dsl::any;
 use diesel::pg::Pg;
 use diesel::prelude::*;
-use newtypes::{FootprintUserId, ObConfigurationId, Status, TenantId, UserVaultId};
+use newtypes::{Fingerprint, FootprintUserId, ObConfigurationId, Status, TenantId, UserVaultId};
 
 #[derive(Clone)]
 pub struct OnboardingListQueryParams {
     pub tenant_id: TenantId,
     pub statuses: Vec<Status>,
-    pub fingerprint: Option<Vec<u8>>,
+    pub fingerprints: Option<Vec<Fingerprint>>,
     pub footprint_user_id: Option<FootprintUserId>,
     pub timestamp_lte: Option<NaiveDateTime>,
     pub timestamp_gte: Option<NaiveDateTime>,
@@ -40,11 +40,11 @@ pub fn list_for_tenant_query<'a>(params: OnboardingListQueryParams) -> BoxedQuer
         query = query.filter(schema::onboardings::start_timestamp.ge(timestamp_gte))
     }
 
-    if let Some(fingerprint) = params.fingerprint {
+    if let Some(fingerprints) = params.fingerprints {
         let matching_uv_ids = schema::user_data::table
             .filter(schema::user_data::user_vault_id.eq(schema::onboardings::user_vault_id))
             .filter(schema::user_data::deactivated_at.is_null())
-            .filter(schema::user_data::sh_data.eq(fingerprint))
+            .filter(schema::user_data::sh_data.eq_any(fingerprints))
             .select(schema::user_data::user_vault_id)
             .distinct();
         query = query.filter(schema::onboardings::user_vault_id.eq(any(matching_uv_ids)))

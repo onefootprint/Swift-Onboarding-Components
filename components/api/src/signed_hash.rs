@@ -1,7 +1,9 @@
+use async_trait::async_trait;
 use aws_sdk_kms::types::Blob;
 use crypto::sha256;
+use newtypes::{Fingerprint, Fingerprinter};
 
-use crate::errors::ApiError;
+use crate::{errors::ApiError, State};
 
 #[derive(Debug, Clone)]
 pub struct SignedHashClient {
@@ -39,5 +41,23 @@ impl SignedHashClient {
             .await?;
 
         Ok(result.mac().unwrap().as_ref().to_vec())
+    }
+}
+
+#[async_trait]
+impl Fingerprinter for SignedHashClient {
+    type Error = ApiError;
+
+    async fn sign_data(&self, data: &[u8]) -> Result<Fingerprint, Self::Error> {
+        Ok(Fingerprint(self.signed_hash(data).await?))
+    }
+}
+
+#[async_trait]
+impl Fingerprinter for State {
+    type Error = ApiError;
+
+    async fn sign_data(&self, data: &[u8]) -> Result<Fingerprint, Self::Error> {
+        self.hmac_client.sign_data(data).await
     }
 }

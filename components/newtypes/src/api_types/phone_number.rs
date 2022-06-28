@@ -41,17 +41,13 @@ impl<'de> Deserialize<'de> for PhoneNumber {
 }
 
 fn phone_fmt(phone: &PhoneNumber) -> String {
-    let mut fmt_str = String::from("");
-    let len = phone.0.len();
-    for (idx, char) in phone.0.char_indices() {
-        // only display last two digits -- helpful for debugging against twilio
-        if idx == (len - 1) || idx == (len - 2) {
-            fmt_str.push(char);
-        } else {
-            fmt_str.push('*')
-        }
-    }
-    fmt_str
+    let skip = phone.0.len() - 2;
+
+    format!(
+        "{}{}",
+        "*".repeat(skip),
+        phone.0.chars().skip(skip).collect::<String>()
+    )
 }
 
 impl Display for PhoneNumber {

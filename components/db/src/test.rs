@@ -1,5 +1,5 @@
 use diesel::{Connection, PgConnection};
-use newtypes::Status;
+use newtypes::{EncryptedVaultPrivateKey, Fingerprint, SealedVaultBytes, Status, VaultPublicKey};
 
 #[actix_rt::test]
 async fn test_db() {
@@ -22,13 +22,16 @@ async fn test_db() {
     let _tenant = crate::tenant::init_or_get(&pool, tenant)
         .await
         .expect("couldn't create tenant");
-    crate::user_vault::create(&pool, crate::models::user_vaults::NewUserVaultReq {
-        e_private_key: "private key".as_bytes().to_vec(),
-        public_key: "public key".as_bytes().to_vec(),
-        id_verified: Status::Incomplete,
-        e_phone_number: "blah".as_bytes().to_vec(),
-        sh_phone_number: "blah".as_bytes().to_vec()
-    })
+    crate::user_vault::create(
+        &pool,
+        crate::models::user_vaults::NewUserVaultReq {
+            e_private_key: EncryptedVaultPrivateKey("private key".as_bytes().to_vec()),
+            public_key: VaultPublicKey::unvalidated("public key".as_bytes().to_vec()),
+            id_verified: Status::Incomplete,
+            e_phone_number: SealedVaultBytes("blah".as_bytes().to_vec()),
+            sh_phone_number: Fingerprint("blah".as_bytes().to_vec()),
+        },
+    )
     .await
     .expect("couldn't init user vault");
 

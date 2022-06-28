@@ -18,9 +18,9 @@ use serde::{Deserialize, Serialize};
     Default,
 )]
 #[serde(transparent)]
-pub struct SealedSessionBytes(pub Vec<u8>);
+pub struct Fingerprint(pub Vec<u8>);
 
-impl AsRef<[u8]> for SealedSessionBytes {
+impl AsRef<[u8]> for Fingerprint {
     fn as_ref(&self) -> &[u8] {
         &self.0
     }

@@ -4,7 +4,7 @@ use db::models::user_data::UserData;
 use db::models::user_vaults::UserVault;
 use db::DbPool;
 use db::{errors::DbError, PgConnection};
-use newtypes::DataKind;
+use newtypes::{DataKind, SealedVaultBytes};
 use paperclip::actix::web;
 
 use crate::errors::ApiError;
@@ -37,9 +37,9 @@ impl UserVaultWrapper {
         self.user_data.get(&data_kind)?.get(0)
     }
 
-    pub fn get_e_field(&self, data_kind: DataKind) -> Option<&[u8]> {
+    pub fn get_e_field(&self, data_kind: DataKind) -> Option<&SealedVaultBytes> {
         // TODO handle multiple values for the same field
-        Some(self.get_data(data_kind)?.e_data.as_slice())
+        Some(&self.get_data(data_kind)?.e_data)
     }
 
     pub async fn get_decrypted_field(
@@ -57,11 +57,11 @@ impl UserVaultWrapper {
         let decrypted_data = crate::enclave::decrypt_bytes(
             state,
             e_data,
-            self._user_vault.e_private_key.clone(),
+            &self._user_vault.e_private_key,
             enclave_proxy::DataTransform::Identity,
         )
         .await?;
-        
+
         Ok(Some(decrypted_data))
     }
 

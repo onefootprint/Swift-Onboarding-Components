@@ -21,6 +21,9 @@ pub use serde;
 mod auth_token;
 pub use self::auth_token::*;
 
+pub mod fingerprint;
+pub use self::fingerprint::*;
+
 #[derive(Debug, Clone, thiserror::Error)]
 pub enum Error {
     #[error("invalid phone number")]

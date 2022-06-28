@@ -9,7 +9,6 @@ use crate::{
     errors::ApiError,
     user::{clean_for_fingerprint, clean_for_storage},
     utils::{
-        crypto::seal_to_vault_pkey,
         email::{clean_email, send_email_challenge},
         user_vault_wrapper::UserVaultWrapper,
     },
@@ -20,7 +19,9 @@ use db::models::{
     user_vaults::UserVault,
 };
 use db::user_vault::get_by_fingerprint;
-use newtypes::{DataKind, DataPriority, UserDataId, UserVaultId};
+use newtypes::{
+    DataKind, DataPriority, Fingerprint, Fingerprinter, SealedVaultBytes, UserDataId, UserVaultId,
+};
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 use std::collections::HashMap;
 
@@ -105,7 +106,11 @@ async fn handler(
     }))
 }
 
-struct DataUpdateRequest(DataKind, Vec<u8>, Option<Vec<u8>>);
+struct DataUpdateRequest {
+    data_kind: DataKind,
+    e_data: SealedVaultBytes,
+    sh_data: Option<Fingerprint>,
+}
 
 pub async fn update<C: HasVaultPermission>(
     context: &C,
@@ -136,7 +141,7 @@ pub async fn update<C: HasVaultPermission>(
     // If we're updating the email address, send an async challenge to the new email address
     if let Some(email) = email {
         let cleaned_email = clean_email(email.to_owned());
-        let sh_email = crate::utils::crypto::signed_hash(state, cleaned_email.clone()).await?;
+        let sh_email = state.compute_fingerprint(DataKind::Email, &cleaned_email).await?;
         let uv_data_for_email = get_by_fingerprint(&state.db_pool, DataKind::Email, sh_email, false).await?;
         // only send a verification email if it's new
         // TODO: edge case where a user may want to re-send email that isn't verified?
@@ -148,14 +153,18 @@ pub async fn update<C: HasVaultPermission>(
     for (data_kind, data_str) in v {
         // Clean/validate data
         let data_str = clean_for_storage(data_kind, data_str);
-        let sh_data = if data_kind.is_fingerprintable() {
+        let sh_data = if data_kind.allows_fingerprint() {
             let cleaned_data = clean_for_fingerprint(data_str.clone());
-            Some(crate::utils::crypto::signed_hash(state, cleaned_data).await?)
+            Some(state.compute_fingerprint(data_kind, &cleaned_data).await?)
         } else {
             None
         };
-        let e_data = seal_to_vault_pkey(data_str, &user_vault.public_key)?;
-        data_to_insert.push(DataUpdateRequest(data_kind, e_data, sh_data))
+        let e_data = user_vault.public_key.seal_data(&data_str)?;
+        data_to_insert.push(DataUpdateRequest {
+            data_kind,
+            e_data,
+            sh_data,
+        })
     }
 
     let _: () = state
@@ -189,7 +198,13 @@ fn process_data_update_request(
 
     let (uds, uds_to_deactivate): (Vec<NewUserData>, Vec<Option<UserDataId>>) = data_to_insert
         .into_iter()
-        .map(|DataUpdateRequest(data_kind, e_data, sh_data)| {
+        .map(|update| {
+            let DataUpdateRequest {
+                data_kind,
+                e_data,
+                sh_data,
+            } = update;
+
             let (data_priority, ud_id_to_deactivate) = match uvw.get_data(data_kind) {
                 Some(existing_user_data) => {
                     // There's an existing piece of data with this kind

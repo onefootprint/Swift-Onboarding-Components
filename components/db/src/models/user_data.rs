@@ -4,7 +4,7 @@ use crate::DbPool;
 use chrono::NaiveDateTime;
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
-use newtypes::{DataKind, UserDataId, UserVaultId, DataPriority};
+use newtypes::{DataKind, DataPriority, Fingerprint, SealedVaultBytes, UserDataId, UserVaultId};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable, Identifiable)]
@@ -13,8 +13,8 @@ pub struct UserData {
     pub id: UserDataId,
     pub user_vault_id: UserVaultId,
     pub data_kind: DataKind,
-    pub e_data: Vec<u8>,
-    pub sh_data: Option<Vec<u8>>,
+    pub e_data: SealedVaultBytes,
+    pub sh_data: Option<Fingerprint>,
     pub is_verified: bool,
     pub data_priority: DataPriority,
     pub deactivated_at: Option<NaiveDateTime>,
@@ -43,8 +43,8 @@ pub struct NewUserData {
     pub user_vault_id: UserVaultId,
     pub data_kind: DataKind,
     pub data_priority: DataPriority,
-    pub e_data: Vec<u8>,
-    pub sh_data: Option<Vec<u8>>,
+    pub e_data: SealedVaultBytes,
+    pub sh_data: Option<Fingerprint>,
     pub is_verified: bool,
 }
 

@@ -2,6 +2,7 @@ use crate::errors::ApiError;
 use crate::types::success::ApiResponseData;
 use crate::types::Empty;
 use crate::State;
+use newtypes::{DataKind, Fingerprinter};
 use paperclip::actix::Apiv2Schema;
 use paperclip::actix::{api_v2_operation, post, web, web::Json};
 use std::str::FromStr;
@@ -42,8 +43,7 @@ async fn post(
     let twilio_client = &state.twilio_client;
     let phone_number = twilio_client.standardize(&requested_number).await?;
     let sh_data = state
-        .hmac_client
-        .signed_hash(phone_number.e164.as_bytes())
+        .compute_fingerprint(DataKind::PhoneNumber, phone_number.as_ref())
         .await?;
     db::private_cleanup_integration_tests(&state.db_pool, sh_data).await?;
 

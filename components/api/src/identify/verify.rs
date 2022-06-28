@@ -6,15 +6,16 @@ use crate::errors::ApiError;
 use crate::identify::{IdentifyChallengeData, IdentifyChallengeState, IdentifyType};
 use crate::types::success::ApiResponseData;
 use crate::utils::challenge::{Challenge, ChallengeToken};
-use crate::utils::crypto::seal_to_vault_pkey;
-use crate::utils::crypto::signed_hash;
 use crate::utils::liveness::LivenessWebauthnConfig;
+use crate::utils::twilio::ValidatedPhoneNumber;
 use crate::State;
 use aws_sdk_kms::model::DataKeyPairSpec;
 use chrono::Duration;
 use crypto::sha256;
 use db::models::user_vaults::{NewUserVaultReq, UserVault};
-use newtypes::{DataKind, SessionAuthToken, Status, UserVaultId};
+use newtypes::{
+    DataKind, EncryptedVaultPrivateKey, Fingerprinter, SessionAuthToken, Status, UserVaultId, VaultPublicKey,
+};
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
@@ -113,20 +114,18 @@ async fn validate_sms_challenge(
     }
 
     let phone_number = challenge_state.phone_number;
-    let sh_phone_number = signed_hash(state, phone_number.e164.clone()).await?;
-    let existing_user = db::user_vault::get_by_fingerprint(
-        &state.db_pool,
-        DataKind::PhoneNumber,
-        sh_phone_number.clone(),
-        true,
-    )
-    .await?
-    .map(|x| x.0);
+    let sh_phone_number = state
+        .compute_fingerprint(DataKind::PhoneNumber, &phone_number.e164)
+        .await?;
+    let existing_user =
+        db::user_vault::get_by_fingerprint(&state.db_pool, DataKind::PhoneNumber, sh_phone_number, true)
+            .await?
+            .map(|x| x.0);
     let result = match existing_user {
         Some(uv) => (uv.id, VerifyKind::UserInherited),
         None => {
             // The user does not exist. Create a new user vault
-            let user = create_new_user_vault(state, phone_number.e164.clone()).await?;
+            let user = create_new_user_vault(state, &phone_number).await?;
             (user.id, VerifyKind::UserCreated)
         }
     };
@@ -135,7 +134,7 @@ async fn validate_sms_challenge(
 
 async fn create_new_user_vault(
     state: &web::Data<State>,
-    phone_number: String,
+    phone_number: &ValidatedPhoneNumber,
 ) -> Result<UserVault, ApiError> {
     let new_key_pair = state
         .kms_client
@@ -145,16 +144,18 @@ async fn create_new_user_vault(
         .send()
         .await?;
 
-    let der_public_key = new_key_pair.public_key.unwrap().into_inner();
-    let ec_pk_uncompressed = crypto::conversion::public_key_der_to_raw_uncompressed(&der_public_key)?;
-    let _pk = crypto::hex::encode(&ec_pk_uncompressed);
+    let vault_public_key = VaultPublicKey::from_der_bytes(&new_key_pair.public_key.unwrap().into_inner())?;
+    let encrypted_vault_private_key =
+        EncryptedVaultPrivateKey(new_key_pair.private_key_ciphertext_blob.unwrap().into_inner());
 
     let new_user = NewUserVaultReq {
-        e_private_key: new_key_pair.private_key_ciphertext_blob.unwrap().into_inner(),
-        public_key: ec_pk_uncompressed.clone(),
+        e_private_key: encrypted_vault_private_key,
         id_verified: Status::Incomplete,
-        e_phone_number: seal_to_vault_pkey(phone_number.clone(), &ec_pk_uncompressed)?,
-        sh_phone_number: signed_hash(state, phone_number.clone()).await?,
+        e_phone_number: vault_public_key.seal_data(phone_number.as_ref())?,
+        public_key: vault_public_key,
+        sh_phone_number: state
+            .compute_fingerprint(DataKind::PhoneNumber, phone_number.as_ref())
+            .await?,
     };
     let user = db::user_vault::create(&state.db_pool, new_user).await?;
 

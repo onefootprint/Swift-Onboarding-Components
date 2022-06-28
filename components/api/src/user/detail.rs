@@ -5,7 +5,7 @@ use crate::utils::user_vault_wrapper::UserVaultWrapper;
 use crate::State;
 use crate::{auth::session_context::SessionContext, errors::ApiError};
 use db::models::user_vaults::UserVault;
-use newtypes::DataKind;
+use newtypes::{DataKind, EncryptedVaultPrivateKey, SealedVaultBytes};
 use paperclip::actix::{api_v2_operation, web, web::Json, Apiv2Schema};
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Serialize)]
@@ -17,8 +17,8 @@ pub struct ApiUser {
 
 async fn decrypt_field(
     state: &web::Data<State>,
-    e_data: Option<&[u8]>,
-    e_private_key: Vec<u8>,
+    e_data: Option<&SealedVaultBytes>,
+    e_private_key: &EncryptedVaultPrivateKey,
 ) -> Result<Option<String>, ApiError> {
     if let Some(e_data) = e_data {
         let decrypted_data = crate::enclave::decrypt_bytes(
@@ -38,18 +38,8 @@ impl ApiUser {
     async fn from(uv: &UserVault, state: &web::Data<State>) -> Result<Self, ApiError> {
         let uvw = UserVaultWrapper::from(&state.db_pool, uv.clone()).await?;
         let api_user = Self {
-            first_name: decrypt_field(
-                state,
-                uvw.get_e_field(DataKind::FirstName),
-                uv.e_private_key.clone(),
-            )
-            .await?,
-            last_name: decrypt_field(
-                state,
-                uvw.get_e_field(DataKind::LastName),
-                uv.e_private_key.clone(),
-            )
-            .await?,
+            first_name: decrypt_field(state, uvw.get_e_field(DataKind::FirstName), &uv.e_private_key).await?,
+            last_name: decrypt_field(state, uvw.get_e_field(DataKind::LastName), &uv.e_private_key).await?,
         };
         Ok(api_user)
     }

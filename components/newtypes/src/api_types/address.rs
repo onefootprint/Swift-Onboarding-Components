@@ -1,7 +1,6 @@
 pub use derive_more::{Add, Display, From, FromStr, Into};
 use paperclip::actix::Apiv2Schema;
 use serde::{Deserialize, Serialize};
-use std::fmt;
 
 #[derive(Clone, Debug, Hash, PartialEq, Eq, Serialize, Deserialize, Default, Apiv2Schema)]
 /// Address includes street addresses, city, state, zip, and country.

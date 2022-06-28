@@ -1,6 +1,6 @@
-use crate::auth::session_data::tenant::secret_key::SecretTenantAuthContext;
 use crate::auth::either::Either;
 use crate::auth::session_context::HasTenant;
+use crate::auth::session_data::tenant::secret_key::SecretTenantAuthContext;
 use crate::auth::session_data::tenant::workos::WorkOsSession;
 use crate::types::onboarding::ApiOnboarding;
 use crate::types::success::ApiPaginatedResponseData;
@@ -10,7 +10,7 @@ use crate::{auth::session_context::SessionContext, errors::ApiError};
 use chrono::{DateTime, Utc};
 use db::onboarding::OnboardingListQueryParams;
 use db::DbError;
-use newtypes::{FootprintUserId, Status};
+use newtypes::{DataKind, Fingerprint, Fingerprinter, FootprintUserId, Status};
 use paperclip::actix::{api_v2_operation, get, web, web::Json, Apiv2Schema};
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize, Apiv2Schema)]
@@ -58,11 +58,14 @@ fn handler(
     };
 
     // TODO clean phone number or email
-    let fingerprint = match fingerprint {
+    let fingerprints = match fingerprint {
         Some(fingerprint) => {
             let cleaned_data = crate::user::clean_for_fingerprint(fingerprint);
-            let fingerprint = crate::utils::crypto::signed_hash(&state, cleaned_data).await?;
-            Some(fingerprint)
+
+            let fut_fingerprints =
+                DataKind::fingerprintable().map(|kind| state.compute_fingerprint(kind, &cleaned_data));
+            let fingerprints: Vec<Fingerprint> = futures::future::try_join_all(fut_fingerprints).await?;
+            Some(fingerprints)
         }
         None => None,
     };
@@ -71,7 +74,7 @@ fn handler(
     let query_params = OnboardingListQueryParams {
         tenant_id: tenant.id.clone(),
         statuses,
-        fingerprint,
+        fingerprints,
         footprint_user_id,
         timestamp_lte: timestamp_lte.as_ref().map(DateTime::naive_utc),
         timestamp_gte: timestamp_gte.as_ref().map(DateTime::naive_utc),

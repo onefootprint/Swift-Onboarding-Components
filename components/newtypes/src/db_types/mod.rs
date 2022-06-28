@@ -3,11 +3,13 @@ mod challenge;
 mod d2p_session_status;
 mod data_kind;
 mod data_priority;
+mod fingerprint;
 mod ob_configuration_settings;
+mod sealed_bytes;
 mod status;
-mod sealed_session;
+mod vault_key_pair;
 
 pub use self::{
-    attestation_type::*, challenge::*, d2p_session_status::*, data_kind::*, data_priority::*,
-    ob_configuration_settings::*, status::*, sealed_session::*
+    attestation_type::*, challenge::*, d2p_session_status::*, data_kind::*, data_priority::*, fingerprint::*,
+    ob_configuration_settings::*, sealed_bytes::*, status::*, vault_key_pair::*,
 };

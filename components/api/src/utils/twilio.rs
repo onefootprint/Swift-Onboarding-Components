@@ -1,4 +1,4 @@
-use std::marker::PhantomData;
+use std::{fmt::Debug, marker::PhantomData};
 
 use crate::{errors::ApiError, identify::PhoneChallengeState, State};
 use chrono::{Duration, Utc};
@@ -7,14 +7,40 @@ use newtypes::{Base64Data, PhoneNumber, SealedSessionBytes, SessionAuthToken};
 
 use self::rate_limit::RateLimitRecord;
 
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[derive(Clone, serde::Serialize, serde::Deserialize)]
 pub struct ValidatedPhoneNumber {
     pub e164: String,
     phantom: PhantomData<()>,
 }
 
+impl Debug for ValidatedPhoneNumber {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let skip = self.e164.len() - 2;
+
+        let out = format!(
+            "{}{}",
+            "*".repeat(skip),
+            self.e164.chars().skip(skip).collect::<String>()
+        );
+        out.fmt(f)
+    }
+}
+
+impl AsRef<[u8]> for ValidatedPhoneNumber {
+    fn as_ref(&self) -> &[u8] {
+        self.e164.as_bytes()
+    }
+}
+
+impl AsRef<str> for ValidatedPhoneNumber {
+    fn as_ref(&self) -> &str {
+        self.e164.as_str()
+    }
+}
+
 impl ValidatedPhoneNumber {
-    pub fn from_str_unsafe(e164: String) -> Self {
+    /// escape hatch for constructing a known validated phone number
+    pub fn unvalidated(e164: String) -> Self {
         Self {
             e164,
             phantom: PhantomData,

@@ -17,7 +17,7 @@ use deadpool_diesel::postgres::{Manager, Pool, Runtime};
 pub use diesel::prelude::PgConnection;
 use diesel::prelude::*;
 use models::onboardings::Onboarding;
-use newtypes::DataKind;
+use newtypes::{DataKind, Fingerprint};
 use user_vault::get_by_fingerprint;
 
 #[allow(unused_imports)]
@@ -75,7 +75,7 @@ pub async fn health_check(pool: &Pool) -> Result<(), DbError> {
     Ok(())
 }
 
-pub async fn private_cleanup_integration_tests(pool: &Pool, sh_data: Vec<u8>) -> Result<(), DbError> {
+pub async fn private_cleanup_integration_tests(pool: &Pool, sh_data: Fingerprint) -> Result<(), DbError> {
     // we register users within our integration tests. to avoid filling up our database with fake information,
     // we clean up afterwards.
     let uv = get_by_fingerprint(pool, DataKind::PhoneNumber, sh_data, false).await?;

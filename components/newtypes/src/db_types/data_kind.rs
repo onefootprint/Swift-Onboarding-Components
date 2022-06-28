@@ -1,7 +1,10 @@
+use crate::SaltedFingerprint;
+use crypto::sha256;
 pub use derive_more::Display;
 use diesel_derive_enum::DbEnum;
 use paperclip::actix::Apiv2Schema;
 use serde::{Deserialize, Serialize};
+use strum::IntoEnumIterator;
 use strum_macros::EnumIter;
 
 /// The type of data attribute
@@ -49,7 +52,7 @@ impl DataKind {
     }
 
     /// Returns true if we store a fingerprint of this value to allow exact match searching.
-    pub fn is_fingerprintable(&self) -> bool {
+    pub fn allows_fingerprint(&self) -> bool {
         matches!(
             self,
             DataKind::PhoneNumber
@@ -59,5 +62,17 @@ impl DataKind {
                 | DataKind::LastName
                 | DataKind::LastFourSsn
         )
+    }
+
+    pub fn fingerprintable() -> impl Iterator<Item = DataKind> {
+        Self::iter().filter(DataKind::allows_fingerprint)
+    }
+}
+
+impl SaltedFingerprint for DataKind {
+    fn salt_data_to_sign(&self, data: &[u8]) -> [u8; 32] {
+        let self_name = self.to_string();
+        let concat = [sha256(self_name.as_bytes()), sha256(data)].concat();
+        sha256(&concat)
     }
 }

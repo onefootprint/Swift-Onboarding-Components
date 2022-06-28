@@ -4,7 +4,6 @@ use super::{
 use crate::errors::ApiError;
 use crate::types::success::ApiResponseData;
 use crate::utils::challenge::{Challenge, ChallengeToken};
-use crate::utils::crypto::signed_hash;
 use crate::utils::email::clean_email;
 use crate::utils::liveness::LivenessWebauthnConfig;
 use crate::utils::twilio::{TwilioClient, ValidatedPhoneNumber};
@@ -14,7 +13,7 @@ use crypto::serde_cbor;
 use db::models::user_vaults::UserVault;
 use db::models::webauthn_credential::WebauthnCredential;
 use db::webauthn_credentials::get_webauthn_creds;
-use newtypes::{DataKind, PhoneNumber, UserVaultId};
+use newtypes::{DataKind, Fingerprinter, PhoneNumber, UserVaultId};
 use paperclip::actix::{api_v2_operation, web, web::Json, Apiv2Schema};
 use webauthn_rs_core::proto::{Base64UrlSafeData, Credential, ParsedAttestation, ParsedAttestationData};
 use webauthn_rs_proto::{RegisteredExtensions, UserVerificationPolicy};
@@ -88,7 +87,7 @@ pub async fn handler(
         .get_decrypted_field(&state, DataKind::PhoneNumber)
         .await?
         .ok_or(ApiError::NoPhoneNumberForVault)?;
-    let e164_phone_number = ValidatedPhoneNumber::from_str_unsafe(phone_number.clone());
+    let e164_phone_number = ValidatedPhoneNumber::unvalidated(phone_number.clone());
 
     // Initiate the challenge of the requested type
     let (challenge_kind, challenge_state_data, biometric_challenge_json) = match preferred_challenge_kind {
@@ -102,9 +101,7 @@ pub async fn handler(
                     Some(challenge.challenge_json),
                 )
             } else {
-                let challenge_state = twilio_client
-                    .send_challenge(&state, e164_phone_number)
-                    .await?;
+                let challenge_state = twilio_client.send_challenge(&state, e164_phone_number).await?;
                 (
                     ChallengeKind::Sms,
                     IdentifyChallengeData::Sms(challenge_state),
@@ -114,9 +111,7 @@ pub async fn handler(
         }
         ChallengeKind::Sms => {
             // Fall back to SMS if the user requested webauthn but doesn't have any creds
-            let challenge_state = twilio_client
-                .send_challenge(&state, e164_phone_number)
-                .await?;
+            let challenge_state = twilio_client.send_challenge(&state, e164_phone_number).await?;
             (
                 ChallengeKind::Sms,
                 IdentifyChallengeData::Sms(challenge_state),
@@ -164,7 +159,7 @@ async fn get_user_by_identifier(
             (DataKind::Email, email)
         }
     };
-    let sh_data = signed_hash(state, data).await?;
+    let sh_data = state.compute_fingerprint(data_kind, &data).await?;
     // TODO should we only look for verified emails?
     let existing_user = db::user_vault::get_by_fingerprint(&state.db_pool, data_kind, sh_data, false)
         .await?

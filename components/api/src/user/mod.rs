@@ -6,7 +6,7 @@ use crate::{
 use crypto::seal::EciesP256Sha256AesGcmSealed;
 use db::models::user_vaults::UserVault;
 use enclave_proxy::{DataTransform, DecryptRequest};
-use newtypes::DataKind;
+use newtypes::{DataKind, SealedVaultBytes};
 use paperclip::actix::web;
 use std::collections::HashMap;
 
@@ -56,7 +56,7 @@ pub async fn decrypt<C: HasVaultPermission>(
         Err(AuthError::UnauthorizedOperation)?
     }
     // Filter out fields that don't have values set on the user vault
-    let (fields_to_decrypt, values_to_decrypt): (Vec<DataKind>, Vec<Vec<u8>>) =
+    let (fields_to_decrypt, values_to_decrypt): (Vec<DataKind>, Vec<SealedVaultBytes>) =
         db::user_data::filter(&state.db_pool, user_vault.id.clone(), data_kinds.clone())
             .await?
             .into_iter()
@@ -68,12 +68,12 @@ pub async fn decrypt<C: HasVaultPermission>(
         .into_iter()
         .map(|sealed_data| {
             Ok(DecryptRequest {
-                sealed_data: EciesP256Sha256AesGcmSealed::from_bytes(&sealed_data)?,
+                sealed_data: EciesP256Sha256AesGcmSealed::from_bytes(sealed_data.as_ref())?,
                 transform: DataTransform::Identity,
             })
         })
         .collect::<Result<Vec<DecryptRequest>, crypto::Error>>()?;
-    let decrypt_response = crate::enclave::decrypt(state, requests, user_vault.e_private_key.clone()).await?;
+    let decrypt_response = crate::enclave::decrypt(state, requests, &user_vault.e_private_key).await?;
     if decrypt_response.len() != fields_to_decrypt.len() {
         return Err(ApiError::InvalidEnclaveDecryptResponse);
     }

@@ -6,7 +6,7 @@ use crate::schema;
 use crate::{errors::DbError, models::user_data::UserData};
 use deadpool_diesel::postgres::Pool;
 use diesel::prelude::*;
-use newtypes::{DataKind, DataPriority, FootprintUserId, TenantId, UserVaultId};
+use newtypes::{DataKind, DataPriority, Fingerprint, FootprintUserId, TenantId, UserVaultId};
 
 pub async fn create(pool: &Pool, new_user: NewUserVaultReq) -> Result<UserVault, crate::DbError> {
     let user_vault = pool
@@ -76,7 +76,7 @@ pub async fn get_by_fingerprint_and_uv_id(
     pool: &Pool,
     data_kind: DataKind,
     uv_id: UserVaultId,
-    sh_data: Vec<u8>,
+    sh_data: Fingerprint,
     require_verified: bool,
 ) -> Result<Option<(UserVault, UserData)>, DbError> {
     let result = pool
@@ -103,7 +103,7 @@ pub async fn get_by_fingerprint_and_uv_id(
 pub async fn get_by_fingerprint(
     pool: &Pool,
     data_kind: DataKind,
-    sh_data: Vec<u8>,
+    sh_data: Fingerprint,
     require_verified: bool,
 ) -> Result<Option<(UserVault, UserData)>, DbError> {
     let result = pool

@@ -6,6 +6,7 @@ use crypto::seal::EciesP256Sha256AesGcmSealed;
 use enclave_proxy::{
     DataTransform, DecryptRequest, EnvelopeDecrypt, FnDecryption, KmsCredentials, RpcPayload,
 };
+use newtypes::{EncryptedVaultPrivateKey, SealedVaultBytes};
 
 pub async fn gen_keypair(state: &actix_web::web::Data<State>) -> Result<(Vec<u8>, Vec<u8>), ApiError> {
     let new_key_pair = state
@@ -28,11 +29,11 @@ pub async fn gen_keypair(state: &actix_web::web::Data<State>) -> Result<(Vec<u8>
 
 pub async fn decrypt_bytes(
     state: &actix_web::web::Data<State>,
-    sealed_data: &[u8],
-    sealed_key: Vec<u8>,
+    sealed_data: &SealedVaultBytes,
+    sealed_key: &EncryptedVaultPrivateKey,
     transform: DataTransform,
 ) -> Result<String, ApiError> {
-    let sealed_data = EciesP256Sha256AesGcmSealed::from_bytes(sealed_data)?;
+    let sealed_data = EciesP256Sha256AesGcmSealed::from_bytes(sealed_data.as_ref())?;
     let requests = vec![DecryptRequest {
         sealed_data,
         transform,
@@ -47,7 +48,7 @@ pub async fn decrypt_bytes(
 pub async fn decrypt(
     state: &actix_web::web::Data<State>,
     requests: Vec<DecryptRequest>,
-    sealed_key: Vec<u8>,
+    sealed_key: &EncryptedVaultPrivateKey,
 ) -> Result<Vec<String>, ApiError> {
     let mut conn = state.enclave_connection_pool.get().await?;
 
@@ -58,7 +59,7 @@ pub async fn decrypt(
             secret_key: state.config.enclave_aws_secret_access_key.clone(),
             session_token: None,
         },
-        sealed_key,
+        sealed_key: sealed_key.0.clone(),
         requests,
     }));
     tracing::info!("sending request");
