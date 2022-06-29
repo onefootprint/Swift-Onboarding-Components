@@ -3,6 +3,7 @@ pub use derive_more::{Add, Display, From, FromStr, Into};
 use paperclip::actix::Apiv2Schema;
 use serde::{Deserialize, Deserializer, Serialize};
 use std::fmt::{Debug, Display};
+use std::marker::PhantomData;
 use std::str::FromStr;
 
 #[doc = "Phone number -- must be between 7-15 digits per e164 standard and include a country code"]
@@ -10,6 +11,62 @@ use std::str::FromStr;
 #[serde(transparent)]
 /// Phone number string. Must be valid e164 length and include a country code
 pub struct PhoneNumber(String);
+
+#[derive(Clone, serde::Serialize, serde::Deserialize)]
+/// Validated phone number string. Only output from the twilio client
+pub struct ValidatedPhoneNumber {
+    pub e164: String,
+    phantom: PhantomData<()>,
+}
+
+impl Debug for ValidatedPhoneNumber {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let skip = self.e164.len() - 2;
+
+        let out = format!(
+            "{}{}",
+            "*".repeat(skip),
+            self.e164.chars().skip(skip).collect::<String>()
+        );
+        std::fmt::Display::fmt(&out, f)
+    }
+}
+
+impl AsRef<[u8]> for ValidatedPhoneNumber {
+    fn as_ref(&self) -> &[u8] {
+        self.e164.as_bytes()
+    }
+}
+
+impl AsRef<str> for ValidatedPhoneNumber {
+    fn as_ref(&self) -> &str {
+        self.e164.as_str()
+    }
+}
+
+impl ValidatedPhoneNumber {
+    /// escape hatch for constructing a known validated phone number
+    pub fn __build_from_vault(e164: String) -> Self {
+        Self {
+            e164,
+            phantom: PhantomData,
+        }
+    }
+
+    /// should only be called from the twilio client
+    pub fn __build_from_twilio(e164: String) -> Self {
+        Self {
+            e164,
+            phantom: PhantomData,
+        }
+    }
+}
+
+impl LeakToString for ValidatedPhoneNumber {
+    fn leak_to_string(self) -> String {
+        self.e164
+    }
+}
 
 impl LeakToString for PhoneNumber {
     fn leak_to_string(self) -> String {

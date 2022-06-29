@@ -1,25 +1,33 @@
+use newtypes::ValidatedPhoneNumber;
+
+use self::client::IdologyApiError;
+
 pub mod client;
 mod conversion;
 
 #[derive(Debug, thiserror::Error)]
-pub enum SocureError {
+pub enum IdologyError {
     #[error("socure type conversion error: {0}")]
-    ConversionEror(#[from] SocureConversionError),
+    ConversionEror(#[from] IdologyConversionError),
     #[error("internal reqwest error: {0}")]
-    InernalReqwestError(#[from] SocureReqwestError),
+    InernalReqwestError(#[from] IdologyReqwestError),
     // TODO: don't show this
-    #[error("error from socure api: {0}")]
-    SocureErrorResponse(String),
+    #[error("error from idology api: {0}")]
+    IdologyErrorResponse(IdologyApiError),
 }
 
 #[derive(Debug, thiserror::Error)]
-pub enum SocureConversionError {
+pub enum IdologyConversionError {
     #[error("zip code is unsupported length for socure API validation")]
     UnsupportedZipFormat,
+    #[error("phone number must be 10 digits")]
+    UnsupportedPhoneNumber(ValidatedPhoneNumber),
+    #[error("unsupported country, country must be US")]
+    UnsupportedCountry(String),
 }
 
 #[derive(Debug, thiserror::Error)]
-pub enum SocureReqwestError {
+pub enum IdologyReqwestError {
     #[error("error building reqwest client: {0}")]
     InternalError(#[from] reqwest::Error),
     #[error("error setting api headers: {0}")]

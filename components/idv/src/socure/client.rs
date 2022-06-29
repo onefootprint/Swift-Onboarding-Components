@@ -1,16 +1,14 @@
-use chrono::{naive::NaiveDateTime, Utc};
-use newtypes::{
-    address::Address, dob::ValidatedDob, email::Email, name::Name, ssn::Ssn, LeakToString, PhoneNumber,
-};
+use newtypes::IdentifyRequest;
 use reqwest::header;
+use std::fmt::Debug;
 
-use crate::ReqwestError;
-
-use super::conversion::SocureAddress;
+use crate::socure::conversion::SocureRequest;
+use crate::SocureReqwestError;
 
 #[derive(Clone)]
 pub struct SocureClient {
     client: reqwest::Client,
+    url: String,
 }
 
 impl std::fmt::Debug for SocureClient {
@@ -24,26 +22,6 @@ impl std::fmt::Debug for SocureClient {
 enum SocureResponse<T> {
     Success(T),
     Error(SocureError),
-}
-
-#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
-#[serde(rename_all = "camelCase")]
-struct SocureRequest {
-    modules: Vec<String>,
-    first_name: String,
-    sur_name: String,
-    dob: String, // YYYY-MM-DD
-    national_id: String,
-    email: String,
-    mobile_number: String, // e164 format
-    physical_address: String,
-    physical_address_2: Option<String>,
-    city: String,
-    state: String,
-    zip: String,
-    country: String,
-    user_consent: bool,
-    consent_timestamp: NaiveDateTime,
 }
 
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
@@ -74,20 +52,10 @@ struct ValidationStruct {
     ssn: f32,
 }
 
-pub struct IdentifyRequest {
-    first_name: Name,
-    last_name: Name,
-    address: Address,
-    phone: PhoneNumber,
-    dob: ValidatedDob,
-    email: Email,
-    ssn: Ssn,
-}
-
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 struct SocureError {
-    status: String,
+    status: Option<String>,
     reference_id: String,
     data: Option<SocureErrorMetadata>,
     msg: String,
@@ -100,7 +68,12 @@ struct SocureErrorMetadata {
 }
 
 impl SocureClient {
-    pub fn new(sdk_key: String) -> Result<Self, crate::ReqwestError> {
+    pub fn new(sdk_key: String, sandbox: bool) -> Result<Self, crate::SocureReqwestError> {
+        let url = if sandbox {
+            "https://sandbox.socure.com/api/3.0/EmailAuthScore"
+        } else {
+            "https://socure.com/api/3.0/EmailAuthScore"
+        };
         let mut headers = header::HeaderMap::new();
         let header_val = format!("SocureApiKey {}", sdk_key);
         headers.insert(
@@ -113,7 +86,10 @@ impl SocureClient {
         );
 
         let client = reqwest::Client::builder().default_headers(headers).build()?;
-        Ok(Self { client })
+        Ok(Self {
+            client,
+            url: url.to_string(),
+        })
     }
 
     /// Uses the kyc socure module which contains built-in support for the social security adm.'s
@@ -122,62 +98,25 @@ impl SocureClient {
         self,
         identify_request: IdentifyRequest,
     ) -> Result<SocureKycResponse, crate::SocureError> {
-        let IdentifyRequest {
-            first_name,
-            last_name,
-            address,
-            ssn,
-            email,
-            phone,
-            dob,
-        } = identify_request;
-
-        let SocureAddress {
-            physical_address,
-            physical_address_2,
-            city,
-            state,
-            zip,
-            country,
-        } = SocureAddress::try_from(address)?;
-
-        let req = SocureRequest {
-            modules: vec!["kyc".to_string()],
-            first_name: first_name.leak_to_string(),
-            sur_name: last_name.leak_to_string(),
-            dob: dob.leak_to_string(),
-            national_id: ssn.leak_to_string(),
-            email: email.leak_to_string(),
-            mobile_number: phone.leak_to_string(),
-            physical_address,
-            physical_address_2,
-            city,
-            state,
-            zip,
-            country,
-            user_consent: true,
-            consent_timestamp: Utc::now().naive_utc(),
-        };
+        let req = SocureRequest::try_from((identify_request, vec!["kyc".to_string()]))?;
 
         let response = self
             .client
-            .post("https://sandbox.socure.com/api/3.0/EmailAuthScore")
+            .post(self.url)
             .json(&req)
             .send()
             .await
-            .map_err(|err| crate::ReqwestError::ReqwestSendError(err.to_string()))?;
+            .map_err(|err| crate::SocureReqwestError::ReqwestSendError(err.to_string()))?;
 
         let socure_response: SocureResponse<SocureKycResponse> = response
             .json::<SocureResponse<SocureKycResponse>>()
             .await
-            .map_err(ReqwestError::InternalError)?;
+            .map_err(SocureReqwestError::InternalError)?;
 
         match socure_response {
             SocureResponse::Success(kyc_response) => Ok(kyc_response),
             SocureResponse::Error(err) => Err(crate::SocureError::SocureErrorResponse(err.msg)),
         }
-
-        // Err(crate::SocureError::SocureErrorResponse("beep".to_string()))
     }
 }
 
@@ -190,17 +129,22 @@ mod tests {
     use dotenv;
     use newtypes::address::*;
     use newtypes::dob::*;
+    use newtypes::email::Email;
+    use newtypes::name::Name;
+    use newtypes::phone_number::*;
+    use newtypes::ssn::Ssn;
 
     #[actix_rt::test]
     #[ignore]
     async fn test_client() {
         let key = "SOCURE_API_KEY";
         let sdk_key = dotenv::var(key).unwrap();
-        let socure_client = SocureClient::new(sdk_key).unwrap();
+        let socure_client = SocureClient::new(sdk_key, true).unwrap();
 
         let first_name: Name = Name::from_str("John").unwrap();
         let last_name: Name = Name::from_str("Smith").unwrap();
-        let phone: PhoneNumber = PhoneNumber::from_str("+13471235555").unwrap();
+        let phone: ValidatedPhoneNumber =
+            ValidatedPhoneNumber::__build_from_vault("+13471235555".to_string());
         let street_address: StreetAddress = StreetAddress::try_from("123 wallaby way".to_string()).unwrap();
         let street_address_2: Option<StreetAddress> = None;
         let city: City = City::try_from("sydney".to_string()).unwrap();

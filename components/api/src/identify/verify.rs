@@ -7,14 +7,14 @@ use crate::identify::{IdentifyChallengeData, IdentifyChallengeState, IdentifyTyp
 use crate::types::success::ApiResponseData;
 use crate::utils::challenge::{Challenge, ChallengeToken};
 use crate::utils::liveness::LivenessWebauthnConfig;
-use crate::utils::twilio::ValidatedPhoneNumber;
 use crate::State;
 use aws_sdk_kms::model::DataKeyPairSpec;
 use chrono::Duration;
 use crypto::sha256;
 use db::models::user_vaults::{NewUserVaultReq, UserVault};
 use newtypes::{
-    DataKind, EncryptedVaultPrivateKey, Fingerprinter, SessionAuthToken, Status, UserVaultId, VaultPublicKey,
+    DataKind, EncryptedVaultPrivateKey, Fingerprinter, SessionAuthToken, Status, UserVaultId,
+    ValidatedPhoneNumber, VaultPublicKey,
 };
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 

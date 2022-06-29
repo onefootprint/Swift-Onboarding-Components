@@ -32,6 +32,7 @@ pub struct Month(u32);
 pub struct Year(i32);
 
 // output struct for validated Dob that actually exists (e.g. Sept 31st is not a real date)
+#[derive(Clone)]
 pub struct ValidatedDob {
     day: Day,
     month: Month,

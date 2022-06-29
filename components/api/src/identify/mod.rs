@@ -3,11 +3,9 @@ pub mod challenge;
 pub mod identify;
 pub mod verify;
 use chrono::{Duration, Utc};
-use newtypes::UserVaultId;
+use newtypes::{UserVaultId, ValidatedPhoneNumber};
 use paperclip::actix::{web, Apiv2Schema};
 use webauthn_rs_core::proto::AuthenticationState;
-
-use crate::utils::twilio::ValidatedPhoneNumber;
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
 #[serde(rename_all = "snake_case")]

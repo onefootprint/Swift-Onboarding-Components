@@ -1,5 +1,3 @@
-use std::{borrow::Cow, time::Duration};
-
 use actix_web::{middleware::Logger, App, HttpServer};
 use config::Config;
 use crypto::aead::ScopedSealingKey;
@@ -9,6 +7,7 @@ use enclave_proxy::{
     pool, StreamManager,
 };
 use signed_hash::SignedHashClient;
+use std::{borrow::Cow, time::Duration};
 use telemetry::TelemetrySpanBuilder;
 use tracing_actix_web::TracingLogger;
 use utils::email::SendgridClient;

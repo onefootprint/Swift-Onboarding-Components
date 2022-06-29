@@ -1,52 +1,14 @@
-use std::{fmt::Debug, marker::PhantomData};
+use std::fmt::Debug;
 
 use crate::{errors::ApiError, identify::PhoneChallengeState, State};
 use chrono::{Duration, Utc};
 use crypto::sha256;
-use newtypes::{Base64Data, LeakToString, PhoneNumber, SealedSessionBytes, SessionAuthToken};
+use newtypes::{
+    Base64Data, LeakToString, PhoneNumber, SealedSessionBytes, SessionAuthToken, ValidatedPhoneNumber,
+};
 
 use self::rate_limit::RateLimitRecord;
 
-#[derive(Clone, serde::Serialize, serde::Deserialize)]
-pub struct ValidatedPhoneNumber {
-    pub e164: String,
-    phantom: PhantomData<()>,
-}
-
-impl Debug for ValidatedPhoneNumber {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let skip = self.e164.len() - 2;
-
-        let out = format!(
-            "{}{}",
-            "*".repeat(skip),
-            self.e164.chars().skip(skip).collect::<String>()
-        );
-        out.fmt(f)
-    }
-}
-
-impl AsRef<[u8]> for ValidatedPhoneNumber {
-    fn as_ref(&self) -> &[u8] {
-        self.e164.as_bytes()
-    }
-}
-
-impl AsRef<str> for ValidatedPhoneNumber {
-    fn as_ref(&self) -> &str {
-        self.e164.as_str()
-    }
-}
-
-impl ValidatedPhoneNumber {
-    /// escape hatch for constructing a known validated phone number
-    pub fn unvalidated(e164: String) -> Self {
-        Self {
-            e164,
-            phantom: PhantomData,
-        }
-    }
-}
 #[derive(Clone)]
 pub struct TwilioClient {
     pub account_sid: String,
@@ -178,10 +140,7 @@ impl TwilioClient {
             TwilioResponse::Error(e) => Err(ApiError::TwilioError(e.message)),
         }?;
 
-        Ok(ValidatedPhoneNumber {
-            e164,
-            phantom: PhantomData,
-        })
+        Ok(ValidatedPhoneNumber::__build_from_twilio(e164))
     }
 
     async fn send_message(

@@ -1,52 +1,71 @@
+use chrono::{naive::NaiveDateTime, Utc};
 use newtypes::address::Address;
 use newtypes::LeakToString;
+use newtypes::*;
 use std::fmt::Debug;
 use std::fmt::Display;
 
-#[derive(Eq, PartialEq, serde::Deserialize, serde::Serialize)]
+#[derive(Clone, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
-pub struct SocureAddress {
-    pub physical_address: String,
-    pub physical_address_2: Option<String>,
-    pub city: String,
-    // The state, province, or region where the consumer resides, specified in ISO 3166-2 format.
-    pub state: String,
-    // The consumer's five or nine digit ZIP code in valid postal address format. Hyphens are optional.
-    pub zip: String,
-    // The country where the consumer resides, specified in ISO 3166-1 alpha-2 format.
-    pub country: String,
+pub(crate) struct SocureRequest {
+    modules: Vec<String>,
+    first_name: String,
+    sur_name: String,
+    /// YYYY-MM-DD
+    dob: String,
+    national_id: String,
+    email: String,
+    /// e164 format, from twilio
+    mobile_number: String,
+    physical_address: String,
+    physical_address_2: Option<String>,
+    city: String,
+    state: String,
+    zip: String,
+    country: String,
+    user_consent: bool,
+    consent_timestamp: NaiveDateTime,
 }
 
-impl Debug for SocureAddress {
+impl Debug for SocureRequest {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.debug_struct("SocureAddress")
-            .field("physicalAddress", &"<redacted>")
-            .field("physicalAddress2", &"<redacted>")
-            .field("city", &"<redacted>")
-            .field("state", &"<redacted>")
-            .field("zip", &"<redacted>")
+        f.debug_struct("SocureRequest")
+            .field("modules", &self.modules)
             .field("country", &self.country)
+            .field("consent_timestamp", &self.consent_timestamp)
+            .field("...", &"..all identity information redacted".to_string())
             .finish()
     }
 }
 
-impl Display for SocureAddress {
+impl Display for SocureRequest {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.debug_struct("SocureAddress")
-            .field("physicalAddress", &"<redacted>")
-            .field("physicalAddress2", &"<redacted>")
-            .field("city", &"<redacted>")
-            .field("state", &"<redacted>")
-            .field("zip", &"<redacted>")
+        f.debug_struct("SocureRequest")
+            .field("modules", &self.modules)
             .field("country", &self.country)
+            .field("consent_timestamp", &self.consent_timestamp)
+            .field("...", &"..all identity information redacted".to_string())
             .finish()
     }
 }
 
-impl TryFrom<Address> for SocureAddress {
+/// identify request and vec of modules we want to use
+impl TryFrom<(IdentifyRequest, Vec<String>)> for SocureRequest {
     type Error = crate::SocureError;
 
-    fn try_from(value: Address) -> Result<Self, Self::Error> {
+    fn try_from(value: (IdentifyRequest, Vec<String>)) -> Result<Self, Self::Error> {
+        let (value, modules) = value;
+
+        let IdentifyRequest {
+            first_name,
+            last_name,
+            dob,
+            ssn,
+            email,
+            phone,
+            address,
+        } = value;
+
         let Address {
             street_address,
             street_address_2,
@@ -54,7 +73,7 @@ impl TryFrom<Address> for SocureAddress {
             state,
             zip,
             country,
-        } = value;
+        } = address;
 
         // per socure API, zip code must either be 5 or 9 digits. hyphens
         // are optional, but it can't contain spaces (which we allow)
@@ -64,8 +83,14 @@ impl TryFrom<Address> for SocureAddress {
         if numeric_zip.len() != 9 && numeric_zip.len() != 5 {
             return Err(crate::SocureConversionError::UnsupportedZipFormat.into());
         }
-
         Ok(Self {
+            modules,
+            first_name: first_name.leak_to_string(),
+            sur_name: last_name.leak_to_string(),
+            dob: dob.leak_to_string(),
+            national_id: ssn.leak_to_string(),
+            email: email.leak_to_string(),
+            mobile_number: phone.leak_to_string(),
             // no restrictions on physical address
             physical_address: street_address.leak_to_string(),
             physical_address_2: street_address_2.map(|val| val.leak_to_string()),
@@ -76,6 +101,8 @@ impl TryFrom<Address> for SocureAddress {
             zip: numeric_zip,
             // country is already 2 digit country code
             country: country.leak_to_string(),
+            user_consent: true,
+            consent_timestamp: Utc::now().naive_utc(),
         })
     }
 }

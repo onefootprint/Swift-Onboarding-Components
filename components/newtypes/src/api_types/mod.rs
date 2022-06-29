@@ -1,3 +1,7 @@
+use crate::ValidatedPhoneNumber;
+
+use self::{address::Address, dob::ValidatedDob, email::Email, name::Name, ssn::Ssn};
+
 pub mod address;
 pub mod dob;
 pub mod email;
@@ -10,4 +14,14 @@ pub mod ssn;
 /// external vendors
 pub trait LeakToString {
     fn leak_to_string(self) -> String;
+}
+
+pub struct IdentifyRequest {
+    pub first_name: Name,
+    pub last_name: Name,
+    pub address: Address,
+    pub phone: ValidatedPhoneNumber,
+    pub dob: ValidatedDob,
+    pub email: Email,
+    pub ssn: Ssn,
 }
