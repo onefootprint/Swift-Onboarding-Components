@@ -51,7 +51,7 @@ const Root = () => (
     </Typography>
     <div
       id="footprint-button"
-      data-public-key="ob_config_pk_uptJs0OJU9lhSSKhQ7OSEH"
+      data-public-key="ob_config_pk_RKInhrtMXqn5T9AQKQxCaQ"
     />
   </Inner>
 );
