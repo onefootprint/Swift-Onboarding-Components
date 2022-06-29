@@ -1,16 +1,17 @@
+use super::util::derive_diesel_text_enum;
 use crate::SaltedFingerprint;
 use crypto::sha256;
 pub use derive_more::Display;
-use diesel_derive_enum::DbEnum;
+use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use paperclip::actix::Apiv2Schema;
 use serde::{Deserialize, Serialize};
+use std::str::FromStr;
 use strum::IntoEnumIterator;
-use strum_macros::EnumIter;
+use strum_macros::{EnumIter, EnumString};
 
 /// The type of data attribute
 #[derive(
     Debug,
-    DbEnum,
     Eq,
     PartialEq,
     Ord,
@@ -23,11 +24,13 @@ use strum_macros::EnumIter;
     Serialize,
     Apiv2Schema,
     EnumIter,
+    AsExpression,
+    FromSqlRow,
+    EnumString,
 )]
+#[strum(serialize_all = "PascalCase")]
 #[serde(rename_all = "snake_case")]
-#[PgType = "data_kind"]
-#[DieselType = "Data_kind"]
-#[DbValueStyle = "verbatim"]
+#[sql_type = "Text"]
 pub enum DataKind {
     FirstName,
     LastName,
@@ -43,6 +46,8 @@ pub enum DataKind {
     PhoneNumber,
     LastFourSsn,
 }
+
+derive_diesel_text_enum! { DataKind }
 
 impl DataKind {
     /// Returns true if a user vault is allowed to have more than one active piece of data for this

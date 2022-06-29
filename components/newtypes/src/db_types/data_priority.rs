@@ -1,12 +1,14 @@
+use super::util::derive_diesel_text_enum;
+use std::str::FromStr;
 pub use derive_more::Display;
-use diesel_derive_enum::DbEnum;
+use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use paperclip::actix::Apiv2Schema;
 use serde::{Deserialize, Serialize};
+use strum_macros::EnumString;
 
 /// The type of data attribute
 #[derive(
     Debug,
-    DbEnum,
     Eq,
     PartialEq,
     Ord,
@@ -18,12 +20,16 @@ use serde::{Deserialize, Serialize};
     Deserialize,
     Serialize,
     Apiv2Schema,
+    AsExpression,
+    FromSqlRow,
+    EnumString,
 )]
+#[strum(serialize_all = "PascalCase")]
 #[serde(rename_all = "snake_case")]
-#[PgType = "data_priority"]
-#[DieselType = "Data_priority"]
-#[DbValueStyle = "verbatim"]
+#[sql_type = "Text"]
 pub enum DataPriority {
     Primary,
     Secondary,
 }
+
+derive_diesel_text_enum! { DataPriority }

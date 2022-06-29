@@ -11,7 +11,7 @@ table! {
         insight_event_id -> Uuid,
         reason -> Varchar,
         principal -> Nullable<Varchar>,
-        data_kinds -> Array<Data_kind>,
+        data_kinds -> Array<Text>,
         ordering_id -> Int8,
     }
 }
@@ -49,7 +49,7 @@ table! {
         tenant_id -> Varchar,
         created_at -> Timestamp,
         updated_at -> Timestamp,
-        required_user_data -> Array<Data_kind>,
+        required_user_data -> Array<Text>,
         settings -> Jsonb,
         is_disabled -> Bool,
     }
@@ -65,7 +65,7 @@ table! {
         user_vault_id -> Varchar,
         ob_config_id -> Varchar,
         tenant_id -> Varchar,
-        status -> User_status,
+        status -> Text,
         created_at -> Timestamp,
         updated_at -> Timestamp,
         insight_event_id -> Uuid,
@@ -126,11 +126,11 @@ table! {
     user_data (id) {
         id -> Varchar,
         user_vault_id -> Varchar,
-        data_kind -> Data_kind,
+        data_kind -> Text,
         e_data -> Bytea,
         sh_data -> Nullable<Bytea>,
         is_verified -> Bool,
-        data_priority -> Data_priority,
+        data_priority -> Text,
         deactivated_at -> Nullable<Timestamp>,
         created_at -> Timestamp,
         updated_at -> Timestamp,
@@ -145,7 +145,7 @@ table! {
         id -> Varchar,
         e_private_key -> Bytea,
         public_key -> Bytea,
-        id_verified -> User_status,
+        id_verified -> Text,
         created_at -> Timestamp,
         updated_at -> Timestamp,
     }
@@ -165,7 +165,7 @@ table! {
         created_at -> Timestamp,
         updated_at -> Timestamp,
         backup_eligible -> Bool,
-        attestation_type -> Attestation_type,
+        attestation_type -> Text,
         insight_event_id -> Uuid,
     }
 }

@@ -6,9 +6,9 @@ use chrono::Utc;
 use diesel::dsl::{any, sql};
 use diesel::prelude::*;
 use diesel::sql_types::Array;
+use diesel::sql_types::Text;
 use itertools::Itertools;
 use newtypes::DataKind;
-use newtypes::Data_kind;
 use newtypes::{UserDataId, UserVaultId};
 use std::collections::HashMap;
 
@@ -82,7 +82,7 @@ pub fn bulk_fetch_populated_kinds(
     let results: Vec<(UserVaultId, Vec<DataKind>)> = user_data::table
         .select((
             user_data::user_vault_id,
-            sql::<Array<Data_kind>>("array_agg(data_kind)"),
+            sql::<Array<Text>>("array_agg(data_kind)"),
         ))
         .filter(user_data::user_vault_id.eq(any(user_vault_ids)))
         .filter(user_data::deactivated_at.is_null())

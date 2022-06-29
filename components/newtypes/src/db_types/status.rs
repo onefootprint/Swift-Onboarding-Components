@@ -1,15 +1,31 @@
-use diesel_derive_enum::DbEnum;
+use super::util::derive_diesel_text_enum;
+pub use derive_more::Display;
+use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use paperclip::actix::Apiv2Schema;
 use serde::{Deserialize, Serialize};
+use std::str::FromStr;
+use strum_macros::EnumString;
 
 /// Determines what integration the app has.
 ///
 /// Custom indicates that there is no other integration.
-#[derive(Debug, DbEnum, Clone, Copy, Deserialize, Serialize, Apiv2Schema, PartialEq, Eq)]
+#[derive(
+    Debug,
+    Display,
+    Clone,
+    Copy,
+    Deserialize,
+    Serialize,
+    Apiv2Schema,
+    PartialEq,
+    Eq,
+    AsExpression,
+    FromSqlRow,
+    EnumString,
+)]
 #[serde(rename_all = "snake_case")]
-#[PgType = "user_status"]
-#[DieselType = "User_status"]
-#[DbValueStyle = "verbatim"]
+#[strum(serialize_all = "PascalCase")]
+#[sql_type = "Text"]
 pub enum Status {
     Verified,
     Processing,
@@ -17,6 +33,8 @@ pub enum Status {
     ManualReview,
     Failed,
 }
+
+derive_diesel_text_enum! { Status }
 
 impl Default for Status {
     fn default() -> Self {
