@@ -9,19 +9,19 @@ import {
 export enum States {
   init = 'Init',
 
-  // tenant
+  // Misc
   tenantInvalid = 'tenantInvalid',
+  confirmation = 'confirmation',
 
   // Identify
   emailIdentification = 'emailIdentification',
-  confirmation = 'confirmation',
   verificationSuccess = 'verificationSuccess',
-  phoneRegistration = 'phoneRegistration', // Email not associated with an existing user, asking for phone
+  phoneIdentification = 'phoneIdentification',
 
   // Challenge
   qrLogin = 'qrLogin',
   biometricLoginRetry = 'biometricLoginRetry',
-  phoneVerification = 'phoneVerification', // Existing user phone gets pin code
+  phoneVerification = 'phoneVerification',
   livenessRegister = 'livenessRegister',
   livenessRegisterSucceeded = 'livenessRegisterSucceeded',
 

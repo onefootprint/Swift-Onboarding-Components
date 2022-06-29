@@ -68,7 +68,7 @@ const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
           },
           [Events.userNotIdentified]: {
             description: "Didn't find an account associated with this email",
-            target: States.phoneRegistration,
+            target: States.phoneIdentification,
             actions: [
               Actions.assignEmail,
               Actions.assignPhone,
@@ -146,7 +146,7 @@ const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
           },
         },
       },
-      [States.phoneRegistration]: {
+      [States.phoneIdentification]: {
         on: {
           [Events.emailChangeRequested]: {
             target: States.emailIdentification,
@@ -168,7 +168,7 @@ const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
         on: {
           [Events.navigatedToPrevPage]: [
             {
-              target: States.phoneRegistration,
+              target: States.phoneIdentification,
               cond: context => !context.userFound || !!context.phone,
             },
             {

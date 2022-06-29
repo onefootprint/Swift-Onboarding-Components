@@ -1,3 +1,4 @@
+import { useTranslation } from 'hooks';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { UserData, UserDataAttribute } from 'src/utils/state-machine/types';
@@ -10,6 +11,7 @@ import useEmailIdentify from './hooks/use-email-identify';
 type FormData = Required<Pick<UserData, UserDataAttribute.email>>;
 
 const EmailIdentification = () => {
+  const { t } = useTranslation('pages.email-identification');
   const { identifyEmail, isLoading } = useEmailIdentify();
 
   const {
@@ -25,15 +27,13 @@ const EmailIdentification = () => {
 
   return (
     <Form onSubmit={handleSubmit(onSubmit)}>
-      <HeaderTitle
-        title="Hey there! 👋"
-        subtitle="Enter your email to get started."
-      />
+      <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
       <TextInput
+        autoFocus
         hasError={!!errors.email}
-        hintText={errors.email && 'Email is required'}
-        label="Email"
-        placeholder="your.email@email.com"
+        hintText={errors.email && t('form.email.error')}
+        label={t('form.email.label')}
+        placeholder={t('form.email.placeholder')}
         type="email"
         {...register('email', { required: true })}
       />

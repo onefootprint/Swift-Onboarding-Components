@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 
 import Box from '../box';
 import LinkButton from '../link-button';
+import LoadingIndicator from '../loading-indicator';
 import Typography from '../typography';
 import PinInput, { PinInputProps } from './pin-input';
 
@@ -29,18 +30,12 @@ export default {
       control: 'text',
       description: 'Append an attribute data-testid for testing purposes',
     },
-    loading: {
-      control: 'boolean',
-      description: 'Append an attribute data-testid for testing purposes',
-    },
   },
 } as ComponentMeta<typeof PinInput>;
 
 const Template: Story<PinInputProps> = ({
   hasError: baseHasError = false,
   hintText: baseHintText,
-  loading: baseLoading = false,
-  loadingTestID,
   onComplete,
   testID,
 }: PinInputProps) => {
@@ -82,14 +77,16 @@ const Template: Story<PinInputProps> = ({
         </Typography>
       </Box>
       <Box sx={{ marginBottom: 8 }}>
-        <PinInput
-          hasError={baseHasError || hasError}
-          hintText={baseHintText || hintText}
-          loading={baseLoading || loading}
-          loadingTestID={loadingTestID}
-          onComplete={handleComplete}
-          testID={testID}
-        />
+        {loading ? (
+          <LoadingIndicator />
+        ) : (
+          <PinInput
+            hasError={baseHasError || hasError}
+            hintText={baseHintText || hintText}
+            onComplete={handleComplete}
+            testID={testID}
+          />
+        )}
       </Box>
       <Box>
         <LinkButton size="compact">Resend code</LinkButton>
@@ -101,8 +98,6 @@ const Template: Story<PinInputProps> = ({
 export const Base = Template.bind({});
 Base.args = {
   hasError: false,
-  loading: false,
-  loadingTestID: '',
   hintText: '',
   onComplete: console.log,
   testID: 'pin-input-test-id',
@@ -112,11 +107,5 @@ export const WithError = Template.bind({});
 WithError.args = {
   hasError: true,
   hintText: 'Incorrect verification code',
-  onComplete: console.log,
-};
-
-export const WithLoading = Template.bind({});
-WithLoading.args = {
-  loading: true,
   onComplete: console.log,
 };

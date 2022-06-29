@@ -4,10 +4,10 @@ import useBifrostMachine from 'src/hooks/use-bifrost-machine';
 import styled, { css } from 'styled-components';
 import { Box, Typography } from 'ui';
 
-import Loading from './components/loading';
-import PinForm from './components/pin-form';
+import PhoneVerificationLoading from './components/phone-verification-loading';
+import PhoneVerificationPinForm from './components/phone-verification-pin-form';
+import PhoneVerificationSuccess from './components/phone-verification-success';
 import PrevHeader from './components/prev-header';
-import Success from './components/success';
 import useOnboarding from './hooks/use-onboarding';
 
 const PhoneVerification = () => {
@@ -38,13 +38,13 @@ const PhoneVerification = () => {
           </Typography>
         </Box>
         {shouldShowForm && (
-          <PinForm
+          <PhoneVerificationPinForm
             verifyMutation={verifyMutation}
             onboardingMutation={onboardingMutation}
           />
         )}
-        {shouldShowLoading && <Loading />}
-        {shouldShowSuccess && <Success />}
+        {shouldShowLoading && <PhoneVerificationLoading />}
+        {shouldShowSuccess && <PhoneVerificationSuccess />}
       </Form>
     </>
   );

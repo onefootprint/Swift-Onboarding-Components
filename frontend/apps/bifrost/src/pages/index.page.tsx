@@ -10,7 +10,7 @@ import BiometricLoginRetry from './liveness-login/biometric-login-retry';
 import QRLogin from './liveness-login/qr-login';
 import Onboarding from './onboarding';
 import OnboardingSuccess from './onboarding-success/onboarding-success';
-import PhoneRegistration from './phone-registration';
+import PhoneIdentification from './phone-identification';
 import PhoneVerification from './phone-verification';
 import TenantInvalid from './tenant-invalid';
 import VerificationSuccess from './verification-success';
@@ -29,7 +29,7 @@ const Root = () => {
     [States.emailIdentification]: EmailIdentification,
     [States.confirmation]: Confirmation,
     [States.verificationSuccess]: VerificationSuccess,
-    [States.phoneRegistration]: PhoneRegistration,
+    [States.phoneIdentification]: PhoneIdentification,
     [States.phoneVerification]: PhoneVerification,
     [States.biometricLoginRetry]: BiometricLoginRetry,
     [States.qrLogin]: QRLogin,

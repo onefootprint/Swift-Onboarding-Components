@@ -16,9 +16,9 @@ type FormData = {
   phone: string;
 };
 
-const PhoneRegistration = () => {
+const PhoneIdentification = () => {
   const [state, send] = useBifrostMachine();
-  const { t } = useTranslation('pages.registration.phone-registration');
+  const { t } = useTranslation('pages.phone-identification');
   const {
     register,
     handleSubmit,
@@ -97,6 +97,7 @@ const PhoneRegistration = () => {
         </LinkButton>
       </EmailCard>
       <TextInput
+        autoFocus
         hasError={!!errors.phone}
         hintText={errors.phone && t('form.phone-input.error')}
         label={t('form.phone-input.label')}
@@ -134,4 +135,4 @@ const EmailCard = styled.div`
   `}
 `;
 
-export default PhoneRegistration;
+export default PhoneIdentification;

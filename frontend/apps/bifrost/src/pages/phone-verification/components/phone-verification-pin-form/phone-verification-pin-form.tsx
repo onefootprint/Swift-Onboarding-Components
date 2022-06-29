@@ -18,7 +18,7 @@ import {
 // Once verification succeeds, delay the transition to next page while you show a success message
 const SUCCESS_EVENT_DELAY_MS = 1500;
 
-type PinFormProps = {
+type PhoneVerificationPinFormProps = {
   verifyMutation: UseMutationResult<
     IdentifyVerifyResponse,
     RequestError,
@@ -31,7 +31,10 @@ type PinFormProps = {
   >;
 };
 
-const PinForm = ({ verifyMutation, onboardingMutation }: PinFormProps) => {
+const PhoneVerificationPinForm = ({
+  verifyMutation,
+  onboardingMutation,
+}: PhoneVerificationPinFormProps) => {
   const [state, send] = useBifrostMachine();
   const identifyMutation = useIdentify();
 
@@ -117,4 +120,4 @@ const PinForm = ({ verifyMutation, onboardingMutation }: PinFormProps) => {
   );
 };
 
-export default PinForm;
+export default PhoneVerificationPinForm;

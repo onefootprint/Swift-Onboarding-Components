@@ -1,3 +1,4 @@
+import { useTranslation } from 'hooks';
 import { QRCodeSVG } from 'qrcode.react';
 import React, { useEffect } from 'react';
 import HeaderTitle from 'src/components/header-title';
@@ -9,15 +10,18 @@ import useLivenessRegisterMachine from 'src/pages/liveness-register/hooks/use-li
 import createBiometricUrl from 'src/utils/create-biometric-url';
 import { Events } from 'src/utils/state-machine/liveness-register';
 import styled, { css } from 'styled-components';
-import { Button, Divider, LoadingIndicator, Typography } from 'ui';
+import { Button, Divider, Shimmer, Typography } from 'ui';
 
 const QRRegister = () => {
+  const { t } = useTranslation('pages.qr-register');
   const [state, send] = useLivenessRegisterMachine();
   const { authToken, scopedAuthToken } = state.context;
   const d2pGenerateMutation = useD2PGenerate();
   const d2pSmsMutation = useD2PSms();
   const statusResponse = useGetD2PStatus();
   const generateScopedAuthToken = useGenerateScopedAuthToken();
+  const shouldShowQRCodeLoading =
+    d2pGenerateMutation.isLoading || !state.context.scopedAuthToken;
 
   useEffect(() => {
     if (authToken) {
@@ -67,47 +71,41 @@ const QRRegister = () => {
 
   return (
     <Container>
-      <HeaderTitle
-        title="Liveness check"
-        subtitle="We need to verify that you're a real person."
-      />
+      <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
       <Typography variant="body-2" color="secondary">
-        Use your camera app or QR code reader on your mobile device and
-        we&apos;ll use biometrics to verify it.
+        {t('instructions')}
       </Typography>
-      {d2pGenerateMutation.isLoading || !state.context.scopedAuthToken ? (
-        <LoadingIndicator />
-      ) : (
-        <QRCodeContainer>
+      <QRCodeContainer>
+        {shouldShowQRCodeLoading ? (
+          <Shimmer sx={{ height: '128px', width: '128px' }} />
+        ) : (
           <QRCodeSVG
             value={createBiometricUrl(state.context.scopedAuthToken)}
           />
-        </QRCodeContainer>
-      )}
+        )}
+      </QRCodeContainer>
       <Typography variant="body-4" color="tertiary">
-        Make sure the QR code is clearly visible on your device&apos;s screen.
-        When authenticated, this page automatically updates.
+        {t('qr-code.instructions')}
       </Typography>
       <Divider />
       <Typography variant="body-2" color="secondary">
-        Alternatively, we can send you a link to your phone and you can continue
-        from there.
+        {t('sms.instructions')}
       </Typography>
       <Button
         fullWidth
         loading={d2pSmsMutation.isLoading}
         onClick={handleSendLinkToPhone}
       >
-        Send a link to phone
+        {t('sms.cta')}
       </Button>
     </Container>
   );
 };
 
 const QRCodeContainer = styled.div`
+  align-items: center;
   display: flex;
   justify-content: center;
-  align-items: center;
 `;
 
 const Container = styled.form`

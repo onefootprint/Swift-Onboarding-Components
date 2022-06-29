@@ -4,7 +4,6 @@ import styled from 'styled-components';
 
 import Hint from '../internal/hint';
 import Input from '../internal/input';
-import LoadingIndicator from '../loading-indicator';
 import usePinInputRefs from './hooks/use-pin-input-refs';
 import { INPUT_FIELDS_COUNT, pins } from './pin-input.constants';
 import { getNextValue, isNumber } from './pin-input.utils';
@@ -12,8 +11,6 @@ import { getNextValue, isNumber } from './pin-input.utils';
 export type PinInputProps = {
   hasError?: boolean;
   hintText?: string;
-  loading?: boolean;
-  loadingTestID?: string;
   onComplete: (value: string) => void;
   testID?: string;
 };
@@ -21,8 +18,6 @@ export type PinInputProps = {
 const PinInput = ({
   hasError = false,
   hintText,
-  loading = false,
-  loadingTestID,
   onComplete,
   testID,
 }: PinInputProps) => {
@@ -87,42 +82,37 @@ const PinInput = ({
 
   return (
     <Container data-testid={testID}>
-      {loading ? (
-        <LoadingIndicator testID={loadingTestID} />
-      ) : (
-        <>
-          <PinContainer>
-            {pins.map((pinPosition, pinIndex) => {
-              const key = pinIndex;
-              const isDisabled = pinIndex > enteredPin.length;
-              return (
-                <Input
-                  autoComplete="one-time-code"
-                  hasError={hasError}
-                  inputMode="numeric"
-                  key={key}
-                  onChange={handleChange(pinIndex)}
-                  onKeyDown={handleKeyDown(pinIndex)}
-                  placeholder=""
-                  sx={{
-                    height: '44px',
-                    padding: 0,
-                    pointerEvents: isDisabled ? 'none' : undefined,
-                    textAlign: 'center',
-                    width: '40px',
-                  }}
-                  ref={pinInputs.refs[pinIndex]}
-                  required
-                  type="tel"
-                  value={enteredPin[pinIndex] || ''}
-                />
-              );
-            })}
-          </PinContainer>
-          {!!hintText && (
-            <Hint color={hasError ? 'error' : 'primary'}>{hintText}</Hint>
-          )}
-        </>
+      <PinContainer>
+        {pins.map((pinPosition, pinIndex) => {
+          const key = pinIndex;
+          const isDisabled = pinIndex > enteredPin.length;
+          return (
+            <Input
+              autoFocus={pinIndex === 0}
+              autoComplete="one-time-code"
+              hasError={hasError}
+              inputMode="numeric"
+              key={key}
+              onChange={handleChange(pinIndex)}
+              onKeyDown={handleKeyDown(pinIndex)}
+              placeholder=""
+              sx={{
+                height: '44px',
+                padding: 0,
+                pointerEvents: isDisabled ? 'none' : undefined,
+                textAlign: 'center',
+                width: '40px',
+              }}
+              ref={pinInputs.refs[pinIndex]}
+              required
+              type="tel"
+              value={enteredPin[pinIndex] || ''}
+            />
+          );
+        })}
+      </PinContainer>
+      {!!hintText && (
+        <Hint color={hasError ? 'error' : 'primary'}>{hintText}</Hint>
       )}
     </Container>
   );
