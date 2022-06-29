@@ -2400,6 +2400,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "idv"
+version = "0.1.0"
+dependencies = [
+ "actix-rt",
+ "chrono",
+ "dotenv",
+ "newtypes",
+ "reqwest",
+ "serde",
+ "serde_json",
+ "serde_with",
+ "thiserror",
+]
+
+[[package]]
 name = "if_chain"
 version = "1.0.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"

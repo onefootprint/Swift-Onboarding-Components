@@ -4,6 +4,8 @@ use serde::{Deserialize, Deserializer, Serialize};
 use std::fmt::{Debug, Display};
 use std::str::FromStr;
 
+use crate::LeakToString;
+
 #[doc = "Name"]
 #[derive(Clone, Hash, PartialEq, Eq, Serialize, Default, Apiv2Schema)]
 #[serde(transparent)]
@@ -38,6 +40,12 @@ impl Display for Name {
 impl Debug for Name {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "<redacted>")
+    }
+}
+
+impl LeakToString for Name {
+    fn leak_to_string(self) -> String {
+        self.0
     }
 }
 

@@ -56,6 +56,8 @@ pub enum AddressError {
     InvalidZip(String),
     #[error("invalid country code: {0}, country code must be 2-digit ISO 3166-1 Alpha 2")]
     InvalidCountry(String),
+    #[error("invalid state code: {0}, state code must be 2-digit U.S. State")]
+    InvalidState(String),
     #[error("invalid address provided: {0}, address must not contain special characters other than #")]
     InvalidAddressCharacters(String),
     #[error("invalid characters provided: {0}, city and/or state must not contain special characters")]

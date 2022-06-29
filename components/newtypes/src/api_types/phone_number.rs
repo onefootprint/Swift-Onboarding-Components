@@ -1,3 +1,4 @@
+use super::LeakToString;
 pub use derive_more::{Add, Display, From, FromStr, Into};
 use paperclip::actix::Apiv2Schema;
 use serde::{Deserialize, Deserializer, Serialize};
@@ -10,8 +11,8 @@ use std::str::FromStr;
 /// Phone number string. Must be valid e164 length and include a country code
 pub struct PhoneNumber(String);
 
-impl PhoneNumber {
-    pub fn leak_to_string(self) -> String {
+impl LeakToString for PhoneNumber {
+    fn leak_to_string(self) -> String {
         self.0
     }
 }

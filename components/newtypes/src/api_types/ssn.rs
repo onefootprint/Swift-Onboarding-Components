@@ -3,6 +3,8 @@ use paperclip::actix::Apiv2Schema;
 use serde::{Deserialize, Deserializer, Serialize};
 use std::str::FromStr;
 
+use crate::LeakToString;
+
 #[doc = "Social security number -- 9 digit numeric string"]
 #[derive(Clone, Hash, PartialEq, Eq, Serialize, Default, Apiv2Schema)]
 #[serde(transparent)]
@@ -47,6 +49,12 @@ impl std::fmt::Display for Ssn {
 impl std::fmt::Debug for Ssn {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "*********")
+    }
+}
+
+impl LeakToString for Ssn {
+    fn leak_to_string(self) -> String {
+        self.0
     }
 }
 

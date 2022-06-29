@@ -1,3 +1,4 @@
+use super::LeakToString;
 pub use derive_more::{Add, Display, From, FromStr, Into};
 use paperclip::actix::Apiv2Schema;
 use regex::Regex;
@@ -8,13 +9,13 @@ use serde::{Deserialize, Serialize};
 /// We uppercase everything for standardization. Country must be 2 digit ISO-3166-1 Alpha 2 country code.
 /// Inputs cannot contain special characters
 pub struct Address {
-    street_address: StreetAddress,
+    pub street_address: StreetAddress,
     #[serde(default)]
-    street_address_2: Option<StreetAddress>,
-    city: City,
-    state: State,
-    zip: Zip,
-    country: Country,
+    pub street_address_2: Option<StreetAddress>,
+    pub city: City,
+    pub state: State,
+    pub zip: Zip,
+    pub country: Country,
 }
 
 #[derive(Clone, Hash, PartialEq, Eq, Serialize, Deserialize, Default, Apiv2Schema)]
@@ -42,6 +43,16 @@ pub struct Zip(String);
 #[serde(try_from = "String")]
 /// 3 digit ISO country code
 pub struct Country(String);
+
+macro_rules! leak_to_string {
+    ($name: ident) => {
+        impl LeakToString for $name {
+            fn leak_to_string(self) -> String {
+                self.0
+            }
+        }
+    };
+}
 
 macro_rules! redact_debug_display {
     ($name: ident) => {
@@ -85,6 +96,7 @@ impl TryFrom<String> for StreetAddress {
 }
 
 redact_debug_display!(StreetAddress);
+leak_to_string!(StreetAddress);
 
 impl TryFrom<String> for City {
     type Error = crate::Error;
@@ -98,6 +110,7 @@ impl TryFrom<String> for City {
 }
 
 redact_debug_display!(City);
+leak_to_string!(City);
 
 impl TryFrom<String> for State {
     type Error = crate::Error;
@@ -106,11 +119,25 @@ impl TryFrom<String> for State {
         if INVALID_INPUT_CHARS.is_match(value.as_str()) {
             return Err(crate::AddressError::InvalidCharacters(value).into());
         }
+        let state = value.to_uppercase();
+        if !ISO_3166_TWO_DIGIT_US_STATES.contains(&state.as_str()) {
+            return Err(crate::AddressError::InvalidCountry(state).into());
+        }
         Ok(State(value.to_uppercase()))
     }
 }
 
+// from https://en.wikipedia.org/wiki/List_of_U.S._state_and_territory_abbreviations
+// our bifrost UI only allows U.S. states for now
+const ISO_3166_TWO_DIGIT_US_STATES: [&str; 60] = [
+    "AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "DC", "FL", "GA", "HI", "ID", "IL", "IN", "IA", "KS",
+    "KY", "LA", "ME", "MD", "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH", "NJ", "NM", "NY", "NC",
+    "ND", "OH", "OK", "OR", "PA", "RI", "SC", "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY",
+    "AS", "GU", "MP", "PR", "VI", "UM", "MH", "FM", "PW",
+];
+
 redact_debug_display!(State);
+leak_to_string!(State);
 
 impl TryFrom<String> for Country {
     type Error = crate::Error;
@@ -162,6 +189,8 @@ impl std::fmt::Debug for Country {
     }
 }
 
+leak_to_string!(Country);
+
 impl TryFrom<String> for Zip {
     type Error = crate::Error;
 
@@ -174,6 +203,7 @@ impl TryFrom<String> for Zip {
 }
 
 redact_debug_display!(Zip);
+leak_to_string!(Zip);
 
 #[cfg(test)]
 mod tests {

@@ -4,6 +4,8 @@ use regex::Regex;
 use serde::{Deserialize, Deserializer, Serialize};
 use std::str::FromStr;
 
+use crate::LeakToString;
+
 #[doc = "Email address"]
 #[derive(Clone, Hash, PartialEq, Eq, Serialize, Default, Apiv2Schema)]
 #[serde(transparent)]
@@ -27,6 +29,12 @@ impl std::str::FromStr for Email {
         }
         // lowercase for consistency & readability
         Ok(Email(s.to_string().to_uppercase()))
+    }
+}
+
+impl LeakToString for Email {
+    fn leak_to_string(self) -> String {
+        self.0
     }
 }
 

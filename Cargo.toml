@@ -7,6 +7,7 @@ members = [
     "components/enclave/proxy",
     "components/enclave/rpc",
     "components/db",
+    "components/idv",
     "components/newtypes",
     "components/app_attest",
 ]

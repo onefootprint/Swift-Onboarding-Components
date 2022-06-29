@@ -6,7 +6,7 @@ use serde::Deserialize;
 use serde::{self, Serialize};
 use std::fmt::Debug;
 
-use super::ToVaultString;
+use super::LeakToString;
 
 #[doc = "Date of birth. Must be 18 or older"]
 #[derive(Clone, Debug, Hash, PartialEq, Eq, Serialize, Deserialize, Default, Apiv2Schema)]
@@ -55,8 +55,8 @@ impl TryFrom<Dob> for ValidatedDob {
     }
 }
 
-impl ToVaultString for ValidatedDob {
-    fn to_vault_string(self) -> String {
+impl LeakToString for ValidatedDob {
+    fn leak_to_string(self) -> String {
         let (year, month, day) = (self.year.0, self.month.0, self.day.0);
         format!("{year}-{month}-{day}")
     }

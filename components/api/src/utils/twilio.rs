@@ -3,7 +3,7 @@ use std::{fmt::Debug, marker::PhantomData};
 use crate::{errors::ApiError, identify::PhoneChallengeState, State};
 use chrono::{Duration, Utc};
 use crypto::sha256;
-use newtypes::{Base64Data, PhoneNumber, SealedSessionBytes, SessionAuthToken};
+use newtypes::{Base64Data, LeakToString, PhoneNumber, SealedSessionBytes, SessionAuthToken};
 
 use self::rate_limit::RateLimitRecord;
 
