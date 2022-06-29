@@ -1,11 +1,13 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import { useCombobox } from 'downshift';
+import { DEFAULT_COUNTRY } from 'global-constants';
 import { usePlacesAutocomplete } from 'hooks';
 import noop from 'lodash/noop';
 import take from 'lodash/take';
 import React, { forwardRef, useRef } from 'react';
 import mergeRefs from 'react-merge-refs';
 import styled, { css } from 'styled-components';
+import type { CountryCode } from 'types';
 
 import Input, { InputProps } from '../internal/input';
 import type { Item } from './adress-input.types';
@@ -17,13 +19,13 @@ const MAX_OF_RESULTS = 5;
 
 export type AddressInputProps = InputProps & {
   onSelect?: (item?: Item | null) => void;
-  country?: string;
+  country?: CountryCode;
 };
 
 const AddressInput = forwardRef<HTMLInputElement, AddressInputProps>(
   (
     {
-      country = 'US',
+      country = DEFAULT_COUNTRY.value,
       onBlur = noop,
       onChange = noop,
       onChangeText,
@@ -118,6 +120,8 @@ const AddressInput = forwardRef<HTMLInputElement, AddressInputProps>(
           {...rest}
           {...toggleButtonProps}
           {...inputProps}
+          autoComplete="address-line1"
+          tabIndex={0}
           onBlur={handleBlur}
           onChange={handleChange}
           onKeyDown={handleKeyDown}

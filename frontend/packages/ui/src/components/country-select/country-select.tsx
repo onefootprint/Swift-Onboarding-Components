@@ -1,70 +1,73 @@
-import { COUNTRIES as options } from 'global-constants';
+import { COUNTRIES } from 'global-constants';
 import React from 'react';
 import styled, { css } from 'styled-components';
+import type { CountryCode } from 'types';
 
-import DefaultOption from '../internal/default-option';
+import BaseSelect, {
+  BaseSelectOption,
+  BaseSelectProps,
+} from '../internal/base-select';
+import BaseSelectTrigger from '../internal/base-select-trigger';
 import Flag from '../internal/flag';
-import Select, { SelectProps } from '../select';
-import type { CountrySelectOption } from './country-select.types';
+import Option from './components/option';
+import { CountrySelectOption } from './country-select.types';
 
 export type CountrySelectProps = Omit<
-  SelectProps<CountrySelectOption>,
-  'options' | 'renderOption'
->;
+  BaseSelectProps<CountrySelectOption>,
+  'options' | 'renderTrigger'
+> & {
+  options?: CountrySelectOption[];
+  placeholder?: string;
+};
 
 const CountrySelect = ({
   disabled,
-  emptyStateTestID,
   emptyStateText,
   hasError,
   hintText,
   id,
   label,
-  onSearchChangeText,
+  name,
+  onBlur,
   onChange,
-  placeholder,
-  searchPlaceholder,
-  value,
+  options = COUNTRIES,
+  placeholder = 'Select',
   testID,
+  value,
 }: CountrySelectProps) => (
-  <Select<CountrySelectOption>
+  <BaseSelect<BaseSelectOption<CountryCode>>
     disabled={disabled}
-    emptyStateTestID={emptyStateTestID}
     emptyStateText={emptyStateText}
     hasError={hasError}
     hintText={hintText}
     id={id}
     label={label}
+    name={name}
+    onBlur={onBlur}
     onChange={onChange}
-    onSearchChangeText={onSearchChangeText}
+    OptionComponent={Option}
     options={options}
-    placeholder={placeholder}
-    searchPlaceholder={searchPlaceholder}
     testID={testID}
     value={value}
-    renderOption={option => (
-      <DefaultOption
-        disableHoverStyles={option.disableHoverStyles}
-        highlighted={option.highlighted}
-        label={option.label}
-        onClick={option.onClick}
-        onMouseDown={option.onMouseDown}
-        onMouseMove={option.onMouseMove}
-        prefixComponent={<StyledFlag code={option.value} />}
-        searchWords={option.searchWords}
-        selected={option.selected}
-        style={option.style}
-      />
+    renderTrigger={({ isOpen, selectedOption, onClick, ref }) => (
+      <BaseSelectTrigger
+        disabled={disabled}
+        hasError={hasError}
+        hasFocus={isOpen}
+        onClick={onClick}
+        ref={ref}
+      >
+        {selectedOption && <StyledFlag code={selectedOption.value} />}
+        {selectedOption?.label || placeholder}
+      </BaseSelectTrigger>
     )}
   />
 );
 
 const StyledFlag = styled(Flag)`
   ${({ theme }) => css`
-    margin-right: ${theme.spacing[3]}px;
+    margin-right: ${theme.spacing[4]}px;
   `}
 `;
-
-export { options };
 
 export default CountrySelect;

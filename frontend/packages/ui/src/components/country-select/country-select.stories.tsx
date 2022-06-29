@@ -2,7 +2,7 @@ import { ComponentMeta, Story } from '@storybook/react';
 import React, { useState } from 'react';
 
 import CountrySelect, { CountrySelectProps } from './country-select';
-import type { CountrySelectOption } from './country-select.types';
+import { CountrySelectOption } from './country-select.types';
 
 export default {
   title: 'Components/CountrySelect',
@@ -17,12 +17,6 @@ export default {
       control: 'text',
       required: false,
       description: 'Append an attribute data-testid for testing purposes',
-    },
-    emptyStateTestID: {
-      control: 'text',
-      required: false,
-      description:
-        'Append an attribute data-testid on the empty-state element for testing purposes',
     },
     emptyStateText: {
       control: 'text',
@@ -68,10 +62,6 @@ export default {
       required: false,
       table: { defaultValue: { summary: 'Search' } },
     },
-    onSearchChangeText: {
-      description: 'Event when the search text changes',
-      required: false,
-    },
     onChange: {
       description: 'Event called after selecting an option',
       required: true,
@@ -81,23 +71,22 @@ export default {
 
 const Template: Story<CountrySelectProps> = ({
   disabled,
-  emptyStateTestID,
   emptyStateText,
   hasError,
   hintText,
   id,
   label,
-  onSearchChangeText,
   onChange,
   placeholder,
   searchPlaceholder,
   testID,
+  value,
 }: CountrySelectProps) => {
   const [selectedOption, setSelectedOption] = useState<
-    CountrySelectOption | null | undefined
-  >(null);
+    CountrySelectOption | undefined
+  >(value);
 
-  const handleSelect = (nextOption: CountrySelectOption | null) => {
+  const handleSelect = (nextOption: CountrySelectOption) => {
     setSelectedOption(nextOption);
     if (onChange) {
       onChange(nextOption);
@@ -107,18 +96,16 @@ const Template: Story<CountrySelectProps> = ({
   return (
     <CountrySelect
       disabled={disabled}
-      emptyStateTestID={emptyStateTestID}
       emptyStateText={emptyStateText}
       hasError={hasError}
       hintText={hintText}
       id={id}
       label={label}
-      onSearchChangeText={onSearchChangeText}
       onChange={handleSelect}
       placeholder={placeholder}
       searchPlaceholder={searchPlaceholder}
-      value={selectedOption ? selectedOption.value : null}
       testID={testID}
+      value={selectedOption}
     />
   );
 };
@@ -126,16 +113,14 @@ const Template: Story<CountrySelectProps> = ({
 export const Base = Template.bind({});
 Base.args = {
   disabled: false,
-  emptyStateTestID: 'empty-state-test-id',
   emptyStateText: 'No results :(',
   hasError: false,
   hintText: 'Hint',
   id: 'select-field',
   label: 'Country',
-  onSearchChangeText: console.log,
   onChange: console.log,
   placeholder: 'Select...',
   searchPlaceholder: 'Search',
-  value: null,
   testID: 'select-test-id',
+  value: undefined,
 };

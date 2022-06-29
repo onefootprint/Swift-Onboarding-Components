@@ -24,6 +24,7 @@ const Toast = ({
       <Typography
         color={variant === 'error' ? 'error' : 'primary'}
         variant="label-3"
+        sx={{ marginBottom: 2 }}
       >
         {title}
       </Typography>

@@ -61,6 +61,7 @@ const BasicInformation = () => {
         <Grid.Row>
           <Grid.Column col={6}>
             <TextInput
+              autoFocus
               hasError={!!errors.firstName}
               hintText={errors.firstName && t('form.first-name.error')}
               label={t('form.first-name.label')}

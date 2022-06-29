@@ -247,7 +247,3 @@ export enum Country {
 }
 
 export type CountryCode = keyof typeof Country;
-
-// array key value pair of country code and country name.
-// For example: [{ES: "Spain"}]
-export type CountrySelectCountries = Record<CountryCode, string>;

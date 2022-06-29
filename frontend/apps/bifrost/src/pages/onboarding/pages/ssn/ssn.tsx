@@ -47,6 +47,7 @@ const SSN = () => {
       <Form onSubmit={handleSubmit(onSubmit)}>
         <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
         <TextInput
+          autoFocus
           hasError={!!errors.ssn}
           hintText={errors.ssn && t('form.ssn.error')}
           label={t('form.ssn.label')}

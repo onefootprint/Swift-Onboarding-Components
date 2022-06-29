@@ -14,23 +14,19 @@ const defaultOptions = [
   { value: 'option 7', label: 'option 7' },
   { value: 'option 8', label: 'option 8' },
   { value: 'option 9', label: 'option 9' },
-  { value: 'option 10', label: 'option 10' },
 ];
 
 describe('<Select />', () => {
   const renderSelect = ({
     disabled,
-    emptyStateTestID,
     emptyStateText,
     hasError,
     hintText,
     id = 'some id',
     label = 'label text',
-    onSearchChangeText,
     onChange = jest.fn(),
     options = defaultOptions,
-    placeholder = 'Select...',
-    renderOption,
+    placeholder = 'Select',
     searchPlaceholder,
     value,
     testID = 'select-test-id',
@@ -38,17 +34,14 @@ describe('<Select />', () => {
     customRender(
       <Select
         disabled={disabled}
-        emptyStateTestID={emptyStateTestID}
         emptyStateText={emptyStateText}
         hasError={hasError}
         hintText={hintText}
         id={id}
         label={label}
-        onSearchChangeText={onSearchChangeText}
         onChange={onChange}
         options={options}
         placeholder={placeholder}
-        renderOption={renderOption}
         searchPlaceholder={searchPlaceholder}
         value={value}
         testID={testID}
@@ -63,15 +56,6 @@ describe('<Select />', () => {
   it('should render the label', () => {
     renderSelect({ label: 'some label text' });
     expect(screen.getByText('some label text')).toBeInTheDocument();
-  });
-
-  it('should render using a custom renderOption function', async () => {
-    const [firstOption] = defaultOptions;
-    const renderOption = (option: any) => <div>custom-{option.label}</div>;
-    renderSelect({ label: 'label text', renderOption });
-    const trigger = screen.getByText('label text');
-    await userEvent.click(trigger);
-    expect(screen.getByText(`custom-${firstOption.label}`)).toBeInTheDocument();
   });
 
   describe('when there is NO item selected', () => {
@@ -91,7 +75,7 @@ describe('<Select />', () => {
       renderSelect({
         placeholder: 'placeholder',
         options,
-        value: selectedOption.value,
+        value: selectedOption,
       });
       expect(screen.queryByText('placeholder')).toBeNull();
     });
@@ -102,7 +86,7 @@ describe('<Select />', () => {
         { value: 'bar', label: 'bar' },
       ];
       const [selectedOption] = options;
-      renderSelect({ options, value: selectedOption.value });
+      renderSelect({ options, value: selectedOption });
       expect(screen.getByText(selectedOption.label)).toBeInTheDocument();
     });
 
@@ -112,7 +96,7 @@ describe('<Select />', () => {
         { value: 'bar', label: 'bar' },
       ];
       const [selectedOption] = options;
-      renderSelect({ options, value: selectedOption.value });
+      renderSelect({ options, value: selectedOption });
       const trigger = screen.getByText(selectedOption.label);
       await userEvent.click(trigger);
       const listOption = screen.getByRole('option', {
@@ -136,51 +120,14 @@ describe('<Select />', () => {
     });
   });
 
-  describe('when selecting an option', () => {
-    it('should trigger onChange with the selected option', async () => {
-      const onChangeMockFn = jest.fn();
-      const options = [
-        { value: 'foo', label: 'foo' },
-        { value: 'bar', label: 'bar' },
-      ];
-      renderSelect({
-        options,
-        onChange: onChangeMockFn,
-      });
-      await userEvent.click(screen.getByText('Select...'));
-      const [firstOption] = options;
-      await userEvent.click(screen.getByText(firstOption.label));
-      expect(onChangeMockFn).toHaveBeenCalledWith(firstOption);
-    });
-  });
-
   describe('search', () => {
-    describe('when theres is more or equal than 10 options', () => {
-      it('should display a search', async () => {
-        renderSelect({ searchPlaceholder: 'Search now' });
-        await userEvent.click(screen.getByText('Select...'));
-        const search = screen.getByPlaceholderText('Search now');
-        expect(search).toBeInTheDocument();
-      });
-    });
-
     describe('when typing in the search', () => {
       it('should filter the results', async () => {
         renderSelect({});
-        await userEvent.click(screen.getByText('Select...'));
+        await userEvent.click(screen.getByRole('button', { name: 'Select' }));
         const search = screen.getByPlaceholderText('Search');
-        await userEvent.type(search, 'option 5');
+        await userEvent.type(search, defaultOptions[0].label);
         expect(screen.queryAllByRole('option').length).toEqual(1);
-      });
-
-      it('should trigger onSearchChangeText event', async () => {
-        const onSearchChangeTextMockFn = jest.fn();
-        renderSelect({ onSearchChangeText: onSearchChangeTextMockFn });
-        await userEvent.click(screen.getByText('Select...'));
-        const search = screen.getByPlaceholderText('Search');
-        const typedValue = 'L';
-        await userEvent.type(search, typedValue);
-        expect(onSearchChangeTextMockFn).toHaveBeenCalledWith(typedValue);
       });
 
       describe('when no results were found', () => {
@@ -188,23 +135,10 @@ describe('<Select />', () => {
           renderSelect({
             emptyStateText: 'No results were found',
           });
-          await userEvent.click(screen.getByText('Select...'));
+          await userEvent.click(screen.getByRole('button', { name: 'Select' }));
           const search = screen.getByPlaceholderText('Search');
           await userEvent.type(search, 'Lorem');
           expect(screen.getByText('No results were found')).toBeInTheDocument();
-        });
-
-        describe('when there is a custom test id for the empty state', () => {
-          it('should add a test id attribute', async () => {
-            const emptyStateTestID = 'empty-state-test-id';
-            renderSelect({
-              emptyStateTestID,
-            });
-            await userEvent.click(screen.getByText('Select...'));
-            const search = screen.getByPlaceholderText('Search');
-            await userEvent.type(search, 'Lorem');
-            expect(screen.getByTestId(emptyStateTestID)).toBeInTheDocument();
-          });
         });
       });
     });
@@ -223,7 +157,9 @@ describe('<Select />', () => {
       renderSelect({
         hasError: true,
       });
-      const trigger = screen.getByText('Select...');
+      const trigger = screen.getByRole('button', {
+        name: 'Select',
+      }) as HTMLButtonElement;
       expect(trigger).toHaveStyle({
         border: `1px solid ${themes.light.borderColor.error}`,
       });
@@ -246,7 +182,9 @@ describe('<Select />', () => {
       renderSelect({
         disabled: true,
       });
-      const trigger = screen.getByText('Select...') as HTMLButtonElement;
+      const trigger = screen.getByRole('button', {
+        name: 'Select',
+      }) as HTMLButtonElement;
       expect(trigger.disabled).toBeTruthy();
     });
   });

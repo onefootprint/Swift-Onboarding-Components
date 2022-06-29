@@ -1,22 +1,21 @@
+import { COUNTRIES as options } from 'global-constants';
 import take from 'lodash/take';
 import React from 'react';
 import { customRender, screen, userEvent } from 'test-utils';
 import themes from 'themes';
 
-import Select, { CountrySelectProps, options } from './country-select';
+import Select, { CountrySelectProps } from './country-select';
 
 describe('<CountrySelect />', () => {
   const renderCountrySelect = ({
     disabled,
-    emptyStateTestID,
     emptyStateText,
     hasError,
     hintText,
     id = 'some id',
     label = 'label text',
-    onSearchChangeText,
     onChange = jest.fn(),
-    placeholder = 'Select...',
+    placeholder = 'Select',
     searchPlaceholder,
     value,
     testID = 'select-test-id',
@@ -24,13 +23,11 @@ describe('<CountrySelect />', () => {
     customRender(
       <Select
         disabled={disabled}
-        emptyStateTestID={emptyStateTestID}
         emptyStateText={emptyStateText}
         hasError={hasError}
         hintText={hintText}
         id={id}
         label={label}
-        onSearchChangeText={onSearchChangeText}
         onChange={onChange}
         placeholder={placeholder}
         searchPlaceholder={searchPlaceholder}
@@ -61,20 +58,20 @@ describe('<CountrySelect />', () => {
       const [selectedOption] = options;
       renderCountrySelect({
         placeholder: 'placeholder',
-        value: selectedOption.value,
+        value: selectedOption,
       });
       expect(screen.queryByText('placeholder')).toBeNull();
     });
 
     it('should render the label of the selected item', () => {
       const [selectedOption] = options;
-      renderCountrySelect({ value: selectedOption.value });
+      renderCountrySelect({ value: selectedOption });
       expect(screen.getByText(selectedOption.label)).toBeInTheDocument();
     });
 
     it('should render a check icon in the list option', async () => {
       const [selectedOption] = options;
-      renderCountrySelect({ value: selectedOption.value });
+      renderCountrySelect({ value: selectedOption });
       const trigger = screen.getByText(selectedOption.label);
       await userEvent.click(trigger);
       const listOption = screen.getByRole('option', {
@@ -96,46 +93,14 @@ describe('<CountrySelect />', () => {
     });
   });
 
-  describe('when selecting an option', () => {
-    it('should trigger onChange with the selected option', async () => {
-      const onChangeMockFn = jest.fn();
-      renderCountrySelect({
-        onChange: onChangeMockFn,
-      });
-      await userEvent.click(screen.getByText('Select...'));
-      const [firstOption] = options;
-      await userEvent.click(screen.getByText(firstOption.label));
-      expect(onChangeMockFn).toHaveBeenCalledWith(firstOption);
-    });
-  });
-
   describe('search', () => {
-    describe('when theres is more or equal than 10 options', () => {
-      it('should display a search', async () => {
-        renderCountrySelect({ searchPlaceholder: 'Search now' });
-        await userEvent.click(screen.getByText('Select...'));
-        const search = screen.getByPlaceholderText('Search now');
-        expect(search).toBeInTheDocument();
-      });
-    });
-
     describe('when typing in the search', () => {
       it('should filter the results', async () => {
         renderCountrySelect({});
-        await userEvent.click(screen.getByText('Select...'));
+        await userEvent.click(screen.getByRole('button', { name: 'Select' }));
         const search = screen.getByPlaceholderText('Search');
         await userEvent.type(search, 'Brazil');
         expect(screen.queryAllByRole('option').length).toEqual(1);
-      });
-
-      it('should trigger onSearchChangeText event', async () => {
-        const onSearchChangeTextMockFn = jest.fn();
-        renderCountrySelect({ onSearchChangeText: onSearchChangeTextMockFn });
-        await userEvent.click(screen.getByText('Select...'));
-        const search = screen.getByPlaceholderText('Search');
-        const typedValue = 'L';
-        await userEvent.type(search, typedValue);
-        expect(onSearchChangeTextMockFn).toHaveBeenCalledWith(typedValue);
       });
 
       describe('when no results were found', () => {
@@ -143,23 +108,10 @@ describe('<CountrySelect />', () => {
           renderCountrySelect({
             emptyStateText: 'No results were found',
           });
-          await userEvent.click(screen.getByText('Select...'));
+          await userEvent.click(screen.getByRole('button', { name: 'Select' }));
           const search = screen.getByPlaceholderText('Search');
           await userEvent.type(search, 'Lorem');
           expect(screen.getByText('No results were found')).toBeInTheDocument();
-        });
-
-        describe('when there is a custom test id for the empty state', () => {
-          it('should add a test id attribute', async () => {
-            const emptyStateTestID = 'empty-state-test-id';
-            renderCountrySelect({
-              emptyStateTestID,
-            });
-            await userEvent.click(screen.getByText('Select...'));
-            const search = screen.getByPlaceholderText('Search');
-            await userEvent.type(search, 'Lorem');
-            expect(screen.getByTestId(emptyStateTestID)).toBeInTheDocument();
-          });
         });
       });
     });
@@ -178,7 +130,9 @@ describe('<CountrySelect />', () => {
       renderCountrySelect({
         hasError: true,
       });
-      const trigger = screen.getByText('Select...');
+      const trigger = screen.getByRole('button', {
+        name: 'Select',
+      }) as HTMLButtonElement;
       expect(trigger).toHaveStyle({
         border: `1px solid ${themes.light.borderColor.error}`,
       });
@@ -201,7 +155,9 @@ describe('<CountrySelect />', () => {
       renderCountrySelect({
         disabled: true,
       });
-      const trigger = screen.getByText('Select...') as HTMLButtonElement;
+      const trigger = screen.getByRole('button', {
+        name: 'Select',
+      }) as HTMLButtonElement;
       expect(trigger.disabled).toBeTruthy();
     });
   });

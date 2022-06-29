@@ -1,6 +1,5 @@
 import type { CountryCode } from 'types';
 
-export type CountrySelectOption = {
-  label: string;
-  value: CountryCode;
-};
+import type { BaseSelectOption } from '../internal/base-select/base-select.types';
+
+export type CountrySelectOption = BaseSelectOption<CountryCode>;
