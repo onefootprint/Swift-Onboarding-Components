@@ -13,8 +13,8 @@ pub struct Tenant {
     pub e_private_key: Vec<u8>,
     pub workos_id: String,
     pub email_domain: String,
-    pub created_at: NaiveDateTime,
-    pub updated_at: NaiveDateTime,
+    pub _created_at: NaiveDateTime,
+    pub _updated_at: NaiveDateTime,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]

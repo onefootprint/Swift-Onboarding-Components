@@ -1,1 +1,0 @@
-ALTER TABLE onboardings ADD COLUMN ordering_id BIGSERIAL NOT NULL;

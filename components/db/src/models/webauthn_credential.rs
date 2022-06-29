@@ -23,8 +23,8 @@ pub struct WebauthnCredential {
     pub counter: i32,
     pub attestation_data: Vec<u8>,
 
-    pub created_at: NaiveDateTime,
-    pub updated_at: NaiveDateTime,
+    pub _created_at: NaiveDateTime,
+    pub _updated_at: NaiveDateTime,
 
     pub backup_eligible: bool,
     pub attestation_type: AttestationType,

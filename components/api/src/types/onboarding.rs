@@ -10,8 +10,6 @@ pub struct ApiOnboarding {
     pub footprint_user_id: FootprintUserId,
     pub status: Status,
     pub populated_data_kinds: Vec<DataKind>,
-    pub created_at: NaiveDateTime,
-    pub updated_at: NaiveDateTime,
     pub start_timestamp: NaiveDateTime,
     pub ordering_id: i64,
     pub insight_event: ApiInsightEvent,
@@ -22,8 +20,6 @@ impl From<(Vec<DataKind>, Onboarding, InsightEvent)> for ApiOnboarding {
         let Onboarding {
             user_ob_id,
             status,
-            created_at,
-            updated_at,
             start_timestamp,
             ordering_id,
             ..
@@ -32,8 +28,6 @@ impl From<(Vec<DataKind>, Onboarding, InsightEvent)> for ApiOnboarding {
             footprint_user_id: user_ob_id,
             status,
             populated_data_kinds: s.0,
-            created_at,
-            updated_at,
             start_timestamp,
             ordering_id,
             insight_event: ApiInsightEvent::from(s.2),

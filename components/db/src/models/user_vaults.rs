@@ -15,8 +15,8 @@ pub struct UserVault {
     pub e_private_key: EncryptedVaultPrivateKey,
     pub public_key: VaultPublicKey,
     pub id_verified: Status,
-    pub created_at: NaiveDateTime,
-    pub updated_at: NaiveDateTime,
+    pub _created_at: NaiveDateTime,
+    pub _updated_at: NaiveDateTime,
 }
 
 impl UserVault {

@@ -13,8 +13,8 @@ pub struct TenantApiKey {
     pub tenant_id: TenantId,
     pub key_name: String,
     pub is_enabled: bool,
-    pub created_at: NaiveDateTime,
-    pub updated_at: NaiveDateTime,
+    pub _created_at: NaiveDateTime,
+    pub _updated_at: NaiveDateTime,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
@@ -25,8 +25,6 @@ pub struct NewTenantApiKey {
     pub tenant_id: TenantId,
     pub key_name: String,
     pub is_enabled: bool,
-    pub created_at: NaiveDateTime,
-    pub updated_at: NaiveDateTime,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]

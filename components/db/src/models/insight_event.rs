@@ -21,6 +21,8 @@ pub struct InsightEvent {
     pub time_zone: Option<String>,
     pub user_agent: Option<String>,
     pub city: Option<String>,
+    pub _created_at: NaiveDateTime,
+    pub _updated_at: NaiveDateTime,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]

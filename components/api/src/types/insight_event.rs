@@ -21,7 +21,6 @@ pub struct ApiInsightEvent {
 impl From<InsightEvent> for ApiInsightEvent {
     fn from(e: InsightEvent) -> Self {
         let InsightEvent {
-            id: _,
             city,
             timestamp,
             ip_address,
@@ -34,6 +33,7 @@ impl From<InsightEvent> for ApiInsightEvent {
             postal_code,
             time_zone,
             user_agent,
+            ..
         } = e;
         ApiInsightEvent {
             timestamp,

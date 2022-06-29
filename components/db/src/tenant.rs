@@ -2,7 +2,6 @@ use crate::errors::DbError;
 use crate::models::tenant_api_keys::*;
 use crate::models::tenants::*;
 use crate::schema;
-use chrono::Utc;
 use deadpool_diesel::postgres::Pool;
 use diesel::prelude::*;
 use newtypes::TenantId;
@@ -73,15 +72,11 @@ pub async fn api_init(
 ) -> Result<TenantApiKey, DbError> {
     let conn = pool.get().await?;
 
-    let now = Utc::now().naive_utc();
-
     let new_tenant_api_key = NewTenantApiKey {
         tenant_id: tenant_api.tenant_id,
         key_name: tenant_api.key_name,
         sh_secret_api_key: sh_api_key,
         is_enabled: true,
-        created_at: now,
-        updated_at: now,
         e_secret_api_key: e_api_key,
     };
     let tenant_api_key = conn

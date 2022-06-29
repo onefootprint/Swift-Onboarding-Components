@@ -1,0 +1,15 @@
+CREATE TABLE tenant_api_keys (
+    id VARCHAR(250) PRIMARY KEY DEFAULT prefixed_uid('key_id_'),
+    sh_secret_api_key BYTEA NOT NULL,
+    e_secret_api_key BYTEA NOT NULL,
+    tenant_id VARCHAR(250) NOT NULL,
+    key_name VARCHAR(250) NOT NULL,
+    is_enabled BOOLEAN NOT NULL,
+    _created_at timestamp NOT NULL DEFAULT NOW(),
+    _updated_at timestamp NOT NULL DEFAULT NOW(),
+    CONSTRAINT fk_tenant_id
+        FOREIGN KEY(tenant_id) 
+        REFERENCES tenants(id)
+);
+
+SELECT diesel_manage_updated_at('tenant_api_keys');

@@ -18,8 +18,8 @@ pub struct UserData {
     pub is_verified: bool,
     pub data_priority: DataPriority,
     pub deactivated_at: Option<NaiveDateTime>,
-    pub created_at: NaiveDateTime,
-    pub updated_at: NaiveDateTime,
+    pub _created_at: NaiveDateTime,
+    pub _updated_at: NaiveDateTime,
 }
 
 impl UserData {

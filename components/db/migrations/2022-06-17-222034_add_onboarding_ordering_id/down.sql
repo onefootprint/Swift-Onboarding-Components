@@ -1,1 +1,0 @@
-ALTER TABLE onboardings DROP COLUMN ordering_id;

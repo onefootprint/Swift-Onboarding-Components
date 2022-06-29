@@ -10,8 +10,8 @@ use serde::{Deserialize, Serialize};
 #[table_name = "sessions"]
 pub struct Session {
     pub h_session_id: String,
-    pub created_at: NaiveDateTime,
-    pub updated_at: NaiveDateTime,
+    pub _created_at: NaiveDateTime,
+    pub _updated_at: NaiveDateTime,
     pub expires_at: NaiveDateTime,
     pub sealed_session_data: SealedSessionBytes,
 }
