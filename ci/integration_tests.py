@@ -103,7 +103,7 @@ def _b64_encode(v):
 @pytest.fixture(scope="module")
 def workos_tenant():
     path = "private/client"
-    data = {"name": "workos_tenant", "workos_org_id": WORKOS_ORG_ID, "email_domain": "onefootprint.com"}
+    data = {"name": "Acme Bank", "workos_org_id": WORKOS_ORG_ID, "email_domain": "onefootprint.com"}
     r = requests.post(url(path), json=data)
     body = _assert_response(r)
     client_public_key = body["data"]["keys"]["client_public_key"]
