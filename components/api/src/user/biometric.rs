@@ -68,7 +68,7 @@ pub fn init(
         None,
         None,
         COSEAlgorithm::secure_algs(),
-        true,
+        false,
         Some(AuthenticatorAttachment::Platform),
         false,
     )?;
