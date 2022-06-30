@@ -54,7 +54,7 @@ impl NewOnboarding {
                     .filter(onboardings::user_vault_id.eq(&user_vault_id))
                     .filter(onboardings::ob_config_id.eq(&ob_config_id))
                     .filter(onboardings::tenant_id.eq(&tenant_id))
-                    .left_join(ob_configurations::table.on(onboardings::ob_config_id.eq(ob_configurations::id)))
+                    .left_join(ob_configurations::table)
                     .filter(ob_configurations::is_disabled.eq(false))
                     .select(onboardings::all_columns)
                     .first(conn)

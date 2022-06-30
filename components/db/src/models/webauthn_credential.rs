@@ -5,7 +5,7 @@ use crate::{
 };
 use chrono::NaiveDateTime;
 use diesel::dsl::any;
-use diesel::{Insertable, JoinOnDsl, PgConnection, QueryDsl, Queryable, RunQueryDsl};
+use diesel::{Insertable, PgConnection, QueryDsl, Queryable, RunQueryDsl};
 use newtypes::{AttestationType, FootprintUserId, TenantId, UserVaultId};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
@@ -53,10 +53,7 @@ impl WebauthnCredential {
             .filter(schema::onboardings::user_ob_id.eq(footprint_user_id))
             .select(schema::onboardings::user_vault_id);
         let creds = schema::webauthn_credentials::table
-            .inner_join(
-                schema::insight_events::table
-                    .on(schema::insight_events::id.eq(schema::webauthn_credentials::insight_event_id)),
-            )
+            .inner_join(schema::insight_events::table)
             .filter(schema::webauthn_credentials::user_vault_id.eq(any(user_vault_ids)))
             .get_results(conn)?;
 

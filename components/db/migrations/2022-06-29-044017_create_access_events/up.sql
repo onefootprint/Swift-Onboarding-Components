@@ -13,14 +13,15 @@ CREATE TABLE access_events (
     data_kinds text[] NOT NULL,
     ordering_id BIGSERIAL NOT NULL,
 
-    CONSTRAINT fk_onboarding
+    CONSTRAINT fk_access_events_onboarding_id
         FOREIGN KEY(onboarding_id)
         REFERENCES onboardings(id),
-    CONSTRAINT fk_insight_event
+    CONSTRAINT fk_access_events_insight_event_id
         FOREIGN KEY(insight_event_id)
         REFERENCES insight_events(id)
 );
 
 CREATE INDEX IF NOT EXISTS access_events_onboarding_id_data_kind ON access_events(onboarding_id, data_kinds);
+CREATE INDEX IF NOT EXISTS access_events_insight_event_id ON access_events(insight_event_id);
 
 SELECT diesel_manage_updated_at('access_events');

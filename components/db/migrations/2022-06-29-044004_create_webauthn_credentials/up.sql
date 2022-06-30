@@ -14,15 +14,16 @@ CREATE TABLE webauthn_credentials (
     attestation_type text not null DEFAULT 'Unknown',
     insight_event_id uuid NOT NULL,
 
-    CONSTRAINT webauthn_credentials_user_id_fk
+    CONSTRAINT fk_webauthn_credentials_user_vault_id
       FOREIGN KEY(user_vault_id)
       REFERENCES user_vaults(id),
-    CONSTRAINT fk_insight_event
+    CONSTRAINT fk_webauthn_credentials_insight_event_id
         FOREIGN KEY(insight_event_id)
         REFERENCES insight_events(id)
 );
 
-CREATE INDEX IF NOT EXISTS webauthn_credential_user_vault_id ON webauthn_credentials(user_vault_id);
+CREATE INDEX IF NOT EXISTS webauthn_credentials_user_vault_id ON webauthn_credentials(user_vault_id);
+CREATE INDEX IF NOT EXISTS webauthn_credentials_insight_event_id ON webauthn_credentials(insight_event_id);
 CREATE UNIQUE INDEX IF NOT EXISTS webauthn_credential_pubkey_user_vault_id ON webauthn_credentials(public_key);
 CREATE UNIQUE INDEX IF NOT EXISTS webauthn_credential_id_user_vault_id ON webauthn_credentials(credential_id);
 

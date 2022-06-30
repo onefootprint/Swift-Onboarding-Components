@@ -9,7 +9,7 @@ CREATE TABLE user_data (
     deactivated_at timestamp,
     _created_at timestamp NOT NULL DEFAULT NOW(),
     _updated_at timestamp NOT NULL DEFAULT NOW(),
-    CONSTRAINT fk_user_valt
+    CONSTRAINT fk_user_data_user_valt_id
         FOREIGN KEY(user_vault_id) 
         REFERENCES user_vaults(id),
     -- Only allow sh_data to be null for fields other than Ssn, PhoneNumber, Email

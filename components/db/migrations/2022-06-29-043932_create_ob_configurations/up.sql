@@ -23,12 +23,12 @@ create table ob_configurations (
     /* abstract configuration data for flexibility? */
     settings jsonb not null default '{}',
     is_disabled boolean not null default false,
-    CONSTRAINT fk_tenant_id
+    CONSTRAINT fk_ob_configurations_tenant_id
         FOREIGN KEY(tenant_id) 
         REFERENCES tenants(id)
 );
 
 CREATE INDEX IF NOT EXISTS ob_configurations_key ON ob_configurations(key);
-CREATE INDEX IF NOT EXISTS ob_configurations_tenant ON ob_configurations(tenant_id);
+CREATE INDEX IF NOT EXISTS ob_configurations_tenant_id ON ob_configurations(tenant_id);
 
 SELECT diesel_manage_updated_at('ob_configurations');

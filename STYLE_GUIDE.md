@@ -33,7 +33,10 @@ So when making style comments, let's make sure they are using our own consistent
   - request/response structs in the same module above the handler or in a `types.rs` if they are going to be used in more places
 - DB tables:
   - Make table names plural and snake_case
-  - When writing foreign keys, point to the primary key of the referenced table unless there's a good reason
+  - When writing foreign keys for `referencing_table_name.referencing_column_name -> referenced_table_name.referenced_column_name`:
+    - Foreign key constraints should be named `fk_{referencing_table_name}_{referencing_column_name}`. Diesel relies upon foreign key constraint names being unique to infer which tables have a `joinable!` macro invocation.
+    - You should always create an index on the referencing column in the referencing table unless you are omitting it for a good reason. These indexes are frequently used in joins, and are occasionally used in internal postgres operations when performing queries on the _referenced_ table. Name the index `{referencing_table_name}_{referencing_column_name}`.
+    - Reference the primary key of the referenced table unless there's a good reason to reference another column
   - Every table should have `_created_at` and `_updated_at` timestamp columns tracked by the DB, _for debugging purposes only_
     - These columns should not be exposed externally since they can very frequently be unintentionally changed. If you want to expose the time at which a specific action occurred, create explicit timestamp column for that purpose. For example, it's not save to assume that the `_updated_at` timestamp on an Onboarding row is the exact time at which its status transitioned to the most recent status
   - Favor normalized data over denormalized columns. Denormalized data is hard to keep synchronized. it is okay to denormalize a piece of data under two conditions:

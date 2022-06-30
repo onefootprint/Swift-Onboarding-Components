@@ -33,10 +33,7 @@ pub async fn list_for_tenant(
         .interact(move |conn| {
             let mut results = schema::access_events::table
                 .inner_join(schema::onboardings::table)
-                .left_join(
-                    schema::insight_events::table
-                        .on(schema::access_events::insight_event_id.eq(schema::insight_events::id)),
-                )
+                .left_join(schema::insight_events::table)
                 .order_by(schema::access_events::ordering_id.desc())
                 .filter(schema::onboardings::tenant_id.eq(params.tenant_id))
                 .limit(page_size)
@@ -87,10 +84,7 @@ pub async fn list(
         .interact(move |conn| {
             let mut results = schema::access_events::table
                 .inner_join(schema::onboardings::table)
-                .left_join(
-                    schema::insight_events::table
-                        .on(schema::access_events::insight_event_id.eq(schema::insight_events::id)),
-                )
+                .left_join(schema::insight_events::table)
                 .order_by(schema::access_events::timestamp.desc())
                 .filter(schema::onboardings::user_vault_id.eq(user_vault_id))
                 .into_boxed();

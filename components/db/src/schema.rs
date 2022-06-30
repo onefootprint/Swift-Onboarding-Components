@@ -211,14 +211,20 @@ table! {
     }
 }
 
+joinable!(access_events -> insight_events (insight_event_id));
 joinable!(access_events -> onboardings (onboarding_id));
+joinable!(ob_configurations -> tenants (tenant_id));
+joinable!(onboardings -> insight_events (insight_event_id));
 joinable!(onboardings -> ob_configurations (ob_config_id));
+joinable!(onboardings -> tenants (tenant_id));
 joinable!(onboardings -> user_vaults (user_vault_id));
+joinable!(tenant_api_keys -> tenants (tenant_id));
 joinable!(user_data -> user_vaults (user_vault_id));
 joinable!(verification_requests -> onboardings (onboarding_id));
 joinable!(verification_requests_user_data -> user_data (user_data_id));
 joinable!(verification_requests_user_data -> verification_requests (request_id));
 joinable!(verification_results -> verification_requests (request_id));
+joinable!(webauthn_credentials -> insight_events (insight_event_id));
 joinable!(webauthn_credentials -> user_vaults (user_vault_id));
 
 allow_tables_to_appear_in_same_query!(

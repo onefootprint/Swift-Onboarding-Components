@@ -7,9 +7,11 @@ CREATE TABLE tenant_api_keys (
     is_enabled BOOLEAN NOT NULL,
     _created_at timestamp NOT NULL DEFAULT NOW(),
     _updated_at timestamp NOT NULL DEFAULT NOW(),
-    CONSTRAINT fk_tenant_id
+    CONSTRAINT fk_tenant_api_keys_tenant_id
         FOREIGN KEY(tenant_id) 
         REFERENCES tenants(id)
 );
+
+CREATE INDEX IF NOT EXISTS tenant_api_keys_tenant_id ON tenant_api_keys(tenant_id);
 
 SELECT diesel_manage_updated_at('tenant_api_keys');

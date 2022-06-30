@@ -66,10 +66,7 @@ pub fn list_for_tenant(
     page_size: i64,
 ) -> Result<Vec<(Onboarding, InsightEvent)>, DbError> {
     let mut onboardings = list_for_tenant_query(params)
-        .inner_join(
-            schema::insight_events::table
-                .on(schema::insight_events::id.eq(schema::onboardings::insight_event_id)),
-        )
+        .inner_join(schema::insight_events::table)
         .select((
             schema::onboardings::all_columns,
             schema::insight_events::all_columns,
