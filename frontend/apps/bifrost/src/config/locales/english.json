@@ -11,7 +11,8 @@
           "label": "Email",
           "placeholder": "your.email@email.com",
           "error": "Email is required"
-        }
+        },
+        "cta": "Continue"
       }
     },
     "phone-identification": {

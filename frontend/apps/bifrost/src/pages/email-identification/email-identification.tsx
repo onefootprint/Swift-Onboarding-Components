@@ -21,8 +21,7 @@ const EmailIdentification = () => {
   } = useForm<FormData>();
 
   const onSubmit = (formData: FormData) => {
-    const { email } = formData;
-    identifyEmail(email);
+    identifyEmail(formData.email);
   };
 
   return (
@@ -38,7 +37,7 @@ const EmailIdentification = () => {
         {...register('email', { required: true })}
       />
       <Button fullWidth type="submit" loading={isLoading()}>
-        Continue
+        {t('form.cta')}
       </Button>
     </Form>
   );

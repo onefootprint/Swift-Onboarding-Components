@@ -14,7 +14,6 @@ const PhoneVerification = () => {
   const [state] = useBifrostMachine();
   const verifyMutation = useIdentifyVerify();
   const onboardingMutation = useOnboarding();
-
   const shouldShowForm = verifyMutation.isIdle || verifyMutation.isError;
   const shouldShowLoading =
     verifyMutation.isLoading || onboardingMutation.isLoading;

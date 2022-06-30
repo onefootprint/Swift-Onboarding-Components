@@ -10,7 +10,7 @@ import useIdentifyChallenge, {
 import useBifrostMachine, { Events } from 'src/hooks/use-bifrost-machine';
 import { ChallengeKind } from 'src/utils/state-machine/types';
 import styled, { css } from 'styled-components';
-import { Button, LinkButton, TextInput, Typography } from 'ui';
+import { Box, Button, LinkButton, TextInput, Typography } from 'ui';
 
 type FormData = {
   phone: string;
@@ -88,10 +88,14 @@ const PhoneIdentification = () => {
     <Form onSubmit={handleSubmit(onSubmit)}>
       <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
       <EmailCard>
-        <IcoEmail24 />
-        <Typography variant="label-3" color="primary" sx={{ flexGrow: 1 }}>
-          {state.context.email}
-        </Typography>
+        <EmailCardContent>
+          <Box>
+            <StyledIcoEmail24 />
+          </Box>
+          <Typography variant="label-3" color="primary">
+            {state.context.email}
+          </Typography>
+        </EmailCardContent>
         <LinkButton size="compact" onClick={handleChangeEmail}>
           {t('email-card.cta')}
         </LinkButton>
@@ -131,7 +135,30 @@ const EmailCard = styled.div`
     border-radius: ${theme.borderRadius[2]}px;
     display: flex;
     gap: ${theme.spacing[4]}px;
+    overflow: hidden;
     padding: ${theme.spacing[5]}px;
+
+    p {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  `}
+`;
+
+const EmailCardContent = styled.div`
+  align-items: center;
+  display: flex;
+  flex-direction: row;
+  flex: 1;
+  min-width: 0;
+`;
+
+const StyledIcoEmail24 = styled(IcoEmail24)`
+  ${({ theme }) => css`
+    margin-right: ${theme.spacing[4]}px;
+    position: relative;
+    top: ${theme.spacing[1]}px;
   `}
 `;
 
