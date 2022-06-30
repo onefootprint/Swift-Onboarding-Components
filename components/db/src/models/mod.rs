@@ -7,4 +7,6 @@ pub mod tenant_api_keys;
 pub mod tenants;
 pub mod user_data;
 pub mod user_vaults;
+pub mod verification_request;
+pub mod verification_result;
 pub mod webauthn_credential;

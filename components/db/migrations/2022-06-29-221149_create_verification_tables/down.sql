@@ -1,0 +1,3 @@
+DROP TABLE verification_results;
+DROP TABLE verification_requests_user_data;
+DROP TABLE verification_requests;

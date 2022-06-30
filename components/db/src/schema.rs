@@ -157,6 +157,45 @@ table! {
     use diesel::sql_types::*;
     use newtypes::db_types::*;
 
+    verification_requests (id) {
+        id -> Uuid,
+        onboarding_id -> Varchar,
+        vendor -> Text,
+        timestamp -> Timestamp,
+        _created_at -> Timestamp,
+        _updated_at -> Timestamp,
+    }
+}
+
+table! {
+    use diesel::sql_types::*;
+    use newtypes::db_types::*;
+
+    verification_requests_user_data (id) {
+        id -> Uuid,
+        user_data_id -> Text,
+        request_id -> Uuid,
+    }
+}
+
+table! {
+    use diesel::sql_types::*;
+    use newtypes::db_types::*;
+
+    verification_results (id) {
+        id -> Uuid,
+        request_id -> Uuid,
+        response -> Jsonb,
+        timestamp -> Timestamp,
+        _created_at -> Timestamp,
+        _updated_at -> Timestamp,
+    }
+}
+
+table! {
+    use diesel::sql_types::*;
+    use newtypes::db_types::*;
+
     webauthn_credentials (id) {
         id -> Uuid,
         user_vault_id -> Varchar,
@@ -176,6 +215,10 @@ joinable!(access_events -> onboardings (onboarding_id));
 joinable!(onboardings -> ob_configurations (ob_config_id));
 joinable!(onboardings -> user_vaults (user_vault_id));
 joinable!(user_data -> user_vaults (user_vault_id));
+joinable!(verification_requests -> onboardings (onboarding_id));
+joinable!(verification_requests_user_data -> user_data (user_data_id));
+joinable!(verification_requests_user_data -> verification_requests (request_id));
+joinable!(verification_results -> verification_requests (request_id));
 joinable!(webauthn_credentials -> user_vaults (user_vault_id));
 
 allow_tables_to_appear_in_same_query!(
@@ -188,5 +231,8 @@ allow_tables_to_appear_in_same_query!(
     tenants,
     user_data,
     user_vaults,
+    verification_requests,
+    verification_requests_user_data,
+    verification_results,
     webauthn_credentials,
 );
