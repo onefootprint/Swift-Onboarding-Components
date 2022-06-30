@@ -1,8 +1,9 @@
-import { useTranslation } from 'hooks';
+import { useRequestErrorToast, useTranslation } from 'hooks';
 import IcoEmail24 from 'icons/ico/ico-email-24';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import HeaderTitle from 'src/components/header-title';
+import NavigationHeader from 'src/components/navigation-header';
 import useIdentify from 'src/hooks/identify/use-identify';
 import useIdentifyChallenge, {
   IdentifyChallengeResponse,
@@ -17,6 +18,7 @@ type FormData = {
 };
 
 const PhoneIdentification = () => {
+  const showRequestErrorToast = useRequestErrorToast();
   const [state, send] = useBifrostMachine();
   const { t } = useTranslation('pages.phone-identification');
   const {
@@ -50,6 +52,7 @@ const PhoneIdentification = () => {
             },
           });
         },
+        onError: showRequestErrorToast,
       },
     );
   };
@@ -77,16 +80,26 @@ const PhoneIdentification = () => {
               },
             });
           }
-          // If this is a new user/phone, send an SMS challenge
           sendSmsChallenge(phone, userFound);
         },
+        onError: showRequestErrorToast,
       },
     );
   };
 
   return (
-    <Form onSubmit={handleSubmit(onSubmit)}>
-      <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
+    <>
+      <NavigationHeader
+        button={{
+          variant: 'back',
+          onClick: handleChangeEmail,
+        }}
+      />
+      <HeaderTitle
+        subtitle={t('subtitle')}
+        sx={{ marginBottom: 8 }}
+        title={t('title')}
+      />
       <EmailCard>
         <EmailCardContent>
           <Box>
@@ -100,24 +113,26 @@ const PhoneIdentification = () => {
           {t('email-card.cta')}
         </LinkButton>
       </EmailCard>
-      <TextInput
-        autoFocus
-        hasError={!!errors.phone}
-        hintText={errors.phone && t('form.phone-input.error')}
-        label={t('form.phone-input.label')}
-        placeholder={t('form.phone-input.placeholder')}
-        {...register('phone', { required: true })}
-      />
-      <Button
-        type="submit"
-        fullWidth
-        loading={
-          identifyMutation.isLoading || identifyChallengeMutation.isLoading
-        }
-      >
-        {t('form.cta')}
-      </Button>
-    </Form>
+      <Form onSubmit={handleSubmit(onSubmit)}>
+        <TextInput
+          autoFocus
+          hasError={!!errors.phone}
+          hintText={errors.phone && t('form.phone-input.error')}
+          label={t('form.phone-input.label')}
+          placeholder={t('form.phone-input.placeholder')}
+          {...register('phone', { required: true })}
+        />
+        <Button
+          type="submit"
+          fullWidth
+          loading={
+            identifyMutation.isLoading || identifyChallengeMutation.isLoading
+          }
+        >
+          {t('form.cta')}
+        </Button>
+      </Form>
+    </>
   );
 };
 
@@ -135,7 +150,7 @@ const EmailCard = styled.div`
     border-radius: ${theme.borderRadius[2]}px;
     display: flex;
     gap: ${theme.spacing[4]}px;
-    overflow: hidden;
+    margin-bottom: ${theme.spacing[8]}px;
     padding: ${theme.spacing[5]}px;
 
     p {

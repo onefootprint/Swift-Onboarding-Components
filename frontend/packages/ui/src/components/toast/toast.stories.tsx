@@ -49,7 +49,7 @@ export default {
       type: { name: 'string', required: false },
       description: 'Append an attribute data-testid for testing purposes',
     },
-    onClose: {
+    onHide: {
       control: {
         type: 'function',
       },
@@ -62,19 +62,19 @@ export default {
 const Template: Story<ToastProps> = ({
   closeAriaLabel,
   description,
-  onClose,
+  onHide,
   testID,
   title,
   variant,
 }: ToastProps) => {
   const [ids, setIds] = useState<string[]>([]);
-  const { open, close } = useToast();
+  const toast = useToast();
 
   const handleOpenToast = () => {
-    const nextId = open({
+    const nextId = toast.show({
       closeAriaLabel,
       description,
-      onClose,
+      onHide,
       testID,
       title,
       variant,
@@ -85,7 +85,7 @@ const Template: Story<ToastProps> = ({
   const handleCloseToast = () => {
     if (ids.length) {
       const lastId = ids[ids.length - 1];
-      close(lastId);
+      toast.hide(lastId);
       setIds(currentIds => currentIds.filter(id => id !== lastId));
     }
   };
@@ -102,7 +102,7 @@ export const Base = Template.bind({});
 Base.args = {
   closeAriaLabel: 'Close',
   description: 'Toast description',
-  onClose: () => {
+  onHide: () => {
     console.log('toast was closed');
   },
   testID: 'input-test-id',

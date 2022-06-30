@@ -1,27 +1,36 @@
 import React from 'react';
-import useIdentifyVerify from 'src/hooks/identify/use-identify-verify';
-import useBifrostMachine from 'src/hooks/use-bifrost-machine';
+import NavigationHeader from 'src/components/navigation-header';
+import useBifrostMachine, { Events } from 'src/hooks/use-bifrost-machine';
+import useIdentifyVerification from 'src/hooks/use-identify-verification';
 import styled, { css } from 'styled-components';
 import { Box, Typography } from 'ui';
 
 import PhoneVerificationLoading from './components/phone-verification-loading';
 import PhoneVerificationPinForm from './components/phone-verification-pin-form';
 import PhoneVerificationSuccess from './components/phone-verification-success';
-import PrevHeader from './components/prev-header';
 import useOnboarding from './hooks/use-onboarding';
 
 const PhoneVerification = () => {
-  const [state] = useBifrostMachine();
-  const verifyMutation = useIdentifyVerify();
+  const [state, send] = useBifrostMachine();
+  const identifyVerificationMutation = useIdentifyVerification();
   const onboardingMutation = useOnboarding();
-  const shouldShowForm = verifyMutation.isIdle || verifyMutation.isError;
+
+  const shouldShowForm =
+    identifyVerificationMutation.isIdle || identifyVerificationMutation.isError;
   const shouldShowLoading =
-    verifyMutation.isLoading || onboardingMutation.isLoading;
+    identifyVerificationMutation.isLoading || onboardingMutation.isLoading;
   const shouldShowSuccess = onboardingMutation.isSuccess;
 
   return (
     <>
-      <PrevHeader />
+      <NavigationHeader
+        button={{
+          variant: 'back',
+          onClick: () => {
+            send(Events.navigatedToPrevPage);
+          },
+        }}
+      />
       <Form>
         <Box>
           <Typography variant="heading-2" color="primary">
@@ -38,7 +47,7 @@ const PhoneVerification = () => {
         </Box>
         {shouldShowForm && (
           <PhoneVerificationPinForm
-            verifyMutation={verifyMutation}
+            verifyMutation={identifyVerificationMutation}
             onboardingMutation={onboardingMutation}
           />
         )}

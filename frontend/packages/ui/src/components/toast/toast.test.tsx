@@ -11,7 +11,7 @@ describe('<Toast />', () => {
     description = 'description',
     id = '1',
     leaving = false,
-    onClose,
+    onHide,
     testID,
     title = 'title',
     variant,
@@ -22,7 +22,7 @@ describe('<Toast />', () => {
         description={description}
         id={id}
         leaving={leaving}
-        onClose={onClose}
+        onHide={onHide}
         testID={testID}
         title={title}
         variant={variant}
@@ -63,12 +63,12 @@ describe('<Toast />', () => {
   });
 
   describe('when clicking on the close button', () => {
-    it('should trigger onClose', async () => {
-      const onCloseMockFn = jest.fn();
-      renderToast({ closeAriaLabel: 'Close', onClose: onCloseMockFn });
+    it('should trigger onHide', async () => {
+      const onHideMockFn = jest.fn();
+      renderToast({ closeAriaLabel: 'Close', onHide: onHideMockFn });
       const closeButton = screen.getByRole('button', { name: 'Close' });
       await userEvent.click(closeButton);
-      expect(onCloseMockFn).toHaveBeenCalled();
+      expect(onHideMockFn).toHaveBeenCalled();
     });
   });
 });

@@ -11,7 +11,7 @@ const Toast = ({
   closeAriaLabel = 'Close',
   description,
   leaving = false,
-  onClose,
+  onHide,
   testID,
   title,
   variant = 'default',
@@ -34,7 +34,7 @@ const Toast = ({
     </Box>
     <button
       aria-label={closeAriaLabel}
-      onClick={onClose}
+      onClick={onHide}
       tabIndex={0}
       type="button"
     >

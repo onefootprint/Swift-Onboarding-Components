@@ -9,6 +9,7 @@ import IcoUserCircle24 from 'icons/ico/ico-user-circle-24';
 import React from 'react';
 import HeaderTitle from 'src/components/header-title';
 import { useBifrostMachine } from 'src/components/machine-provider';
+import NavigationHeader from 'src/components/navigation-header';
 import { Events } from 'src/hooks/use-bifrost-machine';
 import useOnboardingComplete from 'src/hooks/use-onboarding-complete';
 import { UserDataAttribute } from 'src/utils/state-machine/types';
@@ -54,8 +55,8 @@ const IconsByUserDataAttributes: Record<
   [UserDataAttributeCategory.address]: <IcoBuilding24 />,
 };
 
-const Confirmation = () => {
-  const { t } = useTranslation('pages.confirmation');
+const ConfirmAndAuthorize = () => {
+  const { t } = useTranslation('pages.confirm-and-authorize');
   const footprint = useFootprintJs();
   const completeOnboardingMutation = useOnboardingComplete();
   const [state, send] = useBifrostMachine();
@@ -88,28 +89,43 @@ const Confirmation = () => {
   );
 
   return (
-    <Container>
-      <HeaderTitle
-        title={t('title')}
-        subtitle={t('subtitle', { tenantName: state.context.tenant.name })}
-      />
-      <CategoriesContainer>
-        {requiredCategories.map((category: UserDataAttributeCategory) => (
-          <Category key={category}>
-            <IconContainer>{IconsByUserDataAttributes[category]}</IconContainer>
-            <Typography variant="label-3">{category}</Typography>
-          </Category>
-        ))}
-      </CategoriesContainer>
-      <FootprintButton
-        fullWidth
-        loading={completeOnboardingMutation.isLoading}
-        onClick={handleClick}
-        text={t('cta')}
-      />
-    </Container>
+    <>
+      <NavigationHeader button={{ variant: 'close', confirm: true }} />
+      <Container>
+        <HeaderTitle
+          title={t('title')}
+          subtitle={t('subtitle', { tenantName: state.context.tenant.name })}
+        />
+        <CategoriesContainer>
+          {requiredCategories.map((category: UserDataAttributeCategory) => (
+            <Category key={category}>
+              <IconContainer>
+                {IconsByUserDataAttributes[category]}
+              </IconContainer>
+              <Typography variant="label-3">{category}</Typography>
+            </Category>
+          ))}
+        </CategoriesContainer>
+        <FootprintButton
+          fullWidth
+          loading={completeOnboardingMutation.isLoading}
+          onClick={handleClick}
+          text={t('cta')}
+        />
+      </Container>
+    </>
   );
 };
+
+const Container = styled.div`
+  ${({ theme }) => css`
+    display: flex;
+    flex-direction: column;
+    row-gap: ${theme.spacing[8]}px;
+    justify-content: center;
+    align-items: center;
+  `}
+`;
 
 const IconContainer = styled.span`
   ${({ theme }) => css`
@@ -134,14 +150,4 @@ const CategoriesContainer = styled.div`
   `}
 `;
 
-const Container = styled.div`
-  ${({ theme }) => css`
-    display: flex;
-    flex-direction: column;
-    row-gap: ${theme.spacing[8]}px;
-    justify-content: center;
-    align-items: center;
-  `}
-`;
-
-export default Confirmation;
+export default ConfirmAndAuthorize;

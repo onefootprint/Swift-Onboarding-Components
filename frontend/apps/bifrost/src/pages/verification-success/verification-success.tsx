@@ -1,6 +1,39 @@
+import { useFootprintJs } from 'footprint-provider';
+import { useTranslation } from 'hooks';
 import React from 'react';
-import SuccessMessage from 'src/components/success-message';
+import HeaderTitle from 'src/components/header-title';
+import NavigationHeader from 'src/components/navigation-header';
+import styled, { css } from 'styled-components';
+import { LinkButton } from 'ui';
 
-const VerificationSuccess = () => <SuccessMessage />;
+const VerificationSuccess = () => {
+  const { t } = useTranslation('pages.verification-success');
+  const footprint = useFootprintJs();
+
+  const handleClose = () => {
+    footprint.onClose();
+  };
+
+  return (
+    <>
+      <NavigationHeader button={{ variant: 'close' }} />
+      <Container>
+        <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
+        <LinkButton onClick={handleClose}>{t('cta')}</LinkButton>
+      </Container>
+    </>
+  );
+};
+
+const Container = styled.div`
+  ${({ theme }) => css`
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    row-gap: ${theme.spacing[8]}px;
+    text-align: center;
+  `}
+`;
 
 export default VerificationSuccess;

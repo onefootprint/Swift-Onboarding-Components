@@ -1,7 +1,7 @@
 export type NextToast = {
   closeAriaLabel?: string;
   description: string;
-  onClose?: () => void;
+  onHide?: () => void;
   testID?: string;
   title: string;
   variant?: 'default' | 'error';

@@ -1,8 +1,8 @@
 import useIdentify, { IdentifyResponse } from 'src/hooks/identify/use-identify';
-import useIdentifyVerify, {
-  IdentifyVerifyResponse,
-} from 'src/hooks/identify/use-identify-verify';
 import useBifrostMachine, { Events } from 'src/hooks/use-bifrost-machine';
+import useIdentityVerification, {
+  IdentifyVerificationResponse,
+} from 'src/hooks/use-identify-verification';
 import useOnboarding, {
   OnboardingResponse,
 } from 'src/pages/phone-verification/hooks/use-onboarding';
@@ -12,12 +12,12 @@ import { ChallengeData, ChallengeKind } from 'src/utils/state-machine/types';
 const useEmailIdentify = () => {
   const [state, send] = useBifrostMachine();
   const identifyMutation = useIdentify();
-  const identifyVerifyMutation = useIdentifyVerify();
+  const identifyVerificationMutation = useIdentityVerification();
   const onboardingMutation = useOnboarding();
 
   const isLoading = () =>
     identifyMutation.isLoading ||
-    identifyVerifyMutation.isLoading ||
+    identifyVerificationMutation.isLoading ||
     onboardingMutation.isLoading;
 
   const identifyEmail = (email: string) => {
@@ -80,14 +80,14 @@ const useEmailIdentify = () => {
     const challengeResponse = await generateLoginDeviceResponse(
       biometricChallengeJson,
     );
-    identifyVerifyMutation.mutate(
+    identifyVerificationMutation.mutate(
       {
         challengeKind: ChallengeKind.biometric,
         challengeResponse,
         challengeToken,
       },
       {
-        onSuccess: ({ authToken }: IdentifyVerifyResponse) => {
+        onSuccess: ({ authToken }: IdentifyVerificationResponse) => {
           startOnboarding(email, authToken);
         },
         onError: () => {

@@ -12,7 +12,7 @@ type DashboardQueryClientProviderProps = {
 const DashboardQueryClientProvider = ({
   children,
 }: DashboardQueryClientProviderProps) => {
-  const { open } = useToast();
+  const { show } = useToast();
   const { logOut } = useSessionUser();
   const router = useRouter();
 
@@ -25,7 +25,7 @@ const DashboardQueryClientProvider = ({
       if (error.response.status === 401) {
         // If we receive an HTTP 401, assume the auth token has expired and we should prompt to re-log in
         // TODO one day, check that this is a 401 from an expired token
-        open(
+        show(
           {
             description: `To keep your session secure, your login has expired. Please log back in.`,
             title: 'Logged out',
@@ -36,7 +36,7 @@ const DashboardQueryClientProvider = ({
         logOut();
         router.push('/login');
       } else {
-        open({
+        show({
           // @ts-ignore can't type the QueryClient's defaultOptions sadly
           description: `There was an error making your request: ${error.response.statusText}`,
           title: 'Uh-oh!',

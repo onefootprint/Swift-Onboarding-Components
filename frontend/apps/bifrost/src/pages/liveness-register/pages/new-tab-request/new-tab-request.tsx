@@ -1,6 +1,7 @@
 import { useTranslation } from 'hooks';
 import React, { useEffect } from 'react';
 import HeaderTitle from 'src/components/header-title';
+import NavigationHeader from 'src/components/navigation-header';
 import createBiometricUrl from 'src/utils/create-biometric-url';
 import { Events } from 'src/utils/state-machine/liveness-register';
 import styled, { css } from 'styled-components';
@@ -37,12 +38,15 @@ const NewTabRequest = () => {
   };
 
   return (
-    <Container>
-      <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
-      <Button onClick={handleClick} fullWidth>
-        {t('cta')}
-      </Button>
-    </Container>
+    <>
+      <NavigationHeader button={{ variant: 'close', confirm: true }} />
+      <Container>
+        <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
+        <Button onClick={handleClick} fullWidth>
+          {t('cta')}
+        </Button>
+      </Container>
+    </>
   );
 };
 

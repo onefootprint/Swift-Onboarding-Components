@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import HeaderTitle from 'src/components/header-title';
+import NavigationHeader from 'src/components/navigation-header';
 import useGetD2PStatus, { D2PStatus } from 'src/hooks/d2p/use-get-d2p-status';
 import useUpdateD2PStatus, {
   D2PStatusUpdate,
@@ -55,14 +56,17 @@ const QRCodeScanned = () => {
   }, [statusResponse.error]);
 
   return (
-    <Container>
-      <HeaderTitle
-        title="Liveness check"
-        subtitle="QR code scanned. Please continue on your phone."
-      />
-      <LoadingIndicator />
-      <LinkButton onClick={handleCancel}>Cancel</LinkButton>
-    </Container>
+    <>
+      <NavigationHeader button={{ variant: 'close', confirm: true }} />
+      <Container>
+        <HeaderTitle
+          title="Liveness check"
+          subtitle="QR code scanned. Please continue on your phone."
+        />
+        <LoadingIndicator />
+        <LinkButton onClick={handleCancel}>Cancel</LinkButton>
+      </Container>
+    </>
   );
 };
 

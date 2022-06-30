@@ -11,16 +11,16 @@ import ToastProvider, { useToast } from './toast-provider';
 
 const ToastConsumerDemo = () => {
   const [id, setId] = useState<null | string>(null);
-  const { open, close } = useToast();
+  const { show, hide } = useToast();
 
   const handleOpenToast = () => {
-    const nextId = open({ title: 'Title', description: 'Description ' });
+    const nextId = show({ title: 'Title', description: 'Description ' });
     setId(nextId);
   };
 
-  const handleCloseToast = () => {
+  const handleHideToast = () => {
     if (id) {
-      close(id);
+      hide(id);
       setId(null);
     }
   };
@@ -28,7 +28,7 @@ const ToastConsumerDemo = () => {
   return (
     <>
       <Button onClick={handleOpenToast}>Open toast</Button>
-      <Button onClick={handleCloseToast}>Close toast</Button>
+      <Button onClick={handleHideToast}>Close toast</Button>
     </>
   );
 };

@@ -11,7 +11,7 @@ export enum States {
 
   // Misc
   tenantInvalid = 'tenantInvalid',
-  confirmation = 'confirmation',
+  confirmAndAuthorize = 'confirmAndAuthorize',
 
   // Identify
   emailIdentification = 'emailIdentification',

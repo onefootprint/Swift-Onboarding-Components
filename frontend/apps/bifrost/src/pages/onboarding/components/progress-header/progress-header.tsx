@@ -1,9 +1,7 @@
 import React from 'react';
-import CloseButton from 'src/components/close-button';
-import PrevButton from 'src/components/prev-button';
+import NavigationHeader from 'src/components/navigation-header';
 import { Events } from 'src/utils/state-machine/onboarding';
-import styled from 'styled-components';
-import { Portal, Stepper } from 'ui';
+import { Stepper } from 'ui';
 
 import useOnboardingMachine from '../../hooks/use-onboarding-machine';
 import {
@@ -25,25 +23,16 @@ const ProgressHeader = () => {
   };
 
   return (
-    <Portal selector="#main-header" removeContent>
-      {shouldShowCloseButton ? (
-        <CloseButton />
-      ) : (
-        <PrevButton onClick={handleBackButtonClick} />
-      )}
-      <StepperContainer>
-        <Stepper max={max} value={value} />
-      </StepperContainer>
-    </Portal>
+    <NavigationHeader
+      button={{
+        confirm: shouldShowCloseButton,
+        onClick: shouldShowCloseButton ? undefined : handleBackButtonClick,
+        variant: shouldShowCloseButton ? 'close' : 'back',
+      }}
+    >
+      <Stepper max={max} value={value} />
+    </NavigationHeader>
   );
 };
-
-const StepperContainer = styled.div`
-  display: flex;
-  flex-grow: 1;
-  justify-content: center;
-  align-items: center;
-  margin-left: -32px; // Icon size
-`;
 
 export default ProgressHeader;

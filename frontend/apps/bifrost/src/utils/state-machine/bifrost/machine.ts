@@ -90,7 +90,7 @@ const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
                 !event.payload.userFound,
             },
             {
-              target: States.confirmation,
+              target: States.confirmAndAuthorize,
               actions: [
                 Actions.assignAuthToken,
                 Actions.assignEmail,
@@ -123,7 +123,7 @@ const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
                 !event.payload.userFound,
             },
             {
-              target: States.confirmation,
+              target: States.confirmAndAuthorize,
               actions: [
                 Actions.assignAuthToken,
                 Actions.assignEmail,
@@ -139,7 +139,7 @@ const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
           },
         },
       },
-      [States.confirmation]: {
+      [States.confirmAndAuthorize]: {
         on: {
           [Events.sharedDataConfirmed]: {
             target: States.verificationSuccess,
@@ -195,7 +195,7 @@ const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
             {
               description:
                 'Show the confirmation page if there were no missing attributes for existing user',
-              target: States.confirmation,
+              target: States.confirmAndAuthorize,
               actions: [
                 Actions.assignAuthToken,
                 Actions.assignMissingAttributes,

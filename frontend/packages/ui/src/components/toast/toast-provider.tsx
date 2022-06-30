@@ -17,10 +17,10 @@ export type ToastProviderProps = {
 const [Provider, useContext] = constate(useToast);
 
 const ToastManager = ({ children }: ToastManagerProps) => {
-  const { toasts, close } = useContext();
-  const handleCloseClick = (id: string, onClose?: () => void) => () => {
-    close(id);
-    onClose?.();
+  const { toasts, hide } = useContext();
+  const handleCloseClick = (id: string, onHide?: () => void) => () => {
+    hide(id);
+    onHide?.();
   };
 
   return (
@@ -34,7 +34,7 @@ const ToastManager = ({ children }: ToastManagerProps) => {
               description,
               id,
               leaving,
-              onClose,
+              onHide,
               testID,
               title,
               variant,
@@ -45,7 +45,7 @@ const ToastManager = ({ children }: ToastManagerProps) => {
                 id={id}
                 key={id}
                 leaving={leaving}
-                onClose={handleCloseClick(id, onClose)}
+                onHide={handleCloseClick(id, onHide)}
                 testID={testID}
                 title={title}
                 variant={variant}

@@ -1,19 +1,47 @@
+import { useFootprintJs } from 'footprint-provider';
+import { useTranslation } from 'hooks';
 import React from 'react';
-import SuccessMessage from 'src/components/success-message';
-import { Typography } from 'ui';
+import HeaderTitle from 'src/components/header-title';
+import NavigationHeader from 'src/components/navigation-header';
+import styled, { css } from 'styled-components';
+import { LinkButton, Typography } from 'ui';
 
-const OnboardingSuccess = () => (
-  <SuccessMessage>
+const OnboardingSuccess = () => {
+  const { t } = useTranslation('pages.onboarding-success');
+  const footprint = useFootprintJs();
+
+  const handleClose = () => {
+    footprint.onClose();
+  };
+
+  return (
     <>
-      <Typography variant="body-1">
-        You can view your personal data and the companies that have access to it
-        on my.footprint.com.
-      </Typography>
-      <Typography variant="body-1">
-        Next time, you can just sign in using Footprint with one-click!
-      </Typography>
+      <NavigationHeader
+        button={{
+          variant: 'close',
+        }}
+      />
+      <Container>
+        <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
+        <Typography variant="body-2">
+          {t('body.view-on-my-footprint')}
+        </Typography>
+        <Typography variant="body-2">{t('body.one-click')}</Typography>
+        <LinkButton onClick={handleClose}>{t('cta')}</LinkButton>
+      </Container>
     </>
-  </SuccessMessage>
-);
+  );
+};
+
+const Container = styled.div`
+  ${({ theme }) => css`
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    row-gap: ${theme.spacing[8]}px;
+    text-align: center;
+  `}
+`;
 
 export default OnboardingSuccess;

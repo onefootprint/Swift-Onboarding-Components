@@ -8,7 +8,6 @@ import themes from 'themes';
 import { DesignSystemProvider, media } from 'ui';
 
 import FootprintFooter from '../components/footprint-footer';
-import Header from '../components/header';
 import MachineProvider from '../components/machine-provider';
 import { GOOGLE_MAPS_KEY } from '../config/constants';
 import configureReactI18next from '../config/initializers/react-i18next';
@@ -37,7 +36,7 @@ const App = ({ Component, pageProps }: AppProps) => (
           <GlobalStyle />
           <FootprintProvider>
             <Content>
-              <Header />
+              <NavigationHeader id="navigation-header-portal" />
               <Component {...pageProps} />
             </Content>
             <FootprintFooter />
@@ -95,6 +94,10 @@ const Content = styled.div`
       padding: 0 ${theme.spacing[7]}px ${theme.spacing[7]}px;
     `}
   `}
+`;
+
+const NavigationHeader = styled.header`
+  height: 56px;
 `;
 
 export default App;

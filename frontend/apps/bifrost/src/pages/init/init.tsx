@@ -1,6 +1,6 @@
 import React from 'react';
 import styled, { css } from 'styled-components';
-import { Box, Shimmer } from 'ui';
+import { Box, Portal, Shimmer } from 'ui';
 
 import useDeviceInfo from './hooks/use-device-info';
 import useTenantInfo from './hooks/use-tenant-info';
@@ -12,43 +12,49 @@ const Init = () => {
   useTenantInfo(tenantPk);
 
   return (
-    <InitContainer>
-      <Header>
+    <Box>
+      <Portal selector="#navigation-header-portal" removeContent>
+        <HeaderContainer>
+          <CloseButton />
+        </HeaderContainer>
+      </Portal>
+      <TitleContainer>
         <Title />
         <Subtitle />
-      </Header>
-      <Box>
+      </TitleContainer>
+      <Box sx={{ marginBottom: 7 }}>
         <Label />
         <Input />
       </Box>
       <Button />
-    </InitContainer>
+    </Box>
   );
 };
 
-const InitContainer = styled.div`
-  ${({ theme }) => css`
-    display: grid;
-    gap: ${theme.spacing[7]}px;
-  `}
+const HeaderContainer = styled.div`
+  display: flex;
+  height: 56px;
+  align-items: center;
 `;
 
-const Header = styled.div`
+const CloseButton = () => <Shimmer sx={{ width: '24px', height: '24px' }} />;
+
+const TitleContainer = styled.div`
   ${({ theme }) => css`
     align-items: center;
     display: flex;
     flex-direction: column;
     justify-content: center;
-    margin-top: ${theme.spacing[1] + theme.spacing[2]}px;
+    margin-bottom: ${theme.spacing[8]}px;
+    margin-top: ${theme.spacing[3] + theme.spacing[1]}px;
   `}
 `;
 
-// These are shimmer imitating the email-identification page
 const Title = () => (
-  <Shimmer sx={{ width: '120px', height: '25px', marginBottom: 2 }} />
+  <Shimmer sx={{ width: '120px', height: '21px', marginBottom: 3 }} />
 );
 
-const Subtitle = () => <Shimmer sx={{ width: '228px', height: '21px' }} />;
+const Subtitle = () => <Shimmer sx={{ width: '228px', height: '17px' }} />;
 
 const Label = () => (
   <Shimmer sx={{ width: '37px', height: '19.5px', marginBottom: 3 }} />

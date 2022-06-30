@@ -2,11 +2,11 @@ import React from 'react';
 import { UseMutationResult } from 'react-query';
 import { RequestError } from 'request';
 import useIdentify, { IdentifyResponse } from 'src/hooks/identify/use-identify';
-import {
-  IdentifyVerifyRequest,
-  IdentifyVerifyResponse,
-} from 'src/hooks/identify/use-identify-verify';
 import useBifrostMachine, { Events } from 'src/hooks/use-bifrost-machine';
+import {
+  IdentifyVerificationRequest,
+  IdentifyVerificationResponse,
+} from 'src/hooks/use-identify-verification';
 import { ChallengeKind } from 'src/utils/state-machine/types';
 import { LinkButton, LoadingIndicator, PinInput } from 'ui';
 
@@ -20,9 +20,9 @@ const SUCCESS_EVENT_DELAY_MS = 1500;
 
 type PhoneVerificationPinFormProps = {
   verifyMutation: UseMutationResult<
-    IdentifyVerifyResponse,
+    IdentifyVerificationResponse,
     RequestError,
-    IdentifyVerifyRequest
+    IdentifyVerificationRequest
   >;
   onboardingMutation: UseMutationResult<
     OnboardingResponse,
@@ -40,7 +40,7 @@ const PhoneVerificationPinForm = ({
 
   const handlePinValidationSucceeded = ({
     authToken,
-  }: IdentifyVerifyResponse) => {
+  }: IdentifyVerificationResponse) => {
     const tenantPk = state.context.tenant.pk;
     onboardingMutation.mutate(
       { authToken, tenantPk },

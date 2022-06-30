@@ -1,8 +1,8 @@
 import useIdentify, { IdentifyResponse } from 'src/hooks/identify/use-identify';
-import useIdentifyVerify, {
-  IdentifyVerifyResponse,
-} from 'src/hooks/identify/use-identify-verify';
 import useBifrostMachine, { Events } from 'src/hooks/use-bifrost-machine';
+import useIdentityVerification, {
+  IdentifyVerificationResponse,
+} from 'src/hooks/use-identify-verification';
 import useOnboarding, {
   OnboardingResponse,
 } from 'src/pages/phone-verification/hooks/use-onboarding';
@@ -12,7 +12,7 @@ import { ChallengeData, ChallengeKind } from 'src/utils/state-machine/types';
 const useBiometricLoginRetry = () => {
   const [state, send] = useBifrostMachine();
   const identifyMutation = useIdentify();
-  const identifyVerifyMutation = useIdentifyVerify();
+  const identityVerificationMutation = useIdentityVerification();
   const onboardingMutation = useOnboarding();
 
   const requestBiometricChallenge = () => {
@@ -81,14 +81,14 @@ const useBiometricLoginRetry = () => {
     const challengeResponse = await generateLoginDeviceResponse(
       biometricChallengeJson,
     );
-    identifyVerifyMutation.mutate(
+    identityVerificationMutation.mutate(
       {
         challengeKind: ChallengeKind.biometric,
         challengeResponse,
         challengeToken,
       },
       {
-        onSuccess: ({ authToken }: IdentifyVerifyResponse) => {
+        onSuccess: ({ authToken }: IdentifyVerificationResponse) => {
           startOnboarding(authToken);
         },
       },

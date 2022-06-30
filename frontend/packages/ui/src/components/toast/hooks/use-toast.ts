@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 import { NextToast, ToastProps } from '../toast.types';
 
-const CLOSE_TIMEOUT = 8000;
+const HIDE_TIMEOUT = 8000;
 const LEAVING_ANIMATION_DURATION = 200;
 
 const timeoutManager: Record<string, NodeJS.Timeout> = {};
@@ -12,32 +12,32 @@ const createRandomId = () => Math.random().toString(36).substring(2, 15);
 const useToast = () => {
   const [toasts, setToasts] = useState<ToastProps[]>([]);
 
-  const open = (nextToast: NextToast, closeTimeoutMs = CLOSE_TIMEOUT) => {
+  const show = (nextToast: NextToast, hideTimeout = HIDE_TIMEOUT) => {
     const id = createRandomId();
     setToasts(currentToasts => [
       ...currentToasts,
       { ...nextToast, id, leaving: false },
     ]);
-    scheduleToClose(id, closeTimeoutMs);
+    scheduleToHide(id, hideTimeout);
     return id;
   };
 
-  const close = (id: string) => {
+  const hide = (id: string) => {
     clearTimeout(timeoutManager[id]);
     const delay = 0;
-    scheduleToClose(id, delay);
+    scheduleToHide(id, delay);
   };
 
-  const scheduleToClose = (id: string, delay = CLOSE_TIMEOUT) => {
+  const scheduleToHide = (id: string, delay = HIDE_TIMEOUT) => {
     timeoutManager[id] = setTimeout(() => {
-      showAnimationBeforeClose(id);
+      showAnimationBeforeHide(id);
       setTimeout(() => {
         removeFromDom(id);
       }, LEAVING_ANIMATION_DURATION);
     }, delay);
   };
 
-  const showAnimationBeforeClose = (id: string) => {
+  const showAnimationBeforeHide = (id: string) => {
     setToasts(currentToasts =>
       currentToasts.map(toast => {
         if (toast.id === id) {
@@ -56,7 +56,7 @@ const useToast = () => {
     delete timeoutManager[id];
   };
 
-  return { toasts, open, close };
+  return { toasts, show, hide };
 };
 
 export default useToast;

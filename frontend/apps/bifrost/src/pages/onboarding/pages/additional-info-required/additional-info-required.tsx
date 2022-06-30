@@ -1,5 +1,6 @@
 import React from 'react';
 import HeaderTitle from 'src/components/header-title';
+import NavigationHeader from 'src/components/navigation-header';
 import { Events, MachineContext } from 'src/utils/state-machine/onboarding';
 import styled, { css } from 'styled-components';
 import { Button } from 'ui';
@@ -16,16 +17,19 @@ const AdditionalInfoRequired = () => {
   };
 
   return (
-    <Container>
-      <HeaderTitle
-        title="Additional data is required"
-        subtitle={`In addition to the data we already have on you, ${context.tenant.name} requires
+    <>
+      <NavigationHeader button={{ variant: 'close', confirm: true }} />
+      <Container>
+        <HeaderTitle
+          title="Additional data is required"
+          subtitle={`In addition to the data we already have on you, ${context.tenant.name} requires
           some more information to verify your identity.`}
-      />
-      <Button fullWidth onClick={handleClick}>
-        Continue
-      </Button>
-    </Container>
+        />
+        <Button fullWidth onClick={handleClick}>
+          Continue
+        </Button>
+      </Container>
+    </>
   );
 };
 

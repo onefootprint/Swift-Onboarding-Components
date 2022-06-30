@@ -1,30 +1,26 @@
 import React from 'react';
-import styled from 'styled-components';
-import { Typography } from 'ui';
+import { Box, SXStyleProps, Typography } from 'ui';
 
 export type HeaderTitleProps = {
   title: string;
   subtitle: string;
+  sx?: SXStyleProps;
 };
 
-const HeaderTitle = ({ title, subtitle }: HeaderTitleProps) => (
-  <Container>
+const HeaderTitle = ({ title, subtitle, sx }: HeaderTitleProps) => (
+  <Box sx={{ textAlign: 'center', ...sx }}>
     <Typography
-      variant="heading-3"
+      as="h2"
       color="primary"
       sx={{ marginBottom: 2 }}
-      as="h2"
+      variant="heading-3"
     >
       {title}
     </Typography>
     <Typography variant="body-2" color="secondary" as="h3">
       {subtitle}
     </Typography>
-  </Container>
+  </Box>
 );
-
-const Container = styled.header`
-  text-align: center;
-`;
 
 export default HeaderTitle;

@@ -92,6 +92,7 @@ export type BaseStyleProps = Pick<
   | 'justifySelf'
   | 'left'
   | 'letterSpacing'
+  | 'lineHeight'
   | 'maxHeight'
   | 'maxWidth'
   | 'minHeight'

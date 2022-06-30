@@ -3,11 +3,10 @@ import React from 'react';
 import useBifrostMachine from 'src/hooks/use-bifrost-machine';
 import { States } from 'src/utils/state-machine/bifrost';
 
-import Confirmation from './confirmation';
+import BiometricLoginRetry from './biometric-login-retry';
+import ConfirmAndAuthorize from './confirm-and-authorize';
 import EmailIdentification from './email-identification';
 import Init from './init';
-import BiometricLoginRetry from './liveness-login/biometric-login-retry';
-import QRLogin from './liveness-login/qr-login';
 import Onboarding from './onboarding';
 import OnboardingSuccess from './onboarding-success/onboarding-success';
 import PhoneIdentification from './phone-identification';
@@ -27,12 +26,11 @@ const Root = () => {
     [States.tenantInvalid]: TenantInvalid,
 
     [States.emailIdentification]: EmailIdentification,
-    [States.confirmation]: Confirmation,
+    [States.confirmAndAuthorize]: ConfirmAndAuthorize,
     [States.verificationSuccess]: VerificationSuccess,
     [States.phoneIdentification]: PhoneIdentification,
     [States.phoneVerification]: PhoneVerification,
     [States.biometricLoginRetry]: BiometricLoginRetry,
-    [States.qrLogin]: QRLogin,
 
     // Onboarding
     [States.onboarding]: Onboarding,

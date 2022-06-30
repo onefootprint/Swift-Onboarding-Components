@@ -30,7 +30,7 @@
         "cta": "Continue"
       }
     },
-    "confirmation": {
+    "confirm-and-authorize": {
       "title": "Confirm & Authorize",
       "subtitle": "{{tenantName}} will be able to securely view the following data:",
       "cta": "Authorize"
@@ -145,6 +145,20 @@
           },
           "cta": "Complete"
         }
+      }
+    },
+    "verification-success": {
+      "title": "You're all set! 😎",
+      "subtitle": "Identity successfully verified.",
+      "cta": "Return to site"
+    },
+    "onboarding-success": {
+      "title": "You're all set! 😎",
+      "subtitle": "Identity successfully verified.",
+      "cta": "Return to site",
+      "body": {
+        "view-on-my-footprint": "You can view your personal data and the companies that have access to it on my.footprint.com.",
+        "one-click": "Next time, you can just sign in using Footprint with one-click!"
       }
     }
   }

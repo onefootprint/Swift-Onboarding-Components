@@ -12,14 +12,14 @@
     "@types/react-dom": "^17.0.11",
     "@types/ua-parser-js": "^0.7.36",
     "config": "*",
-    "types": "*",
+    "ui": "*",
+    "request": "*",
     "global-constants": "*",
     "react": "17.0.2",
     "react-dom": "17.0.2",
     "react-i18next": "^11.16.9",
     "tsconfig": "*",
     "typescript": "^4.7.3",
-    "ua-parser-js": "^1.0.2",
-    "use-places-autocomplete": "^2.0.0"
+    "ua-parser-js": "^1.0.2"
   }
 }
