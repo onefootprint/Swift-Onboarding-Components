@@ -32,6 +32,7 @@ pub struct NewObConfiguration {
     pub name: String,
     pub description: Option<String>,
     pub tenant_id: TenantId,
+    pub required_user_data: Vec<DataKind>,
     pub settings: ObConfigurationSettings,
 }
 
@@ -52,6 +53,20 @@ impl NewObConfiguration {
             name: "Default".to_string(),
             description: None,
             tenant_id,
+            required_user_data: vec![
+                DataKind::FirstName,
+                DataKind::LastName,
+                DataKind::Dob,
+                DataKind::Ssn,
+                DataKind::StreetAddress,
+                DataKind::StreetAddress2,
+                DataKind::City,
+                DataKind::State,
+                DataKind::Zip,
+                DataKind::Country,
+                DataKind::Email,
+                DataKind::PhoneNumber,
+            ],
             settings: ObConfigurationSettings::Empty,
         };
         let obc = pool

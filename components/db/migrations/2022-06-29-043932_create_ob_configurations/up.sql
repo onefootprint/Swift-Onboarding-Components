@@ -6,20 +6,7 @@ create table ob_configurations (
     tenant_id text not null,
     _created_at timestamp not null default now(),
     _updated_at timestamp not null default now(),
-    required_user_data text [] not null default ARRAY[
-        'FirstName', 
-        'LastName', 
-        'Dob', 
-        'Ssn', 
-        'StreetAddress', 
-        'StreetAddress2', 
-        'City', 
-        'State', 
-        'Zip', 
-        'Country', 
-        'Email', 
-        'PhoneNumber'
-    ],
+    required_user_data text[] not null,
     /* abstract configuration data for flexibility? */
     settings jsonb not null default '{}',
     is_disabled boolean not null default false,
