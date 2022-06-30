@@ -216,36 +216,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "actix-web-httpauth"
-version = "0.6.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "08c25a48b4684f90520183cd1a688e5f4f7e9905835fa75d02c0fe4f60fcdbe6"
-dependencies = [
- "actix-service",
- "actix-utils",
- "actix-web",
- "base64",
- "futures-core",
- "futures-util",
- "pin-project-lite",
-]
-
-[[package]]
-name = "actix-web-opentelemetry"
-version = "0.11.0-beta.8"
-source = "git+https://github.com/OutThereLabs/actix-web-opentelemetry?rev=2d2eb3d415f515ea71b0b15dcda4ccac41987a76#2d2eb3d415f515ea71b0b15dcda4ccac41987a76"
-dependencies = [
- "actix-http",
- "actix-web",
- "futures-util",
- "opentelemetry",
- "opentelemetry-prometheus",
- "opentelemetry-semantic-conventions",
- "prometheus",
- "serde",
-]
-
-[[package]]
 name = "actix-web-validator"
 version = "3.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -372,14 +342,11 @@ name = "app-attest"
 version = "0.1.0"
 dependencies = [
  "base64",
- "byteorder 1.4.3",
- "cbor",
- "hex",
+ "byteorder",
  "openssl",
  "serde",
  "serde_bytes",
  "serde_cbor",
- "serde_json",
  "thiserror",
  "x509-parser",
 ]
@@ -1148,12 +1115,6 @@ checksum = "a4a45a46ab1f2412e53d3a0ade76ffad2025804294569aae387231a0cd6e0899"
 
 [[package]]
 name = "byteorder"
-version = "0.5.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0fc10e8cc6b2580fda3f36eb6dc5316657f812a3df879a44a66fc9f0fdbc4855"
-
-[[package]]
-name = "byteorder"
 version = "1.4.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "14c189c53d098945499cdfa7ecc63567cf3886b3332b312a5b4585d8d3a6a610"
@@ -1164,7 +1125,7 @@ version = "0.4.12"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "206fdffcfa2df7cbe15601ef46c813fce0965eb3286db6b56c583b814b51c81c"
 dependencies = [
- "byteorder 1.4.3",
+ "byteorder",
  "iovec",
 ]
 
@@ -1191,16 +1152,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "90706ba19e97b90786e19dc0d5e2abd80008d99d4c0c5d1ad0b5e72cec7c494d"
 dependencies = [
  "bytes 1.1.0",
-]
-
-[[package]]
-name = "cbor"
-version = "0.4.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e56053652b4b5c0ded5ae6183c7cd547ad2dd6bcce149658bef052a4995533bd"
-dependencies = [
- "byteorder 0.5.3",
- "rustc-serialize",
 ]
 
 [[package]]
@@ -1642,7 +1593,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b28135ecf6b7d446b43e27e225622a038cc4e2930a1022f51cdb97ada19b8e4d"
 dependencies = [
  "bitflags",
- "byteorder 1.4.3",
+ "byteorder",
  "chrono",
  "diesel_derives",
  "pq-sys",
@@ -1785,7 +1736,7 @@ dependencies = [
  "aws-config 0.8.0",
  "aws-sdk-kms 0.8.0",
  "aws-types 0.8.0",
- "byteorder 1.4.3",
+ "byteorder",
  "crypto",
  "env_logger",
  "envconfig",
@@ -1806,19 +1757,15 @@ name = "enclave_proxy"
 version = "0.1.0"
 dependencies = [
  "actix-web",
- "actix-web-opentelemetry",
  "async-trait",
  "bb8",
- "byteorder 1.4.3",
- "dotenv",
+ "byteorder",
  "env_logger",
  "envconfig",
  "futures",
  "futures-util",
  "libc",
  "log",
- "opentelemetry",
- "opentelemetry-otlp",
  "rpc",
  "serde",
  "serde_cbor",
@@ -1826,11 +1773,6 @@ dependencies = [
  "tokio",
  "tokio-vsock",
  "tracing",
- "tracing-actix-web",
- "tracing-bunyan-formatter",
- "tracing-error",
- "tracing-opentelemetry",
- "tracing-subscriber",
  "uuid 0.8.2",
 ]
 
@@ -1932,8 +1874,6 @@ dependencies = [
  "actix-cors",
  "actix-session",
  "actix-web",
- "actix-web-httpauth",
- "actix-web-opentelemetry",
  "anyhow",
  "app-attest",
  "async-trait",
@@ -1963,14 +1903,12 @@ dependencies = [
  "serde_cbor",
  "serde_json",
  "serde_repr",
- "serde_with",
  "strum_macros",
  "thiserror",
  "tokio",
  "tracing",
  "tracing-actix-web",
  "tracing-bunyan-formatter",
- "tracing-error",
  "tracing-opentelemetry",
  "tracing-subscriber",
  "url",
@@ -2763,7 +2701,6 @@ dependencies = [
  "serde",
  "serde_derive",
  "serde_json",
- "serde_repr",
  "strum",
  "strum_macros",
  "thiserror",
@@ -2820,7 +2757,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4547ee5541c18742396ae2c895d0717d0f886d8823b8399cdaf7b07d63ad0480"
 dependencies = [
  "autocfg 0.1.8",
- "byteorder 1.4.3",
+ "byteorder",
  "lazy_static",
  "libm",
  "num-integer",
@@ -2984,26 +2921,6 @@ dependencies = [
  "tokio",
  "tonic",
  "tonic-build",
-]
-
-[[package]]
-name = "opentelemetry-prometheus"
-version = "0.10.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9328977e479cebe12ce0d3fcecdaea4721d234895a9440c5b5dfd113f0594ac6"
-dependencies = [
- "opentelemetry",
- "prometheus",
- "protobuf",
-]
-
-[[package]]
-name = "opentelemetry-semantic-conventions"
-version = "0.9.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "985cc35d832d412224b2cffe2f9194b1b89b6aa5d0bef76d080dce09d90e62bd"
-dependencies = [
- "opentelemetry",
 ]
 
 [[package]]
@@ -3350,21 +3267,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "prometheus"
-version = "0.13.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b7f64969ffd5dd8f39bd57a68ac53c163a095ed9d0fb707146da1b27025a3504"
-dependencies = [
- "cfg-if",
- "fnv",
- "lazy_static",
- "memchr",
- "parking_lot 0.11.2",
- "protobuf",
- "thiserror",
-]
-
-[[package]]
 name = "prost"
 version = "0.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3416,12 +3318,6 @@ dependencies = [
  "bytes 1.1.0",
  "prost",
 ]
-
-[[package]]
-name = "protobuf"
-version = "2.27.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cf7e6d18738ecd0902d30d1ad232c9125985a3422929b16c65517b38adc14f96"
 
 [[package]]
 name = "quote"
@@ -3587,9 +3483,8 @@ dependencies = [
 name = "rpc"
 version = "0.1.0"
 dependencies = [
- "byteorder 1.4.3",
+ "byteorder",
  "crypto",
- "futures",
  "log",
  "serde",
  "serde_cbor",
@@ -3604,7 +3499,7 @@ version = "0.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e05c2603e2823634ab331437001b411b9ed11660fbc4066f3908c84a9439260d"
 dependencies = [
- "byteorder 1.4.3",
+ "byteorder",
  "digest 0.9.0",
  "lazy_static",
  "num-bigint-dig",
@@ -3623,12 +3518,6 @@ name = "rustc-demangle"
 version = "0.1.21"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7ef03e0a2b150c7a90d01faf6254c9c48a41e95fb2a8c2ac1c6f0d2b9aefc342"
-
-[[package]]
-name = "rustc-serialize"
-version = "0.3.24"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "dcf128d1287d2ea9d80910b5f1120d0b8eede3fbf1abe91c40d39ea7d51e6fda"
 
 [[package]]
 name = "rustc_version"
@@ -4505,16 +4394,6 @@ checksum = "03cfcb51380632a72d3111cb8d3447a8d908e577d31beeac006f836383d29a23"
 dependencies = [
  "lazy_static",
  "valuable",
-]
-
-[[package]]
-name = "tracing-error"
-version = "0.2.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d686ec1c0f384b1277f097b2f279a2ecc11afe8c133c1aabf036a27cb4cd206e"
-dependencies = [
- "tracing",
- "tracing-subscriber",
 ]
 
 [[package]]

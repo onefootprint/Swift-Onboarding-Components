@@ -23,27 +23,8 @@ rpc = { path = "../rpc" }
 
 actix-web = "4.0.1"
 env_logger = "0.9.0"
-opentelemetry = { version = "0.17", features = [
-    "rt-tokio",
-    "metrics",
-    "serialize",
-] }
-tracing-opentelemetry = "0.17"
 tracing = "0.1.30"
-tracing-actix-web = { version = "0.5.1", features = ["opentelemetry_0_17"] }
-tracing-subscriber = { version = "0.3", features = [
-    "json",
-    "registry",
-    "env-filter",
-] }
-actix-web-opentelemetry = { git = "https://github.com/OutThereLabs/actix-web-opentelemetry", rev = "2d2eb3d415f515ea71b0b15dcda4ccac41987a76", features = [
-    "metrics",
-] }
 uuid = { version = "0.8.2", features = ["v4"] }
-dotenv = "0.15.0"
-tracing-bunyan-formatter = "0.3.2"
-tracing-error = "0.2.0"
-opentelemetry-otlp = { version = "0.10", features = ["tonic", "metrics"] }
 futures-util = { version = "0.3", default-features = false, features = ["std"] }
 bb8 = "0.7"
 async-trait = "0.1"
