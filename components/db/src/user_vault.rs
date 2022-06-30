@@ -4,62 +4,51 @@ use crate::models::user_vaults::*;
 use crate::onboarding::get_for_fp_id;
 use crate::schema;
 use crate::{errors::DbError, models::user_data::UserData};
-use deadpool_diesel::postgres::Pool;
 use diesel::prelude::*;
 use newtypes::{DataKind, DataPriority, Fingerprint, FootprintUserId, TenantId, UserVaultId};
 
-pub async fn create(pool: &Pool, new_user: NewUserVaultReq) -> Result<UserVault, crate::DbError> {
+pub async fn create(pool: &crate::DbPool, new_user: NewUserVaultReq) -> Result<UserVault, crate::DbError> {
     let user_vault = pool
-        .get()
-        .await?
-        .interact(move |conn| {
-            conn.build_transaction().run(|| -> Result<UserVault, DbError> {
-                let new_user_vault = NewUserVault {
-                    e_private_key: new_user.e_private_key,
-                    public_key: new_user.public_key,
-                    id_verified: new_user.id_verified,
-                };
-                let user_vault = diesel::insert_into(schema::user_vaults::table)
-                    .values(new_user_vault)
-                    .get_result::<UserVault>(conn)?;
-                let phone_number_data = NewUserData {
-                    user_vault_id: user_vault.id.clone(),
-                    data_kind: DataKind::PhoneNumber,
-                    data_priority: DataPriority::Primary,
-                    e_data: new_user.e_phone_number,
-                    sh_data: Some(new_user.sh_phone_number),
-                    // Phone numbers are always created as verified
-                    is_verified: true,
-                };
-                diesel::insert_into(schema::user_data::table)
-                    .values(phone_number_data)
-                    .get_result::<UserData>(conn)?;
-                Ok(user_vault)
-            })
+        .db_transaction(move |conn| {
+            let new_user_vault = NewUserVault {
+                e_private_key: new_user.e_private_key,
+                public_key: new_user.public_key,
+                id_verified: new_user.id_verified,
+            };
+            let user_vault = diesel::insert_into(schema::user_vaults::table)
+                .values(new_user_vault)
+                .get_result::<UserVault>(conn)?;
+            let phone_number_data = NewUserData {
+                user_vault_id: user_vault.id.clone(),
+                data_kind: DataKind::PhoneNumber,
+                data_priority: DataPriority::Primary,
+                e_data: new_user.e_phone_number,
+                sh_data: Some(new_user.sh_phone_number),
+                // Phone numbers are always created as verified
+                is_verified: true,
+            };
+            diesel::insert_into(schema::user_data::table)
+                .values(phone_number_data)
+                .get_result::<UserData>(conn)?;
+            Ok(user_vault)
         })
-        .await??;
+        .await?;
     Ok(user_vault)
 }
 
-pub async fn get(pool: &Pool, uv_id: UserVaultId) -> Result<UserVault, DbError> {
-    let conn = pool.get().await?;
-
-    let user = conn
-        .interact(move |conn| -> Result<UserVault, DbError> { get_sync(conn, uv_id) })
-        .await??;
+pub async fn get(pool: &crate::DbPool, uv_id: UserVaultId) -> Result<UserVault, DbError> {
+    let user = pool.db_query(move |conn| get_sync(conn, uv_id)).await??;
 
     Ok(user)
 }
 
 pub async fn get_by_tenant_and_onboarding(
-    pool: &Pool,
+    pool: &crate::DbPool,
     tenant_id: TenantId,
     footprint_user_id: FootprintUserId,
 ) -> Result<Option<(UserVault, Onboarding)>, DbError> {
-    let conn = pool.get().await?;
-
-    let result: Option<(UserVault, Onboarding)> = conn
-        .interact(move |conn| -> Result<Option<(UserVault, Onboarding)>, DbError> {
+    let result = pool
+        .db_query(move |conn| -> Result<Option<(UserVault, Onboarding)>, DbError> {
             let onboarding: Option<Onboarding> = get_for_fp_id(conn, tenant_id, footprint_user_id)?;
 
             match onboarding {
@@ -73,16 +62,14 @@ pub async fn get_by_tenant_and_onboarding(
 }
 
 pub async fn get_by_fingerprint_and_uv_id(
-    pool: &Pool,
+    pool: &crate::DbPool,
     data_kind: DataKind,
     uv_id: UserVaultId,
     sh_data: Fingerprint,
     require_verified: bool,
 ) -> Result<Option<(UserVault, UserData)>, DbError> {
     let result = pool
-        .get()
-        .await?
-        .interact(move |conn| -> Result<Option<(UserVault, UserData)>, DbError> {
+        .db_query(move |conn| -> Result<Option<(UserVault, UserData)>, DbError> {
             let mut result = schema::user_vaults::table
                 .inner_join(schema::user_data::table)
                 .filter(schema::user_data::data_kind.eq(data_kind))
@@ -101,15 +88,13 @@ pub async fn get_by_fingerprint_and_uv_id(
 }
 
 pub async fn get_by_fingerprint(
-    pool: &Pool,
+    pool: &crate::DbPool,
     data_kind: DataKind,
     sh_data: Fingerprint,
     require_verified: bool,
 ) -> Result<Option<(UserVault, UserData)>, DbError> {
     let result = pool
-        .get()
-        .await?
-        .interact(move |conn| -> Result<Option<(UserVault, UserData)>, DbError> {
+        .db_query(move |conn| -> Result<Option<(UserVault, UserData)>, DbError> {
             let mut result = schema::user_vaults::table
                 .inner_join(schema::user_data::table)
                 .filter(schema::user_data::data_kind.eq(data_kind))

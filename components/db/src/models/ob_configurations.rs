@@ -70,9 +70,7 @@ impl NewObConfiguration {
             settings: ObConfigurationSettings::Empty,
         };
         let obc = pool
-            .get()
-            .await?
-            .interact(move |conn| {
+            .db_query(move |conn| {
                 diesel::insert_into(ob_configurations::table)
                     .values(&default)
                     .get_result::<ObConfiguration>(conn)
@@ -85,9 +83,7 @@ impl NewObConfiguration {
 impl UpdateObConfiguration {
     pub async fn update(self, pool: &DbPool) -> Result<(), crate::DbError> {
         let _ = pool
-            .get()
-            .await?
-            .interact(move |conn| -> Result<(), crate::DbError> {
+            .db_query(move |conn| -> Result<(), crate::DbError> {
                 let _ = diesel::update(
                     ob_configurations::table
                         .filter(ob_configurations::key.eq(self.key.clone()))
@@ -105,9 +101,7 @@ impl UpdateObConfiguration {
 impl ObConfiguration {
     pub async fn get(pool: &DbPool, key: ObConfigurationKey) -> Result<ObConfiguration, crate::DbError> {
         let id = pool
-            .get()
-            .await?
-            .interact(move |conn| -> Result<ObConfiguration, crate::DbError> {
+            .db_query(move |conn| -> Result<ObConfiguration, crate::DbError> {
                 let obc = ob_configurations::table
                     .filter(ob_configurations::key.eq(key))
                     .first(conn)?;
@@ -122,9 +116,7 @@ impl ObConfiguration {
         key: ObConfigurationKey,
     ) -> Result<(ObConfiguration, Tenant), crate::DbError> {
         let id = pool
-            .get()
-            .await?
-            .interact(move |conn| -> Result<(ObConfiguration, Tenant), crate::DbError> {
+            .db_query(move |conn| -> Result<(ObConfiguration, Tenant), crate::DbError> {
                 let obc: ObConfiguration = ob_configurations::table
                     .filter(ob_configurations::key.eq(key))
                     .first(conn)?;
@@ -143,9 +135,7 @@ impl ObConfiguration {
         tenant_id: TenantId,
     ) -> Result<ObConfiguration, crate::DbError> {
         let id = pool
-            .get()
-            .await?
-            .interact(move |conn| -> Result<ObConfiguration, crate::DbError> {
+            .db_query(move |conn| -> Result<ObConfiguration, crate::DbError> {
                 let obc = ob_configurations::table
                     .filter(ob_configurations::key.eq(key))
                     .filter(ob_configurations::tenant_id.eq(tenant_id))

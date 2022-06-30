@@ -44,9 +44,7 @@ struct NewAccessEventWithInsight {
 impl NewAccessEvent {
     pub async fn save(self, pool: &DbPool) -> Result<(), crate::DbError> {
         let _ = pool
-            .get()
-            .await?
-            .interact(move |conn| {
+            .db_query(move |conn| {
                 conn.transaction(|| {
                     let insight_ev = self.insight.insert_with_conn(conn)?;
                     let event = NewAccessEventWithInsight {

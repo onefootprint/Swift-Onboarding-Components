@@ -70,7 +70,6 @@ fn handler(
         None => None,
     };
 
-    let conn = state.db_pool.get().await.map_err(DbError::from)?;
     let query_params = OnboardingListQueryParams {
         tenant_id: tenant.id.clone(),
         statuses,
@@ -79,8 +78,9 @@ fn handler(
         timestamp_lte: timestamp_lte.as_ref().map(DateTime::naive_utc),
         timestamp_gte: timestamp_gte.as_ref().map(DateTime::naive_utc),
     };
-    let (onboardings, user_to_kinds, count) = conn
-        .interact(move |conn| -> Result<_, DbError> {
+    let (onboardings, user_to_kinds, count) = state
+        .db_pool
+        .db_query(move |conn| -> Result<_, DbError> {
             let onboardings =
                 db::onboarding::list_for_tenant(conn, query_params.clone(), cursor, (page_size + 1) as i64)?;
             // If no cursor is provided, we're on the first page, so we should return the total
@@ -94,8 +94,7 @@ fn handler(
 
             Ok((onboardings, user_to_kinds, count))
         })
-        .await
-        .map_err(DbError::from)??;
+        .await??;
 
     // If there are more than page_size results, we should tell the client there's another page
     let cursor = if onboardings.len() > page_size {

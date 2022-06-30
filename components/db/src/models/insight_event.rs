@@ -51,11 +51,7 @@ impl CreateInsightEvent {
     }
 
     pub async fn insert(self, pool: &DbPool) -> Result<InsightEvent, crate::DbError> {
-        let ev = pool
-            .get()
-            .await?
-            .interact(move |conn| self.insert_with_conn(conn))
-            .await??;
+        let ev = pool.db_query(move |conn| self.insert_with_conn(conn)).await??;
         Ok(ev)
     }
 }

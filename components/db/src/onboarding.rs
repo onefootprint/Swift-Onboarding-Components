@@ -1,9 +1,9 @@
 use crate::models::insight_event::InsightEvent;
 use crate::models::onboardings::Onboarding;
 use crate::schema;
+use crate::DbPool;
 use crate::{errors::DbError, schema::onboardings::BoxedQuery};
 use chrono::NaiveDateTime;
-use deadpool_diesel::postgres::Pool;
 use diesel::dsl::any;
 use diesel::pg::Pg;
 use diesel::prelude::*;
@@ -96,14 +96,12 @@ pub(crate) fn get_for_fp_id(
 }
 
 pub async fn get(
-    pool: &Pool,
+    pool: &DbPool,
     id: ObConfigurationId,
     user_vault_id: UserVaultId,
 ) -> Result<Option<Onboarding>, DbError> {
-    let conn = pool.get().await?;
-
-    let ob = conn
-        .interact(|conn| -> Result<Option<Onboarding>, DbError> {
+    let ob = pool
+        .db_query(|conn| -> Result<Option<Onboarding>, DbError> {
             let ob = schema::onboardings::table
                 .filter(schema::onboardings::ob_config_id.eq(id))
                 .filter(schema::onboardings::user_vault_id.eq(user_vault_id))

@@ -1,7 +1,7 @@
+use crate::auth::get_onboarding_for_tenant;
 use crate::auth::session_context::{HasUserVaultId, SessionContext};
 use crate::auth::session_data::tenant::ob_public_key::PublicTenantAuthContext;
 use crate::auth::session_data::user::onboarding::OnboardingSession;
-use crate::auth::{ get_onboarding_for_tenant};
 use crate::errors::ApiError;
 use crate::types::success::ApiResponseData;
 use crate::utils::insight_headers::InsightHeaders;
@@ -49,7 +49,6 @@ fn handler(
         // record the insight for this onboarding
         CreateInsightEvent::from(insights).insert(&state.db_pool).await?;
         // TODO add it to the onboarding table
-
         Ok(Json(ApiResponseData {
             data: CommitResponse {
                 footprint_user_id: onboarding.user_ob_id.clone(),

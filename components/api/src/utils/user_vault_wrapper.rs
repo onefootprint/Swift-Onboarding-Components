@@ -18,9 +18,7 @@ pub struct UserVaultWrapper {
 impl UserVaultWrapper {
     pub async fn from(pool: &DbPool, user_vault: UserVault) -> Result<UserVaultWrapper, DbError> {
         let result: UserVaultWrapper = pool
-            .get()
-            .await?
-            .interact(move |conn| Self::from_conn(conn, user_vault))
+            .db_query(move |conn| Self::from_conn(conn, user_vault))
             .await??;
         Ok(result)
     }

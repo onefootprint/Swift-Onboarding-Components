@@ -77,9 +77,7 @@ pub struct NewWebauthnCredential {
 impl NewWebauthnCredential {
     pub async fn save(self, pool: &DbPool) -> Result<(), crate::DbError> {
         let _ = pool
-            .get()
-            .await?
-            .interact(move |conn| {
+            .db_query(move |conn| {
                 diesel::insert_into(webauthn_credentials::table)
                     .values(self)
                     .execute(conn)

@@ -47,9 +47,7 @@ impl NewOnboarding {
         insight_event: CreateInsightEvent,
     ) -> Result<Onboarding, crate::DbError> {
         let onboarding = pool
-            .get()
-            .await?
-            .interact(move |conn| -> Result<Onboarding, crate::DbError> {
+            .db_query(move |conn| -> Result<Onboarding, crate::DbError> {
                 let existing_ob = onboardings::table
                     // Check to see if the user already has any enabled onboarding for this tenant
                     .filter(onboardings::user_vault_id.eq(&user_vault_id))

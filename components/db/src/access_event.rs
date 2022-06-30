@@ -28,9 +28,8 @@ pub async fn list_for_tenant(
     cursor: Option<i64>,
     page_size: i64,
 ) -> Result<Vec<(AccessEvent, Onboarding, Option<InsightEvent>)>, DbError> {
-    let conn = pool.get().await?;
-    let result = conn
-        .interact(move |conn| {
+    let result = pool
+        .db_query(move |conn| {
             let mut results = schema::access_events::table
                 .inner_join(schema::onboardings::table)
                 .left_join(schema::insight_events::table)
@@ -79,9 +78,8 @@ pub async fn list(
     user_vault_id: UserVaultId,
     kind: Option<DataKind>,
 ) -> Result<Vec<(AccessEvent, Onboarding, Option<InsightEvent>)>, DbError> {
-    let conn = pool.get().await?;
-    let result = conn
-        .interact(move |conn| {
+    let result = pool
+        .db_query(move |conn| {
             let mut results = schema::access_events::table
                 .inner_join(schema::onboardings::table)
                 .left_join(schema::insight_events::table)

@@ -25,9 +25,7 @@ pub struct UserData {
 impl UserData {
     pub async fn mark_verified(self, pool: &DbPool) -> Result<UserData, crate::DbError> {
         let result = pool
-            .get()
-            .await?
-            .interact(move |conn| {
+            .db_query(move |conn| {
                 diesel::update(user_data::table.filter(user_data::id.eq(self.id)))
                     .set(user_data::is_verified.eq(true))
                     .get_result::<UserData>(conn)

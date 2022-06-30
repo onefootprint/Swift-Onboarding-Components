@@ -43,9 +43,7 @@ pub async fn filter(
     use schema::user_data;
 
     let result: Vec<UserData> = pool
-        .get()
-        .await?
-        .interact(move |conn| {
+        .db_query(move |conn| {
             user_data::table
                 .filter(user_data::user_vault_id.eq(user_vault_id))
                 .filter(user_data::data_kind.eq(any(data_kinds)))

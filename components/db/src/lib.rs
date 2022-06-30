@@ -25,10 +25,40 @@ pub mod schema;
 
 embed_migrations!();
 
-pub type DbPool = Pool;
+#[derive(Clone)]
+pub struct DbPool(Pool);
+
+impl DbPool {
+    pub async fn db_query<F, R>(&self, f: F) -> Result<R, DbError>
+    where
+        F: FnOnce(&mut PgConnection) -> R + Send + 'static,
+        R: Send + 'static,
+    {
+        let result = self
+            .0
+            .get()
+            .await
+            .map_err(DbError::from)?
+            .interact(move |conn| f(conn))
+            .await
+            .map_err(DbError::from)?;
+        Ok(result)
+    }
+
+    pub async fn db_transaction<F, R>(&self, f: F) -> Result<R, DbError>
+    where
+        F: FnOnce(&PgConnection) -> Result<R, DbError> + Send + 'static,
+        R: Send + 'static,
+    {
+        let result = self
+            .db_query(|conn: &mut PgConnection| conn.build_transaction().run(|| f(conn)))
+            .await??;
+        Ok(result)
+    }
+}
 
 /// Initialize our DB
-pub fn init(url: &str) -> Result<Pool, DbError> {
+pub fn init(url: &str) -> Result<DbPool, DbError> {
     let init_instant = std::time::Instant::now();
 
     let manager = Manager::new(url, Runtime::Tokio1);
@@ -56,7 +86,7 @@ pub fn init(url: &str) -> Result<Pool, DbError> {
         .max_size(12)
         .build()?;
 
-    Ok(pool)
+    Ok(DbPool(pool))
 }
 
 pub fn run_migrations(url: &str) -> Result<(), DbError> {
@@ -65,17 +95,15 @@ pub fn run_migrations(url: &str) -> Result<(), DbError> {
     Ok(())
 }
 
-pub async fn health_check(pool: &Pool) -> Result<(), DbError> {
+pub async fn health_check(pool: &DbPool) -> Result<(), DbError> {
     let _ = pool
-        .get()
-        .await?
-        .interact(move |conn| diesel::sql_query("SELECT 1").execute(conn))
+        .db_query(move |conn| diesel::sql_query("SELECT 1").execute(conn))
         .await??;
 
     Ok(())
 }
 
-pub async fn private_cleanup_integration_tests(pool: &Pool, sh_data: Fingerprint) -> Result<(), DbError> {
+pub async fn private_cleanup_integration_tests(pool: &DbPool, sh_data: Fingerprint) -> Result<(), DbError> {
     // we register users within our integration tests. to avoid filling up our database with fake information,
     // we clean up afterwards.
     let uv = get_by_fingerprint(pool, DataKind::PhoneNumber, sh_data, false).await?;
@@ -84,9 +112,7 @@ pub async fn private_cleanup_integration_tests(pool: &Pool, sh_data: Fingerprint
     }
     let (uv, _) = uv.unwrap();
 
-    let conn = pool.get().await?;
-
-    conn.interact(move |conn| -> Result<(), DbError> {
+    pool.db_query(move |conn| -> Result<(), DbError> {
         // delete user data
         diesel::delete(schema::user_data::table.filter(schema::user_data::user_vault_id.eq(&uv.id)))
             .execute(conn)?;

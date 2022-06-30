@@ -71,9 +71,7 @@ impl Session {
 impl NewSession {
     pub async fn update_or_create(self, pool: &DbPool) -> Result<Session, crate::DbError> {
         let session = pool
-            .get()
-            .await?
-            .interact(move |conn| {
+            .db_query(move |conn| {
                 diesel::insert_into(sessions::table)
                     .values(self.clone())
                     .on_conflict(sessions::h_session_id)
@@ -92,9 +90,7 @@ impl NewSession {
 impl UpdateSession {
     pub async fn update(self, pool: &DbPool) -> Result<Session, crate::DbError> {
         let session = pool
-            .get()
-            .await?
-            .interact(move |conn| {
+            .db_query(move |conn| {
                 diesel::update(sessions::table)
                     .filter(sessions::h_session_id.eq(self.h_session_id.clone()))
                     .set(self)

@@ -167,17 +167,10 @@ pub async fn update<C: HasVaultPermission>(
         })
     }
 
-    let _: () = state
+    state
         .db_pool
-        .get()
-        .await
-        .map_err(db::DbError::from)?
-        .interact(move |conn| {
-            conn.build_transaction()
-                .run(|| process_data_update_request(conn, user_vault.id, data_to_insert))
-        })
-        .await
-        .map_err(db::DbError::from)??;
+        .db_transaction(move |conn| process_data_update_request(conn, user_vault.id, data_to_insert))
+        .await?;
 
     Ok(())
 }

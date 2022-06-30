@@ -7,7 +7,6 @@ use crate::types::success::ApiResponseData;
 use crate::State;
 use crate::{auth::session_context::SessionContext, errors::ApiError};
 use db::models::webauthn_credential::WebauthnCredential;
-use db::DbError;
 use newtypes::FootprintUserId;
 use paperclip::actix::{api_v2_operation, get, web, web::Json, Apiv2Schema};
 
@@ -34,13 +33,12 @@ fn get(
 ) -> actix_web::Result<Json<ApiResponseData<LivenessResponse>>, ApiError> {
     let tenant = auth.tenant(&state.db_pool).await?;
 
-    let conn = state.db_pool.get().await.map_err(DbError::from)?;
-    let creds = conn
-        .interact(move |conn| {
+    let creds = state
+        .db_pool
+        .db_query(move |conn| {
             WebauthnCredential::get_for_onboarding(conn, &tenant.id, &request.footprint_user_id)
         })
-        .await
-        .map_err(DbError::from)??;
+        .await??;
 
     let response = creds
         .into_iter()
