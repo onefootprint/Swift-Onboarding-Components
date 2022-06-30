@@ -2,13 +2,13 @@ use crate::schema::insight_events;
 use crate::DbPool;
 use chrono::NaiveDateTime;
 use diesel::{Insertable, PgConnection, Queryable, RunQueryDsl};
+use newtypes::InsightEventId;
 use serde::{Deserialize, Serialize};
-use uuid::Uuid;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
 #[table_name = "insight_events"]
 pub struct InsightEvent {
-    pub id: Uuid,
+    pub id: InsightEventId,
     pub timestamp: NaiveDateTime,
     pub ip_address: Option<String>,
     pub country: Option<String>,

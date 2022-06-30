@@ -6,9 +6,10 @@ use crate::{
 use chrono::NaiveDateTime;
 use diesel::dsl::any;
 use diesel::{Insertable, PgConnection, QueryDsl, Queryable, RunQueryDsl};
-use newtypes::{AttestationType, FootprintUserId, TenantId, UserVaultId};
+use newtypes::{
+    AttestationType, FootprintUserId, InsightEventId, TenantId, UserVaultId, WebauthnCredentialId,
+};
 use serde::{Deserialize, Serialize};
-use uuid::Uuid;
 
 use super::insight_event::InsightEvent;
 
@@ -16,7 +17,7 @@ use super::insight_event::InsightEvent;
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Identifiable)]
 #[table_name = "webauthn_credentials"]
 pub struct WebauthnCredential {
-    pub id: Uuid,
+    pub id: WebauthnCredentialId,
     pub user_vault_id: UserVaultId,
     pub credential_id: Vec<u8>,
     pub public_key: Vec<u8>,
@@ -28,7 +29,7 @@ pub struct WebauthnCredential {
 
     pub backup_eligible: bool,
     pub attestation_type: AttestationType,
-    pub insight_event_id: Uuid,
+    pub insight_event_id: InsightEventId,
 }
 
 impl WebauthnCredential {
@@ -70,7 +71,7 @@ pub struct NewWebauthnCredential {
     pub attestation_data: Vec<u8>,
     pub backup_eligible: bool,
     pub attestation_type: AttestationType,
-    pub insight_event_id: Uuid,
+    pub insight_event_id: InsightEventId,
 }
 
 impl NewWebauthnCredential {

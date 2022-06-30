@@ -1533,7 +1533,6 @@ dependencies = [
  "thiserror",
  "tokio",
  "tracing",
- "uuid 0.8.2",
 ]
 
 [[package]]
@@ -1975,7 +1974,6 @@ dependencies = [
  "tracing-opentelemetry",
  "tracing-subscriber",
  "url",
- "uuid 1.1.1",
  "webauthn-rs-core",
  "webauthn-rs-proto",
 ]
@@ -2769,6 +2767,7 @@ dependencies = [
  "strum",
  "strum_macros",
  "thiserror",
+ "uuid 0.8.2",
 ]
 
 [[package]]

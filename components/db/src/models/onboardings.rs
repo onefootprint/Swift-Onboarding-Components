@@ -3,9 +3,10 @@ use crate::DbPool;
 use chrono::NaiveDateTime;
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
-use newtypes::{FootprintUserId, ObConfigurationId, OnboardingId, Status, TenantId, UserVaultId};
+use newtypes::{
+    FootprintUserId, InsightEventId, ObConfigurationId, OnboardingId, Status, TenantId, UserVaultId,
+};
 use serde::{Deserialize, Serialize};
-use uuid::Uuid;
 
 use super::insight_event::CreateInsightEvent;
 
@@ -20,7 +21,7 @@ pub struct Onboarding {
     pub status: Status,
     pub _created_at: NaiveDateTime,
     pub _updated_at: NaiveDateTime,
-    pub insight_event_id: Uuid,
+    pub insight_event_id: InsightEventId,
     pub ordering_id: i64,
     pub start_timestamp: NaiveDateTime,
 }
@@ -32,7 +33,7 @@ pub struct NewOnboarding {
     pub ob_config_id: ObConfigurationId,
     pub tenant_id: TenantId,
     pub status: Status,
-    pub insight_event_id: Uuid,
+    pub insight_event_id: InsightEventId,
     pub start_timestamp: NaiveDateTime,
 }
 

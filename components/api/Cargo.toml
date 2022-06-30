@@ -30,7 +30,6 @@ tracing-subscriber = { version = "0.3", features = [
 actix-web-opentelemetry = { git = "https://github.com/OutThereLabs/actix-web-opentelemetry", rev = "2d2eb3d415f515ea71b0b15dcda4ccac41987a76", features = [
     "metrics",
 ] }
-uuid = { version = "1.1", features = ["v4"] }
 envconfig = "0.10.0"
 dotenv = "0.15.0"
 either = "1.6"

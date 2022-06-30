@@ -2,21 +2,20 @@ use crate::schema::access_events;
 use crate::DbPool;
 use chrono::NaiveDateTime;
 use diesel::{Connection, Insertable, Queryable, RunQueryDsl};
-use newtypes::{DataKind, OnboardingId};
+use newtypes::{AccessEventId, DataKind, InsightEventId, OnboardingId};
 use serde::{Deserialize, Serialize};
-use uuid::Uuid;
 
 use super::insight_event::CreateInsightEvent;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
 #[table_name = "access_events"]
 pub struct AccessEvent {
-    pub id: Uuid,
+    pub id: AccessEventId,
     pub onboarding_id: OnboardingId,
     pub timestamp: NaiveDateTime,
     pub _created_at: NaiveDateTime,
     pub _updated_at: NaiveDateTime,
-    pub insight_event_id: Uuid,
+    pub insight_event_id: InsightEventId,
     pub reason: String,
     pub principal: Option<String>,
     pub data_kinds: Vec<DataKind>,
@@ -37,7 +36,7 @@ pub struct NewAccessEvent {
 struct NewAccessEventWithInsight {
     onboarding_id: OnboardingId,
     data_kinds: Vec<DataKind>,
-    insight_event_id: Uuid,
+    insight_event_id: InsightEventId,
     reason: String,
     principal: Option<String>,
 }
