@@ -65,8 +65,8 @@ actix-session = { version = "0.6.2", features = ["cookie-session"] }
 chrono = { version = "0.4" }
 strum_macros = { version = "0.24" }
 
-webauthn-rs-core = { git = "https://github.com/kanidm/webauthn-rs", rev = "6f8ca8c7e133ed17fdf709579056acf1bcf5afdd"}
-webauthn-rs-proto = { git = "https://github.com/kanidm/webauthn-rs", rev = "6f8ca8c7e133ed17fdf709579056acf1bcf5afdd"}
+webauthn-rs-core = { git = "https://github.com/kanidm/webauthn-rs", rev = "9ffd732fb9d75c3cc20057c12a41b3323f3417b2"}
+webauthn-rs-proto = { git = "https://github.com/kanidm/webauthn-rs", rev = "9ffd732fb9d75c3cc20057c12a41b3323f3417b2"}
 
 url = "2.2.2"
 newtypes = { path = "../newtypes" }

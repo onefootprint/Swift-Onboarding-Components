@@ -58,11 +58,11 @@ pub fn init(
 
     // generate the challenge and return it
     let webauthn = LivenessWebauthnConfig::new(&state);
-    let user_id = user_auth.user_vault_id();
-
+    let vault_id = user_auth.user_vault_id();
     let (challenge, reg_state) = webauthn.webauthn().generate_challenge_register_options(
-        user_id.to_string(),
-        "Footprint".into(), // todo: fix this
+        vault_id.to_string().as_bytes(),
+        "Footprint",
+        "Footprint",
         AttestationConveyancePreference::Direct,
         Some(UserVerificationPolicy::Required),
         None,

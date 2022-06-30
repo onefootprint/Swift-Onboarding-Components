@@ -1043,10 +1043,11 @@ checksum = "874f8444adcb4952a8bc51305c8be95c8ec8237bb0d2e78d2e039f771f8828a0"
 [[package]]
 name = "base64urlsafedata"
 version = "0.1.0"
-source = "git+https://github.com/kanidm/webauthn-rs?rev=6f8ca8c7e133ed17fdf709579056acf1bcf5afdd#6f8ca8c7e133ed17fdf709579056acf1bcf5afdd"
+source = "git+https://github.com/kanidm/webauthn-rs?rev=9ffd732fb9d75c3cc20057c12a41b3323f3417b2#9ffd732fb9d75c3cc20057c12a41b3323f3417b2"
 dependencies = [
  "base64",
  "serde",
+ "serde_json",
 ]
 
 [[package]]
@@ -4754,7 +4755,7 @@ dependencies = [
 [[package]]
 name = "webauthn-rs-core"
 version = "0.4.0-dev"
-source = "git+https://github.com/kanidm/webauthn-rs?rev=6f8ca8c7e133ed17fdf709579056acf1bcf5afdd#6f8ca8c7e133ed17fdf709579056acf1bcf5afdd"
+source = "git+https://github.com/kanidm/webauthn-rs?rev=9ffd732fb9d75c3cc20057c12a41b3323f3417b2#9ffd732fb9d75c3cc20057c12a41b3323f3417b2"
 dependencies = [
  "base64",
  "base64urlsafedata",
@@ -4776,7 +4777,7 @@ dependencies = [
 [[package]]
 name = "webauthn-rs-proto"
 version = "0.1.0"
-source = "git+https://github.com/kanidm/webauthn-rs?rev=6f8ca8c7e133ed17fdf709579056acf1bcf5afdd#6f8ca8c7e133ed17fdf709579056acf1bcf5afdd"
+source = "git+https://github.com/kanidm/webauthn-rs?rev=9ffd732fb9d75c3cc20057c12a41b3323f3417b2#9ffd732fb9d75c3cc20057c12a41b3323f3417b2"
 dependencies = [
  "base64urlsafedata",
  "serde",
