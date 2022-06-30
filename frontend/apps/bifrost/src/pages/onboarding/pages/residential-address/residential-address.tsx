@@ -18,6 +18,7 @@ import {
 import ProgressHeader from '../../components/progress-header';
 import useOnboardingMachine from '../../hooks/use-onboarding-machine';
 import useSyncData from '../../hooks/use-sync-data';
+import useInputValidations from './hooks/use-input-validations';
 
 type FormData = {
   [UserDataAttribute.streetAddress]: string;
@@ -39,6 +40,7 @@ const ResidentialAddress = () => {
     register,
     handleSubmit,
     formState: { errors },
+    setFocus,
   } = useForm<FormData>({
     defaultValues: {
       [UserDataAttribute.country]: DEFAULT_COUNTRY,
@@ -51,6 +53,7 @@ const ResidentialAddress = () => {
     },
   });
   const country = watch(UserDataAttribute.country);
+  const { zipcode } = useInputValidations(country.value);
 
   const onSubmit = (formData: FormData) => {
     const residentialAddress = {
@@ -82,7 +85,10 @@ const ResidentialAddress = () => {
             <CountrySelect
               label={t('form.country.label')}
               onBlur={field.onBlur}
-              onChange={field.onChange}
+              onChange={nextValue => {
+                field.onChange(nextValue);
+                setFocus(UserDataAttribute.streetAddress);
+              }}
               placeholder={t('form.country.placeholder')}
               value={field.value}
             />
@@ -120,8 +126,14 @@ const ResidentialAddress = () => {
               hasError={!!errors.zip}
               hintText={errors.zip && t('form.zipCode.error')}
               label={t('form.zipCode.label')}
+              mask={zipcode.mask}
+              maxLength={zipcode.maxLength}
+              minLength={zipcode.minLength}
               placeholder={t('form.zipCode.placeholder')}
-              {...register(UserDataAttribute.zip, { required: true })}
+              {...register(UserDataAttribute.zip, {
+                required: true,
+                pattern: zipcode.pattern,
+              })}
             />
           </Grid.Column>
         </Grid.Row>

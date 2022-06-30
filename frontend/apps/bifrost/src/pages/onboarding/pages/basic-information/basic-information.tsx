@@ -21,7 +21,7 @@ type FormData = Required<
 >;
 
 const BasicInformation = () => {
-  const inputMasks = useInputMask('en');
+  const inputMasks = useInputMask('en-US');
   const [state, send] = useOnboardingMachine();
   const { data } = state.context;
   const syncDataMutation = useSyncData();

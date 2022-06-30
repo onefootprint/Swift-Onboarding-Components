@@ -12,6 +12,8 @@
     "@types/react-dom": "^17.0.11",
     "@types/ua-parser-js": "^0.7.36",
     "config": "*",
+    "types": "*",
+    "global-constants": "*",
     "react": "17.0.2",
     "react-dom": "17.0.2",
     "react-i18next": "^11.16.9",

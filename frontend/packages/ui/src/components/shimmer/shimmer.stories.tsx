@@ -5,7 +5,7 @@ import Shimmer, { ShimmerProps } from './shimmer';
 
 export default {
   component: Shimmer,
-  title: 'Shimmer',
+  title: 'Components/Shimmer',
   argTypes: {
     testID: {
       control: 'text',

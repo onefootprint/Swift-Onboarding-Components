@@ -1,5 +1,5 @@
 const masks = {
-  en: {
+  'en-US': {
     dob: {
       date: true,
       numericOnly: true,
@@ -14,7 +14,6 @@ const masks = {
   },
 };
 
-// TODO: Type ISO 3166-1 alpha-2
-const useInputMask = (countryCode: 'en') => masks[countryCode];
+const useInputMask = (bcp47Code: 'en-US') => masks[bcp47Code];
 
 export default useInputMask;

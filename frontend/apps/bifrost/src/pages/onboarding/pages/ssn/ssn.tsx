@@ -18,7 +18,7 @@ import Disclaimer from './components/disclaimer';
 type FormData = Required<Pick<UserData, UserDataAttribute.ssn>>;
 
 const SSN = () => {
-  const inputMasks = useInputMask('en');
+  const inputMasks = useInputMask('en-US');
   const [, send] = useOnboardingMachine();
   const syncDataMutation = useSyncData();
   const { t } = useTranslation('pages.registration.ssn');

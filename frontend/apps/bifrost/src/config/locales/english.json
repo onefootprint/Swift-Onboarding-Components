@@ -89,7 +89,7 @@
         "form": {
           "country": {
             "label": "Country",
-            "placeholder": "Select...",
+            "placeholder": "Select",
             "error": "Country cannot be empty"
           },
           "address-line-1": {
@@ -113,7 +113,7 @@
           },
           "state": {
             "label": "State",
-            "placeholder": "Select...",
+            "placeholder": "Select",
             "error": "State cannot be empty"
           },
           "cta": "Continue"
