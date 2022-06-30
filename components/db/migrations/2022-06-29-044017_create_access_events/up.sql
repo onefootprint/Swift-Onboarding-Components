@@ -1,6 +1,6 @@
 CREATE TABLE access_events (
     id uuid NOT NULL PRIMARY KEY DEFAULT uuid_generate_v4(),
-    onboarding_id VARCHAR(250) NOT NULL,
+    onboarding_id text NOT NULL,
     -- TODO who at the tenant accessed?
     -- TODO what was the exact data accessed? if there are multiple emails, might help to store data here
     -- TODO IP address/location?

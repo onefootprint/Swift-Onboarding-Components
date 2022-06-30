@@ -1,6 +1,6 @@
 CREATE TABLE verification_requests (
     id uuid NOT NULL PRIMARY KEY DEFAULT uuid_generate_v4(),
-    onboarding_id varchar(250) NOT NULL,
+    onboarding_id text NOT NULL,
     vendor text NOT NULL,
     timestamp timestamp NOT NULL,
     _created_at timestamp NOT NULL DEFAULT NOW(),

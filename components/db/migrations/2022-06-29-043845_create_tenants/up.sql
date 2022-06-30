@@ -1,5 +1,5 @@
 CREATE TABLE tenants (
-    id VARCHAR(250) PRIMARY KEY DEFAULT prefixed_uid('org_'),
+    id text PRIMARY KEY DEFAULT prefixed_uid('org_'),
     name text NOT NULL UNIQUE,
     public_key BYTEA NOT NULL,
     e_private_key BYTEA NOT NULL,

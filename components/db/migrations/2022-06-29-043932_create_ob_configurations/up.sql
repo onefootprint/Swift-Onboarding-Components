@@ -1,9 +1,9 @@
 create table ob_configurations (
-    id varchar(250) primary key default prefixed_uid('ob_config_id_'),
-    key varchar(250) unique not null default prefixed_uid('ob_config_pk_'),
+    id text primary key default prefixed_uid('ob_config_id_'),
+    key text unique not null default prefixed_uid('ob_config_pk_'),
     name varchar(250) not null,
     description varchar(250),
-    tenant_id varchar(250) not null,
+    tenant_id text not null,
     _created_at timestamp not null default now(),
     _updated_at timestamp not null default now(),
     required_user_data text [] not null default ARRAY[

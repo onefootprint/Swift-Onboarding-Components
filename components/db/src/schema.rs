@@ -4,7 +4,7 @@ table! {
 
     access_events (id) {
         id -> Uuid,
-        onboarding_id -> Varchar,
+        onboarding_id -> Text,
         timestamp -> Timestamp,
         _created_at -> Timestamp,
         _updated_at -> Timestamp,
@@ -44,11 +44,11 @@ table! {
     use newtypes::db_types::*;
 
     ob_configurations (id) {
-        id -> Varchar,
-        key -> Varchar,
+        id -> Text,
+        key -> Text,
         name -> Varchar,
         description -> Nullable<Varchar>,
-        tenant_id -> Varchar,
+        tenant_id -> Text,
         _created_at -> Timestamp,
         _updated_at -> Timestamp,
         required_user_data -> Array<Text>,
@@ -62,11 +62,11 @@ table! {
     use newtypes::db_types::*;
 
     onboardings (id) {
-        id -> Varchar,
-        user_ob_id -> Varchar,
-        user_vault_id -> Varchar,
-        ob_config_id -> Varchar,
-        tenant_id -> Varchar,
+        id -> Text,
+        user_ob_id -> Text,
+        user_vault_id -> Text,
+        ob_config_id -> Text,
+        tenant_id -> Text,
         status -> Text,
         _created_at -> Timestamp,
         _updated_at -> Timestamp,
@@ -94,10 +94,10 @@ table! {
     use newtypes::db_types::*;
 
     tenant_api_keys (id) {
-        id -> Varchar,
+        id -> Text,
         sh_secret_api_key -> Bytea,
         e_secret_api_key -> Bytea,
-        tenant_id -> Varchar,
+        tenant_id -> Text,
         key_name -> Varchar,
         is_enabled -> Bool,
         _created_at -> Timestamp,
@@ -110,7 +110,7 @@ table! {
     use newtypes::db_types::*;
 
     tenants (id) {
-        id -> Varchar,
+        id -> Text,
         name -> Text,
         public_key -> Bytea,
         e_private_key -> Bytea,
@@ -126,8 +126,8 @@ table! {
     use newtypes::db_types::*;
 
     user_data (id) {
-        id -> Varchar,
-        user_vault_id -> Varchar,
+        id -> Text,
+        user_vault_id -> Text,
         data_kind -> Text,
         e_data -> Bytea,
         sh_data -> Nullable<Bytea>,
@@ -144,7 +144,7 @@ table! {
     use newtypes::db_types::*;
 
     user_vaults (id) {
-        id -> Varchar,
+        id -> Text,
         e_private_key -> Bytea,
         public_key -> Bytea,
         id_verified -> Text,
@@ -159,7 +159,7 @@ table! {
 
     verification_requests (id) {
         id -> Uuid,
-        onboarding_id -> Varchar,
+        onboarding_id -> Text,
         vendor -> Text,
         timestamp -> Timestamp,
         _created_at -> Timestamp,
@@ -198,7 +198,7 @@ table! {
 
     webauthn_credentials (id) {
         id -> Uuid,
-        user_vault_id -> Varchar,
+        user_vault_id -> Text,
         credential_id -> Bytea,
         public_key -> Bytea,
         counter -> Int4,

@@ -5,7 +5,7 @@ CREATE OR REPLACE FUNCTION random_string( int ) RETURNS TEXT as $$
 $$ language sql;
 
 CREATE FUNCTION prefixed_uid(prefix VARCHAR(8)) 
-    returns VARCHAR(250) 
+    returns text 
     language plpgsql as $$ 
         begin return CONCAT(prefix, random_string(22));
     end; 

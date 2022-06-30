@@ -1,6 +1,6 @@
 CREATE TABLE webauthn_credentials (
     id uuid NOT NULL PRIMARY KEY DEFAULT uuid_generate_v4(),
-    user_vault_id VARCHAR(250) NOT NULL,
+    user_vault_id text NOT NULL,
     
     credential_id BYTEA NOT NULL,
     public_key BYTEA NOT NULL,

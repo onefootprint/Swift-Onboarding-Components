@@ -1,8 +1,8 @@
 CREATE TABLE tenant_api_keys (
-    id VARCHAR(250) PRIMARY KEY DEFAULT prefixed_uid('key_id_'),
+    id text PRIMARY KEY DEFAULT prefixed_uid('key_id_'),
     sh_secret_api_key BYTEA NOT NULL,
     e_secret_api_key BYTEA NOT NULL,
-    tenant_id VARCHAR(250) NOT NULL,
+    tenant_id text NOT NULL,
     key_name VARCHAR(250) NOT NULL,
     is_enabled BOOLEAN NOT NULL,
     _created_at timestamp NOT NULL DEFAULT NOW(),

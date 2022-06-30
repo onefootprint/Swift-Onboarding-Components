@@ -1,6 +1,6 @@
 CREATE TABLE user_data (
-    id VARCHAR(250) PRIMARY KEY DEFAULT prefixed_uid('ud_'),
-    user_vault_id VARCHAR(250) NOT NULL,
+    id text PRIMARY KEY DEFAULT prefixed_uid('ud_'),
+    user_vault_id text NOT NULL,
     data_kind text NOT NULL,
     e_data BYTEA NOT NULL,
     sh_data BYTEA,
