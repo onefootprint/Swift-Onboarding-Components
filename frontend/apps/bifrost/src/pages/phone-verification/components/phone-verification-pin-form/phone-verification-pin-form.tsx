@@ -1,3 +1,4 @@
+import { useTranslation } from 'hooks';
 import React from 'react';
 import { UseMutationResult } from 'react-query';
 import { RequestError } from 'request';
@@ -35,6 +36,7 @@ const PhoneVerificationPinForm = ({
   verifyMutation,
   onboardingMutation,
 }: PhoneVerificationPinFormProps) => {
+  const { t } = useTranslation('pages.phone-verification.form');
   const [state, send] = useBifrostMachine();
   const identifyMutation = useIdentify();
 
@@ -107,14 +109,12 @@ const PhoneVerificationPinForm = ({
       <PinInput
         onComplete={handleComplete}
         hasError={verifyMutation.isError}
-        hintText={
-          verifyMutation.isError ? 'Incorrect verification code.' : undefined
-        }
+        hintText={verifyMutation.isError ? t('error.description') : undefined}
       />
       {identifyMutation.isLoading ? (
         <LoadingIndicator />
       ) : (
-        <LinkButton onClick={handleResend}>Resend code</LinkButton>
+        <LinkButton onClick={handleResend}>{t('cta')}</LinkButton>
       )}
     </>
   );

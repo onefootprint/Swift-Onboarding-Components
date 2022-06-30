@@ -1,13 +1,17 @@
+import { useTranslation } from 'hooks';
 import React from 'react';
 import styled, { css } from 'styled-components';
 import { LoadingIndicator, Typography } from 'ui';
 
-const PhoneVerificationLoading = () => (
-  <PhoneVerificationLoadingContainer>
-    <LoadingIndicator />
-    <Typography variant="label-3">Verifying...</Typography>
-  </PhoneVerificationLoadingContainer>
-);
+const PhoneVerificationLoading = () => {
+  const { t } = useTranslation('pages.phone-verification.form.loading');
+  return (
+    <PhoneVerificationLoadingContainer>
+      <LoadingIndicator />
+      <Typography variant="label-3">{t('description')}</Typography>
+    </PhoneVerificationLoadingContainer>
+  );
+};
 
 const PhoneVerificationLoadingContainer = styled.div`
   ${({ theme }) => css`

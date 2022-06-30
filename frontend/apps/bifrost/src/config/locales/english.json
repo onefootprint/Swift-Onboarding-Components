@@ -30,6 +30,25 @@
         "cta": "Continue"
       }
     },
+    "phone-verification": {
+      "title": {
+        "new-user": "Let's verify your identity!",
+        "existing-user": "Welcome back! 🎉"
+      },
+      "subtitle": "Enter the 6-digit code sent to (•••) ••• ••{{phoneNumberLastTwo}}",
+      "form": {
+        "error": {
+          "description": "Incorrect verification code"
+        },
+        "loading": {
+          "description": "Verifying..."
+        },
+        "success": {
+          "description": "Phone verified"
+        },
+        "cta": "Resend code"
+      }
+    },
     "confirm-and-authorize": {
       "title": "Confirm & Authorize",
       "subtitle": "{{tenantName}} will be able to securely view the following data:",
