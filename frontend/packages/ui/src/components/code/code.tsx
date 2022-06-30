@@ -12,6 +12,8 @@ export type CodeProps = {
   tooltipTextConfirmation?: string;
 };
 
+const HIDE_TIMEOUT = 600;
+
 let confirmationTimeout: null | NodeJS.Timeout = null;
 
 const Code = ({
@@ -47,7 +49,7 @@ const Code = ({
   const scheduleToHideConfirmation = () => {
     confirmationTimeout = setTimeout(() => {
       setShowConfirmation(false);
-    }, 1000);
+    }, HIDE_TIMEOUT);
   };
 
   return (
