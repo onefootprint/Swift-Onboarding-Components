@@ -55,6 +55,8 @@ import IcoEmail16 from '../ico/ico-email-16';
 import IcoEmail24 from '../ico/ico-email-24';
 import IcoEye16 from '../ico/ico-eye-16';
 import IcoEye24 from '../ico/ico-eye-24';
+import IcoFacebook16 from '../ico/ico-facebook-16';
+import IcoFacebook24 from '../ico/ico-facebook-24';
 import IcoFileText216 from '../ico/ico-file-text-2-16';
 import IcoFileText224 from '../ico/ico-file-text-2-24';
 import IcoFileText16 from '../ico/ico-file-text-16';
@@ -70,6 +72,10 @@ import IcoInfo16 from '../ico/ico-info-16';
 import IcoInfo24 from '../ico/ico-info-24';
 import IcoLaptop16 from '../ico/ico-laptop-16';
 import IcoLaptop24 from '../ico/ico-laptop-24';
+import IcoLink16 from '../ico/ico-link-16';
+import IcoLink24 from '../ico/ico-link-24';
+import IcoLinkedin16 from '../ico/ico-linkedin-16';
+import IcoLinkedin24 from '../ico/ico-linkedin-24';
 import IcoLock16 from '../ico/ico-lock-16';
 import IcoLock24 from '../ico/ico-lock-24';
 import IcoLogOut16 from '../ico/ico-log-out-16';
@@ -93,6 +99,8 @@ import IcoShield16 from '../ico/ico-shield-16';
 import IcoShield24 from '../ico/ico-shield-24';
 import IcoSpinner16 from '../ico/ico-spinner-16';
 import IcoSpinner24 from '../ico/ico-spinner-24';
+import IcoTwitter16 from '../ico/ico-twitter-16';
+import IcoTwitter24 from '../ico/ico-twitter-24';
 import IcoUser16 from '../ico/ico-user-16';
 import IcoUser24 from '../ico/ico-user-24';
 import IcoUserCircle16 from '../ico/ico-user-circle-16';
@@ -127,6 +135,7 @@ export default {
   IcoDotsHorizontal16,
   IcoEmail16,
   IcoEye16,
+  IcoFacebook16,
   IcoFileText16,
   IcoFileText216,
   IcoFootprint16,
@@ -134,6 +143,8 @@ export default {
   IcoHelp16,
   IcoInfo16,
   IcoLaptop16,
+  IcoLink16,
+  IcoLinkedin16,
   IcoLock16,
   IcoLogOut16,
   IcoMenu16,
@@ -145,6 +156,7 @@ export default {
   IcoSettings16,
   IcoShield16,
   IcoSpinner16,
+  IcoTwitter16,
   IcoUser16,
   IcoUserCircle16,
   IcoUsers16,
@@ -174,6 +186,7 @@ export default {
   IcoDotsHorizontal24,
   IcoEmail24,
   IcoEye24,
+  IcoFacebook24,
   IcoFileText224,
   IcoFileText24,
   IcoFootprint24,
@@ -181,6 +194,8 @@ export default {
   IcoHelp24,
   IcoInfo24,
   IcoLaptop24,
+  IcoLink24,
+  IcoLinkedin24,
   IcoLock24,
   IcoLogOut24,
   IcoMenu24,
@@ -192,6 +207,7 @@ export default {
   IcoSettings24,
   IcoShield24,
   IcoSpinner24,
+  IcoTwitter24,
   IcoUser24,
   IcoUserCircle24,
   IcoUsers24,
