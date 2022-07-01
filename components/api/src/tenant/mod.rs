@@ -6,6 +6,7 @@ pub mod decrypt;
 pub mod liveness;
 pub mod onboardings;
 pub mod required_data;
+pub mod validate;
 pub mod workos;
 
 pub fn routes() -> web::Scope {
@@ -17,4 +18,5 @@ pub fn routes() -> web::Scope {
         .service(required_data::get)
         .service(config::get)
         .service(liveness::get)
+        .service(validate::validate)
 }

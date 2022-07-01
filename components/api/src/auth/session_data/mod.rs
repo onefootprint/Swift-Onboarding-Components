@@ -3,7 +3,7 @@ use crate::{errors::ApiError, State};
 use self::{
     email::email_verify::EmailVerifySession,
     tenant::workos::WorkOsSession,
-    user::{d2p::D2pSession, my_fp::My1fpBasicSession, onboarding::OnboardingSession},
+    user::{d2p::D2pSession, my_fp::My1fpBasicSession, onboarding::OnboardingSession}, validate_user::ValidateUserToken,
 };
 use chrono::{Duration, NaiveDateTime, Utc};
 use crypto::aead::ScopedSealingKey;
@@ -15,6 +15,7 @@ use super::AuthError;
 pub mod email;
 pub mod tenant;
 pub mod user;
+pub mod validate_user;
 
 /// This struct is sealed, and then stored in the DB
 #[derive(Debug, Clone)]
@@ -89,6 +90,9 @@ pub enum SessionData {
 
     /// Used for validating email challenges
     EmailVerify(EmailVerifySession),
+
+    /// Used for transforming an
+    ValidateUserToken(ValidateUserToken),
 }
 
 /// Associates an HTTP header name with type

@@ -382,9 +382,26 @@ def test_onboarding_complete(request, workos_tenant):
     )
     body = _assert_response(r)
     fp_user_id = body["data"]["footprint_user_id"]
+    validation_token = body["data"]["validation_token"]
+
     assert body["data"]["missing_webauthn_credentials"] == False
     assert fp_user_id
+    assert validation_token
     request.config.cache.set("fp_user_id", fp_user_id)
+
+    # test the validate api call
+    path = "org/validate"
+    print(url(path))
+    r = requests.post(
+        url(path),
+        headers=dict(**_client_priv_key_headers(workos_tenant["sk"])),
+        json= {"validation_token": validation_token },
+    )
+    body = _assert_response(r)
+    fp_user_id2 = body["data"]["footprint_user_id"]
+    status = body["data"]["status"]
+    assert fp_user_id2 == fp_user_id
+    assert status    
 
 def test_identify_login_repeat_customer_biometric(request, foo_tenant):
     request.config.cache.set("fpuser_auth_token", None)  # Remove fpuser_auth_token from previous test
@@ -503,9 +520,26 @@ def test_identify_repeat_customer(request, foo_tenant):
     )
     body = _assert_response(r)
     fp_user_id = body["data"]["footprint_user_id"]
+    validation_token = body["data"]["validation_token"]
     assert fp_user_id
+    assert validation_token
     old_fp_user_id = request.config.cache.get("fp_user_id", None)
     assert old_fp_user_id != fp_user_id, "Different tenants should have different fp_user_ids"
+
+    # test the validate api call
+    path = "org/validate"
+    print(url(path))
+    r = requests.post(
+        url(path),
+        headers=dict(**_client_priv_key_headers(foo_tenant["sk"])),
+        json= {"validation_token": validation_token },
+    )
+    body = _assert_response(r)
+    fp_user_id2 = body["data"]["footprint_user_id"]
+    status = body["data"]["status"]
+    assert fp_user_id2 == fp_user_id
+    assert status
+
 
 FIELDS_TO_DECRYPT = [
     ["last_name", "ssn"],

@@ -57,6 +57,10 @@ pub enum ApiError {
     UserDoesntExistForEmailChallenge,
     #[error("token invalid or not found")]
     EmailVerificationTokenInvalidOrNotFound,
+    #[error("token invalid or not found")]
+    ValidateTokenInvalidOrNotFound,
+    #[error("token invalid for tenant")]
+    BadValidateToken,
     #[error("email challenge expired")]
     EmailChallengeExpired,
     #[error("invalid tenant skey or footprint user id")]
@@ -167,6 +171,7 @@ impl actix_web::ResponseError for ApiError {
             ApiError::SendgridError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::NewtypeError(_) => StatusCode::BAD_REQUEST,
             ApiError::EmailVerificationTokenInvalidOrNotFound => StatusCode::BAD_REQUEST,
+            ApiError::BadValidateToken | ApiError::ValidateTokenInvalidOrNotFound => StatusCode::BAD_REQUEST,
         }
     }
 

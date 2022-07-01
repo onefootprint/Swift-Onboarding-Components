@@ -2,19 +2,25 @@ use crate::auth::get_onboarding_for_tenant;
 use crate::auth::session_context::{HasUserVaultId, SessionContext};
 use crate::auth::session_data::tenant::ob_public_key::PublicTenantAuthContext;
 use crate::auth::session_data::user::onboarding::OnboardingSession;
+use crate::auth::session_data::validate_user::ValidateUserToken;
+use crate::auth::session_data::{ServerSession, SessionData};
 use crate::errors::ApiError;
 use crate::types::success::ApiResponseData;
 use crate::utils::insight_headers::InsightHeaders;
 use crate::utils::user_vault_wrapper::UserVaultWrapper;
 use crate::State;
+use chrono::Duration;
 use db::{models::insight_event::CreateInsightEvent, webauthn_credentials::get_webauthn_creds};
-use newtypes::FootprintUserId;
+use newtypes::{FootprintUserId, SessionAuthToken};
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Apiv2Schema)]
 struct CommitResponse {
     /// Unique footprint user id
+    /// TODO: (FP-486) remove this for better safety rails of api usage
     footprint_user_id: FootprintUserId,
+    /// Footprint validation token
+    validation_token: SessionAuthToken,
     /// Boolean true / false if webauthn set
     missing_webauthn_credentials: bool,
 }
@@ -45,17 +51,29 @@ fn handler(
     let webauthn_creds = get_webauthn_creds(&state.db_pool, uv_id).await?;
     // TODO kick off user verification with data vendors
 
-    if missing_fields.is_empty() {
-        // record the insight for this onboarding
-        CreateInsightEvent::from(insights).insert(&state.db_pool).await?;
-        // TODO add it to the onboarding table
-        Ok(Json(ApiResponseData {
-            data: CommitResponse {
-                footprint_user_id: onboarding.user_ob_id.clone(),
-                missing_webauthn_credentials: webauthn_creds.is_empty(),
-            },
-        }))
-    } else {
-        Err(ApiError::UserMissingRequiredFields(missing_fields.join(",")))
+    if !missing_fields.is_empty() {
+        return Err(ApiError::UserMissingRequiredFields(missing_fields.join(",")));
     }
+
+    // record the insight for this onboarding
+    CreateInsightEvent::from(insights).insert(&state.db_pool).await?;
+
+    // create the session for this onboarding
+    let validation_token = ServerSession::create(
+        &state,
+        SessionData::ValidateUserToken(ValidateUserToken {
+            onboarding_id: onboarding.id,
+        }),
+        Duration::minutes(15),
+    )
+    .await?;
+
+    // TODO add it to the onboarding table
+    Ok(Json(ApiResponseData {
+        data: CommitResponse {
+            footprint_user_id: onboarding.user_ob_id,
+            validation_token,
+            missing_webauthn_credentials: webauthn_creds.is_empty(),
+        },
+    }))
 }

@@ -7,6 +7,7 @@ use chrono::NaiveDateTime;
 use diesel::dsl::any;
 use diesel::pg::Pg;
 use diesel::prelude::*;
+use newtypes::OnboardingId;
 use newtypes::{Fingerprint, FootprintUserId, ObConfigurationId, Status, TenantId, UserVaultId};
 
 #[derive(Clone)]
@@ -107,6 +108,23 @@ pub async fn get(
                 .filter(schema::onboardings::user_vault_id.eq(user_vault_id))
                 .first(conn)
                 .optional()?;
+            Ok(ob)
+        })
+        .await??;
+    Ok(ob)
+}
+
+pub async fn get_by_onboarding_id_and_tenant(
+    pool: &DbPool,
+    id: OnboardingId,
+    tenant_id: TenantId,
+) -> Result<Onboarding, DbError> {
+    let ob = pool
+        .db_query(|conn| -> Result<Onboarding, DbError> {
+            let ob = schema::onboardings::table
+                .filter(schema::onboardings::id.eq(id))
+                .filter(schema::onboardings::tenant_id.eq(tenant_id))
+                .first(conn)?;
             Ok(ob)
         })
         .await??;
