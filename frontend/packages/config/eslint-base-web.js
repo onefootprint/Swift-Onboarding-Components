@@ -41,6 +41,7 @@ module.exports = {
           'Component',
           'Field',
           'Input',
+          'PhoneInput',
           'PinInput',
           'SearchInput',
           'Select',

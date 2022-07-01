@@ -19,7 +19,7 @@ export type BaseSelectProps<Option extends BaseSelectOption> = {
   hasError?: boolean;
   hintText?: string;
   id?: string;
-  label: string;
+  label?: string;
   name?: string;
   onBlur?: React.FocusEventHandler<HTMLInputElement>;
   onChange?: (newOption: Option) => void;
@@ -42,7 +42,7 @@ const BaseSelect = <Option extends BaseSelectOption>({
   OptionComponent = Option,
   hasError,
   hintText,
-  id: baseID,
+  id,
   label,
   name,
   onBlur,
@@ -57,7 +57,6 @@ const BaseSelect = <Option extends BaseSelectOption>({
   const containerRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const selectRef = useRef<HTMLInputElement>(null);
-  const id = baseID || label;
   const theme = useTheme();
   const styles = useStyles();
 
@@ -102,11 +101,11 @@ const BaseSelect = <Option extends BaseSelectOption>({
 
   return (
     <Box ref={containerRef} testID={testID}>
-      <Label htmlFor={id}>{label}</Label>
+      {label && <Label htmlFor={id || label}>{label}</Label>}
       <HiddenSelect
         aria-hidden="true"
         autoComplete="country-name"
-        id={id}
+        id={id || label}
         onChange={handleAutoComplete}
         onFocus={handleFakeSelectFocus}
         ref={selectRef}

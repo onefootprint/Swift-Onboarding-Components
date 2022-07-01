@@ -15,6 +15,7 @@ export type InternalInputProps = {
 };
 
 export type InputProps = FieldProps & {
+  value?: string;
   mask?: CleaveOptions;
   sx?: SXStyleProps;
 } & InputHTMLAttributes<HTMLInputElement>;
@@ -24,7 +25,9 @@ type AllInputProps = InputProps & InternalInputProps;
 const BaseInput = forwardRef<HTMLInputElement, AllInputProps>(
   (
     {
-      hasError = false,
+      fontVariant = 'body-3',
+      hasError,
+      hasFocus,
       hintText,
       id: baseID,
       label,
@@ -35,9 +38,8 @@ const BaseInput = forwardRef<HTMLInputElement, AllInputProps>(
       prefixElement,
       required,
       suffixElement,
-      testID,
       sx,
-      fontVariant = 'body-3',
+      testID,
       ...remainingProps
     }: AllInputProps,
     ref,
@@ -63,17 +65,18 @@ const BaseInput = forwardRef<HTMLInputElement, AllInputProps>(
           {prefixElement && <PrefixContainer>{prefixElement}</PrefixContainer>}
           <StyledField
             {...remainingProps}
-            sx={sxStyles}
-            fontVariant={fontVariant}
             $hasError={hasError}
+            $hasFocus={hasFocus}
             aria-required={required}
             as={mask ? undefined : 'input'}
             data-testid={testID}
+            fontVariant={fontVariant}
             id={id}
             onChange={handleChange}
             options={mask}
             placeholder={placeholder}
             required={required}
+            $sx={sxStyles}
             // We use Cleave.js for mask, and cleave uses htmlRef instead of ref
             // These conditions are important in order to work with react-hook-forms
             ref={mask ? undefined : ref}
@@ -105,14 +108,14 @@ const SuffixContainer = styled.div`
   height: 100%;
 `;
 
-const StyledField = styled(Field)<{ sx: SXStyles }>`
+const StyledField = styled(Field)<{ $sx: SXStyles }>`
   ${({ theme }) => css`
     padding-left: ${theme.spacing[5]}px;
     padding-right: ${theme.spacing[5]}px;
   `}
-  ${({ sx }) =>
+  ${({ $sx }) =>
     css`
-      ${sx};
+      ${$sx};
     `}
 `;
 

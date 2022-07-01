@@ -3,12 +3,13 @@ import Cleave from 'cleave.js/react';
 import { darken, rgba } from 'polished';
 import React from 'react';
 import styled, { css } from 'styled-components';
-import { FontVariant } from 'themes';
+import { BorderColor, FontVariant } from 'themes';
 
 import { createFontStyles } from '../../../utils/mixins';
 
 export type FieldProps = {
   hasError?: boolean;
+  hasFocus?: boolean;
   hintText?: string;
   label?: string;
   onChangeText?: (nextValue: string) => void;
@@ -17,16 +18,24 @@ export type FieldProps = {
 };
 
 type FieldInternalProps = {
-  htmlRef?: React.ForwardedRef<HTMLInputElement>;
   $hasError?: boolean;
-  options?: CleaveOptions;
+  $hasFocus?: boolean;
   fontVariant?: FontVariant;
+  htmlRef?: React.ForwardedRef<HTMLInputElement>;
+  options?: CleaveOptions;
 };
+
+const createFocusStyle = (borderColor: BorderColor) => css`
+  ${({ theme }) => css`
+    border-color: ${theme.borderColor[borderColor]};
+    box-shadow: 0 0 0 4px ${rgba(theme.borderColor[borderColor], 0.1)};
+  `}
+`;
 
 const Field = styled(Cleave).attrs<{ as?: 'textarea' | 'input' }>(({ as }) => ({
   as,
 }))<FieldInternalProps>`
-  ${({ $hasError, theme, fontVariant }) => {
+  ${({ $hasFocus, $hasError, theme, fontVariant }) => {
     const defaultBorderColor = $hasError ? 'error' : 'primary';
     const hoverBorderColor = $hasError ? 'error' : 'primary';
     const focusBorderColor = $hasError ? 'error' : 'secondary';
@@ -41,18 +50,21 @@ const Field = styled(Cleave).attrs<{ as?: 'textarea' | 'input' }>(({ as }) => ({
       outline: none;
       width: 100%;
 
-      &:hover:enabled {
-        border: ${theme.borderWidth[1]}px solid
-          ${hoverBorderColor === 'error'
-            ? darken(0.1, theme.borderColor[hoverBorderColor])
-            : darken(0.32, theme.borderColor[hoverBorderColor])};
-      }
+      ${!$hasFocus &&
+      css`
+        &:hover:enabled {
+          border: ${theme.borderWidth[1]}px solid
+            ${hoverBorderColor === 'error'
+              ? darken(0.1, theme.borderColor[hoverBorderColor])
+              : darken(0.32, theme.borderColor[hoverBorderColor])};
+        }
+      `}
 
       &:focus:enabled {
-        -webkit-appearance: none;
-        border-color: ${theme.borderColor[focusBorderColor]};
-        box-shadow: 0 0 0 4px ${rgba(theme.borderColor[focusBorderColor], 0.1)};
+        ${createFocusStyle(focusBorderColor)}
       }
+
+      ${$hasFocus && createFocusStyle(focusBorderColor)}
 
       &:disabled {
         background: ${theme.backgroundColor.secondary};

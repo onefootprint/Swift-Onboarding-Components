@@ -3551,6 +3551,11 @@
     "@types/minimatch" "*"
     "@types/node" "*"
 
+"@types/google-libphonenumber@^7.4.23":
+  version "7.4.23"
+  resolved "https://registry.yarnpkg.com/@types/google-libphonenumber/-/google-libphonenumber-7.4.23.tgz#c44c9125d45f042943694d605fd8d8d796cafc3b"
+  integrity sha512-C3ydakLTQa8HxtYf9ge4q6uT9krDX8smSIxmmW3oACFi5g5vv6T068PRExF7UyWbWpuYiDG8Nm24q2X5XhcZWw==
+
 "@types/google-map-react@^2.1.7":
   version "2.1.7"
   resolved "https://registry.yarnpkg.com/@types/google-map-react/-/google-map-react-2.1.7.tgz#10992ecf0f161b2e8cbe647364decb31707db6af"
@@ -8223,6 +8228,11 @@ globby@^9.2.0:
     ignore "^4.0.3"
     pify "^4.0.1"
     slash "^2.0.0"
+
+google-libphonenumber@^3.2.29:
+  version "3.2.29"
+  resolved "https://registry.yarnpkg.com/google-libphonenumber/-/google-libphonenumber-3.2.29.tgz#06ca967f632252e4eb2df032288fb4327284edce"
+  integrity sha512-eRVj4HIcRR+MGPDlrt1n8/nORoUMhEj3Wns5f61uDaSrLeFdXdKjBhoEOkiMe2pnmOY+UzI1j8O8umjhzPYs1A==
 
 google-map-react@^2.1.10:
   version "2.1.10"

@@ -11,7 +11,7 @@ import useIdentifyChallenge, {
 import useBifrostMachine, { Events } from 'src/hooks/use-bifrost-machine';
 import { ChallengeKind } from 'src/utils/state-machine/types';
 import styled, { css } from 'styled-components';
-import { Box, Button, LinkButton, TextInput, Typography } from 'ui';
+import { Box, Button, LinkButton, PhoneInput, Typography } from 'ui';
 
 type FormData = {
   phone: string;
@@ -22,6 +22,7 @@ const PhoneIdentification = () => {
   const [state, send] = useBifrostMachine();
   const { t } = useTranslation('pages.phone-identification');
   const {
+    setValue,
     register,
     handleSubmit,
     formState: { errors },
@@ -114,12 +115,15 @@ const PhoneIdentification = () => {
         </LinkButton>
       </EmailCard>
       <Form onSubmit={handleSubmit(onSubmit)}>
-        <TextInput
+        <PhoneInput
           autoFocus
           hasError={!!errors.phone}
           hintText={errors.phone && t('form.phone-input.error')}
           label={t('form.phone-input.label')}
           placeholder={t('form.phone-input.placeholder')}
+          onReset={() => {
+            setValue('phone', '');
+          }}
           {...register('phone', { required: true })}
         />
         <Button
