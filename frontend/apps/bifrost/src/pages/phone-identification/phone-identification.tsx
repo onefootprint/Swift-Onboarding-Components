@@ -124,7 +124,10 @@ const PhoneIdentification = () => {
           onReset={() => {
             setValue('phone', '');
           }}
-          {...register('phone', { required: true })}
+          {...register('phone', {
+            required: true,
+            pattern: /^(\+)?([ 0-9]){10,16}$/,
+          })}
         />
         <Button
           type="submit"
