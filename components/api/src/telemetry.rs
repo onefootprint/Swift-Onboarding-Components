@@ -103,18 +103,18 @@ impl RootSpanBuilder for TelemetrySpanBuilder {
 
         tracing::info!(
             route=%route, 
-            ip=?ip_address, 
-            lat=?latitude, 
-            lon=?longitude,
-            city=?city,
-            country=?country,
-            region=?region,
-            region_name=?region_name,
-            metro_code=?metro_code,
-            postal_code=?postal_code,
-            time_zone=?time_zone,
-            user_agent=?user_agent,
-            timestamp=?timestamp,
+            ip=?ip_address.unwrap_or_else(|| "".into()), 
+            lat=?latitude.unwrap_or_else(|| "".into()), 
+            lon=?longitude.unwrap_or_else(|| "".into()),
+            city=?city.unwrap_or_else(|| "".into()),
+            country=?country.unwrap_or_else(|| "".into()),
+            region=?region.unwrap_or_else(|| "".into()),
+            region_name=?region_name.unwrap_or_else(|| "".into()),
+            metro_code=?metro_code.unwrap_or_else(|| "".into()),
+            postal_code=?postal_code.unwrap_or_else(|| "".into()),
+            time_zone=?time_zone.unwrap_or_else(|| "".into()),
+            user_agent=?user_agent.unwrap_or_else(|| "".into()),
+            timestamp=%timestamp,
             "request start");
         std::mem::drop(e);
         span
