@@ -99,6 +99,8 @@ impl RootSpanBuilder for TelemetrySpanBuilder {
             timestamp,
         } = InsightHeaders::parse_from_request(request.headers());
 
+        let e = span.enter();
+
         tracing::info!(
             route=%route, 
             ip=?ip_address, 
@@ -114,7 +116,7 @@ impl RootSpanBuilder for TelemetrySpanBuilder {
             user_agent=?user_agent,
             timestamp=?timestamp,
             "request start");
-
+        std::mem::drop(e);
         span
     }
 
