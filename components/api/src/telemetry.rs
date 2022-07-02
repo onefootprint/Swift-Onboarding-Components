@@ -82,7 +82,6 @@ impl RootSpanBuilder for TelemetrySpanBuilder {
             request.method().as_str(),
             request.uri().path_and_query().map(|p| p.as_str()).unwrap_or("")
         );
-        let span = root_span!(request);
 
         let InsightHeaders {
             ip_address,
@@ -99,9 +98,8 @@ impl RootSpanBuilder for TelemetrySpanBuilder {
             timestamp,
         } = InsightHeaders::parse_from_request(request.headers());
 
-        let e = span.enter();
-
-        tracing::info!(
+        let span = root_span!(
+            request,
             route=%route, 
             ip=?ip_address.unwrap_or_else(|| "".into()), 
             lat=?latitude.unwrap_or_else(|| "".into()), 
@@ -116,7 +114,6 @@ impl RootSpanBuilder for TelemetrySpanBuilder {
             user_agent=?user_agent.unwrap_or_else(|| "".into()),
             timestamp=%timestamp,
             "request start");
-        std::mem::drop(e);
         span
     }
 
