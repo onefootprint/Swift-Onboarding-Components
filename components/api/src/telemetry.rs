@@ -15,6 +15,7 @@ use tracing_subscriber::EnvFilter;
 use tracing_subscriber::Registry;
 
 use crate::config::Config;
+use crate::utils::insight_headers::InsightHeaders;
 
 pub fn init(config: &Config) -> Result<Option<PushController>, Box<dyn std::error::Error>> {
     env_logger::init();
@@ -82,7 +83,38 @@ impl RootSpanBuilder for TelemetrySpanBuilder {
             request.uri().path_and_query().map(|p| p.as_str()).unwrap_or("")
         );
         let span = root_span!(request);
-        tracing::info!("{}", route);
+
+        let InsightHeaders {
+            ip_address,
+            city,
+            country,
+            region,
+            region_name,
+            latitude,
+            longitude,
+            metro_code,
+            postal_code,
+            time_zone,
+            user_agent,
+            timestamp,
+        } = InsightHeaders::parse_from_request(request.headers());
+
+        tracing::info!(
+            route=%route, 
+            ip=?ip_address, 
+            lat=?latitude, 
+            lon=?longitude,
+            city=?city,
+            country=?country,
+            region=?region,
+            region_name=?region_name,
+            metro_code=?metro_code,
+            postal_code=?postal_code,
+            time_zone=?time_zone,
+            user_agent=?user_agent,
+            timestamp=?timestamp,
+            "request start");
+
         span
     }
 

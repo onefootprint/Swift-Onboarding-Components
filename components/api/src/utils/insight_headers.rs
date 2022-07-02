@@ -1,6 +1,6 @@
 use std::{net::SocketAddr, pin::Pin};
 
-use actix_web::{FromRequest, HttpRequest};
+use actix_web::{http::header::HeaderMap, FromRequest};
 use chrono::NaiveDateTime;
 use db::models::insight_event::CreateInsightEvent;
 use futures_util::Future;
@@ -27,33 +27,36 @@ impl FromRequest for InsightHeaders {
     type Future = Pin<Box<dyn Future<Output = Result<Self, Self::Error>>>>;
 
     fn from_request(req: &actix_web::HttpRequest, _payload: &mut actix_web::dev::Payload) -> Self::Future {
-        let ip_address = get_header("cloudfront-viewer-address", req)
-            .and_then(|s| s.parse::<SocketAddr>().map(|s| s.ip().to_string()).ok());
-
-        let cloudfront = InsightHeaders {
-            ip_address,
-            city: get_header("cloudfront-viewer-city", req),
-            country: get_header("cloudfront-viewer-country-name", req),
-            region: get_header("cloudfront-viewer-country-region", req),
-            region_name: get_header("cloudfront-viewer-country-region-name", req),
-            latitude: get_header("cloudfront-viewer-latitude", req),
-            longitude: get_header("cloudfront-viewer-longitude", req),
-            metro_code: get_header("cloudfront-viewer-metro-code", req),
-            postal_code: get_header("cloudfront-viewer-postal-code", req),
-            time_zone: get_header("cloudfront-viewer-time-zone", req),
-            user_agent: get_header(actix_web::http::header::USER_AGENT.as_str(), req),
-            timestamp: chrono::Utc::now().naive_utc(),
-        };
-
+        let cloudfront = InsightHeaders::parse_from_request(req.headers());
         Box::pin(async move { Ok(cloudfront) })
     }
 }
 
-fn get_header(name: &str, req: &HttpRequest) -> Option<String> {
-    req.headers()
-        .get(name)
-        .and_then(|h| h.to_str().ok())
-        .map(|s| s.to_string())
+impl InsightHeaders {
+    /// parse cloudfront headers
+    pub fn parse_from_request(headers: &HeaderMap) -> Self {
+        let ip_address = get_header("cloudfront-viewer-address", headers)
+            .and_then(|s| s.parse::<SocketAddr>().map(|s| s.ip().to_string()).ok());
+
+        InsightHeaders {
+            ip_address,
+            city: get_header("cloudfront-viewer-city", headers),
+            country: get_header("cloudfront-viewer-country-name", headers),
+            region: get_header("cloudfront-viewer-country-region", headers),
+            region_name: get_header("cloudfront-viewer-country-region-name", headers),
+            latitude: get_header("cloudfront-viewer-latitude", headers),
+            longitude: get_header("cloudfront-viewer-longitude", headers),
+            metro_code: get_header("cloudfront-viewer-metro-code", headers),
+            postal_code: get_header("cloudfront-viewer-postal-code", headers),
+            time_zone: get_header("cloudfront-viewer-time-zone", headers),
+            user_agent: get_header(actix_web::http::header::USER_AGENT.as_str(), headers),
+            timestamp: chrono::Utc::now().naive_utc(),
+        }
+    }
+}
+
+fn get_header(name: &str, req: &HeaderMap) -> Option<String> {
+    req.get(name).and_then(|h| h.to_str().ok()).map(|s| s.to_string())
 }
 
 impl From<InsightHeaders> for CreateInsightEvent {
