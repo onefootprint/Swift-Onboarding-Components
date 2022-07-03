@@ -35,4 +35,3 @@ serde_json = { version = "1.0" }
 newtypes = { path = "../newtypes" }
 itertools = "0.10.3"
 tracing = "0.1.30"
-diesel_as_jsonb = "0.1.3"

@@ -1,0 +1,37 @@
+use crate::auth::either::Either;
+use crate::auth::session_context::HasTenant;
+use crate::auth::session_data::tenant::secret_key::SecretTenantAuthContext;
+use crate::auth::session_data::tenant::workos::WorkOsSession;
+use crate::types::audit_trail::ApiAuditTrail;
+use crate::types::success::ApiResponseData;
+use crate::State;
+use crate::{auth::session_context::SessionContext, errors::ApiError};
+use db::models::audit_trails::AuditTrail;
+use newtypes::FootprintUserId;
+use paperclip::actix::{api_v2_operation, get, web, web::Json, Apiv2Schema};
+
+#[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, Apiv2Schema)]
+struct AuditTrailRequest {
+    footprint_user_id: FootprintUserId,
+}
+
+type AuditTrailResponse = Vec<ApiAuditTrail>;
+
+#[api_v2_operation(tags(Org))]
+#[get("/audit_trail")]
+/// Allows a tenant to view a customer's audit trail
+fn get(
+    state: web::Data<State>,
+    request: web::Query<AuditTrailRequest>,
+    auth: Either<SessionContext<WorkOsSession>, SecretTenantAuthContext>,
+) -> actix_web::Result<Json<ApiResponseData<AuditTrailResponse>>, ApiError> {
+    let tenant = auth.tenant(&state.db_pool).await?;
+
+    let logs = state
+        .db_pool
+        .db_query(move |conn| AuditTrail::get_for_tenant(conn, &tenant.id, &request.footprint_user_id))
+        .await??;
+
+    let response = logs.into_iter().map(ApiAuditTrail::from).collect::<Vec<_>>();
+    Ok(Json(ApiResponseData::ok(response)))
+}

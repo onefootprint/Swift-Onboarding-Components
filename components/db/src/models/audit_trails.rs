@@ -1,8 +1,12 @@
-use crate::{schema::audit_trails, DbError};
+use crate::diesel::BoolExpressionMethods;
+use crate::diesel::ExpressionMethods;
+use crate::{
+    schema::{self, audit_trails},
+    DbError,
+};
 use chrono::NaiveDateTime;
-use diesel::{Insertable, PgConnection, Queryable, RunQueryDsl};
-use diesel_as_jsonb::AsJsonb;
-use newtypes::{AuditTrailId, DataKind, TenantId, UserVaultId, Vendor};
+use diesel::{dsl::any, Insertable, PgConnection, QueryDsl, Queryable, RunQueryDsl};
+use newtypes::{AuditTrailEvent, AuditTrailId, FootprintUserId, TenantId, UserVaultId};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
@@ -18,6 +22,27 @@ pub struct AuditTrail {
     pub _updated_at: NaiveDateTime,
 }
 
+impl AuditTrail {
+    pub fn get_for_tenant(
+        conn: &PgConnection,
+        tenant_id: &TenantId,
+        footprint_user_id: &FootprintUserId,
+    ) -> Result<Vec<AuditTrail>, DbError> {
+        let user_vault_ids = schema::onboardings::table
+            .filter(schema::onboardings::tenant_id.eq(tenant_id))
+            .filter(schema::onboardings::user_ob_id.eq(footprint_user_id))
+            .select(schema::onboardings::user_vault_id);
+        let audit_trails = schema::audit_trails::table
+            // Get all access events for this user, but filter out access events from other tenants
+            .filter(schema::audit_trails::user_vault_id.eq(any(user_vault_ids)))
+            .filter(schema::audit_trails::tenant_id.is_null().or(
+                schema::audit_trails::tenant_id.eq(tenant_id)))
+            .order_by(schema::audit_trails::timestamp.asc())
+            .get_results(conn)?;
+        Ok(audit_trails)
+    }
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
 #[table_name = "audit_trails"]
 struct NewAuditTrail {
@@ -27,31 +52,10 @@ struct NewAuditTrail {
     pub timestamp: NaiveDateTime,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, AsJsonb)]
-#[serde(rename_all = "snake_case")]
-pub enum AuditTrailEvent {
-    LivenessCheck(LivenessCheckInfo),
-    Verification(VerificationInfo),
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct LivenessCheckInfo {
-    pub attestations: Vec<String>,
-    pub device: String,
-    pub ip_address: Option<String>,
-    pub location: Option<String>,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct VerificationInfo {
-    pub data_kinds: Vec<DataKind>,
-    pub vendor: Vendor,
-}
-
-impl AuditTrailEvent {
-    pub fn save(
-        self,
+impl AuditTrail {
+    pub fn create(
         conn: &PgConnection,
+        event: AuditTrailEvent,
         user_vault_id: UserVaultId,
         tenant_id: Option<TenantId>,
     ) -> Result<(), DbError> {
@@ -59,7 +63,7 @@ impl AuditTrailEvent {
             user_vault_id,
             tenant_id,
             timestamp: chrono::Utc::now().naive_utc(),
-            event: self,
+            event,
         };
         diesel::insert_into(audit_trails::table)
             .values(row)

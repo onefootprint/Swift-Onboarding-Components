@@ -781,10 +781,3 @@ def test_change_attributes(request, workos_tenant):
         }
     )
     _assert_response(r)
-
-def test_cleanup_integration_tests(request):
-    path = "private/cleanup?phone_number={0}".format(PHONE_NUMBER)
-    r = requests.post(
-        url(path),
-    )
-    _assert_response(r)

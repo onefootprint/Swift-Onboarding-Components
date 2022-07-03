@@ -10,10 +10,10 @@ use crate::utils::insight_headers::InsightHeaders;
 use crate::utils::user_vault_wrapper::UserVaultWrapper;
 use crate::State;
 use chrono::Duration;
-use db::models::audit_trails::{AuditTrailEvent, VerificationInfo};
+use db::models::audit_trails::AuditTrail;
 use db::DbError;
 use db::{models::insight_event::CreateInsightEvent, webauthn_credentials::get_webauthn_creds};
-use newtypes::{DataKind, FootprintUserId, SessionAuthToken, Vendor};
+use newtypes::{AuditTrailEvent, DataKind, FootprintUserId, SessionAuthToken, Vendor, VerificationInfo};
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Apiv2Schema)]
@@ -93,7 +93,12 @@ fn handler(
                 },
             ];
             events.into_iter().try_for_each(|e| {
-                AuditTrailEvent::Verification(e).save(conn, uv_id.clone(), Some(tenant_id.clone()))
+                AuditTrail::create(
+                    conn,
+                    AuditTrailEvent::Verification(e),
+                    uv_id.clone(),
+                    Some(tenant_id.clone()),
+                )
             })?;
             Ok(())
         })

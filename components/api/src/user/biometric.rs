@@ -18,13 +18,10 @@ use crate::{
 use app_attest::error::AttestationError;
 use chrono::{Duration, Utc};
 use crypto::sha256;
-use db::models::{
-    audit_trails::{AuditTrailEvent, LivenessCheckInfo},
-    webauthn_credential::NewWebauthnCredential,
-};
+use db::models::{audit_trails::AuditTrail, webauthn_credential::NewWebauthnCredential};
 use db::{models::insight_event::CreateInsightEvent, DbError};
-use newtypes::AttestationType;
-use newtypes::Base64Data;
+use newtypes::{AttestationType, AuditTrailEvent};
+use newtypes::{Base64Data, LivenessCheckInfo};
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 use serde::{Deserialize, Serialize};
 use serde_repr::{Deserialize_repr, Serialize_repr};
@@ -184,14 +181,14 @@ async fn complete(
     state
         .db_pool
         .db_transaction(move |conn| -> Result<_, DbError> {
-            AuditTrailEvent::LivenessCheck(LivenessCheckInfo {
+            let event = AuditTrailEvent::LivenessCheck(LivenessCheckInfo {
                 // TODO https://linear.app/footprint/issue/FP-477/correctly-extract-device-name-and-attestations-in-biometric-audit
                 attestations: vec!["Footprint".to_owned(), "Apple".to_owned()],
                 device: "Apple iPhone 13".to_owned(),
                 ip_address: insights.ip_address.clone(),
                 location: insights.location(),
-            })
-            .save(conn, user_auth.user_vault_id(), None)?;
+            });
+            AuditTrail::create(conn, event, user_auth.user_vault_id(), None)?;
 
             let insight_event = CreateInsightEvent::from(insights).insert_with_conn(&conn)?;
             NewWebauthnCredential {

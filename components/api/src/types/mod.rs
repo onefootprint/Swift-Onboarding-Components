@@ -1,6 +1,7 @@
 use paperclip::actix::Apiv2Schema;
 
 pub mod access_event;
+pub mod audit_trail;
 pub mod error;
 pub mod insight_event;
 pub mod onboarding;
