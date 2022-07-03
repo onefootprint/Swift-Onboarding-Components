@@ -20,6 +20,21 @@ table! {
     use diesel::sql_types::*;
     use newtypes::db_types::*;
 
+    audit_trails (id) {
+        id -> Uuid,
+        user_vault_id -> Text,
+        tenant_id -> Nullable<Text>,
+        event -> Jsonb,
+        timestamp -> Timestamp,
+        _created_at -> Timestamp,
+        _updated_at -> Timestamp,
+    }
+}
+
+table! {
+    use diesel::sql_types::*;
+    use newtypes::db_types::*;
+
     insight_events (id) {
         id -> Uuid,
         timestamp -> Timestamp,
@@ -126,8 +141,8 @@ table! {
     use newtypes::db_types::*;
 
     user_data (id) {
-        id -> Text,
-        user_vault_id -> Text,
+        id -> Varchar,
+        user_vault_id -> Varchar,
         data_kind -> Text,
         e_data -> Bytea,
         sh_data -> Nullable<Bytea>,
@@ -213,6 +228,8 @@ table! {
 
 joinable!(access_events -> insight_events (insight_event_id));
 joinable!(access_events -> onboardings (onboarding_id));
+joinable!(audit_trails -> tenants (tenant_id));
+joinable!(audit_trails -> user_vaults (user_vault_id));
 joinable!(ob_configurations -> tenants (tenant_id));
 joinable!(onboardings -> insight_events (insight_event_id));
 joinable!(onboardings -> ob_configurations (ob_config_id));
@@ -229,6 +246,7 @@ joinable!(webauthn_credentials -> user_vaults (user_vault_id));
 
 allow_tables_to_appear_in_same_query!(
     access_events,
+    audit_trails,
     insight_events,
     ob_configurations,
     onboardings,

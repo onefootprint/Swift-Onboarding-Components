@@ -61,6 +61,7 @@ define_newtype_id!(
     Uuid,
     "Identifier for the junction table that joins verification requests and user data"
 );
+define_newtype_id!(AuditTrailId, Uuid, "Identifier for an audit trail");
 
 #[cfg(test)]
 mod tests {
