@@ -18,8 +18,11 @@ use crate::{
 use app_attest::error::AttestationError;
 use chrono::{Duration, Utc};
 use crypto::sha256;
-use db::models::insight_event::CreateInsightEvent;
-use db::models::webauthn_credential::NewWebauthnCredential;
+use db::models::{
+    audit_trails::{AuditTrailEvent, LivenessCheckInfo},
+    webauthn_credential::NewWebauthnCredential,
+};
+use db::{models::insight_event::CreateInsightEvent, DbError};
 use newtypes::AttestationType;
 use newtypes::Base64Data;
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
@@ -53,7 +56,7 @@ pub fn init(
     state: web::Data<State>,
 ) -> actix_web::Result<Json<ApiResponseData<WebAuthnInitResponse>>, ApiError> {
     if !user_auth.has_permission(VaultPermission::AddBiometrics) {
-        return Err(AuthError::SessionTypeError)?;
+        return Err(AuthError::SessionTypeError.into());
     }
 
     // generate the challenge and return it
@@ -114,7 +117,7 @@ async fn complete(
     state: web::Data<State>,
 ) -> actix_web::Result<Json<ApiResponseData<Empty>>, ApiError> {
     if !user_auth.has_permission(VaultPermission::AddBiometrics) {
-        return Err(AuthError::SessionTypeError)?;
+        return Err(AuthError::SessionTypeError.into());
     }
 
     let challenge_data = Challenge::unseal(&state.challenge_sealing_key, &request.challenge_token)?;
@@ -176,20 +179,34 @@ async fn complete(
     tracing::info!(attestation=?attestation_metadata, "attestation details");
 
     let attestation_data = serde_cbor::to_vec(&attestation_metadata)?;
+    let public_key = crypto::serde_cbor::to_vec(&cred.cred).map_err(crypto::Error::Cbor)?;
 
-    let insight_event = CreateInsightEvent::from(insights).insert(&state.db_pool).await?;
+    state
+        .db_pool
+        .db_transaction(move |conn| -> Result<_, DbError> {
+            AuditTrailEvent::LivenessCheck(LivenessCheckInfo {
+                // TODO https://linear.app/footprint/issue/FP-477/correctly-extract-device-name-and-attestations-in-biometric-audit
+                attestations: vec!["Footprint".to_owned(), "Apple".to_owned()],
+                device: "Apple iPhone 13".to_owned(),
+                ip_address: insights.ip_address.clone(),
+                location: insights.location(),
+            })
+            .save(conn, user_auth.user_vault_id(), None)?;
 
-    NewWebauthnCredential {
-        user_vault_id: user_auth.user_vault_id(),
-        credential_id: cred.cred_id.0,
-        public_key: crypto::serde_cbor::to_vec(&cred.cred).map_err(crypto::Error::Cbor)?,
-        attestation_data,
-        backup_eligible: cred.backup_eligible,
-        attestation_type,
-        insight_event_id: insight_event.id,
-    }
-    .save(&state.db_pool)
-    .await?;
+            let insight_event = CreateInsightEvent::from(insights).insert_with_conn(&conn)?;
+            NewWebauthnCredential {
+                user_vault_id: user_auth.user_vault_id(),
+                credential_id: cred.cred_id.0,
+                public_key,
+                attestation_data,
+                backup_eligible: cred.backup_eligible,
+                attestation_type,
+                insight_event_id: insight_event.id,
+            }
+            .save(&conn)?;
+            Ok(())
+        })
+        .await?;
 
     Ok(Json(ApiResponseData::ok(Empty)))
 }

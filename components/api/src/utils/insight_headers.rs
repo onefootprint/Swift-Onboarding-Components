@@ -59,6 +59,16 @@ fn get_header(name: &str, req: &HeaderMap) -> Option<String> {
     req.get(name).and_then(|h| h.to_str().ok()).map(|s| s.to_string())
 }
 
+impl InsightHeaders {
+    pub fn location(&self) -> Option<String> {
+        match (self.city.as_deref(), self.region.as_deref()) {
+            (Some(city), Some(region)) => Some(format!("{}, {}", city, region)),
+            (Some(x), None) | (None, Some(x)) => Some(x.to_owned()),
+            (None, None) => None,
+        }
+    }
+}
+
 impl From<InsightHeaders> for CreateInsightEvent {
     fn from(i: InsightHeaders) -> CreateInsightEvent {
         let InsightHeaders {

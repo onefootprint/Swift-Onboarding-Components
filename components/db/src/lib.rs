@@ -139,6 +139,10 @@ pub async fn private_cleanup_integration_tests(pool: &DbPool, sh_data: Fingerpri
         )
         .execute(conn)?;
 
+        // delete audit trails
+        diesel::delete(schema::audit_trails::table.filter(schema::audit_trails::user_vault_id.eq(&uv.id)))
+            .execute(conn)?;
+
         // delete user vault
         diesel::delete(schema::user_vaults::table.filter(schema::user_vaults::id.eq(&uv.id)))
             .execute(conn)?;

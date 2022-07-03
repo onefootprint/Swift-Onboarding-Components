@@ -1,8 +1,5 @@
 use crate::diesel::ExpressionMethods;
-use crate::{
-    schema::{self, webauthn_credentials},
-    DbPool,
-};
+use crate::schema::{self, webauthn_credentials};
 use chrono::NaiveDateTime;
 use diesel::dsl::any;
 use diesel::{Insertable, PgConnection, QueryDsl, Queryable, RunQueryDsl};
@@ -75,14 +72,10 @@ pub struct NewWebauthnCredential {
 }
 
 impl NewWebauthnCredential {
-    pub async fn save(self, pool: &DbPool) -> Result<(), crate::DbError> {
-        let _ = pool
-            .db_query(move |conn| {
-                diesel::insert_into(webauthn_credentials::table)
-                    .values(self)
-                    .execute(conn)
-            })
-            .await??;
+    pub fn save(self, conn: &PgConnection) -> Result<(), crate::DbError> {
+        diesel::insert_into(webauthn_credentials::table)
+            .values(self)
+            .execute(conn)?;
         Ok(())
     }
 }
