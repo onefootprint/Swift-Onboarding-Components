@@ -17,6 +17,7 @@ pub enum AuditTrailEvent {
 pub struct LivenessCheckInfo {
     pub attestations: Vec<String>,
     pub device: String,
+    pub os: Option<String>,
     pub ip_address: Option<String>,
     pub location: Option<String>,
 }

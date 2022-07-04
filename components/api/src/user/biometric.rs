@@ -185,6 +185,7 @@ async fn complete(
                 // TODO https://linear.app/footprint/issue/FP-477/correctly-extract-device-name-and-attestations-in-biometric-audit
                 attestations: vec!["Footprint".to_owned(), "Apple".to_owned()],
                 device: "Apple iPhone 13".to_owned(),
+                os: Some("iOS 16".to_owned()),
                 ip_address: insights.ip_address.clone(),
                 location: insights.location(),
             });
