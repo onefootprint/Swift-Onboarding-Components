@@ -31,12 +31,13 @@ const AddressInput = forwardRef<HTMLInputElement, AddressInputProps>(
       onChangeText,
       onKeyDown = noop,
       onSelect = noop,
-      ...rest
+      value,
+      ...props
     }: AddressInputProps,
     ref,
   ) => {
-    const isUncontrolled = rest.value === undefined;
-    const localInputRef = useRef<HTMLInputElement>(null);
+    const isUncontrolled = value === undefined;
+    const localRef = useRef<HTMLInputElement>(null);
     const { setReferenceElement, setPopperElement, popper } = usePopper();
     const {
       suggestions: { data },
@@ -57,7 +58,7 @@ const AddressInput = forwardRef<HTMLInputElement, AddressInputProps>(
       getMenuProps,
       getToggleButtonProps,
       highlightedIndex,
-      inputValue: value,
+      inputValue: search,
       isOpen: downShiftIsOpen,
     } = useCombobox({
       items: options,
@@ -65,16 +66,15 @@ const AddressInput = forwardRef<HTMLInputElement, AddressInputProps>(
       onSelectedItemChange: ({ selectedItem }) => {
         onChangeText?.(selectedItem?.structured_formatting.main_text || '');
         onSelect(selectedItem);
-        const hasToTriggerChangeEvent = isUncontrolled && localInputRef.current;
+        const hasToTriggerChangeEvent = isUncontrolled && localRef.current;
         if (hasToTriggerChangeEvent) {
           const event = new window.Event('change', { bubbles: true });
-          localInputRef.current.dispatchEvent(event);
+          localRef.current.dispatchEvent(event);
         }
       },
-      onInputValueChange: ({ inputValue = '' }) => {
-        const nextValue = inputValue;
-        onChangeText?.(nextValue);
-        setValue(nextValue);
+      onInputValueChange: ({ inputValue: nextSearch = '' }) => {
+        onChangeText?.(nextSearch);
+        setValue(nextSearch);
       },
     });
     const comboBoxProps = getComboboxProps();
@@ -106,7 +106,7 @@ const AddressInput = forwardRef<HTMLInputElement, AddressInputProps>(
           disableHoverStyles={highlightedIndex !== -1}
           highlighted={highlightedIndex === index}
           key={item.place_id}
-          searchWords={value.split(' ')}
+          searchWords={search.split(' ')}
           subtitle={item.structured_formatting.secondary_text}
           title={item.structured_formatting.main_text}
           {...itemProps}
@@ -117,20 +117,21 @@ const AddressInput = forwardRef<HTMLInputElement, AddressInputProps>(
     return (
       <Container {...comboBoxProps}>
         <Input
-          {...rest}
+          {...props}
           {...toggleButtonProps}
           {...inputProps}
           autoComplete="address-line1"
           tabIndex={0}
+          value={value}
           onBlur={handleBlur}
           onChange={handleChange}
           onKeyDown={handleKeyDown}
           ref={mergeRefs([
-            localInputRef,
-            ref,
+            localRef,
             setReferenceElement,
             inputProps.ref,
             toggleButtonProps.ref,
+            ref,
           ])}
         />
         {isDropdownOpen ? (

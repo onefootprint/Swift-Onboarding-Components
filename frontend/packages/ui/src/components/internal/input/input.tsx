@@ -40,7 +40,7 @@ const BaseInput = forwardRef<HTMLInputElement, AllInputProps>(
       suffixElement,
       sx,
       testID,
-      ...remainingProps
+      ...props
     }: AllInputProps,
     ref,
   ) => {
@@ -64,10 +64,10 @@ const BaseInput = forwardRef<HTMLInputElement, AllInputProps>(
         <InputContainer>
           {prefixElement && <PrefixContainer>{prefixElement}</PrefixContainer>}
           <StyledField
-            {...remainingProps}
-            tabIndex={0}
+            {...props}
             $hasError={hasError}
             $hasFocus={hasFocus}
+            $sx={sxStyles}
             aria-required={required}
             as={mask ? undefined : 'input'}
             data-testid={testID}
@@ -77,7 +77,7 @@ const BaseInput = forwardRef<HTMLInputElement, AllInputProps>(
             options={mask}
             placeholder={placeholder}
             required={required}
-            $sx={sxStyles}
+            tabIndex={0}
             // We use Cleave.js for mask, and cleave uses htmlRef instead of ref
             // These conditions are important in order to work with react-hook-forms
             ref={mask ? undefined : ref}

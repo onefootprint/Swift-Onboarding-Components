@@ -1,9 +1,6 @@
 import { Meta, Story } from '@storybook/react';
 import React, { useState } from 'react';
 
-import Box from '../box';
-import Button from '../button';
-import Typography from '../typography';
 import AddressInput, { AddressInputProps } from './address-input';
 
 export default {
@@ -72,51 +69,18 @@ const Template: Story<AddressInputProps> = ({
   };
 
   return (
-    <Box
-      sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        width: '500px',
-        padding: 8,
-      }}
-    >
-      <Box
-        sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
-        <Box sx={{ marginBottom: 3 }}>
-          <Typography variant="heading-2" color="primary">
-            What is your residential address?
-          </Typography>
-        </Box>
-        <Box sx={{ marginBottom: 8 }}>
-          <Typography variant="body-2" color="secondary">
-            We are legally required to collect this information.{' '}
-          </Typography>
-        </Box>
-      </Box>
-      <Box sx={{ marginBottom: 8 }}>
-        <AddressInput
-          country="US"
-          disabled={disabled}
-          hasError={hasError}
-          hintText={hintText}
-          label={label}
-          onChangeText={handleChangeText}
-          onSelect={onSelect}
-          placeholder={placeholder}
-          testID={testID}
-          value={value}
-        />
-      </Box>
-      <Box sx={{ marginBottom: 8 }}>
-        <Button fullWidth>Continue</Button>
-      </Box>
-    </Box>
+    <AddressInput
+      country="US"
+      disabled={disabled}
+      hasError={hasError}
+      hintText={hintText}
+      label={label}
+      onChangeText={handleChangeText}
+      onSelect={onSelect}
+      placeholder={placeholder}
+      testID={testID}
+      value={value}
+    />
   );
 };
 
@@ -130,6 +94,14 @@ Base.args = {
   testID: 'input-test-id',
   value: '',
   hasError: false,
+};
+
+export const WithInitialValue = Template.bind({});
+WithInitialValue.args = {
+  label: 'Address line 1',
+  onSelect: console.log,
+  placeholder: 'Street and house number',
+  value: '14 linda street',
 };
 
 export const WithHint = Template.bind({});

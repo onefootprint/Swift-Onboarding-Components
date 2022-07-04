@@ -1,4 +1,3 @@
-import { DEFAULT_COUNTRY } from 'global-constants';
 import { useTranslation } from 'hooks';
 import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
@@ -19,6 +18,7 @@ import ProgressHeader from '../../components/progress-header';
 import useOnboardingMachine from '../../hooks/use-onboarding-machine';
 import useSyncData from '../../hooks/use-sync-data';
 import useInputValidations from './hooks/use-input-validations';
+import getInitialCountry from './residential-address.utils';
 
 type FormData = {
   [UserDataAttribute.streetAddress]: string;
@@ -43,7 +43,9 @@ const ResidentialAddress = () => {
     setFocus,
   } = useForm<FormData>({
     defaultValues: {
-      [UserDataAttribute.country]: DEFAULT_COUNTRY,
+      [UserDataAttribute.country]: getInitialCountry(
+        data[UserDataAttribute.country],
+      ),
       [UserDataAttribute.state]: data[UserDataAttribute.state],
       [UserDataAttribute.city]: data[UserDataAttribute.city],
       [UserDataAttribute.zip]: data[UserDataAttribute.zip],
