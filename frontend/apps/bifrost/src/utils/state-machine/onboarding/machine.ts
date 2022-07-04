@@ -53,7 +53,7 @@ const createOnboardingMachine = ({
             },
             {
               target: States.livenessRegister,
-              cond: context => !userFound && context.missingWebauthnCredentials,
+              cond: context => context.missingWebauthnCredentials,
             },
             {
               target: States.basicInformation,
