@@ -111,7 +111,7 @@ pub async fn get_by_fingerprint(
     Ok(result)
 }
 
-pub fn get_sync(conn: &PgConnection, uv_id: UserVaultId) -> Result<UserVault, DbError> {
+pub fn get_sync(conn: &mut PgConnection, uv_id: UserVaultId) -> Result<UserVault, DbError> {
     let user = schema::user_vaults::table
         .filter(schema::user_vaults::id.eq(uv_id))
         .first(conn)?;

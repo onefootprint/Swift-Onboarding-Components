@@ -1,10 +1,10 @@
-use super::util::derive_diesel_text_enum;
 pub use derive_more::Display;
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use paperclip::actix::Apiv2Schema;
 use serde::{Deserialize, Serialize};
-use std::str::FromStr;
-use strum_macros::EnumString;
+use strum_macros::{AsRefStr, EnumString};
+
+use crate::util::impl_enum_str_diesel;
 
 /// Determines what integration the app has.
 ///
@@ -22,10 +22,11 @@ use strum_macros::EnumString;
     AsExpression,
     FromSqlRow,
     EnumString,
+    AsRefStr,
 )]
 #[serde(rename_all = "snake_case")]
 #[strum(serialize_all = "PascalCase")]
-#[sql_type = "Text"]
+#[diesel(sql_type = Text)]
 pub enum Status {
     Verified,
     Processing,
@@ -34,10 +35,10 @@ pub enum Status {
     Failed,
 }
 
-derive_diesel_text_enum! { Status }
-
 impl Default for Status {
     fn default() -> Self {
         Status::Incomplete
     }
 }
+
+impl_enum_str_diesel!(Status);

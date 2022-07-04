@@ -12,7 +12,7 @@ use serde::{Deserialize, Serialize};
 use super::tenants::Tenant;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
-#[table_name = "ob_configurations"]
+#[diesel(table_name = ob_configurations)]
 pub struct ObConfiguration {
     pub id: ObConfigurationId,
     pub key: ObConfigurationKey,
@@ -27,7 +27,7 @@ pub struct ObConfiguration {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
-#[table_name = "ob_configurations"]
+#[diesel(table_name = ob_configurations)]
 pub struct NewObConfiguration {
     pub name: String,
     pub description: Option<String>,
@@ -37,7 +37,7 @@ pub struct NewObConfiguration {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable, AsChangeset)]
-#[table_name = "ob_configurations"]
+#[diesel(table_name = ob_configurations)]
 pub struct UpdateObConfiguration {
     pub key: ObConfigurationKey,
     pub tenant_id: TenantId,

@@ -1,4 +1,4 @@
-use diesel::{not_none, AsExpression, FromSqlRow};
+use diesel::{AsExpression, FromSqlRow};
 use diesel_as_jsonb::AsJsonb;
 use paperclip::actix::Apiv2Schema;
 use serde::{Deserialize, Serialize};

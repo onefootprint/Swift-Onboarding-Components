@@ -6,7 +6,7 @@ use newtypes::InsightEventId;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
-#[table_name = "insight_events"]
+#[diesel(table_name = insight_events)]
 pub struct InsightEvent {
     pub id: InsightEventId,
     pub timestamp: NaiveDateTime,
@@ -26,7 +26,7 @@ pub struct InsightEvent {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
-#[table_name = "insight_events"]
+#[diesel(table_name = insight_events)]
 pub struct CreateInsightEvent {
     pub timestamp: NaiveDateTime,
     pub ip_address: Option<String>,
@@ -43,7 +43,7 @@ pub struct CreateInsightEvent {
 }
 
 impl CreateInsightEvent {
-    pub fn insert_with_conn(self, conn: &PgConnection) -> Result<InsightEvent, diesel::result::Error> {
+    pub fn insert_with_conn(self, conn: &mut PgConnection) -> Result<InsightEvent, diesel::result::Error> {
         let ev = diesel::insert_into(crate::schema::insight_events::table)
             .values(self)
             .get_result(conn)?;

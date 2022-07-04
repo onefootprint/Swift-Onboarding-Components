@@ -5,12 +5,12 @@ use crate::{
     DbError,
 };
 use chrono::NaiveDateTime;
-use diesel::{dsl::any, Insertable, PgConnection, QueryDsl, Queryable, RunQueryDsl};
+use diesel::{Insertable, PgConnection, QueryDsl, Queryable, RunQueryDsl};
 use newtypes::{AuditTrailEvent, AuditTrailId, FootprintUserId, TenantId, UserVaultId};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
-#[table_name = "audit_trails"]
+#[diesel(table_name = audit_trails)]
 pub struct AuditTrail {
     pub id: AuditTrailId,
     pub user_vault_id: UserVaultId,
@@ -24,7 +24,7 @@ pub struct AuditTrail {
 
 impl AuditTrail {
     pub fn get_for_tenant(
-        conn: &PgConnection,
+        conn: &mut PgConnection,
         tenant_id: &TenantId,
         footprint_user_id: &FootprintUserId,
     ) -> Result<Vec<AuditTrail>, DbError> {
@@ -34,7 +34,7 @@ impl AuditTrail {
             .select(schema::onboardings::user_vault_id);
         let audit_trails = schema::audit_trails::table
             // Get all access events for this user, but filter out access events from other tenants
-            .filter(schema::audit_trails::user_vault_id.eq(any(user_vault_ids)))
+            .filter(schema::audit_trails::user_vault_id.eq_any(user_vault_ids))
             .filter(schema::audit_trails::tenant_id.is_null().or(
                 schema::audit_trails::tenant_id.eq(tenant_id)))
             .order_by(schema::audit_trails::timestamp.asc())
@@ -44,7 +44,7 @@ impl AuditTrail {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
-#[table_name = "audit_trails"]
+#[diesel(table_name = audit_trails)]
 struct NewAuditTrail {
     pub user_vault_id: UserVaultId,
     pub tenant_id: Option<TenantId>,
@@ -54,7 +54,7 @@ struct NewAuditTrail {
 
 impl AuditTrail {
     pub fn create(
-        conn: &PgConnection,
+        conn: &mut PgConnection,
         event: AuditTrailEvent,
         user_vault_id: UserVaultId,
         tenant_id: Option<TenantId>,

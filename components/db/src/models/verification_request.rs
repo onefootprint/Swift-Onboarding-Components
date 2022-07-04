@@ -5,7 +5,7 @@ use newtypes::{OnboardingId, UserDataId, Vendor, VerificationRequestId, Verifica
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable, Identifiable)]
-#[table_name = "verification_requests"]
+#[diesel(table_name = verification_requests)]
 pub struct VerificationRequest {
     pub id: VerificationRequestId,
     pub onboarding_id: OnboardingId,
@@ -16,7 +16,7 @@ pub struct VerificationRequest {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable, Identifiable)]
-#[table_name = "verification_requests_user_data"]
+#[diesel(table_name = verification_requests_user_data)]
 pub struct VerificationRequestUserData {
     pub id: VerificationRequestUserDataId,
     pub request_id: VerificationRequestId,

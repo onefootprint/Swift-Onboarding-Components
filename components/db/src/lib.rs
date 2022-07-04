@@ -16,6 +16,7 @@ use deadpool::managed::Hook;
 use deadpool_diesel::postgres::{Manager, Pool, Runtime};
 pub use diesel::prelude::PgConnection;
 use diesel::prelude::*;
+use diesel_migrations::EmbeddedMigrations;
 use models::onboardings::Onboarding;
 use newtypes::{DataKind, Fingerprint};
 use user_vault::get_by_fingerprint;
@@ -23,7 +24,7 @@ use user_vault::get_by_fingerprint;
 #[allow(unused_imports)]
 pub mod schema;
 
-embed_migrations!();
+pub const MIGRATIONS: EmbeddedMigrations = embed_migrations!();
 
 #[derive(Clone)]
 pub struct DbPool(Pool);
@@ -37,8 +38,7 @@ impl DbPool {
         let result = self
             .0
             .get()
-            .await
-            .map_err(DbError::from)?
+            .await?
             .interact(move |conn| f(conn))
             .await
             .map_err(DbError::from)?;
@@ -47,11 +47,11 @@ impl DbPool {
 
     pub async fn db_transaction<F, R>(&self, f: F) -> Result<R, DbError>
     where
-        F: FnOnce(&PgConnection) -> Result<R, DbError> + Send + 'static,
+        F: FnOnce(&mut PgConnection) -> Result<R, DbError> + Send + 'static,
         R: Send + 'static,
     {
         let result = self
-            .db_query(|conn: &mut PgConnection| conn.build_transaction().run(|| f(conn)))
+            .db_query(|c: &mut PgConnection| c.build_transaction().run(|conn| f(conn)))
             .await??;
         Ok(result)
     }
@@ -90,8 +90,10 @@ pub fn init(url: &str) -> Result<DbPool, DbError> {
 }
 
 pub fn run_migrations(url: &str) -> Result<(), DbError> {
-    let conn = PgConnection::establish(url)?;
-    embedded_migrations::run(&conn)?;
+    use crate::diesel_migrations::MigrationHarness;
+    let mut conn = PgConnection::establish(url)?;
+    conn.run_pending_migrations(MIGRATIONS)
+        .map_err(DbError::MigrationFailed)?;
     Ok(())
 }
 
@@ -156,8 +158,10 @@ pub mod access_event;
 pub mod onboarding;
 pub mod session;
 pub mod tenant;
-#[cfg(test)]
-pub mod test;
+
 pub mod user_data;
 pub mod user_vault;
 pub mod webauthn_credentials;
+
+#[cfg(test)]
+mod test;

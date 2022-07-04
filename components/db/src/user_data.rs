@@ -3,7 +3,7 @@ use crate::models::user_data::UserData;
 use crate::schema;
 use crate::DbPool;
 use chrono::Utc;
-use diesel::dsl::{any, sql};
+use diesel::dsl::sql;
 use diesel::prelude::*;
 use diesel::sql_types::Array;
 use diesel::sql_types::Text;
@@ -13,7 +13,7 @@ use newtypes::{UserDataId, UserVaultId};
 use std::collections::HashMap;
 
 pub fn list(
-    conn: &PgConnection,
+    conn: &mut PgConnection,
     user_vault_id: UserVaultId,
 ) -> Result<HashMap<DataKind, Vec<UserData>>, DbError> {
     let result: Vec<UserData> = schema::user_data::table
@@ -46,7 +46,7 @@ pub async fn filter(
         .db_query(move |conn| {
             user_data::table
                 .filter(user_data::user_vault_id.eq(user_vault_id))
-                .filter(user_data::data_kind.eq(any(data_kinds)))
+                .filter(user_data::data_kind.eq_any(data_kinds))
                 .filter(user_data::deactivated_at.is_null())
                 .load(conn)
         })
@@ -55,13 +55,13 @@ pub async fn filter(
     Ok(result)
 }
 
-pub fn bulk_deactivate(conn: &PgConnection, user_data_ids: Vec<UserDataId>) -> Result<usize, DbError> {
+pub fn bulk_deactivate(conn: &mut PgConnection, user_data_ids: Vec<UserDataId>) -> Result<usize, DbError> {
     use schema::user_data;
 
     let expected_num_rows_updated = user_data_ids.len();
     let now = Utc::now().naive_utc();
     let num_rows_updated = diesel::update(user_data::table)
-        .filter(user_data::id.eq(any(user_data_ids)))
+        .filter(user_data::id.eq_any(user_data_ids))
         .set(user_data::deactivated_at.eq(now))
         .execute(conn)?;
     if num_rows_updated != expected_num_rows_updated {
@@ -71,7 +71,7 @@ pub fn bulk_deactivate(conn: &PgConnection, user_data_ids: Vec<UserDataId>) -> R
 }
 
 pub fn bulk_fetch_populated_kinds(
-    conn: &PgConnection,
+    conn: &mut PgConnection,
     user_vault_ids: Vec<UserVaultId>,
 ) -> Result<HashMap<UserVaultId, Vec<DataKind>>, DbError> {
     use schema::user_data;
@@ -82,7 +82,7 @@ pub fn bulk_fetch_populated_kinds(
             user_data::user_vault_id,
             sql::<Array<Text>>("array_agg(data_kind)"),
         ))
-        .filter(user_data::user_vault_id.eq(any(user_vault_ids)))
+        .filter(user_data::user_vault_id.eq_any(user_vault_ids))
         .filter(user_data::deactivated_at.is_null())
         .group_by(user_data::user_vault_id)
         .load(conn)?;

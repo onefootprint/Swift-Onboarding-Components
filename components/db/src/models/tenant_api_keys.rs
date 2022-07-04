@@ -5,7 +5,7 @@ use newtypes::{TenantApiKeyId, TenantId};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
-#[table_name = "tenant_api_keys"]
+#[diesel(table_name = tenant_api_keys)]
 pub struct TenantApiKey {
     pub id: TenantApiKeyId,
     pub sh_secret_api_key: Vec<u8>,
@@ -18,7 +18,7 @@ pub struct TenantApiKey {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
-#[table_name = "tenant_api_keys"]
+#[diesel(table_name = tenant_api_keys)]
 pub struct NewTenantApiKey {
     pub sh_secret_api_key: Vec<u8>,
     pub e_secret_api_key: Vec<u8>,
@@ -28,7 +28,7 @@ pub struct NewTenantApiKey {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
-#[table_name = "tenant_api_keys"]
+#[diesel(table_name = tenant_api_keys)]
 pub struct PartialTenantApiKey {
     pub tenant_id: TenantId,
     pub key_name: String,

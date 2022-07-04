@@ -9,7 +9,7 @@ use newtypes::{
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable, Identifiable)]
-#[table_name = "user_vaults"]
+#[diesel(table_name = user_vaults)]
 pub struct UserVault {
     pub id: UserVaultId,
     pub e_private_key: EncryptedVaultPrivateKey,
@@ -20,7 +20,7 @@ pub struct UserVault {
 }
 
 impl UserVault {
-    pub fn lock(conn: &PgConnection, id: UserVaultId) -> Result<Self, DbError> {
+    pub fn lock(conn: &mut PgConnection, id: UserVaultId) -> Result<Self, DbError> {
         let user = user_vaults::table
             .for_no_key_update()
             .filter(user_vaults::id.eq(id))
@@ -30,7 +30,7 @@ impl UserVault {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
-#[table_name = "user_vaults"]
+#[diesel(table_name = user_vaults)]
 pub struct NewUserVault {
     pub e_private_key: EncryptedVaultPrivateKey,
     pub public_key: VaultPublicKey,

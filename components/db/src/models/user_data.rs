@@ -8,7 +8,7 @@ use newtypes::{DataKind, DataPriority, Fingerprint, SealedVaultBytes, UserDataId
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable, Identifiable)]
-#[table_name = "user_data"]
+#[diesel(table_name = user_data)]
 pub struct UserData {
     pub id: UserDataId,
     pub user_vault_id: UserVaultId,
@@ -36,7 +36,7 @@ impl UserData {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
-#[table_name = "user_data"]
+#[diesel(table_name = user_data)]
 pub struct NewUserData {
     pub user_vault_id: UserVaultId,
     pub data_kind: DataKind,
@@ -49,7 +49,7 @@ pub struct NewUserData {
 pub struct NewUserDataBatch(pub Vec<NewUserData>);
 
 impl NewUserDataBatch {
-    pub fn bulk_insert(self, conn: &PgConnection) -> Result<(), crate::DbError> {
+    pub fn bulk_insert(self, conn: &mut PgConnection) -> Result<(), crate::DbError> {
         let _: usize = diesel::insert_into(user_data::table)
             .values(self.0)
             .execute(conn)?;

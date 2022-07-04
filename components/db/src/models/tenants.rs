@@ -5,7 +5,7 @@ use newtypes::TenantId;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
-#[table_name = "tenants"]
+#[diesel(table_name = tenants)]
 pub struct Tenant {
     pub id: TenantId,
     pub name: String,
@@ -18,7 +18,7 @@ pub struct Tenant {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
-#[table_name = "tenants"]
+#[diesel(table_name = tenants)]
 pub struct NewTenant {
     pub name: String,
     pub public_key: Vec<u8>,

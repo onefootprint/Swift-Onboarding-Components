@@ -32,7 +32,7 @@ pub async fn get_opt_by_workos_id(pool: &DbPool, workos_id: String) -> Result<Op
 }
 
 pub(crate) fn get_opt_by_workos_id_sync(
-    conn: &PgConnection,
+    conn: &mut PgConnection,
     workos_id: String,
 ) -> Result<Option<Tenant>, DbError> {
     let tenant: Option<Tenant> = schema::tenants::table

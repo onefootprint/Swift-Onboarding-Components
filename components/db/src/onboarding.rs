@@ -4,7 +4,6 @@ use crate::schema;
 use crate::DbPool;
 use crate::{errors::DbError, schema::onboardings::BoxedQuery};
 use chrono::NaiveDateTime;
-use diesel::dsl::any;
 use diesel::pg::Pg;
 use diesel::prelude::*;
 use newtypes::OnboardingId;
@@ -26,7 +25,7 @@ pub fn list_for_tenant_query<'a>(params: OnboardingListQueryParams) -> BoxedQuer
         .into_boxed();
 
     if !params.statuses.is_empty() {
-        query = query.filter(schema::onboardings::status.eq(any(params.statuses)))
+        query = query.filter(schema::onboardings::status.eq_any(params.statuses))
     }
 
     if let Some(footprint_user_id) = params.footprint_user_id {
@@ -48,20 +47,20 @@ pub fn list_for_tenant_query<'a>(params: OnboardingListQueryParams) -> BoxedQuer
             .filter(schema::user_data::sh_data.eq_any(fingerprints))
             .select(schema::user_data::user_vault_id)
             .distinct();
-        query = query.filter(schema::onboardings::user_vault_id.eq(any(matching_uv_ids)))
+        query = query.filter(schema::onboardings::user_vault_id.eq_any(matching_uv_ids))
     }
 
     query
 }
 
-pub fn count_for_tenant(conn: &PgConnection, params: OnboardingListQueryParams) -> Result<i64, DbError> {
+pub fn count_for_tenant(conn: &mut PgConnection, params: OnboardingListQueryParams) -> Result<i64, DbError> {
     let count = list_for_tenant_query(params).count().get_result(conn)?;
     Ok(count)
 }
 
 // lists all onboardings across all configurations
 pub fn list_for_tenant(
-    conn: &PgConnection,
+    conn: &mut PgConnection,
     params: OnboardingListQueryParams,
     cursor: Option<i64>,
     page_size: i64,
@@ -84,7 +83,7 @@ pub fn list_for_tenant(
 }
 
 pub(crate) fn get_for_fp_id(
-    conn: &PgConnection,
+    conn: &mut PgConnection,
     tenant_id: TenantId,
     footprint_user_id: FootprintUserId,
 ) -> Result<Option<Onboarding>, DbError> {

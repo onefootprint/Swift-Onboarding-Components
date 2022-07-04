@@ -1,7 +1,6 @@
 use crate::diesel::ExpressionMethods;
 use crate::schema::{self, webauthn_credentials};
 use chrono::NaiveDateTime;
-use diesel::dsl::any;
 use diesel::{Insertable, PgConnection, QueryDsl, Queryable, RunQueryDsl};
 use newtypes::{
     AttestationType, FootprintUserId, InsightEventId, TenantId, UserVaultId, WebauthnCredentialId,
@@ -12,7 +11,7 @@ use super::insight_event::InsightEvent;
 
 // TODO handle when a user tries to add a second webauthn credential
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Identifiable)]
-#[table_name = "webauthn_credentials"]
+#[diesel(table_name = webauthn_credentials)]
 pub struct WebauthnCredential {
     pub id: WebauthnCredentialId,
     pub user_vault_id: UserVaultId,
@@ -31,7 +30,7 @@ pub struct WebauthnCredential {
 
 impl WebauthnCredential {
     pub fn get_for_user_vault(
-        conn: &PgConnection,
+        conn: &mut PgConnection,
         user_vault_id: UserVaultId,
     ) -> Result<Vec<Self>, crate::DbError> {
         let creds = schema::webauthn_credentials::table
@@ -42,7 +41,7 @@ impl WebauthnCredential {
     }
 
     pub fn get_for_onboarding(
-        conn: &PgConnection,
+        conn: &mut PgConnection,
         tenant_id: &TenantId,
         footprint_user_id: &FootprintUserId,
     ) -> Result<Vec<(Self, InsightEvent)>, crate::DbError> {
@@ -52,7 +51,7 @@ impl WebauthnCredential {
             .select(schema::onboardings::user_vault_id);
         let creds = schema::webauthn_credentials::table
             .inner_join(schema::insight_events::table)
-            .filter(schema::webauthn_credentials::user_vault_id.eq(any(user_vault_ids)))
+            .filter(schema::webauthn_credentials::user_vault_id.eq_any(user_vault_ids))
             .get_results(conn)?;
 
         Ok(creds)
@@ -60,7 +59,7 @@ impl WebauthnCredential {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
-#[table_name = "webauthn_credentials"]
+#[diesel(table_name = webauthn_credentials)]
 pub struct NewWebauthnCredential {
     pub user_vault_id: UserVaultId,
     pub credential_id: Vec<u8>,
@@ -72,7 +71,7 @@ pub struct NewWebauthnCredential {
 }
 
 impl NewWebauthnCredential {
-    pub fn save(self, conn: &PgConnection) -> Result<(), crate::DbError> {
+    pub fn save(self, conn: &mut PgConnection) -> Result<(), crate::DbError> {
         diesel::insert_into(webauthn_credentials::table)
             .values(self)
             .execute(conn)?;

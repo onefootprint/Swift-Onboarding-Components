@@ -1,10 +1,8 @@
-use super::util::derive_diesel_text_enum;
 pub use derive_more::Display;
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use paperclip::actix::Apiv2Schema;
 use serde::{Deserialize, Serialize};
-use std::str::FromStr;
-use strum_macros::EnumString;
+use strum_macros::{AsRefStr, EnumString};
 
 #[derive(
     Debug,
@@ -19,10 +17,11 @@ use strum_macros::EnumString;
     AsExpression,
     FromSqlRow,
     EnumString,
+    AsRefStr,
 )]
 #[serde(rename_all = "snake_case")]
 #[strum(serialize_all = "PascalCase")]
-#[sql_type = "Text"]
+#[diesel(sql_type = Text)]
 pub enum Vendor {
     Footprint,
     Idology,
@@ -31,4 +30,13 @@ pub enum Vendor {
     Experian,
 }
 
-derive_diesel_text_enum! { Vendor }
+impl<DB> diesel::serialize::ToSql<Text, DB> for Vendor
+where
+    DB: diesel::backend::Backend,
+    str: diesel::serialize::ToSql<Text, DB>,
+{
+    fn to_sql<'b>(&'b self, out: &mut diesel::serialize::Output<'b, '_, DB>) -> diesel::serialize::Result {
+        let s = self.as_ref();
+        s.to_sql(out)
+    }
+}

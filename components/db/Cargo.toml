@@ -8,22 +8,9 @@ serde = { version = "1.0", features = ["derive"] }
 tokio = { version = "1.0", features = ["full"] }
 dotenv = "0.15"
 anyhow = "1.0"
-deadpool-diesel = { version = "0.3.1", features = [
-    "postgres",
-    "rt_tokio_1",
-    "serde",
-] }
-diesel = { version = "1.4.8", features = [
-    "chrono",
-    "postgres",
-    "uuidv07",
-    "serde_json",
-] }
-diesel-derive-newtype = "1.0.0"
-diesel-derive-enum = { version = "1.1.2", features = ["postgres"] }
-diesel_migrations = "1.4.0"
+
 openssl = "0.10.38"
-deadpool = { version = "0.9" }
+
 strum_macros = { version = "0.24" }
 strum = { version = "0.24" }
 chrono = { version = "0.4", features = ["serde"] }
@@ -35,3 +22,21 @@ serde_json = { version = "1.0" }
 newtypes = { path = "../newtypes" }
 itertools = "0.10.3"
 tracing = "0.1.30"
+
+uuid = { version = "1.1.2", features = ["serde", "v4"] }
+
+# diesel
+diesel = { version = "2.0.0-rc.0", features = ["extras", "uuid"] }
+diesel-derive-newtype = "2.0.0-rc.0"
+diesel-derive-enum = {  rev = "e6aa69856245f083645a0087527236a6bff42c18", git="https://github.com/adwhit/diesel-derive-enum",  features = ["postgres"] }
+diesel_migrations = "2.0.0-rc.0"
+
+[dependencies.deadpool-diesel]
+git = "https://github.com/bikeshedder/deadpool"
+rev = "f929e298383f022439575ea492d9a87e8de18ea2"
+features = ["postgres", "serde", "postgres"]
+
+[dependencies.deadpool]
+git = "https://github.com/bikeshedder/deadpool"
+rev = "f929e298383f022439575ea492d9a87e8de18ea2"
+

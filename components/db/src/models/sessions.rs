@@ -7,7 +7,7 @@ use newtypes::{SealedSessionBytes, SessionAuthToken};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
-#[table_name = "sessions"]
+#[diesel(table_name = sessions)]
 pub struct Session {
     pub h_session_id: String,
     pub _created_at: NaiveDateTime,
@@ -17,7 +17,7 @@ pub struct Session {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
-#[table_name = "sessions"]
+#[diesel(table_name = sessions)]
 pub struct NewSession {
     pub h_session_id: String,
     pub sealed_session_data: SealedSessionBytes,
@@ -25,7 +25,7 @@ pub struct NewSession {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable, AsChangeset)]
-#[table_name = "sessions"]
+#[diesel(table_name = sessions)]
 pub struct UpdateSession {
     pub h_session_id: String,
     pub sealed_session_data: Option<SealedSessionBytes>,

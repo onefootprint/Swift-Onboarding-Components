@@ -109,6 +109,7 @@ pub enum ApiError {
 
 fn status_code_for_db_error(e: &DbError) -> StatusCode {
     match e {
+        DbError::MigrationFailed(_) => StatusCode::INTERNAL_SERVER_ERROR,
         DbError::DbInteract(_) => StatusCode::INTERNAL_SERVER_ERROR,
         DbError::DbError(_) => StatusCode::INTERNAL_SERVER_ERROR,
         DbError::PoolGet(_) => StatusCode::INTERNAL_SERVER_ERROR,

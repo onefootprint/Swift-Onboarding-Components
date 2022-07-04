@@ -190,7 +190,7 @@ async fn complete(
             });
             AuditTrail::create(conn, event, user_auth.user_vault_id(), None)?;
 
-            let insight_event = CreateInsightEvent::from(insights).insert_with_conn(&conn)?;
+            let insight_event = CreateInsightEvent::from(insights).insert_with_conn(conn)?;
             NewWebauthnCredential {
                 user_vault_id: user_auth.user_vault_id(),
                 credential_id: cred.cred_id.0,
@@ -200,7 +200,7 @@ async fn complete(
                 attestation_type,
                 insight_event_id: insight_event.id,
             }
-            .save(&conn)?;
+            .save(conn)?;
             Ok(())
         })
         .await?;

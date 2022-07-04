@@ -176,7 +176,7 @@ pub async fn update<C: HasVaultPermission>(
 }
 
 fn process_data_update_request(
-    conn: &db::PgConnection,
+    conn: &mut db::PgConnection,
     user_vault_id: UserVaultId,
     data_to_insert: Vec<DataUpdateRequest>,
 ) -> Result<(), db::DbError> {

@@ -1,13 +1,11 @@
-use super::util::derive_diesel_text_enum;
 use crate::SaltedFingerprint;
 use crypto::sha256;
 pub use derive_more::Display;
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use paperclip::actix::Apiv2Schema;
 use serde::{Deserialize, Serialize};
-use std::str::FromStr;
 use strum::IntoEnumIterator;
-use strum_macros::{EnumIter, EnumString};
+use strum_macros::{AsRefStr, EnumIter, EnumString};
 
 /// The type of data attribute
 #[derive(
@@ -27,10 +25,11 @@ use strum_macros::{EnumIter, EnumString};
     AsExpression,
     FromSqlRow,
     EnumString,
+    AsRefStr,
 )]
 #[strum(serialize_all = "PascalCase")]
 #[serde(rename_all = "snake_case")]
-#[sql_type = "Text"]
+#[diesel(sql_type = Text)]
 pub enum DataKind {
     FirstName,
     LastName,
@@ -47,7 +46,7 @@ pub enum DataKind {
     LastFourSsn,
 }
 
-derive_diesel_text_enum! { DataKind }
+crate::util::impl_enum_str_diesel!(DataKind);
 
 impl DataKind {
     /// Returns true if a user vault is allowed to have more than one active piece of data for this

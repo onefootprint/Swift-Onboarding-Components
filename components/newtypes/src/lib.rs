@@ -24,6 +24,7 @@ pub use self::auth_token::*;
 pub mod fingerprint;
 pub use self::fingerprint::*;
 
+pub use uuid::Uuid;
 #[derive(Debug, Clone, thiserror::Error)]
 pub enum Error {
     #[error("invalid phone number")]
@@ -62,4 +63,117 @@ pub enum AddressError {
     InvalidAddressCharacters(String),
     #[error("invalid characters provided: {0}, city and/or state must not contain special characters")]
     InvalidCharacters(String),
+}
+
+#[macro_use]
+pub mod util {
+    macro_rules! impl_enum_str_diesel {
+        ($type:ty) => {
+            impl<DB> diesel::serialize::ToSql<Text, DB> for $type
+            where
+                DB: diesel::backend::Backend,
+                str: diesel::serialize::ToSql<Text, DB>,
+            {
+                fn to_sql<'b>(
+                    &'b self,
+                    out: &mut diesel::serialize::Output<'b, '_, DB>,
+                ) -> diesel::serialize::Result {
+                    self.as_ref().to_sql(out)
+                }
+            }
+
+            impl diesel::deserialize::FromSql<Text, diesel::pg::Pg> for $type {
+                fn from_sql(value: diesel::pg::PgValue<'_>) -> diesel::deserialize::Result<Self> {
+                    use std::str::FromStr;
+                    let str = String::from_sql(value)?;
+                    Ok(Self::from_str(&str)?)
+                }
+            }
+        };
+    }
+
+    #[cfg(test)]
+    mod tests {
+        use super::impl_enum_str_diesel;
+        use diesel::prelude::*;
+        use diesel::{connection::SimpleConnection, sql_types::Text, AsExpression, FromSqlRow, RunQueryDsl};
+        use strum_macros::{AsRefStr, EnumIter, EnumString};
+
+        #[derive(Debug, Clone, PartialEq, Eq, AsExpression, FromSqlRow, EnumString, AsRefStr, EnumIter)]
+        #[strum(serialize_all = "PascalCase")]
+        #[diesel(sql_type = Text)]
+        pub enum MyEnum {
+            Case1,
+            SpecialCase2,
+            #[allow(non_camel_case_types)]
+            case_3,
+        }
+
+        // test derive
+        impl_enum_str_diesel!(MyEnum);
+
+        diesel::table! {
+            use diesel::sql_types::*;
+            test_table {
+                id -> Integer,
+                custom_enum -> Text,
+            }
+        }
+
+        #[derive(diesel::Insertable, diesel::Queryable, diesel::Identifiable, Debug, PartialEq)]
+        #[diesel(table_name = test_table)]
+        struct HasCustomTypes {
+            id: i32,
+            custom_enum: MyEnum,
+        }
+
+        #[test]
+        fn test_enum_str() {
+            let data = vec![
+                HasCustomTypes {
+                    id: 2,
+                    custom_enum: MyEnum::Case1,
+                },
+                HasCustomTypes {
+                    id: 3,
+                    custom_enum: MyEnum::SpecialCase2,
+                },
+                HasCustomTypes {
+                    id: 4,
+                    custom_enum: MyEnum::case_3,
+                },
+            ];
+            let db_url = std::env::var("DATABASE_URL").expect("couldn't parse DB url from environment");
+
+            let mut connection = PgConnection::establish(&db_url).expect("failed to connect to db");
+
+            connection
+                .batch_execute(
+                    r#"
+                DROP TABLE IF EXISTS test_table;
+                CREATE TABLE IF NOT EXISTS test_table (
+                    id SERIAL PRIMARY KEY,
+                    custom_enum Text NOT NULL
+                );
+                INSERT INTO test_table VALUES (1, 'SpecialCase2');
+
+            "#,
+                )
+                .unwrap();
+
+            let inserted = diesel::insert_into(test_table::table)
+                .values(&data)
+                .get_results(&mut connection)
+                .unwrap();
+            assert_eq!(data, inserted);
+
+            let first_row: HasCustomTypes = test_table::table
+                .filter(test_table::id.eq(1))
+                .get_result(&mut connection)
+                .unwrap();
+
+            assert_eq!(first_row.custom_enum, MyEnum::SpecialCase2);
+        }
+    }
+    pub(crate) use impl_enum_str_diesel;
 }

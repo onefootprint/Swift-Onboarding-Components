@@ -1,5 +1,4 @@
 pub use derive_more::{Add, Display, From, FromStr, Into};
-use diesel::AsExpression;
 use paperclip::actix::Apiv2Schema;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
@@ -9,8 +8,6 @@ macro_rules! define_newtype_id {
     ($name: ident, $type: ty, $doc: literal) => {
         #[doc = $doc]
         #[derive(
-            AsExpression,
-            DieselNewType,
             Debug,
             Clone,
             Hash,
@@ -24,6 +21,7 @@ macro_rules! define_newtype_id {
             Deserialize,
             Default,
             Apiv2Schema,
+            DieselNewType,
         )]
         #[serde(transparent)]
         pub struct $name($type);
@@ -35,6 +33,7 @@ define_newtype_id!(TenantId, String, "Identifier for a Tenant");
 define_newtype_id!(TenantApiKeyId, String, "Primary Key for an api key");
 define_newtype_id!(UserDataId, String, "Identifier for a User Data");
 define_newtype_id!(UserVaultId, String, "Identifier for a User Vault");
+
 define_newtype_id!(OnboardingId, String, "Identifier for an Onboarding");
 define_newtype_id!(FootprintUserId, String, "Identifier for a an onboarding");
 define_newtype_id!(

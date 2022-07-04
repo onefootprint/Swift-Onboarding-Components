@@ -4,9 +4,6 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-diesel-derive-newtype = "1.0.0"
-diesel = { version = "1.4.8", features = ["postgres", "serde_json", "uuidv07"] }
-diesel-derive-enum = { version = "1.1.2", features = ["postgres"] }
 serde = { version = "1.0", features = ["derive"] }
 derive_more = "0.99.17"
 paperclip = { version = "0.7.0", features = ["actix4"] }
@@ -22,5 +19,10 @@ regex = "1.5"
 async-trait = "0.1"
 crypto = { path = "../enclave/crypto" }
 lazy_static = "1.0"
-uuid = { version = "0.8", features = ["serde", "v4"] }
-diesel_as_jsonb = "0.1.3"
+uuid = { version = "1.1.2", features = ["serde", "v4"] }
+
+# diesel
+diesel-derive-newtype = "2.0.0-rc.0"
+diesel = { version = "2.0.0-rc.0", features = ["postgres", "extras"] }
+diesel-derive-enum = {  rev = "e6aa69856245f083645a0087527236a6bff42c18", git="https://github.com/adwhit/diesel-derive-enum",  features = ["postgres"] }
+diesel_as_jsonb = "1.0.0"

@@ -1,4 +1,4 @@
-use diesel::{Connection, PgConnection};
+use crate::run_migrations;
 use newtypes::{EncryptedVaultPrivateKey, Fingerprint, SealedVaultBytes, Status, VaultPublicKey};
 
 #[actix_rt::test]
@@ -8,8 +8,7 @@ async fn test_db() {
     let db_url = std::env::var("DATABASE_URL").expect("couldn't parse DB url from environment");
 
     // Run migrations on this DB if they haven't been run yet
-    let conn = PgConnection::establish(&db_url).expect("couldn't open connection to DB");
-    crate::embedded_migrations::run(&conn).expect("couldn't run migrations on DB");
+    run_migrations(&db_url).expect("couldn't run migrations on DB");
 
     let pool = crate::init(&db_url).expect("couldn't initiate DB pool");
     let tenant = crate::models::tenants::NewTenant {

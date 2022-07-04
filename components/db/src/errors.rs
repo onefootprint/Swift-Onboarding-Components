@@ -9,7 +9,7 @@ pub enum DbError {
     DbError(#[from] diesel::result::Error),
 
     #[error("pool_get: {0}")]
-    PoolGet(#[from] deadpool::managed::PoolError<deadpool_diesel::Error>),
+    PoolGet(#[from] deadpool_diesel::PoolError),
 
     #[error("pool_init: {0}")]
     PoolInit(#[from] deadpool::managed::BuildError<deadpool_diesel::Error>),
@@ -18,7 +18,7 @@ pub enum DbError {
     ConnectionError(#[from] diesel::ConnectionError),
 
     #[error("migration_error: {0}")]
-    MigrationError(#[from] diesel_migrations::RunMigrationsError),
+    MigrationError(#[from] diesel_migrations::MigrationError),
 
     #[error("invalid_session")]
     InvalidSessionForOperation,
@@ -40,4 +40,7 @@ pub enum DbError {
 
     #[error("Incorrect number of rows updated")]
     IncorrectNumberOfRowsUpdated,
+
+    #[error("migration failed: {0}")]
+    MigrationFailed(Box<dyn std::error::Error + Send + Sync>),
 }

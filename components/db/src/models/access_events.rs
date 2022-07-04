@@ -1,5 +1,5 @@
-use crate::schema::access_events;
 use crate::DbPool;
+use crate::{schema::access_events, DbError};
 use chrono::NaiveDateTime;
 use diesel::{Connection, Insertable, Queryable, RunQueryDsl};
 use newtypes::{AccessEventId, DataKind, InsightEventId, OnboardingId};
@@ -8,7 +8,7 @@ use serde::{Deserialize, Serialize};
 use super::insight_event::CreateInsightEvent;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
-#[table_name = "access_events"]
+#[diesel(table_name = access_events)]
 pub struct AccessEvent {
     pub id: AccessEventId,
     pub onboarding_id: OnboardingId,
@@ -32,7 +32,7 @@ pub struct NewAccessEvent {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
-#[table_name = "access_events"]
+#[diesel(table_name = access_events)]
 struct NewAccessEventWithInsight {
     onboarding_id: OnboardingId,
     data_kinds: Vec<DataKind>,
@@ -45,7 +45,7 @@ impl NewAccessEvent {
     pub async fn save(self, pool: &DbPool) -> Result<(), crate::DbError> {
         let _ = pool
             .db_query(move |conn| {
-                conn.transaction(|| {
+                conn.transaction(|conn| -> Result<(), DbError> {
                     let insight_ev = self.insight.insert_with_conn(conn)?;
                     let event = NewAccessEventWithInsight {
                         data_kinds: self.data_kinds,
@@ -55,9 +55,11 @@ impl NewAccessEvent {
                         principal: self.principal,
                     };
 
-                    diesel::insert_into(crate::schema::access_events::table)
+                    let _ = diesel::insert_into(crate::schema::access_events::table)
                         .values(event)
-                        .execute(conn)
+                        .execute(conn)?;
+
+                    Ok(())
                 })
             })
             .await??;

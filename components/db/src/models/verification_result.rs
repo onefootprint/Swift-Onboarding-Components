@@ -5,7 +5,7 @@ use newtypes::{VerificationRequestId, VerificationResultId};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable, Identifiable)]
-#[table_name = "verification_results"]
+#[diesel(table_name = verification_results)]
 pub struct VerificationResult {
     pub id: VerificationResultId,
     pub request_id: VerificationRequestId,

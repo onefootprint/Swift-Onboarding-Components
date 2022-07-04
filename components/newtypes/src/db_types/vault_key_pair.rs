@@ -1,25 +1,10 @@
 pub use derive_more::{Add, Display, From, Into};
-
-use diesel::AsExpression;
 use serde::{Deserialize, Serialize};
 
 use crate::SealedVaultBytes;
 
 /// Bytes of a vault public key
-#[derive(
-    AsExpression,
-    DieselNewType,
-    Debug,
-    Clone,
-    Hash,
-    PartialEq,
-    Eq,
-    From,
-    Into,
-    Serialize,
-    Deserialize,
-    Default,
-)]
+#[derive(DieselNewType, Debug, Clone, Hash, PartialEq, Eq, From, Into, Serialize, Deserialize, Default)]
 #[serde(transparent)]
 pub struct VaultPublicKey(Vec<u8>);
 
@@ -49,19 +34,6 @@ impl VaultPublicKey {
 }
 
 /// Bytes of a sealed vault private key
-#[derive(
-    AsExpression,
-    DieselNewType,
-    Debug,
-    Clone,
-    Hash,
-    PartialEq,
-    Eq,
-    From,
-    Into,
-    Serialize,
-    Deserialize,
-    Default,
-)]
+#[derive(DieselNewType, Debug, Clone, Hash, PartialEq, Eq, From, Into, Serialize, Deserialize, Default)]
 #[serde(transparent)]
 pub struct EncryptedVaultPrivateKey(pub Vec<u8>);

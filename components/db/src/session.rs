@@ -31,7 +31,7 @@ pub async fn get_session_by_auth_token(
 }
 
 pub(crate) fn get_session_by_auth_token_sync(
-    conn: &PgConnection,
+    conn: &mut PgConnection,
     auth_token: SessionAuthToken,
 ) -> Result<Option<Session>, DbError> {
     let session: Option<Session> = schema::sessions::table

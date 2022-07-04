@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, DbEnum, PartialEq, Clone, Copy, Deserialize, Serialize, Apiv2Schema)]
 #[serde(rename_all = "lowercase")]
-#[PgType = "challenge_state"]
+#[DieselExistingType = "ChallengeStatePg"]
 #[DieselType = "Challenge_state"]
 #[DbValueStyle = "verbatim"]
 pub enum ChallengeState {
@@ -12,3 +12,7 @@ pub enum ChallengeState {
     Expired,
     Validated,
 }
+
+#[derive(diesel::sql_types::SqlType)]
+#[diesel(postgres_type(name = "challenge_state"))]
+pub struct ChallengeStatePg;

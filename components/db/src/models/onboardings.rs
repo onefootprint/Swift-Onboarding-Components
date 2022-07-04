@@ -11,7 +11,7 @@ use serde::{Deserialize, Serialize};
 use super::insight_event::CreateInsightEvent;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
-#[table_name = "onboardings"]
+#[diesel(table_name = onboardings)]
 pub struct Onboarding {
     pub id: OnboardingId,
     pub user_ob_id: FootprintUserId,
@@ -27,7 +27,7 @@ pub struct Onboarding {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
-#[table_name = "onboardings"]
+#[diesel(table_name = onboardings)]
 pub struct NewOnboarding {
     pub user_vault_id: UserVaultId,
     pub ob_config_id: ObConfigurationId,
@@ -60,7 +60,7 @@ impl NewOnboarding {
                     .optional()?;
                 match existing_ob {
                     Some(ob) => Ok(ob),
-                    None => conn.transaction(|| {
+                    None => conn.transaction(|conn| {
                         let insight_event = insight_event.insert_with_conn(conn)?;
 
                         let new = NewOnboarding {
