@@ -195,7 +195,7 @@ def test_identify_challenge(request):
 
 def test_identify_verify(request):
     def identify_verify():
-        message = twilio_client.messages.list(to=PHONE_NUMBER)[0]
+        message = twilio_client.messages.list(to=PHONE_NUMBER, limit=1)[0]
         print(PHONE_NUMBER)
         print("post-twilio")
         code = str(re.search("\d{6}", message.body).group(0))
@@ -478,12 +478,12 @@ def test_identify_repeat_customer(request, foo_tenant):
         assert body["data"]["user_found"]
         assert body["data"]["challenge_data"]["phone_number_last_two"] == PHONE_NUMBER[-2:]
         assert body["data"]["challenge_data"]["challenge_kind"] == "sms"
-        return body["data"]["challenge_data"]["token"]
+        return body["data"]["challenge_data"]["challenge_token"]
     challenge_token = try_until_success(identify, 20)
 
     # Log in as the user
     def identify_verify():
-        message = twilio_client.messages.list(to=PHONE_NUMBER)[0]
+        message = twilio_client.messages.list(to=PHONE_NUMBER, limit=1)[0]
         print(message.body)
         code = str(re.search("\d{6}", message.body).group(0))
         print(code)
@@ -675,7 +675,7 @@ def test_my1fp_basic_auth(request):
 
     # Log in as the user
     def identify_verify():
-        message = twilio_client.messages.list(to=PHONE_NUMBER)[0]
+        message = twilio_client.messages.list(to=PHONE_NUMBER, limit=1)[0]
         print(message.body)
         code = str(re.search("\d{6}", message.body).group(0))
         print(code)
