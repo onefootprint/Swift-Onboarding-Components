@@ -56,7 +56,7 @@ cargo install cargo-watch
 Then, you can start a watcher that will continuously compile and restart your server process as you make code changes.
 
 ```bash
-cargo watch -x 'run -p footprint-core'
+cargo watch -x 'run -p footprint-core' -i ci
 ```
 
 ## Getting Pulumi setup

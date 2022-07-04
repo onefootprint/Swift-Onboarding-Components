@@ -1,6 +1,7 @@
 from urllib.parse import urlencode
 import arrow
 import os
+from utils import try_until_success
 import pytest
 import random
 import requests
@@ -193,26 +194,28 @@ def test_identify_challenge(request):
 
 
 def test_identify_verify(request):
-    # todo -- race conditions here
-    message = twilio_client.messages.list(to=PHONE_NUMBER)[0]
-    print(PHONE_NUMBER)
-    code = str(re.search("\d{6}", message.body).group(0))
-    print(code)
-    path = "identify/verify"
-    print(url(path))
-    data = {
-        "challenge_response": code,
-        "challenge_kind": "sms",
-        "challenge_token": request.config.cache.get("challenge_token", None),
-    }
-    r = requests.post(
-        url(path),
-        json=data,
-    )
-    body = _assert_response(r)
-    assert body["data"]["kind"] == "user_created"
-    auth_token = body["data"]["auth_token"]
-    request.config.cache.set("fpuser_auth_token", auth_token)
+    def identify_verify():
+        message = twilio_client.messages.list(to=PHONE_NUMBER)[0]
+        print(PHONE_NUMBER)
+        print("post-twilio")
+        code = str(re.search("\d{6}", message.body).group(0))
+        print(code)
+        path = "identify/verify"
+        print(url(path))
+        data = {
+            "challenge_response": code,
+            "challenge_kind": "sms",
+            "challenge_token": request.config.cache.get("challenge_token", None),
+        }
+        r = requests.post(
+            url(path),
+            json=data,
+        )
+        body = _assert_response(r)
+        assert body["data"]["kind"] == "user_created"
+        auth_token = body["data"]["auth_token"]
+        request.config.cache.set("fpuser_auth_token", auth_token)
+    try_until_success(identify_verify, 5)
 
 def test_onboard_init(request, workos_tenant):
     path = "onboarding"
@@ -466,40 +469,40 @@ def test_identify_repeat_customer(request, foo_tenant):
     identifier = {"email": email}
     data = {"identifier": identifier, "preferred_challenge_kind": "sms"}
 
-    # avoid rate-limit error
-    time.sleep(20)
-    r = requests.post(
-        url(path),
-        json=data,
-    )
-    body = _assert_response(r)
-    assert body["data"]["user_found"]
-    assert body["data"]["challenge_data"]["phone_number_last_two"] == PHONE_NUMBER[-2:]
-    assert body["data"]["challenge_data"]["challenge_kind"] == "sms"
+    def identify():
+        r = requests.post(
+            url(path),
+            json=data,
+        )
+        body = _assert_response(r)
+        assert body["data"]["user_found"]
+        assert body["data"]["challenge_data"]["phone_number_last_two"] == PHONE_NUMBER[-2:]
+        assert body["data"]["challenge_data"]["challenge_kind"] == "sms"
+        return body["data"]["challenge_data"]["token"]
+    challenge_token = try_until_success(identify, 20)
 
     # Log in as the user
-    path = "identify/verify"
-    # todo -- race conditions here
-    time.sleep(5)
-    message = twilio_client.messages.list(to=PHONE_NUMBER)[0]
-    print(message.body)
-    code = str(re.search("\d{6}", message.body).group(0))
-    print(code)
-    print(url(path))
-    data = {
-        "challenge_response": code,
-        "challenge_kind": "sms",
-        "challenge_token": body["data"]["challenge_data"]["challenge_token"],
-    }
-    r = requests.post(
-        url(path),
-        json=data,
-    )
-    body = _assert_response(r)
-    assert body["data"]["kind"] == "user_inherited"
-    auth_token = body["data"]["auth_token"]
-    request.config.cache.set("fpuser_auth_token", auth_token)
-
+    def identify_verify():
+        message = twilio_client.messages.list(to=PHONE_NUMBER)[0]
+        print(message.body)
+        code = str(re.search("\d{6}", message.body).group(0))
+        print(code)
+        path = "identify/verify"
+        print(url(path))
+        data = {
+            "challenge_response": code,
+            "challenge_kind": "sms",
+            "challenge_token": challenge_token,
+        }
+        r = requests.post(
+            url(path),
+            json=data,
+        )
+        body = _assert_response(r)
+        assert body["data"]["kind"] == "user_inherited"
+        auth_token = body["data"]["auth_token"]
+        request.config.cache.set("fpuser_auth_token", auth_token)
+    try_until_success(identify_verify, 5)
 
     # Start onboarding for user
     path = "onboarding"
@@ -658,38 +661,39 @@ def test_my1fp_basic_auth(request):
     identifier = {"email": email}
     data = {"identifier": identifier, "preferred_challenge_kind": "sms", "identify_type": "my1fp"}
 
-    # avoid rate-limit error
-    time.sleep(20)
-    r = requests.post(
-        url(path),
-        json=data,
-    )
-    body = _assert_response(r)
-    assert body["data"]["user_found"]
-    assert body["data"]["challenge_data"]["phone_number_last_two"] == PHONE_NUMBER[-2:]
-    assert body["data"]["challenge_data"]["challenge_kind"] == "sms"
+    def identify():
+        r = requests.post(
+            url(path),
+            json=data,
+        )
+        body = _assert_response(r)
+        assert body["data"]["user_found"]
+        assert body["data"]["challenge_data"]["phone_number_last_two"] == PHONE_NUMBER[-2:]
+        assert body["data"]["challenge_data"]["challenge_kind"] == "sms"
+        return body["data"]["challenge_data"]["challenge_token"]
+    challenge_token = try_until_success(identify, 20, 1)
 
     # Log in as the user
-    path = "identify/verify"
-    # todo -- race conditions here
-    time.sleep(5)
-    message = twilio_client.messages.list(to=PHONE_NUMBER)[0]
-    print(message.body)
-    code = str(re.search("\d{6}", message.body).group(0))
-    print(code)
-    print(url(path))
-    data = {
-        "challenge_response": code,
-        "challenge_token": body["data"]["challenge_data"]["challenge_token"],
-    }
-    r = requests.post(
-        url(path),
-        json=data,
-    )
-    body = _assert_response(r)
-    assert body["data"]["kind"] == "user_inherited"
-    auth_token = body["data"]["auth_token"]
-    request.config.cache.set("my1fp_auth_token", auth_token)
+    def identify_verify():
+        message = twilio_client.messages.list(to=PHONE_NUMBER)[0]
+        print(message.body)
+        code = str(re.search("\d{6}", message.body).group(0))
+        print(code)
+        path = "identify/verify"
+        print(url(path))
+        data = {
+            "challenge_response": code,
+            "challenge_token": challenge_token,
+        }
+        r = requests.post(
+            url(path),
+            json=data,
+        )
+        body = _assert_response(r)
+        assert body["data"]["kind"] == "user_inherited"
+        auth_token = body["data"]["auth_token"]
+        request.config.cache.set("my1fp_auth_token", auth_token)
+    try_until_success(identify_verify, 5)
 
 def test_logged_in_decrypt(request):
     path = "user/decrypt"
