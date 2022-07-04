@@ -18,6 +18,7 @@ pub struct ChallengeRequest {
 #[derive(Debug, Clone, Apiv2Schema, serde::Serialize)]
 pub struct ChallengeResponse {
     challenge_token: ChallengeToken, // Sealed Challenge<PhoneChallengeState>
+    time_before_retry_s: i64,
 }
 
 #[api_v2_operation(tags(Identify))]
@@ -35,7 +36,8 @@ pub async fn handler(
 
     let phone_number = twilio_client.standardize(&req.phone_number).await?;
 
-    let challenge_state_data = twilio_client.send_challenge(&state, phone_number).await?;
+    let (challenge_state_data, time_before_retry_s) =
+        twilio_client.send_challenge(&state, phone_number).await?;
 
     let challenge_state = IdentifyChallengeState {
         identify_type: req.identify_type,
@@ -49,6 +51,9 @@ pub async fn handler(
     .seal(&state.challenge_sealing_key)?;
 
     Ok(Json(ApiResponseData {
-        data: ChallengeResponse { challenge_token },
+        data: ChallengeResponse {
+            challenge_token,
+            time_before_retry_s,
+        },
     }))
 }

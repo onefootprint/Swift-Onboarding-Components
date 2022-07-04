@@ -7,6 +7,8 @@ use newtypes::{
     Base64Data, LeakToString, PhoneNumber, SealedSessionBytes, SessionAuthToken, ValidatedPhoneNumber,
 };
 
+pub type SecondsBeforeRetry = i64;
+
 use self::rate_limit::RateLimitRecord;
 
 #[derive(Clone)]
@@ -178,19 +180,23 @@ impl TwilioClient {
         &self,
         state: &State,
         destination: ValidatedPhoneNumber,
-    ) -> Result<PhoneChallengeState, ApiError> {
+    ) -> Result<(PhoneChallengeState, SecondsBeforeRetry), ApiError> {
         let code = crypto::random::gen_rand_n_digit_code(6);
         let message_body = format!("Your {} verification code is {}. Don't share your code with anyone. We will never contact you to request this code.", &self.rp_id, &code);
 
-        self.rate_limit(state, destination.clone(), rate_limit::SMS_CHALLENGE)
+        let time_before_retry_s = self
+            .rate_limit(state, destination.clone(), rate_limit::SMS_CHALLENGE)
             .await?;
 
         self.send_message(destination.clone(), message_body).await?;
 
-        Ok(PhoneChallengeState {
-            phone_number: destination,
-            h_code: sha256(code.as_bytes()).to_vec(),
-        })
+        Ok((
+            PhoneChallengeState {
+                phone_number: destination,
+                h_code: sha256(code.as_bytes()).to_vec(),
+            },
+            time_before_retry_s,
+        ))
     }
 
     pub async fn send_d2p(
@@ -199,8 +205,9 @@ impl TwilioClient {
         destination: ValidatedPhoneNumber,
         base_url: String,
         auth_token: SessionAuthToken,
-    ) -> Result<(), ApiError> {
-        self.rate_limit(state, destination.clone(), rate_limit::D2P_LINK)
+    ) -> Result<SecondsBeforeRetry, ApiError> {
+        let time_before_retry_s = self
+            .rate_limit(state, destination.clone(), rate_limit::D2P_LINK)
             .await?;
 
         let message_body = format!(
@@ -209,7 +216,7 @@ impl TwilioClient {
         );
         self.send_message(destination.clone(), message_body).await?;
 
-        Ok(())
+        Ok(time_before_retry_s)
     }
 
     async fn rate_limit(
@@ -217,12 +224,13 @@ impl TwilioClient {
         state: &State,
         phone_number: ValidatedPhoneNumber,
         scope: &str,
-    ) -> Result<(), ApiError> {
+    ) -> Result<SecondsBeforeRetry, ApiError> {
         let h_session_id =
             Base64Data(sha256(format!("{}:{}", phone_number.e164, scope).as_bytes()).to_vec()).to_string();
 
         let now = Utc::now().naive_utc();
-        let time_between_challenges = Duration::seconds(self.time_s_between_challenges);
+        let time_between_challenges_s = self.time_s_between_challenges;
+        let duration_between_challenges = Duration::seconds(time_between_challenges_s);
 
         if let Some(session) =
             db::session::get_session_by_primary_key(&state.db_pool, h_session_id.clone()).await?
@@ -231,8 +239,8 @@ impl TwilioClient {
                 serde_json::from_slice(session.sealed_session_data.as_ref())
             {
                 let time_since_last_sent = now - sent_at;
-                if time_since_last_sent < time_between_challenges {
-                    let time_remaining = (time_between_challenges - time_since_last_sent).num_seconds();
+                if time_since_last_sent < duration_between_challenges {
+                    let time_remaining = (duration_between_challenges - time_since_last_sent).num_seconds();
                     return Err(ApiError::RateLimited(time_remaining));
                 }
             }
@@ -241,10 +249,10 @@ impl TwilioClient {
         db::models::sessions::NewSession {
             h_session_id,
             sealed_session_data: SealedSessionBytes(serde_json::to_vec(&RateLimitRecord { sent_at: now })?),
-            expires_at: now + time_between_challenges,
+            expires_at: now + duration_between_challenges,
         }
         .update_or_create(&state.db_pool)
         .await?;
-        Ok(())
+        Ok(time_between_challenges_s)
     }
 }

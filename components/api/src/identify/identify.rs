@@ -48,6 +48,7 @@ pub struct UserChallengeData {
     challenge_token: ChallengeToken,
     phone_number_last_two: String,
     biometric_challenge_json: Option<String>,
+    time_before_retry_s: i64,
 }
 
 #[api_v2_operation(tags(Identify))]
@@ -90,35 +91,41 @@ pub async fn handler(
     let e164_phone_number = ValidatedPhoneNumber::__build_from_vault(phone_number.clone());
 
     // Initiate the challenge of the requested type
-    let (challenge_kind, challenge_state_data, biometric_challenge_json) = match preferred_challenge_kind {
-        ChallengeKind::Biometric => {
-            let creds = get_webauthn_creds(&state.db_pool, user_id.clone()).await?;
-            if !creds.is_empty() {
-                let challenge = initiate_biometric_challenge_for_user(&state, &user_id, creds).await?;
-                (
-                    ChallengeKind::Biometric,
-                    IdentifyChallengeData::Biometric(challenge.state),
-                    Some(challenge.challenge_json),
-                )
-            } else {
-                let challenge_state = twilio_client.send_challenge(&state, e164_phone_number).await?;
+    let (challenge_kind, challenge_state_data, time_before_retry_s, biometric_challenge_json) =
+        match preferred_challenge_kind {
+            ChallengeKind::Biometric => {
+                let creds = get_webauthn_creds(&state.db_pool, user_id.clone()).await?;
+                if !creds.is_empty() {
+                    let challenge = initiate_biometric_challenge_for_user(&state, &user_id, creds).await?;
+                    (
+                        ChallengeKind::Biometric,
+                        IdentifyChallengeData::Biometric(challenge.state),
+                        0,
+                        Some(challenge.challenge_json),
+                    )
+                } else {
+                    let (challenge_state, time_before_retry_s) =
+                        twilio_client.send_challenge(&state, e164_phone_number).await?;
+                    (
+                        ChallengeKind::Sms,
+                        IdentifyChallengeData::Sms(challenge_state),
+                        time_before_retry_s,
+                        None,
+                    )
+                }
+            }
+            ChallengeKind::Sms => {
+                // Fall back to SMS if the user requested webauthn but doesn't have any creds
+                let (challenge_state, time_before_retry_s) =
+                    twilio_client.send_challenge(&state, e164_phone_number).await?;
                 (
                     ChallengeKind::Sms,
                     IdentifyChallengeData::Sms(challenge_state),
+                    time_before_retry_s,
                     None,
                 )
             }
-        }
-        ChallengeKind::Sms => {
-            // Fall back to SMS if the user requested webauthn but doesn't have any creds
-            let challenge_state = twilio_client.send_challenge(&state, e164_phone_number).await?;
-            (
-                ChallengeKind::Sms,
-                IdentifyChallengeData::Sms(challenge_state),
-                None,
-            )
-        }
-    };
+        };
 
     let challenge_state = IdentifyChallengeState {
         identify_type,
@@ -139,6 +146,7 @@ pub async fn handler(
                 challenge_token,
                 phone_number_last_two: phone_number_last_two(phone_number),
                 biometric_challenge_json,
+                time_before_retry_s,
             }),
         },
     }))
