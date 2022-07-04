@@ -9,7 +9,7 @@ import { User } from 'src/pages/users/hooks/use-join-users';
 import { getRegionForInsightEvent } from 'src/types';
 import styled, { css } from 'styled-components';
 import UAParser from 'ua-parser-js';
-import { Box, Divider, LoadingIndicator, Typography } from 'ui';
+import { Box, Divider, Shimmer, Typography } from 'ui';
 
 import MapMarker from './components/map-marker';
 import useGetLiveness from './hooks/use-get-liveness';
@@ -60,10 +60,6 @@ const Insights = ({ user }: InsightsProps) => {
 
   const biometricCred = getLiveness.data?.[0];
 
-  if (getLiveness.isLoading) {
-    return <LoadingIndicator />;
-  }
-
   // If there's a biometric credential, use the insight event from it since it will most likely be the mobile device.
   // If there's no biometric credential, use the insight event from the onboarding, which may be mobile or desktop.
   // We only show `Biometric: Verified` if the user has a biometric credential
@@ -83,80 +79,86 @@ const Insights = ({ user }: InsightsProps) => {
       >
         <Divider />
       </Box>
-      <Box
-        sx={{
-          height: '384px',
-          width: '100%',
-          borderRadius: 2,
-          overflow: 'hidden',
-          position: 'relative',
-        }}
-      >
-        <GoogleMapReact
-          bootstrapURLKeys={{
-            key: 'AIzaSyCxod6W0c-JETh8zoEsT8bAnwJb4iUdFTo',
-          }}
-          defaultCenter={{
-            lat: insightEvent.latitude!,
-            lng: insightEvent.longitude! - 0.009,
-          }}
-          defaultZoom={15}
-          options={{
-            clickableIcons: false,
-            disableDoubleClickZoom: true,
-            gestureHandling: 'none',
-            disableDefaultUI: true,
-            keyboardShortcuts: false,
-            styles: mapStyles,
+      {getLiveness.isLoading ? (
+        <Shimmer sx={{ height: '384px' }} />
+      ) : (
+        <Box
+          sx={{
+            height: '384px',
+            width: '100%',
+            borderRadius: 2,
+            overflow: 'hidden',
+            position: 'relative',
           }}
         >
-          <MapMarker
-            key={insightEvent.timestamp}
-            lat={insightEvent.latitude!}
-            lng={insightEvent.longitude!}
-          />
-        </GoogleMapReact>
-        <FloatingBox>
-          {icoForUserAgent(userAgent)}
-          <Typography variant="label-2" sx={{ marginBottom: 5 }}>
-            {displayForUserAgent(userAgent)}
-          </Typography>
-          {insightEvent.ipAddress && (
+          <GoogleMapReact
+            bootstrapURLKeys={{
+              key: 'AIzaSyCxod6W0c-JETh8zoEsT8bAnwJb4iUdFTo',
+            }}
+            defaultCenter={{
+              lat: insightEvent.latitude!,
+              lng: insightEvent.longitude! - 0.009,
+            }}
+            defaultZoom={15}
+            options={{
+              clickableIcons: false,
+              disableDoubleClickZoom: true,
+              gestureHandling: 'none',
+              disableDefaultUI: true,
+              keyboardShortcuts: false,
+              styles: mapStyles,
+            }}
+          >
+            <MapMarker
+              key={insightEvent.timestamp}
+              lat={insightEvent.latitude!}
+              lng={insightEvent.longitude!}
+            />
+          </GoogleMapReact>
+          <FloatingBox>
+            {icoForUserAgent(userAgent)}
+            <Typography variant="label-2" sx={{ marginBottom: 5 }}>
+              {displayForUserAgent(userAgent)}
+            </Typography>
+            {insightEvent.ipAddress && (
+              <Row>
+                <Typography variant="label-3" color="tertiary">
+                  IP Address
+                </Typography>
+                <Typography variant="body-3">
+                  {insightEvent.ipAddress}
+                </Typography>
+              </Row>
+            )}
             <Row>
               <Typography variant="label-3" color="tertiary">
-                IP Address
-              </Typography>
-              <Typography variant="body-3">{insightEvent.ipAddress}</Typography>
-            </Row>
-          )}
-          <Row>
-            <Typography variant="label-3" color="tertiary">
-              Biometric
-            </Typography>
-            <Typography variant="body-3">
-              {biometricCred ? 'Verified' : 'Not verified'}
-            </Typography>
-          </Row>
-          {getRegionForInsightEvent(insightEvent) && (
-            <Row>
-              <Typography variant="label-3" color="tertiary">
-                Region
+                Biometric
               </Typography>
               <Typography variant="body-3">
-                {getRegionForInsightEvent(insightEvent)}
+                {biometricCred ? 'Verified' : 'Not verified'}
               </Typography>
             </Row>
-          )}
-          {insightEvent.country && (
-            <Row>
-              <Typography variant="label-3" color="tertiary">
-                Country
-              </Typography>
-              <Typography variant="body-3">{insightEvent.country}</Typography>
-            </Row>
-          )}
-        </FloatingBox>
-      </Box>
+            {getRegionForInsightEvent(insightEvent) && (
+              <Row>
+                <Typography variant="label-3" color="tertiary">
+                  Region
+                </Typography>
+                <Typography variant="body-3">
+                  {getRegionForInsightEvent(insightEvent)}
+                </Typography>
+              </Row>
+            )}
+            {insightEvent.country && (
+              <Row>
+                <Typography variant="label-3" color="tertiary">
+                  Country
+                </Typography>
+                <Typography variant="body-3">{insightEvent.country}</Typography>
+              </Row>
+            )}
+          </FloatingBox>
+        </Box>
+      )}
     </>
   );
 };
