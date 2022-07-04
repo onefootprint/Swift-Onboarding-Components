@@ -65,6 +65,7 @@ const BaseInput = forwardRef<HTMLInputElement, AllInputProps>(
           {prefixElement && <PrefixContainer>{prefixElement}</PrefixContainer>}
           <StyledField
             {...remainingProps}
+            tabIndex={0}
             $hasError={hasError}
             $hasFocus={hasFocus}
             aria-required={required}

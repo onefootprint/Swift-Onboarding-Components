@@ -88,7 +88,6 @@ const PinInput = ({
           const isDisabled = pinIndex > enteredPin.length;
           return (
             <Input
-              autoFocus={pinIndex === 0}
               autoComplete="one-time-code"
               hasError={hasError}
               inputMode="numeric"

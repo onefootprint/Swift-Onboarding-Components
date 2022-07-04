@@ -116,7 +116,6 @@ const PhoneIdentification = () => {
       </EmailCard>
       <Form onSubmit={handleSubmit(onSubmit)}>
         <PhoneInput
-          autoFocus
           hasError={!!errors.phone}
           hintText={errors.phone && t('form.phone-input.error')}
           label={t('form.phone-input.label')}

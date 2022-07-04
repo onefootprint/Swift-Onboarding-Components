@@ -95,7 +95,6 @@ const ResidentialAddress = () => {
           )}
         />
         <AddressInput
-          autoFocus
           country={country.value}
           hasError={!!errors.streetAddress}
           hintText={errors.streetAddress && t('form.address-line-1.error')}

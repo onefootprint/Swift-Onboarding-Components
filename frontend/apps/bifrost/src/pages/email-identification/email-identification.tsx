@@ -35,7 +35,6 @@ const EmailIdentification = () => {
       />
       <Form onSubmit={handleSubmit(onSubmit)}>
         <TextInput
-          autoFocus
           hasError={!!errors.email}
           hintText={errors.email && t('form.email.error')}
           label={t('form.email.label')}
