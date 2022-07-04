@@ -38,7 +38,9 @@ const DashboardQueryClientProvider = ({
       } else {
         show({
           // @ts-ignore can't type the QueryClient's defaultOptions sadly
-          description: `There was an error making your request: ${error.response.statusText}`,
+          description: `There was an error making your request: ${
+            error.response.statusText || error.message
+          }`,
           title: 'Uh-oh!',
           variant: 'error',
         });
