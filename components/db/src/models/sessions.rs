@@ -33,8 +33,8 @@ pub struct UpdateSession {
 }
 
 impl Session {
-    pub async fn create(
-        pool: &DbPool,
+    pub fn create(
+        conn: &mut PgConnection,
         sealed_session_data: SealedSessionBytes,
         expires_at: NaiveDateTime,
     ) -> Result<(Session, SessionAuthToken), crate::DbError> {
@@ -46,8 +46,7 @@ impl Session {
             sealed_session_data,
             expires_at,
         }
-        .update_or_create(pool)
-        .await?;
+        .update_or_create(conn)?;
         Ok((session, token))
     }
 
@@ -69,20 +68,16 @@ impl Session {
 }
 
 impl NewSession {
-    pub async fn update_or_create(self, pool: &DbPool) -> Result<Session, crate::DbError> {
-        let session = pool
-            .db_query(move |conn| {
-                diesel::insert_into(sessions::table)
-                    .values(self.clone())
-                    .on_conflict(sessions::h_session_id)
-                    .do_update()
-                    .set((
-                        sessions::sealed_session_data.eq(self.sealed_session_data),
-                        sessions::expires_at.eq(self.expires_at),
-                    ))
-                    .get_result::<Session>(conn)
-            })
-            .await??;
+    pub fn update_or_create(self, conn: &mut PgConnection) -> Result<Session, crate::DbError> {
+        let session = diesel::insert_into(sessions::table)
+            .values(self.clone())
+            .on_conflict(sessions::h_session_id)
+            .do_update()
+            .set((
+                sessions::sealed_session_data.eq(self.sealed_session_data),
+                sessions::expires_at.eq(self.expires_at),
+            ))
+            .get_result::<Session>(conn)?;
         Ok(session)
     }
 }

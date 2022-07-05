@@ -58,7 +58,8 @@ fn handler(
     }
 
     let tenant_id = tenant_auth.tenant.id.clone();
-    state
+    let session_sealing_key = state.session_sealing_key.clone();
+    let validation_token = state
         .db_pool
         .db_transaction(move |conn| -> Result<_, DbError> {
             // TODO add it to the onboarding table
@@ -100,19 +101,18 @@ fn handler(
                     Some(tenant_id.clone()),
                 )
             })?;
-            Ok(())
+            // create the session for this onboarding
+            let validation_token = ServerSession::create_sync(
+                &session_sealing_key,
+                conn,
+                SessionData::ValidateUserToken(ValidateUserToken {
+                    onboarding_id: onboarding.id,
+                }),
+                Duration::minutes(15),
+            )?;
+            Ok(validation_token)
         })
         .await?;
-    // TODO move into txn
-    // create the session for this onboarding
-    let validation_token = ServerSession::create(
-        &state,
-        SessionData::ValidateUserToken(ValidateUserToken {
-            onboarding_id: onboarding.id,
-        }),
-        Duration::minutes(15),
-    )
-    .await?;
     Ok(Json(ApiResponseData {
         data: CommitResponse {
             footprint_user_id: onboarding.user_ob_id.clone(),

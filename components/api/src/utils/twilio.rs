@@ -3,6 +3,7 @@ use std::fmt::Debug;
 use crate::{errors::ApiError, identify::PhoneChallengeState, State};
 use chrono::{Duration, Utc};
 use crypto::sha256;
+use db::DbError;
 use newtypes::{
     Base64Data, LeakToString, PhoneNumber, SealedSessionBytes, SessionAuthToken, ValidatedPhoneNumber,
 };
@@ -246,13 +247,19 @@ impl TwilioClient {
             }
         }
 
-        db::models::sessions::NewSession {
-            h_session_id,
-            sealed_session_data: SealedSessionBytes(serde_json::to_vec(&RateLimitRecord { sent_at: now })?),
-            expires_at: now + duration_between_challenges,
-        }
-        .update_or_create(&state.db_pool)
-        .await?;
+        let sealed_session_data = SealedSessionBytes(serde_json::to_vec(&RateLimitRecord { sent_at: now })?);
+        state
+            .db_pool
+            .db_query(move |conn| -> Result<_, DbError> {
+                db::models::sessions::NewSession {
+                    h_session_id,
+                    sealed_session_data,
+                    expires_at: now + duration_between_challenges,
+                }
+                .update_or_create(conn)?;
+                Ok(())
+            })
+            .await??;
         Ok(time_between_challenges_s)
     }
 }

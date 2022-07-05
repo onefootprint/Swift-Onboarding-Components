@@ -43,4 +43,7 @@ pub enum DbError {
 
     #[error("migration failed: {0}")]
     MigrationFailed(Box<dyn std::error::Error + Send + Sync>),
+
+    #[error("crypto error: {0}")]
+    CryptoError(#[from] crypto::Error),
 }
