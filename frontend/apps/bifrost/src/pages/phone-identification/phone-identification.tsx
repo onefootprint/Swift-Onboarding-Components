@@ -5,9 +5,7 @@ import { useForm } from 'react-hook-form';
 import HeaderTitle from 'src/components/header-title';
 import NavigationHeader from 'src/components/navigation-header';
 import useIdentify from 'src/hooks/identify/use-identify';
-import useIdentifyChallenge, {
-  IdentifyChallengeResponse,
-} from 'src/hooks/identify/use-identify-challenge';
+import useIdentifyChallenge from 'src/hooks/identify/use-identify-challenge';
 import useBifrostMachine, { Events } from 'src/hooks/use-bifrost-machine';
 import { ChallengeKind } from 'src/utils/state-machine/types';
 import styled, { css } from 'styled-components';
@@ -40,7 +38,7 @@ const PhoneIdentification = () => {
         phoneNumber,
       },
       {
-        onSuccess({ challengeToken }: IdentifyChallengeResponse) {
+        onSuccess({ challengeToken }) {
           send({
             type: Events.userIdentifiedByPhone,
             payload: {

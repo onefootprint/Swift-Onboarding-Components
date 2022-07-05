@@ -1,6 +1,6 @@
-import { useTranslation } from 'hooks';
+import { useRequestErrorToast, useTranslation } from 'hooks';
 import React from 'react';
-import useIdentify from 'src/hooks/identify/use-identify';
+import useIdentifyChallenge from 'src/hooks/identify/use-identify-challenge';
 import useBifrostMachine, { Events } from 'src/hooks/use-bifrost-machine';
 import useIdentifyVerification, {
   IdentifyVerificationResponse,
@@ -8,7 +8,7 @@ import useIdentifyVerification, {
 import useOnboarding from 'src/hooks/use-onboarding';
 import useUserData from 'src/hooks/use-user-data';
 import { ChallengeKind } from 'src/utils/state-machine/types';
-import { LinkButton, LoadingIndicator, PinInput } from 'ui';
+import { LinkButton, LoadingIndicator, PinInput, useToast } from 'ui';
 
 const SUCCESS_EVENT_DELAY_MS = 1500;
 
@@ -21,12 +21,19 @@ const PhoneVerificationPinForm = ({
   loadingComponent: LoadingComponent,
   successComponent: SuccessComponent,
 }: PhoneVerificationPinFormProps) => {
-  const onboardingMutation = useOnboarding();
+  const toast = useToast();
+  const showRequestErrorToast = useRequestErrorToast();
   const { t } = useTranslation('pages.phone-verification.form');
+  const onboardingMutation = useOnboarding();
   const [state, send] = useBifrostMachine();
-  const identifyMutation = useIdentify();
+  const identifyChallengeMutation = useIdentifyChallenge();
   const identifyVerificationMutation = useIdentifyVerification();
   const userDataMutation = useUserData();
+  const shouldShowSuccess = onboardingMutation.isSuccess;
+  const shouldShowLoading =
+    identifyVerificationMutation.isLoading ||
+    userDataMutation.isLoading ||
+    onboardingMutation.isLoading;
 
   const startOnboarding = (tenantPk: string, authToken: string) => {
     onboardingMutation.mutate(
@@ -90,34 +97,40 @@ const PhoneVerificationPinForm = ({
   };
 
   const handleResend = () => {
-    const { email } = state.context;
-    identifyMutation.mutate(
-      { identifier: { email }, preferredChallengeKind: ChallengeKind.sms },
-      {
-        onSuccess({ challengeData: newChallenge }) {
-          if (!newChallenge) {
-            return;
-          }
-          send({
-            type: Events.smsChallengeResent,
-            payload: {
-              challengeData: newChallenge,
-            },
-          });
+    const { phone: phoneNumber } = state.context;
+    if (phoneNumber) {
+      identifyChallengeMutation.mutate(
+        {
+          phoneNumber,
         },
-      },
-    );
+        {
+          onError: showRequestErrorToast,
+          onSuccess: ({ challengeToken }) => {
+            toast.show({
+              title: t('resend-code.toast.success.title'),
+              description: t('resend-code.toast.success.description'),
+            });
+            send({
+              type: Events.smsChallengeResent,
+              payload: {
+                challengeData: {
+                  challengeKind: ChallengeKind.sms,
+                  challengeToken,
+                  phoneNumberLastTwo: phoneNumber.slice(-2),
+                },
+              },
+            });
+          },
+        },
+      );
+    }
   };
 
-  if (onboardingMutation.isSuccess) {
+  if (shouldShowSuccess) {
     return <SuccessComponent />;
   }
 
-  if (
-    identifyVerificationMutation.isLoading ||
-    userDataMutation.isLoading ||
-    onboardingMutation.isLoading
-  ) {
+  if (shouldShowLoading) {
     return <LoadingComponent />;
   }
 
@@ -132,7 +145,7 @@ const PhoneVerificationPinForm = ({
             : undefined
         }
       />
-      {identifyMutation.isLoading ? (
+      {identifyChallengeMutation.isLoading ? (
         <LoadingIndicator />
       ) : (
         <LinkButton onClick={handleResend}>{t('resend-code.cta')}</LinkButton>
