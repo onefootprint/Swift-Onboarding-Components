@@ -10,7 +10,6 @@
   "devDependencies": {
     "@types/react": "^17.0.37",
     "@types/react-dom": "^17.0.11",
-    "@types/ua-parser-js": "^0.7.36",
     "config": "*",
     "ui": "*",
     "request": "*",
@@ -19,7 +18,6 @@
     "react-dom": "17.0.2",
     "react-i18next": "^11.16.9",
     "tsconfig": "*",
-    "typescript": "^4.7.3",
-    "ua-parser-js": "^1.0.2"
+    "typescript": "^4.7.3"
   }
 }

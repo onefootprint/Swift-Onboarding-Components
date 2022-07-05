@@ -15,7 +15,9 @@ export default class implements Footprint {
   }
 
   async show() {
-    await this.uiManager.show({ url: `${this.bifrostUrl}#${this.publicKey}` });
+    await this.uiManager.show({
+      url: `${this.bifrostUrl}?public_key=${this.publicKey}`,
+    });
   }
 
   createButton(container: HTMLElement) {
