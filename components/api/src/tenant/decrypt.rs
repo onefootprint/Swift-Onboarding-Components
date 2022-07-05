@@ -1,6 +1,6 @@
-use crate::auth::session_data::tenant::secret_key::SecretTenantAuthContext;
 use crate::auth::either::Either;
-use crate::auth::session_context::{SessionContext, HasTenant};
+use crate::auth::session_context::{HasTenant, SessionContext};
+use crate::auth::session_data::tenant::secret_key::SecretTenantAuthContext;
 use crate::auth::session_data::tenant::workos::WorkOsSession;
 use crate::errors::ApiError;
 use crate::types::success::ApiResponseData;
@@ -53,7 +53,7 @@ fn handler(
     };
 
     let DecryptFieldsResult {
-        fields_to_decrypt,
+        decrypted_data_kinds,
         result_map,
     } = decrypt(
         &auth,
@@ -66,7 +66,7 @@ fn handler(
     // Create an AccessEvent log showing that the tenant accessed these fields
     NewAccessEvent {
         onboarding_id: onboarding.id.clone(),
-        data_kinds: fields_to_decrypt.clone(),
+        data_kinds: decrypted_data_kinds.clone(),
         reason: request.reason.clone(),
         principal: principal.clone(),
         insight: CreateInsightEvent::from(insights),

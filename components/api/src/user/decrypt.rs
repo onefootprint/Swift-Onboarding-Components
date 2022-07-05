@@ -28,7 +28,7 @@ fn handler(
     request: Json<UserDecryptRequest>,
 ) -> actix_web::Result<Json<ApiResponseData<UserDecryptResponse>>, ApiError> {
     let DecryptFieldsResult {
-        fields_to_decrypt: _,
+        decrypted_data_kinds: _,
         result_map,
     } = decrypt(
         &user_auth,

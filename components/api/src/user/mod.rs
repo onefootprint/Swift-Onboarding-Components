@@ -42,7 +42,7 @@ pub fn clean_for_fingerprint(data_str: String) -> String {
 }
 
 pub struct DecryptFieldsResult {
-    pub fields_to_decrypt: Vec<DataKind>,
+    pub decrypted_data_kinds: Vec<DataKind>,
     pub result_map: HashMap<DataKind, Option<String>>,
 }
 
@@ -53,7 +53,7 @@ pub async fn decrypt<C: HasVaultPermission>(
     data_kinds: Vec<DataKind>,
 ) -> Result<DecryptFieldsResult, ApiError> {
     if !session.can_decrypt(&data_kinds) {
-        Err(AuthError::UnauthorizedOperation)?
+        return Err(AuthError::UnauthorizedOperation.into());
     }
     // Filter out fields that don't have values set on the user vault
     let (fields_to_decrypt, values_to_decrypt): (Vec<DataKind>, Vec<SealedVaultBytes>) =
@@ -87,8 +87,9 @@ pub async fn decrypt<C: HasVaultPermission>(
         .enumerate()
         .map(|(_, data_kind)| (data_kind, decrypted_data.get(&data_kind).cloned()))
         .collect();
+    let decrypted_data_kinds = result_map.iter().map(|(kind, _)| *kind).collect();
     Ok(DecryptFieldsResult {
-        fields_to_decrypt,
+        decrypted_data_kinds,
         result_map,
     })
 }
