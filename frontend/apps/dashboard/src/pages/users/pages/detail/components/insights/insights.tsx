@@ -2,6 +2,7 @@ import GoogleMapReact from 'google-map-react';
 import IcoAndroidColored24 from 'icons/ico/ico-android-colored-24';
 import IcoAppleColored24 from 'icons/ico/ico-apple-colored-24';
 import IcoCode24 from 'icons/ico/ico-code-24';
+import IcoLaptop24 from 'icons/ico/ico-laptop-24';
 import IcoPhone24 from 'icons/ico/ico-phone-24';
 import IcoUser24 from 'icons/ico/ico-user-24';
 import React from 'react';
@@ -33,6 +34,14 @@ const icoForUserAgent = (userAgent: UAParser.IResult) => {
   }
   if (isBot(userAgent)) {
     return <IcoCode24 />;
+  }
+  if (
+    userAgent.os.name?.toLowerCase() === 'mac os' ||
+    userAgent.os.name?.toLowerCase() === 'linux' ||
+    userAgent.os.name?.toLowerCase() === 'windows' ||
+    userAgent.device.type === undefined
+  ) {
+    return <IcoLaptop24 />;
   }
   return <IcoUser24 />;
 };
