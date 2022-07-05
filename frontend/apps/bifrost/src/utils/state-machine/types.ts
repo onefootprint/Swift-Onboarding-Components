@@ -72,6 +72,11 @@ export enum ChallengeKind {
   biometric = 'biometric',
 }
 
+export enum UserKind {
+  userInherited = 'user_inherited',
+  userCreated = 'user_created',
+}
+
 export type ChallengeData = {
   challengeToken: string;
   challengeKind: ChallengeKind;

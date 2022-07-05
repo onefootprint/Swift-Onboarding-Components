@@ -3,9 +3,7 @@ import useBifrostMachine, { Events } from 'src/hooks/use-bifrost-machine';
 import useIdentityVerification, {
   IdentifyVerificationResponse,
 } from 'src/hooks/use-identify-verification';
-import useOnboarding, {
-  OnboardingResponse,
-} from 'src/pages/phone-verification/hooks/use-onboarding';
+import useOnboarding from 'src/hooks/use-onboarding';
 import generateLoginDeviceResponse from 'src/utils/biometric/login-challenge-response';
 import { ChallengeData, ChallengeKind } from 'src/utils/state-machine/types';
 
@@ -52,10 +50,7 @@ const useBiometricLoginRetry = () => {
     onboardingMutation.mutate(
       { authToken, tenantPk },
       {
-        onSuccess({
-          missingAttributes,
-          missingWebauthnCredentials,
-        }: OnboardingResponse) {
+        onSuccess({ missingAttributes, missingWebauthnCredentials }) {
           send({
             type: Events.biometricLoginSucceeded,
             payload: {

@@ -1,10 +1,10 @@
 import { useFootprintJs } from 'footprint-provider';
 import useOnboardingComplete from 'src/hooks/use-onboarding-complete';
+import useUserData from 'src/hooks/use-user-data';
 import { hasMissingAttributes } from 'src/utils/state-machine/onboarding/utils/missing-attributes';
 import { UserData } from 'src/utils/state-machine/types';
 
 import useOnboardingMachine from './use-onboarding-machine';
-import useUserData from './use-user-data';
 
 const useSyncData = () => {
   const [state] = useOnboardingMachine();

@@ -1,56 +1,38 @@
 import { useTranslation } from 'hooks';
 import React from 'react';
-import { UseMutationResult } from 'react-query';
-import { RequestError } from 'request';
-import useIdentify, { IdentifyResponse } from 'src/hooks/identify/use-identify';
+import useIdentify from 'src/hooks/identify/use-identify';
 import useBifrostMachine, { Events } from 'src/hooks/use-bifrost-machine';
-import {
-  IdentifyVerificationRequest,
+import useIdentifyVerification, {
   IdentifyVerificationResponse,
 } from 'src/hooks/use-identify-verification';
+import useOnboarding from 'src/hooks/use-onboarding';
+import useUserData from 'src/hooks/use-user-data';
 import { ChallengeKind } from 'src/utils/state-machine/types';
 import { LinkButton, LoadingIndicator, PinInput } from 'ui';
 
-import {
-  OnboardingRequest,
-  OnboardingResponse,
-} from '../../hooks/use-onboarding';
-
-// Once verification succeeds, delay the transition to next page while you show a success message
 const SUCCESS_EVENT_DELAY_MS = 1500;
 
 type PhoneVerificationPinFormProps = {
-  verifyMutation: UseMutationResult<
-    IdentifyVerificationResponse,
-    RequestError,
-    IdentifyVerificationRequest
-  >;
-  onboardingMutation: UseMutationResult<
-    OnboardingResponse,
-    RequestError,
-    OnboardingRequest
-  >;
+  loadingComponent: () => JSX.Element;
+  successComponent: () => JSX.Element;
 };
 
 const PhoneVerificationPinForm = ({
-  verifyMutation,
-  onboardingMutation,
+  loadingComponent: LoadingComponent,
+  successComponent: SuccessComponent,
 }: PhoneVerificationPinFormProps) => {
+  const onboardingMutation = useOnboarding();
   const { t } = useTranslation('pages.phone-verification.form');
   const [state, send] = useBifrostMachine();
   const identifyMutation = useIdentify();
+  const identifyVerificationMutation = useIdentifyVerification();
+  const userDataMutation = useUserData();
 
-  const handlePinValidationSucceeded = ({
-    authToken,
-  }: IdentifyVerificationResponse) => {
-    const tenantPk = state.context.tenant.pk;
+  const startOnboarding = (tenantPk: string, authToken: string) => {
     onboardingMutation.mutate(
       { authToken, tenantPk },
       {
-        onSuccess({
-          missingAttributes,
-          missingWebauthnCredentials,
-        }: OnboardingResponse) {
+        onSuccess: ({ missingAttributes, missingWebauthnCredentials }) => {
           setTimeout(() => {
             send({
               type: Events.smsChallengeSucceeded,
@@ -66,13 +48,36 @@ const PhoneVerificationPinForm = ({
     );
   };
 
-  const handleComplete = (pin: string) => {
+  const assignEmailAndStartOnboarding = (
+    email: string,
+    tenantPk: string,
+    authToken: string,
+  ) => {
+    userDataMutation.mutate(
+      { data: { email }, authToken },
+      {
+        onSuccess: () => {
+          startOnboarding(tenantPk, authToken);
+        },
+      },
+    );
+  };
+
+  const handlePinValidationSucceeded = ({
+    authToken,
+  }: IdentifyVerificationResponse) => {
+    const { email, tenant } = state.context;
+    const tenantPk = tenant.pk;
+    assignEmailAndStartOnboarding(email, tenantPk, authToken);
+  };
+
+  const handlePinCompleted = (pin: string) => {
     const { challenge } = state.context;
     if (!challenge) {
       return;
     }
     const { challengeToken, challengeKind } = challenge;
-    verifyMutation.mutate(
+    identifyVerificationMutation.mutate(
       {
         challengeKind,
         challengeResponse: pin,
@@ -89,7 +94,7 @@ const PhoneVerificationPinForm = ({
     identifyMutation.mutate(
       { identifier: { email }, preferredChallengeKind: ChallengeKind.sms },
       {
-        onSuccess({ challengeData: newChallenge }: IdentifyResponse) {
+        onSuccess({ challengeData: newChallenge }) {
           if (!newChallenge) {
             return;
           }
@@ -104,17 +109,33 @@ const PhoneVerificationPinForm = ({
     );
   };
 
+  if (onboardingMutation.isSuccess) {
+    return <SuccessComponent />;
+  }
+
+  if (
+    identifyVerificationMutation.isLoading ||
+    userDataMutation.isLoading ||
+    onboardingMutation.isLoading
+  ) {
+    return <LoadingComponent />;
+  }
+
   return (
     <>
       <PinInput
-        onComplete={handleComplete}
-        hasError={verifyMutation.isError}
-        hintText={verifyMutation.isError ? t('error.description') : undefined}
+        onComplete={handlePinCompleted}
+        hasError={identifyVerificationMutation.isError}
+        hintText={
+          identifyVerificationMutation.isError
+            ? t('error.description')
+            : undefined
+        }
       />
       {identifyMutation.isLoading ? (
         <LoadingIndicator />
       ) : (
-        <LinkButton onClick={handleResend}>{t('cta')}</LinkButton>
+        <LinkButton onClick={handleResend}>{t('resend-code.cta')}</LinkButton>
       )}
     </>
   );

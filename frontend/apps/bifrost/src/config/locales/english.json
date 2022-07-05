@@ -46,7 +46,15 @@
         "success": {
           "description": "Phone verified"
         },
-        "cta": "Resend code"
+        "resend-code": {
+          "cta": "Resend code",
+          "toast": {
+            "success": {
+              "title": "Success",
+              "description": "We sent you a new code"
+            }
+          }
+        }
       }
     },
     "confirm-and-authorize": {

@@ -1,6 +1,6 @@
 import { useMutation } from 'react-query';
 import request, { RequestError, RequestResponse } from 'request';
-import { ChallengeKind } from 'src/utils/state-machine/types';
+import { ChallengeKind, UserKind } from 'src/utils/state-machine/types';
 
 export type IdentifyVerificationRequest = {
   challengeKind: ChallengeKind;
@@ -9,6 +9,7 @@ export type IdentifyVerificationRequest = {
 };
 
 export type IdentifyVerificationResponse = {
+  kind: UserKind;
   authToken: string;
 };
 
