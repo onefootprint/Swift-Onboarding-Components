@@ -150,7 +150,7 @@ Here's how to get talking to the DB:
 
 3. We use Tailscale SSH so you need no credentials aside from your tailscale login!
    
-4. Now, you have the credentials and the IP. Open a shell on the jumpbox with and pop a psql shell:
+4. Now, you have the credentials and the IP. Open a shell **warning -- tailscale ssh does not work with the Warp terminal, there is currently a bug. Use a different shell** on the jumpbox with and pop a psql shell:
 
 ```bash
 $ ssh ec2-user@jumpbox-dev
