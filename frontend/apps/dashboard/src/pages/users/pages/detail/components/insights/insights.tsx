@@ -1,6 +1,8 @@
 import GoogleMapReact from 'google-map-react';
 import IcoAndroidColored24 from 'icons/ico/ico-android-colored-24';
 import IcoAppleColored24 from 'icons/ico/ico-apple-colored-24';
+import IcoCheckCircle16 from 'icons/ico/ico-check-circle-16';
+import IcoClose16 from 'icons/ico/ico-close-16';
 import IcoCode24 from 'icons/ico/ico-code-24';
 import IcoLaptop24 from 'icons/ico/ico-laptop-24';
 import IcoPhone24 from 'icons/ico/ico-phone-24';
@@ -143,9 +145,23 @@ const Insights = ({ user }: InsightsProps) => {
               <Typography variant="label-3" color="tertiary">
                 Biometric
               </Typography>
-              <Typography variant="body-3">
-                {biometricCred ? 'Verified' : 'Not verified'}
-              </Typography>
+              <Box sx={{ display: 'flex', gap: 3, alignItems: 'center' }}>
+                {biometricCred ? (
+                  <>
+                    <IcoCheckCircle16 color="success" />
+                    <Typography variant="body-3" color="success">
+                      Verified
+                    </Typography>
+                  </>
+                ) : (
+                  <>
+                    <IcoClose16 color="error" />
+                    <Typography variant="body-3" color="error">
+                      Not verified
+                    </Typography>
+                  </>
+                )}
+              </Box>
             </Row>
             {getRegionForInsightEvent(insightEvent) && (
               <Row>
