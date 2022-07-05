@@ -18,7 +18,8 @@ import ProgressHeader from '../../components/progress-header';
 import useOnboardingMachine from '../../hooks/use-onboarding-machine';
 import useSyncData from '../../hooks/use-sync-data';
 import useInputValidations from './hooks/use-input-validations';
-import getInitialCountry from './residential-address.utils';
+import getAddressComponent from './utils/get-address-components';
+import getInitialCountry from './utils/get-initial-country';
 
 type FormData = {
   [UserDataAttribute.streetAddress]: string;
@@ -41,6 +42,8 @@ const ResidentialAddress = () => {
     handleSubmit,
     formState: { errors },
     setFocus,
+    setValue,
+    resetField,
   } = useForm<FormData>({
     defaultValues: {
       [UserDataAttribute.country]: getInitialCountry(
@@ -75,6 +78,40 @@ const ResidentialAddress = () => {
     syncDataMutation(residentialAddress);
   };
 
+  const handleCountryChange = () => {
+    setFocus(UserDataAttribute.streetAddress);
+    resetField(UserDataAttribute.streetAddress);
+    resetField(UserDataAttribute.streetAddress2);
+    resetField(UserDataAttribute.city);
+    resetField(UserDataAttribute.state);
+    resetField(UserDataAttribute.zip);
+  };
+
+  const handleAddressSelect = async (
+    prediction?: google.maps.places.AutocompletePrediction | null,
+  ) => {
+    if (prediction) {
+      const formattedStreetAddress =
+        prediction?.structured_formatting.main_text;
+      if (formattedStreetAddress) {
+        setValue(UserDataAttribute.streetAddress, formattedStreetAddress);
+      }
+
+      const result = await getAddressComponent(prediction);
+      if (result) {
+        if (result.city) {
+          setValue(UserDataAttribute.city, result.city);
+        }
+        if (result.state) {
+          setValue(UserDataAttribute.state, result.state);
+        }
+        if (result.zip) {
+          setValue(UserDataAttribute.zip, result.zip);
+        }
+      }
+    }
+  };
+
   return (
     <>
       <ProgressHeader />
@@ -89,7 +126,7 @@ const ResidentialAddress = () => {
               onBlur={field.onBlur}
               onChange={nextValue => {
                 field.onChange(nextValue);
-                setFocus(UserDataAttribute.streetAddress);
+                handleCountryChange();
               }}
               placeholder={t('form.country.placeholder')}
               value={field.value}
@@ -101,6 +138,7 @@ const ResidentialAddress = () => {
           hasError={!!errors.streetAddress}
           hintText={errors.streetAddress && t('form.address-line-1.error')}
           label={t('form.address-line-1.label')}
+          onSelect={handleAddressSelect}
           placeholder={t('form.address-line-1.placeholder')}
           {...register(UserDataAttribute.streetAddress, { required: true })}
         />

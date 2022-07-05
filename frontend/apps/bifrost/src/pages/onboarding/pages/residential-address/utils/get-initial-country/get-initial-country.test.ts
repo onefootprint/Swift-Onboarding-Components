@@ -1,4 +1,4 @@
-import getInitialCountry from './residential-address.utils';
+import getInitialCountry from './get-initial-country';
 
 describe('getInitialCountry', () => {
   it('should return the default country if no country is passed in', () => {

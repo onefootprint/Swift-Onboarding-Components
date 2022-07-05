@@ -10,15 +10,15 @@ import type { CountryCode } from 'types';
 import usePlacesAutocomplete from 'use-places-autocomplete';
 
 import Input, { InputProps } from '../internal/input';
-import type { Item } from './adress-input.types';
+import type { Prediction } from './address-input.types';
 import AddressDropdownFooter from './components/address-dropdown-footer';
 import AddressDropdownItem from './components/address-dropdown-item';
 import usePopper from './hooks/use-popper';
 
 const MAX_OF_RESULTS = 5;
 
-export type AddressInputProps = InputProps & {
-  onSelect?: (item?: Item | null) => void;
+export type AddressInputProps = Omit<InputProps, 'onSelect'> & {
+  onSelect?: (prediction?: Prediction | null) => void;
   country?: CountryCode;
 };
 
@@ -48,7 +48,6 @@ const AddressInput = forwardRef<HTMLInputElement, AddressInputProps>(
           country,
         },
       },
-      debounce: 300,
     });
     const options = take(data, MAX_OF_RESULTS);
     const {
@@ -99,7 +98,7 @@ const AddressInput = forwardRef<HTMLInputElement, AddressInputProps>(
       onKeyDown(event);
     };
 
-    const renderAddressItem = (item: Item, index: number) => {
+    const renderAddressItem = (item: Prediction, index: number) => {
       const itemProps = getItemProps({ item, index });
       return (
         <AddressDropdownItem
