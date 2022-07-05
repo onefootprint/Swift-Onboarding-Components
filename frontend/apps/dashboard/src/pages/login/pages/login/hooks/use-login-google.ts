@@ -1,6 +1,5 @@
 import { useMutation } from 'react-query';
 import request, { RequestError, RequestResponse } from 'request';
-import { GOOGLE_REDIRECT_URL } from 'src/config/constants';
 
 export type GoogleLoginResponse = {
   redirectUrl: string;
@@ -12,7 +11,7 @@ const loginGoogle = async () => {
   >({
     method: 'GET',
     url: '/auth/google_oauth',
-    params: { redirect_url: `${GOOGLE_REDIRECT_URL}/auth` },
+    params: { redirect_url: `${window.location.origin}/auth` },
   });
   return response.data;
 };
