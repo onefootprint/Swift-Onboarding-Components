@@ -93,7 +93,7 @@ async fn handler(
     user_auth: EitherSession<OnboardingSession, My1fpBasicSession>,
     request: web::Json<UserPatchRequest>,
 ) -> actix_web::Result<Json<ApiResponseData<String>>, ApiError> {
-    let _ = update(
+    update(
         &user_auth,
         &state,
         request.into_inner().into_vec().into_iter().collect(),
@@ -121,7 +121,7 @@ pub async fn update<C: HasVaultPermission>(
     // TODO: distinguish between UPDATE and CREATE (for onboarding vs modification)
     let data_kinds: Vec<DataKind> = values.keys().copied().collect();
     if !context.can_update(&data_kinds) {
-        Err(AuthError::UnauthorizedOperation)?
+        return Err(AuthError::UnauthorizedOperation.into());
     }
 
     let mut data_to_insert = Vec::<DataUpdateRequest>::new();

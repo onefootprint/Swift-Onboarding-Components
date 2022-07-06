@@ -79,7 +79,7 @@ impl FromStr for PhoneNumber {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         // sanitize by removing excess chars + checking length
-        let number = s.chars().filter(|char| char.is_digit(10)).collect::<String>();
+        let number = s.chars().filter(|c| c.is_ascii_digit()).collect::<String>();
         let sanitized = match number.len() {
             7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 => Ok(number),
             _ => Err(crate::Error::InvalidPhoneNumber),

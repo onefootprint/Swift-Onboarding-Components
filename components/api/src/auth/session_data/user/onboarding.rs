@@ -21,7 +21,7 @@ impl TryFrom<SessionData> for OnboardingSession {
     fn try_from(value: SessionData) -> Result<Self, Self::Error> {
         match value {
             SessionData::Onboarding(data) => Ok(data),
-            _ => Err(AuthError::SessionTypeError)?,
+            _ => Err(AuthError::SessionTypeError.into()),
         }
     }
 }

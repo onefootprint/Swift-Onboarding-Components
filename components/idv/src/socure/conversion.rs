@@ -79,7 +79,7 @@ impl TryFrom<(IdentifyRequest, Vec<String>)> for SocureRequest {
         // are optional, but it can't contain spaces (which we allow)
         // filter only for digits & check length before sending
         let zip = zip.leak_to_string();
-        let numeric_zip: String = zip.chars().into_iter().filter(|c| c.is_digit(10)).collect();
+        let numeric_zip: String = zip.chars().into_iter().filter(|c| c.is_ascii_digit()).collect();
         if numeric_zip.len() != 9 && numeric_zip.len() != 5 {
             return Err(crate::SocureConversionError::UnsupportedZipFormat.into());
         }

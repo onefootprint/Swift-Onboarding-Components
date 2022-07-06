@@ -80,7 +80,7 @@ impl ServerSession {
         let unsealed: PrivateServerSession = key.unseal(sealed.as_ref())?;
 
         if unsealed.expires_at < Utc::now().naive_utc() {
-            return Err(AuthError::SessionExpired)?;
+            return Err(AuthError::SessionExpired.into());
         }
         Ok(Self {
             expires_at: unsealed.expires_at,

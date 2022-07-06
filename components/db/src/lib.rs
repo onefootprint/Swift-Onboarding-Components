@@ -7,6 +7,8 @@ extern crate diesel;
 extern crate diesel_migrations;
 
 pub mod errors;
+
+#[allow(clippy::extra_unused_lifetimes)]
 pub mod models;
 
 use std::time::Duration;
@@ -98,8 +100,7 @@ pub fn run_migrations(url: &str) -> Result<(), DbError> {
 }
 
 pub async fn health_check(pool: &DbPool) -> Result<(), DbError> {
-    let _ = pool
-        .db_query(move |conn| diesel::sql_query("SELECT 1").execute(conn))
+    pool.db_query(move |conn| diesel::sql_query("SELECT 1").execute(conn))
         .await??;
 
     Ok(())

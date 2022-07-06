@@ -22,7 +22,7 @@ impl std::str::FromStr for Ssn {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         // sanitize by removing excess chars + checking length
-        let number = s.chars().filter(|char| char.is_digit(10)).collect::<String>();
+        let number = s.chars().filter(|char| char.is_ascii_digit()).collect::<String>();
         if number.len() != 9 {
             return Err(crate::Error::InvalidSsn);
         }
@@ -63,7 +63,7 @@ impl std::str::FromStr for LastFourSsn {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         // sanitize by removing excess chars + checking length
-        let number = s.chars().filter(|char| char.is_digit(10)).collect::<String>();
+        let number = s.chars().filter(|char| char.is_ascii_digit()).collect::<String>();
         if number.len() != 4 {
             return Err(crate::Error::InvalidSsn);
         }

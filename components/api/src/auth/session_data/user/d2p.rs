@@ -23,7 +23,7 @@ impl TryFrom<SessionData> for D2pSession {
     fn try_from(value: SessionData) -> Result<Self, Self::Error> {
         match value {
             SessionData::D2p(data) => Ok(data),
-            _ => Err(AuthError::SessionTypeError)?,
+            _ => Err(AuthError::SessionTypeError.into()),
         }
     }
 }

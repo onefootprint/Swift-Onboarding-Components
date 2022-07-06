@@ -82,18 +82,17 @@ impl NewObConfiguration {
 
 impl UpdateObConfiguration {
     pub async fn update(self, pool: &DbPool) -> Result<(), crate::DbError> {
-        let _ = pool
-            .db_query(move |conn| -> Result<(), crate::DbError> {
-                let _ = diesel::update(
-                    ob_configurations::table
-                        .filter(ob_configurations::key.eq(self.key.clone()))
-                        .filter(ob_configurations::tenant_id.eq(self.tenant_id.clone())),
-                )
-                .set(self)
-                .execute(conn)?;
-                Ok(())
-            })
-            .await??;
+        pool.db_query(move |conn| -> Result<(), crate::DbError> {
+            diesel::update(
+                ob_configurations::table
+                    .filter(ob_configurations::key.eq(self.key.clone()))
+                    .filter(ob_configurations::tenant_id.eq(self.tenant_id.clone())),
+            )
+            .set(self)
+            .execute(conn)?;
+            Ok(())
+        })
+        .await??;
         Ok(())
     }
 }

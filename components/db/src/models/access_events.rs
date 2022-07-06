@@ -43,26 +43,25 @@ struct NewAccessEventWithInsight {
 
 impl NewAccessEvent {
     pub async fn save(self, pool: &DbPool) -> Result<(), crate::DbError> {
-        let _ = pool
-            .db_query(move |conn| {
-                conn.transaction(|conn| -> Result<(), DbError> {
-                    let insight_ev = self.insight.insert_with_conn(conn)?;
-                    let event = NewAccessEventWithInsight {
-                        data_kinds: self.data_kinds,
-                        onboarding_id: self.onboarding_id,
-                        insight_event_id: insight_ev.id,
-                        reason: self.reason,
-                        principal: self.principal,
-                    };
+        pool.db_query(move |conn| {
+            conn.transaction(|conn| -> Result<(), DbError> {
+                let insight_ev = self.insight.insert_with_conn(conn)?;
+                let event = NewAccessEventWithInsight {
+                    data_kinds: self.data_kinds,
+                    onboarding_id: self.onboarding_id,
+                    insight_event_id: insight_ev.id,
+                    reason: self.reason,
+                    principal: self.principal,
+                };
 
-                    let _ = diesel::insert_into(crate::schema::access_events::table)
-                        .values(event)
-                        .execute(conn)?;
+                diesel::insert_into(crate::schema::access_events::table)
+                    .values(event)
+                    .execute(conn)?;
 
-                    Ok(())
-                })
+                Ok(())
             })
-            .await??;
+        })
+        .await??;
         Ok(())
     }
 }

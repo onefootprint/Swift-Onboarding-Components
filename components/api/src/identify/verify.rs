@@ -97,7 +97,7 @@ fn validate_biometric_challenge(
     // Decode and validate the response to the biometric challenge
     let webauthn = LivenessWebauthnConfig::new(state);
     let auth_resp = serde_json::from_str(challenge_response)?;
-    let _ = webauthn
+    webauthn
         .webauthn()
         .authenticate_credential(&auth_resp, &challenge_state.state)?;
 

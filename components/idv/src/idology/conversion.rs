@@ -128,7 +128,7 @@ impl TryFrom<(IdentifyRequest, SocureUsername, SocurePassword)> for IdologyReque
 
         // per idology API, zip code must be 5 digits
         let zip = zip.leak_to_string();
-        let numeric_zip: String = zip.chars().into_iter().filter(|c| c.is_digit(10)).collect();
+        let numeric_zip: String = zip.chars().into_iter().filter(|c| c.is_ascii_digit()).collect();
         if numeric_zip.len() != 5 {
             return Err(IdologyConversionError::UnsupportedZipFormat.into());
         }

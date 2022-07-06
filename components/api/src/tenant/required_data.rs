@@ -1,8 +1,8 @@
 use std::collections::HashSet;
 
-use crate::auth::session_data::tenant::secret_key::SecretTenantAuthContext;
 use crate::auth::either::Either;
-use crate::auth::session_context::{SessionContext, HasTenant};
+use crate::auth::session_context::{HasTenant, SessionContext};
+use crate::auth::session_data::tenant::secret_key::SecretTenantAuthContext;
 use crate::auth::session_data::tenant::workos::WorkOsSession;
 use crate::types::success::ApiResponseData;
 use crate::State;
@@ -35,7 +35,7 @@ fn set(
 ) -> actix_web::Result<Json<ApiResponseData<Empty>>, ApiError> {
     let tenant = auth.tenant(&state.db_pool).await?;
 
-    let _ = UpdateObConfiguration {
+    UpdateObConfiguration {
         required_user_data: Some(request.attributes.clone().into_iter().collect()),
         tenant_id: tenant.id.clone(),
         key: request.configuration_key.clone(),

@@ -24,7 +24,7 @@ impl TryFrom<SessionData> for My1fpBasicSession {
     fn try_from(value: SessionData) -> Result<Self, Self::Error> {
         match value {
             SessionData::My1fp(data) => Ok(data),
-            _ => Err(AuthError::SessionTypeError)?,
+            _ => Err(AuthError::SessionTypeError.into()),
         }
     }
 }

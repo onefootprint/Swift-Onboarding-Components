@@ -125,7 +125,7 @@ pub(crate) async fn send_email_challenge(
     // add unique url query param to avoid incorrect caching by browser/client
     let unique_param = gen_random_alphanumeric_code(5);
     let curl_request_str = format!("https://verify.ui.footprint.dev/?v={}#{}", unique_param, token);
-    let _output = state
+    state
         .sendgrid_client
         .send_with_challenge_template(email_address, curl_request_str)
         .await?;

@@ -50,7 +50,7 @@ pub struct NewUserDataBatch(pub Vec<NewUserData>);
 
 impl NewUserDataBatch {
     pub fn bulk_insert(self, conn: &mut PgConnection) -> Result<(), crate::DbError> {
-        let _: usize = diesel::insert_into(user_data::table)
+        diesel::insert_into(user_data::table)
             .values(self.0)
             .execute(conn)?;
         Ok(())
