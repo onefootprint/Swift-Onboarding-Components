@@ -6,7 +6,7 @@ export const getInitialCountry = (initialCountryCode?: CountryCode) => {
     const possibleCountry = COUNTRIES.find(
       country => country.value === initialCountryCode,
     );
-    return possibleCountry || possibleCountry;
+    return possibleCountry || DEFAULT_COUNTRY;
   }
   return DEFAULT_COUNTRY;
 };
