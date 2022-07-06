@@ -1,6 +1,6 @@
-import { AccessEvent } from '@src/types';
 import React, { useEffect } from 'react';
 import Timeline from 'src/components/timeline';
+import { AccessEvent } from 'src/types';
 import styled, { css } from 'styled-components';
 import { Box, Divider, SearchInput, Typography } from 'ui';
 

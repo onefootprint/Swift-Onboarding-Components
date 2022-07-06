@@ -1,6 +1,6 @@
-import { DateRange, dateRangeToDisplayText } from '@src/types';
 import React from 'react';
 import { FieldErrors, UseFormRegister, UseFormWatch } from 'react-hook-form';
+import { DateRange, dateRangeToDisplayText } from 'src/types';
 import { Box, RadioInput, TextInput } from 'ui';
 
 import { DateRangeSelectorFormValues } from './date-range-selector.types';

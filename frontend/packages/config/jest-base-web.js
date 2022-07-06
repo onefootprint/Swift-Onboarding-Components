@@ -1,6 +1,6 @@
 module.exports = {
   resetMocks: true,
-  moduleDirectories: ['node_modules'],
+  moduleDirectories: ['node_modules', '<rootDir>'],
   testEnvironment: 'jsdom',
   setupFilesAfterEnv: ['@testing-library/jest-dom'],
   collectCoverageFrom: ['**/src/**/*.{js,ts,jsx,tsx}'],
