@@ -9,7 +9,7 @@ import EmailIdentification from './email-identification';
 import Init from './init';
 import Onboarding from './onboarding';
 import OnboardingSuccess from './onboarding-success/onboarding-success';
-import PhoneIdentification from './phone-identification';
+import PhoneRegistration from './phone-registration';
 import PhoneVerification from './phone-verification';
 import TenantInvalid from './tenant-invalid';
 import VerificationSuccess from './verification-success';
@@ -28,7 +28,7 @@ const Root = () => {
     [States.emailIdentification]: EmailIdentification,
     [States.confirmAndAuthorize]: ConfirmAndAuthorize,
     [States.verificationSuccess]: VerificationSuccess,
-    [States.phoneIdentification]: PhoneIdentification,
+    [States.phoneRegistration]: PhoneRegistration,
     [States.phoneVerification]: PhoneVerification,
     [States.biometricLoginRetry]: BiometricLoginRetry,
 

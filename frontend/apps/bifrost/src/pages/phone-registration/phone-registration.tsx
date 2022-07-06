@@ -15,10 +15,10 @@ type FormData = {
   phone: string;
 };
 
-const PhoneIdentification = () => {
+const PhoneRegistration = () => {
   const showRequestErrorToast = useRequestErrorToast();
   const [state, send] = useBifrostMachine();
-  const { t } = useTranslation('pages.phone-identification');
+  const { t } = useTranslation('pages.phone-registration');
   const {
     setValue,
     register,
@@ -181,4 +181,4 @@ const StyledIcoEmail24 = styled(IcoEmail24)`
   `}
 `;
 
-export default PhoneIdentification;
+export default PhoneRegistration;

@@ -16,7 +16,7 @@ export enum States {
   // Identify
   emailIdentification = 'emailIdentification',
   verificationSuccess = 'verificationSuccess',
-  phoneIdentification = 'phoneIdentification',
+  phoneRegistration = 'phoneRegistration',
 
   // Challenge
   qrLogin = 'qrLogin',

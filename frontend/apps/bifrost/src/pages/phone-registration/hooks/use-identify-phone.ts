@@ -1,4 +1,3 @@
-// WARNING: DO NOT EDIT! THIS FILE WILL BE DELETED
 import { useMutation } from 'react-query';
 import request, { RequestError, RequestResponse } from 'request';
 
