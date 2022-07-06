@@ -19,11 +19,11 @@ describe('D2PMobile Machine Tests', () => {
     });
   });
 
-  describe('Correctly assigns authToken following Events.authTokenGotten', () => {
+  describe('Correctly assigns authToken following Events.authTokenReceived', () => {
     it('Auth token in States.init gets set correctly in context', () => {
       const authToken = 'testAuthToken';
       const state = d2pMobileMachine.transition(States.init, {
-        type: Events.authTokenGotten,
+        type: Events.authTokenReceived,
         payload: {
           authToken,
         },
@@ -35,7 +35,7 @@ describe('D2PMobile Machine Tests', () => {
     it('Auth token in States.expired gets set correctly in context', () => {
       const authToken = 'testAuthToken';
       const state = d2pMobileMachine.transition(States.expired, {
-        type: Events.authTokenGotten,
+        type: Events.authTokenReceived,
         payload: {
           authToken,
         },

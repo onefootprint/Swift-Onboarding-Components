@@ -16,7 +16,7 @@ const d2pMobileMachine = createMachine<D2PContext, D2PEvent>(
     states: {
       [States.init]: {
         on: {
-          [Events.authTokenGotten]: {
+          [Events.authTokenReceived]: {
             actions: [Actions.assignAuthToken],
           },
           [Events.deviceInfoIdentified]: [
@@ -76,7 +76,7 @@ const d2pMobileMachine = createMachine<D2PContext, D2PEvent>(
       },
       [States.expired]: {
         on: {
-          [Events.authTokenGotten]: {
+          [Events.authTokenReceived]: {
             target: States.register,
             actions: [Actions.assignAuthToken],
           },
@@ -96,7 +96,7 @@ const d2pMobileMachine = createMachine<D2PContext, D2PEvent>(
         return context;
       }),
       [Actions.assignAuthToken]: assign((context, event) => {
-        if (event.type === Events.authTokenGotten) {
+        if (event.type === Events.authTokenReceived) {
           context.authToken = event.payload.authToken;
         }
         return context;

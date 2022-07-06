@@ -11,7 +11,7 @@ const useAuthToken = () => {
   useEffect(() => {
     if (authToken) {
       send({
-        type: Events.authTokenGotten,
+        type: Events.authTokenReceived,
         payload: {
           authToken,
         },
