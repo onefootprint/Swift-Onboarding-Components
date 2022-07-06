@@ -3,6 +3,15 @@
     "errors": {}
   },
   "pages": {
+    "login": {
+      "instructions": "Sign up or log in to your identity wallet",
+      "footer": {
+        "by-continuing": "By continuing you agree to our",
+        "terms-of-service": "Terms of Service",
+        "and": "and",
+        "privacy-policy": "Privacy Policy"
+      }
+    },
     "my-footprint-identity": {
       "basic": {
         "title": "Basic",
