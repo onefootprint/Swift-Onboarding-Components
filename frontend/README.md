@@ -49,6 +49,7 @@ to enforce more constraints on WebAuthn, each app has its own port:
 | D2P Mobile          | 3005 |
 | Email Verification  | 3006 |
 | UI Docs - Storybook | 3007 |
+| My One Footprint    | 3008 |
 
 ### Build
 
