@@ -39,4 +39,6 @@ features = ["postgres", "serde", "postgres"]
 [dependencies.deadpool]
 git = "https://github.com/bikeshedder/deadpool"
 rev = "f929e298383f022439575ea492d9a87e8de18ea2"
+default-features = false
+features = ["managed"] 
 

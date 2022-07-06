@@ -68,6 +68,18 @@ pub fn init(url: &str) -> Result<DbPool, DbError> {
         .runtime(Runtime::Tokio1)
         .recycle_timeout(Some(Duration::from_secs(1)))
         .create_timeout(Some(Duration::from_secs(1)))
+        .pre_recycle(Hook::sync_fn(move |_, metrics| {
+            let recycled = metrics.created.duration_since(init_instant).as_secs();
+            let created = metrics.created.duration_since(init_instant).as_secs();
+
+            tracing::info!(
+                db.pool.recycle_count = metrics.recycle_count,
+                db.pool.created_secs_ago = created,
+                db.pool.recycled_secs_ago = recycled,
+                "db_pool.pre_recycle"
+            );
+            Ok(())
+        }))
         .post_create(Hook::sync_fn(move |_, metrics| {
             let created = metrics.created.duration_since(init_instant).as_secs();
             tracing::info!(db.pool.created_secs_ago = created, "db_pool.post_create");
@@ -77,7 +89,7 @@ pub fn init(url: &str) -> Result<DbPool, DbError> {
             let recycled = metrics.created.duration_since(init_instant).as_secs();
             let created = metrics.created.duration_since(init_instant).as_secs();
 
-            tracing::debug!(
+            tracing::info!(
                 db.pool.recycle_count = metrics.recycle_count,
                 db.pool.created_secs_ago = created,
                 db.pool.recycled_secs_ago = recycled,
