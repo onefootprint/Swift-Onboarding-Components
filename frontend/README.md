@@ -45,11 +45,10 @@ to enforce more constraints on WebAuthn, each app has its own port:
 | Dashboard           | 3001 |
 | Demo                | 3002 |
 | Frontpage           | 3003 |
-| Identity Wallet     | 3004 |
+| My One Footprint    | 3004 |
 | D2P Mobile          | 3005 |
 | Email Verification  | 3006 |
 | UI Docs - Storybook | 3007 |
-| My One Footprint    | 3008 |
 
 ### Build
 
