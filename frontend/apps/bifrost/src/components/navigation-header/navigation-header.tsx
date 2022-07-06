@@ -10,7 +10,7 @@ export type NavigationHeaderProps = {
   button: {
     variant: 'back' | 'close';
     onClick?: () => void;
-    confirm?: boolean;
+    confirmClose?: boolean;
   };
 };
 
@@ -20,7 +20,7 @@ const NavigationHeader = ({ children, button }: NavigationHeaderProps) => (
       <Box>
         {button.variant === 'close' && (
           <NavigationCloseButton
-            confirm={button.confirm}
+            confirm={button.confirmClose}
             onClick={button.onClick}
           />
         )}

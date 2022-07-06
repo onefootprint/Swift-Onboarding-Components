@@ -50,7 +50,7 @@ const NewTabProcessing = () => {
 
   return (
     <>
-      <NavigationHeader button={{ variant: 'close', confirm: true }} />
+      <NavigationHeader button={{ variant: 'close', confirmClose: true }} />
       <Container>
         <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
         <LoadingIndicator />
