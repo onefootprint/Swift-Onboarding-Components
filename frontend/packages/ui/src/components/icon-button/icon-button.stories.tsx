@@ -19,7 +19,7 @@ export default {
       description: 'Callback function triggered upon click',
       required: false,
     },
-    Icon: {
+    iconComponent: {
       control: 'select',
       description: 'Icon to be rendered',
       options: Object.keys(icos),
@@ -37,19 +37,19 @@ export default {
 } as ComponentMeta<typeof IconButton>;
 
 const Template: Story<IconButtonProps> = ({
-  iconComponent: Icon,
   'aria-label': ariaLabel,
-  onClick,
   disabled,
+  iconComponent: Icon,
+  onClick,
   testID,
 }: IconButtonProps) => {
   const SelectedIcon = typeof Icon === 'string' ? icos[Icon] : Icon;
   return (
     <IconButton
       aria-label={ariaLabel}
+      disabled={disabled}
       iconComponent={SelectedIcon}
       onClick={onClick}
-      disabled={disabled}
       testID={testID}
     />
   );
