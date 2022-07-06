@@ -1,8 +1,11 @@
-use crate::errors::ApiError;
-use crate::tenant::workos::LinkAuthResponse;
 use crate::types::success::ApiResponseData;
 use crate::State;
+use crate::{errors::ApiError, types::Empty};
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
+use workos::passwordless::{
+    CreatePasswordlessSession, CreatePasswordlessSessionParams, CreatePasswordlessSessionType,
+    SendPasswordlessSession, SendPasswordlessSessionParams,
+};
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize, Apiv2Schema)]
 struct LinkAuthRequest {
@@ -17,15 +20,26 @@ struct LinkAuthRequest {
 fn handler(
     state: web::Data<State>,
     request: Json<LinkAuthRequest>,
-) -> actix_web::Result<Json<ApiResponseData<LinkAuthResponse>>, ApiError> {
+) -> actix_web::Result<Json<ApiResponseData<Empty>>, ApiError> {
     // extract code
     let email = &request.email_address;
 
     // initialize WorkOS session & send link to user via email
-    let session_id = &state.workos_client.post_session(email.to_owned()).await?;
-    let link_auth_response = &state.workos_client.post_send_link(session_id.to_owned()).await?;
-
-    Ok(Json(ApiResponseData {
-        data: link_auth_response.to_owned(),
-    }))
+    let passwordless_session = &state
+        .workos_client
+        .passwordless()
+        .create_passwordless_session(&CreatePasswordlessSessionParams {
+            r#type: CreatePasswordlessSessionType::MagicLink { email },
+            redirect_uri: None,
+            state: None,
+        })
+        .await?;
+    state
+        .workos_client
+        .passwordless()
+        .send_passwordless_session(&SendPasswordlessSessionParams {
+            id: &passwordless_session.id,
+        })
+        .await?;
+    Ok(Json(ApiResponseData { data: Empty }))
 }

@@ -7,16 +7,17 @@ use enclave_proxy::{
     pool, StreamManager,
 };
 use signed_hash::SignedHashClient;
-use std::{borrow::Cow, time::Duration};
+use std::{borrow::Cow, sync::Arc, time::Duration};
 use telemetry::TelemetrySpanBuilder;
 use tracing_actix_web::TracingLogger;
 use utils::email::SendgridClient;
+use workos::{ApiKey, WorkOs};
 mod config;
 mod errors;
 mod signed_hash;
 mod telemetry;
 
-use crate::{errors::ApiError, tenant::workos::WorkOSClient, utils::twilio::TwilioClient};
+use crate::{errors::ApiError, utils::twilio::TwilioClient};
 
 // TODO put IAM roles and permissions in pulumi
 
@@ -39,7 +40,7 @@ pub struct State {
     config: Config,
     kms_client: aws_sdk_kms::Client,
     hmac_client: SignedHashClient,
-    workos_client: WorkOSClient,
+    workos_client: Arc<WorkOs>,
     twilio_client: TwilioClient,
     sendgrid_client: SendgridClient,
     db_pool: DbPool,
@@ -106,11 +107,7 @@ async fn main() -> std::io::Result<()> {
             key_id: config.signing_root_key_id.clone(),
         };
 
-        let workos_client = WorkOSClient::new(
-            config.workos_client_id.clone(),
-            config.workos_default_org.clone(),
-            config.workos_api_key.clone(),
-        );
+        let workos_client = WorkOs::new(&ApiKey::from(config.workos_api_key.as_str()));
 
         let twilio_client = TwilioClient::new(
             config.twilio_acount_sid.clone(),
@@ -134,7 +131,7 @@ async fn main() -> std::io::Result<()> {
         // dbg!(crypto::hex::encode(&out));
 
         // run migrations
-        let _ = db::run_migrations(&config.database_url).unwrap();
+        db::run_migrations(&config.database_url).unwrap();
 
         // then create the pool
         let db_pool = db::init(&config.database_url).map_err(ApiError::from).unwrap();
@@ -158,7 +155,7 @@ async fn main() -> std::io::Result<()> {
             enclave_connection_pool: pool,
             kms_client,
             hmac_client,
-            workos_client,
+            workos_client: Arc::new(workos_client),
             twilio_client,
             sendgrid_client,
             db_pool,

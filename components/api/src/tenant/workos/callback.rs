@@ -1,6 +1,5 @@
 use crate::auth::session_data::tenant::workos::WorkOsSession;
 use crate::auth::session_data::{ServerSession, SessionData};
-use crate::tenant::workos::WorkOSProfile;
 use crate::State;
 use crate::{errors::ApiError, types::success::ApiResponseData};
 use actix_session::Session;
@@ -9,16 +8,13 @@ use db::tenant::get_opt_by_workos_id;
 use newtypes::SessionAuthToken;
 use paperclip::actix::Apiv2Schema;
 use paperclip::actix::{api_v2_operation, get, web, web::Json};
+use workos::sso::{
+    AuthorizationCode, ClientId, GetProfileAndToken, GetProfileAndTokenParams, GetProfileAndTokenResponse,
+};
 
 #[derive(serde::Deserialize, Apiv2Schema)]
 struct Code {
     code: String,
-}
-
-#[derive(serde::Serialize, Apiv2Schema)]
-struct DashboardAuthorization {
-    authorization: String,
-    profile: WorkOSProfile,
 }
 
 #[derive(serde::Serialize, Apiv2Schema)]
@@ -40,7 +36,14 @@ fn handler(
 ) -> actix_web::Result<Json<ApiResponseData<DashboardAuthorizationResponse>>, ApiError> {
     let code = &code.code;
 
-    let profile = &state.workos_client.get_profile(code.to_owned()).await?;
+    let GetProfileAndTokenResponse { profile, .. } = &state
+        .workos_client
+        .sso()
+        .get_profile_and_token(&GetProfileAndTokenParams {
+            client_id: &ClientId::from(state.config.workos_client_id.as_str()),
+            code: &AuthorizationCode::from(code.to_owned()),
+        })
+        .await?;
 
     // Magic link auth isn't actually associated with an org, so manually
     // set it to Footprint org identifier doesn't exist for now
@@ -48,10 +51,10 @@ fn handler(
     let org_id = profile
         .clone()
         .organization_id
-        .unwrap_or_else(|| state.workos_client.default_org.clone());
+        .map(|org_id| org_id.to_string())
+        .unwrap_or_else(|| state.config.workos_default_org.clone());
 
-    // TODO change error
-    let tenant = get_opt_by_workos_id(&state.db_pool, org_id.clone())
+    let tenant = get_opt_by_workos_id(&state.db_pool, org_id)
         .await?
         .ok_or(ApiError::WorkOsProfileInvalid)?;
 

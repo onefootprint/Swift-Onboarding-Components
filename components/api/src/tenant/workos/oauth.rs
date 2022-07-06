@@ -2,6 +2,7 @@ use crate::State;
 use crate::{errors::ApiError, types::success::ApiResponseData};
 use actix_web::web::Json;
 use paperclip::actix::{api_v2_operation, get, web, Apiv2Schema};
+use workos::sso::{ClientId, ConnectionSelector, GetAuthorizationUrl, GetAuthorizationUrlParams, Provider};
 
 #[derive(serde::Serialize, Apiv2Schema)]
 struct GoogleOauthResponse {
@@ -23,16 +24,19 @@ fn handler(
 ) -> actix_web::Result<Json<ApiResponseData<GoogleOauthResponse>>, ApiError> {
     let redirect_url = &redirect_url.redirect_url;
 
-    let provider = "GoogleOAuth";
-
-    let redirect_url = &state
+    let authorization_url = &state
         .workos_client
-        .get_authorization_url(provider.to_owned(), redirect_url.to_owned())
-        .await?;
+        .sso()
+        .get_authorization_url(&GetAuthorizationUrlParams {
+            client_id: &ClientId::from(state.config.workos_client_id.as_str()),
+            redirect_uri: redirect_url,
+            connection_selector: ConnectionSelector::Provider(&Provider::GoogleOauth),
+            state: None,
+        })?;
 
     Ok(Json(ApiResponseData {
         data: GoogleOauthResponse {
-            redirect_url: redirect_url.to_owned(),
+            redirect_url: authorization_url.to_string(),
         },
     }))
 }

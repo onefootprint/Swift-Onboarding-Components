@@ -141,8 +141,8 @@ table! {
     use newtypes::db_types::*;
 
     user_data (id) {
-        id -> Varchar,
-        user_vault_id -> Varchar,
+        id -> Text,
+        user_vault_id -> Text,
         data_kind -> Text,
         e_data -> Bytea,
         sh_data -> Nullable<Bytea>,

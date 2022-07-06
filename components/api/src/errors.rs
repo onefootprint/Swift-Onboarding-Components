@@ -12,6 +12,11 @@ use enclave_proxy::bb8;
 use paperclip::v2::schema::Apiv2Errors;
 use thiserror::Error;
 use webauthn_rs_core::error::WebauthnError;
+use workos::{
+    passwordless::{CreatePasswordlessSessionError, SendPasswordlessSessionError},
+    sso::GetProfileAndTokenError,
+    WorkOsError,
+};
 
 use crate::types::error::{ApiResponseError, ApiResponseErrorInfo};
 
@@ -77,10 +82,14 @@ pub enum ApiError {
     WebauthnCredentialsNotSet,
     #[error("Please wait {0} more seconds")]
     RateLimited(i64),
-    #[error("error from workos: {0}")]
-    WorkOsError(String),
-    #[error("workos payload error: {0}")]
-    WorkOsPayload(#[from] actix_web::error::PayloadError),
+    #[error("error creating workos passwordless session: {0}")]
+    WorkOsPasswordlessError(#[from] WorkOsError<CreatePasswordlessSessionError>),
+    #[error("error sending email for workos passwordless session: {0}")]
+    WorkOsPasswordlessSendError(#[from] WorkOsError<SendPasswordlessSessionError>),
+    #[error("workos profile error: {0}")]
+    WorkOsProfileError(#[from] WorkOsError<GetProfileAndTokenError>),
+    #[error("workos authorization url error: {0}")]
+    WorkOsAuthorizationUrlError(#[from] url::ParseError),
     #[error("invalid redirect header returned")]
     WorkOsRedirectError(#[from] actix_web::http::header::ToStrError),
     #[error("invalid response from WorkOS")]
@@ -157,8 +166,6 @@ impl actix_web::ResponseError for ApiError {
             ApiError::KmsVerifyMacError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::WebauthnCredentialsNotSet => StatusCode::BAD_REQUEST,
             ApiError::RateLimited(_) => StatusCode::BAD_REQUEST,
-            ApiError::WorkOsError(_) => StatusCode::INTERNAL_SERVER_ERROR,
-            ApiError::WorkOsPayload(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::WorkOsRedirectError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::WorkOSError => StatusCode::INTERNAL_SERVER_ERROR,
             // This invariant should never be broken
@@ -174,6 +181,10 @@ impl actix_web::ResponseError for ApiError {
             ApiError::NewtypeError(_) => StatusCode::BAD_REQUEST,
             ApiError::EmailVerificationTokenInvalidOrNotFound => StatusCode::BAD_REQUEST,
             ApiError::BadValidateToken | ApiError::ValidateTokenInvalidOrNotFound => StatusCode::BAD_REQUEST,
+            ApiError::WorkOsPasswordlessError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            ApiError::WorkOsProfileError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            ApiError::WorkOsPasswordlessSendError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            ApiError::WorkOsAuthorizationUrlError(_) => StatusCode::INTERNAL_SERVER_ERROR,
         }
     }
 

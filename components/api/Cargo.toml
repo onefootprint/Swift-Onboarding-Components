@@ -71,3 +71,4 @@ reqwest = "0.11"
 sentry = "0.26.0"
 sentry-actix = "0.26.0"
 app-attest = { path = "../app_attest" }
+workos = "0.1"
