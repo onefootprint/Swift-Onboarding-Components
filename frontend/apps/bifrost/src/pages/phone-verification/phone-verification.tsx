@@ -39,8 +39,8 @@ const PhoneVerification = () => {
           />
         </Box>
         <PhoneVerificationPinForm
-          loadingComponent={PhoneVerificationLoading}
-          successComponent={PhoneVerificationSuccess}
+          renderLoadingComponent={PhoneVerificationLoading}
+          renderSuccessComponent={PhoneVerificationSuccess}
         />
       </Form>
     </>

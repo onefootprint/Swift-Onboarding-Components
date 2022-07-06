@@ -13,13 +13,13 @@ import { LinkButton, LoadingIndicator, PinInput, useToast } from 'ui';
 const SUCCESS_EVENT_DELAY_MS = 1500;
 
 type PhoneVerificationPinFormProps = {
-  loadingComponent: () => JSX.Element;
-  successComponent: () => JSX.Element;
+  renderLoadingComponent: () => JSX.Element;
+  renderSuccessComponent: () => JSX.Element;
 };
 
 const PhoneVerificationPinForm = ({
-  loadingComponent: LoadingComponent,
-  successComponent: SuccessComponent,
+  renderLoadingComponent: LoadingComponent,
+  renderSuccessComponent: SuccessComponent,
 }: PhoneVerificationPinFormProps) => {
   const toast = useToast();
   const showRequestErrorToast = useRequestErrorToast();
@@ -55,11 +55,11 @@ const PhoneVerificationPinForm = ({
     );
   };
 
-  const assignEmailAndStartOnboarding = (
-    email: string,
-    tenantPk: string,
-    authToken: string,
-  ) => {
+  const handlePinValidationSucceeded = ({
+    authToken,
+  }: IdentifyVerificationResponse) => {
+    const { email, tenant } = state.context;
+    const tenantPk = tenant.pk;
     userDataMutation.mutate(
       { data: { email }, authToken },
       {
@@ -68,14 +68,6 @@ const PhoneVerificationPinForm = ({
         },
       },
     );
-  };
-
-  const handlePinValidationSucceeded = ({
-    authToken,
-  }: IdentifyVerificationResponse) => {
-    const { email, tenant } = state.context;
-    const tenantPk = tenant.pk;
-    assignEmailAndStartOnboarding(email, tenantPk, authToken);
   };
 
   const handlePinCompleted = (pin: string) => {
