@@ -38,7 +38,7 @@ const InvestorsSection = ({
     <ImageContainer>
       <Image
         alt={imgAlt}
-        height={225}
+        height={315}
         layout="responsive"
         src={imgSrc}
         width={700}

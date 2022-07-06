@@ -45,17 +45,17 @@
         "subtitle": "Why Footprint?",
         "instructions": "Hover over the boxes, will ya? 😎",
         "tooltips": [
-          "Focus on your company, we’ll handle the PII",
-          "KYC should be quicker than tying your shoes",
-          "Faster than Persona",
-          "We got you covered 😇",
           "Privacy is a human right",
+          "Selfie Checks aren’t liveness checks",
+          "Focus on your company, we’ll handle the PII",
+          "We got you covered 😇",
+          "We don't sell complexity, we sell results",
           "Get more good actors in",
-          "More secure than VGS",
           "Fraud detection should not be a moment in time",
           "Without biometrics, how do you know who you’re letting in?",
           "Accuracy and friction should not be a toggle",
-          "Better dev experience than Alloy Automation"
+          "More secure than VGS",
+          "BaaS companies aren't KYC companies"
         ]
       },
       "qualities": {
