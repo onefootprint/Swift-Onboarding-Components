@@ -33,9 +33,10 @@ const DesignSystemProvider = ({ children, theme }: BootstrapProps) => (
         <Reset />
         <GlobalStyle />
         {children}
-        <div id="footprint-portal" />
       </ToastProvider>
     </ConfirmationDialogProvider>
+    <div id="footprint-portal" />
+    <div id="footprint-toast-portal" />
   </ThemeProvider>
 );
 

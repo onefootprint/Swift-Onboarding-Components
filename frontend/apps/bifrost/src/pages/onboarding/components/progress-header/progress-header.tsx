@@ -25,7 +25,7 @@ const ProgressHeader = () => {
   return (
     <NavigationHeader
       button={{
-        confirm: shouldShowCloseButton,
+        confirmClose: shouldShowCloseButton,
         onClick: shouldShowCloseButton ? undefined : handleBackButtonClick,
         variant: shouldShowCloseButton ? 'close' : 'back',
       }}

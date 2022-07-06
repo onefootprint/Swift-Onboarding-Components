@@ -1,4 +1,4 @@
-import { renderHook, Wrapper } from 'test-utils';
+import { HookWrapper, renderHook } from 'test-utils';
 import themes from 'themes';
 
 import useSX from './use-sx';
@@ -6,7 +6,7 @@ import useSX from './use-sx';
 describe('useSX', () => {
   describe('when the parameter is undefined', () => {
     it('should return an empty object', () => {
-      const { result } = renderHook(() => useSX(), { wrapper: Wrapper });
+      const { result } = renderHook(() => useSX(), { wrapper: HookWrapper });
       expect(result.current).toMatchObject({});
     });
   });
@@ -16,7 +16,7 @@ describe('useSX', () => {
       const { result } = renderHook(
         () =>
           useSX({ backgroundColor: 'primary', marginX: 3, display: 'flex' }),
-        { wrapper: Wrapper },
+        { wrapper: HookWrapper },
       );
       expect(result.current).toMatchObject({
         backgroundColor: themes.light.backgroundColor.primary,

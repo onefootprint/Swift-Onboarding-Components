@@ -17,7 +17,7 @@ const LoadingIndicator = ({
   size = 'default',
   testID,
 }: LoadingIndicatorProps) => (
-  <Container data-testid={testID} aria-label={ariaLabel}>
+  <Container data-testid={testID} aria-label={ariaLabel} role="progressbar">
     {size === 'default' ? (
       <IcoSpinner24 color={color} />
     ) : (

@@ -73,7 +73,6 @@ const ToastContainer = styled.div`
 const ToastProvider = ({ children }: ToastProviderProps) => (
   <Provider>
     <ToastManager>{children}</ToastManager>
-    <div id="footprint-toast-portal" />
   </Provider>
 );
 

@@ -5,10 +5,41 @@
   "pages": {
     "my-footprint-identity": {
       "basic": {
-        "title": "Basic"
+        "title": "Basic",
+        "name": {
+          "label": "Name"
+        },
+        "email": {
+          "label": "Email",
+          "verify": {
+            "loading": "Sending email to verify your email address",
+            "cta": "Verify",
+            "success": {
+              "title": "Check your inbox",
+              "description": "Please click the link we sent you by email to verify it."
+            },
+            "error": {
+              "title": "Uh-oh",
+              "description": "Something went wrong"
+            }
+          }
+        },
+        "phone": {
+          "label": "Phone number"
+        }
       },
       "identity": {
-        "title": "Identity"
+        "title": "Identity",
+        "ssn": {
+          "label": "Social Security Number",
+          "toggle": {
+            "show": "Show",
+            "hide": "Hide"
+          }
+        },
+        "dob": {
+          "label": "Date of birth"
+        }
       },
       "address": {
         "title": "Address"
