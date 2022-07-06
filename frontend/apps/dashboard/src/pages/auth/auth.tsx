@@ -5,7 +5,7 @@ import useSessionUser from 'src/hooks/use-session-user';
 
 const Auth = () => {
   const router = useRouter();
-  const session = useSessionUser();
+  const { isLoggedIn, logIn } = useSessionUser();
   const login = useLogin();
   const {
     query: { code },
@@ -13,17 +13,23 @@ const Auth = () => {
   } = router;
 
   useEffect(() => {
-    if (!isReady || !code || Array.isArray(code)) {
+    if (
+      isLoggedIn ||
+      login.isLoading ||
+      !isReady ||
+      !code ||
+      Array.isArray(code)
+    ) {
       return;
     }
     login.mutate(code, {
       onSuccess({ auth, email }: LoginResponse) {
-        session.logIn({ auth, email });
+        logIn({ auth, email });
         router.push('/users');
       },
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isReady, code, router]);
+  }, [isReady, code, router, isLoggedIn, login.isLoading]);
 
   return <div />;
 };
