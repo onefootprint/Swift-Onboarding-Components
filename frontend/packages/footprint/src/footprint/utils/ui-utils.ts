@@ -22,7 +22,7 @@ export const createCSSClasses = () => {
       z-index: 50000;
     }
 
-    @keyframes rotate {
+    @keyframes footprint-rotate {
       from {
         transform: rotate(0deg);
       }
@@ -38,13 +38,7 @@ export const createCSSClasses = () => {
     }
 
     .footprint-loading-spin {
-      animation: rotate 0.8s linear infinite;
-    }
-
-    @keyframes spin {
-      to {
-        transform: rotate(360deg);
-      }
+      animation: footprint-rotate 0.8s linear infinite;
     }
 
     .footprint-modal {
