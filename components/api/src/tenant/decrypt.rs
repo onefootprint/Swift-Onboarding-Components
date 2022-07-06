@@ -2,6 +2,7 @@ use crate::auth::either::Either;
 use crate::auth::session_context::{HasTenant, SessionContext};
 use crate::auth::session_data::tenant::secret_key::SecretTenantAuthContext;
 use crate::auth::session_data::tenant::workos::WorkOsSession;
+use crate::auth::AuthError;
 use crate::errors::ApiError;
 use crate::types::success::ApiResponseData;
 use crate::user::{decrypt, DecryptFieldsResult};
@@ -42,7 +43,7 @@ fn handler(
         request.footprint_user_id.clone(),
     )
     .await?
-    .ok_or(ApiError::InvalidTenantKeyOrUserId)?;
+    .ok_or(AuthError::InvalidTenantKeyOrUserId)?;
 
     let principal = if let Either::Left(workos) = auth.clone() {
         // A user in admin dashboard is decrypting - log the user's name and email

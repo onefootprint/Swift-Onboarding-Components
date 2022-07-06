@@ -78,8 +78,7 @@ async fn init_api_keys(
 ) -> Result<ClientKeysResponse, ApiError> {
     let api_key = format!("sk_{}", gen_random_alphanumeric_code(34));
 
-    let e_api_key =
-        crypto::seal::seal_ecies_p256_x963_sha256_aes_gcm(&tenant.public_key, api_key.clone().into_bytes())?;
+    let e_api_key = &tenant.public_key.seal_data(api_key.as_str())?;
 
     let sh_api_key = state.hmac_client.signed_hash(api_key.as_bytes()).await?;
 
@@ -90,7 +89,7 @@ async fn init_api_keys(
             key_name: "default".to_string(),
         },
         sh_api_key,
-        e_api_key.to_vec()?,
+        e_api_key.0.clone(),
     )
     .await?;
 

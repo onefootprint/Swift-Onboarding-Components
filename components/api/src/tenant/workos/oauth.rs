@@ -1,3 +1,4 @@
+use crate::errors::workos_login::WorkOsLoginError;
 use crate::State;
 use crate::{errors::ApiError, types::success::ApiResponseData};
 use actix_web::web::Json;
@@ -32,7 +33,8 @@ fn handler(
             redirect_uri: redirect_url,
             connection_selector: ConnectionSelector::Provider(&Provider::GoogleOauth),
             state: None,
-        })?;
+        })
+        .map_err(WorkOsLoginError::AuthorizationUrlError)?;
 
     Ok(Json(ApiResponseData {
         data: GoogleOauthResponse {

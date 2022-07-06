@@ -13,8 +13,8 @@ async fn test_db() {
     let pool = crate::init(&db_url).expect("couldn't initiate DB pool");
     let tenant = crate::models::tenants::NewTenant {
         name: "test_tenant".to_owned(),
-        public_key: "".as_bytes().to_vec(),
-        e_private_key: "".as_bytes().to_vec(),
+        e_private_key: EncryptedVaultPrivateKey("private key".as_bytes().to_vec()),
+        public_key: VaultPublicKey::unvalidated("public key".as_bytes().to_vec()),
         workos_id: "test".to_owned(),
         email_domain: "dbtest.com".to_owned(),
     };

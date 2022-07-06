@@ -13,17 +13,15 @@ use tracing_actix_web::TracingLogger;
 use utils::email::SendgridClient;
 use workos::{ApiKey, WorkOs};
 mod config;
-mod errors;
 mod signed_hash;
 mod telemetry;
-
-use crate::{errors::ApiError, utils::twilio::TwilioClient};
 
 // TODO put IAM roles and permissions in pulumi
 
 mod auth;
 mod client;
 mod enclave;
+mod errors;
 mod identify;
 mod index;
 mod onboarding;
@@ -33,6 +31,7 @@ mod types;
 mod user;
 mod utils;
 
+use crate::{errors::ApiError, utils::twilio::TwilioClient};
 use paperclip::actix::{web, OpenApiExt};
 
 #[derive(Clone)]

@@ -4,7 +4,7 @@ use crate::auth::session_data::{ServerSession, SessionData};
 use crate::types::success::ApiResponseData;
 use crate::State;
 use crate::{auth::session_context::SessionContext, errors::ApiError};
-use chrono::{Duration};
+use chrono::Duration;
 use newtypes::SessionAuthToken;
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 

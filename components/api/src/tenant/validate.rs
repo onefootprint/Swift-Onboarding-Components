@@ -1,6 +1,7 @@
 use crate::auth::session_data::tenant::secret_key::SecretTenantAuthContext;
 use crate::auth::session_data::validate_user::ValidateUserToken;
 use crate::auth::session_data::{ServerSession, SessionData};
+use crate::errors::onboarding::OnboardingError;
 use crate::errors::ApiError;
 use crate::types::success::ApiResponseData;
 use crate::State;
@@ -33,14 +34,14 @@ pub fn validate(
     let session =
         db::session::get_session_by_auth_token(&state.db_pool, request.into_inner().validation_token)
             .await?
-            .ok_or(ApiError::ValidateTokenInvalidOrNotFound)?;
+            .ok_or(OnboardingError::ValidateTokenInvalidOrNotFound)?;
 
     let session = ServerSession::unseal(&state.session_sealing_key, &session.sealed_session_data)?;
 
     let ValidateUserToken { onboarding_id } = if let SessionData::ValidateUserToken(data) = session.data {
         Ok(data)
     } else {
-        Err(ApiError::ValidateTokenInvalidOrNotFound)
+        Err(ApiError::from(OnboardingError::ValidateTokenInvalidOrNotFound))
     }?;
 
     let onboarding = db::onboarding::get_by_onboarding_id_and_tenant(

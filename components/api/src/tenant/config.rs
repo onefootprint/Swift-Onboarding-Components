@@ -1,7 +1,7 @@
 use crate::auth::session_data::tenant::ob_public_key::PublicTenantAuthContext;
+use crate::errors::ApiError;
 use crate::types::success::ApiResponseData;
 use crate::State;
-use crate::{errors::ApiError};
 use newtypes::{DataKind, ObConfigurationSettings};
 use paperclip::actix::{api_v2_operation, get, web, web::Json, Apiv2Schema};
 
@@ -10,7 +10,7 @@ use paperclip::actix::{api_v2_operation, get, web, web::Json, Apiv2Schema};
 struct OrgConfigResponse {
     name: String,
     required_user_data: Vec<DataKind>,
-    settings: ObConfigurationSettings
+    settings: ObConfigurationSettings,
 }
 
 #[api_v2_operation(tags(Org))]
@@ -23,5 +23,11 @@ fn get(
     let tenant = auth.tenant;
     let ob_config = auth.ob_config;
 
-    Ok(Json(ApiResponseData { data: OrgConfigResponse { name: tenant.name, required_user_data: ob_config.required_user_data, settings: ob_config.settings } }))
+    Ok(Json(ApiResponseData {
+        data: OrgConfigResponse {
+            name: tenant.name,
+            required_user_data: ob_config.required_user_data,
+            settings: ob_config.settings,
+        },
+    }))
 }

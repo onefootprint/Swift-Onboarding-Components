@@ -1,4 +1,5 @@
-use crate::errors::ApiError;
+use crate::errors::kms::KmsSignError;
+use crate::errors::{enclave::EnclaveError, ApiError};
 use crate::State;
 
 use aws_sdk_kms::model::DataKeyPairSpec;
@@ -6,9 +7,11 @@ use crypto::seal::EciesP256Sha256AesGcmSealed;
 use enclave_proxy::{
     DataTransform, DecryptRequest, EnvelopeDecrypt, FnDecryption, KmsCredentials, RpcPayload,
 };
-use newtypes::{EncryptedVaultPrivateKey, SealedVaultBytes};
+use newtypes::{EncryptedVaultPrivateKey, SealedVaultBytes, VaultPublicKey};
 
-pub async fn gen_keypair(state: &actix_web::web::Data<State>) -> Result<(Vec<u8>, Vec<u8>), ApiError> {
+pub async fn gen_keypair(
+    state: &actix_web::web::Data<State>,
+) -> Result<(VaultPublicKey, EncryptedVaultPrivateKey), KmsSignError> {
     let new_key_pair = state
         .kms_client
         .generate_data_key_pair_without_plaintext()
@@ -17,14 +20,11 @@ pub async fn gen_keypair(state: &actix_web::web::Data<State>) -> Result<(Vec<u8>
         .send()
         .await?;
 
-    let der_public_key = new_key_pair.public_key.unwrap().into_inner();
-    let ec_pk_uncompressed = crypto::conversion::public_key_der_to_raw_uncompressed(&der_public_key)?;
+    let vault_public_key = VaultPublicKey::from_der_bytes(&new_key_pair.public_key.unwrap().into_inner())?;
+    let encrypted_vault_private_key =
+        EncryptedVaultPrivateKey(new_key_pair.private_key_ciphertext_blob.unwrap().into_inner());
 
-    let _pk = crypto::hex::encode(&ec_pk_uncompressed);
-
-    let e_priv_key = new_key_pair.private_key_ciphertext_blob.unwrap().into_inner();
-
-    Ok((ec_pk_uncompressed, e_priv_key))
+    Ok((vault_public_key, encrypted_vault_private_key))
 }
 
 pub async fn decrypt_bytes(
@@ -42,14 +42,14 @@ pub async fn decrypt_bytes(
     results
         .into_iter()
         .next()
-        .ok_or(ApiError::InvalidEnclaveDecryptResponse)
+        .ok_or_else(|| EnclaveError::InvalidEnclaveDecryptResponse.into())
 }
 
 pub async fn decrypt(
     state: &actix_web::web::Data<State>,
     requests: Vec<DecryptRequest>,
     sealed_key: &EncryptedVaultPrivateKey,
-) -> Result<Vec<String>, ApiError> {
+) -> Result<Vec<String>, EnclaveError> {
     let mut conn = state.enclave_connection_pool.get().await?;
 
     let req = enclave_proxy::RpcRequest::new(RpcPayload::FnDecrypt(EnvelopeDecrypt {
@@ -60,7 +60,7 @@ pub async fn decrypt(
             session_token: None,
         },
         sealed_key: sealed_key.0.clone(),
-        requests,
+        requests: requests.clone(),
     }));
     tracing::info!("sending request");
     let response = enclave_proxy::send_rpc_request(&req, &mut conn).await?;
@@ -70,6 +70,9 @@ pub async fn decrypt(
         .results
         .into_iter()
         .map(|r| Ok(std::str::from_utf8(&r.data)?.to_string()))
-        .collect::<Result<Vec<String>, ApiError>>()?;
+        .collect::<Result<Vec<String>, EnclaveError>>()?;
+    if decrypted_results.len() != requests.len() {
+        return Err(EnclaveError::InvalidEnclaveDecryptResponse);
+    }
     Ok(decrypted_results)
 }

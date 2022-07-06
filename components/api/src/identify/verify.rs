@@ -2,19 +2,21 @@ use super::{BiometricChallengeState, PhoneChallengeState};
 use crate::auth::session_data::user::my_fp::{My1fpBasicSession, UserAuthMethod};
 use crate::auth::session_data::user::onboarding::OnboardingSession;
 use crate::auth::session_data::{ServerSession, SessionData};
+use crate::errors::challenge::ChallengeError;
+
 use crate::errors::ApiError;
 use crate::identify::{IdentifyChallengeData, IdentifyChallengeState, IdentifyType};
 use crate::types::success::ApiResponseData;
 use crate::utils::challenge::{Challenge, ChallengeToken};
 use crate::utils::liveness::LivenessWebauthnConfig;
 use crate::State;
-use aws_sdk_kms::model::DataKeyPairSpec;
+
 use chrono::Duration;
 use crypto::sha256;
 use db::models::user_vaults::{NewUserVaultReq, UserVault};
 use newtypes::{
-    DataKind, EncryptedVaultPrivateKey, Fingerprinter, SessionAuthToken, Status, UserVaultId,
-    ValidatedPhoneNumber, VaultPublicKey,
+    DataKind, Fingerprinter, SessionAuthToken, Status, UserVaultId,
+    ValidatedPhoneNumber,
 };
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 
@@ -110,7 +112,7 @@ async fn validate_sms_challenge(
     challenge_response: &str,
 ) -> Result<(UserVaultId, VerifyKind), ApiError> {
     if challenge_state.h_code != sha256(challenge_response.as_bytes()).to_vec() {
-        return Err(ApiError::ChallengeNotValid);
+        return Err(ChallengeError::ChallengeNotValid.into());
     }
 
     let phone_number = challenge_state.phone_number;
@@ -136,23 +138,13 @@ async fn create_new_user_vault(
     state: &web::Data<State>,
     phone_number: &ValidatedPhoneNumber,
 ) -> Result<UserVault, ApiError> {
-    let new_key_pair = state
-        .kms_client
-        .generate_data_key_pair_without_plaintext()
-        .key_id(&state.config.enclave_root_key_id)
-        .key_pair_spec(DataKeyPairSpec::EccNistP256)
-        .send()
-        .await?;
-
-    let vault_public_key = VaultPublicKey::from_der_bytes(&new_key_pair.public_key.unwrap().into_inner())?;
-    let encrypted_vault_private_key =
-        EncryptedVaultPrivateKey(new_key_pair.private_key_ciphertext_blob.unwrap().into_inner());
+    let (public_key, e_private_key) = crate::enclave::gen_keypair(state).await?;
 
     let new_user = NewUserVaultReq {
-        e_private_key: encrypted_vault_private_key,
+        e_private_key,
         id_verified: Status::Incomplete,
-        e_phone_number: vault_public_key.seal_data(phone_number.as_ref())?,
-        public_key: vault_public_key,
+        e_phone_number: public_key.seal_data(phone_number.as_ref())?,
+        public_key,
         sh_phone_number: state
             .compute_fingerprint(DataKind::PhoneNumber, phone_number.as_ref())
             .await?,

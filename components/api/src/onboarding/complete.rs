@@ -4,6 +4,7 @@ use crate::auth::session_data::tenant::ob_public_key::PublicTenantAuthContext;
 use crate::auth::session_data::user::onboarding::OnboardingSession;
 use crate::auth::session_data::validate_user::ValidateUserToken;
 use crate::auth::session_data::{ServerSession, SessionData};
+use crate::errors::onboarding::OnboardingError;
 use crate::errors::ApiError;
 use crate::types::success::ApiResponseData;
 use crate::utils::insight_headers::InsightHeaders;
@@ -54,7 +55,9 @@ fn handler(
     // TODO kick off user verification with data vendors
 
     if !missing_fields.is_empty() {
-        return Err(ApiError::UserMissingRequiredFields(missing_fields.join(",")));
+        return Err(OnboardingError::UserMissingRequiredFields(
+            missing_fields.join(","),
+        ))?;
     }
 
     let tenant_id = tenant_auth.tenant.id.clone();

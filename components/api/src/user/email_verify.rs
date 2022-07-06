@@ -1,5 +1,7 @@
 use crate::auth::session_data::SessionData;
+use crate::errors::challenge::ChallengeError;
 use crate::types::success::ApiResponseData;
+
 use crate::State;
 use crate::{auth::session_data::ServerSession, errors::ApiError};
 use chrono::Utc;
@@ -22,14 +24,16 @@ async fn handler(
 ) -> actix_web::Result<Json<ApiResponseData<String>>, ApiError> {
     let session = db::session::get_session_by_auth_token(&state.db_pool, request.into_inner().data)
         .await?
-        .ok_or(ApiError::EmailVerificationTokenInvalidOrNotFound)?;
+        .ok_or(ChallengeError::EmailVerificationTokenInvalidOrNotFound)?;
 
     let session = ServerSession::unseal(&state.session_sealing_key, &session.sealed_session_data)?;
 
     let data = if let SessionData::EmailVerify(data) = session.data {
         Ok(data)
     } else {
-        Err(ApiError::EmailVerificationTokenInvalidOrNotFound)
+        Err(ApiError::from(
+            ChallengeError::EmailVerificationTokenInvalidOrNotFound,
+        ))
     }?;
 
     // Challenge is tied to a user vault to ensure that if multiple users have registered
@@ -42,10 +46,10 @@ async fn handler(
         false,
     )
     .await?
-    .ok_or(ApiError::UserDoesntExistForEmailChallenge)?;
+    .ok_or(ChallengeError::UserDoesntExistForEmailChallenge)?;
 
     if session.expires_at < Utc::now().naive_utc() {
-        return Err(ApiError::EmailChallengeExpired);
+        return Err(ChallengeError::EmailChallengeExpired.into());
     }
 
     // Challenge is valid, let's mark the email as valid in user vault

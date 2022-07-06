@@ -5,7 +5,7 @@ use db::models::{ob_configurations::ObConfiguration, tenants::Tenant};
 use futures_util::Future;
 use paperclip::actix::Apiv2Security;
 
-use crate::{errors::ApiError, State, auth::AuthError};
+use crate::{auth::AuthError, State};
 
 #[derive(Debug, Clone, Apiv2Security)]
 #[openapi(
@@ -40,7 +40,7 @@ impl FromRequest for PublicTenantAuthContext {
 
         Box::pin(async move {
             let config_key = newtypes::ObConfigurationKey::try_from(config_key?)
-                .map_err(|_| ApiError::InvalidTokenForHeader)?;
+                .map_err(|_| AuthError::InvalidTokenForHeader)?;
             let (ob_config, tenant) = ObConfiguration::get_with_tenant(&pool, config_key).await?;
             Ok(Self {
                 tenant,

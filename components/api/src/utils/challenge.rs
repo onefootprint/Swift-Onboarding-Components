@@ -6,7 +6,7 @@ use newtypes::Base64Data;
 use paperclip::actix::Apiv2Schema;
 use serde::{de::DeserializeOwned, Deserialize, Serialize};
 
-use crate::errors::ApiError;
+use crate::errors::{challenge::ChallengeError, ApiError};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Challenge<C> {
@@ -30,7 +30,7 @@ impl<C: Serialize + DeserializeOwned + std::fmt::Debug> Challenge<C> {
         let unsealed: Self = key.unseal(&sealed)?;
 
         if unsealed.expires_at < Utc::now().naive_utc() {
-            return Err(ApiError::ChallengeExpired);
+            return Err(ChallengeError::ChallengeExpired)?;
         }
         Ok(unsealed)
     }

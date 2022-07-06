@@ -2,7 +2,7 @@ use self::{
     session_context::SessionContext,
     session_data::{tenant::ob_public_key::PublicTenantAuthContext, user::onboarding::OnboardingSession},
 };
-use crate::errors::ApiError;
+use crate::errors::{onboarding::OnboardingError, ApiError};
 use db::models::onboardings::Onboarding;
 use thiserror::Error;
 
@@ -23,6 +23,8 @@ pub enum AuthError {
     MissingFpuserAuthHeader,
     #[error("error reading session: {0}")]
     SessionError(#[from] actix_web::Error),
+    #[error("invalid tenant skey or footprint user id")]
+    InvalidTenantKeyOrUserId,
     #[error("incorrect session type auth")]
     SessionTypeError,
     #[error("no session found")]
@@ -33,6 +35,8 @@ pub enum AuthError {
     UnauthorizedOperation,
     #[error("session expired")]
     SessionExpired,
+    #[error("invalid token for header")]
+    InvalidTokenForHeader,
 }
 
 /// For endpoints that take both a user_auth and tenant_auth, this helps to assert that the authenticated user
@@ -48,7 +52,7 @@ pub async fn get_onboarding_for_tenant(
         user_auth.to_owned().data.user_vault_id,
     )
     .await?
-    .ok_or(ApiError::OnboardingForTenantDoesNotExist)?;
+    .ok_or(OnboardingError::OnboardingForTenantDoesNotExist)?;
 
     Ok(onboarding)
 }

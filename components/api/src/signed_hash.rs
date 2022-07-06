@@ -3,7 +3,7 @@ use aws_sdk_kms::types::Blob;
 use crypto::sha256;
 use newtypes::{Fingerprint, Fingerprinter};
 
-use crate::{errors::ApiError, State};
+use crate::{errors::kms::KmsSignError, State};
 
 #[derive(Debug, Clone)]
 pub struct SignedHashClient {
@@ -13,7 +13,7 @@ pub struct SignedHashClient {
 
 impl SignedHashClient {
     #[allow(dead_code)]
-    pub async fn verify_mac(&self, data: &[u8], signature: &[u8]) -> Result<bool, ApiError> {
+    pub async fn verify_mac(&self, data: &[u8], signature: &[u8]) -> Result<bool, KmsSignError> {
         let result = self
             .client
             .verify_mac()
@@ -27,7 +27,7 @@ impl SignedHashClient {
         Ok(result.mac_valid())
     }
 
-    pub async fn signed_hash(&self, data: &[u8]) -> Result<Vec<u8>, ApiError> {
+    pub async fn signed_hash(&self, data: &[u8]) -> Result<Vec<u8>, KmsSignError> {
         // hash the data before sending it to aws
         let data = sha256(data).to_vec();
 
@@ -46,7 +46,7 @@ impl SignedHashClient {
 
 #[async_trait]
 impl Fingerprinter for SignedHashClient {
-    type Error = ApiError;
+    type Error = KmsSignError;
 
     async fn sign_data(&self, data: &[u8]) -> Result<Fingerprint, Self::Error> {
         Ok(Fingerprint(self.signed_hash(data).await?))
@@ -55,7 +55,7 @@ impl Fingerprinter for SignedHashClient {
 
 #[async_trait]
 impl Fingerprinter for State {
-    type Error = ApiError;
+    type Error = KmsSignError;
 
     async fn sign_data(&self, data: &[u8]) -> Result<Fingerprint, Self::Error> {
         self.hmac_client.sign_data(data).await

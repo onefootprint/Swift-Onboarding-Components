@@ -1,6 +1,7 @@
 use super::{
     BiometricChallengeState, ChallengeKind, IdentifyChallengeData, IdentifyChallengeState, IdentifyType,
 };
+use crate::errors::onboarding::OnboardingError;
 use crate::errors::ApiError;
 use crate::types::success::ApiResponseData;
 use crate::utils::challenge::{Challenge, ChallengeToken};
@@ -186,7 +187,7 @@ async fn initiate_biometric_challenge_for_user(
     creds: Vec<WebauthnCredential>,
 ) -> Result<BiometricChallenge, ApiError> {
     if creds.is_empty() {
-        return Err(ApiError::WebauthnCredentialsNotSet);
+        return Err(OnboardingError::WebauthnCredentialsNotSet)?;
     }
 
     // convert these creds to webauthn rs type

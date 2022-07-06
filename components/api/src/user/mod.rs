@@ -1,6 +1,6 @@
 use crate::{
     auth::{uv_permission::HasVaultPermission, AuthError},
-    errors::ApiError,
+    errors::{enclave::EnclaveError, ApiError},
     State,
 };
 use crypto::seal::EciesP256Sha256AesGcmSealed;
@@ -75,7 +75,7 @@ pub async fn decrypt<C: HasVaultPermission>(
         .collect::<Result<Vec<DecryptRequest>, crypto::Error>>()?;
     let decrypt_response = crate::enclave::decrypt(state, requests, &user_vault.e_private_key).await?;
     if decrypt_response.len() != fields_to_decrypt.len() {
-        return Err(ApiError::InvalidEnclaveDecryptResponse);
+        return Err(EnclaveError::InvalidEnclaveDecryptResponse.into());
     }
     let decrypted_data: HashMap<DataKind, String> = decrypt_response
         .into_iter()

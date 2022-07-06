@@ -1,5 +1,6 @@
 use crate::auth::session_data::tenant::workos::WorkOsSession;
 use crate::auth::session_data::{ServerSession, SessionData};
+use crate::errors::workos_login::WorkOsLoginError;
 use crate::State;
 use crate::{errors::ApiError, types::success::ApiResponseData};
 use actix_session::Session;
@@ -56,7 +57,7 @@ fn handler(
 
     let tenant = get_opt_by_workos_id(&state.db_pool, org_id)
         .await?
-        .ok_or(ApiError::WorkOsProfileInvalid)?;
+        .ok_or(WorkOsLoginError::ProfileInvalid)?;
 
     // Save tenant login in session data into the DB
     let session_data = SessionData::WorkOs(WorkOsSession {
