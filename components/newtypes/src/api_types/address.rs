@@ -154,7 +154,7 @@ impl TryFrom<String> for State {
         }
         let state = value.to_uppercase();
         if !ISO_3166_TWO_DIGIT_US_STATES.contains(&state.as_str()) {
-            return Err(crate::AddressError::InvalidCountry(state).into());
+            return Err(crate::AddressError::InvalidState(state).into());
         }
         Ok(State(PiiString::new(value.to_uppercase())))
     }
