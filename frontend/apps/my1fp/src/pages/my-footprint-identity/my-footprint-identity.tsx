@@ -1,4 +1,4 @@
-import React, { Suspense, useState } from 'react';
+import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
 import { Accordion, Box, Container, Divider } from 'ui';
 
@@ -28,9 +28,7 @@ const MyFootprintIdentity = () => {
           open={activeAccordion === id}
           title={title}
         >
-          <Suspense fallback={null}>
-            <Content />
-          </Suspense>
+          <Content />
         </Accordion>
       ))}
     </SectionContainer>

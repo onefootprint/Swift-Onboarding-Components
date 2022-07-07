@@ -35,6 +35,13 @@ describe('<Accordion />', () => {
     expect(screen.getByText('Accordion title')).toBeInTheDocument();
   });
 
+  describe('when is not open', () => {
+    it('should not render the children', () => {
+      renderAccordion({ children: 'content', open: false });
+      expect(screen.queryByText('content')).toBeNull();
+    });
+  });
+
   describe('when is open', () => {
     it('should render the children', () => {
       renderAccordion({ children: 'content', open: true });

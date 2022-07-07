@@ -4,20 +4,13 @@ import IcoBuilding24 from 'icons/ico/ico-building-24';
 import IcoFileText24 from 'icons/ico/ico-file-text-24';
 import IcoShield24 from 'icons/ico/ico-shield-24';
 import IcoUserCircle24 from 'icons/ico/ico-user-circle-24';
-import dynamic from 'next/dynamic';
 import React from 'react';
 
-const Address = dynamic(() => import('../components/sections/address'));
-
-const Basic = dynamic(() => import('../components/sections/basic'));
-
-const Identity = dynamic(() => import('../components/sections/identity'));
-
-const AccessLogs = dynamic(() => import('../components/sections/access-logs'));
-
-const LoginAndSecurity = dynamic(
-  () => import('../components/sections/login-and-security'),
-);
+import AccessLogs from '../components/sections/access-logs';
+import Address from '../components/sections/address';
+import Basic from '../components/sections/basic';
+import Identity from '../components/sections/identity';
+import LoginAndSecurity from '../components/sections/login-and-security';
 
 export type Section = {
   id: number;

@@ -82,3 +82,22 @@ Base.args = {
   title: 'Identity',
   onChange: console.log,
 };
+
+export const OpenedByDefault = Template.bind({});
+OpenedByDefault.args = {
+  children: (
+    <>
+      <Typography color="tertiary" variant="label-3" sx={{ marginBottom: 2 }}>
+        Email
+      </Typography>
+      <Typography color="primary" variant="body-3">
+        john.doe@gmail.com
+      </Typography>
+    </>
+  ),
+  iconComponent: IcoUserCircle24,
+  open: true,
+  testID: 'accordion-test-id',
+  title: 'Identity',
+  onChange: console.log,
+};
