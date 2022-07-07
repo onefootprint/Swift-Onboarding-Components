@@ -2,20 +2,32 @@ import { useMutation } from 'react-query';
 import request, { RequestError, RequestResponse } from 'request';
 import { BIFROST_AUTH_HEADER } from 'src/config/constants';
 
-export type UserDataRequest = {
-  data: {
-    firstName?: string;
-    lastName?: string;
-    dob?: string;
-    email?: string;
-    ssn?: string;
-    streetAddress?: string;
-    streetAddress2?: string;
+export type UserDataObj = {
+  address?: {
+    address?: {
+      streetAddress?: string;
+      streetAddress2?: string;
+    };
     city?: string;
     state?: string;
     country?: string;
     zip?: string;
   };
+  dob?: {
+    day?: number;
+    month?: number;
+    year?: number;
+  };
+  email?: string;
+  name?: {
+    firstName?: string;
+    lastName?: string;
+  };
+  ssn?: string;
+};
+
+export type UserDataRequest = {
+  data: UserDataObj;
   authToken: string;
 };
 

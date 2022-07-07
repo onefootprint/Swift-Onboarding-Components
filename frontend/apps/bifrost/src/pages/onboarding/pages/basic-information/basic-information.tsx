@@ -10,6 +10,7 @@ import { Button, Grid, TextInput } from 'ui';
 import ProgressHeader from '../../components/progress-header';
 import useOnboardingMachine from '../../hooks/use-onboarding-machine';
 import useSyncData from '../../hooks/use-sync-data';
+import validateDob from './utils/validate-dob';
 
 type FormData = Required<
   Pick<
@@ -84,7 +85,10 @@ const BasicInformation = () => {
           label={t('form.dob.label')}
           mask={inputMasks.dob}
           placeholder={t('form.dob.placeholder')}
-          {...register(UserDataAttribute.dob, { required: true })}
+          {...register(UserDataAttribute.dob, {
+            required: true,
+            validate: validateDob,
+          })}
         />
         <Button type="submit" fullWidth>
           {t('form.cta')}
