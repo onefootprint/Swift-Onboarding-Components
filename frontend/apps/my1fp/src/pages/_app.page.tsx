@@ -25,6 +25,16 @@ const App = ({ Component, pageProps }: AppProps) => (
   </QueryClientProvider>
 );
 
-const GlobalStyle = createGlobalStyle``;
+const GlobalStyle = createGlobalStyle`
+  html,
+  body {
+    height: 100%;
+    width: 100%;
+  }
+
+  #__next {
+    height: 100vh;
+  }
+`;
 
 export default App;

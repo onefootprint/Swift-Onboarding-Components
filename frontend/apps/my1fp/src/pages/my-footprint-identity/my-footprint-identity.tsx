@@ -37,21 +37,40 @@ const MyFootprintIdentity = () => {
   );
 
   return (
-    <Container>
-      <Header />
+    <PageContainer>
       <Content>
-        {renderSectionGroup(sections.top)}
-        <Box sx={{ marginY: 8 }}>
-          <Divider />
-        </Box>
-        {renderSectionGroup(sections.bottom)}
+        <Header />
+        <Container>
+          <div>
+            {renderSectionGroup(sections.top)}
+            <Box sx={{ marginY: 8 }}>
+              <Divider />
+            </Box>
+            {renderSectionGroup(sections.bottom)}
+          </div>
+        </Container>
       </Content>
+
       <Footer />
-    </Container>
+    </PageContainer>
   );
 };
 
-const Content = styled.div``;
+const Content = styled.div`
+  ${({ theme }) => css`
+    > :not(:last-child) {
+      margin-bottom: ${theme.spacing[4]}px;
+    }
+  `}
+`;
+
+const PageContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  justify-content: space-between;
+`;
 
 const SectionContainer = styled.div`
   ${({ theme }) => css`
