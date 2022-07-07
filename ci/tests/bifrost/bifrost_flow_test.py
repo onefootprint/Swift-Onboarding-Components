@@ -291,6 +291,7 @@ def test_identify_login_repeat_customer_biometric(request, foo_tenant):
     body = _assert_response(r)
     assert body["data"]["user_found"]
     assert body["data"]["challenge_data"]["phone_number_last_two"] == PHONE_NUMBER[-2:]
+    assert body["data"]["challenge_data"]["phone_country"] == "US"
     assert body["data"]["challenge_data"]["challenge_kind"] == "biometric"
     assert body["data"]["challenge_data"]["biometric_challenge_json"]
   

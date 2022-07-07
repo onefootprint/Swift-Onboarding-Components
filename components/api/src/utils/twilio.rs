@@ -146,10 +146,7 @@ impl TwilioClient {
             TwilioResponse::Error(e) => Err(ApiError::TwilioError(e.message)),
         }?;
 
-        Ok(ValidatedPhoneNumber::__build_from_twilio(
-            e164,
-            Some(country_code),
-        ))
+        Ok(ValidatedPhoneNumber::__build_from_twilio(e164, country_code))
     }
 
     async fn send_message(

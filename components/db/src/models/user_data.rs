@@ -45,7 +45,7 @@ impl UserData {
 pub struct NewUserData {
     pub user_vault_id: UserVaultId,
     pub data_kind: DataKind,
-    pub data_group_id: Option<DataGroupId>,
+    pub data_group_id: DataGroupId,
     pub data_group_kind: DataGroupKind,
     pub data_group_priority: DataPriority,
     pub e_data: SealedVaultBytes,
@@ -54,7 +54,9 @@ pub struct NewUserData {
 }
 
 impl NewUserData {
+    /// This should always be run inside of a transaction (.db_transaction)
     pub fn insert(self, conn: &mut PgConnection) -> Result<UserData, crate::DbError> {
+        ensure_new_group_uuid(conn, self.data_group_id.clone())?;
         let data = diesel::insert_into(user_data::table)
             .values(&self)
             .get_result::<UserData>(conn)?;
@@ -62,13 +64,28 @@ impl NewUserData {
     }
 }
 
+fn ensure_new_group_uuid(conn: &mut PgConnection, id: DataGroupId) -> Result<(), crate::DbError> {
+    let group_exists = diesel::dsl::select(diesel::dsl::exists(
+        user_data::table.filter(user_data::data_group_id.eq(id)),
+    ))
+    .get_result(conn)?;
+    if group_exists {
+        return Err(crate::DbError::CouldNotCreateGroupUuid);
+    }
+    Ok(())
+}
+
 pub struct GroupInsert(pub Vec<NewUserData>);
 
 impl GroupInsert {
+    /// This should always be run inside of a transaction (.db_transaction)
     pub fn group_insert(self, conn: &mut PgConnection) -> Result<(), crate::DbError> {
-        diesel::insert_into(user_data::table)
-            .values(self.0)
-            .execute(conn)?;
+        if let Some(req) = self.0.first() {
+            ensure_new_group_uuid(conn, req.data_group_id.clone())?;
+            diesel::insert_into(user_data::table)
+                .values(self.0)
+                .execute(conn)?;
+        }
         Ok(())
     }
 }
@@ -114,7 +131,7 @@ impl NewUserDataBatch {
                     NewUserData {
                         user_vault_id: user_vault_id.clone(),
                         data_kind,
-                        data_group_id: Some(group_id.clone()),
+                        data_group_id: group_id.clone(),
                         data_group_kind,
                         data_group_priority,
                         e_data,

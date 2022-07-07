@@ -48,6 +48,7 @@ pub struct UserChallengeData {
     challenge_kind: ChallengeKind,
     challenge_token: ChallengeToken,
     phone_number_last_two: String,
+    phone_country: String,
     biometric_challenge_json: Option<String>,
     time_before_retry_s: i64,
 }
@@ -89,7 +90,12 @@ pub async fn handler(
         .get_decrypted_field(&state, DataKind::PhoneNumber)
         .await?
         .ok_or(ApiError::NoPhoneNumberForVault)?;
-    let e164_phone_number = ValidatedPhoneNumber::__build_from_vault(phone_number.clone(), None);
+    let phone_country = uvw
+        .get_decrypted_field(&state, DataKind::PhoneCountry)
+        .await?
+        .ok_or(ApiError::NoPhoneNumberForVault)?;
+    let e164_phone_number =
+        ValidatedPhoneNumber::__build_from_vault(phone_number.clone(), phone_country.clone());
 
     // Initiate the challenge of the requested type
     let (challenge_kind, challenge_state_data, time_before_retry_s, biometric_challenge_json) =
@@ -146,6 +152,7 @@ pub async fn handler(
                 challenge_kind,
                 challenge_token,
                 phone_number_last_two: phone_number_last_two(phone_number),
+                phone_country,
                 biometric_challenge_json,
                 time_before_retry_s,
             }),

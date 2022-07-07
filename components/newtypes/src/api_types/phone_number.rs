@@ -68,7 +68,7 @@ impl Debug for PhoneNumber {
 /// such as "US" or "CH"
 pub struct ValidatedPhoneNumber {
     pub e164: PiiString,
-    pub iso_country_code: Option<Country>,
+    pub iso_country_code: Country,
     phantom: PhantomData<()>,
 }
 
@@ -80,16 +80,14 @@ impl From<ValidatedPhoneNumber> for PiiString {
 
 impl ValidatedPhoneNumber {
     pub fn without_us_country_code(&self) -> PiiString {
-        if let Some(country_code) = self.iso_country_code.clone() {
-            let country: PiiString = country_code.into();
-            if country.leak() != "US" {
-                return self
-                    .e164
-                    .leak()
-                    .strip_prefix("+1")
-                    .map(PiiString::from)
-                    .unwrap_or_else(|| self.e164.clone());
-            }
+        let country: PiiString = self.iso_country_code.clone().into();
+        if country.leak() == "US" {
+            return self
+                .e164
+                .leak()
+                .strip_prefix("+1")
+                .map(PiiString::from)
+                .unwrap_or_else(|| self.e164.clone());
         }
         self.e164.clone()
     }
@@ -98,13 +96,9 @@ impl ValidatedPhoneNumber {
 impl Decomposable for ValidatedPhoneNumber {
     fn decompose(&self) -> crate::DecomposedDataKind {
         let data = vec![
-            (DataKind::PhoneNumber, Some(self.e164.clone())),
-            (
-                DataKind::PhoneCountry,
-                self.iso_country_code.clone().map(|country| country.into()),
-            ),
+            (DataKind::PhoneNumber, self.e164.clone()),
+            (DataKind::PhoneCountry, self.iso_country_code.clone().into()),
         ];
-        let data = data.into_iter().flat_map(|(k, d)| d.map(|d| (k, d))).collect();
         crate::DecomposedDataKind {
             group: DataKind::PhoneNumber.group_kind(),
             data,
@@ -127,19 +121,19 @@ impl Debug for ValidatedPhoneNumber {
 
 impl ValidatedPhoneNumber {
     /// escape hatch for constructing a known validated phone number
-    pub fn __build_from_vault(e164: String, iso_country_code: Option<String>) -> Self {
+    pub fn __build_from_vault(e164: String, iso_country_code: String) -> Self {
         Self {
             e164: PiiString::from(e164),
-            iso_country_code: iso_country_code.map(Country::__build),
+            iso_country_code: Country::__build(iso_country_code),
             phantom: PhantomData,
         }
     }
 
     /// should only be called from the twilio client
-    pub fn __build_from_twilio(e164: String, iso_country_code: Option<String>) -> Self {
+    pub fn __build_from_twilio(e164: String, iso_country_code: String) -> Self {
         Self {
             e164: PiiString::from(e164),
-            iso_country_code: iso_country_code.map(Country::__build),
+            iso_country_code: Country::__build(iso_country_code),
             phantom: PhantomData,
         }
     }

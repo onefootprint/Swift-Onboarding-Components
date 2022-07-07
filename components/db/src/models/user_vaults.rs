@@ -44,4 +44,5 @@ pub struct NewUserVaultReq {
     // Note: these aren't actual columns on the table -
     pub e_phone_number: SealedVaultBytes,
     pub sh_phone_number: Fingerprint,
+    pub e_phone_country: SealedVaultBytes,
 }

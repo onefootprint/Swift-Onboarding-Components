@@ -44,8 +44,9 @@ pub enum DbError {
     #[error("Invalid data group set for data kind. For instance, data group address may be set for ssn")]
     InvalidDataGroupForKind,
 
-    #[error("Could not create uuid")]
-    UuidCreationError,
+    #[error("Could not create uuid -- group uuid already exists")]
+    CouldNotCreateGroupUuid,
+
     #[error("migration failed: {0}")]
     MigrationFailed(Box<dyn std::error::Error + Send + Sync>),
 

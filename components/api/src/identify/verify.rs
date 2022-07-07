@@ -15,7 +15,7 @@ use chrono::Duration;
 use crypto::sha256;
 use db::models::user_vaults::{NewUserVaultReq, UserVault};
 use newtypes::{
-    DataKind, Fingerprinter, SessionAuthToken, Status, UserVaultId, ValidatedPhoneNumber,
+    DataKind, Fingerprinter, PiiString, SessionAuthToken, Status, UserVaultId, ValidatedPhoneNumber,
 };
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 
@@ -143,6 +143,7 @@ async fn create_new_user_vault(
         e_private_key,
         id_verified: Status::Incomplete,
         e_phone_number: public_key.seal_pii(&phone_number.e164)?,
+        e_phone_country: public_key.seal_pii(&PiiString::from(phone_number.iso_country_code.clone()))?,
         public_key,
         sh_phone_number: state
             .compute_fingerprint(DataKind::PhoneNumber, &phone_number.e164)

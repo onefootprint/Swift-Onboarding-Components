@@ -144,7 +144,7 @@ mod tests {
         let first_name: Name = Name::from_str("John").unwrap();
         let last_name: Name = Name::from_str("Smith").unwrap();
         let phone: ValidatedPhoneNumber =
-            ValidatedPhoneNumber::__build_from_vault("+13471235555".to_string(), Some("1".to_string()));
+            ValidatedPhoneNumber::__build_from_vault("+13471235555".to_string(), "US".to_string());
         let street_address: StreetAddress = StreetAddress::try_from("123 wallaby way".to_string()).unwrap();
         let street_address_2: Option<StreetAddress> = None;
         let city = City::try_from("sydney".to_string()).unwrap();

@@ -1,11 +1,11 @@
 use crate::models::onboardings::*;
-use crate::models::user_data::NewUserData;
+use crate::models::user_data::{GroupDataUpdateRequest, GroupInsert, NewUserData};
 use crate::models::user_vaults::*;
 use crate::onboarding::get_for_fp_id;
 use crate::schema;
 use crate::{errors::DbError, models::user_data::UserData};
 use diesel::prelude::*;
-use newtypes::{DataKind, DataPriority, Fingerprint, FootprintUserId, TenantId, UserVaultId};
+use newtypes::{DataGroupId, DataKind, DataPriority, Fingerprint, FootprintUserId, TenantId, UserVaultId};
 
 pub async fn create(pool: &crate::DbPool, new_user: NewUserVaultReq) -> Result<UserVault, crate::DbError> {
     let user_vault = pool
@@ -18,19 +18,30 @@ pub async fn create(pool: &crate::DbPool, new_user: NewUserVaultReq) -> Result<U
             let user_vault = diesel::insert_into(schema::user_vaults::table)
                 .values(new_user_vault)
                 .get_result::<UserVault>(conn)?;
+            let data_group_id = DataGroupId::generate();
             let phone_number_data = NewUserData {
                 user_vault_id: user_vault.id.clone(),
                 data_kind: DataKind::PhoneNumber,
-
                 e_data: new_user.e_phone_number,
                 sh_data: Some(new_user.sh_phone_number),
                 // Phone numbers are always created as verified
                 is_verified: true,
-                data_group_id: None,
+                data_group_id: data_group_id.clone(),
                 data_group_kind: newtypes::DataGroupKind::PhoneNumber,
                 data_group_priority: DataPriority::Primary,
             };
-            phone_number_data.insert(conn)?;
+            let phone_number_country = NewUserData {
+                user_vault_id: user_vault.id.clone(),
+                data_kind: DataKind::PhoneCountry,
+                e_data: new_user.e_phone_country,
+                sh_data: None,
+                // Phone numbers are always created as verified
+                is_verified: true,
+                data_group_id: data_group_id.clone(),
+                data_group_kind: newtypes::DataGroupKind::PhoneNumber,
+                data_group_priority: DataPriority::Primary,
+            };
+            GroupInsert(vec![phone_number_data, phone_number_country]).group_insert(conn)?;
             Ok(user_vault)
         })
         .await?;

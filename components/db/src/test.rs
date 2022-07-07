@@ -1,5 +1,7 @@
-use crate::run_migrations;
-use newtypes::{EncryptedVaultPrivateKey, Fingerprint, SealedVaultBytes, Status, VaultPublicKey};
+use crate::{models::user_data::NewUserData, run_migrations};
+use newtypes::{
+    DataGroupId, EncryptedVaultPrivateKey, Fingerprint, SealedVaultBytes, Status, VaultPublicKey,
+};
 
 #[actix_rt::test]
 async fn test_db() {
@@ -21,7 +23,7 @@ async fn test_db() {
     let _tenant = crate::tenant::init_or_get(&pool, tenant)
         .await
         .expect("couldn't create tenant");
-    crate::user_vault::create(
+    let uv = crate::user_vault::create(
         &pool,
         crate::models::user_vaults::NewUserVaultReq {
             e_private_key: EncryptedVaultPrivateKey("private key".as_bytes().to_vec()),
@@ -33,10 +35,47 @@ async fn test_db() {
                     .as_bytes()
                     .to_vec(),
             ),
+            e_phone_country: SealedVaultBytes("blah".as_bytes().to_vec()),
         },
     )
     .await
     .expect("couldn't init user vault");
 
+    let data_group_id = DataGroupId::generate();
+    let test_data = NewUserData {
+        user_vault_id: uv.id.clone(),
+        data_kind: newtypes::DataKind::Email,
+        data_group_id: data_group_id.clone(),
+        data_group_kind: newtypes::DataGroupKind::Email,
+        data_group_priority: newtypes::DataPriority::Primary,
+        e_data: SealedVaultBytes("blah".as_bytes().to_vec()),
+        sh_data: Some(Fingerprint(
+            crypto::random::gen_random_alphanumeric_code(32)
+                .as_bytes()
+                .to_vec(),
+        )),
+        is_verified: false,
+    };
+    pool.db_transaction(move |conn| test_data.insert(conn))
+        .await
+        .expect("couldn't create user data");
+    let test_data_bad_group_uuid = NewUserData {
+        user_vault_id: uv.id,
+        data_kind: newtypes::DataKind::FirstName,
+        data_group_id,
+        data_group_kind: newtypes::DataGroupKind::FullName,
+        data_group_priority: newtypes::DataPriority::Primary,
+        e_data: SealedVaultBytes("blah".as_bytes().to_vec()),
+        sh_data: Some(Fingerprint(
+            crypto::random::gen_random_alphanumeric_code(32)
+                .as_bytes()
+                .to_vec(),
+        )),
+        is_verified: false,
+    };
+    let bad_data = pool
+        .db_transaction(move |conn| test_data_bad_group_uuid.insert(conn))
+        .await;
+    assert!(bad_data.is_err())
     // TODO find_by_phone_number and find_by_email
 }
