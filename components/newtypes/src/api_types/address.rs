@@ -1,4 +1,5 @@
-use super::LeakToString;
+use crate::{pii_helper::newtype_to_pii, DataGroupKind, DataKind, Decomposable, PiiString};
+
 pub use derive_more::{Add, Display, From, FromStr, Into};
 use paperclip::actix::Apiv2Schema;
 use regex::Regex;
@@ -9,66 +10,104 @@ use serde::{Deserialize, Serialize};
 /// We uppercase everything for standardization. Country must be 2 digit ISO-3166-1 Alpha 2 country code.
 /// Inputs cannot contain special characters
 pub struct Address {
+    pub address: Option<StreetAddressData>,
+    pub city: Option<City>,
+    pub state: Option<State>,
+    pub zip: Option<Zip>,
+    pub country: Option<Country>,
+}
+
+impl Decomposable for Address {
+    fn decompose(&self) -> crate::DecomposedDataKind {
+        let Address {
+            address,
+            city,
+            state,
+            zip,
+            country,
+        } = self;
+
+        let data = vec![
+            (
+                DataKind::StreetAddress,
+                address
+                    .as_ref()
+                    .map(|a| a.street_address.clone())
+                    .map(PiiString::from),
+            ),
+            (
+                DataKind::StreetAddress2,
+                address
+                    .as_ref()
+                    .and_then(|a| a.street_address_2.clone())
+                    .map(PiiString::from),
+            ),
+            (DataKind::City, city.clone().map(PiiString::from)),
+            (DataKind::State, state.clone().map(PiiString::from)),
+            (DataKind::Zip, zip.clone().map(PiiString::from)),
+            (DataKind::Country, country.clone().map(PiiString::from)),
+        ]
+        .into_iter()
+        .flat_map(|(k, d)| d.map(|d| (k, d)))
+        .collect();
+
+        crate::DecomposedDataKind {
+            data,
+            group: DataGroupKind::Address,
+        }
+    }
+}
+
+#[derive(Clone, Debug, Hash, PartialEq, Eq, Serialize, Deserialize, Default, Apiv2Schema)]
+/// Address includes street addresses, city, state, zip, and country.
+/// We uppercase everything for standardization. Country must be 2 digit ISO-3166-1 Alpha 2 country code.
+/// Inputs cannot contain special characters
+pub struct StreetAddressData {
     pub street_address: StreetAddress,
     #[serde(default)]
     pub street_address_2: Option<StreetAddress>,
-    pub city: City,
-    pub state: State,
-    pub zip: Zip,
-    pub country: Country,
 }
 
-#[derive(Clone, Hash, PartialEq, Eq, Serialize, Deserialize, Default, Apiv2Schema)]
+impl From<StreetAddressData> for PiiString {
+    fn from(address: StreetAddressData) -> PiiString {
+        if let Some(second) = address.street_address_2 {
+            PiiString::new(format!("{} {}", address.street_address.0.leak(), second.0.leak()))
+        } else {
+            PiiString::from(address.street_address)
+        }
+    }
+}
+
+#[derive(Debug, Clone, Hash, PartialEq, Eq, Serialize, Deserialize, Default, Apiv2Schema)]
 #[serde(try_from = "String")]
 /// String of either part 1 or 2 of your street address. We capitalize everything for standardization.
 /// cannot contain special characters, other than #
-pub struct StreetAddress(String);
+pub struct StreetAddress(PiiString);
+newtype_to_pii!(StreetAddress);
 
-#[derive(Clone, Hash, PartialEq, Eq, Serialize, Deserialize, Default, Apiv2Schema)]
+#[derive(Debug, Clone, Hash, PartialEq, Eq, Serialize, Deserialize, Default, Apiv2Schema)]
 /// String of your city, cannot contain special characters
 #[serde(try_from = "String")]
-pub struct City(String);
+pub struct City(PiiString);
+newtype_to_pii!(City);
 
-#[derive(Clone, Hash, PartialEq, Eq, Serialize, Deserialize, Default, Apiv2Schema)]
+#[derive(Debug, Clone, Hash, PartialEq, Eq, Serialize, Deserialize, Default, Apiv2Schema)]
 #[serde(try_from = "String")]
 /// Name of your state or province, cannot contain special characters
-pub struct State(String);
+pub struct State(PiiString);
+newtype_to_pii!(State);
 
-#[derive(Clone, Hash, PartialEq, Eq, Serialize, Deserialize, Default, Apiv2Schema)]
+#[derive(Debug, Clone, Hash, PartialEq, Eq, Serialize, Deserialize, Default, Apiv2Schema)]
 #[serde(try_from = "String")]
 /// String, alphanumeric zip code, can also contain - or spaces
-pub struct Zip(String);
+pub struct Zip(PiiString);
+newtype_to_pii!(Zip);
 
-#[derive(Clone, Hash, PartialEq, Eq, Serialize, Deserialize, Default, Apiv2Schema)]
+#[derive(Debug, Clone, Hash, PartialEq, Eq, Serialize, Deserialize, Default, Apiv2Schema)]
 #[serde(try_from = "String")]
 /// 3 digit ISO country code
-pub struct Country(String);
-
-macro_rules! leak_to_string {
-    ($name: ident) => {
-        impl LeakToString for $name {
-            fn leak_to_string(self) -> String {
-                self.0
-            }
-        }
-    };
-}
-
-macro_rules! redact_debug_display {
-    ($name: ident) => {
-        impl std::fmt::Display for $name {
-            fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-                write!(f, "<redacted>")
-            }
-        }
-
-        impl std::fmt::Debug for $name {
-            fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-                write!(f, "<redacted>")
-            }
-        }
-    };
-}
+pub struct Country(PiiString);
+newtype_to_pii!(Country);
 
 lazy_static! {
     // regex that checks for bad characters
@@ -91,12 +130,9 @@ impl TryFrom<String> for StreetAddress {
         if INVALID_ADDRESS_CHARS.is_match(value.as_str()) {
             return Err(crate::AddressError::InvalidAddressCharacters(value).into());
         }
-        Ok(StreetAddress(value.to_uppercase()))
+        Ok(StreetAddress(PiiString::new(value.to_uppercase())))
     }
 }
-
-redact_debug_display!(StreetAddress);
-leak_to_string!(StreetAddress);
 
 impl TryFrom<String> for City {
     type Error = crate::Error;
@@ -105,12 +141,9 @@ impl TryFrom<String> for City {
         if INVALID_INPUT_CHARS.is_match(value.as_str()) {
             return Err(crate::AddressError::InvalidCharacters(value).into());
         }
-        Ok(City(value.to_uppercase()))
+        Ok(City(PiiString::new(value.to_uppercase())))
     }
 }
-
-redact_debug_display!(City);
-leak_to_string!(City);
 
 impl TryFrom<String> for State {
     type Error = crate::Error;
@@ -123,7 +156,7 @@ impl TryFrom<String> for State {
         if !ISO_3166_TWO_DIGIT_US_STATES.contains(&state.as_str()) {
             return Err(crate::AddressError::InvalidCountry(state).into());
         }
-        Ok(State(value.to_uppercase()))
+        Ok(State(PiiString::new(value.to_uppercase())))
     }
 }
 
@@ -136,9 +169,6 @@ const ISO_3166_TWO_DIGIT_US_STATES: [&str; 60] = [
     "AS", "GU", "MP", "PR", "VI", "UM", "MH", "FM", "PW",
 ];
 
-redact_debug_display!(State);
-leak_to_string!(State);
-
 impl TryFrom<String> for Country {
     type Error = crate::Error;
 
@@ -150,7 +180,13 @@ impl TryFrom<String> for Country {
         if !ISO_3166_COUNTRIES.contains(&country.as_str()) {
             return Err(crate::AddressError::InvalidCountry(country).into());
         }
-        Ok(Country(country))
+        Ok(Country(PiiString::new(country)))
+    }
+}
+
+impl Country {
+    pub fn __build(country_code: String) -> Self {
+        Country(PiiString::new(country_code))
     }
 }
 
@@ -175,22 +211,6 @@ const ISO_3166_COUNTRIES: [&str; 249] = [
     "UY", "UZ", "VU", "VE", "VN", "WF", "EH", "YE", "ZM", "ZW", "AX",
 ];
 
-impl std::fmt::Display for Country {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        // actually allow country for debugging
-        write!(f, "{}", self.0)
-    }
-}
-
-impl std::fmt::Debug for Country {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        // actually allow country for debugging
-        write!(f, "{}", self.0)
-    }
-}
-
-leak_to_string!(Country);
-
 impl TryFrom<String> for Zip {
     type Error = crate::Error;
 
@@ -198,12 +218,9 @@ impl TryFrom<String> for Zip {
         if !ZIP_CHARS.is_match(value.as_str()) {
             return Err(crate::AddressError::InvalidZip(value).into());
         }
-        Ok(Zip(value))
+        Ok(Zip(PiiString::new(value)))
     }
 }
-
-redact_debug_display!(Zip);
-leak_to_string!(Zip);
 
 #[cfg(test)]
 mod tests {
@@ -212,13 +229,13 @@ mod tests {
 
     #[test]
     fn test_address() {
-        let address =  "{\"street_address\": \"1 footprint way\", \"city\": \"new york\",  \"state\": \"NY\", \"country\": \"us\", \"zip\": \"20009\"}";
+        let address =  "{\"address\": {\"street_address\": \"1 footprint way\"}, \"city\": \"new york\",  \"state\": \"NY\", \"country\": \"us\", \"zip\": \"20009\"}";
 
-        let bad_zip = "{\"street_address\": \"1 footprint way\", \"city\": \"new york\",  \"state\": \"NY\", \"country\": \"us\", \"zip\": \"20009@\"}";
-        let bad_country = "{\"street_address\": \"1 footprint way\", \"city\": \"new york\",  \"state\": \"NY\", \"country\": \"USA\", \"zip\": \"20009\"}";
-        let bad_address = "{\"street_address\": \"1 footprint way\x00\x01\x02\", \"city\": \"new york\",  \"state\": \"NY\", \"country\": \"us\", \"zip\": \"20009\"}";
-        let good_address = "{\"street_address\": \"1 footprint way #201W\", \"city\": \"new york\",  \"state\": \"NY\", \"country\": \"us\", \"zip\": \"20009\"}";
-        let bad_city = "{\"street_address\": \"1 footprint way\", \"city\": \"new york\x00#!?\",  \"state\": \"NY\", \"country\": \"us\", \"zip\": \"20009\"}";
+        let bad_zip = "{\"address\": {\"street_address\": \"1 footprint way\"}, \"city\": \"new york\",  \"state\": \"NY\", \"country\": \"us\", \"zip\": \"20009@\"}";
+        let bad_country = "{\"address\": {\"street_address\": \"1 footprint way\"}, \"city\": \"new york\",  \"state\": \"NY\", \"country\": \"USA\", \"zip\": \"20009\"}";
+        let bad_address = "{\"address\":{\"street_address\": \"1 footprint way\x00#\x00#\"}, \"city\": \"new york\",  \"state\": \"NY\", \"country\": \"us\", \"zip\": \"20009\"}";
+        let good_address = "{\"address\": {\"street_address\": \"1 footprint way #201W\"}, \"city\": \"new york\",  \"state\": \"NY\", \"country\": \"us\", \"zip\": \"20009\"}";
+        let bad_city = "{\"address\": {\"street_address\": \"1 footprint way\"}, \"city\": \"new york\x00#!?\",  \"state\": \"NY\", \"country\": \"us\", \"zip\": \"20009\"}";
 
         let bad_zip: Result<Address, _> = serde_json::from_str(bad_zip);
         let bad_country: Result<Address, _> = serde_json::from_str(bad_country);
@@ -238,15 +255,17 @@ mod tests {
         assert_eq!(
             address,
             Address {
-                street_address: StreetAddress("1 FOOTPRINT WAY".to_string()),
-                street_address_2: None,
-                city: City("NEW YORK".to_string()),
-                state: State("NY".to_string()),
-                country: Country("US".to_string()),
-                zip: Zip("20009".to_string())
+                address: Some(StreetAddressData {
+                    street_address: StreetAddress(PiiString::new("1 FOOTPRINT WAY".to_string())),
+                    street_address_2: None
+                }),
+                city: Some(City(PiiString::new("NEW YORK".to_string()))),
+                state: Some(State(PiiString::new("NY".to_string()))),
+                country: Some(Country(PiiString::new("US".to_string()))),
+                zip: Some(Zip(PiiString::new("20009".to_string())))
             }
         );
 
-        assert_eq!(format!("{:?}", address), "Address { street_address: <redacted>, street_address_2: None, city: <redacted>, state: <redacted>, zip: <redacted>, country: US }");
+        assert_eq!(format!("{:?}", address), "Address { address: Some(StreetAddressData { street_address: StreetAddress(<redacted>), street_address_2: None }), city: Some(City(<redacted>)), state: Some(State(<redacted>)), zip: Some(Zip(<redacted>)), country: Some(Country(<redacted>)) }");
     }
 }

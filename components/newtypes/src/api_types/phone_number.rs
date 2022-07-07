@@ -1,78 +1,26 @@
-use super::LeakToString;
+use crate::address::Country;
+use crate::pii_helper::newtype_to_pii;
+use crate::{DataKind, Decomposable, PiiString};
+
 pub use derive_more::{Add, Display, From, FromStr, Into};
 use paperclip::actix::Apiv2Schema;
 use serde::{Deserialize, Deserializer, Serialize};
-use std::fmt::{Debug, Display};
+use std::fmt::Debug;
 use std::marker::PhantomData;
 use std::str::FromStr;
 
-#[doc = "Phone number -- must be between 7-15 digits per e164 standard and include a country code"]
 #[derive(Clone, Hash, PartialEq, Eq, Serialize, Default, Apiv2Schema)]
 #[serde(transparent)]
 /// Phone number string. Must be valid e164 length and include a country code
 pub struct PhoneNumber(String);
 
-#[derive(Clone, serde::Serialize, serde::Deserialize)]
-/// Validated phone number string. Only output from the twilio client
-pub struct ValidatedPhoneNumber {
-    pub e164: String,
-    phantom: PhantomData<()>,
-}
-
-impl Debug for ValidatedPhoneNumber {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let skip = self.e164.len() - 2;
-
-        let out = format!(
-            "{}{}",
-            "*".repeat(skip),
-            self.e164.chars().skip(skip).collect::<String>()
-        );
-        std::fmt::Display::fmt(&out, f)
+impl PhoneNumber {
+    pub fn leak(&self) -> &str {
+        &self.0
     }
 }
 
-impl AsRef<[u8]> for ValidatedPhoneNumber {
-    fn as_ref(&self) -> &[u8] {
-        self.e164.as_bytes()
-    }
-}
-
-impl AsRef<str> for ValidatedPhoneNumber {
-    fn as_ref(&self) -> &str {
-        self.e164.as_str()
-    }
-}
-
-impl ValidatedPhoneNumber {
-    /// escape hatch for constructing a known validated phone number
-    pub fn __build_from_vault(e164: String) -> Self {
-        Self {
-            e164,
-            phantom: PhantomData,
-        }
-    }
-
-    /// should only be called from the twilio client
-    pub fn __build_from_twilio(e164: String) -> Self {
-        Self {
-            e164,
-            phantom: PhantomData,
-        }
-    }
-}
-
-impl LeakToString for ValidatedPhoneNumber {
-    fn leak_to_string(self) -> String {
-        self.e164
-    }
-}
-
-impl LeakToString for PhoneNumber {
-    fn leak_to_string(self) -> String {
-        self.0
-    }
-}
+newtype_to_pii!(PhoneNumber);
 
 impl FromStr for PhoneNumber {
     type Err = crate::Error;
@@ -108,18 +56,94 @@ fn phone_fmt(phone: &PhoneNumber) -> String {
     )
 }
 
-impl Display for PhoneNumber {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", phone_fmt(self))
-    }
-}
-
 impl Debug for PhoneNumber {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", phone_fmt(self))
     }
 }
 
+#[derive(Clone, serde::Serialize, serde::Deserialize)]
+/// Validated phone number string. Only output from the twilio client
+/// iso_country_code is two digit country code for e164 formatted number,
+/// such as "US" or "CH"
+pub struct ValidatedPhoneNumber {
+    pub e164: PiiString,
+    pub iso_country_code: Option<Country>,
+    phantom: PhantomData<()>,
+}
+
+impl From<ValidatedPhoneNumber> for PiiString {
+    fn from(v: ValidatedPhoneNumber) -> Self {
+        v.e164
+    }
+}
+
+impl ValidatedPhoneNumber {
+    pub fn without_us_country_code(&self) -> PiiString {
+        if let Some(country_code) = self.iso_country_code.clone() {
+            let country: PiiString = country_code.into();
+            if country.leak() != "US" {
+                return self
+                    .e164
+                    .leak()
+                    .strip_prefix("+1")
+                    .map(PiiString::from)
+                    .unwrap_or_else(|| self.e164.clone());
+            }
+        }
+        self.e164.clone()
+    }
+}
+
+impl Decomposable for ValidatedPhoneNumber {
+    fn decompose(&self) -> crate::DecomposedDataKind {
+        let data = vec![
+            (DataKind::PhoneNumber, Some(self.e164.clone())),
+            (
+                DataKind::PhoneCountry,
+                self.iso_country_code.clone().map(|country| country.into()),
+            ),
+        ];
+        let data = data.into_iter().flat_map(|(k, d)| d.map(|d| (k, d))).collect();
+        crate::DecomposedDataKind {
+            group: DataKind::PhoneNumber.group_kind(),
+            data,
+        }
+    }
+}
+
+impl Debug for ValidatedPhoneNumber {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let skip = self.e164.leak().len() - 2;
+
+        let out = format!(
+            "{}{}",
+            "*".repeat(skip),
+            self.e164.leak().chars().skip(skip).collect::<String>()
+        );
+        std::fmt::Display::fmt(&out, f)
+    }
+}
+
+impl ValidatedPhoneNumber {
+    /// escape hatch for constructing a known validated phone number
+    pub fn __build_from_vault(e164: String, iso_country_code: Option<String>) -> Self {
+        Self {
+            e164: PiiString::from(e164),
+            iso_country_code: iso_country_code.map(Country::__build),
+            phantom: PhantomData,
+        }
+    }
+
+    /// should only be called from the twilio client
+    pub fn __build_from_twilio(e164: String, iso_country_code: Option<String>) -> Self {
+        Self {
+            e164: PiiString::from(e164),
+            iso_country_code: iso_country_code.map(Country::__build),
+            phantom: PhantomData,
+        }
+    }
+}
 #[cfg(test)]
 mod tests {
 

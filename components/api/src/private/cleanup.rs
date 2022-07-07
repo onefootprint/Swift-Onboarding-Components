@@ -43,7 +43,7 @@ async fn post(
     let twilio_client = &state.twilio_client;
     let phone_number = twilio_client.standardize(&requested_number).await?;
     let sh_data = state
-        .compute_fingerprint(DataKind::PhoneNumber, phone_number.as_ref())
+        .compute_fingerprint(DataKind::PhoneNumber, &phone_number.e164)
         .await?;
     db::private_cleanup_integration_tests(&state.db_pool, sh_data).await?;
 

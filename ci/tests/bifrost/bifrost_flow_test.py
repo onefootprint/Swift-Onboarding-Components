@@ -94,18 +94,28 @@ def test_user_data(request):
     request.config.cache.set("ssn", ssn)
     path = "user/data"
     data = {
-        "first_name": "Flerp",
-        "last_name": "Derp",
-        "dob": "12-25-1995",
+        "name": {
+            "first_name": "Flerp",
+            "last_name": "Derp",
+        },
+        "dob": {
+            "month": 12,
+            "day": 25,
+            "year": 1995,
+        },
+        "address": {
+            "address": {
+                "street_address": "1 Footprint Way",
+                "street_address_2": "PO Box Wallaby Way",
+            },
+            "city": "Enclave",
+            "state": "NY",
+            "zip": "10009",
+            "country": "US",
+        },
         "ssn": ssn,
-        "street_address": "1 Footprint Way",
-        "city": "Enclave",
-        "state": "NY",
-        "zip": "10009",
-        "country": "USA",
-        "email": request.config.cache.get("email", None),
-    }
-    
+        "email": EMAIL
+    } 
     r = requests.post(
         url(path),
         json=data,
@@ -115,8 +125,10 @@ def test_user_data(request):
 
     # Issue a second POST /user/data request to update some fields
     data = {
-        "first_name": "Flerp2",
-        "last_name": "Derp2",
+        "name": {
+            "first_name": "Flerp2",
+            "last_name": "Derp2",
+        }
     }
     
     r = requests.post(
@@ -269,7 +281,7 @@ def test_identify_login_repeat_customer_biometric(request, foo_tenant):
     # Identify the user by email
     path = "identify"
     
-    email = request.config.cache.get("email", None)
+    email = EMAIL
     identifier = {"email": email}
     data = {"identifier": identifier, "preferred_challenge_kind": "biometric"}
     r = requests.post(
@@ -316,7 +328,7 @@ def test_identify_repeat_customer(request, foo_tenant):
 
     # Identify the user by email
     path = "identify"
-    email = request.config.cache.get("email", None)
+    email = EMAIL
     identifier = {"email": email}
     data = {"identifier": identifier, "preferred_challenge_kind": "sms"}
 

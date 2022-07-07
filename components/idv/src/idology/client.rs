@@ -1,4 +1,4 @@
-use newtypes::IdentifyRequest;
+use newtypes::{IdentifyRequest, PiiString};
 use std::fmt::{Debug, Display};
 
 use crate::IdologyReqwestError;
@@ -91,15 +91,17 @@ impl IdologyClient {
 
     /// ExpectId module
     pub async fn verify_expectid(
-        self,
+        &self,
         identify_request: IdentifyRequest,
     ) -> Result<IdologySuccess, crate::IdologyError> {
-        let req = IdologyRequest::try_from((identify_request, self.username, self.password))?;
-
-        let req_list = <Vec<(&str, String)>>::from(req);
+        let req_list = IdologyRequest::new(
+            PiiString::from(&self.username),
+            PiiString::from(&self.password),
+            identify_request,
+        )?;
         let response = self
             .client
-            .get(self.url)
+            .get(&self.url)
             .query(&req_list)
             .send()
             .await

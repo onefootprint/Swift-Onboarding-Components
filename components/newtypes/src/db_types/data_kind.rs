@@ -1,4 +1,4 @@
-use crate::SaltedFingerprint;
+use crate::{PiiString, SaltedFingerprint};
 use crypto::sha256;
 pub use derive_more::Display;
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
@@ -6,6 +6,8 @@ use paperclip::actix::Apiv2Schema;
 use serde::{Deserialize, Serialize};
 use strum::IntoEnumIterator;
 use strum_macros::{AsRefStr, EnumIter, EnumString};
+
+use super::data_group_kind::DataGroupKind;
 
 /// The type of data attribute
 #[derive(
@@ -43,6 +45,8 @@ pub enum DataKind {
     Country,
     Email,
     PhoneNumber,
+    /// Phone country iso code, like "US"
+    PhoneCountry,
     LastFourSsn,
 }
 
@@ -71,12 +75,29 @@ impl DataKind {
     pub fn fingerprintable() -> impl Iterator<Item = DataKind> {
         Self::iter().filter(DataKind::allows_fingerprint)
     }
+
+    pub fn group_kind(&self) -> DataGroupKind {
+        match self {
+            DataKind::FirstName | DataKind::LastName => DataGroupKind::FullName,
+            DataKind::Ssn | DataKind::LastFourSsn => DataGroupKind::Ssn,
+            DataKind::StreetAddress
+            | DataKind::StreetAddress2
+            | DataKind::City
+            | DataKind::State
+            | DataKind::Zip
+            | DataKind::Country => DataGroupKind::Address,
+            DataKind::Dob => DataGroupKind::Dob,
+            DataKind::Email => DataGroupKind::Email,
+            DataKind::PhoneNumber | DataKind::PhoneCountry => DataGroupKind::PhoneNumber,
+        }
+    }
 }
 
 impl SaltedFingerprint for DataKind {
-    fn salt_data_to_sign(&self, data: &[u8]) -> [u8; 32] {
+    fn salt_pii_to_sign(&self, data: &PiiString) -> [u8; 32] {
         let self_name = self.to_string();
-        let concat = [sha256(self_name.as_bytes()), sha256(data)].concat();
+        let data_clean = data.clean_for_fingerprint();
+        let concat = [sha256(self_name.as_bytes()), sha256(data_clean.leak().as_bytes())].concat();
         sha256(&concat)
     }
 }

@@ -1,100 +1,44 @@
 use newtypes::address::Address;
-use newtypes::LeakToString;
 use newtypes::*;
 use std::fmt::Debug;
-use std::fmt::Display;
 
-use crate::IdologyConversionError;
+use crate::IdologyError;
 
 /// Idology request, we'll only use this for U.S. citizens for now
 /// as KYC requests differ for UK + other countries
-#[derive(Clone, serde::Deserialize, serde::Serialize)]
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 pub(crate) struct IdologyRequest {
-    username: String,
-    password: String,
-    first_name: String,
-    last_name: String,
-    address: String,
-    city: String,
+    username: PiiString,
+    password: PiiString,
+    first_name: PiiString,
+    last_name: PiiString,
+    address: Option<PiiString>,
+    city: Option<PiiString>,
     /// 2-digit state code
-    state: String,
+    state: Option<PiiString>,
     /// zip code must be 5 digits
-    zip: String,
-    ssn: String,
-    dob_month: String,
-    dob_year: String,
-    dob_day: String,
-    email: String,
+    zip: Option<PiiString>,
+    ssn: PiiString,
+    dob_month: PiiString,
+    dob_year: PiiString,
+    dob_day: PiiString,
+    email: PiiString,
     /// this must be 10 digits
-    telephone: String,
+    telephone: PiiString,
 }
 
-impl Debug for IdologyRequest {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.debug_struct("IdologyRequest")
-            .field("username", &self.username)
-            .field("...", &"..all identity information redacted".to_string())
-            .finish()
-    }
-}
+type SocureUsername = PiiString;
+type SocurePassword = PiiString;
 
-impl Display for IdologyRequest {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.debug_struct("IdologyRequest")
-            .field("username", &self.username)
-            .field("...", &"..all identity information redacted".to_string())
-            .finish()
-    }
-}
-
-impl From<IdologyRequest> for Vec<(&str, String)> {
-    fn from(value: IdologyRequest) -> Self {
-        let IdologyRequest {
-            username,
-            password,
-            first_name,
-            last_name,
-            address,
-            city,
-            state,
-            zip,
-            ssn,
-            dob_month,
-            dob_year,
-            dob_day,
-            email,
-            telephone,
-        } = value;
-
-        vec![
-            ("username", username),
-            ("password", password),
-            ("firstName", first_name),
-            ("lastName", last_name),
-            ("address", address),
-            ("city", city),
-            ("state", state),
-            ("zip", zip),
-            ("ssn", ssn),
-            ("dobMonth", dob_month),
-            ("dobYear", dob_year),
-            ("dobDay", dob_day),
-            ("email", email),
-            ("telephone", telephone),
-        ]
-    }
-}
-
-type SocureUsername = String;
-type SocurePassword = String;
-/// identify request and vec of modules we want to use
-impl TryFrom<(IdentifyRequest, SocureUsername, SocurePassword)> for IdologyRequest {
-    type Error = crate::IdologyError;
-
-    fn try_from(value: (IdentifyRequest, String, String)) -> Result<Self, Self::Error> {
-        let (value, username, password) = value;
-
+impl IdologyRequest {
+    /// identify request and vec of modules we want to use
+    /// TODO: ensure we call this only on US users (US address/phone number)
+    pub fn new(
+        username: SocureUsername,
+        password: SocurePassword,
+        value: IdentifyRequest,
+    ) -> Result<Self, IdologyError> {
         let IdentifyRequest {
             first_name,
             last_name,
@@ -106,66 +50,34 @@ impl TryFrom<(IdentifyRequest, SocureUsername, SocurePassword)> for IdologyReque
         } = value;
 
         let Address {
-            street_address,
-            street_address_2,
+            address,
             city,
             state,
             zip,
-            country,
+            country: _, // only US
         } = address;
 
-        // country must be US
-        let country = country.leak_to_string();
-        if country != "US" {
-            return Err(IdologyConversionError::UnsupportedCountry(country).into());
-        }
-
         // phone number must be 10 digits
-        let telephone = phone.clone().leak_to_string().replace('+', "");
-        if telephone.len() != 10 {
-            return Err(IdologyConversionError::UnsupportedPhoneNumber(phone).into());
-        }
-
-        // per idology API, zip code must be 5 digits
-        let zip = zip.leak_to_string();
-        let numeric_zip: String = zip.chars().into_iter().filter(|c| c.is_ascii_digit()).collect();
-        if numeric_zip.len() != 5 {
-            return Err(IdologyConversionError::UnsupportedZipFormat.into());
-        }
-
-        // collapse address
-        let mut address = street_address.leak_to_string();
-        if let Some(address_2) = street_address_2 {
-            address = format!("{} {}", address, address_2.leak_to_string());
-        }
-
-        let dob_str = dob.leak_to_string();
-        let dob_split = dob_str.split('-').collect::<Vec<&str>>();
-
-        let (dob_year, dob_month, dob_day) = (
-            dob_split[0].to_string(),
-            dob_split[1].to_string(),
-            dob_split[2].to_string(),
-        );
+        let telephone = phone.without_us_country_code();
 
         Ok(Self {
             username,
             password,
-            first_name: first_name.leak_to_string(),
-            last_name: last_name.leak_to_string(),
-            ssn: ssn.leak_to_string(),
-            email: email.leak_to_string(),
+            first_name: first_name.into(),
+            last_name: last_name.into(),
+            ssn: ssn.into(),
+            email: email.into(),
             telephone,
             // no restrictions on address
-            address,
+            address: address.map(PiiString::from),
             // no restrictions on city
-            city: city.leak_to_string(),
+            city: city.map(PiiString::from),
             // state is already 2 digit us state
-            state: state.leak_to_string(),
-            zip: numeric_zip,
-            dob_year,
-            dob_month,
-            dob_day,
+            state: state.map(PiiString::from),
+            zip: zip.map(PiiString::from),
+            dob_year: dob.year.into(),
+            dob_month: dob.month.into(),
+            dob_day: dob.day.into(),
         })
     }
 }

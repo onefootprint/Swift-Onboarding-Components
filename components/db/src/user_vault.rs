@@ -21,15 +21,16 @@ pub async fn create(pool: &crate::DbPool, new_user: NewUserVaultReq) -> Result<U
             let phone_number_data = NewUserData {
                 user_vault_id: user_vault.id.clone(),
                 data_kind: DataKind::PhoneNumber,
-                data_priority: DataPriority::Primary,
+
                 e_data: new_user.e_phone_number,
                 sh_data: Some(new_user.sh_phone_number),
                 // Phone numbers are always created as verified
                 is_verified: true,
+                data_group_id: None,
+                data_group_kind: newtypes::DataGroupKind::PhoneNumber,
+                data_group_priority: DataPriority::Primary,
             };
-            diesel::insert_into(schema::user_data::table)
-                .values(phone_number_data)
-                .get_result::<UserData>(conn)?;
+            phone_number_data.insert(conn)?;
             Ok(user_vault)
         })
         .await?;

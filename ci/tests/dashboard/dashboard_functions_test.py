@@ -3,6 +3,7 @@
 from urllib.parse import urlencode
 import requests
 import arrow
+from tests.constants import EMAIL
 from tests.constants import FIELDS_TO_DECRYPT
 from tests.utils import _client_priv_key_headers, _assert_response, url
 
@@ -10,12 +11,12 @@ from tests.utils import _client_priv_key_headers, _assert_response, url
 def test_tenant_decrypt(request, workos_tenant):
     path = "org/decrypt"
     expected_data = dict(
-        first_name="Flerp2",
-        last_name="Derp2",
-        email=request.config.cache.get("email", None),
-        street_address="1 Footprint Way",
+        first_name="FLERP2",
+        last_name="DERP2",
+        email=EMAIL,
+        street_address="1 FOOTPRINT WAY",
         zip="10009",
-        country="USA",
+        country="US",
         ssn=request.config.cache.get("ssn", None),
         last_four_ssn=request.config.cache.get("ssn", None)[-4:],
     )
@@ -33,7 +34,7 @@ def test_tenant_decrypt(request, workos_tenant):
         body = _assert_response(r)
         attributes = body["data"]
         for data_kind, value in attributes.items():
-            assert expected_data[data_kind] == value
+            assert expected_data[data_kind] == value.upper()
     
 def test_onboardings_list(request, workos_tenant):
     # TODO don't filter on fp_user_id in this test. We only do it to ensure it doesn't flake in dev

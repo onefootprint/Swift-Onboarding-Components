@@ -10,8 +10,6 @@ use newtypes::{DataKind, SealedVaultBytes};
 use paperclip::actix::web;
 use std::collections::HashMap;
 
-use crate::utils::email::clean_email;
-
 pub mod access_events;
 pub mod biometric;
 pub mod data;
@@ -28,17 +26,6 @@ pub fn routes() -> web::Scope {
         .service(access_events::handler)
         .service(biometric::init)
         .service(biometric::complete)
-}
-
-pub fn clean_for_storage(data_kind: DataKind, data_str: String) -> String {
-    match data_kind {
-        DataKind::Email => clean_email(data_str),
-        _ => data_str,
-    }
-}
-
-pub fn clean_for_fingerprint(data_str: String) -> String {
-    data_str.to_lowercase().trim().to_string()
 }
 
 pub struct DecryptFieldsResult {

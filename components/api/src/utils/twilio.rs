@@ -5,8 +5,9 @@ use chrono::{Duration, Utc};
 use crypto::sha256;
 use db::DbError;
 use newtypes::{
-    Base64Data, LeakToString, PhoneNumber, SealedSessionBytes, SessionAuthToken, ValidatedPhoneNumber,
+    Base64Data, PhoneNumber, PiiString, SealedSessionBytes, SessionAuthToken, ValidatedPhoneNumber,
 };
+use serde::Serialize;
 
 pub type SecondsBeforeRetry = i64;
 
@@ -57,7 +58,7 @@ struct TwilioMessageResponse {
 struct TwilioLookupResponse {
     caller_name: Option<String>,
     carrier: Option<TwilioCarrierInformation>,
-    country_code: Option<String>,
+    country_code: String,
     national_format: String,
     phone_number: String,
     add_ons: Option<String>,
@@ -125,8 +126,10 @@ impl TwilioClient {
     }
 
     pub async fn standardize(&self, phone_number: &PhoneNumber) -> Result<ValidatedPhoneNumber, ApiError> {
-        let sanitized = phone_number.clone().leak_to_string();
-        let url = format!("https://lookups.twilio.com/v1/PhoneNumbers/{sanitized}");
+        let url = format!(
+            "https://lookups.twilio.com/v1/PhoneNumbers/{}",
+            phone_number.leak()
+        );
 
         let response = self
             .client
@@ -138,12 +141,15 @@ impl TwilioClient {
 
         let twilio_response = response.json::<TwilioResponse<TwilioLookupResponse>>().await?;
 
-        let e164 = match twilio_response {
-            TwilioResponse::Success(resp) => Ok(resp.phone_number),
+        let (e164, country_code) = match twilio_response {
+            TwilioResponse::Success(resp) => Ok((resp.phone_number, resp.country_code)),
             TwilioResponse::Error(e) => Err(ApiError::TwilioError(e.message)),
         }?;
 
-        Ok(ValidatedPhoneNumber::__build_from_twilio(e164))
+        Ok(ValidatedPhoneNumber::__build_from_twilio(
+            e164,
+            Some(country_code),
+        ))
     }
 
     async fn send_message(
@@ -154,11 +160,18 @@ impl TwilioClient {
         let account_sid = self.account_sid.clone();
         let url = format!("https://api.twilio.com/2010-04-01/Accounts/{account_sid}/Messages.json");
 
-        let params = [
-            ("Body", body),
-            ("To", destination.e164),
-            ("From", self.source_phone_number.to_string()),
-        ];
+        #[derive(Serialize)]
+        #[serde(rename_all = "PascalCase")]
+        struct SendForm {
+            body: String,
+            to: PiiString,
+            from: String,
+        }
+        let params = SendForm {
+            body,
+            to: destination.e164,
+            from: self.source_phone_number.to_string(),
+        };
 
         let response = self
             .client
@@ -227,7 +240,8 @@ impl TwilioClient {
         scope: &str,
     ) -> Result<SecondsBeforeRetry, ApiError> {
         let h_session_id =
-            Base64Data(sha256(format!("{}:{}", phone_number.e164, scope).as_bytes()).to_vec()).to_string();
+            Base64Data(sha256(format!("{}:{}", phone_number.e164.leak(), scope).as_bytes()).to_vec())
+                .to_string();
 
         let now = Utc::now().naive_utc();
         let time_between_challenges_s = self.time_s_between_challenges;

@@ -3,7 +3,8 @@ use crate::auth::session_data::{ServerSession, SessionData};
 use crate::errors::ApiError;
 use crate::State;
 use crypto::random::gen_random_alphanumeric_code;
-use newtypes::{DataKind, Fingerprinter, UserVaultId};
+use db::user_vault::get_by_fingerprint;
+use newtypes::{DataKind, Fingerprinter, PiiString, UserVaultId};
 use paperclip::actix::web;
 use reqwest::StatusCode;
 use std::collections::HashMap;
@@ -105,19 +106,21 @@ impl SendgridClient {
     }
 }
 
-pub fn clean_email(raw_email: String) -> String {
-    raw_email.to_lowercase()
-}
-
 pub(crate) async fn send_email_challenge(
     state: &web::Data<State>,
     uv_id: UserVaultId,
-    email_address: String,
+    email_address: &PiiString,
 ) -> Result<(), ApiError> {
-    let session_data = SessionData::EmailVerify(EmailVerifySession {
-        uv_id,
-        sh_email: state.compute_fingerprint(DataKind::Email, &email_address).await?,
-    });
+    // avoid sending multiple emails if we already have the address on file
+    // TODO: edge case where a user may want to re-send email that isn't verified?
+    let sh_email = state.compute_fingerprint(DataKind::Email, email_address).await?;
+    let uv_data_for_email =
+        get_by_fingerprint(&state.db_pool, DataKind::Email, sh_email.clone(), false).await?;
+    if uv_data_for_email.is_some() {
+        return Ok(());
+    }
+
+    let session_data = SessionData::EmailVerify(EmailVerifySession { uv_id, sh_email });
 
     // create new session
     let token = ServerSession::create(state, session_data, chrono::Duration::days(1)).await?;
@@ -127,7 +130,7 @@ pub(crate) async fn send_email_challenge(
     let curl_request_str = format!("https://verify.ui.footprint.dev/?v={}#{}", unique_param, token);
     state
         .sendgrid_client
-        .send_with_challenge_template(email_address, curl_request_str)
+        .send_with_challenge_template(email_address.leak_to_string(), curl_request_str)
         .await?;
     Ok(())
 }

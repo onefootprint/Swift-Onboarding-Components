@@ -10,7 +10,7 @@ use crate::{auth::session_context::SessionContext, errors::ApiError};
 use chrono::{DateTime, Utc};
 use db::onboarding::OnboardingListQueryParams;
 use db::DbError;
-use newtypes::{DataKind, Fingerprint, Fingerprinter, FootprintUserId, Status};
+use newtypes::{DataKind, Fingerprint, Fingerprinter, FootprintUserId, PiiString, Status};
 use paperclip::actix::{api_v2_operation, get, web, web::Json, Apiv2Schema};
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize, Apiv2Schema)]
@@ -19,7 +19,7 @@ struct OnboardingRequest {
     #[serde(default)]
     #[serde(deserialize_with = "deserialize_stringified_list")]
     statuses: Vec<Status>,
-    fingerprint: Option<String>,
+    fingerprint: Option<PiiString>,
     footprint_user_id: Option<FootprintUserId>,
     // Accept timezones with a timestamp, but translate them to naive utc representation
     timestamp_lte: Option<DateTime<Utc>>,
@@ -60,7 +60,7 @@ fn handler(
     // TODO clean phone number or email
     let fingerprints = match fingerprint {
         Some(fingerprint) => {
-            let cleaned_data = crate::user::clean_for_fingerprint(fingerprint);
+            let cleaned_data = fingerprint.clean_for_fingerprint();
 
             let fut_fingerprints =
                 DataKind::fingerprintable().map(|kind| state.compute_fingerprint(kind, &cleaned_data));

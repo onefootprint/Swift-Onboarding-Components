@@ -225,6 +225,8 @@ fn try_attest_apple_app_attestation(
     app_attestation: &[u8],
 ) -> Result<AppAttestationMetadata, AttestationError> {
     let verifier = app_attest::apple::AppleAppAttestationVerifier::new_default_ca(vec![
+        "5F264K8AG4.com.onefootprint.my",
+        "5F264K8AG4.com.onefootprint.my.live",
         "C246BC89CJ.in.alexgr.FootprintVerify",
         "C246BC89CJ.in.alexgr.FootprintVerify.Clip",
     ])?; // todo: move App IDs to config

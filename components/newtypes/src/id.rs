@@ -37,6 +37,11 @@ define_newtype_id!(UserVaultId, String, "Identifier for a User Vault");
 define_newtype_id!(OnboardingId, String, "Identifier for an Onboarding");
 define_newtype_id!(FootprintUserId, String, "Identifier for a an onboarding");
 define_newtype_id!(
+    DataGroupId,
+    Uuid,
+    "Identifier for a group of related data, such as an address"
+);
+define_newtype_id!(
     ObConfigurationId,
     String,
     "Internal identifier for a an onboarding configuration"
@@ -61,6 +66,13 @@ define_newtype_id!(
     "Identifier for the junction table that joins verification requests and user data"
 );
 define_newtype_id!(AuditTrailId, Uuid, "Identifier for an audit trail");
+
+impl DataGroupId {
+    pub fn generate() -> Self {
+        let uuid = Uuid::new_v4();
+        Self(uuid)
+    }
+}
 
 #[cfg(test)]
 mod tests {

@@ -5,7 +5,7 @@ use crate::{enclave::gen_keypair, errors::ApiError};
 use crypto::random::gen_random_alphanumeric_code;
 use db::models::ob_configurations::NewObConfiguration;
 use db::models::tenant_api_keys::PartialTenantApiKey;
-use newtypes::{ObConfigurationId, ObConfigurationKey, TenantId};
+use newtypes::{ObConfigurationId, ObConfigurationKey, PiiString, TenantId};
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 
 use db::models::tenants::{NewTenant, Tenant};
@@ -78,7 +78,7 @@ async fn init_api_keys(
 ) -> Result<ClientKeysResponse, ApiError> {
     let api_key = format!("sk_{}", gen_random_alphanumeric_code(34));
 
-    let e_api_key = &tenant.public_key.seal_data(api_key.as_str())?;
+    let e_api_key = &tenant.public_key.seal_pii(&PiiString::from(api_key.as_str()))?;
 
     let sh_api_key = state.hmac_client.signed_hash(api_key.as_bytes()).await?;
 

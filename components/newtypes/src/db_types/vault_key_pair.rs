@@ -1,7 +1,7 @@
 pub use derive_more::{Add, Display, From, Into};
 use serde::{Deserialize, Serialize};
 
-use crate::SealedVaultBytes;
+use crate::{PiiString, SealedVaultBytes};
 
 /// Bytes of a vault public key
 #[derive(DieselNewType, Debug, Clone, Hash, PartialEq, Eq, From, Into, Serialize, Deserialize, Default)]
@@ -26,7 +26,11 @@ impl AsRef<[u8]> for VaultPublicKey {
 }
 
 impl VaultPublicKey {
-    pub fn seal_data(&self, data: &str) -> Result<SealedVaultBytes, crypto::Error> {
+    pub fn seal_pii(&self, pii: &PiiString) -> Result<SealedVaultBytes, crypto::Error> {
+        self.seal_data(pii.leak())
+    }
+
+    fn seal_data(&self, data: &str) -> Result<SealedVaultBytes, crypto::Error> {
         let result =
             crypto::seal::seal_ecies_p256_x963_sha256_aes_gcm(&self.0, data.as_bytes().to_vec())?.to_vec()?;
         Ok(SealedVaultBytes(result))

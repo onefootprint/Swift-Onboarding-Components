@@ -16,6 +16,8 @@ pub enum SocureError {
 pub enum SocureConversionError {
     #[error("zip code is unsupported length for socure API validation")]
     UnsupportedZipFormat,
+    #[error("address not present for user")]
+    NoAddressPresent,
 }
 
 #[derive(Debug, thiserror::Error)]

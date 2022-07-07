@@ -85,6 +85,8 @@ fn status_code_for_db_error(e: &DbError) -> StatusCode {
         DbError::InvalidSessionForOperation => StatusCode::UNAUTHORIZED,
         DbError::IncorrectNumberOfRowsUpdated => StatusCode::INTERNAL_SERVER_ERROR,
         DbError::CryptoError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+        DbError::InvalidDataGroupForKind => StatusCode::INTERNAL_SERVER_ERROR,
+        DbError::UuidCreationError => StatusCode::INTERNAL_SERVER_ERROR,
     }
 }
 

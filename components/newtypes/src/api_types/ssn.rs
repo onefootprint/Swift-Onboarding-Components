@@ -3,13 +3,40 @@ use paperclip::actix::Apiv2Schema;
 use serde::{Deserialize, Deserializer, Serialize};
 use std::str::FromStr;
 
-use crate::LeakToString;
+use crate::{DataGroupKind, DataKind, Decomposable, PiiString};
 
+#[doc = "Social security number -- 9 digit or 4 digit numeric string"]
+#[derive(Debug, Clone, Hash, PartialEq, Eq, Serialize, Deserialize, Apiv2Schema)]
+#[serde(untagged)]
+/// 9 digit social security number
+pub enum Ssn {
+    Ssn(FullSsn),
+    LastFour(LastFourSsn),
+}
+
+impl Decomposable for Ssn {
+    fn decompose(&self) -> crate::DecomposedDataKind {
+        let list = match self {
+            Ssn::Ssn(ssn) => {
+                let last_four = LastFourSsn::from(ssn);
+                vec![
+                    (DataKind::LastFourSsn, PiiString::from(&last_four.0)),
+                    (DataKind::Ssn, PiiString::from(&ssn.0)),
+                ]
+            }
+            Ssn::LastFour(last_four) => vec![(DataKind::LastFourSsn, PiiString::from(&last_four.0))],
+        };
+        crate::DecomposedDataKind {
+            data: list,
+            group: DataGroupKind::Ssn,
+        }
+    }
+}
 #[doc = "Social security number -- 9 digit numeric string"]
 #[derive(Clone, Hash, PartialEq, Eq, Serialize, Default, Apiv2Schema)]
 #[serde(transparent)]
 /// 9 digit social security number
-pub struct Ssn(String);
+pub struct FullSsn(String);
 
 #[doc = "Last four digits of ssn -- 4 digit numeric string"]
 #[derive(Clone, Hash, PartialEq, Eq, Serialize, Default, Apiv2Schema)]
@@ -17,7 +44,7 @@ pub struct Ssn(String);
 #[serde(transparent)]
 pub struct LastFourSsn(String);
 
-impl std::str::FromStr for Ssn {
+impl std::str::FromStr for FullSsn {
     type Err = crate::Error;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
@@ -26,11 +53,18 @@ impl std::str::FromStr for Ssn {
         if number.len() != 9 {
             return Err(crate::Error::InvalidSsn);
         }
-        Ok(Ssn(number))
+        Ok(FullSsn(number))
     }
 }
 
-impl<'de> Deserialize<'de> for Ssn {
+impl From<&FullSsn> for LastFourSsn {
+    fn from(val: &FullSsn) -> Self {
+        let last_four = val.0.chars().skip(val.0.len() - 4).collect();
+        LastFourSsn(last_four)
+    }
+}
+
+impl<'de> Deserialize<'de> for FullSsn {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: Deserializer<'de>,
@@ -40,21 +74,15 @@ impl<'de> Deserialize<'de> for Ssn {
     }
 }
 
-impl std::fmt::Display for Ssn {
+impl std::fmt::Display for FullSsn {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "*********")
     }
 }
 
-impl std::fmt::Debug for Ssn {
+impl std::fmt::Debug for FullSsn {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "*********")
-    }
-}
-
-impl LeakToString for Ssn {
-    fn leak_to_string(self) -> String {
-        self.0
     }
 }
 
@@ -101,7 +129,7 @@ mod tests {
     fn test_ssn() {
         #[derive(Eq, Debug, PartialEq, Serialize, Deserialize)]
         struct Test {
-            pub ssn: Ssn,
+            pub ssn: FullSsn,
         }
         let example = "{\"ssn\": \"123-45-7890\"}";
         let bad_example = "{\"ssn\": \"12345a\"}";
@@ -113,12 +141,12 @@ mod tests {
         assert_eq!(
             deserialized,
             Test {
-                ssn: Ssn("123457890".to_owned())
+                ssn: FullSsn("123457890".to_owned())
             }
         );
 
         let test_bad_str = "12345a";
-        assert!(Ssn::from_str(test_bad_str).is_err());
+        assert!(FullSsn::from_str(test_bad_str).is_err());
 
         assert_eq!(format!("{ssn:#?}"), "*********");
     }
@@ -144,7 +172,7 @@ mod tests {
         );
 
         let test_bad_str = "12345a";
-        assert!(Ssn::from_str(test_bad_str).is_err());
+        assert!(FullSsn::from_str(test_bad_str).is_err());
 
         assert_eq!(format!("{ssn:#?}"), "****")
     }

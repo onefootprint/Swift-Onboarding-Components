@@ -24,6 +24,8 @@ pub enum IdologyConversionError {
     UnsupportedPhoneNumber(ValidatedPhoneNumber),
     #[error("unsupported country, country must be US")]
     UnsupportedCountry(String),
+    #[error("no address listed for user")]
+    NoAddressPresent,
 }
 
 #[derive(Debug, thiserror::Error)]

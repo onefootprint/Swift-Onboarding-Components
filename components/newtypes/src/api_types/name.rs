@@ -4,7 +4,27 @@ use serde::{Deserialize, Deserializer, Serialize};
 use std::fmt::{Debug, Display};
 use std::str::FromStr;
 
-use crate::LeakToString;
+use crate::{DataGroupKind, DataKind, Decomposable, PiiString};
+
+#[doc = "Full Name"]
+#[derive(Debug, Clone, Hash, PartialEq, Eq, Serialize, Deserialize, Default, Apiv2Schema)]
+/// A struct representing first and last name. We uppercase all names for consistency
+pub struct FullName {
+    first_name: Name,
+    last_name: Name,
+}
+
+impl Decomposable for FullName {
+    fn decompose(&self) -> crate::DecomposedDataKind {
+        crate::DecomposedDataKind {
+            data: vec![
+                (DataKind::FirstName, PiiString::from(&self.first_name.0)),
+                (DataKind::LastName, PiiString::from(&self.last_name.0)),
+            ],
+            group: DataGroupKind::FullName,
+        }
+    }
+}
 
 #[doc = "Name"]
 #[derive(Clone, Hash, PartialEq, Eq, Serialize, Default, Apiv2Schema)]
@@ -40,12 +60,6 @@ impl Display for Name {
 impl Debug for Name {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "<redacted>")
-    }
-}
-
-impl LeakToString for Name {
-    fn leak_to_string(self) -> String {
-        self.0
     }
 }
 

@@ -98,7 +98,7 @@ impl SocureClient {
         self,
         identify_request: IdentifyRequest,
     ) -> Result<SocureKycResponse, crate::SocureError> {
-        let req = SocureRequest::try_from((identify_request, vec!["kyc".to_string()]))?;
+        let req = SocureRequest::new(vec!["kyc".to_string()], identify_request)?;
 
         let response = self
             .client
@@ -132,7 +132,7 @@ mod tests {
     use newtypes::email::Email;
     use newtypes::name::Name;
     use newtypes::phone_number::*;
-    use newtypes::ssn::Ssn;
+    use newtypes::ssn::FullSsn;
 
     #[actix_rt::test]
     #[ignore]
@@ -144,25 +144,27 @@ mod tests {
         let first_name: Name = Name::from_str("John").unwrap();
         let last_name: Name = Name::from_str("Smith").unwrap();
         let phone: ValidatedPhoneNumber =
-            ValidatedPhoneNumber::__build_from_vault("+13471235555".to_string());
+            ValidatedPhoneNumber::__build_from_vault("+13471235555".to_string(), Some("1".to_string()));
         let street_address: StreetAddress = StreetAddress::try_from("123 wallaby way".to_string()).unwrap();
         let street_address_2: Option<StreetAddress> = None;
-        let city: City = City::try_from("sydney".to_string()).unwrap();
-        let state: State = State::try_from("NC".to_string()).unwrap();
-        let country: Country = Country::try_from("US".to_string()).unwrap();
-        let zip: Zip = Zip::try_from("12345".to_string()).unwrap();
+        let city = City::try_from("sydney".to_string()).unwrap();
+        let state = State::try_from("NC".to_string()).unwrap();
+        let country = Country::try_from("US".to_string()).unwrap();
+        let zip = Zip::try_from("12345".to_string()).unwrap();
         let address: Address = Address {
-            street_address,
-            street_address_2,
-            city,
-            state,
-            zip,
-            country,
+            address: Some(StreetAddressData {
+                street_address,
+                street_address_2,
+            }),
+            city: Some(city),
+            state: Some(state),
+            zip: Some(zip),
+            country: Some(country),
         };
         let email: Email = Email::from_str("beep@boop.org").unwrap();
         let bad_dob: Dob = serde_json::from_str("{\"month\": 1, \"day\": 9, \"year\": 1998 }").unwrap();
-        let dob: ValidatedDob = ValidatedDob::try_from(bad_dob).unwrap();
-        let ssn: Ssn = Ssn::from_str("123456789").unwrap();
+        let dob: DateOfBirth = DateOfBirth::try_from(bad_dob).unwrap();
+        let ssn: FullSsn = FullSsn::from_str("123456789").unwrap();
 
         let request = IdentifyRequest {
             first_name,
@@ -174,8 +176,6 @@ mod tests {
             ssn,
         };
 
-        let resp = socure_client.verify_kyc(request).await.unwrap();
-
-        println!("{:?}", resp)
+        let _resp = socure_client.verify_kyc(request).await.unwrap();
     }
 }

@@ -5,7 +5,6 @@ use crate::errors::onboarding::OnboardingError;
 use crate::errors::ApiError;
 use crate::types::success::ApiResponseData;
 use crate::utils::challenge::{Challenge, ChallengeToken};
-use crate::utils::email::clean_email;
 use crate::utils::liveness::LivenessWebauthnConfig;
 use crate::utils::twilio::TwilioClient;
 use crate::utils::user_vault_wrapper::UserVaultWrapper;
@@ -14,7 +13,8 @@ use crypto::serde_cbor;
 use db::models::user_vaults::UserVault;
 use db::models::webauthn_credential::WebauthnCredential;
 use db::webauthn_credentials::get_webauthn_creds;
-use newtypes::{DataKind, Fingerprinter, PhoneNumber, UserVaultId, ValidatedPhoneNumber};
+use newtypes::email::Email;
+use newtypes::{DataKind, Fingerprinter, PhoneNumber, PiiString, UserVaultId, ValidatedPhoneNumber};
 use paperclip::actix::{api_v2_operation, web, web::Json, Apiv2Schema};
 use webauthn_rs_core::proto::{Base64UrlSafeData, Credential, ParsedAttestation, ParsedAttestationData};
 use webauthn_rs_proto::{RegisteredExtensions, UserVerificationPolicy};
@@ -31,7 +31,7 @@ pub struct IdentifyRequest {
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum Identifier {
-    Email(String),
+    Email(Email),
     PhoneNumber(PhoneNumber),
 }
 
@@ -89,7 +89,7 @@ pub async fn handler(
         .get_decrypted_field(&state, DataKind::PhoneNumber)
         .await?
         .ok_or(ApiError::NoPhoneNumberForVault)?;
-    let e164_phone_number = ValidatedPhoneNumber::__build_from_vault(phone_number.clone());
+    let e164_phone_number = ValidatedPhoneNumber::__build_from_vault(phone_number.clone(), None);
 
     // Initiate the challenge of the requested type
     let (challenge_kind, challenge_state_data, time_before_retry_s, biometric_challenge_json) =
@@ -163,10 +163,7 @@ async fn get_user_by_identifier(
             let phone_number = twilio_client.standardize(&phone_number).await?;
             (DataKind::PhoneNumber, phone_number.e164)
         }
-        Identifier::Email(email) => {
-            let email = clean_email(email);
-            (DataKind::Email, email)
-        }
+        Identifier::Email(email) => (DataKind::Email, PiiString::from(email)),
     };
     let sh_data = state.compute_fingerprint(data_kind, &data).await?;
     // TODO should we only look for verified emails?

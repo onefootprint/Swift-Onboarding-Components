@@ -63,7 +63,7 @@ def test_logged_in_decrypt(request):
     body = _assert_response(r)
     attributes = body["data"]
     assert attributes["phone_number"] == PHONE_NUMBER.replace(" ", "")
-    assert attributes["email"] == request.config.cache.get("email", None)
+    assert attributes["email"] == EMAIL
 
 def test_logged_in_user_detail(request):
     # Get the user detail using the logged in context
@@ -74,8 +74,8 @@ def test_logged_in_user_detail(request):
     )
     body = _assert_response(r)
     user = body["data"]
-    assert user["first_name"] == "Flerp2"
-    assert user["last_name"] == "Derp2"
+    assert user["first_name"] == "FLERP2"
+    assert user["last_name"] == "DERP2"
 
 def test_logged_in_access_events(request):
     # Get the user detail using the logged in context

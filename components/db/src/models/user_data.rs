@@ -4,7 +4,10 @@ use crate::DbPool;
 use chrono::NaiveDateTime;
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
-use newtypes::{DataKind, DataPriority, Fingerprint, SealedVaultBytes, UserDataId, UserVaultId};
+use newtypes::{
+    DataGroupId, DataGroupKind, DataKind, DataPriority, Fingerprint, SealedVaultBytes, UserDataId,
+    UserVaultId,
+};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable, Identifiable)]
@@ -13,10 +16,12 @@ pub struct UserData {
     pub id: UserDataId,
     pub user_vault_id: UserVaultId,
     pub data_kind: DataKind,
+    pub data_group_id: DataGroupId,
+    pub data_group_kind: DataGroupKind,
+    pub data_group_priority: DataPriority,
     pub e_data: SealedVaultBytes,
     pub sh_data: Option<Fingerprint>,
     pub is_verified: bool,
-    pub data_priority: DataPriority,
     pub deactivated_at: Option<NaiveDateTime>,
     pub _created_at: NaiveDateTime,
     pub _updated_at: NaiveDateTime,
@@ -40,19 +45,86 @@ impl UserData {
 pub struct NewUserData {
     pub user_vault_id: UserVaultId,
     pub data_kind: DataKind,
-    pub data_priority: DataPriority,
+    pub data_group_id: Option<DataGroupId>,
+    pub data_group_kind: DataGroupKind,
+    pub data_group_priority: DataPriority,
     pub e_data: SealedVaultBytes,
     pub sh_data: Option<Fingerprint>,
     pub is_verified: bool,
 }
 
-pub struct NewUserDataBatch(pub Vec<NewUserData>);
+impl NewUserData {
+    pub fn insert(self, conn: &mut PgConnection) -> Result<UserData, crate::DbError> {
+        let data = diesel::insert_into(user_data::table)
+            .values(&self)
+            .get_result::<UserData>(conn)?;
+        Ok(data)
+    }
+}
 
-impl NewUserDataBatch {
-    pub fn bulk_insert(self, conn: &mut PgConnection) -> Result<(), crate::DbError> {
+pub struct GroupInsert(pub Vec<NewUserData>);
+
+impl GroupInsert {
+    pub fn group_insert(self, conn: &mut PgConnection) -> Result<(), crate::DbError> {
         diesel::insert_into(user_data::table)
             .values(self.0)
             .execute(conn)?;
+        Ok(())
+    }
+}
+
+pub struct UserDataUpdate {
+    pub data_kind: DataKind,
+    pub e_data: SealedVaultBytes,
+    pub sh_data: Option<Fingerprint>,
+    pub is_verified: bool,
+}
+
+pub struct GroupDataUpdateRequest {
+    pub user_vault_id: UserVaultId,
+    pub data_group_kind: DataGroupKind,
+    pub data_group_priority: DataPriority,
+    pub data: Vec<UserDataUpdate>,
+}
+
+pub struct NewUserDataBatch(pub Vec<GroupDataUpdateRequest>);
+
+impl NewUserDataBatch {
+    pub fn bulk_insert(self, conn: &mut PgConnection) -> Result<(), crate::DbError> {
+        for data in self.0 {
+            let GroupDataUpdateRequest {
+                user_vault_id,
+                data_group_priority,
+                data_group_kind,
+                data,
+            } = data;
+
+            // generate uuid for checking they're in the same group: todo, check collisions
+            // earlier
+            let group_id = DataGroupId::generate();
+            let updates: Vec<NewUserData> = data
+                .into_iter()
+                .map(|update_data| {
+                    let UserDataUpdate {
+                        data_kind,
+                        e_data,
+                        sh_data,
+                        is_verified,
+                    } = update_data;
+                    NewUserData {
+                        user_vault_id: user_vault_id.clone(),
+                        data_kind,
+                        data_group_id: Some(group_id.clone()),
+                        data_group_kind,
+                        data_group_priority,
+                        e_data,
+                        sh_data,
+                        is_verified,
+                    }
+                })
+                .collect();
+            GroupInsert(updates).group_insert(conn)?;
+        }
         Ok(())
     }
 }

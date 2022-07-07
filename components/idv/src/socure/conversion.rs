@@ -1,61 +1,33 @@
 use chrono::{naive::NaiveDateTime, Utc};
 use newtypes::address::Address;
-use newtypes::LeakToString;
 use newtypes::*;
 use std::fmt::Debug;
-use std::fmt::Display;
 
-#[derive(Clone, serde::Deserialize, serde::Serialize)]
+#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 pub(crate) struct SocureRequest {
     modules: Vec<String>,
-    first_name: String,
-    sur_name: String,
+    first_name: PiiString,
+    sur_name: PiiString,
     /// YYYY-MM-DD
-    dob: String,
-    national_id: String,
-    email: String,
+    dob: PiiString,
+    national_id: PiiString,
+    email: PiiString,
     /// e164 format, from twilio
-    mobile_number: String,
-    physical_address: String,
-    physical_address_2: Option<String>,
-    city: String,
-    state: String,
-    zip: String,
-    country: String,
+    mobile_number: PiiString,
+    physical_address: Option<PiiString>,
+    physical_address_2: Option<PiiString>,
+    city: Option<PiiString>,
+    state: Option<PiiString>,
+    zip: Option<PiiString>,
+    country: Option<PiiString>,
     user_consent: bool,
     consent_timestamp: NaiveDateTime,
 }
 
-impl Debug for SocureRequest {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.debug_struct("SocureRequest")
-            .field("modules", &self.modules)
-            .field("country", &self.country)
-            .field("consent_timestamp", &self.consent_timestamp)
-            .field("...", &"..all identity information redacted".to_string())
-            .finish()
-    }
-}
-
-impl Display for SocureRequest {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.debug_struct("SocureRequest")
-            .field("modules", &self.modules)
-            .field("country", &self.country)
-            .field("consent_timestamp", &self.consent_timestamp)
-            .field("...", &"..all identity information redacted".to_string())
-            .finish()
-    }
-}
-
 /// identify request and vec of modules we want to use
-impl TryFrom<(IdentifyRequest, Vec<String>)> for SocureRequest {
-    type Error = crate::SocureError;
-
-    fn try_from(value: (IdentifyRequest, Vec<String>)) -> Result<Self, Self::Error> {
-        let (value, modules) = value;
-
+impl SocureRequest {
+    pub fn new(modules: Vec<String>, request: IdentifyRequest) -> Result<Self, crate::SocureError> {
         let IdentifyRequest {
             first_name,
             last_name,
@@ -64,43 +36,49 @@ impl TryFrom<(IdentifyRequest, Vec<String>)> for SocureRequest {
             email,
             phone,
             address,
-        } = value;
+        } = request;
 
         let Address {
-            street_address,
-            street_address_2,
+            address: street_address,
             city,
             state,
             zip,
             country,
         } = address;
 
+        // if street_address.is_none() {
+        //     return Err(crate::SocureConversionError::NoAddressPresent.into());
+        // }
+
         // per socure API, zip code must either be 5 or 9 digits. hyphens
         // are optional, but it can't contain spaces (which we allow)
         // filter only for digits & check length before sending
-        let zip = zip.leak_to_string();
-        let numeric_zip: String = zip.chars().into_iter().filter(|c| c.is_ascii_digit()).collect();
-        if numeric_zip.len() != 9 && numeric_zip.len() != 5 {
-            return Err(crate::SocureConversionError::UnsupportedZipFormat.into());
-        }
+        // let zip = zip.leak_to_string();
+        // let numeric_zip: String = zip.chars().into_iter().filter(|c| c.is_ascii_digit()).collect();
+        // if numeric_zip.len() != 9 && numeric_zip.len() != 5 {
+        //     return Err(crate::SocureConversionError::UnsupportedZipFormat.into());
+        // }
+
         Ok(Self {
             modules,
-            first_name: first_name.leak_to_string(),
-            sur_name: last_name.leak_to_string(),
-            dob: dob.leak_to_string(),
-            national_id: ssn.leak_to_string(),
-            email: email.leak_to_string(),
-            mobile_number: phone.leak_to_string(),
+            first_name: first_name.into(),
+            sur_name: last_name.into(),
+            dob: dob.yyyy_mm_dd(),
+            national_id: ssn.into(),
+            email: email.into(),
+            mobile_number: phone.into(),
             // no restrictions on physical address
-            physical_address: street_address.leak_to_string(),
-            physical_address_2: street_address_2.map(|val| val.leak_to_string()),
+            physical_address: street_address.as_ref().map(|s| s.street_address.clone().into()),
+            physical_address_2: street_address
+                .as_ref()
+                .and_then(|s| s.street_address_2.clone().map(|s2| s2.into())),
             // no restrictions on city
-            city: city.leak_to_string(),
+            city: city.map(PiiString::from),
             // state is already 2 digit us state
-            state: state.leak_to_string(),
-            zip: numeric_zip,
+            state: state.map(PiiString::from),
+            zip: zip.map(PiiString::from),
             // country is already 2 digit country code
-            country: country.leak_to_string(),
+            country: country.map(PiiString::from),
             user_consent: true,
             consent_timestamp: Utc::now().naive_utc(),
         })

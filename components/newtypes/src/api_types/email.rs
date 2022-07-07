@@ -4,7 +4,7 @@ use regex::Regex;
 use serde::{Deserialize, Deserializer, Serialize};
 use std::str::FromStr;
 
-use crate::LeakToString;
+use crate::{pii_helper::newtype_to_pii, DataKind, Decomposable};
 
 #[doc = "Email address"]
 #[derive(Clone, Hash, PartialEq, Eq, Serialize, Default, Apiv2Schema)]
@@ -13,9 +13,23 @@ use crate::LeakToString;
 /// uppercased for consistency.
 pub struct Email(String);
 
+impl Email {
+    pub fn leak(&self) -> &str {
+        &self.0
+    }
+}
+
+newtype_to_pii!(Email);
+
 lazy_static! {
     pub static ref EMAIL_RE: Regex =
         Regex::new(r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)").unwrap();
+}
+
+impl Decomposable for Email {
+    fn decompose(&self) -> crate::DecomposedDataKind {
+        crate::DecomposedDataKind::simple(DataKind::Email, &self.0)
+    }
 }
 
 impl std::str::FromStr for Email {
@@ -29,12 +43,6 @@ impl std::str::FromStr for Email {
         }
         // lowercase for consistency & readability
         Ok(Email(s.to_string().to_uppercase()))
-    }
-}
-
-impl LeakToString for Email {
-    fn leak_to_string(self) -> String {
-        self.0
     }
 }
 
@@ -53,12 +61,6 @@ fn email_fmt(email: &Email) -> String {
     let name = String::from_iter(split.next().unwrap().chars().map(|_| '*'));
     let domain = split.next().unwrap();
     format!("{name}@{domain}")
-}
-
-impl std::fmt::Display for Email {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", email_fmt(self))
-    }
 }
 
 impl std::fmt::Debug for Email {
