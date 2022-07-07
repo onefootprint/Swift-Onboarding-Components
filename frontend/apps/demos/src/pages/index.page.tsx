@@ -4,7 +4,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { Box, FootprintButton, media, Typography } from 'ui';
 
-footprint.init({ publicKey: 'ob_config_pk_RKInhrtMXqn5T9AQKQxCaQ' });
+footprint.init({ publicKey: 'ob_config_pk_fKWziZsm0tB847ujvMlYT6' });
 
 const Root = () => {
   const handleClick = async () => {
