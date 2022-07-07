@@ -25,15 +25,19 @@ type WrapperProps = {
 };
 
 export const Wrapper = ({ children }: WrapperProps) => (
-  <QueryClientProvider client={queryClient}>
-    <FootprintProvider>
-      <DesignSystemProvider theme={light}>{children}</DesignSystemProvider>
-    </FootprintProvider>
-  </QueryClientProvider>
+  <React.StrictMode>
+    <QueryClientProvider client={queryClient}>
+      <FootprintProvider>
+        <DesignSystemProvider theme={light}>{children}</DesignSystemProvider>
+      </FootprintProvider>
+    </QueryClientProvider>
+  </React.StrictMode>
 );
 
 export const HookWrapper = ({ children }: WrapperProps) => (
-  <ThemeProvider theme={light}>{children}</ThemeProvider>
+  <React.StrictMode>
+    <ThemeProvider theme={light}>{children}</ThemeProvider>
+  </React.StrictMode>
 );
 
 export const customRender = (Component?: React.ReactNode) => {
@@ -42,5 +46,4 @@ export const customRender = (Component?: React.ReactNode) => {
 };
 
 export * from '@testing-library/react';
-export { renderHook } from '@testing-library/react-hooks';
 export { default as userEvent } from '@testing-library/user-event';

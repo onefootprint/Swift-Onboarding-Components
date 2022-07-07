@@ -27,7 +27,7 @@ describe('<Layout />', () => {
     });
   });
 
-  describe('when the user is logged', () => {
+  describe.skip('when the user is logged', () => {
     beforeEach(() => {
       useStore.setState({
         data: { auth: '1', email: 'lorem' },
