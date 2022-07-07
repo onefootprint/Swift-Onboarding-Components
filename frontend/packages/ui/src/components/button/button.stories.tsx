@@ -2,7 +2,7 @@ import { Meta, Story } from '@storybook/react';
 import React from 'react';
 
 import Button, { ButtonProps } from './button';
-import { buttonSizes } from './button.constants';
+import { buttonSizes } from './button.utils';
 
 export default {
   component: Button,

@@ -1,15 +1,14 @@
 import React, { forwardRef } from 'react';
 import styled, { css } from 'styled-components';
 
-import { createFontStyles, createOverlayBackground } from '../../utils/mixins';
 import LoadingIndicator from '../loading-indicator';
+import type { ButtonSize, ButtonVariant } from './button.types';
 import {
-  activeBackgroundColor,
-  backgroundColors,
-  borderColors,
-  colors,
-  hoverBackgroundColor,
-} from './button.constants';
+  createFullWidthStyles,
+  createLoadingStyles,
+  createSizeStyles,
+  createVariantStyles,
+} from './button.utils';
 
 export type ButtonProps = {
   children: React.ReactNode;
@@ -18,10 +17,10 @@ export type ButtonProps = {
   loading?: boolean;
   loadingAriaLabel?: string;
   onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
-  size?: 'default' | 'compact' | 'small' | 'large';
+  size?: ButtonSize;
   testID?: string;
   type?: 'button' | 'submit' | 'reset';
-  variant?: 'primary' | 'secondary';
+  variant?: ButtonVariant;
 };
 
 const Button = forwardRef<HTMLButtonElement, ButtonProps>(
@@ -41,15 +40,16 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     ref,
   ) => (
     <ButtonContainer
-      ref={ref}
+      $fullWidth={fullWidth}
+      $loading={loading}
+      $size={size}
+      $variant={variant}
       data-testid={testID}
       disabled={disabled}
-      fullWidth={fullWidth}
       onClick={onClick}
-      size={size}
+      ref={ref}
       tabIndex={0}
       type={type}
-      variant={variant}
     >
       {loading ? (
         <LoadingIndicator aria-label={loadingAriaLabel} color="quinary" />
@@ -61,85 +61,25 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 );
 
 const ButtonContainer = styled.button<{
-  size: 'default' | 'compact' | 'small' | 'large';
-  variant: 'primary' | 'secondary';
-  fullWidth?: boolean;
-  loading?: boolean;
+  $fullWidth?: boolean;
+  $loading?: boolean;
+  $size: ButtonSize;
+  $variant: ButtonVariant;
 }>`
-  ${({ theme, variant }) => css`
+  ${({ theme, $variant, $fullWidth, $size, $loading }) => css`
+    ${createSizeStyles($size)};
+    ${createVariantStyles($variant)};
+    ${createFullWidthStyles($fullWidth)};
+    ${createLoadingStyles($loading)};
     align-items: center;
-    background-color: ${theme.backgroundColor[backgroundColors[variant]]};
     border-radius: ${theme.borderRadius[2]}px;
-    border: 0;
-    box-shadow: 0 ${theme.borderWidth[1]}px ${theme.borderWidth[1]}px
-        rgb(0 0 0 / 0%),
-      0 0 0 ${theme.borderWidth[1]}px
-        ${theme.borderColor[borderColors[variant]]};
-    color: ${theme.color[colors[variant]]};
     cursor: pointer;
     display: flex;
     justify-content: center;
+    outline-offset: ${theme.spacing[2]}px;
     text-decoration: none;
     user-select: none;
   `}
-  ${({ theme, size }) =>
-    size === 'default' &&
-    css`
-      ${createFontStyles('label-2')};
-      padding: ${theme.spacing[4]}px ${theme.spacing[7]}px;
-    `}
-  ${({ theme, size }) =>
-    size === 'compact' &&
-    css`
-      ${createFontStyles('label-3')};
-      padding: ${theme.spacing[1] + theme.spacing[3]}px ${theme.spacing[7]}px;
-    `}
-    ${({ theme, size }) =>
-    size === 'small' &&
-    css`
-      ${createFontStyles('label-4')};
-      padding: ${theme.spacing[2]}px ${theme.spacing[4]}px;
-    `}
-    ${({ theme, size }) =>
-    size === 'large' &&
-    css`
-      ${createFontStyles('label-1')};
-      padding: ${theme.spacing[5]}px ${theme.spacing[7]}px;
-    `}
-  ${({ fullWidth }) =>
-    fullWidth &&
-    css`
-      width: 100%;
-    `}
-  
-  ${({ loading }) =>
-    loading &&
-    css`
-      pointer-events: none;
-    `}
-
-  &:disabled {
-    cursor: not-allowed;
-    opacity: 0.5;
-  }
-
-  &:hover:enabled {
-    ${({ variant }) => css`
-      ${createOverlayBackground(
-        hoverBackgroundColor[variant],
-        backgroundColors[variant],
-      )}
-    `}
-  }
-
-  &:active:enabled {
-    ${({ variant }) => css`
-      ${createOverlayBackground(
-        activeBackgroundColor[variant],
-        backgroundColors[variant],
-      )}
-    `}
-  }
 `;
 
 export default Button;
