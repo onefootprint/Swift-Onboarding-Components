@@ -86,7 +86,7 @@ jobs:
         run: sleep 30
       - name: Integration testing
         working-directory: ci
-        run: pytest -q integration_tests.py --emoji -v --md report.md --html report.html --self-contained-html
+        run: pytest tests/ --emoji --md report.md --html report.html --self-contained-html
       - name: Upload pytest test results
         uses: actions/upload-artifact@v3
         with:

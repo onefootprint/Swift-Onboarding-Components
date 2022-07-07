@@ -89,11 +89,20 @@ jobs:
         run: make set-dot-env
       - name: Integration testing
         working-directory: ci
-        run: pytest -q integration_tests.py --emoji -v --md report.md --html report.html --self-contained-html
+        run: pytest tests/ -s --emoji &> pytest.txt &> pytest.txt
       - name: Comment markdown on PR
         working-directory: ci
         run: |
-          COMMENT="$(awk '{printf "%s\\n", $0}' report.md)"
+          FINISH=`awk '/===/{ print NR; }' pytest.txt | sed -n 2p`
+          CROP=$(expr $FINISH - 1)
+          BEGIN=$(expr $FINISH - 7)
+          cat pytest.txt
+          head -n $CROP pytest.txt | tail -n $BEGIN > out.txt
+          sed -i 's/\[.*%\]//g' out.txt
+          sed -i 's/tests/* tests/g' out.txt
+          echo '# :footprints: Footprint Core: Local Test Report' > tmp.txt
+          cat out.txt >> tmp.txt
+          COMMENT="$(awk '{printf "%s\\n", $0}' tmp.txt)"
           comments_url=$(curl -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/onefootprint/footprint-core/pulls/$PR_NUMBER" | jq '._links.comments.href' | sed 's/\"//g')
           curl -X POST -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" "$comments_url" -d "{\"body\": \"$COMMENT\" }"
         if: ${{ always() }}
