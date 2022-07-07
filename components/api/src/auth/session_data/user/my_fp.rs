@@ -41,7 +41,20 @@ impl HasVaultPermission for My1fpBasicSession {
         use VaultPermission::*;
 
         match permission {
-            Decrypt(data) => matches!(data, FirstName | LastName | Email | PhoneNumber),
+            Decrypt(data) => matches!(
+                data,
+                FirstName
+                    | LastName
+                    | Dob
+                    | StreetAddress
+                    | StreetAddress2
+                    | City
+                    | State
+                    | Zip
+                    | Country
+                    | PhoneNumber
+                    | Email
+            ),
             AddBiometrics => true,
             Update(data) if data == Email => true,
             _ => false,

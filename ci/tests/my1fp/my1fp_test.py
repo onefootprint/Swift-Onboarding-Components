@@ -53,7 +53,7 @@ def test_my1fp_basic_auth(request):
 def test_logged_in_decrypt(request):
     path = "user/decrypt"
     data = {
-        "attributes": ["phone_number", "email"]
+        "attributes": ["phone_number", "email", "street_address", "zip"]
     }
     r = requests.post(
         url(path),
@@ -64,6 +64,22 @@ def test_logged_in_decrypt(request):
     attributes = body["data"]
     assert attributes["phone_number"] == PHONE_NUMBER.replace(" ", "")
     assert attributes["email"] == EMAIL
+    assert attributes["street_address"] == "1 FOOTPRINT WAY"
+    assert attributes["zip"] == "10009"
+
+
+def test_unauthorized_my1fp_basic_session_decrypt(request):
+    path = "user/decrypt"
+    data = {
+        "attributes": ["ssn"]
+    }
+    r = requests.post(
+        url(path),
+        headers=_my1fp_auth_headers(request),
+        json=data,
+    )
+    assert r.status_code == 401
+
 
 def test_logged_in_user_detail(request):
     # Get the user detail using the logged in context
