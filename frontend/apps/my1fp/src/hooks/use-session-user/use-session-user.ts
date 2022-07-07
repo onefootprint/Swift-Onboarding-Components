@@ -10,6 +10,12 @@ export type UserSession = {
   ssn?: string;
   hasSSNFilled?: boolean;
   wasLoggedUsingBiometrics?: boolean;
+  streetAddress?: string;
+  streetAddress2?: string;
+  city?: string;
+  zip?: string;
+  state?: string;
+  country?: string;
 };
 
 type UserSessionState = {
@@ -28,6 +34,12 @@ const initialMe = {
   isEmailVerified: false,
   lastName: 'Doe',
   phone: '+1 (305) 541-3102',
+  streetAddress: '158 West 23 Street',
+  streetAddress2: 'Apt 107',
+  city: 'New York',
+  zip: '94107',
+  state: 'NY',
+  country: 'USA',
 };
 
 // TODO: Enable persist
