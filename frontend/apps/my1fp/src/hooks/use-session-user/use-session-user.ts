@@ -5,6 +5,8 @@ export type UserSession = {
   email?: string;
   firstName?: string;
   isEmailVerified?: boolean;
+  isBiometricsVerified?: boolean;
+  device?: string;
   lastName?: string;
   phone?: string;
   ssn?: string;
@@ -28,6 +30,8 @@ type UserSessionState = {
 const initialMe = {
   hasSSNFilled: true,
   wasLoggedUsingBiometrics: false,
+  isBiometricsVerified: false,
+  device: 'iPhone 12',
   dob: '03/10/1990',
   email: 'john.doe@gmail.com',
   firstName: 'John',

@@ -54,7 +54,19 @@
         "title": "Address"
       },
       "login-and-security": {
-        "title": "Login & Security"
+        "title": "Login & Security",
+        "email": {
+          "label": "Email"
+        },
+        "phone-number": {
+          "label": "Phone Number"
+        },
+        "biometrics": {
+          "label": "Biometrics",
+          "loading": "Starting biometric liveness check.",
+          "not-verified": "Not verified",
+          "cta": "Verify"
+        }
       },
       "access-logs": {
         "title": "Access logs"
