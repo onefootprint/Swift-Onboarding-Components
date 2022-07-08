@@ -35,6 +35,11 @@ async fn test_db() {
                     .as_bytes()
                     .to_vec(),
             ),
+            sh_phone_country: Fingerprint(
+                crypto::random::gen_random_alphanumeric_code(32)
+                    .as_bytes()
+                    .to_vec(),
+            ),
             e_phone_country: SealedVaultBytes("blah".as_bytes().to_vec()),
         },
     )

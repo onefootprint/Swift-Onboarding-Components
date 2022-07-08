@@ -188,6 +188,10 @@ impl Country {
     pub fn __build(country_code: String) -> Self {
         Country(PiiString::new(country_code))
     }
+
+    pub fn equals(&self, cc: &'static str) -> bool {
+        self.0.equals(cc)
+    }
 }
 
 // list of valid iso3166-alpha-2 country codes, from https://datahub.io/core/country-codes#data

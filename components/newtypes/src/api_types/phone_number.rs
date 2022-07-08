@@ -68,7 +68,7 @@ impl Debug for PhoneNumber {
 /// such as "US" or "CH"
 pub struct ValidatedPhoneNumber {
     pub e164: PiiString,
-    pub iso_country_code: Country,
+    pub iso_country_code: PiiString,
     phantom: PhantomData<()>,
 }
 
@@ -80,8 +80,7 @@ impl From<ValidatedPhoneNumber> for PiiString {
 
 impl ValidatedPhoneNumber {
     pub fn without_us_country_code(&self) -> PiiString {
-        let country: PiiString = self.iso_country_code.clone().into();
-        if country.leak() == "US" {
+        if self.iso_country_code.equals("US") {
             return self
                 .e164
                 .leak()
@@ -97,7 +96,7 @@ impl Decomposable for ValidatedPhoneNumber {
     fn decompose(&self) -> crate::DecomposedDataKind {
         let data = vec![
             (DataKind::PhoneNumber, self.e164.clone()),
-            (DataKind::PhoneCountry, self.iso_country_code.clone().into()),
+            (DataKind::PhoneCountry, self.iso_country_code.clone()),
         ];
         crate::DecomposedDataKind {
             group: DataKind::PhoneNumber.group_kind(),
@@ -124,7 +123,7 @@ impl ValidatedPhoneNumber {
     pub fn __build_from_vault(e164: String, iso_country_code: String) -> Self {
         Self {
             e164: PiiString::from(e164),
-            iso_country_code: Country::__build(iso_country_code),
+            iso_country_code: PiiString::from(iso_country_code),
             phantom: PhantomData,
         }
     }
@@ -133,7 +132,7 @@ impl ValidatedPhoneNumber {
     pub fn __build_from_twilio(e164: String, iso_country_code: String) -> Self {
         Self {
             e164: PiiString::from(e164),
-            iso_country_code: Country::__build(iso_country_code),
+            iso_country_code: PiiString::from(iso_country_code),
             phantom: PhantomData,
         }
     }

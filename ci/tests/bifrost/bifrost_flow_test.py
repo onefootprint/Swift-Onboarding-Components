@@ -74,6 +74,7 @@ def test_identify_verify(request):
             json=data,
         )
         body = _assert_response(r)
+        print(body)
         assert body["data"]["kind"] == "user_created"
         auth_token = body["data"]["auth_token"]
         request.config.cache.set("fpuser_auth_token", auth_token)

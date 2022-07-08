@@ -1,5 +1,5 @@
 use crate::models::onboardings::*;
-use crate::models::user_data::{GroupDataUpdateRequest, GroupInsert, NewUserData};
+use crate::models::user_data::{GroupInsert, NewUserData};
 use crate::models::user_vaults::*;
 use crate::onboarding::get_for_fp_id;
 use crate::schema;
@@ -34,10 +34,10 @@ pub async fn create(pool: &crate::DbPool, new_user: NewUserVaultReq) -> Result<U
                 user_vault_id: user_vault.id.clone(),
                 data_kind: DataKind::PhoneCountry,
                 e_data: new_user.e_phone_country,
-                sh_data: None,
+                sh_data: Some(new_user.sh_phone_country),
                 // Phone numbers are always created as verified
                 is_verified: true,
-                data_group_id: data_group_id.clone(),
+                data_group_id,
                 data_group_kind: newtypes::DataGroupKind::PhoneNumber,
                 data_group_priority: DataPriority::Primary,
             };

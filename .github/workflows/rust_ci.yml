@@ -145,7 +145,7 @@ jobs:
               sleep 10
           done
           cd ci
-          pytest tests/ -s --emoji &> pytest.txt && kill $server_pid
+          pytest tests/ --emoji &> pytest.txt && kill $server_pid
 
       - name: Comment markdown on PR
         working-directory: ci
@@ -165,14 +165,6 @@ jobs:
           curl -X POST -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" "$comments_url" -d "{\"body\": \" $COMMENT \" }"
         # only run on PRs
         if: ${{ github.ref != 'refs/heads/master' && (success() || failure()) }}
-
-      - name: Upload pytest test results
-        uses: actions/upload-artifact@v3
-        with:
-          name: integ-tests-results-${{ matrix.python-version }}
-          path: ci/report.html
-        # Use always() to always run this step to publish test results when there are test failures
-        if: ${{ always() }}
 
       - name: Install diesel cli
         run: cargo install diesel_cli --no-default-features --features postgres

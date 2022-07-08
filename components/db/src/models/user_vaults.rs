@@ -45,4 +45,5 @@ pub struct NewUserVaultReq {
     pub e_phone_number: SealedVaultBytes,
     pub sh_phone_number: Fingerprint,
     pub e_phone_country: SealedVaultBytes,
+    pub sh_phone_country: Fingerprint,
 }
