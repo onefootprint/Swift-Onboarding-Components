@@ -20,7 +20,11 @@
     "footer": {
       "copyright": "One Footprint Inc.",
       "links": {
-        "privacy": {
+        "terms-of-service": {
+          "href": "/terms-of-service",
+          "text": "Terms of Service"
+        },
+        "privacy-policy": {
           "href": "/privacy-policy",
           "text": "Privacy Policy"
         },
@@ -139,6 +143,11 @@
       "html-title": "Footprint - Privacy Policy",
       "title": "Privacy Policy",
       "subtitle": "Last modified 04/14/2022"
+    },
+    "terms-of-service": {
+      "html-title": "Footprint - Terms of Service",
+      "title": "Terms of Service",
+      "subtitle": "Last modified 06/22/2022"
     }
   }
 }

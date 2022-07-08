@@ -61,6 +61,10 @@ const Article = styled.article`
   p:last-child {
     margin-bottom: 0;
   }
+
+  li p {
+    margin-bottom: 0;
+  }
 `;
 
 export default MarkdownLayout;

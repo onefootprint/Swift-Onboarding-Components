@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import Link from 'next/link';
 import React from 'react';
 import styled, { css } from 'styled-components';
 import { Container, media, Typography } from 'ui';
@@ -20,15 +21,21 @@ const Footer = ({ copyright, links }: FooterProps) => (
         <Nav>
           {links.map(link => (
             <li key={link.text}>
-              <a
+              <Link
                 href={link.href}
                 rel="noopener noreferrer"
                 target={link.newWindow ? '_blank' : undefined}
               >
-                <Typography variant="body-3" color="senary">
-                  {link.text}
-                </Typography>
-              </a>
+                <a
+                  href={link.href}
+                  rel="noopener noreferrer"
+                  target={link.newWindow ? '_blank' : undefined}
+                >
+                  <Typography variant="body-3" color="senary">
+                    {link.text}
+                  </Typography>
+                </a>
+              </Link>
             </li>
           ))}
         </Nav>

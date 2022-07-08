@@ -43,8 +43,13 @@ const Layout = ({ children }: LayoutProps) => {
           copyright={t('footer.copyright')}
           links={[
             {
-              text: t('footer.links.privacy.text'),
-              href: t('footer.links.privacy.href'),
+              text: t('footer.links.terms-of-service.text'),
+              href: t('footer.links.terms-of-service.href'),
+              newWindow: false,
+            },
+            {
+              text: t('footer.links.privacy-policy.text'),
+              href: t('footer.links.privacy-policy.href'),
               newWindow: false,
             },
             {

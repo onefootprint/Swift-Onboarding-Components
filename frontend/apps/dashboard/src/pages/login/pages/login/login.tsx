@@ -41,13 +41,21 @@ const Login = () => {
           <Typography variant="caption-2" color="tertiary">
             By continuing you agree to our
           </Typography>
-          <LinkButton size="xxTiny" href="/">
+          <LinkButton
+            size="xxTiny"
+            href="https://onefootprint.com/terms-of-service"
+            target="_blank"
+          >
             Terms of Service
           </LinkButton>
           <Typography variant="caption-2" color="tertiary">
             and
           </Typography>
-          <LinkButton size="xxTiny" href="/">
+          <LinkButton
+            size="xxTiny"
+            href="https://onefootprint.com/privacy-policy"
+            target="_blank"
+          >
             Privacy Policy.
           </LinkButton>
         </TextContainer>
