@@ -46,13 +46,20 @@ pub fn init(config: &Config) -> Result<Option<PushController>, Box<dyn std::erro
         .with_exporter(exporter)
         .install_simple()?;
 
+    // sentry layer 
+    let sentry_layer = sentry_tracing::layer().event_filter(|md| match *md.level() {
+        tracing::Level::ERROR => sentry_tracing::EventFilter::Event,
+        tracing::Level::INFO => sentry_tracing::EventFilter::Breadcrumb,
+        _ => sentry_tracing::EventFilter::Ignore,
+    });
+    
     // Initialize `tracing` using `opentelemetry-tracing` and configure logging
     let sub = Registry::default()
         .with(env_filter)
         .with(JsonStorageLayer)
-        .with(tracing_opentelemetry::layer().with_tracer(tracer))
-        .with(tracing_subscriber::fmt::layer().pretty());
-    // .with(formatting_layer)
+        .with(tracing_subscriber::fmt::layer())
+        .with(tracing_opentelemetry::layer().with_tracer(tracer))        
+        .with(sentry_layer);
 
     tracing::subscriber::set_global_default(sub)?;
 
@@ -100,18 +107,18 @@ impl RootSpanBuilder for TelemetrySpanBuilder {
 
         let span = root_span!(
             request,
-            route=%route, 
-            ip=?ip_address.unwrap_or_else(|| "".into()), 
-            lat=?latitude.unwrap_or_else(|| "".into()), 
-            lon=?longitude.unwrap_or_else(|| "".into()),
-            city=?city.unwrap_or_else(|| "".into()),
-            country=?country.unwrap_or_else(|| "".into()),
-            region=?region.unwrap_or_else(|| "".into()),
-            region_name=?region_name.unwrap_or_else(|| "".into()),
-            metro_code=?metro_code.unwrap_or_else(|| "".into()),
-            postal_code=?postal_code.unwrap_or_else(|| "".into()),
-            time_zone=?time_zone.unwrap_or_else(|| "".into()),
-            user_agent=?user_agent.unwrap_or_else(|| "".into()),
+            route, 
+            ip_address,
+            latitude,
+            longitude,
+            city,
+            country,
+            region,
+            region_name,
+            metro_code,
+            postal_code,
+            time_zone,
+            user_agent,
             timestamp=%timestamp,
             "request start");
         span

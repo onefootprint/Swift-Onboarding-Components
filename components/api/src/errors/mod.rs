@@ -1,5 +1,6 @@
 use actix_web::{error::JsonPayloadError, http::StatusCode};
 use db::errors::DbError;
+use newtypes::Uuid;
 use paperclip::v2::schema::Apiv2Errors;
 use thiserror::Error;
 use webauthn_rs_core::error::WebauthnError;
@@ -72,7 +73,12 @@ fn status_code_for_db_error(e: &DbError) -> StatusCode {
     match e {
         DbError::MigrationFailed(_) => StatusCode::INTERNAL_SERVER_ERROR,
         DbError::DbInteract(_) => StatusCode::INTERNAL_SERVER_ERROR,
-        DbError::DbError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+        DbError::DbError(_) => {
+            if e.is_not_found() {
+                return StatusCode::NOT_FOUND;
+            }
+            StatusCode::INTERNAL_SERVER_ERROR
+        }
         DbError::PoolGet(_) => StatusCode::INTERNAL_SERVER_ERROR,
         DbError::PoolInit(_) => StatusCode::INTERNAL_SERVER_ERROR,
         DbError::ConnectionError(_) => StatusCode::INTERNAL_SERVER_ERROR,
@@ -121,10 +127,23 @@ impl actix_web::ResponseError for ApiError {
     }
 
     fn error_response(&self) -> actix_web::HttpResponse<actix_web::body::BoxBody> {
+        let support_id = Uuid::new_v4();
+        let status_code = self.status_code().as_u16();
+
+        let message = if status_code == StatusCode::INTERNAL_SERVER_ERROR {
+            tracing::error!(error=?self, support_id=support_id.to_string(), status_code, "returning api ISE");
+            "something went wrong".to_string()
+        } else {
+            tracing::info!(error=?self, support_id=support_id.to_string(), status_code, "returning api error");
+            self.to_string()
+        };
+
+
         let response = ApiResponseError {
             error: ApiResponseErrorInfo {
-                status_code: self.status_code().as_u16(),
-                message: self.to_string(),
+                status_code,
+                message,
+                support_id,
             },
         };
         actix_web::HttpResponse::build(self.status_code()).json(response)

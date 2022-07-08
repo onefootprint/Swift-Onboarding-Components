@@ -1,4 +1,3 @@
-use crate::address::Country;
 use crate::pii_helper::newtype_to_pii;
 use crate::{DataKind, Decomposable, PiiString};
 

@@ -26,7 +26,7 @@ use strum_macros::{AsRefStr, EnumIter, EnumString};
 )]
 #[strum(serialize_all = "PascalCase")]
 #[serde(rename_all = "snake_case")]
-#[sql_type = "Text"]
+#[diesel(sql_type = Text)]
 pub enum DataGroupKind {
     Address,
     FullName,

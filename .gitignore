@@ -3,6 +3,7 @@ node_modules/
 .env
 out/
 ci/tests/__pycache__/
+ci/__pycache__/
 ci/venv/
 ci/*.html
 infra/Pulumi.dev-*.yaml

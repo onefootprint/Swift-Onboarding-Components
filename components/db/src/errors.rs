@@ -53,3 +53,10 @@ pub enum DbError {
     #[error("crypto error: {0}")]
     CryptoError(#[from] crypto::Error),
 }
+
+impl DbError {
+    /// checks if this is a not found error from the DB
+    pub fn is_not_found(&self) -> bool {
+        matches!(self, Self::DbError(diesel::result::Error::NotFound))
+    }
+}
