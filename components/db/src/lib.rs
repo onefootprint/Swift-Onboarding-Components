@@ -14,7 +14,7 @@ pub mod models;
 use std::time::Duration;
 
 pub use crate::errors::DbError;
-use deadpool::managed::Hook;
+use deadpool::managed::{Hook, HookError};
 use deadpool_diesel::postgres::{Manager, Pool, Runtime};
 pub use diesel::prelude::PgConnection;
 use diesel::prelude::*;
@@ -59,19 +59,35 @@ impl DbPool {
     }
 }
 
+/// max age of a recycled connection in seconds (10min)
+const CONNECTION_RECYCLE_MAX_AGES_SECS: u64 = 600;
+
 /// Initialize our DB
 pub fn init(url: &str) -> Result<DbPool, DbError> {
-    let init_instant = std::time::Instant::now();
-
     let manager = Manager::new(url, Runtime::Tokio1);
     let pool = Pool::builder(manager)
         .runtime(Runtime::Tokio1)
         .recycle_timeout(Some(Duration::from_secs(1)))
         .create_timeout(Some(Duration::from_secs(1)))
         .pre_recycle(Hook::sync_fn(move |_, metrics| {
-            let recycled = metrics.created.duration_since(init_instant).as_secs();
-            let created = metrics.created.duration_since(init_instant).as_secs();
+            let now = std::time::Instant::now();
 
+            let recycled = metrics.recycled.map(|d| now.duration_since(d).as_secs());
+            let created = now.duration_since(metrics.created).as_secs();
+
+            // if the connection has been running for a while (10min) we can drop it
+            // and force the pool to build a new one
+            if created > CONNECTION_RECYCLE_MAX_AGES_SECS {
+                tracing::info!(
+                    db.pool.recycled_secs_ago = recycled,
+                    "db_pool.pre_recycle.drop_stale"
+                );
+                // this tells deadpool to continue the operation, but drop the connection
+                // and build a new one
+                return Err(HookError::Continue(None));
+            }
+
+            // log the pre recycle event
             tracing::info!(
                 db.pool.recycle_count = metrics.recycle_count,
                 db.pool.created_secs_ago = created,
@@ -81,13 +97,15 @@ pub fn init(url: &str) -> Result<DbPool, DbError> {
             Ok(())
         }))
         .post_create(Hook::sync_fn(move |_, metrics| {
-            let created = metrics.created.duration_since(init_instant).as_secs();
+            let now = std::time::Instant::now();
+            let created = now.duration_since(metrics.created).as_secs();
             tracing::info!(db.pool.created_secs_ago = created, "db_pool.post_create");
             Ok(())
         }))
         .post_recycle(Hook::sync_fn(move |_, metrics| {
-            let recycled = metrics.created.duration_since(init_instant).as_secs();
-            let created = metrics.created.duration_since(init_instant).as_secs();
+            let now = std::time::Instant::now();
+            let recycled = metrics.recycled.map(|d| now.duration_since(d).as_secs());
+            let created = now.duration_since(metrics.created).as_secs();
 
             tracing::info!(
                 db.pool.recycle_count = metrics.recycle_count,
