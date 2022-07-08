@@ -3,7 +3,7 @@ use crate::auth::session_data::{ServerSession, SessionData};
 use crate::errors::ApiError;
 use crate::State;
 use crypto::random::gen_random_alphanumeric_code;
-use db::user_vault::get_by_fingerprint;
+
 use newtypes::{DataKind, Fingerprinter, PiiString, UserVaultId};
 use paperclip::actix::web;
 use reqwest::StatusCode;
@@ -111,14 +111,7 @@ pub(crate) async fn send_email_challenge(
     uv_id: UserVaultId,
     email_address: &PiiString,
 ) -> Result<(), ApiError> {
-    // avoid sending multiple emails if we already have the address on file
-    // TODO: edge case where a user may want to re-send email that isn't verified?
     let sh_email = state.compute_fingerprint(DataKind::Email, email_address).await?;
-    let uv_data_for_email =
-        get_by_fingerprint(&state.db_pool, DataKind::Email, sh_email.clone(), false).await?;
-    if uv_data_for_email.is_some() {
-        return Ok(());
-    }
 
     let session_data = SessionData::EmailVerify(EmailVerifySession { uv_id, sh_email });
 
