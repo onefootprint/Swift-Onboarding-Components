@@ -2,7 +2,7 @@ import pytest
 import requests
 from .utils import url, _assert_response
 
-from .constants import PHONE_NUMBER, WORKOS_ORG_ID
+from .constants import EMAIL, PHONE_NUMBER, WORKOS_ORG_ID
 
 def cleanup():
     path = "private/cleanup?phone_number={0}".format(PHONE_NUMBER)
@@ -10,6 +10,18 @@ def cleanup():
         url(path),
     )
     assert r.status_code == 200
+    identify_path = "identify"
+    identifier = {"email": EMAIL}
+    data = {"identifier": identifier, "preferred_challenge_kind": "sms"}
+
+    # check that we properly cleaned up user
+    r = requests.post(
+        url(identify_path),
+        json=data,
+    )
+    body = _assert_response(r)
+    assert not body["data"]["user_found"]
+    assert not body["data"].get("challenge_data", dict())
 
 # runs before all integration tests
 def pytest_sessionstart(session):
