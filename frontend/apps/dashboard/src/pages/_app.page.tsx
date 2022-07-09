@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import PageGuard from 'src/components/page-guard';
 import { createGlobalStyle } from 'styled-components';
 import themes from 'themes';
@@ -18,20 +18,26 @@ type AppProps = {
   pageProps: Record<string, any>;
 };
 
-const App = ({ Component, pageProps }: AppProps) => (
-  <DesignSystemProvider theme={themes.light}>
-    <DashboardQueryClientProvider>
-      <UserDataProvider>
-        <GlobalStyle />
-        <PageGuard>
-          <Layout>
-            <Component {...pageProps} />
-          </Layout>
-        </PageGuard>
-      </UserDataProvider>
-    </DashboardQueryClientProvider>
-  </DesignSystemProvider>
-);
+const App = ({ Component, pageProps }: AppProps) => {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  if (!mounted) return null;
+
+  return (
+    <DesignSystemProvider theme={themes.light}>
+      <DashboardQueryClientProvider>
+        <UserDataProvider>
+          <GlobalStyle />
+          <PageGuard>
+            <Layout>
+              <Component {...pageProps} />
+            </Layout>
+          </PageGuard>
+        </UserDataProvider>
+      </DashboardQueryClientProvider>
+    </DesignSystemProvider>
+  );
+};
 
 const GlobalStyle = createGlobalStyle``;
 

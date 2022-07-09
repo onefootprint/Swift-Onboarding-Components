@@ -1,22 +1,17 @@
-import IcoCode16 from 'icons/ico/ico-code-16';
 import IcoFileText16 from 'icons/ico/ico-file-text-16';
-import IcoFootprint24 from 'icons/ico/ico-footprint-24';
-import IcoSettings16 from 'icons/ico/ico-settings-16';
 import IcoUser24 from 'icons/ico/ico-user-24';
 import IcoUsers16 from 'icons/ico/ico-users-16';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React from 'react';
 import styled, { css } from 'styled-components';
-import { Container, IconButton, Tab, Typography } from 'ui';
+import { Container, FootprintLogo, IconButton, Tab } from 'ui';
 
 import useSessionUser from '../../../../hooks/use-session-user';
 
 const routes = [
   { href: '/users', Icon: IcoUsers16, text: 'Users' },
   { href: '/security-logs', Icon: IcoFileText16, text: 'Security logs' },
-  { href: '/developers', Icon: IcoCode16, text: 'Developers' },
-  { href: '/settings', Icon: IcoSettings16, text: 'Settings' },
 ];
 
 type PrivateLayoutProps = {
@@ -31,10 +26,11 @@ const PrivateLayout = ({ children }: PrivateLayoutProps) => {
       <header>
         <Container>
           <Footprint>
-            <FootprintLogoContainer>
-              <IcoFootprint24 />
-            </FootprintLogoContainer>
-            <Typography variant="display-4">Footprint</Typography>
+            <Link href="/users">
+              <a href="/users">
+                <FootprintLogo />
+              </a>
+            </Link>
             <SuffixContainer>
               <IconButton
                 iconComponent={IcoUser24}
@@ -76,13 +72,6 @@ const Footprint = styled.div`
   ${({ theme }) => css`
     padding: ${theme.spacing[4]}px 0;
   `};
-`;
-
-const FootprintLogoContainer = styled.div`
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 `;
 
 const SuffixContainer = styled.div`
