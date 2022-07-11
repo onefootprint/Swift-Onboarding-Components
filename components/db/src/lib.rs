@@ -136,53 +136,64 @@ pub async fn health_check(pool: &DbPool) -> Result<(), DbError> {
     Ok(())
 }
 
-pub async fn private_cleanup_integration_tests(pool: &DbPool, sh_data: Fingerprint) -> Result<(), DbError> {
+pub async fn private_cleanup_integration_tests(
+    pool: &DbPool,
+    sh_data: Fingerprint,
+) -> Result<usize, DbError> {
     // we register users within our integration tests. to avoid filling up our database with fake information,
     // we clean up afterwards.
     let uv = get_by_fingerprint(pool, DataKind::PhoneNumber, sh_data, false).await?;
     if uv.is_none() {
-        return Ok(());
+        return Ok(0);
     }
     let (uv, _) = uv.unwrap();
 
-    pool.db_query(move |conn| -> Result<(), DbError> {
-        // delete user data
-        diesel::delete(schema::user_data::table.filter(schema::user_data::user_vault_id.eq(&uv.id)))
-            .execute(conn)?;
+    let deleted_rows = pool
+        .db_query(move |conn| -> Result<usize, DbError> {
+            let mut deleted_rows = 0;
+            // delete user data
+            deleted_rows +=
+                diesel::delete(schema::user_data::table.filter(schema::user_data::user_vault_id.eq(&uv.id)))
+                    .execute(conn)?;
 
-        // grab onboardings, delete access events
-        let obs: Vec<Onboarding> = schema::onboardings::table
-            .filter(schema::onboardings::user_vault_id.eq(&uv.id))
-            .get_results(conn)?;
-        for ob in obs {
-            diesel::delete(
-                schema::access_events::table.filter(schema::access_events::onboarding_id.eq(&ob.id)),
+            // grab onboardings, delete access events
+            let obs: Vec<Onboarding> = schema::onboardings::table
+                .filter(schema::onboardings::user_vault_id.eq(&uv.id))
+                .get_results(conn)?;
+            for ob in obs {
+                deleted_rows += diesel::delete(
+                    schema::access_events::table.filter(schema::access_events::onboarding_id.eq(&ob.id)),
+                )
+                .execute(conn)?;
+            }
+
+            // delete onboardings
+            deleted_rows += diesel::delete(
+                schema::onboardings::table.filter(schema::onboardings::user_vault_id.eq(&uv.id)),
             )
             .execute(conn)?;
-        }
 
-        // delete onboardings
-        diesel::delete(schema::onboardings::table.filter(schema::onboardings::user_vault_id.eq(&uv.id)))
+            // delete webauthn
+            deleted_rows += diesel::delete(
+                schema::webauthn_credentials::table
+                    .filter(schema::webauthn_credentials::user_vault_id.eq(&uv.id)),
+            )
             .execute(conn)?;
 
-        // delete webauthn
-        diesel::delete(
-            schema::webauthn_credentials::table
-                .filter(schema::webauthn_credentials::user_vault_id.eq(&uv.id)),
-        )
-        .execute(conn)?;
-
-        // delete audit trails
-        diesel::delete(schema::audit_trails::table.filter(schema::audit_trails::user_vault_id.eq(&uv.id)))
+            // delete audit trails
+            deleted_rows += diesel::delete(
+                schema::audit_trails::table.filter(schema::audit_trails::user_vault_id.eq(&uv.id)),
+            )
             .execute(conn)?;
 
-        // delete user vault
-        diesel::delete(schema::user_vaults::table.filter(schema::user_vaults::id.eq(&uv.id)))
-            .execute(conn)?;
-        Ok(())
-    })
-    .await??;
-    Ok(())
+            // delete user vault
+            deleted_rows +=
+                diesel::delete(schema::user_vaults::table.filter(schema::user_vaults::id.eq(&uv.id)))
+                    .execute(conn)?;
+            Ok(deleted_rows)
+        })
+        .await??;
+    Ok(deleted_rows)
 }
 
 pub mod access_event;
