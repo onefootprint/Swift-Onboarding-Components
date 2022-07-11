@@ -51,7 +51,7 @@ export = async () => {
         const vpcAndProvider = vpcProviders[index];
 
         // mint a cert for this property
-        const cert = await certs.CreateCertificate({ domain: `*.${constants.domain.base}`, region, hostedZoneId: hostedZone.id });
+        const cert = await certs.CreateCertificate({ domain: `${constants.domain.base}`, region, hostedZoneId: hostedZone.id });
 
         // create our ecs service
         const service = await svc.Create(vpcAndProvider, {

@@ -15,7 +15,8 @@ export async function CreateCertificate(config: CertConfig): Promise<pulumi.Outp
     const provider = new aws.Provider(`provider-${nameSuffix}`, { region: config.region });
 
     const cert = new aws.acm.Certificate(`cert-${nameSuffix}`, {
-        domainName: config.domain,
+        domainName: `*.${config.domain}`,
+        subjectAlternativeNames: [config.domain],
         validationMethod: "DNS",
     }, { provider });
 
