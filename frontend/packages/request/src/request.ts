@@ -1,6 +1,5 @@
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
 import applyCaseMiddleware from 'axios-case-converter';
-import { API_BASE_URL, API_TIMEOUT } from 'global-constants';
 
 export type RequestError = AxiosError<{
   error: {
@@ -23,8 +22,8 @@ export const getErrorMessage = (error: RequestError): string =>
 const request = <TData = any>(requestConfig: AxiosRequestConfig = {}) => {
   const client = applyCaseMiddleware(axios.create());
   return client.request<TData, RequestResponse<TData>>({
-    baseURL: API_BASE_URL,
-    timeout: API_TIMEOUT,
+    baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
+    timeout: 60000,
     withCredentials: true,
     ...requestConfig,
   });
