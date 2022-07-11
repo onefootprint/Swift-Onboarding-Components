@@ -12,6 +12,10 @@ const Footer = () => {
       href: 'https://www.onefootprint.com/privacy-policy',
     },
     {
+      label: 'Terms',
+      href: 'https://www.onefootprint.com/terms-of-service',
+    },
+    {
       label: 'Contact Us',
       href: 'href=mailto:hello@onefootprint.com',
     },
