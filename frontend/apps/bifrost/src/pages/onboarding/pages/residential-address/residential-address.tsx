@@ -1,3 +1,4 @@
+import { STATES } from 'global-constants';
 import { useTranslation } from 'hooks';
 import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
@@ -11,6 +12,8 @@ import {
   CountrySelect,
   CountrySelectOption,
   Grid,
+  Select,
+  SelectOption,
   TextInput,
 } from 'ui';
 
@@ -20,12 +23,13 @@ import useSyncData from '../../hooks/use-sync-data';
 import useInputValidations from './hooks/use-input-validations';
 import getAddressComponent from './utils/get-address-components';
 import getInitialCountry from './utils/get-initial-country';
+import getInitialState from './utils/get-initial-state';
 
 type FormData = {
   [UserDataAttribute.streetAddress]: string;
   [UserDataAttribute.streetAddress2]: string;
   [UserDataAttribute.city]: string;
-  [UserDataAttribute.state]: string;
+  [UserDataAttribute.state]: string | SelectOption;
   [UserDataAttribute.country]: CountrySelectOption;
   [UserDataAttribute.zip]: string;
 };
@@ -43,13 +47,12 @@ const ResidentialAddress = () => {
     formState: { errors },
     setFocus,
     setValue,
-    resetField,
   } = useForm<FormData>({
     defaultValues: {
       [UserDataAttribute.country]: getInitialCountry(
         data[UserDataAttribute.country],
       ),
-      [UserDataAttribute.state]: data[UserDataAttribute.state],
+      [UserDataAttribute.state]: getInitialState(data[UserDataAttribute.state]),
       [UserDataAttribute.city]: data[UserDataAttribute.city],
       [UserDataAttribute.zip]: data[UserDataAttribute.zip],
       [UserDataAttribute.streetAddress]: data[UserDataAttribute.streetAddress],
@@ -67,7 +70,10 @@ const ResidentialAddress = () => {
       city: formData.city,
       zip: formData.zip,
       country: formData.country.value,
-      state: formData.state,
+      state:
+        typeof formData.state === 'object'
+          ? formData.state.value
+          : formData.state,
     };
     send({
       type: Events.residentialAddressSubmitted,
@@ -80,11 +86,11 @@ const ResidentialAddress = () => {
 
   const handleCountryChange = () => {
     setFocus(UserDataAttribute.streetAddress);
-    resetField(UserDataAttribute.streetAddress);
-    resetField(UserDataAttribute.streetAddress2);
-    resetField(UserDataAttribute.city);
-    resetField(UserDataAttribute.state);
-    resetField(UserDataAttribute.zip);
+    setValue(UserDataAttribute.streetAddress, '');
+    setValue(UserDataAttribute.streetAddress2, '');
+    setValue(UserDataAttribute.city, '');
+    setValue(UserDataAttribute.state, '');
+    setValue(UserDataAttribute.zip, '');
   };
 
   const handleAddressSelect = async (
@@ -103,7 +109,16 @@ const ResidentialAddress = () => {
           setValue(UserDataAttribute.city, result.city);
         }
         if (result.state) {
-          setValue(UserDataAttribute.state, result.state);
+          if (country.value === 'US') {
+            const possibleState = STATES.find(
+              stateOption => stateOption.label === result.state,
+            );
+            if (possibleState) {
+              setValue(UserDataAttribute.state, possibleState);
+            }
+          } else {
+            setValue(UserDataAttribute.state, result.state);
+          }
         }
         if (result.zip) {
           setValue(UserDataAttribute.zip, result.zip);
@@ -176,14 +191,37 @@ const ResidentialAddress = () => {
             />
           </Grid.Column>
         </Grid.Row>
-        <TextInput
-          autoComplete="address-level1"
-          hasError={!!errors.state}
-          hintText={errors.state && t('form.state.error')}
-          label={t('form.state.label')}
-          placeholder={t('form.state.placeholder')}
-          {...register(UserDataAttribute.state, { required: true })}
-        />
+        {country.value === 'US' ? (
+          <Controller
+            control={control}
+            name={UserDataAttribute.state}
+            render={({ field }) => {
+              const value =
+                typeof field.value === 'object' ? field.value : undefined;
+              return (
+                <Select
+                  label={t('form.state.label')}
+                  onBlur={field.onBlur}
+                  options={STATES}
+                  onChange={nextOption => {
+                    field.onChange(nextOption);
+                  }}
+                  placeholder={t('form.state.placeholder')}
+                  value={value}
+                />
+              );
+            }}
+          />
+        ) : (
+          <TextInput
+            autoComplete="address-level1"
+            hasError={!!errors.state}
+            hintText={errors.state && t('form.state.error')}
+            label={t('form.state.label')}
+            placeholder={t('form.state.placeholder')}
+            {...register(UserDataAttribute.state)}
+          />
+        )}
         <Button type="submit" fullWidth>
           {t('form.cta')}
         </Button>

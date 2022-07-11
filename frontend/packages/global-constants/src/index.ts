@@ -2,4 +2,4 @@ export * from './api';
 export * from './countries';
 export * from './env';
 export { default as REGION_CODES } from './region-codes';
-export * from './states';
+export { default as STATES } from './states';
