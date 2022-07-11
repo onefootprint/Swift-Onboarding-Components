@@ -5,6 +5,8 @@ import React from 'react';
 import styled from 'styled-components';
 import { Box, media, Typography } from 'ui';
 
+import { TENANT_KEY } from '../../config/constants';
+
 const Root = () => (
   <Inner>
     <script
@@ -49,10 +51,7 @@ const Root = () => (
       your identity when you create your account at AcmeBank. To learn more
       about how we process this data, please see our privacy policy.
     </Typography>
-    <div
-      id="footprint-button"
-      data-public-key="ob_config_pk_IvWYjoYFW704uEi7ORCV4T"
-    />
+    <div id="footprint-button" data-public-key={TENANT_KEY} />
   </Inner>
 );
 

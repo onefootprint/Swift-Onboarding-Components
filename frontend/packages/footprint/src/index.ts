@@ -5,7 +5,7 @@ import UiManager from './footprint/ui-manager';
 const getUrl = () =>
   process.env.NODE_ENV === 'development'
     ? 'http://localhost:3000'
-    : 'https://bifrost.ui.footprint.dev/';
+    : 'https://id.onefootprint.com';
 
 const footprintUrl = getUrl();
 const uiManager = new UiManager();
