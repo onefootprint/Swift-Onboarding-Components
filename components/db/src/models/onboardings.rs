@@ -1,5 +1,5 @@
 use crate::schema::{ob_configurations, onboardings};
-use crate::DbPool;
+use crate::{DbError, DbPool};
 use chrono::NaiveDateTime;
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
@@ -26,6 +26,16 @@ pub struct Onboarding {
     pub start_timestamp: NaiveDateTime,
 }
 
+impl Onboarding {
+    pub fn update_status(&self, conn: &mut PgConnection, new_status: Status) -> Result<(), DbError> {
+        diesel::update(onboardings::table)
+            .filter(onboardings::id.eq(&self.id))
+            .set(onboardings::status.eq(new_status))
+            .execute(conn)?;
+        Ok(())
+    }
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
 #[diesel(table_name = onboardings)]
 pub struct NewOnboarding {
@@ -45,9 +55,9 @@ impl NewOnboarding {
         ob_config_id: ObConfigurationId,
         status: Status,
         insight_event: CreateInsightEvent,
-    ) -> Result<Onboarding, crate::DbError> {
+    ) -> Result<Onboarding, DbError> {
         let onboarding = pool
-            .db_query(move |conn| -> Result<Onboarding, crate::DbError> {
+            .db_query(move |conn| -> Result<Onboarding, DbError> {
                 let existing_ob = onboardings::table
                     // Check to see if the user already has any enabled onboarding for this tenant
                     .filter(onboardings::user_vault_id.eq(&user_vault_id))

@@ -14,7 +14,9 @@ use chrono::Duration;
 use db::models::audit_trails::AuditTrail;
 use db::DbError;
 use db::{models::insight_event::CreateInsightEvent, webauthn_credentials::get_webauthn_creds};
-use newtypes::{AuditTrailEvent, DataKind, FootprintUserId, SessionAuthToken, Vendor, VerificationInfo};
+use newtypes::{
+    AuditTrailEvent, DataKind, FootprintUserId, SessionAuthToken, Status, Vendor, VerificationInfo,
+};
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Apiv2Schema)]
@@ -55,17 +57,15 @@ fn handler(
     // TODO kick off user verification with data vendors
 
     if !missing_fields.is_empty() {
-        return Err(OnboardingError::UserMissingRequiredFields(
-            missing_fields.join(","),
-        ))?;
+        return Err(OnboardingError::UserMissingRequiredFields(missing_fields.join(",")).into());
     }
 
+    let footprint_user_id = onboarding.user_ob_id.clone();
     let tenant_id = tenant_auth.tenant.id.clone();
     let session_sealing_key = state.session_sealing_key.clone();
     let validation_token = state
         .db_pool
         .db_transaction(move |conn| -> Result<_, DbError> {
-            // TODO add it to the onboarding table
             // record the insight for this onboarding
             CreateInsightEvent::from(insights).insert_with_conn(conn)?;
             // Just create some fixture events for now
@@ -104,6 +104,8 @@ fn handler(
                     Some(tenant_id.clone()),
                 )
             })?;
+            // TODO don't mark as verified until data verification with vendors is complete
+            onboarding.update_status(conn, Status::Verified)?;
             // create the session for this onboarding
             let validation_token = ServerSession::create_sync(
                 &session_sealing_key,
@@ -118,7 +120,7 @@ fn handler(
         .await?;
     Ok(Json(ApiResponseData {
         data: CommitResponse {
-            footprint_user_id: onboarding.user_ob_id.clone(),
+            footprint_user_id,
             validation_token,
             missing_webauthn_credentials: webauthn_creds.is_empty(),
         },

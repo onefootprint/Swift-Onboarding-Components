@@ -36,7 +36,7 @@ pub fn handler(
         uv_id.clone(),
         tenant_auth.tenant.id.clone(),
         tenant_auth.ob_config.id.clone(),
-        Status::Processing,
+        Status::Incomplete,
         CreateInsightEvent::from(insights),
     )
     .await?;
