@@ -7,7 +7,7 @@ import * as pulumi from "@pulumi/pulumi"
 import * as random from "@pulumi/random";
 import * as cdn from './cdn';
 import * as secrets from './secrets'
-import { Config } from './config'
+import { CDN_PROTECTION_HEADER_NAME, Config } from './config'
 import * as svc from './service/service';
 import * as enclaveKey from './enclave_key';
 import * as db from './db';
@@ -23,7 +23,7 @@ export = async () => {
     const otherRegions: Region[] = [];// [Region.USWest1];
     const regions = [primaryRegion, ...otherRegions];
 
-    const hostedZone = await aws.route53.getZone({ name: constants.rootDomain });
+    const hostedZone = await aws.route53.getZone({ name: constants.domain.base });
 
     // init the enclave key
     const enclaveKeyConfig = await enclaveKey.Initialize(constants, otherRegions);
@@ -42,20 +42,24 @@ export = async () => {
         protectDeletion: false,
     });
 
+    // extract our api domain
+    const apiDomain = `${constants.domain.prefix}${constants.domain.base}`;
+    const internalApiDomain = `internal.${apiDomain}`;
+
     // launch of core service
     const services = await Promise.all(regions.map(async (region, index) => {
         const vpcAndProvider = vpcProviders[index];
 
         // mint a cert for this property
-        const cert = await certs.CreateCertificate({ domain: `*.${stack}.${constants.rootDomain}`, region, hostedZoneId: hostedZone.id });
+        const cert = await certs.CreateCertificate({ domain: `*.${constants.domain.base}`, region, hostedZoneId: hostedZone.id });
 
         // create our ecs service
         const service = await svc.Create(vpcAndProvider, {
-            cpuUnits: 256,
-            memoryMB: 512,
-            instanceCount: 2,
+            cpuUnits: constants.resources.cpuUnits,
+            memoryMB: constants.resources.memoryMB,
+            instanceCount: constants.resources.instances,
             certArn: cert,
-            domain: `${constants.internalAppSubdomain}.${stack}.${constants.rootDomain}`,
+            domain: internalApiDomain,
             serviceName: "fpc",
             region,
             hostedZoneId: hostedZone.zoneId,
@@ -67,14 +71,15 @@ export = async () => {
     const distribution = await cdn.Create({
         certArn: services[0].cert, // needs US-East-1 cert
         cdnToAlbSecret: secretsStore.cloudfrontSecret,
-        cdnToAlbSecretHeaderName: constants.cdnProtectionHeaderName,
-        domain: `${constants.cdnAppSubdomain}.${stack}.${constants.rootDomain}`,
-        origin: `${constants.internalAppSubdomain}.${stack}.${constants.rootDomain}`,
+        cdnToAlbSecretHeaderName: CDN_PROTECTION_HEADER_NAME,
+        domain: apiDomain,
+        origin: internalApiDomain,
         hostedZoneId: hostedZone.zoneId
     });
 
     return {
-        domain: `${constants.cdnAppSubdomain}.${stack}.${constants.rootDomain}`,
+        domain: apiDomain,
+        internal: internalApiDomain,
         cdn: distribution.domainName,
         appLBs: services.map(svc => { svc.service.lb.loadBalancer.dnsName }),
         databaseUrl: database.databaseUrl,

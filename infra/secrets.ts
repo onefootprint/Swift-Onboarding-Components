@@ -75,7 +75,6 @@ export async function LoadSecrets(config: pulumi.Config, enclaveKeyDescriptor: E
 
     const secretConstants = config.requireSecretObject<SecretConstants>("constants");
 
-    const applicationURI = `https://api.${stack}.infra.footprint.dev`;
     return {
         secretsPolicyArn: secretsPolicy.arn,
         cloudfrontSecret: pulumi.secret(cloudfrontSecret),

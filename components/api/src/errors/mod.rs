@@ -13,6 +13,7 @@ pub mod workos_login;
 
 use crate::types::error::{ApiResponseError, ApiResponseErrorInfo};
 
+#[allow(clippy::large_enum_variant)]
 #[derive(Debug, Error)]
 pub enum ApiError {
     #[error("auth error: {0}")]
@@ -137,7 +138,6 @@ impl actix_web::ResponseError for ApiError {
             tracing::info!(error=?self, support_id=support_id.to_string(), status_code, "returning api error");
             self.to_string()
         };
-
 
         let response = ApiResponseError {
             error: ApiResponseErrorInfo {

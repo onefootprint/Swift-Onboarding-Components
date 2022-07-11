@@ -32,7 +32,7 @@ build-eif: build-enclave-docker
 
 	@echo "building EIF"
 
-	@nitro-cli build-enclave --docker-dir ./ --docker-uri enclave:latest --output-file ./out/enclave.eif --private-key ../enclavekey.pem --signing-certificate ../cert.pem
+	@nitro-cli build-enclave --docker-uri enclave:latest --output-file ./out/enclave.eif --private-key ../enclavekey.pem --signing-certificate ../cert.pem
 
 run-enclave-debug:
 	@echo "running enclave [debug mode]"

@@ -24,6 +24,8 @@ export abstract class ServiceContainers {
             serviceEnvironment = "preview";            
         } else if (pulumi.getStack() === "dev") {
             serviceEnvironment = "development";
+        } else if (pulumi.getStack() === "prod") {
+            serviceEnvironment = "production";
         } else {
             serviceEnvironment = pulumi.getStack();
         }

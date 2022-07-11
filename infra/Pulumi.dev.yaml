@@ -3,19 +3,22 @@ encryptedkey: AQICAHierjVilfttqs7gag2b9al8BtcDNoSoVbmhJTJW+UU0GgGJuMYg+vgtHDUvKo
 config:
   aws:region: us-east-1
   infra:constants:
-    cdnAppSubdomain: api
-    cdnProtectionHeaderName: X-Token-From-CloudFront
     containers:
       apiVersion: latest
       enclaveVersion: latest
+    domain:
+      base: "dev.onefootprint.com"
+      prefix: "api"
     elastic:
       apiKey:
         secure: v1:lefOi07p1WAkmMbb:6IK3746SDP+nra5/Tpym+AisWeELd2cSzgcTNbdzxBcaSQ==
       apmEndpoint: 66e04f7b644c4d1c98e26e58b75de669.apm.us-east-2.aws.elastic-cloud.com:443
     enclaveCertPCR8: 48cb393ec504192fb147ffb2818c2a00c8e2d74659b509cc449a48ffe1c257a266b6a9f9ac356c4cd38a6c11825dd600
-    internalAppSubdomain: api-internal
-    rootDomain: infra.footprint.dev
-    rpId: footprint.dev
+    resources:
+      cpuUnits: 256
+      instances: 2
+      memoryMB: 512
+    rpId: onefootprint.com
     sendgrid:
       apiKey:
         secure: v1:rcN9jM7uB9KA3jjQ:H49idM5tdoD3IoVXyA2T5rSIbr5xvjxqJJXHYh7jCtKefwzpE7VakZc2VzMeAC3kAX4W0uRTdvI9iSKycCMFDAXYaLH5P715BhcWm9lr739sJ849wg==

@@ -4,22 +4,22 @@ on:
   workflow_dispatch:
     inputs:
       stackName:
-        description: 'Name of the stack to refresh'
+        description: "Name of the stack to refresh"
         required: true
         type: string
         default: "dev"
 
       environment:
-        description: 'Environment to run against'
+        description: "Environment to run against"
         type: environment
-        required: true         
+        required: true
 
 jobs:
   refresh_stack:
     name: Refresh Stack
     runs-on: ubuntu-latest
     environment:
-      name: ${{ github.event.inputs.environment }}        
+      name: ${{ github.event.inputs.environment }}
     steps:
       - uses: actions/checkout@v2
 

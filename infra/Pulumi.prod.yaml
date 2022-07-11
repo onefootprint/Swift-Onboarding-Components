@@ -1,0 +1,42 @@
+secretsprovider: awskms://2d02d130-c1a6-4aab-b318-797f6d8253ee?region=us-east-1
+encryptedkey: AQICAHgpY5Udo7qUEpCiqKUsoEkW+S7YqIg73iLR+fnkXhfd3wHP9rr2NW7SwYOE+iCCGYT7AAAAfjB8BgkqhkiG9w0BBwagbzBtAgEAMGgGCSqGSIb3DQEHATAeBglghkgBZQMEAS4wEQQM5icsLWsDynzJkv8PAgEQgDuaWus35hln+Yyqbm+6R3SV3B4SWgUuQi7huWelhEe6x6vaSwdxkrmLbe9arjVDHnwPK8f1ymcQVHbeiA==
+config:
+  aws:region: us-east-1
+  infra:constants:
+    containers:
+      apiVersion: latest
+      enclaveVersion: latest
+    domain:
+      base: "api.onefootprint.com"
+      prefix: ""
+    elastic:
+      apiKey:
+        secure: v1:XzHosuh3FHFZesM8:BFzoDFYHmZbxiai3KV6aR2zLW1ZoImnWTQoVodoiGnCH5g==
+      apmEndpoint: 66e04f7b644c4d1c98e26e58b75de669.apm.us-east-2.aws.elastic-cloud.com:443
+    enclaveCertPCR8: "e865feba7ebc599a657c329387caa88db6b487591e249b65a8edf0ddf7a2bcf269f3a7aa952f56741b18bdafe6766b96"
+    resources:
+      cpuUnits: 256
+      instances: 2
+      memoryMB: 512
+    rpId: onefootprint.com
+    sendgrid:
+      apiKey:
+        secure: v1:bKv7D+zTxpPdjHoO:qfXikLY0jplLN/CmQ4/P0/Ts4akQLZttRFJKjW08xIEQDuFGW5DUK2VnihJq1OVtS0CgV81VJTeHdJfE5YesX4GCRVdO03bnR010AC5tJeyPnHPs/Q==
+      fromEmail: verify@noreply.onefootprint.com
+    sentryUrl:
+      secure: v1:WtHZGm3z+ldCM2Hu:pGr/a63SHFQiYKm1Wa53xwNM0P268cqpgVIBfBlN2cJ/DUB15PebePtgF8eS+bERXNVsQP5Hw+8bViuhs0CgQfsErTvtE2DGRFcpzdNjCcRkrTMLAUjlXnav
+    twilio:
+      accountSid: AC675cd7f6557fb29b4fd3483fe49f6ff0
+      apiKey:
+        secure: v1:g/Buavshjo4oCE/9:iYXVkuHQxY8XO4HFDPvM69p/Xph/A6VZoYYtwgYJmN7Ofh9mwWxMUQAdl9cmckt25gM=
+      apiKeySecret:
+        secure: v1:WTH51OSrsdCEdap7:bIRwAeQZYkdPq0+VXdOeL2/A3eDYJ1/pruElC2LyDU/XMnZgQniODR9bWbfqGo44
+      integrationTestPhoneNumber: "+13393311410"
+      phoneNumber: "+15105883668"
+    workos:
+      clientId: client_01G371B7G8Y43RETQKQ0D63F88
+      defaultOrg: org_01G39KR1V1E52JEZV6BYNG590J
+      secretKey:
+        secure: v1:qBwY9xkQ5AxOOFFR:nJs8FBGP1lGvhsAUJ/ANgv2PKoIWYJovYxCyLtDBWa24r+sDRpLxD7EC3z6ZWcVOlBb2hoYuR4vJobSyQ/3FBe7jPAFqLDJhrL9m6LEsX0NFg6iP/hYMKnPCqVfE+L2YaE5m
+  infra:tailscaleKey:
+    secure: v1:bODV3p3yRWrT59pq:g2+0HB8ps3I4JR/lmPbZRMSjyv0j8udg6poBvTCKGGBk0VW26zDgoUNwsvm5NHALL+ymGcNqzVA=

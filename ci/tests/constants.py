@@ -2,6 +2,12 @@ import os
 from dotenv import load_dotenv
 load_dotenv()
 
+def get_secret(name):
+    environ = os.environ.get(name)
+    if (environ is None):
+        return os.getenv(name)
+    return environ
+
 TENANT_AUTH_HEADER = "x-client-public-key"
 TENANT_SECRET_HEADER = "x-client-secret-key"
 FPUSER_AUTH_HEADER = "x-fpuser-authorization"
@@ -25,10 +31,10 @@ DEFAULT_ATTRIBUTES = {
     }
 url = lambda path: "{}/{}".format(os.environ.get('TEST_URL'), path)
 
-TWILIO_API_KEY = os.getenv('TWILIO_API_KEY')
-TWILIO_ACCOUNT_SID = os.getenv('TWILIO_ACCOUNT_SID')
-TWILIO_API_KEY_SECRET = os.getenv('TWILIO_API_KEY_SECRET')
-PHONE_NUMBER = os.getenv('INTEGRATION_TEST_PHONE_NUMBER')
+TWILIO_API_KEY = get_secret('TWILIO_API_KEY')
+TWILIO_ACCOUNT_SID = get_secret('TWILIO_ACCOUNT_SID')
+TWILIO_API_KEY_SECRET = get_secret('TWILIO_API_KEY_SECRET')
+PHONE_NUMBER = get_secret('INTEGRATION_TEST_PHONE_NUMBER')
 EMAIL = "FOOTPRINT.USER.DEV@GMAIL.COM"
 
 

@@ -15,7 +15,9 @@ jobs:
     name: Destroy Ephemeral Stack
     runs-on: ubuntu-latest
     environment: dev
-    if: github.actor != 'dependabot[bot]' # don't run for dependabot changes
+    # don't run for dependabot changes and PRs that don't tag ephemeral
+    if: github.actor != 'dependabot[bot]' && ((github.event_name != 'pull_request') || (github.event_name == 'pull_request' && contains( github.event.pull_request.labels.*.name, 'ephemeral')))
+
     steps:
       - uses: actions/checkout@v2
 
@@ -37,22 +39,24 @@ jobs:
 
       - run: npm install
         working-directory: infra
-      - name: Extract branch name
+
+      - name: Extract stack name
         shell: bash
         run: |
           branch_raw="${{ github.event.inputs.branchName || github.head_ref }}"
-          branch="$(echo ${branch_raw} | sed -r 's/\//-/g' | sed -r 's/_/-/g')"          
-          echo "##[set-output name=branch;]$(echo ${branch})"
-        id: extract_branch
+          branch="$(echo ${branch_raw} | sed -r 's/\//-/g' | sed -r 's/_/-/g')"
+          stack="dev-${branch}"
+          echo "##[set-output name=stack;]$(echo ${stack})"
+        id: get_stack_name
 
       # create our temp stack
-      - run: pulumi stack init --secrets-provider ${{ secrets.AWS_SECRETS_PROVIDER }} --copy-config-from "footprint/dev" "footprint/dev-${{ steps.extract_branch.outputs.branch }}" || true
+      - run: pulumi stack init --secrets-provider ${{ secrets.AWS_SECRETS_PROVIDER }} --copy-config-from "footprint/dev" "footprint/${{ steps.get_stack_name.outputs.stack }}" || true
         working-directory: infra
         env:
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
 
       # copy our stack file just in case
-      - run: cp Pulumi.dev.yaml Pulumi.dev-${{ steps.extract_branch.outputs.branch }}.yaml
+      - run: cp Pulumi.dev.yaml Pulumi.${{ steps.get_stack_name.outputs.stack }}.yaml
         working-directory: infra
 
       # get the url for the environment
@@ -60,9 +64,8 @@ jobs:
         shell: bash
         working-directory: infra
         run: |
-          sub=$(pulumi config --stack footprint/dev-${{ steps.extract_branch.outputs.branch }} get --path constants.cdnAppSubdomain)
-          root=$(pulumi config --stack footprint/dev-${{ steps.extract_branch.outputs.branch }} get --path constants.rootDomain)
-          url="${sub}.dev-${{ steps.extract_branch.outputs.branch }}.${root}"
+          base=$(pulumi config --stack footprint/${{ steps.get_stack_name.outputs.stack }} get --path constants.domain.base)
+          url="${{ steps.get_stack_name.outputs.stack }}.${base}"
           echo "##[set-output name=url;]$(echo ${url})"
         id: extract_env_url
 
@@ -71,13 +74,13 @@ jobs:
         with:
           command: destroy
           work-dir: infra
-          stack-name: "footprint/dev-${{ steps.extract_branch.outputs.branch }}"
+          stack-name: "footprint/${{ steps.get_stack_name.outputs.stack }}"
           message: "Destroyed ephemeral environment https://${{ steps.extract_env_url.outputs.url }}"
         env:
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
 
       # rm our temp stack
-      - run: pulumi stack --stack footprint/dev-${{ steps.extract_branch.outputs.branch }} rm -y
+      - run: pulumi stack --stack footprint/${{ steps.get_stack_name.outputs.stack }} rm -y
         working-directory: infra
         env:
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}

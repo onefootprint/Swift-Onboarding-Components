@@ -1,8 +1,6 @@
 export interface Config {
-    cdnProtectionHeaderName: string;
-    rootDomain: string;
-    internalAppSubdomain: string;
-    cdnAppSubdomain: string;
+    resources: Resources;
+    domain: Domains;
     elastic: Elastic;
     enclaveCertPCR8: string;
     containers: Containers;
@@ -11,6 +9,22 @@ export interface Config {
     twilio: Twilio;
     sendgrid: Sendgrid;
     sentryUrl: string;
+}
+
+/**
+ * Our header name for securing auth between cloudfront and internal load balancers
+ */
+export const CDN_PROTECTION_HEADER_NAME: string  =  "X-Token-From-CloudFront";
+
+export interface Domains {
+    base: string;
+    prefix: string;
+}
+
+export interface Resources {
+    instances: number;
+    memoryMB: number;
+    cpuUnits: number;
 }
 
 export interface Elastic {

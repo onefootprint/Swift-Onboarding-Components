@@ -3,7 +3,7 @@ import * as awsx from "@pulumi/awsx";
 import * as aws from "@pulumi/aws";
 import * as pulumi from "@pulumi/pulumi"
 import { StaticSecrets } from "../secrets";
-import { Config } from "../config";
+import { CDN_PROTECTION_HEADER_NAME, Config } from "../config";
 import { CreateCluster } from "./cluster";
 import { ServiceContainers } from "./containers";
 import { EnclaveKeyDescriptor } from "../enclave_key";
@@ -141,7 +141,7 @@ function createCdnFrontedLoadBalancer(vpc: awsx.ec2.Vpc, secretsStore: StaticSec
         actions: [{ type: "forward", targetGroupArn: loadBalancerTargetGroup.targetGroup.arn }],
         conditions: [{
             httpHeader: {
-                httpHeaderName: constants.cdnProtectionHeaderName,
+                httpHeaderName: CDN_PROTECTION_HEADER_NAME,
                 values: [secretsStore.cloudfrontSecret]
             }
         }]

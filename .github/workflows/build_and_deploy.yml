@@ -14,14 +14,24 @@ on:
         required: true
 
       stackName:
-        description: "stack or possibly ephemeral stack name, i.e. dev or dev-feature-x"
+        description: "stack or possibly ephemeral stack name, i.e. dev"
         type: string
         required: true
 
-      ephemeral:
-        description: "whether or not this stack is ephemeral"
+      createStack:
+        description: "create a new stack"
         type: boolean
         default: false
+        required: false
+
+      baseDomain:
+        description: "override the base domain for the stack"
+        type: string
+        required: false
+
+      prefixDomain:
+        description: "override the prefix domain for the stack"
+        type: string
         required: false
 
     outputs:
@@ -133,7 +143,9 @@ jobs:
           docker push ${account}.dkr.ecr.us-east-1.amazonaws.com/enclave_pkg:latest
 
       # cleanup: remove keys
-      - run: rm -f ../enclavekey.pem
+      - name: cleanup
+        if: always()
+        run: rm -f ../enclavekey.pem
 
   deploy_stack:
     name: deploy stack
@@ -167,9 +179,9 @@ jobs:
       - run: yarn install
         working-directory: infra
 
-      # create our temp stack if needed
-      - name: create emphemeral stack
-        if: ${{ inputs.ephemeral }}
+      # create our stack if needed
+      - name: "create stack"
+        if: ${{ inputs.createStack }}
         working-directory: infra
         run: |
           pulumi stack init --secrets-provider ${{ secrets.AWS_SECRETS_PROVIDER }} --copy-config-from "footprint/${{ inputs.baseStackName }}" "footprint/${{ inputs.stackName  }}" || true
@@ -177,13 +189,29 @@ jobs:
         env:
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
 
+      - name: "override base domain"
+        if: ${{ inputs.baseDomain || false }}
+        working-directory: infra
+        run: |
+          pulumi config --stack footprint/${{ inputs.stackName }} set --path constants.domain.base ${{ inputs.baseDomain }}
+        env:
+          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
+
+      - name: "override prefix domain"
+        if: ${{ inputs.prefixDomain || false }}
+        working-directory: infra
+        run: |
+          pulumi config --stack footprint/${{ inputs.stackName }} set --path constants.domain.prefix ${{ inputs.prefixDomain }}
+        env:
+          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
+
       # get environment constants
       - name: Extract Constants
         shell: bash
         run: |
-          sub=$(pulumi --cwd infra config --stack footprint/${{ inputs.stackName }} get --path constants.cdnAppSubdomain)
-          root=$(pulumi --cwd infra config --stack footprint/${{ inputs.stackName }} get --path constants.rootDomain)
-          url="${sub}.${{ inputs.stackName }}.${root}"
+          sub=$(pulumi --cwd infra config --stack footprint/${{ inputs.stackName }} get --path constants.domain.prefix)
+          base=$(pulumi --cwd infra config --stack footprint/${{ inputs.stackName }} get --path constants.domain.base)
+          url="${sub}${base}"
           branch="$(echo ${{ github.head_ref || github.ref_name }} | sed -r 's/\//-/g' | sed -r 's/_/-/g')"
           version="${branch}-$(git rev-parse --short HEAD)"
           echo "##[set-output name=url;]$(echo ${url})"
@@ -201,8 +229,8 @@ jobs:
           pulumi --cwd infra config set --path constants.containers.apiVersion ${{ steps.constants.outputs.componentVersion }}
           pulumi --cwd infra config set --path constants.containers.enclaveVersion ${{ steps.constants.outputs.componentVersion }}
 
-      - name: Set Ephemeral DB Restore Snapshot
-        if: ${{ inputs.ephemeral }}
+      - name: Create Stack DB Restore Snapshot
+        if: ${{ inputs.createStack }}
         working-directory: infra
         run: |
           pulumi config set restoreSnapshotFromClusterNamed "db-${{ inputs.baseStackName }}"

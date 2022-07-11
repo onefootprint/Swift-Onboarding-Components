@@ -7,3 +7,4 @@ This is footprint's core backend monorepo. This houses our main backend API crat
 - [Development](DEVELOPMENT.md)
 - [Style Guide](STYLE_GUIDE.md)
 - [Cross Device Testing](CROSS_DEVICE.md)
+- [Setting up enclave signing](ENCLAVE_SIGNING_KEY.md)

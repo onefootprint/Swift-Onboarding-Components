@@ -70,6 +70,7 @@ export async function CreateDB(vpcProvider: vpcUtil.VpcRegion, clusterName: stri
 
     const jump = await createDbJumpBox(clusterName, constants, databaseUrl, auroraVpcSecurityGroup, auroraVpc);
 
+    
     return {
         databaseUrl,
         db,
@@ -84,8 +85,15 @@ async function getSnapshotIdIfNeeded(): Promise<pulumi.Output<string> | undefine
         return undefined;
     }
 
-    const parentCluster = await aws.rds.getCluster({ clusterIdentifier: `db-${clusterName}` });
-    const snapshot = new aws.rds.ClusterSnapshot(`branch-snapshot-${clusterName}`, { dbClusterIdentifier: parentCluster.clusterIdentifier, dbClusterSnapshotIdentifier: `branch-${clusterName}-${pulumi.getStack()}` });
+    let parentCluster;
+    try {
+        parentCluster = await aws.rds.getCluster({ clusterIdentifier: `db-${clusterName}` });
+    } catch(error) {
+        console.log(`error getting DB cluster snapshot: ${error}`);
+        return undefined;
+    }
+    
+    const snapshot = new aws.rds.ClusterSnapshot(`branch-snapshot-${clusterName}`, { dbClusterIdentifier: parentCluster.clusterIdentifier, dbClusterSnapshotIdentifier: `branch-${clusterName}-${pulumi.getStack()}`});
 
     return snapshot.id;
 }

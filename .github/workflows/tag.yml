@@ -1,0 +1,19 @@
+name: Auto-tag
+
+on:
+  pull_request:
+    branches: [master]
+    paths:
+      - "infra/**/*"
+      - "infra/*"
+
+jobs:
+  tag-ephemeral:
+    name: Ephemeral
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: tag ephemeral environment
+        uses: andymckay/labeler@master
+        with:
+          add-labels: "ephemeral"

@@ -92,6 +92,7 @@ pub mod util {
         };
     }
 
+    #[allow(clippy::extra_unused_lifetimes)]
     #[cfg(test)]
     mod tests {
         use super::impl_enum_str_diesel;
