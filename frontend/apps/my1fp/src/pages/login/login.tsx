@@ -5,7 +5,7 @@ import styled, { css } from 'styled-components';
 import { FootprintButton, FootprintLogo, LinkButton, Typography } from 'ui';
 
 // TODO: Remove public key
-footprint.init({ publicKey: 'ob_config_pk_fKWziZsm0tB847ujvMlYT6' });
+footprint.init({ publicKey: 'ob_config_pk_IvWYjoYFW704uEi7ORCV4T' });
 
 const Login = () => {
   const { t } = useTranslation('pages.login');
