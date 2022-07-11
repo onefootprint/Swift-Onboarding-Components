@@ -1,6 +1,6 @@
 use crate::diesel::ExpressionMethods;
 use crate::schema::{self, webauthn_credentials};
-use chrono::NaiveDateTime;
+use chrono::{DateTime, Utc};
 use diesel::{Insertable, PgConnection, QueryDsl, Queryable, RunQueryDsl};
 use newtypes::{
     AttestationType, FootprintUserId, InsightEventId, TenantId, UserVaultId, WebauthnCredentialId,
@@ -20,8 +20,8 @@ pub struct WebauthnCredential {
     pub counter: i32,
     pub attestation_data: Vec<u8>,
 
-    pub _created_at: NaiveDateTime,
-    pub _updated_at: NaiveDateTime,
+    pub _created_at: DateTime<Utc>,
+    pub _updated_at: DateTime<Utc>,
 
     pub backup_eligible: bool,
     pub attestation_type: AttestationType,

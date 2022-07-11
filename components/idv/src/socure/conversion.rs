@@ -1,4 +1,4 @@
-use chrono::{naive::NaiveDateTime, Utc};
+use chrono::{DateTime, Utc};
 use newtypes::address::Address;
 use newtypes::*;
 use std::fmt::Debug;
@@ -22,7 +22,7 @@ pub(crate) struct SocureRequest {
     zip: Option<PiiString>,
     country: Option<PiiString>,
     user_consent: bool,
-    consent_timestamp: NaiveDateTime,
+    consent_timestamp: DateTime<Utc>,
 }
 
 /// identify request and vec of modules we want to use
@@ -80,7 +80,7 @@ impl SocureRequest {
             // country is already 2 digit country code
             country: country.map(PiiString::from),
             user_consent: true,
-            consent_timestamp: Utc::now().naive_utc(),
+            consent_timestamp: Utc::now(),
         })
     }
 }

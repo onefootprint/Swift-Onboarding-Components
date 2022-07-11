@@ -1,6 +1,6 @@
 use crate::errors::DbError;
 use crate::schema::user_vaults;
-use chrono::NaiveDateTime;
+use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use diesel::{Insertable, PgConnection, QueryDsl, Queryable};
 use newtypes::{
@@ -15,8 +15,8 @@ pub struct UserVault {
     pub e_private_key: EncryptedVaultPrivateKey,
     pub public_key: VaultPublicKey,
     pub id_verified: Status,
-    pub _created_at: NaiveDateTime,
-    pub _updated_at: NaiveDateTime,
+    pub _created_at: DateTime<Utc>,
+    pub _updated_at: DateTime<Utc>,
 }
 
 impl UserVault {

@@ -2,7 +2,7 @@ use std::{marker::PhantomData, pin::Pin};
 
 use actix_web::{web, FromRequest};
 use async_trait::async_trait;
-use chrono::NaiveDateTime;
+use chrono::{DateTime, Utc};
 use db::{
     models::{sessions::Session, tenants::Tenant, user_vaults::UserVault},
     DbPool,
@@ -25,7 +25,7 @@ use super::{
 pub struct SessionContext<T> {
     pub data: T,
     pub auth_token: SessionAuthToken,
-    pub expires_at: NaiveDateTime,
+    pub expires_at: DateTime<Utc>,
     // prevents external construction
     phantom: PhantomData<()>,
 }

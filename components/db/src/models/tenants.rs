@@ -1,5 +1,5 @@
 use crate::schema::tenants;
-use chrono::NaiveDateTime;
+use chrono::{DateTime, Utc};
 use diesel::{Insertable, Queryable};
 use newtypes::{EncryptedVaultPrivateKey, TenantId, VaultPublicKey};
 use serde::{Deserialize, Serialize};
@@ -13,8 +13,8 @@ pub struct Tenant {
     pub e_private_key: EncryptedVaultPrivateKey,
     pub workos_id: String,
     pub email_domain: String,
-    pub _created_at: NaiveDateTime,
-    pub _updated_at: NaiveDateTime,
+    pub _created_at: DateTime<Utc>,
+    pub _updated_at: DateTime<Utc>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]

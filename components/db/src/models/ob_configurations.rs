@@ -3,7 +3,7 @@ use crate::diesel::QueryDsl;
 use crate::diesel::RunQueryDsl;
 use crate::schema::{ob_configurations, tenants};
 use crate::DbPool;
-use chrono::NaiveDateTime;
+use chrono::{DateTime, Utc};
 use diesel::{Insertable, Queryable};
 use newtypes::ObConfigurationSettings;
 use newtypes::{DataKind, ObConfigurationId, ObConfigurationKey, TenantId};
@@ -19,8 +19,8 @@ pub struct ObConfiguration {
     pub name: String,
     pub description: Option<String>,
     pub tenant_id: TenantId,
-    pub _created_at: NaiveDateTime,
-    pub _updated_at: NaiveDateTime,
+    pub _created_at: DateTime<Utc>,
+    pub _updated_at: DateTime<Utc>,
     pub required_user_data: Vec<DataKind>,
     pub settings: ObConfigurationSettings,
     pub is_disabled: bool,

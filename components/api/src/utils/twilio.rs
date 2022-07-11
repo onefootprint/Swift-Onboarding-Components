@@ -95,12 +95,14 @@ enum TwilioResponse<T> {
 }
 
 mod rate_limit {
+    use chrono::{DateTime, Utc};
+
     pub const D2P_LINK: &str = "d2p_session";
     pub const SMS_CHALLENGE: &str = "sms_challenge";
 
     #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
     pub struct RateLimitRecord {
-        pub sent_at: chrono::NaiveDateTime,
+        pub sent_at: DateTime<Utc>,
     }
 }
 
@@ -240,7 +242,7 @@ impl TwilioClient {
             Base64Data(sha256(format!("{}:{}", phone_number.e164.leak(), scope).as_bytes()).to_vec())
                 .to_string();
 
-        let now = Utc::now().naive_utc();
+        let now = Utc::now();
         let time_between_challenges_s = self.time_s_between_challenges;
         let duration_between_challenges = Duration::seconds(time_between_challenges_s);
 

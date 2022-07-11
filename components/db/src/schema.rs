@@ -5,9 +5,9 @@ table! {
     access_events (id) {
         id -> Uuid,
         onboarding_id -> Text,
-        timestamp -> Timestamp,
-        _created_at -> Timestamp,
-        _updated_at -> Timestamp,
+        timestamp -> Timestamptz,
+        _created_at -> Timestamptz,
+        _updated_at -> Timestamptz,
         insight_event_id -> Uuid,
         reason -> Varchar,
         principal -> Nullable<Varchar>,
@@ -25,9 +25,9 @@ table! {
         user_vault_id -> Text,
         tenant_id -> Nullable<Text>,
         event -> Jsonb,
-        timestamp -> Timestamp,
-        _created_at -> Timestamp,
-        _updated_at -> Timestamp,
+        timestamp -> Timestamptz,
+        _created_at -> Timestamptz,
+        _updated_at -> Timestamptz,
     }
 }
 
@@ -37,7 +37,7 @@ table! {
 
     insight_events (id) {
         id -> Uuid,
-        timestamp -> Timestamp,
+        timestamp -> Timestamptz,
         ip_address -> Nullable<Varchar>,
         country -> Nullable<Varchar>,
         region -> Nullable<Varchar>,
@@ -49,8 +49,8 @@ table! {
         time_zone -> Nullable<Varchar>,
         user_agent -> Nullable<Varchar>,
         city -> Nullable<Varchar>,
-        _created_at -> Timestamp,
-        _updated_at -> Timestamp,
+        _created_at -> Timestamptz,
+        _updated_at -> Timestamptz,
     }
 }
 
@@ -64,8 +64,8 @@ table! {
         name -> Varchar,
         description -> Nullable<Varchar>,
         tenant_id -> Text,
-        _created_at -> Timestamp,
-        _updated_at -> Timestamp,
+        _created_at -> Timestamptz,
+        _updated_at -> Timestamptz,
         required_user_data -> Array<Text>,
         settings -> Jsonb,
         is_disabled -> Bool,
@@ -83,11 +83,11 @@ table! {
         ob_config_id -> Text,
         tenant_id -> Text,
         status -> Text,
-        _created_at -> Timestamp,
-        _updated_at -> Timestamp,
+        _created_at -> Timestamptz,
+        _updated_at -> Timestamptz,
         insight_event_id -> Uuid,
         ordering_id -> Int8,
-        start_timestamp -> Timestamp,
+        start_timestamp -> Timestamptz,
     }
 }
 
@@ -97,9 +97,9 @@ table! {
 
     sessions (h_session_id) {
         h_session_id -> Varchar,
-        _created_at -> Timestamp,
-        _updated_at -> Timestamp,
-        expires_at -> Timestamp,
+        _created_at -> Timestamptz,
+        _updated_at -> Timestamptz,
+        expires_at -> Timestamptz,
         sealed_session_data -> Bytea,
     }
 }
@@ -115,8 +115,8 @@ table! {
         tenant_id -> Text,
         key_name -> Varchar,
         is_enabled -> Bool,
-        _created_at -> Timestamp,
-        _updated_at -> Timestamp,
+        _created_at -> Timestamptz,
+        _updated_at -> Timestamptz,
     }
 }
 
@@ -131,8 +131,8 @@ table! {
         e_private_key -> Bytea,
         workos_id -> Varchar,
         email_domain -> Varchar,
-        _created_at -> Timestamp,
-        _updated_at -> Timestamp,
+        _created_at -> Timestamptz,
+        _updated_at -> Timestamptz,
     }
 }
 
@@ -150,9 +150,9 @@ table! {
         e_data -> Bytea,
         sh_data -> Nullable<Bytea>,
         is_verified -> Bool,
-        deactivated_at -> Nullable<Timestamp>,
-        _created_at -> Timestamp,
-        _updated_at -> Timestamp,
+        deactivated_at -> Nullable<Timestamptz>,
+        _created_at -> Timestamptz,
+        _updated_at -> Timestamptz,
     }
 }
 
@@ -165,8 +165,8 @@ table! {
         e_private_key -> Bytea,
         public_key -> Bytea,
         id_verified -> Text,
-        _created_at -> Timestamp,
-        _updated_at -> Timestamp,
+        _created_at -> Timestamptz,
+        _updated_at -> Timestamptz,
     }
 }
 
@@ -178,9 +178,9 @@ table! {
         id -> Uuid,
         onboarding_id -> Text,
         vendor -> Text,
-        timestamp -> Timestamp,
-        _created_at -> Timestamp,
-        _updated_at -> Timestamp,
+        timestamp -> Timestamptz,
+        _created_at -> Timestamptz,
+        _updated_at -> Timestamptz,
     }
 }
 
@@ -203,9 +203,9 @@ table! {
         id -> Uuid,
         request_id -> Uuid,
         response -> Jsonb,
-        timestamp -> Timestamp,
-        _created_at -> Timestamp,
-        _updated_at -> Timestamp,
+        timestamp -> Timestamptz,
+        _created_at -> Timestamptz,
+        _updated_at -> Timestamptz,
     }
 }
 
@@ -220,8 +220,8 @@ table! {
         public_key -> Bytea,
         counter -> Int4,
         attestation_data -> Bytea,
-        _created_at -> Timestamp,
-        _updated_at -> Timestamp,
+        _created_at -> Timestamptz,
+        _updated_at -> Timestamptz,
         backup_eligible -> Bool,
         attestation_type -> Text,
         insight_event_id -> Uuid,

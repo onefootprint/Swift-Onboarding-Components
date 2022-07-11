@@ -3,7 +3,7 @@ use crate::models::onboardings::Onboarding;
 use crate::schema;
 use crate::DbPool;
 use crate::{errors::DbError, schema::onboardings::BoxedQuery};
-use chrono::NaiveDateTime;
+use chrono::{DateTime, Utc};
 use diesel::pg::Pg;
 use diesel::prelude::*;
 use newtypes::OnboardingId;
@@ -15,8 +15,8 @@ pub struct OnboardingListQueryParams {
     pub statuses: Vec<Status>,
     pub fingerprints: Option<Vec<Fingerprint>>,
     pub footprint_user_id: Option<FootprintUserId>,
-    pub timestamp_lte: Option<NaiveDateTime>,
-    pub timestamp_gte: Option<NaiveDateTime>,
+    pub timestamp_lte: Option<DateTime<Utc>>,
+    pub timestamp_gte: Option<DateTime<Utc>>,
 }
 
 pub fn list_for_tenant_query<'a>(params: OnboardingListQueryParams) -> BoxedQuery<'a, Pg> {

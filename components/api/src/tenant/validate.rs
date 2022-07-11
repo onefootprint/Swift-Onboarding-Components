@@ -5,7 +5,7 @@ use crate::errors::onboarding::OnboardingError;
 use crate::errors::ApiError;
 use crate::types::success::ApiResponseData;
 use crate::State;
-use chrono::NaiveDateTime;
+use chrono::{DateTime, Utc};
 use newtypes::{FootprintUserId, ObConfigurationId, SessionAuthToken};
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 
@@ -20,7 +20,7 @@ pub struct ValidateResponse {
     onboarding_configuration_id: ObConfigurationId,
     footprint_user_id: FootprintUserId,
     status: newtypes::Status,
-    timestamp: NaiveDateTime,
+    timestamp: DateTime<Utc>,
 }
 
 #[api_v2_operation(tags(Org))]

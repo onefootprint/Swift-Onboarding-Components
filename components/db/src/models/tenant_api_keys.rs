@@ -1,5 +1,5 @@
 use crate::schema::tenant_api_keys;
-use chrono::NaiveDateTime;
+use chrono::{DateTime, Utc};
 use diesel::{Insertable, Queryable};
 use newtypes::{TenantApiKeyId, TenantId};
 use serde::{Deserialize, Serialize};
@@ -13,8 +13,8 @@ pub struct TenantApiKey {
     pub tenant_id: TenantId,
     pub key_name: String,
     pub is_enabled: bool,
-    pub _created_at: NaiveDateTime,
-    pub _updated_at: NaiveDateTime,
+    pub _created_at: DateTime<Utc>,
+    pub _updated_at: DateTime<Utc>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]

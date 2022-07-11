@@ -1,10 +1,11 @@
+use chrono::{DateTime, Utc};
 use db::models::insight_event::InsightEvent;
 use paperclip::actix::Apiv2Schema;
 
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize, Apiv2Schema)]
 pub struct ApiInsightEvent {
     // TODO id?
-    pub timestamp: chrono::NaiveDateTime,
+    pub timestamp: DateTime<Utc>,
     pub ip_address: Option<String>,
     pub city: Option<String>,
     pub country: Option<String>,

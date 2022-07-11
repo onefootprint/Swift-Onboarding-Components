@@ -1,6 +1,6 @@
 use crate::DbPool;
 use crate::{schema::access_events, DbError};
-use chrono::NaiveDateTime;
+use chrono::{DateTime, Utc};
 use diesel::{Connection, Insertable, Queryable, RunQueryDsl};
 use newtypes::{AccessEventId, DataKind, InsightEventId, OnboardingId};
 use serde::{Deserialize, Serialize};
@@ -12,9 +12,9 @@ use super::insight_event::CreateInsightEvent;
 pub struct AccessEvent {
     pub id: AccessEventId,
     pub onboarding_id: OnboardingId,
-    pub timestamp: NaiveDateTime,
-    pub _created_at: NaiveDateTime,
-    pub _updated_at: NaiveDateTime,
+    pub timestamp: DateTime<Utc>,
+    pub _created_at: DateTime<Utc>,
+    pub _updated_at: DateTime<Utc>,
     pub insight_event_id: InsightEventId,
     pub reason: String,
     pub principal: Option<String>,

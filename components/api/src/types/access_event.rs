@@ -1,3 +1,4 @@
+use chrono::{DateTime, Utc};
 use db::models::onboardings::Onboarding;
 use db::models::{access_events::AccessEvent, insight_event::InsightEvent};
 use newtypes::{DataKind, FootprintUserId, TenantId};
@@ -12,7 +13,7 @@ pub struct ApiAccessEvent {
     pub data_kinds: Vec<DataKind>,
     pub reason: String,
     pub principal: Option<String>,
-    pub timestamp: chrono::NaiveDateTime,
+    pub timestamp: DateTime<Utc>,
     pub ordering_id: i64,
     pub insight_event: Option<ApiInsightEvent>,
 }

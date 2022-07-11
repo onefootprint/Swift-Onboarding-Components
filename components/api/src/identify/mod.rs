@@ -2,7 +2,7 @@ pub mod challenge;
 #[allow(clippy::module_inception)]
 pub mod identify;
 pub mod verify;
-use chrono::{Duration, Utc};
+use chrono::{DateTime, Duration, Utc};
 use newtypes::{UserVaultId, ValidatedPhoneNumber};
 use paperclip::actix::{web, Apiv2Schema};
 use webauthn_rs_core::proto::AuthenticationState;
@@ -66,12 +66,12 @@ pub enum IdentifyChallengeData {
 }
 
 impl IdentifyChallengeState {
-    pub fn expires_at(&self) -> chrono::NaiveDateTime {
+    pub fn expires_at(&self) -> DateTime<Utc> {
         let ttl = match &self.data {
             IdentifyChallengeData::Sms(_) => Duration::minutes(5),
             IdentifyChallengeData::Biometric(_) => Duration::minutes(5),
         };
 
-        Utc::now().naive_utc() + ttl
+        Utc::now() + ttl
     }
 }

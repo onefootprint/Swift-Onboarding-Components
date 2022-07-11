@@ -1,7 +1,7 @@
 use crate::diesel::RunQueryDsl;
 use crate::schema::user_data;
 use crate::DbPool;
-use chrono::NaiveDateTime;
+use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
 use newtypes::{
@@ -22,9 +22,9 @@ pub struct UserData {
     pub e_data: SealedVaultBytes,
     pub sh_data: Option<Fingerprint>,
     pub is_verified: bool,
-    pub deactivated_at: Option<NaiveDateTime>,
-    pub _created_at: NaiveDateTime,
-    pub _updated_at: NaiveDateTime,
+    pub deactivated_at: Option<DateTime<Utc>>,
+    pub _created_at: DateTime<Utc>,
+    pub _updated_at: DateTime<Utc>,
 }
 
 impl UserData {

@@ -3,9 +3,9 @@ CREATE TABLE audit_trails (
     user_vault_id text NOT NULL,
     tenant_id text,
     event jsonb NOT NULL,
-    timestamp timestamp NOT NULL,
-    _created_at timestamp NOT NULL DEFAULT NOW(),
-    _updated_at timestamp NOT NULL DEFAULT NOW(),
+    timestamp timestamptz NOT NULL,
+    _created_at timestamptz NOT NULL DEFAULT NOW(),
+    _updated_at timestamptz NOT NULL DEFAULT NOW(),
     CONSTRAINT fk_audit_trails_user_vault_id
         FOREIGN KEY(user_vault_id)
         REFERENCES user_vaults(id),

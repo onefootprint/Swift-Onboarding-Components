@@ -59,7 +59,7 @@ pub fn bulk_deactivate(conn: &mut PgConnection, user_data_ids: Vec<UserDataId>) 
     use schema::user_data;
 
     let expected_num_rows_updated = user_data_ids.len();
-    let now = Utc::now().naive_utc();
+    let now = Utc::now();
     let num_rows_updated = diesel::update(user_data::table)
         .filter(user_data::id.eq_any(user_data_ids))
         .set(user_data::deactivated_at.eq(now))

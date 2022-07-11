@@ -1,4 +1,4 @@
-use chrono::NaiveDateTime;
+use chrono::{DateTime, Utc};
 use db::models::{insight_event::InsightEvent, onboardings::Onboarding};
 use newtypes::{DataKind, FootprintUserId, Status};
 use paperclip::actix::Apiv2Schema;
@@ -10,7 +10,7 @@ pub struct ApiOnboarding {
     pub footprint_user_id: FootprintUserId,
     pub status: Status,
     pub populated_data_kinds: Vec<DataKind>,
-    pub start_timestamp: NaiveDateTime,
+    pub start_timestamp: DateTime<Utc>,
     pub ordering_id: i64,
     pub insight_event: ApiInsightEvent,
 }

@@ -1,5 +1,5 @@
 use crate::schema::{verification_requests, verification_requests_user_data};
-use chrono::NaiveDateTime;
+use chrono::{DateTime, Utc};
 use diesel::Insertable;
 use newtypes::{OnboardingId, UserDataId, Vendor, VerificationRequestId, VerificationRequestUserDataId};
 use serde::{Deserialize, Serialize};
@@ -10,9 +10,9 @@ pub struct VerificationRequest {
     pub id: VerificationRequestId,
     pub onboarding_id: OnboardingId,
     pub vendor: Vendor,
-    pub timestamp: NaiveDateTime,
-    pub _created_at: NaiveDateTime,
-    pub _updated_at: NaiveDateTime,
+    pub timestamp: DateTime<Utc>,
+    pub _created_at: DateTime<Utc>,
+    pub _updated_at: DateTime<Utc>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable, Identifiable)]

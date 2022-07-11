@@ -1,6 +1,6 @@
 use crate::schema::insight_events;
 use crate::DbPool;
-use chrono::NaiveDateTime;
+use chrono::{DateTime, Utc};
 use diesel::{Insertable, PgConnection, Queryable, RunQueryDsl};
 use newtypes::InsightEventId;
 use serde::{Deserialize, Serialize};
@@ -9,7 +9,7 @@ use serde::{Deserialize, Serialize};
 #[diesel(table_name = insight_events)]
 pub struct InsightEvent {
     pub id: InsightEventId,
-    pub timestamp: NaiveDateTime,
+    pub timestamp: DateTime<Utc>,
     pub ip_address: Option<String>,
     pub country: Option<String>,
     pub region: Option<String>,
@@ -21,14 +21,14 @@ pub struct InsightEvent {
     pub time_zone: Option<String>,
     pub user_agent: Option<String>,
     pub city: Option<String>,
-    pub _created_at: NaiveDateTime,
-    pub _updated_at: NaiveDateTime,
+    pub _created_at: DateTime<Utc>,
+    pub _updated_at: DateTime<Utc>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
 #[diesel(table_name = insight_events)]
 pub struct CreateInsightEvent {
-    pub timestamp: NaiveDateTime,
+    pub timestamp: DateTime<Utc>,
     pub ip_address: Option<String>,
     pub country: Option<String>,
     pub region: Option<String>,

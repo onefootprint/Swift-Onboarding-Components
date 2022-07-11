@@ -48,7 +48,7 @@ async fn handler(
     .await?
     .ok_or(ChallengeError::UserDoesntExistForEmailChallenge)?;
 
-    if session.expires_at < Utc::now().naive_utc() {
+    if session.expires_at < Utc::now() {
         return Err(ChallengeError::EmailChallengeExpired.into());
     }
 

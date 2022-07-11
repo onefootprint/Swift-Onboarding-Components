@@ -74,7 +74,7 @@ pub fn init(
     )?;
 
     let challenge_data = Challenge {
-        expires_at: Utc::now().naive_utc() + Duration::minutes(5),
+        expires_at: Utc::now() + Duration::minutes(5),
         data: reg_state,
     };
     let response = ApiResponseData::ok(WebAuthnInitResponse {

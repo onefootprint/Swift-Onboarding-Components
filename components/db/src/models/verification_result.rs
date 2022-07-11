@@ -1,5 +1,5 @@
 use crate::schema::verification_results;
-use chrono::NaiveDateTime;
+use chrono::{DateTime, Utc};
 use diesel::Insertable;
 use newtypes::{VerificationRequestId, VerificationResultId};
 use serde::{Deserialize, Serialize};
@@ -10,7 +10,7 @@ pub struct VerificationResult {
     pub id: VerificationResultId,
     pub request_id: VerificationRequestId,
     pub response: serde_json::Value,
-    pub timestamp: NaiveDateTime,
-    pub _created_at: NaiveDateTime,
-    pub _updated_at: NaiveDateTime,
+    pub timestamp: DateTime<Utc>,
+    pub _created_at: DateTime<Utc>,
+    pub _updated_at: DateTime<Utc>,
 }

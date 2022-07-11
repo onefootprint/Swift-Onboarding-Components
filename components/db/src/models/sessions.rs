@@ -1,6 +1,6 @@
 use crate::schema::sessions;
 use crate::DbPool;
-use chrono::NaiveDateTime;
+use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
 use newtypes::{SealedSessionBytes, SessionAuthToken};
@@ -10,9 +10,9 @@ use serde::{Deserialize, Serialize};
 #[diesel(table_name = sessions)]
 pub struct Session {
     pub h_session_id: String,
-    pub _created_at: NaiveDateTime,
-    pub _updated_at: NaiveDateTime,
-    pub expires_at: NaiveDateTime,
+    pub _created_at: DateTime<Utc>,
+    pub _updated_at: DateTime<Utc>,
+    pub expires_at: DateTime<Utc>,
     pub sealed_session_data: SealedSessionBytes,
 }
 
@@ -21,7 +21,7 @@ pub struct Session {
 pub struct NewSession {
     pub h_session_id: String,
     pub sealed_session_data: SealedSessionBytes,
-    pub expires_at: NaiveDateTime,
+    pub expires_at: DateTime<Utc>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable, AsChangeset)]
@@ -29,14 +29,14 @@ pub struct NewSession {
 pub struct UpdateSession {
     pub h_session_id: String,
     pub sealed_session_data: Option<SealedSessionBytes>,
-    pub expires_at: Option<NaiveDateTime>,
+    pub expires_at: Option<DateTime<Utc>>,
 }
 
 impl Session {
     pub fn create(
         conn: &mut PgConnection,
         sealed_session_data: SealedSessionBytes,
-        expires_at: NaiveDateTime,
+        expires_at: DateTime<Utc>,
     ) -> Result<(Session, SessionAuthToken), crate::DbError> {
         // create a token to identify session for future lookup
         let token = SessionAuthToken::generate();
@@ -54,7 +54,7 @@ impl Session {
         pool: &DbPool,
         sealed_session_data: Option<SealedSessionBytes>,
         token: &SessionAuthToken,
-        expires_at: Option<NaiveDateTime>,
+        expires_at: Option<DateTime<Utc>>,
     ) -> Result<Session, crate::DbError> {
         let session = UpdateSession {
             h_session_id: token.id(),

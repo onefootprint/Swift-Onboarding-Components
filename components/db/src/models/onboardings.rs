@@ -1,6 +1,6 @@
 use crate::schema::{ob_configurations, onboardings};
 use crate::{DbError, DbPool};
-use chrono::NaiveDateTime;
+use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
 use newtypes::{
@@ -19,11 +19,11 @@ pub struct Onboarding {
     pub ob_config_id: ObConfigurationId,
     pub tenant_id: TenantId,
     pub status: Status,
-    pub _created_at: NaiveDateTime,
-    pub _updated_at: NaiveDateTime,
+    pub _created_at: DateTime<Utc>,
+    pub _updated_at: DateTime<Utc>,
     pub insight_event_id: InsightEventId,
     pub ordering_id: i64,
-    pub start_timestamp: NaiveDateTime,
+    pub start_timestamp: DateTime<Utc>,
 }
 
 impl Onboarding {
@@ -44,7 +44,7 @@ pub struct NewOnboarding {
     pub tenant_id: TenantId,
     pub status: Status,
     pub insight_event_id: InsightEventId,
-    pub start_timestamp: NaiveDateTime,
+    pub start_timestamp: DateTime<Utc>,
 }
 
 impl NewOnboarding {
@@ -79,7 +79,7 @@ impl NewOnboarding {
                             tenant_id,
                             status,
                             insight_event_id: insight_event.id,
-                            start_timestamp: chrono::Utc::now().naive_utc(),
+                            start_timestamp: Utc::now(),
                         };
 
                         let new_ob = diesel::insert_into(onboardings::table)

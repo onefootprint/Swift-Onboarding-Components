@@ -6,7 +6,7 @@ use self::{
     user::{d2p::D2pSession, my_fp::My1fpBasicSession, onboarding::OnboardingSession},
     validate_user::ValidateUserToken,
 };
-use chrono::{Duration, NaiveDateTime, Utc};
+use chrono::{DateTime, Duration, Utc};
 use crypto::aead::ScopedSealingKey;
 use db::{models::sessions::Session, DbError, PgConnection};
 use newtypes::{SealedSessionBytes, SessionAuthToken};
@@ -21,19 +21,19 @@ pub mod validate_user;
 /// This struct is sealed, and then stored in the DB
 #[derive(Debug, Clone)]
 pub struct ServerSession {
-    pub expires_at: NaiveDateTime,
+    pub expires_at: DateTime<Utc>,
     pub data: SessionData,
 }
 
 /// a private type to prevent ServerSession from being serialized, deserialized
 #[derive(Debug, Clone, Serialize, Deserialize)]
 struct PrivateServerSession {
-    expires_at: NaiveDateTime,
+    expires_at: DateTime<Utc>,
     data: SessionData,
 }
 
 impl ServerSession {
-    pub fn new(data: SessionData, expires_at: NaiveDateTime) -> Self {
+    pub fn new(data: SessionData, expires_at: DateTime<Utc>) -> Self {
         Self { expires_at, data }
     }
 
@@ -58,7 +58,7 @@ impl ServerSession {
         data: SessionData,
         expires_in: Duration,
     ) -> Result<SessionAuthToken, DbError> {
-        let expires_at = Utc::now().naive_utc() + expires_in;
+        let expires_at = Utc::now() + expires_in;
         let server_session = ServerSession::new(data, expires_at);
         let sealed_session_data = server_session.seal(session_sealing_key)?;
 
@@ -79,7 +79,7 @@ impl ServerSession {
     pub fn unseal(key: &ScopedSealingKey, sealed: &SealedSessionBytes) -> Result<Self, ApiError> {
         let unsealed: PrivateServerSession = key.unseal(sealed.as_ref())?;
 
-        if unsealed.expires_at < Utc::now().naive_utc() {
+        if unsealed.expires_at < Utc::now() {
             return Err(AuthError::SessionExpired.into());
         }
         Ok(Self {

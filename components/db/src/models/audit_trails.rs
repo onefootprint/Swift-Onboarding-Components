@@ -4,7 +4,7 @@ use crate::{
     schema::{self, audit_trails},
     DbError,
 };
-use chrono::NaiveDateTime;
+use chrono::{DateTime, Utc};
 use diesel::{Insertable, PgConnection, QueryDsl, Queryable, RunQueryDsl};
 use newtypes::{AuditTrailEvent, AuditTrailId, FootprintUserId, TenantId, UserVaultId};
 use serde::{Deserialize, Serialize};
@@ -17,9 +17,9 @@ pub struct AuditTrail {
     // Optional tenant_id if the event should only be visible by a specific tenant
     pub tenant_id: Option<TenantId>,
     pub event: AuditTrailEvent,
-    pub timestamp: NaiveDateTime,
-    pub _created_at: NaiveDateTime,
-    pub _updated_at: NaiveDateTime,
+    pub timestamp: DateTime<Utc>,
+    pub _created_at: DateTime<Utc>,
+    pub _updated_at: DateTime<Utc>,
 }
 
 impl AuditTrail {
@@ -49,7 +49,7 @@ struct NewAuditTrail {
     pub user_vault_id: UserVaultId,
     pub tenant_id: Option<TenantId>,
     pub event: AuditTrailEvent,
-    pub timestamp: NaiveDateTime,
+    pub timestamp: DateTime<Utc>,
 }
 
 impl AuditTrail {
@@ -62,7 +62,7 @@ impl AuditTrail {
         let row = NewAuditTrail {
             user_vault_id,
             tenant_id,
-            timestamp: chrono::Utc::now().naive_utc(),
+            timestamp: chrono::Utc::now(),
             event,
         };
         diesel::insert_into(audit_trails::table)

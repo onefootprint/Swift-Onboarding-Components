@@ -21,7 +21,6 @@ struct OnboardingRequest {
     statuses: Vec<Status>,
     fingerprint: Option<PiiString>,
     footprint_user_id: Option<FootprintUserId>,
-    // Accept timezones with a timestamp, but translate them to naive utc representation
     timestamp_lte: Option<DateTime<Utc>>,
     timestamp_gte: Option<DateTime<Utc>>,
     cursor: Option<i64>,
@@ -75,8 +74,8 @@ fn handler(
         statuses,
         fingerprints,
         footprint_user_id,
-        timestamp_lte: timestamp_lte.as_ref().map(DateTime::naive_utc),
-        timestamp_gte: timestamp_gte.as_ref().map(DateTime::naive_utc),
+        timestamp_lte,
+        timestamp_gte,
     };
     let (onboardings, user_to_kinds, count) = state
         .db_pool

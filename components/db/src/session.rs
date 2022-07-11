@@ -41,7 +41,7 @@ pub(crate) fn get_session_by_auth_token_sync(
 
     //check cookie expiration every time we get session
     if let Some(session) = &session {
-        let now = Utc::now().naive_utc();
+        let now = Utc::now();
         if session.expires_at <= now {
             return Ok(None);
         }

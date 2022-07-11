@@ -1,7 +1,7 @@
 use std::{net::SocketAddr, pin::Pin};
 
 use actix_web::{http::header::HeaderMap, FromRequest};
-use chrono::NaiveDateTime;
+use chrono::{DateTime, Utc};
 use db::models::insight_event::CreateInsightEvent;
 use futures_util::Future;
 use paperclip::actix::Apiv2Schema;
@@ -19,7 +19,7 @@ pub struct InsightHeaders {
     pub postal_code: Option<String>,
     pub time_zone: Option<String>,
     pub user_agent: Option<String>,
-    pub timestamp: NaiveDateTime,
+    pub timestamp: DateTime<Utc>,
 }
 
 impl FromRequest for InsightHeaders {
@@ -50,7 +50,7 @@ impl InsightHeaders {
             postal_code: get_header("cloudfront-viewer-postal-code", headers),
             time_zone: get_header("cloudfront-viewer-time-zone", headers),
             user_agent: get_header(actix_web::http::header::USER_AGENT.as_str(), headers),
-            timestamp: chrono::Utc::now().naive_utc(),
+            timestamp: chrono::Utc::now(),
         }
     }
 }

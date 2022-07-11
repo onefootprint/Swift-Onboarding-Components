@@ -4,7 +4,7 @@ use crate::models::insight_event::InsightEvent;
 use crate::models::onboardings::*;
 use crate::schema;
 use crate::DbPool;
-use chrono::NaiveDateTime;
+use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use newtypes::DataKind;
 use newtypes::FootprintUserId;
@@ -16,8 +16,8 @@ pub struct AccessEventListQueryParams {
     pub tenant_id: TenantId,
     pub fp_user_id: Option<FootprintUserId>,
     pub search: Option<String>,
-    pub timestamp_lte: Option<NaiveDateTime>,
-    pub timestamp_gte: Option<NaiveDateTime>,
+    pub timestamp_lte: Option<DateTime<Utc>>,
+    pub timestamp_gte: Option<DateTime<Utc>>,
     pub kinds: Vec<DataKind>,
 }
 
