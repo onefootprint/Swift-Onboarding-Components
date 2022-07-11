@@ -10,7 +10,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  deploy:
+  deploy_stack_prod:
     name: Deploy stack
     uses: ./.github/workflows/build_and_deploy.yml
     with:
@@ -51,7 +51,7 @@ jobs:
       contents: write
       pull-requests: write
     with:
-      testUrl: "${{ needs.deploy.outputs.url }}"
+      testUrl: "${{ needs.deploy_stack_prod.outputs.url }}"
       isPR: false
     secrets:
       INTEGRATION_TEST_PHONE_NUMBER: ${{ secrets.INTEGRATION_TEST_PHONE_NUMBER }}
