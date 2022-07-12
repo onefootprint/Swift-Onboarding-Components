@@ -1,5 +1,6 @@
 import React from 'react';
 import { AccessEvent, getRegionForInsightEvent } from 'src/types';
+import { displayForUserAgent } from 'src/utils/user-agent';
 import styled, { css } from 'styled-components';
 import { Box, Code, Typography } from 'ui';
 
@@ -52,7 +53,7 @@ const SecurityLogBody = ({ accessEvent }: SecurityLogBodyProps) => (
             }}
           >
             <Typography variant="body-3" sx={{ overflow: 'hidden' }}>
-              {accessEvent.insightEvent.userAgent || '-'}
+              {displayForUserAgent(accessEvent.insightEvent.userAgent || '')}
             </Typography>
           </Box>
           <Typography variant="label-3" color="tertiary">
