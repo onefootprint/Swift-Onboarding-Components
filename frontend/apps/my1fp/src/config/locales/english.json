@@ -69,7 +69,17 @@
         }
       },
       "access-logs": {
-        "title": "Access logs"
+        "title": "Access logs",
+        "timeline": {
+          "log": {
+            "singular-kind-accessed-by": "was accessed by",
+            "plural-kinds-accessed-by": "were accessed by",
+            "default-principle": "an automated process",
+            "when": "When",
+            "reason": "Reason"
+          },
+          "cta": "Load more"
+        }
       }
     }
   }
