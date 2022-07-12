@@ -89,38 +89,43 @@ const buttonSizeStyles: Record<
     fontVariant: FontVariant;
     height: number;
     paddingX: Spacing;
+    paddingY: Spacing;
   }
 > = {
   small: {
     fontVariant: 'label-4',
     height: 28,
-    paddingX: 7,
+    paddingX: 4,
+    paddingY: 2,
   },
   compact: {
     fontVariant: 'label-3',
     height: 40,
     paddingX: 7,
+    paddingY: 3,
   },
   default: {
     fontVariant: 'label-2',
     height: 48,
     paddingX: 7,
+    paddingY: 4,
   },
   large: {
     fontVariant: 'label-1',
     height: 60,
-    paddingX: 4,
+    paddingX: 7,
+    paddingY: 5,
   },
 };
 
 export const createSizeStyles = (size: ButtonSize) => {
-  const { fontVariant, height, paddingX } = buttonSizeStyles[size];
+  const { fontVariant, height, paddingX, paddingY } = buttonSizeStyles[size];
 
   return css`
     ${({ theme }) => css`
       ${createFontStyles(fontVariant)};
       height: ${height}px;
-      padding: 0 ${theme.spacing[paddingX]}px;
+      padding: ${theme.spacing[paddingY]}px ${theme.spacing[paddingX]}px;
     `}
   `;
 };
