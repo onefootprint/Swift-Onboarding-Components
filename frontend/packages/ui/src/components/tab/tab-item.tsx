@@ -55,6 +55,7 @@ const Anchor = styled.a<{ selected: boolean }>`
       line-height: ${font.lineHeight};
       padding: ${theme.spacing[2]}px ${theme.spacing[4]}px;
       text-decoration: none;
+      user-select: none;
 
       svg {
         position: relative;
