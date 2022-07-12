@@ -25,6 +25,7 @@ export type BaseSelectProps<Option extends BaseSelectOption> = {
   onChange?: (newOption: Option) => void;
   options: Option[];
   searchPlaceholder?: string;
+  isSearchable?: boolean;
   renderTrigger?: (options: {
     onClick: () => void;
     ref: React.RefObject<HTMLButtonElement>;
@@ -50,6 +51,7 @@ const BaseSelect = <Option extends BaseSelectOption>({
   options,
   renderTrigger,
   searchPlaceholder = 'Search',
+  isSearchable = true,
   testID,
   value,
 }: BaseSelectProps<Option>) => {
@@ -120,6 +122,7 @@ const BaseSelect = <Option extends BaseSelectOption>({
         {isOpen && (
           <DropdownMenu>
             <ReactSelect
+              isSearchable={isSearchable}
               maxMenuHeight={180}
               backspaceRemovesValue={false}
               controlShouldRenderValue={false}
@@ -134,6 +137,7 @@ const BaseSelect = <Option extends BaseSelectOption>({
                 Option: OptionComponent,
                 Placeholder: () => null,
                 SingleValue: () => null,
+                ...(isSearchable ? {} : { Control: () => null }),
               }}
               inputId={id}
               isDisabled={disabled}

@@ -19,10 +19,10 @@ const Template: Story<SelectProps> = ({
   placeholder,
   value,
   searchPlaceholder,
+  isSearchable,
 }: SelectProps) => {
-  const [selectedOption, setSelectedOption] = useState<
-    SelectOption | undefined
-  >(value);
+  const [selectedOption, setSelectedOption] =
+    useState<SelectOption | undefined>(value);
 
   const handleSelect = (newOption: SelectOption) => {
     setSelectedOption(newOption);
@@ -41,6 +41,7 @@ const Template: Story<SelectProps> = ({
       options={options}
       placeholder={placeholder}
       searchPlaceholder={searchPlaceholder}
+      isSearchable={isSearchable}
       value={selectedOption}
     />
   );
@@ -56,5 +57,6 @@ Base.args = {
   options: STATES,
   placeholder: 'Select',
   searchPlaceholder: 'Search',
+  isSearchable: true,
   value: undefined,
 };

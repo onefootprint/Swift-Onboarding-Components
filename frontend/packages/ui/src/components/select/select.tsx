@@ -29,6 +29,7 @@ const Select = <Option extends SelectOption = SelectOption>({
   options,
   placeholder = 'Select',
   searchPlaceholder,
+  isSearchable,
   testID,
   value,
   renderTrigger = ({ onClick, ref, isOpen, selectedOption }) => (
@@ -57,6 +58,7 @@ const Select = <Option extends SelectOption = SelectOption>({
     options={options}
     renderTrigger={renderTrigger}
     searchPlaceholder={searchPlaceholder}
+    isSearchable={isSearchable}
     testID={testID}
     value={value}
   />
