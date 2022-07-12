@@ -1,12 +1,13 @@
 import { useMutation } from 'react-query';
 import request, { RequestError, RequestResponse } from 'request';
-import { ChallengeKind } from 'src/utils/state-machine/types';
+import { ChallengeKind, IdentifyType } from 'src/utils/state-machine/types';
 
 export type IdentifyRequest = {
   identifier: {
     email?: string;
     phoneNumber?: string;
   };
+  identifyType?: IdentifyType;
   preferredChallengeKind: ChallengeKind;
 };
 

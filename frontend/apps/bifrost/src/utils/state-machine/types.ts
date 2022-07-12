@@ -67,6 +67,11 @@ export type ResidentialAddress = Required<
   >
 >;
 
+export enum IdentifyType {
+  onboarding = 'onboarding',
+  my1fp = 'my1fp',
+}
+
 export enum ChallengeKind {
   sms = 'sms',
   biometric = 'biometric',

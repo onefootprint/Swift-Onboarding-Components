@@ -63,6 +63,7 @@ const PhoneRegistration = () => {
     identifyMutation.mutate(
       {
         identifier: { phoneNumber: phone },
+        identifyType: state.context.identifyType,
         preferredChallengeKind: ChallengeKind.sms,
       },
       {

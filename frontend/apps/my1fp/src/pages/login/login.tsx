@@ -1,16 +1,66 @@
 import footprint from 'footprint';
 import { useTranslation } from 'hooks';
+import { useRouter } from 'next/router';
 import React from 'react';
+import { getErrorMessage, RequestError } from 'request';
 import styled, { css } from 'styled-components';
-import { FootprintButton, FootprintLogo, LinkButton, Typography } from 'ui';
+import {
+  FootprintButton,
+  FootprintLogo,
+  LinkButton,
+  Typography,
+  useToast,
+} from 'ui';
 
-// TODO: Remove public key
-footprint.init({ publicKey: 'ob_config_pk_IvWYjoYFW704uEi7ORCV4T' });
+import useUserSession from '../../hooks/use-session-user';
+import useUserDecrypt, {
+  UserDecryptResponse,
+} from '../../hooks/use-user-decrypt';
+import attributes from './login.constants';
+
+footprint.init({ flow: 'authentication' });
 
 const Login = () => {
+  const router = useRouter();
+  const toast = useToast();
+  const userMutation = useUserDecrypt();
+  const { logIn } = useUserSession();
   const { t } = useTranslation('pages.login');
+
+  const saveInSessionAndGoToHome = (response: UserDecryptResponse) => {
+    logIn({
+      city: response.city,
+      country: response.country,
+      dob: response.dob,
+      email: response.email,
+      firstName: response.firstName,
+      lastName: response.lastName,
+      phoneNumber: response.phoneNumber,
+      state: response.state,
+      streetAddress: response.streetAddress,
+      streetAddress2: response.streetAddress2,
+      zip: response.zip,
+    });
+    router.push('/');
+  };
+
   const handleClick = async () => {
     await footprint.show();
+    footprint.onAuthenticated(authToken => {
+      userMutation.mutate(
+        { authToken, attributes },
+        {
+          onSuccess: saveInSessionAndGoToHome,
+          onError: (error: RequestError) => {
+            toast.show({
+              description: getErrorMessage(error),
+              title: 'Uh-oh!',
+              variant: 'error',
+            });
+          },
+        },
+      );
+    });
   };
 
   return (
@@ -24,6 +74,7 @@ const Login = () => {
           fullWidth
           onClick={handleClick}
           text="Continue with Footprint"
+          loading={userMutation.isLoading}
         />
         <TextContainer>
           <Typography variant="caption-2" color="tertiary">

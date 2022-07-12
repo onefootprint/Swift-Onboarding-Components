@@ -13,7 +13,7 @@ const LoginAndSecurity = () => {
     'pages.my-footprint-identity.login-and-security',
   );
   const {
-    data: { email, phone, isBiometricsVerified, device },
+    data: { email, phoneNumber, isBiometricsVerified, device },
   } = useSessionUser();
   const shouldShowVerifyButton = !isBiometricsVerified;
   const isVerificationLoading = false;
@@ -24,7 +24,7 @@ const LoginAndSecurity = () => {
   return (
     <FieldGroup>
       <Field label={t('email.label')} value={email} />
-      <Field label={t('phone-number.label')} value={phone} />
+      <Field label={t('phone-number.label')} value={phoneNumber} />
       <BiometricsContainer>
         <BiometricsField verified={isBiometricsVerified} device={device} />
         {shouldShowVerifyButton && (

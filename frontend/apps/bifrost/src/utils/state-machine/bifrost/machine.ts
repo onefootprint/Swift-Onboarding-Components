@@ -1,10 +1,11 @@
-import { ChallengeKind } from 'src/utils/state-machine/types';
+import { ChallengeKind, IdentifyType } from 'src/utils/state-machine/types';
 import { assign, createMachine } from 'xstate';
 
 import createOnboardingMachine from '../onboarding';
 import { Actions, BifrostContext, BifrostEvent, Events, States } from './types';
 
 const initialContext: BifrostContext = {
+  identifyType: IdentifyType.onboarding,
   email: '',
   phone: undefined,
   authToken: undefined,
@@ -37,6 +38,10 @@ const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
           [Events.deviceInfoIdentified]: {
             actions: [Actions.assignDeviceInfo],
           },
+          [Events.authenticationFlowStarted]: {
+            target: States.emailIdentification,
+            actions: [Actions.assignIdentifyType],
+          },
           [Events.tenantInfoRequestSucceeded]: {
             target: States.emailIdentification,
             actions: [Actions.assignTenantInfo],
@@ -45,9 +50,6 @@ const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
             target: States.tenantInvalid,
           },
         },
-      },
-      [States.tenantInvalid]: {
-        type: 'final',
       },
       [States.emailIdentification]: {
         on: {
@@ -76,6 +78,11 @@ const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
             ],
           },
           [Events.biometricLoginSucceeded]: [
+            {
+              target: States.authenticationSuccess,
+              actions: [Actions.assignAuthToken],
+              cond: context => context.identifyType === IdentifyType.my1fp,
+            },
             {
               target: States.onboarding,
               actions: [
@@ -109,6 +116,11 @@ const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
       [States.biometricLoginRetry]: {
         on: {
           [Events.biometricLoginSucceeded]: [
+            {
+              target: States.authenticationSuccess,
+              actions: [Actions.assignAuthToken],
+              cond: context => context.identifyType === IdentifyType.my1fp,
+            },
             {
               target: States.onboarding,
               actions: [
@@ -182,25 +194,36 @@ const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
           ],
           [Events.smsChallengeSucceeded]: [
             {
-              target: States.onboarding,
+              target: States.authenticationSuccess,
+              actions: [Actions.assignAuthToken],
+              cond: context => context.identifyType === IdentifyType.my1fp,
+            },
+            {
+              target: States.onboardingVerification,
+              actions: [Actions.assignAuthToken],
+            },
+          ],
+        },
+      },
+      [States.onboardingVerification]: {
+        on: {
+          [Events.onboardingVerificationSucceeded]: [
+            {
               actions: [
-                Actions.assignAuthToken,
                 Actions.assignMissingAttributes,
                 Actions.assignMissingWebauthnCredentials,
               ],
+              target: States.onboarding,
               cond: (context, event) =>
                 !context.userFound ||
                 event.payload.missingAttributes.length > 0,
             },
             {
-              description:
-                'Show the confirmation page if there were no missing attributes for existing user',
-              target: States.confirmAndAuthorize,
               actions: [
-                Actions.assignAuthToken,
                 Actions.assignMissingAttributes,
                 Actions.assignMissingWebauthnCredentials,
               ],
+              target: States.confirmAndAuthorize,
             },
           ],
         },
@@ -221,6 +244,12 @@ const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
           },
         },
       },
+      [States.tenantInvalid]: {
+        type: 'final',
+      },
+      [States.authenticationSuccess]: {
+        type: 'final',
+      },
       [States.onboardingSuccess]: {
         type: 'final',
       },
@@ -231,6 +260,12 @@ const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
   },
   {
     actions: {
+      [Actions.assignIdentifyType]: assign((context, event) => {
+        if (event.type === Events.authenticationFlowStarted) {
+          context.identifyType = IdentifyType.my1fp;
+        }
+        return context;
+      }),
       [Actions.assignEmail]: assign((context, event) => {
         if (
           (event.type === Events.userIdentifiedByEmail ||
@@ -320,7 +355,7 @@ const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
       }),
       [Actions.assignMissingAttributes]: assign((context, event) => {
         if (
-          event.type === Events.smsChallengeSucceeded ||
+          event.type === Events.onboardingVerificationSucceeded ||
           event.type === Events.biometricLoginSucceeded
         ) {
           context.onboarding.missingAttributes = [
@@ -331,7 +366,7 @@ const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
       }),
       [Actions.assignMissingWebauthnCredentials]: assign((context, event) => {
         if (
-          event.type === Events.smsChallengeSucceeded ||
+          event.type === Events.onboardingVerificationSucceeded ||
           event.type === Events.biometricLoginSucceeded
         ) {
           context.onboarding.missingWebauthnCredentials =

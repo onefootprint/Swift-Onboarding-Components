@@ -3,12 +3,14 @@ import React from 'react';
 import useBifrostMachine from 'src/hooks/use-bifrost-machine';
 import { States } from 'src/utils/state-machine/bifrost';
 
+import AuthenticationSuccess from './authentication-success';
 import BiometricLoginRetry from './biometric-login-retry';
 import ConfirmAndAuthorize from './confirm-and-authorize';
 import EmailIdentification from './email-identification';
 import Init from './init';
 import Onboarding from './onboarding';
 import OnboardingSuccess from './onboarding-success/onboarding-success';
+import OnboardingVerification from './onboarding-verification';
 import PhoneRegistration from './phone-registration';
 import PhoneVerification from './phone-verification';
 import TenantInvalid from './tenant-invalid';
@@ -33,8 +35,12 @@ const Root = () => {
     [States.biometricLoginRetry]: BiometricLoginRetry,
 
     // Onboarding
+    [States.onboardingVerification]: OnboardingVerification,
     [States.onboarding]: Onboarding,
     [States.onboardingSuccess]: OnboardingSuccess,
+
+    // Authentication
+    [States.authenticationSuccess]: AuthenticationSuccess,
   };
   if (has(pages, valueCasted)) {
     const Page = pages[valueCasted];

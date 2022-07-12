@@ -9,6 +9,9 @@ import { ChallengeData, ChallengeKind } from 'src/utils/state-machine/types';
 
 const useEmailIdentify = () => {
   const [state, send] = useBifrostMachine();
+  const {
+    context: { device, identifyType },
+  } = state;
   const identifyMutation = useIdentify();
   const identifyVerificationMutation = useIdentityVerification();
   const onboardingMutation = useOnboarding();
@@ -20,12 +23,11 @@ const useEmailIdentify = () => {
 
   const identifyEmail = (email: string) => {
     const preferredChallengeKind =
-      state.context.device.hasSupportForWebAuthn &&
-      state.context.device.type === 'mobile'
+      device.hasSupportForWebAuthn && device.type === 'mobile'
         ? ChallengeKind.biometric
         : ChallengeKind.sms;
     identifyMutation.mutate(
-      { identifier: { email }, preferredChallengeKind },
+      { identifier: { email }, preferredChallengeKind, identifyType },
       {
         onSuccess({ userFound, challengeData }: IdentifyResponse) {
           if (

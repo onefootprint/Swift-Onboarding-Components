@@ -5,7 +5,6 @@ import useBifrostMachine, { Events } from 'src/hooks/use-bifrost-machine';
 import useIdentifyVerification, {
   IdentifyVerificationResponse,
 } from 'src/hooks/use-identify-verification';
-import useOnboarding from 'src/hooks/use-onboarding';
 import useUserData from 'src/hooks/use-user-data';
 import { ChallengeKind } from 'src/utils/state-machine/types';
 import { LinkButton, LoadingIndicator, PinInput, useToast } from 'ui';
@@ -24,50 +23,30 @@ const PhoneVerificationPinForm = ({
   const toast = useToast();
   const showRequestErrorToast = useRequestErrorToast();
   const { t } = useTranslation('pages.phone-verification.form');
-  const onboardingMutation = useOnboarding();
   const [state, send] = useBifrostMachine();
   const identifyChallengeMutation = useIdentifyChallenge();
   const identifyVerificationMutation = useIdentifyVerification();
   const userDataMutation = useUserData();
-  const shouldShowSuccess = onboardingMutation.isSuccess;
+  const shouldShowSuccess = identifyVerificationMutation.isSuccess;
   const shouldShowLoading =
-    identifyVerificationMutation.isLoading ||
-    userDataMutation.isLoading ||
-    onboardingMutation.isLoading;
-
-  const startOnboarding = (tenantPk: string, authToken: string) => {
-    onboardingMutation.mutate(
-      { authToken, tenantPk },
-      {
-        onSuccess: ({ missingAttributes, missingWebauthnCredentials }) => {
-          setTimeout(() => {
-            send({
-              type: Events.smsChallengeSucceeded,
-              payload: {
-                authToken,
-                missingAttributes,
-                missingWebauthnCredentials,
-              },
-            });
-          }, SUCCESS_EVENT_DELAY_MS);
-        },
-      },
-    );
-  };
+    identifyVerificationMutation.isLoading || userDataMutation.isLoading;
 
   const handlePinValidationSucceeded = ({
     authToken,
   }: IdentifyVerificationResponse) => {
-    const { email, tenant } = state.context;
-    const tenantPk = tenant.pk;
-    userDataMutation.mutate(
-      { data: { email }, authToken },
-      {
-        onSuccess: () => {
-          startOnboarding(tenantPk, authToken);
-        },
-      },
-    );
+    const { email } = state.context;
+    userDataMutation.mutate({ data: { email }, authToken });
+
+    if (authToken) {
+      setTimeout(() => {
+        send({
+          type: Events.smsChallengeSucceeded,
+          payload: {
+            authToken,
+          },
+        });
+      }, SUCCESS_EVENT_DELAY_MS);
+    }
   };
 
   const handlePinCompleted = (pin: string) => {

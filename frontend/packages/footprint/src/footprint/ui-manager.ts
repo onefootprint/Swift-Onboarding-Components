@@ -6,7 +6,12 @@ import {
   LOADING_INDICATOR_ID,
   OVERLAY_ID,
 } from '../config/constants';
-import { Event, Events, OpenOptions, UIManager } from './types';
+import {
+  FootprintEvent,
+  FootprintEvents,
+  OpenOptions,
+  UIManager,
+} from './types';
 import {
   createCSSClasses,
   createFootprintButton,
@@ -43,11 +48,11 @@ export default class implements UIManager {
       'otp-credentials; publickey-credentials-get *',
     );
     handleOnIframeLoaded();
-    child.on(Events.closed, () => this.hide());
+    child.on(FootprintEvents.closed, () => this.hide());
     this.child = child;
   }
 
-  on(eventName: Event, callback: (data?: any) => void) {
+  on(eventName: FootprintEvent, callback: (data?: any) => void) {
     if (!this.child) {
       throw new Error('Footprint should be open in order to listen events');
     }

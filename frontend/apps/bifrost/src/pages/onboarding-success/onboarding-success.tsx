@@ -11,7 +11,7 @@ const OnboardingSuccess = () => {
   const footprint = useFootprintJs();
 
   const handleClose = () => {
-    footprint.onClose();
+    footprint.close();
   };
 
   return (

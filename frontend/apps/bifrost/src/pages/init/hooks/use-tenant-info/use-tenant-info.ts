@@ -38,7 +38,6 @@ const useTenantInfo = (tenantPk: string) => {
     () => getTenantInfo({ tenantPk }),
     {
       enabled: !!tenantPk,
-      retry: 3,
       onSuccess: ({ name, requiredUserData }) => {
         send({
           type: Events.tenantInfoRequestSucceeded,

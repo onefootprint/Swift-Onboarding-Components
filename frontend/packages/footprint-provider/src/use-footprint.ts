@@ -11,24 +11,28 @@ const useFootprint = () => {
   };
 
   const sendEvent = (eventName: string, data?: any) => {
-    if (!postmate) {
+    if (postmate) {
+      postmate.emit(eventName, data);
+    } else {
       console.warn(
         `Footprint.js must be initialized in order to dispatch the event "${eventName}"`,
       );
-      return;
     }
-    postmate.emit(eventName, data);
   };
 
-  const onClose = () => {
+  const authenticate = (vtok: string) => {
+    sendEvent('authenticated', vtok);
+  };
+
+  const close = () => {
     sendEvent('closed');
   };
 
-  const onComplete = (footprintUserId: string) => {
+  const complete = (footprintUserId: string) => {
     sendEvent('completed', footprintUserId);
   };
 
-  const onUserCancel = () => {
+  const cancel = () => {
     sendEvent('userCanceled');
   };
 
@@ -38,9 +42,10 @@ const useFootprint = () => {
 
   return {
     isReady,
-    onComplete,
-    onClose,
-    onUserCancel,
+    authenticate,
+    close,
+    complete,
+    cancel,
   };
 };
 

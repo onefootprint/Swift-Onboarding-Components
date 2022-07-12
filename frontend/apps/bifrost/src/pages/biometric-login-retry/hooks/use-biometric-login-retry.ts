@@ -17,6 +17,7 @@ const useBiometricLoginRetry = () => {
     identifyMutation.mutate(
       {
         identifier: { email: state.context.email },
+        identifyType: state.context.identifyType,
         preferredChallengeKind: ChallengeKind.biometric,
       },
       {

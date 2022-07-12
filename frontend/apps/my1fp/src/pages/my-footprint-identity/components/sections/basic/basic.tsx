@@ -7,13 +7,13 @@ import styled from 'styled-components';
 
 import VerifyEmail from './components/verify-email';
 
-const getFullName = (firstName?: string, lastName?: string) =>
+const getFullName = (firstName: string | null, lastName: string | null) =>
   firstName && lastName ? `${firstName} ${lastName}` : '';
 
 const Basic = () => {
   const { t } = useTranslation('pages.my-footprint-identity.basic');
   const {
-    data: { firstName, lastName, email, phone, isEmailVerified },
+    data: { firstName, lastName, email, phoneNumber, isEmailVerified },
   } = useSessionUser();
   const fullName = getFullName(firstName, lastName);
   const shouldShowVerifyEmailButton = !isEmailVerified;
@@ -25,7 +25,7 @@ const Basic = () => {
         <Field label={t('email.label')} value={email} />
         {shouldShowVerifyEmailButton && <VerifyEmail />}
       </EmailFieldContainer>
-      <Field label={t('phone.label')} value={phone} />
+      <Field label={t('phone.label')} value={phoneNumber} />
     </FieldGroup>
   );
 };

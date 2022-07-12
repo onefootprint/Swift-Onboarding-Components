@@ -20,7 +20,7 @@ describe('useSessionUser', () => {
         email: 'john.doe@gmail.com',
         firstName: 'John',
         lastName: 'Doe',
-        phone: '+1 (305) 541-3102',
+        phoneNumber: '+1 (305) 541-3102',
       };
       act(() => {
         result.current.logIn(nextData);
@@ -38,7 +38,7 @@ describe('useSessionUser', () => {
         email: 'john.doe@gmail.com',
         firstName: 'John',
         lastName: 'Doe',
-        phone: '+1 (305) 541-3102',
+        phoneNumber: '+1 (305) 541-3102',
       };
       act(() => {
         result.current.logIn(nextData);

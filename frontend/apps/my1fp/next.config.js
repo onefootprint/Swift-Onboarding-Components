@@ -3,14 +3,19 @@ const withPlugins = require('next-compose-plugins');
 const withBundleAnalyzer = require('@next/bundle-analyzer')({
   enabled: process.env.ANALYZE === 'true',
 });
+
+// TODO: Transpile
+// https://linear.app/footprint/issue/FP-534/footprintjs-build
 const withTM = require('next-transpile-modules')([
   'ui',
   'icons',
   'hooks',
   'request',
   'global-constants',
-  'themes',
   'footprint',
+  'footprint-provider',
+  'themes',
+  'types',
 ]);
 
 module.exports = withPlugins([withTM, withBundleAnalyzer], {

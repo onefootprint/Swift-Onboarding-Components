@@ -1,23 +1,23 @@
 import create from 'zustand';
 
 export type UserSession = {
-  dob?: string;
-  email?: string;
-  firstName?: string;
+  dob: string | null;
+  email: string;
+  firstName: string | null;
   isEmailVerified?: boolean;
   isBiometricsVerified?: boolean;
   device?: string;
-  lastName?: string;
-  phone?: string;
-  ssn?: string;
+  lastName: string | null;
+  phoneNumber: string | null;
+  ssn?: string | null;
   hasSSNFilled?: boolean;
   wasLoggedUsingBiometrics?: boolean;
-  streetAddress?: string;
-  streetAddress2?: string;
-  city?: string;
-  zip?: string;
-  state?: string;
-  country?: string;
+  streetAddress: string | null;
+  streetAddress2: string | null;
+  city: string | null;
+  zip: string | null;
+  state: string | null;
+  country: string | null;
 };
 
 type UserSessionState = {
@@ -37,7 +37,7 @@ const initialMe = {
   firstName: 'John',
   isEmailVerified: false,
   lastName: 'Doe',
-  phone: '+1 (305) 541-3102',
+  phoneNumber: '+1 (305) 541-3102',
   streetAddress: '158 West 23 Street',
   streetAddress2: 'Apt 107',
   city: 'New York',

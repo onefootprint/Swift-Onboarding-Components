@@ -52,10 +52,10 @@ describe('<Address />', () => {
   describe('when there are missing values', () => {
     const data = {
       streetAddress: '413 Missouri Street',
-      streetAddress2: undefined,
+      streetAddress2: null,
       city: 'San Francisco',
       zip: '94107',
-      state: undefined,
+      state: null,
       country: 'US',
     };
 
@@ -67,18 +67,12 @@ describe('<Address />', () => {
 
     it('should render the correct first address line', () => {
       renderAddress();
-      expect(
-        screen.getByText(createAddressLine([data.streetAddress])),
-      ).toBeInTheDocument();
+      expect(screen.getByText('413 Missouri Street')).toBeInTheDocument();
     });
 
     it('should render the correct second address line', () => {
       renderAddress();
-      expect(
-        screen.getByText(
-          createAddressLine([data.city, data.zip, data.country]),
-        ),
-      ).toBeInTheDocument();
+      expect(screen.getByText('San Francisco, 94107, US')).toBeInTheDocument();
     });
   });
 });

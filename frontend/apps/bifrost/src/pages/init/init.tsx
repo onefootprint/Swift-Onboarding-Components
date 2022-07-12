@@ -2,6 +2,7 @@ import React from 'react';
 import styled, { css } from 'styled-components';
 import { Box, Portal, Shimmer } from 'ui';
 
+import useAuthenticationFlow from './hooks/use-authentication-flow';
 import useDeviceInfo from './hooks/use-device-info';
 import useTenantInfo from './hooks/use-tenant-info';
 import useTenantPublicKey from './hooks/use-tenant-public-key';
@@ -10,6 +11,7 @@ const Init = () => {
   const tenantPk = useTenantPublicKey();
   useDeviceInfo();
   useTenantInfo(tenantPk);
+  useAuthenticationFlow();
 
   return (
     <Box>

@@ -3,7 +3,7 @@ import { Box, Typography } from 'ui';
 
 export type FieldProps = {
   label: string;
-  value?: string;
+  value?: string | null;
 };
 
 const Field = ({ label, value }: FieldProps) => (

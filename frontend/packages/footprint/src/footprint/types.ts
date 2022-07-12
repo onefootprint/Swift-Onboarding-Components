@@ -1,11 +1,15 @@
+export type Flow = 'authentication' | 'onboarding';
+
 export type InitOptions = {
-  publicKey: string;
+  publicKey?: string;
+  flow?: Flow;
 };
 
 export type Footprint = {
   init(options: InitOptions): Footprint;
   show(options?: OpenOptions): void;
   createButton(container: HTMLElement): HTMLButtonElement;
+  onAuthenticated(callback: (vtok: string) => void): void;
   onCompleted(callback: (footprintUserId: string) => void): void;
   onFailed(callback: () => void): void;
   onUserCanceled(callback: () => void): void;
@@ -26,16 +30,17 @@ export type OpenOptions = {
 
 export type UIManager = {
   createButton(container: HTMLElement): HTMLButtonElement;
-  on(eventName: Event, callback: (data?: any) => void): void;
+  on(eventName: FootprintEvent, callback: (data?: any) => void): void;
   show(option?: OpenOptions): Promise<void>;
   hide(option?: OpenOptions): void;
 };
 
-export enum Events {
+export enum FootprintEvents {
+  authenticated = 'authenticated',
   closed = 'closed',
   completed = 'completed',
   failed = 'failed',
   userCanceled = 'userCanceled',
 }
 
-export type Event = Events;
+export type FootprintEvent = FootprintEvents;

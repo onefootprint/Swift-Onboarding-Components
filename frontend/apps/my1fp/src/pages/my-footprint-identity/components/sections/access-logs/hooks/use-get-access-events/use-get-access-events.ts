@@ -1,6 +1,6 @@
 import { QueryFunctionContext, QueryKey, useInfiniteQuery } from 'react-query';
 import request, { RequestError, RequestResponse } from 'request';
-import { MY1FP_AUTH_HEADER } from 'src/constants';
+import { MY1FP_AUTH_HEADER } from 'src/config/constants';
 
 import { AccessLog } from '../../types';
 

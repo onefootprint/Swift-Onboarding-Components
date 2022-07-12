@@ -30,8 +30,8 @@ const NavigationCloseButton = ({
   };
 
   const close = () => {
-    footprint.onUserCancel();
-    footprint.onClose();
+    footprint.cancel();
+    footprint.close();
   };
 
   const handleClick = () => {

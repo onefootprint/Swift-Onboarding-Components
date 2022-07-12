@@ -1,6 +1,7 @@
 import {
   ChallengeData,
   DeviceInfo,
+  IdentifyType,
   OnboardingData,
   TenantInfo,
   UserDataAttribute,
@@ -26,14 +27,20 @@ export enum States {
   livenessRegisterSucceeded = 'livenessRegisterSucceeded',
 
   // Onboarding
+  onboardingVerification = 'onboardingVerification',
   onboarding = 'onboarding',
   onboardingSuccess = 'registrationSuccess',
+
+  // Authentication
+  authenticationSuccess = 'authenticationSuccess',
 }
 
 export enum Events {
   // Tenant
   tenantInfoRequestSucceeded = 'tenantInfoRequestSucceeded',
   tenantInfoRequestFailed = 'tenantInfoRequestFailed',
+
+  onboardingVerificationSucceeded = 'onboardingVerificationSucceeded',
 
   // Identify
   emailChangeRequested = 'emailChangeRequested',
@@ -42,6 +49,10 @@ export enum Events {
   userNotIdentified = 'userNotIdentified',
   navigatedToPrevPage = 'navigatedToPrevPage',
   sharedDataConfirmed = 'sharedDataConfirmed',
+
+  // Authentication
+  authenticationFlowStarted = 'authenticationFlowStarted',
+  authenticationSucceeded = 'authenticationSucceeded',
 
   // Liveness Challenge
   smsChallengeInitiated = 'smsChallengeInitiated',
@@ -54,6 +65,7 @@ export enum Events {
 
 export enum Actions {
   // Identify & Challenge
+  assignIdentifyType = 'assignIdentifyType',
   assignEmail = 'assignEmail',
   assignPhone = 'assignPhone',
   resetContext = 'resetContext',
@@ -73,6 +85,7 @@ export type BifrostContext = {
   challenge?: ChallengeData;
   device: DeviceInfo;
   email: string;
+  identifyType: IdentifyType;
   onboarding: OnboardingData;
   phone?: string;
   tenant: TenantInfo;
@@ -80,6 +93,7 @@ export type BifrostContext = {
 };
 
 export type BifrostEvent =
+  | { type: Events.authenticationFlowStarted }
   | {
       type: Events.tenantInfoRequestSucceeded;
       payload: {
@@ -107,6 +121,13 @@ export type BifrostEvent =
         email: string;
         userFound: boolean;
         authToken: string;
+        missingAttributes: readonly UserDataAttribute[];
+        missingWebauthnCredentials: boolean;
+      };
+    }
+  | {
+      type: Events.onboardingVerificationSucceeded;
+      payload: {
         missingAttributes: readonly UserDataAttribute[];
         missingWebauthnCredentials: boolean;
       };
@@ -155,8 +176,6 @@ export type BifrostEvent =
       type: Events.smsChallengeSucceeded;
       payload: {
         authToken: string;
-        missingAttributes: readonly UserDataAttribute[];
-        missingWebauthnCredentials: boolean;
       };
     }
   | { type: Events.sharedDataConfirmed };

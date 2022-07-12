@@ -2,15 +2,15 @@ import createAddressLine from './create-address-line';
 
 describe('createAddressLine', () => {
   it('filters out empty entries', () => {
-    const address = [undefined, 'San Mateo', undefined, '', 'CA', ' ', 'USA'];
+    const address = [null, 'San Mateo', null, '', 'CA', ' ', 'USA'];
     expect(createAddressLine(address)).toEqual('San Mateo, CA, USA');
   });
 
   it('trims white space correctly', () => {
     const address = [
-      undefined,
+      null,
       '      San Mateo       ',
-      undefined,
+      null,
       '',
       '     CA',
       '    ',

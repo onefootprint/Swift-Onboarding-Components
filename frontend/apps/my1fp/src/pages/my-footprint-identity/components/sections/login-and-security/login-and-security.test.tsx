@@ -16,7 +16,7 @@ describe('<LoginAndSecurity />', () => {
   describe('with all the values are filled and biometrics is verified', () => {
     const data = {
       email: 'john.doe@gmail.com',
-      phone: '+1 (305) 541-3102',
+      phoneNumber: '+1 (305) 541-3102',
       isBiometricsVerified: true,
       device: 'iPhone 12',
     };
@@ -30,7 +30,7 @@ describe('<LoginAndSecurity />', () => {
     it('should render the email and phone', () => {
       renderLoginAndSecurity();
       expect(screen.getByText(data.email)).toBeInTheDocument();
-      expect(screen.getByText(data.phone)).toBeInTheDocument();
+      expect(screen.getByText(data.phoneNumber)).toBeInTheDocument();
     });
 
     it('should render the device info', () => {
@@ -42,7 +42,7 @@ describe('<LoginAndSecurity />', () => {
   describe('with unverified biometrics', () => {
     const data = {
       email: 'john.doe@gmail.com',
-      phone: '+1 (305) 541-3102',
+      phoneNumber: '+1 (305) 541-3102',
       isBiometricsVerified: false,
     };
 
@@ -55,7 +55,7 @@ describe('<LoginAndSecurity />', () => {
     it('should render the email and phone', () => {
       renderLoginAndSecurity();
       expect(screen.getByText(data.email)).toBeInTheDocument();
-      expect(screen.getByText(data.phone)).toBeInTheDocument();
+      expect(screen.getByText(data.phoneNumber)).toBeInTheDocument();
     });
 
     it('should show biometrics is not verified', () => {
