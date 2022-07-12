@@ -52,7 +52,10 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       type={type}
     >
       {loading ? (
-        <LoadingIndicator aria-label={loadingAriaLabel} color="quinary" />
+        <LoadingIndicator
+          aria-label={loadingAriaLabel}
+          color={variant === 'primary' ? 'quinary' : 'primary'}
+        />
       ) : (
         children
       )}
