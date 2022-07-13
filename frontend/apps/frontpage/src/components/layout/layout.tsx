@@ -21,9 +21,10 @@ const Layout = ({ children }: LayoutProps) => {
   return (
     <>
       <Navbar
-        cta={t('navbar.cta')}
-        logoAlt={t('navbar.logoAlt')}
-        onCtaClick={toggleTypeform}
+        cta={{
+          text: t('navbar.cta'),
+          onClick: toggleTypeform,
+        }}
       />
       <Content>{children}</Content>
       <FooterContainer>
@@ -53,6 +54,11 @@ const Layout = ({ children }: LayoutProps) => {
               newWindow: false,
             },
             {
+              text: t('footer.links.status.text'),
+              href: t('footer.links.status.href'),
+              newWindow: true,
+            },
+            {
               text: t('footer.links.twitter.text'),
               href: t('footer.links.twitter.href'),
               newWindow: true,
@@ -68,6 +74,10 @@ const Content = styled.section`
   ${({ theme }) => css`
     > *:first-child {
       padding-top: ${theme.spacing[11]}px;
+
+      ${media.greaterThan('lg')`
+        padding-top: ${theme.spacing[13]}px;
+      `}
     }
   `}
 `;
@@ -78,7 +88,7 @@ const FooterContainer = styled.section`
     background: ${theme.backgroundColor.tertiary};
 
     ${media.greaterThan('lg')`
-      padding-top: ${theme.spacing[11]}px;
+      padding-top: ${theme.spacing[13]}px;
     `}
   `}
 `;

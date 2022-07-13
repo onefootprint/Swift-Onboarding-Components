@@ -42,6 +42,7 @@ const InvestorsSection = ({
         layout="responsive"
         src={imgSrc}
         width={700}
+        priority
       />
     </ImageContainer>
   </Container>
@@ -63,7 +64,7 @@ const ImageContainer = styled.div`
 
     ${media.greaterThan('lg')`
       margin-top: ${theme.spacing[10]}px;
-      margin-bottom: ${theme.spacing[11]}px;
+      margin-bottom: ${theme.spacing[13]}px;
     `}
   `}
 `;

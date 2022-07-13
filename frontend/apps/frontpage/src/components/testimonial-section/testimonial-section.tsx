@@ -2,11 +2,11 @@ import { useTranslation } from 'hooks';
 import IcoQuote40 from 'icons/ico/ico-quote-40';
 import Image from 'next/image';
 import React from 'react';
-import styled, { css } from 'styled-components';
-import { Container, media, Typography } from 'ui';
+import styled from 'styled-components';
+import { Container, Typography } from 'ui';
 
 const TestimonialSection = () => {
-  const { t } = useTranslation('pages.home.testimonial');
+  const { t } = useTranslation('components.testimonial');
   return (
     <Container id="testimonial" as="section">
       <Inner>
@@ -42,19 +42,12 @@ const TestimonialSection = () => {
 };
 
 const Inner = styled.div`
-  ${({ theme }) => css`
-    align-items: center;
-    display: flex;
-    flex-direction: column;
-    margin: 0 auto;
-    max-width: 800px;
-    padding: ${theme.spacing[10]}px 0;
-    text-align: center;
-
-    ${media.greaterThan('lg')`
-      padding: ${theme.spacing[11]}px 0;
-    `}
-  `}
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  margin: 0 auto;
+  max-width: 800px;
+  text-align: center;
 `;
 
 const AuthorContainer = styled.div`

@@ -72,6 +72,8 @@ export type Spacings = {
   10: number;
   11: number;
   12: number;
+  13: number;
+  14: number;
 };
 
 export type Spacing = keyof Spacings;
@@ -149,6 +151,7 @@ export type BorderColor = keyof BorderColors;
 
 export type ZIndexes = {
   dropdown: number;
+  tooltip: number;
   sticky: number;
   dialog: number;
   overlay: number;

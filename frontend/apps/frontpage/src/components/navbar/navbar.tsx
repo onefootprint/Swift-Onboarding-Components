@@ -1,47 +1,51 @@
-import Link from 'next/link';
-import React, { useCallback, useEffect, useState } from 'react';
+import { useToggle, useTranslation } from 'hooks';
+import React from 'react';
 import styled, { css } from 'styled-components';
-import { Button, Container, FootprintLogo } from 'ui';
+import { Container, media } from 'ui';
 
-export type NavbarProps = {
-  cta: string;
-  logoAlt: string;
-  onCtaClick: () => void;
+import DesktopNav from './components/desktop-nav';
+import LogoLink from './components/logo-link';
+import MobileNav from './components/mobile-nav';
+import useHasScroll from './hooks/use-has-scroll';
+
+type NavbarProps = {
+  cta: {
+    text: string;
+    onClick: () => void;
+  };
 };
 
-const Navbar = ({ logoAlt, cta, onCtaClick }: NavbarProps) => {
-  const [hasScroll, setHasScroll] = useState(false);
-  const handleScroll = useCallback(() => {
-    setHasScroll(window.scrollY > 0);
-  }, []);
+const Navbar = ({ cta }: NavbarProps) => {
+  const [isFloatingEnabled, enableFloating, disableFloating] = useToggle(true);
+  const hasScroll = useHasScroll();
+  const { t } = useTranslation('components.navbar');
 
-  useEffect(() => {
-    handleScroll();
-    window.addEventListener('scroll', handleScroll);
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-    };
-  }, [handleScroll]);
+  const links = [
+    { text: t('links.compare.text'), href: t('links.compare.href') },
+  ];
 
   return (
-    <Header isFloating={hasScroll}>
-      <Container
-        as="nav"
-        sx={{
-          alignItems: 'center',
-          display: 'flex',
-          justifyContent: 'space-between',
-          paddingY: 4,
-        }}
-      >
-        <Link href="/">
-          <a href="/" aria-label="Go to Footprint's main page">
-            <FootprintLogo alt={logoAlt} height={24} width={115} />
-          </a>
-        </Link>
-        <Button size="compact" onClick={onCtaClick}>
-          {cta}
-        </Button>
+    <Header isFloating={hasScroll && isFloatingEnabled}>
+      <Container>
+        <Inner>
+          <LogoLink />
+          <MobileNav
+            onOpen={disableFloating}
+            onClose={enableFloating}
+            cta={{
+              text: cta.text,
+              onClick: cta.onClick,
+            }}
+            links={links}
+          />
+          <DesktopNav
+            cta={{
+              text: cta.text,
+              onClick: cta.onClick,
+            }}
+            links={links}
+          />
+        </Inner>
       </Container>
     </Header>
   );
@@ -63,6 +67,19 @@ const Header = styled.header<{ isFloating: boolean }>`
       border-bottom: ${theme.borderWidth[1]}px solid
         ${theme.borderColor.primary};
     `}
+`;
+
+const Inner = styled.div`
+  ${({ theme }) => css`
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+    padding: ${theme.spacing[6]}px 0 ${theme.spacing[5]}px;
+
+    ${media.greaterThan('md')`
+      padding:  ${theme.spacing[4]}px;
+    `}
+  `}
 `;
 
 export default Navbar;

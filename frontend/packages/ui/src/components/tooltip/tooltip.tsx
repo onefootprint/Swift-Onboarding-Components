@@ -1,6 +1,7 @@
 import type { Placement } from '@popperjs/core';
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { usePopper } from 'react-popper';
+import { useUpdateEffect } from 'react-use';
 import styled, { css, useTheme } from 'styled-components';
 
 import { createFontStyles } from '../../utils/mixins';
@@ -35,6 +36,7 @@ const Tooltip = ({
   const [refElement, setRefElement] = useState<HTMLElement | null>(null);
   const [popperElement, setPopperElement] = useState<HTMLElement | null>(null);
   const {
+    forceUpdate,
     styles,
     attributes: { popper },
   } = usePopper(refElement, popperElement, {
@@ -52,6 +54,18 @@ const Tooltip = ({
   const isVisible = useVisibility(refElement);
   const shouldShowTooltip = isVisible && !disabled;
   const clonedChildren = useGetElementRef(children, id, setRefElement);
+
+  const recalculateStylesAfterTextChange = useCallback(() => {
+    if (forceUpdate) {
+      forceUpdate();
+    }
+  }, [forceUpdate]);
+
+  useUpdateEffect(() => {
+    if (text) {
+      queueMicrotask(recalculateStylesAfterTextChange);
+    }
+  }, [text, recalculateStylesAfterTextChange]);
 
   return (
     <>

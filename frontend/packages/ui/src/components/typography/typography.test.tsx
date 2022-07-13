@@ -10,7 +10,6 @@ describe('<Typography />', () => {
         foo
       </Typography>,
     );
-
     expect(screen.getByText('foo')).toBeInTheDocument();
   });
 
@@ -24,7 +23,15 @@ describe('<Typography />', () => {
         foo
       </Typography>,
     );
-
     expect(screen.getByTestId('typography-test-id')).toBeInTheDocument();
+  });
+
+  it('should assign an ID', () => {
+    customRender(
+      <Typography variant="display-1" color="primary" id="typography-id">
+        foo
+      </Typography>,
+    );
+    expect(screen.getByText('foo').id).toEqual('typography-id');
   });
 });

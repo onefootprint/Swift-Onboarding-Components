@@ -5,10 +5,10 @@ import React from 'react';
 import styled, { css } from 'styled-components';
 import { media } from 'ui';
 
+import TestimonialSection from '../../components/testimonial-section';
 import HeroSection from './components/hero-section';
 import HighlightsSection from './components/highlights-section';
 import PlaygroundSection from './components/playground-section';
-import TestimonialSection from './components/testimonial-section';
 import VaultSection from './components/vault-section';
 
 const { toggle: toggleTypeform } = createPopup('COZNk70C');
@@ -75,7 +75,9 @@ const Home = () => {
           title={t('advantages.title')}
         />
       </HighlightsContainer>
-      <TestimonialSection />
+      <TestimonialContainer>
+        <TestimonialSection />
+      </TestimonialContainer>
       <VaultSection />
     </>
   );
@@ -115,8 +117,18 @@ const HighlightsContainer = styled.section`
     `}
 
     ${media.greaterThan('lg')`
-      padding: ${theme.spacing[11]}px 0;
-      row-gap: ${theme.spacing[11]}px;
+      padding: ${theme.spacing[13]}px 0;
+      row-gap: ${theme.spacing[13]}px;
+    `}
+  `}
+`;
+
+const TestimonialContainer = styled.div`
+  ${({ theme }) => css`
+    padding: ${theme.spacing[10]}px 0;
+
+    ${media.greaterThan('lg')`
+      padding: ${theme.spacing[13]}px 0;
     `}
   `}
 `;

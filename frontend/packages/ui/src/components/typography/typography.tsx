@@ -22,9 +22,10 @@ export type TypographyProps = {
   as?: TypographyTag;
   children: React.ReactNode;
   color?: Color;
+  id?: string;
+  sx?: SXStyleProps;
   testID?: string;
   variant: FontVariant;
-  sx?: SXStyleProps;
 };
 
 const Typography = forwardRef<HTMLElement, TypographyProps>(
@@ -33,6 +34,7 @@ const Typography = forwardRef<HTMLElement, TypographyProps>(
       as = 'p',
       children,
       color = 'primary',
+      id,
       sx,
       testID,
       variant,
@@ -45,6 +47,7 @@ const Typography = forwardRef<HTMLElement, TypographyProps>(
         as={as || variantMapping[variant]}
         color={color}
         data-testid={testID}
+        id={id}
         ref={ref}
         sx={sxStyles}
         variant={variant}

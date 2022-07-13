@@ -100,7 +100,7 @@ const Inner = styled.div`
     padding: ${theme.spacing[10]}px 0;
 
     ${media.greaterThan('lg')`
-      padding: ${theme.spacing[11]}px 0;
+      padding: ${theme.spacing[13]}px 0;
     `}
   `}
 `;
