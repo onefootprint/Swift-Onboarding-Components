@@ -1,1 +1,1 @@
-export { default } from './use-get-access-events';
+export { default } from './use-get-access-logs';

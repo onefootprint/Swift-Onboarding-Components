@@ -20,17 +20,15 @@ const getAccessLogsRequest = async ({
   pageParam,
 }: QueryFunctionContext<QueryKey, string>) => {
   const [, , authToken] = queryKey as AccessLogQueryKey;
-  const { data: response } = await request<RequestResponse<AccessLogsResponse>>(
-    {
-      method: 'POST',
-      url: '/user/access_events',
-      params: { cursor: pageParam },
-      headers: {
-        [MY1FP_AUTH_HEADER]: authToken,
-      },
+  const { data: response } = await request<RequestResponse<AccessLog[]>>({
+    method: 'GET',
+    url: '/user/access_events',
+    params: { cursor: pageParam },
+    headers: {
+      [MY1FP_AUTH_HEADER]: authToken,
     },
-  );
-  return response.data;
+  });
+  return response;
 };
 
 const useGetAccessLogs = (authToken: string) =>

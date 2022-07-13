@@ -27,7 +27,10 @@ const Login = () => {
   const { logIn } = useUserSession();
   const { t } = useTranslation('pages.login');
 
-  const saveInSessionAndGoToHome = (response: UserDecryptResponse) => {
+  const saveInSessionAndGoToHome = (
+    authToken: string,
+    response: UserDecryptResponse,
+  ) => {
     logIn({
       city: response.city,
       country: response.country,
@@ -40,6 +43,7 @@ const Login = () => {
       streetAddress: response.streetAddress,
       streetAddress2: response.streetAddress2,
       zip: response.zip,
+      authToken,
     });
     router.push('/');
   };
@@ -50,7 +54,9 @@ const Login = () => {
       userMutation.mutate(
         { authToken, attributes },
         {
-          onSuccess: saveInSessionAndGoToHome,
+          onSuccess(data) {
+            saveInSessionAndGoToHome(authToken, data);
+          },
           onError: (error: RequestError) => {
             toast.show({
               description: getErrorMessage(error),

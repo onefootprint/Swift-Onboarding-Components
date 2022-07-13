@@ -1,5 +1,6 @@
 import { useTranslation } from 'hooks';
 import React from 'react';
+import useSessionUser from 'src/hooks/use-session-user';
 import styled from 'styled-components';
 import { LinkButton, LoadingIndicator } from 'ui';
 
@@ -9,15 +10,13 @@ import { AccessLog } from './types';
 
 const AccessLogs = () => {
   const { t } = useTranslation('pages.my-footprint-identity.access-logs');
-  // TODO: pass auth token
-  // https://linear.app/footprint/issue/FP-589/add-auth-token-to-access-logs-fetching-in-my1fp
-  const getAccessLogsQuery = useGetAccessLogs('');
-  const accessLogs =
-    (getAccessLogsQuery.data?.pages || []).reduce(
-      (allPages, page) => [...allPages, ...page.data],
-      [] as AccessLog[],
-    ) || [];
+  const { data } = useSessionUser();
 
+  const getAccessLogsQuery = useGetAccessLogs(data.authToken);
+  const accessLogs = (getAccessLogsQuery.data?.pages || []).reduce(
+    (allPages, page) => [...allPages, ...page.data],
+    [] as AccessLog[],
+  );
   const isLoading =
     getAccessLogsQuery.isLoading || getAccessLogsQuery.isFetchingNextPage;
   const shouldShowLoadMoreButton = !isLoading && getAccessLogsQuery.hasNextPage;
@@ -45,7 +44,6 @@ const AccessLogs = () => {
 const Container = styled.div`
   display: flex;
   justify-content: center;
-  align-items: center;
   flex-direction: column;
 `;
 

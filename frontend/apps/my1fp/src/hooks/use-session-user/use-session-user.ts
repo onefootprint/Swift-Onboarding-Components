@@ -18,6 +18,7 @@ export type UserSession = {
   zip: string | null;
   state: string | null;
   country: string | null;
+  authToken: string;
 };
 
 type UserSessionState = {
@@ -44,6 +45,7 @@ const initialMe = {
   zip: '94107',
   state: 'NY',
   country: 'USA',
+  authToken: '',
 };
 
 // TODO: Enable persist
