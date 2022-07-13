@@ -21,8 +21,9 @@ const Template: Story<SelectProps> = ({
   searchPlaceholder,
   isSearchable,
 }: SelectProps) => {
-  const [selectedOption, setSelectedOption] =
-    useState<SelectOption | undefined>(value);
+  const [selectedOption, setSelectedOption] = useState<
+    SelectOption | undefined
+  >(value);
 
   const handleSelect = (newOption: SelectOption) => {
     setSelectedOption(newOption);
