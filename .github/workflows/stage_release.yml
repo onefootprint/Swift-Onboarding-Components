@@ -36,6 +36,7 @@ jobs:
       - name: Create Pull Request
         uses: actions/github-script@v6
         with:
+          github-token: $$ {{ secrets.PR_RELEASE_TOKEN }}
           script: |
             const { repo, owner } = context.repo;
             const result = await github.rest.pulls.create({
