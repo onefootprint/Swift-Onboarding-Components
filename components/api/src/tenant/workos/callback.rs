@@ -66,7 +66,7 @@ fn handler(
         last_name: profile.last_name.clone(),
         tenant_id: tenant.id,
     });
-    let auth_token = ServerSession::create(&state, session_data, Duration::minutes(60)).await?;
+    let auth_token = ServerSession::create(&state, session_data, Duration::hours(8)).await?;
 
     Ok(Json(ApiResponseData {
         data: DashboardAuthorizationResponse {
