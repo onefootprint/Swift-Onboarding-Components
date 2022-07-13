@@ -51,7 +51,7 @@ jobs:
               title: '[Release] ${{ steps.version_name.outputs.version }}',
               owner,
               repo,
-              head: 'staging/release-${{ steps.version_name.outputs.version }}',
+              head: '${GITHUB_REPOSITORY_OWNER}:staging/release-${{ steps.version_name.outputs.version }}',
               base: 'production',
               body: [
                 'This PR is automatically generated to stage a release',
