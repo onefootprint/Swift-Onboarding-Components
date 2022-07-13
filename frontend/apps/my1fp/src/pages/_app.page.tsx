@@ -1,5 +1,5 @@
 import Head from 'next/head';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { QueryClientProvider } from 'react-query';
 import { createGlobalStyle } from 'styled-components';
 import themes from 'themes';
@@ -18,24 +18,30 @@ type AppProps = {
   pageProps: Record<string, any>;
 };
 
-const App = ({ Component, pageProps }: AppProps) => (
-  <>
-    <Head>
-      <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
-      />
-    </Head>
-    <QueryClientProvider client={queryClient}>
-      <DesignSystemProvider theme={themes.light}>
-        <GlobalStyle />
-        <PageGuard>
-          <Component {...pageProps} />
-        </PageGuard>
-      </DesignSystemProvider>
-    </QueryClientProvider>
-  </>
-);
+const App = ({ Component, pageProps }: AppProps) => {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  if (!mounted) return null;
+
+  return (
+    <>
+      <Head>
+        <meta
+          name="viewport"
+          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+        />
+      </Head>
+      <QueryClientProvider client={queryClient}>
+        <DesignSystemProvider theme={themes.light}>
+          <GlobalStyle />
+          <PageGuard>
+            <Component {...pageProps} />
+          </PageGuard>
+        </DesignSystemProvider>
+      </QueryClientProvider>
+    </>
+  );
+};
 
 const GlobalStyle = createGlobalStyle`
   html,

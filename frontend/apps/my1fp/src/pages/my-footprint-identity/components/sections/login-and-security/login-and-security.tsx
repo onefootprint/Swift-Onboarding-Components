@@ -12,9 +12,12 @@ const LoginAndSecurity = () => {
   const { t } = useTranslation(
     'pages.my-footprint-identity.login-and-security',
   );
-  const {
-    data: { email, phoneNumber, isBiometricsVerified, device },
-  } = useSessionUser();
+  const { data } = useSessionUser();
+  if (!data) {
+    return null;
+  }
+
+  const { email, phoneNumber, isBiometricsVerified, device } = data;
   const shouldShowVerifyButton = !isBiometricsVerified;
   const isVerificationLoading = false;
   const handleVerify = () => {

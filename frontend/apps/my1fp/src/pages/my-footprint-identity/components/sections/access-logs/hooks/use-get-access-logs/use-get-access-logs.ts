@@ -31,12 +31,13 @@ const getAccessLogsRequest = async ({
   return response;
 };
 
-const useGetAccessLogs = (authToken: string) =>
+const useGetAccessLogs = (authToken?: string) =>
   useInfiniteQuery<AccessLogsResponse, RequestError>(
     ['paginatedAccessEvents', null, authToken],
     getAccessLogsRequest,
     {
       retry: false,
+      enabled: !!authToken,
       getNextPageParam: lastPage => lastPage.next,
     },
   );

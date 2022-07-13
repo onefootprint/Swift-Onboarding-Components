@@ -1,9 +1,8 @@
 import React from 'react';
-import { useStore } from 'src/hooks/use-session-user';
+import { UserSession, useStore } from 'src/hooks/use-session-user';
 import { customRender, screen } from 'test-utils';
 
 import Address from './address';
-import createAddressLine from './utils/create-address-line/create-address-line';
 
 const originalState = useStore.getState();
 
@@ -15,13 +14,20 @@ describe('<Address />', () => {
   });
 
   describe('when all the values are filled', () => {
-    const data = {
-      streetAddress: '413 Missouri Street',
-      streetAddress2: 'Apt 104',
+    const data: UserSession = {
+      authToken: 'lorem',
       city: 'San Francisco',
-      zip: '94107',
+      country: 'United States',
+      dob: '01/01/2000',
+      email: 'john.doe@gmail.com',
+      firstName: 'John',
+      isEmailVerified: true,
+      lastName: 'Doe',
+      phoneNumber: '+1 (305) 541-3102',
       state: 'CA',
-      country: 'US',
+      streetAddress: '14 Linda St',
+      streetAddress2: null,
+      zip: '94102',
     };
 
     beforeEach(() => {
@@ -32,31 +38,32 @@ describe('<Address />', () => {
 
     it('should render the correct first address line', () => {
       renderAddress();
-      expect(
-        screen.getByText(
-          createAddressLine([data.streetAddress, data.streetAddress2]),
-        ),
-      ).toBeInTheDocument();
+      expect(screen.getByText('14 Linda St')).toBeInTheDocument();
     });
 
     it('should render the correct second address line', () => {
       renderAddress();
       expect(
-        screen.getByText(
-          createAddressLine([data.city, data.state, data.zip, data.country]),
-        ),
+        screen.getByText('San Francisco, CA, 94102, United States'),
       ).toBeInTheDocument();
     });
   });
 
   describe('when there are missing values', () => {
-    const data = {
-      streetAddress: '413 Missouri Street',
-      streetAddress2: null,
+    const data: UserSession = {
+      authToken: 'lorem',
       city: 'San Francisco',
-      zip: '94107',
+      country: 'United States',
+      dob: '01/01/2000',
+      email: 'john.doe@gmail.com',
+      firstName: 'John',
+      isEmailVerified: true,
+      lastName: 'Doe',
+      phoneNumber: '+1 (305) 541-3102',
       state: null,
-      country: 'US',
+      streetAddress: '14 Linda St',
+      streetAddress2: null,
+      zip: '94102',
     };
 
     beforeEach(() => {
@@ -67,12 +74,14 @@ describe('<Address />', () => {
 
     it('should render the correct first address line', () => {
       renderAddress();
-      expect(screen.getByText('413 Missouri Street')).toBeInTheDocument();
+      expect(screen.getByText('14 Linda St')).toBeInTheDocument();
     });
 
     it('should render the correct second address line', () => {
       renderAddress();
-      expect(screen.getByText('San Francisco, 94107, US')).toBeInTheDocument();
+      expect(
+        screen.getByText('San Francisco, 94102, United States'),
+      ).toBeInTheDocument();
     });
   });
 });

@@ -17,11 +17,19 @@ describe('<Basic />', () => {
     beforeEach(() => {
       useStore.setState({
         data: {
-          isEmailVerified: true,
+          authToken: 'lorem',
+          city: 'San Francisco',
+          country: 'United States',
+          dob: '01/01/2000',
           email: 'john.doe@gmail.com',
           firstName: 'John',
+          isEmailVerified: true,
           lastName: 'Doe',
           phoneNumber: '+1 (305) 541-3102',
+          state: 'CA',
+          streetAddress: '14 Linda St',
+          streetAddress2: null,
+          zip: '94102',
         },
       });
     });
@@ -47,10 +55,18 @@ describe('<Basic />', () => {
       useStore.setState({
         data: {
           isEmailVerified: false,
+          authToken: 'lorem',
+          city: 'San Francisco',
+          country: 'United States',
+          dob: '01/01/2000',
           email: 'john.doe@gmail.com',
           firstName: 'John',
           lastName: 'Doe',
           phoneNumber: '+1 (305) 541-3102',
+          state: 'CA',
+          streetAddress: '14 Linda St',
+          streetAddress2: null,
+          zip: '94102',
         },
       });
     });

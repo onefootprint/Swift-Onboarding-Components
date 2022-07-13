@@ -9,9 +9,12 @@ import ToggleSSN from './components/toggle-ssn';
 
 const Identity = () => {
   const { t } = useTranslation('pages.my-footprint-identity.identity');
-  const {
-    data: { ssn, dob, wasLoggedUsingBiometrics, hasSSNFilled },
-  } = useSessionUser();
+  const { data } = useSessionUser();
+  if (!data) {
+    return null;
+  }
+
+  const { ssn, dob, wasLoggedUsingBiometrics, hasSSNFilled } = data;
   const ssnValue = ssn || '•••••••••';
   const shouldShowSSNToggle = wasLoggedUsingBiometrics && hasSSNFilled;
 

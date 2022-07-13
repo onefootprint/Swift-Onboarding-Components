@@ -6,9 +6,11 @@ import { Typography } from 'ui';
 import createAddressLine from './utils/create-address-line';
 
 const Address = () => {
-  const {
-    data: { streetAddress, streetAddress2, city, country, state, zip },
-  } = useSessionUser();
+  const { data } = useSessionUser();
+  if (!data) {
+    return null;
+  }
+  const { streetAddress, streetAddress2, city, country, state, zip } = data;
 
   return (
     <Container>

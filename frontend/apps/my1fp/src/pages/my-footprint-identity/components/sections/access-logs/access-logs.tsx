@@ -12,7 +12,11 @@ const AccessLogs = () => {
   const { t } = useTranslation('pages.my-footprint-identity.access-logs');
   const { data } = useSessionUser();
 
-  const getAccessLogsQuery = useGetAccessLogs(data.authToken);
+  const getAccessLogsQuery = useGetAccessLogs(data?.authToken);
+  if (!data) {
+    return null;
+  }
+
   const accessLogs = (getAccessLogsQuery.data?.pages || []).reduce(
     (allPages, page) => [...allPages, ...page.data],
     [] as AccessLog[],

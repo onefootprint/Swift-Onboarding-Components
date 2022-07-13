@@ -17,8 +17,19 @@ describe('<Identity />', () => {
     beforeEach(() => {
       useStore.setState({
         data: {
+          authToken: 'lorem',
+          city: 'San Francisco',
+          country: 'United States',
+          dob: '01/01/2000',
+          email: 'john.doe@gmail.com',
+          firstName: 'John',
           hasSSNFilled: true,
-          dob: '03/10/1990',
+          lastName: 'Doe',
+          phoneNumber: '+1 (305) 541-3102',
+          state: 'CA',
+          streetAddress: '14 Linda St',
+          streetAddress2: null,
+          zip: '94102',
         },
       });
     });
@@ -30,7 +41,7 @@ describe('<Identity />', () => {
 
     it('should render the DOB', () => {
       renderIdentity();
-      expect(screen.getByText('03/10/1990')).toBeInTheDocument();
+      expect(screen.getByText('01/01/2000')).toBeInTheDocument();
     });
   });
 
@@ -38,8 +49,19 @@ describe('<Identity />', () => {
     beforeEach(() => {
       useStore.setState({
         data: {
+          authToken: 'lorem',
+          city: 'San Francisco',
+          country: 'United States',
+          dob: '01/01/2000',
+          email: 'john.doe@gmail.com',
+          firstName: 'John',
           hasSSNFilled: false,
-          dob: '03/10/1990',
+          lastName: 'Doe',
+          phoneNumber: '+1 (305) 541-3102',
+          state: 'CA',
+          streetAddress: '14 Linda St',
+          streetAddress2: null,
+          zip: '94102',
         },
       });
     });
@@ -54,10 +76,21 @@ describe('<Identity />', () => {
     beforeEach(() => {
       useStore.setState({
         data: {
+          authToken: 'lorem',
+          city: 'San Francisco',
+          country: 'United States',
+          dob: '01/01/2000',
           email: 'john.doe@gmail.com',
+          firstName: 'John',
           hasSSNFilled: true,
           isEmailVerified: false,
+          lastName: 'Doe',
+          phoneNumber: '+1 (305) 541-3102',
+          state: 'CA',
+          streetAddress: '14 Linda St',
+          streetAddress2: null,
           wasLoggedUsingBiometrics: true,
+          zip: '94102',
         },
       });
     });
