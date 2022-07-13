@@ -32,11 +32,19 @@ jobs:
       - name: create branch        
         run: |
           git checkout -b "staging/release-${{ steps.version_name.outputs.version }}"
+          
+      - name: token
+        id: get_token
+        uses: onefootprint/action-github-app-token@v1
+        with:
+          app_id: ${{ secrets.RELEASE_APP_ID }}
+          private_key: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
+          
 
       - name: Create Pull Request
         uses: actions/github-script@v6
         with:
-          github-token: $$ {{ secrets.PR_RELEASE_TOKEN }}
+          github-token: ${{ steps.get_token.outputs.token }}
           script: |
             const { repo, owner } = context.repo;
             const result = await github.rest.pulls.create({
