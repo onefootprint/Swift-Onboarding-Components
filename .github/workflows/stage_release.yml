@@ -32,6 +32,7 @@ jobs:
       - name: create branch        
         run: |
           git checkout -b "staging/release-${{ steps.version_name.outputs.version }}"
+          git push --set-upstream origin "staging/release-${{ steps.version_name.outputs.version }}"
           
       - name: token
         id: get_token
