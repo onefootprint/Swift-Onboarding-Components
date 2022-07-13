@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { LinkButton, LoadingIndicator } from 'ui';
 
 import AccessLogsTimeline from './components/access-logs-timeline';
-import useGetAccessLogs from './hooks/use-get-access-events/use-get-access-events';
+import useGetAccessLogs from './hooks/use-get-access-logs';
 import { AccessLog } from './types';
 
 const AccessLogs = () => {
