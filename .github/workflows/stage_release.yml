@@ -25,7 +25,9 @@ jobs:
       - name: extract version name
         id: version_name
         run: |
-          version=${{inputs.version}} || ${GITHUB_REF##*/}
+          input=${{inputs.version}}
+          ref=${GITHUB_REF##*/}
+          version="${input:-$ref}"
           echo "##[set-output name=version;]$(echo ${version})"
 
       - name: create branch        
