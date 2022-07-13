@@ -82,6 +82,7 @@ import IcoLogOut16 from '../ico/ico-log-out-16';
 import IcoLogOut24 from '../ico/ico-log-out-24';
 import IcoMenu16 from '../ico/ico-menu-16';
 import IcoMenu24 from '../ico/ico-menu-24';
+import IcoMinusSmall24 from '../ico/ico-minus-small-24';
 import IcoPhone16 from '../ico/ico-phone-16';
 import IcoPhone24 from '../ico/ico-phone-24';
 import IcoPlusBig16 from '../ico/ico-plus-big-16';
@@ -199,6 +200,7 @@ export default {
   IcoLock24,
   IcoLogOut24,
   IcoMenu24,
+  IcoMinusSmall24,
   IcoPhone24,
   IcoPlusBig24,
   IcoPlusSmall24,

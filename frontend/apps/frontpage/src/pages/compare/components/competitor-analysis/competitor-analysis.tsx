@@ -33,6 +33,7 @@ const CompetitorAnalysis = ({
       id={anchor}
       sx={{ marginBottom: 8 }}
       variant="display-3"
+      as="h3"
     >
       {title}
     </Typography>

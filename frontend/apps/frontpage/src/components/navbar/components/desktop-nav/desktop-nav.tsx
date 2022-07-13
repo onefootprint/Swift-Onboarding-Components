@@ -40,6 +40,10 @@ const Container = styled.div`
 
 const LinksContainer = styled.div`
   ${({ theme }) => css`
+    align-items: center;
+    display: flex;
+    gap: ${theme.spacing[7]}px;
+
     a {
       ${createFontStyles('label-3')};
       color: ${theme.color.primary};

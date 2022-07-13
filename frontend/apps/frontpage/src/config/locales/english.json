@@ -13,6 +13,10 @@
         "compare": {
           "href": "/compare",
           "text": "Compare"
+        },
+        "faq": {
+          "href": "/faq",
+          "text": "FAQ"
         }
       }
     },
@@ -151,6 +155,61 @@
             }
           }
         }
+      }
+    },
+    "faq": {
+      "html-title": "Footprint - FAQ",
+      "title": "FAQ",
+      "subtitle": "Frequently Asked Questions",
+      "questions": {
+        "what-is-kyc": {
+          "title": "What is KYC?",
+          "content": ["Know Your Customer (KYC)"]
+        },
+        "satisfy-kyc": {
+          "title": "Does this satisfy KYC?",
+          "content": [
+            "Yes, and then some. Our system is designed to comply with Section 326 of the Patriot Act (KYC)and the Safe Banking Act. You, as our customer, still own the data of your users, but we simply store it (no different from AWS hosting you in their cloud). You at all times can call from our server a token unique to each user with an audit log of how we verified their identity (this updates in real-time, as we continuously increase our accuracy based on how users interact with other applications), and both you and your banking partner can request access to specific PII attributes. Footprint has had conversations with Directors at FinCEN and the top legal minds in the field to ensure as much."
+          ]
+        },
+        "too-good": {
+          "title": "This seems too good to be true—you handle KYC + PII Vaulting—what’s the catch?",
+          "content": [
+            "The catch was that you were paying for those services separately before :). We aren’t geniuses—it is actually simpler, quicker, and more secure to do both of these in one solution. By virtue of us securely storing data, we verify it (for example, by storing John Doe’s encrypted SSN as credentialed by the Social Security Administration, we are in real-time verifying John Doe’s identity in conjunction with our liveness checks).",
+            "We think it is silly that in the past, companies have had to pay to tokenize/vault this KYC data that was of little use to them, and never evolved. Fraudsters are always changing their approach, but nothing screams static like tokenizing KYC data upon account creation. Our vault with PII is a living mechanism. We constantly update our predictions on people’s identity based on new signals. For companies, this means they benefit from future KYCs done on their users identities."
+          ]
+        },
+        "customize-kyc": {
+          "title": "Other places let me customize KYC. Why don’t you?",
+          "content": [
+            "We don’t think KYC should be customized, and it certainly should not be a toggle of accuracy. There are certain attributes required by law that need to be collected (SSN, DOB), and then attributes that help us better confirm your identity (phone + email, and how long you’ve had each of those). We get all of this data and check it from the best data sources to remove complexity. Truth be told, this is why we think KYC is becoming commoditized, and why our product is built around security/storage of the data, real-time fraud monitoring, and the best developer experience. Our competitors don’t do any of those things, so they add complexity to their own product (you definitely don’t need 82 data vendors to choose from) or fancy “magic” (wow—that selfie check on your driver’s license is so cool ;)) to obfuscate the truth. We solve KYC for you, and just give you the six lines of code to do it. We know you’re busy building an amazing product, so take care of KYC for you."
+          ]
+        },
+        "internet-fraud": {
+          "title": "Is Internet fraud that big of a problem?",
+          "content": [
+            "There is $50B of identity theft a year despite enterprises spending $20B on IDV. The problem is only getting worse; an IDology study found a 53% increase in fraud attempts in 2020. Enterprises report 15%-50% account abandonment when people must go through a ~5 minute document verification. Meanwhile, even large Neobanks with $1M budgets say they are still only accurate 98.5% of the time; with 1M+ verifications a year this means they miss 1500 people a year with the cost of a bad actor ranging from $300-$30k. And this accuracy is much lower for growing fintechs with much fewer resources. Identity shouldn’t be a toggle; it should be 100% accurate. And it needs to be in the emerging world of embedded fintech."
+          ]
+        },
+        "why-vaulting": {
+          "title": "We built an in-house solution to store the data, so we really just need help with KYC. Why do we need your vaulting?",
+          "content": [
+            "This is a common question we get, often because historically these have been seen as different functions performed by separate teams. As such, it may not be immediately clear how risk teams can solve issues for security team, and vice versa. While in-house solutions for vaulting can be a good starting point, there are many problems with them over time. It is expensive to maintain these structures—whether it be cost of architecture or opportunity cost of the hours your own engineering teams are being consumed keeping the vaults secure. Further, even if you build the vault, you will need to likely still pay for tools like BigID and OneTrust to label the fact that you securely stored the PII.",
+            "Even if you adapted our nitro enclaves and brought advanced encryption to your environments, it would be massively disruptive to generate the zero-trust environment we have built by default within Footprint. For example, some investment apps need to access an SSN for trades over $10k, while payroll systems want to see SSN and DOB if a user changes their direct deposit. Our system knows if one of these instances occurred, and thus can grant proper permission. Conversely, if one of these customers requested user information for accounts that did not fit these descriptions, we would know there is actually a malicious actor internally (knowingly or unknowingly), and Footprint can simply reject the request.",
+            "Footprint’s vaulting system is designed to support least privilege access from the start. With Footprint, you can restrict  sub-components in your applications to only have access to certain user PII attributes (like last 4 of SSN)."
+          ]
+        },
+        "aml-inquiry": {
+          "title": "We have an AML inquiry from our bank. How do we get the data if you store it?",
+          "content": [
+            "If your bank has an AML inquiry, we make it easy to access the PII data required. As mentioned in the first Q&A, the token with the audit trail is always available to be pulled, and all other data can be easily requested by you or your banking partner. Behind the scenes, we pull the data by XX"
+          ]
+        }
+      },
+      "contact": {
+        "title": "Haven't found what you were looking for?",
+        "subtitle": "Say hi and we'll get back to you as soon as possible.",
+        "cta": "Contact us"
       }
     },
     "compare": {
