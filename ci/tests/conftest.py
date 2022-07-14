@@ -52,7 +52,7 @@ def pytest_collection_modifyitems(items):
 
 
 # global fixtures
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="session")
 def workos_tenant():
     path = "private/client"
     data = {
@@ -66,6 +66,8 @@ def workos_tenant():
     body = _assert_response(r)
     client_public_key = body["data"]["keys"]["client_public_key"]
     client_secret_key = body["data"]["keys"]["client_secret_key"]
+    print("\n======Client info======")
+    print(body)
     return {
         "pk": client_public_key,
         "sk": client_secret_key,
@@ -73,7 +75,7 @@ def workos_tenant():
     }
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="session")
 def foo_tenant():
     path = "private/client"
     data = {
