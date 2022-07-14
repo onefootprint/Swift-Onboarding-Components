@@ -21,6 +21,13 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-region: ${{ secrets.AWS_REGION }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
       # pulumi setup
       - uses: actions/setup-node@v2
         with:
@@ -29,7 +36,7 @@ jobs:
       - run: npm install
         working-directory: infra
 
-      # bring down the ephemeral stack
+      # bring down the staging stack
       - uses: pulumi/actions@v3
         with:
           command: destroy
