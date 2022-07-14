@@ -3,10 +3,10 @@ on:
   pull_request:
     types: [closed]
     branches:
-      - staging/*
+      - "staging/**"
 
   workflow_dispatch:
-  
+
 concurrency:
   group: ${{ github.workflow }}
   cancel-in-progress: true
@@ -16,8 +16,7 @@ jobs:
     name: Destroy stack
     runs-on: ubuntu-latest
     environment: prod
-    # don't run for dependabot changes and PRs that don't tag release
-    if: github.actor != 'dependabot[bot]' && contains( github.event.pull_request.labels.*.name, 'release')
+    if: github.actor != 'dependabot[bot]' && ((github.event_name != 'pull_request') || (github.event_name == 'pull_request' && contains( github.event.pull_request.labels.*.name, 'release')))
 
     steps:
       - uses: actions/checkout@v2
