@@ -23,8 +23,8 @@ const request = <TData = any>(requestConfig: AxiosRequestConfig = {}) => {
   console.log('api base url', process.env.NEXT_PUBLIC_API_BASE_URL);
   console.log('NEXT_PUBLIC_VERCEL_ENV', process.env.NEXT_PUBLIC_VERCEL_ENV);
   console.log(
-    'NEXT_PUBLIC_VERCEL_GIT_REPO_SLUG',
-    process.env.NEXT_PUBLIC_VERCEL_GIT_REPO_SLUG,
+    'NEXT_PUBLIC_VERCEL_GIT_COMMIT_REF',
+    process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_REF,
   );
 
   const client = applyCaseMiddleware(axios.create());
