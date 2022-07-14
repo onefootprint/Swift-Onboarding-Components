@@ -23,10 +23,12 @@ const PhoneVerificationPinForm = ({
   const toast = useToast();
   const showRequestErrorToast = useRequestErrorToast();
   const { t } = useTranslation('pages.phone-verification.form');
+
   const [state, send] = useBifrostMachine();
   const identifyChallengeMutation = useIdentifyChallenge();
   const identifyVerificationMutation = useIdentifyVerification();
   const userDataMutation = useUserData();
+
   const shouldShowSuccess = identifyVerificationMutation.isSuccess;
   const shouldShowLoading =
     identifyVerificationMutation.isLoading || userDataMutation.isLoading;
@@ -35,7 +37,11 @@ const PhoneVerificationPinForm = ({
     authToken,
   }: IdentifyVerificationResponse) => {
     const { email } = state.context;
-    userDataMutation.mutate({ data: { email }, authToken });
+    // Only send the user email to the backend if we are onboarding the user for
+    // the first time
+    if (!state.context.userFound) {
+      userDataMutation.mutate({ data: { email }, authToken });
+    }
 
     if (authToken) {
       setTimeout(() => {
