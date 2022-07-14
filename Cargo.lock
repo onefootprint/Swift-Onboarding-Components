@@ -1917,6 +1917,7 @@ dependencies = [
  "envconfig",
  "futures",
  "futures-util",
+ "itertools",
  "log",
  "mime",
  "newtypes",

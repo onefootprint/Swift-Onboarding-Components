@@ -59,7 +59,9 @@ def _d2p_auth_header_raw(value):
     }
 
 def _assert_response(response, status_code=200, msg="Incorrect status code"):
-    assert response.status_code == status_code, msg
+    if response.status_code != status_code:
+        print(response.content)
+        assert False, msg
     return response.json()
 
 def _pretty_print_json_str(o):

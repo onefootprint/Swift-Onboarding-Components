@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 
+use db::models::ob_configurations::ObConfiguration;
 use db::models::user_data::{GroupDataUpdateRequest, NewUserDataBatch, UserData, UserDataUpdate};
 use db::models::user_vaults::UserVault;
 use db::DbPool;
@@ -159,7 +160,7 @@ impl UserVaultWrapper {
         Ok(Some(decrypted_data))
     }
 
-    pub fn missing_fields(&self) -> Vec<DataKind> {
+    pub fn missing_fields(&self, ob_config: &ObConfiguration) -> Vec<DataKind> {
         vec![
             DataKind::FirstName,
             DataKind::LastName,
@@ -175,6 +176,7 @@ impl UserVaultWrapper {
         ]
         .into_iter()
         .filter(|data_kind| self.get_e_field(*data_kind).is_none())
+        .filter(|x| ob_config.must_collect_data_kinds.contains(x))
         .collect()
     }
 }

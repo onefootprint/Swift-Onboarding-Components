@@ -46,11 +46,7 @@ pub fn handler(
     let uvw = UserVaultWrapper::from(&state.db_pool, uv).await?;
     Ok(Json(ApiResponseData {
         data: OnboardingResponse {
-            missing_attributes: uvw
-                .missing_fields()
-                .into_iter()
-                .filter(|x| tenant_auth.ob_config.must_collect_data_kinds.contains(x))
-                .collect(),
+            missing_attributes: uvw.missing_fields(&tenant_auth.ob_config),
             missing_webauthn_credentials: webauthn_creds.is_empty(),
         },
     }))

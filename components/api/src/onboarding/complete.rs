@@ -13,6 +13,7 @@ use chrono::Duration;
 use db::models::audit_trails::AuditTrail;
 use db::webauthn_credentials::get_webauthn_creds;
 use db::DbError;
+use itertools::Itertools;
 use newtypes::{
     AuditTrailEvent, DataKind, FootprintUserId, SessionAuthToken, Status, Vendor, VerificationInfo,
 };
@@ -44,20 +45,13 @@ fn handler(
     let uv_id = uv.id.clone();
 
     let uvw = UserVaultWrapper::from(&state.db_pool, uv.clone()).await?;
-    let missing_fields = uvw
-        .missing_fields()
-        .into_iter()
-        // check if we're missing something that's required
-        .filter(|x| tenant_auth.ob_config.must_collect_data_kinds.contains(x))
-        .map(|x| x.to_string())
-        .collect::<Vec<String>>();
-    let webauthn_creds = get_webauthn_creds(&state.db_pool, uv_id.clone()).await?;
-    // TODO kick off user verification with data vendors
-
+    let missing_fields = uvw.missing_fields(&tenant_auth.ob_config);
     if !missing_fields.is_empty() {
-        return Err(OnboardingError::UserMissingRequiredFields(missing_fields.join(",")).into());
+        return Err(OnboardingError::UserMissingRequiredFields(missing_fields.into_iter().join(", ")).into());
     }
 
+    // TODO kick off user verification with data vendors
+    let webauthn_creds = get_webauthn_creds(&state.db_pool, uv_id.clone()).await?;
     let footprint_user_id = onboarding.user_ob_id.clone();
     let tenant_id = tenant_auth.tenant.id.clone();
     let session_sealing_key = state.session_sealing_key.clone();
