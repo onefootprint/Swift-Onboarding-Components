@@ -92,16 +92,9 @@ struct WebauthnRegisterRequest {
     challenge_token: ChallengeToken,
     /// for iOS app clip attestation
     supplementary_attestation_data: Option<Base64Data>,
-    /// if the location matches or is unknown
-    location_match: Option<LocationMatchType>,
-}
-
-#[derive(Debug, PartialEq, Clone, Copy, Serialize_repr, Deserialize_repr, Apiv2Schema)]
-#[repr(u8)]
-enum LocationMatchType {
-    Unknown = 0,
-    NoMatch = 1,
-    Match = 2,
+    /// the attested metadata as json
+    #[serde(rename = "attested_metadata")]
+    attested_metadata_json: Option<Base64Data>,
 }
 
 /// Response to a registration challenge
@@ -149,23 +142,25 @@ async fn complete(
         AttestationFormat::AndroidSafetyNet => AttestationType::AndroidSafetyNet,
         AttestationFormat::None => {
             // this is our work around for supplementary app-based attestation
+            let metadata_json = request
+                .attested_metadata_json
+                .as_ref()
+                .map(|b| b.0.as_slice())
+                .unwrap_or(b"");
+
             match &request.supplementary_attestation_data {
                 Some(app_attest) => {
-                    try_attest_apple_app_attestation(
-                        &reg,
-                        request.location_match.unwrap_or(LocationMatchType::Unknown),
-                        app_attest.as_ref(),
-                    )
-                    .map_err(|err| {
-                        tracing::error!(error=?err, "failed to verify app attestation");
-                    })
-                    .map(|att| {
-                        // store the metadata
-                        attestation_metadata.app_attestation = Some(att);
-                        // return the verified type
-                        AttestationType::AppleApp
-                    })
-                    .unwrap_or(AttestationType::None)
+                    try_attest_apple_app_attestation(&reg, &metadata_json, app_attest.as_ref())
+                        .map_err(|err| {
+                            tracing::error!(error=?err, "failed to verify app attestation");
+                        })
+                        .map(|att| {
+                            // store the metadata
+                            attestation_metadata.app_attestation = Some(att);
+                            // return the verified type
+                            AttestationType::AppleApp
+                        })
+                        .unwrap_or(AttestationType::None)
                 }
                 None => AttestationType::None,
             }
@@ -213,7 +208,26 @@ async fn complete(
 /// TODO: move this struct to newtypes for use later
 #[derive(Debug, Serialize)]
 enum AppAttestationMetadata {
-    Apple { is_development: bool, receipt: Vec<u8> },
+    Apple {
+        is_development: bool,
+        receipt: Vec<u8>,
+        metadata: AppleDeviceMetadata,
+    },
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+struct AppleDeviceMetadata {
+    location_match: LocationMatchType,
+    model: Option<String>,
+    os: Option<String>,
+}
+
+#[derive(Debug, PartialEq, Clone, Copy, Serialize_repr, Deserialize_repr, Apiv2Schema)]
+#[repr(u8)]
+enum LocationMatchType {
+    Unknown = 0,
+    NoMatch = 1,
+    Match = 2,
 }
 
 /// Our internal method of combining an attestation Apple's DeviceCheck
@@ -221,7 +235,7 @@ enum AppAttestationMetadata {
 /// credential to the attested device (PassKeys are not attested currently due to iOS bug)
 fn try_attest_apple_app_attestation(
     credential: &RegisterPublicKeyCredential,
-    location_match: LocationMatchType,
+    device_metadata_json_bytes: &[u8],
     app_attestation: &[u8],
 ) -> Result<AppAttestationMetadata, AttestationError> {
     let verifier = app_attest::apple::AppleAppAttestationVerifier::new_default_ca(vec![
@@ -235,7 +249,7 @@ fn try_attest_apple_app_attestation(
     let client_data = vec![
         credential.response.client_data_json.as_ref(),
         credential.response.attestation_object.as_ref(),
-        &[location_match as u8],
+        device_metadata_json_bytes,
     ]
     .into_iter()
     .map(sha256)
@@ -244,9 +258,19 @@ fn try_attest_apple_app_attestation(
 
     let verified = verifier.attest(&client_data, app_attestation)?;
 
+    let metadata: AppleDeviceMetadata =
+        serde_json::from_slice(device_metadata_json_bytes)
+            .ok()
+            .unwrap_or(AppleDeviceMetadata {
+                location_match: LocationMatchType::Unknown,
+                model: None,
+                os: None,
+            });
+
     Ok(AppAttestationMetadata::Apple {
         is_development: verified.is_development,
         receipt: verified.receipt,
+        metadata,
     })
 }
 
@@ -257,14 +281,14 @@ mod tests {
     #[test]
     fn test_app_attest() {
         let json = serde_json::json!(
-            {"supplementary_attestation_data":"o2NmbXRvYXBwbGUtYXBwYXR0ZXN0Z2F0dFN0bXSiY3g1Y4JZAuwwggLoMIICbaADAgECAgYBgXedm1YwCgYIKoZIzj0EAwIwTzEjMCEGA1UEAwwaQXBwbGUgQXBwIEF0dGVzdGF0aW9uIENBIDExEzARBgNVBAoMCkFwcGxlIEluYy4xEzARBgNVBAgMCkNhbGlmb3JuaWEwHhcNMjIwNjE3MTYyMDI2WhcNMjMwMTE3MTMxNTI2WjCBkTFJMEcGA1UEAwxAMTA4N2ZmNDVkM2Q3NTA3YWRlOWQ0OWM1MGQ5MjgzZTNmNDY3NWZjNTBkNmE1OGVhY2EwZDM4ZTlkMmI4N2JiMTEaMBgGA1UECwwRQUFBIENlcnRpZmljYXRpb24xEzARBgNVBAoMCkFwcGxlIEluYy4xEzARBgNVBAgMCkNhbGlmb3JuaWEwWTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAARSEfEMqo_gCuZR08NW5K_5F0A5J0CJEAUytNdH_yTdeY-K4LbR0obWNW0Zhrsw2yfsv8d0ZcwgowVo0grBgzdko4HxMIHuMAwGA1UdEwEB_wQCMAAwDgYDVR0PAQH_BAQDAgTwMH4GCSqGSIb3Y2QIBQRxMG-kAwIBCr-JMAMCAQG_iTEDAgEAv4kyAwIBAb-JMwMCAQG_iTQmBCRDMjQ2QkM4OUNKLmluLmFsZXhnci5Gb290cHJpbnRWZXJpZnmlBgQEc2tzIL-JNgMCAQW_iTcDAgEAv4k5AwIBAL-JOgMCAQAwGQYJKoZIhvdjZAgHBAwwCr-KeAYEBDE2LjAwMwYJKoZIhvdjZAgCBCYwJKEiBCC4JsVxyhcd1igOXZ1iQQMXyd1gR9I2D-qrAa7TpJ64eDAKBggqhkjOPQQDAgNpADBmAjEAmHV4YXYRaf1BtqrTHodUzKyjd8t9iwbnMjJVVEciL0acTA1yPERT1d8tX12ez4d8AjEAlj_fl1rObsTE3v0u8CO1p_HsvG0cl-nkZHQhC_7-cdVaqIvRZ4V74N8yaywv42IGWQJHMIICQzCCAcigAwIBAgIQCbrF4bxAGtnUU5W8OBoIVDAKBggqhkjOPQQDAzBSMSYwJAYDVQQDDB1BcHBsZSBBcHAgQXR0ZXN0YXRpb24gUm9vdCBDQTETMBEGA1UECgwKQXBwbGUgSW5jLjETMBEGA1UECAwKQ2FsaWZvcm5pYTAeFw0yMDAzMTgxODM5NTVaFw0zMDAzMTMwMDAwMDBaME8xIzAhBgNVBAMMGkFwcGxlIEFwcCBBdHRlc3RhdGlvbiBDQSAxMRMwEQYDVQQKDApBcHBsZSBJbmMuMRMwEQYDVQQIDApDYWxpZm9ybmlhMHYwEAYHKoZIzj0CAQYFK4EEACIDYgAErls3oHdNebI1j0Dn0fImJvHCX-8XgC3qs4JqWYdP-NKtFSV4mqJmBBkSSLY8uWcGnpjTY71eNw-_oI4ynoBzqYXndG6jWaL2bynbMq9FXiEWWNVnr54mfrJhTcIaZs6Zo2YwZDASBgNVHRMBAf8ECDAGAQH_AgEAMB8GA1UdIwQYMBaAFKyREFMzvb5oQf-nDKnl-url5YqhMB0GA1UdDgQWBBQ-410cBBmpybQx-IR01uHhV3LjmzAOBgNVHQ8BAf8EBAMCAQYwCgYIKoZIzj0EAwMDaQAwZgIxALu-iI1zjQUCz7z9Zm0JV1A1vNaHLD-EMEkmKe3R-RToeZkcmui1rvjTqFQz97YNBgIxAKs47dDMge0ApFLDukT5k2NlU_7MKX8utN-fXr5aSsq2mVxLgg35BDhveAe7WJQ5t2dyZWNlaXB0WQ5fMIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwGggCSABIID6DGCBBkwLAIBAgIBAQQkQzI0NkJDODlDSi5pbi5hbGV4Z3IuRm9vdHByaW50VmVyaWZ5MIIC9gIBAwIBAQSCAuwwggLoMIICbaADAgECAgYBgXedm1YwCgYIKoZIzj0EAwIwTzEjMCEGA1UEAwwaQXBwbGUgQXBwIEF0dGVzdGF0aW9uIENBIDExEzARBgNVBAoMCkFwcGxlIEluYy4xEzARBgNVBAgMCkNhbGlmb3JuaWEwHhcNMjIwNjE3MTYyMDI2WhcNMjMwMTE3MTMxNTI2WjCBkTFJMEcGA1UEAwxAMTA4N2ZmNDVkM2Q3NTA3YWRlOWQ0OWM1MGQ5MjgzZTNmNDY3NWZjNTBkNmE1OGVhY2EwZDM4ZTlkMmI4N2JiMTEaMBgGA1UECwwRQUFBIENlcnRpZmljYXRpb24xEzARBgNVBAoMCkFwcGxlIEluYy4xEzARBgNVBAgMCkNhbGlmb3JuaWEwWTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAARSEfEMqo_gCuZR08NW5K_5F0A5J0CJEAUytNdH_yTdeY-K4LbR0obWNW0Zhrsw2yfsv8d0ZcwgowVo0grBgzdko4HxMIHuMAwGA1UdEwEB_wQCMAAwDgYDVR0PAQH_BAQDAgTwMH4GCSqGSIb3Y2QIBQRxMG-kAwIBCr-JMAMCAQG_iTEDAgEAv4kyAwIBAb-JMwMCAQG_iTQmBCRDMjQ2QkM4OUNKLmluLmFsZXhnci5Gb290cHJpbnRWZXJpZnmlBgQEc2tzIL-JNgMCAQW_iTcDAgEAv4k5AwIBAL-JOgMCAQAwGQYJKoZIhvdjZAgHBAwwCr-KeAYEBDE2LjAwMwYJKoZIhvdjZAgCBCYwJKEiBCC4JsVxyhcd1igOXZ1iQQMXyd1gR9I2D-qrAa7TpJ64eDAKBggqhkjOPQQDAgNpADBmAjEAmHV4YXYRaf1BtqrTHodUzKyjd8t9iwbnMjJVVEciL0acTA1yPERT1d8tX12ez4d8AjEAlj_fl1rObsTE3v0u8CO1p_HsvG0cl-nkZHQhC_7-cdVaqIvRZ4V74N8yaywv42IGMCgCAQQCAQEEIPY8WUVNf5zdIiMRxq3CqJFIUTMVXD9cSHXzG1gwTU16MGACAQUCAQEEWE1sZGpkTWtPQmkrSjdnSlB5MjRCSXc5MUdrVisvdGdvdUlmY2tFcDZDZ3d0ZHoxWGpTemg5TjBhcUdBcE5BSWZkMzRubVZLZlZWcjl5Tkx6dG9qOC9nPT0wDgIBBgIBAQQGQVRURVNUMA8CAQcCAQEEB3NhbmRib3gwIAIBDAIBAQQYMjAyMi0ENTA2LTE4VDE2OjIwOjI2LjYyMVowIAIBFQIBAQQYMjAyMi0wOS0xNlQxNjoyMDoyNi42MjFaAAAAAAAAoIAwggOuMIIDVKADAgECAhAJObS86QzDoYFlNjcvZnFBMAoGCCqGSM49BAMCMHwxMDAuBgNVBAMMJ0FwcGxlIEFwcGxpY2F0aW9uIEludGVncmF0aW9uIENBIDUgLSBHMTEmMCQGA1UECwwdQXBwbGUgQ2VydGlmaWNhdGlvbiBBdXRob3JpdHkxEzARBgNVBAoMCkFwcGxlIEluYy4xCzAJBgNVBAYTAlVTMB4XDTIyMDQxOTEzMzMwM1oXDTIzMDUxOTEzMzMwMlowWjE2MDQGA1UEAwwtQXBwbGljYXRpb24gQXR0ZXN0YXRpb24gRnJhdWQgUmVjZWlwdCBTaWduaW5nMRMwEQYDVQQKDApBcHBsZSBJbmMuMQswCQYDVQQGEwJVUzBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABDnU-aqbHMRF1lumF6zywITsbwcI1ZAUoOduzz3uOZmpTGv7AVUQVVVkbNqOI-AmARQC0H4TuVQf2LTWV9guk3ijggHYMIIB1DAMBgNVHRMBAf8EAjAAMB8GA1UdIwQYMBaAFNkX_ktnkDhLkvTbztVXgBQLjz3JMEMGCCsGAQUFBwEBBDcwNTAzBggrBgEFBQcwAYYnaHR0cDovL29jc3AuYXBwbGUuY29tL29jc3AwMy1hYWljYTVnMTAxMIIBHAYDVR0gBIIBEzCCAQ8wggELBgkqhkiG92NkBQEwgf0wgcMGCCsGAQUFBwICMIG2DIGzUmVsaWFuY2Ugb24gdGhpcyBjZXJ0aWZpY2F0ZSBieSBhbnkgcGFydHkgYXNzdW1lcyBhY2NlcHRhbmNlIG9mIHRoZSB0aGVuIGFwcGxpY2FibGUgc3RhbmRhcmQgdGVybXMgYW5kIGNvbmRpdGlvbnMgb2YgdXNlLCBjZXJ0aWZpY2F0ZSBwb2xpY3kgYW5kIGNlcnRpZmljYXRpb24gcHJhY3RpY2Ugc3RhdGVtZW50cy4wNQYIKwYBBQUHAgEWKWh0dHA6Ly93d3cuYXBwbGUuY29tL2NlcnRpZmljYXRlYXV0aG9yaXR5MB0GA1UdDgQWBBT7Z9MNv3O3kqYmXUiNLMEdleJz-DAOBgNVHQ8BAf8EBAMCB4AwDwYJKoZIhvdjZAwPBAIFADAKBggqhkjOPQQDAgNIADBFAiEAlJCgZzdz5y94KTZ2I7jdUdfImgnquwDjnG5FCwVYC9ACIEc0GivRPMBUqAo6qsw8wUV8AFRTGOozjX1t1fYLK4cuMIIC-TCCAn-gAwIBAgIQVvuD1Cv_jcM3mSO1Wq5uvTAKBggqhkjOPQQDAzBnMRswGQYDVQQDDBJBcHBsZSBSb290IENBIC0gRzMxJjAkBgNVBAsMHUFwcGxlIENlcnRpZmljYXRpb24gQXV0aG9yaXR5MRMwEQYDVQQKDApBcHBsZSBJbmMuMQswCQYDVQQGEwJVUzAeFw0xOTAzMjIxNzUzMzNaFw0zNDAzMjIwMDAwMDBaMHwxMDAuBgNVBAMMJ0FwcGxlIEFwcGxpY2F0aW9uIEludGVncmF0aW9uIENBIDUgLSBHMTEmMCQGA1UECwwdQXBwbGUgQ2VydGlmaWNhdGlvbiBBdXRob3JpdHkxEzARBgNVBAoMCkFwcGxlIEluYy4xCzAJBgNVBAYTAlVTMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEks5jvX2GsasoCjsc4a_7BJSAkaz2Md-myyg1b0RL4SHlV90SjY26gnyVvkn6vjPKrs0EGfEvQyX69L6zy4N-uqOB9zCB9DAPBgNVHRMBAf8EBTADAQH_MB8GA1UdIwQYMBaAFLuw3qFYM4iapIqZ3r6966_ayySrMEYGCCsGAQUFBwEBBDowODA2BggrBgEFBQcwAYYqaHR0cDovL29jc3AuYXBwbGUuY29tL29jc3AwMy1hcHBsZXJvb3RjYWczMDcGA1UdHwQwMC4wLKAqoCiGJmh0dHA6Ly9jcmwuYXBwbGUuY29tL2FwcGxlcm9vdGNhZzMuY3JsMB0GA1UdDgQWBBTZF_5LZ5A4S5L0287VV4AUC489yTAOBgNVHQ8BAf8EBAMCAQYwEAYKKoZIhvdjZAYCAwQCBQAwCgYIKoZIzj0EAwMDaAAwZQIxAI1vpp-h4OTsW05zipJ_PXhTmI_02h9YHsN1Sv44qEwqgxoaqg2mZG3huZPo0VVM7QIwZzsstOHoNwd3y9XsdqgaOlU7PzVqyMXmkrDhYb6ASWnkXyupbOERAqrMYdk4t3NKMIICQzCCAcmgAwIBAgIILcX8iNLFS5UwCgYIKoZIzj0EAwMwZzEbMBkGA1UEAwwSQXBwbGUgUm9vdCBDQSAtIEczMSYwJAYDVQQLDB1BcHBsZSBDZXJ0aWZpY2F0aW9uIEF1dGhvcml0eTETMBEGA1UECgwKQXBwbGUgSW5jLjELMAkGA1UEBhMCVVMwHhcNMTQwNDMwMTgxOTA2WhcNMzkwNDMwMTgxOTA2WjBnMRswGQYDVQQDDBJBcHBsZSBSb290IENBIC0gRzMxJjAkBgNVBAsMHUFwcGxlIENlcnRpZmljYXRpb24gQXV0aG9yaXR5MRMwEQYDVQQKDApBcHBsZSBJbmMuMQswCQYDVQQGEwJVUzB2MBAGByqGSM49AgEGBSuBBAAiA2IABJjpLz1AcqTtkyJygRMc3RCV8cWjTnHcFBbZDuWmBSp3ZHtfTjjTuxxEtX_1H7YyYl3J6YRbTzBPEVoA_VhYDKX1DyxNB0cTddqXl5dvMVztK517IDvYuVTZXpmkOlEKMaNCMEAwHQYDVR0OBBYEFLuw3qFYM4iapIqZ3r6966_ayySrMA8GA1UdEwEB_wQFMAMBAf8wDgYDVR0PAQH_BAQDAgEGMAoGCCqGSM49BAMDA2gAMGUCMQCD6cHEFl4aXTQY2e3v9GwOAEZLuN-yRhHFD_3meoyhpmvOwgPUnPWTxnS4at-qIxUCMG1mihDK1A3UT82NQz60imOlM27jbdoXt2QfyFMm-YhidDkLF1vLUagM6BgD56KyKAAAMYH9MIH6AgEBMIGQMHwxMDAuBgNVBAMMJ0FwcGxlIEFwcGxpY2F0aW9uIEludGVncmF0aW9uIENBIDUgLSBHMTEmMCQGA1UECwwdQXBwbGUgQ2VydGlmaWNhdGlvbiBBdXRob3JpdHkxEzARBgNVBAoMCkFwcGxlIEluYy4xCzAJBgNVBAYTAlVTAhAJObS86QzDoYFlNjcvZnFBMA0GCWCGSAFlAwQCAQUAMAoGCCqGSM49BAMCBEcwRQIhAJzUqBxuc9DGqpAD6Iu2xbEDeF1V15hVYhjH3DnKi_eDAiAejB9EucWASNeL_oSXS6gtV8vxuQr0fME6k6xmJ20sAAAAAAAAAGhhdXRoRGF0YVikCYBXqS4yuvxbsQNKDw69fi2znP5U7QoV0OI-YtTmiY9AAAAAAGFwcGF0dGVzdGRldmVsb3AAIBCH_0XT11B63p1JxQ2Sg-P0Z1_FDWpY6soNOOnSuHuxpQECAyYgASFYIFIR8Qyqj-AK5lHTw1bkr_kXQDknQIkQBTK010f_JN15Ilggj4rgttHShtY1bRmGuzDbJ-y_x3RlzCCjBWjSCsGDN2Q","location_match":0,"device_response_json":"{\"rawId\":\"yIP0nPUJb6tLWpRvcEoR8xu5eDk\",\"id\":\"yIP0nPUJb6tLWpRvcEoR8xu5eDk\",\"response\":{\"attestationObject\":\"o2NmbXRkbm9uZWdhdHRTdG10oGhhdXRoRGF0YViY-OLwle2v2xLqCtchQhgKzUd88HBYwRC3AD4aIpx6oLldAAAAAAAAAAAAAAAAAAAAAAAAAAAAFMiD9Jz1CW-rS1qUb3BKEfMbuXg5pQECAyYgASFYIHDLrK_44D42AAgKvUYqPKNeUSjYkpHqK3-D6_FGRamxIlgg-Nwqf3EvxN4xknE2mr0upFt5LlyAR9CEc16GVb9Pkdg\",\"clientDataJSON\":\"eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoidkt4V3RlQlFScnVaeG9iNENicXQ5aTVpNldvY29lTmtOZ2VzNy1CU3U1dyIsIm9yaWdpbiI6Imh0dHBzOi8vZm9vdHByaW50LmRldiJ9\"},\"type\":\"public-key\"}","challenge_token":"omFumBgYGRinBBjBEhj_GHIYYhgxFhiqGJwDGK0YPhjYGE0YIxgtGGUYZhivGIwYI2FjmQEkGIQYjhjwGNoYpRQYXhiRGIQYVxh0GDUYvxjPGFURGGMYMBgbBhhuGPYJGNACCBhrGLoYrRjRAxhEDhi4GLMYzxiYGM0Y_hhMGOsYKRhGGPYYWhjWExUYdhhFGNgY_Bi1GCAYRBjPFhhXGG0Y7Rg-GFAYUhg3GFQYUhhsGE8YGhjbGBwY_xiWGJMYThjuGMEYIBihGCUYyxiZGKwYeRj7GIEYnxhBGP4YNRheGFQYnxgeGLYYHBg1GDwYpRjFGO8YxBjkGCUYOBAYjhg2GNcYiRjPGCsYxRioGIgYnxgrGDsY9xjfGIcYiRi5GPwYuxh3GBgYGBjtGHcYURivGKkYVBiPGOgY3wMYohg9GEoYehgqGGsYSRj-GOoYwBjfEhhSGNkY2xihGHAYeBgcGHIYVxh7GH8YohjgGFEYRRgZGDMYUhhpGNQYfxiQGE0YuRieGOYYxRhuGGIYKxicGMYY-xg5GJgYPAIYixjUGIcYNhjlGNMYuRglGNUYNxjAGMgYgRjQGMIWGKUY8xiWGIkYbhg_GDQYGBj2GKMYYAMYLxhGGGEYtxg9GKoYihhGGPIYRRjsGH0Y8xjhGLsYsBh6GNUY0hhSGE0YqhhlGHUBCxgpGIsLGC4YbhgeEBjlGEQYkxhlGIcXGMkYSxjwGDAYnxjXChh4DBirGJoYHBjHGOgY5BjpGPAYfRiNGIMY3RhlGCgYGBh-GG0YNxhtGIAYzhj-GHEYaRiyGL4YgBhkGOU"}
+            {"supplementary_attestation_data":"o2NmbXRvYXBwbGUtYXBwYXR0ZXN0Z2F0dFN0bXSiY3g1Y4JZAuUwggLhMIICZ6ADAgECAgYBgf1nYYwwCgYIKoZIzj0EAwIwTzEjMCEGA1UEAwwaQXBwbGUgQXBwIEF0dGVzdGF0aW9uIENBIDExEzARBgNVBAoMCkFwcGxlIEluYy4xEzARBgNVBAgMCkNhbGlmb3JuaWEwHhcNMjIwNzEzMTU1MDE5WhcNMjMwMTE2MTcxNTE5WjCBkTFJMEcGA1UEAwxAOTIwMGRmYmY5MWJkOWI0ZTViMDE3MzYxODgxMjk0YTFkMTBiN2QwYTc3OGRkNTkyYjA3MTQxNDlhNjhlZGI2NjEaMBgGA1UECwwRQUFBIENlcnRpZmljYXRpb24xEzARBgNVBAoMCkFwcGxlIEluYy4xEzARBgNVBAgMCkNhbGlmb3JuaWEwWTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAARDlXf-we4lPa8cuNpz_JUmuW9tAzD2J26AzL367HZ6XojE0ZiAioc-GSRJw2ckNhDqYMnTnbK9DYmd7iWR5BNHo4HrMIHoMAwGA1UdEwEB_wQCMAAwDgYDVR0PAQH_BAQDAgTwMHgGCSqGSIb3Y2QIBQRrMGmkAwIBCr-JMAMCAQG_iTEDAgEAv4kyAwIBAb-JMwMCAQG_iTQgBB41RjI2NEs4QUc0LmNvbS5vbmVmb290cHJpbnQubXmlBgQEc2tzIL-JNgMCAQW_iTcDAgEAv4k5AwIBAL-JOgMCAQAwGQYJKoZIhvdjZAgHBAwwCr-KeAYEBDE2LjAwMwYJKoZIhvdjZAgCBCYwJKEiBCBtnQYcDjNX-CMnu81WNZGDg-hICUF71n-RZm1EAK77ODAKBggqhkjOPQQDAgNoADBlAjBCHs6tnRIWRbFzOklE3r9PPBfS-0uelovE_tABwICYfBhZhmRp4wIIctmyQ0s4JxwCMQCqjU3r7mmG-RCcwck3J_A3Yra1ClUmRfaNGLwJxKxgkjfmeoak079XQl-UxaTE0W1ZAkcwggJDMIIByKADAgECAhAJusXhvEAa2dRTlbw4GghUMAoGCCqGSM49BAMDMFIxJjAkBgNVBAMMHUFwcGxlIEFwcCBBdHRlc3RhdGlvbiBSb290IENBMRMwEQYDVQQKDApBcHBsZSBJbmMuMRMwEQYDVQQIDApDYWxpZm9ybmlhMB4XDTIwMDMxODE4Mzk1NVoXDTMwMDMxMzAwMDAwMFowTzEjMCEGA1UEAwwaQXBwbGUgQXBwIEF0dGVzdGF0aW9uIENBIDExEzARBgNVBAoMCkFwcGxlIEluYy4xEzARBgNVBAgMCkNhbGlmb3JuaWEwdjAQBgcqhkjOPQIBBgUrgQQAIgNiAASuWzegd015sjWPQOfR8iYm8cJf7xeALeqzgmpZh0_40q0VJXiaomYEGRJItjy5ZwaemNNjvV43D7-gjjKegHOphed0bqNZovZvKdsyr0VeIRZY1WevniZ-smFNwhpmzpmjZjBkMBIGA1UdEwEB_wQIMAYBAf8CAQAwHwYDVR0jBBgwFoAUrJEQUzO9vmhB_6cMqeX66uXliqEwHQYDVR0OBBYEFD7jXRwEGanJtDH4hHTW4eFXcuObMA4GA1UdDwEB_wQEAwIBBjAKBggqhkjOPQQDAwNpADBmAjEAu76IjXONBQLPvP1mbQlXUDW81ocsP4QwSSYp7dH5FOh5mRya6LWu-NOoVDP3tg0GAjEAqzjt0MyB7QCkUsO6RPmTY2VT_swpfy60359evlpKyraZXEuCDfkEOG94B7tYlDm3Z3JlY2VpcHRZDlIwgAYJKoZIhvcNAQcCoIAwgAIBATEPMA0GCWCGSAFlAwQCAQUAMIAGCSqGSIb3DQEHAaCAJIAEggPoMYIEDDAmAgECAgEBBB41RjI2NEs4QUc0LmNvbS5vbmVmb290cHJpbnQubXkwggLvAgEDAgEBBIIC5TCCAuEwggJnoAMCAQICBgGB_WdhjDAKBggqhkjOPQQDAjBPMSMwIQYDVQQDDBpBcHBsZSBBcHAgQXR0ZXN0YXRpb24gQ0EgMTETMBEGA1UECgwKQXBwbGUgSW5jLjETMBEGA1UECAwKQ2FsaWZvcm5pYTAeFw0yMjA3MTMxNTUwMTlaFw0yMzAxMTYxNzE1MTlaMIGRMUkwRwYDVQQDDEA5MjAwZGZiZjkxYmQ5YjRlNWIwMTczNjE4ODEyOTRhMWQxMGI3ZDBhNzc4ZGQ1OTJiMDcxNDE0OWE2OGVkYjY2MRowGAYDVQQLDBFBQUEgQ2VydGlmaWNhdGlvbjETMBEGA1UECgwKQXBwbGUgSW5jLjETMBEGA1UECAwKQ2FsaWZvcm5pYTBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABEOVd_7B7iU9rxy42nP8lSa5b20DMPYnboDMvfrsdnpeiMTRmICKhz4ZJEnDZyQ2EOpgydOdsr0NiZ3uJZHkE0ejgeswgegwDAYDVR0TAQH_BAIwADAOBgNVHQ8BAf8EBAMCBPAweAYJKoZIhvdjZAgFBGswaaQDAgEKv4kwAwIBAb-JMQMCAQC_iTIDAgEBv4kzAwIBAb-JNCAEHjVGMjY0SzhBRzQuY29tLm9uZWZvb3RwcmludC5teaUGBARza3Mgv4k2AwIBBb-JNwMCAQC_iTkDAgEAv4k6AwIBADAZBgkqhkiG92NkCAcEDDAKv4p4BgQEMTYuMDAzBgkqhkiG92NkCAIEJjAkoSIEIG2dBhwOM1f4Iye7zVY1kYOD6EgJQXvWf5FmbUQArvs4MAoGCCqGSM49BAMCA2gAMGUCMEIezq2dEhZFsXM6SUTev088F9L7S56Wi8T-0AHAgJh8GFmGZGnjAghy2bJDSzgnHAIxAKqNTevuaYb5EJzByTcn8DditrUKVSZF9o0YvAnErGCSN-Z6hqTTv1dCX5TFpMTRbTAoAgEEAgEBBCDmegOG4AJS0O7tUzIfOSjWanIFTrEvCxbEJIk1QcNpqDBgAgEFAgEBBFg1Sm5MNHMwbGRuU0hNNHlxdHdDelRZYzZud1BnSDIva3RzbThUOXFUWjJRUzlSc0hwWmtWbUQwNnNpUXJiSXZvb0s3Slhwd3JMZkVqWWExUUdpV0JHUT09MA4CAQYCAQEEBkFUVEVTVDAPAgEHAgEBBAdzYW5kYm94MCACAQwCAQEEGDIwMjItMDctMTRUMTU6NTA6MQQoOS43OTNaMCACARUCAQEEGDIwMjItMTAtMTJUMTU6NTA6MTkuNzkzWgAAAAAAAKCAMIIDrjCCA1SgAwIBAgIQCTm0vOkMw6GBZTY3L2ZxQTAKBggqhkjOPQQDAjB8MTAwLgYDVQQDDCdBcHBsZSBBcHBsaWNhdGlvbiBJbnRlZ3JhdGlvbiBDQSA1IC0gRzExJjAkBgNVBAsMHUFwcGxlIENlcnRpZmljYXRpb24gQXV0aG9yaXR5MRMwEQYDVQQKDApBcHBsZSBJbmMuMQswCQYDVQQGEwJVUzAeFw0yMjA0MTkxMzMzMDNaFw0yMzA1MTkxMzMzMDJaMFoxNjA0BgNVBAMMLUFwcGxpY2F0aW9uIEF0dGVzdGF0aW9uIEZyYXVkIFJlY2VpcHQgU2lnbmluZzETMBEGA1UECgwKQXBwbGUgSW5jLjELMAkGA1UEBhMCVVMwWTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAAQ51PmqmxzERdZbphes8sCE7G8HCNWQFKDnbs897jmZqUxr-wFVEFVVZGzajiPgJgEUAtB-E7lUH9i01lfYLpN4o4IB2DCCAdQwDAYDVR0TAQH_BAIwADAfBgNVHSMEGDAWgBTZF_5LZ5A4S5L0287VV4AUC489yTBDBggrBgEFBQcBAQQ3MDUwMwYIKwYBBQUHMAGGJ2h0dHA6Ly9vY3NwLmFwcGxlLmNvbS9vY3NwMDMtYWFpY2E1ZzEwMTCCARwGA1UdIASCARMwggEPMIIBCwYJKoZIhvdjZAUBMIH9MIHDBggrBgEFBQcCAjCBtgyBs1JlbGlhbmNlIG9uIHRoaXMgY2VydGlmaWNhdGUgYnkgYW55IHBhcnR5IGFzc3VtZXMgYWNjZXB0YW5jZSBvZiB0aGUgdGhlbiBhcHBsaWNhYmxlIHN0YW5kYXJkIHRlcm1zIGFuZCBjb25kaXRpb25zIG9mIHVzZSwgY2VydGlmaWNhdGUgcG9saWN5IGFuZCBjZXJ0aWZpY2F0aW9uIHByYWN0aWNlIHN0YXRlbWVudHMuMDUGCCsGAQUFBwIBFilodHRwOi8vd3d3LmFwcGxlLmNvbS9jZXJ0aWZpY2F0ZWF1dGhvcml0eTAdBgNVHQ4EFgQU-2fTDb9zt5KmJl1IjSzBHZXic_gwDgYDVR0PAQH_BAQDAgeAMA8GCSqGSIb3Y2QMDwQCBQAwCgYIKoZIzj0EAwIDSAAwRQIhAJSQoGc3c-cveCk2diO43VHXyJoJ6rsA45xuRQsFWAvQAiBHNBor0TzAVKgKOqrMPMFFfABUUxjqM419bdX2CyuHLjCCAvkwggJ_oAMCAQICEFb7g9Qr_43DN5kjtVqubr0wCgYIKoZIzj0EAwMwZzEbMBkGA1UEAwwSQXBwbGUgUm9vdCBDQSAtIEczMSYwJAYDVQQLDB1BcHBsZSBDZXJ0aWZpY2F0aW9uIEF1dGhvcml0eTETMBEGA1UECgwKQXBwbGUgSW5jLjELMAkGA1UEBhMCVVMwHhcNMTkwMzIyMTc1MzMzWhcNMzQwMzIyMDAwMDAwWjB8MTAwLgYDVQQDDCdBcHBsZSBBcHBsaWNhdGlvbiBJbnRlZ3JhdGlvbiBDQSA1IC0gRzExJjAkBgNVBAsMHUFwcGxlIENlcnRpZmljYXRpb24gQXV0aG9yaXR5MRMwEQYDVQQKDApBcHBsZSBJbmMuMQswCQYDVQQGEwJVUzBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABJLOY719hrGrKAo7HOGv-wSUgJGs9jHfpssoNW9ES-Eh5VfdEo2NuoJ8lb5J-r4zyq7NBBnxL0Ml-vS-s8uDfrqjgfcwgfQwDwYDVR0TAQH_BAUwAwEB_zAfBgNVHSMEGDAWgBS7sN6hWDOImqSKmd6-veuv2sskqzBGBggrBgEFBQcBAQQ6MDgwNgYIKwYBBQUHMAGGKmh0dHA6Ly9vY3NwLmFwcGxlLmNvbS9vY3NwMDMtYXBwbGVyb290Y2FnMzA3BgNVHR8EMDAuMCygKqAohiZodHRwOi8vY3JsLmFwcGxlLmNvbS9hcHBsZXJvb3RjYWczLmNybDAdBgNVHQ4EFgQU2Rf-S2eQOEuS9NvO1VeAFAuPPckwDgYDVR0PAQH_BAQDAgEGMBAGCiqGSIb3Y2QGAgMEAgUAMAoGCCqGSM49BAMDA2gAMGUCMQCNb6afoeDk7FtOc4qSfz14U5iP9NofWB7DdUr-OKhMKoMaGqoNpmRt4bmT6NFVTO0CMGc7LLTh6DcHd8vV7HaoGjpVOz81asjF5pKw4WG-gElp5F8rqWzhEQKqzGHZOLdzSjCCAkMwggHJoAMCAQICCC3F_IjSxUuVMAoGCCqGSM49BAMDMGcxGzAZBgNVBAMMEkFwcGxlIFJvb3QgQ0EgLSBHMzEmMCQGA1UECwwdQXBwbGUgQ2VydGlmaWNhdGlvbiBBdXRob3JpdHkxEzARBgNVBAoMCkFwcGxlIEluYy4xCzAJBgNVBAYTAlVTMB4XDTE0MDQzMDE4MTkwNloXDTM5MDQzMDE4MTkwNlowZzEbMBkGA1UEAwwSQXBwbGUgUm9vdCBDQSAtIEczMSYwJAYDVQQLDB1BcHBsZSBDZXJ0aWZpY2F0aW9uIEF1dGhvcml0eTETMBEGA1UECgwKQXBwbGUgSW5jLjELMAkGA1UEBhMCVVMwdjAQBgcqhkjOPQIBBgUrgQQAIgNiAASY6S89QHKk7ZMicoETHN0QlfHFo05x3BQW2Q7lpgUqd2R7X04407scRLV_9R-2MmJdyemEW08wTxFaAP1YWAyl9Q8sTQdHE3Xal5eXbzFc7SudeyA72LlU2V6ZpDpRCjGjQjBAMB0GA1UdDgQWBBS7sN6hWDOImqSKmd6-veuv2sskqzAPBgNVHRMBAf8EBTADAQH_MA4GA1UdDwEB_wQEAwIBBjAKBggqhkjOPQQDAwNoADBlAjEAg-nBxBZeGl00GNnt7_RsDgBGS7jfskYRxQ_95nqMoaZrzsID1Jz1k8Z0uGrfqiMVAjBtZooQytQN1E_NjUM-tIpjpTNu423aF7dkH8hTJvmIYnQ5Cxdby1GoDOgYA-eisigAADGB_TCB-gIBATCBkDB8MTAwLgYDVQQDDCdBcHBsZSBBcHBsaWNhdGlvbiBJbnRlZ3JhdGlvbiBDQSA1IC0gRzExJjAkBgNVBAsMHUFwcGxlIENlcnRpZmljYXRpb24gQXV0aG9yaXR5MRMwEQYDVQQKDApBcHBsZSBJbmMuMQswCQYDVQQGEwJVUwIQCTm0vOkMw6GBZTY3L2ZxQTANBglghkgBZQMEAgEFADAKBggqhkjOPQQDAgRHMEUCIQDN_f4T1NHsyT472s7sDOeRkbEm8cbLSACAvjpDdrkjTQIgVzUv2I3jtMnzMVXfhkd24CbTzUMCBZfC-FuTTFfT88sAAAAAAABoYXV0aERhdGFYpCYD5Qu9eDoEc0tMe31wTgPpO4Bzu792qkqfE3K3b2GkQAAAAABhcHBhdHRlc3RkZXZlbG9wACCSAN-_kb2bTlsBc2GIEpSh0Qt9CneN1ZKwcUFJpo7bZqUBAgMmIAEhWCBDlXf-we4lPa8cuNpz_JUmuW9tAzD2J26AzL367HZ6XiJYIIjE0ZiAioc-GSRJw2ckNhDqYMnTnbK9DYmd7iWR5BNH","attested_metadata":"eyJtb2RlbCI6ImlQaG9uZSAxMyBQcm8gTWF4IiwibG9jYXRpb25fbWF0Y2giOjAsIm9zIjoiMTYuMCJ9","device_response_json":"{\"rawId\":\"MsIIoo1qIY2qhHBBZ8dfi_e-Bp0\",\"id\":\"MsIIoo1qIY2qhHBBZ8dfi_e-Bp0\",\"response\":{\"attestationObject\":\"o2NmbXRkbm9uZWdhdHRTdG10oGhhdXRoRGF0YViY5pQ6pn_-Ct5rzO2iKgJ1Ni__jbZC0rRle3i_CQSu5AhdAAAAAAAAAAAAAAAAAAAAAAAAAAAAFDLCCKKNaiGNqoRwQWfHX4v3vgadpQECAyYgASFYIFyNB5rfc2O9r7gsyGvL5gqL6hh2X63m7_d-da-yWNzKIlggYLDRNwjiiM9hc9RUqQTXrr4WTntQTnYpcmvUEsmOB2I\",\"clientDataJSON\":\"eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoiNkJpaVBrZ2QzUjQ3NHc2RGlwai1Lc3VnZDByWVdub0l2U0xOYk5WeFVTYyIsIm9yaWdpbiI6Imh0dHBzOi8vb25lZm9vdHByaW50LmNvbSJ9\"},\"type\":\"public-key\"}","challenge_token":"omFumBgVGNQYxxixDBguBRggGEMYqhgZGCYYcRipGHsOGJcYbRghGO0YSBjxGGERYWOZASQY3BigGPIY9xiWGNYYvBYY5hjYGH8YkxicAxg-GBoKGDgYdRiKGDsYLBi9GIwYmBinGDwYXhjiGC8YtRhKGKEYcxhwGH4YnAUY8BiQFhiPBBiIGGUYsAYYmBhiGNEYPRg-GNUYKxgpGPcY1hMY3hhnGNIMGNMYGhhwGEEYkRhUGCUYtxjLCBjOGCoYfxjBGHEYdhh-CRiGGMMYkBgaGN4Yohg2GPQMGB0YkhjxGM0Y1xjNGIsIGNYY1RjYGB4YGRiwGPcYehgxGPcYrhiVGOMYzxg-GHYYXRikGH4UGNcYtxjCGNUYoRgtGP0YKRgzCBjFGKgNGJAY5xhlEBh5GPIYhhipGPQY5xjaGKAYNBiXGFgY3hiMGLsFGNsYpRh4GBgYSBUYdhjvGO0YbBg-GP0YiBh1GOEY7hiGGIYYcBh7GL0Y-xjSGPcYwxhuGHQYgRjcGBsYqQgYbhj6GNMYWhiUGGwY1gcY2hjvGGUY7xhdGNMYaBgeGGIYkRiQGHkY7xjBGEIYaBjAGDkYhhixGOkYvBjCGO0Y2xiCGGoYfhjsGEkJGHsYNBgyGM0YxRimGJUYlRUY_QwYsxgdGCoYNxi3GNUYvwIYYRg1GNsYYRjvGPgYaA8Y1BhmGLwYgBh0GJYAGFcYrxijGKAYkRibGP0Yjxg-GIcDGLsYPBg6GFwYcRhSGNAYdhh3AxjWGL0YqhhVGC4YHRiuGI8YVRg-GJYY3xi_GHgYzhh2GFU"}
         );
         let request: WebauthnRegisterRequest = serde_json::from_value(json).expect("invalid json");
         let reg = serde_json::from_str(&request.device_response_json).expect("invalid inner json");
 
         let att = try_attest_apple_app_attestation(
             &reg,
-            request.location_match.expect("missing location field"),
+            &request.attested_metadata_json.unwrap().0,
             request
                 .supplementary_attestation_data
                 .expect("missing attest data")
@@ -276,8 +300,11 @@ mod tests {
             super::AppAttestationMetadata::Apple {
                 is_development,
                 receipt: _,
+                metadata,
             } => {
                 assert!(is_development);
+                assert_eq!(metadata.model.unwrap(), "iPhone 13 Pro Max");
+                assert_eq!(metadata.os.unwrap(), "16.0");
             }
         };
     }
