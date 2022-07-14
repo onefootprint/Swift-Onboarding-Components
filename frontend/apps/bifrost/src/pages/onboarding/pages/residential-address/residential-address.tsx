@@ -1,8 +1,8 @@
+import { HeaderTitle } from 'footprint-ui';
 import { STATES } from 'global-constants';
 import { useTranslation } from 'hooks';
 import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import HeaderTitle from 'src/components/header-title';
 import { Events } from 'src/utils/state-machine/onboarding';
 import { UserDataAttribute } from 'src/utils/state-machine/types';
 import styled, { css } from 'styled-components';

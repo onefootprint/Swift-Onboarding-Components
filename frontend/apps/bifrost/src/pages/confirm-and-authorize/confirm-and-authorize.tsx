@@ -1,4 +1,5 @@
 import { useFootprintJs } from 'footprint-provider';
+import { HeaderTitle } from 'footprint-ui';
 import { useTranslation } from 'hooks';
 import IcoBuilding24 from 'icons/ico/ico-building-24';
 import IcoCake24 from 'icons/ico/ico-cake-24';
@@ -7,7 +8,6 @@ import IcoFileText24 from 'icons/ico/ico-file-text-24';
 import IcoPhone24 from 'icons/ico/ico-phone-24';
 import IcoUserCircle24 from 'icons/ico/ico-user-circle-24';
 import React from 'react';
-import HeaderTitle from 'src/components/header-title';
 import { useBifrostMachine } from 'src/components/machine-provider';
 import NavigationHeader from 'src/components/navigation-header';
 import { Events } from 'src/hooks/use-bifrost-machine';

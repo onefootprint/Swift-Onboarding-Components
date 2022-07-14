@@ -1,5 +1,5 @@
+import { HeaderTitle } from 'footprint-ui';
 import React from 'react';
-import HeaderTitle from 'src/components/header-title';
 import NavigationHeader from 'src/components/navigation-header';
 import { Events, MachineContext } from 'src/utils/state-machine/onboarding';
 import styled, { css } from 'styled-components';

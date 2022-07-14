@@ -1,6 +1,6 @@
+import { HeaderTitle } from 'footprint-ui';
 import { useTranslation } from 'hooks';
 import React from 'react';
-import HeaderTitle from 'src/components/header-title';
 import NavigationHeader from 'src/components/navigation-header';
 import useBifrostMachine, { Events } from 'src/hooks/use-bifrost-machine';
 import styled, { css } from 'styled-components';

@@ -1,7 +1,7 @@
+import { HeaderTitle } from 'footprint-ui';
 import { useTranslation } from 'hooks';
 import { QRCodeSVG } from 'qrcode.react';
 import React, { useEffect } from 'react';
-import HeaderTitle from 'src/components/header-title';
 import NavigationHeader from 'src/components/navigation-header';
 import useD2PGenerate from 'src/hooks/d2p/use-d2p-generate';
 import useD2PSms from 'src/hooks/d2p/use-d2p-sms';

@@ -15,6 +15,7 @@
     "@xstate/react": "^3.0.0",
     "constate": "^3.3.2",
     "footprint": "*",
+    "footprint-ui": "*",
     "global-constants": "*",
     "hooks": "*",
     "icons": "*",

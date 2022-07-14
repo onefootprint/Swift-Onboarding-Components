@@ -1,7 +1,7 @@
 import { useFootprintJs } from 'footprint-provider';
+import { HeaderTitle } from 'footprint-ui';
 import { useTranslation } from 'hooks';
 import React from 'react';
-import HeaderTitle from 'src/components/header-title';
 import NavigationHeader from 'src/components/navigation-header';
 import styled, { css } from 'styled-components';
 import { LinkButton, Typography } from 'ui';

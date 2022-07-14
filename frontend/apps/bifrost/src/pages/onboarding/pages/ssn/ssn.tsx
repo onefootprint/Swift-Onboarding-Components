@@ -1,10 +1,10 @@
+import { HeaderTitle } from 'footprint-ui';
 import { useInputMask, useTranslation } from 'hooks';
 import IcoFileText24 from 'icons/ico/ico-file-text-24';
 import IcoLock24 from 'icons/ico/ico-lock-24';
 import IcoShield24 from 'icons/ico/ico-shield-24';
 import React from 'react';
 import { useForm } from 'react-hook-form';
-import HeaderTitle from 'src/components/header-title';
 import { Events } from 'src/utils/state-machine/onboarding';
 import { UserData, UserDataAttribute } from 'src/utils/state-machine/types';
 import styled, { css } from 'styled-components';

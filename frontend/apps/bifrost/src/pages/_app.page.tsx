@@ -1,4 +1,5 @@
 import FootprintProvider from 'footprint-provider';
+import { FootprintFooter } from 'footprint-ui';
 import Head from 'next/head';
 import Script from 'next/script';
 import React from 'react';
@@ -7,7 +8,6 @@ import styled, { createGlobalStyle, css } from 'styled-components';
 import themes from 'themes';
 import { DesignSystemProvider, media } from 'ui';
 
-import FootprintFooter from '../components/footprint-footer';
 import MachineProvider from '../components/machine-provider';
 import { GOOGLE_MAPS_KEY } from '../config/constants';
 import configureReactI18next from '../config/initializers/react-i18next';

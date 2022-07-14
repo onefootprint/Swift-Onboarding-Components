@@ -1,6 +1,6 @@
+import { HeaderTitle } from 'footprint-ui';
 import { useTranslation } from 'hooks';
 import React from 'react';
-import HeaderTitle from 'src/components/header-title';
 import NavigationHeader from 'src/components/navigation-header';
 import useGetD2PStatus, { D2PStatus } from 'src/hooks/d2p/use-get-d2p-status';
 import { Events } from 'src/utils/state-machine/liveness-register';

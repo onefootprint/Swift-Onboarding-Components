@@ -1,8 +1,8 @@
+import { HeaderTitle } from 'footprint-ui';
 import { useRequestErrorToast, useTranslation } from 'hooks';
 import IcoEmail24 from 'icons/ico/ico-email-24';
 import React from 'react';
 import { useForm } from 'react-hook-form';
-import HeaderTitle from 'src/components/header-title';
 import NavigationHeader from 'src/components/navigation-header';
 import useIdentify from 'src/hooks/identify/use-identify';
 import useIdentifyChallenge from 'src/hooks/identify/use-identify-challenge';
