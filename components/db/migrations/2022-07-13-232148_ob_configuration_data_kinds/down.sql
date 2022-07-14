@@ -1,0 +1,2 @@
+ALTER TABLE ob_configurations RENAME COLUMN must_collect_data_kinds TO required_user_data;
+ALTER TABLE ob_configurations DROP COLUMN can_access_data_kinds;

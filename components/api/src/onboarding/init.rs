@@ -49,7 +49,7 @@ pub fn handler(
             missing_attributes: uvw
                 .missing_fields()
                 .into_iter()
-                .filter(|x| tenant_auth.ob_config.required_user_data.contains(x))
+                .filter(|x| tenant_auth.ob_config.must_collect_data_kinds.contains(x))
                 .collect(),
             missing_webauthn_credentials: webauthn_creds.is_empty(),
         },

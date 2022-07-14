@@ -21,9 +21,10 @@ pub struct ObConfiguration {
     pub tenant_id: TenantId,
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
-    pub required_user_data: Vec<DataKind>,
+    pub must_collect_data_kinds: Vec<DataKind>,
     pub settings: ObConfigurationSettings,
     pub is_disabled: bool,
+    pub can_access_data_kinds: Vec<DataKind>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
@@ -32,30 +33,36 @@ pub struct NewObConfiguration {
     pub name: String,
     pub description: Option<String>,
     pub tenant_id: TenantId,
-    pub required_user_data: Vec<DataKind>,
+    pub must_collect_data_kinds: Vec<DataKind>,
+    pub can_access_data_kinds: Vec<DataKind>,
     pub settings: ObConfigurationSettings,
 }
 
 impl NewObConfiguration {
     pub async fn default(pool: &DbPool, tenant_id: TenantId) -> Result<ObConfiguration, crate::DbError> {
+        // TODO accept these from the ob_configuration init endpoint
+        // https://linear.app/footprint/issue/FP-614/accept-list-of-required-data-kinds-in-tenant-creation-endpoint
+        let default_data_kinds = vec![
+            DataKind::FirstName,
+            DataKind::LastName,
+            DataKind::Dob,
+            DataKind::Ssn,
+            DataKind::StreetAddress,
+            DataKind::StreetAddress2,
+            DataKind::City,
+            DataKind::State,
+            DataKind::Zip,
+            DataKind::Country,
+            DataKind::Email,
+            DataKind::PhoneNumber,
+        ];
+
         let default = Self {
             name: "Default".to_string(),
             description: None,
             tenant_id,
-            required_user_data: vec![
-                DataKind::FirstName,
-                DataKind::LastName,
-                DataKind::Dob,
-                DataKind::Ssn,
-                DataKind::StreetAddress,
-                DataKind::StreetAddress2,
-                DataKind::City,
-                DataKind::State,
-                DataKind::Zip,
-                DataKind::Country,
-                DataKind::Email,
-                DataKind::PhoneNumber,
-            ],
+            must_collect_data_kinds: default_data_kinds.clone(),
+            can_access_data_kinds: default_data_kinds,
             settings: ObConfigurationSettings::Empty,
         };
         let obc = pool

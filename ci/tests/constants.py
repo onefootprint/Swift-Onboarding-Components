@@ -43,3 +43,18 @@ FIELDS_TO_DECRYPT = [
     ["street_address"],
     ["first_name", "email", "zip", "country", "last_four_ssn"],
 ]
+
+REQUIRED_DATA_KINDS = [
+    "first_name",
+    "last_name",
+    "dob",
+    "ssn",
+    "street_address",
+    "street_address2",
+    "city",
+    "state",
+    "zip",
+    "country",
+    "email",
+    "phone_number",
+]

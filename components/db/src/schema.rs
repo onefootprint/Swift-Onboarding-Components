@@ -66,9 +66,10 @@ table! {
         tenant_id -> Text,
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
-        required_user_data -> Array<Text>,
+        must_collect_data_kinds -> Array<Text>,
         settings -> Jsonb,
         is_disabled -> Bool,
+        can_access_data_kinds -> Array<Text>,
     }
 }
 
