@@ -42,7 +42,7 @@ struct ClientKeysResponse {
 /// Create a new client (this endpoint will be private in prod TODO)
 #[api_v2_operation(tags(Private))]
 #[post("/client")]
-async fn handler(
+async fn post(
     request: web::Json<NewClientRequest>,
     state: web::Data<State>,
 ) -> actix_web::Result<Json<ApiResponseData<NewClientResponse>>, ApiError> {

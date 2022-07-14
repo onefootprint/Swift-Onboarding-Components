@@ -19,7 +19,6 @@ mod telemetry;
 // TODO put IAM roles and permissions in pulumi
 
 mod auth;
-mod client;
 mod enclave;
 mod errors;
 mod identify;
@@ -198,11 +197,7 @@ async fn main() -> std::io::Result<()> {
             .app_data(json_cfg)
             .wrap_api()
             .configure(index::routes)
-            .service(
-                web::scope("/private")
-                    .service(client::init::handler)
-                    .service(private::cleanup::post),
-            )
+            .service(private::routes())
             .service(identify::routes())
             .service(tenant::routes())
             .service(onboarding::routes())
