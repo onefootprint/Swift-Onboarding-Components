@@ -1,0 +1,41 @@
+name: Destroy staging
+on:
+  pull_request:
+    types: [closed]
+    branches:
+      - staging/*
+
+  workflow_dispatch:
+  
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: true
+
+jobs:
+  destroy_staging_stack:
+    name: Destroy stack
+    runs-on: ubuntu-latest
+    environment: prod
+    # don't run for dependabot changes and PRs that don't tag release
+    if: github.actor != 'dependabot[bot]' && contains( github.event.pull_request.labels.*.name, 'release')
+
+    steps:
+      - uses: actions/checkout@v2
+
+      # pulumi setup
+      - uses: actions/setup-node@v2
+        with:
+          node-version: 14.x
+
+      - run: npm install
+        working-directory: infra
+
+      # bring down the ephemeral stack
+      - uses: pulumi/actions@v3
+        with:
+          command: destroy
+          work-dir: infra
+          stack-name: "footprint/staging"
+          message: "Destroyed staging environment"
+        env:
+          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
