@@ -99,7 +99,8 @@ export type BifrostEvent =
       payload: {
         pk: string;
         name: string;
-        requiredUserData: UserDataAttribute[];
+        mustCollectDataKinds: UserDataAttribute[];
+        canAccessDataKinds: UserDataAttribute[];
       };
     }
   | {

@@ -81,7 +81,7 @@ const ConfirmAndAuthorize = () => {
     }
   };
 
-  const requiredData = state.context.tenant.requiredUserData.map(
+  const requiredData = state.context.tenant.canAccessDataKinds.map(
     (data: UserDataAttribute) => CategoryByUserDataAttribute[data],
   );
   const requiredCategories = Array.from(

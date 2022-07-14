@@ -18,7 +18,8 @@ const initialContext: BifrostContext = {
   tenant: {
     pk: '',
     name: '',
-    requiredUserData: [],
+    mustCollectDataKinds: [],
+    canAccessDataKinds: [],
   },
   onboarding: {
     missingAttributes: [],
@@ -337,7 +338,8 @@ const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
           context.tenant = {
             pk: event.payload.pk,
             name: event.payload.name,
-            requiredUserData: [...event.payload.requiredUserData],
+            mustCollectDataKinds: [...event.payload.mustCollectDataKinds],
+            canAccessDataKinds: [...event.payload.canAccessDataKinds],
           };
         }
         return context;

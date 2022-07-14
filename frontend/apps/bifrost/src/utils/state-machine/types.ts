@@ -103,5 +103,6 @@ export type DeviceInfo = {
 export type TenantInfo = {
   pk: string;
   name: string;
-  requiredUserData: UserDataAttribute[];
+  mustCollectDataKinds: UserDataAttribute[];
+  canAccessDataKinds: UserDataAttribute[];
 };

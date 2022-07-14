@@ -30,7 +30,14 @@ describe('Onboarding Machine Tests', () => {
       tenant: {
         pk: 'pk',
         name: 'tenant',
-        requiredUserData: [
+        mustCollectDataKinds: [
+          UserDataAttribute.firstName,
+          UserDataAttribute.lastName,
+          UserDataAttribute.email,
+          UserDataAttribute.city,
+          UserDataAttribute.ssn,
+        ],
+        canAccessDataKinds: [
           UserDataAttribute.firstName,
           UserDataAttribute.lastName,
           UserDataAttribute.email,
@@ -64,7 +71,14 @@ describe('Onboarding Machine Tests', () => {
       const tenant = {
         pk: 'pk',
         name: 'tenant',
-        requiredUserData: [
+        mustCollectDataKinds: [
+          UserDataAttribute.firstName,
+          UserDataAttribute.lastName,
+          UserDataAttribute.email,
+          UserDataAttribute.city,
+          UserDataAttribute.ssn,
+        ],
+        canAccessDataKinds: [
           UserDataAttribute.firstName,
           UserDataAttribute.lastName,
           UserDataAttribute.email,
@@ -121,7 +135,14 @@ describe('Onboarding Machine Tests', () => {
           tenant: {
             pk: 'pk',
             name: 'tenant',
-            requiredUserData: [
+            mustCollectDataKinds: [
+              UserDataAttribute.firstName,
+              UserDataAttribute.lastName,
+              UserDataAttribute.email,
+              UserDataAttribute.city,
+              UserDataAttribute.ssn,
+            ],
+            canAccessDataKinds: [
               UserDataAttribute.firstName,
               UserDataAttribute.lastName,
               UserDataAttribute.email,
@@ -159,7 +180,14 @@ describe('Onboarding Machine Tests', () => {
           tenant: {
             pk: 'pk',
             name: 'tenant',
-            requiredUserData: [
+            mustCollectDataKinds: [
+              UserDataAttribute.firstName,
+              UserDataAttribute.lastName,
+              UserDataAttribute.email,
+              UserDataAttribute.city,
+              UserDataAttribute.ssn,
+            ],
+            canAccessDataKinds: [
               UserDataAttribute.firstName,
               UserDataAttribute.lastName,
               UserDataAttribute.email,
@@ -192,7 +220,14 @@ describe('Onboarding Machine Tests', () => {
           tenant: {
             pk: 'pk',
             name: 'tenant',
-            requiredUserData: [
+            mustCollectDataKinds: [
+              UserDataAttribute.firstName,
+              UserDataAttribute.lastName,
+              UserDataAttribute.email,
+              UserDataAttribute.city,
+              UserDataAttribute.ssn,
+            ],
+            canAccessDataKinds: [
               UserDataAttribute.firstName,
               UserDataAttribute.lastName,
               UserDataAttribute.email,
@@ -225,7 +260,14 @@ describe('Onboarding Machine Tests', () => {
           tenant: {
             pk: 'pk',
             name: 'tenant',
-            requiredUserData: [
+            mustCollectDataKinds: [
+              UserDataAttribute.firstName,
+              UserDataAttribute.lastName,
+              UserDataAttribute.email,
+              UserDataAttribute.city,
+              UserDataAttribute.ssn,
+            ],
+            canAccessDataKinds: [
               UserDataAttribute.firstName,
               UserDataAttribute.lastName,
               UserDataAttribute.email,
@@ -258,7 +300,14 @@ describe('Onboarding Machine Tests', () => {
           tenant: {
             pk: 'pk',
             name: 'tenant',
-            requiredUserData: [
+            mustCollectDataKinds: [
+              UserDataAttribute.firstName,
+              UserDataAttribute.lastName,
+              UserDataAttribute.email,
+              UserDataAttribute.city,
+              UserDataAttribute.ssn,
+            ],
+            canAccessDataKinds: [
               UserDataAttribute.firstName,
               UserDataAttribute.lastName,
               UserDataAttribute.email,
