@@ -36,17 +36,6 @@ pub struct NewObConfiguration {
     pub settings: ObConfigurationSettings,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, Insertable, AsChangeset)]
-#[diesel(table_name = ob_configurations)]
-pub struct UpdateObConfiguration {
-    pub key: ObConfigurationKey,
-    pub tenant_id: TenantId,
-    pub name: Option<String>,
-    pub description: Option<String>,
-    pub required_user_data: Option<Vec<DataKind>>,
-    pub settings: Option<ObConfigurationSettings>,
-}
-
 impl NewObConfiguration {
     pub async fn default(pool: &DbPool, tenant_id: TenantId) -> Result<ObConfiguration, crate::DbError> {
         let default = Self {
@@ -77,23 +66,6 @@ impl NewObConfiguration {
             })
             .await??;
         Ok(obc)
-    }
-}
-
-impl UpdateObConfiguration {
-    pub async fn update(self, pool: &DbPool) -> Result<(), crate::DbError> {
-        pool.db_query(move |conn| -> Result<(), crate::DbError> {
-            diesel::update(
-                ob_configurations::table
-                    .filter(ob_configurations::key.eq(self.key.clone()))
-                    .filter(ob_configurations::tenant_id.eq(self.tenant_id.clone())),
-            )
-            .set(self)
-            .execute(conn)?;
-            Ok(())
-        })
-        .await??;
-        Ok(())
     }
 }
 

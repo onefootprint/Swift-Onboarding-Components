@@ -6,7 +6,6 @@ pub mod config;
 pub mod decrypt;
 pub mod liveness;
 pub mod onboardings;
-pub mod required_data;
 pub mod validate;
 pub mod workos;
 
@@ -16,8 +15,6 @@ pub fn routes() -> web::Scope {
         .service(audit_trail::get)
         .service(decrypt::handler)
         .service(onboardings::handler)
-        .service(required_data::set)
-        .service(required_data::get)
         .service(config::get)
         .service(liveness::get)
         .service(validate::validate)
