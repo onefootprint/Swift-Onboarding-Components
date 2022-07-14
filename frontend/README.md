@@ -39,16 +39,17 @@ If you prefer, you can also run `yarn dev` from the root folder. This will run a
 The last command described above, `yarn dev`, will try to bootstrap a new server using an available port. To have more predictability, as well as
 to enforce more constraints on WebAuthn, each app has its own port:
 
-| App                 | Port |
-| ------------------- | ---- |
-| Bifrost             | 3000 |
-| Dashboard           | 3001 |
-| Demo                | 3002 |
-| Frontpage           | 3003 |
-| My One Footprint    | 3004 |
-| D2P Mobile          | 3005 |
-| Email Verification  | 3006 |
-| UI Docs - Storybook | 3007 |
+| App                           | Port |
+| ----------------------------- | ---- |
+| Bifrost                       | 3000 |
+| Dashboard                     | 3001 |
+| Demo                          | 3002 |
+| Frontpage                     | 3003 |
+| My One Footprint              | 3004 |
+| D2P Mobile                    | 3005 |
+| Email Verification            | 3006 |
+| UI Docs - Storybook           | 3007 |
+| Footprint UI Docs - Storybook | 3007 |
 
 ### Build
 
