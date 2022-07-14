@@ -13,9 +13,9 @@ concurrency:
 
 jobs:
   destroy_staging_stack:
-    name: Destroy stack
+    name: Destroy staging stack
     runs-on: ubuntu-latest
-    environment: prod
+    environment: production
     if: github.actor != 'dependabot[bot]' && ((github.event_name != 'pull_request') || (github.event_name == 'pull_request' && contains( github.event.pull_request.labels.*.name, 'release')))
 
     steps:
