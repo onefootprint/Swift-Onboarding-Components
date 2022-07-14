@@ -40,9 +40,9 @@ const Faq = () => {
       content: t('questions.why-vaulting.content'),
     },
     {
-      id: 'aml-inquiry',
-      title: t('questions.aml-inquiry.title'),
-      content: t('questions.aml-inquiry.content'),
+      id: 'promises-one-click',
+      title: t('questions.promises-one-click.title'),
+      content: t('questions.promises-one-click.content'),
     },
   ];
 
