@@ -70,6 +70,7 @@ table! {
         settings -> Jsonb,
         is_disabled -> Bool,
         can_access_data_kinds -> Array<Text>,
+        is_live -> Bool,
     }
 }
 
@@ -89,6 +90,7 @@ table! {
         insight_event_id -> Uuid,
         ordering_id -> Int8,
         start_timestamp -> Timestamptz,
+        is_live -> Bool,
     }
 }
 
@@ -118,6 +120,7 @@ table! {
         is_enabled -> Bool,
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
+        is_live -> Bool,
     }
 }
 
@@ -168,6 +171,7 @@ table! {
         id_verified -> Text,
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
+        is_live -> Bool,
     }
 }
 

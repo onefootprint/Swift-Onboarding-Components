@@ -148,7 +148,11 @@ impl TwilioClient {
             TwilioResponse::Error(e) => Err(ApiError::TwilioError(e.message)),
         }?;
 
-        Ok(ValidatedPhoneNumber::__build_from_twilio(e164, country_code))
+        Ok(ValidatedPhoneNumber::__build(
+            e164,
+            country_code,
+            phone_number.suffix.clone(),
+        ))
     }
 
     async fn send_message(
@@ -238,9 +242,10 @@ impl TwilioClient {
         phone_number: ValidatedPhoneNumber,
         scope: &str,
     ) -> Result<SecondsBeforeRetry, ApiError> {
-        let h_session_id =
-            Base64Data(sha256(format!("{}:{}", phone_number.e164.leak(), scope).as_bytes()).to_vec())
-                .to_string();
+        let h_session_id = Base64Data(
+            sha256(format!("{}:{}", phone_number.to_piistring().leak(), scope).as_bytes()).to_vec(),
+        )
+        .to_string();
 
         let now = Utc::now();
         let time_between_challenges_s = self.time_s_between_challenges;

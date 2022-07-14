@@ -4,7 +4,8 @@ use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use diesel::{Insertable, PgConnection, QueryDsl, Queryable};
 use newtypes::{
-    EncryptedVaultPrivateKey, Fingerprint, SealedVaultBytes, Status, UserVaultId, VaultPublicKey,
+    EncryptedVaultPrivateKey, Fingerprint, LiveModeConsistency, SealedVaultBytes, Status, UserVaultId,
+    VaultPublicKey,
 };
 use serde::{Deserialize, Serialize};
 
@@ -17,6 +18,23 @@ pub struct UserVault {
     pub id_verified: Status,
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
+    pub is_live: bool,
+}
+
+impl LiveModeConsistency for UserVault {
+    type Error = crate::errors::DbError;
+
+    fn is_live(&self) -> bool {
+        self.is_live
+    }
+
+    fn mismatch_self_is_live(&self) -> Self::Error {
+        crate::errors::DbError::LiveUserInSandbox
+    }
+
+    fn mismatch_self_is_sandbox(&self) -> Self::Error {
+        crate::errors::DbError::SandboxUserInLive
+    }
 }
 
 impl UserVault {
@@ -35,12 +53,14 @@ pub struct NewUserVault {
     pub e_private_key: EncryptedVaultPrivateKey,
     pub public_key: VaultPublicKey,
     pub id_verified: Status,
+    pub is_live: bool,
 }
 
 pub struct NewUserVaultReq {
     pub e_private_key: EncryptedVaultPrivateKey,
     pub public_key: VaultPublicKey,
     pub id_verified: Status,
+    pub is_live: bool,
     // Note: these aren't actual columns on the table -
     pub e_phone_number: SealedVaultBytes,
     pub sh_phone_number: Fingerprint,

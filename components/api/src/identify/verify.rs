@@ -14,7 +14,9 @@ use crate::State;
 use chrono::Duration;
 use crypto::sha256;
 use db::models::user_vaults::{NewUserVaultReq, UserVault};
-use newtypes::{DataKind, Fingerprinter, SessionAuthToken, Status, UserVaultId, ValidatedPhoneNumber};
+use newtypes::{
+    DataKind, Fingerprinter, LiveModeConsistency, SessionAuthToken, Status, UserVaultId, ValidatedPhoneNumber,
+};
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
@@ -52,9 +54,14 @@ pub async fn handler(
             .data;
 
     let (user_vault_id, user_kind, user_auth_method) = match challenge_state.data {
-        IdentifyChallengeData::Sms(challenge_state) => {
-            let (uv_id, user_kind) =
-                validate_sms_challenge(&state, challenge_state, &request.challenge_response).await?;
+        IdentifyChallengeData::Sms(c_state) => {
+            let (uv_id, user_kind) = validate_sms_challenge(
+                &state,
+                c_state,
+                &request.challenge_response,
+                challenge_state.is_live,
+            )
+            .await?;
 
             (uv_id, user_kind, UserAuthMethod::SmsOnly)
         }
@@ -107,6 +114,7 @@ async fn validate_sms_challenge(
     state: &web::Data<State>,
     challenge_state: PhoneChallengeState,
     challenge_response: &str,
+    is_live: bool,
 ) -> Result<(UserVaultId, VerifyKind), ApiError> {
     if challenge_state.h_code != sha256(challenge_response.as_bytes()).to_vec() {
         return Err(ChallengeError::ChallengeNotValid.into());
@@ -114,17 +122,21 @@ async fn validate_sms_challenge(
 
     let phone_number = challenge_state.phone_number;
     let sh_phone_number = state
-        .compute_fingerprint(DataKind::PhoneNumber, &phone_number.e164)
+        .compute_fingerprint(DataKind::PhoneNumber, &phone_number.to_piistring())
         .await?;
     let existing_user =
         db::user_vault::get_by_fingerprint(&state.db_pool, DataKind::PhoneNumber, sh_phone_number, true)
             .await?
             .map(|x| x.0);
     let result = match existing_user {
-        Some(uv) => (uv.id, VerifyKind::UserInherited),
+        Some(uv) => {
+            // check user mode matches requested mode
+            uv.ensure_live_consistency(is_live)?;
+            (uv.id, VerifyKind::UserInherited)
+        }
         None => {
             // The user does not exist. Create a new user vault
-            let user = create_new_user_vault(state, &phone_number).await?;
+            let user = create_new_user_vault(state, &phone_number, is_live).await?;
             (user.id, VerifyKind::UserCreated)
         }
     };
@@ -134,21 +146,23 @@ async fn validate_sms_challenge(
 async fn create_new_user_vault(
     state: &web::Data<State>,
     phone_number: &ValidatedPhoneNumber,
+    is_live: bool,
 ) -> Result<UserVault, ApiError> {
     let (public_key, e_private_key) = crate::enclave::gen_keypair(state).await?;
 
     let new_user = NewUserVaultReq {
         e_private_key,
         id_verified: Status::Incomplete,
-        e_phone_number: public_key.seal_pii(&phone_number.e164)?,
+        e_phone_number: public_key.seal_pii(&phone_number.to_piistring())?,
         e_phone_country: public_key.seal_pii(&phone_number.iso_country_code)?,
         public_key,
         sh_phone_number: state
-            .compute_fingerprint(DataKind::PhoneNumber, &phone_number.e164)
+            .compute_fingerprint(DataKind::PhoneNumber, &phone_number.to_piistring())
             .await?,
         sh_phone_country: state
             .compute_fingerprint(DataKind::PhoneCountry, &phone_number.iso_country_code)
             .await?,
+        is_live,
     };
     let user = db::user_vault::create(&state.db_pool, new_user).await?;
 

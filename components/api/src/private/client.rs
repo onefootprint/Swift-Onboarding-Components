@@ -1,7 +1,7 @@
 use crate::types::success::ApiResponseData;
+use crate::utils::sandbox::default_is_live;
 use crate::State;
 use crate::{enclave::gen_keypair, errors::ApiError};
-
 use crypto::random::gen_random_alphanumeric_code;
 use db::models::ob_configurations::NewObConfiguration;
 use db::models::tenant_api_keys::PartialTenantApiKey;
@@ -19,6 +19,8 @@ struct NewClientRequest {
     /// example: onefootprint.com, gmail.com
     /// used for login gating
     email_domain: String,
+    #[serde(default = "default_is_live")]
+    is_live: bool,
     /// list of data kinds that this tenant requires collecting
     must_collect_data_kinds: Vec<DataKind>,
     /// list of data kinds that this tenant requires access to decrypt
@@ -60,12 +62,13 @@ async fn post(
         email_domain,
         must_collect_data_kinds,
         can_access_data_kinds,
+        is_live,
     } = request.into_inner();
 
     let tenant = db::tenant::init_or_get(
         &state.db_pool,
         NewTenant {
-            name,
+            name: name.clone(),
             e_private_key: e_priv_key,
             public_key: ec_pk_uncompressed,
             workos_id: workos_org_id,
@@ -81,12 +84,13 @@ async fn post(
         must_collect_data_kinds,
         can_access_data_kinds,
         settings: ObConfigurationSettings::Empty,
+        is_live,
     };
     let obc = obc.save(&state.db_pool).await?;
 
     Ok(Json(ApiResponseData {
         data: NewClientResponse {
-            keys: init_api_keys(&state, &tenant, obc.key.clone()).await?,
+            keys: init_api_keys(&state, &tenant, obc.key.clone(), name.to_string(), is_live).await?,
             configuration_id: obc.id,
             client_id: tenant.id,
         },
@@ -97,6 +101,8 @@ async fn init_api_keys(
     state: &State,
     tenant: &Tenant,
     key_id: ObConfigurationKey,
+    key_name: String,
+    is_live: bool,
 ) -> Result<ClientKeysResponse, ApiError> {
     let api_key = format!("sk_{}", gen_random_alphanumeric_code(34));
 
@@ -108,7 +114,8 @@ async fn init_api_keys(
         &state.db_pool,
         PartialTenantApiKey {
             tenant_id: tenant.id.clone(),
-            key_name: "default".to_string(),
+            key_name,
+            is_live,
         },
         sh_api_key,
         e_api_key.0.clone(),

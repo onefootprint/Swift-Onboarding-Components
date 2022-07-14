@@ -2,34 +2,39 @@ import pytest
 import requests
 from .utils import url, _assert_response
 
-from .constants import EMAIL, PHONE_NUMBER, WORKOS_ORG_ID, REQUIRED_DATA_KINDS
+from .constants import EMAIL, PHONE_NUMBER, SANDBOX_EMAIL, SANDBOX_PHONE_NUMBER, WORKOS_ORG_ID, REQUIRED_DATA_KINDS
 
-def cleanup():
-    path = "private/cleanup?phone_number={0}".format(PHONE_NUMBER)
+def cleanup(phone_number, email, is_live):
+    # cleanup live user
+    path = "private/cleanup?phone_number={0}&is_live={1}".format(phone_number.replace("#", "%23%0A"), is_live)
     r = requests.post(
         url(path),
     )
     assert r.status_code == 200
     identify_path = "identify"
-    identifier = {"email": EMAIL}
-    data = {"identifier": identifier, "preferred_challenge_kind": "sms"}
-
-    # check that we properly cleaned up user
+    identifier = {"email": email}
+    is_live = True if is_live == "true" else False
+    data = {"identifier": identifier, "preferred_challenge_kind": "sms", "is_live": is_live}
     r = requests.post(
         url(identify_path),
         json=data,
     )
-    body = _assert_response(r)
+    assert r.status_code == 200    
+    body = r.json()
     assert not body["data"]["user_found"]
     assert not body["data"].get("challenge_data", dict())
 
+
 # runs before all integration tests
 def pytest_sessionstart(session):
-    cleanup()
+    cleanup(PHONE_NUMBER, EMAIL, "true")
+    cleanup(SANDBOX_PHONE_NUMBER, SANDBOX_EMAIL, "false")
 
 # runs after all integration tests
 def pytest_sessionfinish(session, exitstatus):
-    cleanup()
+    cleanup(PHONE_NUMBER, EMAIL, "true")
+    cleanup(SANDBOX_PHONE_NUMBER, SANDBOX_EMAIL, "false")
+
 
 # order to run tests in
 def pytest_collection_modifyitems(items):
@@ -68,6 +73,22 @@ def workos_tenant():
     client_secret_key = body["data"]["keys"]["client_secret_key"]
     print("\n======Client info======")
     print(body)
+    return {
+        "pk": client_public_key,
+        "sk": client_secret_key,
+        "configuration_id": body["data"]["configuration_id"]
+    }
+
+# global fixtures
+@pytest.fixture(scope="module")
+def workos_sandbox():
+    path = "private/client"
+    data = {"name": "Acme Bank", "workos_org_id": WORKOS_ORG_ID, "email_domain": "onefootprint.com", "is_live": False,         "must_collect_data_kinds": REQUIRED_DATA_KINDS,
+        "can_access_data_kinds": REQUIRED_DATA_KINDS}
+    r = requests.post(url(path), json=data)
+    body = _assert_response(r)
+    client_public_key = body["data"]["keys"]["client_public_key"]
+    client_secret_key = body["data"]["keys"]["client_secret_key"]
     return {
         "pk": client_public_key,
         "sk": client_secret_key,

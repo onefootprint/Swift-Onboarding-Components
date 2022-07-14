@@ -40,14 +40,16 @@ async fn post(
     let requested_number = number.phone_number.clone();
 
     if !(allowed_deletion_numbers.contains(&requested_number)
-        || requested_number == state.config.integration_test_phone_number)
+        || requested_number == state.config.integration_test_phone_number
+        || requested_number.leak().split('#').next()
+            == Some(state.config.integration_test_phone_number.leak()))
     {
         return Err(ApiError::NotImplemented);
     }
     let twilio_client = &state.twilio_client;
     let phone_number = twilio_client.standardize(&requested_number).await?;
     let sh_data = state
-        .compute_fingerprint(DataKind::PhoneNumber, &phone_number.e164)
+        .compute_fingerprint(DataKind::PhoneNumber, &phone_number.to_piistring())
         .await?;
     let num_deleted_rows = db::private_cleanup_integration_tests(&state.db_pool, sh_data).await?;
 

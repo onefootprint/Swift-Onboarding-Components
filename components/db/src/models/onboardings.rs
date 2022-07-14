@@ -24,6 +24,7 @@ pub struct Onboarding {
     pub insight_event_id: InsightEventId,
     pub ordering_id: i64,
     pub start_timestamp: DateTime<Utc>,
+    pub is_live: bool,
 }
 
 impl Onboarding {
@@ -45,6 +46,7 @@ pub struct NewOnboarding {
     pub status: Status,
     pub insight_event_id: InsightEventId,
     pub start_timestamp: DateTime<Utc>,
+    pub is_live: bool,
 }
 
 impl NewOnboarding {
@@ -55,6 +57,7 @@ impl NewOnboarding {
         ob_config_id: ObConfigurationId,
         status: Status,
         insight_event: CreateInsightEvent,
+        is_live: bool,
     ) -> Result<Onboarding, DbError> {
         let onboarding = pool
             .db_query(move |conn| -> Result<Onboarding, DbError> {
@@ -80,6 +83,7 @@ impl NewOnboarding {
                             status,
                             insight_event_id: insight_event.id,
                             start_timestamp: Utc::now(),
+                            is_live,
                         };
 
                         let new_ob = diesel::insert_into(onboardings::table)

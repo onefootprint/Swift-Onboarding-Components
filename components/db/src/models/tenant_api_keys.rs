@@ -15,6 +15,7 @@ pub struct TenantApiKey {
     pub is_enabled: bool,
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
+    pub is_live: bool,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
@@ -25,6 +26,7 @@ pub struct NewTenantApiKey {
     pub tenant_id: TenantId,
     pub key_name: String,
     pub is_enabled: bool,
+    pub is_live: bool,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
@@ -32,4 +34,5 @@ pub struct NewTenantApiKey {
 pub struct PartialTenantApiKey {
     pub tenant_id: TenantId,
     pub key_name: String,
+    pub is_live: bool,
 }

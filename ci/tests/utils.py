@@ -38,11 +38,11 @@ def _client_priv_key_headers(client_priv_key):
         TENANT_SECRET_HEADER: client_priv_key,
     }
 
-def _fpuser_auth_headers(request):
-    return _fpuser_auth_header_raw(request.config.cache.get("fpuser_auth_token", None))
+def _fpuser_auth_headers(request, mode):
+    return _fpuser_auth_header_raw(request.config.cache.get("{0}_fpuser_auth_token".format(mode), None))
 
-def _my1fp_auth_headers(request):
-    return _my1fp_auth_header_raw(request.config.cache.get("my1fp_auth_token", None))
+def _my1fp_auth_headers(request, mode):
+    return _my1fp_auth_header_raw(request.config.cache.get("{0}_my1fp_auth_token".format(mode), None))
 
 def _fpuser_auth_header_raw(value):
     return {

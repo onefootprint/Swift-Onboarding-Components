@@ -41,6 +41,7 @@ async fn test_db() {
                     .to_vec(),
             ),
             e_phone_country: SealedVaultBytes("blah".as_bytes().to_vec()),
+            is_live: false,
         },
     )
     .await

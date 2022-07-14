@@ -25,6 +25,7 @@ pub struct ObConfiguration {
     pub settings: ObConfigurationSettings,
     pub is_disabled: bool,
     pub can_access_data_kinds: Vec<DataKind>,
+    pub is_live: bool,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
@@ -36,6 +37,7 @@ pub struct NewObConfiguration {
     pub must_collect_data_kinds: Vec<DataKind>,
     pub can_access_data_kinds: Vec<DataKind>,
     pub settings: ObConfigurationSettings,
+    pub is_live: bool,
 }
 
 impl NewObConfiguration {

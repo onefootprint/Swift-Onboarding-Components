@@ -1,18 +1,20 @@
+use super::IdentifyType;
 use crate::identify::IdentifyChallengeData;
 use crate::types::success::ApiResponseData;
 use crate::utils::challenge::{Challenge, ChallengeToken};
+use crate::utils::sandbox::default_is_live;
 use crate::State;
 use crate::{errors::ApiError, identify::IdentifyChallengeState};
-use newtypes::PhoneNumber;
+use newtypes::{LiveModeConsistency, PhoneNumber};
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
-
-use super::IdentifyType;
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
 pub struct ChallengeRequest {
     phone_number: PhoneNumber,
     #[serde(default)]
     identify_type: IdentifyType,
+    #[serde(default = "default_is_live")]
+    is_live: bool,
 }
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Serialize)]
@@ -34,6 +36,8 @@ pub async fn handler(
 
     let twilio_client = &state.twilio_client;
 
+    // check if we've requested a valid phone # for the set mode
+    req.phone_number.ensure_live_consistency(req.is_live)?;
     let phone_number = twilio_client.standardize(&req.phone_number).await?;
 
     let (challenge_state_data, time_before_retry_s) =
@@ -42,6 +46,7 @@ pub async fn handler(
     let challenge_state = IdentifyChallengeState {
         identify_type: req.identify_type,
         data: IdentifyChallengeData::Sms(challenge_state_data),
+        is_live: req.is_live,
     };
 
     let challenge_token = Challenge {

@@ -67,6 +67,7 @@ pub async fn api_init(
         sh_secret_api_key: sh_api_key,
         is_enabled: true,
         e_secret_api_key: e_api_key,
+        is_live: tenant_api.is_live,
     };
     let tenant_api_key = pool
         .db_query(move |conn| {

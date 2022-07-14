@@ -10,7 +10,7 @@ from twilio.rest import Client
 twilio_client = Client(TWILIO_API_KEY, TWILIO_API_KEY_SECRET, TWILIO_ACCOUNT_SID)
 
 def test_my1fp_basic_auth(request):
-    request.config.cache.set("my1fp_auth_token", None) 
+    request.config.cache.set("live_my1fp_auth_token", None) 
 
     # Identify the user by email
     path = "identify"
@@ -46,7 +46,7 @@ def test_my1fp_basic_auth(request):
         body = _assert_response(r)
         assert body["data"]["kind"] == "user_inherited"
         auth_token = body["data"]["auth_token"]
-        request.config.cache.set("my1fp_auth_token", auth_token)
+        request.config.cache.set("live_my1fp_auth_token", auth_token)
     try_until_success(identify_verify, 5)
 
 
@@ -57,7 +57,7 @@ def test_logged_in_decrypt(request):
     }
     r = requests.post(
         url(path),
-        headers=_my1fp_auth_headers(request),
+        headers=_my1fp_auth_headers(request, "live"),
         json=data,
     )
     body = _assert_response(r)
@@ -75,7 +75,7 @@ def test_unauthorized_my1fp_basic_session_decrypt(request):
     }
     r = requests.post(
         url(path),
-        headers=_my1fp_auth_headers(request),
+        headers=_my1fp_auth_headers(request, "live"),
         json=data,
     )
     assert r.status_code == 401
@@ -86,7 +86,7 @@ def test_logged_in_user_detail(request):
     path = f"user"
     r = requests.get(
         url(path),
-        headers=_my1fp_auth_headers(request),
+        headers=_my1fp_auth_headers(request, "live"),
     )
     body = _assert_response(r)
     user = body["data"]
@@ -98,7 +98,7 @@ def test_logged_in_access_events(request):
     path = f"user/access_events"
     r = requests.get(
         url(path),
-        headers=_my1fp_auth_headers(request),
+        headers=_my1fp_auth_headers(request, "live"),
     )
     body = _assert_response(r)
     access_events = body["data"]

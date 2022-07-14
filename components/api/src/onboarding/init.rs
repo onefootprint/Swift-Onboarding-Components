@@ -8,7 +8,7 @@ use crate::utils::user_vault_wrapper::UserVaultWrapper;
 use crate::State;
 use db::models::onboardings::NewOnboarding;
 use db::{models::insight_event::CreateInsightEvent, webauthn_credentials::get_webauthn_creds};
-use newtypes::{DataKind, Status};
+use newtypes::{DataKind, LiveModeConsistency, Status};
 use paperclip::actix::{api_v2_operation, web, web::Json, Apiv2Schema};
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Serialize)]
@@ -31,6 +31,8 @@ pub fn handler(
     let uv = user_auth.user_vault(&state.db_pool).await?;
     let uv_id = user_auth.data.user_vault_id;
 
+    uv.ensure_live_consistency(tenant_auth.ob_config.is_live)?;
+
     NewOnboarding::get_or_create(
         &state.db_pool,
         uv_id.clone(),
@@ -38,6 +40,7 @@ pub fn handler(
         tenant_auth.ob_config.id.clone(),
         Status::Incomplete,
         CreateInsightEvent::from(insights),
+        tenant_auth.ob_config.is_live,
     )
     .await?;
 

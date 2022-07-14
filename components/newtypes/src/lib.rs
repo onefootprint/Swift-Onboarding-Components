@@ -27,8 +27,6 @@ pub use self::fingerprint::*;
 pub use uuid::Uuid;
 #[derive(Debug, Clone, thiserror::Error)]
 pub enum Error {
-    #[error("invalid phone number")]
-    InvalidPhoneNumber,
     #[error("invalid length ssn")]
     InvalidSsn,
     #[error("invalid email address")]
@@ -37,6 +35,20 @@ pub enum Error {
     DobError(#[from] DobError),
     #[error("address error: {0}")]
     AddressError(#[from] AddressError),
+    #[error("phone error: {0}")]
+    PhoneError(#[from] PhoneError),
+}
+
+#[derive(Debug, Clone, thiserror::Error)]
+pub enum PhoneError {
+    #[error("invalid phone number")]
+    InvalidPhoneNumber,
+    #[error("live phone expected in live mode (no #)")]
+    LivePhoneExpected,
+    #[error("sandbox phone expected in sandbox mode (phone_number#suffix)")]
+    SandboxPhoneExpected,
+    #[error("invalid sandbox phone number (phone_number#suffix)")]
+    InvalidSandboxNumber,
 }
 
 #[derive(Debug, Clone, thiserror::Error)]
@@ -63,6 +75,24 @@ pub enum AddressError {
     InvalidAddressCharacters(String),
     #[error("invalid characters provided: {0}, city and/or state must not contain special characters")]
     InvalidCharacters(String),
+}
+
+pub trait LiveModeConsistency {
+    type Error;
+
+    fn is_live(&self) -> bool;
+
+    fn mismatch_self_is_live(&self) -> Self::Error;
+
+    fn mismatch_self_is_sandbox(&self) -> Self::Error;
+
+    fn ensure_live_consistency(&self, target: bool) -> Result<(), Self::Error> {
+        match (self.is_live(), target) {
+            (true, false) => Err(self.mismatch_self_is_live()),
+            (false, true) => Err(self.mismatch_self_is_sandbox()),
+            _ => Ok(()),
+        }
+    }
 }
 
 #[macro_use]

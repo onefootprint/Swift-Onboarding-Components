@@ -17,12 +17,12 @@ def test_tenant_decrypt(request, workos_tenant):
         street_address="1 FOOTPRINT WAY",
         zip="10009",
         country="US",
-        ssn=request.config.cache.get("ssn", None),
-        last_four_ssn=request.config.cache.get("ssn", None)[-4:],
+        ssn=request.config.cache.get("live_ssn", None),
+        last_four_ssn=request.config.cache.get("live_ssn", None)[-4:],
     )
     for attributes in FIELDS_TO_DECRYPT:
         data = {
-            "footprint_user_id": request.config.cache.get("fp_user_id", None),
+            "footprint_user_id": request.config.cache.get("live_fp_user_id", None),
             "attributes": attributes,
             "reason": "Doing a hecking decrypt",
         }
@@ -39,7 +39,7 @@ def test_tenant_decrypt(request, workos_tenant):
 def test_onboardings_list(request, workos_tenant):
     # TODO don't filter on fp_user_id in this test. We only do it to ensure it doesn't flake in dev
     # https://linear.app/footprint/issue/FP-390/integration-tests-for-onboarding-list-break-in-dev
-    old_fp_user_id = request.config.cache.get("fp_user_id", None)
+    old_fp_user_id = request.config.cache.get("live_fp_user_id", None)
     path = "org/onboardings?fp_user_id={old_fp_user_id}"
     r = requests.get(
         url(path),
@@ -52,7 +52,7 @@ def test_onboardings_list(request, workos_tenant):
     assert set(["first_name", "last_name"]) < set(onboardings[0]["populated_data_kinds"])
 
 def test_liveness_list(request, workos_tenant):
-    old_fp_user_id = request.config.cache.get("fp_user_id", None)
+    old_fp_user_id = request.config.cache.get("live_fp_user_id", None)
     path = f"org/liveness?footprint_user_id={old_fp_user_id}"
     r = requests.get(
         url(path),
@@ -64,7 +64,7 @@ def test_liveness_list(request, workos_tenant):
     assert creds[0]["insight_event"]
 
 def test_access_events_list(request, workos_tenant):
-    fp_user_id = request.config.cache.get("fp_user_id", None)
+    fp_user_id = request.config.cache.get("live_fp_user_id", None)
     path = f"org/access_events?footprint_user_id={fp_user_id}"
     r = requests.get(
         url(path),
