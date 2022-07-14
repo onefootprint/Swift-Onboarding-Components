@@ -5,7 +5,9 @@ use crate::{enclave::gen_keypair, errors::ApiError};
 use crypto::random::gen_random_alphanumeric_code;
 use db::models::ob_configurations::NewObConfiguration;
 use db::models::tenant_api_keys::PartialTenantApiKey;
-use newtypes::{ObConfigurationId, ObConfigurationKey, PiiString, TenantId};
+use newtypes::{
+    DataKind, ObConfigurationId, ObConfigurationKey, ObConfigurationSettings, PiiString, TenantId,
+};
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 
 use db::models::tenants::{NewTenant, Tenant};
@@ -17,6 +19,10 @@ struct NewClientRequest {
     /// example: onefootprint.com, gmail.com
     /// used for login gating
     email_domain: String,
+    /// list of data kinds that this tenant requires collecting
+    must_collect_data_kinds: Vec<DataKind>,
+    /// list of data kinds that this tenant requires access to decrypt
+    can_access_data_kinds: Vec<DataKind>,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Apiv2Schema)]
@@ -48,19 +54,35 @@ async fn post(
 ) -> actix_web::Result<Json<ApiResponseData<NewClientResponse>>, ApiError> {
     let (ec_pk_uncompressed, e_priv_key) = gen_keypair(&state).await?;
 
+    let NewClientRequest {
+        name,
+        workos_org_id,
+        email_domain,
+        must_collect_data_kinds,
+        can_access_data_kinds,
+    } = request.into_inner();
+
     let tenant = db::tenant::init_or_get(
         &state.db_pool,
         NewTenant {
-            name: request.name.clone(),
+            name,
             e_private_key: e_priv_key,
             public_key: ec_pk_uncompressed,
-            workos_id: request.workos_org_id.clone(),
-            email_domain: request.email_domain.clone(),
+            workos_id: workos_org_id,
+            email_domain,
         },
     )
     .await?;
 
-    let obc = NewObConfiguration::default(&state.db_pool, tenant.id.clone()).await?;
+    let obc = NewObConfiguration {
+        name: "Default".to_string(),
+        description: None,
+        tenant_id: tenant.id.clone(),
+        must_collect_data_kinds,
+        can_access_data_kinds,
+        settings: ObConfigurationSettings::Empty,
+    };
+    let obc = obc.save(&state.db_pool).await?;
 
     Ok(Json(ApiResponseData {
         data: NewClientResponse {

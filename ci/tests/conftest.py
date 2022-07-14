@@ -2,7 +2,7 @@ import pytest
 import requests
 from .utils import url, _assert_response
 
-from .constants import EMAIL, PHONE_NUMBER, WORKOS_ORG_ID
+from .constants import EMAIL, PHONE_NUMBER, WORKOS_ORG_ID, REQUIRED_DATA_KINDS
 
 def cleanup():
     path = "private/cleanup?phone_number={0}".format(PHONE_NUMBER)
@@ -55,7 +55,13 @@ def pytest_collection_modifyitems(items):
 @pytest.fixture(scope="module")
 def workos_tenant():
     path = "private/client"
-    data = {"name": "Acme Bank", "workos_org_id": WORKOS_ORG_ID, "email_domain": "onefootprint.com"}
+    data = {
+        "name": "Acme Bank",
+        "workos_org_id": WORKOS_ORG_ID,
+        "email_domain": "onefootprint.com",
+        "must_collect_data_kinds": REQUIRED_DATA_KINDS,
+        "can_access_data_kinds": REQUIRED_DATA_KINDS,
+    }
     r = requests.post(url(path), json=data)
     body = _assert_response(r)
     client_public_key = body["data"]["keys"]["client_public_key"]
@@ -70,7 +76,13 @@ def workos_tenant():
 @pytest.fixture(scope="module")
 def foo_tenant():
     path = "private/client"
-    data = {"name": "foo", "workos_org_id": "bar", "email_domain": "foo.bar"}
+    data = {
+        "name": "foo",
+        "workos_org_id": "bar",
+        "email_domain": "foo.bar",
+        "must_collect_data_kinds": REQUIRED_DATA_KINDS,
+        "can_access_data_kinds": REQUIRED_DATA_KINDS,
+    }
     r = requests.post(url(path), json=data)
     body = _assert_response(r)
     client_public_key = body["data"]["keys"]["client_public_key"]

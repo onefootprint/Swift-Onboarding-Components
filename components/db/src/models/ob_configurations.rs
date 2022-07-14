@@ -39,36 +39,11 @@ pub struct NewObConfiguration {
 }
 
 impl NewObConfiguration {
-    pub async fn default(pool: &DbPool, tenant_id: TenantId) -> Result<ObConfiguration, crate::DbError> {
-        // TODO accept these from the ob_configuration init endpoint
-        // https://linear.app/footprint/issue/FP-614/accept-list-of-required-data-kinds-in-tenant-creation-endpoint
-        let default_data_kinds = vec![
-            DataKind::FirstName,
-            DataKind::LastName,
-            DataKind::Dob,
-            DataKind::Ssn,
-            DataKind::StreetAddress,
-            DataKind::StreetAddress2,
-            DataKind::City,
-            DataKind::State,
-            DataKind::Zip,
-            DataKind::Country,
-            DataKind::Email,
-            DataKind::PhoneNumber,
-        ];
-
-        let default = Self {
-            name: "Default".to_string(),
-            description: None,
-            tenant_id,
-            must_collect_data_kinds: default_data_kinds.clone(),
-            can_access_data_kinds: default_data_kinds,
-            settings: ObConfigurationSettings::Empty,
-        };
+    pub async fn save(self, pool: &DbPool) -> Result<ObConfiguration, crate::DbError> {
         let obc = pool
             .db_query(move |conn| {
                 diesel::insert_into(ob_configurations::table)
-                    .values(&default)
+                    .values(self)
                     .get_result::<ObConfiguration>(conn)
             })
             .await??;
