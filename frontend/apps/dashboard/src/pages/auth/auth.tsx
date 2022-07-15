@@ -25,11 +25,10 @@ const Auth = () => {
     login.mutate(code, {
       onSuccess({ auth, email }: LoginResponse) {
         logIn({ auth, email });
-        router.push('/users');
+        router.push('/');
       },
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isReady, code, router, isLoggedIn, login.isLoading]);
+  });
 
   return <div />;
 };

@@ -8,25 +8,29 @@ export type UserSession = {
 
 type UserSessionState = {
   data?: UserSession;
+  returnUrl?: string;
   logIn: (data: UserSession) => void;
   logOut: () => void;
+  setReturnUrl: (returnUrl?: string) => void;
 };
-
-const initialMe = undefined;
 
 export const useStore = create<UserSessionState>()(
   persist(set => ({
-    data: initialMe,
+    data: undefined,
+    returnUrl: undefined,
     logIn: (data: UserSession) => set({ data }),
     logOut: () => set({ data: undefined }),
+    setReturnUrl: (returnUrl: string | undefined) => set({ returnUrl }),
   })),
 );
 
 const useSessionUser = () => {
-  const { data, logIn, logOut } = useStore(state => state);
+  const { data, returnUrl, logIn, logOut, setReturnUrl } = useStore(
+    state => state,
+  );
   const isLoggedIn = !!data;
 
-  return { data, isLoggedIn, logIn, logOut };
+  return { data, returnUrl, isLoggedIn, logIn, logOut, setReturnUrl };
 };
 
 export default useSessionUser;

@@ -18,9 +18,4 @@ module.exports = withPlugins([withTM, withBundleAnalyzer], {
   compiler: {
     styledComponents: true,
   },
-  exportPathMap: () => {
-    return {
-      '/': { page: '/users' },
-    };
-  },
 });

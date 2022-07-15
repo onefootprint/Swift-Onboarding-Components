@@ -13,7 +13,7 @@ export type PageGuardProps = {
 };
 
 const PageGuard = ({ children }: PageGuardProps) => {
-  const { isLoggedIn } = useSessionUser();
+  const { isLoggedIn, setReturnUrl } = useSessionUser();
   const router = useRouter();
   const isLoggedOutRoute = LOGGED_OUT_ROUTES.includes(router.pathname);
   const isLoggedInRoute = !isLoggedOutRoute;
@@ -22,11 +22,15 @@ const PageGuard = ({ children }: PageGuardProps) => {
 
   useEffect(() => {
     if (!hasAccessToThePage) {
+      if (!isLoggedIn) {
+        // Save the url we were trying to visit before being redirected
+        setReturnUrl(router.asPath);
+      }
       router.push(
         isLoggedIn ? DEFAULT_LOGGED_IN_ROUTE : DEFAULT_LOGGED_OUT_ROUTE,
       );
     }
-  }, [hasAccessToThePage, isLoggedIn, router]);
+  }, [hasAccessToThePage, isLoggedIn, router, setReturnUrl]);
 
   return hasAccessToThePage ? children : <div />;
 };
