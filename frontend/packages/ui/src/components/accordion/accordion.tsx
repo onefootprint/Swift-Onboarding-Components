@@ -5,7 +5,6 @@ import React, { useRef } from 'react';
 import styled, { css } from 'styled-components';
 
 import Typography from '../typography';
-import useContentVisibility from './hooks/use-content-visibility';
 
 export type AccordionProps = {
   children: React.ReactNode;
@@ -15,8 +14,6 @@ export type AccordionProps = {
   testID?: string;
   title: string;
 };
-
-const ANIMATION_DURATION = 240;
 
 const Accordion = ({
   children,
@@ -30,11 +27,6 @@ const Accordion = ({
   const summaryId = `accordion-summary-${title.replace(/\s/g, '-')}`;
   const detailsId = `accordion-details-${title.replace(/\s/g, '-')}`;
   const contentRef = useRef<HTMLDivElement>(null);
-  const shouldShow = useContentVisibility({
-    animationDuration: ANIMATION_DURATION,
-    contentRef,
-    open,
-  });
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     onChange?.(event, !open);
@@ -56,7 +48,7 @@ const Accordion = ({
         </Title>
         <IconIndicator color="primary" inverted={open} />
       </Summary>
-      {shouldShow && (
+      {open && (
         <Content
           aria-labelledby={summaryId}
           id={detailsId}
@@ -115,9 +107,7 @@ const IconIndicator = styled(IcoChevronDown24)<{ inverted: boolean }>`
 `;
 
 const Content = styled.div<{ open: boolean }>`
-  max-height: 0;
   overflow: hidden;
-  transition: max-height ${ANIMATION_DURATION}ms ease-in-out;
 `;
 
 const ContentInner = styled.div`
