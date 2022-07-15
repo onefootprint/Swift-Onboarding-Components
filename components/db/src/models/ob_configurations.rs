@@ -78,7 +78,7 @@ impl ObConfiguration {
         Ok(id)
     }
 
-    pub async fn get_with_tenant(
+    pub async fn get_enabled(
         pool: &DbPool,
         key: ObConfigurationKey,
     ) -> Result<(ObConfiguration, Tenant), crate::DbError> {
@@ -86,6 +86,7 @@ impl ObConfiguration {
             .db_query(move |conn| -> Result<(ObConfiguration, Tenant), crate::DbError> {
                 let obc: ObConfiguration = ob_configurations::table
                     .filter(ob_configurations::key.eq(key))
+                    .filter(ob_configurations::is_disabled.eq(false))
                     .first(conn)?;
                 let tenant: Tenant = tenants::table
                     .filter(tenants::id.eq(&obc.tenant_id))

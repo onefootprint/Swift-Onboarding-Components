@@ -1,4 +1,4 @@
-use crate::schema::{ob_configurations, onboardings};
+use crate::schema::onboardings;
 use crate::{DbError, DbPool};
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
@@ -66,9 +66,6 @@ impl NewOnboarding {
                     .filter(onboardings::user_vault_id.eq(&user_vault_id))
                     .filter(onboardings::ob_config_id.eq(&ob_config_id))
                     .filter(onboardings::tenant_id.eq(&tenant_id))
-                    .left_join(ob_configurations::table)
-                    .filter(ob_configurations::is_disabled.eq(false))
-                    .select(onboardings::all_columns)
                     .first(conn)
                     .optional()?;
                 match existing_ob {
