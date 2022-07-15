@@ -12,13 +12,13 @@ import { nameData, User } from './hooks/use-join-users';
 import Pagination from './pages/detail/components/pagination';
 
 const columns = [
-  { text: 'Name', width: '12.5%' },
-  { text: 'Footprint Token', width: '15%' },
-  { text: 'Status', width: '12.5%' },
-  { text: 'Email', width: '15%' },
-  { text: 'SSN', width: '12.5%' },
-  { text: 'Phone Number', width: '15%' },
-  { text: 'Date', width: '15%' },
+  { text: 'Name', width: '14%' },
+  { text: 'Footprint Token', width: '14%' },
+  { text: 'Status', width: '14%' },
+  { text: 'Email', width: '14%' },
+  { text: 'SSN', width: '14%' },
+  { text: 'Phone Number', width: '14%' },
+  { text: 'Date', width: '19%' },
 ];
 
 const PAGE_SIZE = 10;

@@ -1,7 +1,7 @@
 import { Property } from 'csstype';
 import React from 'react';
 import styled, { css } from 'styled-components';
-import { LoadingIndicator, media, Typography } from 'ui';
+import { LoadingIndicator, Typography } from 'ui';
 
 export type Row<T> = {
   item: T;
@@ -82,10 +82,7 @@ const TableContainer = styled.table`
     border: 1px solid ${theme.borderColor.tertiary};
     border-top: none;
     border-radius: 0 0 ${theme.borderRadius[2]}px ${theme.borderRadius[2]}px;
-
-    ${media.greaterThan('md')`
     table-layout: fixed;
-    `}
   `}
 
   ${({ theme }) => css`

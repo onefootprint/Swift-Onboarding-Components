@@ -24,7 +24,7 @@ const PrivateLayout = ({ children }: PrivateLayoutProps) => {
   return (
     <div data-testid="private-layout">
       <header>
-        <Container>
+        <Container minSize="md">
           <Footprint>
             <Link href="/users">
               <a href="/users">
@@ -41,7 +41,7 @@ const PrivateLayout = ({ children }: PrivateLayoutProps) => {
           </Footprint>
         </Container>
         <Nav>
-          <Container>
+          <Container minSize="md">
             <Tab.List>
               {routes.map(({ href, Icon, text }) => (
                 <Link href={href} key={text}>
@@ -59,7 +59,7 @@ const PrivateLayout = ({ children }: PrivateLayoutProps) => {
         </Nav>
       </header>
       <section>
-        <Container>{children}</Container>
+        <Container minSize="md">{children}</Container>
       </section>
     </div>
   );

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import PageGuard from 'src/components/page-guard';
-import { createGlobalStyle } from 'styled-components';
+import { createGlobalStyle, css } from 'styled-components';
 import themes from 'themes';
 import { DesignSystemProvider } from 'ui';
 
@@ -39,6 +39,12 @@ const App = ({ Component, pageProps }: AppProps) => {
   );
 };
 
-const GlobalStyle = createGlobalStyle``;
+const GlobalStyle = createGlobalStyle`
+  ${({ theme }) => css`
+    body {
+      min-width: ${theme.grid.container.maxWidth.md}px;
+    }
+  `}
+`;
 
 export default App;
