@@ -5,11 +5,11 @@ import { createGlobalStyle } from 'styled-components';
 import themes from 'themes';
 import { DesignSystemProvider } from 'ui';
 
-import MachineProvider from '../components/machine-provider';
 import PageGuard from '../components/page-guard';
 import configureReactI18next from '../config/initializers/react-i18next';
 import queryClient from '../config/initializers/react-query';
 import configureSentry from '../config/initializers/sentry';
+import MachineProvider from './liveness-check/components/machine-provider';
 
 configureSentry();
 configureReactI18next();

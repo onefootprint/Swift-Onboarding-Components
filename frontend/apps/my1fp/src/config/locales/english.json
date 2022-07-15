@@ -12,6 +12,30 @@
         "privacy-policy": "Privacy Policy"
       }
     },
+    "liveness-check": {
+      "qr-register": {
+        "title": "Liveness check",
+        "subtitle": "We need to verify that you're a real person",
+        "instructions": "Use your camera app or QR code reader on your mobile device and we'll use biometrics to verify it",
+        "qr-code": {
+          "instructions": "Make sure the QR code is clearly visible on your device's screen. When authenticated, this page automatically updates"
+        },
+        "sms": {
+          "instructions": "Alternatively, we can send you a link to your phone and you can continue from there",
+          "cta": "Send a link to phone"
+        }
+      },
+      "qr-code-sent": {
+        "title": "Liveness Check",
+        "subtitle": "Link sent to phone. Please continue from there.",
+        "cancel": "Cancel"
+      },
+      "qr-code-scanned": {
+        "title": "Liveness Check",
+        "subtitle": "QR code scanned. Please continue on your phone.",
+        "cancel": "Cancel"
+      }
+    },
     "my-footprint-identity": {
       "basic": {
         "title": "Basic",

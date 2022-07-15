@@ -12,8 +12,10 @@
     "lint": "eslint src --fix"
   },
   "dependencies": {
+    "@types/lodash": "^4.14.182",
     "@xstate/react": "^3.0.0",
     "constate": "^3.3.2",
+    "focus-trap-react": "^9.0.2",
     "footprint": "*",
     "footprint-ui": "*",
     "global-constants": "*",
@@ -22,6 +24,7 @@
     "next": "12.2.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
+    "react-use": "^17.4.0",
     "request": "*",
     "styled-components": "^5.3.5",
     "themes": "*",
