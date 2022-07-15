@@ -45,17 +45,19 @@ FIELDS_TO_DECRYPT = [
     ["first_name", "email", "zip", "country", "last_four_ssn"],
 ]
 
-REQUIRED_DATA_KINDS = [
+# Everything but city
+CAN_ACCESS_DATA_KINDS = [
     "first_name",
     "last_name",
     "dob",
     "ssn",
     "street_address",
     "street_address2",
-    "city",
     "state",
     "zip",
     "country",
     "email",
     "phone_number",
 ]
+
+MUST_COLLECT_DATA_KINDS = CAN_ACCESS_DATA_KINDS + ["city"]

@@ -1,14 +1,14 @@
 use crate::{
     auth::{uv_permission::HasVaultPermission, AuthError},
-    errors::{ApiError},
+    errors::ApiError,
     State,
 };
 use crypto::seal::EciesP256Sha256AesGcmSealed;
-use db::models::user_vaults::UserVault;
+use db::models::{ob_configurations::ObConfiguration, user_vaults::UserVault};
 use enclave_proxy::{DataTransform, DecryptRequest};
 use newtypes::{DataKind, SealedVaultBytes};
 use paperclip::actix::web;
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 pub mod access_events;
 pub mod biometric;
@@ -37,11 +37,24 @@ pub async fn decrypt<C: HasVaultPermission>(
     session: &C,
     state: &web::Data<State>,
     user_vault: UserVault,
+    ob_config: Option<&ObConfiguration>,
     data_kinds: Vec<DataKind>,
 ) -> Result<DecryptFieldsResult, ApiError> {
     if !session.can_decrypt(&data_kinds) {
         return Err(AuthError::UnauthorizedOperation.into());
     }
+    if let Some(ob_config) = ob_config {
+        let data_to_access_kinds: HashSet<_> = data_kinds.iter().map(|x| x.to_owned()).collect();
+        let can_access_kinds: HashSet<_> = ob_config
+            .can_access_data_kinds
+            .iter()
+            .flat_map(|x| x.permissioning_kinds())
+            .collect();
+        if !can_access_kinds.is_superset(&data_to_access_kinds) {
+            return Err(AuthError::UnauthorizedOperation.into());
+        }
+    }
+
     // Filter out fields that don't have values set on the user vault
     let (fields_to_decrypt, values_to_decrypt): (Vec<DataKind>, Vec<SealedVaultBytes>) =
         db::user_data::filter(&state.db_pool, user_vault.id.clone(), data_kinds.clone())

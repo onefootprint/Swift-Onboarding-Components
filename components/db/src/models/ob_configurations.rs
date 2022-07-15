@@ -54,6 +54,18 @@ impl NewObConfiguration {
 }
 
 impl ObConfiguration {
+    pub async fn get_by_id(pool: &DbPool, id: ObConfigurationId) -> Result<ObConfiguration, crate::DbError> {
+        let id = pool
+            .db_query(move |conn| -> Result<ObConfiguration, crate::DbError> {
+                let obc = ob_configurations::table
+                    .filter(ob_configurations::id.eq(id))
+                    .first(conn)?;
+                Ok(obc)
+            })
+            .await??;
+        Ok(id)
+    }
+
     pub async fn get(pool: &DbPool, key: ObConfigurationKey) -> Result<ObConfiguration, crate::DbError> {
         let id = pool
             .db_query(move |conn| -> Result<ObConfiguration, crate::DbError> {

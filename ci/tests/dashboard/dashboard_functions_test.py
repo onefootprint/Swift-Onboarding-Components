@@ -3,8 +3,7 @@
 from urllib.parse import urlencode
 import requests
 import arrow
-from tests.constants import EMAIL
-from tests.constants import FIELDS_TO_DECRYPT
+from tests.constants import EMAIL, FIELDS_TO_DECRYPT
 from tests.utils import _client_priv_key_headers, _assert_response, url
 
     
@@ -35,6 +34,20 @@ def test_tenant_decrypt(request, workos_tenant):
         attributes = body["data"]
         for data_kind, value in attributes.items():
             assert expected_data[data_kind] == value.upper()
+
+def test_tenant_decrypt_no_permissions(request, workos_tenant):
+    path = "org/decrypt"
+    data = {
+        "footprint_user_id": request.config.cache.get("live_fp_user_id", None),
+        "attributes": ["city"],
+        "reason": "Not doing a hecking decrypt",
+    }
+    r = requests.post(
+        url(path),
+        headers=_client_priv_key_headers(workos_tenant["sk"]),
+        json=data,
+    )
+    _assert_response(r, status_code=401)
     
 def test_onboardings_list(request, workos_tenant):
     # TODO don't filter on fp_user_id in this test. We only do it to ensure it doesn't flake in dev

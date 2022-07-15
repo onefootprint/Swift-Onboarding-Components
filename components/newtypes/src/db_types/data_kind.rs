@@ -91,6 +91,16 @@ impl DataKind {
             DataKind::PhoneNumber | DataKind::PhoneCountry => DataGroupKind::PhoneNumber,
         }
     }
+
+    pub fn permissioning_kinds(self) -> Vec<DataKind> {
+        // Returns the list of DataKinds for which this kind yields permissions.
+        // For example, ability to decrypt an Ssn also provides the ability to decrypt LastFourSsn
+        match self {
+            DataKind::Ssn => vec![DataKind::Ssn, DataKind::LastFourSsn],
+            DataKind::PhoneNumber => vec![DataKind::PhoneNumber, DataKind::PhoneCountry],
+            kind => vec![kind],
+        }
+    }
 }
 
 impl SaltedFingerprint for DataKind {

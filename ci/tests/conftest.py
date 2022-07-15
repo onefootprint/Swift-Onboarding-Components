@@ -2,7 +2,17 @@ import pytest
 import requests
 from .utils import url, _assert_response
 
-from .constants import EMAIL, PHONE_NUMBER, SANDBOX_EMAIL, SANDBOX_PHONE_NUMBER, WORKOS_ORG_ID, REQUIRED_DATA_KINDS
+from .constants import (
+    CAN_ACCESS_DATA_KINDS,
+    EMAIL,
+    MUST_COLLECT_DATA_KINDS,
+    PHONE_NUMBER,
+    SANDBOX_EMAIL,
+    SANDBOX_PHONE_NUMBER,
+    WORKOS_ORG_ID,
+    MUST_COLLECT_DATA_KINDS,
+    CAN_ACCESS_DATA_KINDS,
+)
 
 def cleanup(phone_number, email, is_live):
     # cleanup live user
@@ -64,8 +74,8 @@ def workos_tenant():
         "name": "Acme Bank",
         "workos_org_id": WORKOS_ORG_ID,
         "email_domain": "onefootprint.com",
-        "must_collect_data_kinds": REQUIRED_DATA_KINDS,
-        "can_access_data_kinds": REQUIRED_DATA_KINDS,
+        "must_collect_data_kinds": MUST_COLLECT_DATA_KINDS,
+        "can_access_data_kinds": CAN_ACCESS_DATA_KINDS,
     }
     r = requests.post(url(path), json=data)
     body = _assert_response(r)
@@ -83,8 +93,14 @@ def workos_tenant():
 @pytest.fixture(scope="module")
 def workos_sandbox():
     path = "private/client"
-    data = {"name": "Acme Bank", "workos_org_id": WORKOS_ORG_ID, "email_domain": "onefootprint.com", "is_live": False,         "must_collect_data_kinds": REQUIRED_DATA_KINDS,
-        "can_access_data_kinds": REQUIRED_DATA_KINDS}
+    data = {
+        "name": "Acme Bank",
+        "workos_org_id": WORKOS_ORG_ID,
+        "email_domain": "onefootprint.com",
+        "is_live": False,
+        "must_collect_data_kinds": MUST_COLLECT_DATA_KINDS,
+        "can_access_data_kinds": CAN_ACCESS_DATA_KINDS,
+    }
     r = requests.post(url(path), json=data)
     body = _assert_response(r)
     client_public_key = body["data"]["keys"]["client_public_key"]
@@ -103,8 +119,8 @@ def foo_tenant():
         "name": "foo",
         "workos_org_id": "bar",
         "email_domain": "foo.bar",
-        "must_collect_data_kinds": REQUIRED_DATA_KINDS,
-        "can_access_data_kinds": REQUIRED_DATA_KINDS,
+        "must_collect_data_kinds": MUST_COLLECT_DATA_KINDS,
+        "can_access_data_kinds": CAN_ACCESS_DATA_KINDS,
     }
     r = requests.post(url(path), json=data)
     body = _assert_response(r)
