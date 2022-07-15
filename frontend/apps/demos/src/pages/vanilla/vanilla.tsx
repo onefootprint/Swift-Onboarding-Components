@@ -5,7 +5,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { Box, media, Typography } from 'ui';
 
-import { TENANT_KEY } from '../../config/constants';
+const TENANT_KEY = process.env.NEXT_PUBLIC_TENANT_KEY;
 
 const Root = () => (
   <Inner>

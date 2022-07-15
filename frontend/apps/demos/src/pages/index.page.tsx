@@ -4,15 +4,14 @@ import React from 'react';
 import styled from 'styled-components';
 import { Box, FootprintButton, media, Typography } from 'ui';
 
-import { TENANT_KEY } from '../config/constants';
-
-footprint.init({ publicKey: TENANT_KEY });
+footprint.init({ publicKey: process.env.NEXT_PUBLIC_TENANT_KEY });
 
 const Root = () => {
-  const handleClick = async () => {
-    await footprint.show();
-    footprint.onCompleted(footprintUserId => {
-      alert(`footprint user id: ${footprintUserId}`);
+  const handleClick = () => {
+    footprint.show({
+      onCompleted(footprintUserId) {
+        console.log('footprintUserId', footprintUserId);
+      },
     });
   };
 

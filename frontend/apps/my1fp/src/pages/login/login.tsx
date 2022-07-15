@@ -18,8 +18,6 @@ import useUserDecrypt, {
 } from '../../hooks/use-user-decrypt';
 import attributes from './login.constants';
 
-footprint.init({ flow: 'authentication' });
-
 const Login = () => {
   const router = useRouter();
   const toast = useToast();
@@ -48,24 +46,25 @@ const Login = () => {
     router.push('/');
   };
 
-  const handleClick = async () => {
-    await footprint.show();
-    footprint.onAuthenticated(authToken => {
-      userMutation.mutate(
-        { authToken, attributes },
-        {
-          onSuccess(data) {
-            saveInSessionAndGoToHome(authToken, data);
+  const handleClick = () => {
+    footprint.show({
+      onAuthenticated: (authToken: string) => {
+        userMutation.mutate(
+          { authToken, attributes },
+          {
+            onSuccess(data) {
+              saveInSessionAndGoToHome(authToken, data);
+            },
+            onError: (error: RequestError) => {
+              toast.show({
+                description: getErrorMessage(error),
+                title: 'Uh-oh!',
+                variant: 'error',
+              });
+            },
           },
-          onError: (error: RequestError) => {
-            toast.show({
-              description: getErrorMessage(error),
-              title: 'Uh-oh!',
-              variant: 'error',
-            });
-          },
-        },
-      );
+        );
+      },
     });
   };
 

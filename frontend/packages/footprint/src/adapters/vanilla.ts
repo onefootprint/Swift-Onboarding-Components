@@ -1,18 +1,19 @@
 import { IS_SSR } from '../config/constants';
 import { Footprint } from '../footprint/types';
-import defer from '../utils/defer';
+
+const defer = (callback: () => void) => {
+  window.setTimeout(callback, 0);
+};
 
 const vanillaIntegration = (footprint: Footprint) => {
   const handleButtonClicked = async () => {
-    await footprint.show();
-    footprint.onUserCanceled(() => {
-      window.onFootprintCanceled?.();
-    });
-    footprint.onCompleted((footprintUserId: string) => {
-      window.onFootprintCompleted?.(footprintUserId);
-    });
-    footprint.onFailed(() => {
-      window.onFootprintFailed?.();
+    await footprint.show({
+      onUserCanceled: () => {
+        window.onFootprintCanceled?.();
+      },
+      onCompleted: (footprintUserId: string) => {
+        window.onFootprintCompleted?.(footprintUserId);
+      },
     });
   };
 
