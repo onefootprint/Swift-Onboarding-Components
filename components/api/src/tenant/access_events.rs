@@ -8,7 +8,7 @@ use crate::utils::querystring::deserialize_stringified_list;
 use crate::State;
 use crate::{auth::session_context::SessionContext, errors::ApiError};
 use chrono::{DateTime, Utc};
-use db::access_event::AccessEventListQueryParams;
+use db::access_event::{AccessEventListItemForTenant, AccessEventListQueryParams};
 use newtypes::{DataKind, FootprintUserId};
 use paperclip::actix::{api_v2_operation, get, web, web::Json, Apiv2Schema};
 
@@ -63,11 +63,11 @@ fn handler(
         kinds: data_kinds,
     };
     let results =
-        db::access_event::list_for_tenant(&state.db_pool, params, cursor, (page_size + 1) as i64).await?;
+        AccessEventListItemForTenant::get(&state.db_pool, params, cursor, (page_size + 1) as i64).await?;
 
     // If there are more than page_size results, we should tell the client there's another page
     let cursor = if results.len() > page_size {
-        results.last().map(|x| x.0.ordering_id)
+        results.last().map(|x| x.event.ordering_id)
     } else {
         None
     };

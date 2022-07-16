@@ -1,6 +1,5 @@
 use chrono::{DateTime, Utc};
-use db::models::onboardings::Onboarding;
-use db::models::{access_events::AccessEvent, insight_event::InsightEvent};
+use db::access_event::{AccessEventListItemForTenant, AccessEventListItemForUser};
 use newtypes::{DataKind, FootprintUserId, TenantId};
 use paperclip::actix::Apiv2Schema;
 
@@ -18,17 +17,44 @@ pub struct ApiAccessEvent {
     pub insight_event: Option<ApiInsightEvent>,
 }
 
-impl From<(AccessEvent, Onboarding, Option<InsightEvent>)> for ApiAccessEvent {
-    fn from(s: (AccessEvent, Onboarding, Option<InsightEvent>)) -> Self {
+impl From<AccessEventListItemForTenant> for ApiAccessEvent {
+    fn from(evt: AccessEventListItemForTenant) -> Self {
+        let AccessEventListItemForTenant {
+            event,
+            onboarding,
+            insight,
+        } = evt;
+
         ApiAccessEvent {
-            fp_user_id: s.1.user_ob_id,
-            tenant_id: s.1.tenant_id,
-            data_kinds: s.0.data_kinds,
-            reason: s.0.reason,
-            principal: s.0.principal,
-            timestamp: s.0.timestamp,
-            ordering_id: s.0.ordering_id,
-            insight_event: s.2.map(ApiInsightEvent::from),
+            fp_user_id: onboarding.user_ob_id,
+            tenant_id: onboarding.tenant_id,
+            data_kinds: event.data_kinds,
+            reason: event.reason,
+            principal: event.principal,
+            timestamp: event.timestamp,
+            ordering_id: event.ordering_id,
+            insight_event: insight.map(ApiInsightEvent::from),
+        }
+    }
+}
+
+impl From<AccessEventListItemForUser> for ApiAccessEvent {
+    fn from(evt: AccessEventListItemForUser) -> Self {
+        let AccessEventListItemForUser {
+            event,
+            tenant_name,
+            onboarding,
+        } = evt;
+
+        ApiAccessEvent {
+            fp_user_id: onboarding.user_ob_id,
+            tenant_id: onboarding.tenant_id,
+            data_kinds: event.data_kinds,
+            reason: event.reason,
+            principal: Some(tenant_name), // we don't want to leak any principal, just the tenant name
+            timestamp: event.timestamp,
+            ordering_id: event.ordering_id,
+            insight_event: None, // we don't want to expose tenant location to end user
         }
     }
 }

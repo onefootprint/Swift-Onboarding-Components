@@ -3,6 +3,7 @@ use crate::errors::ApiError;
 use crate::types::access_event::ApiAccessEvent;
 use crate::types::success::ApiResponseData;
 use crate::State;
+use db::access_event::AccessEventListItemForUser;
 use newtypes::DataKind;
 use paperclip::actix::{api_v2_operation, get, web, web::Json, Apiv2Schema};
 
@@ -25,7 +26,7 @@ fn handler(
     user_auth: SessionContext<My1fpBasicSession>,
 ) -> actix_web::Result<Json<ApiResponseData<AccessEventResponse>>, ApiError> {
     // TODO paginate the response when there are too many results
-    let results = db::access_event::list(
+    let results = AccessEventListItemForUser::get(
         &state.db_pool,
         user_auth.data.user_vault_id,
         request.data_kind.map(DataKind::from),
