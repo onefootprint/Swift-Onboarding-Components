@@ -36,7 +36,7 @@ pub async fn handler(
     let phone_number = twilio_client.standardize(&req.phone_number).await?;
 
     let (challenge_state_data, time_before_retry_s) =
-        twilio_client.send_challenge(&state, phone_number).await?;
+        twilio_client.send_challenge(&state, &phone_number).await?;
 
     let challenge_state = IdentifyChallengeState {
         identify_type: req.identify_type,

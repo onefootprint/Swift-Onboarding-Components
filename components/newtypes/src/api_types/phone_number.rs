@@ -134,6 +134,12 @@ impl ValidatedPhoneNumber {
     pub fn is_live(&self) -> bool {
         self.suffix.is_empty()
     }
+
+    pub fn leak_last_two(&self) -> String {
+        let mut phone_number = self.e164.leak().to_owned();
+        let len = phone_number.len();
+        phone_number.drain((len - 2)..len).into_iter().collect()
+    }
 }
 
 impl Decomposable for ValidatedPhoneNumber {

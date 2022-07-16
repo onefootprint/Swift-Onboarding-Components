@@ -196,7 +196,7 @@ impl TwilioClient {
     pub async fn send_challenge(
         &self,
         state: &State,
-        destination: ValidatedPhoneNumber,
+        destination: &ValidatedPhoneNumber,
     ) -> Result<(PhoneChallengeState, SecondsBeforeRetry), ApiError> {
         let code = crypto::random::gen_rand_n_digit_code(6);
         let message_body = format!("Your {} verification code is {}. Don't share your code with anyone. We will never contact you to request this code.", &self.rp_id, &code);
@@ -209,7 +209,7 @@ impl TwilioClient {
 
         Ok((
             PhoneChallengeState {
-                phone_number: destination,
+                phone_number: destination.clone(),
                 h_code: sha256(code.as_bytes()).to_vec(),
             },
             time_before_retry_s,

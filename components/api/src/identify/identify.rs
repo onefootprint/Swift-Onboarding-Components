@@ -94,7 +94,7 @@ pub async fn handler(
         .get_decrypted_field(&state, DataKind::PhoneCountry)
         .await?
         .ok_or(ApiError::NoPhoneNumberForVault)?;
-    let e164_phone_number =
+    let validated_phone_number =
         ValidatedPhoneNumber::__build_from_vault(phone_number.clone(), phone_country.clone())?;
 
     // Initiate the challenge of the requested type
@@ -111,8 +111,9 @@ pub async fn handler(
                         Some(challenge.challenge_json),
                     )
                 } else {
-                    let (challenge_state, time_before_retry_s) =
-                        twilio_client.send_challenge(&state, e164_phone_number).await?;
+                    let (challenge_state, time_before_retry_s) = twilio_client
+                        .send_challenge(&state, &validated_phone_number)
+                        .await?;
                     (
                         ChallengeKind::Sms,
                         IdentifyChallengeData::Sms(challenge_state),
@@ -123,8 +124,9 @@ pub async fn handler(
             }
             ChallengeKind::Sms => {
                 // Fall back to SMS if the user requested webauthn but doesn't have any creds
-                let (challenge_state, time_before_retry_s) =
-                    twilio_client.send_challenge(&state, e164_phone_number).await?;
+                let (challenge_state, time_before_retry_s) = twilio_client
+                    .send_challenge(&state, &validated_phone_number)
+                    .await?;
                 (
                     ChallengeKind::Sms,
                     IdentifyChallengeData::Sms(challenge_state),
@@ -151,7 +153,7 @@ pub async fn handler(
             challenge_data: Some(UserChallengeData {
                 challenge_kind,
                 challenge_token,
-                phone_number_last_two: phone_number_last_two(phone_number),
+                phone_number_last_two: validated_phone_number.leak_last_two(),
                 phone_country,
                 biometric_challenge_json,
                 time_before_retry_s,
@@ -231,10 +233,4 @@ async fn initiate_biometric_challenge_for_user(
         },
         challenge_json: serde_json::to_string(&challenge)?,
     })
-}
-
-fn phone_number_last_two(phone_number: String) -> String {
-    let mut phone_number = phone_number;
-    let len = phone_number.len();
-    phone_number.drain((len - 2)..len).into_iter().collect()
 }
