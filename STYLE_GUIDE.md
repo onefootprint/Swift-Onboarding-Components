@@ -42,6 +42,7 @@ So when making style comments, let's make sure they are using our own consistent
   - Favor normalized data over denormalized columns. Denormalized data is hard to keep synchronized. it is okay to denormalize a piece of data under two conditions:
     - The data being denormalized is static and isn't frequently changed
     - Denormalizing the data will drastically reduce complexity in code and save lots of JOINs. For example, if you have tables A foreign keys to B foreign keys to C, and you very frequently need to fetch data on JOINed rows from A and C, you may be joining _through_ table B without ever reading data from table B. This is a case when it may be worthwhile to denormalize a foreign key from A to C
+  - Favor setting default values for columns inside application code where possible since DB-level defaults are easy to forget about. Only add db-level defaults to columns that aren't set explicitly in application code
 - Newtypes:
   - anything returned by our API and used inside the Database model should be a Newtype
   - use Newtypes to represent structured primitives (like a String that represents an encrypted token for example)
