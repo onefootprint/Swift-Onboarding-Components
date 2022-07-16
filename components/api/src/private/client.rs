@@ -1,5 +1,4 @@
 use crate::types::success::ApiResponseData;
-use crate::utils::sandbox::default_is_live;
 use crate::State;
 use crate::{enclave::gen_keypair, errors::ApiError};
 use crypto::random::gen_random_alphanumeric_code;
@@ -19,7 +18,6 @@ struct NewClientRequest {
     /// example: onefootprint.com, gmail.com
     /// used for login gating
     email_domain: String,
-    #[serde(default = "default_is_live")]
     is_live: bool,
     /// list of data kinds that this tenant requires collecting
     must_collect_data_kinds: Vec<DataKind>,

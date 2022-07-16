@@ -14,36 +14,35 @@ from .constants import (
     CAN_ACCESS_DATA_KINDS,
 )
 
-def cleanup(phone_number, email, is_live):
+def cleanup(phone_number, email):
     # cleanup live user
-    path = "private/cleanup?phone_number={0}&is_live={1}".format(phone_number.replace("#", "%23%0A"), is_live)
+    path = "private/cleanup"
     r = requests.post(
         url(path),
+        json=dict(phone_number=phone_number)
     )
-    assert r.status_code == 200
+    _assert_response(r)
     identify_path = "identify"
     identifier = {"email": email}
-    is_live = True if is_live == "true" else False
-    data = {"identifier": identifier, "preferred_challenge_kind": "sms", "is_live": is_live}
+    data = {"identifier": identifier, "preferred_challenge_kind": "sms"}
     r = requests.post(
         url(identify_path),
         json=data,
     )
-    assert r.status_code == 200    
-    body = r.json()
+    body = _assert_response(r)
     assert not body["data"]["user_found"]
     assert not body["data"].get("challenge_data", dict())
 
 
 # runs before all integration tests
 def pytest_sessionstart(session):
-    cleanup(PHONE_NUMBER, EMAIL, "true")
-    cleanup(SANDBOX_PHONE_NUMBER, SANDBOX_EMAIL, "false")
+    cleanup(PHONE_NUMBER, EMAIL)
+    cleanup(SANDBOX_PHONE_NUMBER, SANDBOX_EMAIL)
 
 # runs after all integration tests
 def pytest_sessionfinish(session, exitstatus):
-    cleanup(PHONE_NUMBER, EMAIL, "true")
-    cleanup(SANDBOX_PHONE_NUMBER, SANDBOX_EMAIL, "false")
+    cleanup(PHONE_NUMBER, EMAIL)
+    cleanup(SANDBOX_PHONE_NUMBER, SANDBOX_EMAIL)
 
 
 # order to run tests in
@@ -76,6 +75,7 @@ def workos_tenant():
         "email_domain": "onefootprint.com",
         "must_collect_data_kinds": MUST_COLLECT_DATA_KINDS,
         "can_access_data_kinds": CAN_ACCESS_DATA_KINDS,
+        "is_live": True,
     }
     r = requests.post(url(path), json=data)
     body = _assert_response(r)
@@ -100,6 +100,7 @@ def workos_sandbox():
         "is_live": False,
         "must_collect_data_kinds": MUST_COLLECT_DATA_KINDS,
         "can_access_data_kinds": CAN_ACCESS_DATA_KINDS,
+        "is_live": False,
     }
     r = requests.post(url(path), json=data)
     body = _assert_response(r)
@@ -121,6 +122,7 @@ def foo_tenant():
         "email_domain": "foo.bar",
         "must_collect_data_kinds": MUST_COLLECT_DATA_KINDS,
         "can_access_data_kinds": CAN_ACCESS_DATA_KINDS,
+        "is_live": True,
     }
     r = requests.post(url(path), json=data)
     body = _assert_response(r)

@@ -4,8 +4,7 @@ use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use diesel::{Insertable, PgConnection, QueryDsl, Queryable};
 use newtypes::{
-    EncryptedVaultPrivateKey, Fingerprint, LiveModeConsistency, SealedVaultBytes, Status, UserVaultId,
-    VaultPublicKey,
+    EncryptedVaultPrivateKey, Fingerprint, SealedVaultBytes, Status, UserVaultId, VaultPublicKey,
 };
 use serde::{Deserialize, Serialize};
 
@@ -19,22 +18,6 @@ pub struct UserVault {
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
     pub is_live: bool,
-}
-
-impl LiveModeConsistency for UserVault {
-    type Error = crate::errors::DbError;
-
-    fn is_live(&self) -> bool {
-        self.is_live
-    }
-
-    fn mismatch_self_is_live(&self) -> Self::Error {
-        crate::errors::DbError::LiveUserInSandbox
-    }
-
-    fn mismatch_self_is_sandbox(&self) -> Self::Error {
-        crate::errors::DbError::SandboxUserInLive
-    }
 }
 
 impl UserVault {

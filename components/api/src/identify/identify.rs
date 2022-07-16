@@ -6,7 +6,6 @@ use crate::errors::ApiError;
 use crate::types::success::ApiResponseData;
 use crate::utils::challenge::{Challenge, ChallengeToken};
 use crate::utils::liveness::LivenessWebauthnConfig;
-use crate::utils::sandbox::default_is_live;
 use crate::utils::twilio::TwilioClient;
 use crate::utils::user_vault_wrapper::UserVaultWrapper;
 use crate::State;
@@ -15,9 +14,7 @@ use db::models::user_vaults::UserVault;
 use db::models::webauthn_credential::WebauthnCredential;
 use db::webauthn_credentials::get_webauthn_creds;
 use newtypes::email::Email;
-use newtypes::{
-    DataKind, Fingerprinter, LiveModeConsistency, PhoneNumber, PiiString, UserVaultId, ValidatedPhoneNumber,
-};
+use newtypes::{DataKind, Fingerprinter, PhoneNumber, PiiString, UserVaultId, ValidatedPhoneNumber};
 use paperclip::actix::{api_v2_operation, web, web::Json, Apiv2Schema};
 use webauthn_rs_core::proto::{Base64UrlSafeData, Credential, ParsedAttestation, ParsedAttestationData};
 use webauthn_rs_proto::{RegisteredExtensions, UserVerificationPolicy};
@@ -29,8 +26,6 @@ pub struct IdentifyRequest {
     preferred_challenge_kind: ChallengeKind,
     #[serde(default)]
     identify_type: IdentifyType,
-    #[serde(default = "default_is_live")]
-    is_live: bool,
 }
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
@@ -69,7 +64,6 @@ pub async fn handler(
         identifier,
         preferred_challenge_kind,
         identify_type,
-        is_live,
     } = request.into_inner();
 
     // Fall back to SMS if the user requested webauthn but doesn't have any creds
@@ -88,9 +82,6 @@ pub async fn handler(
                 },
             }));
         };
-
-    // check that user vault is what we expect
-    existing_user.ensure_live_consistency(is_live)?;
 
     // The user vault exists. Extract the phone number for the user
     let user_id = existing_user.id.clone();
@@ -146,7 +137,6 @@ pub async fn handler(
     let challenge_state = IdentifyChallengeState {
         identify_type,
         data: challenge_state_data,
-        is_live,
     };
 
     let challenge_token = Challenge {

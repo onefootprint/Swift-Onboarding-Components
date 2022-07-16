@@ -10,4 +10,6 @@ pub enum OnboardingError {
     OnboardingForTenantDoesNotExist,
     #[error("webauthn credential not set")]
     WebauthnCredentialsNotSet,
+    #[error("Sandbox phone numbers must be provided in sandbox mode")]
+    InvalidSandboxState,
 }

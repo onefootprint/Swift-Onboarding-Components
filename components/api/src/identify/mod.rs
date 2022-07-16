@@ -44,7 +44,6 @@ pub fn routes() -> web::Scope {
 pub struct IdentifyChallengeState {
     identify_type: IdentifyType,
     data: IdentifyChallengeData,
-    is_live: bool,
 }
 
 #[derive(Debug, serde::Serialize, serde::Deserialize, PartialEq, Clone, Copy, Apiv2Schema)]

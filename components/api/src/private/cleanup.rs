@@ -21,7 +21,7 @@ pub struct CleanupResponse {
 /// Private endpoint to clean up specific integration test user information
 async fn post(
     state: web::Data<State>,
-    number: web::Query<PhoneNumber>,
+    request: web::Json<PhoneNumber>,
 ) -> actix_web::Result<Json<ApiResponseData<CleanupResponse>>, ApiError> {
     // allowed deletion #s
     let allowed_deletion_numbers: Vec<newtypes::PhoneNumber> = vec![
@@ -37,7 +37,7 @@ async fn post(
     .map(newtypes::PhoneNumber::from_str)
     .collect::<Result<Vec<_>, _>>()?;
 
-    let requested_number = number.phone_number.clone();
+    let requested_number = request.phone_number.clone();
 
     if !(allowed_deletion_numbers.contains(&requested_number)
         || requested_number == state.config.integration_test_phone_number

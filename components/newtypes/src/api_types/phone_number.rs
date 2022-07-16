@@ -1,4 +1,4 @@
-use crate::{DataKind, Decomposable, LiveModeConsistency, PhoneError, PiiString};
+use crate::{DataKind, Decomposable, PhoneError, PiiString};
 
 pub use derive_more::{Add, Display, From, FromStr, Into};
 use paperclip::actix::Apiv2Schema;
@@ -18,21 +18,9 @@ impl PhoneNumber {
     pub fn leak(&self) -> &str {
         self.number.leak()
     }
-}
-
-impl LiveModeConsistency for PhoneNumber {
-    type Error = crate::Error;
 
     fn is_live(&self) -> bool {
         self.suffix.is_empty()
-    }
-
-    fn mismatch_self_is_live(&self) -> Self::Error {
-        crate::Error::from(crate::PhoneError::SandboxPhoneExpected)
-    }
-
-    fn mismatch_self_is_sandbox(&self) -> Self::Error {
-        crate::Error::from(crate::PhoneError::LivePhoneExpected)
     }
 }
 
@@ -49,27 +37,19 @@ impl FromStr for PhoneNumber {
     type Err = crate::Error;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let is_live = !s.contains('#');
-        // if we're in sandbox mode, leave number as is
-        if !is_live {
+        let (number, suffix) = if s.contains('#') {
             let split = s.split('#').collect::<Vec<&str>>();
-            if split.len() != 2 {
-                return Err(crate::PhoneError::InvalidSandboxNumber)?;
+            if split.len() != 2 || !split[1].chars().all(|x| x.is_alphanumeric()) {
+                return Err(crate::PhoneError::InvalidSandboxNumber.into());
             }
-            let number = sanitize_phone(split[0])?;
-            let suffix = split[1]
-                .chars()
-                .filter(|c| c.is_alphanumeric())
-                .collect::<String>();
-            return Ok(PhoneNumber {
-                number: PiiString::from(format!("+{}", number)),
-                suffix,
-            });
+            (split[0], split[1])
+        } else {
+            (s, "")
         };
-        let sanitized = sanitize_phone(s)?;
+        let sanitized = sanitize_phone(number)?;
         Ok(PhoneNumber {
             number: PiiString::from(format!("+{}", sanitized)),
-            suffix: "".to_string(),
+            suffix: suffix.to_owned(),
         })
     }
 }
@@ -149,6 +129,10 @@ impl ValidatedPhoneNumber {
         } else {
             PiiString::from(format!("{}#{}", self.e164.leak(), self.suffix))
         }
+    }
+
+    pub fn is_live(&self) -> bool {
+        self.suffix.is_empty()
     }
 }
 
