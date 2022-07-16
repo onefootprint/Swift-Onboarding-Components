@@ -142,13 +142,15 @@ def user(workos_sandbox_tenant, twilio):
     sandbox_email = _random_sandbox_email()
 
     # Initiate the challenge to a sandbox phone number
-    data = {"phone_number": sandbox_phone_number}
-    r = requests.post(
-        url("identify/challenge"),
-        json=data,
-    )
-    body = _assert_response(r)
-    challenge_token = body["data"]["challenge_token"]
+    def initiate_challenge():
+        data = {"phone_number": sandbox_phone_number}
+        r = requests.post(
+            url("identify/challenge"),
+            json=data,
+        )
+        body = _assert_response(r)
+        return body["data"]["challenge_token"]
+    challenge_token = try_until_success(initiate_challenge, 20)  # Rate limiting may take a while
 
     # Respond to the challenge and create the sandbox user
     def identify_verify():

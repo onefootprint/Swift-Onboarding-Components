@@ -157,7 +157,7 @@ impl TwilioClient {
 
     async fn send_message(
         &self,
-        destination: ValidatedPhoneNumber,
+        destination: &ValidatedPhoneNumber,
         body: String,
     ) -> Result<TwilioMessageResponse, ApiError> {
         let account_sid = self.account_sid.clone();
@@ -165,14 +165,14 @@ impl TwilioClient {
 
         #[derive(Serialize)]
         #[serde(rename_all = "PascalCase")]
-        struct SendForm {
+        struct SendForm<'a> {
             body: String,
-            to: PiiString,
+            to: &'a PiiString,
             from: String,
         }
         let params = SendForm {
             body,
-            to: destination.e164,
+            to: &destination.e164,
             from: self.source_phone_number.to_string(),
         };
 
@@ -202,10 +202,10 @@ impl TwilioClient {
         let message_body = format!("Your {} verification code is {}. Don't share your code with anyone. We will never contact you to request this code.", &self.rp_id, &code);
 
         let time_before_retry_s = self
-            .rate_limit(state, destination.clone(), rate_limit::SMS_CHALLENGE)
+            .rate_limit(state, destination, rate_limit::SMS_CHALLENGE)
             .await?;
 
-        self.send_message(destination.clone(), message_body).await?;
+        self.send_message(destination, message_body).await?;
 
         Ok((
             PhoneChallengeState {
@@ -219,19 +219,17 @@ impl TwilioClient {
     pub async fn send_d2p(
         &self,
         state: &State,
-        destination: ValidatedPhoneNumber,
+        destination: &ValidatedPhoneNumber,
         base_url: String,
         auth_token: SessionAuthToken,
     ) -> Result<SecondsBeforeRetry, ApiError> {
-        let time_before_retry_s = self
-            .rate_limit(state, destination.clone(), rate_limit::D2P_LINK)
-            .await?;
+        let time_before_retry_s = self.rate_limit(state, destination, rate_limit::D2P_LINK).await?;
 
         let message_body = format!(
             "Hello from {}! Continue signing up for your account here: {}#{}",
             self.rp_id, base_url, auth_token
         );
-        self.send_message(destination.clone(), message_body).await?;
+        self.send_message(destination, message_body).await?;
 
         Ok(time_before_retry_s)
     }
@@ -239,13 +237,12 @@ impl TwilioClient {
     async fn rate_limit(
         &self,
         state: &State,
-        phone_number: ValidatedPhoneNumber,
+        phone_number: &ValidatedPhoneNumber,
         scope: &str,
     ) -> Result<SecondsBeforeRetry, ApiError> {
-        let h_session_id = Base64Data(
-            sha256(format!("{}:{}", phone_number.to_piistring().leak(), scope).as_bytes()).to_vec(),
-        )
-        .to_string();
+        let h_session_id =
+            Base64Data(sha256(format!("{}:{}", phone_number.e164.leak(), scope).as_bytes()).to_vec())
+                .to_string();
 
         let now = Utc::now();
         let time_between_challenges_s = self.time_s_between_challenges;

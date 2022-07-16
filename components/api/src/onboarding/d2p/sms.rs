@@ -39,7 +39,7 @@ pub fn handler(
     let time_before_retry_s = twilio_client
         .send_d2p(
             &state,
-            phone_number,
+            &phone_number,
             request.base_url.clone(),
             user_auth.auth_token,
         )
