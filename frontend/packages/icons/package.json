@@ -8,7 +8,8 @@
     "lint": "eslint src --fix",
     "generate:icos": "node ./src/scripts/icos/generate.js",
     "generate:flags": "node ./src/scripts/flags/generate.js",
-    "generate": "yarn generate:icos && yarn generate:flags && prettier --write \"./**/*.{ts,tsx,md}\" && eslint --fix \"./**/*.{ts,tsx,md}\""
+    "generate": "yarn generate:icos && yarn generate:flags && prettier --write \"./**/*.{ts,tsx,md}\" && eslint --fix \"./**/*.{ts,tsx,md}\"",
+    "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
   },
   "devDependencies": {
     "@svgr/core": "^6.2.1",

@@ -14,7 +14,8 @@
     "format:fix": "prettier --write \"**/*.{ts,tsx,md}\"",
     "lint": "turbo run lint",
     "prepare": "husky install",
-    "test": "turbo run test"
+    "test": "turbo run test",
+    "clean": "turbo run clean && rm -rf node_modules"
   },
   "devDependencies": {
     "esbuild": "^0.14.38",

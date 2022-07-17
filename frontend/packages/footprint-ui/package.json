@@ -10,7 +10,9 @@
     "test": "jest --coverage",
     "test:watch": "jest --watch",
     "lint": "eslint src --fix",
-    "dev": "start-storybook -p 3008"
+    "dev": "start-storybook -p 3008",
+    "build": "build-storybook",
+    "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
   },
   "dependencies": {
     "icons": "*",

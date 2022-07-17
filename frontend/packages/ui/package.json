@@ -11,7 +11,8 @@
     "test:watch": "jest --watch",
     "lint": "eslint src --fix",
     "dev": "start-storybook -p 3007",
-    "build": "build-storybook"
+    "build": "build-storybook",
+    "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
   },
   "dependencies": {
     "@popperjs/core": "^2.11.5",
