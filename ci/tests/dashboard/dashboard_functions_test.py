@@ -1,14 +1,12 @@
-from urllib.parse import urlencode
-import requests
+from urllib.parse import quote
 import arrow
 from tests.constants import EMAIL, FIELDS_TO_DECRYPT
-from tests.utils import _client_priv_key_headers, _assert_response, url
+from tests.utils import get, post
 
 
 class TestDashboard:
     def test_tenant_decrypt(self, user):
         tenant = user.tenant
-        path = "org/decrypt"
         expected_data = dict(
             first_name=user.first_name,
             last_name=user.last_name,
@@ -25,41 +23,25 @@ class TestDashboard:
                 "attributes": attributes,
                 "reason": "Doing a hecking decrypt",
             }
-            r = requests.post(
-                url(path),
-                headers=_client_priv_key_headers(tenant["sk"]),
-                json=data,
-            )
-            body = _assert_response(r)
+            body = post("org/decrypt", data, tenant.sk)
             attributes = body["data"]
             for data_kind, value in attributes.items():
                 assert expected_data[data_kind].upper() == value.upper()
 
     def test_tenant_decrypt_no_permissions(self, user):
         tenant = user.tenant
-        path = "org/decrypt"
         data = {
             "footprint_user_id": user.fp_user_id,
             "attributes": ["city"],
             "reason": "Not doing a hecking decrypt",
         }
-        r = requests.post(
-            url(path),
-            headers=_client_priv_key_headers(tenant["sk"]),
-            json=data,
-        )
-        _assert_response(r, status_code=401)
+        post("org/decrypt", data, tenant.sk, status_code=401)
         
     def test_onboardings_list(self, user):
         tenant = user.tenant
         # TODO don't filter on fp_user_id in this test. We only do it to ensure it doesn't flake in dev
         # https://linear.app/footprint/issue/FP-390/integration-tests-for-onboarding-list-break-in-dev
-        path = "org/onboardings?fp_user_id={user.fp_user_id}"
-        r = requests.get(
-            url(path),
-            headers=_client_priv_key_headers(tenant["sk"]),  
-        )
-        body = _assert_response(r)
+        body = get("org/onboardings", dict(fp_user_id=user.fp_user_id), tenant.sk)
         onboardings = body["data"]
         assert len(onboardings)
         assert onboardings[0]["footprint_user_id"] == user.fp_user_id
@@ -67,24 +49,14 @@ class TestDashboard:
 
     def test_liveness_list(self, user):
         tenant = user.tenant
-        path = f"org/liveness?footprint_user_id={user.fp_user_id}"
-        r = requests.get(
-            url(path),
-            headers=_client_priv_key_headers(tenant["sk"]),
-        )
-        body = _assert_response(r)
+        body = get("org/liveness", dict(footprint_user_id=user.fp_user_id), tenant.sk)
         creds = body["data"]
         assert len(creds)
         assert creds[0]["insight_event"]
 
     def test_access_events_list(self, user):
         tenant = user.tenant
-        path = f"org/access_events?footprint_user_id={user.fp_user_id}"
-        r = requests.get(
-            url(path),
-            headers=_client_priv_key_headers(tenant["sk"]),  
-        )
-        body = _assert_response(r)
+        body = get("org/access_events", dict(footprint_user_id=user.fp_user_id), tenant.sk)
         access_events = body["data"]
         assert len(access_events) == len(FIELDS_TO_DECRYPT)
         for i, expected_fields in enumerate(FIELDS_TO_DECRYPT[-1:0]):
@@ -92,13 +64,11 @@ class TestDashboard:
 
         # Test filtering on kinds. We provide two different kinds, and we should get all access events
         # that contain at least one of these fields
-        path = f"org/access_events?footprint_user_id={user.fp_user_id}&data_kinds=email,street_address"
-        r = requests.get(
-            url(path),
-            headers=_client_priv_key_headers(tenant["sk"]),
-            # TODO params
-        )
-        body = _assert_response(r)
+        # https://linear.app/footprint/issue/FP-641/fix-test-for-access-events-querystring
+        # TODO we should be able to pass this as a dict. I think the server is expecting the
+        # querystring to not be urlencoded
+        params = f"footprint_user_id={user.fp_user_id}&data_kinds=email,street_address"
+        body = get("org/access_events", params, tenant.sk)
         access_events = body["data"]
         assert len(access_events) == 2
         assert "email" in set(access_events[0]["data_kinds"])
@@ -108,10 +78,5 @@ class TestDashboard:
         params = dict(
             timestamp_gte=arrow.utcnow().shift(days=1).isoformat()
         )
-        path = f"org/access_events?{urlencode(params)}"
-        r = requests.get(
-            url(path),
-            headers=_client_priv_key_headers(tenant["sk"]),
-        )
-        body = _assert_response(r)
+        body = get("org/access_events", params, tenant.sk)
         assert not body["data"]

@@ -1,3 +1,4 @@
+import requests
 import base64
 import json
 import random
@@ -5,9 +6,45 @@ import arrow
 import time
 import os 
 
-from .constants import D2P_AUTH_HEADER, EMAIL, FPUSER_AUTH_HEADER, MY1FP_AUTH_HEADER, PHONE_NUMBER, TENANT_AUTH_HEADER, TENANT_SECRET_HEADER
+from .constants import EMAIL, PHONE_NUMBER
 
 url = lambda path: "{}/{}".format(os.environ.get('TEST_URL'), path)
+
+def _make_request(method, path, data, params, status_code, auths):
+    headers = {
+        auth.HEADER_NAME: auth.token
+        for auth in auths
+    }
+    response = method(
+        url(path),
+        headers=headers,
+        json=data,
+        params=params,
+    )
+    if response.status_code != status_code:
+        print(f"\nFailed request\nPath: {path}\nData: {data}\nParams: {params}\nHeaders: {headers}\nReponse: {response.content}")
+        assert False, f"Incorrect status code in {method.__name__.upper()} {path}. Got {response.status_code}, expected {status_code}:\n{response.content}"
+    return response.json()
+
+def get(path, params=None, *auths, status_code=200):
+    return _make_request(
+        method=requests.get,
+        path=path,
+        data=None,
+        params=params,
+        status_code=status_code,
+        auths=auths,
+    )
+
+def post(path, data=None, *auths, status_code=200):
+    return _make_request(
+        method=requests.post,
+        path=path,
+        data=data,
+        params=None,
+        status_code=status_code,
+        auths=auths,
+    )
 
 def try_until_success(fn, timeout_s=5, retry_interval_s=1):
     start_time = arrow.now()
@@ -35,37 +72,6 @@ def _random_sandbox_email():
 
 def _gen_random_ssn():
     return _gen_random_n_digit_number(9)
-
-def _client_pub_key_headers(client_public_key):
-    return {
-        TENANT_AUTH_HEADER: client_public_key,
-    }
-
-def _client_priv_key_headers(client_priv_key):
-    return {
-        TENANT_SECRET_HEADER: client_priv_key,
-    }
-
-def _fpuser_auth_header(value):
-    return {
-        FPUSER_AUTH_HEADER: value
-    }
-
-def _my1fp_auth_header(value):
-    return {
-        MY1FP_AUTH_HEADER: value
-    }
-
-def _d2p_auth_header_raw(value):
-    return {
-        D2P_AUTH_HEADER: value
-    }
-
-def _assert_response(response, status_code=200, msg="Incorrect status code"):
-    if response.status_code != status_code:
-        print(response.content)
-        assert False, msg
-    return response.json()
 
 def _pretty_print_json_str(o):
     print(_pretty_print_json(json.loads(o)))

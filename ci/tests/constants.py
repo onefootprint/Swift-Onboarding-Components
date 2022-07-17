@@ -8,12 +8,6 @@ def get_secret(name):
         return os.getenv(name)
     return environ
 
-TENANT_AUTH_HEADER = "x-client-public-key"
-TENANT_SECRET_HEADER = "x-client-secret-key"
-FPUSER_AUTH_HEADER = "x-fpuser-authorization"
-D2P_AUTH_HEADER = "x-d2p-authorization"
-MY1FP_AUTH_HEADER = "X-My1fp-Authorization"
-
 WORKOS_ORG_ID = "org_01G39KR1V1E52JEZV6BYNG590J"
 DEFAULT_ATTRIBUTES = {
         'first_name', 

@@ -1,14 +1,8 @@
-import requests
-from tests.utils import url, _client_pub_key_headers, _assert_response
+from tests.utils import get
 from tests.constants import MUST_COLLECT_DATA_KINDS, CAN_ACCESS_DATA_KINDS
 
-def test_get_org_config(request, workos_tenant):
-    path = "org/config"
-    r = requests.get(
-        url(path),
-        headers=_client_pub_key_headers(workos_tenant["pk"]),
-    )
-    body = _assert_response(r)
+def test_get_org_config(workos_tenant):
+    body = get("org/config", None, workos_tenant.pk)
     tenant = body['data']
     assert tenant['name'] == 'Acme Bank'
     assert tenant['settings'] == 'Empty'
