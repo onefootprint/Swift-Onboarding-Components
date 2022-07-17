@@ -1,4 +1,6 @@
 const throwOnConsoleErrors = () => {
+  // this is a function that will trigger an error if there's any console.error shown during the tests
+  // this is to make our tests very strict and catch potential problems that people would just ignore
   const originalConsoleError = console.error;
   let consoleErrorSpy = jest.spyOn(console, 'error');
   let didConsoleError = false;
@@ -6,17 +8,18 @@ const throwOnConsoleErrors = () => {
   const mockConsoleErrorImplementation = () => {
     consoleErrorSpy = jest.spyOn(console, 'error');
     consoleErrorSpy.mockImplementation((...args) => {
-      // except for this error we don't care about (which should not even exist in react in the first
-      // place, see here: https://github.com/reactwg/react-18/discussions/82), we want to explode on console.errors
-      if (
-        !args.some(
-          arg =>
-            typeof arg === 'string' &&
-            arg.includes(
-              "Can't perform a React state update on an unmounted component",
-            ),
-        )
-      ) {
+      // Every time a request fails (status code 4xx or 5xx), it shows a console error
+      // In this case, if the request came from the mock server, this was intended and therefore
+      // we should just remove to make the console cleaner and prevent the to break the test
+      const hasIgnored = args.some(arg => {
+        const isMockRequest = arg.response?.headers?.xPoweredBy === 'msw';
+        if (typeof arg === 'object' && isMockRequest) {
+          return true;
+        }
+        return false;
+      });
+
+      if (!hasIgnored) {
         originalConsoleError(...args);
         didConsoleError = true;
       }

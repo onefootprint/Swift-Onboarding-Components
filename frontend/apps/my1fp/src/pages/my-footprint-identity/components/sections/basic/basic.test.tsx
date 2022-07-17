@@ -1,6 +1,6 @@
 import React from 'react';
 import { useStore } from 'src/hooks/use-session-user';
-import { customRender, screen, userEvent } from 'test-utils';
+import { customRender, mockRequest, screen, userEvent } from 'test-utils';
 
 import Basic from './basic';
 
@@ -8,6 +8,29 @@ const originalState = useStore.getState();
 
 describe('<Basic />', () => {
   const renderBasic = () => customRender(<Basic />);
+
+  const withVerification = () => {
+    mockRequest({
+      method: 'post',
+      path: 'user/email',
+      response: {
+        data: 'Success',
+      },
+    });
+  };
+
+  const withVerificationError = () => {
+    mockRequest({
+      method: 'post',
+      path: 'user/email',
+      statusCode: 403,
+      response: {
+        error: {
+          message: 'Something bad happened',
+        },
+      },
+    });
+  };
 
   afterAll(() => {
     useStore.setState(originalState);
@@ -79,6 +102,7 @@ describe('<Basic />', () => {
 
     describe('when clicking on the verify button', () => {
       it('should display a loading indicator while the request is pending', async () => {
+        withVerification();
         renderBasic();
         const button = screen.getByRole('button', { name: 'Verify' });
         await userEvent.click(button);
@@ -90,6 +114,7 @@ describe('<Basic />', () => {
       });
 
       it('should display a confirmation if the request succeeds', async () => {
+        withVerification();
         renderBasic();
         const button = screen.getByRole('button', { name: 'Verify' });
         await userEvent.click(button);
@@ -103,6 +128,15 @@ describe('<Basic />', () => {
             'Please click the link we sent you by email to verify it.',
           ),
         ).toBeInTheDocument();
+      });
+
+      it('should display a confirmation if the request fails', async () => {
+        withVerificationError();
+        renderBasic();
+        const button = screen.getByRole('button', { name: 'Verify' });
+        await userEvent.click(button);
+        await screen.findByText('Something went wrong');
+        expect(screen.getByText('Something went wrong')).toBeInTheDocument();
       });
     });
   });

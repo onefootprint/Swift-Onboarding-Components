@@ -1,27 +1,30 @@
 import { useMutation } from 'react-query';
-import { RequestError } from 'request';
+import request, { RequestError, RequestResponse } from 'request';
 
 export type VerificationEmailRequest = {
-  authToken: string;
+  emailAddress: string;
 };
 
-export type VerifyResponse = string;
+export type VerificationEmailResponse = {
+  success: boolean;
+};
 
-// TODO: Make real integration
-// https://linear.app/footprint/issue/FP-499/verify-email
-const verificationEmail = async (
-  payload: VerificationEmailRequest,
-): Promise<VerifyResponse> =>
-  new Promise(resolve => {
-    console.log('making fake verify email request', payload);
-    setTimeout(() => {
-      resolve('success');
-    }, 250);
+const verificationEmailRequest = async (payload: VerificationEmailRequest) => {
+  const { data: response } = await request<
+    RequestResponse<VerificationEmailResponse>
+  >({
+    method: 'post',
+    url: '/user/email',
+    data: payload,
   });
+  return response.data;
+};
 
 const useVerificationEmail = () =>
-  useMutation<VerifyResponse, RequestError, VerificationEmailRequest>(
-    verificationEmail,
-  );
+  useMutation<
+    VerificationEmailResponse,
+    RequestError,
+    VerificationEmailRequest
+  >(verificationEmailRequest);
 
 export default useVerificationEmail;

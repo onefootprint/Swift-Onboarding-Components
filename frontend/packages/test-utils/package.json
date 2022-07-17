@@ -24,6 +24,7 @@
     "themes": "*",
     "tsconfig": "*",
     "typescript": "^4.7.3",
-    "ui": "*"
+    "ui": "*",
+    "msw": "^0.44.1"
   }
 }

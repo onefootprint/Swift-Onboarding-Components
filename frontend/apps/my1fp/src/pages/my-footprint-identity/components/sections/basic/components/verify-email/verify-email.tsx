@@ -1,23 +1,25 @@
 import { useTranslation } from 'hooks';
 import React from 'react';
+import useSessionUser from 'src/hooks/use-session-user';
 import { Box, LinkButton, LoadingIndicator, useToast } from 'ui';
 
 import useVerificationEmail from './hooks/use-verification-email';
 
-// TODO: https://linear.app/footprint/issue/FP-499/verify-email
-// Make real HTTP REQUEST
-// Mock request
-// Test error scenario
 const VerifyEmail = () => {
   const { t } = useTranslation(
     'pages.my-footprint-identity.basic.email.verify',
   );
   const toast = useToast();
+  const { data } = useSessionUser();
   const verificationEmailMutation = useVerificationEmail();
+  if (!data) {
+    return null;
+  }
+  const { email: emailAddress } = data;
 
   const handleVerifyClick = () => {
     verificationEmailMutation.mutate(
-      { authToken: 'fix-me' },
+      { emailAddress },
       {
         onSuccess: () => {
           toast.show({
