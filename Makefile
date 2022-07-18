@@ -106,4 +106,4 @@ setup-integration-tests:
 	@pip3 install -r ci/requirements.txt
 
 run-integration-tests:
-	TEST_URL="http://localhost:8000" pytest -x ci/integration_tests.py	
+	TEST_URL="http://localhost:8000" pytest ci/tests

@@ -76,19 +76,27 @@ async fn post(
     .await?;
 
     let obc = NewObConfiguration {
-        name: "Default".to_string(),
+        name: name.clone(),
         description: None,
         tenant_id: tenant.id.clone(),
         must_collect_data_kinds,
         can_access_data_kinds,
         settings: ObConfigurationSettings::Empty,
         is_live,
+        logo_url: Some("https://acmebank.onefootprint.com/logo-acme-bank.png".to_string()),
     };
     let obc = obc.save(&state.db_pool).await?;
 
     Ok(Json(ApiResponseData {
         data: NewClientResponse {
-            keys: init_api_keys(&state, &tenant, obc.key.clone(), name.to_string(), is_live).await?,
+            keys: init_api_keys(
+                &state,
+                &tenant,
+                obc.key.clone(),
+                "default_api_key".into(),
+                is_live,
+            )
+            .await?,
             configuration_id: obc.id,
             client_id: tenant.id,
         },

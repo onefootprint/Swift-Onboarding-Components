@@ -211,7 +211,7 @@ pip3 install -r ci/requirements.txt
 3. Now, you're ready to run your integration tests locally! You can point them at either an ephemeral environment OR a server running locally.
 
 ```
-TEST_URL="http://localhost:8000" pytest -x ci/integration_tests.py
+TEST_URL="http://localhost:8000" pytest -x ci/tests
 ```
 
 ## Accessing Logs & Metrics

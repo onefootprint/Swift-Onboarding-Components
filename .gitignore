@@ -10,3 +10,4 @@ infra/Pulumi.dev-*.yaml
 tls_proxy/*.crt
 tls_proxy/*.key
 tls_proxy/local_proxy.json
+**/__pycache__/

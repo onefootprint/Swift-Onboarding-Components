@@ -150,7 +150,7 @@ async fn complete(
 
             match &request.supplementary_attestation_data {
                 Some(app_attest) => {
-                    try_attest_apple_app_attestation(&reg, &metadata_json, app_attest.as_ref())
+                    try_attest_apple_app_attestation(&reg, metadata_json, app_attest.as_ref())
                         .map_err(|err| {
                             tracing::error!(error=?err, "failed to verify app attestation");
                         })

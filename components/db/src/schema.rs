@@ -71,6 +71,7 @@ table! {
         is_disabled -> Bool,
         can_access_data_kinds -> Array<Text>,
         is_live -> Bool,
+        logo_url -> Nullable<Text>,
     }
 }
 

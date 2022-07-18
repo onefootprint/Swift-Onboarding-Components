@@ -63,6 +63,15 @@ class TestMy1fp:
         assert user["first_name"].upper() == my1fp_authed_user.first_name.upper()
         assert user["last_name"].upper() == my1fp_authed_user.last_name.upper()
 
+    def test_logged_in_user_onboardings(self, my1fp_authed_user):
+        # Get the user detail using the logged in context
+        body = get("user/onboardings", None, my1fp_authed_user.auth_token)
+        onboardings = body["data"]
+
+        assert len(onboardings) != 0
+        assert onboardings[0]["authorized_data_kinds"]
+        assert onboardings[0]["name"]
+        
     def test_logged_in_access_events(self, my1fp_authed_user):
         tenant = my1fp_authed_user.tenant
         # Decrypt as the tenant in order to generate some access events

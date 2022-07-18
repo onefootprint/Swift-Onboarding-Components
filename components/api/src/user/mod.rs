@@ -16,6 +16,7 @@ pub mod data;
 pub mod decrypt;
 pub mod detail;
 pub mod email_verify;
+pub mod onboardings;
 
 pub fn routes() -> web::Scope {
     web::scope("/user")
@@ -24,6 +25,7 @@ pub fn routes() -> web::Scope {
         .service(email_verify::handler)
         .service(decrypt::handler)
         .service(access_events::handler)
+        .service(onboardings::handler)
         .service(biometric::init)
         .service(biometric::complete)
 }

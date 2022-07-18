@@ -1,4 +1,5 @@
 use crate::models::insight_event::InsightEvent;
+use crate::models::ob_configurations::ObConfiguration;
 use crate::models::onboardings::Onboarding;
 use crate::schema;
 use crate::DbPool;
@@ -58,7 +59,7 @@ pub fn count_for_tenant(conn: &mut PgConnection, params: OnboardingListQueryPara
     Ok(count)
 }
 
-// lists all onboardings across all configurations
+/// lists all onboardings across all configurations
 pub fn list_for_tenant(
     conn: &mut PgConnection,
     params: OnboardingListQueryParams,
@@ -128,4 +129,22 @@ pub async fn get_by_onboarding_id_and_tenant(
         })
         .await??;
     Ok(ob)
+}
+
+/// get onboardings by a specific user vault
+pub async fn list_for_user_vault(
+    pool: &DbPool,
+    user_vault_id: UserVaultId,
+) -> Result<Vec<(Onboarding, ObConfiguration, InsightEvent)>, DbError> {
+    let results = pool
+        .db_query(|conn| -> Result<_, DbError> {
+            let results = schema::onboardings::table
+                .filter(schema::onboardings::user_vault_id.eq(user_vault_id))
+                .inner_join(schema::ob_configurations::table)
+                .inner_join(schema::insight_events::table)
+                .get_results(conn)?;
+            Ok(results)
+        })
+        .await??;
+    Ok(results)
 }
