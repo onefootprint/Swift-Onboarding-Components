@@ -1,9 +1,12 @@
+use crate::auth::either::EitherSession;
+use crate::auth::session_context::HasUserVaultId;
 use crate::auth::session_data::user::d2p::D2pSession;
+use crate::auth::session_data::user::my_fp::My1fpBasicSession;
 use crate::auth::session_data::user::onboarding::OnboardingSession;
 use crate::auth::session_data::{ServerSession, SessionData};
+use crate::errors::ApiError;
 use crate::types::success::ApiResponseData;
 use crate::State;
-use crate::{auth::session_context::SessionContext, errors::ApiError};
 use chrono::Duration;
 use newtypes::SessionAuthToken;
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
@@ -20,10 +23,12 @@ pub struct GenerateResponse {
 /// and desktop.
 pub async fn handler(
     state: web::Data<State>,
-    user_auth: SessionContext<OnboardingSession>,
+    // TODO this should only allow a step-up my1fp auth
+    // https://linear.app/footprint/issue/FP-664/build-step-up-auth
+    user_auth: EitherSession<OnboardingSession, My1fpBasicSession>,
 ) -> actix_web::Result<Json<ApiResponseData<GenerateResponse>>, ApiError> {
     let session_data = SessionData::D2p(D2pSession {
-        user_vault_id: user_auth.data.user_vault_id,
+        user_vault_id: user_auth.user_vault_id(),
         ..D2pSession::default()
     });
 
