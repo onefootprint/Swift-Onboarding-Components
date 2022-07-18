@@ -10,7 +10,6 @@ use crate::utils::insight_headers::InsightHeaders;
 use crate::State;
 use db::models::access_events::NewAccessEvent;
 use db::models::insight_event::CreateInsightEvent;
-use db::models::ob_configurations::ObConfiguration;
 use newtypes::{DataKind, FootprintUserId};
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 use std::collections::{HashMap, HashSet};
@@ -45,7 +44,6 @@ fn handler(
     )
     .await?
     .ok_or(AuthError::InvalidTenantKeyOrUserId)?;
-    let ob_config = ObConfiguration::get_by_id(&state.db_pool, onboarding.ob_config_id.clone()).await?;
 
     let principal = if let Either::Left(workos) = auth.clone() {
         // A user in admin dashboard is decrypting - log the user's name and email
@@ -62,7 +60,7 @@ fn handler(
         &auth,
         &state,
         vault,
-        Some(&ob_config),
+        Some(&onboarding.id),
         request.attributes.clone().into_iter().collect(),
     )
     .await?;

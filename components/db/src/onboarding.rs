@@ -1,6 +1,7 @@
 use crate::models::insight_event::InsightEvent;
 use crate::models::ob_configurations::ObConfiguration;
 use crate::models::onboardings::Onboarding;
+use crate::models::onboardings::OnboardingLink;
 use crate::schema;
 use crate::DbPool;
 use crate::{errors::DbError, schema::onboardings::BoxedQuery};
@@ -104,8 +105,10 @@ pub async fn get(
     let ob = pool
         .db_query(|conn| -> Result<Option<Onboarding>, DbError> {
             let ob = schema::onboardings::table
-                .filter(schema::onboardings::ob_config_id.eq(id))
+                .inner_join(schema::onboarding_links::table)
+                .filter(schema::onboarding_links::ob_configuration_id.eq(id))
                 .filter(schema::onboardings::user_vault_id.eq(user_vault_id))
+                .select(schema::onboardings::all_columns)
                 .first(conn)
                 .optional()?;
             Ok(ob)
@@ -135,12 +138,16 @@ pub async fn get_by_onboarding_id_and_tenant(
 pub async fn list_for_user_vault(
     pool: &DbPool,
     user_vault_id: UserVaultId,
-) -> Result<Vec<(Onboarding, ObConfiguration, InsightEvent)>, DbError> {
+) -> Result<Vec<(Onboarding, OnboardingLink, ObConfiguration, InsightEvent)>, DbError> {
     let results = pool
         .db_query(|conn| -> Result<_, DbError> {
             let results = schema::onboardings::table
                 .filter(schema::onboardings::user_vault_id.eq(user_vault_id))
-                .inner_join(schema::ob_configurations::table)
+                .inner_join(schema::onboarding_links::table)
+                .inner_join(
+                    schema::ob_configurations::table
+                        .on(schema::ob_configurations::id.eq(schema::onboarding_links::ob_configuration_id)),
+                )
                 .inner_join(schema::insight_events::table)
                 .get_results(conn)?;
             Ok(results)

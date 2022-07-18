@@ -30,10 +30,12 @@ fn handler(
     state: web::Data<State>,
     user_auth: SessionContext<My1fpBasicSession>,
 ) -> actix_web::Result<Json<ApiResponseData<OnboardingResponse>>, ApiError> {
+    // TODO adapt this endpoint to support multiple ob configs per onboarding
+    // https://linear.app/footprint/issue/FP-645/adapt-useronboardings-endpoint-to-support-multiple-ob-configurations
     let results = db::onboarding::list_for_user_vault(&state.db_pool, user_auth.user_vault_id())
         .await?
         .into_iter()
-        .map(|(onboarding, config, insight)| ApiUserOnboarding {
+        .map(|(onboarding, _, config, insight)| ApiUserOnboarding {
             id: onboarding.id,
             tenant_id: onboarding.tenant_id,
             date: onboarding.start_timestamp,

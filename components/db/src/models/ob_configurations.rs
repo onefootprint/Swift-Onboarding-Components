@@ -1,11 +1,12 @@
 use crate::diesel::ExpressionMethods;
 use crate::diesel::QueryDsl;
 use crate::diesel::RunQueryDsl;
-use crate::schema::{ob_configurations, tenants};
+use crate::schema::{ob_configurations, onboarding_links, tenants};
 use crate::DbPool;
 use chrono::{DateTime, Utc};
 use diesel::{Insertable, Queryable};
 use newtypes::ObConfigurationSettings;
+use newtypes::OnboardingId;
 use newtypes::{DataKind, ObConfigurationId, ObConfigurationKey, TenantId};
 use serde::{Deserialize, Serialize};
 
@@ -56,13 +57,20 @@ impl NewObConfiguration {
 }
 
 impl ObConfiguration {
-    pub async fn get_by_id(pool: &DbPool, id: ObConfigurationId) -> Result<ObConfiguration, crate::DbError> {
+    pub async fn list_for_onboarding(
+        pool: &DbPool,
+        onboarding_id: OnboardingId,
+    ) -> Result<Vec<ObConfiguration>, crate::DbError> {
         let id = pool
-            .db_query(move |conn| -> Result<ObConfiguration, crate::DbError> {
-                let obc = ob_configurations::table
-                    .filter(ob_configurations::id.eq(id))
-                    .first(conn)?;
-                Ok(obc)
+            .db_query(move |conn| -> Result<Vec<ObConfiguration>, crate::DbError> {
+                let obcs = ob_configurations::table
+                    .inner_join(onboarding_links::table)
+                    .filter(onboarding_links::onboarding_id.eq(onboarding_id))
+                    // TODO filter on active onboarding_links
+                    // https://linear.app/footprint/issue/FP-644/move-insight-event-id-status-onto-onboardinglink
+                    .select(ob_configurations::all_columns)
+                    .get_results(conn)?;
+                Ok(obcs)
             })
             .await??;
         Ok(id)

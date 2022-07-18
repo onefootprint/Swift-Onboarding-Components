@@ -6,7 +6,7 @@ use crate::errors::ApiError;
 use crate::types::success::ApiResponseData;
 use crate::State;
 use chrono::{DateTime, Utc};
-use newtypes::{FootprintUserId, ObConfigurationId, SessionAuthToken};
+use newtypes::{FootprintUserId, SessionAuthToken};
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 
 /// Validate a short lived token to get the footprint user id
@@ -17,7 +17,6 @@ pub struct ValidateRequest {
 
 #[derive(Debug, Clone, serde::Serialize, Apiv2Schema)]
 pub struct ValidateResponse {
-    onboarding_configuration_id: ObConfigurationId,
     footprint_user_id: FootprintUserId,
     status: newtypes::Status,
     timestamp: DateTime<Utc>,
@@ -52,7 +51,6 @@ pub fn validate(
     .await?;
 
     Ok(Json(ApiResponseData::ok(ValidateResponse {
-        onboarding_configuration_id: onboarding.ob_config_id,
         footprint_user_id: onboarding.user_ob_id,
         status: onboarding.status,
         timestamp: onboarding.start_timestamp,
