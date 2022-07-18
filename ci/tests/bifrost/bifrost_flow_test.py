@@ -163,9 +163,7 @@ class TestBifrost:
         data = dict(validation_token=validation_token)
         body = post("org/validate", data, workos_tenant.sk)
         fp_user_id2 = body["data"]["footprint_user_id"]
-        status = body["data"]["status"]
         assert fp_user_id2 == fp_user_id
-        assert status    
 
     def test_identify_login_repeat_customer_biometric(self):
         pytest.fpuser_auth_token = None  # Remove fpuser_auth_token from previous test

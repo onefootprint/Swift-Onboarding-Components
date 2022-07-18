@@ -39,7 +39,7 @@ fn handler(
     tenant_auth: PublicTenantAuthContext,
     state: web::Data<State>,
 ) -> actix_web::Result<Json<ApiResponseData<CommitResponse>>, ApiError> {
-    let onboarding = get_onboarding_for_tenant(&state.db_pool, &user_auth, &tenant_auth).await?;
+    let (ob_link, onboarding) = get_onboarding_for_tenant(&state.db_pool, &user_auth, &tenant_auth).await?;
     let uv = user_auth.user_vault(&state.db_pool).await?;
 
     let uv_id = uv.id.clone();
@@ -58,7 +58,7 @@ fn handler(
     let validation_token = state
         .db_pool
         .db_transaction(move |conn| -> Result<_, DbError> {
-            if onboarding.status != Status::Verified {
+            if ob_link.status != Status::Verified {
                 // Just create some fixture events for now
                 // Don't make duplicate fixture events if the user onboards multiple times since it
                 // isn't very self-explanatory for the demo
@@ -98,7 +98,7 @@ fn handler(
                     )
                 })?;
                 // TODO don't mark as verified until data verification with vendors is complete
-                onboarding.update_status(conn, Status::Verified)?;
+                ob_link.update_status(conn, Status::Verified)?;
             }
             // create the session for this onboarding
             let validation_token = ServerSession::create_sync(

@@ -18,10 +18,8 @@ pub struct Onboarding {
     pub user_ob_id: FootprintUserId,
     pub user_vault_id: UserVaultId,
     pub tenant_id: TenantId,
-    pub status: Status,
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
-    pub insight_event_id: InsightEventId,
     pub ordering_id: i64,
     pub start_timestamp: DateTime<Utc>,
     pub is_live: bool,
@@ -33,9 +31,11 @@ pub struct OnboardingLink {
     pub id: OnboardingLinkId,
     pub onboarding_id: OnboardingId,
     pub ob_configuration_id: ObConfigurationId,
-    pub timestamp: DateTime<Utc>,
+    pub start_timestamp: DateTime<Utc>,
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
+    pub status: Status,
+    pub insight_event_id: InsightEventId,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
@@ -43,14 +43,35 @@ pub struct OnboardingLink {
 pub struct NewOnboardingLink {
     pub onboarding_id: OnboardingId,
     pub ob_configuration_id: ObConfigurationId,
-    pub timestamp: DateTime<Utc>,
+    pub start_timestamp: DateTime<Utc>,
+    pub status: Status,
+    pub insight_event_id: InsightEventId,
 }
 
-impl Onboarding {
+impl OnboardingLink {
+    pub async fn get(
+        pool: &DbPool,
+        id: ObConfigurationId,
+        user_vault_id: UserVaultId,
+    ) -> Result<Option<(OnboardingLink, Onboarding)>, DbError> {
+        let ob = pool
+            .db_query(|conn| -> Result<Option<(OnboardingLink, Onboarding)>, DbError> {
+                let ob = onboarding_links::table
+                    .inner_join(onboardings::table)
+                    .filter(onboarding_links::ob_configuration_id.eq(id))
+                    .filter(onboardings::user_vault_id.eq(user_vault_id))
+                    .first(conn)
+                    .optional()?;
+                Ok(ob)
+            })
+            .await??;
+        Ok(ob)
+    }
+
     pub fn update_status(&self, conn: &mut PgConnection, new_status: Status) -> Result<(), DbError> {
-        diesel::update(onboardings::table)
-            .filter(onboardings::id.eq(&self.id))
-            .set(onboardings::status.eq(new_status))
+        diesel::update(onboarding_links::table)
+            .filter(onboarding_links::id.eq(&self.id))
+            .set(onboarding_links::status.eq(new_status))
             .execute(conn)?;
         Ok(())
     }
@@ -61,8 +82,6 @@ impl Onboarding {
 pub struct NewOnboarding {
     pub user_vault_id: UserVaultId,
     pub tenant_id: TenantId,
-    pub status: Status,
-    pub insight_event_id: InsightEventId,
     pub start_timestamp: DateTime<Utc>,
     pub is_live: bool,
 }
@@ -95,8 +114,6 @@ impl NewOnboarding {
                         let new = NewOnboarding {
                             user_vault_id,
                             tenant_id,
-                            status,
-                            insight_event_id: insight_event.id,
                             start_timestamp: Utc::now(),
                             is_live,
                         };
@@ -106,7 +123,9 @@ impl NewOnboarding {
                         let new_ob_link = NewOnboardingLink {
                             onboarding_id: new_ob.id.clone(),
                             ob_configuration_id: ob_config_id,
-                            timestamp: Utc::now(),
+                            start_timestamp: Utc::now(),
+                            status,
+                            insight_event_id: insight_event.id,
                         };
                         diesel::insert_into(onboarding_links::table)
                             .values(new_ob_link)

@@ -18,7 +18,6 @@ pub struct ValidateRequest {
 #[derive(Debug, Clone, serde::Serialize, Apiv2Schema)]
 pub struct ValidateResponse {
     footprint_user_id: FootprintUserId,
-    status: newtypes::Status,
     timestamp: DateTime<Utc>,
 }
 
@@ -50,9 +49,9 @@ pub fn validate(
     )
     .await?;
 
+    // TODO https://linear.app/footprint/issue/FP-663/store-ob-config-id-or-ob-link-id-inside-validateusertoken
     Ok(Json(ApiResponseData::ok(ValidateResponse {
         footprint_user_id: onboarding.user_ob_id,
-        status: onboarding.status,
         timestamp: onboarding.start_timestamp,
     })))
 }

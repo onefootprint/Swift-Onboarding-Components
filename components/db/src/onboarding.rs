@@ -9,7 +9,7 @@ use chrono::{DateTime, Utc};
 use diesel::pg::Pg;
 use diesel::prelude::*;
 use newtypes::OnboardingId;
-use newtypes::{Fingerprint, FootprintUserId, ObConfigurationId, Status, TenantId, UserVaultId};
+use newtypes::{Fingerprint, FootprintUserId, Status, TenantId, UserVaultId};
 
 #[derive(Clone)]
 pub struct OnboardingListQueryParams {
@@ -27,7 +27,12 @@ pub fn list_for_tenant_query<'a>(params: OnboardingListQueryParams) -> BoxedQuer
         .into_boxed();
 
     if !params.statuses.is_empty() {
-        query = query.filter(schema::onboardings::status.eq_any(params.statuses))
+        // TODO https://linear.app/footprint/issue/FP-661/adapt-orgonboardings-to-support-multiple-ob-configurations-per
+        let matching_ob_ids = schema::onboarding_links::table
+            .filter(schema::onboarding_links::status.eq_any(params.statuses))
+            .select(schema::onboarding_links::onboarding_id)
+            .distinct();
+        query = query.filter(schema::onboardings::id.eq_any(matching_ob_ids))
     }
 
     if let Some(footprint_user_id) = params.footprint_user_id {
@@ -66,11 +71,16 @@ pub fn list_for_tenant(
     params: OnboardingListQueryParams,
     cursor: Option<i64>,
     page_size: i64,
-) -> Result<Vec<(Onboarding, InsightEvent)>, DbError> {
+) -> Result<Vec<(Onboarding, OnboardingLink, InsightEvent)>, DbError> {
     let mut onboardings = list_for_tenant_query(params)
-        .inner_join(schema::insight_events::table)
+        .inner_join(schema::onboarding_links::table)
+        .inner_join(
+            schema::insight_events::table
+                .on(schema::insight_events::id.eq(schema::onboarding_links::insight_event_id)),
+        )
         .select((
             schema::onboardings::all_columns,
+            schema::onboarding_links::all_columns,
             schema::insight_events::all_columns,
         ))
         .order_by(schema::onboardings::ordering_id.desc())
@@ -80,7 +90,7 @@ pub fn list_for_tenant(
         onboardings = onboardings.filter(schema::onboardings::ordering_id.le(cursor));
     }
 
-    let onboardings = onboardings.load::<(Onboarding, InsightEvent)>(conn)?;
+    let onboardings = onboardings.load::<(Onboarding, OnboardingLink, InsightEvent)>(conn)?;
     Ok(onboardings)
 }
 
@@ -94,26 +104,6 @@ pub(crate) fn get_for_fp_id(
         .filter(schema::onboardings::user_ob_id.eq(footprint_user_id))
         .first(conn)
         .optional()?;
-    Ok(ob)
-}
-
-pub async fn get(
-    pool: &DbPool,
-    id: ObConfigurationId,
-    user_vault_id: UserVaultId,
-) -> Result<Option<Onboarding>, DbError> {
-    let ob = pool
-        .db_query(|conn| -> Result<Option<Onboarding>, DbError> {
-            let ob = schema::onboardings::table
-                .inner_join(schema::onboarding_links::table)
-                .filter(schema::onboarding_links::ob_configuration_id.eq(id))
-                .filter(schema::onboardings::user_vault_id.eq(user_vault_id))
-                .select(schema::onboardings::all_columns)
-                .first(conn)
-                .optional()?;
-            Ok(ob)
-        })
-        .await??;
     Ok(ob)
 }
 
@@ -139,16 +129,19 @@ pub async fn list_for_user_vault(
     pool: &DbPool,
     user_vault_id: UserVaultId,
 ) -> Result<Vec<(Onboarding, OnboardingLink, ObConfiguration, InsightEvent)>, DbError> {
+    use schema::*;
     let results = pool
         .db_query(|conn| -> Result<_, DbError> {
-            let results = schema::onboardings::table
-                .filter(schema::onboardings::user_vault_id.eq(user_vault_id))
-                .inner_join(schema::onboarding_links::table)
+            let results = onboardings::table
+                .filter(onboardings::user_vault_id.eq(user_vault_id))
+                .inner_join(onboarding_links::table)
                 .inner_join(
-                    schema::ob_configurations::table
-                        .on(schema::ob_configurations::id.eq(schema::onboarding_links::ob_configuration_id)),
+                    ob_configurations::table
+                        .on(ob_configurations::id.eq(onboarding_links::ob_configuration_id)),
                 )
-                .inner_join(schema::insight_events::table)
+                .inner_join(
+                    insight_events::table.on(insight_events::id.eq(onboarding_links::insight_event_id)),
+                )
                 .get_results(conn)?;
             Ok(results)
         })

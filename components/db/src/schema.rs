@@ -83,9 +83,11 @@ table! {
         id -> Uuid,
         onboarding_id -> Text,
         ob_configuration_id -> Text,
-        timestamp -> Timestamptz,
+        start_timestamp -> Timestamptz,
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
+        status -> Text,
+        insight_event_id -> Uuid,
     }
 }
 
@@ -98,10 +100,8 @@ table! {
         user_ob_id -> Text,
         user_vault_id -> Text,
         tenant_id -> Text,
-        status -> Text,
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
-        insight_event_id -> Uuid,
         ordering_id -> Int8,
         start_timestamp -> Timestamptz,
         is_live -> Bool,
@@ -252,9 +252,9 @@ joinable!(access_events -> onboardings (onboarding_id));
 joinable!(audit_trails -> tenants (tenant_id));
 joinable!(audit_trails -> user_vaults (user_vault_id));
 joinable!(ob_configurations -> tenants (tenant_id));
+joinable!(onboarding_links -> insight_events (insight_event_id));
 joinable!(onboarding_links -> ob_configurations (ob_configuration_id));
 joinable!(onboarding_links -> onboardings (onboarding_id));
-joinable!(onboardings -> insight_events (insight_event_id));
 joinable!(onboardings -> tenants (tenant_id));
 joinable!(onboardings -> user_vaults (user_vault_id));
 joinable!(tenant_api_keys -> tenants (tenant_id));

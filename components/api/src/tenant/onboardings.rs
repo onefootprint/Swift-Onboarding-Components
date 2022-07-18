@@ -110,6 +110,7 @@ fn handler(
                 user_to_kinds.get(&x.0.user_vault_id).unwrap_or(&vec![]).clone(),
                 x.0,
                 x.1,
+                x.2,
             )
         })
         .map(ApiOnboarding::from)
