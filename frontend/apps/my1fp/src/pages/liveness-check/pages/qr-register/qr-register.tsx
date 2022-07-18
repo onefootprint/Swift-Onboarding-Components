@@ -14,7 +14,7 @@ import createBiometricUrl from '../../utils/create-biometric-url';
 import useD2PSms from './hooks/use-d2p-sms';
 import useD2PGenerate from './hooks/use-generate-d2p';
 
-const QRLivenessCheck = () => {
+const QRRegister = () => {
   const { t } = useTranslation('pages.liveness-check.qr-register');
   const [state, send] = useLivenessCheckMachine();
   const { scopedAuthToken } = state.context;
@@ -116,4 +116,4 @@ const Container = styled.form`
   `}
 `;
 
-export default QRLivenessCheck;
+export default QRRegister;

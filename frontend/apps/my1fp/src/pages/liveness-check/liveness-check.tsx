@@ -8,7 +8,11 @@ import withProvider from 'src/utils/with-provider';
 
 import LivenessCheckMachineProvider from './components/machine-provider';
 import useLivenessCheckMachine from './hooks/use-liveness-check-machine';
-import QrRegister from './pages/qr-register';
+import NewTabProcessing from './pages/new-tab-processing';
+import NewTabRequest from './pages/new-tab-request';
+import QRCodeScanned from './pages/qr-code-scanned';
+import QRCodeSent from './pages/qr-code-sent';
+import QRRegister from './pages/qr-register';
 
 type Page = {
   [page in States]?: () => JSX.Element;
@@ -24,7 +28,11 @@ const LivenessCheck = () => {
   });
   const valueCasted = state.value as States;
   const pages: Page = {
-    [States.qrRegister]: QrRegister,
+    [States.newTabProcessing]: NewTabProcessing,
+    [States.newTabRequest]: NewTabRequest,
+    [States.qrCodeScanned]: QRCodeScanned,
+    [States.qrCodeSent]: QRCodeSent,
+    [States.qrRegister]: QRRegister,
   };
 
   if (has(pages, valueCasted)) {
