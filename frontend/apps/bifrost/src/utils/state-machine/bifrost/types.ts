@@ -1,6 +1,6 @@
+import { DeviceInfo } from 'footprint-ui/src/hooks/use-device-info';
 import {
   ChallengeData,
-  DeviceInfo,
   IdentifyType,
   OnboardingData,
   TenantInfo,
@@ -168,10 +168,7 @@ export type BifrostEvent =
     }
   | {
       type: Events.deviceInfoIdentified;
-      payload: {
-        hasSupportForWebAuthn: boolean;
-        type: string;
-      };
+      payload: DeviceInfo;
     }
   | {
       type: Events.smsChallengeSucceeded;

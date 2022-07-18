@@ -1,7 +1,4 @@
-export type DeviceInfo = {
-  hasSupportForWebAuthn: boolean;
-  type: string;
-};
+import { DeviceInfo } from 'footprint-ui/src/hooks/use-device-info';
 
 export enum States {
   init = 'Init',
@@ -55,9 +52,7 @@ export type MachineContext = {
 export type MachineEvents =
   | {
       type: Events.deviceInfoIdentified;
-      payload: {
-        device: DeviceInfo;
-      };
+      payload: DeviceInfo;
     }
   | { type: Events.livenessRegisterStarted }
   | {

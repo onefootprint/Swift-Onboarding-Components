@@ -1,7 +1,8 @@
+import { DeviceInfo } from 'footprint-ui/src/hooks/use-device-info';
 import { assign, createMachine } from 'xstate';
 
 import createLivenessRegisterMachine from '../liveness-register';
-import { DeviceInfo, OnboardingData, TenantInfo } from '../types';
+import { OnboardingData, TenantInfo } from '../types';
 import {
   Actions,
   Events,

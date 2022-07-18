@@ -1,3 +1,5 @@
+import { DeviceInfo } from 'footprint-ui/src/hooks/use-device-info';
+
 export enum States {
   init = 'init',
   register = 'register',
@@ -23,11 +25,6 @@ export enum Actions {
   clearAuthToken = 'clearAuthToken',
 }
 
-export type DeviceInfo = {
-  hasSupportForWebAuthn: boolean;
-  type: string;
-};
-
 export type D2PContext = {
   device: DeviceInfo;
   authToken: string;
@@ -37,10 +34,7 @@ export type D2PEvent =
   | { type: Events.authTokenReceived; payload: { authToken: string } }
   | {
       type: Events.deviceInfoIdentified;
-      payload: {
-        hasSupportForWebAuthn: boolean;
-        type: string;
-      };
+      payload: DeviceInfo;
     }
   | { type: Events.registerFailed }
   | { type: Events.registerSucceeded }

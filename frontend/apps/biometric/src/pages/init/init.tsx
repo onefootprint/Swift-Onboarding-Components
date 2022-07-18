@@ -1,12 +1,22 @@
+import useDeviceInfo, {
+  DeviceInfo,
+} from 'footprint-ui/src/hooks/use-device-info';
 import React from 'react';
+import useD2PMobileMachine from 'src/hooks/use-d2p-mobile-machine';
+import { Events } from 'src/utils/state-machine';
 import { LoadingIndicator } from 'ui';
 
 import useAuthToken from './hooks/use-auth-token';
-import useDeviceInfo from './hooks/use-device-info';
 
 const Init = () => {
+  const [, send] = useD2PMobileMachine();
   useAuthToken();
-  useDeviceInfo();
+  useDeviceInfo((info: DeviceInfo) => {
+    send({
+      type: Events.deviceInfoIdentified,
+      payload: info,
+    });
+  });
   return <LoadingIndicator />;
 };
 

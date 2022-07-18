@@ -1,15 +1,25 @@
+import useDeviceInfo, {
+  DeviceInfo,
+} from 'footprint-ui/src/hooks/use-device-info';
 import React from 'react';
+import useBifrostMachine from 'src/hooks/use-bifrost-machine';
+import { Events } from 'src/utils/state-machine/bifrost';
 import styled, { css } from 'styled-components';
 import { Box, Portal, Shimmer } from 'ui';
 
 import useAuthenticationFlow from './hooks/use-authentication-flow';
-import useDeviceInfo from './hooks/use-device-info';
 import useTenantInfo from './hooks/use-tenant-info';
 import useTenantPublicKey from './hooks/use-tenant-public-key';
 
 const Init = () => {
   const tenantPk = useTenantPublicKey();
-  useDeviceInfo();
+  const [, send] = useBifrostMachine();
+  useDeviceInfo((info: DeviceInfo) => {
+    send({
+      type: Events.deviceInfoIdentified,
+      payload: info,
+    });
+  });
   useTenantInfo(tenantPk);
   useAuthenticationFlow();
 

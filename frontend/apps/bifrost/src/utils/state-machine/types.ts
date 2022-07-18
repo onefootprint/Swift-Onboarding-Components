@@ -95,11 +95,6 @@ export type OnboardingData = {
   data: UserData; // Filled user data
 };
 
-export type DeviceInfo = {
-  hasSupportForWebAuthn: boolean;
-  type: string;
-};
-
 export type TenantInfo = {
   pk: string;
   name: string;

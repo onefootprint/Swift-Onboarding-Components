@@ -10,6 +10,7 @@ const withTM = require('next-transpile-modules')([
   'request',
   'global-constants',
   'footprint',
+  'footprint-ui',
   'footprint-provider',
   'themes',
 ]);

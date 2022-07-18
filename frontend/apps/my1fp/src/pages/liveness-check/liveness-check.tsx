@@ -1,6 +1,9 @@
+import useDeviceInfo, {
+  DeviceInfo,
+} from 'footprint-ui/src/hooks/use-device-info';
 import has from 'lodash/has';
 import React from 'react';
-import { States } from 'src/utils/state-machine/liveness-check/types';
+import { Events, States } from 'src/utils/state-machine/liveness-check/types';
 import withProvider from 'src/utils/with-provider';
 
 import LivenessCheckMachineProvider from './components/machine-provider';
@@ -12,7 +15,13 @@ type Page = {
 };
 
 const LivenessCheck = () => {
-  const [state] = useLivenessCheckMachine();
+  const [state, send] = useLivenessCheckMachine();
+  useDeviceInfo((info: DeviceInfo) => {
+    send({
+      type: Events.deviceInfoIdentified,
+      payload: info,
+    });
+  });
   const valueCasted = state.value as States;
   const pages: Page = {
     [States.qrRegister]: QrRegister,

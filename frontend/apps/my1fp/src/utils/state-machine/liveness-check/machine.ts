@@ -23,15 +23,15 @@ const livenessCheckMachine = createMachine<MachineContext, MachineEvents>(
               target: States.newTabRequest,
               actions: [Actions.assignDeviceInfo],
               cond: (context, event) =>
-                event.payload.device.type === 'mobile' &&
-                event.payload.device.hasSupportForWebAuthn,
+                event.payload.type === 'mobile' &&
+                event.payload.hasSupportForWebAuthn,
             },
             {
               target: States.livenessRegisterFailed,
               actions: [Actions.assignDeviceInfo],
               cond: (context, event) =>
-                event.payload.device.type === 'mobile' &&
-                !event.payload.device.hasSupportForWebAuthn,
+                event.payload.type === 'mobile' &&
+                !event.payload.hasSupportForWebAuthn,
             },
             {
               target: States.qrRegister,
@@ -137,7 +137,7 @@ const livenessCheckMachine = createMachine<MachineContext, MachineEvents>(
     actions: {
       [Actions.assignDeviceInfo]: assign((context, event) => {
         if (event.type === Events.deviceInfoIdentified) {
-          context.device = { ...event.payload.device };
+          context.device = { ...event.payload };
         }
         return context;
       }),
