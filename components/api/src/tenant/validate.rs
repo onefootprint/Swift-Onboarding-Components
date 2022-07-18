@@ -6,7 +6,8 @@ use crate::errors::ApiError;
 use crate::types::success::ApiResponseData;
 use crate::State;
 use chrono::{DateTime, Utc};
-use newtypes::{FootprintUserId, SessionAuthToken};
+use db::models::onboardings::OnboardingLink;
+use newtypes::{FootprintUserId, ObConfigurationId, SessionAuthToken};
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 
 /// Validate a short lived token to get the footprint user id
@@ -17,7 +18,9 @@ pub struct ValidateRequest {
 
 #[derive(Debug, Clone, serde::Serialize, Apiv2Schema)]
 pub struct ValidateResponse {
+    onboarding_configuration_id: ObConfigurationId,
     footprint_user_id: FootprintUserId,
+    status: newtypes::Status,
     timestamp: DateTime<Utc>,
 }
 
@@ -36,22 +39,23 @@ pub fn validate(
 
     let session = ServerSession::unseal(&state.session_sealing_key, &session.sealed_session_data)?;
 
-    let ValidateUserToken { onboarding_id } = if let SessionData::ValidateUserToken(data) = session.data {
-        Ok(data)
+    let ValidateUserToken { ob_link_id } = if let SessionData::ValidateUserToken(data) = session.data {
+        data
     } else {
-        Err(ApiError::from(OnboardingError::ValidateTokenInvalidOrNotFound))
-    }?;
+        return Err(OnboardingError::ValidateTokenInvalidOrNotFound.into());
+    };
 
-    let onboarding = db::onboarding::get_by_onboarding_id_and_tenant(
-        &state.db_pool,
-        onboarding_id,
-        auth.tenant().id.clone(),
-    )
-    .await?;
+    let (ob_link, onboarding) = OnboardingLink::get_by_id(&state.db_pool, ob_link_id)
+        .await?
+        .ok_or(OnboardingError::NoOnboarding)?;
+    if onboarding.tenant_id != auth.tenant().id {
+        return Err(OnboardingError::TenantMismatch.into());
+    }
 
-    // TODO https://linear.app/footprint/issue/FP-663/store-ob-config-id-or-ob-link-id-inside-validateusertoken
     Ok(Json(ApiResponseData::ok(ValidateResponse {
+        onboarding_configuration_id: ob_link.ob_configuration_id,
         footprint_user_id: onboarding.user_ob_id,
+        status: ob_link.status,
         timestamp: onboarding.start_timestamp,
     })))
 }

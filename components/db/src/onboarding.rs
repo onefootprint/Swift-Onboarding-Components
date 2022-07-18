@@ -107,23 +107,6 @@ pub(crate) fn get_for_fp_id(
     Ok(ob)
 }
 
-pub async fn get_by_onboarding_id_and_tenant(
-    pool: &DbPool,
-    id: OnboardingId,
-    tenant_id: TenantId,
-) -> Result<Onboarding, DbError> {
-    let ob = pool
-        .db_query(|conn| -> Result<Onboarding, DbError> {
-            let ob = schema::onboardings::table
-                .filter(schema::onboardings::id.eq(id))
-                .filter(schema::onboardings::tenant_id.eq(tenant_id))
-                .first(conn)?;
-            Ok(ob)
-        })
-        .await??;
-    Ok(ob)
-}
-
 /// get onboardings by a specific user vault
 pub async fn list_for_user_vault(
     pool: &DbPool,

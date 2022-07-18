@@ -68,6 +68,23 @@ impl OnboardingLink {
         Ok(ob)
     }
 
+    pub async fn get_by_id(
+        pool: &DbPool,
+        id: OnboardingLinkId,
+    ) -> Result<Option<(OnboardingLink, Onboarding)>, DbError> {
+        let ob = pool
+            .db_query(|conn| -> Result<Option<(OnboardingLink, Onboarding)>, DbError> {
+                let ob = onboarding_links::table
+                    .inner_join(onboardings::table)
+                    .filter(onboarding_links::id.eq(id))
+                    .first(conn)
+                    .optional()?;
+                Ok(ob)
+            })
+            .await??;
+        Ok(ob)
+    }
+
     pub fn update_status(&self, conn: &mut PgConnection, new_status: Status) -> Result<(), DbError> {
         diesel::update(onboarding_links::table)
             .filter(onboarding_links::id.eq(&self.id))

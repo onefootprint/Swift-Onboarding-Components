@@ -107,7 +107,7 @@ pub enum SessionData {
     /// Used for validating email challenges
     EmailVerify(EmailVerifySession),
 
-    /// Used for transforming an
+    /// Used to prove to a tenant that a user is authed with footprint
     ValidateUserToken(ValidateUserToken),
 }
 

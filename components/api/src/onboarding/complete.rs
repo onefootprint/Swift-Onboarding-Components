@@ -105,7 +105,7 @@ fn handler(
                 &session_sealing_key,
                 conn,
                 SessionData::ValidateUserToken(ValidateUserToken {
-                    onboarding_id: onboarding.id,
+                    ob_link_id: ob_link.id,
                 }),
                 Duration::minutes(15),
             )?;
