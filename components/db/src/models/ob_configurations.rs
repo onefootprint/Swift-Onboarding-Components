@@ -76,18 +76,6 @@ impl ObConfiguration {
         Ok(id)
     }
 
-    pub async fn get(pool: &DbPool, key: ObConfigurationKey) -> Result<ObConfiguration, crate::DbError> {
-        let id = pool
-            .db_query(move |conn| -> Result<ObConfiguration, crate::DbError> {
-                let obc = ob_configurations::table
-                    .filter(ob_configurations::key.eq(key))
-                    .first(conn)?;
-                Ok(obc)
-            })
-            .await??;
-        Ok(id)
-    }
-
     pub async fn get_enabled(
         pool: &DbPool,
         key: ObConfigurationKey,
@@ -102,23 +90,6 @@ impl ObConfiguration {
                     .filter(tenants::id.eq(&obc.tenant_id))
                     .first(conn)?;
                 Ok((obc, tenant))
-            })
-            .await??;
-        Ok(id)
-    }
-
-    pub async fn get_for_tenant(
-        pool: &DbPool,
-        key: ObConfigurationKey,
-        tenant_id: TenantId,
-    ) -> Result<ObConfiguration, crate::DbError> {
-        let id = pool
-            .db_query(move |conn| -> Result<ObConfiguration, crate::DbError> {
-                let obc = ob_configurations::table
-                    .filter(ob_configurations::key.eq(key))
-                    .filter(ob_configurations::tenant_id.eq(tenant_id))
-                    .first(conn)?;
-                Ok(obc)
             })
             .await??;
         Ok(id)
