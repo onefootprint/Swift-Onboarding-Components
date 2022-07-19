@@ -1,7 +1,7 @@
 import { omit } from 'lodash';
 import { QueryFunctionContext, QueryKey, useQuery } from 'react-query';
 import request, { RequestError, RequestResponse } from 'request';
-import useSessionUser from 'src/hooks/use-session-user';
+import useSessionUser, { AuthHeaders } from 'src/hooks/use-session-user';
 import {
   getCursors,
   OnboardingListQuerystring,
@@ -9,12 +9,10 @@ import {
 } from 'src/pages/users/hooks/use-filters';
 import { dateRangeToFilterParams, Onboarding } from 'src/types';
 
-import { DASHBOARD_AUTHORIZATION_HEADER } from '../../../config/constants';
-
 type OnboardingsListQueryKey = [
   string,
   OnboardingListQuerystring,
-  string,
+  AuthHeaders,
   number,
 ];
 
@@ -27,7 +25,7 @@ type OnboardingsListResponse = {
 const getOnboardingsRequest = async ({
   queryKey,
 }: QueryFunctionContext<QueryKey, string>) => {
-  const [, params, auth, pageSize] = queryKey as OnboardingsListQueryKey;
+  const [, params, authHeaders, pageSize] = queryKey as OnboardingsListQueryKey;
   const dateRangeFilters = dateRangeToFilterParams(params);
   // cursors is a stack of cursors for all pages visited. Use the cursor on the top of the stack
   // (the current page) when asking the backend for results
@@ -42,18 +40,17 @@ const getOnboardingsRequest = async ({
     method: 'GET',
     url: '/org/onboardings',
     params: req,
-    headers: { [DASHBOARD_AUTHORIZATION_HEADER]: auth as string },
+    headers: authHeaders,
   });
   return response;
 };
 
 const useGetOnboardings = (pageSize: number) => {
-  const session = useSessionUser();
-  const auth = session.data?.auth;
+  const { authHeaders } = useSessionUser();
   const { filters } = useFilters();
 
   return useQuery<OnboardingsListResponse, RequestError>(
-    ['paginatedOnboardings', filters, auth, pageSize],
+    ['paginatedOnboardings', filters, authHeaders, pageSize],
     getOnboardingsRequest,
     {
       retry: false,

@@ -1,6 +1,6 @@
 import { QueryFunctionContext, QueryKey, useInfiniteQuery } from 'react-query';
 import request, { RequestError, RequestResponse } from 'request';
-import useSessionUser from 'src/hooks/use-session-user';
+import useSessionUser, { AuthHeaders } from 'src/hooks/use-session-user';
 import {
   AccessEventFilters,
   useFilters,
@@ -8,20 +8,18 @@ import {
 import { AccessEvent, dateRangeToFilterParams } from 'src/types';
 import { useDebounce } from 'usehooks-ts';
 
-import { DASHBOARD_AUTHORIZATION_HEADER } from '../../../config/constants';
-
 type AccessEventsResponse = {
   data: AccessEvent[];
   next?: string;
 };
 
-type AccessEventQueryKey = [string, AccessEventFilters, string];
+type AccessEventQueryKey = [string, AccessEventFilters, AuthHeaders];
 
 const getAccessEventsRequest = async ({
   queryKey,
   pageParam,
 }: QueryFunctionContext<QueryKey, string>) => {
-  const [, filters, auth] = queryKey as AccessEventQueryKey;
+  const [, filters, authHeaders] = queryKey as AccessEventQueryKey;
   const dateRangeFilters = dateRangeToFilterParams(filters);
   // Join filter request args with the pageParam
   const params = {
@@ -33,20 +31,23 @@ const getAccessEventsRequest = async ({
     method: 'GET',
     url: '/org/access_events',
     params,
-    headers: { [DASHBOARD_AUTHORIZATION_HEADER]: auth as string },
+    headers: authHeaders,
   });
   return response;
 };
 
 const useGetAccessEvents = () => {
-  const session = useSessionUser();
-  const auth = session.data?.auth;
+  const { authHeaders } = useSessionUser();
   const { filters } = useFilters();
 
   const debouncedFilters = useDebounce(filters, 500);
 
   return useInfiniteQuery<AccessEventsResponse, RequestError>(
-    ['paginatedAccessEvents', debouncedFilters, auth] as AccessEventQueryKey,
+    [
+      'paginatedAccessEvents',
+      debouncedFilters,
+      authHeaders,
+    ] as AccessEventQueryKey,
     getAccessEventsRequest,
     {
       retry: false,

@@ -1,38 +1,39 @@
 import { QueryFunctionContext, QueryKey, useQuery } from 'react-query';
 import request, { RequestError, RequestResponse } from 'request';
-import useSessionUser from 'src/hooks/use-session-user';
+import useSessionUser, { AuthHeaders } from 'src/hooks/use-session-user';
 import { AuditTrail } from 'src/types';
-
-import { DASHBOARD_AUTHORIZATION_HEADER } from '../../../../../../../config/constants';
 
 type AuditTrailRequestQueryString = {
   footprintUserId: string;
 };
 
-type AuditTrailRequestQueryKey = [string, AuditTrailRequestQueryString, string];
+type AuditTrailRequestQueryKey = [
+  string,
+  AuditTrailRequestQueryString,
+  AuthHeaders,
+];
 
 const getAuditTrailRequest = async ({
   queryKey,
 }: QueryFunctionContext<QueryKey, string>) => {
-  const [, params, auth] = queryKey as AuditTrailRequestQueryKey;
+  const [, params, authHeaders] = queryKey as AuditTrailRequestQueryKey;
   const { data: response } = await request<RequestResponse<AuditTrail[]>>({
     method: 'GET',
     url: '/org/audit_trail',
     params,
-    headers: { [DASHBOARD_AUTHORIZATION_HEADER]: auth as string },
+    headers: authHeaders,
   });
   return response.data;
 };
 
 const useGetAuditTrail = (footprintUserId: string) => {
-  const session = useSessionUser();
-  const auth = session.data?.auth;
+  const { authHeaders } = useSessionUser();
   const filters = {
     footprintUserId,
   };
 
   return useQuery<AuditTrail[], RequestError>(
-    ['AuditTrail', filters, auth],
+    ['AuditTrail', filters, authHeaders],
     getAuditTrailRequest,
     {
       retry: false,
