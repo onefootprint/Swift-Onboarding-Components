@@ -1,6 +1,7 @@
 use crate::auth::session_data::tenant::secret_key::SecretTenantAuthContext;
 use crate::auth::session_data::validate_user::ValidateUserToken;
 use crate::auth::session_data::{ServerSession, SessionData};
+use crate::auth::IsLive;
 use crate::errors::onboarding::OnboardingError;
 use crate::errors::ApiError;
 use crate::types::success::ApiResponseData;
@@ -50,6 +51,9 @@ pub fn validate(
         .ok_or(OnboardingError::NoOnboarding)?;
     if onboarding.tenant_id != auth.tenant().id {
         return Err(OnboardingError::TenantMismatch.into());
+    }
+    if onboarding.is_live != auth.is_live() {
+        return Err(OnboardingError::InvalidSandboxState.into());
     }
 
     Ok(Json(ApiResponseData::ok(ValidateResponse {

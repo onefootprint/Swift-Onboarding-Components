@@ -4,9 +4,12 @@ use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use diesel::{Insertable, PgConnection, QueryDsl, Queryable};
 use newtypes::{
-    EncryptedVaultPrivateKey, Fingerprint, SealedVaultBytes, Status, UserVaultId, VaultPublicKey,
+    EncryptedVaultPrivateKey, Fingerprint, FootprintUserId, SealedVaultBytes, Status, TenantId, UserVaultId,
+    VaultPublicKey,
 };
 use serde::{Deserialize, Serialize};
+
+use super::onboardings::Onboarding;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable, Identifiable)]
 #[diesel(table_name = user_vaults)]
@@ -27,6 +30,29 @@ impl UserVault {
             .filter(user_vaults::id.eq(id))
             .first(conn)?;
         Ok(user)
+    }
+
+    pub async fn get_for_tenant(
+        pool: &crate::DbPool,
+        tenant_id: TenantId,
+        footprint_user_id: FootprintUserId,
+        is_live: bool,
+    ) -> Result<Option<(UserVault, Onboarding)>, DbError> {
+        use crate::schema::onboardings;
+        let result = pool
+            .db_query(move |conn| -> Result<Option<(UserVault, Onboarding)>, DbError> {
+                let result = user_vaults::table
+                    .inner_join(onboardings::table)
+                    .filter(onboardings::tenant_id.eq(tenant_id))
+                    .filter(onboardings::user_ob_id.eq(footprint_user_id))
+                    .filter(onboardings::is_live.eq(is_live))
+                    .first(conn)
+                    .optional()?;
+                Ok(result)
+            })
+            .await??;
+
+        Ok(result)
     }
 }
 

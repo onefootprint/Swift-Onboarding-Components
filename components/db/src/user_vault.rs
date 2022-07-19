@@ -1,11 +1,9 @@
-use crate::models::onboardings::*;
 use crate::models::user_data::{GroupInsert, NewUserData};
 use crate::models::user_vaults::*;
-use crate::onboarding::get_for_fp_id;
 use crate::schema;
 use crate::{errors::DbError, models::user_data::UserData};
 use diesel::prelude::*;
-use newtypes::{DataGroupId, DataKind, DataPriority, Fingerprint, FootprintUserId, TenantId, UserVaultId};
+use newtypes::{DataGroupId, DataKind, DataPriority, Fingerprint, UserVaultId};
 
 pub async fn create(pool: &crate::DbPool, new_user: NewUserVaultReq) -> Result<UserVault, crate::DbError> {
     let user_vault = pool
@@ -50,28 +48,16 @@ pub async fn create(pool: &crate::DbPool, new_user: NewUserVaultReq) -> Result<U
 }
 
 pub async fn get(pool: &crate::DbPool, uv_id: UserVaultId) -> Result<UserVault, DbError> {
-    let user = pool.db_query(move |conn| get_sync(conn, uv_id)).await??;
-
-    Ok(user)
-}
-
-pub async fn get_by_tenant_and_onboarding(
-    pool: &crate::DbPool,
-    tenant_id: TenantId,
-    footprint_user_id: FootprintUserId,
-) -> Result<Option<(UserVault, Onboarding)>, DbError> {
-    let result = pool
-        .db_query(move |conn| -> Result<Option<(UserVault, Onboarding)>, DbError> {
-            let onboarding: Option<Onboarding> = get_for_fp_id(conn, tenant_id, footprint_user_id)?;
-
-            match onboarding {
-                Some(ob) => Ok(Some((get_sync(conn, ob.user_vault_id.clone())?, ob))),
-                None => Ok(None),
-            }
+    let user = pool
+        .db_query(move |conn| -> Result<UserVault, DbError> {
+            let user = schema::user_vaults::table
+                .filter(schema::user_vaults::id.eq(uv_id))
+                .first(conn)?;
+            Ok(user)
         })
         .await??;
 
-    Ok(result)
+    Ok(user)
 }
 
 pub async fn get_by_fingerprint_and_uv_id(
@@ -122,11 +108,4 @@ pub async fn get_by_fingerprint(
         .await??;
 
     Ok(result)
-}
-
-pub fn get_sync(conn: &mut PgConnection, uv_id: UserVaultId) -> Result<UserVault, DbError> {
-    let user = schema::user_vaults::table
-        .filter(schema::user_vaults::id.eq(uv_id))
-        .first(conn)?;
-    Ok(user)
 }

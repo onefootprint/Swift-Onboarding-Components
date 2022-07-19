@@ -92,16 +92,3 @@ pub fn list_for_tenant(
     let onboardings = onboardings.load::<(Onboarding, OnboardingLink, InsightEvent)>(conn)?;
     Ok(onboardings)
 }
-
-pub(crate) fn get_for_fp_id(
-    conn: &mut PgConnection,
-    tenant_id: TenantId,
-    footprint_user_id: FootprintUserId,
-) -> Result<Option<Onboarding>, DbError> {
-    let ob = schema::onboardings::table
-        .filter(schema::onboardings::tenant_id.eq(tenant_id))
-        .filter(schema::onboardings::user_ob_id.eq(footprint_user_id))
-        .first(conn)
-        .optional()?;
-    Ok(ob)
-}

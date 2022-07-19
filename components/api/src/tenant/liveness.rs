@@ -2,6 +2,7 @@ use crate::auth::either::Either;
 use crate::auth::session_context::HasTenant;
 use crate::auth::session_data::tenant::secret_key::SecretTenantAuthContext;
 use crate::auth::session_data::tenant::workos::WorkOsSession;
+use crate::auth::IsLive;
 use crate::types::insight_event::ApiInsightEvent;
 use crate::types::success::ApiResponseData;
 use crate::State;
@@ -36,7 +37,12 @@ fn get(
     let creds = state
         .db_pool
         .db_query(move |conn| {
-            WebauthnCredential::get_for_onboarding(conn, &tenant.id, &request.footprint_user_id)
+            WebauthnCredential::get_for_onboarding(
+                conn,
+                &tenant.id,
+                &request.footprint_user_id,
+                auth.is_live(),
+            )
         })
         .await??;
 

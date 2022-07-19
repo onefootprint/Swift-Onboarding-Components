@@ -2,7 +2,7 @@ use crate::auth::either::Either;
 use crate::auth::session_context::{HasTenant, SessionContext};
 use crate::auth::session_data::tenant::secret_key::SecretTenantAuthContext;
 use crate::auth::session_data::tenant::workos::WorkOsSession;
-use crate::auth::AuthError;
+use crate::auth::{AuthError, IsLive};
 use crate::errors::ApiError;
 use crate::types::success::ApiResponseData;
 use crate::user::{decrypt, DecryptFieldsResult};
@@ -10,6 +10,7 @@ use crate::utils::insight_headers::InsightHeaders;
 use crate::State;
 use db::models::access_events::NewAccessEvent;
 use db::models::insight_event::CreateInsightEvent;
+use db::models::user_vaults::UserVault;
 use newtypes::{DataKind, FootprintUserId};
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 use std::collections::{HashMap, HashSet};
@@ -37,10 +38,11 @@ fn handler(
 ) -> actix_web::Result<Json<ApiResponseData<UserDecryptResponse>>, ApiError> {
     let tenant = auth.tenant(&state.db_pool).await?;
     // look up tenant & user vault
-    let (vault, onboarding) = db::user_vault::get_by_tenant_and_onboarding(
+    let (vault, onboarding) = UserVault::get_for_tenant(
         &state.db_pool,
         tenant.id.clone(),
         request.footprint_user_id.clone(),
+        auth.is_live(),
     )
     .await?
     .ok_or(AuthError::InvalidTenantKeyOrUserId)?;

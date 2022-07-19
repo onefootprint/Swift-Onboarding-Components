@@ -2,6 +2,7 @@ use crate::auth::either::Either;
 use crate::auth::session_context::HasTenant;
 use crate::auth::session_data::tenant::secret_key::SecretTenantAuthContext;
 use crate::auth::session_data::tenant::workos::WorkOsSession;
+use crate::auth::IsLive;
 use crate::types::access_event::ApiAccessEvent;
 use crate::types::success::ApiPaginatedResponseData;
 use crate::utils::querystring::deserialize_stringified_list;
@@ -61,6 +62,7 @@ fn handler(
         timestamp_lte,
         timestamp_gte,
         kinds: data_kinds,
+        is_live: auth.is_live(),
     };
     let results =
         AccessEventListItemForTenant::get(&state.db_pool, params, cursor, (page_size + 1) as i64).await?;

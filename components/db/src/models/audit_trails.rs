@@ -27,10 +27,12 @@ impl AuditTrail {
         conn: &mut PgConnection,
         tenant_id: &TenantId,
         footprint_user_id: &FootprintUserId,
+        is_live: bool,
     ) -> Result<Vec<AuditTrail>, DbError> {
         let user_vault_ids = schema::onboardings::table
             .filter(schema::onboardings::tenant_id.eq(tenant_id))
             .filter(schema::onboardings::user_ob_id.eq(footprint_user_id))
+            .filter(schema::onboardings::is_live.eq(is_live))
             .select(schema::onboardings::user_vault_id);
         let audit_trails = schema::audit_trails::table
             // Get all access events for this user, but filter out access events from other tenants

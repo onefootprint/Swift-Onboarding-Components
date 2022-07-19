@@ -20,6 +20,7 @@ pub struct AccessEventListQueryParams {
     pub timestamp_lte: Option<DateTime<Utc>>,
     pub timestamp_gte: Option<DateTime<Utc>>,
     pub kinds: Vec<DataKind>,
+    pub is_live: bool,
 }
 
 #[derive(Debug)]
@@ -44,6 +45,7 @@ impl AccessEventListItemForTenant {
                     .left_join(schema::insight_events::table)
                     .order_by(schema::access_events::ordering_id.desc())
                     .filter(schema::onboardings::tenant_id.eq(params.tenant_id))
+                    .filter(schema::onboardings::is_live.eq(params.is_live))
                     .limit(page_size)
                     .into_boxed();
 

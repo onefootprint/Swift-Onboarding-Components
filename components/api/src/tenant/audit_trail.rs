@@ -2,6 +2,7 @@ use crate::auth::either::Either;
 use crate::auth::session_context::HasTenant;
 use crate::auth::session_data::tenant::secret_key::SecretTenantAuthContext;
 use crate::auth::session_data::tenant::workos::WorkOsSession;
+use crate::auth::IsLive;
 use crate::types::audit_trail::ApiAuditTrail;
 use crate::types::success::ApiResponseData;
 use crate::State;
@@ -29,7 +30,9 @@ fn get(
 
     let logs = state
         .db_pool
-        .db_query(move |conn| AuditTrail::get_for_tenant(conn, &tenant.id, &request.footprint_user_id))
+        .db_query(move |conn| {
+            AuditTrail::get_for_tenant(conn, &tenant.id, &request.footprint_user_id, auth.is_live())
+        })
         .await??;
 
     let response = logs.into_iter().map(ApiAuditTrail::from).collect::<Vec<_>>();
