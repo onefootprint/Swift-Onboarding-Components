@@ -40,7 +40,7 @@ impl FromRequest for PublicTenantAuthContext {
 
         Box::pin(async move {
             let config_key = newtypes::ObConfigurationKey::try_from(config_key?)
-                .map_err(|_| AuthError::InvalidTokenForHeader)?;
+                .map_err(|_| AuthError::InvalidTokenForHeader(HEADER_NAME.to_string()))?;
             let (ob_config, tenant) = ObConfiguration::get_enabled(&pool, config_key).await?;
             Ok(Self {
                 tenant,

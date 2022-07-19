@@ -35,8 +35,8 @@ pub enum AuthError {
     UnauthorizedOperation,
     #[error("session expired")]
     SessionExpired,
-    #[error("invalid token for header")]
-    InvalidTokenForHeader,
+    #[error("invalid token for header {0}")]
+    InvalidTokenForHeader(String),
 }
 
 /// For endpoints that take both a user_auth and tenant_auth, this helps to assert that the authenticated user

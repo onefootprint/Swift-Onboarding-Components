@@ -74,8 +74,8 @@ where
             // that they allow (example: UserSession<OnboardingSessionData>)
             // and if the session associated with the token cannot be converted to type T (in this case, OnboardingSession)
             // we fail
-            let session_data =
-                T::try_from(server_session.data).map_err(|_| AuthError::InvalidTokenForHeader)?;
+            let session_data = T::try_from(server_session.data)
+                .map_err(|_| AuthError::InvalidTokenForHeader(T::header_name()))?;
             Ok(Self {
                 data: session_data,
                 auth_token,
