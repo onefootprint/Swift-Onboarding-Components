@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React from 'react';
 import styled, { css } from 'styled-components';
-import { Container, FootprintLogo, IconButton, Tab } from 'ui';
+import { Box, Container, FootprintLogo, IconButton, Tab, Typography } from 'ui';
 
 import useSessionUser from '../../../../hooks/use-session-user';
 
@@ -20,10 +20,20 @@ type PrivateLayoutProps = {
 
 const PrivateLayout = ({ children }: PrivateLayoutProps) => {
   const router = useRouter();
-  const { logOut } = useSessionUser();
+  const { isLive, logOut } = useSessionUser();
   return (
     <div data-testid="private-layout">
       <header>
+        {!isLive && (
+          <Box sx={{ backgroundColor: 'warning' }}>
+            <Typography
+              variant="body-3"
+              sx={{ textAlign: 'center', paddingY: 2 }}
+            >
+              You are in sandbox mode.
+            </Typography>
+          </Box>
+        )}
         <Container minSize="md">
           <Footprint>
             <Link href="/users">

@@ -22,6 +22,7 @@ type UserSessionState = {
   returnUrl?: string;
   logIn: (data: UserSession) => void;
   logOut: () => void;
+  setIsLive: (value: boolean) => void;
   setReturnUrl: (returnUrl?: string) => void;
 };
 
@@ -32,14 +33,14 @@ export const useStore = create<UserSessionState>()(
     isLive: true,
     logIn: (data: UserSession) => set({ data }),
     logOut: () => set({ data: undefined }),
+    setIsLive: (value: boolean) => set({ isLive: value }),
     setReturnUrl: (returnUrl: string | undefined) => set({ returnUrl }),
   })),
 );
 
 const useSessionUser = () => {
-  const { data, returnUrl, logIn, logOut, setReturnUrl, isLive } = useStore(
-    state => state,
-  );
+  const { data, returnUrl, isLive, logIn, logOut, setIsLive, setReturnUrl } =
+    useStore(state => state);
   const isLoggedIn = !!data;
   const authHeaders = {
     [DASHBOARD_AUTHORIZATION_HEADER]: data?.auth as string,
@@ -50,9 +51,11 @@ const useSessionUser = () => {
     data,
     returnUrl,
     isLoggedIn,
+    isLive,
     authHeaders,
     logIn,
     logOut,
+    setIsLive,
     setReturnUrl,
   };
 };
