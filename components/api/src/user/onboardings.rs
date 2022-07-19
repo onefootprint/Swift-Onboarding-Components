@@ -1,11 +1,11 @@
 use crate::auth::session_context::HasUserVaultId;
 use crate::auth::{session_context::SessionContext, session_data::user::my_fp::My1fpBasicSession};
 use crate::errors::ApiError;
-use crate::types::insight_event::ApiInsightEvent;
+use crate::types::onboarding_link::ApiOnboardingLink;
 use crate::types::success::ApiResponseData;
 use crate::State;
-use chrono::{DateTime, Utc};
-use newtypes::{DataKind, OnboardingId, TenantId};
+use db::models::onboardings::{Onboarding, OnboardingLink};
+use newtypes::{OnboardingId, TenantId};
 use paperclip::actix::{api_v2_operation, get, web, web::Json, Apiv2Schema};
 
 type OnboardingResponse = Vec<ApiUserOnboarding>;
@@ -15,36 +15,38 @@ type OnboardingResponse = Vec<ApiUserOnboarding>;
 pub struct ApiUserOnboarding {
     id: OnboardingId,
     tenant_id: TenantId,
-    name: String,
-    description: Option<String>,
-    logo_url: Option<String>,
-    date: DateTime<Utc>,
-    authorized_data_kinds: Vec<DataKind>,
-    insight: ApiInsightEvent,
+    onboarding_links: Vec<ApiOnboardingLink>,
 }
 
 /// Returns a list of onboardings that a user has performed
 #[api_v2_operation(tags(User))]
 #[get("/onboardings")]
-fn handler(
+pub async fn handler(
     state: web::Data<State>,
     user_auth: SessionContext<My1fpBasicSession>,
 ) -> actix_web::Result<Json<ApiResponseData<OnboardingResponse>>, ApiError> {
-    // TODO adapt this endpoint to support multiple ob configs per onboarding
-    // https://linear.app/footprint/issue/FP-645/adapt-useronboardings-endpoint-to-support-multiple-ob-configurations
-    let results = db::onboarding::list_for_user_vault(&state.db_pool, user_auth.user_vault_id())
-        .await?
+    let user_vault_id = user_auth.user_vault_id();
+    let (onboardings, ob_links) = state
+        .db_pool
+        .db_query(move |conn| -> Result<_, db::DbError> {
+            let onboardings = Onboarding::list_for_user_vault(conn, &user_vault_id)?;
+            let onboarding_ids = onboardings.iter().map(|x| &x.id).collect();
+            let ob_links = OnboardingLink::get_for_onboardings(conn, onboarding_ids)?;
+            Ok((onboardings, ob_links))
+        })
+        .await??;
+    let results = onboardings
         .into_iter()
-        .map(|(onboarding, _, config, insight)| ApiUserOnboarding {
-            id: onboarding.id,
+        .map(|onboarding| ApiUserOnboarding {
             tenant_id: onboarding.tenant_id,
-            date: onboarding.start_timestamp,
-            name: config.name,
-            description: config.description,
-            logo_url: config.logo_url,
-            authorized_data_kinds: config.can_access_data_kinds,
-            insight: ApiInsightEvent::from(insight),
+            onboarding_links: ob_links
+                .get(&onboarding.id)
+                .unwrap_or(&vec![])
+                .iter()
+                .map(|x| ApiOnboardingLink::from(x.clone()))
+                .collect(),
+            id: onboarding.id,
         })
         .collect();
-    Ok(Json(ApiResponseData { data: results }))
+    Ok(Json(ApiResponseData::ok(results)))
 }

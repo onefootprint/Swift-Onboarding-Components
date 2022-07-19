@@ -5,6 +5,7 @@ pub mod audit_trail;
 pub mod error;
 pub mod insight_event;
 pub mod onboarding;
+pub mod onboarding_link;
 pub mod success;
 
 /// empty data

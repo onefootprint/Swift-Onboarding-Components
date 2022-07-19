@@ -1,15 +1,12 @@
 use crate::models::insight_event::InsightEvent;
-use crate::models::ob_configurations::ObConfiguration;
 use crate::models::onboardings::Onboarding;
 use crate::models::onboardings::OnboardingLink;
 use crate::schema;
-use crate::DbPool;
 use crate::{errors::DbError, schema::onboardings::BoxedQuery};
 use chrono::{DateTime, Utc};
 use diesel::pg::Pg;
 use diesel::prelude::*;
-use newtypes::OnboardingId;
-use newtypes::{Fingerprint, FootprintUserId, Status, TenantId, UserVaultId};
+use newtypes::{Fingerprint, FootprintUserId, Status, TenantId};
 
 #[derive(Clone)]
 pub struct OnboardingListQueryParams {
@@ -105,29 +102,4 @@ pub(crate) fn get_for_fp_id(
         .first(conn)
         .optional()?;
     Ok(ob)
-}
-
-/// get onboardings by a specific user vault
-pub async fn list_for_user_vault(
-    pool: &DbPool,
-    user_vault_id: UserVaultId,
-) -> Result<Vec<(Onboarding, OnboardingLink, ObConfiguration, InsightEvent)>, DbError> {
-    use schema::*;
-    let results = pool
-        .db_query(|conn| -> Result<_, DbError> {
-            let results = onboardings::table
-                .filter(onboardings::user_vault_id.eq(user_vault_id))
-                .inner_join(onboarding_links::table)
-                .inner_join(
-                    ob_configurations::table
-                        .on(ob_configurations::id.eq(onboarding_links::ob_configuration_id)),
-                )
-                .inner_join(
-                    insight_events::table.on(insight_events::id.eq(onboarding_links::insight_event_id)),
-                )
-                .get_results(conn)?;
-            Ok(results)
-        })
-        .await??;
-    Ok(results)
 }

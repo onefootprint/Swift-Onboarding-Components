@@ -1,8 +1,13 @@
+use std::collections::HashMap;
+
+use crate::models::insight_event::InsightEvent;
+use crate::models::ob_configurations::ObConfiguration;
 use crate::schema::{onboarding_links, onboardings};
 use crate::{DbError, DbPool};
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
+use itertools::Itertools;
 use newtypes::{
     FootprintUserId, InsightEventId, ObConfigurationId, OnboardingId, OnboardingLinkId, Status, TenantId,
     UserVaultId,
@@ -48,6 +53,8 @@ pub struct NewOnboardingLink {
     pub insight_event_id: InsightEventId,
 }
 
+pub type OnboardingLinkInfo = (OnboardingLink, ObConfiguration, InsightEvent);
+
 impl OnboardingLink {
     pub async fn get(
         pool: &DbPool,
@@ -83,6 +90,29 @@ impl OnboardingLink {
             })
             .await??;
         Ok(ob)
+    }
+
+    pub fn get_for_onboardings(
+        conn: &mut PgConnection,
+        onboarding_ids: Vec<&OnboardingId>,
+    ) -> Result<HashMap<OnboardingId, Vec<OnboardingLinkInfo>>, DbError> {
+        use crate::schema::{insight_events, ob_configurations};
+        let ob_links: Vec<OnboardingLinkInfo> = onboarding_links::table
+            .inner_join(ob_configurations::table)
+            .inner_join(insight_events::table)
+            .filter(onboarding_links::onboarding_id.eq_any(onboarding_ids))
+            .order_by(onboarding_links::onboarding_id)
+            .load(conn)?;
+
+        // Turn the Vec of OnboardingLinkInfo into a hashmap of OnboadringId -> Vec<OnboardingLinkInfo>
+        // group_by only groups adjacent items, so this requires that the vec is sorted by onboarding_id
+        let result = ob_links
+            .into_iter()
+            .group_by(|(link, _, _)| link.onboarding_id.clone())
+            .into_iter()
+            .map(|g| (g.0, g.1.collect()))
+            .collect();
+        Ok(result)
     }
 
     pub fn update_status(&self, conn: &mut PgConnection, new_status: Status) -> Result<(), DbError> {
@@ -154,5 +184,18 @@ impl NewOnboarding {
             })
             .await?;
         Ok(onboarding)
+    }
+}
+
+impl Onboarding {
+    /// get onboardings by a specific user vault
+    pub fn list_for_user_vault(
+        conn: &mut PgConnection,
+        user_vault_id: &UserVaultId,
+    ) -> Result<Vec<Onboarding>, DbError> {
+        let results = onboardings::table
+            .filter(onboardings::user_vault_id.eq(user_vault_id))
+            .get_results(conn)?;
+        Ok(results)
     }
 }
