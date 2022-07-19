@@ -2,6 +2,7 @@ use crate::auth::either::Either;
 use crate::auth::session_context::HasTenant;
 use crate::auth::session_data::tenant::secret_key::SecretTenantAuthContext;
 use crate::auth::session_data::tenant::workos::WorkOsSession;
+use crate::auth::IsLive;
 use crate::types::onboarding::ApiOnboarding;
 use crate::types::success::ApiPaginatedResponseData;
 use crate::utils::querystring::deserialize_stringified_list;
@@ -71,6 +72,7 @@ fn handler(
 
     let query_params = OnboardingListQueryParams {
         tenant_id: tenant.id.clone(),
+        is_live: auth.is_live(),
         statuses,
         fingerprints,
         footprint_user_id,

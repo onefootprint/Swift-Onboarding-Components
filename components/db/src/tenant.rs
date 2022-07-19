@@ -80,25 +80,20 @@ pub async fn api_init(
     Ok(tenant_api_key)
 }
 
-pub async fn secret_auth(pool: &DbPool, sh_api_key: Vec<u8>) -> Result<Option<Tenant>, DbError> {
-    let tenant = pool
-        .db_query(move |conn| -> Result<Option<Tenant>, DbError> {
-            let tenant_api_key: Option<TenantApiKey> = schema::tenant_api_keys::table
+pub async fn secret_auth(
+    pool: &DbPool,
+    sh_api_key: Vec<u8>,
+) -> Result<Option<(Tenant, TenantApiKey)>, DbError> {
+    let result = pool
+        .db_query(move |conn| -> Result<Option<(Tenant, TenantApiKey)>, DbError> {
+            let result: Option<(Tenant, TenantApiKey)> = schema::tenants::table
+                .inner_join(schema::tenant_api_keys::table)
                 .filter(schema::tenant_api_keys::sh_secret_api_key.eq(sh_api_key))
                 .first(conn)
                 .optional()?;
-
-            if let Some(tenant_api_key) = tenant_api_key {
-                let tenant: Tenant = schema::tenants::table
-                    .find(tenant_api_key.tenant_id)
-                    .first(conn)?;
-
-                Ok(Some(tenant))
-            } else {
-                Ok(None)
-            }
+            Ok(result)
         })
         .await??;
 
-    Ok(tenant)
+    Ok(result)
 }

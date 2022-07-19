@@ -1,6 +1,6 @@
 use std::{marker::PhantomData, pin::Pin};
 
-use actix_web::{web, FromRequest};
+use actix_web::{http::header::HeaderMap, web, FromRequest};
 use async_trait::async_trait;
 use chrono::{DateTime, Utc};
 use db::{
@@ -14,9 +14,9 @@ use paperclip::actix::Apiv2Security;
 use crate::{errors::ApiError, State};
 
 use super::{
-    session_data::{tenant::secret_key::SecretTenantAuthContext, HeaderName, ServerSession, SessionData},
+    session_data::{HeaderName, ServerSession, SessionData},
     uv_permission::{HasVaultPermission, VaultPermission},
-    AuthError,
+    AuthError, IsLive, SupportsIsLiveHeader,
 };
 
 #[derive(Debug, Clone, Apiv2Security)]
@@ -26,8 +26,18 @@ pub struct SessionContext<T> {
     pub data: T,
     pub auth_token: SessionAuthToken,
     pub expires_at: DateTime<Utc>,
+    pub headers: MaskedHeaderMap,
     // prevents external construction
     phantom: PhantomData<()>,
+}
+
+#[derive(Clone)]
+pub struct MaskedHeaderMap(HeaderMap);
+
+impl std::fmt::Debug for MaskedHeaderMap {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str("<redacted>")
+    }
 }
 
 impl<T> FromRequest for SessionContext<T>
@@ -41,12 +51,12 @@ where
         let state = req.app_data::<web::Data<State>>().unwrap().clone();
 
         let header = T::header_name();
-
         let auth_token = req
             .headers()
             .get(header.clone())
             .and_then(|hv| hv.to_str().map(|s| s.to_string()).ok())
             .ok_or(AuthError::MissingHeader(header));
+        let headers = req.headers().clone();
 
         Box::pin(async move {
             let auth_token = SessionAuthToken::from(auth_token?);
@@ -70,6 +80,7 @@ where
                 data: session_data,
                 auth_token,
                 expires_at: server_session.expires_at,
+                headers: MaskedHeaderMap(headers),
                 phantom: PhantomData,
             })
         })
@@ -126,17 +137,6 @@ where
     }
 }
 
-#[async_trait]
-impl HasTenant for SecretTenantAuthContext {
-    fn tenant_id(&self) -> TenantId {
-        self.tenant().id.clone()
-    }
-
-    async fn tenant(&self, _pool: &DbPool) -> Result<Tenant, ApiError> {
-        Ok(self.tenant().clone())
-    }
-}
-
 impl<C> SessionContext<C> {
     /// updates the session data and produces a sealed session data
     /// to update in the db
@@ -145,5 +145,19 @@ impl<C> SessionContext<C> {
         let sealed = session.seal(&state.session_sealing_key)?;
         Session::update(&state.db_pool, Some(sealed), &self.auth_token, None).await?;
         Ok(())
+    }
+}
+
+impl<C> IsLive for SessionContext<C>
+where
+    C: SupportsIsLiveHeader,
+{
+    fn is_live(&self) -> bool {
+        self.headers
+            .0
+            .get("x-is-live".to_owned())
+            .and_then(|hv| hv.to_str().map(|s| s.to_string()).ok())
+            .map(|v| v.trim().parse::<bool>().unwrap_or(true))
+            .unwrap_or(true)
     }
 }

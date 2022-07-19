@@ -1,10 +1,15 @@
+use crate::auth::session_context::HasTenant;
 use crate::auth::uv_permission::{HasVaultPermission, VaultPermission};
-use crate::auth::AuthError;
+use crate::auth::{AuthError, IsLive};
 use crate::{errors::ApiError, State};
 use actix_web::{web, FromRequest};
+use async_trait::async_trait;
+use db::models::tenant_api_keys::TenantApiKey;
 use db::models::tenants::Tenant;
+use db::DbPool;
 use futures_util::Future;
 
+use newtypes::TenantId;
 use paperclip::actix::Apiv2Security;
 use std::pin::Pin;
 
@@ -19,6 +24,7 @@ use std::pin::Pin;
 /// which authenticates the client as a tenant.
 pub struct SecretTenantAuthContext {
     tenant: Tenant,
+    api_key: TenantApiKey,
 }
 
 impl SecretTenantAuthContext {
@@ -54,14 +60,31 @@ pub async fn from_request_inner(req: &actix_web::HttpRequest) -> Result<SecretTe
 
     let sh_api_key = hmac_client.signed_hash(tenant_pk.as_bytes()).await?;
 
-    let tenant = db::tenant::secret_auth(&pool, sh_api_key)
+    let (tenant, api_key) = db::tenant::secret_auth(&pool, sh_api_key)
         .await?
         .ok_or(AuthError::UnknownClient)?;
-    Ok(SecretTenantAuthContext { tenant })
+    Ok(SecretTenantAuthContext { tenant, api_key })
 }
 
 impl HasVaultPermission for SecretTenantAuthContext {
     fn has_permission(&self, permission: VaultPermission) -> bool {
         matches!(permission, VaultPermission::Decrypt(_))
+    }
+}
+
+#[async_trait]
+impl HasTenant for SecretTenantAuthContext {
+    fn tenant_id(&self) -> TenantId {
+        self.tenant().id.clone()
+    }
+
+    async fn tenant(&self, _pool: &DbPool) -> Result<Tenant, ApiError> {
+        Ok(self.tenant().clone())
+    }
+}
+
+impl IsLive for SecretTenantAuthContext {
+    fn is_live(&self) -> bool {
+        self.api_key.is_live
     }
 }

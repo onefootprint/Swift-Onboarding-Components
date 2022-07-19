@@ -56,3 +56,10 @@ pub async fn get_onboarding_for_tenant(
 
     Ok(onboarding)
 }
+
+/// A helper trait to extract whether the auth session is for sandbox or production data
+pub trait IsLive {
+    fn is_live(&self) -> bool;
+}
+
+pub trait SupportsIsLiveHeader {}

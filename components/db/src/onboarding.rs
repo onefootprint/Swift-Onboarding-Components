@@ -11,6 +11,7 @@ use newtypes::{Fingerprint, FootprintUserId, Status, TenantId};
 #[derive(Clone)]
 pub struct OnboardingListQueryParams {
     pub tenant_id: TenantId,
+    pub is_live: bool,
     pub statuses: Vec<Status>,
     pub fingerprints: Option<Vec<Fingerprint>>,
     pub footprint_user_id: Option<FootprintUserId>,
@@ -21,6 +22,7 @@ pub struct OnboardingListQueryParams {
 pub fn list_for_tenant_query<'a>(params: OnboardingListQueryParams) -> BoxedQuery<'a, Pg> {
     let mut query = schema::onboardings::table
         .filter(schema::onboardings::tenant_id.eq(params.tenant_id))
+        .filter(schema::onboardings::is_live.eq(params.is_live))
         .into_boxed();
 
     if !params.statuses.is_empty() {

@@ -12,7 +12,7 @@ use crate::errors::ApiError;
 use super::{
     session_context::{HasTenant, HasUserVaultId, SessionContext},
     uv_permission::{HasVaultPermission, VaultPermission},
-    AuthError,
+    AuthError, IsLive,
 };
 
 #[derive(Debug, Clone, Apiv2Security)]
@@ -118,6 +118,19 @@ where
         match self {
             Either::Left(s) => s.tenant(pool).await,
             Either::Right(s) => s.tenant(pool).await,
+        }
+    }
+}
+
+impl<A, B> IsLive for Either<A, B>
+where
+    A: IsLive,
+    B: IsLive,
+{
+    fn is_live(&self) -> bool {
+        match self {
+            Either::Left(l) => l.is_live(),
+            Either::Right(r) => r.is_live(),
         }
     }
 }

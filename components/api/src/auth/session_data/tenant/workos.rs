@@ -3,7 +3,7 @@ use crate::{
         session_context::HasTenant,
         session_data::{HeaderName, SessionData},
         uv_permission::{HasVaultPermission, VaultPermission},
-        AuthError,
+        AuthError, SupportsIsLiveHeader,
     },
     errors::ApiError,
 };
@@ -68,3 +68,5 @@ impl WorkOsSession {
         }
     }
 }
+
+impl SupportsIsLiveHeader for WorkOsSession {}
