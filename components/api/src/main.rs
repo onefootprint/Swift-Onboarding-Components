@@ -183,8 +183,6 @@ async fn main() -> std::io::Result<()> {
             // use custom error handler
             .error_handler(|err, _req| actix_web::Error::from(ApiError::InvalidJsonBody(err)));
 
-        tracing::info!("flerp");
-
         App::new()
             .app_data(web::Data::new(state.clone()))
             .wrap(
