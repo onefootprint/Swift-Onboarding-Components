@@ -19,6 +19,7 @@ async fn test_db() {
         public_key: VaultPublicKey::unvalidated("public key".as_bytes().to_vec()),
         workos_id: "test".to_owned(),
         email_domain: "dbtest.com".to_owned(),
+        logo_url: None,
     };
     let _tenant = crate::tenant::init_or_get(&pool, tenant)
         .await

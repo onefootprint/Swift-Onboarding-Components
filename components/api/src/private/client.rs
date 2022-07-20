@@ -71,6 +71,7 @@ async fn post(
             public_key: ec_pk_uncompressed,
             workos_id: workos_org_id,
             email_domain,
+            logo_url: Some("https://acmebank.onefootprint.com/logo-acme-bank.png".to_string()),
         },
     )
     .await?;
@@ -83,7 +84,6 @@ async fn post(
         can_access_data_kinds,
         settings: ObConfigurationSettings::Empty,
         is_live,
-        logo_url: Some("https://acmebank.onefootprint.com/logo-acme-bank.png".to_string()),
     };
     let obc = obc.save(&state.db_pool).await?;
 

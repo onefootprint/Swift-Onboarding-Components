@@ -15,6 +15,7 @@ use newtypes::{
 use serde::{Deserialize, Serialize};
 
 use super::insight_event::CreateInsightEvent;
+use super::tenants::Tenant;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
 #[diesel(table_name = onboardings)]
@@ -192,8 +193,10 @@ impl Onboarding {
     pub fn list_for_user_vault(
         conn: &mut PgConnection,
         user_vault_id: &UserVaultId,
-    ) -> Result<Vec<Onboarding>, DbError> {
+    ) -> Result<Vec<(Onboarding, Tenant)>, DbError> {
+        use crate::schema::tenants;
         let results = onboardings::table
+            .inner_join(tenants::table)
             .filter(onboardings::user_vault_id.eq(user_vault_id))
             .get_results(conn)?;
         Ok(results)

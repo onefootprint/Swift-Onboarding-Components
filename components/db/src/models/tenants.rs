@@ -15,6 +15,7 @@ pub struct Tenant {
     pub email_domain: String,
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
+    pub logo_url: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
@@ -25,4 +26,5 @@ pub struct NewTenant {
     pub e_private_key: EncryptedVaultPrivateKey,
     pub workos_id: String,
     pub email_domain: String,
+    pub logo_url: Option<String>,
 }

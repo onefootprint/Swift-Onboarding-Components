@@ -71,7 +71,6 @@ table! {
         is_disabled -> Bool,
         can_access_data_kinds -> Array<Text>,
         is_live -> Bool,
-        logo_url -> Nullable<Text>,
     }
 }
 
@@ -151,6 +150,7 @@ table! {
         email_domain -> Varchar,
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
+        logo_url -> Nullable<Text>,
     }
 }
 

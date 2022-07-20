@@ -9,7 +9,6 @@ use super::insight_event::ApiInsightEvent;
 pub struct ApiOnboardingLink {
     name: String,
     description: Option<String>,
-    logo_url: Option<String>,
     timestamp: DateTime<Utc>,
     status: Status,
     can_access_data_kinds: Vec<DataKind>,
@@ -26,14 +25,12 @@ impl From<OnboardingLinkInfo> for ApiOnboardingLink {
         let db::models::ob_configurations::ObConfiguration {
             name,
             description,
-            logo_url,
             can_access_data_kinds,
             ..
         } = s.1;
         Self {
             name,
             description,
-            logo_url,
             timestamp: start_timestamp,
             status,
             can_access_data_kinds,
