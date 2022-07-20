@@ -11,15 +11,22 @@ const Address = () => {
     return null;
   }
   const { streetAddress, streetAddress2, city, country, state, zip } = data;
+  const hasAddress =
+    streetAddress || streetAddress2 || city || country || state || zip;
 
   return (
     <Container>
-      <Typography variant="label-3">
-        {createAddressLine([streetAddress, streetAddress2])}
-      </Typography>
-      <Typography variant="body-3">
-        {createAddressLine([city, state, zip, country])}
-      </Typography>
+      {!hasAddress && <Typography variant="label-3"> -</Typography>}
+      {hasAddress && (
+        <>
+          <Typography variant="label-3">
+            {createAddressLine([streetAddress, streetAddress2])}
+          </Typography>
+          <Typography variant="body-3">
+            {createAddressLine([city, state, zip, country])}
+          </Typography>
+        </>
+      )}
     </Container>
   );
 };
