@@ -110,6 +110,7 @@
       },
       "access-logs": {
         "title": "Access logs",
+        "empty": "Your data hasn't been accessed by any companies yet.",
         "timeline": {
           "log": {
             "singular-kind-accessed-by": "was accessed by",
