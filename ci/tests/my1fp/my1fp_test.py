@@ -2,7 +2,7 @@ import pytest
 
 import re
 from tests.auth import My1fpAuth
-from tests.constants import FIELDS_TO_DECRYPT, EMAIL, PHONE_NUMBER, CAN_ACCESS_DATA_KINDS
+from tests.constants import FIELDS_TO_DECRYPT
 
 from tests.utils import try_until_success, post, get
 
@@ -63,7 +63,7 @@ class TestMy1fp:
         assert user["first_name"].upper() == my1fp_authed_user.first_name.upper()
         assert user["last_name"].upper() == my1fp_authed_user.last_name.upper()
 
-    def test_logged_in_user_onboardings(self, my1fp_authed_user):
+    def test_logged_in_user_onboardings(self, my1fp_authed_user, can_access_data_kinds):
         # Get the user detail using the logged in context
         body = get("user/onboardings", None, my1fp_authed_user.auth_token)
         onboardings = body["data"]
@@ -71,7 +71,7 @@ class TestMy1fp:
         onboarding_info = onboardings[0]["onboarding_links"][0]
         assert onboarding_info["name"] == "Acme Bank"
         assert onboarding_info["insight_event"]
-        assert set(onboarding_info["can_access_data_kinds"]) == set(CAN_ACCESS_DATA_KINDS)
+        assert set(onboarding_info["can_access_data_kinds"]) == set(can_access_data_kinds)
         
     def test_logged_in_access_events(self, my1fp_authed_user):
         tenant = my1fp_authed_user.tenant

@@ -1,32 +1,69 @@
 import json
 import os
 import re
-from tests.conftest import cleanup
 import pytest
 
 from tests.auth import D2pAuth, OnboardingAuth
 from tests.constants import EMAIL, PHONE_NUMBER
-from tests.utils import _b64_decode, _b64_encode, _gen_random_ssn, try_until_success, _override_webauthn_attestation, _override_webauthn_challenge, get, post
+from tests.utils import _b64_decode, _b64_encode, _gen_random_ssn, try_until_success, _override_webauthn_attestation, _override_webauthn_challenge, get, post, create_tenant, clean_up_user
 from tests.webauthn_simulator import SoftWebauthnDevice
-from collections import defaultdict
 
 
 WEBAUTHN_DEVICE = SoftWebauthnDevice()
 
-def pytest_namespace():
-    # Normally, we wouldn't write tests that share data between them. Since the onboarding flow
-    # is so long, there's benefit in splitting it into separate tests and passing info between
-    # them
-    return {"fpuser_auth_token": None, "fp_user_id": None, "challenge_token": None}
+
+@pytest.fixture(scope="module")
+def auth_token(twilio):
+    # Test the SMS challenge flow, return the resulting auth token of the user created with the number
+    data = {"phone_number": PHONE_NUMBER}
+    body = post("identify/challenge", data)
+    challenge_token = body["data"]["challenge_token"]
+    def identify_verify():
+        message = twilio.messages.list(to=PHONE_NUMBER, limit=1)[0]
+        code = str(re.search("\\d{6}", message.body).group(0))
+        
+        data = {
+            "challenge_response": code,
+            "challenge_kind": "sms",
+            "challenge_token": challenge_token,
+        }
+        body = post("identify/verify", data)
+        assert body["data"]["kind"] == "user_created"
+        return OnboardingAuth(body["data"]["auth_token"])
+    return try_until_success(identify_verify, 5)
+
+
+@pytest.fixture(scope="session")
+def foo_tenant(must_collect_data_kinds, can_access_data_kinds):
+    data = {
+        "name": "foo",
+        "must_collect_data_kinds": must_collect_data_kinds,
+        "can_access_data_kinds": can_access_data_kinds,
+        "is_live": True,
+    }
+    return create_tenant(data)
+
+
+@pytest.fixture(scope="session")
+def bar_tenant(must_collect_data_kinds, can_access_data_kinds):
+    data = {
+        "name": "bar",
+        "must_collect_data_kinds": must_collect_data_kinds,
+        "can_access_data_kinds": can_access_data_kinds,
+        "is_live": True,
+    }
+    return create_tenant(data)
+
+
+@pytest.fixture(scope="module", autouse="true")
+def cleanup():
+    # Cleanup the non-sandbox user that is used across all integration test runs
+    clean_up_user(PHONE_NUMBER, EMAIL)
 
 
 class TestBifrost:
-    def test_cleanup_user(self):
-        # Cleanup the non-sandbox user that is used across all integration test runs
-        cleanup(PHONE_NUMBER, EMAIL)
-
-    def test_identify_email(self):
-        identifier = {"email": EMAIL}
+    @pytest.mark.parametrize("identifier", [dict(email=EMAIL), dict(phone_number=PHONE_NUMBER)])
+    def test_identify_doesnt_exist(self, identifier):
         data = {"identifier": identifier, "preferred_challenge_kind": "sms"}
 
         # First try identifying with an email. The user won't exist
@@ -34,40 +71,12 @@ class TestBifrost:
         assert not body["data"]["user_found"]
         assert not body["data"].get("challenge_data", dict())
 
-    def test_identify_phone(self):
-        identifier = {"phone_number": PHONE_NUMBER}
-        data = {"identifier": identifier, "preferred_challenge_kind": "sms"}
-
-        body = post("identify", data)
-        assert not body["data"]["user_found"]
-        assert not body["data"].get("challenge_data", dict())
-
-
-    def test_identify_challenge(self, twilio):
-        data = {"phone_number": PHONE_NUMBER}
-        body = post("identify/challenge", data)
-        pytest.challenge_token = body["data"]["challenge_token"]
-        def identify_verify():
-            message = twilio.messages.list(to=PHONE_NUMBER, limit=1)[0]
-            code = str(re.search("\\d{6}", message.body).group(0))
-            
-            data = {
-                "challenge_response": code,
-                "challenge_kind": "sms",
-                "challenge_token": pytest.challenge_token,
-            }
-            body = post("identify/verify", data)
-            assert body["data"]["kind"] == "user_created"
-            auth_token = body["data"]["auth_token"]
-            pytest.fpuser_auth_token = OnboardingAuth(auth_token)
-        try_until_success(identify_verify, 5)
-
-    def test_onboard_init(self, workos_tenant):
-        body = post("onboarding", None, workos_tenant.pk, pytest.fpuser_auth_token)
+    def test_onboard_init(self, workos_tenant, auth_token):
+        body = post("onboarding", None, workos_tenant.pk, auth_token)
         assert set(body["data"]["missing_attributes"]) == {"first_name", "last_name", "dob", "ssn", "street_address", "city", "state", "zip", "country", "email"}
         assert body["data"]["missing_webauthn_credentials"] == True
 
-    def test_user_data(self):
+    def test_user_data(self, auth_token):
         data = {
             "name": {
                 "first_name": "Flerp",
@@ -91,7 +100,7 @@ class TestBifrost:
             "ssn": _gen_random_ssn(),
             "email": EMAIL,
         } 
-        post("user/data", data, pytest.fpuser_auth_token)
+        post("user/data", data, auth_token)
 
         # Issue a second POST /user/data request to update some fields
         data = {
@@ -100,11 +109,11 @@ class TestBifrost:
                 "last_name": "Derp2",
             }
         }
-        post("user/data", data, pytest.fpuser_auth_token)
+        post("user/data", data, auth_token)
 
-    def test_user_biometric(self):    
+    def test_user_biometric(self, auth_token):
         # get challenge
-        body = post("user/biometric/init", None, pytest.fpuser_auth_token)
+        body = post("user/biometric/init", None, auth_token)
         chal_token = body["data"]["challenge_token"]
         chal = _override_webauthn_challenge(json.loads(body["data"]["challenge_json"]))
         attestation = WEBAUTHN_DEVICE.create(chal, os.environ.get('TEST_URL'))
@@ -112,11 +121,11 @@ class TestBifrost:
 
         # Register credential
         data = dict(challenge_token=chal_token, device_response_json=json.dumps(attestation))
-        post("user/biometric", data, pytest.fpuser_auth_token)
+        post("user/biometric", data, auth_token)
 
-    def test_d2p(self):
+    def test_d2p(self, auth_token):
         # Get new auth token in d2p/generate endpoint
-        body = post("onboarding/d2p/generate", None, pytest.fpuser_auth_token)
+        body = post("onboarding/d2p/generate", None, auth_token)
         d2p_auth_token = D2pAuth(body["data"]["auth_token"])
 
         # Send the d2p token to the user via SMS
@@ -149,15 +158,14 @@ class TestBifrost:
         # Shouldn't be able to use the auth token to add a biometric unless it's in in_progress
         body = post("user/biometric/init", None, d2p_auth_token, status_code=401)
 
-    def test_onboarding_complete(self, workos_tenant): 
-        body = post("onboarding/complete", None, workos_tenant.pk, pytest.fpuser_auth_token)
+    def test_onboarding_complete(self, workos_tenant, auth_token): 
+        body = post("onboarding/complete", None, workos_tenant.pk, auth_token)
         fp_user_id = body["data"]["footprint_user_id"]
         validation_token = body["data"]["validation_token"]
 
         assert body["data"]["missing_webauthn_credentials"] == False
         assert fp_user_id
         assert validation_token
-        pytest.fp_user_id = fp_user_id
 
         # test the validate api call
         data = dict(validation_token=validation_token)
@@ -166,19 +174,20 @@ class TestBifrost:
         assert fp_user_id2 == fp_user_id
         assert body["data"]["status"]
 
-    def test_onboard_onto_same_tenant(self, workos_tenant):
-        body = post("onboarding", None, workos_tenant.pk, pytest.fpuser_auth_token)
+    def test_onboard_onto_same_tenant(self, workos_tenant, auth_token):
+        body = post("onboarding", None, workos_tenant.pk, auth_token)
         assert not body["data"]["missing_attributes"]
         assert not body["data"]["missing_webauthn_credentials"]
 
-        body = post("onboarding/complete", None, workos_tenant.pk, pytest.fpuser_auth_token)
+        body = post("onboarding/complete", None, workos_tenant.pk, auth_token)
         validation_token = body["data"]["validation_token"]
         data = dict(validation_token=validation_token)
         body = post("org/validate", data, workos_tenant.sk)
         assert body["data"]["footprint_user_id"]
 
-    def test_identify_login_repeat_customer_biometric(self):
-        pytest.fpuser_auth_token = None  # Remove fpuser_auth_token from previous test
+    def test_identify_login_repeat_customer_biometric(self, auth_token):
+        # Not used in test, but want to make sure the user has been created before running this test
+        auth_token
         # Identify the user by email
         identifier = {"email": EMAIL}
         data = {"identifier": identifier, "preferred_challenge_kind": "biometric"}
@@ -214,9 +223,9 @@ class TestBifrost:
         body = post("identify/verify", data)
         assert body["data"]["kind"] == "user_inherited"
 
-    def test_identify_repeat_customer(self, foo_tenant, twilio):
-        pytest.fpuser_auth_token = None  # Remove fpuser_auth_token from previous test
-
+    def test_identify_repeat_customer(self, foo_tenant, bar_tenant, twilio, auth_token):
+        # Not used in test, but want to make sure the user has been created before running this test
+        auth_token
         # Identify the user by email
         identifier = {"email": EMAIL}
         data = {"identifier": identifier, "preferred_challenge_kind": "sms"}
@@ -240,21 +249,26 @@ class TestBifrost:
             }
             body = post("identify/verify", data)
             assert body["data"]["kind"] == "user_inherited"
-            auth_token = body["data"]["auth_token"]
-            pytest.fpuser_auth_token = OnboardingAuth(auth_token)
-        try_until_success(identify_verify, 5)
+            return OnboardingAuth(body["data"]["auth_token"])
+        auth_token = try_until_success(identify_verify, 5)
 
-        # Start onboarding for user
-        body = post("onboarding", None, foo_tenant.pk, pytest.fpuser_auth_token)
-        assert not body["data"]["missing_attributes"]
+        def onboard_onto_tenant(tenant):
+            # Start onboarding for user
+            body = post("onboarding", None, tenant.pk, auth_token)
+            assert not body["data"]["missing_attributes"]
 
-        # complete onboarding for user
-        body = post("onboarding/complete", None, foo_tenant.pk, pytest.fpuser_auth_token)
-        validation_token = body["data"]["validation_token"]
-        assert validation_token
+            # complete onboarding for user
+            body = post("onboarding/complete", None, tenant.pk, auth_token)
+            validation_token = body["data"]["validation_token"]
+            assert validation_token
 
-        # test the validate api call
-        data = dict(validation_token=validation_token)
-        body = post("org/validate", data, foo_tenant.sk)
-        fp_user_id2 = body["data"]["footprint_user_id"]
-        assert pytest.fp_user_id != fp_user_id2, "Different tenants should have different fp_user_ids"
+            # test the validate api call
+            data = dict(validation_token=validation_token)
+            body = post("org/validate", data, tenant.sk)
+            return body["data"]["footprint_user_id"]
+
+        foo_fp_user_id = onboard_onto_tenant(foo_tenant)
+        bar_fp_user_id = onboard_onto_tenant(bar_tenant)
+        assert foo_fp_user_id != bar_fp_user_id, (
+            "Onboarding onto different tenants should give different fp_user_id"
+        )

@@ -5,21 +5,13 @@ import pytest
 from twilio.rest import Client
 from .auth import (
     OnboardingAuth,
-    TenantAuth,
-    TenantSecretAuth,
-    D2pAuth,
-    My1fpAuth,
 )
 from .constants import (
-    CAN_ACCESS_DATA_KINDS,
-    WORKOS_ORG_ID,
-    MUST_COLLECT_DATA_KINDS,
-    CAN_ACCESS_DATA_KINDS,
     TWILIO_ACCOUNT_SID,
     TWILIO_API_KEY,
     TWILIO_API_KEY_SECRET,
 )
-from .types import User, Tenant
+from .types import User
 from .utils import (
     _gen_random_ssn,
     _override_webauthn_attestation,
@@ -28,63 +20,55 @@ from .utils import (
     _random_sandbox_phone,
     try_until_success,
     post,
+    create_tenant,
 )
 from .webauthn_simulator import SoftWebauthnDevice
 
-def cleanup(phone_number, email):
-    # cleanup live user
-    post("private/cleanup", dict(phone_number=phone_number))
-    identifier = {"email": email}
-    body = post("identify", dict(identifier=identifier, preferred_challenge_kind="sms"))
-    assert not body["data"]["user_found"]
-    assert not body["data"].get("challenge_data", dict())
 
-
-def _create_tenant(data):
-    body = post("private/client", data)
-    client_public_key = body["data"]["keys"]["client_public_key"]
-    client_secret_key = body["data"]["keys"]["client_secret_key"]
-    print("\n======Client info======")
-    print(body)
-    return Tenant(
-        pk=TenantAuth(client_public_key),
-        sk=TenantSecretAuth(client_secret_key),
-        configuration_id=body["data"]["configuration_id"],
-    )
+@pytest.fixture(scope="session")
+def can_access_data_kinds():
+    # Everything but city
+    return [
+        "first_name",
+        "last_name",
+        "dob",
+        "ssn",
+        "street_address",
+        "street_address2",
+        "state",
+        "zip",
+        "country",
+        "email",
+        "phone_number",
+    ]
 
 
 @pytest.fixture(scope="session")
-def workos_tenant():
+def must_collect_data_kinds(can_access_data_kinds):
+    return can_access_data_kinds + ["city"]
+
+
+@pytest.fixture(scope="session")
+def workos_tenant(must_collect_data_kinds, can_access_data_kinds):
     data = {
         "name": "Acme Bank",        
-        "must_collect_data_kinds": MUST_COLLECT_DATA_KINDS,
-        "can_access_data_kinds": CAN_ACCESS_DATA_KINDS,
+        "must_collect_data_kinds": must_collect_data_kinds,
+        "can_access_data_kinds": can_access_data_kinds,
         "is_live": True,
     }
-    return _create_tenant(data)
+    return create_tenant(data)
 
 
 @pytest.fixture(scope="module")
-def workos_sandbox_tenant():
+def workos_sandbox_tenant(must_collect_data_kinds, can_access_data_kinds):
     data = {
         "name": "Acme Bank",    
         "is_live": False,
-        "must_collect_data_kinds": MUST_COLLECT_DATA_KINDS,
-        "can_access_data_kinds": CAN_ACCESS_DATA_KINDS,
+        "must_collect_data_kinds": must_collect_data_kinds,
+        "can_access_data_kinds": can_access_data_kinds,
         "is_live": False,
     }
-    return _create_tenant(data)
-
-
-@pytest.fixture(scope="session")
-def foo_tenant():
-    data = {
-        "name": "foo",
-        "must_collect_data_kinds": MUST_COLLECT_DATA_KINDS,
-        "can_access_data_kinds": CAN_ACCESS_DATA_KINDS,
-        "is_live": True,
-    }
-    return _create_tenant(data)
+    return create_tenant(data)
 
 
 @pytest.fixture(scope="session")
