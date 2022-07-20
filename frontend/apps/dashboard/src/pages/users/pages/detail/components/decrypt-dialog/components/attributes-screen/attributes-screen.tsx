@@ -1,6 +1,6 @@
 import React, { ChangeEvent } from 'react';
 import DataKindBoxes from 'src/components/data-kind-boxes';
-import { ALL_FIELDS, DataKindType } from 'src/types';
+import { DataKindType } from 'src/types';
 import { Box, Checkbox, Divider, Typography } from 'ui';
 
 type AttributesScreenProps = {
@@ -10,6 +10,7 @@ type AttributesScreenProps = {
     ...kinds: DataKindType[]
   ) => (e: ChangeEvent<HTMLInputElement>) => void;
   isFieldDisabled: (...kinds: DataKindType[]) => boolean;
+  allDecryptableFields: DataKindType[];
 };
 
 const AttributesScreen = ({
@@ -17,6 +18,7 @@ const AttributesScreen = ({
   isFieldSelected,
   setFieldFor,
   isFieldDisabled,
+  allDecryptableFields,
 }: AttributesScreenProps) => (
   <>
     <Typography variant="label-1">
@@ -30,9 +32,9 @@ const AttributesScreen = ({
     <Box sx={{ marginTop: 7, marginBottom: 7 }}>
       <Checkbox
         label="All"
-        disabled={isFieldDisabled(...ALL_FIELDS)}
-        checked={isFieldSelected(...ALL_FIELDS)}
-        onChange={setFieldFor(...ALL_FIELDS)}
+        disabled={isFieldDisabled(...allDecryptableFields)}
+        checked={isFieldSelected(...allDecryptableFields)}
+        onChange={setFieldFor(...allDecryptableFields)}
       />
     </Box>
     <Divider />

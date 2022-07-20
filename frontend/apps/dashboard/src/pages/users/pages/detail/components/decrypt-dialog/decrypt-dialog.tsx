@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import useDataKindSelectedFields from 'src/components/data-kind-boxes/hooks/use-data-kind-selected-fields';
 import { User } from 'src/pages/users/hooks/use-join-users';
-import { DataKindType } from 'src/types';
+import { dataKindToType, DataKindType } from 'src/types';
 import { Button, Dialog } from 'ui';
 
 import AttributesScreen from './components/attributes-screen';
@@ -22,14 +22,36 @@ const DecryptDialog = ({ user, onDecrypt }: DecryptDialogProps) => {
   const [reason, setReason] = useState('');
   const { selectedFields, setFieldFor, clearSelectedFields } =
     useDataKindSelectedFields();
+  const allowedToDecryptFields = Array.from(
+    new Set(
+      user.onboardingLinks.flatMap(link =>
+        link.canAccessDataKinds.map(dataKind => dataKindToType[dataKind]),
+      ),
+    ),
+  );
+  // The user is allowed to decrypt a field if
+  //   (1) the onboarding configuration gives access to decrypt it AND
+  //   (2) the user vault has a value set for this field
+  const decryptableFields = allowedToDecryptFields.filter(
+    kind => user.attributes[kind]?.exists,
+  );
 
   const isFieldSelected = (...kinds: DataKindType[]) =>
-    kinds.every(kind => selectedFields[kind] || isFieldDisabled(kind));
+    // Display box as checked if
+    //   (1) the user checked it OR
+    //   (2) it's decrypted OR
+    //   (3) there's no value set
+    kinds.every(
+      kind =>
+        selectedFields[kind] ||
+        user.attributes[kind]?.value ||
+        !user.attributes[kind]?.exists,
+    );
 
   const isFieldDisabled = (...kinds: DataKindType[]) =>
-    // Don't allow requesting to decrypt a field that is either already decrypted OR explicitly null
+    // Don't allow decrypting a field that is already decrypted
     kinds.every(
-      kind => user.attributes[kind]?.value || !user.attributes[kind]?.exists,
+      kind => user.attributes[kind]?.value || !decryptableFields.includes(kind),
     );
 
   const openDialog = () => {
@@ -89,6 +111,7 @@ const DecryptDialog = ({ user, onDecrypt }: DecryptDialogProps) => {
             isFieldSelected={isFieldSelected}
             setFieldFor={setFieldFor}
             isFieldDisabled={isFieldDisabled}
+            allDecryptableFields={decryptableFields}
           />
         )}
         {dialogScreen === 'reason' && (
