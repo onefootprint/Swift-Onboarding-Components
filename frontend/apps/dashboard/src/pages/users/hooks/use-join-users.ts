@@ -4,20 +4,15 @@ import {
   DataKind,
   DataKindType,
   Onboarding,
-  OnboardingLink,
   OnboardingStatus,
   statusToPriority,
 } from 'src/types';
 
 import { UserAttributes, UserData } from './use-user-data';
 
-export type User = {
-  footprintUserId: string;
+export type User = Onboarding & {
   status: OnboardingStatus;
-  initiatedAt: string;
-  orderingId: string;
   attributes: UserAttributes;
-  onboardingLinks: OnboardingLink[];
 };
 
 // Create a custom UserData for name since it's two separate attributes joined
@@ -75,12 +70,9 @@ const useJoinUsers = (
           )[0]?.status || OnboardingStatus.incomplete;
 
         return {
-          footprintUserId: onboarding.footprintUserId,
           status: maxStatus,
-          orderingId: onboarding.orderingId,
-          initiatedAt: onboarding.startTimestamp,
           attributes,
-          onboardingLinks: onboarding.onboardingLinks,
+          ...onboarding,
         } as User;
       }),
     [decryptedUsers, onboardings],

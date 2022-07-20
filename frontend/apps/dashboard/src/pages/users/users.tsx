@@ -100,7 +100,7 @@ const Users = () => {
             <td>
               <Typography variant="body-3" color="primary">
                 {/* TODO better formatting utils */}
-                {new Date(item.initiatedAt).toLocaleString('en-us', {
+                {new Date(item.startTimestamp).toLocaleString('en-us', {
                   month: 'numeric',
                   day: 'numeric',
                   year: '2-digit',

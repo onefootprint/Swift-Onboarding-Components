@@ -31,7 +31,7 @@ const UserHeader = ({ user, onDecrypt }: BasicInfoProps) => {
         <RowContainer>
           <Typography variant="body-3" color="primary">
             {/* TODO better formatting utils */}
-            {new Date(user.initiatedAt).toLocaleString('en-us', {
+            {new Date(user.startTimestamp).toLocaleString('en-us', {
               month: 'numeric',
               day: 'numeric',
               year: '2-digit',
