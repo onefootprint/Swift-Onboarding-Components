@@ -1,10 +1,13 @@
+import { useTranslation } from 'hooks';
+import IcoForbid40 from 'icons/ico/ico-forbid-40';
 import React, { useEffect } from 'react';
 import useBifrostMachine, { Events } from 'src/hooks/use-bifrost-machine';
 import useOnboarding from 'src/hooks/use-onboarding';
-import styled from 'styled-components';
-import { LoadingIndicator } from 'ui';
+import styled, { css } from 'styled-components';
+import { LoadingIndicator, Typography } from 'ui';
 
 const OnboardingVerification = () => {
+  const { t } = useTranslation('pages.registration.onboarding-verification');
   const [state, send] = useBifrostMachine();
   const { context } = state;
   const onboardingMutation = useOnboarding();
@@ -33,16 +36,20 @@ const OnboardingVerification = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [context.authToken, context.tenant.pk]);
 
-  // TODO: Create edge case errors screen
-  // In theory this should not happen, but it's cover do cover
-  // https://linear.app/footprint/issue/FP-566/create-edge-case-erro-scree-s
   if (!context.tenant.pk || !context.authToken) {
     return <div />;
   }
 
-  // TODO: ERROR
   if (onboardingMutation.isError) {
-    return <div />;
+    return (
+      <Container>
+        <TitleContainer>
+          <IcoForbid40 color="error" />
+          <Typography variant="heading-3">{t('error.title')}</Typography>
+        </TitleContainer>
+        <Typography variant="body-2">{t('error.description')}</Typography>
+      </Container>
+    );
   }
 
   return (
@@ -52,11 +59,26 @@ const OnboardingVerification = () => {
   );
 };
 
+const TitleContainer = styled.div`
+  ${({ theme }) => css`
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    row-gap: ${theme.spacing[2]}px;
+    justify-content: center;
+  `}
+`;
+
 const Container = styled.div`
-  align-items: center;
-  display: flex;
-  height: 188px;
-  justify-content: center;
+  ${({ theme }) => css`
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    row-gap: ${theme.spacing[7]}px;
+    height: 188px;
+    justify-content: center;
+    text-align: center;
+  `}
 `;
 
 export default OnboardingVerification;
