@@ -16,20 +16,25 @@ describe('<Identity />', () => {
   describe('when all the values are filled', () => {
     beforeEach(() => {
       useStore.setState({
-        data: {
+        session: {
           authToken: 'lorem',
-          city: 'San Francisco',
-          country: 'United States',
-          dob: '01/01/2000',
-          email: 'john.doe@gmail.com',
-          firstName: 'John',
-          hasSSNFilled: true,
-          lastName: 'Doe',
-          phoneNumber: '+1 (305) 541-3102',
-          state: 'CA',
-          streetAddress: '14 Linda St',
-          streetAddress2: null,
-          zip: '94102',
+          data: {
+            city: 'San Francisco',
+            country: 'United States',
+            dob: '01/01/2000',
+            email: 'john.doe@gmail.com',
+            firstName: 'John',
+            lastName: 'Doe',
+            phoneNumber: '+1 (305) 541-3102',
+            state: 'CA',
+            streetAddress: '14 Linda St',
+            streetAddress2: null,
+            zip: '94102',
+          },
+          metadata: {
+            hasSSNFilled: true,
+          },
+          biometric: {},
         },
       });
     });
@@ -48,20 +53,25 @@ describe('<Identity />', () => {
   describe('when the SSN is not filled', () => {
     beforeEach(() => {
       useStore.setState({
-        data: {
+        session: {
           authToken: 'lorem',
-          city: 'San Francisco',
-          country: 'United States',
-          dob: '01/01/2000',
-          email: 'john.doe@gmail.com',
-          firstName: 'John',
-          hasSSNFilled: false,
-          lastName: 'Doe',
-          phoneNumber: '+1 (305) 541-3102',
-          state: 'CA',
-          streetAddress: '14 Linda St',
-          streetAddress2: null,
-          zip: '94102',
+          data: {
+            city: 'San Francisco',
+            country: 'United States',
+            dob: '01/01/2000',
+            email: 'john.doe@gmail.com',
+            firstName: 'John',
+            lastName: 'Doe',
+            phoneNumber: '+1 (305) 541-3102',
+            state: 'CA',
+            streetAddress: '14 Linda St',
+            streetAddress2: null,
+            zip: '94102',
+          },
+          metadata: {
+            hasSSNFilled: false,
+          },
+          biometric: {},
         },
       });
     });
@@ -75,22 +85,27 @@ describe('<Identity />', () => {
   describe('when the user was logged using biometrics and has the SSN filled', () => {
     beforeEach(() => {
       useStore.setState({
-        data: {
+        session: {
           authToken: 'lorem',
-          city: 'San Francisco',
-          country: 'United States',
-          dob: '01/01/2000',
-          email: 'john.doe@gmail.com',
-          firstName: 'John',
-          hasSSNFilled: true,
-          isEmailVerified: false,
-          lastName: 'Doe',
-          phoneNumber: '+1 (305) 541-3102',
-          state: 'CA',
-          streetAddress: '14 Linda St',
-          streetAddress2: null,
-          wasLoggedUsingBiometrics: true,
-          zip: '94102',
+          data: {
+            city: 'San Francisco',
+            country: 'United States',
+            dob: '01/01/2000',
+            email: 'john.doe@gmail.com',
+            firstName: 'John',
+            lastName: 'Doe',
+            phoneNumber: '+1 (305) 541-3102',
+            state: 'CA',
+            streetAddress: '14 Linda St',
+            streetAddress2: null,
+            zip: '94102',
+          },
+          metadata: {
+            hasSSNFilled: true,
+            isEmailVerified: false,
+            wasLoggedUsingBiometrics: true,
+          },
+          biometric: {},
         },
       });
     });

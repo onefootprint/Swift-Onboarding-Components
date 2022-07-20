@@ -39,20 +39,25 @@ describe('<Basic />', () => {
   describe('when all the values are filled', () => {
     beforeEach(() => {
       useStore.setState({
-        data: {
+        session: {
           authToken: 'lorem',
-          city: 'San Francisco',
-          country: 'United States',
-          dob: '01/01/2000',
-          email: 'john.doe@gmail.com',
-          firstName: 'John',
-          isEmailVerified: true,
-          lastName: 'Doe',
-          phoneNumber: '+1 (305) 541-3102',
-          state: 'CA',
-          streetAddress: '14 Linda St',
-          streetAddress2: null,
-          zip: '94102',
+          data: {
+            city: 'San Francisco',
+            country: 'United States',
+            dob: '01/01/2000',
+            email: 'john.doe@gmail.com',
+            firstName: 'John',
+            lastName: 'Doe',
+            phoneNumber: '+1 (305) 541-3102',
+            state: 'CA',
+            streetAddress: '14 Linda St',
+            streetAddress2: null,
+            zip: '94102',
+          },
+          metadata: {
+            isEmailVerified: true,
+          },
+          biometric: {},
         },
       });
     });
@@ -76,20 +81,25 @@ describe('<Basic />', () => {
   describe('when the email is not verified', () => {
     beforeEach(() => {
       useStore.setState({
-        data: {
-          isEmailVerified: false,
+        session: {
+          metadata: {
+            isEmailVerified: false,
+          },
           authToken: 'lorem',
-          city: 'San Francisco',
-          country: 'United States',
-          dob: '01/01/2000',
-          email: 'john.doe@gmail.com',
-          firstName: 'John',
-          lastName: 'Doe',
-          phoneNumber: '+1 (305) 541-3102',
-          state: 'CA',
-          streetAddress: '14 Linda St',
-          streetAddress2: null,
-          zip: '94102',
+          data: {
+            city: 'San Francisco',
+            country: 'United States',
+            dob: '01/01/2000',
+            email: 'john.doe@gmail.com',
+            firstName: 'John',
+            lastName: 'Doe',
+            phoneNumber: '+1 (305) 541-3102',
+            state: 'CA',
+            streetAddress: '14 Linda St',
+            streetAddress2: null,
+            zip: '94102',
+          },
+          biometric: {},
         },
       });
     });

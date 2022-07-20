@@ -1,11 +1,14 @@
 import IcoFootprint24 from 'icons/ico/ico-footprint-24';
 import IcoUser24 from 'icons/ico/ico-user-24';
 import React from 'react';
+import useSessionUser from 'src/hooks/use-session-user';
 import styled, { css } from 'styled-components';
 import { IconButton, media, Typography } from 'ui';
 
 const Header = () => {
+  const { logOut } = useSessionUser();
   const handleClick = () => {
+    logOut();
     // TODO: https://linear.app/footprint/issue/FP-529/account-dropdown
   };
 

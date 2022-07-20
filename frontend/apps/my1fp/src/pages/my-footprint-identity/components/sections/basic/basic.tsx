@@ -12,12 +12,14 @@ const getFullName = (firstName: string | null, lastName: string | null) =>
 
 const Basic = () => {
   const { t } = useTranslation('pages.my-footprint-identity.basic');
-  const { data } = useSessionUser();
-  if (!data) {
+  const { session } = useSessionUser();
+  if (!session) {
     return null;
   }
-
-  const { firstName, lastName, email, phoneNumber, isEmailVerified } = data;
+  const {
+    data: { firstName, lastName, email, phoneNumber },
+    metadata: { isEmailVerified },
+  } = session;
   const fullName = getFullName(firstName, lastName);
   const shouldShowVerifyEmailButton = !isEmailVerified;
 

@@ -30,17 +30,21 @@ const Login = () => {
     response: UserDecryptResponse,
   ) => {
     logIn({
-      city: response.city,
-      country: response.country,
-      dob: response.dob,
-      email: response.email,
-      firstName: response.firstName,
-      lastName: response.lastName,
-      phoneNumber: response.phoneNumber,
-      state: response.state,
-      streetAddress: response.streetAddress,
-      streetAddress2: response.streetAddress2,
-      zip: response.zip,
+      data: {
+        firstName: response.firstName,
+        lastName: response.lastName,
+        dob: response.dob,
+        email: response.email,
+        phoneNumber: response.phoneNumber,
+        streetAddress: response.streetAddress,
+        streetAddress2: response.streetAddress2,
+        city: response.city,
+        state: response.state,
+        country: response.country,
+        zip: response.zip,
+      },
+      biometric: {},
+      metadata: {},
       authToken,
     });
     router.push('/');

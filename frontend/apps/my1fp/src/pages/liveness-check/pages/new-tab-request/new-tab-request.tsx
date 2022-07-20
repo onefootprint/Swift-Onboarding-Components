@@ -15,8 +15,8 @@ const NewTabRequest = () => {
   const [state, send] = useLivenessCheckMachine();
   const { scopedAuthToken } = state.context;
   const generateScopedAuthToken = useGenerateScopedAuthToken();
-  const { data } = useSessionUser();
-  const authToken = data?.authToken;
+  const { session } = useSessionUser();
+  const authToken = session?.authToken;
 
   useEffect(() => {
     if (!scopedAuthToken && authToken) {

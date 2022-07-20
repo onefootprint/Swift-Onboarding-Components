@@ -18,8 +18,8 @@ const QRRegister = () => {
   const { t } = useTranslation('pages.liveness-check.qr-register');
   const [state, send] = useLivenessCheckMachine();
   const { scopedAuthToken } = state.context;
-  const { data } = useSessionUser();
-  const authToken = data?.authToken;
+  const { session } = useSessionUser();
+  const authToken = session?.authToken;
 
   const d2pGenerateMutation = useD2PGenerate();
   const d2pSmsMutation = useD2PSms();

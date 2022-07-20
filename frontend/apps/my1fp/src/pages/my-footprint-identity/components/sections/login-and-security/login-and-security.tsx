@@ -15,13 +15,16 @@ const LoginAndSecurity = () => {
   const { t } = useTranslation(
     'pages.my-footprint-identity.login-and-security',
   );
-  const { data } = useSessionUser();
+  const { session } = useSessionUser();
   const [livenessCheckVisible, setLivenessCheckVisible] = useState(false);
-  if (!data) {
+  if (!session) {
     return null;
   }
 
-  const { email, phoneNumber, isBiometricsVerified, device } = data;
+  const {
+    data: { email, phoneNumber },
+    biometric: { isBiometricsVerified, device },
+  } = session;
   const shouldShowVerifyButton = !isBiometricsVerified;
   const isVerificationLoading = false;
   const handleVerify = () => {

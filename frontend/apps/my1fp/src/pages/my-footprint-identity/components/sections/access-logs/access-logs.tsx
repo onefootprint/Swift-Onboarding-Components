@@ -10,10 +10,10 @@ import { AccessLog } from './types';
 
 const AccessLogs = () => {
   const { t } = useTranslation('pages.my-footprint-identity.access-logs');
-  const { data } = useSessionUser();
+  const { session } = useSessionUser();
 
-  const getAccessLogsQuery = useGetAccessLogs(data?.authToken);
-  if (!data) {
+  const getAccessLogsQuery = useGetAccessLogs(session?.authToken);
+  if (!session) {
     return null;
   }
 

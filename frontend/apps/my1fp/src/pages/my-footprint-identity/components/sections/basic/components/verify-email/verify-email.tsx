@@ -10,12 +10,15 @@ const VerifyEmail = () => {
     'pages.my-footprint-identity.basic.email.verify',
   );
   const toast = useToast();
-  const { data } = useSessionUser();
+  const { session } = useSessionUser();
   const verificationEmailMutation = useVerificationEmail();
-  if (!data) {
+  if (!session) {
     return null;
   }
-  const { email, authToken } = data;
+  const {
+    data: { email },
+    authToken,
+  } = session;
 
   const handleVerifyClick = () => {
     verificationEmailMutation.mutate(
