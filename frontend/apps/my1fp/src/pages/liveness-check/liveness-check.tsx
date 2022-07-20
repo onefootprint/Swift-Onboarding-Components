@@ -8,6 +8,8 @@ import withProvider from 'src/utils/with-provider';
 
 import LivenessCheckMachineProvider from './components/machine-provider';
 import useLivenessCheckMachine from './hooks/use-liveness-check-machine';
+import LivenessCheckFailure from './pages/liveness-check-failure';
+import LivenessCheckSuccess from './pages/liveness-check-success';
 import NewTabProcessing from './pages/new-tab-processing';
 import NewTabRequest from './pages/new-tab-request';
 import QRCodeScanned from './pages/qr-code-scanned';
@@ -33,6 +35,8 @@ const LivenessCheck = () => {
     [States.qrCodeScanned]: QRCodeScanned,
     [States.qrCodeSent]: QRCodeSent,
     [States.qrRegister]: QRRegister,
+    [States.livenessCheckFailed]: LivenessCheckFailure,
+    [States.livenessCheckSucceeded]: LivenessCheckSuccess,
   };
 
   if (has(pages, valueCasted)) {

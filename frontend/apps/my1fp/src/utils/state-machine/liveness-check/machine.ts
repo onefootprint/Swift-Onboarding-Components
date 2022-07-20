@@ -27,7 +27,7 @@ const livenessCheckMachine = createMachine<MachineContext, MachineEvents>(
                 event.payload.hasSupportForWebAuthn,
             },
             {
-              target: States.livenessRegisterFailed,
+              target: States.livenessCheckFailed,
               actions: [Actions.assignDeviceInfo],
               cond: (context, event) =>
                 event.payload.type === 'mobile' &&
@@ -51,10 +51,10 @@ const livenessCheckMachine = createMachine<MachineContext, MachineEvents>(
             target: States.qrCodeScanned,
           },
           [Events.qrRegisterSucceeded]: {
-            target: States.livenessRegisterSucceeded,
+            target: States.livenessCheckSucceeded,
           },
           [Events.qrRegisterFailed]: {
-            target: States.livenessRegisterFailed,
+            target: States.livenessCheckFailed,
           },
           [Events.statusPollingErrored]: {
             actions: [Actions.clearScopedAuthToken],
@@ -68,10 +68,10 @@ const livenessCheckMachine = createMachine<MachineContext, MachineEvents>(
             actions: [Actions.clearScopedAuthToken],
           },
           [Events.qrRegisterSucceeded]: {
-            target: States.livenessRegisterSucceeded,
+            target: States.livenessCheckSucceeded,
           },
           [Events.qrRegisterFailed]: {
-            target: States.livenessRegisterFailed,
+            target: States.livenessCheckFailed,
           },
           [Events.statusPollingErrored]: {
             target: States.qrRegister,
@@ -86,10 +86,10 @@ const livenessCheckMachine = createMachine<MachineContext, MachineEvents>(
             actions: [Actions.clearScopedAuthToken],
           },
           [Events.qrRegisterSucceeded]: {
-            target: States.livenessRegisterSucceeded,
+            target: States.livenessCheckSucceeded,
           },
           [Events.qrRegisterFailed]: {
-            target: States.livenessRegisterFailed,
+            target: States.livenessCheckFailed,
           },
           [Events.statusPollingErrored]: {
             target: States.qrRegister,
@@ -114,10 +114,10 @@ const livenessCheckMachine = createMachine<MachineContext, MachineEvents>(
             target: States.newTabRequest,
           },
           [Events.newTabRegisterSucceeded]: {
-            target: States.livenessRegisterSucceeded,
+            target: States.livenessCheckSucceeded,
           },
           [Events.newTabRegisterFailed]: {
-            target: States.livenessRegisterFailed,
+            target: States.livenessCheckFailed,
           },
           [Events.statusPollingErrored]: {
             target: States.newTabRequest,
@@ -125,10 +125,10 @@ const livenessCheckMachine = createMachine<MachineContext, MachineEvents>(
           },
         },
       },
-      [States.livenessRegisterSucceeded]: {
+      [States.livenessCheckSucceeded]: {
         type: 'final',
       },
-      [States.livenessRegisterFailed]: {
+      [States.livenessCheckFailed]: {
         type: 'final',
       },
     },

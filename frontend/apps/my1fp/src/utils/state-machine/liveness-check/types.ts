@@ -7,8 +7,8 @@ export enum States {
   qrRegister = 'qrRegister',
   qrCodeScanned = 'qrCodeScanned',
   qrCodeSent = 'qrCodeSent',
-  livenessRegisterSucceeded = 'livenessRegisterSucceeded',
-  livenessRegisterFailed = 'livenessRegisterFailed',
+  livenessCheckSucceeded = 'livenessCheckSucceeded',
+  livenessCheckFailed = 'livenessCheckFailed',
 }
 
 export enum Events {

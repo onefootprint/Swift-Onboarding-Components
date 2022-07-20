@@ -1,6 +1,6 @@
 import { useMutation } from 'react-query';
 import request, { RequestError, RequestResponse } from 'request';
-import { MY1FP_USER_AUTH_HEADER } from 'src/config/constants';
+import { MY1FP_AUTH_HEADER } from 'src/config/constants';
 
 export type D2PGenerateRequest = {
   authToken: string;
@@ -21,7 +21,7 @@ const d2pGenerate = async (payload: D2PGenerateRequest) => {
     url: '/onboarding/d2p/generate',
     data: payload,
     headers: {
-      [MY1FP_USER_AUTH_HEADER]: payload.authToken,
+      [MY1FP_AUTH_HEADER]: payload.authToken,
     },
   });
   return response.data;
