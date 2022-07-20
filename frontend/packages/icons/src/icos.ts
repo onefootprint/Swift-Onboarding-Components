@@ -22,6 +22,7 @@ import IcoBuilding16 from '../ico/ico-building-16';
 import IcoBuilding24 from '../ico/ico-building-24';
 import IcoCake16 from '../ico/ico-cake-16';
 import IcoCake24 from '../ico/ico-cake-24';
+import IcoChartUp40 from '../ico/ico-chart-up-40';
 import IcoCheck16 from '../ico/ico-check-16';
 import IcoCheck24 from '../ico/ico-check-24';
 import IcoCheckCircle16 from '../ico/ico-check-circle-16';
@@ -41,6 +42,7 @@ import IcoClipboard16 from '../ico/ico-clipboard-16';
 import IcoClipboard24 from '../ico/ico-clipboard-24';
 import IcoClose16 from '../ico/ico-close-16';
 import IcoClose24 from '../ico/ico-close-24';
+import IcoClose40 from '../ico/ico-close-40';
 import IcoCloseSmall16 from '../ico/ico-close-small-16';
 import IcoCloseSmall24 from '../ico/ico-close-small-24';
 import IcoCode16 from '../ico/ico-code-16';
@@ -53,6 +55,7 @@ import IcoDotsHorizontal16 from '../ico/ico-dots-horizontal-16';
 import IcoDotsHorizontal24 from '../ico/ico-dots-horizontal-24';
 import IcoEmail16 from '../ico/ico-email-16';
 import IcoEmail24 from '../ico/ico-email-24';
+import IcoEmojiHappy40 from '../ico/ico-emoji-happy-40';
 import IcoEye16 from '../ico/ico-eye-16';
 import IcoEye24 from '../ico/ico-eye-24';
 import IcoFacebook16 from '../ico/ico-facebook-16';
@@ -64,14 +67,17 @@ import IcoFileText24 from '../ico/ico-file-text-24';
 import IcoFootprint16 from '../ico/ico-footprint-16';
 import IcoFootprint24 from '../ico/ico-footprint-24';
 import IcoFootprint40 from '../ico/ico-footprint-40';
+import IcoForbid40 from '../ico/ico-forbid-40';
 import IcoGoogleColored16 from '../ico/ico-google-colored-16';
 import IcoGoogleColored24 from '../ico/ico-google-colored-24';
+import IcoHeart40 from '../ico/ico-heart-40';
 import IcoHelp16 from '../ico/ico-help-16';
 import IcoHelp24 from '../ico/ico-help-24';
 import IcoInfo16 from '../ico/ico-info-16';
 import IcoInfo24 from '../ico/ico-info-24';
 import IcoLaptop16 from '../ico/ico-laptop-16';
 import IcoLaptop24 from '../ico/ico-laptop-24';
+import IcoLeaf40 from '../ico/ico-leaf-40';
 import IcoLink16 from '../ico/ico-link-16';
 import IcoLink24 from '../ico/ico-link-24';
 import IcoLinkedin16 from '../ico/ico-linkedin-16';
@@ -98,6 +104,7 @@ import IcoSettings16 from '../ico/ico-settings-16';
 import IcoSettings24 from '../ico/ico-settings-24';
 import IcoShield16 from '../ico/ico-shield-16';
 import IcoShield24 from '../ico/ico-shield-24';
+import IcoShield40 from '../ico/ico-shield-40';
 import IcoSpinner16 from '../ico/ico-spinner-16';
 import IcoSpinner24 from '../ico/ico-spinner-24';
 import IcoTwitter16 from '../ico/ico-twitter-16';
@@ -214,7 +221,14 @@ export default {
   IcoUserCircle24,
   IcoUsers24,
   IcoAppleColored40,
+  IcoChartUp40,
   IcoCheckCircle40,
+  IcoClose40,
+  IcoEmojiHappy40,
   IcoFootprint40,
+  IcoForbid40,
+  IcoHeart40,
+  IcoLeaf40,
   IcoQuote40,
+  IcoShield40,
 };
