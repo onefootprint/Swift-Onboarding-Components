@@ -1,7 +1,18 @@
-import { COUNTRIES, DEFAULT_COUNTRY } from 'global-constants';
+import { COUNTRIES, DEFAULT_COUNTRY, REGION_CODES } from 'global-constants';
 import { PhoneNumberUtil } from 'google-libphonenumber';
 
 const phoneUtils = PhoneNumberUtil.getInstance();
+
+export const getNumberByCountryValue = (countryValue: string) => {
+  if (!countryValue) {
+    return '';
+  }
+  const country = COUNTRIES.find(
+    ({ value }) =>
+      value.toLocaleLowerCase() === countryValue.toLocaleLowerCase(),
+  );
+  return country ? REGION_CODES[country.value] : '';
+};
 
 export const getCountryByNumber = (phone?: string) => {
   if (!phone) {

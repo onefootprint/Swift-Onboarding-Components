@@ -5,6 +5,10 @@ import NavigationHeader from 'src/components/navigation-header';
 import useBifrostMachine, { Events } from 'src/hooks/use-bifrost-machine';
 import styled, { css } from 'styled-components';
 import { Box } from 'ui';
+import {
+  getCountryByNumber,
+  getNumberByCountryValue,
+} from 'ui/src/components/phone-input/phone-input.utils';
 
 import PhoneVerificationLoading from './components/phone-verification-loading';
 import PhoneVerificationPinForm from './components/phone-verification-pin-form';
@@ -13,6 +17,16 @@ import PhoneVerificationSuccess from './components/phone-verification-success';
 const PhoneVerification = () => {
   const { t } = useTranslation('pages.phone-verification');
   const [state, send] = useBifrostMachine();
+
+  let phoneCountryCode = '';
+  if (state.context.challenge?.phoneCountry) {
+    phoneCountryCode = getNumberByCountryValue(
+      state.context.challenge?.phoneCountry,
+    );
+  } else if (state.context.phone) {
+    const phoneCountryVal = getCountryByNumber(state.context.phone).value;
+    phoneCountryCode = getNumberByCountryValue(phoneCountryVal);
+  }
   const phoneNumberLastTwo =
     state.context.challenge?.phoneNumberLastTwo ??
     state.context.phone?.slice(-2);
@@ -35,7 +49,10 @@ const PhoneVerification = () => {
                 ? t('title.existing-user')
                 : t('title.new-user')
             }
-            subtitle={t('subtitle', { phoneNumberLastTwo })}
+            subtitle={t('subtitle', {
+              phoneCountryCode,
+              phoneNumberLastTwo,
+            })}
           />
         </Box>
         <PhoneVerificationPinForm

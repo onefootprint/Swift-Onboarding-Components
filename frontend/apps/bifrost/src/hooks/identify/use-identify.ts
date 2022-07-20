@@ -15,6 +15,7 @@ export type ChallengeData = {
   challengeKind: ChallengeKind;
   challengeToken: string;
   phoneNumberLastTwo: string;
+  phoneCountry: string;
   biometricChallengeJson?: string;
 };
 

@@ -35,7 +35,7 @@
         "new-user": "Let's verify your identity!",
         "existing-user": "Welcome back! 🎉"
       },
-      "subtitle": "Enter the 6-digit code sent to (•••) ••• ••{{phoneNumberLastTwo}}.",
+      "subtitle": "Enter the 6-digit code sent to {{phoneCountryCode}} (•••) ••• ••{{phoneNumberLastTwo}}.",
       "form": {
         "error": {
           "description": "Incorrect verification code"
