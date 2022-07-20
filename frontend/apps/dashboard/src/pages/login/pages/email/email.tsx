@@ -6,10 +6,7 @@ import { Button, TextInput, Typography } from 'ui';
 
 import BackButton from '../../components/back-button/back-button';
 import LogoAndText from '../../components/logo-and-text';
-import useLoginEmail, {
-  EmailLoginRequest,
-  EmailLoginResponse,
-} from './hooks/use-login-email';
+import useLoginEmail, { EmailLoginRequest } from './hooks/use-login-email';
 
 type FormData = {
   emailAddress: string;
@@ -29,17 +26,14 @@ const EmailLogin = () => {
     const { emailAddress } = formData;
     const request: EmailLoginRequest = {
       emailAddress,
+      redirectUrl: `${window.location.origin}/auth`,
     };
     mutateLoginEmail.mutate(request, {
-      onSuccess({ success }: EmailLoginResponse) {
-        if (success) {
-          router.push({
-            pathname: '/login/link-sent',
-            query: { email_address: emailAddress },
-          });
-        } else {
-          // TODO: handle error
-        }
+      onSuccess() {
+        router.push({
+          pathname: '/login/link-sent',
+          query: { email_address: emailAddress },
+        });
       },
     });
   };

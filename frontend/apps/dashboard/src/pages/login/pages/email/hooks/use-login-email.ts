@@ -3,17 +3,16 @@ import request, { RequestError, RequestResponse } from 'request';
 
 export type EmailLoginRequest = {
   emailAddress: string;
+  redirectUrl: string;
 };
 
-export type EmailLoginResponse = {
-  success: boolean;
-};
+export type EmailLoginResponse = {};
 
 const loginEmailRequest = async (payload: EmailLoginRequest) => {
   const { data: response } = await request<RequestResponse<EmailLoginResponse>>(
     {
       method: 'POST',
-      url: '/auth/magic_link',
+      url: '/org/auth/magic_link',
       data: payload,
     },
   );

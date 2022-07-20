@@ -6,13 +6,15 @@ export type LoginResponse = {
   auth: string;
   firstName?: string;
   lastName?: string;
+  newTenant: boolean;
+  tenantName: string;
 };
 
 const login = async (code: string) => {
   const { data: response } = await request<RequestResponse<LoginResponse>>({
-    method: 'GET',
-    url: '/auth/login',
-    params: { code },
+    method: 'POST',
+    url: '/org/auth/login',
+    data: { code },
   });
   return response.data;
 };

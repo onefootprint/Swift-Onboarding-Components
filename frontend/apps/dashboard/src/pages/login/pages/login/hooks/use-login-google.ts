@@ -10,7 +10,7 @@ const loginGoogle = async () => {
     RequestResponse<GoogleLoginResponse>
   >({
     method: 'GET',
-    url: '/auth/google_oauth',
+    url: '/org/auth/google_oauth',
     params: { redirect_url: `${window.location.origin}/auth` },
   });
   return response.data;

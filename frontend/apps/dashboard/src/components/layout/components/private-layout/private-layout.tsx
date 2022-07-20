@@ -20,7 +20,7 @@ type PrivateLayoutProps = {
 
 const PrivateLayout = ({ children }: PrivateLayoutProps) => {
   const router = useRouter();
-  const { isLive, logOut } = useSessionUser();
+  const { data, isLive, logOut } = useSessionUser();
   return (
     <div data-testid="private-layout">
       <header>
@@ -71,6 +71,13 @@ const PrivateLayout = ({ children }: PrivateLayoutProps) => {
       <section>
         <Container minSize="md">{children}</Container>
       </section>
+      <section>
+        <FooterContainer>
+          <Typography variant="caption-2" color="tertiary">
+            We ❤️ {data?.tenantName}
+          </Typography>
+        </FooterContainer>
+      </section>
     </div>
   );
 };
@@ -100,6 +107,14 @@ const Nav = styled.nav`
     background-color: ${theme.backgroundColor.secondary};
     padding: ${theme.spacing[3]}px 0;
     margin-bottom: ${theme.spacing[7]}px;
+  `};
+`;
+
+const FooterContainer = styled.div`
+  ${({ theme }) => css`
+    text-align: center;
+    padding: ${theme.spacing[3]}px 0;
+    margin: ${theme.spacing[12]}px;
   `};
 `;
 

@@ -9,6 +9,7 @@ import {
 export type UserSession = {
   auth: string;
   email: string;
+  tenantName: string;
 };
 
 export type AuthHeaders = {

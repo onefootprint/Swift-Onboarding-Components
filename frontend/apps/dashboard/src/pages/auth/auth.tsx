@@ -16,6 +16,7 @@ const Auth = () => {
     if (
       isLoggedIn ||
       login.isLoading ||
+      login.isError ||
       !isReady ||
       !code ||
       Array.isArray(code)
@@ -23,8 +24,8 @@ const Auth = () => {
       return;
     }
     login.mutate(code, {
-      onSuccess({ auth, email }: LoginResponse) {
-        logIn({ auth, email });
+      onSuccess({ auth, email, tenantName }: LoginResponse) {
+        logIn({ auth, email, tenantName });
         router.push('/');
       },
     });
