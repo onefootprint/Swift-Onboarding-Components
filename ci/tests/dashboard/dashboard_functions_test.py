@@ -43,7 +43,6 @@ class TestDashboard:
         # https://linear.app/footprint/issue/FP-390/integration-tests-for-onboarding-list-break-in-dev
         body = get("org/onboardings", dict(fp_user_id=user.fp_user_id), tenant.sk)
         onboardings = body["data"]
-        print(onboardings)
         assert len(onboardings)
         assert onboardings[0]["footprint_user_id"] == user.fp_user_id
         assert set(["first_name", "last_name"]) < set(onboardings[0]["populated_data_kinds"])

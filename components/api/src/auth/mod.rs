@@ -3,7 +3,7 @@ use self::{
     session_data::{tenant::ob_public_key::PublicTenantAuthContext, user::onboarding::OnboardingSession},
 };
 use crate::errors::{onboarding::OnboardingError, ApiError};
-use db::models::onboardings::{Onboarding, OnboardingLink};
+use db::models::onboardings::Onboarding;
 use thiserror::Error;
 
 pub mod either;
@@ -45,15 +45,14 @@ pub async fn get_onboarding_for_tenant(
     db_pool: &db::DbPool,
     user_auth: &SessionContext<OnboardingSession>,
     tenant_auth: &PublicTenantAuthContext,
-) -> Result<(OnboardingLink, Onboarding), ApiError> {
-    let onboarding = OnboardingLink::get(
+) -> Result<Onboarding, ApiError> {
+    let onboarding = Onboarding::get_for_tenant(
         db_pool,
-        tenant_auth.ob_config.id.clone(),
-        user_auth.to_owned().data.user_vault_id,
+        tenant_auth.tenant.id.clone(),
+        user_auth.data.user_vault_id.clone(),
     )
     .await?
     .ok_or(OnboardingError::OnboardingForTenantDoesNotExist)?;
-
     Ok(onboarding)
 }
 

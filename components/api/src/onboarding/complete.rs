@@ -7,10 +7,13 @@ use crate::auth::session_data::{ServerSession, SessionData};
 use crate::errors::onboarding::OnboardingError;
 use crate::errors::ApiError;
 use crate::types::success::ApiResponseData;
+use crate::utils::insight_headers::InsightHeaders;
 use crate::utils::user_vault_wrapper::UserVaultWrapper;
 use crate::State;
 use chrono::Duration;
 use db::models::audit_trails::AuditTrail;
+use db::models::insight_event::CreateInsightEvent;
+use db::models::onboardings::OnboardingLink;
 use db::webauthn_credentials::get_webauthn_creds;
 use db::DbError;
 use itertools::Itertools;
@@ -37,9 +40,10 @@ struct CommitResponse {
 fn handler(
     user_auth: SessionContext<OnboardingSession>,
     tenant_auth: PublicTenantAuthContext,
+    insights: InsightHeaders,
     state: web::Data<State>,
 ) -> actix_web::Result<Json<ApiResponseData<CommitResponse>>, ApiError> {
-    let (ob_link, onboarding) = get_onboarding_for_tenant(&state.db_pool, &user_auth, &tenant_auth).await?;
+    let onboarding = get_onboarding_for_tenant(&state.db_pool, &user_auth, &tenant_auth).await?;
     let uv = user_auth.user_vault(&state.db_pool).await?;
 
     let uv_id = uv.id.clone();
@@ -58,6 +62,13 @@ fn handler(
     let validation_token = state
         .db_pool
         .db_transaction(move |conn| -> Result<_, DbError> {
+            let insight_event = CreateInsightEvent::from(insights).insert_with_conn(conn)?;
+            let ob_link = OnboardingLink::get_or_create(
+                conn,
+                onboarding.id.clone(),
+                tenant_auth.ob_config.id.clone(),
+                insight_event.id,
+            )?;
             if ob_link.status != Status::Verified {
                 // Just create some fixture events for now
                 // Don't make duplicate fixture events if the user onboards multiple times since it

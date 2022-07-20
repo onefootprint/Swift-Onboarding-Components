@@ -104,6 +104,7 @@ table! {
         ordering_id -> Int8,
         start_timestamp -> Timestamptz,
         is_live -> Bool,
+        insight_event_id -> Uuid,
     }
 }
 
@@ -255,6 +256,7 @@ joinable!(ob_configurations -> tenants (tenant_id));
 joinable!(onboarding_links -> insight_events (insight_event_id));
 joinable!(onboarding_links -> ob_configurations (ob_configuration_id));
 joinable!(onboarding_links -> onboardings (onboarding_id));
+joinable!(onboardings -> insight_events (insight_event_id));
 joinable!(onboardings -> tenants (tenant_id));
 joinable!(onboardings -> user_vaults (user_vault_id));
 joinable!(tenant_api_keys -> tenants (tenant_id));

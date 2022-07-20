@@ -1,0 +1,1 @@
+ALTER TABLE onboardings DROP COLUMN insight_event_id;
