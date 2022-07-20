@@ -60,7 +60,11 @@ jobs:
       - name: Integration testing
         working-directory: ci
         run: pytest tests/ --emoji &> pytest.txt
-
+        
+      - name: Print test results
+        if: always()
+        run: cat pytest.txt        
+        
       - name: Comment markdown on PR
         if: ${{ inputs.isPR && (success() || failure()) }}
         working-directory: ci
