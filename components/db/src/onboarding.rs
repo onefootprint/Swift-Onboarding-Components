@@ -1,3 +1,4 @@
+use crate::models::insight_event::InsightEvent;
 use crate::models::onboardings::Onboarding;
 use crate::schema;
 use crate::{errors::DbError, schema::onboardings::BoxedQuery};
@@ -68,15 +69,20 @@ pub fn list_for_tenant(
     params: OnboardingListQueryParams,
     cursor: Option<i64>,
     page_size: i64,
-) -> Result<Vec<Onboarding>, DbError> {
+) -> Result<Vec<(Onboarding, InsightEvent)>, DbError> {
     let mut onboardings = list_for_tenant_query(params)
+        .inner_join(schema::insight_events::table)
         .order_by(schema::onboardings::ordering_id.desc())
+        .select((
+            schema::onboardings::all_columns,
+            schema::insight_events::all_columns,
+        ))
         .limit(page_size);
 
     if let Some(cursor) = cursor {
         onboardings = onboardings.filter(schema::onboardings::ordering_id.le(cursor));
     }
 
-    let onboardings = onboardings.load(conn)?;
+    let onboardings = onboardings.load::<(Onboarding, InsightEvent)>(conn)?;
     Ok(onboardings)
 }

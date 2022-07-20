@@ -91,8 +91,10 @@ fn handler(
                 Some(_) => None,
                 None => Some(db::onboarding::count_for_tenant(conn, query_params)?),
             };
-            let (onboarding_ids, user_vault_ids) =
-                onboardings.iter().map(|ob| (&ob.id, &ob.user_vault_id)).unzip();
+            let (onboarding_ids, user_vault_ids) = onboardings
+                .iter()
+                .map(|(ob, _)| (&ob.id, &ob.user_vault_id))
+                .unzip();
             let user_to_kinds = db::user_data::bulk_fetch_populated_kinds(conn, user_vault_ids)?;
             let ob_links = OnboardingLink::get_for_onboardings(conn, onboarding_ids)?;
 
@@ -102,7 +104,7 @@ fn handler(
 
     // If there are more than page_size results, we should tell the client there's another page
     let cursor = if onboardings.len() > page_size {
-        onboardings.last().map(|x| x.ordering_id)
+        onboardings.last().map(|(ob, _)| ob.ordering_id)
     } else {
         None
     };
@@ -111,11 +113,12 @@ fn handler(
     let onboardings = onboardings
         .into_iter()
         .take(page_size)
-        .map(|ob| {
+        .map(|(ob, insight_event)| {
             (
                 user_to_kinds.get(&ob.user_vault_id).unwrap_or(&vec![]).clone(),
                 ob_links.get(&ob.id).unwrap_or(&empty_vec),
                 ob,
+                insight_event,
             )
         })
         .map(ApiOnboarding::from)
