@@ -59,21 +59,17 @@ jobs:
 
       - name: Integration testing
         working-directory: ci
-        run: pytest tests/ --emoji &> pytest.txt
-        
-      - name: Print test results
-        if: always()
-        run: cat pytest.txt        
-        
+        run: pytest tests/ --emoji 2>&1 tee integration_test_output.txt
+
       - name: Comment markdown on PR
         if: ${{ inputs.isPR && (success() || failure()) }}
         working-directory: ci
         run: |
-          FINISH=`awk '/===/{ print NR; }' pytest.txt | sed -n 2p`
+          FINISH=`awk '/===/{ print NR; }' integration_test_output.txt | sed -n 2p`
           CROP=$(expr $FINISH - 1)
           BEGIN=$(expr $FINISH - 7)
-          cat pytest.txt
-          head -n $CROP pytest.txt | tail -n $BEGIN > out.txt
+          cat integration_test_output.txt
+          head -n $CROP integration_test_output.txt | tail -n $BEGIN > out.txt
           sed -i 's/\[.*%\]//g' out.txt
           sed -i 's/tests/* tests/g' out.txt
           echo '# :globe_with_meridians: :footprints: ${{ inputs.testUrl }} Integration Report' > tmp.txt

@@ -145,20 +145,16 @@ jobs:
               sleep 10
           done
           cd ci
-          pytest tests/ --emoji &> pytest.txt && kill $server_pid
-          
-      - name: "Print test results"
-        if: always()
-        run: cat pytest.txt          
+          pytest tests/ --emoji 2>&1 tee integration_test_output.txt && kill $server_pid
 
       - name: Comment markdown on PR
         working-directory: ci
         run: |
-          FINISH=`awk '/===/{ print NR; }' pytest.txt | sed -n 2p`
+          FINISH=`awk '/===/{ print NR; }' integration_test_output.txt | sed -n 2p`
           CROP=$(expr $FINISH - 1)
           BEGIN=$(expr $FINISH - 7)
-          cat pytest.txt
-          head -n $CROP pytest.txt | tail -n $BEGIN > out.txt
+          cat integration_test_output.txt
+          head -n $CROP integration_test_output.txt | tail -n $BEGIN > out.txt
           sed -i 's/\[.*%\]//g' out.txt
           sed -i 's/tests/* tests/g' out.txt
           echo '# :footprints: Footprint Core: Local Test Report' > tmp.txt
