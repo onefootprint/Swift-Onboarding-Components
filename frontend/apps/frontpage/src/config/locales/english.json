@@ -92,12 +92,12 @@
         "subtitle": "An enhanced experience",
         "items": {
           "security": {
-            "content": "Footprint’s privacy-preserving technology lets you satisfy KYC without needing to ever touch PII. Our secure PII vault protects your user's data while saving you time and money.",
+            "content": "Footprint’s privacy-preserving technology lets you satisfy KYC without needing to ever touch PII. Our secure patent-pending PII vault protects your user's data while saving you time and money.",
             "img-alt": "",
             "title": "Best-in-class security"
           },
           "accuracy": {
-            "content": "Footprint leverages cutting-edge biometric scans, liveness checks, and peer-to-peer verification to validate real people in real time. Our ecosystem keeps bad actors out while creating a seamless experience for real users.",
+            "content": "Footprint leverages cutting-edge biometric scans, patent-pending liveness checks, and peer-to-peer verification to validate real people in real time. Our ecosystem keeps bad actors out while creating a seamless experience for real users.",
             "img-alt": "",
             "title": "Unprecedented accuracy"
           },
