@@ -3,9 +3,10 @@ import {
   ALL_FIELDS,
   DataKind,
   DataKindType,
-  InsightEvent,
   Onboarding,
+  OnboardingLink,
   OnboardingStatus,
+  statusToPriority,
 } from 'src/types';
 
 import { UserAttributes, UserData } from './use-user-data';
@@ -16,7 +17,7 @@ export type User = {
   initiatedAt: string;
   orderingId: string;
   attributes: UserAttributes;
-  insightEvent: InsightEvent;
+  onboardingLinks: OnboardingLink[];
 };
 
 // Create a custom UserData for name since it's two separate attributes joined
@@ -66,13 +67,20 @@ const useJoinUsers = (
           ]),
         );
 
+        // The status we display for the user is the maximum status of all the onboarding links,
+        // or incomplete if there are no onboarding links
+        const maxStatus =
+          onboarding.onboardingLinks.sort(
+            (a, b) => statusToPriority[b.status] - statusToPriority[a.status],
+          )[0]?.status || OnboardingStatus.incomplete;
+
         return {
           footprintUserId: onboarding.footprintUserId,
-          status: onboarding.status,
+          status: maxStatus,
           orderingId: onboarding.orderingId,
           initiatedAt: onboarding.startTimestamp,
           attributes,
-          insightEvent: onboarding.insightEvent,
+          onboardingLinks: onboarding.onboardingLinks,
         } as User;
       }),
     [decryptedUsers, onboardings],

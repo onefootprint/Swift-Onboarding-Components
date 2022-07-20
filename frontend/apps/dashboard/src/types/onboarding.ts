@@ -8,5 +8,14 @@ export type Onboarding = {
   populatedDataKinds: DataKind[];
   startTimestamp: string;
   orderingId: string;
+  onboardingLinks: OnboardingLink[];
+};
+
+export type OnboardingLink = {
+  status: OnboardingStatus;
+  canAccessDataKinds: DataKind[];
+  name: string;
+  description?: string;
   insightEvent: InsightEvent;
+  timestamp: string;
 };
