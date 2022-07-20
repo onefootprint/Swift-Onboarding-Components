@@ -1,4 +1,7 @@
 use crate::schema::tenants;
+use crate::DbPool;
+use diesel::prelude::*;
+
 use chrono::{DateTime, Utc};
 use diesel::{Insertable, Queryable};
 use newtypes::{EncryptedVaultPrivateKey, TenantId, VaultPublicKey};
@@ -11,11 +14,11 @@ pub struct Tenant {
     pub name: String,
     pub public_key: VaultPublicKey,
     pub e_private_key: EncryptedVaultPrivateKey,
-    pub workos_id: String,
-    pub email_domain: String,
+    pub workos_id: Option<String>,
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
     pub logo_url: Option<String>,
+    pub workos_admin_profile_id: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
@@ -24,7 +27,41 @@ pub struct NewTenant {
     pub name: String,
     pub public_key: VaultPublicKey,
     pub e_private_key: EncryptedVaultPrivateKey,
-    pub workos_id: String,
-    pub email_domain: String,
+    pub workos_id: Option<String>,
     pub logo_url: Option<String>,
+    pub workos_admin_profile_id: Option<String>,
+}
+
+impl NewTenant {
+    pub async fn create(self, pool: &DbPool) -> Result<Tenant, crate::DbError> {
+        pool.db_query(move |conn| {
+            let tenant = diesel::insert_into(tenants::table)
+                .values(&self)
+                .get_result::<Tenant>(conn)?;
+            Ok(tenant)
+        })
+        .await?
+    }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, AsChangeset)]
+#[diesel(table_name = tenants)]
+pub struct UpdateTenantNameOrLogo {
+    pub id: TenantId,
+    pub name: Option<String>,
+    pub logo_url: Option<String>,
+}
+
+impl UpdateTenantNameOrLogo {
+    pub async fn update(self, pool: &DbPool) -> Result<(), crate::DbError> {
+        let _ = pool
+            .db_query(move |conn| {
+                diesel::update(tenants::table)
+                    .filter(tenants::id.eq(&self.id))
+                    .set(&self)
+                    .execute(conn)
+            })
+            .await??;
+        Ok(())
+    }
 }

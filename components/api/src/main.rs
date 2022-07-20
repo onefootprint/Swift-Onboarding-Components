@@ -120,6 +120,7 @@ async fn main() -> std::io::Result<()> {
             config.sendgrid_api_key.clone(),
             config.sendgrid_from_email.clone(),
             config.sendgrid_challenge_template_id.clone(),
+            config.sendgrid_magic_link_template_id.clone(),
         );
 
         // let out = hmac_client
@@ -202,7 +203,6 @@ async fn main() -> std::io::Result<()> {
             .service(tenant::routes())
             .service(onboarding::routes())
             .service(user::routes())
-            .service(tenant::workos::routes())
             .with_json_spec_at("/open-api/spec")
             .with_swagger_ui_at("/open-api/swagger")
             .build()

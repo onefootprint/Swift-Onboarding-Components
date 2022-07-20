@@ -12,8 +12,8 @@ use std::collections::HashMap;
 #[derive(Debug, Clone)]
 pub struct SendgridClient {
     pub from_email: String,
-    // id of email template for challenges
     pub challenge_template_id: String,
+    pub magic_link_template_id: String,
     api_key: String,
     client: reqwest::Client,
 }
@@ -63,20 +63,45 @@ struct SendgridErrorFieldAndMessage {
 }
 
 impl SendgridClient {
-    pub fn new(api_key: String, from_email: String, challenge_template_id: String) -> Self {
+    pub fn new(
+        api_key: String,
+        from_email: String,
+        challenge_template_id: String,
+        magic_link_template_id: String,
+    ) -> Self {
         let client = reqwest::Client::new();
         Self {
             api_key,
             from_email,
             challenge_template_id,
+            magic_link_template_id,
             client,
         }
+    }
+
+    pub async fn send_with_magic_link_template(
+        &self,
+        to_email: String,
+        curl_url: String,
+    ) -> Result<(), ApiError> {
+        self.send_with_link_template(to_email, curl_url, &self.magic_link_template_id)
+            .await
     }
 
     pub async fn send_with_challenge_template(
         &self,
         to_email: String,
         curl_url: String,
+    ) -> Result<(), ApiError> {
+        self.send_with_link_template(to_email, curl_url, &self.challenge_template_id)
+            .await
+    }
+
+    pub async fn send_with_link_template(
+        &self,
+        to_email: String,
+        curl_url: String,
+        template_id: &str,
     ) -> Result<(), ApiError> {
         let req = SendgridTemplateRequest {
             personalizations: vec![SendgridPersonalization {
@@ -86,7 +111,7 @@ impl SendgridClient {
             from: SendgridEmail {
                 email: self.from_email.clone(),
             },
-            template_id: self.challenge_template_id.to_string(),
+            template_id: template_id.to_string(),
         };
         let res = self
             .client
@@ -104,6 +129,18 @@ impl SendgridClient {
         let err = &res.text().await?;
         Err(ApiError::SendgridError(err.to_owned()))
     }
+}
+
+pub(crate) async fn send_magic_link_dashboard_auth_email(
+    state: &State,
+    email_address: String,
+    url: String,
+) -> Result<(), ApiError> {
+    state
+        .sendgrid_client
+        .send_with_magic_link_template(email_address, url)
+        .await?;
+    Ok(())
 }
 
 pub(crate) async fn send_email_challenge(

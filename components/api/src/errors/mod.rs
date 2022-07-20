@@ -64,9 +64,12 @@ pub enum ApiError {
     SerdeCbor(#[from] serde_cbor::Error),
 }
 
-impl<T> From<WorkOsError<T>> for ApiError {
+impl<T> From<WorkOsError<T>> for ApiError
+where
+    T: std::fmt::Debug,
+{
     fn from(e: WorkOsError<T>) -> Self {
-        ApiError::WorkOsApiError(e.to_string())
+        ApiError::WorkOsApiError(format!("{:?}", e))
     }
 }
 

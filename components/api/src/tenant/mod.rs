@@ -2,10 +2,11 @@ use paperclip::actix::web;
 
 pub mod access_events;
 pub mod audit_trail;
-pub mod config;
 pub mod decrypt;
 pub mod liveness;
+pub mod ob_config;
 pub mod onboardings;
+pub mod settings;
 pub mod validate;
 pub mod workos;
 
@@ -15,7 +16,9 @@ pub fn routes() -> web::Scope {
         .service(audit_trail::get)
         .service(decrypt::handler)
         .service(onboardings::handler)
-        .service(config::get)
+        .service(ob_config::get)
         .service(liveness::get)
         .service(validate::validate)
+        .service(settings::routes())
+        .service(workos::routes())
 }

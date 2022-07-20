@@ -35,7 +35,8 @@
         "Tailscale",
         "thiserror",
         "vsock",
-        "webauthn"
+        "webauthn",
+        "workos"
     ],
     "[rust]": {
         "editor.defaultFormatter": "rust-lang.rust-analyzer",

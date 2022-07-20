@@ -6,39 +6,36 @@ use crate::DbPool;
 use diesel::prelude::*;
 use newtypes::TenantId;
 
-pub async fn init_or_get(pool: &DbPool, new_tenant: NewTenant) -> Result<Tenant, DbError> {
-    let workos_id = new_tenant.workos_id.clone();
-    pool.db_query(move |conn| {
-        let tenant = get_opt_by_workos_id_sync(conn, workos_id)?;
-        match tenant {
-            Some(tenant) => Ok(tenant),
-            _ => {
-                let tenant = diesel::insert_into(schema::tenants::table)
-                    .values(&new_tenant)
-                    .get_result::<Tenant>(conn)?;
-                Ok(tenant)
-            }
-        }
-    })
-    .await?
-}
-
-pub async fn get_opt_by_workos_id(pool: &DbPool, workos_id: String) -> Result<Option<Tenant>, DbError> {
+pub async fn get_opt_by_workos_profile_id(
+    pool: &DbPool,
+    workos_profile_id: String,
+) -> Result<Option<Tenant>, DbError> {
     let tenant = pool
-        .db_query(move |conn| get_opt_by_workos_id_sync(conn, workos_id))
+        .db_query(move |conn| -> Result<_, DbError> {
+            let tenant: Option<Tenant> = schema::tenants::table
+                .filter(schema::tenants::workos_admin_profile_id.eq(workos_profile_id))
+                .first(conn)
+                .optional()?;
+            Ok(tenant)
+        })
         .await??;
 
     Ok(tenant)
 }
 
-pub(crate) fn get_opt_by_workos_id_sync(
-    conn: &mut PgConnection,
-    workos_id: String,
+pub async fn get_opt_by_workos_org_id(
+    pool: &DbPool,
+    workos_org_id: String,
 ) -> Result<Option<Tenant>, DbError> {
-    let tenant: Option<Tenant> = schema::tenants::table
-        .filter(schema::tenants::workos_id.eq(workos_id))
-        .first(conn)
-        .optional()?;
+    let tenant = pool
+        .db_query(move |conn| -> Result<_, DbError> {
+            let tenant: Option<Tenant> = schema::tenants::table
+                .filter(schema::tenants::workos_id.eq(workos_org_id))
+                .first(conn)
+                .optional()?;
+            Ok(tenant)
+        })
+        .await??;
 
     Ok(tenant)
 }

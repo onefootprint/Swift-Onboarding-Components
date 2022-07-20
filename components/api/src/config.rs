@@ -90,6 +90,12 @@ pub struct Config {
     )]
     pub sendgrid_challenge_template_id: String,
 
+    #[envconfig(
+        from = "SENDGRID_MAGIC_LINK_TEMPLATE_ID",
+        default = "d-a631e0eb72984e28a39940aa8f3bbe60"
+    )]
+    pub sendgrid_magic_link_template_id: String,
+
     #[envconfig(from = "SENTRY_URL")]
     pub sentry_url: String,
 

@@ -56,9 +56,7 @@ def _create_tenant(data):
 @pytest.fixture(scope="session")
 def workos_tenant():
     data = {
-        "name": "Acme Bank",
-        "workos_org_id": WORKOS_ORG_ID,
-        "email_domain": "onefootprint.com",
+        "name": "Acme Bank",        
         "must_collect_data_kinds": MUST_COLLECT_DATA_KINDS,
         "can_access_data_kinds": CAN_ACCESS_DATA_KINDS,
         "is_live": True,
@@ -69,9 +67,7 @@ def workos_tenant():
 @pytest.fixture(scope="module")
 def workos_sandbox_tenant():
     data = {
-        "name": "Acme Bank",
-        "workos_org_id": WORKOS_ORG_ID,
-        "email_domain": "onefootprint.com",
+        "name": "Acme Bank",    
         "is_live": False,
         "must_collect_data_kinds": MUST_COLLECT_DATA_KINDS,
         "can_access_data_kinds": CAN_ACCESS_DATA_KINDS,
@@ -84,8 +80,6 @@ def workos_sandbox_tenant():
 def foo_tenant():
     data = {
         "name": "foo",
-        "workos_org_id": "bar",
-        "email_domain": "foo.bar",
         "must_collect_data_kinds": MUST_COLLECT_DATA_KINDS,
         "can_access_data_kinds": CAN_ACCESS_DATA_KINDS,
         "is_live": True,

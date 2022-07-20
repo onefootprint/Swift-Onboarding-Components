@@ -14,10 +14,8 @@ use db::models::tenants::{NewTenant, Tenant};
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Apiv2Schema)]
 struct NewClientRequest {
     name: String,
-    workos_org_id: String,
-    /// example: onefootprint.com, gmail.com
-    /// used for login gating
-    email_domain: String,
+    /// the org to attach this client to
+    workos_org_id: Option<String>,
     is_live: bool,
     /// list of data kinds that this tenant requires collecting
     must_collect_data_kinds: Vec<DataKind>,
@@ -57,23 +55,20 @@ async fn post(
     let NewClientRequest {
         name,
         workos_org_id,
-        email_domain,
         must_collect_data_kinds,
         can_access_data_kinds,
         is_live,
     } = request.into_inner();
 
-    let tenant = db::tenant::init_or_get(
-        &state.db_pool,
-        NewTenant {
-            name: name.clone(),
-            e_private_key: e_priv_key,
-            public_key: ec_pk_uncompressed,
-            workos_id: workos_org_id,
-            email_domain,
-            logo_url: Some("https://acmebank.onefootprint.com/logo-acme-bank.png".to_string()),
-        },
-    )
+    let tenant = NewTenant {
+        name: name.clone(),
+        e_private_key: e_priv_key,
+        public_key: ec_pk_uncompressed,
+        workos_id: workos_org_id,
+        workos_admin_profile_id: None,
+        logo_url: Some("https://acmebank.onefootprint.com/logo-acme-bank.png".to_string()),
+    }
+    .create(&state.db_pool)
     .await?;
 
     let obc = NewObConfiguration {

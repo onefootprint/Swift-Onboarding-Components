@@ -1,12 +1,12 @@
 use paperclip::actix::web;
 
-pub mod callback;
-pub mod magic_auth;
+pub mod login;
+pub mod magic_link;
 pub mod oauth;
 
 pub fn routes() -> web::Scope {
     web::scope("/auth")
-        .service(callback::handler)
-        .service(magic_auth::handler)
+        .service(login::handler)
+        .service(magic_link::handler)
         .service(oauth::handler)
 }

@@ -17,13 +17,12 @@ async fn test_db() {
         name: "test_tenant".to_owned(),
         e_private_key: EncryptedVaultPrivateKey("private key".as_bytes().to_vec()),
         public_key: VaultPublicKey::unvalidated("public key".as_bytes().to_vec()),
-        workos_id: "test".to_owned(),
-        email_domain: "dbtest.com".to_owned(),
         logo_url: None,
+        workos_id: None,
+        workos_admin_profile_id: None,
     };
-    let _tenant = crate::tenant::init_or_get(&pool, tenant)
-        .await
-        .expect("couldn't create tenant");
+    let _tenant = tenant.create(&pool).await.expect("couldn't create tenant");
+
     let uv = crate::user_vault::create(
         &pool,
         crate::models::user_vaults::NewUserVaultReq {

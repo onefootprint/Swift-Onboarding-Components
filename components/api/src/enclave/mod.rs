@@ -9,9 +9,7 @@ use enclave_proxy::{
 };
 use newtypes::{EncryptedVaultPrivateKey, SealedVaultBytes, VaultPublicKey};
 
-pub async fn gen_keypair(
-    state: &actix_web::web::Data<State>,
-) -> Result<(VaultPublicKey, EncryptedVaultPrivateKey), KmsSignError> {
+pub async fn gen_keypair(state: &State) -> Result<(VaultPublicKey, EncryptedVaultPrivateKey), KmsSignError> {
     let new_key_pair = state
         .kms_client
         .generate_data_key_pair_without_plaintext()

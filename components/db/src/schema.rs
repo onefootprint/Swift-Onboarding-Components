@@ -147,11 +147,11 @@ table! {
         name -> Text,
         public_key -> Bytea,
         e_private_key -> Bytea,
-        workos_id -> Varchar,
-        email_domain -> Varchar,
+        workos_id -> Nullable<Varchar>,
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
         logo_url -> Nullable<Text>,
+        workos_admin_profile_id -> Nullable<Text>,
     }
 }
 

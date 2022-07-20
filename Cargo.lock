@@ -1918,6 +1918,7 @@ dependencies = [
  "futures",
  "futures-util",
  "itertools",
+ "lazy_static",
  "log",
  "mime",
  "newtypes",
@@ -1933,6 +1934,7 @@ dependencies = [
  "serde_json",
  "serde_repr",
  "strum_macros",
+ "test-case",
  "thiserror",
  "tokio",
  "tracing",
@@ -4192,6 +4194,28 @@ dependencies = [
 ]
 
 [[package]]
+name = "test-case"
+version = "2.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "196e8a70562e252cc51eaaaee3ecddc39803d9b7fd4a772b7c7dae7cdf42a859"
+dependencies = [
+ "test-case-macros",
+]
+
+[[package]]
+name = "test-case-macros"
+version = "2.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8dd461f47ade621665c9f4e44b20449341769911c253275dc5cb03726cbb852c"
+dependencies = [
+ "cfg-if",
+ "proc-macro-error",
+ "proc-macro2 1.0.40",
+ "quote 1.0.20",
+ "syn 1.0.98",
+]
+
+[[package]]
 name = "thiserror"
 version = "1.0.31"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4955,9 +4979,9 @@ dependencies = [
 
 [[package]]
 name = "webpki-roots"
-version = "0.22.3"
+version = "0.22.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "44d8de8415c823c8abd270ad483c6feeac771fad964890779f9a8cb24fbbc1bf"
+checksum = "f1c760f0d366a6c24a02ed7816e23e691f5d92291f94d15e836006fd11b04daf"
 dependencies = [
  "webpki 0.22.0",
 ]
@@ -5058,9 +5082,9 @@ dependencies = [
 
 [[package]]
 name = "workos"
-version = "0.1.0"
+version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9e6d40091d44c277f97e45b8bd0a1ad15443dccb719209160710757f192325f4"
+checksum = "f2d9fef6bdedd1846dd136225d9b829f696b13b9d9cb05eb96aa4979f011a590"
 dependencies = [
  "async-trait",
  "chrono",
