@@ -1,6 +1,4 @@
-use crate::models::insight_event::InsightEvent;
 use crate::models::onboardings::Onboarding;
-use crate::models::onboardings::OnboardingLink;
 use crate::schema;
 use crate::{errors::DbError, schema::onboardings::BoxedQuery};
 use chrono::{DateTime, Utc};
@@ -70,18 +68,8 @@ pub fn list_for_tenant(
     params: OnboardingListQueryParams,
     cursor: Option<i64>,
     page_size: i64,
-) -> Result<Vec<(Onboarding, OnboardingLink, InsightEvent)>, DbError> {
+) -> Result<Vec<Onboarding>, DbError> {
     let mut onboardings = list_for_tenant_query(params)
-        .inner_join(schema::onboarding_links::table)
-        .inner_join(
-            schema::insight_events::table
-                .on(schema::insight_events::id.eq(schema::onboarding_links::insight_event_id)),
-        )
-        .select((
-            schema::onboardings::all_columns,
-            schema::onboarding_links::all_columns,
-            schema::insight_events::all_columns,
-        ))
         .order_by(schema::onboardings::ordering_id.desc())
         .limit(page_size);
 
@@ -89,6 +77,6 @@ pub fn list_for_tenant(
         onboardings = onboardings.filter(schema::onboardings::ordering_id.le(cursor));
     }
 
-    let onboardings = onboardings.load::<(Onboarding, OnboardingLink, InsightEvent)>(conn)?;
+    let onboardings = onboardings.load(conn)?;
     Ok(onboardings)
 }

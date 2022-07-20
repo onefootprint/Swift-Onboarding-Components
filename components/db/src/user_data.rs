@@ -72,7 +72,7 @@ pub fn bulk_deactivate(conn: &mut PgConnection, user_data_ids: Vec<UserDataId>) 
 
 pub fn bulk_fetch_populated_kinds(
     conn: &mut PgConnection,
-    user_vault_ids: Vec<UserVaultId>,
+    user_vault_ids: Vec<&UserVaultId>,
 ) -> Result<HashMap<UserVaultId, Vec<DataKind>>, DbError> {
     use schema::user_data;
     // Fetch a list of data kinds from the set of active user_datas, grouped by user_vault_id.

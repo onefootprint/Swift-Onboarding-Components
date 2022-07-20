@@ -9,6 +9,7 @@ use crate::utils::querystring::deserialize_stringified_list;
 use crate::State;
 use crate::{auth::session_context::SessionContext, errors::ApiError};
 use chrono::{DateTime, Utc};
+use db::models::onboardings::OnboardingLink;
 use db::onboarding::OnboardingListQueryParams;
 use db::DbError;
 use newtypes::{DataKind, Fingerprint, Fingerprinter, FootprintUserId, PiiString, Status};
@@ -79,7 +80,7 @@ fn handler(
         timestamp_lte,
         timestamp_gte,
     };
-    let (onboardings, user_to_kinds, count) = state
+    let (onboardings, ob_links, user_to_kinds, count) = state
         .db_pool
         .db_query(move |conn| -> Result<_, DbError> {
             let onboardings =
@@ -90,29 +91,31 @@ fn handler(
                 Some(_) => None,
                 None => Some(db::onboarding::count_for_tenant(conn, query_params)?),
             };
-            let user_vault_ids = onboardings.iter().map(|ob| ob.0.user_vault_id.clone()).collect();
+            let (onboarding_ids, user_vault_ids) =
+                onboardings.iter().map(|ob| (&ob.id, &ob.user_vault_id)).unzip();
             let user_to_kinds = db::user_data::bulk_fetch_populated_kinds(conn, user_vault_ids)?;
+            let ob_links = OnboardingLink::get_for_onboardings(conn, onboarding_ids)?;
 
-            Ok((onboardings, user_to_kinds, count))
+            Ok((onboardings, ob_links, user_to_kinds, count))
         })
         .await??;
 
     // If there are more than page_size results, we should tell the client there's another page
     let cursor = if onboardings.len() > page_size {
-        onboardings.last().map(|x| x.0.ordering_id)
+        onboardings.last().map(|x| x.ordering_id)
     } else {
         None
     };
 
+    let empty_vec = vec![];
     let onboardings = onboardings
         .into_iter()
         .take(page_size)
-        .map(|x| {
+        .map(|ob| {
             (
-                user_to_kinds.get(&x.0.user_vault_id).unwrap_or(&vec![]).clone(),
-                x.0,
-                x.1,
-                x.2,
+                user_to_kinds.get(&ob.user_vault_id).unwrap_or(&vec![]).clone(),
+                ob_links.get(&ob.id).unwrap_or(&empty_vec),
+                ob,
             )
         })
         .map(ApiOnboarding::from)
