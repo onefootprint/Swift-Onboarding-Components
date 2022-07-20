@@ -24,8 +24,8 @@ mod errors;
 mod identify;
 mod index;
 mod onboarding;
+mod org;
 mod private;
-mod tenant;
 mod types;
 mod user;
 mod utils;
@@ -200,7 +200,7 @@ async fn main() -> std::io::Result<()> {
             .configure(index::routes)
             .service(private::routes())
             .service(identify::routes())
-            .service(tenant::routes())
+            .service(org::routes())
             .service(onboarding::routes())
             .service(user::routes())
             .with_json_spec_at("/open-api/spec")
