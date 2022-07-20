@@ -7,7 +7,6 @@ on:
 
 concurrency:
   group: ${{ github.workflow }}-deploy-prod
-  cancel-in-progress: true
 
 jobs:
   deploy_stack_prod:
