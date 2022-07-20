@@ -46,10 +46,12 @@
         "cancel": "Cancel"
       },
       "liveness-check-success": {
-        "description": "Liveness check succeeded."
+        "title": "Liveness check succeeded!",
+        "description": "You are all set."
       },
       "liveness-check-failure": {
-        "description": "Liveness check failed."
+        "title": "Liveness check failed.",
+        "description": "Please try again."
       }
     },
     "my-footprint-identity": {

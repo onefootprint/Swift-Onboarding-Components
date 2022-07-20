@@ -9,22 +9,34 @@ const LivenessCheckSuccess = () => {
 
   return (
     <Container>
-      <IcoCheckCircle40 color="success" />
-      <Typography variant="label-3" color="success">
-        {t('description')}
-      </Typography>
+      <TitleContainer>
+        <IcoCheckCircle40 color="success" />
+        <Typography variant="heading-3">{t('title')}</Typography>
+      </TitleContainer>
+      <Typography variant="body-2">{t('description')}</Typography>
     </Container>
   );
 };
 
-const Container = styled.div`
+const TitleContainer = styled.div`
   ${({ theme }) => css`
+    align-items: center;
     display: flex;
     flex-direction: column;
+    row-gap: ${theme.spacing[2]}px;
     justify-content: center;
+  `}
+`;
+
+const Container = styled.div`
+  ${({ theme }) => css`
     align-items: center;
-    height: 100px;
-    row-gap: ${theme.spacing[8]}px;
+    display: flex;
+    flex-direction: column;
+    row-gap: ${theme.spacing[7]}px;
+    height: 156px;
+    justify-content: center;
+    text-align: center;
   `}
 `;
 
