@@ -53,6 +53,7 @@
       }
     },
     "my-footprint-identity": {
+      "title": "My Footprint Identity",
       "basic": {
         "title": "Basic",
         "name": {

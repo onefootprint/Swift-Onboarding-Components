@@ -1,12 +1,14 @@
+import { useTranslation } from 'hooks';
 import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
-import { Accordion, Box, Container, Divider } from 'ui';
+import { Accordion, Box, Container, Divider, Typography } from 'ui';
 
 import Footer from './components/footer';
 import Header from './components/header';
 import useSections, { Section } from './hooks/use-sections';
 
 const MyFootprintIdentity = () => {
+  const { t } = useTranslation('pages.my-footprint-identity');
   const sections = useSections();
   const [activeAccordion, setActiveAccordion] = useState<null | number>(null);
 
@@ -38,7 +40,10 @@ const MyFootprintIdentity = () => {
     <PageContainer>
       <Content>
         <Header />
-        <Container>
+        <Container sx={{ maxWidth: '680px' }}>
+          <Typography variant="heading-3" sx={{ marginBottom: 5 }}>
+            {t('title')}
+          </Typography>
           <div>
             {renderSectionGroup(sections.top)}
             <Box sx={{ marginY: 8 }}>
