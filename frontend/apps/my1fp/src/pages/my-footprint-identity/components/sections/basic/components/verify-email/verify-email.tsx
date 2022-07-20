@@ -15,11 +15,11 @@ const VerifyEmail = () => {
   if (!data) {
     return null;
   }
-  const { email: emailAddress } = data;
+  const { email, authToken } = data;
 
   const handleVerifyClick = () => {
     verificationEmailMutation.mutate(
-      { emailAddress },
+      { email, authToken },
       {
         onSuccess: () => {
           toast.show({

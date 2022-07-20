@@ -12,7 +12,7 @@ describe('<Basic />', () => {
   const withVerification = () => {
     mockRequest({
       method: 'post',
-      path: 'user/email',
+      path: 'user/data',
       response: {
         data: 'Success',
       },
@@ -22,7 +22,7 @@ describe('<Basic />', () => {
   const withVerificationError = () => {
     mockRequest({
       method: 'post',
-      path: 'user/email',
+      path: 'user/data',
       statusCode: 403,
       response: {
         error: {

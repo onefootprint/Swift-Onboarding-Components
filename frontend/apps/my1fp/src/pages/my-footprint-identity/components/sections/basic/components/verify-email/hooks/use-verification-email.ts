@@ -1,8 +1,10 @@
 import { useMutation } from 'react-query';
 import request, { RequestError, RequestResponse } from 'request';
+import { MY1FP_AUTH_HEADER } from 'src/config/constants';
 
 export type VerificationEmailRequest = {
-  emailAddress: string;
+  email: string;
+  authToken: string;
 };
 
 export type VerificationEmailResponse = {
@@ -14,8 +16,11 @@ const verificationEmailRequest = async (payload: VerificationEmailRequest) => {
     RequestResponse<VerificationEmailResponse>
   >({
     method: 'post',
-    url: '/user/email',
+    url: '/user/data',
     data: payload,
+    headers: {
+      [MY1FP_AUTH_HEADER]: payload.authToken,
+    },
   });
   return response.data;
 };
