@@ -146,6 +146,10 @@ jobs:
           done
           cd ci
           pytest tests/ --emoji &> pytest.txt && kill $server_pid
+          
+      - name: "Print test results"
+        if: always()
+        run: cat pytest.txt          
 
       - name: Comment markdown on PR
         working-directory: ci
