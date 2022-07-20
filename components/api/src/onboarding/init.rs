@@ -40,12 +40,11 @@ pub fn handler(
     state
         .db_pool
         .db_transaction(move |conn| -> Result<(), DbError> {
-            let insight_event = CreateInsightEvent::from(insights).insert_with_conn(conn)?;
             Onboarding::get_or_create(
                 conn,
                 uv_id,
                 tenant_auth.tenant.id.clone(),
-                insight_event.id,
+                CreateInsightEvent::from(insights),
                 tenant_auth.ob_config.is_live,
             )?;
             Ok(())

@@ -1,3 +1,4 @@
+use super::insight_event::CreateInsightEvent;
 use super::tenants::Tenant;
 use crate::models::insight_event::InsightEvent;
 use crate::models::ob_configurations::ObConfiguration;
@@ -99,22 +100,27 @@ impl OnboardingLink {
         conn: &mut PgConnection,
         onboarding_id: OnboardingId,
         ob_configuration_id: ObConfigurationId,
-        insight_event_id: InsightEventId,
+        insight_event: CreateInsightEvent,
     ) -> Result<OnboardingLink, DbError> {
+        let ob_link = onboarding_links::table
+            .filter(onboarding_links::onboarding_id.eq(&onboarding_id))
+            .filter(onboarding_links::ob_configuration_id.eq(&ob_configuration_id))
+            .first(conn)
+            .optional()?;
+        if let Some(ob_link) = ob_link {
+            return Ok(ob_link);
+        }
+        // Row doesn't exist for onboarding_id, ob_configuration_id - create a new one
+        let insight_event = insight_event.insert_with_conn(conn)?;
         let new_ob_link = NewOnboardingLink {
             onboarding_id,
             ob_configuration_id,
             start_timestamp: Utc::now(),
             status: Status::Processing,
-            insight_event_id,
+            insight_event_id: insight_event.id,
         };
         let ob_link = diesel::insert_into(onboarding_links::table)
             .values(new_ob_link)
-            .on_conflict((
-                onboarding_links::onboarding_id,
-                onboarding_links::ob_configuration_id,
-            ))
-            .do_nothing()
             .get_result::<OnboardingLink>(conn)?;
         Ok(ob_link)
     }
@@ -143,20 +149,28 @@ impl Onboarding {
         conn: &mut PgConnection,
         user_vault_id: UserVaultId,
         tenant_id: TenantId,
-        insight_event_id: InsightEventId,
+        insight_event: CreateInsightEvent,
         is_live: bool,
     ) -> Result<Onboarding, DbError> {
+        let onboarding = onboardings::table
+            .filter(onboardings::user_vault_id.eq(&user_vault_id))
+            .filter(onboardings::tenant_id.eq(&tenant_id))
+            .first(conn)
+            .optional()?;
+        if let Some(onboarding) = onboarding {
+            return Ok(onboarding);
+        }
+        // Row doesn't exist for user_vault_id, tenant_id - create a new one
+        let insight_event = insight_event.insert_with_conn(conn)?;
         let new = NewOnboarding {
             user_vault_id,
             tenant_id,
-            insight_event_id,
+            insight_event_id: insight_event.id,
             start_timestamp: Utc::now(),
             is_live,
         };
         let ob = diesel::insert_into(onboardings::table)
             .values(new)
-            .on_conflict((onboardings::user_vault_id, onboardings::tenant_id))
-            .do_nothing()
             .get_result::<Onboarding>(conn)?;
         Ok(ob)
     }

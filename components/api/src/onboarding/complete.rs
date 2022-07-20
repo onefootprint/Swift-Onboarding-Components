@@ -62,12 +62,12 @@ fn handler(
     let validation_token = state
         .db_pool
         .db_transaction(move |conn| -> Result<_, DbError> {
-            let insight_event = CreateInsightEvent::from(insights).insert_with_conn(conn)?;
+            let insight_event = CreateInsightEvent::from(insights);
             let ob_link = OnboardingLink::get_or_create(
                 conn,
                 onboarding.id.clone(),
                 tenant_auth.ob_config.id.clone(),
-                insight_event.id,
+                insight_event,
             )?;
             if ob_link.status != Status::Verified {
                 // Just create some fixture events for now

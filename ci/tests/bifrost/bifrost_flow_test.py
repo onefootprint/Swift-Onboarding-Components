@@ -166,9 +166,19 @@ class TestBifrost:
         assert fp_user_id2 == fp_user_id
         assert body["data"]["status"]
 
+    def test_onboard_onto_same_tenant(self, workos_tenant):
+        body = post("onboarding", None, workos_tenant.pk, pytest.fpuser_auth_token)
+        assert not body["data"]["missing_attributes"]
+        assert not body["data"]["missing_webauthn_credentials"]
+
+        body = post("onboarding/complete", None, workos_tenant.pk, pytest.fpuser_auth_token)
+        validation_token = body["data"]["validation_token"]
+        data = dict(validation_token=validation_token)
+        body = post("org/validate", data, workos_tenant.sk)
+        assert body["data"]["footprint_user_id"]
+
     def test_identify_login_repeat_customer_biometric(self):
         pytest.fpuser_auth_token = None  # Remove fpuser_auth_token from previous test
-
         # Identify the user by email
         identifier = {"email": EMAIL}
         data = {"identifier": identifier, "preferred_challenge_kind": "biometric"}
