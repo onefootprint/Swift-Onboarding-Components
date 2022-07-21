@@ -1,3 +1,4 @@
+use crate::auth::key_context::custodian::CustodianAuthContext;
 use crate::errors::{enclave::EnclaveError, ApiError};
 use crate::State;
 use enclave_proxy::{EnclavePayload, RpcPayload};
@@ -39,7 +40,7 @@ async fn enclave_pong(state: &web::Data<State>) -> Result<String, EnclaveError> 
 #[api_v2_operation]
 #[tracing::instrument(name = "panic")]
 #[get("/panic")]
-async fn panic_handler() -> &'static str {
+async fn panic_handler(_: CustodianAuthContext) -> &'static str {
     tracing::debug!("about to panic");
     panic!("at the disco");
 }
