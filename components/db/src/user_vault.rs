@@ -1,7 +1,7 @@
-use crate::models::user_data::{GroupInsert, NewUserData};
+use crate::errors::DbError;
+use crate::models::user_data::{NewUserData, UserData};
 use crate::models::user_vaults::*;
 use crate::schema;
-use crate::{errors::DbError, models::user_data::UserData};
 use diesel::prelude::*;
 use newtypes::{DataGroupId, DataKind, DataPriority, Fingerprint, UserVaultId};
 
@@ -40,7 +40,7 @@ pub async fn create(pool: &crate::DbPool, new_user: NewUserVaultReq) -> Result<U
                 data_group_kind: newtypes::DataGroupKind::PhoneNumber,
                 data_group_priority: DataPriority::Primary,
             };
-            GroupInsert(vec![phone_number_data, phone_number_country]).group_insert(conn)?;
+            UserData::bulk_insert(conn, vec![phone_number_data, phone_number_country])?;
             Ok(user_vault)
         })
         .await?;

@@ -1,3 +1,5 @@
+use std::collections::HashSet;
+
 use crate::diesel::RunQueryDsl;
 use crate::schema::user_data;
 use crate::DbPool;
@@ -38,6 +40,18 @@ impl UserData {
             .await??;
         Ok(result)
     }
+
+    pub fn bulk_insert(conn: &mut PgConnection, data: Vec<NewUserData>) -> Result<(), crate::DbError> {
+        let group_ids: HashSet<&DataGroupId> = data.iter().map(|x| &x.data_group_id).collect();
+        let existing_groups: Vec<UserData> = user_data::table
+            .filter(user_data::data_group_id.eq_any(group_ids))
+            .get_results(conn)?;
+        if !existing_groups.is_empty() {
+            return Err(crate::DbError::CouldNotCreateGroupUuid);
+        }
+        diesel::insert_into(user_data::table).values(data).execute(conn)?;
+        Ok(())
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
@@ -51,43 +65,6 @@ pub struct NewUserData {
     pub e_data: SealedVaultBytes,
     pub sh_data: Option<Fingerprint>,
     pub is_verified: bool,
-}
-
-impl NewUserData {
-    /// This should always be run inside of a transaction (.db_transaction)
-    pub fn insert(self, conn: &mut PgConnection) -> Result<UserData, crate::DbError> {
-        ensure_new_group_uuid(conn, self.data_group_id.clone())?;
-        let data = diesel::insert_into(user_data::table)
-            .values(&self)
-            .get_result::<UserData>(conn)?;
-        Ok(data)
-    }
-}
-
-fn ensure_new_group_uuid(conn: &mut PgConnection, id: DataGroupId) -> Result<(), crate::DbError> {
-    let group_exists = diesel::dsl::select(diesel::dsl::exists(
-        user_data::table.filter(user_data::data_group_id.eq(id)),
-    ))
-    .get_result(conn)?;
-    if group_exists {
-        return Err(crate::DbError::CouldNotCreateGroupUuid);
-    }
-    Ok(())
-}
-
-pub struct GroupInsert(pub Vec<NewUserData>);
-
-impl GroupInsert {
-    /// This should always be run inside of a transaction (.db_transaction)
-    pub fn group_insert(self, conn: &mut PgConnection) -> Result<(), crate::DbError> {
-        if let Some(req) = self.0.first() {
-            ensure_new_group_uuid(conn, req.data_group_id.clone())?;
-            diesel::insert_into(user_data::table)
-                .values(self.0)
-                .execute(conn)?;
-        }
-        Ok(())
-    }
 }
 
 pub struct UserDataUpdate {
@@ -108,26 +85,25 @@ pub struct NewUserDataBatch(pub Vec<GroupDataUpdateRequest>);
 
 impl NewUserDataBatch {
     pub fn bulk_insert(self, conn: &mut PgConnection) -> Result<(), crate::DbError> {
-        for data in self.0 {
-            let GroupDataUpdateRequest {
-                user_vault_id,
-                data_group_priority,
-                data_group_kind,
-                data,
-            } = data;
-
-            // generate uuid for checking they're in the same group: todo, check collisions
-            // earlier
-            let group_id = DataGroupId::generate();
-            let updates: Vec<NewUserData> = data
-                .into_iter()
-                .map(|update_data| {
+        let new_user_datas = self
+            .0
+            .into_iter()
+            .flat_map(|data_group| {
+                let GroupDataUpdateRequest {
+                    user_vault_id,
+                    data_group_priority,
+                    data_group_kind,
+                    data,
+                } = data_group;
+                // generate uuid for grouping data
+                let group_id = DataGroupId::generate();
+                data.into_iter().map(move |new_data| {
                     let UserDataUpdate {
                         data_kind,
                         e_data,
                         sh_data,
                         is_verified,
-                    } = update_data;
+                    } = new_data;
                     NewUserData {
                         user_vault_id: user_vault_id.clone(),
                         data_kind,
@@ -139,9 +115,9 @@ impl NewUserDataBatch {
                         is_verified,
                     }
                 })
-                .collect();
-            GroupInsert(updates).group_insert(conn)?;
-        }
+            })
+            .collect::<Vec<NewUserData>>();
+        UserData::bulk_insert(conn, new_user_datas)?;
         Ok(())
     }
 }

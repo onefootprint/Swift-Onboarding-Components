@@ -1,4 +1,7 @@
-use crate::{models::user_data::NewUserData, run_migrations};
+use crate::{
+    models::user_data::{NewUserData, UserData},
+    run_migrations,
+};
 use newtypes::{
     DataGroupId, EncryptedVaultPrivateKey, Fingerprint, SealedVaultBytes, Status, VaultPublicKey,
 };
@@ -63,7 +66,7 @@ async fn test_db() {
         )),
         is_verified: false,
     };
-    pool.db_transaction(move |conn| test_data.insert(conn))
+    pool.db_transaction(move |conn| UserData::bulk_insert(conn, vec![test_data]))
         .await
         .expect("couldn't create user data");
     let test_data_bad_group_uuid = NewUserData {
@@ -81,7 +84,7 @@ async fn test_db() {
         is_verified: false,
     };
     let bad_data = pool
-        .db_transaction(move |conn| test_data_bad_group_uuid.insert(conn))
+        .db_transaction(move |conn| UserData::bulk_insert(conn, vec![test_data_bad_group_uuid]))
         .await;
     assert!(bad_data.is_err())
     // TODO find_by_phone_number and find_by_email
