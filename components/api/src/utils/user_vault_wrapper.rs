@@ -34,14 +34,16 @@ impl UserVaultWrapper {
         })
     }
 
-    pub fn get_data(&self, data_kind: DataKind) -> Option<&UserData> {
-        // TODO handle multiple values for the same field
-        self.user_data.get(&data_kind)?.get(0)
+    pub fn get_data(&self, data_kind: DataKind) -> Vec<&UserData> {
+        self.user_data
+            .get(&data_kind)
+            .map(|x| x.iter().collect())
+            .unwrap_or_default()
     }
 
     pub fn get_e_field(&self, data_kind: DataKind) -> Option<&SealedVaultBytes> {
         // TODO handle multiple values for the same field
-        Some(&self.get_data(data_kind)?.e_data)
+        Some(&self.get_data(data_kind).get(0)?.e_data)
     }
 
     pub async fn bulk_update(
@@ -98,7 +100,7 @@ impl UserVaultWrapper {
     }
 
     fn decide_priority(&self, data_kind: &DataKind) -> (DataPriority, Option<UserDataId>) {
-        match self.get_data(data_kind.to_owned()) {
+        match self.get_data(data_kind.to_owned()).get(0) {
             Some(existing_data) => {
                 // There's an existing piece of data with this kind
                 if data_kind.allow_multiple() {
