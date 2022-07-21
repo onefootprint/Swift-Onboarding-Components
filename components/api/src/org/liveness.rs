@@ -33,6 +33,7 @@ fn get(
     auth: Either<SessionContext<WorkOsSession>, SecretTenantAuthContext>,
 ) -> actix_web::Result<Json<ApiResponseData<LivenessResponse>>, ApiError> {
     let tenant = auth.tenant(&state.db_pool).await?;
+    let is_live = auth.is_live()?;
 
     let creds = state
         .db_pool
@@ -41,7 +42,7 @@ fn get(
                 conn,
                 &tenant.id,
                 &request.footprint_user_id,
-                auth.is_live(),
+                is_live,
             )
         })
         .await??;

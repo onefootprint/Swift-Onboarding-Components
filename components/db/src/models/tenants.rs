@@ -19,6 +19,7 @@ pub struct Tenant {
     pub _updated_at: DateTime<Utc>,
     pub logo_url: Option<String>,
     pub workos_admin_profile_id: Option<String>,
+    pub sandbox_restricted: bool,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
@@ -30,6 +31,7 @@ pub struct NewTenant {
     pub workos_id: Option<String>,
     pub logo_url: Option<String>,
     pub workos_admin_profile_id: Option<String>,
+    pub sandbox_restricted: bool,
 }
 
 impl NewTenant {

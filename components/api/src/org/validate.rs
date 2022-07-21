@@ -52,7 +52,7 @@ pub fn validate(
     if onboarding.tenant_id != auth.tenant().id {
         return Err(OnboardingError::TenantMismatch.into());
     }
-    if onboarding.is_live != auth.is_live() {
+    if onboarding.is_live != auth.is_live()? {
         return Err(OnboardingError::InvalidSandboxState.into());
     }
 

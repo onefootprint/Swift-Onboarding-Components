@@ -22,14 +22,14 @@ async fn handler(
     state: web::Data<State>,
     auth: SessionContext<WorkOsSession>,
 ) -> actix_web::Result<Json<ApiResponseData<GenerateApiKeyResponse>>, ApiError> {
-    let api_key = SecretApiKey::generate(auth.is_live());
+    let api_key = SecretApiKey::generate(auth.is_live()?);
     let tenant = auth.tenant(&state.db_pool).await?;
     let _ = NewTenantApiKey {
         sh_secret_api_key: api_key.fingerprint(&state.hmac_client).await?,
         e_secret_api_key: api_key.seal_to(&tenant.public_key)?,
         tenant_id: tenant.id,
         is_enabled: true,
-        is_live: auth.is_live(),
+        is_live: auth.is_live()?,
     }
     .create(&state.db_pool)
     .await?;

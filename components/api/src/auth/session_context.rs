@@ -120,6 +120,8 @@ where
 pub trait HasTenant {
     fn tenant_id(&self) -> TenantId;
 
+    fn is_sandbox_restricted(&self) -> bool;
+
     async fn tenant(&self, pool: &DbPool) -> Result<Tenant, ApiError>;
 }
 
@@ -130,6 +132,10 @@ where
 {
     fn tenant_id(&self) -> TenantId {
         self.data.tenant_id()
+    }
+
+    fn is_sandbox_restricted(&self) -> bool {
+        self.data.is_sandbox_restricted()
     }
 
     async fn tenant(&self, pool: &DbPool) -> Result<Tenant, ApiError> {
@@ -150,14 +156,22 @@ impl<C> SessionContext<C> {
 
 impl<C> IsLive for SessionContext<C>
 where
-    C: SupportsIsLiveHeader,
+    C: SupportsIsLiveHeader + HasTenant,
 {
-    fn is_live(&self) -> bool {
-        self.headers
+    fn is_live(&self) -> Result<bool, AuthError> {
+        let is_live: Option<bool> = self
+            .headers
             .0
             .get("x-is-live".to_owned())
             .and_then(|hv| hv.to_str().map(|s| s.to_string()).ok())
-            .map(|v| v.trim().parse::<bool>().unwrap_or(true))
-            .unwrap_or(true)
+            .and_then(|v| v.trim().parse::<bool>().ok());
+
+        // error if the sandbox is restricted
+        if self.data.is_sandbox_restricted() && is_live == Some(true) {
+            return Err(AuthError::SandboxRestricted);
+        }
+
+        // otherwise return the default of the sent header or live if not restricted
+        Ok(is_live.unwrap_or_else(|| !self.data.is_sandbox_restricted()))
     }
 }

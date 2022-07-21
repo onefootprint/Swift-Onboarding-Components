@@ -73,7 +73,7 @@ fn handler(
 
     let query_params = OnboardingListQueryParams {
         tenant_id: tenant.id.clone(),
-        is_live: auth.is_live(),
+        is_live: auth.is_live()?,
         statuses,
         fingerprints,
         footprint_user_id,

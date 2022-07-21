@@ -42,7 +42,7 @@ fn handler(
         &state.db_pool,
         tenant.id.clone(),
         request.footprint_user_id.clone(),
-        auth.is_live(),
+        auth.is_live()?,
     )
     .await?
     .ok_or(AuthError::InvalidTenantKeyOrUserId)?;

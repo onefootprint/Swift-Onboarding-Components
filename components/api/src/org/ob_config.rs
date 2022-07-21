@@ -80,7 +80,7 @@ fn post(
         must_collect_data_kinds,
         can_access_data_kinds,
         settings: ObConfigurationSettings::Empty,
-        is_live: auth.is_live(),
+        is_live: auth.is_live()?,
     }
     .save(&state.db_pool)
     .await?;

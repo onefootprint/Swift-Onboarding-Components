@@ -114,6 +114,13 @@ where
         }
     }
 
+    fn is_sandbox_restricted(&self) -> bool {
+        match self {
+            Either::Left(s) => s.is_sandbox_restricted(),
+            Either::Right(s) => s.is_sandbox_restricted(),
+        }
+    }
+
     async fn tenant(&self, pool: &DbPool) -> Result<Tenant, ApiError> {
         match self {
             Either::Left(s) => s.tenant(pool).await,
@@ -127,7 +134,7 @@ where
     A: IsLive,
     B: IsLive,
 {
-    fn is_live(&self) -> bool {
+    fn is_live(&self) -> Result<bool, AuthError> {
         match self {
             Either::Left(l) => l.is_live(),
             Either::Right(r) => r.is_live(),

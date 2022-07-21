@@ -20,6 +20,7 @@ async fn test_db() {
         logo_url: None,
         workos_id: None,
         workos_admin_profile_id: None,
+        sandbox_restricted: true,
     };
     let _tenant = tenant.create(&pool).await.expect("couldn't create tenant");
 

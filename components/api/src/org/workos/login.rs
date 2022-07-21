@@ -33,6 +33,7 @@ struct DashboardAuthorizationResponse {
     last_name: Option<String>,
     created_new_tenant: bool,
     tenant_name: String,
+    sandbox_restricted: bool,
 }
 
 /// Called from the front-end with the WorkOS code. Returns
@@ -64,6 +65,8 @@ async fn handler(
         first_name: profile.first_name.clone(),
         last_name: profile.last_name.clone(),
         tenant_id: tenant.id,
+        //TODO https://linear.app/footprint/issue/FP-715/dynamically-check-sandbox-restricted-on-workos-session remove this denormalization so updates take effect immediately
+        sandbox_restricted: tenant.sandbox_restricted,
     });
     let auth_token = ServerSession::create(&state, session_data, Duration::hours(8)).await?;
 
@@ -75,6 +78,7 @@ async fn handler(
             last_name: profile.last_name.clone(),
             created_new_tenant: is_new,
             tenant_name: tenant.name,
+            sandbox_restricted: tenant.sandbox_restricted,
         },
     }))
 }
@@ -181,6 +185,7 @@ async fn create_tenant(
         workos_id: Some(workos_org_id),
         workos_admin_profile_id: workos_profile_id,
         logo_url: None,
+        sandbox_restricted: true,
     }
     .create(&state.db_pool)
     .await?;

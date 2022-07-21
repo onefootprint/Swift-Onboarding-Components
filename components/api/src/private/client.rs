@@ -52,6 +52,7 @@ async fn post(
         workos_id: workos_org_id,
         workos_admin_profile_id: None,
         logo_url,
+        sandbox_restricted: false, // this is needed for our integration tests
     }
     .create(&state.db_pool)
     .await?;

@@ -42,6 +42,8 @@ pub enum AuthError {
     SessionExpired,
     #[error("invalid token for header {0}")]
     InvalidTokenForHeader(String),
+    #[error("not allowed: restricted to sandbox mode")]
+    SandboxRestricted,
 }
 
 /// For endpoints that take both a user_auth and tenant_auth, this helps to assert that the authenticated user
@@ -63,7 +65,7 @@ pub async fn get_onboarding_for_tenant(
 
 /// A helper trait to extract whether the auth session is for sandbox or production data
 pub trait IsLive {
-    fn is_live(&self) -> bool;
+    fn is_live(&self) -> Result<bool, AuthError>;
 }
 
 pub trait SupportsIsLiveHeader {}

@@ -52,12 +52,6 @@ pub enum DbError {
 
     #[error("crypto error: {0}")]
     CryptoError(#[from] crypto::Error),
-
-    #[error("sandbox user vault expected")]
-    LiveUserInSandbox,
-
-    #[error("live user vault expected")]
-    SandboxUserInLive,
 }
 
 impl DbError {
