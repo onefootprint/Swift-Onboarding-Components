@@ -15,10 +15,10 @@ struct EmailVerifyRequest {
 }
 
 #[api_v2_operation(tags(User))]
-#[post("/email/verify")]
+#[post("/verify")]
 /// Used to asynchronously verify a user's email address.
 /// Requires the token sent to the users email
-async fn handler(
+async fn post(
     state: web::Data<State>,
     request: Json<EmailVerifyRequest>,
 ) -> actix_web::Result<Json<ApiResponseData<String>>, ApiError> {

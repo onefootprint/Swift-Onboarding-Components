@@ -15,7 +15,7 @@ pub mod biometric;
 pub mod data;
 pub mod decrypt;
 pub mod detail;
-pub mod email_verify;
+pub mod email;
 pub mod liveness;
 pub mod onboardings;
 
@@ -23,13 +23,13 @@ pub fn routes() -> web::Scope {
     web::scope("/user")
         .service(web::resource("").route(web::get().to(detail::handler)))
         .service(data::handler)
-        .service(email_verify::handler)
         .service(decrypt::handler)
         .service(access_events::handler)
         .service(onboardings::handler)
         .service(biometric::init)
         .service(biometric::complete)
         .service(liveness::get)
+        .service(email::routes())
 }
 
 pub struct DecryptFieldsResult {
