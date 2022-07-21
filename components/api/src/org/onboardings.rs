@@ -1,6 +1,6 @@
 use crate::auth::either::Either;
+use crate::auth::key_context::secret_key::SecretTenantAuthContext;
 use crate::auth::session_context::HasTenant;
-use crate::auth::session_data::tenant::secret_key::SecretTenantAuthContext;
 use crate::auth::session_data::tenant::workos::WorkOsSession;
 use crate::auth::IsLive;
 use crate::types::onboarding::ApiOnboarding;

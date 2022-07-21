@@ -35,24 +35,34 @@ def auth_token(twilio):
 
 @pytest.fixture(scope="session")
 def foo_tenant(must_collect_data_kinds, can_access_data_kinds):
-    data = {
-        "name": "foo",
-        "must_collect_data_kinds": must_collect_data_kinds,
-        "can_access_data_kinds": can_access_data_kinds,
+    org_data = {
+        "name": "foo",    
         "is_live": True,
     }
-    return create_tenant(data)
+
+    ob_data = {
+        "name": "Foo Stocks",
+        "must_collect_data_kinds": must_collect_data_kinds,
+        "can_access_data_kinds": can_access_data_kinds,
+    }
+    
+    return create_tenant(org_data, ob_data)
 
 
 @pytest.fixture(scope="session")
 def bar_tenant(must_collect_data_kinds, can_access_data_kinds):
-    data = {
-        "name": "bar",
-        "must_collect_data_kinds": must_collect_data_kinds,
-        "can_access_data_kinds": can_access_data_kinds,
+    org_data = {
+        "name": "bar",    
         "is_live": True,
     }
-    return create_tenant(data)
+
+    ob_data = {
+        "name": "Bar Insurance",
+        "must_collect_data_kinds": must_collect_data_kinds,
+        "can_access_data_kinds": can_access_data_kinds,
+    }
+    
+    return create_tenant(org_data, ob_data)
 
 
 @pytest.fixture(scope="module", autouse="true")

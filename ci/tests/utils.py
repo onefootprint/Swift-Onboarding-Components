@@ -11,7 +11,7 @@ from .auth import (
     TenantAuth,
     TenantSecretAuth,
 )
-from .constants import EMAIL, PHONE_NUMBER
+from .constants import CUSTODIAN_AUTH, EMAIL, PHONE_NUMBER
 
 url = lambda path: "{}/{}".format(os.environ.get('TEST_URL'), path)
 
@@ -63,26 +63,34 @@ def try_until_success(fn, timeout_s=5, retry_interval_s=1):
     if last_exception:
         raise last_exception
 
-def create_tenant(data):
-    body = post("private/client", data)
-    client_public_key = body["data"]["keys"]["client_public_key"]
-    client_secret_key = body["data"]["keys"]["client_secret_key"]
-    print("\n======Client info======")
+def create_tenant(org_data, ob_conf_data):
+    body = post("private/client", org_data, CUSTODIAN_AUTH)
+    client_secret_key = body["data"]["api_key"]
+    print("\n======org info======")
     print(body)
+
+    body = post("org/config", ob_conf_data, TenantSecretAuth(client_secret_key))
+    client_public_key = body["data"]["publishable_key"]
+    ob_config_id = body["data"]["id"]
+    print("\n======org onboarding info======")
+    print(body)
+
     return Tenant(
         pk=TenantAuth(client_public_key),
         sk=TenantSecretAuth(client_secret_key),
-        configuration_id=body["data"]["configuration_id"],
+        configuration_id=ob_config_id,
     )
+
 
 
 def clean_up_user(phone_number, email):
     # cleanup live user
-    post("private/cleanup", dict(phone_number=phone_number))
+    post("private/cleanup", dict(phone_number=phone_number), CUSTODIAN_AUTH)
     identifier = {"email": email}
     body = post("identify", dict(identifier=identifier, preferred_challenge_kind="sms"))
     assert not body["data"]["user_found"]
     assert not body["data"].get("challenge_data", dict())
+
 
 def _gen_random_n_digit_number(n):
     return "".join([str(random.randint(0, 9)) for _ in range(n)])

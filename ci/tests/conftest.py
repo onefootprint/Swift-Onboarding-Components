@@ -50,25 +50,36 @@ def must_collect_data_kinds(can_access_data_kinds):
 
 @pytest.fixture(scope="session")
 def workos_tenant(must_collect_data_kinds, can_access_data_kinds):
-    data = {
+    org_data = {
         "name": "Acme Bank",        
-        "must_collect_data_kinds": must_collect_data_kinds,
-        "can_access_data_kinds": can_access_data_kinds,
         "is_live": True,
     }
-    return create_tenant(data)
+
+    ob_data = {
+        "name": "Acme Bank Card",
+        "must_collect_data_kinds": must_collect_data_kinds,
+        "can_access_data_kinds": can_access_data_kinds,
+    }
+
+
+    return create_tenant(org_data, ob_data)
 
 
 @pytest.fixture(scope="module")
 def workos_sandbox_tenant(must_collect_data_kinds, can_access_data_kinds):
-    data = {
+
+    org_data = {
         "name": "Acme Bank",    
         "is_live": False,
+    }
+
+    ob_data = {
+        "name": "Acme Bank Card",
         "must_collect_data_kinds": must_collect_data_kinds,
         "can_access_data_kinds": can_access_data_kinds,
-        "is_live": False,
     }
-    return create_tenant(data)
+
+    return create_tenant(org_data, ob_data)
 
 
 @pytest.fixture(scope="session")

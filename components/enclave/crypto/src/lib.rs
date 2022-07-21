@@ -46,6 +46,11 @@ pub enum Error {
     Sha2DigestLength(#[from] sha2::digest::InvalidLength),
 }
 
+/// safely compare to byte strings
+pub fn safe_compare(a: &[u8], b: &[u8]) -> bool {
+    sha256(a) == sha256(b)
+}
+
 pub fn sha256(input: &[u8]) -> [u8; 32] {
     let mut hasher = Sha256::new();
     hasher.update(&input);

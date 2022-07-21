@@ -1,3 +1,4 @@
+use crate::auth::key_context::custodian::CustodianAuthContext;
 use crate::errors::ApiError;
 use crate::types::success::ApiResponseData;
 use crate::State;
@@ -21,6 +22,7 @@ pub struct CleanupResponse {
 /// Private endpoint to clean up specific integration test user information
 async fn post(
     state: web::Data<State>,
+    _custodian: CustodianAuthContext,
     request: web::Json<PhoneNumber>,
 ) -> actix_web::Result<Json<ApiResponseData<CleanupResponse>>, ApiError> {
     // allowed deletion #s

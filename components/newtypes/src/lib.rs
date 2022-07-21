@@ -24,6 +24,8 @@ pub use self::auth_token::*;
 pub mod fingerprint;
 pub use self::fingerprint::*;
 
+pub mod secret_api_key;
+
 pub use uuid::Uuid;
 #[derive(Debug, Clone, thiserror::Error)]
 pub enum Error {

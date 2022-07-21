@@ -30,7 +30,7 @@ impl VaultPublicKey {
         self.seal_data(pii.leak())
     }
 
-    fn seal_data(&self, data: &str) -> Result<SealedVaultBytes, crypto::Error> {
+    pub(crate) fn seal_data(&self, data: &str) -> Result<SealedVaultBytes, crypto::Error> {
         let result =
             crypto::seal::seal_ecies_p256_x963_sha256_aes_gcm(&self.0, data.as_bytes().to_vec())?.to_vec()?;
         Ok(SealedVaultBytes(result))

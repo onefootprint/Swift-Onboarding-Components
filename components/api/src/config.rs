@@ -101,6 +101,9 @@ pub struct Config {
 
     #[envconfig(from = "DEFAULT_PAGE_SIZE", default = "10")]
     pub default_page_size: usize,
+
+    #[envconfig(from = "CUSTODIAN_KEY", default = "onefootprint")]
+    pub custodian_key: String,
 }
 
 impl Config {

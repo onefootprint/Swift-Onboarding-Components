@@ -130,7 +130,6 @@ table! {
         sh_secret_api_key -> Bytea,
         e_secret_api_key -> Bytea,
         tenant_id -> Text,
-        key_name -> Varchar,
         is_enabled -> Bool,
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,

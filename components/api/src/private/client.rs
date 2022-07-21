@@ -1,46 +1,31 @@
+use crate::auth::key_context::custodian::CustodianAuthContext;
 use crate::types::success::ApiResponseData;
 use crate::State;
 use crate::{enclave::gen_keypair, errors::ApiError};
-use crypto::random::gen_random_alphanumeric_code;
-use db::models::ob_configurations::NewObConfiguration;
-use db::models::tenant_api_keys::PartialTenantApiKey;
-use newtypes::{
-    DataKind, ObConfigurationId, ObConfigurationKey, ObConfigurationSettings, PiiString, TenantId,
-};
+use db::models::tenant_api_keys::NewTenantApiKey;
+use newtypes::secret_api_key::SecretApiKey;
+use newtypes::TenantId;
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 
-use db::models::tenants::{NewTenant, Tenant};
+use db::models::tenants::NewTenant;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Apiv2Schema)]
 struct NewClientRequest {
     name: String,
     /// the org to attach this client to
     workos_org_id: Option<String>,
+    /// determines if a live api key is created or not
     is_live: bool,
-    /// list of data kinds that this tenant requires collecting
-    must_collect_data_kinds: Vec<DataKind>,
-    /// list of data kinds that this tenant requires access to decrypt
-    can_access_data_kinds: Vec<DataKind>,
+    /// logo url
+    logo_url: Option<String>,
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Apiv2Schema)]
 struct NewClientResponse {
     /// unique identifier for this client
-    client_id: TenantId,
-    /// onboarding settings id for this client
-    configuration_id: ObConfigurationId,
-    /// keys for authenticating as this client
-    keys: ClientKeysResponse,
-}
-
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Apiv2Schema)]
-struct ClientKeysResponse {
-    /// Public key used to identify client
-    client_public_key: ObConfigurationKey,
-    /// Secret key, not yet used
-    client_secret_key: String,
-    /// Name of this keypair, i.e. "keypair-dev" or "keypair-prod"
-    key_name: String,
+    org_id: TenantId,
+    /// api key for org-level api access
+    api_key: SecretApiKey,
 }
 
 /// Create a new client (this endpoint will be private in prod TODO)
@@ -48,6 +33,7 @@ struct ClientKeysResponse {
 #[post("/client")]
 async fn post(
     request: web::Json<NewClientRequest>,
+    _custodian: CustodianAuthContext,
     state: web::Data<State>,
 ) -> actix_web::Result<Json<ApiResponseData<NewClientResponse>>, ApiError> {
     let (ec_pk_uncompressed, e_priv_key) = gen_keypair(&state).await?;
@@ -55,9 +41,8 @@ async fn post(
     let NewClientRequest {
         name,
         workos_org_id,
-        must_collect_data_kinds,
-        can_access_data_kinds,
         is_live,
+        logo_url,
     } = request.into_inner();
 
     let tenant = NewTenant {
@@ -66,66 +51,27 @@ async fn post(
         public_key: ec_pk_uncompressed,
         workos_id: workos_org_id,
         workos_admin_profile_id: None,
-        logo_url: Some("https://acmebank.onefootprint.com/logo-acme-bank.png".to_string()),
+        logo_url,
     }
     .create(&state.db_pool)
     .await?;
 
-    let obc = NewObConfiguration {
-        name: name.clone(),
-        description: None,
+    let secret_api_key = SecretApiKey::generate(is_live);
+
+    let _ = NewTenantApiKey {
+        sh_secret_api_key: secret_api_key.fingerprint(&state.hmac_client).await?,
+        e_secret_api_key: secret_api_key.seal_to(&tenant.public_key)?,
         tenant_id: tenant.id.clone(),
-        must_collect_data_kinds,
-        can_access_data_kinds,
-        settings: ObConfigurationSettings::Empty,
+        is_enabled: true,
         is_live,
-    };
-    let obc = obc.save(&state.db_pool).await?;
+    }
+    .create(&state.db_pool)
+    .await?;
 
     Ok(Json(ApiResponseData {
         data: NewClientResponse {
-            keys: init_api_keys(
-                &state,
-                &tenant,
-                obc.key.clone(),
-                "default_api_key".into(),
-                is_live,
-            )
-            .await?,
-            configuration_id: obc.id,
-            client_id: tenant.id,
+            org_id: tenant.id,
+            api_key: secret_api_key,
         },
     }))
-}
-
-async fn init_api_keys(
-    state: &State,
-    tenant: &Tenant,
-    key_id: ObConfigurationKey,
-    key_name: String,
-    is_live: bool,
-) -> Result<ClientKeysResponse, ApiError> {
-    let api_key = format!("sk_{}", gen_random_alphanumeric_code(34));
-
-    let e_api_key = &tenant.public_key.seal_pii(&PiiString::from(api_key.as_str()))?;
-
-    let sh_api_key = state.hmac_client.signed_hash(api_key.as_bytes()).await?;
-
-    let tenant_keys = db::tenant::api_init(
-        &state.db_pool,
-        PartialTenantApiKey {
-            tenant_id: tenant.id.clone(),
-            key_name,
-            is_live,
-        },
-        sh_api_key,
-        e_api_key.0.clone(),
-    )
-    .await?;
-
-    Ok(ClientKeysResponse {
-        client_public_key: key_id,
-        client_secret_key: api_key,
-        key_name: tenant_keys.key_name,
-    })
 }

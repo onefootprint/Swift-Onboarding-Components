@@ -1,4 +1,4 @@
-use crate::auth::session_data::tenant::secret_key::SecretTenantAuthContext;
+use crate::auth::key_context::secret_key::SecretTenantAuthContext;
 use crate::auth::session_data::validate_user::ValidateUserToken;
 use crate::auth::session_data::{ServerSession, SessionData};
 use crate::auth::IsLive;

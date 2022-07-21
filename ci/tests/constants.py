@@ -1,4 +1,8 @@
 import os
+from .auth import (
+    CustodianAuth
+)
+
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -30,6 +34,9 @@ TWILIO_ACCOUNT_SID = get_secret('TWILIO_ACCOUNT_SID')
 TWILIO_API_KEY_SECRET = get_secret('TWILIO_API_KEY_SECRET')
 PHONE_NUMBER = get_secret('INTEGRATION_TEST_PHONE_NUMBER')
 EMAIL = "FOOTPRINT.USER.DEV@GMAIL.COM"
+CUSTODIAN_KEY = get_secret('CUSTODIAN_KEY') or "onefootprint"
+
+CUSTODIAN_AUTH = CustodianAuth(CUSTODIAN_KEY)
 
 FIELDS_TO_DECRYPT = [
     ["last_name", "ssn"],

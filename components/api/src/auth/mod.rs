@@ -1,12 +1,13 @@
 use self::{
-    session_context::SessionContext,
-    session_data::{tenant::ob_public_key::PublicTenantAuthContext, user::onboarding::OnboardingSession},
+    key_context::ob_public_key::PublicTenantAuthContext, session_context::SessionContext,
+    session_data::user::onboarding::OnboardingSession,
 };
 use crate::errors::{onboarding::OnboardingError, ApiError};
 use db::models::onboardings::Onboarding;
 use thiserror::Error;
 
 pub mod either;
+pub mod key_context;
 pub mod session_context;
 pub mod session_data;
 pub mod uv_permission;
@@ -21,6 +22,10 @@ pub enum AuthError {
     MissingClientSecretAuthHeader,
     #[error("missing X-Fpuser-Authorization")]
     MissingFpuserAuthHeader,
+    #[error("missing X-Footprint-Custodian-Key")]
+    MissingCustodianAuthHeader,
+    #[error("invalid X-Footprint-Custodian-Key")]
+    InvalidCustodianAuthHeader,
     #[error("error reading session: {0}")]
     SessionError(#[from] actix_web::Error),
     #[error("invalid tenant skey or footprint user id")]

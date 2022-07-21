@@ -33,6 +33,7 @@
         "repr",
         "sqlx",
         "Tailscale",
+        "testkey",
         "thiserror",
         "vsock",
         "webauthn",

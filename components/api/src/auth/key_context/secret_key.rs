@@ -9,6 +9,7 @@ use db::models::tenants::Tenant;
 use db::DbPool;
 use futures_util::Future;
 
+use newtypes::secret_api_key::SecretApiKey;
 use newtypes::TenantId;
 use paperclip::actix::Apiv2Security;
 use std::pin::Pin;
@@ -48,19 +49,17 @@ impl FromRequest for SecretTenantAuthContext {
 
 pub async fn from_request_inner(req: &actix_web::HttpRequest) -> Result<SecretTenantAuthContext, ApiError> {
     // get the tenant header
-    let tenant_pk = req
+    let tenant_sk_input = req
         .headers()
         .get(HEADER_NAME)
         .and_then(|hv| hv.to_str().map(|s| s.to_string()).ok())
+        .map(SecretApiKey::from)
         .ok_or(AuthError::MissingClientSecretAuthHeader)?;
 
     let state = req.app_data::<web::Data<State>>().unwrap();
-    let pool = state.db_pool.clone();
-    let hmac_client = state.hmac_client.clone();
+    let sh_api_key = tenant_sk_input.fingerprint(&state.hmac_client).await?;
 
-    let sh_api_key = hmac_client.signed_hash(tenant_pk.as_bytes()).await?;
-
-    let (tenant, api_key) = db::tenant::secret_auth(&pool, sh_api_key)
+    let (tenant, api_key) = db::tenant::secret_auth(&state.db_pool, sh_api_key)
         .await?
         .ok_or(AuthError::UnknownClient)?;
     Ok(SecretTenantAuthContext { tenant, api_key })

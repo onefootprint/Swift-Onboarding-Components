@@ -1,6 +1,6 @@
 use crate::auth::get_onboarding_for_tenant;
+use crate::auth::key_context::ob_public_key::PublicTenantAuthContext;
 use crate::auth::session_context::{HasUserVaultId, SessionContext};
-use crate::auth::session_data::tenant::ob_public_key::PublicTenantAuthContext;
 use crate::auth::session_data::user::onboarding::OnboardingSession;
 use crate::auth::session_data::validate_user::ValidateUserToken;
 use crate::auth::session_data::{ServerSession, SessionData};

@@ -69,7 +69,7 @@ class TestMy1fp:
         onboardings = body["data"]
 
         onboarding_info = onboardings[0]["onboarding_links"][0]
-        assert onboarding_info["name"] == "Acme Bank"
+        assert onboarding_info["name"] == "Acme Bank Card"
         assert onboarding_info["insight_event"]
         assert set(onboarding_info["can_access_data_kinds"]) == set(can_access_data_kinds)
         
