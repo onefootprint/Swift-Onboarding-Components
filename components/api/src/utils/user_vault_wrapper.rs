@@ -100,7 +100,7 @@ impl UserVaultWrapper {
     }
 
     fn decide_priority(&self, data_kind: &DataKind) -> (DataPriority, Option<UserDataId>) {
-        match self.get_data(data_kind.to_owned()).get(0) {
+        match self.get_data(data_kind.to_owned()).first() {
             Some(existing_data) => {
                 // There's an existing piece of data with this kind
                 if data_kind.allow_multiple() {

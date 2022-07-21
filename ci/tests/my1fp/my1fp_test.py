@@ -59,9 +59,12 @@ class TestMy1fp:
     def test_logged_in_user_detail(self, my1fp_authed_user):
         # Get the user detail using the logged in context
         body = get("user", None, my1fp_authed_user.auth_token)
-        user = body["data"]
-        assert user["first_name"].upper() == my1fp_authed_user.first_name.upper()
-        assert user["last_name"].upper() == my1fp_authed_user.last_name.upper()
+        phone_numbers = body["data"]["phone_numbers"]
+        assert phone_numbers[0]["is_verified"]
+        assert phone_numbers[0]["priority"] == "primary"
+        emails = body["data"]["emails"]
+        assert not emails[0]["is_verified"]
+        assert emails[0]["priority"] == "primary"
 
     def test_logged_in_user_onboardings(self, my1fp_authed_user, can_access_data_kinds):
         # Get the user detail using the logged in context
