@@ -3,8 +3,7 @@ use crate::auth::session_data::{ServerSession, SessionData};
 use crate::errors::ApiError;
 use crate::State;
 use crypto::random::gen_random_alphanumeric_code;
-
-use newtypes::{DataKind, Fingerprinter, PiiString, UserVaultId};
+use newtypes::{PiiString, UserDataId};
 use paperclip::actix::web;
 use reqwest::StatusCode;
 use std::collections::HashMap;
@@ -145,12 +144,10 @@ pub(crate) async fn send_magic_link_dashboard_auth_email(
 
 pub(crate) async fn send_email_challenge(
     state: &web::Data<State>,
-    uv_id: UserVaultId,
+    user_data_id: UserDataId,
     email_address: &PiiString,
 ) -> Result<(), ApiError> {
-    let sh_email = state.compute_fingerprint(DataKind::Email, email_address).await?;
-
-    let session_data = SessionData::EmailVerify(EmailVerifySession { uv_id, sh_email });
+    let session_data = SessionData::EmailVerify(EmailVerifySession { user_data_id });
 
     // create new session
     let token = ServerSession::create(state, session_data, chrono::Duration::days(1)).await?;

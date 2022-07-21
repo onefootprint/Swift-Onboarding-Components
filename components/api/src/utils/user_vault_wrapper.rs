@@ -51,7 +51,7 @@ impl UserVaultWrapper {
         state: &web::Data<State>,
         user_vault_id: UserVaultId,
         update_request: &Vec<DataPatchRequest>,
-    ) -> Result<(), ApiError> {
+    ) -> Result<Vec<UserData>, ApiError> {
         let mut all_db_updates: Vec<GroupDataUpdateRequest> = vec![];
         let mut ud_to_deactivate: Vec<UserDataId> = vec![];
         // for every group we need to update (ex: address)
@@ -87,16 +87,16 @@ impl UserVaultWrapper {
         let all_db_updates = NewUserDataBatch(all_db_updates);
 
         // deactive old info + bulk insert
-        state
+        let results = state
             .db_pool
-            .db_transaction(move |conn| -> Result<(), DbError> {
+            .db_transaction(move |conn| -> Result<_, DbError> {
                 db::user_data::bulk_deactivate(conn, ud_to_deactivate)?;
-                all_db_updates.bulk_insert(conn)?;
-                Ok(())
+                let results = all_db_updates.bulk_insert(conn)?;
+                Ok(results)
             })
             .await?;
 
-        Ok(())
+        Ok(results)
     }
 
     fn decide_priority(&self, data_kind: &DataKind) -> (DataPriority, Option<UserDataId>) {

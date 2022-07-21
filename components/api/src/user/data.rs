@@ -10,6 +10,7 @@ use crate::{
     utils::{email::send_email_challenge, user_vault_wrapper::UserVaultWrapper},
     State,
 };
+use db::models::user_data::UserData;
 use db::models::user_vaults::UserVault;
 
 use newtypes::{DataKind, PiiString, UserPatchRequest};
@@ -26,11 +27,16 @@ async fn handler(
 ) -> actix_web::Result<Json<ApiResponseData<String>>, ApiError> {
     let user_vault = user_auth.user_vault(&state.db_pool).await?;
     let request = request.into_inner();
-    update(&user_auth, &state, &request, &user_vault).await?;
+    let results = update(&user_auth, &state, &request, &user_vault).await?;
 
     // If we updated the email address, send an async challenge to the new email address
     if let Some(email) = request.email.map(PiiString::from).clone() {
-        send_email_challenge(&state, user_vault.id.clone(), &email).await?;
+        // We only support one email per request, so there will be a UserData row
+        let user_data: UserData = results
+            .into_iter()
+            .find(|x| x.data_kind == DataKind::Email)
+            .ok_or(ApiError::NotImplemented)?;
+        send_email_challenge(&state, user_data.id, &email).await?;
     }
     Ok(Json(ApiResponseData {
         data: "Successful update".to_string(),
@@ -42,7 +48,7 @@ pub async fn update<C: HasVaultPermission>(
     state: &web::Data<State>,
     request: &UserPatchRequest,
     user_vault: &UserVault,
-) -> Result<(), ApiError> {
+) -> Result<Vec<UserData>, ApiError> {
     let update_requests = request.decompose();
 
     let data_kinds: Vec<DataKind> = update_requests
@@ -57,8 +63,9 @@ pub async fn update<C: HasVaultPermission>(
 
     // Lock the user vault to prevent someone else from editing the data while we're editing it
     let uvw = UserVaultWrapper::from(&state.db_pool, user_vault.to_owned()).await?;
-    uvw.bulk_update(state, user_vault.id.clone(), &update_requests)
+    let results = uvw
+        .bulk_update(state, user_vault.id.clone(), &update_requests)
         .await?;
 
-    Ok(())
+    Ok(results)
 }

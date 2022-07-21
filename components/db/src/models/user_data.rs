@@ -2,7 +2,6 @@ use std::collections::HashSet;
 
 use crate::diesel::RunQueryDsl;
 use crate::schema::user_data;
-use crate::DbPool;
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
@@ -30,18 +29,20 @@ pub struct UserData {
 }
 
 impl UserData {
-    pub async fn mark_verified(self, pool: &DbPool) -> Result<UserData, crate::DbError> {
-        let result = pool
-            .db_query(move |conn| {
-                diesel::update(user_data::table.filter(user_data::id.eq(self.id)))
-                    .set(user_data::is_verified.eq(true))
-                    .get_result::<UserData>(conn)
-            })
-            .await??;
+    pub fn mark_verified(
+        conn: &mut PgConnection,
+        id: &UserDataId,
+        data_kind: DataKind,
+    ) -> Result<UserData, crate::DbError> {
+        let result = diesel::update(user_data::table)
+            .filter(user_data::id.eq(id))
+            .filter(user_data::data_kind.eq(data_kind))
+            .set(user_data::is_verified.eq(true))
+            .get_result::<UserData>(conn)?;
         Ok(result)
     }
 
-    pub fn bulk_insert(conn: &mut PgConnection, data: Vec<NewUserData>) -> Result<(), crate::DbError> {
+    pub fn bulk_insert(conn: &mut PgConnection, data: Vec<NewUserData>) -> Result<Vec<Self>, crate::DbError> {
         let group_ids: HashSet<&DataGroupId> = data.iter().map(|x| &x.data_group_id).collect();
         let existing_groups: Vec<UserData> = user_data::table
             .filter(user_data::data_group_id.eq_any(group_ids))
@@ -49,8 +50,10 @@ impl UserData {
         if !existing_groups.is_empty() {
             return Err(crate::DbError::CouldNotCreateGroupUuid);
         }
-        diesel::insert_into(user_data::table).values(data).execute(conn)?;
-        Ok(())
+        let results = diesel::insert_into(user_data::table)
+            .values(data)
+            .get_results(conn)?;
+        Ok(results)
     }
 }
 
@@ -84,7 +87,7 @@ pub struct GroupDataUpdateRequest {
 pub struct NewUserDataBatch(pub Vec<GroupDataUpdateRequest>);
 
 impl NewUserDataBatch {
-    pub fn bulk_insert(self, conn: &mut PgConnection) -> Result<(), crate::DbError> {
+    pub fn bulk_insert(self, conn: &mut PgConnection) -> Result<Vec<UserData>, crate::DbError> {
         let new_user_datas = self
             .0
             .into_iter()
@@ -117,7 +120,7 @@ impl NewUserDataBatch {
                 })
             })
             .collect::<Vec<NewUserData>>();
-        UserData::bulk_insert(conn, new_user_datas)?;
-        Ok(())
+        let results = UserData::bulk_insert(conn, new_user_datas)?;
+        Ok(results)
     }
 }
