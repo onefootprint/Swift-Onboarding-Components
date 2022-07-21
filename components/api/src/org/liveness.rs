@@ -3,7 +3,7 @@ use crate::auth::key_context::secret_key::SecretTenantAuthContext;
 use crate::auth::session_context::HasTenant;
 use crate::auth::session_data::tenant::workos::WorkOsSession;
 use crate::auth::IsLive;
-use crate::types::insight_event::ApiInsightEvent;
+use crate::types::liveness::ApiLiveness;
 use crate::types::success::ApiResponseData;
 use crate::State;
 use crate::{auth::session_context::SessionContext, errors::ApiError};
@@ -16,15 +16,9 @@ struct LivenessRequest {
     footprint_user_id: FootprintUserId,
 }
 
-#[derive(Debug, Clone, serde::Serialize, Apiv2Schema)]
-struct ApiLiveness {
-    // TODO other webauthn cred fields here probably
-    insight_event: ApiInsightEvent,
-}
-
 type LivenessResponse = Vec<ApiLiveness>;
 
-#[api_v2_operation(tags(Org))]
+#[api_v2_operation(tags(User))]
 #[get("/liveness")]
 /// Allows a tenant to view a customer's registered webauthn credentials
 fn get(
@@ -38,20 +32,10 @@ fn get(
     let creds = state
         .db_pool
         .db_query(move |conn| {
-            WebauthnCredential::get_for_onboarding(
-                conn,
-                &tenant.id,
-                &request.footprint_user_id,
-                is_live,
-            )
+            WebauthnCredential::get_for_onboarding(conn, &tenant.id, &request.footprint_user_id, is_live)
         })
         .await??;
 
-    let response = creds
-        .into_iter()
-        .map(|(_, insight_event)| ApiLiveness {
-            insight_event: ApiInsightEvent::from(insight_event),
-        })
-        .collect::<Vec<_>>();
+    let response = creds.into_iter().map(ApiLiveness::from).collect::<Vec<_>>();
     Ok(Json(ApiResponseData::ok(response)))
 }

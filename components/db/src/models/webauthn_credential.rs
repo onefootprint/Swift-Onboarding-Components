@@ -40,6 +40,18 @@ impl WebauthnCredential {
         Ok(creds)
     }
 
+    pub fn list(
+        conn: &mut PgConnection,
+        user_vault_id: &UserVaultId,
+    ) -> Result<Vec<(Self, InsightEvent)>, crate::DbError> {
+        let creds = schema::webauthn_credentials::table
+            .filter(schema::webauthn_credentials::user_vault_id.eq(user_vault_id))
+            .inner_join(schema::insight_events::table)
+            .get_results(conn)?;
+
+        Ok(creds)
+    }
+
     pub fn get_for_onboarding(
         conn: &mut PgConnection,
         tenant_id: &TenantId,
