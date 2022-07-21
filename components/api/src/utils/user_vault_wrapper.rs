@@ -15,7 +15,7 @@ use crate::errors::ApiError;
 use crate::State;
 
 pub struct UserVaultWrapper {
-    _user_vault: UserVault,
+    user_vault: UserVault,
     user_data: HashMap<DataKind, Vec<UserData>>,
 }
 
@@ -30,7 +30,7 @@ impl UserVaultWrapper {
     pub fn from_conn(conn: &mut PgConnection, user_vault: UserVault) -> Result<UserVaultWrapper, DbError> {
         Ok(Self {
             user_data: db::user_data::list(conn, user_vault.id.clone())?,
-            _user_vault: user_vault,
+            user_vault,
         })
     }
 
@@ -130,7 +130,7 @@ impl UserVaultWrapper {
         } else {
             None
         };
-        let e_data = self._user_vault.public_key.seal_pii(val)?;
+        let e_data = self.user_vault.public_key.seal_pii(val)?;
         Ok(UserDataUpdate {
             data_kind,
             e_data,
@@ -154,7 +154,7 @@ impl UserVaultWrapper {
         let decrypted_data = crate::enclave::decrypt_bytes(
             state,
             e_data,
-            &self._user_vault.e_private_key,
+            &self.user_vault.e_private_key,
             enclave_proxy::DataTransform::Identity,
         )
         .await?;

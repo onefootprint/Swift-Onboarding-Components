@@ -11,6 +11,8 @@ use newtypes::{
 };
 use serde::{Deserialize, Serialize};
 
+use super::user_vaults::UserVault;
+
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable, Identifiable)]
 #[diesel(table_name = user_data)]
 pub struct UserData {
@@ -54,6 +56,20 @@ impl UserData {
             .values(data)
             .get_results(conn)?;
         Ok(results)
+    }
+
+    pub fn get(
+        conn: &mut PgConnection,
+        id: &UserDataId,
+        user_vault_id: &UserVaultId,
+    ) -> Result<(UserData, UserVault), crate::DbError> {
+        use crate::schema::user_vaults;
+        let result = user_data::table
+            .inner_join(user_vaults::table)
+            .filter(user_data::id.eq(id))
+            .filter(user_data::user_vault_id.eq(user_vault_id))
+            .get_result(conn)?;
+        Ok(result)
     }
 }
 
