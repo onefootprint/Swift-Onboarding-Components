@@ -209,7 +209,6 @@ pub mod tenant;
 
 pub mod user_data;
 pub mod user_vault;
-pub mod webauthn_credentials;
 
 #[cfg(test)]
 mod test;

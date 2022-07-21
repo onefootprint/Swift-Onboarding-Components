@@ -31,7 +31,7 @@ pub struct WebauthnCredential {
 impl WebauthnCredential {
     pub fn get_for_user_vault(
         conn: &mut PgConnection,
-        user_vault_id: UserVaultId,
+        user_vault_id: &UserVaultId,
     ) -> Result<Vec<Self>, crate::DbError> {
         let creds = schema::webauthn_credentials::table
             .filter(schema::webauthn_credentials::user_vault_id.eq(user_vault_id))

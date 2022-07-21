@@ -14,7 +14,7 @@ use chrono::Duration;
 use db::models::audit_trails::AuditTrail;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::onboardings::OnboardingLink;
-use db::webauthn_credentials::get_webauthn_creds;
+use db::models::webauthn_credential::WebauthnCredential;
 use db::DbError;
 use itertools::Itertools;
 use newtypes::{
@@ -55,11 +55,10 @@ fn handler(
     }
 
     // TODO kick off user verification with data vendors
-    let webauthn_creds = get_webauthn_creds(&state.db_pool, uv_id.clone()).await?;
     let footprint_user_id = onboarding.user_ob_id.clone();
     let tenant_id = tenant_auth.tenant.id.clone();
     let session_sealing_key = state.session_sealing_key.clone();
-    let validation_token = state
+    let (validation_token, webauthn_creds) = state
         .db_pool
         .db_transaction(move |conn| -> Result<_, DbError> {
             let insight_event = CreateInsightEvent::from(insights);
@@ -120,7 +119,8 @@ fn handler(
                 }),
                 Duration::minutes(15),
             )?;
-            Ok(validation_token)
+            let webauthn_creds = WebauthnCredential::get_for_user_vault(conn, &uv_id)?;
+            Ok((validation_token, webauthn_creds))
         })
         .await?;
     Ok(Json(ApiResponseData {

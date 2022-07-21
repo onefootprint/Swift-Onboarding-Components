@@ -12,7 +12,6 @@ use crate::State;
 use crypto::serde_cbor;
 use db::models::user_vaults::UserVault;
 use db::models::webauthn_credential::WebauthnCredential;
-use db::webauthn_credentials::get_webauthn_creds;
 use newtypes::email::Email;
 use newtypes::{DataKind, Fingerprinter, PhoneNumber, PiiString, UserVaultId, ValidatedPhoneNumber};
 use paperclip::actix::{api_v2_operation, web, web::Json, Apiv2Schema};
@@ -84,7 +83,6 @@ pub async fn handler(
         };
 
     // The user vault exists. Extract the phone number for the user
-    let user_id = existing_user.id.clone();
     let uvw = UserVaultWrapper::from(&state.db_pool, existing_user.clone()).await?;
     let phone_number = uvw
         .get_decrypted_field(&state, DataKind::PhoneNumber)
@@ -101,9 +99,14 @@ pub async fn handler(
     let (challenge_kind, challenge_state_data, time_before_retry_s, biometric_challenge_json) =
         match preferred_challenge_kind {
             ChallengeKind::Biometric => {
-                let creds = get_webauthn_creds(&state.db_pool, user_id.clone()).await?;
+                let user_id = existing_user.id.clone();
+                let creds = state
+                    .db_pool
+                    .db_query(move |conn| WebauthnCredential::get_for_user_vault(conn, &user_id))
+                    .await??;
                 if !creds.is_empty() {
-                    let challenge = initiate_biometric_challenge_for_user(&state, &user_id, creds).await?;
+                    let challenge =
+                        initiate_biometric_challenge_for_user(&state, &existing_user.id, creds).await?;
                     (
                         ChallengeKind::Biometric,
                         IdentifyChallengeData::Biometric(challenge.state),

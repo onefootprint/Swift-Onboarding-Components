@@ -7,9 +7,10 @@ use crate::types::success::ApiResponseData;
 use crate::utils::insight_headers::InsightHeaders;
 use crate::utils::user_vault_wrapper::UserVaultWrapper;
 use crate::State;
+use db::models::insight_event::CreateInsightEvent;
 use db::models::onboardings::Onboarding;
+use db::models::webauthn_credential::WebauthnCredential;
 use db::DbError;
-use db::{models::insight_event::CreateInsightEvent, webauthn_credentials::get_webauthn_creds};
 use newtypes::DataKind;
 use paperclip::actix::{api_v2_operation, web, web::Json, Apiv2Schema};
 
@@ -37,9 +38,9 @@ pub fn handler(
     }
 
     let uv_id = user_auth.data.user_vault_id.clone();
-    state
+    let webauthn_creds = state
         .db_pool
-        .db_transaction(move |conn| -> Result<(), DbError> {
+        .db_transaction(move |conn| -> Result<_, DbError> {
             Onboarding::get_or_create(
                 conn,
                 uv_id,
@@ -47,11 +48,10 @@ pub fn handler(
                 CreateInsightEvent::from(insights),
                 tenant_auth.ob_config.is_live,
             )?;
-            Ok(())
+            let webauthn_creds = WebauthnCredential::get_for_user_vault(conn, &user_auth.data.user_vault_id)?;
+            Ok(webauthn_creds)
         })
         .await?;
-
-    let webauthn_creds = get_webauthn_creds(&state.db_pool, user_auth.data.user_vault_id).await?;
 
     let uvw = UserVaultWrapper::from(&state.db_pool, uv).await?;
     Ok(Json(ApiResponseData {
