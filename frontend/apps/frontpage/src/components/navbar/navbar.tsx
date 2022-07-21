@@ -23,6 +23,7 @@ const Navbar = ({ cta }: NavbarProps) => {
   const links = [
     { text: t('links.compare.text'), href: t('links.compare.href') },
     { text: t('links.faq.text'), href: t('links.faq.href') },
+    { text: t('links.company.text'), href: t('links.company.href') },
   ];
 
   return (
