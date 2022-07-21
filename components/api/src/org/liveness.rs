@@ -18,7 +18,7 @@ struct LivenessRequest {
 
 type LivenessResponse = Vec<ApiLiveness>;
 
-#[api_v2_operation(tags(User))]
+#[api_v2_operation(tags(Org))]
 #[get("/liveness")]
 /// Allows a tenant to view a customer's registered webauthn credentials
 fn get(
