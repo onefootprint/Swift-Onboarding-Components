@@ -1,0 +1,1 @@
+ALTER SEQUENCE onboardings_ordering_id_seq RENAME TO scoped_users_ordering_id_seq; 
