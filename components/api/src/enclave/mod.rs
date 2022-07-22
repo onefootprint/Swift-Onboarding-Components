@@ -7,7 +7,7 @@ use crypto::seal::EciesP256Sha256AesGcmSealed;
 use enclave_proxy::{
     DataTransform, DecryptRequest, EnvelopeDecrypt, FnDecryption, KmsCredentials, RpcPayload,
 };
-use newtypes::{EncryptedVaultPrivateKey, SealedVaultBytes, VaultPublicKey};
+use newtypes::{EncryptedVaultPrivateKey, PiiString, SealedVaultBytes, VaultPublicKey};
 
 pub async fn gen_keypair(state: &State) -> Result<(VaultPublicKey, EncryptedVaultPrivateKey), KmsSignError> {
     let new_key_pair = state
@@ -30,7 +30,7 @@ pub async fn decrypt_bytes(
     sealed_data: &SealedVaultBytes,
     sealed_key: &EncryptedVaultPrivateKey,
     transform: DataTransform,
-) -> Result<String, ApiError> {
+) -> Result<PiiString, ApiError> {
     let sealed_data = EciesP256Sha256AesGcmSealed::from_bytes(sealed_data.as_ref())?;
     let requests = vec![DecryptRequest {
         sealed_data,
@@ -47,7 +47,7 @@ pub async fn decrypt(
     state: &actix_web::web::Data<State>,
     requests: Vec<DecryptRequest>,
     sealed_key: &EncryptedVaultPrivateKey,
-) -> Result<Vec<String>, EnclaveError> {
+) -> Result<Vec<PiiString>, EnclaveError> {
     let mut conn = state.enclave_connection_pool.get().await?;
 
     let req = enclave_proxy::RpcRequest::new(RpcPayload::FnDecrypt(EnvelopeDecrypt {
@@ -68,7 +68,8 @@ pub async fn decrypt(
         .results
         .into_iter()
         .map(|r| Ok(std::str::from_utf8(&r.data)?.to_string()))
-        .collect::<Result<Vec<String>, EnclaveError>>()?;
+        .map(|x| x.map(PiiString::from))
+        .collect::<Result<Vec<PiiString>, EnclaveError>>()?;
     if decrypted_results.len() != requests.len() {
         return Err(EnclaveError::InvalidEnclaveDecryptResponse);
     }

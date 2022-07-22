@@ -157,7 +157,7 @@ pub async fn handler(
                 challenge_kind,
                 challenge_token,
                 phone_number_last_two: validated_phone_number.leak_last_two(),
-                phone_country,
+                phone_country: phone_country.leak_to_string(),
                 biometric_challenge_json,
                 time_before_retry_s,
             }),

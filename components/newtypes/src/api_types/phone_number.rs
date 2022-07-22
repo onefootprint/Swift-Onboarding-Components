@@ -188,11 +188,11 @@ impl ValidatedPhoneNumber {
         }
     }
 
-    pub fn __build_from_vault(number: String, iso_country_code: String) -> Result<Self, crate::Error> {
-        let number = PhoneNumber::from_str(number.as_str())?;
+    pub fn __build_from_vault(number: PiiString, iso_country_code: PiiString) -> Result<Self, crate::Error> {
+        let number = PhoneNumber::from_str(number.leak())?;
         Ok(Self {
             e164: number.number,
-            iso_country_code: PiiString::from(iso_country_code),
+            iso_country_code,
             suffix: number.suffix,
             phantom: PhantomData,
         })

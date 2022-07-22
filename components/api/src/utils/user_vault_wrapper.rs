@@ -143,7 +143,7 @@ impl UserVaultWrapper {
         &self,
         state: &web::Data<State>,
         data_kind: DataKind,
-    ) -> Result<Option<String>, ApiError> {
+    ) -> Result<Option<PiiString>, ApiError> {
         // TODO standardize this to use one decrypt util
         let e_data = if let Some(e_field) = self.get_e_field(data_kind) {
             e_field

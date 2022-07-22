@@ -6,7 +6,7 @@ use crate::{
 use crypto::seal::EciesP256Sha256AesGcmSealed;
 use db::models::{ob_configurations::ObConfiguration, user_vaults::UserVault};
 use enclave_proxy::{DataTransform, DecryptRequest};
-use newtypes::{DataKind, OnboardingId, SealedVaultBytes};
+use newtypes::{DataKind, OnboardingId, PiiString, SealedVaultBytes};
 use paperclip::actix::web;
 use std::collections::{HashMap, HashSet};
 
@@ -34,7 +34,7 @@ pub fn routes() -> web::Scope {
 
 pub struct DecryptFieldsResult {
     pub decrypted_data_kinds: Vec<DataKind>,
-    pub result_map: HashMap<DataKind, Option<String>>,
+    pub result_map: HashMap<DataKind, Option<PiiString>>,
 }
 
 pub async fn decrypt<C: HasVaultPermission>(
@@ -79,12 +79,12 @@ pub async fn decrypt<C: HasVaultPermission>(
         })
         .collect::<Result<Vec<DecryptRequest>, crypto::Error>>()?;
     let decrypt_response = crate::enclave::decrypt(state, requests, &user_vault.e_private_key).await?;
-    let decrypted_data: HashMap<DataKind, String> = decrypt_response
+    let decrypted_data: HashMap<DataKind, PiiString> = decrypt_response
         .into_iter()
         .enumerate()
         .map(|(i, result)| (fields_to_decrypt[i], result))
         .collect();
-    let result_map: HashMap<DataKind, Option<String>> = data_kinds
+    let result_map: HashMap<DataKind, Option<PiiString>> = data_kinds
         .into_iter()
         .enumerate()
         .map(|(_, data_kind)| (data_kind, decrypted_data.get(&data_kind).cloned()))

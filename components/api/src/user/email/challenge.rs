@@ -7,7 +7,6 @@ use crate::types::Empty;
 use crate::utils::email::send_email_challenge;
 use crate::State;
 use db::models::user_data::UserData;
-use newtypes::PiiString;
 use newtypes::UserDataId;
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 
@@ -29,6 +28,7 @@ async fn post(
         .db_pool
         .db_query(move |conn| UserData::get(conn, &request.id, &auth.user_vault_id()))
         .await??;
+    // TODO make sure the user data isn't verified
     let email = crate::enclave::decrypt_bytes(
         &state,
         &user_data.e_data,
@@ -36,7 +36,6 @@ async fn post(
         enclave_proxy::DataTransform::Identity,
     )
     .await?;
-    let email = PiiString::from(email);
 
     send_email_challenge(&state, user_data.id, &email).await?;
 

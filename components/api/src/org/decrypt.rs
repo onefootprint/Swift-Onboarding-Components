@@ -78,5 +78,9 @@ fn handler(
     .save(&state.db_pool)
     .await?;
 
+    let result_map = result_map
+        .into_iter()
+        .map(|(k, v)| (k, v.map(|x| x.leak_to_string())))
+        .collect();
     Ok(Json(ApiResponseData { data: result_map }))
 }
