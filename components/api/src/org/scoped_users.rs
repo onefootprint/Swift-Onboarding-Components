@@ -9,7 +9,7 @@ use crate::utils::querystring::deserialize_stringified_list;
 use crate::State;
 use crate::{auth::session_context::SessionContext, errors::ApiError};
 use chrono::{DateTime, Utc};
-use db::models::scoped_users::Onboarding;
+use db::models::onboardings::Onboarding;
 use db::scoped_users::OnboardingListQueryParams;
 use db::DbError;
 use newtypes::{DataKind, Fingerprint, Fingerprinter, FootprintUserId, PiiString, Status};

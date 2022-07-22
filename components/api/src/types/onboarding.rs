@@ -1,5 +1,5 @@
 use chrono::{DateTime, Utc};
-use db::models::scoped_users::{Onboarding, OnboardingInfo};
+use db::models::onboardings::{Onboarding, OnboardingInfo};
 use newtypes::{DataKind, Status};
 use paperclip::actix::Apiv2Schema;
 

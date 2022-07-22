@@ -1,8 +1,5 @@
 use chrono::{DateTime, Utc};
-use db::models::{
-    insight_event::InsightEvent,
-    scoped_users::{OnboardingInfo, ScopedUser},
-};
+use db::models::{insight_event::InsightEvent, onboardings::OnboardingInfo, scoped_users::ScopedUser};
 use newtypes::{DataKind, FootprintUserId};
 use paperclip::actix::Apiv2Schema;
 

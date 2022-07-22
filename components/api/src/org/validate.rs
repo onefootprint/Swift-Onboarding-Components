@@ -7,7 +7,7 @@ use crate::errors::ApiError;
 use crate::types::success::ApiResponseData;
 use crate::State;
 use chrono::{DateTime, Utc};
-use db::models::scoped_users::Onboarding;
+use db::models::onboardings::Onboarding;
 use newtypes::{FootprintUserId, ObConfigurationId, SessionAuthToken};
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 

@@ -13,7 +13,7 @@ use crate::State;
 use chrono::Duration;
 use db::models::audit_trails::AuditTrail;
 use db::models::insight_event::CreateInsightEvent;
-use db::models::scoped_users::Onboarding;
+use db::models::onboardings::Onboarding;
 use db::models::webauthn_credential::WebauthnCredential;
 use db::DbError;
 use itertools::Itertools;
