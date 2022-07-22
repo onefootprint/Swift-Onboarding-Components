@@ -179,36 +179,3 @@ def user(workos_sandbox_tenant, twilio):
         email=sandbox_email,
         tenant=workos_sandbox_tenant,
     )
-
-
-@pytest.hookimpl(tryfirst=True, hookwrapper=True)
-def pytest_runtest_makereport(item, call):
-    # execute all other hooks to obtain the report object
-    outcome = yield
-    rep = outcome.get_result()
-
-    # set a report attribute for each phase of a call, which can
-    # be "setup", "call", "teardown"
-    setattr(item, "rep_" + rep.when, rep)
-
-
-@pytest.fixture(scope='module', autouse=True)
-def print_failed_tests(request):
-    def fin():
-        l = request.config.cache.get("failed_tests", [])
-        if len(l):
-            print("\n")
-            for val in l:
-                print(":bangbang: test failed: {}".format(val))
-            request.config.cache.set("failed_tests", [])
-    request.addfinalizer(fin) 
-
-
-@pytest.fixture(scope='function', autouse=True)
-def print_failure(request):
-    yield
-    if request.node.rep_setup.passed:
-        if request.node.rep_call.failed:
-            l = request.config.cache.get("failed_tests", [])
-            l.append(request.node.nodeid)
-            request.config.cache.set("failed_tests", l)
