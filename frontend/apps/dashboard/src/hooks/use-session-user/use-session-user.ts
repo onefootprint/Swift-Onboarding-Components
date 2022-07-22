@@ -10,6 +10,7 @@ export type UserSession = {
   auth: string;
   email: string;
   tenantName: string;
+  sandboxRestricted: boolean;
 };
 
 export type AuthHeaders = {
@@ -32,7 +33,8 @@ export const useStore = create<UserSessionState>()(
     data: undefined,
     returnUrl: undefined,
     isLive: true,
-    logIn: (data: UserSession) => set({ data }),
+    logIn: (data: UserSession) =>
+      set({ data, isLive: !data.sandboxRestricted }),
     logOut: () => set({ data: undefined }),
     setIsLive: (value: boolean) => set({ isLive: value }),
     setReturnUrl: (returnUrl: string | undefined) => set({ returnUrl }),

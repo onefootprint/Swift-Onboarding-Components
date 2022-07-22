@@ -8,6 +8,7 @@ export type LoginResponse = {
   lastName?: string;
   newTenant: boolean;
   tenantName: string;
+  sandboxRestricted: boolean;
 };
 
 const login = async (code: string) => {

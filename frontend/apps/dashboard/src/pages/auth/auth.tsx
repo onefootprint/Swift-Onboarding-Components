@@ -24,8 +24,8 @@ const Auth = () => {
       return;
     }
     login.mutate(code, {
-      onSuccess({ auth, email, tenantName }: LoginResponse) {
-        logIn({ auth, email, tenantName });
+      onSuccess({ auth, email, tenantName, sandboxRestricted }: LoginResponse) {
+        logIn({ auth, email, tenantName, sandboxRestricted });
         router.push('/');
       },
     });
