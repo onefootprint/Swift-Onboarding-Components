@@ -1,6 +1,6 @@
-use newtypes::OnboardingLinkId;
+use newtypes::OnboardingId;
 
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 pub struct ValidateUserToken {
-    pub ob_link_id: OnboardingLinkId,
+    pub ob_id: OnboardingId,
 }

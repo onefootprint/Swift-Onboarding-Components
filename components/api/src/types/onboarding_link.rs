@@ -1,5 +1,5 @@
 use chrono::{DateTime, Utc};
-use db::models::scoped_users::{OnboardingLink, OnboardingLinkInfo};
+use db::models::scoped_users::{Onboarding, OnboardingInfo};
 use newtypes::{DataKind, Status};
 use paperclip::actix::Apiv2Schema;
 
@@ -15,9 +15,9 @@ pub struct ApiOnboardingLink {
     insight_event: ApiInsightEvent,
 }
 
-impl From<OnboardingLinkInfo> for ApiOnboardingLink {
-    fn from(s: OnboardingLinkInfo) -> Self {
-        let OnboardingLink {
+impl From<OnboardingInfo> for ApiOnboardingLink {
+    fn from(s: OnboardingInfo) -> Self {
+        let Onboarding {
             start_timestamp,
             status,
             ..

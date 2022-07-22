@@ -78,7 +78,7 @@ table! {
     use diesel::sql_types::*;
     use newtypes::db_types::*;
 
-    onboarding_links (id) {
+    onboardings (id) {
         id -> Uuid,
         scoped_user_id -> Text,
         ob_configuration_id -> Text,
@@ -253,9 +253,9 @@ joinable!(access_events -> scoped_users (scoped_user_id));
 joinable!(audit_trails -> tenants (tenant_id));
 joinable!(audit_trails -> user_vaults (user_vault_id));
 joinable!(ob_configurations -> tenants (tenant_id));
-joinable!(onboarding_links -> insight_events (insight_event_id));
-joinable!(onboarding_links -> ob_configurations (ob_configuration_id));
-joinable!(onboarding_links -> scoped_users (scoped_user_id));
+joinable!(onboardings -> insight_events (insight_event_id));
+joinable!(onboardings -> ob_configurations (ob_configuration_id));
+joinable!(onboardings -> scoped_users (scoped_user_id));
 joinable!(scoped_users -> insight_events (insight_event_id));
 joinable!(scoped_users -> tenants (tenant_id));
 joinable!(scoped_users -> user_vaults (user_vault_id));
@@ -273,7 +273,7 @@ allow_tables_to_appear_in_same_query!(
     audit_trails,
     insight_events,
     ob_configurations,
-    onboarding_links,
+    onboardings,
     scoped_users,
     sessions,
     tenant_api_keys,

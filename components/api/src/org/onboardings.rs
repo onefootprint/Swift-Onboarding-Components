@@ -9,7 +9,7 @@ use crate::utils::querystring::deserialize_stringified_list;
 use crate::State;
 use crate::{auth::session_context::SessionContext, errors::ApiError};
 use chrono::{DateTime, Utc};
-use db::models::scoped_users::OnboardingLink;
+use db::models::scoped_users::Onboarding;
 use db::scoped_users::OnboardingListQueryParams;
 use db::DbError;
 use newtypes::{DataKind, Fingerprint, Fingerprinter, FootprintUserId, PiiString, Status};
@@ -80,7 +80,7 @@ fn handler(
         timestamp_lte,
         timestamp_gte,
     };
-    let (scoped_users, ob_links, user_to_kinds, count) = state
+    let (scoped_users, obs, user_to_kinds, count) = state
         .db_pool
         .db_query(move |conn| -> Result<_, DbError> {
             let scoped_users = db::scoped_users::list_for_tenant(
@@ -100,9 +100,9 @@ fn handler(
                 .map(|(ob, _)| (&ob.id, &ob.user_vault_id))
                 .unzip();
             let user_to_kinds = db::user_data::bulk_fetch_populated_kinds(conn, user_vault_ids)?;
-            let ob_links = OnboardingLink::get_for_scoped_users(conn, scoped_user_ids)?;
+            let obs = Onboarding::get_for_scoped_users(conn, scoped_user_ids)?;
 
-            Ok((scoped_users, ob_links, user_to_kinds, count))
+            Ok((scoped_users, obs, user_to_kinds, count))
         })
         .await??;
 
@@ -120,7 +120,7 @@ fn handler(
         .map(|(ob, insight_event)| {
             (
                 user_to_kinds.get(&ob.user_vault_id).unwrap_or(&vec![]).clone(),
-                ob_links.get(&ob.id).unwrap_or(&empty_vec),
+                obs.get(&ob.id).unwrap_or(&empty_vec),
                 ob,
                 insight_event,
             )

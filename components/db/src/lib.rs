@@ -156,7 +156,7 @@ pub async fn private_cleanup_integration_tests(
                 diesel::delete(schema::user_data::table.filter(schema::user_data::user_vault_id.eq(&uv.id)))
                     .execute(conn)?;
 
-            // grab scoped_users, delete access events and onboarding_links
+            // grab scoped_users, delete access events and onboardings
             let obs: Vec<ScopedUser> = schema::scoped_users::table
                 .filter(schema::scoped_users::user_vault_id.eq(&uv.id))
                 .get_results(conn)?;
@@ -167,8 +167,7 @@ pub async fn private_cleanup_integration_tests(
                 .execute(conn)?;
 
                 deleted_rows += diesel::delete(
-                    schema::onboarding_links::table
-                        .filter(schema::onboarding_links::scoped_user_id.eq(&ob.id)),
+                    schema::onboardings::table.filter(schema::onboardings::scoped_user_id.eq(&ob.id)),
                 )
                 .execute(conn)?;
             }

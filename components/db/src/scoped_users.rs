@@ -26,9 +26,9 @@ pub fn list_for_tenant_query<'a>(params: OnboardingListQueryParams) -> BoxedQuer
 
     if !params.statuses.is_empty() {
         // TODO https://linear.app/footprint/issue/FP-661/adapt-orgonboardings-to-support-multiple-ob-configurations-per
-        let matching_ob_ids = schema::onboarding_links::table
-            .filter(schema::onboarding_links::status.eq_any(params.statuses))
-            .select(schema::onboarding_links::scoped_user_id)
+        let matching_ob_ids = schema::onboardings::table
+            .filter(schema::onboardings::status.eq_any(params.statuses))
+            .select(schema::onboardings::scoped_user_id)
             .distinct();
         query = query.filter(schema::scoped_users::id.eq_any(matching_ob_ids))
     }

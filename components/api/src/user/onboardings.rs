@@ -4,7 +4,7 @@ use crate::errors::ApiError;
 use crate::types::onboarding_link::ApiOnboardingLink;
 use crate::types::success::ApiResponseData;
 use crate::State;
-use db::models::scoped_users::{OnboardingLink, ScopedUser};
+use db::models::scoped_users::{Onboarding, ScopedUser};
 use newtypes::{ScopedUserId, TenantId};
 use paperclip::actix::{api_v2_operation, get, web, web::Json, Apiv2Schema};
 
@@ -28,13 +28,13 @@ pub async fn handler(
     user_auth: SessionContext<My1fpBasicSession>,
 ) -> actix_web::Result<Json<ApiResponseData<OnboardingResponse>>, ApiError> {
     let user_vault_id = user_auth.user_vault_id();
-    let (scoped_users, ob_links) = state
+    let (scoped_users, obs) = state
         .db_pool
         .db_query(move |conn| -> Result<_, db::DbError> {
             let scoped_users = ScopedUser::list_for_user_vault(conn, &user_vault_id)?;
             let scoped_user_ids = scoped_users.iter().map(|x| &x.0.id).collect();
-            let ob_links = OnboardingLink::get_for_scoped_users(conn, scoped_user_ids)?;
-            Ok((scoped_users, ob_links))
+            let obs = Onboarding::get_for_scoped_users(conn, scoped_user_ids)?;
+            Ok((scoped_users, obs))
         })
         .await??;
     let results = scoped_users
@@ -43,7 +43,7 @@ pub async fn handler(
             tenant_id: scoped_user.tenant_id,
             name: tenant.name,
             logo_url: tenant.logo_url,
-            onboarding_links: ob_links
+            onboarding_links: obs
                 .get(&scoped_user.id)
                 .unwrap_or(&vec![])
                 .iter()

@@ -13,7 +13,7 @@ use crate::State;
 use chrono::Duration;
 use db::models::audit_trails::AuditTrail;
 use db::models::insight_event::CreateInsightEvent;
-use db::models::scoped_users::OnboardingLink;
+use db::models::scoped_users::Onboarding;
 use db::models::webauthn_credential::WebauthnCredential;
 use db::DbError;
 use itertools::Itertools;
@@ -62,13 +62,13 @@ fn handler(
         .db_pool
         .db_transaction(move |conn| -> Result<_, DbError> {
             let insight_event = CreateInsightEvent::from(insights);
-            let ob_link = OnboardingLink::get_or_create(
+            let ob = Onboarding::get_or_create(
                 conn,
                 scoped_user.id.clone(),
                 tenant_auth.ob_config.id.clone(),
                 insight_event,
             )?;
-            if ob_link.status != Status::Verified {
+            if ob.status != Status::Verified {
                 // Just create some fixture events for now
                 // Don't make duplicate fixture events if the user onboards multiple times since it
                 // isn't very self-explanatory for the demo
@@ -108,15 +108,13 @@ fn handler(
                     )
                 })?;
                 // TODO don't mark as verified until data verification with vendors is complete
-                ob_link.update_status(conn, Status::Verified)?;
+                ob.update_status(conn, Status::Verified)?;
             }
             // create the session for this scoped_user
             let validation_token = ServerSession::create_sync(
                 &session_sealing_key,
                 conn,
-                SessionData::ValidateUserToken(ValidateUserToken {
-                    ob_link_id: ob_link.id,
-                }),
+                SessionData::ValidateUserToken(ValidateUserToken { ob_id: ob.id }),
                 Duration::minutes(15),
             )?;
             let webauthn_creds = WebauthnCredential::get_for_user_vault(conn, &uv_id)?;

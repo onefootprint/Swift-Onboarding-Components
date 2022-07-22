@@ -1,0 +1,13 @@
+ALTER TABLE onboarding_links RENAME TO onboardings;
+
+-- Rename indexes
+ALTER INDEX onboarding_links_pkey RENAME TO onboardings_pkey;
+ALTER INDEX fk_onboarding_links_ob_configuration_id RENAME TO onboardings_ob_configuration_id;
+ALTER INDEX fk_onboarding_links_onboarding_id RENAME TO onboardings_onboarding_id;
+ALTER INDEX onboarding_links_insight_event_id RENAME TO onboardings_insight_event_id;
+ALTER INDEX onboarding_links_onboarding_id_ob_configuration_id RENAME TO onboardings_onboarding_id_ob_configuration_id;
+
+-- Rename FK constraints
+ALTER TABLE onboardings RENAME CONSTRAINT fk_onboarding_links_insight_event_id TO fk_onboardings_insight_event_id;
+ALTER TABLE onboardings RENAME CONSTRAINT fk_onboarding_links_ob_configuration_id TO fk_onboardings_ob_configuration_id;
+ALTER TABLE onboardings RENAME CONSTRAINT fk_onboarding_links_scoped_user_id TO fk_onboardings_scoped_user_id;

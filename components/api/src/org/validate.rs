@@ -7,7 +7,7 @@ use crate::errors::ApiError;
 use crate::types::success::ApiResponseData;
 use crate::State;
 use chrono::{DateTime, Utc};
-use db::models::scoped_users::OnboardingLink;
+use db::models::scoped_users::Onboarding;
 use newtypes::{FootprintUserId, ObConfigurationId, SessionAuthToken};
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 
@@ -40,13 +40,13 @@ pub fn validate(
 
     let session = ServerSession::unseal(&state.session_sealing_key, &session.sealed_session_data)?;
 
-    let ValidateUserToken { ob_link_id } = if let SessionData::ValidateUserToken(data) = session.data {
+    let ValidateUserToken { ob_id } = if let SessionData::ValidateUserToken(data) = session.data {
         data
     } else {
         return Err(OnboardingError::ValidateTokenInvalidOrNotFound.into());
     };
 
-    let (ob_link, scoped_user) = OnboardingLink::get_by_id(&state.db_pool, ob_link_id)
+    let (ob, scoped_user) = Onboarding::get_by_id(&state.db_pool, ob_id)
         .await?
         .ok_or(OnboardingError::NoOnboarding)?;
     if scoped_user.tenant_id != auth.tenant().id {
@@ -57,9 +57,9 @@ pub fn validate(
     }
 
     Ok(Json(ApiResponseData::ok(ValidateResponse {
-        onboarding_configuration_id: ob_link.ob_configuration_id,
+        onboarding_configuration_id: ob.ob_configuration_id,
         footprint_user_id: scoped_user.fp_user_id,
-        status: ob_link.status,
+        status: ob.status,
         timestamp: scoped_user.start_timestamp,
     })))
 }

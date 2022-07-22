@@ -1,7 +1,7 @@
 use crate::diesel::ExpressionMethods;
 use crate::diesel::QueryDsl;
 use crate::diesel::RunQueryDsl;
-use crate::schema::{ob_configurations, onboarding_links, tenants};
+use crate::schema::{ob_configurations, onboardings, tenants};
 use crate::DbPool;
 use chrono::{DateTime, Utc};
 use diesel::{Insertable, Queryable};
@@ -62,9 +62,9 @@ impl ObConfiguration {
         let id = pool
             .db_query(move |conn| -> Result<Vec<ObConfiguration>, crate::DbError> {
                 let obcs = ob_configurations::table
-                    .inner_join(onboarding_links::table)
-                    .filter(onboarding_links::scoped_user_id.eq(scoped_user_id))
-                    // TODO filter on active onboarding_links
+                    .inner_join(onboardings::table)
+                    .filter(onboardings::scoped_user_id.eq(scoped_user_id))
+                    // TODO filter on active onboardings
                     // https://linear.app/footprint/issue/FP-644/move-insight-event-id-status-onto-onboardinglink
                     .select(ob_configurations::all_columns)
                     .get_results(conn)?;
