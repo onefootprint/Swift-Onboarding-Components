@@ -2,16 +2,16 @@ import { DataKind } from './data-kind';
 import { InsightEvent } from './insight-event';
 import { OnboardingStatus } from './onboarding-status';
 
-export type Onboarding = {
+export type ScopedUser = {
   footprintUserId: string;
   populatedDataKinds: DataKind[];
   startTimestamp: string;
   orderingId: string;
   insightEvent: InsightEvent;
-  onboardingLinks: OnboardingLink[];
+  onboardings: Onboarding[];
 };
 
-export type OnboardingLink = {
+export type Onboarding = {
   status: OnboardingStatus;
   canAccessDataKinds: DataKind[];
   name: string;

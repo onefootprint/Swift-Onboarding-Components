@@ -24,7 +24,7 @@ const DecryptDialog = ({ user, onDecrypt }: DecryptDialogProps) => {
     useDataKindSelectedFields();
   const allowedToDecryptFields = Array.from(
     new Set(
-      user.onboardingLinks.flatMap(link =>
+      user.onboardings.flatMap(link =>
         link.canAccessDataKinds.map(dataKind => dataKindToType[dataKind]),
       ),
     ),

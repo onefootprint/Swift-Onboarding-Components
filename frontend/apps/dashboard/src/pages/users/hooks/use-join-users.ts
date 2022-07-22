@@ -3,14 +3,14 @@ import {
   ALL_FIELDS,
   DataKind,
   DataKindType,
-  Onboarding,
   OnboardingStatus,
+  ScopedUser,
   statusToPriority,
 } from 'src/types';
 
 import { UserAttributes, UserData } from './use-user-data';
 
-export type User = Onboarding & {
+export type User = ScopedUser & {
   status: OnboardingStatus;
   attributes: UserAttributes;
 };
@@ -35,20 +35,20 @@ type DecryptedUsersMap = Omit<
 >;
 
 const useJoinUsers = (
-  onboardings: Onboarding[] | undefined,
+  scoped_users: ScopedUser[] | undefined,
   decryptedUsers: DecryptedUsersMap,
 ) =>
   useMemo<User[] | undefined>(
     () =>
-      onboardings?.map((onboarding: Onboarding) => {
+      scoped_users?.map((scoped_user: ScopedUser) => {
         const decryptedData =
-          decryptedUsers.get(onboarding.footprintUserId) ||
+          decryptedUsers.get(scoped_user.footprintUserId) ||
           ({} as UserAttributes);
         // Create a UserData for every type of DataKind for this user. The UserData contains
         // the value of the attribute if decrypted, otherwise information on whether the value
         // is set for the user and whether we're currently fetching the decrypted value.
         // This object is composed by joining info from previous POST /org/decrypt calls and
-        // GET /org/onboardings calls
+        // GET /org/scoped_users calls
         const attributes = Object.fromEntries(
           ALL_FIELDS.map((dataKindType: DataKindType) => [
             dataKindType,
@@ -57,25 +57,25 @@ const useJoinUsers = (
               isLoading: decryptedData[dataKindType]?.isLoading || false,
               exists:
                 decryptedData[dataKindType]?.exists ||
-                onboarding.populatedDataKinds.includes(DataKind[dataKindType]),
+                scoped_user.populatedDataKinds.includes(DataKind[dataKindType]),
             } as UserData,
           ]),
         );
 
-        // The status we display for the user is the maximum status of all the onboarding links,
-        // or incomplete if there are no onboarding links
+        // The status we display for the user is the maximum status of all the scoped_user links,
+        // or incomplete if there are no scoped_user links
         const maxStatus =
-          onboarding.onboardingLinks.sort(
+          scoped_user.onboardings.sort(
             (a, b) => statusToPriority[b.status] - statusToPriority[a.status],
           )[0]?.status || OnboardingStatus.incomplete;
 
         return {
           status: maxStatus,
           attributes,
-          ...onboarding,
+          ...scoped_user,
         } as User;
       }),
-    [decryptedUsers, onboardings],
+    [decryptedUsers, scoped_users],
   );
 
 export default useJoinUsers;

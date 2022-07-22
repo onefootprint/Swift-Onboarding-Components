@@ -22,13 +22,13 @@ const Insights = ({ user }: InsightsProps) => {
   const biometricCred = getLiveness.data?.[0];
 
   // If there's a biometric credential, use the insight event from it since it will most likely be the mobile device.
-  // If there's no biometric credential, use the insight event from the onboarding link, which is when the user finished
-  // onboarding.
-  // If there's no onboarding link, use the insight event from the onboarding, which is when the user started onboarding.
+  // If there's no biometric credential, use the insight event from the onboarding, which is when the user finished
+  // signing up.
+  // If there's no onboarding, use the insight event from the scoped user, which is when the user started signing up.
   // We only show `Biometric: Verified` if the user has a biometric credential
   const insightEvent =
     biometricCred?.insightEvent ||
-    user.onboardingLinks[0]?.insightEvent ||
+    user.onboardings[0]?.insightEvent ||
     user.insightEvent;
   const userAgent = insightEvent.userAgent || '';
 

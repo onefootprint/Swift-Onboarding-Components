@@ -2,22 +2,22 @@ import { useEffect, useState } from 'react';
 
 import useDecryptUser from './use-decrypt-user';
 import { getCursors, useFilters } from './use-filters';
-import useGetOnboardings from './use-get-onboardings';
+import useGetScopedUsers from './use-get-scoped-users';
 import useJoinUsers from './use-join-users';
 
 // Higher-order hook that combines all util hooks required for fetching users and decrypting data
 const useGetUsers = (pageSize: number) => {
-  const getOnboardings = useGetOnboardings(pageSize);
+  const getScopedUsers = useGetScopedUsers(pageSize);
   const [totalNumResults, setTotalNumResults] = useState(0);
   const { decryptedUsers, loadEncryptedAttributes } = useDecryptUser();
   const { filters, setFilter, setCursors } = useFilters();
 
   useEffect(() => {
     // Only update total count of results when it is sent from the server
-    if (getOnboardings.data?.count || getOnboardings.data?.count === 0) {
-      setTotalNumResults(getOnboardings.data?.count);
+    if (getScopedUsers.data?.count || getScopedUsers.data?.count === 0) {
+      setTotalNumResults(getScopedUsers.data?.count);
     }
-  }, [getOnboardings.data]);
+  }, [getScopedUsers.data]);
 
   // The backend only supports paginating forward, so we will keep a stack of the previous pages
   // we've visited in order to paginate backwards
@@ -25,23 +25,23 @@ const useGetUsers = (pageSize: number) => {
 
   // Add the new cursor onto the stack
   const loadNextPage = () =>
-    getOnboardings.data?.next &&
-    setCursors([...cursors, getOnboardings.data.next]);
+    getScopedUsers.data?.next &&
+    setCursors([...cursors, getScopedUsers.data.next]);
 
   // Pop the last cursor off the stack
   const loadPrevPage = () => setCursors(cursors.slice(0, -1));
 
-  // Join the onboarding list results with any decrypted user data
-  const users = useJoinUsers(getOnboardings.data?.data || [], decryptedUsers);
+  // Join the scoped users list results with any decrypted user data
+  const users = useJoinUsers(getScopedUsers.data?.data || [], decryptedUsers);
 
   return {
     users,
     totalNumResults,
     pageIndex: cursors.length,
-    isLoading: getOnboardings.isLoading,
+    isLoading: getScopedUsers.isLoading,
     loadNextPage,
     loadPrevPage,
-    hasNextPage: !!getOnboardings.data?.next,
+    hasNextPage: !!getScopedUsers.data?.next,
     hasPrevPage: cursors.length > 0,
     filters,
     setFilter,

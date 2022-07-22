@@ -4,28 +4,28 @@ import request, { RequestError, RequestResponse } from 'request';
 import useSessionUser, { AuthHeaders } from 'src/hooks/use-session-user';
 import {
   getCursors,
-  OnboardingListQuerystring,
+  ScopedUsersListQuerystring,
   useFilters,
 } from 'src/pages/users/hooks/use-filters';
-import { dateRangeToFilterParams, Onboarding } from 'src/types';
+import { dateRangeToFilterParams, ScopedUser } from 'src/types';
 
-type OnboardingsListQueryKey = [
+type ScopedUsersListQueryKey = [
   string,
-  OnboardingListQuerystring,
+  ScopedUsersListQuerystring,
   AuthHeaders,
   number,
 ];
 
-type OnboardingsListResponse = {
-  data: Onboarding[];
+type ScopedUsersListResponse = {
+  data: ScopedUser[];
   next?: string;
   count?: number;
 };
 
-const getOnboardingsRequest = async ({
+const getScopedUsersRequest = async ({
   queryKey,
 }: QueryFunctionContext<QueryKey, string>) => {
-  const [, params, authHeaders, pageSize] = queryKey as OnboardingsListQueryKey;
+  const [, params, authHeaders, pageSize] = queryKey as ScopedUsersListQueryKey;
   const dateRangeFilters = dateRangeToFilterParams(params);
   // cursors is a stack of cursors for all pages visited. Use the cursor on the top of the stack
   // (the current page) when asking the backend for results
@@ -36,26 +36,26 @@ const getOnboardingsRequest = async ({
     cursor: cursors[cursors.length - 1],
     pageSize,
   };
-  const { data: response } = await request<RequestResponse<Onboarding[]>>({
+  const { data: response } = await request<RequestResponse<ScopedUser[]>>({
     method: 'GET',
-    url: '/org/onboardings',
+    url: '/org/scoped_users',
     params: req,
     headers: authHeaders,
   });
   return response;
 };
 
-const useGetOnboardings = (pageSize: number) => {
+const useGetScopedUsers = (pageSize: number) => {
   const { authHeaders } = useSessionUser();
   const { filters } = useFilters();
 
-  return useQuery<OnboardingsListResponse, RequestError>(
-    ['paginatedOnboardings', filters, authHeaders, pageSize],
-    getOnboardingsRequest,
+  return useQuery<ScopedUsersListResponse, RequestError>(
+    ['paginatedScopedUsers', filters, authHeaders, pageSize],
+    getScopedUsersRequest,
     {
       retry: false,
     },
   );
 };
 
-export default useGetOnboardings;
+export default useGetScopedUsers;

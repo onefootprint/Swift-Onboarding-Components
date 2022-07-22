@@ -1,7 +1,7 @@
 import { omit, omitBy } from 'lodash';
 import { useRouter } from 'next/router';
 
-export type OnboardingListFilters = {
+export type ScopedUserListFilters = {
   footprint_user_id?: string;
   statuses?: string;
   // Filter via secure hash of a piece of data belonging to a user.
@@ -12,24 +12,24 @@ export type OnboardingListFilters = {
   dateRange?: string;
 };
 
-export type OnboardingListQuerystring = OnboardingListFilters & {
+export type ScopedUsersListQuerystring = ScopedUserListFilters & {
   // JSON serialized list of the cursors for all of the previous pages that have been visited.
   // When asking the backend for results, we use the cursor most recently put on the stack
   cursors?: string;
 };
 
-export const getCursors = (req: OnboardingListQuerystring) =>
+export const getCursors = (req: ScopedUsersListQuerystring) =>
   req.cursors ? req.cursors.split(',') : [];
 
 export const useFilters = () => {
   const router = useRouter();
-  const setQuerystring = (query: OnboardingListQuerystring) => {
+  const setQuerystring = (query: ScopedUsersListQuerystring) => {
     // Also clean up query params if values are empty
     router.push({ query: omitBy(query, x => !x) }, undefined, {
       shallow: true,
     });
   };
-  const setFilter = (newQuery: OnboardingListFilters) => {
+  const setFilter = (newQuery: ScopedUserListFilters) => {
     // Merge newQuery with the existing filters extracted from the current router querystring.
     // When we adjust filters, the result set will change, so we want to start on the first page.
     setQuerystring({ ...omit(router.query, 'cursors'), ...newQuery });
@@ -39,7 +39,7 @@ export const useFilters = () => {
     setQuerystring({ ...router.query, cursors: cursors.join(',') });
   };
   return {
-    filters: router.query as OnboardingListQuerystring,
+    filters: router.query as ScopedUsersListQuerystring,
     setFilter,
     setCursors,
   };
