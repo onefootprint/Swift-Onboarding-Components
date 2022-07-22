@@ -22,8 +22,7 @@ pub mod liveness;
 pub fn routes() -> web::Scope {
     web::scope("/user")
         .service(web::resource("").route(web::get().to(detail::handler)))
-        .service(web::resource("onboardings").route(web::get().to(authorized_orgs::handler)))
-        .service(web::resource("authorized_orgs").route(web::get().to(authorized_orgs::handler)))
+        .service(authorized_orgs::handler)
         .service(data::handler)
         .service(decrypt::handler)
         .service(access_events::handler)

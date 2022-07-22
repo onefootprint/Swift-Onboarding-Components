@@ -12,7 +12,6 @@ pub struct ApiScopedUser {
     pub start_timestamp: DateTime<Utc>,
     pub ordering_id: i64,
     pub insight_event: ApiInsightEvent,
-    pub onboarding_links: Vec<ApiOnboarding>,
     pub onboardings: Vec<ApiOnboarding>,
 }
 
@@ -31,7 +30,6 @@ impl From<(Vec<DataKind>, &Vec<OnboardingInfo>, ScopedUser, InsightEvent)> for A
             start_timestamp,
             ordering_id,
             insight_event: ApiInsightEvent::from(s.3),
-            onboarding_links: ob_links.iter().map(|x| ApiOnboarding::from(x.clone())).collect(),
             onboardings: ob_links.iter().map(|x| ApiOnboarding::from(x.clone())).collect(),
         }
     }
