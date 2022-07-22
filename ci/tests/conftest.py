@@ -65,7 +65,7 @@ def workos_tenant(must_collect_data_kinds, can_access_data_kinds):
     return create_tenant(org_data, ob_data)
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="session")
 def workos_sandbox_tenant(must_collect_data_kinds, can_access_data_kinds):
 
     org_data = {
