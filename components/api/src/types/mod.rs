@@ -6,7 +6,7 @@ pub mod error;
 pub mod insight_event;
 pub mod liveness;
 pub mod onboarding;
-pub mod onboarding_link;
+pub mod scoped_user;
 pub mod success;
 
 /// empty data

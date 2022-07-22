@@ -3,7 +3,7 @@ use crate::auth::key_context::secret_key::SecretTenantAuthContext;
 use crate::auth::session_context::HasTenant;
 use crate::auth::session_data::tenant::workos::WorkOsSession;
 use crate::auth::IsLive;
-use crate::types::onboarding::ApiOnboarding;
+use crate::types::scoped_user::ApiScopedUser;
 use crate::types::success::ApiPaginatedResponseData;
 use crate::utils::querystring::deserialize_stringified_list;
 use crate::State;
@@ -29,7 +29,7 @@ struct OnboardingRequest {
     page_size: Option<usize>,
 }
 
-type OnboardingResponse = Vec<ApiOnboarding>;
+type OnboardingResponse = Vec<ApiScopedUser>;
 
 #[api_v2_operation(tags(Org))]
 #[get("/onboardings")]
@@ -125,7 +125,7 @@ fn handler(
                 insight_event,
             )
         })
-        .map(ApiOnboarding::from)
+        .map(ApiScopedUser::from)
         .collect();
 
     Ok(Json(ApiPaginatedResponseData::ok(scoped_users, cursor, count)))

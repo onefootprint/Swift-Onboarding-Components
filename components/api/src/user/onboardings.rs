@@ -1,7 +1,7 @@
 use crate::auth::session_context::HasUserVaultId;
 use crate::auth::{session_context::SessionContext, session_data::user::my_fp::My1fpBasicSession};
 use crate::errors::ApiError;
-use crate::types::onboarding_link::ApiOnboardingLink;
+use crate::types::onboarding::ApiOnboarding;
 use crate::types::success::ApiResponseData;
 use crate::State;
 use db::models::scoped_users::{Onboarding, ScopedUser};
@@ -17,7 +17,7 @@ pub struct ApiUserOnboarding {
     tenant_id: TenantId,
     name: String,
     logo_url: Option<String>,
-    onboarding_links: Vec<ApiOnboardingLink>,
+    onboarding_links: Vec<ApiOnboarding>,
 }
 
 /// Returns a list of onboardings that a user has performed
@@ -47,7 +47,7 @@ pub async fn handler(
                 .get(&scoped_user.id)
                 .unwrap_or(&vec![])
                 .iter()
-                .map(|x| ApiOnboardingLink::from(x.clone()))
+                .map(|x| ApiOnboarding::from(x.clone()))
                 .collect(),
             id: scoped_user.id,
         })
