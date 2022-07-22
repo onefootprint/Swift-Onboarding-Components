@@ -37,15 +37,15 @@ class TestDashboard:
         }
         post("org/decrypt", data, tenant.sk, status_code=401)
         
-    def test_onboardings_list(self, user):
+    def test_scoped_users_list(self, user):
         tenant = user.tenant
         # TODO don't filter on fp_user_id in this test. We only do it to ensure it doesn't flake in dev
         # https://linear.app/footprint/issue/FP-390/integration-tests-for-onboarding-list-break-in-dev
-        body = get("org/onboardings", dict(fp_user_id=user.fp_user_id), tenant.sk)
-        onboardings = body["data"]
-        assert len(onboardings)
-        assert onboardings[0]["footprint_user_id"] == user.fp_user_id
-        assert set(["first_name", "last_name"]) < set(onboardings[0]["populated_data_kinds"])
+        body = get("org/scoped_users", dict(fp_user_id=user.fp_user_id), tenant.sk)
+        scoped_users = body["data"]
+        assert len(scoped_users)
+        assert scoped_users[0]["footprint_user_id"] == user.fp_user_id
+        assert set(["first_name", "last_name"]) < set(scoped_users[0]["populated_data_kinds"])
 
     def test_liveness_list(self, user):
         tenant = user.tenant

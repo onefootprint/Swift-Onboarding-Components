@@ -39,7 +39,7 @@ def my1fp_authed_user(user, twilio):
 
 
 class TestMy1fp:
-    def test_logged_in_decrypt(self, my1fp_authed_user):
+    def test_decrypt(self, my1fp_authed_user):
         data = {
             "attributes": ["phone_number", "email", "street_address", "zip"]
         }
@@ -56,7 +56,7 @@ class TestMy1fp:
         }
         post("user/decrypt", data, my1fp_authed_user.auth_token, status_code=401)
 
-    def test_logged_in_user_detail(self, my1fp_authed_user):
+    def test_user_detail(self, my1fp_authed_user):
         # Get the user detail using the logged in context
         body = get("user", None, my1fp_authed_user.auth_token)
         phone_numbers = body["data"]["phone_numbers"]
@@ -66,17 +66,17 @@ class TestMy1fp:
         assert not emails[0]["is_verified"]
         assert emails[0]["priority"] == "primary"
 
-    def test_logged_in_user_onboardings(self, my1fp_authed_user, can_access_data_kinds):
+    def test_authorized_tenants(self, my1fp_authed_user, can_access_data_kinds):
         # Get the user detail using the logged in context
-        body = get("user/onboardings", None, my1fp_authed_user.auth_token)
-        onboardings = body["data"]
+        body = get("user/authorized_orgs", None, my1fp_authed_user.auth_token)
+        authorized_orgs = body["data"]
 
-        onboarding_info = onboardings[0]["onboarding_links"][0]
+        onboarding_info = authorized_orgs[0]["onboardings"][0]
         assert onboarding_info["name"] == "Acme Bank Card"
         assert onboarding_info["insight_event"]
         assert set(onboarding_info["can_access_data_kinds"]) == set(can_access_data_kinds)
         
-    def test_logged_in_access_events(self, my1fp_authed_user):
+    def test_access_events(self, my1fp_authed_user):
         tenant = my1fp_authed_user.tenant
         # Decrypt as the tenant in order to generate some access events
         for attributes in FIELDS_TO_DECRYPT:

@@ -13,11 +13,11 @@ use db::models::scoped_users::Onboarding;
 use db::scoped_users::OnboardingListQueryParams;
 use db::DbError;
 use newtypes::{DataKind, Fingerprint, Fingerprinter, FootprintUserId, PiiString, Status};
-use paperclip::actix::{api_v2_operation, get, web, web::Json, Apiv2Schema};
+use paperclip::actix::{api_v2_operation, web, web::Json, Apiv2Schema};
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
-struct OnboardingRequest {
+pub struct OnboardingRequest {
     #[serde(default)]
     #[serde(deserialize_with = "deserialize_stringified_list")]
     statuses: Vec<Status>,
@@ -32,11 +32,10 @@ struct OnboardingRequest {
 type OnboardingResponse = Vec<ApiScopedUser>;
 
 #[api_v2_operation(tags(Org))]
-#[get("/onboardings")]
 /// Allows a tenant to view a list of their Onboardings, effectively showing all users that have
 /// started the onboarding process for the tenant. Optionally allows filtering on Onboarding status.
 /// Requires tenant secret key auth.
-fn handler(
+pub fn get(
     state: web::Data<State>,
     request: web::Query<OnboardingRequest>,
     auth: Either<SessionContext<WorkOsSession>, SecretTenantAuthContext>,

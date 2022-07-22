@@ -11,21 +11,22 @@ use paperclip::actix::web;
 use std::collections::{HashMap, HashSet};
 
 pub mod access_events;
+pub mod authorized_orgs;
 pub mod biometric;
 pub mod data;
 pub mod decrypt;
 pub mod detail;
 pub mod email;
 pub mod liveness;
-pub mod onboardings;
 
 pub fn routes() -> web::Scope {
     web::scope("/user")
         .service(web::resource("").route(web::get().to(detail::handler)))
+        .service(web::resource("onboardings").route(web::get().to(authorized_orgs::handler)))
+        .service(web::resource("authorized_orgs").route(web::get().to(authorized_orgs::handler)))
         .service(data::handler)
         .service(decrypt::handler)
         .service(access_events::handler)
-        .service(onboardings::handler)
         .service(biometric::init)
         .service(biometric::complete)
         .service(liveness::get)

@@ -6,7 +6,7 @@ use crate::types::success::ApiResponseData;
 use crate::State;
 use db::models::scoped_users::{Onboarding, ScopedUser};
 use newtypes::{ScopedUserId, TenantId};
-use paperclip::actix::{api_v2_operation, get, web, web::Json, Apiv2Schema};
+use paperclip::actix::{api_v2_operation, web, web::Json, Apiv2Schema};
 
 type OnboardingResponse = Vec<ApiUserOnboarding>;
 
@@ -18,11 +18,11 @@ pub struct ApiUserOnboarding {
     name: String,
     logo_url: Option<String>,
     onboarding_links: Vec<ApiOnboarding>,
+    onboardings: Vec<ApiOnboarding>,
 }
 
 /// Returns a list of onboardings that a user has performed
 #[api_v2_operation(tags(User))]
-#[get("/onboardings")]
 pub async fn handler(
     state: web::Data<State>,
     user_auth: SessionContext<My1fpBasicSession>,
@@ -44,6 +44,12 @@ pub async fn handler(
             name: tenant.name,
             logo_url: tenant.logo_url,
             onboarding_links: obs
+                .get(&scoped_user.id)
+                .unwrap_or(&vec![])
+                .iter()
+                .map(|x| ApiOnboarding::from(x.clone()))
+                .collect(),
+            onboardings: obs
                 .get(&scoped_user.id)
                 .unwrap_or(&vec![])
                 .iter()
