@@ -1,7 +1,7 @@
 use crate::errors::DbError;
 use crate::models::access_events::AccessEvent;
 use crate::models::insight_event::InsightEvent;
-use crate::models::onboardings::*;
+use crate::models::scoped_users::*;
 use crate::models::tenants::Tenant;
 use crate::schema;
 use crate::DbPool;
@@ -26,7 +26,7 @@ pub struct AccessEventListQueryParams {
 #[derive(Debug)]
 pub struct AccessEventListItemForTenant {
     pub event: AccessEvent,
-    pub onboarding: Onboarding,
+    pub scoped_user: ScopedUser,
     pub insight: Option<InsightEvent>,
 }
 
@@ -38,19 +38,19 @@ impl AccessEventListItemForTenant {
         cursor: Option<i64>,
         page_size: i64,
     ) -> Result<Vec<Self>, DbError> {
-        let result: Vec<(AccessEvent, Onboarding, Option<InsightEvent>)> = pool
+        let result: Vec<(AccessEvent, ScopedUser, Option<InsightEvent>)> = pool
             .db_query(move |conn| {
                 let mut results = schema::access_events::table
-                    .inner_join(schema::onboardings::table)
+                    .inner_join(schema::scoped_users::table)
                     .left_join(schema::insight_events::table)
                     .order_by(schema::access_events::ordering_id.desc())
-                    .filter(schema::onboardings::tenant_id.eq(params.tenant_id))
-                    .filter(schema::onboardings::is_live.eq(params.is_live))
+                    .filter(schema::scoped_users::tenant_id.eq(params.tenant_id))
+                    .filter(schema::scoped_users::is_live.eq(params.is_live))
                     .limit(page_size)
                     .into_boxed();
 
                 if let Some(fp_user_id) = params.fp_user_id {
-                    results = results.filter(schema::onboardings::user_ob_id.eq(fp_user_id))
+                    results = results.filter(schema::scoped_users::fp_user_id.eq(fp_user_id))
                 }
 
                 if let Some(search) = params.search {
@@ -58,7 +58,7 @@ impl AccessEventListItemForTenant {
                         schema::access_events::reason
                             .ilike(format!("%{}%", search))
                             .or(schema::access_events::principal.ilike(format!("%{}%", search)))
-                            .or(schema::onboardings::user_ob_id.eq(search)),
+                            .or(schema::scoped_users::fp_user_id.eq(search)),
                     )
                 }
 
@@ -85,10 +85,10 @@ impl AccessEventListItemForTenant {
         let result = result
             .into_iter()
             .map(|res| {
-                let (event, onboarding, insight) = res;
+                let (event, scoped_user, insight) = res;
                 Self {
                     event,
-                    onboarding,
+                    scoped_user,
                     insight,
                 }
             })
@@ -102,7 +102,7 @@ impl AccessEventListItemForTenant {
 pub struct AccessEventListItemForUser {
     pub event: AccessEvent,
     pub tenant_name: String,
-    pub onboarding: Onboarding,
+    pub scoped_user: ScopedUser,
 }
 
 impl AccessEventListItemForUser {
@@ -112,15 +112,15 @@ impl AccessEventListItemForUser {
         user_vault_id: UserVaultId,
         kind: Option<DataKind>,
     ) -> Result<Vec<AccessEventListItemForUser>, DbError> {
-        let result: Vec<(AccessEvent, Onboarding, Tenant)> = pool
+        let result: Vec<(AccessEvent, ScopedUser, Tenant)> = pool
             .db_query(move |conn| {
                 let mut results = schema::access_events::table
-                    .inner_join(schema::onboardings::table)
+                    .inner_join(schema::scoped_users::table)
                     .inner_join(
-                        schema::tenants::table.on(schema::tenants::id.eq(schema::onboardings::tenant_id)),
+                        schema::tenants::table.on(schema::tenants::id.eq(schema::scoped_users::tenant_id)),
                     )
                     .order_by(schema::access_events::timestamp.desc())
-                    .filter(schema::onboardings::user_vault_id.eq(user_vault_id))
+                    .filter(schema::scoped_users::user_vault_id.eq(user_vault_id))
                     .into_boxed();
 
                 if let Some(kind) = kind {
@@ -134,10 +134,10 @@ impl AccessEventListItemForUser {
         let result = result
             .into_iter()
             .map(|res| {
-                let (event, onboarding, tenant) = res;
+                let (event, scoped_user, tenant) = res;
                 Self {
                     event,
-                    onboarding,
+                    scoped_user,
                     tenant_name: tenant.name,
                 }
             })

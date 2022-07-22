@@ -2,24 +2,24 @@ use super::insight_event::CreateInsightEvent;
 use super::tenants::Tenant;
 use crate::models::insight_event::InsightEvent;
 use crate::models::ob_configurations::ObConfiguration;
-use crate::schema::{onboarding_links, onboardings};
+use crate::schema::{onboarding_links, scoped_users};
 use crate::{DbError, DbPool};
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
 use itertools::Itertools;
 use newtypes::{
-    FootprintUserId, InsightEventId, ObConfigurationId, OnboardingId, OnboardingLinkId, Status, TenantId,
+    FootprintUserId, InsightEventId, ObConfigurationId, OnboardingLinkId, ScopedUserId, Status, TenantId,
     UserVaultId,
 };
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
-#[diesel(table_name = onboardings)]
-pub struct Onboarding {
-    pub id: OnboardingId,
-    pub user_ob_id: FootprintUserId,
+#[diesel(table_name = scoped_users)]
+pub struct ScopedUser {
+    pub id: ScopedUserId,
+    pub fp_user_id: FootprintUserId,
     pub user_vault_id: UserVaultId,
     pub tenant_id: TenantId,
     pub _created_at: DateTime<Utc>,
@@ -34,7 +34,7 @@ pub struct Onboarding {
 #[diesel(table_name = onboarding_links)]
 pub struct OnboardingLink {
     pub id: OnboardingLinkId,
-    pub onboarding_id: OnboardingId,
+    pub scoped_user_id: ScopedUserId,
     pub ob_configuration_id: ObConfigurationId,
     pub start_timestamp: DateTime<Utc>,
     pub _created_at: DateTime<Utc>,
@@ -46,7 +46,7 @@ pub struct OnboardingLink {
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
 #[diesel(table_name = onboarding_links)]
 struct NewOnboardingLink {
-    onboarding_id: OnboardingId,
+    scoped_user_id: ScopedUserId,
     ob_configuration_id: ObConfigurationId,
     start_timestamp: DateTime<Utc>,
     status: Status,
@@ -59,11 +59,11 @@ impl OnboardingLink {
     pub async fn get_by_id(
         pool: &DbPool,
         id: OnboardingLinkId,
-    ) -> Result<Option<(OnboardingLink, Onboarding)>, DbError> {
+    ) -> Result<Option<(OnboardingLink, ScopedUser)>, DbError> {
         let ob = pool
-            .db_query(|conn| -> Result<Option<(OnboardingLink, Onboarding)>, DbError> {
+            .db_query(|conn| -> Result<Option<(OnboardingLink, ScopedUser)>, DbError> {
                 let ob = onboarding_links::table
-                    .inner_join(onboardings::table)
+                    .inner_join(scoped_users::table)
                     .filter(onboarding_links::id.eq(id))
                     .first(conn)
                     .optional()?;
@@ -73,23 +73,23 @@ impl OnboardingLink {
         Ok(ob)
     }
 
-    pub fn get_for_onboardings(
+    pub fn get_for_scoped_users(
         conn: &mut PgConnection,
-        onboarding_ids: Vec<&OnboardingId>,
-    ) -> Result<HashMap<OnboardingId, Vec<OnboardingLinkInfo>>, DbError> {
+        scoped_user_ids: Vec<&ScopedUserId>,
+    ) -> Result<HashMap<ScopedUserId, Vec<OnboardingLinkInfo>>, DbError> {
         use crate::schema::{insight_events, ob_configurations};
         let ob_links: Vec<OnboardingLinkInfo> = onboarding_links::table
             .inner_join(ob_configurations::table)
             .inner_join(insight_events::table)
-            .filter(onboarding_links::onboarding_id.eq_any(onboarding_ids))
-            .order_by(onboarding_links::onboarding_id)
+            .filter(onboarding_links::scoped_user_id.eq_any(scoped_user_ids))
+            .order_by(onboarding_links::scoped_user_id)
             .load(conn)?;
 
         // Turn the Vec of OnboardingLinkInfo into a hashmap of OnboadringId -> Vec<OnboardingLinkInfo>
-        // group_by only groups adjacent items, so this requires that the vec is sorted by onboarding_id
+        // group_by only groups adjacent items, so this requires that the vec is sorted by scoped_user_id
         let result = ob_links
             .into_iter()
-            .group_by(|(link, _, _)| link.onboarding_id.clone())
+            .group_by(|(link, _, _)| link.scoped_user_id.clone())
             .into_iter()
             .map(|g| (g.0, g.1.collect()))
             .collect();
@@ -98,22 +98,22 @@ impl OnboardingLink {
 
     pub fn get_or_create(
         conn: &mut PgConnection,
-        onboarding_id: OnboardingId,
+        scoped_user_id: ScopedUserId,
         ob_configuration_id: ObConfigurationId,
         insight_event: CreateInsightEvent,
     ) -> Result<OnboardingLink, DbError> {
         let ob_link = onboarding_links::table
-            .filter(onboarding_links::onboarding_id.eq(&onboarding_id))
+            .filter(onboarding_links::scoped_user_id.eq(&scoped_user_id))
             .filter(onboarding_links::ob_configuration_id.eq(&ob_configuration_id))
             .first(conn)
             .optional()?;
         if let Some(ob_link) = ob_link {
             return Ok(ob_link);
         }
-        // Row doesn't exist for onboarding_id, ob_configuration_id - create a new one
+        // Row doesn't exist for scoped_user_id, ob_configuration_id - create a new one
         let insight_event = insight_event.insert_with_conn(conn)?;
         let new_ob_link = NewOnboardingLink {
-            onboarding_id,
+            scoped_user_id,
             ob_configuration_id,
             start_timestamp: Utc::now(),
             status: Status::Processing,
@@ -135,8 +135,8 @@ impl OnboardingLink {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
-#[diesel(table_name = onboardings)]
-struct NewOnboarding {
+#[diesel(table_name = scoped_users)]
+struct NewScopedUser {
     user_vault_id: UserVaultId,
     tenant_id: TenantId,
     insight_event_id: InsightEventId,
@@ -144,46 +144,46 @@ struct NewOnboarding {
     is_live: bool,
 }
 
-impl Onboarding {
+impl ScopedUser {
     pub fn get_or_create(
         conn: &mut PgConnection,
         user_vault_id: UserVaultId,
         tenant_id: TenantId,
         insight_event: CreateInsightEvent,
         is_live: bool,
-    ) -> Result<Onboarding, DbError> {
-        let onboarding = onboardings::table
-            .filter(onboardings::user_vault_id.eq(&user_vault_id))
-            .filter(onboardings::tenant_id.eq(&tenant_id))
+    ) -> Result<ScopedUser, DbError> {
+        let scoped_user = scoped_users::table
+            .filter(scoped_users::user_vault_id.eq(&user_vault_id))
+            .filter(scoped_users::tenant_id.eq(&tenant_id))
             .first(conn)
             .optional()?;
-        if let Some(onboarding) = onboarding {
-            return Ok(onboarding);
+        if let Some(scoped_user) = scoped_user {
+            return Ok(scoped_user);
         }
         // Row doesn't exist for user_vault_id, tenant_id - create a new one
         let insight_event = insight_event.insert_with_conn(conn)?;
-        let new = NewOnboarding {
+        let new = NewScopedUser {
             user_vault_id,
             tenant_id,
             insight_event_id: insight_event.id,
             start_timestamp: Utc::now(),
             is_live,
         };
-        let ob = diesel::insert_into(onboardings::table)
+        let ob = diesel::insert_into(scoped_users::table)
             .values(new)
-            .get_result::<Onboarding>(conn)?;
+            .get_result::<ScopedUser>(conn)?;
         Ok(ob)
     }
 
-    /// get onboardings by a specific user vault
+    /// get scoped_users by a specific user vault
     pub fn list_for_user_vault(
         conn: &mut PgConnection,
         user_vault_id: &UserVaultId,
-    ) -> Result<Vec<(Onboarding, Tenant)>, DbError> {
+    ) -> Result<Vec<(ScopedUser, Tenant)>, DbError> {
         use crate::schema::tenants;
-        let results = onboardings::table
+        let results = scoped_users::table
             .inner_join(tenants::table)
-            .filter(onboardings::user_vault_id.eq(user_vault_id))
+            .filter(scoped_users::user_vault_id.eq(user_vault_id))
             .get_results(conn)?;
         Ok(results)
     }
@@ -192,12 +192,12 @@ impl Onboarding {
         pool: &DbPool,
         tenant_id: TenantId,
         user_vault_id: UserVaultId,
-    ) -> Result<Option<Onboarding>, DbError> {
+    ) -> Result<Option<ScopedUser>, DbError> {
         let ob = pool
-            .db_query(|conn| -> Result<Option<Onboarding>, DbError> {
-                let ob = onboardings::table
-                    .filter(onboardings::tenant_id.eq(tenant_id))
-                    .filter(onboardings::user_vault_id.eq(user_vault_id))
+            .db_query(|conn| -> Result<Option<ScopedUser>, DbError> {
+                let ob = scoped_users::table
+                    .filter(scoped_users::tenant_id.eq(tenant_id))
+                    .filter(scoped_users::user_vault_id.eq(user_vault_id))
                     .first(conn)
                     .optional()?;
                 Ok(ob)

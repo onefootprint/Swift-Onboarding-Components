@@ -1,4 +1,4 @@
-use crate::auth::get_onboarding_for_tenant;
+use crate::auth::get_scoped_user;
 use crate::auth::key_context::ob_public_key::PublicTenantAuthContext;
 use crate::auth::session_context::{HasUserVaultId, SessionContext};
 use crate::auth::session_data::user::onboarding::OnboardingSession;
@@ -13,7 +13,7 @@ use crate::State;
 use chrono::Duration;
 use db::models::audit_trails::AuditTrail;
 use db::models::insight_event::CreateInsightEvent;
-use db::models::onboardings::OnboardingLink;
+use db::models::scoped_users::OnboardingLink;
 use db::models::webauthn_credential::WebauthnCredential;
 use db::DbError;
 use itertools::Itertools;
@@ -43,7 +43,7 @@ fn handler(
     insights: InsightHeaders,
     state: web::Data<State>,
 ) -> actix_web::Result<Json<ApiResponseData<CommitResponse>>, ApiError> {
-    let onboarding = get_onboarding_for_tenant(&state.db_pool, &user_auth, &tenant_auth).await?;
+    let scoped_user = get_scoped_user(&state.db_pool, &user_auth, &tenant_auth).await?;
     let uv = user_auth.user_vault(&state.db_pool).await?;
 
     let uv_id = uv.id.clone();
@@ -55,7 +55,7 @@ fn handler(
     }
 
     // TODO kick off user verification with data vendors
-    let footprint_user_id = onboarding.user_ob_id.clone();
+    let footprint_user_id = scoped_user.fp_user_id.clone();
     let tenant_id = tenant_auth.tenant.id.clone();
     let session_sealing_key = state.session_sealing_key.clone();
     let (validation_token, webauthn_creds) = state
@@ -64,7 +64,7 @@ fn handler(
             let insight_event = CreateInsightEvent::from(insights);
             let ob_link = OnboardingLink::get_or_create(
                 conn,
-                onboarding.id.clone(),
+                scoped_user.id.clone(),
                 tenant_auth.ob_config.id.clone(),
                 insight_event,
             )?;
@@ -110,7 +110,7 @@ fn handler(
                 // TODO don't mark as verified until data verification with vendors is complete
                 ob_link.update_status(conn, Status::Verified)?;
             }
-            // create the session for this onboarding
+            // create the session for this scoped_user
             let validation_token = ServerSession::create_sync(
                 &session_sealing_key,
                 conn,

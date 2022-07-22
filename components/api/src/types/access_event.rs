@@ -21,13 +21,13 @@ impl From<AccessEventListItemForTenant> for ApiAccessEvent {
     fn from(evt: AccessEventListItemForTenant) -> Self {
         let AccessEventListItemForTenant {
             event,
-            onboarding,
+            scoped_user,
             insight,
         } = evt;
 
         ApiAccessEvent {
-            fp_user_id: onboarding.user_ob_id,
-            tenant_id: onboarding.tenant_id,
+            fp_user_id: scoped_user.fp_user_id,
+            tenant_id: scoped_user.tenant_id,
             data_kinds: event.data_kinds,
             reason: event.reason,
             principal: event.principal,
@@ -43,12 +43,12 @@ impl From<AccessEventListItemForUser> for ApiAccessEvent {
         let AccessEventListItemForUser {
             event,
             tenant_name,
-            onboarding,
+            scoped_user,
         } = evt;
 
         ApiAccessEvent {
-            fp_user_id: onboarding.user_ob_id,
-            tenant_id: onboarding.tenant_id,
+            fp_user_id: scoped_user.fp_user_id,
+            tenant_id: scoped_user.tenant_id,
             data_kinds: event.data_kinds,
             reason: event.reason,
             principal: Some(tenant_name), // we don't want to leak any principal, just the tenant name

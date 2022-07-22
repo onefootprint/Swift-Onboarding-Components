@@ -6,7 +6,7 @@ use crate::DbPool;
 use chrono::{DateTime, Utc};
 use diesel::{Insertable, Queryable};
 use newtypes::ObConfigurationSettings;
-use newtypes::OnboardingId;
+use newtypes::ScopedUserId;
 use newtypes::{DataKind, ObConfigurationId, ObConfigurationKey, TenantId};
 use serde::{Deserialize, Serialize};
 
@@ -55,15 +55,15 @@ impl NewObConfiguration {
 }
 
 impl ObConfiguration {
-    pub async fn list_for_onboarding(
+    pub async fn list_for_scoped_user(
         pool: &DbPool,
-        onboarding_id: OnboardingId,
+        scoped_user_id: ScopedUserId,
     ) -> Result<Vec<ObConfiguration>, crate::DbError> {
         let id = pool
             .db_query(move |conn| -> Result<Vec<ObConfiguration>, crate::DbError> {
                 let obcs = ob_configurations::table
                     .inner_join(onboarding_links::table)
-                    .filter(onboarding_links::onboarding_id.eq(onboarding_id))
+                    .filter(onboarding_links::scoped_user_id.eq(scoped_user_id))
                     // TODO filter on active onboarding_links
                     // https://linear.app/footprint/issue/FP-644/move-insight-event-id-status-onto-onboardinglink
                     .select(ob_configurations::all_columns)

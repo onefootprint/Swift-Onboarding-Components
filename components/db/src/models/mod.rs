@@ -2,7 +2,7 @@ pub mod access_events;
 pub mod audit_trails;
 pub mod insight_event;
 pub mod ob_configurations;
-pub mod onboardings;
+pub mod scoped_users;
 pub mod sessions;
 pub mod tenant_api_keys;
 pub mod tenants;

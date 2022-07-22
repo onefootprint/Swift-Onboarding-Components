@@ -9,7 +9,7 @@ use newtypes::{
 };
 use serde::{Deserialize, Serialize};
 
-use super::onboardings::Onboarding;
+use super::scoped_users::ScopedUser;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable, Identifiable)]
 #[diesel(table_name = user_vaults)]
@@ -37,15 +37,15 @@ impl UserVault {
         tenant_id: TenantId,
         footprint_user_id: FootprintUserId,
         is_live: bool,
-    ) -> Result<Option<(UserVault, Onboarding)>, DbError> {
-        use crate::schema::onboardings;
+    ) -> Result<Option<(UserVault, ScopedUser)>, DbError> {
+        use crate::schema::scoped_users;
         let result = pool
-            .db_query(move |conn| -> Result<Option<(UserVault, Onboarding)>, DbError> {
+            .db_query(move |conn| -> Result<Option<(UserVault, ScopedUser)>, DbError> {
                 let result = user_vaults::table
-                    .inner_join(onboardings::table)
-                    .filter(onboardings::tenant_id.eq(tenant_id))
-                    .filter(onboardings::user_ob_id.eq(footprint_user_id))
-                    .filter(onboardings::is_live.eq(is_live))
+                    .inner_join(scoped_users::table)
+                    .filter(scoped_users::tenant_id.eq(tenant_id))
+                    .filter(scoped_users::fp_user_id.eq(footprint_user_id))
+                    .filter(scoped_users::is_live.eq(is_live))
                     .first(conn)
                     .optional()?;
                 Ok(result)

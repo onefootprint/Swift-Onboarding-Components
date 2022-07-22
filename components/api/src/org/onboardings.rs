@@ -9,8 +9,8 @@ use crate::utils::querystring::deserialize_stringified_list;
 use crate::State;
 use crate::{auth::session_context::SessionContext, errors::ApiError};
 use chrono::{DateTime, Utc};
-use db::models::onboardings::OnboardingLink;
-use db::onboarding::OnboardingListQueryParams;
+use db::models::scoped_users::OnboardingLink;
+use db::scoped_users::OnboardingListQueryParams;
 use db::DbError;
 use newtypes::{DataKind, Fingerprint, Fingerprinter, FootprintUserId, PiiString, Status};
 use paperclip::actix::{api_v2_operation, get, web, web::Json, Apiv2Schema};
@@ -80,37 +80,41 @@ fn handler(
         timestamp_lte,
         timestamp_gte,
     };
-    let (onboardings, ob_links, user_to_kinds, count) = state
+    let (scoped_users, ob_links, user_to_kinds, count) = state
         .db_pool
         .db_query(move |conn| -> Result<_, DbError> {
-            let onboardings =
-                db::onboarding::list_for_tenant(conn, query_params.clone(), cursor, (page_size + 1) as i64)?;
+            let scoped_users = db::scoped_users::list_for_tenant(
+                conn,
+                query_params.clone(),
+                cursor,
+                (page_size + 1) as i64,
+            )?;
             // If no cursor is provided, we're on the first page, so we should return the total
             // count of results matching this query.
             let count = match cursor {
                 Some(_) => None,
-                None => Some(db::onboarding::count_for_tenant(conn, query_params)?),
+                None => Some(db::scoped_users::count_for_tenant(conn, query_params)?),
             };
-            let (onboarding_ids, user_vault_ids) = onboardings
+            let (scoped_user_ids, user_vault_ids) = scoped_users
                 .iter()
                 .map(|(ob, _)| (&ob.id, &ob.user_vault_id))
                 .unzip();
             let user_to_kinds = db::user_data::bulk_fetch_populated_kinds(conn, user_vault_ids)?;
-            let ob_links = OnboardingLink::get_for_onboardings(conn, onboarding_ids)?;
+            let ob_links = OnboardingLink::get_for_scoped_users(conn, scoped_user_ids)?;
 
-            Ok((onboardings, ob_links, user_to_kinds, count))
+            Ok((scoped_users, ob_links, user_to_kinds, count))
         })
         .await??;
 
     // If there are more than page_size results, we should tell the client there's another page
-    let cursor = if onboardings.len() > page_size {
-        onboardings.last().map(|(ob, _)| ob.ordering_id)
+    let cursor = if scoped_users.len() > page_size {
+        scoped_users.last().map(|(ob, _)| ob.ordering_id)
     } else {
         None
     };
 
     let empty_vec = vec![];
-    let onboardings = onboardings
+    let scoped_users = scoped_users
         .into_iter()
         .take(page_size)
         .map(|(ob, insight_event)| {
@@ -124,5 +128,5 @@ fn handler(
         .map(ApiOnboarding::from)
         .collect();
 
-    Ok(Json(ApiPaginatedResponseData::ok(onboardings, cursor, count)))
+    Ok(Json(ApiPaginatedResponseData::ok(scoped_users, cursor, count)))
 }

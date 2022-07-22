@@ -32,7 +32,7 @@ fn get(
     let creds = state
         .db_pool
         .db_query(move |conn| {
-            WebauthnCredential::get_for_onboarding(conn, &tenant.id, &request.footprint_user_id, is_live)
+            WebauthnCredential::get_for_scoped_user(conn, &tenant.id, &request.footprint_user_id, is_live)
         })
         .await??;
 

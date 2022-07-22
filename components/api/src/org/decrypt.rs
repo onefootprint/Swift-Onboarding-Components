@@ -38,7 +38,7 @@ fn handler(
 ) -> actix_web::Result<Json<ApiResponseData<UserDecryptResponse>>, ApiError> {
     let tenant = auth.tenant(&state.db_pool).await?;
     // look up tenant & user vault
-    let (vault, onboarding) = UserVault::get_for_tenant(
+    let (vault, scoped_user) = UserVault::get_for_tenant(
         &state.db_pool,
         tenant.id.clone(),
         request.footprint_user_id.clone(),
@@ -62,14 +62,14 @@ fn handler(
         &auth,
         &state,
         vault,
-        Some(&onboarding.id),
+        Some(&scoped_user.id),
         request.attributes.clone().into_iter().collect(),
     )
     .await?;
 
     // Create an AccessEvent log showing that the tenant accessed these fields
     NewAccessEvent {
-        onboarding_id: onboarding.id.clone(),
+        scoped_user_id: scoped_user.id.clone(),
         data_kinds: decrypted_data_kinds.clone(),
         reason: request.reason.clone(),
         principal: principal.clone(),

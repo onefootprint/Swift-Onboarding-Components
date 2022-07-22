@@ -1,7 +1,7 @@
 use chrono::{DateTime, Utc};
 use db::models::{
     insight_event::InsightEvent,
-    onboardings::{Onboarding, OnboardingLinkInfo},
+    scoped_users::{OnboardingLinkInfo, ScopedUser},
 };
 use newtypes::{DataKind, FootprintUserId};
 use paperclip::actix::Apiv2Schema;
@@ -18,17 +18,17 @@ pub struct ApiOnboarding {
     pub onboarding_links: Vec<ApiOnboardingLink>,
 }
 
-impl From<(Vec<DataKind>, &Vec<OnboardingLinkInfo>, Onboarding, InsightEvent)> for ApiOnboarding {
-    fn from(s: (Vec<DataKind>, &Vec<OnboardingLinkInfo>, Onboarding, InsightEvent)) -> Self {
-        let Onboarding {
-            user_ob_id,
+impl From<(Vec<DataKind>, &Vec<OnboardingLinkInfo>, ScopedUser, InsightEvent)> for ApiOnboarding {
+    fn from(s: (Vec<DataKind>, &Vec<OnboardingLinkInfo>, ScopedUser, InsightEvent)) -> Self {
+        let ScopedUser {
+            fp_user_id,
             start_timestamp,
             ordering_id,
             ..
         } = s.2;
         let ob_links = s.1;
         ApiOnboarding {
-            footprint_user_id: user_ob_id,
+            footprint_user_id: fp_user_id,
             populated_data_kinds: s.0,
             start_timestamp,
             ordering_id,

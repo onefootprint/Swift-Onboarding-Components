@@ -1,5 +1,5 @@
-use crate::auth::session_context::{HasUserVaultId, SessionContext};
 use crate::auth::key_context::ob_public_key::PublicTenantAuthContext;
+use crate::auth::session_context::{HasUserVaultId, SessionContext};
 use crate::auth::session_data::user::onboarding::OnboardingSession;
 use crate::errors::onboarding::OnboardingError;
 use crate::errors::ApiError;
@@ -8,7 +8,7 @@ use crate::utils::insight_headers::InsightHeaders;
 use crate::utils::user_vault_wrapper::UserVaultWrapper;
 use crate::State;
 use db::models::insight_event::CreateInsightEvent;
-use db::models::onboardings::Onboarding;
+use db::models::scoped_users::ScopedUser;
 use db::models::webauthn_credential::WebauthnCredential;
 use db::DbError;
 use newtypes::DataKind;
@@ -41,7 +41,7 @@ pub fn handler(
     let webauthn_creds = state
         .db_pool
         .db_transaction(move |conn| -> Result<_, DbError> {
-            Onboarding::get_or_create(
+            ScopedUser::get_or_create(
                 conn,
                 uv_id,
                 tenant_auth.tenant.id.clone(),

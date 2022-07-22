@@ -52,17 +52,17 @@ impl WebauthnCredential {
         Ok(creds)
     }
 
-    pub fn get_for_onboarding(
+    pub fn get_for_scoped_user(
         conn: &mut PgConnection,
         tenant_id: &TenantId,
         footprint_user_id: &FootprintUserId,
         is_live: bool,
     ) -> Result<Vec<(Self, InsightEvent)>, crate::DbError> {
-        let user_vault_ids = schema::onboardings::table
-            .filter(schema::onboardings::tenant_id.eq(tenant_id))
-            .filter(schema::onboardings::user_ob_id.eq(footprint_user_id))
-            .filter(schema::onboardings::is_live.eq(is_live))
-            .select(schema::onboardings::user_vault_id);
+        let user_vault_ids = schema::scoped_users::table
+            .filter(schema::scoped_users::tenant_id.eq(tenant_id))
+            .filter(schema::scoped_users::fp_user_id.eq(footprint_user_id))
+            .filter(schema::scoped_users::is_live.eq(is_live))
+            .select(schema::scoped_users::user_vault_id);
         let creds = schema::webauthn_credentials::table
             .inner_join(schema::insight_events::table)
             .filter(schema::webauthn_credentials::user_vault_id.eq_any(user_vault_ids))

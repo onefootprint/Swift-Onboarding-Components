@@ -4,7 +4,7 @@ table! {
 
     access_events (id) {
         id -> Uuid,
-        onboarding_id -> Text,
+        scoped_user_id -> Text,
         timestamp -> Timestamptz,
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
@@ -80,7 +80,7 @@ table! {
 
     onboarding_links (id) {
         id -> Uuid,
-        onboarding_id -> Text,
+        scoped_user_id -> Text,
         ob_configuration_id -> Text,
         start_timestamp -> Timestamptz,
         _created_at -> Timestamptz,
@@ -94,9 +94,9 @@ table! {
     use diesel::sql_types::*;
     use newtypes::db_types::*;
 
-    onboardings (id) {
+    scoped_users (id) {
         id -> Text,
-        user_ob_id -> Text,
+        fp_user_id -> Text,
         user_vault_id -> Text,
         tenant_id -> Text,
         _created_at -> Timestamptz,
@@ -196,7 +196,7 @@ table! {
 
     verification_requests (id) {
         id -> Uuid,
-        onboarding_id -> Text,
+        scoped_user_id -> Text,
         vendor -> Text,
         timestamp -> Timestamptz,
         _created_at -> Timestamptz,
@@ -249,19 +249,19 @@ table! {
 }
 
 joinable!(access_events -> insight_events (insight_event_id));
-joinable!(access_events -> onboardings (onboarding_id));
+joinable!(access_events -> scoped_users (scoped_user_id));
 joinable!(audit_trails -> tenants (tenant_id));
 joinable!(audit_trails -> user_vaults (user_vault_id));
 joinable!(ob_configurations -> tenants (tenant_id));
 joinable!(onboarding_links -> insight_events (insight_event_id));
 joinable!(onboarding_links -> ob_configurations (ob_configuration_id));
-joinable!(onboarding_links -> onboardings (onboarding_id));
-joinable!(onboardings -> insight_events (insight_event_id));
-joinable!(onboardings -> tenants (tenant_id));
-joinable!(onboardings -> user_vaults (user_vault_id));
+joinable!(onboarding_links -> scoped_users (scoped_user_id));
+joinable!(scoped_users -> insight_events (insight_event_id));
+joinable!(scoped_users -> tenants (tenant_id));
+joinable!(scoped_users -> user_vaults (user_vault_id));
 joinable!(tenant_api_keys -> tenants (tenant_id));
 joinable!(user_data -> user_vaults (user_vault_id));
-joinable!(verification_requests -> onboardings (onboarding_id));
+joinable!(verification_requests -> scoped_users (scoped_user_id));
 joinable!(verification_requests_user_data -> user_data (user_data_id));
 joinable!(verification_requests_user_data -> verification_requests (request_id));
 joinable!(verification_results -> verification_requests (request_id));
@@ -274,7 +274,7 @@ allow_tables_to_appear_in_same_query!(
     insight_events,
     ob_configurations,
     onboarding_links,
-    onboardings,
+    scoped_users,
     sessions,
     tenant_api_keys,
     tenants,

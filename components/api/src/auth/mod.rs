@@ -3,7 +3,7 @@ use self::{
     session_data::user::onboarding::OnboardingSession,
 };
 use crate::errors::{onboarding::OnboardingError, ApiError};
-use db::models::onboardings::Onboarding;
+use db::models::scoped_users::ScopedUser;
 use thiserror::Error;
 
 pub mod either;
@@ -48,19 +48,19 @@ pub enum AuthError {
 
 /// For endpoints that take both a user_auth and tenant_auth, this helps to assert that the authenticated user
 /// has been onboarded to the provided tenant by fetching the Onboarding for this (user, tenant) pair.
-pub async fn get_onboarding_for_tenant(
+pub async fn get_scoped_user(
     db_pool: &db::DbPool,
     user_auth: &SessionContext<OnboardingSession>,
     tenant_auth: &PublicTenantAuthContext,
-) -> Result<Onboarding, ApiError> {
-    let onboarding = Onboarding::get_for_tenant(
+) -> Result<ScopedUser, ApiError> {
+    let scoped_user = ScopedUser::get_for_tenant(
         db_pool,
         tenant_auth.tenant.id.clone(),
         user_auth.data.user_vault_id.clone(),
     )
     .await?
     .ok_or(OnboardingError::OnboardingForTenantDoesNotExist)?;
-    Ok(onboarding)
+    Ok(scoped_user)
 }
 
 /// A helper trait to extract whether the auth session is for sandbox or production data

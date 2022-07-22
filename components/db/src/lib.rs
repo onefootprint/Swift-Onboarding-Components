@@ -19,7 +19,7 @@ use deadpool_diesel::postgres::{Manager, Pool, Runtime};
 pub use diesel::prelude::PgConnection;
 use diesel::prelude::*;
 use diesel_migrations::EmbeddedMigrations;
-use models::onboardings::Onboarding;
+use models::scoped_users::ScopedUser;
 use newtypes::{DataKind, Fingerprint};
 use user_vault::get_by_fingerprint;
 
@@ -156,26 +156,26 @@ pub async fn private_cleanup_integration_tests(
                 diesel::delete(schema::user_data::table.filter(schema::user_data::user_vault_id.eq(&uv.id)))
                     .execute(conn)?;
 
-            // grab onboardings, delete access events and onboarding_links
-            let obs: Vec<Onboarding> = schema::onboardings::table
-                .filter(schema::onboardings::user_vault_id.eq(&uv.id))
+            // grab scoped_users, delete access events and onboarding_links
+            let obs: Vec<ScopedUser> = schema::scoped_users::table
+                .filter(schema::scoped_users::user_vault_id.eq(&uv.id))
                 .get_results(conn)?;
             for ob in obs {
                 deleted_rows += diesel::delete(
-                    schema::access_events::table.filter(schema::access_events::onboarding_id.eq(&ob.id)),
+                    schema::access_events::table.filter(schema::access_events::scoped_user_id.eq(&ob.id)),
                 )
                 .execute(conn)?;
 
                 deleted_rows += diesel::delete(
                     schema::onboarding_links::table
-                        .filter(schema::onboarding_links::onboarding_id.eq(&ob.id)),
+                        .filter(schema::onboarding_links::scoped_user_id.eq(&ob.id)),
                 )
                 .execute(conn)?;
             }
 
-            // delete onboardings
+            // delete scoped_users
             deleted_rows += diesel::delete(
-                schema::onboardings::table.filter(schema::onboardings::user_vault_id.eq(&uv.id)),
+                schema::scoped_users::table.filter(schema::scoped_users::user_vault_id.eq(&uv.id)),
             )
             .execute(conn)?;
 
@@ -203,7 +203,7 @@ pub async fn private_cleanup_integration_tests(
 }
 
 pub mod access_event;
-pub mod onboarding;
+pub mod scoped_users;
 pub mod session;
 pub mod tenant;
 

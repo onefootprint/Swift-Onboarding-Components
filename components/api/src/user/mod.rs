@@ -6,7 +6,7 @@ use crate::{
 use crypto::seal::EciesP256Sha256AesGcmSealed;
 use db::models::{ob_configurations::ObConfiguration, user_vaults::UserVault};
 use enclave_proxy::{DataTransform, DecryptRequest};
-use newtypes::{DataKind, OnboardingId, PiiString, SealedVaultBytes};
+use newtypes::{DataKind, PiiString, ScopedUserId, SealedVaultBytes};
 use paperclip::actix::web;
 use std::collections::{HashMap, HashSet};
 
@@ -41,14 +41,15 @@ pub async fn decrypt<C: HasVaultPermission>(
     session: &C,
     state: &web::Data<State>,
     user_vault: UserVault,
-    onboarding_id: Option<&OnboardingId>,
+    scoped_user_id: Option<&ScopedUserId>,
     data_kinds: Vec<DataKind>,
 ) -> Result<DecryptFieldsResult, ApiError> {
     if !session.can_decrypt(&data_kinds) {
         return Err(AuthError::UnauthorizedOperation.into());
     }
-    if let Some(onboarding_id) = onboarding_id {
-        let ob_configs = ObConfiguration::list_for_onboarding(&state.db_pool, onboarding_id.clone()).await?;
+    if let Some(scoped_user_id) = scoped_user_id {
+        let ob_configs =
+            ObConfiguration::list_for_scoped_user(&state.db_pool, scoped_user_id.clone()).await?;
         let data_to_access_kinds: HashSet<_> = data_kinds.iter().map(|x| x.to_owned()).collect();
         let can_access_kinds: HashSet<_> = ob_configs
             .into_iter()

@@ -34,9 +34,9 @@ define_newtype_id!(TenantApiKeyId, String, "Primary Key for an api key");
 define_newtype_id!(UserDataId, String, "Identifier for a User Data");
 define_newtype_id!(UserVaultId, String, "Identifier for a User Vault");
 
-define_newtype_id!(OnboardingId, String, "Identifier for an Onboarding");
+define_newtype_id!(ScopedUserId, String, "Identifier for an ScopedUser");
 define_newtype_id!(OnboardingLinkId, Uuid, "Identifier for an OnboardingLink");
-define_newtype_id!(FootprintUserId, String, "Identifier for a an onboarding");
+define_newtype_id!(FootprintUserId, String, "Identifier for a ScopedUser");
 define_newtype_id!(
     DataGroupId,
     Uuid,
