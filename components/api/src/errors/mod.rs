@@ -16,7 +16,7 @@ use crate::types::error::{ApiResponseError, ApiResponseErrorInfo};
 #[allow(clippy::large_enum_variant)]
 #[derive(Debug, Error)]
 pub enum ApiError {
-    #[error("auth error: {0}")]
+    #[error("Auth error: {0}")]
     AuthError(#[from] crate::auth::AuthError),
     #[error("kms error: {0}")]
     KmsError(#[from] kms::KmsSignError),

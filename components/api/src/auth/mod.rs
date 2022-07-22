@@ -32,7 +32,7 @@ pub enum AuthError {
     InvalidTenantKeyOrUserId,
     #[error("incorrect session type auth")]
     SessionTypeError,
-    #[error("no session found")]
+    #[error("Session expired or does not exist")]
     NoSessionFound,
     #[error("missing header: {0}")]
     MissingHeader(String),
