@@ -1,6 +1,7 @@
 use crate::auth::session_context::HasUserVaultId;
 use crate::auth::session_context::SessionContext;
 use crate::auth::session_data::user::my_fp::My1fpBasicSession;
+use crate::errors::challenge::ChallengeError;
 use crate::errors::ApiError;
 use crate::types::success::ApiResponseData;
 use crate::types::Empty;
@@ -28,7 +29,9 @@ async fn post(
         .db_pool
         .db_query(move |conn| UserData::get(conn, &request.id, &auth.user_vault_id()))
         .await??;
-    // TODO make sure the user data isn't verified
+    if user_data.is_verified {
+        return Err(ChallengeError::EmailAlreadyVerified.into());
+    }
     let email = crate::enclave::decrypt_bytes(
         &state,
         &user_data.e_data,
