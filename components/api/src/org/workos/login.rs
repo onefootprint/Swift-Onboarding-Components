@@ -38,7 +38,7 @@ struct DashboardAuthorizationResponse {
 
 /// Called from the front-end with the WorkOS code. Returns
 /// the authorization token needed for future requests as well as user information
-#[api_v2_operation(tags(Private, WorkOS))]
+#[api_v2_operation(tags(WorkOS))]
 #[post("/login")]
 async fn handler(
     state: web::Data<State>,

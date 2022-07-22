@@ -15,7 +15,7 @@ struct RedirectUrl {
     redirect_url: String,
 }
 
-#[api_v2_operation(tags(Private, WorkOS))]
+#[api_v2_operation(tags(WorkOS))]
 #[get("/google_oauth")]
 /// Request to authenticate via Google OAuth. We will have to manually add domains to our
 /// service.
