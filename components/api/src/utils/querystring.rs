@@ -9,7 +9,7 @@ where
     D: serde::Deserializer<'de>,
     I: de::DeserializeOwned,
 {
-    let s: Option<&str> = serde::Deserialize::deserialize(deserializer)?;
+    let s: Option<String> = serde::Deserialize::deserialize(deserializer)?;
     let s = if let Some(s) = s {
         s
     } else {

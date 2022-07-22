@@ -64,10 +64,7 @@ class TestDashboard:
 
         # Test filtering on kinds. We provide two different kinds, and we should get all access events
         # that contain at least one of these fields
-        # https://linear.app/footprint/issue/FP-641/fix-test-for-access-events-querystring
-        # TODO we should be able to pass this as a dict. I think the server is expecting the
-        # querystring to not be urlencoded
-        params = f"footprint_user_id={user.fp_user_id}&data_kinds=email,street_address"
+        params = dict(footprint_user_id=user.fp_user_id, data_kinds=",".join(["email", "street_address"]))
         body = get("org/access_events", params, tenant.sk)
         access_events = body["data"]
         assert len(access_events) == 2
