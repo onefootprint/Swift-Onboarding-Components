@@ -41,10 +41,10 @@ export default class MyDocument extends Document {
       <Html>
         <Head>
           <LoadFonts />
-          <meta
+          {/* <meta
             name="apple-itunes-app"
             content="app-id=1632436468, app-clip-bundle-id=com.onefootprint.my.live, app-clip-display=card"
-          />
+          /> */}
         </Head>
         <body>
           <Main />
