@@ -65,19 +65,25 @@ export const LinkButtonStyled = styled.a.attrs<{
 }>(({ href }) => ({
   as: href ? 'a' : 'button',
 }))<LinkButtonStyleProps>`
-  ${({ theme, size }) => css`
+  ${({ theme, size, href }) => css`
     ${createFontStyles(fontSize[size])};
     align-items: center;
     background: transparent;
     border: none;
     color: ${theme.color.accent};
     cursor: pointer;
-    display: flex;
+    display: inline-flex;
     margin: 0;
     padding: 0;
+    text-decoration: none;
 
     &:hover {
       opacity: 0.7;
+
+      ${href &&
+      css`
+        text-decoration: underline;
+      `};
     }
 
     &:active {

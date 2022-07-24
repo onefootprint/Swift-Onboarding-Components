@@ -1,14 +1,16 @@
+import IcoArrowRightSmall24 from 'icons/ico/ico-arrow-right-small-24';
 import IcoLinkedin24 from 'icons/ico/ico-linkedin-24';
 import IcoTwitter24 from 'icons/ico/ico-twitter-24';
 import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react';
 import styled, { css } from 'styled-components';
-import { media, Typography } from 'ui';
+import { LinkButton, media, Typography } from 'ui';
 
 type TeamProps = {
   title: string;
   description: string;
+  cta: string;
   items: {
     avatarSrc: string;
     linkedin?: string;
@@ -18,14 +20,21 @@ type TeamProps = {
   }[];
 };
 
-const Team = ({ title, description, items }: TeamProps) => (
+const Team = ({ title, cta, description, items }: TeamProps) => (
   <>
     <Typography variant="display-3" as="h3" sx={{ marginBottom: 5 }}>
       {title}
     </Typography>
-    <Typography variant="body-1" sx={{ marginBottom: 10 }}>
+    <Typography variant="body-1" sx={{ marginBottom: 7 }}>
       {description}
     </Typography>
+    <LinkButton
+      href="https://onefootprint.notion.site/Join-us-at-Footprint-29e1b0de675840c39e79e9ffd587ca3c"
+      iconComponent={IcoArrowRightSmall24}
+      target="_blank"
+    >
+      {cta}
+    </LinkButton>
     <ItemsContainer>
       {items.map(item => (
         <Item key={item.name}>
@@ -39,7 +48,6 @@ const Team = ({ title, description, items }: TeamProps) => (
               priority
             />
           </AvatarContainer>
-
           <Typography variant="heading-3">{item.name}</Typography>
           <Typography variant="body-1" sx={{ marginBottom: 7 }}>
             {item.role}
@@ -69,8 +77,9 @@ const Team = ({ title, description, items }: TeamProps) => (
 const ItemsContainer = styled.ul`
   ${({ theme }) => css`
     display: grid;
-    grid-template-columns: repeat(1, 1fr);
     gap: ${theme.spacing[10]}px;
+    grid-template-columns: repeat(1, 1fr);
+    margin-top: ${theme.spacing[10]}px;
     text-align: center;
 
     ${media.greaterThan('md')`

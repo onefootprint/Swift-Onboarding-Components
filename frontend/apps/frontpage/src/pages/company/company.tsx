@@ -127,9 +127,10 @@ const Company = () => {
         </ValuesContainer>
         <TeamContainer>
           <Team
-            title={t('team.title')}
+            cta={t('team.cta')}
             description={t('team.description')}
             items={team}
+            title={t('team.title')}
           />
         </TeamContainer>
       </Container>
