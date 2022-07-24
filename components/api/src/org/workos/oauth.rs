@@ -1,8 +1,9 @@
 use crate::errors::workos_login::WorkOsLoginError;
+use crate::errors::ApiError;
 use crate::State;
-use crate::{errors::ApiError, types::success::ApiResponseData};
-use actix_web::web::Json;
-use paperclip::actix::{api_v2_operation, get, web, Apiv2Schema};
+use actix_web::HttpResponseBuilder;
+use paperclip::actix::{api_v2_operation, get, web, web::HttpResponse, Apiv2Schema};
+use reqwest::redirect;
 use workos::sso::{ClientId, ConnectionSelector, GetAuthorizationUrl, GetAuthorizationUrlParams, Provider};
 
 #[derive(serde::Serialize, Apiv2Schema)]
@@ -17,12 +18,11 @@ struct RedirectUrl {
 
 #[api_v2_operation(tags(WorkOS))]
 #[get("/google_oauth")]
-/// Request to authenticate via Google OAuth. We will have to manually add domains to our
-/// service.
-fn handler(
+/// Request to authenticate via Google OAuth
+async fn handler(
     state: web::Data<State>,
     redirect_url: web::Query<RedirectUrl>,
-) -> actix_web::Result<Json<ApiResponseData<GoogleOauthResponse>>, ApiError> {
+) -> actix_web::Result<HttpResponse, ApiError> {
     let redirect_url = &redirect_url.redirect_url;
 
     let authorization_url = &state
@@ -36,9 +36,18 @@ fn handler(
         })
         .map_err(WorkOsLoginError::AuthorizationUrlError)?;
 
-    Ok(Json(ApiResponseData {
-        data: GoogleOauthResponse {
-            redirect_url: authorization_url.to_string(),
-        },
-    }))
+    // get the redirect from workos
+    let client = reqwest::ClientBuilder::new()
+        .redirect(redirect::Policy::none())
+        .build()?;
+
+    let response = client.get(authorization_url.to_string()).send().await?;
+
+    // forward the response back to the client
+    let mut builder = HttpResponseBuilder::new(response.status());
+    for header in response.headers() {
+        builder.insert_header(header);
+    }
+    let response = builder.body(response.bytes().await?);
+    Ok(response)
 }
