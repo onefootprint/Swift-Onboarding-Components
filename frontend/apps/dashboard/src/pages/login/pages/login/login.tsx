@@ -4,30 +4,20 @@ import styled, { css } from 'styled-components';
 import { Button, GoogleButton, LinkButton, Typography } from 'ui';
 
 import LogoAndText from '../../components/logo-and-text';
-import useLoginGoogle, { GoogleLoginResponse } from './hooks/use-login-google';
 
 const Login = () => {
   const router = useRouter();
-  const loginGoogle = useLoginGoogle();
-
   const handleGoggleButtonClick = () => {
-    loginGoogle.mutate(undefined, {
-      onSuccess({ redirectUrl }: GoogleLoginResponse) {
-        window.location.href = redirectUrl;
-      },
-    });
+    const redirect = `${window.location.origin}/auth`;
+    const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/org/auth/google_oauth?redirect_url=${redirect}`;
+    window.location.href = url;
   };
 
   return (
     <Container>
       <LogoAndText text="Sign up or Log in" />
       <Inner>
-        <GoogleButton
-          fullWidth
-          type="submit"
-          onClick={handleGoggleButtonClick}
-          loading={loginGoogle.isLoading}
-        >
+        <GoogleButton fullWidth type="submit" onClick={handleGoggleButtonClick}>
           Continue with Google
         </GoogleButton>
         <Button
