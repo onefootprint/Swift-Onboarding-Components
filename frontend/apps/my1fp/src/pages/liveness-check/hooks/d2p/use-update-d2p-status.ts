@@ -1,6 +1,6 @@
 import { useMutation } from 'react-query';
 import request, { RequestError, RequestResponse } from 'request';
-import { MY1FP_D2P_SCOPED_AUTH_HEADER } from 'src/config/constants';
+import { MY1FP_BIOMETRIC_SCOPED_AUTH_HEADER } from 'src/config/constants';
 
 export enum D2PStatusUpdate {
   inProgress = 'in_progress',
@@ -20,7 +20,7 @@ const updateD2PStatus = async (payload: UpdateD2PStatusRequest) => {
     url: '/onboarding/d2p/status',
     data: payload,
     headers: {
-      [MY1FP_D2P_SCOPED_AUTH_HEADER]: payload.authToken,
+      [MY1FP_BIOMETRIC_SCOPED_AUTH_HEADER]: payload.authToken,
     },
   });
   return response.data;

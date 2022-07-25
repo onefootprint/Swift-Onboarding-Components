@@ -1,10 +1,10 @@
-import { MY1FP_D2P_BASE_URL } from 'src/config/constants';
+import { BIOMETRIC_BASE_URL } from 'global-constants';
 
 const createBiometricUrl = (scopedAuthToken: string, deviceType?: string) => {
   if (deviceType) {
-    return `${MY1FP_D2P_BASE_URL}?opener=${deviceType}#${scopedAuthToken}`;
+    return `${BIOMETRIC_BASE_URL}?opener=${deviceType}#${scopedAuthToken}`;
   }
-  return `${MY1FP_D2P_BASE_URL}#${scopedAuthToken}`;
+  return `${BIOMETRIC_BASE_URL}#${scopedAuthToken}`;
 };
 
 export default createBiometricUrl;

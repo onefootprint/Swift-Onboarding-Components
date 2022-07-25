@@ -46,7 +46,7 @@ to enforce more constraints on WebAuthn, each app has its own port:
 | Demo                          | 3002 |
 | Frontpage                     | 3003 |
 | My One Footprint              | 3004 |
-| D2P Mobile                    | 3005 |
+| Biometric                     | 3005 |
 | Email Verification            | 3006 |
 | UI Docs - Storybook           | 3007 |
 | Footprint UI Docs - Storybook | 3007 |

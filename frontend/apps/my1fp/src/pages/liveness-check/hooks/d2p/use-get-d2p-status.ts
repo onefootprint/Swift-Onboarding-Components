@@ -1,7 +1,7 @@
 import { useQuery } from 'react-query';
 import request, { RequestError, RequestResponse } from 'request';
 
-import { MY1FP_D2P_SCOPED_AUTH_HEADER } from '../../../../config/constants';
+import { MY1FP_BIOMETRIC_SCOPED_AUTH_HEADER } from '../../../../config/constants';
 import useLivenessCheckMachine from '../use-liveness-check-machine';
 
 const D2P_STATUS_FETCH_INTERVAL = 1000;
@@ -27,7 +27,7 @@ const getD2PStatus = async (payload: GetD2PRequest) => {
     method: 'GET',
     url: '/onboarding/d2p/status',
     headers: {
-      [MY1FP_D2P_SCOPED_AUTH_HEADER]: payload.scopedAuthToken,
+      [MY1FP_BIOMETRIC_SCOPED_AUTH_HEADER]: payload.scopedAuthToken,
     },
   });
   return response.data;
