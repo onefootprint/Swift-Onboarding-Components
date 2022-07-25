@@ -53,12 +53,6 @@ pub enum DataKind {
 crate::util::impl_enum_str_diesel!(DataKind);
 
 impl DataKind {
-    /// Returns true if a user vault is allowed to have more than one active piece of data for this
-    /// kind.
-    pub fn allow_multiple(&self) -> bool {
-        matches!(self, DataKind::PhoneNumber | DataKind::Email)
-    }
-
     /// Returns true if we store a fingerprint of this value to allow exact match searching.
     pub fn allows_fingerprint(&self) -> bool {
         matches!(
