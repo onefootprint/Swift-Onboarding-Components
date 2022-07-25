@@ -8,7 +8,7 @@ export type IdentifyRequest = {
     email?: string;
     phoneNumber?: string;
   };
-  identifyType?: IdentifyType;
+  identifyType: IdentifyType;
   preferredChallengeKind: ChallengeKind;
 };
 

@@ -58,6 +58,7 @@ const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
           src: context =>
             createIdentifyMachine({
               device: { ...context.device },
+              identifyType: context.identifyType,
             }),
           onDone: [
             {

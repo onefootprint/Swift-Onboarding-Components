@@ -1,4 +1,5 @@
 import { DeviceInfo } from 'footprint-ui/src/hooks/use-device-info/use-device-info.types';
+import { IdentifyType } from 'src/utils/state-machine/types';
 import { assign, createMachine } from 'xstate';
 
 import {
@@ -11,16 +12,18 @@ import {
 } from './types';
 
 export type IdentifyMachineArgs = {
+  identifyType: IdentifyType;
   device: DeviceInfo;
 };
 
-const createIdentifyMachine = ({ device }: IdentifyMachineArgs) =>
+const createIdentifyMachine = ({ identifyType, device }: IdentifyMachineArgs) =>
   createMachine<MachineContext, MachineEvents>(
     {
       id: 'identify',
       initial: States.emailIdentification,
       context: {
         device,
+        identifyType,
       },
       states: {
         [States.emailIdentification]: {

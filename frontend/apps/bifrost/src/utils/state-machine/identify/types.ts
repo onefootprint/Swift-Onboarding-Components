@@ -1,4 +1,5 @@
 import { DeviceInfo } from 'footprint-ui/src/hooks/use-device-info/use-device-info.types';
+import { IdentifyType } from 'src/utils/state-machine/types';
 
 export enum States {
   emailIdentification = 'emailIdentification',
@@ -28,6 +29,7 @@ export type MachineContext = {
   challengeData?: ChallengeData;
   phone?: string;
   authToken?: string;
+  identifyType: IdentifyType;
 };
 
 export enum Events {
