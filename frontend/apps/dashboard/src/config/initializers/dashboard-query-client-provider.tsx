@@ -1,7 +1,7 @@
 import { useRouter } from 'next/router';
 import React from 'react';
 import { QueryClient, QueryClientProvider } from 'react-query';
-import { isFootprintError } from 'request';
+import { isFootprintError, isLogoutError } from 'request';
 import useSessionUser from 'src/hooks/use-session-user';
 import { useToast } from 'ui/src/components/toast/toast-provider';
 
@@ -22,7 +22,7 @@ const DashboardQueryClientProvider = ({
     // @ts-ignore
     if (isFootprintError(error) && error.response) {
       // @ts-ignore
-      if (error.response.status === 401) {
+      if (isLogoutError(error)) {
         // If we receive an HTTP 401, assume the auth token has expired and we should prompt to re-log in
         // TODO one day, check that this is a 401 from an expired token
         show(
