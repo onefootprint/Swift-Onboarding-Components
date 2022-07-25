@@ -4,12 +4,13 @@ import IcoEmail24 from 'icons/ico/ico-email-24';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import NavigationHeader from 'src/components/navigation-header';
-import useIdentify from 'src/hooks/identify/use-identify';
-import useIdentifyChallenge from 'src/hooks/identify/use-identify-challenge';
-import useBifrostMachine, { Events } from 'src/hooks/use-bifrost-machine';
-import { ChallengeKind } from 'src/utils/state-machine/types';
+import useIdentify from 'src/pages/identify/hooks/use-identify';
+import useIdentifyChallenge from 'src/pages/identify/hooks/use-identify-challenge';
+import { ChallengeKind, Events } from 'src/utils/state-machine/identify/types';
 import styled, { css } from 'styled-components';
 import { Box, Button, LinkButton, PhoneInput, Typography } from 'ui';
+
+import useIdentifyMachine from '../../hooks/use-identify-machine';
 
 type FormData = {
   phone: string;
@@ -17,7 +18,7 @@ type FormData = {
 
 const PhoneRegistration = () => {
   const showRequestErrorToast = useRequestErrorToast();
-  const [state, send] = useBifrostMachine();
+  const [state, send] = useIdentifyMachine();
   const { t } = useTranslation('pages.phone-registration');
   const {
     setValue,
@@ -32,17 +33,15 @@ const PhoneRegistration = () => {
     send({ type: Events.emailChangeRequested });
   };
 
-  const sendSmsChallenge = (phoneNumber: string, userFound: boolean) => {
+  const getNewPhoneChallenge = (phone: string, userFound: boolean) => {
     identifyChallengeMutation.mutate(
-      {
-        phoneNumber,
-      },
+      { phoneNumber: phone },
       {
         onSuccess({ challengeToken }) {
           send({
-            type: Events.userIdentifiedByPhone,
+            type: Events.phoneIdentificationCompleted,
             payload: {
-              phone: phoneNumber,
+              phone,
               userFound,
               challengeData: {
                 challengeKind: ChallengeKind.sms,
@@ -68,11 +67,12 @@ const PhoneRegistration = () => {
       },
       {
         onSuccess({ userFound, challengeData }) {
-          // userFound=true when we found an account associated with this phone
-          // even though we didn't recognize the email in the email-identification page
-          if (userFound && challengeData) {
+          // Need to manually initiate a challenge for this unrecognized number
+          if (!userFound || !challengeData) {
+            getNewPhoneChallenge(phone, userFound);
+          } else {
             send({
-              type: Events.userIdentifiedByPhone,
+              type: Events.phoneIdentificationCompleted,
               payload: {
                 phone,
                 userFound,
@@ -80,7 +80,6 @@ const PhoneRegistration = () => {
               },
             });
           }
-          sendSmsChallenge(phone, userFound);
         },
         onError: showRequestErrorToast,
       },

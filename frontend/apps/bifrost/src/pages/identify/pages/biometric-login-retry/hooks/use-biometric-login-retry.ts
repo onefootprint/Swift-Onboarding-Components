@@ -1,17 +1,22 @@
-import useIdentify, { IdentifyResponse } from 'src/hooks/identify/use-identify';
-import useBifrostMachine, { Events } from 'src/hooks/use-bifrost-machine';
+import useIdentify, {
+  IdentifyResponse,
+} from 'src/pages/identify/hooks/use-identify';
 import useIdentityVerification, {
   IdentifyVerificationResponse,
-} from 'src/hooks/use-identify-verification';
-import useOnboarding from 'src/hooks/use-onboarding';
+} from 'src/pages/identify/hooks/use-identity-verification';
 import generateLoginDeviceResponse from 'src/utils/biometric/login-challenge-response';
-import { ChallengeData, ChallengeKind } from 'src/utils/state-machine/types';
+import {
+  ChallengeData,
+  ChallengeKind,
+  Events,
+} from 'src/utils/state-machine/identify/types';
+
+import useIdentifyMachine from '../../../hooks/use-identify-machine';
 
 const useBiometricLoginRetry = () => {
-  const [state, send] = useBifrostMachine();
+  const [state, send] = useIdentifyMachine();
   const identifyMutation = useIdentify();
   const identityVerificationMutation = useIdentityVerification();
-  const onboardingMutation = useOnboarding();
 
   const requestBiometricChallenge = () => {
     identifyMutation.mutate(
@@ -47,27 +52,6 @@ const useBiometricLoginRetry = () => {
     );
   };
 
-  const startOnboarding = (authToken: string) => {
-    const tenantPk = state.context.tenant.pk;
-    onboardingMutation.mutate(
-      { authToken, tenantPk },
-      {
-        onSuccess({ missingAttributes, missingWebauthnCredentials }) {
-          send({
-            type: Events.biometricLoginSucceeded,
-            payload: {
-              authToken,
-              email: state.context.email,
-              userFound: true,
-              missingAttributes,
-              missingWebauthnCredentials,
-            },
-          });
-        },
-      },
-    );
-  };
-
   const handleBiometricChallenge = async (challengeData: ChallengeData) => {
     const { biometricChallengeJson, challengeToken } = challengeData;
     // TODO: log this error if we din't get a biometricChallengeJson
@@ -86,7 +70,12 @@ const useBiometricLoginRetry = () => {
       },
       {
         onSuccess: ({ authToken }: IdentifyVerificationResponse) => {
-          startOnboarding(authToken);
+          send({
+            type: Events.biometricLoginSucceeded,
+            payload: {
+              authToken,
+            },
+          });
         },
       },
     );

@@ -1,13 +1,14 @@
 import { useRequestErrorToast, useTranslation } from 'hooks';
 import React from 'react';
-import useIdentifyChallenge from 'src/hooks/identify/use-identify-challenge';
-import useBifrostMachine, { Events } from 'src/hooks/use-bifrost-machine';
+import useUserData from 'src/hooks/use-user-data';
+import useIdentifyChallenge from 'src/pages/identify/hooks/use-identify-challenge';
+import { ChallengeKind, Events } from 'src/utils/state-machine/identify/types';
+import { LinkButton, LoadingIndicator, PinInput, useToast } from 'ui';
+
+import useIdentifyMachine from '../../../../hooks/use-identify-machine';
 import useIdentifyVerification, {
   IdentifyVerificationResponse,
-} from 'src/hooks/use-identify-verification';
-import useUserData from 'src/hooks/use-user-data';
-import { ChallengeKind } from 'src/utils/state-machine/types';
-import { LinkButton, LoadingIndicator, PinInput, useToast } from 'ui';
+} from '../../../../hooks/use-identity-verification';
 
 const SUCCESS_EVENT_DELAY_MS = 1500;
 
@@ -24,7 +25,7 @@ const PhoneVerificationPinForm = ({
   const showRequestErrorToast = useRequestErrorToast();
   const { t } = useTranslation('pages.phone-verification.form');
 
-  const [state, send] = useBifrostMachine();
+  const [state, send] = useIdentifyMachine();
   const identifyChallengeMutation = useIdentifyChallenge();
   const identifyVerificationMutation = useIdentifyVerification();
   const userDataMutation = useUserData();
@@ -56,11 +57,11 @@ const PhoneVerificationPinForm = ({
   };
 
   const handlePinCompleted = (pin: string) => {
-    const { challenge } = state.context;
-    if (!challenge) {
+    const { challengeData } = state.context;
+    if (!challengeData) {
       return;
     }
-    const { challengeToken, challengeKind } = challenge;
+    const { challengeToken, challengeKind } = challengeData;
     identifyVerificationMutation.mutate(
       {
         challengeKind,

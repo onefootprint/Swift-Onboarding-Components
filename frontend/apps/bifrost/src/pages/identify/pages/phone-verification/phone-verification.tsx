@@ -2,7 +2,6 @@ import { HeaderTitle } from 'footprint-ui';
 import { useTranslation } from 'hooks';
 import React from 'react';
 import NavigationHeader from 'src/components/navigation-header';
-import useBifrostMachine, { Events } from 'src/hooks/use-bifrost-machine';
 import styled, { css } from 'styled-components';
 import { Box } from 'ui';
 import {
@@ -10,25 +9,27 @@ import {
   getNumberByCountryValue,
 } from 'ui/src/components/phone-input/phone-input.utils';
 
+import { Events } from '../../../../utils/state-machine/identify/types';
+import useIdentifyMachine from '../../hooks/use-identify-machine';
 import PhoneVerificationLoading from './components/phone-verification-loading';
 import PhoneVerificationPinForm from './components/phone-verification-pin-form';
 import PhoneVerificationSuccess from './components/phone-verification-success';
 
 const PhoneVerification = () => {
   const { t } = useTranslation('pages.phone-verification');
-  const [state, send] = useBifrostMachine();
+  const [state, send] = useIdentifyMachine();
 
   let phoneCountryCode = '';
-  if (state.context.challenge?.phoneCountry) {
+  if (state.context.challengeData?.phoneCountry) {
     phoneCountryCode = getNumberByCountryValue(
-      state.context.challenge?.phoneCountry,
+      state.context.challengeData?.phoneCountry,
     );
   } else if (state.context.phone) {
     const phoneCountryVal = getCountryByNumber(state.context.phone).value;
     phoneCountryCode = getNumberByCountryValue(phoneCountryVal);
   }
   const phoneNumberLastTwo =
-    state.context.challenge?.phoneNumberLastTwo ??
+    state.context.challengeData?.phoneNumberLastTwo ??
     state.context.phone?.slice(-2);
 
   return (

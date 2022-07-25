@@ -72,23 +72,10 @@ export enum IdentifyType {
   my1fp = 'my1fp',
 }
 
-export enum ChallengeKind {
-  sms = 'sms',
-  biometric = 'biometric',
-}
-
 export enum UserKind {
   userInherited = 'user_inherited',
   userCreated = 'user_created',
 }
-
-export type ChallengeData = {
-  challengeToken: string;
-  challengeKind: ChallengeKind;
-  phoneNumberLastTwo?: string;
-  phoneCountry?: string;
-  biometricChallengeJson?: string;
-};
 
 export type OnboardingData = {
   missingWebauthnCredentials: boolean;

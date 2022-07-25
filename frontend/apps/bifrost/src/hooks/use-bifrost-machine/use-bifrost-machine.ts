@@ -1,3 +1,3 @@
-import { useBifrostMachine } from '../../components/machine-provider';
+import { useBifrostMachine } from '../../components/bifrost-machine-provider';
 
 export default useBifrostMachine;

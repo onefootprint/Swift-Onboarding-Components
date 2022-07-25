@@ -8,7 +8,7 @@ import IcoFileText24 from 'icons/ico/ico-file-text-24';
 import IcoPhone24 from 'icons/ico/ico-phone-24';
 import IcoUserCircle24 from 'icons/ico/ico-user-circle-24';
 import React from 'react';
-import { useBifrostMachine } from 'src/components/machine-provider';
+import { useBifrostMachine } from 'src/components/bifrost-machine-provider';
 import NavigationHeader from 'src/components/navigation-header';
 import { Events } from 'src/hooks/use-bifrost-machine';
 import useOnboardingComplete from 'src/hooks/use-onboarding-complete';

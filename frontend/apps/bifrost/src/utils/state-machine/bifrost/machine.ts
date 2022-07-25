@@ -1,6 +1,7 @@
-import { ChallengeKind, IdentifyType } from 'src/utils/state-machine/types';
+import { IdentifyType } from 'src/utils/state-machine/types';
 import { assign, createMachine } from 'xstate';
 
+import createIdentifyMachine from '../identify';
 import createOnboardingMachine from '../onboarding';
 import { Actions, BifrostContext, BifrostEvent, Events, States } from './types';
 
@@ -10,7 +11,6 @@ const initialContext: BifrostContext = {
   phone: undefined,
   authToken: undefined,
   userFound: false,
-  challenge: undefined,
   device: {
     type: 'mobile',
     hasSupportForWebAuthn: false,
@@ -40,11 +40,11 @@ const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
             actions: [Actions.assignDeviceInfo],
           },
           [Events.authenticationFlowStarted]: {
-            target: States.emailIdentification,
+            target: States.identify,
             actions: [Actions.assignIdentifyType],
           },
           [Events.tenantInfoRequestSucceeded]: {
-            target: States.emailIdentification,
+            target: States.identify,
             actions: [Actions.assignTenantInfo],
           },
           [Events.tenantInfoRequestFailed]: {
@@ -52,156 +52,32 @@ const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
           },
         },
       },
-      [States.emailIdentification]: {
-        on: {
-          [Events.userIdentifiedByEmail]: {
-            description: 'SMS challenge was initiated for the existing user',
-            target: States.phoneVerification,
-            actions: [
-              Actions.assignEmail,
-              Actions.assignUserFound,
-              Actions.assignChallenge,
-            ],
-            cond: (context, event) => {
-              const { userFound, challengeData } = event.payload;
-              return (
-                userFound && challengeData?.challengeKind === ChallengeKind.sms
-              );
-            },
-          },
-          [Events.userNotIdentified]: {
-            description: "Didn't find an account associated with this email",
-            target: States.phoneRegistration,
-            actions: [
-              Actions.assignEmail,
-              Actions.assignPhone,
-              Actions.assignUserFound,
-            ],
-          },
-          [Events.biometricLoginSucceeded]: [
+      [States.identify]: {
+        invoke: {
+          id: 'identify',
+          src: context =>
+            createIdentifyMachine({
+              device: { ...context.device },
+            }),
+          onDone: [
             {
               target: States.authenticationSuccess,
-              actions: [Actions.assignAuthToken],
-              cond: context => context.identifyType === IdentifyType.my1fp,
-            },
-            {
-              target: States.onboarding,
               actions: [
                 Actions.assignAuthToken,
                 Actions.assignEmail,
+                Actions.assignPhone,
                 Actions.assignUserFound,
-                Actions.assignMissingAttributes,
-                Actions.assignMissingWebauthnCredentials,
               ],
-              cond: (context, event) =>
-                event.payload.missingAttributes.length > 0 ||
-                !event.payload.userFound,
-            },
-            {
-              target: States.confirmAndAuthorize,
-              actions: [
-                Actions.assignAuthToken,
-                Actions.assignEmail,
-                Actions.assignUserFound,
-                Actions.assignMissingAttributes,
-                Actions.assignMissingWebauthnCredentials,
-              ],
-            },
-          ],
-          [Events.biometricLoginFailed]: {
-            target: States.biometricLoginRetry,
-            actions: [Actions.assignEmail, Actions.assignUserFound],
-          },
-        },
-      },
-      [States.biometricLoginRetry]: {
-        on: {
-          [Events.biometricLoginSucceeded]: [
-            {
-              target: States.authenticationSuccess,
-              actions: [Actions.assignAuthToken],
-              cond: context => context.identifyType === IdentifyType.my1fp,
-            },
-            {
-              target: States.onboarding,
-              actions: [
-                Actions.assignAuthToken,
-                Actions.assignEmail,
-                Actions.assignUserFound,
-                Actions.assignMissingAttributes,
-                Actions.assignMissingWebauthnCredentials,
-              ],
-              cond: (context, event) =>
-                event.payload.missingAttributes.length > 0 ||
-                !event.payload.userFound,
-            },
-            {
-              target: States.confirmAndAuthorize,
-              actions: [
-                Actions.assignAuthToken,
-                Actions.assignEmail,
-                Actions.assignUserFound,
-                Actions.assignMissingAttributes,
-                Actions.assignMissingWebauthnCredentials,
-              ],
-            },
-          ],
-          [Events.smsChallengeInitiated]: {
-            target: States.phoneVerification,
-            actions: [Actions.assignChallenge],
-          },
-        },
-      },
-      [States.confirmAndAuthorize]: {
-        on: {
-          [Events.sharedDataConfirmed]: {
-            target: States.verificationSuccess,
-          },
-        },
-      },
-      [States.phoneRegistration]: {
-        on: {
-          [Events.emailChangeRequested]: {
-            target: States.emailIdentification,
-            actions: [Actions.resetContext],
-          },
-          [Events.userIdentifiedByPhone]: {
-            description:
-              'Phone is associated with an existing user, even though the previously typed email was not',
-            target: States.phoneVerification,
-            actions: [
-              Actions.assignPhone,
-              Actions.assignUserFound,
-              Actions.assignChallenge,
-            ],
-          },
-        },
-      },
-      [States.phoneVerification]: {
-        on: {
-          [Events.navigatedToPrevPage]: [
-            {
-              target: States.phoneRegistration,
-              cond: context => !context.userFound || !!context.phone,
-            },
-            {
-              target: States.emailIdentification,
-            },
-          ],
-          [Events.smsChallengeResent]: [
-            {
-              actions: [Actions.assignChallenge],
-            },
-          ],
-          [Events.smsChallengeSucceeded]: [
-            {
-              target: States.authenticationSuccess,
-              actions: [Actions.assignAuthToken],
               cond: context => context.identifyType === IdentifyType.my1fp,
             },
             {
               target: States.onboardingVerification,
-              actions: [Actions.assignAuthToken],
+              actions: [
+                Actions.assignAuthToken,
+                Actions.assignEmail,
+                Actions.assignPhone,
+                Actions.assignUserFound,
+              ],
             },
           ],
         },
@@ -210,21 +86,30 @@ const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
         on: {
           [Events.onboardingVerificationSucceeded]: [
             {
+              target: States.onboarding,
               actions: [
                 Actions.assignMissingAttributes,
                 Actions.assignMissingWebauthnCredentials,
               ],
-              target: States.onboarding,
+
               cond: (context, event) =>
                 !context.userFound ||
                 event.payload.missingAttributes.length > 0,
+            },
+            {
+              target: States.confirmAndAuthorize,
+              actions: [
+                Actions.assignMissingAttributes,
+                Actions.assignMissingWebauthnCredentials,
+              ],
+              cond: context => context.tenant.canAccessDataKinds.length > 0,
             },
             {
               actions: [
                 Actions.assignMissingAttributes,
                 Actions.assignMissingWebauthnCredentials,
               ],
-              target: States.confirmAndAuthorize,
+              target: States.verificationSuccess,
             },
           ],
         },
@@ -241,8 +126,23 @@ const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
               tenant: context.tenant,
             }),
           onDone: {
-            target: States.onboardingSuccess,
+            target: States.confirmAndAuthorize,
           },
+        },
+      },
+      [States.confirmAndAuthorize]: {
+        on: {
+          [Events.sharedDataConfirmed]: [
+            {
+              target: States.verificationSuccess,
+              cond: context =>
+                context.userFound &&
+                context.onboarding.missingAttributes.length === 0,
+            },
+            {
+              target: States.onboardingSuccess,
+            },
+          ],
         },
       },
       [States.tenantInvalid]: {
@@ -268,59 +168,27 @@ const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
         return context;
       }),
       [Actions.assignEmail]: assign((context, event) => {
-        if (
-          (event.type === Events.userIdentifiedByEmail ||
-            event.type === Events.userNotIdentified ||
-            event.type === Events.biometricLoginFailed ||
-            event.type === Events.biometricLoginSucceeded) &&
-          event.payload.email
-        ) {
-          context.email = event.payload.email;
-          context.onboarding.data.email = event.payload.email;
+        if (event.type === Events.identifyCompleted && event.data.email) {
+          context.email = event.data.email;
+          context.onboarding.data.email = event.data.email;
         }
         return context;
       }),
       [Actions.assignPhone]: assign((context, event) => {
-        if (
-          (event.type === Events.userIdentifiedByPhone ||
-            event.type === Events.userNotIdentified) &&
-          event.payload.phone
-        ) {
-          context.phone = event.payload.phone;
+        if (event.type === Events.identifyCompleted && event.data.phone) {
+          context.phone = event.data.phone;
         }
         return context;
       }),
-      [Actions.resetContext]: assign(context => {
-        context.email = '';
-        context.phone = undefined;
-        context.userFound = false;
-        context.authToken = undefined;
-        context.challenge = undefined;
-        context.onboarding = {
-          data: {},
-          missingAttributes: [],
-          missingWebauthnCredentials: true,
-        };
-        return context;
-      }),
       [Actions.assignUserFound]: assign((context, event) => {
-        if (
-          event.type === Events.userIdentifiedByPhone ||
-          event.type === Events.userIdentifiedByEmail ||
-          event.type === Events.userNotIdentified ||
-          event.type === Events.biometricLoginFailed ||
-          event.type === Events.biometricLoginSucceeded
-        ) {
-          context.userFound = event.payload.userFound;
+        if (event.type === Events.identifyCompleted) {
+          context.userFound = event.data.userFound;
         }
         return context;
       }),
       [Actions.assignAuthToken]: assign((context, event) => {
-        if (
-          event.type === Events.smsChallengeSucceeded ||
-          event.type === Events.biometricLoginSucceeded
-        ) {
-          context.authToken = event.payload.authToken;
+        if (event.type === Events.identifyCompleted) {
+          context.authToken = event.data.authToken;
         }
         return context;
       }),
@@ -344,22 +212,8 @@ const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
         }
         return context;
       }),
-      [Actions.assignChallenge]: assign((context, event) => {
-        if (
-          event.type === Events.userIdentifiedByEmail ||
-          event.type === Events.userIdentifiedByPhone ||
-          event.type === Events.smsChallengeInitiated ||
-          event.type === Events.smsChallengeResent
-        ) {
-          context.challenge = event.payload.challengeData;
-        }
-        return context;
-      }),
       [Actions.assignMissingAttributes]: assign((context, event) => {
-        if (
-          event.type === Events.onboardingVerificationSucceeded ||
-          event.type === Events.biometricLoginSucceeded
-        ) {
+        if (event.type === Events.onboardingVerificationSucceeded) {
           context.onboarding.missingAttributes = [
             ...event.payload.missingAttributes,
           ];
@@ -367,10 +221,7 @@ const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
         return context;
       }),
       [Actions.assignMissingWebauthnCredentials]: assign((context, event) => {
-        if (
-          event.type === Events.onboardingVerificationSucceeded ||
-          event.type === Events.biometricLoginSucceeded
-        ) {
+        if (event.type === Events.onboardingVerificationSucceeded) {
           context.onboarding.missingWebauthnCredentials =
             event.payload.missingWebauthnCredentials;
         }

@@ -9,10 +9,15 @@ import { LoadingIndicator, Typography } from 'ui';
 const OnboardingVerification = () => {
   const { t } = useTranslation('pages.registration.onboarding-verification');
   const [state, send] = useBifrostMachine();
-  const { context } = state;
   const onboardingMutation = useOnboarding();
+  const { context } = state;
+  const { authToken } = context;
+  const tenantPk = context.tenant.pk;
 
-  const startOnboarding = (authToken: string, tenantPk: string) => {
+  useEffect(() => {
+    if (!authToken || !tenantPk) {
+      return;
+    }
     onboardingMutation.mutate(
       { authToken, tenantPk },
       {
@@ -27,20 +32,10 @@ const OnboardingVerification = () => {
         },
       },
     );
-  };
-
-  useEffect(() => {
-    if (context.authToken && context.tenant.pk) {
-      startOnboarding(context.authToken, context.tenant.pk);
-    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [context.authToken, context.tenant.pk]);
+  }, [authToken, tenantPk]);
 
-  if (!context.tenant.pk || !context.authToken) {
-    return <div />;
-  }
-
-  if (onboardingMutation.isError) {
+  if (!context.tenant.pk || !context.authToken || onboardingMutation.isError) {
     return (
       <Container>
         <TitleContainer>
