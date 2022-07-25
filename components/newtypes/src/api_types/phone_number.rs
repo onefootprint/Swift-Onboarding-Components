@@ -39,7 +39,7 @@ impl FromStr for PhoneNumber {
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let (number, suffix) = if s.contains('#') {
             let split = s.split('#').collect::<Vec<&str>>();
-            if split.len() != 2 || !split[1].chars().all(|x| x.is_alphanumeric()) {
+            if split.len() != 2 || split[1].is_empty() || !split[1].chars().all(|x| x.is_alphanumeric()) {
                 return Err(crate::PhoneError::InvalidSandboxNumber.into());
             }
             (split[0], split[1])

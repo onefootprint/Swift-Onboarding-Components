@@ -18,6 +18,7 @@ struct PublicOnboardingConfigResponse {
     must_collect_data_kinds: Vec<DataKind>,
     can_access_data_kinds: Vec<DataKind>,
     settings: ObConfigurationSettings,
+    is_live: bool,
 }
 
 #[api_v2_operation(tags(Org))]
@@ -37,6 +38,7 @@ fn get(
             must_collect_data_kinds: ob_config.must_collect_data_kinds.clone(),
             can_access_data_kinds: ob_config.can_access_data_kinds,
             settings: ob_config.settings,
+            is_live: ob_config.is_live,
         },
     }))
 }
