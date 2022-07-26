@@ -5,6 +5,7 @@ use newtypes::{SealedSessionBytes, SessionAuthToken};
 
 use crate::{
     auth::session_data::{ServerSession, SessionData},
+    errors::ApiError,
     State,
 };
 
@@ -59,5 +60,21 @@ impl AuthSession {
         let sealed_session_data = server_session.seal(session_sealing_key)?;
         Session::update_or_create(conn, token.id(), sealed_session_data.0, expires_at)?;
         Ok(token)
+    }
+
+    pub async fn update(
+        state: &State,
+        auth_token: &SessionAuthToken,
+        new_data: SessionData,
+        expires_at: DateTime<Utc>,
+    ) -> Result<(), ApiError> {
+        let session = ServerSession::new(new_data, expires_at);
+        let sealed = session.seal(&state.session_sealing_key)?;
+        let key = auth_token.id();
+        state
+            .db_pool
+            .db_query(move |conn| Session::update_or_create(conn, key, sealed.0, expires_at))
+            .await??;
+        Ok(())
     }
 }

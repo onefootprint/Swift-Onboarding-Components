@@ -139,6 +139,15 @@ where
     }
 }
 
+impl<C> SessionContext<C> {
+    /// updates the session data and produces a sealed session data
+    /// to update in the db
+    pub async fn update_session_data(&self, state: &State, new_data: SessionData) -> Result<(), ApiError> {
+        AuthSession::update(state, &self.auth_token, new_data, self.expires_at).await?;
+        Ok(())
+    }
+}
+
 impl<C> IsLive for SessionContext<C>
 where
     C: SupportsIsLiveHeader + HasTenant,

@@ -1,17 +1,12 @@
 use chrono::{DateTime, Utc};
 use crypto::sha256;
 use db::{models::sessions::Session, DbError, PgConnection};
-use newtypes::{Base64Data, D2pSessionStatus};
+use newtypes::Base64Data;
 use serde::{de::DeserializeOwned, Serialize};
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct RateLimitRecord {
     pub sent_at: DateTime<Utc>,
-}
-
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
-pub struct HandoffRecord {
-    pub status: D2pSessionStatus,
 }
 
 pub struct JsonSession<C>
@@ -22,24 +17,17 @@ where
     pub data: C,
 }
 
-pub struct JsonSessionKey(String);
-
-impl<S> From<S> for JsonSessionKey
-where
-    S: AsRef<str>,
-{
-    fn from(s: S) -> Self {
-        let s = s.as_ref();
-        Self(Base64Data(sha256(format!("json_sesson:{s}").as_bytes()).to_vec()).to_string())
-    }
-}
-
 impl<C> JsonSession<C>
 where
     C: Serialize + DeserializeOwned,
 {
-    pub fn get<S: Into<JsonSessionKey>>(conn: &mut PgConnection, key: S) -> Result<Option<Self>, DbError> {
-        let session = Session::get(conn, key.into().0)?;
+    fn key(key: &str) -> String {
+        Base64Data(sha256(format!("json_sesson:{key}").as_bytes()).to_vec()).to_string()
+    }
+
+    pub fn get(conn: &mut PgConnection, key: &str) -> Result<Option<Self>, DbError> {
+        let key = Self::key(key);
+        let session = Session::get(conn, key)?;
         let session = if let Some(session) = session {
             Some(Self {
                 expires_at: session.expires_at,
@@ -51,14 +39,15 @@ where
         Ok(session)
     }
 
-    pub fn update_or_create<S: Into<JsonSessionKey>>(
+    pub fn update_or_create(
         conn: &mut PgConnection,
-        key: S,
+        key: &str,
         data: &C,
         expires_at: DateTime<Utc>,
     ) -> Result<(), DbError> {
+        let key = Self::key(key);
         let data = serde_json::to_vec(data)?;
-        Session::update_or_create(conn, key.into().0, data, expires_at)?;
+        Session::update_or_create(conn, key, data, expires_at)?;
         Ok(())
     }
 }
