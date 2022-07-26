@@ -4,6 +4,8 @@ export * from './address-input';
 export { default as AddressInput } from './address-input';
 export * from './badge';
 export { default as Badge } from './badge';
+export * from './banner';
+export { default as Banner } from './banner';
 export * from './box';
 export { default as Box } from './box';
 export * from './button';
