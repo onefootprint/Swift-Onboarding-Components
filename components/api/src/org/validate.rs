@@ -45,7 +45,7 @@ pub fn validate(
         return Err(OnboardingError::ValidateTokenInvalidOrNotFound.into());
     };
 
-    let (ob, scoped_user) = Onboarding::get_by_id(&state.db_pool, ob_id)
+    let (ob, scoped_user) = Onboarding::get(&state.db_pool, ob_id)
         .await?
         .ok_or(OnboardingError::NoOnboarding)?;
     if scoped_user.tenant_id != auth.tenant().id {

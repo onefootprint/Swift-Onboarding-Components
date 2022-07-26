@@ -85,6 +85,7 @@ class TestBifrost:
         body = post("onboarding", None, workos_tenant.pk, auth_token)
         assert set(body["data"]["missing_attributes"]) == {"first_name", "last_name", "dob", "ssn", "street_address", "city", "state", "zip", "country", "email"}
         assert body["data"]["missing_webauthn_credentials"] == True
+        assert not body["data"]["validation_token"]
 
     def test_user_data(self, auth_token):
         data = {
@@ -189,7 +190,13 @@ class TestBifrost:
         body = post("onboarding", None, workos_tenant.pk, auth_token)
         assert not body["data"]["missing_attributes"]
         assert not body["data"]["missing_webauthn_credentials"]
+        validation_token = body["data"]["validation_token"]
+        data = dict(validation_token=validation_token)
+        body = post("org/validate", data, workos_tenant.sk)
+        assert body["data"]["footprint_user_id"]
 
+        # We won't ever actually hit onboarding/complete if the tenant has already onboarded,
+        # but if we do, we should no-op and succeed
         body = post("onboarding/complete", None, workos_tenant.pk, auth_token)
         validation_token = body["data"]["validation_token"]
         data = dict(validation_token=validation_token)

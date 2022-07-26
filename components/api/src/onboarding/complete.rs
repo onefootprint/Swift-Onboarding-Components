@@ -1,16 +1,12 @@
 use crate::auth::key_context::ob_public_key::PublicTenantAuthContext;
 use crate::auth::session_context::{HasUserVaultId, SessionContext};
 use crate::auth::session_data::user::onboarding::OnboardingSession;
-use crate::auth::session_data::validate_user::ValidateUserToken;
-use crate::auth::session_data::SessionData;
 use crate::errors::onboarding::OnboardingError;
 use crate::errors::ApiError;
 use crate::types::success::ApiResponseData;
 use crate::utils::insight_headers::InsightHeaders;
-use crate::utils::session::AuthSession;
 use crate::utils::user_vault_wrapper::UserVaultWrapper;
 use crate::State;
-use chrono::Duration;
 use db::models::audit_trails::AuditTrail;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::onboardings::Onboarding;
@@ -56,7 +52,7 @@ fn handler(
 
     // TODO kick off user verification with data vendors
     let tenant_id = tenant_auth.tenant.id.clone();
-    let session_sealing_key = state.session_sealing_key.clone();
+    let session_key = state.session_sealing_key.clone();
     let (scoped_user, validation_token, webauthn_creds) = state
         .db_pool
         .db_transaction(move |conn| -> Result<_, DbError> {
@@ -115,13 +111,7 @@ fn handler(
                 // TODO don't mark as verified until data verification with vendors is complete
                 ob.update_status(conn, Status::Verified)?;
             }
-            // create the session for this scoped_user
-            let validation_token = AuthSession::create_sync(
-                conn,
-                &session_sealing_key,
-                SessionData::ValidateUserToken(ValidateUserToken { ob_id: ob.id }),
-                Duration::minutes(15),
-            )?;
+            let validation_token = super::create_onboarding_validation_token(conn, &session_key, ob.id)?;
             let webauthn_creds = WebauthnCredential::get_for_user_vault(conn, &uv_id)?;
             Ok((scoped_user, validation_token, webauthn_creds))
         })

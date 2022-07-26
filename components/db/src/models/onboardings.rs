@@ -8,7 +8,7 @@ use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
 use itertools::Itertools;
-use newtypes::{InsightEventId, ObConfigurationId, OnboardingId, ScopedUserId, Status};
+use newtypes::{InsightEventId, ObConfigurationId, OnboardingId, ScopedUserId, Status, UserVaultId};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
@@ -38,10 +38,7 @@ struct NewOnboarding {
 pub type OnboardingInfo = (Onboarding, ObConfiguration, InsightEvent);
 
 impl Onboarding {
-    pub async fn get_by_id(
-        pool: &DbPool,
-        id: OnboardingId,
-    ) -> Result<Option<(Onboarding, ScopedUser)>, DbError> {
+    pub async fn get(pool: &DbPool, id: OnboardingId) -> Result<Option<(Onboarding, ScopedUser)>, DbError> {
         let ob = pool
             .db_query(|conn| -> Result<Option<(Onboarding, ScopedUser)>, DbError> {
                 let ob = onboardings::table
@@ -76,6 +73,21 @@ impl Onboarding {
             .map(|g| (g.0, g.1.collect()))
             .collect();
         Ok(result)
+    }
+
+    pub fn get_by_config(
+        conn: &mut PgConnection,
+        user_vault_id: &UserVaultId,
+        ob_configuration_id: &ObConfigurationId,
+    ) -> Result<Option<Onboarding>, DbError> {
+        let onboarding = onboardings::table
+            .inner_join(scoped_users::table)
+            .filter(scoped_users::user_vault_id.eq(user_vault_id))
+            .filter(onboardings::ob_configuration_id.eq(ob_configuration_id))
+            .select(onboardings::all_columns)
+            .first(conn)
+            .optional()?;
+        Ok(onboarding)
     }
 
     pub fn get_or_create(
