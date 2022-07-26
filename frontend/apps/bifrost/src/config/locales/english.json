@@ -181,16 +181,14 @@
       }
     },
     "verification-success": {
-      "title": "You're all set! 😎",
-      "subtitle": "Identity successfully verified.",
+      "title": "You're all set! 🎉",
+      "description": "Your identity has been successfully verified.",
       "cta": "Return to site"
     },
     "onboarding-success": {
-      "title": "You're all set! 😎",
-      "subtitle": "Identity successfully verified.",
-      "cta": "Return to site",
+      "title": "You're verified!  🎉",
       "body": {
-        "view-on-my-footprint": "You can view your personal data and the companies that have access to it on my.footprint.com.",
+        "view-on-my-footprint": "You can view your personal data and the companies that have access to it on",
         "one-click": "Next time, you can just sign in using Footprint with one-click!"
       }
     }

@@ -21,6 +21,8 @@
     "hooks": "*",
     "icons": "*",
     "qrcode.react": "^3.0.2",
+    "react-confetti": "^6.1.0",
+    "react-use": "^17.4.0",
     "request": "*",
     "themes": "*",
     "ui": "*",

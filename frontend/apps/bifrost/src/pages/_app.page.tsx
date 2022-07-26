@@ -35,7 +35,7 @@ const App = ({ Component, pageProps }: AppProps) => (
         <DesignSystemProvider theme={themes.light}>
           <GlobalStyle />
           <FootprintProvider>
-            <Content>
+            <Content id="content">
               <NavigationHeader id="navigation-header-portal" />
               <Component {...pageProps} />
             </Content>
@@ -71,6 +71,7 @@ const GlobalStyle = createGlobalStyle`
       height: 100vh;
       max-width: 480px;
       margin: 0 auto;
+      position: relative;
 
       ${media.greaterThan('md')`
         background-color: unset;

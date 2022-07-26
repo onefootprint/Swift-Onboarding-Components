@@ -1,47 +1,56 @@
-import { useFootprintJs } from 'footprint-provider';
-import { HeaderTitle } from 'footprint-ui';
+import { MY1FP_URL } from 'global-constants';
 import { useTranslation } from 'hooks';
+import IcoCheckCircle40 from 'icons/ico/ico-check-circle-40';
 import React from 'react';
+import Confetti from 'react-confetti';
 import NavigationHeader from 'src/components/navigation-header';
-import styled, { css } from 'styled-components';
-import { LinkButton, Typography } from 'ui';
+import useConfettiState from 'src/hooks/use-confetti-state';
+import styled from 'styled-components';
+import { Box, LinkButton, Typography } from 'ui';
 
 const OnboardingSuccess = () => {
   const { t } = useTranslation('pages.onboarding-success');
-  const footprint = useFootprintJs();
-
-  const handleClose = () => {
-    footprint.close();
-  };
+  const { running, width, height } = useConfettiState();
 
   return (
     <>
+      <Confetti
+        height={height}
+        numberOfPieces={50}
+        recycle={running}
+        width={width}
+      />
       <NavigationHeader
         button={{
           variant: 'close',
         }}
       />
       <Container>
-        <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
-        <Typography variant="body-2">
-          {t('body.view-on-my-footprint')}
+        <Box sx={{ marginBottom: 3 }}>
+          <IcoCheckCircle40 color="success" />
+        </Box>
+        <Typography variant="heading-3" sx={{ marginBottom: 7 }}>
+          {t('title')}
         </Typography>
-        <Typography variant="body-2">{t('body.one-click')}</Typography>
-        <LinkButton onClick={handleClose}>{t('cta')}</LinkButton>
+        <Typography variant="body-2" sx={{ marginBottom: 7 }} color="secondary">
+          {t('body.view-on-my-footprint')}&nbsp;
+          <LinkButton href={MY1FP_URL} target="_blank">
+            my.onefootprint.com
+          </LinkButton>
+        </Typography>
+        <Typography variant="body-2" color="secondary">
+          {t('body.one-click')}
+        </Typography>
       </Container>
     </>
   );
 };
 
 const Container = styled.div`
-  ${({ theme }) => css`
-    align-items: center;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    row-gap: ${theme.spacing[8]}px;
-    text-align: center;
-  `}
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  text-align: center;
 `;
 
 export default OnboardingSuccess;
