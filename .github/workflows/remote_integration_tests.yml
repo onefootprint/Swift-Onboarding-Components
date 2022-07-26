@@ -59,7 +59,9 @@ jobs:
 
       - name: Integration testing
         working-directory: ci
-        run: pytest tests/ --emoji 2>&1 | tee integration_test_output.txt
+        run: |
+          set -o pipefail
+          pytest tests/ --emoji 2>&1 | tee integration_test_output.txt
 
       - name: Comment markdown on PR
         if: ${{ inputs.isPR && (success() || failure()) }}
