@@ -87,6 +87,9 @@ class TestBifrost:
         assert body["data"]["missing_webauthn_credentials"] == True
         assert not body["data"]["validation_token"]
 
+        # Shouldn't be able to complete the onboarding until user data is provided
+        post("onboarding/complete", None, workos_tenant.pk, auth_token, status_code=400)
+
     def test_user_data(self, auth_token):
         data = {
             "name": {
