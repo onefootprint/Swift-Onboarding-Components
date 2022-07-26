@@ -1,7 +1,8 @@
 use crate::auth::session_data::user::d2p::D2pSession;
-use crate::auth::session_data::SessionData;
+use crate::errors::handoff::HandoffError;
 use crate::types::success::ApiResponseData;
 use crate::types::Empty;
+use crate::utils::session::{HandoffRecord, JsonSession};
 use crate::State;
 use crate::{auth::session_context::SessionContext, errors::ApiError};
 use newtypes::D2pSessionStatus;
@@ -15,12 +16,18 @@ pub struct StatusResponse {
 #[api_v2_operation(tags(D2p))]
 #[get("status")]
 /// Gets the status of the provided d2p session. Requires the d2p session token as the auth header.
-pub fn get(
+pub async fn get(
+    state: web::Data<State>,
     user_auth: SessionContext<D2pSession>,
 ) -> actix_web::Result<Json<ApiResponseData<StatusResponse>>, ApiError> {
+    let session = &state
+        .db_pool
+        .db_query(move |conn| JsonSession::<HandoffRecord>::get(conn, &user_auth.auth_token))
+        .await??
+        .ok_or(HandoffError::HandoffSessionNotFound)?;
     Ok(Json(ApiResponseData {
         data: StatusResponse {
-            status: user_auth.data.status,
+            status: session.data.status,
         },
     }))
 }
@@ -39,19 +46,19 @@ pub fn post(
     state: web::Data<State>,
 ) -> actix_web::Result<Json<ApiResponseData<Empty>>, ApiError> {
     let UpdateStatusRequest { status } = request.into_inner();
-    if status.priority() <= user_auth.data.status.priority() {
-        return Err(ApiError::InvalidStatusTransition);
-    }
-
-    user_auth
-        .update_session_data(
-            &state,
-            SessionData::D2p(D2pSession {
-                user_vault_id: user_auth.data.user_vault_id.clone(),
-                status,
-            }),
-        )
-        .await?;
+    state
+        .db_pool
+        .db_query(move |conn| -> Result<_, HandoffError> {
+            let session = JsonSession::<HandoffRecord>::get(conn, &user_auth.auth_token)?
+                .ok_or(HandoffError::HandoffSessionNotFound)?;
+            if status.priority() <= session.data.status.priority() {
+                return Err(HandoffError::InvalidStatusTransition);
+            }
+            let handoff_record = HandoffRecord { status };
+            JsonSession::update_or_create(conn, &user_auth.auth_token, &handoff_record, session.expires_at)?;
+            Ok(())
+        })
+        .await??;
 
     Ok(Json(ApiResponseData { data: Empty }))
 }

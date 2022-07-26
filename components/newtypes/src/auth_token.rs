@@ -40,3 +40,9 @@ impl SessionAuthToken {
         crypto::hex::encode(sha256(self.0.as_bytes()))
     }
 }
+
+impl AsRef<str> for SessionAuthToken {
+    fn as_ref(&self) -> &str {
+        &self.0
+    }
+}

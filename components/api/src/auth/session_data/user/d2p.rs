@@ -42,7 +42,7 @@ impl HasUserVaultId for D2pSession {
 
 impl HasVaultPermission for D2pSession {
     fn has_permission(&self, permission: VaultPermission) -> bool {
-        matches!(self.status, D2pSessionStatus::InProgress)
-            && matches!(permission, VaultPermission::AddBiometrics)
+        // TODO only allow in-progress d2p session to add vault credential
+        matches!(permission, VaultPermission::AddBiometrics)
     }
 }
