@@ -7,13 +7,14 @@ use webauthn_rs_core::error::WebauthnError;
 use workos::WorkOsError;
 pub mod challenge;
 pub mod enclave;
+pub mod handoff;
 pub mod kms;
 pub mod onboarding;
 pub mod workos_login;
 
 use crate::types::error::{ApiResponseError, ApiResponseErrorInfo};
 
-use self::challenge::ChallengeError;
+use self::{challenge::ChallengeError, handoff::HandoffError};
 
 #[allow(clippy::large_enum_variant)]
 #[derive(Debug, Error)]
@@ -24,6 +25,8 @@ pub enum ApiError {
     KmsError(#[from] kms::KmsSignError),
     #[error("onboarding error: {0}")]
     OnboardingError(#[from] onboarding::OnboardingError),
+    #[error("handoff error: {0}")]
+    HandoffError(#[from] HandoffError),
     #[error("challenge error: {0}")]
     ChallengeError(#[from] ChallengeError),
     #[error("crypto error: {0}")]
@@ -44,8 +47,6 @@ pub enum ApiError {
     NoPhoneNumberForVault,
     #[error("not implemented")]
     NotImplemented,
-    #[error("cannot transition status backwards")]
-    InvalidStatusTransition,
     #[error("twilio error creating message: {0}")]
     TwilioError(String),
     #[error("external request error: {0}")]
@@ -108,14 +109,14 @@ impl actix_web::ResponseError for ApiError {
             ApiError::KmsError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::Crypto(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::EnclaveError(_) => StatusCode::INTERNAL_SERVER_ERROR,
-            ApiError::Database(e) | ApiError::ChallengeError(ChallengeError::Database(e)) => {
-                status_code_for_db_error(e)
-            }
+            ApiError::Database(e)
+            | ApiError::ChallengeError(ChallengeError::Database(e))
+            | ApiError::HandoffError(HandoffError::Database(e)) => status_code_for_db_error(e),
             ApiError::Dotenv(_) => actix_web::http::StatusCode::INTERNAL_SERVER_ERROR,
             // This invariant should never be broken
             ApiError::NoPhoneNumberForVault => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::NotImplemented => StatusCode::INTERNAL_SERVER_ERROR,
-            ApiError::InvalidStatusTransition => StatusCode::BAD_REQUEST,
+            ApiError::HandoffError(_) => StatusCode::BAD_REQUEST,
             ApiError::TwilioError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::ReqwestError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::SendgridError(_) => StatusCode::INTERNAL_SERVER_ERROR,
