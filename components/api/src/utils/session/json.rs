@@ -1,8 +1,10 @@
 use chrono::{DateTime, Utc};
 use crypto::sha256;
-use db::{models::sessions::Session, DbError, PgConnection};
+use db::{models::sessions::Session, PgConnection};
 use newtypes::{Base64Data, D2pSessionStatus};
 use serde::{de::DeserializeOwned, Serialize};
+
+use crate::errors::ApiError;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct RateLimitRecord {
@@ -38,7 +40,7 @@ impl<C> JsonSession<C>
 where
     C: Serialize + DeserializeOwned,
 {
-    pub fn get<S: Into<JsonSessionKey>>(conn: &mut PgConnection, key: S) -> Result<Option<Self>, DbError> {
+    pub fn get<S: Into<JsonSessionKey>>(conn: &mut PgConnection, key: S) -> Result<Option<Self>, ApiError> {
         let session = Session::get(conn, key.into().0)?;
         let session = if let Some(session) = session {
             Some(Self {
@@ -56,7 +58,7 @@ where
         key: S,
         data: &C,
         expires_at: DateTime<Utc>,
-    ) -> Result<(), DbError> {
+    ) -> Result<(), ApiError> {
         let data = serde_json::to_vec(data)?;
         Session::update_or_create(conn, key.into().0, data, expires_at)?;
         Ok(())

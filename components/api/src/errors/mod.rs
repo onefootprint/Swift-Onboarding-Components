@@ -98,7 +98,6 @@ fn status_code_for_db_error(e: &DbError) -> StatusCode {
         DbError::CryptoError(_) => StatusCode::INTERNAL_SERVER_ERROR,
         DbError::InvalidDataGroupForKind => StatusCode::INTERNAL_SERVER_ERROR,
         DbError::CouldNotCreateGroupUuid => StatusCode::INTERNAL_SERVER_ERROR,
-        DbError::JsonError(_) => StatusCode::INTERNAL_SERVER_ERROR,
     }
 }
 
@@ -109,9 +108,7 @@ impl actix_web::ResponseError for ApiError {
             ApiError::KmsError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::Crypto(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::EnclaveError(_) => StatusCode::INTERNAL_SERVER_ERROR,
-            ApiError::Database(e)
-            | ApiError::ChallengeError(ChallengeError::Database(e))
-            | ApiError::HandoffError(HandoffError::Database(e)) => status_code_for_db_error(e),
+            ApiError::Database(e) => status_code_for_db_error(e),
             ApiError::Dotenv(_) => actix_web::http::StatusCode::INTERNAL_SERVER_ERROR,
             // This invariant should never be broken
             ApiError::NoPhoneNumberForVault => StatusCode::INTERNAL_SERVER_ERROR,

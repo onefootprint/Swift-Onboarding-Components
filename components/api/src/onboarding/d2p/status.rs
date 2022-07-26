@@ -48,11 +48,11 @@ pub fn post(
     let UpdateStatusRequest { status } = request.into_inner();
     state
         .db_pool
-        .db_query(move |conn| -> Result<_, HandoffError> {
+        .db_query(move |conn| -> Result<_, ApiError> {
             let session = JsonSession::<HandoffRecord>::get(conn, &user_auth.auth_token)?
                 .ok_or(HandoffError::HandoffSessionNotFound)?;
             if status.priority() <= session.data.status.priority() {
-                return Err(HandoffError::InvalidStatusTransition);
+                return Err(HandoffError::InvalidStatusTransition.into());
             }
             let handoff_record = HandoffRecord { status };
             JsonSession::update_or_create(conn, &user_auth.auth_token, &handoff_record, session.expires_at)?;

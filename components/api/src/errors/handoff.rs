@@ -6,6 +6,4 @@ pub enum HandoffError {
     InvalidStatusTransition,
     #[error("Cannot find handoff session")]
     HandoffSessionNotFound,
-    #[error("Database error: {0}")]
-    Database(#[from] db::DbError),
 }

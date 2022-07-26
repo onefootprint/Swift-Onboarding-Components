@@ -26,8 +26,6 @@ pub enum AuthError {
     MissingCustodianAuthHeader,
     #[error("invalid X-Footprint-Custodian-Key")]
     InvalidCustodianAuthHeader,
-    #[error("error reading session: {0}")]
-    SessionError(#[from] actix_web::Error),
     #[error("invalid tenant skey or footprint user id")]
     InvalidTenantKeyOrUserId,
     #[error("incorrect session type auth")]

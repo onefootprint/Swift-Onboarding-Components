@@ -14,6 +14,4 @@ pub enum ChallengeError {
     EmailChallengeExpired,
     #[error("Please wait {0} more seconds")]
     RateLimited(i64),
-    #[error("Database error: {0}")]
-    Database(#[from] db::DbError),
 }

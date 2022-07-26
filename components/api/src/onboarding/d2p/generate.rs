@@ -36,7 +36,7 @@ pub async fn handler(
     let session_sealing_key = state.session_sealing_key.clone();
     let auth_token = state
         .db_pool
-        .db_query(move |conn| -> Result<_, db::DbError> {
+        .db_query(move |conn| -> Result<_, ApiError> {
             let expires_in = Duration::minutes(3);
             let auth_token = AuthSession::create_sync(conn, &session_sealing_key, session_data, expires_in)?;
             // Also keep track of the status of the handoff session. We use a JsonSession keyed on

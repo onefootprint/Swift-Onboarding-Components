@@ -238,12 +238,12 @@ impl TwilioClient {
 
         state
             .db_pool
-            .db_query(move |conn| -> Result<_, ChallengeError> {
+            .db_query(move |conn| -> Result<_, ApiError> {
                 if let Some(session) = JsonSession::<RateLimitRecord>::get(conn, &rate_limit_key)? {
                     let time_since_last_sent = now - session.data.sent_at;
                     if time_since_last_sent < time_between_challenges {
                         let time_remaining = (time_between_challenges - time_since_last_sent).num_seconds();
-                        return Err(ChallengeError::RateLimited(time_remaining));
+                        return Err(ChallengeError::RateLimited(time_remaining).into());
                     }
                 }
 
