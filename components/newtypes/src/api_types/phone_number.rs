@@ -37,19 +37,11 @@ impl FromStr for PhoneNumber {
     type Err = crate::Error;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let (number, suffix) = if s.contains('#') {
-            let split = s.split('#').collect::<Vec<&str>>();
-            if split.len() != 2 || split[1].is_empty() || !split[1].chars().all(|x| x.is_alphanumeric()) {
-                return Err(crate::PhoneError::InvalidSandboxNumber.into());
-            }
-            (split[0], split[1])
-        } else {
-            (s, "")
-        };
+        let (number, sandbox_suffix) = super::sandbox::split_sandbox_parts(s)?;
         let sanitized = sanitize_phone(number)?;
         Ok(PhoneNumber {
             number: PiiString::from(format!("+{}", sanitized)),
-            suffix: suffix.to_owned(),
+            suffix: sandbox_suffix.to_owned(),
         })
     }
 }
@@ -67,20 +59,17 @@ impl<'de> Deserialize<'de> for PhoneNumber {
 fn phone_fmt(phone: &PhoneNumber) -> String {
     let number = phone.number.leak();
     let skip = number.len() - 2;
-    if !phone.is_live() {
-        format!(
-            "{}{}#{}",
-            "*".repeat(skip),
-            phone.number.leak().chars().skip(skip).collect::<String>(),
-            phone.suffix
-        )
+    let phone_str = format!(
+        "{}{}",
+        "*".repeat(skip),
+        phone.number.leak().chars().skip(skip).collect::<String>()
+    );
+    let suffix = if !phone.is_live() {
+        format!("#{}", phone.suffix)
     } else {
-        format!(
-            "{}{}",
-            "*".repeat(skip),
-            phone.number.leak().chars().skip(skip).collect::<String>()
-        )
-    }
+        "".to_string()
+    };
+    format!("{phone_str}{suffix}")
 }
 
 impl Debug for PhoneNumber {
@@ -102,11 +91,7 @@ pub struct ValidatedPhoneNumber {
 
 impl From<ValidatedPhoneNumber> for PiiString {
     fn from(v: ValidatedPhoneNumber) -> Self {
-        if v.suffix.is_empty() {
-            v.e164
-        } else {
-            PiiString::from(format!("{}#{}", v.e164.leak(), v.suffix))
-        }
+        v.to_piistring()
     }
 }
 
@@ -159,20 +144,18 @@ impl Debug for ValidatedPhoneNumber {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let number = self.e164.leak();
         let skip = number.len() - 2;
-        let out = if !self.suffix.is_empty() {
-            format!(
-                "{}{}#{}",
-                "*".repeat(skip),
-                number.chars().skip(skip).collect::<String>(),
-                self.suffix
-            )
+
+        let phone_number = format!(
+            "{}{}",
+            "*".repeat(skip),
+            number.chars().skip(skip).collect::<String>()
+        );
+        let suffix = if !self.is_live() {
+            format!("#{}", self.suffix)
         } else {
-            format!(
-                "{}{}",
-                "*".repeat(skip),
-                number.chars().skip(skip).collect::<String>()
-            )
+            "".to_owned()
         };
+        let out = format!("{phone_number}{suffix}");
         std::fmt::Display::fmt(&out, f)
     }
 }

@@ -4,6 +4,7 @@ use crate::auth::session_data::user::my_fp::My1fpBasicSession;
 use crate::auth::session_data::user::onboarding::OnboardingSession;
 use crate::auth::uv_permission::HasVaultPermission;
 use crate::auth::AuthError;
+use crate::errors::user::UserError;
 use crate::types::success::ApiResponseData;
 use crate::{
     errors::ApiError,
@@ -13,7 +14,7 @@ use crate::{
 use db::models::user_data::UserData;
 use db::models::user_vaults::UserVault;
 
-use newtypes::{DataKind, PiiString, UserPatchRequest};
+use newtypes::{DataKind, UserPatchRequest};
 use paperclip::actix::{api_v2_operation, post, web, web::Json};
 
 #[api_v2_operation(tags(User))]
@@ -27,16 +28,24 @@ async fn handler(
 ) -> actix_web::Result<Json<ApiResponseData<String>>, ApiError> {
     let user_vault = user_auth.user_vault(&state.db_pool).await?;
     let request = request.into_inner();
+
+    // Enforce that sandbox emails are used for sandbox users
+    if let Some(email) = request.email.as_ref() {
+        if email.is_live() != user_vault.is_live {
+            return Err(UserError::SandboxMismatch.into());
+        }
+    }
+
     let results = update(&user_auth, &state, &request, &user_vault).await?;
 
     // If we updated the email address, send an async challenge to the new email address
-    if let Some(email) = request.email.map(PiiString::from).clone() {
+    if let Some(email) = request.email.as_ref() {
         // We only support one email per request, so there will be a UserData row
         let user_data: UserData = results
             .into_iter()
             .find(|x| x.data_kind == DataKind::Email)
             .ok_or(ApiError::NotImplemented)?;
-        send_email_challenge(&state, user_data.id, &email).await?;
+        send_email_challenge(&state, user_data.id, &email.email).await?;
     }
     Ok(Json(ApiResponseData {
         data: "Successful update".to_string(),

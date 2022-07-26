@@ -1,3 +1,5 @@
+use std::str::FromStr;
+
 use crate::auth::session_context::HasUserVaultId;
 use crate::auth::session_context::SessionContext;
 use crate::auth::session_data::user::my_fp::My1fpBasicSession;
@@ -8,6 +10,7 @@ use crate::types::Empty;
 use crate::utils::email::send_email_challenge;
 use crate::State;
 use db::models::user_data::UserData;
+use newtypes::email::Email;
 use newtypes::UserDataId;
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 
@@ -39,8 +42,9 @@ async fn post(
         enclave_proxy::DataTransform::Identity,
     )
     .await?;
+    let email = Email::from_str(email.leak())?;
 
-    send_email_challenge(&state, user_data.id, &email).await?;
+    send_email_challenge(&state, user_data.id, &email.email).await?;
 
     Ok(Json(ApiResponseData::ok(Empty {})))
 }

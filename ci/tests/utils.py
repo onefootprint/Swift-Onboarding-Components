@@ -95,14 +95,9 @@ def clean_up_user(phone_number, email):
 def _gen_random_n_digit_number(n):
     return "".join([str(random.randint(0, 9)) for _ in range(n)])
 
-def _random_sandbox_phone():
+def _random_sandbox_info():
     seed = _gen_random_n_digit_number(10)
-    return f"{PHONE_NUMBER}#sandbox{seed}"
-
-def _random_sandbox_email():
-    seed = _gen_random_n_digit_number(10)
-    email_parts= EMAIL.split("@")
-    return f"{email_parts[0]}+sandbox{seed}@{email_parts[1]}"
+    return (f"{PHONE_NUMBER}#sandbox{seed}", f"{EMAIL}#sandbox{seed}")
 
 def _gen_random_ssn():
     return _gen_random_n_digit_number(9)

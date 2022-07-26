@@ -16,8 +16,7 @@ from .utils import (
     _gen_random_ssn,
     _override_webauthn_attestation,
     _override_webauthn_challenge,
-    _random_sandbox_email,
-    _random_sandbox_phone,
+    _random_sandbox_info,
     try_until_success,
     post,
     create_tenant,
@@ -93,9 +92,8 @@ def user(workos_sandbox_tenant, twilio):
     Create a user with registered data and webuathn creds and onboard them onto the workos_sandbox_tenant
     """
     ssn = _gen_random_ssn()
-    sandbox_phone_number = _random_sandbox_phone()
+    sandbox_phone_number, sandbox_email = _random_sandbox_info()
     phone_number = sandbox_phone_number.split("#")[0]
-    sandbox_email = _random_sandbox_email()
 
     # Initiate the challenge to a sandbox phone number
     def initiate_challenge():

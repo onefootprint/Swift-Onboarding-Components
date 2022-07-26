@@ -45,8 +45,8 @@ pub enum Error {
 pub enum PhoneError {
     #[error("invalid phone number")]
     InvalidPhoneNumber,
-    #[error("Invalid sandbox number. Suffix must be non-empty, alphanumeric string")]
-    InvalidSandboxNumber,
+    #[error("Invalid sandbox suffix. Suffix must be non-empty, alphanumeric string")]
+    InvalidSandboxSuffix,
 }
 
 #[derive(Debug, Clone, thiserror::Error)]
