@@ -1,4 +1,3 @@
-use crate::models::insight_event::InsightEvent;
 use crate::models::scoped_users::ScopedUser;
 use crate::schema;
 use crate::{errors::DbError, schema::scoped_users::BoxedQuery};
@@ -69,20 +68,15 @@ pub fn list_for_tenant(
     params: OnboardingListQueryParams,
     cursor: Option<i64>,
     page_size: i64,
-) -> Result<Vec<(ScopedUser, InsightEvent)>, DbError> {
+) -> Result<Vec<ScopedUser>, DbError> {
     let mut scoped_users = list_for_tenant_query(params)
-        .inner_join(schema::insight_events::table)
         .order_by(schema::scoped_users::ordering_id.desc())
-        .select((
-            schema::scoped_users::all_columns,
-            schema::insight_events::all_columns,
-        ))
         .limit(page_size);
 
     if let Some(cursor) = cursor {
         scoped_users = scoped_users.filter(schema::scoped_users::ordering_id.le(cursor));
     }
 
-    let scoped_users = scoped_users.load::<(ScopedUser, InsightEvent)>(conn)?;
+    let scoped_users = scoped_users.load::<ScopedUser>(conn)?;
     Ok(scoped_users)
 }

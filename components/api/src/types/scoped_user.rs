@@ -1,9 +1,9 @@
 use chrono::{DateTime, Utc};
-use db::models::{insight_event::InsightEvent, onboardings::OnboardingInfo, scoped_users::ScopedUser};
+use db::models::{onboardings::OnboardingInfo, scoped_users::ScopedUser};
 use newtypes::{DataKind, FootprintUserId};
 use paperclip::actix::Apiv2Schema;
 
-use super::{insight_event::ApiInsightEvent, onboarding::ApiOnboarding};
+use super::onboarding::ApiOnboarding;
 
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize, Apiv2Schema)]
 pub struct ApiScopedUser {
@@ -11,12 +11,11 @@ pub struct ApiScopedUser {
     pub populated_data_kinds: Vec<DataKind>,
     pub start_timestamp: DateTime<Utc>,
     pub ordering_id: i64,
-    pub insight_event: ApiInsightEvent,
     pub onboardings: Vec<ApiOnboarding>,
 }
 
-impl From<(Vec<DataKind>, &Vec<OnboardingInfo>, ScopedUser, InsightEvent)> for ApiScopedUser {
-    fn from(s: (Vec<DataKind>, &Vec<OnboardingInfo>, ScopedUser, InsightEvent)) -> Self {
+impl From<(Vec<DataKind>, &Vec<OnboardingInfo>, ScopedUser)> for ApiScopedUser {
+    fn from(s: (Vec<DataKind>, &Vec<OnboardingInfo>, ScopedUser)) -> Self {
         let ScopedUser {
             fp_user_id,
             start_timestamp,
@@ -29,7 +28,6 @@ impl From<(Vec<DataKind>, &Vec<OnboardingInfo>, ScopedUser, InsightEvent)> for A
             populated_data_kinds: s.0,
             start_timestamp,
             ordering_id,
-            insight_event: ApiInsightEvent::from(s.3),
             onboardings: ob_links.iter().map(|x| ApiOnboarding::from(x.clone())).collect(),
         }
     }

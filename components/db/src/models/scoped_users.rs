@@ -1,11 +1,10 @@
-use super::insight_event::CreateInsightEvent;
 use super::tenants::Tenant;
 use crate::schema::scoped_users;
 use crate::{DbError, DbPool};
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
-use newtypes::{FootprintUserId, InsightEventId, ScopedUserId, TenantId, UserVaultId};
+use newtypes::{FootprintUserId, ScopedUserId, TenantId, UserVaultId};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
@@ -20,7 +19,6 @@ pub struct ScopedUser {
     pub ordering_id: i64,
     pub start_timestamp: DateTime<Utc>,
     pub is_live: bool,
-    pub insight_event_id: InsightEventId,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
@@ -28,7 +26,6 @@ pub struct ScopedUser {
 struct NewScopedUser {
     user_vault_id: UserVaultId,
     tenant_id: TenantId,
-    insight_event_id: InsightEventId,
     start_timestamp: DateTime<Utc>,
     is_live: bool,
 }
@@ -38,7 +35,6 @@ impl ScopedUser {
         conn: &mut PgConnection,
         user_vault_id: UserVaultId,
         tenant_id: TenantId,
-        insight_event: CreateInsightEvent,
         is_live: bool,
     ) -> Result<ScopedUser, DbError> {
         let scoped_user = scoped_users::table
@@ -50,11 +46,9 @@ impl ScopedUser {
             return Ok(scoped_user);
         }
         // Row doesn't exist for user_vault_id, tenant_id - create a new one
-        let insight_event = insight_event.insert_with_conn(conn)?;
         let new = NewScopedUser {
             user_vault_id,
             tenant_id,
-            insight_event_id: insight_event.id,
             start_timestamp: Utc::now(),
             is_live,
         };

@@ -9,7 +9,7 @@ use db::models::scoped_users::ScopedUser;
 use newtypes::{ScopedUserId, TenantId};
 use paperclip::actix::{api_v2_operation, get, web, web::Json, Apiv2Schema};
 
-type OnboardingResponse = Vec<ApiUserOnboarding>;
+type AuthorizedOrgsResponse = Vec<ApiUserOnboarding>;
 
 /// Describes an onboarding of a user vault to a tenant
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize, Apiv2Schema)]
@@ -27,7 +27,7 @@ pub struct ApiUserOnboarding {
 pub async fn handler(
     state: web::Data<State>,
     user_auth: SessionContext<My1fpBasicSession>,
-) -> actix_web::Result<Json<ApiResponseData<OnboardingResponse>>, ApiError> {
+) -> actix_web::Result<Json<ApiResponseData<AuthorizedOrgsResponse>>, ApiError> {
     let user_vault_id = user_auth.user_vault_id();
     let (scoped_users, obs) = state
         .db_pool

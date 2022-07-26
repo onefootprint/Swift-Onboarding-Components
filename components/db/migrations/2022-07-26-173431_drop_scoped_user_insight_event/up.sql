@@ -1,0 +1,1 @@
+ALTER TABLE scoped_users DROP COLUMN insight_event_id;

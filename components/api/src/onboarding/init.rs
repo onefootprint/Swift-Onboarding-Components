@@ -4,10 +4,8 @@ use crate::auth::session_data::user::onboarding::OnboardingSession;
 use crate::errors::onboarding::OnboardingError;
 use crate::errors::ApiError;
 use crate::types::success::ApiResponseData;
-use crate::utils::insight_headers::InsightHeaders;
 use crate::utils::user_vault_wrapper::UserVaultWrapper;
 use crate::State;
-use db::models::insight_event::CreateInsightEvent;
 use db::models::scoped_users::ScopedUser;
 use db::models::webauthn_credential::WebauthnCredential;
 use db::DbError;
@@ -29,7 +27,6 @@ pub fn handler(
     state: web::Data<State>,
     tenant_auth: PublicTenantAuthContext,
     user_auth: SessionContext<OnboardingSession>,
-    insights: InsightHeaders,
 ) -> actix_web::Result<Json<ApiResponseData<OnboardingResponse>>, ApiError> {
     let uv = user_auth.user_vault(&state.db_pool).await?;
 
@@ -45,7 +42,6 @@ pub fn handler(
                 conn,
                 uv_id,
                 tenant_auth.tenant.id.clone(),
-                CreateInsightEvent::from(insights),
                 tenant_auth.ob_config.is_live,
             )?;
             let webauthn_creds = WebauthnCredential::get_for_user_vault(conn, &user_auth.data.user_vault_id)?;

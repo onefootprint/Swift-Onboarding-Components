@@ -17,7 +17,7 @@ use paperclip::actix::{api_v2_operation, get, web, web::Json, Apiv2Schema};
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
-pub struct OnboardingRequest {
+pub struct ScopedUsersRequest {
     #[serde(default)]
     #[serde(deserialize_with = "deserialize_stringified_list")]
     statuses: Vec<Status>,
@@ -29,7 +29,7 @@ pub struct OnboardingRequest {
     page_size: Option<usize>,
 }
 
-type OnboardingResponse = Vec<ApiScopedUser>;
+type ScopedUsersResponse = Vec<ApiScopedUser>;
 
 #[api_v2_operation(tags(Org))]
 /// Allows a tenant to view a list of their Onboardings, effectively showing all users that have
@@ -38,12 +38,12 @@ type OnboardingResponse = Vec<ApiScopedUser>;
 #[get("scoped_users")]
 pub fn get(
     state: web::Data<State>,
-    request: web::Query<OnboardingRequest>,
+    request: web::Query<ScopedUsersRequest>,
     auth: Either<SessionContext<WorkOsSession>, SecretTenantAuthContext>,
-) -> actix_web::Result<Json<ApiPaginatedResponseData<OnboardingResponse, i64>>, ApiError> {
+) -> actix_web::Result<Json<ApiPaginatedResponseData<ScopedUsersResponse, i64>>, ApiError> {
     let tenant = auth.tenant(&state.db_pool).await?;
 
-    let OnboardingRequest {
+    let ScopedUsersRequest {
         statuses,
         fingerprint,
         footprint_user_id,
@@ -95,10 +95,8 @@ pub fn get(
                 Some(_) => None,
                 None => Some(db::scoped_users::count_for_tenant(conn, query_params)?),
             };
-            let (scoped_user_ids, user_vault_ids) = scoped_users
-                .iter()
-                .map(|(ob, _)| (&ob.id, &ob.user_vault_id))
-                .unzip();
+            let (scoped_user_ids, user_vault_ids) =
+                scoped_users.iter().map(|ob| (&ob.id, &ob.user_vault_id)).unzip();
             let user_to_kinds = db::user_data::bulk_fetch_populated_kinds(conn, user_vault_ids)?;
             let obs = Onboarding::get_for_scoped_users(conn, scoped_user_ids)?;
 
@@ -108,7 +106,7 @@ pub fn get(
 
     // If there are more than page_size results, we should tell the client there's another page
     let cursor = if scoped_users.len() > page_size {
-        scoped_users.last().map(|(ob, _)| ob.ordering_id)
+        scoped_users.last().map(|su| su.ordering_id)
     } else {
         None
     };
@@ -117,12 +115,11 @@ pub fn get(
     let scoped_users = scoped_users
         .into_iter()
         .take(page_size)
-        .map(|(ob, insight_event)| {
+        .map(|su| {
             (
-                user_to_kinds.get(&ob.user_vault_id).unwrap_or(&vec![]).clone(),
-                obs.get(&ob.id).unwrap_or(&empty_vec),
-                ob,
-                insight_event,
+                user_to_kinds.get(&su.user_vault_id).unwrap_or(&vec![]).clone(),
+                obs.get(&su.id).unwrap_or(&empty_vec),
+                su,
             )
         })
         .map(ApiScopedUser::from)
