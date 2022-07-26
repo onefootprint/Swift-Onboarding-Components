@@ -21,15 +21,26 @@ const GetStartedSection = ({
   <Container id="get-started" as="section">
     <Inner>
       <Content>
-        <LogoContainer>
-          <Image
-            alt="Footprint logo"
-            height={107}
-            layout="fixed"
-            src="/footer/footprint-circle.png"
-            width={118}
-          />
-        </LogoContainer>
+        <PenguinContainer>
+          <SmallPenguinContainer>
+            <Image
+              alt="Footprint Penguin"
+              layout="fixed"
+              height={106}
+              src="/footer/penguin-mobile.png"
+              width={192}
+            />
+          </SmallPenguinContainer>
+          <LargePenguinContainer>
+            <Image
+              alt="Footprint Penguin"
+              layout="fixed"
+              height={202}
+              src="/footer/penguin-desktop.png"
+              width={150}
+            />
+          </LargePenguinContainer>
+        </PenguinContainer>
         <TextContent>
           <TitleContainer>
             <Typography
@@ -90,7 +101,7 @@ const Content = styled.div`
   `}
 `;
 
-const LogoContainer = styled.div`
+const PenguinContainer = styled.div`
   ${({ theme }) => css`
     margin-bottom: ${theme.spacing[9]}px;
 
@@ -99,6 +110,20 @@ const LogoContainer = styled.div`
       margin-bottom: unset;
       text-align: right;
     `}
+  `}
+`;
+
+const SmallPenguinContainer = styled.div`
+  ${media.greaterThan('md')`
+    display: none;
+  `}
+`;
+
+const LargePenguinContainer = styled.div`
+  display: none;
+
+  ${media.greaterThan('md')`
+    display: block;
   `}
 `;
 
