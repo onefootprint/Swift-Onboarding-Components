@@ -1,10 +1,10 @@
-use crate::auth::session_data::SessionData;
 use crate::errors::challenge::ChallengeError;
 use crate::types::success::ApiResponseData;
 use crate::types::Empty;
+use crate::{auth::session_data::SessionData, utils::session::AuthSession};
 
+use crate::errors::ApiError;
 use crate::State;
-use crate::{auth::session_data::ServerSession, errors::ApiError};
 use chrono::Utc;
 use db::models::user_data::UserData;
 use newtypes::{DataKind, SessionAuthToken};
@@ -24,11 +24,11 @@ async fn post(
     state: web::Data<State>,
     request: Json<EmailVerifyRequest>,
 ) -> actix_web::Result<Json<ApiResponseData<Empty>>, ApiError> {
-    let session = db::session::get_session_by_auth_token(&state.db_pool, request.into_inner().data)
+    let session = AuthSession::get(&state, &request.data)
         .await?
-        .ok_or(ChallengeError::EmailVerificationTokenInvalidOrNotFound)?;
+        .ok_or(ChallengeError::EmailVerificationTokenInvalidOrNotFound)?
+        .data;
 
-    let session = ServerSession::unseal(&state.session_sealing_key, &session.sealed_session_data)?;
     if session.expires_at < Utc::now() {
         return Err(ChallengeError::EmailChallengeExpired.into());
     }

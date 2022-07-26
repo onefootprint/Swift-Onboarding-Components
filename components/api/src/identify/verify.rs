@@ -1,7 +1,7 @@
 use super::{BiometricChallengeState, PhoneChallengeState};
 use crate::auth::session_data::user::my_fp::{My1fpBasicSession, UserAuthMethod};
 use crate::auth::session_data::user::onboarding::OnboardingSession;
-use crate::auth::session_data::{ServerSession, SessionData};
+use crate::auth::session_data::SessionData;
 use crate::errors::challenge::ChallengeError;
 
 use crate::errors::ApiError;
@@ -9,6 +9,7 @@ use crate::identify::{IdentifyChallengeData, IdentifyChallengeState, IdentifyTyp
 use crate::types::success::ApiResponseData;
 use crate::utils::challenge::{Challenge, ChallengeToken};
 use crate::utils::liveness::LivenessWebauthnConfig;
+use crate::utils::session::AuthSession;
 use crate::State;
 
 use chrono::Duration;
@@ -69,14 +70,14 @@ pub async fn handler(
     let auth_token = match challenge_state.identify_type {
         IdentifyType::Onboarding => {
             let data = SessionData::Onboarding(OnboardingSession { user_vault_id });
-            ServerSession::create(&state, data, Duration::minutes(15)).await?
+            AuthSession::create(&state, data, Duration::minutes(15)).await?
         }
         IdentifyType::My1fp => {
             let data = SessionData::My1fp(My1fpBasicSession {
                 user_vault_id,
                 auth_method: user_auth_method,
             });
-            ServerSession::create(&state, data, Duration::hours(24)).await?
+            AuthSession::create(&state, data, Duration::hours(24)).await?
         }
     };
 

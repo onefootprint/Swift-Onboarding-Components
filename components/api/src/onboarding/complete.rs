@@ -3,11 +3,12 @@ use crate::auth::key_context::ob_public_key::PublicTenantAuthContext;
 use crate::auth::session_context::{HasUserVaultId, SessionContext};
 use crate::auth::session_data::user::onboarding::OnboardingSession;
 use crate::auth::session_data::validate_user::ValidateUserToken;
-use crate::auth::session_data::{ServerSession, SessionData};
+use crate::auth::session_data::SessionData;
 use crate::errors::onboarding::OnboardingError;
 use crate::errors::ApiError;
 use crate::types::success::ApiResponseData;
 use crate::utils::insight_headers::InsightHeaders;
+use crate::utils::session::AuthSession;
 use crate::utils::user_vault_wrapper::UserVaultWrapper;
 use crate::State;
 use chrono::Duration;
@@ -111,9 +112,9 @@ fn handler(
                 ob.update_status(conn, Status::Verified)?;
             }
             // create the session for this scoped_user
-            let validation_token = ServerSession::create_sync(
-                &session_sealing_key,
+            let validation_token = AuthSession::create_sync(
                 conn,
+                &session_sealing_key,
                 SessionData::ValidateUserToken(ValidateUserToken { ob_id: ob.id }),
                 Duration::minutes(15),
             )?;

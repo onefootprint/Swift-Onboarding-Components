@@ -4,17 +4,17 @@ use actix_web::{http::header::HeaderMap, web, FromRequest};
 use async_trait::async_trait;
 use chrono::{DateTime, Utc};
 use db::{
-    models::{sessions::Session, tenants::Tenant, user_vaults::UserVault},
+    models::{tenants::Tenant, user_vaults::UserVault},
     DbPool,
 };
 use futures_util::Future;
 use newtypes::{SessionAuthToken, TenantId, UserVaultId};
 use paperclip::actix::Apiv2Security;
 
-use crate::{errors::ApiError, State};
+use crate::{errors::ApiError, utils::session::AuthSession, State};
 
 use super::{
-    session_data::{HeaderName, ServerSession, SessionData},
+    session_data::{HeaderName, SessionData},
     uv_permission::{HasVaultPermission, VaultPermission},
     AuthError, IsLive, SupportsIsLiveHeader,
 };
@@ -61,25 +61,21 @@ where
         Box::pin(async move {
             let auth_token = SessionAuthToken::from(auth_token?);
 
-            let session = db::session::get_session_by_auth_token(&state.db_pool, auth_token.clone())
+            let session = AuthSession::get(&state, &auth_token)
                 .await?
                 .ok_or(AuthError::NoSessionFound)?;
-
-            // try to unseal our server session here
-            let server_session =
-                ServerSession::unseal(&state.session_sealing_key, &session.sealed_session_data)?;
 
             // Explicit type annotation here (T:: try_from) automatically ensures that a malicious user
             // cannot re-use session tokens for different purposes -- the API endpoints declare the session type "T"
             // that they allow (example: UserSession<OnboardingSessionData>)
             // and if the session associated with the token cannot be converted to type T (in this case, OnboardingSession)
             // we fail
-            let session_data = T::try_from(server_session.data)
+            let session_data = T::try_from(session.data.data)
                 .map_err(|_| AuthError::InvalidTokenForHeader(T::header_name()))?;
             Ok(Self {
                 data: session_data,
                 auth_token,
-                expires_at: server_session.expires_at,
+                expires_at: session.expires_at,
                 headers: MaskedHeaderMap(headers),
                 phantom: PhantomData,
             })
@@ -147,9 +143,7 @@ impl<C> SessionContext<C> {
     /// updates the session data and produces a sealed session data
     /// to update in the db
     pub async fn update_session_data(&self, state: &State, new_data: SessionData) -> Result<(), ApiError> {
-        let session = ServerSession::new(new_data, self.expires_at);
-        let sealed = session.seal(&state.session_sealing_key)?;
-        Session::update(&state.db_pool, Some(sealed), &self.auth_token, None).await?;
+        AuthSession::update(state, &self.auth_token, new_data, self.expires_at).await?;
         Ok(())
     }
 }

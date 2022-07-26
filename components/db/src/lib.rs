@@ -203,7 +203,6 @@ pub async fn private_cleanup_integration_tests(
 
 pub mod access_event;
 pub mod scoped_users;
-pub mod session;
 pub mod tenant;
 
 pub mod user_data;

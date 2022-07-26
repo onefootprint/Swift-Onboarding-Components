@@ -1,9 +1,10 @@
 use std::collections::HashSet;
 
 use crate::auth::session_data::tenant::workos::WorkOsSession;
-use crate::auth::session_data::{ServerSession, SessionData};
+use crate::auth::session_data::SessionData;
 use crate::errors::workos_login::WorkOsLoginError;
 use crate::utils::email_domain;
+use crate::utils::session::AuthSession;
 use crate::State;
 use crate::{errors::ApiError, types::success::ApiResponseData};
 use chrono::Duration;
@@ -68,7 +69,7 @@ async fn handler(
         //TODO https://linear.app/footprint/issue/FP-715/dynamically-check-sandbox-restricted-on-workos-session remove this denormalization so updates take effect immediately
         sandbox_restricted: tenant.sandbox_restricted,
     });
-    let auth_token = ServerSession::create(&state, session_data, Duration::hours(8)).await?;
+    let auth_token = AuthSession::create(&state, session_data, Duration::hours(8)).await?;
 
     Ok(Json(ApiResponseData {
         data: DashboardAuthorizationResponse {

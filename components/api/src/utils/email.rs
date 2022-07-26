@@ -1,5 +1,5 @@
 use crate::auth::session_data::email::email_verify::EmailVerifySession;
-use crate::auth::session_data::{ServerSession, SessionData};
+use crate::auth::session_data::SessionData;
 use crate::errors::ApiError;
 use crate::State;
 use crypto::random::gen_random_alphanumeric_code;
@@ -7,6 +7,8 @@ use newtypes::{PiiString, UserDataId};
 use paperclip::actix::web;
 use reqwest::StatusCode;
 use std::collections::HashMap;
+
+use super::session::AuthSession;
 
 #[derive(Debug, Clone)]
 pub struct SendgridClient {
@@ -150,7 +152,7 @@ pub(crate) async fn send_email_challenge(
     let session_data = SessionData::EmailVerify(EmailVerifySession { user_data_id });
 
     // create new session
-    let token = ServerSession::create(state, session_data, chrono::Duration::days(1)).await?;
+    let token = AuthSession::create(state, session_data, chrono::Duration::days(1)).await?;
 
     // add unique url query param to avoid incorrect caching by browser/client
     let unique_param = gen_random_alphanumeric_code(5);

@@ -3,15 +3,15 @@ use std::fmt::Debug;
 use crate::{errors::ApiError, identify::PhoneChallengeState, State};
 use chrono::{Duration, Utc};
 use crypto::sha256;
-use db::DbError;
-use newtypes::{
-    Base64Data, PhoneNumber, PiiString, SealedSessionBytes, SessionAuthToken, ValidatedPhoneNumber,
-};
+use newtypes::{PhoneNumber, PiiString, SessionAuthToken, ValidatedPhoneNumber};
 use serde::Serialize;
+
+use super::session::RateLimitSession;
 
 pub type SecondsBeforeRetry = i64;
 
-use self::rate_limit::RateLimitRecord;
+pub const D2P_LINK: &str = "d2p_session";
+pub const SMS_CHALLENGE: &str = "sms_challenge";
 
 #[derive(Clone)]
 pub struct TwilioClient {
@@ -92,18 +92,6 @@ struct SubResourceUri {
 enum TwilioResponse<T> {
     Success(T),
     Error(TwilioError),
-}
-
-mod rate_limit {
-    use chrono::{DateTime, Utc};
-
-    pub const D2P_LINK: &str = "d2p_session";
-    pub const SMS_CHALLENGE: &str = "sms_challenge";
-
-    #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
-    pub struct RateLimitRecord {
-        pub sent_at: DateTime<Utc>,
-    }
 }
 
 impl TwilioClient {
@@ -201,9 +189,7 @@ impl TwilioClient {
         let code = crypto::random::gen_rand_n_digit_code(6);
         let message_body = format!("Your {} verification code is {}. Don't share your code with anyone. We will never contact you to request this code.", &self.rp_id, &code);
 
-        let time_before_retry_s = self
-            .rate_limit(state, destination, rate_limit::SMS_CHALLENGE)
-            .await?;
+        let time_before_retry_s = self.rate_limit(state, destination, SMS_CHALLENGE).await?;
 
         self.send_message(destination, message_body).await?;
 
@@ -223,7 +209,7 @@ impl TwilioClient {
         base_url: String,
         auth_token: SessionAuthToken,
     ) -> Result<SecondsBeforeRetry, ApiError> {
-        let time_before_retry_s = self.rate_limit(state, destination, rate_limit::D2P_LINK).await?;
+        let time_before_retry_s = self.rate_limit(state, destination, D2P_LINK).await?;
 
         let message_body = format!(
             "Hello from {}! Continue signing up for your account here: {}#{}",
@@ -240,41 +226,22 @@ impl TwilioClient {
         phone_number: &ValidatedPhoneNumber,
         scope: &str,
     ) -> Result<SecondsBeforeRetry, ApiError> {
-        let h_session_id =
-            Base64Data(sha256(format!("{}:{}", phone_number.e164.leak(), scope).as_bytes()).to_vec())
-                .to_string();
+        let rate_limit_key = format!("{}:{}", phone_number.e164.leak(), scope);
 
         let now = Utc::now();
         let time_between_challenges_s = self.time_s_between_challenges;
         let duration_between_challenges = Duration::seconds(time_between_challenges_s);
 
-        if let Some(session) =
-            db::session::get_session_by_primary_key(&state.db_pool, h_session_id.clone()).await?
-        {
-            if let Ok(RateLimitRecord { sent_at }) =
-                serde_json::from_slice(session.sealed_session_data.as_ref())
-            {
-                let time_since_last_sent = now - sent_at;
-                if time_since_last_sent < duration_between_challenges {
-                    let time_remaining = (duration_between_challenges - time_since_last_sent).num_seconds();
-                    return Err(ApiError::RateLimited(time_remaining));
-                }
+        if let Some(session) = RateLimitSession::get(state, &rate_limit_key).await? {
+            let time_since_last_sent = now - session.data.sent_at;
+            if time_since_last_sent < duration_between_challenges {
+                let time_remaining = (duration_between_challenges - time_since_last_sent).num_seconds();
+                return Err(ApiError::RateLimited(time_remaining));
             }
         }
 
-        let sealed_session_data = SealedSessionBytes(serde_json::to_vec(&RateLimitRecord { sent_at: now })?);
-        state
-            .db_pool
-            .db_query(move |conn| -> Result<_, DbError> {
-                db::models::sessions::NewSession {
-                    h_session_id,
-                    sealed_session_data,
-                    expires_at: now + duration_between_challenges,
-                }
-                .update_or_create(conn)?;
-                Ok(())
-            })
-            .await??;
+        RateLimitSession::update_or_create(state, &rate_limit_key, now, now + duration_between_challenges)
+            .await?;
         Ok(time_between_challenges_s)
     }
 }

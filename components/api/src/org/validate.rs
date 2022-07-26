@@ -1,10 +1,11 @@
 use crate::auth::key_context::secret_key::SecretTenantAuthContext;
 use crate::auth::session_data::validate_user::ValidateUserToken;
-use crate::auth::session_data::{ServerSession, SessionData};
+use crate::auth::session_data::SessionData;
 use crate::auth::IsLive;
 use crate::errors::onboarding::OnboardingError;
 use crate::errors::ApiError;
 use crate::types::success::ApiResponseData;
+use crate::utils::session::AuthSession;
 use crate::State;
 use chrono::{DateTime, Utc};
 use db::models::onboardings::Onboarding;
@@ -33,12 +34,10 @@ pub fn validate(
     request: web::Json<ValidateRequest>,
     auth: SecretTenantAuthContext,
 ) -> actix_web::Result<Json<ApiResponseData<ValidateResponse>>, ApiError> {
-    let session =
-        db::session::get_session_by_auth_token(&state.db_pool, request.into_inner().validation_token)
-            .await?
-            .ok_or(OnboardingError::ValidateTokenInvalidOrNotFound)?;
-
-    let session = ServerSession::unseal(&state.session_sealing_key, &session.sealed_session_data)?;
+    let session = AuthSession::get(&state, &request.validation_token)
+        .await?
+        .ok_or(OnboardingError::ValidateTokenInvalidOrNotFound)?
+        .data;
 
     let ValidateUserToken { ob_id } = if let SessionData::ValidateUserToken(data) = session.data {
         data

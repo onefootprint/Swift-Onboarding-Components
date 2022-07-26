@@ -112,12 +112,12 @@ table! {
     use diesel::sql_types::*;
     use newtypes::db_types::*;
 
-    sessions (h_session_id) {
-        h_session_id -> Varchar,
+    sessions (key) {
+        key -> Varchar,
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
         expires_at -> Timestamptz,
-        sealed_session_data -> Bytea,
+        data -> Bytea,
     }
 }
 
