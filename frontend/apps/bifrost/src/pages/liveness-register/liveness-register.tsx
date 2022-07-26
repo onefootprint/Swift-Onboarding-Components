@@ -3,7 +3,7 @@ import React from 'react';
 import { States } from 'src/utils/state-machine/liveness-register';
 import withProvider from 'src/utils/with-provider';
 
-import MachineProvider from './components/machine-provider';
+import LivenessRegisterMachineProvider from './components/machine-provider';
 import useLivenessRegisterMachine from './hooks/use-liveness-register';
 import NewTabProcessing from './pages/new-tab-processing';
 import NewTabRequest from './pages/new-tab-request';
@@ -34,4 +34,5 @@ const LivenessRegister = () => {
   return null;
 };
 
-export default () => withProvider(MachineProvider, LivenessRegister);
+export default () =>
+  withProvider(LivenessRegisterMachineProvider, LivenessRegister);

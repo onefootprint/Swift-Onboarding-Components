@@ -8,7 +8,7 @@ import styled, { createGlobalStyle, css } from 'styled-components';
 import themes from 'themes';
 import { DesignSystemProvider, media } from 'ui';
 
-import MachineProvider from '../components/bifrost-machine-provider';
+import BifrostMachineProvider from '../components/bifrost-machine-provider';
 import { GOOGLE_MAPS_KEY } from '../config/constants';
 import configureReactI18next from '../config/initializers/react-i18next';
 import queryClient from '../config/initializers/react-query';
@@ -31,7 +31,7 @@ const App = ({ Component, pageProps }: AppProps) => (
       />
     </Head>
     <QueryClientProvider client={queryClient}>
-      <MachineProvider>
+      <BifrostMachineProvider>
         <DesignSystemProvider theme={themes.light}>
           <GlobalStyle />
           <FootprintProvider>
@@ -42,7 +42,7 @@ const App = ({ Component, pageProps }: AppProps) => (
             <FootprintFooter />
           </FootprintProvider>
         </DesignSystemProvider>
-      </MachineProvider>
+      </BifrostMachineProvider>
     </QueryClientProvider>
     <Script
       src={`https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_KEY}&libraries=places`}
