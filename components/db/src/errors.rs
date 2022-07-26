@@ -52,6 +52,9 @@ pub enum DbError {
 
     #[error("crypto error: {0}")]
     CryptoError(#[from] crypto::Error),
+
+    #[error("Json error: {0}")]
+    JsonError(#[from] serde_json::Error),
 }
 
 impl DbError {

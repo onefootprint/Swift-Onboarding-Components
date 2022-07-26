@@ -1,12 +1,16 @@
 use std::fmt::Debug;
 
-use crate::{errors::ApiError, identify::PhoneChallengeState, State};
+use crate::{
+    errors::{challenge::ChallengeError, ApiError},
+    identify::PhoneChallengeState,
+    State,
+};
 use chrono::{Duration, Utc};
 use crypto::sha256;
 use newtypes::{PhoneNumber, PiiString, SessionAuthToken, ValidatedPhoneNumber};
 use serde::Serialize;
 
-use super::session::RateLimitSession;
+use super::session::{JsonSession, RateLimitRecord};
 
 pub type SecondsBeforeRetry = i64;
 
@@ -230,18 +234,25 @@ impl TwilioClient {
 
         let now = Utc::now();
         let time_between_challenges_s = self.time_s_between_challenges;
-        let duration_between_challenges = Duration::seconds(time_between_challenges_s);
+        let time_between_challenges = Duration::seconds(time_between_challenges_s);
 
-        if let Some(session) = RateLimitSession::get(state, &rate_limit_key).await? {
-            let time_since_last_sent = now - session.data.sent_at;
-            if time_since_last_sent < duration_between_challenges {
-                let time_remaining = (duration_between_challenges - time_since_last_sent).num_seconds();
-                return Err(ApiError::RateLimited(time_remaining));
-            }
-        }
+        state
+            .db_pool
+            .db_query(move |conn| -> Result<_, ChallengeError> {
+                if let Some(session) = JsonSession::<RateLimitRecord>::get(conn, &rate_limit_key)? {
+                    let time_since_last_sent = now - session.data.sent_at;
+                    if time_since_last_sent < time_between_challenges {
+                        let time_remaining = (time_between_challenges - time_since_last_sent).num_seconds();
+                        return Err(ChallengeError::RateLimited(time_remaining));
+                    }
+                }
 
-        RateLimitSession::update_or_create(state, &rate_limit_key, now, now + duration_between_challenges)
-            .await?;
+                let record = RateLimitRecord { sent_at: now };
+                JsonSession::update_or_create(conn, &rate_limit_key, &record, now + time_between_challenges)?;
+                Ok(())
+            })
+            .await??;
+
         Ok(time_between_challenges_s)
     }
 }

@@ -13,6 +13,8 @@ pub mod workos_login;
 
 use crate::types::error::{ApiResponseError, ApiResponseErrorInfo};
 
+use self::challenge::ChallengeError;
+
 #[allow(clippy::large_enum_variant)]
 #[derive(Debug, Error)]
 pub enum ApiError {
@@ -23,7 +25,7 @@ pub enum ApiError {
     #[error("onboarding error: {0}")]
     OnboardingError(#[from] onboarding::OnboardingError),
     #[error("challenge error: {0}")]
-    ChallengeError(#[from] challenge::ChallengeError),
+    ChallengeError(#[from] ChallengeError),
     #[error("crypto error: {0}")]
     Crypto(#[from] crypto::Error),
     #[error("database error: {0}")]
@@ -38,8 +40,6 @@ pub enum ApiError {
     WorkOsLoginError(#[from] workos_login::WorkOsLoginError),
     #[error("webauthn error: {0}")]
     Webauthn(#[from] WebauthnError),
-    #[error("Please wait {0} more seconds")]
-    RateLimited(i64),
     #[error("no phone number for vault")]
     NoPhoneNumberForVault,
     #[error("not implemented")]
@@ -97,6 +97,7 @@ fn status_code_for_db_error(e: &DbError) -> StatusCode {
         DbError::CryptoError(_) => StatusCode::INTERNAL_SERVER_ERROR,
         DbError::InvalidDataGroupForKind => StatusCode::INTERNAL_SERVER_ERROR,
         DbError::CouldNotCreateGroupUuid => StatusCode::INTERNAL_SERVER_ERROR,
+        DbError::JsonError(_) => StatusCode::INTERNAL_SERVER_ERROR,
     }
 }
 
@@ -107,9 +108,10 @@ impl actix_web::ResponseError for ApiError {
             ApiError::KmsError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::Crypto(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::EnclaveError(_) => StatusCode::INTERNAL_SERVER_ERROR,
-            ApiError::Database(e) => status_code_for_db_error(e),
+            ApiError::Database(e) | ApiError::ChallengeError(ChallengeError::Database(e)) => {
+                status_code_for_db_error(e)
+            }
             ApiError::Dotenv(_) => actix_web::http::StatusCode::INTERNAL_SERVER_ERROR,
-            ApiError::RateLimited(_) => StatusCode::BAD_REQUEST,
             // This invariant should never be broken
             ApiError::NoPhoneNumberForVault => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::NotImplemented => StatusCode::INTERNAL_SERVER_ERROR,

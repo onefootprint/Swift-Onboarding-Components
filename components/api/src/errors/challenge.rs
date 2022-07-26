@@ -12,4 +12,8 @@ pub enum ChallengeError {
     EmailVerificationTokenInvalidOrNotFound,
     #[error("Email challenge expired")]
     EmailChallengeExpired,
+    #[error("Please wait {0} more seconds")]
+    RateLimited(i64),
+    #[error("Database error: {0}")]
+    Database(#[from] db::DbError),
 }

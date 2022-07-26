@@ -1,4 +1,4 @@
-mod rate_limit;
+mod json;
 mod user;
 
-pub use self::{rate_limit::*, user::*};
+pub use self::{json::*, user::*};
