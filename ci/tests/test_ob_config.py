@@ -1,6 +1,7 @@
 from tests.utils import get
 
 def test_get_org_config(workos_tenant, must_collect_data_kinds, can_access_data_kinds):
+    assert False
     body = get("org/config", None, workos_tenant.pk)
     tenant = body['data']
     assert tenant['name'] == 'Acme Bank Card'
