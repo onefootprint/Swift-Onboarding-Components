@@ -6,9 +6,7 @@ use crate::errors::ApiError;
 use crate::types::success::ApiResponseData;
 use crate::utils::user_vault_wrapper::UserVaultWrapper;
 use crate::State;
-use db::models::scoped_users::ScopedUser;
 use db::models::webauthn_credential::WebauthnCredential;
-use db::DbError;
 use newtypes::DataKind;
 use paperclip::actix::{api_v2_operation, web, web::Json, Apiv2Schema};
 
@@ -29,25 +27,14 @@ pub fn handler(
     user_auth: SessionContext<OnboardingSession>,
 ) -> actix_web::Result<Json<ApiResponseData<OnboardingResponse>>, ApiError> {
     let uv = user_auth.user_vault(&state.db_pool).await?;
-
     if tenant_auth.ob_config.is_live != uv.is_live {
         return Err(OnboardingError::InvalidSandboxState.into());
     }
 
-    let uv_id = user_auth.data.user_vault_id.clone();
     let webauthn_creds = state
         .db_pool
-        .db_transaction(move |conn| -> Result<_, DbError> {
-            ScopedUser::get_or_create(
-                conn,
-                uv_id,
-                tenant_auth.tenant.id.clone(),
-                tenant_auth.ob_config.is_live,
-            )?;
-            let webauthn_creds = WebauthnCredential::get_for_user_vault(conn, &user_auth.data.user_vault_id)?;
-            Ok(webauthn_creds)
-        })
-        .await?;
+        .db_query(move |conn| WebauthnCredential::get_for_user_vault(conn, &user_auth.data.user_vault_id))
+        .await??;
 
     let uvw = UserVaultWrapper::from(&state.db_pool, uv).await?;
     Ok(Json(ApiResponseData {

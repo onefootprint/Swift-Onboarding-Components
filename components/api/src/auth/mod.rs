@@ -1,9 +1,3 @@
-use self::{
-    key_context::ob_public_key::PublicTenantAuthContext, session_context::SessionContext,
-    session_data::user::onboarding::OnboardingSession,
-};
-use crate::errors::{onboarding::OnboardingError, ApiError};
-use db::models::scoped_users::ScopedUser;
 use thiserror::Error;
 
 pub mod either;
@@ -42,23 +36,6 @@ pub enum AuthError {
     InvalidTokenForHeader(String),
     #[error("not allowed: restricted to sandbox mode")]
     SandboxRestricted,
-}
-
-/// For endpoints that take both a user_auth and tenant_auth, this helps to assert that the authenticated user
-/// has been onboarded to the provided tenant by fetching the Onboarding for this (user, tenant) pair.
-pub async fn get_scoped_user(
-    db_pool: &db::DbPool,
-    user_auth: &SessionContext<OnboardingSession>,
-    tenant_auth: &PublicTenantAuthContext,
-) -> Result<ScopedUser, ApiError> {
-    let scoped_user = ScopedUser::get_for_tenant(
-        db_pool,
-        tenant_auth.tenant.id.clone(),
-        user_auth.data.user_vault_id.clone(),
-    )
-    .await?
-    .ok_or(OnboardingError::OnboardingForTenantDoesNotExist)?;
-    Ok(scoped_user)
 }
 
 /// A helper trait to extract whether the auth session is for sandbox or production data
