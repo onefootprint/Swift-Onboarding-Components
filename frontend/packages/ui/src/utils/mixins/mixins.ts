@@ -7,6 +7,8 @@ export const createFontStyles = (variant: FontVariant) => css`
     font-size: ${theme.typography[variant].fontSize};
     font-weight: ${theme.typography[variant].fontWeight};
     line-height: ${theme.typography[variant].lineHeight};
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   `}
 `;
 
