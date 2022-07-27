@@ -97,13 +97,13 @@ const typographies: Typographies = {
     fontSize: '13px',
     lineHeight: '16px',
     fontFamily: 'DM Sans',
-    fontWeight: 400,
+    fontWeight: 500,
   },
   'caption-2': {
     fontSize: '12px',
     lineHeight: '16px',
     fontFamily: 'DM Sans',
-    fontWeight: 400,
+    fontWeight: 500,
   },
   'snippet-1': {
     fontSize: '16px',
