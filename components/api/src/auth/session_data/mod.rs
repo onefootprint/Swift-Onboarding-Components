@@ -12,7 +12,7 @@ pub mod user;
 pub mod validate_user;
 pub mod workos;
 
-impl SessionData {
+impl AuthSessionData {
     pub(crate) fn seal(&self, key: &ScopedSealingKey) -> Result<SealedSessionBytes, crypto::Error> {
         Ok(SealedSessionBytes(key.seal(&self)?))
     }
@@ -26,7 +26,7 @@ impl SessionData {
 /// Represents various types of session data our server maybe storing
 /// in its encrypted session store
 #[derive(Serialize, Deserialize, Debug, Clone)]
-pub enum SessionData {
+pub enum AuthSessionData {
     /// workos login to tenant admin
     WorkOs(WorkOsSession),
 

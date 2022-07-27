@@ -5,7 +5,7 @@ use newtypes::{OnboardingId, SessionAuthToken};
 use paperclip::actix::web;
 
 use crate::{
-    auth::session_data::{validate_user::ValidateUserToken, SessionData},
+    auth::session_data::{validate_user::ValidateUserToken, AuthSessionData},
     utils::session::AuthSession,
 };
 
@@ -29,7 +29,7 @@ fn create_onboarding_validation_token(
     let validation_token = AuthSession::create_sync(
         conn,
         session_sealing_key,
-        SessionData::ValidateUserToken(ValidateUserToken { ob_id }),
+        AuthSessionData::ValidateUserToken(ValidateUserToken { ob_id }),
         Duration::minutes(15),
     )?;
     Ok(validation_token)

@@ -3,12 +3,12 @@ use crypto::aead::ScopedSealingKey;
 use db::{models::sessions::Session, PgConnection};
 use newtypes::{SealedSessionBytes, SessionAuthToken};
 
-use crate::{auth::session_data::SessionData, State};
+use crate::{auth::session_data::AuthSessionData, State};
 
 pub struct AuthSession {
     pub key: String,
     pub expires_at: DateTime<Utc>,
-    pub data: SessionData,
+    pub data: AuthSessionData,
 }
 
 impl AuthSession {
@@ -22,7 +22,7 @@ impl AuthSession {
             Some(Self {
                 key: session.key,
                 expires_at: session.expires_at,
-                data: SessionData::unseal(&state.session_sealing_key, &SealedSessionBytes(session.data))?,
+                data: AuthSessionData::unseal(&state.session_sealing_key, &SealedSessionBytes(session.data))?,
             })
         } else {
             None
@@ -32,7 +32,7 @@ impl AuthSession {
 
     pub async fn create(
         state: &State,
-        data: SessionData,
+        data: AuthSessionData,
         expires_in: Duration,
     ) -> Result<SessionAuthToken, db::DbError> {
         let key = state.session_sealing_key.clone();
@@ -47,7 +47,7 @@ impl AuthSession {
     pub fn create_sync(
         conn: &mut PgConnection,
         session_sealing_key: &ScopedSealingKey,
-        data: SessionData,
+        data: AuthSessionData,
         expires_in: Duration,
     ) -> Result<SessionAuthToken, db::DbError> {
         let token = SessionAuthToken::generate();

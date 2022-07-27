@@ -1,7 +1,7 @@
 use crate::{
     auth::{
         session_context::HasTenant,
-        session_data::{HeaderName, SessionData},
+        session_data::{AuthSessionData, HeaderName},
         AuthError, SupportsIsLiveHeader,
     },
     errors::ApiError,
@@ -20,12 +20,12 @@ pub struct WorkOsSession {
     pub sandbox_restricted: bool,
 }
 
-impl TryFrom<SessionData> for WorkOsSession {
+impl TryFrom<AuthSessionData> for WorkOsSession {
     type Error = ApiError;
 
-    fn try_from(value: SessionData) -> Result<Self, Self::Error> {
+    fn try_from(value: AuthSessionData) -> Result<Self, Self::Error> {
         match value {
-            SessionData::WorkOs(data) => Ok(data),
+            AuthSessionData::WorkOs(data) => Ok(data),
             _ => Err(AuthError::SessionTypeError.into()),
         }
     }

@@ -1,6 +1,6 @@
 use crate::auth::key_context::secret_key::SecretTenantAuthContext;
 use crate::auth::session_data::validate_user::ValidateUserToken;
-use crate::auth::session_data::SessionData;
+use crate::auth::session_data::AuthSessionData;
 use crate::auth::IsLive;
 use crate::errors::onboarding::OnboardingError;
 use crate::errors::ApiError;
@@ -39,7 +39,7 @@ pub fn validate(
         .ok_or(OnboardingError::ValidateTokenInvalidOrNotFound)?
         .data;
 
-    let ValidateUserToken { ob_id } = if let SessionData::ValidateUserToken(data) = session {
+    let ValidateUserToken { ob_id } = if let AuthSessionData::ValidateUserToken(data) = session {
         data
     } else {
         return Err(OnboardingError::ValidateTokenInvalidOrNotFound.into());

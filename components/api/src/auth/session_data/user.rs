@@ -4,7 +4,7 @@ use paperclip::actix::Apiv2Schema;
 use crate::{
     auth::{
         session_context::HasUserVaultId,
-        session_data::{HeaderName, SessionData},
+        session_data::{AuthSessionData, HeaderName},
         AuthError,
     },
     errors::ApiError,
@@ -32,8 +32,8 @@ pub struct UserSession {
 }
 
 impl UserSession {
-    pub fn create(user_vault_id: UserVaultId, scopes: Vec<UserAuthScope>) -> SessionData {
-        SessionData::User(Self {
+    pub fn create(user_vault_id: UserVaultId, scopes: Vec<UserAuthScope>) -> AuthSessionData {
+        AuthSessionData::User(Self {
             user_vault_id,
             scopes,
         })
@@ -52,12 +52,12 @@ impl UserSession {
     }
 }
 
-impl TryFrom<SessionData> for UserSession {
+impl TryFrom<AuthSessionData> for UserSession {
     type Error = ApiError;
 
-    fn try_from(value: SessionData) -> Result<Self, Self::Error> {
+    fn try_from(value: AuthSessionData) -> Result<Self, Self::Error> {
         match value {
-            SessionData::User(data) => Ok(data),
+            AuthSessionData::User(data) => Ok(data),
             _ => Err(AuthError::SessionTypeError.into()),
         }
     }

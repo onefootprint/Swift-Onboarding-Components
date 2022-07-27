@@ -1,5 +1,5 @@
 use crate::auth::session_data::email_verify::EmailVerifySession;
-use crate::auth::session_data::SessionData;
+use crate::auth::session_data::AuthSessionData;
 use crate::errors::ApiError;
 use crate::State;
 use crypto::random::gen_random_alphanumeric_code;
@@ -149,7 +149,7 @@ pub(crate) async fn send_email_challenge(
     user_data_id: UserDataId,
     email_address: &PiiString,
 ) -> Result<(), ApiError> {
-    let session_data = SessionData::EmailVerify(EmailVerifySession { user_data_id });
+    let session_data = AuthSessionData::EmailVerify(EmailVerifySession { user_data_id });
 
     // create new session
     let token = AuthSession::create(state, session_data, chrono::Duration::days(1)).await?;

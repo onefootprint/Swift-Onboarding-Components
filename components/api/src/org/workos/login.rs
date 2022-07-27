@@ -1,7 +1,7 @@
 use std::collections::HashSet;
 
 use crate::auth::session_data::workos::WorkOsSession;
-use crate::auth::session_data::SessionData;
+use crate::auth::session_data::AuthSessionData;
 use crate::errors::workos_login::WorkOsLoginError;
 use crate::utils::email_domain;
 use crate::utils::session::AuthSession;
@@ -61,7 +61,7 @@ async fn handler(
     let (tenant, is_new) = find_or_create_tenant(&state, profile).await?;
 
     // Save tenant login in session data into the DB
-    let session_data = SessionData::WorkOs(WorkOsSession {
+    let session_data = AuthSessionData::WorkOs(WorkOsSession {
         email: profile.email.clone(),
         first_name: profile.first_name.clone(),
         last_name: profile.last_name.clone(),

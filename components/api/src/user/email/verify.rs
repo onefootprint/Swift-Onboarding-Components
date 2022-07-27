@@ -1,7 +1,7 @@
 use crate::errors::challenge::ChallengeError;
 use crate::types::success::ApiResponseData;
 use crate::types::Empty;
-use crate::{auth::session_data::SessionData, utils::session::AuthSession};
+use crate::{auth::session_data::AuthSessionData, utils::session::AuthSession};
 
 use crate::errors::ApiError;
 use crate::State;
@@ -27,7 +27,7 @@ async fn post(
         .await?
         .ok_or(ChallengeError::EmailVerificationTokenInvalidOrNotFound)?;
 
-    let data = if let SessionData::EmailVerify(data) = session.data {
+    let data = if let AuthSessionData::EmailVerify(data) = session.data {
         Ok(data)
     } else {
         Err(ApiError::from(

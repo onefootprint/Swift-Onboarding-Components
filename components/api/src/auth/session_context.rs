@@ -16,7 +16,7 @@ use crate::{errors::ApiError, utils::session::AuthSession, State};
 use super::{
     session_data::{
         user::{UserAuthScope, UserSession},
-        HeaderName, SessionData,
+        AuthSessionData, HeaderName,
     },
     AuthError, IsLive, SupportsIsLiveHeader,
 };
@@ -53,7 +53,7 @@ impl std::fmt::Debug for MaskedHeaderMap {
 
 impl<T> FromRequest for SessionContext<T>
 where
-    T: TryFrom<SessionData> + HeaderName,
+    T: TryFrom<AuthSessionData> + HeaderName,
 {
     type Error = ApiError;
     type Future = Pin<Box<dyn Future<Output = Result<Self, Self::Error>>>>;
