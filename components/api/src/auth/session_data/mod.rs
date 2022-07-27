@@ -3,55 +3,23 @@ use self::{
     workos::WorkOsSession,
 };
 use crate::errors::ApiError;
-use chrono::{DateTime, Utc};
 use crypto::aead::ScopedSealingKey;
 use newtypes::SealedSessionBytes;
 use serde::{Deserialize, Serialize};
 
-use super::AuthError;
 pub mod email_verify;
 pub mod user;
 pub mod validate_user;
 pub mod workos;
 
-/// This struct is sealed, and then stored in the DB
-#[derive(Debug, Clone)]
-pub struct ServerSession {
-    pub expires_at: DateTime<Utc>,
-    pub data: SessionData,
-}
-
-/// a private type to prevent ServerSession from being serialized, deserialized
-#[derive(Debug, Clone, Serialize, Deserialize)]
-struct PrivateServerSession {
-    expires_at: DateTime<Utc>,
-    data: SessionData,
-}
-
-impl ServerSession {
-    pub fn new(data: SessionData, expires_at: DateTime<Utc>) -> Self {
-        Self { expires_at, data }
-    }
-
-    pub(crate) fn seal(self, key: &ScopedSealingKey) -> Result<SealedSessionBytes, crypto::Error> {
-        let internal = PrivateServerSession {
-            expires_at: self.expires_at,
-            data: self.data,
-        };
-
-        Ok(SealedSessionBytes(key.seal(&internal)?))
+impl SessionData {
+    pub(crate) fn seal(&self, key: &ScopedSealingKey) -> Result<SealedSessionBytes, crypto::Error> {
+        Ok(SealedSessionBytes(key.seal(&self)?))
     }
 
     pub fn unseal(key: &ScopedSealingKey, sealed: &SealedSessionBytes) -> Result<Self, ApiError> {
-        let unsealed: PrivateServerSession = key.unseal(sealed.as_ref())?;
-
-        if unsealed.expires_at < Utc::now() {
-            return Err(AuthError::SessionExpired.into());
-        }
-        Ok(Self {
-            expires_at: unsealed.expires_at,
-            data: unsealed.data,
-        })
+        let unsealed: Self = key.unseal(sealed.as_ref())?;
+        Ok(unsealed)
     }
 }
 

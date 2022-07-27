@@ -5,7 +5,6 @@ use crate::{auth::session_data::SessionData, utils::session::AuthSession};
 
 use crate::errors::ApiError;
 use crate::State;
-use chrono::Utc;
 use db::models::user_data::UserData;
 use newtypes::{DataKind, SessionAuthToken};
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
@@ -26,12 +25,7 @@ async fn post(
 ) -> actix_web::Result<Json<ApiResponseData<Empty>>, ApiError> {
     let session = AuthSession::get(&state, &request.data)
         .await?
-        .ok_or(ChallengeError::EmailVerificationTokenInvalidOrNotFound)?
-        .data;
-
-    if session.expires_at < Utc::now() {
-        return Err(ChallengeError::EmailChallengeExpired.into());
-    }
+        .ok_or(ChallengeError::EmailVerificationTokenInvalidOrNotFound)?;
 
     let data = if let SessionData::EmailVerify(data) = session.data {
         Ok(data)

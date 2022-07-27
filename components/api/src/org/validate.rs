@@ -39,7 +39,7 @@ pub fn validate(
         .ok_or(OnboardingError::ValidateTokenInvalidOrNotFound)?
         .data;
 
-    let ValidateUserToken { ob_id } = if let SessionData::ValidateUserToken(data) = session.data {
+    let ValidateUserToken { ob_id } = if let SessionData::ValidateUserToken(data) = session {
         data
     } else {
         return Err(OnboardingError::ValidateTokenInvalidOrNotFound.into());
