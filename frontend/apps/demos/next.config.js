@@ -20,4 +20,16 @@ module.exports = withPlugins([withTM, withBundleAnalyzer], {
   compiler: {
     styledComponents: true,
   },
+  images: {
+    domains: ['footprint-demos.ghost.io', 'static.ghost.org'],
+  },
+  async redirects() {
+    return [
+      {
+        source: '/',
+        destination: '/acme-bank',
+        permanent: true,
+      },
+    ];
+  },
 });
