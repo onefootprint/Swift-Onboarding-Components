@@ -1,7 +1,7 @@
 use crate::{
     auth::{
         session_context::HasTenant,
-        session_data::{AuthSessionData, HeaderName},
+        session_data::{AuthSessionData, ExtractableAuthSession},
         AuthError, SupportsIsLiveHeader,
     },
     errors::ApiError,
@@ -31,7 +31,7 @@ impl TryFrom<AuthSessionData> for WorkOsSession {
     }
 }
 
-impl HeaderName for WorkOsSession {
+impl ExtractableAuthSession for WorkOsSession {
     fn header_names() -> Vec<&'static str> {
         vec!["X-Fp-Dashboard-Authorization"]
     }

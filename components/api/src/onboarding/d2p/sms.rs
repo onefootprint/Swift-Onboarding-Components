@@ -1,5 +1,5 @@
-use crate::auth::session_context::{HasUserVaultId, UserAuth};
 use crate::auth::session_data::user::UserAuthScope;
+use crate::auth::{session_context::HasUserVaultId, UserAuth};
 use crate::errors::ApiError;
 use crate::types::success::ApiResponseData;
 use crate::utils::user_vault_wrapper::UserVaultWrapper;
@@ -26,7 +26,7 @@ pub fn handler(
     request: Json<D2pSmsRequest>,
     state: web::Data<State>,
 ) -> actix_web::Result<Json<ApiResponseData<D2pSmsResponse>>, ApiError> {
-    user_auth.enforce_has_any(vec![UserAuthScope::Handoff])?;
+    let user_auth = user_auth.check_permissions(vec![UserAuthScope::Handoff])?;
 
     let user_vault = user_auth.user_vault(&state.db_pool).await?;
     let uvw = UserVaultWrapper::from(&state.db_pool, user_vault).await?;

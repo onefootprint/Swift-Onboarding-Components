@@ -1,5 +1,6 @@
-use crate::auth::session_context::{HasUserVaultId, UserAuth};
+use crate::auth::session_context::HasUserVaultId;
 use crate::auth::session_data::user::{UserAuthScope, UserSession};
+use crate::auth::UserAuth;
 use crate::errors::ApiError;
 use crate::types::success::ApiResponseData;
 use crate::utils::session::JsonSession;
@@ -23,7 +24,7 @@ pub async fn handler(
     state: web::Data<State>,
     user_auth: UserAuth,
 ) -> actix_web::Result<Json<ApiResponseData<GenerateResponse>>, ApiError> {
-    user_auth.enforce_has_any(vec![UserAuthScope::SignUp])?;
+    let user_auth = user_auth.check_permissions(vec![UserAuthScope::SignUp])?;
 
     let session_sealing_key = state.session_sealing_key.clone();
     let auth_token = state

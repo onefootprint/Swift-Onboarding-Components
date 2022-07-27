@@ -1,5 +1,5 @@
-use crate::auth::session_context::UserAuth;
 use crate::auth::session_data::user::UserAuthScope;
+use crate::auth::UserAuth;
 use crate::errors::handoff::HandoffError;
 use crate::errors::ApiError;
 use crate::types::success::ApiResponseData;
@@ -21,7 +21,7 @@ pub async fn get(
     state: web::Data<State>,
     user_auth: UserAuth,
 ) -> actix_web::Result<Json<ApiResponseData<StatusResponse>>, ApiError> {
-    user_auth.enforce_has_any(vec![UserAuthScope::Handoff])?;
+    let user_auth = user_auth.check_permissions(vec![UserAuthScope::Handoff])?;
 
     let session = &state
         .db_pool
@@ -48,7 +48,7 @@ pub fn post(
     request: Json<UpdateStatusRequest>,
     state: web::Data<State>,
 ) -> actix_web::Result<Json<ApiResponseData<Empty>>, ApiError> {
-    user_auth.enforce_has_any(vec![UserAuthScope::Handoff])?;
+    let user_auth = user_auth.check_permissions(vec![UserAuthScope::Handoff])?;
 
     let UpdateStatusRequest { status } = request.into_inner();
     state

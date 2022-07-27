@@ -1,6 +1,6 @@
-use crate::auth::key_context::ob_public_key::PublicTenantAuthContext;
-use crate::auth::session_context::{HasUserVaultId, UserAuth};
+use crate::auth::session_context::HasUserVaultId;
 use crate::auth::session_data::user::UserAuthScope;
+use crate::auth::{key_context::ob_public_key::PublicTenantAuthContext, UserAuth};
 use crate::errors::onboarding::OnboardingError;
 use crate::errors::ApiError;
 use crate::types::success::ApiResponseData;
@@ -32,7 +32,7 @@ pub fn handler(
     tenant_auth: PublicTenantAuthContext,
     user_auth: UserAuth,
 ) -> actix_web::Result<Json<ApiResponseData<OnboardingResponse>>, ApiError> {
-    user_auth.enforce_has_any(vec![UserAuthScope::OrgOnboarding])?;
+    let user_auth = user_auth.check_permissions(vec![UserAuthScope::OrgOnboarding])?;
 
     let uv = user_auth.user_vault(&state.db_pool).await?;
     if tenant_auth.ob_config.is_live != uv.is_live {

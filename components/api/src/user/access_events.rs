@@ -1,4 +1,4 @@
-use crate::auth::{session_context::UserAuth, session_data::user::UserAuthScope};
+use crate::auth::{session_data::user::UserAuthScope, UserAuth};
 use crate::errors::ApiError;
 use crate::types::access_event::ApiAccessEvent;
 use crate::types::success::ApiResponseData;
@@ -25,7 +25,7 @@ fn handler(
     request: web::Query<AccessEventRequest>,
     user_auth: UserAuth,
 ) -> actix_web::Result<Json<ApiResponseData<AccessEventResponse>>, ApiError> {
-    user_auth.enforce_has_any(vec![UserAuthScope::BasicProfile])?;
+    let user_auth = user_auth.check_permissions(vec![UserAuthScope::BasicProfile])?;
 
     // TODO paginate the response when there are too many results
     let results = AccessEventListItemForUser::get(

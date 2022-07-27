@@ -2,13 +2,11 @@ use newtypes::UserVaultId;
 use paperclip::actix::Apiv2Schema;
 
 use crate::{
-    auth::{
-        session_context::HasUserVaultId,
-        session_data::{AuthSessionData, HeaderName},
-        AuthError,
-    },
+    auth::{session_context::HasUserVaultId, session_data::AuthSessionData, AuthError},
     errors::ApiError,
 };
+
+use super::ExtractableAuthSession;
 
 #[derive(serde::Serialize, serde::Deserialize, PartialEq, Debug, Clone, Copy, Apiv2Schema)]
 #[serde(rename = "snake_case")]
@@ -24,7 +22,9 @@ pub enum UserAuthScope {
     Handoff,
 }
 
-/// A user-specific session. Permissions for the session are defined by the set of issues scopes
+/// A user-specific session. Permissions for the session are defined by the set of scopes.
+/// IMPORTANT: Purposefully doesn't implement TryFrom<AuthSessionData> or HeaderName to prevent
+/// users from using this in an actix extractor. The ParsableUserSession
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, Apiv2Schema)]
 pub struct UserSession {
     pub user_vault_id: UserVaultId,
@@ -42,28 +42,35 @@ impl UserSession {
     pub fn has_scope(&self, scope: UserAuthScope) -> bool {
         self.scopes.contains(&scope)
     }
+}
 
-    pub fn enforce_has_any(&self, scopes: Vec<UserAuthScope>) -> Result<(), AuthError> {
-        if scopes.iter().any(|s| self.has_scope(s.to_owned())) {
-            Ok(())
-        } else {
-            Err(AuthError::MissingScope(scopes))
-        }
+impl HasUserVaultId for UserSession {
+    fn user_vault_id(&self) -> UserVaultId {
+        self.user_vault_id.clone()
     }
 }
 
-impl TryFrom<AuthSessionData> for UserSession {
+/// Nests a private UserSession and implements traits required to extract this session from an
+/// actix request.
+/// Notably, this struct isn't very useful since the entire nested UserSession is hidden. If you
+/// want to do something useful, you likely have to enforce permissions by calling
+/// `check_permissions`, which will give you the more useful nested UserSession
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, Apiv2Schema)]
+#[serde(transparent)]
+pub struct ParsedUserSession(UserSession);
+
+impl TryFrom<AuthSessionData> for ParsedUserSession {
     type Error = ApiError;
 
     fn try_from(value: AuthSessionData) -> Result<Self, Self::Error> {
         match value {
-            AuthSessionData::User(data) => Ok(data),
+            AuthSessionData::User(data) => Ok(ParsedUserSession(data)),
             _ => Err(AuthError::SessionTypeError.into()),
         }
     }
 }
 
-impl HeaderName for UserSession {
+impl ExtractableAuthSession for ParsedUserSession {
     fn header_names() -> Vec<&'static str> {
         vec![
             "X-Fpuser-Authorization",
@@ -74,8 +81,12 @@ impl HeaderName for UserSession {
     }
 }
 
-impl HasUserVaultId for UserSession {
-    fn user_vault_id(&self) -> UserVaultId {
-        self.user_vault_id.clone()
+impl ParsedUserSession {
+    pub fn check_permissions(self, scopes: Vec<UserAuthScope>) -> Result<UserSession, AuthError> {
+        if scopes.iter().any(|s| self.0.has_scope(s.to_owned())) {
+            Ok(self.0)
+        } else {
+            Err(AuthError::MissingScope(scopes))
+        }
     }
 }

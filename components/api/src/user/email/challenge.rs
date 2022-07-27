@@ -1,6 +1,6 @@
 use std::str::FromStr;
 
-use crate::auth::session_context::UserAuth;
+use crate::auth::UserAuth;
 use crate::auth::{session_context::HasUserVaultId, session_data::user::UserAuthScope};
 use crate::errors::challenge::ChallengeError;
 use crate::errors::ApiError;
@@ -27,7 +27,7 @@ async fn post(
     user_auth: UserAuth,
     request: Json<RequestEmailVerifyRequest>,
 ) -> actix_web::Result<Json<ApiResponseData<Empty>>, ApiError> {
-    user_auth.enforce_has_any(vec![UserAuthScope::BasicProfile])?;
+    let user_auth = user_auth.check_permissions(vec![UserAuthScope::BasicProfile])?;
 
     let (user_data, user_vault) = state
         .db_pool

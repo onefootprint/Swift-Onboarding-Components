@@ -1,8 +1,5 @@
 use crate::{
-    auth::{
-        session_context::{HasUserVaultId, UserAuth},
-        session_data::user::UserAuthScope,
-    },
+    auth::{session_context::HasUserVaultId, session_data::user::UserAuthScope, UserAuth},
     errors::ApiError,
     types::{success::ApiResponseData, Empty},
     utils::{
@@ -49,7 +46,7 @@ pub fn init(
     user_auth: UserAuth,
     state: web::Data<State>,
 ) -> actix_web::Result<Json<ApiResponseData<WebAuthnInitResponse>>, ApiError> {
-    user_auth.enforce_has_any(vec![UserAuthScope::SignUp, UserAuthScope::Handoff])?;
+    let user_auth = user_auth.check_permissions(vec![UserAuthScope::SignUp, UserAuthScope::Handoff])?;
 
     // generate the challenge and return it
     let webauthn = LivenessWebauthnConfig::new(&state);
@@ -101,7 +98,7 @@ async fn complete(
     insights: InsightHeaders,
     state: web::Data<State>,
 ) -> actix_web::Result<Json<ApiResponseData<Empty>>, ApiError> {
-    user_auth.enforce_has_any(vec![UserAuthScope::SignUp, UserAuthScope::Handoff])?;
+    let user_auth = user_auth.check_permissions(vec![UserAuthScope::SignUp, UserAuthScope::Handoff])?;
 
     let challenge_data = Challenge::unseal(&state.challenge_sealing_key, &request.challenge_token)?;
     let reg_state = challenge_data.data;

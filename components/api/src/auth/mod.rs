@@ -6,6 +6,9 @@ pub mod either;
 pub mod key_context;
 pub mod session_context;
 pub mod session_data;
+pub mod user_auth;
+
+pub use user_auth::UserAuth;
 
 #[derive(Debug, Error)]
 pub enum AuthError {

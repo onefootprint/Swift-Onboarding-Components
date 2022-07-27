@@ -1,6 +1,6 @@
 use crate::auth::session_context::HasUserVaultId;
-use crate::auth::session_context::UserAuth;
 use crate::auth::session_data::user::UserAuthScope;
+use crate::auth::UserAuth;
 use crate::errors::ApiError;
 use crate::types::success::ApiResponseData;
 use crate::user::decrypt;
@@ -32,7 +32,7 @@ fn handler(
     } else {
         UserAuthScope::BasicProfile
     };
-    user_auth.enforce_has_any(vec![required_scope])?;
+    let user_auth = user_auth.check_permissions(vec![required_scope])?;
 
     let DecryptFieldsResult {
         decrypted_data_kinds: _,

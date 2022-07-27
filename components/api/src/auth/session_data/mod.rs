@@ -41,6 +41,6 @@ pub enum AuthSessionData {
 }
 
 /// Associates an HTTP header name with type
-pub trait HeaderName {
+pub trait ExtractableAuthSession {
     fn header_names() -> Vec<&'static str>;
 }

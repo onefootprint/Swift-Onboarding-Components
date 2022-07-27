@@ -14,10 +14,7 @@ use paperclip::actix::Apiv2Security;
 use crate::{errors::ApiError, utils::session::AuthSession, State};
 
 use super::{
-    session_data::{
-        user::{UserAuthScope, UserSession},
-        AuthSessionData, HeaderName,
-    },
+    session_data::{AuthSessionData, ExtractableAuthSession},
     AuthError, IsLive, SupportsIsLiveHeader,
 };
 
@@ -30,16 +27,7 @@ pub struct SessionContext<T> {
     pub expires_at: DateTime<Utc>,
     pub headers: MaskedHeaderMap,
     // prevents external construction
-    phantom: PhantomData<()>,
-}
-
-// Just a shorthand for the commonly used UserSession context, including commonly used utils
-pub type UserAuth = SessionContext<UserSession>;
-
-impl UserAuth {
-    pub fn enforce_has_any(&self, scopes: Vec<UserAuthScope>) -> Result<(), AuthError> {
-        self.data.enforce_has_any(scopes)
-    }
+    pub(super) phantom: PhantomData<()>,
 }
 
 #[derive(Clone)]
@@ -53,7 +41,7 @@ impl std::fmt::Debug for MaskedHeaderMap {
 
 impl<T> FromRequest for SessionContext<T>
 where
-    T: TryFrom<AuthSessionData> + HeaderName,
+    T: TryFrom<AuthSessionData> + ExtractableAuthSession,
 {
     type Error = ApiError;
     type Future = Pin<Box<dyn Future<Output = Result<Self, Self::Error>>>>;

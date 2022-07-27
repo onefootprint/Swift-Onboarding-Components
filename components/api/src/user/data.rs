@@ -1,5 +1,6 @@
-use crate::auth::session_context::{HasUserVaultId, UserAuth};
+use crate::auth::session_context::HasUserVaultId;
 use crate::auth::session_data::user::UserAuthScope;
+use crate::auth::UserAuth;
 use crate::errors::user::UserError;
 use crate::types::success::ApiResponseData;
 use crate::{
@@ -22,7 +23,7 @@ async fn handler(
     user_auth: UserAuth,
     request: web::Json<UserPatchRequest>,
 ) -> actix_web::Result<Json<ApiResponseData<String>>, ApiError> {
-    user_auth.enforce_has_any(vec![UserAuthScope::SignUp])?;
+    let user_auth = user_auth.check_permissions(vec![UserAuthScope::SignUp])?;
 
     let user_vault = user_auth.user_vault(&state.db_pool).await?;
     let request = request.into_inner();
