@@ -66,6 +66,7 @@
           "verify": {
             "loading": "Sending email to verify your email address",
             "cta": "Verify",
+            "email-sent": "Email sent!",
             "success": {
               "title": "Check your inbox",
               "description": "Please click the link we sent you by email to verify it."

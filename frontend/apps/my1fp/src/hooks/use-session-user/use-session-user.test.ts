@@ -8,6 +8,23 @@ import useSessionUser, {
 } from './use-session-user';
 
 describe('useSessionUser', () => {
+  const fakeSessionMetadata: UserSessionMetadata = {
+    phoneNumbers: [
+      {
+        id: '123456789',
+        isVerified: true,
+        priority: 'primary',
+      },
+    ],
+    emails: [
+      {
+        id: '123456789',
+        isVerified: true,
+        priority: 'primary',
+      },
+    ],
+  };
+
   describe('when the state is empty', () => {
     it('should indicate that the user is not logged in', () => {
       const { result } = renderHook(() => useSessionUser());
@@ -34,9 +51,7 @@ describe('useSessionUser', () => {
           zip: '94102',
         },
         biometric: {},
-        metadata: {
-          isEmailVerified: true,
-        },
+        metadata: fakeSessionMetadata,
       };
       act(() => {
         result.current.logIn(nextData);
@@ -65,9 +80,7 @@ describe('useSessionUser', () => {
           zip: '94102',
         },
         biometric: {},
-        metadata: {
-          isEmailVerified: true,
-        },
+        metadata: fakeSessionMetadata,
       };
       act(() => {
         result.current.logIn(nextData);
@@ -100,7 +113,7 @@ describe('useSessionUser', () => {
         authToken: 'lorem',
         data: oldData,
         biometric: {},
-        metadata: {},
+        metadata: fakeSessionMetadata,
       };
 
       const newData: UserSessionData = {
@@ -120,7 +133,7 @@ describe('useSessionUser', () => {
         authToken: 'lorem',
         data: newData,
         biometric: {},
-        metadata: {},
+        metadata: fakeSessionMetadata,
       };
 
       act(() => {
@@ -136,7 +149,22 @@ describe('useSessionUser', () => {
   describe('when updating biometric', () => {
     it('should correctly update biometric data', () => {
       const { result } = renderHook(() => useSessionUser());
-      const oldMetadata: UserSessionMetadata = { isEmailVerified: false };
+      const oldMetadata: UserSessionMetadata = {
+        emails: [
+          {
+            id: '123456789',
+            isVerified: false,
+            priority: 'primary',
+          },
+        ],
+        phoneNumbers: [
+          {
+            id: '123456789',
+            isVerified: false,
+            priority: 'primary',
+          },
+        ],
+      };
       const data: UserSessionData = {
         firstName: 'John',
         lastName: 'Doe',
@@ -158,7 +186,20 @@ describe('useSessionUser', () => {
       };
 
       const newMetadata: UserSessionMetadata = {
-        isEmailVerified: true,
+        emails: [
+          {
+            id: '123456789',
+            isVerified: true,
+            priority: 'primary',
+          },
+        ],
+        phoneNumbers: [
+          {
+            id: '123456789',
+            isVerified: true,
+            priority: 'primary',
+          },
+        ],
       };
       const newSession: UserSession = {
         authToken: 'lorem',
@@ -197,7 +238,7 @@ describe('useSessionUser', () => {
         authToken: 'lorem',
         data,
         biometric: {},
-        metadata: {},
+        metadata: fakeSessionMetadata,
       };
 
       const newBiometric: UserSessionBiometric = {
@@ -207,7 +248,7 @@ describe('useSessionUser', () => {
         authToken: 'lorem',
         data,
         biometric: newBiometric,
-        metadata: {},
+        metadata: fakeSessionMetadata,
       };
 
       act(() => {

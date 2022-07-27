@@ -13,22 +13,28 @@ const getFullName = (firstName: string | null, lastName: string | null) =>
 const Basic = () => {
   const { t } = useTranslation('pages.my-footprint-identity.basic');
   const { session } = useSessionUser();
+
   if (!session) {
     return null;
   }
+
   const {
     data: { firstName, lastName, email, phoneNumber },
-    metadata: { isEmailVerified },
+    metadata: { emails },
   } = session;
   const fullName = getFullName(firstName, lastName);
-  const shouldShowVerifyEmailButton = !isEmailVerified;
+  const shouldShowVerifyEmailButton =
+    !emails.length || emails.some(e => !e.isVerified);
 
+  // TODO: Add UI support for multiple emails and phone numbers (needs design
+  // For now we just assume that there is exactly one email address
+  // https://linear.app/footprint/issue/FP-740/support-multiple-user-emails-and-phone-numbers-in-my1fp
   return (
     <FieldGroup>
       <Field label={t('name.label')} value={fullName} />
       <EmailFieldContainer>
         <Field label={t('email.label')} value={email} />
-        {shouldShowVerifyEmailButton && <VerifyEmail />}
+        {shouldShowVerifyEmailButton && <VerifyEmail email={emails[0]} />}
       </EmailFieldContainer>
       <Field label={t('phone.label')} value={phoneNumber} />
     </FieldGroup>

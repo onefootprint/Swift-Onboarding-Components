@@ -21,11 +21,11 @@ import attributes from './login.constants';
 const Login = () => {
   const router = useRouter();
   const toast = useToast();
-  const userMutation = useUserDecrypt();
+  const userDecryptMutation = useUserDecrypt();
   const { logIn } = useUserSession();
   const { t } = useTranslation('pages.login');
 
-  const saveInSessionAndGoToHome = (
+  const saveSessionData = (
     authToken: string,
     response: UserDecryptResponse,
   ) => {
@@ -43,21 +43,24 @@ const Login = () => {
         country: response.country,
         zip: response.zip,
       },
-      biometric: {},
-      metadata: {},
       authToken,
+      metadata: {
+        phoneNumbers: [],
+        emails: [],
+      },
+      biometric: {},
     });
-    router.push('/');
   };
 
   const handleClick = () => {
     footprint.show({
       onAuthenticated: (authToken: string) => {
-        userMutation.mutate(
+        userDecryptMutation.mutate(
           { authToken, attributes },
           {
             onSuccess(data) {
-              saveInSessionAndGoToHome(authToken, data);
+              saveSessionData(authToken, data);
+              router.push('/');
             },
             onError: (error: RequestError) => {
               toast.show({
@@ -83,7 +86,7 @@ const Login = () => {
           fullWidth
           onClick={handleClick}
           text="Continue with Footprint"
-          loading={userMutation.isLoading}
+          loading={userDecryptMutation.isLoading}
         />
         <TextContainer>
           <Typography variant="caption-2" color="tertiary">

@@ -6,10 +6,16 @@ export type UserSessionBiometric = {
   device?: string;
 };
 
+export type UserIdentification = {
+  id: string;
+  priority: 'primary' | 'secondary';
+  isVerified: boolean;
+};
+
 export type UserSessionMetadata = {
-  hasSSNFilled?: boolean;
-  isEmailVerified?: boolean;
   wasLoggedUsingBiometrics?: boolean;
+  emails: UserIdentification[];
+  phoneNumbers: UserIdentification[];
 };
 
 export type UserSessionData = {

@@ -3,7 +3,7 @@ import request, { RequestError, RequestResponse } from 'request';
 import { MY1FP_AUTH_HEADER } from 'src/config/constants';
 
 export type VerificationEmailRequest = {
-  email: string;
+  id: string;
   authToken: string;
 };
 
@@ -16,8 +16,10 @@ const verificationEmailRequest = async (payload: VerificationEmailRequest) => {
     RequestResponse<VerificationEmailResponse>
   >({
     method: 'post',
-    url: '/user/data',
-    data: payload,
+    url: '/user/email/challenge',
+    data: {
+      id: payload.id,
+    },
     headers: {
       [MY1FP_AUTH_HEADER]: payload.authToken,
     },

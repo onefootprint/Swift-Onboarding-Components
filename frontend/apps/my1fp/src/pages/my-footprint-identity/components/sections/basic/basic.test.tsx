@@ -12,7 +12,7 @@ describe('<Basic />', () => {
   const withVerification = () => {
     mockRequest({
       method: 'post',
-      path: 'user/data',
+      path: 'user/email/challenge',
       response: {
         data: 'Success',
       },
@@ -22,7 +22,7 @@ describe('<Basic />', () => {
   const withVerificationError = () => {
     mockRequest({
       method: 'post',
-      path: 'user/data',
+      path: 'user/email/challenge',
       statusCode: 403,
       response: {
         error: {
@@ -55,7 +55,20 @@ describe('<Basic />', () => {
             zip: '94102',
           },
           metadata: {
-            isEmailVerified: true,
+            phoneNumbers: [
+              {
+                id: '123456789',
+                isVerified: true,
+                priority: 'primary',
+              },
+            ],
+            emails: [
+              {
+                id: '123456789',
+                isVerified: true,
+                priority: 'primary',
+              },
+            ],
           },
           biometric: {},
         },
@@ -83,7 +96,20 @@ describe('<Basic />', () => {
       useStore.setState({
         session: {
           metadata: {
-            isEmailVerified: false,
+            phoneNumbers: [
+              {
+                id: '123456789',
+                isVerified: true,
+                priority: 'primary',
+              },
+            ],
+            emails: [
+              {
+                id: '123456789',
+                isVerified: false,
+                priority: 'primary',
+              },
+            ],
           },
           authToken: 'lorem',
           data: {

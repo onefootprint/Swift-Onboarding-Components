@@ -1,11 +1,16 @@
 import { useTranslation } from 'hooks';
 import React from 'react';
 import useSessionUser from 'src/hooks/use-session-user';
-import { Box, LinkButton, LoadingIndicator, useToast } from 'ui';
+import { Box, LinkButton, LoadingIndicator, Typography, useToast } from 'ui';
 
+import { UserIdentification } from '../../../../../../../hooks/use-session-user/use-session-user';
 import useVerificationEmail from './hooks/use-verification-email';
 
-const VerifyEmail = () => {
+type VerifyEmailProps = {
+  email: UserIdentification;
+};
+
+const VerifyEmail = ({ email }: VerifyEmailProps) => {
   const { t } = useTranslation(
     'pages.my-footprint-identity.basic.email.verify',
   );
@@ -15,14 +20,29 @@ const VerifyEmail = () => {
   if (!session) {
     return null;
   }
-  const {
-    data: { email },
-    authToken,
-  } = session;
+
+  if (verificationEmailMutation.isLoading) {
+    return (
+      <Box>
+        <LoadingIndicator aria-label={t('loading')} />
+      </Box>
+    );
+  }
+
+  if (verificationEmailMutation.isSuccess) {
+    return (
+      <Box>
+        <Typography variant="label-3" color="tertiary">
+          {t('email-sent')}
+        </Typography>
+      </Box>
+    );
+  }
 
   const handleVerifyClick = () => {
+    const { authToken } = session;
     verificationEmailMutation.mutate(
-      { email, authToken },
+      { id: email.id, authToken },
       {
         onSuccess: () => {
           toast.show({
@@ -43,13 +63,9 @@ const VerifyEmail = () => {
 
   return (
     <Box>
-      {verificationEmailMutation.isLoading ? (
-        <LoadingIndicator aria-label={t('loading')} />
-      ) : (
-        <LinkButton size="compact" onClick={handleVerifyClick}>
-          {t('cta')}
-        </LinkButton>
-      )}
+      <LinkButton size="compact" onClick={handleVerifyClick}>
+        {t('cta')}
+      </LinkButton>
     </Box>
   );
 };

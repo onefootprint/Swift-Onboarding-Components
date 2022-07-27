@@ -1,5 +1,5 @@
 import React from 'react';
-import { useStore } from 'src/hooks/use-session-user';
+import { UserSessionMetadata, useStore } from 'src/hooks/use-session-user';
 import { customRender, screen } from 'test-utils';
 
 import Identity from './identity';
@@ -8,6 +8,23 @@ const originalState = useStore.getState();
 
 describe('<Identity />', () => {
   const renderIdentity = () => customRender(<Identity />);
+
+  const fakeSessionMetadata: UserSessionMetadata = {
+    phoneNumbers: [
+      {
+        id: '123456789',
+        isVerified: true,
+        priority: 'primary',
+      },
+    ],
+    emails: [
+      {
+        id: '123456789',
+        isVerified: true,
+        priority: 'primary',
+      },
+    ],
+  };
 
   afterAll(() => {
     useStore.setState(originalState);
@@ -30,10 +47,9 @@ describe('<Identity />', () => {
             streetAddress: '14 Linda St',
             streetAddress2: null,
             zip: '94102',
+            ssn: '02392432423',
           },
-          metadata: {
-            hasSSNFilled: true,
-          },
+          metadata: fakeSessionMetadata,
           biometric: {},
         },
       });
@@ -68,9 +84,7 @@ describe('<Identity />', () => {
             streetAddress2: null,
             zip: '94102',
           },
-          metadata: {
-            hasSSNFilled: false,
-          },
+          metadata: fakeSessionMetadata,
           biometric: {},
         },
       });
@@ -99,12 +113,9 @@ describe('<Identity />', () => {
             streetAddress: '14 Linda St',
             streetAddress2: null,
             zip: '94102',
+            ssn: '02392432423',
           },
-          metadata: {
-            hasSSNFilled: true,
-            isEmailVerified: false,
-            wasLoggedUsingBiometrics: true,
-          },
+          metadata: fakeSessionMetadata,
           biometric: {},
         },
       });

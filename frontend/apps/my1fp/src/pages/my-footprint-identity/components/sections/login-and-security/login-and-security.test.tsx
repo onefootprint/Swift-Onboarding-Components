@@ -9,15 +9,30 @@ const originalState = useStore.getState();
 describe('<LoginAndSecurity />', () => {
   const renderLoginAndSecurity = () => customRender(<LoginAndSecurity />);
 
+  const fakeSessionMetadata = {
+    phoneNumbers: [
+      {
+        id: '123456789',
+        isVerified: true,
+        priority: 'primary',
+      },
+    ],
+    emails: [
+      {
+        id: '123456789',
+        isVerified: true,
+        priority: 'primary',
+      },
+    ],
+  };
+
   afterAll(() => {
     useStore.setState(originalState);
   });
 
   describe('with all the values are filled and biometrics is verified', () => {
     const session: UserSession = {
-      metadata: {
-        isEmailVerified: true,
-      },
+      metadata: fakeSessionMetadata,
       biometric: {
         isBiometricsVerified: true,
         device: 'iPhone 12',
@@ -58,9 +73,7 @@ describe('<LoginAndSecurity />', () => {
 
   describe('with unverified biometrics', () => {
     const data: UserSession = {
-      metadata: {
-        isEmailVerified: true,
-      },
+      metadata: fakeSessionMetadata,
       biometric: {
         isBiometricsVerified: false,
       },

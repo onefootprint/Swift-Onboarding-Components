@@ -3,17 +3,7 @@ import request, { RequestError, RequestResponse } from 'request';
 
 import { MY1FP_AUTH_HEADER } from '../../config/constants';
 import useSessionUser from '../use-session-user';
-
-export enum UserIdentificationPriority {
-  primary = 'primary',
-  secondary = 'secondary',
-}
-
-export type UserIdentification = {
-  id: string;
-  priority: UserIdentificationPriority;
-  isVerified: boolean;
-};
+import { UserIdentification } from '../use-session-user/use-session-user';
 
 export type GetUserRequest = {
   authToken: string;
@@ -35,7 +25,6 @@ const getUser = async (payload: GetUserRequest) => {
   return response.data;
 };
 
-// TODO: start using this hook instead of use-user-decrypt next
 const useGetUser = () => {
   const { session } = useSessionUser();
   const authToken = session?.authToken || '';

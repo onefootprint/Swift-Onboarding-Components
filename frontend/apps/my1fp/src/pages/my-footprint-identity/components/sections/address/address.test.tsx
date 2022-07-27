@@ -1,5 +1,9 @@
 import React from 'react';
-import { UserSession, useStore } from 'src/hooks/use-session-user';
+import {
+  UserSession,
+  UserSessionMetadata,
+  useStore,
+} from 'src/hooks/use-session-user';
 import { customRender, screen } from 'test-utils';
 
 import Address from './address';
@@ -8,6 +12,23 @@ const originalState = useStore.getState();
 
 describe('<Address />', () => {
   const renderAddress = () => customRender(<Address />);
+
+  const fakeSessionMetadata: UserSessionMetadata = {
+    phoneNumbers: [
+      {
+        id: '123456789',
+        isVerified: true,
+        priority: 'primary',
+      },
+    ],
+    emails: [
+      {
+        id: '123456789',
+        isVerified: true,
+        priority: 'primary',
+      },
+    ],
+  };
 
   afterAll(() => {
     useStore.setState(originalState);
@@ -29,7 +50,7 @@ describe('<Address />', () => {
         streetAddress2: null,
         zip: '94102',
       },
-      metadata: { isEmailVerified: true },
+      metadata: fakeSessionMetadata,
       biometric: {},
     };
 
@@ -69,7 +90,7 @@ describe('<Address />', () => {
         zip: '94102',
       },
       biometric: {},
-      metadata: { isEmailVerified: true },
+      metadata: fakeSessionMetadata,
     };
 
     beforeEach(() => {
