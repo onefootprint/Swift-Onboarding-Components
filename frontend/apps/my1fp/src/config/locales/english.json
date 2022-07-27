@@ -109,6 +109,7 @@
           "label": "Biometrics",
           "loading": "Starting biometric liveness check.",
           "not-verified": "Not verified",
+          "default-device": "Mobile",
           "cta": "Verify"
         }
       },

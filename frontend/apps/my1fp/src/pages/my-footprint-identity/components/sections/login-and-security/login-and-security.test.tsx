@@ -33,10 +33,12 @@ describe('<LoginAndSecurity />', () => {
   describe('with all the values are filled and biometrics is verified', () => {
     const session: UserSession = {
       metadata: fakeSessionMetadata,
-      biometric: {
-        isBiometricsVerified: true,
-        device: 'iPhone 12',
-      },
+      biometric: [
+        {
+          userAgent: 'iPhone 12',
+          timestamp: 'time',
+        },
+      ],
       authToken: 'lorem',
       data: {
         city: 'San Francisco',
@@ -74,9 +76,7 @@ describe('<LoginAndSecurity />', () => {
   describe('with unverified biometrics', () => {
     const data: UserSession = {
       metadata: fakeSessionMetadata,
-      biometric: {
-        isBiometricsVerified: false,
-      },
+      biometric: [],
       authToken: 'lorem',
       data: {
         city: 'San Francisco',

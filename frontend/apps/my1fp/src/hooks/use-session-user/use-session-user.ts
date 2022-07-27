@@ -1,10 +1,9 @@
 import create from 'zustand';
 import { persist } from 'zustand/middleware';
 
-export type UserSessionBiometric = {
-  isBiometricsVerified?: boolean;
-  device?: string;
-};
+import { InsightEvent } from '../../pages/my-footprint-identity/components/sections/access-logs/types';
+
+export type UserSessionBiometric = InsightEvent[];
 
 export type UserIdentification = {
   id: string;
@@ -40,6 +39,28 @@ export type UserSession = {
   authToken: string;
 };
 
+const emptySession: UserSession = {
+  data: {
+    firstName: null,
+    lastName: null,
+    dob: null,
+    phoneNumber: null,
+    email: '',
+    streetAddress: null,
+    streetAddress2: null,
+    city: null,
+    state: null,
+    country: null,
+    zip: null,
+  },
+  authToken: '',
+  metadata: {
+    emails: [],
+    phoneNumbers: [],
+  },
+  biometric: [],
+};
+
 type UserSessionState = {
   session?: UserSession;
   logIn: (data: UserSession) => void;
@@ -58,29 +79,32 @@ export const useStore = create<UserSessionState>()(
     logOut: () => set({ session: undefined }),
     updateData: (data: UserSessionData) => {
       set(state => {
-        const { session } = state;
-        if (session) {
-          session.data = { ...data };
+        const newState = { ...state };
+        if (!newState.session) {
+          newState.session = emptySession;
         }
-        return state;
+        newState.session!.data = { ...data };
+        return newState;
       });
     },
     updateBiometric: (biometric: UserSessionBiometric) => {
       set(state => {
-        const { session } = state;
-        if (session) {
-          session.biometric = { ...biometric };
+        const newState = { ...state };
+        if (!newState.session) {
+          newState.session = emptySession;
         }
-        return state;
+        newState.session!.biometric = [...biometric];
+        return newState;
       });
     },
     updateMetadata: (metadata: UserSessionMetadata) => {
       set(state => {
-        const { session } = state;
-        if (session) {
-          session.metadata = { ...metadata };
+        const newState = { ...state };
+        if (!newState.session) {
+          newState.session = emptySession;
         }
-        return state;
+        newState.session!.metadata = { ...metadata };
+        return newState;
       });
     },
   })),

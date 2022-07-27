@@ -70,7 +70,7 @@ describe('<Basic />', () => {
               },
             ],
           },
-          biometric: {},
+          biometric: [],
         },
       });
     });
@@ -125,7 +125,7 @@ describe('<Basic />', () => {
             streetAddress2: null,
             zip: '94102',
           },
-          biometric: {},
+          biometric: [],
         },
       });
     });

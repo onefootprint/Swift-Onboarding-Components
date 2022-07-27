@@ -49,8 +49,8 @@ describe('<Identity />', () => {
             zip: '94102',
             ssn: '02392432423',
           },
+          biometric: [],
           metadata: fakeSessionMetadata,
-          biometric: {},
         },
       });
     });
@@ -84,8 +84,8 @@ describe('<Identity />', () => {
             streetAddress2: null,
             zip: '94102',
           },
+          biometric: [],
           metadata: fakeSessionMetadata,
-          biometric: {},
         },
       });
     });
@@ -115,8 +115,8 @@ describe('<Identity />', () => {
             zip: '94102',
             ssn: '02392432423',
           },
+          biometric: [],
           metadata: fakeSessionMetadata,
-          biometric: {},
         },
       });
     });

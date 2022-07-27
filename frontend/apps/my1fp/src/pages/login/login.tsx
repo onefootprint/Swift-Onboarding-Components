@@ -43,12 +43,12 @@ const Login = () => {
         country: response.country,
         zip: response.zip,
       },
+      biometric: [],
       authToken,
       metadata: {
         phoneNumbers: [],
         emails: [],
       },
-      biometric: {},
     });
   };
 

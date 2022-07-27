@@ -51,7 +51,7 @@ describe('<Address />', () => {
         zip: '94102',
       },
       metadata: fakeSessionMetadata,
-      biometric: {},
+      biometric: [],
     };
 
     beforeEach(() => {
@@ -89,7 +89,7 @@ describe('<Address />', () => {
         streetAddress2: null,
         zip: '94102',
       },
-      biometric: {},
+      biometric: [],
       metadata: fakeSessionMetadata,
     };
 

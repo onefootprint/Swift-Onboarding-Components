@@ -30,6 +30,13 @@ const QRRegister = () => {
     d2pGenerateMutation.isLoading || !state.context.scopedAuthToken;
 
   useEffect(() => {
+    if (!scopedAuthToken && authToken) {
+      generateScopedAuthToken(authToken);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
     if (authToken && statusResponse.error) {
       generateScopedAuthToken(authToken);
     }

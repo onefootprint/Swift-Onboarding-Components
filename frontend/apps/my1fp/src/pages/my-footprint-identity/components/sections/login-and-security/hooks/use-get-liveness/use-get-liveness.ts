@@ -9,13 +9,14 @@ export type GetLivenessRequest = {
   authToken: string;
 };
 
-export type GetLivenessResponse = {
-  data: InsightEvent[];
+export type InsightEventEntry = {
+  insightEvent: InsightEvent;
 };
+export type GetLivenessResponse = InsightEvent[];
 
 const getLiveness = async (payload: GetLivenessRequest) => {
   const { data: response } = await request<
-    RequestResponse<GetLivenessResponse>
+    RequestResponse<InsightEventEntry[]>
   >({
     method: 'GET',
     url: '/user/liveness',
@@ -24,7 +25,7 @@ const getLiveness = async (payload: GetLivenessRequest) => {
     },
   });
 
-  return response.data;
+  return response.data.map(e => e.insightEvent);
 };
 
 const useGetLiveness = () => {

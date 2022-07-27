@@ -50,7 +50,7 @@ describe('useSessionUser', () => {
           country: 'United States',
           zip: '94102',
         },
-        biometric: {},
+        biometric: [],
         metadata: fakeSessionMetadata,
       };
       act(() => {
@@ -79,7 +79,7 @@ describe('useSessionUser', () => {
           country: 'United States',
           zip: '94102',
         },
-        biometric: {},
+        biometric: [],
         metadata: fakeSessionMetadata,
       };
       act(() => {
@@ -112,7 +112,7 @@ describe('useSessionUser', () => {
       const oldSession: UserSession = {
         authToken: 'lorem',
         data: oldData,
-        biometric: {},
+        biometric: [],
         metadata: fakeSessionMetadata,
       };
 
@@ -132,7 +132,7 @@ describe('useSessionUser', () => {
       const newSession: UserSession = {
         authToken: 'lorem',
         data: newData,
-        biometric: {},
+        biometric: [],
         metadata: fakeSessionMetadata,
       };
 
@@ -181,7 +181,7 @@ describe('useSessionUser', () => {
       const oldSession: UserSession = {
         authToken: 'lorem',
         data,
-        biometric: {},
+        biometric: [],
         metadata: oldMetadata,
       };
 
@@ -204,7 +204,7 @@ describe('useSessionUser', () => {
       const newSession: UserSession = {
         authToken: 'lorem',
         data,
-        biometric: {},
+        biometric: [],
         metadata: newMetadata,
       };
 
@@ -237,13 +237,16 @@ describe('useSessionUser', () => {
       const oldSession: UserSession = {
         authToken: 'lorem',
         data,
-        biometric: {},
+        biometric: [],
         metadata: fakeSessionMetadata,
       };
 
-      const newBiometric: UserSessionBiometric = {
-        device: 'mobile',
-      };
+      const newBiometric: UserSessionBiometric = [
+        {
+          timestamp: '',
+          userAgent: 'mobile',
+        },
+      ];
       const newSession: UserSession = {
         authToken: 'lorem',
         data,

@@ -1,51 +1,111 @@
-import useDeviceInfo, {
-  DeviceInfo,
-} from 'footprint-ui/src/hooks/use-device-info';
-import has from 'lodash/has';
-import React from 'react';
-import { Events, States } from 'src/utils/state-machine/liveness-check/types';
-import withProvider from 'src/utils/with-provider';
+import FocusTrap from 'focus-trap-react';
+import { FootprintFooter } from 'footprint-ui';
+import IcoClose24 from 'icons/ico/ico-close-16';
+import React, { useState } from 'react';
+import { useKey, useLockBodyScroll } from 'react-use';
+import styled, { css } from 'styled-components';
+import { IconButton } from 'ui';
 
 import LivenessCheckMachineProvider from './components/machine-provider';
-import useLivenessCheckMachine from './hooks/use-liveness-check-machine';
-import LivenessCheckFailure from './pages/liveness-check-failure';
-import LivenessCheckSuccess from './pages/liveness-check-success';
-import NewTabProcessing from './pages/new-tab-processing';
-import NewTabRequest from './pages/new-tab-request';
-import QRCodeScanned from './pages/qr-code-scanned';
-import QRCodeSent from './pages/qr-code-sent';
-import QRRegister from './pages/qr-register';
+import LivenessCheckDialogBody from './pages/liveness-check-dialog-body';
 
-type Page = {
-  [page in States]?: () => JSX.Element;
+export type LivenessCheckProps = {
+  onClose: () => void;
 };
 
-const LivenessCheck = () => {
-  const [state, send] = useLivenessCheckMachine();
-  useDeviceInfo((info: DeviceInfo) => {
-    send({
-      type: Events.deviceInfoIdentified,
-      payload: info,
-    });
-  });
-  const valueCasted = state.value as States;
-  const pages: Page = {
-    [States.newTabProcessing]: NewTabProcessing,
-    [States.newTabRequest]: NewTabRequest,
-    [States.qrCodeScanned]: QRCodeScanned,
-    [States.qrCodeSent]: QRCodeSent,
-    [States.qrRegister]: QRRegister,
-    [States.livenessCheckFailed]: LivenessCheckFailure,
-    [States.livenessCheckSucceeded]: LivenessCheckSuccess,
+const LIVENESS_DIALOG_CLOSE_DELAY = 1500;
+
+const LivenessCheck = ({ onClose }: LivenessCheckProps) => {
+  const [isDialogOpen, setDialogOpen] = useState(true);
+  useLockBodyScroll(isDialogOpen);
+  useKey('Escape', onClose);
+
+  const handleDoneLiveness = () => {
+    setTimeout(() => {
+      setDialogOpen(false);
+      onClose();
+    }, LIVENESS_DIALOG_CLOSE_DELAY);
   };
 
-  if (has(pages, valueCasted)) {
-    const Page = pages[valueCasted];
-    if (Page) {
-      return <Page />;
-    }
-  }
-  return null;
+  return isDialogOpen ? (
+    <LivenessCheckMachineProvider>
+      <FocusTrap>
+        <Overlay onClick={onClose} aria-modal>
+          <DialogContainer
+            aria-label="Liveness Check Dialog"
+            data-testid="liveness-check-test-id"
+            role="dialog"
+            onClick={(event: React.MouseEvent<HTMLDivElement>) => {
+              event.stopPropagation();
+            }}
+          >
+            <Header>
+              <CloseContainer>
+                <IconButton
+                  aria-label="Close"
+                  iconComponent={IcoClose24}
+                  onClick={onClose}
+                />
+              </CloseContainer>
+            </Header>
+            <Body>
+              <LivenessCheckDialogBody onDone={handleDoneLiveness} />
+            </Body>
+            <FootprintFooter />
+          </DialogContainer>
+        </Overlay>
+      </FocusTrap>
+    </LivenessCheckMachineProvider>
+  ) : null;
 };
 
-export default () => withProvider(LivenessCheckMachineProvider, LivenessCheck);
+const DialogContainer = styled.div`
+  ${({ theme }) => css`
+    background-color: ${theme.backgroundColor.primary};
+    border-radius: ${theme.borderRadius[2]}px;
+    box-shadow: ${theme.elevation[3]};
+    z-index: ${theme.zIndex.dialog};
+    width: 650px;
+  `}
+`;
+
+const Header = styled.header`
+  ${({ theme }) => css`
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 ${theme.spacing[5]}px;
+    height: 56px;
+    position: relative;
+  `}
+`;
+
+const CloseContainer = styled.div`
+  ${({ theme }) => css`
+    position: absolute;
+    left: ${theme.spacing[5]}px;
+  `}
+`;
+
+const Body = styled.div`
+  ${({ theme }) => css`
+    padding: ${theme.spacing[7]}px;
+  `}
+`;
+
+const Overlay = styled.div`
+  ${({ theme }) => css`
+    align-items: center;
+    background: rgba(0, 0, 0, 0.3);
+    display: flex;
+    height: 100%;
+    justify-content: center;
+    left: 0;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: ${theme.zIndex.overlay};
+  `}
+`;
+
+export default LivenessCheck;
