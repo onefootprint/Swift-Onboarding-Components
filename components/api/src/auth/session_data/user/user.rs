@@ -51,8 +51,12 @@ impl TryFrom<SessionData> for UserSession {
 }
 
 impl HeaderName for UserSession {
-    fn header_name() -> String {
-        "X-Fpuser-Authorization".to_owned()
+    fn header_names() -> Vec<&'static str> {
+        vec![
+            "X-Fpuser-Authorization",
+            "X-My1fp-Authorization",
+            "X-D2p-Authorization",
+        ]
     }
 }
 

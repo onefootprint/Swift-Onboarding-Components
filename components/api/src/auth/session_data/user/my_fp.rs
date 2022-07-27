@@ -30,8 +30,8 @@ impl TryFrom<SessionData> for My1fpBasicSession {
 }
 
 impl HeaderName for My1fpBasicSession {
-    fn header_name() -> String {
-        "X-My1fp-Authorization".to_owned()
+    fn header_names() -> Vec<&'static str> {
+        vec!["X-My1fp-Authorization"]
     }
 }
 
@@ -80,7 +80,7 @@ pub enum StepUpAuthMethod {
 }
 
 impl HeaderName for My1fpStepUpSession {
-    fn header_name() -> String {
-        "X-My1fp-Authorization".to_owned()
+    fn header_names() -> Vec<&'static str> {
+        vec!["X-My1fp-Authorization"]
     }
 }

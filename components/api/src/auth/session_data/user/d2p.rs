@@ -29,8 +29,8 @@ impl TryFrom<SessionData> for D2pSession {
 }
 
 impl HeaderName for D2pSession {
-    fn header_name() -> String {
-        "X-D2P-Authorization".to_owned()
+    fn header_names() -> Vec<&'static str> {
+        vec!["X-D2P-Authorization"]
     }
 }
 

@@ -81,5 +81,5 @@ pub enum SessionData {
 
 /// Associates an HTTP header name with type
 pub trait HeaderName {
-    fn header_name() -> String;
+    fn header_names() -> Vec<&'static str>;
 }

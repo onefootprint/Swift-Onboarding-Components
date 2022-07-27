@@ -27,8 +27,8 @@ impl TryFrom<SessionData> for OnboardingSession {
 }
 
 impl HeaderName for OnboardingSession {
-    fn header_name() -> String {
-        "X-Fpuser-Authorization".to_owned()
+    fn header_names() -> Vec<&'static str> {
+        vec!["X-Fpuser-Authorization"]
     }
 }
 

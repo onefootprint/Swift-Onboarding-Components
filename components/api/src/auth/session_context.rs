@@ -50,12 +50,13 @@ where
     fn from_request(req: &actix_web::HttpRequest, _payload: &mut actix_web::dev::Payload) -> Self::Future {
         let state = req.app_data::<web::Data<State>>().unwrap().clone();
 
-        let header = T::header_name();
-        let auth_token = req
-            .headers()
-            .get(header.clone())
+        let allowed_headers = T::header_names().join(", "); // Temporary
+        let auth_token = T::header_names()
+            .into_iter()
+            .filter_map(|h| req.headers().get(h))
+            .next()
             .and_then(|hv| hv.to_str().map(|s| s.to_string()).ok())
-            .ok_or(AuthError::MissingHeader(header));
+            .ok_or_else(|| AuthError::MissingHeader(allowed_headers.clone()));
         let headers = req.headers().clone();
 
         Box::pin(async move {
@@ -71,7 +72,7 @@ where
             // and if the session associated with the token cannot be converted to type T (in this case, OnboardingSession)
             // we fail
             let session_data = T::try_from(session.data.data)
-                .map_err(|_| AuthError::InvalidTokenForHeader(T::header_name()))?;
+                .map_err(|_| AuthError::InvalidTokenForHeader(allowed_headers))?;
             Ok(Self {
                 data: session_data,
                 auth_token,

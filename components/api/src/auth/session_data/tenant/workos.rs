@@ -33,8 +33,8 @@ impl TryFrom<SessionData> for WorkOsSession {
 }
 
 impl HeaderName for WorkOsSession {
-    fn header_name() -> String {
-        "X-Fp-Dashboard-Authorization".to_owned()
+    fn header_names() -> Vec<&'static str> {
+        vec!["X-Fp-Dashboard-Authorization"]
     }
 }
 
