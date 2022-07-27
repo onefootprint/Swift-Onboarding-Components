@@ -36,6 +36,13 @@ const ComparisonTable = () => {
     { key: 'Unit', value: false },
     { key: 'VGS', value: true },
   ];
+  const accessControl = [
+    { key: 'Footprint', value: true },
+    { key: 'Persona', value: false },
+    { key: 'Alloy', value: false },
+    { key: 'Unit', value: false },
+    { key: 'VGS', value: false },
+  ];
   const liveness = [
     { key: 'Footprint', value: true },
     { key: 'Persona', value: true },
@@ -120,6 +127,16 @@ const ComparisonTable = () => {
             </Typography>
           </td>
           {piiVaulting.map(({ key, value }) => (
+            <td key={key}>{value ? <IcoCheck24 /> : undefined}</td>
+          ))}
+        </tr>
+        <tr>
+          <td>
+            <Typography color="secondary" variant="body-3">
+              {t('features.accessControl')}
+            </Typography>
+          </td>
+          {accessControl.map(({ key, value }) => (
             <td key={key}>{value ? <IcoCheck24 /> : undefined}</td>
           ))}
         </tr>

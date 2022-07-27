@@ -305,6 +305,7 @@
           "kyc": "KYC Check",
           "tokenization": "Tokenization",
           "piiVaulting": "PII Vaulting",
+          "accessControl": "Access control",
           "liveness": "Liveness/Biometrics",
           "faceId": "Face ID Compatible",
           "zeroTrustSecurity": "Zero-trust Security",
