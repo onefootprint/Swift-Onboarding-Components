@@ -38,7 +38,6 @@ fn handler(
         decrypted_data_kinds: _,
         result_map,
     } = decrypt(
-        &user_auth,
         &state,
         user_auth.user_vault(&state.db_pool).await?,
         None,

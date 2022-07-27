@@ -59,7 +59,6 @@ fn handler(
         decrypted_data_kinds,
         result_map,
     } = decrypt(
-        &auth,
         &state,
         vault,
         Some(&scoped_user.id),

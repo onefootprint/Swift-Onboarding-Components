@@ -1,8 +1,4 @@
-use crate::{
-    auth::{uv_permission::HasVaultPermission, AuthError},
-    errors::ApiError,
-    State,
-};
+use crate::{auth::AuthError, errors::ApiError, State};
 use crypto::seal::EciesP256Sha256AesGcmSealed;
 use db::models::{ob_configurations::ObConfiguration, user_vaults::UserVault};
 use enclave_proxy::{DataTransform, DecryptRequest};
@@ -37,16 +33,12 @@ pub struct DecryptFieldsResult {
     pub result_map: HashMap<DataKind, Option<PiiString>>,
 }
 
-pub async fn decrypt<C: HasVaultPermission>(
-    session: &C,
+pub async fn decrypt(
     state: &web::Data<State>,
     user_vault: UserVault,
     scoped_user_id: Option<&ScopedUserId>,
     data_kinds: Vec<DataKind>,
 ) -> Result<DecryptFieldsResult, ApiError> {
-    if !session.can_decrypt(&data_kinds) {
-        return Err(AuthError::UnauthorizedOperation.into());
-    }
     if let Some(scoped_user_id) = scoped_user_id {
         let ob_configs =
             ObConfiguration::list_for_scoped_user(&state.db_pool, scoped_user_id.clone()).await?;

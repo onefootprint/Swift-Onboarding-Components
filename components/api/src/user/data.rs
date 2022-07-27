@@ -1,7 +1,5 @@
 use crate::auth::session_context::{HasUserVaultId, UserAuth};
 use crate::auth::session_data::user::UserAuthScope;
-use crate::auth::uv_permission::HasVaultPermission;
-use crate::auth::AuthError;
 use crate::errors::user::UserError;
 use crate::types::success::ApiResponseData;
 use crate::{
@@ -36,7 +34,7 @@ async fn handler(
         }
     }
 
-    let results = update(&user_auth, &state, &request, &user_vault).await?;
+    let results = update(&state, &request, &user_vault).await?;
 
     // If we updated the email address, send an async challenge to the new email address
     if let Some(email) = request.email.as_ref() {
@@ -52,23 +50,12 @@ async fn handler(
     }))
 }
 
-pub async fn update<C: HasVaultPermission>(
-    context: &C,
+pub async fn update(
     state: &web::Data<State>,
     request: &UserPatchRequest,
     user_vault: &UserVault,
 ) -> Result<Vec<UserData>, ApiError> {
     let update_requests = request.decompose();
-
-    let data_kinds: Vec<DataKind> = update_requests
-        .clone()
-        .into_iter()
-        .flat_map(|update| -> Vec<DataKind> { update.data.into_iter().map(|(kind, _)| kind).collect() })
-        .collect();
-
-    if !context.can_update(&data_kinds) {
-        return Err(AuthError::SessionTypeError.into());
-    }
 
     // Lock the user vault to prevent someone else from editing the data while we're editing it
     let uvw = UserVaultWrapper::from(&state.db_pool, user_vault.to_owned()).await?;
