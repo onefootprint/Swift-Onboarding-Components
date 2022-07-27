@@ -86,7 +86,6 @@ const UsersFilter = () => {
         <Box sx={{ display: 'flex', flexDirection: 'column' }}>
           {[
             OnboardingStatus.verified,
-            OnboardingStatus.incomplete,
             OnboardingStatus.manualReview,
             OnboardingStatus.processing,
             OnboardingStatus.failed,

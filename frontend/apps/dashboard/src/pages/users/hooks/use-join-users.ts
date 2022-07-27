@@ -62,12 +62,10 @@ const useJoinUsers = (
           ]),
         );
 
-        // The status we display for the user is the maximum status of all the scoped_user links,
-        // or incomplete if there are no scoped_user links
-        const maxStatus =
-          scoped_user.onboardings.sort(
-            (a, b) => statusToPriority[b.status] - statusToPriority[a.status],
-          )[0]?.status || OnboardingStatus.incomplete;
+        // The status we display for the user is the maximum status of all the onboardings
+        const maxStatus = scoped_user.onboardings.sort(
+          (a, b) => statusToPriority[b.status] - statusToPriority[a.status],
+        )[0].status;
 
         return {
           status: maxStatus,
