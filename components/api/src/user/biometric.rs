@@ -1,8 +1,7 @@
 use crate::{
     auth::{
-        either::EitherSession3,
-        session_context::HasUserVaultId,
-        session_data::user::{d2p::D2pSession, my_fp::My1fpBasicSession, onboarding::OnboardingSession},
+        session_context::{HasUserVaultId, UserAuth},
+        session_data::user::UserAuthScope,
         uv_permission::{HasVaultPermission, VaultPermission},
         AuthError,
     },
@@ -49,9 +48,11 @@ pub fn init(
     // TODO only allow registering webauthn credentials if you have no previous credentials OR if
     // you logged into this session via webauthn. Otherwise, someone who SIM swaps you can register
     // their own webauthn creds
-    user_auth: EitherSession3<D2pSession, OnboardingSession, My1fpBasicSession>,
+    user_auth: UserAuth,
     state: web::Data<State>,
 ) -> actix_web::Result<Json<ApiResponseData<WebAuthnInitResponse>>, ApiError> {
+    user_auth.enforce_has_any(vec![UserAuthScope::SignUp, UserAuthScope::Handoff])?;
+
     if !user_auth.has_permission(VaultPermission::AddBiometrics) {
         return Err(AuthError::SessionTypeError.into());
     }
@@ -102,10 +103,12 @@ struct WebauthnRegisterRequest {
 #[post("/biometric")]
 async fn complete(
     request: Json<WebauthnRegisterRequest>,
-    user_auth: EitherSession3<D2pSession, OnboardingSession, My1fpBasicSession>,
+    user_auth: UserAuth,
     insights: InsightHeaders,
     state: web::Data<State>,
 ) -> actix_web::Result<Json<ApiResponseData<Empty>>, ApiError> {
+    user_auth.enforce_has_any(vec![UserAuthScope::SignUp, UserAuthScope::Handoff])?;
+
     if !user_auth.has_permission(VaultPermission::AddBiometrics) {
         return Err(AuthError::SessionTypeError.into());
     }

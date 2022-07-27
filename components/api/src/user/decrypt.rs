@@ -1,6 +1,6 @@
 use crate::auth::session_context::HasUserVaultId;
-use crate::auth::session_context::SessionContext;
-use crate::auth::session_data::user::my_fp::My1fpBasicSession;
+use crate::auth::session_context::UserAuth;
+use crate::auth::session_data::user::UserAuthScope;
 use crate::errors::ApiError;
 use crate::types::success::ApiResponseData;
 use crate::user::decrypt;
@@ -24,9 +24,16 @@ type UserDecryptResponse = HashMap<DataKind, Option<String>>;
 /// Requires user auth provided in the cookie.
 fn handler(
     state: web::Data<State>,
-    user_auth: SessionContext<My1fpBasicSession>, // TODO: require stepup m1fp session here
+    user_auth: UserAuth,
     request: Json<UserDecryptRequest>,
 ) -> actix_web::Result<Json<ApiResponseData<UserDecryptResponse>>, ApiError> {
+    let required_scope = if request.attributes.contains(&DataKind::Ssn) {
+        UserAuthScope::ExtendedProfile
+    } else {
+        UserAuthScope::BasicProfile
+    };
+    user_auth.enforce_has_any(vec![required_scope])?;
+
     let DecryptFieldsResult {
         decrypted_data_kinds: _,
         result_map,

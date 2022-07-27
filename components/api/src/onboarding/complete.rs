@@ -1,6 +1,6 @@
-use crate::auth::key_context::ob_public_key::PublicTenantAuthContext;
-use crate::auth::session_context::{HasUserVaultId, SessionContext};
-use crate::auth::session_data::user::onboarding::OnboardingSession;
+use crate::auth::session_context::HasUserVaultId;
+use crate::auth::session_data::user::UserAuthScope;
+use crate::auth::{key_context::ob_public_key::PublicTenantAuthContext, session_context::UserAuth};
 use crate::errors::onboarding::OnboardingError;
 use crate::errors::ApiError;
 use crate::types::success::ApiResponseData;
@@ -35,13 +35,14 @@ struct CommitResponse {
 /// Finish onboarding the user. Returns the footprint_user_id for login. If any necessary
 /// attributes were not set, returns an error with the list of missing fields.
 fn handler(
-    user_auth: SessionContext<OnboardingSession>,
+    user_auth: UserAuth,
     tenant_auth: PublicTenantAuthContext,
     insights: InsightHeaders,
     state: web::Data<State>,
 ) -> actix_web::Result<Json<ApiResponseData<CommitResponse>>, ApiError> {
-    let uv = user_auth.user_vault(&state.db_pool).await?;
+    user_auth.enforce_has_any(vec![UserAuthScope::OrgOnboarding])?;
 
+    let uv = user_auth.user_vault(&state.db_pool).await?;
     let uv_id = uv.id.clone();
 
     let uvw = UserVaultWrapper::from(&state.db_pool, uv.clone()).await?;

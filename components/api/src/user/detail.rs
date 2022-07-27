@@ -1,9 +1,9 @@
-use crate::auth::session_context::HasUserVaultId;
-use crate::auth::session_data::user::my_fp::My1fpBasicSession;
+use crate::auth::session_context::{HasUserVaultId, UserAuth};
+use crate::auth::session_data::user::UserAuthScope;
+use crate::errors::ApiError;
 use crate::types::success::ApiResponseData;
 use crate::utils::user_vault_wrapper::UserVaultWrapper;
 use crate::State;
-use crate::{auth::session_context::SessionContext, errors::ApiError};
 use db::models::user_data::UserData;
 use newtypes::{DataKind, DataPriority, UserDataId};
 use paperclip::actix::{api_v2_operation, web, web::Json, Apiv2Schema};
@@ -43,9 +43,11 @@ fn get_data(uvw: &UserVaultWrapper, data_kind: DataKind) -> Vec<ApiUserData> {
 /// Returns a decrypted profile for the logged-in user
 /// Requires user authentication sent in the cookie after a successful /identify/verify call
 pub async fn handler(
-    user_auth: SessionContext<My1fpBasicSession>,
+    user_auth: UserAuth,
     state: web::Data<State>,
 ) -> actix_web::Result<Json<ApiResponseData<ApiUser>>, ApiError> {
+    user_auth.enforce_has_any(vec![UserAuthScope::BasicProfile])?;
+
     let existing_user = user_auth.user_vault(&state.db_pool).await?;
     let uvw = UserVaultWrapper::from(&state.db_pool, existing_user).await?;
     Ok(Json(ApiResponseData::ok(ApiUser {

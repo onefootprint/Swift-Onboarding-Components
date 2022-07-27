@@ -1,7 +1,5 @@
-use crate::auth::either::EitherSession;
-use crate::auth::session_context::HasUserVaultId;
-use crate::auth::session_data::user::my_fp::My1fpBasicSession;
-use crate::auth::session_data::user::onboarding::OnboardingSession;
+use crate::auth::session_context::{HasUserVaultId, UserAuth};
+use crate::auth::session_data::user::UserAuthScope;
 use crate::auth::uv_permission::HasVaultPermission;
 use crate::auth::AuthError;
 use crate::errors::user::UserError;
@@ -23,9 +21,11 @@ use paperclip::actix::{api_v2_operation, post, web, web::Json};
 /// sent in the cookie after a successful /identify/verify call.
 async fn handler(
     state: web::Data<State>,
-    user_auth: EitherSession<OnboardingSession, My1fpBasicSession>,
+    user_auth: UserAuth,
     request: web::Json<UserPatchRequest>,
 ) -> actix_web::Result<Json<ApiResponseData<String>>, ApiError> {
+    user_auth.enforce_has_any(vec![UserAuthScope::SignUp])?;
+
     let user_vault = user_auth.user_vault(&state.db_pool).await?;
     let request = request.into_inner();
 

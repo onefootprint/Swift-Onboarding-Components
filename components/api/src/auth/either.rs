@@ -4,13 +4,13 @@ use actix_web::FromRequest;
 use async_trait::async_trait;
 use db::{models::tenants::Tenant, DbPool};
 use futures_util::Future;
-use newtypes::{TenantId, UserVaultId};
+use newtypes::TenantId;
 use paperclip::actix::Apiv2Security;
 
 use crate::errors::ApiError;
 
 use super::{
-    session_context::{HasTenant, HasUserVaultId, SessionContext},
+    session_context::HasTenant,
     uv_permission::{HasVaultPermission, VaultPermission},
     AuthError, IsLive,
 };
@@ -69,22 +69,6 @@ where
                 }
             }
         })
-    }
-}
-
-pub type EitherSession<A, B> = Either<SessionContext<A>, SessionContext<B>>;
-pub type EitherSession3<A, B, C> = Either<SessionContext<A>, EitherSession<B, C>>;
-
-impl<A, B> HasUserVaultId for Either<A, B>
-where
-    A: HasUserVaultId,
-    B: HasUserVaultId,
-{
-    fn user_vault_id(&self) -> UserVaultId {
-        match self {
-            Either::Left(l) => l.user_vault_id(),
-            Either::Right(r) => r.user_vault_id(),
-        }
     }
 }
 

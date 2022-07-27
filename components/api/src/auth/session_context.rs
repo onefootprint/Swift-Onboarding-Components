@@ -14,7 +14,10 @@ use paperclip::actix::Apiv2Security;
 use crate::{errors::ApiError, utils::session::AuthSession, State};
 
 use super::{
-    session_data::{HeaderName, SessionData},
+    session_data::{
+        user::{UserAuthScope, UserSession},
+        HeaderName, SessionData,
+    },
     uv_permission::{HasVaultPermission, VaultPermission},
     AuthError, IsLive, SupportsIsLiveHeader,
 };
@@ -29,6 +32,15 @@ pub struct SessionContext<T> {
     pub headers: MaskedHeaderMap,
     // prevents external construction
     phantom: PhantomData<()>,
+}
+
+// Just a shorthand for the commonly used UserSession context, including commonly used utils
+pub type UserAuth = SessionContext<UserSession>;
+
+impl UserAuth {
+    pub fn enforce_has_any(&self, scopes: Vec<UserAuthScope>) -> Result<(), AuthError> {
+        self.data.enforce_has_any(scopes)
+    }
 }
 
 #[derive(Clone)]

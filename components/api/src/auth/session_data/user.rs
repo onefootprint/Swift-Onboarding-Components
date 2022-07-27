@@ -39,6 +39,27 @@ pub struct UserSession {
     pub scopes: Vec<UserAuthScope>,
 }
 
+impl UserSession {
+    pub fn create(user_vault_id: UserVaultId, scopes: Vec<UserAuthScope>) -> SessionData {
+        SessionData::User(Self {
+            user_vault_id,
+            scopes,
+        })
+    }
+
+    pub fn has_scope(&self, scope: UserAuthScope) -> bool {
+        self.scopes.contains(&scope)
+    }
+
+    pub fn enforce_has_any(&self, scopes: Vec<UserAuthScope>) -> Result<(), AuthError> {
+        if scopes.iter().any(|s| self.has_scope(s.to_owned())) {
+            Ok(())
+        } else {
+            Err(AuthError::MissingScope(scopes))
+        }
+    }
+}
+
 impl TryFrom<SessionData> for UserSession {
     type Error = ApiError;
 

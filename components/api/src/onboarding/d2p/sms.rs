@@ -1,5 +1,5 @@
-use crate::auth::session_context::{HasUserVaultId, SessionContext};
-use crate::auth::session_data::user::d2p::D2pSession;
+use crate::auth::session_context::{HasUserVaultId, UserAuth};
+use crate::auth::session_data::user::UserAuthScope;
 use crate::errors::ApiError;
 use crate::types::success::ApiResponseData;
 use crate::utils::user_vault_wrapper::UserVaultWrapper;
@@ -22,10 +22,12 @@ pub struct D2pSmsResponse {
 #[post("sms")]
 /// Send an SMS with a link to the phone onboarding page
 pub fn handler(
-    user_auth: SessionContext<D2pSession>,
+    user_auth: UserAuth,
     request: Json<D2pSmsRequest>,
     state: web::Data<State>,
 ) -> actix_web::Result<Json<ApiResponseData<D2pSmsResponse>>, ApiError> {
+    user_auth.enforce_has_any(vec![UserAuthScope::Handoff])?;
+
     let user_vault = user_auth.user_vault(&state.db_pool).await?;
     let uvw = UserVaultWrapper::from(&state.db_pool, user_vault).await?;
     let phone_number = uvw

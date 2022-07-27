@@ -1,7 +1,5 @@
 use super::{BiometricChallengeState, PhoneChallengeState};
-use crate::auth::session_data::user::my_fp::{My1fpBasicSession, UserAuthMethod};
-use crate::auth::session_data::user::onboarding::OnboardingSession;
-use crate::auth::session_data::SessionData;
+use crate::auth::session_data::user::{UserAuthScope, UserSession};
 use crate::errors::challenge::ChallengeError;
 
 use crate::errors::ApiError;
@@ -52,34 +50,28 @@ pub async fn handler(
         Challenge::<IdentifyChallengeState>::unseal(&state.challenge_sealing_key, &request.challenge_token)?
             .data;
 
-    let (user_vault_id, user_kind, user_auth_method) = match challenge_state.data {
+    let (user_vault_id, user_kind) = match challenge_state.data {
         IdentifyChallengeData::Sms(c_state) => {
-            let (uv_id, user_kind) =
-                validate_sms_challenge(&state, c_state, &request.challenge_response).await?;
-
-            (uv_id, user_kind, UserAuthMethod::SmsOnly)
+            validate_sms_challenge(&state, c_state, &request.challenge_response).await?
         }
         IdentifyChallengeData::Biometric(challenge_state) => {
-            let (uv_id, user_kind) =
-                validate_biometric_challenge(&state, challenge_state, &request.challenge_response)?;
-            (uv_id, user_kind, UserAuthMethod::BiometricsOnly)
+            validate_biometric_challenge(&state, challenge_state, &request.challenge_response)?
         }
     };
 
     // create the session and token
-    let auth_token = match challenge_state.identify_type {
-        IdentifyType::Onboarding => {
-            let data = SessionData::Onboarding(OnboardingSession { user_vault_id });
-            AuthSession::create(&state, data, Duration::minutes(15)).await?
-        }
-        IdentifyType::My1fp => {
-            let data = SessionData::My1fp(My1fpBasicSession {
-                user_vault_id,
-                auth_method: user_auth_method,
-            });
-            AuthSession::create(&state, data, Duration::hours(24)).await?
-        }
+    let (scopes, duration) = match challenge_state.identify_type {
+        IdentifyType::Onboarding => (
+            vec![UserAuthScope::SignUp, UserAuthScope::OrgOnboarding],
+            Duration::minutes(15),
+        ),
+        IdentifyType::My1fp => (
+            vec![UserAuthScope::SignUp, UserAuthScope::BasicProfile],
+            Duration::hours(24),
+        ),
     };
+    let data = UserSession::create(user_vault_id, scopes);
+    let auth_token = AuthSession::create(&state, data, duration).await?;
 
     Ok(Json(ApiResponseData {
         data: VerifyResponse {

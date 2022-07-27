@@ -1,7 +1,5 @@
 use self::{
-    email::email_verify::EmailVerifySession,
-    tenant::workos::WorkOsSession,
-    user::{d2p::D2pSession, my_fp::My1fpBasicSession, onboarding::OnboardingSession, user::UserSession},
+    email::email_verify::EmailVerifySession, tenant::workos::WorkOsSession, user::UserSession,
     validate_user::ValidateUserToken,
 };
 use crate::errors::ApiError;
@@ -72,11 +70,6 @@ pub enum SessionData {
 
     /// Used to prove to a tenant that a user is authed with footprint
     ValidateUserToken(ValidateUserToken),
-
-    // TODO remove all of these after flattening
-    Onboarding(OnboardingSession),
-    My1fp(My1fpBasicSession),
-    D2p(D2pSession),
 }
 
 /// Associates an HTTP header name with type

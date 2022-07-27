@@ -1,8 +1,7 @@
 use std::str::FromStr;
 
-use crate::auth::session_context::HasUserVaultId;
-use crate::auth::session_context::SessionContext;
-use crate::auth::session_data::user::my_fp::My1fpBasicSession;
+use crate::auth::session_context::UserAuth;
+use crate::auth::{session_context::HasUserVaultId, session_data::user::UserAuthScope};
 use crate::errors::challenge::ChallengeError;
 use crate::errors::ApiError;
 use crate::types::success::ApiResponseData;
@@ -25,12 +24,14 @@ struct RequestEmailVerifyRequest {
 /// Re-send the email verification email for the given user data
 async fn post(
     state: web::Data<State>,
-    auth: SessionContext<My1fpBasicSession>,
+    user_auth: UserAuth,
     request: Json<RequestEmailVerifyRequest>,
 ) -> actix_web::Result<Json<ApiResponseData<Empty>>, ApiError> {
+    user_auth.enforce_has_any(vec![UserAuthScope::BasicProfile])?;
+
     let (user_data, user_vault) = state
         .db_pool
-        .db_query(move |conn| UserData::get(conn, &request.id, &auth.user_vault_id()))
+        .db_query(move |conn| UserData::get(conn, &request.id, &user_auth.user_vault_id()))
         .await??;
     if user_data.is_verified {
         return Err(ChallengeError::EmailAlreadyVerified.into());

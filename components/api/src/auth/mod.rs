@@ -1,5 +1,7 @@
 use thiserror::Error;
 
+use self::session_data::user::UserAuthScope;
+
 pub mod either;
 pub mod key_context;
 pub mod session_context;
@@ -36,6 +38,8 @@ pub enum AuthError {
     InvalidTokenForHeader(String),
     #[error("not allowed: restricted to sandbox mode")]
     SandboxRestricted,
+    #[error("Not allowed: requires one of the following scopes: {0:?}")]
+    MissingScope(Vec<UserAuthScope>),
 }
 
 /// A helper trait to extract whether the auth session is for sandbox or production data

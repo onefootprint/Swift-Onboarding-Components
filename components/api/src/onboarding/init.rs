@@ -1,6 +1,6 @@
 use crate::auth::key_context::ob_public_key::PublicTenantAuthContext;
-use crate::auth::session_context::{HasUserVaultId, SessionContext};
-use crate::auth::session_data::user::onboarding::OnboardingSession;
+use crate::auth::session_context::{HasUserVaultId, UserAuth};
+use crate::auth::session_data::user::UserAuthScope;
 use crate::errors::onboarding::OnboardingError;
 use crate::errors::ApiError;
 use crate::types::success::ApiResponseData;
@@ -30,8 +30,10 @@ pub struct OnboardingResponse {
 pub fn handler(
     state: web::Data<State>,
     tenant_auth: PublicTenantAuthContext,
-    user_auth: SessionContext<OnboardingSession>,
+    user_auth: UserAuth,
 ) -> actix_web::Result<Json<ApiResponseData<OnboardingResponse>>, ApiError> {
+    user_auth.enforce_has_any(vec![UserAuthScope::OrgOnboarding])?;
+
     let uv = user_auth.user_vault(&state.db_pool).await?;
     if tenant_auth.ob_config.is_live != uv.is_live {
         return Err(OnboardingError::InvalidSandboxState.into());

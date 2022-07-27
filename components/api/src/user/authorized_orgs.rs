@@ -1,5 +1,5 @@
-use crate::auth::session_context::HasUserVaultId;
-use crate::auth::{session_context::SessionContext, session_data::user::my_fp::My1fpBasicSession};
+use crate::auth::session_context::{HasUserVaultId, UserAuth};
+use crate::auth::session_data::user::UserAuthScope;
 use crate::errors::ApiError;
 use crate::types::onboarding::ApiOnboarding;
 use crate::types::success::ApiResponseData;
@@ -26,8 +26,10 @@ pub struct ApiUserOnboarding {
 #[get("authorized_orgs")]
 pub async fn handler(
     state: web::Data<State>,
-    user_auth: SessionContext<My1fpBasicSession>,
+    user_auth: UserAuth,
 ) -> actix_web::Result<Json<ApiResponseData<AuthorizedOrgsResponse>>, ApiError> {
+    user_auth.enforce_has_any(vec![UserAuthScope::BasicProfile])?;
+
     let user_vault_id = user_auth.user_vault_id();
     let (scoped_users, obs) = state
         .db_pool
