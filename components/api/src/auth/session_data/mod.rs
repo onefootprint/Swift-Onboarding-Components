@@ -1,7 +1,7 @@
 use self::{
     email::email_verify::EmailVerifySession,
     tenant::workos::WorkOsSession,
-    user::{d2p::D2pSession, my_fp::My1fpBasicSession, onboarding::OnboardingSession},
+    user::{d2p::D2pSession, my_fp::My1fpBasicSession, onboarding::OnboardingSession, user::UserSession},
     validate_user::ValidateUserToken,
 };
 use crate::errors::ApiError;
@@ -63,20 +63,20 @@ impl ServerSession {
 pub enum SessionData {
     /// workos login to tenant admin
     WorkOs(WorkOsSession),
-    /// onboarding a user to a tenant
-    Onboarding(OnboardingSession),
 
-    /// my.onefootprint.com
-    My1fp(My1fpBasicSession),
-
-    /// desktop 2 phone transfer session
-    D2p(D2pSession),
+    /// user-specific sessions
+    User(UserSession),
 
     /// Used for validating email challenges
     EmailVerify(EmailVerifySession),
 
     /// Used to prove to a tenant that a user is authed with footprint
     ValidateUserToken(ValidateUserToken),
+
+    // TODO remove all of these after flattening
+    Onboarding(OnboardingSession),
+    My1fp(My1fpBasicSession),
+    D2p(D2pSession),
 }
 
 /// Associates an HTTP header name with type
