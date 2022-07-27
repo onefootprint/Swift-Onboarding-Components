@@ -9,11 +9,7 @@ use paperclip::actix::Apiv2Security;
 
 use crate::errors::ApiError;
 
-use super::{
-    session_context::HasTenant,
-    uv_permission::{HasVaultPermission, VaultPermission},
-    AuthError, IsLive,
-};
+use super::{session_context::HasTenant, AuthError, IsLive};
 
 #[derive(Debug, Clone, Apiv2Security)]
 #[openapi(apiKey)]
@@ -69,19 +65,6 @@ where
                 }
             }
         })
-    }
-}
-
-impl<A, B> HasVaultPermission for Either<A, B>
-where
-    A: HasVaultPermission,
-    B: HasVaultPermission,
-{
-    fn has_permission(&self, permission: VaultPermission) -> bool {
-        match self {
-            Either::Left(l) => l.has_permission(permission),
-            Either::Right(r) => r.has_permission(permission),
-        }
     }
 }
 

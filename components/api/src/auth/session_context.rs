@@ -18,7 +18,6 @@ use super::{
         user::{UserAuthScope, UserSession},
         HeaderName, SessionData,
     },
-    uv_permission::{HasVaultPermission, VaultPermission},
     AuthError, IsLive, SupportsIsLiveHeader,
 };
 
@@ -112,15 +111,6 @@ where
 {
     fn user_vault_id(&self) -> UserVaultId {
         self.data.user_vault_id()
-    }
-}
-
-impl<C> HasVaultPermission for SessionContext<C>
-where
-    C: HasVaultPermission,
-{
-    fn has_permission(&self, permission: VaultPermission) -> bool {
-        self.data.has_permission(permission)
     }
 }
 

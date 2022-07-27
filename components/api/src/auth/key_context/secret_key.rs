@@ -1,5 +1,4 @@
 use crate::auth::session_context::HasTenant;
-use crate::auth::uv_permission::{HasVaultPermission, VaultPermission};
 use crate::auth::{AuthError, IsLive};
 use crate::{errors::ApiError, State};
 use actix_web::{web, FromRequest};
@@ -63,12 +62,6 @@ pub async fn from_request_inner(req: &actix_web::HttpRequest) -> Result<SecretTe
         .await?
         .ok_or(AuthError::UnknownClient)?;
     Ok(SecretTenantAuthContext { tenant, api_key })
-}
-
-impl HasVaultPermission for SecretTenantAuthContext {
-    fn has_permission(&self, permission: VaultPermission) -> bool {
-        matches!(permission, VaultPermission::Decrypt(_))
-    }
 }
 
 #[async_trait]

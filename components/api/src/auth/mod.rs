@@ -6,7 +6,6 @@ pub mod either;
 pub mod key_context;
 pub mod session_context;
 pub mod session_data;
-pub mod uv_permission;
 
 #[derive(Debug, Error)]
 pub enum AuthError {

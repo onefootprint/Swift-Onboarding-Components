@@ -5,7 +5,6 @@ use crate::{
     auth::{
         session_context::HasUserVaultId,
         session_data::{HeaderName, SessionData},
-        uv_permission::{HasVaultPermission, VaultPermission},
         AuthError,
     },
     errors::ApiError,
@@ -23,13 +22,6 @@ pub enum UserAuthScope {
     ExtendedProfile,
     SensitiveProfile,
     Handoff,
-}
-
-impl HasVaultPermission for UserAuthScope {
-    fn has_permission(&self, _permission: VaultPermission) -> bool {
-        // TODO get rid of old permission model
-        true
-    }
 }
 
 /// A user-specific session. Permissions for the session are defined by the set of issues scopes
@@ -78,12 +70,6 @@ impl HeaderName for UserSession {
             "X-My1fp-Authorization",
             "X-D2p-Authorization",
         ]
-    }
-}
-
-impl HasVaultPermission for UserSession {
-    fn has_permission(&self, permission: VaultPermission) -> bool {
-        self.scopes.iter().any(|scope| scope.has_permission(permission))
     }
 }
 

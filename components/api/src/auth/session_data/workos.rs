@@ -2,7 +2,6 @@ use crate::{
     auth::{
         session_context::HasTenant,
         session_data::{HeaderName, SessionData},
-        uv_permission::{HasVaultPermission, VaultPermission},
         AuthError, SupportsIsLiveHeader,
     },
     errors::ApiError,
@@ -35,12 +34,6 @@ impl TryFrom<SessionData> for WorkOsSession {
 impl HeaderName for WorkOsSession {
     fn header_names() -> Vec<&'static str> {
         vec!["X-Fp-Dashboard-Authorization"]
-    }
-}
-
-impl HasVaultPermission for WorkOsSession {
-    fn has_permission(&self, permission: VaultPermission) -> bool {
-        matches!(permission, VaultPermission::Decrypt(_))
     }
 }
 
