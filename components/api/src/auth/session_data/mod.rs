@@ -1,6 +1,6 @@
 use self::{
-    email::email_verify::EmailVerifySession, tenant::workos::WorkOsSession, user::UserSession,
-    validate_user::ValidateUserToken,
+    email_verify::EmailVerifySession, user::UserSession, validate_user::ValidateUserToken,
+    workos::WorkOsSession,
 };
 use crate::errors::ApiError;
 use chrono::{DateTime, Utc};
@@ -9,10 +9,10 @@ use newtypes::SealedSessionBytes;
 use serde::{Deserialize, Serialize};
 
 use super::AuthError;
-pub mod email;
-pub mod tenant;
+pub mod email_verify;
 pub mod user;
 pub mod validate_user;
+pub mod workos;
 
 /// This struct is sealed, and then stored in the DB
 #[derive(Debug, Clone)]

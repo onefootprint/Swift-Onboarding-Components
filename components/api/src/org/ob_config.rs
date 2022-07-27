@@ -1,7 +1,7 @@
 use crate::auth::either::Either;
 use crate::auth::key_context::secret_key::SecretTenantAuthContext;
 use crate::auth::session_context::{HasTenant, SessionContext};
-use crate::auth::session_data::tenant::workos::WorkOsSession;
+use crate::auth::session_data::workos::WorkOsSession;
 use crate::auth::IsLive;
 use crate::types::success::ApiResponseData;
 use crate::State;

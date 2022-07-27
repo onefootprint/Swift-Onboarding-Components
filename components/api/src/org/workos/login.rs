@@ -1,6 +1,6 @@
 use std::collections::HashSet;
 
-use crate::auth::session_data::tenant::workos::WorkOsSession;
+use crate::auth::session_data::workos::WorkOsSession;
 use crate::auth::session_data::SessionData;
 use crate::errors::workos_login::WorkOsLoginError;
 use crate::utils::email_domain;
