@@ -69,6 +69,7 @@ impl HeaderName for UserSession {
             "X-Fpuser-Authorization",
             "X-My1fp-Authorization",
             "X-D2p-Authorization",
+            "x-fp-authorization",
         ]
     }
 }
