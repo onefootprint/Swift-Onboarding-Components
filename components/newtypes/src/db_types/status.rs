@@ -30,14 +30,13 @@ use crate::util::impl_enum_str_diesel;
 pub enum Status {
     Verified,
     Processing,
-    Incomplete,
     ManualReview,
     Failed,
 }
 
 impl Default for Status {
     fn default() -> Self {
-        Status::Incomplete
+        Status::Processing
     }
 }
 

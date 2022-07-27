@@ -15,7 +15,7 @@ use crate::State;
 use chrono::Duration;
 use crypto::sha256;
 use db::models::user_vaults::{NewUserVaultReq, UserVault};
-use newtypes::{DataKind, Fingerprinter, SessionAuthToken, Status, UserVaultId, ValidatedPhoneNumber};
+use newtypes::{DataKind, Fingerprinter, SessionAuthToken, UserVaultId, ValidatedPhoneNumber};
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
@@ -140,7 +140,6 @@ async fn create_new_user_vault(
 
     let new_user = NewUserVaultReq {
         e_private_key,
-        id_verified: Status::Incomplete,
         e_phone_number: public_key.seal_pii(&phone_number.to_piistring())?,
         e_phone_country: public_key.seal_pii(&phone_number.iso_country_code)?,
         public_key,

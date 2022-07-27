@@ -1,0 +1,1 @@
+ALTER TABLE user_vaults DROP COLUMN id_verified;

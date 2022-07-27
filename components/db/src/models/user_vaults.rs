@@ -4,7 +4,7 @@ use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use diesel::{Insertable, PgConnection, QueryDsl, Queryable};
 use newtypes::{
-    EncryptedVaultPrivateKey, Fingerprint, FootprintUserId, SealedVaultBytes, Status, TenantId, UserVaultId,
+    EncryptedVaultPrivateKey, Fingerprint, FootprintUserId, SealedVaultBytes, TenantId, UserVaultId,
     VaultPublicKey,
 };
 use serde::{Deserialize, Serialize};
@@ -17,7 +17,6 @@ pub struct UserVault {
     pub id: UserVaultId,
     pub e_private_key: EncryptedVaultPrivateKey,
     pub public_key: VaultPublicKey,
-    pub id_verified: Status,
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
     pub is_live: bool,
@@ -61,14 +60,12 @@ impl UserVault {
 pub struct NewUserVault {
     pub e_private_key: EncryptedVaultPrivateKey,
     pub public_key: VaultPublicKey,
-    pub id_verified: Status,
     pub is_live: bool,
 }
 
 pub struct NewUserVaultReq {
     pub e_private_key: EncryptedVaultPrivateKey,
     pub public_key: VaultPublicKey,
-    pub id_verified: Status,
     pub is_live: bool,
     // Note: these aren't actual columns on the table -
     pub e_phone_number: SealedVaultBytes,

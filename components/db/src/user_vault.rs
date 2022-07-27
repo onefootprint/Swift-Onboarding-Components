@@ -11,7 +11,6 @@ pub async fn create(pool: &crate::DbPool, new_user: NewUserVaultReq) -> Result<U
             let new_user_vault = NewUserVault {
                 e_private_key: new_user.e_private_key,
                 public_key: new_user.public_key,
-                id_verified: new_user.id_verified,
                 is_live: new_user.is_live,
             };
             let user_vault = diesel::insert_into(schema::user_vaults::table)

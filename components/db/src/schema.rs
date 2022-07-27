@@ -182,7 +182,6 @@ table! {
         id -> Text,
         e_private_key -> Bytea,
         public_key -> Bytea,
-        id_verified -> Text,
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
         is_live -> Bool,

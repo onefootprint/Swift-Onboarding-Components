@@ -32,7 +32,6 @@ async fn test_db() {
         crate::models::user_vaults::NewUserVaultReq {
             e_private_key: EncryptedVaultPrivateKey("private key".as_bytes().to_vec()),
             public_key: VaultPublicKey::unvalidated("public key".as_bytes().to_vec()),
-            id_verified: Status::Incomplete,
             e_phone_number: SealedVaultBytes("blah".as_bytes().to_vec()),
             sh_phone_number: Fingerprint(
                 crypto::random::gen_random_alphanumeric_code(32)
