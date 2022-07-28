@@ -6,7 +6,7 @@ import styled from 'styled-components';
 import { Container, Typography } from 'ui';
 
 const TestimonialSection = () => {
-  const { t } = useTranslation('components.testimonial');
+  const { t } = useTranslation('pages.home.testimonial');
   return (
     <Container id="testimonial" as="section">
       <Inner>

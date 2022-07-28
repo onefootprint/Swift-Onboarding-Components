@@ -29,14 +29,7 @@
       "subtitle": "Join our waitlist to get a chance at 1,000 free verifications when we launch out of private beta.",
       "title": "Ready to get started?"
     },
-    "testimonial": {
-      "quote": "Footprint is the first identity company I’ve come across to make onboarding frictionless while handling both KYC and PII storage. I’m very excited to use the product to make our onboarding experience better at DoNotPay.",
-      "author": {
-        "name": "Joshua Browder",
-        "img-alt": "Picture of Joshua Browder",
-        "role": "Founder & CEO of DoNotPay"
-      }
-    },
+
     "investors": {
       "img-alt": "An image with all the investors",
       "subtitle": "Backed by the best founders & investors",
@@ -133,7 +126,14 @@
           }
         }
       },
-
+      "testimonial": {
+        "quote": "Footprint is the first identity company I’ve come across to make onboarding frictionless while handling both KYC and PII storage. I’m very excited to use the product to make our onboarding experience better at DoNotPay.",
+        "author": {
+          "name": "Joshua Browder",
+          "img-alt": "Picture of Joshua Browder",
+          "role": "Founder & CEO of DoNotPay"
+        }
+      },
       "vault": {
         "title": "Own the data, disown the risk.",
         "subtitle": "PII vault",

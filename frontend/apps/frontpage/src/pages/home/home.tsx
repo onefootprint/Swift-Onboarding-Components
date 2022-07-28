@@ -5,10 +5,10 @@ import React from 'react';
 import styled, { css } from 'styled-components';
 import { media } from 'ui';
 
-import TestimonialSection from '../../components/testimonial-section';
 import HeroSection from './components/hero-section';
 import HighlightsSection from './components/highlights-section';
 import PlaygroundSection from './components/playground-section';
+import TestimonialSection from './components/testimonial-section';
 import VaultSection from './components/vault-section';
 
 const { toggle: toggleTypeform } = createPopup('COZNk70C');

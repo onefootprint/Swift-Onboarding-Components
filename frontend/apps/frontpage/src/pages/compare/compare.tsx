@@ -4,7 +4,6 @@ import React from 'react';
 import styled, { css } from 'styled-components';
 import { Container, media, Typography } from 'ui';
 
-import TestimonialSection from '../../components/testimonial-section';
 import Carousel from './components/carousel';
 import ComparisonTable from './components/comparison-table';
 import CompetitorAnalysis from './components/competitor-analysis';
@@ -51,9 +50,6 @@ const Compare = () => {
           />
         </RestContainer>
       </Container>
-      <TestimonialContainer>
-        <TestimonialSection />
-      </TestimonialContainer>
       <Container>
         <CompetitorAnalysisContainer>
           <CompetitorAnalysis
@@ -129,22 +125,10 @@ const ComparisonTableContainer = styled.div`
 
 const RestContainer = styled.div`
   ${({ theme }) => css`
-    margin-bottom: ${theme.spacing[10]}px;
+    margin-bottom: ${theme.spacing[11]}px;
 
     ${media.greaterThan('lg')`
-      margin-bottom: ${theme.spacing[12]}px;
-    `}
-  `}
-`;
-
-const TestimonialContainer = styled.div`
-  ${({ theme }) => css`
-    background: ${theme.backgroundColor.secondary};
-    margin-bottom: ${theme.spacing[10]}px;
-    padding: ${theme.spacing[11]}px 0;
-
-    ${media.greaterThan('lg')`
-      margin-bottom: ${theme.spacing[12]}px;
+      margin-bottom: ${theme.spacing[13]}px;
     `}
   `}
 `;
