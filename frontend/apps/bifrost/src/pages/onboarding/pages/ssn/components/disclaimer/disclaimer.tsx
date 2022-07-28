@@ -11,9 +11,9 @@ const Disclaimer = ({ items }: DisclaimerProps) => (
   <Container>
     {items.map(({ title, description, Icon }) => (
       <Item title={title} key={title}>
-        <Box>
+        <IconContainer>
           <Icon color="primary" />
-        </Box>
+        </IconContainer>
         <Box>
           <Typography
             color="primary"
@@ -46,6 +46,13 @@ const Item = styled.li`
     display: flex;
     flex-direction: row;
     gap: ${theme.spacing[3]}px;
+  `}
+`;
+
+const IconContainer = styled.div`
+  ${({ theme }) => css`
+    position: relative;
+    top: -${theme.spacing[1]}px;
   `}
 `;
 
