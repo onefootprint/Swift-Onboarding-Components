@@ -20,7 +20,7 @@ const UserHeader = ({ user, onDecrypt }: BasicInfoProps) => {
   return (
     <HeaderContainer>
       <RowContainer>
-        <Typography variant="heading-3" sx={{ userSelect: 'none' }}>
+        <Typography variant="label-1" sx={{ userSelect: 'none' }}>
           User info
         </Typography>
         <Badge variant={statusToBadgeVariant[user.status]}>
@@ -39,7 +39,7 @@ const UserHeader = ({ user, onDecrypt }: BasicInfoProps) => {
               minute: 'numeric',
             })}
           </Typography>
-          <Typography variant="body-4" color="tertiary">
+          <Typography variant="body-3" color="tertiary">
             ·
           </Typography>
           <Code>{footprintUserId}</Code>
