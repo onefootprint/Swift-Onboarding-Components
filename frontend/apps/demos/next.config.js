@@ -21,7 +21,7 @@ module.exports = withPlugins([withTM, withBundleAnalyzer], {
     styledComponents: true,
   },
   images: {
-    domains: ['footprint-demos.ghost.io', 'static.ghost.org'],
+    domains: ['footprint-blog.ghost.io', 'static.ghost.org'],
   },
   async redirects() {
     return [
