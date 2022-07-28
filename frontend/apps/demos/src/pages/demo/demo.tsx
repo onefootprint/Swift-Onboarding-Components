@@ -88,12 +88,13 @@ const Inner = styled.div`
     border: ${theme.borderWidth[1]}px solid ${theme.borderColor.tertiary};
     display: flex;
     flex-direction: column;
-    gap: ${theme.spacing[9]}px;
+    gap: ${theme.spacing[7]}px;
     padding: ${theme.spacing[5]}px;
     text-align: center;
-    width: 480px;
+    width: 94%;
 
     ${media.greaterThan('lg')`
+      gap: ${theme.spacing[9]}px;
       width: 700px;
       padding: ${theme.spacing[9]}px;
     `}
@@ -102,8 +103,8 @@ const Inner = styled.div`
 
 const Content = styled.div`
   ${({ theme }) => css`
-    img:first-child {
-      margin-bottom: ${theme.spacing[9]}px;
+    img {
+      margin-bottom: ${theme.spacing[7]}px;
     }
 
     h1,
@@ -122,8 +123,12 @@ const Content = styled.div`
 `;
 
 const ButtonContainer = styled.div`
-  width: 60%;
+  width: 100%;
   margin: 0 auto;
+
+  ${media.greaterThan('lg')`
+    width: 60%;
+  `}
 `;
 
 export default Demo;
