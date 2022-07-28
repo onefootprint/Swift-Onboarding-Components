@@ -88,15 +88,18 @@ const Inner = styled.div`
     border: ${theme.borderWidth[1]}px solid ${theme.borderColor.tertiary};
     display: flex;
     flex-direction: column;
-    gap: ${theme.spacing[7]}px;
-    padding: ${theme.spacing[5]}px;
+    gap: ${theme.spacing[9]}px;
+    padding: ${theme.spacing[7]}px ${theme.spacing[5]}px;
     text-align: center;
-    width: 94%;
+    width: 90%;
 
-    ${media.greaterThan('lg')`
-      gap: ${theme.spacing[9]}px;
-      width: 700px;
+    ${media.greaterThan('sm')`
+      max-width: 552px;
       padding: ${theme.spacing[9]}px;
+    `}
+
+    ${media.greaterThan('md')`
+      max-width: 700px;
     `}
   `}
 `;
@@ -126,8 +129,8 @@ const ButtonContainer = styled.div`
   width: 100%;
   margin: 0 auto;
 
-  ${media.greaterThan('lg')`
-    width: 60%;
+  ${media.greaterThan('sm')`
+    width: 380px;
   `}
 `;
 
