@@ -6,6 +6,9 @@ import useSessionUser from 'src/hooks/use-session-user';
 import styled from 'styled-components';
 import { LinkButton } from 'ui';
 
+const getFullName = (firstName: string | null, lastName: string | null) =>
+  firstName && lastName ? `${firstName} ${lastName}` : '';
+
 const Identity = () => {
   const { t } = useTranslation('pages.my-footprint-identity.identity');
   const { session } = useSessionUser();
@@ -14,7 +17,7 @@ const Identity = () => {
     return null;
   }
   const {
-    data: { ssn, dob },
+    data: { firstName, lastName, ssn, dob },
   } = session;
 
   const handleToggleSSN = () => {
@@ -28,8 +31,11 @@ const Identity = () => {
     return '-';
   };
 
+  const fullName = getFullName(firstName, lastName);
+
   return (
     <FieldGroup>
+      <Field label={t('name.label')} value={fullName} />
       <SSNFieldContainer>
         <Field label={t('ssn.label')} value={getSSN()} />
         {ssn && (

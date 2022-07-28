@@ -1,11 +1,11 @@
 import { useTranslation } from 'hooks';
 import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
-import { Accordion, Box, Container, Divider, Typography } from 'ui';
+import { Accordion, Container, Typography } from 'ui';
 
 import Footer from './components/footer';
 import Header from './components/header';
-import useSections, { Section } from './hooks/use-sections';
+import useSections from './hooks/use-sections';
 
 const MyFootprintIdentity = () => {
   const { t } = useTranslation('pages.my-footprint-identity');
@@ -20,22 +20,6 @@ const MyFootprintIdentity = () => {
     }
   };
 
-  const renderSectionGroup = (sectionGroup: Section[]) => (
-    <SectionContainer>
-      {sectionGroup.map(({ id, title, iconComponent, Content }) => (
-        <Accordion
-          iconComponent={iconComponent}
-          key={id}
-          onChange={handleAccordionChange(id)}
-          open={activeAccordion === id}
-          title={title}
-        >
-          <Content />
-        </Accordion>
-      ))}
-    </SectionContainer>
-  );
-
   return (
     <PageContainer>
       <Content>
@@ -45,11 +29,19 @@ const MyFootprintIdentity = () => {
             {t('title')}
           </Typography>
           <div>
-            {renderSectionGroup(sections.top)}
-            <Box sx={{ marginY: 8 }}>
-              <Divider />
-            </Box>
-            {renderSectionGroup(sections.bottom)}
+            <SectionContainer>
+              {sections.map(({ id, title, iconComponent, Content }) => (
+                <Accordion
+                  iconComponent={iconComponent}
+                  key={id}
+                  onChange={handleAccordionChange(id)}
+                  open={activeAccordion === id}
+                  title={title}
+                >
+                  <Content />
+                </Accordion>
+              ))}
+            </SectionContainer>
           </div>
         </Container>
       </Content>

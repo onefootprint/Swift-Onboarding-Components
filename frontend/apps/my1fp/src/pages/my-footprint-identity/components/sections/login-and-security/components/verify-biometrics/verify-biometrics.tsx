@@ -45,7 +45,11 @@ const VerifyBiometrics = () => {
           <LoadingIndicator aria-label={t('loading')} />
         </Box>
       ) : (
-        <LinkButton size="compact" onClick={handleStartLivenessCheck}>
+        <LinkButton
+          testID="verify-biometrics"
+          size="compact"
+          onClick={handleStartLivenessCheck}
+        >
           {t('cta')}
         </LinkButton>
       )}

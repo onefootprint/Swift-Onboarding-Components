@@ -12,7 +12,7 @@ type VerifyEmailProps = {
 
 const VerifyEmail = ({ email }: VerifyEmailProps) => {
   const { t } = useTranslation(
-    'pages.my-footprint-identity.basic.email.verify',
+    'pages.my-footprint-identity.login-and-security.email.verify',
   );
   const toast = useToast();
   const { session } = useSessionUser();
@@ -63,7 +63,11 @@ const VerifyEmail = ({ email }: VerifyEmailProps) => {
 
   return (
     <Box>
-      <LinkButton size="compact" onClick={handleVerifyClick}>
+      <LinkButton
+        testID="verify-email"
+        size="compact"
+        onClick={handleVerifyClick}
+      >
         {t('cta')}
       </LinkButton>
     </Box>

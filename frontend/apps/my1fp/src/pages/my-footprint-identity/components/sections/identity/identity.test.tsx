@@ -55,6 +55,11 @@ describe('<Identity />', () => {
       });
     });
 
+    it('should render the full name', () => {
+      renderIdentity();
+      expect(screen.getByText('John Doe')).toBeInTheDocument();
+    });
+
     it('should render the SSN masked', () => {
       renderIdentity();
       expect(screen.getByText('•••••••••')).toBeInTheDocument();

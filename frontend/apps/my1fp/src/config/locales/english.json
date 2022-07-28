@@ -56,33 +56,11 @@
     },
     "my-footprint-identity": {
       "title": "My Footprint Identity",
-      "basic": {
-        "title": "Basic",
+      "identity": {
+        "title": "Identity",
         "name": {
           "label": "Name"
         },
-        "email": {
-          "label": "Email",
-          "verify": {
-            "loading": "Sending email to verify your email address",
-            "cta": "Verify",
-            "email-sent": "Email sent!",
-            "success": {
-              "title": "Check your inbox",
-              "description": "Please click the link we sent you by email to verify it."
-            },
-            "error": {
-              "title": "Uh-oh",
-              "description": "Something went wrong"
-            }
-          }
-        },
-        "phone": {
-          "label": "Phone number"
-        }
-      },
-      "identity": {
-        "title": "Identity",
         "ssn": {
           "label": "Social Security Number",
           "toggle": {
@@ -100,9 +78,22 @@
       "login-and-security": {
         "title": "Login & Security",
         "email": {
-          "label": "Email"
+          "label": "Email",
+          "verify": {
+            "loading": "Sending email to verify your email address",
+            "cta": "Verify",
+            "email-sent": "Email sent!",
+            "success": {
+              "title": "Check your inbox",
+              "description": "Please click the link we sent you by email to verify it."
+            },
+            "error": {
+              "title": "Uh-oh",
+              "description": "Something went wrong"
+            }
+          }
         },
-        "phone-number": {
+        "phone": {
           "label": "Phone Number"
         },
         "biometrics": {
@@ -112,6 +103,10 @@
           "default-device": "Mobile",
           "cta": "Verify"
         }
+      },
+      "accounts-verified": {
+        "title": "Accounts verified with Footprint",
+        "empty": "You haven't created any accounts with Footprint yet."
       },
       "access-logs": {
         "title": "Access logs",
