@@ -5,15 +5,15 @@ import styled, { css } from 'styled-components';
 import { createOverlayBackground } from '../../utils/mixins';
 
 export type ToggleProps = {
-  onBlur?: (event: React.FocusEvent<HTMLInputElement>) => void;
-  onFocus?: (event: React.FocusEvent<HTMLInputElement>) => void;
+  onBlur?: (event: React.FocusEvent<HTMLButtonElement>) => void;
+  onFocus?: (event: React.FocusEvent<HTMLButtonElement>) => void;
   disabled?: boolean;
   required?: boolean;
   id?: string;
   name?: string;
   checked?: boolean;
   defaultChecked?: boolean;
-  onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
 };
 
 const Switch = forwardRef<HTMLInputElement, ToggleProps>(
@@ -65,15 +65,15 @@ const Switch = forwardRef<HTMLInputElement, ToggleProps>(
           disabled={disabled}
           id={id}
           name={name}
-          onBlur={onBlur}
           onChange={onChange}
-          onFocus={onFocus}
           ref={mergeRefs([localRef, ref])}
           required={required}
           tabIndex={-1}
           type="checkbox"
         />
         <Button
+          onBlur={onBlur}
+          onFocus={onFocus}
           aria-checked={checked}
           checked={checked}
           disabled={disabled}
