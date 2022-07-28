@@ -48,32 +48,32 @@ const useSyncData = () => {
   };
 
   return (userData: UserData) => {
-    const { authToken } = state.context;
+    const { authToken, missingAttributes, data } = state.context;
     if (!authToken) {
       return;
     }
 
-    const data: UserDataObj = {
+    const requestData: UserDataObj = {
       email: userData[UserDataAttribute.email],
       ssn: userData[UserDataAttribute.ssn],
     };
 
     if (dataHasName(userData)) {
-      data.name = {
+      requestData.name = {
         firstName: userData[UserDataAttribute.firstName],
         lastName: userData[UserDataAttribute.lastName],
       };
     }
 
     if (dataHasAddress(userData)) {
-      data.address = {
+      requestData.address = {
         city: userData[UserDataAttribute.city],
         state: userData[UserDataAttribute.state],
         country: userData[UserDataAttribute.country],
         zip: userData[UserDataAttribute.zip],
       };
       if (dataHasStreetAddress(userData)) {
-        data.address.address = {
+        requestData.address.address = {
           streetAddress: userData[UserDataAttribute.streetAddress],
           streetAddress2: userData[UserDataAttribute.streetAddress2],
         };
@@ -85,17 +85,19 @@ const useSyncData = () => {
       const [month, day, year] = dobData
         .split('/')
         .map((dobStr: string) => parseInt(dobStr, 10));
-      data.dob = {
+      requestData.dob = {
         day,
         month,
         year,
       };
     }
 
+    const speculative = hasMissingAttributes(missingAttributes, data);
     userDataMutation.mutate(
       {
-        data,
+        data: requestData,
         authToken,
+        speculative,
       },
       {
         onSuccess: handleSyncDataSucceeded,

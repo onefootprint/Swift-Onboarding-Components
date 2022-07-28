@@ -29,6 +29,7 @@ export type UserDataObj = {
 export type UserDataRequest = {
   data: UserDataObj;
   authToken: string;
+  speculative?: boolean;
 };
 
 export type UserDataResponse = { data: string };
@@ -37,7 +38,10 @@ const userDataRequest = async (payload: UserDataRequest) => {
   const { data: response } = await request<RequestResponse<UserDataResponse>>({
     method: 'POST',
     url: '/user/data',
-    data: payload.data,
+    data: {
+      ...payload.data,
+      speculative: !!payload.speculative,
+    },
     headers: {
       [BIFROST_AUTH_HEADER]: payload.authToken,
     },
