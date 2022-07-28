@@ -5,13 +5,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::{DataGroupKind, DataKind, ValidatedPhoneNumber};
 
-use self::{
-    address::Address,
-    dob::DateOfBirth,
-    email::Email,
-    name::{FullName, Name},
-    ssn::{FullSsn, Ssn},
-};
+use self::{address::Address, dob::DateOfBirth, email::Email, name::Name, ssn::FullSsn};
 
 pub mod address;
 pub mod dob;
@@ -120,45 +114,4 @@ pub struct IdentifyRequest {
     pub dob: DateOfBirth,
     pub email: Email,
     pub ssn: FullSsn,
-}
-
-#[derive(Debug, Clone, serde::Deserialize, Apiv2Schema)]
-
-/// Key-value pairs of fields to update for the user_vault
-/// (all optional). Patch can be preformed in batch
-/// or all at once. *All fields are optional* & do
-/// not have to be represented in the request
-/// for example {"email_address": "test@test.com"}
-/// is a valid UserPatchRequest
-/// ssn is either last 4 of ssn or full ssn
-pub struct UserPatchRequest {
-    pub name: Option<FullName>,
-    pub ssn: Option<Ssn>,
-    pub dob: Option<DateOfBirth>,
-    pub address: Option<Address>,
-    pub email: Option<Email>,
-}
-
-impl UserPatchRequest {
-    pub fn decompose(self) -> Vec<NewData> {
-        let UserPatchRequest {
-            name,
-            ssn,
-            dob,
-            address,
-            email,
-        } = self;
-
-        vec![
-            name.map(|n| n.decompose()),
-            ssn.map(|ssn| ssn.decompose()),
-            dob.map(|dob| dob.decompose()),
-            address.map(|addr| addr.decompose()),
-            email.map(|email| email.decompose()),
-        ]
-        .into_iter()
-        .flatten()
-        .flatten()
-        .collect::<Vec<NewData>>()
-    }
 }

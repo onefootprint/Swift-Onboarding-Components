@@ -15,13 +15,60 @@ use db::models::user_data::NewUserData;
 use db::models::user_data::UserData;
 use db::models::user_vaults::UserVault;
 
+use newtypes::address::Address;
+use newtypes::dob::DateOfBirth;
+use newtypes::email::Email;
+use newtypes::name::FullName;
+use newtypes::ssn::Ssn;
 use newtypes::DataGroupId;
 use newtypes::DataGroupKind;
+use newtypes::DataKind;
 use newtypes::DataPriority;
+use newtypes::Decomposable;
 use newtypes::Fingerprinter;
 use newtypes::NewData;
-use newtypes::{DataKind, UserPatchRequest};
+use paperclip::actix::Apiv2Schema;
 use paperclip::actix::{api_v2_operation, post, web, web::Json};
+
+/// Key-value pairs of fields to update for the user_vault
+/// (all optional). Patch can be preformed in batch
+/// or all at once. *All fields are optional* & do
+/// not have to be represented in the request
+/// for example {"email_address": "test@test.com"}
+/// is a valid UserPatchRequest
+/// ssn is either last 4 of ssn or full ssn
+#[derive(Debug, Clone, serde::Deserialize, Apiv2Schema)]
+struct UserPatchRequest {
+    pub name: Option<FullName>,
+    pub ssn: Option<Ssn>,
+    pub dob: Option<DateOfBirth>,
+    pub address: Option<Address>,
+    pub email: Option<Email>,
+}
+
+impl Decomposable for UserPatchRequest {
+    fn decompose(self) -> Vec<NewData> {
+        let UserPatchRequest {
+            name,
+            ssn,
+            dob,
+            address,
+            email,
+        } = self;
+
+        vec![
+            name.map(|n| n.decompose()),
+            ssn.map(|ssn| ssn.decompose()),
+            dob.map(|dob| dob.decompose()),
+            address.map(|addr| addr.decompose()),
+            email.map(|email| email.decompose()),
+        ]
+        .into_iter()
+        .flatten()
+        .flatten()
+        .collect::<Vec<NewData>>()
+    }
+}
 
 #[api_v2_operation(tags(User))]
 #[post("/data")]
