@@ -7,6 +7,7 @@ import { media } from 'ui';
 
 import HeroSection from './components/hero-section';
 import HighlightsSection from './components/highlights-section';
+import PenguinSeparator from './components/penguin-separator';
 import PlaygroundSection from './components/playground-section';
 import TestimonialSection from './components/testimonial-section';
 import VaultSection from './components/vault-section';
@@ -78,7 +79,12 @@ const Home = () => {
       <TestimonialContainer>
         <TestimonialSection />
       </TestimonialContainer>
-      <VaultSection />
+      <PenguinSeparatorContainer>
+        <PenguinSeparator />
+      </PenguinSeparatorContainer>
+      <VaultContainer>
+        <VaultSection />
+      </VaultContainer>
     </>
   );
 };
@@ -126,9 +132,25 @@ const HighlightsContainer = styled.section`
 const TestimonialContainer = styled.div`
   ${({ theme }) => css`
     padding: ${theme.spacing[10]}px 0;
-
     ${media.greaterThan('lg')`
-      padding: ${theme.spacing[13]}px 0;
+      padding: ${theme.spacing[12]}px 0;
+    `}
+  `}
+`;
+
+const PenguinSeparatorContainer = styled.div`
+  ${({ theme }) => css`
+    ${media.greaterThan('lg')`
+      padding: ${theme.spacing[10]}px 0;
+    `}
+  `}
+`;
+
+const VaultContainer = styled.div`
+  ${({ theme }) => css`
+    padding: ${theme.spacing[10]}px 0;
+    ${media.greaterThan('lg')`
+      padding: ${theme.spacing[12]}px 0;
     `}
   `}
 `;

@@ -89,20 +89,12 @@ const VaultSection = () => {
 };
 
 const Inner = styled.div`
-  ${({ theme }) => css`
-    align-items: center;
-    border-top: ${theme.borderWidth[1]}px solid ${theme.borderColor.tertiary};
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    margin: 0 auto;
-    max-width: 960px;
-    padding: ${theme.spacing[10]}px 0;
-
-    ${media.greaterThan('lg')`
-      padding: ${theme.spacing[13]}px 0;
-    `}
-  `}
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin: 0 auto;
+  max-width: 960px;
 `;
 
 const Header = styled.div`
