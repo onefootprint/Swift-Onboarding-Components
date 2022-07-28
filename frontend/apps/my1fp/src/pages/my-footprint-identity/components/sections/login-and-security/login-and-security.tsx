@@ -5,6 +5,10 @@ import FieldGroup from 'src/components/field-group';
 import useSessionUser from 'src/hooks/use-session-user';
 import styled from 'styled-components';
 
+import useGetUser, {
+  GetUserResponse,
+} from '../../../../../hooks/use-get-user/use-get-user';
+import { UserIdentification } from '../../../../../hooks/use-session-user/use-session-user';
 import UserBiometricsInfo from './components/user-biometrics-info/user-biometrics-info';
 import VerifyEmail from './components/verify-email';
 
@@ -12,29 +16,45 @@ const LoginAndSecurity = () => {
   const { t } = useTranslation(
     'pages.my-footprint-identity.login-and-security',
   );
-  const { session } = useSessionUser();
+
+  const { session, updateMetadata } = useSessionUser();
+  const handleUserQueryResult = (data: GetUserResponse) => {
+    if (data) {
+      updateMetadata(data);
+    }
+  };
+  useGetUser({ onSuccess: handleUserQueryResult });
+
   if (!session) {
     return null;
   }
 
   const {
     data: { email, phoneNumber },
-    metadata: { emails },
+    metadata: { emails, phoneNumbers },
   } = session;
 
-  const shouldShowVerifyEmailButton =
-    !emails.length || emails.some(e => !e.isVerified);
+  // TODO: specifically return the phone number associated with id once we get it from BE
+  const getPhoneNumberValue = () => phoneNumber;
 
-  // TODO: Add UI support for multiple emails and phone numbers (needs design
-  // For now we just assume that there is exactly one email address
-  // https://linear.app/footprint/issue/FP-740/support-multiple-user-emails-and-phone-numbers-in-my1fp
+  // TODO: specifically return the email address associated with id once we get it from BE
+  const getEmailValue = () => email;
+
   return (
     <FieldGroup>
-      <EmailFieldContainer>
-        <Field label={t('email.label')} value={email} />
-        {shouldShowVerifyEmailButton && <VerifyEmail email={emails[0]} />}
-      </EmailFieldContainer>
-      <Field label={t('phone.label')} value={phoneNumber} />{' '}
+      {emails.map((e: UserIdentification) => (
+        <EmailFieldContainer key={e.id}>
+          <Field label={t('email.label')} value={getEmailValue()} />
+          {!e.isVerified && <VerifyEmail email={e} />}
+        </EmailFieldContainer>
+      ))}
+      {phoneNumbers.map((p: UserIdentification) => (
+        <Field
+          key={p.id}
+          label={t('phone.label')}
+          value={getPhoneNumberValue()}
+        />
+      ))}
       <UserBiometricsInfo />
     </FieldGroup>
   );

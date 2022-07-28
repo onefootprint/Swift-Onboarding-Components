@@ -10,6 +10,31 @@ const originalState = useStore.getState();
 describe('<LoginAndSecurity />', () => {
   const renderLoginAndSecurity = () => customRender(<LoginAndSecurity />);
 
+  const withUserQuery = (emailVerified?: boolean) => {
+    mockRequest({
+      method: 'get',
+      path: 'user',
+      response: {
+        data: {
+          phoneNumbers: [
+            {
+              id: '123456789',
+              isVerified: true,
+              priority: 'primary',
+            },
+          ],
+          emails: [
+            {
+              id: '123456789',
+              isVerified: !!emailVerified,
+              priority: 'primary',
+            },
+          ],
+        },
+      },
+    });
+  };
+
   const withLivenessQuery = () => {
     mockRequest({
       method: 'get',
@@ -97,6 +122,7 @@ describe('<LoginAndSecurity />', () => {
 
     it('should render the email and phone', () => {
       withLivenessQuery();
+      withUserQuery();
       renderLoginAndSecurity();
       expect(screen.getByText('john.doe@gmail.com')).toBeInTheDocument();
       expect(screen.getByText('+1 (305) 541-3102')).toBeInTheDocument();
@@ -104,6 +130,7 @@ describe('<LoginAndSecurity />', () => {
 
     it('should render the device info', () => {
       withLivenessQuery();
+      withUserQuery();
       renderLoginAndSecurity();
       expect(screen.getByText('iPhone 12')).toBeInTheDocument();
     });
@@ -137,6 +164,7 @@ describe('<LoginAndSecurity />', () => {
 
     it('should render the email and phone', () => {
       withLivenessQuery();
+      withUserQuery();
       renderLoginAndSecurity();
       expect(screen.getByText('john.doe@gmail.com')).toBeInTheDocument();
       expect(screen.getByText('+1 (305) 541-3102')).toBeInTheDocument();
@@ -144,6 +172,7 @@ describe('<LoginAndSecurity />', () => {
 
     it('should show biometrics is not verified', () => {
       withLivenessQuery();
+      withUserQuery();
       renderLoginAndSecurity();
       expect(screen.getByText('Not verified')).toBeInTheDocument();
       expect(screen.getByTestId('verify-biometrics')).toBeInTheDocument();
@@ -192,6 +221,7 @@ describe('<LoginAndSecurity />', () => {
 
     it('should render a button to verify the email', () => {
       withLivenessQuery();
+      withUserQuery();
       renderLoginAndSecurity();
       const button = screen.getByTestId('verify-email');
       expect(button).toBeInTheDocument();
@@ -200,6 +230,7 @@ describe('<LoginAndSecurity />', () => {
     describe('when clicking on the verify button', () => {
       it('should display a loading indicator while the request is pending', async () => {
         withLivenessQuery();
+        withUserQuery();
         withVerification();
         renderLoginAndSecurity();
         const button = screen.getByTestId('verify-email');
@@ -213,6 +244,7 @@ describe('<LoginAndSecurity />', () => {
 
       it('should display a confirmation if the request succeeds', async () => {
         withLivenessQuery();
+        withUserQuery();
         withVerification();
         renderLoginAndSecurity();
         const button = screen.getByTestId('verify-email');
@@ -231,6 +263,7 @@ describe('<LoginAndSecurity />', () => {
 
       it('should display a confirmation if the request fails', async () => {
         withLivenessQuery();
+        withUserQuery();
         withVerificationError();
         renderLoginAndSecurity();
         const button = screen.getByTestId('verify-email');

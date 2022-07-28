@@ -25,7 +25,12 @@ const getUser = async (payload: GetUserRequest) => {
   return response.data;
 };
 
-const useGetUser = () => {
+const useGetUser = (
+  options: {
+    onSuccess?: (data: GetUserResponse) => void;
+    onError?: (error: RequestError) => void;
+  } = {},
+) => {
   const { session } = useSessionUser();
   const authToken = session?.authToken || '';
 
@@ -34,6 +39,8 @@ const useGetUser = () => {
     () => getUser({ authToken }),
     {
       enabled: !!authToken,
+      onSuccess: options.onSuccess,
+      onError: options.onError,
     },
   );
 };
