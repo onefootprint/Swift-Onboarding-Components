@@ -1,4 +1,4 @@
-use crate::{DataKind, Decomposable, PhoneError, PiiString};
+use crate::{DataKind, Decomposable, NewData, PhoneError, PiiString};
 
 pub use derive_more::{Add, Display, From, FromStr, Into};
 use paperclip::actix::Apiv2Schema;
@@ -128,15 +128,12 @@ impl ValidatedPhoneNumber {
 }
 
 impl Decomposable for ValidatedPhoneNumber {
-    fn decompose(&self) -> crate::DecomposedDataKind {
+    fn decompose(self) -> Vec<NewData> {
         let data = vec![
             (DataKind::PhoneNumber, self.to_piistring()),
-            (DataKind::PhoneCountry, self.iso_country_code.clone()),
+            (DataKind::PhoneCountry, self.iso_country_code),
         ];
-        crate::DecomposedDataKind {
-            group: DataKind::PhoneNumber.group_kind(),
-            data,
-        }
+        NewData::list(data, DataKind::PhoneNumber.group_kind())
     }
 }
 

@@ -8,6 +8,7 @@ use std::fmt::Debug;
 
 use crate::DataKind;
 use crate::Decomposable;
+use crate::NewData;
 use crate::PiiString;
 
 #[doc = "Date of birth"]
@@ -45,8 +46,8 @@ pub struct DateOfBirth {
 }
 
 impl Decomposable for DateOfBirth {
-    fn decompose(&self) -> crate::DecomposedDataKind {
-        crate::DecomposedDataKind::simple(DataKind::Dob, self.default_string_format())
+    fn decompose(self) -> Vec<NewData> {
+        NewData::single(DataKind::Dob, self.default_string_format())
     }
 }
 

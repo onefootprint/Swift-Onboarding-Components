@@ -1,4 +1,4 @@
-use crate::{pii_helper::newtype_to_pii, DataGroupKind, DataKind, Decomposable, PiiString};
+use crate::{pii_helper::newtype_to_pii, DataGroupKind, DataKind, Decomposable, NewData, PiiString};
 
 pub use derive_more::{Add, Display, From, FromStr, Into};
 use paperclip::actix::Apiv2Schema;
@@ -18,7 +18,7 @@ pub struct Address {
 }
 
 impl Decomposable for Address {
-    fn decompose(&self) -> crate::DecomposedDataKind {
+    fn decompose(self) -> Vec<NewData> {
         let Address {
             address,
             city,
@@ -26,7 +26,6 @@ impl Decomposable for Address {
             zip,
             country,
         } = self;
-
         let data = vec![
             (
                 DataKind::StreetAddress,
@@ -42,19 +41,16 @@ impl Decomposable for Address {
                     .and_then(|a| a.street_address_2.clone())
                     .map(PiiString::from),
             ),
-            (DataKind::City, city.clone().map(PiiString::from)),
-            (DataKind::State, state.clone().map(PiiString::from)),
-            (DataKind::Zip, zip.clone().map(PiiString::from)),
-            (DataKind::Country, country.clone().map(PiiString::from)),
+            (DataKind::City, city.map(PiiString::from)),
+            (DataKind::State, state.map(PiiString::from)),
+            (DataKind::Zip, zip.map(PiiString::from)),
+            (DataKind::Country, country.map(PiiString::from)),
         ]
         .into_iter()
-        .flat_map(|(k, d)| d.map(|d| (k, d)))
+        .filter_map(|(k, d)| d.map(|d| (k, d)))
         .collect();
 
-        crate::DecomposedDataKind {
-            data,
-            group: DataGroupKind::Address,
-        }
+        NewData::list(data, DataGroupKind::Address)
     }
 }
 

@@ -3,7 +3,7 @@ use paperclip::actix::Apiv2Schema;
 use serde::{Deserialize, Deserializer, Serialize};
 use std::str::FromStr;
 
-use crate::{DataGroupKind, DataKind, Decomposable, PiiString};
+use crate::{DataGroupKind, DataKind, Decomposable, NewData, PiiString};
 
 #[doc = "Social security number -- 9 digit or 4 digit numeric string"]
 #[derive(Debug, Clone, Hash, PartialEq, Eq, Serialize, Deserialize, Apiv2Schema)]
@@ -15,10 +15,10 @@ pub enum Ssn {
 }
 
 impl Decomposable for Ssn {
-    fn decompose(&self) -> crate::DecomposedDataKind {
+    fn decompose(self) -> Vec<NewData> {
         let list = match self {
             Ssn::Ssn(ssn) => {
-                let last_four = LastFourSsn::from(ssn);
+                let last_four = LastFourSsn::from(&ssn);
                 vec![
                     (DataKind::LastFourSsn, PiiString::from(&last_four.0)),
                     (DataKind::Ssn, PiiString::from(&ssn.0)),
@@ -26,12 +26,10 @@ impl Decomposable for Ssn {
             }
             Ssn::LastFour(last_four) => vec![(DataKind::LastFourSsn, PiiString::from(&last_four.0))],
         };
-        crate::DecomposedDataKind {
-            data: list,
-            group: DataGroupKind::Ssn,
-        }
+        NewData::list(list, DataGroupKind::Ssn)
     }
 }
+
 #[doc = "Social security number -- 9 digit numeric string"]
 #[derive(Clone, Hash, PartialEq, Eq, Serialize, Default, Apiv2Schema)]
 #[serde(transparent)]

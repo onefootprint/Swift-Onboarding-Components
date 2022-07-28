@@ -79,17 +79,29 @@ impl Debug for PiiString {
     }
 }
 
-pub struct DecomposedDataKind {
-    pub data: Vec<(DataKind, PiiString)>,
-    pub group: DataGroupKind,
+pub struct NewData {
+    pub data_kind: DataKind,
+    pub data: PiiString,
+    pub group_kind: DataGroupKind,
 }
 
-impl DecomposedDataKind {
-    pub fn simple<P: Into<PiiString>>(kind: DataKind, pii: P) -> Self {
-        Self {
-            group: kind.group_kind(),
-            data: vec![(kind, pii.into())],
-        }
+impl NewData {
+    pub fn list<P: Into<PiiString>>(data: Vec<(DataKind, P)>, group_kind: DataGroupKind) -> Vec<Self> {
+        data.into_iter()
+            .map(|(data_kind, pii)| Self {
+                data_kind,
+                data: pii.into(),
+                group_kind,
+            })
+            .collect()
+    }
+
+    pub fn single<P: Into<PiiString>>(data_kind: DataKind, pii: P) -> Vec<Self> {
+        vec![Self {
+            data_kind,
+            data: pii.into(),
+            group_kind: data_kind.group_kind(),
+        }]
     }
 }
 
@@ -97,7 +109,7 @@ impl DecomposedDataKind {
 /// form it needs for db update -- a list of the datakind, value paired with a data
 /// group kind
 pub trait Decomposable {
-    fn decompose(&self) -> DecomposedDataKind;
+    fn decompose(self) -> Vec<NewData>;
 }
 
 pub struct IdentifyRequest {
@@ -127,14 +139,8 @@ pub struct UserPatchRequest {
     pub email: Option<Email>,
 }
 
-#[derive(Clone)]
-pub struct DataPatchRequest {
-    pub data: Vec<(DataKind, PiiString)>,
-    pub group_kind: DataGroupKind,
-}
-
 impl UserPatchRequest {
-    pub fn decompose(&self) -> Vec<DataPatchRequest> {
+    pub fn decompose(self) -> Vec<NewData> {
         let UserPatchRequest {
             name,
             ssn,
@@ -143,21 +149,16 @@ impl UserPatchRequest {
             email,
         } = self;
 
-        let all = vec![
-            name.clone().map(|n| n.decompose()),
-            ssn.clone().map(|ssn| ssn.decompose()),
-            dob.clone().map(|dob| dob.decompose()),
-            address.clone().map(|addr| addr.decompose()),
-            email.clone().map(|email| email.decompose()),
-        ];
-
-        all.into_iter()
-            .filter_map(|decomposed| {
-                decomposed.map(|d| DataPatchRequest {
-                    data: d.data,
-                    group_kind: d.group,
-                })
-            })
-            .collect()
+        vec![
+            name.map(|n| n.decompose()),
+            ssn.map(|ssn| ssn.decompose()),
+            dob.map(|dob| dob.decompose()),
+            address.map(|addr| addr.decompose()),
+            email.map(|email| email.decompose()),
+        ]
+        .into_iter()
+        .flatten()
+        .flatten()
+        .collect::<Vec<NewData>>()
     }
 }

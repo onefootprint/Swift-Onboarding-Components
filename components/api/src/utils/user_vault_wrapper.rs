@@ -1,14 +1,11 @@
 use std::collections::HashMap;
 
 use db::models::ob_configurations::ObConfiguration;
-use db::models::user_data::{GroupDataUpdateRequest, NewUserDataBatch, UserData, UserDataUpdate};
+use db::models::user_data::{NewUserData, UserData};
 use db::models::user_vaults::UserVault;
 use db::DbPool;
 use db::{errors::DbError, PgConnection};
-use newtypes::{
-    DataKind, DataPatchRequest, DataPriority, Fingerprinter, PiiString, SealedVaultBytes, UserDataId,
-    UserVaultId,
-};
+use newtypes::{DataKind, PiiString, SealedVaultBytes, UserDataId};
 use paperclip::actix::web;
 
 use crate::errors::ApiError;
@@ -46,75 +43,21 @@ impl UserVaultWrapper {
         Some(&self.get_data(data_kind).get(0)?.e_data)
     }
 
-    pub async fn bulk_update(
+    pub fn bulk_update(
         &self,
-        state: &web::Data<State>,
-        user_vault_id: UserVaultId,
-        update_request: &Vec<DataPatchRequest>,
-    ) -> Result<Vec<UserData>, ApiError> {
-        let mut all_db_updates: Vec<GroupDataUpdateRequest> = vec![];
-        // for every group we need to update (ex: address)
-        // iterate through every individual piece of data in that group (city, state)
-        // and build an update struct with the encrypted and/or sh data
-        for data_group_update in update_request {
-            let DataPatchRequest { data, group_kind } = data_group_update;
-
-            let mut db_updates_for_group: Vec<UserDataUpdate> = vec![];
-            for (data_kind, val) in data {
-                let db_update_for_data = self.build_update_struct(state, data_kind.to_owned(), val).await?;
-                db_updates_for_group.push(db_update_for_data);
-            }
-            all_db_updates.push(GroupDataUpdateRequest {
-                user_vault_id: user_vault_id.clone(),
-                data_group_priority: DataPriority::Primary,
-                data_group_kind: group_kind.to_owned(),
-                data: db_updates_for_group,
-            })
-        }
-
-        let ud_to_deactivate: Vec<UserDataId> = update_request
+        conn: &mut PgConnection,
+        new_user_datas: Vec<NewUserData>,
+    ) -> Result<Vec<UserData>, db::DbError> {
+        // TODO what happens if we make a new address with only one field updated?
+        // https://linear.app/footprint/issue/FP-814/replace-entire-old-data-group-when-updating-in-post-userdata
+        let ud_to_deactivate: Vec<UserDataId> = new_user_datas
             .iter()
-            .flat_map(|DataPatchRequest { data, .. }| {
-                data.iter()
-                    .filter_map(|(data_kind, _)| self.get_data(*data_kind).first().map(|x| x.id.clone()))
-            })
+            .flat_map(|NewUserData { data_kind, .. }| self.get_data(*data_kind).first().map(|x| x.id.clone()))
             .collect();
 
-        let all_db_updates = NewUserDataBatch(all_db_updates);
-
-        // deactive old info + bulk insert
-        let results = state
-            .db_pool
-            .db_transaction(move |conn| -> Result<_, DbError> {
-                db::user_data::bulk_deactivate(conn, ud_to_deactivate)?;
-                let results = all_db_updates.bulk_insert(conn)?;
-                Ok(results)
-            })
-            .await?;
-
+        db::user_data::bulk_deactivate(conn, ud_to_deactivate)?;
+        let results = UserData::bulk_insert(conn, new_user_datas)?;
         Ok(results)
-    }
-
-    /// Builds an individual update struct for the db, with the sh_data
-    /// if the type supports it and the e_data
-    async fn build_update_struct(
-        &self,
-        state: &web::Data<State>,
-        data_kind: DataKind,
-        val: &PiiString,
-    ) -> Result<UserDataUpdate, ApiError> {
-        let sh_data = if data_kind.allows_fingerprint() {
-            Some(state.compute_fingerprint(data_kind, val).await?)
-        } else {
-            None
-        };
-        let e_data = self.user_vault.public_key.seal_pii(val)?;
-        Ok(UserDataUpdate {
-            data_kind,
-            e_data,
-            sh_data,
-            is_verified: false,
-        })
     }
 
     pub async fn get_decrypted_field(

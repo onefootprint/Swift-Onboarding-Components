@@ -4,7 +4,7 @@ use regex::Regex;
 use serde::{Deserialize, Deserializer, Serialize};
 use std::str::FromStr;
 
-use crate::{DataKind, Decomposable, PiiString};
+use crate::{DataKind, Decomposable, NewData, PiiString};
 
 #[derive(Clone, Hash, PartialEq, Eq, Serialize, Default, Apiv2Schema)]
 /// Email address. Will be checked against a basic regex for validity and
@@ -38,8 +38,8 @@ lazy_static! {
 }
 
 impl Decomposable for Email {
-    fn decompose(&self) -> crate::DecomposedDataKind {
-        crate::DecomposedDataKind::simple(DataKind::Email, self.to_piistring())
+    fn decompose(self) -> Vec<NewData> {
+        NewData::single(DataKind::Email, self.to_piistring())
     }
 }
 
