@@ -1,4 +1,4 @@
-use crate::auth::session_context::HasTenant;
+use crate::auth::HasTenant;
 use crate::auth::{AuthError, IsLive};
 use crate::{errors::ApiError, State};
 use actix_web::{web, FromRequest};

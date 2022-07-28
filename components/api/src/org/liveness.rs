@@ -1,12 +1,12 @@
-use crate::auth::either::Either;
 use crate::auth::key_context::secret_key::SecretTenantAuthContext;
-use crate::auth::session_context::HasTenant;
 use crate::auth::session_data::workos::WorkOsSession;
+use crate::auth::Either;
+use crate::auth::HasTenant;
 use crate::auth::IsLive;
 use crate::types::liveness::ApiLiveness;
 use crate::types::success::ApiResponseData;
 use crate::State;
-use crate::{auth::session_context::SessionContext, errors::ApiError};
+use crate::{auth::SessionContext, errors::ApiError};
 use db::models::webauthn_credential::WebauthnCredential;
 use newtypes::FootprintUserId;
 use paperclip::actix::{api_v2_operation, get, web, web::Json, Apiv2Schema};

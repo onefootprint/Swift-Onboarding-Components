@@ -3,20 +3,13 @@ use std::{marker::PhantomData, pin::Pin};
 use actix_web::{http::header::HeaderMap, web, FromRequest};
 use async_trait::async_trait;
 use chrono::{DateTime, Utc};
-use db::{
-    models::{tenants::Tenant, user_vaults::UserVault},
-    DbPool,
-};
 use futures_util::Future;
 use newtypes::{SessionAuthToken, TenantId, UserVaultId};
 use paperclip::actix::Apiv2Security;
 
 use crate::{errors::ApiError, utils::session::AuthSession, State};
 
-use super::{
-    session_data::{AuthSessionData, ExtractableAuthSession},
-    AuthError, IsLive, SupportsIsLiveHeader,
-};
+use super::{AuthError, ExtractableAuthSession, HasTenant, IsLive, SupportsIsLiveHeader, VerifiedUserAuth};
 
 #[derive(Debug, Clone, Apiv2Security)]
 #[openapi(apiKey)]
@@ -41,7 +34,7 @@ impl std::fmt::Debug for MaskedHeaderMap {
 
 impl<T> FromRequest for SessionContext<T>
 where
-    T: TryFrom<AuthSessionData> + ExtractableAuthSession,
+    T: ExtractableAuthSession,
 {
     type Error = ApiError;
     type Future = Pin<Box<dyn Future<Output = Result<Self, Self::Error>>>>;
@@ -83,33 +76,13 @@ where
     }
 }
 
-/// A helper trait to extract a user vault id on combined types
-#[async_trait]
-pub trait HasUserVaultId {
-    fn user_vault_id(&self) -> UserVaultId;
-
-    async fn user_vault(&self, pool: &DbPool) -> Result<UserVault, ApiError> {
-        Ok(db::user_vault::get(pool, self.user_vault_id()).await?)
-    }
-}
-
-impl<A> HasUserVaultId for SessionContext<A>
+impl<A> VerifiedUserAuth for SessionContext<A>
 where
-    A: HasUserVaultId,
+    A: VerifiedUserAuth,
 {
     fn user_vault_id(&self) -> UserVaultId {
         self.data.user_vault_id()
     }
-}
-
-/// A helper trait to get a Tenant on combined objects
-#[async_trait]
-pub trait HasTenant {
-    fn tenant_id(&self) -> TenantId;
-
-    fn is_sandbox_restricted(&self) -> bool;
-
-    async fn tenant(&self, pool: &DbPool) -> Result<Tenant, ApiError>;
 }
 
 #[async_trait]
@@ -123,10 +96,6 @@ where
 
     fn is_sandbox_restricted(&self) -> bool {
         self.data.is_sandbox_restricted()
-    }
-
-    async fn tenant(&self, pool: &DbPool) -> Result<Tenant, ApiError> {
-        self.data.tenant(pool).await
     }
 }
 

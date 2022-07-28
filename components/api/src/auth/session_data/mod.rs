@@ -39,8 +39,3 @@ pub enum AuthSessionData {
     /// Used to prove to a tenant that a user is authed with footprint
     ValidateUserToken(ValidateUserToken),
 }
-
-/// Associates an HTTP header name with type
-pub trait ExtractableAuthSession {
-    fn header_names() -> Vec<&'static str>;
-}

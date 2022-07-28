@@ -2,12 +2,16 @@ use thiserror::Error;
 
 use self::session_data::user::UserAuthScope;
 
-pub mod either;
+mod either;
 pub mod key_context;
-pub mod session_context;
+mod session_context;
 pub mod session_data;
-pub mod user_auth;
+mod traits;
+mod user_auth;
 
+pub use self::either::Either;
+pub use session_context::SessionContext;
+pub use traits::*;
 pub use user_auth::UserAuth;
 
 #[derive(Debug, Error)]
@@ -43,10 +47,3 @@ pub enum AuthError {
     #[error("Not allowed: requires one of the following scopes: {0:?}")]
     MissingScope(Vec<UserAuthScope>),
 }
-
-/// A helper trait to extract whether the auth session is for sandbox or production data
-pub trait IsLive {
-    fn is_live(&self) -> Result<bool, AuthError>;
-}
-
-pub trait SupportsIsLiveHeader {}

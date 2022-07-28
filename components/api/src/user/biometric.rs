@@ -1,5 +1,5 @@
 use crate::{
-    auth::{session_context::HasUserVaultId, session_data::user::UserAuthScope, UserAuth},
+    auth::{session_data::user::UserAuthScope, UserAuth, VerifiedUserAuth},
     errors::ApiError,
     types::{success::ApiResponseData, Empty},
     utils::{

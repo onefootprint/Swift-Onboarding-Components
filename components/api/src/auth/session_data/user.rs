@@ -2,11 +2,9 @@ use newtypes::UserVaultId;
 use paperclip::actix::Apiv2Schema;
 
 use crate::{
-    auth::{session_context::HasUserVaultId, session_data::AuthSessionData, AuthError},
+    auth::{session_data::AuthSessionData, AuthError, ExtractableAuthSession, VerifiedUserAuth},
     errors::ApiError,
 };
-
-use super::ExtractableAuthSession;
 
 #[derive(serde::Serialize, serde::Deserialize, PartialEq, Debug, Clone, Copy, Apiv2Schema)]
 #[serde(rename = "snake_case")]
@@ -44,7 +42,7 @@ impl UserSession {
     }
 }
 
-impl HasUserVaultId for UserSession {
+impl VerifiedUserAuth for UserSession {
     fn user_vault_id(&self) -> UserVaultId {
         self.user_vault_id.clone()
     }

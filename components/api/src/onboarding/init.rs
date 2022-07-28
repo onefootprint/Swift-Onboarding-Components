@@ -1,5 +1,5 @@
-use crate::auth::session_context::HasUserVaultId;
 use crate::auth::session_data::user::UserAuthScope;
+use crate::auth::VerifiedUserAuth;
 use crate::auth::{key_context::ob_public_key::PublicTenantAuthContext, UserAuth};
 use crate::errors::onboarding::OnboardingError;
 use crate::errors::ApiError;

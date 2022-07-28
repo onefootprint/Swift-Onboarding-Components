@@ -1,15 +1,12 @@
 use crate::{
-    auth::{
-        session_context::HasTenant,
-        session_data::{AuthSessionData, ExtractableAuthSession},
-        AuthError, SupportsIsLiveHeader,
-    },
+    auth::{AuthError, ExtractableAuthSession, HasTenant, SupportsIsLiveHeader},
     errors::ApiError,
 };
 use async_trait::async_trait;
-use db::{models::tenants::Tenant, DbPool};
 use newtypes::TenantId;
 use paperclip::actix::Apiv2Schema;
+
+use super::AuthSessionData;
 
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, Apiv2Schema)]
 pub struct WorkOsSession {
@@ -45,10 +42,6 @@ impl HasTenant for WorkOsSession {
 
     fn is_sandbox_restricted(&self) -> bool {
         self.sandbox_restricted
-    }
-
-    async fn tenant(&self, pool: &DbPool) -> Result<Tenant, ApiError> {
-        Ok(db::tenant::get_tenant(pool, self.tenant_id.clone()).await?)
     }
 }
 

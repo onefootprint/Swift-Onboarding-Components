@@ -9,7 +9,7 @@ use paperclip::actix::Apiv2Security;
 
 use crate::errors::ApiError;
 
-use super::{session_context::HasTenant, AuthError, IsLive};
+use super::{AuthError, HasTenant, IsLive};
 
 #[derive(Debug, Clone, Apiv2Security)]
 #[openapi(apiKey)]

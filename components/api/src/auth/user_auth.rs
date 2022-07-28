@@ -1,7 +1,6 @@
 use super::{
-    session_context::SessionContext,
     session_data::user::{ParsedUserSession, UserAuthScope, UserSession},
-    AuthError,
+    AuthError, SessionContext,
 };
 
 /// A shorthand for the commonly used ParsableUserSession context

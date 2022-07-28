@@ -1,7 +1,7 @@
 use std::str::FromStr;
 
 use crate::auth::UserAuth;
-use crate::auth::{session_context::HasUserVaultId, session_data::user::UserAuthScope};
+use crate::auth::{session_data::user::UserAuthScope, VerifiedUserAuth};
 use crate::errors::challenge::ChallengeError;
 use crate::errors::ApiError;
 use crate::types::success::ApiResponseData;
