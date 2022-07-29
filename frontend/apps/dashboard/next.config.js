@@ -14,7 +14,7 @@ const withTM = require('next-transpile-modules')([
 
 module.exports = withPlugins([withTM, withBundleAnalyzer], {
   pageExtensions: ['page.tsx', 'page.ts', 'page.jsx', 'page.js'],
-  reactStrictMode: true,
+  reactStrictMode: false,
   compiler: {
     styledComponents: true,
   },

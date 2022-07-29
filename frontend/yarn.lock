@@ -8159,7 +8159,7 @@ google-libphonenumber@^3.2.29:
   resolved "https://registry.yarnpkg.com/google-libphonenumber/-/google-libphonenumber-3.2.29.tgz#06ca967f632252e4eb2df032288fb4327284edce"
   integrity sha512-eRVj4HIcRR+MGPDlrt1n8/nORoUMhEj3Wns5f61uDaSrLeFdXdKjBhoEOkiMe2pnmOY+UzI1j8O8umjhzPYs1A==
 
-google-map-react@^2.1.10:
+google-map-react@^2.2.0:
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/google-map-react/-/google-map-react-2.2.0.tgz#10b23a42526556adaacbaeec114a72bf3b733053"
   integrity sha512-UPiTwR3qNKJJizURXTuCbnBr8kLtLsiikj/KH1UTLGhadnU6fT+CE3CLw1lzZwk5zZIduQQODyIcEwNInECmUg==
