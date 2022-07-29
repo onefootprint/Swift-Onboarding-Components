@@ -1,4 +1,8 @@
-import { QueryFunctionContext, QueryKey, useInfiniteQuery } from 'react-query';
+import {
+  QueryFunctionContext,
+  QueryKey,
+  useInfiniteQuery,
+} from '@tanstack/react-query';
 import request, { RequestError, RequestResponse } from 'request';
 import useSessionUser, { AuthHeaders } from 'src/hooks/use-session-user';
 import {

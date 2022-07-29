@@ -1,4 +1,4 @@
-import { useMutation } from 'react-query';
+import { useMutation } from '@tanstack/react-query';
 import request, { RequestError, RequestResponse } from 'request';
 import { ChallengeKind } from 'src/utils/state-machine/identify/types';
 import { IdentifyType } from 'src/utils/state-machine/types';

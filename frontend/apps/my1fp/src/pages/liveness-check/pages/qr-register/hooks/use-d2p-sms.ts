@@ -1,5 +1,5 @@
+import { useMutation } from '@tanstack/react-query';
 import { BIOMETRIC_BASE_URL } from 'global-constants';
-import { useMutation } from 'react-query';
 import request, { RequestError, RequestResponse } from 'request';
 import { MY1FP_AUTH_HEADER } from 'src/config/constants';
 

@@ -1,9 +1,9 @@
 import '@testing-library/jest-dom';
 
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render } from '@testing-library/react';
 import FootprintProvider from 'footprint-provider';
 import React from 'react';
-import { QueryClient, QueryClientProvider } from 'react-query';
 import { ThemeProvider } from 'styled-components';
 import themes from 'themes';
 import { DesignSystemProvider } from 'ui';

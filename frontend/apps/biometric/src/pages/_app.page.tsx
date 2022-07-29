@@ -1,7 +1,7 @@
+import { QueryClientProvider } from '@tanstack/react-query';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import React from 'react';
-import { QueryClientProvider } from 'react-query';
 import { createGlobalStyle, css } from 'styled-components';
 import themes from 'themes';
 import { DesignSystemProvider } from 'ui';

@@ -1,4 +1,4 @@
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 import request, { RequestError, RequestResponse } from 'request';
 import { BIOMETRIC_AUTH_HEADER } from 'src/config/constants';
 import useD2PMobileMachine from 'src/hooks/use-d2p-mobile-machine';

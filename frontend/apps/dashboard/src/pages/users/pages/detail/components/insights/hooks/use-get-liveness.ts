@@ -1,4 +1,8 @@
-import { QueryFunctionContext, QueryKey, useQuery } from 'react-query';
+import {
+  QueryFunctionContext,
+  QueryKey,
+  useQuery,
+} from '@tanstack/react-query';
 import request, { RequestError, RequestResponse } from 'request';
 import useSessionUser, { AuthHeaders } from 'src/hooks/use-session-user';
 import { InsightEvent } from 'src/types/insight-event';

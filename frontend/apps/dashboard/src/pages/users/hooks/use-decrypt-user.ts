@@ -1,5 +1,5 @@
+import { useMutation } from '@tanstack/react-query';
 import { partial } from 'lodash';
-import { useMutation } from 'react-query';
 import request, { RequestError, RequestResponse } from 'request';
 import useSessionUser, { AuthHeaders } from 'src/hooks/use-session-user';
 import { DataKind, DataKindType, DecryptedUserAttributes } from 'src/types';

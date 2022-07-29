@@ -1,5 +1,9 @@
+import {
+  QueryFunctionContext,
+  QueryKey,
+  useQuery,
+} from '@tanstack/react-query';
 import { omit } from 'lodash';
-import { QueryFunctionContext, QueryKey, useQuery } from 'react-query';
 import request, { RequestError, RequestResponse } from 'request';
 import useSessionUser, { AuthHeaders } from 'src/hooks/use-session-user';
 import {

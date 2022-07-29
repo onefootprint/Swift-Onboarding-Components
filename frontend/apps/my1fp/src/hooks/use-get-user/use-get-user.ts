@@ -1,4 +1,4 @@
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 import request, { RequestError, RequestResponse } from 'request';
 
 import { MY1FP_AUTH_HEADER } from '../../config/constants';

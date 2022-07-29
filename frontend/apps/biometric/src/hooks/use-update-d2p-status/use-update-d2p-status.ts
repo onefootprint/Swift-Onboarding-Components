@@ -1,4 +1,4 @@
-import { useMutation } from 'react-query';
+import { useMutation } from '@tanstack/react-query';
 import request, { RequestError, RequestResponse } from 'request';
 
 import { BIOMETRIC_AUTH_HEADER } from '../../config/constants';

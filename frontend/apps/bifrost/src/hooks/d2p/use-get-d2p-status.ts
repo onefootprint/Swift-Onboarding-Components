@@ -1,4 +1,4 @@
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 import request, { RequestError, RequestResponse } from 'request';
 import { BIFROST_AUTH_HEADER } from 'src/config/constants';
 import { useLivenessRegisterMachine } from 'src/pages/liveness-register/components/machine-provider';

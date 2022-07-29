@@ -1,4 +1,4 @@
-import { useMutation } from 'react-query';
+import { useMutation } from '@tanstack/react-query';
 import request, { RequestError, RequestResponse } from 'request';
 import { BIFROST_AUTH_HEADER } from 'src/config/constants';
 
