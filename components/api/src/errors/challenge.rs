@@ -14,4 +14,6 @@ pub enum ChallengeError {
     EmailChallengeExpired,
     #[error("Please wait {0} more seconds")]
     RateLimited(i64),
+    #[error("Cannot add more than one biometric credential")]
+    BiometricCredentialAlreadyExists,
 }

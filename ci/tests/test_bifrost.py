@@ -125,19 +125,7 @@ class TestBifrost:
         }
         post("user/data", data, auth_token)
 
-    def test_user_biometric(self, auth_token):
-        # get challenge
-        body = post("user/biometric/init", None, auth_token)
-        chal_token = body["data"]["challenge_token"]
-        chal = _override_webauthn_challenge(json.loads(body["data"]["challenge_json"]))
-        attestation = WEBAUTHN_DEVICE.create(chal, os.environ.get('TEST_URL'))
-        attestation = _override_webauthn_attestation(attestation)
-
-        # Register credential
-        data = dict(challenge_token=chal_token, device_response_json=json.dumps(attestation))
-        post("user/biometric", data, auth_token)
-
-    def test_d2p(self, auth_token):
+    def test_d2p_biometric(self, auth_token):
         # Get new auth token in d2p/generate endpoint
         body = post("onboarding/d2p/generate", None, auth_token)
         d2p_auth_token = D2pAuth(body["data"]["auth_token"])
@@ -156,11 +144,17 @@ class TestBifrost:
         # Use the auth token to check the status of the d2p session
         _assert_get_status("waiting")
 
-        # Make sure the auth token can be used to add a biometric credential
+        # Add a biometric credential using the token
         _update_status("in_progress")
-
         body = post("user/biometric/init", None, d2p_auth_token)
-        assert body["data"]["challenge_token"]
+        chal_token = body["data"]["challenge_token"]
+        chal = _override_webauthn_challenge(json.loads(body["data"]["challenge_json"]))
+        attestation = WEBAUTHN_DEVICE.create(chal, os.environ.get('TEST_URL'))
+        attestation = _override_webauthn_attestation(attestation)
+
+        # Register credential
+        data = dict(challenge_token=chal_token, device_response_json=json.dumps(attestation))
+        post("user/biometric", data, d2p_auth_token)
 
         # Check that the status is updated
         _update_status("completed")
@@ -169,9 +163,9 @@ class TestBifrost:
         # Don't allow transitioning the status backwards
         _update_status("canceled", status_code=400)
 
-        # Shouldn't be able to use the auth token to add a biometric unless it's in in_progress
-        # TODO: re-add this test after flattening auth
-        # body = post("user/biometric/init", None, d2p_auth_token, status_code=401)
+        # Shouldn't be able to add a second biometric credential
+        post("user/biometric/init", None, d2p_auth_token, status_code=400)
+        post("user/biometric", data, d2p_auth_token, status_code=400)
 
     def test_onboarding_complete(self, workos_tenant, auth_token): 
         body = post("onboarding/complete", None, workos_tenant.pk, auth_token)

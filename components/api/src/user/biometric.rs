@@ -1,6 +1,6 @@
 use crate::{
     auth::{session_data::user::UserAuthScope, UserAuth, VerifiedUserAuth},
-    errors::ApiError,
+    errors::{challenge::ChallengeError, ApiError},
     types::{success::ApiResponseData, Empty},
     utils::{
         challenge::{Challenge, ChallengeToken},
@@ -12,8 +12,12 @@ use crate::{
 use app_attest::error::AttestationError;
 use chrono::{Duration, Utc};
 use crypto::sha256;
-use db::models::{audit_trails::AuditTrail, webauthn_credential::NewWebauthnCredential};
-use db::{models::insight_event::CreateInsightEvent, DbError};
+use db::models::insight_event::CreateInsightEvent;
+use db::models::{
+    audit_trails::AuditTrail,
+    user_vaults::UserVault,
+    webauthn_credential::{NewWebauthnCredential, WebauthnCredential},
+};
 use newtypes::{AttestationType, AuditTrailEvent};
 use newtypes::{Base64Data, LivenessCheckInfo};
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
@@ -47,6 +51,15 @@ pub fn init(
     state: web::Data<State>,
 ) -> actix_web::Result<Json<ApiResponseData<WebAuthnInitResponse>>, ApiError> {
     let user_auth = user_auth.check_permissions(vec![UserAuthScope::SignUp, UserAuthScope::Handoff])?;
+
+    let user_vault_id = user_auth.user_vault_id();
+    let creds = state
+        .db_pool
+        .db_query(move |conn| WebauthnCredential::list(conn, &user_vault_id))
+        .await??;
+    if !creds.is_empty() {
+        return Err(ChallengeError::BiometricCredentialAlreadyExists.into());
+    }
 
     // generate the challenge and return it
     let webauthn = LivenessWebauthnConfig::new(&state);
@@ -165,7 +178,15 @@ async fn complete(
 
     state
         .db_pool
-        .db_transaction(move |conn| -> Result<_, DbError> {
+        .db_transaction(move |conn| -> Result<_, ApiError> {
+            // Protect against someone adding a webauthn credential while we verify that there's
+            // only one
+            UserVault::lock(conn, user_auth.user_vault_id())?;
+            let creds = WebauthnCredential::list(conn, &user_auth.user_vault_id())?;
+            if !creds.is_empty() {
+                return Err(ChallengeError::BiometricCredentialAlreadyExists.into());
+            }
+
             let event = AuditTrailEvent::LivenessCheck(LivenessCheckInfo {
                 // TODO https://linear.app/footprint/issue/FP-477/correctly-extract-device-name-and-attestations-in-biometric-audit
                 attestations: vec!["Footprint".to_owned(), "Apple".to_owned()],
