@@ -6,6 +6,7 @@ pub mod audit_trail;
 pub mod decrypt;
 pub mod liveness;
 pub mod ob_config;
+pub mod onboarding_configs;
 pub mod scoped_users;
 pub mod settings;
 pub mod validate;
@@ -18,7 +19,8 @@ pub fn routes() -> web::Scope {
         .service(decrypt::handler)
         .service(scoped_users::get)
         .service(ob_config::get)
-        .service(ob_config::post)
+        .service(web::resource("/config").route(web::post().to(onboarding_configs::post)))
+        .service(web::resource("/onboarding_configs").route(web::post().to(onboarding_configs::post)))
         .service(liveness::get)
         .service(validate::validate)
         .service(settings::routes())
