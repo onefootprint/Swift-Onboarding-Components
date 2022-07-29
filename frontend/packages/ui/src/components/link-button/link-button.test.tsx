@@ -1,8 +1,10 @@
 import IcoArrowRightSmall24 from 'icons/ico/ico-arrow-right-small-24';
 import React from 'react';
 import { customRender, screen, userEvent } from 'test-utils';
+import themes, { Color } from 'themes';
 
 import LinkButton, { LinkButtonProps } from './link-button';
+import type { LinkButtonVariant } from './link-button.types';
 
 describe('<LinkButton />', () => {
   const renderLinkButton = ({
@@ -15,6 +17,7 @@ describe('<LinkButton />', () => {
     size = 'default',
     target,
     testID,
+    variant = 'default',
   }: Partial<LinkButtonProps>) =>
     customRender(
       <LinkButton
@@ -26,6 +29,7 @@ describe('<LinkButton />', () => {
         size={size}
         target={target}
         testID={testID}
+        variant={variant}
       >
         {children}
       </LinkButton>,
@@ -41,25 +45,50 @@ describe('<LinkButton />', () => {
 
     it('should render the text', () => {
       renderLinkButton({
-        children: 'foo',
+        children: 'Link button',
       });
-      expect(screen.getByText('foo')).toBeInTheDocument();
+      expect(
+        screen.getByRole('button', { name: 'Link button' }),
+      ).toBeInTheDocument();
     });
 
     it('should assign an aria label', () => {
       renderLinkButton({
         ariaLabel: 'lorem',
-        children: 'foo',
+        children: 'Link button',
       });
       expect(screen.getByLabelText('lorem')).toBeInTheDocument();
     });
 
     it('should trigger onClick event when clicking', async () => {
       const onClickMockFn = jest.fn();
-      renderLinkButton({ children: 'foo', onClick: onClickMockFn });
-      await userEvent.click(screen.getByText('foo'));
+      renderLinkButton({ children: 'Link button', onClick: onClickMockFn });
+      await userEvent.click(
+        screen.getByRole('button', { name: 'Link button' }),
+      );
       expect(onClickMockFn).toHaveBeenCalledTimes(1);
     });
+
+    const variants: {
+      variant: LinkButtonVariant;
+      styles: {
+        color: Color;
+      };
+    }[] = [
+      { variant: 'default', styles: { color: 'accent' } },
+      { variant: 'destructive', styles: { color: 'error' } },
+    ];
+    describe.each(variants)(
+      'when is set the variant $variant',
+      ({ variant, styles }) => {
+        it('should render with the correct styles', () => {
+          renderLinkButton({ children: 'Link button', variant });
+          expect(screen.getByRole('button')).toHaveStyle({
+            color: themes.light.color[styles.color],
+          });
+        });
+      },
+    );
 
     describe('when the href prop is present', () => {
       it('should render the component as an anchor', () => {

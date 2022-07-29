@@ -2,7 +2,7 @@ import type { FontVariant } from 'themes';
 
 import type { LinkButtonSize } from './link-button.types';
 
-const fontSize: Record<LinkButtonSize, FontVariant> = {
+export const fontSize: Record<LinkButtonSize, FontVariant> = {
   default: 'label-2',
   compact: 'label-3',
   tiny: 'label-4',
@@ -10,4 +10,6 @@ const fontSize: Record<LinkButtonSize, FontVariant> = {
   xxTiny: 'caption-2',
 };
 
-export default fontSize;
+export const sizes = ['default', 'compact', 'tiny', 'xTiny', 'xxTiny'];
+
+export const variants = ['default', 'destructive'];

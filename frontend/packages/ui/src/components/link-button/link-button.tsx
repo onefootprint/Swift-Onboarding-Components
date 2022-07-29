@@ -3,8 +3,8 @@ import React, { HTMLAttributeAnchorTarget } from 'react';
 import styled, { css } from 'styled-components';
 
 import { createFontStyles } from '../../utils/mixins';
-import fontSize from './link-button.constants';
-import type { LinkButtonSize } from './link-button.types';
+import { fontSize } from './link-button.constants';
+import type { LinkButtonSize, LinkButtonVariant } from './link-button.types';
 
 export type LinkButtonProps = {
   ariaLabel?: string;
@@ -22,6 +22,7 @@ export type LinkButtonProps = {
   size?: LinkButtonSize;
   target?: HTMLAttributeAnchorTarget;
   testID?: string;
+  variant?: LinkButtonVariant;
 };
 
 const LinkButton = ({
@@ -34,10 +35,14 @@ const LinkButton = ({
   size = 'default',
   target,
   testID,
+  variant = 'default',
 }: LinkButtonProps) => {
-  const renderedIcon = Icon && <Icon color="accent" />;
+  const renderedIcon = Icon && (
+    <Icon color={variant === 'default' ? 'accent' : 'error'} />
+  );
   return (
     <LinkButtonStyled
+      variant={variant}
       aria-label={ariaLabel}
       data-testid={testID}
       href={href}
@@ -57,20 +62,22 @@ const LinkButton = ({
 
 type LinkButtonStyleProps = Pick<LinkButtonProps, 'href'> & {
   size: LinkButtonSize;
+  variant: LinkButtonVariant;
 };
 
 export const LinkButtonStyled = styled.a.attrs<{
   href: string;
   size: LinkButtonSize;
+  variant: LinkButtonVariant;
 }>(({ href }) => ({
   as: href ? 'a' : 'button',
 }))<LinkButtonStyleProps>`
-  ${({ theme, size, href }) => css`
+  ${({ theme, size, href, variant }) => css`
     ${createFontStyles(fontSize[size])};
     align-items: center;
     background: transparent;
     border: none;
-    color: ${theme.color.accent};
+    color: ${theme.color[variant === 'default' ? 'accent' : 'error']};
     cursor: pointer;
     display: inline-flex;
     margin: 0;

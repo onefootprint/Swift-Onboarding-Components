@@ -4,3 +4,5 @@ export type LinkButtonSize =
   | 'tiny'
   | 'xTiny'
   | 'xxTiny';
+
+export type LinkButtonVariant = 'default' | 'destructive';

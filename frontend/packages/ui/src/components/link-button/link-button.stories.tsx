@@ -5,6 +5,7 @@ import IcoPlusSmall24 from 'icons/ico/ico-plus-small-24';
 import React from 'react';
 
 import LinkButton, { LinkButtonProps } from './link-button';
+import { sizes, variants } from './link-button.constants';
 
 export default {
   title: 'Components/LinkButton',
@@ -23,16 +24,10 @@ export default {
       name: 'children *',
     },
     href: { control: 'text', description: 'Creates a hyperlink to web pages' },
-    size: {
+    iconComponent: {
       control: 'select',
-      description: 'Size',
-      options: ['default', 'compact', 'tiny', 'xTiny', 'xxTiny'],
-      table: { defaultValue: { summary: 'default' } },
-    },
-    target: {
-      control: 'select',
-      description: 'Where the browser should load the link',
-      options: ['_blank', '_self', '_parent', '_top', 'framename'],
+      description: 'Icon to be rendered',
+      options: Object.keys(icos),
     },
     iconPosition: {
       control: 'select',
@@ -40,19 +35,30 @@ export default {
       options: ['left', 'right'],
       table: { defaultValue: { summary: 'right' } },
     },
-    Icon: {
+    onClick: {
+      control: 'object',
+      description: 'Callback function triggered upon click',
+    },
+    size: {
       control: 'select',
-      description: 'Icon to be rendered',
-      options: Object.keys(icos),
+      description: 'Size',
+      options: sizes,
+      table: { defaultValue: { summary: 'default' } },
+    },
+    target: {
+      control: 'select',
+      description: 'Where the browser should load the link',
+      options: ['_blank', '_self', '_parent', '_top', 'framename'],
     },
     testID: {
       control: 'text',
       description: 'Append an attribute data-testid for testing purposes',
     },
-    onClick: {
-      control: 'object',
-      description: 'Callback function triggered upon click',
-      required: false,
+    variant: {
+      control: 'select',
+      description: 'Variant style',
+      options: variants,
+      table: { defaultValue: { summary: 'default' } },
     },
   },
 } as ComponentMeta<typeof LinkButton>;
@@ -67,6 +73,7 @@ const Template: Story<LinkButtonProps> = ({
   size,
   target,
   testID,
+  variant,
 }: LinkButtonProps) => {
   const SelectedIcon = typeof Icon === 'string' ? icos[Icon] : Icon;
   return (
@@ -79,6 +86,7 @@ const Template: Story<LinkButtonProps> = ({
       size={size}
       target={target}
       testID={testID}
+      variant={variant}
     >
       {children}
     </LinkButton>
@@ -95,6 +103,7 @@ AsLink.args = {
   size: 'default',
   target: '_blank',
   testID: 'link-button-test-id',
+  variant: 'default',
 };
 
 export const Base = Template.bind({});
