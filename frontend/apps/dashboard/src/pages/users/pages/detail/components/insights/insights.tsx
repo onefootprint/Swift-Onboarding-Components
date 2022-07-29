@@ -65,7 +65,7 @@ const Insights = ({ user }: InsightsProps) => {
               lat: insightEvent.latitude!,
               lng: insightEvent.longitude! - 0.009,
             }}
-            defaultZoom={15}
+            defaultZoom={13}
             options={{
               clickableIcons: false,
               disableDoubleClickZoom: true,
