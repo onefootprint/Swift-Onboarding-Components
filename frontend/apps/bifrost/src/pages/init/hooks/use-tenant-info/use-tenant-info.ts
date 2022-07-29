@@ -13,9 +13,11 @@ type TenantInfoRequest = {
 };
 
 type TenantInfoResponse = {
-  name: string;
-  mustCollectDataKinds: UserDataAttribute[];
   canAccessDataKinds: UserDataAttribute[];
+  isLive: boolean;
+  mustCollectDataKinds: UserDataAttribute[];
+  name: string;
+  orgName: string;
 };
 
 const getTenantInfo = async (payload: TenantInfoRequest) => {
@@ -39,12 +41,20 @@ const useTenantInfo = (tenantPk: string) => {
     () => getTenantInfo({ tenantPk }),
     {
       enabled: !!tenantPk,
-      onSuccess: ({ name, mustCollectDataKinds, canAccessDataKinds }) => {
+      onSuccess: ({
+        orgName,
+        name,
+        isLive,
+        mustCollectDataKinds,
+        canAccessDataKinds,
+      }) => {
         send({
           type: Events.tenantInfoRequestSucceeded,
           payload: {
             pk: tenantPk,
+            orgName,
             name,
+            isLive,
             mustCollectDataKinds: mustCollectDataKinds.map(
               (attr: string) => UserDataAttributeLabels[attr],
             ),

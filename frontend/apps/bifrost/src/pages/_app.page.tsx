@@ -8,7 +8,8 @@ import styled, { createGlobalStyle, css } from 'styled-components';
 import themes from 'themes';
 import { DesignSystemProvider, media } from 'ui';
 
-import BifrostMachineProvider from '../components/bifrost-machine-provider';
+import { BifrostMachineProvider } from '../components/bifrost-machine-provider';
+import SandboxBanner from '../components/sandbox-banner';
 import { GOOGLE_MAPS_KEY } from '../config/constants';
 import configureReactI18next from '../config/initializers/react-i18next';
 import queryClient from '../config/initializers/react-query';
@@ -35,11 +36,14 @@ const App = ({ Component, pageProps }: AppProps) => (
         <DesignSystemProvider theme={themes.light}>
           <GlobalStyle />
           <FootprintProvider>
-            <Content id="content">
-              <NavigationHeader id="navigation-header-portal" />
-              <Component {...pageProps} />
-            </Content>
-            <FootprintFooter />
+            <Container>
+              <SandboxBanner />
+              <Content id="content">
+                <NavigationHeader id="navigation-header-portal" />
+                <Component {...pageProps} />
+              </Content>
+              <FootprintFooter />
+            </Container>
           </FootprintProvider>
         </DesignSystemProvider>
       </BifrostMachineProvider>
@@ -81,17 +85,24 @@ const GlobalStyle = createGlobalStyle`
       `}
     }
   `}
- 
+`;
+
+const Container = styled.div`
+  ${({ theme }) => css`
+    border-radius: ${theme.borderRadius[2]}px;
+
+    ${media.greaterThan('md')`
+      background-color: ${theme.backgroundColor.primary};
+    `}
+  `}
 `;
 
 const Content = styled.div`
   ${({ theme }) => css`
-    border-radius: ${theme.borderRadius[2]}px ${theme.borderRadius[2]}px 0 0;
     flex: 1 0 auto;
     padding: ${theme.spacing[5]}px;
 
     ${media.greaterThan('md')`
-      background-color: ${theme.backgroundColor.primary};
       padding: 0 ${theme.spacing[7]}px ${theme.spacing[7]}px;
     `}
   `}

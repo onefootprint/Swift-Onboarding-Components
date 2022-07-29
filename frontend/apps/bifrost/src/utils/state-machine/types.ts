@@ -84,8 +84,10 @@ export type OnboardingData = {
 };
 
 export type TenantInfo = {
-  pk: string;
-  name: string;
-  mustCollectDataKinds: UserDataAttribute[];
   canAccessDataKinds: UserDataAttribute[];
+  isLive?: boolean;
+  mustCollectDataKinds: UserDataAttribute[];
+  name: string;
+  orgName: string;
+  pk: string;
 };

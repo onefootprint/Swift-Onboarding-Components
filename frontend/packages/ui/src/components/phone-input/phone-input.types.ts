@@ -6,6 +6,7 @@ import { InputProps as BaseInputProps } from '../internal/input';
 export type InputProps = Omit<BaseInputProps, 'mask' | 'placeholder'>;
 
 export type PhoneInputProps = InputProps & {
+  disableMask?: boolean;
   onReset?: () => void;
   placeholder?: string;
   searchPlaceholder?: string;

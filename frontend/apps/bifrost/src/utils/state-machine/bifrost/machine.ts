@@ -16,10 +16,12 @@ const initialContext: BifrostContext = {
     hasSupportForWebAuthn: false,
   },
   tenant: {
-    pk: '',
-    name: '',
-    mustCollectDataKinds: [],
     canAccessDataKinds: [],
+    isLive: undefined,
+    mustCollectDataKinds: [],
+    name: '',
+    orgName: '',
+    pk: '',
   },
   onboarding: {
     missingAttributes: [],
@@ -205,10 +207,12 @@ const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
       [Actions.assignTenantInfo]: assign((context, event) => {
         if (event.type === Events.tenantInfoRequestSucceeded) {
           context.tenant = {
-            pk: event.payload.pk,
-            name: event.payload.name,
-            mustCollectDataKinds: [...event.payload.mustCollectDataKinds],
             canAccessDataKinds: [...event.payload.canAccessDataKinds],
+            isLive: event.payload.isLive,
+            mustCollectDataKinds: [...event.payload.mustCollectDataKinds],
+            name: event.payload.name,
+            orgName: event.payload.orgName,
+            pk: event.payload.pk,
           };
         }
         return context;

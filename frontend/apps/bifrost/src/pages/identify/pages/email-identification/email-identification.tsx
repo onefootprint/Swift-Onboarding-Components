@@ -1,12 +1,10 @@
 import { HeaderTitle } from 'footprint-ui';
 import { useTranslation } from 'hooks';
 import React from 'react';
-import { useForm } from 'react-hook-form';
 import NavigationHeader from 'src/components/navigation-header';
 import { UserData, UserDataAttribute } from 'src/utils/state-machine/types';
-import styled, { css } from 'styled-components';
-import { Button, TextInput } from 'ui';
 
+import EmailIdentificationForm from './components/email-identification-form';
 import useEmailIdentify from './hooks/use-email-identify';
 
 type FormData = Required<Pick<UserData, UserDataAttribute.email>>;
@@ -14,12 +12,6 @@ type FormData = Required<Pick<UserData, UserDataAttribute.email>>;
 const EmailIdentification = () => {
   const { t } = useTranslation('pages.email-identification');
   const { identifyEmail, isLoading } = useEmailIdentify();
-
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<FormData>();
 
   const onSubmit = (formData: FormData) => {
     identifyEmail(formData.email);
@@ -33,28 +25,9 @@ const EmailIdentification = () => {
         sx={{ marginBottom: 8 }}
         title={t('title')}
       />
-      <Form onSubmit={handleSubmit(onSubmit)}>
-        <TextInput
-          hasError={!!errors.email}
-          hintText={errors.email && t('form.email.error')}
-          label={t('form.email.label')}
-          placeholder={t('form.email.placeholder')}
-          type="email"
-          {...register('email', { required: true })}
-        />
-        <Button fullWidth type="submit" loading={isLoading()}>
-          {t('form.cta')}
-        </Button>
-      </Form>
+      <EmailIdentificationForm onSubmit={onSubmit} isLoading={isLoading()} />
     </>
   );
 };
-
-const Form = styled.form`
-  ${({ theme }) => css`
-    display: grid;
-    row-gap: ${theme.spacing[7]}px;
-  `}
-`;
 
 export default EmailIdentification;

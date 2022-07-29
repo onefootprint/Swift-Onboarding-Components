@@ -13,11 +13,13 @@ import { getCountryByNumber } from './phone-input.utils';
 const PhoneInput = forwardRef<HTMLInputElement, PhoneInputProps>(
   (
     {
+      disableMask,
+      hasError,
+      hintText,
       onReset,
       searchPlaceholder,
       selectEmptyStateText,
       value,
-      hintText,
       ...props
     }: PhoneInputProps,
     ref,
@@ -51,6 +53,7 @@ const PhoneInput = forwardRef<HTMLInputElement, PhoneInputProps>(
         OptionComponent={Option}
         options={COUNTRIES}
         hintText={hintText}
+        hasError={hasError}
         searchPlaceholder={searchPlaceholder}
         value={selectedCountry}
         renderTrigger={trigger =>
@@ -61,9 +64,10 @@ const PhoneInput = forwardRef<HTMLInputElement, PhoneInputProps>(
               <Input
                 {...props}
                 countryCode={countryCode}
-                hasMask={masks[countryCode]}
+                hasMask={disableMask ? undefined : masks[countryCode]}
                 prefix={REGION_CODES[countryCode]}
                 ref={mergeRefs([ref, localRef])}
+                hasError={hasError}
                 value={value}
                 selectTrigger={{
                   ref: trigger.ref,
@@ -74,10 +78,11 @@ const PhoneInput = forwardRef<HTMLInputElement, PhoneInputProps>(
             <Input
               {...props}
               countryCode={countryCode}
-              hasMask={masks[countryCode]}
+              hasMask={disableMask ? undefined : masks[countryCode]}
               prefix={REGION_CODES[countryCode]}
               ref={mergeRefs([ref, localRef])}
               value={value}
+              hasError={hasError}
               selectTrigger={{
                 isOpen: trigger.isOpen,
                 onClick: trigger.onClick,

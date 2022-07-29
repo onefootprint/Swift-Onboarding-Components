@@ -11,7 +11,7 @@ const Banner = styled.div.attrs<BannerProps>({
   role: 'alert',
 })<BannerProps>`
   ${({ theme, variant }) => css`
-    ${createFontStyles('body-3')};
+    ${createFontStyles('label-3')};
     background-color: ${theme.backgroundColor[variant]};
     color: ${theme.color[variant]};
     padding: ${theme.spacing[4]}px ${theme.spacing[5]}px;

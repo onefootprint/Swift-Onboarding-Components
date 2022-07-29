@@ -2,30 +2,21 @@ import { HeaderTitle } from 'footprint-ui';
 import { useRequestErrorToast, useTranslation } from 'hooks';
 import IcoEmail24 from 'icons/ico/ico-email-24';
 import React from 'react';
-import { useForm } from 'react-hook-form';
 import NavigationHeader from 'src/components/navigation-header';
 import useIdentify from 'src/pages/identify/hooks/use-identify';
 import useIdentifyChallenge from 'src/pages/identify/hooks/use-identify-challenge';
 import { ChallengeKind, Events } from 'src/utils/state-machine/identify/types';
 import styled, { css } from 'styled-components';
-import { Box, Button, LinkButton, PhoneInput, Typography } from 'ui';
+import { Box, LinkButton, Typography } from 'ui';
 
 import useIdentifyMachine from '../../hooks/use-identify-machine';
-
-type FormData = {
-  phone: string;
-};
+import PhoneRegistrationForm from './components/phone-registration-form';
 
 const PhoneRegistration = () => {
   const showRequestErrorToast = useRequestErrorToast();
   const [state, send] = useIdentifyMachine();
   const { t } = useTranslation('pages.phone-registration');
-  const {
-    setValue,
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<FormData>();
+
   const identifyMutation = useIdentify();
   const identifyChallengeMutation = useIdentifyChallenge();
 
@@ -55,7 +46,7 @@ const PhoneRegistration = () => {
     );
   };
 
-  const onSubmit = (formData: FormData) => {
+  const handleSubmit = (formData: { phone: string }) => {
     const { phone } = formData;
     // When onboarding a new user, always ask for an SMS challenge, we will register
     // biometrics in another step if needed
@@ -112,40 +103,15 @@ const PhoneRegistration = () => {
           {t('email-card.cta')}
         </LinkButton>
       </EmailCard>
-      <Form onSubmit={handleSubmit(onSubmit)}>
-        <PhoneInput
-          hasError={!!errors.phone}
-          hintText={errors.phone && t('form.phone-input.error')}
-          label={t('form.phone-input.label')}
-          placeholder={t('form.phone-input.placeholder')}
-          onReset={() => {
-            setValue('phone', '');
-          }}
-          {...register('phone', {
-            required: true,
-            pattern: /^(\+)?([ 0-9]){10,16}$/,
-          })}
-        />
-        <Button
-          type="submit"
-          fullWidth
-          loading={
-            identifyMutation.isLoading || identifyChallengeMutation.isLoading
-          }
-        >
-          {t('form.cta')}
-        </Button>
-      </Form>
+      <PhoneRegistrationForm
+        onSubmit={handleSubmit}
+        isLoading={
+          identifyMutation.isLoading || identifyChallengeMutation.isLoading
+        }
+      />
     </>
   );
 };
-
-const Form = styled.form`
-  ${({ theme }) => css`
-    display: grid;
-    row-gap: ${theme.spacing[7]}px;
-  `}
-`;
 
 const EmailCard = styled.div`
   ${({ theme }) => css`
