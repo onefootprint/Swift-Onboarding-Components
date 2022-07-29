@@ -44,6 +44,8 @@ struct UserPatchRequest {
     pub dob: Option<DateOfBirth>,
     pub address: Option<Address>,
     pub email: Option<Email>,
+    #[serde(default)]
+    pub speculative: bool,
 }
 
 impl Decomposable for UserPatchRequest {
@@ -54,6 +56,7 @@ impl Decomposable for UserPatchRequest {
             dob,
             address,
             email,
+            speculative: _,
         } = self;
 
         vec![
@@ -80,6 +83,11 @@ async fn handler(
     request: web::Json<UserPatchRequest>,
 ) -> actix_web::Result<Json<ApiResponseData<Empty>>, ApiError> {
     let user_auth = user_auth.check_permissions(vec![UserAuthScope::SignUp])?;
+    if request.speculative {
+        // We've already parsed the request and done validation on the input. Return a successful
+        // response before writing anything to the DB
+        return Ok(Json(ApiResponseData::ok(Empty)));
+    }
 
     let user_vault = user_auth.user_vault(&state.db_pool).await?;
     let request = request.into_inner();

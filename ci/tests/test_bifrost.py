@@ -91,6 +91,14 @@ class TestBifrost:
         post("onboarding/complete", None, workos_tenant.pk, auth_token, status_code=400)
 
     def test_user_data(self, auth_token):
+        # Test failed validation
+        data = {
+            "email": "flerpderp",
+            "speculative": True,
+        }
+        post("user/data", data, auth_token, status_code=400)
+
+        # Test validating data before setting
         data = {
             "name": {
                 "first_name": "Flerp",
@@ -113,7 +121,12 @@ class TestBifrost:
             },
             "ssn": _gen_random_ssn(),
             "email": EMAIL,
+            "speculative": True,
         } 
+        post("user/data", data, auth_token)
+
+        # Actually set the data
+        data.pop("speculative")
         post("user/data", data, auth_token)
 
         # Issue a second POST /user/data request to update some fields
