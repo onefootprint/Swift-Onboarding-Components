@@ -1,16 +1,18 @@
 import { Property } from 'csstype';
 import React from 'react';
 import styled, { css } from 'styled-components';
-import { LoadingIndicator, Typography } from 'ui';
 
-export type Row<T> = {
+import LoadingIndicator from '../loading-indicator';
+import Typography from '../typography';
+
+export type TableRow<T> = {
   item: T;
   index: Number;
 };
 
 export type TableProps<T> = {
   columns: { text: string; width?: Property.Width }[];
-  renderTr: (row: Row<T>) => JSX.Element;
+  renderTr: (row: TableRow<T>) => JSX.Element;
   getKeyForRow: (item: T) => string;
   onRowClick?: (item: T) => void;
   items?: Array<T>;
@@ -45,16 +47,16 @@ const Table = <T,>({
       </thead>
       <tbody>
         {isLoading && (
-          <EmptyTr>
+          <LoadingTr>
             <td colSpan={columns.length}>
               <LoadingIndicator />
             </td>
-          </EmptyTr>
+          </LoadingTr>
         )}
         {shouldShowEmptyState && (
           <EmptyTr>
             <td colSpan={columns.length}>
-              <Typography variant="caption-2">{emptyStateText}</Typography>
+              <Typography variant="body-3">{emptyStateText}</Typography>
             </td>
           </EmptyTr>
         )}
@@ -81,7 +83,7 @@ const TableContainer = styled.table`
     text-align: left;
     border: 1px solid ${theme.borderColor.tertiary};
     border-top: none;
-    border-radius: 0 0 ${theme.borderRadius[2]}px ${theme.borderRadius[2]}px;
+    border-radius: ${theme.borderRadius[2]}px;
     table-layout: fixed;
   `}
 
@@ -98,10 +100,19 @@ const TableContainer = styled.table`
 
   th {
     ${({ theme }) => css`
-      user-select: none;
-      text-transform: uppercase;
-      padding: ${theme.spacing[4]}px ${theme.spacing[6]}px;
       background-color: ${theme.backgroundColor.secondary};
+      border-top: 1px solid ${theme.borderColor.tertiary};
+      padding: ${theme.spacing[4]}px ${theme.spacing[6]}px;
+      text-transform: uppercase;
+      user-select: none;
+
+      &:first-child {
+        border-top-left-radius: ${theme.borderRadius[2]}px;
+      }
+
+      &:last-child {
+        border-top-right-radius: ${theme.borderRadius[2]}px;
+      }
     `}
   }
 
@@ -125,13 +136,18 @@ const Tr = styled.tr<{
     `}
 `;
 
-const EmptyTr = styled.tr`
+const LoadingTr = styled.tr`
   width: 100%;
   justify-content: center;
 
   td {
-    user-select: none;
     text-align: center;
+  }
+`;
+
+const EmptyTr = styled.tr`
+  td {
+    text-align: left;
   }
 `;
 

@@ -1,9 +1,9 @@
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
-import { Row, Table } from 'src/components/table';
 import { statusToBadgeVariant, statusToDisplayText } from 'src/types';
 import styled, { css } from 'styled-components';
-import { Badge, Code, SearchInput, Typography } from 'ui';
+import type { TableRow } from 'ui';
+import { Badge, Code, SearchInput, Table, Typography } from 'ui';
 
 import FieldOrPlaceholder from './components/field-or-placeholder';
 import UsersFilter from './components/filter-dialog';
@@ -73,7 +73,7 @@ const Users = () => {
           });
         }}
         columns={columns}
-        renderTr={({ item }: Row<User>) => (
+        renderTr={({ item }: TableRow<User>) => (
           <>
             <td>
               <FieldOrPlaceholder data={nameData(item.attributes)} />

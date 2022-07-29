@@ -41,6 +41,12 @@ const App = ({ Component, pageProps }: AppProps) => {
 
 const GlobalStyle = createGlobalStyle`
   ${({ theme }) => css`
+    #__next {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+
     body {
       min-width: ${theme.grid.container.maxWidth.md}px;
     }

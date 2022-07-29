@@ -13,6 +13,7 @@ import {
 export type ButtonProps = {
   children: React.ReactNode;
   disabled?: boolean;
+  form?: string;
   fullWidth?: boolean;
   loading?: boolean;
   loadingAriaLabel?: string;
@@ -28,6 +29,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     {
       children,
       disabled = false,
+      form,
       fullWidth,
       loading,
       loadingAriaLabel,
@@ -46,6 +48,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       $variant={variant}
       data-testid={testID}
       disabled={disabled}
+      form={form}
       onClick={onClick}
       ref={ref}
       tabIndex={0}

@@ -14,9 +14,11 @@ import Typography from '../typography';
 
 type DialogButton = {
   disabled?: boolean;
+  form?: string;
   label: string;
   loading?: boolean;
-  onClick?: () => void;
+  onClick?: (dataSubmitted?: any) => void;
+  type?: 'button' | 'submit' | 'reset';
 };
 
 type DialogLinkButton = {
@@ -105,8 +107,10 @@ const Dialog = ({
                 {secondaryButton && (
                   <Button
                     disabled={secondaryButton.disabled}
+                    form={secondaryButton.form}
                     loading={secondaryButton.loading}
                     onClick={secondaryButton.onClick}
+                    type={secondaryButton.type}
                     size="compact"
                     variant="secondary"
                   >
@@ -116,8 +120,10 @@ const Dialog = ({
                 {primaryButton && (
                   <Button
                     disabled={primaryButton.disabled}
+                    form={primaryButton.form}
                     loading={primaryButton.loading}
                     onClick={primaryButton.onClick}
+                    type={primaryButton.type}
                     size="compact"
                     variant="primary"
                   >

@@ -1,17 +1,26 @@
+import IcoCode16 from 'icons/ico/ico-code-16';
 import IcoFileText16 from 'icons/ico/ico-file-text-16';
 import IcoUser24 from 'icons/ico/ico-user-24';
 import IcoUsers16 from 'icons/ico/ico-users-16';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React from 'react';
+import useIsSandbox from 'src/hooks/use-is-sandbox';
+import useSessionUser from 'src/hooks/use-session-user';
 import styled, { css } from 'styled-components';
-import { Box, Container, FootprintLogo, IconButton, Tab, Typography } from 'ui';
-
-import useSessionUser from '../../../../hooks/use-session-user';
+import {
+  Banner,
+  Container,
+  FootprintLogo,
+  IconButton,
+  Tab,
+  Typography,
+} from 'ui';
 
 const routes = [
   { href: '/users', Icon: IcoUsers16, text: 'Users' },
   { href: '/security-logs', Icon: IcoFileText16, text: 'Security logs' },
+  { href: '/developers', Icon: IcoCode16, text: 'Developers' },
 ];
 
 type PrivateLayoutProps = {
@@ -20,58 +29,56 @@ type PrivateLayoutProps = {
 
 const PrivateLayout = ({ children }: PrivateLayoutProps) => {
   const router = useRouter();
-  const { data, isLive, logOut } = useSessionUser();
+  const isSandbox = useIsSandbox();
+  const { data, logOut } = useSessionUser();
   return (
-    <div data-testid="private-layout">
-      <header>
-        {!isLive && (
-          <Box sx={{ backgroundColor: 'warning' }}>
-            <Typography
-              variant="body-3"
-              sx={{ textAlign: 'center', paddingY: 2 }}
-            >
-              You are in sandbox mode.
-            </Typography>
-          </Box>
-        )}
-        <Container minSize="md">
-          <Footprint>
-            <Link href="/users">
-              <a href="/users">
-                <FootprintLogo />
-              </a>
-            </Link>
-            <SuffixContainer>
-              <IconButton
-                iconComponent={IcoUser24}
-                onClick={logOut}
-                aria-label="account"
-              />
-            </SuffixContainer>
-          </Footprint>
-        </Container>
-        <Nav>
+    <>
+      <PrivateLayoutContainer data-testid="private-layout">
+        <header>
+          {isSandbox && (
+            <SandboxBannerContainer>
+              <Banner variant="warning">You are in sandbox mode.</Banner>
+            </SandboxBannerContainer>
+          )}
           <Container minSize="md">
-            <Tab.List>
-              {routes.map(({ href, Icon, text }) => (
-                <Link href={href} key={text}>
-                  <Tab.Item
-                    href={href}
-                    iconComponent={Icon}
-                    selected={router.pathname.startsWith(href)}
-                  >
-                    {text}
-                  </Tab.Item>
-                </Link>
-              ))}
-            </Tab.List>
+            <Footprint>
+              <Link href="/users">
+                <a href="/users">
+                  <FootprintLogo />
+                </a>
+              </Link>
+              <SuffixContainer>
+                <IconButton
+                  iconComponent={IcoUser24}
+                  onClick={logOut}
+                  aria-label="account"
+                />
+              </SuffixContainer>
+            </Footprint>
           </Container>
-        </Nav>
-      </header>
-      <section>
-        <Container minSize="md">{children}</Container>
-      </section>
-      <section>
+          <Nav>
+            <Container minSize="md">
+              <Tab.List>
+                {routes.map(({ href, Icon, text }) => (
+                  <Link href={href} key={text}>
+                    <Tab.Item
+                      href={href}
+                      iconComponent={Icon}
+                      selected={router.pathname.startsWith(href)}
+                    >
+                      {text}
+                    </Tab.Item>
+                  </Link>
+                ))}
+              </Tab.List>
+            </Container>
+          </Nav>
+        </header>
+        <section>
+          <Container minSize="md">{children}</Container>
+        </section>
+      </PrivateLayoutContainer>
+      <Footer>
         <Typography
           color="tertiary"
           variant="label-4"
@@ -79,10 +86,20 @@ const PrivateLayout = ({ children }: PrivateLayoutProps) => {
         >
           Footprint ❤️ {data?.tenantName}
         </Typography>
-      </section>
-    </div>
+      </Footer>
+    </>
   );
 };
+
+const PrivateLayoutContainer = styled.div`
+  flex: 1 0 auto;
+`;
+
+const SandboxBannerContainer = styled.div`
+  ${({ theme }) => css`
+    border-bottom: 1px solid ${theme.borderColor.tertiary};
+  `};
+`;
 
 const Footprint = styled.div`
   position: relative;
@@ -109,6 +126,12 @@ const Nav = styled.nav`
     background-color: ${theme.backgroundColor.secondary};
     padding: ${theme.spacing[3]}px 0;
     margin-bottom: ${theme.spacing[7]}px;
+  `};
+`;
+
+const Footer = styled.footer`
+  ${({ theme }) => css`
+    margin: ${theme.spacing[5]}px 0;
   `};
 `;
 

@@ -2,5 +2,63 @@
   "global": {
     "errors": {}
   },
-  "pages": {}
+  "pages": {
+    "developers": {
+      "page-title": "Footprint - Developers",
+      "header": {
+        "title": "Developers",
+        "subtitle": {
+          "live": "You're viewing live keys. Enable sandbox mode to view test keys.",
+          "sandbox": "You're viewing test keys. Disable sandbox mode to view live keys."
+        }
+      },
+      "secret-keys": {
+        "header": {
+          "title": "Secret API Keys",
+          "subtitle": "These are like passwords. Keep them safe.",
+          "cta": "Create secret key"
+        },
+        "create": {
+          "title": "Create secret key",
+          "form": {
+            "name": {
+              "label": "Secret key name",
+              "placeholder": "Secret key",
+              "errors": {
+                "required": "Please enter a name for your secret key."
+              }
+            }
+          },
+          "cta": "Save",
+          "cancel": "Cancel"
+        },
+        "table": {
+          "header": {
+            "name": "Name",
+            "token": "Token",
+            "last-used": "Last used",
+            "created": "Created",
+            "status": "Status"
+          },
+          "body": {
+            "options": {
+              "disable": "Disable secret key",
+              "reveal": "Reveal secret key"
+            }
+          },
+          "no-results": "No secret keys"
+        }
+      },
+      "onboarding-configurations": {
+        "header": {
+          "title": "Onboarding configurations",
+          "subtitle": "Set up requirements for customers onboarding onto your platform.",
+          "cta": "Create onboarding config"
+        },
+        "list": {
+          "no-results": "You haven't created any onboarding configurations just yet."
+        }
+      }
+    }
+  }
 }
