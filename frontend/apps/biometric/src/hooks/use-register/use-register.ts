@@ -1,7 +1,7 @@
 import base64url from 'base64url';
 import { useMutation } from 'react-query';
 import request, { RequestError, RequestResponse } from 'request';
-import { D2P_AUTH_HEADER } from 'src/config/constants';
+import { BIOMETRIC_AUTH_HEADER } from 'src/config/constants';
 
 export type RegisterRequest = {
   authToken: string;
@@ -60,7 +60,7 @@ const register = async (payload: RegisterRequest) => {
     url: '/user/biometric/init',
     data: payload,
     headers: {
-      [D2P_AUTH_HEADER]: authToken,
+      [BIOMETRIC_AUTH_HEADER]: authToken,
     },
   });
 
@@ -77,7 +77,7 @@ const register = async (payload: RegisterRequest) => {
       challengeToken,
     },
     headers: {
-      [D2P_AUTH_HEADER]: authToken,
+      [BIOMETRIC_AUTH_HEADER]: authToken,
     },
   });
   return response.data;

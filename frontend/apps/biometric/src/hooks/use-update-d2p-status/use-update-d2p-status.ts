@@ -1,7 +1,7 @@
 import { useMutation } from 'react-query';
 import request, { RequestError, RequestResponse } from 'request';
 
-import { D2P_AUTH_HEADER } from '../../config/constants';
+import { BIOMETRIC_AUTH_HEADER } from '../../config/constants';
 
 export enum D2PStatusUpdate {
   inProgress = 'in_progress',
@@ -21,7 +21,7 @@ const updateD2PStatus = async (payload: UpdateD2PStatusRequest) => {
     url: '/onboarding/d2p/status',
     data: payload,
     headers: {
-      [D2P_AUTH_HEADER]: payload.authToken,
+      [BIOMETRIC_AUTH_HEADER]: payload.authToken,
     },
   });
   return response.data;
