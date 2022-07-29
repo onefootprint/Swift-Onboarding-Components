@@ -16,12 +16,14 @@ export default class MyDocument extends Document {
   ): Promise<DocumentInitialProps> {
     const sheet = new ServerStyleSheet();
     const originalRenderPage = ctx.renderPage;
+
     try {
       ctx.renderPage = () =>
         originalRenderPage({
           enhanceApp: App => props => sheet.collectStyles(<App {...props} />),
         });
       const initialProps = await Document.getInitialProps(ctx);
+
       return {
         ...initialProps,
         styles: [
@@ -41,10 +43,6 @@ export default class MyDocument extends Document {
       <Html>
         <Head>
           <LoadFonts />
-          {/* <meta
-            name="apple-itunes-app"
-            content="app-id=1632436468, app-clip-bundle-id=com.onefootprint.my.live, app-clip-display=card"
-          /> */}
         </Head>
         <body>
           <Main />

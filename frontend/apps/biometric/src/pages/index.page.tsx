@@ -29,6 +29,7 @@ const Root = () => {
   };
   if (has(pages, valueCasted)) {
     const Page = pages[valueCasted];
+
     if (Page) {
       return <Page />;
     }

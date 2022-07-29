@@ -1,3 +1,5 @@
+import Head from 'next/head';
+import { useRouter } from 'next/router';
 import React from 'react';
 import { QueryClientProvider } from 'react-query';
 import { createGlobalStyle, css } from 'styled-components';
@@ -18,17 +20,30 @@ type AppProps = {
   pageProps: Record<string, any>;
 };
 
-const App = ({ Component, pageProps }: AppProps) => (
-  <QueryClientProvider client={queryClient}>
-    <MachineProvider>
-      <DesignSystemProvider theme={themes.light}>
-        <GlobalStyle />
-        <Header />
-        <Component {...pageProps} />
-      </DesignSystemProvider>
-    </MachineProvider>
-  </QueryClientProvider>
-);
+const App = ({ Component, pageProps }: AppProps) => {
+  const router = useRouter();
+  const { hideAppClip } = router.query;
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <MachineProvider>
+        <DesignSystemProvider theme={themes.light}>
+          <GlobalStyle />
+          <Head>
+            {hideAppClip ? null : (
+              <meta
+                name="apple-itunes-app"
+                content="app-id=1632436468, app-clip-bundle-id=com.onefootprint.my.live, app-clip-display=card"
+              />
+            )}
+          </Head>
+          <Header />
+          <Component {...pageProps} />
+        </DesignSystemProvider>
+      </MachineProvider>
+    </QueryClientProvider>
+  );
+};
 
 const GlobalStyle = createGlobalStyle`
   ${({ theme }) => css`
