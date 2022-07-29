@@ -77,3 +77,15 @@ class TestDashboard:
         )
         body = get("org/access_events", params, tenant.sk)
         assert not body["data"]
+
+    def test_config_list(self, workos_sandbox_tenant):
+        body = get("org/onboarding_configs", None, workos_sandbox_tenant.sk)
+        configs = body["data"]
+        # TODO better tests when we aren't making a new config for every request
+        config = configs[0]
+        assert config["key"]
+        assert config["name"]
+        assert config["must_collect_data_kinds"]
+        assert config["can_access_data_kinds"]
+        assert config["created_at"]
+        assert config["status"]

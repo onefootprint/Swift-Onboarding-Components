@@ -19,6 +19,7 @@ pub fn routes() -> web::Scope {
         .service(decrypt::handler)
         .service(scoped_users::get)
         .service(ob_config::get)
+        .service(onboarding_configs::get)
         .service(web::resource("/config").route(web::post().to(onboarding_configs::post)))
         .service(web::resource("/onboarding_configs").route(web::post().to(onboarding_configs::post)))
         .service(liveness::get)

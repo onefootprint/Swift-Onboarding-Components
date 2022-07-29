@@ -2,8 +2,10 @@ use crate::diesel::ExpressionMethods;
 use crate::diesel::QueryDsl;
 use crate::diesel::RunQueryDsl;
 use crate::schema::{ob_configurations, onboardings, tenants};
+use crate::DbError;
 use crate::DbPool;
 use chrono::{DateTime, Utc};
+use diesel::PgConnection;
 use diesel::{Insertable, Queryable};
 use newtypes::ObConfigurationSettings;
 use newtypes::ScopedUserId;
@@ -55,6 +57,18 @@ impl NewObConfiguration {
 }
 
 impl ObConfiguration {
+    pub fn list_for_tenant(
+        conn: &mut PgConnection,
+        tenant_id: &TenantId,
+        is_live: bool,
+    ) -> Result<Vec<ObConfiguration>, DbError> {
+        let results = ob_configurations::table
+            .filter(ob_configurations::tenant_id.eq(tenant_id))
+            .filter(ob_configurations::is_live.eq(is_live))
+            .get_results(conn)?;
+        Ok(results)
+    }
+
     pub async fn list_for_scoped_user(
         pool: &DbPool,
         scoped_user_id: ScopedUserId,
