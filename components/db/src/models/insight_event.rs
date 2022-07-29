@@ -1,5 +1,5 @@
-use crate::schema::insight_events;
 use crate::DbPool;
+use crate::{schema::insight_events, DbError};
 use chrono::{DateTime, Utc};
 use diesel::{Insertable, PgConnection, Queryable, RunQueryDsl};
 use newtypes::InsightEventId;
@@ -43,14 +43,14 @@ pub struct CreateInsightEvent {
 }
 
 impl CreateInsightEvent {
-    pub fn insert_with_conn(self, conn: &mut PgConnection) -> Result<InsightEvent, diesel::result::Error> {
+    pub fn insert_with_conn(self, conn: &mut PgConnection) -> Result<InsightEvent, DbError> {
         let ev = diesel::insert_into(crate::schema::insight_events::table)
             .values(self)
             .get_result(conn)?;
         Ok(ev)
     }
 
-    pub async fn insert(self, pool: &DbPool) -> Result<InsightEvent, crate::DbError> {
+    pub async fn insert(self, pool: &DbPool) -> Result<InsightEvent, DbError> {
         let ev = pool.db_query(move |conn| self.insert_with_conn(conn)).await??;
         Ok(ev)
     }

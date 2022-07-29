@@ -19,6 +19,7 @@ use deadpool_diesel::postgres::{Manager, Pool, Runtime};
 pub use diesel::prelude::PgConnection;
 use diesel::prelude::*;
 use diesel_migrations::EmbeddedMigrations;
+use errors::TransactionError;
 use models::scoped_users::ScopedUser;
 use newtypes::{DataKind, Fingerprint};
 use user_vault::get_by_fingerprint;
@@ -47,15 +48,26 @@ impl DbPool {
         Ok(result)
     }
 
-    pub async fn db_transaction<F, R>(&self, f: F) -> Result<R, DbError>
+    pub async fn db_transaction<F, R, E>(&self, f: F) -> Result<R, E>
     where
-        F: FnOnce(&mut PgConnection) -> Result<R, DbError> + Send + 'static,
+        F: FnOnce(&mut PgConnection) -> Result<R, E> + Send + 'static,
+        E: From<DbError> + Send + 'static,
         R: Send + 'static,
     {
         let result = self
-            .db_query(|c: &mut PgConnection| c.build_transaction().run(|conn| f(conn)))
-            .await??;
-        Ok(result)
+            .db_query(|c: &mut PgConnection| {
+                c.build_transaction()
+                    .run(|conn| -> Result<_, TransactionError<E>> {
+                        // Any error returned by f() is an ApplicationError
+                        f(conn).map_err(|e| TransactionError::ApplicationError(e))
+                    })
+            })
+            .await?;
+        // Return ApplicationErrors as-is. Map DbErrors to E
+        result.map_err(|txn_error| match txn_error {
+            TransactionError::ApplicationError(e) => e,
+            TransactionError::DbError(e) => E::from(DbError::from(e)),
+        })
     }
 }
 

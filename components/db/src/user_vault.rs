@@ -5,9 +5,9 @@ use crate::schema;
 use diesel::prelude::*;
 use newtypes::{DataGroupId, DataKind, DataPriority, Fingerprint, UserVaultId};
 
-pub async fn create(pool: &crate::DbPool, new_user: NewUserVaultReq) -> Result<UserVault, crate::DbError> {
+pub async fn create(pool: &crate::DbPool, new_user: NewUserVaultReq) -> Result<UserVault, DbError> {
     let user_vault = pool
-        .db_transaction(move |conn| {
+        .db_transaction(move |conn| -> Result<_, DbError> {
             let new_user_vault = NewUserVault {
                 e_private_key: new_user.e_private_key,
                 public_key: new_user.public_key,

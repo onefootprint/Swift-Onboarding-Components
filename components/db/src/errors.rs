@@ -1,6 +1,12 @@
 use thiserror::Error;
 
 #[derive(Debug, Error)]
+pub enum TransactionError<E> {
+    DbError(#[from] diesel::result::Error),
+    ApplicationError(E),
+}
+
+#[derive(Debug, Error)]
 pub enum DbError {
     #[error("db_interact: {0}")]
     DbInteract(#[from] deadpool_diesel::InteractError),
