@@ -56,43 +56,44 @@ const App = ({ Component, pageProps }: AppProps) => (
 );
 
 const GlobalStyle = createGlobalStyle`
-  ${({ theme }) => css`
-    html,
-    body {
-      height: 100%;
-      width: 100%;
-      overflow: hidden;
-    }
+  html,
+  body {
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+  }
 
-    body {
-      background: transparent;
-    }
+  body {
+    background: transparent;
+  }
 
-    #__next {
+  #__next {
+    ${({ theme }) => css`
+      background-blend-mode: ${theme.backgroundColor.primary};
       background-color: ${theme.backgroundColor.primary};
-      display: flex;
-      flex-direction: column;
       height: 100vh;
-      max-width: 480px;
-      margin: 0 auto;
-      position: relative;
 
       ${media.greaterThan('md')`
-        background-color: unset;
-        display: block;
-        margin: ${theme.spacing[9]}px auto 0;
-        width: 100%;
+        background: unset;
       `}
-    }
-  `}
+    `}
+  }
 `;
 
 const Container = styled.div`
   ${({ theme }) => css`
+    background: ${theme.backgroundColor.primary};
     border-radius: ${theme.borderRadius[2]}px;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    margin: 0;
+    position: relative;
 
     ${media.greaterThan('md')`
-      background-color: ${theme.backgroundColor.primary};
+      height: unset;
+      margin: ${theme.spacing[9]}px auto 0;
+      max-width: 480px;
     `}
   `}
 `;
