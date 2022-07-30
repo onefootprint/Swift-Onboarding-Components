@@ -4,7 +4,7 @@ use crate::State;
 use crate::{enclave::gen_keypair, errors::ApiError};
 use db::models::tenant_api_keys::NewTenantApiKey;
 use newtypes::secret_api_key::SecretApiKey;
-use newtypes::TenantId;
+use newtypes::{TenantApiKeyId, TenantId};
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 
 use db::models::tenants::NewTenant;
@@ -26,6 +26,7 @@ struct NewClientResponse {
     org_id: TenantId,
     /// api key for org-level api access
     api_key: SecretApiKey,
+    api_key_id: TenantApiKeyId,
 }
 
 /// Create a new client (this endpoint will be private in prod TODO)
@@ -59,7 +60,7 @@ async fn post(
 
     let secret_api_key = SecretApiKey::generate(is_live);
 
-    let _ = NewTenantApiKey {
+    let new_key = NewTenantApiKey {
         sh_secret_api_key: secret_api_key.fingerprint(&state.hmac_client).await?,
         e_secret_api_key: secret_api_key.seal_to(&tenant.public_key)?,
         tenant_id: tenant.id.clone(),
@@ -73,6 +74,7 @@ async fn post(
         data: NewClientResponse {
             org_id: tenant.id,
             api_key: secret_api_key,
+            api_key_id: new_key.id,
         },
     }))
 }

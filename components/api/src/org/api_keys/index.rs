@@ -8,12 +8,11 @@ use crate::types::success::ApiResponseData;
 use crate::State;
 use db::models::tenant_api_keys::{NewTenantApiKey, TenantApiKey};
 use newtypes::secret_api_key::SecretApiKey;
-use paperclip::actix::{api_v2_operation, get, post, web, web::Json};
+use paperclip::actix::{api_v2_operation, web, web::Json};
 
 /// List the tenant's secret API keys
 #[api_v2_operation(tags(Org))]
-#[get("/api_keys")]
-async fn get(
+pub async fn get(
     state: web::Data<State>,
     auth: Either<SessionContext<WorkOsSession>, SecretTenantAuthContext>,
 ) -> actix_web::Result<Json<ApiResponseData<Vec<TenantApiKeyResponse>>>, ApiError> {
@@ -30,10 +29,9 @@ async fn get(
     )))
 }
 
-/// Generate a new tenant api key
+/// Generate a new secret tenant api key
 #[api_v2_operation(tags(Org))]
-#[post("/api_keys")]
-async fn post(
+pub async fn post(
     state: web::Data<State>,
     auth: SessionContext<WorkOsSession>,
 ) -> actix_web::Result<Json<ApiResponseData<TenantApiKeyResponse>>, ApiError> {

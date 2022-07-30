@@ -60,7 +60,6 @@ def workos_tenant(must_collect_data_kinds, can_access_data_kinds):
         "can_access_data_kinds": can_access_data_kinds,
     }
 
-
     return create_tenant(org_data, ob_data)
 
 

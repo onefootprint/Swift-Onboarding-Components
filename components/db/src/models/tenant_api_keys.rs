@@ -30,6 +30,20 @@ impl TenantApiKey {
             .get_results(conn)?;
         Ok(results)
     }
+
+    pub fn get(
+        conn: &mut PgConnection,
+        tenant_id: &TenantId,
+        id: &TenantApiKeyId,
+        is_live: bool,
+    ) -> Result<TenantApiKey, DbError> {
+        let result = tenant_api_keys::table
+            .filter(tenant_api_keys::tenant_id.eq(tenant_id))
+            .filter(tenant_api_keys::id.eq(id))
+            .filter(tenant_api_keys::is_live.eq(is_live))
+            .first(conn)?;
+        Ok(result)
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]

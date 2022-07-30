@@ -4,6 +4,7 @@ from tests.auth import TenantAuth, TenantSecretAuth
 class Tenant(NamedTuple):
     pk: TenantAuth
     sk: TenantSecretAuth
+    sk_id: str
     configuration_id: str
 
 

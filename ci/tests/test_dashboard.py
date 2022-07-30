@@ -100,3 +100,8 @@ class TestDashboard:
         assert key["status"]
         assert key["created_at"]
         assert not key["key"]
+
+    def test_api_key_reveal(self, workos_sandbox_tenant):
+        body = get(f"org/api_keys/{workos_sandbox_tenant.sk_id}/reveal", None, workos_sandbox_tenant.sk)
+        key = body["data"]
+        assert key["key"] == workos_sandbox_tenant.sk.token

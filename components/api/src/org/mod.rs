@@ -26,6 +26,5 @@ pub fn routes() -> web::Scope {
         .service(validate::validate)
         .service(settings::routes())
         .service(workos::routes())
-        .service(api_keys::get)
-        .service(api_keys::post)
+        .service(api_keys::routes())
 }

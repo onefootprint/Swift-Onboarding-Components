@@ -47,6 +47,7 @@ impl SecretApiKey {
         f.sign_data(self.0.as_bytes()).await
     }
 }
+
 impl Debug for SecretApiKey {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let debug1 = self
