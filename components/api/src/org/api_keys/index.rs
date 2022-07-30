@@ -8,6 +8,7 @@ use crate::types::success::ApiResponseData;
 use crate::State;
 use db::models::tenant_api_keys::TenantApiKey;
 use newtypes::secret_api_key::SecretApiKey;
+use paperclip::actix::Apiv2Schema;
 use paperclip::actix::{api_v2_operation, web, web::Json};
 
 /// List the tenant's secret API keys
@@ -29,17 +30,23 @@ pub async fn get(
     )))
 }
 
+#[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
+pub struct CreateApiKeyRequest {
+    name: String,
+}
+
 /// Generate a new secret tenant api key
 #[api_v2_operation(tags(Org))]
 pub async fn post(
     state: web::Data<State>,
     auth: SessionContext<WorkOsSession>,
+    request: web::Json<CreateApiKeyRequest>,
 ) -> actix_web::Result<Json<ApiResponseData<TenantApiKeyResponse>>, ApiError> {
     let secret_key = SecretApiKey::generate(auth.is_live()?);
     let tenant = auth.tenant(&state.db_pool).await?;
     let new_key = TenantApiKey::create(
         &state.db_pool,
-        "Secret key".to_owned(), // TODO
+        request.into_inner().name,
         secret_key.fingerprint(&state.hmac_client).await?,
         secret_key.seal_to(&tenant.public_key)?,
         tenant.id,
