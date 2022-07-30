@@ -7,12 +7,10 @@ use crate::errors::ApiError;
 use crate::types::ob_config::ApiObConfig;
 use crate::types::success::ApiResponseData;
 use crate::State;
-use db::models::ob_configurations::NewObConfiguration;
 use db::models::ob_configurations::ObConfiguration;
 use newtypes::DataKind;
 use newtypes::ObConfigurationId;
 use newtypes::ObConfigurationKey;
-use newtypes::ObConfigurationSettings;
 use paperclip::actix::Apiv2Schema;
 use paperclip::actix::{api_v2_operation, get, web, web::Json};
 
@@ -68,16 +66,14 @@ pub fn post(
         can_access_data_kinds,
     } = request.into_inner();
 
-    let obc = NewObConfiguration {
-        name: name.clone(),
-        description: None,
-        tenant_id: auth.tenant_id(),
+    let obc = ObConfiguration::create(
+        &state.db_pool,
+        name,
+        auth.tenant_id(),
         must_collect_data_kinds,
         can_access_data_kinds,
-        settings: ObConfigurationSettings::Empty,
-        is_live: auth.is_live()?,
-    }
-    .save(&state.db_pool)
+        auth.is_live()?,
+    )
     .await?;
 
     Ok(Json(ApiResponseData {

@@ -6,7 +6,7 @@ use crate::errors::ApiError;
 use crate::types::secret_api_key::TenantApiKeyResponse;
 use crate::types::success::ApiResponseData;
 use crate::State;
-use db::models::tenant_api_keys::{NewTenantApiKey, TenantApiKey};
+use db::models::tenant_api_keys::TenantApiKey;
 use newtypes::secret_api_key::SecretApiKey;
 use paperclip::actix::{api_v2_operation, web, web::Json};
 
@@ -37,14 +37,14 @@ pub async fn post(
 ) -> actix_web::Result<Json<ApiResponseData<TenantApiKeyResponse>>, ApiError> {
     let secret_key = SecretApiKey::generate(auth.is_live()?);
     let tenant = auth.tenant(&state.db_pool).await?;
-    let new_key = NewTenantApiKey {
-        sh_secret_api_key: secret_key.fingerprint(&state.hmac_client).await?,
-        e_secret_api_key: secret_key.seal_to(&tenant.public_key)?,
-        tenant_id: tenant.id,
-        is_enabled: true,
-        is_live: auth.is_live()?,
-    }
-    .create(&state.db_pool)
+    let new_key = TenantApiKey::create(
+        &state.db_pool,
+        "Secret key".to_owned(), // TODO
+        secret_key.fingerprint(&state.hmac_client).await?,
+        secret_key.seal_to(&tenant.public_key)?,
+        tenant.id,
+        auth.is_live()?,
+    )
     .await?;
 
     Ok(Json(ApiResponseData::ok(TenantApiKeyResponse::from((

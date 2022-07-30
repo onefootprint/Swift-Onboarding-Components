@@ -19,9 +19,9 @@ impl From<ObConfiguration> for ApiObConfig {
         let ObConfiguration {
             key,
             name,
-            _created_at,
+            created_at,
             must_collect_data_kinds,
-            is_disabled,
+            status,
             can_access_data_kinds,
             is_live,
             ..
@@ -32,14 +32,8 @@ impl From<ObConfiguration> for ApiObConfig {
             must_collect_data_kinds,
             can_access_data_kinds,
             is_live,
-            // TODO don't use debug time and use status enum
-            // https://linear.app/footprint/issue/FP-830/add-status-to-ob-config
-            created_at: _created_at,
-            status: if is_disabled {
-                ApiKeyStatus::Disabled
-            } else {
-                ApiKeyStatus::Enabled
-            },
+            created_at,
+            status,
         }
     }
 }

@@ -62,15 +62,14 @@ table! {
         id -> Text,
         key -> Text,
         name -> Varchar,
-        description -> Nullable<Varchar>,
         tenant_id -> Text,
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
         must_collect_data_kinds -> Array<Text>,
-        settings -> Jsonb,
-        is_disabled -> Bool,
         can_access_data_kinds -> Array<Text>,
         is_live -> Bool,
+        status -> Text,
+        created_at -> Timestamptz,
     }
 }
 
@@ -129,10 +128,12 @@ table! {
         sh_secret_api_key -> Bytea,
         e_secret_api_key -> Bytea,
         tenant_id -> Text,
-        is_enabled -> Bool,
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
         is_live -> Bool,
+        status -> Text,
+        name -> Text,
+        created_at -> Timestamptz,
     }
 }
 

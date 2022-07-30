@@ -18,25 +18,21 @@ impl From<(TenantApiKey, Option<SecretApiKey>)> for TenantApiKeyResponse {
     fn from(s: (TenantApiKey, Option<SecretApiKey>)) -> Self {
         let TenantApiKey {
             id,
-            is_enabled,
-            _created_at,
+            name,
+            status,
+            created_at,
             is_live,
             ..
         } = s.0;
         Self {
             id,
-            name: "Secret API key".to_owned(),
+            name,
             is_live,
             key: s.1,
-            // TODO don't use debug time and use status enum
-            // https://linear.app/footprint/issue/FP-835/add-status-to-secret-key
-            created_at: _created_at,
+            created_at,
+            status,
+            // TODO https://linear.app/footprint/issue/FP-855/build-last-used-at-time-for-secret-key
             last_used_at: None,
-            status: if is_enabled {
-                ApiKeyStatus::Enabled
-            } else {
-                ApiKeyStatus::Disabled
-            },
         }
     }
 }

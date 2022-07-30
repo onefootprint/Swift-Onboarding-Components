@@ -7,7 +7,7 @@ use crate::DbPool;
 use chrono::{DateTime, Utc};
 use diesel::PgConnection;
 use diesel::{Insertable, Queryable};
-use newtypes::ObConfigurationSettings;
+use newtypes::ApiKeyStatus;
 use newtypes::ScopedUserId;
 use newtypes::{DataKind, ObConfigurationId, ObConfigurationKey, TenantId};
 use serde::{Deserialize, Serialize};
@@ -20,40 +20,26 @@ pub struct ObConfiguration {
     pub id: ObConfigurationId,
     pub key: ObConfigurationKey,
     pub name: String,
-    pub description: Option<String>,
     pub tenant_id: TenantId,
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
     pub must_collect_data_kinds: Vec<DataKind>,
-    pub settings: ObConfigurationSettings,
-    pub is_disabled: bool,
     pub can_access_data_kinds: Vec<DataKind>,
     pub is_live: bool,
+    pub status: ApiKeyStatus,
+    pub created_at: DateTime<Utc>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
 #[diesel(table_name = ob_configurations)]
-pub struct NewObConfiguration {
-    pub name: String,
-    pub description: Option<String>,
-    pub tenant_id: TenantId,
-    pub must_collect_data_kinds: Vec<DataKind>,
-    pub can_access_data_kinds: Vec<DataKind>,
-    pub settings: ObConfigurationSettings,
-    pub is_live: bool,
-}
-
-impl NewObConfiguration {
-    pub async fn save(self, pool: &DbPool) -> Result<ObConfiguration, crate::DbError> {
-        let obc = pool
-            .db_query(move |conn| {
-                diesel::insert_into(ob_configurations::table)
-                    .values(self)
-                    .get_result::<ObConfiguration>(conn)
-            })
-            .await??;
-        Ok(obc)
-    }
+struct NewObConfiguration {
+    name: String,
+    tenant_id: TenantId,
+    must_collect_data_kinds: Vec<DataKind>,
+    can_access_data_kinds: Vec<DataKind>,
+    is_live: bool,
+    status: ApiKeyStatus,
+    created_at: DateTime<Utc>,
 }
 
 impl ObConfiguration {
@@ -96,7 +82,7 @@ impl ObConfiguration {
             .db_query(move |conn| -> Result<(ObConfiguration, Tenant), crate::DbError> {
                 let obc: ObConfiguration = ob_configurations::table
                     .filter(ob_configurations::key.eq(key))
-                    .filter(ob_configurations::is_disabled.eq(false))
+                    .filter(ob_configurations::status.eq(ApiKeyStatus::Enabled))
                     .first(conn)?;
                 let tenant: Tenant = tenants::table
                     .filter(tenants::id.eq(&obc.tenant_id))
@@ -105,5 +91,32 @@ impl ObConfiguration {
             })
             .await??;
         Ok(id)
+    }
+
+    pub async fn create(
+        pool: &DbPool,
+        name: String,
+        tenant_id: TenantId,
+        must_collect_data_kinds: Vec<DataKind>,
+        can_access_data_kinds: Vec<DataKind>,
+        is_live: bool,
+    ) -> Result<ObConfiguration, crate::DbError> {
+        let config = NewObConfiguration {
+            name,
+            tenant_id,
+            must_collect_data_kinds,
+            can_access_data_kinds,
+            is_live,
+            status: ApiKeyStatus::Enabled,
+            created_at: Utc::now(),
+        };
+        let obc = pool
+            .db_query(move |conn| {
+                diesel::insert_into(ob_configurations::table)
+                    .values(config)
+                    .get_result::<ObConfiguration>(conn)
+            })
+            .await??;
+        Ok(obc)
     }
 }

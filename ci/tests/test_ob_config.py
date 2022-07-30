@@ -5,6 +5,5 @@ def test_get_org_config(workos_tenant, must_collect_data_kinds, can_access_data_
     tenant = body['data']
     assert tenant['name'] == 'Acme Bank Card'
     assert tenant['org_name'] == 'Acme Bank'
-    assert tenant['settings'] == 'Empty'
     assert set(tenant['must_collect_data_kinds']) == set(must_collect_data_kinds)
     assert set(tenant['can_access_data_kinds']) == set(can_access_data_kinds)
