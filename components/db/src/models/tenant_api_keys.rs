@@ -18,6 +18,20 @@ pub struct TenantApiKey {
     pub is_live: bool,
 }
 
+impl TenantApiKey {
+    pub fn list(
+        conn: &mut PgConnection,
+        tenant_id: &TenantId,
+        is_live: bool,
+    ) -> Result<Vec<TenantApiKey>, DbError> {
+        let results = tenant_api_keys::table
+            .filter(tenant_api_keys::tenant_id.eq(tenant_id))
+            .filter(tenant_api_keys::is_live.eq(is_live))
+            .get_results(conn)?;
+        Ok(results)
+    }
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
 #[diesel(table_name = tenant_api_keys)]
 pub struct NewTenantApiKey {
@@ -40,11 +54,4 @@ impl NewTenantApiKey {
 
         Ok(tenant_api_key)
     }
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
-#[diesel(table_name = tenant_api_keys)]
-pub struct PartialTenantApiKey {
-    pub tenant_id: TenantId,
-    pub is_live: bool,
 }

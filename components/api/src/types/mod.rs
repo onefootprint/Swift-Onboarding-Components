@@ -8,6 +8,7 @@ pub mod liveness;
 pub mod ob_config;
 pub mod onboarding;
 pub mod scoped_user;
+pub mod secret_api_key;
 pub mod success;
 
 /// empty data

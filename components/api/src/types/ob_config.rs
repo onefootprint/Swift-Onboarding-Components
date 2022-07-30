@@ -1,6 +1,6 @@
 use chrono::{DateTime, Utc};
 use db::models::ob_configurations::ObConfiguration;
-use newtypes::{DataKind, ObConfigStatus, ObConfigurationKey};
+use newtypes::{ApiKeyStatus, DataKind, ObConfigurationKey};
 use paperclip::actix::Apiv2Schema;
 
 #[derive(Debug, Clone, serde::Serialize, Apiv2Schema)]
@@ -11,7 +11,7 @@ pub struct ApiObConfig {
     can_access_data_kinds: Vec<DataKind>,
     is_live: bool,
     created_at: DateTime<Utc>,
-    status: ObConfigStatus,
+    status: ApiKeyStatus,
 }
 
 impl From<ObConfiguration> for ApiObConfig {
@@ -36,9 +36,9 @@ impl From<ObConfiguration> for ApiObConfig {
             // https://linear.app/footprint/issue/FP-830/add-status-to-ob-config
             created_at: _created_at,
             status: if is_disabled {
-                ObConfigStatus::Disabled
+                ApiKeyStatus::Disabled
             } else {
-                ObConfigStatus::Enabled
+                ApiKeyStatus::Enabled
             },
         }
     }

@@ -89,3 +89,14 @@ class TestDashboard:
         assert config["can_access_data_kinds"]
         assert config["created_at"]
         assert config["status"]
+
+    def test_api_key_list(self, workos_sandbox_tenant):
+        body = get("org/api_keys", None, workos_sandbox_tenant.sk)
+        keys = body["data"]
+        # TODO better tests when we aren't making a new key for every request
+        key = keys[0]
+        assert key["id"]
+        assert key["name"]
+        assert key["status"]
+        assert key["created_at"]
+        assert not key["key"]
