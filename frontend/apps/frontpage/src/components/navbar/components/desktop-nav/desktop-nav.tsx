@@ -1,7 +1,9 @@
 import Link from 'next/link';
 import React from 'react';
 import styled, { css } from 'styled-components';
-import { Button, createFontStyles, media } from 'ui';
+import { Box, Button, createFontStyles, media } from 'ui';
+
+import LogoLink from '../logo-link';
 
 type DesktopNavProps = {
   cta: {
@@ -13,6 +15,7 @@ type DesktopNavProps = {
 
 const DesktopNav = ({ cta, links }: DesktopNavProps) => (
   <Container>
+    <LogoLink />
     <LinksContainer>
       {links.map(link => (
         <Link href={link.href} key={link.text}>
@@ -20,9 +23,11 @@ const DesktopNav = ({ cta, links }: DesktopNavProps) => (
         </Link>
       ))}
     </LinksContainer>
-    <Button onClick={cta.onClick} fullWidth>
-      {cta.text}
-    </Button>
+    <Box>
+      <Button onClick={cta.onClick} fullWidth>
+        {cta.text}
+      </Button>
+    </Box>
   </Container>
 );
 
@@ -33,7 +38,9 @@ const Container = styled.div`
     ${media.greaterThan('lg')`
       align-items: center;
       display: flex;
+      flex-grow: 1;
       gap: ${theme.spacing[7]}px;
+      justify-content: space-between;
     `}
   `}
 `;

@@ -85,6 +85,9 @@ const MobileNav = ({ onOpen, onClose, cta, links }: MobileNavProps) => {
 };
 
 const Container = styled.div`
+  display: flex;
+  justify-content: end;
+
   ${media.greaterThan('lg')`
     display: none;
   `}
@@ -140,7 +143,7 @@ const LinksContainer = styled.div`
       ${createFontStyles('label-1')};
       color: ${theme.color.primary};
       display: block;
-      padding: ${theme.spacing[3]}px ${theme.spacing[6]}px;
+      padding: ${theme.spacing[4]}px ${theme.spacing[6]}px;
       text-decoration: none;
     }
   `}

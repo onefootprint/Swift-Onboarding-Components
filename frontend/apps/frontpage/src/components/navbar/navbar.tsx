@@ -4,7 +4,6 @@ import styled, { css } from 'styled-components';
 import { Container, media } from 'ui';
 
 import DesktopNav from './components/desktop-nav';
-import LogoLink from './components/logo-link';
 import MobileNav from './components/mobile-nav';
 import useHasScroll from './hooks/use-has-scroll';
 
@@ -22,15 +21,14 @@ const Navbar = ({ cta }: NavbarProps) => {
 
   const links = [
     { text: t('links.compare.text'), href: t('links.compare.href') },
-    { text: t('links.faq.text'), href: t('links.faq.href') },
     { text: t('links.company.text'), href: t('links.company.href') },
+    { text: t('links.faq.text'), href: t('links.faq.href') },
   ];
 
   return (
     <Header isFloating={hasScroll && isFloatingEnabled}>
       <Container>
         <Inner>
-          <LogoLink />
           <MobileNav
             onOpen={disableFloating}
             onClose={enableFloating}
@@ -73,9 +71,6 @@ const Header = styled.header<{ isFloating: boolean }>`
 
 const Inner = styled.div`
   ${({ theme }) => css`
-    align-items: center;
-    display: flex;
-    justify-content: space-between;
     padding: ${theme.spacing[6]}px 0 ${theme.spacing[5]}px;
 
     ${media.greaterThan('md')`
