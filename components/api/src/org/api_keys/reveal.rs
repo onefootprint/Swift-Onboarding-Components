@@ -19,7 +19,7 @@ struct RevealRequest {
 }
 
 /// Decrypt a specific tenant secret API key
-#[api_v2_operation(tags(org))]
+#[api_v2_operation(tags(Org))]
 #[get("/{id}/reveal")]
 async fn get(
     state: web::Data<State>,
