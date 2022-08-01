@@ -1,3 +1,4 @@
+use diesel::result::DatabaseErrorKind;
 use thiserror::Error;
 
 #[derive(Debug, Error)]
@@ -61,8 +62,20 @@ pub enum DbError {
 }
 
 impl DbError {
-    /// checks if this is a not found error from the DB
     pub fn is_not_found(&self) -> bool {
         matches!(self, Self::DbError(diesel::result::Error::NotFound))
+    }
+
+    pub fn is_constraint_violation(&self) -> bool {
+        if let Self::DbError(diesel::result::Error::DatabaseError(kind, _)) = self {
+            matches!(
+                kind,
+                DatabaseErrorKind::UniqueViolation
+                    | DatabaseErrorKind::ForeignKeyViolation
+                    | DatabaseErrorKind::CheckViolation
+            )
+        } else {
+            false
+        }
     }
 }

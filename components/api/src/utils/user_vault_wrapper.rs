@@ -1,11 +1,11 @@
 use std::collections::HashMap;
 
 use db::models::ob_configurations::ObConfiguration;
-use db::models::user_data::{NewUserData, UserData};
+use db::models::user_data::UserData;
 use db::models::user_vaults::UserVault;
 use db::DbPool;
 use db::{errors::DbError, PgConnection};
-use newtypes::{DataKind, PiiString, SealedVaultBytes, UserDataId};
+use newtypes::{DataKind, PiiString, SealedVaultBytes};
 use paperclip::actix::web;
 
 use crate::errors::ApiError;
@@ -41,23 +41,6 @@ impl UserVaultWrapper {
     pub fn get_e_field(&self, data_kind: DataKind) -> Option<&SealedVaultBytes> {
         // TODO handle multiple values for the same field
         Some(&self.get_data(data_kind).get(0)?.e_data)
-    }
-
-    pub fn bulk_update(
-        &self,
-        conn: &mut PgConnection,
-        new_user_datas: Vec<NewUserData>,
-    ) -> Result<Vec<UserData>, db::DbError> {
-        // TODO what happens if we make a new address with only one field updated?
-        // https://linear.app/footprint/issue/FP-814/replace-entire-old-data-group-when-updating-in-post-userdata
-        let ud_to_deactivate: Vec<UserDataId> = new_user_datas
-            .iter()
-            .flat_map(|NewUserData { data_kind, .. }| self.get_data(*data_kind).first().map(|x| x.id.clone()))
-            .collect();
-
-        db::user_data::bulk_deactivate(conn, ud_to_deactivate)?;
-        let results = UserData::bulk_insert(conn, new_user_datas)?;
-        Ok(results)
     }
 
     pub async fn get_decrypted_field(

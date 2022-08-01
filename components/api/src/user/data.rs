@@ -6,14 +6,9 @@ use crate::auth::VerifiedUserAuth;
 use crate::errors::user::UserError;
 use crate::types::success::ApiResponseData;
 use crate::types::Empty;
-use crate::{
-    errors::ApiError,
-    utils::{email::send_email_challenge, user_vault_wrapper::UserVaultWrapper},
-    State,
-};
+use crate::{errors::ApiError, utils::email::send_email_challenge, State};
 use db::models::user_data::NewUserData;
 use db::models::user_data::UserData;
-use db::models::user_vaults::UserVault;
 
 use newtypes::address::Address;
 use newtypes::dob::DateOfBirth;
@@ -140,13 +135,7 @@ async fn handler(
     // User the UVW util to add the new UserData rows and deactivate any old rows
     let results = state
         .db_pool
-        .db_transaction(move |conn| -> Result<_, db::DbError> {
-            // Lock the user vault to prevent someone else from editing the data while we're editing it
-            let user_vault = UserVault::lock(conn, user_auth.user_vault_id())?;
-            let uvw = UserVaultWrapper::from_conn(conn, user_vault)?;
-            let results = uvw.bulk_update(conn, new_user_datas)?;
-            Ok(results)
-        })
+        .db_transaction(move |conn| UserData::bulk_insert(conn, new_user_datas))
         .await?;
 
     // If we updated the email address, send an async challenge to the new email address

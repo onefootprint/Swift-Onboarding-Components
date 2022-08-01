@@ -129,14 +129,14 @@ class TestBifrost:
         data.pop("speculative")
         post("user/data", data, auth_token)
 
-        # Issue a second POST /user/data request to update some fields
+        # Shouldn't be allowed to update fields that are already set
         data = {
             "name": {
                 "first_name": "Flerp2",
                 "last_name": "Derp2",
             }
         }
-        post("user/data", data, auth_token)
+        post("user/data", data, auth_token, status_code=400)
 
     def test_d2p_biometric(self, auth_token):
         # Get new auth token in d2p/generate endpoint
