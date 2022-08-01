@@ -5,6 +5,7 @@ import Dialog, { DialogProps } from './dialog';
 
 describe('<Dialog />', () => {
   const renderDialog = ({
+    closeIconComponent,
     closeAriaLabel = 'Close',
     title = 'Title',
     onClose = jest.fn(),
@@ -24,14 +25,15 @@ describe('<Dialog />', () => {
       // @ts-ignore
       <Dialog
         closeAriaLabel={closeAriaLabel}
-        title={title}
+        closeIconComponent={closeIconComponent}
         linkButton={linkButton}
         onClose={onClose}
+        open={open}
         primaryButton={primaryButton}
         secondaryButton={secondaryButton}
         size={size}
         testID={testID}
-        open={open}
+        title={title}
       >
         {children}
       </Dialog>,

@@ -1,4 +1,6 @@
 import { Meta, Story } from '@storybook/react';
+import { icos } from 'icons';
+import IcoClose24 from 'icons/ico/ico-close-24';
 import React, { useState } from 'react';
 
 import Button from '../button';
@@ -15,6 +17,11 @@ export default {
         type: { summary: 'string', required: true },
       },
       description: 'The header text of the dialog',
+    },
+    closeIconComponent: {
+      control: 'select',
+      description: 'Close icon',
+      options: Object.keys(icos),
     },
     closeAriaLabel: {
       control: 'text',
@@ -88,30 +95,36 @@ export default {
 
 const Template: Story<DialogProps> = ({
   children,
-  title,
+  closeIconComponent: CloseIconComponent,
   onClose,
+  open: initialOpen,
   primaryButton,
   secondaryButton,
   size,
   testID,
-  open: initialOpen,
+  title,
 }: DialogProps) => {
   const [open, setOpen] = useState(initialOpen);
+  const SelectedIcon =
+    typeof CloseIconComponent === 'string'
+      ? icos[CloseIconComponent]
+      : CloseIconComponent;
 
   return (
     <>
       <Dialog
-        title={title}
+        closeIconComponent={SelectedIcon}
+        linkButton={undefined}
         onClose={() => {
           setOpen(false);
           onClose();
         }}
+        open={open}
         primaryButton={primaryButton}
         secondaryButton={secondaryButton}
-        linkButton={undefined}
         size={size}
         testID={testID}
-        open={open}
+        title={title}
       >
         <Typography variant="body-4">{children}</Typography>
       </Dialog>
@@ -125,10 +138,12 @@ const Template: Story<DialogProps> = ({
 export const Base = Template.bind({});
 Base.args = {
   children: 'Content',
-  open: false,
-  size: 'default',
   closeAriaLabel: 'Close',
-  title: 'Title',
+  closeIconComponent: IcoClose24,
+  onClose: () => {
+    console.log('close');
+  },
+  open: false,
   primaryButton: {
     label: 'Primary',
     onClick: () => {
@@ -141,10 +156,9 @@ Base.args = {
       alert('Secondary button clicked');
     },
   },
-  onClose: () => {
-    console.log('close');
-  },
+  size: 'default',
   testID: 'dialog-test-id',
+  title: 'Title',
 };
 
 export const OnlyPrimary = Template.bind({});

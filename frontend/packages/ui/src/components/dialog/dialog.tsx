@@ -1,4 +1,5 @@
 import FocusTrap from 'focus-trap-react';
+import type { Icon } from 'icons';
 import IcoClose24 from 'icons/ico/ico-close-16';
 import React from 'react';
 import { useKey, useLockBodyScroll } from 'react-use';
@@ -49,24 +50,26 @@ type PrimaryAndLinkButtons = {
 export type DialogProps = {
   children?: React.ReactNode;
   closeAriaLabel?: string;
-  title: string;
+  closeIconComponent?: Icon;
   onClose: () => void;
+  open?: boolean;
   size?: Size;
   testID?: string;
-  open?: boolean;
+  title: string;
 } & (OnlyPrimaryButton | OnlyButtons | PrimaryAndLinkButtons);
 
 const Dialog = ({
   children,
   closeAriaLabel = 'Close',
-  title,
+  closeIconComponent = IcoClose24,
+  linkButton = undefined,
   onClose,
+  open,
   primaryButton,
   secondaryButton = undefined,
-  linkButton = undefined,
   size = 'default',
   testID,
-  open,
+  title,
 }: DialogProps) => {
   useLockBodyScroll(open);
   useKey('Escape', onClose);
@@ -88,7 +91,7 @@ const Dialog = ({
               <CloseContainer>
                 <IconButton
                   aria-label={closeAriaLabel}
-                  iconComponent={IcoClose24}
+                  iconComponent={closeIconComponent}
                   onClick={onClose}
                 />
               </CloseContainer>
