@@ -5,13 +5,11 @@ import { isFootprintError, isLogoutError } from 'request';
 import useSessionUser from 'src/hooks/use-session-user';
 import { useToast } from 'ui/src/components/toast/toast-provider';
 
-type DashboardQueryClientProviderProps = {
+type ReactQueryProviderProps = {
   children: React.ReactNode;
 };
 
-const DashboardQueryClientProvider = ({
-  children,
-}: DashboardQueryClientProviderProps) => {
+const ReactQueryProvider = ({ children }: ReactQueryProviderProps) => {
   const { show } = useToast();
   const { logOut } = useSessionUser();
   const router = useRouter();
@@ -66,4 +64,4 @@ const DashboardQueryClientProvider = ({
   );
 };
 
-export default DashboardQueryClientProvider;
+export default ReactQueryProvider;

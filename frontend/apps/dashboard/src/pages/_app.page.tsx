@@ -5,8 +5,8 @@ import themes from 'themes';
 import { DesignSystemProvider } from 'ui';
 
 import Layout from '../components/layout';
-import DashboardQueryClientProvider from '../config/initializers/dashboard-query-client-provider';
 import configureReactI18next from '../config/initializers/react-i18next';
+import ReactQueryProvider from '../config/initializers/react-query-provider';
 import configureSentry from '../config/initializers/sentry';
 import { UserDataProvider } from './users/hooks/use-user-data';
 
@@ -25,7 +25,7 @@ const App = ({ Component, pageProps }: AppProps) => {
 
   return (
     <DesignSystemProvider theme={themes.light}>
-      <DashboardQueryClientProvider>
+      <ReactQueryProvider>
         <UserDataProvider>
           <GlobalStyle />
           <PageGuard>
@@ -34,7 +34,7 @@ const App = ({ Component, pageProps }: AppProps) => {
             </Layout>
           </PageGuard>
         </UserDataProvider>
-      </DashboardQueryClientProvider>
+      </ReactQueryProvider>
     </DesignSystemProvider>
   );
 };
