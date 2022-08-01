@@ -5,18 +5,18 @@ import IcoFootprint16 from 'icons/ico/ico-footprint-16';
 import IcoPhone16 from 'icons/ico/ico-phone-16';
 import IcoUser16 from 'icons/ico/ico-user-16';
 import React from 'react';
-import FieldTag from 'src/components/field-tag';
 import { TimelineItem } from 'src/components/timeline/timeline';
 import {
   AuditTrail,
   AuditTrailEvent,
   DataKind,
+  dataKindToDisplayName,
   LivenessCheckInfo,
   Vendor,
   vendorToDisplayName,
   VerificationInfo,
 } from 'src/types';
-import { Typography } from 'ui';
+import { Tag, Typography } from 'ui';
 
 const iconForDataKind = {
   [DataKind.firstName]: IcoUser16,
@@ -87,7 +87,7 @@ const detailsForVerificationEvent = (data: VerificationInfo) => {
       <>
         {data.dataKinds.map((dataKind, i: number) => (
           <React.Fragment key={dataKind}>
-            <FieldTag dataKind={dataKind} />
+            <Tag>{dataKindToDisplayName[dataKind]}</Tag>
             {i !== data.dataKinds.length - 1 ? ', ' : ''}
           </React.Fragment>
         ))}{' '}

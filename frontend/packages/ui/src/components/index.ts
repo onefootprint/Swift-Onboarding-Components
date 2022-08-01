@@ -54,6 +54,8 @@ export * from './tab';
 export { default as Tab } from './tab';
 export * from './table';
 export { default as Table } from './table';
+export * from './tag';
+export { default as Tag } from './tag';
 export * from './text-area';
 export { default as TextArea } from './text-area';
 export * from './text-input';

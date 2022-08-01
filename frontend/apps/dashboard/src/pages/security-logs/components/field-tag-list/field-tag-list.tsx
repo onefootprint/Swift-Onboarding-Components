@@ -1,6 +1,6 @@
 import React from 'react';
-import FieldTag from 'src/components/field-tag';
-import { DataKind } from 'src/types';
+import { DataKind, dataKindToDisplayName } from 'src/types';
+import { Tag } from 'ui';
 
 type FieldTagListProps = {
   dataKinds: DataKind[];
@@ -11,7 +11,7 @@ const FieldTagList = ({ dataKinds }: FieldTagListProps) => (
     {dataKinds.map((dataKind: DataKind, i: number) => (
       // eslint-disable-next-line react/no-array-index-key
       <span key={`${dataKind}-${i}`}>
-        <FieldTag dataKind={dataKind} />
+        <Tag>{dataKindToDisplayName[dataKind]}</Tag>
         {i !== dataKinds.length - 1 && <span>, </span>}
       </span>
     ))}

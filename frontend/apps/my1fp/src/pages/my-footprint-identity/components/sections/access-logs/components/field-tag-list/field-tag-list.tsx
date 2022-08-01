@@ -1,7 +1,7 @@
 import React, { Fragment } from 'react';
+import { Tag } from 'ui';
 
-import { DataKind } from '../../types';
-import FieldTag from '../field-tag';
+import { DataKind, dataKindToDisplayName } from '../../types';
 
 type FieldTagListProps = {
   dataKinds: DataKind[];
@@ -15,7 +15,7 @@ const FieldTagList = ({ dataKinds }: FieldTagListProps) => {
     <>
       {uniqueDataKinds.map((dataKind: DataKind, i: number) => (
         <Fragment key={dataKind}>
-          <FieldTag dataKind={dataKind} />
+          <Tag>{dataKindToDisplayName[dataKind]}</Tag>
           {i !== dataKinds.length - 1 && <span>, </span>}
         </Fragment>
       ))}
