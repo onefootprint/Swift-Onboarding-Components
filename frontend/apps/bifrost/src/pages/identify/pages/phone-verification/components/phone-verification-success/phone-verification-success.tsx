@@ -4,13 +4,20 @@ import React from 'react';
 import styled, { css } from 'styled-components';
 import { Typography } from 'ui';
 
+import { IdentifyType } from '../../../../../../utils/state-machine/types';
+import useIdentifyMachine from '../../../../hooks/use-identify-machine';
+
 const PhoneVerificationSuccess = () => {
+  const [state] = useIdentifyMachine();
+  const { identifyType } = state.context;
   const { t } = useTranslation('pages.phone-verification.form.success');
   return (
     <PhoneVerificationSuccessContainer>
       <IcoCheckCircle40 color="success" />
       <Typography variant="label-3" color="success">
-        {t('description')}
+        {identifyType === IdentifyType.onboarding
+          ? t('onboarding-description')
+          : t('authentication-description')}
       </Typography>
     </PhoneVerificationSuccessContainer>
   );

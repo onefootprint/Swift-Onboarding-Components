@@ -58,7 +58,8 @@
           "description": "Verifying..."
         },
         "success": {
-          "description": "Phone verified"
+          "onboarding-description": "Phone verified",
+          "authentication-description": "Success! Logging in..."
         },
         "resend-code": {
           "cta": "Resend code",
