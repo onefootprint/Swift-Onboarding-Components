@@ -33,6 +33,11 @@ export default {
       description: 'If true, the checkbox will be disabled',
       required: false,
     },
+    label: {
+      control: 'text',
+      description: 'Toggle label',
+      required: false,
+    },
     required: {
       control: 'boolean',
       description:
@@ -64,6 +69,7 @@ const Template: Story<ToggleProps> = ({
   defaultChecked,
   disabled,
   id,
+  label,
   name,
   onBlur,
   onChange,
@@ -78,6 +84,7 @@ const Template: Story<ToggleProps> = ({
       defaultChecked={defaultChecked}
       disabled={disabled}
       id={id}
+      label={label}
       name={name}
       onBlur={onBlur}
       onChange={event => {
@@ -97,6 +104,7 @@ Base.args = {
   defaultChecked: false,
   disabled: false,
   id: 'toggle-id',
+  label: 'Toggle',
   name: 'toggle',
   onBlur: console.log,
   onChange: console.log,

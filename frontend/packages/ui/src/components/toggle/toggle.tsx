@@ -1,10 +1,11 @@
-import React, { forwardRef, useRef } from 'react';
+import React, { forwardRef, useId, useRef } from 'react';
 import mergeRefs from 'react-merge-refs';
 import styled, { css } from 'styled-components';
 
-import { createOverlayBackground } from '../../utils/mixins';
+import { createFontStyles, createOverlayBackground } from '../../utils/mixins';
 
 export type ToggleProps = {
+  label?: string;
   onBlur?: (event: React.FocusEvent<HTMLButtonElement>) => void;
   onFocus?: (event: React.FocusEvent<HTMLButtonElement>) => void;
   disabled?: boolean;
@@ -19,10 +20,11 @@ export type ToggleProps = {
 const Switch = forwardRef<HTMLInputElement, ToggleProps>(
   (
     {
+      label,
       checked: initialChecked,
       defaultChecked,
       disabled,
-      id,
+      id: possibleId,
       name,
       onBlur,
       onChange,
@@ -31,6 +33,8 @@ const Switch = forwardRef<HTMLInputElement, ToggleProps>(
     }: ToggleProps,
     ref,
   ) => {
+    const internalId = useId();
+    const id = possibleId || internalId;
     const isControlled = typeof initialChecked !== 'undefined';
     const checked = isControlled ? initialChecked : defaultChecked || false;
     const localRef = useRef<HTMLInputElement>(null);
@@ -57,7 +61,8 @@ const Switch = forwardRef<HTMLInputElement, ToggleProps>(
     };
 
     return (
-      <>
+      <ToggleContainer>
+        {label && <Label htmlFor={id}>{label}</Label>}
         <Input
           aria-hidden="true"
           checked={isControlled ? checked : undefined}
@@ -83,10 +88,22 @@ const Switch = forwardRef<HTMLInputElement, ToggleProps>(
         >
           <StyledIcoToggleKnob16 checked={checked} disabled={disabled} />
         </Button>
-      </>
+      </ToggleContainer>
     );
   },
 );
+
+const ToggleContainer = styled.div`
+  display: flex;
+  align-items: center;
+`;
+
+const Label = styled.label`
+  ${({ theme }) => css`
+    ${createFontStyles('label-4')};
+    margin-right: ${theme.spacing[3]}px;
+  `}
+`;
 
 const Input = styled.input`
   height: 24px;

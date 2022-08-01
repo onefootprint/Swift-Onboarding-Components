@@ -5,7 +5,7 @@ import IcoUsers16 from 'icons/ico/ico-users-16';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React from 'react';
-import useIsSandbox from 'src/hooks/use-is-sandbox';
+import useSandboxMode from 'src/hooks/use-sandbox-mode';
 import useSessionUser from 'src/hooks/use-session-user';
 import styled, { css } from 'styled-components';
 import {
@@ -14,6 +14,7 @@ import {
   FootprintLogo,
   IconButton,
   Tab,
+  Toggle,
   Typography,
 } from 'ui';
 
@@ -29,18 +30,18 @@ type PrivateLayoutProps = {
 
 const PrivateLayout = ({ children }: PrivateLayoutProps) => {
   const router = useRouter();
-  const isSandbox = useIsSandbox();
+  const [isSandboxMode, toggleSandboxMode] = useSandboxMode();
   const { data, logOut } = useSessionUser();
   return (
     <>
       <PrivateLayoutContainer data-testid="private-layout">
         <header>
-          {isSandbox && (
+          {isSandboxMode && (
             <SandboxBannerContainer>
               <Banner variant="warning">You are in sandbox mode.</Banner>
             </SandboxBannerContainer>
           )}
-          <Container minSize="md">
+          <Container>
             <Footprint>
               <Link href="/users">
                 <a href="/users">
@@ -57,25 +58,35 @@ const PrivateLayout = ({ children }: PrivateLayoutProps) => {
             </Footprint>
           </Container>
           <Nav>
-            <Container minSize="md">
-              <Tab.List>
-                {routes.map(({ href, Icon, text }) => (
-                  <Link href={href} key={text}>
-                    <Tab.Item
-                      href={href}
-                      iconComponent={Icon}
-                      selected={router.pathname.startsWith(href)}
-                    >
-                      {text}
-                    </Tab.Item>
-                  </Link>
-                ))}
-              </Tab.List>
+            <Container>
+              <NavInner>
+                <Tab.List>
+                  {routes.map(({ href, Icon, text }) => (
+                    <Link href={href} key={text}>
+                      <Tab.Item
+                        href={href}
+                        iconComponent={Icon}
+                        selected={router.pathname.startsWith(href)}
+                      >
+                        {text}
+                      </Tab.Item>
+                    </Link>
+                  ))}
+                </Tab.List>
+                <ToggleContainer>
+                  <Toggle
+                    checked={isSandboxMode}
+                    id="sandbox-toggle"
+                    label="Sandbox mode"
+                    onChange={toggleSandboxMode}
+                  />
+                </ToggleContainer>
+              </NavInner>
             </Container>
           </Nav>
         </header>
         <section>
-          <Container minSize="md">{children}</Container>
+          <Container>{children}</Container>
         </section>
       </PrivateLayoutContainer>
       <Footer>
@@ -126,6 +137,21 @@ const Nav = styled.nav`
     background-color: ${theme.backgroundColor.secondary};
     padding: ${theme.spacing[3]}px 0;
     margin-bottom: ${theme.spacing[7]}px;
+  `};
+`;
+
+const NavInner = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+`;
+
+const ToggleContainer = styled.div`
+  ${({ theme }) => css`
+    align-items: center;
+    display: flex;
+    gap: ${theme.spacing[3]}px;
   `};
 `;
 

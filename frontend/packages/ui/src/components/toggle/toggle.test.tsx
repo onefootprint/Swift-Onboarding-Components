@@ -6,6 +6,7 @@ import Toggle, { ToggleProps } from './toggle';
 
 describe('<Toggle />', () => {
   const renderToggle = ({
+    label,
     checked,
     defaultChecked,
     disabled,
@@ -18,6 +19,7 @@ describe('<Toggle />', () => {
   }: Partial<ToggleProps>) =>
     customRender(
       <Toggle
+        label={label}
         checked={checked}
         defaultChecked={defaultChecked}
         disabled={disabled}
@@ -31,11 +33,15 @@ describe('<Toggle />', () => {
     );
 
   describe('<Toggle />', () => {
+    it('should render a label', () => {
+      renderToggle({ label: 'Toggle' });
+      const input = screen.getByLabelText('Toggle') as HTMLInputElement;
+      expect(input).toBeInTheDocument();
+    });
+
     describe('when it is a controlled component', () => {
       it('should check the checkbox', () => {
-        renderToggle({
-          checked: true,
-        });
+        renderToggle({ checked: true });
         const input = screen.getByRole('checkbox', {
           hidden: true,
         }) as HTMLInputElement;

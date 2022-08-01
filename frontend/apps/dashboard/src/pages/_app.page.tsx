@@ -1,3 +1,4 @@
+import Head from 'next/head';
 import React, { useEffect, useState } from 'react';
 import PageGuard from 'src/components/page-guard';
 import { createGlobalStyle, css } from 'styled-components';
@@ -24,18 +25,23 @@ const App = ({ Component, pageProps }: AppProps) => {
   if (!mounted) return null;
 
   return (
-    <DesignSystemProvider theme={themes.light}>
-      <ReactQueryProvider>
-        <UserDataProvider>
-          <GlobalStyle />
-          <PageGuard>
-            <Layout>
-              <Component {...pageProps} />
-            </Layout>
-          </PageGuard>
-        </UserDataProvider>
-      </ReactQueryProvider>
-    </DesignSystemProvider>
+    <>
+      <Head>
+        <meta name="viewport" content="width=900,maximum-scale=1.0" />
+      </Head>
+      <DesignSystemProvider theme={themes.light}>
+        <ReactQueryProvider>
+          <UserDataProvider>
+            <GlobalStyle />
+            <PageGuard>
+              <Layout>
+                <Component {...pageProps} />
+              </Layout>
+            </PageGuard>
+          </UserDataProvider>
+        </ReactQueryProvider>
+      </DesignSystemProvider>
+    </>
   );
 };
 
