@@ -130,6 +130,7 @@ const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
             }),
           onDone: {
             target: States.confirmAndAuthorize,
+            actions: [Actions.assignOnboardingData],
           },
         },
       },
@@ -229,6 +230,12 @@ const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
         if (event.type === Events.onboardingVerificationSucceeded) {
           context.onboarding.missingWebauthnCredentials =
             event.payload.missingWebauthnCredentials;
+        }
+        return context;
+      }),
+      [Actions.assignOnboardingData]: assign((context, event) => {
+        if (event.type === Events.onboardingCompleted) {
+          context.onboarding.data = { ...event.data.onboardingData };
         }
         return context;
       }),

@@ -6,10 +6,11 @@ import { Events } from 'src/utils/state-machine/onboarding';
 import { UserData, UserDataAttribute } from 'src/utils/state-machine/types';
 import styled, { css } from 'styled-components';
 import { Button, Grid, TextInput } from 'ui';
+import useToast from 'ui/src/components/toast/hooks/use-toast';
 
+import useSyncData from '../../../../hooks/use-sync-data';
 import ProgressHeader from '../../components/progress-header';
 import useOnboardingMachine from '../../hooks/use-onboarding-machine';
-import useSyncData from '../../hooks/use-sync-data';
 import validateDob from './utils/validate-dob';
 
 type FormData = Required<
@@ -24,8 +25,9 @@ type FormData = Required<
 const BasicInformation = () => {
   const inputMasks = useInputMask('en-US');
   const [state, send] = useOnboardingMachine();
-  const { data } = state.context;
+  const { data, authToken } = state.context;
   const syncDataMutation = useSyncData();
+  const toast = useToast();
   const { t } = useTranslation('pages.registration.basic-information');
   const {
     register,
@@ -45,13 +47,29 @@ const BasicInformation = () => {
       lastName: formData.lastName,
       dob: formData.dob,
     };
-    send({
-      type: Events.basicInformationSubmitted,
-      payload: {
-        basicInformation,
-      },
+
+    const handleSuccess = () => {
+      send({
+        type: Events.basicInformationSubmitted,
+        payload: {
+          basicInformation,
+        },
+      });
+    };
+
+    const handleError = () => {
+      toast.show({
+        title: t('sync-data-error.title'),
+        description: t('sync-data-error.description'),
+        variant: 'error',
+      });
+    };
+
+    syncDataMutation(authToken, basicInformation, {
+      speculative: true,
+      onSuccess: handleSuccess,
+      onError: handleError,
     });
-    syncDataMutation(basicInformation);
   };
 
   return (

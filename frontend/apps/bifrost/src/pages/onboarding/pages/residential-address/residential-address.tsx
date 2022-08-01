@@ -16,10 +16,11 @@ import {
   SelectOption,
   TextInput,
 } from 'ui';
+import useToast from 'ui/src/components/toast/hooks/use-toast';
 
+import useSyncData from '../../../../hooks/use-sync-data';
 import ProgressHeader from '../../components/progress-header';
 import useOnboardingMachine from '../../hooks/use-onboarding-machine';
-import useSyncData from '../../hooks/use-sync-data';
 import useInputValidations from './hooks/use-input-validations';
 import getAddressComponent from './utils/get-address-components';
 import getInitialCountry from './utils/get-initial-country';
@@ -37,7 +38,8 @@ type FormData = {
 const ResidentialAddress = () => {
   const [state, send] = useOnboardingMachine();
   const syncDataMutation = useSyncData();
-  const { data } = state.context;
+  const toast = useToast();
+  const { data, authToken } = state.context;
   const { t } = useTranslation('pages.registration.residential-address');
   const {
     watch,
@@ -75,13 +77,29 @@ const ResidentialAddress = () => {
           ? formData.state.value
           : formData.state,
     };
-    send({
-      type: Events.residentialAddressSubmitted,
-      payload: {
-        residentialAddress,
-      },
+
+    const handleSuccess = () => {
+      send({
+        type: Events.residentialAddressSubmitted,
+        payload: {
+          residentialAddress,
+        },
+      });
+    };
+
+    const handleError = () => {
+      toast.show({
+        title: t('sync-data-error.title'),
+        description: t('sync-data-error.description'),
+        variant: 'error',
+      });
+    };
+
+    syncDataMutation(authToken, residentialAddress, {
+      speculative: true,
+      onSuccess: handleSuccess,
+      onError: handleError,
     });
-    syncDataMutation(residentialAddress);
   };
 
   const handleCountryChange = () => {

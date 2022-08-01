@@ -1,4 +1,3 @@
-import { useFootprintJs } from 'footprint-provider';
 import { HeaderTitle } from 'footprint-ui';
 import { useTranslation } from 'hooks';
 import IcoBuilding24 from 'icons/ico/ico-building-24';
@@ -7,14 +6,14 @@ import IcoEmail24 from 'icons/ico/ico-email-24';
 import IcoFileText24 from 'icons/ico/ico-file-text-24';
 import IcoPhone24 from 'icons/ico/ico-phone-24';
 import IcoUserCircle24 from 'icons/ico/ico-user-circle-24';
-import React from 'react';
+import React, { useState } from 'react';
 import { useBifrostMachine } from 'src/components/bifrost-machine-provider';
 import NavigationHeader from 'src/components/navigation-header';
-import { Events } from 'src/hooks/use-bifrost-machine';
-import useOnboardingComplete from 'src/hooks/use-onboarding-complete';
 import { UserDataAttribute } from 'src/utils/state-machine/types';
 import styled, { css } from 'styled-components';
 import { FootprintButton, Typography } from 'ui';
+
+import useConfirmOnboardingData from './hooks/use-confirm-onboarding-data';
 
 enum UserDataAttributeCategory {
   name = 'Name',
@@ -56,29 +55,17 @@ const IconsByUserDataAttributes: Record<
 };
 
 const ConfirmAndAuthorize = () => {
+  const [loading, setLoading] = useState(false);
+  const confirmOnboardingData = useConfirmOnboardingData();
   const { t } = useTranslation('pages.confirm-and-authorize');
-  const footprint = useFootprintJs();
-  const completeOnboardingMutation = useOnboardingComplete();
-  const [state, send] = useBifrostMachine();
+  const [state] = useBifrostMachine();
 
   const handleClick = () => {
-    const { authToken, tenant } = state.context;
-    if (authToken) {
-      completeOnboardingMutation.mutate(
-        { authToken, tenantPk: tenant.pk },
-        {
-          onSuccess: ({ footprintUserId }) => {
-            footprint.complete(footprintUserId);
-            send({
-              type: Events.sharedDataConfirmed,
-            });
-          },
-          onError: () => {
-            // TODO: https://linear.app/footprint/issue/FP-429/handle-confirmation-error
-          },
-        },
-      );
-    }
+    setLoading(true);
+    const handleConfirmOnboardingCompleted = () => {
+      setLoading(false);
+    };
+    confirmOnboardingData({ onComplete: handleConfirmOnboardingCompleted });
   };
 
   const requiredData = state.context.tenant.canAccessDataKinds.map(
@@ -108,7 +95,7 @@ const ConfirmAndAuthorize = () => {
         </CategoriesContainer>
         <FootprintButton
           fullWidth
-          loading={completeOnboardingMutation.isLoading}
+          loading={loading}
           onClick={handleClick}
           text={t('cta')}
         />

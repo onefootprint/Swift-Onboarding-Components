@@ -3,6 +3,7 @@ import {
   IdentifyType,
   OnboardingData,
   TenantInfo,
+  UserData,
   UserDataAttribute,
 } from 'src/utils/state-machine/types';
 
@@ -27,6 +28,7 @@ export enum Events {
   authenticationSucceeded = 'authenticationSucceeded',
   deviceInfoIdentified = 'deviceInfoIdentified',
   identifyCompleted = 'done.invoke.identify',
+  onboardingCompleted = 'done.invoke.onboarding',
 }
 
 export enum Actions {
@@ -42,6 +44,7 @@ export enum Actions {
   // Onboarding
   assignMissingAttributes = 'assignMissingAttributes',
   assignMissingWebauthnCredentials = 'assignMissingWebAuthnCredentials',
+  assignOnboardingData = 'assignOnboardingData',
 }
 
 export type BifrostContext = {
@@ -78,6 +81,12 @@ export type BifrostEvent =
         email: string;
         phone?: string;
         userFound: boolean;
+      };
+    }
+  | {
+      type: Events.onboardingCompleted;
+      data: {
+        onboardingData: UserData;
       };
     }
   | {

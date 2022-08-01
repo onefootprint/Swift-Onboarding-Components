@@ -242,6 +242,9 @@ const createOnboardingMachine = ({
         },
         [States.onboardingSuccess]: {
           type: 'final',
+          data: {
+            onboardingData: (context: MachineContext) => context.data,
+          },
         },
       },
     },

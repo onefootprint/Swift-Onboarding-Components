@@ -118,7 +118,7 @@ describe('MissingAttributesUtils', () => {
           [UserDataAttribute.firstName, UserDataAttribute.country],
           {
             [UserDataAttribute.firstName]: 'Belce',
-            [UserDataAttribute.country]: 'Turkey',
+            [UserDataAttribute.country]: 'TR',
           },
         ),
       ).toEqual(false);

@@ -74,7 +74,15 @@
     "confirm-and-authorize": {
       "title": "Confirm & Authorize",
       "subtitle": "{{tenantName}} will be able to securely view the following data:",
-      "cta": "Authorize"
+      "cta": "Authorize",
+      "sync-data-error": {
+        "title": "An error occurred",
+        "description": "An error occurred while saving data. Please fix the inputs and try again."
+      },
+      "onboarding-complete-error": {
+        "title": "An error occurred",
+        "description": "An error occurred while completing onboarding. Please try again."
+      }
     },
     "qr-register": {
       "title": "Liveness check",
@@ -123,6 +131,10 @@
             "error": "Date of birth cannot be empty or is invalid"
           },
           "cta": "Continue"
+        },
+        "sync-data-error": {
+          "title": "An error occurred",
+          "description": "An error occurred while saving data. Please fix the inputs and try again."
         }
       },
       "residential-address": {
@@ -159,6 +171,10 @@
             "error": "State cannot be empty"
           },
           "cta": "Continue"
+        },
+        "sync-data-error": {
+          "title": "An error occurred",
+          "description": "An error occurred while saving data. Please fix the inputs and try again."
         }
       },
       "ssn": {
@@ -185,6 +201,10 @@
             "error": "SSN cannot be empty or is invalid"
           },
           "cta": "Complete"
+        },
+        "sync-data-error": {
+          "title": "An error occurred",
+          "description": "An error occurred while saving data. Please fix the inputs and try again."
         }
       },
       "onboarding-verification": {

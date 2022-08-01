@@ -9,18 +9,21 @@ import { Events } from 'src/utils/state-machine/onboarding';
 import { UserData, UserDataAttribute } from 'src/utils/state-machine/types';
 import styled, { css } from 'styled-components';
 import { Button, TextInput } from 'ui';
+import useToast from 'ui/src/components/toast/hooks/use-toast';
 
+import useSyncData from '../../../../hooks/use-sync-data';
 import ProgressHeader from '../../components/progress-header';
 import useOnboardingMachine from '../../hooks/use-onboarding-machine';
-import useSyncData from '../../hooks/use-sync-data';
 import Disclaimer from './components/disclaimer';
 
 type FormData = Required<Pick<UserData, UserDataAttribute.ssn>>;
 
 const SSN = () => {
   const inputMasks = useInputMask('en-US');
-  const [, send] = useOnboardingMachine();
+  const [state, send] = useOnboardingMachine();
+  const { authToken } = state.context;
   const syncDataMutation = useSyncData();
+  const toast = useToast();
   const { t } = useTranslation('pages.registration.ssn');
   const {
     register,
@@ -29,16 +32,27 @@ const SSN = () => {
   } = useForm<FormData>();
 
   const onSubmit = (formData: FormData) => {
-    const ssn: UserData = {
-      ssn: formData.ssn,
+    const ssn = { ssn: formData.ssn };
+    const handleSuccess = () => {
+      send({
+        type: Events.ssnSubmitted,
+        payload: ssn,
+      });
     };
-    send({
-      type: Events.ssnSubmitted,
-      payload: {
-        ssn: formData.ssn,
-      },
+
+    const handleError = () => {
+      toast.show({
+        title: t('sync-data-error.title'),
+        description: t('sync-data-error.description'),
+        variant: 'error',
+      });
+    };
+
+    syncDataMutation(authToken, ssn, {
+      speculative: true,
+      onSuccess: handleSuccess,
+      onError: handleError,
     });
-    syncDataMutation(ssn);
   };
 
   return (
