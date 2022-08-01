@@ -87,123 +87,129 @@ const ComparisonTable = () => {
   ];
 
   return (
-    <Table>
-      <thead>
-        <tr>
-          {header.map(text => (
-            <th key={text}>
-              <Typography color="primary" variant="label-3">
-                {text}
+    <Container>
+      <Table>
+        <thead>
+          <tr>
+            {header.map(text => (
+              <th key={text}>
+                <Typography color="primary" variant="label-3">
+                  {text}
+                </Typography>
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <Typography color="secondary" variant="body-3">
+                {t('features.kyc')}
               </Typography>
-            </th>
-          ))}
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>
-            <Typography color="secondary" variant="body-3">
-              {t('features.kyc')}
-            </Typography>
-          </td>
-          {kyc.map(({ key, value }) => (
-            <td key={key}>{value ? <IcoCheck24 /> : undefined}</td>
-          ))}
-        </tr>
-        <tr>
-          <td>
-            <Typography color="secondary" variant="body-3">
-              {t('features.tokenization')}
-            </Typography>
-          </td>
-          {tokenization.map(({ key, value }) => (
-            <td key={key}>{value ? <IcoCheck24 /> : undefined}</td>
-          ))}
-        </tr>
-        <tr>
-          <td>
-            <Typography color="secondary" variant="body-3">
-              {t('features.piiVaulting')}
-            </Typography>
-          </td>
-          {piiVaulting.map(({ key, value }) => (
-            <td key={key}>{value ? <IcoCheck24 /> : undefined}</td>
-          ))}
-        </tr>
-        <tr>
-          <td>
-            <Typography color="secondary" variant="body-3">
-              {t('features.accessControl')}
-            </Typography>
-          </td>
-          {accessControl.map(({ key, value }) => (
-            <td key={key}>{value ? <IcoCheck24 /> : undefined}</td>
-          ))}
-        </tr>
-        <tr>
-          <td>
-            <Typography color="secondary" variant="body-3">
-              {t('features.liveness')}
-            </Typography>
-          </td>
-          {liveness.map(({ key, value }) => (
-            <td key={key}>{value ? <IcoCheck24 /> : undefined}</td>
-          ))}
-        </tr>
-        <tr>
-          <td>
-            <Typography color="secondary" variant="body-3">
-              {t('features.faceId')}
-            </Typography>
-          </td>
-          {faceId.map(({ key, value }) => (
-            <td key={key}>{value ? <IcoCheck24 /> : undefined}</td>
-          ))}
-        </tr>
-        <tr>
-          <td>
-            <Typography color="secondary" variant="body-3">
-              {t('features.oneClick')}
-            </Typography>
-          </td>
-          {oneClick.map(({ key, value }) => (
-            <td key={key}>{value ? <IcoCheck24 /> : undefined}</td>
-          ))}
-        </tr>
-        <tr>
-          <td>
-            <Typography color="secondary" variant="body-3">
-              {t('features.zeroTrustSecurity')}
-            </Typography>
-          </td>
-          {zeroTrustSecurity.map(({ key, value }) => (
-            <td key={key}>{value ? <IcoCheck24 /> : undefined}</td>
-          ))}
-        </tr>
-        <tr>
-          <td>
-            <Typography color="secondary" variant="body-3">
-              {t('features.simpleIntegration')}
-            </Typography>
-          </td>
-          {simpleIntegration.map(({ key, value }) => (
-            <td key={key}>{value ? <IcoCheck24 /> : undefined}</td>
-          ))}
-        </tr>
-        <tr>
-          <td>
-            <Typography color="secondary" variant="body-3">
-              {t('features.fancyAI')}
-            </Typography>
-          </td>
-          {fancyAI.map(({ key, value }) => (
-            <td key={key}>{value ? <IcoCheck24 /> : undefined}</td>
-          ))}
-        </tr>
-      </tbody>
-    </Table>
+            </td>
+            {kyc.map(({ key, value }) => (
+              <td key={key}>{value ? <IcoCheck24 /> : undefined}</td>
+            ))}
+          </tr>
+          <tr>
+            <td>
+              <Typography color="secondary" variant="body-3">
+                {t('features.tokenization')}
+              </Typography>
+            </td>
+            {tokenization.map(({ key, value }) => (
+              <td key={key}>{value ? <IcoCheck24 /> : undefined}</td>
+            ))}
+          </tr>
+          <tr>
+            <td>
+              <Typography color="secondary" variant="body-3">
+                {t('features.piiVaulting')}
+              </Typography>
+            </td>
+            {piiVaulting.map(({ key, value }) => (
+              <td key={key}>{value ? <IcoCheck24 /> : undefined}</td>
+            ))}
+          </tr>
+          <tr>
+            <td>
+              <Typography color="secondary" variant="body-3">
+                {t('features.accessControl')}
+              </Typography>
+            </td>
+            {accessControl.map(({ key, value }) => (
+              <td key={key}>{value ? <IcoCheck24 /> : undefined}</td>
+            ))}
+          </tr>
+          <tr>
+            <td>
+              <Typography color="secondary" variant="body-3">
+                {t('features.liveness')}
+              </Typography>
+            </td>
+            {liveness.map(({ key, value }) => (
+              <td key={key}>{value ? <IcoCheck24 /> : undefined}</td>
+            ))}
+          </tr>
+          <tr>
+            <td>
+              <Typography color="secondary" variant="body-3">
+                {t('features.faceId')}
+              </Typography>
+            </td>
+            {faceId.map(({ key, value }) => (
+              <td key={key}>{value ? <IcoCheck24 /> : undefined}</td>
+            ))}
+          </tr>
+          <tr>
+            <td>
+              <Typography color="secondary" variant="body-3">
+                {t('features.oneClick')}
+              </Typography>
+            </td>
+            {oneClick.map(({ key, value }) => (
+              <td key={key}>{value ? <IcoCheck24 /> : undefined}</td>
+            ))}
+          </tr>
+          <tr>
+            <td>
+              <Typography color="secondary" variant="body-3">
+                {t('features.zeroTrustSecurity')}
+              </Typography>
+            </td>
+            {zeroTrustSecurity.map(({ key, value }) => (
+              <td key={key}>{value ? <IcoCheck24 /> : undefined}</td>
+            ))}
+          </tr>
+          <tr>
+            <td>
+              <Typography color="secondary" variant="body-3">
+                {t('features.simpleIntegration')}
+              </Typography>
+            </td>
+            {simpleIntegration.map(({ key, value }) => (
+              <td key={key}>{value ? <IcoCheck24 /> : undefined}</td>
+            ))}
+          </tr>
+          <tr>
+            <td>
+              <Typography color="secondary" variant="body-3">
+                {t('features.fancyAI')}
+              </Typography>
+            </td>
+            {fancyAI.map(({ key, value }) => (
+              <td key={key}>{value ? <IcoCheck24 /> : undefined}</td>
+            ))}
+          </tr>
+        </tbody>
+      </Table>
+    </Container>
   );
 };
+
+const Container = styled.div`
+  min-width: 590px;
+`;
 
 const Table = styled.table`
   ${({ theme }) => css`

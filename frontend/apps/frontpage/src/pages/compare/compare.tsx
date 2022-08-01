@@ -114,7 +114,7 @@ const IntroductionContainer = styled.div`
 const ComparisonTableContainer = styled.div`
   ${({ theme }) => css`
     overflow: auto;
-    margin: 0 -${theme.spacing[5]}px ${theme.spacing[10]}px;
+    margin: 0 0 ${theme.spacing[10]}px;
 
     ${media.greaterThan('lg')`
       margin: 0 0 ${theme.spacing[10]}px;
