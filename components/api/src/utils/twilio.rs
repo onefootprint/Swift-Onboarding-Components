@@ -242,7 +242,9 @@ impl TwilioClient {
                 if let Some(session) = JsonSession::<RateLimitRecord>::get(conn, &rate_limit_key)? {
                     let time_since_last_sent = now - session.data.sent_at;
                     if time_since_last_sent < time_between_challenges {
-                        let time_remaining = (time_between_challenges - time_since_last_sent).num_seconds();
+                        // num_seconds() only returns count of whole seconds, so we add one to avoid returning 0 seconds as time remaining
+                        let time_remaining =
+                            (time_between_challenges - time_since_last_sent).num_seconds() + 1;
                         return Err(ChallengeError::RateLimited(time_remaining).into());
                     }
                 }
