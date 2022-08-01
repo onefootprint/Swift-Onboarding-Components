@@ -105,3 +105,4 @@ class TestDashboard:
         body = get(f"org/api_keys/{workos_sandbox_tenant.sk_id}/reveal", None, workos_sandbox_tenant.sk)
         key = body["data"]
         assert key["key"] == workos_sandbox_tenant.sk.token
+        assert key["name"] == "Test secret key"

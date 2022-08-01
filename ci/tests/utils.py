@@ -64,20 +64,24 @@ def try_until_success(fn, timeout_s=5, retry_interval_s=1):
 
 def create_tenant(org_data, ob_conf_data):
     body = post("private/client", org_data, CUSTODIAN_AUTH)
-    client_secret_key = body["data"]["api_key"]
-    client_secret_key_id = body["data"]["api_key_id"]
+    client_secret_key = TenantSecretAuth(body["data"]["api_key"])
     print("\n======org info======")
     print(body)
 
-    body = post("org/onboarding_configs", ob_conf_data, TenantSecretAuth(client_secret_key))
-    client_public_key = body["data"]["publishable_key"]
+    data = dict(name="Test secret key")
+    body = post("org/api_keys", data, client_secret_key)
+    client_secret_key = TenantSecretAuth(body["data"]["key"])
+    client_secret_key_id = body["data"]["id"]
+
+    body = post("org/onboarding_configs", ob_conf_data, client_secret_key)
+    client_public_key = TenantAuth(body["data"]["publishable_key"])
     ob_config_id = body["data"]["id"]
     print("\n======org onboarding info======")
     print(body)
 
     return Tenant(
-        pk=TenantAuth(client_public_key),
-        sk=TenantSecretAuth(client_secret_key),
+        pk=client_public_key,
+        sk=client_secret_key,
         sk_id=client_secret_key_id,
         configuration_id=ob_config_id,
     )

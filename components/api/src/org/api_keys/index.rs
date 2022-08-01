@@ -39,7 +39,7 @@ pub struct CreateApiKeyRequest {
 #[api_v2_operation(tags(Org))]
 pub async fn post(
     state: web::Data<State>,
-    auth: SessionContext<WorkOsSession>,
+    auth: Either<SessionContext<WorkOsSession>, SecretTenantAuthContext>,
     request: web::Json<CreateApiKeyRequest>,
 ) -> actix_web::Result<Json<ApiResponseData<TenantApiKeyResponse>>, ApiError> {
     let secret_key = SecretApiKey::generate(auth.is_live()?);
