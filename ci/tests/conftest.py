@@ -117,7 +117,7 @@ def user(workos_sandbox_tenant, twilio):
     auth_token = OnboardingAuth(auth_token)
 
     # Initialize the onboarding
-    post("onboarding", None, workos_sandbox_tenant.pk, auth_token)
+    post("onboarding", None, workos_sandbox_tenant.ob_config.key, auth_token)
 
     # Populate the user's data
     user_data = {
@@ -156,11 +156,11 @@ def user(workos_sandbox_tenant, twilio):
     post("user/biometric", data, auth_token)
 
     # Complete the onboarding
-    body = post("onboarding/complete", None, workos_sandbox_tenant.pk, auth_token)
+    body = post("onboarding/complete", None, workos_sandbox_tenant.ob_config.key, auth_token)
     validation_token = body["data"]["validation_token"]
 
     # Get the fp_user_id
-    body = post("org/validate", dict(validation_token=validation_token), workos_sandbox_tenant.sk)
+    body = post("org/validate", dict(validation_token=validation_token), workos_sandbox_tenant.sk.key)
     fp_user_id = body["data"]["footprint_user_id"]
     return User(
         auth_token=auth_token,

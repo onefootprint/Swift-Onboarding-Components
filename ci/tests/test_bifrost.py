@@ -82,13 +82,13 @@ class TestBifrost:
         assert not body["data"].get("challenge_data", dict())
 
     def test_onboard_init(self, workos_tenant, auth_token):
-        body = post("onboarding", None, workos_tenant.pk, auth_token)
+        body = post("onboarding", None, workos_tenant.ob_config.key, auth_token)
         assert set(body["data"]["missing_attributes"]) == {"first_name", "last_name", "dob", "ssn", "street_address", "city", "state", "zip", "country", "email"}
         assert body["data"]["missing_webauthn_credentials"] == True
         assert not body["data"]["validation_token"]
 
         # Shouldn't be able to complete the onboarding until user data is provided
-        post("onboarding/complete", None, workos_tenant.pk, auth_token, status_code=400)
+        post("onboarding/complete", None, workos_tenant.ob_config.key, auth_token, status_code=400)
 
     def test_user_data(self, auth_token):
         # Test failed validation
@@ -181,7 +181,7 @@ class TestBifrost:
         post("user/biometric", data, d2p_auth_token, status_code=400)
 
     def test_onboarding_complete(self, workos_tenant, auth_token): 
-        body = post("onboarding/complete", None, workos_tenant.pk, auth_token)
+        body = post("onboarding/complete", None, workos_tenant.ob_config.key, auth_token)
         fp_user_id = body["data"]["footprint_user_id"]
         validation_token = body["data"]["validation_token"]
 
@@ -191,26 +191,26 @@ class TestBifrost:
 
         # test the validate api call
         data = dict(validation_token=validation_token)
-        body = post("org/validate", data, workos_tenant.sk)
+        body = post("org/validate", data, workos_tenant.sk.key)
         fp_user_id2 = body["data"]["footprint_user_id"]
         assert fp_user_id2 == fp_user_id
         assert body["data"]["status"]
 
     def test_onboard_onto_same_tenant(self, workos_tenant, auth_token):
-        body = post("onboarding", None, workos_tenant.pk, auth_token)
+        body = post("onboarding", None, workos_tenant.ob_config.key, auth_token)
         assert not body["data"]["missing_attributes"]
         assert not body["data"]["missing_webauthn_credentials"]
         validation_token = body["data"]["validation_token"]
         data = dict(validation_token=validation_token)
-        body = post("org/validate", data, workos_tenant.sk)
+        body = post("org/validate", data, workos_tenant.sk.key)
         assert body["data"]["footprint_user_id"]
 
         # We won't ever actually hit onboarding/complete if the tenant has already onboarded,
         # but if we do, we should no-op and succeed
-        body = post("onboarding/complete", None, workos_tenant.pk, auth_token)
+        body = post("onboarding/complete", None, workos_tenant.ob_config.key, auth_token)
         validation_token = body["data"]["validation_token"]
         data = dict(validation_token=validation_token)
-        body = post("org/validate", data, workos_tenant.sk)
+        body = post("org/validate", data, workos_tenant.sk.key)
         assert body["data"]["footprint_user_id"]
 
     def test_identify_login_repeat_customer_biometric(self, auth_token):
@@ -282,17 +282,17 @@ class TestBifrost:
 
         def onboard_onto_tenant(tenant):
             # Start onboarding for user
-            body = post("onboarding", None, tenant.pk, auth_token)
+            body = post("onboarding", None, tenant.ob_config.key, auth_token)
             assert not body["data"]["missing_attributes"]
 
             # complete onboarding for user
-            body = post("onboarding/complete", None, tenant.pk, auth_token)
+            body = post("onboarding/complete", None, tenant.ob_config.key, auth_token)
             validation_token = body["data"]["validation_token"]
             assert validation_token
 
             # test the validate api call
             data = dict(validation_token=validation_token)
-            body = post("org/validate", data, tenant.sk)
+            body = post("org/validate", data, tenant.sk.key)
             return body["data"]["footprint_user_id"]
 
         foo_fp_user_id = onboard_onto_tenant(foo_tenant)

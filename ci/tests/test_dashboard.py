@@ -4,39 +4,18 @@ from urllib.parse import quote
 from typing import NamedTuple
 from tests.constants import EMAIL, FIELDS_TO_DECRYPT
 from tests.utils import get, post, patch
+from tests.types import SecretApiKey, ObConfiguration
 from .auth import (
     TenantSecretAuth,
     TenantAuth,
 )
 
 
-class SecretKey(NamedTuple):
-    key: TenantSecretAuth
-    id: str
-    name: str
-    status: str
-
-
-class ObConfiguration(NamedTuple):
-    key: TenantAuth
-    id: str
-    name: str
-    status: str
-    must_collect_data_kinds: list
-    can_access_data_kinds: list
-
-
 @pytest.fixture(scope="session")
 def secret_key(workos_sandbox_tenant):
     data = dict(name="Test secret key")
-    body = post("org/api_keys", data, workos_sandbox_tenant.sk)
-    client_secret_key = TenantSecretAuth(body["data"]["key"])
-    return SecretKey(
-        client_secret_key,
-        body["data"]["id"],
-        body["data"]["name"],
-        body["data"]["status"],
-    )
+    body = post("org/api_keys", data, workos_sandbox_tenant.sk.key)
+    return SecretApiKey.from_response(body["data"])
 
 
 @pytest.fixture(scope="session")
@@ -46,16 +25,8 @@ def ob_configuration(workos_sandbox_tenant, must_collect_data_kinds, can_access_
         must_collect_data_kinds=must_collect_data_kinds,
         can_access_data_kinds=can_access_data_kinds,
     )
-    body = post("org/onboarding_configs", data, workos_sandbox_tenant.sk)
-    client_public_key = TenantAuth(body["data"]["key"])
-    return ObConfiguration(
-        client_public_key,
-        body["data"]["id"],
-        body["data"]["name"],
-        body["data"]["status"],
-        body["data"]["must_collect_data_kinds"],
-        body["data"]["can_access_data_kinds"],
-    )
+    body = post("org/onboarding_configs", data, workos_sandbox_tenant.sk.key)
+    return ObConfiguration.from_response(body["data"])
 
 
 class TestDashboard:
@@ -77,7 +48,7 @@ class TestDashboard:
                 "attributes": attributes,
                 "reason": "Doing a hecking decrypt",
             }
-            body = post("org/decrypt", data, tenant.sk)
+            body = post("org/decrypt", data, tenant.sk.key)
             attributes = body["data"]
             for data_kind, value in attributes.items():
                 assert expected_data[data_kind].upper() == value.upper()
@@ -89,13 +60,13 @@ class TestDashboard:
             "attributes": ["city"],
             "reason": "Not doing a hecking decrypt",
         }
-        post("org/decrypt", data, tenant.sk, status_code=401)
+        post("org/decrypt", data, tenant.sk.key, status_code=401)
         
     def test_scoped_users_list(self, user):
         tenant = user.tenant
         # TODO don't filter on fp_user_id in this test. We only do it to ensure it doesn't flake in dev
         # https://linear.app/footprint/issue/FP-390/integration-tests-for-onboarding-list-break-in-dev
-        body = get("org/scoped_users", dict(fp_user_id=user.fp_user_id), tenant.sk)
+        body = get("org/scoped_users", dict(fp_user_id=user.fp_user_id), tenant.sk.key)
         scoped_users = body["data"]
         assert len(scoped_users)
         assert scoped_users[0]["footprint_user_id"] == user.fp_user_id
@@ -103,14 +74,14 @@ class TestDashboard:
 
     def test_liveness_list(self, user):
         tenant = user.tenant
-        body = get("org/liveness", dict(footprint_user_id=user.fp_user_id), tenant.sk)
+        body = get("org/liveness", dict(footprint_user_id=user.fp_user_id), tenant.sk.key)
         creds = body["data"]
         assert len(creds)
         assert creds[0]["insight_event"]
 
     def test_access_events_list(self, user):
         tenant = user.tenant
-        body = get("org/access_events", dict(footprint_user_id=user.fp_user_id), tenant.sk)
+        body = get("org/access_events", dict(footprint_user_id=user.fp_user_id), tenant.sk.key)
         access_events = body["data"]
         assert len(access_events) == len(FIELDS_TO_DECRYPT)
         for i, expected_fields in enumerate(FIELDS_TO_DECRYPT[-1:0]):
@@ -119,7 +90,7 @@ class TestDashboard:
         # Test filtering on kinds. We provide two different kinds, and we should get all access events
         # that contain at least one of these fields
         params = dict(footprint_user_id=user.fp_user_id, data_kinds=",".join(["email", "street_address"]))
-        body = get("org/access_events", params, tenant.sk)
+        body = get("org/access_events", params, tenant.sk.key)
         access_events = body["data"]
         assert len(access_events) == 2
         assert "email" in set(access_events[0]["data_kinds"])
@@ -129,11 +100,11 @@ class TestDashboard:
         params = dict(
             timestamp_gte=arrow.utcnow().shift(days=1).isoformat()
         )
-        body = get("org/access_events", params, tenant.sk)
+        body = get("org/access_events", params, tenant.sk.key)
         assert not body["data"]
 
     def test_config_list(self, workos_sandbox_tenant, ob_configuration):
-        body = get("org/onboarding_configs", None, workos_sandbox_tenant.sk)
+        body = get("org/onboarding_configs", None, workos_sandbox_tenant.sk.key)
         config = next (
             config for config in body["data"] if config["id"] == ob_configuration.id
         )
@@ -149,13 +120,13 @@ class TestDashboard:
         new_name = "Updated ob config name"
         new_status = "disabled"
         data = dict(name=new_name, status=new_status)
-        patch(f"org/onboarding_configs/flerpderp", data, workos_sandbox_tenant.sk, status_code=404)
+        patch(f"org/onboarding_configs/flerpderp", data, workos_sandbox_tenant.sk.key, status_code=404)
 
         # Update the name and status
-        patch(f"org/onboarding_configs/{ob_configuration.id}", data, workos_sandbox_tenant.sk)
+        patch(f"org/onboarding_configs/{ob_configuration.id}", data, workos_sandbox_tenant.sk.key)
 
         # Verify the update
-        body = get(f"org/onboarding_configs", None, workos_sandbox_tenant.sk)
+        body = get(f"org/onboarding_configs", None, workos_sandbox_tenant.sk.key)
         configs = body["data"]
         ob_config = next(
             i for i in configs

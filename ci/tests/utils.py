@@ -6,7 +6,7 @@ import arrow
 import time
 import os 
 
-from .types import Tenant
+from .types import ObConfiguration, SecretApiKey, Tenant
 from .auth import (
     TenantAuth,
     TenantSecretAuth,
@@ -74,22 +74,18 @@ def try_until_success(fn, timeout_s=5, retry_interval_s=1):
 
 def create_tenant(org_data, ob_conf_data):
     body = post("private/client", org_data, CUSTODIAN_AUTH)
-    client_secret_key = TenantSecretAuth(body["data"]["api_key"])
-    client_secret_key_id = body["data"]["api_key_id"]
+    sk = SecretApiKey.from_response(body["data"]["key"])
     print("\n======org info======")
     print(body)
 
-    body = post("org/onboarding_configs", ob_conf_data, client_secret_key)
-    client_public_key = TenantAuth(body["data"]["key"])
-    ob_config_id = body["data"]["id"]
+    body = post("org/onboarding_configs", ob_conf_data, sk.key)
+    ob_config = ObConfiguration.from_response(body["data"])
     print("\n======org onboarding info======")
     print(body)
 
     return Tenant(
-        pk=client_public_key,
-        sk=client_secret_key,
-        sk_id=client_secret_key_id,
-        configuration_id=ob_config_id,
+        ob_config=ob_config,
+        sk=sk,
     )
 
 

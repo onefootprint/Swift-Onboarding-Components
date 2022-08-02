@@ -1,10 +1,11 @@
 use crate::auth::key_context::custodian::CustodianAuthContext;
+use crate::types::secret_api_key::TenantApiKeyResponse;
 use crate::types::success::ApiResponseData;
 use crate::State;
 use crate::{enclave::gen_keypair, errors::ApiError};
 use db::models::tenant_api_keys::TenantApiKey;
 use newtypes::secret_api_key::SecretApiKey;
-use newtypes::{TenantApiKeyId, TenantId};
+use newtypes::TenantId;
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 
 use db::models::tenants::NewTenant;
@@ -20,13 +21,12 @@ struct NewClientRequest {
     logo_url: Option<String>,
 }
 
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Apiv2Schema)]
+#[derive(Debug, Clone, serde::Serialize, Apiv2Schema)]
 struct NewClientResponse {
     /// unique identifier for this client
     org_id: TenantId,
     /// api key for org-level api access
-    api_key: SecretApiKey,
-    api_key_id: TenantApiKeyId,
+    key: TenantApiKeyResponse,
 }
 
 /// Create a new client (this endpoint will be private in prod TODO)
@@ -59,22 +59,20 @@ async fn post(
     .await?;
 
     let secret_api_key = SecretApiKey::generate(is_live);
-
     let new_key = TenantApiKey::create(
         &state.db_pool,
         "Secret key".to_owned(), // TODO
         secret_api_key.fingerprint(&state.hmac_client).await?,
         secret_api_key.seal_to(&tenant.public_key)?,
-        tenant.id,
+        tenant.id.clone(),
         is_live,
     )
     .await?;
 
     Ok(Json(ApiResponseData {
         data: NewClientResponse {
-            org_id: new_key.tenant_id,
-            api_key: secret_api_key,
-            api_key_id: new_key.id,
+            org_id: tenant.id,
+            key: TenantApiKeyResponse::from((new_key, Some(secret_api_key))),
         },
     }))
 }
