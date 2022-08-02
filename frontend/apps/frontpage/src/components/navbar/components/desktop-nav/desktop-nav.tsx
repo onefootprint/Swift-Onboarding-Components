@@ -24,7 +24,7 @@ const DesktopNav = ({ cta, links }: DesktopNavProps) => (
       ))}
     </LinksContainer>
     <Box>
-      <Button onClick={cta.onClick} fullWidth>
+      <Button onClick={cta.onClick} fullWidth size="compact">
         {cta.text}
       </Button>
     </Box>

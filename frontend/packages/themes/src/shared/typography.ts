@@ -22,7 +22,7 @@ const typographies: Typographies = {
     fontWeight: 700,
   },
   'display-4': {
-    fontSize: '21px',
+    fontSize: '20px',
     lineHeight: '32px',
     fontFamily: baseFontFamily,
     fontWeight: 400,
