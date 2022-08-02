@@ -15,7 +15,7 @@ export default {
     variant: {
       control: 'select',
       description: 'Intent of the Banner',
-      options: ['info', 'error', 'warning'],
+      options: ['info', 'error', 'warning', 'announcement'],
       required: true,
     },
   },
@@ -41,6 +41,12 @@ export const Info = Template.bind({});
 Info.args = {
   children: 'Info message goes here.',
   variant: 'info',
+};
+
+export const Announcement = Template.bind({});
+Announcement.args = {
+  children: 'Announcement message goes here.',
+  variant: 'announcement',
 };
 
 export const WithLink = Template.bind({});
