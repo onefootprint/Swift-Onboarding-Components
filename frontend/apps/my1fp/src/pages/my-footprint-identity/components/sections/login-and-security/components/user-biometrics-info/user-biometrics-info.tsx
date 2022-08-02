@@ -3,17 +3,31 @@ import IcoClose16 from 'icons/ico/ico-close-16';
 import React from 'react';
 import useSessionUser from 'src/hooks/use-session-user';
 import styled from 'styled-components';
-import { Box, Typography } from 'ui';
+import { Box, LoadingIndicator, Typography } from 'ui';
 
 import { InsightEvent } from '../../../access-logs/types';
+import useGetLiveness, {
+  GetLivenessResponse,
+} from '../../hooks/use-get-liveness/use-get-liveness';
 import BiometricsField from '../biometrics-field/biometrics-field';
 import VerifyBiometrics from '../verify-biometrics';
 
 const UserBiometricsInfo = () => {
-  const { session } = useSessionUser();
+  const { session, updateBiometric } = useSessionUser();
   const { t } = useTranslation(
     'pages.my-footprint-identity.login-and-security.biometrics',
   );
+
+  const handleLivenessQuerySuccess = (data: GetLivenessResponse) => {
+    if (data?.length) {
+      updateBiometric(data);
+    }
+  };
+
+  const livenessQuery = useGetLiveness({
+    onSuccess: handleLivenessQuerySuccess,
+  });
+
   if (!session) {
     return null;
   }
@@ -23,6 +37,17 @@ const UserBiometricsInfo = () => {
       {t('label')}
     </Typography>
   );
+
+  if (livenessQuery.isLoading && !biometric.length) {
+    return (
+      <Box>
+        {label}
+        <LoadingContainer>
+          <LoadingIndicator />
+        </LoadingContainer>
+      </Box>
+    );
+  }
 
   if (biometric.length > 0) {
     return (
@@ -54,6 +79,11 @@ const UserBiometricsInfo = () => {
 const LabelContainer = styled.div`
   display: flex;
   align-items: center;
+`;
+
+const LoadingContainer = styled.div`
+  display: flex;
+  justify-content: flex-start;
 `;
 
 const Container = styled.div`

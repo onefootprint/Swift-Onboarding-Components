@@ -28,7 +28,12 @@ const getLiveness = async (payload: GetLivenessRequest) => {
   return response.data.map(e => e.insightEvent);
 };
 
-const useGetLiveness = () => {
+const useGetLiveness = (
+  options: {
+    onSuccess?: (data: GetLivenessResponse) => void;
+    onError?: (error: RequestError) => void;
+  } = {},
+) => {
   const { session } = useSessionUser();
   const authToken = session?.authToken || '';
 
@@ -37,6 +42,8 @@ const useGetLiveness = () => {
     () => getLiveness({ authToken }),
     {
       enabled: !!authToken,
+      onSuccess: options.onSuccess,
+      onError: options.onError,
     },
   );
 };

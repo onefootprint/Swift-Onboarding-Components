@@ -1,6 +1,12 @@
 import React from 'react';
 import { UserSession, useStore } from 'src/hooks/use-session-user';
-import { customRender, mockRequest, screen, userEvent } from 'test-utils';
+import {
+  customRender,
+  mockRequest,
+  screen,
+  userEvent,
+  waitFor,
+} from 'test-utils';
 
 import { UserSessionMetadata } from '../../../../../hooks/use-session-user/use-session-user';
 import LoginAndSecurity from './login-and-security';
@@ -36,6 +42,23 @@ describe('<LoginAndSecurity />', () => {
   };
 
   const withLivenessQuery = () => {
+    mockRequest({
+      method: 'get',
+      path: 'user/liveness',
+      response: {
+        data: [
+          {
+            insightEvent: {
+              userAgent: 'iPhone 12',
+              timestamp: '01/01/2021',
+            },
+          },
+        ],
+      },
+    });
+  };
+
+  const withEmptyLivenessQuery = () => {
     mockRequest({
       method: 'get',
       path: 'user/liveness',
@@ -136,6 +159,42 @@ describe('<LoginAndSecurity />', () => {
     });
   });
 
+  describe('with missing biometrics data', () => {
+    const session: UserSession = {
+      metadata: fakeSessionMetadata,
+      biometric: [],
+      authToken: 'lorem',
+      data: {
+        city: 'San Francisco',
+        country: 'United States',
+        dob: '01/01/2000',
+        email: 'john.doe@gmail.com',
+        firstName: 'John',
+        lastName: 'Doe',
+        phoneNumber: '+1 (305) 541-3102',
+        state: 'CA',
+        streetAddress: '14 Linda St',
+        streetAddress2: null,
+        zip: '94102',
+      },
+    };
+
+    beforeEach(() => {
+      useStore.setState({
+        session,
+      });
+    });
+
+    it('should fetch and update the device info in state', async () => {
+      withLivenessQuery();
+      withUserQuery();
+      renderLoginAndSecurity();
+      await waitFor(() => {
+        expect(screen.getByText('iPhone 12')).toBeInTheDocument();
+      });
+    });
+  });
+
   describe('with unverified biometrics', () => {
     const data: UserSession = {
       metadata: fakeSessionMetadata,
@@ -163,7 +222,7 @@ describe('<LoginAndSecurity />', () => {
     });
 
     it('should render the email and phone', () => {
-      withLivenessQuery();
+      withEmptyLivenessQuery();
       withUserQuery();
       renderLoginAndSecurity();
       expect(screen.getByText('john.doe@gmail.com')).toBeInTheDocument();
@@ -171,7 +230,7 @@ describe('<LoginAndSecurity />', () => {
     });
 
     it('should show biometrics is not verified', () => {
-      withLivenessQuery();
+      withEmptyLivenessQuery();
       withUserQuery();
       renderLoginAndSecurity();
       expect(screen.getByText('Not verified')).toBeInTheDocument();
@@ -220,7 +279,7 @@ describe('<LoginAndSecurity />', () => {
     });
 
     it('should render a button to verify the email', () => {
-      withLivenessQuery();
+      withEmptyLivenessQuery();
       withUserQuery();
       renderLoginAndSecurity();
       const button = screen.getByTestId('verify-email');
@@ -229,7 +288,7 @@ describe('<LoginAndSecurity />', () => {
 
     describe('when clicking on the verify button', () => {
       it('should display a loading indicator while the request is pending', async () => {
-        withLivenessQuery();
+        withEmptyLivenessQuery();
         withUserQuery();
         withVerification();
         renderLoginAndSecurity();
@@ -243,7 +302,7 @@ describe('<LoginAndSecurity />', () => {
       });
 
       it('should display a confirmation if the request succeeds', async () => {
-        withLivenessQuery();
+        withEmptyLivenessQuery();
         withUserQuery();
         withVerification();
         renderLoginAndSecurity();
@@ -262,7 +321,7 @@ describe('<LoginAndSecurity />', () => {
       });
 
       it('should display a confirmation if the request fails', async () => {
-        withLivenessQuery();
+        withEmptyLivenessQuery();
         withUserQuery();
         withVerificationError();
         renderLoginAndSecurity();
