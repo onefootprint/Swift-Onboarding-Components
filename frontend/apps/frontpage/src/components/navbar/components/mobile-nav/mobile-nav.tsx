@@ -77,6 +77,7 @@ const MobileNav = ({ onOpen, onClose, cta, links }: MobileNavProps) => {
     </Menu>
   ) : (
     <Container>
+      <LogoLink onClick={handleLinkClick} />
       <NavTriggerButton type="button" onClick={handleToggle}>
         <IcoMenu24 />
       </NavTriggerButton>
@@ -86,7 +87,8 @@ const MobileNav = ({ onOpen, onClose, cta, links }: MobileNavProps) => {
 
 const Container = styled.div`
   display: flex;
-  justify-content: end;
+  justify-content: space-between;
+  align-items: center;
 
   ${media.greaterThan('lg')`
     display: none;
@@ -95,6 +97,7 @@ const Container = styled.div`
 
 const Menu = styled(Container)`
   ${({ theme }) => css`
+    align-items: initial;
     background: ${theme.backgroundColor.primary};
     bottom: 0;
     display: flex;
