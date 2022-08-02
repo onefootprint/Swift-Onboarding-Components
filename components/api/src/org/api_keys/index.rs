@@ -7,7 +7,9 @@ use crate::types::secret_api_key::TenantApiKeyResponse;
 use crate::types::success::ApiResponseData;
 use crate::types::Empty;
 use crate::State;
+use db::models::tenant_api_key_access_log::TenantApiKeyAccessLog;
 use db::models::tenant_api_keys::TenantApiKey;
+use db::DbError;
 use newtypes::secret_api_key::SecretApiKey;
 use newtypes::{ApiKeyStatus, TenantApiKeyId};
 use paperclip::actix::Apiv2Schema;
@@ -20,13 +22,19 @@ pub async fn get(
     auth: Either<SessionContext<WorkOsSession>, SecretTenantAuthContext>,
 ) -> actix_web::Result<Json<ApiResponseData<Vec<TenantApiKeyResponse>>>, ApiError> {
     let is_live = auth.is_live()?;
-    let keys = state
+    let (keys, id_to_last_used) = state
         .db_pool
-        .db_query(move |conn| TenantApiKey::list(conn, &auth.tenant_id(), is_live))
+        .db_query(move |conn| -> Result<_, DbError> {
+            let keys = TenantApiKey::list(conn, &auth.tenant_id(), is_live)?;
+            let tenant_api_key_ids = keys.iter().map(|x| &x.id).collect();
+            let id_to_last_used = TenantApiKeyAccessLog::get(conn, tenant_api_key_ids)?;
+            Ok((keys, id_to_last_used))
+        })
         .await??;
 
     Ok(Json(ApiResponseData::ok(
         keys.into_iter()
+            .map(|x| (id_to_last_used.get(&x.id).copied(), x))
             .map(TenantApiKeyResponse::from)
             .collect::<Vec<TenantApiKeyResponse>>(),
     )))

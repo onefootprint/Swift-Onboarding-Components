@@ -14,8 +14,8 @@ pub struct TenantApiKeyResponse {
     is_live: bool,
 }
 
-impl From<(TenantApiKey, Option<SecretApiKey>)> for TenantApiKeyResponse {
-    fn from(s: (TenantApiKey, Option<SecretApiKey>)) -> Self {
+impl From<(TenantApiKey, Option<SecretApiKey>, Option<DateTime<Utc>>)> for TenantApiKeyResponse {
+    fn from(s: (TenantApiKey, Option<SecretApiKey>, Option<DateTime<Utc>>)) -> Self {
         let TenantApiKey {
             id,
             name,
@@ -31,14 +31,25 @@ impl From<(TenantApiKey, Option<SecretApiKey>)> for TenantApiKeyResponse {
             key: s.1,
             created_at,
             status,
-            // TODO https://linear.app/footprint/issue/FP-855/build-last-used-at-time-for-secret-key
-            last_used_at: None,
+            last_used_at: s.2,
         }
+    }
+}
+
+impl From<(Option<DateTime<Utc>>, TenantApiKey)> for TenantApiKeyResponse {
+    fn from(s: (Option<DateTime<Utc>>, TenantApiKey)) -> Self {
+        Self::from((s.1, None, s.0))
+    }
+}
+
+impl From<(TenantApiKey, Option<SecretApiKey>)> for TenantApiKeyResponse {
+    fn from(s: (TenantApiKey, Option<SecretApiKey>)) -> Self {
+        Self::from((s.0, s.1, None))
     }
 }
 
 impl From<TenantApiKey> for TenantApiKeyResponse {
     fn from(s: TenantApiKey) -> Self {
-        Self::from((s, None))
+        Self::from((s, None, None))
     }
 }

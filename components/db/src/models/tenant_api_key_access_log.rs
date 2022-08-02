@@ -1,5 +1,8 @@
+use std::collections::HashMap;
+
 use crate::{schema::tenant_api_key_access_logs, DbError};
 use chrono::{DateTime, Utc};
+use diesel::dsl::max;
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
 use newtypes::{TenantApiKeyId, Uuid};
@@ -32,5 +35,23 @@ impl TenantApiKeyAccessLog {
             .values(access_log)
             .get_result::<TenantApiKeyAccessLog>(conn)?;
         Ok(())
+    }
+
+    pub fn get(
+        conn: &mut PgConnection,
+        tenant_api_key_ids: Vec<&TenantApiKeyId>,
+    ) -> Result<HashMap<TenantApiKeyId, DateTime<Utc>>, DbError> {
+        let results: HashMap<TenantApiKeyId, DateTime<Utc>> = tenant_api_key_access_logs::table
+            .filter(tenant_api_key_access_logs::tenant_api_key_id.eq_any(tenant_api_key_ids))
+            .group_by(tenant_api_key_access_logs::tenant_api_key_id)
+            .select((
+                tenant_api_key_access_logs::tenant_api_key_id,
+                max(tenant_api_key_access_logs::timestamp),
+            ))
+            .load::<(TenantApiKeyId, Option<DateTime<Utc>>)>(conn)?
+            .into_iter()
+            .filter_map(|x| x.1.map(|timestamp| (x.0, timestamp)))
+            .collect();
+        Ok(results)
     }
 }

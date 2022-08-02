@@ -138,7 +138,6 @@ class TestDashboard:
         # Verify we can't use the disabled ob config for anything anymore
         get("org/config", None, ob_configuration.key, status_code=401)
 
-
     def test_api_key_list(self, secret_key):
         body = get("org/api_keys", None, secret_key.key)
         key = next(
@@ -149,6 +148,7 @@ class TestDashboard:
         assert key["status"] == secret_key.status
         assert key["created_at"]
         assert not key["key"]
+        assert key["last_used_at"]
 
     def test_api_key_reveal(self, secret_key):
         body = get(f"org/api_keys/{secret_key.id}/reveal", None, secret_key.key)
