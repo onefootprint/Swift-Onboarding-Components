@@ -1,3 +1,4 @@
+import { useRequestErrorToast } from 'hooks';
 import useOnboarding from 'src/hooks/use-onboarding';
 import useIdentify, {
   IdentifyResponse,
@@ -22,6 +23,7 @@ const useEmailIdentify = () => {
   const identifyMutation = useIdentify();
   const identifyVerifyMutation = useIdentityVerification();
   const onboardingMutation = useOnboarding();
+  const showRequestErrorToast = useRequestErrorToast();
 
   const isLoading = () =>
     identifyMutation.isLoading ||
@@ -52,6 +54,7 @@ const useEmailIdentify = () => {
             handleBiometricChallenge(challengeData);
           }
         },
+        onError: showRequestErrorToast,
       },
     );
   };

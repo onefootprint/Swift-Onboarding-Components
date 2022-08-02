@@ -73,6 +73,7 @@ const PhoneVerificationPinForm = ({
       },
       {
         onSuccess: handlePinValidationSucceeded,
+        onError: showRequestErrorToast,
       },
     );
   };
