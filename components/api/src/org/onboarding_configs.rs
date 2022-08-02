@@ -14,9 +14,10 @@ use newtypes::ApiKeyStatus;
 use newtypes::DataKind;
 use newtypes::ObConfigurationId;
 use paperclip::actix::Apiv2Schema;
-use paperclip::actix::{api_v2_operation, get, patch, web, web::Json};
+use paperclip::actix::{api_v2_operation, get, patch, post, web, web::Json};
 
 #[api_v2_operation(tags(Org))]
+#[get("/onboarding_config")]
 /// Uses tenant public key auth to return information about the tenant
 pub fn get_detail(
     auth: PublicTenantAuthContext,
@@ -59,6 +60,7 @@ pub struct CreateOnboardingConfigurationRequest {
 }
 
 #[api_v2_operation(tags(Org))]
+#[post("/onboarding_configs")]
 /// Create a new onboarding configuration
 pub fn post(
     state: web::Data<State>,
