@@ -123,6 +123,19 @@ table! {
     use diesel::sql_types::*;
     use newtypes::db_types::*;
 
+    tenant_api_key_access_logs (id) {
+        id -> Uuid,
+        tenant_api_key_id -> Text,
+        timestamp -> Timestamptz,
+        _created_at -> Timestamptz,
+        _updated_at -> Timestamptz,
+    }
+}
+
+table! {
+    use diesel::sql_types::*;
+    use newtypes::db_types::*;
+
     tenant_api_keys (id) {
         id -> Text,
         sh_secret_api_key -> Bytea,
@@ -257,6 +270,7 @@ joinable!(onboardings -> ob_configurations (ob_configuration_id));
 joinable!(onboardings -> scoped_users (scoped_user_id));
 joinable!(scoped_users -> tenants (tenant_id));
 joinable!(scoped_users -> user_vaults (user_vault_id));
+joinable!(tenant_api_key_access_logs -> tenant_api_keys (tenant_api_key_id));
 joinable!(tenant_api_keys -> tenants (tenant_id));
 joinable!(user_data -> user_vaults (user_vault_id));
 joinable!(verification_requests -> scoped_users (scoped_user_id));
@@ -274,6 +288,7 @@ allow_tables_to_appear_in_same_query!(
     onboardings,
     scoped_users,
     sessions,
+    tenant_api_key_access_logs,
     tenant_api_keys,
     tenants,
     user_data,

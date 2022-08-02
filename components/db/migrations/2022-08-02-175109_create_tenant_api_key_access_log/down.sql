@@ -1,0 +1,1 @@
+DROP TABLE tenant_api_key_access_logs;

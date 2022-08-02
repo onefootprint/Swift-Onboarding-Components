@@ -1,3 +1,4 @@
+use crate::models::tenant_api_key_access_log::TenantApiKeyAccessLog;
 use crate::{schema::tenant_api_keys, DbError, DbPool};
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
@@ -70,6 +71,7 @@ impl TenantApiKey {
             if api_key.status != ApiKeyStatus::Enabled {
                 return Err(DbError::ApiKeyDisabled);
             }
+            TenantApiKeyAccessLog::create(conn, api_key.id.clone())?;
         }
         Ok(result)
     }
