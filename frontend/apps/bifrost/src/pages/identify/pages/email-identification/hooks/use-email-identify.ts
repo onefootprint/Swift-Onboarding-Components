@@ -3,8 +3,8 @@ import useIdentify, {
   IdentifyResponse,
 } from 'src/pages/identify/hooks/use-identify';
 import useIdentityVerification, {
-  IdentifyVerificationResponse,
-} from 'src/pages/identify/hooks/use-identity-verification';
+  IdentifyVerifyResponse,
+} from 'src/pages/identify/hooks/use-identity-verify';
 import generateLoginDeviceResponse from 'src/utils/biometric/login-challenge-response';
 import {
   ChallengeData,
@@ -20,12 +20,12 @@ const useEmailIdentify = () => {
     context: { device, identifyType },
   } = state;
   const identifyMutation = useIdentify();
-  const identifyVerificationMutation = useIdentityVerification();
+  const identifyVerifyMutation = useIdentityVerification();
   const onboardingMutation = useOnboarding();
 
   const isLoading = () =>
     identifyMutation.isLoading ||
-    identifyVerificationMutation.isLoading ||
+    identifyVerifyMutation.isLoading ||
     onboardingMutation.isLoading;
 
   const identifyEmail = (email: string) => {
@@ -66,14 +66,13 @@ const useEmailIdentify = () => {
     const challengeResponse = await generateLoginDeviceResponse(
       biometricChallengeJson,
     );
-    identifyVerificationMutation.mutate(
+    identifyVerifyMutation.mutate(
       {
-        challengeKind: ChallengeKind.biometric,
         challengeResponse,
         challengeToken,
       },
       {
-        onSuccess: ({ authToken }: IdentifyVerificationResponse) => {
+        onSuccess: ({ authToken }: IdentifyVerifyResponse) => {
           send({
             type: Events.biometricLoginSucceeded,
             payload: {

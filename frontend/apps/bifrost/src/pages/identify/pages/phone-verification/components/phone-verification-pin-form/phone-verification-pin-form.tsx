@@ -1,14 +1,17 @@
 import { useRequestErrorToast, useTranslation } from 'hooks';
 import React from 'react';
 import useUserData from 'src/hooks/use-user-data';
+import useIdentify, {
+  IdentifyResponse,
+} from 'src/pages/identify/hooks/use-identify';
 import useIdentifyChallenge from 'src/pages/identify/hooks/use-identify-challenge';
 import { ChallengeKind, Events } from 'src/utils/state-machine/identify/types';
 import { LinkButton, LoadingIndicator, PinInput, useToast } from 'ui';
 
 import useIdentifyMachine from '../../../../hooks/use-identify-machine';
-import useIdentifyVerification, {
-  IdentifyVerificationResponse,
-} from '../../../../hooks/use-identity-verification';
+import useIdentifyVerify, {
+  IdentifyVerifyResponse,
+} from '../../../../hooks/use-identity-verify';
 
 const SUCCESS_EVENT_DELAY_MS = 1500;
 
@@ -27,16 +30,17 @@ const PhoneVerificationPinForm = ({
 
   const [state, send] = useIdentifyMachine();
   const identifyChallengeMutation = useIdentifyChallenge();
-  const identifyVerificationMutation = useIdentifyVerification();
+  const identifyMutation = useIdentify();
+  const identifyVerifyMutation = useIdentifyVerify();
   const userDataMutation = useUserData();
 
-  const shouldShowSuccess = identifyVerificationMutation.isSuccess;
+  const shouldShowSuccess = identifyVerifyMutation.isSuccess;
   const shouldShowLoading =
-    identifyVerificationMutation.isLoading || userDataMutation.isLoading;
+    identifyVerifyMutation.isLoading || userDataMutation.isLoading;
 
   const handlePinValidationSucceeded = ({
     authToken,
-  }: IdentifyVerificationResponse) => {
+  }: IdentifyVerifyResponse) => {
     const { email } = state.context;
     // Only send the user email to the backend if we are onboarding the user for
     // the first time
@@ -61,10 +65,9 @@ const PhoneVerificationPinForm = ({
     if (!challengeData) {
       return;
     }
-    const { challengeToken, challengeKind } = challengeData;
-    identifyVerificationMutation.mutate(
+    const { challengeToken } = challengeData;
+    identifyVerifyMutation.mutate(
       {
-        challengeKind,
         challengeResponse: pin,
         challengeToken,
       },
@@ -74,33 +77,66 @@ const PhoneVerificationPinForm = ({
     );
   };
 
-  const handleResend = () => {
-    const { phone: phoneNumber } = state.context;
-    if (phoneNumber) {
-      identifyChallengeMutation.mutate(
-        {
-          phoneNumber,
-        },
-        {
-          onError: showRequestErrorToast,
-          onSuccess: ({ challengeToken }) => {
-            toast.show({
-              title: t('resend-code.toast.success.title'),
-              description: t('resend-code.toast.success.description'),
-            });
-            send({
-              type: Events.smsChallengeResent,
-              payload: {
-                challengeData: {
-                  challengeKind: ChallengeKind.sms,
-                  challengeToken,
-                  phoneNumberLastTwo: phoneNumber.slice(-2),
-                },
+  const sendIdentifyChallenge = (phoneNumber: string) => {
+    identifyChallengeMutation.mutate(
+      {
+        phoneNumber,
+      },
+      {
+        onError: showRequestErrorToast,
+        onSuccess: ({ challengeToken }) => {
+          toast.show({
+            title: t('resend-code.toast.success.title'),
+            description: t('resend-code.toast.success.description'),
+          });
+          send({
+            type: Events.smsChallengeResent,
+            payload: {
+              challengeData: {
+                challengeKind: ChallengeKind.sms,
+                challengeToken,
+                phoneNumberLastTwo: phoneNumber.slice(-2),
               },
-            });
-          },
+            },
+          });
         },
-      );
+      },
+    );
+  };
+
+  const sendIdentify = (email: string) => {
+    const { identifyType } = state.context;
+    identifyMutation.mutate(
+      {
+        identifier: { email },
+        preferredChallengeKind: ChallengeKind.sms,
+        identifyType,
+      },
+      {
+        onSuccess({ challengeData }: IdentifyResponse) {
+          if (!challengeData) {
+            return;
+          }
+          send({
+            type: Events.smsChallengeResent,
+            payload: {
+              challengeData,
+            },
+          });
+        },
+        onError: showRequestErrorToast,
+      },
+    );
+  };
+
+  const handleResend = () => {
+    const { phone, email } = state.context;
+    // Depending on if the user's phone is known (if this is a new user who went
+    // through the phone-registration page) handle resending differently
+    if (phone) {
+      sendIdentifyChallenge(phone);
+    } else {
+      sendIdentify(email);
     }
   };
 
@@ -116,11 +152,9 @@ const PhoneVerificationPinForm = ({
     <>
       <PinInput
         onComplete={handlePinCompleted}
-        hasError={identifyVerificationMutation.isError}
+        hasError={identifyVerifyMutation.isError}
         hintText={
-          identifyVerificationMutation.isError
-            ? t('error.description')
-            : undefined
+          identifyVerifyMutation.isError ? t('error.description') : undefined
         }
       />
       {identifyChallengeMutation.isLoading ? (

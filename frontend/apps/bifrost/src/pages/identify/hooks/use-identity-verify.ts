@@ -1,24 +1,20 @@
 import { useMutation } from '@tanstack/react-query';
 import request, { RequestError, RequestResponse } from 'request';
-import { ChallengeKind } from 'src/utils/state-machine/identify/types';
 import { UserKind } from 'src/utils/state-machine/types';
 
-export type IdentifyVerificationRequest = {
-  challengeKind: ChallengeKind;
+export type IdentifyVerifyRequest = {
   challengeResponse: string; // either biometric response or the 6 code digit sent via sms
   challengeToken: string; // Challenge token received after email-identification
 };
 
-export type IdentifyVerificationResponse = {
+export type IdentifyVerifyResponse = {
   kind: UserKind;
   authToken: string;
 };
 
-const identifyVerificationRequest = async (
-  payload: IdentifyVerificationRequest,
-) => {
+const identifyVerifyRequest = async (payload: IdentifyVerifyRequest) => {
   const { data: response } = await request<
-    RequestResponse<IdentifyVerificationResponse>
+    RequestResponse<IdentifyVerifyResponse>
   >({
     method: 'POST',
     url: '/identify/verify',
@@ -27,11 +23,9 @@ const identifyVerificationRequest = async (
   return response.data;
 };
 
-const useIdentifyVerification = () =>
-  useMutation<
-    IdentifyVerificationResponse,
-    RequestError,
-    IdentifyVerificationRequest
-  >(identifyVerificationRequest);
+const useIdentifyVerify = () =>
+  useMutation<IdentifyVerifyResponse, RequestError, IdentifyVerifyRequest>(
+    identifyVerifyRequest,
+  );
 
-export default useIdentifyVerification;
+export default useIdentifyVerify;

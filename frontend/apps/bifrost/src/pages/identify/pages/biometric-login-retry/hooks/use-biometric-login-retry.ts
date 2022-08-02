@@ -1,9 +1,9 @@
 import useIdentify, {
   IdentifyResponse,
 } from 'src/pages/identify/hooks/use-identify';
-import useIdentityVerification, {
-  IdentifyVerificationResponse,
-} from 'src/pages/identify/hooks/use-identity-verification';
+import useIdentityVerify, {
+  IdentifyVerifyResponse,
+} from 'src/pages/identify/hooks/use-identity-verify';
 import generateLoginDeviceResponse from 'src/utils/biometric/login-challenge-response';
 import {
   ChallengeData,
@@ -16,7 +16,7 @@ import useIdentifyMachine from '../../../hooks/use-identify-machine';
 const useBiometricLoginRetry = () => {
   const [state, send] = useIdentifyMachine();
   const identifyMutation = useIdentify();
-  const identityVerificationMutation = useIdentityVerification();
+  const identityVerifyMutation = useIdentityVerify();
 
   const requestBiometricChallenge = () => {
     identifyMutation.mutate(
@@ -62,14 +62,13 @@ const useBiometricLoginRetry = () => {
     const challengeResponse = await generateLoginDeviceResponse(
       biometricChallengeJson,
     );
-    identityVerificationMutation.mutate(
+    identityVerifyMutation.mutate(
       {
-        challengeKind: ChallengeKind.biometric,
         challengeResponse,
         challengeToken,
       },
       {
-        onSuccess: ({ authToken }: IdentifyVerificationResponse) => {
+        onSuccess: ({ authToken }: IdentifyVerifyResponse) => {
           send({
             type: Events.biometricLoginSucceeded,
             payload: {
