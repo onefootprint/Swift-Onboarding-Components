@@ -31,6 +31,7 @@ const AccessLogHeader = ({ accessLog }: AccessLogHeaderProps) => {
 
 const Container = styled.div`
   overflow-wrap: break-word;
+  line-height: 26px;
 `;
 
 export default AccessLogHeader;
