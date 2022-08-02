@@ -135,6 +135,10 @@ class TestDashboard:
         assert ob_config["name"] == new_name
         assert ob_config["status"] == new_status
 
+        # Verify we can't use the disabled ob config for anything anymore
+        get("org/config", None, ob_configuration.key, status_code=401)
+
+
     def test_api_key_list(self, secret_key):
         body = get("org/api_keys", None, secret_key.key)
         key = next(
@@ -153,17 +157,19 @@ class TestDashboard:
         assert key["status"] == "enabled"
         assert key["name"] == "Test secret key"
 
-    def test_api_key_update(self, secret_key):
+    def test_api_key_update(self, workos_sandbox_tenant, secret_key):
         # Test failing to update
         new_name = "Updated secret key name"
-        new_status = "disabled"
-        data = dict(name=new_name, status=new_status)
+        data = dict(name=new_name, status="disabled")
         patch(f"org/api_keys/flerpderp", data, secret_key.key, status_code=404)
 
         # Update the name and status
         patch(f"org/api_keys/{secret_key.id}", data, secret_key.key)
 
         # Verify the update, using the reveal endpoint as the detail endpoint
-        body = get(f"org/api_keys/{secret_key.id}/reveal", None, secret_key.key)
+        body = get(f"org/api_keys/{secret_key.id}/reveal", None, workos_sandbox_tenant.sk.key)
         assert body["data"]["name"] == new_name
-        assert body["data"]["status"] == new_status
+        assert body["data"]["status"] == "disabled"
+
+        # Verify we can't use the disabled API key for anything anymore
+        get(f"org/api_keys/{secret_key.id}/reveal", None, secret_key.key, status_code=401)

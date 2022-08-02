@@ -36,17 +36,26 @@ impl FromRequest for PublicTenantAuthContext {
             .and_then(|hv| hv.to_str().map(|s| s.to_string()).ok())
             .ok_or(AuthError::MissingClientPublicAuthHeader);
 
-        let pool = req.app_data::<web::Data<State>>().unwrap().db_pool.clone();
-
-        Box::pin(async move {
-            let config_key = newtypes::ObConfigurationKey::try_from(config_key?)
-                .map_err(|_| AuthError::InvalidTokenForHeader(HEADER_NAME.to_string()))?;
-            let (ob_config, tenant) = ObConfiguration::get_enabled(&pool, config_key).await?;
-            Ok(Self {
-                tenant,
-                ob_config,
-                phantom: PhantomData,
-            })
-        })
+        let static_req = req.clone();
+        Box::pin(async move { from_request_inner(&static_req, config_key).await })
     }
+}
+
+pub async fn from_request_inner(
+    req: &actix_web::HttpRequest,
+    key: Result<String, AuthError>,
+) -> Result<PublicTenantAuthContext, crate::ApiError> {
+    let key = newtypes::ObConfigurationKey::try_from(key?)
+        .map_err(|_| AuthError::InvalidTokenForHeader(HEADER_NAME.to_string()))?;
+    let state = req.app_data::<web::Data<State>>().unwrap();
+    let (ob_config, tenant) = state
+        .db_pool
+        .db_query(|conn| ObConfiguration::get_enabled(conn, key))
+        .await??
+        .ok_or(AuthError::ApiKeyNotFound)?;
+    Ok(PublicTenantAuthContext {
+        tenant,
+        ob_config,
+        phantom: PhantomData,
+    })
 }

@@ -105,6 +105,7 @@ fn status_code_for_db_error(e: &DbError) -> StatusCode {
         DbError::CryptoError(_) => StatusCode::INTERNAL_SERVER_ERROR,
         DbError::InvalidDataGroupForKind => StatusCode::INTERNAL_SERVER_ERROR,
         DbError::CouldNotCreateGroupUuid => StatusCode::INTERNAL_SERVER_ERROR,
+        DbError::ApiKeyDisabled => StatusCode::UNAUTHORIZED,
     }
 }
 

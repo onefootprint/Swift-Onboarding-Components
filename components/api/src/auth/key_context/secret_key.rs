@@ -58,9 +58,11 @@ pub async fn from_request_inner(req: &actix_web::HttpRequest) -> Result<SecretTe
     let state = req.app_data::<web::Data<State>>().unwrap();
     let sh_api_key = tenant_sk_input.fingerprint(&state.hmac_client).await?;
 
-    let (tenant, api_key) = db::tenant::secret_auth(&state.db_pool, sh_api_key)
-        .await?
-        .ok_or(AuthError::UnknownClient)?;
+    let (api_key, tenant) = state
+        .db_pool
+        .db_query(|conn| TenantApiKey::get_enabled(conn, sh_api_key))
+        .await??
+        .ok_or(AuthError::ApiKeyNotFound)?;
     Ok(SecretTenantAuthContext { tenant, api_key })
 }
 

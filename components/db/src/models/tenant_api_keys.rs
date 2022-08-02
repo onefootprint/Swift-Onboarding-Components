@@ -5,6 +5,8 @@ use diesel::{Insertable, Queryable};
 use newtypes::{ApiKeyStatus, Fingerprint, SealedVaultBytes, TenantApiKeyId, TenantId};
 use serde::{Deserialize, Serialize};
 
+use super::tenants::Tenant;
+
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
 #[diesel(table_name = tenant_api_keys)]
 pub struct TenantApiKey {
@@ -51,6 +53,24 @@ impl TenantApiKey {
             .filter(tenant_api_keys::id.eq(id))
             .filter(tenant_api_keys::is_live.eq(is_live))
             .first(conn)?;
+        Ok(result)
+    }
+
+    pub fn get_enabled(
+        conn: &mut PgConnection,
+        sh_api_key: Fingerprint,
+    ) -> Result<Option<(TenantApiKey, Tenant)>, DbError> {
+        use crate::schema::tenants;
+        let result: Option<(TenantApiKey, Tenant)> = tenant_api_keys::table
+            .inner_join(tenants::table)
+            .filter(tenant_api_keys::sh_secret_api_key.eq(sh_api_key))
+            .first(conn)
+            .optional()?;
+        if let Some((api_key, _)) = &result {
+            if api_key.status != ApiKeyStatus::Enabled {
+                return Err(DbError::ApiKeyDisabled);
+            }
+        }
         Ok(result)
     }
 

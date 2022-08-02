@@ -16,8 +16,8 @@ pub use user_auth::UserAuth;
 
 #[derive(Debug, Error)]
 pub enum AuthError {
-    #[error("unknown client")]
-    UnknownClient,
+    #[error("Key not found")]
+    ApiKeyNotFound,
     #[error("missing X-Client-Public-Key")]
     MissingClientPublicAuthHeader,
     #[error("missing X-Client-Secret-Key")]

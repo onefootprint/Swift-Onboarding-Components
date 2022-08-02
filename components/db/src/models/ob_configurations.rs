@@ -1,10 +1,8 @@
-use crate::diesel::ExpressionMethods;
-use crate::diesel::QueryDsl;
-use crate::diesel::RunQueryDsl;
 use crate::schema::{ob_configurations, onboardings, tenants};
 use crate::DbError;
 use crate::DbPool;
 use chrono::{DateTime, Utc};
+use diesel::prelude::*;
 use diesel::PgConnection;
 use diesel::{Insertable, Queryable};
 use newtypes::ApiKeyStatus;
@@ -82,23 +80,21 @@ impl ObConfiguration {
         Ok(id)
     }
 
-    pub async fn get_enabled(
-        pool: &DbPool,
+    pub fn get_enabled(
+        conn: &mut PgConnection,
         key: ObConfigurationKey,
-    ) -> Result<(ObConfiguration, Tenant), crate::DbError> {
-        let id = pool
-            .db_query(move |conn| -> Result<(ObConfiguration, Tenant), crate::DbError> {
-                let obc: ObConfiguration = ob_configurations::table
-                    .filter(ob_configurations::key.eq(key))
-                    .filter(ob_configurations::status.eq(ApiKeyStatus::Enabled))
-                    .first(conn)?;
-                let tenant: Tenant = tenants::table
-                    .filter(tenants::id.eq(&obc.tenant_id))
-                    .first(conn)?;
-                Ok((obc, tenant))
-            })
-            .await??;
-        Ok(id)
+    ) -> Result<Option<(ObConfiguration, Tenant)>, crate::DbError> {
+        let result: Option<(ObConfiguration, Tenant)> = ob_configurations::table
+            .inner_join(tenants::table)
+            .filter(ob_configurations::key.eq(key))
+            .first(conn)
+            .optional()?;
+        if let Some((obc, _)) = &result {
+            if obc.status != ApiKeyStatus::Enabled {
+                return Err(DbError::ApiKeyDisabled);
+            }
+        }
+        Ok(result)
     }
 
     pub async fn create(

@@ -1,8 +1,7 @@
 use crate::types::success::ApiResponseData;
-use crate::State;
 use crate::{auth::key_context::ob_public_key::PublicTenantAuthContext, errors::ApiError};
 use newtypes::DataKind;
-use paperclip::actix::{api_v2_operation, get, web, web::Json, Apiv2Schema};
+use paperclip::actix::{api_v2_operation, get, web::Json, Apiv2Schema};
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
@@ -18,7 +17,6 @@ struct PublicOnboardingConfigResponse {
 #[get("/config")]
 /// Uses tenant public key auth to return information about the tenant
 fn get(
-    _state: web::Data<State>,
     auth: PublicTenantAuthContext,
 ) -> actix_web::Result<Json<ApiResponseData<PublicOnboardingConfigResponse>>, ApiError> {
     let tenant = auth.tenant;

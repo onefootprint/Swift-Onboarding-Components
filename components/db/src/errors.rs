@@ -61,6 +61,9 @@ pub enum DbError {
 
     #[error("crypto error: {0}")]
     CryptoError(#[from] crypto::Error),
+
+    #[error("This API key is disabled")]
+    ApiKeyDisabled,
 }
 
 impl DbError {

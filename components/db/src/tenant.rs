@@ -1,10 +1,8 @@
 use crate::errors::DbError;
-use crate::models::tenant_api_keys::*;
 use crate::models::tenants::*;
 use crate::schema;
 use crate::DbPool;
 use diesel::prelude::*;
-use newtypes::Fingerprint;
 use newtypes::TenantId;
 
 pub async fn get_opt_by_workos_profile_id(
@@ -51,22 +49,4 @@ pub async fn get_tenant(pool: &DbPool, tenant_id: TenantId) -> Result<Tenant, Db
         .await??;
 
     Ok(tenant)
-}
-
-pub async fn secret_auth(
-    pool: &DbPool,
-    sh_api_key: Fingerprint,
-) -> Result<Option<(Tenant, TenantApiKey)>, DbError> {
-    let result = pool
-        .db_query(move |conn| -> Result<Option<(Tenant, TenantApiKey)>, DbError> {
-            let result: Option<(Tenant, TenantApiKey)> = schema::tenants::table
-                .inner_join(schema::tenant_api_keys::table)
-                .filter(schema::tenant_api_keys::sh_secret_api_key.eq(sh_api_key))
-                .first(conn)
-                .optional()?;
-            Ok(result)
-        })
-        .await??;
-
-    Ok(result)
 }
