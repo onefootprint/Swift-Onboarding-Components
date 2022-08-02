@@ -14,15 +14,14 @@ type HeroProps = {
 const Hero = ({ title, subtitle, cta }: HeroProps) => (
   <Container>
     <Typography
-      color="primary"
       variant="display-1"
       as="h1"
-      sx={{ maxWidth: '700px', marginBottom: 5 }}
+      sx={{ maxWidth: '830px', marginBottom: 5 }}
     >
       {title}
     </Typography>
     <Typography
-      color="primary"
+      color="secondary"
       variant="display-4"
       as="h2"
       sx={{ maxWidth: '830px', marginBottom: 9 }}

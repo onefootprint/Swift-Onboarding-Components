@@ -1,10 +1,9 @@
 import { useTranslation } from 'hooks';
 import Head from 'next/head';
 import React from 'react';
+import FaqItem from 'src/components/faq-item';
 import styled, { css } from 'styled-components';
 import { Button, media, Typography } from 'ui';
-
-import FaqItem from './components/faq-item';
 
 const Faq = () => {
   const { t } = useTranslation('pages.faq');
@@ -56,14 +55,14 @@ const Faq = () => {
         <title>{t('html-title')}</title>
       </Head>
       <Container>
-        <TitleContainer>
+        <HeroContainer>
           <Typography variant="display-1" as="h1">
             {t('title')}
           </Typography>
-          <Typography variant="display-4" as="h2">
+          <Typography variant="display-4" as="h2" color="secondary">
             {t('subtitle')}
           </Typography>
-        </TitleContainer>
+        </HeroContainer>
         <QuestionsContainer>
           {items.map(({ id, title, content }) => {
             const isContentArray = Array.isArray(content);
@@ -104,7 +103,7 @@ const Container = styled.div`
   `}
 `;
 
-const TitleContainer = styled.div`
+const HeroContainer = styled.div`
   ${({ theme }) => css`
     display: grid;
     gap: ${theme.spacing[5]}px;

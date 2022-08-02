@@ -19,8 +19,8 @@ const FaqItem = ({ title, content }: FaqItemProps) => {
   };
 
   return (
-    <Details open={open}>
-      <Summary onClick={handleClick}>
+    <Details open={open} onClick={handleClick}>
+      <Summary>
         <Typography variant="label-1">{title}</Typography>
         <div>{open ? <IcoMinusSmall24 /> : <IcoPlusSmall24 />}</div>
       </Summary>
@@ -43,7 +43,6 @@ const Details = styled.details`
 const Summary = styled.summary`
   ${({ theme }) => css`
     align-items: center;
-    cursor: pointer;
     display: flex;
     gap: ${theme.spacing[3]}px;
     justify-content: space-between;

@@ -110,14 +110,14 @@ const Company = () => {
         <title>{t('html-title')}</title>
       </Head>
       <Container>
-        <TitleContainer>
+        <HeroContainer>
           <Typography variant="display-1" as="h1" sx={{ marginBottom: 5 }}>
             {t('title')}
           </Typography>
-          <Typography variant="display-4" as="h2">
+          <Typography variant="display-4" as="h2" color="secondary">
             {t('subtitle')}
           </Typography>
-        </TitleContainer>
+        </HeroContainer>
         <ValuesContainer>
           <Values
             title={t('values.title')}
@@ -150,7 +150,7 @@ const Container = styled.div`
   `}
 `;
 
-const TitleContainer = styled.section`
+const HeroContainer = styled.div`
   ${({ theme }) => css`
     margin: 0 auto ${theme.spacing[10]}px;
     max-width: 700px;
