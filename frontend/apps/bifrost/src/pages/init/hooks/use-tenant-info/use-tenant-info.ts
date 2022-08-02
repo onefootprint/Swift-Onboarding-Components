@@ -24,7 +24,7 @@ const getTenantInfo = async (payload: TenantInfoRequest) => {
   const { data: response } = await request<RequestResponse<TenantInfoResponse>>(
     {
       method: 'GET',
-      url: '/org/config',
+      url: '/org/onboarding_config',
       headers: {
         [CLIENT_PUBLIC_KEY_HEADER]: payload.tenantPk,
       },
