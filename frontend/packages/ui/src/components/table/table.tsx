@@ -36,7 +36,7 @@ const Table = <T,>({
   const shouldShowData = !isLoading && items;
 
   return (
-    <TableContainer id="rafael">
+    <TableContainer>
       <thead>
         <tr>
           {columns.map(column => (

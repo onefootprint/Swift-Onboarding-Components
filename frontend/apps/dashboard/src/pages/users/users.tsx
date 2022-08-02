@@ -51,17 +51,19 @@ const Users = () => {
       <HeaderContainer>
         <Typography variant="heading-2">Users</Typography>
       </HeaderContainer>
-      <StyledSearchInput
-        placeholder="Search (exact match)..."
-        suffixElement={<UsersFilter />}
-        value={searchText}
-        inputSize="large"
-        onChangeText={(text: string) =>
-          setFilter({
-            fingerprint: text,
-          })
-        }
-      />
+      <TableSearch>
+        <StyledSearchInput
+          placeholder="Search (exact match)..."
+          suffixElement={<UsersFilter />}
+          value={searchText}
+          inputSize="large"
+          onChangeText={(text: string) =>
+            setFilter({
+              fingerprint: text,
+            })
+          }
+        />
+      </TableSearch>
       <Table
         items={users}
         isLoading={isLoading}
@@ -129,6 +131,21 @@ const HeaderContainer = styled.div`
   ${({ theme }) => css`
     margin-bottom: ${theme.spacing[5]}px;
   `};
+`;
+
+const TableSearch = styled.div`
+  + table {
+    border-radius: 0;
+
+    th {
+      border-top: none;
+    }
+
+    th:first-child,
+    th:last-child {
+      border-radius: 0;
+    }
+  }
 `;
 
 const StyledSearchInput = styled(SearchInput)`
