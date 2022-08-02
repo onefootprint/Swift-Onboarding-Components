@@ -51,7 +51,6 @@ export default class MyDocument extends Document {
             name="keywords"
             content="footprint,foot,print,id,onefootprint,identity,kyc,verify,security"
           />
-          <link rel="canonical" href="https://www.onefootprint.com" />
           <meta
             property="og:image"
             content="https://onefootprint.com/cover.png"
