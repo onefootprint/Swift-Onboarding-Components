@@ -136,7 +136,7 @@ class TestDashboard:
         assert ob_config["status"] == new_status
 
         # Verify we can't use the disabled ob config for anything anymore
-        get("org/config", None, ob_configuration.key, status_code=401)
+        get("org/onboarding_config", None, ob_configuration.key, status_code=401)
 
     def test_api_key_list(self, secret_key):
         body = get("org/api_keys", None, secret_key.key)

@@ -1,3 +1,4 @@
+use crate::auth::key_context::ob_public_key::PublicTenantAuthContext;
 use crate::auth::key_context::secret_key::SecretTenantAuthContext;
 use crate::auth::session_data::workos::WorkOsSession;
 use crate::auth::Either;
@@ -16,13 +17,25 @@ use paperclip::actix::Apiv2Schema;
 use paperclip::actix::{api_v2_operation, get, patch, web, web::Json};
 
 #[api_v2_operation(tags(Org))]
-#[get("/onboarding_configs")]
 /// Uses tenant public key auth to return information about the tenant
+pub fn get_detail(
+    auth: PublicTenantAuthContext,
+) -> actix_web::Result<Json<ApiResponseData<ApiObConfig>>, ApiError> {
+    Ok(Json(ApiResponseData::ok(ApiObConfig::from((
+        auth.ob_config,
+        auth.tenant,
+    )))))
+}
+
+#[api_v2_operation(tags(Org))]
+#[get("/onboarding_configs")]
+/// Return a list of onboarding configurations owned by the tenant
 async fn get(
     state: web::Data<State>,
     auth: Either<SessionContext<WorkOsSession>, SecretTenantAuthContext>,
 ) -> actix_web::Result<Json<ApiResponseData<Vec<ApiObConfig>>>, ApiError> {
     let is_live = auth.is_live()?;
+    let tenant = auth.tenant(&state.db_pool).await?;
     let configs = state
         .db_pool
         .db_query(move |conn| ObConfiguration::list_for_tenant(conn, &auth.tenant_id(), is_live))
@@ -31,6 +44,7 @@ async fn get(
     Ok(Json(ApiResponseData::ok(
         configs
             .into_iter()
+            .map(|x| (x, tenant.clone()))
             .map(ApiObConfig::from)
             .collect::<Vec<ApiObConfig>>(),
     )))
@@ -45,12 +59,13 @@ pub struct CreateOnboardingConfigurationRequest {
 }
 
 #[api_v2_operation(tags(Org))]
-/// Uses tenant public key auth to return information about the tenant
+/// Create a new onboarding configuration
 pub fn post(
     state: web::Data<State>,
     auth: Either<SessionContext<WorkOsSession>, SecretTenantAuthContext>,
     request: Json<CreateOnboardingConfigurationRequest>,
 ) -> actix_web::Result<Json<ApiResponseData<ApiObConfig>>, ApiError> {
+    let tenant = auth.tenant(&state.db_pool).await?;
     let CreateOnboardingConfigurationRequest {
         name,
         must_collect_data_kinds,
@@ -67,7 +82,7 @@ pub fn post(
     )
     .await?;
 
-    Ok(Json(ApiResponseData::ok(ApiObConfig::from(obc))))
+    Ok(Json(ApiResponseData::ok(ApiObConfig::from((obc, tenant)))))
 }
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
@@ -83,7 +98,7 @@ struct UpdateObConfigRequest {
 
 #[api_v2_operation(tags(Org))]
 #[patch("/onboarding_configs/{id}")]
-/// Uses tenant public key auth to return information about the tenant
+/// Update an existing onboarding configuration
 async fn patch(
     state: web::Data<State>,
     auth: Either<SessionContext<WorkOsSession>, SecretTenantAuthContext>,
