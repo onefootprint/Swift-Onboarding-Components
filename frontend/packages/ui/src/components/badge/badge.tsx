@@ -21,6 +21,7 @@ const Badge = styled.span.attrs<BadgeProps>(({ testID }) => ({
     color: ${theme.color[variant]};
     padding: ${theme.spacing[2]}px ${theme.spacing[3]}px;
     text-decoration: none;
+    text-transform: capitalize;
   `}
 `;
 

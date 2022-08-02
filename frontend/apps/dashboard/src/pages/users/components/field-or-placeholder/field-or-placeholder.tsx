@@ -1,5 +1,5 @@
 import React from 'react';
-import EncryptedCell from 'src/pages/users/components/encrypted-cell';
+import EncryptedCell from 'src/components/encrypted-cell';
 import { Shimmer, Typography } from 'ui';
 
 import { UserData } from '../../hooks/use-user-data';

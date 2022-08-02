@@ -4,18 +4,15 @@ import { useForm } from 'react-hook-form';
 import styled from 'styled-components';
 import { Dialog, TextInput } from 'ui';
 
-type CreateSecretKeyDialogProps = {
+type CreateApiKeyDialogProps = {
   open: boolean;
   onClose: () => void;
 };
 
 type FormData = { name: string };
 
-const CreateSecretKeyDialog = ({
-  open,
-  onClose,
-}: CreateSecretKeyDialogProps) => {
-  const { t } = useTranslation('pages.developers.secret-keys.create');
+const CreateApiKeyDialog = ({ open, onClose }: CreateApiKeyDialogProps) => {
+  const { t } = useTranslation('pages.developers.api-keys.create');
   const {
     reset,
     register,
@@ -70,4 +67,4 @@ const CreateSecretKeyDialog = ({
 
 const Form = styled.form``;
 
-export default CreateSecretKeyDialog;
+export default CreateApiKeyDialog;

@@ -2,6 +2,7 @@ import { Property } from 'csstype';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
+import { createFontStyles } from '../../utils';
 import LoadingIndicator from '../loading-indicator';
 import Typography from '../typography';
 
@@ -11,6 +12,7 @@ export type TableRow<T> = {
 };
 
 export type TableProps<T> = {
+  loadingAriaLabel?: string;
   columns: { text: string; width?: Property.Width }[];
   renderTr: (row: TableRow<T>) => JSX.Element;
   getKeyForRow: (item: T) => string;
@@ -21,6 +23,7 @@ export type TableProps<T> = {
 };
 
 const Table = <T,>({
+  loadingAriaLabel = 'Loading...',
   columns,
   renderTr,
   getKeyForRow,
@@ -33,14 +36,12 @@ const Table = <T,>({
   const shouldShowData = !isLoading && items;
 
   return (
-    <TableContainer>
+    <TableContainer id="rafael">
       <thead>
         <tr>
           {columns.map(column => (
-            <th key={column.text} style={{ width: column.width || undefined }}>
-              <Typography variant="caption-2" color="secondary">
-                {column.text}
-              </Typography>
+            <th key={column.text} style={{ width: column.width }}>
+              {column.text}
             </th>
           ))}
         </tr>
@@ -49,7 +50,7 @@ const Table = <T,>({
         {isLoading && (
           <LoadingTr>
             <td colSpan={columns.length}>
-              <LoadingIndicator />
+              <LoadingIndicator aria-label={loadingAriaLabel} />
             </td>
           </LoadingTr>
         )}
@@ -63,9 +64,10 @@ const Table = <T,>({
         {shouldShowData &&
           items.map((item: T, index: Number) => (
             <Tr
-              onClick={onRowClick && (() => onRowClick(item))}
-              key={getKeyForRow(item)}
+              data-testid={getKeyForRow(item)}
               isRowClickable={!!onRowClick}
+              key={getKeyForRow(item)}
+              onClick={onRowClick && (() => onRowClick(item))}
             >
               {renderTr({ index, item })}
             </Tr>
@@ -89,6 +91,8 @@ const TableContainer = styled.table`
 
   ${({ theme }) => css`
     td {
+      ${createFontStyles('body-3')};
+      color: ${theme.color.primary};
       padding: ${theme.spacing[4]}px ${theme.spacing[6]}px;
     }
 
@@ -100,11 +104,14 @@ const TableContainer = styled.table`
 
   th {
     ${({ theme }) => css`
+      ${createFontStyles('caption-2')};
       background-color: ${theme.backgroundColor.secondary};
       border-top: 1px solid ${theme.borderColor.tertiary};
+      color: ${theme.color.secondary};
       padding: ${theme.spacing[4]}px ${theme.spacing[6]}px;
+      position: sticky;
       text-transform: uppercase;
-      user-select: none;
+      top: 0;
 
       &:first-child {
         border-top-left-radius: ${theme.borderRadius[2]}px;

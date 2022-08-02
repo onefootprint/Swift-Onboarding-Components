@@ -41,7 +41,7 @@ export const isLogoutError = (error: unknown) => {
 };
 
 export const getErrorMessage = (error: RequestError): string =>
-  error.response?.data.error.message || error.message;
+  error.response?.data?.error?.message || error.message;
 
 const request = <TData = any>(requestConfig: AxiosRequestConfig = {}) => {
   const client = applyCaseMiddleware(axios.create());

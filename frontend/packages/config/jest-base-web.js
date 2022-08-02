@@ -1,3 +1,5 @@
+process.env.TZ = 'UTC';
+
 module.exports = {
   resetMocks: true,
   moduleDirectories: ['node_modules', '<rootDir>'],

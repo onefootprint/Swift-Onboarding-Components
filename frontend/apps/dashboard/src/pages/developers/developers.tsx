@@ -5,8 +5,8 @@ import useSandboxMode from 'src/hooks/use-sandbox-mode';
 import styled, { css } from 'styled-components';
 import { Box, Typography } from 'ui';
 
+import ApiKeys from './components/api-keys';
 import OnboardingConfigurations from './components/onboarding-configurations';
-import SecretKeys from './components/secret-keys';
 
 const Developers = () => {
   const { t } = useTranslation('pages.developers');
@@ -31,7 +31,7 @@ const Developers = () => {
         </Typography>
       </Header>
       <Box sx={{ marginBottom: 9 }}>
-        <SecretKeys />
+        <ApiKeys />
       </Box>
       <Box>
         <OnboardingConfigurations />
