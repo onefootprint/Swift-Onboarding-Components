@@ -65,6 +65,7 @@ const PageContainer = styled.div`
   height: 100%;
   width: 100%;
   justify-content: space-between;
+  background: linear-gradient(180deg, #fafffb 0%, #ffffff 100%);
 `;
 
 const SectionContainer = styled.div`

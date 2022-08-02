@@ -3,7 +3,7 @@ import IcoUser24 from 'icons/ico/ico-user-24';
 import React from 'react';
 import useSessionUser from 'src/hooks/use-session-user';
 import styled, { css } from 'styled-components';
-import { IconButton, media, Typography } from 'ui';
+import { Container, IconButton, Typography } from 'ui';
 
 const Header = () => {
   const { logOut } = useSessionUser();
@@ -14,32 +14,29 @@ const Header = () => {
 
   return (
     <Container>
-      <FootprintLogoContainer>
-        <IcoFootprint24 />
-        <Typography sx={{ marginLeft: 2 }} variant="display-4">
-          Footprint
-        </Typography>
-      </FootprintLogoContainer>
-      <IconButton
-        iconComponent={IcoUser24}
-        onClick={handleClick}
-        aria-label="account"
-      />
+      <Inner>
+        <FootprintLogoContainer>
+          <IcoFootprint24 />
+          <Typography sx={{ marginLeft: 2 }} variant="display-4">
+            Footprint
+          </Typography>
+        </FootprintLogoContainer>
+        <IconButton
+          iconComponent={IcoUser24}
+          onClick={handleClick}
+          aria-label="account"
+        />
+      </Inner>
     </Container>
   );
 };
 
-const Container = styled.div`
+const Inner = styled.div`
   ${({ theme }) => css`
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: ${theme.spacing[4]}px ${theme.spacing[7]}px;
-
-    ${media.greaterThan('sm')`
-      margin-left: ${theme.spacing[10]}px;
-      margin-right: ${theme.spacing[10]}px;
-    `}
   `}
 `;
 

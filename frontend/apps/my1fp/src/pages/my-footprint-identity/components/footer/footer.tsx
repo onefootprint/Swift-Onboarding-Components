@@ -1,6 +1,6 @@
 import React from 'react';
 import styled, { css } from 'styled-components';
-import { media, Typography } from 'ui';
+import { Container, media, Typography } from 'ui';
 
 import EncryptedByFootprint from './components/encrypted-by-footprint';
 import type { Link } from './footer.types';
@@ -23,23 +23,25 @@ const Footer = () => {
 
   return (
     <Container>
-      <EncryptedByFootprint />
-      <LinksContainer>
-        {links.map(({ href, label }) => (
-          <li key={label}>
-            <a href={href} target="_blank" rel="noreferrer">
-              <Typography variant="body-4" color="tertiary" as="span">
-                {label}
-              </Typography>
-            </a>
-          </li>
-        ))}
-      </LinksContainer>
+      <Inner>
+        <EncryptedByFootprint />
+        <LinksContainer>
+          {links.map(({ href, label }) => (
+            <li key={label}>
+              <a href={href} target="_blank" rel="noreferrer">
+                <Typography variant="body-4" color="tertiary" as="span">
+                  {label}
+                </Typography>
+              </a>
+            </li>
+          ))}
+        </LinksContainer>
+      </Inner>
     </Container>
   );
 };
 
-const Container = styled.div`
+const Inner = styled.div`
   ${({ theme }) => css`
     display: flex;
     justify-content: space-between;
@@ -50,7 +52,7 @@ const Container = styled.div`
       margin-top: ${theme.spacing[3]}px;
     }
 
-    ${media.greaterThan('sm')`
+    ${media.greaterThan('md')`
       flex-direction: row;
       margin-left: ${theme.spacing[10]}px;
       margin-right: ${theme.spacing[10]}px;
