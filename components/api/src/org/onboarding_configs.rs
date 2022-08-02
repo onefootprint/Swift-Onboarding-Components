@@ -9,8 +9,6 @@ use crate::types::success::ApiResponseData;
 use crate::State;
 use db::models::ob_configurations::ObConfiguration;
 use newtypes::DataKind;
-use newtypes::ObConfigurationId;
-use newtypes::ObConfigurationKey;
 use paperclip::actix::Apiv2Schema;
 use paperclip::actix::{api_v2_operation, get, web, web::Json};
 
@@ -43,23 +41,13 @@ pub struct CreateOnboardingConfigurationRequest {
     can_access_data_kinds: Vec<DataKind>,
 }
 
-#[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize, Apiv2Schema)]
-#[serde(rename_all = "snake_case")]
-pub struct CreateOnboardingConfigurationResponse {
-    id: ObConfigurationId,
-    publishable_key: ObConfigurationKey,
-    name: String,
-    must_collect_data_kinds: Vec<DataKind>,
-    can_access_data_kinds: Vec<DataKind>,
-}
-
 #[api_v2_operation(tags(Org))]
 /// Uses tenant public key auth to return information about the tenant
 pub fn post(
     state: web::Data<State>,
     auth: Either<SessionContext<WorkOsSession>, SecretTenantAuthContext>,
     request: Json<CreateOnboardingConfigurationRequest>,
-) -> actix_web::Result<Json<ApiResponseData<CreateOnboardingConfigurationResponse>>, ApiError> {
+) -> actix_web::Result<Json<ApiResponseData<ApiObConfig>>, ApiError> {
     let CreateOnboardingConfigurationRequest {
         name,
         must_collect_data_kinds,
@@ -76,13 +64,5 @@ pub fn post(
     )
     .await?;
 
-    Ok(Json(ApiResponseData {
-        data: CreateOnboardingConfigurationResponse {
-            id: obc.id,
-            name: obc.name,
-            must_collect_data_kinds: obc.must_collect_data_kinds.clone(),
-            can_access_data_kinds: obc.can_access_data_kinds,
-            publishable_key: obc.key,
-        },
-    }))
+    Ok(Json(ApiResponseData::ok(ApiObConfig::from(obc))))
 }

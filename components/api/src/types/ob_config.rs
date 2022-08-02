@@ -1,10 +1,11 @@
 use chrono::{DateTime, Utc};
 use db::models::ob_configurations::ObConfiguration;
-use newtypes::{ApiKeyStatus, DataKind, ObConfigurationKey};
+use newtypes::{ApiKeyStatus, DataKind, ObConfigurationId, ObConfigurationKey};
 use paperclip::actix::Apiv2Schema;
 
 #[derive(Debug, Clone, serde::Serialize, Apiv2Schema)]
 pub struct ApiObConfig {
+    id: ObConfigurationId,
     key: ObConfigurationKey,
     name: String,
     must_collect_data_kinds: Vec<DataKind>,
@@ -17,6 +18,7 @@ pub struct ApiObConfig {
 impl From<ObConfiguration> for ApiObConfig {
     fn from(s: ObConfiguration) -> Self {
         let ObConfiguration {
+            id,
             key,
             name,
             created_at,
@@ -27,6 +29,7 @@ impl From<ObConfiguration> for ApiObConfig {
             ..
         } = s;
         Self {
+            id,
             key,
             name,
             must_collect_data_kinds,

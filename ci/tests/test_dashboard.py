@@ -6,6 +6,7 @@ from tests.constants import EMAIL, FIELDS_TO_DECRYPT
 from tests.utils import get, post, patch
 from .auth import (
     TenantSecretAuth,
+    TenantAuth,
 )
 
 
@@ -14,6 +15,15 @@ class SecretKey(NamedTuple):
     id: str
     name: str
     status: str
+
+
+class ObConfiguration(NamedTuple):
+    key: TenantAuth
+    id: str
+    name: str
+    status: str
+    must_collect_data_kinds: list
+    can_access_data_kinds: list
 
 
 @pytest.fixture(scope="session")
@@ -26,6 +36,25 @@ def secret_key(workos_sandbox_tenant):
         body["data"]["id"],
         body["data"]["name"],
         body["data"]["status"],
+    )
+
+
+@pytest.fixture(scope="session")
+def ob_configuration(workos_sandbox_tenant, must_collect_data_kinds, can_access_data_kinds):
+    data = dict(
+        name="Test OB config",
+        must_collect_data_kinds=must_collect_data_kinds,
+        can_access_data_kinds=can_access_data_kinds,
+    )
+    body = post("org/onboarding_configs", data, workos_sandbox_tenant.sk)
+    client_public_key = TenantAuth(body["data"]["key"])
+    return ObConfiguration(
+        client_public_key,
+        body["data"]["id"],
+        body["data"]["name"],
+        body["data"]["status"],
+        body["data"]["must_collect_data_kinds"],
+        body["data"]["can_access_data_kinds"],
     )
 
 
@@ -103,17 +132,17 @@ class TestDashboard:
         body = get("org/access_events", params, tenant.sk)
         assert not body["data"]
 
-    def test_config_list(self, workos_sandbox_tenant):
+    def test_config_list(self, workos_sandbox_tenant, ob_configuration):
         body = get("org/onboarding_configs", None, workos_sandbox_tenant.sk)
-        configs = body["data"]
-        # TODO better tests when we aren't making a new config for every request
-        config = configs[0]
-        assert config["key"]
-        assert config["name"]
-        assert config["must_collect_data_kinds"]
-        assert config["can_access_data_kinds"]
+        config = next (
+            config for config in body["data"] if config["id"] == ob_configuration.id
+        )
+        assert config["key"] == ob_configuration.key.token
+        assert config["name"] == ob_configuration.name
+        assert config["must_collect_data_kinds"] == ob_configuration.must_collect_data_kinds
+        assert config["can_access_data_kinds"] == ob_configuration.can_access_data_kinds
+        assert config["status"] == ob_configuration.status
         assert config["created_at"]
-        assert config["status"]
 
     def test_api_key_list(self, secret_key):
         body = get("org/api_keys", None, secret_key.key)

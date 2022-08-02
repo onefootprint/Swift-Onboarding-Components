@@ -80,7 +80,7 @@ def create_tenant(org_data, ob_conf_data):
     print(body)
 
     body = post("org/onboarding_configs", ob_conf_data, client_secret_key)
-    client_public_key = TenantAuth(body["data"]["publishable_key"])
+    client_public_key = TenantAuth(body["data"]["key"])
     ob_config_id = body["data"]["id"]
     print("\n======org onboarding info======")
     print(body)
