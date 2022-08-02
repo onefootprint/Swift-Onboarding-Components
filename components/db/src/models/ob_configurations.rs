@@ -42,6 +42,13 @@ struct NewObConfiguration {
     created_at: DateTime<Utc>,
 }
 
+#[derive(AsChangeset)]
+#[diesel(table_name = ob_configurations)]
+struct ObConfigurationUpdate {
+    name: Option<String>,
+    status: Option<ApiKeyStatus>,
+}
+
 impl ObConfiguration {
     pub fn list_for_tenant(
         conn: &mut PgConnection,
@@ -118,5 +125,27 @@ impl ObConfiguration {
             })
             .await??;
         Ok(obc)
+    }
+
+    pub fn update(
+        conn: &mut PgConnection,
+        id: ObConfigurationId,
+        tenant_id: TenantId,
+        is_live: bool,
+        name: Option<String>,
+        status: Option<ApiKeyStatus>,
+    ) -> Result<usize, DbError> {
+        let update = ObConfigurationUpdate { name, status };
+        let num_updates = diesel::update(ob_configurations::table)
+            .filter(ob_configurations::id.eq(id))
+            .filter(ob_configurations::tenant_id.eq(tenant_id))
+            .filter(ob_configurations::is_live.eq(is_live))
+            .set(update)
+            .execute(conn)?;
+
+        if num_updates == 0 {
+            return Err(DbError::UpdateTargetNotFound);
+        }
+        Ok(num_updates)
     }
 }

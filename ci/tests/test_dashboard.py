@@ -144,6 +144,26 @@ class TestDashboard:
         assert config["status"] == ob_configuration.status
         assert config["created_at"]
 
+    def test_config_update(self, workos_sandbox_tenant, ob_configuration):
+        # Test failing to update
+        new_name = "Updated ob config name"
+        new_status = "disabled"
+        data = dict(name=new_name, status=new_status)
+        patch(f"org/onboarding_configs/flerpderp", data, workos_sandbox_tenant.sk, status_code=404)
+
+        # Update the name and status
+        patch(f"org/onboarding_configs/{ob_configuration.id}", data, workos_sandbox_tenant.sk)
+
+        # Verify the update
+        body = get(f"org/onboarding_configs", None, workos_sandbox_tenant.sk)
+        configs = body["data"]
+        ob_config = next(
+            i for i in configs
+            if i["id"] == ob_configuration.id
+        )
+        assert ob_config["name"] == new_name
+        assert ob_config["status"] == new_status
+
     def test_api_key_list(self, secret_key):
         body = get("org/api_keys", None, secret_key.key)
         key = next(

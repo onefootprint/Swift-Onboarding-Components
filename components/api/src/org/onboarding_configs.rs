@@ -6,11 +6,14 @@ use crate::auth::{HasTenant, SessionContext};
 use crate::errors::ApiError;
 use crate::types::ob_config::ApiObConfig;
 use crate::types::success::ApiResponseData;
+use crate::types::Empty;
 use crate::State;
 use db::models::ob_configurations::ObConfiguration;
+use newtypes::ApiKeyStatus;
 use newtypes::DataKind;
+use newtypes::ObConfigurationId;
 use paperclip::actix::Apiv2Schema;
-use paperclip::actix::{api_v2_operation, get, web, web::Json};
+use paperclip::actix::{api_v2_operation, get, patch, web, web::Json};
 
 #[api_v2_operation(tags(Org))]
 #[get("/onboarding_configs")]
@@ -65,4 +68,36 @@ pub fn post(
     .await?;
 
     Ok(Json(ApiResponseData::ok(ApiObConfig::from(obc))))
+}
+
+#[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
+struct UpdateObConfigPath {
+    id: ObConfigurationId,
+}
+
+#[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
+struct UpdateObConfigRequest {
+    name: Option<String>,
+    status: Option<ApiKeyStatus>,
+}
+
+#[api_v2_operation(tags(Org))]
+#[patch("/onboarding_configs/{id}")]
+/// Uses tenant public key auth to return information about the tenant
+async fn patch(
+    state: web::Data<State>,
+    auth: Either<SessionContext<WorkOsSession>, SecretTenantAuthContext>,
+    path: web::Path<UpdateObConfigPath>,
+    request: web::Json<UpdateObConfigRequest>,
+) -> actix_web::Result<Json<ApiResponseData<Empty>>, ApiError> {
+    let tenant = auth.tenant(&state.db_pool).await?;
+    let is_live = auth.is_live()?;
+    let UpdateObConfigPath { id } = path.into_inner();
+    let UpdateObConfigRequest { name, status } = request.into_inner();
+    state
+        .db_pool
+        .db_query(move |conn| ObConfiguration::update(conn, id, tenant.id, is_live, name, status))
+        .await??;
+
+    Ok(Json(ApiResponseData::ok(Empty {})))
 }
