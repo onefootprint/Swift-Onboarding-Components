@@ -10,7 +10,6 @@ import Layout from '../components/layout';
 import MDXProvider from '../components/mdx-provider';
 import { FATHOM_TRACKING_CODE } from '../config/constants';
 import configureReactI18next from '../config/initializers/react-i18next';
-import useFathomAnalytics from '../hooks/use-fathom-analytics';
 
 configureReactI18next();
 
@@ -21,27 +20,25 @@ type AppProps = {
 
 const GlobalStyle = createGlobalStyle``;
 
-const App = ({ Component, pageProps }: AppProps) => {
-  useFathomAnalytics();
-
-  return (
-    <>
-      {FATHOM_TRACKING_CODE && (
-        <Script
-          data-site={FATHOM_TRACKING_CODE}
-          defer
-          src="https://cdn.usefathom.com/script.js"
-        />
-      )}
-      <DesignSystemProvider theme={themes.light}>
-        <GlobalStyle />
-        <Layout>
-          <MDXProvider>
-            <Component {...pageProps} />
-          </MDXProvider>
-        </Layout>
-      </DesignSystemProvider>
-    </>
-  );
-};
+const App = ({ Component, pageProps }: AppProps) => (
+  <>
+    {FATHOM_TRACKING_CODE && (
+      <Script
+        data-canonical="false"
+        data-site={FATHOM_TRACKING_CODE}
+        data-spa="auto"
+        defer
+        src="https://cdn.usefathom.com/script.js"
+      />
+    )}
+    <DesignSystemProvider theme={themes.light}>
+      <GlobalStyle />
+      <Layout>
+        <MDXProvider>
+          <Component {...pageProps} />
+        </MDXProvider>
+      </Layout>
+    </DesignSystemProvider>
+  </>
+);
 export default App;
