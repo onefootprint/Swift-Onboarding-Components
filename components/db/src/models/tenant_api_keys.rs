@@ -20,6 +20,13 @@ pub struct TenantApiKey {
     pub created_at: DateTime<Utc>,
 }
 
+#[derive(AsChangeset)]
+#[diesel(table_name = tenant_api_keys)]
+struct TenantApiKeyUpdate {
+    name: Option<String>,
+    status: Option<ApiKeyStatus>,
+}
+
 impl TenantApiKey {
     pub fn list(
         conn: &mut PgConnection,
@@ -73,6 +80,28 @@ impl TenantApiKey {
             .await??;
 
         Ok(tenant_api_key)
+    }
+
+    pub fn update(
+        conn: &mut PgConnection,
+        id: TenantApiKeyId,
+        tenant_id: TenantId,
+        is_live: bool,
+        name: Option<String>,
+        status: Option<ApiKeyStatus>,
+    ) -> Result<usize, DbError> {
+        let update = TenantApiKeyUpdate { name, status };
+        let num_updates = diesel::update(tenant_api_keys::table)
+            .filter(tenant_api_keys::id.eq(id))
+            .filter(tenant_api_keys::tenant_id.eq(tenant_id))
+            .filter(tenant_api_keys::is_live.eq(is_live))
+            .set(update)
+            .execute(conn)?;
+
+        if num_updates == 0 {
+            return Err(DbError::UpdateTargetNotFound);
+        }
+        Ok(num_updates)
     }
 }
 

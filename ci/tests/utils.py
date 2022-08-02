@@ -50,6 +50,16 @@ def post(path, data=None, *auths, status_code=200):
         auths=auths,
     )
 
+def patch(path, data=None, *auths, status_code=200):
+    return _make_request(
+        method=requests.patch,
+        path=path,
+        data=data,
+        params=None,
+        status_code=status_code,
+        auths=auths,
+    )
+
 def try_until_success(fn, timeout_s=5, retry_interval_s=1):
     start_time = arrow.now()
     last_exception = None
@@ -65,13 +75,9 @@ def try_until_success(fn, timeout_s=5, retry_interval_s=1):
 def create_tenant(org_data, ob_conf_data):
     body = post("private/client", org_data, CUSTODIAN_AUTH)
     client_secret_key = TenantSecretAuth(body["data"]["api_key"])
+    client_secret_key_id = body["data"]["api_key_id"]
     print("\n======org info======")
     print(body)
-
-    data = dict(name="Test secret key")
-    body = post("org/api_keys", data, client_secret_key)
-    client_secret_key = TenantSecretAuth(body["data"]["key"])
-    client_secret_key_id = body["data"]["id"]
 
     body = post("org/onboarding_configs", ob_conf_data, client_secret_key)
     client_public_key = TenantAuth(body["data"]["publishable_key"])

@@ -10,6 +10,6 @@ pub fn routes() -> web::Scope {
                 .route(web::post().to(index::post))
                 .route(web::get().to(index::get)),
         )
-        .service(web::resource("").route(web::get().to(index::get)))
+        .service(index::patch)
         .service(reveal::get)
 }

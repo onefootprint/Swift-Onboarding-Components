@@ -1,7 +1,32 @@
-from urllib.parse import quote
 import arrow
+import pytest
+from urllib.parse import quote
+from typing import NamedTuple
 from tests.constants import EMAIL, FIELDS_TO_DECRYPT
-from tests.utils import get, post
+from tests.utils import get, post, patch
+from .auth import (
+    TenantSecretAuth,
+)
+
+
+class SecretKey(NamedTuple):
+    key: TenantSecretAuth
+    id: str
+    name: str
+    status: str
+
+
+@pytest.fixture(scope="session")
+def secret_key(workos_sandbox_tenant):
+    data = dict(name="Test secret key")
+    body = post("org/api_keys", data, workos_sandbox_tenant.sk)
+    client_secret_key = TenantSecretAuth(body["data"]["key"])
+    return SecretKey(
+        client_secret_key,
+        body["data"]["id"],
+        body["data"]["name"],
+        body["data"]["status"],
+    )
 
 
 class TestDashboard:
@@ -90,19 +115,35 @@ class TestDashboard:
         assert config["created_at"]
         assert config["status"]
 
-    def test_api_key_list(self, workos_sandbox_tenant):
-        body = get("org/api_keys", None, workos_sandbox_tenant.sk)
-        keys = body["data"]
-        # TODO better tests when we aren't making a new key for every request
-        key = keys[0]
-        assert key["id"]
-        assert key["name"]
-        assert key["status"]
+    def test_api_key_list(self, secret_key):
+        body = get("org/api_keys", None, secret_key.key)
+        key = next(
+            key
+            for key in body["data"] if key["id"] == secret_key.id
+        )
+        assert key["name"] == secret_key.name
+        assert key["status"] == secret_key.status
         assert key["created_at"]
         assert not key["key"]
 
-    def test_api_key_reveal(self, workos_sandbox_tenant):
-        body = get(f"org/api_keys/{workos_sandbox_tenant.sk_id}/reveal", None, workos_sandbox_tenant.sk)
+    def test_api_key_reveal(self, secret_key):
+        body = get(f"org/api_keys/{secret_key.id}/reveal", None, secret_key.key)
         key = body["data"]
-        assert key["key"] == workos_sandbox_tenant.sk.token
+        assert key["key"] == secret_key.key.token
+        assert key["status"] == "enabled"
         assert key["name"] == "Test secret key"
+
+    def test_api_key_update(self, secret_key):
+        # Test failing to update
+        new_name = "Updated secret key name"
+        new_status = "disabled"
+        data = dict(name=new_name, status=new_status)
+        patch(f"org/api_keys/flerpderp", data, secret_key.key, status_code=404)
+
+        # Update the name and status
+        patch(f"org/api_keys/{secret_key.id}", data, secret_key.key)
+
+        # Verify the update, using the reveal endpoint as the detail endpoint
+        body = get(f"org/api_keys/{secret_key.id}/reveal", None, secret_key.key)
+        assert body["data"]["name"] == new_name
+        assert body["data"]["status"] == new_status
