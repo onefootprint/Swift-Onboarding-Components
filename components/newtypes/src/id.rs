@@ -75,6 +75,33 @@ impl DataGroupId {
     }
 }
 
+impl ObConfigurationKey {
+    /// prefixed on LIVE keys
+    pub const LIVE_PREFIX: &'static str = "ob_live";
+
+    /// prefix on sandbox keys
+    pub const SANDBOX_PREFIX: &'static str = "ob_test";
+
+    const LENGTH: usize = 22;
+
+    /// generate a random new secret api key
+    pub fn generate(is_live: bool) -> Self {
+        let prefix = if is_live {
+            Self::LIVE_PREFIX
+        } else {
+            Self::SANDBOX_PREFIX
+        };
+
+        let key = format!(
+            "{}_{}",
+            prefix,
+            crypto::random::gen_random_alphanumeric_code(Self::LENGTH)
+        );
+
+        Self(key)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use std::str::FromStr;

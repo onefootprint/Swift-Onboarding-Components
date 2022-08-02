@@ -33,6 +33,7 @@ pub struct ObConfiguration {
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
 #[diesel(table_name = ob_configurations)]
 struct NewObConfiguration {
+    key: ObConfigurationKey,
     name: String,
     tenant_id: TenantId,
     must_collect_data_kinds: Vec<DataKind>,
@@ -109,6 +110,7 @@ impl ObConfiguration {
         is_live: bool,
     ) -> Result<ObConfiguration, crate::DbError> {
         let config = NewObConfiguration {
+            key: ObConfigurationKey::generate(is_live),
             name,
             tenant_id,
             must_collect_data_kinds,
