@@ -19,6 +19,12 @@ on:
         default: false
         required: false
 
+      waitForDeploy:
+        description: "whether to wait for an in-progress deploy to finish"
+        type: boolean
+        default: false
+        required: false
+
     secrets:
       INTEGRATION_TEST_PHONE_NUMBER:
         required: true
@@ -45,6 +51,10 @@ jobs:
       TWILIO_API_KEY_SECRET: ${{ secrets.TWILIO_API_KEY_SECRET }}
 
     steps:
+      - name: Sleep to wait for in-progress deploy
+        if: ${{ inputs.waitForDeploy }}
+        run: sleep 60
+
       - uses: actions/checkout@v3
       - name: Setup Python # Set Python version
         uses: actions/setup-python@v3
