@@ -27,7 +27,6 @@ const Post = ({ post }: PostProps) => {
   return (
     <>
       <SEO
-        createdAt={post.created_at}
         description={post.meta_description}
         image={post.og_image}
         kind="article"
@@ -35,6 +34,7 @@ const Post = ({ post }: PostProps) => {
           description: post.og_description,
           image: post.og_image,
           title: post.og_title,
+          author: post.primary_author.name,
         }}
         slug={`/blog/${post.slug}`}
         title={post.title}
@@ -47,7 +47,6 @@ const Post = ({ post }: PostProps) => {
             { label: 'Reading time', data: `${post.reading_time} minutes` },
           ],
         }}
-        updatedAt={post.updated_at}
       />
       <article>
         <Container>

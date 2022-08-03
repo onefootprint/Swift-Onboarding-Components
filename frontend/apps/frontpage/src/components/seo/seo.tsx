@@ -2,8 +2,6 @@ import Head from 'next/head';
 import React from 'react';
 
 type SeoProps = {
-  createdAt?: string;
-  updatedAt?: string;
   description?: string;
   image?: string;
   keywords?: string;
@@ -14,6 +12,7 @@ type SeoProps = {
     title?: string;
     description?: string;
     image?: string;
+    author?: string;
   };
   twitter?: {
     title?: string;
@@ -27,8 +26,6 @@ type SeoProps = {
 };
 
 const Seo = ({
-  createdAt,
-  updatedAt,
   description = "The last identity verification you'll ever need",
   image = 'https://onefootprint.com/cover.png',
   keywords = 'footprint,foot,print,id,onefootprint,identity,kyc,verify,security',
@@ -46,6 +43,9 @@ const Seo = ({
     <meta property="og:type" content={kind} />
     <meta property="og:title" content={og.title || title} />
     <meta property="og:description" content={og.description || description} />
+    {og.author && (
+      <meta name="author" property="og:author" content={og.author} />
+    )}
     <meta property="og:url" content={`https://onefootprint.com${slug}`} />
     <meta property="og:image" content={og.image || image} />
     <meta name="twitter:card" content="summary_large_image" />
@@ -63,10 +63,6 @@ const Seo = ({
     />
     <meta name="twitter:url" content={`https://onefootprint.com${slug}`} />
     <meta name="twitter:image" content={twitter.image || image} />
-    {createdAt && (
-      <meta property="article:published_time" content={createdAt} />
-    )}
-    {updatedAt && <meta property="article:modified_time" content={updatedAt} />}
   </Head>
 );
 
