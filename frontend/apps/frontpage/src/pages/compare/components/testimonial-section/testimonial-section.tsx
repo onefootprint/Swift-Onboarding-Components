@@ -3,9 +3,9 @@ import React from 'react';
 import Testimonial from 'src/components/testimonial';
 
 const TestimonialSection = () => {
-  const { t } = useTranslation('pages.home.testimonial');
+  const { t } = useTranslation('pages.compare.testimonial');
   const testimonialAuthor = {
-    imgSrc: '/testimonial/joshua-browder.png',
+    imgSrc: '/testimonial/shardul-shah.png',
     name: t('author.name'),
     role: t('author.role'),
     imgAlt: t('author.img-alt'),

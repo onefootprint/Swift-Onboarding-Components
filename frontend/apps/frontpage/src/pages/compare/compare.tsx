@@ -8,6 +8,7 @@ import Carousel from './components/carousel';
 import ComparisonTable from './components/comparison-table';
 import CompetitorAnalysis from './components/competitor-analysis';
 import Hero from './components/hero';
+import TestimonialSection from './components/testimonial-section';
 
 const Compare = () => {
   const { t } = useTranslation('pages.compare');
@@ -50,6 +51,9 @@ const Compare = () => {
           />
         </RestContainer>
       </Container>
+      <TestimonialContainer>
+        <TestimonialSection />
+      </TestimonialContainer>
       <Container>
         <CompetitorAnalysisContainer>
           <CompetitorAnalysis
@@ -125,10 +129,22 @@ const ComparisonTableContainer = styled.div`
 
 const RestContainer = styled.div`
   ${({ theme }) => css`
-    margin-bottom: ${theme.spacing[11]}px;
+    margin-bottom: ${theme.spacing[10]}px;
 
     ${media.greaterThan('lg')`
-      margin-bottom: ${theme.spacing[13]}px;
+      margin-bottom: ${theme.spacing[12]}px;
+    `}
+  `}
+`;
+
+const TestimonialContainer = styled.div`
+  ${({ theme }) => css`
+    background: ${theme.backgroundColor.secondary};
+    margin-bottom: ${theme.spacing[10]}px;
+    padding: ${theme.spacing[11]}px 0;
+
+    ${media.greaterThan('lg')`
+      margin-bottom: ${theme.spacing[12]}px;
     `}
   `}
 `;

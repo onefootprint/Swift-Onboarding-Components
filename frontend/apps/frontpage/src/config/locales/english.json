@@ -432,6 +432,14 @@
             "Our simple API supports a variety of scopes and controls to maintain zero trust, least privilege principles. Generate credentials that have access to specific data attributes — or functions of those data attributes (like someone’s age versus their birthdate). All of this is invisible to your code or data model, and all you need to worry about is a single user footprint token that can be stored easily in plain-text."
           ]
         }
+      },
+      "testimonial": {
+        "quote": "Footprint is the first platform that delivers verification that is both low-friction and high accuracy. The platform's opinionated data storage architecture facilitates this breakthrough.",
+        "author": {
+          "name": "Shardul Shah",
+          "img-alt": "Picture of Shardul Shah",
+          "role": "Partner at Index Ventures"
+        }
       }
     },
     "privacy-policy": {
