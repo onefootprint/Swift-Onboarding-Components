@@ -58,8 +58,9 @@ const Header = styled.header<{ isFloating: boolean }>`
   right: 0;
   top: 0;
   transition: background 200ms ease 0s;
-  z-index: 20;
-
+  ${({ theme }) => css`
+    z-index: ${theme.zIndex.overlay};
+  `}
   ${({ theme, isFloating }) =>
     isFloating &&
     css`

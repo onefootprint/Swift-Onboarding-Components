@@ -5,10 +5,11 @@ import styled, { css } from 'styled-components';
 import { Button, Container, media, Typography } from 'ui';
 
 type HeroSectionProps = {
-  onCtaClick: () => void;
+  onRequestAccess: () => void;
+  onWatchDemo: () => void;
 };
 
-const HeroSection = ({ onCtaClick }: HeroSectionProps) => {
+const HeroSection = ({ onRequestAccess, onWatchDemo }: HeroSectionProps) => {
   const { t } = useTranslation('pages.home.hero');
   return (
     <Container as="section" id="hero">
@@ -32,9 +33,14 @@ const HeroSection = ({ onCtaClick }: HeroSectionProps) => {
         >
           {t('subtitle')}
         </Typography>
-        <Button size="large" onClick={onCtaClick}>
-          {t('cta')}
-        </Button>
+        <ButtonsContainer>
+          <Button size="large" onClick={onRequestAccess}>
+            {t('request-access')}
+          </Button>
+          <Button size="large" variant="secondary" onClick={onWatchDemo}>
+            {t('watch-demo')}
+          </Button>
+        </ButtonsContainer>
       </ContentContainer>
       <ImageContainer>
         <SmallImageContainer>
@@ -61,6 +67,21 @@ const HeroSection = ({ onCtaClick }: HeroSectionProps) => {
     </Container>
   );
 };
+
+const ButtonsContainer = styled.div`
+  ${({ theme }) => css`
+    display: inline-grid;
+    grid-template-columns: repeat(1, 1fr);
+    grid-template-rows: 2 1fr;
+    row-gap: ${theme.spacing[5]}px;
+
+    ${media.greaterThan('sm')`
+      grid-template-columns: repeat(2, 1fr);
+      grid-template-rows: 1 1fr;
+      column-gap: ${theme.spacing[5]}px;
+    `}
+  `}
+`;
 
 const ContentContainer = styled.div`
   ${({ theme }) => css`

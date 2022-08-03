@@ -1,10 +1,11 @@
 import { createPopup } from '@typeform/embed';
 import { useTranslation } from 'hooks';
 import Head from 'next/head';
-import React from 'react';
+import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
 import { media } from 'ui';
 
+import DemoVideo from './components/demo-video';
 import HeroSection from './components/hero-section';
 import HighlightsSection from './components/highlights-section';
 import PenguinSeparator from './components/penguin-separator';
@@ -16,6 +17,11 @@ const { toggle: toggleTypeform } = createPopup('COZNk70C');
 
 const Home = () => {
   const { t } = useTranslation('pages.home');
+  const [isDemoVisible, setDemoVisible] = useState(false);
+
+  const toggleDemo = () => {
+    setDemoVisible(!isDemoVisible);
+  };
 
   return (
     <>
@@ -23,8 +29,17 @@ const Home = () => {
         <title>{t('html-title')}</title>
       </Head>
       <HeaderContainer>
-        <HeroSection onCtaClick={toggleTypeform} />
+        <HeroSection
+          onRequestAccess={toggleTypeform}
+          onWatchDemo={toggleDemo}
+        />
       </HeaderContainer>
+      <DemoVideo
+        link="https://www.youtube.com/embed/VYNY7ZvxKQs?autoplay=1"
+        onClose={toggleDemo}
+        title="Footprint Demo"
+        open={isDemoVisible}
+      />
       <PlaygroundSection />
       <HighlightsContainer id="highlights">
         <HighlightsSection

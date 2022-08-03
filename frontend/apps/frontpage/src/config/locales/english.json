@@ -67,7 +67,8 @@
       "hero": {
         "title": "Frictionless Identity Verification",
         "subtitle": "Onboard users with the click of a button. Offload handling sensitive data. Grow your user base quickly and securely with Footprint's one-click KYC and secure data vault.",
-        "cta": "Request early access",
+        "request-access": "Request early access",
+        "watch-demo": "Watch demo video",
         "img-alt": "An image of Footprint System"
       },
       "playground": {
