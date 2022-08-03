@@ -18,6 +18,10 @@
           "href": "/pricing",
           "text": "Pricing"
         },
+        "blog": {
+          "href": "/blog",
+          "text": "Blog"
+        },
         "company": {
           "href": "/company",
           "text": "Company"
@@ -452,6 +456,18 @@
       "html-title": "Footprint - Terms of Service",
       "title": "Terms of Service",
       "subtitle": "Last modified 06/22/2022"
+    },
+    "blog": {
+      "html-title": "Footprint - Blog",
+      "go-back": "Back",
+      "breadcrumb": {
+        "title": "Blog",
+        "description": " | Updates, announcements, knowledge sharing",
+        "twitter": "Footprint on Twitter"
+      },
+      "post": {
+        "reading-time": "{{readingTime}} min. read"
+      }
     }
   }
 }

@@ -1,9 +1,10 @@
 import { useTranslation } from 'hooks';
-import Head from 'next/head';
 import React from 'react';
 import FaqItem from 'src/components/faq-item';
 import styled, { css } from 'styled-components';
 import { Button, media, Typography } from 'ui';
+
+import SEO from '../../components/seo';
 
 const Faq = () => {
   const { t } = useTranslation('pages.faq');
@@ -51,9 +52,7 @@ const Faq = () => {
 
   return (
     <>
-      <Head>
-        <title>{t('html-title')}</title>
-      </Head>
+      <SEO title={t('html-title')} slug="/faq" />
       <Container>
         <HeroContainer>
           <Typography variant="display-1" as="h1">

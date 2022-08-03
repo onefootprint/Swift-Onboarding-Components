@@ -1,18 +1,24 @@
-type FormatOptions = 'date-with-time';
+const useIntl = (locale = 'en-US') => {
+  const formatDateWithLongMonth = (date: Date) =>
+    new Intl.DateTimeFormat(locale, {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+    }).format(date);
 
-const useIntl =
-  (locale = 'en-US') =>
-  (value: string, formatOptions: FormatOptions) => {
-    if (formatOptions === 'date-with-time') {
-      return new Date(value).toLocaleString(locale, {
-        month: 'numeric',
-        day: 'numeric',
-        year: '2-digit',
-        hour: 'numeric',
-        minute: 'numeric',
-      });
-    }
-    return value;
+  const formatDateWithTime = (date: Date) =>
+    date.toLocaleString(locale, {
+      month: 'numeric',
+      day: 'numeric',
+      year: '2-digit',
+      hour: 'numeric',
+      minute: 'numeric',
+    });
+
+  return {
+    formatDateWithLongMonth,
+    formatDateWithTime,
   };
+};
 
 export default useIntl;

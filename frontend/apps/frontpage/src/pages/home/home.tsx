@@ -1,10 +1,10 @@
 import { createPopup } from '@typeform/embed';
 import { useTranslation } from 'hooks';
-import Head from 'next/head';
 import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
 import { media } from 'ui';
 
+import SEO from '../../components/seo';
 import DemoVideo from './components/demo-video';
 import HeroSection from './components/hero-section';
 import HighlightsSection from './components/highlights-section';
@@ -25,9 +25,7 @@ const Home = () => {
 
   return (
     <>
-      <Head>
-        <title>{t('html-title')}</title>
-      </Head>
+      <SEO title={t('html-title')} slug="/" />
       <HeaderContainer>
         <HeroSection
           onRequestAccess={toggleTypeform}

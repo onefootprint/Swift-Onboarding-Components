@@ -5,11 +5,11 @@ import IcoEmojiHappy40 from 'icons/ico/ico-emoji-happy-40';
 import IcoHeart40 from 'icons/ico/ico-heart-40';
 import IcoLeaf40 from 'icons/ico/ico-leaf-40';
 import IcoShield40 from 'icons/ico/ico-shield-40';
-import Head from 'next/head';
 import React from 'react';
 import styled, { css } from 'styled-components';
 import { media, Typography } from 'ui';
 
+import SEO from '../../components/seo';
 import Team from './components/team';
 import Values from './components/values';
 
@@ -106,9 +106,7 @@ const Company = () => {
 
   return (
     <>
-      <Head>
-        <title>{t('html-title')}</title>
-      </Head>
+      <SEO title={t('html-title')} slug="/company" />
       <Container>
         <HeroContainer>
           <Typography variant="display-1" as="h1" sx={{ marginBottom: 5 }}>

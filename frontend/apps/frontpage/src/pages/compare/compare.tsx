@@ -1,9 +1,9 @@
 import { useTranslation } from 'hooks';
-import Head from 'next/head';
 import React from 'react';
 import styled, { css } from 'styled-components';
 import { Container, media, Typography } from 'ui';
 
+import SEO from '../../components/seo';
 import Carousel from './components/carousel';
 import ComparisonTable from './components/comparison-table';
 import CompetitorAnalysis from './components/competitor-analysis';
@@ -15,9 +15,7 @@ const Compare = () => {
 
   return (
     <>
-      <Head>
-        <title>{t('html-title')}</title>
-      </Head>
+      <SEO title={t('html-title')} slug="/compare" />
       <HeroContainer>
         <Container>
           <Hero

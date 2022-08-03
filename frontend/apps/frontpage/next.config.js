@@ -28,4 +28,11 @@ module.exports = withPlugins([withTM, withMDX, withBundleAnalyzer], {
   compiler: {
     styledComponents: true,
   },
+  images: {
+    domains: [
+      'www.gravatar.com',
+      'footprint-blog.ghost.io',
+      'static.ghost.org',
+    ],
+  },
 });

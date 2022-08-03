@@ -37,7 +37,7 @@ const getApiKeys = async ({ authHeaders }: GetApiKeysRequest) => {
 };
 
 const useApiKeys = () => {
-  const format = useIntl();
+  const { formatDateWithTime } = useIntl();
   const { authHeaders } = useSessionUser();
   return useQuery<
     GetApiKeysResponse,
@@ -48,9 +48,9 @@ const useApiKeys = () => {
       response.map((apiKey: ApiKey) => ({
         ...apiKey,
         isDecrypted: false,
-        createdAt: format(apiKey.createdAt, 'date-with-time'),
+        createdAt: formatDateWithTime(new Date(apiKey.createdAt)),
         lastUsedAt: apiKey.lastUsedAt
-          ? format(apiKey.lastUsedAt, 'date-with-time')
+          ? formatDateWithTime(new Date(apiKey.lastUsedAt))
           : null,
       })),
   });

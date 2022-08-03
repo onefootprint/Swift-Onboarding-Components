@@ -1,12 +1,14 @@
 import { useTranslation } from 'hooks';
-import Head from 'next/head';
 import React from 'react';
 import styled, { css } from 'styled-components';
 import { Container, media, Typography } from 'ui';
 
+import SEO from '../seo';
+
 type MarkdownLayoutProps = {
   children: React.ReactNode;
   meta: {
+    slug: string;
     htmlTitleKey: string;
     titleKey: string;
     subtitleKey: string;
@@ -17,9 +19,7 @@ const MarkdownLayout = ({ children, meta }: MarkdownLayoutProps) => {
   const { t } = useTranslation();
   return (
     <>
-      <Head>
-        <title>{t(meta.htmlTitleKey)}</title>
-      </Head>
+      <SEO title={t(meta.htmlTitleKey)} slug={meta.slug} />
       <Container>
         <Inner>
           <Header>

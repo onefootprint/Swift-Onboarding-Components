@@ -1,5 +1,6 @@
 import '@typeform/embed/build/css/popup.css';
 
+import Head from 'next/head';
 import Script from 'next/script';
 import React from 'react';
 import { createGlobalStyle } from 'styled-components';
@@ -22,6 +23,28 @@ const GlobalStyle = createGlobalStyle``;
 
 const App = ({ Component, pageProps }: AppProps) => (
   <>
+    <Head>
+      <meta charSet="utf-8" />
+      <link rel="shortcut icon" href="/favicon.ico" />
+      <link
+        rel="apple-touch-icon"
+        sizes="180x180"
+        href="/apple-touch-icon.png"
+      />
+      <link
+        rel="icon"
+        type="image/png"
+        sizes="32x32"
+        href="/favicon-32x32.png"
+      />
+      <link
+        rel="icon"
+        type="image/png"
+        sizes="16x16"
+        href="/favicon-16x16.png"
+      />
+      <link rel="manifest" href="/site.webmanifest" />
+    </Head>
     {FATHOM_TRACKING_CODE && (
       <Script
         data-canonical="false"

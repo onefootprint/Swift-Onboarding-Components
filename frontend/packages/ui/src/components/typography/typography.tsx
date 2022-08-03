@@ -25,6 +25,7 @@ export type TypographyProps = {
   id?: string;
   sx?: SXStyleProps;
   testID?: string;
+  title?: string;
   variant: FontVariant;
 };
 
@@ -37,6 +38,7 @@ const Typography = forwardRef<HTMLElement, TypographyProps>(
       id,
       sx,
       testID,
+      title,
       variant,
     }: TypographyProps,
     ref,
@@ -50,6 +52,7 @@ const Typography = forwardRef<HTMLElement, TypographyProps>(
         id={id}
         ref={ref}
         sx={sxStyles}
+        title={title}
         variant={variant}
       >
         {children}

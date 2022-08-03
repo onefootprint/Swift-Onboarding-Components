@@ -1,9 +1,9 @@
 import { useTranslation } from 'hooks';
-import Head from 'next/head';
 import React from 'react';
 import styled, { css } from 'styled-components';
 import { media, Typography } from 'ui';
 
+import SEO from '../../components/seo';
 import Faq from './components/faq';
 import Plans from './components/plans';
 
@@ -11,9 +11,7 @@ const Pricing = () => {
   const { t } = useTranslation('pages.pricing');
   return (
     <>
-      <Head>
-        <title>{t('html-title')}</title>
-      </Head>
+      <SEO title={t('html-title')} slug="/pricing" />
       <Container>
         <HeroContainer>
           <Typography

@@ -40,66 +40,6 @@ export default class MyDocument extends Document {
     return (
       <Html lang="en">
         <Head>
-          <meta name="robots" content="index,follow" />
-          <meta charSet="utf-8" />
-          <link rel="shortcut icon" href="/favicon.ico" />
-          <meta
-            name="description"
-            content="The last identity verification you'll ever need"
-          />
-          <meta
-            name="keywords"
-            content="footprint,foot,print,id,onefootprint,identity,kyc,verify,security"
-          />
-          <meta
-            property="og:image"
-            content="https://onefootprint.com/cover.png"
-          />
-          <meta property="og:type" content="product" />
-          <meta property="og:url" content="https://onefootprint.com" />
-          <meta property="og:title" content="Footprint" />
-          <meta
-            property="og:description"
-            content="The last identity verification you'll ever need"
-          />
-          <meta property="og:site_name" content="Footprint" />
-          <meta property="og:locale" content="en_US" />
-          <meta name="twitter:card" content="photo" />
-          <meta name="twitter:site" content="@onefootprintid" />
-          <meta name="twitter:creator" content="@onefootprintid" />
-          <meta name="twitter:title" content="Footprint" />
-          <meta
-            name="twitter:description"
-            content="The last identity verification you'll ever need"
-          />
-          <meta
-            name="twitter:description"
-            content="https://onefootprint.com/cover.png"
-          />
-          <link
-            rel="apple-touch-icon"
-            sizes="180x180"
-            href="/apple-touch-icon.png"
-          />
-          <link
-            rel="icon"
-            type="image/png"
-            sizes="32x32"
-            href="/favicon-32x32.png"
-          />
-          <link
-            rel="icon"
-            type="image/png"
-            sizes="16x16"
-            href="/favicon-16x16.png"
-          />
-          <link rel="manifest" href="/site.webmanifest" />
-          <link
-            rel="preload"
-            as="document"
-            href="https://form.typeform.com/to/COZNk70C"
-          />
-
           <LoadFonts />
         </Head>
         <body>
