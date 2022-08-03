@@ -49,10 +49,6 @@ const Values = ({ title, description, items }: ValuesProps) => (
 const TitleContainer = styled.div`
   ${({ theme }) => css`
     margin-bottom: ${theme.spacing[9]}px;
-
-    ${media.greaterThan('lg')`
-      margin-bottom: ${theme.spacing[10]}px;
-    `}
   `}
 `;
 

@@ -28,7 +28,7 @@ const Hero = ({ title, subtitle, cta }: HeroProps) => (
     >
       {subtitle}
     </Typography>
-    <Button onClick={toggleTypeform} size="large" type="button">
+    <Button onClick={toggleTypeform} type="button">
       {cta}
     </Button>
   </Container>

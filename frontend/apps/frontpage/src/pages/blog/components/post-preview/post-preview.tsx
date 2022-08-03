@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import React from 'react';
 import styled, { css } from 'styled-components';
-import { Typography } from 'ui';
+import { media, Typography } from 'ui';
 
 export type PostPreviewProps = {
   author: { avatarImgUrl: string; name: string };
@@ -26,15 +26,25 @@ const PostPreview = ({
 }: PostPreviewProps) => (
   <Container>
     <Anchor href={href}>
-      <FeatureImage
-        alt={featureImageAlt}
-        height={300}
-        layout="responsive"
-        objectFit="cover"
-        objectPosition="center"
-        src={featureImageUrl}
-        width={960}
-      />
+      <FeatureImageDesktopContainer>
+        <FeatureImage
+          alt={featureImageAlt}
+          height={300}
+          layout="responsive"
+          objectFit="cover"
+          src={featureImageUrl}
+          width={960}
+        />
+      </FeatureImageDesktopContainer>
+      <FeatureImageMobileContainer>
+        <FeatureImage
+          height={228}
+          layout="responsive"
+          objectFit="cover"
+          src={featureImageUrl}
+          width={358}
+        />
+      </FeatureImageMobileContainer>
       <Content>
         <Header>
           <Typography color="accent" variant="label-4" sx={{ marginBottom: 2 }}>
@@ -77,10 +87,23 @@ const Anchor = styled.a`
     text-decoration: none;
   `}
 `;
-
 const FeatureImage = styled(Image)`
   ${({ theme }) => css`
     border-radius: ${theme.borderRadius[2]}px ${theme.borderRadius[2]}px 0 0;
+  `}
+`;
+
+const FeatureImageDesktopContainer = styled.div`
+  display: none;
+
+  ${media.greaterThan('md')`
+    display: block;
+  `}
+`;
+
+const FeatureImageMobileContainer = styled.div`
+  ${media.greaterThan('md')`
+    display: none;
   `}
 `;
 

@@ -69,12 +69,12 @@ const Blog = ({ posts }: BlogProps) => {
 
 const Inner = styled.div`
   ${({ theme }) => css`
-    margin: 0 auto;
-    padding-bottom: ${theme.spacing[10]}px;
+    margin: -${theme.spacing[7]}px auto ${theme.spacing[7]}px;
     max-width: 960px;
 
     ${media.greaterThan('lg')`
-      padding-bottom: ${theme.spacing[11]}px;
+      margin-bottom: ${theme.spacing[10]}px;
+      margin-top: -${theme.spacing[10]}px;
     `}
   `}
 `;

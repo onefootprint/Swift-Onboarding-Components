@@ -68,7 +68,7 @@ const GlobalStyle = createGlobalStyle`
     font-size: 16px;
 
     ${media.between('xs', 'sm')`
-      font-size: 13px;
+      font-size: 12px;
     `}
   }
 `;

@@ -34,10 +34,8 @@ const HeroSection = ({ onRequestAccess, onWatchDemo }: HeroSectionProps) => {
           {t('subtitle')}
         </Typography>
         <ButtonsContainer>
-          <Button size="large" onClick={onRequestAccess}>
-            {t('request-access')}
-          </Button>
-          <Button size="large" variant="secondary" onClick={onWatchDemo}>
+          <Button onClick={onRequestAccess}>{t('request-access')}</Button>
+          <Button variant="secondary" onClick={onWatchDemo}>
             {t('watch-demo')}
           </Button>
         </ButtonsContainer>
@@ -73,12 +71,11 @@ const ButtonsContainer = styled.div`
     display: inline-grid;
     grid-template-columns: repeat(1, 1fr);
     grid-template-rows: 2 1fr;
-    row-gap: ${theme.spacing[5]}px;
+    gap: ${theme.spacing[4]}px;
 
     ${media.greaterThan('sm')`
       grid-template-columns: repeat(2, 1fr);
       grid-template-rows: 1 1fr;
-      column-gap: ${theme.spacing[5]}px;
     `}
   `}
 `;

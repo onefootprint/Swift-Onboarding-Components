@@ -99,12 +99,11 @@ const Post = ({ post }: PostProps) => {
 
 const Inner = styled.div`
   ${({ theme }) => css`
-    margin: 0 auto;
-    padding-bottom: ${theme.spacing[10]}px;
+    margin: -${theme.spacing[3]}px auto ${theme.spacing[10]}px;
     max-width: 960px;
 
     ${media.greaterThan('lg')`
-      padding-bottom: ${theme.spacing[11]}px;
+      margin-top: -${theme.spacing[10]}px;
     `}
   `}
 `;
@@ -116,7 +115,7 @@ const Content = styled.div`
     img {
       margin-bottom: ${theme.spacing[9]}px;
       object-fit: cover;
-      width: 100%;
+      max-width: 100%;
     }
 
     p {

@@ -76,7 +76,7 @@ const Content = styled.section`
       padding-top: ${theme.spacing[11]}px;
 
       ${media.greaterThan('lg')`
-        padding-top: ${theme.spacing[13]}px;
+        padding-top: 160px;
       `}
     }
   `}
