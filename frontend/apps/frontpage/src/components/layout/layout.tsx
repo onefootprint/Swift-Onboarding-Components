@@ -73,10 +73,11 @@ const Layout = ({ children }: LayoutProps) => {
 const Content = styled.section`
   ${({ theme }) => css`
     > *:first-child {
-      padding-top: ${theme.spacing[11]}px;
+      // TODO: Remove this extra spacing due to the announcement
+      padding-top: ${theme.spacing[10] + theme.spacing[11]}px;
 
       ${media.greaterThan('lg')`
-        padding-top: 160px;
+        padding-top: ${theme.spacing[13] + theme.spacing[3]}px;
       `}
     }
   `}

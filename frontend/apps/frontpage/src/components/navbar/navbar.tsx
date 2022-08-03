@@ -1,7 +1,7 @@
 import { useToggle, useTranslation } from 'hooks';
 import React from 'react';
 import styled, { css } from 'styled-components';
-import { Container, media } from 'ui';
+import { Banner, Container, media } from 'ui';
 
 import DesktopNav from './components/desktop-nav';
 import MobileNav from './components/mobile-nav';
@@ -29,6 +29,18 @@ const Navbar = ({ cta }: NavbarProps) => {
 
   return (
     <Header isFloating={hasScroll && isFloatingEnabled}>
+      <BannerContainer>
+        <Banner variant="announcement">
+          {t('banner.text')}{' '}
+          <a
+            href="https://techcrunch.com/2022/08/03/footprint-wants-to-change-how-companies-collect-store-and-share-personal-data/"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {t('banner.link-label')}
+          </a>
+        </Banner>
+      </BannerContainer>
       <Container>
         <Inner>
           <MobileNav
@@ -52,6 +64,12 @@ const Navbar = ({ cta }: NavbarProps) => {
     </Header>
   );
 };
+
+const BannerContainer = styled.div`
+  ${({ theme }) => css`
+    border-bottom: 1px solid ${theme.borderColor.tertiary};
+  `}
+`;
 
 const Header = styled.header<{ isFloating: boolean }>`
   left: 0;

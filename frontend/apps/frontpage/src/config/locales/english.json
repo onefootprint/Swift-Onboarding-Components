@@ -30,6 +30,10 @@
           "href": "/faq",
           "text": "FAQ"
         }
+      },
+      "banner": {
+        "text": "🎉 Announcing our $6M seed round led by Index Ventures.",
+        "link-label": "Read more"
       }
     },
     "get-started": {
