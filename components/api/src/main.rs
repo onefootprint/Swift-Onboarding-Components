@@ -200,7 +200,6 @@ async fn main() -> std::io::Result<()> {
             .service(private::routes())
             .service(org::routes())
             .service(internal::routes())
-            .service(internal::old_routes())
             .service(users::routes())
             .with_json_spec_at("/open-api/spec")
             .with_swagger_ui_at("/open-api/swagger")

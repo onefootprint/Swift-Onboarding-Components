@@ -16,7 +16,7 @@ def my1fp_authed_user(user, twilio):
     data = {"identifier": identifier, "preferred_challenge_kind": "sms", "identify_type": "my1fp"}
 
     def identify():
-        body = post("identify", data)
+        body = post("internal/identify", data)
         assert body["data"]["user_found"]
         assert body["data"]["challenge_data"]["phone_number_last_two"] == user.real_phone_number[-2:]
         assert body["data"]["challenge_data"]["challenge_kind"] == "sms"
@@ -31,7 +31,7 @@ def my1fp_authed_user(user, twilio):
             "challenge_response": code,
             "challenge_token": challenge_token,
         }
-        body = post("identify/verify", data)
+        body = post("internal/identify/verify", data)
         assert body["data"]["kind"] == "user_inherited"
         return body["data"]["auth_token"]
     my1fp_auth_token = try_until_success(identify_verify, 5)
@@ -43,7 +43,7 @@ class TestMy1fp:
         data = {
             "attributes": ["phone_number", "email", "street_address", "zip"]
         }
-        body = post("user/decrypt", data, my1fp_authed_user.auth_token)
+        body = post("internal/user/decrypt", data, my1fp_authed_user.auth_token)
         attributes = body["data"]
         assert attributes["phone_number"] == my1fp_authed_user.phone_number.replace(" ", "")
         assert attributes["email"].upper() == my1fp_authed_user.email.upper()
@@ -56,11 +56,11 @@ class TestMy1fp:
         data = {
             "attributes": ["ssn"]
         }
-        post("user/decrypt", data, my1fp_authed_user.auth_token, status_code=401)
+        post("internal/user/decrypt", data, my1fp_authed_user.auth_token, status_code=401)
 
     def test_user_detail(self, my1fp_authed_user):
         # Get the user detail using the logged in context
-        body = get("user", None, my1fp_authed_user.auth_token)
+        body = get("internal/user", None, my1fp_authed_user.auth_token)
         phone_numbers = body["data"]["phone_numbers"]
         assert phone_numbers[0]["is_verified"]
         assert phone_numbers[0]["priority"] == "primary"
@@ -70,7 +70,7 @@ class TestMy1fp:
 
     def test_authorized_tenants(self, my1fp_authed_user, can_access_data_kinds):
         # Get the user detail using the logged in context
-        body = get("user/authorized_orgs", None, my1fp_authed_user.auth_token)
+        body = get("internal/user/authorized_orgs", None, my1fp_authed_user.auth_token)
         authorized_orgs = body["data"]
 
         onboarding_info = authorized_orgs[0]["onboardings"][0]
@@ -90,7 +90,7 @@ class TestMy1fp:
             post("org/decrypt", data, tenant.sk.key)
 
         # Get the user detail using the logged in context
-        body = get("user/access_events", None, my1fp_authed_user.auth_token)
+        body = get("internal/user/access_events", None, my1fp_authed_user.auth_token)
         access_events = body["data"]
         assert len(access_events) == len(FIELDS_TO_DECRYPT)
         for i, expected_fields in enumerate(FIELDS_TO_DECRYPT[-1:0]):

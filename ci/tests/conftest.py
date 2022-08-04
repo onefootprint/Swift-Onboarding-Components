@@ -97,7 +97,7 @@ def user(workos_sandbox_tenant, twilio):
     # Initiate the challenge to a sandbox phone number
     def initiate_challenge():
         data = {"phone_number": sandbox_phone_number}
-        body = post("identify/challenge", data)
+        body = post("internal/identify/challenge", data)
         return body["data"]["challenge_token"]
     challenge_token = try_until_success(initiate_challenge, 20)  # Rate limiting may take a while
 
@@ -110,14 +110,14 @@ def user(workos_sandbox_tenant, twilio):
             "challenge_kind": "sms",
             "challenge_token": challenge_token,
         }
-        body = post("identify/verify", data)
+        body = post("internal/identify/verify", data)
         assert body["data"]["kind"] == "user_created"
         return body["data"]["auth_token"]
     auth_token = try_until_success(identify_verify, 5)
     auth_token = OnboardingAuth(auth_token)
 
     # Initialize the onboarding
-    post("onboarding", None, workos_sandbox_tenant.ob_config.key, auth_token)
+    post("internal/onboarding", None, workos_sandbox_tenant.ob_config.key, auth_token)
 
     # Populate the user's data
     user_data = {
@@ -143,20 +143,20 @@ def user(workos_sandbox_tenant, twilio):
         "ssn": ssn,
         "email": sandbox_email,
     } 
-    post("user/data", user_data, auth_token)
+    post("internal/user/data", user_data, auth_token)
 
     # Register the biometric credential
     webauthn_device = SoftWebauthnDevice()
-    body = post("user/biometric/init", None, auth_token)
+    body = post("internal/user/biometric/init", None, auth_token)
     chal_token = body["data"]["challenge_token"]
     chal = _override_webauthn_challenge(json.loads(body["data"]["challenge_json"]))
     attestation = webauthn_device.create(chal, os.environ.get('TEST_URL'))
     attestation = _override_webauthn_attestation(attestation)
     data = dict(challenge_token=chal_token, device_response_json=json.dumps(attestation))
-    post("user/biometric", data, auth_token)
+    post("internal/user/biometric", data, auth_token)
 
     # Complete the onboarding
-    body = post("onboarding/complete", None, workos_sandbox_tenant.ob_config.key, auth_token)
+    body = post("internal/onboarding/complete", None, workos_sandbox_tenant.ob_config.key, auth_token)
     validation_token = body["data"]["validation_token"]
 
     # Get the fp_user_id

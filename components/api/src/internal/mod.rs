@@ -11,10 +11,3 @@ pub fn routes() -> web::Scope {
         .service(identify::routes())
         .service(onboarding::routes())
 }
-
-pub fn old_routes() -> web::Scope {
-    web::scope("")
-        .service(user::routes())
-        .service(identify::routes())
-        .service(onboarding::routes())
-}
