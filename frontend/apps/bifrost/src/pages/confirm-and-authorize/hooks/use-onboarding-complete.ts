@@ -11,7 +11,7 @@ export type OnboardingCompleteRequest = {
 };
 
 export type OnboardingCompleteResponse = {
-  footprintUserId: string;
+  validationToken: string; // A cryptographically generated auth token to authenticate a session
   missingWebauthnCredentials: boolean;
 };
 

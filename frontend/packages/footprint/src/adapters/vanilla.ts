@@ -11,8 +11,8 @@ const vanillaIntegration = (footprint: Footprint) => {
       onUserCanceled: () => {
         window.onFootprintCanceled?.();
       },
-      onCompleted: (footprintUserId: string) => {
-        window.onFootprintCompleted?.(footprintUserId);
+      onCompleted: (validationToken: string) => {
+        window.onFootprintCompleted?.(validationToken);
       },
     });
   };

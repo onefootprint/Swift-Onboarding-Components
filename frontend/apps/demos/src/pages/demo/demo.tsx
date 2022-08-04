@@ -22,8 +22,8 @@ const Demo = ({ page }: DemoProps) => {
 
   const handleClick = () => {
     footprint.show({
-      onCompleted(footprintUserId) {
-        console.log('footprintUserId', footprintUserId);
+      onCompleted(validationToken) {
+        console.log('validationToken', validationToken);
         setConfirmation(true);
       },
     });

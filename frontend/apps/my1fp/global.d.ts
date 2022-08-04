@@ -1,5 +1,5 @@
 interface Window {
   onFootprintCanceled?: () => void;
-  onFootprintCompleted?: (footprintUserId: string) => void;
+  onFootprintCompleted?: (validationToken: string) => void;
   onFootprintFailed?: () => void;
 }

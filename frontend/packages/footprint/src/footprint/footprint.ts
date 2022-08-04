@@ -23,7 +23,7 @@ export default class implements Footprint {
     });
   }
 
-  private onCompleted(callback: (footprintUserId: string) => void) {
+  private onCompleted(callback: (validationToken: string) => void) {
     return this.uiManager.on(FootprintEvents.completed, (data: any) => {
       if (data && typeof data === 'string') {
         callback(data);
@@ -38,7 +38,7 @@ export default class implements Footprint {
   async show(
     callback: {
       onAuthenticated?: (vtok: string) => void;
-      onCompleted?: (footprintUserId: string) => void;
+      onCompleted?: (validationToken: string) => void;
       onUserCanceled?: () => void;
     } = {},
   ) {

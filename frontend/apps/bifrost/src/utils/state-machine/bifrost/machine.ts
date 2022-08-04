@@ -93,6 +93,7 @@ const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
               actions: [
                 Actions.assignMissingAttributes,
                 Actions.assignMissingWebauthnCredentials,
+                Actions.assignValidationToken,
               ],
 
               cond: (context, event) =>
@@ -104,6 +105,7 @@ const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
               actions: [
                 Actions.assignMissingAttributes,
                 Actions.assignMissingWebauthnCredentials,
+                Actions.assignValidationToken,
               ],
               cond: context => context.tenant.canAccessDataKinds.length > 0,
             },
@@ -111,6 +113,7 @@ const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
               actions: [
                 Actions.assignMissingAttributes,
                 Actions.assignMissingWebauthnCredentials,
+                Actions.assignValidationToken,
               ],
               target: States.verificationSuccess,
             },
@@ -139,12 +142,14 @@ const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
           [Events.sharedDataConfirmed]: [
             {
               target: States.verificationSuccess,
+              actions: [Actions.assignValidationToken],
               cond: context =>
                 context.userFound &&
                 context.onboarding.missingAttributes.length === 0,
             },
             {
               target: States.onboardingSuccess,
+              actions: [Actions.assignValidationToken],
             },
           ],
         },
@@ -230,6 +235,15 @@ const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
         if (event.type === Events.onboardingVerificationSucceeded) {
           context.onboarding.missingWebauthnCredentials =
             event.payload.missingWebauthnCredentials;
+        }
+        return context;
+      }),
+      [Actions.assignValidationToken]: assign((context, event) => {
+        if (
+          event.type === Events.onboardingVerificationSucceeded ||
+          event.type === Events.sharedDataConfirmed
+        ) {
+          context.validationToken = event.payload.validationToken;
         }
         return context;
       }),

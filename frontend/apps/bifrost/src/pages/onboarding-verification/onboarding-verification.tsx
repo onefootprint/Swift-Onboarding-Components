@@ -21,12 +21,17 @@ const OnboardingVerification = () => {
     onboardingMutation.mutate(
       { authToken, tenantPk },
       {
-        onSuccess: ({ missingAttributes, missingWebauthnCredentials }) => {
+        onSuccess: ({
+          missingAttributes,
+          missingWebauthnCredentials,
+          validationToken,
+        }) => {
           send({
             type: Events.onboardingVerificationSucceeded,
             payload: {
               missingAttributes,
               missingWebauthnCredentials,
+              validationToken,
             },
           });
         },

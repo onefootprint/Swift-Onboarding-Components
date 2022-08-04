@@ -1,5 +1,4 @@
 import { useRequestErrorToast } from 'hooks';
-import useOnboarding from 'src/hooks/use-onboarding';
 import useIdentify, {
   IdentifyResponse,
 } from 'src/pages/identify/hooks/use-identify';
@@ -22,13 +21,10 @@ const useEmailIdentify = () => {
   } = state;
   const identifyMutation = useIdentify();
   const identifyVerifyMutation = useIdentityVerification();
-  const onboardingMutation = useOnboarding();
   const showRequestErrorToast = useRequestErrorToast();
 
   const isLoading = () =>
-    identifyMutation.isLoading ||
-    identifyVerifyMutation.isLoading ||
-    onboardingMutation.isLoading;
+    identifyMutation.isLoading || identifyVerifyMutation.isLoading;
 
   const identifyEmail = (email: string) => {
     const preferredChallengeKind =

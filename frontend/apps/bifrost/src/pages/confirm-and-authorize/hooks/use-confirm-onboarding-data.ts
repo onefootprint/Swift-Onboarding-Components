@@ -39,12 +39,15 @@ const useConfirmOnboardingData = () => {
     completeOnboardingMutation.mutate(
       { authToken, tenantPk },
       {
-        onSuccess: ({ footprintUserId }) => {
+        onSuccess: ({ validationToken }) => {
           onComplete?.();
           send({
             type: Events.sharedDataConfirmed,
+            payload: {
+              validationToken,
+            },
           });
-          footprint.complete(footprintUserId);
+          footprint.complete(validationToken);
         },
         onError() {
           showOnboardingError();

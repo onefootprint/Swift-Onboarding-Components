@@ -44,6 +44,7 @@ export enum Actions {
   // Onboarding
   assignMissingAttributes = 'assignMissingAttributes',
   assignMissingWebauthnCredentials = 'assignMissingWebAuthnCredentials',
+  assignValidationToken = 'assignValidationToken',
   assignOnboardingData = 'assignOnboardingData',
 }
 
@@ -56,6 +57,7 @@ export type BifrostContext = {
   phone?: string;
   tenant: TenantInfo;
   userFound: boolean;
+  validationToken?: string;
 };
 
 export type BifrostEvent =
@@ -94,10 +96,16 @@ export type BifrostEvent =
       payload: {
         missingAttributes: readonly UserDataAttribute[];
         missingWebauthnCredentials: boolean;
+        validationToken?: string;
       };
     }
   | {
       type: Events.deviceInfoIdentified;
       payload: DeviceInfo;
     }
-  | { type: Events.sharedDataConfirmed };
+  | {
+      type: Events.sharedDataConfirmed;
+      payload: {
+        validationToken: string;
+      };
+    };

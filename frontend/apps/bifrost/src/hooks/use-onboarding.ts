@@ -17,6 +17,9 @@ export type OnboardingRequest = {
 export type OnboardingResponse = {
   missingAttributes: UserDataAttribute[];
   missingWebauthnCredentials: boolean;
+  // A cryptographically generated auth token to authenticate a session
+  // Returned only if the user has already authorized the configuration for tenant
+  validationToken?: string;
 };
 
 const onboardingRequest = async (payload: OnboardingRequest) => {

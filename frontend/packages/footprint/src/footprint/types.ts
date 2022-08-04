@@ -4,7 +4,7 @@ export type Footprint = {
   init(options?: { publicKey?: string }): void;
   show(callback?: {
     onAuthenticated?: (vtok: string) => void;
-    onCompleted?: (footprintUserId: string) => void;
+    onCompleted?: (validationToken: string) => void;
     onUserCanceled?: () => void;
   }): Promise<void>;
   createButton(container: HTMLElement): HTMLButtonElement;

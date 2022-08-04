@@ -28,8 +28,8 @@ const useFootprint = () => {
     sendEvent('closed');
   };
 
-  const complete = (footprintUserId: string) => {
-    sendEvent('completed', footprintUserId);
+  const complete = (validationToken: string) => {
+    sendEvent('completed', validationToken);
   };
 
   const cancel = () => {
