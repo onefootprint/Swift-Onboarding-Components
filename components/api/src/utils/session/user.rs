@@ -3,7 +3,11 @@ use crypto::aead::ScopedSealingKey;
 use db::{models::sessions::Session, PgConnection};
 use newtypes::{SealedSessionBytes, SessionAuthToken};
 
-use crate::{auth::session_data::AuthSessionData, State};
+use crate::{
+    auth::{session_data::AuthSessionData, AuthError},
+    errors::ApiError,
+    State,
+};
 
 pub struct AuthSession {
     pub key: String,
@@ -19,10 +23,22 @@ impl AuthSession {
             .db_query(move |conn| Session::get(conn, key))
             .await??;
         let session = if let Some(session) = session {
+            let data = AuthSessionData::unseal(&state.session_sealing_key, &SealedSessionBytes(session.data));
+            let data = match data {
+                Ok(data) => data,
+                Err(e) => {
+                    return Err(match e {
+                        // If there was an error deserializing the session, return a 401 to trigger the
+                        // client to re-auth
+                        crypto::Error::Cbor(_) => AuthError::NoSessionFound.into(),
+                        _ => ApiError::from(e),
+                    });
+                }
+            };
             Some(Self {
                 key: session.key,
                 expires_at: session.expires_at,
-                data: AuthSessionData::unseal(&state.session_sealing_key, &SealedSessionBytes(session.data))?,
+                data,
             })
         } else {
             None

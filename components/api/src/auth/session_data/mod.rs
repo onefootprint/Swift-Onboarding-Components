@@ -2,7 +2,6 @@ use self::{
     email_verify::EmailVerifySession, user::UserSession, validate_user::ValidateUserToken,
     workos::WorkOsSession,
 };
-use crate::errors::ApiError;
 use crypto::aead::ScopedSealingKey;
 use newtypes::SealedSessionBytes;
 use serde::{Deserialize, Serialize};
@@ -17,7 +16,7 @@ impl AuthSessionData {
         Ok(SealedSessionBytes(key.seal(&self)?))
     }
 
-    pub fn unseal(key: &ScopedSealingKey, sealed: &SealedSessionBytes) -> Result<Self, ApiError> {
+    pub fn unseal(key: &ScopedSealingKey, sealed: &SealedSessionBytes) -> Result<Self, crypto::Error> {
         let unsealed: Self = key.unseal(sealed.as_ref())?;
         Ok(unsealed)
     }
