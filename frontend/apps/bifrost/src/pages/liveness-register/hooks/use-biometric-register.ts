@@ -20,7 +20,7 @@ const biometricRegister = async (payload: BiometricRegisterRequest) => {
     }>
   >({
     method: 'POST',
-    url: '/user/biometric/init',
+    url: '/internal/user/biometric/init',
     data: payload,
     headers: {
       [BIFROST_AUTH_HEADER]: authToken,
@@ -36,7 +36,7 @@ const biometricRegister = async (payload: BiometricRegisterRequest) => {
     RequestResponse<BiometricRegisterResponse>
   >({
     method: 'POST',
-    url: '/user/biometric',
+    url: '/internal/user/biometric',
     data: {
       deviceResponseJson,
       challengeToken,

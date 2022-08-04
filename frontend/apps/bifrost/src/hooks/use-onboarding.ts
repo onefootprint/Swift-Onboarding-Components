@@ -26,7 +26,7 @@ const onboardingRequest = async (payload: OnboardingRequest) => {
   const { data: response } = await request<RequestResponse<OnboardingResponse>>(
     {
       method: 'POST',
-      url: '/onboarding',
+      url: '/internal/onboarding',
       headers: {
         [BIFROST_AUTH_HEADER]: payload.authToken,
         [CLIENT_PUBLIC_KEY_HEADER]: payload.tenantPk,

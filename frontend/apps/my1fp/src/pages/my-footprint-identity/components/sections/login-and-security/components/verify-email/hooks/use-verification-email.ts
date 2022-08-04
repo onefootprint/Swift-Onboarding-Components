@@ -16,7 +16,7 @@ const verificationEmailRequest = async (payload: VerificationEmailRequest) => {
     RequestResponse<VerificationEmailResponse>
   >({
     method: 'post',
-    url: '/user/email/challenge',
+    url: '/internal/user/email/challenge',
     data: {
       id: payload.id,
     },

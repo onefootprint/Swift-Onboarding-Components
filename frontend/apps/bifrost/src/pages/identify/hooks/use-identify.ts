@@ -29,7 +29,7 @@ export type IdentifyResponse = {
 const identifyRequest = async (payload: IdentifyRequest) => {
   const { data: response } = await request<RequestResponse<IdentifyResponse>>({
     method: 'POST',
-    url: '/identify',
+    url: '/internal/identify',
     data: payload,
   });
   return response.data;

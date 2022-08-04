@@ -19,7 +19,7 @@ const getLiveness = async (payload: GetLivenessRequest) => {
     RequestResponse<InsightEventEntry[]>
   >({
     method: 'GET',
-    url: '/user/liveness',
+    url: '/internal/user/liveness',
     headers: {
       [MY1FP_AUTH_HEADER]: payload.authToken,
     },

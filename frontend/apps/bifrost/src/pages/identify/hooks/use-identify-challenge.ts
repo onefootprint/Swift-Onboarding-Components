@@ -15,7 +15,7 @@ const identifyChallenge = async (payload: IdentifyChallengeRequest) => {
     RequestResponse<IdentifyChallengeResponse>
   >({
     method: 'POST',
-    url: '/identify/challenge',
+    url: '/internal/identify/challenge',
     data: payload,
   });
   return response.data;

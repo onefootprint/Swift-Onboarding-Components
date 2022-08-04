@@ -15,7 +15,7 @@ const identifyPhoneRequest = async (payload: IdentifyPhoneRequest) => {
     RequestResponse<IdentifyPhoneResponse>
   >({
     method: 'POST',
-    url: '/identify/phone',
+    url: '/internal/identify/phone',
     data: payload,
   });
   return response.data;
