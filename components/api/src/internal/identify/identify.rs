@@ -120,7 +120,7 @@ pub async fn handler(
                     (
                         ChallengeKind::Sms,
                         IdentifyChallengeData::Sms(challenge_state),
-                        time_before_retry_s,
+                        time_before_retry_s.num_seconds(),
                         None,
                     )
                 }
@@ -133,7 +133,7 @@ pub async fn handler(
                 (
                     ChallengeKind::Sms,
                     IdentifyChallengeData::Sms(challenge_state),
-                    time_before_retry_s,
+                    time_before_retry_s.num_seconds(),
                     None,
                 )
             }

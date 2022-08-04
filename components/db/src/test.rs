@@ -2,9 +2,7 @@ use crate::{
     models::user_data::{NewUserData, UserData},
     run_migrations,
 };
-use newtypes::{
-    DataGroupId, EncryptedVaultPrivateKey, Fingerprint, SealedVaultBytes, Status, VaultPublicKey,
-};
+use newtypes::{DataGroupId, EncryptedVaultPrivateKey, Fingerprint, SealedVaultBytes, VaultPublicKey};
 
 #[actix_rt::test]
 async fn test_db() {

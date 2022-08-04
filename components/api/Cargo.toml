@@ -78,5 +78,7 @@ lazy_static = "1.0"
 
 workos = "0.2"
 
+twilio = { path = "../twilio"}
+
 [dev-dependencies]
 test-case = "2.1.0"

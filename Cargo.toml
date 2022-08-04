@@ -10,4 +10,5 @@ members = [
     "components/idv",
     "components/newtypes",
     "components/app_attest",
+    "components/twilio"
 ]

@@ -52,7 +52,7 @@ pub async fn handler(
     Ok(Json(ApiResponseData {
         data: ChallengeResponse {
             challenge_token,
-            time_before_retry_s,
+            time_before_retry_s: time_before_retry_s.num_seconds(),
         },
     }))
 }

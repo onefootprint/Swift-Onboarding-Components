@@ -47,5 +47,7 @@ pub fn handler(
         )
         .await?;
 
-    Ok(Json(ApiResponseData::ok(D2pSmsResponse { time_before_retry_s })))
+    Ok(Json(ApiResponseData::ok(D2pSmsResponse {
+        time_before_retry_s: time_before_retry_s.num_seconds(),
+    })))
 }

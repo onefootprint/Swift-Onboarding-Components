@@ -50,8 +50,6 @@ pub enum ApiError {
     NoPhoneNumberForVault,
     #[error("not implemented")]
     NotImplemented,
-    #[error("twilio error creating message: {0}")]
-    TwilioError(String),
     #[error("external request error: {0}")]
     ReqwestError(#[from] reqwest::Error),
     #[error("error from sendgrid api: {0}")]
@@ -66,6 +64,8 @@ pub enum ApiError {
     SerdeJson(#[from] serde_json::Error),
     #[error("cbor error: {0}")]
     SerdeCbor(#[from] serde_cbor::Error),
+    #[error("twilio error: {0}")]
+    Twilio(#[from] twilio::error::Error),
 }
 
 impl<T> From<WorkOsError<T>> for ApiError
@@ -122,8 +122,8 @@ impl actix_web::ResponseError for ApiError {
             ApiError::NoPhoneNumberForVault => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::NotImplemented => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::HandoffError(_) => StatusCode::BAD_REQUEST,
-            ApiError::TwilioError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::ReqwestError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            ApiError::Twilio(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::SendgridError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::NewtypeError(_) => StatusCode::BAD_REQUEST,
             ApiError::ChallengeError(_) => StatusCode::BAD_REQUEST,
