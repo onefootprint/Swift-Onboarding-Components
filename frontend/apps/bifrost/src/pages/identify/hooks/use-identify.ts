@@ -18,6 +18,7 @@ export type ChallengeData = {
   phoneNumberLastTwo: string;
   phoneCountry: string;
   biometricChallengeJson?: string;
+  timeBeforeRetryS: number;
 };
 
 export type IdentifyResponse = {

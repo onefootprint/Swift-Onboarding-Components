@@ -77,6 +77,7 @@ describe('Identify Machine Tests', () => {
         challengeKind: ChallengeKind.sms,
         phoneNumberLastTwo: '00',
         phoneCountry: 'US',
+        timeBeforeRetryInSeconds: 15,
       };
       state = machine.send({
         type: Events.phoneIdentificationCompleted,
@@ -310,6 +311,7 @@ describe('Identify Machine Tests', () => {
         challengeKind: ChallengeKind.sms,
         phoneNumberLastTwo: '00',
         phoneCountry: 'US',
+        timeBeforeRetryInSeconds: 15,
       };
       state = machine.send({
         type: Events.smsChallengeResent,

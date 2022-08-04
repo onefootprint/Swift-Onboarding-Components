@@ -28,7 +28,7 @@ const PhoneRegistration = () => {
     identifyChallengeMutation.mutate(
       { phoneNumber: phone },
       {
-        onSuccess({ challengeToken }) {
+        onSuccess({ challengeToken, timeBeforeRetryS }) {
           send({
             type: Events.phoneIdentificationCompleted,
             payload: {
@@ -37,6 +37,7 @@ const PhoneRegistration = () => {
               challengeData: {
                 challengeKind: ChallengeKind.sms,
                 challengeToken,
+                timeBeforeRetryInSeconds: timeBeforeRetryS,
               },
             },
           });

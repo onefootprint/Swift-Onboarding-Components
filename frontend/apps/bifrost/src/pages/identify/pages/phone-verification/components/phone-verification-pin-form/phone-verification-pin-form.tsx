@@ -85,7 +85,7 @@ const PhoneVerificationPinForm = ({
       },
       {
         onError: showRequestErrorToast,
-        onSuccess: ({ challengeToken }) => {
+        onSuccess: ({ challengeToken, timeBeforeRetryS }) => {
           toast.show({
             title: t('resend-code.toast.success.title'),
             description: t('resend-code.toast.success.description'),
@@ -97,6 +97,7 @@ const PhoneVerificationPinForm = ({
                 challengeKind: ChallengeKind.sms,
                 challengeToken,
                 phoneNumberLastTwo: phoneNumber.slice(-2),
+                timeBeforeRetryInSeconds: timeBeforeRetryS,
               },
             },
           });

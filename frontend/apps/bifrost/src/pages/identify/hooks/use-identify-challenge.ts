@@ -7,6 +7,7 @@ export type IdentifyChallengeRequest = {
 
 export type IdentifyChallengeResponse = {
   challengeToken: string;
+  timeBeforeRetryS: number;
 };
 
 const identifyChallenge = async (payload: IdentifyChallengeRequest) => {
