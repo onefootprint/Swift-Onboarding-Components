@@ -28,7 +28,7 @@ pub struct ValidateResponse {
 
 #[api_v2_operation(tags(Org))]
 #[post("/validate")]
-/// Allows a tenant to view a customer's registered webauthn creden&tials
+/// Allows a tenant to view a customer's registered webauthn credentials
 pub fn validate(
     state: web::Data<State>,
     request: web::Json<ValidateRequest>,

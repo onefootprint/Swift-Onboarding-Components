@@ -13,11 +13,11 @@ use db::models::onboardings::Onboarding;
 use db::scoped_users::OnboardingListQueryParams;
 use db::DbError;
 use newtypes::{DataKind, Fingerprint, Fingerprinter, FootprintUserId, PiiString, Status};
-use paperclip::actix::{api_v2_operation, get, web, web::Json, Apiv2Schema};
+use paperclip::actix::{api_v2_operation, web, web::Json, Apiv2Schema};
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
-pub struct ScopedUsersRequest {
+pub struct UsersRequest {
     #[serde(default)]
     #[serde(deserialize_with = "deserialize_stringified_list")]
     statuses: Vec<Status>,
@@ -29,21 +29,20 @@ pub struct ScopedUsersRequest {
     page_size: Option<usize>,
 }
 
-type ScopedUsersResponse = Vec<ApiScopedUser>;
+type UsersResponse = Vec<ApiScopedUser>;
 
 #[api_v2_operation(tags(Org))]
 /// Allows a tenant to view a list of their Onboardings, effectively showing all users that have
 /// started the onboarding process for the tenant. Optionally allows filtering on Onboarding status.
 /// Requires tenant secret key auth.
-#[get("scoped_users")]
 pub fn get(
     state: web::Data<State>,
-    request: web::Query<ScopedUsersRequest>,
+    request: web::Query<UsersRequest>,
     auth: Either<SessionContext<WorkOsSession>, SecretTenantAuthContext>,
-) -> actix_web::Result<Json<ApiPaginatedResponseData<ScopedUsersResponse, i64>>, ApiError> {
+) -> actix_web::Result<Json<ApiPaginatedResponseData<UsersResponse, i64>>, ApiError> {
     let tenant = auth.tenant(&state.db_pool).await?;
 
-    let ScopedUsersRequest {
+    let UsersRequest {
         statuses,
         fingerprint,
         footprint_user_id,

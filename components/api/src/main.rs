@@ -15,6 +15,7 @@ use workos::{ApiKey, WorkOs};
 mod config;
 mod signed_hash;
 mod telemetry;
+mod users;
 
 // TODO put IAM roles and permissions in pulumi
 
@@ -200,6 +201,7 @@ async fn main() -> std::io::Result<()> {
             .service(org::routes())
             .service(internal::routes())
             .service(internal::old_routes())
+            .service(users::routes())
             .with_json_spec_at("/open-api/spec")
             .with_swagger_ui_at("/open-api/swagger")
             .build()

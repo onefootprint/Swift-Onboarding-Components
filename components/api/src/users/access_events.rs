@@ -34,7 +34,7 @@ type AccessEventResponse = Vec<ApiAccessEvent>;
 /// Allows a tenant to view a list of AccessEvent logs for a specific user's data. Optionally
 /// allows filtering on data_kind.
 /// Requires tenant secret key auth.
-fn handler(
+fn get(
     state: web::Data<State>,
     request: web::Query<AccessEventRequest>,
     auth: Either<SessionContext<WorkOsSession>, SecretTenantAuthContext>,

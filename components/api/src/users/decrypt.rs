@@ -30,7 +30,7 @@ type UserDecryptResponse = HashMap<DataKind, Option<String>>;
 /// Allows a tenant to decrypt a specific user's data. The user requested must be onboarded onto
 /// the requesting tenant.
 /// Requires tenant secret key auth.
-fn handler(
+fn post(
     state: web::Data<State>,
     auth: Either<SessionContext<WorkOsSession>, SecretTenantAuthContext>,
     request: Json<UserDecryptRequest>,
