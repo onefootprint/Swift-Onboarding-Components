@@ -21,13 +21,11 @@ mod telemetry;
 mod auth;
 mod enclave;
 mod errors;
-mod identify;
 mod index;
-mod onboarding;
+mod internal;
 mod org;
 mod private;
 mod types;
-mod user;
 mod utils;
 
 use crate::{errors::ApiError, utils::twilio::TwilioClient};
@@ -199,10 +197,9 @@ async fn main() -> std::io::Result<()> {
             .wrap_api()
             .configure(index::routes)
             .service(private::routes())
-            .service(identify::routes())
             .service(org::routes())
-            .service(onboarding::routes())
-            .service(user::routes())
+            .service(internal::routes())
+            .service(internal::old_routes())
             .with_json_spec_at("/open-api/spec")
             .with_swagger_ui_at("/open-api/swagger")
             .build()

@@ -2,7 +2,7 @@ use std::fmt::Debug;
 
 use crate::{
     errors::{challenge::ChallengeError, ApiError},
-    identify::PhoneChallengeState,
+    internal::identify::PhoneChallengeState,
     State,
 };
 use chrono::{Duration, Utc};
