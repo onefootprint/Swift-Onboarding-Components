@@ -11,8 +11,8 @@ import styled, { css } from 'styled-components';
 import {
   Banner,
   Container,
+  Dropdown,
   FootprintLogo,
-  IconButton,
   Tab,
   Toggle,
   Typography,
@@ -32,6 +32,7 @@ const PrivateLayout = ({ children }: PrivateLayoutProps) => {
   const router = useRouter();
   const [isSandboxMode, toggleSandboxMode] = useSandboxMode();
   const { data, logOut } = useSessionUser();
+
   return (
     <>
       <PrivateLayoutContainer data-testid="private-layout">
@@ -49,11 +50,23 @@ const PrivateLayout = ({ children }: PrivateLayoutProps) => {
                 </a>
               </Link>
               <SuffixContainer>
-                <IconButton
-                  iconComponent={IcoUser24}
-                  onClick={logOut}
-                  aria-label="account"
-                />
+                <Dropdown.Root>
+                  <Dropdown.Trigger aria-label="Account">
+                    <IcoUser24 />
+                  </Dropdown.Trigger>
+                  <Dropdown.Portal>
+                    <Dropdown.Content align="end">
+                      <Dropdown.Item>
+                        <Typography variant="label-3">John Doe</Typography>
+                        <Typography variant="body-3" color="secondary">
+                          {data?.email}
+                        </Typography>
+                      </Dropdown.Item>
+                      <Dropdown.Divider />
+                      <Dropdown.Item onSelect={logOut}>Log out</Dropdown.Item>
+                    </Dropdown.Content>
+                  </Dropdown.Portal>
+                </Dropdown.Root>
               </SuffixContainer>
             </Footprint>
           </Container>

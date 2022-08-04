@@ -1,9 +1,19 @@
 import { useToggle, useTranslation } from 'hooks';
+import IcoDotsHorizontal24 from 'icons/ico/ico-dots-horizontal-24';
 import React from 'react';
 import { getErrorMessage } from 'request';
 import EncryptedCell from 'src/components/encrypted-cell';
 import styled, { css } from 'styled-components';
-import { Badge, Box, Button, Divider, Table, TableRow, Typography } from 'ui';
+import {
+  Badge,
+  Box,
+  Button,
+  Divider,
+  Dropdown,
+  Table,
+  TableRow,
+  Typography,
+} from 'ui';
 
 import CreateApiKeyDialog from './components/create-api-key-dialog';
 import useApiKeys, { EnhancedApiKey } from './hooks/use-api-keys';
@@ -51,7 +61,27 @@ const ApiKeys = () => {
             <td>
               <Badge variant="success">{item.status}</Badge>
             </td>
-            <td />
+            <td>
+              <ActionMenuContainer>
+                <Dropdown.Root>
+                  <Dropdown.Trigger
+                    aria-label={t('table.body.manage.aria-label')}
+                  >
+                    <IcoDotsHorizontal24 />
+                  </Dropdown.Trigger>
+                  <Dropdown.Portal>
+                    <Dropdown.Content align="end">
+                      <Dropdown.Item>
+                        {t('table.body.manage.reveal')}
+                      </Dropdown.Item>
+                      <Dropdown.Item>
+                        {t('table.body.manage.disable')}
+                      </Dropdown.Item>
+                    </Dropdown.Content>
+                  </Dropdown.Portal>
+                </Dropdown.Root>
+              </ActionMenuContainer>
+            </td>
           </>
         )}
       />
@@ -72,6 +102,14 @@ const Header = styled.header`
 const StyledDivider = styled(Divider)`
   ${({ theme }) => css`
     margin: ${theme.spacing[7]}px 0;
+  `}
+`;
+
+const ActionMenuContainer = styled.div`
+  ${({ theme }) => css`
+    position: relative;
+    margin-top: -${theme.spacing[4]}px;
+    top: ${theme.spacing[4] / 2}px;
   `}
 `;
 

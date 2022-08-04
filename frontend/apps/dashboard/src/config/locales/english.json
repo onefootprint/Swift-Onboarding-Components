@@ -53,9 +53,12 @@
             "status": "Status"
           },
           "body": {
-            "options": {
+            "manage": {
+              "aria-label": "Open menu to manage secret key",
+              "enable": "Enable secret key",
               "disable": "Disable secret key",
-              "reveal": "Reveal secret key"
+              "reveal": "Reveal secret key",
+              "hide": "Hide secret key"
             }
           },
           "empty-state": "No secret keys"

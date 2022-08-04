@@ -21,6 +21,7 @@ export { default as CountrySelect } from './country-select';
 export * from './dialog';
 export { default as Dialog } from './dialog';
 export { default as Divider } from './divider';
+export { default as Dropdown } from './dropdown';
 export * from './footprint-button';
 export { default as FootprintButton } from './footprint-button';
 export * from './footprint-logo';

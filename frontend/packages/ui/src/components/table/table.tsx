@@ -132,15 +132,17 @@ const TableContainer = styled.table`
 const Tr = styled.tr<{
   isRowClickable: boolean;
 }>`
-  transition: 0.1s;
-  ${({ theme, isRowClickable }) =>
-    isRowClickable &&
+  ${({ theme, isRowClickable }) => css`
+    transition: 0.1s;
+    :hover {
+      background-color: ${theme.backgroundColor.secondary};
+    }
+
+    ${isRowClickable &&
     css`
       cursor: pointer;
-      :hover {
-        background-color: ${theme.backgroundColor.secondary};
-      }
     `}
+  `}
 `;
 
 const LoadingTr = styled.tr`

@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@popperjs/core": "^2.11.5",
+    "@radix-ui/react-dropdown-menu": "^1.0.0",
     "cleave.js": "^1.6.0",
     "config": "*",
     "constate": "^3.3.2",
@@ -56,8 +57,8 @@
     "@types/react-highlight-words": "^0.16.4",
     "@types/react-window": "^1.8.5",
     "@types/styled-components": "^5.1.25",
-    "react-dom": "18.2.0",
     "react": "18.2.0",
+    "react-dom": "18.2.0",
     "storybook-addon-designs": "^6.2.1",
     "styled-components": "^5.3.5",
     "tsconfig": "*",
@@ -65,9 +66,9 @@
     "webpack": "*"
   },
   "peerDependencies": {
-    "styled-components": "5.x",
     "next": "12.x",
     "react": "18.x",
-    "react-dom": "18.x"
+    "react-dom": "18.x",
+    "styled-components": "5.x"
   }
 }
