@@ -5,7 +5,6 @@ use newtypes::{SealedSessionBytes, SessionAuthToken};
 
 use crate::{
     auth::{session_data::AuthSessionData, AuthError},
-    errors::ApiError,
     State,
 };
 
@@ -24,16 +23,10 @@ impl AuthSession {
             .await??;
         let session = if let Some(session) = session {
             let data = AuthSessionData::unseal(&state.session_sealing_key, &SealedSessionBytes(session.data));
-            let data = match data {
-                Ok(data) => data,
-                Err(e) => {
-                    return Err(match e {
-                        // If there was an error deserializing the session, return a 401 to trigger the
-                        // client to re-auth
-                        crypto::Error::Cbor(_) => AuthError::NoSessionFound.into(),
-                        _ => ApiError::from(e),
-                    });
-                }
+            let data = if let Err(crypto::Error::Cbor(_)) = data {
+                return Err(AuthError::NoSessionFound.into());
+            } else {
+                data?
             };
             Some(Self {
                 key: session.key,
