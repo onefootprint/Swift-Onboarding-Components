@@ -42,7 +42,7 @@ const PhoneVerification = () => {
           },
         }}
       />
-      <Form>
+      <Form autoComplete="off" role="presentation">
         <Box>
           <HeaderTitle
             title={
