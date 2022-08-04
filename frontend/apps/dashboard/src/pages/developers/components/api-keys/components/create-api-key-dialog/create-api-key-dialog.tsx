@@ -4,6 +4,8 @@ import { useForm } from 'react-hook-form';
 import styled from 'styled-components';
 import { Dialog, TextInput } from 'ui';
 
+import useCreateApiKey from './hooks/use-create-api-key';
+
 type CreateApiKeyDialogProps = {
   open: boolean;
   onClose: () => void;
@@ -12,6 +14,7 @@ type CreateApiKeyDialogProps = {
 type FormData = { name: string };
 
 const CreateApiKeyDialog = ({ open, onClose }: CreateApiKeyDialogProps) => {
+  const createApiKeyMutation = useCreateApiKey();
   const { t } = useTranslation('pages.developers.api-keys.create');
   const {
     reset,
@@ -26,7 +29,7 @@ const CreateApiKeyDialog = ({ open, onClose }: CreateApiKeyDialogProps) => {
   };
 
   const onSubmit = (formData: FormData) => {
-    console.log('formData', formData);
+    createApiKeyMutation.mutate(formData, { onSuccess: handleClose });
   };
 
   return (
@@ -35,11 +38,13 @@ const CreateApiKeyDialog = ({ open, onClose }: CreateApiKeyDialogProps) => {
       title={t('title')}
       primaryButton={{
         form: 'create-secret-key-form',
-        label: t('cta'),
-        onClick: onSubmit,
+        label: t('cta.label'),
+        loading: createApiKeyMutation.isLoading,
+        loadingAriaLabel: t('cta.aria-label'),
         type: 'submit',
       }}
       secondaryButton={{
+        disabled: createApiKeyMutation.isLoading,
         label: t('cancel'),
         onClick: handleClose,
       }}

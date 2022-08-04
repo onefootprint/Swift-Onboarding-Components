@@ -29,7 +29,16 @@
               }
             }
           },
-          "cta": "Save",
+          "cta": {
+            "label": "Create",
+            "aria-label": "Creating secret key..."
+          },
+          "feedback": {
+            "success": {
+              "title": "Success",
+              "description": "Secret key created successfully."
+            }
+          },
           "cancel": "Cancel"
         },
         "table": {

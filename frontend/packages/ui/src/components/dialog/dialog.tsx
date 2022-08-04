@@ -18,6 +18,7 @@ type DialogButton = {
   form?: string;
   label: string;
   loading?: boolean;
+  loadingAriaLabel?: string;
   onClick?: (dataSubmitted?: any) => void;
   type?: 'button' | 'submit' | 'reset';
 };
@@ -112,9 +113,10 @@ const Dialog = ({
                     disabled={secondaryButton.disabled}
                     form={secondaryButton.form}
                     loading={secondaryButton.loading}
+                    loadingAriaLabel={secondaryButton.loadingAriaLabel}
                     onClick={secondaryButton.onClick}
-                    type={secondaryButton.type}
                     size="compact"
+                    type={secondaryButton.type}
                     variant="secondary"
                   >
                     {secondaryButton.label}
@@ -125,9 +127,10 @@ const Dialog = ({
                     disabled={primaryButton.disabled}
                     form={primaryButton.form}
                     loading={primaryButton.loading}
+                    loadingAriaLabel={primaryButton.loadingAriaLabel}
                     onClick={primaryButton.onClick}
-                    type={primaryButton.type}
                     size="compact"
+                    type={primaryButton.type}
                     variant="primary"
                   >
                     {primaryButton.label}

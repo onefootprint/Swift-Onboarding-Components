@@ -5,7 +5,7 @@ import EncryptedCell from 'src/components/encrypted-cell';
 import styled, { css } from 'styled-components';
 import { Badge, Box, Button, Divider, Table, TableRow, Typography } from 'ui';
 
-import CreateApiKeyDialog from './componets/create-api-key-dialog';
+import CreateApiKeyDialog from './components/create-api-key-dialog';
 import useApiKeys, { EnhancedApiKey } from './hooks/use-api-keys';
 
 const ApiKeys = () => {
