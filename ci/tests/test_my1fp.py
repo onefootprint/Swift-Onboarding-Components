@@ -69,13 +69,13 @@ class TestMy1fp:
         assert emails[0]["priority"] == "primary"
 
     def test_decrypt_v2(self, my1fp_authed_user):
-        body = get("user", None, my1fp_authed_user.auth_token)
+        body = get("internal/user", None, my1fp_authed_user.auth_token)
         phone_number_id = body["data"]["phone_numbers"][0]["id"]
         email_id = body["data"]["emails"][0]["id"]
         data = dict(
             user_data_ids=[phone_number_id, email_id]
         )
-        body = post("user/decrypt", data, my1fp_authed_user.auth_token)
+        body = post("internal/user/decrypt", data, my1fp_authed_user.auth_token)
         decrypted_data = body["data"]
         assert decrypted_data[phone_number_id] == my1fp_authed_user.phone_number.replace(" ", "")
         assert decrypted_data[email_id].upper() == my1fp_authed_user.email.upper()
