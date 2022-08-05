@@ -133,18 +133,19 @@ impl ObConfiguration {
         is_live: bool,
         name: Option<String>,
         status: Option<ApiKeyStatus>,
-    ) -> Result<usize, DbError> {
+    ) -> Result<Self, DbError> {
         let update = ObConfigurationUpdate { name, status };
-        let num_updates = diesel::update(ob_configurations::table)
+        let results: Vec<Self> = diesel::update(ob_configurations::table)
             .filter(ob_configurations::id.eq(id))
             .filter(ob_configurations::tenant_id.eq(tenant_id))
             .filter(ob_configurations::is_live.eq(is_live))
             .set(update)
-            .execute(conn)?;
+            .load(conn)?;
 
-        if num_updates == 0 {
-            return Err(DbError::UpdateTargetNotFound);
+        if results.len() > 1 {
+            return Err(DbError::IncorrectNumberOfRowsUpdated);
         }
-        Ok(num_updates)
+        let result = results.into_iter().next().ok_or(DbError::UpdateTargetNotFound)?;
+        Ok(result)
     }
 }

@@ -7,7 +7,6 @@ use crate::auth::{HasTenant, SessionContext};
 use crate::errors::ApiError;
 use crate::types::ob_config::ApiObConfig;
 use crate::types::success::ApiResponseData;
-use crate::types::Empty;
 use crate::State;
 use db::models::ob_configurations::ObConfiguration;
 use newtypes::ApiKeyStatus;
@@ -106,15 +105,16 @@ async fn patch(
     auth: Either<SessionContext<WorkOsSession>, SecretTenantAuthContext>,
     path: web::Path<UpdateObConfigPath>,
     request: web::Json<UpdateObConfigRequest>,
-) -> actix_web::Result<Json<ApiResponseData<Empty>>, ApiError> {
+) -> actix_web::Result<Json<ApiResponseData<ApiObConfig>>, ApiError> {
     let tenant = auth.tenant(&state.db_pool).await?;
     let is_live = auth.is_live()?;
     let UpdateObConfigPath { id } = path.into_inner();
     let UpdateObConfigRequest { name, status } = request.into_inner();
-    state
+    let tenant_id = tenant.id.clone();
+    let result = state
         .db_pool
-        .db_query(move |conn| ObConfiguration::update(conn, id, tenant.id, is_live, name, status))
-        .await??;
+        .db_transaction(move |conn| ObConfiguration::update(conn, id, tenant_id, is_live, name, status))
+        .await?;
 
-    Ok(Json(ApiResponseData::ok(Empty {})))
+    Ok(Json(ApiResponseData::ok(ApiObConfig::from((result, tenant)))))
 }

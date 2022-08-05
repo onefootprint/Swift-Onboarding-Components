@@ -112,19 +112,20 @@ impl TenantApiKey {
         is_live: bool,
         name: Option<String>,
         status: Option<ApiKeyStatus>,
-    ) -> Result<usize, DbError> {
+    ) -> Result<Self, DbError> {
         let update = TenantApiKeyUpdate { name, status };
-        let num_updates = diesel::update(tenant_api_keys::table)
+        let results: Vec<Self> = diesel::update(tenant_api_keys::table)
             .filter(tenant_api_keys::id.eq(id))
             .filter(tenant_api_keys::tenant_id.eq(tenant_id))
             .filter(tenant_api_keys::is_live.eq(is_live))
             .set(update)
-            .execute(conn)?;
+            .load(conn)?;
 
-        if num_updates == 0 {
-            return Err(DbError::UpdateTargetNotFound);
+        if results.len() > 1 {
+            return Err(DbError::IncorrectNumberOfRowsUpdated);
         }
-        Ok(num_updates)
+        let result = results.into_iter().next().ok_or(DbError::UpdateTargetNotFound)?;
+        Ok(result)
     }
 }
 

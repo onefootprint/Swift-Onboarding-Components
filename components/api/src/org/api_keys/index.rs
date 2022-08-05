@@ -5,7 +5,6 @@ use crate::auth::{HasTenant, SessionContext};
 use crate::errors::ApiError;
 use crate::types::secret_api_key::TenantApiKeyResponse;
 use crate::types::success::ApiResponseData;
-use crate::types::Empty;
 use crate::State;
 use db::models::tenant_api_key_access_log::TenantApiKeyAccessLog;
 use db::models::tenant_api_keys::TenantApiKey;
@@ -89,15 +88,15 @@ pub async fn patch(
     auth: Either<SessionContext<WorkOsSession>, SecretTenantAuthContext>,
     path: web::Path<UpdateApiKeyPath>,
     request: web::Json<UpdateApiKeyRequest>,
-) -> actix_web::Result<Json<ApiResponseData<Empty>>, ApiError> {
+) -> actix_web::Result<Json<ApiResponseData<TenantApiKeyResponse>>, ApiError> {
     let tenant = auth.tenant(&state.db_pool).await?;
     let is_live = auth.is_live()?;
     let UpdateApiKeyPath { id } = path.into_inner();
     let UpdateApiKeyRequest { name, status } = request.into_inner();
-    state
+    let result = state
         .db_pool
-        .db_query(move |conn| TenantApiKey::update(conn, id, tenant.id, is_live, name, status))
-        .await??;
+        .db_transaction(move |conn| TenantApiKey::update(conn, id, tenant.id, is_live, name, status))
+        .await?;
 
-    Ok(Json(ApiResponseData::ok(Empty {})))
+    Ok(Json(ApiResponseData::ok(TenantApiKeyResponse::from(result))))
 }

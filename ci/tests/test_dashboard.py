@@ -123,7 +123,10 @@ class TestDashboard:
         patch(f"org/onboarding_configs/flerpderp", data, workos_sandbox_tenant.sk.key, status_code=404)
 
         # Update the name and status
-        patch(f"org/onboarding_configs/{ob_configuration.id}", data, workos_sandbox_tenant.sk.key)
+        body = patch(f"org/onboarding_configs/{ob_configuration.id}", data, workos_sandbox_tenant.sk.key)
+        ob_config = body["data"]
+        assert ob_config["name"] == new_name
+        assert ob_config["status"] == new_status
 
         # Verify the update
         body = get(f"org/onboarding_configs", None, workos_sandbox_tenant.sk.key)
@@ -164,7 +167,10 @@ class TestDashboard:
         patch(f"org/api_keys/flerpderp", data, secret_key.key, status_code=404)
 
         # Update the name and status
-        patch(f"org/api_keys/{secret_key.id}", data, secret_key.key)
+        body = patch(f"org/api_keys/{secret_key.id}", data, secret_key.key)
+        key = body["data"]
+        assert key["name"] == new_name
+        assert key["status"] == "disabled"
 
         # Verify the update, using the reveal endpoint as the detail endpoint
         body = get(f"org/api_keys/{secret_key.id}/reveal", None, workos_sandbox_tenant.sk.key)
