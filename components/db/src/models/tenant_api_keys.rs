@@ -39,6 +39,7 @@ impl TenantApiKey {
         let results = tenant_api_keys::table
             .filter(tenant_api_keys::tenant_id.eq(tenant_id))
             .filter(tenant_api_keys::is_live.eq(is_live))
+            .order_by(tenant_api_keys::created_at.desc())
             .get_results(conn)?;
         Ok(results)
     }

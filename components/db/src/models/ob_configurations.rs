@@ -57,6 +57,7 @@ impl ObConfiguration {
         let results = ob_configurations::table
             .filter(ob_configurations::tenant_id.eq(tenant_id))
             .filter(ob_configurations::is_live.eq(is_live))
+            .order_by(ob_configurations::created_at.desc())
             .get_results(conn)?;
         Ok(results)
     }
