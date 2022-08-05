@@ -47,8 +47,8 @@ const useJoinUsers = (
         // Create a UserData for every type of DataKind for this user. The UserData contains
         // the value of the attribute if decrypted, otherwise information on whether the value
         // is set for the user and whether we're currently fetching the decrypted value.
-        // This object is composed by joining info from previous POST /org/decrypt calls and
-        // GET /org/scoped_users calls
+        // This object is composed by joining info from previous POST /users/decrypt calls and
+        // GET /users calls
         const attributes = Object.fromEntries(
           ALL_FIELDS.map((dataKindType: DataKindType) => [
             dataKindType,

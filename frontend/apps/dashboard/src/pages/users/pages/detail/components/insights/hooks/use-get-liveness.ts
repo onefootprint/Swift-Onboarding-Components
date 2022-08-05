@@ -27,7 +27,7 @@ const getLivenessRequest = async ({
   const [, params, authHeaders] = queryKey as LivenessRequestQueryKey;
   const { data: response } = await request<RequestResponse<Liveness[]>>({
     method: 'GET',
-    url: '/org/liveness',
+    url: '/users/liveness',
     params,
     headers: authHeaders,
   });

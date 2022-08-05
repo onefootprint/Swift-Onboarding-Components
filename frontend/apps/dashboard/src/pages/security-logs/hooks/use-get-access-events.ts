@@ -33,7 +33,7 @@ const getAccessEventsRequest = async ({
   };
   const { data: response } = await request<RequestResponse<AccessEvent[]>>({
     method: 'GET',
-    url: '/org/access_events',
+    url: '/users/access_events',
     params,
     headers: authHeaders,
   });

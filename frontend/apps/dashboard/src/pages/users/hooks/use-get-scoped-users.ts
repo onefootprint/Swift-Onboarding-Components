@@ -42,7 +42,7 @@ const getScopedUsersRequest = async ({
   };
   const { data: response } = await request<RequestResponse<ScopedUser[]>>({
     method: 'GET',
-    url: '/org/scoped_users',
+    url: '/users',
     params: req,
     headers: authHeaders,
   });

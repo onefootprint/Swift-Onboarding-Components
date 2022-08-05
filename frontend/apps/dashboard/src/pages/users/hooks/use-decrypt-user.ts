@@ -20,7 +20,7 @@ const decryptUserRequest = async (
     RequestResponse<DecryptedUserAttributes>
   >({
     method: 'POST',
-    url: '/org/decrypt',
+    url: '/users/decrypt',
     data,
     headers: authHeaders,
   });
