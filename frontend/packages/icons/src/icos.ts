@@ -12,6 +12,8 @@ import IcoArrowLeftSmall16 from '../ico/ico-arrow-left-small-16';
 import IcoArrowLeftSmall24 from '../ico/ico-arrow-left-small-24';
 import IcoArrowRightSmall16 from '../ico/ico-arrow-right-small-16';
 import IcoArrowRightSmall24 from '../ico/ico-arrow-right-small-24';
+import IcoArrowTopRight16 from '../ico/ico-arrow-top-right-16';
+import IcoArrowTopRight24 from '../ico/ico-arrow-top-right-24';
 import IcoArrowUp16 from '../ico/ico-arrow-up-16';
 import IcoArrowUp24 from '../ico/ico-arrow-up-24';
 import IcoArrowUpRight16 from '../ico/ico-arrow-up-right-16';
@@ -22,6 +24,8 @@ import IcoBuilding16 from '../ico/ico-building-16';
 import IcoBuilding24 from '../ico/ico-building-24';
 import IcoCake16 from '../ico/ico-cake-16';
 import IcoCake24 from '../ico/ico-cake-24';
+import IcoChartUp16 from '../ico/ico-chart-up-16';
+import IcoChartUp24 from '../ico/ico-chart-up-24';
 import IcoChartUp40 from '../ico/ico-chart-up-40';
 import IcoCheck16 from '../ico/ico-check-16';
 import IcoCheck24 from '../ico/ico-check-24';
@@ -51,10 +55,14 @@ import IcoCrosshair16 from '../ico/ico-crosshair-16';
 import IcoCrosshair24 from '../ico/ico-crosshair-24';
 import IcoDatabase16 from '../ico/ico-database-16';
 import IcoDatabase24 from '../ico/ico-database-24';
+import IcoDollar16 from '../ico/ico-dollar-16';
+import IcoDollar24 from '../ico/ico-dollar-24';
 import IcoDotsHorizontal16 from '../ico/ico-dots-horizontal-16';
 import IcoDotsHorizontal24 from '../ico/ico-dots-horizontal-24';
 import IcoEmail16 from '../ico/ico-email-16';
 import IcoEmail24 from '../ico/ico-email-24';
+import IcoEmojiHappy16 from '../ico/ico-emoji-happy-16';
+import IcoEmojiHappy24 from '../ico/ico-emoji-happy-24';
 import IcoEmojiHappy40 from '../ico/ico-emoji-happy-40';
 import IcoEye16 from '../ico/ico-eye-16';
 import IcoEye24 from '../ico/ico-eye-24';
@@ -70,6 +78,8 @@ import IcoFootprint40 from '../ico/ico-footprint-40';
 import IcoForbid40 from '../ico/ico-forbid-40';
 import IcoGoogleColored16 from '../ico/ico-google-colored-16';
 import IcoGoogleColored24 from '../ico/ico-google-colored-24';
+import IcoHeart16 from '../ico/ico-heart-16';
+import IcoHeart24 from '../ico/ico-heart-24';
 import IcoHeart40 from '../ico/ico-heart-40';
 import IcoHelp16 from '../ico/ico-help-16';
 import IcoHelp24 from '../ico/ico-help-24';
@@ -77,6 +87,10 @@ import IcoInfo16 from '../ico/ico-info-16';
 import IcoInfo24 from '../ico/ico-info-24';
 import IcoLaptop16 from '../ico/ico-laptop-16';
 import IcoLaptop24 from '../ico/ico-laptop-24';
+import IcoLayer0116 from '../ico/ico-layer01-16';
+import IcoLayer0124 from '../ico/ico-layer01-24';
+import IcoLeaf16 from '../ico/ico-leaf-16';
+import IcoLeaf24 from '../ico/ico-leaf-24';
 import IcoLeaf40 from '../ico/ico-leaf-40';
 import IcoLink16 from '../ico/ico-link-16';
 import IcoLink24 from '../ico/ico-link-24';
@@ -88,7 +102,12 @@ import IcoLogOut16 from '../ico/ico-log-out-16';
 import IcoLogOut24 from '../ico/ico-log-out-24';
 import IcoMenu16 from '../ico/ico-menu-16';
 import IcoMenu24 from '../ico/ico-menu-24';
+import IcoMinusBig16 from '../ico/ico-minus-big-16';
+import IcoMinusBig24 from '../ico/ico-minus-big-24';
+import IcoMinusSmall16 from '../ico/ico-minus-small-16';
 import IcoMinusSmall24 from '../ico/ico-minus-small-24';
+import IcoPencil16 from '../ico/ico-pencil-16';
+import IcoPencil24 from '../ico/ico-pencil-24';
 import IcoPhone16 from '../ico/ico-phone-16';
 import IcoPhone24 from '../ico/ico-phone-24';
 import IcoPlusBig16 from '../ico/ico-plus-big-16';
@@ -102,11 +121,16 @@ import IcoSearchSmall16 from '../ico/ico-search-small-16';
 import IcoSearchSmall24 from '../ico/ico-search-small-24';
 import IcoSettings16 from '../ico/ico-settings-16';
 import IcoSettings24 from '../ico/ico-settings-24';
+import IcoShare16 from '../ico/ico-share-16';
+import IcoShare24 from '../ico/ico-share-24';
 import IcoShield16 from '../ico/ico-shield-16';
 import IcoShield24 from '../ico/ico-shield-24';
 import IcoShield40 from '../ico/ico-shield-40';
 import IcoSpinner16 from '../ico/ico-spinner-16';
 import IcoSpinner24 from '../ico/ico-spinner-24';
+import IcoStore16 from '../ico/ico-store-16';
+import IcoStore24 from '../ico/ico-store-24';
+import IcoToggleKnob16 from '../ico/ico-toggle-knob-16';
 import IcoTwitter16 from '../ico/ico-twitter-16';
 import IcoTwitter24 from '../ico/ico-twitter-24';
 import IcoUser16 from '../ico/ico-user-16';
@@ -122,11 +146,13 @@ export default {
   IcoArrowDown16,
   IcoArrowLeftSmall16,
   IcoArrowRightSmall16,
+  IcoArrowTopRight16,
   IcoArrowUp16,
   IcoArrowUpRight16,
   IcoBolt16,
   IcoBuilding16,
   IcoCake16,
+  IcoChartUp16,
   IcoCheck16,
   IcoCheckCircle16,
   IcoCheckSmall16,
@@ -140,30 +166,41 @@ export default {
   IcoCode16,
   IcoCrosshair16,
   IcoDatabase16,
+  IcoDollar16,
   IcoDotsHorizontal16,
   IcoEmail16,
+  IcoEmojiHappy16,
   IcoEye16,
   IcoFacebook16,
   IcoFileText16,
   IcoFileText216,
   IcoFootprint16,
   IcoGoogleColored16,
+  IcoHeart16,
   IcoHelp16,
   IcoInfo16,
   IcoLaptop16,
+  IcoLayer0116,
+  IcoLeaf16,
   IcoLink16,
   IcoLinkedin16,
   IcoLock16,
   IcoLogOut16,
   IcoMenu16,
+  IcoMinusBig16,
+  IcoMinusSmall16,
+  IcoPencil16,
   IcoPhone16,
   IcoPlusBig16,
   IcoPlusSmall16,
   IcoSearch16,
   IcoSearchSmall16,
   IcoSettings16,
+  IcoShare16,
   IcoShield16,
   IcoSpinner16,
+  IcoStore16,
+  IcoToggleKnob16,
   IcoTwitter16,
   IcoUser16,
   IcoUserCircle16,
@@ -173,11 +210,13 @@ export default {
   IcoArrowDown24,
   IcoArrowLeftSmall24,
   IcoArrowRightSmall24,
+  IcoArrowTopRight24,
   IcoArrowUp24,
   IcoArrowUpRight24,
   IcoBolt24,
   IcoBuilding24,
   IcoCake24,
+  IcoChartUp24,
   IcoCheck24,
   IcoCheckCircle24,
   IcoCheckSmall24,
@@ -191,31 +230,40 @@ export default {
   IcoCode24,
   IcoCrosshair24,
   IcoDatabase24,
+  IcoDollar24,
   IcoDotsHorizontal24,
   IcoEmail24,
+  IcoEmojiHappy24,
   IcoEye24,
   IcoFacebook24,
   IcoFileText224,
   IcoFileText24,
   IcoFootprint24,
   IcoGoogleColored24,
+  IcoHeart24,
   IcoHelp24,
   IcoInfo24,
   IcoLaptop24,
+  IcoLayer0124,
+  IcoLeaf24,
   IcoLink24,
   IcoLinkedin24,
   IcoLock24,
   IcoLogOut24,
   IcoMenu24,
+  IcoMinusBig24,
   IcoMinusSmall24,
+  IcoPencil24,
   IcoPhone24,
   IcoPlusBig24,
   IcoPlusSmall24,
   IcoSearch24,
   IcoSearchSmall24,
   IcoSettings24,
+  IcoShare24,
   IcoShield24,
   IcoSpinner24,
+  IcoStore24,
   IcoTwitter24,
   IcoUser24,
   IcoUserCircle24,
