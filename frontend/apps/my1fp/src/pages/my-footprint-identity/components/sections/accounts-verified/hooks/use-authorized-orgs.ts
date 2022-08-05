@@ -2,43 +2,40 @@ import { useQuery } from '@tanstack/react-query';
 import request, { RequestError, RequestResponse } from 'request';
 import { MY1FP_AUTH_HEADER } from 'src/config/constants';
 import useSessionUser from 'src/hooks/use-session-user';
-import { InsightEvent } from 'src/types';
 
-export type GetLivenessRequest = {
+import { AuthorizedOrg } from '../types';
+
+export type AuthorizedOrgsRequest = {
   authToken: string;
 };
 
-export type InsightEventEntry = {
-  insightEvent: InsightEvent;
-};
-export type GetLivenessResponse = InsightEvent[];
+export type AuthorizedOrgsResponse = AuthorizedOrg[];
 
-const getLiveness = async (payload: GetLivenessRequest) => {
+const getAuthorizedOrgs = async (payload: AuthorizedOrgsRequest) => {
   const { data: response } = await request<
-    RequestResponse<InsightEventEntry[]>
+    RequestResponse<AuthorizedOrgsResponse>
   >({
     method: 'GET',
-    url: '/internal/user/liveness',
+    url: '/internal/user/authorized_orgs',
     headers: {
       [MY1FP_AUTH_HEADER]: payload.authToken,
     },
   });
-
-  return response.data.map(e => e.insightEvent);
+  return response.data;
 };
 
-const useGetLiveness = (
+const useGetAuthorizedOrgs = (
   options: {
-    onSuccess?: (data: GetLivenessResponse) => void;
+    onSuccess?: (data: AuthorizedOrgsResponse) => void;
     onError?: (error: RequestError) => void;
   } = {},
 ) => {
   const { session } = useSessionUser();
   const authToken = session?.authToken || '';
 
-  return useQuery<GetLivenessResponse, RequestError>(
-    ['get-liveness', authToken],
-    () => getLiveness({ authToken }),
+  return useQuery<AuthorizedOrgsResponse, RequestError>(
+    ['get-authorized-orgs', authToken],
+    () => getAuthorizedOrgs({ authToken }),
     {
       enabled: !!authToken,
       onSuccess: options.onSuccess,
@@ -47,4 +44,4 @@ const useGetLiveness = (
   );
 };
 
-export default useGetLiveness;
+export default useGetAuthorizedOrgs;

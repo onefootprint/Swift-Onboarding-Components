@@ -1,7 +1,6 @@
+import { InsightEvent } from 'src/types';
 import create from 'zustand';
 import { persist } from 'zustand/middleware';
-
-import { InsightEvent } from '../../pages/my-footprint-identity/components/sections/access-logs/types';
 
 export type UserSessionBiometric = InsightEvent[];
 

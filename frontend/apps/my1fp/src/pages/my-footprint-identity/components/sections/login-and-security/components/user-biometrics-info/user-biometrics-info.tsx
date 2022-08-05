@@ -2,10 +2,10 @@ import useTranslation from 'hooks/src/use-translation/use-translation';
 import IcoClose16 from 'icons/ico/ico-close-16';
 import React from 'react';
 import useSessionUser from 'src/hooks/use-session-user';
+import { InsightEvent } from 'src/types';
 import styled from 'styled-components';
 import { Box, LoadingIndicator, Typography } from 'ui';
 
-import { InsightEvent } from '../../../access-logs/types';
 import useGetLiveness, {
   GetLivenessResponse,
 } from '../../hooks/use-get-liveness/use-get-liveness';

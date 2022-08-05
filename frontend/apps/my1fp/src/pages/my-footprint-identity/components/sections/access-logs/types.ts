@@ -1,3 +1,5 @@
+import { InsightEvent } from 'src/types';
+
 export enum DataKind {
   firstName = 'first_name',
   lastName = 'last_name',
@@ -38,19 +40,4 @@ export type AccessLog = {
   timestamp: string;
   principal?: string;
   insightEvent?: InsightEvent;
-};
-
-export type InsightEvent = {
-  city?: string;
-  country?: string;
-  ipAddress?: string;
-  latitude?: number;
-  longitude?: number;
-  metroCode?: string;
-  postalCode?: string;
-  region?: string;
-  regionName?: string;
-  timeZone?: string;
-  timestamp: string;
-  userAgent?: string;
 };

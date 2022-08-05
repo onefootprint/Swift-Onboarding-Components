@@ -1,11 +1,42 @@
 import useTranslation from 'hooks/src/use-translation/use-translation';
 import React from 'react';
-import { Typography } from 'ui';
+import styled from 'styled-components';
+import { LoadingIndicator, Typography } from 'ui';
 
-// TODO: https://linear.app/footprint/issue/FP-825/implement-accounts-verified-with-footprint
+import VerifiedAccountCard from './components/verified-account-card';
+import useGetAuthorizedOrgs from './hooks/use-authorized-orgs';
+import { AuthorizedOrg } from './types';
+
 const AccountsVerified = () => {
   const { t } = useTranslation('pages.my-footprint-identity.access-logs');
-  return <Typography variant="body-3">{t('empty')}</Typography>;
+  const authorizedOrgsQuery = useGetAuthorizedOrgs();
+  const { data } = authorizedOrgsQuery;
+
+  if (authorizedOrgsQuery.isLoading) {
+    return (
+      <Container>
+        <LoadingIndicator />
+      </Container>
+    );
+  }
+
+  if (!data?.length) {
+    return <Typography variant="body-3">{t('empty')}</Typography>;
+  }
+
+  return (
+    <Container>
+      {data.map((org: AuthorizedOrg) => (
+        <VerifiedAccountCard org={org} key={org.id} />
+      ))}
+    </Container>
+  );
 };
+
+const Container = styled.div`
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+`;
 
 export default AccountsVerified;
