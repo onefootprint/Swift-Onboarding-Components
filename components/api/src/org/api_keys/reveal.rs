@@ -6,6 +6,7 @@ use crate::errors::ApiError;
 use crate::types::secret_api_key::TenantApiKeyResponse;
 use crate::types::success::ApiResponseData;
 use crate::State;
+use db::models::tenant_api_key_access_log::TenantApiKeyAccessLog;
 use db::models::tenant_api_keys::TenantApiKey;
 use enclave_proxy::DataTransform;
 use newtypes::secret_api_key::SecretApiKey;
@@ -29,9 +30,16 @@ async fn get(
     // TODO more strict auth for viewing secret keys
     let is_live = auth.is_live()?;
     let tenant_id = auth.tenant_id();
-    let key = state
+    let (key, last_used_at) = state
         .db_pool
-        .db_query(move |conn| TenantApiKey::get(conn, &tenant_id, &request.id, is_live))
+        .db_query(move |conn| -> Result<_, ApiError> {
+            let key = TenantApiKey::get(conn, &tenant_id, &request.id, is_live)?;
+            let last_used_at = TenantApiKeyAccessLog::get(conn, vec![&key.id])?
+                .get(&key.id)
+                .ok_or(ApiError::NotImplemented)?
+                .to_owned();
+            Ok((key, last_used_at))
+        })
         .await??;
 
     let tenant = auth.tenant(&state.db_pool).await?;
@@ -46,5 +54,6 @@ async fn get(
     Ok(Json(ApiResponseData::ok(TenantApiKeyResponse::from((
         key,
         Some(SecretApiKey::from(decrypted_secret_key.leak().to_string())),
+        Some(last_used_at),
     )))))
 }
