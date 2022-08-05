@@ -173,7 +173,7 @@ async fn get_user_by_identifier(
     let (data_kind, data) = match identifier {
         Identifier::PhoneNumber(phone_number) => {
             let phone_number = twilio_client.standardize(&phone_number).await?;
-            (DataKind::PhoneNumber, phone_number.e164)
+            (DataKind::PhoneNumber, phone_number.to_piistring())
         }
         Identifier::Email(email) => (DataKind::Email, PiiString::from(email)),
     };
