@@ -86,6 +86,7 @@ const CodeContent = styled.code`
     border: ${theme.borderWidth[1]}px solid ${theme.borderColor.tertiary};
     color: ${theme.color.error};
     display: block;
+    height: 24px;
     overflow: hidden;
     padding: ${theme.spacing[1]}px ${theme.spacing[2]}px;
     text-overflow: ellipsis;

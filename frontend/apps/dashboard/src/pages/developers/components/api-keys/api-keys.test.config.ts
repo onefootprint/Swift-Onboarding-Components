@@ -63,3 +63,13 @@ export const withCreateApiKeysError = () =>
       },
     },
   });
+
+export const withApiReveal = (apiKey: any, key: string) =>
+  mockRequest({
+    method: 'get',
+    path: `/org/api_keys/${apiKey.id}/reveal`,
+    response: {
+      ...apiKey,
+      key,
+    },
+  });

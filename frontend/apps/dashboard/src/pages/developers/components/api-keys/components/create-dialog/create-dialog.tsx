@@ -6,14 +6,14 @@ import { Dialog, TextInput } from 'ui';
 
 import useCreateApiKey from './hooks/use-create-api-key';
 
-type CreateApiKeyDialogProps = {
+type CreateDialogProps = {
   open: boolean;
   onClose: () => void;
 };
 
 type FormData = { name: string };
 
-const CreateApiKeyDialog = ({ open, onClose }: CreateApiKeyDialogProps) => {
+const CreateDialog = ({ open, onClose }: CreateDialogProps) => {
   const createApiKeyMutation = useCreateApiKey();
   const { t } = useTranslation('pages.developers.api-keys.create');
   const {
@@ -72,4 +72,4 @@ const CreateApiKeyDialog = ({ open, onClose }: CreateApiKeyDialogProps) => {
 
 const Form = styled.form``;
 
-export default CreateApiKeyDialog;
+export default CreateDialog;

@@ -52,13 +52,15 @@
             "created": "Created",
             "status": "Status"
           },
-          "body": {
-            "manage": {
-              "aria-label": "Open menu to manage secret key",
-              "enable": "Enable secret key",
-              "disable": "Disable secret key",
-              "reveal": "Reveal secret key",
+          "manage": {
+            "aria-label": "Manage secret key",
+            "reveal": {
+              "show": "Reveal secret key",
               "hide": "Hide secret key"
+            },
+            "status": {
+              "enable": "Enable secret key",
+              "disable": "Disable secret key"
             }
           },
           "empty-state": "No secret keys"

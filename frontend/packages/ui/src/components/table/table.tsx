@@ -93,7 +93,9 @@ const TableContainer = styled.table`
     td {
       ${createFontStyles('body-3')};
       color: ${theme.color.primary};
-      padding: ${theme.spacing[4]}px ${theme.spacing[6]}px;
+      height: 46px;
+      padding: 0 ${theme.spacing[6]}px;
+      vertical-align: middle;
     }
 
     tr:not(:last-child) td,
@@ -134,13 +136,14 @@ const Tr = styled.tr<{
 }>`
   ${({ theme, isRowClickable }) => css`
     transition: 0.1s;
-    :hover {
-      background-color: ${theme.backgroundColor.secondary};
-    }
 
     ${isRowClickable &&
     css`
       cursor: pointer;
+
+      :hover {
+        background-color: ${theme.backgroundColor.secondary};
+      }
     `}
   `}
 `;
