@@ -48,7 +48,7 @@ class TestDashboard:
                 "attributes": attributes,
                 "reason": "Doing a hecking decrypt",
             }
-            body = post("org/decrypt", data, tenant.sk.key)
+            body = post("users/decrypt", data, tenant.sk.key)
             attributes = body["data"]
             for data_kind, value in attributes.items():
                 assert expected_data[data_kind].upper() == value.upper()
@@ -60,13 +60,13 @@ class TestDashboard:
             "attributes": ["city"],
             "reason": "Not doing a hecking decrypt",
         }
-        post("org/decrypt", data, tenant.sk.key, status_code=401)
+        post("users/decrypt", data, tenant.sk.key, status_code=401)
         
     def test_scoped_users_list(self, user):
         tenant = user.tenant
         # TODO don't filter on fp_user_id in this test. We only do it to ensure it doesn't flake in dev
         # https://linear.app/footprint/issue/FP-390/integration-tests-for-onboarding-list-break-in-dev
-        body = get("org/scoped_users", dict(fp_user_id=user.fp_user_id), tenant.sk.key)
+        body = get("users", dict(fp_user_id=user.fp_user_id), tenant.sk.key)
         scoped_users = body["data"]
         assert len(scoped_users)
         assert scoped_users[0]["footprint_user_id"] == user.fp_user_id
@@ -74,14 +74,14 @@ class TestDashboard:
 
     def test_liveness_list(self, user):
         tenant = user.tenant
-        body = get("org/liveness", dict(footprint_user_id=user.fp_user_id), tenant.sk.key)
+        body = get("users/liveness", dict(footprint_user_id=user.fp_user_id), tenant.sk.key)
         creds = body["data"]
         assert len(creds)
         assert creds[0]["insight_event"]
 
     def test_access_events_list(self, user):
         tenant = user.tenant
-        body = get("org/access_events", dict(footprint_user_id=user.fp_user_id), tenant.sk.key)
+        body = get("users/access_events", dict(footprint_user_id=user.fp_user_id), tenant.sk.key)
         access_events = body["data"]
         assert len(access_events) == len(FIELDS_TO_DECRYPT)
         for i, expected_fields in enumerate(FIELDS_TO_DECRYPT[-1:0]):
@@ -90,7 +90,7 @@ class TestDashboard:
         # Test filtering on kinds. We provide two different kinds, and we should get all access events
         # that contain at least one of these fields
         params = dict(footprint_user_id=user.fp_user_id, data_kinds=",".join(["email", "street_address"]))
-        body = get("org/access_events", params, tenant.sk.key)
+        body = get("users/access_events", params, tenant.sk.key)
         access_events = body["data"]
         assert len(access_events) == 2
         assert "email" in set(access_events[0]["data_kinds"])
@@ -100,7 +100,7 @@ class TestDashboard:
         params = dict(
             timestamp_gte=arrow.utcnow().shift(days=1).isoformat()
         )
-        body = get("org/access_events", params, tenant.sk.key)
+        body = get("users/access_events", params, tenant.sk.key)
         assert not body["data"]
 
     def test_config_list(self, workos_sandbox_tenant, ob_configuration):

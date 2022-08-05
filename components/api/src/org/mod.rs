@@ -14,11 +14,4 @@ pub fn routes() -> web::Scope {
         .service(settings::routes())
         .service(workos::routes())
         .service(api_keys::routes())
-        // TODO remove these old routes
-        .service(web::resource("/scoped_users").route(web::get().to(super::users::index::get)))
-        .service(super::users::access_events::get)
-        .service(super::users::audit_trail::get)
-        .service(super::users::decrypt::post)
-        .service(super::users::liveness::get)
-        .service(super::users::validate::validate)
 }

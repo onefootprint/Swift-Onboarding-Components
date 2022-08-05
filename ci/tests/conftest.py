@@ -160,7 +160,7 @@ def user(workos_sandbox_tenant, twilio):
     validation_token = body["data"]["validation_token"]
 
     # Get the fp_user_id
-    body = post("org/validate", dict(validation_token=validation_token), workos_sandbox_tenant.sk.key)
+    body = post("users/validate", dict(validation_token=validation_token), workos_sandbox_tenant.sk.key)
     fp_user_id = body["data"]["footprint_user_id"]
     return User(
         auth_token=auth_token,

@@ -191,7 +191,7 @@ class TestBifrost:
 
         # test the validate api call
         data = dict(validation_token=validation_token)
-        body = post("org/validate", data, workos_tenant.sk.key)
+        body = post("users/validate", data, workos_tenant.sk.key)
         fp_user_id2 = body["data"]["footprint_user_id"]
         assert fp_user_id2 == fp_user_id
         assert body["data"]["status"]
@@ -202,7 +202,7 @@ class TestBifrost:
         assert not body["data"]["missing_webauthn_credentials"]
         validation_token = body["data"]["validation_token"]
         data = dict(validation_token=validation_token)
-        body = post("org/validate", data, workos_tenant.sk.key)
+        body = post("users/validate", data, workos_tenant.sk.key)
         assert body["data"]["footprint_user_id"]
 
         # We won't ever actually hit onboarding/complete if the tenant has already onboarded,
@@ -210,7 +210,7 @@ class TestBifrost:
         body = post("internal/onboarding/complete", None, workos_tenant.ob_config.key, auth_token)
         validation_token = body["data"]["validation_token"]
         data = dict(validation_token=validation_token)
-        body = post("org/validate", data, workos_tenant.sk.key)
+        body = post("users/validate", data, workos_tenant.sk.key)
         assert body["data"]["footprint_user_id"]
 
     def test_identify_login_repeat_customer_biometric(self, auth_token):
@@ -292,7 +292,7 @@ class TestBifrost:
 
             # test the validate api call
             data = dict(validation_token=validation_token)
-            body = post("org/validate", data, tenant.sk.key)
+            body = post("users/validate", data, tenant.sk.key)
             return body["data"]["footprint_user_id"]
 
         foo_fp_user_id = onboard_onto_tenant(foo_tenant)

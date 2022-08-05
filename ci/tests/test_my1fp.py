@@ -99,7 +99,7 @@ class TestMy1fp:
                 "attributes": attributes,
                 "reason": "Doing a hecking decrypt",
             }
-            post("org/decrypt", data, tenant.sk.key)
+            post("users/decrypt", data, tenant.sk.key)
 
         # Get the user detail using the logged in context
         body = get("internal/user/access_events", None, my1fp_authed_user.auth_token)
