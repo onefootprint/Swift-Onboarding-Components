@@ -25,8 +25,9 @@ const PhoneRegistration = () => {
   };
 
   const getNewPhoneChallenge = (phone: string, userFound: boolean) => {
+    const { identifyType } = state.context;
     identifyChallengeMutation.mutate(
-      { phoneNumber: phone },
+      { phoneNumber: phone, identifyType },
       {
         onSuccess({ challengeToken, timeBeforeRetryS }) {
           send({

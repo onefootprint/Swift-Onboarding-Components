@@ -1,8 +1,10 @@
 import { useMutation } from '@tanstack/react-query';
 import request, { RequestError, RequestResponse } from 'request';
+import { IdentifyType } from 'src/utils/state-machine/types';
 
 export type IdentifyChallengeRequest = {
   phoneNumber: string;
+  identifyType: IdentifyType;
 };
 
 export type IdentifyChallengeResponse = {

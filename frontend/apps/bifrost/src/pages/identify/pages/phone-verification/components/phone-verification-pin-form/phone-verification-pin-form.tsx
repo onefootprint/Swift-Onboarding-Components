@@ -79,10 +79,9 @@ const PhoneVerificationPinForm = ({
   };
 
   const sendIdentifyChallenge = (phoneNumber: string) => {
+    const { identifyType } = state.context;
     identifyChallengeMutation.mutate(
-      {
-        phoneNumber,
-      },
+      { phoneNumber, identifyType },
       {
         onError: showRequestErrorToast,
         onSuccess: ({ challengeToken, timeBeforeRetryS }) => {
