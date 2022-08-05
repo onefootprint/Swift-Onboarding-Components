@@ -14,6 +14,7 @@ pub mod decrypt;
 pub mod detail;
 pub mod email;
 pub mod liveness;
+pub mod token;
 
 pub fn routes() -> web::Scope {
     web::scope("/user")
@@ -25,6 +26,7 @@ pub fn routes() -> web::Scope {
         .service(biometric::init)
         .service(biometric::complete)
         .service(liveness::get)
+        .service(token::get)
         .service(email::routes())
 }
 
