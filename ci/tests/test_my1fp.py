@@ -13,7 +13,7 @@ Returns a user authed under a my1fp scope
 def my1fp_authed_user(user, twilio):
     # Identify the user by email
     identifier = {"email": user.email}
-    data = {"identifier": identifier, "preferred_challenge_kind": "sms", "identify_type": "my1fp"}
+    data = dict(identifier=identifier, preferred_challenge_kind="sms", identify_type="my1fp")
 
     def identify():
         body = post("internal/identify", data)

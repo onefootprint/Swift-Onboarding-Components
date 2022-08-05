@@ -15,7 +15,7 @@ WEBAUTHN_DEVICE = SoftWebauthnDevice()
 @pytest.fixture(scope="module")
 def auth_token(twilio):
     # Test the SMS challenge flow, return the resulting auth token of the user created with the number
-    data = {"phone_number": PHONE_NUMBER}
+    data = dict(phone_number=PHONE_NUMBER, identify_type="onboarding")
     body = post("internal/identify/challenge", data)
     challenge_token = body["data"]["challenge_token"]
     def identify_verify():
@@ -74,7 +74,7 @@ def cleanup():
 class TestBifrost:
     @pytest.mark.parametrize("identifier", [dict(email=EMAIL), dict(phone_number=PHONE_NUMBER)])
     def test_identify_doesnt_exist(self, identifier):
-        data = {"identifier": identifier, "preferred_challenge_kind": "sms"}
+        data = dict(identifier=identifier, preferred_challenge_kind="sms", identify_type="onboarding")
 
         # First try identifying with an email. The user won't exist
         body = post("internal/identify", data)
@@ -218,7 +218,7 @@ class TestBifrost:
         auth_token
         # Identify the user by email
         identifier = {"email": EMAIL}
-        data = {"identifier": identifier, "preferred_challenge_kind": "biometric"}
+        data = dict(identifier=identifier, preferred_challenge_kind="biometric", identify_type="onboarding")
         body = post("internal/identify", data)
         assert body["data"]["user_found"]
         assert body["data"]["challenge_data"]["phone_number_last_two"] == PHONE_NUMBER[-2:]
@@ -256,7 +256,7 @@ class TestBifrost:
         auth_token
         # Identify the user by email
         identifier = {"email": EMAIL}
-        data = {"identifier": identifier, "preferred_challenge_kind": "sms"}
+        data = dict(identifier=identifier, preferred_challenge_kind="sms", identify_type="onboarding")
 
         def identify():
             body = post("internal/identify", data)

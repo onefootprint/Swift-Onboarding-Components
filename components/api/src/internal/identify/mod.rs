@@ -49,13 +49,14 @@ pub struct IdentifyChallengeState {
 #[derive(Debug, serde::Serialize, serde::Deserialize, PartialEq, Clone, Copy, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
 pub enum IdentifyType {
+    Unspecified,
     Onboarding,
     My1fp,
 }
 
 impl Default for IdentifyType {
     fn default() -> Self {
-        Self::Onboarding
+        Self::Unspecified
     }
 }
 

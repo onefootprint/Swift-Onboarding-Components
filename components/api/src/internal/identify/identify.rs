@@ -23,7 +23,6 @@ use webauthn_rs_proto::{RegisteredExtensions, UserVerificationPolicy};
 pub struct IdentifyRequest {
     identifier: Identifier,
     preferred_challenge_kind: ChallengeKind,
-    #[serde(default)]
     identify_type: IdentifyType,
 }
 

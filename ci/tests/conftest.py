@@ -96,7 +96,7 @@ def user(workos_sandbox_tenant, twilio):
 
     # Initiate the challenge to a sandbox phone number
     def initiate_challenge():
-        data = {"phone_number": sandbox_phone_number}
+        data = dict(phone_number=sandbox_phone_number, identify_type="onboarding")
         body = post("internal/identify/challenge", data)
         return body["data"]["challenge_token"]
     challenge_token = try_until_success(initiate_challenge, 20)  # Rate limiting may take a while

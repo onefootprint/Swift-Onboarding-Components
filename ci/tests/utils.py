@@ -94,7 +94,8 @@ def clean_up_user(phone_number, email):
     # cleanup live user
     post("private/cleanup", dict(phone_number=phone_number), CUSTODIAN_AUTH)
     identifier = {"email": email}
-    body = post("internal/identify", dict(identifier=identifier, preferred_challenge_kind="sms"))
+    data = dict(identifier=identifier, preferred_challenge_kind="sms", identify_type="onboarding")
+    body = post("internal/identify", data)
     assert not body["data"]["user_found"]
     assert not body["data"].get("challenge_data", dict())
 

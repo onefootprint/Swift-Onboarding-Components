@@ -10,7 +10,6 @@ use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
 pub struct ChallengeRequest {
     phone_number: PhoneNumber,
-    #[serde(default)]
     identify_type: IdentifyType,
 }
 
