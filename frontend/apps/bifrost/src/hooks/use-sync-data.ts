@@ -19,9 +19,9 @@ const dataHasAddress = (data: UserData) =>
   data[UserDataAttribute.zip];
 
 const useSyncData = () => {
-  const userDataMutation = useUserData();
+  const mutation = useUserData();
 
-  return (
+  const syncData = (
     authToken: string,
     data: UserData,
     options: {
@@ -75,7 +75,7 @@ const useSyncData = () => {
       };
     }
 
-    userDataMutation.mutate(
+    mutation.mutate(
       {
         data: requestData,
         authToken,
@@ -87,6 +87,8 @@ const useSyncData = () => {
       },
     );
   };
+
+  return { mutation, syncData };
 };
 
 export default useSyncData;

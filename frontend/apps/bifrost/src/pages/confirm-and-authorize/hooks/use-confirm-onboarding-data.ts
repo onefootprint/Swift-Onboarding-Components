@@ -10,7 +10,7 @@ import useSyncData from '../../../hooks/use-sync-data';
 const useConfirmOnboardingData = () => {
   const { t } = useTranslation('pages.confirm-and-authorize');
   const [state, send] = useBifrostMachine();
-  const syncDataMutation = useSyncData();
+  const { syncData } = useSyncData();
   const toast = useToast();
   const footprint = useFootprintJs();
   const completeOnboardingMutation = useOnboardingComplete();
@@ -78,7 +78,7 @@ const useConfirmOnboardingData = () => {
       return;
     }
 
-    syncDataMutation(authToken, data, {
+    syncData(authToken, data, {
       speculative: false,
       onSuccess: () => {
         completeOnboarding(authToken, tenant.pk, options.onComplete);

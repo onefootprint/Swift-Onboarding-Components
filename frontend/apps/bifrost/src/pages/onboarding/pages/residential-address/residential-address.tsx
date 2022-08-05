@@ -37,7 +37,7 @@ type FormData = {
 
 const ResidentialAddress = () => {
   const [state, send] = useOnboardingMachine();
-  const syncDataMutation = useSyncData();
+  const { mutation, syncData } = useSyncData();
   const toast = useToast();
   const { data, authToken } = state.context;
   const { t } = useTranslation('pages.registration.residential-address');
@@ -95,7 +95,7 @@ const ResidentialAddress = () => {
       });
     };
 
-    syncDataMutation(authToken, residentialAddress, {
+    syncData(authToken, residentialAddress, {
       speculative: true,
       onSuccess: handleSuccess,
       onError: handleError,
@@ -240,7 +240,7 @@ const ResidentialAddress = () => {
             {...register(UserDataAttribute.state)}
           />
         )}
-        <Button type="submit" fullWidth>
+        <Button type="submit" fullWidth loading={mutation.isLoading}>
           {t('form.cta')}
         </Button>
       </Form>

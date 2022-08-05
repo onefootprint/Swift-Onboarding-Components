@@ -26,7 +26,7 @@ const BasicInformation = () => {
   const inputMasks = useInputMask('en-US');
   const [state, send] = useOnboardingMachine();
   const { data, authToken } = state.context;
-  const syncDataMutation = useSyncData();
+  const { mutation, syncData } = useSyncData();
   const toast = useToast();
   const { t } = useTranslation('pages.registration.basic-information');
   const {
@@ -65,7 +65,7 @@ const BasicInformation = () => {
       });
     };
 
-    syncDataMutation(authToken, basicInformation, {
+    syncData(authToken, basicInformation, {
       speculative: true,
       onSuccess: handleSuccess,
       onError: handleError,
@@ -108,7 +108,7 @@ const BasicInformation = () => {
             validate: validateDob,
           })}
         />
-        <Button type="submit" fullWidth>
+        <Button type="submit" fullWidth loading={mutation.isLoading}>
           {t('form.cta')}
         </Button>
       </Form>

@@ -1,3 +1,4 @@
+import { useIsMutating } from '@tanstack/react-query';
 import { HeaderTitle } from 'footprint-ui';
 import { useTranslation } from 'hooks';
 import IcoBuilding24 from 'icons/ico/ico-building-24';
@@ -6,7 +7,7 @@ import IcoEmail24 from 'icons/ico/ico-email-24';
 import IcoFileText24 from 'icons/ico/ico-file-text-24';
 import IcoPhone24 from 'icons/ico/ico-phone-24';
 import IcoUserCircle24 from 'icons/ico/ico-user-circle-24';
-import React, { useState } from 'react';
+import React from 'react';
 import { useBifrostMachine } from 'src/components/bifrost-machine-provider';
 import NavigationHeader from 'src/components/navigation-header';
 import { UserDataAttribute } from 'src/utils/state-machine/types';
@@ -55,16 +56,13 @@ const IconsByUserDataAttributes: Record<
 };
 
 const ConfirmAndAuthorize = () => {
-  const [loading, setLoading] = useState(false);
   const confirmOnboardingData = useConfirmOnboardingData();
+  const isMutating = useIsMutating();
   const { t } = useTranslation('pages.confirm-and-authorize');
   const [state] = useBifrostMachine();
 
   const handleClick = () => {
-    setLoading(true);
-    const handleConfirmOnboardingCompleted = () => {
-      setLoading(false);
-    };
+    const handleConfirmOnboardingCompleted = () => {};
     confirmOnboardingData({ onComplete: handleConfirmOnboardingCompleted });
   };
 
@@ -95,7 +93,7 @@ const ConfirmAndAuthorize = () => {
         </CategoriesContainer>
         <FootprintButton
           fullWidth
-          loading={loading}
+          loading={isMutating > 0}
           onClick={handleClick}
           text={t('cta')}
         />

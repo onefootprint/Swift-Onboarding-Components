@@ -22,7 +22,7 @@ const SSN = () => {
   const inputMasks = useInputMask('en-US');
   const [state, send] = useOnboardingMachine();
   const { authToken } = state.context;
-  const syncDataMutation = useSyncData();
+  const { mutation, syncData } = useSyncData();
   const toast = useToast();
   const { t } = useTranslation('pages.registration.ssn');
   const {
@@ -48,7 +48,7 @@ const SSN = () => {
       });
     };
 
-    syncDataMutation(authToken, ssn, {
+    syncData(authToken, ssn, {
       speculative: true,
       onSuccess: handleSuccess,
       onError: handleError,
@@ -94,7 +94,7 @@ const SSN = () => {
             },
           ]}
         />
-        <Button type="submit" fullWidth>
+        <Button type="submit" fullWidth loading={mutation.isLoading}>
           {t('form.cta')}
         </Button>
       </Form>
