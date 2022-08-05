@@ -51,7 +51,8 @@ export const createVariantStyles = (variant: BannerVariant) => {
       background-color: ${theme.backgroundColor[backgroundColor]};
       color: ${theme.color[color]};
 
-      a {
+      a,
+      button {
         color: ${theme.color[link.color]};
       }
     `}

@@ -15,7 +15,7 @@ const ApiKeys = () => {
     <section data-testid="api-keys-section">
       <Header>
         <Box>
-          <Typography variant="heading-2" as="h3" sx={{ marginBottom: 2 }}>
+          <Typography variant="label-1" as="h3" sx={{ marginBottom: 2 }}>
             {t('header.title')}
           </Typography>
           <Typography variant="body-3">{t('header.subtitle')}</Typography>

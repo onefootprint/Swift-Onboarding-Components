@@ -35,7 +35,7 @@ describe('<Toggle />', () => {
   describe('<Toggle />', () => {
     it('should render a label', () => {
       renderToggle({ label: 'Toggle' });
-      const input = screen.getByLabelText('Toggle') as HTMLInputElement;
+      const input = screen.getByLabelText('Toggle');
       expect(input).toBeInTheDocument();
     });
 

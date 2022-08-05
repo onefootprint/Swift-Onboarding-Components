@@ -19,7 +19,16 @@ const Banner = styled.div.attrs<BannerProps>({
     text-align: center;
     width: 100%;
 
-    a {
+    button {
+      ${createFontStyles('label-3')};
+      background: unset;
+      border: unset;
+      cursor: pointer;
+      text-decoration: underline;
+    }
+
+    a,
+    button {
       &:hover {
         opacity: 0.7;
       }

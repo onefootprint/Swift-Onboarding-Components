@@ -2,6 +2,14 @@
   "global": {
     "errors": {}
   },
+  "components": {
+    "private-layout": {
+      "sandbox-banner": {
+        "title": "Sandbox mode.",
+        "disable": "Disable"
+      }
+    }
+  },
   "pages": {
     "developers": {
       "page-title": "Footprint - Developers",
@@ -10,6 +18,9 @@
         "subtitle": {
           "live": "You're viewing live keys. Enable sandbox mode to view test keys.",
           "sandbox": "You're viewing test keys. Disable sandbox mode to view live keys."
+        },
+        "toggle-sandbox": {
+          "label": "Sandbox mode"
         }
       },
       "api-keys": {

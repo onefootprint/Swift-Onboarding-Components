@@ -5,21 +5,23 @@ import styled, { css } from 'styled-components';
 import { createFontStyles, createOverlayBackground } from '../../utils/mixins';
 
 export type ToggleProps = {
-  label?: string;
-  onBlur?: (event: React.FocusEvent<HTMLButtonElement>) => void;
-  onFocus?: (event: React.FocusEvent<HTMLButtonElement>) => void;
-  disabled?: boolean;
-  required?: boolean;
-  id?: string;
-  name?: string;
+  'aria-label'?: string;
   checked?: boolean;
   defaultChecked?: boolean;
+  disabled?: boolean;
+  id?: string;
+  label?: string;
+  name?: string;
+  onBlur?: (event: React.FocusEvent<HTMLButtonElement>) => void;
   onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  onFocus?: (event: React.FocusEvent<HTMLButtonElement>) => void;
+  required?: boolean;
 };
 
 const Switch = forwardRef<HTMLInputElement, ToggleProps>(
   (
     {
+      'aria-label': ariaLabel,
       label,
       checked: initialChecked,
       defaultChecked,
@@ -77,12 +79,13 @@ const Switch = forwardRef<HTMLInputElement, ToggleProps>(
           type="checkbox"
         />
         <Button
-          onBlur={onBlur}
-          onFocus={onFocus}
           aria-checked={checked}
+          aria-label={ariaLabel}
           checked={checked}
           disabled={disabled}
+          onBlur={onBlur}
           onClick={handleClick}
+          onFocus={onFocus}
           role="switch"
           type="button"
         >
@@ -124,6 +127,7 @@ const Button = styled.button<{ checked?: boolean }>`
     border-width: ${theme.borderWidth[2]}px;
     cursor: pointer;
     height: 24px;
+    outline-offset: ${theme.spacing[2]}px;
     padding: ${theme.spacing[1]}px;
     width: 36px;
 
