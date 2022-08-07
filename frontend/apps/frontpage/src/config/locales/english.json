@@ -71,7 +71,7 @@
   },
   "pages": {
     "home": {
-      "html-title": "Footprint - 1-click KYC & PII vault",
+      "html-title": "Footprint - one-click KYC & PII vault",
       "hero": {
         "title": "Frictionless Identity Verification",
         "subtitle": "Onboard users with the click of a button. Offload handling sensitive data. Grow your user base quickly and securely with Footprint's one-click KYC and secure data vault.",
@@ -362,10 +362,10 @@
         "slide": {
           "button-label": "Slide image {{index}}",
           "integration": {
-            "alt": "Onboard users with 1-click",
-            "tooltip": "1-click Onboarding"
+            "alt": "Onboard users with one-click",
+            "tooltip": "one-click Onboarding"
           },
-          "1-click": {
+          "one-click": {
             "alt": "Know the data you're sharing",
             "tooltip": "Transparent"
           },

@@ -20,8 +20,8 @@ const Carousel = () => {
     },
     {
       src: '/compare/carousel/carousel-2.png',
-      alt: t('slide.1-click.alt'),
-      tooltip: t('slide.1-click.tooltip'),
+      alt: t('slide.one-click.alt'),
+      tooltip: t('slide.one-click.tooltip'),
     },
     {
       src: '/compare/carousel/carousel-3.png',
