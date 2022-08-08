@@ -10,6 +10,7 @@ pub mod onboarding;
 pub mod scoped_user;
 pub mod secret_api_key;
 pub mod success;
+pub mod tenant;
 
 /// empty data
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Apiv2Schema)]

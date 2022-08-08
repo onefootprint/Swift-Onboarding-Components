@@ -1,12 +1,14 @@
 use paperclip::actix::web;
 
 pub mod api_keys;
+pub mod index;
 pub mod onboarding_configs;
 pub mod settings;
 pub mod workos;
 
 pub fn routes() -> web::Scope {
     web::scope("/org")
+        .service(web::resource("").route(web::get().to(index::get)))
         .service(onboarding_configs::get)
         .service(onboarding_configs::get_detail)
         .service(onboarding_configs::patch)

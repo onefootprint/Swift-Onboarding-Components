@@ -61,6 +61,13 @@ class TestDashboard:
             "reason": "Not doing a hecking decrypt",
         }
         post("users/decrypt", data, tenant.sk.key, status_code=401)
+
+    def test_get_org(self, user):
+        body = get("org", None, user.tenant.sk.key)
+        tenant = body["data"]
+        assert tenant["name"] == "Acme Bank"
+        assert not tenant["is_sandbox_restricted"]
+        tenant["logo_url"]
         
     def test_scoped_users_list(self, user):
         tenant = user.tenant
