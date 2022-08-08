@@ -36,8 +36,7 @@ async fn get(
             let key = TenantApiKey::get(conn, &tenant_id, &request.id, is_live)?;
             let last_used_at = TenantApiKeyAccessLog::get(conn, vec![&key.id])?
                 .get(&key.id)
-                .ok_or(ApiError::NotImplemented)?
-                .to_owned();
+                .map(|x| x.to_owned());
             Ok((key, last_used_at))
         })
         .await??;
@@ -54,6 +53,6 @@ async fn get(
     Ok(Json(ApiResponseData::ok(TenantApiKeyResponse::from((
         key,
         Some(SecretApiKey::from(decrypted_secret_key.leak().to_string())),
-        Some(last_used_at),
+        last_used_at,
     )))))
 }
