@@ -102,7 +102,10 @@
         },
         "list-item": {
           "created-at": "Created on {{date}}",
-          "disable": "Disable",
+          "toggle-status": {
+            "disable": "Disable",
+            "enable": "Enable"
+          },
           "required-data": {
             "label": "Required data to be collected",
             "tooltip": ""

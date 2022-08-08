@@ -5,6 +5,8 @@ import type { OnboardingConfig } from 'src/types/onboarding-config';
 import styled, { css } from 'styled-components';
 import { Badge, Code, IconButton, LinkButton, Tag, Typography } from 'ui';
 
+import useUpdateOnboardingConfig from './hooks/use-update-onboarding-config';
+
 type ListItemProps = {
   data: OnboardingConfig;
 };
@@ -12,6 +14,7 @@ type ListItemProps = {
 const ListItem = ({ data }: ListItemProps) => {
   const { t } = useTranslation('pages.developers.onboarding-configs.list-item');
   const { t: globalT } = useTranslation('global.data-kinds');
+  const { toggleStatus } = useUpdateOnboardingConfig(data);
 
   return (
     <Table data-testid={`onboarding-config-${data.id}`}>
@@ -40,13 +43,13 @@ const ListItem = ({ data }: ListItemProps) => {
           <th>&nbsp;</th>
           <th>
             <LinkButton
-              variant="destructive"
+              onClick={toggleStatus}
               size="tiny"
-              onClick={() => {
-                alert('to be implemented');
-              }}
+              variant={data.status === 'enabled' ? 'destructive' : 'default'}
             >
-              {t('disable')}
+              {data.status === 'enabled'
+                ? t('toggle-status.disable')
+                : t('toggle-status.enable')}
             </LinkButton>
           </th>
         </tr>

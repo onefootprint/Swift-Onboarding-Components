@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { useIntl } from 'hooks';
+import take from 'lodash/take';
 import request, { RequestError, RequestResponse } from 'request';
 import useSessionUser, { AuthHeaders } from 'src/hooks/use-session-user';
 import type { ApiKey } from 'src/types/api-key';
@@ -29,7 +30,7 @@ const useApiKeys = () => {
     () => getApiKeys({ authHeaders }),
     {
       select: response =>
-        response.map((apiKey: ApiKey) => ({
+        take(response, 10).map((apiKey: ApiKey) => ({
           ...apiKey,
           createdAt: formatDateWithTime(new Date(apiKey.createdAt)),
           lastUsedAt: apiKey.lastUsedAt
