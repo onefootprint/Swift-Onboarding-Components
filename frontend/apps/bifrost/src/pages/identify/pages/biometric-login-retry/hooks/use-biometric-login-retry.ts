@@ -3,7 +3,7 @@ import useIdentify, {
 } from 'src/pages/identify/hooks/use-identify';
 import useIdentityVerify, {
   IdentifyVerifyResponse,
-} from 'src/pages/identify/hooks/use-identity-verify';
+} from 'src/pages/identify/hooks/use-identify-verify';
 import generateLoginDeviceResponse from 'src/utils/biometric/login-challenge-response';
 import {
   ChallengeData,

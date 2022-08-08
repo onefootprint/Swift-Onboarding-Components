@@ -11,7 +11,7 @@ import { LinkButton, LoadingIndicator, PinInput, useToast } from 'ui';
 import useIdentifyMachine from '../../../../hooks/use-identify-machine';
 import useIdentifyVerify, {
   IdentifyVerifyResponse,
-} from '../../../../hooks/use-identity-verify';
+} from '../../../../hooks/use-identify-verify';
 
 const SUCCESS_EVENT_DELAY_MS = 1500;
 
