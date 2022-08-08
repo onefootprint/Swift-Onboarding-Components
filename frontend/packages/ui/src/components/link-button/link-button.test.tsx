@@ -18,6 +18,7 @@ describe('<LinkButton />', () => {
     target,
     testID,
     variant = 'default',
+    disabled = false,
   }: Partial<LinkButtonProps>) =>
     customRender(
       <LinkButton
@@ -30,6 +31,7 @@ describe('<LinkButton />', () => {
         target={target}
         testID={testID}
         variant={variant}
+        disabled={disabled}
       >
         {children}
       </LinkButton>,
@@ -89,6 +91,21 @@ describe('<LinkButton />', () => {
         });
       },
     );
+
+    describe('when the button is disabled', () => {
+      it('should NOT fire an event when pressing', async () => {
+        const onClickMockFn = jest.fn();
+        renderLinkButton({
+          children: 'Link button',
+          onClick: onClickMockFn,
+          disabled: true,
+        });
+        await userEvent.click(
+          screen.getByRole('button', { name: 'Link button' }),
+        );
+        expect(onClickMockFn).not.toHaveBeenCalled();
+      });
+    });
 
     describe('when the href prop is present', () => {
       it('should render the component as an anchor', () => {

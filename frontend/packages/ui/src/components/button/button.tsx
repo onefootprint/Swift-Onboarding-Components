@@ -71,8 +71,9 @@ const ButtonContainer = styled.button<{
   $loading?: boolean;
   $size: ButtonSize;
   $variant: ButtonVariant;
+  disabled: boolean;
 }>`
-  ${({ theme, $variant, $fullWidth, $size, $loading }) => css`
+  ${({ theme, $variant, $fullWidth, $size, $loading, disabled }) => css`
     ${createSizeStyles($size)};
     ${createVariantStyles($variant)};
     ${createFullWidthStyles($fullWidth)};
@@ -85,6 +86,7 @@ const ButtonContainer = styled.button<{
     outline-offset: ${theme.spacing[2]}px;
     text-decoration: none;
     user-select: none;
+    cursor: ${disabled ? 'auto' : 'cursor'};
   `}
 `;
 

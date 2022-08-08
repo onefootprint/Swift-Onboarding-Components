@@ -23,6 +23,7 @@ export type LinkButtonProps = {
   target?: HTMLAttributeAnchorTarget;
   testID?: string;
   variant?: LinkButtonVariant;
+  disabled?: boolean;
 };
 
 const LinkButton = ({
@@ -36,6 +37,7 @@ const LinkButton = ({
   target,
   testID,
   variant = 'default',
+  disabled = false,
 }: LinkButtonProps) => {
   const renderedIcon = Icon && (
     <Icon color={variant === 'default' ? 'accent' : 'error'} />
@@ -43,15 +45,16 @@ const LinkButton = ({
   return (
     <LinkButtonStyled
       variant={variant}
+      disabled={disabled}
       aria-label={ariaLabel}
       data-testid={testID}
-      href={href}
-      onClick={onClick}
+      href={!disabled ? href : undefined}
+      onClick={!disabled ? onClick : undefined}
       rel={target === '_blank' ? 'noopener noreferrer' : undefined}
       size={size}
       tabIndex={0}
-      target={href ? target : undefined}
-      type={href ? undefined : 'button'}
+      target={href && !disabled ? target : undefined}
+      type={href && !disabled ? undefined : 'button'}
     >
       {iconPosition === 'left' && renderedIcon}
       <span>{children}</span>
@@ -63,44 +66,50 @@ const LinkButton = ({
 type LinkButtonStyleProps = Pick<LinkButtonProps, 'href'> & {
   size: LinkButtonSize;
   variant: LinkButtonVariant;
+  disabled: boolean;
 };
 
 export const LinkButtonStyled = styled.a.attrs<{
   href: string;
   size: LinkButtonSize;
   variant: LinkButtonVariant;
+  disabled: boolean;
 }>(({ href }) => ({
   as: href ? 'a' : 'button',
 }))<LinkButtonStyleProps>`
-  ${({ theme, size, href, variant }) => css`
+  ${({ theme, size, href, variant, disabled }) => css`
     ${createFontStyles(fontSize[size])};
     align-items: center;
     background: transparent;
     border: none;
     color: ${theme.color[variant === 'default' ? 'accent' : 'error']};
-    cursor: pointer;
+    cursor: ${disabled ? 'auto' : 'cursor'};
     display: inline-flex;
     margin: 0;
     padding: 0;
     text-decoration: none;
 
-    &:hover {
-      opacity: 0.7;
-
-      ${href &&
-      css`
-        text-decoration: underline;
-      `};
-    }
-
-    &:active {
-      opacity: 0.85;
-    }
-
     span + svg,
     svg + span {
       margin-left: ${theme.spacing[2]}px;
     }
+
+    ${disabled
+      ? 'opacity: 0.45'
+      : css`
+          &:hover {
+            opacity: 0.7;
+
+            ${href &&
+            css`
+              text-decoration: underline;
+            `};
+          }
+
+          &:active {
+            opacity: 0.85;
+          }
+        `}
   `}
 `;
 

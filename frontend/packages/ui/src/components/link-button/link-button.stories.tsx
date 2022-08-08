@@ -60,6 +60,10 @@ export default {
       options: variants,
       table: { defaultValue: { summary: 'default' } },
     },
+    disabled: {
+      control: 'boolean',
+      description: 'Whether the button is disabled',
+    },
   },
 } as ComponentMeta<typeof LinkButton>;
 
@@ -74,6 +78,7 @@ const Template: Story<LinkButtonProps> = ({
   target,
   testID,
   variant,
+  disabled,
 }: LinkButtonProps) => {
   const SelectedIcon = typeof Icon === 'string' ? icos[Icon] : Icon;
   return (
@@ -87,6 +92,7 @@ const Template: Story<LinkButtonProps> = ({
       target={target}
       testID={testID}
       variant={variant}
+      disabled={disabled}
     >
       {children}
     </LinkButton>
@@ -104,6 +110,7 @@ AsLink.args = {
   target: '_blank',
   testID: 'link-button-test-id',
   variant: 'default',
+  disabled: false,
 };
 
 export const Base = Template.bind({});
