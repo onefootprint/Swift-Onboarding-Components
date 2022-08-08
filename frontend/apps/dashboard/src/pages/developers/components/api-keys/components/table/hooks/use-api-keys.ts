@@ -10,8 +10,6 @@ export type GetApiKeysRequest = {
 
 export type GetApiKeysResponse = ApiKey[];
 
-export type GetApiKeysResponseTransformed = ApiKey[];
-
 const getApiKeys = async ({ authHeaders }: GetApiKeysRequest) => {
   const { data: response } = await request<RequestResponse<GetApiKeysResponse>>(
     {
@@ -26,20 +24,20 @@ const getApiKeys = async ({ authHeaders }: GetApiKeysRequest) => {
 const useApiKeys = () => {
   const { formatDateWithTime } = useIntl();
   const { authHeaders } = useSessionUser();
-  return useQuery<
-    GetApiKeysResponse,
-    RequestError,
-    GetApiKeysResponseTransformed
-  >(['api-keys', authHeaders], () => getApiKeys({ authHeaders }), {
-    select: response =>
-      response.map((apiKey: ApiKey) => ({
-        ...apiKey,
-        createdAt: formatDateWithTime(new Date(apiKey.createdAt)),
-        lastUsedAt: apiKey.lastUsedAt
-          ? formatDateWithTime(new Date(apiKey.lastUsedAt))
-          : null,
-      })),
-  });
+  return useQuery<GetApiKeysResponse, RequestError>(
+    ['api-keys', authHeaders],
+    () => getApiKeys({ authHeaders }),
+    {
+      select: response =>
+        response.map((apiKey: ApiKey) => ({
+          ...apiKey,
+          createdAt: formatDateWithTime(new Date(apiKey.createdAt)),
+          lastUsedAt: apiKey.lastUsedAt
+            ? formatDateWithTime(new Date(apiKey.lastUsedAt))
+            : null,
+        })),
+    },
+  );
 };
 
 export default useApiKeys;

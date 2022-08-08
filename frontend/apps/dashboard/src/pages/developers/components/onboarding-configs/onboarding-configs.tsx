@@ -3,8 +3,10 @@ import React from 'react';
 import styled, { css } from 'styled-components';
 import { Box, Button, Divider, Typography } from 'ui';
 
+import List from './components/list';
+
 const OnboardingConfigurations = () => {
-  const { t } = useTranslation('pages.developers.onboarding-configurations');
+  const { t } = useTranslation('pages.developers.onboarding-configs');
 
   return (
     <>
@@ -20,9 +22,7 @@ const OnboardingConfigurations = () => {
         </Button>
       </Header>
       <StyledDivider />
-      <Typography color="secondary" variant="body-2">
-        {t('list.no-results')}
-      </Typography>
+      <List />
     </>
   );
 };

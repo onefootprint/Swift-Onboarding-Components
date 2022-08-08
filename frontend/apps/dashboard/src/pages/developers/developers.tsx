@@ -6,7 +6,7 @@ import styled, { css } from 'styled-components';
 import { Box, Toggle, Typography } from 'ui';
 
 import ApiKeys from './components/api-keys';
-import OnboardingConfigurations from './components/onboarding-configurations';
+import OnboardingConfigs from './components/onboarding-configs';
 
 const Developers = () => {
   const { t } = useTranslation('pages.developers');
@@ -44,7 +44,7 @@ const Developers = () => {
         <ApiKeys />
       </Box>
       <Box>
-        <OnboardingConfigurations />
+        <OnboardingConfigs />
       </Box>
     </>
   );

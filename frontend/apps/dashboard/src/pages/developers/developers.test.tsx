@@ -3,13 +3,14 @@ import { customRender, screen, userEvent, waitFor } from 'test-utils';
 
 import { useStore } from '../../hooks/use-session-user';
 import Developers from './developers';
-import { withApiKeys } from './developers.test.config';
+import { withApiKeys, withOnboardingConfigs } from './developers.test.config';
 
 const originalState = useStore.getState();
 
 describe('<Developers />', () => {
   beforeEach(() => {
     withApiKeys();
+    withOnboardingConfigs();
   });
 
   afterAll(() => {

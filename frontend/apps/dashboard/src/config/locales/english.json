@@ -1,6 +1,20 @@
 {
   "global": {
-    "errors": {}
+    "data-kinds": {
+      "first_name": "First name",
+      "last_name": "Last name",
+      "email": "Email",
+      "phone_number": "Phone number",
+      "ssn": "SSN",
+      "last_four_ssn": "SSN last four",
+      "dob": "Date of birth",
+      "street_address": "Address line 1",
+      "street_address2": "Address line 2",
+      "city": "City",
+      "state": "State",
+      "zip": "Zip code",
+      "country": "Country"
+    }
   },
   "components": {
     "private-layout": {
@@ -77,7 +91,7 @@
           "empty-state": "No secret keys"
         }
       },
-      "onboarding-configurations": {
+      "onboarding-configs": {
         "header": {
           "title": "Onboarding configurations",
           "subtitle": "Set up requirements for customers onboarding onto your platform.",
@@ -85,6 +99,24 @@
         },
         "list": {
           "no-results": "You haven't created any onboarding configurations just yet."
+        },
+        "list-item": {
+          "created-at": "Created on {{date}}",
+          "disable": "Disable",
+          "required-data": {
+            "label": "Required data to be collected",
+            "tooltip": ""
+          },
+          "access-data": {
+            "label": "Access permission scope",
+            "tooltip": "Attributes you'll have access to after user onboardings."
+          },
+          "key": {
+            "label": "Onboarding publishable key"
+          },
+          "status": {
+            "label": "Status"
+          }
         }
       }
     }
