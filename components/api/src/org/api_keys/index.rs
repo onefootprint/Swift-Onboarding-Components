@@ -4,7 +4,9 @@ use crate::auth::{Either, IsLive};
 use crate::auth::{HasTenant, SessionContext};
 use crate::errors::ApiError;
 use crate::types::secret_api_key::TenantApiKeyResponse;
-use crate::types::success::{ApiPaginatedResponseData, ApiResponseData};
+use crate::types::EmptyRequest;
+use crate::types::PaginatedRequest;
+use crate::types::{ApiPaginatedResponseData, ApiResponseData};
 use crate::State;
 use chrono::{DateTime, Utc};
 use db::models::tenant_api_key_access_log::TenantApiKeyAccessLog;
@@ -15,26 +17,15 @@ use newtypes::{ApiKeyStatus, TenantApiKeyId};
 use paperclip::actix::Apiv2Schema;
 use paperclip::actix::{api_v2_operation, patch, web, web::Json};
 
-#[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize, Apiv2Schema)]
-#[serde(rename_all = "snake_case")]
-pub struct ApiKeysRequest {
-    cursor: Option<DateTime<Utc>>,
-    page_size: Option<usize>,
-}
-
 /// List the tenant's secret API keys
 #[api_v2_operation(tags(Org))]
 pub async fn get(
     state: web::Data<State>,
-    request: web::Query<ApiKeysRequest>,
+    request: web::Query<PaginatedRequest<EmptyRequest, DateTime<Utc>>>,
     auth: Either<SessionContext<WorkOsSession>, SecretTenantAuthContext>,
 ) -> actix_web::Result<Json<ApiPaginatedResponseData<Vec<TenantApiKeyResponse>, DateTime<Utc>>>, ApiError> {
-    let ApiKeysRequest { cursor, page_size } = request.into_inner();
-    let page_size = if let Some(page_size) = page_size {
-        page_size
-    } else {
-        state.config.default_page_size
-    };
+    let page_size = request.page_size(&state);
+    let cursor = request.cursor;
 
     let is_live = auth.is_live()?;
     let (keys, id_to_last_used, count) = state
@@ -52,12 +43,7 @@ pub async fn get(
         })
         .await??;
 
-    let cursor = if keys.len() > page_size {
-        keys.last().map(|su| su.created_at)
-    } else {
-        None
-    };
-
+    let cursor = request.cursor_item(&state, &keys).map(|x| x.created_at);
     let keys = keys
         .into_iter()
         .take(page_size)

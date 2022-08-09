@@ -3,8 +3,9 @@ use crate::auth::session_data::workos::WorkOsSession;
 use crate::auth::Either;
 use crate::auth::HasTenant;
 use crate::auth::IsLive;
+use crate::types::request::PaginatedRequest;
+use crate::types::response::ApiPaginatedResponseData;
 use crate::types::scoped_user::ApiScopedUser;
-use crate::types::success::ApiPaginatedResponseData;
 use crate::utils::querystring::deserialize_stringified_list;
 use crate::State;
 use crate::{auth::SessionContext, errors::ApiError};
@@ -25,8 +26,6 @@ pub struct UsersRequest {
     footprint_user_id: Option<FootprintUserId>,
     timestamp_lte: Option<DateTime<Utc>>,
     timestamp_gte: Option<DateTime<Utc>>,
-    cursor: Option<i64>,
-    page_size: Option<usize>,
 }
 
 type UsersResponse = Vec<ApiScopedUser>;
@@ -37,25 +36,20 @@ type UsersResponse = Vec<ApiScopedUser>;
 /// Requires tenant secret key auth.
 pub fn get(
     state: web::Data<State>,
-    request: web::Query<UsersRequest>,
+    request: web::Query<PaginatedRequest<UsersRequest, i64>>,
     auth: Either<SessionContext<WorkOsSession>, SecretTenantAuthContext>,
 ) -> actix_web::Result<Json<ApiPaginatedResponseData<UsersResponse, i64>>, ApiError> {
     let tenant = auth.tenant(&state.db_pool).await?;
 
+    let cursor = request.cursor;
+    let page_size = request.page_size(&state);
     let UsersRequest {
         statuses,
         fingerprint,
         footprint_user_id,
         timestamp_lte,
         timestamp_gte,
-        cursor,
-        page_size,
-    } = request.into_inner();
-    let page_size = if let Some(page_size) = page_size {
-        page_size
-    } else {
-        state.config.default_page_size
-    };
+    } = request.data.clone();
 
     // TODO clean phone number or email
     let fingerprints = match fingerprint {
@@ -90,10 +84,9 @@ pub fn get(
             )?;
             // If no cursor is provided, we're on the first page, so we should return the total
             // count of results matching this query.
-            let count = match cursor {
-                Some(_) => None,
-                None => Some(db::scoped_users::count_for_tenant(conn, query_params)?),
-            };
+            let count = cursor.map_or(Ok(None), |_| {
+                db::scoped_users::count_for_tenant(conn, query_params).map(Some)
+            })?;
             let (scoped_user_ids, user_vault_ids) =
                 scoped_users.iter().map(|ob| (&ob.id, &ob.user_vault_id)).unzip();
             let user_to_kinds = db::user_data::bulk_fetch_populated_kinds(conn, user_vault_ids)?;
@@ -104,12 +97,9 @@ pub fn get(
         .await??;
 
     // If there are more than page_size results, we should tell the client there's another page
-    let cursor = if scoped_users.len() > page_size {
-        scoped_users.last().map(|su| su.ordering_id)
-    } else {
-        None
-    };
-
+    let cursor = request
+        .cursor_item(&state, &scoped_users)
+        .map(|su| su.ordering_id);
     let empty_vec = vec![];
     let scoped_users = scoped_users
         .into_iter()

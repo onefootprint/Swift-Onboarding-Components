@@ -1,7 +1,7 @@
 use crate::auth::session_data::user::UserAuthScope;
 use crate::auth::{UserAuth, VerifiedUserAuth};
 use crate::errors::ApiError;
-use crate::types::success::ApiResponseData;
+use crate::types::response::ApiResponseData;
 use crate::utils::user_vault_wrapper::UserVaultWrapper;
 use crate::State;
 use db::models::user_data::UserData;

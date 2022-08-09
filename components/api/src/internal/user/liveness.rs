@@ -2,7 +2,7 @@ use crate::auth::session_data::user::UserAuthScope;
 use crate::auth::{UserAuth, VerifiedUserAuth};
 use crate::errors::ApiError;
 use crate::types::liveness::ApiLiveness;
-use crate::types::success::ApiResponseData;
+use crate::types::response::ApiResponseData;
 use crate::State;
 use db::models::webauthn_credential::WebauthnCredential;
 use paperclip::actix::{api_v2_operation, get, web, web::Json};

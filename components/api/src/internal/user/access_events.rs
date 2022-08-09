@@ -1,7 +1,7 @@
 use crate::auth::{session_data::user::UserAuthScope, UserAuth};
 use crate::errors::ApiError;
 use crate::types::access_event::ApiAccessEvent;
-use crate::types::success::ApiResponseData;
+use crate::types::response::ApiResponseData;
 use crate::State;
 use db::access_event::AccessEventListItemForUser;
 use newtypes::DataKind;

@@ -1,6 +1,6 @@
 use super::IdentifyType;
 use crate::internal::identify::IdentifyChallengeData;
-use crate::types::success::ApiResponseData;
+use crate::types::response::ApiResponseData;
 use crate::utils::challenge::{Challenge, ChallengeToken};
 use crate::State;
 use crate::{errors::ApiError, internal::identify::IdentifyChallengeState};

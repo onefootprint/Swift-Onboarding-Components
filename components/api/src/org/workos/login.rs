@@ -6,7 +6,7 @@ use crate::errors::workos_login::WorkOsLoginError;
 use crate::utils::email_domain;
 use crate::utils::session::AuthSession;
 use crate::State;
-use crate::{errors::ApiError, types::success::ApiResponseData};
+use crate::{errors::ApiError, types::response::ApiResponseData};
 use chrono::Duration;
 use db::models::tenants::{NewTenant, Tenant};
 use db::tenant::{get_opt_by_workos_org_id, get_opt_by_workos_profile_id};

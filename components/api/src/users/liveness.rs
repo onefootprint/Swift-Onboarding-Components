@@ -4,7 +4,7 @@ use crate::auth::Either;
 use crate::auth::HasTenant;
 use crate::auth::IsLive;
 use crate::types::liveness::ApiLiveness;
-use crate::types::success::ApiResponseData;
+use crate::types::response::ApiResponseData;
 use crate::State;
 use crate::{auth::SessionContext, errors::ApiError};
 use db::models::webauthn_credential::WebauthnCredential;

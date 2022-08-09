@@ -1,6 +1,6 @@
 use crate::auth::key_context::custodian::CustodianAuthContext;
+use crate::types::response::ApiResponseData;
 use crate::types::secret_api_key::TenantApiKeyResponse;
-use crate::types::success::ApiResponseData;
 use crate::State;
 use crate::{enclave::gen_keypair, errors::ApiError};
 use db::models::tenant_api_keys::TenantApiKey;

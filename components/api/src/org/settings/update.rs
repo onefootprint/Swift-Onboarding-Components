@@ -1,8 +1,8 @@
 use crate::auth::session_data::workos::WorkOsSession;
 use crate::auth::{HasTenant, SessionContext};
 use crate::errors::ApiError;
-use crate::types::success::ApiResponseData;
-use crate::types::Empty;
+use crate::types::response::ApiResponseData;
+use crate::types::EmptyResponse;
 use crate::State;
 use db::models::tenants::UpdateTenantNameOrLogo;
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
@@ -23,7 +23,7 @@ fn handler(
     state: web::Data<State>,
     request: Json<UpdateRequest>,
     auth: SessionContext<WorkOsSession>,
-) -> actix_web::Result<Json<ApiResponseData<Empty>>, ApiError> {
+) -> actix_web::Result<Json<ApiResponseData<EmptyResponse>>, ApiError> {
     let request = request.into_inner();
 
     // update the tenant name
@@ -35,5 +35,5 @@ fn handler(
     .update(&state.db_pool)
     .await?;
 
-    Ok(Json(ApiResponseData { data: Empty }))
+    Ok(Json(ApiResponseData { data: EmptyResponse }))
 }

@@ -4,8 +4,8 @@ use crate::auth::UserAuth;
 use crate::auth::{session_data::user::UserAuthScope, VerifiedUserAuth};
 use crate::errors::challenge::ChallengeError;
 use crate::errors::ApiError;
-use crate::types::success::ApiResponseData;
-use crate::types::Empty;
+use crate::types::response::ApiResponseData;
+use crate::types::EmptyResponse;
 use crate::utils::email::send_email_challenge;
 use crate::State;
 use db::models::user_data::UserData;
@@ -26,7 +26,7 @@ async fn post(
     state: web::Data<State>,
     user_auth: UserAuth,
     request: Json<RequestEmailVerifyRequest>,
-) -> actix_web::Result<Json<ApiResponseData<Empty>>, ApiError> {
+) -> actix_web::Result<Json<ApiResponseData<EmptyResponse>>, ApiError> {
     let user_auth = user_auth.check_permissions(vec![UserAuthScope::BasicProfile])?;
 
     let (user_data, user_vault) = state
@@ -47,5 +47,5 @@ async fn post(
 
     send_email_challenge(&state, user_data.id, &email.email).await?;
 
-    Ok(Json(ApiResponseData::ok(Empty {})))
+    Ok(Json(ApiResponseData::ok(EmptyResponse {})))
 }

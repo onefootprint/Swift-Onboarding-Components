@@ -1,6 +1,6 @@
-use crate::types::success::ApiResponseData;
+use crate::types::response::ApiResponseData;
 use crate::State;
-use crate::{errors::ApiError, types::Empty};
+use crate::{errors::ApiError, types::EmptyResponse};
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 use workos::passwordless::{
     CreatePasswordlessSession, CreatePasswordlessSessionParams, CreatePasswordlessSessionType,
@@ -21,7 +21,7 @@ struct LinkAuthRequest {
 fn handler(
     state: web::Data<State>,
     request: Json<LinkAuthRequest>,
-) -> actix_web::Result<Json<ApiResponseData<Empty>>, ApiError> {
+) -> actix_web::Result<Json<ApiResponseData<EmptyResponse>>, ApiError> {
     let email = &request.email_address;
 
     let session = &state
@@ -40,5 +40,5 @@ fn handler(
 
     crate::utils::email::send_magic_link_dashboard_auth_email(&state, email.to_owned(), link).await?;
 
-    Ok(Json(ApiResponseData { data: Empty }))
+    Ok(Json(ApiResponseData { data: EmptyResponse }))
 }

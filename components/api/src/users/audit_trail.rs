@@ -4,7 +4,7 @@ use crate::auth::Either;
 use crate::auth::HasTenant;
 use crate::auth::IsLive;
 use crate::types::audit_trail::ApiAuditTrail;
-use crate::types::success::ApiResponseData;
+use crate::types::response::ApiResponseData;
 use crate::State;
 use crate::{auth::SessionContext, errors::ApiError};
 use db::models::audit_trails::AuditTrail;

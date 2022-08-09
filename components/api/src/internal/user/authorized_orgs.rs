@@ -2,7 +2,7 @@ use crate::auth::session_data::user::UserAuthScope;
 use crate::auth::{UserAuth, VerifiedUserAuth};
 use crate::errors::ApiError;
 use crate::types::onboarding::ApiOnboarding;
-use crate::types::success::ApiResponseData;
+use crate::types::response::ApiResponseData;
 use crate::State;
 use db::models::onboardings::Onboarding;
 use db::models::scoped_users::ScopedUser;

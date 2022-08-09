@@ -6,7 +6,7 @@ use crate::auth::IsLive;
 use crate::auth::{HasTenant, SessionContext};
 use crate::errors::ApiError;
 use crate::types::ob_config::ApiObConfig;
-use crate::types::success::ApiResponseData;
+use crate::types::response::ApiResponseData;
 use crate::State;
 use db::models::ob_configurations::ObConfiguration;
 use newtypes::ApiKeyStatus;

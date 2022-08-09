@@ -4,7 +4,7 @@ use crate::auth::UserAuth;
 use crate::auth::VerifiedUserAuth;
 use crate::errors::onboarding::OnboardingError;
 use crate::errors::ApiError;
-use crate::types::success::ApiResponseData;
+use crate::types::response::ApiResponseData;
 use crate::utils::insight_headers::InsightHeaders;
 use crate::utils::user_vault_wrapper::UserVaultWrapper;
 use crate::State;

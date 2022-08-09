@@ -3,7 +3,7 @@ use crate::auth::VerifiedUserAuth;
 use crate::auth::{key_context::ob_public_key::PublicTenantAuthContext, UserAuth};
 use crate::errors::onboarding::OnboardingError;
 use crate::errors::ApiError;
-use crate::types::success::ApiResponseData;
+use crate::types::response::ApiResponseData;
 use crate::utils::user_vault_wrapper::UserVaultWrapper;
 use crate::State;
 use db::models::onboardings::Onboarding;

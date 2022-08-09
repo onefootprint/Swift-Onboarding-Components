@@ -4,8 +4,8 @@ use crate::auth::session_data::user::UserAuthScope;
 use crate::auth::UserAuth;
 use crate::auth::VerifiedUserAuth;
 use crate::errors::user::UserError;
-use crate::types::success::ApiResponseData;
-use crate::types::Empty;
+use crate::types::response::ApiResponseData;
+use crate::types::EmptyResponse;
 use crate::{errors::ApiError, utils::email::send_email_challenge, State};
 use db::models::user_data::NewUserData;
 use db::models::user_data::UserData;
@@ -76,12 +76,12 @@ async fn handler(
     state: web::Data<State>,
     user_auth: UserAuth,
     request: web::Json<UserPatchRequest>,
-) -> actix_web::Result<Json<ApiResponseData<Empty>>, ApiError> {
+) -> actix_web::Result<Json<ApiResponseData<EmptyResponse>>, ApiError> {
     let user_auth = user_auth.check_permissions(vec![UserAuthScope::SignUp])?;
     if request.speculative {
         // We've already parsed the request and done validation on the input. Return a successful
         // response before writing anything to the DB
-        return Ok(Json(ApiResponseData::ok(Empty)));
+        return Ok(Json(ApiResponseData::ok(EmptyResponse)));
     }
 
     let user_vault = user_auth.user_vault(&state.db_pool).await?;
@@ -147,5 +147,5 @@ async fn handler(
             .ok_or(ApiError::NotImplemented)?;
         send_email_challenge(&state, user_data.id, &email.email).await?;
     }
-    Ok(Json(ApiResponseData::ok(Empty)))
+    Ok(Json(ApiResponseData::ok(EmptyResponse)))
 }

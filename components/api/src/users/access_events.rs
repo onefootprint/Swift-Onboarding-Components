@@ -4,7 +4,8 @@ use crate::auth::Either;
 use crate::auth::HasTenant;
 use crate::auth::IsLive;
 use crate::types::access_event::ApiAccessEvent;
-use crate::types::success::ApiPaginatedResponseData;
+use crate::types::request::PaginatedRequest;
+use crate::types::response::ApiPaginatedResponseData;
 use crate::utils::querystring::deserialize_stringified_list;
 use crate::State;
 use crate::{auth::SessionContext, errors::ApiError};
@@ -23,8 +24,6 @@ struct AccessEventRequest {
     search: Option<String>,
     timestamp_lte: Option<DateTime<Utc>>,
     timestamp_gte: Option<DateTime<Utc>>,
-    cursor: Option<i64>,
-    page_size: Option<usize>,
 }
 
 type AccessEventResponse = Vec<ApiAccessEvent>;
@@ -36,23 +35,18 @@ type AccessEventResponse = Vec<ApiAccessEvent>;
 /// Requires tenant secret key auth.
 fn get(
     state: web::Data<State>,
-    request: web::Query<AccessEventRequest>,
+    request: web::Query<PaginatedRequest<AccessEventRequest, i64>>,
     auth: Either<SessionContext<WorkOsSession>, SecretTenantAuthContext>,
 ) -> actix_web::Result<Json<ApiPaginatedResponseData<AccessEventResponse, i64>>, ApiError> {
+    let page_size = request.page_size(&state);
+    let cursor = request.cursor;
     let AccessEventRequest {
         footprint_user_id,
         data_kinds,
         search,
         timestamp_lte,
         timestamp_gte,
-        cursor,
-        page_size,
-    } = request.into_inner();
-    let page_size = if let Some(page_size) = page_size {
-        page_size
-    } else {
-        state.config.default_page_size
-    };
+    } = request.data.clone();
 
     let tenant = auth.tenant(&state.db_pool).await?;
     let params = AccessEventListQueryParams {
@@ -68,12 +62,7 @@ fn get(
         AccessEventListItemForTenant::get(&state.db_pool, params, cursor, (page_size + 1) as i64).await?;
 
     // If there are more than page_size results, we should tell the client there's another page
-    let cursor = if results.len() > page_size {
-        results.last().map(|x| x.event.ordering_id)
-    } else {
-        None
-    };
-
+    let cursor = request.cursor_item(&state, &results).map(|x| x.event.ordering_id);
     let response = results
         .into_iter()
         .take(page_size)

@@ -2,6 +2,9 @@ use actix_web::Responder;
 use paperclip::actix::Apiv2Schema;
 use serde::Serialize;
 
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Apiv2Schema)]
+pub struct EmptyResponse;
+
 #[derive(Debug, Clone, serde::Serialize, Apiv2Schema)]
 pub struct ApiResponseData<T> {
     pub data: T,

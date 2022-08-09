@@ -1,6 +1,6 @@
 use crate::auth::key_context::custodian::CustodianAuthContext;
 use crate::errors::ApiError;
-use crate::types::success::ApiResponseData;
+use crate::types::response::ApiResponseData;
 use crate::State;
 use newtypes::{DataKind, Fingerprinter};
 use paperclip::actix::Apiv2Schema;

@@ -1,7 +1,7 @@
 use crate::{
     auth::{session_data::user::UserAuthScope, UserAuth, VerifiedUserAuth},
     errors::{challenge::ChallengeError, ApiError},
-    types::{success::ApiResponseData, Empty},
+    types::{response::ApiResponseData, EmptyResponse},
     utils::{
         challenge::{Challenge, ChallengeToken},
         insight_headers::InsightHeaders,
@@ -110,7 +110,7 @@ async fn complete(
     user_auth: UserAuth,
     insights: InsightHeaders,
     state: web::Data<State>,
-) -> actix_web::Result<Json<ApiResponseData<Empty>>, ApiError> {
+) -> actix_web::Result<Json<ApiResponseData<EmptyResponse>>, ApiError> {
     let user_auth = user_auth.check_permissions(vec![UserAuthScope::SignUp, UserAuthScope::Handoff])?;
 
     let challenge_data = Challenge::unseal(&state.challenge_sealing_key, &request.challenge_token)?;
@@ -212,7 +212,7 @@ async fn complete(
         })
         .await?;
 
-    Ok(Json(ApiResponseData::ok(Empty)))
+    Ok(Json(ApiResponseData::ok(EmptyResponse)))
 }
 
 /// Storable app attestation metadata

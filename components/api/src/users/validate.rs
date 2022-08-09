@@ -4,7 +4,7 @@ use crate::auth::session_data::AuthSessionData;
 use crate::auth::IsLive;
 use crate::errors::onboarding::OnboardingError;
 use crate::errors::ApiError;
-use crate::types::success::ApiResponseData;
+use crate::types::response::ApiResponseData;
 use crate::utils::session::AuthSession;
 use crate::State;
 use chrono::{DateTime, Utc};

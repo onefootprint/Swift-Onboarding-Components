@@ -5,7 +5,7 @@ use crate::auth::VerifiedUserAuth;
 use crate::errors::ApiError;
 use crate::internal::user::decrypt;
 use crate::internal::user::DecryptFieldsResult;
-use crate::types::success::ApiResponseData;
+use crate::types::response::ApiResponseData;
 use crate::State;
 use db::models::user_data::UserData;
 use newtypes::DataKind;

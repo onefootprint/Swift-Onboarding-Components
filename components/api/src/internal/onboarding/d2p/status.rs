@@ -2,8 +2,8 @@ use crate::auth::session_data::user::UserAuthScope;
 use crate::auth::UserAuth;
 use crate::errors::handoff::HandoffError;
 use crate::errors::ApiError;
-use crate::types::success::ApiResponseData;
-use crate::types::Empty;
+use crate::types::response::ApiResponseData;
+use crate::types::EmptyResponse;
 use crate::utils::session::{HandoffRecord, JsonSession};
 use crate::State;
 use newtypes::D2pSessionStatus;
@@ -47,7 +47,7 @@ pub fn post(
     user_auth: UserAuth,
     request: Json<UpdateStatusRequest>,
     state: web::Data<State>,
-) -> actix_web::Result<Json<ApiResponseData<Empty>>, ApiError> {
+) -> actix_web::Result<Json<ApiResponseData<EmptyResponse>>, ApiError> {
     let user_auth = user_auth.check_permissions(vec![UserAuthScope::Handoff])?;
 
     let UpdateStatusRequest { status } = request.into_inner();
@@ -65,5 +65,5 @@ pub fn post(
         })
         .await??;
 
-    Ok(Json(ApiResponseData { data: Empty }))
+    Ok(Json(ApiResponseData { data: EmptyResponse }))
 }

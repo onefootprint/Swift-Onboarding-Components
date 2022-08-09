@@ -1,7 +1,7 @@
 use crate::auth::session_data::workos::WorkOsSession;
 use crate::auth::{HasTenant, SessionContext};
 use crate::errors::ApiError;
-use crate::types::success::ApiResponseData;
+use crate::types::response::ApiResponseData;
 use crate::State;
 use paperclip::actix::{api_v2_operation, get, web, web::Json, Apiv2Schema};
 use workos::organizations::{GetOrganization, OrganizationId};

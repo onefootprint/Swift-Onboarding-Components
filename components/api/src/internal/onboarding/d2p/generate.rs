@@ -2,7 +2,7 @@ use crate::auth::session_data::user::{UserAuthScope, UserSession};
 use crate::auth::UserAuth;
 use crate::auth::VerifiedUserAuth;
 use crate::errors::ApiError;
-use crate::types::success::ApiResponseData;
+use crate::types::response::ApiResponseData;
 use crate::utils::session::JsonSession;
 use crate::utils::session::{AuthSession, HandoffRecord};
 use crate::State;
