@@ -1,6 +1,8 @@
 use crate::models::tenant_api_key_access_log::TenantApiKeyAccessLog;
+use crate::schema::tenant_api_keys::BoxedQuery;
 use crate::{schema::tenant_api_keys, DbError, DbPool};
 use chrono::{DateTime, Utc};
+use diesel::pg::Pg;
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
 use newtypes::{ApiKeyStatus, Fingerprint, SealedVaultBytes, TenantApiKeyId, TenantId};
@@ -30,18 +32,41 @@ struct TenantApiKeyUpdate {
     status: Option<ApiKeyStatus>,
 }
 
+#[derive(Debug, Clone)]
+pub struct ApiKeyListQuery {
+    pub tenant_id: TenantId,
+    pub is_live: bool,
+}
+
 impl TenantApiKey {
+    fn list_query(query: &ApiKeyListQuery) -> BoxedQuery<Pg> {
+        tenant_api_keys::table
+            .filter(tenant_api_keys::tenant_id.eq(&query.tenant_id))
+            .filter(tenant_api_keys::is_live.eq(query.is_live))
+            .into_boxed()
+    }
+
     pub fn list(
         conn: &mut PgConnection,
-        tenant_id: &TenantId,
-        is_live: bool,
+        query: &ApiKeyListQuery,
+        cursor: Option<DateTime<Utc>>,
+        page_size: i64,
     ) -> Result<Vec<TenantApiKey>, DbError> {
-        let results = tenant_api_keys::table
-            .filter(tenant_api_keys::tenant_id.eq(tenant_id))
-            .filter(tenant_api_keys::is_live.eq(is_live))
+        let mut query = Self::list_query(query)
             .order_by(tenant_api_keys::created_at.desc())
-            .get_results(conn)?;
+            .limit(page_size);
+
+        if let Some(cursor) = cursor {
+            query = query.filter(tenant_api_keys::created_at.le(cursor))
+        }
+
+        let results = query.load::<TenantApiKey>(conn)?;
         Ok(results)
+    }
+
+    pub fn count(conn: &mut PgConnection, query: &ApiKeyListQuery) -> Result<i64, DbError> {
+        let count = Self::list_query(query).count().get_result(conn)?;
+        Ok(count)
     }
 
     pub fn get(

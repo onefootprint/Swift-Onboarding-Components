@@ -25,15 +25,27 @@ where
 }
 
 #[derive(Debug, Clone, serde::Serialize, Apiv2Schema)]
-pub struct ApiPaginatedResponseData<T, C> {
-    pub data: T,
+pub struct ApiPaginatedResponseMeta<C> {
     pub next: Option<C>,
     pub count: Option<i64>,
 }
 
-impl<T, C> ApiPaginatedResponseData<T, C> {
+#[derive(Debug, Clone, serde::Serialize, Apiv2Schema)]
+pub struct ApiPaginatedResponseData<T, C> {
+    pub data: T,
+    pub next: Option<C>,
+    pub count: Option<i64>,
+    pub meta: ApiPaginatedResponseMeta<C>,
+}
+
+impl<T, C: Clone> ApiPaginatedResponseData<T, C> {
     pub fn ok(data: T, next: Option<C>, count: Option<i64>) -> Self {
-        Self { data, next, count }
+        Self {
+            data,
+            next: next.clone(),
+            count,
+            meta: ApiPaginatedResponseMeta { next, count },
+        }
     }
 }
 
