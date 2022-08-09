@@ -7,8 +7,8 @@ config:
       apiVersion: latest
       enclaveVersion: latest
     domain:
-      base: "api.onefootprint.com"
-      prefix: ""
+      base: "prod.onefootprint.com"
+      prefix: "api."
       testUrl: ""
     elastic:
       apiKey:
