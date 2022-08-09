@@ -83,7 +83,8 @@ export async function Create(config: CdnConfig): Promise<aws.cloudfront.Distribu
                 httpsPort: 443,
                 httpPort: 80,
                 originProtocolPolicy: "https-only",
-                originSslProtocols: ["TLSv1.2"]
+                originSslProtocols: ["TLSv1.2"],
+                originReadTimeout: 60
             },
             customHeaders: [
                 {
