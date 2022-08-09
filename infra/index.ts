@@ -77,7 +77,6 @@ export = async () => {
     const cachePolicyId = policies[1].id;
     // Proxy external-facing domains (domain and testDomain) through a cloudfront proxy
     const distribution = await cdn.Create({
-        name: "primary",
         certArn: services[0].cert, // needs US-East-1 cert
         cdnToAlbSecret: secretsStore.cloudfrontSecret,
         cdnToAlbSecretHeaderName: CDN_PROTECTION_HEADER_NAME,
@@ -88,7 +87,7 @@ export = async () => {
         cachePolicyId,
     });
     await cdn.Create({
-        name: "test",
+        suffix: "test",
         certArn: services[0].cert, // needs US-East-1 cert
         cdnToAlbSecret: secretsStore.cloudfrontSecret,
         cdnToAlbSecretHeaderName: CDN_PROTECTION_HEADER_NAME,
