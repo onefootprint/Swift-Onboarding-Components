@@ -25,6 +25,7 @@ export type ServiceConfig = {
     serviceName: string,
     hostedZoneId: string,
     domain: string,
+    testDomain: string,
 }
 
 /**
@@ -159,10 +160,25 @@ function createCdnFrontedLoadBalancer(vpc: awsx.ec2.Vpc, secretsStore: StaticSec
         },
     }, { provider });
 
-    const record = new route53.Record(`dnsrecord-alb-${serviceName}`, {
+    // Route domain -> loadbalancer
+    new route53.Record(`dnsrecord-alb-${serviceName}`, {
         zoneId: config.hostedZoneId,
         type: "A",
         name: config.domain,
+        setIdentifier: `app-record-setid-${serviceName}`,
+        latencyRoutingPolicies: [{ region: region }],
+        aliases: [{
+            name: web.loadBalancer.loadBalancer.dnsName,
+            zoneId: web.loadBalancer.loadBalancer.zoneId,
+            evaluateTargetHealth: true,
+        }]
+    });
+
+    // Route test domain -> loadbalancer
+    new route53.Record(`dnsrecord-hash-alb-${serviceName}`, {
+        zoneId: config.hostedZoneId,
+        type: "A",
+        name: config.testDomain,
         setIdentifier: `app-record-setid-${serviceName}`,
         latencyRoutingPolicies: [{ region: region }],
         aliases: [{

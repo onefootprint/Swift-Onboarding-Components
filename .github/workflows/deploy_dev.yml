@@ -57,9 +57,8 @@ jobs:
       contents: write
       pull-requests: write
     with:
-      testUrl: "${{ needs.deploy_stack_dev.outputs.url }}"
+      testUrl: "${{ needs.deploy_stack_dev.outputs.testUrl }}"
       isPR: false
-      waitForDeploy: true
     secrets:
       INTEGRATION_TEST_PHONE_NUMBER: ${{ secrets.INTEGRATION_TEST_PHONE_NUMBER }}
       TWILIO_ACCOUNT_SID: ${{ secrets.TWILIO_ACCOUNT_SID }}

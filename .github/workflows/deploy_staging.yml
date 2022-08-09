@@ -48,7 +48,7 @@ jobs:
       contents: write
       pull-requests: write
     with:
-      testUrl: "${{ needs.deploy_staging_stack.outputs.url }}"
+      testUrl: "${{ needs.deploy_staging_stack.outputs.testUrl }}"
       prNumber: ${{ github.event.number }}
       isPR: true
     secrets:

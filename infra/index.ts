@@ -46,6 +46,9 @@ export = async () => {
     const apiDomain = `${constants.domain.prefix}${constants.domain.base}`;
     const internalApiDomain = `internal.${apiDomain}`;
 
+    const testDomain = constants.domain.testUrl;
+    const internalTestDomain = `internal.${constants.domain.testUrl}`;
+
     // launch of core service
     const services = await Promise.all(regions.map(async (region, index) => {
         const vpcAndProvider = vpcProviders[index];
@@ -60,6 +63,7 @@ export = async () => {
             instanceCount: constants.resources.instances,
             certArn: cert,
             domain: internalApiDomain,
+            testDomain: internalTestDomain,
             serviceName: "fpc",
             region,
             hostedZoneId: hostedZone.zoneId,
@@ -68,13 +72,31 @@ export = async () => {
         return { service, cert, region }
     }));
 
+    const policies = await cdn.CreatePolicies();
+    const requestPolicyId = policies[0].id;
+    const cachePolicyId = policies[1].id;
+    // Proxy external-facing domains (domain and testDomain) through a cloudfront proxy
     const distribution = await cdn.Create({
+        name: "primary",
         certArn: services[0].cert, // needs US-East-1 cert
         cdnToAlbSecret: secretsStore.cloudfrontSecret,
         cdnToAlbSecretHeaderName: CDN_PROTECTION_HEADER_NAME,
-        domain: apiDomain,
-        origin: internalApiDomain,
-        hostedZoneId: hostedZone.zoneId
+        source: apiDomain,
+        target: internalApiDomain,
+        hostedZoneId: hostedZone.zoneId,
+        requestPolicyId,
+        cachePolicyId,
+    });
+    await cdn.Create({
+        name: "test",
+        certArn: services[0].cert, // needs US-East-1 cert
+        cdnToAlbSecret: secretsStore.cloudfrontSecret,
+        cdnToAlbSecretHeaderName: CDN_PROTECTION_HEADER_NAME,
+        source: testDomain,
+        target: internalTestDomain,
+        hostedZoneId: hostedZone.zoneId,
+        requestPolicyId,
+        cachePolicyId,
     });
 
     return {

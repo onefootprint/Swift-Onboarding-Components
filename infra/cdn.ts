@@ -7,19 +7,22 @@ import * as pulumi from "@pulumi/pulumi"
 import * as random from "@pulumi/random";
 
 export type CdnConfig = {
+    name: string,
     certArn: pulumi.Output<string>,
-    domain: string,
-    origin: string,
+    source: string,
+    target: string,
     cdnToAlbSecretHeaderName: string,
     cdnToAlbSecret: pulumi.Output<string>,
     hostedZoneId: string,
+    requestPolicyId: pulumi.Output<string>,
+    cachePolicyId: pulumi.Output<string>,
 }
 
 /**
- * Create a Cloudfront distribution to front access to the app service ALBs
+ * Create OriginRequestPolicy and CachePolicy that is used for each cloudfront CDN
  */
-export async function Create(config: CdnConfig): Promise<aws.cloudfront.Distribution> {
-    const requestPolicy = new aws.cloudfront.OriginRequestPolicy("app-cdn-origin-req-policy", {
+export async function CreatePolicies(): Promise<[aws.cloudfront.OriginRequestPolicy, aws.cloudfront.CachePolicy]> {
+    const requestPolicy = new aws.cloudfront.OriginRequestPolicy(`app-cdn-origin-req-policy`, {
         cookiesConfig: {
             cookieBehavior: "all"
         },
@@ -45,7 +48,7 @@ export async function Create(config: CdnConfig): Promise<aws.cloudfront.Distribu
         }
     });
 
-    const cachePolicy = new aws.cloudfront.CachePolicy("app-cdn-origin-cache-policy", {
+    const cachePolicy = new aws.cloudfront.CachePolicy(`app-cdn-origin-cache-policy`, {
         defaultTtl: 0,
         maxTtl: 0,
         minTtl: 0,
@@ -56,12 +59,20 @@ export async function Create(config: CdnConfig): Promise<aws.cloudfront.Distribu
         }
     });
 
-    const cdn = new aws.cloudfront.Distribution("app-cdn", {
+    return [requestPolicy, cachePolicy]
+}
+
+/**
+ * Create a Cloudfront distribution to front access to the app service ALBs
+ */
+export async function Create(config: CdnConfig): Promise<aws.cloudfront.Distribution> {
+    // Cloudfront to front traffic for config.target
+    const cdn = new aws.cloudfront.Distribution(`app-cdn-${config.name}`, {
         enabled: true,
-        aliases: [config.domain],
+        aliases: [config.source],
         origins: [{
-            originId: config.origin,
-            domainName: config.origin,
+            originId: config.target,
+            domainName: config.target,
             customOriginConfig: {
                 httpsPort: 443,
                 httpPort: 80,
@@ -81,12 +92,12 @@ export async function Create(config: CdnConfig): Promise<aws.cloudfront.Distribu
             sslSupportMethod: "sni-only"
         },
         defaultCacheBehavior: {
-            targetOriginId: config.origin,
+            targetOriginId: config.target,
             viewerProtocolPolicy: "redirect-to-https",
             allowedMethods: ["GET", "HEAD", "OPTIONS", "POST", "PUT", "DELETE", "PATCH"],
             cachedMethods: ["HEAD", "GET", "OPTIONS"],
-            originRequestPolicyId: requestPolicy.id,
-            cachePolicyId: cachePolicy.id,            
+            originRequestPolicyId: config.requestPolicyId,
+            cachePolicyId: config.cachePolicyId,
         },
 
         restrictions: {
@@ -96,16 +107,16 @@ export async function Create(config: CdnConfig): Promise<aws.cloudfront.Distribu
         },
     });
 
-    new route53.Record(`cdn-record`, {
+    // Route config.source -> cloudfront CDN
+    new route53.Record(`cdn-record-${config.name}`, {
         zoneId: config.hostedZoneId,
         type: "A",
-        name: config.domain,
+        name: config.source,
         aliases: [{
             name: cdn.domainName,
             zoneId: cdn.hostedZoneId,
             evaluateTargetHealth: true,
-        }
-        ],
+        }],
     });
 
     return cdn

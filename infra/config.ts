@@ -19,6 +19,7 @@ export const CDN_PROTECTION_HEADER_NAME: string  =  "X-Token-From-CloudFront";
 export interface Domains {
     base: string;
     prefix: string;
+    testUrl: string;
 }
 
 export interface Resources {

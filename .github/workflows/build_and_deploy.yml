@@ -38,6 +38,9 @@ on:
       url:
         description: "stack url"
         value: ${{ jobs.deploy_stack.outputs.url }}
+      testUrl:
+        description: "URL for this specific version of code deployed"
+        value: ${{ jobs.deploy_stack.outputs.testUrl }}
 
     secrets:
       AWS_ACCESS_KEY_ID:
@@ -150,6 +153,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       url: "https://${{ steps.constants.outputs.url }}"
+      testUrl: "https://${{ steps.constants.outputs.testUrl }}"
     environment:
       name: ${{ inputs.environment }}
       url: "https://${{ steps.constants.outputs.url }}"
@@ -210,9 +214,12 @@ jobs:
           sub=$(pulumi --cwd infra config --stack footprint/${{ inputs.stackName }} get --path constants.domain.prefix)
           base=$(pulumi --cwd infra config --stack footprint/${{ inputs.stackName }} get --path constants.domain.base)
           url="${sub}${base}"
+          commit_hash=$(git rev-parse --short HEAD)
+          test_url=$(echo ${url} | sed "s/\./-${commit_hash}./")
           branch="$(echo ${{ github.head_ref || github.ref_name }} | sed -r 's/\//-/g' | sed -r 's/_/-/g')"
-          version="${branch}-$(git rev-parse --short HEAD)"
+          version="${branch}-${commit_hash}"
           echo "##[set-output name=url;]$(echo ${url})"
+          echo "##[set-output name=testUrl;]$(echo ${test_url})"
           echo "##[set-output name=componentVersion;]$(echo ${version})"
         id: constants
         env:
@@ -222,10 +229,11 @@ jobs:
         working-directory: infra
         run: pulumi stack select "footprint/${{ inputs.stackName }}"
 
-      - name: "set api/enclave image version"
+      - name: "set api/enclave image version and test URL"
         run: |
           pulumi --cwd infra config set --path constants.containers.apiVersion ${{ steps.constants.outputs.componentVersion }}
           pulumi --cwd infra config set --path constants.containers.enclaveVersion ${{ steps.constants.outputs.componentVersion }}
+          pulumi --cwd infra config set --path constants.domain.testUrl ${{ steps.constants.outputs.testUrl }}
 
       - name: Create Stack DB Restore Snapshot
         if: ${{ inputs.createStack }}
