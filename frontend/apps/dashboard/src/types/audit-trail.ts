@@ -1,4 +1,4 @@
-import { DataKind } from './data-kind';
+import { DataKinds } from './data-kind';
 import { Vendor } from './vendor';
 
 export type LivenessCheckInfo = {
@@ -10,7 +10,7 @@ export type LivenessCheckInfo = {
 };
 
 export type VerificationInfo = {
-  dataKinds: DataKind[];
+  dataKinds: DataKinds[];
   vendor: Vendor;
 };
 

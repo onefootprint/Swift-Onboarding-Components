@@ -1,4 +1,4 @@
-export enum DataKind {
+export enum DataKinds {
   firstName = 'first_name',
   lastName = 'last_name',
   email = 'email',
@@ -14,13 +14,13 @@ export enum DataKind {
   country = 'country',
 }
 
-export type DataKindType = keyof typeof DataKind;
+export type DataKind = keyof typeof DataKinds;
 
 export const dataKindToType = Object.fromEntries(
-  Object.entries(DataKind).map(x => [x[1], x[0]]),
-) as Record<DataKind, DataKindType>;
+  Object.entries(DataKinds).map(x => [x[1], x[0]]),
+) as Record<DataKinds, DataKind>;
 
-export const ALL_FIELDS: DataKindType[] = [
+export const ALL_FIELDS: DataKind[] = [
   'firstName',
   'lastName',
   'email',
@@ -35,20 +35,20 @@ export const ALL_FIELDS: DataKindType[] = [
   'state',
 ];
 
-export const dataKindToDisplayName: Record<DataKind, String> = {
-  [DataKind.firstName]: 'First name',
-  [DataKind.lastName]: 'Last name',
-  [DataKind.email]: 'Email',
-  [DataKind.phoneNumber]: 'Phone number',
-  [DataKind.ssn]: 'SSN',
-  [DataKind.lastFourSsn]: 'SSN last four',
-  [DataKind.dob]: 'Date of birth',
-  [DataKind.streetAddress]: 'Address line 1',
-  [DataKind.streetAddress2]: 'Address line 2',
-  [DataKind.city]: 'City',
-  [DataKind.state]: 'State',
-  [DataKind.zip]: 'Zip code',
-  [DataKind.country]: 'Country',
+export const dataKindToDisplayName: Record<DataKinds, String> = {
+  [DataKinds.firstName]: 'First name',
+  [DataKinds.lastName]: 'Last name',
+  [DataKinds.email]: 'Email',
+  [DataKinds.phoneNumber]: 'Phone number',
+  [DataKinds.ssn]: 'SSN',
+  [DataKinds.lastFourSsn]: 'SSN last four',
+  [DataKinds.dob]: 'Date of birth',
+  [DataKinds.streetAddress]: 'Address line 1',
+  [DataKinds.streetAddress2]: 'Address line 2',
+  [DataKinds.city]: 'City',
+  [DataKinds.state]: 'State',
+  [DataKinds.zip]: 'Zip code',
+  [DataKinds.country]: 'Country',
 };
 
-export type DecryptedUserAttributes = Record<DataKindType, string>;
+export type DecryptedUserAttributes = Record<DataKind, string>;

@@ -1,10 +1,6 @@
 import React from 'react';
 import { User } from 'src/pages/users/hooks/use-join-users';
-import {
-  DataKindType,
-  statusToBadgeVariant,
-  statusToDisplayText,
-} from 'src/types';
+import { DataKind, statusToBadgeVariant, statusToDisplayText } from 'src/types';
 import styled, { css } from 'styled-components';
 import { Badge, Code, Typography } from 'ui';
 
@@ -12,7 +8,7 @@ import DecryptDialog from '../decrypt-dialog';
 
 type BasicInfoProps = {
   user: User;
-  onDecrypt: (fieldsToDecrypt: DataKindType[], reason: string) => void;
+  onDecrypt: (fieldsToDecrypt: DataKind[], reason: string) => void;
 };
 
 const UserHeader = ({ user, onDecrypt }: BasicInfoProps) => {

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import useDataKindSelectedFields from 'src/components/data-kind-boxes/hooks/use-data-kind-selected-fields';
 import { User } from 'src/pages/users/hooks/use-join-users';
-import { dataKindToType, DataKindType } from 'src/types';
+import { DataKind, dataKindToType } from 'src/types';
 import { Button, Dialog } from 'ui';
 
 import AttributesScreen from './components/attributes-screen';
@@ -9,7 +9,7 @@ import ReasonScreen from './components/reason-screen';
 
 type DecryptDialogProps = {
   user: User;
-  onDecrypt: (fieldsToDecrypt: DataKindType[], reason: string) => void;
+  onDecrypt: (fieldsToDecrypt: DataKind[], reason: string) => void;
 };
 
 const DecryptDialog = ({ user, onDecrypt }: DecryptDialogProps) => {
@@ -36,7 +36,7 @@ const DecryptDialog = ({ user, onDecrypt }: DecryptDialogProps) => {
     kind => user.attributes[kind]?.exists,
   );
 
-  const isFieldSelected = (...kinds: DataKindType[]) =>
+  const isFieldSelected = (...kinds: DataKind[]) =>
     // Display box as checked if
     //   (1) the user checked it OR
     //   (2) it's decrypted OR
@@ -48,7 +48,7 @@ const DecryptDialog = ({ user, onDecrypt }: DecryptDialogProps) => {
         !user.attributes[kind]?.exists,
     );
 
-  const isFieldDisabled = (...kinds: DataKindType[]) =>
+  const isFieldDisabled = (...kinds: DataKind[]) =>
     // Don't allow decrypting a field that is already decrypted
     kinds.every(
       kind => user.attributes[kind]?.value || !decryptableFields.includes(kind),
@@ -66,8 +66,8 @@ const DecryptDialog = ({ user, onDecrypt }: DecryptDialogProps) => {
   const onPrimaryButtonClick = () => {
     const fieldsToDecrypt = Object.entries(selectedFields)
       .filter(x => x[1])
-      .filter(x => !isFieldDisabled(x[0] as DataKindType))
-      .map(x => x[0] as DataKindType);
+      .filter(x => !isFieldDisabled(x[0] as DataKind))
+      .map(x => x[0] as DataKind);
     if (dialogScreen === 'attributes') {
       // Currently on the attributes screen
       if (!fieldsToDecrypt.length) {

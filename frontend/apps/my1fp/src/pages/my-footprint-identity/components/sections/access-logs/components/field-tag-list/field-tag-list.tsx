@@ -2,10 +2,10 @@ import React, { Fragment } from 'react';
 import styled, { css } from 'styled-components';
 import { createFontStyles } from 'ui/src/utils/mixins/mixins';
 
-import { DataKind, dataKindToDisplayName } from '../../types';
+import { DataKinds, dataKindToDisplayName } from '../../types';
 
 type FieldTagListProps = {
-  dataKinds: DataKind[];
+  dataKinds: DataKinds[];
 };
 
 const FieldTagList = ({ dataKinds }: FieldTagListProps) => {
@@ -14,7 +14,7 @@ const FieldTagList = ({ dataKinds }: FieldTagListProps) => {
 
   return (
     <>
-      {uniqueDataKinds.map((dataKind: DataKind, i: number) => (
+      {uniqueDataKinds.map((dataKind: DataKinds, i: number) => (
         <Fragment key={dataKind}>
           <StyledTag>{dataKindToDisplayName[dataKind]}</StyledTag>
           {i !== dataKinds.length - 1 && <span>, </span>}

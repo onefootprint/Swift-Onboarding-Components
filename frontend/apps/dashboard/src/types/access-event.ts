@@ -1,8 +1,8 @@
-import { DataKind } from './data-kind';
+import { DataKinds } from './data-kind';
 import { InsightEvent } from './insight-event';
 
 export type AccessEvent = {
-  dataKinds: DataKind[];
+  dataKinds: DataKinds[];
   fpUserId: string;
   reason: string;
   tenantId: string;

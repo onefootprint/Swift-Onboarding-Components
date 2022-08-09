@@ -1,11 +1,11 @@
 import { ChangeEvent, useReducer } from 'react';
-import { ALL_FIELDS, DataKindType } from 'src/types';
+import { ALL_FIELDS, DataKind } from 'src/types';
 
 const initialFields = Object.fromEntries(
   ALL_FIELDS.map(x => [x, false]),
 ) as SelectedFields;
 
-type SelectedFields = Record<DataKindType, boolean>;
+type SelectedFields = Record<DataKind, boolean>;
 
 const useDataKindSelectedFields = () => {
   const [selectedFields, updateSelectedFields] = useReducer(
@@ -15,7 +15,7 @@ const useDataKindSelectedFields = () => {
     }),
     initialFields,
   );
-  const clearSelectedFields = (initialSetValues?: DataKindType[]) => {
+  const clearSelectedFields = (initialSetValues?: DataKind[]) => {
     // Clear values, but set some initial fields to true
     const initialSetValuesObj = Object.fromEntries(
       (initialSetValues || []).map(x => [x, true]),
@@ -23,7 +23,7 @@ const useDataKindSelectedFields = () => {
     updateSelectedFields({ ...initialFields, ...initialSetValuesObj });
   };
   const setFieldFor =
-    (...kinds: DataKindType[]) =>
+    (...kinds: DataKind[]) =>
     (e: ChangeEvent<HTMLInputElement>) => {
       // Overwrite the selectedFields to match the checkbox value for all of the respective data kinds
       updateSelectedFields(

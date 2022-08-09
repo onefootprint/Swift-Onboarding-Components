@@ -14,8 +14,8 @@ import DateRangeSelector, {
 } from 'src/components/date-range-selector';
 import {
   DataKind,
+  DataKinds,
   dataKindToType,
-  DataKindType,
   getDateRange,
   serializeDateRange,
 } from 'src/types';
@@ -37,7 +37,7 @@ const FilterDialog = () => {
   const { selectedFields, setFieldFor, clearSelectedFields } =
     useDataKindSelectedFields();
 
-  const isFieldSelected = (...kinds: DataKindType[]) =>
+  const isFieldSelected = (...kinds: DataKind[]) =>
     kinds.every(kind => selectedFields[kind]);
   const isFieldDisabled = () => false;
 
@@ -48,7 +48,7 @@ const FilterDialog = () => {
     }
     const fields = Object.entries(selectedFields)
       .filter(x => x[1])
-      .map(x => DataKind[x[0] as DataKindType])
+      .map(x => DataKinds[x[0] as DataKind])
       .join(',');
     setFilter({
       dataKinds: fields,
@@ -68,7 +68,7 @@ const FilterDialog = () => {
     const dataKindsStr = filters.dataKinds || '';
     const initialSelectedFields = (
       dataKindsStr.length ? dataKindsStr.split(',') : []
-    ).map(x => dataKindToType[x as DataKind]);
+    ).map(x => dataKindToType[x as DataKinds]);
     clearSelectedFields(initialSelectedFields);
     const [dateRange, customDateStart, customDateEnd] = getDateRange(filters);
     setValue('dateRange', dateRange);

@@ -1,5 +1,5 @@
 import constate from 'constate';
-import { DataKindType, DecryptedUserAttributes } from 'src/types';
+import { DataKind, DecryptedUserAttributes } from 'src/types';
 import { useMap } from 'usehooks-ts';
 
 export type UserData = {
@@ -8,7 +8,7 @@ export type UserData = {
   exists: boolean;
 };
 
-export type UserAttributes = Record<DataKindType, UserData>;
+export type UserAttributes = Record<DataKind, UserData>;
 
 // Hook with utilities for maintaining state on decrypted user attributes
 const useUserDataImpl = () => {
@@ -37,7 +37,7 @@ const useUserDataImpl = () => {
 
   const setLoading = (
     userId: string,
-    loadingAttributes: DataKindType[],
+    loadingAttributes: DataKind[],
     value = true,
   ) => {
     const currentDecryptedUser =

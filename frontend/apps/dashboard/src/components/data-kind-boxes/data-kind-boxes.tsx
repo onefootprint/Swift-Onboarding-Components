@@ -1,15 +1,15 @@
 import React, { ChangeEvent } from 'react';
-import { DataKindType } from 'src/types';
+import type { DataKind } from 'src/types';
 import styled, { css } from 'styled-components';
 import { Checkbox, Typography } from 'ui';
-import { SXStyles } from 'ui/src/hooks/use-sx';
+import type { SXStyles } from 'ui/src/hooks/use-sx';
 
 type DataKindBoxesProps = {
   setFieldFor: (
-    ...kinds: DataKindType[]
+    ...kinds: DataKind[]
   ) => (e: ChangeEvent<HTMLInputElement>) => void;
-  isFieldSelected: (...kinds: DataKindType[]) => boolean;
-  isFieldDisabled: (...kinds: DataKindType[]) => boolean;
+  isFieldSelected: (...kinds: DataKind[]) => boolean;
+  isFieldDisabled: (...kinds: DataKind[]) => boolean;
 };
 
 const DataKindBoxes = ({

@@ -1,14 +1,14 @@
 import React from 'react';
-import { DataKind, dataKindToDisplayName } from 'src/types';
+import { DataKinds, dataKindToDisplayName } from 'src/types';
 import { Tag } from 'ui';
 
 type FieldTagListProps = {
-  dataKinds: DataKind[];
+  dataKinds: DataKinds[];
 };
 
 const FieldTagList = ({ dataKinds }: FieldTagListProps) => (
   <>
-    {dataKinds.map((dataKind: DataKind, i: number) => (
+    {dataKinds.map((dataKind: DataKinds, i: number) => (
       // eslint-disable-next-line react/no-array-index-key
       <span key={`${dataKind}-${i}`}>
         <Tag>{dataKindToDisplayName[dataKind]}</Tag>

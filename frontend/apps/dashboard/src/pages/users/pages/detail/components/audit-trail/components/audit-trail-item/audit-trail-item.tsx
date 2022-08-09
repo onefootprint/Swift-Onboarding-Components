@@ -9,7 +9,7 @@ import { TimelineItem } from 'src/components/timeline/timeline';
 import {
   AuditTrail,
   AuditTrailEvent,
-  DataKind,
+  DataKinds,
   dataKindToDisplayName,
   LivenessCheckInfo,
   Vendor,
@@ -19,19 +19,19 @@ import {
 import { Tag, Typography } from 'ui';
 
 const iconForDataKind = {
-  [DataKind.firstName]: IcoUser16,
-  [DataKind.lastName]: IcoUser16,
-  [DataKind.email]: IcoUser16,
-  [DataKind.phoneNumber]: IcoPhone16,
-  [DataKind.ssn]: IcoUser16,
-  [DataKind.lastFourSsn]: IcoUser16,
-  [DataKind.dob]: IcoUser16,
-  [DataKind.streetAddress]: IcoBuilding16,
-  [DataKind.streetAddress2]: IcoBuilding16,
-  [DataKind.city]: IcoBuilding16,
-  [DataKind.state]: IcoBuilding16,
-  [DataKind.zip]: IcoBuilding16,
-  [DataKind.country]: IcoBuilding16,
+  [DataKinds.firstName]: IcoUser16,
+  [DataKinds.lastName]: IcoUser16,
+  [DataKinds.email]: IcoUser16,
+  [DataKinds.phoneNumber]: IcoPhone16,
+  [DataKinds.ssn]: IcoUser16,
+  [DataKinds.lastFourSsn]: IcoUser16,
+  [DataKinds.dob]: IcoUser16,
+  [DataKinds.streetAddress]: IcoBuilding16,
+  [DataKinds.streetAddress2]: IcoBuilding16,
+  [DataKinds.city]: IcoBuilding16,
+  [DataKinds.state]: IcoBuilding16,
+  [DataKinds.zip]: IcoBuilding16,
+  [DataKinds.country]: IcoBuilding16,
 };
 
 const detailsForLivenessEvent = (data: LivenessCheckInfo) => ({

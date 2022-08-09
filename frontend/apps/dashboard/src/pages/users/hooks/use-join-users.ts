@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import {
   ALL_FIELDS,
   DataKind,
-  DataKindType,
+  DataKinds,
   OnboardingStatus,
   ScopedUser,
   statusToPriority,
@@ -50,14 +50,14 @@ const useJoinUsers = (
         // This object is composed by joining info from previous POST /users/decrypt calls and
         // GET /users calls
         const attributes = Object.fromEntries(
-          ALL_FIELDS.map((dataKindType: DataKindType) => [
-            dataKindType,
+          ALL_FIELDS.map((dataKind: DataKind) => [
+            dataKind,
             {
-              value: decryptedData[dataKindType]?.value,
-              isLoading: decryptedData[dataKindType]?.isLoading || false,
+              value: decryptedData[dataKind]?.value,
+              isLoading: decryptedData[dataKind]?.isLoading || false,
               exists:
-                decryptedData[dataKindType]?.exists ||
-                scoped_user.populatedDataKinds.includes(DataKind[dataKindType]),
+                decryptedData[dataKind]?.exists ||
+                scoped_user.populatedDataKinds.includes(DataKinds[dataKind]),
             } as UserData,
           ]),
         );
