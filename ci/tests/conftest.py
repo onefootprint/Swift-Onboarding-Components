@@ -20,6 +20,7 @@ from .utils import (
     try_until_success,
     post,
     create_tenant,
+    create_basic_user,
 )
 from .webauthn_simulator import SoftWebauthnDevice
 
@@ -86,38 +87,23 @@ def twilio():
 
 
 @pytest.fixture(scope="module")
+def basic_user(twilio):
+    """
+    Create a sandbox user with no data other than phone/email
+    """
+    return create_basic_user(twilio)
+
+
+@pytest.fixture(scope="module")
 def user(workos_sandbox_tenant, twilio):
     """
     Create a user with registered data and webuathn creds and onboard them onto the workos_sandbox_tenant
     """
+    basic_user = create_basic_user(twilio)
     ssn = _gen_random_ssn()
-    sandbox_phone_number, sandbox_email = _random_sandbox_info()
-    phone_number = sandbox_phone_number.split("#")[0]
-
-    # Initiate the challenge to a sandbox phone number
-    def initiate_challenge():
-        data = dict(phone_number=sandbox_phone_number, identify_type="onboarding")
-        body = post("internal/identify/challenge", data)
-        return body["data"]["challenge_token"]
-    challenge_token = try_until_success(initiate_challenge, 20)  # Rate limiting may take a while
-
-    # Respond to the challenge and create the sandbox user
-    def identify_verify():
-        message = twilio.messages.list(to=phone_number, limit=1)[0]
-        code = str(re.search("\\d{6}", message.body).group(0))
-        data = {
-            "challenge_response": code,
-            "challenge_kind": "sms",
-            "challenge_token": challenge_token,
-        }
-        body = post("internal/identify/verify", data)
-        assert body["data"]["kind"] == "user_created"
-        return body["data"]["auth_token"]
-    auth_token = try_until_success(identify_verify, 5)
-    auth_token = OnboardingAuth(auth_token)
 
     # Initialize the onboarding
-    post("internal/onboarding", None, workos_sandbox_tenant.ob_config.key, auth_token)
+    post("internal/onboarding", None, workos_sandbox_tenant.ob_config.key, basic_user.auth_token)
 
     # Populate the user's data
     user_data = {
@@ -141,29 +127,28 @@ def user(workos_sandbox_tenant, twilio):
             "country": "US",
         },
         "ssn": ssn,
-        "email": sandbox_email,
     } 
-    post("internal/user/data", user_data, auth_token)
+    post("internal/user/data", user_data, basic_user.auth_token)
 
     # Register the biometric credential
     webauthn_device = SoftWebauthnDevice()
-    body = post("internal/user/biometric/init", None, auth_token)
+    body = post("internal/user/biometric/init", None, basic_user.auth_token)
     chal_token = body["data"]["challenge_token"]
     chal = _override_webauthn_challenge(json.loads(body["data"]["challenge_json"]))
     attestation = webauthn_device.create(chal, os.environ.get('TEST_URL'))
     attestation = _override_webauthn_attestation(attestation)
     data = dict(challenge_token=chal_token, device_response_json=json.dumps(attestation))
-    post("internal/user/biometric", data, auth_token)
+    post("internal/user/biometric", data, basic_user.auth_token)
 
     # Complete the onboarding
-    body = post("internal/onboarding/complete", None, workos_sandbox_tenant.ob_config.key, auth_token)
+    body = post("internal/onboarding/complete", None, workos_sandbox_tenant.ob_config.key, basic_user.auth_token)
     validation_token = body["data"]["validation_token"]
 
     # Get the fp_user_id
     body = post("users/validate", dict(validation_token=validation_token), workos_sandbox_tenant.sk.key)
     fp_user_id = body["data"]["footprint_user_id"]
     return User(
-        auth_token=auth_token,
+        auth_token=basic_user.auth_token,
         fp_user_id=fp_user_id,
         first_name=user_data["name"]["first_name"],
         last_name=user_data["name"]["last_name"],
@@ -171,8 +156,8 @@ def user(workos_sandbox_tenant, twilio):
         zip=user_data["address"]["zip"],
         country=user_data["address"]["country"],
         ssn=ssn,
-        phone_number=sandbox_phone_number,
-        real_phone_number=phone_number,
-        email=sandbox_email,
+        phone_number=basic_user.phone_number,
+        real_phone_number=basic_user.real_phone_number,
+        email=basic_user.email,
         tenant=workos_sandbox_tenant,
     )

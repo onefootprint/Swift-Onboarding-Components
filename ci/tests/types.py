@@ -41,6 +41,13 @@ class Tenant(NamedTuple):
     sk: SecretApiKey
 
 
+class BasicUser(NamedTuple):
+    auth_token: str
+    phone_number: str
+    real_phone_number: str
+    email: str
+
+
 class User(NamedTuple):
     auth_token: str
     fp_user_id: str

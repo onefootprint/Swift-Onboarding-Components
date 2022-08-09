@@ -1,3 +1,4 @@
+import re
 import requests
 import base64
 import json
@@ -6,8 +7,9 @@ import arrow
 import time
 import os 
 
-from .types import ObConfiguration, SecretApiKey, Tenant
+from .types import ObConfiguration, SecretApiKey, Tenant, BasicUser
 from .auth import (
+    OnboardingAuth,
     TenantAuth,
     TenantSecretAuth,
 )
@@ -71,6 +73,46 @@ def try_until_success(fn, timeout_s=5, retry_interval_s=1):
         time.sleep(retry_interval_s)
     if last_exception:
         raise last_exception
+
+
+def create_basic_user(twilio):
+    sandbox_phone_number, sandbox_email = _random_sandbox_info()
+    phone_number = sandbox_phone_number.split("#")[0]
+
+    # Initiate the challenge to a sandbox phone number
+    def initiate_challenge():
+        data = dict(phone_number=sandbox_phone_number, identify_type="onboarding")
+        body = post("internal/identify/challenge", data)
+        return body["data"]["challenge_token"]
+    challenge_token = try_until_success(initiate_challenge, 20)  # Rate limiting may take a while
+
+    # Respond to the challenge and create the sandbox user
+    def identify_verify():
+        message = twilio.messages.list(to=phone_number, limit=1)[0]
+        code = str(re.search("\\d{6}", message.body).group(0))
+        data = {
+            "challenge_response": code,
+            "challenge_kind": "sms",
+            "challenge_token": challenge_token,
+        }
+        body = post("internal/identify/verify", data)
+        assert body["data"]["kind"] == "user_created"
+        return body["data"]["auth_token"]
+    auth_token = try_until_success(identify_verify, 5)
+    auth_token = OnboardingAuth(auth_token)
+
+    user_data = {
+        "email": sandbox_email,
+    } 
+    post("internal/user/data", user_data, auth_token)
+
+    return BasicUser(
+        auth_token=auth_token,
+        email=sandbox_email,
+        phone_number=sandbox_phone_number,
+        real_phone_number=phone_number,
+    )
+
 
 def create_tenant(org_data, ob_conf_data):
     body = post("private/client", org_data, CUSTODIAN_AUTH)

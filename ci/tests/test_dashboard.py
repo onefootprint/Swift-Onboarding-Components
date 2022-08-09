@@ -122,6 +122,19 @@ class TestDashboard:
         assert config["status"] == ob_configuration.status
         assert config["created_at"]
 
+    def test_config_create(self, workos_sandbox_tenant, basic_user):
+        data = dict(
+            name="Acme Bank Loan",
+            must_collect_data_kinds=["last_four_ssn"],
+            can_access_data_kinds=["last_four_ssn"],
+        )
+        body = post("org/onboarding_configs", data, workos_sandbox_tenant.sk.key)
+        ob_config = body["data"]
+        ob_config_key = TenantAuth(ob_config["key"])
+
+        body = post("internal/onboarding", None, basic_user.auth_token, ob_config_key)
+        assert body["data"]["missing_attributes"] == ["last_four_ssn"]
+
     def test_config_update(self, workos_sandbox_tenant, ob_configuration):
         # Test failing to update
         new_name = "Updated ob config name"
