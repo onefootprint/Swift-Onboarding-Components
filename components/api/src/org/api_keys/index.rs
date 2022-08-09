@@ -27,14 +27,13 @@ pub async fn get(
     let page_size = request.page_size(&state);
     let cursor = request.cursor;
 
-    let is_live = auth.is_live()?;
+    let query = ApiKeyListQuery {
+        tenant_id: auth.tenant_id(),
+        is_live: auth.is_live()?,
+    };
     let (keys, id_to_last_used, count) = state
         .db_pool
         .db_query(move |conn| -> Result<_, DbError> {
-            let query = ApiKeyListQuery {
-                tenant_id: auth.tenant_id(),
-                is_live,
-            };
             let keys = TenantApiKey::list(conn, &query, cursor, (page_size + 1) as i64)?;
             let count = TenantApiKey::count(conn, &query)?;
             let tenant_api_key_ids = keys.iter().map(|x| &x.id).collect();

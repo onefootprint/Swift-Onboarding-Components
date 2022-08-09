@@ -7,8 +7,15 @@ use crate::auth::{HasTenant, SessionContext};
 use crate::errors::ApiError;
 use crate::types::ob_config::ApiObConfig;
 use crate::types::response::ApiResponseData;
+use crate::types::ApiPaginatedResponseData;
+use crate::types::EmptyRequest;
+use crate::types::PaginatedRequest;
 use crate::State;
+use chrono::DateTime;
+use chrono::Utc;
 use db::models::ob_configurations::ObConfiguration;
+use db::models::ob_configurations::ObConfigurationQuery;
+use db::DbError;
 use newtypes::ApiKeyStatus;
 use newtypes::DataKind;
 use newtypes::ObConfigurationId;
@@ -32,22 +39,34 @@ pub fn get_detail(
 /// Return a list of onboarding configurations owned by the tenant
 async fn get(
     state: web::Data<State>,
+    request: web::Query<PaginatedRequest<EmptyRequest, DateTime<Utc>>>,
     auth: Either<SessionContext<WorkOsSession>, SecretTenantAuthContext>,
-) -> actix_web::Result<Json<ApiResponseData<Vec<ApiObConfig>>>, ApiError> {
-    let is_live = auth.is_live()?;
+) -> actix_web::Result<Json<ApiPaginatedResponseData<Vec<ApiObConfig>, DateTime<Utc>>>, ApiError> {
     let tenant = auth.tenant(&state.db_pool).await?;
-    let configs = state
+    let cursor = request.cursor;
+    let page_size = request.page_size(&state);
+
+    let query = ObConfigurationQuery {
+        tenant_id: auth.tenant_id(),
+        is_live: auth.is_live()?,
+    };
+    let (configs, count) = state
         .db_pool
-        .db_query(move |conn| ObConfiguration::list_for_tenant(conn, &auth.tenant_id(), is_live))
+        .db_query(move |conn| -> Result<_, DbError> {
+            let results = ObConfiguration::list(conn, &query, cursor, (page_size + 1) as i64)?;
+            let count = ObConfiguration::count(conn, &query)?;
+            Ok((results, count))
+        })
         .await??;
 
-    Ok(Json(ApiResponseData::ok(
-        configs
-            .into_iter()
-            .map(|x| (x, tenant.clone()))
-            .map(ApiObConfig::from)
-            .collect::<Vec<ApiObConfig>>(),
-    )))
+    let cursor = request.cursor_item(&state, &configs).map(|x| x.created_at);
+    let configs = configs
+        .into_iter()
+        .take(page_size)
+        .map(|x| (x, tenant.clone()))
+        .map(ApiObConfig::from)
+        .collect::<Vec<ApiObConfig>>();
+    Ok(Json(ApiPaginatedResponseData::ok(configs, cursor, Some(count))))
 }
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize, Apiv2Schema)]

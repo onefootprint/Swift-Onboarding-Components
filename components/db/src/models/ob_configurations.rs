@@ -1,7 +1,9 @@
+use crate::schema::ob_configurations::BoxedQuery;
 use crate::schema::{ob_configurations, onboardings, tenants};
 use crate::DbError;
 use crate::DbPool;
 use chrono::{DateTime, Utc};
+use diesel::pg::Pg;
 use diesel::prelude::*;
 use diesel::PgConnection;
 use diesel::{Insertable, Queryable};
@@ -48,18 +50,40 @@ struct ObConfigurationUpdate {
     status: Option<ApiKeyStatus>,
 }
 
+#[derive(Debug, Clone)]
+pub struct ObConfigurationQuery {
+    pub tenant_id: TenantId,
+    pub is_live: bool,
+}
+
 impl ObConfiguration {
-    pub fn list_for_tenant(
+    fn list_query(query: &ObConfigurationQuery) -> BoxedQuery<Pg> {
+        ob_configurations::table
+            .filter(ob_configurations::tenant_id.eq(&query.tenant_id))
+            .filter(ob_configurations::is_live.eq(query.is_live))
+            .into_boxed()
+    }
+
+    pub fn list(
         conn: &mut PgConnection,
-        tenant_id: &TenantId,
-        is_live: bool,
+        query: &ObConfigurationQuery,
+        cursor: Option<DateTime<Utc>>,
+        page_size: i64,
     ) -> Result<Vec<ObConfiguration>, DbError> {
-        let results = ob_configurations::table
-            .filter(ob_configurations::tenant_id.eq(tenant_id))
-            .filter(ob_configurations::is_live.eq(is_live))
+        let mut query = Self::list_query(query)
             .order_by(ob_configurations::created_at.desc())
-            .get_results(conn)?;
+            .limit(page_size);
+
+        if let Some(cursor) = cursor {
+            query = query.filter(ob_configurations::created_at.le(cursor))
+        }
+        let results = query.load::<ObConfiguration>(conn)?;
         Ok(results)
+    }
+
+    pub fn count(conn: &mut PgConnection, query: &ObConfigurationQuery) -> Result<i64, DbError> {
+        let count = Self::list_query(query).count().get_result(conn)?;
+        Ok(count)
     }
 
     pub async fn list_for_scoped_user(
