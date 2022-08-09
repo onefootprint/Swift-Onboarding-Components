@@ -1,9 +1,12 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useRequestErrorToast } from 'hooks';
 import request, { RequestError, RequestResponse } from 'request';
 import useSessionUser, { AuthHeaders } from 'src/hooks/use-session-user';
 import type { OnboardingConfig } from 'src/types/onboarding-config';
 
-export type UpdateOnboardingConfigRequest = OnboardingConfig;
+export type UpdateOnboardingConfigRequest = Partial<OnboardingConfig> & {
+  id: string;
+};
 
 export type UpdateOnboardingConfigResponse = OnboardingConfig;
 
@@ -25,11 +28,12 @@ const updateOnboardingConfig = async (
   return response.data;
 };
 
-const useUpdateStatus = (onboardingConfig: OnboardingConfig) => {
+const useUpdateStatus = () => {
   const queryClient = useQueryClient();
   const { authHeaders } = useSessionUser();
+  const showErrorToast = useRequestErrorToast();
 
-  const mutation = useMutation<
+  return useMutation<
     UpdateOnboardingConfigResponse,
     RequestError,
     UpdateOnboardingConfigRequest
@@ -44,17 +48,22 @@ const useUpdateStatus = (onboardingConfig: OnboardingConfig) => {
           queryClient.getQueryData(['onboarding-configs', authHeaders]);
 
         queryClient.setQueryData(['onboarding-configs', authHeaders], () =>
-          prevOnboardingConfigs?.map(_onboardingConfig => {
-            if (_onboardingConfig.id === updatedOnboardingConfig.id) {
-              return updatedOnboardingConfig;
+          prevOnboardingConfigs?.map(onboardingConfig => {
+            if (onboardingConfig.id === updatedOnboardingConfig.id) {
+              return {
+                ...onboardingConfig,
+                ...updatedOnboardingConfig,
+              };
             }
-            return _onboardingConfig;
+            return onboardingConfig;
           }),
         );
 
         return { prevOnboardingConfigs };
       },
       onError: (err, updatedOnboardingConfig, context: any) => {
+        showErrorToast(err);
+
         if (context.prevOnboardingConfigs) {
           queryClient.setQueryData(
             ['onboarding-configs', authHeaders],
@@ -64,19 +73,6 @@ const useUpdateStatus = (onboardingConfig: OnboardingConfig) => {
       },
     },
   );
-
-  const toggleStatus = () => {
-    if (onboardingConfig.status === 'enabled') {
-      mutation.mutate({ ...onboardingConfig, status: 'disabled' });
-    } else {
-      mutation.mutate({ ...onboardingConfig, status: 'enabled' });
-    }
-  };
-
-  return {
-    toggleStatus,
-    mutation,
-  };
 };
 
 export default useUpdateStatus;

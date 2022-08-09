@@ -6,6 +6,7 @@ import {
   onboardingConfig,
   withOnboardingConfigs,
   withUpdateOnboardingConfigs,
+  withUpdateOnboardingConfigsError,
 } from './onboarding-configs.test.config';
 
 describe('<OnboardingConfigs />', () => {
@@ -15,7 +16,7 @@ describe('<OnboardingConfigs />', () => {
 
   describe('list the api keys', () => {
     describe('when listing the onboarding configs with success', () => {
-      beforeAll(() => {
+      beforeEach(() => {
         withOnboardingConfigs();
       });
 
@@ -54,27 +55,163 @@ describe('<OnboardingConfigs />', () => {
   });
 
   describe('when toggling the status', () => {
-    beforeAll(() => {
+    beforeEach(() => {
       withOnboardingConfigs();
     });
 
-    it('should change the status from enabled to disabled', async () => {
-      withUpdateOnboardingConfigs(onboardingConfig, { status: 'Disabled' });
-      renderOnboardingConfigs();
-      const item = await screen.findByTestId(
-        `onboarding-config-${onboardingConfig.id}`,
-      );
-      const prevStatus = within(item).getByText('Enabled', {
-        exact: false,
+    describe('when updating with error', () => {
+      beforeEach(() => {
+        withUpdateOnboardingConfigsError(onboardingConfig);
       });
-      expect(prevStatus).toBeInTheDocument();
-      const disableButton = screen.getByRole('button', { name: 'Disable' });
-      await userEvent.click(disableButton);
-      await waitFor(() => {
-        const newStatus = within(item).getByText('Disabled', {
+
+      it('should rollback to the previous status and show an error notification', async () => {
+        renderOnboardingConfigs();
+        const item = await screen.findByTestId(
+          `onboarding-config-${onboardingConfig.id}`,
+        );
+        const prevStatus = within(item).getByText('Enabled', {
           exact: false,
         });
-        expect(newStatus).toBeInTheDocument();
+        expect(prevStatus).toBeInTheDocument();
+        const disableButton = screen.getByRole('button', { name: 'Disable' });
+        await userEvent.click(disableButton);
+        await waitFor(() => {
+          const newStatus = within(item).getByText('Disabled', {
+            exact: false,
+          });
+          expect(newStatus).toBeInTheDocument();
+        });
+        await waitFor(() => {
+          const rollbackStatus = within(item).getByText('Enabled', {
+            exact: false,
+          });
+          expect(rollbackStatus).toBeInTheDocument();
+        });
+        await waitFor(() => {
+          const errorMessage = screen.getByText('Something went wrong');
+          expect(errorMessage).toBeInTheDocument();
+        });
+      });
+    });
+
+    describe('when updating with success', () => {
+      beforeEach(() => {
+        withUpdateOnboardingConfigs({
+          prevData: onboardingConfig,
+          nextData: { status: 'disabled' },
+        });
+      });
+
+      it('should change the status from enabled to disabled', async () => {
+        renderOnboardingConfigs();
+        const item = await screen.findByTestId(
+          `onboarding-config-${onboardingConfig.id}`,
+        );
+        const prevStatus = within(item).getByText('Enabled', {
+          exact: false,
+        });
+        expect(prevStatus).toBeInTheDocument();
+        const disableButton = screen.getByRole('button', { name: 'Disable' });
+        await userEvent.click(disableButton);
+        await waitFor(() => {
+          const newStatus = within(item).getByText('Disabled', {
+            exact: false,
+          });
+          expect(newStatus).toBeInTheDocument();
+        });
+      });
+    });
+  });
+
+  describe('when updating the name', () => {
+    beforeEach(() => {
+      withOnboardingConfigs();
+    });
+
+    describe('when updating with error', () => {
+      beforeEach(() => {
+        withUpdateOnboardingConfigsError(onboardingConfig);
+      });
+
+      it('should rollback to the previous state and show an error notification', async () => {
+        renderOnboardingConfigs();
+        const item = await screen.findByTestId(
+          `onboarding-config-${onboardingConfig.id}`,
+        );
+
+        const button = within(item).getByRole('button', {
+          name: 'Edit onboarding config',
+        });
+        await userEvent.click(button);
+
+        const dialog = screen.getByRole('dialog', {
+          name: 'Edit onboarding configuration name',
+        });
+
+        const input = screen.getByLabelText('Onboarding configuration name');
+        await userEvent.type(input, 'Acme Lorem');
+
+        const submitButton = within(dialog).getByRole('button', {
+          name: 'Save',
+        });
+        await userEvent.click(submitButton);
+
+        await waitFor(() => {
+          const newName = within(item).getByText('Acme Lorem', {
+            exact: false,
+          });
+          expect(newName).toBeInTheDocument();
+        });
+        await waitFor(() => {
+          const rollbackName = within(item).getByText('Acme Bank', {
+            exact: false,
+          });
+          expect(rollbackName).toBeInTheDocument();
+        });
+        await waitFor(() => {
+          const errorMessage = screen.getByText('Something went wrong');
+          expect(errorMessage).toBeInTheDocument();
+        });
+      });
+    });
+
+    describe('when updating with success', () => {
+      beforeEach(() => {
+        withUpdateOnboardingConfigs({
+          prevData: onboardingConfig,
+          nextData: { name: 'Acme Lorem' },
+        });
+      });
+
+      it('should change the name', async () => {
+        renderOnboardingConfigs();
+        const item = await screen.findByTestId(
+          `onboarding-config-${onboardingConfig.id}`,
+        );
+
+        const button = within(item).getByRole('button', {
+          name: 'Edit onboarding config',
+        });
+        await userEvent.click(button);
+
+        const dialog = screen.getByRole('dialog', {
+          name: 'Edit onboarding configuration name',
+        });
+
+        const input = screen.getByLabelText('Onboarding configuration name');
+        await userEvent.type(input, 'Acme Lorem');
+
+        const submitButton = within(dialog).getByRole('button', {
+          name: 'Save',
+        });
+        await userEvent.click(submitButton);
+
+        await waitFor(() => {
+          const newName = within(item).getByText('Acme Lorem', {
+            exact: false,
+          });
+          expect(newName).toBeInTheDocument();
+        });
       });
     });
   });

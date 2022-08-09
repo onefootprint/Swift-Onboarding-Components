@@ -24,15 +24,28 @@ export const withOnboardingConfigs = (data = listOnboardingConfigsFixture) =>
     },
   });
 
-export const withUpdateOnboardingConfigs = (
-  currentData: Record<string, any>,
-  newData: Record<string, any>,
-) =>
+export const withUpdateOnboardingConfigs = (options: {
+  prevData: Record<string, any>;
+  nextData: Record<string, any>;
+}) =>
   mockRequest({
     method: 'patch',
-    path: `/org/onboarding_configs/${currentData.id}`,
+    path: `/org/onboarding_configs/${options.prevData.id}`,
     response: {
-      ...currentData,
-      ...newData,
+      ...options.prevData,
+      ...options.nextData,
+    },
+  });
+
+export const withUpdateOnboardingConfigsError = (data: any) =>
+  mockRequest({
+    delay: 150,
+    method: 'patch',
+    path: `/org/onboarding_configs/${data.id}`,
+    statusCode: 400,
+    response: {
+      error: {
+        message: 'Something went wrong',
+      },
     },
   });

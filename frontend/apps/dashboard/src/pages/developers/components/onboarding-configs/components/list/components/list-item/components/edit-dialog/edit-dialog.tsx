@@ -3,32 +3,41 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import { Dialog, TextInput } from 'ui';
 
-import useCreateApiKey from './hooks/use-create-api-key';
-
-type CreateDialogProps = {
-  open: boolean;
-  onClose: () => void;
-};
-
 type FormData = { name: string };
 
-const CreateDialog = ({ open, onClose }: CreateDialogProps) => {
-  const createApiKeyMutation = useCreateApiKey();
-  const { t } = useTranslation('pages.developers.api-keys.create');
+type EditDialogProps = {
+  defaultValues: FormData;
+  onClose: () => void;
+  onSubmit: (formData: FormData) => void;
+  open: boolean;
+};
+
+const EditDialog = ({
+  defaultValues,
+  onClose,
+  onSubmit,
+  open,
+}: EditDialogProps) => {
+  const { t } = useTranslation('pages.developers.onboarding-configs.edit');
   const {
     reset,
     register,
     handleSubmit,
-    formState: { errors },
-  } = useForm<FormData>();
+    formState: { errors, isDirty },
+  } = useForm<FormData>({
+    defaultValues,
+  });
 
   const handleClose = () => {
     reset();
     onClose();
   };
 
-  const onSubmit = (formData: FormData) => {
-    createApiKeyMutation.mutate(formData, { onSuccess: handleClose });
+  const handleBeforeSubmit = (formData: FormData) => {
+    if (isDirty) {
+      onSubmit(formData);
+    }
+    onClose();
   };
 
   return (
@@ -36,21 +45,21 @@ const CreateDialog = ({ open, onClose }: CreateDialogProps) => {
       size="compact"
       title={t('title')}
       primaryButton={{
-        form: 'create-secret-key-form',
-        label: t('cta.label'),
-        loading: createApiKeyMutation.isLoading,
-        loadingAriaLabel: t('cta.aria-label'),
+        form: 'edit-onboarding-config-form',
+        label: t('cta'),
         type: 'submit',
       }}
       secondaryButton={{
-        disabled: createApiKeyMutation.isLoading,
         label: t('cancel'),
         onClick: handleClose,
       }}
       onClose={handleClose}
       open={open}
     >
-      <form onSubmit={handleSubmit(onSubmit)} id="create-secret-key-form">
+      <form
+        onSubmit={handleSubmit(handleBeforeSubmit)}
+        id="edit-onboarding-config-form"
+      >
         <TextInput
           autoFocus
           hasError={!!errors.name}
@@ -69,4 +78,4 @@ const CreateDialog = ({ open, onClose }: CreateDialogProps) => {
   );
 };
 
-export default CreateDialog;
+export default EditDialog;

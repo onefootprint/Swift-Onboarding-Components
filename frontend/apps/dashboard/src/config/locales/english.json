@@ -102,6 +102,7 @@
         },
         "list-item": {
           "created-at": "Created on {{date}}",
+          "edit": "Edit onboarding config",
           "toggle-status": {
             "disable": "Disable",
             "enable": "Enable"
@@ -120,6 +121,20 @@
           "status": {
             "label": "Status"
           }
+        },
+        "edit": {
+          "title": "Edit onboarding configuration name",
+          "form": {
+            "name": {
+              "label": "Onboarding configuration name",
+              "placeholder": "User ID verification",
+              "errors": {
+                "required": "Please enter a name for your onboarding configuration."
+              }
+            }
+          },
+          "cta": "Save",
+          "cancel": "Cancel"
         }
       }
     }
