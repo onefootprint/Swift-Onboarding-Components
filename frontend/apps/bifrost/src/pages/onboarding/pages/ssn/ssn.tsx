@@ -24,7 +24,7 @@ const SSN = () => {
   const { authToken } = state.context;
   const { mutation, syncData } = useSyncData();
   const toast = useToast();
-  const { t } = useTranslation('pages.registration.ssn');
+  const { t } = useTranslation('pages.onboarding.ssn');
   const {
     register,
     handleSubmit,

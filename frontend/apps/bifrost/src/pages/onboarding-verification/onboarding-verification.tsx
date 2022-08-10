@@ -7,7 +7,7 @@ import styled, { css } from 'styled-components';
 import { LoadingIndicator, Typography } from 'ui';
 
 const OnboardingVerification = () => {
-  const { t } = useTranslation('pages.registration.onboarding-verification');
+  const { t } = useTranslation('pages.onboarding.onboarding-verification');
   const [state, send] = useBifrostMachine();
   const onboardingMutation = useOnboarding();
   const { context } = state;

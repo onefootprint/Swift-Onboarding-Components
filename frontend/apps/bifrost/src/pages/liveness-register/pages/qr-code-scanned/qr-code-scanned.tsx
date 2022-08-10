@@ -1,4 +1,5 @@
 import { HeaderTitle } from 'footprint-ui';
+import { useTranslation } from 'hooks';
 import React, { useEffect } from 'react';
 import NavigationHeader from 'src/components/navigation-header';
 import useGetD2PStatus, { D2PStatus } from 'src/hooks/d2p/use-get-d2p-status';
@@ -13,6 +14,7 @@ import { useLivenessRegisterMachine } from '../../components/machine-provider';
 
 const QRCodeScanned = () => {
   const [state, send] = useLivenessRegisterMachine();
+  const { t } = useTranslation('pages.qr-code-scanned');
   const updateD2PStatusMutation = useUpdateD2PStatus();
   const statusResponse = useGetD2PStatus();
 
@@ -59,12 +61,9 @@ const QRCodeScanned = () => {
     <>
       <NavigationHeader button={{ variant: 'close', confirmClose: true }} />
       <Container>
-        <HeaderTitle
-          title="Liveness check"
-          subtitle="QR code scanned. Please continue on your phone."
-        />
+        <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
         <LoadingIndicator />
-        <LinkButton onClick={handleCancel}>Cancel</LinkButton>
+        <LinkButton onClick={handleCancel}>{t('cancel')}</LinkButton>
       </Container>
     </>
   );

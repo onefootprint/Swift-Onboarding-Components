@@ -40,7 +40,7 @@ const ResidentialAddress = () => {
   const { mutation, syncData } = useSyncData();
   const toast = useToast();
   const { data, authToken } = state.context;
-  const { t } = useTranslation('pages.registration.residential-address');
+  const { t } = useTranslation('pages.onboarding.residential-address');
   const {
     watch,
     control,

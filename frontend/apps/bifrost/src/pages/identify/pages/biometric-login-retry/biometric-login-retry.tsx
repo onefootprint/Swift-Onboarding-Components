@@ -1,4 +1,5 @@
 import { HeaderTitle } from 'footprint-ui';
+import { useTranslation } from 'hooks';
 import React from 'react';
 import NavigationHeader from 'src/components/navigation-header';
 import styled, { css } from 'styled-components';
@@ -7,6 +8,7 @@ import { Button } from 'ui';
 import useBiometricLoginRetry from './hooks/use-biometric-login-retry';
 
 const BiometricLoginRetry = () => {
+  const { t } = useTranslation('pages.biometric-login-retry');
   const [requestBiometricChallenge, requestPhoneChallenge] =
     useBiometricLoginRetry();
 
@@ -14,16 +16,13 @@ const BiometricLoginRetry = () => {
     <>
       <NavigationHeader button={{ variant: 'close', confirmClose: true }} />
       <Container>
-        <HeaderTitle
-          title="Face not recognized"
-          subtitle="You can try Face ID again or you can use your phone number to complete your authentication."
-        />
+        <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
         <ButtonContainer>
           <Button onClick={requestBiometricChallenge} fullWidth>
-            Try Face ID again
+            {t('cta')}
           </Button>
           <Button onClick={requestPhoneChallenge} variant="secondary" fullWidth>
-            Use phone number
+            {t('use-phone')}
           </Button>
         </ButtonContainer>
       </Container>

@@ -1,4 +1,5 @@
 import { HeaderTitle } from 'footprint-ui';
+import { useTranslation } from 'hooks';
 import React from 'react';
 import NavigationHeader from 'src/components/navigation-header';
 import { Events, MachineContext } from 'src/utils/state-machine/onboarding';
@@ -8,6 +9,7 @@ import { Button } from 'ui';
 import useOnboardingMachine from '../../hooks/use-onboarding-machine';
 
 const AdditionalInfoRequired = () => {
+  const { t } = useTranslation('pages.onboarding.additional-info-required');
   const [state, send] = useOnboardingMachine();
   const context = state.context as MachineContext;
   const handleClick = () => {
@@ -21,12 +23,11 @@ const AdditionalInfoRequired = () => {
       <NavigationHeader button={{ variant: 'close', confirmClose: true }} />
       <Container>
         <HeaderTitle
-          title="Additional data is required"
-          subtitle={`In addition to the data we already have on you, ${context.tenant.name} requires
-          some more information to verify your identity.`}
+          title={t('title')}
+          subtitle={t('subtitle', { tenantName: context.tenant.name })}
         />
         <Button fullWidth onClick={handleClick}>
-          Continue
+          {t('cta')}
         </Button>
       </Container>
     </>

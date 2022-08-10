@@ -28,7 +28,7 @@ const BasicInformation = () => {
   const { data, authToken } = state.context;
   const { mutation, syncData } = useSyncData();
   const toast = useToast();
-  const { t } = useTranslation('pages.registration.basic-information');
+  const { t } = useTranslation('pages.onboarding.basic-information');
   const {
     register,
     handleSubmit,
