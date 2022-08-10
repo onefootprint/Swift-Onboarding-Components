@@ -22,6 +22,20 @@
           }
         },
         "cta": "Continue"
+      },
+      "challenge-picker": {
+        "header": "Welcome back! 🎉",
+        "title": "How would you like to continue?",
+        "sms": {
+          "title": "SMS",
+          "description": "Get a text message on your phone"
+        },
+        "biometric": {
+          "title": "Biometric",
+          "description-ios": "Use FaceID or TouchID",
+          "description-default": "Use device biometrics"
+        },
+        "cta": "Continue"
       }
     },
     "biometric-login-retry": {
