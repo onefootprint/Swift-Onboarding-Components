@@ -68,6 +68,8 @@ import IcoEye16 from '../ico/ico-eye-16';
 import IcoEye24 from '../ico/ico-eye-24';
 import IcoFacebook16 from '../ico/ico-facebook-16';
 import IcoFacebook24 from '../ico/ico-facebook-24';
+import IcoFaceid16 from '../ico/ico-faceid-16';
+import IcoFaceid24 from '../ico/ico-faceid-24';
 import IcoFileText216 from '../ico/ico-file-text-2-16';
 import IcoFileText224 from '../ico/ico-file-text-2-24';
 import IcoFileText16 from '../ico/ico-file-text-16';
@@ -126,6 +128,8 @@ import IcoShare24 from '../ico/ico-share-24';
 import IcoShield16 from '../ico/ico-shield-16';
 import IcoShield24 from '../ico/ico-shield-24';
 import IcoShield40 from '../ico/ico-shield-40';
+import IcoSmartphone16 from '../ico/ico-smartphone-16';
+import IcoSmartphone24 from '../ico/ico-smartphone-24';
 import IcoSpinner16 from '../ico/ico-spinner-16';
 import IcoSpinner24 from '../ico/ico-spinner-24';
 import IcoStore16 from '../ico/ico-store-16';
@@ -172,6 +176,7 @@ export default {
   IcoEmojiHappy16,
   IcoEye16,
   IcoFacebook16,
+  IcoFaceid16,
   IcoFileText16,
   IcoFileText216,
   IcoFootprint16,
@@ -198,6 +203,7 @@ export default {
   IcoSettings16,
   IcoShare16,
   IcoShield16,
+  IcoSmartphone16,
   IcoSpinner16,
   IcoStore16,
   IcoToggleKnob16,
@@ -236,6 +242,7 @@ export default {
   IcoEmojiHappy24,
   IcoEye24,
   IcoFacebook24,
+  IcoFaceid24,
   IcoFileText224,
   IcoFileText24,
   IcoFootprint24,
@@ -262,6 +269,7 @@ export default {
   IcoSettings24,
   IcoShare24,
   IcoShield24,
+  IcoSmartphone24,
   IcoSpinner24,
   IcoStore24,
   IcoTwitter24,
