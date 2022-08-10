@@ -2,7 +2,7 @@ import { DeviceInfo } from 'hooks';
 import { assign, createMachine } from 'xstate';
 
 import createLivenessRegisterMachine from '../liveness-register';
-import { OnboardingData, TenantInfo } from '../types';
+import { TenantInfo } from '../types';
 import {
   Actions,
   Events,
@@ -19,7 +19,6 @@ import {
 
 export type OnboardingMachineArgs = {
   userFound: boolean;
-  onboarding: OnboardingData;
   device: DeviceInfo;
   tenant: TenantInfo;
   authToken?: string;
@@ -27,7 +26,6 @@ export type OnboardingMachineArgs = {
 
 const createOnboardingMachine = ({
   userFound,
-  onboarding,
   device,
   authToken,
   tenant,
@@ -35,21 +33,47 @@ const createOnboardingMachine = ({
   createMachine<MachineContext, MachineEvents>(
     {
       id: 'onboarding',
-      initial: States.init,
+      initial: States.onboardingVerification,
       context: {
         userFound,
-        missingAttributes: [...onboarding.missingAttributes],
-        missingWebauthnCredentials: onboarding.missingWebauthnCredentials,
-        data: onboarding.data || {},
+        missingAttributes: [],
+        missingWebauthnCredentials: false,
+        data: {},
         device,
         authToken,
         tenant,
       },
       states: {
-        [States.init]: {
+        [States.onboardingVerification]: {
+          on: {
+            [Events.onboardingVerificationCompleted]: [
+              {
+                target: States.onboardingComplete,
+                cond: (context, event) => !!event.payload.validationToken,
+                actions: [
+                  Actions.assignValidationToken,
+                  Actions.assignMissingAttributes,
+                  Actions.assignMissingWebauthnCredentials,
+                ],
+              },
+              {
+                target: States.initOnboarding,
+                actions: [
+                  Actions.assignValidationToken,
+                  Actions.assignMissingAttributes,
+                  Actions.assignMissingWebauthnCredentials,
+                ],
+              },
+            ],
+          },
+        },
+        [States.initOnboarding]: {
           always: [
             {
-              cond: () => userFound && onboarding.missingAttributes.length > 0,
+              cond: context =>
+                userFound &&
+                (context.missingAttributes.length > 0 ||
+                  context.missingWebauthnCredentials),
               target: States.additionalDataRequired,
             },
             {
@@ -79,7 +103,7 @@ const createOnboardingMachine = ({
                 isMissingSsnAttribute(context.missingAttributes, context.data),
             },
             {
-              target: States.onboardingSuccess,
+              target: States.onboardingComplete,
             },
           ],
         },
@@ -120,7 +144,7 @@ const createOnboardingMachine = ({
                   ),
               },
               {
-                target: States.onboardingSuccess,
+                target: States.onboardingComplete,
               },
             ],
           },
@@ -159,7 +183,7 @@ const createOnboardingMachine = ({
                   ),
               },
               {
-                target: States.onboardingSuccess,
+                target: States.onboardingComplete,
               },
             ],
           },
@@ -186,7 +210,7 @@ const createOnboardingMachine = ({
                   ),
               },
               {
-                target: States.onboardingSuccess,
+                target: States.onboardingComplete,
                 actions: [Actions.assignBasicInformation],
               },
             ],
@@ -205,7 +229,7 @@ const createOnboardingMachine = ({
                   ),
               },
               {
-                target: States.onboardingSuccess,
+                target: States.onboardingComplete,
                 actions: [Actions.assignResidentialAddress],
               },
             ],
@@ -222,7 +246,7 @@ const createOnboardingMachine = ({
           on: {
             [Events.ssnSubmitted]: [
               {
-                target: States.onboardingSuccess,
+                target: States.onboardingComplete,
                 actions: [Actions.assignSsn],
               },
             ],
@@ -240,16 +264,41 @@ const createOnboardingMachine = ({
             ],
           },
         },
-        [States.onboardingSuccess]: {
+        [States.onboardingComplete]: {
           type: 'final',
           data: {
             onboardingData: (context: MachineContext) => context.data,
+            missingWebauthnCredentials: (context: MachineContext) =>
+              context.missingWebauthnCredentials,
+            missingAttributes: (context: MachineContext) =>
+              context.missingAttributes,
+            validationToken: (context: MachineContext) =>
+              context.validationToken,
           },
         },
       },
     },
     {
       actions: {
+        [Actions.assignMissingAttributes]: assign((context, event) => {
+          if (event.type === Events.onboardingVerificationCompleted) {
+            context.missingAttributes = [...event.payload.missingAttributes];
+          }
+          return context;
+        }),
+        [Actions.assignMissingWebauthnCredentials]: assign((context, event) => {
+          if (event.type === Events.onboardingVerificationCompleted) {
+            context.missingWebauthnCredentials =
+              event.payload.missingWebauthnCredentials;
+          }
+          return context;
+        }),
+        [Actions.assignValidationToken]: assign((context, event) => {
+          if (event.type === Events.onboardingVerificationCompleted) {
+            context.validationToken = event.payload.validationToken;
+          }
+          return context;
+        }),
         [Actions.assignBasicInformation]: assign((context, event) => {
           if (event.type === Events.basicInformationSubmitted) {
             context.data = {

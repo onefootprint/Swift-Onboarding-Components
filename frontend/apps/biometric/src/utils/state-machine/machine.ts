@@ -9,7 +9,7 @@ const d2pMobileMachine = createMachine<D2PContext, D2PEvent>(
     context: {
       device: {
         type: 'mobile',
-        hasSupportForWebAuthn: false,
+        hasSupportForWebauthn: false,
       },
       authToken: '',
     },
@@ -24,7 +24,7 @@ const d2pMobileMachine = createMachine<D2PContext, D2PEvent>(
               target: States.register,
               cond: (context, event) =>
                 event.payload.type === 'mobile' &&
-                event.payload.hasSupportForWebAuthn,
+                event.payload.hasSupportForWebauthn,
               actions: [Actions.assignDeviceInfo],
             },
             {
@@ -90,7 +90,7 @@ const d2pMobileMachine = createMachine<D2PContext, D2PEvent>(
         if (event.type === Events.deviceInfoIdentified) {
           context.device = {
             type: event.payload.type,
-            hasSupportForWebAuthn: event.payload.hasSupportForWebAuthn,
+            hasSupportForWebauthn: event.payload.hasSupportForWebauthn,
           };
         }
         return context;

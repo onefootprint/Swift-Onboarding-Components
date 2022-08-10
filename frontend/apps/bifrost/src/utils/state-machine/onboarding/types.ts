@@ -8,13 +8,14 @@ import {
 } from 'src/utils/state-machine/types';
 
 export enum States {
-  init = 'init',
+  onboardingVerification = 'onboardingVerification',
+  initOnboarding = 'initOnboarding',
   additionalDataRequired = 'additionalDataRequired',
   livenessRegister = 'livenessRegister',
   basicInformation = 'basicInformation',
   residentialAddress = 'residentialAddress',
   ssn = 'ssn',
-  onboardingSuccess = 'onboardingSuccess',
+  onboardingComplete = 'onboardingComplete',
 }
 
 export type MachineContext = {
@@ -25,9 +26,11 @@ export type MachineContext = {
   tenant: TenantInfo;
   device: DeviceInfo;
   authToken?: string;
+  validationToken?: string;
 };
 
 export enum Events {
+  onboardingVerificationCompleted = 'onboardingVerificationCompleted',
   onboardingStarted = 'onboardingStarted',
   additionalInfoRequired = 'additionalInfoRequired',
   basicInformationSubmitted = 'basicInformationSubmitted',
@@ -37,12 +40,24 @@ export enum Events {
 }
 
 export enum Actions {
+  assignMissingAttributes = 'assignMissingAttributes',
+  assignMissingWebauthnCredentials = 'assignMissingWebauthnCredentials',
+  assignValidationToken = 'assignValidationToken',
+
   assignBasicInformation = 'assignBasicInformation',
   assignResidentialAddress = 'assignResidentialAddress',
   assignSsn = 'assignSsn',
 }
 
 export type MachineEvents =
+  | {
+      type: Events.onboardingVerificationCompleted;
+      payload: {
+        missingAttributes: readonly UserDataAttribute[];
+        missingWebauthnCredentials: boolean;
+        validationToken?: string;
+      };
+    }
   | { type: Events.onboardingStarted }
   | { type: Events.additionalInfoRequired }
   | {

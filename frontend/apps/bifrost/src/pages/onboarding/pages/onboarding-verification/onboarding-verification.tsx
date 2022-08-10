@@ -1,17 +1,19 @@
-import { useTranslation } from 'hooks';
+import useTranslation from 'hooks/src/use-translation/use-translation';
 import IcoForbid40 from 'icons/ico/ico-forbid-40';
 import React, { useEffect } from 'react';
-import useBifrostMachine, { Events } from 'src/hooks/use-bifrost-machine';
 import useOnboarding from 'src/hooks/use-onboarding';
+import { Events } from 'src/utils/state-machine/onboarding';
 import styled, { css } from 'styled-components';
 import { LoadingIndicator, Typography } from 'ui';
 
+import useOnboardingMachine from '../../hooks/use-onboarding-machine';
+
 const OnboardingVerification = () => {
-  const { t } = useTranslation('pages.onboarding.onboarding-verification');
-  const [state, send] = useBifrostMachine();
-  const onboardingMutation = useOnboarding();
+  const { t } = useTranslation('pages.registration.onboarding-verification');
+  const [state, send] = useOnboardingMachine();
   const { context } = state;
   const { authToken } = context;
+  const onboardingMutation = useOnboarding();
   const tenantPk = context.tenant.pk;
 
   useEffect(() => {
@@ -27,7 +29,7 @@ const OnboardingVerification = () => {
           validationToken,
         }) => {
           send({
-            type: Events.onboardingVerificationSucceeded,
+            type: Events.onboardingVerificationCompleted,
             payload: {
               missingAttributes,
               missingWebauthnCredentials,

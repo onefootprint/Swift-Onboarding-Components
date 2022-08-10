@@ -1,17 +1,30 @@
 import { useFootprintJs } from 'footprint-provider';
 import { useTranslation } from 'hooks';
 import IcoCheckCircle40 from 'icons/ico/ico-check-circle-40';
-import React from 'react';
-import Confetti from 'react-confetti';
+import React, { useEffect } from 'react';
 import NavigationHeader from 'src/components/navigation-header';
-import useConfettiState from 'src/hooks/use-confetti-state';
 import styled from 'styled-components';
 import { Box, LinkButton, Typography } from 'ui';
+
+import useBifrostMachine from '../../hooks/use-bifrost-machine/use-bifrost-machine';
+
+const CLOSE_DELAY = 1000;
 
 const VerificationSuccess = () => {
   const { t } = useTranslation('pages.verification-success');
   const footprint = useFootprintJs();
-  const { height, width, running } = useConfettiState();
+  const [state] = useBifrostMachine();
+
+  useEffect(() => {
+    const { validationToken } = state.context.onboarding;
+    if (!validationToken) {
+      return;
+    }
+    setTimeout(() => {
+      footprint.complete(validationToken);
+      footprint.close();
+    }, CLOSE_DELAY);
+  }, []);
 
   const handleClose = () => {
     footprint.close();
@@ -19,12 +32,6 @@ const VerificationSuccess = () => {
 
   return (
     <>
-      <Confetti
-        height={height}
-        numberOfPieces={50}
-        recycle={running}
-        width={width}
-      />
       <NavigationHeader button={{ variant: 'close' }} />
       <Container>
         <Box sx={{ marginBottom: 3 }}>

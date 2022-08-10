@@ -11,13 +11,13 @@ const DEFAULT_DEVICE_TYPE = 'unknown';
 async function checkDeviceInfo() {
   const uaParser = new UAParser();
   const device = uaParser.getDevice();
-  let hasSupportForWebAuthn = false;
+  let hasSupportForWebauthn = false;
   if (window.PublicKeyCredential) {
-    hasSupportForWebAuthn =
+    hasSupportForWebauthn =
       await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
   }
   const info: DeviceInfo = {
-    hasSupportForWebAuthn,
+    hasSupportForWebauthn,
     type: device.type || DEFAULT_DEVICE_TYPE,
   };
   return info;

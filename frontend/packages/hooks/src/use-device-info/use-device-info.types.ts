@@ -1,4 +1,4 @@
 export type DeviceInfo = {
-  hasSupportForWebAuthn: boolean;
+  hasSupportForWebauthn: boolean;
   type: string;
 };

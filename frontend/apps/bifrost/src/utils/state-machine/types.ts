@@ -81,6 +81,7 @@ export type OnboardingData = {
   missingWebauthnCredentials: boolean;
   missingAttributes: readonly UserDataAttribute[]; // Initial set of attributes received from /onboarding
   data: UserData; // Filled user data
+  validationToken?: string;
 };
 
 export type TenantInfo = {

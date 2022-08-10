@@ -28,7 +28,7 @@ const useEmailIdentify = () => {
 
   const identifyEmail = (email: string) => {
     const preferredChallengeKind =
-      device.hasSupportForWebAuthn && device.type === 'mobile'
+      device.hasSupportForWebauthn && device.type === 'mobile'
         ? ChallengeKind.biometric
         : ChallengeKind.sms;
     identifyMutation.mutate(

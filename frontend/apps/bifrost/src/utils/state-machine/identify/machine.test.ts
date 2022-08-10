@@ -17,7 +17,7 @@ describe('Identify Machine Tests', () => {
       const machine = interpret(
         createMachine({
           type: 'mobile',
-          hasSupportForWebAuthn: true,
+          hasSupportForWebauthn: true,
         }),
       );
       machine.start();
@@ -25,7 +25,7 @@ describe('Identify Machine Tests', () => {
       expect(state.value).toEqual(States.emailIdentification);
       expect(state.context.device).toEqual({
         type: 'mobile',
-        hasSupportForWebAuthn: true,
+        hasSupportForWebauthn: true,
       });
 
       const challengeData = {
@@ -52,7 +52,7 @@ describe('Identify Machine Tests', () => {
       const machine = interpret(
         createMachine({
           type: 'mobile',
-          hasSupportForWebAuthn: true,
+          hasSupportForWebauthn: true,
         }),
       );
       machine.start();
@@ -60,7 +60,7 @@ describe('Identify Machine Tests', () => {
       expect(state.value).toEqual(States.emailIdentification);
       expect(state.context.device).toEqual({
         type: 'mobile',
-        hasSupportForWebAuthn: true,
+        hasSupportForWebauthn: true,
       });
 
       state = machine.send({
@@ -104,7 +104,7 @@ describe('Identify Machine Tests', () => {
       const machine = interpret(
         createMachine({
           type: 'mobile',
-          hasSupportForWebAuthn: true,
+          hasSupportForWebauthn: true,
         }),
       );
       machine.start();
@@ -112,7 +112,7 @@ describe('Identify Machine Tests', () => {
       expect(state.value).toEqual(States.emailIdentification);
       expect(state.context.device).toEqual({
         type: 'mobile',
-        hasSupportForWebAuthn: true,
+        hasSupportForWebauthn: true,
       });
 
       state = machine.send({
@@ -164,7 +164,7 @@ describe('Identify Machine Tests', () => {
       const machine = interpret(
         createMachine({
           type: 'mobile',
-          hasSupportForWebAuthn: true,
+          hasSupportForWebauthn: true,
         }),
       );
       machine.start();
@@ -172,7 +172,7 @@ describe('Identify Machine Tests', () => {
       expect(state.value).toEqual(States.emailIdentification);
       expect(state.context.device).toEqual({
         type: 'mobile',
-        hasSupportForWebAuthn: true,
+        hasSupportForWebauthn: true,
       });
 
       state = machine.send({
@@ -201,7 +201,7 @@ describe('Identify Machine Tests', () => {
       const machine = interpret(
         createMachine({
           type: 'mobile',
-          hasSupportForWebAuthn: true,
+          hasSupportForWebauthn: true,
         }),
       );
       machine.start();
@@ -229,7 +229,7 @@ describe('Identify Machine Tests', () => {
       const machine = interpret(
         createMachine({
           type: 'mobile',
-          hasSupportForWebAuthn: true,
+          hasSupportForWebauthn: true,
         }),
       );
       machine.start();
@@ -286,7 +286,7 @@ describe('Identify Machine Tests', () => {
       const machine = interpret(
         createMachine({
           type: 'mobile',
-          hasSupportForWebAuthn: true,
+          hasSupportForWebauthn: true,
         }),
       );
       machine.start();

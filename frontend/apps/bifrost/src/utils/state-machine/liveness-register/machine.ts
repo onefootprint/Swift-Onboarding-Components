@@ -33,13 +33,13 @@ const createLivenessRegisterMachine = ({
               target: States.newTabRequest,
               cond: context =>
                 context.device.type === 'mobile' &&
-                context.device.hasSupportForWebAuthn,
+                context.device.hasSupportForWebauthn,
             },
             {
               target: States.livenessRegisterFailed,
               cond: context =>
                 context.device.type === 'mobile' &&
-                !context.device.hasSupportForWebAuthn,
+                !context.device.hasSupportForWebauthn,
             },
             {
               target: States.qrRegister,

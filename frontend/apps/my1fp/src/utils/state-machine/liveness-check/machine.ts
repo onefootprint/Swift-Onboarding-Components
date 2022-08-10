@@ -24,14 +24,14 @@ const livenessCheckMachine = createMachine<MachineContext, MachineEvents>(
               actions: [Actions.assignDeviceInfo],
               cond: (context, event) =>
                 event.payload.type === 'mobile' &&
-                event.payload.hasSupportForWebAuthn,
+                event.payload.hasSupportForWebauthn,
             },
             {
               target: States.livenessCheckFailed,
               actions: [Actions.assignDeviceInfo],
               cond: (context, event) =>
                 event.payload.type === 'mobile' &&
-                !event.payload.hasSupportForWebAuthn,
+                !event.payload.hasSupportForWebauthn,
             },
             {
               target: States.qrRegister,

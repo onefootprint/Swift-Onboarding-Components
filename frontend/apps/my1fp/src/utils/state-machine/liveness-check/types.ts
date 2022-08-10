@@ -41,10 +41,7 @@ export enum Actions {
 }
 
 export type MachineContext = {
-  device?: {
-    hasSupportForWebAuthn: boolean;
-    type: string;
-  };
+  device?: DeviceInfo;
   scopedAuthToken?: string;
   tab?: Window;
 };

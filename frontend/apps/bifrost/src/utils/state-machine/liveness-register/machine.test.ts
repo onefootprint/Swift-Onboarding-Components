@@ -13,7 +13,7 @@ describe('LivenessRegister Machine Tests', () => {
           createLivenessRegisterMachine({
             device: {
               type,
-              hasSupportForWebAuthn: true,
+              hasSupportForWebauthn: true,
             },
             authToken,
           }),
@@ -41,7 +41,7 @@ describe('LivenessRegister Machine Tests', () => {
           createLivenessRegisterMachine({
             device: {
               type,
-              hasSupportForWebAuthn: true,
+              hasSupportForWebauthn: true,
             },
             authToken,
           }),
@@ -69,7 +69,7 @@ describe('LivenessRegister Machine Tests', () => {
           createLivenessRegisterMachine({
             device: {
               type,
-              hasSupportForWebAuthn: true,
+              hasSupportForWebauthn: true,
             },
             authToken,
           }),
@@ -97,7 +97,7 @@ describe('LivenessRegister Machine Tests', () => {
           createLivenessRegisterMachine({
             device: {
               type,
-              hasSupportForWebAuthn: true,
+              hasSupportForWebauthn: true,
             },
             authToken,
           }),
@@ -125,7 +125,7 @@ describe('LivenessRegister Machine Tests', () => {
           createLivenessRegisterMachine({
             device: {
               type,
-              hasSupportForWebAuthn: false,
+              hasSupportForWebauthn: false,
             },
             authToken,
           }),
@@ -136,7 +136,7 @@ describe('LivenessRegister Machine Tests', () => {
         const { state } = machine;
         const { context } = state;
         expect(context.authToken).toEqual(authToken);
-        expect(context.device.hasSupportForWebAuthn).toEqual(false);
+        expect(context.device.hasSupportForWebauthn).toEqual(false);
         expect(context.device.type).toEqual(type);
         expect(state.value).toEqual(States.livenessRegisterFailed);
       });
@@ -152,7 +152,7 @@ describe('transitions from init state', () => {
       createLivenessRegisterMachine({
         device: {
           type: 'tablet',
-          hasSupportForWebAuthn: false,
+          hasSupportForWebauthn: false,
         },
         authToken: 'testAuthToken',
       });
@@ -231,7 +231,7 @@ describe('transitions from init state', () => {
       createLivenessRegisterMachine({
         device: {
           type: 'tablet',
-          hasSupportForWebAuthn: false,
+          hasSupportForWebauthn: false,
         },
         authToken: 'testAuthToken',
       });
@@ -284,7 +284,7 @@ describe('transitions from init state', () => {
       createLivenessRegisterMachine({
         device: {
           type: 'tablet',
-          hasSupportForWebAuthn: false,
+          hasSupportForWebauthn: false,
         },
         authToken: 'testAuthToken',
       });

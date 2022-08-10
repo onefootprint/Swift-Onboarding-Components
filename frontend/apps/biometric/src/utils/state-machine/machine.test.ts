@@ -15,7 +15,7 @@ describe('D2PMobile Machine Tests', () => {
       expect(state.value).toEqual(States.init);
       expect(context.authToken).toEqual('');
       expect(context.device.type).toEqual('mobile');
-      expect(context.device.hasSupportForWebAuthn).toEqual(false);
+      expect(context.device.hasSupportForWebauthn).toEqual(false);
     });
   });
 
@@ -48,69 +48,69 @@ describe('D2PMobile Machine Tests', () => {
   describe('Correctly transitions out of init state', () => {
     it('Events.deviceInfoIdentified when mobile has webauthn support should set context correctly', () => {
       const type = 'mobile';
-      const hasSupportForWebAuthn = true;
+      const hasSupportForWebauthn = true;
       const state = d2pMobileMachine.transition(States.init, {
         type: Events.deviceInfoIdentified,
         payload: {
           type,
-          hasSupportForWebAuthn,
+          hasSupportForWebauthn,
         },
       });
       expect(state.value).toBe(States.register);
       expect(state.context.device.type).toEqual(type);
-      expect(state.context.device.hasSupportForWebAuthn).toEqual(
-        hasSupportForWebAuthn,
+      expect(state.context.device.hasSupportForWebauthn).toEqual(
+        hasSupportForWebauthn,
       );
     });
 
     it('Events.deviceInfoIdentified when mobile lacks webauthn support should set context correctly', () => {
       const type = 'mobile';
-      const hasSupportForWebAuthn = false;
+      const hasSupportForWebauthn = false;
       const state = d2pMobileMachine.transition(States.init, {
         type: Events.deviceInfoIdentified,
         payload: {
           type,
-          hasSupportForWebAuthn,
+          hasSupportForWebauthn,
         },
       });
       expect(state.value).toBe(States.unavailable);
       expect(state.context.device.type).toEqual(type);
-      expect(state.context.device.hasSupportForWebAuthn).toEqual(
-        hasSupportForWebAuthn,
+      expect(state.context.device.hasSupportForWebauthn).toEqual(
+        hasSupportForWebauthn,
       );
     });
 
     it('Events.deviceInfoIdentified when non-mobile lacks webauthn support should set context correctly', () => {
       const type = 'tablet';
-      const hasSupportForWebAuthn = false;
+      const hasSupportForWebauthn = false;
       const state = d2pMobileMachine.transition(States.init, {
         type: Events.deviceInfoIdentified,
         payload: {
           type,
-          hasSupportForWebAuthn,
+          hasSupportForWebauthn,
         },
       });
       expect(state.value).toBe(States.unavailable);
       expect(state.context.device.type).toEqual(type);
-      expect(state.context.device.hasSupportForWebAuthn).toEqual(
-        hasSupportForWebAuthn,
+      expect(state.context.device.hasSupportForWebauthn).toEqual(
+        hasSupportForWebauthn,
       );
     });
 
     it('Events.deviceInfoIdentified when non-mobile has webauthn support should set context correctly', () => {
       const type = 'tablet';
-      const hasSupportForWebAuthn = true;
+      const hasSupportForWebauthn = true;
       const state = d2pMobileMachine.transition(States.init, {
         type: Events.deviceInfoIdentified,
         payload: {
           type,
-          hasSupportForWebAuthn,
+          hasSupportForWebauthn,
         },
       });
       expect(state.value).toBe(States.unavailable);
       expect(state.context.device.type).toEqual(type);
-      expect(state.context.device.hasSupportForWebAuthn).toEqual(
-        hasSupportForWebAuthn,
+      expect(state.context.device.hasSupportForWebauthn).toEqual(
+        hasSupportForWebauthn,
       );
     });
   });

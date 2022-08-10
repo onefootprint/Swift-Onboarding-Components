@@ -9,6 +9,7 @@ import MachineProvider, {
 } from './components/machine-provider';
 import AdditionalInfoRequired from './pages/additional-info-required';
 import BasicInformation from './pages/basic-information';
+import OnboardingVerification from './pages/onboarding-verification/onboarding-verification';
 import ResidentialAddress from './pages/residential-address';
 import SSN from './pages/ssn';
 
@@ -20,6 +21,7 @@ const Onboarding = () => {
   const [state] = useOnboardingMachine();
   const valueCasted = state.value as States;
   const pages: Page = {
+    [States.onboardingVerification]: OnboardingVerification,
     [States.additionalDataRequired]: AdditionalInfoRequired,
     [States.livenessRegister]: LivenessRegister,
     [States.basicInformation]: BasicInformation,

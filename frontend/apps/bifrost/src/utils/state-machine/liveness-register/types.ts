@@ -1,3 +1,5 @@
+import { DeviceInfo } from 'hooks';
+
 export enum States {
   init = 'init',
   newTabRequest = 'newTabRequest',
@@ -10,10 +12,7 @@ export enum States {
 }
 
 export type MachineContext = {
-  device: {
-    hasSupportForWebAuthn: boolean;
-    type: string;
-  };
+  device: DeviceInfo;
   authToken?: string;
   scopedAuthToken?: string;
   tab?: Window;

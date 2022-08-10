@@ -9,7 +9,6 @@ import Identify from './identify';
 import Init from './init';
 import Onboarding from './onboarding';
 import OnboardingSuccess from './onboarding-success/onboarding-success';
-import OnboardingVerification from './onboarding-verification';
 import TenantInvalid from './tenant-invalid';
 import VerificationSuccess from './verification-success';
 
@@ -23,17 +22,11 @@ const Root = () => {
   const pages: Page = {
     [States.init]: Init,
     [States.tenantInvalid]: TenantInvalid,
-
     [States.confirmAndAuthorize]: ConfirmAndAuthorize,
-    [States.verificationSuccess]: VerificationSuccess,
     [States.identify]: Identify,
-
-    // Onboarding
-    [States.onboardingVerification]: OnboardingVerification,
+    [States.verificationSuccess]: VerificationSuccess,
     [States.onboarding]: Onboarding,
     [States.onboardingSuccess]: OnboardingSuccess,
-
-    // Authentication
     [States.authenticationSuccess]: AuthenticationSuccess,
   };
   if (has(pages, valueCasted)) {

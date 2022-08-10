@@ -13,16 +13,14 @@ export enum States {
   tenantInvalid = 'tenantInvalid',
   confirmAndAuthorize = 'confirmAndAuthorize',
   authenticationSuccess = 'authenticationSuccess',
-  onboardingVerification = 'onboardingVerification',
   onboarding = 'onboarding',
-  onboardingSuccess = 'registrationSuccess',
+  onboardingSuccess = 'onboardingSuccess',
   verificationSuccess = 'verificationSuccess',
 }
 
 export enum Events {
   tenantInfoRequestSucceeded = 'tenantInfoRequestSucceeded',
   tenantInfoRequestFailed = 'tenantInfoRequestFailed',
-  onboardingVerificationSucceeded = 'onboardingVerificationSucceeded',
   sharedDataConfirmed = 'sharedDataConfirmed',
   authenticationFlowStarted = 'authenticationFlowStarted',
   authenticationSucceeded = 'authenticationSucceeded',
@@ -42,10 +40,10 @@ export enum Actions {
   assignTenantInfo = 'assignTenantInfo',
 
   // Onboarding
-  assignMissingAttributes = 'assignMissingAttributes',
-  assignMissingWebauthnCredentials = 'assignMissingWebAuthnCredentials',
-  assignValidationToken = 'assignValidationToken',
   assignOnboardingData = 'assignOnboardingData',
+  assignValidationToken = 'assignValidationToken',
+  assignMissingAttributes = 'assignMissingAttributes',
+  assignMissingWebauthnCredentials = 'assignMissingWebauthnCredentials',
 }
 
 export type BifrostContext = {
@@ -57,7 +55,6 @@ export type BifrostContext = {
   phone?: string;
   tenant: TenantInfo;
   userFound: boolean;
-  validationToken?: string;
 };
 
 export type BifrostEvent =
@@ -89,13 +86,8 @@ export type BifrostEvent =
       type: Events.onboardingCompleted;
       data: {
         onboardingData: UserData;
-      };
-    }
-  | {
-      type: Events.onboardingVerificationSucceeded;
-      payload: {
-        missingAttributes: readonly UserDataAttribute[];
         missingWebauthnCredentials: boolean;
+        missingAttributes: readonly UserDataAttribute[];
         validationToken?: string;
       };
     }
