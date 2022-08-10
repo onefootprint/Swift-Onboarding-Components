@@ -14,11 +14,9 @@
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
   },
   "dependencies": {
-    "@types/ua-parser-js": "^0.7.36",
     "icons": "*",
     "styled-media-query": "^2.1.2",
     "themes": "*",
-    "ua-parser-js": "^1.0.2",
     "ui": "*"
   },
   "devDependencies": {

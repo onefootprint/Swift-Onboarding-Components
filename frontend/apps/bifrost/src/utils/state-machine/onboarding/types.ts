@@ -1,4 +1,4 @@
-import { DeviceInfo } from 'footprint-ui/src/hooks/use-device-info';
+import { DeviceInfo } from 'hooks';
 import {
   BasicInformation,
   ResidentialAddress,

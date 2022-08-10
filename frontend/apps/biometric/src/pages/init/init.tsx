@@ -1,6 +1,4 @@
-import useDeviceInfo, {
-  DeviceInfo,
-} from 'footprint-ui/src/hooks/use-device-info';
+import { DeviceInfo, useDeviceInfo } from 'hooks';
 import React from 'react';
 import useD2PMobileMachine from 'src/hooks/use-d2p-mobile-machine';
 import { Events } from 'src/utils/state-machine';

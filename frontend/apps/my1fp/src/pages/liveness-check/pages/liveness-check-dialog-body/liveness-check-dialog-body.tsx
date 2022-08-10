@@ -1,6 +1,4 @@
-import useDeviceInfo, {
-  DeviceInfo,
-} from 'footprint-ui/src/hooks/use-device-info';
+import { DeviceInfo, useDeviceInfo } from 'hooks';
 import has from 'lodash/has';
 import React, { useEffect } from 'react';
 import { Events, States } from 'src/utils/state-machine/liveness-check/types';

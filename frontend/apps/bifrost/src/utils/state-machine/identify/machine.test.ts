@@ -1,6 +1,7 @@
-import { DeviceInfo } from 'footprint-ui/src/hooks/use-device-info/use-device-info.types';
+import { DeviceInfo } from 'hooks';
 import { interpret } from 'xstate';
 
+import { IdentifyType } from '../types';
 import createIdentifyMachine from './machine';
 import { ChallengeKind, Events, States } from './types';
 
@@ -8,6 +9,7 @@ describe('Identify Machine Tests', () => {
   const createMachine = (deviceInfo: DeviceInfo) =>
     createIdentifyMachine({
       device: deviceInfo,
+      identifyType: IdentifyType.onboarding,
     });
 
   describe('with existing account', () => {

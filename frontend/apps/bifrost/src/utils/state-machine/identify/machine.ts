@@ -1,4 +1,4 @@
-import { DeviceInfo } from 'footprint-ui/src/hooks/use-device-info/use-device-info.types';
+import { DeviceInfo } from 'hooks';
 import { IdentifyType } from 'src/utils/state-machine/types';
 import { assign, createMachine } from 'xstate';
 

@@ -1,6 +1,4 @@
-import useDeviceInfo, {
-  DeviceInfo,
-} from 'footprint-ui/src/hooks/use-device-info';
+import { DeviceInfo, useDeviceInfo } from 'hooks';
 import React from 'react';
 import useBifrostMachine from 'src/hooks/use-bifrost-machine';
 import { Events } from 'src/utils/state-machine/bifrost';
