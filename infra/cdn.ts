@@ -7,7 +7,7 @@ import * as pulumi from "@pulumi/pulumi"
 import * as random from "@pulumi/random";
 
 export type CdnConfig = {
-    suffix?: string,
+    name: string,
     certArn: pulumi.Output<string>,
     source: string,
     target: string,
@@ -66,14 +66,8 @@ export async function CreatePolicies(): Promise<[aws.cloudfront.OriginRequestPol
  * Create a Cloudfront distribution to front access to the app service ALBs
  */
 export async function Create(config: CdnConfig): Promise<aws.cloudfront.Distribution> {
-    let suffix: String;
-    if (config.suffix) {
-        suffix = `-${config.suffix}`;
-    } else {
-        suffix = '';
-    }
     // Cloudfront to front traffic for config.target
-    const cdn = new aws.cloudfront.Distribution(`app-cdn${suffix}`, {
+    const cdn = new aws.cloudfront.Distribution(`app-cdn-${config.name}`, {
         enabled: true,
         aliases: [config.source],
         origins: [{
@@ -115,7 +109,7 @@ export async function Create(config: CdnConfig): Promise<aws.cloudfront.Distribu
     });
 
     // Route config.source -> cloudfront CDN
-    new route53.Record(`cdn-record${suffix}`, {
+    new route53.Record(`cdn-record-${config.name}`, {
         zoneId: config.hostedZoneId,
         type: "A",
         name: config.source,
