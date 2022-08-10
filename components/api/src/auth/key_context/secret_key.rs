@@ -9,7 +9,7 @@ use db::DbPool;
 use futures_util::Future;
 
 use newtypes::secret_api_key::SecretApiKey;
-use newtypes::TenantId;
+use newtypes::{TenantId};
 use paperclip::actix::Apiv2Security;
 use std::pin::Pin;
 
@@ -28,9 +28,14 @@ pub struct SecretTenantAuthContext {
 }
 
 impl SecretTenantAuthContext {
-    // get tenant secret key for context
+    /// get tenant secret key for context
     pub fn tenant(&self) -> &Tenant {
         &self.tenant
+    }
+
+    /// get the tenant's api key id
+    pub fn api_key(&self) -> &TenantApiKey {
+        &self.api_key
     }
 }
 

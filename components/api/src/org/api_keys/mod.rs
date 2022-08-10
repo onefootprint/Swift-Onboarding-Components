@@ -1,5 +1,6 @@
 use paperclip::actix::web;
 
+mod check;
 mod index;
 mod reveal;
 
@@ -12,4 +13,5 @@ pub fn routes() -> web::Scope {
         )
         .service(index::patch)
         .service(reveal::get)
+        .service(check::get)
 }

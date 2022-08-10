@@ -161,6 +161,10 @@ class TestDashboard:
         # Verify we can't use the disabled ob config for anything anymore
         get("org/onboarding_config", None, ob_configuration.key, status_code=401)
 
+    def test_api_key_check(self, secret_key):
+        body = get("org/api_keys/check", None, secret_key.key)
+        assert body["data"]["id"] == secret_key.id
+
     def test_api_key_list(self, secret_key):
         body = get("org/api_keys", None, secret_key.key)
         key = next(
