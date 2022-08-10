@@ -9,7 +9,6 @@ config:
     domain:
       base: "dev.onefootprint.com"
       prefix: "api."
-      testUrl: ""
     elastic:
       apiKey:
         secure: v1:lefOi07p1WAkmMbb:6IK3746SDP+nra5/Tpym+AisWeELd2cSzgcTNbdzxBcaSQ==
