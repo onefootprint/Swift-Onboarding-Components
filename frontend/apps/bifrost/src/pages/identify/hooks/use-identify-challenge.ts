@@ -2,6 +2,8 @@ import { useMutation } from '@tanstack/react-query';
 import request, { RequestError, RequestResponse } from 'request';
 import { IdentifyType } from 'src/utils/state-machine/types';
 
+import getRetryDisabledUntil from './get-retry-disabled-until';
+
 export type IdentifyChallengeRequest = {
   phoneNumber: string;
   identifyType: IdentifyType;
@@ -9,18 +11,28 @@ export type IdentifyChallengeRequest = {
 
 export type IdentifyChallengeResponse = {
   challengeToken: string;
+  retryDisabledUntil: Date;
+};
+
+type PrivateIdentifyChallengeResponse = {
+  challengeToken: string;
   timeBeforeRetryS: number;
 };
 
 const identifyChallenge = async (payload: IdentifyChallengeRequest) => {
   const { data: response } = await request<
-    RequestResponse<IdentifyChallengeResponse>
+    RequestResponse<PrivateIdentifyChallengeResponse>
   >({
     method: 'POST',
     url: '/internal/identify/challenge',
     data: payload,
   });
-  return response.data;
+  const { challengeToken, timeBeforeRetryS } = response.data;
+
+  return {
+    challengeToken,
+    retryDisabledUntil: getRetryDisabledUntil(timeBeforeRetryS),
+  };
 };
 
 const useIdentifyChallenge = () =>

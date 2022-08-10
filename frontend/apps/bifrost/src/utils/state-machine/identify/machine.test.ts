@@ -79,7 +79,7 @@ describe('Identify Machine Tests', () => {
         challengeKind: ChallengeKind.sms,
         phoneNumberLastTwo: '00',
         phoneCountry: 'US',
-        timeBeforeRetryInSeconds: 15,
+        retryDisabledUntil: new Date('Aug 07 2022 18:00:00'),
       };
       state = machine.send({
         type: Events.phoneIdentificationCompleted,
@@ -313,7 +313,7 @@ describe('Identify Machine Tests', () => {
         challengeKind: ChallengeKind.sms,
         phoneNumberLastTwo: '00',
         phoneCountry: 'US',
-        timeBeforeRetryInSeconds: 15,
+        retryDisabledUntil: new Date('Aug 07 2022 18:00:00'),
       };
       state = machine.send({
         type: Events.smsChallengeResent,

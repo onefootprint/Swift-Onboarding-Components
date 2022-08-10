@@ -3,10 +3,12 @@ import { useEffect, useState } from 'react';
 let interval: NodeJS.Timer | null = null;
 const MILLISECONDS_IN_SECOND = 1000;
 
-const useCountdown = (options: {
-  disabled?: boolean;
-  onCompleted: () => void;
-}) => {
+const useCountdown = (
+  options: {
+    disabled?: boolean;
+    onCompleted?: () => void;
+  } = {},
+) => {
   const { disabled, onCompleted } = options;
   const [countdown, setCountdown] = useState(0);
 
@@ -15,9 +17,7 @@ const useCountdown = (options: {
       return;
     }
     setCountdown(seconds);
-    if (interval) {
-      clearCounter();
-    }
+    clearCounter();
     interval = setInterval(() => {
       setCountdown(current => Math.max(0, current - 1));
     }, MILLISECONDS_IN_SECOND);
@@ -42,11 +42,11 @@ const useCountdown = (options: {
       return;
     }
     if (countdown <= 0 && interval) {
-      onCompleted();
+      onCompleted?.();
       clearCounter();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [countdown, disabled, interval]);
+  }, [countdown, disabled]);
 
   const setSeconds = (seconds: number) => {
     startCounter(seconds);

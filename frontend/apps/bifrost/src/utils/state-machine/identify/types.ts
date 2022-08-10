@@ -20,7 +20,7 @@ export type ChallengeData = {
   phoneNumberLastTwo?: string;
   phoneCountry?: string;
   biometricChallengeJson?: string;
-  timeBeforeRetryInSeconds?: number;
+  retryDisabledUntil?: Date;
 };
 
 export type MachineContext = {
