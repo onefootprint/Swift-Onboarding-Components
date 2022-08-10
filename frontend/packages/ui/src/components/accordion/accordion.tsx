@@ -1,7 +1,8 @@
+import { useAutoAnimate } from '@formkit/auto-animate/react';
 import type { Icon } from 'icons';
 import IcoChevronDown24 from 'icons/ico/ico-chevron-down-24';
 import { darken } from 'polished';
-import React, { useRef } from 'react';
+import React, { useId, useRef } from 'react';
 import styled, { css } from 'styled-components';
 
 import Typography from '../typography';
@@ -23,9 +24,9 @@ const Accordion = ({
   testID,
   title,
 }: AccordionProps) => {
-  // TODO: Migrate to use-id once we migrate to react 18
-  const summaryId = `accordion-summary-${title.replace(/\s/g, '-')}`;
-  const detailsId = `accordion-details-${title.replace(/\s/g, '-')}`;
+  const [animate] = useAutoAnimate<HTMLDivElement>();
+  const summaryId = useId();
+  const detailsId = useId();
   const contentRef = useRef<HTMLDivElement>(null);
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -33,7 +34,7 @@ const Accordion = ({
   };
 
   return (
-    <Details data-testid={testID}>
+    <Details data-testid={testID} ref={animate}>
       <Summary
         aria-controls={detailsId}
         aria-expanded={open}
