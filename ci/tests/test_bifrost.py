@@ -83,7 +83,7 @@ class TestBifrost:
 
     def test_onboard_init(self, workos_tenant, auth_token):
         body = post("internal/onboarding", None, workos_tenant.ob_config.key, auth_token)
-        assert set(body["data"]["missing_attributes"]) == {"first_name", "last_name", "dob", "ssn", "street_address", "street_address2", "city", "state", "zip", "country", "email"}
+        assert set(body["data"]["missing_attributes"]) == {"first_name", "last_name", "dob", "ssn", "street_address", "city", "state", "zip", "country", "email"}
         assert body["data"]["missing_webauthn_credentials"] == True
         assert not body["data"]["validation_token"]
 
@@ -112,7 +112,7 @@ class TestBifrost:
             "address": {
                 "address": {
                     "street_address": "1 Footprint Way",
-                    "street_address_2": "PO Box Wallaby Way",
+                    "street_address_2": "",
                 },
                 "city": "Enclave",
                 "state": "NY",

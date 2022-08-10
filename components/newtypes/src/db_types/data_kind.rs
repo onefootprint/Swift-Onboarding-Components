@@ -66,6 +66,10 @@ impl DataKind {
         )
     }
 
+    pub fn is_required(&self) -> bool {
+        !matches!(self, DataKind::StreetAddress2)
+    }
+
     pub fn fingerprintable() -> impl Iterator<Item = DataKind> {
         Self::iter().filter(DataKind::allows_fingerprint)
     }

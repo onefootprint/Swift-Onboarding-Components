@@ -71,6 +71,7 @@ impl UserVaultWrapper {
             .must_collect_data_kinds
             .iter()
             .cloned()
+            .filter(|data_kind| data_kind.is_required())
             .filter(|data_kind| self.get_e_field(*data_kind).is_none())
             .collect()
     }
