@@ -24,8 +24,6 @@ export { default as Divider } from './divider';
 export { default as Dropdown } from './dropdown';
 export * from './footprint-button';
 export { default as FootprintButton } from './footprint-button';
-export * from './footprint-logo';
-export { default as FootprintLogo } from './footprint-logo';
 export * from './google-button';
 export { default as GoogleButton } from './google-button';
 export { default as Grid } from './grid';

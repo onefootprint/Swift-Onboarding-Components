@@ -1,10 +1,10 @@
+import IcoLogoFpDefault from 'icons/ico/ico-logo-fp-default';
 import React from 'react';
 import styled, { css } from 'styled-components';
-import { FootprintLogo } from 'ui';
 
 const Header = () => (
   <Container>
-    <FootprintLogo />
+    <IcoLogoFpDefault />
   </Container>
 );
 

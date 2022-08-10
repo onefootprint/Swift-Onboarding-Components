@@ -1,6 +1,7 @@
 import { useTranslation } from 'hooks';
 import IcoCode16 from 'icons/ico/ico-code-16';
 import IcoFileText16 from 'icons/ico/ico-file-text-16';
+import IcoLogoFpCompact from 'icons/ico/ico-logo-fp-compact';
 import IcoUser24 from 'icons/ico/ico-user-24';
 import IcoUsers16 from 'icons/ico/ico-users-16';
 import Link from 'next/link';
@@ -9,14 +10,7 @@ import React from 'react';
 import useSandboxMode from 'src/hooks/use-sandbox-mode';
 import useSessionUser from 'src/hooks/use-session-user';
 import styled, { css } from 'styled-components';
-import {
-  Banner,
-  Container,
-  Dropdown,
-  FootprintLogo,
-  Tab,
-  Typography,
-} from 'ui';
+import { Banner, Container, Dropdown, Tab, Typography } from 'ui';
 
 const routes = [
   { href: '/users', Icon: IcoUsers16, text: 'Users' },
@@ -52,7 +46,7 @@ const PrivateLayout = ({ children }: PrivateLayoutProps) => {
             <Footprint>
               <Link href="/users">
                 <a href="/users">
-                  <FootprintLogo />
+                  <IcoLogoFpCompact />
                 </a>
               </Link>
               <SuffixContainer>

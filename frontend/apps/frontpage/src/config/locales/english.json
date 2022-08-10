@@ -6,7 +6,6 @@
     "navbar": {
       "cta": "Request early access",
       "logo": {
-        "alt": "Footprint Logo's",
         "aria-label": "Go to Footprint's main page"
       },
       "links": {

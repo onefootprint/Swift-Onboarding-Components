@@ -1,16 +1,11 @@
 import footprint from 'footprint';
 import { useTranslation } from 'hooks';
+import IcoLogoFpDefault from 'icons/ico/ico-logo-fp-default';
 import { useRouter } from 'next/router';
 import React from 'react';
 import { getErrorMessage, RequestError } from 'request';
 import styled, { css } from 'styled-components';
-import {
-  FootprintButton,
-  FootprintLogo,
-  LinkButton,
-  Typography,
-  useToast,
-} from 'ui';
+import { FootprintButton, LinkButton, Typography, useToast } from 'ui';
 
 import useUserSession from '../../hooks/use-session-user';
 import useUserDecrypt, {
@@ -77,7 +72,7 @@ const Login = () => {
 
   return (
     <Container>
-      <FootprintLogo />
+      <IcoLogoFpDefault />
       <Inner>
         <Typography variant="label-1" color="primary" sx={{ marginY: 8 }}>
           {t('instructions')}

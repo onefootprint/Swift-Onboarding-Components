@@ -1,9 +1,9 @@
-import { useTranslation } from 'hooks';
+import IcoLogoFpDefault from 'icons/ico/ico-logo-fp-default';
 import isString from 'lodash/isString';
 import { useRouter } from 'next/router';
 import React, { useEffect } from 'react';
 import styled from 'styled-components';
-import { Box, FootprintLogo } from 'ui';
+import { Box } from 'ui';
 
 import VerifyError from './components/verify-error';
 import VerifyLoading from './components/verify-loading';
@@ -11,7 +11,6 @@ import VerifySuccess from './components/verify-success';
 import useVerify from './hooks/use-verify-email';
 
 const Verify = () => {
-  const { t } = useTranslation('pages.verify');
   const verifyMutation = useVerify();
   const router = useRouter();
   const challenge = router.asPath.split('#')[1];
@@ -27,7 +26,7 @@ const Verify = () => {
     <Container>
       <Inner>
         <Box sx={{ marginBottom: 8 }}>
-          <FootprintLogo height={26} width={122} alt={t('logo-alt')} />
+          <IcoLogoFpDefault />
         </Box>
         {verifyMutation.isLoading && <VerifyLoading />}
         {verifyMutation.isSuccess && <VerifySuccess />}

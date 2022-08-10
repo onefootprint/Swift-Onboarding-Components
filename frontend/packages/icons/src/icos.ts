@@ -102,6 +102,9 @@ import IcoLock16 from '../ico/ico-lock-16';
 import IcoLock24 from '../ico/ico-lock-24';
 import IcoLogOut16 from '../ico/ico-log-out-16';
 import IcoLogOut24 from '../ico/ico-log-out-24';
+import IcoLogoFpCompact from '../ico/ico-logo-fp-compact';
+import IcoLogoFpDefault from '../ico/ico-logo-fp-default';
+import IcoLogoFpLarge from '../ico/ico-logo-fp-large';
 import IcoMenu16 from '../ico/ico-menu-16';
 import IcoMenu24 from '../ico/ico-menu-24';
 import IcoMinusBig16 from '../ico/ico-minus-big-16';
@@ -287,4 +290,7 @@ export default {
   IcoLeaf40,
   IcoQuote40,
   IcoShield40,
+  IcoLogoFpCompact,
+  IcoLogoFpDefault,
+  IcoLogoFpLarge,
 };
