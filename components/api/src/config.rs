@@ -60,7 +60,7 @@ pub struct Config {
     #[envconfig(from = "COOKIE_DOMAIN", default = "localhost")]
     pub cookie_domain: String,
 
-    #[envconfig(from = "TIME_S_BETWEEN_SMS_CHALLENGES", default = "15")]
+    #[envconfig(from = "TIME_S_BETWEEN_SMS_CHALLENGES", default = "8")]
     pub time_s_between_sms_challenges: i64,
 
     #[envconfig(from = "INTEGRATION_TEST_PHONE_NUMBER", default = "+1 339 331 1410")]
