@@ -133,7 +133,7 @@ impl Decomposable for ValidatedPhoneNumber {
             (DataKind::PhoneNumber, self.to_piistring()),
             (DataKind::PhoneCountry, self.iso_country_code),
         ];
-        NewData::list(data, DataKind::PhoneNumber.group_kind())
+        NewData::list(data)
     }
 }
 

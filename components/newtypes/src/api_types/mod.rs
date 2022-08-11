@@ -3,7 +3,7 @@ use std::fmt::{Debug, Display};
 use paperclip::actix::Apiv2Schema;
 use serde::{Deserialize, Serialize};
 
-use crate::{DataGroupKind, DataKind, ValidatedPhoneNumber};
+use crate::{DataKind, Fingerprint, SealedVaultBytes, ValidatedPhoneNumber};
 
 use self::{address::Address, dob::DateOfBirth, email::Email, name::Name, ssn::FullSsn};
 
@@ -76,16 +76,14 @@ impl Debug for PiiString {
 pub struct NewData {
     pub data_kind: DataKind,
     pub data: PiiString,
-    pub group_kind: DataGroupKind,
 }
 
 impl NewData {
-    pub fn list<P: Into<PiiString>>(data: Vec<(DataKind, P)>, group_kind: DataGroupKind) -> Vec<Self> {
+    pub fn list<P: Into<PiiString>>(data: Vec<(DataKind, P)>) -> Vec<Self> {
         data.into_iter()
             .map(|(data_kind, pii)| Self {
                 data_kind,
                 data: pii.into(),
-                group_kind,
             })
             .collect()
     }
@@ -94,9 +92,13 @@ impl NewData {
         vec![Self {
             data_kind,
             data: pii.into(),
-            group_kind: data_kind.group_kind(),
         }]
     }
+}
+
+pub struct NewSealedData {
+    pub e_data: SealedVaultBytes,
+    pub sh_data: Option<Fingerprint>,
 }
 
 /// Decompose composite type in to

@@ -7,8 +7,6 @@ use serde::{Deserialize, Serialize};
 use strum::IntoEnumIterator;
 use strum_macros::{AsRefStr, EnumIter, EnumString};
 
-use super::data_group_kind::DataGroupKind;
-
 /// The type of data attribute
 #[derive(
     Debug,
@@ -72,22 +70,6 @@ impl DataKind {
 
     pub fn fingerprintable() -> impl Iterator<Item = DataKind> {
         Self::iter().filter(DataKind::allows_fingerprint)
-    }
-
-    pub fn group_kind(&self) -> DataGroupKind {
-        match self {
-            DataKind::FirstName | DataKind::LastName => DataGroupKind::FullName,
-            DataKind::Ssn | DataKind::LastFourSsn => DataGroupKind::Ssn,
-            DataKind::StreetAddress
-            | DataKind::StreetAddress2
-            | DataKind::City
-            | DataKind::State
-            | DataKind::Zip
-            | DataKind::Country => DataGroupKind::Address,
-            DataKind::Dob => DataGroupKind::Dob,
-            DataKind::Email => DataGroupKind::Email,
-            DataKind::PhoneNumber | DataKind::PhoneCountry => DataGroupKind::PhoneNumber,
-        }
     }
 
     pub fn permissioning_kinds(self) -> Vec<DataKind> {

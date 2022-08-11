@@ -6,22 +6,19 @@ use crate::auth::VerifiedUserAuth;
 use crate::errors::user::UserError;
 use crate::types::response::ApiResponseData;
 use crate::types::EmptyResponse;
+use crate::utils::user_vault_wrapper::UserVaultWrapper;
 use crate::{errors::ApiError, utils::email::send_email_challenge, State};
-use db::models::user_data::NewUserData;
-use db::models::user_data::UserData;
-
+use db::models::user_vaults::UserVault;
 use newtypes::address::Address;
 use newtypes::dob::DateOfBirth;
 use newtypes::email::Email;
 use newtypes::name::FullName;
 use newtypes::ssn::Ssn;
-use newtypes::DataGroupId;
-use newtypes::DataGroupKind;
 use newtypes::DataKind;
-use newtypes::DataPriority;
 use newtypes::Decomposable;
 use newtypes::Fingerprinter;
 use newtypes::NewData;
+use newtypes::NewSealedData;
 use paperclip::actix::Apiv2Schema;
 use paperclip::actix::{api_v2_operation, post, web, web::Json};
 
@@ -43,8 +40,12 @@ struct UserPatchRequest {
     pub speculative: bool,
 }
 
-impl Decomposable for UserPatchRequest {
-    fn decompose(self) -> Vec<NewData> {
+impl UserPatchRequest {
+    async fn decompose_and_seal(
+        self,
+        state: &State,
+        user_vault: &UserVault,
+    ) -> Result<HashMap<DataKind, NewSealedData>, ApiError> {
         let UserPatchRequest {
             name,
             ssn,
@@ -54,7 +55,7 @@ impl Decomposable for UserPatchRequest {
             speculative: _,
         } = self;
 
-        vec![
+        let results = vec![
             name.map(|n| n.decompose()),
             ssn.map(|ssn| ssn.decompose()),
             dob.map(|dob| dob.decompose()),
@@ -64,7 +65,20 @@ impl Decomposable for UserPatchRequest {
         .into_iter()
         .flatten()
         .flatten()
-        .collect::<Vec<NewData>>()
+        .collect::<Vec<NewData>>();
+
+        let mut new_data = HashMap::<DataKind, NewSealedData>::new();
+        for NewData { data_kind, data } in results {
+            // Compute the fingerprint and seal the data
+            let sh_data = if data_kind.allows_fingerprint() {
+                Some(state.compute_fingerprint(data_kind, &data).await?)
+            } else {
+                None
+            };
+            let e_data = user_vault.public_key.seal_pii(&data)?;
+            new_data.insert(data_kind, NewSealedData { e_data, sh_data });
+        }
+        Ok(new_data)
     }
 }
 
@@ -95,57 +109,22 @@ async fn handler(
         }
     }
 
-    // Parse the input request into the list of rows that will be inserted into the DB
-    let mut data_group_ids = HashMap::<DataGroupKind, DataGroupId>::new();
-    let mut new_user_datas = Vec::<NewUserData>::new();
-    for d in request.decompose() {
-        let NewData {
-            data_kind,
-            data,
-            group_kind: data_group_kind,
-        } = d;
-        // Compute the fingerprint and seal the data
-        let sh_data = if data_kind.allows_fingerprint() {
-            Some(state.compute_fingerprint(data_kind, &data).await?)
-        } else {
-            None
-        };
-        let e_data = user_vault.public_key.seal_pii(&data)?;
-        // Get or create an ID for this group of data
-        let data_group_id = if let Some(id) = data_group_ids.get(&data_group_kind) {
-            id.clone()
-        } else {
-            let id = DataGroupId::generate();
-            data_group_ids.insert(data_group_kind, id.clone());
-            id
-        };
-        let new_data = NewUserData {
-            user_vault_id: user_auth.user_vault_id(),
-            data_kind,
-            data_group_kind,
-            data_group_id,
-            data_group_priority: DataPriority::Primary,
-            e_data,
-            sh_data,
-            is_verified: false,
-        };
-        new_user_datas.push(new_data);
-    }
-
-    // User the UVW util to add the new UserData rows and deactivate any old rows
-    let results = state
+    let new_data = request.decompose_and_seal(&state, &user_vault).await?;
+    let uvw = state
         .db_pool
-        .db_transaction(move |conn| UserData::bulk_insert(conn, new_user_datas))
+        .db_transaction(move |conn| -> Result<_, ApiError> {
+            let mut uvw = UserVaultWrapper::from_conn(conn, user_vault)?;
+            uvw.process_updates(conn, new_data)?;
+            Ok(uvw)
+        })
         .await?;
 
     // If we updated the email address, send an async challenge to the new email address
     if let Some(email) = &email_update {
         // We only support one email per request, so there will be a UserData row
-        let user_data: UserData = results
-            .into_iter()
-            .find(|x| x.data_kind == DataKind::Email)
-            .ok_or(ApiError::NotImplemented)?;
-        send_email_challenge(&state, user_data.id, &email.email).await?;
+        // TODO support multiple emails per user vault
+        let email_row = uvw.emails.first().ok_or(ApiError::NotImplemented)?;
+        send_email_challenge(&state, email_row.id.clone(), &email.email).await?;
     }
     Ok(Json(ApiResponseData::ok(EmptyResponse)))
 }

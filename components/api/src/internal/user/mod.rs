@@ -1,4 +1,4 @@
-use crate::{auth::AuthError, errors::ApiError, State};
+use crate::{auth::AuthError, errors::ApiError, utils::user_vault_wrapper::UserVaultWrapper, State};
 use crypto::seal::EciesP256Sha256AesGcmSealed;
 use db::models::{ob_configurations::ObConfiguration, user_vaults::UserVault};
 use enclave_proxy::{DataTransform, DecryptRequest};
@@ -56,12 +56,11 @@ pub async fn decrypt(
     }
 
     // Filter out fields that don't have values set on the user vault
-    let (fields_to_decrypt, values_to_decrypt): (Vec<DataKind>, Vec<SealedVaultBytes>) =
-        db::user_data::filter(&state.db_pool, user_vault.id.clone(), data_kinds.clone())
-            .await?
-            .into_iter()
-            .map(|user_data| (user_data.data_kind, user_data.e_data))
-            .unzip();
+    let uvw = UserVaultWrapper::from(&state.db_pool, user_vault).await?;
+    let (fields_to_decrypt, values_to_decrypt): (Vec<DataKind>, Vec<&SealedVaultBytes>) = data_kinds
+        .iter()
+        .filter_map(|kind| uvw.get_e_field(*kind).map(|data| (kind, data)))
+        .unzip();
 
     // Actually decrypt the fields
     let requests = values_to_decrypt
@@ -73,7 +72,7 @@ pub async fn decrypt(
             })
         })
         .collect::<Result<Vec<DecryptRequest>, crypto::Error>>()?;
-    let decrypt_response = crate::enclave::decrypt(state, requests, &user_vault.e_private_key).await?;
+    let decrypt_response = crate::enclave::decrypt(state, requests, &uvw.user_vault.e_private_key).await?;
     let decrypted_data: HashMap<DataKind, PiiString> = decrypt_response
         .into_iter()
         .enumerate()

@@ -23,6 +23,11 @@ pub struct UserVault {
 }
 
 impl UserVault {
+    pub fn get(conn: &mut PgConnection, id: &UserVaultId) -> Result<Self, DbError> {
+        let user = user_vaults::table.filter(user_vaults::id.eq(id)).first(conn)?;
+        Ok(user)
+    }
+
     pub fn lock(conn: &mut PgConnection, id: UserVaultId) -> Result<Self, DbError> {
         let user = user_vaults::table
             .for_no_key_update()

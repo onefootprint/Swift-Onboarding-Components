@@ -178,9 +178,7 @@ async fn get_user_by_identifier(
     };
     let sh_data = state.compute_fingerprint(data_kind, &data).await?;
     // TODO should we only look for verified emails?
-    let existing_user = db::user_vault::get_by_fingerprint(&state.db_pool, data_kind, sh_data, false)
-        .await?
-        .map(|x| x.0);
+    let existing_user = db::user_vault::get_by_fingerprint(&state.db_pool, sh_data).await?;
     Ok(existing_user)
 }
 

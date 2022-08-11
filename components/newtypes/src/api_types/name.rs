@@ -4,7 +4,7 @@ use serde::{Deserialize, Deserializer, Serialize};
 use std::fmt::{Debug, Display};
 use std::str::FromStr;
 
-use crate::{DataGroupKind, DataKind, Decomposable, NewData, PiiString};
+use crate::{DataKind, Decomposable, NewData, PiiString};
 
 #[doc = "Full Name"]
 #[derive(Debug, Clone, Hash, PartialEq, Eq, Serialize, Deserialize, Default, Apiv2Schema)]
@@ -16,13 +16,10 @@ pub struct FullName {
 
 impl Decomposable for FullName {
     fn decompose(self) -> Vec<NewData> {
-        NewData::list(
-            vec![
-                (DataKind::FirstName, PiiString::from(self.first_name.0)),
-                (DataKind::LastName, PiiString::from(self.last_name.0)),
-            ],
-            DataGroupKind::FullName,
-        )
+        NewData::list(vec![
+            (DataKind::FirstName, PiiString::from(self.first_name.0)),
+            (DataKind::LastName, PiiString::from(self.last_name.0)),
+        ])
     }
 }
 

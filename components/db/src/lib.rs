@@ -21,7 +21,7 @@ use diesel::prelude::*;
 use diesel_migrations::EmbeddedMigrations;
 use errors::TransactionError;
 use models::scoped_users::ScopedUser;
-use newtypes::{DataKind, Fingerprint};
+use newtypes::Fingerprint;
 use user_vault::get_by_fingerprint;
 
 #[allow(unused_imports)]
@@ -154,11 +154,12 @@ pub async fn private_cleanup_integration_tests(
 ) -> Result<usize, DbError> {
     // we register users within our integration tests. to avoid filling up our database with fake information,
     // we clean up afterwards.
-    let uv = get_by_fingerprint(pool, DataKind::PhoneNumber, sh_data, false).await?;
-    if uv.is_none() {
+    let uv = get_by_fingerprint(pool, sh_data).await?;
+    let uv = if let Some(uv) = uv {
+        uv
+    } else {
         return Ok(0);
-    }
-    let (uv, _) = uv.unwrap();
+    };
 
     let deleted_rows = pool
         .db_query(move |conn| -> Result<usize, DbError> {
@@ -167,6 +168,29 @@ pub async fn private_cleanup_integration_tests(
             deleted_rows +=
                 diesel::delete(schema::user_data::table.filter(schema::user_data::user_vault_id.eq(&uv.id)))
                     .execute(conn)?;
+
+            deleted_rows += diesel::delete(
+                schema::fingerprint::table.filter(schema::fingerprint::user_vault_id.eq(&uv.id)),
+            )
+            .execute(conn)?;
+
+            deleted_rows += diesel::delete(
+                schema::phone_number::table.filter(schema::phone_number::user_vault_id.eq(&uv.id)),
+            )
+            .execute(conn)?;
+
+            deleted_rows +=
+                diesel::delete(schema::email::table.filter(schema::email::user_vault_id.eq(&uv.id)))
+                    .execute(conn)?;
+
+            deleted_rows +=
+                diesel::delete(schema::address::table.filter(schema::address::user_vault_id.eq(&uv.id)))
+                    .execute(conn)?;
+
+            deleted_rows += diesel::delete(
+                schema::user_basic_info::table.filter(schema::user_basic_info::user_vault_id.eq(&uv.id)),
+            )
+            .execute(conn)?;
 
             // grab scoped_users, delete access events and onboardings
             let obs: Vec<ScopedUser> = schema::scoped_users::table
@@ -216,8 +240,6 @@ pub async fn private_cleanup_integration_tests(
 pub mod access_event;
 pub mod scoped_users;
 pub mod tenant;
-
-pub mod user_data;
 pub mod user_vault;
 
 #[cfg(test)]

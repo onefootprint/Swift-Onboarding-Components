@@ -1,6 +1,6 @@
-use newtypes::UserDataId;
+use newtypes::EmailId;
 
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 pub struct EmailVerifySession {
-    pub user_data_id: UserDataId,
+    pub email_id: EmailId,
 }

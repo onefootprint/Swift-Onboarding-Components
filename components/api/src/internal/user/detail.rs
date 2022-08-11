@@ -4,23 +4,34 @@ use crate::errors::ApiError;
 use crate::types::response::ApiResponseData;
 use crate::utils::user_vault_wrapper::UserVaultWrapper;
 use crate::State;
-use db::models::user_data::UserData;
-use newtypes::{DataKind, DataPriority, UserDataId};
+use db::models::email::Email;
+use db::models::phone_number::PhoneNumber;
+use newtypes::DataPriority;
 use paperclip::actix::{api_v2_operation, web, web::Json, Apiv2Schema};
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Serialize)]
 pub struct ApiUserData {
-    pub id: UserDataId,
+    pub id: String, // TODO
     pub is_verified: bool,
     pub priority: DataPriority,
 }
 
-impl From<&UserData> for ApiUserData {
-    fn from(data: &UserData) -> Self {
+impl From<&Email> for ApiUserData {
+    fn from(email: &Email) -> Self {
         Self {
-            id: data.id.clone(),
-            is_verified: data.is_verified,
-            priority: data.data_group_priority,
+            id: email.id.to_string(),
+            is_verified: email.is_verified,
+            priority: email.priority,
+        }
+    }
+}
+
+impl From<&PhoneNumber> for ApiUserData {
+    fn from(phone_number: &PhoneNumber) -> Self {
+        Self {
+            id: phone_number.id.to_string(),
+            is_verified: phone_number.is_verified,
+            priority: phone_number.priority,
         }
     }
 }
@@ -30,13 +41,6 @@ pub struct ApiUser {
     pub phone_numbers: Vec<ApiUserData>,
     pub emails: Vec<ApiUserData>,
     // TODO can expand this to include many other data kinds
-}
-
-fn get_data(uvw: &UserVaultWrapper, data_kind: DataKind) -> Vec<ApiUserData> {
-    uvw.get_data(data_kind)
-        .into_iter()
-        .map(ApiUserData::from)
-        .collect()
 }
 
 #[api_v2_operation(tags(User))]
@@ -51,7 +55,7 @@ pub async fn handler(
     let existing_user = user_auth.user_vault(&state.db_pool).await?;
     let uvw = UserVaultWrapper::from(&state.db_pool, existing_user).await?;
     Ok(Json(ApiResponseData::ok(ApiUser {
-        phone_numbers: get_data(&uvw, DataKind::PhoneNumber),
-        emails: get_data(&uvw, DataKind::Email),
+        phone_numbers: uvw.phone_numbers.iter().map(ApiUserData::from).collect(),
+        emails: uvw.emails.iter().map(ApiUserData::from).collect(),
     })))
 }

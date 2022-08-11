@@ -1,4 +1,4 @@
-use crate::{pii_helper::newtype_to_pii, DataGroupKind, DataKind, Decomposable, NewData, PiiString};
+use crate::{pii_helper::newtype_to_pii, DataKind, Decomposable, NewData, PiiString};
 
 pub use derive_more::{Add, Display, From, FromStr, Into};
 use paperclip::actix::Apiv2Schema;
@@ -50,7 +50,7 @@ impl Decomposable for Address {
         .filter_map(|(k, d)| d.map(|d| (k, d)))
         .collect();
 
-        NewData::list(data, DataGroupKind::Address)
+        NewData::list(data)
     }
 }
 

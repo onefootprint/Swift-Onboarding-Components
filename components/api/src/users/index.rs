@@ -7,12 +7,12 @@ use crate::types::request::PaginatedRequest;
 use crate::types::response::ApiPaginatedResponseData;
 use crate::types::scoped_user::ApiScopedUser;
 use crate::utils::querystring::deserialize_stringified_list;
+use crate::utils::user_vault_wrapper::UserVaultWrapper;
 use crate::State;
 use crate::{auth::SessionContext, errors::ApiError};
 use chrono::{DateTime, Utc};
 use db::models::onboardings::Onboarding;
 use db::scoped_users::OnboardingListQueryParams;
-use db::DbError;
 use newtypes::{DataKind, Fingerprint, Fingerprinter, FootprintUserId, PiiString, Status};
 use paperclip::actix::{api_v2_operation, web, web::Json, Apiv2Schema};
 
@@ -73,9 +73,9 @@ pub fn get(
         timestamp_lte,
         timestamp_gte,
     };
-    let (scoped_users, obs, user_to_kinds, count) = state
+    let (scoped_users, obs, uvws, count) = state
         .db_pool
-        .db_query(move |conn| -> Result<_, DbError> {
+        .db_query(move |conn| -> Result<_, ApiError> {
             let scoped_users = db::scoped_users::list_for_tenant(
                 conn,
                 query_params.clone(),
@@ -87,12 +87,17 @@ pub fn get(
             let count = cursor.map_or(Ok(None), |_| {
                 db::scoped_users::count_for_tenant(conn, query_params).map(Some)
             })?;
-            let (scoped_user_ids, user_vault_ids) =
+            let (scoped_user_ids, user_vault_ids): (_, Vec<_>) =
                 scoped_users.iter().map(|ob| (&ob.id, &ob.user_vault_id)).unzip();
-            let user_to_kinds = db::user_data::bulk_fetch_populated_kinds(conn, user_vault_ids)?;
+            // TODO bulk fetch user vault wrapper endpoint to save many DB queries
+            // https://linear.app/footprint/issue/FP-1004/create-util-to-bulk-hydrate-uvws
+            let uvws: Vec<UserVaultWrapper> = user_vault_ids
+                .into_iter()
+                .map(|id| UserVaultWrapper::from_id(conn, id))
+                .collect::<Result<_, _>>()?;
             let obs = Onboarding::get_for_scoped_users(conn, scoped_user_ids)?;
 
-            Ok((scoped_users, obs, user_to_kinds, count))
+            Ok((scoped_users, obs, uvws, count))
         })
         .await??;
 
@@ -103,10 +108,11 @@ pub fn get(
     let empty_vec = vec![];
     let scoped_users = scoped_users
         .into_iter()
+        .zip(uvws.into_iter())
         .take(page_size)
-        .map(|su| {
+        .map(|(su, uvw)| {
             (
-                user_to_kinds.get(&su.user_vault_id).unwrap_or(&vec![]).clone(),
+                uvw.get_populated_fields(),
                 obs.get(&su.id).unwrap_or(&empty_vec),
                 su,
             )

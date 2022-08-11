@@ -3,7 +3,7 @@ use paperclip::actix::Apiv2Schema;
 use serde::{Deserialize, Deserializer, Serialize};
 use std::str::FromStr;
 
-use crate::{DataGroupKind, DataKind, Decomposable, NewData, PiiString};
+use crate::{DataKind, Decomposable, NewData, PiiString};
 
 #[doc = "Social security number -- 9 digit or 4 digit numeric string"]
 #[derive(Debug, Clone, Hash, PartialEq, Eq, Serialize, Deserialize, Apiv2Schema)]
@@ -26,7 +26,7 @@ impl Decomposable for Ssn {
             }
             Ssn::LastFour(last_four) => vec![(DataKind::LastFourSsn, PiiString::from(&last_four.0))],
         };
-        NewData::list(list, DataGroupKind::Ssn)
+        NewData::list(list)
     }
 }
 

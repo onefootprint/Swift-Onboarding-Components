@@ -75,6 +75,7 @@ sentry-tracing = "0.27.0"
 app-attest = { path = "../app_attest" }
 itertools = "0.10.1"
 lazy_static = "1.0"
+strum = { version = "0.24" }
 
 workos = "0.2"
 

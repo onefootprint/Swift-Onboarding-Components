@@ -5,8 +5,8 @@ use crate::{auth::session_data::AuthSessionData, utils::session::AuthSession};
 
 use crate::errors::ApiError;
 use crate::State;
-use db::models::user_data::UserData;
-use newtypes::{DataKind, SessionAuthToken};
+use db::models::email::Email;
+use newtypes::SessionAuthToken;
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
@@ -37,7 +37,7 @@ async fn post(
 
     state
         .db_pool
-        .db_query(move |conn| UserData::mark_verified(conn, &data.user_data_id, DataKind::Email))
+        .db_query(move |conn| Email::mark_verified(conn, &data.email_id))
         .await??;
 
     Ok(Json(ApiResponseData::ok(EmptyResponse {})))

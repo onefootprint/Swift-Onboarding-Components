@@ -1,8 +1,5 @@
-use crate::{
-    models::user_data::{NewUserData, UserData},
-    run_migrations,
-};
-use newtypes::{DataGroupId, EncryptedVaultPrivateKey, Fingerprint, SealedVaultBytes, VaultPublicKey};
+use crate::run_migrations;
+use newtypes::{EncryptedVaultPrivateKey, Fingerprint, SealedVaultBytes, VaultPublicKey};
 
 #[actix_rt::test]
 async fn test_db() {
@@ -25,7 +22,7 @@ async fn test_db() {
     };
     let _tenant = tenant.create(&pool).await.expect("couldn't create tenant");
 
-    let uv = crate::user_vault::create(
+    crate::user_vault::create(
         &pool,
         crate::models::user_vaults::NewUserVaultReq {
             e_private_key: EncryptedVaultPrivateKey("private key".as_bytes().to_vec()),
@@ -48,41 +45,5 @@ async fn test_db() {
     .await
     .expect("couldn't init user vault");
 
-    let data_group_id = DataGroupId::generate();
-    let test_data = NewUserData {
-        user_vault_id: uv.id.clone(),
-        data_kind: newtypes::DataKind::Email,
-        data_group_id: data_group_id.clone(),
-        data_group_kind: newtypes::DataGroupKind::Email,
-        data_group_priority: newtypes::DataPriority::Primary,
-        e_data: SealedVaultBytes("blah".as_bytes().to_vec()),
-        sh_data: Some(Fingerprint(
-            crypto::random::gen_random_alphanumeric_code(32)
-                .as_bytes()
-                .to_vec(),
-        )),
-        is_verified: false,
-    };
-    pool.db_transaction(move |conn| UserData::bulk_insert(conn, vec![test_data]))
-        .await
-        .expect("couldn't create user data");
-    let test_data_bad_group_uuid = NewUserData {
-        user_vault_id: uv.id,
-        data_kind: newtypes::DataKind::FirstName,
-        data_group_id,
-        data_group_kind: newtypes::DataGroupKind::FullName,
-        data_group_priority: newtypes::DataPriority::Primary,
-        e_data: SealedVaultBytes("blah".as_bytes().to_vec()),
-        sh_data: Some(Fingerprint(
-            crypto::random::gen_random_alphanumeric_code(32)
-                .as_bytes()
-                .to_vec(),
-        )),
-        is_verified: false,
-    };
-    let bad_data = pool
-        .db_transaction(move |conn| UserData::bulk_insert(conn, vec![test_data_bad_group_uuid]))
-        .await;
-    assert!(bad_data.is_err())
     // TODO find_by_phone_number and find_by_email
 }

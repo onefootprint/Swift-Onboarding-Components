@@ -27,7 +27,6 @@ async fn post(
 ) -> actix_web::Result<Json<ApiResponseData<CleanupResponse>>, ApiError> {
     // allowed deletion #s
     let allowed_deletion_numbers: Vec<newtypes::PhoneNumber> = vec![
-        "19196169455",    // gabbi
         "16504600700",    // belce
         "14259844138",    // elliott
         "16178408644",    // alex
