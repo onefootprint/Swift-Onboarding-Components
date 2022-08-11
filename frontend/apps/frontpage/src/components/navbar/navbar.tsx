@@ -24,6 +24,7 @@ const Navbar = ({ cta }: NavbarProps) => {
     { text: t('links.company.text'), href: t('links.company.href') },
     { text: t('links.faq.text'), href: t('links.faq.href') },
     { text: t('links.blog.text'), href: t('links.blog.href') },
+    { text: t('links.media.text'), href: t('links.media.href') },
   ];
 
   return (

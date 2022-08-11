@@ -16,13 +16,13 @@ type DesktopNavProps = {
 const DesktopNav = ({ cta, links }: DesktopNavProps) => (
   <Container>
     <LogoLink />
-    <LinksContainer>
+    <Nav>
       {links.map(link => (
         <Link href={link.href} key={link.text}>
           <a href={link.href}>{link.text}</a>
         </Link>
       ))}
-    </LinksContainer>
+    </Nav>
     <Box>
       <Button onClick={cta.onClick} fullWidth size="compact">
         {cta.text}
@@ -45,11 +45,11 @@ const Container = styled.div`
   `}
 `;
 
-const LinksContainer = styled.div`
+const Nav = styled.nav`
   ${({ theme }) => css`
     align-items: center;
     display: flex;
-    gap: ${theme.spacing[7]}px;
+    gap: ${theme.spacing[8]}px;
 
     a {
       ${createFontStyles('label-3')};

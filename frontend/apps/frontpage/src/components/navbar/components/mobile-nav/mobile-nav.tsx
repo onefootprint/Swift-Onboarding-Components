@@ -59,7 +59,7 @@ const MobileNav = ({ onOpen, onClose, cta, links }: MobileNavProps) => {
         </NavTriggerButton>
       </Header>
       <Content>
-        <LinksContainer>
+        <Nav>
           {links.map(link => (
             <Link href={link.href} key={link.text}>
               <a href={link.href} onClick={handleLinkClick}>
@@ -67,7 +67,7 @@ const MobileNav = ({ onOpen, onClose, cta, links }: MobileNavProps) => {
               </a>
             </Link>
           ))}
-        </LinksContainer>
+        </Nav>
         <CtaContainer>
           <Button onClick={cta.onClick} fullWidth>
             {cta.text}
@@ -140,7 +140,7 @@ const NavTriggerButton = styled.button`
   width: 36px;
 `;
 
-const LinksContainer = styled.div`
+const Nav = styled.nav`
   ${({ theme }) => css`
     a {
       ${createFontStyles('label-1')};
