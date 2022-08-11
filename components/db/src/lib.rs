@@ -165,10 +165,6 @@ pub async fn private_cleanup_integration_tests(
         .db_query(move |conn| -> Result<usize, DbError> {
             let mut deleted_rows = 0;
             // delete user data
-            deleted_rows +=
-                diesel::delete(schema::user_data::table.filter(schema::user_data::user_vault_id.eq(&uv.id)))
-                    .execute(conn)?;
-
             deleted_rows += diesel::delete(
                 schema::fingerprint::table.filter(schema::fingerprint::user_vault_id.eq(&uv.id)),
             )

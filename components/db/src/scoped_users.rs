@@ -45,11 +45,11 @@ pub fn list_for_tenant_query<'a>(params: OnboardingListQueryParams) -> BoxedQuer
     }
 
     if let Some(fingerprints) = params.fingerprints {
-        let matching_uv_ids = schema::user_data::table
-            .filter(schema::user_data::user_vault_id.eq(schema::scoped_users::user_vault_id))
-            .filter(schema::user_data::deactivated_at.is_null())
-            .filter(schema::user_data::sh_data.eq_any(fingerprints))
-            .select(schema::user_data::user_vault_id)
+        let matching_uv_ids = schema::fingerprint::table
+            .filter(schema::fingerprint::user_vault_id.eq(schema::scoped_users::user_vault_id))
+            .filter(schema::fingerprint::deactivated_at.is_null())
+            .filter(schema::fingerprint::sh_data.eq_any(fingerprints))
+            .select(schema::fingerprint::user_vault_id)
             .distinct();
         query = query.filter(schema::scoped_users::user_vault_id.eq_any(matching_uv_ids))
     }
