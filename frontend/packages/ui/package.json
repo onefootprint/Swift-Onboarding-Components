@@ -34,6 +34,7 @@
     "react-merge-refs": "^1.1.0",
     "react-popper": "^2.3.0",
     "react-select": "^5.3.2",
+    "react-syntax-highlighter": "^15.5.0",
     "react-use": "^17.3.2",
     "react-window": "^1.8.7",
     "styled-media-query": "^2.1.2",
