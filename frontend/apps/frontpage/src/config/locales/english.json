@@ -346,6 +346,12 @@
             "content": [
               "Given our mission of bringing back trust and transparency to the Internet, we proudly display our pricing below, and genuine business model above. The pricing may change a bit over time, but we’ll update it here. As you’ll see below, we charge in credits for the KYC and Security product. For each user that does a standard KYC through you, we will give you a credit back each of the next three times they do a one-click KYC. That means you’ll recoup the cost of everyone you “onboard” to our network. Talk about aligned incentives :)."
             ]
+          },
+          "drivers-license-scans": {
+            "title": "Do you support driver’s license scans?",
+            "content": [
+              "Yes. We offer the ability to to a scan and selfie check for an extra $1 per verification, and will do a KBA for an extra $1.50. Our goal is to not do this unless your internal compliance team requires this, or if we can not make a confident pass decision without doing so. Unlike others in the space, our default is to not charge the extra dollar to do the dl scan."
+            ]
           }
         }
       }

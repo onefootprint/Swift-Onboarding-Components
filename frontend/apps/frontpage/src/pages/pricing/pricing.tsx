@@ -66,6 +66,11 @@ const Pricing = () => {
               id: 'disclose-pricing',
               title: t('faq.questions.disclose-pricing.title'),
             },
+            {
+              content: t('faq.questions.drivers-license-scans.content'),
+              id: 'drivers-license-scans',
+              title: t('faq.questions.drivers-license-scans.title'),
+            },
           ]}
         />
       </Container>
