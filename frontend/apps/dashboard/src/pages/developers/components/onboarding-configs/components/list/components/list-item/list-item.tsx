@@ -1,4 +1,6 @@
+import { DEMO_BASE_URL } from 'global-constants';
 import { useToggle, useTranslation } from 'hooks';
+import IcoArrowTopRight16 from 'icons/ico/ico-arrow-top-right-16';
 import IcoPencil16 from 'icons/ico/ico-pencil-16';
 import React from 'react';
 import type { OnboardingConfig } from 'src/types/onboarding-config';
@@ -8,7 +10,7 @@ import { Badge, CodeInline, IconButton, LinkButton, Tag, Typography } from 'ui';
 import EditDialog from './components/edit-dialog';
 import useUpdateOnboardingConfig from './hooks/use-update-onboarding-config';
 
-type ListItemProps = {
+export type ListItemProps = {
   data: OnboardingConfig;
 };
 
@@ -109,7 +111,18 @@ const ListItem = ({ data }: ListItemProps) => {
             <td>
               <CodeInline>{data.key}</CodeInline>
             </td>
-            <td />
+            <td>
+              {data.isLive ? null : (
+                <LinkButton
+                  href={`${DEMO_BASE_URL}/preview?ob_key=${data.key}`}
+                  iconComponent={IcoArrowTopRight16}
+                  size="xTiny"
+                  target="_blank"
+                >
+                  {t('key.cta')}
+                </LinkButton>
+              )}
+            </td>
           </tr>
           <tr>
             <td>
@@ -166,6 +179,10 @@ const Table = styled.table`
     tbody {
       td {
         padding: ${theme.spacing[4]}px ${theme.spacing[6]}px;
+
+        &:last-child {
+          text-align: right;
+        }
       }
     }
 

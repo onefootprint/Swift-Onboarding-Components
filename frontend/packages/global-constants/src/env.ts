@@ -1,15 +1,26 @@
+const getBranchSlug = (branchName: string) =>
+  branchName.toLowerCase().replaceAll('/', '-');
+
+const getDemoUrl = (env = 'local', branchName?: string) => {
+  if (env === 'local') {
+    return 'http://localhost:3002';
+  }
+  if (env === 'preview' && branchName) {
+    const branchSlug = getBranchSlug(branchName);
+    return `https://demo-git-${branchSlug}.preview.onefootprint.com`;
+  }
+  return 'https://demo.onefootprint.com';
+};
+
 const getBiometricUrl = (env = 'local', branchName?: string) => {
   if (env === 'local') {
     return (
       process.env.NEXT_PUBLIC_LOCAL_BIOMETRIC_BASE_URL ||
-      'http://localhost:3005/'
+      'http://localhost:3005'
     );
   }
-  if (env === 'development') {
-    return 'https://biometric.preview.onefootprint.com';
-  }
   if (env === 'preview' && branchName) {
-    const branchSlug = branchName.toLowerCase().replaceAll('/', '-');
+    const branchSlug = getBranchSlug(branchName);
     return `https://biometric-git-${branchSlug}.preview.onefootprint.com`;
   }
   return 'https://biometric.onefootprint.com';
@@ -17,13 +28,10 @@ const getBiometricUrl = (env = 'local', branchName?: string) => {
 
 const getMy1fpUrl = (env = 'local', branchName?: string) => {
   if (env === 'local') {
-    return 'http://localhost:3004/';
-  }
-  if (env === 'development') {
-    return 'https://my1fp.preview.onefootprint.com';
+    return 'http://localhost:3004';
   }
   if (env === 'preview' && branchName) {
-    const branchSlug = branchName.toLowerCase().replaceAll('/', '-');
+    const branchSlug = getBranchSlug(branchName);
     return `https://my1fp-git-${branchSlug}.preview.onefootprint.com`;
   }
   return 'https://my.onefootprint.com';
@@ -40,6 +48,11 @@ export const BIOMETRIC_BASE_URL = getBiometricUrl(
 );
 
 export const MY1FP_URL = getMy1fpUrl(
+  process.env.NEXT_PUBLIC_VERCEL_ENV,
+  process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_REF,
+);
+
+export const DEMO_BASE_URL = getDemoUrl(
   process.env.NEXT_PUBLIC_VERCEL_ENV,
   process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_REF,
 );

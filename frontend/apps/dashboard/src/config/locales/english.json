@@ -126,7 +126,8 @@
             "tooltip": "Attributes you'll have access to after user onboardings."
           },
           "key": {
-            "label": "Onboarding publishable key"
+            "label": "Onboarding publishable key",
+            "cta": "Test onboarding configuration"
           },
           "status": {
             "label": "Status"
