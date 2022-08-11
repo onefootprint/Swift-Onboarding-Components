@@ -37,9 +37,8 @@ const useUpdateStatus = (apiKey: ApiKey) => {
       await queryClient.cancelQueries(['api-keys']);
       const previousApiKeys: ApiKey[] | undefined = queryClient.getQueryData([
         'api-keys',
-        authHeaders,
       ]);
-      queryClient.setQueryData(['api-keys', authHeaders], () => {
+      queryClient.setQueryData(['api-keys'], () => {
         const apiKeys = previousApiKeys?.map(_apiKey => {
           if (_apiKey.id === updatedApiKey.id) {
             return updatedApiKey;

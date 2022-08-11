@@ -27,8 +27,12 @@ const CreateDialog = ({ open, onClose }: CreateDialogProps) => {
     onClose();
   };
 
-  const onSubmit = (formData: FormData) => {
-    createApiKeyMutation.mutate(formData, { onSuccess: handleClose });
+  const handleBeforeSubmit = (formData: FormData) => {
+    createApiKeyMutation.mutate(formData, {
+      onSuccess: () => {
+        handleClose();
+      },
+    });
   };
 
   return (
@@ -50,7 +54,10 @@ const CreateDialog = ({ open, onClose }: CreateDialogProps) => {
       onClose={handleClose}
       open={open}
     >
-      <form onSubmit={handleSubmit(onSubmit)} id="create-secret-key-form">
+      <form
+        onSubmit={handleSubmit(handleBeforeSubmit)}
+        id="create-secret-key-form"
+      >
         <TextInput
           autoFocus
           hasError={!!errors.name}

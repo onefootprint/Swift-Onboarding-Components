@@ -9,7 +9,7 @@ const useTranslation = (namespace?: string) => {
       ? translate(`${namespace}.${key}`, { ...options, ...defaultOptions })
       : translate(key, { ...options, ...defaultOptions });
 
-  return { t };
+  return { t, allT: translate };
 };
 
 export default useTranslation;

@@ -71,22 +71,19 @@ const ButtonContainer = styled.button<{
   $loading?: boolean;
   $size: ButtonSize;
   $variant: ButtonVariant;
-  disabled: boolean;
 }>`
-  ${({ theme, $variant, $fullWidth, $size, $loading, disabled }) => css`
+  ${({ theme, $variant, $fullWidth, $size, $loading }) => css`
     ${createSizeStyles($size)};
     ${createVariantStyles($variant)};
     ${createFullWidthStyles($fullWidth)};
     ${createLoadingStyles($loading)};
     align-items: center;
     border-radius: ${theme.borderRadius[2]}px;
-    cursor: pointer;
     display: flex;
     justify-content: center;
     outline-offset: ${theme.spacing[2]}px;
     text-decoration: none;
     user-select: none;
-    cursor: ${disabled ? 'auto' : 'cursor'};
   `}
 `;
 

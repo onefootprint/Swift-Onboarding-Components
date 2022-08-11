@@ -45,15 +45,12 @@ const useUpdateStatus = () => {
         await queryClient.cancelQueries(['onboarding-configs']);
 
         const prevOnboardingConfigs: OnboardingConfig[] | undefined =
-          queryClient.getQueryData(['onboarding-configs', authHeaders]);
+          queryClient.getQueryData(['onboarding-configs']);
 
-        queryClient.setQueryData(['onboarding-configs', authHeaders], () =>
+        queryClient.setQueryData(['onboarding-configs'], () =>
           prevOnboardingConfigs?.map(onboardingConfig => {
             if (onboardingConfig.id === updatedOnboardingConfig.id) {
-              return {
-                ...onboardingConfig,
-                ...updatedOnboardingConfig,
-              };
+              return { ...onboardingConfig, ...updatedOnboardingConfig };
             }
             return onboardingConfig;
           }),
@@ -70,6 +67,9 @@ const useUpdateStatus = () => {
             context.prevOnboardingConfigs,
           );
         }
+      },
+      onSettled: () => {
+        queryClient.invalidateQueries(['onboarding-configs']);
       },
     },
   );

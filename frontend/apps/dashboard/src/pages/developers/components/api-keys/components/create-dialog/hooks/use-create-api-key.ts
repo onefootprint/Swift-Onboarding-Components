@@ -1,8 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useRequestErrorToast, useTranslation } from 'hooks';
+import { useRequestErrorToast } from 'hooks';
 import request, { RequestError, RequestResponse } from 'request';
 import useSessionUser, { AuthHeaders } from 'src/hooks/use-session-user';
-import { useToast } from 'ui';
 
 export type CreateApiKeyRequest = {
   name: string;
@@ -26,8 +25,6 @@ const createApiKey = async (
 };
 
 const useCreateApiKey = () => {
-  const toast = useToast();
-  const { t } = useTranslation('pages.developers.api-keys.create.feedback');
   const showErrorToast = useRequestErrorToast();
   const { authHeaders } = useSessionUser();
   const queryClient = useQueryClient();
@@ -35,14 +32,10 @@ const useCreateApiKey = () => {
   return useMutation<GetApiKeysResponse, RequestError, CreateApiKeyRequest>(
     (data: CreateApiKeyRequest) => createApiKey(authHeaders, data),
     {
-      onSuccess: () => {
-        toast.show({
-          description: t('success.description'),
-          title: t('success.title'),
-        });
+      onError: showErrorToast,
+      onSettled: () => {
         queryClient.invalidateQueries(['api-keys']);
       },
-      onError: showErrorToast,
     },
   );
 };

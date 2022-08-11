@@ -146,7 +146,7 @@ describe('<ApiKeys />', () => {
         withCreateApiKeys();
       });
 
-      it('should show a spinner, close the dialog, show a confirmation and display the new key created', async () => {
+      it('should show a spinner, close the dialog and show the key created', async () => {
         renderDevelopers();
 
         const keyName = 'Lorem Bank';
@@ -175,11 +175,6 @@ describe('<ApiKeys />', () => {
           name: 'Create secret key',
         });
         await waitForElementToBeRemoved(dialog);
-
-        await waitFor(() => {
-          const successMessage = 'Secret key created successfully.';
-          expect(screen.getByText(successMessage)).toBeInTheDocument();
-        });
 
         await waitFor(() => {
           expect(screen.getByText(keyName)).toBeInTheDocument();

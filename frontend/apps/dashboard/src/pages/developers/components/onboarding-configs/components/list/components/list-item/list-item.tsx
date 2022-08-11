@@ -13,8 +13,9 @@ type ListItemProps = {
 };
 
 const ListItem = ({ data }: ListItemProps) => {
-  const { t } = useTranslation('pages.developers.onboarding-configs.list-item');
-  const { t: globalT } = useTranslation('global.data-kinds');
+  const { t, allT } = useTranslation(
+    'pages.developers.onboarding-configs.list-item',
+  );
   const [isEditDialogOpen, openEditDialog, closeEditDialog] = useToggle(false);
   const updateMutation = useUpdateOnboardingConfig();
 
@@ -74,7 +75,9 @@ const ListItem = ({ data }: ListItemProps) => {
             <td>
               <TagList data-testid={`must-collect-data-kinds-${data.id}`}>
                 {data.mustCollectDataKinds.map(tag => (
-                  <Tag key={`must-access-${tag}`}>{globalT(tag)}</Tag>
+                  <Tag key={`must-access-${tag}`}>
+                    {allT(`data-kinds.${tag}`)}
+                  </Tag>
                 ))}
               </TagList>
             </td>
@@ -89,7 +92,9 @@ const ListItem = ({ data }: ListItemProps) => {
             <td>
               <TagList data-testid={`can-access-data-kinds-${data.id}`}>
                 {data.canAccessDataKinds.map(tag => (
-                  <Tag key={`can-access-${tag}`}>{globalT(tag)}</Tag>
+                  <Tag key={`can-access-${tag}`}>
+                    {allT(`data-kinds.${tag}`)}
+                  </Tag>
                 ))}
               </TagList>
             </td>

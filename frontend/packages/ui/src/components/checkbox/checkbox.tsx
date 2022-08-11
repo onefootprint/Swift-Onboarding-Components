@@ -1,4 +1,4 @@
-import React, { forwardRef } from 'react';
+import React, { forwardRef, useId } from 'react';
 import styled, { css } from 'styled-components';
 
 import { createFontStyles } from '../../utils/mixins';
@@ -7,6 +7,7 @@ import { createCheckedStyled, createPseudoStyles } from './checkbox.utils';
 
 export type CheckboxProps = {
   checked?: boolean;
+  defaultChecked?: boolean;
   disabled?: boolean;
   hasError?: boolean;
   hintText?: string;
@@ -25,10 +26,11 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
   (
     {
       checked,
+      defaultChecked,
       disabled,
       hasError,
       hintText,
-      id: baseID,
+      id: possibleId,
       label,
       name,
       onBlur,
@@ -40,7 +42,8 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
     }: CheckboxProps,
     ref,
   ) => {
-    const id = `checkbox-${baseID || label}`;
+    const internalId = useId();
+    const id = possibleId || internalId;
     return (
       <Container>
         <Label
@@ -54,6 +57,7 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
             aria-disabled={disabled}
             aria-required={required}
             checked={checked}
+            defaultChecked={defaultChecked}
             disabled={disabled}
             hasError={hasError}
             id={id}
@@ -64,8 +68,8 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
             ref={ref}
             required={required}
             tabIndex={disabled ? undefined : 0}
-            value={value}
             type="checkbox"
+            value={value}
           />
           {label}
         </Label>
