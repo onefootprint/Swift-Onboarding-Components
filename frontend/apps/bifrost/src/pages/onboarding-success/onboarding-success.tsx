@@ -1,16 +1,39 @@
+import { useFootprintJs } from 'footprint-provider';
 import { MY1FP_URL } from 'global-constants';
 import { useTranslation } from 'hooks';
 import IcoCheckCircle40 from 'icons/ico/ico-check-circle-40';
-import React from 'react';
+import React, { useEffect } from 'react';
 import Confetti from 'react-confetti';
 import NavigationHeader from 'src/components/navigation-header';
 import useConfettiState from 'src/hooks/use-confetti-state';
 import styled from 'styled-components';
 import { Box, LinkButton, Typography } from 'ui';
 
+import useBifrostMachine from '../../hooks/use-bifrost-machine/use-bifrost-machine';
+
+const CLOSE_DELAY = 6000;
+
 const OnboardingSuccess = () => {
   const { t } = useTranslation('pages.onboarding-success');
   const { running, width, height } = useConfettiState();
+  const footprint = useFootprintJs();
+  const [state] = useBifrostMachine();
+
+  useEffect(() => {
+    const { validationToken } = state.context.onboarding;
+    if (!validationToken) {
+      return () => {};
+    }
+    footprint.complete(validationToken);
+    const timer = setTimeout(() => {
+      footprint.close();
+    }, CLOSE_DELAY);
+
+    return () => {
+      clearTimeout(timer);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <>

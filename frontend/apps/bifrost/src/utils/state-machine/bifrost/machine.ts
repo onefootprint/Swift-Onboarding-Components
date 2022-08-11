@@ -125,10 +125,20 @@ const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
       [States.confirmAndAuthorize]: {
         on: {
           [Events.sharedDataConfirmed]: [
+            // TODO: uncomment when we start using multiple config keys in demos
+            // Replace this with the onboardingSuccess one below
+            // https://linear.app/footprint/issue/FP-991/start-using-multiple-config-keys-one-per-demo-tenant-in-demos
+            // {
+            //   target: States.onboardingSuccess,
+            //   actions: [Actions.assignValidationToken],
+            //   cond: (context, event) => !event.payload.validationToken,
+            // },
             {
               target: States.onboardingSuccess,
+              cond: context =>
+                !context.userFound ||
+                context.onboarding.missingAttributes.length > 0,
               actions: [Actions.assignValidationToken],
-              cond: (context, event) => !event.payload.validationToken,
             },
             {
               target: States.verificationSuccess,

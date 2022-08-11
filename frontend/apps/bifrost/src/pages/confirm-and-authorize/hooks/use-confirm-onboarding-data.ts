@@ -1,4 +1,3 @@
-import { useFootprintJs } from 'footprint-provider';
 import useTranslation from 'hooks/src/use-translation/use-translation';
 import { useBifrostMachine } from 'src/components/bifrost-machine-provider';
 import { Events } from 'src/hooks/use-bifrost-machine';
@@ -12,7 +11,6 @@ const useConfirmOnboardingData = () => {
   const [state, send] = useBifrostMachine();
   const { syncData } = useSyncData();
   const toast = useToast();
-  const footprint = useFootprintJs();
   const completeOnboardingMutation = useOnboardingComplete();
 
   const showSyncDataError = () => {
@@ -47,7 +45,6 @@ const useConfirmOnboardingData = () => {
               validationToken,
             },
           });
-          footprint.complete(validationToken);
         },
         onError() {
           showOnboardingError();
