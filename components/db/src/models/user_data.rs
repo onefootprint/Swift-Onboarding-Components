@@ -71,11 +71,6 @@ impl UserData {
             .get_result(conn)?;
         Ok(result)
     }
-
-    pub fn list(conn: &mut PgConnection, ids: Vec<UserDataId>) -> Result<Vec<UserData>, crate::DbError> {
-        let result = user_data::table.filter(user_data::id.eq_any(ids)).load(conn)?;
-        Ok(result)
-    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
