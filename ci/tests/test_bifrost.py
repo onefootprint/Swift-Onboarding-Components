@@ -182,18 +182,15 @@ class TestBifrost:
 
     def test_onboarding_complete(self, workos_tenant, auth_token): 
         body = post("internal/onboarding/complete", None, workos_tenant.ob_config.key, auth_token)
-        fp_user_id = body["data"]["footprint_user_id"]
         validation_token = body["data"]["validation_token"]
 
         assert body["data"]["missing_webauthn_credentials"] == False
-        assert fp_user_id
         assert validation_token
 
         # test the validate api call
         data = dict(validation_token=validation_token)
         body = post("users/validate", data, workos_tenant.sk.key)
-        fp_user_id2 = body["data"]["footprint_user_id"]
-        assert fp_user_id2 == fp_user_id
+        assert body["data"]["footprint_user_id"]
         assert body["data"]["status"]
 
     def test_onboard_onto_same_tenant(self, workos_tenant, auth_token):

@@ -15,16 +15,11 @@ use db::models::scoped_users::ScopedUser;
 use db::models::webauthn_credential::WebauthnCredential;
 use db::DbError;
 use itertools::Itertools;
-use newtypes::{
-    AuditTrailEvent, DataKind, FootprintUserId, SessionAuthToken, Status, Vendor, VerificationInfo,
-};
+use newtypes::{AuditTrailEvent, DataKind, SessionAuthToken, Status, Vendor, VerificationInfo};
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Apiv2Schema)]
 struct CommitResponse {
-    /// Unique footprint user id
-    /// TODO: (FP-486) remove this for better safety rails of api usage
-    footprint_user_id: FootprintUserId,
     /// Footprint validation token
     validation_token: SessionAuthToken,
     /// Boolean true / false if webauthn set
@@ -55,7 +50,7 @@ fn handler(
     // TODO kick off user verification with data vendors
     let tenant_id = tenant_auth.tenant.id.clone();
     let session_key = state.session_sealing_key.clone();
-    let (scoped_user, validation_token, webauthn_creds) = state
+    let (validation_token, webauthn_creds) = state
         .db_pool
         .db_transaction(move |conn| -> Result<_, DbError> {
             let scoped_user = ScopedUser::get_or_create(
@@ -67,7 +62,7 @@ fn handler(
             let insight_event = CreateInsightEvent::from(insights);
             let ob = Onboarding::get_or_create(
                 conn,
-                scoped_user.id.clone(),
+                scoped_user.id,
                 tenant_auth.ob_config.id.clone(),
                 insight_event,
             )?;
@@ -115,12 +110,11 @@ fn handler(
             }
             let validation_token = super::create_onboarding_validation_token(conn, &session_key, ob.id)?;
             let webauthn_creds = WebauthnCredential::get_for_user_vault(conn, &uv_id)?;
-            Ok((scoped_user, validation_token, webauthn_creds))
+            Ok((validation_token, webauthn_creds))
         })
         .await?;
     Ok(Json(ApiResponseData {
         data: CommitResponse {
-            footprint_user_id: scoped_user.fp_user_id,
             validation_token,
             missing_webauthn_credentials: webauthn_creds.is_empty(),
         },
