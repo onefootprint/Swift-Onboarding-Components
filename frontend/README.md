@@ -49,7 +49,8 @@ to enforce more constraints on WebAuthn, each app has its own port:
 | Biometric                     | 3005 |
 | Email Verification            | 3006 |
 | UI Docs - Storybook           | 3007 |
-| Footprint UI Docs - Storybook | 3007 |
+| Footprint UI Docs - Storybook | 3008 |
+| Footprint Developer Docs      | 3009 |
 
 ### Build
 
