@@ -1,11 +1,10 @@
-import { useToggle, useTranslation } from 'hooks';
+import { useHasScroll, useToggle, useTranslation } from 'hooks';
 import React from 'react';
 import styled, { css } from 'styled-components';
 import { Banner, Container, media } from 'ui';
 
 import DesktopNav from './components/desktop-nav';
 import MobileNav from './components/mobile-nav';
-import useHasScroll from './hooks/use-has-scroll';
 
 type NavbarProps = {
   cta: {

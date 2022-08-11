@@ -12,6 +12,7 @@
     "clean": "rm -rf .turbo && rm -rf .next && rm -rf node_modules"
   },
   "dependencies": {
+    "@typeform/embed": "^1.37.0",
     "global-constants": "*",
     "hooks": "*",
     "icons": "*",

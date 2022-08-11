@@ -2,5 +2,36 @@
   "global": {
     "errors": {}
   },
+  "components": {
+    "footer": {
+      "copyright": "One Footprint Inc.",
+      "links": {
+        "terms-of-service": {
+          "href": "/terms-of-service",
+          "text": "Terms"
+        },
+        "privacy-policy": {
+          "href": "/privacy-policy",
+          "text": "Privacy"
+        },
+        "status": {
+          "href": "https://footprint.instatus.com/",
+          "text": "Status"
+        },
+        "twitter": {
+          "href": "https://twitter.com/footprint_hq",
+          "text": "Twitter"
+        }
+      }
+    },
+    "header": {
+      "title": "Docs",
+      "request-early-access": "Request Early Access",
+      "nav": {
+        "kyc-with-pii": "KYC + PII Vault",
+        "pii": "PII Vault"
+      }
+    }
+  },
   "pages": {}
 }
