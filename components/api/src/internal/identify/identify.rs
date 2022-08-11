@@ -13,7 +13,7 @@ use crypto::serde_cbor;
 use db::models::user_vaults::UserVault;
 use db::models::webauthn_credential::WebauthnCredential;
 use newtypes::email::Email;
-use newtypes::{DataKind, Fingerprinter, PhoneNumber, PiiString, UserVaultId, ValidatedPhoneNumber};
+use newtypes::{DataKind, Fingerprinter, PhoneNumber, PiiString, UserVaultId};
 use paperclip::actix::{api_v2_operation, web, web::Json, Apiv2Schema};
 use webauthn_rs_core::proto::{Base64UrlSafeData, Credential, ParsedAttestation, ParsedAttestationData};
 use webauthn_rs_proto::{RegisteredExtensions, UserVerificationPolicy};
@@ -83,9 +83,7 @@ pub async fn handler(
 
     // The user vault exists. Extract the phone number for the user
     let uvw = UserVaultWrapper::from(&state.db_pool, existing_user.clone()).await?;
-    let (phone_number, phone_country) = uvw.get_decrypted_primary_phone(&state).await?;
-    let validated_phone_number =
-        ValidatedPhoneNumber::__build_from_vault(phone_number.clone(), phone_country.clone())?;
+    let validated_phone_number = uvw.get_decrypted_primary_phone(&state).await?;
 
     // Initiate the challenge of the requested type
     let (challenge_kind, challenge_state_data, time_before_retry_s, biometric_challenge_json) =
@@ -149,7 +147,7 @@ pub async fn handler(
                 challenge_kind,
                 challenge_token,
                 phone_number_last_two: validated_phone_number.leak_last_two(),
-                phone_country: phone_country.leak_to_string(),
+                phone_country: validated_phone_number.iso_country_code.leak_to_string(),
                 biometric_challenge_json,
                 time_before_retry_s,
             }),

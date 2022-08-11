@@ -11,7 +11,7 @@ use db::models::user_basic_info::{NewUserBasicInfoReq, UserBasicInfo};
 use db::models::user_vaults::UserVault;
 use db::DbPool;
 use db::{errors::DbError, PgConnection};
-use newtypes::{DataKind, DataPriority, NewSealedData, PiiString, SealedVaultBytes, UserVaultId};
+use newtypes::{DataKind, DataPriority, NewSealedData, SealedVaultBytes, UserVaultId, ValidatedPhoneNumber};
 use paperclip::actix::web;
 
 use crate::errors::user::UserError;
@@ -93,7 +93,7 @@ impl UserVaultWrapper {
     pub async fn get_decrypted_primary_phone(
         &self,
         state: &web::Data<State>,
-    ) -> Result<(PiiString, PiiString), ApiError> {
+    ) -> Result<ValidatedPhoneNumber, ApiError> {
         let number = self
             .phone_numbers
             .iter()
@@ -110,7 +110,8 @@ impl UserVaultWrapper {
         let e164 = decrypt_response.get(0).ok_or(ApiError::NotImplemented)?.clone();
         let country = decrypt_response.get(1).ok_or(ApiError::NotImplemented)?.clone();
 
-        Ok((e164, country))
+        let validated_phone_number = ValidatedPhoneNumber::__build_from_vault(e164, country)?;
+        Ok(validated_phone_number)
     }
 
     pub fn missing_fields(&self, ob_config: &ObConfiguration) -> Vec<DataKind> {
