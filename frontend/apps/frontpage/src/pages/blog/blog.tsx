@@ -21,7 +21,6 @@ export type BlogProps = {
 const Blog = ({ posts }: BlogProps) => {
   const { t } = useTranslation('pages.blog');
   const { formatDateWithLongMonth } = useIntl();
-  const [latestPost] = posts;
 
   return (
     <>
@@ -47,20 +46,24 @@ const Blog = ({ posts }: BlogProps) => {
               </LinkButton>
             </Breadcrumb>
           </BreadcrumbContainer>
-          <PostPreview
-            href={`/blog/${latestPost.slug}`}
-            author={{
-              avatarImgUrl: latestPost.primary_author.profile_image,
-              name: latestPost.primary_author.name,
-            }}
-            primaryTag={latestPost.primary_tag.name}
-            featureImageUrl={latestPost.feature_image}
-            featureImageAlt={latestPost.feature_image_alt || latestPost.title}
-            createdAt={formatDateWithLongMonth(new Date(latestPost.created_at))}
-            excerpt={latestPost.excerpt}
-            key={latestPost.uuid}
-            title={latestPost.title}
-          />
+          <Posts>
+            {posts.map(post => (
+              <PostPreview
+                href={`/blog/${post.slug}`}
+                author={{
+                  avatarImgUrl: post.primary_author.profile_image,
+                  name: post.primary_author.name,
+                }}
+                primaryTag={post.primary_tag.name}
+                featureImageUrl={post.feature_image}
+                featureImageAlt={post.feature_image_alt || post.title}
+                createdAt={formatDateWithLongMonth(new Date(post.created_at))}
+                excerpt={post.excerpt}
+                key={post.uuid}
+                title={post.title}
+              />
+            ))}
+          </Posts>
         </Inner>
       </Container>
     </>
@@ -112,16 +115,15 @@ const BreadcrumbContainer = styled.div`
   `}
 `;
 
-// const GridList = styled.div`
-//   ${({ theme }) => css`
-//     display: grid;
-//     gap: ${theme.spacing[7]}px;
-//     grid-template-rows: 512px;
+const Posts = styled.div`
+  ${({ theme }) => css`
+    display: grid;
+    gap: ${theme.spacing[7]}px;
 
-//     ${media.greaterThan('md')`
-//       grid-template-columns: repeat(2, 1fr);
-//     `}
-//   `}
-// `;
+    ${media.greaterThan('md')`
+      grid-template-columns: repeat(2, 1fr);
+    `}
+  `}
+`;
 
 export default Blog;

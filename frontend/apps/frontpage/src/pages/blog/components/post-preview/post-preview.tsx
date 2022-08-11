@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import React from 'react';
 import styled, { css } from 'styled-components';
-import { media, Typography } from 'ui';
+import { Box, media, Typography } from 'ui';
 
 export type PostPreviewProps = {
   author: { avatarImgUrl: string; name: string };
@@ -29,11 +29,11 @@ const PostPreview = ({
       <FeatureImageDesktopContainer>
         <FeatureImage
           alt={featureImageAlt}
-          height={300}
+          height={228}
           layout="responsive"
           objectFit="cover"
           src={featureImageUrl}
-          width={960}
+          width={468}
         />
       </FeatureImageDesktopContainer>
       <FeatureImageMobileContainer>
@@ -54,23 +54,32 @@ const PostPreview = ({
             {title}
           </Typography>
         </Header>
-        <Body>
-          <Typography color="secondary" variant="body-2">
-            {excerpt}
-          </Typography>
-        </Body>
-        <Footer>
-          <Avatar
-            alt={author.name}
-            height={16}
-            layout="fixed"
-            src={author.avatarImgUrl}
-            width={16}
-          />
-          <Typography color="tertiary" variant="body-4">
-            {author.name} | <time>{createdAt}</time>
-          </Typography>
-        </Footer>
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            flexGrow: 1,
+            justifyContent: 'space-between',
+          }}
+        >
+          <Body>
+            <Typography color="secondary" variant="body-2">
+              {excerpt}
+            </Typography>
+          </Body>
+          <Footer>
+            <Avatar
+              alt={author.name}
+              height={16}
+              layout="fixed"
+              src={author.avatarImgUrl}
+              width={16}
+            />
+            <Typography color="tertiary" variant="body-4">
+              {author.name} | <time>{createdAt}</time>
+            </Typography>
+          </Footer>
+        </Box>
       </Content>
     </Anchor>
   </Container>
@@ -83,7 +92,9 @@ const Anchor = styled.a`
     border-radius: ${theme.borderRadius[2]}px;
     border: ${theme.borderWidth[1]}px solid ${theme.borderColor.tertiary};
     box-shadow: ${theme.elevation[1]};
-    display: block;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
     text-decoration: none;
   `}
 `;
@@ -109,6 +120,9 @@ const FeatureImageMobileContainer = styled.div`
 
 const Content = styled.div`
   ${({ theme }) => css`
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
     padding: ${theme.spacing[7]}px;
   `}
 `;
@@ -122,6 +136,7 @@ const Header = styled.header`
 const Body = styled.div`
   ${({ theme }) => css`
     margin-bottom: ${theme.spacing[6]}px;
+    min-height: ${theme.spacing[1]}px;
   `}
 `;
 
