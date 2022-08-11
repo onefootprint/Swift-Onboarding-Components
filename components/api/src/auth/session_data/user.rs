@@ -70,12 +70,7 @@ impl TryFrom<AuthSessionData> for ParsedUserSession {
 
 impl ExtractableAuthSession for ParsedUserSession {
     fn header_names() -> Vec<&'static str> {
-        vec![
-            "X-Fpuser-Authorization",
-            "X-My1fp-Authorization",
-            "X-D2p-Authorization",
-            "x-fp-authorization",
-        ]
+        vec!["X-Fp-Authorization"]
     }
 }
 

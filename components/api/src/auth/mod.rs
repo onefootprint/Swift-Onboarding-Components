@@ -22,8 +22,6 @@ pub enum AuthError {
     MissingClientPublicAuthHeader,
     #[error("missing X-Client-Secret-Key")]
     MissingClientSecretAuthHeader,
-    #[error("missing X-Fpuser-Authorization")]
-    MissingFpuserAuthHeader,
     #[error("missing X-Footprint-Custodian-Key")]
     MissingCustodianAuthHeader,
     #[error("invalid X-Footprint-Custodian-Key")]
