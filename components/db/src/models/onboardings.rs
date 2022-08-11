@@ -119,7 +119,7 @@ impl Onboarding {
         Ok(ob)
     }
 
-    pub fn update_status(&self, conn: &mut PgConnection, new_status: Status) -> Result<(), DbError> {
+    pub fn update_status(self, conn: &mut PgConnection, new_status: Status) -> Result<(), DbError> {
         diesel::update(onboardings::table)
             .filter(onboardings::id.eq(&self.id))
             .set(onboardings::status.eq(new_status))

@@ -13,8 +13,9 @@ use db::models::insight_event::CreateInsightEvent;
 use db::models::onboardings::Onboarding;
 use db::models::scoped_users::ScopedUser;
 use db::models::webauthn_credential::WebauthnCredential;
-use db::DbError;
+use db::PgConnection;
 use itertools::Itertools;
+use newtypes::TenantId;
 use newtypes::{AuditTrailEvent, DataKind, SessionAuthToken, Status, Vendor, VerificationInfo};
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 
@@ -39,23 +40,20 @@ fn handler(
     let user_auth = user_auth.check_permissions(vec![UserAuthScope::OrgOnboarding])?;
 
     let uv = user_auth.user_vault(&state.db_pool).await?;
-    let uv_id = uv.id.clone();
-
-    let uvw = UserVaultWrapper::from(&state.db_pool, uv.clone()).await?;
+    let uvw = UserVaultWrapper::from(&state.db_pool, uv).await?;
     let missing_fields = uvw.missing_fields(&tenant_auth.ob_config);
     if !missing_fields.is_empty() {
-        return Err(OnboardingError::UserMissingRequiredFields(missing_fields.into_iter().join(", ")).into());
+        return Err(OnboardingError::UserMissingRequiredFields(missing_fields.iter().join(", ")).into());
     }
 
-    // TODO kick off user verification with data vendors
     let tenant_id = tenant_auth.tenant.id.clone();
     let session_key = state.session_sealing_key.clone();
     let (validation_token, webauthn_creds) = state
         .db_pool
-        .db_transaction(move |conn| -> Result<_, DbError> {
+        .db_transaction(move |conn| -> Result<_, ApiError> {
             let scoped_user = ScopedUser::get_or_create(
                 conn,
-                uv_id.clone(),
+                uvw.user_vault.id.clone(),
                 tenant_auth.tenant.id.clone(),
                 tenant_auth.ob_config.is_live,
             )?;
@@ -66,50 +64,10 @@ fn handler(
                 tenant_auth.ob_config.id.clone(),
                 insight_event,
             )?;
-            if ob.status != Status::Verified {
-                // Just create some fixture events for now
-                // Don't make duplicate fixture events if the user onboards multiple times since it
-                // isn't very self-explanatory for the demo
-                let events = vec![
-                    VerificationInfo {
-                        data_kinds: vec![DataKind::FirstName, DataKind::LastName, DataKind::Dob],
-                        vendor: Vendor::Experian,
-                    },
-                    VerificationInfo {
-                        data_kinds: vec![DataKind::Country, DataKind::State],
-                        vendor: Vendor::Socure,
-                    },
-                    VerificationInfo {
-                        data_kinds: vec![
-                            DataKind::StreetAddress,
-                            DataKind::StreetAddress2,
-                            DataKind::City,
-                            DataKind::Zip,
-                        ],
-                        vendor: Vendor::Idology,
-                    },
-                    VerificationInfo {
-                        data_kinds: vec![DataKind::Ssn9],
-                        vendor: Vendor::LexisNexis,
-                    },
-                    VerificationInfo {
-                        data_kinds: vec![],
-                        vendor: Vendor::Footprint,
-                    },
-                ];
-                events.into_iter().try_for_each(|e| {
-                    AuditTrail::create(
-                        conn,
-                        AuditTrailEvent::Verification(e),
-                        uv_id.clone(),
-                        Some(tenant_id.clone()),
-                    )
-                })?;
-                // TODO don't mark as verified until data verification with vendors is complete
-                ob.update_status(conn, Status::Verified)?;
-            }
-            let validation_token = super::create_onboarding_validation_token(conn, &session_key, ob.id)?;
-            let webauthn_creds = WebauthnCredential::get_for_user_vault(conn, &uv_id)?;
+            let ob_id = ob.id.clone();
+            initiate_verification(conn, ob, &uvw, &tenant_id)?;
+            let validation_token = super::create_onboarding_validation_token(conn, &session_key, ob_id)?;
+            let webauthn_creds = WebauthnCredential::get_for_user_vault(conn, &uvw.user_vault.id)?;
             Ok((validation_token, webauthn_creds))
         })
         .await?;
@@ -119,4 +77,57 @@ fn handler(
             missing_webauthn_credentials: webauthn_creds.is_empty(),
         },
     }))
+}
+
+fn initiate_verification(
+    conn: &mut PgConnection,
+    ob: Onboarding,
+    uvw: &UserVaultWrapper,
+    tenant_id: &TenantId,
+) -> Result<(), ApiError> {
+    if ob.status == Status::Verified {
+        return Ok(());
+    }
+    // Just create some fixture events for now
+    // Don't make duplicate fixture events if the user onboards multiple times since it
+    // isn't very self-explanatory for the demo
+    // TODO kick off user verification with data vendors
+    let events = vec![
+        VerificationInfo {
+            data_kinds: vec![DataKind::FirstName, DataKind::LastName, DataKind::Dob],
+            vendor: Vendor::Experian,
+        },
+        VerificationInfo {
+            data_kinds: vec![DataKind::Country, DataKind::State],
+            vendor: Vendor::Socure,
+        },
+        VerificationInfo {
+            data_kinds: vec![
+                DataKind::StreetAddress,
+                DataKind::StreetAddress2,
+                DataKind::City,
+                DataKind::Zip,
+            ],
+            vendor: Vendor::Idology,
+        },
+        VerificationInfo {
+            data_kinds: vec![DataKind::Ssn9],
+            vendor: Vendor::LexisNexis,
+        },
+        VerificationInfo {
+            data_kinds: vec![],
+            vendor: Vendor::Footprint,
+        },
+    ];
+    events.into_iter().try_for_each(|e| {
+        AuditTrail::create(
+            conn,
+            AuditTrailEvent::Verification(e),
+            uvw.user_vault.id.clone(),
+            Some(tenant_id.clone()),
+        )
+    })?;
+    // TODO don't mark as verified until data verification with vendors is complete
+    ob.update_status(conn, Status::Verified)?;
+    Ok(())
 }
