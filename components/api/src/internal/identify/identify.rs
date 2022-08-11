@@ -83,14 +83,7 @@ pub async fn handler(
 
     // The user vault exists. Extract the phone number for the user
     let uvw = UserVaultWrapper::from(&state.db_pool, existing_user.clone()).await?;
-    let phone_number = uvw
-        .get_decrypted_field(&state, DataKind::PhoneNumber)
-        .await?
-        .ok_or(ApiError::NoPhoneNumberForVault)?;
-    let phone_country = uvw
-        .get_decrypted_field(&state, DataKind::PhoneCountry)
-        .await?
-        .ok_or(ApiError::NoPhoneNumberForVault)?;
+    let (phone_number, phone_country) = uvw.get_decrypted_primary_phone(&state).await?;
     let validated_phone_number =
         ValidatedPhoneNumber::__build_from_vault(phone_number.clone(), phone_country.clone())?;
 

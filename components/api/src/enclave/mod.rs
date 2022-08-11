@@ -31,16 +31,30 @@ pub async fn decrypt_bytes(
     sealed_key: &EncryptedVaultPrivateKey,
     transform: DataTransform,
 ) -> Result<PiiString, ApiError> {
-    let sealed_data = EciesP256Sha256AesGcmSealed::from_bytes(sealed_data.as_ref())?;
-    let requests = vec![DecryptRequest {
-        sealed_data,
-        transform,
-    }];
-    let results = decrypt(state, requests, sealed_key).await?;
-    results
+    decrypt_bytes_batch(state, vec![sealed_data], sealed_key, transform)
+        .await?
         .into_iter()
         .next()
         .ok_or_else(|| EnclaveError::InvalidEnclaveDecryptResponse.into())
+}
+
+pub async fn decrypt_bytes_batch(
+    state: &actix_web::web::Data<State>,
+    sealed_data: Vec<&SealedVaultBytes>,
+    sealed_key: &EncryptedVaultPrivateKey,
+    transform: DataTransform,
+) -> Result<Vec<PiiString>, ApiError> {
+    let requests = sealed_data
+        .into_iter()
+        .map(|d| {
+            Ok(DecryptRequest {
+                sealed_data: EciesP256Sha256AesGcmSealed::from_bytes(d.as_ref())?,
+                transform,
+            })
+        })
+        .collect::<Result<Vec<DecryptRequest>, crypto::Error>>()?;
+    let results = decrypt(state, requests, sealed_key).await?;
+    Ok(results)
 }
 
 pub async fn decrypt(

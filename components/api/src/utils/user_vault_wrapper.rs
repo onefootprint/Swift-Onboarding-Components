@@ -1,3 +1,4 @@
+use enclave_proxy::DataTransform;
 use std::collections::HashMap;
 use std::marker::PhantomData;
 use strum::IntoEnumIterator;
@@ -81,33 +82,35 @@ impl UserVaultWrapper {
         }
     }
 
-    pub fn get_populated_fields(&self) -> Vec<DataKind> {
-        DataKind::iter()
-            .filter_map(|k| self.get_e_field(k).map(|_| k))
-            .collect()
+    pub fn has_field(&self, data_kind: DataKind) -> bool {
+        self.get_e_field(data_kind).is_some()
     }
 
-    pub async fn get_decrypted_field(
+    pub fn get_populated_fields(&self) -> Vec<DataKind> {
+        DataKind::iter().filter(|k| self.has_field(*k)).collect()
+    }
+
+    pub async fn get_decrypted_primary_phone(
         &self,
         state: &web::Data<State>,
-        data_kind: DataKind,
-    ) -> Result<Option<PiiString>, ApiError> {
-        // TODO standardize this to use one decrypt util
-        let e_data = if let Some(e_field) = self.get_e_field(data_kind) {
-            e_field
-        } else {
-            return Ok(None);
-        };
+    ) -> Result<(PiiString, PiiString), ApiError> {
+        let number = self
+            .phone_numbers
+            .iter()
+            .find(|x| x.priority == DataPriority::Primary)
+            .ok_or(ApiError::NoPhoneNumberForVault)?;
 
-        let decrypted_data = crate::enclave::decrypt_bytes(
+        let decrypt_response = crate::enclave::decrypt_bytes_batch(
             state,
-            e_data,
+            vec![&number.e_e164, &number.e_country],
             &self.user_vault.e_private_key,
-            enclave_proxy::DataTransform::Identity,
+            DataTransform::Identity,
         )
         .await?;
+        let e164 = decrypt_response.get(0).ok_or(ApiError::NotImplemented)?.clone();
+        let country = decrypt_response.get(1).ok_or(ApiError::NotImplemented)?.clone();
 
-        Ok(Some(decrypted_data))
+        Ok((e164, country))
     }
 
     pub fn missing_fields(&self, ob_config: &ObConfiguration) -> Vec<DataKind> {
@@ -116,7 +119,7 @@ impl UserVaultWrapper {
             .iter()
             .cloned()
             .filter(|data_kind| data_kind.is_required())
-            .filter(|data_kind| self.get_e_field(*data_kind).is_none())
+            .filter(|data_kind| !self.has_field(*data_kind))
             .collect()
     }
 
@@ -127,7 +130,7 @@ impl UserVaultWrapper {
     ) -> Result<(), ApiError> {
         // Don't allow updating any data that is already set
         // Right now, this also only allows setting new data and doesn't allow updating data
-        if let Some(kind) = new_data.keys().find(|k| self.get_e_field(**k).is_some()) {
+        if let Some(kind) = new_data.keys().find(|k| self.has_field(**k)) {
             return Err(UserError::DataAlreadyPopulated(*kind).into());
         }
 

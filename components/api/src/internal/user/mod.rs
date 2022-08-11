@@ -1,7 +1,6 @@
 use crate::{auth::AuthError, errors::ApiError, utils::user_vault_wrapper::UserVaultWrapper, State};
-use crypto::seal::EciesP256Sha256AesGcmSealed;
 use db::models::{ob_configurations::ObConfiguration, user_vaults::UserVault};
-use enclave_proxy::{DataTransform, DecryptRequest};
+use enclave_proxy::DataTransform;
 use newtypes::{DataKind, PiiString, ScopedUserId, SealedVaultBytes};
 use paperclip::actix::web;
 use std::collections::{HashMap, HashSet};
@@ -57,22 +56,15 @@ pub async fn decrypt(
 
     // Filter out fields that don't have values set on the user vault
     let uvw = UserVaultWrapper::from(&state.db_pool, user_vault).await?;
-    let (fields_to_decrypt, values_to_decrypt): (Vec<DataKind>, Vec<&SealedVaultBytes>) = data_kinds
+    let (fields_to_decrypt, e_datas): (Vec<DataKind>, Vec<&SealedVaultBytes>) = data_kinds
         .iter()
         .filter_map(|kind| uvw.get_e_field(*kind).map(|data| (kind, data)))
         .unzip();
 
     // Actually decrypt the fields
-    let requests = values_to_decrypt
-        .into_iter()
-        .map(|sealed_data| {
-            Ok(DecryptRequest {
-                sealed_data: EciesP256Sha256AesGcmSealed::from_bytes(sealed_data.as_ref())?,
-                transform: DataTransform::Identity,
-            })
-        })
-        .collect::<Result<Vec<DecryptRequest>, crypto::Error>>()?;
-    let decrypt_response = crate::enclave::decrypt(state, requests, &uvw.user_vault.e_private_key).await?;
+    let e_private_key = &uvw.user_vault.e_private_key;
+    let decrypt_response =
+        crate::enclave::decrypt_bytes_batch(state, e_datas, e_private_key, DataTransform::Identity).await?;
     let decrypted_data: HashMap<DataKind, PiiString> = decrypt_response
         .into_iter()
         .enumerate()
