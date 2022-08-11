@@ -1,11 +1,7 @@
 import json
 import os
-import re
 import pytest
 from twilio.rest import Client
-from .auth import (
-    OnboardingAuth,
-)
 from .constants import (
     TWILIO_ACCOUNT_SID,
     TWILIO_API_KEY,
@@ -13,11 +9,9 @@ from .constants import (
 )
 from .types import User
 from .utils import (
-    _gen_random_ssn,
     _override_webauthn_attestation,
     _override_webauthn_challenge,
-    _random_sandbox_info,
-    try_until_success,
+    build_user_data,
     post,
     create_tenant,
     create_basic_user,
@@ -100,34 +94,12 @@ def user(workos_sandbox_tenant, twilio):
     Create a user with registered data and webuathn creds and onboard them onto the workos_sandbox_tenant
     """
     basic_user = create_basic_user(twilio)
-    ssn = _gen_random_ssn()
+    user_data = build_user_data()
 
     # Initialize the onboarding
     post("internal/onboarding", None, workos_sandbox_tenant.ob_config.key, basic_user.auth_token)
 
     # Populate the user's data
-    user_data = {
-        "name": {
-            "first_name": "Sandbox",
-            "last_name": "User",
-        },
-        "dob": {
-            "month": 12,
-            "day": 25,
-            "year": 1995,
-        },
-        "address": {
-            "address": {
-                "street_address": "1 Footprint Way",
-                "street_address_2": "PO Box Wallaby Way",
-            },
-            "city": "Enclave",
-            "state": "NY",
-            "zip": "10009",
-            "country": "US",
-        },
-        "ssn": ssn,
-    } 
     post("internal/user/data", user_data, basic_user.auth_token)
 
     # Register the biometric credential
@@ -155,7 +127,7 @@ def user(workos_sandbox_tenant, twilio):
         street_address=user_data["address"]["address"]["street_address"],
         zip=user_data["address"]["zip"],
         country=user_data["address"]["country"],
-        ssn=ssn,
+        ssn=user_data["ssn"],
         phone_number=basic_user.phone_number,
         real_phone_number=basic_user.real_phone_number,
         email=basic_user.email,

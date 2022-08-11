@@ -16,6 +16,7 @@ use db::models::webauthn_credential::WebauthnCredential;
 use db::PgConnection;
 use itertools::Itertools;
 use newtypes::TenantId;
+use newtypes::ValidatedPhoneNumber;
 use newtypes::{AuditTrailEvent, DataKind, SessionAuthToken, Status, Vendor, VerificationInfo};
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 
@@ -46,6 +47,13 @@ fn handler(
         return Err(OnboardingError::UserMissingRequiredFields(missing_fields.iter().join(", ")).into());
     }
 
+    let decrypted_phone = if !uvw.user_vault.is_live {
+        let phone_number = uvw.get_decrypted_primary_phone(&state).await?;
+        Some(phone_number)
+    } else {
+        None
+    };
+
     let tenant_id = tenant_auth.tenant.id.clone();
     let session_key = state.session_sealing_key.clone();
     let (validation_token, webauthn_creds) = state
@@ -65,7 +73,7 @@ fn handler(
                 insight_event,
             )?;
             let ob_id = ob.id.clone();
-            initiate_verification(conn, ob, &uvw, &tenant_id)?;
+            initiate_verification(conn, ob, &uvw, &tenant_id, decrypted_phone)?;
             let validation_token = super::create_onboarding_validation_token(conn, &session_key, ob_id)?;
             let webauthn_creds = WebauthnCredential::get_for_user_vault(conn, &uvw.user_vault.id)?;
             Ok((validation_token, webauthn_creds))
@@ -84,10 +92,26 @@ fn initiate_verification(
     ob: Onboarding,
     uvw: &UserVaultWrapper,
     tenant_id: &TenantId,
+    decrypted_phone: Option<ValidatedPhoneNumber>,
 ) -> Result<(), ApiError> {
     if ob.status == Status::Verified {
         return Ok(());
     }
+
+    let desired_status = if let Some(decrypted_phone) = decrypted_phone {
+        // This is a sandbox user vault. Check for pre-set validation cases
+        if decrypted_phone.suffix.starts_with("fail") {
+            Status::Failed
+        } else if decrypted_phone.suffix.starts_with("manualreview") {
+            Status::ManualReview
+        } else {
+            Status::Verified
+        }
+    } else {
+        Status::Verified
+    };
+    ob.update_status(conn, desired_status)?;
+
     // Just create some fixture events for now
     // Don't make duplicate fixture events if the user onboards multiple times since it
     // isn't very self-explanatory for the demo
@@ -128,6 +152,5 @@ fn initiate_verification(
         )
     })?;
     // TODO don't mark as verified until data verification with vendors is complete
-    ob.update_status(conn, Status::Verified)?;
     Ok(())
 }

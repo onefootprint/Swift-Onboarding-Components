@@ -75,8 +75,8 @@ def try_until_success(fn, timeout_s=5, retry_interval_s=1):
         raise last_exception
 
 
-def create_basic_user(twilio):
-    sandbox_phone_number, sandbox_email = _random_sandbox_info()
+def create_basic_user(twilio, suffix=None):
+    sandbox_phone_number, sandbox_email = _random_sandbox_info(suffix)
     phone_number = sandbox_phone_number.split("#")[0]
 
     # Initiate the challenge to a sandbox phone number
@@ -131,6 +131,32 @@ def create_tenant(org_data, ob_conf_data):
     )
 
 
+def build_user_data():
+    ssn = _gen_random_ssn()
+    user_data = {
+        "name": {
+            "first_name": "Sandbox",
+            "last_name": "User",
+        },
+        "dob": {
+            "month": 12,
+            "day": 25,
+            "year": 1995,
+        },
+        "address": {
+            "address": {
+                "street_address": "1 Footprint Way",
+                "street_address_2": "PO Box Wallaby Way",
+            },
+            "city": "Enclave",
+            "state": "NY",
+            "zip": "10009",
+            "country": "US",
+        },
+        "ssn": ssn,
+    } 
+    return user_data
+
 
 def clean_up_user(phone_number, email):
     # cleanup live user
@@ -145,9 +171,10 @@ def clean_up_user(phone_number, email):
 def _gen_random_n_digit_number(n):
     return "".join([str(random.randint(0, 9)) for _ in range(n)])
 
-def _random_sandbox_info():
+def _random_sandbox_info(suffix=None):
+    suffix = suffix or "sandbox"
     seed = _gen_random_n_digit_number(10)
-    return (f"{PHONE_NUMBER}#sandbox{seed}", f"{EMAIL}#sandbox{seed}")
+    return (f"{PHONE_NUMBER}#{suffix}{seed}", f"{EMAIL}#{suffix}{seed}")
 
 def _gen_random_ssn():
     return _gen_random_n_digit_number(9)

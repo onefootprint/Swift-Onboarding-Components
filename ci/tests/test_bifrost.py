@@ -5,7 +5,7 @@ import pytest
 
 from tests.auth import D2pAuth, OnboardingAuth
 from tests.constants import EMAIL, PHONE_NUMBER
-from tests.utils import _b64_decode, _b64_encode, _gen_random_ssn, try_until_success, _override_webauthn_attestation, _override_webauthn_challenge, get, post, create_tenant, clean_up_user
+from tests.utils import _b64_decode, _b64_encode, _gen_random_ssn, try_until_success, _override_webauthn_attestation, _override_webauthn_challenge, get, post, create_tenant, clean_up_user, create_basic_user, build_user_data
 from tests.webauthn_simulator import SoftWebauthnDevice
 
 
@@ -297,3 +297,26 @@ class TestBifrost:
         assert foo_fp_user_id != bar_fp_user_id, (
             "Onboarding onto different tenants should give different fp_user_id"
         )
+
+
+class TestBifrostSandbox:
+    @pytest.mark.parametrize(
+        "suffix,expected_status",
+        [
+            ("fail", "failed"),
+            ("manualreview", "manual_review"),
+        ]
+    )
+    def test_deterministic_onboarding(self, twilio, workos_sandbox_tenant, suffix, expected_status):
+        basic_user = create_basic_user(twilio, suffix)
+        user_data = build_user_data()
+
+        # Initialize the onboarding, poopulate data, complete the onboarding
+        post("internal/onboarding", None, workos_sandbox_tenant.ob_config.key, basic_user.auth_token)
+        post("internal/user/data", user_data, basic_user.auth_token)
+        body = post("internal/onboarding/complete", None, workos_sandbox_tenant.ob_config.key, basic_user.auth_token)
+        validation_token = body["data"]["validation_token"]
+
+        # Get the status
+        body = post("users/validate", dict(validation_token=validation_token), workos_sandbox_tenant.sk.key)
+        assert body["data"]["status"] == expected_status
