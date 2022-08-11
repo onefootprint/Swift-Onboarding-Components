@@ -2,7 +2,7 @@ import React from 'react';
 import { User } from 'src/pages/users/hooks/use-join-users';
 import { DataKind, statusToBadgeVariant, statusToDisplayText } from 'src/types';
 import styled, { css } from 'styled-components';
-import { Badge, Code, Typography } from 'ui';
+import { Badge, CodeInline, Typography } from 'ui';
 
 import DecryptDialog from '../decrypt-dialog';
 
@@ -38,7 +38,7 @@ const UserHeader = ({ user, onDecrypt }: BasicInfoProps) => {
           <Typography variant="body-3" color="tertiary">
             ·
           </Typography>
-          <Code>{footprintUserId}</Code>
+          <CodeInline>{footprintUserId}</CodeInline>
         </RowContainer>
         <DecryptDialog user={user} onDecrypt={onDecrypt} />
       </SplitRow>

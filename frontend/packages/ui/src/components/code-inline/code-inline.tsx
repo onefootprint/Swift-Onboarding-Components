@@ -4,7 +4,7 @@ import styled, { css } from 'styled-components';
 import { createFontStyles } from '../../utils/mixins';
 import Tooltip from '../tooltip';
 
-export type CodeProps = {
+export type CodeInlineProps = {
   buttonAriaLabel?: string;
   children: string;
   testID?: string;
@@ -16,13 +16,13 @@ const HIDE_TIMEOUT = 600;
 
 let confirmationTimeout: null | NodeJS.Timeout = null;
 
-const Code = ({
+const CodeInline = ({
   buttonAriaLabel = 'Copy to clipboard',
   children,
   testID,
   tooltipText = 'Copy to clipboard',
   tooltipTextConfirmation = 'Copied!',
-}: CodeProps) => {
+}: CodeInlineProps) => {
   const [shouldShowConfirmation, setShowConfirmation] = useState(false);
 
   useEffect(
@@ -94,4 +94,4 @@ const CodeContent = styled.code`
   `}
 `;
 
-export default Code;
+export default CodeInline;

@@ -7,42 +7,42 @@ import {
 } from 'test-utils';
 
 import ToastProvider from '../toast/toast-provider';
-import Code, { CodeProps } from './code';
+import CodeInline, { CodeInlineProps } from './code-inline';
 
-describe('<Code />', () => {
-  const renderCode = ({
+describe('<CodeInline />', () => {
+  const renderCodeInline = ({
     buttonAriaLabel = 'Copy to clipboard',
     children = 'fp_xm7T6MqhfRBkxL0DPOpfwM4',
     testID,
     tooltipText = 'Copy to clipboard',
     tooltipTextConfirmation = 'Copied!',
-  }: Partial<CodeProps>) =>
+  }: Partial<CodeInlineProps>) =>
     customRender(
       <ToastProvider>
-        <Code
+        <CodeInline
           buttonAriaLabel={buttonAriaLabel}
           testID={testID}
           tooltipText={tooltipText}
           tooltipTextConfirmation={tooltipTextConfirmation}
         >
           {children}
-        </Code>
+        </CodeInline>
       </ToastProvider>,
     );
 
   it('should assign a testID', () => {
-    renderCode({ testID: 'code-test-id' });
+    renderCodeInline({ testID: 'code-test-id' });
     expect(screen.getByTestId('code-test-id')).toBeInTheDocument();
   });
 
   it('should show the text', () => {
-    renderCode({ children: 'fp_xm7T6MqhfRBkxL0DPOpfwM4' });
+    renderCodeInline({ children: 'fp_xm7T6MqhfRBkxL0DPOpfwM4' });
     expect(screen.getByText('fp_xm7T6MqhfRBkxL0DPOpfwM4')).toBeInTheDocument();
   });
 
   describe('when hovering the button', () => {
     it('should show a tooltip', async () => {
-      renderCode({
+      renderCodeInline({
         tooltipText: 'Copy to clipboard',
         buttonAriaLabel: 'Copy',
       });
@@ -58,7 +58,7 @@ describe('<Code />', () => {
   describe('when clicking on the button', () => {
     it('should copy the text to the clipboard and show a confirmation', async () => {
       const { writeTestMockFn } = createClipboardSpy();
-      renderCode({
+      renderCodeInline({
         children: 'fp_xm7T6MqhfRBkxL0DPOpfwM4',
         tooltipText: 'Copy to clipboard',
         tooltipTextConfirmation: 'Copied!',

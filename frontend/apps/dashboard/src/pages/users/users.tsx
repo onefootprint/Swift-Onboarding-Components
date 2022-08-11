@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { statusToBadgeVariant, statusToDisplayText } from 'src/types';
 import styled, { css } from 'styled-components';
 import type { TableRow } from 'ui';
-import { Badge, Code, SearchInput, Table, Typography } from 'ui';
+import { Badge, CodeInline, SearchInput, Table, Typography } from 'ui';
 
 import FieldOrPlaceholder from './components/field-or-placeholder';
 import UsersFilter from './components/filter-dialog';
@@ -82,7 +82,7 @@ const Users = () => {
             </td>
             <td>
               <CodeContainer>
-                <Code>{item.footprintUserId}</Code>
+                <CodeInline>{item.footprintUserId}</CodeInline>
               </CodeContainer>
             </td>
             <td>

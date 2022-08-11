@@ -1,7 +1,7 @@
 import React from 'react';
 import EncryptedCell from 'src/components/encrypted-cell';
 import styled from 'styled-components';
-import { Code, Shimmer } from 'ui';
+import { CodeInline, Shimmer } from 'ui';
 
 type KeyCellProps = {
   isLoading: boolean;
@@ -19,7 +19,7 @@ const KeyCell = ({ value, isLoading }: KeyCellProps) => {
 
   return value ? (
     <CodeContainer>
-      <Code>{value}</Code>
+      <CodeInline>{value}</CodeInline>
     </CodeContainer>
   ) : (
     <EncryptedCell />

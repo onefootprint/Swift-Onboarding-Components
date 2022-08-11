@@ -3,7 +3,7 @@ import IcoPencil16 from 'icons/ico/ico-pencil-16';
 import React from 'react';
 import type { OnboardingConfig } from 'src/types/onboarding-config';
 import styled, { css } from 'styled-components';
-import { Badge, Code, IconButton, LinkButton, Tag, Typography } from 'ui';
+import { Badge, CodeInline, IconButton, LinkButton, Tag, Typography } from 'ui';
 
 import EditDialog from './components/edit-dialog';
 import useUpdateOnboardingConfig from './hooks/use-update-onboarding-config';
@@ -107,7 +107,7 @@ const ListItem = ({ data }: ListItemProps) => {
               </Typography>
             </td>
             <td>
-              <Code>{data.key}</Code>
+              <CodeInline>{data.key}</CodeInline>
             </td>
             <td />
           </tr>

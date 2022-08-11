@@ -1,11 +1,11 @@
 import { Meta, Story } from '@storybook/react';
 import React from 'react';
 
-import Code, { CodeProps } from './code';
+import CodeInline, { CodeInlineProps } from './code-inline';
 
 export default {
-  component: Code,
-  title: 'Components/Code',
+  component: CodeInline,
+  title: 'Components/CodeInline',
   argTypes: {
     buttonAriaLabel: {
       control: 'text',
@@ -40,21 +40,21 @@ export default {
   },
 } as Meta;
 
-const Template: Story<CodeProps> = ({
+const Template: Story<CodeInlineProps> = ({
   buttonAriaLabel,
   children,
   testID,
   tooltipText,
   tooltipTextConfirmation,
-}: CodeProps) => (
-  <Code
+}: CodeInlineProps) => (
+  <CodeInline
     buttonAriaLabel={buttonAriaLabel}
     testID={testID}
     tooltipText={tooltipText}
     tooltipTextConfirmation={tooltipTextConfirmation}
   >
     {children}
-  </Code>
+  </CodeInline>
 );
 
 export const Base = Template.bind({});

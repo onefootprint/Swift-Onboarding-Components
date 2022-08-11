@@ -2,7 +2,7 @@ import React from 'react';
 import { AccessEvent, getRegionForInsightEvent } from 'src/types';
 import { displayForUserAgent } from 'src/utils/user-agent';
 import styled, { css } from 'styled-components';
-import { Box, Code, Typography } from 'ui';
+import { Box, CodeInline, Typography } from 'ui';
 
 type SecurityLogBodyProps = {
   accessEvent: AccessEvent;
@@ -17,7 +17,7 @@ const SecurityLogBody = ({ accessEvent }: SecurityLogBodyProps) => (
           Footprint token
         </Typography>
         <CodeContainer>
-          <Code>{accessEvent.fpUserId}</Code>
+          <CodeInline>{accessEvent.fpUserId}</CodeInline>
         </CodeContainer>
       </DataGrid>
     </div>
