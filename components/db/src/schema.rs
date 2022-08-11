@@ -260,26 +260,6 @@ table! {
     use diesel::sql_types::*;
     use newtypes::db_types::*;
 
-    user_data (id) {
-        id -> Text,
-        user_vault_id -> Text,
-        data_kind -> Text,
-        data_group_id -> Uuid,
-        data_group_kind -> Text,
-        data_group_priority -> Text,
-        e_data -> Bytea,
-        sh_data -> Nullable<Bytea>,
-        is_verified -> Bool,
-        deactivated_at -> Nullable<Timestamptz>,
-        _created_at -> Timestamptz,
-        _updated_at -> Timestamptz,
-    }
-}
-
-table! {
-    use diesel::sql_types::*;
-    use newtypes::db_types::*;
-
     user_vaults (id) {
         id -> Text,
         e_private_key -> Bytea,
@@ -365,9 +345,7 @@ joinable!(scoped_users -> user_vaults (user_vault_id));
 joinable!(tenant_api_key_access_logs -> tenant_api_keys (tenant_api_key_id));
 joinable!(tenant_api_keys -> tenants (tenant_id));
 joinable!(user_basic_info -> user_vaults (user_vault_id));
-joinable!(user_data -> user_vaults (user_vault_id));
 joinable!(verification_requests -> scoped_users (scoped_user_id));
-joinable!(verification_requests_user_data -> user_data (user_data_id));
 joinable!(verification_requests_user_data -> verification_requests (request_id));
 joinable!(verification_results -> verification_requests (request_id));
 joinable!(webauthn_credentials -> insight_events (insight_event_id));
@@ -389,7 +367,6 @@ allow_tables_to_appear_in_same_query!(
     tenant_api_keys,
     tenants,
     user_basic_info,
-    user_data,
     user_vaults,
     verification_requests,
     verification_requests_user_data,
