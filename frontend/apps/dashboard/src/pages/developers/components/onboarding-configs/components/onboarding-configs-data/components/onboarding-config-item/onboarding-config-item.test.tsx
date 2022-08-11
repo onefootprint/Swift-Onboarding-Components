@@ -5,14 +5,15 @@ import {
   liveOnboardingKey,
   sandboxOnboardingConfig,
 } from './__fixtures__/onboarding-config';
-import type { ListItemProps } from './list-item';
-import ListItem from './list-item';
+import type { OnboardingConfigItemProps } from './onboarding-config-item';
+import ListItem from './onboarding-config-item';
 
-describe('<ListItem />', () => {
+describe('<OnboardingConfigItem />', () => {
   describe('when in sandbox', () => {
     const renderSandboxListItem = ({
       data = sandboxOnboardingConfig,
-    }: Partial<ListItemProps>) => customRender(<ListItem data={data} />);
+    }: Partial<OnboardingConfigItemProps>) =>
+      customRender(<ListItem data={data} />);
 
     it('should show a link button "Test onboarding configuration"', () => {
       renderSandboxListItem({});
@@ -32,7 +33,8 @@ describe('<ListItem />', () => {
   describe('when in live', () => {
     const renderLiveListItem = ({
       data = liveOnboardingKey,
-    }: Partial<ListItemProps>) => customRender(<ListItem data={data} />);
+    }: Partial<OnboardingConfigItemProps>) =>
+      customRender(<ListItem data={data} />);
 
     it('should NOT show the button "Test onboarding configuration"', () => {
       renderLiveListItem({});

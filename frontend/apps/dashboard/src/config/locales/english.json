@@ -111,6 +111,7 @@
           "no-results": "You haven't created any onboarding configurations just yet."
         },
         "list-item": {
+          "loading": "Loading onboarding configs",
           "created-at": "Created on {{date}}",
           "edit": "Edit onboarding config",
           "toggle-status": {

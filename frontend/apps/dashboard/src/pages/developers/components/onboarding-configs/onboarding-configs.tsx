@@ -1,15 +1,20 @@
 import { useToggle, useTranslation } from 'hooks';
 import React from 'react';
-import styled, { css } from 'styled-components';
+import { getErrorMessage } from 'request';
+import styled from 'styled-components';
 import { Box, Button, Divider, Typography } from 'ui';
 
-import CreateDialog from './components/create-dialog';
-import List from './components/list';
+import CreateDialog from './components/create-onboarding-config';
+import OnboardingConfigsData from './components/onboarding-configs-data';
+import OnboardingConfigsError from './components/onboarding-configs-error';
+import OnboardingConfigsLoading from './components/onboarding-configs-loading';
+import useOnboardingConfigs from './hooks/use-onboarding-configs';
 
-const OnboardingConfigurations = () => {
+const OnboardingConfis = () => {
   const [isCreateDialogOpen, openCreateDialog, closeCreateDialog] =
     useToggle(false);
   const { t } = useTranslation('pages.developers.onboarding-configs');
+  const { data, error, isLoading } = useOnboardingConfigs();
 
   return (
     <section data-testid="onboarding-configs-section">
@@ -24,8 +29,12 @@ const OnboardingConfigurations = () => {
           {t('header.cta')}
         </Button>
       </Header>
-      <StyledDivider />
-      <List />
+      <Box sx={{ margin: 7 }}>
+        <Divider />
+      </Box>
+      {data && <OnboardingConfigsData data={data} />}
+      {isLoading && <OnboardingConfigsLoading />}
+      {error && <OnboardingConfigsError message={getErrorMessage(error)} />}
       <CreateDialog open={isCreateDialogOpen} onClose={closeCreateDialog} />
     </section>
   );
@@ -37,10 +46,4 @@ const Header = styled.header`
   justify-content: space-between;
 `;
 
-const StyledDivider = styled(Divider)`
-  ${({ theme }) => css`
-    margin: ${theme.spacing[7]}px 0;
-  `}
-`;
-
-export default OnboardingConfigurations;
+export default OnboardingConfis;

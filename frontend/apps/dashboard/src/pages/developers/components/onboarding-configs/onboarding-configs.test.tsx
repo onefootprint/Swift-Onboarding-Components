@@ -1,10 +1,18 @@
 import React from 'react';
-import { customRender, screen, userEvent, waitFor, within } from 'test-utils';
+import {
+  customRender,
+  screen,
+  userEvent,
+  waitFor,
+  waitForElementToBeRemoved,
+  within,
+} from 'test-utils';
 
 import OnboardingConfigs from './onboarding-configs';
 import {
   onboardingConfig,
   withOnboardingConfigs,
+  withOnboardingConfigsError,
   withUpdateOnboardingConfigs,
   withUpdateOnboardingConfigsError,
 } from './onboarding-configs.test.config';
@@ -15,41 +23,82 @@ describe('<OnboardingConfigs />', () => {
   };
 
   describe('list the api keys', () => {
-    describe('when listing the onboarding configs with success', () => {
+    describe('when the request fails', () => {
       beforeEach(() => {
-        withOnboardingConfigs();
+        withOnboardingConfigsError();
       });
 
-      it('should show the data', async () => {
+      it('should show an error message', async () => {
         renderOnboardingConfigs();
-        const item = await screen.findByTestId(
-          `onboarding-config-${onboardingConfig.id}`,
-        );
-        const name = within(item).getByText(onboardingConfig.name);
-        expect(name).toBeInTheDocument();
-        const createdAt = within(item).getByText('7/20/22, 1:52 AM', {
-          exact: false,
+
+        const loadingIndicator = await screen.findByRole('progressbar');
+        await waitForElementToBeRemoved(loadingIndicator);
+
+        await waitFor(() => {
+          const errorMessage = screen.getByText('Something went wrong');
+          expect(errorMessage).toBeInTheDocument();
         });
-        expect(createdAt).toBeInTheDocument();
-        const mustCollectList = within(item).getByTestId(
-          `must-collect-data-kinds-${onboardingConfig.id}`,
-        );
-        expect(
-          within(mustCollectList).getByText('First name'),
-        ).toBeInTheDocument();
-        expect(
-          within(mustCollectList).getByText('Last name'),
-        ).toBeInTheDocument();
-        const canAccessList = within(item).getByTestId(
-          `can-access-data-kinds-${onboardingConfig.id}`,
-        );
-        expect(
-          within(canAccessList).getByText('Date of birth'),
-        ).toBeInTheDocument();
-        const onboardingKey = within(item).getByText(onboardingConfig.key);
-        expect(onboardingKey).toBeInTheDocument();
-        const status = within(item).getByText('Enabled', { exact: false });
-        expect(status).toBeInTheDocument();
+      });
+    });
+
+    describe('when the request succeeds', () => {
+      describe('when no data is returned', () => {
+        beforeEach(() => {
+          withOnboardingConfigs([]);
+        });
+
+        it('should show an empty message', async () => {
+          renderOnboardingConfigs();
+
+          const loadingIndicator = await screen.findByRole('progressbar');
+          await waitForElementToBeRemoved(loadingIndicator);
+
+          await waitFor(() => {
+            const emptyMessage = screen.getByText(
+              "You haven't created any onboarding configurations just yet.",
+            );
+            expect(emptyMessage).toBeInTheDocument();
+          });
+        });
+      });
+
+      describe('when some data is returned', () => {
+        beforeEach(() => {
+          withOnboardingConfigs();
+        });
+
+        it('should show the data', async () => {
+          renderOnboardingConfigs();
+
+          const item = await screen.findByTestId(
+            `onboarding-config-${onboardingConfig.id}`,
+          );
+          const name = within(item).getByText(onboardingConfig.name);
+          expect(name).toBeInTheDocument();
+          const createdAt = within(item).getByText('7/20/22, 1:52 AM', {
+            exact: false,
+          });
+          expect(createdAt).toBeInTheDocument();
+          const mustCollectList = within(item).getByTestId(
+            `must-collect-data-kinds-${onboardingConfig.id}`,
+          );
+          expect(
+            within(mustCollectList).getByText('First name'),
+          ).toBeInTheDocument();
+          expect(
+            within(mustCollectList).getByText('Last name'),
+          ).toBeInTheDocument();
+          const canAccessList = within(item).getByTestId(
+            `can-access-data-kinds-${onboardingConfig.id}`,
+          );
+          expect(
+            within(canAccessList).getByText('Date of birth'),
+          ).toBeInTheDocument();
+          const onboardingKey = within(item).getByText(onboardingConfig.key);
+          expect(onboardingKey).toBeInTheDocument();
+          const status = within(item).getByText('Enabled', { exact: false });
+          expect(status).toBeInTheDocument();
+        });
       });
     });
   });
@@ -59,7 +108,7 @@ describe('<OnboardingConfigs />', () => {
       withOnboardingConfigs();
     });
 
-    describe('when updating with error', () => {
+    describe('when the request fails', () => {
       beforeEach(() => {
         withUpdateOnboardingConfigsError(onboardingConfig);
       });
@@ -94,7 +143,7 @@ describe('<OnboardingConfigs />', () => {
       });
     });
 
-    describe('when updating with success', () => {
+    describe('when the request succeeds', () => {
       beforeEach(() => {
         withUpdateOnboardingConfigs({
           prevData: onboardingConfig,
@@ -128,7 +177,7 @@ describe('<OnboardingConfigs />', () => {
       withOnboardingConfigs();
     });
 
-    describe('when updating with error', () => {
+    describe('when the request fails', () => {
       beforeEach(() => {
         withUpdateOnboardingConfigsError(onboardingConfig);
       });
@@ -175,7 +224,7 @@ describe('<OnboardingConfigs />', () => {
       });
     });
 
-    describe('when updating with success', () => {
+    describe('when the request succeeds', () => {
       beforeEach(() => {
         withUpdateOnboardingConfigs({
           prevData: onboardingConfig,

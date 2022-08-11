@@ -7,14 +7,15 @@ import type { OnboardingConfig } from 'src/types/onboarding-config';
 import styled, { css } from 'styled-components';
 import { Badge, CodeInline, IconButton, LinkButton, Tag, Typography } from 'ui';
 
+import Table from '../../../table';
 import EditDialog from './components/edit-dialog';
 import useUpdateOnboardingConfig from './hooks/use-update-onboarding-config';
 
-export type ListItemProps = {
+export type OnboardingConfigItemProps = {
   data: OnboardingConfig;
 };
 
-const ListItem = ({ data }: ListItemProps) => {
+const OnboardingConfigItem = ({ data }: OnboardingConfigItemProps) => {
   const { t, allT } = useTranslation(
     'pages.developers.onboarding-configs.list-item',
   );
@@ -149,49 +150,6 @@ const ListItem = ({ data }: ListItemProps) => {
   );
 };
 
-const Table = styled.table`
-  ${({ theme }) => css`
-    border-collapse: collapse;
-    border-radius: ${theme.borderRadius[2]}px;
-    border-style: hidden;
-    box-shadow: 0 0 0 1px ${theme.borderColor.tertiary};
-    width: 100%;
-
-    thead {
-      tr {
-        background: ${theme.backgroundColor.secondary};
-      }
-
-      th {
-        padding: ${theme.spacing[5]}px ${theme.spacing[6]}px;
-        vertical-align: middle;
-
-        &:first-child {
-          text-align: left;
-        }
-
-        &:last-child {
-          text-align: right;
-        }
-      }
-    }
-
-    tbody {
-      td {
-        padding: ${theme.spacing[4]}px ${theme.spacing[6]}px;
-
-        &:last-child {
-          text-align: right;
-        }
-      }
-    }
-
-    tr {
-      border-bottom: 1pt solid ${theme.borderColor.tertiary};
-    }
-  `}
-`;
-
 const Name = styled.div`
   ${({ theme }) => css`
     align-items: center;
@@ -208,4 +166,4 @@ const TagList = styled.div`
   `}
 `;
 
-export default ListItem;
+export default OnboardingConfigItem;

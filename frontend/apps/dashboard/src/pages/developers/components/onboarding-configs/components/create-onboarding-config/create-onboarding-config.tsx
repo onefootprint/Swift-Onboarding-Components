@@ -13,12 +13,15 @@ import type { AccessFormData, CollectFormData, NameFormData } from './types';
 import getSelectedDataKinds from './utils/get-selected-data-kinds';
 import transformDataKindFormToArray from './utils/transform-data-kind-form-to-array';
 
-export type CreateDialogProps = {
+export type CreateOnboardingConfigProps = {
   open: boolean;
   onClose: () => void;
 };
 
-const CreateDialog = ({ open, onClose }: CreateDialogProps) => {
+const CreateOnboardingConfig = ({
+  open,
+  onClose,
+}: CreateOnboardingConfigProps) => {
   const [state, dispatch] = useCreateState();
   const mutation = useCreateOnboardingConfig();
   const confirmationDialog = useConfirmationDialog();
@@ -118,4 +121,4 @@ const CreateDialog = ({ open, onClose }: CreateDialogProps) => {
   );
 };
 
-export default CreateDialog;
+export default CreateOnboardingConfig;

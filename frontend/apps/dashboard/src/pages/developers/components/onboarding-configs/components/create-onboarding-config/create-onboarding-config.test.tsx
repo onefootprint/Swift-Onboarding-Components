@@ -1,8 +1,8 @@
 import React from 'react';
 import { customRender, screen, userEvent, waitFor, within } from 'test-utils';
 
-import type { CreateDialogProps } from './create-dialog';
-import CreateDialog from './create-dialog';
+import type { CreateOnboardingConfigProps } from './create-onboarding-config';
+import CreateDialog from './create-onboarding-config';
 
 describe('<CreateDialog />', () => {
   const defaultOptions = { open: true, onClose: jest.fn() };
@@ -10,7 +10,7 @@ describe('<CreateDialog />', () => {
   const renderCreateDialog = ({
     open = defaultOptions.open,
     onClose = defaultOptions.onClose,
-  }: Partial<CreateDialogProps> = defaultOptions) =>
+  }: Partial<CreateOnboardingConfigProps> = defaultOptions) =>
     customRender(<CreateDialog open={open} onClose={onClose} />);
 
   const renderCreateDialogOnTheCollectDataSection = async (

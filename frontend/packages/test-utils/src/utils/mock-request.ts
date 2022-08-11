@@ -8,7 +8,7 @@ beforeAll(() => server.listen());
 
 afterAll(() => server.close());
 
-afterEach(() => server.restoreHandlers());
+// afterEach(() => server.restoreHandlers());
 
 export const mockRequest = (requestParams: RequestParams) =>
   server.use(requestHelper(requestParams));

@@ -7,7 +7,7 @@ import { DataKinds } from 'src/types/data-kind';
 import styled, { css } from 'styled-components';
 import { Box, Checkbox, RadioInput, Typography } from 'ui';
 
-import DEFAULT_FORM_VALUES from '../../create-dialog.constants';
+import DEFAULT_FORM_VALUES from '../../create-onboarding-config.constants';
 import type { CollectFormData } from '../../types';
 import FormTitle from '../form-title';
 

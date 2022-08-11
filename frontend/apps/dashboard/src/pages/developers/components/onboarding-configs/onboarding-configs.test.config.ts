@@ -19,8 +19,21 @@ export const withOnboardingConfigs = (data = listOnboardingConfigsFixture) =>
   mockRequest({
     method: 'get',
     path: '/org/onboarding_configs',
+    delay: 50,
     response: {
       data,
+    },
+  });
+
+export const withOnboardingConfigsError = () =>
+  mockRequest({
+    method: 'get',
+    path: '/org/onboarding_configs',
+    statusCode: 400,
+    response: {
+      error: {
+        message: 'Something went wrong',
+      },
     },
   });
 

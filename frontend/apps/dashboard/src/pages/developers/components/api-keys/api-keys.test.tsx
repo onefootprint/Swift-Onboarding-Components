@@ -23,8 +23,8 @@ describe('<ApiKeys />', () => {
     customRender(<ApiKeys />);
   };
 
-  describe('list the api keys', () => {
-    describe('when listing the secret keys with error', () => {
+  describe('listing the api keys', () => {
+    describe('when the request fails', () => {
       beforeAll(() => {
         withApiKeysError();
       });
@@ -51,7 +51,7 @@ describe('<ApiKeys />', () => {
       });
     });
 
-    describe('when listing the secret keys with success', () => {
+    describe('when the request succeeds', () => {
       beforeAll(() => {
         withApiKeys();
       });
@@ -86,7 +86,7 @@ describe('<ApiKeys />', () => {
     });
   });
 
-  describe('create a new key', () => {
+  describe('creating a new key', () => {
     beforeAll(() => {
       withApiKeys();
     });
@@ -106,7 +106,7 @@ describe('<ApiKeys />', () => {
       });
     });
 
-    describe('when creating a new secret key with error', () => {
+    describe('when the request fails', () => {
       beforeEach(() => {
         withCreateApiKeysError();
       });
@@ -141,7 +141,7 @@ describe('<ApiKeys />', () => {
       });
     });
 
-    describe('when creating a new secret key with success', () => {
+    describe('when the request succeeds', () => {
       beforeEach(() => {
         withCreateApiKeys();
       });

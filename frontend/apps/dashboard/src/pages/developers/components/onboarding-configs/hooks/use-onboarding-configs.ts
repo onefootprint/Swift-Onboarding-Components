@@ -1,6 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
 import { useIntl } from 'hooks';
-import take from 'lodash/take';
 import request, { RequestError, RequestResponse } from 'request';
 import useSessionUser, { AuthHeaders } from 'src/hooks/use-session-user';
 import type { OnboardingConfig } from 'src/types/onboarding-config';
@@ -30,8 +29,7 @@ const useOnboardingConfigs = () => {
     () => getApiKeys({ authHeaders }),
     {
       select: response =>
-        // TODO: Remove take
-        take(response, 10).map((onboardingKey: OnboardingConfig) => ({
+        response.map((onboardingKey: OnboardingConfig) => ({
           ...onboardingKey,
           createdAt: formatDateWithTime(new Date(onboardingKey.createdAt)),
         })),
