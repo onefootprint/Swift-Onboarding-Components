@@ -39,7 +39,7 @@ CUSTODIAN_KEY = get_secret('CUSTODIAN_KEY') or "onefootprint"
 CUSTODIAN_AUTH = CustodianAuth(CUSTODIAN_KEY)
 
 FIELDS_TO_DECRYPT = [
-    ["last_name", "ssn"],
+    ["last_name", "ssn", "ssn9"],
     ["street_address"],
     ["first_name", "email", "zip", "country", "last_four_ssn"],
 ]

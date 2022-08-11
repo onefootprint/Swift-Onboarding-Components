@@ -20,11 +20,11 @@ impl Decomposable for Ssn {
             Ssn::Ssn(ssn) => {
                 let last_four = LastFourSsn::from(&ssn);
                 vec![
-                    (DataKind::LastFourSsn, PiiString::from(&last_four.0)),
-                    (DataKind::Ssn, PiiString::from(&ssn.0)),
+                    (DataKind::Ssn4, PiiString::from(&last_four.0)),
+                    (DataKind::Ssn9, PiiString::from(&ssn.0)),
                 ]
             }
-            Ssn::LastFour(last_four) => vec![(DataKind::LastFourSsn, PiiString::from(&last_four.0))],
+            Ssn::LastFour(last_four) => vec![(DataKind::Ssn4, PiiString::from(&last_four.0))],
         };
         NewData::list(list)
     }

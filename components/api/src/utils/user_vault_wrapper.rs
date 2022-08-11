@@ -76,8 +76,8 @@ impl UserVaultWrapper {
             DataKind::FirstName => self.basic_info.as_ref().and_then(|x| x.e_first_name.as_ref()),
             DataKind::LastName => self.basic_info.as_ref().and_then(|x| x.e_last_name.as_ref()),
             DataKind::Dob => self.basic_info.as_ref().and_then(|x| x.e_dob.as_ref()),
-            DataKind::Ssn => self.basic_info.as_ref().and_then(|x| x.e_ssn9.as_ref()),
-            DataKind::LastFourSsn => self.basic_info.as_ref().and_then(|x| x.e_ssn4.as_ref()),
+            DataKind::Ssn9 => self.basic_info.as_ref().and_then(|x| x.e_ssn9.as_ref()),
+            DataKind::Ssn4 => self.basic_info.as_ref().and_then(|x| x.e_ssn4.as_ref()),
         }
     }
 

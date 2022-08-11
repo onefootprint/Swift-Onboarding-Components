@@ -56,8 +56,8 @@ impl NewUserBasicInfoReq {
             e_first_name: get_field(DataKind::FirstName, old_data.map(|d| d.e_first_name.clone())),
             e_last_name: get_field(DataKind::LastName, old_data.map(|d| d.e_last_name.clone())),
             e_dob: get_field(DataKind::Dob, old_data.map(|d| d.e_dob.clone())),
-            e_ssn9: get_field(DataKind::Ssn, old_data.map(|d| d.e_ssn9.clone())),
-            e_ssn4: get_field(DataKind::LastFourSsn, old_data.map(|d| d.e_ssn4.clone())),
+            e_ssn9: get_field(DataKind::Ssn9, old_data.map(|d| d.e_ssn9.clone())),
+            e_ssn4: get_field(DataKind::Ssn4, old_data.map(|d| d.e_ssn4.clone())),
         }
     }
 }
@@ -109,7 +109,7 @@ impl UserBasicInfo {
     pub fn contains(data_kind: &DataKind) -> bool {
         matches!(
             data_kind,
-            DataKind::FirstName | DataKind::LastName | DataKind::Dob | DataKind::Ssn | DataKind::LastFourSsn
+            DataKind::FirstName | DataKind::LastName | DataKind::Dob | DataKind::Ssn9 | DataKind::Ssn4
         )
     }
 

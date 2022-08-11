@@ -27,7 +27,7 @@ fn handler(
     user_auth: UserAuth,
     request: Json<UserDecryptRequest>,
 ) -> actix_web::Result<Json<ApiResponseData<UserDecryptResponse>>, ApiError> {
-    let required_scope = if request.attributes.contains(&DataKind::Ssn) {
+    let required_scope = if request.attributes.contains(&DataKind::Ssn9) {
         UserAuthScope::ExtendedProfile
     } else {
         UserAuthScope::BasicProfile

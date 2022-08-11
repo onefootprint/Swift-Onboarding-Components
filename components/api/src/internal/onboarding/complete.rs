@@ -94,7 +94,7 @@ fn handler(
                         vendor: Vendor::Idology,
                     },
                     VerificationInfo {
-                        data_kinds: vec![DataKind::Ssn],
+                        data_kinds: vec![DataKind::Ssn9],
                         vendor: Vendor::LexisNexis,
                     },
                     VerificationInfo {

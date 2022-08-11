@@ -34,7 +34,9 @@ pub enum DataKind {
     FirstName,
     LastName,
     Dob,
-    Ssn,
+    #[serde(rename = "ssn")]
+    #[serde(alias = "ssn9")]
+    Ssn9,
     StreetAddress,
     StreetAddress2,
     City,
@@ -45,7 +47,9 @@ pub enum DataKind {
     PhoneNumber,
     /// Phone country iso code, like "US"
     PhoneCountry,
-    LastFourSsn,
+    #[serde(rename = "last_four_ssn")]
+    #[serde(alias = "ssn4")]
+    Ssn4,
 }
 
 crate::util::impl_enum_str_diesel!(DataKind);
@@ -57,10 +61,10 @@ impl DataKind {
             self,
             DataKind::PhoneNumber
                 | DataKind::Email
-                | DataKind::Ssn
+                | DataKind::Ssn9
                 | DataKind::FirstName
                 | DataKind::LastName
-                | DataKind::LastFourSsn
+                | DataKind::Ssn4
         )
     }
 
@@ -76,7 +80,7 @@ impl DataKind {
         // Returns the list of DataKinds for which this kind yields permissions.
         // For example, ability to decrypt an Ssn also provides the ability to decrypt LastFourSsn
         match self {
-            DataKind::Ssn => vec![DataKind::Ssn, DataKind::LastFourSsn],
+            DataKind::Ssn9 => vec![DataKind::Ssn9, DataKind::Ssn4],
             DataKind::PhoneNumber => vec![DataKind::PhoneNumber, DataKind::PhoneCountry],
             kind => vec![kind],
         }
