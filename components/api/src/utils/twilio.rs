@@ -56,21 +56,28 @@ impl TwilioClient {
         let code = crypto::random::gen_rand_n_digit_code(6);
         let message_body = format!("Your {} verification code is {}. Don't share your code with anyone. We will never contact you to request this code.", &self.rp_id, &code);
 
-        let rate_limit = RateLimit {
+        RateLimit {
             state,
             phone_number: destination,
             period: self.duration_between_challenges,
             scope: rate_limit::SMS_CHALLENGE,
-        };
+        }
+        .enforce_and_update()
+        .await?;
 
-        rate_limit.enforce().await?;
+        // spawn this async so we return immediately
+        let client = self.client.clone();
+        let destination_clone = destination.clone();
 
-        let _ = self
-            .client
-            .send_message(destination.e164.leak(), message_body)
-            .await?;
-
-        rate_limit.update().await?;
+        tokio::spawn(async move {
+            let _ = client
+                .clone()
+                .send_message(destination_clone.e164.leak(), message_body)
+                .await
+                .map_err(|err| {
+                    tracing::error!(error=?err, "twilio error");
+                });
+        });
 
         Ok((
             PhoneChallengeState {
@@ -93,21 +100,28 @@ impl TwilioClient {
             self.rp_id, base_url, auth_token
         );
 
-        let rate_limit = RateLimit {
+        RateLimit {
             state,
             phone_number: destination,
             period: self.duration_between_challenges,
             scope: rate_limit::D2P_LINK,
-        };
+        }
+        .enforce_and_update()
+        .await?;
 
-        rate_limit.enforce().await?;
+        // spawn this async so we return immediately
+        let client = self.client.clone();
+        let destination_clone = destination.clone();
 
-        let _ = self
-            .client
-            .send_message(destination.e164.leak(), message_body)
-            .await?;
-
-        rate_limit.update().await?;
+        tokio::spawn(async move {
+            let _ = client
+                .clone()
+                .send_message(destination_clone.e164.leak(), message_body)
+                .await
+                .map_err(|err| {
+                    tracing::error!(error=?err, "twilio error");
+                });
+        });
 
         Ok(self.duration_between_challenges)
     }
@@ -131,7 +145,7 @@ mod rate_limit {
     }
 
     impl<'a> RateLimit<'a> {
-        pub(super) async fn enforce(&self) -> Result<(), ApiError> {
+        pub(super) async fn enforce_and_update(&self) -> Result<(), ApiError> {
             let RateLimit {
                 state,
                 period,
@@ -154,27 +168,6 @@ mod rate_limit {
                         }
                     }
 
-                    Ok(())
-                })
-                .await??;
-
-            Ok(())
-        }
-
-        pub(super) async fn update(&self) -> Result<(), ApiError> {
-            let RateLimit {
-                state,
-                period,
-                phone_number,
-                scope,
-            } = *self;
-
-            let rate_limit_key = key(phone_number, scope);
-            let now = Utc::now();
-
-            state
-                .db_pool
-                .db_query(move |conn| -> Result<_, ApiError> {
                     let record = RateLimitRecord { sent_at: now };
                     JsonSession::update_or_create(conn, &rate_limit_key, &record, now + period)?;
 
