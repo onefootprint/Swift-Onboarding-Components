@@ -41,7 +41,7 @@ const identifyRequest = async (payload: IdentifyRequest) => {
     RequestResponse<PrivateIdentifyResponse>
   >({
     method: 'POST',
-    url: '/internal/identify',
+    url: '/hosted/identify',
     data: payload,
   });
   const { userFound, challengeData } = response.data;

@@ -57,7 +57,7 @@ const register = async (payload: RegisterRequest) => {
     }>
   >({
     method: 'POST',
-    url: '/internal/user/biometric/init',
+    url: '/hosted/user/biometric/init',
     data: payload,
     headers: {
       [BIOMETRIC_AUTH_HEADER]: authToken,
@@ -71,7 +71,7 @@ const register = async (payload: RegisterRequest) => {
 
   const { data: response } = await request<RequestResponse<RegisterResponse>>({
     method: 'POST',
-    url: '/internal/user/biometric',
+    url: '/hosted/user/biometric',
     data: {
       deviceResponseJson,
       challengeToken,

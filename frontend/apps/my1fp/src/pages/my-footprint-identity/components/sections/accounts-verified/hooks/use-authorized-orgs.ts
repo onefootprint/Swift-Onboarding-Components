@@ -16,7 +16,7 @@ const getAuthorizedOrgs = async (payload: AuthorizedOrgsRequest) => {
     RequestResponse<AuthorizedOrgsResponse>
   >({
     method: 'GET',
-    url: '/internal/user/authorized_orgs',
+    url: '/hosted/user/authorized_orgs',
     headers: {
       [MY1FP_AUTH_HEADER]: payload.authToken,
     },

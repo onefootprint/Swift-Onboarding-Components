@@ -10,7 +10,7 @@ export type UserDataResponse = RequestResponse<string>;
 const userDataRequest = async (payload: UserDataRequest) => {
   const { data: response } = await request<RequestResponse<UserDataResponse>>({
     method: 'POST',
-    url: '/internal/user/email/verify',
+    url: '/hosted/user/email/verify',
     data: payload,
   });
   return response.data;

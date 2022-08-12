@@ -17,7 +17,7 @@ export type UpdateD2PStatusRequest = {
 const updateD2PStatus = async (payload: UpdateD2PStatusRequest) => {
   const { data: response } = await request<RequestResponse<{}>>({
     method: 'POST',
-    url: '/internal/onboarding/d2p/status',
+    url: '/hosted/onboarding/d2p/status',
     data: payload,
     headers: {
       [MY1FP_AUTH_HEADER]: payload.authToken,

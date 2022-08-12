@@ -24,7 +24,7 @@ export type GetD2PResponse = {
 const getD2PStatus = async (payload: GetD2PRequest) => {
   const { data: response } = await request<RequestResponse<GetD2PResponse>>({
     method: 'GET',
-    url: '/internal/onboarding/d2p/status',
+    url: '/hosted/onboarding/d2p/status',
     headers: {
       [BIFROST_AUTH_HEADER]: payload.scopedAuthToken,
     },

@@ -22,7 +22,7 @@ const onboardingCompleteRequest = async (
     RequestResponse<OnboardingCompleteResponse>
   >({
     method: 'POST',
-    url: '/internal/onboarding/complete',
+    url: '/hosted/onboarding/complete',
     headers: {
       [BIFROST_AUTH_HEADER]: payload.authToken,
       [CLIENT_PUBLIC_KEY_HEADER]: payload.tenantPk,

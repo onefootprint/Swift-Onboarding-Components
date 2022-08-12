@@ -17,7 +17,7 @@ const identifyVerifyRequest = async (payload: IdentifyVerifyRequest) => {
     RequestResponse<IdentifyVerifyResponse>
   >({
     method: 'POST',
-    url: '/internal/identify/verify',
+    url: '/hosted/identify/verify',
     data: payload,
   });
   return response.data;

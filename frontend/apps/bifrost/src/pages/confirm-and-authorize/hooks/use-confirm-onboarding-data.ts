@@ -67,8 +67,8 @@ const useConfirmOnboardingData = () => {
     }
 
     // If the user didn't fill any new fields, no need to call the
-    // internal/user/data endpoint non-speculatively.
-    // For now, we still call internal/onboarding/complete, in case this is
+    // hosted/user/data endpoint non-speculatively.
+    // For now, we still call hosted/onboarding/complete, in case this is
     // a new onboarding or a new tenant.
     if (!missingAttributes.length) {
       completeOnboarding(authToken, tenant.pk, options.onComplete);

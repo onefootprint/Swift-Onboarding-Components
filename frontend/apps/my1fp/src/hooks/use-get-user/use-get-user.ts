@@ -17,7 +17,7 @@ export type GetUserResponse = {
 const getUser = async (payload: GetUserRequest) => {
   const { data: response } = await request<RequestResponse<GetUserResponse>>({
     method: 'GET',
-    url: '/internal/user',
+    url: '/hosted/user',
     headers: {
       [MY1FP_AUTH_HEADER]: payload.authToken,
     },

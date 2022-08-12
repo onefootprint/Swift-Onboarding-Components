@@ -10,7 +10,7 @@ export type D2PSmsRequest = {
 const d2pSms = async (payload: D2PSmsRequest) => {
   const { data: response } = await request<RequestResponse<{}>>({
     method: 'POST',
-    url: '/internal/onboarding/d2p/sms',
+    url: '/hosted/onboarding/d2p/sms',
     data: {
       baseUrl: BIOMETRIC_BASE_URL,
     },

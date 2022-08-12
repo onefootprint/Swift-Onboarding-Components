@@ -27,7 +27,7 @@ const decryptUserRequest = async (payload: UserDecryptRequest) => {
     RequestResponse<UserDecryptResponse>
   >({
     method: 'POST',
-    url: '/internal/user/decrypt',
+    url: '/hosted/user/decrypt',
     data: {
       attributes: payload.attributes,
     },

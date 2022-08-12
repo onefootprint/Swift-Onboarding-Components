@@ -19,7 +19,7 @@ describe('<LoginAndSecurity />', () => {
   const withUserQuery = (emailVerified?: boolean) => {
     mockRequest({
       method: 'get',
-      path: 'internal/user',
+      path: 'hosted/user',
       response: {
         data: {
           phoneNumbers: [
@@ -44,7 +44,7 @@ describe('<LoginAndSecurity />', () => {
   const withLivenessQuery = () => {
     mockRequest({
       method: 'get',
-      path: 'internal/user/liveness',
+      path: 'hosted/user/liveness',
       response: {
         data: [
           {
@@ -61,7 +61,7 @@ describe('<LoginAndSecurity />', () => {
   const withEmptyLivenessQuery = () => {
     mockRequest({
       method: 'get',
-      path: 'internal/user/liveness',
+      path: 'hosted/user/liveness',
       response: {
         data: [],
       },
@@ -71,7 +71,7 @@ describe('<LoginAndSecurity />', () => {
   const withVerification = () => {
     mockRequest({
       method: 'post',
-      path: 'internal/user/email/challenge',
+      path: 'hosted/user/email/challenge',
       response: {
         data: 'Success',
       },
@@ -81,7 +81,7 @@ describe('<LoginAndSecurity />', () => {
   const withVerificationError = () => {
     mockRequest({
       method: 'post',
-      path: 'internal/user/email/challenge',
+      path: 'hosted/user/email/challenge',
       statusCode: 403,
       response: {
         error: {

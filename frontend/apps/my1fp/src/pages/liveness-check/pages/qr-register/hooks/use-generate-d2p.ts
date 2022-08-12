@@ -18,7 +18,7 @@ const d2pGenerate = async (payload: D2PGenerateRequest) => {
     RequestResponse<D2PGenerateResponse>
   >({
     method: 'POST',
-    url: '/internal/onboarding/d2p/generate',
+    url: '/hosted/onboarding/d2p/generate',
     data: payload,
     headers: {
       [MY1FP_AUTH_HEADER]: payload.authToken,

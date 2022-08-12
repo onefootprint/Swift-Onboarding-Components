@@ -37,7 +37,7 @@ export type UserDataResponse = { data: string };
 const userDataRequest = async (payload: UserDataRequest) => {
   const { data: response } = await request<RequestResponse<UserDataResponse>>({
     method: 'POST',
-    url: '/internal/user/data',
+    url: '/hosted/user/data',
     data: {
       ...payload.data,
       speculative: !!payload.speculative,

@@ -24,7 +24,7 @@ const identifyChallenge = async (payload: IdentifyChallengeRequest) => {
     RequestResponse<PrivateIdentifyChallengeResponse>
   >({
     method: 'POST',
-    url: '/internal/identify/challenge',
+    url: '/hosted/identify/challenge',
     data: payload,
   });
   const { challengeToken, timeBeforeRetryS } = response.data;
