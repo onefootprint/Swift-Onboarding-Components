@@ -20,17 +20,17 @@ const PhoneVerification = () => {
   const [state, send] = useIdentifyMachine();
 
   let phoneCountryCode = '';
+  const filteredPhone = state.context.phone?.split('#')[0]; // Filter out sandbox suffixes
   if (state.context.challengeData?.phoneCountry) {
     phoneCountryCode = getNumberByCountryValue(
       state.context.challengeData?.phoneCountry,
     );
   } else if (state.context.phone) {
-    const phoneCountryVal = getCountryByNumber(state.context.phone).value;
+    const phoneCountryVal = getCountryByNumber(filteredPhone).value;
     phoneCountryCode = getNumberByCountryValue(phoneCountryVal);
   }
   const phoneNumberLastTwo =
-    state.context.challengeData?.phoneNumberLastTwo ??
-    state.context.phone?.slice(-2);
+    state.context.challengeData?.phoneNumberLastTwo ?? filteredPhone.slice(-2);
 
   return (
     <>
