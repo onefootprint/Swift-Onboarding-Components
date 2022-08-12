@@ -3,6 +3,7 @@ import '@typeform/embed/build/css/popup.css';
 import Head from 'next/head';
 import Script from 'next/script';
 import React from 'react';
+import Drift from 'react-driftjs';
 import { createGlobalStyle } from 'styled-components';
 import themes from 'themes';
 import { DesignSystemProvider } from 'ui';
@@ -60,6 +61,7 @@ const App = ({ Component, pageProps }: AppProps) => (
         <MDXProvider>
           <Component {...pageProps} />
         </MDXProvider>
+        <Drift appId="bp8bybvft4dm" />
       </Layout>
     </DesignSystemProvider>
   </>
