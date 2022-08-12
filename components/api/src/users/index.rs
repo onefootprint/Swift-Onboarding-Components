@@ -82,11 +82,7 @@ pub fn get(
                 cursor,
                 (page_size + 1) as i64,
             )?;
-            // If no cursor is provided, we're on the first page, so we should return the total
-            // count of results matching this query.
-            let count = cursor.map_or(Ok(None), |_| {
-                db::scoped_users::count_for_tenant(conn, query_params).map(Some)
-            })?;
+            let count = db::scoped_users::count_for_tenant(conn, query_params).map(Some)?;
             let (scoped_user_ids, user_vault_ids): (_, Vec<_>) =
                 scoped_users.iter().map(|ob| (&ob.id, &ob.user_vault_id)).unzip();
             // TODO bulk fetch user vault wrapper endpoint to save many DB queries
