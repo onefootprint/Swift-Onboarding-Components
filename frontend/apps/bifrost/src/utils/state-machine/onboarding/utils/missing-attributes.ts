@@ -61,13 +61,25 @@ export const isMissingSsnAttribute = (
   if (!missingAttributes.length) {
     return false;
   }
-  if (missingAttributes.indexOf(UserDataAttribute.ssn) === -1) {
+  const missingFullSsn = missingAttributes.indexOf(UserDataAttribute.ssn) > -1;
+  const missingLast4Ssn =
+    missingAttributes.indexOf(UserDataAttribute.lastFourSsn) > -1;
+
+  if (!missingFullSsn && !missingLast4Ssn) {
     return false;
   }
+
   if (!data) {
     return true;
   }
-  return !data[UserDataAttribute.ssn];
+
+  if (missingFullSsn && !data[UserDataAttribute.ssn]) {
+    return true;
+  }
+  if (missingLast4Ssn && !data[UserDataAttribute.lastFourSsn]) {
+    return true;
+  }
+  return false;
 };
 
 export const hasMissingAttributes = (

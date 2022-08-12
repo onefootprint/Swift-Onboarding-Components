@@ -34,12 +34,13 @@ const useSyncData = () => {
       return;
     }
 
+    // Only one of ssn and last_four_ssn can ever be included in the request
+    const requestData: UserDataObj = {
+      ssn: data[UserDataAttribute.ssn] || data[UserDataAttribute.lastFourSsn],
+    };
     // Don't include the email in this request, since it would
     // cause a 400 response. We only send the email when we
     // need to trigger a verification email.
-    const requestData: UserDataObj = {
-      ssn: data[UserDataAttribute.ssn],
-    };
 
     if (dataHasName(data)) {
       requestData.name = {

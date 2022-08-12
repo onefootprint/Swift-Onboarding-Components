@@ -7,6 +7,7 @@ export enum UserDataAttribute {
   email = 'email',
   phone = 'phone',
   ssn = 'ssn',
+  lastFourSsn = 'last_four_ssn',
   streetAddress = 'streetAddress',
   streetAddress2 = 'streetAddress2',
   city = 'city',
@@ -22,6 +23,7 @@ export const UserDataAttributeLabels: Record<string, UserDataAttribute> = {
   dob: UserDataAttribute.dob,
   email: UserDataAttribute.email,
   ssn: UserDataAttribute.ssn,
+  last_four_ssn: UserDataAttribute.lastFourSsn,
   street_address: UserDataAttribute.streetAddress,
   street_address2: UserDataAttribute.streetAddress2,
   city: UserDataAttribute.city,
@@ -37,6 +39,7 @@ export type UserData = Partial<{
   [UserDataAttribute.dob]: string;
   [UserDataAttribute.email]: string;
   [UserDataAttribute.ssn]: string;
+  [UserDataAttribute.lastFourSsn]: string;
   [UserDataAttribute.streetAddress]: string;
   [UserDataAttribute.streetAddress2]: string;
   [UserDataAttribute.city]: string;

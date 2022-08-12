@@ -20,7 +20,8 @@ enum UserDataAttributeCategory {
   name = 'Name',
   email = 'Email',
   phoneNumber = 'Phone Number',
-  ssn = 'SSN',
+  ssn = 'SSN (Full)',
+  lastFourSsn = 'SSN (Last 4)',
   dob = 'Date of Birth',
   address = 'Address',
 }
@@ -35,6 +36,7 @@ const CategoryByUserDataAttribute: Record<
   [UserDataAttribute.email]: UserDataAttributeCategory.email,
   [UserDataAttribute.phone]: UserDataAttributeCategory.phoneNumber,
   [UserDataAttribute.ssn]: UserDataAttributeCategory.ssn,
+  [UserDataAttribute.lastFourSsn]: UserDataAttributeCategory.lastFourSsn,
   [UserDataAttribute.streetAddress]: UserDataAttributeCategory.address,
   [UserDataAttribute.streetAddress2]: UserDataAttributeCategory.address,
   [UserDataAttribute.city]: UserDataAttributeCategory.address,
@@ -51,6 +53,7 @@ const IconsByUserDataAttributes: Record<
   [UserDataAttributeCategory.email]: <IcoEmail24 />,
   [UserDataAttributeCategory.phoneNumber]: <IcoPhone24 />,
   [UserDataAttributeCategory.ssn]: <IcoFileText24 />,
+  [UserDataAttributeCategory.lastFourSsn]: <IcoFileText24 />,
   [UserDataAttributeCategory.dob]: <IcoCake24 />,
   [UserDataAttributeCategory.address]: <IcoBuilding24 />,
 };

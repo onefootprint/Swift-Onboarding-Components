@@ -94,7 +94,7 @@ describe('MissingAttributesUtils', () => {
       expect(isMissingSsnAttribute([], {})).toEqual(false);
     });
 
-    it('should return false if the user the SSN', () => {
+    it('should return false if the user has SSN', () => {
       expect(
         isMissingSsnAttribute([UserDataAttribute.ssn], {
           [UserDataAttribute.ssn]: '000000',
@@ -102,8 +102,29 @@ describe('MissingAttributesUtils', () => {
       ).toEqual(false);
     });
 
+    it('should return false if the user has last 4 digits of SSN', () => {
+      expect(
+        isMissingSsnAttribute([UserDataAttribute.lastFourSsn], {
+          [UserDataAttribute.lastFourSsn]: '000000',
+        }),
+      ).toEqual(false);
+    });
+
     it('should return true if the user does not have the SSN', () => {
       expect(isMissingSsnAttribute([UserDataAttribute.ssn], {})).toEqual(true);
+      expect(
+        isMissingSsnAttribute([UserDataAttribute.lastFourSsn], {}),
+      ).toEqual(true);
+      expect(
+        isMissingSsnAttribute([UserDataAttribute.lastFourSsn], {
+          ssn: '0000000',
+        }),
+      ).toEqual(true);
+      expect(
+        isMissingSsnAttribute([UserDataAttribute.ssn], {
+          last_four_ssn: '0000',
+        }),
+      ).toEqual(true);
     });
   });
 

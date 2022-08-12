@@ -11,6 +11,10 @@ const masks = {
       delimiters: ['-', '-'],
       blocks: [3, 2, 4],
     },
+    lastFourSsn: {
+      numericOnly: true,
+      blocks: [4],
+    },
   },
 };
 
