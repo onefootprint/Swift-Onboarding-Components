@@ -82,7 +82,7 @@ def create_basic_user(twilio, suffix=None):
     # Initiate the challenge to a sandbox phone number
     def initiate_challenge():
         data = dict(phone_number=sandbox_phone_number, identify_type="onboarding")
-        body = post("internal/identify/challenge", data)
+        body = post("hosted/identify/challenge", data)
         return body["data"]["challenge_token"]
     challenge_token = try_until_success(initiate_challenge, 20)  # Rate limiting may take a while
 
@@ -95,7 +95,7 @@ def create_basic_user(twilio, suffix=None):
             "challenge_kind": "sms",
             "challenge_token": challenge_token,
         }
-        body = post("internal/identify/verify", data)
+        body = post("hosted/identify/verify", data)
         assert body["data"]["kind"] == "user_created"
         return body["data"]["auth_token"]
     auth_token = try_until_success(identify_verify, 5)
@@ -104,7 +104,7 @@ def create_basic_user(twilio, suffix=None):
     user_data = {
         "email": sandbox_email,
     } 
-    post("internal/user/data", user_data, auth_token)
+    post("hosted/user/data", user_data, auth_token)
 
     return BasicUser(
         auth_token=auth_token,
@@ -163,7 +163,7 @@ def clean_up_user(phone_number, email):
     post("private/cleanup", dict(phone_number=phone_number), CUSTODIAN_AUTH)
     identifier = {"email": email}
     data = dict(identifier=identifier, preferred_challenge_kind="sms", identify_type="onboarding")
-    body = post("internal/identify", data)
+    body = post("hosted/identify", data)
     assert not body["data"]["user_found"]
     assert not body["data"].get("challenge_data", dict())
 

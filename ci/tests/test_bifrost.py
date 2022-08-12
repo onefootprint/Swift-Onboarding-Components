@@ -16,7 +16,7 @@ WEBAUTHN_DEVICE = SoftWebauthnDevice()
 def auth_token(twilio):
     # Test the SMS challenge flow, return the resulting auth token of the user created with the number
     data = dict(phone_number=PHONE_NUMBER, identify_type="onboarding")
-    body = post("internal/identify/challenge", data)
+    body = post("hosted/identify/challenge", data)
     challenge_token = body["data"]["challenge_token"]
     def identify_verify():
         message = twilio.messages.list(to=PHONE_NUMBER, limit=1)[0]
@@ -27,7 +27,7 @@ def auth_token(twilio):
             "challenge_kind": "sms",
             "challenge_token": challenge_token,
         }
-        body = post("internal/identify/verify", data)
+        body = post("hosted/identify/verify", data)
         assert body["data"]["kind"] == "user_created"
         return OnboardingAuth(body["data"]["auth_token"])
     return try_until_success(identify_verify, 5)
@@ -77,18 +77,18 @@ class TestBifrost:
         data = dict(identifier=identifier, preferred_challenge_kind="sms", identify_type="onboarding")
 
         # First try identifying with an email. The user won't exist
-        body = post("internal/identify", data)
+        body = post("hosted/identify", data)
         assert not body["data"]["user_found"]
         assert not body["data"].get("challenge_data", dict())
 
     def test_onboard_init(self, workos_tenant, auth_token):
-        body = post("internal/onboarding", None, workos_tenant.ob_config.key, auth_token)
+        body = post("hosted/onboarding", None, workos_tenant.ob_config.key, auth_token)
         assert set(body["data"]["missing_attributes"]) == {"first_name", "last_name", "dob", "ssn", "street_address", "city", "state", "zip", "country", "email"}
         assert body["data"]["missing_webauthn_credentials"] == True
         assert not body["data"]["validation_token"]
 
         # Shouldn't be able to complete the onboarding until user data is provided
-        post("internal/onboarding/complete", None, workos_tenant.ob_config.key, auth_token, status_code=400)
+        post("hosted/onboarding/complete", None, workos_tenant.ob_config.key, auth_token, status_code=400)
 
     def test_user_data(self, auth_token):
         # Test failed validation
@@ -96,7 +96,7 @@ class TestBifrost:
             "email": "flerpderp",
             "speculative": True,
         }
-        post("internal/user/data", data, auth_token, status_code=400)
+        post("hosted/user/data", data, auth_token, status_code=400)
 
         # Test validating data before setting
         data = {
@@ -123,11 +123,11 @@ class TestBifrost:
             "email": EMAIL,
             "speculative": True,
         } 
-        post("internal/user/data", data, auth_token)
+        post("hosted/user/data", data, auth_token)
 
         # Actually set the data
         data.pop("speculative")
-        post("internal/user/data", data, auth_token)
+        post("hosted/user/data", data, auth_token)
 
         # Shouldn't be allowed to update fields that are already set
         data = {
@@ -136,22 +136,22 @@ class TestBifrost:
                 "last_name": "Derp2",
             }
         }
-        post("internal/user/data", data, auth_token, status_code=400)
+        post("hosted/user/data", data, auth_token, status_code=400)
 
     def test_d2p_biometric(self, auth_token):
         # Get new auth token in d2p/generate endpoint
-        body = post("internal/onboarding/d2p/generate", None, auth_token)
+        body = post("hosted/onboarding/d2p/generate", None, auth_token)
         d2p_auth_token = D2pAuth(body["data"]["auth_token"])
 
         # Send the d2p token to the user via SMS
         data = dict(base_url="https://onefootprint.com/")
-        post("internal/onboarding/d2p/sms", data, d2p_auth_token)
+        post("hosted/onboarding/d2p/sms", data, d2p_auth_token)
 
         def _update_status(status, status_code=200):
-            post("internal/onboarding/d2p/status", dict(status=status), d2p_auth_token, status_code=status_code)
+            post("hosted/onboarding/d2p/status", dict(status=status), d2p_auth_token, status_code=status_code)
 
         def _assert_get_status(expected_status):
-            body = get("internal/onboarding/d2p/status", None, d2p_auth_token)
+            body = get("hosted/onboarding/d2p/status", None, d2p_auth_token)
             assert body["data"]["status"] == expected_status
 
         # Use the auth token to check the status of the d2p session
@@ -159,7 +159,7 @@ class TestBifrost:
 
         # Add a biometric credential using the token
         _update_status("in_progress")
-        body = post("internal/user/biometric/init", None, d2p_auth_token)
+        body = post("hosted/user/biometric/init", None, d2p_auth_token)
         chal_token = body["data"]["challenge_token"]
         chal = _override_webauthn_challenge(json.loads(body["data"]["challenge_json"]))
         attestation = WEBAUTHN_DEVICE.create(chal, os.environ.get('TEST_URL'))
@@ -167,7 +167,7 @@ class TestBifrost:
 
         # Register credential
         data = dict(challenge_token=chal_token, device_response_json=json.dumps(attestation))
-        post("internal/user/biometric", data, d2p_auth_token)
+        post("hosted/user/biometric", data, d2p_auth_token)
 
         # Check that the status is updated
         _update_status("completed")
@@ -177,11 +177,11 @@ class TestBifrost:
         _update_status("canceled", status_code=400)
 
         # Shouldn't be able to add a second biometric credential
-        post("internal/user/biometric/init", None, d2p_auth_token, status_code=400)
-        post("internal/user/biometric", data, d2p_auth_token, status_code=400)
+        post("hosted/user/biometric/init", None, d2p_auth_token, status_code=400)
+        post("hosted/user/biometric", data, d2p_auth_token, status_code=400)
 
     def test_onboarding_complete(self, workos_tenant, auth_token): 
-        body = post("internal/onboarding/complete", None, workos_tenant.ob_config.key, auth_token)
+        body = post("hosted/onboarding/complete", None, workos_tenant.ob_config.key, auth_token)
         validation_token = body["data"]["validation_token"]
 
         assert body["data"]["missing_webauthn_credentials"] == False
@@ -194,7 +194,7 @@ class TestBifrost:
         assert body["data"]["status"]
 
     def test_onboard_onto_same_tenant(self, workos_tenant, auth_token):
-        body = post("internal/onboarding", None, workos_tenant.ob_config.key, auth_token)
+        body = post("hosted/onboarding", None, workos_tenant.ob_config.key, auth_token)
         assert not body["data"]["missing_attributes"]
         assert not body["data"]["missing_webauthn_credentials"]
         validation_token = body["data"]["validation_token"]
@@ -204,7 +204,7 @@ class TestBifrost:
 
         # We won't ever actually hit onboarding/complete if the tenant has already onboarded,
         # but if we do, we should no-op and succeed
-        body = post("internal/onboarding/complete", None, workos_tenant.ob_config.key, auth_token)
+        body = post("hosted/onboarding/complete", None, workos_tenant.ob_config.key, auth_token)
         validation_token = body["data"]["validation_token"]
         data = dict(validation_token=validation_token)
         body = post("users/validate", data, workos_tenant.sk.key)
@@ -216,7 +216,7 @@ class TestBifrost:
         # Identify the user by email
         identifier = {"email": EMAIL}
         data = dict(identifier=identifier, preferred_challenge_kind="biometric", identify_type="onboarding")
-        body = post("internal/identify", data)
+        body = post("hosted/identify", data)
         assert body["data"]["user_found"]
         assert body["data"]["challenge_data"]["phone_number_last_two"] == PHONE_NUMBER[-2:]
         assert body["data"]["challenge_data"]["phone_country"] == "US"
@@ -245,7 +245,7 @@ class TestBifrost:
             "challenge_kind": "biometric",
             "challenge_token": body["data"]["challenge_data"]["challenge_token"],
         }
-        body = post("internal/identify/verify", data)
+        body = post("hosted/identify/verify", data)
         assert body["data"]["kind"] == "user_inherited"
 
     def test_identify_repeat_customer(self, foo_tenant, bar_tenant, twilio, auth_token):
@@ -256,7 +256,7 @@ class TestBifrost:
         data = dict(identifier=identifier, preferred_challenge_kind="sms", identify_type="onboarding")
 
         def identify():
-            body = post("internal/identify", data)
+            body = post("hosted/identify", data)
             assert body["data"]["user_found"]
             assert body["data"]["challenge_data"]["phone_number_last_two"] == PHONE_NUMBER[-2:]
             assert body["data"]["challenge_data"]["challenge_kind"] == "sms"
@@ -272,18 +272,18 @@ class TestBifrost:
                 "challenge_kind": "sms",
                 "challenge_token": challenge_token,
             }
-            body = post("internal/identify/verify", data)
+            body = post("hosted/identify/verify", data)
             assert body["data"]["kind"] == "user_inherited"
             return OnboardingAuth(body["data"]["auth_token"])
         auth_token = try_until_success(identify_verify, 5)
 
         def onboard_onto_tenant(tenant):
             # Start onboarding for user
-            body = post("internal/onboarding", None, tenant.ob_config.key, auth_token)
+            body = post("hosted/onboarding", None, tenant.ob_config.key, auth_token)
             assert not body["data"]["missing_attributes"]
 
             # complete onboarding for user
-            body = post("internal/onboarding/complete", None, tenant.ob_config.key, auth_token)
+            body = post("hosted/onboarding/complete", None, tenant.ob_config.key, auth_token)
             validation_token = body["data"]["validation_token"]
             assert validation_token
 
@@ -312,9 +312,9 @@ class TestBifrostSandbox:
         user_data = build_user_data()
 
         # Initialize the onboarding, poopulate data, complete the onboarding
-        post("internal/onboarding", None, workos_sandbox_tenant.ob_config.key, basic_user.auth_token)
-        post("internal/user/data", user_data, basic_user.auth_token)
-        body = post("internal/onboarding/complete", None, workos_sandbox_tenant.ob_config.key, basic_user.auth_token)
+        post("hosted/onboarding", None, workos_sandbox_tenant.ob_config.key, basic_user.auth_token)
+        post("hosted/user/data", user_data, basic_user.auth_token)
+        body = post("hosted/onboarding/complete", None, workos_sandbox_tenant.ob_config.key, basic_user.auth_token)
         validation_token = body["data"]["validation_token"]
 
         # Get the status

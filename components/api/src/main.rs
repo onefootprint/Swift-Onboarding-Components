@@ -22,8 +22,8 @@ mod users;
 mod auth;
 mod enclave;
 mod errors;
+mod hosted;
 mod index;
-mod internal;
 mod org;
 mod private;
 mod types;
@@ -199,8 +199,7 @@ async fn main() -> std::io::Result<()> {
             .configure(index::routes)
             .service(private::routes())
             .service(org::routes())
-            .service(internal::routes())
-            .service(internal::old_routes())
+            .service(hosted::routes())
             .service(users::routes())
             .with_json_spec_at("/open-api/spec")
             .with_swagger_ui_at("/open-api/swagger")

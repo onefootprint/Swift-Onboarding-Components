@@ -132,7 +132,7 @@ class TestDashboard:
         ob_config = body["data"]
         ob_config_key = TenantAuth(ob_config["key"])
 
-        body = post("internal/onboarding", None, basic_user.auth_token, ob_config_key)
+        body = post("hosted/onboarding", None, basic_user.auth_token, ob_config_key)
         assert body["data"]["missing_attributes"] == ["last_four_ssn"]
 
     def test_config_update(self, workos_sandbox_tenant, ob_configuration):

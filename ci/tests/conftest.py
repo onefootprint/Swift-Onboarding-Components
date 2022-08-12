@@ -97,23 +97,23 @@ def user(workos_sandbox_tenant, twilio):
     user_data = build_user_data()
 
     # Initialize the onboarding
-    post("internal/onboarding", None, workos_sandbox_tenant.ob_config.key, basic_user.auth_token)
+    post("hosted/onboarding", None, workos_sandbox_tenant.ob_config.key, basic_user.auth_token)
 
     # Populate the user's data
-    post("internal/user/data", user_data, basic_user.auth_token)
+    post("hosted/user/data", user_data, basic_user.auth_token)
 
     # Register the biometric credential
     webauthn_device = SoftWebauthnDevice()
-    body = post("internal/user/biometric/init", None, basic_user.auth_token)
+    body = post("hosted/user/biometric/init", None, basic_user.auth_token)
     chal_token = body["data"]["challenge_token"]
     chal = _override_webauthn_challenge(json.loads(body["data"]["challenge_json"]))
     attestation = webauthn_device.create(chal, os.environ.get('TEST_URL'))
     attestation = _override_webauthn_attestation(attestation)
     data = dict(challenge_token=chal_token, device_response_json=json.dumps(attestation))
-    post("internal/user/biometric", data, basic_user.auth_token)
+    post("hosted/user/biometric", data, basic_user.auth_token)
 
     # Complete the onboarding
-    body = post("internal/onboarding/complete", None, workos_sandbox_tenant.ob_config.key, basic_user.auth_token)
+    body = post("hosted/onboarding/complete", None, workos_sandbox_tenant.ob_config.key, basic_user.auth_token)
     validation_token = body["data"]["validation_token"]
 
     # Get the fp_user_id

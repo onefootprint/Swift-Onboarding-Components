@@ -3,7 +3,7 @@ use crate::auth::session_data::user::{UserAuthScope, UserSession};
 use crate::errors::challenge::ChallengeError;
 
 use crate::errors::ApiError;
-use crate::internal::identify::{IdentifyChallengeData, IdentifyChallengeState, IdentifyType};
+use crate::hosted::identify::{IdentifyChallengeData, IdentifyChallengeState, IdentifyType};
 use crate::types::response::ApiResponseData;
 use crate::utils::challenge::{Challenge, ChallengeToken};
 use crate::utils::liveness::LivenessWebauthnConfig;

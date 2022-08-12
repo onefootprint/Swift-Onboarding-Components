@@ -4,7 +4,7 @@ use crate::auth::Either;
 use crate::auth::{AuthError, IsLive};
 use crate::auth::{HasTenant, SessionContext};
 use crate::errors::ApiError;
-use crate::internal::user::{decrypt, DecryptFieldsResult};
+use crate::hosted::user::{decrypt, DecryptFieldsResult};
 use crate::types::response::ApiResponseData;
 use crate::utils::insight_headers::InsightHeaders;
 use crate::State;
