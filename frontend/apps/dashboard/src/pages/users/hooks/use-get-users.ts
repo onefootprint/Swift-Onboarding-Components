@@ -14,8 +14,11 @@ const useGetUsers = (pageSize: number) => {
 
   useEffect(() => {
     // Only update total count of results when it is sent from the server
-    if (getScopedUsers.data?.count || getScopedUsers.data?.count === 0) {
-      setTotalNumResults(getScopedUsers.data?.count);
+    if (
+      getScopedUsers.data?.meta.count ||
+      getScopedUsers.data?.meta.count === 0
+    ) {
+      setTotalNumResults(getScopedUsers.data?.meta.count);
     }
   }, [getScopedUsers.data]);
 
@@ -25,8 +28,8 @@ const useGetUsers = (pageSize: number) => {
 
   // Add the new cursor onto the stack
   const loadNextPage = () =>
-    getScopedUsers.data?.next &&
-    setCursors([...cursors, getScopedUsers.data.next]);
+    getScopedUsers.data?.meta.next &&
+    setCursors([...cursors, getScopedUsers.data.meta.next]);
 
   // Pop the last cursor off the stack
   const loadPrevPage = () => setCursors(cursors.slice(0, -1));
@@ -41,7 +44,7 @@ const useGetUsers = (pageSize: number) => {
     isLoading: getScopedUsers.isLoading,
     loadNextPage,
     loadPrevPage,
-    hasNextPage: !!getScopedUsers.data?.next,
+    hasNextPage: !!getScopedUsers.data?.meta.next,
     hasPrevPage: cursors.length > 0,
     filters,
     setFilter,

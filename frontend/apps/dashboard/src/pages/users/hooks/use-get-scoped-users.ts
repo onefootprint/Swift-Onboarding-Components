@@ -4,7 +4,7 @@ import {
   useQuery,
 } from '@tanstack/react-query';
 import { omit } from 'lodash';
-import request, { RequestError, RequestResponse } from 'request';
+import request, { PaginatedRequestResponse, RequestError } from 'request';
 import useSessionUser, { AuthHeaders } from 'src/hooks/use-session-user';
 import {
   getCursors,
@@ -20,11 +20,7 @@ type ScopedUsersListQueryKey = [
   number,
 ];
 
-type ScopedUsersListResponse = {
-  data: ScopedUser[];
-  next?: string;
-  count?: number;
-};
+type ScopedUsersListResponse = ScopedUser[];
 
 const getScopedUsersRequest = async ({
   queryKey,
@@ -40,7 +36,9 @@ const getScopedUsersRequest = async ({
     cursor: cursors[cursors.length - 1],
     pageSize,
   };
-  const { data: response } = await request<RequestResponse<ScopedUser[]>>({
+  const { data: response } = await request<
+    PaginatedRequestResponse<ScopedUsersListResponse>
+  >({
     method: 'GET',
     url: '/users',
     params: req,
@@ -53,7 +51,10 @@ const useGetScopedUsers = (pageSize: number) => {
   const { authHeaders } = useSessionUser();
   const { filters } = useFilters();
 
-  return useQuery<ScopedUsersListResponse, RequestError>(
+  return useQuery<
+    PaginatedRequestResponse<ScopedUsersListResponse>,
+    RequestError
+  >(
     ['paginatedScopedUsers', filters, authHeaders, pageSize],
     getScopedUsersRequest,
     {

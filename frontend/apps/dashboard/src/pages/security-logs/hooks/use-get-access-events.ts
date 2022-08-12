@@ -3,7 +3,7 @@ import {
   QueryKey,
   useInfiniteQuery,
 } from '@tanstack/react-query';
-import request, { RequestError, RequestResponse } from 'request';
+import request, { PaginatedRequestResponse, RequestError } from 'request';
 import useSessionUser, { AuthHeaders } from 'src/hooks/use-session-user';
 import {
   AccessEventFilters,
@@ -12,10 +12,7 @@ import {
 import { AccessEvent, dateRangeToFilterParams } from 'src/types';
 import { useDebounce } from 'usehooks-ts';
 
-type AccessEventsResponse = {
-  data: AccessEvent[];
-  next?: string;
-};
+type AccessEventsResponse = AccessEvent[];
 
 type AccessEventQueryKey = [string, AccessEventFilters, AuthHeaders];
 
@@ -31,7 +28,9 @@ const getAccessEventsRequest = async ({
     ...dateRangeFilters,
     cursor: pageParam,
   };
-  const { data: response } = await request<RequestResponse<AccessEvent[]>>({
+  const { data: response } = await request<
+    PaginatedRequestResponse<AccessEventsResponse>
+  >({
     method: 'GET',
     url: '/users/access_events',
     params,
@@ -46,7 +45,10 @@ const useGetAccessEvents = () => {
 
   const debouncedFilters = useDebounce(filters, 500);
 
-  return useInfiniteQuery<AccessEventsResponse, RequestError>(
+  return useInfiniteQuery<
+    PaginatedRequestResponse<AccessEventsResponse>,
+    RequestError
+  >(
     [
       'paginatedAccessEvents',
       debouncedFilters,
@@ -55,7 +57,7 @@ const useGetAccessEvents = () => {
     getAccessEventsRequest,
     {
       retry: false,
-      getNextPageParam: lastPage => lastPage.next,
+      getNextPageParam: lastPage => lastPage.meta.next,
     },
   );
 };
