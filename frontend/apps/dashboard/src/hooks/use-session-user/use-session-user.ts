@@ -7,6 +7,8 @@ import {
 } from '../../config/constants';
 
 export type UserSession = {
+  firstName: string;
+  lastName: string;
   auth: string;
   email: string;
   tenantName: string;

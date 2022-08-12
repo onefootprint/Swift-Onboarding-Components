@@ -24,8 +24,22 @@ const Auth = () => {
       return;
     }
     login.mutate(code, {
-      onSuccess({ auth, email, tenantName, sandboxRestricted }: LoginResponse) {
-        logIn({ auth, email, tenantName, sandboxRestricted });
+      onSuccess({
+        auth,
+        email,
+        tenantName,
+        sandboxRestricted,
+        firstName,
+        lastName,
+      }: LoginResponse) {
+        logIn({
+          firstName,
+          lastName,
+          auth,
+          email,
+          tenantName,
+          sandboxRestricted,
+        });
         router.push('/');
       },
     });

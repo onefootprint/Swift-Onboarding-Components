@@ -3,14 +3,14 @@ import Head from 'next/head';
 import React from 'react';
 import useSandboxMode from 'src/hooks/use-sandbox-mode';
 import styled, { css } from 'styled-components';
-import { Box, Toggle, Typography } from 'ui';
+import { Box, Toggle, Tooltip, Typography } from 'ui';
 
 import ApiKeys from './components/api-keys';
 import OnboardingConfigs from './components/onboarding-configs';
 
 const Developers = () => {
   const { t } = useTranslation('pages.developers');
-  const [isSandboxMode, toggleSandboxMode] = useSandboxMode();
+  const sandboxMode = useSandboxMode();
 
   return (
     <>
@@ -24,20 +24,29 @@ const Developers = () => {
           </Typography>
           <Typography
             variant="body-2"
-            color={isSandboxMode ? 'warning' : 'success'}
+            color={sandboxMode.isSandbox ? 'warning' : 'success'}
           >
-            {isSandboxMode
+            {sandboxMode.isSandbox
               ? t('header.subtitle.sandbox')
               : t('header.subtitle.live')}
           </Typography>
         </Box>
         <ToggleContainer>
-          <Toggle
-            aria-label={t('header.toggle-sandbox.label')}
-            checked={isSandboxMode}
-            label={t('header.toggle-sandbox.label')}
-            onChange={toggleSandboxMode}
-          />
+          <Tooltip
+            disabled={sandboxMode.canToggle}
+            size="compact"
+            text={t('header.toggle-sandbox.tooltip')}
+          >
+            <Box>
+              <Toggle
+                aria-label={t('header.toggle-sandbox.label')}
+                checked={sandboxMode.isSandbox}
+                disabled={!sandboxMode.canToggle}
+                label={t('header.toggle-sandbox.label')}
+                onChange={sandboxMode.toggle}
+              />
+            </Box>
+          </Tooltip>
         </ToggleContainer>
       </Header>
       <Box sx={{ marginBottom: 9 }}>

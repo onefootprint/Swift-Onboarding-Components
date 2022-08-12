@@ -19,8 +19,8 @@ describe('useIsSandbox', () => {
 
     it('should return false', () => {
       const { result } = renderHook(() => useIsSandbox());
-      const [value] = result.current;
-      expect(value).toBeFalsy();
+      const { isSandbox } = result.current;
+      expect(isSandbox).toBeFalsy();
     });
   });
 
@@ -33,8 +33,30 @@ describe('useIsSandbox', () => {
 
     it('should return false', () => {
       const { result } = renderHook(() => useIsSandbox());
-      const [value] = result.current;
-      expect(value).toBeTruthy();
+      const { isSandbox } = result.current;
+      expect(isSandbox).toBeTruthy();
+    });
+
+    describe('when is restricted to toggle', () => {
+      beforeEach(() => {
+        useStore.setState({
+          isLive: false,
+          data: {
+            auth: 'vtok_X7n2zMasfrMSCp8DQJD56cnDojCJUtaUKRzKKF',
+            firstName: 'John',
+            lastName: 'Doe',
+            email: 'john.doe@gmail.com',
+            tenantName: 'Acme Bank',
+            sandboxRestricted: true,
+          },
+        });
+      });
+
+      it('should return canToggle = false', () => {
+        const { result } = renderHook(() => useIsSandbox());
+        const { canToggle } = result.current;
+        expect(canToggle).toBeFalsy();
+      });
     });
   });
 
@@ -47,13 +69,12 @@ describe('useIsSandbox', () => {
 
     it('should toggle the value', () => {
       const { result } = renderHook(() => useIsSandbox());
-      const [initialValue, toggle] = result.current;
-      expect(initialValue).toBeTruthy();
+      const { isSandbox, toggle } = result.current;
+      expect(isSandbox).toBeTruthy();
       act(() => {
         toggle();
       });
-      const [nextValue] = result.current;
-      expect(nextValue).toBeFalsy();
+      expect(result.current.isSandbox).toBeFalsy();
     });
   });
 });

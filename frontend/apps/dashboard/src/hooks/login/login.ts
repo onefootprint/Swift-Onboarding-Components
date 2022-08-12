@@ -4,8 +4,8 @@ import request, { RequestError, RequestResponse } from 'request';
 export type LoginResponse = {
   email: string;
   auth: string;
-  firstName?: string;
-  lastName?: string;
+  firstName: string;
+  lastName: string;
   newTenant: boolean;
   tenantName: string;
   sandboxRestricted: boolean;

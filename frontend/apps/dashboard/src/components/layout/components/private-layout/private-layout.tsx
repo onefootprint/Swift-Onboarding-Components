@@ -25,18 +25,18 @@ type PrivateLayoutProps = {
 const PrivateLayout = ({ children }: PrivateLayoutProps) => {
   const { t } = useTranslation('components.private-layout');
   const router = useRouter();
-  const [isSandboxMode, toggleSandboxMode] = useSandboxMode();
+  const sandboxMode = useSandboxMode();
   const { data, logOut } = useSessionUser();
 
   return (
     <>
       <PrivateLayoutContainer data-testid="private-layout">
         <header>
-          {isSandboxMode && (
+          {sandboxMode.isSandbox && (
             <SandboxBannerContainer>
               <Banner variant="warning">
                 {t('sandbox-banner.title')}
-                <button type="button" onClick={toggleSandboxMode}>
+                <button type="button" onClick={sandboxMode.toggle}>
                   {t('sandbox-banner.disable')}
                 </button>
               </Banner>
@@ -57,7 +57,9 @@ const PrivateLayout = ({ children }: PrivateLayoutProps) => {
                   <Dropdown.Portal>
                     <Dropdown.Content align="end">
                       <Dropdown.Item>
-                        <Typography variant="label-3">John Doe</Typography>
+                        <Typography variant="label-3">
+                          {data?.firstName} {data?.lastName}
+                        </Typography>
                         <Typography variant="body-3" color="secondary">
                           {data?.email}
                         </Typography>

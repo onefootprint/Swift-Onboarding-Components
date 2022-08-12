@@ -1,11 +1,14 @@
 import useSessionUser from '../use-session-user';
 
 const useSandboxMode = () => {
-  const { isLive, setIsLive } = useSessionUser();
-  const value = isLive === false;
+  const { isLive, data, setIsLive } = useSessionUser();
   const toggle = () => setIsLive(!isLive);
 
-  return [value, toggle] as const;
+  return {
+    isSandbox: isLive === false,
+    canToggle: !data?.sandboxRestricted,
+    toggle,
+  };
 };
 
 export default useSandboxMode;
