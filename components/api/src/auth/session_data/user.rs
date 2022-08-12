@@ -6,7 +6,7 @@ use crate::{
     errors::ApiError,
 };
 
-#[derive(serde::Serialize, serde::Deserialize, PartialEq, Debug, Clone, Copy, Apiv2Schema)]
+#[derive(serde::Serialize, serde::Deserialize, PartialEq, Eq, Debug, Clone, Copy, Apiv2Schema)]
 #[serde(rename = "snake_case")]
 pub enum UserAuthScope {
     // This is just the initial scope - we will update this to have scopes that represent perms for

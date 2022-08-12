@@ -47,7 +47,7 @@ pub async fn handle_fn_decrypt(request: EnvelopeDecrypt) -> Result<FnDecryption,
             )?;
             Ok(FnDecryptionSingle {
                 data: result.0,
-                transform: r.transform.clone(),
+                transform: r.transform,
             })
         })
         .collect::<Result<Vec<FnDecryptionSingle>, Error>>()?;

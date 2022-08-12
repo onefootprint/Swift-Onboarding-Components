@@ -7,6 +7,7 @@ use strum_macros::{AsRefStr, EnumString};
 #[derive(
     Debug,
     Display,
+    Eq,
     PartialEq,
     Clone,
     Copy,

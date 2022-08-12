@@ -46,7 +46,7 @@ pub struct IdentifyChallengeState {
     data: IdentifyChallengeData,
 }
 
-#[derive(Debug, serde::Serialize, serde::Deserialize, PartialEq, Clone, Copy, Apiv2Schema)]
+#[derive(Debug, serde::Serialize, serde::Deserialize, Eq, PartialEq, Clone, Copy, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
 pub enum IdentifyType {
     Unspecified,

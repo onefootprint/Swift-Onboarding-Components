@@ -164,7 +164,8 @@ async fn main() -> std::io::Result<()> {
 
     log::info!("starting server on port {}", config.port);
 
-    let res = HttpServer::new(move || {
+    // telemetry::shutdown();
+    HttpServer::new(move || {
         let cors = actix_cors::Cors::default()
             .allow_any_origin()
             .allow_any_header()
@@ -207,8 +208,5 @@ async fn main() -> std::io::Result<()> {
     })
     .bind(("0.0.0.0", config.port))?
     .run()
-    .await;
-
-    // telemetry::shutdown();
-    res
+    .await
 }

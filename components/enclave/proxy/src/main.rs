@@ -1,8 +1,8 @@
 use actix_web::{middleware::Logger, post, web, App, HttpServer, Responder, ResponseError};
 use config::Config;
-use rpc::{EnclavePayload, RpcRequest};
 use enclave_proxy::*;
 use futures::TryFutureExt;
+use rpc::{EnclavePayload, RpcRequest};
 use thiserror::Error;
 
 #[derive(Clone)]
@@ -39,7 +39,7 @@ async fn main() -> Result<(), std::io::Error> {
 
     log::info!("Starting enclave_parent on port {}", config.port);
 
-    let res = HttpServer::new(move || {
+    HttpServer::new(move || {
         App::new()
             .app_data(state.clone())
             .wrap(Logger::default())
@@ -47,9 +47,7 @@ async fn main() -> Result<(), std::io::Error> {
     })
     .bind(("0.0.0.0", config.port))?
     .run()
-    .await;
-
-    res
+    .await
 }
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]

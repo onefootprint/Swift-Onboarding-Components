@@ -114,7 +114,7 @@ impl Address {
     }
 
     pub fn contains(data_kind: &DataKind) -> bool {
-        return matches!(
+        matches!(
             data_kind,
             DataKind::StreetAddress
                 | DataKind::StreetAddress2
@@ -122,7 +122,7 @@ impl Address {
                 | DataKind::State
                 | DataKind::Zip
                 | DataKind::Country
-        );
+        )
     }
 
     pub fn deactivate(&self, conn: &mut PgConnection) -> Result<(), DbError> {

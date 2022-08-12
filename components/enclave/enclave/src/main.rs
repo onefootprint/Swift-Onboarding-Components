@@ -26,7 +26,7 @@ async fn main() -> std::io::Result<()> {
     // for local development, use a local tcp socket instead of AF_VSOCK
     #[cfg(not(feature = "nitro"))]
     {
-        return listen_tcp(&format!("127.0.0.1:{}", config.port)).await;
+        listen_tcp(&format!("127.0.0.1:{}", config.port)).await
     }
 
     #[cfg(feature = "nitro")]
