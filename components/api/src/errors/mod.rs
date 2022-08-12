@@ -10,6 +10,7 @@ pub mod enclave;
 pub mod handoff;
 pub mod kms;
 pub mod onboarding;
+pub mod tenant;
 pub mod user;
 pub mod workos_login;
 
@@ -26,6 +27,8 @@ pub enum ApiError {
     KmsError(#[from] kms::KmsSignError),
     #[error("onboarding error: {0}")]
     OnboardingError(#[from] onboarding::OnboardingError),
+    #[error("{0}")]
+    TenantError(#[from] tenant::TenantError),
     #[error("handoff error: {0}")]
     HandoffError(#[from] HandoffError),
     #[error("user error: {0}")]
@@ -129,6 +132,7 @@ impl actix_web::ResponseError for ApiError {
             ApiError::ChallengeError(_) => StatusCode::BAD_REQUEST,
             ApiError::WorkOsApiError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::OnboardingError(_) => StatusCode::BAD_REQUEST,
+            ApiError::TenantError(_) => StatusCode::BAD_REQUEST,
             ApiError::UserError(_) => StatusCode::BAD_REQUEST,
             ApiError::Webauthn(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::CannotDecodeUtf8(_)

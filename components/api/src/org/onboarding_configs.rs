@@ -1,9 +1,12 @@
+use std::collections::HashSet;
+
 use crate::auth::key_context::ob_public_key::PublicTenantAuthContext;
 use crate::auth::key_context::secret_key::SecretTenantAuthContext;
 use crate::auth::session_data::workos::WorkOsSession;
 use crate::auth::Either;
 use crate::auth::IsLive;
 use crate::auth::{HasTenant, SessionContext};
+use crate::errors::tenant::TenantError;
 use crate::errors::ApiError;
 use crate::types::ob_config::ApiObConfig;
 use crate::types::response::ApiResponseData;
@@ -77,6 +80,51 @@ pub struct CreateOnboardingConfigurationRequest {
     can_access_data_kinds: Vec<DataKind>,
 }
 
+impl CreateOnboardingConfigurationRequest {
+    fn validate(&self) -> Result<(), TenantError> {
+        let must_collect = &self.must_collect_data_kinds;
+        let contains_any = |kinds: &[DataKind]| kinds.iter().any(|x| must_collect.contains(x));
+        let contains_all = |kinds: &[DataKind]| kinds.iter().all(|x| must_collect.contains(x));
+        let contains_all_or_none = |kinds| contains_all(kinds) || !contains_any(kinds);
+
+        // if contains all fields or (contains Zip and ! other address fields)
+        // if !contains all or none and (!contains zip or contains other address fields)
+
+        // accpetable states: full address or just zip or nothing
+        // contains_all(address_kinds) || ! contains_any(address_kinds) || (contains(Zip) && !contains_any(other_address_kinds))
+        // !contains_all(address_kinds) && contains_any(address_kinds) && !(contains(Zip) && !contains_any(other_address_kinds))
+        let address_kinds = &[
+            DataKind::StreetAddress,
+            DataKind::StreetAddress2,
+            DataKind::City,
+            DataKind::State,
+            DataKind::Country,
+            DataKind::Zip,
+        ];
+        let address_kinds_without_zip = &address_kinds
+            .iter()
+            .cloned()
+            .filter(|x| x != &DataKind::Zip)
+            .collect::<Vec<DataKind>>();
+        let err = if !contains_all_or_none(&[DataKind::FirstName, DataKind::LastName]) {
+            TenantError::ValidationError("Must request first name and last name together".to_owned())
+        } else if !(contains_all_or_none(address_kinds)
+            || (must_collect.contains(&DataKind::Zip) && !contains_any(address_kinds_without_zip)))
+        {
+            TenantError::ValidationError("Can only request all address fields, zip only, or none".to_owned())
+        } else if must_collect.contains(&DataKind::Ssn4) && must_collect.contains(&DataKind::Ssn9) {
+            TenantError::ValidationError("Cannot request full SSN and last four of SSN".to_owned())
+        } else if !HashSet::<&DataKind>::from_iter(self.can_access_data_kinds.iter())
+            .is_subset(&HashSet::from_iter(must_collect.iter()))
+        {
+            TenantError::ValidationError("Decryptable fields must be a subset of collected fields".to_owned())
+        } else {
+            return Ok(());
+        };
+        Err(err)
+    }
+}
+
 #[api_v2_operation(tags(Org))]
 #[post("/onboarding_configs")]
 /// Create a new onboarding configuration
@@ -85,6 +133,7 @@ pub fn post(
     auth: Either<SessionContext<WorkOsSession>, SecretTenantAuthContext>,
     request: Json<CreateOnboardingConfigurationRequest>,
 ) -> actix_web::Result<Json<ApiResponseData<ApiObConfig>>, ApiError> {
+    request.validate()?;
     let tenant = auth.tenant(&state.db_pool).await?;
     let CreateOnboardingConfigurationRequest {
         name,

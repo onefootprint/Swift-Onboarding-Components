@@ -135,6 +135,25 @@ class TestDashboard:
         body = post("hosted/onboarding", None, basic_user.auth_token, ob_config_key)
         assert body["data"]["missing_attributes"] == ["last_four_ssn"]
 
+    @pytest.mark.parametrize(
+        "must_collect,can_access,expected_status",
+        [
+            (["last_name"], [], 400),  # Can't collect last name without first name
+            (["last_four_ssn", "ssn"], [], 400),  # Can't collect both last four SSN and whole SSN
+            (["street_address"], [], 400),  # Can't collect only some address fields
+            (["zip"], [], 200),  # Except for zip
+            (["first_name", "last_name"], ["ssn"], 400),  # can_access must be < must_collect
+        ],
+    )
+    def test_config_create_validation(self, workos_sandbox_tenant, must_collect, can_access, expected_status):
+        # Test validation errors
+        data = dict(
+            name="Acme Bank Loan",
+            must_collect_data_kinds=must_collect,
+            can_access_data_kinds=can_access,
+        )
+        post("org/onboarding_configs", data, workos_sandbox_tenant.sk.key, status_code=expected_status)
+
     def test_config_update(self, workos_sandbox_tenant, ob_configuration):
         # Test failing to update
         new_name = "Updated ob config name"
