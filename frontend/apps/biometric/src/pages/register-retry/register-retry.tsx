@@ -4,7 +4,7 @@ import styled, { css } from 'styled-components';
 import { Button } from 'ui';
 
 import HeaderTitle from '../../components/header-title';
-import useD2pMobileMachine, {
+import useBiometricMachine, {
   Events,
 } from '../../hooks/use-d2p-mobile-machine';
 import useGetD2PStatus, { D2PStatus } from '../../hooks/use-get-d2p-status';
@@ -15,7 +15,7 @@ import useUpdateD2pStatus, {
 
 const RegisterRetry = () => {
   const { t } = useTranslation('pages.register-retry');
-  const [state, send] = useD2pMobileMachine();
+  const [state, send] = useBiometricMachine();
   const registerMutation = useRegister();
   const updateD2PStatusMutation = useUpdateD2pStatus();
   const statusResponse = useGetD2PStatus();

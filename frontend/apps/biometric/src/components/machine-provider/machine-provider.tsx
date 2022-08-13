@@ -1,11 +1,11 @@
 import { useMachine } from '@xstate/react';
 import constate from 'constate';
-import d2pMobileMachine from 'src/utils/state-machine';
+import { biometricMachine } from 'src/utils/state-machine';
 
-const useLocalD2PMobileMachine = () => useMachine(d2pMobileMachine);
+const useLocalBiometricMachine = () => useMachine(biometricMachine);
 
-export const [D2PMobileMachineProvider, useD2PMobileMachine] = constate(
-  useLocalD2PMobileMachine,
+export const [BiometricMachineProvider, useBiometricMachine] = constate(
+  useLocalBiometricMachine,
 );
 
-export default D2PMobileMachineProvider;
+export default BiometricMachineProvider;

@@ -1,6 +1,6 @@
 import has from 'lodash/has';
 import React from 'react';
-import useD2PMobileMachine from 'src/hooks/use-d2p-mobile-machine';
+import useBiometricMachine from 'src/hooks/use-d2p-mobile-machine';
 import { States } from 'src/utils/state-machine';
 
 import Canceled from './canceled';
@@ -16,7 +16,7 @@ type Page = {
 };
 
 const Root = () => {
-  const [state] = useD2PMobileMachine();
+  const [state] = useBiometricMachine();
   const valueCasted = state.value as States;
   const pages: Page = {
     [States.init]: Init,

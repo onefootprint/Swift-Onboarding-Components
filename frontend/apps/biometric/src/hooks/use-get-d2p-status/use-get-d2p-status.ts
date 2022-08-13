@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import request, { RequestError, RequestResponse } from 'request';
 import { BIOMETRIC_AUTH_HEADER } from 'src/config/constants';
-import useD2PMobileMachine from 'src/hooks/use-d2p-mobile-machine';
+import useBiometricMachine from 'src/hooks/use-d2p-mobile-machine';
 
 const D2P_STATUS_FETCH_INTERVAL = 1000;
 
@@ -33,7 +33,7 @@ const getD2PStatus = async (payload: GetD2PRequest) => {
 };
 
 const useGetD2PStatus = () => {
-  const [state] = useD2PMobileMachine();
+  const [state] = useBiometricMachine();
   const { authToken } = state.context;
   return useQuery<GetD2PResponse, RequestError>(
     [authToken],

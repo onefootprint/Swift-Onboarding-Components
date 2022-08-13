@@ -1,172 +1,250 @@
 import { interpret } from 'xstate';
 
-import d2pMobileMachine from './machine';
+import { createBiometricMachine } from './machine';
 import { Events, States } from './types';
 
-describe('D2PMobile Machine Tests', () => {
+describe('Biometric Machine Tests', () => {
   describe('Correctly initializes the state machine', () => {
     it('Initial context is correct', () => {
-      const machine = interpret(d2pMobileMachine);
+      const machine = interpret(createBiometricMachine());
       machine.start();
-
       // Check that the initial context was set correctly from the args
       const { state } = machine;
       const { context } = state;
       expect(state.value).toEqual(States.init);
       expect(context.authToken).toEqual('');
-      expect(context.device.type).toEqual('mobile');
-      expect(context.device.hasSupportForWebauthn).toEqual(false);
+      expect(context.device).toEqual(undefined);
+      machine.stop();
     });
   });
 
-  describe('Correctly assigns authToken following Events.authTokenReceived', () => {
-    it('Auth token in States.init gets set correctly in context', () => {
-      const authToken = 'testAuthToken';
-      const state = d2pMobileMachine.transition(States.init, {
-        type: Events.authTokenReceived,
-        payload: {
-          authToken,
-        },
-      });
+  describe('When device info is identified first', () => {
+    it('Waits for auth token', () => {
+      const machine = interpret(createBiometricMachine());
+      let { state } = machine.start();
+
       expect(state.value).toBe(States.init);
-      expect(state.context.authToken).toEqual(authToken);
-    });
+      expect(state.context.authToken).toEqual('');
+      expect(state.context.device).toEqual(undefined);
 
-    it('Auth token in States.expired gets set correctly in context', () => {
-      const authToken = 'testAuthToken';
-      const state = d2pMobileMachine.transition(States.expired, {
+      state = machine.send({
+        type: Events.deviceInfoIdentified,
+        payload: {
+          type: 'mobile',
+          hasSupportForWebauthn: true,
+        },
+      });
+
+      expect(state.context.device?.type).toEqual('mobile');
+      expect(state.context.device?.hasSupportForWebauthn).toEqual(true);
+      expect(state.value).toBe(States.init);
+
+      state = machine.send({
         type: Events.authTokenReceived,
         payload: {
-          authToken,
+          authToken: 'authToken',
         },
       });
       expect(state.value).toBe(States.register);
-      expect(state.context.authToken).toEqual(authToken);
+      expect(state.context.authToken).toEqual('authToken');
+
+      machine.stop();
+    });
+
+    it('mobile device has no webauthn support', () => {
+      const machine = interpret(createBiometricMachine());
+      let { state } = machine.start();
+      expect(state.value).toBe(States.init);
+
+      state = machine.send({
+        type: Events.deviceInfoIdentified,
+        payload: {
+          type: 'mobile',
+          hasSupportForWebauthn: false,
+        },
+      });
+      expect(state.context.device?.type).toEqual('mobile');
+      expect(state.context.device?.hasSupportForWebauthn).toEqual(false);
+      expect(state.value).toBe(States.unavailable);
+
+      machine.stop();
+    });
+
+    it('non-mobile device has webauthn supprt', () => {
+      const machine = interpret(createBiometricMachine());
+      let { state } = machine.start();
+      expect(state.value).toBe(States.init);
+
+      state = machine.send({
+        type: Events.deviceInfoIdentified,
+        payload: {
+          type: 'tablet',
+          hasSupportForWebauthn: true,
+        },
+      });
+      expect(state.context.device?.type).toEqual('tablet');
+      expect(state.context.device?.hasSupportForWebauthn).toEqual(true);
+      expect(state.value).toBe(States.unavailable);
+
+      machine.stop();
     });
   });
 
-  describe('Correctly transitions out of init state', () => {
-    it('Events.deviceInfoIdentified when mobile has webauthn support should set context correctly', () => {
-      const type = 'mobile';
-      const hasSupportForWebauthn = true;
-      const state = d2pMobileMachine.transition(States.init, {
+  describe('If auth token is identified first', () => {
+    it('Waits for device info', () => {
+      const machine = interpret(createBiometricMachine());
+      let { state } = machine.start();
+
+      state = machine.send({
+        type: Events.authTokenReceived,
+        payload: {
+          authToken: 'authToken',
+        },
+      });
+      expect(state.context.device).toEqual(undefined);
+      expect(state.context.authToken).toEqual('authToken');
+      expect(state.value).toBe(States.init);
+
+      state = machine.send({
         type: Events.deviceInfoIdentified,
         payload: {
-          type,
-          hasSupportForWebauthn,
+          type: 'mobile',
+          hasSupportForWebauthn: true,
+        },
+      });
+
+      expect(state.value).toBe(States.register);
+      expect(state.context.device?.type).toEqual('mobile');
+      expect(state.context.device?.hasSupportForWebauthn).toEqual(true);
+
+      machine.stop();
+    });
+  });
+
+  describe('When registering', () => {
+    it('Successful attempt', () => {
+      const machine = interpret(createBiometricMachine());
+      machine.start();
+
+      let state = machine.send({
+        type: Events.deviceInfoIdentified,
+        payload: {
+          type: 'mobile',
+          hasSupportForWebauthn: true,
+        },
+      });
+
+      state = machine.send({
+        type: Events.authTokenReceived,
+        payload: {
+          authToken: 'authToken',
         },
       });
       expect(state.value).toBe(States.register);
-      expect(state.context.device.type).toEqual(type);
-      expect(state.context.device.hasSupportForWebauthn).toEqual(
-        hasSupportForWebauthn,
-      );
+
+      state = machine.send({
+        type: Events.registerSucceeded,
+      });
+      expect(state.value).toBe(States.success);
+      machine.stop();
     });
 
-    it('Events.deviceInfoIdentified when mobile lacks webauthn support should set context correctly', () => {
-      const type = 'mobile';
-      const hasSupportForWebauthn = false;
-      const state = d2pMobileMachine.transition(States.init, {
+    it('Successful after retry attempt', () => {
+      const machine = interpret(createBiometricMachine());
+      machine.start();
+
+      let state = machine.send({
         type: Events.deviceInfoIdentified,
         payload: {
-          type,
-          hasSupportForWebauthn,
+          type: 'mobile',
+          hasSupportForWebauthn: true,
         },
       });
-      expect(state.value).toBe(States.unavailable);
-      expect(state.context.device.type).toEqual(type);
-      expect(state.context.device.hasSupportForWebauthn).toEqual(
-        hasSupportForWebauthn,
-      );
-    });
 
-    it('Events.deviceInfoIdentified when non-mobile lacks webauthn support should set context correctly', () => {
-      const type = 'tablet';
-      const hasSupportForWebauthn = false;
-      const state = d2pMobileMachine.transition(States.init, {
-        type: Events.deviceInfoIdentified,
+      state = machine.send({
+        type: Events.authTokenReceived,
         payload: {
-          type,
-          hasSupportForWebauthn,
+          authToken: 'authToken',
         },
       });
-      expect(state.value).toBe(States.unavailable);
-      expect(state.context.device.type).toEqual(type);
-      expect(state.context.device.hasSupportForWebauthn).toEqual(
-        hasSupportForWebauthn,
-      );
-    });
+      expect(state.value).toBe(States.register);
 
-    it('Events.deviceInfoIdentified when non-mobile has webauthn support should set context correctly', () => {
-      const type = 'tablet';
-      const hasSupportForWebauthn = true;
-      const state = d2pMobileMachine.transition(States.init, {
-        type: Events.deviceInfoIdentified,
-        payload: {
-          type,
-          hasSupportForWebauthn,
-        },
-      });
-      expect(state.value).toBe(States.unavailable);
-      expect(state.context.device.type).toEqual(type);
-      expect(state.context.device.hasSupportForWebauthn).toEqual(
-        hasSupportForWebauthn,
-      );
-    });
-  });
-
-  describe('Transitions correctly from States.register', () => {
-    it('Transitions to States.registerRetry', () => {
-      const state = d2pMobileMachine.transition(States.register, {
+      // can have multiple retries
+      state = machine.send({
         type: Events.registerFailed,
       });
       expect(state.value).toBe(States.registerRetry);
-    });
 
-    it('Transitions to States.success', () => {
-      const state = d2pMobileMachine.transition(States.register, {
+      state = machine.send({
+        type: Events.registerFailed,
+      });
+      expect(state.value).toBe(States.registerRetry);
+
+      state = machine.send({
         type: Events.registerSucceeded,
       });
       expect(state.value).toBe(States.success);
+      machine.stop();
     });
 
-    it('Transitions to States.canceled', () => {
-      const state = d2pMobileMachine.transition(States.register, {
+    it('Cancelled attempt', () => {
+      const machine = interpret(createBiometricMachine());
+      machine.start();
+
+      let state = machine.send({
+        type: Events.deviceInfoIdentified,
+        payload: {
+          type: 'mobile',
+          hasSupportForWebauthn: true,
+        },
+      });
+
+      state = machine.send({
+        type: Events.authTokenReceived,
+        payload: {
+          authToken: 'authToken',
+        },
+      });
+      expect(state.value).toBe(States.register);
+
+      state = machine.send({
+        type: Events.registerFailed,
+      });
+      expect(state.value).toBe(States.registerRetry);
+
+      state = machine.send({
         type: Events.canceled,
       });
       expect(state.value).toBe(States.canceled);
+      machine.stop();
     });
 
-    it('Transitions to States.expired', () => {
-      const state = d2pMobileMachine.transition(States.register, {
+    it('Expired auth token', () => {
+      const machine = interpret(createBiometricMachine());
+      machine.start();
+
+      let state = machine.send({
+        type: Events.deviceInfoIdentified,
+        payload: {
+          type: 'mobile',
+          hasSupportForWebauthn: true,
+        },
+      });
+
+      state = machine.send({
+        type: Events.authTokenReceived,
+        payload: {
+          authToken: 'authToken',
+        },
+      });
+      expect(state.value).toBe(States.register);
+
+      state = machine.send({
         type: Events.statusPollingErrored,
       });
-      expect(state.value).toBe(States.expired);
       expect(state.context.authToken).toEqual('');
-    });
-  });
-
-  describe('Transitions correctly from States.registerRetry', () => {
-    it('Transitions to States.success', () => {
-      const state = d2pMobileMachine.transition(States.registerRetry, {
-        type: Events.registerSucceeded,
-      });
-      expect(state.value).toBe(States.success);
-    });
-
-    it('Transitions to States.canceled', () => {
-      const state = d2pMobileMachine.transition(States.registerRetry, {
-        type: Events.canceled,
-      });
-      expect(state.value).toBe(States.canceled);
-    });
-
-    it('Transitions to States.expired', () => {
-      const state = d2pMobileMachine.transition(States.registerRetry, {
-        type: Events.statusPollingErrored,
-      });
       expect(state.value).toBe(States.expired);
-      expect(state.context.authToken).toEqual('');
+      machine.stop();
     });
   });
 });

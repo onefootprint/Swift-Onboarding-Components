@@ -25,12 +25,12 @@ export enum Actions {
   clearAuthToken = 'clearAuthToken',
 }
 
-export type D2PContext = {
-  device: DeviceInfo;
+export type BiometricContext = {
+  device?: DeviceInfo;
   authToken: string;
 };
 
-export type D2PEvent =
+export type BiometricEvent =
   | { type: Events.authTokenReceived; payload: { authToken: string } }
   | {
       type: Events.deviceInfoIdentified;
