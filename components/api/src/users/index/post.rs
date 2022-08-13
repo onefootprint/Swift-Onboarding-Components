@@ -21,7 +21,7 @@ pub async fn post(
     let request = NewNonPortableUserVaultReq {
         e_private_key,
         public_key,
-        is_live: auth.is_live()?,
+        is_live: auth.is_live(&state.db_pool).await?,
         tenant_id: auth.tenant_id(),
     };
 

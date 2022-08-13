@@ -26,7 +26,7 @@ pub async fn post(
         &state.db_pool,
         tenant_auth.tenant_id(),
         footprint_user_id,
-        tenant_auth.is_live()?,
+        tenant_auth.is_live(&state.db_pool).await?,
     )
     .await?
     .ok_or(AuthError::InvalidTenantKeyOrUserId)?;
@@ -46,7 +46,6 @@ async fn perform_update(
     let _uvw = state
         .db_pool
         .db_transaction(move |conn| -> Result<_, ApiError> {
-            
             let mut uvw = UserVaultWrapper::from_conn(conn, user_vault)?;
             uvw.process_updates(conn, new_data)?;
             Ok(uvw)
