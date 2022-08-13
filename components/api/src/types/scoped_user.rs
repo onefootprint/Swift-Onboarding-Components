@@ -12,23 +12,33 @@ pub struct ApiScopedUser {
     pub start_timestamp: DateTime<Utc>,
     pub ordering_id: i64,
     pub onboardings: Vec<ApiOnboarding>,
+    pub is_portable: bool,
 }
 
-impl From<(Vec<DataKind>, &Vec<OnboardingInfo>, ScopedUser)> for ApiScopedUser {
-    fn from(s: (Vec<DataKind>, &Vec<OnboardingInfo>, ScopedUser)) -> Self {
+impl ApiScopedUser {
+    pub fn from(
+        populated_data_kinds: Vec<DataKind>,
+        onboarding_info: &[OnboardingInfo],
+        scoped_user: ScopedUser,
+        is_portable: bool,
+    ) -> Self {
         let ScopedUser {
             fp_user_id,
             start_timestamp,
             ordering_id,
             ..
-        } = s.2;
-        let ob_links = s.1;
-        Self {
+        } = scoped_user;
+
+        ApiScopedUser {
             footprint_user_id: fp_user_id,
-            populated_data_kinds: s.0,
+            populated_data_kinds,
             start_timestamp,
             ordering_id,
-            onboardings: ob_links.iter().map(|x| ApiOnboarding::from(x.clone())).collect(),
+            is_portable,
+            onboardings: onboarding_info
+                .iter()
+                .map(|x| ApiOnboarding::from(x.clone()))
+                .collect(),
         }
     }
 }

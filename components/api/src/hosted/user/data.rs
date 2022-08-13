@@ -1,91 +1,17 @@
-use std::collections::HashMap;
-
 use crate::auth::session_data::user::UserAuthScope;
 use crate::auth::UserAuth;
 use crate::auth::VerifiedUserAuth;
 use crate::errors::user::UserError;
 use crate::types::response::ApiResponseData;
+use crate::types::user_patch_request::UserPatchRequest;
 use crate::types::EmptyResponse;
 use crate::utils::user_vault_wrapper::UserVaultWrapper;
 use crate::{errors::ApiError, utils::email::send_email_challenge, State};
-use db::models::user_vaults::UserVault;
-use newtypes::address::Address;
-use newtypes::dob::DateOfBirth;
-use newtypes::email::Email;
-use newtypes::name::FullName;
-use newtypes::ssn::Ssn;
-use newtypes::DataKind;
-use newtypes::Decomposable;
-use newtypes::Fingerprinter;
-use newtypes::NewData;
-use newtypes::NewSealedData;
-use paperclip::actix::Apiv2Schema;
 use paperclip::actix::{api_v2_operation, post, web, web::Json};
-
-/// Key-value pairs of fields to update for the user_vault
-/// (all optional). Patch can be preformed in batch
-/// or all at once. *All fields are optional* & do
-/// not have to be represented in the request
-/// for example {"email_address": "test@test.com"}
-/// is a valid UserPatchRequest
-/// ssn is either last 4 of ssn or full ssn
-#[derive(Debug, Clone, serde::Deserialize, Apiv2Schema)]
-struct UserPatchRequest {
-    pub name: Option<FullName>,
-    pub ssn: Option<Ssn>,
-    pub dob: Option<DateOfBirth>,
-    pub address: Option<Address>,
-    pub email: Option<Email>,
-    #[serde(default)]
-    pub speculative: bool,
-}
-
-impl UserPatchRequest {
-    async fn decompose_and_seal(
-        self,
-        state: &State,
-        user_vault: &UserVault,
-    ) -> Result<HashMap<DataKind, NewSealedData>, ApiError> {
-        let UserPatchRequest {
-            name,
-            ssn,
-            dob,
-            address,
-            email,
-            speculative: _,
-        } = self;
-
-        let results = vec![
-            name.map(|n| n.decompose()),
-            ssn.map(|ssn| ssn.decompose()),
-            dob.map(|dob| dob.decompose()),
-            address.map(|addr| addr.decompose()),
-            email.map(|email| email.decompose()),
-        ]
-        .into_iter()
-        .flatten()
-        .flatten()
-        .collect::<Vec<NewData>>();
-
-        let mut new_data = HashMap::<DataKind, NewSealedData>::new();
-        for NewData { data_kind, data } in results {
-            // Compute the fingerprint and seal the data
-            let sh_data = if data_kind.allows_fingerprint() {
-                Some(state.compute_fingerprint(data_kind, &data).await?)
-            } else {
-                None
-            };
-            let e_data = user_vault.public_key.seal_pii(&data)?;
-            new_data.insert(data_kind, NewSealedData { e_data, sh_data });
-        }
-        Ok(new_data)
-    }
-}
 
 #[api_v2_operation(tags(User))]
 #[post("/data")]
-/// Operates as a PATCH request to update data in the user vault. Requires user authentication
-/// sent in the cookie after a successful /identify/verify call.
+/// Operates as a PATCH request to update data in the user vault
 async fn handler(
     state: web::Data<State>,
     user_auth: UserAuth,

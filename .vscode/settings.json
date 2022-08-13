@@ -55,4 +55,5 @@
     "rust-analyzer.files.excludeDirs": [
         "**/target/**"
     ],
+    "rust-analyzer.rustfmt.overrideCommand": null,
 }

@@ -84,6 +84,9 @@ run-local: stop-local
 	@cargo run -p enclave --features simulate & echo "starting enclave..."
 	@cargo run -p footprint-core
 
+watch-local: stop-local
+	@cargo run -p enclave --features simulate & echo "starting enclave..."
+	@cargo watch -x 'run -p footprint-core' -i ci
 
 update-dot-env:
 	@AWS_REGION=us-east-1 aws kms encrypt --key-id 4e61ea01-1193-475e-82ee-e9639743efd6 \

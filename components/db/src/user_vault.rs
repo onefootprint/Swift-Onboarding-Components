@@ -1,17 +1,20 @@
 use crate::errors::DbError;
 use crate::models::phone_number::PhoneNumber;
+use crate::models::scoped_users::ScopedUser;
 use crate::models::user_vaults::*;
 use crate::schema;
 use diesel::prelude::*;
 use newtypes::{DataPriority, Fingerprint, UserVaultId};
 
-pub async fn create(pool: &crate::DbPool, new_user: NewUserVaultReq) -> Result<UserVault, DbError> {
+/// creates a portable user vault
+pub async fn create(pool: &crate::DbPool, new_user: NewPortableUserVaultReq) -> Result<UserVault, DbError> {
     let user_vault = pool
         .db_transaction(move |conn| -> Result<_, DbError> {
             let new_user_vault = NewUserVault {
                 e_private_key: new_user.e_private_key,
                 public_key: new_user.public_key,
                 is_live: new_user.is_live,
+                is_portable: true,
             };
             let user_vault = diesel::insert_into(schema::user_vaults::table)
                 .values(new_user_vault)
@@ -29,6 +32,40 @@ pub async fn create(pool: &crate::DbPool, new_user: NewUserVaultReq) -> Result<U
         })
         .await?;
     Ok(user_vault)
+}
+
+/// creates a NON-portable, tenant-scoped vault + a scoped user for the tenant and the vault
+/// returning the scoped user
+pub async fn create_non_portable(
+    pool: &crate::DbPool,
+    req: NewNonPortableUserVaultReq,
+) -> Result<ScopedUser, DbError> {
+    let NewNonPortableUserVaultReq {
+        e_private_key,
+        public_key,
+        is_live,
+        tenant_id,
+    } = req;
+
+    let scoped_user = pool
+        .db_transaction(move |conn| -> Result<_, DbError> {
+            let new_user_vault = NewUserVault {
+                e_private_key,
+                public_key,
+                is_live,
+                is_portable: false,
+            };
+            let user_vault = diesel::insert_into(schema::user_vaults::table)
+                .values(new_user_vault)
+                .get_result::<UserVault>(conn)?;
+
+            // create the scoped user
+            let scoped_user = ScopedUser::get_or_create(conn, user_vault.id, tenant_id, is_live)?;
+
+            Ok(scoped_user)
+        })
+        .await?;
+    Ok(scoped_user)
 }
 
 pub async fn get(pool: &crate::DbPool, uv_id: UserVaultId) -> Result<UserVault, DbError> {

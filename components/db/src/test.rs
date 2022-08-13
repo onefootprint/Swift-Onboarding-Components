@@ -24,7 +24,7 @@ async fn test_db() {
 
     crate::user_vault::create(
         &pool,
-        crate::models::user_vaults::NewUserVaultReq {
+        crate::models::user_vaults::NewPortableUserVaultReq {
             e_private_key: EncryptedVaultPrivateKey("private key".as_bytes().to_vec()),
             public_key: VaultPublicKey::unvalidated("public key".as_bytes().to_vec()),
             e_phone_number: SealedVaultBytes("blah".as_bytes().to_vec()),

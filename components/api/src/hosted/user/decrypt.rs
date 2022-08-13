@@ -40,7 +40,6 @@ fn handler(
     } = decrypt(
         &state,
         user_auth.user_vault(&state.db_pool).await?,
-        None,
         request.attributes.clone(),
     )
     .await?;

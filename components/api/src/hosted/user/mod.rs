@@ -1,9 +1,9 @@
-use crate::{auth::AuthError, errors::ApiError, utils::user_vault_wrapper::UserVaultWrapper, State};
-use db::models::{ob_configurations::ObConfiguration, user_vaults::UserVault};
+use crate::{errors::ApiError, utils::user_vault_wrapper::UserVaultWrapper, State};
+use db::models::user_vaults::UserVault;
 use enclave_proxy::DataTransform;
-use newtypes::{DataKind, PiiString, ScopedUserId, SealedVaultBytes};
+use newtypes::{DataKind, PiiString, SealedVaultBytes};
 use paperclip::actix::web;
-use std::collections::{HashMap, HashSet};
+use std::collections::HashMap;
 
 pub mod access_events;
 pub mod authorized_orgs;
@@ -37,23 +37,8 @@ pub struct DecryptFieldsResult {
 pub async fn decrypt(
     state: &web::Data<State>,
     user_vault: UserVault,
-    scoped_user_id: Option<&ScopedUserId>,
     data_kinds: Vec<DataKind>,
 ) -> Result<DecryptFieldsResult, ApiError> {
-    if let Some(scoped_user_id) = scoped_user_id {
-        let ob_configs =
-            ObConfiguration::list_for_scoped_user(&state.db_pool, scoped_user_id.clone()).await?;
-        let data_to_access_kinds: HashSet<_> = data_kinds.iter().map(|x| x.to_owned()).collect();
-        let can_access_kinds: HashSet<_> = ob_configs
-            .into_iter()
-            .flat_map(|x| x.can_access_data_kinds)
-            .flat_map(|x| x.permissioning_kinds())
-            .collect();
-        if !can_access_kinds.is_superset(&data_to_access_kinds) {
-            return Err(AuthError::UnauthorizedOperation.into());
-        }
-    }
-
     // Filter out fields that don't have values set on the user vault
     let uvw = UserVaultWrapper::from(&state.db_pool, user_vault).await?;
     let (fields_to_decrypt, e_datas): (Vec<DataKind>, Vec<&SealedVaultBytes>) = data_kinds

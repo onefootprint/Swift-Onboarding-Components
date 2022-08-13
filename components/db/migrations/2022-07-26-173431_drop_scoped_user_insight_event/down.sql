@@ -9,7 +9,7 @@ UPDATE scoped_users SET insight_event_id = o1.insight_event_id
         AND o1.start_timestamp > o2.start_timestamp
     WHERE o2.id IS NULL AND o1.scoped_user_id=scoped_users.id;
       
-ALTER TABLE scoped_users ALTER COLUMN insight_event_id SET NOT NULL;
+-- ALTER TABLE scoped_users ALTER COLUMN insight_event_id SET NOT NULL;
 
 CREATE INDEX IF NOT EXISTS scoped_users_insight_event_id ON scoped_users(insight_event_id);
 ALTER TABLE scoped_users ADD CONSTRAINT fk_scoped_users_insight_event_id

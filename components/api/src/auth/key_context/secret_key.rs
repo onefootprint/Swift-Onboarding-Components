@@ -1,4 +1,4 @@
-use crate::auth::HasTenant;
+use crate::auth::{HasTenant, Principal};
 use crate::auth::{AuthError, IsLive};
 use crate::{errors::ApiError, State};
 use actix_web::{web, FromRequest};
@@ -93,5 +93,11 @@ impl IsLive for SecretTenantAuthContext {
         }
 
         Ok(self.api_key.is_live)
+    }
+}
+
+impl Principal for SecretTenantAuthContext {
+    fn format_principal(&self) -> String {
+        format!("ApiKey<{}>", self.api_key.name)
     }
 }

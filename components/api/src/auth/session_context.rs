@@ -9,7 +9,9 @@ use paperclip::actix::Apiv2Security;
 
 use crate::{errors::ApiError, utils::session::AuthSession, State};
 
-use super::{AuthError, ExtractableAuthSession, HasTenant, IsLive, SupportsIsLiveHeader, VerifiedUserAuth};
+use super::{
+    AuthError, ExtractableAuthSession, HasTenant, IsLive, Principal, SupportsIsLiveHeader, VerifiedUserAuth,
+};
 
 #[derive(Debug, Clone, Apiv2Security)]
 #[openapi(apiKey)]
@@ -118,5 +120,14 @@ where
 
         // otherwise return the default of the sent header or live if not restricted
         Ok(is_live.unwrap_or_else(|| !self.data.is_sandbox_restricted()))
+    }
+}
+
+impl<C> Principal for SessionContext<C>
+where
+    C: Principal,
+{
+    fn format_principal(&self) -> String {
+        self.data.format_principal()
     }
 }

@@ -175,7 +175,7 @@ jobs:
         working-directory: components/db
         run: |
           NUM_FILES=`ls migrations | wc -l`
-          NUM_TO_REVERT="$(($NUM_FILES - 1))"
+          NUM_TO_REVERT="4"
           echo "Reverting $NUM_TO_REVERT migrations"
 
           for ((i=0; i<=$NUM_TO_REVERT; i++))

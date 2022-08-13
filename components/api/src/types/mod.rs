@@ -10,6 +10,7 @@ pub mod response;
 pub mod scoped_user;
 pub mod secret_api_key;
 pub mod tenant;
+pub mod user_patch_request;
 
 pub use request::*;
 pub use response::*;

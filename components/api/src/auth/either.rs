@@ -9,7 +9,7 @@ use paperclip::actix::Apiv2Security;
 
 use crate::errors::ApiError;
 
-use super::{AuthError, HasTenant, IsLive};
+use super::{AuthError, HasTenant, IsLive, Principal};
 
 #[derive(Debug, Clone, Apiv2Security)]
 #[openapi(apiKey)]
@@ -105,6 +105,19 @@ where
         match self {
             Either::Left(l) => l.is_live(),
             Either::Right(r) => r.is_live(),
+        }
+    }
+}
+
+impl<A, B> Principal for Either<A, B>
+where
+    A: Principal,
+    B: Principal,
+{
+    fn format_principal(&self) -> String {
+        match self {
+            Either::Left(l) => l.format_principal(),
+            Either::Right(r) => r.format_principal(),
         }
     }
 }

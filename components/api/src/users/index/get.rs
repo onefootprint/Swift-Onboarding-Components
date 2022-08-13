@@ -30,7 +30,7 @@ pub struct UsersRequest {
 
 type UsersResponse = Vec<ApiScopedUser>;
 
-#[api_v2_operation(tags(Org))]
+#[api_v2_operation(tags(Org, Users))]
 /// Allows a tenant to view a list of their Onboardings, effectively showing all users that have
 /// started the onboarding process for the tenant. Optionally allows filtering on Onboarding status.
 /// Requires tenant secret key auth.
@@ -107,13 +107,13 @@ pub fn get(
         .zip(uvws.into_iter())
         .take(page_size)
         .map(|(su, uvw)| {
-            (
+            ApiScopedUser::from(
                 uvw.get_populated_fields(),
                 obs.get(&su.id).unwrap_or(&empty_vec),
                 su,
+                uvw.user_vault.is_portable,
             )
         })
-        .map(ApiScopedUser::from)
         .collect();
 
     Ok(Json(ApiPaginatedResponseData::ok(scoped_users, cursor, count)))

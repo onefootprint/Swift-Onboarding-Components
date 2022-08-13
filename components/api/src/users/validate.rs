@@ -26,7 +26,7 @@ pub struct ValidateResponse {
     timestamp: DateTime<Utc>,
 }
 
-#[api_v2_operation(tags(Org))]
+#[api_v2_operation(tags(Org, Users))]
 #[post("/validate")]
 /// Allows a tenant to view a customer's registered webauthn credentials
 pub fn validate(

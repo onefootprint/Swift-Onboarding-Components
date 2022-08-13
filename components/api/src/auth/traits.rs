@@ -42,3 +42,9 @@ pub trait SupportsIsLiveHeader {}
 pub trait ExtractableAuthSession: TryFrom<AuthSessionData> {
     fn header_names() -> Vec<&'static str>;
 }
+
+
+/// Principal that is behind the SessionContext
+pub trait Principal {
+    fn format_principal(&self) -> String;
+}
