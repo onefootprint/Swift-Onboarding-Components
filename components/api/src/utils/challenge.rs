@@ -30,7 +30,7 @@ impl<C: Serialize + DeserializeOwned + std::fmt::Debug> Challenge<C> {
         let unsealed: Self = key.unseal(&sealed)?;
 
         if unsealed.expires_at < Utc::now() {
-            return Err(ChallengeError::ChallengeExpired)?;
+            return Err(ChallengeError::ChallengeExpired.into());
         }
         Ok(unsealed)
     }

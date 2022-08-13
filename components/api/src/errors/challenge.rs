@@ -2,9 +2,9 @@ use thiserror::Error;
 
 #[derive(Debug, Error)]
 pub enum ChallengeError {
-    #[error("Challenge timeout or mismatch")]
-    ChallengeNotValid,
-    #[error("Challenge is expired")]
+    #[error("Incorrect PIN code")]
+    IncorrectPin,
+    #[error("Challenge has timed out. Please try again")]
     ChallengeExpired,
     #[error("Email is already verified")]
     EmailAlreadyVerified,

@@ -29,7 +29,7 @@ def _make_request(method, path, data, params, status_code, auths):
         params=params,
     )
     if response.status_code != status_code:
-        assert False, f"Incorrect status code in {method.__name__.upper()} {path}. Got {response.status_code}, expected {status_code}:\n{response.content}\nPath: {path}\nData: {data}\nParams: {params}\nHeaders: {headers}\nReponse: {response.content}"
+        assert False, f"Incorrect status code in {method.__name__.upper()} {path}. Got {response.status_code}, expected {status_code}:\n{response.content}\nPath: {path}\nData: {data}\nParams: {params}\nHeaders: {headers}\nResponse: {response.content}"
     return response.json()
 
 def get(path, params=None, *auths, status_code=200):

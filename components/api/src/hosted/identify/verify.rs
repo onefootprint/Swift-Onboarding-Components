@@ -103,7 +103,7 @@ async fn validate_sms_challenge(
     challenge_response: &str,
 ) -> Result<(UserVaultId, VerifyKind), ApiError> {
     if challenge_state.h_code != sha256(challenge_response.as_bytes()).to_vec() {
-        return Err(ChallengeError::ChallengeNotValid.into());
+        return Err(ChallengeError::IncorrectPin.into());
     }
 
     let phone_number = challenge_state.phone_number;
