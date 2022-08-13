@@ -12,77 +12,66 @@ const ComparisonTable = () => {
     t('companies.footprint'),
     t('companies.persona'),
     t('companies.alloy'),
-    t('companies.unit'),
     t('companies.vgs'),
   ];
   const kyc = [
     { key: 'Footprint', value: true },
     { key: 'Persona', value: true },
     { key: 'Alloy', value: true },
-    { key: 'Unit', value: true },
     { key: 'VGS', value: false },
   ];
   const tokenization = [
     { key: 'Footprint', value: true },
     { key: 'Persona', value: false },
     { key: 'Alloy', value: false },
-    { key: 'Unit', value: false },
     { key: 'VGS', value: true },
   ];
   const piiVaulting = [
     { key: 'Footprint', value: true },
     { key: 'Persona', value: false },
     { key: 'Alloy', value: false },
-    { key: 'Unit', value: false },
     { key: 'VGS', value: true },
   ];
   const accessControl = [
     { key: 'Footprint', value: true },
     { key: 'Persona', value: false },
     { key: 'Alloy', value: false },
-    { key: 'Unit', value: false },
     { key: 'VGS', value: false },
   ];
   const liveness = [
     { key: 'Footprint', value: true },
     { key: 'Persona', value: true },
     { key: 'Alloy', value: false },
-    { key: 'Unit', value: false },
     { key: 'VGS', value: false },
   ];
   const faceId = [
     { key: 'Footprint', value: true },
     { key: 'Persona', value: false },
     { key: 'Alloy', value: false },
-    { key: 'Unit', value: false },
     { key: 'VGS', value: false },
   ];
   const oneClick = [
     { key: 'Footprint', value: true },
     { key: 'Persona', value: false },
     { key: 'Alloy', value: false },
-    { key: 'Unit', value: false },
     { key: 'VGS', value: false },
   ];
   const zeroTrustSecurity = [
     { key: 'Footprint', value: true },
     { key: 'Persona', value: false },
     { key: 'Alloy', value: false },
-    { key: 'Unit', value: false },
     { key: 'VGS', value: true },
   ];
   const simpleIntegration = [
     { key: 'Footprint', value: true },
     { key: 'Persona', value: true },
     { key: 'Alloy', value: false },
-    { key: 'Unit', value: false },
     { key: 'VGS', value: false },
   ];
   const fancyAI = [
     { key: 'Footprint', value: false },
     { key: 'Persona', value: true },
     { key: 'Alloy', value: true },
-    { key: 'Unit', value: true },
     { key: 'VGS', value: false },
   ];
 

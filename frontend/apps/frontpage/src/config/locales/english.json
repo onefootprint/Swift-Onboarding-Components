@@ -405,7 +405,6 @@
           "footprint": "Footprint",
           "persona": "Persona",
           "alloy": "Alloy",
-          "unit": "Unit",
           "vgs": "VGS"
         },
         "features": {
