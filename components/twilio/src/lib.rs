@@ -113,38 +113,6 @@ impl Client {
             return Err(Error::DeliveryFailed)
         }
 
-        // check the status with back off to see if it was delivered
-        let retry_strategy = ExponentialBackoff::from_millis(10)        
-        .take(5);
-
-        let message = Retry::spawn(retry_strategy, move || {
-            self.check_status(message.clone())
-        })
-        .await?;
-
-        Ok(message)
-    }
-
-    /// checks the status of a message to see what its delivery status is
-    async fn check_status(&self, message: Message) -> crate::response::Result<Message> {
-        let url = format!("https://api.twilio.com{}", message.uri);
-
-        let response = self
-        .request_builder(Method::GET, url)
-        .send()
-        .await?;
-
-        let message: Message = decode_response(response).await?;
-
-        use Status::*;
-        if matches!(message.status, Undelivered | Failed) {
-            return Err(Error::DeliveryFailed)
-        }
-
-        if !matches!(message.status, Delivered) {
-            return Err(Error::NotDelivered)
-        }
-
         Ok(message)
     }
 }
