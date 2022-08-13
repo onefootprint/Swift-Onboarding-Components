@@ -51,7 +51,7 @@ pub fn validate(
     if scoped_user.tenant_id != auth.tenant().id {
         return Err(OnboardingError::TenantMismatch.into());
     }
-    if scoped_user.is_live != auth.is_live()? {
+    if scoped_user.is_live != auth.is_live(&state.db_pool).await? {
         return Err(OnboardingError::InvalidSandboxState.into());
     }
 

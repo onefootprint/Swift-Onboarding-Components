@@ -96,15 +96,16 @@ where
     }
 }
 
+#[async_trait]
 impl<A, B> IsLive for Either<A, B>
 where
-    A: IsLive,
-    B: IsLive,
+    A: IsLive + Sync,
+    B: IsLive + Sync,
 {
-    fn is_live(&self) -> Result<bool, AuthError> {
+    async fn is_live(&self, pool: &DbPool) -> Result<bool, AuthError> {
         match self {
-            Either::Left(l) => l.is_live(),
-            Either::Right(r) => r.is_live(),
+            Either::Left(l) => l.is_live(pool).await,
+            Either::Right(r) => r.is_live(pool).await,
         }
     }
 }

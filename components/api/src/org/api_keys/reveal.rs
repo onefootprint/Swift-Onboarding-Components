@@ -28,7 +28,7 @@ async fn get(
     auth: Either<SessionContext<WorkOsSession>, SecretTenantAuthContext>,
 ) -> actix_web::Result<Json<ApiResponseData<TenantApiKeyResponse>>, ApiError> {
     // TODO more strict auth for viewing secret keys
-    let is_live = auth.is_live()?;
+    let is_live = auth.is_live(&state.db_pool).await?;
     let tenant_id = auth.tenant_id();
     let (key, last_used_at) = state
         .db_pool

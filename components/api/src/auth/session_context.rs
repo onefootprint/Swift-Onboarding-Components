@@ -3,6 +3,7 @@ use std::{marker::PhantomData, pin::Pin};
 use actix_web::{http::header::HeaderMap, web, FromRequest};
 use async_trait::async_trait;
 use chrono::{DateTime, Utc};
+use db::DbPool;
 use futures_util::Future;
 use newtypes::{SessionAuthToken, TenantId, UserVaultId};
 use paperclip::actix::Apiv2Security;
@@ -101,11 +102,12 @@ where
     }
 }
 
+#[async_trait]
 impl<C> IsLive for SessionContext<C>
 where
-    C: SupportsIsLiveHeader + HasTenant,
+    C: SupportsIsLiveHeader + HasTenant + std::marker::Sync,
 {
-    fn is_live(&self) -> Result<bool, AuthError> {
+    async fn is_live(&self, _pool: &DbPool) -> Result<bool, AuthError> {
         let is_live: Option<bool> = self
             .headers
             .0

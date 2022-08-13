@@ -27,7 +27,7 @@ fn get(
     auth: Either<SessionContext<WorkOsSession>, SecretTenantAuthContext>,
 ) -> actix_web::Result<Json<ApiResponseData<AuditTrailResponse>>, ApiError> {
     let tenant = auth.tenant(&state.db_pool).await?;
-    let is_live = auth.is_live()?;
+    let is_live = auth.is_live(&state.db_pool).await?;
 
     let logs = state
         .db_pool

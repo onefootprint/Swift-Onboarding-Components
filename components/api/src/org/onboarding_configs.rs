@@ -51,7 +51,7 @@ async fn get(
 
     let query = ObConfigurationQuery {
         tenant_id: auth.tenant_id(),
-        is_live: auth.is_live()?,
+        is_live: auth.is_live(&state.db_pool).await?,
     };
     let (configs, count) = state
         .db_pool
@@ -147,7 +147,7 @@ pub fn post(
         auth.tenant_id(),
         must_collect_data_kinds,
         can_access_data_kinds,
-        auth.is_live()?,
+        auth.is_live(&state.db_pool).await?,
     )
     .await?;
 
@@ -175,7 +175,7 @@ async fn patch(
     request: web::Json<UpdateObConfigRequest>,
 ) -> actix_web::Result<Json<ApiResponseData<ApiObConfig>>, ApiError> {
     let tenant = auth.tenant(&state.db_pool).await?;
-    let is_live = auth.is_live()?;
+    let is_live = auth.is_live(&state.db_pool).await?;
     let UpdateObConfigPath { id } = path.into_inner();
     let UpdateObConfigRequest { name, status } = request.into_inner();
     let tenant_id = tenant.id.clone();

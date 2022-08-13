@@ -56,7 +56,7 @@ fn get(
         timestamp_lte,
         timestamp_gte,
         kinds: data_kinds,
-        is_live: auth.is_live()?,
+        is_live: auth.is_live(&state.db_pool).await?,
     };
     let results =
         AccessEventListItemForTenant::get(&state.db_pool, params, cursor, (page_size + 1) as i64).await?;

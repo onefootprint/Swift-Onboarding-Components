@@ -86,8 +86,9 @@ impl HasTenant for SecretTenantAuthContext {
     }
 }
 
+#[async_trait]
 impl IsLive for SecretTenantAuthContext {
-    fn is_live(&self) -> Result<bool, AuthError> {
+    async fn is_live(&self, _pool: &DbPool) -> Result<bool, AuthError> {
         if self.is_sandbox_restricted() && self.api_key.is_live {
             return Err(AuthError::SandboxRestricted);
         }

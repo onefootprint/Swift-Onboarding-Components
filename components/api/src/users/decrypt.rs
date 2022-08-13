@@ -83,7 +83,7 @@ async fn post_inner(
         &state.db_pool,
         tenant.id.clone(),
         request.footprint_user_id.clone(),
-        auth.is_live()?,
+        auth.is_live(&state.db_pool).await?,
     )
     .await?
     .ok_or(AuthError::InvalidTenantKeyOrUserId)?;

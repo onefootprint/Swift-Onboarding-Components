@@ -32,8 +32,9 @@ pub trait HasTenant {
 }
 
 /// A helper trait to extract whether the auth session is for sandbox or production data
+#[async_trait]
 pub trait IsLive {
-    fn is_live(&self) -> Result<bool, AuthError>;
+    async fn is_live(&self, pool: &DbPool) -> Result<bool, AuthError>;
 }
 
 pub trait SupportsIsLiveHeader {}

@@ -66,7 +66,7 @@ pub fn get(
 
     let query_params = OnboardingListQueryParams {
         tenant_id: tenant.id.clone(),
-        is_live: auth.is_live()?,
+        is_live: auth.is_live(&state.db_pool).await?,
         statuses,
         fingerprints,
         footprint_user_id,

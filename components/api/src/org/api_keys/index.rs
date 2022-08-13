@@ -29,7 +29,7 @@ pub async fn get(
 
     let query = ApiKeyListQuery {
         tenant_id: auth.tenant_id(),
-        is_live: auth.is_live()?,
+        is_live: auth.is_live(&state.db_pool).await?,
     };
     let (keys, id_to_last_used, count) = state
         .db_pool
@@ -64,7 +64,7 @@ pub async fn post(
     auth: Either<SessionContext<WorkOsSession>, SecretTenantAuthContext>,
     request: web::Json<CreateApiKeyRequest>,
 ) -> actix_web::Result<Json<ApiResponseData<TenantApiKeyResponse>>, ApiError> {
-    let secret_key = SecretApiKey::generate(auth.is_live()?);
+    let secret_key = SecretApiKey::generate(auth.is_live(&state.db_pool).await?);
     let tenant = auth.tenant(&state.db_pool).await?;
     let new_key = TenantApiKey::create(
         &state.db_pool,
@@ -72,7 +72,7 @@ pub async fn post(
         secret_key.fingerprint(&state.hmac_client).await?,
         secret_key.seal_to(&tenant.public_key)?,
         tenant.id,
-        auth.is_live()?,
+        auth.is_live(&state.db_pool).await?,
     )
     .await?;
 
@@ -103,7 +103,7 @@ pub async fn patch(
     request: web::Json<UpdateApiKeyRequest>,
 ) -> actix_web::Result<Json<ApiResponseData<TenantApiKeyResponse>>, ApiError> {
     let tenant = auth.tenant(&state.db_pool).await?;
-    let is_live = auth.is_live()?;
+    let is_live = auth.is_live(&state.db_pool).await?;
     let UpdateApiKeyPath { id } = path.into_inner();
     let UpdateApiKeyRequest { name, status } = request.into_inner();
     let result = state
