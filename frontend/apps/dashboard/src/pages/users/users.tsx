@@ -85,11 +85,13 @@ const Users = () => {
                 <CodeInline>{item.footprintUserId}</CodeInline>
               </CodeContainer>
             </td>
+
             <td>
-              <Badge variant={statusToBadgeVariant[item.status]}>
-                {statusToDisplayText[item.status]}
+              <Badge variant={statusToBadgeVariant[item.status!]}>
+                {statusToDisplayText[item.status!]}
               </Badge>
             </td>
+
             <td>
               <FieldOrPlaceholder data={item.attributes.email} />
             </td>

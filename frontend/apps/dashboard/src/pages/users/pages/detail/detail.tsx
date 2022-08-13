@@ -42,9 +42,9 @@ const Detail = () => {
           </Box>
           <BasicInfo user={user} />
           <Box sx={{ height: '40px' }}>&nbsp;</Box>
-          <AuditTrail user={user} />
+          {user.isPortable ? <AuditTrail user={user} /> : null}
           <Box sx={{ height: '40px' }}>&nbsp;</Box>
-          <Insights user={user} />
+          {user.isPortable ? <Insights user={user} /> : null}
           <Box sx={{ height: '72px' }}>&nbsp;</Box>
         </>
       )}

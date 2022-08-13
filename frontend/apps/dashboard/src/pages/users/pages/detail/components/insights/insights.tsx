@@ -27,10 +27,9 @@ const Insights = ({ user }: InsightsProps) => {
   // If there's no onboarding, use the insight event from the scoped user, which is when the user started signing up.
   // We only show `Biometric: Verified` if the user has a biometric credential
   const insightEvent =
-    biometricCred?.insightEvent ||
-    user.onboardings[0]?.insightEvent ||
-    user.insightEvent;
-  const userAgent = insightEvent.userAgent || '';
+    biometricCred?.insightEvent || user.onboardings[0]?.insightEvent;
+
+  const userAgent = insightEvent?.userAgent || '';
 
   return (
     <>

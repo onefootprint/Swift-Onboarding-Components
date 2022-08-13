@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import useDataKindSelectedFields from 'src/components/data-kind-boxes/hooks/use-data-kind-selected-fields';
 import { User } from 'src/pages/users/hooks/use-join-users';
-import { DataKind, dataKindToType } from 'src/types';
+import { ALL_FIELDS, DataKind, dataKindToType } from 'src/types';
 import { Button, Dialog } from 'ui';
 
 import AttributesScreen from './components/attributes-screen';
@@ -22,13 +22,16 @@ const DecryptDialog = ({ user, onDecrypt }: DecryptDialogProps) => {
   const [reason, setReason] = useState('');
   const { selectedFields, setFieldFor, clearSelectedFields } =
     useDataKindSelectedFields();
-  const allowedToDecryptFields = Array.from(
-    new Set(
-      user.onboardings.flatMap(link =>
-        link.canAccessDataKinds.map(dataKind => dataKindToType[dataKind]),
-      ),
-    ),
-  );
+  const allowedToDecryptFields = user.isPortable
+    ? Array.from(
+        new Set(
+          user.onboardings.flatMap(link =>
+            link.canAccessDataKinds.map(dataKind => dataKindToType[dataKind]),
+          ),
+        ),
+      )
+    : ALL_FIELDS;
+
   // The user is allowed to decrypt a field if
   //   (1) the onboarding configuration gives access to decrypt it AND
   //   (2) the user vault has a value set for this field

@@ -7,8 +7,8 @@ export type ScopedUser = {
   populatedDataKinds: DataKinds[];
   startTimestamp: string;
   orderingId: string;
-  insightEvent: InsightEvent;
   onboardings: Onboarding[];
+  isPortable: boolean;
 };
 
 export type Onboarding = {

@@ -5,6 +5,7 @@ export enum OnboardingStatus {
   manualReview = 'manual_review',
   processing = 'processing',
   failed = 'failed',
+  vaultOnly = 'vault-only',
 }
 
 export const statusToPriority = {
@@ -12,6 +13,7 @@ export const statusToPriority = {
   [OnboardingStatus.processing]: 1,
   [OnboardingStatus.manualReview]: 2,
   [OnboardingStatus.failed]: 3,
+  [OnboardingStatus.vaultOnly]: 5,
 };
 
 export const statusToBadgeVariant: Record<OnboardingStatus, UIState> = {
@@ -19,6 +21,7 @@ export const statusToBadgeVariant: Record<OnboardingStatus, UIState> = {
   [OnboardingStatus.processing]: 'neutral',
   [OnboardingStatus.manualReview]: 'error',
   [OnboardingStatus.failed]: 'error',
+  [OnboardingStatus.vaultOnly]: 'neutral',
 };
 
 export const statusToDisplayText = {
@@ -26,4 +29,5 @@ export const statusToDisplayText = {
   [OnboardingStatus.processing]: 'Processing',
   [OnboardingStatus.manualReview]: 'Manual review',
   [OnboardingStatus.failed]: 'Failed',
+  [OnboardingStatus.vaultOnly]: 'Vault',
 };

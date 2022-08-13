@@ -65,10 +65,10 @@ const useJoinUsers = (
         // The status we display for the user is the maximum status of all the onboardings
         const maxStatus = scoped_user.onboardings.sort(
           (a, b) => statusToPriority[b.status] - statusToPriority[a.status],
-        )[0].status;
+        )[0]?.status;
 
         return {
-          status: maxStatus,
+          status: maxStatus || OnboardingStatus.vaultOnly,
           attributes,
           ...scoped_user,
         } as User;
