@@ -3,7 +3,7 @@ import pytest
 from urllib.parse import quote
 from typing import NamedTuple
 from tests.constants import EMAIL, FIELDS_TO_DECRYPT
-from tests.utils import get, post, patch
+from tests.utils import get, post, patch, _gen_random_ssn
 from tests.types import SecretApiKey, ObConfiguration
 from .auth import (
     TenantSecretAuth,
@@ -222,3 +222,21 @@ class TestDashboard:
 
         # Verify we can't use the disabled API key for anything anymore
         get(f"org/api_keys/{secret_key.id}/reveal", None, secret_key.key, status_code=401)
+
+    def test_portable_failed_data_write(self, user):         
+        data = dict(reason="test", attributes=["first_name", "ssn"])
+        body = post(f"users/{user.fp_user_id}/decrypt", data, user.tenant.sk.key)
+        print(body)
+        assert body["data"]["first_name"]
+
+        data = {
+            "dob": {
+                "month": 1,
+                "day": 1,
+                "year": 1970,
+            },
+            "ssn": _gen_random_ssn()
+        }
+
+        # ensure we cannot change data in a portable vault
+        post(f"users/{user.fp_user_id}/data", data, user.tenant.sk.key, status_code=401)

@@ -59,9 +59,9 @@ paperclip = { version = "0.7.1", features = [
     "v3"
 ] }
 mime = "0.3.16"
-actix-session = { version = "0.6.2", features = ["cookie-session"] }
 chrono = { version = "0.4" }
 strum_macros = { version = "0.24" }
+actix-web-httpauth = "0.8.0"
 
 webauthn-rs-core = { git = "https://github.com/kanidm/webauthn-rs", rev = "9ffd732fb9d75c3cc20057c12a41b3323f3417b2"}
 webauthn-rs-proto = { git = "https://github.com/kanidm/webauthn-rs", rev = "9ffd732fb9d75c3cc20057c12a41b3323f3417b2"}

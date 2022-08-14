@@ -20,8 +20,8 @@ pub enum AuthError {
     ApiKeyNotFound,
     #[error("missing X-Client-Public-Key")]
     MissingClientPublicAuthHeader,
-    #[error("missing X-Client-Secret-Key")]
-    MissingClientSecretAuthHeader,
+    #[error("missing X-Client-Secret-Key or HttpBasicAuth")]
+    MissingSecretKeyAuth,
     #[error("missing X-Footprint-Custodian-Key")]
     MissingCustodianAuthHeader,
     #[error("invalid X-Footprint-Custodian-Key")]

@@ -29,7 +29,7 @@ pub async fn post(
 
     Ok(Json(ApiResponseData::ok(ApiScopedUser::from(
         vec![],
-        &vec![],
+        &[],
         scoped,
         false,
     ))))

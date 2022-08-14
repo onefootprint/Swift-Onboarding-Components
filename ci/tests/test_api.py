@@ -1,11 +1,12 @@
 from ast import Pass
-from tests.utils import _gen_random_ssn
+from tests.utils import _gen_random_ssn, url
 import pytest
-from tests.utils import post, build_user_data
+from tests.utils import post, build_user_data, clean_up_user, PHONE_NUMBER, EMAIL
 from tests.types import SecretApiKey
+import requests
+from requests.auth import HTTPBasicAuth
 
-
-class TestNonPortableVault:
+class TestNonPortableVaultApi:
     def test_vault_create_write_decrypt(self, workos_sandbox_tenant):
         
         # create the vault
@@ -26,19 +27,12 @@ class TestNonPortableVault:
         assert data["first_name"] == "SANDBOX"
         assert data["zip"] == "10009"
         assert data["city"] == "Enclave".upper()
+        
+class TestApiFormats:
+    def test_basic_auth(self, workos_sandbox_tenant):    
+        response = requests.get(
+            url("org/api_keys/check"),
+            auth=HTTPBasicAuth(workos_sandbox_tenant.sk.key.token, '')
+        )
+        assert response.status_code == 200
 
-    def test_portable_failed_data_write(self, user):    
-        data = dict(reason="test", attributes=["first_name", "ssn"])
-        post(f"users/{user.fp_user_id}/decrypt", data, user.tenant.sk.key)
-    
-        data = {
-            "dob": {
-                "month": 1,
-                "day": 1,
-                "year": 1970,
-            },
-            "ssn": _gen_random_ssn()
-        }
-
-        # ensure we cannot change data in a portable vault
-        post(f"users/{user.fp_user_id}/data", data, user.tenant.sk.key, status_code=401)
