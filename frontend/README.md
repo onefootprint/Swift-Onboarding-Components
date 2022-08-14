@@ -1,4 +1,4 @@
-# Footprint monorepo
+# Frontend
 
 ## Setup
 

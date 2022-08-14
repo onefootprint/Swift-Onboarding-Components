@@ -11,3 +11,8 @@ tls_proxy/*.crt
 tls_proxy/*.key
 tls_proxy/local_proxy.json
 **/__pycache__/
+
+# misc
+.DS_Store
+*.pem
+.idea/
