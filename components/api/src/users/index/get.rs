@@ -30,7 +30,7 @@ pub struct UsersRequest {
 
 type UsersResponse = Vec<ApiScopedUser>;
 
-#[api_v2_operation(tags(Org, Users))]
+#[api_v2_operation(tags(PublicApi))]
 /// Allows a tenant to view a list of their Onboardings, effectively showing all users that have
 /// started the onboarding process for the tenant. Optionally allows filtering on Onboarding status.
 /// Requires tenant secret key auth.

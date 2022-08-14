@@ -10,7 +10,7 @@ use crate::State;
 use db::models::user_vaults::NewNonPortableUserVaultReq;
 use paperclip::actix::{api_v2_operation, web, web::Json};
 
-#[api_v2_operation(tags(Org, Users))]
+#[api_v2_operation(tags(PublicApi))]
 /// creates a new user vault + scoped user that is not portable
 pub async fn post(
     state: web::Data<State>,

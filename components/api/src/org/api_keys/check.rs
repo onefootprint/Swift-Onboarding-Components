@@ -9,7 +9,7 @@ use chrono::Utc;
 use paperclip::actix::{api_v2_operation, get, web, web::Json};
 
 /// Check that the api key is OK
-#[api_v2_operation(tags(Org))]
+#[api_v2_operation(tags(PublicApi))]
 #[get("/check")]
 async fn get(
     _state: web::Data<State>,

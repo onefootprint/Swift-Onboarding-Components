@@ -202,8 +202,8 @@ async fn main() -> std::io::Result<()> {
             .service(org::routes())
             .service(hosted::routes())
             .service(users::routes())
-            .with_json_spec_at("/open-api/spec")
-            .with_swagger_ui_at("/open-api/swagger")
+            .with_json_spec_at("/docs-spec")
+            .with_swagger_ui_at("/docs-ui")
             .build()
     })
     .bind(("0.0.0.0", config.port))?

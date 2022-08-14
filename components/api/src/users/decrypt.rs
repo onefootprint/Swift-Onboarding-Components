@@ -25,7 +25,7 @@ struct UserDecryptRequest2 {
 
 type UserDecryptResponse = HashMap<DataKind, Option<String>>;
 
-#[api_v2_operation(tags(Org, Users))]
+#[api_v2_operation(tags(PublicApi))]
 #[post("/{footprint_user_id}/decrypt")]
 async fn post2(
     state: web::Data<State>,
@@ -57,7 +57,7 @@ struct UserDecryptRequest {
     reason: String,
 }
 
-#[api_v2_operation(tags(Org, Users))]
+#[api_v2_operation(tags(PublicApi))]
 #[post("/decrypt")]
 async fn post(
     state: web::Data<State>,

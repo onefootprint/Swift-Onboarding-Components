@@ -12,7 +12,7 @@ use db::models::user_vaults::UserVault;
 use newtypes::FootprintUserId;
 use paperclip::actix::{api_v2_operation, post, web, web::Json};
 
-#[api_v2_operation(tags(Org, Users))]
+#[api_v2_operation(tags(PublicApi))]
 #[post("/{footprint_user_id}/data")]
 pub async fn post(
     state: web::Data<State>,

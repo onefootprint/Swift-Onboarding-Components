@@ -16,7 +16,7 @@ struct RedirectUrl {
     redirect_url: String,
 }
 
-#[api_v2_operation(tags(WorkOS))]
+#[api_v2_operation(tags(Private))]
 #[get("/google_oauth")]
 /// Request to authenticate via Google OAuth
 async fn handler(

@@ -43,7 +43,7 @@ pub struct ApiUser {
     // TODO can expand this to include many other data kinds
 }
 
-#[api_v2_operation(tags(User))]
+#[api_v2_operation(tags(Hosted))]
 /// Returns a decrypted profile for the logged-in user
 /// Requires user authentication sent in the cookie after a successful /identify/verify call
 pub async fn handler(

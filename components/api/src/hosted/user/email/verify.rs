@@ -15,7 +15,7 @@ struct EmailVerifyRequest {
     data: SessionAuthToken,
 }
 
-#[api_v2_operation(tags(User))]
+#[api_v2_operation(tags(Hosted))]
 #[post("/verify")]
 /// Used to asynchronously verify a user's email address.
 /// Requires the token sent to the users email

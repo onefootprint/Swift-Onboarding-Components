@@ -3,7 +3,7 @@ use actix_web::HttpRequest;
 
 use paperclip::actix::{api_v2_operation, get};
 
-#[api_v2_operation]
+#[api_v2_operation(tags(Private))]
 #[tracing::instrument(name = "index", skip(req))]
 #[get("/")]
 async fn handler(req: HttpRequest) -> Result<String, ApiError> {

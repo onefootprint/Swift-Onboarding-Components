@@ -24,7 +24,7 @@ pub struct OnboardingResponse {
     validation_token: Option<SessionAuthToken>,
 }
 
-#[api_v2_operation(tags(Onboarding))]
+#[api_v2_operation(tags(Hosted, Bifrost))]
 /// Gets or creates the onboarding for this (user, tenant) pair. Returns the list of fields
 /// required to complete the onboarding for this tenant.
 pub fn handler(

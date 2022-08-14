@@ -16,7 +16,7 @@ pub struct D2pSmsResponse {
     time_before_retry_s: i64,
 }
 
-#[api_v2_operation(tags(D2p))]
+#[api_v2_operation(tags(Hosted))]
 #[post("sms")]
 /// Send an SMS with a link to the phone onboarding page
 pub fn handler(

@@ -3,22 +3,23 @@ use std::{marker::PhantomData, pin::Pin};
 use actix_web::{web, FromRequest};
 use db::models::{ob_configurations::ObConfiguration, tenants::Tenant};
 use futures_util::Future;
-use paperclip::actix::Apiv2Security;
+use newtypes::ObConfigurationKey;
+use paperclip::actix::Apiv2Header;
 
 use crate::{auth::AuthError, State};
 
-#[derive(Debug, Clone, Apiv2Security)]
-#[openapi(
-    apiKey,
-    in = "header",
-    name = "X-Client-Public-Key",
-    description = "The client's publishable key"
-)]
+#[derive(Debug, Clone, Apiv2Header)]
 /// SecretTenantAuthContext extracts a tenant's public key from the X-Client-Public-Key header
 /// which authenticates the client as a tenant.
 pub struct PublicTenantAuthContext {
+    #[allow(unused)]
+    #[openapi(name = "X-Client-Public-Key", description = "The onboarding publishable key")]
+    onboarding_key: ObConfigurationKey,
+    #[openapi(skip)]
     pub tenant: Tenant,
+    #[openapi(skip)]
     pub ob_config: ObConfiguration,
+    #[openapi(skip)]
     phantom: PhantomData<()>,
 }
 
@@ -54,6 +55,7 @@ pub async fn from_request_inner(
         .await??
         .ok_or(AuthError::ApiKeyNotFound)?;
     Ok(PublicTenantAuthContext {
+        onboarding_key: ob_config.key.clone(),
         tenant,
         ob_config,
         phantom: PhantomData,

@@ -1,7 +1,7 @@
 use crate::schema::{verification_requests, verification_requests_user_data};
 use chrono::{DateTime, Utc};
 use diesel::Insertable;
-use newtypes::{ScopedUserId, UserDataId, Vendor, VerificationRequestId, VerificationRequestUserDataId};
+use newtypes::{ScopedUserId, Vendor, VerificationRequestId, VerificationRequestUserDataId};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable, Identifiable)]
@@ -20,5 +20,4 @@ pub struct VerificationRequest {
 pub struct VerificationRequestUserData {
     pub id: VerificationRequestUserDataId,
     pub request_id: VerificationRequestId,
-    pub user_data_id: UserDataId,
 }

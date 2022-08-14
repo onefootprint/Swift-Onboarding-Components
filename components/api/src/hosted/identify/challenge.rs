@@ -19,7 +19,7 @@ pub struct ChallengeResponse {
     time_before_retry_s: i64,
 }
 
-#[api_v2_operation(tags(Identify))]
+#[api_v2_operation(tags(Hosted, Bifrost))]
 #[post("/challenge")]
 /// Sends a challenge to the phone number and returns an HTTP 200. When the challenge is completed
 /// through the identify/verify endpoint, we will get or create the user with this phone number

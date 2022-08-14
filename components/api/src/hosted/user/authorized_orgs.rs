@@ -22,7 +22,7 @@ pub struct ApiUserOnboarding {
 }
 
 /// Returns a list of onboardings that a user has performed
-#[api_v2_operation(tags(User))]
+#[api_v2_operation(tags(Hosted))]
 #[get("authorized_orgs")]
 pub async fn handler(
     state: web::Data<State>,

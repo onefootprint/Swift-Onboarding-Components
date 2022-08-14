@@ -14,7 +14,7 @@ pub struct StatusResponse {
     status: D2pSessionStatus,
 }
 
-#[api_v2_operation(tags(D2p))]
+#[api_v2_operation(tags(Hosted))]
 #[get("status")]
 /// Gets the status of the provided d2p session. Requires the d2p session token as the auth header.
 pub async fn get(
@@ -40,7 +40,7 @@ pub struct UpdateStatusRequest {
     status: D2pSessionStatus,
 }
 
-#[api_v2_operation(tags(D2p))]
+#[api_v2_operation(tags(Hosted))]
 #[post("status")]
 /// Update the status of the provided d2p session. Only allows updating to certain statuses
 pub fn post(

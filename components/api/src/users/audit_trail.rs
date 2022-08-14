@@ -18,7 +18,7 @@ struct AuditTrailRequest {
 
 type AuditTrailResponse = Vec<ApiAuditTrail>;
 
-#[api_v2_operation(tags(Org, Users))]
+#[api_v2_operation(tags(PublicApi))]
 #[get("/audit_trail")]
 /// Allows a tenant to view a customer's audit trail
 fn get(

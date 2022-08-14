@@ -16,7 +16,7 @@ struct GetTenantResponse {
 }
 
 /// get tenant settings
-#[api_v2_operation(tags(Org))]
+#[api_v2_operation(tags(PublicApi))]
 #[get("/")]
 fn handler(
     state: web::Data<State>,

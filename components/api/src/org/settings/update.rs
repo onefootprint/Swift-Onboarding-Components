@@ -16,7 +16,7 @@ struct UpdateRequest {
     logo_url: Option<String>,
 }
 
-#[api_v2_operation(tags(Org))]
+#[api_v2_operation(tags(PublicApi))]
 #[post("/")]
 /// Update tenant configuration settings
 fn handler(

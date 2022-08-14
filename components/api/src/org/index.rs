@@ -8,7 +8,7 @@ use crate::State;
 use paperclip::actix::{api_v2_operation, web, web::Json};
 
 /// Return basic info about the authed tenant
-#[api_v2_operation(tags(Org))]
+#[api_v2_operation(tags(PublicApi))]
 pub async fn get(
     state: web::Data<State>,
     auth: Either<SessionContext<WorkOsSession>, SecretTenantAuthContext>,

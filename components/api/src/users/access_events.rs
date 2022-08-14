@@ -28,7 +28,7 @@ struct AccessEventRequest {
 
 type AccessEventResponse = Vec<ApiAccessEvent>;
 
-#[api_v2_operation(tags(Org, Users))]
+#[api_v2_operation(tags(PublicApi))]
 #[get("/access_events")]
 /// Allows a tenant to view a list of AccessEvent logs for a specific user's data. Optionally
 /// allows filtering on data_kind.

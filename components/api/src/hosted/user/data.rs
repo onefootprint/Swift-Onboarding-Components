@@ -9,7 +9,7 @@ use crate::utils::user_vault_wrapper::UserVaultWrapper;
 use crate::{errors::ApiError, utils::email::send_email_challenge, State};
 use paperclip::actix::{api_v2_operation, post, web, web::Json};
 
-#[api_v2_operation(tags(User))]
+#[api_v2_operation(tags(Hosted))]
 #[post("/data")]
 /// Operates as a PATCH request to update data in the user vault
 async fn handler(

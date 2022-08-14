@@ -5,8 +5,7 @@ use super::insight_event::ApiInsightEvent;
 
 #[derive(Debug, Clone, serde::Serialize, Apiv2Schema)]
 pub struct ApiLiveness {
-    // TODO other webauthn cred fields here probably
-    insight_event: ApiInsightEvent,
+    pub insight_event: ApiInsightEvent,
 }
 
 impl From<(WebauthnCredential, InsightEvent)> for ApiLiveness {

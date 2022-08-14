@@ -25,7 +25,7 @@ use newtypes::ObConfigurationId;
 use paperclip::actix::Apiv2Schema;
 use paperclip::actix::{api_v2_operation, get, patch, post, web, web::Json};
 
-#[api_v2_operation(tags(Org))]
+#[api_v2_operation(tags(PublicApi))]
 #[get("/onboarding_config")]
 /// Uses tenant public key auth to return information about the tenant
 pub fn get_detail(
@@ -37,7 +37,7 @@ pub fn get_detail(
     )))))
 }
 
-#[api_v2_operation(tags(Org))]
+#[api_v2_operation(tags(PublicApi))]
 #[get("/onboarding_configs")]
 /// Return a list of onboarding configurations owned by the tenant
 async fn get(
@@ -125,7 +125,7 @@ impl CreateOnboardingConfigurationRequest {
     }
 }
 
-#[api_v2_operation(tags(Org))]
+#[api_v2_operation(tags(PublicApi))]
 #[post("/onboarding_configs")]
 /// Create a new onboarding configuration
 pub fn post(
@@ -165,7 +165,7 @@ struct UpdateObConfigRequest {
     status: Option<ApiKeyStatus>,
 }
 
-#[api_v2_operation(tags(Org))]
+#[api_v2_operation(tags(PublicApi))]
 #[patch("/onboarding_configs/{id}")]
 /// Update an existing onboarding configuration
 async fn patch(

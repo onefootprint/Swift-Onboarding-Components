@@ -1,5 +1,4 @@
 pub use derive_more::{Add, Display, From, FromStr, Into};
-use paperclip::actix::Apiv2Schema;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
@@ -20,18 +19,26 @@ macro_rules! define_newtype_id {
             Serialize,
             Deserialize,
             Default,
-            Apiv2Schema,
             DieselNewType,
         )]
         #[serde(transparent)]
         pub struct $name($type);
+
+        impl paperclip::v2::schema::TypedData for $name {
+            fn data_type() -> paperclip::v2::models::DataType {
+                paperclip::v2::models::DataType::String
+            }
+
+            fn format() -> Option<paperclip::v2::models::DataTypeFormat> {
+                None
+            }
+        }
     };
 }
 
 // define our raw ids here
 define_newtype_id!(TenantId, String, "Identifier for a Tenant");
 define_newtype_id!(TenantApiKeyId, String, "Primary Key for an api key");
-define_newtype_id!(UserDataId, String, "Identifier for a User Data");
 define_newtype_id!(UserVaultId, String, "Identifier for a User Vault");
 
 define_newtype_id!(FingerprintId, Uuid, "Identifier for a fingerprint");

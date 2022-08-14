@@ -12,20 +12,18 @@ use newtypes::FootprintUserId;
 use paperclip::actix::{api_v2_operation, get, web, web::Json, Apiv2Schema};
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, Apiv2Schema)]
-struct LivenessRequest {
+pub struct LivenessRequest {
     footprint_user_id: FootprintUserId,
 }
 
-type LivenessResponse = Vec<ApiLiveness>;
-
-#[api_v2_operation(tags(Org, Users))]
+#[api_v2_operation(tags(PublicApi))]
 #[get("/liveness")]
 /// Allows a tenant to view a customer's registered webauthn credentials
-fn get(
+pub async fn get(
     state: web::Data<State>,
     request: web::Query<LivenessRequest>,
     auth: Either<SessionContext<WorkOsSession>, SecretTenantAuthContext>,
-) -> actix_web::Result<Json<ApiResponseData<LivenessResponse>>, ApiError> {
+) -> actix_web::Result<Json<ApiResponseData<Vec<ApiLiveness>>>, ApiError> {
     let tenant = auth.tenant(&state.db_pool).await?;
     let is_live = auth.is_live(&state.db_pool).await?;
 

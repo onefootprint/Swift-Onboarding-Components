@@ -19,7 +19,7 @@ struct RequestEmailVerifyRequest {
     id: EmailId,
 }
 
-#[api_v2_operation(tags(User))]
+#[api_v2_operation(tags(Hosted))]
 #[post("/challenge")]
 /// Re-send the email verification email for the given user data
 async fn post(

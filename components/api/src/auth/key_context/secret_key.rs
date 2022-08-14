@@ -1,5 +1,5 @@
-use crate::auth::{HasTenant, Principal};
 use crate::auth::{AuthError, IsLive};
+use crate::auth::{HasTenant, Principal};
 use crate::{errors::ApiError, State};
 use actix_web::{web, FromRequest};
 use async_trait::async_trait;
@@ -9,7 +9,7 @@ use db::DbPool;
 use futures_util::Future;
 
 use newtypes::secret_api_key::SecretApiKey;
-use newtypes::{TenantId};
+use newtypes::TenantId;
 use paperclip::actix::Apiv2Security;
 use std::pin::Pin;
 

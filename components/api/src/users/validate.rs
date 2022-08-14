@@ -20,16 +20,16 @@ pub struct ValidateRequest {
 
 #[derive(Debug, Clone, serde::Serialize, Apiv2Schema)]
 pub struct ValidateResponse {
-    onboarding_configuration_id: ObConfigurationId,
-    footprint_user_id: FootprintUserId,
-    status: newtypes::Status,
-    timestamp: DateTime<Utc>,
+    pub onboarding_configuration_id: ObConfigurationId,
+    pub footprint_user_id: FootprintUserId,
+    pub status: newtypes::Status,
+    pub timestamp: DateTime<Utc>,
 }
 
-#[api_v2_operation(tags(Org, Users))]
+#[api_v2_operation(tags(PublicApi))]
 #[post("/validate")]
 /// Allows a tenant to view a customer's registered webauthn credentials
-pub fn validate(
+pub async fn validate(
     state: web::Data<State>,
     request: web::Json<ValidateRequest>,
     auth: SecretTenantAuthContext,

@@ -13,7 +13,7 @@ pub struct TokenResponse {
     pub expires_at: DateTime<Utc>,
 }
 
-#[api_v2_operation(tags(User))]
+#[api_v2_operation(tags(Hosted))]
 #[get("token")]
 /// Returns information about a given auth token
 pub fn get(user_auth: UserAuth) -> actix_web::Result<Json<ApiResponseData<TokenResponse>>, ApiError> {
