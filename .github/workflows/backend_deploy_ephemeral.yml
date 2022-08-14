@@ -1,12 +1,12 @@
-name: Ephemeral Stack
+name: [Backend] Ephemeral Stack
 on:
   pull_request:
     types: [labeled, reopened, opened, synchronize, edited]
     paths:
-      - "components/**/*"
-      - "infra/*"
-      - "infra/**/*"
-      - "*.dockerfile"
+      - "backend/components/**/*"
+      - "backend/infra/*"
+      - "backend/infra/**/*"
+      - "backend/*.dockerfile"
       - ".github/workflows/*.yml"
 
 concurrency:

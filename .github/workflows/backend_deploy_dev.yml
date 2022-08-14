@@ -1,13 +1,13 @@
-name: Deploy Dev
+name: [Backend] Deploy Dev
 
 on:
   push:
     paths:
-      - "infra/**"
-      - "components/**"
-      - "*.dockerfile"
-      - ".github/workflows/build_and_deploy.yml"
-      - ".github/workflows/deploy_dev.yml"
+      - "backend/infra/**"
+      - "backend/components/**"
+      - "backend/*.dockerfile"
+      - ".github/workflows/backend_build_and_deploy.yml"
+      - ".github/workflows/backend_deploy_dev.yml"
 
     branches:
       - master

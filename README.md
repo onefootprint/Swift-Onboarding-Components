@@ -1,12 +1,7 @@
 # Footprint Monorepo
+This repository is the entire Footprint core product codebase. 
 
-This is footprint's core backend monorepo. This houses our main backend API crate, user vaults, tokenization service, enclave service, and the verification engine and their APIs. This repo also includes `/infra` which manages the full infra-as-code deployment using Pulumi on AWS.
+The codebase comprises two main components:
+- [Frontend](frontend/README.md): a collection of NextJS/react apps that runs atop Vercel powering all of our frontend web-based applications.
+- [Backend](backend/README.md): API services that powers user vaults, tokenization service, enclave service, and the verification engine and their APIs which all run atop AWS using infra-as-code via Pulumi.
 
-![Infra Architecture-2](https://user-images.githubusercontent.com/356333/165533366-db6ad5f5-5d2f-4cb5-9869-06c3b816696f.png)
-
-## Documents
-
-- [Development](DEVELOPMENT.md)
-- [Style Guide](STYLE_GUIDE.md)
-- [Cross Device Testing](CROSS_DEVICE.md)
-- [Setting up enclave signing](ENCLAVE_SIGNING_KEY.md)

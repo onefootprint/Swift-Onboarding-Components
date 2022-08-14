@@ -1,4 +1,4 @@
-name: Destroy Ephemeral Stack
+name: [Backend] Destroy Ephemeral Stack
 on:
   pull_request:
     types: [closed]
@@ -20,6 +20,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+      - run: cd backend/
 
       # pulumi setup
       - uses: actions/setup-node@v2
@@ -38,7 +39,7 @@ jobs:
           pulumi-version: 3.32.1
 
       - run: npm install
-        working-directory: infra
+        working-directory: ./infra
 
       - name: Extract stack name
         shell: bash
@@ -51,18 +52,18 @@ jobs:
 
       # create our temp stack
       - run: pulumi stack init --secrets-provider ${{ secrets.AWS_SECRETS_PROVIDER }} --copy-config-from "footprint/dev" "footprint/${{ steps.get_stack_name.outputs.stack }}" || true
-        working-directory: infra
+        working-directory: ./infra
         env:
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
 
       # copy our stack file just in case
       - run: cp Pulumi.dev.yaml Pulumi.${{ steps.get_stack_name.outputs.stack }}.yaml
-        working-directory: infra
+        working-directory: ./infra
 
       # get the url for the environment
       - name: Extract env url
         shell: bash
-        working-directory: infra
+        working-directory: ./infra
         run: |
           base=$(pulumi config --stack footprint/${{ steps.get_stack_name.outputs.stack }} get --path constants.domain.base)
           url="${{ steps.get_stack_name.outputs.stack }}.${base}"
@@ -81,6 +82,6 @@ jobs:
 
       # rm our temp stack
       - run: pulumi stack --stack footprint/${{ steps.get_stack_name.outputs.stack }} rm -y
-        working-directory: infra
+        working-directory: ./infra
         env:
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}

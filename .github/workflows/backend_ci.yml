@@ -1,11 +1,16 @@
-name: CI
+name: [Backend] CI
 
 on:
   push:
+    paths:
+      - "backend/"
+
     branches:
       - master
 
   pull_request:
+    paths:
+      - "backend/"
 
 env:
   CARGO_TERM_COLOR: always
@@ -38,6 +43,7 @@ jobs:
           sudo apt-get install -y libssl-dev libpq-dev
 
       - uses: actions/checkout@v3
+      - run: cd backend/
 
       - name: rust-toolchain
         uses: actions-rs/toolchain@v1.0.6
@@ -100,6 +106,7 @@ jobs:
           psql -h localhost -c 'create database footprint_db;'
 
       - uses: actions/checkout@v3
+      - run: cd backend/
 
       - name: Set dot env
         run: make set-dot-env
@@ -118,7 +125,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
 
       - name: Install python deps
-        working-directory: ci
+        working-directory: ./ci
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
@@ -150,7 +157,7 @@ jobs:
           kill $server_pid
 
       - name: Comment markdown on PR
-        working-directory: ci
+        working-directory: ./ci
         run: |
           FINISH=`awk '/===/{ print NR; }' integration_test_output.txt | sed -n 2p`
           CROP=$(expr $FINISH - 1)
@@ -163,7 +170,7 @@ jobs:
           echo 'Tests organized by file' >> tmp.txt
           cat out.txt >> tmp.txt
           COMMENT="$(awk '{printf "%s\\n", $0}' tmp.txt)"
-          comments_url=$(curl -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/onefootprint/footprint-core/pulls/$PR_NUMBER" | jq '._links.comments.href' | sed 's/\"//g')
+          comments_url=$(curl -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/onefootprint/monorepo/pulls/$PR_NUMBER" | jq '._links.comments.href' | sed 's/\"//g')
           curl -X POST -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" "$comments_url" -d "{\"body\": \" $COMMENT \" }"
         # only run on PRs
         if: ${{ github.ref != 'refs/heads/master' && (success() || failure()) }}
@@ -172,7 +179,7 @@ jobs:
         run: cargo install diesel_cli --no-default-features --features postgres
 
       - name: Check valid db migrations
-        working-directory: components/db
+        working-directory: ./components/db
         run: |
           NUM_FILES=`ls migrations | wc -l`
           NUM_TO_REVERT="4"
@@ -207,6 +214,7 @@ jobs:
           sudo apt-get install -y libssl-dev libpq-dev
 
       - uses: actions/checkout@v3
+      - run: cd backend/
 
       - name: rust-toolchain
         uses: actions-rs/toolchain@v1.0.6

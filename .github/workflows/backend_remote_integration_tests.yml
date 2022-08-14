@@ -1,4 +1,4 @@
-name: Remote Integration Tests
+name: [Backend] Remote Integration Tests
 
 on:
   workflow_call:
@@ -62,20 +62,20 @@ jobs:
           python-version: ${{ matrix.python-version }}
 
       - name: Install dependencies
-        working-directory: ci
+        working-directory: ./ci
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
       - name: Integration testing
-        working-directory: ci
+        working-directory: ./ci
         run: |
           set -o pipefail
           pytest tests/ --emoji 2>&1 | tee integration_test_output.txt
 
       - name: Comment markdown on PR
         if: ${{ inputs.isPR && (success() || failure()) }}
-        working-directory: ci
+        working-directory: ./ci
         run: |
           FINISH=`awk '/===/{ print NR; }' integration_test_output.txt | sed -n 2p`
           CROP=$(expr $FINISH - 1)
@@ -87,5 +87,5 @@ jobs:
           echo '# :globe_with_meridians: :footprints: ${{ inputs.testUrl }} Integration Report' > tmp.txt
           cat out.txt >> tmp.txt
           COMMENT="$(awk '{printf "%s\\n", $0}' tmp.txt)"
-          comments_url=$(curl -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/onefootprint/footprint-core/pulls/$PR_NUMBER" | jq '._links.comments.href' | sed 's/\"//g')
+          comments_url=$(curl -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/onefootprint/monorepo/pulls/$PR_NUMBER" | jq '._links.comments.href' | sed 's/\"//g')
           curl -X POST -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" "$comments_url" -d "{\"body\": \"$COMMENT\" }"

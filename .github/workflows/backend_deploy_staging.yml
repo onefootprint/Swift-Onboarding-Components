@@ -1,26 +1,35 @@
-name: Deploy Production
-
+name: [Backend] Deploy Staging
 on:
-  #
-  # NOTE: for now we are auto-deploying to prod if tests pass!
-  #
-  workflow_run:
-    workflows: ["Deploy Dev"]
-    types:
-      - completed
+  pull_request:
+    types: [reopened, opened, synchronize, edited]
+    branches:
+      - "production"
+    paths:
+      - "backend/components/**/*"
+      - "backend/infra/*"
+      - "backend/infra/**/*"
+      - "backend/*.dockerfile"
+      - "backend/.github/workflows/*.yml"
 
 concurrency:
-  group: ${{ github.workflow }}-deploy-prod
+  group: ${{ github.workflow }}-staging
 
 jobs:
-  deploy_stack_prod:
-    name: Deploy stack
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+  deploy_staging_stack:
+    name: staging
     uses: ./.github/workflows/build_and_deploy.yml
+    if: github.actor != 'dependabot[bot]'
+    permissions:
+      contents: write
+      pull-requests: write
     with:
       environment: production
       baseStackName: prod
-      stackName: prod
+      createStack: true
+      stackName: "staging"
+      baseDomain: "staging.onefootprint.com"
+      prefixDomain: "api."
+
     secrets:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_REGION: ${{ secrets.AWS_REGION }}
@@ -30,34 +39,18 @@ jobs:
       PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
       AWS_SECRETS_PROVIDER: ${{ secrets.AWS_SECRETS_PROVIDER }}
 
-  sentry_release:
-    name: "Sentry Release Integration"
-    runs-on: ubuntu-latest
-    needs: [deploy_stack_prod]
-    environment: production
-    steps:
-      - uses: actions/checkout@v2
-      - name: Create Sentry release
-        uses: getsentry/action-release@v1
-        env:
-          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-          SENTRY_ORG: onefootprint
-          SENTRY_PROJECT: backend
-        with:
-          environment: production
-
   run_tests:
-    name: "integration tests"
-    needs: [deploy_stack_prod]
+    name: "staging integration tests"
+    needs: [deploy_staging_stack]
     if: success()
     uses: ./.github/workflows/remote_integration_tests.yml
     permissions:
       contents: write
       pull-requests: write
     with:
-      testUrl: "${{ needs.deploy_stack_prod.outputs.url }}"
-      isPR: false
-      waitForDeploy: true
+      testUrl: "${{ needs.deploy_staging_stack.outputs.url }}"
+      prNumber: ${{ github.event.number }}
+      isPR: true
     secrets:
       INTEGRATION_TEST_PHONE_NUMBER: ${{ secrets.INTEGRATION_TEST_PHONE_NUMBER }}
       TWILIO_ACCOUNT_SID: ${{ secrets.TWILIO_ACCOUNT_SID }}

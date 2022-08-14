@@ -4,8 +4,8 @@ on:
   pull_request:
     branches: [master]
     paths:
-      - "infra/**/*"
-      - "infra/*"
+      - "backend/infra/**/*"
+      - "backend/infra/*"
 
 jobs:
   tag-ephemeral:

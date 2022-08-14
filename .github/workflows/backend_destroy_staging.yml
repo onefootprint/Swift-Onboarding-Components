@@ -1,4 +1,4 @@
-name: Destroy staging
+name: [Backend] Destroy staging
 on:
   pull_request:
     types: [closed]
@@ -20,6 +20,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+      - run: cd backend/
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -34,7 +35,7 @@ jobs:
           node-version: 14.x
 
       - run: npm install
-        working-directory: infra
+        working-directory: ./infra
 
       # bring down the staging stack
       - uses: pulumi/actions@v3
