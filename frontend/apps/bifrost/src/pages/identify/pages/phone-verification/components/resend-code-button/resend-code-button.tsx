@@ -23,6 +23,7 @@ const ResendCodeButton = () => {
     if (retryDisabledUntil) {
       setDate(retryDisabledUntil);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const isResendLoading =

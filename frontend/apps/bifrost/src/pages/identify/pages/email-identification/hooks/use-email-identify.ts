@@ -17,7 +17,7 @@ import useIdentifyMachine from '../../../hooks/use-identify-machine';
 const useEmailIdentify = () => {
   const [state, send] = useIdentifyMachine();
   const {
-    context: { device, identifyType },
+    context: { identifyType },
   } = state;
   const identifyMutation = useIdentify();
   const identifyVerifyMutation = useIdentityVerification();
@@ -26,11 +26,10 @@ const useEmailIdentify = () => {
   const isLoading = () =>
     identifyMutation.isLoading || identifyVerifyMutation.isLoading;
 
-  const identifyEmail = (email: string) => {
-    const preferredChallengeKind =
-      device.hasSupportForWebauthn && device.type === 'mobile'
-        ? ChallengeKind.biometric
-        : ChallengeKind.sms;
+  const identifyEmail = (
+    email: string,
+    preferredChallengeKind: ChallengeKind,
+  ) => {
     identifyMutation.mutate(
       { identifier: { email }, preferredChallengeKind, identifyType },
       {

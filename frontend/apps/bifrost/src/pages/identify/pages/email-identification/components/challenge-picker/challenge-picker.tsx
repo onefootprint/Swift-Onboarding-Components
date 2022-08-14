@@ -1,26 +1,52 @@
 import FocusTrap from 'focus-trap-react';
 import { useTranslation } from 'hooks';
 import IcoClose24 from 'icons/ico/ico-close-16';
+import IcoFaceid24 from 'icons/ico/ico-faceid-24';
+import IcoSmartphone24 from 'icons/ico/ico-smartphone-24';
 import React, { useState } from 'react';
+import { useIdentifyMachine } from 'src/components/identify-machine-provider';
+import { ChallengeKind } from 'src/utils/state-machine/identify/types';
 import styled, { css } from 'styled-components';
 import { Button, Typography } from 'ui';
 import Overlay from 'ui/src/components/internal/overlay/overlay';
 
-import { ChallengeKind } from '../../../../../../utils/state-machine/identify/types';
+import ChallengeOption from './components/challenge-option';
+
+const iOSPlatforms = [
+  'iPad Simulator',
+  'iPhone Simulator',
+  'iPod Simulator',
+  'iPad',
+  'iPhone',
+  'iPod',
+];
 
 type BottomSheetProps = {
+  open: boolean;
   onClose: () => void;
   onSelectSms: () => void;
   onSelectBiometric: () => void;
 };
 
 const ChallengePicker = ({
+  open,
   onClose,
   onSelectSms,
   onSelectBiometric,
 }: BottomSheetProps) => {
   const { t } = useTranslation('pages.email-identification.challenge-picker');
-  const [challengeKind, setChallengeKind] = useState(ChallengeKind.sms);
+  const [state] = useIdentifyMachine();
+  const {
+    context: { device },
+  } = state;
+
+  const supportsBiometric =
+    device.hasSupportForWebauthn && device.type === 'mobile';
+  const [challengeKind, setChallengeKind] = useState(
+    supportsBiometric ? ChallengeKind.biometric : ChallengeKind.sms,
+  );
+
+  const iOS = iOSPlatforms.includes(navigator.platform);
 
   const handleComplete = () => {
     if (challengeKind === ChallengeKind.sms) {
@@ -38,10 +64,11 @@ const ChallengePicker = ({
     setChallengeKind(ChallengeKind.biometric);
   };
 
-  return (
+  // TODO: add open animation
+  return !open ? null : (
     <FocusTrap>
       <Overlay onClick={onClose} aria-modal>
-        <BottomSheet>
+        <BottomSheet className={open ? 'visible' : 'hidden'}>
           <Header>
             <CloseContainer onClick={onClose}>
               <IcoClose24 />
@@ -51,31 +78,24 @@ const ChallengePicker = ({
           <Body>
             <Typography variant="body-2">{t('title')}</Typography>
             <OptionsContainer>
-              <Option
-                selected={challengeKind === ChallengeKind.sms}
+              <ChallengeOption
+                title={t('sms.title')}
+                description={t('sms.description')}
+                IconComponent={IcoSmartphone24}
                 onClick={handleSelectSms}
-              >
-                <Typography variant="label-2" color="accent">
-                  {t('sms.title')}
-                </Typography>
-                {/* TODO: add icon */}
-                <Typography variant="body-4" color="secondary">
-                  {t('sms.description')}
-                </Typography>
-              </Option>
-              <Option
-                selected={challengeKind === ChallengeKind.biometric}
+                selected={challengeKind === ChallengeKind.sms}
+              />
+              <ChallengeOption
+                title={t('biometric.title')}
+                description={
+                  iOS
+                    ? t('biometric.description-ios')
+                    : t('biometric.description-default')
+                }
+                IconComponent={IcoFaceid24}
                 onClick={handleSelectBiometric}
-              >
-                <Typography variant="label-2" color="accent">
-                  {t('biometric.title')}
-                </Typography>
-                {/* TODO: add icon */}
-                <Typography variant="body-4" color="secondary">
-                  {t('biometric.description-default')}
-                  {/* TODO: Detect whether ios & show different text */}
-                </Typography>
-              </Option>
+                selected={challengeKind === ChallengeKind.biometric}
+              />
             </OptionsContainer>
             <Button fullWidth onClick={handleComplete}>
               {t('cta')}
@@ -93,7 +113,6 @@ const CloseContainer = styled.div`
     top: 50%;
     transform: translateY(-50%);
     left: ${theme.spacing[5]}px;
-    align-self: end;
   `}
 `;
 
@@ -102,6 +121,8 @@ const BottomSheet = styled.div`
     width: 100%;
     background-color: ${theme.backgroundColor.primary};
     border-radius: ${theme.borderRadius[3]}px ${theme.borderRadius[3]}px 0 0;
+    z-index: ${theme.zIndex.overlay + 1};
+    align-self: end;
   `}
 `;
 
@@ -130,32 +151,6 @@ const OptionsContainer = styled.div`
   display: flex;
   flex-direction: column;
   text-align: left;
-`;
-
-const Option = styled.div<{ selected?: boolean }>`
-  ${({ theme, selected }) => css`
-    border-radius: ${theme.borderRadius[2]}px;
-    border: 1px solid ${theme.borderColor.tertiary};
-    padding: ${theme.spacing[5]}px;
-
-    &:first-child {
-      border-radius: ${theme.borderRadius[2]}px ${theme.borderRadius[2]}px 0 0;
-    }
-
-    &:last-child {
-      border-radius: 0 0 ${theme.borderRadius[2]}px ${theme.borderRadius[2]}px;
-    }
-
-    &:not(:last-child) {
-      margin-top: -1px; // because of the borders
-    }
-
-    ${selected &&
-    css`
-      background-color: #4a24db14;
-      border: 1px solid ${theme.borderColor.secondary};
-    `}
-  `}
 `;
 
 export default ChallengePicker;
