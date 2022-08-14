@@ -1,12 +1,16 @@
-name: Quality check
+name: Frontend Quality check
 
 on:
   push:
     branches:
       - master
+    paths:
+      - frontend
   pull_request:
     branches:
       - master
+    paths:
+      - frontend
 
 jobs:
   quality:

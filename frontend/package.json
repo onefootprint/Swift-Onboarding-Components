@@ -13,14 +13,12 @@
     "format": "prettier --check \"**/*.{ts,tsx,md}\"",
     "format:fix": "prettier --write \"**/*.{ts,tsx,md}\"",
     "lint": "turbo run lint",
-    "prepare": "husky install",
     "test": "turbo run test",
     "clean": "turbo run clean && rm -rf node_modules"
   },
   "devDependencies": {
     "esbuild": "^0.14.38",
     "esbuild-jest": "^0.5.0",
-    "husky": "^7.0.4",
     "identity-obj-proxy": "^3.0.0",
     "jest": "^28.0.1",
     "jest-environment-jsdom": "^28.0.1",
