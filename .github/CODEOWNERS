@@ -1,4 +1,4 @@
 # Each line is a file pattern followed by one or more owners.
 
-/frontend @rafaelmotta @belcedogru
-/backend @agrinman @evforde
+/frontend @onefootprint/frontend
+/backend @onefootprint/backend
