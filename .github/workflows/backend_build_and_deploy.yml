@@ -62,14 +62,13 @@ jobs:
     environment: ${{ inputs.environment }}
     steps:
       - uses: actions/checkout@v2
-      - run: cd backend/
 
       - name: Cache docker cargo cache
         uses: actions/cache@v3
         with:
           path: |
             ~/docker-cache
-            ./target
+            ./backend/target
           key: ${{ runner.os }}-cargo-cache-docker-2-${{ hashFiles('Cargo.lock') }}
 
       - name: Restore docker cache
@@ -85,7 +84,9 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
       # package and push the api image
-      - run: |
+      - name: build api container
+        working-directory: ./backend
+        run: |
           make api-release
           account="$(aws sts get-caller-identity --query "Account" --output text)"
           branch="$(echo ${{ github.head_ref || github.ref_name }} | sed -r 's/\//-/g' | sed -r 's/_/-/g')"
@@ -114,7 +115,6 @@ jobs:
     environment: ${{ inputs.environment }}
     steps:
       - uses: actions/checkout@v2
-      - run: cd backend/
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -126,6 +126,7 @@ jobs:
       # install our signing credentials
       # build, sign, package and push the eif image
       - name: build, sign and package
+        working-directory: ./backend
         run: |
           echo "${{ secrets.ENCLAVE_SIGNING_KEY }}" > ../enclavekey.pem
           echo "${{ secrets.ENCLAVE_SIGNING_CERT }}" > ../cert.pem
@@ -144,6 +145,7 @@ jobs:
 
       # cleanup: remove keys
       - name: cleanup
+        working-directory: ./backend
         if: always()
         run: rm -f ../enclavekey.pem
 
@@ -159,7 +161,6 @@ jobs:
     if: success()
     steps:
       - uses: actions/checkout@v2
-      - run: cd backend/
 
       # pulumi setup
       - uses: actions/setup-node@v2
@@ -178,12 +179,12 @@ jobs:
           pulumi-version: 3.32.1
 
       - run: yarn install
-        working-directory: ./infra
+        working-directory: ./backend/infra
 
       # create our stack if needed
       - name: "create stack"
         if: ${{ inputs.createStack }}
-        working-directory: ./infra
+        working-directory: ./backend/infra
         run: |
           pulumi stack init --secrets-provider ${{ secrets.AWS_SECRETS_PROVIDER }} --copy-config-from "footprint/${{ inputs.baseStackName }}" "footprint/${{ inputs.stackName  }}" || true
           cp Pulumi.${{ inputs.baseStackName }}.yaml Pulumi.${{ inputs.stackName }}.yaml
@@ -192,7 +193,7 @@ jobs:
 
       - name: "override base domain"
         if: ${{ inputs.baseDomain || false }}
-        working-directory: ./infra
+        working-directory: ./backend/infra
         run: |
           pulumi config --stack footprint/${{ inputs.stackName }} set --path constants.domain.base ${{ inputs.baseDomain }}
         env:
@@ -200,7 +201,7 @@ jobs:
 
       - name: "override prefix domain"
         if: ${{ inputs.prefixDomain || false }}
-        working-directory: ./infra
+        working-directory: ./backend/infra
         run: |
           pulumi config --stack footprint/${{ inputs.stackName }} set --path constants.domain.prefix ${{ inputs.prefixDomain }}
         env:
@@ -222,7 +223,7 @@ jobs:
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
 
       - name: select stack
-        working-directory: ./infra
+        working-directory: ./backend/infra
         run: pulumi stack select "footprint/${{ inputs.stackName }}"
 
       - name: "set api/enclave image version"
@@ -232,7 +233,7 @@ jobs:
 
       - name: Create Stack DB Restore Snapshot
         if: ${{ inputs.createStack }}
-        working-directory: ./infra
+        working-directory: ./backend/infra
         run: |
           pulumi config set restoreSnapshotFromClusterNamed "db-${{ inputs.baseStackName }}"
 
@@ -240,7 +241,7 @@ jobs:
       - uses: pulumi/actions@v3
         with:
           command: up
-          work-dir: infra
+          work-dir: ./backend/infra
           stack-name: "footprint/${{ inputs.stackName }}"
           message: "Deployed to https://${{ steps.constants.outputs.url }} with component ${{ steps.constants.outputs.componentVersion }}"
         env:

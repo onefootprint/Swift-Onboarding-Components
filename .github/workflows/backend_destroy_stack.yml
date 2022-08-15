@@ -20,7 +20,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - run: cd backend/
 
       # pulumi setup
       - uses: actions/setup-node@v2
@@ -39,7 +38,7 @@ jobs:
           pulumi-version: 3.32.1
 
       - run: npm install
-        working-directory: ./infra
+        working-directory: ./backend/infra
 
       - name: Extract stack name
         shell: bash
@@ -52,18 +51,18 @@ jobs:
 
       # create our temp stack
       - run: pulumi stack init --secrets-provider ${{ secrets.AWS_SECRETS_PROVIDER }} --copy-config-from "footprint/dev" "footprint/${{ steps.get_stack_name.outputs.stack }}" || true
-        working-directory: ./infra
+        working-directory: ./backend/infra
         env:
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
 
       # copy our stack file just in case
       - run: cp Pulumi.dev.yaml Pulumi.${{ steps.get_stack_name.outputs.stack }}.yaml
-        working-directory: ./infra
+        working-directory: ./backend/infra
 
       # get the url for the environment
       - name: Extract env url
         shell: bash
-        working-directory: ./infra
+        working-directory: ./backend/infra
         run: |
           base=$(pulumi config --stack footprint/${{ steps.get_stack_name.outputs.stack }} get --path constants.domain.base)
           url="${{ steps.get_stack_name.outputs.stack }}.${base}"
@@ -74,7 +73,7 @@ jobs:
       - uses: pulumi/actions@v3
         with:
           command: destroy
-          work-dir: infra
+          work-dir: ./backend/infra
           stack-name: "footprint/${{ steps.get_stack_name.outputs.stack }}"
           message: "Destroyed ephemeral environment https://${{ steps.extract_env_url.outputs.url }}"
         env:
@@ -82,6 +81,6 @@ jobs:
 
       # rm our temp stack
       - run: pulumi stack --stack footprint/${{ steps.get_stack_name.outputs.stack }} rm -y
-        working-directory: ./infra
+        working-directory: ./backend/infra
         env:
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}

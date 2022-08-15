@@ -43,7 +43,6 @@ jobs:
           sudo apt-get install -y libssl-dev libpq-dev
 
       - uses: actions/checkout@v3
-      - run: cd backend/
 
       - name: rust-toolchain
         uses: actions-rs/toolchain@v1.0.6
@@ -54,12 +53,15 @@ jobs:
         uses: Swatinem/rust-cache@v1.3.0
 
       - name: Check
+        working-directory: ./backend
         run: cargo check --all --no-default-features --features simulate
 
       - name: Build
+        working-directory: ./backend
         run: cargo build --all --no-default-features --features simulate
 
       - name: Run tests
+        working-directory: ./backend
         run: cargo test --all --no-default-features --features simulate
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost/postgres
@@ -106,9 +108,9 @@ jobs:
           psql -h localhost -c 'create database footprint_db;'
 
       - uses: actions/checkout@v3
-      - run: cd backend/
 
       - name: Set dot env
+        working-directory: ./backend
         run: make set-dot-env
 
       - name: rust-toolchain
@@ -125,12 +127,13 @@ jobs:
           python-version: ${{ matrix.python-version }}
 
       - name: Install python deps
-        working-directory: ./ci
+        working-directory: ./backend/ci
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
       - name: Run local integration tests
+        working-directory: ./backend
         run: |
           cargo build -p enclave
           cargo build -p footprint-core
@@ -157,7 +160,7 @@ jobs:
           kill $server_pid
 
       - name: Comment markdown on PR
-        working-directory: ./ci
+        working-directory: ./backend/ci
         run: |
           FINISH=`awk '/===/{ print NR; }' integration_test_output.txt | sed -n 2p`
           CROP=$(expr $FINISH - 1)
@@ -179,7 +182,7 @@ jobs:
         run: cargo install diesel_cli --no-default-features --features postgres
 
       - name: Check valid db migrations
-        working-directory: ./components/db
+        working-directory: ./backend/components/db
         run: |
           NUM_FILES=`ls migrations | wc -l`
           NUM_TO_REVERT="4"
@@ -214,7 +217,6 @@ jobs:
           sudo apt-get install -y libssl-dev libpq-dev
 
       - uses: actions/checkout@v3
-      - run: cd backend/
 
       - name: rust-toolchain
         uses: actions-rs/toolchain@v1.0.6
@@ -225,3 +227,4 @@ jobs:
       - uses: actions-rs/clippy-check@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+          args: --manifest-path ./backend/Cargo.toml

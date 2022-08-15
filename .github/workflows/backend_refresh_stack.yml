@@ -22,7 +22,6 @@ jobs:
       name: ${{ github.event.inputs.environment }}
     steps:
       - uses: actions/checkout@v2
-      - run: cd backend/
 
       # pulumi setup
       - uses: actions/setup-node@v2
@@ -42,13 +41,13 @@ jobs:
           pulumi-version: 3.30.0
 
       - run: yarn install
-        working-directory: ./infra
+        working-directory: ./backend/infra
 
       # bring up the stack
       - uses: pulumi/actions@v3
         with:
           command: refresh
-          work-dir: infra
+          work-dir: ./backend/infra
           stack-name: "footprint/${{ github.event.inputs.stackName }}"
         env:
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}

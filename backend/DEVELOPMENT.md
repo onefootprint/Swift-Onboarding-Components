@@ -140,7 +140,7 @@ Finally, run `up` and `down` and `up` again to make sure your migration works!
 
 ## Accessing dev/dev-ephemeral DB
 
-The aurora DB cluster is not accessible to the public internet, but you may need to access it for some read-only querying or to migrate/wipe the DB. So, we've set up a [jumpbox to access the DB](./infra/db.ts).
+The aurora DB cluster is not accessible to the public internet, but you may need to access it for some read-only querying or to migrate/wipe the DB. So, we've set up a [jumpbox to access the DB](./backend/infra/db.ts).
 
 Here's how to get talking to the DB:
 
