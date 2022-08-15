@@ -32,7 +32,7 @@ jobs:
   deploy_ephemeral_stack:
     name: deploy ephemeral
     needs: [ephemeral_stack_name]
-    uses: ./.github/workflows/build_and_deploy.yml
+    uses: ./.github/workflows/backend_build_and_deploy.yml
     # don't run for dependabot changes and only run when labeled ephemerla
     if: github.actor != 'dependabot[bot]' && contains( github.event.pull_request.labels.*.name, 'ephemeral')
     permissions:
@@ -58,7 +58,7 @@ jobs:
     name: "ephemeral integration tests"
     needs: [deploy_ephemeral_stack]
     if: success()
-    uses: ./.github/workflows/remote_integration_tests.yml
+    uses: ./.github/workflows/backend_remote_integration_tests.yml
     permissions:
       contents: write
       pull-requests: write
