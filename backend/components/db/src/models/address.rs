@@ -146,4 +146,18 @@ impl Address {
             .get_result::<Self>(conn)?;
         Ok(result)
     }
+
+    pub fn data_items(self) -> Vec<(DataKind, SealedVaultBytes)> {
+        vec![
+            self.e_line1.map(|x| (DataKind::StreetAddress, x)),
+            self.e_line2.map(|x| (DataKind::StreetAddress2, x)),
+            self.e_city.map(|x| (DataKind::City, x)),
+            self.e_state.map(|x| (DataKind::State, x)),
+            self.e_zip.map(|x| (DataKind::Zip, x)),
+            self.e_country.map(|x| (DataKind::Country, x)),
+        ]
+        .into_iter()
+        .flatten()
+        .collect()
+    }
 }

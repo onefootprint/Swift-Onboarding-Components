@@ -134,4 +134,17 @@ impl UserBasicInfo {
             .get_result::<Self>(conn)?;
         Ok(result)
     }
+
+    pub fn data_items(self) -> Vec<(DataKind, SealedVaultBytes)> {
+        vec![
+            self.e_first_name.map(|x| (DataKind::FirstName, x)),
+            self.e_last_name.map(|x| (DataKind::LastName, x)),
+            self.e_dob.map(|x| (DataKind::Dob, x)),
+            self.e_ssn9.map(|x| (DataKind::Ssn9, x)),
+            self.e_ssn4.map(|x| (DataKind::Ssn4, x)),
+        ]
+        .into_iter()
+        .flatten()
+        .collect()
+    }
 }

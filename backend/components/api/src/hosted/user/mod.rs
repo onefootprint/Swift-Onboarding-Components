@@ -43,7 +43,7 @@ pub async fn decrypt(
     let uvw = UserVaultWrapper::from(&state.db_pool, user_vault).await?;
     let (fields_to_decrypt, e_datas): (Vec<DataKind>, Vec<&SealedVaultBytes>) = data_kinds
         .iter()
-        .filter_map(|kind| uvw.get_e_field(*kind).map(|data| (kind, data)))
+        .filter_map(|kind| uvw.get_e_field(kind).map(|data| (kind, data)))
         .unzip();
 
     // Actually decrypt the fields

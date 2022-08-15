@@ -2,6 +2,7 @@ use crate::{schema::email, DbError};
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use diesel::Queryable;
+use newtypes::DataKind;
 use newtypes::{
     DataPriority, EmailId, Fingerprint as FingerprintData, FingerprintId, SealedVaultBytes, UserVaultId,
 };
@@ -85,5 +86,9 @@ impl Email {
             .set(email::is_verified.eq(true))
             .execute(conn)?;
         Ok(())
+    }
+
+    pub fn data_items(self) -> Vec<(DataKind, SealedVaultBytes)> {
+        vec![(DataKind::Email, self.e_data)]
     }
 }

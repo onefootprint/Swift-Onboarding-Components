@@ -24,70 +24,63 @@ pub struct UserVaultWrapper {
     pub phone_numbers: Vec<PhoneNumber>,
     pub emails: Vec<Email>,
     pub basic_info: Option<UserBasicInfo>,
+    data_kind_to_e_data: HashMap<DataKind, SealedVaultBytes>,
     phantom: PhantomData<()>,
 }
 
 impl UserVaultWrapper {
-    pub async fn from(pool: &DbPool, user_vault: UserVault) -> Result<UserVaultWrapper, DbError> {
+    pub async fn from(pool: &DbPool, user_vault: UserVault) -> Result<Self, DbError> {
         pool.db_transaction(move |conn| -> Result<UserVaultWrapper, DbError> {
             Self::from_conn(conn, user_vault)
         })
         .await
     }
 
-    pub fn from_conn(conn: &mut PgConnection, user_vault: UserVault) -> Result<UserVaultWrapper, DbError> {
+    pub fn from_conn(conn: &mut PgConnection, user_vault: UserVault) -> Result<Self, DbError> {
+        let addresses = Address::list(conn, &user_vault.id)?;
+        let phone_numbers = PhoneNumber::list(conn, &user_vault.id)?;
+        let emails = Email::list(conn, &user_vault.id)?;
+        let basic_info = UserBasicInfo::get(conn, &user_vault.id)?;
+
+        let basic_info_items = if let Some(ref basic_info) = basic_info {
+            basic_info.clone().data_items()
+        } else {
+            vec![]
+        };
+        let data_kind_to_e_data = basic_info_items
+            .into_iter()
+            .chain(phone_numbers.iter().cloned().flat_map(|x| x.data_items()))
+            .chain(emails.iter().cloned().flat_map(|x| x.data_items()))
+            .chain(addresses.iter().cloned().flat_map(|x| x.data_items()))
+            .collect();
         Ok(Self {
-            addresses: Address::list(conn, &user_vault.id)?,
-            phone_numbers: PhoneNumber::list(conn, &user_vault.id)?,
-            emails: Email::list(conn, &user_vault.id)?,
-            basic_info: UserBasicInfo::get(conn, &user_vault.id)?,
+            addresses,
+            phone_numbers,
+            emails,
+            basic_info,
             user_vault,
+            data_kind_to_e_data,
             phantom: PhantomData,
         })
     }
 
-    pub fn from_id(
-        conn: &mut PgConnection,
-        user_vault_id: &UserVaultId,
-    ) -> Result<UserVaultWrapper, DbError> {
+    pub fn from_id(conn: &mut PgConnection, user_vault_id: &UserVaultId) -> Result<Self, DbError> {
         let user_vault = UserVault::get(conn, user_vault_id)?;
         let uvw = Self::from_conn(conn, user_vault)?;
         Ok(uvw)
     }
 
-    pub fn get_e_field(&self, data_kind: DataKind) -> Option<&SealedVaultBytes> {
+    pub fn get_e_field(&self, data_kind: &DataKind) -> Option<&SealedVaultBytes> {
         // TODO handle multiple values for the same field
-        match data_kind {
-            // Address
-            DataKind::StreetAddress => self.addresses.iter().filter_map(|x| x.e_line1.as_ref()).next(),
-            DataKind::StreetAddress2 => self.addresses.iter().filter_map(|x| x.e_line2.as_ref()).next(),
-            DataKind::City => self.addresses.iter().filter_map(|x| x.e_city.as_ref()).next(),
-            DataKind::State => self.addresses.iter().filter_map(|x| x.e_state.as_ref()).next(),
-            DataKind::Zip => self.addresses.iter().filter_map(|x| x.e_zip.as_ref()).next(),
-            DataKind::Country => self.addresses.iter().filter_map(|x| x.e_country.as_ref()).next(),
-
-            // Phone
-            DataKind::PhoneNumber => self.phone_numbers.iter().map(|x| &x.e_e164).next(),
-            DataKind::PhoneCountry => self.phone_numbers.iter().map(|x| &x.e_country).next(),
-
-            // Email
-            DataKind::Email => self.emails.iter().map(|x| &x.e_data).next(),
-
-            // Basic info
-            DataKind::FirstName => self.basic_info.as_ref().and_then(|x| x.e_first_name.as_ref()),
-            DataKind::LastName => self.basic_info.as_ref().and_then(|x| x.e_last_name.as_ref()),
-            DataKind::Dob => self.basic_info.as_ref().and_then(|x| x.e_dob.as_ref()),
-            DataKind::Ssn9 => self.basic_info.as_ref().and_then(|x| x.e_ssn9.as_ref()),
-            DataKind::Ssn4 => self.basic_info.as_ref().and_then(|x| x.e_ssn4.as_ref()),
-        }
+        self.data_kind_to_e_data.get(data_kind)
     }
 
-    pub fn has_field(&self, data_kind: DataKind) -> bool {
+    pub fn has_field(&self, data_kind: &DataKind) -> bool {
         self.get_e_field(data_kind).is_some()
     }
 
     pub fn get_populated_fields(&self) -> Vec<DataKind> {
-        DataKind::iter().filter(|k| self.has_field(*k)).collect()
+        DataKind::iter().filter(|k| self.has_field(k)).collect()
     }
 
     pub async fn get_decrypted_primary_phone(
@@ -120,7 +113,7 @@ impl UserVaultWrapper {
             .iter()
             .cloned()
             .filter(|data_kind| data_kind.is_required())
-            .filter(|data_kind| !self.has_field(*data_kind))
+            .filter(|data_kind| !self.has_field(data_kind))
             .collect()
     }
 
@@ -131,7 +124,7 @@ impl UserVaultWrapper {
     ) -> Result<(), ApiError> {
         // Don't allow updating any data that is already set
         // Right now, this also only allows setting new data and doesn't allow updating data
-        if let Some(kind) = new_data.keys().find(|k| self.has_field(**k)) {
+        if let Some(kind) = new_data.keys().find(|k| self.has_field(*k)) {
             return Err(UserError::DataAlreadyPopulated(*kind).into());
         }
 
@@ -142,14 +135,16 @@ impl UserVaultWrapper {
             } else {
                 vec![]
             };
-            self.emails.push(Email::create(
+            let new_email = Email::create(
                 conn,
                 self.user_vault.id.clone(),
                 update.e_data.clone(),
                 fingerprints,
                 false,
                 DataPriority::Primary,
-            )?);
+            )?;
+            self.data_kind_to_e_data.extend(new_email.clone().data_items());
+            self.emails.push(new_email);
         }
 
         // Update any new basic info if provided
@@ -159,6 +154,8 @@ impl UserVaultWrapper {
             }
             let new_basic_info = NewUserBasicInfoReq::build(&new_data, self.basic_info.as_ref());
             let new_basic_info = UserBasicInfo::create(conn, self.user_vault.id.clone(), new_basic_info)?;
+            self.data_kind_to_e_data
+                .extend(new_basic_info.clone().data_items());
             self.basic_info = Some(new_basic_info)
         }
 
@@ -170,6 +167,7 @@ impl UserVaultWrapper {
             }
             let new_address = NewAddressReq::build(&new_data, current_address);
             let new_address = Address::create(conn, self.user_vault.id.clone(), new_address)?;
+            self.data_kind_to_e_data.extend(new_address.clone().data_items());
             self.addresses = vec![new_address];
         }
 

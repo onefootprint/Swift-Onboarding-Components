@@ -3,7 +3,8 @@ use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use diesel::{PgConnection, Queryable};
 use newtypes::{
-    DataPriority, Fingerprint as FingerprintData, FingerprintId, PhoneNumberId, SealedVaultBytes, UserVaultId,
+    DataKind, DataPriority, Fingerprint as FingerprintData, FingerprintId, PhoneNumberId, SealedVaultBytes,
+    UserVaultId,
 };
 use serde::{Deserialize, Serialize};
 
@@ -68,5 +69,12 @@ impl PhoneNumber {
             .values(new_row)
             .get_result(conn)?;
         Ok(phone_number)
+    }
+
+    pub fn data_items(self) -> Vec<(DataKind, SealedVaultBytes)> {
+        vec![
+            (DataKind::PhoneNumber, self.e_e164),
+            (DataKind::PhoneCountry, self.e_country),
+        ]
     }
 }
