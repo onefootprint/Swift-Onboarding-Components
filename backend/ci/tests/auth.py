@@ -11,7 +11,7 @@ class OnboardingAuth(BaseAuth):
     
 
 class TenantAuth(BaseAuth):
-    HEADER_NAME = "x-client-public-key"
+    HEADER_NAME = "X-Onboarding-Config-Key"
 
 
 class TenantSecretAuth(BaseAuth):

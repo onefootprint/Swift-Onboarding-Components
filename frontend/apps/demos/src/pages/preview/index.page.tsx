@@ -11,7 +11,7 @@ const getOnboardingConfig = async (params: GetOnboardingConfigRequest) => {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
-      'X-Client-Public-Key': params.key,
+      'X-Onboarding-Config-Key': params.key,
     },
   });
   if (!response.ok) {

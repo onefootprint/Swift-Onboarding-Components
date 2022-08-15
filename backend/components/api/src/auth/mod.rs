@@ -18,7 +18,7 @@ pub use user_auth::UserAuth;
 pub enum AuthError {
     #[error("Key not found")]
     ApiKeyNotFound,
-    #[error("missing X-Client-Public-Key")]
+    #[error("missing X-Onboarding-Config-Key")]
     MissingClientPublicAuthHeader,
     #[error("missing X-Client-Secret-Key or HttpBasicAuth")]
     MissingSecretKeyAuth,

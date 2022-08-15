@@ -9,11 +9,14 @@ use paperclip::actix::Apiv2Header;
 use crate::{auth::AuthError, State};
 
 #[derive(Debug, Clone, Apiv2Header)]
-/// SecretTenantAuthContext extracts a tenant's public key from the X-Client-Public-Key header
+/// SecretTenantAuthContext extracts a tenant's public key from the X-Onboarding-Config-Key header
 /// which authenticates the client as a tenant.
 pub struct PublicTenantAuthContext {
     #[allow(unused)]
-    #[openapi(name = "X-Client-Public-Key", description = "The onboarding publishable key")]
+    #[openapi(
+        name = "X-Onboarding-Config-Key",
+        description = "The onboarding publishable key"
+    )]
     onboarding_key: ObConfigurationKey,
     #[openapi(skip)]
     pub tenant: Tenant,
@@ -23,7 +26,7 @@ pub struct PublicTenantAuthContext {
     phantom: PhantomData<()>,
 }
 
-const HEADER_NAME: &str = "X-Client-Public-Key";
+const HEADER_NAME: &str = "X-Onboarding-Config-Key";
 
 impl FromRequest for PublicTenantAuthContext {
     type Error = crate::ApiError;
@@ -48,10 +51,15 @@ impl FromRequest for PublicTenantAuthContext {
                 .await??
                 .ok_or(AuthError::ApiKeyNotFound)?;
             Ok(PublicTenantAuthContext {
+                onboarding_key: ob_config.key.clone(),
                 tenant,
                 ob_config,
                 phantom: PhantomData,
             })
         })
+    }
+
+    fn extract(req: &actix_web::HttpRequest) -> Self::Future {
+        Self::from_request(req, &mut actix_web::dev::Payload::None)
     }
 }
