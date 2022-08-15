@@ -13,8 +13,13 @@ const abortBuild = () => {
   process.exit(ABORT_BUILD_CODE);
 }
 
+const dir = process.argv[3] || path.basename(path.resolve());
 
 const stepCheck = () => {
+  if (!dir) {
+    return abortBuild();
+  }
+
   // get all file names changed in last commit
   const fileNameList = childProcess
     .execSync("git diff --name-only HEAD~1")
@@ -22,14 +27,10 @@ const stepCheck = () => {
     .trim()
     .split("\n");
 
-  console.log('fileNameList', fileNameList)
-
   // check if any files in the app, or in any shared packages have changed
   const shouldBuild = fileNameList.some(
-    (file) => file.startsWith(`frontend`)
+    (file) => file.startsWith(dir)
   );
-
-  console.log('shouldBuild', shouldBuild)
 
   if (shouldBuild) {
     return continueBuild();
