@@ -88,16 +88,26 @@ def create_basic_user(twilio, suffix=None):
 
     # Respond to the challenge and create the sandbox user
     def identify_verify():
-        message = twilio.messages.list(to=phone_number, limit=1)[0]
-        code = str(re.search("\\d{6}", message.body).group(0))
-        data = {
-            "challenge_response": code,
-            "challenge_kind": "sms",
-            "challenge_token": challenge_token,
-        }
-        body = post("hosted/identify/verify", data)
-        assert body["data"]["kind"] == "user_created"
-        return body["data"]["auth_token"]
+        messages = twilio.messages.list(to=phone_number, limit=6)
+        for message in messages:
+            try:
+                code = str(re.search("\\d{6}", message.body).group(0))
+            except:
+                print("No challenge code found in SMS message.")
+                continue
+            try:
+                data = {
+                    "challenge_response": code,
+                    "challenge_kind": "sms",
+                    "challenge_token": challenge_token,
+                }
+                body = post("hosted/identify/verify", data)
+                assert body["data"]["kind"] == "user_created"
+                return body["data"]["auth_token"]
+            except:
+                print(f"Tried challenge code {code} unsuccessfully.")
+                pass
+        assert False, "Didn't find correct code for identify"
     auth_token = try_until_success(identify_verify, 5)
     auth_token = OnboardingAuth(auth_token)
 
