@@ -34,6 +34,7 @@ async fn post(
         "4917629716301",  // rafa
         "16106807897",    // eli
         "+5561999771150", // pedro
+        "+15169727353",   // omar
     ]
     .into_iter()
     .map(newtypes::PhoneNumber::from_str)
