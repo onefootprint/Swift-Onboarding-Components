@@ -228,9 +228,10 @@ jobs:
         run: pulumi stack select "footprint/${{ inputs.stackName }}"
 
       - name: "set api/enclave image version"
+        working-directory: ./backend/infra
         run: |
-          pulumi --cwd infra config set --path constants.containers.apiVersion ${{ steps.constants.outputs.componentVersion }}
-          pulumi --cwd infra config set --path constants.containers.enclaveVersion ${{ steps.constants.outputs.componentVersion }}
+          pulumi config set --path constants.containers.apiVersion ${{ steps.constants.outputs.componentVersion }}
+          pulumi config set --path constants.containers.enclaveVersion ${{ steps.constants.outputs.componentVersion }}
 
       - name: Create Stack DB Restore Snapshot
         if: ${{ inputs.createStack }}
