@@ -37,34 +37,36 @@ impl UserVault {
         Ok(user)
     }
 
+    #[allow(unused)]
     pub async fn get_portable_for_tenant(
         pool: &crate::DbPool,
         tenant_id: TenantId,
         footprint_user_id: FootprintUserId,
         is_live: bool,
     ) -> Result<Option<(UserVault, ScopedUser)>, DbError> {
-        Self::get_for_tenant(pool, tenant_id, footprint_user_id, is_live, Some(true)).await
+        Self::get_for_tenant_inner(pool, tenant_id, footprint_user_id, is_live, Some(true)).await
     }
 
+    #[allow(unused)]
     pub async fn get_non_portable_for_tenant(
         pool: &crate::DbPool,
         tenant_id: TenantId,
         footprint_user_id: FootprintUserId,
         is_live: bool,
     ) -> Result<Option<(UserVault, ScopedUser)>, DbError> {
-        Self::get_for_tenant(pool, tenant_id, footprint_user_id, is_live, Some(false)).await
+        Self::get_for_tenant_inner(pool, tenant_id, footprint_user_id, is_live, Some(false)).await
     }
 
-    pub async fn get_all_for_tenant(
+    pub async fn get_for_tenant(
         pool: &crate::DbPool,
         tenant_id: TenantId,
         footprint_user_id: FootprintUserId,
         is_live: bool,
     ) -> Result<Option<(UserVault, ScopedUser)>, DbError> {
-        Self::get_for_tenant(pool, tenant_id, footprint_user_id, is_live, None).await
+        Self::get_for_tenant_inner(pool, tenant_id, footprint_user_id, is_live, None).await
     }
 
-    async fn get_for_tenant(
+    async fn get_for_tenant_inner(
         pool: &crate::DbPool,
         tenant_id: TenantId,
         footprint_user_id: FootprintUserId,

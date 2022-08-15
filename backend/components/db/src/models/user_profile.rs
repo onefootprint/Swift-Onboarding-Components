@@ -1,21 +1,21 @@
 use std::collections::HashMap;
 
-use crate::{schema::user_basic_info, DbError};
+use crate::{schema::user_profile, DbError};
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use diesel::{PgConnection, Queryable};
 use newtypes::{
-    DataKind, Fingerprint as FingerprintData, FingerprintId, NewSealedData, SealedVaultBytes,
-    UserBasicInfoId, UserVaultId,
+    DataKind, Fingerprint as FingerprintData, FingerprintId, NewSealedData, SealedVaultBytes, UserProfileId,
+    UserVaultId,
 };
 use serde::{Deserialize, Serialize};
 
 use super::fingerprint::Fingerprint;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable)]
-#[diesel(table_name = user_basic_info)]
-pub struct UserBasicInfo {
-    pub id: UserBasicInfoId,
+#[diesel(table_name = user_profile)]
+pub struct UserProfile {
+    pub id: UserProfileId,
     pub user_vault_id: UserVaultId,
     pub fingerprint_ids: Vec<FingerprintId>,
     pub e_first_name: Option<SealedVaultBytes>,
@@ -29,7 +29,7 @@ pub struct UserBasicInfo {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct NewUserBasicInfoReq {
+pub struct NewUserProfileReq {
     pub fingerprints: Vec<FingerprintData>,
     pub e_first_name: Option<SealedVaultBytes>,
     pub e_last_name: Option<SealedVaultBytes>,
@@ -38,8 +38,8 @@ pub struct NewUserBasicInfoReq {
     pub e_ssn4: Option<SealedVaultBytes>,
 }
 
-impl NewUserBasicInfoReq {
-    pub fn build(new_data: &HashMap<DataKind, NewSealedData>, old_data: Option<&UserBasicInfo>) -> Self {
+impl NewUserProfileReq {
+    pub fn build(new_data: &HashMap<DataKind, NewSealedData>, old_data: Option<&UserProfile>) -> Self {
         let get_field = |data_kind, default: Option<Option<SealedVaultBytes>>| {
             new_data
                 .get(&data_kind)
@@ -48,7 +48,7 @@ impl NewUserBasicInfoReq {
         };
         let fingerprints = new_data
             .iter()
-            .filter(|(k, _)| UserBasicInfo::contains(k))
+            .filter(|(k, _)| UserProfile::contains(k))
             .filter_map(|(_, v)| v.sh_data.clone())
             .collect();
         Self {
@@ -63,8 +63,8 @@ impl NewUserBasicInfoReq {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
-#[diesel(table_name = user_basic_info)]
-struct NewUserBasicInfo {
+#[diesel(table_name = user_profile)]
+struct NewUserProfile {
     user_vault_id: UserVaultId,
     fingerprint_ids: Vec<FingerprintId>,
     e_first_name: Option<SealedVaultBytes>,
@@ -74,9 +74,9 @@ struct NewUserBasicInfo {
     e_ssn4: Option<SealedVaultBytes>,
 }
 
-impl From<(NewUserBasicInfoReq, UserVaultId, Vec<FingerprintId>)> for NewUserBasicInfo {
-    fn from(s: (NewUserBasicInfoReq, UserVaultId, Vec<FingerprintId>)) -> Self {
-        let NewUserBasicInfoReq {
+impl From<(NewUserProfileReq, UserVaultId, Vec<FingerprintId>)> for NewUserProfile {
+    fn from(s: (NewUserProfileReq, UserVaultId, Vec<FingerprintId>)) -> Self {
+        let NewUserProfileReq {
             e_first_name,
             e_last_name,
             e_dob,
@@ -96,11 +96,11 @@ impl From<(NewUserBasicInfoReq, UserVaultId, Vec<FingerprintId>)> for NewUserBas
     }
 }
 
-impl UserBasicInfo {
+impl UserProfile {
     pub fn get(conn: &mut PgConnection, user_vault_id: &UserVaultId) -> Result<Option<Self>, DbError> {
-        let result = user_basic_info::table
-            .filter(user_basic_info::user_vault_id.eq(user_vault_id))
-            .filter(user_basic_info::deactivated_at.is_null())
+        let result = user_profile::table
+            .filter(user_profile::user_vault_id.eq(user_vault_id))
+            .filter(user_profile::deactivated_at.is_null())
             .first(conn)
             .optional()?;
         Ok(result)
@@ -115,9 +115,9 @@ impl UserBasicInfo {
 
     pub fn deactivate(&self, conn: &mut PgConnection) -> Result<(), DbError> {
         Fingerprint::deactivate(conn, &self.fingerprint_ids)?;
-        diesel::update(user_basic_info::table)
-            .filter(user_basic_info::id.eq(&self.id))
-            .set(user_basic_info::deactivated_at.eq(Utc::now()))
+        diesel::update(user_profile::table)
+            .filter(user_profile::id.eq(&self.id))
+            .set(user_profile::deactivated_at.eq(Utc::now()))
             .execute(conn)?;
         Ok(())
     }
@@ -125,11 +125,11 @@ impl UserBasicInfo {
     pub fn create(
         conn: &mut PgConnection,
         user_vault_id: UserVaultId,
-        new_data: NewUserBasicInfoReq,
+        new_data: NewUserProfileReq,
     ) -> Result<Self, DbError> {
         let fingerprint_ids = Fingerprint::bulk_create(conn, new_data.fingerprints.clone(), &user_vault_id)?;
-        let new_row = NewUserBasicInfo::from((new_data, user_vault_id, fingerprint_ids));
-        let result = diesel::insert_into(user_basic_info::table)
+        let new_row = NewUserProfile::from((new_data, user_vault_id, fingerprint_ids));
+        let result = diesel::insert_into(user_profile::table)
             .values(&new_row)
             .get_result::<Self>(conn)?;
         Ok(result)

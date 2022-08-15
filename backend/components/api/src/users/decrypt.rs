@@ -79,7 +79,7 @@ async fn post_inner(
 ) -> actix_web::Result<Json<ApiResponseData<UserDecryptResponse>>, ApiError> {
     let tenant = auth.tenant(&state.db_pool).await?;
     // look up tenant & user vault
-    let (vault, scoped_user) = UserVault::get_all_for_tenant(
+    let (vault, scoped_user) = UserVault::get_for_tenant(
         &state.db_pool,
         tenant.id.clone(),
         request.footprint_user_id.clone(),

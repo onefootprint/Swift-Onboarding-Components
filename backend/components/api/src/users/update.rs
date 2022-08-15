@@ -22,7 +22,7 @@ pub async fn post(
 ) -> actix_web::Result<Json<ApiResponseData<EmptyResponse>>, ApiError> {
     let footprint_user_id = path.into_inner();
 
-    let (user_vault, scoped_user) = UserVault::get_non_portable_for_tenant(
+    let (user_vault, scoped_user) = UserVault::get_for_tenant(
         &state.db_pool,
         tenant_auth.tenant_id(),
         footprint_user_id,
@@ -30,6 +30,11 @@ pub async fn post(
     )
     .await?
     .ok_or(AuthError::InvalidTenantKeyOrUserId)?;
+
+    // TODO: support adding tenant-scoped unstructured data to a portable vault
+    if user_vault.is_portable {
+        return Err(AuthError::CannotModifyPortableUser)?;
+    }
 
     perform_update(state, request.into_inner(), user_vault, scoped_user).await?;
 

@@ -184,7 +184,7 @@ pub async fn private_cleanup_integration_tests(
                     .execute(conn)?;
 
             deleted_rows += diesel::delete(
-                schema::user_basic_info::table.filter(schema::user_basic_info::user_vault_id.eq(&uv.id)),
+                schema::user_profile::table.filter(schema::user_profile::user_vault_id.eq(&uv.id)),
             )
             .execute(conn)?;
 

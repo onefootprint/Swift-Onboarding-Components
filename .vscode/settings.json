@@ -56,4 +56,7 @@
         "**/target/**"
     ],
     "rust-analyzer.rustfmt.overrideCommand": null,
+    "search.exclude": {
+        "**/target/": true
+    },
 }

@@ -45,7 +45,7 @@ define_newtype_id!(FingerprintId, Uuid, "Identifier for a fingerprint");
 define_newtype_id!(AddressId, String, "Identifier for an address");
 define_newtype_id!(EmailId, String, "Identifier for an email");
 define_newtype_id!(PhoneNumberId, String, "Identifier for a phone number");
-define_newtype_id!(UserBasicInfoId, String, "Identifier for user basic info");
+define_newtype_id!(UserProfileId, String, "Identifier for user basic info");
 define_newtype_id!(ScopedUserId, String, "Identifier for an ScopedUser");
 define_newtype_id!(OnboardingId, Uuid, "Identifier for an OnboardingLink");
 define_newtype_id!(FootprintUserId, String, "Identifier for a ScopedUser");

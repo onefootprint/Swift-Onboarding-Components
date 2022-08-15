@@ -7,7 +7,7 @@ use db::models::address::{Address, NewAddressReq};
 use db::models::email::Email;
 use db::models::ob_configurations::ObConfiguration;
 use db::models::phone_number::PhoneNumber;
-use db::models::user_basic_info::{NewUserBasicInfoReq, UserBasicInfo};
+use db::models::user_profile::{NewUserProfileReq, UserProfile};
 use db::models::user_vaults::UserVault;
 use db::DbPool;
 use db::{errors::DbError, PgConnection};
@@ -23,7 +23,7 @@ pub struct UserVaultWrapper {
     pub addresses: Vec<Address>,
     pub phone_numbers: Vec<PhoneNumber>,
     pub emails: Vec<Email>,
-    pub basic_info: Option<UserBasicInfo>,
+    pub profile: Option<UserProfile>,
     data_kind_to_e_data: HashMap<DataKind, SealedVaultBytes>,
     phantom: PhantomData<()>,
 }
@@ -40,14 +40,14 @@ impl UserVaultWrapper {
         let addresses = Address::list(conn, &user_vault.id)?;
         let phone_numbers = PhoneNumber::list(conn, &user_vault.id)?;
         let emails = Email::list(conn, &user_vault.id)?;
-        let basic_info = UserBasicInfo::get(conn, &user_vault.id)?;
+        let profile = UserProfile::get(conn, &user_vault.id)?;
 
-        let basic_info_items = if let Some(ref basic_info) = basic_info {
-            basic_info.clone().data_items()
+        let profile_items = if let Some(ref profile) = profile {
+            profile.clone().data_items()
         } else {
             vec![]
         };
-        let data_kind_to_e_data = basic_info_items
+        let data_kind_to_e_data = profile_items
             .into_iter()
             .chain(phone_numbers.iter().cloned().flat_map(|x| x.data_items()))
             .chain(emails.iter().cloned().flat_map(|x| x.data_items()))
@@ -57,7 +57,7 @@ impl UserVaultWrapper {
             addresses,
             phone_numbers,
             emails,
-            basic_info,
+            profile,
             user_vault,
             data_kind_to_e_data,
             phantom: PhantomData,
@@ -148,15 +148,15 @@ impl UserVaultWrapper {
         }
 
         // Update any new basic info if provided
-        if new_data.keys().any(UserBasicInfo::contains) {
-            if let Some(ref basic_info) = self.basic_info {
-                basic_info.deactivate(conn)?;
+        if new_data.keys().any(UserProfile::contains) {
+            if let Some(ref profile) = self.profile {
+                profile.deactivate(conn)?;
             }
-            let new_basic_info = NewUserBasicInfoReq::build(&new_data, self.basic_info.as_ref());
-            let new_basic_info = UserBasicInfo::create(conn, self.user_vault.id.clone(), new_basic_info)?;
+            let new_profile = NewUserProfileReq::build(&new_data, self.profile.as_ref());
+            let new_profile = UserProfile::create(conn, self.user_vault.id.clone(), new_profile)?;
             self.data_kind_to_e_data
-                .extend(new_basic_info.clone().data_items());
-            self.basic_info = Some(new_basic_info)
+                .extend(new_profile.clone().data_items());
+            self.profile = Some(new_profile)
         }
 
         // Add new address fields if provided

@@ -241,7 +241,7 @@ table! {
     use diesel::sql_types::*;
     use newtypes::db_types::*;
 
-    user_basic_info (id) {
+    user_profile (id) {
         id -> Text,
         user_vault_id -> Text,
         fingerprint_ids -> Array<Uuid>,
@@ -345,7 +345,7 @@ joinable!(scoped_users -> tenants (tenant_id));
 joinable!(scoped_users -> user_vaults (user_vault_id));
 joinable!(tenant_api_key_access_logs -> tenant_api_keys (tenant_api_key_id));
 joinable!(tenant_api_keys -> tenants (tenant_id));
-joinable!(user_basic_info -> user_vaults (user_vault_id));
+joinable!(user_profile -> user_vaults (user_vault_id));
 joinable!(verification_requests -> scoped_users (scoped_user_id));
 joinable!(verification_requests_user_data -> verification_requests (request_id));
 joinable!(verification_results -> verification_requests (request_id));
@@ -367,7 +367,7 @@ allow_tables_to_appear_in_same_query!(
     tenant_api_key_access_logs,
     tenant_api_keys,
     tenants,
-    user_basic_info,
+    user_profile,
     user_vaults,
     verification_requests,
     verification_requests_user_data,

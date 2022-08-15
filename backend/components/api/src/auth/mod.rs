@@ -44,4 +44,7 @@ pub enum AuthError {
     SandboxRestricted,
     #[error("Not allowed: requires one of the following scopes: {0:?}")]
     MissingScope(Vec<UserAuthScope>),
+    #[error("Cannot modify global properties on portable user")]
+    CannotModifyPortableUser,
+
 }
