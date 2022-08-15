@@ -16,11 +16,13 @@ describe('<CodeInline />', () => {
     testID,
     tooltipText = 'Copy to clipboard',
     tooltipTextConfirmation = 'Copied!',
+    disable = false,
   }: Partial<CodeInlineProps>) =>
     customRender(
       <ToastProvider>
         <CodeInline
           buttonAriaLabel={buttonAriaLabel}
+          disable={disable}
           testID={testID}
           tooltipText={tooltipText}
           tooltipTextConfirmation={tooltipTextConfirmation}
@@ -74,6 +76,38 @@ describe('<CodeInline />', () => {
       expect(writeTestMockFn).toHaveBeenCalledWith(
         'fp_xm7T6MqhfRBkxL0DPOpfwM4',
       );
+    });
+  });
+
+  describe('when disabled', () => {
+    it('should not show a tooltip', async () => {
+      renderCodeInline({
+        tooltipText: 'Copy to clipboard',
+        buttonAriaLabel: 'Copy',
+        disable: true,
+      });
+      const code = screen.getByRole('button', { name: 'Copy' });
+      await userEvent.hover(code);
+      const tooltip = screen.queryByRole('tooltip', {
+        name: 'Copy to clipboard',
+      });
+      expect(tooltip).not.toBeInTheDocument();
+    });
+
+    it('should not trigger onClick handler', async () => {
+      const { writeTestMockFn } = createClipboardSpy();
+      renderCodeInline({
+        tooltipText: 'Copy to clipboard',
+        buttonAriaLabel: 'Copy',
+        disable: true,
+      });
+      const code = screen.getByRole('button', { name: 'Copy' });
+      await userEvent.click(code);
+      const tooltip = screen.queryByRole('tooltip', {
+        name: 'Copy to clipboard',
+      });
+      expect(tooltip).not.toBeInTheDocument();
+      expect(writeTestMockFn).not.toHaveBeenCalled();
     });
   });
 });

@@ -12,6 +12,8 @@ export * from './button';
 export { default as Button } from './button';
 export * from './checkbox';
 export { default as Checkbox } from './checkbox';
+export * from './code-block';
+export { default as CodeBlock } from './code-block';
 export * from './code-inline';
 export { default as CodeInline } from './code-inline';
 export * from './container';

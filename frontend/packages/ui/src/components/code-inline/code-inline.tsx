@@ -7,6 +7,7 @@ import Tooltip from '../tooltip';
 export type CodeInlineProps = {
   buttonAriaLabel?: string;
   children: string;
+  disable?: boolean;
   testID?: string;
   tooltipText?: string;
   tooltipTextConfirmation?: string;
@@ -19,6 +20,7 @@ let confirmationTimeout: null | NodeJS.Timeout = null;
 const CodeInline = ({
   buttonAriaLabel = 'Copy to clipboard',
   children,
+  disable,
   testID,
   tooltipText = 'Copy to clipboard',
   tooltipTextConfirmation = 'Copied!',
@@ -54,6 +56,7 @@ const CodeInline = ({
 
   return (
     <Tooltip
+      disabled={disable}
       placement="right"
       size="compact"
       text={shouldShowConfirmation ? tooltipTextConfirmation : tooltipText}
@@ -61,7 +64,7 @@ const CodeInline = ({
       <Button
         aria-label={buttonAriaLabel}
         data-testid={testID}
-        onClick={handleClick}
+        onClick={disable ? undefined : handleClick}
         type="button"
       >
         <CodeContent>{children}</CodeContent>
@@ -73,7 +76,6 @@ const CodeInline = ({
 const Button = styled.button`
   background: none;
   border: none;
-  cursor: pointer;
   margin: 0;
   padding: 0;
 `;

@@ -17,6 +17,11 @@ export default {
       description: 'Content to be rendered',
       required: true,
     },
+    disable: {
+      control: 'boolean',
+      description: 'Disable copy',
+      required: false,
+    },
     testID: {
       control: 'text',
       description: 'Append an attribute data-testid for testing purposes',
@@ -43,12 +48,14 @@ export default {
 const Template: Story<CodeInlineProps> = ({
   buttonAriaLabel,
   children,
+  disable,
   testID,
   tooltipText,
   tooltipTextConfirmation,
 }: CodeInlineProps) => (
   <CodeInline
     buttonAriaLabel={buttonAriaLabel}
+    disable={disable}
     testID={testID}
     tooltipText={tooltipText}
     tooltipTextConfirmation={tooltipTextConfirmation}
@@ -60,6 +67,7 @@ const Template: Story<CodeInlineProps> = ({
 export const Base = Template.bind({});
 Base.args = {
   buttonAriaLabel: 'Copy',
+  disable: false,
   children: 'fp_xm7T6MqhfRBkxL0DPOpfwM4',
   testID: 'code-test-id',
   tooltipText: 'Copy to clipboard',
