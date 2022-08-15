@@ -7,7 +7,7 @@ use newtypes::{TenantId, UserVaultId};
 
 use crate::errors::ApiError;
 
-use super::{session_data::AuthSessionData, AuthError};
+use super::session_data::AuthSessionData;
 
 /// A helper trait to extract a user vault id on combined types
 #[async_trait]
@@ -24,8 +24,6 @@ pub trait VerifiedUserAuth {
 pub trait HasTenant {
     fn tenant_id(&self) -> TenantId;
 
-    fn is_sandbox_restricted(&self) -> bool;
-
     async fn tenant(&self, pool: &DbPool) -> Result<Tenant, ApiError> {
         Ok(db::tenant::get_tenant(pool, self.tenant_id()).await?)
     }
@@ -34,7 +32,7 @@ pub trait HasTenant {
 /// A helper trait to extract whether the auth session is for sandbox or production data
 #[async_trait]
 pub trait IsLive {
-    async fn is_live(&self, pool: &DbPool) -> Result<bool, AuthError>;
+    async fn is_live(&self, pool: &DbPool) -> Result<bool, ApiError>;
 }
 
 pub trait SupportsIsLiveHeader {}

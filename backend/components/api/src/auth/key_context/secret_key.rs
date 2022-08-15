@@ -89,10 +89,6 @@ impl HasTenant for SecretTenantAuthContext {
         self.tenant().id.clone()
     }
 
-    fn is_sandbox_restricted(&self) -> bool {
-        self.tenant.sandbox_restricted
-    }
-
     async fn tenant(&self, _pool: &DbPool) -> Result<Tenant, ApiError> {
         Ok(self.tenant().clone())
     }
@@ -100,9 +96,9 @@ impl HasTenant for SecretTenantAuthContext {
 
 #[async_trait]
 impl IsLive for SecretTenantAuthContext {
-    async fn is_live(&self, _pool: &DbPool) -> Result<bool, AuthError> {
-        if self.is_sandbox_restricted() && self.api_key.is_live {
-            return Err(AuthError::SandboxRestricted);
+    async fn is_live(&self, _pool: &DbPool) -> Result<bool, ApiError> {
+        if self.tenant.sandbox_restricted && self.api_key.is_live {
+            return Err(AuthError::SandboxRestricted.into());
         }
 
         Ok(self.api_key.is_live)

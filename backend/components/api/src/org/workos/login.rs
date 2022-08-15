@@ -66,8 +66,6 @@ async fn handler(
         first_name: profile.first_name.clone(),
         last_name: profile.last_name.clone(),
         tenant_id: tenant.id,
-        //TODO https://linear.app/footprint/issue/FP-715/dynamically-check-sandbox-restricted-on-workos-session remove this denormalization so updates take effect immediately
-        sandbox_restricted: tenant.sandbox_restricted,
     });
     let auth_token = AuthSession::create(&state, session_data, Duration::hours(8)).await?;
 

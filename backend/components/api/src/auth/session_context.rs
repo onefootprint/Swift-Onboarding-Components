@@ -96,18 +96,14 @@ where
     fn tenant_id(&self) -> TenantId {
         self.data.tenant_id()
     }
-
-    fn is_sandbox_restricted(&self) -> bool {
-        self.data.is_sandbox_restricted()
-    }
 }
 
 #[async_trait]
 impl<C> IsLive for SessionContext<C>
 where
-    C: SupportsIsLiveHeader + HasTenant + std::marker::Sync,
+    C: SupportsIsLiveHeader + HasTenant + Sync + Send,
 {
-    async fn is_live(&self, _pool: &DbPool) -> Result<bool, AuthError> {
+    async fn is_live(&self, pool: &DbPool) -> Result<bool, ApiError> {
         let is_live: Option<bool> = self
             .headers
             .0
@@ -115,13 +111,14 @@ where
             .and_then(|hv| hv.to_str().map(|s| s.to_string()).ok())
             .and_then(|v| v.trim().parse::<bool>().ok());
 
-        // error if the sandbox is restricted
-        if self.data.is_sandbox_restricted() && is_live == Some(true) {
-            return Err(AuthError::SandboxRestricted);
+        // error if the tenant is sandbox-restricted but is requesting live data
+        let is_sandbox_restricted = self.data.tenant(pool).await?.sandbox_restricted;
+        if is_sandbox_restricted && is_live == Some(true) {
+            return Err(AuthError::SandboxRestricted.into());
         }
 
         // otherwise return the default of the sent header or live if not restricted
-        Ok(is_live.unwrap_or_else(|| !self.data.is_sandbox_restricted()))
+        Ok(is_live.unwrap_or_else(|| !is_sandbox_restricted))
     }
 }
 

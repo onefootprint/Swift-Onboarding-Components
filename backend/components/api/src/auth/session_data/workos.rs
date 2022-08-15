@@ -14,7 +14,6 @@ pub struct WorkOsSession {
     pub first_name: Option<String>,
     pub last_name: Option<String>,
     pub tenant_id: TenantId,
-    pub sandbox_restricted: bool,
 }
 
 impl TryFrom<AuthSessionData> for WorkOsSession {
@@ -38,10 +37,6 @@ impl ExtractableAuthSession for WorkOsSession {
 impl HasTenant for WorkOsSession {
     fn tenant_id(&self) -> TenantId {
         self.tenant_id.clone()
-    }
-
-    fn is_sandbox_restricted(&self) -> bool {
-        self.sandbox_restricted
     }
 }
 
