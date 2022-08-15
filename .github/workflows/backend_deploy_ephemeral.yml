@@ -1,4 +1,4 @@
-name: [Backend] Ephemeral Stack
+name: Backend Ephemeral Stack
 on:
   pull_request:
     types: [labeled, reopened, opened, synchronize, edited]

@@ -1,4 +1,4 @@
-name: [Backend] Deploy Production
+name: Backend Deploy Production
 
 on:
   #

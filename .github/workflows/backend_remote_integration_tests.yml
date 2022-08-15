@@ -1,4 +1,4 @@
-name: [Backend] Remote Integration Tests
+name: Backend Remote Integration Tests
 
 on:
   workflow_call:

@@ -1,4 +1,4 @@
-name: [Backend] Destroy Ephemeral Stack
+name: Backend Destroy Ephemeral Stack
 on:
   pull_request:
     types: [closed]

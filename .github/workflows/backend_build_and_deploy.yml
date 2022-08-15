@@ -1,4 +1,4 @@
-name: [Backend] Build and Deploy Stack
+name: Backend Build and Deploy Stack
 
 on:
   workflow_call:

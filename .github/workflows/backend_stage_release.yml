@@ -1,4 +1,4 @@
-name: [Backend] Release
+name: Backend Release
 on:
   release:
     types: [published]
@@ -9,7 +9,7 @@ on:
         description: "Version name"
         required: true
         type: string
-        
+
 permissions:
   contents: write
   pull-requests: write
@@ -30,18 +30,17 @@ jobs:
           version="${input:-$ref}"
           echo "##[set-output name=version;]$(echo ${version})"
 
-      - name: create branch        
+      - name: create branch
         run: |
           git checkout -b "staging/release-${{ steps.version_name.outputs.version }}"
           git push --set-upstream origin "staging/release-${{ steps.version_name.outputs.version }}"
-          
+
       - name: token
         id: get_token
         uses: onefootprint/action-github-app-token@v1
         with:
           app_id: ${{ secrets.RELEASE_APP_ID }}
           private_key: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
-          
 
       - name: Create Pull Request
         uses: actions/github-script@v6

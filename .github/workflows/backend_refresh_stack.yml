@@ -1,4 +1,4 @@
-name: [Backend] Refresh Stack
+name: Backend Refresh Stack
 
 on:
   workflow_dispatch:
