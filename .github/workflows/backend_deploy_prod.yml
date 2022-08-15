@@ -5,7 +5,7 @@ on:
   # NOTE: for now we are auto-deploying to prod if tests pass!
   #
   workflow_run:
-    workflows: ["Deploy Dev"]
+    workflows: ["Backend Deploy Dev"]
     types:
       - completed
 

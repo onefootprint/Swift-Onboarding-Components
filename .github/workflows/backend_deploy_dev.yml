@@ -6,8 +6,7 @@ on:
       - "backend/infra/**"
       - "backend/components/**"
       - "backend/*.dockerfile"
-      - ".github/workflows/backend_build_and_deploy.yml"
-      - ".github/workflows/backend_deploy_dev.yml"
+      - ".github/workflows/backend_*.yml"
 
     branches:
       - master
