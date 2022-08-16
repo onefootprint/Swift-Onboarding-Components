@@ -8,14 +8,15 @@ import time
 import os 
 
 from .types import ObConfiguration, SecretApiKey, Tenant, BasicUser
-from .auth import (
-    OnboardingAuth,
-    TenantAuth,
-    TenantSecretAuth,
-)
+from .auth import FpAuth
 from .constants import CUSTODIAN_AUTH, EMAIL, PHONE_NUMBER
 
 url = lambda path: "{}/{}".format(os.environ.get('TEST_URL'), path)
+
+class HttpError(Exception):
+    def __init__(self, code, message):
+        self.code = code
+        super().__init__(message)
 
 def _make_request(method, path, data, params, status_code, auths):
     headers = {
@@ -29,7 +30,7 @@ def _make_request(method, path, data, params, status_code, auths):
         params=params,
     )
     if response.status_code != status_code:
-        assert False, f"Incorrect status code in {method.__name__.upper()} {path}. Got {response.status_code}, expected {status_code}:\n{response.content}\nPath: {path}\nData: {data}\nParams: {params}\nHeaders: {headers}\nResponse: {response.content}"
+        raise HttpError(response.status_code, f"Incorrect status code in {method.__name__.upper()} {path}. Got {response.status_code}, expected {status_code}:\n{response.content}\nPath: {path}\nData: {data}\nParams: {params}\nHeaders: {headers}\nResponse: {response.content}")
     return response.json()
 
 def get(path, params=None, *auths, status_code=200):
@@ -73,6 +74,31 @@ def try_until_success(fn, timeout_s=5, retry_interval_s=1):
         time.sleep(retry_interval_s)
     if last_exception:
         raise last_exception
+    
+
+def identify_verify(twilio, phone_number, challenge_token, expected_kind="user_created"):
+    messages = twilio.messages.list(to=phone_number, limit=6)
+    for message in messages:
+        try:
+            code = str(re.search("\\d{6}", message.body).group(0))
+        except:
+            # No code in this message, move on to the next
+            continue
+
+        try:
+            data = {
+                "challenge_response": code,
+                "challenge_kind": "sms",
+                "challenge_token": challenge_token,
+            }
+            body = post("hosted/identify/verify", data)
+            assert body["data"]["kind"] == expected_kind
+            return FpAuth(body["data"]["auth_token"])
+        except HttpError as e:
+            last_error = e
+    if last_error:
+        raise last_error
+    assert False, "Didn't find correct code for identify"
 
 
 def create_basic_user(twilio, suffix=None):
@@ -87,29 +113,7 @@ def create_basic_user(twilio, suffix=None):
     challenge_token = try_until_success(initiate_challenge, 20)  # Rate limiting may take a while
 
     # Respond to the challenge and create the sandbox user
-    def identify_verify():
-        messages = twilio.messages.list(to=phone_number, limit=6)
-        for message in messages:
-            try:
-                code = str(re.search("\\d{6}", message.body).group(0))
-            except:
-                print("No challenge code found in SMS message.")
-                continue
-            try:
-                data = {
-                    "challenge_response": code,
-                    "challenge_kind": "sms",
-                    "challenge_token": challenge_token,
-                }
-                body = post("hosted/identify/verify", data)
-                assert body["data"]["kind"] == "user_created"
-                return body["data"]["auth_token"]
-            except:
-                print(f"Tried challenge code {code} unsuccessfully.")
-                pass
-        assert False, "Didn't find correct code for identify"
-    auth_token = try_until_success(identify_verify, 5)
-    auth_token = OnboardingAuth(auth_token)
+    auth_token = try_until_success(lambda: identify_verify(twilio, phone_number, challenge_token), 5)
 
     user_data = {
         "email": sandbox_email,

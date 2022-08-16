@@ -1,10 +1,10 @@
 import pytest
 
 import re
-from tests.auth import My1fpAuth
+from tests.auth import FpAuth
 from tests.constants import FIELDS_TO_DECRYPT
 
-from tests.utils import try_until_success, post, get
+from tests.utils import try_until_success, post, get, identify_verify
 
 """
 Returns a user authed under a my1fp scope
@@ -24,18 +24,8 @@ def my1fp_authed_user(user, twilio):
     challenge_token = try_until_success(identify, 20, 1)
 
     # Log in as the user
-    def identify_verify():
-        message = twilio.messages.list(to=user.real_phone_number, limit=1)[0]
-        code = str(re.search("\\d{6}", message.body).group(0))
-        data = {
-            "challenge_response": code,
-            "challenge_token": challenge_token,
-        }
-        body = post("hosted/identify/verify", data)
-        assert body["data"]["kind"] == "user_inherited"
-        return body["data"]["auth_token"]
-    my1fp_auth_token = try_until_success(identify_verify, 5)
-    return user._replace(auth_token=My1fpAuth(my1fp_auth_token))
+    my1fp_auth_token = try_until_success(lambda: identify_verify(twilio, user.real_phone_number, challenge_token, expected_kind="user_inherited"), 5)
+    return user._replace(auth_token=my1fp_auth_token)
 
 
 class TestMy1fp:

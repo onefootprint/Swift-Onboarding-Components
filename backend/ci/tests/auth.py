@@ -6,7 +6,7 @@ class BaseAuth:
         assert self.HEADER_NAME, "Auth class doesn't have HEADER_NAME set"
 
 
-class OnboardingAuth(BaseAuth):
+class FpAuth(BaseAuth):
     HEADER_NAME = "x-fp-authorization"
     
 
@@ -16,14 +16,6 @@ class TenantAuth(BaseAuth):
 
 class TenantSecretAuth(BaseAuth):
     HEADER_NAME = "x-client-secret-key"
-
-
-class D2pAuth(BaseAuth):
-    HEADER_NAME = "x-fp-authorization"
-
-
-class My1fpAuth(BaseAuth):
-    HEADER_NAME = "x-fp-authorization"
 
 
 class CustodianAuth(BaseAuth):

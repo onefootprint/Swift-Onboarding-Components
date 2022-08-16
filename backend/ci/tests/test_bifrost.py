@@ -3,9 +3,9 @@ import os
 import re
 import pytest
 
-from tests.auth import D2pAuth, OnboardingAuth
 from tests.constants import EMAIL, PHONE_NUMBER
-from tests.utils import _b64_decode, _b64_encode, _gen_random_ssn, try_until_success, _override_webauthn_attestation, _override_webauthn_challenge, get, post, create_tenant, clean_up_user, create_basic_user, build_user_data
+from tests.auth import FpAuth
+from tests.utils import _b64_decode, _b64_encode, _gen_random_ssn, try_until_success, _override_webauthn_attestation, _override_webauthn_challenge, get, post, create_tenant, clean_up_user, create_basic_user, build_user_data, identify_verify
 from tests.webauthn_simulator import SoftWebauthnDevice
 
 
@@ -18,20 +18,7 @@ def auth_token(twilio):
     data = dict(phone_number=PHONE_NUMBER, identify_type="onboarding")
     body = post("hosted/identify/challenge", data)
     challenge_token = body["data"]["challenge_token"]
-    def identify_verify():
-        message = twilio.messages.list(to=PHONE_NUMBER, limit=1)[0]
-        code = str(re.search("\\d{6}", message.body).group(0))
-        
-        data = {
-            "challenge_response": code,
-            "challenge_kind": "sms",
-            "challenge_token": challenge_token,
-        }
-        body = post("hosted/identify/verify", data)
-        assert body["data"]["kind"] == "user_created"
-        return OnboardingAuth(body["data"]["auth_token"])
-    return try_until_success(identify_verify, 5)
-
+    return try_until_success(lambda: identify_verify(twilio, PHONE_NUMBER, challenge_token), 5)
 
 @pytest.fixture(scope="session")
 def foo_tenant(must_collect_data_kinds, can_access_data_kinds):
@@ -81,7 +68,7 @@ class TestBifrost:
         assert not body["data"]["user_found"]
         assert not body["data"].get("challenge_data", dict())
 
-    def test_onboard_init(self, workos_tenant, auth_token):
+    def test_onboarding_init(self, workos_tenant, auth_token):
         body = post("hosted/onboarding", None, workos_tenant.ob_config.key, auth_token)
         assert set(body["data"]["missing_attributes"]) == {"first_name", "last_name", "dob", "ssn", "street_address", "city", "state", "zip", "country", "email"}
         assert body["data"]["missing_webauthn_credentials"] == True
@@ -141,7 +128,7 @@ class TestBifrost:
     def test_d2p_biometric(self, auth_token):
         # Get new auth token in d2p/generate endpoint
         body = post("hosted/onboarding/d2p/generate", None, auth_token)
-        d2p_auth_token = D2pAuth(body["data"]["auth_token"])
+        d2p_auth_token = FpAuth(body["data"]["auth_token"])
 
         # Send the d2p token to the user via SMS
         data = dict(base_url="https://onefootprint.com/")
@@ -264,18 +251,7 @@ class TestBifrost:
         challenge_token = try_until_success(identify, 20)
 
         # Log in as the user
-        def identify_verify():
-            message = twilio.messages.list(to=PHONE_NUMBER, limit=1)[0]
-            code = str(re.search("\\d{6}", message.body).group(0))
-            data = {
-                "challenge_response": code,
-                "challenge_kind": "sms",
-                "challenge_token": challenge_token,
-            }
-            body = post("hosted/identify/verify", data)
-            assert body["data"]["kind"] == "user_inherited"
-            return OnboardingAuth(body["data"]["auth_token"])
-        auth_token = try_until_success(identify_verify, 5)
+        auth_token = try_until_success(lambda: identify_verify(twilio, PHONE_NUMBER, challenge_token, expected_kind="user_inherited"), 5)
 
         def onboard_onto_tenant(tenant):
             # Start onboarding for user
