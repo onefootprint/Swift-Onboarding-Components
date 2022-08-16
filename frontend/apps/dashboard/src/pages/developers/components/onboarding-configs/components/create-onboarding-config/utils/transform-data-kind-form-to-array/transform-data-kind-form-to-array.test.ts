@@ -9,68 +9,67 @@ describe('transformDataKindFormToArray', () => {
       email: true,
       name: true,
       phone_number: true,
-      ssn: true,
-      street_address: true,
-      street_address2: true,
-      zip: true,
     });
     expect(response0).toEqual([
       DataKinds.firstName,
       DataKinds.lastName,
       DataKinds.email,
       DataKinds.phoneNumber,
-      DataKinds.ssn,
       DataKinds.dob,
-      DataKinds.streetAddress,
-      DataKinds.streetAddress2,
-      DataKinds.zip,
     ]);
 
     const response1 = transformDataKindFormToArray({
-      dob: true,
       email: true,
-      name: true,
       phone_number: true,
-      ssn: false,
-      streetAddress: true,
-      streetAddress2: true,
-      zip: false,
+      last_four_ssn: true,
     });
     expect(response1).toEqual([
+      DataKinds.email,
+      DataKinds.phoneNumber,
+      DataKinds.lastFourSsn,
+    ]);
+
+    const response2 = transformDataKindFormToArray({
+      email: true,
+      phone_number: true,
+      name: true,
+    });
+    expect(response2).toEqual([
       DataKinds.firstName,
       DataKinds.lastName,
       DataKinds.email,
       DataKinds.phoneNumber,
-      DataKinds.dob,
-    ]);
-
-    const response2 = transformDataKindFormToArray({
-      dob: true,
-      email: false,
-      name: false,
-      phone_number: false,
-      ssn: false,
-      street_address: true,
-      street_address2: true,
-      zip: true,
-    });
-    expect(response2).toEqual([
-      DataKinds.dob,
-      DataKinds.streetAddress,
-      DataKinds.streetAddress2,
-      DataKinds.zip,
     ]);
 
     const response3 = transformDataKindFormToArray({
-      dob: false,
-      email: false,
-      name: false,
-      phone_number: false,
-      ssn: false,
-      street_address: false,
-      street_address2: false,
-      zip: false,
+      email: true,
+      phone_number: true,
+      address_full: true,
     });
-    expect(response3).toEqual([]);
+    expect(response3).toEqual([
+      DataKinds.zip,
+      DataKinds.city,
+      DataKinds.country,
+      DataKinds.state,
+      DataKinds.streetAddress,
+      DataKinds.streetAddress2,
+      DataKinds.email,
+      DataKinds.phoneNumber,
+    ]);
+
+    const response4 = transformDataKindFormToArray({
+      email: true,
+      phone_number: true,
+      address_partial: true,
+    });
+    expect(response4).toEqual([
+      DataKinds.zip,
+      DataKinds.country,
+      DataKinds.email,
+      DataKinds.phoneNumber,
+    ]);
+
+    const response5 = transformDataKindFormToArray({});
+    expect(response5).toEqual([]);
   });
 });

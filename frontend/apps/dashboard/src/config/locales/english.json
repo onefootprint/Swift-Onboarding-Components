@@ -11,20 +11,22 @@
   },
   "cancel": "Cancel",
   "data-kinds": {
-    "name": "Name",
+    "name": "Full name",
     "first_name": "First name",
     "last_name": "Last name",
     "email": "Email",
     "phone_number": "Phone number",
-    "ssn": "SSN (full)",
-    "last_four_ssn": "SSN (last 4)",
-    "dob": "Date of birth",
+    "ssn": "SSN (Full)",
+    "last_four_ssn": "SSN (Last 4)",
+    "dob": "Date of Birth",
     "street_address": "Address line 1",
     "street_address2": "Address line 2",
     "city": "City",
     "state": "State",
     "zip": "Zip code",
-    "country": "Country"
+    "country": "Country",
+    "address_full": "Address (Full)",
+    "address_partial": "Address (Country & Zip Code)"
   },
   "components": {
     "private-layout": {
@@ -154,10 +156,12 @@
           "collect-form": {
             "title": "Collected data",
             "description": "Select the attributes you require us to collect during onboarding to verify the user's identity.",
-            "error": "Choose at least one data attribute to continue.",
             "ssn": "SSN",
             "ssn_full": "Full",
-            "ssn_last_4": "Last 4"
+            "ssn_last_4": "Last 4",
+            "address": "Address",
+            "address_full": "Full",
+            "address_partial": "Country & Zip Code"
           },
           "access-form": {
             "title": "Authorized scopes",

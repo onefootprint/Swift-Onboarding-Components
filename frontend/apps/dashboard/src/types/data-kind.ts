@@ -14,6 +14,12 @@ export enum DataKinds {
   country = 'country',
 }
 
+export enum VirtualDataKinds {
+  name = 'name',
+  addressFull = 'address_full',
+  addressPartial = 'address_partial',
+}
+
 export type DataKind = keyof typeof DataKinds;
 
 export const dataKindToType = Object.fromEntries(

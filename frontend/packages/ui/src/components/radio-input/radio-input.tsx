@@ -1,4 +1,4 @@
-import React, { forwardRef } from 'react';
+import React, { forwardRef, useId } from 'react';
 import styled, { css } from 'styled-components';
 
 import { createFontStyles } from '../../utils/mixins';
@@ -30,7 +30,7 @@ const RadioInput = forwardRef<HTMLInputElement, RadioInputProps>(
       disabled,
       hasError,
       hintText,
-      id: baseID,
+      id: possibleId,
       label,
       name,
       onBlur,
@@ -42,7 +42,8 @@ const RadioInput = forwardRef<HTMLInputElement, RadioInputProps>(
     }: RadioInputProps,
     ref,
   ) => {
-    const id = `checkbox-${baseID || label}`;
+    const internalId = useId();
+    const id = possibleId || internalId;
     return (
       <Container>
         <Label

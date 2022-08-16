@@ -1,4 +1,7 @@
 import { useReducer } from 'react';
+import { DataKinds } from 'src/types/data-kind';
+
+import type { DataKindForm } from '../create-onboarding-config.types';
 
 export enum Actions {
   next = 'NEXT',
@@ -15,13 +18,19 @@ type State = {
   step: number;
   data: {
     name: string;
-    collect: Record<string, any>;
+    collect: DataKindForm;
   };
 };
 
 const initialState = {
   step: 0,
-  data: {},
+  data: {
+    name: '',
+    collect: {
+      [DataKinds.email]: true,
+      [DataKinds.phoneNumber]: true,
+    },
+  },
 };
 
 const reducer = (state: State, action: Action) => {

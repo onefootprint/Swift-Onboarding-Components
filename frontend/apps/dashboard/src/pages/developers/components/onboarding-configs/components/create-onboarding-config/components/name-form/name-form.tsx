@@ -3,13 +3,14 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import { TextInput } from 'ui';
 
-import type { NameFormData } from '../../types';
+import type { NameFormData } from '../../create-onboarding-config.types';
 
 type NameFormProps = {
+  defaultValues?: NameFormData;
   onSubmit: (formData: NameFormData) => void;
 };
 
-const NameForm = ({ onSubmit }: NameFormProps) => {
+const NameForm = ({ defaultValues, onSubmit }: NameFormProps) => {
   const { t } = useTranslation(
     'pages.developers.onboarding-configs.create.name-form',
   );
@@ -17,7 +18,9 @@ const NameForm = ({ onSubmit }: NameFormProps) => {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<NameFormData>();
+  } = useForm<NameFormData>({
+    defaultValues,
+  });
 
   return (
     <form

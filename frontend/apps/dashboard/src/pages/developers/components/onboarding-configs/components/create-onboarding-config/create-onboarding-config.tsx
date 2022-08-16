@@ -2,14 +2,17 @@ import { useTranslation } from 'hooks';
 import IcoChevronLeft24 from 'icons/ico/ico-chevron-left-24';
 import IcoClose24 from 'icons/ico/ico-close-16';
 import React from 'react';
-import { Box, Dialog, useConfirmationDialog } from 'ui';
+import { Dialog, useConfirmationDialog } from 'ui';
 
 import AccessForm from './components/access-form';
 import CollectForm from './components/collect-form';
 import NameForm from './components/name-form';
+import type {
+  DataKindForm,
+  NameFormData,
+} from './create-onboarding-config.types';
 import useCreateOnboardingConfig from './hooks/use-create-onboarding-config';
 import useCreateState, { Actions } from './hooks/use-create-state';
-import type { AccessFormData, CollectFormData, NameFormData } from './types';
 import getSelectedDataKinds from './utils/get-selected-data-kinds';
 import transformDataKindFormToArray from './utils/transform-data-kind-form-to-array';
 
@@ -67,11 +70,11 @@ const CreateOnboardingConfig = ({
     });
   };
 
-  const handleSubmitCollect = (formData: CollectFormData) => {
+  const handleSubmitCollect = (formData: DataKindForm) => {
     dispatch({ type: Actions.next, payload: { data: { collect: formData } } });
   };
 
-  const handleSubmitAccess = (accessFormData: AccessFormData) => {
+  const handleSubmitAccess = (accessFormData: DataKindForm) => {
     mutation.mutate(
       {
         name: state.data.name,
@@ -105,18 +108,29 @@ const CreateOnboardingConfig = ({
       closeIconComponent={state.step === 0 ? IcoClose24 : IcoChevronLeft24}
       open={open}
     >
-      <Box sx={{ display: state.step === 0 ? 'block' : 'none' }}>
-        <NameForm onSubmit={handleSubmitName} />
-      </Box>
-      <Box sx={{ display: state.step === 1 ? 'block' : 'none' }}>
-        <CollectForm onSubmit={handleSubmitCollect} />
-      </Box>
-      <Box sx={{ display: state.step === 2 ? 'block' : 'none' }}>
+      {state.step === 0 && (
+        <NameForm
+          onSubmit={handleSubmitName}
+          defaultValues={{
+            name: state.data.name,
+          }}
+        />
+      )}
+      {state.step === 1 && (
+        <CollectForm
+          onSubmit={handleSubmitCollect}
+          defaultValues={state.data.collect}
+        />
+      )}
+      {state.step === 2 && (
         <AccessForm
           onSubmit={handleSubmitAccess}
           fields={getSelectedDataKinds(state.data?.collect)}
+          defaultValues={Object.fromEntries(
+            getSelectedDataKinds(state.data?.collect),
+          )}
         />
-      </Box>
+      )}
     </Dialog>
   );
 };

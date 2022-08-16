@@ -1,5 +1,5 @@
 import React from 'react';
-import { customRender, screen, userEvent, waitFor, within } from 'test-utils';
+import { customRender, screen, userEvent, waitFor } from 'test-utils';
 
 import type { CreateOnboardingConfigProps } from './create-onboarding-config';
 import CreateDialog from './create-onboarding-config';
@@ -90,25 +90,16 @@ describe('<CreateDialog />', () => {
   });
 
   describe('"Collect data" section', () => {
-    it('should show an error if nothing was selected and remove it once the user selects a field', async () => {
+    it('should show the email and phone_number checked and disabled', async () => {
       await renderCreateDialogOnTheCollectDataSection();
 
-      const collectForm = screen.getByTestId('collect-form');
+      const emailCheckbox = screen.getByLabelText('Email') as HTMLInputElement;
+      expect(emailCheckbox).toBeDisabled();
 
-      const allCheckbox = within(collectForm).getByLabelText('All');
-      await userEvent.click(allCheckbox);
-
-      const continueButton = screen.getByRole('button', {
-        name: 'Continue',
-      });
-      await userEvent.click(continueButton);
-
-      await waitFor(() => {
-        const errorMessage = screen.getByText(
-          'Choose at least one data attribute to continue.',
-        );
-        expect(errorMessage).toBeInTheDocument();
-      });
+      const phoneCheckbox = screen.getByLabelText(
+        'Phone number',
+      ) as HTMLInputElement;
+      expect(phoneCheckbox).toBeDisabled();
     });
 
     describe('when clicking on the back button', () => {
@@ -151,16 +142,8 @@ describe('<CreateDialog />', () => {
     it('should only show the fields that were selected in the previous step', async () => {
       await renderCreateDialogOnTheCollectDataSection();
 
-      const collectForm = screen.getByTestId('collect-form');
-
-      const allCheckbox = within(collectForm).getByLabelText('All');
-      await userEvent.click(allCheckbox);
-
-      const nameCheckbox = within(collectForm).getByLabelText('Email');
+      const nameCheckbox = screen.getByLabelText('Full name');
       await userEvent.click(nameCheckbox);
-
-      const phoneCheckbox = within(collectForm).getByLabelText('Phone number');
-      await userEvent.click(phoneCheckbox);
 
       const continueButton = screen.getByRole('button', { name: 'Continue' });
       await userEvent.click(continueButton);
@@ -169,61 +152,113 @@ describe('<CreateDialog />', () => {
         expect(screen.getByTestId('access-form')).toBeVisible();
       });
 
-      const accessForm = screen.getByTestId('access-form');
-      const allCheckboxes = within(accessForm).getAllByRole('checkbox', {
+      const allCheckboxes = screen.getAllByRole('checkbox', {
         checked: true,
       });
 
-      // All + Email + Phone number
+      // Phone number + Email + Full name
       expect(allCheckboxes.length).toEqual(3);
     });
 
-    describe('when the user selectes only the SSN (Last 4) in the "Collect form" section', () => {
-      it('should show only the SSN (Last 4) field', async () => {
-        await renderCreateDialogOnTheCollectDataSection();
+    describe('when selecting the ssn', () => {
+      describe('when collecting the full ssn', () => {
+        it('should show only the SSN (Full) field', async () => {
+          await renderCreateDialogOnTheCollectDataSection();
 
-        const collectForm = screen.getByTestId('collect-form');
+          const ssnCheckbox = screen.getByLabelText('SSN');
+          await userEvent.click(ssnCheckbox);
 
-        const lastFourSsn = within(collectForm).getByLabelText('Last 4');
-        await userEvent.click(lastFourSsn);
+          const ssnRadio = screen.getByLabelText('Full');
+          await userEvent.click(ssnRadio);
 
-        const continueButton = screen.getByRole('button', { name: 'Continue' });
-        await userEvent.click(continueButton);
+          const continueButton = screen.getByRole('button', {
+            name: 'Continue',
+          });
+          await userEvent.click(continueButton);
 
-        await waitFor(() => {
-          expect(screen.getByTestId('access-form')).toBeVisible();
+          await waitFor(() => {
+            expect(screen.getByTestId('access-form')).toBeVisible();
+          });
+
+          const fullSsn = screen.getByLabelText('SSN (Full)');
+          expect(fullSsn).toBeInTheDocument();
         });
+      });
 
-        const last4Ssn = screen.getByLabelText('SSN (last 4)');
-        expect(last4Ssn).toBeInTheDocument();
+      describe('when collecting the last four ssn', () => {
+        it('should show only the SSN (Last 4) field', async () => {
+          await renderCreateDialogOnTheCollectDataSection();
+
+          const ssnCheckbox = screen.getByLabelText('SSN');
+          await userEvent.click(ssnCheckbox);
+
+          const ssnRadio = screen.getByLabelText('Last 4');
+          await userEvent.click(ssnRadio);
+
+          const continueButton = screen.getByRole('button', {
+            name: 'Continue',
+          });
+          await userEvent.click(continueButton);
+
+          await waitFor(() => {
+            expect(screen.getByTestId('access-form')).toBeVisible();
+          });
+
+          const last4Ssn = screen.getByLabelText('SSN (Last 4)');
+          expect(last4Ssn).toBeInTheDocument();
+        });
       });
     });
 
-    describe('when the user selectes only one option in the "Collect form" section', () => {
-      it('should not show the field "All"', async () => {
-        await renderCreateDialogOnTheCollectDataSection();
+    describe('when selecting the address', () => {
+      describe('when collecting the full address', () => {
+        it('should show the Address (full) field', async () => {
+          await renderCreateDialogOnTheCollectDataSection();
 
-        const collectForm = screen.getByTestId('collect-form');
+          const addressCheckbox = screen.getByLabelText('Address');
+          await userEvent.click(addressCheckbox);
 
-        const allCheckbox = within(collectForm).getByLabelText('All');
-        await userEvent.click(allCheckbox);
+          const addressRadio = screen.getByLabelText('Full');
+          await userEvent.click(addressRadio);
 
-        const nameCheckbox = within(collectForm).getByLabelText('Email');
-        await userEvent.click(nameCheckbox);
+          const continueButton = screen.getByRole('button', {
+            name: 'Continue',
+          });
+          await userEvent.click(continueButton);
 
-        const continueButton = screen.getByRole('button', { name: 'Continue' });
-        await userEvent.click(continueButton);
+          await waitFor(() => {
+            expect(screen.getByTestId('access-form')).toBeVisible();
+          });
 
-        await waitFor(() => {
-          expect(screen.getByTestId('access-form')).toBeVisible();
+          const addressFullCheckbox = screen.getByLabelText('Address (Full)');
+          expect(addressFullCheckbox).toBeInTheDocument();
         });
+      });
 
-        const accessForm = screen.getByTestId('access-form');
-        const allCheckboxes = within(accessForm).getAllByRole('checkbox', {
-          checked: true,
+      describe('when collecting the partial address', () => {
+        it('should show the Address (Country & Zip Code) field', async () => {
+          await renderCreateDialogOnTheCollectDataSection();
+
+          const addressCheckbox = screen.getByLabelText('Address');
+          await userEvent.click(addressCheckbox);
+
+          const addressRadio = screen.getByLabelText('Country & Zip Code');
+          await userEvent.click(addressRadio);
+
+          const continueButton = screen.getByRole('button', {
+            name: 'Continue',
+          });
+          await userEvent.click(continueButton);
+
+          await waitFor(() => {
+            expect(screen.getByTestId('access-form')).toBeVisible();
+          });
+
+          const addressPartialCheckbox = screen.getByLabelText(
+            'Address (Country & Zip Code)',
+          );
+          expect(addressPartialCheckbox).toBeInTheDocument();
         });
-
-        expect(allCheckboxes.length).toEqual(1);
       });
     });
 

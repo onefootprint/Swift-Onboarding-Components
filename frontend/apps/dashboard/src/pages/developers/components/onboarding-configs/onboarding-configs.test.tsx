@@ -92,7 +92,7 @@ describe('<OnboardingConfigs />', () => {
             `can-access-data-kinds-${onboardingConfig.id}`,
           );
           expect(
-            within(canAccessList).getByText('Date of birth'),
+            within(canAccessList).getByText('Date of Birth'),
           ).toBeInTheDocument();
           const onboardingKey = within(item).getByText(onboardingConfig.key);
           expect(onboardingKey).toBeInTheDocument();
