@@ -1,3 +1,4 @@
+use db::models::scoped_users::ScopedUser;
 use enclave_proxy::DataTransform;
 use std::collections::HashMap;
 use std::marker::PhantomData;
@@ -11,7 +12,10 @@ use db::models::user_profile::{NewUserProfileReq, UserProfile};
 use db::models::user_vaults::UserVault;
 use db::DbPool;
 use db::{errors::DbError, PgConnection};
-use newtypes::{DataKind, DataPriority, NewSealedData, SealedVaultBytes, UserVaultId, ValidatedPhoneNumber};
+use newtypes::{
+    DataKind, DataPriority, FootprintUserId, NewSealedData, SealedVaultBytes, TenantId, UserVaultId,
+    ValidatedPhoneNumber,
+};
 use paperclip::actix::web;
 
 use crate::errors::user::UserError;
@@ -68,6 +72,17 @@ impl UserVaultWrapper {
         let user_vault = UserVault::get(conn, user_vault_id)?;
         let uvw = Self::from_conn(conn, user_vault)?;
         Ok(uvw)
+    }
+
+    pub fn from_fp_user_id(
+        conn: &mut PgConnection,
+        fp_user_id: &FootprintUserId,
+        tenant_id: &TenantId,
+        is_live: bool,
+    ) -> Result<(Self, ScopedUser), DbError> {
+        let (user_vault, scoped_user) = UserVault::get_for_tenant(conn, tenant_id, fp_user_id, is_live)?;
+        let uvw = Self::from_conn(conn, user_vault)?;
+        Ok((uvw, scoped_user))
     }
 
     pub fn get_e_field(&self, data_kind: &DataKind) -> Option<&SealedVaultBytes> {
@@ -154,8 +169,7 @@ impl UserVaultWrapper {
             }
             let new_profile = NewUserProfileReq::build(&new_data, self.profile.as_ref());
             let new_profile = UserProfile::create(conn, self.user_vault.id.clone(), new_profile)?;
-            self.data_kind_to_e_data
-                .extend(new_profile.clone().data_items());
+            self.data_kind_to_e_data.extend(new_profile.clone().data_items());
             self.profile = Some(new_profile)
         }
 

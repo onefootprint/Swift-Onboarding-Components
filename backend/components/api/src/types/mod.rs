@@ -1,4 +1,5 @@
 pub mod access_event;
+pub mod address;
 pub mod audit_trail;
 pub mod error;
 pub mod insight_event;
