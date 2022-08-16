@@ -1,62 +1,90 @@
 {
-    "git.ignoreLimitWarning": true,
-    "terminal.integrated.localEchoLatencyThreshold": 0,
-    "cSpell.words": [
-        "aaguid",
-        "actix",
-        "algs",
-        "Apiv",
-        "appattest",
-        "appattestdevelop",
-        "awsx",
-        "byteorder",
-        "cbor",
-        "chacha",
-        "chal",
-        "chrono",
-        "COSE",
-        "creds",
-        "deadpool",
-        "ecies",
-        "envconfig",
-        "fingerprintable",
-        "Fpuser",
-        "hmac",
-        "livecheck",
-        "newtype",
-        "newtypes",
-        "octetstring",
-        "openapi",
-        "opentelemetry",
-        "pinpointemail",
-        "pulumi",
-        "repr",
-        "sqlx",
-        "Tailscale",
-        "testkey",
-        "thiserror",
-        "vsock",
-        "webauthn",
-        "workos"
-    ],
-    "[rust]": {
-        "editor.defaultFormatter": "rust-lang.rust-analyzer",
-        "editor.semanticHighlighting.enabled": true,
-        "editor.formatOnSave": true
+  "git.ignoreLimitWarning": true,
+  "terminal.integrated.localEchoLatencyThreshold": 0,
+  "cSpell.words": [
+    "aaguid",
+    "actix",
+    "algs",
+    "Apiv",
+    "appattest",
+    "appattestdevelop",
+    "awsx",
+    "byteorder",
+    "cbor",
+    "chacha",
+    "chal",
+    "chrono",
+    "COSE",
+    "creds",
+    "deadpool",
+    "ecies",
+    "envconfig",
+    "fingerprintable",
+    "Fpuser",
+    "hmac",
+    "livecheck",
+    "newtype",
+    "newtypes",
+    "noselect",
+    "octetstring",
+    "openapi",
+    "opentelemetry",
+    "pinpointemail",
+    "pulumi",
+    "repr",
+    "sqlx",
+    "Tailscale",
+    "testkey",
+    "thiserror",
+    "vsock",
+    "webauthn",
+    "workos"
+  ],
+  "[rust]": {
+    "editor.defaultFormatter": "rust-lang.rust-analyzer",
+    "editor.semanticHighlighting.enabled": true,
+    "editor.formatOnSave": true
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.codeActionsOnSave": {
+      "source.fixAll.eslint": true,
     },
-    "rust-analyzer.checkOnSave.command": "clippy",
-    "cSpell.diagnosticLevel": "Hint",
-    "files.exclude": {
-        "**/target/**": true
+    "editor.formatOnSave": true,
+    "editor.formatOnPaste": false,
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.codeActionsOnSave": {
+      "source.fixAll.eslint": true,
     },
-    "files.watcherExclude": {
-        "**/target/**": true
+    "editor.formatOnSave": true,
+    "editor.formatOnPaste": false,
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.codeActionsOnSave": {
+      "source.fixAll.eslint": true,
     },
-    "rust-analyzer.files.excludeDirs": [
-        "**/target/**"
-    ],
-    "rust-analyzer.rustfmt.overrideCommand": null,
-    "search.exclude": {
-        "**/target/": true
-    },
+    "editor.formatOnSave": true,
+    "editor.formatOnPaste": false,
+  },
+  "rust-analyzer.checkOnSave.command": "clippy",
+  "cSpell.diagnosticLevel": "Hint",
+  "files.exclude": {
+    "**/target/**": true
+  },
+  "files.watcherExclude": {
+    "**/target/**": true
+  },
+  "rust-analyzer.files.excludeDirs": ["**/target/**"],
+  "rust-analyzer.rustfmt.overrideCommand": null,
+  "search.exclude": {
+    "**/target/": true
+  },
+  "eslint.validate": [
+    "javascript",
+    "typescript",
+    "typescriptreact",
+  ]
 }

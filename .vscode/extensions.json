@@ -6,5 +6,12 @@
         "serayuzgur.crates",
         "vadimcn.vscode-lldb",
         "ms-vscode.vscode-typescript-next",
+        "steoates.autoimport",
+        "formulahendry.auto-rename-tag",
+        "streetsidesoftware.code-spell-checker",
+        "naumovs.color-highlight",
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "wayou.vscode-todo-highlight"
     ]
 }
