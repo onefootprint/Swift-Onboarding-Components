@@ -141,7 +141,8 @@ class TestDashboard:
             (["last_name"], [], 400),  # Can't collect last name without first name
             (["last_four_ssn", "ssn"], [], 400),  # Can't collect both last four SSN and whole SSN
             (["street_address"], [], 400),  # Can't collect only some address fields
-            (["zip"], [], 200),  # Except for zip
+            (["zip", "country"], [], 200),  # Except for zip & country
+            (["zip"], [], 400),  # Country is always required along with zip
             (["first_name", "last_name"], ["ssn"], 400),  # can_access must be < must_collect
         ],
     )

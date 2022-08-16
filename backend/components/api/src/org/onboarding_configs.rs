@@ -87,12 +87,7 @@ impl CreateOnboardingConfigurationRequest {
         let contains_all = |kinds: &[DataKind]| kinds.iter().all(|x| must_collect.contains(x));
         let contains_all_or_none = |kinds| contains_all(kinds) || !contains_any(kinds);
 
-        // if contains all fields or (contains Zip and ! other address fields)
-        // if !contains all or none and (!contains zip or contains other address fields)
-
-        // accpetable states: full address or just zip or nothing
-        // contains_all(address_kinds) || ! contains_any(address_kinds) || (contains(Zip) && !contains_any(other_address_kinds))
-        // !contains_all(address_kinds) && contains_any(address_kinds) && !(contains(Zip) && !contains_any(other_address_kinds))
+        // acceptable states: all address fields or no address fields or just zip & country fields
         let address_kinds = &[
             DataKind::StreetAddress,
             DataKind::StreetAddress2,
@@ -101,17 +96,19 @@ impl CreateOnboardingConfigurationRequest {
             DataKind::Country,
             DataKind::Zip,
         ];
-        let address_kinds_without_zip = &address_kinds
+        let address_kinds_without_zip_and_country = &address_kinds
             .iter()
             .cloned()
-            .filter(|x| x != &DataKind::Zip)
+            .filter(|x| x != &DataKind::Zip && x != &DataKind:: Country)
             .collect::<Vec<DataKind>>();
+        let contains_only_zip_and_country = must_collect.contains(&DataKind::Zip) && 
+                                                  must_collect.contains(&DataKind::Country) && 
+                                                  !contains_any(address_kinds_without_zip_and_country);
+
         let err = if !contains_all_or_none(&[DataKind::FirstName, DataKind::LastName]) {
             TenantError::ValidationError("Must request first name and last name together".to_owned())
-        } else if !(contains_all_or_none(address_kinds)
-            || (must_collect.contains(&DataKind::Zip) && !contains_any(address_kinds_without_zip)))
-        {
-            TenantError::ValidationError("Can only request all address fields, zip only, or none".to_owned())
+        } else if !(contains_all_or_none(address_kinds)|| contains_only_zip_and_country) {
+            TenantError::ValidationError("Can only request all address fields, zip & country only, or none".to_owned())
         } else if must_collect.contains(&DataKind::Ssn4) && must_collect.contains(&DataKind::Ssn9) {
             TenantError::ValidationError("Cannot request full SSN and last four of SSN".to_owned())
         } else if !HashSet::<&DataKind>::from_iter(self.can_access_data_kinds.iter())
