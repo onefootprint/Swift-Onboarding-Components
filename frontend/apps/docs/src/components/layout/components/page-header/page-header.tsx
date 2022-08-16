@@ -1,8 +1,8 @@
 import { createPopup } from '@typeform/embed';
 import { useHasScroll, useTranslation } from 'hooks';
 import IcoDatabase16 from 'icons/ico/ico-database-16';
-import IcoLogoFpCompact from 'icons/ico/ico-logo-fp-compact';
 import IcoShield16 from 'icons/ico/ico-shield-16';
+import LogoFpCompact from 'icons/ico/logo-fp-compact';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React from 'react';
@@ -28,7 +28,7 @@ const PageHeader = () => {
       <Container>
         <Inner>
           <Title>
-            <IcoLogoFpCompact />
+            <LogoFpCompact />
             <Typography
               variant="label-2"
               color="tertiary"

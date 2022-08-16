@@ -102,11 +102,10 @@ import IcoLock16 from '../ico/ico-lock-16';
 import IcoLock24 from '../ico/ico-lock-24';
 import IcoLogOut16 from '../ico/ico-log-out-16';
 import IcoLogOut24 from '../ico/ico-log-out-24';
-import IcoLogoFpCompact from '../ico/ico-logo-fp-compact';
-import IcoLogoFpDefault from '../ico/ico-logo-fp-default';
-import IcoLogoFpLarge from '../ico/ico-logo-fp-large';
 import IcoMenu16 from '../ico/ico-menu-16';
 import IcoMenu24 from '../ico/ico-menu-24';
+import IcoMessage16 from '../ico/ico-message-16';
+import IcoMessage24 from '../ico/ico-message-24';
 import IcoMinusBig16 from '../ico/ico-minus-big-16';
 import IcoMinusBig24 from '../ico/ico-minus-big-24';
 import IcoMinusSmall16 from '../ico/ico-minus-small-16';
@@ -146,6 +145,12 @@ import IcoUserCircle16 from '../ico/ico-user-circle-16';
 import IcoUserCircle24 from '../ico/ico-user-circle-24';
 import IcoUsers16 from '../ico/ico-users-16';
 import IcoUsers24 from '../ico/ico-users-24';
+import IcoWarning16 from '../ico/ico-warning-16';
+import IcoWarning24 from '../ico/ico-warning-24';
+import LogoFpCompact from '../ico/logo-fp-compact';
+import LogoFpDefault from '../ico/logo-fp-default';
+import LogoFpLarge from '../ico/logo-fp-large';
+import LogoFpdocsDefault from '../ico/logo-fpdocs-default';
 
 export default {
   IcoAndroidColored16,
@@ -195,6 +200,7 @@ export default {
   IcoLock16,
   IcoLogOut16,
   IcoMenu16,
+  IcoMessage16,
   IcoMinusBig16,
   IcoMinusSmall16,
   IcoPencil16,
@@ -214,6 +220,7 @@ export default {
   IcoUser16,
   IcoUserCircle16,
   IcoUsers16,
+  IcoWarning16,
   IcoAndroidColored24,
   IcoAppleColored24,
   IcoArrowDown24,
@@ -261,6 +268,7 @@ export default {
   IcoLock24,
   IcoLogOut24,
   IcoMenu24,
+  IcoMessage24,
   IcoMinusBig24,
   IcoMinusSmall24,
   IcoPencil24,
@@ -279,6 +287,7 @@ export default {
   IcoUser24,
   IcoUserCircle24,
   IcoUsers24,
+  IcoWarning24,
   IcoAppleColored40,
   IcoChartUp40,
   IcoCheckCircle40,
@@ -290,7 +299,8 @@ export default {
   IcoLeaf40,
   IcoQuote40,
   IcoShield40,
-  IcoLogoFpCompact,
-  IcoLogoFpDefault,
-  IcoLogoFpLarge,
+  LogoFpCompact,
+  LogoFpDefault,
+  LogoFpLarge,
+  LogoFpdocsDefault,
 };

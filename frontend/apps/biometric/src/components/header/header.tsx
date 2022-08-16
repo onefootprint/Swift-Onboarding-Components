@@ -1,10 +1,10 @@
-import IcoLogoFpDefault from 'icons/ico/ico-logo-fp-default';
+import LogoFpDefault from 'icons/ico/logo-fp-default';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
 const Header = () => (
   <Container>
-    <IcoLogoFpDefault />
+    <LogoFpDefault />
   </Container>
 );
 

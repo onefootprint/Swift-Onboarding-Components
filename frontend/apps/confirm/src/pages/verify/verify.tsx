@@ -1,4 +1,4 @@
-import IcoLogoFpDefault from 'icons/ico/ico-logo-fp-default';
+import LogoFpDefault from 'icons/ico/logo-fp-default';
 import isString from 'lodash/isString';
 import { useRouter } from 'next/router';
 import React, { useEffect } from 'react';
@@ -26,7 +26,7 @@ const Verify = () => {
     <Container>
       <Inner>
         <Box sx={{ marginBottom: 8 }}>
-          <IcoLogoFpDefault />
+          <LogoFpDefault />
         </Box>
         {verifyMutation.isLoading && <VerifyLoading />}
         {verifyMutation.isSuccess && <VerifySuccess />}

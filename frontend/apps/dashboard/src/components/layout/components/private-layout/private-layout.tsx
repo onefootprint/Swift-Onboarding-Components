@@ -1,9 +1,9 @@
 import { useTranslation } from 'hooks';
 import IcoCode16 from 'icons/ico/ico-code-16';
 import IcoFileText16 from 'icons/ico/ico-file-text-16';
-import IcoLogoFpCompact from 'icons/ico/ico-logo-fp-compact';
 import IcoUser24 from 'icons/ico/ico-user-24';
 import IcoUsers16 from 'icons/ico/ico-users-16';
+import LogoFpCompact from 'icons/ico/logo-fp-compact';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React from 'react';
@@ -46,7 +46,7 @@ const PrivateLayout = ({ children }: PrivateLayoutProps) => {
             <Footprint>
               <Link href="/users">
                 <a href="/users">
-                  <IcoLogoFpCompact />
+                  <LogoFpCompact />
                 </a>
               </Link>
               <SuffixContainer>

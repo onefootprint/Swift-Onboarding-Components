@@ -1,5 +1,5 @@
 import { useTranslation } from 'hooks';
-import IcoLogoFpDefault from 'icons/ico/ico-logo-fp-default';
+import LogoFpDefault from 'icons/ico/logo-fp-default';
 import Link from 'next/link';
 import React from 'react';
 
@@ -13,7 +13,7 @@ const LogoLink = ({ onClick }: LogoLinkProps) => {
   return (
     <Link href="/">
       <a href="/" aria-label={t('aria-label')} onClick={onClick}>
-        <IcoLogoFpDefault />
+        <LogoFpDefault />
       </a>
     </Link>
   );

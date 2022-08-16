@@ -1,4 +1,4 @@
-import IcoLogoFpDefault from 'icons/ico/ico-logo-fp-default';
+import LogoFpDefault from 'icons/ico/logo-fp-default';
 import React from 'react';
 import styled from 'styled-components';
 import { Typography } from 'ui';
@@ -9,7 +9,7 @@ export type LogoAndTextProps = {
 
 const LogoAndText = ({ text }: LogoAndTextProps) => (
   <Container>
-    <IcoLogoFpDefault />
+    <LogoFpDefault />
     <Typography variant="heading-3" color="primary" sx={{ marginY: 8 }}>
       {text}
     </Typography>

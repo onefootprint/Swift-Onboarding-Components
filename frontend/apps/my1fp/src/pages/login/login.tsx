@@ -1,6 +1,6 @@
 import footprint from 'footprint';
 import { useTranslation } from 'hooks';
-import IcoLogoFpDefault from 'icons/ico/ico-logo-fp-default';
+import LogoFpDefault from 'icons/ico/logo-fp-default';
 import { useRouter } from 'next/router';
 import React from 'react';
 import { getErrorMessage, RequestError } from 'request';
@@ -72,7 +72,7 @@ const Login = () => {
 
   return (
     <Container>
-      <IcoLogoFpDefault />
+      <LogoFpDefault />
       <Inner>
         <Typography variant="label-1" color="primary" sx={{ marginY: 8 }}>
           {t('instructions')}
