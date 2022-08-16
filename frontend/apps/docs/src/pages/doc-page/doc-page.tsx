@@ -4,6 +4,7 @@ import type { Page } from 'src/types/page';
 import styled, { css } from 'styled-components';
 import { createFontStyles } from 'ui';
 
+import A from './components/a';
 import Code from './components/code';
 import H2 from './components/h2';
 import H3 from './components/h3';
@@ -13,6 +14,7 @@ type DocPageProps = {
 };
 
 const components = {
+  a: A,
   code: Code,
   h2: H2,
   h3: H3,
@@ -30,15 +32,6 @@ const DocPage = ({ page }: DocPageProps) => (
 
 const Container = styled.div`
   ${({ theme }) => css`
-    a {
-      color: ${theme.color.accent};
-      text-decoration: none;
-
-      &:hover {
-        text-decoration: underline;
-      }
-    }
-
     p,
     li {
       ${createFontStyles('body-2')};
@@ -54,12 +47,22 @@ const Container = styled.div`
       }
 
       > li {
-        margin-bottom: ${theme.spacing[8]}px;
+        margin-bottom: ${theme.spacing[9]}px;
+
+        p,
+        li {
+          margin-bottom: ${theme.spacing[3]}px;
+        }
       }
     }
 
     ul {
       list-style: disc;
+    }
+
+    pre > div {
+      margin-top: -${theme.spacing[7] + theme.spacing[2]}px;
+      margin-bottom: ${theme.spacing[9]}px;
     }
   `};
 `;

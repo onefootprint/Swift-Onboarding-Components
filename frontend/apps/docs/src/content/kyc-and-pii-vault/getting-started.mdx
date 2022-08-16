@@ -18,20 +18,20 @@ position: 1
 3. Add the `footprint.js` script to your app.
 
 ```html
-<script crossorigin src="https://unpkg.com/onefootprint.js"/>
+<script crossorigin src="https://unpkg.com/onefootprint.js"></script>
 ```
 
 4. Embed the Footprint button.
 
 ```html
-<div id="footprint-button" data-fp-pk="pk_test_yflLnFW219f9bC0pdyGd" onComplete=onFootprintComplete></div>
+<div id="footprint-button" data-fp-pk="pk_test_yflLnFW219f9bC0pdyGd"></div>
 ```
 
 5. Add your Footprint completion handler
 
 ```javascript
-function onFootprintComplete(token, error) {
-// TODO: If no error, POST the token to your server
+window.onFootprintComplete = function(token) {
+// TODO: Post the token to your server
 }
 ```
 
@@ -41,7 +41,7 @@ function onFootprintComplete(token, error) {
 
 2. From step 5 above, you should create/modify your endpoint to receive the validation token from your frontend. In this endpoint, send the validation token to Footprint’s backend.
 
-```bash
+```sh
 curl -X POST https://api.onefootprint.com/id/validate \
    -u sk_test_CJvsN1kaZH3GGtYkaZH3GGtY: \
    -d '{"validation_token": "vtok_udLaWUxPBo3fss603v8kY8k9ssjboxfwI"}'
@@ -49,7 +49,7 @@ curl -X POST https://api.onefootprint.com/id/validate \
 
 3. Footprint will give you some information from this onboarding session. We’ll also give you a `footprint_user_id`, which looks like `fp_id_GSxJr68GAf5jUT3pdL9ndjf7TLkA3GCX`
 
-```JSON
+```json
 {
    "data": {
       "footprint_user_id": "fp_id_GSxJr68GAf5jUT3pdL9ndjf7TLkA3GCX",
@@ -63,14 +63,14 @@ curl -X POST https://api.onefootprint.com/id/validate \
 
 5. (Optionally) Fetch the user’s audit trail for detailed results on the identity verification:
 
-```bash
+```sh
 curl -X GET -G https://api.onefootprint.com/users/fp_id_GSxJr68GAf5jUT3pdL9ndjf7TLkA3GCX/audit_trail \
    -u sk_test_CJvsN1kaZH3GGtYkaZH3GGtY
 ```
 
 6. (Optionally) Decrypt identity fields from the user’s vault:
 
-```bash
+```sh
 # Available attributes include: 
 # first_name, last_name, dob, ssn, street_address, street_address2, city, state, zip, country, email, phone_number, phone_country, last_four_ssn
 
