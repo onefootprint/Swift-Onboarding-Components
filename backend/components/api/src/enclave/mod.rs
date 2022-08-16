@@ -26,7 +26,7 @@ pub async fn gen_keypair(state: &State) -> Result<(VaultPublicKey, EncryptedVaul
 }
 
 pub async fn decrypt_bytes(
-    state: &actix_web::web::Data<State>,
+    state: &State,
     sealed_data: &SealedVaultBytes,
     sealed_key: &EncryptedVaultPrivateKey,
     transform: DataTransform,
@@ -39,7 +39,7 @@ pub async fn decrypt_bytes(
 }
 
 pub async fn decrypt_bytes_batch(
-    state: &actix_web::web::Data<State>,
+    state: &State,
     sealed_data: Vec<&SealedVaultBytes>,
     sealed_key: &EncryptedVaultPrivateKey,
     transform: DataTransform,
@@ -58,7 +58,7 @@ pub async fn decrypt_bytes_batch(
 }
 
 pub async fn decrypt(
-    state: &actix_web::web::Data<State>,
+    state: &State,
     requests: Vec<DecryptRequest>,
     sealed_key: &EncryptedVaultPrivateKey,
 ) -> Result<Vec<PiiString>, EnclaveError> {

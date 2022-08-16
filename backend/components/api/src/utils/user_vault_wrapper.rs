@@ -1,5 +1,6 @@
 use db::models::scoped_users::ScopedUser;
 use enclave_proxy::DataTransform;
+use paperclip::actix::Apiv2Schema;
 use std::collections::HashMap;
 use std::marker::PhantomData;
 use strum::IntoEnumIterator;
@@ -13,10 +14,9 @@ use db::models::user_vaults::UserVault;
 use db::DbPool;
 use db::{errors::DbError, PgConnection};
 use newtypes::{
-    DataKind, DataPriority, FootprintUserId, NewSealedData, SealedVaultBytes, TenantId, UserVaultId,
-    ValidatedPhoneNumber,
+    DataKind, DataPriority, FootprintUserId, NewSealedData, PiiString, SealedVaultBytes, TenantId,
+    UserVaultId, ValidatedPhoneNumber,
 };
-use paperclip::actix::web;
 
 use crate::errors::user::UserError;
 use crate::errors::ApiError;
@@ -30,6 +30,11 @@ pub struct UserVaultWrapper {
     pub profile: Option<UserProfile>,
     data_kind_to_e_data: HashMap<DataKind, SealedVaultBytes>,
     phantom: PhantomData<()>,
+}
+
+#[derive(Debug, Clone, Eq, PartialEq, serde::Serialize, serde::Deserialize, Apiv2Schema)]
+pub struct DecryptRequest {
+    pub reason: String,
 }
 
 impl UserVaultWrapper {
@@ -98,23 +103,31 @@ impl UserVaultWrapper {
         DataKind::iter().filter(|k| self.has_field(k)).collect()
     }
 
-    pub async fn get_decrypted_primary_phone(
+    pub async fn decrypt(
         &self,
-        state: &web::Data<State>,
-    ) -> Result<ValidatedPhoneNumber, ApiError> {
+        state: &State,
+        data: Vec<&SealedVaultBytes>,
+    ) -> Result<Vec<PiiString>, ApiError> {
+        let decrypted_results = crate::enclave::decrypt_bytes_batch(
+            state,
+            data,
+            &self.user_vault.e_private_key,
+            DataTransform::Identity,
+        )
+        .await?;
+        Ok(decrypted_results)
+    }
+
+    pub async fn get_decrypted_primary_phone(&self, state: &State) -> Result<ValidatedPhoneNumber, ApiError> {
         let number = self
             .phone_numbers
             .iter()
             .find(|x| x.priority == DataPriority::Primary)
             .ok_or(ApiError::NoPhoneNumberForVault)?;
 
-        let decrypt_response = crate::enclave::decrypt_bytes_batch(
-            state,
-            vec![&number.e_e164, &number.e_country],
-            &self.user_vault.e_private_key,
-            DataTransform::Identity,
-        )
-        .await?;
+        let decrypt_response = self
+            .decrypt(state, vec![&number.e_e164, &number.e_country])
+            .await?;
         let e164 = decrypt_response.get(0).ok_or(ApiError::NotImplemented)?.clone();
         let country = decrypt_response.get(1).ok_or(ApiError::NotImplemented)?.clone();
 
