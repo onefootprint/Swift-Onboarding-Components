@@ -47,7 +47,7 @@ const Typography = forwardRef<HTMLElement, TypographyProps>(
     return (
       <StyledTypography
         as={as || variantMapping[variant]}
-        color={color}
+        $color={color}
         data-testid={testID}
         id={id}
         ref={ref}
@@ -62,13 +62,13 @@ const Typography = forwardRef<HTMLElement, TypographyProps>(
 );
 
 const StyledTypography = styled.p<{
-  color: Color;
+  $color: Color;
   sx: SXStyles;
   variant: FontVariant;
 }>`
-  ${({ theme, color, variant, sx }) => css`
+  ${({ theme, $color, variant, sx }) => css`
     ${createFontStyles(variant)}
-    color: ${theme.color[color]};
+    color: ${theme.color[$color]};
     ${sx};
   `}
 `;

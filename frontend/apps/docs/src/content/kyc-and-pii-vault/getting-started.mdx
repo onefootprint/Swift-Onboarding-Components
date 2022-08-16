@@ -1,0 +1,80 @@
+---
+section: KYC + PII Vault
+title: Getting started
+slug: /kyc-pii-vault-getting-started
+position: 1
+---
+
+## Getting started
+
+### Add Footprint.js to your app
+
+1. Go to the Footprint [developer dashboard](https://dashboard.onefootprint.com/developers) and create a new `Onboarding configuration`
+   * Select the “standard” list of IDV fields to collect or customize the fields.
+   * Select the “standard” list of IDV fields you require access to decrypt.
+
+2. Grab the onboarding Publishable Key, for example `pk_test_yflLnFW219f9bC0pdyGd`.
+
+3. Add the `footprint.js` script to your app.
+
+```html
+<script crossorigin src="https://unpkg.com/onefootprint.js"/>
+```
+
+4. Embed the Footprint button.
+
+```html
+<div id="footprint-button" data-fp-pk="pk_test_yflLnFW219f9bC0pdyGd" onComplete=onFootprintComplete></div>
+```
+
+5. Add your Footprint completion handler
+
+```javascript
+function onFootprintComplete(token, error) {
+// TODO: If no error, POST the token to your server
+}
+```
+
+## Verify the Footprint token server-side
+
+1. Go to the Footprint developer dashboard and generate a new Secret API Key. This will look something like `sk_test_CJvsN1kaZH3GGtYkaZH3GGtY`. Add this to the credential manager of your server-side app.
+
+2. From step 5 above, you should create/modify your endpoint to receive the validation token from your frontend. In this endpoint, send the validation token to Footprint’s backend.
+
+```bash
+curl -X POST https://api.onefootprint.com/id/validate \
+   -u sk_test_CJvsN1kaZH3GGtYkaZH3GGtY: \
+   -d '{"validation_token": "vtok_udLaWUxPBo3fss603v8kY8k9ssjboxfwI"}'
+```
+
+3. Footprint will give you some information from this onboarding session. We’ll also give you a `footprint_user_id`, which looks like `fp_id_GSxJr68GAf5jUT3pdL9ndjf7TLkA3GCX`
+
+```JSON
+{
+   "data": {
+      "footprint_user_id": "fp_id_GSxJr68GAf5jUT3pdL9ndjf7TLkA3GCX",
+      "status": "verified",
+      "timestamp": "2022-07-30T05:39:33.723Z"
+   }
+}
+```
+
+4. Save the `footprint_user_id` in your database tied to the individual user. It is the identifier you will send to request any user-specific information.
+
+5. (Optionally) Fetch the user’s audit trail for detailed results on the identity verification:
+
+```bash
+curl -X GET -G https://api.onefootprint.com/users/fp_id_GSxJr68GAf5jUT3pdL9ndjf7TLkA3GCX/audit_trail \
+   -u sk_test_CJvsN1kaZH3GGtYkaZH3GGtY
+```
+
+6. (Optionally) Decrypt identity fields from the user’s vault:
+
+```bash
+# Available attributes include: 
+# first_name, last_name, dob, ssn, street_address, street_address2, city, state, zip, country, email, phone_number, phone_country, last_four_ssn
+
+curl -X POST https://api.onefootprint.com/users/decrypt \
+   -u sk_test_CJvsN1kaZH3GGtYkaZH3GGtY: \
+   -d '{"attributes": ["first_name", "last_name", "last_four_ssn"}'
+```

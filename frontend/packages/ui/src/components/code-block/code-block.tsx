@@ -121,8 +121,9 @@ const CopyButton = styled.button`
 
 const Content = styled.code`
   ${({ theme }) => css`
-    width: 100%;
     background-color: ${theme.backgroundColor.primary};
+    padding: ${theme.spacing[5]}px;
+    width: 100%;
     ${createFontStyles('snippet-2')};
 
     pre {

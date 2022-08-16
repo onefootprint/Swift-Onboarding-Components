@@ -1,31 +1,18 @@
 import { createPopup } from '@typeform/embed';
-import { useHasScroll, useTranslation } from 'hooks';
-import IcoDatabase16 from 'icons/ico/ico-database-16';
-import IcoShield16 from 'icons/ico/ico-shield-16';
+import { useTranslation } from 'hooks';
 import LogoFpCompact from 'icons/ico/logo-fp-compact';
-import Link from 'next/link';
-import { useRouter } from 'next/router';
 import React from 'react';
 import styled, { css } from 'styled-components';
-import { Button, Container, Tab, Typography } from 'ui';
+import { Button, Container, Typography } from 'ui';
 
 const { toggle: toggleTypeform } = createPopup('COZNk70C');
 
 const PageHeader = () => {
   const { t } = useTranslation('components.header');
-  const router = useRouter();
-  // TODO: add better mobile support
-  // https://linear.app/footprint/issue/FP-1002/add-better-support-for-mobile-docs-experience
-  const hasScroll = useHasScroll();
-
-  const routes = [
-    { href: '/kyc-with-pii', Icon: IcoShield16, text: t('nav.kyc-with-pii') },
-    { href: '/pii', Icon: IcoDatabase16, text: t('nav.pii') },
-  ];
 
   return (
-    <Header isFloating={hasScroll}>
-      <Container>
+    <Header>
+      <Container fluid>
         <Inner>
           <Title>
             <LogoFpCompact />
@@ -42,34 +29,20 @@ const PageHeader = () => {
           </Button>
         </Inner>
       </Container>
-      <Nav>
-        <Container>
-          <Tab.List>
-            {routes.map(({ href, Icon, text }) => (
-              <Link href={href} key={text}>
-                <Tab.Item
-                  href={href}
-                  iconComponent={Icon}
-                  selected={router.pathname.startsWith(href)}
-                >
-                  {text}
-                </Tab.Item>
-              </Link>
-            ))}
-          </Tab.List>
-        </Container>
-      </Nav>
     </Header>
   );
 };
 
-const Nav = styled.nav`
+const Header = styled.header`
   ${({ theme }) => css`
-    border-top: 1px solid ${theme.borderColor.tertiary};
-    border-bottom: 1px solid ${theme.borderColor.tertiary};
-    background-color: ${theme.backgroundColor.secondary};
-    padding: ${theme.spacing[3]}px 0;
-  `};
+    background: ${theme.backgroundColor.primary};
+    border: ${theme.borderWidth[1]}px solid ${theme.borderColor.tertiary};
+    left: 0;
+    position: fixed;
+    right: 0;
+    top: 0;
+    z-index: ${theme.zIndex.overlay};
+  `}
 `;
 
 const Title = styled.div`
@@ -85,23 +58,6 @@ const Inner = styled.div`
     justify-content: space-between;
     padding: ${theme.spacing[4]}px 0;
   `};
-`;
-
-const Header = styled.header<{ isFloating: boolean }>`
-  left: 0;
-  position: fixed;
-  right: 0;
-  top: 0;
-  transition: background 200ms ease 0s;
-  ${({ theme }) => css`
-    z-index: ${theme.zIndex.overlay};
-  `}
-  ${({ isFloating }) =>
-    isFloating &&
-    css`
-      backdrop-filter: blur(15px) saturate(125%);
-      background-color: rgba(255, 255, 255, 0.75);
-    `}
 `;
 
 export default PageHeader;

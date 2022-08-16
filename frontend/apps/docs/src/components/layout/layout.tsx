@@ -1,32 +1,58 @@
 import React from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { Container } from 'ui';
 
-import PageFooter from './components/page-footer';
+import AsideNavigation from './components/aside-navigation';
 import PageHeader from './components/page-header';
+import PageSections from './components/page-sections';
 
 export type LayoutProps = {
   children: React.ReactNode;
+  navigation: {
+    section: string;
+    secondary: { title: string; slug: string }[];
+  };
 };
 
-const Layout = ({ children }: LayoutProps) => (
+const Layout = ({ children, navigation }: LayoutProps) => (
   <>
     <PageHeader />
-    <LayoutContainer>
-      <Body>
-        <Container>{children}</Container>
-      </Body>
-    </LayoutContainer>
-    <PageFooter />
+    <Container fluid>
+      <Content>
+        <AsideNavigation
+          items={navigation.secondary}
+          section={navigation.section}
+        />
+        <Main>
+          <Article>{children} </Article>
+          <PageSections />
+        </Main>
+      </Content>
+    </Container>
   </>
 );
 
-const LayoutContainer = styled.div`
-  flex: 1 0 auto;
+const Content = styled.div`
+  display: flex;
+  margin-top: 54px;
+  width: 100%;
 `;
 
-const Body = styled.section`
-  margin-top: 98px;
+const Main = styled.main`
+  ${({ theme }) => css`
+    width: 100%;
+    display: grid;
+    grid-template-columns: auto 250px;
+    gap: ${theme.spacing[9]}px;
+    padding: ${theme.spacing[9]}px ${theme.spacing[7]}px 0px
+      ${270 + theme.spacing[9]}px;
+  `};
+`;
+
+const Article = styled.article`
+  max-width: 720px;
+  width: 100%;
+  overflow: hidden;
 `;
 
 export default Layout;

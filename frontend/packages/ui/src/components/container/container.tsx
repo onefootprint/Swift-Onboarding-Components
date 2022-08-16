@@ -1,42 +1,21 @@
-/* eslint-disable react/jsx-props-no-spreading */
 import React, { forwardRef } from 'react';
-import styled, { css, DefaultTheme } from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import useSX, { SXStyleProps, SXStyles } from '../../hooks/use-sx';
 import media from '../../utils/media';
 
-type ContainerSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
-
-const ALL_SIZES: ContainerSize[] = ['xs', 'sm', 'md', 'lg', 'xl'];
-
-const size: Record<ContainerSize, number> = {
-  xs: 0,
-  sm: 1,
-  md: 2,
-  lg: 3,
-  xl: 4,
-};
-
 export type ContainerProps = {
   as?: 'div' | 'section' | 'main' | 'article' | 'nav' | 'header' | 'footer';
   children: React.ReactNode;
+  fluid?: boolean;
   id?: string;
   sx?: SXStyleProps;
   testID?: string;
-  minSize?: ContainerSize;
 };
 
 const Container = forwardRef<HTMLElement, ContainerProps>(
   (
-    {
-      id,
-      as = 'div',
-      sx,
-      children,
-      testID,
-      minSize = 'xs',
-      ...remainingProps
-    }: ContainerProps,
+    { id, as = 'div', sx, children, testID, fluid = false }: ContainerProps,
     ref,
   ) => {
     const sxStyles = useSX(sx);
@@ -44,11 +23,10 @@ const Container = forwardRef<HTMLElement, ContainerProps>(
       <StyledContainer
         as={as}
         data-testid={testID}
+        data-fluid={fluid}
         id={id}
         ref={ref}
         sx={sxStyles}
-        minSize={minSize}
-        {...remainingProps}
       >
         {children}
       </StyledContainer>
@@ -56,53 +34,44 @@ const Container = forwardRef<HTMLElement, ContainerProps>(
   },
 );
 
-const styleForBounds = (
-  theme: DefaultTheme,
-  minSize: ContainerSize,
-  lowerBound: ContainerSize,
-  upperBound: ContainerSize | null,
-) => {
-  // Generate the styles for this viewport range. A null value is treated as an unbounded range
-  let styleFn;
-  if (lowerBound === minSize) {
-    styleFn = media.lessThan(upperBound!);
-  } else if (!upperBound) {
-    styleFn = media.greaterThan(lowerBound!);
-  } else {
-    styleFn = media.between(lowerBound, upperBound);
-  }
-  // The width for xs should be 100%, but we have no way of specifying non-px widths in the theme
-  const width =
-    lowerBound === 'xs'
-      ? '100%'
-      : `${theme.grid.container.maxWidth[lowerBound]}px`;
-  const paddingX = theme.grid.container.margin[lowerBound];
-  return styleFn`
-    width: ${width};
-    padding-left: ${paddingX}px;
-    padding-right: ${paddingX}px;
-  `;
-};
-
-function zipAdjacent<T>(arr: T[]) {
-  // Create an array of size bounds for which to generate a media query.
-  // A null value represents an open-ended bound
-  const arrOffset = [...arr.slice(1), null];
-  return arr.map((x, index) => [x, arrOffset[index]]);
-}
-
-const StyledContainer = styled.div<{
-  sx: SXStyles;
-  minSize: ContainerSize;
-}>`
-  ${({ theme, sx, minSize }) => css`
+const StyledContainer = styled.div<{ sx: SXStyles }>`
+  ${({ theme, sx }) => css`
     margin-left: auto;
     margin-right: auto;
     ${sx};
-
-    ${zipAdjacent(ALL_SIZES.filter(s => size[s] >= size[minSize])).map(bounds =>
-      styleForBounds(theme, minSize, bounds[0]!, bounds[1]).join(''),
-    )}
+    ${media.between('xs', 'sm')`
+      width: 100%;
+      padding-left: ${theme.grid.container.margin.xs}px;
+      padding-right: ${theme.grid.container.margin.xs}px;
+    `}
+    ${media.between('sm', 'md')`
+      width: ${theme.grid.container.maxWidth.sm}px;
+      padding-left: ${theme.grid.container.margin.sm}px;
+      padding-right: ${theme.grid.container.margin.sm}px;
+    `}
+    ${media.between('md', 'lg')`
+      width: ${theme.grid.container.maxWidth.md}px;
+      padding-left: ${theme.grid.container.margin.md}px;
+      padding-right: ${theme.grid.container.margin.md}px;
+    `}
+    ${media.between('lg', 'xl')`
+      width: ${theme.grid.container.maxWidth.lg}px;
+      padding-left: ${theme.grid.container.margin.lg}px;
+      padding-right: ${theme.grid.container.margin.lg}px;
+    `}
+    
+    ${media.greaterThan('xl')`
+      &[data-fluid='true'] {
+        width: 100%;
+        padding-left: ${theme.grid.container.margin.xs}px;
+        padding-right: ${theme.grid.container.margin.xs}px;
+      }
+      &[data-fluid='false'] {
+        width: ${theme.grid.container.maxWidth.xl}px;
+        padding-left: ${theme.grid.container.margin.xl}px;
+        padding-right: ${theme.grid.container.margin.xl}px;
+      }
+    `}
   `}
 `;
 

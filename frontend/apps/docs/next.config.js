@@ -18,4 +18,13 @@ module.exports = withPlugins([withTM, withBundleAnalyzer], {
   compiler: {
     styledComponents: true,
   },
+  async redirects() {
+    return [
+      {
+        source: '/',
+        destination: '/kyc-pii-vault-getting-started',
+        permanent: true,
+      },
+    ];
+  },
 });
