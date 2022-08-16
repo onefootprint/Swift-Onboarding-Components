@@ -21,15 +21,13 @@ pub async fn post(
     tenant_auth: SecretTenantAuthContext,
 ) -> actix_web::Result<Json<ApiResponseData<EmptyResponse>>, ApiError> {
     let footprint_user_id = path.into_inner();
+    let tenant_id = tenant_auth.tenant_id();
+    let is_live = tenant_auth.is_live(&state.db_pool).await?;
 
-    let (user_vault, scoped_user) = UserVault::get_for_tenant(
-        &state.db_pool,
-        tenant_auth.tenant_id(),
-        footprint_user_id,
-        tenant_auth.is_live(&state.db_pool).await?,
-    )
-    .await?
-    .ok_or(AuthError::InvalidTenantKeyOrUserId)?;
+    let (user_vault, scoped_user) = state
+        .db_pool
+        .db_query(move |conn| UserVault::get_for_tenant(conn, &tenant_id, &footprint_user_id, is_live))
+        .await??;
 
     // TODO: support adding tenant-scoped unstructured data to a portable vault
     if user_vault.is_portable {

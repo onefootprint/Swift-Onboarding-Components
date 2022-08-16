@@ -78,15 +78,16 @@ async fn post_inner(
     insights: InsightHeaders,
 ) -> actix_web::Result<Json<ApiResponseData<UserDecryptResponse>>, ApiError> {
     let tenant = auth.tenant(&state.db_pool).await?;
+    let is_live = auth.is_live(&state.db_pool).await?;
+    let UserDecryptRequest { footprint_user_id, attributes, reason } = request.into_inner();
     // look up tenant & user vault
-    let (vault, scoped_user) = UserVault::get_for_tenant(
-        &state.db_pool,
-        tenant.id.clone(),
-        request.footprint_user_id.clone(),
-        auth.is_live(&state.db_pool).await?,
-    )
-    .await?
-    .ok_or(AuthError::InvalidTenantKeyOrUserId)?;
+    let (vault, scoped_user) = state.db_pool.db_query(move |conn| UserVault::get_for_tenant(
+        conn,
+        &tenant.id,
+        &footprint_user_id,
+        is_live,
+    ))
+    .await??;
 
     // if the vault is PORTABLE: check permissions on the scoped user onboarding configuration
     if vault.is_portable {
@@ -97,7 +98,7 @@ async fn post_inner(
             .flat_map(|x| x.can_access_data_kinds)
             .flat_map(|x| x.permissioning_kinds())
             .collect();
-        if !can_access_kinds.is_superset(&request.attributes) {
+        if !can_access_kinds.is_superset(&attributes) {
             return Err(AuthError::UnauthorizedOperation.into());
         }
     }
@@ -105,13 +106,13 @@ async fn post_inner(
     let DecryptFieldsResult {
         decrypted_data_kinds,
         result_map,
-    } = decrypt(&state, vault, request.attributes.clone().into_iter().collect()).await?;
+    } = decrypt(&state, vault, attributes.into_iter().collect()).await?;
 
     // Create an AccessEvent log showing that the tenant accessed these fields
     NewAccessEvent {
         scoped_user_id: scoped_user.id.clone(),
         data_kinds: decrypted_data_kinds.clone(),
-        reason: request.reason.clone(),
+        reason: reason,
         principal: Some(auth.format_principal()),
         insight: CreateInsightEvent::from(insights),
     }

@@ -38,60 +38,54 @@ impl UserVault {
     }
 
     #[allow(unused)]
-    pub async fn get_portable_for_tenant(
-        pool: &crate::DbPool,
-        tenant_id: TenantId,
-        footprint_user_id: FootprintUserId,
+    pub fn get_portable_for_tenant(
+        conn: &mut PgConnection,
+        tenant_id: &TenantId,
+        footprint_user_id: &FootprintUserId,
         is_live: bool,
-    ) -> Result<Option<(UserVault, ScopedUser)>, DbError> {
-        Self::get_for_tenant_inner(pool, tenant_id, footprint_user_id, is_live, Some(true)).await
+    ) -> Result<(UserVault, ScopedUser), DbError> {
+        Self::get_for_tenant_inner(conn, tenant_id, footprint_user_id, is_live, Some(true))
     }
 
     #[allow(unused)]
-    pub async fn get_non_portable_for_tenant(
-        pool: &crate::DbPool,
-        tenant_id: TenantId,
-        footprint_user_id: FootprintUserId,
+    pub fn get_non_portable_for_tenant(
+        conn: &mut PgConnection,
+        tenant_id: &TenantId,
+        footprint_user_id: &FootprintUserId,
         is_live: bool,
-    ) -> Result<Option<(UserVault, ScopedUser)>, DbError> {
-        Self::get_for_tenant_inner(pool, tenant_id, footprint_user_id, is_live, Some(false)).await
+    ) -> Result<(UserVault, ScopedUser), DbError> {
+        Self::get_for_tenant_inner(conn, tenant_id, footprint_user_id, is_live, Some(false))
     }
 
-    pub async fn get_for_tenant(
-        pool: &crate::DbPool,
-        tenant_id: TenantId,
-        footprint_user_id: FootprintUserId,
+    pub fn get_for_tenant(
+        conn: &mut PgConnection,
+        tenant_id: &TenantId,
+        footprint_user_id: &FootprintUserId,
         is_live: bool,
-    ) -> Result<Option<(UserVault, ScopedUser)>, DbError> {
-        Self::get_for_tenant_inner(pool, tenant_id, footprint_user_id, is_live, None).await
+    ) -> Result<(UserVault, ScopedUser), DbError> {
+        Self::get_for_tenant_inner(conn, tenant_id, footprint_user_id, is_live, None)
     }
 
-    async fn get_for_tenant_inner(
-        pool: &crate::DbPool,
-        tenant_id: TenantId,
-        footprint_user_id: FootprintUserId,
+    fn get_for_tenant_inner(
+        conn: &mut PgConnection,
+        tenant_id: &TenantId,
+        footprint_user_id: &FootprintUserId,
         is_live: bool,
         is_portable: Option<bool>,
-    ) -> Result<Option<(UserVault, ScopedUser)>, DbError> {
+    ) -> Result<(UserVault, ScopedUser), DbError> {
         use crate::schema::scoped_users;
-        let result = pool
-            .db_query(move |conn| -> Result<Option<(UserVault, ScopedUser)>, DbError> {
-                let mut query = user_vaults::table
-                    .inner_join(scoped_users::table)
-                    .filter(scoped_users::tenant_id.eq(tenant_id))
-                    .filter(scoped_users::fp_user_id.eq(footprint_user_id))
-                    .filter(scoped_users::is_live.eq(is_live))
-                    .into_boxed();
+        let mut query = user_vaults::table
+            .inner_join(scoped_users::table)
+            .filter(scoped_users::tenant_id.eq(tenant_id))
+            .filter(scoped_users::fp_user_id.eq(footprint_user_id))
+            .filter(scoped_users::is_live.eq(is_live))
+            .into_boxed();
 
-                if let Some(portable_filter) = is_portable {
-                    query = query.filter(user_vaults::is_portable.eq(portable_filter));
-                }
+        if let Some(portable_filter) = is_portable {
+            query = query.filter(user_vaults::is_portable.eq(portable_filter));
+        }
 
-                let result = query.first(conn).optional()?;
-                Ok(result)
-            })
-            .await??;
-
+        let result = query.first(conn)?;
         Ok(result)
     }
 }
