@@ -1,11 +1,11 @@
 import { Meta, Story } from '@storybook/react';
 import React from 'react';
 
-import InlineBanner, { InlineBannerProps } from './inline-banner';
+import InlineAlert, { InlineAlertProps } from './inline-alert';
 
 export default {
-  component: InlineBanner,
-  title: 'Components/InlineBanner',
+  component: InlineAlert,
+  title: 'Components/InlineAlert',
   argTypes: {
     children: {
       control: 'text',
@@ -14,19 +14,17 @@ export default {
     },
     variant: {
       control: 'select',
-      description: 'Intent of the Inline Banner',
+      description: 'Intent of the Inline Alert',
       options: ['info', 'error', 'warning'],
       required: true,
     },
   },
 } as Meta;
 
-const Template: Story<InlineBannerProps> = ({
+const Template: Story<InlineAlertProps> = ({
   children,
   variant,
-}: InlineBannerProps) => (
-  <InlineBanner variant={variant}>{children}</InlineBanner>
-);
+}: InlineAlertProps) => <InlineAlert variant={variant}>{children}</InlineAlert>;
 
 export const Base = Template.bind({});
 Base.args = {

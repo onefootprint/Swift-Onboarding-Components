@@ -2,25 +2,25 @@ import React from 'react';
 import styled, { css } from 'styled-components';
 
 import { createFontStyles } from '../../utils/mixins';
-import type { InlineBannerVariant } from './inline-banner.types';
-import { createVariantStyles, getIconForVariant } from './inline-banner.utils';
+import type { InlineAlertVariant } from './inline-alert.types';
+import { createVariantStyles, getIconForVariant } from './inline-alert.utils';
 
-export type InlineBannerProps = {
+export type InlineAlertProps = {
   children: React.ReactNode;
-  variant: InlineBannerVariant;
+  variant: InlineAlertVariant;
 };
 
-const InlineBanner = ({ children, variant }: InlineBannerProps) => {
+const InlineAlert = ({ children, variant }: InlineAlertProps) => {
   const IconComponent = getIconForVariant(variant);
   return (
-    <InlineBannerContainer role="alert" variant={variant}>
+    <InlineAlertContainer role="alert" variant={variant}>
       <IconComponent color={variant} />
       {children}
-    </InlineBannerContainer>
+    </InlineAlertContainer>
   );
 };
 
-const InlineBannerContainer = styled.div<{ variant: InlineBannerVariant }>`
+const InlineAlertContainer = styled.div<{ variant: InlineAlertVariant }>`
   ${({ theme, variant }) => css`
     ${createFontStyles('body-2')};
     ${createVariantStyles(variant)};
@@ -37,4 +37,4 @@ const InlineBannerContainer = styled.div<{ variant: InlineBannerVariant }>`
   `};
 `;
 
-export default InlineBanner;
+export default InlineAlert;

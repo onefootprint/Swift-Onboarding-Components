@@ -4,10 +4,10 @@ import IcoInfo24 from 'icons/ico/ico-info-24';
 import { css } from 'styled-components';
 import type { BackgroundColor, BorderColor } from 'themes';
 
-import type { InlineBannerVariant } from './inline-banner.types';
+import type { InlineAlertVariant } from './inline-alert.types';
 
-export const inlineBannerVariantStyles: Record<
-  InlineBannerVariant,
+export const inlineAlertVariantStyles: Record<
+  InlineAlertVariant,
   {
     backgroundColor: BackgroundColor;
     borderColor: BorderColor;
@@ -27,7 +27,7 @@ export const inlineBannerVariantStyles: Record<
   },
 };
 
-export const getIconForVariant = (variant: InlineBannerVariant) => {
+export const getIconForVariant = (variant: InlineAlertVariant) => {
   if (variant === 'error') {
     return IcoClose24;
   }
@@ -39,8 +39,8 @@ export const getIconForVariant = (variant: InlineBannerVariant) => {
   return IcoInfo24;
 };
 
-export const createVariantStyles = (variant: InlineBannerVariant) => {
-  const { backgroundColor, borderColor } = inlineBannerVariantStyles[variant];
+export const createVariantStyles = (variant: InlineAlertVariant) => {
+  const { backgroundColor, borderColor } = inlineAlertVariantStyles[variant];
 
   return css`
     ${({ theme }) => css`

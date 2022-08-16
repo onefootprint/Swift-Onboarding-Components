@@ -3,27 +3,27 @@ import { customRender, screen } from 'test-utils';
 import type { BackgroundColor, BorderColor } from 'themes';
 import themes from 'themes';
 
-import InlineBanner, { InlineBannerProps } from './inline-banner';
+import InlineAlert, { InlineAlertProps } from './inline-alert';
 
-describe('<InlineBanner />', () => {
-  const renderInlineBanner = ({
-    children = 'banner content',
+describe('<InlineAlert />', () => {
+  const renderInlineAlert = ({
+    children = 'alert content',
     variant = 'warning',
-  }: Partial<InlineBannerProps>) =>
-    customRender(<InlineBanner variant={variant}>{children}</InlineBanner>);
+  }: Partial<InlineAlertProps>) =>
+    customRender(<InlineAlert variant={variant}>{children}</InlineAlert>);
 
   it('should assign a role alert', () => {
-    renderInlineBanner({ children: 'banner content' });
+    renderInlineAlert({ children: 'alert content' });
     expect(screen.getByRole('alert')).toBeInTheDocument();
   });
 
   it('should render the text', () => {
-    renderInlineBanner({ children: 'banner content' });
-    expect(screen.getByText('banner content')).toBeInTheDocument();
+    renderInlineAlert({ children: 'alert content' });
+    expect(screen.getByText('alert content')).toBeInTheDocument();
   });
 
   const variants: {
-    variant: InlineBannerProps['variant'];
+    variant: InlineAlertProps['variant'];
     styles: {
       backgroundColor: BackgroundColor;
       borderColor: BorderColor;
@@ -46,8 +46,8 @@ describe('<InlineBanner />', () => {
     'when is the variant $variant',
     ({ variant, styles }) => {
       it('should render with the correct styles', () => {
-        renderInlineBanner({ children: 'banner content', variant });
-        expect(screen.getByText('banner content')).toHaveStyle({
+        renderInlineAlert({ children: 'alert content', variant });
+        expect(screen.getByText('alert content')).toHaveStyle({
           backgroundColor: themes.light.backgroundColor[styles.backgroundColor],
           borderColor: themes.light.borderColor[styles.borderColor],
         });
