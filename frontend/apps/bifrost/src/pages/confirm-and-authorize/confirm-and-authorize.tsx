@@ -23,8 +23,15 @@ enum UserDataAttributeCategory {
   ssn = 'SSN (Full)',
   lastFourSsn = 'SSN (Last 4)',
   dob = 'Date of Birth',
-  address = 'Address',
+  address = 'Address (Full)',
+  zipCodeAndCountry = 'Country & Zip Code',
 }
+
+const tenantCanAddressFullAddress = (attributes: UserDataAttribute[]) =>
+  attributes.indexOf(UserDataAttribute.streetAddress) > -1 ||
+  attributes.indexOf(UserDataAttribute.streetAddress2) > -1 ||
+  attributes.indexOf(UserDataAttribute.city) > -1 ||
+  attributes.indexOf(UserDataAttribute.state) > -1;
 
 const CategoryByUserDataAttribute: Record<
   UserDataAttribute | string,
@@ -56,6 +63,27 @@ const IconsByUserDataAttributes: Record<
   [UserDataAttributeCategory.lastFourSsn]: <IcoFileText24 />,
   [UserDataAttributeCategory.dob]: <IcoCake24 />,
   [UserDataAttributeCategory.address]: <IcoBuilding24 />,
+  [UserDataAttributeCategory.zipCodeAndCountry]: <IcoBuilding24 />,
+};
+
+const getCategoriesFromUserDataAttributes = (
+  attributes: UserDataAttribute[],
+) => {
+  const requiredData = attributes
+    .map((data: UserDataAttribute) => CategoryByUserDataAttribute[data])
+    .filter(attr => !!attr);
+  const categories = new Set<UserDataAttributeCategory>(requiredData);
+
+  // If the requested address data only includes zipcode & country, change the category
+  if (
+    categories.has(UserDataAttributeCategory.address) &&
+    !tenantCanAddressFullAddress(attributes)
+  ) {
+    categories.delete(UserDataAttributeCategory.address);
+    categories.add(UserDataAttributeCategory.zipCodeAndCountry);
+  }
+
+  return Array.from(categories);
 };
 
 const ConfirmAndAuthorize = () => {
@@ -69,12 +97,9 @@ const ConfirmAndAuthorize = () => {
     confirmOnboardingData({ onComplete: handleConfirmOnboardingCompleted });
   };
 
-  const requiredData = state.context.tenant.canAccessDataKinds
-    .map((data: UserDataAttribute) => CategoryByUserDataAttribute[data])
-    .filter(attr => !!attr);
-  const requiredCategories = Array.from(
-    new Set<UserDataAttributeCategory>(requiredData),
-  );
+  const { canAccessDataKinds } = state.context.tenant;
+  const requiredCategories =
+    getCategoriesFromUserDataAttributes(canAccessDataKinds);
 
   return (
     <>

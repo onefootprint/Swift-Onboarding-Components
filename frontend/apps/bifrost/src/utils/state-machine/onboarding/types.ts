@@ -66,7 +66,9 @@ export type MachineEvents =
     }
   | {
       type: Events.residentialAddressSubmitted;
-      payload: { residentialAddress: ResidentialAddress };
+      payload: {
+        residentialAddress: ResidentialAddress;
+      };
     }
   | { type: Events.ssnSubmitted; payload: { [UserDataAttribute.ssn]: string } }
   | { type: Events.navigatedToPrevPage };

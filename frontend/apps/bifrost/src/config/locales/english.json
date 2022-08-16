@@ -175,39 +175,58 @@
         }
       },
       "residential-address": {
-        "title": "What's your residential address?",
-        "subtitle": "We're legally required to collect this information.",
-        "form": {
-          "country": {
-            "label": "Country",
-            "placeholder": "Select",
-            "error": "Country cannot be empty"
-          },
-          "address-line-1": {
-            "label": "Address line 1",
-            "placeholder": "Street and house number",
-            "error": "Address cannot be empty"
-          },
-          "address-line-2": {
-            "label": "Address line 2 (optional)",
-            "placeholder": "Apartment, suite, etc."
-          },
-          "city": {
-            "label": "City",
-            "placeholder": "Brooklyn",
-            "error": "City cannot be empty"
-          },
-          "zipCode": {
-            "label": "Zip code",
-            "placeholder": "11206",
-            "error": "Zip code cannot be empty"
-          },
-          "state": {
-            "label": "State",
-            "placeholder": "Select",
-            "error": "State cannot be empty"
-          },
-          "cta": "Continue"
+        "full": {
+          "title": "What's your residential address?",
+          "subtitle": "We're legally required to collect this information.",
+          "form": {
+            "country": {
+              "label": "Country",
+              "placeholder": "Select",
+              "error": "Country cannot be empty"
+            },
+            "address-line-1": {
+              "label": "Address line 1",
+              "placeholder": "Street and house number",
+              "error": "Address cannot be empty"
+            },
+            "address-line-2": {
+              "label": "Address line 2 (optional)",
+              "placeholder": "Apartment, suite, etc."
+            },
+            "city": {
+              "label": "City",
+              "placeholder": "Brooklyn",
+              "error": "City cannot be empty"
+            },
+            "zipCode": {
+              "label": "Zip code",
+              "placeholder": "11206",
+              "error": "Zip code cannot be empty"
+            },
+            "state": {
+              "label": "State",
+              "placeholder": "Select",
+              "error": "State cannot be empty"
+            },
+            "cta": "Continue"
+          }
+        },
+        "zip-code-and-country": {
+          "title": "What's your country zip code?",
+          "subtitle": "We're legally required to collect this information.",
+          "form": {
+            "country": {
+              "label": "Country",
+              "placeholder": "Select",
+              "error": "Country cannot be empty"
+            },
+            "zipCode": {
+              "label": "Zip code",
+              "placeholder": "11206",
+              "error": "Zip code cannot be empty"
+            },
+            "cta": "Continue"
+          }
         },
         "sync-data-error": {
           "title": "An error occurred",

@@ -58,7 +58,15 @@ export type BasicInformation = Required<
   >
 >;
 
-export type ResidentialAddress = Required<
+export type ResidentialAddress =
+  | ResidentialZipCodeAndCountry
+  | ResidentialAddressFull;
+
+export type ResidentialZipCodeAndCountry = Required<
+  Pick<UserData, UserDataAttribute.country | UserDataAttribute.zip>
+>;
+
+export type ResidentialAddressFull = Required<
   Pick<
     UserData,
     | UserDataAttribute.country

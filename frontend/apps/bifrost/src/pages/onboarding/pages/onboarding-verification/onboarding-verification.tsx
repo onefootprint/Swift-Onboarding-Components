@@ -1,4 +1,4 @@
-import useTranslation from 'hooks/src/use-translation/use-translation';
+import { useTranslation } from 'hooks';
 import IcoForbid40 from 'icons/ico/ico-forbid-40';
 import React, { useEffect } from 'react';
 import useOnboarding from 'src/hooks/use-onboarding';
