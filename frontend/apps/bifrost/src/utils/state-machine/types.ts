@@ -5,7 +5,7 @@ export enum UserDataAttribute {
   lastName = 'lastName',
   dob = 'dob',
   email = 'email',
-  phone = 'phone',
+  phone = 'phone_number',
   ssn = 'ssn',
   lastFourSsn = 'last_four_ssn',
   streetAddress = 'streetAddress',
@@ -30,7 +30,7 @@ export const UserDataAttributeLabels: Record<string, UserDataAttribute> = {
   state: UserDataAttribute.state,
   country: UserDataAttribute.country,
   zip: UserDataAttribute.zip,
-  phone: UserDataAttribute.phone,
+  phone_number: UserDataAttribute.phone,
 };
 
 export type UserData = Partial<{

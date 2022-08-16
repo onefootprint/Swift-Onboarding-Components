@@ -5,7 +5,7 @@ export enum UserDataAttribute {
   lastName = 'lastName',
   dob = 'dob',
   email = 'email',
-  phone = 'phone',
+  phone = 'phone_number',
   ssn = 'ssn',
   streetAddress = 'streetAddress',
   streetAddress2 = 'streetAddress2',

@@ -69,9 +69,9 @@ const ConfirmAndAuthorize = () => {
     confirmOnboardingData({ onComplete: handleConfirmOnboardingCompleted });
   };
 
-  const requiredData = state.context.tenant.canAccessDataKinds.map(
-    (data: UserDataAttribute) => CategoryByUserDataAttribute[data],
-  );
+  const requiredData = state.context.tenant.canAccessDataKinds
+    .map((data: UserDataAttribute) => CategoryByUserDataAttribute[data])
+    .filter(attr => !!attr);
   const requiredCategories = Array.from(
     new Set<UserDataAttributeCategory>(requiredData),
   );
