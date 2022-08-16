@@ -49,7 +49,13 @@ export type UserData = Partial<{
   [UserDataAttribute.phone]: string;
 }>;
 
-export type BasicInformation = Required<
+export type BasicInformation = NameInformation | NameAndDobInformation;
+
+export type NameInformation = Required<
+  Pick<UserData, UserDataAttribute.firstName | UserDataAttribute.lastName>
+>;
+
+export type NameAndDobInformation = Required<
   Pick<
     UserData,
     | UserDataAttribute.firstName
