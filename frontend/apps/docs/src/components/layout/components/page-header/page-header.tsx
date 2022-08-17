@@ -1,9 +1,9 @@
 import { createPopup } from '@typeform/embed';
 import { useTranslation } from 'hooks';
-import LogoFpCompact from 'icons/ico/logo-fp-compact';
+import Logo from 'icons/ico/logo-fpdocs-default';
 import React from 'react';
 import styled, { css } from 'styled-components';
-import { Button, Container, Typography } from 'ui';
+import { Button, Container } from 'ui';
 
 const { toggle: toggleTypeform } = createPopup('COZNk70C');
 
@@ -14,16 +14,7 @@ const PageHeader = () => {
     <Header>
       <Container fluid>
         <Inner>
-          <Title>
-            <LogoFpCompact />
-            <Typography
-              variant="label-2"
-              color="tertiary"
-              sx={{ marginLeft: 3 }}
-            >
-              {t('title')}
-            </Typography>
-          </Title>
+          <Logo />
           <Button onClick={toggleTypeform} size="small">
             {t('request-early-access')}
           </Button>
@@ -43,12 +34,6 @@ const Header = styled.header`
     top: 0;
     z-index: ${theme.zIndex.overlay};
   `}
-`;
-
-const Title = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
 `;
 
 const Inner = styled.div`
