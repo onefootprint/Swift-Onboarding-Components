@@ -1,6 +1,6 @@
 import React from 'react';
 import { customRender, screen } from 'test-utils';
-import type { BackgroundColor } from 'themes';
+import type { BackgroundColor, Color } from 'themes';
 import themes from 'themes';
 
 import InlineAlert, { InlineAlertProps } from './inline-alert';
@@ -26,19 +26,20 @@ describe('<InlineAlert />', () => {
     variant: InlineAlertProps['variant'];
     styles: {
       backgroundColor: BackgroundColor;
+      color: Color;
     };
   }[] = [
     {
       variant: 'error',
-      styles: { backgroundColor: 'error' },
+      styles: { backgroundColor: 'error', color: 'error' },
     },
     {
       variant: 'info',
-      styles: { backgroundColor: 'secondary' },
+      styles: { backgroundColor: 'info', color: 'info' },
     },
     {
       variant: 'warning',
-      styles: { backgroundColor: 'warning' },
+      styles: { backgroundColor: 'warning', color: 'warning' },
     },
   ];
   describe.each(variants)(
@@ -48,6 +49,7 @@ describe('<InlineAlert />', () => {
         renderInlineAlert({ children: 'alert content', variant });
         expect(screen.getByText('alert content')).toHaveStyle({
           backgroundColor: themes.light.backgroundColor[styles.backgroundColor],
+          color: themes.light.color[styles.color],
         });
       });
     },
