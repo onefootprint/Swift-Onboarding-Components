@@ -34,7 +34,7 @@ const Layout = ({ children, navigation }: LayoutProps) => (
 
 const Content = styled.div`
   display: flex;
-  margin-top: 54px;
+  margin-top: var(--header-height);
   width: 100%;
 `;
 
@@ -52,7 +52,6 @@ const Main = styled.main`
 const Article = styled.article`
   max-width: 720px;
   width: 100%;
-  overflow: hidden;
 `;
 
 export default Layout;

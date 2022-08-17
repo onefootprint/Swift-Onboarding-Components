@@ -22,6 +22,11 @@ const App = ({ Component, pageProps }: AppProps) => (
   </DesignSystemProvider>
 );
 
-const GlobalStyle = createGlobalStyle``;
+const GlobalStyle = createGlobalStyle`
+  html {
+    --header-height: 54px;
+    scroll-padding-top: var(--header-height);
+  }
+`;
 
 export default App;

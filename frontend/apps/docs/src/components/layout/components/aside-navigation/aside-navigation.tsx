@@ -36,7 +36,7 @@ const Aside = styled.aside`
     max-height: 100vh;
     padding: ${theme.spacing[7]}px 0;
     position: fixed;
-    top: 54px;
+    top: var(--header-height);
     width: 270px;
     background: ${theme.backgroundColor.primary};
   `}
