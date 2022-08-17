@@ -5,8 +5,127 @@ slug: /pii-vault-getting-started
 position: 1
 ---
 
-# Getting started
+## Getting started
 
-1. Go to the Footprint developer dashboard and generate a new Secret API Key. This will look something like sk_test_CJvsN1kaZH3GGtYkaZH3GGtY. Add this to the credential manager of your server-side app. Warning: treat this key like a sensitive password!
+### Setup
+
+1. Go to the Footprint [developer dashboard](https://dashboard.onefootprint.com/developers) and generate a new **Secret API Key**. This will look something like `sk_test_CJvsN1kaZH3GGtYkaZH3GGtY`. Add this to the credential manager of your server-side app. **Warning: treat this key like a sensitive password!**
 
 2. Check that your API key is working as expected, you should get back some information about this key.
+
+```sh
+curl -X POST https://api.onefootprint.com/org/api_keys/check \
+  -u sk_test_CJvsN1kaZH3GGtYkaZH3GGtY:
+```
+
+### Create a user vault
+
+1. The first step is to create a new vault for one of your users (optionally you can create a new vault with data in a single API call)
+
+```sh
+curl -X POST https://api.onefootprint.com/users \
+  -u sk_test_CJvsN1kaZH3GGtYkaZH3GGtY:
+```
+
+2. Footprint will give you a `footprint_user_id`, which looks like `fp_id_GSxJr68GAf5j...`
+
+```json
+{
+  "data": {
+    "footprint_user_id": "fp_id_GSxJr68GAf5jUT3pdL9ndjf7TLkA3GCX",
+    "populated_data": [],
+		"start_timestamp": "2022-07-30T05:39:33.723Z"
+  }
+}
+```
+
+3. Save this `footprint_user_id` in your database tied to the individual user it was created for. It is the identifier you will send to request any user-specific information. ***Note: This value is safe to store in plaintext!***
+
+### Update a user vault
+
+Footprint user vaults store two types of data attributes: structured and unstructured. Structured data are first-class attributes that Footprint automatically validates, tokenizes, and in some cases fingerprints to make it searchable. Unstructured data, are custom key-value attributes that are set by you that provide no extra validation. Unstructured data are keyed by the format: `custom.<key>` in Footprint’s API requests.
+
+```sh
+curl -X POST https://api.onefootprint.com/users/fp_id_GSxJr68GAf5jUT3pdL9ndjf7TLkA3GCX/data \
+  -u sk_test_CJvsN1kaZH3GGtYkaZH3GGtY: \
+	-d first_name="John" \ 
+	-d last_name="Smith" \ 
+	-d ssn9="12-121-1212" \
+	-d dob="12-12-1988" \
+	-d custom.ach_acct="111122224444"
+```
+
+### Decrypt data from a user's vault
+
+Footprint’s API provides attribute-level decryption. API keys are configurable to have certain attribute-level scopes.
+
+```sh
+curl -X POST https://api.onefootprint.com/users/fp_id_GSxJr68GAf5jUT3pdL9ndjf7TLkA3GCX/decrypt \
+  -u sk_test_CJvsN1kaZH3GGtYkaZH3GGtY: \
+	-d '{ "attributes": ["last_name", "dob", "ssn9", "custom.ach_acct"], "reason": "direct deposit verification"}'
+```
+
+```json
+{
+	"data": {
+		"last_name": "Smith",
+		"ssn9": "12-121-1212",
+		"dob": {
+			"day": 12,
+			"month": 9,
+			"year": 1988
+		},
+		"custom": {
+			"ach_acct": "111122224444"
+		}
+	}
+}
+```
+
+### List data in a user's vault
+
+When you need to simply know what data fields a user vault contains, simply perform a `GET` on the vault
+
+```sh
+curl https://api.onefootprint.com/users/fp_id_GSxJr68GAf5jUT3pdL9ndjf7TLkA3GCX \
+  -u sk_test_CJvsN1kaZH3GGtYkaZH3GGtY: \
+```
+
+```json
+{
+	"data": {
+		"footprint_user_id": "fp_id_GSxJr68GAf5jUT3pdL9ndjf7TLkA3GCX",
+		"start_timestamp": "2022-07-30T05:39:33.723Z"
+		"populated_data": [
+			"first_name",
+			"last_name",
+			"dob",
+			"ssn9",
+			"custom.ach_account",
+			"custom.ach_routing",
+		],	
+	}
+}
+```
+
+### Search across users' vaults
+
+Footprint lets you search across all of your user vaults by certain fields that are fingerprinted. This lets you easily search across all of your users vaults privately without building complicated decryption procedures.
+
+***For example:***
+
+```sh
+curl -X POST https://api.onefootprint.com/users/?zip_code=10014 \
+  -u sk_test_CJvsN1kaZH3GGtYkaZH3GGtY:
+```
+
+```json
+{
+	"data": [
+		"fp_id_GSxJr68GAf5jUT3pdL9ndjf7TLkA3GCX"
+	]
+}
+```
+
+### Need help?
+We’re just an email away, reach us at [support@onefootprint.com](mailto:support@onefootprint.com)!
