@@ -21,6 +21,7 @@ export type BlogProps = {
 const Blog = ({ posts }: BlogProps) => {
   const { t } = useTranslation('pages.blog');
   const { formatDateWithLongMonth } = useIntl();
+  const [featuredPost, ...allPosts] = posts;
 
   return (
     <>
@@ -46,8 +47,28 @@ const Blog = ({ posts }: BlogProps) => {
               </LinkButton>
             </Breadcrumb>
           </BreadcrumbContainer>
+          <FeaturedPost>
+            <PostPreview
+              href={`/blog/${featuredPost.slug}`}
+              author={{
+                avatarImgUrl: featuredPost.primary_author.profile_image,
+                name: featuredPost.primary_author.name,
+              }}
+              primaryTag={featuredPost.primary_tag.name}
+              featureImageUrl={featuredPost.feature_image}
+              featureImageAlt={
+                featuredPost.feature_image_alt || featuredPost.title
+              }
+              createdAt={formatDateWithLongMonth(
+                new Date(featuredPost.created_at),
+              )}
+              excerpt={featuredPost.excerpt}
+              key={featuredPost.uuid}
+              title={featuredPost.title}
+            />
+          </FeaturedPost>
           <Posts>
-            {posts.map(post => (
+            {allPosts.map(post => (
               <PostPreview
                 href={`/blog/${post.slug}`}
                 author={{
@@ -110,6 +131,12 @@ const BreadcrumbTitleContainer = styled.div`
 `;
 
 const BreadcrumbContainer = styled.div`
+  ${({ theme }) => css`
+    margin-bottom: ${theme.spacing[7]}px;
+  `}
+`;
+
+const FeaturedPost = styled.div`
   ${({ theme }) => css`
     margin-bottom: ${theme.spacing[7]}px;
   `}
