@@ -26,7 +26,7 @@ const primitives = {
   blue300: '#6DA7EE',
   blue200: '#9EC5F3',
   blue100: '#CEE2F9',
-  blue50: '#E7F0FC',
+  blue50: '#EDF3FC',
   // red
   red800: '#4C0804',
   red700: '#730C06',
@@ -36,7 +36,7 @@ const primitives = {
   red300: '#D9726C',
   red200: '#E5A19D',
   red100: '#EDD0CE',
-  red50: '#FFF8F7',
+  red50: '#FFF2F0',
   // yellow
   yellow800: '#9B4E00',
   yellow700: '#BA5D00',
@@ -56,7 +56,7 @@ const primitives = {
   green300: '#6DB59D',
   green200: '#9ECEBE',
   green100: '#CEE6DE',
-  green50: '#EBFFF1',
+  green50: '#E9F5F1',
   // purple
   purple800: '#190c49',
   purple700: '#29147a',

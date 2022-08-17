@@ -31,7 +31,7 @@ const theme: DefaultTheme = {
     info: primitives.blue100,
     success: primitives.green100,
     warning: primitives.yellow100,
-    neutral: primitives.gray100,
+    neutral: primitives.gray50,
   },
   borderColor: {
     transparent: 'transparent',
