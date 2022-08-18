@@ -16,6 +16,10 @@ describe('useSessionUser', () => {
       const nextData = {
         auth: '1',
         email: 'lorem',
+        firstName: 'Jane',
+        lastName: 'Doe',
+        tenantName: 'Footprint',
+        sandboxRestricted: false,
       };
       act(() => {
         result.current.logIn(nextData);
@@ -31,6 +35,10 @@ describe('useSessionUser', () => {
       const nextData = {
         auth: '1',
         email: 'lorem',
+        firstName: 'Jane',
+        lastName: 'Doe',
+        tenantName: 'Footprint',
+        sandboxRestricted: false,
       };
       act(() => {
         result.current.logIn(nextData);

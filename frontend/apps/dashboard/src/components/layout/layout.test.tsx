@@ -30,7 +30,14 @@ describe('<Layout />', () => {
   describe.skip('when the user is logged', () => {
     beforeEach(() => {
       useStore.setState({
-        data: { auth: '1', email: 'lorem' },
+        data: {
+          firstName: 'Jane',
+          lastName: 'Doe',
+          tenantName: 'Footprint',
+          sandboxRestricted: false,
+          auth: '1',
+          email: 'lorem',
+        },
       });
     });
     it('should render the private layout', () => {
