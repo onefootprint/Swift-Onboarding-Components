@@ -3,6 +3,11 @@
     "errors": {}
   },
   "components": {
+    "product-navigation": {
+      "feedback": "Send Feedback",
+      "help": "Need help?",
+      "dark-mode": "Dark mode"
+    },
     "header": {
       "request-early-access": "Request Early Access",
       "nav": {

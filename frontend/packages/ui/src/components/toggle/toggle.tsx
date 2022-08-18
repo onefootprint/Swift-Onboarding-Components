@@ -99,11 +99,13 @@ const Switch = forwardRef<HTMLInputElement, ToggleProps>(
 const ToggleContainer = styled.div`
   display: flex;
   align-items: center;
+  justify-content: space-between;
 `;
 
 const Label = styled.label`
   ${({ theme }) => css`
     ${createFontStyles('label-4')};
+    color: ${theme.color.primary};
     margin-right: ${theme.spacing[3]}px;
   `}
 `;

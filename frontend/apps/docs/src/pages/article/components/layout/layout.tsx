@@ -32,12 +32,13 @@ const Content = styled.div`
   width: 100%;
 
   ${media.greaterThan('sm')`
-    padding-left: var(--product-aside-nav);
+    padding-left: var(--product-aside-nav-width);
   `}
 `;
 
 const Main = styled.main`
   ${({ theme }) => css`
+    background: ${theme.backgroundColor.primary};
     padding: ${theme.spacing[7]}px ${theme.spacing[5]}px;
     width: 100%;
 

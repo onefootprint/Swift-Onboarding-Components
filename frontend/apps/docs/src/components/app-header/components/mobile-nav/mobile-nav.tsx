@@ -6,10 +6,10 @@ import Logo from 'icons/ico/logo-fpdocs-default';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useState } from 'react';
-import { useLockBodyScroll } from 'react-use';
 import type { ProductArticle } from 'src/types/product';
 import styled, { css } from 'styled-components';
 import { Box, media, Tab } from 'ui';
+import { useLockedBody } from 'usehooks-ts';
 
 import type { NavItem } from '../../app-header.types';
 import ProductNavigation from './components/product-navigation';
@@ -24,7 +24,7 @@ const MobileNav = ({ navItems, articles }: MobileNavProps) => {
   const { t } = useTranslation('components.header');
   const [isExpanded, setIsExpanded] = useState(false);
   const [animateNavMenu] = useAutoAnimate<HTMLDivElement>();
-  useLockBodyScroll(isExpanded);
+  useLockedBody(isExpanded);
 
   const handleToggleNav = () => {
     setIsExpanded(prevState => !prevState);
