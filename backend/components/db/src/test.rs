@@ -11,7 +11,7 @@ async fn test_db() {
     run_migrations(&db_url).expect("couldn't run migrations on DB");
 
     let pool = crate::init(&db_url).expect("couldn't initiate DB pool");
-    let tenant = crate::models::tenants::NewTenant {
+    let tenant = crate::models::tenant::NewTenant {
         name: "test_tenant".to_owned(),
         e_private_key: EncryptedVaultPrivateKey("private key".as_bytes().to_vec()),
         public_key: VaultPublicKey::unvalidated("public key".as_bytes().to_vec()),
@@ -24,7 +24,7 @@ async fn test_db() {
 
     crate::user_vault::create(
         &pool,
-        crate::models::user_vaults::NewPortableUserVaultReq {
+        crate::models::user_vault::NewPortableUserVaultReq {
             e_private_key: EncryptedVaultPrivateKey("private key".as_bytes().to_vec()),
             public_key: VaultPublicKey::unvalidated("public key".as_bytes().to_vec()),
             e_phone_number: SealedVaultBytes("blah".as_bytes().to_vec()),

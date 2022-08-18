@@ -1,5 +1,5 @@
 use crate::errors::DbError;
-use crate::schema::user_vaults;
+use crate::schema::user_vault;
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use diesel::{Insertable, PgConnection, QueryDsl, Queryable};
@@ -9,10 +9,10 @@ use newtypes::{
 };
 use serde::{Deserialize, Serialize};
 
-use super::scoped_users::ScopedUser;
+use super::scoped_user::ScopedUser;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable, Identifiable)]
-#[diesel(table_name = user_vaults)]
+#[diesel(table_name = user_vault)]
 pub struct UserVault {
     pub id: UserVaultId,
     pub e_private_key: EncryptedVaultPrivateKey,
@@ -25,14 +25,14 @@ pub struct UserVault {
 
 impl UserVault {
     pub fn get(conn: &mut PgConnection, id: &UserVaultId) -> Result<Self, DbError> {
-        let user = user_vaults::table.filter(user_vaults::id.eq(id)).first(conn)?;
+        let user = user_vault::table.filter(user_vault::id.eq(id)).first(conn)?;
         Ok(user)
     }
 
     pub fn lock(conn: &mut PgConnection, id: UserVaultId) -> Result<Self, DbError> {
-        let user = user_vaults::table
+        let user = user_vault::table
             .for_no_key_update()
-            .filter(user_vaults::id.eq(id))
+            .filter(user_vault::id.eq(id))
             .first(conn)?;
         Ok(user)
     }
@@ -73,16 +73,16 @@ impl UserVault {
         is_live: bool,
         is_portable: Option<bool>,
     ) -> Result<(UserVault, ScopedUser), DbError> {
-        use crate::schema::scoped_users;
-        let mut query = user_vaults::table
-            .inner_join(scoped_users::table)
-            .filter(scoped_users::tenant_id.eq(tenant_id))
-            .filter(scoped_users::fp_user_id.eq(footprint_user_id))
-            .filter(scoped_users::is_live.eq(is_live))
+        use crate::schema::scoped_user;
+        let mut query = user_vault::table
+            .inner_join(scoped_user::table)
+            .filter(scoped_user::tenant_id.eq(tenant_id))
+            .filter(scoped_user::fp_user_id.eq(footprint_user_id))
+            .filter(scoped_user::is_live.eq(is_live))
             .into_boxed();
 
         if let Some(portable_filter) = is_portable {
-            query = query.filter(user_vaults::is_portable.eq(portable_filter));
+            query = query.filter(user_vault::is_portable.eq(portable_filter));
         }
 
         let result = query.first(conn)?;
@@ -91,7 +91,7 @@ impl UserVault {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
-#[diesel(table_name = user_vaults)]
+#[diesel(table_name = user_vault)]
 pub struct NewUserVault {
     pub e_private_key: EncryptedVaultPrivateKey,
     pub public_key: VaultPublicKey,

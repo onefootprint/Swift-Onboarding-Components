@@ -4,7 +4,7 @@ use crate::errors::ApiError;
 use crate::types::response::ApiResponseData;
 use crate::types::EmptyResponse;
 use crate::State;
-use db::models::tenants::UpdateTenantNameOrLogo;
+use db::models::tenant::UpdateTenantNameOrLogo;
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize, Apiv2Schema)]

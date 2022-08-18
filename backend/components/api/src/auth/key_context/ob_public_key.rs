@@ -1,7 +1,7 @@
 use std::{marker::PhantomData, pin::Pin};
 
 use actix_web::{web, FromRequest};
-use db::models::{ob_configurations::ObConfiguration, tenants::Tenant};
+use db::models::{ob_configuration::ObConfiguration, tenant::Tenant};
 use futures_util::Future;
 use newtypes::ObConfigurationKey;
 use paperclip::actix::Apiv2Header;

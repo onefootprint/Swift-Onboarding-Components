@@ -12,8 +12,8 @@ use crate::State;
 use crate::{auth::SessionContext, errors::ApiError};
 use chrono::{DateTime, Utc};
 use db::models::identity_data::HasIdentityDataFields;
-use db::models::onboardings::Onboarding;
-use db::scoped_users::OnboardingListQueryParams;
+use db::models::onboarding::Onboarding;
+use db::scoped_user::OnboardingListQueryParams;
 use newtypes::{DataKind, Fingerprint, Fingerprinter, FootprintUserId, PiiString, Status};
 use paperclip::actix::{api_v2_operation, web, web::Json, Apiv2Schema};
 
@@ -77,13 +77,9 @@ pub fn get(
     let (scoped_users, obs, uvws, count) = state
         .db_pool
         .db_query(move |conn| -> Result<_, ApiError> {
-            let scoped_users = db::scoped_users::list_for_tenant(
-                conn,
-                query_params.clone(),
-                cursor,
-                (page_size + 1) as i64,
-            )?;
-            let count = db::scoped_users::count_for_tenant(conn, query_params).map(Some)?;
+            let scoped_users =
+                db::scoped_user::list_for_tenant(conn, query_params.clone(), cursor, (page_size + 1) as i64)?;
+            let count = db::scoped_user::count_for_tenant(conn, query_params).map(Some)?;
             let (scoped_user_ids, user_vault_ids): (_, Vec<_>) =
                 scoped_users.iter().map(|ob| (&ob.id, &ob.user_vault_id)).unzip();
             // TODO bulk fetch user vault wrapper endpoint to save many DB queries

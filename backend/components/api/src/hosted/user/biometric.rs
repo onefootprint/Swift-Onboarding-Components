@@ -14,8 +14,8 @@ use chrono::{Duration, Utc};
 use crypto::sha256;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::{
-    audit_trails::AuditTrail,
-    user_vaults::UserVault,
+    audit_trail::AuditTrail,
+    user_vault::UserVault,
     webauthn_credential::{NewWebauthnCredential, WebauthnCredential},
 };
 use newtypes::{AttestationType, AuditTrailEvent};

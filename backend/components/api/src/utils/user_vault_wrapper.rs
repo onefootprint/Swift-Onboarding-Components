@@ -1,6 +1,6 @@
 use db::models::fingerprint::IsUnique;
 use db::models::identity_data::{HasIdentityDataFields, IdentityData};
-use db::models::scoped_users::ScopedUser;
+use db::models::scoped_user::ScopedUser;
 use enclave_proxy::DataTransform;
 
 use db::models::email::Email;
@@ -9,10 +9,10 @@ use paperclip::actix::Apiv2Schema;
 
 use std::marker::PhantomData;
 
-use db::models::ob_configurations::ObConfiguration;
+use db::models::ob_configuration::ObConfiguration;
 use db::models::phone_number::PhoneNumber;
 
-use db::models::user_vaults::UserVault;
+use db::models::user_vault::UserVault;
 use db::DbPool;
 use db::{errors::DbError, PgConnection};
 use newtypes::{

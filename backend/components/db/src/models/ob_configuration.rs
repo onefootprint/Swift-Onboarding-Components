@@ -1,5 +1,5 @@
-use crate::schema::ob_configurations::BoxedQuery;
-use crate::schema::{ob_configurations, onboardings, tenants};
+use crate::schema::ob_configuration::BoxedQuery;
+use crate::schema::{ob_configuration, onboarding, tenant};
 use crate::DbError;
 use crate::DbPool;
 use chrono::{DateTime, Utc};
@@ -12,10 +12,10 @@ use newtypes::ScopedUserId;
 use newtypes::{DataKind, ObConfigurationId, ObConfigurationKey, TenantId};
 use serde::{Deserialize, Serialize};
 
-use super::tenants::Tenant;
+use super::tenant::Tenant;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
-#[diesel(table_name = ob_configurations)]
+#[diesel(table_name = ob_configuration)]
 pub struct ObConfiguration {
     pub id: ObConfigurationId,
     pub key: ObConfigurationKey,
@@ -31,7 +31,7 @@ pub struct ObConfiguration {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
-#[diesel(table_name = ob_configurations)]
+#[diesel(table_name = ob_configuration)]
 struct NewObConfiguration {
     key: ObConfigurationKey,
     name: String,
@@ -44,7 +44,7 @@ struct NewObConfiguration {
 }
 
 #[derive(AsChangeset)]
-#[diesel(table_name = ob_configurations)]
+#[diesel(table_name = ob_configuration)]
 struct ObConfigurationUpdate {
     name: Option<String>,
     status: Option<ApiKeyStatus>,
@@ -58,9 +58,9 @@ pub struct ObConfigurationQuery {
 
 impl ObConfiguration {
     fn list_query(query: &ObConfigurationQuery) -> BoxedQuery<Pg> {
-        ob_configurations::table
-            .filter(ob_configurations::tenant_id.eq(&query.tenant_id))
-            .filter(ob_configurations::is_live.eq(query.is_live))
+        ob_configuration::table
+            .filter(ob_configuration::tenant_id.eq(&query.tenant_id))
+            .filter(ob_configuration::is_live.eq(query.is_live))
             .into_boxed()
     }
 
@@ -71,11 +71,11 @@ impl ObConfiguration {
         page_size: i64,
     ) -> Result<Vec<ObConfiguration>, DbError> {
         let mut query = Self::list_query(query)
-            .order_by(ob_configurations::created_at.desc())
+            .order_by(ob_configuration::created_at.desc())
             .limit(page_size);
 
         if let Some(cursor) = cursor {
-            query = query.filter(ob_configurations::created_at.le(cursor))
+            query = query.filter(ob_configuration::created_at.le(cursor))
         }
         let results = query.load::<ObConfiguration>(conn)?;
         Ok(results)
@@ -92,12 +92,12 @@ impl ObConfiguration {
     ) -> Result<Vec<ObConfiguration>, crate::DbError> {
         let id = pool
             .db_query(move |conn| -> Result<Vec<ObConfiguration>, crate::DbError> {
-                let obcs = ob_configurations::table
-                    .inner_join(onboardings::table)
-                    .filter(onboardings::scoped_user_id.eq(scoped_user_id))
+                let obcs = ob_configuration::table
+                    .inner_join(onboarding::table)
+                    .filter(onboarding::scoped_user_id.eq(scoped_user_id))
                     // TODO filter on active onboardings
                     // https://linear.app/footprint/issue/FP-644/move-insight-event-id-status-onto-onboardinglink
-                    .select(ob_configurations::all_columns)
+                    .select(ob_configuration::all_columns)
                     .get_results(conn)?;
                 Ok(obcs)
             })
@@ -109,9 +109,9 @@ impl ObConfiguration {
         conn: &mut PgConnection,
         key: ObConfigurationKey,
     ) -> Result<Option<(ObConfiguration, Tenant)>, crate::DbError> {
-        let result: Option<(ObConfiguration, Tenant)> = ob_configurations::table
-            .inner_join(tenants::table)
-            .filter(ob_configurations::key.eq(key))
+        let result: Option<(ObConfiguration, Tenant)> = ob_configuration::table
+            .inner_join(tenant::table)
+            .filter(ob_configuration::key.eq(key))
             .first(conn)
             .optional()?;
         if let Some((obc, _)) = &result {
@@ -142,7 +142,7 @@ impl ObConfiguration {
         };
         let obc = pool
             .db_query(move |conn| {
-                diesel::insert_into(ob_configurations::table)
+                diesel::insert_into(ob_configuration::table)
                     .values(config)
                     .get_result::<ObConfiguration>(conn)
             })
@@ -159,10 +159,10 @@ impl ObConfiguration {
         status: Option<ApiKeyStatus>,
     ) -> Result<Self, DbError> {
         let update = ObConfigurationUpdate { name, status };
-        let results: Vec<Self> = diesel::update(ob_configurations::table)
-            .filter(ob_configurations::id.eq(id))
-            .filter(ob_configurations::tenant_id.eq(tenant_id))
-            .filter(ob_configurations::is_live.eq(is_live))
+        let results: Vec<Self> = diesel::update(ob_configuration::table)
+            .filter(ob_configuration::id.eq(id))
+            .filter(ob_configuration::tenant_id.eq(tenant_id))
+            .filter(ob_configuration::is_live.eq(is_live))
             .set(update)
             .load(conn)?;
 

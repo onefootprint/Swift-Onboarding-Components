@@ -1,11 +1,11 @@
-use crate::schema::sessions;
+use crate::schema::session;
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
-#[diesel(table_name = sessions)]
+#[diesel(table_name = session)]
 pub struct Session {
     pub key: String,
     pub _created_at: DateTime<Utc>,
@@ -15,7 +15,7 @@ pub struct Session {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
-#[diesel(table_name = sessions)]
+#[diesel(table_name = session)]
 pub struct UpdateSession {
     pub key: String,
     pub data: Vec<u8>,
@@ -24,8 +24,8 @@ pub struct UpdateSession {
 
 impl Session {
     pub fn get(conn: &mut PgConnection, key: String) -> Result<Option<Session>, crate::DbError> {
-        let session = sessions::table
-            .filter(sessions::key.eq(key))
+        let session = session::table
+            .filter(session::key.eq(key))
             .first::<Session>(conn)
             .optional()?;
         // check session expiration every time we get session
@@ -49,13 +49,13 @@ impl Session {
             data,
             expires_at,
         };
-        let session = diesel::insert_into(sessions::table)
+        let session = diesel::insert_into(session::table)
             .values(&session)
-            .on_conflict(sessions::key)
+            .on_conflict(session::key)
             .do_update()
             .set((
-                sessions::data.eq(&session.data),
-                sessions::expires_at.eq(&session.expires_at),
+                session::data.eq(&session.data),
+                session::expires_at.eq(&session.expires_at),
             ))
             .get_result::<Session>(conn)?;
         Ok(session)

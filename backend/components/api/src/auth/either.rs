@@ -2,7 +2,7 @@ use std::pin::Pin;
 
 use actix_web::FromRequest;
 use async_trait::async_trait;
-use db::{models::tenants::Tenant, DbPool};
+use db::{models::tenant::Tenant, DbPool};
 use futures_util::Future;
 use newtypes::TenantId;
 use paperclip::actix::Apiv2Security;

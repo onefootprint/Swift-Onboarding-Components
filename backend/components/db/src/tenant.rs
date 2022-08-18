@@ -1,5 +1,5 @@
 use crate::errors::DbError;
-use crate::models::tenants::*;
+use crate::models::tenant::*;
 use crate::schema;
 use crate::DbPool;
 use diesel::prelude::*;
@@ -11,8 +11,8 @@ pub async fn get_opt_by_workos_profile_id(
 ) -> Result<Option<Tenant>, DbError> {
     let tenant = pool
         .db_query(move |conn| -> Result<_, DbError> {
-            let tenant: Option<Tenant> = schema::tenants::table
-                .filter(schema::tenants::workos_admin_profile_id.eq(workos_profile_id))
+            let tenant: Option<Tenant> = schema::tenant::table
+                .filter(schema::tenant::workos_admin_profile_id.eq(workos_profile_id))
                 .first(conn)
                 .optional()?;
             Ok(tenant)
@@ -28,8 +28,8 @@ pub async fn get_opt_by_workos_org_id(
 ) -> Result<Option<Tenant>, DbError> {
     let tenant = pool
         .db_query(move |conn| -> Result<_, DbError> {
-            let tenant: Option<Tenant> = schema::tenants::table
-                .filter(schema::tenants::workos_id.eq(workos_org_id))
+            let tenant: Option<Tenant> = schema::tenant::table
+                .filter(schema::tenant::workos_id.eq(workos_org_id))
                 .first(conn)
                 .optional()?;
             Ok(tenant)
@@ -42,8 +42,8 @@ pub async fn get_opt_by_workos_org_id(
 pub async fn get_tenant(pool: &DbPool, tenant_id: TenantId) -> Result<Tenant, DbError> {
     let tenant: Tenant = pool
         .db_query(move |conn| {
-            schema::tenants::table
-                .filter(schema::tenants::id.eq(tenant_id))
+            schema::tenant::table
+                .filter(schema::tenant::id.eq(tenant_id))
                 .first(conn)
         })
         .await??;

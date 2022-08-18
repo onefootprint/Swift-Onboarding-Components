@@ -7,7 +7,7 @@ use crate::errors::ApiError;
 use crate::types::scoped_user::ApiScopedUser;
 use crate::types::ApiResponseData;
 use crate::State;
-use db::models::user_vaults::NewNonPortableUserVaultReq;
+use db::models::user_vault::NewNonPortableUserVaultReq;
 use paperclip::actix::{api_v2_operation, web, web::Json};
 
 #[api_v2_operation(tags(PublicApi))]

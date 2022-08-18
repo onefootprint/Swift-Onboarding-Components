@@ -1,7 +1,7 @@
 use crate::diesel::BoolExpressionMethods;
 use crate::diesel::ExpressionMethods;
 use crate::{
-    schema::{self, audit_trails},
+    schema::{self, audit_trail},
     DbError,
 };
 use chrono::{DateTime, Utc};
@@ -10,7 +10,7 @@ use newtypes::{AuditTrailEvent, AuditTrailId, FootprintUserId, TenantId, UserVau
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
-#[diesel(table_name = audit_trails)]
+#[diesel(table_name = audit_trail)]
 pub struct AuditTrail {
     pub id: AuditTrailId,
     pub user_vault_id: UserVaultId,
@@ -29,24 +29,24 @@ impl AuditTrail {
         footprint_user_id: &FootprintUserId,
         is_live: bool,
     ) -> Result<Vec<AuditTrail>, DbError> {
-        let user_vault_ids = schema::scoped_users::table
-            .filter(schema::scoped_users::tenant_id.eq(tenant_id))
-            .filter(schema::scoped_users::fp_user_id.eq(footprint_user_id))
-            .filter(schema::scoped_users::is_live.eq(is_live))
-            .select(schema::scoped_users::user_vault_id);
-        let audit_trails = schema::audit_trails::table
+        let user_vault_ids = schema::scoped_user::table
+            .filter(schema::scoped_user::tenant_id.eq(tenant_id))
+            .filter(schema::scoped_user::fp_user_id.eq(footprint_user_id))
+            .filter(schema::scoped_user::is_live.eq(is_live))
+            .select(schema::scoped_user::user_vault_id);
+        let audit_trails = schema::audit_trail::table
             // Get all access events for this user, but filter out access events from other tenants
-            .filter(schema::audit_trails::user_vault_id.eq_any(user_vault_ids))
-            .filter(schema::audit_trails::tenant_id.is_null().or(
-                schema::audit_trails::tenant_id.eq(tenant_id)))
-            .order_by(schema::audit_trails::timestamp.asc())
+            .filter(schema::audit_trail::user_vault_id.eq_any(user_vault_ids))
+            .filter(schema::audit_trail::tenant_id.is_null().or(
+                schema::audit_trail::tenant_id.eq(tenant_id)))
+            .order_by(schema::audit_trail::timestamp.asc())
             .get_results(conn)?;
         Ok(audit_trails)
     }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
-#[diesel(table_name = audit_trails)]
+#[diesel(table_name = audit_trail)]
 struct NewAuditTrail {
     pub user_vault_id: UserVaultId,
     pub tenant_id: Option<TenantId>,
@@ -67,7 +67,7 @@ impl AuditTrail {
             timestamp: chrono::Utc::now(),
             event,
         };
-        diesel::insert_into(audit_trails::table)
+        diesel::insert_into(audit_trail::table)
             .values(row)
             .execute(conn)?;
         Ok(())

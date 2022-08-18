@@ -20,7 +20,7 @@ pub use diesel::prelude::PgConnection;
 use diesel::prelude::*;
 use diesel_migrations::EmbeddedMigrations;
 use errors::TransactionError;
-use models::scoped_users::ScopedUser;
+use models::scoped_user::ScopedUser;
 use newtypes::Fingerprint;
 use user_vault::get_by_fingerprint;
 
@@ -185,43 +185,43 @@ pub async fn private_cleanup_integration_tests(
             .execute(conn)?;
 
             // grab scoped_users, delete access events and onboardings
-            let obs: Vec<ScopedUser> = schema::scoped_users::table
-                .filter(schema::scoped_users::user_vault_id.eq(&uv.id))
+            let obs: Vec<ScopedUser> = schema::scoped_user::table
+                .filter(schema::scoped_user::user_vault_id.eq(&uv.id))
                 .get_results(conn)?;
             for ob in obs {
                 deleted_rows += diesel::delete(
-                    schema::access_events::table.filter(schema::access_events::scoped_user_id.eq(&ob.id)),
+                    schema::access_event::table.filter(schema::access_event::scoped_user_id.eq(&ob.id)),
                 )
                 .execute(conn)?;
 
                 deleted_rows += diesel::delete(
-                    schema::onboardings::table.filter(schema::onboardings::scoped_user_id.eq(&ob.id)),
+                    schema::onboarding::table.filter(schema::onboarding::scoped_user_id.eq(&ob.id)),
                 )
                 .execute(conn)?;
             }
 
             // delete scoped_users
             deleted_rows += diesel::delete(
-                schema::scoped_users::table.filter(schema::scoped_users::user_vault_id.eq(&uv.id)),
+                schema::scoped_user::table.filter(schema::scoped_user::user_vault_id.eq(&uv.id)),
             )
             .execute(conn)?;
 
             // delete webauthn
             deleted_rows += diesel::delete(
-                schema::webauthn_credentials::table
-                    .filter(schema::webauthn_credentials::user_vault_id.eq(&uv.id)),
+                schema::webauthn_credential::table
+                    .filter(schema::webauthn_credential::user_vault_id.eq(&uv.id)),
             )
             .execute(conn)?;
 
             // delete audit trails
             deleted_rows += diesel::delete(
-                schema::audit_trails::table.filter(schema::audit_trails::user_vault_id.eq(&uv.id)),
+                schema::audit_trail::table.filter(schema::audit_trail::user_vault_id.eq(&uv.id)),
             )
             .execute(conn)?;
 
             // delete user vault
             deleted_rows +=
-                diesel::delete(schema::user_vaults::table.filter(schema::user_vaults::id.eq(&uv.id)))
+                diesel::delete(schema::user_vault::table.filter(schema::user_vault::id.eq(&uv.id)))
                     .execute(conn)?;
             Ok(deleted_rows)
         })
@@ -230,7 +230,7 @@ pub async fn private_cleanup_integration_tests(
 }
 
 pub mod access_event;
-pub mod scoped_users;
+pub mod scoped_user;
 pub mod tenant;
 pub mod user_vault;
 

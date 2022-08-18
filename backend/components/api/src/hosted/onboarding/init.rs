@@ -6,7 +6,7 @@ use crate::errors::ApiError;
 use crate::types::response::ApiResponseData;
 use crate::utils::user_vault_wrapper::UserVaultWrapper;
 use crate::State;
-use db::models::onboardings::Onboarding;
+use db::models::onboarding::Onboarding;
 use db::models::webauthn_credential::WebauthnCredential;
 use db::DbError;
 use newtypes::{DataKind, SessionAuthToken};

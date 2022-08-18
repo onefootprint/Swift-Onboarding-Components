@@ -1,5 +1,5 @@
 use crate::diesel::ExpressionMethods;
-use crate::schema::{self, webauthn_credentials};
+use crate::schema::{self, webauthn_credential};
 use chrono::{DateTime, Utc};
 use diesel::{Insertable, PgConnection, QueryDsl, Queryable, RunQueryDsl};
 use newtypes::{
@@ -11,7 +11,7 @@ use super::insight_event::InsightEvent;
 
 // TODO handle when a user tries to add a second webauthn credential
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Identifiable)]
-#[diesel(table_name = webauthn_credentials)]
+#[diesel(table_name = webauthn_credential)]
 pub struct WebauthnCredential {
     pub id: WebauthnCredentialId,
     pub user_vault_id: UserVaultId,
@@ -33,8 +33,8 @@ impl WebauthnCredential {
         conn: &mut PgConnection,
         user_vault_id: &UserVaultId,
     ) -> Result<Vec<Self>, crate::DbError> {
-        let creds = schema::webauthn_credentials::table
-            .filter(schema::webauthn_credentials::user_vault_id.eq(user_vault_id))
+        let creds = schema::webauthn_credential::table
+            .filter(schema::webauthn_credential::user_vault_id.eq(user_vault_id))
             .get_results(conn)?;
 
         Ok(creds)
@@ -44,9 +44,9 @@ impl WebauthnCredential {
         conn: &mut PgConnection,
         user_vault_id: &UserVaultId,
     ) -> Result<Vec<(Self, InsightEvent)>, crate::DbError> {
-        let creds = schema::webauthn_credentials::table
-            .filter(schema::webauthn_credentials::user_vault_id.eq(user_vault_id))
-            .inner_join(schema::insight_events::table)
+        let creds = schema::webauthn_credential::table
+            .filter(schema::webauthn_credential::user_vault_id.eq(user_vault_id))
+            .inner_join(schema::insight_event::table)
             .get_results(conn)?;
 
         Ok(creds)
@@ -58,14 +58,14 @@ impl WebauthnCredential {
         footprint_user_id: &FootprintUserId,
         is_live: bool,
     ) -> Result<Vec<(Self, InsightEvent)>, crate::DbError> {
-        let user_vault_ids = schema::scoped_users::table
-            .filter(schema::scoped_users::tenant_id.eq(tenant_id))
-            .filter(schema::scoped_users::fp_user_id.eq(footprint_user_id))
-            .filter(schema::scoped_users::is_live.eq(is_live))
-            .select(schema::scoped_users::user_vault_id);
-        let creds = schema::webauthn_credentials::table
-            .inner_join(schema::insight_events::table)
-            .filter(schema::webauthn_credentials::user_vault_id.eq_any(user_vault_ids))
+        let user_vault_ids = schema::scoped_user::table
+            .filter(schema::scoped_user::tenant_id.eq(tenant_id))
+            .filter(schema::scoped_user::fp_user_id.eq(footprint_user_id))
+            .filter(schema::scoped_user::is_live.eq(is_live))
+            .select(schema::scoped_user::user_vault_id);
+        let creds = schema::webauthn_credential::table
+            .inner_join(schema::insight_event::table)
+            .filter(schema::webauthn_credential::user_vault_id.eq_any(user_vault_ids))
             .get_results(conn)?;
 
         Ok(creds)
@@ -73,7 +73,7 @@ impl WebauthnCredential {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
-#[diesel(table_name = webauthn_credentials)]
+#[diesel(table_name = webauthn_credential)]
 pub struct NewWebauthnCredential {
     pub user_vault_id: UserVaultId,
     pub credential_id: Vec<u8>,
@@ -86,7 +86,7 @@ pub struct NewWebauthnCredential {
 
 impl NewWebauthnCredential {
     pub fn save(self, conn: &mut PgConnection) -> Result<(), crate::DbError> {
-        diesel::insert_into(webauthn_credentials::table)
+        diesel::insert_into(webauthn_credential::table)
             .values(self)
             .execute(conn)?;
         Ok(())

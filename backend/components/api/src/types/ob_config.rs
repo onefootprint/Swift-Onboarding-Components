@@ -1,5 +1,5 @@
 use chrono::{DateTime, Utc};
-use db::models::{ob_configurations::ObConfiguration, tenants::Tenant};
+use db::models::{ob_configuration::ObConfiguration, tenant::Tenant};
 use newtypes::{ApiKeyStatus, DataKind, ObConfigurationId, ObConfigurationKey};
 use paperclip::actix::Apiv2Schema;
 

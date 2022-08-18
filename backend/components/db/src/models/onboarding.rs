@@ -1,8 +1,8 @@
 use super::insight_event::CreateInsightEvent;
-use super::scoped_users::ScopedUser;
+use super::scoped_user::ScopedUser;
 use crate::models::insight_event::InsightEvent;
-use crate::models::ob_configurations::ObConfiguration;
-use crate::schema::{onboardings, scoped_users};
+use crate::models::ob_configuration::ObConfiguration;
+use crate::schema::{onboarding, scoped_user};
 use crate::{DbError, DbPool};
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
@@ -13,7 +13,7 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
-#[diesel(table_name = onboardings)]
+#[diesel(table_name = onboarding)]
 pub struct Onboarding {
     pub id: OnboardingId,
     pub scoped_user_id: ScopedUserId,
@@ -26,7 +26,7 @@ pub struct Onboarding {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
-#[diesel(table_name = onboardings)]
+#[diesel(table_name = onboarding)]
 struct NewOnboarding {
     scoped_user_id: ScopedUserId,
     ob_configuration_id: ObConfigurationId,
@@ -41,9 +41,9 @@ impl Onboarding {
     pub async fn get(pool: &DbPool, id: OnboardingId) -> Result<Option<(Onboarding, ScopedUser)>, DbError> {
         let ob = pool
             .db_query(|conn| -> Result<Option<(Onboarding, ScopedUser)>, DbError> {
-                let ob = onboardings::table
-                    .inner_join(scoped_users::table)
-                    .filter(onboardings::id.eq(id))
+                let ob = onboarding::table
+                    .inner_join(scoped_user::table)
+                    .filter(onboarding::id.eq(id))
                     .first(conn)
                     .optional()?;
                 Ok(ob)
@@ -56,12 +56,12 @@ impl Onboarding {
         conn: &mut PgConnection,
         scoped_user_ids: Vec<&ScopedUserId>,
     ) -> Result<HashMap<ScopedUserId, Vec<OnboardingInfo>>, DbError> {
-        use crate::schema::{insight_events, ob_configurations};
-        let obs: Vec<OnboardingInfo> = onboardings::table
-            .inner_join(ob_configurations::table)
-            .inner_join(insight_events::table)
-            .filter(onboardings::scoped_user_id.eq_any(scoped_user_ids))
-            .order_by(onboardings::scoped_user_id)
+        use crate::schema::{insight_event, ob_configuration};
+        let obs: Vec<OnboardingInfo> = onboarding::table
+            .inner_join(ob_configuration::table)
+            .inner_join(insight_event::table)
+            .filter(onboarding::scoped_user_id.eq_any(scoped_user_ids))
+            .order_by(onboarding::scoped_user_id)
             .load(conn)?;
 
         // Turn the Vec of OnboardingInfo into a hashmap of OnboadringId -> Vec<OnboardingInfo>
@@ -80,11 +80,11 @@ impl Onboarding {
         user_vault_id: &UserVaultId,
         ob_configuration_id: &ObConfigurationId,
     ) -> Result<Option<Onboarding>, DbError> {
-        let onboarding = onboardings::table
-            .inner_join(scoped_users::table)
-            .filter(scoped_users::user_vault_id.eq(user_vault_id))
-            .filter(onboardings::ob_configuration_id.eq(ob_configuration_id))
-            .select(onboardings::all_columns)
+        let onboarding = onboarding::table
+            .inner_join(scoped_user::table)
+            .filter(scoped_user::user_vault_id.eq(user_vault_id))
+            .filter(onboarding::ob_configuration_id.eq(ob_configuration_id))
+            .select(onboarding::all_columns)
             .first(conn)
             .optional()?;
         Ok(onboarding)
@@ -96,9 +96,9 @@ impl Onboarding {
         ob_configuration_id: ObConfigurationId,
         insight_event: CreateInsightEvent,
     ) -> Result<Onboarding, DbError> {
-        let ob = onboardings::table
-            .filter(onboardings::scoped_user_id.eq(&scoped_user_id))
-            .filter(onboardings::ob_configuration_id.eq(&ob_configuration_id))
+        let ob = onboarding::table
+            .filter(onboarding::scoped_user_id.eq(&scoped_user_id))
+            .filter(onboarding::ob_configuration_id.eq(&ob_configuration_id))
             .first(conn)
             .optional()?;
         if let Some(ob) = ob {
@@ -113,16 +113,16 @@ impl Onboarding {
             status: Status::Processing,
             insight_event_id: insight_event.id,
         };
-        let ob = diesel::insert_into(onboardings::table)
+        let ob = diesel::insert_into(onboarding::table)
             .values(new_ob)
             .get_result::<Onboarding>(conn)?;
         Ok(ob)
     }
 
     pub fn update_status(self, conn: &mut PgConnection, new_status: Status) -> Result<(), DbError> {
-        diesel::update(onboardings::table)
-            .filter(onboardings::id.eq(&self.id))
-            .set(onboardings::status.eq(new_status))
+        diesel::update(onboarding::table)
+            .filter(onboarding::id.eq(&self.id))
+            .set(onboarding::status.eq(new_status))
             .execute(conn)?;
         Ok(())
     }

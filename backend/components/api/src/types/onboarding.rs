@@ -1,5 +1,5 @@
 use chrono::{DateTime, Utc};
-use db::models::onboardings::{Onboarding, OnboardingInfo};
+use db::models::onboarding::{Onboarding, OnboardingInfo};
 use newtypes::{DataKind, Status};
 use paperclip::actix::Apiv2Schema;
 
@@ -21,7 +21,7 @@ impl From<OnboardingInfo> for ApiOnboarding {
             status,
             ..
         } = s.0;
-        let db::models::ob_configurations::ObConfiguration {
+        let db::models::ob_configuration::ObConfiguration {
             name,
             can_access_data_kinds,
             ..

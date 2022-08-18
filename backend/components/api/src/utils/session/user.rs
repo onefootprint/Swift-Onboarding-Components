@@ -1,6 +1,6 @@
 use chrono::{DateTime, Duration, Utc};
 use crypto::aead::ScopedSealingKey;
-use db::{models::sessions::Session, PgConnection};
+use db::{models::session::Session, PgConnection};
 use newtypes::{SealedSessionBytes, SessionAuthToken};
 
 use crate::{

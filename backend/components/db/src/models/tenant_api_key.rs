@@ -1,6 +1,6 @@
 use crate::models::tenant_api_key_access_log::TenantApiKeyAccessLog;
-use crate::schema::tenant_api_keys::BoxedQuery;
-use crate::{schema::tenant_api_keys, DbError, DbPool};
+use crate::schema::tenant_api_key::BoxedQuery;
+use crate::{schema::tenant_api_key, DbError, DbPool};
 use chrono::{DateTime, Utc};
 use diesel::pg::Pg;
 use diesel::prelude::*;
@@ -8,10 +8,10 @@ use diesel::{Insertable, Queryable};
 use newtypes::{ApiKeyStatus, Fingerprint, SealedVaultBytes, TenantApiKeyId, TenantId};
 use serde::{Deserialize, Serialize};
 
-use super::tenants::Tenant;
+use super::tenant::Tenant;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
-#[diesel(table_name = tenant_api_keys)]
+#[diesel(table_name = tenant_api_key)]
 pub struct TenantApiKey {
     pub id: TenantApiKeyId,
     pub sh_secret_api_key: Fingerprint,
@@ -26,7 +26,7 @@ pub struct TenantApiKey {
 }
 
 #[derive(AsChangeset)]
-#[diesel(table_name = tenant_api_keys)]
+#[diesel(table_name = tenant_api_key)]
 struct TenantApiKeyUpdate {
     name: Option<String>,
     status: Option<ApiKeyStatus>,
@@ -40,9 +40,9 @@ pub struct ApiKeyListQuery {
 
 impl TenantApiKey {
     fn list_query(query: &ApiKeyListQuery) -> BoxedQuery<Pg> {
-        tenant_api_keys::table
-            .filter(tenant_api_keys::tenant_id.eq(&query.tenant_id))
-            .filter(tenant_api_keys::is_live.eq(query.is_live))
+        tenant_api_key::table
+            .filter(tenant_api_key::tenant_id.eq(&query.tenant_id))
+            .filter(tenant_api_key::is_live.eq(query.is_live))
             .into_boxed()
     }
 
@@ -53,11 +53,11 @@ impl TenantApiKey {
         page_size: i64,
     ) -> Result<Vec<TenantApiKey>, DbError> {
         let mut query = Self::list_query(query)
-            .order_by(tenant_api_keys::created_at.desc())
+            .order_by(tenant_api_key::created_at.desc())
             .limit(page_size);
 
         if let Some(cursor) = cursor {
-            query = query.filter(tenant_api_keys::created_at.le(cursor))
+            query = query.filter(tenant_api_key::created_at.le(cursor))
         }
 
         let results = query.load::<TenantApiKey>(conn)?;
@@ -75,10 +75,10 @@ impl TenantApiKey {
         id: &TenantApiKeyId,
         is_live: bool,
     ) -> Result<TenantApiKey, DbError> {
-        let result = tenant_api_keys::table
-            .filter(tenant_api_keys::tenant_id.eq(tenant_id))
-            .filter(tenant_api_keys::id.eq(id))
-            .filter(tenant_api_keys::is_live.eq(is_live))
+        let result = tenant_api_key::table
+            .filter(tenant_api_key::tenant_id.eq(tenant_id))
+            .filter(tenant_api_key::id.eq(id))
+            .filter(tenant_api_key::is_live.eq(is_live))
             .first(conn)?;
         Ok(result)
     }
@@ -87,10 +87,10 @@ impl TenantApiKey {
         conn: &mut PgConnection,
         sh_api_key: Fingerprint,
     ) -> Result<Option<(TenantApiKey, Tenant)>, DbError> {
-        use crate::schema::tenants;
-        let result: Option<(TenantApiKey, Tenant)> = tenant_api_keys::table
-            .inner_join(tenants::table)
-            .filter(tenant_api_keys::sh_secret_api_key.eq(sh_api_key))
+        use crate::schema::tenant;
+        let result: Option<(TenantApiKey, Tenant)> = tenant_api_key::table
+            .inner_join(tenant::table)
+            .filter(tenant_api_key::sh_secret_api_key.eq(sh_api_key))
             .first(conn)
             .optional()?;
         if let Some((api_key, _)) = &result {
@@ -121,7 +121,7 @@ impl TenantApiKey {
         };
         let tenant_api_key = pool
             .db_query(move |conn| {
-                diesel::insert_into(tenant_api_keys::table)
+                diesel::insert_into(tenant_api_key::table)
                     .values(new_key)
                     .get_result::<TenantApiKey>(conn)
             })
@@ -139,10 +139,10 @@ impl TenantApiKey {
         status: Option<ApiKeyStatus>,
     ) -> Result<Self, DbError> {
         let update = TenantApiKeyUpdate { name, status };
-        let results: Vec<Self> = diesel::update(tenant_api_keys::table)
-            .filter(tenant_api_keys::id.eq(id))
-            .filter(tenant_api_keys::tenant_id.eq(tenant_id))
-            .filter(tenant_api_keys::is_live.eq(is_live))
+        let results: Vec<Self> = diesel::update(tenant_api_key::table)
+            .filter(tenant_api_key::id.eq(id))
+            .filter(tenant_api_key::tenant_id.eq(tenant_id))
+            .filter(tenant_api_key::is_live.eq(is_live))
             .set(update)
             .load(conn)?;
 
@@ -155,7 +155,7 @@ impl TenantApiKey {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
-#[diesel(table_name = tenant_api_keys)]
+#[diesel(table_name = tenant_api_key)]
 struct NewTenantApiKey {
     name: String,
     sh_secret_api_key: Fingerprint,

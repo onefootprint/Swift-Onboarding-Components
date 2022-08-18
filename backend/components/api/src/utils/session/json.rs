@@ -1,6 +1,6 @@
 use chrono::{DateTime, Utc};
 use crypto::sha256;
-use db::{models::sessions::Session, PgConnection};
+use db::{models::session::Session, PgConnection};
 use newtypes::{Base64Data, D2pSessionStatus};
 use serde::{de::DeserializeOwned, Serialize};
 

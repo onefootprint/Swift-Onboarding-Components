@@ -8,8 +8,7 @@ use crate::types::{ApiResponseData, EmptyResponse};
 use crate::utils::user_vault_wrapper::UserVaultWrapper;
 use crate::{errors::ApiError, State};
 
-use db::models::user_vaults::UserVault;
-
+use db::models::user_vault::UserVault;
 use newtypes::FootprintUserId;
 
 use paperclip::actix::{api_v2_operation, post, web, web::Json};

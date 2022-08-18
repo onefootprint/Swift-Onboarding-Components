@@ -5,8 +5,8 @@ use actix_web::http::header::Header;
 use actix_web::{web, FromRequest};
 use actix_web_httpauth::headers::authorization::{Authorization, Basic};
 use async_trait::async_trait;
-use db::models::tenant_api_keys::TenantApiKey;
-use db::models::tenants::Tenant;
+use db::models::tenant::Tenant;
+use db::models::tenant_api_key::TenantApiKey;
 use db::DbPool;
 use futures_util::Future;
 

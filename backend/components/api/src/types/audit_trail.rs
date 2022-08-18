@@ -1,5 +1,5 @@
 use chrono::{DateTime, Utc};
-use db::models::audit_trails::AuditTrail;
+use db::models::audit_trail::AuditTrail;
 use newtypes::AuditTrailEvent;
 use paperclip::actix::Apiv2Schema;
 

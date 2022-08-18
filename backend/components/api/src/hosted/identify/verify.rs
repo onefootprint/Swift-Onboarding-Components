@@ -12,7 +12,7 @@ use crate::State;
 
 use chrono::Duration;
 use crypto::sha256;
-use db::models::user_vaults::{NewPortableUserVaultReq, UserVault};
+use db::models::user_vault::{NewPortableUserVaultReq, UserVault};
 use newtypes::{DataKind, Fingerprinter, SessionAuthToken, UserVaultId, ValidatedPhoneNumber};
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 

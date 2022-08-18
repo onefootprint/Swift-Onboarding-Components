@@ -1,4 +1,4 @@
-use db::models::tenants::Tenant;
+use db::models::tenant::Tenant;
 use paperclip::actix::Apiv2Schema;
 
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize, Apiv2Schema)]

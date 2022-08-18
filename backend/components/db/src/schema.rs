@@ -2,7 +2,7 @@ table! {
     use diesel::sql_types::*;
     use newtypes::db_types::*;
 
-    access_events (id) {
+    access_event (id) {
         id -> Uuid,
         scoped_user_id -> Text,
         timestamp -> Timestamptz,
@@ -20,7 +20,7 @@ table! {
     use diesel::sql_types::*;
     use newtypes::db_types::*;
 
-    audit_trails (id) {
+    audit_trail (id) {
         id -> Uuid,
         user_vault_id -> Text,
         tenant_id -> Nullable<Text>,
@@ -93,7 +93,7 @@ table! {
     use diesel::sql_types::*;
     use newtypes::db_types::*;
 
-    insight_events (id) {
+    insight_event (id) {
         id -> Uuid,
         timestamp -> Timestamptz,
         ip_address -> Nullable<Varchar>,
@@ -116,7 +116,7 @@ table! {
     use diesel::sql_types::*;
     use newtypes::db_types::*;
 
-    ob_configurations (id) {
+    ob_configuration (id) {
         id -> Text,
         key -> Text,
         name -> Varchar,
@@ -135,7 +135,7 @@ table! {
     use diesel::sql_types::*;
     use newtypes::db_types::*;
 
-    onboardings (id) {
+    onboarding (id) {
         id -> Uuid,
         scoped_user_id -> Text,
         ob_configuration_id -> Text,
@@ -169,7 +169,7 @@ table! {
     use diesel::sql_types::*;
     use newtypes::db_types::*;
 
-    scoped_users (id) {
+    scoped_user (id) {
         id -> Text,
         fp_user_id -> Text,
         user_vault_id -> Text,
@@ -186,7 +186,7 @@ table! {
     use diesel::sql_types::*;
     use newtypes::db_types::*;
 
-    sessions (key) {
+    session (key) {
         key -> Varchar,
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
@@ -199,38 +199,7 @@ table! {
     use diesel::sql_types::*;
     use newtypes::db_types::*;
 
-    tenant_api_key_access_logs (id) {
-        id -> Uuid,
-        tenant_api_key_id -> Text,
-        timestamp -> Timestamptz,
-        _created_at -> Timestamptz,
-        _updated_at -> Timestamptz,
-    }
-}
-
-table! {
-    use diesel::sql_types::*;
-    use newtypes::db_types::*;
-
-    tenant_api_keys (id) {
-        id -> Text,
-        sh_secret_api_key -> Bytea,
-        e_secret_api_key -> Bytea,
-        tenant_id -> Text,
-        _created_at -> Timestamptz,
-        _updated_at -> Timestamptz,
-        is_live -> Bool,
-        status -> Text,
-        name -> Text,
-        created_at -> Timestamptz,
-    }
-}
-
-table! {
-    use diesel::sql_types::*;
-    use newtypes::db_types::*;
-
-    tenants (id) {
+    tenant (id) {
         id -> Text,
         name -> Text,
         public_key -> Bytea,
@@ -248,7 +217,38 @@ table! {
     use diesel::sql_types::*;
     use newtypes::db_types::*;
 
-    user_vaults (id) {
+    tenant_api_key (id) {
+        id -> Text,
+        sh_secret_api_key -> Bytea,
+        e_secret_api_key -> Bytea,
+        tenant_id -> Text,
+        _created_at -> Timestamptz,
+        _updated_at -> Timestamptz,
+        is_live -> Bool,
+        status -> Text,
+        name -> Text,
+        created_at -> Timestamptz,
+    }
+}
+
+table! {
+    use diesel::sql_types::*;
+    use newtypes::db_types::*;
+
+    tenant_api_key_access_log (id) {
+        id -> Uuid,
+        tenant_api_key_id -> Text,
+        timestamp -> Timestamptz,
+        _created_at -> Timestamptz,
+        _updated_at -> Timestamptz,
+    }
+}
+
+table! {
+    use diesel::sql_types::*;
+    use newtypes::db_types::*;
+
+    user_vault (id) {
         id -> Text,
         e_private_key -> Bytea,
         public_key -> Bytea,
@@ -263,7 +263,7 @@ table! {
     use diesel::sql_types::*;
     use newtypes::db_types::*;
 
-    verification_requests (id) {
+    verification_request (id) {
         id -> Uuid,
         scoped_user_id -> Text,
         vendor -> Text,
@@ -277,7 +277,7 @@ table! {
     use diesel::sql_types::*;
     use newtypes::db_types::*;
 
-    verification_requests_user_data (id) {
+    verification_request_user_data (id) {
         id -> Uuid,
         user_data_id -> Text,
         request_id -> Uuid,
@@ -288,7 +288,7 @@ table! {
     use diesel::sql_types::*;
     use newtypes::db_types::*;
 
-    verification_results (id) {
+    verification_result (id) {
         id -> Uuid,
         request_id -> Uuid,
         response -> Jsonb,
@@ -302,7 +302,7 @@ table! {
     use diesel::sql_types::*;
     use newtypes::db_types::*;
 
-    webauthn_credentials (id) {
+    webauthn_credential (id) {
         id -> Uuid,
         user_vault_id -> Text,
         credential_id -> Bytea,
@@ -317,46 +317,46 @@ table! {
     }
 }
 
-joinable!(access_events -> insight_events (insight_event_id));
-joinable!(access_events -> scoped_users (scoped_user_id));
-joinable!(audit_trails -> tenants (tenant_id));
-joinable!(audit_trails -> user_vaults (user_vault_id));
-joinable!(email -> user_vaults (user_vault_id));
-joinable!(fingerprint -> user_vaults (user_vault_id));
-joinable!(identity_data -> user_vaults (user_vault_id));
-joinable!(ob_configurations -> tenants (tenant_id));
-joinable!(onboardings -> insight_events (insight_event_id));
-joinable!(onboardings -> ob_configurations (ob_configuration_id));
-joinable!(onboardings -> scoped_users (scoped_user_id));
-joinable!(phone_number -> user_vaults (user_vault_id));
-joinable!(scoped_users -> tenants (tenant_id));
-joinable!(scoped_users -> user_vaults (user_vault_id));
-joinable!(tenant_api_key_access_logs -> tenant_api_keys (tenant_api_key_id));
-joinable!(tenant_api_keys -> tenants (tenant_id));
-joinable!(verification_requests -> scoped_users (scoped_user_id));
-joinable!(verification_requests_user_data -> verification_requests (request_id));
-joinable!(verification_results -> verification_requests (request_id));
-joinable!(webauthn_credentials -> insight_events (insight_event_id));
-joinable!(webauthn_credentials -> user_vaults (user_vault_id));
+joinable!(access_event -> insight_event (insight_event_id));
+joinable!(access_event -> scoped_user (scoped_user_id));
+joinable!(audit_trail -> tenant (tenant_id));
+joinable!(audit_trail -> user_vault (user_vault_id));
+joinable!(email -> user_vault (user_vault_id));
+joinable!(fingerprint -> user_vault (user_vault_id));
+joinable!(identity_data -> user_vault (user_vault_id));
+joinable!(ob_configuration -> tenant (tenant_id));
+joinable!(onboarding -> insight_event (insight_event_id));
+joinable!(onboarding -> ob_configuration (ob_configuration_id));
+joinable!(onboarding -> scoped_user (scoped_user_id));
+joinable!(phone_number -> user_vault (user_vault_id));
+joinable!(scoped_user -> tenant (tenant_id));
+joinable!(scoped_user -> user_vault (user_vault_id));
+joinable!(tenant_api_key -> tenant (tenant_id));
+joinable!(tenant_api_key_access_log -> tenant_api_key (tenant_api_key_id));
+joinable!(verification_request -> scoped_user (scoped_user_id));
+joinable!(verification_request_user_data -> verification_request (request_id));
+joinable!(verification_result -> verification_request (request_id));
+joinable!(webauthn_credential -> insight_event (insight_event_id));
+joinable!(webauthn_credential -> user_vault (user_vault_id));
 
 allow_tables_to_appear_in_same_query!(
-    access_events,
-    audit_trails,
+    access_event,
+    audit_trail,
     email,
     fingerprint,
     identity_data,
-    insight_events,
-    ob_configurations,
-    onboardings,
+    insight_event,
+    ob_configuration,
+    onboarding,
     phone_number,
-    scoped_users,
-    sessions,
-    tenant_api_key_access_logs,
-    tenant_api_keys,
-    tenants,
-    user_vaults,
-    verification_requests,
-    verification_requests_user_data,
-    verification_results,
-    webauthn_credentials,
+    scoped_user,
+    session,
+    tenant,
+    tenant_api_key,
+    tenant_api_key_access_log,
+    user_vault,
+    verification_request,
+    verification_request_user_data,
+    verification_result,
+    webauthn_credential,
 );

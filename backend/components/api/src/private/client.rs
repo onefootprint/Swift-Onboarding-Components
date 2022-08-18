@@ -3,12 +3,12 @@ use crate::types::response::ApiResponseData;
 use crate::types::secret_api_key::TenantApiKeyResponse;
 use crate::State;
 use crate::{enclave::gen_keypair, errors::ApiError};
-use db::models::tenant_api_keys::TenantApiKey;
+use db::models::tenant_api_key::TenantApiKey;
 use newtypes::secret_api_key::SecretApiKey;
 use newtypes::TenantId;
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 
-use db::models::tenants::NewTenant;
+use db::models::tenant::NewTenant;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Apiv2Schema)]
 struct NewClientRequest {

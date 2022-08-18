@@ -4,8 +4,8 @@ use crate::errors::ApiError;
 use crate::types::onboarding::ApiOnboarding;
 use crate::types::response::ApiResponseData;
 use crate::State;
-use db::models::onboardings::Onboarding;
-use db::models::scoped_users::ScopedUser;
+use db::models::onboarding::Onboarding;
+use db::models::scoped_user::ScopedUser;
 use newtypes::{ScopedUserId, TenantId};
 use paperclip::actix::{api_v2_operation, get, web, web::Json, Apiv2Schema};
 

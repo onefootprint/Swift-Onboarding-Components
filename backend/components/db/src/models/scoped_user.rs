@@ -1,5 +1,5 @@
-use super::tenants::Tenant;
-use crate::schema::scoped_users;
+use super::tenant::Tenant;
+use crate::schema::scoped_user;
 use crate::{DbError, DbPool};
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
@@ -8,7 +8,7 @@ use newtypes::{FootprintUserId, ScopedUserId, TenantId, UserVaultId};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
-#[diesel(table_name = scoped_users)]
+#[diesel(table_name = scoped_user)]
 pub struct ScopedUser {
     pub id: ScopedUserId,
     pub fp_user_id: FootprintUserId,
@@ -22,7 +22,7 @@ pub struct ScopedUser {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
-#[diesel(table_name = scoped_users)]
+#[diesel(table_name = scoped_user)]
 struct NewScopedUser {
     user_vault_id: UserVaultId,
     tenant_id: TenantId,
@@ -37,9 +37,9 @@ impl ScopedUser {
         tenant_id: TenantId,
         is_live: bool,
     ) -> Result<ScopedUser, DbError> {
-        let scoped_user = scoped_users::table
-            .filter(scoped_users::user_vault_id.eq(&user_vault_id))
-            .filter(scoped_users::tenant_id.eq(&tenant_id))
+        let scoped_user = scoped_user::table
+            .filter(scoped_user::user_vault_id.eq(&user_vault_id))
+            .filter(scoped_user::tenant_id.eq(&tenant_id))
             .first(conn)
             .optional()?;
         if let Some(scoped_user) = scoped_user {
@@ -52,7 +52,7 @@ impl ScopedUser {
             start_timestamp: Utc::now(),
             is_live,
         };
-        let ob = diesel::insert_into(scoped_users::table)
+        let ob = diesel::insert_into(scoped_user::table)
             .values(new)
             .get_result::<ScopedUser>(conn)?;
         Ok(ob)
@@ -63,10 +63,10 @@ impl ScopedUser {
         conn: &mut PgConnection,
         user_vault_id: &UserVaultId,
     ) -> Result<Vec<(ScopedUser, Tenant)>, DbError> {
-        use crate::schema::tenants;
-        let results = scoped_users::table
-            .inner_join(tenants::table)
-            .filter(scoped_users::user_vault_id.eq(user_vault_id))
+        use crate::schema::tenant;
+        let results = scoped_user::table
+            .inner_join(tenant::table)
+            .filter(scoped_user::user_vault_id.eq(user_vault_id))
             .get_results(conn)?;
         Ok(results)
     }
@@ -78,9 +78,9 @@ impl ScopedUser {
     ) -> Result<Option<ScopedUser>, DbError> {
         let ob = pool
             .db_query(|conn| -> Result<Option<ScopedUser>, DbError> {
-                let ob = scoped_users::table
-                    .filter(scoped_users::tenant_id.eq(tenant_id))
-                    .filter(scoped_users::user_vault_id.eq(user_vault_id))
+                let ob = scoped_user::table
+                    .filter(scoped_user::tenant_id.eq(tenant_id))
+                    .filter(scoped_user::user_vault_id.eq(user_vault_id))
                     .first(conn)
                     .optional()?;
                 Ok(ob)

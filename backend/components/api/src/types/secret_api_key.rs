@@ -1,5 +1,5 @@
 use chrono::{DateTime, Utc};
-use db::models::tenant_api_keys::TenantApiKey;
+use db::models::tenant_api_key::TenantApiKey;
 use newtypes::{secret_api_key::SecretApiKey, ApiKeyStatus, TenantApiKeyId};
 use paperclip::actix::Apiv2Schema;
 

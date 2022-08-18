@@ -8,10 +8,10 @@ use crate::hosted::user::{decrypt, DecryptFieldsResult};
 use crate::types::response::ApiResponseData;
 use crate::utils::insight_headers::InsightHeaders;
 use crate::State;
-use db::models::access_events::NewAccessEvent;
+use db::models::access_event::NewAccessEvent;
 use db::models::insight_event::CreateInsightEvent;
-use db::models::ob_configurations::ObConfiguration;
-use db::models::user_vaults::UserVault;
+use db::models::ob_configuration::ObConfiguration;
+use db::models::user_vault::UserVault;
 use newtypes::{DataKind, FootprintUserId};
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 use std::collections::{HashMap, HashSet};
@@ -79,15 +79,16 @@ async fn post_inner(
 ) -> actix_web::Result<Json<ApiResponseData<UserDecryptResponse>>, ApiError> {
     let tenant = auth.tenant(&state.db_pool).await?;
     let is_live = auth.is_live(&state.db_pool).await?;
-    let UserDecryptRequest { footprint_user_id, attributes, reason } = request.into_inner();
+    let UserDecryptRequest {
+        footprint_user_id,
+        attributes,
+        reason,
+    } = request.into_inner();
     // look up tenant & user vault
-    let (vault, scoped_user) = state.db_pool.db_query(move |conn| UserVault::get_for_tenant(
-        conn,
-        &tenant.id,
-        &footprint_user_id,
-        is_live,
-    ))
-    .await??;
+    let (vault, scoped_user) = state
+        .db_pool
+        .db_query(move |conn| UserVault::get_for_tenant(conn, &tenant.id, &footprint_user_id, is_live))
+        .await??;
 
     // if the vault is PORTABLE: check permissions on the scoped user onboarding configuration
     if vault.is_portable {

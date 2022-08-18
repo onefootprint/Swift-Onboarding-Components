@@ -1,5 +1,5 @@
 use crate::{errors::ApiError, utils::user_vault_wrapper::UserVaultWrapper, State};
-use db::models::{user_vaults::UserVault, identity_data::HasIdentityDataFields};
+use db::models::{identity_data::HasIdentityDataFields, user_vault::UserVault};
 use enclave_proxy::DataTransform;
 use newtypes::{DataKind, PiiString, SealedVaultBytes};
 use paperclip::actix::web;

@@ -1,7 +1,7 @@
 --
--- tenants
+-- tenant
 --
-CREATE TABLE tenants (
+CREATE TABLE tenant (
     id text PRIMARY KEY DEFAULT prefixed_uid('org_'),
     name text NOT NULL,
     public_key BYTEA NOT NULL,
@@ -14,15 +14,15 @@ CREATE TABLE tenants (
     sandbox_restricted BOOLEAN NOT NULL
 );
 
-CREATE INDEX IF NOT EXISTS tenants_workos_id ON tenants(workos_id);
-CREATE UNIQUE INDEX IF NOT EXISTS tenants_profile_id ON tenants(workos_admin_profile_id);
+CREATE INDEX IF NOT EXISTS tenant_workos_id ON tenant(workos_id);
+CREATE UNIQUE INDEX IF NOT EXISTS tenant_profile_id ON tenant(workos_admin_profile_id);
 
-SELECT diesel_manage_updated_at('tenants');
+SELECT diesel_manage_updated_at('tenant');
 
 --
--- tenant_api_keys
+-- tenant_api_key
 --
-CREATE TABLE tenant_api_keys (
+CREATE TABLE tenant_api_key (
     id text PRIMARY KEY DEFAULT prefixed_uid('key_id_'),
     sh_secret_api_key BYTEA NOT NULL,
     e_secret_api_key BYTEA NOT NULL,
@@ -35,17 +35,17 @@ CREATE TABLE tenant_api_keys (
     created_at TIMESTAMPTZ NOT NULL,
     CONSTRAINT fk_tenant_api_keys_tenant_id
         FOREIGN KEY(tenant_id) 
-        REFERENCES tenants(id)
+        REFERENCES tenant(id)
 );
 
-CREATE INDEX IF NOT EXISTS tenant_api_keys_tenant_id ON tenant_api_keys(tenant_id);
+CREATE INDEX IF NOT EXISTS tenant_api_keys_tenant_id ON tenant_api_key(tenant_id);
 
-SELECT diesel_manage_updated_at('tenant_api_keys');
+SELECT diesel_manage_updated_at('tenant_api_key');
 
 --
--- insight_events
+-- insight_event
 --
-CREATE TABLE insight_events (
+CREATE TABLE insight_event (
     id uuid NOT NULL PRIMARY KEY DEFAULT uuid_generate_v4(),    
     timestamp timestamptz NOT NULL DEFAULT NOW(),
     ip_address VARCHAR(250),
@@ -63,12 +63,12 @@ CREATE TABLE insight_events (
     _updated_at timestamptz NOT NULL DEFAULT NOW()
 );
 
-SELECT diesel_manage_updated_at('insight_events');
+SELECT diesel_manage_updated_at('insight_event');
 
 --
--- ob_configurations
+-- ob_configuration
 --
-create table ob_configurations (
+create table ob_configuration (
     id text primary key default prefixed_uid('ob_config_id_'),
     key text unique not null,
     name varchar(250) not null,
@@ -82,18 +82,18 @@ create table ob_configurations (
     created_at timestamptz not null,
     CONSTRAINT fk_ob_configurations_tenant_id
         FOREIGN KEY(tenant_id) 
-        REFERENCES tenants(id)
+        REFERENCES tenant(id)
 );
 
-CREATE INDEX IF NOT EXISTS ob_configurations_key ON ob_configurations(key);
-CREATE INDEX IF NOT EXISTS ob_configurations_tenant_id ON ob_configurations(tenant_id);
+CREATE INDEX IF NOT EXISTS ob_configurations_key ON ob_configuration(key);
+CREATE INDEX IF NOT EXISTS ob_configurations_tenant_id ON ob_configuration(tenant_id);
 
-SELECT diesel_manage_updated_at('ob_configurations');
+SELECT diesel_manage_updated_at('ob_configuration');
 
 --
--- user_vaults
+-- user_vault
 --
-CREATE TABLE user_vaults (
+CREATE TABLE user_vault (
     id text PRIMARY KEY DEFAULT prefixed_uid('uv_'),  
     e_private_key BYTEA NOT NULL,
     public_key BYTEA NOT NULL,
@@ -103,12 +103,12 @@ CREATE TABLE user_vaults (
     is_portable BOOLEAN NOT NULL
 );
 
-SELECT diesel_manage_updated_at('user_vaults');
+SELECT diesel_manage_updated_at('user_vault');
 
 --
--- scoped_users
+-- scoped_user
 --
-CREATE TABLE scoped_users (
+CREATE TABLE scoped_user (
     id text PRIMARY KEY DEFAULT prefixed_uid('su_'),
     fp_user_id text UNIQUE NOT NULL DEFAULT prefixed_uid('fp_id_'),
     user_vault_id text NOT NULL,
@@ -120,24 +120,24 @@ CREATE TABLE scoped_users (
     is_live BOOLEAN NOT NULL,
     CONSTRAINT fk_scoped_users_tenant_id
         FOREIGN KEY(tenant_id) 
-        REFERENCES tenants(id),
+        REFERENCES tenant(id),
     CONSTRAINT fk_scoped_users_user_vault_id
         FOREIGN KEY(user_vault_id) 
-        REFERENCES user_vaults(id)
+        REFERENCES user_vault(id)
 );
 
-CREATE INDEX IF NOT EXISTS scoped_users_fp_id ON scoped_users(fp_user_id);
-CREATE INDEX IF NOT EXISTS scoped_users_tenant_id ON scoped_users(tenant_id);
-CREATE INDEX IF NOT EXISTS scoped_users_user_vault_id ON scoped_users(user_vault_id);
-CREATE UNIQUE INDEX IF NOT EXISTS scoped_users_unique_user_vault_id_tenant_id ON scoped_users(user_vault_id, tenant_id);
+CREATE INDEX IF NOT EXISTS scoped_users_fp_id ON scoped_user(fp_user_id);
+CREATE INDEX IF NOT EXISTS scoped_users_tenant_id ON scoped_user(tenant_id);
+CREATE INDEX IF NOT EXISTS scoped_users_user_vault_id ON scoped_user(user_vault_id);
+CREATE UNIQUE INDEX IF NOT EXISTS scoped_users_unique_user_vault_id_tenant_id ON scoped_user(user_vault_id, tenant_id);
 
-SELECT diesel_manage_updated_at('scoped_users');
+SELECT diesel_manage_updated_at('scoped_user');
 
 
 --
--- webauthn_credentials
+-- webauthn_credential
 --
-CREATE TABLE webauthn_credentials (
+CREATE TABLE webauthn_credential (
     id uuid NOT NULL PRIMARY KEY DEFAULT uuid_generate_v4(),
     user_vault_id text NOT NULL,
     
@@ -155,24 +155,24 @@ CREATE TABLE webauthn_credentials (
 
     CONSTRAINT fk_webauthn_credentials_user_vault_id
       FOREIGN KEY(user_vault_id)
-      REFERENCES user_vaults(id),
+      REFERENCES user_vault(id),
     CONSTRAINT fk_webauthn_credentials_insight_event_id
         FOREIGN KEY(insight_event_id)
-        REFERENCES insight_events(id)
+        REFERENCES insight_event(id)
 );
 
-CREATE INDEX IF NOT EXISTS webauthn_credentials_user_vault_id ON webauthn_credentials(user_vault_id);
-CREATE INDEX IF NOT EXISTS webauthn_credentials_insight_event_id ON webauthn_credentials(insight_event_id);
-CREATE UNIQUE INDEX IF NOT EXISTS webauthn_credential_pubkey_user_vault_id ON webauthn_credentials(public_key);
-CREATE UNIQUE INDEX IF NOT EXISTS webauthn_credential_id_user_vault_id ON webauthn_credentials(credential_id);
+CREATE INDEX IF NOT EXISTS webauthn_credentials_user_vault_id ON webauthn_credential(user_vault_id);
+CREATE INDEX IF NOT EXISTS webauthn_credentials_insight_event_id ON webauthn_credential(insight_event_id);
+CREATE UNIQUE INDEX IF NOT EXISTS webauthn_credential_pubkey_user_vault_id ON webauthn_credential(public_key);
+CREATE UNIQUE INDEX IF NOT EXISTS webauthn_credential_id_user_vault_id ON webauthn_credential(credential_id);
 
-SELECT diesel_manage_updated_at('webauthn_credentials');
+SELECT diesel_manage_updated_at('webauthn_credential');
 
 
 --
--- access_events
+-- access_event
 --
-CREATE TABLE access_events (
+CREATE TABLE access_event (
     id uuid NOT NULL PRIMARY KEY DEFAULT uuid_generate_v4(),
     scoped_user_id text NOT NULL,
     -- TODO who at the tenant accessed?
@@ -189,21 +189,21 @@ CREATE TABLE access_events (
 
     CONSTRAINT fk_access_events_scoped_user_id
         FOREIGN KEY(scoped_user_id)
-        REFERENCES scoped_users(id),
+        REFERENCES scoped_user(id),
     CONSTRAINT fk_access_events_insight_event_id
         FOREIGN KEY(insight_event_id)
-        REFERENCES insight_events(id)
+        REFERENCES insight_event(id)
 );
 
-CREATE INDEX IF NOT EXISTS access_events_scoped_user_id_data_kind ON access_events(scoped_user_id, data_kinds);
-CREATE INDEX IF NOT EXISTS access_events_insight_event_id ON access_events(insight_event_id);
+CREATE INDEX IF NOT EXISTS access_events_scoped_user_id_data_kind ON access_event(scoped_user_id, data_kinds);
+CREATE INDEX IF NOT EXISTS access_events_insight_event_id ON access_event(insight_event_id);
 
-SELECT diesel_manage_updated_at('access_events');
+SELECT diesel_manage_updated_at('access_event');
 
 --
--- sessions
+-- session
 --
-CREATE TABLE sessions (
+CREATE TABLE session (
     key VARCHAR(250) PRIMARY KEY NOT NULL,
     _created_at timestamptz NOT NULL DEFAULT NOW(),
     _updated_at timestamptz NOT NULL DEFAULT NOW(),
@@ -215,54 +215,54 @@ CREATE FUNCTION expire_sessions() RETURNS trigger
     LANGUAGE plpgsql
     AS $$
         BEGIN
-            -- Delete rows in the sessions table that have been expired for 30 minutes
-            DELETE FROM sessions WHERE expires_at < NOW() - INTERVAL '30 minutes';
+            -- Delete rows in the session table that have been expired for 30 minutes
+            DELETE FROM session WHERE expires_at < NOW() - INTERVAL '30 minutes';
             RETURN NEW;
         END;
     $$;
 
 CREATE TRIGGER expire_sessions
-    AFTER INSERT ON sessions
+    AFTER INSERT ON session
     EXECUTE PROCEDURE expire_sessions();
     
-SELECT diesel_manage_updated_at('sessions');
+SELECT diesel_manage_updated_at('session');
 
 
 --
--- verification_requests
+-- verification_request
 --
-CREATE TABLE verification_requests (
+CREATE TABLE verification_request (
     id uuid NOT NULL PRIMARY KEY DEFAULT uuid_generate_v4(),
     scoped_user_id text NOT NULL,
     vendor text NOT NULL,
     timestamp timestamptz NOT NULL,
     _created_at timestamptz NOT NULL DEFAULT NOW(),
     _updated_at timestamptz NOT NULL DEFAULT NOW(),
-    CONSTRAINT fk_verification_requests_scoped_user_id
+    CONSTRAINT fk_verification_request_scoped_user_id
         FOREIGN KEY(scoped_user_id) 
-        REFERENCES scoped_users(id)
+        REFERENCES scoped_user(id)
 );
 
-CREATE INDEX IF NOT EXISTS verification_requests_scoped_user_id ON verification_requests(scoped_user_id);
+CREATE INDEX IF NOT EXISTS verification_request_scoped_user_id ON verification_request(scoped_user_id);
 
-SELECT diesel_manage_updated_at('verification_requests');
+SELECT diesel_manage_updated_at('verification_request');
 
 -- Junction table to attach multiple user_data rows to one verification_request
-CREATE TABLE verification_requests_user_data (
+CREATE TABLE verification_request_user_data (
     id uuid NOT NULL PRIMARY KEY DEFAULT uuid_generate_v4(),
     user_data_id text NOT NULL,
     request_id uuid NOT NULL,
-    CONSTRAINT fk_verification_requests_user_data_request_id
+    CONSTRAINT fk_verification_request_user_data_request_id
         FOREIGN KEY(request_id) 
-        REFERENCES verification_requests(id)
+        REFERENCES verification_request(id)
 );
  
-CREATE INDEX IF NOT EXISTS fk_verification_requests_user_data_request_id ON verification_requests_user_data(request_id);
+CREATE INDEX IF NOT EXISTS fk_verification_request_user_data_request_id ON verification_request_user_data(request_id);
 
 --
--- verification_results
+-- verification_result
 --
-CREATE TABLE verification_results (
+CREATE TABLE verification_result (
     id uuid NOT NULL PRIMARY KEY DEFAULT uuid_generate_v4(),
     request_id uuid NOT NULL,
     response jsonb NOT NULL,
@@ -271,17 +271,17 @@ CREATE TABLE verification_results (
     _updated_at timestamptz NOT NULL DEFAULT NOW(),
     CONSTRAINT fk_verification_results_request_id
         FOREIGN KEY(request_id) 
-        REFERENCES verification_requests(id)
+        REFERENCES verification_request(id)
 );
 
-CREATE INDEX IF NOT EXISTS verification_results_request_id ON verification_results(request_id);
+CREATE INDEX IF NOT EXISTS verification_results_request_id ON verification_result(request_id);
  
-SELECT diesel_manage_updated_at('verification_results');
+SELECT diesel_manage_updated_at('verification_result');
 
 --
--- audit_trails
+-- audit_trail
 --
-CREATE TABLE audit_trails (
+CREATE TABLE audit_trail (
     id uuid NOT NULL PRIMARY KEY DEFAULT uuid_generate_v4(),
     user_vault_id text NOT NULL,
     tenant_id text,
@@ -291,22 +291,22 @@ CREATE TABLE audit_trails (
     _updated_at timestamptz NOT NULL DEFAULT NOW(),
     CONSTRAINT fk_audit_trails_user_vault_id
         FOREIGN KEY(user_vault_id)
-        REFERENCES user_vaults(id),
+        REFERENCES user_vault(id),
     CONSTRAINT fk_audit_trails_tenant_id
         FOREIGN KEY(tenant_id)
-        REFERENCES tenants(id)
+        REFERENCES tenant(id)
 );
 
-CREATE INDEX IF NOT EXISTS audit_trails_user_vault_id ON audit_trails(user_vault_id);
-CREATE INDEX IF NOT EXISTS audit_trails_tenant_id ON audit_trails(tenant_id);
+CREATE INDEX IF NOT EXISTS audit_trails_user_vault_id ON audit_trail(user_vault_id);
+CREATE INDEX IF NOT EXISTS audit_trails_tenant_id ON audit_trail(tenant_id);
 
-SELECT diesel_manage_updated_at('audit_trails');
+SELECT diesel_manage_updated_at('audit_trail');
 
 
 --
--- onboardings
+-- onboarding
 --
-CREATE TABLE onboardings (
+CREATE TABLE onboarding (
     id uuid NOT NULL PRIMARY KEY DEFAULT uuid_generate_v4(),
     scoped_user_id text NOT NULL,
     ob_configuration_id text NOT NULL,
@@ -317,25 +317,25 @@ CREATE TABLE onboardings (
     insight_event_id UUID NOT NULL,
     CONSTRAINT fk_onboardings_insight_event_id
         FOREIGN KEY(insight_event_id)
-        REFERENCES insight_events(id),
+        REFERENCES insight_event(id),
     CONSTRAINT fk_onboardings_scoped_user_id
         FOREIGN KEY(scoped_user_id) 
-        REFERENCES scoped_users(id),
+        REFERENCES scoped_user(id),
     CONSTRAINT fk_onboardings_ob_configuration_id
         FOREIGN KEY(ob_configuration_id) 
-        REFERENCES ob_configurations(id)
+        REFERENCES ob_configuration(id)
 );
  
-CREATE INDEX IF NOT EXISTS onboardings_scoped_user_id ON onboardings(scoped_user_id);
-CREATE INDEX IF NOT EXISTS onboardings_ob_configuration_id ON onboardings(ob_configuration_id);
-CREATE INDEX IF NOT EXISTS onboardings_insight_event_id ON onboardings(insight_event_id);
-CREATE UNIQUE INDEX IF NOT EXISTS onboardings_scoped_user_id_ob_configuration_id ON onboardings(scoped_user_id, ob_configuration_id);
+CREATE INDEX IF NOT EXISTS onboardings_scoped_user_id ON onboarding(scoped_user_id);
+CREATE INDEX IF NOT EXISTS onboardings_ob_configuration_id ON onboarding(ob_configuration_id);
+CREATE INDEX IF NOT EXISTS onboardings_insight_event_id ON onboarding(insight_event_id);
+CREATE UNIQUE INDEX IF NOT EXISTS onboardings_scoped_user_id_ob_configuration_id ON onboarding(scoped_user_id, ob_configuration_id);
 
 
 --
--- tenant_api_key_access_logs
+-- tenant_api_key_access_log
 --
-CREATE TABLE tenant_api_key_access_logs (
+CREATE TABLE tenant_api_key_access_log (
     id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
     tenant_api_key_id TEXT NOT NULL,
     timestamp timestamptz NOT NULL,
@@ -343,12 +343,12 @@ CREATE TABLE tenant_api_key_access_logs (
     _updated_at timestamptz NOT NULL DEFAULT NOW(),
     CONSTRAINT fk_tenant_api_key_access_logs_tenant_api_key_id
         FOREIGN KEY(tenant_api_key_id) 
-        REFERENCES tenant_api_keys(id)
+        REFERENCES tenant_api_key(id)
 );
 
-CREATE INDEX IF NOT EXISTS tenant_api_key_access_logs_tenant_api_key_id ON tenant_api_key_access_logs(tenant_api_key_id, timestamp);
+CREATE INDEX IF NOT EXISTS tenant_api_key_access_logs_tenant_api_key_id ON tenant_api_key_access_log(tenant_api_key_id, timestamp);
 
-SELECT diesel_manage_updated_at('tenant_api_key_access_logs');
+SELECT diesel_manage_updated_at('tenant_api_key_access_log');
 
 --
 -- fingerprint
@@ -364,7 +364,7 @@ CREATE TABLE fingerprint (
     is_unique BOOLEAN NOT NULL,
     CONSTRAINT fk_fingerprint_user_vault_id
         FOREIGN KEY(user_vault_id) 
-        REFERENCES user_vaults(id)
+        REFERENCES user_vault(id)
 );
 
 CREATE INDEX IF NOT EXISTS fingerprint_user_vault_id ON fingerprint(user_vault_id);
@@ -387,7 +387,7 @@ CREATE TABLE phone_number (
     _updated_at timestamptz NOT NULL DEFAULT NOW(),
     CONSTRAINT fk_phone_number_user_valt_id
         FOREIGN KEY(user_vault_id) 
-        REFERENCES user_vaults(id)
+        REFERENCES user_vault(id)
 );
 
 CREATE INDEX IF NOT EXISTS phone_number_user_vault_id ON phone_number(user_vault_id);
@@ -408,7 +408,7 @@ CREATE TABLE email (
     _updated_at timestamptz NOT NULL DEFAULT NOW(),
     CONSTRAINT fk_email_user_valt_id
         FOREIGN KEY(user_vault_id) 
-        REFERENCES user_vaults(id)
+        REFERENCES user_vault(id)
 );
 
 CREATE INDEX IF NOT EXISTS email_user_vault_id ON email(user_vault_id);
@@ -441,7 +441,7 @@ CREATE TABLE identity_data (
 
     CONSTRAINT fk_id_user_vault_id
         FOREIGN KEY(user_vault_id) 
-        REFERENCES user_vaults(id)
+        REFERENCES user_vault(id)
 );
 
 CREATE INDEX IF NOT EXISTS id_data_user_vault_id ON identity_data(user_vault_id);

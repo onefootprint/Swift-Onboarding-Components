@@ -1,8 +1,8 @@
 use crate::errors::DbError;
-use crate::models::access_events::AccessEvent;
+use crate::models::access_event::AccessEvent;
 use crate::models::insight_event::InsightEvent;
-use crate::models::scoped_users::*;
-use crate::models::tenants::Tenant;
+use crate::models::scoped_user::*;
+use crate::models::tenant::Tenant;
 use crate::schema;
 use crate::DbPool;
 use chrono::{DateTime, Utc};
@@ -40,42 +40,42 @@ impl AccessEventListItemForTenant {
     ) -> Result<Vec<Self>, DbError> {
         let result: Vec<(AccessEvent, ScopedUser, Option<InsightEvent>)> = pool
             .db_query(move |conn| {
-                let mut results = schema::access_events::table
-                    .inner_join(schema::scoped_users::table)
-                    .left_join(schema::insight_events::table)
-                    .order_by(schema::access_events::ordering_id.desc())
-                    .filter(schema::scoped_users::tenant_id.eq(params.tenant_id))
-                    .filter(schema::scoped_users::is_live.eq(params.is_live))
+                let mut results = schema::access_event::table
+                    .inner_join(schema::scoped_user::table)
+                    .left_join(schema::insight_event::table)
+                    .order_by(schema::access_event::ordering_id.desc())
+                    .filter(schema::scoped_user::tenant_id.eq(params.tenant_id))
+                    .filter(schema::scoped_user::is_live.eq(params.is_live))
                     .limit(page_size)
                     .into_boxed();
 
                 if let Some(fp_user_id) = params.fp_user_id {
-                    results = results.filter(schema::scoped_users::fp_user_id.eq(fp_user_id))
+                    results = results.filter(schema::scoped_user::fp_user_id.eq(fp_user_id))
                 }
 
                 if let Some(search) = params.search {
                     results = results.filter(
-                        schema::access_events::reason
+                        schema::access_event::reason
                             .ilike(format!("%{}%", search))
-                            .or(schema::access_events::principal.ilike(format!("%{}%", search)))
-                            .or(schema::scoped_users::fp_user_id.eq(search)),
+                            .or(schema::access_event::principal.ilike(format!("%{}%", search)))
+                            .or(schema::scoped_user::fp_user_id.eq(search)),
                     )
                 }
 
                 if let Some(timestamp_lte) = params.timestamp_lte {
-                    results = results.filter(schema::access_events::timestamp.le(timestamp_lte))
+                    results = results.filter(schema::access_event::timestamp.le(timestamp_lte))
                 }
 
                 if let Some(timestamp_gte) = params.timestamp_gte {
-                    results = results.filter(schema::access_events::timestamp.ge(timestamp_gte))
+                    results = results.filter(schema::access_event::timestamp.ge(timestamp_gte))
                 }
 
                 if !params.kinds.is_empty() {
-                    results = results.filter(schema::access_events::data_kinds.overlaps_with(params.kinds));
+                    results = results.filter(schema::access_event::data_kinds.overlaps_with(params.kinds));
                 }
 
                 if let Some(cursor) = cursor {
-                    results = results.filter(schema::access_events::ordering_id.le(cursor));
+                    results = results.filter(schema::access_event::ordering_id.le(cursor));
                 }
 
                 results.load(conn)
@@ -114,17 +114,17 @@ impl AccessEventListItemForUser {
     ) -> Result<Vec<AccessEventListItemForUser>, DbError> {
         let result: Vec<(AccessEvent, ScopedUser, Tenant)> = pool
             .db_query(move |conn| {
-                let mut results = schema::access_events::table
-                    .inner_join(schema::scoped_users::table)
+                let mut results = schema::access_event::table
+                    .inner_join(schema::scoped_user::table)
                     .inner_join(
-                        schema::tenants::table.on(schema::tenants::id.eq(schema::scoped_users::tenant_id)),
+                        schema::tenant::table.on(schema::tenant::id.eq(schema::scoped_user::tenant_id)),
                     )
-                    .order_by(schema::access_events::timestamp.desc())
-                    .filter(schema::scoped_users::user_vault_id.eq(user_vault_id))
+                    .order_by(schema::access_event::timestamp.desc())
+                    .filter(schema::scoped_user::user_vault_id.eq(user_vault_id))
                     .into_boxed();
 
                 if let Some(kind) = kind {
-                    results = results.filter(schema::access_events::data_kinds.contains(vec![kind]));
+                    results = results.filter(schema::access_event::data_kinds.contains(vec![kind]));
                 }
 
                 results.load(conn)

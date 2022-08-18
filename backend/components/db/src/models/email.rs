@@ -9,7 +9,7 @@ use newtypes::{
 use serde::{Deserialize, Serialize};
 
 use super::fingerprint::Fingerprint;
-use super::user_vaults::UserVault;
+use super::user_vault::UserVault;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable)]
 #[diesel(table_name = email)]
@@ -100,9 +100,9 @@ impl Email {
         id: &EmailId,
         user_vault_id: &UserVaultId,
     ) -> Result<(Email, UserVault), crate::DbError> {
-        use crate::schema::user_vaults;
+        use crate::schema::user_vault;
         let result = email::table
-            .inner_join(user_vaults::table)
+            .inner_join(user_vault::table)
             .filter(email::id.eq(id))
             .filter(email::user_vault_id.eq(user_vault_id))
             .get_result(conn)?;

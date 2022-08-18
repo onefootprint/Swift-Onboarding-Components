@@ -7,7 +7,7 @@ use crate::types::audit_trail::ApiAuditTrail;
 use crate::types::response::ApiResponseData;
 use crate::State;
 use crate::{auth::SessionContext, errors::ApiError};
-use db::models::audit_trails::AuditTrail;
+use db::models::audit_trail::AuditTrail;
 use newtypes::FootprintUserId;
 use paperclip::actix::{api_v2_operation, get, web, web::Json, Apiv2Schema};
 

@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use crate::{schema::tenant_api_key_access_logs, DbError};
+use crate::{schema::tenant_api_key_access_log, DbError};
 use chrono::{DateTime, Utc};
 use diesel::dsl::max;
 use diesel::prelude::*;
@@ -9,7 +9,7 @@ use newtypes::{TenantApiKeyId, Uuid};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
-#[diesel(table_name = tenant_api_key_access_logs)]
+#[diesel(table_name = tenant_api_key_access_log)]
 pub struct TenantApiKeyAccessLog {
     pub id: Uuid,
     pub tenant_api_key_id: TenantApiKeyId,
@@ -19,7 +19,7 @@ pub struct TenantApiKeyAccessLog {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
-#[diesel(table_name = tenant_api_key_access_logs)]
+#[diesel(table_name = tenant_api_key_access_log)]
 struct NewTenantApiKeyAccessLog {
     tenant_api_key_id: TenantApiKeyId,
     timestamp: DateTime<Utc>,
@@ -31,7 +31,7 @@ impl TenantApiKeyAccessLog {
             tenant_api_key_id,
             timestamp: Utc::now(),
         };
-        diesel::insert_into(tenant_api_key_access_logs::table)
+        diesel::insert_into(tenant_api_key_access_log::table)
             .values(access_log)
             .get_result::<TenantApiKeyAccessLog>(conn)?;
         Ok(())
@@ -41,12 +41,12 @@ impl TenantApiKeyAccessLog {
         conn: &mut PgConnection,
         tenant_api_key_ids: Vec<&TenantApiKeyId>,
     ) -> Result<HashMap<TenantApiKeyId, DateTime<Utc>>, DbError> {
-        let results: HashMap<TenantApiKeyId, DateTime<Utc>> = tenant_api_key_access_logs::table
-            .filter(tenant_api_key_access_logs::tenant_api_key_id.eq_any(tenant_api_key_ids))
-            .group_by(tenant_api_key_access_logs::tenant_api_key_id)
+        let results: HashMap<TenantApiKeyId, DateTime<Utc>> = tenant_api_key_access_log::table
+            .filter(tenant_api_key_access_log::tenant_api_key_id.eq_any(tenant_api_key_ids))
+            .group_by(tenant_api_key_access_log::tenant_api_key_id)
             .select((
-                tenant_api_key_access_logs::tenant_api_key_id,
-                max(tenant_api_key_access_logs::timestamp),
+                tenant_api_key_access_log::tenant_api_key_id,
+                max(tenant_api_key_access_log::timestamp),
             ))
             .load::<(TenantApiKeyId, Option<DateTime<Utc>>)>(conn)?
             .into_iter()

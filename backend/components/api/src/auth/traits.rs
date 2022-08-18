@@ -1,6 +1,6 @@
 use async_trait::async_trait;
 use db::{
-    models::{tenants::Tenant, user_vaults::UserVault},
+    models::{tenant::Tenant, user_vault::UserVault},
     DbPool,
 };
 use newtypes::{TenantId, UserVaultId};
@@ -41,7 +41,6 @@ pub trait SupportsIsLiveHeader {}
 pub trait ExtractableAuthSession: TryFrom<AuthSessionData> {
     fn header_names() -> Vec<&'static str>;
 }
-
 
 /// Principal that is behind the SessionContext
 pub trait Principal {

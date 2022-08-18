@@ -10,7 +10,7 @@ use crate::utils::twilio::TwilioClient;
 use crate::utils::user_vault_wrapper::UserVaultWrapper;
 use crate::State;
 use crypto::serde_cbor;
-use db::models::user_vaults::UserVault;
+use db::models::user_vault::UserVault;
 use db::models::webauthn_credential::WebauthnCredential;
 use newtypes::email::Email;
 use newtypes::{DataKind, Fingerprinter, PhoneNumber, PiiString, UserVaultId};

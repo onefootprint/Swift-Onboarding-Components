@@ -1,7 +1,7 @@
 use crate::errors::DbError;
 use crate::models::phone_number::PhoneNumber;
-use crate::models::scoped_users::ScopedUser;
-use crate::models::user_vaults::*;
+use crate::models::scoped_user::ScopedUser;
+use crate::models::user_vault::*;
 use crate::schema;
 use diesel::prelude::*;
 use newtypes::{DataPriority, Fingerprint, UserVaultId};
@@ -16,7 +16,7 @@ pub async fn create(pool: &crate::DbPool, new_user: NewPortableUserVaultReq) -> 
                 is_live: new_user.is_live,
                 is_portable: true,
             };
-            let user_vault = diesel::insert_into(schema::user_vaults::table)
+            let user_vault = diesel::insert_into(schema::user_vault::table)
                 .values(new_user_vault)
                 .get_result::<UserVault>(conn)?;
             PhoneNumber::create(
@@ -56,7 +56,7 @@ pub async fn create_non_portable(
                 is_live,
                 is_portable: false,
             };
-            let user_vault = diesel::insert_into(schema::user_vaults::table)
+            let user_vault = diesel::insert_into(schema::user_vault::table)
                 .values(new_user_vault)
                 .get_result::<UserVault>(conn)?;
 
@@ -80,10 +80,10 @@ pub async fn get_by_fingerprint(
 ) -> Result<Option<UserVault>, DbError> {
     let result = pool
         .db_query(move |conn| -> Result<_, DbError> {
-            let result = schema::user_vaults::table
+            let result = schema::user_vault::table
                 .inner_join(schema::fingerprint::table)
                 .filter(schema::fingerprint::sh_data.eq(sh_data))
-                .select(schema::user_vaults::all_columns)
+                .select(schema::user_vault::all_columns)
                 .first(conn)
                 .optional()?;
             Ok(result)

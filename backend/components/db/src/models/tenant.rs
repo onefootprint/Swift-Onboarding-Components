@@ -1,4 +1,4 @@
-use crate::schema::tenants;
+use crate::schema::tenant;
 use crate::DbPool;
 use diesel::prelude::*;
 
@@ -8,7 +8,7 @@ use newtypes::{EncryptedVaultPrivateKey, TenantId, VaultPublicKey};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
-#[diesel(table_name = tenants)]
+#[diesel(table_name = tenant)]
 pub struct Tenant {
     pub id: TenantId,
     pub name: String,
@@ -23,7 +23,7 @@ pub struct Tenant {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
-#[diesel(table_name = tenants)]
+#[diesel(table_name = tenant)]
 pub struct NewTenant {
     pub name: String,
     pub public_key: VaultPublicKey,
@@ -37,7 +37,7 @@ pub struct NewTenant {
 impl NewTenant {
     pub async fn create(self, pool: &DbPool) -> Result<Tenant, crate::DbError> {
         pool.db_query(move |conn| {
-            let tenant = diesel::insert_into(tenants::table)
+            let tenant = diesel::insert_into(tenant::table)
                 .values(&self)
                 .get_result::<Tenant>(conn)?;
             Ok(tenant)
@@ -47,7 +47,7 @@ impl NewTenant {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, AsChangeset)]
-#[diesel(table_name = tenants)]
+#[diesel(table_name = tenant)]
 pub struct UpdateTenantNameOrLogo {
     pub id: TenantId,
     pub name: Option<String>,
@@ -58,8 +58,8 @@ impl UpdateTenantNameOrLogo {
     pub async fn update(self, pool: &DbPool) -> Result<(), crate::DbError> {
         let _ = pool
             .db_query(move |conn| {
-                diesel::update(tenants::table)
-                    .filter(tenants::id.eq(&self.id))
+                diesel::update(tenant::table)
+                    .filter(tenant::id.eq(&self.id))
                     .set(&self)
                     .execute(conn)
             })

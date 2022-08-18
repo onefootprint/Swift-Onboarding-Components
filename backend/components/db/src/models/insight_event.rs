@@ -1,12 +1,12 @@
 use crate::DbPool;
-use crate::{schema::insight_events, DbError};
+use crate::{schema::insight_event, DbError};
 use chrono::{DateTime, Utc};
 use diesel::{Insertable, PgConnection, Queryable, RunQueryDsl};
 use newtypes::InsightEventId;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
-#[diesel(table_name = insight_events)]
+#[diesel(table_name = insight_event)]
 pub struct InsightEvent {
     pub id: InsightEventId,
     pub timestamp: DateTime<Utc>,
@@ -26,7 +26,7 @@ pub struct InsightEvent {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
-#[diesel(table_name = insight_events)]
+#[diesel(table_name = insight_event)]
 pub struct CreateInsightEvent {
     pub timestamp: DateTime<Utc>,
     pub ip_address: Option<String>,
@@ -44,7 +44,7 @@ pub struct CreateInsightEvent {
 
 impl CreateInsightEvent {
     pub fn insert_with_conn(self, conn: &mut PgConnection) -> Result<InsightEvent, DbError> {
-        let ev = diesel::insert_into(crate::schema::insight_events::table)
+        let ev = diesel::insert_into(crate::schema::insight_event::table)
             .values(self)
             .get_result(conn)?;
         Ok(ev)
