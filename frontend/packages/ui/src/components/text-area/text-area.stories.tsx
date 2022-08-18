@@ -67,7 +67,9 @@ const Template: Story<TextAreaProps> = ({
   testID,
   value: initialValue = '',
 }: TextAreaProps) => {
-  const [value, setValue] = useState<string>(initialValue);
+  const [value, setValue] = useState<
+    string | ReadonlyArray<string> | number | undefined
+  >(initialValue);
   const handleChangeText = (text: string) => {
     setValue(text);
     if (onChangeText) onChangeText(text);

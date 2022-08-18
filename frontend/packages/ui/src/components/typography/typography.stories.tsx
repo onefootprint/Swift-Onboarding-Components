@@ -14,9 +14,7 @@ export default {
       control: 'select',
       options: ['p', 'a', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'label', 'span'],
     },
-    center: { control: 'boolean' },
     color: { control: 'select', options: Object.keys(themes.light.color) },
-    htmlTitle: { control: 'text' },
     testID: {
       control: 'text',
       description: 'Append an attribute data-testid for testing purposes',
@@ -28,21 +26,12 @@ export default {
 
 const Template: Story<TypographyProps> = ({
   as,
-  center,
   children = 'lorem',
   color = 'primary',
-  htmlTitle,
   testID,
   variant = 'heading-1',
 }: Partial<TypographyProps>) => (
-  <Typography
-    as={as}
-    center={center}
-    color={color}
-    htmlTitle={htmlTitle}
-    testID={testID}
-    variant={variant}
-  >
+  <Typography as={as} color={color} testID={testID} variant={variant}>
     {children}
   </Typography>
 );
@@ -87,10 +76,8 @@ Heading2.args = {
 export const Heading3 = Template.bind({});
 Heading3.args = {
   as: 'p',
-  center: false,
   children: 'Footprint (heading-3)',
   color: 'primary',
-  htmlTitle: '',
   testID: 'typography-test-id',
   variant: 'heading-3',
 };
