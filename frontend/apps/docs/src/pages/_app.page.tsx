@@ -16,7 +16,7 @@ type AppProps = {
 const App = ({ Component, pageProps }: AppProps) => (
   <DesignSystemProvider theme={themes.light}>
     <GlobalStyle />
-    <AppHeader articles={pageProps.product.articles} />
+    <AppHeader articles={pageProps.product?.articles} />
     <Component {...pageProps} />
   </DesignSystemProvider>
 );

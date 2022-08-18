@@ -4,30 +4,35 @@ import React from 'react';
 import styled from 'styled-components';
 import { Container, Typography } from 'ui';
 
+import SEO from '../../components/seo';
+
 const Page404 = () => {
   const { t } = useTranslation('pages.404');
   return (
-    <Container>
-      <Inner>
-        <Image
-          alt={t('image.alt')}
-          height={212.62}
-          layout="fixed"
-          src="/404.png"
-          width={298}
-        />
-        <Typography
-          variant="heading-3"
-          as="h2"
-          sx={{ marginTop: 9, marginBottom: 3 }}
-        >
-          {t('title')}
-        </Typography>
-        <Typography color="secondary" variant="body-1" as="h3">
-          {t('description')}
-        </Typography>
-      </Inner>
-    </Container>
+    <>
+      <SEO title={t('title')} slug="/" />
+      <Container>
+        <Inner>
+          <Image
+            alt={t('image.alt')}
+            height={212.62}
+            layout="fixed"
+            src="/404.png"
+            width={298}
+          />
+          <Typography
+            variant="heading-3"
+            as="h2"
+            sx={{ marginTop: 9, marginBottom: 3 }}
+          >
+            {t('title')}
+          </Typography>
+          <Typography color="secondary" variant="body-1" as="h3">
+            {t('description')}
+          </Typography>
+        </Inner>
+      </Container>
+    </>
   );
 };
 

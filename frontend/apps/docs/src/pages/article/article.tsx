@@ -4,6 +4,7 @@ import type { Article } from 'src/types/article';
 import styled, { css } from 'styled-components';
 import { createFontStyles } from 'ui';
 
+import SEO from '../../components/seo';
 import A from './components/a';
 import Code from './components/code';
 import H2 from './components/h2';
@@ -22,15 +23,20 @@ const components = {
   h3: H3,
 };
 
-// TODO:
-// https://linear.app/footprint/issue/FP-1077/seo
 const ArticlePage = ({ product, article }: ArticleProps) => (
-  <Layout product={product} article={article}>
-    <Container>
-      {/* @ts-ignore */}
-      <ReactMarkdown components={components}>{article.content}</ReactMarkdown>
-    </Container>
-  </Layout>
+  <>
+    <SEO
+      description={article.data.meta.description}
+      slug={article.data.slug}
+      title={article.data.meta.title}
+    />
+    <Layout product={product} article={article}>
+      <Container>
+        {/* @ts-ignore */}
+        <ReactMarkdown components={components}>{article.content}</ReactMarkdown>
+      </Container>
+    </Layout>
+  </>
 );
 
 const Container = styled.div`

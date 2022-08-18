@@ -3,8 +3,8 @@ import type { ParsedUrlQuery } from 'querystring';
 
 import {
   getAllArticles,
+  getArticleBySlug,
   getNavigation,
-  getPageBySlug,
 } from '../utils/articles';
 
 export async function getStaticPaths() {
@@ -19,21 +19,21 @@ type Params = ParsedUrlQuery & {
 
 export const getStaticProps: GetStaticProps<any, Params> = async context => {
   const { slug } = context.params!;
-  const page = await getPageBySlug('/'.concat(slug.join('/')));
+  const article = await getArticleBySlug('/'.concat(slug.join('/')));
   const navigation = await getNavigation();
-  if (!page) {
+  if (!article) {
     return { notFound: true };
   }
-  const items = navigation.get(page.data.product) || new Set();
+  const items = navigation.get(article.data.product) || new Set();
   return {
     props: {
       product: {
-        name: page.data.product,
+        name: article.data.product,
         articles: Array.from(items).sort((a, b) => a.position - b.position),
       },
       article: {
-        data: page.data,
-        content: page.content,
+        data: article.data,
+        content: article.content,
       },
     },
   };

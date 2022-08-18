@@ -51,13 +51,13 @@ const getAllMarkdownFiles = (contentPaths: string[]) =>
 
 export const getAllArticles = async () => {
   const filesPath = await getFilesPath(DOCS_PATH);
-  const pages = await getAllMarkdownFiles(filesPath);
-  return pages;
+  const articles = await getAllMarkdownFiles(filesPath);
+  return articles;
 };
 
-export const getPageBySlug = async (slug: string) => {
-  const pages = await getAllArticles();
-  return pages.find(page => page.data.slug === slug);
+export const getArticleBySlug = async (slug: string) => {
+  const articles = await getAllArticles();
+  return articles.find(article => article.data.slug === slug);
 };
 
 export const getNavigation = async () => {
@@ -65,8 +65,8 @@ export const getNavigation = async () => {
     string,
     Set<{ title: string; position: number; slug: string }>
   >();
-  const pages = await getAllArticles();
-  pages.forEach(({ data: { product, title, position, slug } }) => {
+  const articles = await getAllArticles();
+  articles.forEach(({ data: { product, title, position, slug } }) => {
     if (navigation.has(product)) {
       const set = navigation.get(product);
       if (set) {
