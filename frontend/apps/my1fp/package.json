@@ -10,6 +10,7 @@
     "test": "jest --coverage",
     "test:watch": "jest --watch",
     "lint": "eslint src --fix",
+    "typecheck": "yarn tsc --noEmit",
     "clean": "rm -rf .turbo && rm -rf .next && rm -rf node_modules"
   },
   "dependencies": {

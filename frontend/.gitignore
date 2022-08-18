@@ -18,6 +18,7 @@ dist
 .DS_Store
 *.pem
 .idea/
+*.tsbuildinfo
 
 # debug
 npm-debug.log*

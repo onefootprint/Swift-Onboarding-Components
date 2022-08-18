@@ -22,6 +22,9 @@
     "lint": {
       "outputs": []
     },
+    "typecheck": {
+      "outputs": []
+    },
     "format": {
       "outputs": []
     },
