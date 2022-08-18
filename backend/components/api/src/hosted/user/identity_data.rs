@@ -23,18 +23,16 @@ async fn handler(
         return Ok(Json(ApiResponseData::ok(EmptyResponse)));
     }
 
-    let user_vault = user_auth.user_vault(&state.db_pool).await?;
     let request = request.into_inner();
-
     let fingerprints = request.fingerprints(&state).await?;
     let update = request.update;
 
-    let _uvw = state
+    state
         .db_pool
         .db_transaction(move |conn| -> Result<_, ApiError> {
-            let mut uvw = UserVaultWrapper::from_conn(conn, user_vault)?;
+            let mut uvw = UserVaultWrapper::lock(conn, &user_auth.user_vault_id())?;
             uvw.update_identity_data(conn, update, fingerprints)?;
-            Ok(uvw)
+            Ok(())
         })
         .await?;
 

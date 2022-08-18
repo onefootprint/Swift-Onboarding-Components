@@ -25,9 +25,12 @@ pub fn handler(
     state: web::Data<State>,
 ) -> actix_web::Result<Json<ApiResponseData<D2pSmsResponse>>, ApiError> {
     let user_auth = user_auth.check_permissions(vec![UserAuthScope::Handoff])?;
+    let user_vault_id = user_auth.user_vault_id();
 
-    let user_vault = user_auth.user_vault(&state.db_pool).await?;
-    let uvw = UserVaultWrapper::from(&state.db_pool, user_vault).await?;
+    let uvw = state
+        .db_pool
+        .db_query(move |conn| UserVaultWrapper::get(conn, &user_vault_id))
+        .await??;
     let phone_number = uvw.get_decrypted_primary_phone(&state).await?;
 
     let time_before_retry_s = state

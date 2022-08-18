@@ -181,7 +181,7 @@ async fn complete(
         .db_transaction(move |conn| -> Result<_, ApiError> {
             // Protect against someone adding a webauthn credential while we verify that there's
             // only one
-            UserVault::lock(conn, user_auth.user_vault_id())?;
+            UserVault::lock(conn, &user_auth.user_vault_id())?;
             let creds = WebauthnCredential::list(conn, &user_auth.user_vault_id())?;
             if !creds.is_empty() {
                 return Err(ChallengeError::BiometricCredentialAlreadyExists.into());

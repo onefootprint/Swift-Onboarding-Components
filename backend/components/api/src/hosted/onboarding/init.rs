@@ -8,7 +8,6 @@ use crate::utils::user_vault_wrapper::UserVaultWrapper;
 use crate::State;
 use db::models::onboarding::Onboarding;
 use db::models::webauthn_credential::WebauthnCredential;
-use db::DbError;
 use newtypes::{DataKind, SessionAuthToken};
 use paperclip::actix::{api_v2_operation, web, web::Json, Apiv2Schema};
 
@@ -34,30 +33,27 @@ pub fn handler(
 ) -> actix_web::Result<Json<ApiResponseData<OnboardingResponse>>, ApiError> {
     let user_auth = user_auth.check_permissions(vec![UserAuthScope::OrgOnboarding])?;
 
-    let uv = user_auth.user_vault(&state.db_pool).await?;
-    if tenant_auth.ob_config.is_live != uv.is_live {
-        return Err(OnboardingError::InvalidSandboxState.into());
-    }
-
     let ob_config_id = tenant_auth.ob_config.id.clone();
-    let uv_id = uv.id.clone();
     let session_key = state.session_sealing_key.clone();
-    let (validation_token, webauthn_creds) = state
+    let (validation_token, webauthn_creds, uvw) = state
         .db_pool
-        .db_query(move |conn| -> Result<_, DbError> {
+        .db_query(move |conn| -> Result<_, ApiError> {
+            let uvw = UserVaultWrapper::get(conn, &user_auth.user_vault_id())?;
+            if tenant_auth.ob_config.is_live != uvw.user_vault.is_live {
+                return Err(OnboardingError::InvalidSandboxState.into());
+            }
             // Check if the customer has already onboarded onto this exact ob_config
-            let existing_ob = Onboarding::get_by_config(conn, &uv_id, &ob_config_id)?;
+            let existing_ob = Onboarding::get_by_config(conn, &uvw.user_vault.id, &ob_config_id)?;
             let validation_token = if let Some(ob) = existing_ob {
                 Some(create_onboarding_validation_token(conn, &session_key, ob.id)?)
             } else {
                 None
             };
             let creds = WebauthnCredential::get_for_user_vault(conn, &user_auth.data.user_vault_id)?;
-            Ok((validation_token, creds))
+            Ok((validation_token, creds, uvw))
         })
         .await??;
 
-    let uvw = UserVaultWrapper::from(&state.db_pool, uv).await?;
     Ok(Json(ApiResponseData {
         data: OnboardingResponse {
             missing_attributes: uvw.missing_fields(&tenant_auth.ob_config),

@@ -30,9 +30,6 @@ pub async fn post(
         .db_query(move |conn| UserVault::get_for_tenant(conn, &tenant_id, &footprint_user_id, is_live))
         .await??;
 
-    if user_vault.is_portable {
-        return Err(AuthError::CannotModifyPortableUser)?;
-    }
     let request = request.into_inner();
     let fingerprints = request.fingerprints(&state).await?;
     let update = request.update;
@@ -42,7 +39,10 @@ pub async fn post(
     let _uvw = state
         .db_pool
         .db_transaction(move |conn| -> Result<_, ApiError> {
-            let mut uvw = UserVaultWrapper::from_conn(conn, user_vault)?;
+            let mut uvw = UserVaultWrapper::lock(conn, &user_vault.id)?;
+            if user_vault.is_portable {
+                return Err(AuthError::CannotModifyPortableUser.into());
+            }
             uvw.update_identity_data(conn, update, fingerprints)?;
             Ok(uvw)
         })

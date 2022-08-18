@@ -82,21 +82,24 @@ pub async fn handler(
         };
 
     // The user vault exists. Extract the phone number for the user
-    let uvw = UserVaultWrapper::from(&state.db_pool, existing_user.clone()).await?;
+    let uvw = state
+        .db_pool
+        .db_query(move |conn| UserVaultWrapper::build(conn, existing_user))
+        .await??;
     let validated_phone_number = uvw.get_decrypted_primary_phone(&state).await?;
 
     // Initiate the challenge of the requested type
     let (challenge_kind, challenge_state_data, time_before_retry_s, biometric_challenge_json) =
         match preferred_challenge_kind {
             ChallengeKind::Biometric => {
-                let user_id = existing_user.id.clone();
+                let user_id = uvw.user_vault.id.clone();
                 let creds = state
                     .db_pool
                     .db_query(move |conn| WebauthnCredential::get_for_user_vault(conn, &user_id))
                     .await??;
                 if !creds.is_empty() {
                     let challenge =
-                        initiate_biometric_challenge_for_user(&state, &existing_user.id, creds).await?;
+                        initiate_biometric_challenge_for_user(&state, &uvw.user_vault.id, creds).await?;
                     (
                         ChallengeKind::Biometric,
                         IdentifyChallengeData::Biometric(challenge.state),

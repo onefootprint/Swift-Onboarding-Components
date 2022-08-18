@@ -52,18 +52,22 @@ pub async fn handler(
 ) -> actix_web::Result<Json<ApiResponseData<ApiUser>>, ApiError> {
     let user_auth = user_auth.check_permissions(vec![UserAuthScope::BasicProfile])?;
 
-    let existing_user = user_auth.user_vault(&state.db_pool).await?;
-    let uvw = UserVaultWrapper::from(&state.db_pool, existing_user).await?;
+    let uvw = state
+        .db_pool
+        .db_query(move |conn| UserVaultWrapper::get(conn, &user_auth.user_vault_id()))
+        .await??;
     Ok(Json(ApiResponseData::ok(ApiUser {
         phone_numbers: uvw
             .phone_number
             .as_ref()
             .map(ApiUserData::from)
-            .map(|v| vec![v]).unwrap_or_default(),
+            .map(|v| vec![v])
+            .unwrap_or_default(),
         emails: uvw
             .email
             .as_ref()
             .map(ApiUserData::from)
-            .map(|v| vec![v]).unwrap_or_default(),
+            .map(|v| vec![v])
+            .unwrap_or_default(),
     })))
 }

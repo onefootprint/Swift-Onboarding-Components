@@ -53,7 +53,7 @@ pub async fn post(
     let email_id = state
         .db_pool
         .db_transaction(move |conn| -> Result<_, ApiError> {
-            let mut uvw = UserVaultWrapper::from_conn(conn, user_vault)?;
+            let mut uvw = UserVaultWrapper::lock(conn, &user_vault.id)?;
             let email_id = uvw.add_email(conn, email.clone(), sh_data)?;
             Ok(email_id)
         })

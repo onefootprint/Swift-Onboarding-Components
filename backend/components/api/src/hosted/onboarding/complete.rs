@@ -40,8 +40,10 @@ fn handler(
 ) -> actix_web::Result<Json<ApiResponseData<CommitResponse>>, ApiError> {
     let user_auth = user_auth.check_permissions(vec![UserAuthScope::OrgOnboarding])?;
 
-    let uv = user_auth.user_vault(&state.db_pool).await?;
-    let uvw = UserVaultWrapper::from(&state.db_pool, uv).await?;
+    let uvw = state
+        .db_pool
+        .db_query(move |conn| UserVaultWrapper::get(conn, &user_auth.user_vault_id()))
+        .await??;
     let missing_fields = uvw.missing_fields(&tenant_auth.ob_config);
     if !missing_fields.is_empty() {
         return Err(OnboardingError::UserMissingRequiredFields(missing_fields.iter().join(", ")).into());

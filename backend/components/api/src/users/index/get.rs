@@ -86,7 +86,7 @@ pub fn get(
             // https://linear.app/footprint/issue/FP-1004/create-util-to-bulk-hydrate-uvws
             let uvws: Vec<UserVaultWrapper> = user_vault_ids
                 .into_iter()
-                .map(|id| UserVaultWrapper::from_id(conn, id))
+                .map(|id| UserVaultWrapper::get(conn, id))
                 .collect::<Result<_, _>>()?;
             let obs = Onboarding::get_for_scoped_users(conn, scoped_user_ids)?;
 

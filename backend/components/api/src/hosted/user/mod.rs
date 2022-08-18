@@ -1,6 +1,5 @@
 use crate::{errors::ApiError, utils::user_vault_wrapper::UserVaultWrapper, State};
 use db::models::{identity_data::HasIdentityDataFields, user_vault::UserVault};
-use enclave_proxy::DataTransform;
 use newtypes::{DataKind, PiiString, SealedVaultBytes};
 use paperclip::actix::web;
 use std::collections::HashMap;
@@ -40,16 +39,17 @@ pub async fn decrypt(
     data_kinds: Vec<DataKind>,
 ) -> Result<DecryptFieldsResult, ApiError> {
     // Filter out fields that don't have values set on the user vault
-    let uvw = UserVaultWrapper::from(&state.db_pool, user_vault).await?;
+    let uvw = state
+        .db_pool
+        .db_query(move |conn| UserVaultWrapper::build(conn, user_vault))
+        .await??;
     let (fields_to_decrypt, e_datas): (Vec<DataKind>, Vec<&SealedVaultBytes>) = data_kinds
         .iter()
         .filter_map(|kind| uvw.get_e_field(*kind).map(|data| (kind, data)))
         .unzip();
 
     // Actually decrypt the fields
-    let e_private_key = &uvw.user_vault.e_private_key;
-    let decrypt_response =
-        crate::enclave::decrypt_bytes_batch(state, e_datas, e_private_key, DataTransform::Identity).await?;
+    let decrypt_response = uvw.decrypt(state, e_datas).await?;
     let decrypted_data: HashMap<DataKind, PiiString> = decrypt_response
         .into_iter()
         .enumerate()

@@ -71,6 +71,8 @@ pub enum ApiError {
     SerdeCbor(#[from] serde_cbor::Error),
     #[error("twilio error: {0}")]
     Twilio(#[from] twilio::error::Error),
+    #[error("Not running in locked transaction")]
+    UserNotLocked,
 }
 
 impl<T> From<WorkOsError<T>> for ApiError
@@ -143,6 +145,7 @@ impl actix_web::ResponseError for ApiError {
             | ApiError::SerdeJson(_)
             | ApiError::SerdeCbor(_) => StatusCode::BAD_REQUEST,
             ApiError::WorkOsLoginError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            ApiError::UserNotLocked => StatusCode::INTERNAL_SERVER_ERROR,
         }
     }
 

@@ -30,7 +30,7 @@ impl UserVault {
         Ok(user)
     }
 
-    pub fn lock(conn: &mut PgConnection, id: UserVaultId) -> Result<Self, DbError> {
+    pub fn lock(conn: &mut PgConnection, id: &UserVaultId) -> Result<Self, DbError> {
         assert_in_transaction(conn)?; // Doesn't make sense to lock outside of a txn
         let user = user_vault::table
             .for_no_key_update()

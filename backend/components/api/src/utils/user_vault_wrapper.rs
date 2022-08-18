@@ -1,6 +1,5 @@
 use db::models::fingerprint::IsUnique;
 use db::models::identity_data::{HasIdentityDataFields, IdentityData};
-use db::models::scoped_user::ScopedUser;
 use enclave_proxy::DataTransform;
 
 use db::models::email::Email;
@@ -12,12 +11,12 @@ use std::marker::PhantomData;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::phone_number::PhoneNumber;
 
+use db::assert_in_transaction;
 use db::models::user_vault::UserVault;
-use db::{assert_in_transaction, DbPool};
 use db::{errors::DbError, PgConnection};
 use newtypes::{
-    DataKind, DataPriority, EmailId, Fingerprint, FootprintUserId, PiiString, SealedVaultBytes, TenantId,
-    UserVaultId, ValidatedPhoneNumber,
+    DataKind, DataPriority, EmailId, Fingerprint, PiiString, SealedVaultBytes, UserVaultId,
+    ValidatedPhoneNumber,
 };
 
 use crate::errors::{ApiError, ApiResult};
@@ -31,6 +30,7 @@ pub struct UserVaultWrapper {
     pub identity_data: Option<IdentityData>,
     pub phone_number: Option<PhoneNumber>,
     pub email: Option<Email>,
+    is_locked: bool,
     phantom: PhantomData<()>,
 }
 
@@ -40,14 +40,11 @@ pub struct DecryptRequest {
 }
 
 impl UserVaultWrapper {
-    pub async fn from(pool: &DbPool, user_vault: UserVault) -> Result<Self, DbError> {
-        pool.db_transaction(move |conn| -> Result<UserVaultWrapper, DbError> {
-            Self::from_conn(conn, user_vault)
-        })
-        .await
-    }
-
-    pub fn from_conn(conn: &mut PgConnection, user_vault: UserVault) -> Result<Self, DbError> {
+    fn build_internal(
+        conn: &mut PgConnection,
+        user_vault: UserVault,
+        is_locked: bool,
+    ) -> Result<Self, DbError> {
         let identity_data = IdentityData::get(conn, &user_vault.id)?;
         let phone_number = PhoneNumber::get_primary(conn, &user_vault.id)?;
         let email = Email::get_primary(conn, &user_vault.id)?;
@@ -57,34 +54,45 @@ impl UserVaultWrapper {
             user_vault,
             phone_number,
             email,
+            is_locked,
             phantom: PhantomData,
         })
     }
 
-    pub fn from_id(conn: &mut PgConnection, user_vault_id: &UserVaultId) -> Result<Self, DbError> {
-        let user_vault = UserVault::get(conn, user_vault_id)?;
-        let uvw = Self::from_conn(conn, user_vault)?;
+    pub fn build(conn: &mut PgConnection, user_vault: UserVault) -> Result<Self, DbError> {
+        Self::build_internal(conn, user_vault, false)
+    }
+
+    pub fn lock(conn: &mut PgConnection, id: &UserVaultId) -> Result<Self, DbError> {
+        let user_vault = UserVault::lock(conn, id)?;
+        let uvw = Self::build_internal(conn, user_vault, true)?;
         Ok(uvw)
     }
 
-    pub fn from_fp_user_id(
-        conn: &mut PgConnection,
-        fp_user_id: &FootprintUserId,
-        tenant_id: &TenantId,
-        is_live: bool,
-    ) -> Result<(Self, ScopedUser), DbError> {
-        let (user_vault, scoped_user) = UserVault::get_for_tenant(conn, tenant_id, fp_user_id, is_live)?;
-        let uvw = Self::from_conn(conn, user_vault)?;
-        Ok((uvw, scoped_user))
+    pub fn get(conn: &mut PgConnection, id: &UserVaultId) -> Result<Self, DbError> {
+        let user_vault = UserVault::get(conn, id)?;
+        let uvw = Self::build_internal(conn, user_vault, false)?;
+        Ok(uvw)
     }
 
+    pub fn assert_is_locked(&self, conn: &mut PgConnection) -> Result<(), ApiError> {
+        assert_in_transaction(conn)?;
+        if !self.is_locked {
+            Err(ApiError::UserNotLocked)
+        } else {
+            Ok(())
+        }
+    }
+}
+
+impl UserVaultWrapper {
     pub fn add_email(
         &mut self,
         conn: &mut PgConnection,
         email: NewtypeEmail,
         fingerprint: Fingerprint,
     ) -> ApiResult<EmailId> {
-        assert_in_transaction(conn)?;
+        self.assert_is_locked(conn)?;
         let email = email.to_piistring();
         let e_data = self.user_vault.public_key.seal_pii(&email)?;
         let priority = if self.email.is_some() {
@@ -164,7 +172,7 @@ impl UserVaultWrapper {
         update: IdentityDataUpdate,
         fingerprints: Vec<(DataKind, Fingerprint, IsUnique)>,
     ) -> Result<(), ApiError> {
-        assert_in_transaction(conn)?;
+        self.assert_is_locked(conn)?;
         let mut builder = IdentityDataBuilder::new(
             self.user_vault.is_portable,
             self.user_vault.id.clone(),
