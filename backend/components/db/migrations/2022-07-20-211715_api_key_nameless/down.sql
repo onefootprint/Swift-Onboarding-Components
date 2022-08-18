@@ -1,1 +1,0 @@
-ALTER table tenant_api_keys ADD COLUMN key_name VARCHAR(250) NOT NULL DEFAULT '';

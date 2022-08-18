@@ -1,4 +1,0 @@
-ALTER TABLE tenant_api_keys ALTER COLUMN is_live DROP DEFAULT;
-ALTER TABLE ob_configurations ALTER COLUMN is_live DROP DEFAULT;
-ALTER TABLE onboardings ALTER COLUMN is_live DROP DEFAULT;
-ALTER TABLE user_vaults ALTER COLUMN is_live DROP DEFAULT;

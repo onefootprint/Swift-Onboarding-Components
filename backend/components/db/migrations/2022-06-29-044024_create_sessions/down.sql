@@ -1,2 +1,0 @@
-DROP TABLE IF EXISTS sessions;
-DROP FUNCTION IF EXISTS expire_sessions;

@@ -1,1 +1,0 @@
-ALTER TABLE ob_configurations ADD COLUMN logo_url Text;

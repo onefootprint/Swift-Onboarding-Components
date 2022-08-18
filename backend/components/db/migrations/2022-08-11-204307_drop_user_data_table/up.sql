@@ -1,3 +1,0 @@
-ALTER TABLE verification_requests_user_data DROP CONSTRAINT fk_verification_requests_user_data_user_data_id;
-
-DROP TABLE user_data;

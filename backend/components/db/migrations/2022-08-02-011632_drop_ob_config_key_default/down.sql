@@ -1,1 +1,0 @@
-ALTER TABLE ob_configurations ALTER COLUMN key SET DEFAULT prefixed_uid('ob_config_pk_');

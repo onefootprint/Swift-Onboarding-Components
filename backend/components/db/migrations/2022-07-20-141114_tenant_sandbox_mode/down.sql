@@ -1,1 +1,0 @@
-ALTER TABLE tenants DROP COLUMN sandbox_restricted;

@@ -1,1 +1,0 @@
-ALTER TABLE ob_configurations DROP COLUMN logo_url;

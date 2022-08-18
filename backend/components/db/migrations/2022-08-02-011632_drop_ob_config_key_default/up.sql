@@ -1,1 +1,0 @@
-ALTER TABLE ob_configurations ALTER COLUMN key DROP DEFAULT;
