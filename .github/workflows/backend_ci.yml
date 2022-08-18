@@ -3,14 +3,14 @@ name: Backend CI
 on:
   push:
     paths:
-      - "backend/**"
+      - 'backend/**'
 
     branches:
       - master
 
   pull_request:
     paths:
-      - "backend/**"
+      - 'backend/**'
 
 env:
   CARGO_TERM_COLOR: always
@@ -50,7 +50,10 @@ jobs:
           toolchain: stable
 
       - name: Rust Cache
-        uses: Swatinem/rust-cache@v1.3.0
+        uses: Swatinem/rust-cache@v2.0.0
+        with:
+          workspaces: |
+            backend
 
       - name: Check
         working-directory: ./backend
@@ -72,13 +75,13 @@ jobs:
     environment: dev
     strategy:
       matrix:
-        python-version: ["3.9"]
+        python-version: ['3.9']
     services:
       postgres:
         image: postgres:10.18
         env:
-          POSTGRES_USER: "runner"
-          POSTGRES_HOST_AUTH_METHOD: "trust"
+          POSTGRES_USER: 'runner'
+          POSTGRES_HOST_AUTH_METHOD: 'trust'
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -88,7 +91,7 @@ jobs:
           - 5432:5432
     env:
       PR_NUMBER: ${{ github.event.number }}
-      TEST_URL: "http://localhost:8000"
+      TEST_URL: 'http://localhost:8000'
     if: success()
     steps:
       - name: Install libpq + libssl
@@ -119,7 +122,10 @@ jobs:
           toolchain: stable
 
       - name: Rust Cache
-        uses: Swatinem/rust-cache@v1.3.0
+        uses: Swatinem/rust-cache@v2.0.0
+        with:
+          workspaces: |
+            backend
 
       - name: Setup Python # Set Python version
         uses: actions/setup-python@v3
@@ -207,7 +213,7 @@ jobs:
           fi
 
   clippy:
-    name: "Clippy"
+    name: 'Clippy'
     runs-on: ubuntu-latest
 
     steps:
