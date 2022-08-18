@@ -1,9 +1,10 @@
 import fs from 'fs';
 import glob from 'glob';
 import matter from 'gray-matter';
+import kebabCase from 'lodash/kebabCase';
 import path from 'path';
 
-import type { Page } from '../types/page';
+import type { Article } from '../types/page';
 
 const DOCS_PATH = path.join(process.cwd(), 'src/content/**/**.mdx');
 
@@ -18,25 +19,44 @@ const getFilesPath = (filesPath: string): Promise<string[]> =>
     });
   });
 
-const getPages = (contentPaths: string[]) =>
+const getArticleSections = (content: string) => {
+  const regXHeader = /#{1,6}.+/g;
+  const sections = content.match(regXHeader);
+
+  return sections?.map(section => {
+    const level = section.split('#').length - 1;
+    const label = section.replaceAll('#', '').trim();
+    const id = kebabCase(label);
+    const anchor = `#${id}`;
+    return { label, level, anchor, id };
+  });
+};
+
+const getAllMarkdownFiles = (contentPaths: string[]) =>
   Promise.all(
     contentPaths.map(async contentPath => {
       const fileContent = await fs.promises.readFile(contentPath, {
         encoding: 'utf8',
       });
-      const matterFile = matter(fileContent) as unknown as Page;
-      return matterFile;
+      const matterFile = matter(fileContent) as unknown as Article;
+      return {
+        ...matterFile,
+        data: {
+          ...matterFile.data,
+          sections: getArticleSections(matterFile.content),
+        },
+      };
     }),
   );
 
-export const getAllPages = async () => {
+export const getAllArticles = async () => {
   const filesPath = await getFilesPath(DOCS_PATH);
-  const pages = await getPages(filesPath);
+  const pages = await getAllMarkdownFiles(filesPath);
   return pages;
 };
 
 export const getPageBySlug = async (slug: string) => {
-  const pages = await getAllPages();
+  const pages = await getAllArticles();
   return pages.find(page => page.data.slug === slug);
 };
 
@@ -45,17 +65,17 @@ export const getNavigation = async () => {
     string,
     Set<{ title: string; position: number; slug: string }>
   >();
-  const pages = await getAllPages();
-  pages.forEach(({ data: { section, title, position, slug } }) => {
-    if (navigation.has(section)) {
-      const set = navigation.get(section);
+  const pages = await getAllArticles();
+  pages.forEach(({ data: { product, title, position, slug } }) => {
+    if (navigation.has(product)) {
+      const set = navigation.get(product);
       if (set) {
         set.add({ title, position, slug });
       }
     } else {
       const set = new Set<{ title: string; position: number; slug: string }>();
       set.add({ title, position, slug });
-      navigation.set(section, set);
+      navigation.set(product, set);
     }
   });
   return navigation;

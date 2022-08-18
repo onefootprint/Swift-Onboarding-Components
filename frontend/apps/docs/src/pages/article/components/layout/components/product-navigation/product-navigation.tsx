@@ -4,19 +4,19 @@ import React from 'react';
 import styled, { css } from 'styled-components';
 import { createFontStyles, Typography } from 'ui';
 
-type AsideNavigationProps = {
-  section: string;
+type ProductNavigationProps = {
+  name: string;
   items: { title: string; slug: string }[];
 };
 
-const AsideNavigation = ({ section, items }: AsideNavigationProps) => {
+const ProductNavigation = ({ name, items }: ProductNavigationProps) => {
   const router = useRouter();
 
   return (
-    <Aside>
-      <Section>
-        <Typography variant="label-4">{section}</Typography>
-      </Section>
+    <Container>
+      <Header>
+        <Typography variant="caption-1">{name}</Typography>
+      </Header>
       <nav>
         {items.map(({ title, slug }) => (
           <Link href={slug} key={slug}>
@@ -26,25 +26,27 @@ const AsideNavigation = ({ section, items }: AsideNavigationProps) => {
           </Link>
         ))}
       </nav>
-    </Aside>
+    </Container>
   );
 };
 
-const Aside = styled.aside`
+const Container = styled.aside`
   ${({ theme }) => css`
+    background: ${theme.backgroundColor.primary};
+    border-right: ${theme.borderWidth[1]}px solid ${theme.borderColor.tertiary};
     height: 100vh;
-    max-height: 100vh;
-    padding: ${theme.spacing[7]}px 0;
-    position: fixed;
+    padding: ${theme.spacing[7]}px ${theme.spacing[5]}px;
+    position: sticky;
     top: var(--header-height);
     width: 270px;
-    background: ${theme.backgroundColor.primary};
   `}
 `;
 
-const Section = styled.div`
+const Header = styled.header`
   ${({ theme }) => css`
-    padding-bottom: ${theme.spacing[5]}px;
+    margin-bottom: ${theme.spacing[5]}px;
+    margin-left: ${theme.spacing[4]}px;
+    text-transform: uppercase;
   `}
 `;
 
@@ -71,4 +73,4 @@ const Anchor = styled.a`
   `}
 `;
 
-export default AsideNavigation;
+export default ProductNavigation;

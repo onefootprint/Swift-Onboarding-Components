@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
-import type { Page } from 'src/types/page';
+import type { Article } from 'src/types/page';
 import styled, { css } from 'styled-components';
 import { createFontStyles } from 'ui';
 
@@ -8,9 +8,11 @@ import A from './components/a';
 import Code from './components/code';
 import H2 from './components/h2';
 import H3 from './components/h3';
+import Layout from './components/layout';
 
-type DocPageProps = {
-  page: Page;
+type ArticleProps = {
+  product: any;
+  article: Article;
 };
 
 const components = {
@@ -22,12 +24,13 @@ const components = {
 
 // TODO:
 // https://linear.app/footprint/issue/FP-1077/seo
-// https://linear.app/footprint/issue/FP-1076/adjust-spacings-based-on-layout
-const DocPage = ({ page }: DocPageProps) => (
-  <Container>
-    {/* @ts-ignore */}
-    <ReactMarkdown components={components}>{page.content}</ReactMarkdown>
-  </Container>
+const ArticlePage = ({ product, article }: ArticleProps) => (
+  <Layout product={product} article={article}>
+    <Container>
+      {/* @ts-ignore */}
+      <ReactMarkdown components={components}>{article.content}</ReactMarkdown>
+    </Container>
+  </Layout>
 );
 
 const Container = styled.div`
@@ -47,7 +50,7 @@ const Container = styled.div`
       }
 
       > li {
-        margin-bottom: ${theme.spacing[9]}px;
+        margin-bottom: ${theme.spacing[7]}px;
 
         p,
         li {
@@ -61,10 +64,10 @@ const Container = styled.div`
     }
 
     pre > div {
-      margin-top: -${theme.spacing[7] + theme.spacing[2]}px;
-      margin-bottom: ${theme.spacing[9]}px;
+      margin-top: -${theme.spacing[3]}px;
+      margin-bottom: ${theme.spacing[7]}px;
     }
   `};
 `;
 
-export default DocPage;
+export default ArticlePage;

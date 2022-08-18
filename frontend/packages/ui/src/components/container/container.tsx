@@ -39,39 +39,40 @@ const StyledContainer = styled.div<{ sx: SXStyles }>`
     margin-left: auto;
     margin-right: auto;
     ${sx};
-    ${media.between('xs', 'sm')`
+
+    &[data-fluid='true'] {
       width: 100%;
       padding-left: ${theme.grid.container.margin.xs}px;
       padding-right: ${theme.grid.container.margin.xs}px;
-    `}
-    ${media.between('sm', 'md')`
-      width: ${theme.grid.container.maxWidth.sm}px;
-      padding-left: ${theme.grid.container.margin.sm}px;
-      padding-right: ${theme.grid.container.margin.sm}px;
-    `}
-    ${media.between('md', 'lg')`
-      width: ${theme.grid.container.maxWidth.md}px;
-      padding-left: ${theme.grid.container.margin.md}px;
-      padding-right: ${theme.grid.container.margin.md}px;
-    `}
-    ${media.between('lg', 'xl')`
-      width: ${theme.grid.container.maxWidth.lg}px;
-      padding-left: ${theme.grid.container.margin.lg}px;
-      padding-right: ${theme.grid.container.margin.lg}px;
-    `}
-    
-    ${media.greaterThan('xl')`
-      &[data-fluid='true'] {
+    }
+
+    &[data-fluid='false'] {
+      ${media.between('xs', 'sm')`
         width: 100%;
         padding-left: ${theme.grid.container.margin.xs}px;
         padding-right: ${theme.grid.container.margin.xs}px;
-      }
-      &[data-fluid='false'] {
+      `}
+      ${media.between('sm', 'md')`
+        width: ${theme.grid.container.maxWidth.sm}px;
+        padding-left: ${theme.grid.container.margin.sm}px;
+        padding-right: ${theme.grid.container.margin.sm}px;
+      `}
+      ${media.between('md', 'lg')`
+        width: ${theme.grid.container.maxWidth.md}px;
+        padding-left: ${theme.grid.container.margin.md}px;
+        padding-right: ${theme.grid.container.margin.md}px;
+      `}
+      ${media.between('lg', 'xl')`
+        width: ${theme.grid.container.maxWidth.lg}px;
+        padding-left: ${theme.grid.container.margin.lg}px;
+        padding-right: ${theme.grid.container.margin.lg}px;
+      `}
+      ${media.greaterThan('xl')`
         width: ${theme.grid.container.maxWidth.xl}px;
         padding-left: ${theme.grid.container.margin.xl}px;
         padding-right: ${theme.grid.container.margin.xl}px;
-      }
-    `}
+      `}
+    }
   `}
 `;
 

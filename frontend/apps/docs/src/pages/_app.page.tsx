@@ -1,9 +1,8 @@
 import React from 'react';
-import { createGlobalStyle } from 'styled-components';
+import { createGlobalStyle, css } from 'styled-components';
 import themes from 'themes';
 import { DesignSystemProvider } from 'ui';
 
-import Layout from '../components/layout';
 import configureReactI18next from '../config/initializers/react-i18next';
 
 configureReactI18next();
@@ -16,17 +15,18 @@ type AppProps = {
 const App = ({ Component, pageProps }: AppProps) => (
   <DesignSystemProvider theme={themes.light}>
     <GlobalStyle />
-    <Layout navigation={pageProps.navigation}>
-      <Component {...pageProps} />
-    </Layout>
+    <Component {...pageProps} />
   </DesignSystemProvider>
 );
 
 const GlobalStyle = createGlobalStyle`
-  html {
-    --header-height: 54px;
-    scroll-padding-top: var(--header-height);
-  }
+  ${({ theme }) => css`
+    html {
+      --header-height: 54px;
+      scroll-padding-top: calc(var(--header-height) + ${theme.spacing[5]}px);
+      scroll-behavior: smooth;
+    }
+  `};
 `;
 
 export default App;
