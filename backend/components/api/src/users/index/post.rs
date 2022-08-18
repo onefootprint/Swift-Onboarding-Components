@@ -21,8 +21,8 @@ pub async fn post(
     let request = NewNonPortableUserVaultReq {
         e_private_key,
         public_key,
-        is_live: auth.is_live(&state.db_pool).await?,
-        tenant_id: auth.tenant_id(),
+        is_live: auth.is_live()?,
+        tenant_id: auth.tenant().id.clone(),
     };
 
     let scoped = db::user_vault::create_non_portable(&state.db_pool, request).await?;

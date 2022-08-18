@@ -1,5 +1,5 @@
 use crate::auth::key_context::secret_key::SecretTenantAuthContext;
-use crate::auth::session_data::workos::WorkOsSession;
+use crate::auth::session_data::workos::WorkOs;
 use crate::auth::Either;
 use crate::auth::HasTenant;
 use crate::auth::IsLive;
@@ -22,15 +22,15 @@ pub struct LivenessRequest {
 pub async fn get(
     state: web::Data<State>,
     request: web::Query<LivenessRequest>,
-    auth: Either<SessionContext<WorkOsSession>, SecretTenantAuthContext>,
+    auth: Either<SessionContext<WorkOs>, SecretTenantAuthContext>,
 ) -> actix_web::Result<Json<ApiResponseData<Vec<ApiLiveness>>>, ApiError> {
-    let tenant = auth.tenant(&state.db_pool).await?;
-    let is_live = auth.is_live(&state.db_pool).await?;
+    let tenant_id = auth.tenant().id.clone();
+    let is_live = auth.is_live()?;
 
     let creds = state
         .db_pool
         .db_query(move |conn| {
-            WebauthnCredential::get_for_scoped_user(conn, &tenant.id, &request.footprint_user_id, is_live)
+            WebauthnCredential::get_for_scoped_user(conn, &tenant_id, &request.footprint_user_id, is_live)
         })
         .await??;
 

@@ -1,5 +1,5 @@
 use crate::auth::key_context::secret_key::SecretTenantAuthContext;
-use crate::auth::session_data::workos::WorkOsSession;
+use crate::auth::session_data::workos::WorkOs;
 use crate::auth::{Either, IsLive};
 use crate::auth::{HasTenant, SessionContext};
 use crate::errors::ApiError;
@@ -22,14 +22,14 @@ use paperclip::actix::{api_v2_operation, patch, web, web::Json};
 pub async fn get(
     state: web::Data<State>,
     request: web::Query<PaginatedRequest<EmptyRequest, DateTime<Utc>>>,
-    auth: Either<SessionContext<WorkOsSession>, SecretTenantAuthContext>,
+    auth: Either<SessionContext<WorkOs>, SecretTenantAuthContext>,
 ) -> actix_web::Result<Json<ApiPaginatedResponseData<Vec<TenantApiKeyResponse>, DateTime<Utc>>>, ApiError> {
     let page_size = request.page_size(&state);
     let cursor = request.cursor;
 
     let query = ApiKeyListQuery {
-        tenant_id: auth.tenant_id(),
-        is_live: auth.is_live(&state.db_pool).await?,
+        tenant_id: auth.tenant().id.clone(),
+        is_live: auth.is_live()?,
     };
     let (keys, id_to_last_used, count) = state
         .db_pool
@@ -61,18 +61,19 @@ pub struct CreateApiKeyRequest {
 #[api_v2_operation(tags(PublicApi))]
 pub async fn post(
     state: web::Data<State>,
-    auth: Either<SessionContext<WorkOsSession>, SecretTenantAuthContext>,
+    auth: Either<SessionContext<WorkOs>, SecretTenantAuthContext>,
     request: web::Json<CreateApiKeyRequest>,
 ) -> actix_web::Result<Json<ApiResponseData<TenantApiKeyResponse>>, ApiError> {
-    let secret_key = SecretApiKey::generate(auth.is_live(&state.db_pool).await?);
-    let tenant = auth.tenant(&state.db_pool).await?;
+    let is_live = auth.is_live()?;
+    let secret_key = SecretApiKey::generate(is_live);
+    let tenant = auth.tenant();
     let new_key = TenantApiKey::create(
         &state.db_pool,
         request.into_inner().name,
         secret_key.fingerprint(&state.hmac_client).await?,
         secret_key.seal_to(&tenant.public_key)?,
-        tenant.id,
-        auth.is_live(&state.db_pool).await?,
+        tenant.id.clone(),
+        is_live,
     )
     .await?;
 
@@ -98,17 +99,17 @@ pub struct UpdateApiKeyRequest {
 #[patch("/{id}")]
 pub async fn patch(
     state: web::Data<State>,
-    auth: Either<SessionContext<WorkOsSession>, SecretTenantAuthContext>,
+    auth: Either<SessionContext<WorkOs>, SecretTenantAuthContext>,
     path: web::Path<UpdateApiKeyPath>,
     request: web::Json<UpdateApiKeyRequest>,
 ) -> actix_web::Result<Json<ApiResponseData<TenantApiKeyResponse>>, ApiError> {
-    let tenant = auth.tenant(&state.db_pool).await?;
-    let is_live = auth.is_live(&state.db_pool).await?;
+    let tenant_id = auth.tenant().id.clone();
+    let is_live = auth.is_live()?;
     let UpdateApiKeyPath { id } = path.into_inner();
     let UpdateApiKeyRequest { name, status } = request.into_inner();
     let result = state
         .db_pool
-        .db_transaction(move |conn| TenantApiKey::update(conn, id, tenant.id, is_live, name, status))
+        .db_transaction(move |conn| TenantApiKey::update(conn, id, tenant_id, is_live, name, status))
         .await?;
 
     Ok(Json(ApiResponseData::ok(TenantApiKeyResponse::from(result))))

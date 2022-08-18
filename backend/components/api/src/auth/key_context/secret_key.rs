@@ -4,14 +4,11 @@ use crate::{errors::ApiError, State};
 use actix_web::http::header::Header;
 use actix_web::{web, FromRequest};
 use actix_web_httpauth::headers::authorization::{Authorization, Basic};
-use async_trait::async_trait;
 use db::models::tenant::Tenant;
 use db::models::tenant_api_key::TenantApiKey;
-use db::DbPool;
 use futures_util::Future;
 
 use newtypes::secret_api_key::SecretApiKey;
-use newtypes::TenantId;
 use paperclip::actix::Apiv2Security;
 use std::pin::Pin;
 
@@ -30,11 +27,6 @@ pub struct SecretTenantAuthContext {
 }
 
 impl SecretTenantAuthContext {
-    /// get tenant secret key for context
-    pub fn tenant(&self) -> &Tenant {
-        &self.tenant
-    }
-
     /// get the tenant's api key id
     pub fn api_key(&self) -> &TenantApiKey {
         &self.api_key
@@ -83,20 +75,14 @@ fn parse_auth_key(req: &actix_web::HttpRequest) -> Result<SecretApiKey, ApiError
     Ok(tenant_sk_input)
 }
 
-#[async_trait]
 impl HasTenant for SecretTenantAuthContext {
-    fn tenant_id(&self) -> TenantId {
-        self.tenant().id.clone()
-    }
-
-    async fn tenant(&self, _pool: &DbPool) -> Result<Tenant, ApiError> {
-        Ok(self.tenant().clone())
+    fn tenant(&self) -> &Tenant {
+        &self.tenant
     }
 }
 
-#[async_trait]
 impl IsLive for SecretTenantAuthContext {
-    async fn is_live(&self, _pool: &DbPool) -> Result<bool, ApiError> {
+    fn is_live(&self) -> Result<bool, ApiError> {
         if self.tenant.sandbox_restricted && self.api_key.is_live {
             return Err(AuthError::SandboxRestricted.into());
         }

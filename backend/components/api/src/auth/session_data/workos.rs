@@ -2,13 +2,25 @@ use crate::{
     auth::{AuthError, ExtractableAuthSession, HasTenant, Principal, SupportsIsLiveHeader},
     errors::ApiError,
 };
-use async_trait::async_trait;
+use db::{models::tenant::Tenant, PgConnection};
 use newtypes::TenantId;
-use paperclip::actix::Apiv2Schema;
+use paperclip::actix::Apiv2Security;
 
 use super::AuthSessionData;
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, Apiv2Schema)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, Apiv2Security)]
+#[openapi(
+    apiKey,
+    in = "header",
+    name = "X-Fp-Dashboard-Authorization",
+    description = "Auth token for a dashboard user"
+)]
+pub struct WorkOs {
+    tenant: Tenant,
+    data: WorkOsSession,
+}
+
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
 pub struct WorkOsSession {
     pub email: String,
     pub first_name: Option<String>,
@@ -16,43 +28,42 @@ pub struct WorkOsSession {
     pub tenant_id: TenantId,
 }
 
-impl TryFrom<AuthSessionData> for WorkOsSession {
-    type Error = ApiError;
-
-    fn try_from(value: AuthSessionData) -> Result<Self, Self::Error> {
-        match value {
-            AuthSessionData::WorkOs(data) => Ok(data),
-            _ => Err(AuthError::SessionTypeError.into()),
-        }
-    }
-}
-
-impl ExtractableAuthSession for WorkOsSession {
+impl ExtractableAuthSession for WorkOs {
     fn header_names() -> Vec<&'static str> {
         vec!["X-Fp-Dashboard-Authorization"]
     }
-}
 
-#[async_trait]
-impl HasTenant for WorkOsSession {
-    fn tenant_id(&self) -> TenantId {
-        self.tenant_id.clone()
+    fn try_from(auth_session: AuthSessionData, conn: &mut PgConnection) -> Result<Self, ApiError> {
+        let data = match auth_session {
+            AuthSessionData::WorkOs(data) => data,
+            _ => {
+                return Err(AuthError::SessionTypeError.into());
+            }
+        };
+        let tenant = Tenant::get(conn, &data.tenant_id)?;
+        Ok(Self { data, tenant })
     }
 }
 
-impl Principal for WorkOsSession {
+impl HasTenant for WorkOs {
+    fn tenant(&self) -> &Tenant {
+        &self.tenant
+    }
+}
+
+impl Principal for WorkOs {
     fn format_principal(&self) -> String {
         // Show "Name (email)" as the principal if the name is set, otherwise just email
-        let name = match (&self.first_name, &self.last_name) {
+        let name = match (&self.data.first_name, &self.data.last_name) {
             (Some(first_name), Some(last_name)) => Some(format!("{} {}", first_name, last_name)),
             (Some(name), None) | (None, Some(name)) => Some(name.clone()),
             (None, None) => None,
         };
         match name {
-            Some(name) => format!("{} ({})", name, self.email),
-            None => self.email.clone(),
+            Some(name) => format!("{} ({})", name, self.data.email),
+            None => self.data.email.clone(),
         }
     }
 }
 
-impl SupportsIsLiveHeader for WorkOsSession {}
+impl SupportsIsLiveHeader for WorkOs {}

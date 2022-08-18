@@ -2,7 +2,7 @@ use std::collections::HashSet;
 
 use crate::auth::key_context::ob_public_key::PublicTenantAuthContext;
 use crate::auth::key_context::secret_key::SecretTenantAuthContext;
-use crate::auth::session_data::workos::WorkOsSession;
+use crate::auth::session_data::workos::WorkOs;
 use crate::auth::Either;
 use crate::auth::IsLive;
 use crate::auth::{HasTenant, SessionContext};
@@ -43,15 +43,15 @@ pub fn get_detail(
 async fn get(
     state: web::Data<State>,
     request: web::Query<PaginatedRequest<EmptyRequest, DateTime<Utc>>>,
-    auth: Either<SessionContext<WorkOsSession>, SecretTenantAuthContext>,
+    auth: Either<SessionContext<WorkOs>, SecretTenantAuthContext>,
 ) -> actix_web::Result<Json<ApiPaginatedResponseData<Vec<ApiObConfig>, DateTime<Utc>>>, ApiError> {
-    let tenant = auth.tenant(&state.db_pool).await?;
+    let tenant = auth.tenant();
     let cursor = request.cursor;
     let page_size = request.page_size(&state);
 
     let query = ObConfigurationQuery {
-        tenant_id: auth.tenant_id(),
-        is_live: auth.is_live(&state.db_pool).await?,
+        tenant_id: tenant.id.clone(),
+        is_live: auth.is_live()?,
     };
     let (configs, count) = state
         .db_pool
@@ -129,11 +129,11 @@ impl CreateOnboardingConfigurationRequest {
 /// Create a new onboarding configuration
 pub fn post(
     state: web::Data<State>,
-    auth: Either<SessionContext<WorkOsSession>, SecretTenantAuthContext>,
+    auth: Either<SessionContext<WorkOs>, SecretTenantAuthContext>,
     request: Json<CreateOnboardingConfigurationRequest>,
 ) -> actix_web::Result<Json<ApiResponseData<ApiObConfig>>, ApiError> {
     request.validate()?;
-    let tenant = auth.tenant(&state.db_pool).await?;
+    let tenant = auth.tenant().clone();
     let CreateOnboardingConfigurationRequest {
         name,
         must_collect_data_kinds,
@@ -143,10 +143,10 @@ pub fn post(
     let obc = ObConfiguration::create(
         &state.db_pool,
         name,
-        auth.tenant_id(),
+        tenant.id.clone(),
         must_collect_data_kinds,
         can_access_data_kinds,
-        auth.is_live(&state.db_pool).await?,
+        auth.is_live()?,
     )
     .await?;
 
@@ -169,12 +169,12 @@ struct UpdateObConfigRequest {
 /// Update an existing onboarding configuration
 async fn patch(
     state: web::Data<State>,
-    auth: Either<SessionContext<WorkOsSession>, SecretTenantAuthContext>,
+    auth: Either<SessionContext<WorkOs>, SecretTenantAuthContext>,
     path: web::Path<UpdateObConfigPath>,
     request: web::Json<UpdateObConfigRequest>,
 ) -> actix_web::Result<Json<ApiResponseData<ApiObConfig>>, ApiError> {
-    let tenant = auth.tenant(&state.db_pool).await?;
-    let is_live = auth.is_live(&state.db_pool).await?;
+    let tenant = auth.tenant().clone();
+    let is_live = auth.is_live()?;
     let UpdateObConfigPath { id } = path.into_inner();
     let UpdateObConfigRequest { name, status } = request.into_inner();
     let tenant_id = tenant.id.clone();

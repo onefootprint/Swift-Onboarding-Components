@@ -1,4 +1,4 @@
-use crate::auth::session_data::workos::WorkOsSession;
+use crate::auth::session_data::workos::WorkOs;
 use crate::auth::{HasTenant, SessionContext};
 use crate::errors::ApiError;
 use crate::types::response::ApiResponseData;
@@ -22,13 +22,13 @@ struct UpdateRequest {
 fn handler(
     state: web::Data<State>,
     request: Json<UpdateRequest>,
-    auth: SessionContext<WorkOsSession>,
+    auth: SessionContext<WorkOs>,
 ) -> actix_web::Result<Json<ApiResponseData<EmptyResponse>>, ApiError> {
     let request = request.into_inner();
 
     // update the tenant name
     UpdateTenantNameOrLogo {
-        id: auth.tenant_id(),
+        id: auth.tenant().id.clone(),
         name: request.name,
         logo_url: request.logo_url,
     }

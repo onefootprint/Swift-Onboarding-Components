@@ -1,9 +1,9 @@
 use async_trait::async_trait;
 use db::{
     models::{tenant::Tenant, user_vault::UserVault},
-    DbPool,
+    DbPool, PgConnection,
 };
-use newtypes::{TenantId, UserVaultId};
+use newtypes::UserVaultId;
 
 use crate::errors::ApiError;
 
@@ -20,26 +20,22 @@ pub trait VerifiedUserAuth {
 }
 
 /// A helper trait to get a Tenant on combined objects
-#[async_trait]
 pub trait HasTenant {
-    fn tenant_id(&self) -> TenantId;
-
-    async fn tenant(&self, pool: &DbPool) -> Result<Tenant, ApiError> {
-        Ok(db::tenant::get_tenant(pool, self.tenant_id()).await?)
-    }
+    fn tenant(&self) -> &Tenant;
 }
 
 /// A helper trait to extract whether the auth session is for sandbox or production data
-#[async_trait]
 pub trait IsLive {
-    async fn is_live(&self, pool: &DbPool) -> Result<bool, ApiError>;
+    fn is_live(&self) -> Result<bool, ApiError>;
 }
 
 pub trait SupportsIsLiveHeader {}
 
 /// Allows an auth session to be extracted from an actix request using the extractor SessionContext utility
-pub trait ExtractableAuthSession: TryFrom<AuthSessionData> {
+pub trait ExtractableAuthSession: Sized + Send + Sync + 'static {
     fn header_names() -> Vec<&'static str>;
+
+    fn try_from(auth_session: AuthSessionData, conn: &mut PgConnection) -> Result<Self, ApiError>;
 }
 
 /// Principal that is behind the SessionContext

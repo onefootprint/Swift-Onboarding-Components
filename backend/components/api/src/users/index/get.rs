@@ -1,5 +1,5 @@
 use crate::auth::key_context::secret_key::SecretTenantAuthContext;
-use crate::auth::session_data::workos::WorkOsSession;
+use crate::auth::session_data::workos::WorkOs;
 use crate::auth::Either;
 use crate::auth::HasTenant;
 use crate::auth::IsLive;
@@ -38,9 +38,9 @@ type UsersResponse = Vec<ApiScopedUser>;
 pub fn get(
     state: web::Data<State>,
     request: web::Query<PaginatedRequest<UsersRequest, i64>>,
-    auth: Either<SessionContext<WorkOsSession>, SecretTenantAuthContext>,
+    auth: Either<SessionContext<WorkOs>, SecretTenantAuthContext>,
 ) -> actix_web::Result<Json<ApiPaginatedResponseData<UsersResponse, i64>>, ApiError> {
-    let tenant = auth.tenant(&state.db_pool).await?;
+    let tenant = auth.tenant();
 
     let cursor = request.cursor;
     let page_size = request.page_size(&state);
@@ -67,7 +67,7 @@ pub fn get(
 
     let query_params = OnboardingListQueryParams {
         tenant_id: tenant.id.clone(),
-        is_live: auth.is_live(&state.db_pool).await?,
+        is_live: auth.is_live()?,
         statuses,
         fingerprints,
         footprint_user_id,

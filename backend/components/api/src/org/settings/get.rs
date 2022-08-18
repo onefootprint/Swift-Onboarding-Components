@@ -1,4 +1,4 @@
-use crate::auth::session_data::workos::WorkOsSession;
+use crate::auth::session_data::workos::WorkOs;
 use crate::auth::{HasTenant, SessionContext};
 use crate::errors::ApiError;
 use crate::types::response::ApiResponseData;
@@ -20,9 +20,9 @@ struct GetTenantResponse {
 #[get("/")]
 fn handler(
     state: web::Data<State>,
-    auth: SessionContext<WorkOsSession>,
+    auth: SessionContext<WorkOs>,
 ) -> actix_web::Result<Json<ApiResponseData<GetTenantResponse>>, ApiError> {
-    let tenant = auth.tenant(&state.db_pool).await?;
+    let tenant = auth.tenant();
 
     let email_domains = if let Some(org_id) = tenant.workos_id.as_ref() {
         let org = state
@@ -39,7 +39,7 @@ fn handler(
     //TODO: update tenant settings
     Ok(Json(ApiResponseData {
         data: GetTenantResponse {
-            name: tenant.name,
+            name: tenant.name.clone(),
             email_domains,
         },
     }))

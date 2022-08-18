@@ -1,10 +1,8 @@
 use std::pin::Pin;
 
 use actix_web::FromRequest;
-use async_trait::async_trait;
-use db::{models::tenant::Tenant, DbPool};
+use db::models::tenant::Tenant;
 use futures_util::Future;
-use newtypes::TenantId;
 use paperclip::actix::Apiv2Security;
 
 use crate::errors::ApiError;
@@ -68,37 +66,28 @@ where
     }
 }
 
-#[async_trait]
 impl<A, B> HasTenant for Either<A, B>
 where
-    A: HasTenant + Sync,
-    B: HasTenant + Sync,
+    A: HasTenant,
+    B: HasTenant,
 {
-    fn tenant_id(&self) -> TenantId {
+    fn tenant(&self) -> &Tenant {
         match self {
-            Either::Left(s) => s.tenant_id(),
-            Either::Right(s) => s.tenant_id(),
-        }
-    }
-
-    async fn tenant(&self, pool: &DbPool) -> Result<Tenant, ApiError> {
-        match self {
-            Either::Left(s) => s.tenant(pool).await,
-            Either::Right(s) => s.tenant(pool).await,
+            Either::Left(s) => s.tenant(),
+            Either::Right(s) => s.tenant(),
         }
     }
 }
 
-#[async_trait]
 impl<A, B> IsLive for Either<A, B>
 where
-    A: IsLive + Sync,
-    B: IsLive + Sync,
+    A: IsLive,
+    B: IsLive,
 {
-    async fn is_live(&self, pool: &DbPool) -> Result<bool, ApiError> {
+    fn is_live(&self) -> Result<bool, ApiError> {
         match self {
-            Either::Left(l) => l.is_live(pool).await,
-            Either::Right(r) => r.is_live(pool).await,
+            Either::Left(l) => l.is_live(),
+            Either::Right(r) => r.is_live(),
         }
     }
 }

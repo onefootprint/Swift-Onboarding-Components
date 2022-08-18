@@ -1,5 +1,5 @@
 use crate::auth::key_context::secret_key::SecretTenantAuthContext;
-use crate::auth::session_data::workos::WorkOsSession;
+use crate::auth::session_data::workos::WorkOs;
 use crate::auth::{AuthError, IsLive};
 use crate::auth::{Either, Principal};
 use crate::auth::{HasTenant, SessionContext};
@@ -29,7 +29,7 @@ type UserDecryptResponse = HashMap<DataKind, Option<String>>;
 #[post("/{footprint_user_id}/decrypt")]
 async fn post2(
     state: web::Data<State>,
-    auth: Either<SessionContext<WorkOsSession>, SecretTenantAuthContext>,
+    auth: Either<SessionContext<WorkOs>, SecretTenantAuthContext>,
     path: web::Path<FootprintUserId>,
     request: Json<UserDecryptRequest2>,
     insights: InsightHeaders,
@@ -61,7 +61,7 @@ struct UserDecryptRequest {
 #[post("/decrypt")]
 async fn post(
     state: web::Data<State>,
-    auth: Either<SessionContext<WorkOsSession>, SecretTenantAuthContext>,
+    auth: Either<SessionContext<WorkOs>, SecretTenantAuthContext>,
     request: Json<UserDecryptRequest>,
     insights: InsightHeaders,
 ) -> actix_web::Result<Json<ApiResponseData<UserDecryptResponse>>, ApiError> {
@@ -73,12 +73,12 @@ async fn post(
 /// Requires tenant secret key auth.
 async fn post_inner(
     state: web::Data<State>,
-    auth: Either<SessionContext<WorkOsSession>, SecretTenantAuthContext>,
+    auth: Either<SessionContext<WorkOs>, SecretTenantAuthContext>,
     request: Json<UserDecryptRequest>,
     insights: InsightHeaders,
 ) -> actix_web::Result<Json<ApiResponseData<UserDecryptResponse>>, ApiError> {
-    let tenant = auth.tenant(&state.db_pool).await?;
-    let is_live = auth.is_live(&state.db_pool).await?;
+    let tenant_id = auth.tenant().id.clone();
+    let is_live = auth.is_live()?;
     let UserDecryptRequest {
         footprint_user_id,
         attributes,
@@ -87,7 +87,7 @@ async fn post_inner(
     // look up tenant & user vault
     let (vault, scoped_user) = state
         .db_pool
-        .db_query(move |conn| UserVault::get_for_tenant(conn, &tenant.id, &footprint_user_id, is_live))
+        .db_query(move |conn| UserVault::get_for_tenant(conn, &tenant_id, &footprint_user_id, is_live))
         .await??;
 
     // if the vault is PORTABLE: check permissions on the scoped user onboarding configuration

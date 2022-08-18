@@ -1,11 +1,10 @@
 use std::{marker::PhantomData, pin::Pin};
 
 use actix_web::{http::header::HeaderMap, web, FromRequest};
-use async_trait::async_trait;
 use chrono::{DateTime, Utc};
-use db::DbPool;
+use db::models::tenant::Tenant;
 use futures_util::Future;
-use newtypes::{SessionAuthToken, TenantId, UserVaultId};
+use newtypes::{SessionAuthToken, UserVaultId};
 use paperclip::actix::Apiv2Security;
 
 use crate::{errors::ApiError, utils::session::AuthSession, State};
@@ -14,9 +13,9 @@ use super::{
     AuthError, ExtractableAuthSession, HasTenant, IsLive, Principal, SupportsIsLiveHeader, VerifiedUserAuth,
 };
 
+/// Abstract Session Context Type
 #[derive(Debug, Clone, Apiv2Security)]
 #[openapi(apiKey)]
-/// Abstract Session Context Type
 pub struct SessionContext<T> {
     pub data: T,
     pub auth_token: SessionAuthToken,
@@ -66,8 +65,13 @@ where
             // that they allow (example: UserSession<OnboardingSessionData>)
             // and if the session associated with the token cannot be converted to type T (in this case, OnboardingSession)
             // we fail
-            let session_data =
-                T::try_from(session.data).map_err(|_| AuthError::InvalidTokenForHeader(allowed_headers))?;
+            let session_data = state
+                .db_pool
+                .db_query(move |conn| {
+                    T::try_from(session.data, conn)
+                        .map_err(|_| AuthError::InvalidTokenForHeader(allowed_headers))
+                })
+                .await??;
             Ok(Self {
                 data: session_data,
                 auth_token,
@@ -88,22 +92,20 @@ where
     }
 }
 
-#[async_trait]
 impl<C> HasTenant for SessionContext<C>
 where
-    C: HasTenant + Sync + Send,
+    C: HasTenant,
 {
-    fn tenant_id(&self) -> TenantId {
-        self.data.tenant_id()
+    fn tenant(&self) -> &Tenant {
+        self.data.tenant()
     }
 }
 
-#[async_trait]
 impl<C> IsLive for SessionContext<C>
 where
-    C: SupportsIsLiveHeader + HasTenant + Sync + Send,
+    C: SupportsIsLiveHeader + HasTenant,
 {
-    async fn is_live(&self, pool: &DbPool) -> Result<bool, ApiError> {
+    fn is_live(&self) -> Result<bool, ApiError> {
         let is_live: Option<bool> = self
             .headers
             .0
@@ -112,7 +114,7 @@ where
             .and_then(|v| v.trim().parse::<bool>().ok());
 
         // error if the tenant is sandbox-restricted but is requesting live data
-        let is_sandbox_restricted = self.data.tenant(pool).await?.sandbox_restricted;
+        let is_sandbox_restricted = self.data.tenant().sandbox_restricted;
         if is_sandbox_restricted && is_live == Some(true) {
             return Err(AuthError::SandboxRestricted.into());
         }

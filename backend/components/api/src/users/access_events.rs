@@ -1,5 +1,5 @@
 use crate::auth::key_context::secret_key::SecretTenantAuthContext;
-use crate::auth::session_data::workos::WorkOsSession;
+use crate::auth::session_data::workos::WorkOs;
 use crate::auth::Either;
 use crate::auth::HasTenant;
 use crate::auth::IsLive;
@@ -36,7 +36,7 @@ type AccessEventResponse = Vec<ApiAccessEvent>;
 fn get(
     state: web::Data<State>,
     request: web::Query<PaginatedRequest<AccessEventRequest, i64>>,
-    auth: Either<SessionContext<WorkOsSession>, SecretTenantAuthContext>,
+    auth: Either<SessionContext<WorkOs>, SecretTenantAuthContext>,
 ) -> actix_web::Result<Json<ApiPaginatedResponseData<AccessEventResponse, i64>>, ApiError> {
     let page_size = request.page_size(&state);
     let cursor = request.cursor;
@@ -48,7 +48,7 @@ fn get(
         timestamp_gte,
     } = request.data.clone();
 
-    let tenant = auth.tenant(&state.db_pool).await?;
+    let tenant = auth.tenant();
     let params = AccessEventListQueryParams {
         tenant_id: tenant.id.clone(),
         fp_user_id: footprint_user_id.clone(),
@@ -56,7 +56,7 @@ fn get(
         timestamp_lte,
         timestamp_gte,
         kinds: data_kinds,
-        is_live: auth.is_live(&state.db_pool).await?,
+        is_live: auth.is_live()?,
     };
     let results =
         AccessEventListItemForTenant::get(&state.db_pool, params, cursor, (page_size + 1) as i64).await?;

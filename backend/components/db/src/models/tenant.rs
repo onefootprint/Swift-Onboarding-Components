@@ -1,5 +1,5 @@
-use crate::schema::tenant;
 use crate::DbPool;
+use crate::{schema::tenant, DbError};
 use diesel::prelude::*;
 
 use chrono::{DateTime, Utc};
@@ -20,6 +20,13 @@ pub struct Tenant {
     pub logo_url: Option<String>,
     pub workos_admin_profile_id: Option<String>,
     pub sandbox_restricted: bool,
+}
+
+impl Tenant {
+    pub fn get(conn: &mut PgConnection, id: &TenantId) -> Result<Self, DbError> {
+        let result = tenant::table.filter(tenant::id.eq(id)).first(conn)?;
+        Ok(result)
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]

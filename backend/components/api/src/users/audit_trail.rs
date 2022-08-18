@@ -1,5 +1,5 @@
 use crate::auth::key_context::secret_key::SecretTenantAuthContext;
-use crate::auth::session_data::workos::WorkOsSession;
+use crate::auth::session_data::workos::WorkOs;
 use crate::auth::Either;
 use crate::auth::HasTenant;
 use crate::auth::IsLive;
@@ -24,15 +24,15 @@ type AuditTrailResponse = Vec<ApiAuditTrail>;
 fn get(
     state: web::Data<State>,
     request: web::Query<AuditTrailRequest>,
-    auth: Either<SessionContext<WorkOsSession>, SecretTenantAuthContext>,
+    auth: Either<SessionContext<WorkOs>, SecretTenantAuthContext>,
 ) -> actix_web::Result<Json<ApiResponseData<AuditTrailResponse>>, ApiError> {
-    let tenant = auth.tenant(&state.db_pool).await?;
-    let is_live = auth.is_live(&state.db_pool).await?;
+    let tenant_id = auth.tenant().id.clone();
+    let is_live = auth.is_live()?;
 
     let logs = state
         .db_pool
         .db_query(move |conn| {
-            AuditTrail::get_for_tenant(conn, &tenant.id, &request.footprint_user_id, is_live)
+            AuditTrail::get_for_tenant(conn, &tenant_id, &request.footprint_user_id, is_live)
         })
         .await??;
 

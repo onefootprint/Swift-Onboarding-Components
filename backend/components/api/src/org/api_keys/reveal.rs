@@ -1,5 +1,5 @@
 use crate::auth::key_context::secret_key::SecretTenantAuthContext;
-use crate::auth::session_data::workos::WorkOsSession;
+use crate::auth::session_data::workos::WorkOs;
 use crate::auth::{Either, IsLive};
 use crate::auth::{HasTenant, SessionContext};
 use crate::errors::ApiError;
@@ -25,11 +25,11 @@ struct RevealRequest {
 async fn get(
     state: web::Data<State>,
     request: web::Path<RevealRequest>,
-    auth: Either<SessionContext<WorkOsSession>, SecretTenantAuthContext>,
+    auth: Either<SessionContext<WorkOs>, SecretTenantAuthContext>,
 ) -> actix_web::Result<Json<ApiResponseData<TenantApiKeyResponse>>, ApiError> {
     // TODO more strict auth for viewing secret keys
-    let is_live = auth.is_live(&state.db_pool).await?;
-    let tenant_id = auth.tenant_id();
+    let is_live = auth.is_live()?;
+    let tenant_id = auth.tenant().id.clone();
     let (key, last_used_at) = state
         .db_pool
         .db_query(move |conn| -> Result<_, ApiError> {
@@ -41,7 +41,7 @@ async fn get(
         })
         .await??;
 
-    let tenant = auth.tenant(&state.db_pool).await?;
+    let tenant = auth.tenant();
     let decrypted_secret_key = crate::enclave::decrypt_bytes(
         &state,
         &key.e_secret_api_key,

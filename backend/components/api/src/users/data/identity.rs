@@ -22,8 +22,8 @@ pub async fn post(
     tenant_auth: SecretTenantAuthContext,
 ) -> actix_web::Result<Json<ApiResponseData<EmptyResponse>>, ApiError> {
     let footprint_user_id = path.into_inner();
-    let tenant_id = tenant_auth.tenant_id();
-    let is_live = tenant_auth.is_live(&state.db_pool).await?;
+    let tenant_id = tenant_auth.tenant().id.clone();
+    let is_live = tenant_auth.is_live()?;
 
     let (user_vault, _scoped_user) = state
         .db_pool
