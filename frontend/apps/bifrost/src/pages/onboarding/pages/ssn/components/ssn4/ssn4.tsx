@@ -2,20 +2,20 @@ import { HeaderTitle } from 'footprint-ui';
 import { useInputMask, useTranslation } from 'hooks';
 import React from 'react';
 import { useForm } from 'react-hook-form';
-import { UserData, UserDataAttribute } from 'src/utils/state-machine/types';
 import styled, { css } from 'styled-components';
 import { Button, TextInput } from 'ui';
 
+import { SSN4Information } from '../../../../../../utils/state-machine/types';
 import ProgressHeader from '../../../../components/progress-header';
 
-type FormData = Required<Pick<UserData, UserDataAttribute.ssn>>;
+type FormData = SSN4Information;
 
-type SsnLastFourProps = {
+type SSN4Props = {
   isMutationLoading: boolean;
   onSubmit: (formData: FormData) => void;
 };
 
-const SsnLastFour = ({ isMutationLoading, onSubmit }: SsnLastFourProps) => {
+const SSN4 = ({ isMutationLoading, onSubmit }: SSN4Props) => {
   const inputMasks = useInputMask('en-US');
   const { t } = useTranslation('pages.onboarding.ssn.last-four');
   const {
@@ -30,13 +30,13 @@ const SsnLastFour = ({ isMutationLoading, onSubmit }: SsnLastFourProps) => {
       <Form onSubmit={handleSubmit(onSubmit)}>
         <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
         <TextInput
-          hasError={!!errors.ssn}
-          hintText={errors.ssn && t('form.error')}
+          hasError={!!errors.ssn4}
+          hintText={errors.ssn4 && t('form.error')}
           label={t('form.label')}
           mask={inputMasks.lastFourSsn}
           placeholder={t('form.placeholder')}
           type="tel"
-          {...register('ssn', {
+          {...register('ssn4', {
             required: true,
             // 0000 is not allowed, has to be 4 digits long
             pattern: /^((?!(0000))\d{4})$/,
@@ -57,4 +57,4 @@ const Form = styled.form`
   `}
 `;
 
-export default SsnLastFour;
+export default SSN4;

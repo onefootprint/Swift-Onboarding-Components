@@ -167,7 +167,7 @@ async fn get_user_by_identifier(
         }
         Identifier::Email(email) => (DataKind::Email, PiiString::from(email)),
     };
-    let sh_data = state.compute_fingerprint(data_kind, &data).await?;
+    let sh_data = state.compute_fingerprint(data_kind, data).await?;
     // TODO should we only look for verified emails?
     let existing_user = db::user_vault::get_by_fingerprint(&state.db_pool, sh_data).await?;
     Ok(existing_user)

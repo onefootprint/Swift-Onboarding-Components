@@ -47,16 +47,51 @@ impl PhoneNumber {
         Ok(results)
     }
 
+    pub fn get_primary(
+        conn: &mut PgConnection,
+        user_vault_id: &UserVaultId,
+    ) -> Result<Option<Self>, DbError> {
+        let result = phone_number::table
+            .filter(phone_number::user_vault_id.eq(user_vault_id))
+            .filter(phone_number::deactivated_at.is_null())
+            .filter(phone_number::priority.eq(DataPriority::Primary))
+            .first(conn)
+            .optional()?;
+        Ok(result)
+    }
+
+    pub fn get_by_id(
+        conn: &mut PgConnection,
+        user_vault_id: &UserVaultId,
+        phone_number_id: &PhoneNumberId,
+    ) -> Result<Self, DbError> {
+        let result = phone_number::table
+            .filter(phone_number::user_vault_id.eq(user_vault_id))
+            .filter(phone_number::id.eq(phone_number_id))
+            .first(conn)?;
+        Ok(result)
+    }
+
+    #[allow(clippy::too_many_arguments)]
     pub fn create(
         conn: &mut PgConnection,
         user_vault_id: UserVaultId,
         e_e164: SealedVaultBytes,
+        fp_e164: FingerprintData,
         e_country: SealedVaultBytes,
-        fingerprints: Vec<FingerprintData>,
+        fp_country: FingerprintData,
         is_verified: bool,
         priority: DataPriority,
     ) -> Result<PhoneNumber, DbError> {
-        let fingerprint_ids = Fingerprint::bulk_create(conn, fingerprints, &user_vault_id)?;
+        let fingerprint_ids = Fingerprint::bulk_create(
+            conn,
+            &user_vault_id,
+            vec![
+                (DataKind::PhoneNumber, fp_e164, is_verified),
+                (DataKind::PhoneCountry, fp_country, false),
+            ],
+        )?;
+
         let new_row = NewPhoneNumber {
             user_vault_id,
             fingerprint_ids,

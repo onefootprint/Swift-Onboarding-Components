@@ -34,11 +34,9 @@ pub enum DataKind {
     FirstName,
     LastName,
     Dob,
-    #[serde(rename = "ssn")]
-    #[serde(alias = "ssn9")]
     Ssn9,
-    StreetAddress,
-    StreetAddress2,
+    AddressLine1,
+    AddressLine2,
     City,
     State,
     Zip,
@@ -47,8 +45,6 @@ pub enum DataKind {
     PhoneNumber,
     /// Phone country iso code, like "US"
     PhoneCountry,
-    #[serde(rename = "last_four_ssn")]
-    #[serde(alias = "ssn4")]
     Ssn4,
 }
 
@@ -69,7 +65,7 @@ impl DataKind {
     }
 
     pub fn is_required(&self) -> bool {
-        !matches!(self, DataKind::StreetAddress2)
+        !matches!(self, DataKind::AddressLine2)
     }
 
     pub fn fingerprintable() -> impl Iterator<Item = DataKind> {

@@ -321,7 +321,11 @@ const createOnboardingMachine = ({
           if (event.type !== Events.ssnSubmitted) {
             return context;
           }
-          context.data.ssn = event.payload.ssn;
+          context.data = {
+            ...context.data,
+            ...event.payload,
+          };
+
           return context;
         }),
       },

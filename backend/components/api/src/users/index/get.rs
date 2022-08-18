@@ -11,6 +11,7 @@ use crate::utils::user_vault_wrapper::UserVaultWrapper;
 use crate::State;
 use crate::{auth::SessionContext, errors::ApiError};
 use chrono::{DateTime, Utc};
+use db::models::identity_data::HasIdentityDataFields;
 use db::models::onboardings::Onboarding;
 use db::scoped_users::OnboardingListQueryParams;
 use newtypes::{DataKind, Fingerprint, Fingerprinter, FootprintUserId, PiiString, Status};
@@ -57,7 +58,7 @@ pub fn get(
             let cleaned_data = fingerprint.clean_for_fingerprint();
 
             let fut_fingerprints =
-                DataKind::fingerprintable().map(|kind| state.compute_fingerprint(kind, &cleaned_data));
+                DataKind::fingerprintable().map(|kind| state.compute_fingerprint(kind, cleaned_data.clone()));
             let fingerprints: Vec<Fingerprint> = futures::future::try_join_all(fut_fingerprints).await?;
             Some(fingerprints)
         }

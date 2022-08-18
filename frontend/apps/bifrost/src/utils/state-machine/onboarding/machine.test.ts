@@ -14,14 +14,14 @@ describe('Onboarding Machine Tests', () => {
       UserDataAttribute.lastName,
       UserDataAttribute.email,
       UserDataAttribute.city,
-      UserDataAttribute.ssn,
+      UserDataAttribute.ssn9,
     ],
     canAccessDataKinds: [
       UserDataAttribute.firstName,
       UserDataAttribute.lastName,
       UserDataAttribute.email,
       UserDataAttribute.city,
-      UserDataAttribute.ssn,
+      UserDataAttribute.ssn9,
     ],
     orgName: 'tenantOrg',
   };
@@ -97,7 +97,7 @@ describe('Onboarding Machine Tests', () => {
           missingAttributes: [
             UserDataAttribute.firstName,
             UserDataAttribute.country,
-            UserDataAttribute.ssn,
+            UserDataAttribute.ssn9,
           ],
           missingWebauthnCredentials: false,
         },
@@ -107,7 +107,7 @@ describe('Onboarding Machine Tests', () => {
       expect(context.missingAttributes).toEqual([
         UserDataAttribute.firstName,
         UserDataAttribute.country,
-        UserDataAttribute.ssn,
+        UserDataAttribute.ssn9,
       ]);
       expect(context.missingWebauthnCredentials).toEqual(false);
 
@@ -150,6 +150,7 @@ describe('Onboarding Machine Tests', () => {
       expect(state.value).toEqual(States.ssn);
       context = state.context;
       expect(context.data.country).toEqual('US');
+      expect(context.data.zip).toEqual('94107');
 
       // Navigate to prev
       state = machine.send({
@@ -164,17 +165,18 @@ describe('Onboarding Machine Tests', () => {
       });
       context = state.context;
       expect(context.data.country).toEqual('TR');
+      expect(context.data.zip).toEqual('94107');
       expect(state.value).toEqual(States.ssn);
 
       state = machine.send({
         type: Events.ssnSubmitted,
         payload: {
-          ssn: '101010101',
+          ssn9: '101010101',
         },
       });
       expect(state.value).toEqual(States.onboardingComplete);
       context = state.context;
-      expect(context.data.ssn).toEqual('101010101');
+      expect(context.data.ssn9).toEqual('101010101');
     });
 
     it('Skips states without missing attributes', () => {
@@ -188,7 +190,7 @@ describe('Onboarding Machine Tests', () => {
         payload: {
           missingAttributes: [
             UserDataAttribute.firstName,
-            UserDataAttribute.ssn,
+            UserDataAttribute.ssn9,
           ],
           missingWebauthnCredentials: false,
         },
@@ -197,7 +199,7 @@ describe('Onboarding Machine Tests', () => {
       let { context } = state;
       expect(context.missingAttributes).toEqual([
         UserDataAttribute.firstName,
-        UserDataAttribute.ssn,
+        UserDataAttribute.ssn9,
       ]);
       expect(context.missingWebauthnCredentials).toEqual(false);
 
@@ -234,12 +236,12 @@ describe('Onboarding Machine Tests', () => {
       state = machine.send({
         type: Events.ssnSubmitted,
         payload: {
-          ssn: '101010101',
+          ssn9: '101010101',
         },
       });
       expect(state.value).toEqual(States.onboardingComplete);
       context = state.context;
-      expect(context.data.ssn).toEqual('101010101');
+      expect(context.data.ssn9).toEqual('101010101');
     });
   });
 

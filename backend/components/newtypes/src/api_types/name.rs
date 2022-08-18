@@ -1,33 +1,34 @@
 pub use derive_more::{Add, Display, From, FromStr, Into};
 use paperclip::actix::Apiv2Schema;
+use paperclip::v2::schema::TypedData;
 use serde::{Deserialize, Deserializer, Serialize};
-use std::fmt::{Debug, Display};
+use std::fmt::{Debug};
 use std::str::FromStr;
 
-use crate::{DataKind, Decomposable, NewData, PiiString};
+use crate::pii_helper::newtype_to_pii;
+
 
 #[doc = "Full Name"]
 #[derive(Debug, Clone, Hash, PartialEq, Eq, Serialize, Deserialize, Default, Apiv2Schema)]
 /// A struct representing first and last name. We uppercase all names for consistency
 pub struct FullName {
-    first_name: Name,
-    last_name: Name,
-}
-
-impl Decomposable for FullName {
-    fn decompose(self) -> Vec<NewData> {
-        NewData::list(vec![
-            (DataKind::FirstName, PiiString::from(self.first_name.0)),
-            (DataKind::LastName, PiiString::from(self.last_name.0)),
-        ])
-    }
+    pub first_name: Name,
+    pub last_name: Name,
 }
 
 #[doc = "Name"]
-#[derive(Clone, Hash, PartialEq, Eq, Serialize, Default, Apiv2Schema)]
+#[derive(Clone, Hash, PartialEq, Eq, Serialize, Default)]
 #[serde(transparent)]
 /// A string. We uppercase all names for consistency.
 pub struct Name(String);
+
+impl TypedData for Name {
+    fn data_type() -> paperclip::v2::models::DataType {
+        paperclip::v2::models::DataType::String
+    }
+}
+
+newtype_to_pii!(Name);
 
 impl FromStr for Name {
     type Err = crate::Error;
@@ -45,12 +46,6 @@ impl<'de> Deserialize<'de> for Name {
     {
         let s = String::deserialize(deserializer)?;
         FromStr::from_str(&s).map_err(serde::de::Error::custom)
-    }
-}
-
-impl Display for Name {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "<redacted>")
     }
 }
 

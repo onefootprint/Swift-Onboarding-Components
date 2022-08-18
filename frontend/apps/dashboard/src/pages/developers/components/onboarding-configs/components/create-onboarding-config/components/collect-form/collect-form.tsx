@@ -12,7 +12,7 @@ type FormData = DataKindForm & {
   addressKind?: VirtualDataKinds.addressFull | VirtualDataKinds.addressPartial;
   showAddressOptions: boolean;
   showSSNOptions: boolean;
-  ssnKind?: DataKinds.lastFourSsn | DataKinds.ssn;
+  ssnKind?: DataKinds.ssn4 | DataKinds.ssn9;
 };
 
 type CollectFormProps = {
@@ -27,7 +27,7 @@ const CollectForm = ({ defaultValues, onSubmit }: CollectFormProps) => {
   const [animateSSN] = useAutoAnimate<HTMLDivElement>();
   const [animateAddress] = useAutoAnimate<HTMLDivElement>();
   const [innerFields, setInnerFields] = useState({
-    ssn: defaultValues.last_four_ssn || defaultValues.ssn,
+    ssn: defaultValues.ssn4 || defaultValues.ssn9,
     address: defaultValues.address_full || defaultValues.address_partial,
   });
 
@@ -42,11 +42,11 @@ const CollectForm = ({ defaultValues, onSubmit }: CollectFormProps) => {
   };
 
   const getInitialSSNKind = () => {
-    if (defaultValues.ssn) {
-      return DataKinds.ssn;
+    if (defaultValues.ssn9) {
+      return DataKinds.ssn9;
     }
-    if (defaultValues.last_four_ssn) {
-      return DataKinds.lastFourSsn;
+    if (defaultValues.ssn4) {
+      return DataKinds.ssn4;
     }
     return undefined;
   };
@@ -64,7 +64,7 @@ const CollectForm = ({ defaultValues, onSubmit }: CollectFormProps) => {
   const handleSSNKindsChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { checked } = event.target;
     setInnerFields(prevState => ({ ...prevState, ssn: checked }));
-    setValue('ssnKind', checked ? DataKinds.ssn : undefined);
+    setValue('ssnKind', checked ? DataKinds.ssn9 : undefined);
   };
 
   const handleAddressChanged = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -83,8 +83,8 @@ const CollectForm = ({ defaultValues, onSubmit }: CollectFormProps) => {
     } = formData;
     onSubmit({
       ...rest,
-      [DataKinds.lastFourSsn]: ssnKind === DataKinds.lastFourSsn,
-      [DataKinds.ssn]: ssnKind === DataKinds.ssn,
+      [DataKinds.ssn4]: ssnKind === DataKinds.ssn4,
+      [DataKinds.ssn9]: ssnKind === DataKinds.ssn9,
       [VirtualDataKinds.addressFull]:
         addressKind === VirtualDataKinds.addressFull,
       [VirtualDataKinds.addressPartial]:
@@ -115,12 +115,12 @@ const CollectForm = ({ defaultValues, onSubmit }: CollectFormProps) => {
         {innerFields.ssn && (
           <Box sx={{ marginLeft: 5, marginBottom: 3 }}>
             <RadioInput
-              value={DataKinds.ssn}
+              value={DataKinds.ssn9}
               label={t('collect-form.ssn_full')}
               {...register('ssnKind')}
             />
             <RadioInput
-              value={DataKinds.lastFourSsn}
+              value={DataKinds.ssn4}
               label={t('collect-form.ssn_last_4')}
               {...register('ssnKind')}
             />

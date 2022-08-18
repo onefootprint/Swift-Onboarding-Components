@@ -6,7 +6,6 @@ pub mod data;
 pub mod decrypt;
 pub mod index;
 pub mod liveness;
-pub mod update;
 pub mod validate;
 
 pub fn routes() -> web::Scope {
@@ -20,7 +19,6 @@ pub fn routes() -> web::Scope {
         .service(audit_trail::get)
         .service(decrypt::post)
         .service(decrypt::post2)
-        .service(update::post)
         .service(liveness::get)
         .service(validate::validate)
         .service(data::routes())

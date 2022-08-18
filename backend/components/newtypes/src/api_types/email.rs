@@ -1,17 +1,23 @@
 pub use derive_more::{Add, Display, From, FromStr, Into};
-use paperclip::actix::Apiv2Schema;
+use paperclip::v2::schema::TypedData;
 use regex::Regex;
 use serde::{Deserialize, Deserializer, Serialize};
 use std::str::FromStr;
 
-use crate::{DataKind, Decomposable, NewData, PiiString};
+use crate::PiiString;
 
-#[derive(Clone, Hash, PartialEq, Eq, Serialize, Default, Apiv2Schema)]
+#[derive(Clone, Hash, PartialEq, Eq, Serialize, Default)]
 /// Email address. Will be checked against a basic regex for validity and
 /// uppercased for consistency.
 pub struct Email {
     pub email: PiiString,
     pub suffix: String,
+}
+
+impl TypedData for Email {
+    fn data_type() -> paperclip::v2::models::DataType {
+        paperclip::v2::models::DataType::String
+    }
 }
 
 impl Email {
@@ -35,12 +41,6 @@ impl Email {
 lazy_static! {
     pub static ref EMAIL_RE: Regex =
         Regex::new(r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)").unwrap();
-}
-
-impl Decomposable for Email {
-    fn decompose(self) -> Vec<NewData> {
-        NewData::single(DataKind::Email, self.to_piistring())
-    }
 }
 
 impl std::str::FromStr for Email {

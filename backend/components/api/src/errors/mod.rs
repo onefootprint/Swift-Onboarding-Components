@@ -18,6 +18,8 @@ use crate::types::error::{ApiResponseError, ApiResponseErrorInfo};
 
 use self::{challenge::ChallengeError, handoff::HandoffError};
 
+pub type ApiResult<T> = Result<T, ApiError>;
+
 #[allow(clippy::large_enum_variant)]
 #[derive(Debug, Error)]
 pub enum ApiError {

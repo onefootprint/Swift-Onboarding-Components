@@ -131,7 +131,11 @@ def create_basic_user(twilio, suffix=None):
     user_data = {
         "email": sandbox_email,
     }
-    post("hosted/user/data", user_data, auth_token)
+    post(
+        "hosted/user/email",
+        user_data,
+        auth_token,
+    )
 
     return BasicUser(
         auth_token=auth_token,
@@ -171,16 +175,14 @@ def build_user_data():
             "year": 1995,
         },
         "address": {
-            "address": {
-                "street_address": "1 Footprint Way",
-                "street_address_2": "PO Box Wallaby Way",
-            },
+            "line1": "1 Footprint Way",
+            "line2": "PO Box Wallaby Way",
             "city": "Enclave",
             "state": "NY",
             "zip": "10009",
             "country": "US",
         },
-        "ssn": ssn,
+        "ssn9": ssn,
     }
     return user_data
 

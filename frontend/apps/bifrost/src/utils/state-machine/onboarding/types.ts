@@ -2,6 +2,7 @@ import { DeviceInfo } from 'hooks';
 import {
   BasicInformation,
   ResidentialAddress,
+  SSNInformation,
   TenantInfo,
   UserData,
   UserDataAttribute,
@@ -70,5 +71,8 @@ export type MachineEvents =
         residentialAddress: ResidentialAddress;
       };
     }
-  | { type: Events.ssnSubmitted; payload: { [UserDataAttribute.ssn]: string } }
+  | {
+      type: Events.ssnSubmitted;
+      payload: SSNInformation;
+    }
   | { type: Events.navigatedToPrevPage };

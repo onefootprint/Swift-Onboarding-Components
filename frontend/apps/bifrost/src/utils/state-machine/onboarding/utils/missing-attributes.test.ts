@@ -96,33 +96,31 @@ describe('MissingAttributesUtils', () => {
 
     it('should return false if the user has SSN', () => {
       expect(
-        isMissingSsnAttribute([UserDataAttribute.ssn], {
-          [UserDataAttribute.ssn]: '000000',
+        isMissingSsnAttribute([UserDataAttribute.ssn9], {
+          [UserDataAttribute.ssn9]: '000000',
         }),
       ).toEqual(false);
     });
 
     it('should return false if the user has last 4 digits of SSN', () => {
       expect(
-        isMissingSsnAttribute([UserDataAttribute.lastFourSsn], {
-          [UserDataAttribute.lastFourSsn]: '000000',
+        isMissingSsnAttribute([UserDataAttribute.ssn4], {
+          [UserDataAttribute.ssn4]: '000000',
         }),
       ).toEqual(false);
     });
 
     it('should return true if the user does not have the SSN', () => {
-      expect(isMissingSsnAttribute([UserDataAttribute.ssn], {})).toEqual(true);
+      expect(isMissingSsnAttribute([UserDataAttribute.ssn9], {})).toEqual(true);
+      expect(isMissingSsnAttribute([UserDataAttribute.ssn4], {})).toEqual(true);
       expect(
-        isMissingSsnAttribute([UserDataAttribute.lastFourSsn], {}),
-      ).toEqual(true);
-      expect(
-        isMissingSsnAttribute([UserDataAttribute.lastFourSsn], {
-          ssn: '0000000',
+        isMissingSsnAttribute([UserDataAttribute.ssn4], {
+          [UserDataAttribute.ssn9]: '0000000',
         }),
       ).toEqual(true);
       expect(
-        isMissingSsnAttribute([UserDataAttribute.ssn], {
-          last_four_ssn: '0000',
+        isMissingSsnAttribute([UserDataAttribute.ssn9], {
+          [UserDataAttribute.ssn4]: '0000',
         }),
       ).toEqual(true);
     });
@@ -177,7 +175,7 @@ describe('MissingAttributesUtils', () => {
       expect(
         getMaxStepFromMissingAttributes([
           UserDataAttribute.firstName,
-          UserDataAttribute.ssn,
+          UserDataAttribute.ssn9,
         ]),
       ).toEqual(2);
 
@@ -192,7 +190,7 @@ describe('MissingAttributesUtils', () => {
         getMaxStepFromMissingAttributes([
           UserDataAttribute.firstName,
           UserDataAttribute.city,
-          UserDataAttribute.ssn,
+          UserDataAttribute.ssn9,
         ]),
       ).toEqual(3);
     });

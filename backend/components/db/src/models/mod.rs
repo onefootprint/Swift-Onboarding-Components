@@ -1,8 +1,8 @@
 pub mod access_events;
-pub mod address;
 pub mod audit_trails;
 pub mod email;
 pub mod fingerprint;
+pub mod identity_data;
 pub mod insight_event;
 pub mod ob_configurations;
 pub mod onboardings;
@@ -12,7 +12,6 @@ pub mod sessions;
 pub mod tenant_api_key_access_log;
 pub mod tenant_api_keys;
 pub mod tenants;
-pub mod user_profile;
 pub mod user_vaults;
 pub mod verification_request;
 pub mod verification_result;

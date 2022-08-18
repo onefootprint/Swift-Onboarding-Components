@@ -26,9 +26,9 @@ def can_access_data_kinds():
         "first_name",
         "last_name",
         "dob",
-        "ssn",
-        "street_address",
-        "street_address2",
+        "ssn9",
+        "address_line1",
+        "address_line2",
         "state",
         "zip",
         "country",
@@ -105,7 +105,7 @@ def user(workos_sandbox_tenant, twilio):
     )
 
     # Populate the user's data
-    post("hosted/user/data", user_data, basic_user.auth_token)
+    post("hosted/user/data/identity", user_data, basic_user.auth_token)
 
     # Register the biometric credential
     webauthn_device = SoftWebauthnDevice()
@@ -140,10 +140,11 @@ def user(workos_sandbox_tenant, twilio):
         fp_user_id=fp_user_id,
         first_name=user_data["name"]["first_name"],
         last_name=user_data["name"]["last_name"],
-        street_address=user_data["address"]["address"]["street_address"],
+        address_line1=user_data["address"]["line1"],
+        address_line2=user_data["address"]["line2"],
         zip=user_data["address"]["zip"],
         country=user_data["address"]["country"],
-        ssn=user_data["ssn"],
+        ssn=user_data["ssn9"],
         phone_number=basic_user.phone_number,
         real_phone_number=basic_user.real_phone_number,
         email=basic_user.email,

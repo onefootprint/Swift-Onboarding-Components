@@ -1,17 +1,23 @@
-use crate::{DataKind, Decomposable, NewData, PhoneError, PiiString};
+use crate::{PhoneError, PiiString};
 
 pub use derive_more::{Add, Display, From, FromStr, Into};
-use paperclip::actix::Apiv2Schema;
+use paperclip::v2::schema::TypedData;
 use serde::{Deserialize, Deserializer, Serialize};
 use std::fmt::Debug;
 use std::marker::PhantomData;
 use std::str::FromStr;
 
-#[derive(Clone, Hash, PartialEq, Eq, Serialize, Default, Apiv2Schema)]
+#[derive(Clone, Hash, PartialEq, Eq, Serialize, Default)]
 /// Phone number string. Must be valid e164 length and include a country code
 pub struct PhoneNumber {
     pub number: PiiString,
     pub suffix: String,
+}
+
+impl TypedData for PhoneNumber {
+    fn data_type() -> paperclip::v2::models::DataType {
+        paperclip::v2::models::DataType::String
+    }
 }
 
 impl PhoneNumber {
@@ -21,6 +27,16 @@ impl PhoneNumber {
 
     fn is_live(&self) -> bool {
         self.suffix.is_empty()
+    }
+}
+
+impl From<PhoneNumber> for PiiString {
+    fn from(phone: PhoneNumber) -> Self {
+        if phone.suffix.is_empty() {
+            phone.number
+        } else {
+            PiiString::from(format!("{}#{}", phone.number.leak(), phone.suffix))
+        }
     }
 }
 
@@ -124,16 +140,6 @@ impl ValidatedPhoneNumber {
         let mut phone_number = self.e164.leak().to_owned();
         let len = phone_number.len();
         phone_number.drain((len - 2)..len).into_iter().collect()
-    }
-}
-
-impl Decomposable for ValidatedPhoneNumber {
-    fn decompose(self) -> Vec<NewData> {
-        let data = vec![
-            (DataKind::PhoneNumber, self.to_piistring()),
-            (DataKind::PhoneCountry, self.iso_country_code),
-        ];
-        NewData::list(data)
     }
 }
 

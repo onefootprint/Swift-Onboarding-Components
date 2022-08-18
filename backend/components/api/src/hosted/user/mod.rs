@@ -1,5 +1,5 @@
 use crate::{errors::ApiError, utils::user_vault_wrapper::UserVaultWrapper, State};
-use db::models::user_vaults::UserVault;
+use db::models::{user_vaults::UserVault, identity_data::HasIdentityDataFields};
 use enclave_proxy::DataTransform;
 use newtypes::{DataKind, PiiString, SealedVaultBytes};
 use paperclip::actix::web;
@@ -8,10 +8,10 @@ use std::collections::HashMap;
 pub mod access_events;
 pub mod authorized_orgs;
 pub mod biometric;
-pub mod data;
 pub mod decrypt;
 pub mod detail;
 pub mod email;
+pub mod identity_data;
 pub mod liveness;
 pub mod token;
 
@@ -19,7 +19,7 @@ pub fn routes() -> web::Scope {
     web::scope("/user")
         .service(web::resource("").route(web::get().to(detail::handler)))
         .service(authorized_orgs::handler)
-        .service(data::handler)
+        .service(identity_data::handler)
         .service(decrypt::handler)
         .service(access_events::handler)
         .service(biometric::init)
@@ -43,7 +43,7 @@ pub async fn decrypt(
     let uvw = UserVaultWrapper::from(&state.db_pool, user_vault).await?;
     let (fields_to_decrypt, e_datas): (Vec<DataKind>, Vec<&SealedVaultBytes>) = data_kinds
         .iter()
-        .filter_map(|kind| uvw.get_e_field(kind).map(|data| (kind, data)))
+        .filter_map(|kind| uvw.get_e_field(*kind).map(|data| (kind, data)))
         .unzip();
 
     // Actually decrypt the fields

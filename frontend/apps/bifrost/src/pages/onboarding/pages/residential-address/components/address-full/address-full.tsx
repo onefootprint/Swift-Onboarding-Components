@@ -27,8 +27,8 @@ import getInitialCountry from '../../utils/get-initial-country/get-initial-count
 import getInitialState from '../../utils/get-initial-state/get-initial-state';
 
 type FormData = {
-  [UserDataAttribute.streetAddress]: string;
-  [UserDataAttribute.streetAddress2]: string;
+  [UserDataAttribute.addressLine1]: string;
+  [UserDataAttribute.addressLine2]: string;
   [UserDataAttribute.city]: string;
   [UserDataAttribute.state]: string | SelectOption;
   [UserDataAttribute.country]: CountrySelectOption;
@@ -60,9 +60,8 @@ const AddressFull = ({ isMutationLoading, onSubmit }: AddressFullProps) => {
       [UserDataAttribute.state]: getInitialState(data[UserDataAttribute.state]),
       [UserDataAttribute.city]: data[UserDataAttribute.city],
       [UserDataAttribute.zip]: data[UserDataAttribute.zip],
-      [UserDataAttribute.streetAddress]: data[UserDataAttribute.streetAddress],
-      [UserDataAttribute.streetAddress2]:
-        data[UserDataAttribute.streetAddress2],
+      [UserDataAttribute.addressLine1]: data[UserDataAttribute.addressLine1],
+      [UserDataAttribute.addressLine2]: data[UserDataAttribute.addressLine2],
     },
   });
   const country = watch(UserDataAttribute.country);
@@ -70,8 +69,8 @@ const AddressFull = ({ isMutationLoading, onSubmit }: AddressFullProps) => {
 
   const onSubmitFormData = (formData: FormData) => {
     onSubmit({
-      streetAddress: formData.streetAddress,
-      streetAddress2: formData.streetAddress2,
+      address_line1: formData.address_line1,
+      address_line2: formData.address_line2,
       city: formData.city,
       zip: formData.zip,
       country: formData.country.value,
@@ -83,9 +82,9 @@ const AddressFull = ({ isMutationLoading, onSubmit }: AddressFullProps) => {
   };
 
   const handleCountryChange = () => {
-    setFocus(UserDataAttribute.streetAddress);
-    setValue(UserDataAttribute.streetAddress, '');
-    setValue(UserDataAttribute.streetAddress2, '');
+    setFocus(UserDataAttribute.addressLine1);
+    setValue(UserDataAttribute.addressLine1, '');
+    setValue(UserDataAttribute.addressLine2, '');
     setValue(UserDataAttribute.city, '');
     setValue(UserDataAttribute.state, '');
     setValue(UserDataAttribute.zip, '');
@@ -98,7 +97,7 @@ const AddressFull = ({ isMutationLoading, onSubmit }: AddressFullProps) => {
       const formattedStreetAddress =
         prediction?.structured_formatting.main_text;
       if (formattedStreetAddress) {
-        setValue(UserDataAttribute.streetAddress, formattedStreetAddress);
+        setValue(UserDataAttribute.addressLine1, formattedStreetAddress);
       }
 
       const result = await getAddressComponent(prediction);
@@ -148,25 +147,28 @@ const AddressFull = ({ isMutationLoading, onSubmit }: AddressFullProps) => {
         />
         <AddressInput
           country={country.value}
-          hasError={!!errors.streetAddress}
-          hintText={errors.streetAddress && t('form.address-line-1.error')}
+          hasError={!!errors[UserDataAttribute.addressLine1]}
+          hintText={
+            errors[UserDataAttribute.addressLine1] &&
+            t('form.address-line-1.error')
+          }
           label={t('form.address-line-1.label')}
           onSelect={handleAddressSelect}
           placeholder={t('form.address-line-1.placeholder')}
-          {...register(UserDataAttribute.streetAddress, { required: true })}
+          {...register(UserDataAttribute.addressLine1, { required: true })}
         />
         <TextInput
           autoComplete="address-line2"
           label={t('form.address-line-2.label')}
           placeholder={t('form.address-line-2.placeholder')}
-          {...register(UserDataAttribute.streetAddress2)}
+          {...register(UserDataAttribute.addressLine2)}
         />
         <Grid.Row>
           <Grid.Column col={6}>
             <TextInput
               autoComplete="address-level2"
-              hasError={!!errors.city}
-              hintText={errors.city && t('form.city.error')}
+              hasError={!!errors[UserDataAttribute.city]}
+              hintText={errors[UserDataAttribute.city] && t('form.city.error')}
               label={t('form.city.label')}
               placeholder={t('form.city.placeholder')}
               {...register(UserDataAttribute.city, { required: true })}
@@ -175,8 +177,10 @@ const AddressFull = ({ isMutationLoading, onSubmit }: AddressFullProps) => {
           <Grid.Column col={6}>
             <TextInput
               autoComplete="postal-code"
-              hasError={!!errors.zip}
-              hintText={errors.zip && t('form.zipCode.error')}
+              hasError={!!errors[UserDataAttribute.zip]}
+              hintText={
+                errors[UserDataAttribute.zip] && t('form.zipCode.error')
+              }
               label={t('form.zipCode.label')}
               mask={zipcode.mask}
               maxLength={zipcode.maxLength}
@@ -213,8 +217,8 @@ const AddressFull = ({ isMutationLoading, onSubmit }: AddressFullProps) => {
         ) : (
           <TextInput
             autoComplete="address-level1"
-            hasError={!!errors.state}
-            hintText={errors.state && t('form.state.error')}
+            hasError={!!errors[UserDataAttribute.state]}
+            hintText={errors[UserDataAttribute.state] && t('form.state.error')}
             label={t('form.state.label')}
             placeholder={t('form.state.placeholder')}
             {...register(UserDataAttribute.state)}

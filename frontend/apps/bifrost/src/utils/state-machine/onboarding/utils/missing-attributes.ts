@@ -8,8 +8,8 @@ const BASIC_ATTRIBUTES = new Set([
 ]);
 
 const RESIDENTIAL_ATTRIBUTES = new Set([
-  UserDataAttribute.streetAddress,
-  UserDataAttribute.streetAddress2,
+  UserDataAttribute.addressLine1,
+  UserDataAttribute.addressLine2,
   UserDataAttribute.city,
   UserDataAttribute.state,
   UserDataAttribute.country,
@@ -61,9 +61,9 @@ export const isMissingSsnAttribute = (
   if (!missingAttributes.length) {
     return false;
   }
-  const missingFullSsn = missingAttributes.indexOf(UserDataAttribute.ssn) > -1;
+  const missingFullSsn = missingAttributes.indexOf(UserDataAttribute.ssn9) > -1;
   const missingLast4Ssn =
-    missingAttributes.indexOf(UserDataAttribute.lastFourSsn) > -1;
+    missingAttributes.indexOf(UserDataAttribute.ssn4) > -1;
 
   if (!missingFullSsn && !missingLast4Ssn) {
     return false;
@@ -73,10 +73,10 @@ export const isMissingSsnAttribute = (
     return true;
   }
 
-  if (missingFullSsn && !data[UserDataAttribute.ssn]) {
+  if (missingFullSsn && !data[UserDataAttribute.ssn9]) {
     return true;
   }
-  if (missingLast4Ssn && !data[UserDataAttribute.lastFourSsn]) {
+  if (missingLast4Ssn && !data[UserDataAttribute.ssn4]) {
     return true;
   }
   return false;

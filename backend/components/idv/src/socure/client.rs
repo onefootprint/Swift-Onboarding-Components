@@ -132,7 +132,7 @@ mod tests {
     use newtypes::email::Email;
     use newtypes::name::Name;
     use newtypes::phone_number::*;
-    use newtypes::ssn::FullSsn;
+    use newtypes::ssn::Ssn9;
 
     #[actix_rt::test]
     #[ignore]
@@ -164,7 +164,7 @@ mod tests {
         let email: Email = Email::from_str("beep@boop.org").unwrap();
         let bad_dob: Dob = serde_json::from_str("{\"month\": 1, \"day\": 9, \"year\": 1998 }").unwrap();
         let dob: DateOfBirth = DateOfBirth::try_from(bad_dob).unwrap();
-        let ssn: FullSsn = FullSsn::from_str("123456789").unwrap();
+        let ssn: Ssn9 = Ssn9::from_str("123456789").unwrap();
 
         let request = IdentifyRequest {
             first_name,

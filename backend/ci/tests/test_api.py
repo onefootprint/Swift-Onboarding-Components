@@ -15,12 +15,12 @@ class TestNonPortableVaultApi:
 
         # post data to it
         data = build_user_data()
-        post(f"users/{fp_id}/data", data, workos_sandbox_tenant.sk.key)
+        post(f"users/{fp_id}/data/identity", data, workos_sandbox_tenant.sk.key)
 
         data = dict(reason="test", attributes=["first_name", "zip", "city"])
         body = post(f"users/{fp_id}/decrypt", data, workos_sandbox_tenant.sk.key)
         data = body["data"]
-
+        print(data)
         assert data["first_name"] == "SANDBOX"
         assert data["zip"] == "10009"
         assert data["city"] == "Enclave".upper()

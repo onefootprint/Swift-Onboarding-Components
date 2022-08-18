@@ -1,9 +1,8 @@
 use paperclip::actix::web;
 
-pub mod addresses;
+pub mod identity;
 
 pub fn routes() -> web::Scope {
-    web::scope("/{fp_user_id}")
-        .service(addresses::get)
-        .service(addresses::decrypt)
+    web::scope("/{footprint_user_id}/data")
+        .service(identity::post)
 }

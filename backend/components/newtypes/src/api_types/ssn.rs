@@ -1,48 +1,49 @@
 pub use derive_more::{Add, Display, From, FromStr, Into};
-use paperclip::actix::Apiv2Schema;
+use paperclip::{actix::Apiv2Schema, v2::schema::TypedData};
 use serde::{Deserialize, Deserializer, Serialize};
 use std::str::FromStr;
 
-use crate::{DataKind, Decomposable, NewData, PiiString};
+use crate::pii_helper::newtype_to_pii;
 
 #[doc = "Social security number -- 9 digit or 4 digit numeric string"]
 #[derive(Debug, Clone, Hash, PartialEq, Eq, Serialize, Deserialize, Apiv2Schema)]
-#[serde(untagged)]
 /// 9 digit social security number
 pub enum Ssn {
-    Ssn(FullSsn),
-    LastFour(LastFourSsn),
-}
-
-impl Decomposable for Ssn {
-    fn decompose(self) -> Vec<NewData> {
-        let list = match self {
-            Ssn::Ssn(ssn) => {
-                let last_four = LastFourSsn::from(&ssn);
-                vec![
-                    (DataKind::Ssn4, PiiString::from(&last_four.0)),
-                    (DataKind::Ssn9, PiiString::from(&ssn.0)),
-                ]
-            }
-            Ssn::LastFour(last_four) => vec![(DataKind::Ssn4, PiiString::from(&last_four.0))],
-        };
-        NewData::list(list)
-    }
+    #[serde(rename = "ssn9")]
+    Ssn9(Ssn9),
+    #[serde(rename = "ssn4")]
+    Ssn4(Ssn4),
 }
 
 #[doc = "Social security number -- 9 digit numeric string"]
-#[derive(Clone, Hash, PartialEq, Eq, Serialize, Default, Apiv2Schema)]
+#[derive(Clone, Hash, PartialEq, Eq, Serialize, Default)]
 #[serde(transparent)]
 /// 9 digit social security number
-pub struct FullSsn(String);
+pub struct Ssn9(String);
+
+impl TypedData for Ssn9 {
+    fn data_type() -> paperclip::v2::models::DataType {
+        paperclip::v2::models::DataType::String
+    }
+}
+
+newtype_to_pii!(Ssn9);
 
 #[doc = "Last four digits of ssn -- 4 digit numeric string"]
-#[derive(Clone, Hash, PartialEq, Eq, Serialize, Default, Apiv2Schema)]
+#[derive(Clone, Hash, PartialEq, Eq, Serialize, Default)]
 /// Last four digits of social security number
 #[serde(transparent)]
-pub struct LastFourSsn(String);
+pub struct Ssn4(String);
 
-impl std::str::FromStr for FullSsn {
+impl TypedData for Ssn4 {
+    fn data_type() -> paperclip::v2::models::DataType {
+        paperclip::v2::models::DataType::String
+    }
+}
+
+newtype_to_pii!(Ssn4);
+
+impl std::str::FromStr for Ssn9 {
     type Err = crate::Error;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
@@ -51,18 +52,18 @@ impl std::str::FromStr for FullSsn {
         if number.len() != 9 {
             return Err(crate::Error::InvalidSsn);
         }
-        Ok(FullSsn(number))
+        Ok(Ssn9(number))
     }
 }
 
-impl From<&FullSsn> for LastFourSsn {
-    fn from(val: &FullSsn) -> Self {
+impl From<&Ssn9> for Ssn4 {
+    fn from(val: &Ssn9) -> Self {
         let last_four = val.0.chars().skip(val.0.len() - 4).collect();
-        LastFourSsn(last_four)
+        Ssn4(last_four)
     }
 }
 
-impl<'de> Deserialize<'de> for FullSsn {
+impl<'de> Deserialize<'de> for Ssn9 {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: Deserializer<'de>,
@@ -72,19 +73,13 @@ impl<'de> Deserialize<'de> for FullSsn {
     }
 }
 
-impl std::fmt::Display for FullSsn {
+impl std::fmt::Debug for Ssn9 {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "*********")
     }
 }
 
-impl std::fmt::Debug for FullSsn {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "*********")
-    }
-}
-
-impl std::str::FromStr for LastFourSsn {
+impl std::str::FromStr for Ssn4 {
     type Err = crate::Error;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
@@ -93,11 +88,11 @@ impl std::str::FromStr for LastFourSsn {
         if number.len() != 4 {
             return Err(crate::Error::InvalidSsn);
         }
-        Ok(LastFourSsn(number))
+        Ok(Ssn4(number))
     }
 }
 
-impl<'de> Deserialize<'de> for LastFourSsn {
+impl<'de> Deserialize<'de> for Ssn4 {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: Deserializer<'de>,
@@ -107,13 +102,7 @@ impl<'de> Deserialize<'de> for LastFourSsn {
     }
 }
 
-impl std::fmt::Display for LastFourSsn {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "****")
-    }
-}
-
-impl std::fmt::Debug for LastFourSsn {
+impl std::fmt::Debug for Ssn4 {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "****")
     }
@@ -127,7 +116,7 @@ mod tests {
     fn test_ssn() {
         #[derive(Eq, Debug, PartialEq, Serialize, Deserialize)]
         struct Test {
-            pub ssn: FullSsn,
+            pub ssn: Ssn9,
         }
         let example = "{\"ssn\": \"123-45-7890\"}";
         let bad_example = "{\"ssn\": \"12345a\"}";
@@ -139,12 +128,12 @@ mod tests {
         assert_eq!(
             deserialized,
             Test {
-                ssn: FullSsn("123457890".to_owned())
+                ssn: Ssn9("123457890".to_owned())
             }
         );
 
         let test_bad_str = "12345a";
-        assert!(FullSsn::from_str(test_bad_str).is_err());
+        assert!(Ssn9::from_str(test_bad_str).is_err());
 
         assert_eq!(format!("{ssn:#?}"), "*********");
     }
@@ -153,7 +142,7 @@ mod tests {
     fn test_ssn_last_four() {
         #[derive(Eq, Debug, PartialEq, Serialize, Deserialize)]
         struct Test {
-            pub last_four_ssn: LastFourSsn,
+            pub last_four_ssn: Ssn4,
         }
         let example = "{\"last_four_ssn\": \"7890\"}";
         let bad_example = "{\"last_four_ssn\": \"12345a\"}";
@@ -165,12 +154,12 @@ mod tests {
         assert_eq!(
             deserialized,
             Test {
-                last_four_ssn: LastFourSsn("7890".to_owned())
+                last_four_ssn: Ssn4("7890".to_owned())
             }
         );
 
         let test_bad_str = "12345a";
-        assert!(FullSsn::from_str(test_bad_str).is_err());
+        assert!(Ssn9::from_str(test_bad_str).is_err());
 
         assert_eq!(format!("{ssn:#?}"), "****")
     }

@@ -53,7 +53,8 @@ class User(NamedTuple):
     fp_user_id: str
     first_name: str
     last_name: str
-    street_address: str
+    address_line1: str
+    address_line2: str
     zip: str
     country: str
     ssn: str

@@ -96,8 +96,8 @@ class TestBifrost:
             "first_name",
             "last_name",
             "dob",
-            "ssn",
-            "street_address",
+            "ssn9",
+            "address_line1",
             "city",
             "state",
             "zip",
@@ -122,7 +122,7 @@ class TestBifrost:
             "email": "flerpderp",
             "speculative": True,
         }
-        post("hosted/user/data", data, auth_token, status_code=400)
+        post("hosted/user/email", data, auth_token, status_code=400)
 
         # Test validating data before setting
         data = {
@@ -136,24 +136,21 @@ class TestBifrost:
                 "year": 1995,
             },
             "address": {
-                "address": {
-                    "street_address": "1 Footprint Way",
-                    "street_address_2": "",
-                },
+                "line1": "1 Footprint Way",
+                "line2": "",
                 "city": "Enclave",
                 "state": "NY",
                 "zip": "10009",
                 "country": "US",
             },
-            "ssn": _gen_random_ssn(),
-            "email": EMAIL,
+            "ssn9": _gen_random_ssn(),
             "speculative": True,
         }
-        post("hosted/user/data", data, auth_token)
+        post("hosted/user/data/identity", data, auth_token)
 
         # Actually set the data
         data.pop("speculative")
-        post("hosted/user/data", data, auth_token)
+        post("hosted/user/data/identity", data, auth_token)
 
         # Shouldn't be allowed to update fields that are already set
         data = {
@@ -162,7 +159,10 @@ class TestBifrost:
                 "last_name": "Derp2",
             }
         }
-        post("hosted/user/data", data, auth_token, status_code=400)
+        post("hosted/user/data/identity", data, auth_token, status_code=400)
+
+    def test_add_email(self, auth_token):
+        post("hosted/user/email", {"email": EMAIL}, auth_token)
 
     def test_d2p_biometric(self, auth_token):
         # Get new auth token in d2p/generate endpoint
@@ -375,7 +375,8 @@ class TestBifrostSandbox:
             workos_sandbox_tenant.ob_config.key,
             basic_user.auth_token,
         )
-        post("hosted/user/data", user_data, basic_user.auth_token)
+        post("hosted/user/data/identity", user_data, basic_user.auth_token)
+
         body = post(
             "hosted/onboarding/complete",
             None,

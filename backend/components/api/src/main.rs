@@ -203,6 +203,7 @@ async fn main() -> std::io::Result<()> {
             .service(hosted::routes())
             .service(users::routes())
             .with_json_spec_at("/docs-spec")
+            .with_json_spec_v3_at("/docs-spec-v3")
             .with_swagger_ui_at("/docs-ui")
             .build()
     })

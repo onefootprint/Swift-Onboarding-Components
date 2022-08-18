@@ -47,10 +47,16 @@ const DataKindBoxes = ({
         Identity data
       </Typography>
       <Checkbox
-        label="SSN"
-        disabled={isFieldDisabled('ssn')}
-        checked={isFieldSelected('ssn')}
-        onChange={setFieldFor('ssn')}
+        label="SSN (full)"
+        disabled={isFieldDisabled('ssn9')}
+        checked={isFieldSelected('ssn9')}
+        onChange={setFieldFor('ssn9')}
+      />
+      <Checkbox
+        label="SSN (last four)"
+        disabled={isFieldDisabled('ssn4')}
+        checked={isFieldSelected('ssn4') || isFieldSelected('ssn9')}
+        onChange={setFieldFor('ssn4')}
       />
       <Checkbox
         label="Date of birth"
@@ -71,15 +77,15 @@ const DataKindBoxes = ({
       />
       <Checkbox
         label="Address line 1"
-        disabled={isFieldDisabled('streetAddress')}
-        checked={isFieldSelected('streetAddress')}
-        onChange={setFieldFor('streetAddress')}
+        disabled={isFieldDisabled('addressLine1')}
+        checked={isFieldSelected('addressLine1')}
+        onChange={setFieldFor('addressLine1')}
       />
       <Checkbox
         label="Address line 2"
-        disabled={isFieldDisabled('streetAddress2')}
-        checked={isFieldSelected('streetAddress2')}
-        onChange={setFieldFor('streetAddress2')}
+        disabled={isFieldDisabled('addressLine2')}
+        checked={isFieldSelected('addressLine2')}
+        onChange={setFieldFor('addressLine2')}
       />
       <Checkbox
         label="City"

@@ -179,12 +179,8 @@ pub async fn private_cleanup_integration_tests(
                 diesel::delete(schema::email::table.filter(schema::email::user_vault_id.eq(&uv.id)))
                     .execute(conn)?;
 
-            deleted_rows +=
-                diesel::delete(schema::address::table.filter(schema::address::user_vault_id.eq(&uv.id)))
-                    .execute(conn)?;
-
             deleted_rows += diesel::delete(
-                schema::user_profile::table.filter(schema::user_profile::user_vault_id.eq(&uv.id)),
+                schema::identity_data::table.filter(schema::identity_data::user_vault_id.eq(&uv.id)),
             )
             .execute(conn)?;
 

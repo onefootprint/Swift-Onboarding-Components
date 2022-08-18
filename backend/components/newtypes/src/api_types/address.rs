@@ -1,4 +1,4 @@
-use crate::{pii_helper::newtype_to_pii, DataKind, Decomposable, NewData, PiiString};
+use crate::{pii_helper::newtype_to_pii, PiiString};
 
 pub use derive_more::{Add, Display, From, FromStr, Into};
 use paperclip::actix::Apiv2Schema;
@@ -10,76 +10,28 @@ use serde::{Deserialize, Serialize};
 /// We uppercase everything for standardization. Country must be 2 digit ISO-3166-1 Alpha 2 country code.
 /// Inputs cannot contain special characters
 pub struct Address {
-    pub address: Option<StreetAddressData>,
-    pub city: Option<City>,
-    pub state: Option<State>,
-    pub zip: Option<Zip>,
-    pub country: Option<Country>,
+    pub line1: AddressLine,
+    pub line2: Option<AddressLine>,
+    pub city: City,
+    pub state: State,
+    pub zip: Zip,
+    pub country: Country,
 }
 
-impl Decomposable for Address {
-    fn decompose(self) -> Vec<NewData> {
-        let Address {
-            address,
-            city,
-            state,
-            zip,
-            country,
-        } = self;
-        let data = vec![
-            (
-                DataKind::StreetAddress,
-                address
-                    .as_ref()
-                    .map(|a| a.street_address.clone())
-                    .map(PiiString::from),
-            ),
-            (
-                DataKind::StreetAddress2,
-                address
-                    .as_ref()
-                    .and_then(|a| a.street_address_2.clone())
-                    .map(PiiString::from),
-            ),
-            (DataKind::City, city.map(PiiString::from)),
-            (DataKind::State, state.map(PiiString::from)),
-            (DataKind::Zip, zip.map(PiiString::from)),
-            (DataKind::Country, country.map(PiiString::from)),
-        ]
-        .into_iter()
-        .filter_map(|(k, d)| d.map(|d| (k, d)))
-        .collect();
-
-        NewData::list(data)
-    }
-}
-
-#[derive(Clone, Debug, Hash, PartialEq, Eq, Serialize, Deserialize, Default, Apiv2Schema)]
-/// Address includes street addresses, city, state, zip, and country.
-/// We uppercase everything for standardization. Country must be 2 digit ISO-3166-1 Alpha 2 country code.
-/// Inputs cannot contain special characters
-pub struct StreetAddressData {
-    pub street_address: StreetAddress,
-    #[serde(default)]
-    pub street_address_2: Option<StreetAddress>,
-}
-
-impl From<StreetAddressData> for PiiString {
-    fn from(address: StreetAddressData) -> PiiString {
-        if let Some(second) = address.street_address_2 {
-            PiiString::new(format!("{} {}", address.street_address.0.leak(), second.0.leak()))
-        } else {
-            PiiString::from(address.street_address)
-        }
-    }
+#[derive(Clone, Debug, Hash, PartialEq, Eq, Serialize, Deserialize, Apiv2Schema)]
+pub enum FullAddressOrZip {
+    #[serde(rename = "address")]
+    Address(Address),
+    #[serde(rename = "zip_address")]
+    ZipAndCountry { zip: Zip, country: Country },
 }
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq, Serialize, Deserialize, Default, Apiv2Schema)]
 #[serde(try_from = "String")]
 /// String of either part 1 or 2 of your street address. We capitalize everything for standardization.
 /// cannot contain special characters, other than #
-pub struct StreetAddress(PiiString);
-newtype_to_pii!(StreetAddress);
+pub struct AddressLine(PiiString);
+newtype_to_pii!(AddressLine);
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq, Serialize, Deserialize, Default, Apiv2Schema)]
 /// String of your city, cannot contain special characters
@@ -119,14 +71,14 @@ lazy_static! {
     pub static ref COUNTRY_RE : Regex = Regex::new(r"^([A-Za-z]{2})$").unwrap();
 }
 
-impl TryFrom<String> for StreetAddress {
+impl TryFrom<String> for AddressLine {
     type Error = crate::Error;
 
     fn try_from(value: String) -> Result<Self, Self::Error> {
         if INVALID_ADDRESS_CHARS.is_match(value.as_str()) {
             return Err(crate::AddressError::InvalidAddressCharacters(value).into());
         }
-        Ok(StreetAddress(PiiString::new(value.to_uppercase())))
+        Ok(AddressLine(PiiString::new(value.to_uppercase())))
     }
 }
 
@@ -229,13 +181,13 @@ mod tests {
 
     #[test]
     fn test_address() {
-        let address =  "{\"address\": {\"street_address\": \"1 footprint way\"}, \"city\": \"new york\",  \"state\": \"NY\", \"country\": \"us\", \"zip\": \"20009\"}";
+        let address =  "{\"line1\": \"1 footprint way\", \"city\": \"new york\",  \"state\": \"NY\", \"country\": \"us\", \"zip\": \"20009\"}";
 
-        let bad_zip = "{\"address\": {\"street_address\": \"1 footprint way\"}, \"city\": \"new york\",  \"state\": \"NY\", \"country\": \"us\", \"zip\": \"20009@\"}";
-        let bad_country = "{\"address\": {\"street_address\": \"1 footprint way\"}, \"city\": \"new york\",  \"state\": \"NY\", \"country\": \"USA\", \"zip\": \"20009\"}";
-        let bad_address = "{\"address\":{\"street_address\": \"1 footprint way\x00#\x00#\"}, \"city\": \"new york\",  \"state\": \"NY\", \"country\": \"us\", \"zip\": \"20009\"}";
-        let good_address = "{\"address\": {\"street_address\": \"1 footprint way #201W\"}, \"city\": \"new york\",  \"state\": \"NY\", \"country\": \"us\", \"zip\": \"20009\"}";
-        let bad_city = "{\"address\": {\"street_address\": \"1 footprint way\"}, \"city\": \"new york\x00#!?\",  \"state\": \"NY\", \"country\": \"us\", \"zip\": \"20009\"}";
+        let bad_zip = "{\"line1\": \"1 footprint way\", \"city\": \"new york\",  \"state\": \"NY\", \"country\": \"us\", \"zip\": \"20009@\"}";
+        let bad_country = "{\"line1\": \"1 footprint way\", \"city\": \"new york\",  \"state\": \"NY\", \"country\": \"USA\", \"zip\": \"20009\"}";
+        let bad_address = "{\"line1\": \"1 footprint way\x00#\x00#\", \"city\": \"new york\",  \"state\": \"NY\", \"country\": \"us\", \"zip\": \"20009\"}";
+        let good_address = "{\"line1\": \"1 footprint way #201W\", \"city\": \"new york\",  \"state\": \"NY\", \"country\": \"us\", \"zip\": \"20009\"}";
+        let bad_city = "{\"line1\": \"1 footprint way\", \"city\": \"new york\x00#!?\",  \"state\": \"NY\", \"country\": \"us\", \"zip\": \"20009\"}";
 
         let bad_zip: Result<Address, _> = serde_json::from_str(bad_zip);
         let bad_country: Result<Address, _> = serde_json::from_str(bad_country);
@@ -245,7 +197,6 @@ mod tests {
 
         assert!(bad_zip.is_err());
         assert!(bad_country.is_err());
-        println!("{:?}", good_address);
         assert!(bad_address.is_err());
         assert!(good_address.is_ok());
         assert!(bad_city.is_err());
@@ -255,17 +206,15 @@ mod tests {
         assert_eq!(
             address,
             Address {
-                address: Some(StreetAddressData {
-                    street_address: StreetAddress(PiiString::new("1 FOOTPRINT WAY".to_string())),
-                    street_address_2: None
-                }),
-                city: Some(City(PiiString::new("NEW YORK".to_string()))),
-                state: Some(State(PiiString::new("NY".to_string()))),
-                country: Some(Country(PiiString::new("US".to_string()))),
-                zip: Some(Zip(PiiString::new("20009".to_string())))
+                line1: AddressLine(PiiString::new("1 FOOTPRINT WAY".to_string())),
+                line2: None,
+                city: City(PiiString::new("NEW YORK".to_string())),
+                state: State(PiiString::new("NY".to_string())),
+                country: Country(PiiString::new("US".to_string())),
+                zip: Zip(PiiString::new("20009".to_string()))
             }
         );
 
-        assert_eq!(format!("{:?}", address), "Address { address: Some(StreetAddressData { street_address: StreetAddress(<redacted>), street_address_2: None }), city: Some(City(<redacted>)), state: Some(State(<redacted>)), zip: Some(Zip(<redacted>)), country: Some(Country(<redacted>)) }");
+        assert_eq!(format!("{:?}", address), "Address { line1: AddressLine(<redacted>), line2: None, city: City(<redacted>), state: State(<redacted>), zip: Zip(<redacted>), country: Country(<redacted>) }");
     }
 }

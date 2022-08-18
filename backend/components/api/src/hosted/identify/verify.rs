@@ -108,7 +108,7 @@ async fn validate_sms_challenge(
 
     let phone_number = challenge_state.phone_number;
     let sh_phone_number = state
-        .compute_fingerprint(DataKind::PhoneNumber, &phone_number.to_piistring())
+        .compute_fingerprint(DataKind::PhoneNumber, phone_number.to_piistring())
         .await?;
     let existing_user = db::user_vault::get_by_fingerprint(&state.db_pool, sh_phone_number).await?;
     let result = match existing_user {
@@ -134,10 +134,10 @@ async fn create_new_user_vault(
         e_phone_country: public_key.seal_pii(&phone_number.iso_country_code)?,
         public_key,
         sh_phone_number: state
-            .compute_fingerprint(DataKind::PhoneNumber, &phone_number.to_piistring())
+            .compute_fingerprint(DataKind::PhoneNumber, phone_number.to_piistring())
             .await?,
         sh_phone_country: state
-            .compute_fingerprint(DataKind::PhoneCountry, &phone_number.iso_country_code)
+            .compute_fingerprint(DataKind::PhoneCountry, phone_number.iso_country_code.clone())
             .await?,
         is_live: phone_number.is_live(),
     };

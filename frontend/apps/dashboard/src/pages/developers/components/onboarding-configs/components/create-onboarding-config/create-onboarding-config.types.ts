@@ -7,9 +7,9 @@ export type NameFormData = {
 export type DataKindForm = {
   [DataKinds.dob]: boolean;
   [DataKinds.email]: boolean;
-  [DataKinds.lastFourSsn]: boolean;
+  [DataKinds.ssn4]: boolean;
   [DataKinds.phoneNumber]: boolean;
-  [DataKinds.ssn]: boolean;
+  [DataKinds.ssn9]: boolean;
   [VirtualDataKinds.addressFull]: boolean;
   [VirtualDataKinds.addressPartial]: boolean;
   [VirtualDataKinds.name]: boolean;

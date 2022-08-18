@@ -51,13 +51,16 @@ const AccessForm = ({ defaultValues, onSubmit, fields }: AccessFormProps) => {
       {fields.has(DataKinds.dob) && (
         <Checkbox label={allT('data-kinds.dob')} {...register(DataKinds.dob)} />
       )}
-      {fields.has(DataKinds.ssn) && (
-        <Checkbox label={allT('data-kinds.ssn')} {...register(DataKinds.ssn)} />
+      {fields.has(DataKinds.ssn9) && (
+        <Checkbox
+          label={allT('data-kinds.ssn')}
+          {...register(DataKinds.ssn9)}
+        />
       )}
-      {fields.has(DataKinds.lastFourSsn) && (
+      {fields.has(DataKinds.ssn4) && (
         <Checkbox
           label={allT('data-kinds.last_four_ssn')}
-          {...register(DataKinds.lastFourSsn)}
+          {...register(DataKinds.ssn4)}
         />
       )}
       {fields.has(VirtualDataKinds.addressFull) && (

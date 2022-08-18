@@ -1,18 +1,15 @@
 use chrono::Datelike;
 use chrono::NaiveDate;
 pub use derive_more::{Add, Display, From, FromStr, Into};
-use paperclip::actix::Apiv2Schema;
+use paperclip::v2::schema::TypedData;
 use serde::Deserialize;
 use serde::{self, Serialize};
 use std::fmt::Debug;
 
-use crate::DataKind;
-use crate::Decomposable;
-use crate::NewData;
 use crate::PiiString;
 
 #[doc = "Date of birth"]
-#[derive(Clone, Debug, Hash, PartialEq, Eq, Serialize, Deserialize, Default, Apiv2Schema)]
+#[derive(Clone, Debug, Hash, PartialEq, Eq, Serialize, Deserialize, Default)]
 /// Date of birth. Day, month, and year are integers (not strings).
 /// Example of a valid dob struct:
 /// "{\"month\": 1, \"day\": 9, \"year\": 1998 }",
@@ -22,19 +19,19 @@ pub struct Dob {
     year: Year,
 }
 
-#[derive(Clone, Hash, PartialEq, Eq, Serialize, Deserialize, Default, Apiv2Schema)]
+#[derive(Clone, Hash, PartialEq, Eq, Serialize, Deserialize, Default)]
 #[serde(try_from = "u32")]
 pub struct Day(u32);
 
-#[derive(Clone, Hash, PartialEq, Eq, Serialize, Deserialize, Default, Apiv2Schema)]
+#[derive(Clone, Hash, PartialEq, Eq, Serialize, Deserialize, Default)]
 #[serde(try_from = "u32")]
 pub struct Month(u32);
 
-#[derive(Clone, Hash, PartialEq, Eq, Serialize, Deserialize, Default, Apiv2Schema)]
+#[derive(Clone, Hash, PartialEq, Eq, Serialize, Deserialize, Default)]
 #[serde(try_from = "i32")]
 pub struct Year(i32);
 
-#[derive(Clone, Debug, Hash, PartialEq, Eq, Serialize, Deserialize, Apiv2Schema)]
+#[derive(Clone, Debug, Hash, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(try_from = "Dob")]
 /// Date of birth. Day, month, and year are integers (not strings).
 /// Example of a valid dob struct:
@@ -45,9 +42,9 @@ pub struct DateOfBirth {
     pub year: Year,
 }
 
-impl Decomposable for DateOfBirth {
-    fn decompose(self) -> Vec<NewData> {
-        NewData::single(DataKind::Dob, self.default_string_format())
+impl TypedData for DateOfBirth {
+    fn data_type() -> paperclip::v2::models::DataType {
+        paperclip::v2::models::DataType::String
     }
 }
 
@@ -65,6 +62,12 @@ impl TryFrom<Dob> for DateOfBirth {
             month: value.month,
             year: value.year,
         })
+    }
+}
+
+impl From<DateOfBirth> for PiiString {
+    fn from(data: DateOfBirth) -> Self {
+        data.default_string_format()
     }
 }
 
@@ -90,12 +93,6 @@ impl TryFrom<u32> for Day {
     }
 }
 
-impl std::fmt::Display for Day {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "**")
-    }
-}
-
 impl std::fmt::Debug for Day {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "**")
@@ -110,12 +107,6 @@ impl TryFrom<u32> for Month {
             return Err(crate::DobError::InvalidMonth(value).into());
         }
         Ok(Month(value))
-    }
-}
-
-impl std::fmt::Display for Month {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "**")
     }
 }
 
@@ -134,12 +125,6 @@ impl TryFrom<i32> for Year {
             return Err(crate::DobError::InvalidYear(value).into());
         }
         Ok(Year(value))
-    }
-}
-
-impl std::fmt::Display for Year {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "****")
     }
 }
 

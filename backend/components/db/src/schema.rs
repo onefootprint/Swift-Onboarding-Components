@@ -20,26 +20,6 @@ table! {
     use diesel::sql_types::*;
     use newtypes::db_types::*;
 
-    address (id) {
-        id -> Text,
-        user_vault_id -> Text,
-        fingerprint_ids -> Array<Uuid>,
-        e_line1 -> Nullable<Bytea>,
-        e_line2 -> Nullable<Bytea>,
-        e_city -> Nullable<Bytea>,
-        e_state -> Nullable<Bytea>,
-        e_zip -> Nullable<Bytea>,
-        e_country -> Nullable<Bytea>,
-        deactivated_at -> Nullable<Timestamptz>,
-        _created_at -> Timestamptz,
-        _updated_at -> Timestamptz,
-    }
-}
-
-table! {
-    use diesel::sql_types::*;
-    use newtypes::db_types::*;
-
     audit_trails (id) {
         id -> Uuid,
         user_vault_id -> Text,
@@ -76,6 +56,33 @@ table! {
         id -> Uuid,
         user_vault_id -> Text,
         sh_data -> Bytea,
+        deactivated_at -> Nullable<Timestamptz>,
+        _created_at -> Timestamptz,
+        _updated_at -> Timestamptz,
+        data_kind -> Text,
+        is_unique -> Bool,
+    }
+}
+
+table! {
+    use diesel::sql_types::*;
+    use newtypes::db_types::*;
+
+    identity_data (id) {
+        id -> Text,
+        user_vault_id -> Text,
+        fingerprint_ids -> Array<Uuid>,
+        e_first_name -> Nullable<Bytea>,
+        e_last_name -> Nullable<Bytea>,
+        e_dob -> Nullable<Bytea>,
+        e_ssn9 -> Nullable<Bytea>,
+        e_ssn4 -> Nullable<Bytea>,
+        e_address_line1 -> Nullable<Bytea>,
+        e_address_line2 -> Nullable<Bytea>,
+        e_address_city -> Nullable<Bytea>,
+        e_address_state -> Nullable<Bytea>,
+        e_address_zip -> Nullable<Bytea>,
+        e_address_country -> Nullable<Bytea>,
         deactivated_at -> Nullable<Timestamptz>,
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
@@ -241,25 +248,6 @@ table! {
     use diesel::sql_types::*;
     use newtypes::db_types::*;
 
-    user_profile (id) {
-        id -> Text,
-        user_vault_id -> Text,
-        fingerprint_ids -> Array<Uuid>,
-        e_first_name -> Nullable<Bytea>,
-        e_last_name -> Nullable<Bytea>,
-        e_dob -> Nullable<Bytea>,
-        e_ssn9 -> Nullable<Bytea>,
-        e_ssn4 -> Nullable<Bytea>,
-        deactivated_at -> Nullable<Timestamptz>,
-        _created_at -> Timestamptz,
-        _updated_at -> Timestamptz,
-    }
-}
-
-table! {
-    use diesel::sql_types::*;
-    use newtypes::db_types::*;
-
     user_vaults (id) {
         id -> Text,
         e_private_key -> Bytea,
@@ -331,11 +319,11 @@ table! {
 
 joinable!(access_events -> insight_events (insight_event_id));
 joinable!(access_events -> scoped_users (scoped_user_id));
-joinable!(address -> user_vaults (user_vault_id));
 joinable!(audit_trails -> tenants (tenant_id));
 joinable!(audit_trails -> user_vaults (user_vault_id));
 joinable!(email -> user_vaults (user_vault_id));
 joinable!(fingerprint -> user_vaults (user_vault_id));
+joinable!(identity_data -> user_vaults (user_vault_id));
 joinable!(ob_configurations -> tenants (tenant_id));
 joinable!(onboardings -> insight_events (insight_event_id));
 joinable!(onboardings -> ob_configurations (ob_configuration_id));
@@ -345,7 +333,6 @@ joinable!(scoped_users -> tenants (tenant_id));
 joinable!(scoped_users -> user_vaults (user_vault_id));
 joinable!(tenant_api_key_access_logs -> tenant_api_keys (tenant_api_key_id));
 joinable!(tenant_api_keys -> tenants (tenant_id));
-joinable!(user_profile -> user_vaults (user_vault_id));
 joinable!(verification_requests -> scoped_users (scoped_user_id));
 joinable!(verification_requests_user_data -> verification_requests (request_id));
 joinable!(verification_results -> verification_requests (request_id));
@@ -354,10 +341,10 @@ joinable!(webauthn_credentials -> user_vaults (user_vault_id));
 
 allow_tables_to_appear_in_same_query!(
     access_events,
-    address,
     audit_trails,
     email,
     fingerprint,
+    identity_data,
     insight_events,
     ob_configurations,
     onboardings,
@@ -367,7 +354,6 @@ allow_tables_to_appear_in_same_query!(
     tenant_api_key_access_logs,
     tenant_api_keys,
     tenants,
-    user_profile,
     user_vaults,
     verification_requests,
     verification_requests_user_data,

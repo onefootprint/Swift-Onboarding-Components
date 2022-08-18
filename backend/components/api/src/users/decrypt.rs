@@ -112,7 +112,7 @@ async fn post_inner(
     NewAccessEvent {
         scoped_user_id: scoped_user.id.clone(),
         data_kinds: decrypted_data_kinds.clone(),
-        reason: reason,
+        reason,
         principal: Some(auth.format_principal()),
         insight: CreateInsightEvent::from(insights),
     }

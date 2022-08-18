@@ -118,7 +118,7 @@ where
         }
 
         // otherwise return the default of the sent header or live if not restricted
-        Ok(is_live.unwrap_or_else(|| !is_sandbox_restricted))
+        Ok(is_live.unwrap_or(!is_sandbox_restricted))
     }
 }
 

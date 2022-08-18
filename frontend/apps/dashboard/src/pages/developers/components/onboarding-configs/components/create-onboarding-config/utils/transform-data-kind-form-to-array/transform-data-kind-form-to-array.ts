@@ -11,8 +11,8 @@ const transformDataKindFormToArray = (formData: Record<string, any>) => {
     array.push(DataKinds.city);
     array.push(DataKinds.country);
     array.push(DataKinds.state);
-    array.push(DataKinds.streetAddress);
-    array.push(DataKinds.streetAddress2);
+    array.push(DataKinds.addressLine1);
+    array.push(DataKinds.addressLine2);
   }
   if (formData.address_partial) {
     array.push(DataKinds.zip);

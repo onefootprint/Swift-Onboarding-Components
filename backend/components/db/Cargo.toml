@@ -7,7 +7,6 @@ edition = "2021"
 serde = { version = "1.0", features = ["derive"] }
 tokio = { version = "1.0", features = ["full"] }
 dotenv = "0.15"
-anyhow = "1.0"
 
 openssl = "0.10.38"
 

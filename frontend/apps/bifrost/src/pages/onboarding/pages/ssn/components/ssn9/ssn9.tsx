@@ -5,21 +5,21 @@ import IcoLock24 from 'icons/ico/ico-lock-24';
 import IcoShield24 from 'icons/ico/ico-shield-24';
 import React from 'react';
 import { useForm } from 'react-hook-form';
-import { UserData, UserDataAttribute } from 'src/utils/state-machine/types';
 import styled, { css } from 'styled-components';
 import { Button, TextInput } from 'ui';
 
+import { SSN9Information } from '../../../../../../utils/state-machine/types';
 import ProgressHeader from '../../../../components/progress-header';
 import Disclaimer from '../disclaimer';
 
-type FormData = Required<Pick<UserData, UserDataAttribute.ssn>>;
+type FormData = SSN9Information;
 
-type SsnLastFourProps = {
+type SSN9Props = {
   isMutationLoading: boolean;
   onSubmit: (formData: FormData) => void;
 };
 
-const SSN = ({ isMutationLoading, onSubmit }: SsnLastFourProps) => {
+const SSN9 = ({ isMutationLoading, onSubmit }: SSN9Props) => {
   const inputMasks = useInputMask('en-US');
   const { t } = useTranslation('pages.onboarding.ssn.full');
   const {
@@ -34,13 +34,13 @@ const SSN = ({ isMutationLoading, onSubmit }: SsnLastFourProps) => {
       <Form onSubmit={handleSubmit(onSubmit)}>
         <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
         <TextInput
-          hasError={!!errors.ssn}
-          hintText={errors.ssn && t('form.error')}
+          hasError={!!errors.ssn9}
+          hintText={errors.ssn9 && t('form.error')}
           label={t('form.label')}
           mask={inputMasks.ssn}
           placeholder={t('form.placeholder')}
           type="tel"
-          {...register('ssn', {
+          {...register('ssn9', {
             required: true,
             // Numbers with all zeros in any digit group (000-##-####, ###-00-####, ###-##-0000) are not allowed.
             // Numbers with 666 or 900–999 in the first digit group are not allowed.
@@ -82,4 +82,4 @@ const Form = styled.form`
   `}
 `;
 
-export default SSN;
+export default SSN9;

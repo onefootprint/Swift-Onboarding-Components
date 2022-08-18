@@ -3,9 +3,9 @@ use std::fmt::{Debug, Display};
 use paperclip::actix::Apiv2Schema;
 use serde::{Deserialize, Serialize};
 
-use crate::{DataKind, Fingerprint, SealedVaultBytes, ValidatedPhoneNumber};
+use crate::{DataKind};
 
-use self::{address::Address, dob::DateOfBirth, email::Email, name::Name, ssn::FullSsn};
+
 
 pub mod address;
 pub mod dob;
@@ -94,26 +94,4 @@ impl NewData {
             data: pii.into(),
         }]
     }
-}
-
-pub struct NewSealedData {
-    pub e_data: SealedVaultBytes,
-    pub sh_data: Option<Fingerprint>,
-}
-
-/// Decompose composite type in to
-/// form it needs for db update -- a list of the datakind, value paired with a data
-/// group kind
-pub trait Decomposable {
-    fn decompose(self) -> Vec<NewData>;
-}
-
-pub struct IdentifyRequest {
-    pub first_name: Name,
-    pub last_name: Name,
-    pub address: Address,
-    pub phone: ValidatedPhoneNumber,
-    pub dob: DateOfBirth,
-    pub email: Email,
-    pub ssn: FullSsn,
 }

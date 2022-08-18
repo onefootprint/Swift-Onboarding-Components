@@ -21,12 +21,12 @@ describe('transformDataKindFormToArray', () => {
     const response1 = transformDataKindFormToArray({
       email: true,
       phone_number: true,
-      last_four_ssn: true,
+      ssn4: true,
     });
     expect(response1).toEqual([
       DataKinds.email,
       DataKinds.phoneNumber,
-      DataKinds.lastFourSsn,
+      DataKinds.ssn4,
     ]);
 
     const response2 = transformDataKindFormToArray({
@@ -51,8 +51,8 @@ describe('transformDataKindFormToArray', () => {
       DataKinds.city,
       DataKinds.country,
       DataKinds.state,
-      DataKinds.streetAddress,
-      DataKinds.streetAddress2,
+      DataKinds.addressLine1,
+      DataKinds.addressLine2,
       DataKinds.email,
       DataKinds.phoneNumber,
     ]);

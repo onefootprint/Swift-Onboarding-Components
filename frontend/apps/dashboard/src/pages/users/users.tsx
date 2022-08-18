@@ -96,7 +96,9 @@ const Users = () => {
               <FieldOrPlaceholder data={item.attributes.email} />
             </td>
             <td>
-              <FieldOrPlaceholder data={item.attributes.ssn} />
+              <FieldOrPlaceholder
+                data={item.attributes.ssn9 || item.attributes.ssn4}
+              />
             </td>
             <td>
               <FieldOrPlaceholder data={item.attributes.phoneNumber} />

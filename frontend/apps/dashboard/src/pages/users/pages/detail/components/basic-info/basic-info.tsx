@@ -34,7 +34,7 @@ const BasicInfo = ({ user }: BasicInfoProps) => {
         HeaderIcon={IcoUserCircle24}
         header="Identity data"
         rows={[
-          { title: 'SSN', data: userAttributes.ssn },
+          { title: 'SSN', data: userAttributes.ssn9 || userAttributes.ssn4 },
           { title: 'Date of birth', data: userAttributes.dob },
         ]}
       />
@@ -46,11 +46,11 @@ const BasicInfo = ({ user }: BasicInfoProps) => {
           { title: 'Country', data: userAttributes.country },
           {
             title: 'Address line 1',
-            data: userAttributes.streetAddress,
+            data: userAttributes.addressLine1,
           },
           {
             title: 'Address line 2',
-            data: userAttributes.streetAddress2,
+            data: userAttributes.addressLine2,
           },
           { title: 'City', data: userAttributes.city },
           { title: 'Zip code', data: userAttributes.zip },

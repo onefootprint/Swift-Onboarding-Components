@@ -7,16 +7,15 @@ import { UserDataResponse } from './use-user-data/use-user-data';
 const dataHasName = (data: UserData) =>
   data[UserDataAttribute.firstName] || data[UserDataAttribute.lastName];
 
-const dataHasStreetAddress = (data: UserData) =>
-  data[UserDataAttribute.streetAddress] ||
-  data[UserDataAttribute.streetAddress2];
-
 const dataHasAddress = (data: UserData) =>
-  dataHasStreetAddress(data) ||
-  data[UserDataAttribute.city] ||
-  data[UserDataAttribute.state] ||
-  data[UserDataAttribute.country] ||
+  data[UserDataAttribute.addressLine1] &&
+  data[UserDataAttribute.city] &&
+  data[UserDataAttribute.state] &&
+  data[UserDataAttribute.country] &&
   data[UserDataAttribute.zip];
+
+const dataHasZipCountry = (data: UserData) =>
+  data[UserDataAttribute.country] && data[UserDataAttribute.zip];
 
 const useSyncData = () => {
   const mutation = useUserData();
@@ -35,12 +34,14 @@ const useSyncData = () => {
     }
 
     // Only one of ssn and last_four_ssn can ever be included in the request
-    const requestData: UserDataObj = {
-      ssn: data[UserDataAttribute.ssn] || data[UserDataAttribute.lastFourSsn],
-    };
-    // Don't include the email in this request, since it would
-    // cause a 400 response. We only send the email when we
-    // need to trigger a verification email.
+    const requestData: UserDataObj = {};
+
+    console.log(data);
+    if (data[UserDataAttribute.ssn9]) {
+      requestData.ssn9 = data[UserDataAttribute.ssn9];
+    } else if (data[UserDataAttribute.ssn4]) {
+      requestData.ssn4 = data[UserDataAttribute.ssn4];
+    }
 
     if (dataHasName(data)) {
       requestData.name = {
@@ -51,17 +52,18 @@ const useSyncData = () => {
 
     if (dataHasAddress(data)) {
       requestData.address = {
+        line1: data[UserDataAttribute.addressLine1],
+        line2: data[UserDataAttribute.addressLine2],
         city: data[UserDataAttribute.city],
         state: data[UserDataAttribute.state],
         country: data[UserDataAttribute.country],
         zip: data[UserDataAttribute.zip],
       };
-      if (dataHasStreetAddress(data)) {
-        requestData.address.address = {
-          streetAddress: data[UserDataAttribute.streetAddress],
-          streetAddress2: data[UserDataAttribute.streetAddress2],
-        };
-      }
+    } else if (dataHasZipCountry(data)) {
+      requestData.zip_address = {
+        country: data[UserDataAttribute.country],
+        zip: data[UserDataAttribute.zip],
+      };
     }
 
     const dobData = data[UserDataAttribute.dob];

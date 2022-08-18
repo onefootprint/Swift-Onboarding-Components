@@ -1,34 +1,36 @@
+use db::models::fingerprint::IsUnique;
+use db::models::identity_data::{HasIdentityDataFields, IdentityData};
 use db::models::scoped_users::ScopedUser;
 use enclave_proxy::DataTransform;
-use paperclip::actix::Apiv2Schema;
-use std::collections::HashMap;
-use std::marker::PhantomData;
-use strum::IntoEnumIterator;
 
-use db::models::address::{Address, NewAddressReq};
 use db::models::email::Email;
+use newtypes::email::Email as NewtypeEmail;
+use paperclip::actix::Apiv2Schema;
+
+use std::marker::PhantomData;
+
 use db::models::ob_configurations::ObConfiguration;
 use db::models::phone_number::PhoneNumber;
-use db::models::user_profile::{NewUserProfileReq, UserProfile};
+
 use db::models::user_vaults::UserVault;
 use db::DbPool;
 use db::{errors::DbError, PgConnection};
 use newtypes::{
-    DataKind, DataPriority, FootprintUserId, NewSealedData, PiiString, SealedVaultBytes, TenantId,
-    UserVaultId, ValidatedPhoneNumber,
+    DataKind, DataPriority, EmailId, Fingerprint, Fingerprinter, FootprintUserId, PiiString,
+    SealedVaultBytes, TenantId, UserVaultId, ValidatedPhoneNumber,
 };
 
-use crate::errors::user::UserError;
-use crate::errors::ApiError;
+use crate::errors::{ApiError, ApiResult};
+use crate::types::identity_data_request::IdentityDataUpdate;
 use crate::State;
+
+use super::identity_data_builder::IdentityDataBuilder;
 
 pub struct UserVaultWrapper {
     pub user_vault: UserVault,
-    pub addresses: Vec<Address>,
-    pub phone_numbers: Vec<PhoneNumber>,
-    pub emails: Vec<Email>,
-    pub profile: Option<UserProfile>,
-    data_kind_to_e_data: HashMap<DataKind, SealedVaultBytes>,
+    pub identity_data: Option<IdentityData>,
+    pub phone_number: Option<PhoneNumber>,
+    pub email: Option<Email>,
     phantom: PhantomData<()>,
 }
 
@@ -46,29 +48,15 @@ impl UserVaultWrapper {
     }
 
     pub fn from_conn(conn: &mut PgConnection, user_vault: UserVault) -> Result<Self, DbError> {
-        let addresses = Address::list(conn, &user_vault.id)?;
-        let phone_numbers = PhoneNumber::list(conn, &user_vault.id)?;
-        let emails = Email::list(conn, &user_vault.id)?;
-        let profile = UserProfile::get(conn, &user_vault.id)?;
+        let identity_data = IdentityData::get(conn, &user_vault.id)?;
+        let phone_number = PhoneNumber::get_primary(conn, &user_vault.id)?;
+        let email = Email::get_primary(conn, &user_vault.id)?;
 
-        let profile_items = if let Some(ref profile) = profile {
-            profile.clone().data_items()
-        } else {
-            vec![]
-        };
-        let data_kind_to_e_data = profile_items
-            .into_iter()
-            .chain(phone_numbers.iter().cloned().flat_map(|x| x.data_items()))
-            .chain(emails.iter().cloned().flat_map(|x| x.data_items()))
-            .chain(addresses.iter().cloned().flat_map(|x| x.data_items()))
-            .collect();
         Ok(Self {
-            addresses,
-            phone_numbers,
-            emails,
-            profile,
+            identity_data,
             user_vault,
-            data_kind_to_e_data,
+            phone_number,
+            email,
             phantom: PhantomData,
         })
     }
@@ -90,17 +78,32 @@ impl UserVaultWrapper {
         Ok((uvw, scoped_user))
     }
 
-    pub fn get_e_field(&self, data_kind: &DataKind) -> Option<&SealedVaultBytes> {
-        // TODO handle multiple values for the same field
-        self.data_kind_to_e_data.get(data_kind)
-    }
+    pub async fn add_email(&mut self, state: &State, email: NewtypeEmail) -> ApiResult<EmailId> {
+        let email = email.to_piistring();
+        let e_data = self.user_vault.public_key.seal_pii(&email)?;
+        let fingerprint = state
+            .compute_fingerprint(DataKind::Email, email.clean_for_fingerprint())
+            .await?;
+        let priority = if self.email.is_some() {
+            DataPriority::Secondary
+        } else {
+            DataPriority::Primary
+        };
 
-    pub fn has_field(&self, data_kind: &DataKind) -> bool {
-        self.get_e_field(data_kind).is_some()
-    }
+        let user_vault_id = self.user_vault.id.clone();
 
-    pub fn get_populated_fields(&self) -> Vec<DataKind> {
-        DataKind::iter().filter(|k| self.has_field(k)).collect()
+        let email = state
+            .db_pool
+            .db_transaction(move |conn| {
+                db::models::email::Email::create(conn, user_vault_id, e_data, fingerprint, false, priority)
+            })
+            .await?;
+
+        if self.email.is_none() {
+            self.email = Some(email.clone());
+        }
+
+        Ok(email.id)
     }
 
     pub async fn decrypt(
@@ -120,9 +123,8 @@ impl UserVaultWrapper {
 
     pub async fn get_decrypted_primary_phone(&self, state: &State) -> Result<ValidatedPhoneNumber, ApiError> {
         let number = self
-            .phone_numbers
-            .iter()
-            .find(|x| x.priority == DataPriority::Primary)
+            .phone_number
+            .as_ref()
             .ok_or(ApiError::NoPhoneNumberForVault)?;
 
         let decrypt_response = self
@@ -141,62 +143,66 @@ impl UserVaultWrapper {
             .iter()
             .cloned()
             .filter(|data_kind| data_kind.is_required())
-            .filter(|data_kind| !self.has_field(data_kind))
+            .filter(|data_kind| !self.has_field(*data_kind))
             .collect()
     }
+}
 
-    pub fn process_updates(
+impl HasIdentityDataFields for UserVaultWrapper {
+    fn get_e_field(&self, data_kind: DataKind) -> Option<&SealedVaultBytes> {
+        let id = self.identity_data.as_ref();
+        match data_kind {
+            DataKind::Email => self.email.as_ref().map(|e| &e.e_data),
+            DataKind::PhoneNumber => self.phone_number.as_ref().map(|p| &p.e_e164),
+            DataKind::PhoneCountry => self.phone_number.as_ref().map(|p| &p.e_country),
+            kind => id?.get_e_field(kind),
+        }
+    }
+}
+
+impl UserVaultWrapper {
+    pub fn update_identity_data(
         &mut self,
         conn: &mut PgConnection,
-        new_data: HashMap<DataKind, NewSealedData>,
+        update: IdentityDataUpdate,
+        fingerprints: Vec<(DataKind, Fingerprint, IsUnique)>,
     ) -> Result<(), ApiError> {
-        // Don't allow updating any data that is already set
-        // Right now, this also only allows setting new data and doesn't allow updating data
-        if let Some(kind) = new_data.keys().find(|k| self.has_field(*k)) {
-            return Err(UserError::DataAlreadyPopulated(*kind).into());
+        let mut builder = IdentityDataBuilder::new(
+            self.user_vault.is_portable,
+            self.user_vault.id.clone(),
+            self.identity_data.clone(),
+            self.user_vault.public_key.clone(),
+            fingerprints,
+        );
+
+        let IdentityDataUpdate {
+            name,
+            dob,
+            ssn,
+            address,
+        } = update;
+
+        if let Some(name) = name {
+            builder.add_full_name(name)?;
         }
 
-        // Add a new email address if provided
-        if let Some(update) = new_data.get(&DataKind::Email) {
-            let fingerprints = if let Some(fingerprint) = update.sh_data.clone() {
-                vec![fingerprint]
-            } else {
-                vec![]
-            };
-            let new_email = Email::create(
-                conn,
-                self.user_vault.id.clone(),
-                update.e_data.clone(),
-                fingerprints,
-                false,
-                DataPriority::Primary,
-            )?;
-            self.data_kind_to_e_data.extend(new_email.clone().data_items());
-            self.emails.push(new_email);
+        if let Some(dob) = dob {
+            builder.add_dob(dob)?;
         }
 
-        // Update any new basic info if provided
-        if new_data.keys().any(UserProfile::contains) {
-            if let Some(ref profile) = self.profile {
-                profile.deactivate(conn)?;
-            }
-            let new_profile = NewUserProfileReq::build(&new_data, self.profile.as_ref());
-            let new_profile = UserProfile::create(conn, self.user_vault.id.clone(), new_profile)?;
-            self.data_kind_to_e_data.extend(new_profile.clone().data_items());
-            self.profile = Some(new_profile)
+        if let Some(ssn) = ssn {
+            builder.add_ssn(ssn)?;
         }
 
-        // Add new address fields if provided
-        if new_data.keys().any(Address::contains) {
-            let current_address = self.addresses.get(0);
-            if let Some(current_address) = current_address {
-                current_address.deactivate(conn)?;
-            }
-            let new_address = NewAddressReq::build(&new_data, current_address);
-            let new_address = Address::create(conn, self.user_vault.id.clone(), new_address)?;
-            self.data_kind_to_e_data.extend(new_address.clone().data_items());
-            self.addresses = vec![new_address];
+        if let Some(address) = address {
+            builder.add_full_address_or_zip(address)?;
         }
+
+        let new_identity_data = builder.finish(conn)?;
+
+        // finally create our new fingerprint
+        let identity_data = IdentityData::create(conn, new_identity_data)?;
+        self.identity_data = Some(identity_data);
 
         Ok(())
     }

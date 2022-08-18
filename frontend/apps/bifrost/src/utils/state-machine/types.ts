@@ -6,10 +6,10 @@ export enum UserDataAttribute {
   dob = 'dob',
   email = 'email',
   phone = 'phone_number',
-  ssn = 'ssn',
-  lastFourSsn = 'last_four_ssn',
-  streetAddress = 'streetAddress',
-  streetAddress2 = 'streetAddress2',
+  ssn9 = 'ssn9',
+  ssn4 = 'ssn4',
+  addressLine1 = 'address_line1',
+  addressLine2 = 'address_line2',
   city = 'city',
   state = 'state',
   country = 'country',
@@ -22,10 +22,10 @@ export const UserDataAttributeLabels: Record<string, UserDataAttribute> = {
   last_name: UserDataAttribute.lastName,
   dob: UserDataAttribute.dob,
   email: UserDataAttribute.email,
-  ssn: UserDataAttribute.ssn,
-  last_four_ssn: UserDataAttribute.lastFourSsn,
-  street_address: UserDataAttribute.streetAddress,
-  street_address2: UserDataAttribute.streetAddress2,
+  ssn9: UserDataAttribute.ssn9,
+  ssn4: UserDataAttribute.ssn4,
+  address_line1: UserDataAttribute.addressLine1,
+  address_line2: UserDataAttribute.addressLine2,
   city: UserDataAttribute.city,
   state: UserDataAttribute.state,
   country: UserDataAttribute.country,
@@ -38,10 +38,10 @@ export type UserData = Partial<{
   [UserDataAttribute.lastName]: string;
   [UserDataAttribute.dob]: string;
   [UserDataAttribute.email]: string;
-  [UserDataAttribute.ssn]: string;
-  [UserDataAttribute.lastFourSsn]: string;
-  [UserDataAttribute.streetAddress]: string;
-  [UserDataAttribute.streetAddress2]: string;
+  [UserDataAttribute.ssn9]: string;
+  [UserDataAttribute.ssn4]: string;
+  [UserDataAttribute.addressLine1]: string;
+  [UserDataAttribute.addressLine2]: string;
   [UserDataAttribute.city]: string;
   [UserDataAttribute.state]: string;
   [UserDataAttribute.country]: CountryCode;
@@ -76,13 +76,23 @@ export type ResidentialAddressFull = Required<
   Pick<
     UserData,
     | UserDataAttribute.country
-    | UserDataAttribute.streetAddress
-    | UserDataAttribute.streetAddress2
+    | UserDataAttribute.addressLine1
+    | UserDataAttribute.addressLine2
     | UserDataAttribute.city
     | UserDataAttribute.zip
     | UserDataAttribute.state
   >
 >;
+
+export type SSN4Information = {
+  [UserDataAttribute.ssn4]: string;
+};
+
+export type SSN9Information = {
+  [UserDataAttribute.ssn9]: string;
+};
+
+export type SSNInformation = SSN4Information | SSN9Information;
 
 export enum IdentifyType {
   onboarding = 'onboarding',

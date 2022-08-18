@@ -44,20 +44,20 @@ def my1fp_authed_user(user, twilio):
 
 class TestMy1fp:
     def test_decrypt(self, my1fp_authed_user):
-        data = {"attributes": ["phone_number", "email", "street_address", "zip"]}
+        data = {"attributes": ["phone_number", "email", "address_line1", "zip"]}
         body = post("hosted/user/decrypt", data, my1fp_authed_user.auth_token)
         attributes = body["data"]
         assert attributes["phone_number"] == my1fp_authed_user.phone_number.replace(
             " ", ""
         )
         assert attributes["email"].upper() == my1fp_authed_user.email.upper()
-        assert attributes["street_address"].upper() == "1 FOOTPRINT WAY"
+        assert attributes["address_line1"].upper() == "1 FOOTPRINT WAY"
         assert attributes["zip"] == "10009"
 
     def test_unauthorized_my1fp_basic_session_decrypt(self, my1fp_authed_user):
         return
         # TODO Re-instate this test after we differentiate between basic and step-up auth
-        data = {"attributes": ["ssn"]}
+        data = {"attributes": ["ssn9"]}
         post("hosted/user/decrypt", data, my1fp_authed_user.auth_token, status_code=401)
 
     def test_user_detail(self, my1fp_authed_user):

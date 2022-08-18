@@ -37,11 +37,12 @@ class TestDashboard:
             first_name=user.first_name,
             last_name=user.last_name,
             email=user.email,
-            street_address=user.street_address,
+            address_line1=user.address_line1,
+            address_line2=user.address_line2,
             zip=user.zip,
             country=user.country,
-            ssn=user.ssn,
-            last_four_ssn=user.ssn[-4:],
+            ssn9=user.ssn,
+            ssn4=user.ssn[-4:],
         )
         for attributes in FIELDS_TO_DECRYPT:
             data = {
@@ -51,6 +52,7 @@ class TestDashboard:
             }
             body = post("users/decrypt", data, tenant.sk.key)
             attributes = body["data"]
+            print(attributes)
             for data_kind, value in attributes.items():
                 assert expected_data[data_kind].upper() == value.upper()
 
@@ -107,13 +109,13 @@ class TestDashboard:
         # that contain at least one of these fields
         params = dict(
             footprint_user_id=user.fp_user_id,
-            data_kinds=",".join(["email", "street_address"]),
+            data_kinds=",".join(["email", "address_line1"]),
         )
         body = get("users/access_events", params, tenant.sk.key)
         access_events = body["data"]
         assert len(access_events) == 2
         assert "email" in set(access_events[0]["data_kinds"])
-        assert "street_address" in set(access_events[1]["data_kinds"])
+        assert "address_line1" in set(access_events[1]["data_kinds"])
 
         # Test filtering on timestamp - if we filter for events in the future, there shouldn't be any
         params = dict(timestamp_gte=arrow.utcnow().shift(days=1).isoformat())
@@ -138,31 +140,31 @@ class TestDashboard:
     def test_config_create(self, workos_sandbox_tenant, basic_user):
         data = dict(
             name="Acme Bank Loan",
-            must_collect_data_kinds=["last_four_ssn"],
-            can_access_data_kinds=["last_four_ssn"],
+            must_collect_data_kinds=["ssn4"],
+            can_access_data_kinds=["ssn4"],
         )
         body = post("org/onboarding_configs", data, workos_sandbox_tenant.sk.key)
         ob_config = body["data"]
         ob_config_key = TenantAuth(ob_config["key"])
 
         body = post("hosted/onboarding", None, basic_user.auth_token, ob_config_key)
-        assert body["data"]["missing_attributes"] == ["last_four_ssn"]
+        assert body["data"]["missing_attributes"] == ["ssn4"]
 
     @pytest.mark.parametrize(
         "must_collect,can_access,expected_status",
         [
             (["last_name"], [], 400),  # Can't collect last name without first name
             (
-                ["last_four_ssn", "ssn"],
+                ["ssn4", "ssn9"],
                 [],
                 400,
             ),  # Can't collect both last four SSN and whole SSN
-            (["street_address"], [], 400),  # Can't collect only some address fields
+            (["address_line1"], [], 400),  # Can't collect only some address fields
             (["zip", "country"], [], 200),  # Except for zip & country
             (["zip"], [], 400),  # Country is always required along with zip
             (
                 ["first_name", "last_name"],
-                ["ssn"],
+                ["ssn9"],
                 400,
             ),  # can_access must be < must_collect
         ],
@@ -263,7 +265,7 @@ class TestDashboard:
         )
 
     def test_portable_failed_data_write(self, user):
-        data = dict(reason="test", attributes=["first_name", "ssn"])
+        data = dict(reason="test", attributes=["first_name", "ssn9"])
         body = post(f"users/{user.fp_user_id}/decrypt", data, user.tenant.sk.key)
         print(body)
         assert body["data"]["first_name"]
@@ -274,8 +276,13 @@ class TestDashboard:
                 "day": 1,
                 "year": 1970,
             },
-            "ssn": _gen_random_ssn(),
+            "ssn9": _gen_random_ssn(),
         }
 
         # ensure we cannot change data in a portable vault
-        post(f"users/{user.fp_user_id}/data", data, user.tenant.sk.key, status_code=401)
+        post(
+            f"users/{user.fp_user_id}/data/identity",
+            data,
+            user.tenant.sk.key,
+            status_code=401,
+        )

@@ -2,7 +2,7 @@ use crate::schema::fingerprint;
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use diesel::{PgConnection, Queryable};
-use newtypes::{Fingerprint as FingerprintData, FingerprintId, UserVaultId};
+use newtypes::{DataKind, Fingerprint as FingerprintData, FingerprintId, UserVaultId};
 use serde::{Deserialize, Serialize};
 
 use crate::DbError;
@@ -16,6 +16,8 @@ pub struct Fingerprint {
     pub deactivated_at: Option<DateTime<Utc>>,
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
+    pub data_kind: DataKind,
+    pub is_unique: bool,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
@@ -23,27 +25,41 @@ pub struct Fingerprint {
 pub struct NewFingerprint {
     pub user_vault_id: UserVaultId,
     pub sh_data: FingerprintData,
+    pub data_kind: DataKind,
+    pub is_unique: bool,
 }
 
+pub type IsUnique = bool;
+
 impl Fingerprint {
-    pub(crate) fn deactivate(conn: &mut PgConnection, ids: &[FingerprintId]) -> Result<(), DbError> {
-        diesel::update(fingerprint::table)
-            .filter(fingerprint::id.eq_any(ids))
+    pub(crate) fn deactivate(
+        conn: &mut PgConnection,
+        ids: &[FingerprintId],
+        kinds: &[DataKind],
+    ) -> Result<Vec<Fingerprint>, DbError> {
+        let deleted = diesel::update(fingerprint::table)
+            .filter(
+                fingerprint::id
+                    .eq_any(ids)
+                    .and(fingerprint::data_kind.eq_any(kinds)),
+            )
             .set(fingerprint::deactivated_at.eq(Utc::now()))
-            .execute(conn)?;
-        Ok(())
+            .get_results(conn)?;
+        Ok(deleted)
     }
 
-    pub(crate) fn bulk_create(
+    pub fn bulk_create(
         conn: &mut PgConnection,
-        sh_datas: Vec<FingerprintData>,
         user_vault_id: &UserVaultId,
+        fingerprints: Vec<(DataKind, FingerprintData, IsUnique)>,
     ) -> Result<Vec<FingerprintId>, DbError> {
-        let new_rows: Vec<NewFingerprint> = sh_datas
+        let new_rows: Vec<NewFingerprint> = fingerprints
             .into_iter()
-            .map(|d| NewFingerprint {
+            .map(|(data_kind, sh_data, is_unique)| NewFingerprint {
                 user_vault_id: user_vault_id.clone(),
-                sh_data: d,
+                sh_data,
+                data_kind,
+                is_unique,
             })
             .collect();
         let new_rows = diesel::insert_into(fingerprint::table)

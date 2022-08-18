@@ -28,8 +28,8 @@ enum UserDataAttributeCategory {
 }
 
 const tenantCanAddressFullAddress = (attributes: UserDataAttribute[]) =>
-  attributes.indexOf(UserDataAttribute.streetAddress) > -1 ||
-  attributes.indexOf(UserDataAttribute.streetAddress2) > -1 ||
+  attributes.indexOf(UserDataAttribute.addressLine1) > -1 ||
+  attributes.indexOf(UserDataAttribute.addressLine2) > -1 ||
   attributes.indexOf(UserDataAttribute.city) > -1 ||
   attributes.indexOf(UserDataAttribute.state) > -1;
 
@@ -42,10 +42,10 @@ const CategoryByUserDataAttribute: Record<
   [UserDataAttribute.dob]: UserDataAttributeCategory.dob,
   [UserDataAttribute.email]: UserDataAttributeCategory.email,
   [UserDataAttribute.phone]: UserDataAttributeCategory.phoneNumber,
-  [UserDataAttribute.ssn]: UserDataAttributeCategory.ssn,
-  [UserDataAttribute.lastFourSsn]: UserDataAttributeCategory.lastFourSsn,
-  [UserDataAttribute.streetAddress]: UserDataAttributeCategory.address,
-  [UserDataAttribute.streetAddress2]: UserDataAttributeCategory.address,
+  [UserDataAttribute.ssn9]: UserDataAttributeCategory.ssn,
+  [UserDataAttribute.ssn4]: UserDataAttributeCategory.lastFourSsn,
+  [UserDataAttribute.addressLine1]: UserDataAttributeCategory.address,
+  [UserDataAttribute.addressLine2]: UserDataAttributeCategory.address,
   [UserDataAttribute.city]: UserDataAttributeCategory.address,
   [UserDataAttribute.state]: UserDataAttributeCategory.address,
   [UserDataAttribute.country]: UserDataAttributeCategory.address,

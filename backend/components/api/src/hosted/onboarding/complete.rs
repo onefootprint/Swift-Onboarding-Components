@@ -127,8 +127,8 @@ fn initiate_verification(
         },
         VerificationInfo {
             data_kinds: vec![
-                DataKind::StreetAddress,
-                DataKind::StreetAddress2,
+                DataKind::AddressLine1,
+                DataKind::AddressLine2,
                 DataKind::City,
                 DataKind::Zip,
             ],

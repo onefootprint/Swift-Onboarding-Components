@@ -1,0 +1,65 @@
+use std::str::FromStr;
+
+use crate::auth::UserAuth;
+use crate::auth::{session_data::user::UserAuthScope, VerifiedUserAuth};
+
+use crate::errors::user::UserError;
+use crate::errors::ApiError;
+use crate::types::response::ApiResponseData;
+use crate::types::EmptyResponse;
+use crate::utils::email::send_email_challenge;
+use crate::utils::user_vault_wrapper::UserVaultWrapper;
+use crate::State;
+
+use newtypes::email::Email as EmailData;
+
+use paperclip::actix::{api_v2_operation, web, web::Json, Apiv2Schema};
+
+#[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize, Apiv2Schema)]
+#[serde(rename_all = "snake_case")]
+pub struct AddEmailRequest {
+    email: EmailData,
+    #[serde(default)]
+    speculative: bool,
+}
+
+#[api_v2_operation(tags(Hosted))]
+/// Add an email to the account and send a challenge
+pub async fn post(
+    state: web::Data<State>,
+    user_auth: UserAuth,
+    request: Json<AddEmailRequest>,
+) -> actix_web::Result<Json<ApiResponseData<EmptyResponse>>, ApiError> {
+    let user_auth = user_auth.check_permissions(vec![UserAuthScope::SignUp])?;
+
+    if request.speculative {
+        // We've already parsed the request and done validation on the input. Return a successful
+        // response before writing anything to the DB
+        return Ok(Json(ApiResponseData::ok(EmptyResponse)));
+    }
+
+    let user_vault = user_auth.user_vault(&state.db_pool).await?;
+
+    let email = request.into_inner().email;
+
+    // Enforce that sandbox emails are used for sandbox users
+    if email.is_live() != user_vault.is_live {
+        return Err(UserError::SandboxMismatch.into());
+    }
+
+    // grab our uvw
+    let mut uvw = state
+        .db_pool
+        .db_transaction(move |conn| -> Result<_, ApiError> {
+            Ok(UserVaultWrapper::from_conn(conn, user_vault)?)
+        })
+        .await?;
+
+    // create the email
+    let email_id = uvw.add_email(&state, email.clone()).await?;
+
+    let email = EmailData::from_str(email.leak())?;
+    send_email_challenge(&state, email_id, &email.email).await?;
+
+    Ok(Json(ApiResponseData::ok(EmptyResponse {})))
+}

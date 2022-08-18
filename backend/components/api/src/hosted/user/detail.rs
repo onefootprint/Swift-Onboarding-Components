@@ -55,7 +55,15 @@ pub async fn handler(
     let existing_user = user_auth.user_vault(&state.db_pool).await?;
     let uvw = UserVaultWrapper::from(&state.db_pool, existing_user).await?;
     Ok(Json(ApiResponseData::ok(ApiUser {
-        phone_numbers: uvw.phone_numbers.iter().map(ApiUserData::from).collect(),
-        emails: uvw.emails.iter().map(ApiUserData::from).collect(),
+        phone_numbers: uvw
+            .phone_number
+            .as_ref()
+            .map(ApiUserData::from)
+            .map(|v| vec![v]).unwrap_or_default(),
+        emails: uvw
+            .email
+            .as_ref()
+            .map(ApiUserData::from)
+            .map(|v| vec![v]).unwrap_or_default(),
     })))
 }

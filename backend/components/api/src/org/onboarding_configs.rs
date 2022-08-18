@@ -89,8 +89,8 @@ impl CreateOnboardingConfigurationRequest {
 
         // acceptable states: all address fields or no address fields or just zip & country fields
         let address_kinds = &[
-            DataKind::StreetAddress,
-            DataKind::StreetAddress2,
+            DataKind::AddressLine1,
+            DataKind::AddressLine2,
             DataKind::City,
             DataKind::State,
             DataKind::Country,
@@ -99,16 +99,18 @@ impl CreateOnboardingConfigurationRequest {
         let address_kinds_without_zip_and_country = &address_kinds
             .iter()
             .cloned()
-            .filter(|x| x != &DataKind::Zip && x != &DataKind:: Country)
+            .filter(|x| x != &DataKind::Zip && x != &DataKind::Country)
             .collect::<Vec<DataKind>>();
-        let contains_only_zip_and_country = must_collect.contains(&DataKind::Zip) && 
-                                                  must_collect.contains(&DataKind::Country) && 
-                                                  !contains_any(address_kinds_without_zip_and_country);
+        let contains_only_zip_and_country = must_collect.contains(&DataKind::Zip)
+            && must_collect.contains(&DataKind::Country)
+            && !contains_any(address_kinds_without_zip_and_country);
 
         let err = if !contains_all_or_none(&[DataKind::FirstName, DataKind::LastName]) {
             TenantError::ValidationError("Must request first name and last name together".to_owned())
-        } else if !(contains_all_or_none(address_kinds)|| contains_only_zip_and_country) {
-            TenantError::ValidationError("Can only request all address fields, zip & country only, or none".to_owned())
+        } else if !(contains_all_or_none(address_kinds) || contains_only_zip_and_country) {
+            TenantError::ValidationError(
+                "Can only request all address fields, zip & country only, or none".to_owned(),
+            )
         } else if must_collect.contains(&DataKind::Ssn4) && must_collect.contains(&DataKind::Ssn9) {
             TenantError::ValidationError("Cannot request full SSN and last four of SSN".to_owned())
         } else if !HashSet::<&DataKind>::from_iter(self.can_access_data_kinds.iter())

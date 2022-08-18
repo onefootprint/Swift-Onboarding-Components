@@ -4,12 +4,14 @@ import { BIFROST_AUTH_HEADER } from 'src/config/constants';
 
 export type UserDataObj = {
   address?: {
-    address?: {
-      streetAddress?: string;
-      streetAddress2?: string;
-    };
+    line1?: string;
+    line2?: string;
     city?: string;
     state?: string;
+    country?: string;
+    zip?: string;
+  };
+  zip_address?: {
     country?: string;
     zip?: string;
   };
@@ -18,12 +20,12 @@ export type UserDataObj = {
     month?: number;
     year?: number;
   };
-  email?: string;
   name?: {
     firstName?: string;
     lastName?: string;
   };
-  ssn?: string;
+  ssn9?: string;
+  ssn4?: string;
 };
 
 export type UserDataRequest = {
@@ -37,7 +39,7 @@ export type UserDataResponse = { data: string };
 const userDataRequest = async (payload: UserDataRequest) => {
   const { data: response } = await request<RequestResponse<UserDataResponse>>({
     method: 'POST',
-    url: '/hosted/user/data',
+    url: '/hosted/user/data/identity',
     data: {
       ...payload.data,
       speculative: !!payload.speculative,

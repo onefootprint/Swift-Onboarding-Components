@@ -1,6 +1,5 @@
 import { useRequestErrorToast, useTranslation } from 'hooks';
 import React from 'react';
-import useUserData from 'src/hooks/use-user-data';
 import { Events } from 'src/utils/state-machine/identify/types';
 import { PinInput } from 'ui';
 
@@ -9,6 +8,7 @@ import useIdentifyVerify, {
   IdentifyVerifyResponse,
 } from '../../../../hooks/use-identify-verify';
 import ResendCodeButton from '../resend-code-button/resend-code-button';
+import useUserEmail from './hooks/use-user-email';
 
 const SUCCESS_EVENT_DELAY_MS = 1500;
 
@@ -26,11 +26,11 @@ const PhoneVerificationPinForm = ({
 
   const [state, send] = useIdentifyMachine();
   const identifyVerifyMutation = useIdentifyVerify();
-  const userDataMutation = useUserData();
+  const userEmailMutation = useUserEmail();
 
   const shouldShowSuccess = identifyVerifyMutation.isSuccess;
   const shouldShowLoading =
-    identifyVerifyMutation.isLoading || userDataMutation.isLoading;
+    identifyVerifyMutation.isLoading || userEmailMutation.isLoading;
 
   const handlePinValidationSucceeded = ({
     authToken,
@@ -39,7 +39,7 @@ const PhoneVerificationPinForm = ({
     // Only send the user email to the backend if we are onboarding the user for
     // the first time
     if (!state.context.userFound) {
-      userDataMutation.mutate({ data: { email }, authToken });
+      userEmailMutation.mutate({ data: { email }, authToken });
     }
 
     if (authToken) {

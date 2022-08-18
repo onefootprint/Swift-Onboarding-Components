@@ -44,15 +44,44 @@ impl Email {
         Ok(results)
     }
 
+    pub fn get_primary(
+        conn: &mut PgConnection,
+        user_vault_id: &UserVaultId,
+    ) -> Result<Option<Self>, DbError> {
+        let result = email::table
+            .filter(email::user_vault_id.eq(user_vault_id))
+            .filter(email::deactivated_at.is_null())
+            .filter(email::priority.eq(DataPriority::Primary))
+            .first(conn)
+            .optional()?;
+        Ok(result)
+    }
+
+    pub fn get_by_id(
+        conn: &mut PgConnection,
+        user_vault_id: &UserVaultId,
+        email_id: &EmailId,
+    ) -> Result<Self, DbError> {
+        let result = email::table
+            .filter(email::user_vault_id.eq(user_vault_id))
+            .filter(email::id.eq(email_id))
+            .first(conn)?;
+        Ok(result)
+    }
+
     pub fn create(
         conn: &mut PgConnection,
         user_vault_id: UserVaultId,
         e_data: SealedVaultBytes,
-        fingerprints: Vec<FingerprintData>,
+        fingerprint: FingerprintData,
         is_verified: bool,
         priority: DataPriority,
     ) -> Result<Email, DbError> {
-        let fingerprint_ids = Fingerprint::bulk_create(conn, fingerprints, &user_vault_id)?;
+        let fingerprint_ids = Fingerprint::bulk_create(
+            conn,
+            &user_vault_id,
+            vec![(DataKind::Email, fingerprint, is_verified)],
+        )?;
         let new_row = NewEmail {
             user_vault_id,
             fingerprint_ids,

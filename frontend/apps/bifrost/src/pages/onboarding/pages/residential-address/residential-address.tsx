@@ -46,8 +46,8 @@ const ResidentialAddress = () => {
   };
 
   const requiresFullAddress =
-    missingAttributes.indexOf(UserDataAttribute.streetAddress) > -1 ||
-    missingAttributes.indexOf(UserDataAttribute.streetAddress2) > -1 ||
+    missingAttributes.indexOf(UserDataAttribute.addressLine1) > -1 ||
+    missingAttributes.indexOf(UserDataAttribute.addressLine2) > -1 ||
     missingAttributes.indexOf(UserDataAttribute.city) > -1 ||
     missingAttributes.indexOf(UserDataAttribute.state) > -1;
 
