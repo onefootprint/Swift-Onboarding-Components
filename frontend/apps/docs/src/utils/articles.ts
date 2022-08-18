@@ -4,7 +4,7 @@ import matter from 'gray-matter';
 import kebabCase from 'lodash/kebabCase';
 import path from 'path';
 
-import type { Article } from '../types/page';
+import type { Article } from '../types/article';
 
 const DOCS_PATH = path.join(process.cwd(), 'src/content/**/**.mdx');
 

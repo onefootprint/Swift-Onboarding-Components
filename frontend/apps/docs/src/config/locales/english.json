@@ -6,8 +6,13 @@
     "header": {
       "request-early-access": "Request Early Access",
       "nav": {
+        "home": "Go to the home page",
         "kyc-with-pii": "KYC + PII Vault",
-        "pii": "PII Vault"
+        "pii": "PII Vault",
+        "nav-toggle": {
+          "open": "Open navigation",
+          "close": "Close navigation"
+        }
       }
     }
   },

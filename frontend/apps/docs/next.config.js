@@ -22,7 +22,17 @@ module.exports = withPlugins([withTM, withBundleAnalyzer], {
     return [
       {
         source: '/',
-        destination: '/kyc-pii-vault/getting-started',
+        destination: '/kyc-with-pii/getting-started',
+        permanent: true,
+      },
+      {
+        source: '/kyc-with-pii',
+        destination: '/kyc-with-pii/getting-started',
+        permanent: true,
+      },
+      {
+        source: '/pii',
+        destination: '/pii/getting-started',
         permanent: true,
       },
     ];

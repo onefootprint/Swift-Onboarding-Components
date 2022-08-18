@@ -1,8 +1,8 @@
 import IcoFileText16 from 'icons/ico/ico-file-text-16';
 import React from 'react';
-import type { ArticleSection } from 'src/types/page';
+import type { ArticleSection } from 'src/types/article';
 import styled, { css } from 'styled-components';
-import { Box, createFontStyles, Typography } from 'ui';
+import { Box, createFontStyles, media, Typography } from 'ui';
 
 import scrollSpy from './utils/scroll-spy';
 
@@ -46,13 +46,18 @@ const ArticleSections = ({ sections }: ArticleSectionsProps) => (
   </Container>
 );
 
-const Container = styled.div`
+const Container = styled.aside`
   ${({ theme }) => css`
+    display: none;
     height: max-content;
     max-height: calc(100vh - ${theme.spacing[11]}px);
     position: sticky;
     top: ${theme.spacing[11]}px;
     width: 100%;
+
+    ${media.greaterThan('lg')`
+      display: block;
+    `}
 
     ul {
       padding-left: ${theme.spacing[5]}px;

@@ -16,7 +16,7 @@ type AppProps = {
 const App = ({ Component, pageProps }: AppProps) => (
   <DesignSystemProvider theme={themes.light}>
     <GlobalStyle />
-    <AppHeader />
+    <AppHeader articles={pageProps.product.articles} />
     <Component {...pageProps} />
   </DesignSystemProvider>
 );
@@ -24,7 +24,9 @@ const App = ({ Component, pageProps }: AppProps) => (
 const GlobalStyle = createGlobalStyle`
   ${({ theme }) => css`
     html {
-      --header-height: 54px;
+      --header-height: 48px;
+      --product-aside-nav: 270px;
+
       scroll-padding-top: calc(var(--header-height) + ${theme.spacing[5]}px);
       scroll-behavior: smooth;
     }

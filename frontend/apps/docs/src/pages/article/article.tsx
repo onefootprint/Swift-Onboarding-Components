@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
-import type { Article } from 'src/types/page';
+import type { Article } from 'src/types/article';
 import styled, { css } from 'styled-components';
 import { createFontStyles } from 'ui';
 

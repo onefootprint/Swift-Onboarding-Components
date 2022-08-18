@@ -2,14 +2,14 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React from 'react';
 import styled, { css } from 'styled-components';
-import { createFontStyles, Typography } from 'ui';
+import { createFontStyles, media, Typography } from 'ui';
 
 type ProductNavigationProps = {
   name: string;
-  items: { title: string; slug: string }[];
+  articles: { title: string; slug: string }[];
 };
 
-const ProductNavigation = ({ name, items }: ProductNavigationProps) => {
+const ProductNavigation = ({ name, articles }: ProductNavigationProps) => {
   const router = useRouter();
 
   return (
@@ -18,7 +18,7 @@ const ProductNavigation = ({ name, items }: ProductNavigationProps) => {
         <Typography variant="caption-1">{name}</Typography>
       </Header>
       <nav>
-        {items.map(({ title, slug }) => (
+        {articles.map(({ title, slug }) => (
           <Link href={slug} key={slug}>
             <Anchor href={slug} data-selected={router.asPath === slug}>
               {title}
@@ -34,11 +34,17 @@ const Container = styled.aside`
   ${({ theme }) => css`
     background: ${theme.backgroundColor.primary};
     border-right: ${theme.borderWidth[1]}px solid ${theme.borderColor.tertiary};
+    display: none;
     height: 100vh;
+    left: 0;
     padding: ${theme.spacing[7]}px ${theme.spacing[5]}px;
-    position: sticky;
+    position: fixed;
     top: var(--header-height);
-    width: 270px;
+    width: var(--product-aside-nav);
+
+    ${media.greaterThan('sm')`
+      display: block;
+    `};
   `}
 `;
 
