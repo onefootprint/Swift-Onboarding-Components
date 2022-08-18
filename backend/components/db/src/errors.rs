@@ -64,6 +64,9 @@ pub enum DbError {
 
     #[error("This API key is disabled")]
     ApiKeyDisabled,
+
+    #[error("Not in transaction")]
+    NotInTransaction,
 }
 
 impl DbError {

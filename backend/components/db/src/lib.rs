@@ -16,6 +16,7 @@ use std::time::Duration;
 pub use crate::errors::DbError;
 use deadpool::managed::{Hook, HookError};
 use deadpool_diesel::postgres::{Manager, Pool, Runtime};
+use diesel::connection::{AnsiTransactionManager, TransactionManager};
 pub use diesel::prelude::PgConnection;
 use diesel::prelude::*;
 use diesel_migrations::EmbeddedMigrations;
@@ -68,6 +69,14 @@ impl DbPool {
             TransactionError::ApplicationError(e) => e,
             TransactionError::DbError(e) => E::from(DbError::from(e)),
         })
+    }
+}
+
+pub fn assert_in_transaction(conn: &mut PgConnection) -> Result<(), DbError> {
+    let depth = AnsiTransactionManager::transaction_manager_status_mut(conn).transaction_depth()?;
+    match depth {
+        None => Err(DbError::NotInTransaction),
+        Some(_) => Ok(()),
     }
 }
 

@@ -1,3 +1,4 @@
+use crate::assert_in_transaction;
 use crate::errors::DbError;
 use crate::schema::user_vault;
 use chrono::{DateTime, Utc};
@@ -30,6 +31,7 @@ impl UserVault {
     }
 
     pub fn lock(conn: &mut PgConnection, id: UserVaultId) -> Result<Self, DbError> {
+        assert_in_transaction(conn)?; // Doesn't make sense to lock outside of a txn
         let user = user_vault::table
             .for_no_key_update()
             .filter(user_vault::id.eq(id))

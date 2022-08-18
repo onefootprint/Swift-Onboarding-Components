@@ -13,7 +13,7 @@ use db::models::ob_configuration::ObConfiguration;
 use db::models::phone_number::PhoneNumber;
 
 use db::models::user_vault::UserVault;
-use db::DbPool;
+use db::{assert_in_transaction, DbPool};
 use db::{errors::DbError, PgConnection};
 use newtypes::{
     DataKind, DataPriority, EmailId, Fingerprint, Fingerprinter, FootprintUserId, PiiString,
@@ -95,6 +95,7 @@ impl UserVaultWrapper {
         let email = state
             .db_pool
             .db_transaction(move |conn| {
+                assert_in_transaction(conn)?;
                 db::models::email::Email::create(conn, user_vault_id, e_data, fingerprint, false, priority)
             })
             .await?;
@@ -167,6 +168,7 @@ impl UserVaultWrapper {
         update: IdentityDataUpdate,
         fingerprints: Vec<(DataKind, Fingerprint, IsUnique)>,
     ) -> Result<(), ApiError> {
+        assert_in_transaction(conn)?;
         let mut builder = IdentityDataBuilder::new(
             self.user_vault.is_portable,
             self.user_vault.id.clone(),
