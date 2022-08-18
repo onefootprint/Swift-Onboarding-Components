@@ -329,13 +329,13 @@
           "get-first-year-free": {
             "title": "How do I get my first year free?",
             "content": [
-              "To be even more aligned with our early users, we will give you a rebate of one credit for each user that goes through a standard Footprint KYC on your platform for the next three times they do a one-click KYC on another platform. As a result, the cost of the first year of that user is given back to you in future credits to use."
+            "To be even more aligned with our early users, we will give you a rebate of three credits for each user that goes through a standard Footprint KYC on your platform the next time they do a one-click KYC on another platform. As a result, the cost of the first year of that user is given back to you in future credits to use."
             ]
           },
           "one-click-charge": {
             "title": "How much do you charge for one-click KYC more expensive?",
             "content": [
-              "We charge six credits ($1.50) for the one-click. This is because companies report drop-off of north of 50% when users have to fill in a KYC flow. Due to the lift in conversion and extra LTV of the net new customers we bring in through replacing the form with one-click, we charge a premium."
+              "We charge eight credits ($2.00) for the one-click. This is because companies report drop-off of north of 50% when users have to fill in a KYC flow. Due to the lift in conversion and extra LTV of the net new customers we bring in through replacing the form with one-click, we charge a premium."
             ]
           },
           "competitor-pricing": {
