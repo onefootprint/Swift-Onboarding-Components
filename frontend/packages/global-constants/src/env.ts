@@ -1,5 +1,5 @@
 const getBranchSlug = (branchName: string) =>
-  branchName.toLowerCase().replaceAll('/', '-');
+  branchName.toLowerCase().split('/').join('-');
 
 const getDemoUrl = (env = 'local', branchName?: string) => {
   if (env === 'local') {

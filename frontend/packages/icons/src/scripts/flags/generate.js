@@ -12,7 +12,7 @@ const MAIN_PATH = path.join(__dirname, '../../');
 const getFileName = path => last(path.split('/'));
 
 const getComponentName = fileName =>
-  startCase(fileName.replace('.svg', '')).replaceAll(' ', '');
+  startCase(fileName.replace('.svg', '')).split(' ').join('');
 
 const createIcoComponent = async icoPath => {
   const svgSource = await fs.promises.readFile(icoPath);

@@ -10,7 +10,7 @@ const getUrl = (env = 'local', branchName?: string) => {
     return 'https://id.preview.onefootprint.com';
   }
   if (env === 'preview' && branchName) {
-    const slugBranch = branchName.toLowerCase().replaceAll('/', '-');
+    const slugBranch = branchName.toLowerCase().split('/').join('-');
     return `https://bifrost-git-${slugBranch}.preview.onefootprint.com`;
   }
   return 'https://id.onefootprint.com';

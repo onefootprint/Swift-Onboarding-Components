@@ -25,7 +25,7 @@ const getArticleSections = (content: string) => {
 
   return sections?.map(section => {
     const level = section.split('#').length - 1;
-    const label = section.replaceAll('#', '').trim();
+    const label = section.split('#').join('').trim();
     const id = kebabCase(label);
     const anchor = `#${id}`;
     return { label, level, anchor, id };
