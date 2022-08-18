@@ -194,7 +194,7 @@ jobs:
           NUM_TO_REVERT=$(( $NUM_FILES < 4 ? $NUM_FILES : 4 ))
           echo "Reverting $NUM_TO_REVERT migrations"
 
-          for ((i=0; i<=$NUM_TO_REVERT; i++))
+          for ((i=0; i<$NUM_TO_REVERT; i++))
           do
             echo $i
             diesel migration revert
