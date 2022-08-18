@@ -69,6 +69,12 @@
     "editor.formatOnSave": true,
     "editor.formatOnPaste": false,
   },
+  "[python]": {
+    "editor.defaultFormatter": "ms-python.python",
+    "editor.semanticHighlighting.enabled": true,
+    "editor.formatOnSave": true
+  },
+  "python.formatting.provider": "black",
   "rust-analyzer.checkOnSave.command": "clippy",
   "cSpell.diagnosticLevel": "Hint",
   "files.exclude": {

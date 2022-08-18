@@ -45,7 +45,7 @@ def must_collect_data_kinds(can_access_data_kinds):
 @pytest.fixture(scope="session")
 def workos_tenant(must_collect_data_kinds, can_access_data_kinds):
     org_data = {
-        "name": "Acme Bank",        
+        "name": "Acme Bank",
         "is_live": True,
     }
 
@@ -62,7 +62,7 @@ def workos_tenant(must_collect_data_kinds, can_access_data_kinds):
 def workos_sandbox_tenant(must_collect_data_kinds, can_access_data_kinds):
 
     org_data = {
-        "name": "Acme Bank",    
+        "name": "Acme Bank",
         "is_live": False,
     }
 
@@ -97,7 +97,12 @@ def user(workos_sandbox_tenant, twilio):
     user_data = build_user_data()
 
     # Initialize the onboarding
-    post("hosted/onboarding", None, workos_sandbox_tenant.ob_config.key, basic_user.auth_token)
+    post(
+        "hosted/onboarding",
+        None,
+        workos_sandbox_tenant.ob_config.key,
+        basic_user.auth_token,
+    )
 
     # Populate the user's data
     post("hosted/user/data", user_data, basic_user.auth_token)
@@ -107,17 +112,28 @@ def user(workos_sandbox_tenant, twilio):
     body = post("hosted/user/biometric/init", None, basic_user.auth_token)
     chal_token = body["data"]["challenge_token"]
     chal = _override_webauthn_challenge(json.loads(body["data"]["challenge_json"]))
-    attestation = webauthn_device.create(chal, os.environ.get('TEST_URL'))
+    attestation = webauthn_device.create(chal, os.environ.get("TEST_URL"))
     attestation = _override_webauthn_attestation(attestation)
-    data = dict(challenge_token=chal_token, device_response_json=json.dumps(attestation))
+    data = dict(
+        challenge_token=chal_token, device_response_json=json.dumps(attestation)
+    )
     post("hosted/user/biometric", data, basic_user.auth_token)
 
     # Complete the onboarding
-    body = post("hosted/onboarding/complete", None, workos_sandbox_tenant.ob_config.key, basic_user.auth_token)
+    body = post(
+        "hosted/onboarding/complete",
+        None,
+        workos_sandbox_tenant.ob_config.key,
+        basic_user.auth_token,
+    )
     validation_token = body["data"]["validation_token"]
 
     # Get the fp_user_id
-    body = post("users/validate", dict(validation_token=validation_token), workos_sandbox_tenant.sk.key)
+    body = post(
+        "users/validate",
+        dict(validation_token=validation_token),
+        workos_sandbox_tenant.sk.key,
+    )
     fp_user_id = body["data"]["footprint_user_id"]
     return User(
         auth_token=basic_user.auth_token,

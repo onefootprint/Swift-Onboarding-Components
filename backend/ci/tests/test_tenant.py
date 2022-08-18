@@ -15,7 +15,9 @@ class TestTenantAPIs:
     def test_addresses_decrypt(self, user):
         reason = "Decrypting the address"
         data = dict(reason=reason)
-        body = post(f"users/{user.fp_user_id}/addresses/decrypt", data, user.tenant.sk.key)
+        body = post(
+            f"users/{user.fp_user_id}/addresses/decrypt", data, user.tenant.sk.key
+        )
         address = body["data"][0]
         assert address["line1"].upper() == "1 FOOTPRINT WAY"
         assert address["line2"].upper() == "PO BOX WALLABY WAY"
@@ -29,4 +31,9 @@ class TestTenantAPIs:
         assert body["data"][0]["reason"] == reason
 
         # Can't decrypt without reason
-        post(f"users/{user.fp_user_id}/addresses/decrypt", None, user.tenant.sk.key, status_code=400)
+        post(
+            f"users/{user.fp_user_id}/addresses/decrypt",
+            None,
+            user.tenant.sk.key,
+            status_code=400,
+        )

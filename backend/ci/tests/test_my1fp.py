@@ -1,41 +1,55 @@
 import pytest
 
-import re
 from tests.auth import FpAuth
 from tests.constants import FIELDS_TO_DECRYPT
 
 from tests.utils import try_until_success, post, get, identify_verify
 
-"""
-Returns a user authed under a my1fp scope
-"""
+
 @pytest.fixture(scope="module")
 def my1fp_authed_user(user, twilio):
+    """
+    Returns a user authed under a my1fp scope
+    """
     # Identify the user by email
     identifier = {"email": user.email}
-    data = dict(identifier=identifier, preferred_challenge_kind="sms", identify_type="my1fp")
+    data = dict(
+        identifier=identifier, preferred_challenge_kind="sms", identify_type="my1fp"
+    )
 
     def identify():
         body = post("hosted/identify", data)
         assert body["data"]["user_found"]
-        assert body["data"]["challenge_data"]["phone_number_last_two"] == user.real_phone_number[-2:]
+        assert (
+            body["data"]["challenge_data"]["phone_number_last_two"]
+            == user.real_phone_number[-2:]
+        )
         assert body["data"]["challenge_data"]["challenge_kind"] == "sms"
         return body["data"]["challenge_data"]["challenge_token"]
+
     challenge_token = try_until_success(identify, 20, 1)
 
     # Log in as the user
-    my1fp_auth_token = try_until_success(lambda: identify_verify(twilio, user.real_phone_number, challenge_token, expected_kind="user_inherited"), 5)
+    my1fp_auth_token = try_until_success(
+        lambda: identify_verify(
+            twilio,
+            user.real_phone_number,
+            challenge_token,
+            expected_kind="user_inherited",
+        ),
+        5,
+    )
     return user._replace(auth_token=my1fp_auth_token)
 
 
 class TestMy1fp:
     def test_decrypt(self, my1fp_authed_user):
-        data = {
-            "attributes": ["phone_number", "email", "street_address", "zip"]
-        }
+        data = {"attributes": ["phone_number", "email", "street_address", "zip"]}
         body = post("hosted/user/decrypt", data, my1fp_authed_user.auth_token)
         attributes = body["data"]
-        assert attributes["phone_number"] == my1fp_authed_user.phone_number.replace(" ", "")
+        assert attributes["phone_number"] == my1fp_authed_user.phone_number.replace(
+            " ", ""
+        )
         assert attributes["email"].upper() == my1fp_authed_user.email.upper()
         assert attributes["street_address"].upper() == "1 FOOTPRINT WAY"
         assert attributes["zip"] == "10009"
@@ -43,9 +57,7 @@ class TestMy1fp:
     def test_unauthorized_my1fp_basic_session_decrypt(self, my1fp_authed_user):
         return
         # TODO Re-instate this test after we differentiate between basic and step-up auth
-        data = {
-            "attributes": ["ssn"]
-        }
+        data = {"attributes": ["ssn"]}
         post("hosted/user/decrypt", data, my1fp_authed_user.auth_token, status_code=401)
 
     def test_user_detail(self, my1fp_authed_user):
@@ -66,8 +78,10 @@ class TestMy1fp:
         onboarding_info = authorized_orgs[0]["onboardings"][0]
         assert onboarding_info["name"] == "Acme Bank Card"
         assert onboarding_info["insight_event"]
-        assert set(onboarding_info["can_access_data_kinds"]) == set(can_access_data_kinds)
-        
+        assert set(onboarding_info["can_access_data_kinds"]) == set(
+            can_access_data_kinds
+        )
+
     def test_access_events(self, my1fp_authed_user):
         tenant = my1fp_authed_user.tenant
         # Decrypt as the tenant in order to generate some access events

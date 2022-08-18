@@ -1,18 +1,16 @@
-from ast import Pass
-from tests.utils import _gen_random_ssn, url
-import pytest
-from tests.utils import post, build_user_data, clean_up_user, PHONE_NUMBER, EMAIL
-from tests.types import SecretApiKey
+from tests.utils import url
+from tests.utils import post, build_user_data
 import requests
 from requests.auth import HTTPBasicAuth
 
+
 class TestNonPortableVaultApi:
     def test_vault_create_write_decrypt(self, workos_sandbox_tenant):
-        
+
         # create the vault
         body = post("users/", None, workos_sandbox_tenant.sk.key)
         user = body["data"]
-        fp_id = user["footprint_user_id"]     
+        fp_id = user["footprint_user_id"]
         assert fp_id
 
         # post data to it
@@ -22,17 +20,16 @@ class TestNonPortableVaultApi:
         data = dict(reason="test", attributes=["first_name", "zip", "city"])
         body = post(f"users/{fp_id}/decrypt", data, workos_sandbox_tenant.sk.key)
         data = body["data"]
-        
 
         assert data["first_name"] == "SANDBOX"
         assert data["zip"] == "10009"
         assert data["city"] == "Enclave".upper()
-        
+
+
 class TestApiFormats:
-    def test_basic_auth(self, workos_sandbox_tenant):    
+    def test_basic_auth(self, workos_sandbox_tenant):
         response = requests.get(
             url("org/api_keys/check"),
-            auth=HTTPBasicAuth(workos_sandbox_tenant.sk.key.token, '')
+            auth=HTTPBasicAuth(workos_sandbox_tenant.sk.key.token, ""),
         )
         assert response.status_code == 200
-

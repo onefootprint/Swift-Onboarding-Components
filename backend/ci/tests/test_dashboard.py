@@ -6,7 +6,6 @@ from tests.constants import EMAIL, FIELDS_TO_DECRYPT
 from tests.utils import get, post, patch, _gen_random_ssn
 from tests.types import SecretApiKey, ObConfiguration
 from .auth import (
-    TenantSecretAuth,
     TenantAuth,
 )
 
@@ -19,7 +18,9 @@ def secret_key(workos_sandbox_tenant):
 
 
 @pytest.fixture(scope="session")
-def ob_configuration(workos_sandbox_tenant, must_collect_data_kinds, can_access_data_kinds):
+def ob_configuration(
+    workos_sandbox_tenant, must_collect_data_kinds, can_access_data_kinds
+):
     data = dict(
         name="Test OB config",
         must_collect_data_kinds=must_collect_data_kinds,
@@ -68,7 +69,7 @@ class TestDashboard:
         assert tenant["name"] == "Acme Bank"
         assert not tenant["is_sandbox_restricted"]
         tenant["logo_url"]
-        
+
     def test_scoped_users_list(self, user):
         tenant = user.tenant
         # TODO don't filter on fp_user_id in this test. We only do it to ensure it doesn't flake in dev
@@ -77,18 +78,26 @@ class TestDashboard:
         scoped_users = body["data"]
         assert len(scoped_users)
         assert scoped_users[0]["footprint_user_id"] == user.fp_user_id
-        assert set(["first_name", "last_name"]) < set(scoped_users[0]["populated_data_kinds"])
+        assert set(["first_name", "last_name"]) < set(
+            scoped_users[0]["populated_data_kinds"]
+        )
 
     def test_liveness_list(self, user):
         tenant = user.tenant
-        body = get("users/liveness", dict(footprint_user_id=user.fp_user_id), tenant.sk.key)
+        body = get(
+            "users/liveness", dict(footprint_user_id=user.fp_user_id), tenant.sk.key
+        )
         creds = body["data"]
         assert len(creds)
         assert creds[0]["insight_event"]
 
     def test_access_events_list(self, user):
         tenant = user.tenant
-        body = get("users/access_events", dict(footprint_user_id=user.fp_user_id), tenant.sk.key)
+        body = get(
+            "users/access_events",
+            dict(footprint_user_id=user.fp_user_id),
+            tenant.sk.key,
+        )
         access_events = body["data"]
         assert len(access_events) == len(FIELDS_TO_DECRYPT)
         for i, expected_fields in enumerate(FIELDS_TO_DECRYPT[-1:0]):
@@ -96,7 +105,10 @@ class TestDashboard:
 
         # Test filtering on kinds. We provide two different kinds, and we should get all access events
         # that contain at least one of these fields
-        params = dict(footprint_user_id=user.fp_user_id, data_kinds=",".join(["email", "street_address"]))
+        params = dict(
+            footprint_user_id=user.fp_user_id,
+            data_kinds=",".join(["email", "street_address"]),
+        )
         body = get("users/access_events", params, tenant.sk.key)
         access_events = body["data"]
         assert len(access_events) == 2
@@ -104,20 +116,21 @@ class TestDashboard:
         assert "street_address" in set(access_events[1]["data_kinds"])
 
         # Test filtering on timestamp - if we filter for events in the future, there shouldn't be any
-        params = dict(
-            timestamp_gte=arrow.utcnow().shift(days=1).isoformat()
-        )
+        params = dict(timestamp_gte=arrow.utcnow().shift(days=1).isoformat())
         body = get("users/access_events", params, tenant.sk.key)
         assert not body["data"]
 
     def test_config_list(self, workos_sandbox_tenant, ob_configuration):
         body = get("org/onboarding_configs", None, workos_sandbox_tenant.sk.key)
-        config = next (
+        config = next(
             config for config in body["data"] if config["id"] == ob_configuration.id
         )
         assert config["key"] == ob_configuration.key.token
         assert config["name"] == ob_configuration.name
-        assert config["must_collect_data_kinds"] == ob_configuration.must_collect_data_kinds
+        assert (
+            config["must_collect_data_kinds"]
+            == ob_configuration.must_collect_data_kinds
+        )
         assert config["can_access_data_kinds"] == ob_configuration.can_access_data_kinds
         assert config["status"] == ob_configuration.status
         assert config["created_at"]
@@ -139,31 +152,55 @@ class TestDashboard:
         "must_collect,can_access,expected_status",
         [
             (["last_name"], [], 400),  # Can't collect last name without first name
-            (["last_four_ssn", "ssn"], [], 400),  # Can't collect both last four SSN and whole SSN
+            (
+                ["last_four_ssn", "ssn"],
+                [],
+                400,
+            ),  # Can't collect both last four SSN and whole SSN
             (["street_address"], [], 400),  # Can't collect only some address fields
             (["zip", "country"], [], 200),  # Except for zip & country
             (["zip"], [], 400),  # Country is always required along with zip
-            (["first_name", "last_name"], ["ssn"], 400),  # can_access must be < must_collect
+            (
+                ["first_name", "last_name"],
+                ["ssn"],
+                400,
+            ),  # can_access must be < must_collect
         ],
     )
-    def test_config_create_validation(self, workos_sandbox_tenant, must_collect, can_access, expected_status):
+    def test_config_create_validation(
+        self, workos_sandbox_tenant, must_collect, can_access, expected_status
+    ):
         # Test validation errors
         data = dict(
             name="Acme Bank Loan",
             must_collect_data_kinds=must_collect,
             can_access_data_kinds=can_access,
         )
-        post("org/onboarding_configs", data, workos_sandbox_tenant.sk.key, status_code=expected_status)
+        post(
+            "org/onboarding_configs",
+            data,
+            workos_sandbox_tenant.sk.key,
+            status_code=expected_status,
+        )
 
     def test_config_update(self, workos_sandbox_tenant, ob_configuration):
         # Test failing to update
         new_name = "Updated ob config name"
         new_status = "disabled"
         data = dict(name=new_name, status=new_status)
-        patch(f"org/onboarding_configs/flerpderp", data, workos_sandbox_tenant.sk.key, status_code=404)
+        patch(
+            f"org/onboarding_configs/flerpderp",
+            data,
+            workos_sandbox_tenant.sk.key,
+            status_code=404,
+        )
 
         # Update the name and status
-        body = patch(f"org/onboarding_configs/{ob_configuration.id}", data, workos_sandbox_tenant.sk.key)
+        body = patch(
+            f"org/onboarding_configs/{ob_configuration.id}",
+            data,
+            workos_sandbox_tenant.sk.key,
+        )
         ob_config = body["data"]
         assert ob_config["name"] == new_name
         assert ob_config["status"] == new_status
@@ -171,10 +208,7 @@ class TestDashboard:
         # Verify the update
         body = get(f"org/onboarding_configs", None, workos_sandbox_tenant.sk.key)
         configs = body["data"]
-        ob_config = next(
-            i for i in configs
-            if i["id"] == ob_configuration.id
-        )
+        ob_config = next(i for i in configs if i["id"] == ob_configuration.id)
         assert ob_config["name"] == new_name
         assert ob_config["status"] == new_status
 
@@ -187,10 +221,7 @@ class TestDashboard:
 
     def test_api_key_list(self, secret_key):
         body = get("org/api_keys", None, secret_key.key)
-        key = next(
-            key
-            for key in body["data"] if key["id"] == secret_key.id
-        )
+        key = next(key for key in body["data"] if key["id"] == secret_key.id)
         assert key["name"] == secret_key.name
         assert key["status"] == secret_key.status
         assert key["created_at"]
@@ -217,14 +248,21 @@ class TestDashboard:
         assert key["status"] == "disabled"
 
         # Verify the update, using the reveal endpoint as the detail endpoint
-        body = get(f"org/api_keys/{secret_key.id}/reveal", None, workos_sandbox_tenant.sk.key)
+        body = get(
+            f"org/api_keys/{secret_key.id}/reveal", None, workos_sandbox_tenant.sk.key
+        )
         assert body["data"]["name"] == new_name
         assert body["data"]["status"] == "disabled"
 
         # Verify we can't use the disabled API key for anything anymore
-        get(f"org/api_keys/{secret_key.id}/reveal", None, secret_key.key, status_code=401)
+        get(
+            f"org/api_keys/{secret_key.id}/reveal",
+            None,
+            secret_key.key,
+            status_code=401,
+        )
 
-    def test_portable_failed_data_write(self, user):         
+    def test_portable_failed_data_write(self, user):
         data = dict(reason="test", attributes=["first_name", "ssn"])
         body = post(f"users/{user.fp_user_id}/decrypt", data, user.tenant.sk.key)
         print(body)
@@ -236,7 +274,7 @@ class TestDashboard:
                 "day": 1,
                 "year": 1970,
             },
-            "ssn": _gen_random_ssn()
+            "ssn": _gen_random_ssn(),
         }
 
         # ensure we cannot change data in a portable vault
