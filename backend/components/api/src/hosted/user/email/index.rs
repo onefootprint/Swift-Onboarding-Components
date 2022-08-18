@@ -1,5 +1,3 @@
-use std::str::FromStr;
-
 use crate::auth::UserAuth;
 use crate::auth::{session_data::user::UserAuthScope, VerifiedUserAuth};
 
@@ -12,6 +10,7 @@ use crate::utils::user_vault_wrapper::UserVaultWrapper;
 use crate::State;
 
 use newtypes::email::Email as EmailData;
+use newtypes::{DataKind, Fingerprinter};
 
 use paperclip::actix::{api_v2_operation, web, web::Json, Apiv2Schema};
 
@@ -41,25 +40,28 @@ pub async fn post(
     let user_vault = user_auth.user_vault(&state.db_pool).await?;
 
     let email = request.into_inner().email;
-
     // Enforce that sandbox emails are used for sandbox users
     if email.is_live() != user_vault.is_live {
         return Err(UserError::SandboxMismatch.into());
     }
 
+    let sh_data = state
+        .compute_fingerprint(DataKind::Email, email.to_piistring().clean_for_fingerprint())
+        .await?;
     // grab our uvw
-    let mut uvw = state
+    let email_address = email.email.clone();
+    let email_id = state
         .db_pool
         .db_transaction(move |conn| -> Result<_, ApiError> {
-            Ok(UserVaultWrapper::from_conn(conn, user_vault)?)
+            let mut uvw = UserVaultWrapper::from_conn(conn, user_vault)?;
+            let email_id = uvw.add_email(conn, email.clone(), sh_data)?;
+            Ok(email_id)
         })
         .await?;
 
     // create the email
-    let email_id = uvw.add_email(&state, email.clone()).await?;
 
-    let email = EmailData::from_str(email.leak())?;
-    send_email_challenge(&state, email_id, &email.email).await?;
+    send_email_challenge(&state, email_id, &email_address).await?;
 
     Ok(Json(ApiResponseData::ok(EmptyResponse {})))
 }

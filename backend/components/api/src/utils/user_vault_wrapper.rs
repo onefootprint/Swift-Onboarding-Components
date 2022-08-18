@@ -16,8 +16,8 @@ use db::models::user_vault::UserVault;
 use db::{assert_in_transaction, DbPool};
 use db::{errors::DbError, PgConnection};
 use newtypes::{
-    DataKind, DataPriority, EmailId, Fingerprint, Fingerprinter, FootprintUserId, PiiString,
-    SealedVaultBytes, TenantId, UserVaultId, ValidatedPhoneNumber,
+    DataKind, DataPriority, EmailId, Fingerprint, FootprintUserId, PiiString, SealedVaultBytes, TenantId,
+    UserVaultId, ValidatedPhoneNumber,
 };
 
 use crate::errors::{ApiError, ApiResult};
@@ -78,33 +78,29 @@ impl UserVaultWrapper {
         Ok((uvw, scoped_user))
     }
 
-    pub async fn add_email(&mut self, state: &State, email: NewtypeEmail) -> ApiResult<EmailId> {
+    pub fn add_email(
+        &mut self,
+        conn: &mut PgConnection,
+        email: NewtypeEmail,
+        fingerprint: Fingerprint,
+    ) -> ApiResult<EmailId> {
+        assert_in_transaction(conn)?;
         let email = email.to_piistring();
         let e_data = self.user_vault.public_key.seal_pii(&email)?;
-        let fingerprint = state
-            .compute_fingerprint(DataKind::Email, email.clean_for_fingerprint())
-            .await?;
         let priority = if self.email.is_some() {
             DataPriority::Secondary
         } else {
             DataPriority::Primary
         };
-
         let user_vault_id = self.user_vault.id.clone();
+        let email =
+            db::models::email::Email::create(conn, user_vault_id, e_data, fingerprint, false, priority)?;
+        let email_id = email.id.clone();
 
-        let email = state
-            .db_pool
-            .db_transaction(move |conn| {
-                assert_in_transaction(conn)?;
-                db::models::email::Email::create(conn, user_vault_id, e_data, fingerprint, false, priority)
-            })
-            .await?;
-
-        if self.email.is_none() {
-            self.email = Some(email.clone());
+        if priority == DataPriority::Primary {
+            self.email = Some(email);
         }
-
-        Ok(email.id)
+        Ok(email_id)
     }
 
     pub async fn decrypt(
