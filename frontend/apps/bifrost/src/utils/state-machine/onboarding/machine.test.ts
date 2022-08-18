@@ -119,7 +119,7 @@ describe('Onboarding Machine Tests', () => {
       state = machine.send({
         type: Events.basicInformationSubmitted,
         payload: {
-          basicInformation: { firstName: 'Otto' },
+          basicInformation: { firstName: 'Otto', lastName: 'Footprint' },
         },
       });
       expect(state.value).toEqual(States.residentialAddress);
@@ -134,7 +134,7 @@ describe('Onboarding Machine Tests', () => {
       state = machine.send({
         type: Events.basicInformationSubmitted,
         payload: {
-          basicInformation: { firstName: 'Diffie' },
+          basicInformation: { firstName: 'Diffie', lastName: 'Footprint' },
         },
       });
       context = state.context;
@@ -144,7 +144,7 @@ describe('Onboarding Machine Tests', () => {
       state = machine.send({
         type: Events.residentialAddressSubmitted,
         payload: {
-          residentialAddress: { country: 'US' },
+          residentialAddress: { country: 'US', zip: '94107' },
         },
       });
       expect(state.value).toEqual(States.ssn);
@@ -159,7 +159,7 @@ describe('Onboarding Machine Tests', () => {
       state = machine.send({
         type: Events.residentialAddressSubmitted,
         payload: {
-          residentialAddress: { country: 'TR' },
+          residentialAddress: { country: 'TR', zip: '94107' },
         },
       });
       context = state.context;
@@ -209,7 +209,7 @@ describe('Onboarding Machine Tests', () => {
       state = machine.send({
         type: Events.basicInformationSubmitted,
         payload: {
-          basicInformation: { firstName: 'Otto' },
+          basicInformation: { firstName: 'Otto', lastName: 'Footprint' },
         },
       });
       expect(state.value).toEqual(States.ssn);
@@ -224,7 +224,7 @@ describe('Onboarding Machine Tests', () => {
       state = machine.send({
         type: Events.basicInformationSubmitted,
         payload: {
-          basicInformation: { firstName: 'Otto2' },
+          basicInformation: { firstName: 'Otto2', lastName: 'Footprint' },
         },
       });
       context = state.context;
