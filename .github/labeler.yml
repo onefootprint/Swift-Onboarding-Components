@@ -1,0 +1,21 @@
+CI:
+  - .github/**/*
+
+Backend:
+  - backend/**/*
+
+ephemeral:
+  - backend/infra/**/*
+  - backend/infra/*
+
+Frontend:
+  - frontend/**/*
+
+Dashboard:
+  - frontend/apps/dashboard/**/*
+
+My1fp:
+  - frontend/apps/my1fp/**/*
+
+Bifrost:
+  - frontend/apps/bifrost/**/*

@@ -1,11 +1,11 @@
-name: Auto-tag
+name: Tag Ephemeral
 
 on:
   pull_request:
     branches: [master]
     paths:
-      - "backend/infra/**/*"
-      - "backend/infra/*"
+      - 'backend/infra/**/*'
+      - 'backend/infra/*'
 
 jobs:
   tag-ephemeral:
@@ -16,4 +16,4 @@ jobs:
       - name: tag ephemeral environment
         uses: andymckay/labeler@master
         with:
-          add-labels: "ephemeral"
+          add-labels: 'ephemeral'
