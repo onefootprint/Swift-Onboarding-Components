@@ -15,8 +15,12 @@ type PageHeaderProps = {
 const PageHeader = ({ articles }: PageHeaderProps) => {
   const { t } = useTranslation('components.header');
   const navItems = [
-    { href: '/kyc-with-pii', Icon: IcoShield16, text: t('nav.kyc-with-pii') },
-    { href: '/pii', Icon: IcoDatabase16, text: t('nav.pii') },
+    {
+      href: '/kyc-with-pii/getting-started',
+      Icon: IcoShield16,
+      text: t('nav.kyc-with-pii'),
+    },
+    { href: '/pii/getting-started', Icon: IcoDatabase16, text: t('nav.pii') },
   ];
 
   return (

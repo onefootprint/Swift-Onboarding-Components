@@ -25,16 +25,6 @@ module.exports = withPlugins([withTM, withBundleAnalyzer], {
         destination: '/kyc-with-pii/getting-started',
         permanent: true,
       },
-      {
-        source: '/kyc-with-pii',
-        destination: '/kyc-with-pii/getting-started',
-        permanent: true,
-      },
-      {
-        source: '/pii',
-        destination: '/pii/getting-started',
-        permanent: true,
-      },
     ];
   },
 });

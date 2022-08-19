@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import Link from 'next/link';
 import React from 'react';
 import styled, { css } from 'styled-components';
 import { Box, media, Typography } from 'ui';
@@ -25,63 +26,69 @@ const PostPreview = ({
   title,
 }: PostPreviewProps) => (
   <Container>
-    <Anchor href={href}>
-      <FeatureImageDesktopContainer>
-        <FeatureImage
-          alt={featureImageAlt}
-          height={228}
-          layout="responsive"
-          objectFit="cover"
-          src={featureImageUrl}
-          width={468}
-        />
-      </FeatureImageDesktopContainer>
-      <FeatureImageMobileContainer>
-        <FeatureImage
-          height={228}
-          layout="responsive"
-          objectFit="cover"
-          src={featureImageUrl}
-          width={358}
-        />
-      </FeatureImageMobileContainer>
-      <Content>
-        <Header>
-          <Typography color="accent" variant="label-4" sx={{ marginBottom: 2 }}>
-            {primaryTag}
-          </Typography>
-          <Typography color="primary" variant="heading-2">
-            {title}
-          </Typography>
-        </Header>
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            flexGrow: 1,
-            justifyContent: 'space-between',
-          }}
-        >
-          <Body>
-            <Typography color="secondary" variant="body-2">
-              {excerpt}
+    <Link href={href} passHref>
+      <Anchor>
+        <FeatureImageDesktopContainer>
+          <FeatureImage
+            alt={featureImageAlt}
+            height={228}
+            layout="responsive"
+            objectFit="cover"
+            src={featureImageUrl}
+            width={468}
+          />
+        </FeatureImageDesktopContainer>
+        <FeatureImageMobileContainer>
+          <FeatureImage
+            height={228}
+            layout="responsive"
+            objectFit="cover"
+            src={featureImageUrl}
+            width={358}
+          />
+        </FeatureImageMobileContainer>
+        <Content>
+          <Header>
+            <Typography
+              color="accent"
+              variant="label-4"
+              sx={{ marginBottom: 2 }}
+            >
+              {primaryTag}
             </Typography>
-          </Body>
-          <Footer>
-            <Avatar
-              alt={author.name}
-              height={16}
-              layout="fixed"
-              src={author.avatarImgUrl}
-              width={16}
-            />
-            <Typography color="tertiary" variant="body-4">
-              {author.name} | <time>{createdAt}</time>
+            <Typography color="primary" variant="heading-2">
+              {title}
             </Typography>
-          </Footer>
-        </Box>
-      </Content>
-    </Anchor>
+          </Header>
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              flexGrow: 1,
+              justifyContent: 'space-between',
+            }}
+          >
+            <Body>
+              <Typography color="secondary" variant="body-2">
+                {excerpt}
+              </Typography>
+            </Body>
+            <Footer>
+              <Avatar
+                alt={author.name}
+                height={16}
+                layout="fixed"
+                src={author.avatarImgUrl}
+                width={16}
+              />
+              <Typography color="tertiary" variant="body-4">
+                {author.name} | <time>{createdAt}</time>
+              </Typography>
+            </Footer>
+          </Box>
+        </Content>
+      </Anchor>
+    </Link>
   </Container>
 );
 

@@ -1,5 +1,5 @@
 import type { Icon } from 'icons';
-import React, { HTMLAttributeAnchorTarget } from 'react';
+import React, { forwardRef, HTMLAttributeAnchorTarget } from 'react';
 import styled, { css } from 'styled-components';
 
 import { createFontStyles } from '../../utils/mixins';
@@ -26,42 +26,46 @@ export type LinkButtonProps = {
   disabled?: boolean;
 };
 
-const LinkButton = ({
-  ariaLabel,
-  children,
-  href,
-  iconComponent: Icon,
-  iconPosition = 'right',
-  onClick,
-  size = 'default',
-  target,
-  testID,
-  variant = 'default',
-  disabled = false,
-}: LinkButtonProps) => {
-  const renderedIcon = Icon && (
-    <Icon color={variant === 'default' ? 'accent' : 'error'} />
-  );
-  return (
-    <LinkButtonStyled
-      variant={variant}
-      disabled={disabled}
-      aria-label={ariaLabel}
-      data-testid={testID}
-      href={!disabled ? href : undefined}
-      onClick={!disabled ? onClick : undefined}
-      rel={target === '_blank' ? 'noopener noreferrer' : undefined}
-      size={size}
-      tabIndex={0}
-      target={href && !disabled ? target : undefined}
-      type={href && !disabled ? undefined : 'button'}
-    >
-      {iconPosition === 'left' && renderedIcon}
-      <span>{children}</span>
-      {iconPosition === 'right' && renderedIcon}
-    </LinkButtonStyled>
-  );
-};
+const LinkButton = forwardRef<HTMLAnchorElement, LinkButtonProps>(
+  (
+    {
+      ariaLabel,
+      children,
+      href,
+      iconComponent: Icon,
+      iconPosition = 'right',
+      onClick,
+      size = 'default',
+      target,
+      testID,
+      variant = 'default',
+      disabled = false,
+    }: LinkButtonProps,
+    ref,
+  ) => {
+    const renderedIcon = Icon && (
+      <Icon color={variant === 'default' ? 'accent' : 'error'} />
+    );
+    return (
+      <LinkButtonStyled
+        size={size}
+        ref={ref}
+        variant={variant}
+        disabled={disabled}
+        aria-label={ariaLabel}
+        data-testid={testID}
+        href={!disabled ? href : undefined}
+        onClick={!disabled ? onClick : undefined}
+        target={target}
+        rel={target === '_blank' ? 'noopener noreferrer' : undefined}
+      >
+        {iconPosition === 'left' && renderedIcon}
+        {children}
+        {iconPosition === 'right' && renderedIcon}
+      </LinkButtonStyled>
+    );
+  },
+);
 
 type LinkButtonStyleProps = Pick<LinkButtonProps, 'href'> & {
   size: LinkButtonSize;

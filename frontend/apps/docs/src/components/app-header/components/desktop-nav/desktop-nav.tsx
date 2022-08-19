@@ -29,9 +29,8 @@ const DesktopNav = ({ navItems }: DesktopNavProps) => {
         </Link>
         <Tab.List>
           {navItems.map(({ href, Icon, text }) => (
-            <Link href={href} key={text}>
+            <Link href={href} key={text} passHref>
               <Tab.Item
-                href={href}
                 iconComponent={Icon}
                 selected={router.asPath.startsWith(href)}
               >

@@ -1,5 +1,6 @@
 import { useIntl, useTranslation } from 'hooks';
 import IcoChevronLeftBig24 from 'icons/ico/ico-chevron-left-big-24';
+import Link from 'next/link';
 import React from 'react';
 import SEO from 'src/components/seo';
 import styled, { css } from 'styled-components';
@@ -52,13 +53,15 @@ const Post = ({ post }: PostProps) => {
         <Container>
           <Inner>
             <Box sx={{ marginBottom: 8 }}>
-              <LinkButton
-                iconPosition="left"
-                iconComponent={IcoChevronLeftBig24}
-                href="/blog"
-              >
-                {t('go-back')}
-              </LinkButton>
+              <Link href="/blog" passHref>
+                <LinkButton
+                  iconPosition="left"
+                  iconComponent={IcoChevronLeftBig24}
+                  href="/blog"
+                >
+                  {t('go-back')}
+                </LinkButton>
+              </Link>
             </Box>
             <Header>
               <Box

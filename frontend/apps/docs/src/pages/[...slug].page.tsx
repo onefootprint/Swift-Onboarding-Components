@@ -10,7 +10,7 @@ import {
 export async function getStaticPaths() {
   const pages = await getAllArticles();
   const paths = pages.map(({ data }) => data.slug);
-  return { paths, fallback: false };
+  return { paths, fallback: 'blocking' };
 }
 
 type Params = ParsedUrlQuery & {

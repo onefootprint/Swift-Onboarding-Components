@@ -1,5 +1,5 @@
 import Head from 'next/head';
-import React from 'react';
+import React, { Fragment } from 'react';
 
 type SeoProps = {
   description?: string;
@@ -52,10 +52,10 @@ const Seo = ({
     <meta name="twitter:title" content={twitter.title || title} />
     {twitter.extraData &&
       twitter.extraData.map(({ label, data }, index) => (
-        <>
+        <Fragment key={label}>
           <meta name={`twitter:label${index + 1}`} content={label} />
           <meta name={`twitter:data${index + 1}`} content={data} />
-        </>
+        </Fragment>
       ))}
     <meta
       name="twitter:description"
