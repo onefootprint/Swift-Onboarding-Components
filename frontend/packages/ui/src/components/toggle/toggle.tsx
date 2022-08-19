@@ -104,7 +104,7 @@ const ToggleContainer = styled.div`
 
 const Label = styled.label`
   ${({ theme }) => css`
-    ${createFontStyles('label-4')};
+    ${createFontStyles('label-3')};
     color: ${theme.color.primary};
     margin-right: ${theme.spacing[3]}px;
   `}

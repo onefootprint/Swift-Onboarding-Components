@@ -3,6 +3,7 @@ import glob from 'glob';
 import matter from 'gray-matter';
 import kebabCase from 'lodash/kebabCase';
 import path from 'path';
+import readingTime from 'reading-time';
 
 import type { Article } from '../types/article';
 
@@ -19,17 +20,18 @@ const getFilesPath = (filesPath: string): Promise<string[]> =>
     });
   });
 
-const getArticleSections = (content: string) => {
+const getSectionMeta = (text: string) => {
+  const level = text.split('#').length - 1;
+  const label = text.split('#').join('').trim();
+  const id = kebabCase(label);
+  const anchor = `#${id}`;
+  return { label, level, anchor, id };
+};
+
+const getSections = (content: string) => {
   const regXHeader = /#{1,6}.+/g;
   const sections = content.match(regXHeader);
-
-  return sections?.map(section => {
-    const level = section.split('#').length - 1;
-    const label = section.split('#').join('').trim();
-    const id = kebabCase(label);
-    const anchor = `#${id}`;
-    return { label, level, anchor, id };
-  });
+  return sections ? sections.map(getSectionMeta) : [];
 };
 
 const getAllMarkdownFiles = (contentPaths: string[]) =>
@@ -43,7 +45,11 @@ const getAllMarkdownFiles = (contentPaths: string[]) =>
         ...matterFile,
         data: {
           ...matterFile.data,
-          sections: getArticleSections(matterFile.content),
+          readingTime: readingTime(matterFile.content),
+          sections: [
+            getSectionMeta(`#${matterFile.data.title}`),
+            ...getSections(matterFile.content),
+          ],
         },
       };
     }),

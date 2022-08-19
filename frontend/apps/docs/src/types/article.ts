@@ -5,6 +5,13 @@ export type ArticleSection = {
   level: number;
 };
 
+export type ArticleReadingTime = {
+  minutes: number;
+  text: string;
+  time: number;
+  words: number;
+};
+
 export type ArticleMeta = {
   title: string;
   description: string;
@@ -16,6 +23,7 @@ export type Article = {
     meta: ArticleMeta;
     position: number;
     product: string;
+    readingTime: ArticleReadingTime;
     sections: ArticleSection[];
     slug: string;
     title: string;

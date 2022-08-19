@@ -4,14 +4,14 @@ import React from 'react';
 import styled, { css } from 'styled-components';
 import { Typography } from 'ui';
 
-type H3Props = {
+type H1Props = {
   children: string;
 };
 
-const H3 = ({ children }: H3Props) => {
+const H1 = ({ children }: H1Props) => {
   const id = kebabCase(children);
   return (
-    <Typography as="h3" color="primary" variant="label-1">
+    <Typography as="h1" color="primary" variant="heading-2">
       <Anchor id={id} href={`#${id}`} rel="noopener">
         {children}
         <IcoLink16 />
@@ -37,9 +37,8 @@ const Anchor = styled.a`
       transform: translateX(-${theme.spacing[3]}px);
       opacity: 0;
       visibility: hidden;
-      vertical-align: middle;
     }
   `};
 `;
 
-export default H3;
+export default H1;

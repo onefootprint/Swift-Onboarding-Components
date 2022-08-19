@@ -95,13 +95,13 @@ const Container = styled.aside`
         }
       }
 
-      &[data-level='2'] {
+      &[data-level='1'] {
         a {
           ${createFontStyles('label-4')};
         }
       }
 
-      &[data-level='3'] {
+      &[data-level='2'] {
         padding-left: ${theme.spacing[3]}px;
 
         a {

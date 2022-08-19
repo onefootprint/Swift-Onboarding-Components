@@ -9,9 +9,7 @@ meta: {
 }
 ---
 
-## Getting started
-
-### Setup
+## Setup
 
 1. Go to the Footprint [developer dashboard](https://dashboard.onefootprint.com/developers) and generate a new **Secret API Key**. This will look something like `sk_test_CJvsN1kaZH3GGtYkaZH3GGtY`. Add this to the credential manager of your server-side app. **Warning: treat this key like a sensitive password!**
 
@@ -22,7 +20,7 @@ curl -X POST https://api.onefootprint.com/org/api_keys/check \
   -u sk_test_CJvsN1kaZH3GGtYkaZH3GGtY:
 ```
 
-### Create a user vault
+## Create a user vault
 
 1. The first step is to create a new vault for one of your users (optionally you can create a new vault with data in a single API call)
 
@@ -45,7 +43,7 @@ curl -X POST https://api.onefootprint.com/users \
 
 3. Save this `footprint_user_id` in your database tied to the individual user it was created for. It is the identifier you will send to request any user-specific information. ***Note: This value is safe to store in plaintext!***
 
-### Update a user vault
+## Update a user vault
 
 Footprint user vaults store two types of data attributes: structured and unstructured. Structured data are first-class attributes that Footprint automatically validates, tokenizes, and in some cases fingerprints to make it searchable. Unstructured data, are custom key-value attributes that are set by you that provide no extra validation. Unstructured data are keyed by the format: `custom.<key>` in Footprint’s API requests.
 
@@ -59,7 +57,7 @@ curl -X POST https://api.onefootprint.com/users/fp_id_GSxJr68GAf5jUT3pdL9ndjf7TL
 	-d custom.ach_acct="111122224444"
 ```
 
-### Decrypt data from a user's vault
+## Decrypt data from a user's vault
 
 Footprint’s API provides attribute-level decryption. API keys are configurable to have certain attribute-level scopes.
 
@@ -86,7 +84,7 @@ curl -X POST https://api.onefootprint.com/users/fp_id_GSxJr68GAf5jUT3pdL9ndjf7TL
 }
 ```
 
-### List data in a user's vault
+## List data in a user's vault
 
 When you need to simply know what data fields a user vault contains, simply perform a `GET` on the vault
 
@@ -112,7 +110,7 @@ curl https://api.onefootprint.com/users/fp_id_GSxJr68GAf5jUT3pdL9ndjf7TLkA3GCX \
 }
 ```
 
-### Search across users' vaults
+## Search across users' vaults
 
 Footprint lets you search across all of your user vaults by certain fields that are fingerprinted. This lets you easily search across all of your users vaults privately without building complicated decryption procedures.
 

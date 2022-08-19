@@ -6,9 +6,10 @@ import { createFontStyles } from 'ui';
 
 import SEO from '../../components/seo';
 import A from './components/a';
+import ArticleHeader from './components/article-header';
 import Code from './components/code';
+import H1 from './components/h1';
 import H2 from './components/h2';
-import H3 from './components/h3';
 import Layout from './components/layout';
 
 type ArticleProps = {
@@ -19,8 +20,8 @@ type ArticleProps = {
 const components = {
   a: A,
   code: Code,
+  h1: H1,
   h2: H2,
-  h3: H3,
 };
 
 const ArticlePage = ({ product, article }: ArticleProps) => (
@@ -32,6 +33,10 @@ const ArticlePage = ({ product, article }: ArticleProps) => (
     />
     <Layout product={product} article={article}>
       <Container>
+        <ArticleHeader
+          title={article.data.title}
+          subtitle={article.data.readingTime.text}
+        />
         {/* @ts-ignore */}
         <ReactMarkdown components={components}>{article.content}</ReactMarkdown>
       </Container>

@@ -115,7 +115,7 @@ const Anchor = styled.a`
 const SupportList = styled.ul`
   ${({ theme }) => css`
     border-top: ${theme.borderWidth[1]}px solid ${theme.borderColor.tertiary};
-    padding: ${theme.spacing[5]}px 0;
+    padding: ${theme.spacing[6]}px 0;
 
     li:not(:last-child) {
       margin-bottom: ${theme.spacing[4]}px;
