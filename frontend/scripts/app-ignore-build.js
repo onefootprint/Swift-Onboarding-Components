@@ -18,6 +18,10 @@ const abortBuild = () => {
 const dir = process.argv[2] || path.basename(path.resolve());
 
 const stepCheck = () => {
+  if (process.env.VERCEL_ENV === 'production') {
+    return continueBuild();
+  }
+
   if (!dir) {
     return abortBuild();
   }
@@ -27,7 +31,11 @@ const stepCheck = () => {
     .toString()
     .trim()
     .split('\n');
-  const shouldBuild = fileNameList.some(file => file.startsWith(dir));
+  const hasChangedApp = fileNameList.some(file => file.startsWith(dir));
+  const hasChangedPackages = fileNameList.some(file =>
+    file.startsWith('frontend/packages'),
+  );
+  const shouldBuild = hasChangedApp || hasChangedPackages;
   return shouldBuild ? continueBuild() : abortBuild();
 };
 
