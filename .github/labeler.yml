@@ -3,6 +3,15 @@ CI:
 
 Backend:
   - backend/**/*
+  
+DB:
+  - backend/components/db/**/*
+  
+Migrations:
+  - backend/components/db/migrations/**/*
+  
+API:
+  - backend/components/api/**/*  
 
 ephemeral:
   - backend/infra/**/*
