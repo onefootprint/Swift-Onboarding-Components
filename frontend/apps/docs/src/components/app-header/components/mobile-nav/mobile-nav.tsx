@@ -89,7 +89,12 @@ const Header = styled.div`
     display: flex;
     gap: ${theme.spacing[8]}px;
     justify-content: space-between;
-    padding: ${theme.spacing[5]}px;
+    height: 48px;
+    padding: 0 ${theme.spacing[5]}px;
+
+    > a {
+      display: flex;
+    }
   `};
 `;
 

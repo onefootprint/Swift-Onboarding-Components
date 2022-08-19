@@ -45,7 +45,7 @@ window.onFootprintComplete = function(token) {
 
 2. From step 5 above, you should create/modify your endpoint to receive the validation token from your frontend. In this endpoint, send the validation token to Footprint’s backend.
 
-```sh
+```bash
 curl -X POST https://api.onefootprint.com/id/validate \
    -u sk_test_CJvsN1kaZH3GGtYkaZH3GGtY: \
    -d '{"validation_token": "vtok_udLaWUxPBo3fss603v8kY8k9ssjboxfwI"}'
@@ -67,14 +67,14 @@ curl -X POST https://api.onefootprint.com/id/validate \
 
 5. (Optionally) Fetch the user’s audit trail for detailed results on the identity verification:
 
-```sh
+```bash
 curl -X GET -G https://api.onefootprint.com/users/fp_id_GSxJr68GAf5jUT3pdL9ndjf7TLkA3GCX/audit_trail \
    -u sk_test_CJvsN1kaZH3GGtYkaZH3GGtY
 ```
 
 6. (Optionally) Decrypt identity fields from the user’s vault:
 
-```sh
+```bash
 curl -X POST https://api.onefootprint.com/users/decrypt \
    -u sk_test_CJvsN1kaZH3GGtYkaZH3GGtY: \
    -d '{"attributes": ["first_name", "last_name", "last_four_ssn"}'

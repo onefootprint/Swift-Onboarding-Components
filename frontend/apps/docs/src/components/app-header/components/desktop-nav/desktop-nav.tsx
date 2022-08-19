@@ -1,15 +1,12 @@
-import { createPopup } from '@typeform/embed';
 import { useTranslation } from 'hooks';
 import Logo from 'icons/ico/logo-fpdocs-default';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React from 'react';
 import styled, { css } from 'styled-components';
-import { Button, media, Tab } from 'ui';
+import { media, Tab } from 'ui';
 
 import type { NavItem } from '../../app-header.types';
-
-const { toggle: toggleTypeform } = createPopup('COZNk70C');
 
 type DesktopNavProps = {
   navItems: NavItem[];
@@ -40,9 +37,6 @@ const DesktopNav = ({ navItems }: DesktopNavProps) => {
           ))}
         </Tab.List>
       </Nav>
-      <Button size="small" onClick={toggleTypeform}>
-        {t('request-early-access')}
-      </Button>
     </Container>
   );
 };
@@ -52,20 +46,17 @@ const Container = styled.div`
     align-items: center;
     border-bottom: ${theme.borderWidth[1]}px solid ${theme.borderColor.tertiary};
     display: none;
+    height: var(--header-height);
     justify-content: space-between;
-    padding: ${theme.spacing[3]}px ${theme.spacing[7] + theme.spacing[2]}px;
+    padding: ${theme.spacing[4]}px ${theme.spacing[7] + theme.spacing[2]}px;
+
+    nav > a {
+      display: flex;
+    }
 
     ${media.greaterThan('sm')`
       display: flex;
     `}
-
-    button {
-      display: none;
-
-      ${media.greaterThan('md')`
-        display: block;
-      `}
-    }
   `};
 `;
 

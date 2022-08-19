@@ -58,7 +58,6 @@ const Main = styled.main`
 const ArticleContent = styled.article`
   max-width: 720px;
   width: 100%;
-  overflow: hidden;
 
   ${media.greaterThan('lg')`
     margin: 0 auto;

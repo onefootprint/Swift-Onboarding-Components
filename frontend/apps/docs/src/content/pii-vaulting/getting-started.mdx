@@ -17,7 +17,7 @@ meta: {
 
 2. Check that your API key is working as expected, you should get back some information about this key.
 
-```sh
+```bash
 curl -X POST https://api.onefootprint.com/org/api_keys/check \
   -u sk_test_CJvsN1kaZH3GGtYkaZH3GGtY:
 ```
@@ -26,7 +26,7 @@ curl -X POST https://api.onefootprint.com/org/api_keys/check \
 
 1. The first step is to create a new vault for one of your users (optionally you can create a new vault with data in a single API call)
 
-```sh
+```bash
 curl -X POST https://api.onefootprint.com/users \
   -u sk_test_CJvsN1kaZH3GGtYkaZH3GGtY:
 ```
@@ -49,7 +49,7 @@ curl -X POST https://api.onefootprint.com/users \
 
 Footprint user vaults store two types of data attributes: structured and unstructured. Structured data are first-class attributes that Footprint automatically validates, tokenizes, and in some cases fingerprints to make it searchable. Unstructured data, are custom key-value attributes that are set by you that provide no extra validation. Unstructured data are keyed by the format: `custom.<key>` in Footprint’s API requests.
 
-```sh
+```bash
 curl -X POST https://api.onefootprint.com/users/fp_id_GSxJr68GAf5jUT3pdL9ndjf7TLkA3GCX/data \
   -u sk_test_CJvsN1kaZH3GGtYkaZH3GGtY: \
 	-d first_name="John" \ 
@@ -63,7 +63,7 @@ curl -X POST https://api.onefootprint.com/users/fp_id_GSxJr68GAf5jUT3pdL9ndjf7TL
 
 Footprint’s API provides attribute-level decryption. API keys are configurable to have certain attribute-level scopes.
 
-```sh
+```bash
 curl -X POST https://api.onefootprint.com/users/fp_id_GSxJr68GAf5jUT3pdL9ndjf7TLkA3GCX/decrypt \
   -u sk_test_CJvsN1kaZH3GGtYkaZH3GGtY: \
 	-d '{ "attributes": ["last_name", "dob", "ssn9", "custom.ach_acct"], "reason": "direct deposit verification"}'
@@ -90,7 +90,7 @@ curl -X POST https://api.onefootprint.com/users/fp_id_GSxJr68GAf5jUT3pdL9ndjf7TL
 
 When you need to simply know what data fields a user vault contains, simply perform a `GET` on the vault
 
-```sh
+```bash
 curl https://api.onefootprint.com/users/fp_id_GSxJr68GAf5jUT3pdL9ndjf7TLkA3GCX \
   -u sk_test_CJvsN1kaZH3GGtYkaZH3GGtY: \
 ```
@@ -118,7 +118,7 @@ Footprint lets you search across all of your user vaults by certain fields that 
 
 ***For example:***
 
-```sh
+```bash
 curl -X POST https://api.onefootprint.com/users/?zip_code=10014 \
   -u sk_test_CJvsN1kaZH3GGtYkaZH3GGtY:
 ```
@@ -130,6 +130,3 @@ curl -X POST https://api.onefootprint.com/users/?zip_code=10014 \
 	]
 }
 ```
-
-### Need help?
-We’re just an email away, reach us at [support@onefootprint.com](mailto:support@onefootprint.com)!

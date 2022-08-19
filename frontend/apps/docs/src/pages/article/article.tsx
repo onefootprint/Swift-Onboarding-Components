@@ -41,10 +41,19 @@ const ArticlePage = ({ product, article }: ArticleProps) => (
 
 const Container = styled.div`
   ${({ theme }) => css`
-    p,
-    li {
-      ${createFontStyles('body-2')};
-      color: ${theme.color.secondary};
+    ${createFontStyles('body-2')};
+    color: ${theme.color.secondary};
+
+    > p {
+      margin-bottom: ${theme.spacing[7]}px;
+    }
+
+    h3 {
+      margin-bottom: ${theme.spacing[7]}px;
+
+      &:not(:first-of-type) {
+        margin-top: ${theme.spacing[10]}px;
+      }
     }
 
     ol {
@@ -70,7 +79,7 @@ const Container = styled.div`
     }
 
     pre > div {
-      margin-top: -${theme.spacing[3]}px;
+      margin-top: -${theme.spacing[4]}px;
       margin-bottom: ${theme.spacing[7]}px;
     }
   `};
