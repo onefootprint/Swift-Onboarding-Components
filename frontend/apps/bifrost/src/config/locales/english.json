@@ -83,7 +83,7 @@
         },
         "resend-code": {
           "cta": "Resend code",
-          "disabled": "Please wait {{seconds}} seconds to resend...",
+          "disabled": "Please wait {{seconds}} seconds to resend it...",
           "toast": {
             "success": {
               "title": "Success",

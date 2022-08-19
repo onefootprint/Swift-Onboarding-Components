@@ -4,7 +4,8 @@ import useIdentify, {
   IdentifyResponse,
 } from 'src/pages/identify/hooks/use-identify';
 import { ChallengeKind, Events } from 'src/utils/state-machine/identify/types';
-import { LinkButton, LoadingIndicator, useToast } from 'ui';
+import styled, { css } from 'styled-components';
+import { LinkButton, LoadingIndicator, Typography, useToast } from 'ui';
 
 import useIdentifyChallenge from '../../../../hooks/use-identify-challenge';
 import useIdentifyMachine from '../../../../hooks/use-identify-machine';
@@ -105,10 +106,27 @@ const ResendCodeButton = () => {
   };
 
   return (
-    <LinkButton disabled={countdown > 0} onClick={handleResend}>
-      {countdown > 0 ? t('disabled', { seconds: countdown }) : t('cta')}
-    </LinkButton>
+    <Container>
+      <LinkButton disabled={countdown > 0} onClick={handleResend}>
+        {t('cta')}
+      </LinkButton>
+      {countdown > 0 && (
+        <Typography variant="body-4" color="tertiary">
+          {t('disabled', { seconds: countdown })}{' '}
+        </Typography>
+      )}
+    </Container>
   );
 };
+
+const Container = styled.div`
+  ${({ theme }) => css`
+    row-gap: ${theme.spacing[4]}px;
+    flex-direction: column;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  `}
+`;
 
 export default ResendCodeButton;
