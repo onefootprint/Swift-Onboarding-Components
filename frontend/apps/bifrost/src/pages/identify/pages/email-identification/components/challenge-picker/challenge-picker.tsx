@@ -3,7 +3,7 @@ import { useTranslation } from 'hooks';
 import IcoClose24 from 'icons/ico/ico-close-16';
 import IcoFaceid24 from 'icons/ico/ico-faceid-24';
 import IcoSmartphone24 from 'icons/ico/ico-smartphone-24';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useIdentifyMachine } from 'src/components/identify-machine-provider';
 import { ChallengeKind } from 'src/utils/state-machine/identify/types';
 import styled, { css } from 'styled-components';
@@ -28,6 +28,15 @@ type BottomSheetProps = {
   onSelectBiometric: () => void;
 };
 
+enum State {
+  open = 'open',
+  opening = 'opening',
+  closed = 'closed',
+  closing = 'closing',
+}
+
+const OPEN_CLOSE_DELAY = 200;
+
 const ChallengePicker = ({
   open,
   onClose,
@@ -46,7 +55,37 @@ const ChallengePicker = ({
     supportsBiometric ? ChallengeKind.biometric : ChallengeKind.sms,
   );
 
-  const iOS = iOSPlatforms.includes(navigator.platform);
+  const [visibleState, setVisibleState] = useState<State>(State.closed);
+  useEffect(() => {
+    setVisibleState(open ? State.open : State.closed);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (visibleState === State.opening || visibleState === State.closing) {
+      return;
+    }
+
+    if (visibleState === State.open && !open) {
+      setVisibleState(State.closing);
+      setTimeout(() => {
+        setVisibleState(State.closed);
+      }, OPEN_CLOSE_DELAY);
+      return;
+    }
+
+    if (visibleState === State.closed && open) {
+      setVisibleState(State.opening);
+      setTimeout(() => {
+        setVisibleState(State.open);
+      }, OPEN_CLOSE_DELAY);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open]);
+
+  if (visibleState === State.closed) {
+    return null;
+  }
 
   const handleComplete = () => {
     if (challengeKind === ChallengeKind.sms) {
@@ -64,11 +103,11 @@ const ChallengePicker = ({
     setChallengeKind(ChallengeKind.biometric);
   };
 
-  // TODO: add open animation
-  return !open ? null : (
-    <FocusTrap>
-      <Overlay onClick={onClose} aria-modal>
-        <BottomSheet className={open ? 'visible' : 'hidden'}>
+  const iOS = iOSPlatforms.includes(navigator.platform);
+  return (
+    <FocusTrap active={open}>
+      <StyledOverlay onClick={onClose} aria-modal className={visibleState}>
+        <BottomSheet className={visibleState}>
           <Header>
             <CloseContainer onClick={onClose}>
               <IcoClose24 />
@@ -102,10 +141,23 @@ const ChallengePicker = ({
             </Button>
           </Body>
         </BottomSheet>
-      </Overlay>
+      </StyledOverlay>
     </FocusTrap>
   );
 };
+
+const StyledOverlay = styled(Overlay)`
+  transition: all 0.2s linear;
+
+  &.open {
+    opacity: 1;
+  }
+
+  &.closing,
+  &.opening {
+    opacity: 0;
+  }
+`;
 
 const CloseContainer = styled.div`
   ${({ theme }) => css`
@@ -123,6 +175,16 @@ const BottomSheet = styled.div`
     border-radius: ${theme.borderRadius[3]}px ${theme.borderRadius[3]}px 0 0;
     z-index: ${theme.zIndex.overlay + 1};
     align-self: end;
+    transition: all 0.2s linear;
+
+    &.open {
+      translateY(0%);
+    }
+
+    &.opening,
+    &.closing {
+      transform: translateY(100%);
+    }
   `}
 `;
 
