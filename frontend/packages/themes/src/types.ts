@@ -1,3 +1,5 @@
+import * as CSS from 'csstype';
+
 export type UIStates = {
   accent: string;
   error: string;
@@ -55,6 +57,44 @@ type Colors = {
   senary: string;
   septenary: string;
 } & UIStates;
+
+export type CodeHighlight<T = CSS.Properties> = {
+  hljs: T;
+  'hljs-comment': T;
+  'hljs-quote': T;
+  'hljs-doctag': T;
+  'hljs-keyword': T;
+  'hljs-formula': T;
+  'hljs-section': T;
+  'hljs-name': T;
+  'hljs-selector-tag': T;
+  'hljs-deletion': T;
+  'hljs-subst': T;
+  'hljs-literal': T;
+  'hljs-string': T;
+  'hljs-regexp': T;
+  'hljs-addition': T;
+  'hljs-attribute': T;
+  'hljs-meta-string': T;
+  'hljs-built_in': T;
+  'hljs-class .hljs-title': T;
+  'hljs-attr': T;
+  'hljs-variable': T;
+  'hljs-template-variable': T;
+  'hljs-type': T;
+  'hljs-selector-class': T;
+  'hljs-selector-attr': T;
+  'hljs-selector-pseudo': T;
+  'hljs-number': T;
+  'hljs-symbol': T;
+  'hljs-bullet': T;
+  'hljs-link': T;
+  'hljs-meta': T;
+  'hljs-selector-id': T;
+  'hljs-title': T;
+  'hljs-emphasis': T;
+  'hljs-strong': T;
+};
 
 export type Color = keyof Colors;
 
@@ -164,6 +204,7 @@ export type Theme = {
   borderRadius: BorderRadiuses;
   borderWidth: BorderWidths;
   breakpoint: Breakpoints;
+  codeHighlight: CodeHighlight;
   color: Colors;
   elevation: Elevations;
   grid: Grids;

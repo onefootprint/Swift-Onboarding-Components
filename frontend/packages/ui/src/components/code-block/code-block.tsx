@@ -1,8 +1,7 @@
 import IcoClipboard24 from 'icons/ico/ico-clipboard-24';
 import React, { useEffect, useState } from 'react';
 import SyntaxHighlighter from 'react-syntax-highlighter';
-import atomOneLight from 'react-syntax-highlighter/dist/cjs/styles/hljs/atom-one-light';
-import styled, { css } from 'styled-components';
+import styled, { css, useTheme } from 'styled-components';
 
 import { createFontStyles } from '../../utils/mixins';
 import Tooltip from '../tooltip';
@@ -29,6 +28,7 @@ const CodeBlock = ({
   tooltipText = 'Copy to clipboard',
   tooltipTextConfirmation = 'Copied!',
 }: CodeBlockProps) => {
+  const theme = useTheme();
   const [shouldShowConfirmation, setShowConfirmation] = useState(false);
 
   useEffect(
@@ -78,7 +78,7 @@ const CodeBlock = ({
         </Tooltip>
       </Header>
       <Content>
-        <SyntaxHighlighter language={language} style={atomOneLight}>
+        <SyntaxHighlighter language={language} style={theme.codeHighlight}>
           {children}
         </SyntaxHighlighter>
       </Content>

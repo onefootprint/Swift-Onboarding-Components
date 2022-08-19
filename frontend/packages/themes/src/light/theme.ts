@@ -8,6 +8,7 @@ import grid from '../shared/grid';
 import spacing from '../shared/spacing';
 import typography from '../shared/typography';
 import zIndex from '../shared/z-index';
+import codeHighlight from './code-highlight';
 import primitives from './primitives';
 
 const theme: DefaultTheme = {
@@ -18,6 +19,7 @@ const theme: DefaultTheme = {
   borderRadius,
   borderWidth,
   zIndex,
+  codeHighlight,
   backgroundColor: {
     transparent: 'transparent',
     primary: primitives.gray0,
