@@ -28,7 +28,6 @@ const ClearButtonContainer = styled.button<{ size: Size }>`
     align-items: center;
     background: none;
     border: none;
-    cursor: pointer;
     display: flex;
     height: 100%;
     margin-right: ${theme.spacing[sizeToIconMargin[size]]}px;

@@ -53,7 +53,7 @@ const Container = styled.div`
       margin-bottom: ${theme.spacing[7]}px;
     }
 
-    h3 {
+    h2 {
       margin-bottom: ${theme.spacing[7]}px;
 
       &:not(:first-of-type) {

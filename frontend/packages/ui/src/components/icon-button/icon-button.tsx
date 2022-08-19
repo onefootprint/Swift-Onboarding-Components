@@ -40,7 +40,6 @@ const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
 const Container = styled.button`
   align-items: center;
   border: none;
-  cursor: pointer;
   display: flex;
   height: 32px;
   justify-content: center;

@@ -98,37 +98,69 @@ const Container = styled.div`
   `}
 `;
 
-const Header = styled.div`
+const Header = styled.header`
   ${({ theme }) => css`
-    height: 48px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     background-color: ${theme.backgroundColor.secondary};
     border-bottom: 1px solid ${theme.borderColor.tertiary};
     width: 100%;
-    padding: ${theme.spacing[5]}px;
+    padding: ${theme.spacing[3]}px ${theme.spacing[5]}px;
   `}
 `;
 
 const CopyButton = styled.button`
   background: none;
   border: none;
-  cursor: pointer;
-  margin: 0;
   padding: 0;
+  display: flex;
+
+  &:hover {
+    opacity: 0.8;
+  }
 `;
 
-const Content = styled.code`
+const Content = styled.div`
   ${({ theme }) => css`
-    background-color: ${theme.backgroundColor.primary};
-    padding: ${theme.spacing[5]}px;
-    width: 100%;
     ${createFontStyles('snippet-2')};
+    background: transparent;
+    position: relative;
+    width: 100%;
+
+    &::before,
+    &::after {
+      pointer-events: none;
+      content: '';
+      position: absolute;
+      top: 0px;
+      bottom: ${theme.spacing[3]}px;
+    }
+
+    &::before {
+      left: 0px;
+      width: ${theme.spacing[5]}px;
+      background: linear-gradient(
+        -90deg,
+        rgba(255, 255, 255, 0),
+        ${theme.backgroundColor.primary}
+      );
+    }
+
+    &::after {
+      right: 0px;
+      width: ${theme.spacing[7]}px;
+      background: linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0) 0%,
+        ${theme.backgroundColor.primary} 80%
+      );
+    }
 
     pre {
+      text-align: left;
+      padding: ${theme.spacing[5]}px !important;
       background: none !important;
-      padding: 0 !important;
     }
   `}
 `;
