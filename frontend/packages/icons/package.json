@@ -27,6 +27,6 @@
     "styled-components": "^5.3.5",
     "tsconfig": "*",
     "themes": "*",
-    "typescript": "^4.7.3"
+    "typescript": "^4.7.4"
   }
 }
