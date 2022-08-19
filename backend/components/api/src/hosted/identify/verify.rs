@@ -136,9 +136,6 @@ async fn create_new_user_vault(
         sh_phone_number: state
             .compute_fingerprint(DataKind::PhoneNumber, phone_number.to_piistring())
             .await?,
-        sh_phone_country: state
-            .compute_fingerprint(DataKind::PhoneCountry, phone_number.iso_country_code.clone())
-            .await?,
         is_live: phone_number.is_live(),
     };
     let user = db::user_vault::create(&state.db_pool, new_user).await?;

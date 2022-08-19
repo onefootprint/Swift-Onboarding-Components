@@ -25,7 +25,6 @@ pub async fn create(pool: &crate::DbPool, new_user: NewPortableUserVaultReq) -> 
                 new_user.e_phone_number,
                 new_user.sh_phone_number,
                 new_user.e_phone_country,
-                new_user.sh_phone_country,
                 true, // phone numbers created as verified
                 DataPriority::Primary,
             )?;

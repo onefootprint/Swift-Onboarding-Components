@@ -43,8 +43,6 @@ pub enum DataKind {
     Country,
     Email,
     PhoneNumber,
-    /// Phone country iso code, like "US"
-    PhoneCountry,
     Ssn4,
 }
 
@@ -77,7 +75,6 @@ impl DataKind {
         // For example, ability to decrypt an Ssn also provides the ability to decrypt LastFourSsn
         match self {
             DataKind::Ssn9 => vec![DataKind::Ssn9, DataKind::Ssn4],
-            DataKind::PhoneNumber => vec![DataKind::PhoneNumber, DataKind::PhoneCountry],
             kind => vec![kind],
         }
     }

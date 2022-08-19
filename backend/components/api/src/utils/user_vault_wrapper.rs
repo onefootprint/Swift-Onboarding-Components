@@ -159,7 +159,6 @@ impl HasIdentityDataFields for UserVaultWrapper {
         match data_kind {
             DataKind::Email => self.email.as_ref().map(|e| &e.e_data),
             DataKind::PhoneNumber => self.phone_number.as_ref().map(|p| &p.e_e164),
-            DataKind::PhoneCountry => self.phone_number.as_ref().map(|p| &p.e_country),
             kind => id?.get_e_field(kind),
         }
     }

@@ -72,24 +72,19 @@ impl PhoneNumber {
         Ok(result)
     }
 
-    #[allow(clippy::too_many_arguments)]
     pub fn create(
         conn: &mut PgConnection,
         user_vault_id: UserVaultId,
         e_e164: SealedVaultBytes,
         fp_e164: FingerprintData,
         e_country: SealedVaultBytes,
-        fp_country: FingerprintData,
         is_verified: bool,
         priority: DataPriority,
     ) -> Result<PhoneNumber, DbError> {
         let fingerprint_ids = Fingerprint::bulk_create(
             conn,
             &user_vault_id,
-            vec![
-                (DataKind::PhoneNumber, fp_e164, is_verified),
-                (DataKind::PhoneCountry, fp_country, false),
-            ],
+            vec![(DataKind::PhoneNumber, fp_e164, is_verified)],
         )?;
 
         let new_row = NewPhoneNumber {
@@ -107,9 +102,6 @@ impl PhoneNumber {
     }
 
     pub fn data_items(self) -> Vec<(DataKind, SealedVaultBytes)> {
-        vec![
-            (DataKind::PhoneNumber, self.e_e164),
-            (DataKind::PhoneCountry, self.e_country),
-        ]
+        vec![(DataKind::PhoneNumber, self.e_e164)]
     }
 }

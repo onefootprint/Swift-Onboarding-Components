@@ -171,7 +171,6 @@ impl HasIdentityDataFields for IdentityData {
             DataKind::Country => self.e_address_country.as_ref(),
             DataKind::Email => None,
             DataKind::PhoneNumber => None,
-            DataKind::PhoneCountry => None,
         }
     }
 }
