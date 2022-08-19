@@ -3,15 +3,15 @@ CI:
 
 Backend:
   - backend/**/*
-  
+
 DB:
   - backend/components/db/**/*
-  
+
 Migrations:
   - backend/components/db/migrations/**/*
-  
+
 API:
-  - backend/components/api/**/*  
+  - backend/components/api/**/*
 
 ephemeral:
   - backend/infra/**/*
@@ -28,3 +28,15 @@ My1fp:
 
 Bifrost:
   - frontend/apps/bifrost/**/*
+
+Developer Docs:
+  - frontend/apps/bifrost/**/*
+
+Frontpage:
+  - frontend/apps/bifrost/**/*
+
+Design System:
+  - frontend/packages/ui/**/*
+
+Tooling:
+  - frontend/packages/**/*
