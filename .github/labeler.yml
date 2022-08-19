@@ -30,10 +30,10 @@ Bifrost:
   - frontend/apps/bifrost/**/*
 
 Developer Docs:
-  - frontend/apps/bifrost/**/*
+  - frontend/apps/docs/**/*
 
 Frontpage:
-  - frontend/apps/bifrost/**/*
+  - frontend/apps/frontpage/**/*
 
 Design System:
   - frontend/packages/ui/**/*
