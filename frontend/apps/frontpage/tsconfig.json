@@ -5,7 +5,6 @@
     "paths": {
       "src/*": ["src/*"],
       "global-constants": ["../../packages/global-constants/src/*"],
-      "request": ["../../packages/request/src/*"],
       "themes": ["../../packages/themes/src/*"]
     }
   },

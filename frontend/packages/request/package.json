@@ -27,5 +27,9 @@
     "tsconfig": "*",
     "tsup": "^6.2.2",
     "typescript": "^4.7.4"
+  },
+  "peerDependencies": {
+    "axios": "^0.27.2",
+    "axios-case-converter": "^0.9.0"
   }
 }
