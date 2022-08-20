@@ -11,7 +11,6 @@ const withTM = require('next-transpile-modules')([
   'footprint',
   'footprint-ui',
   'footprint-provider',
-  'themes',
 ]);
 
 module.exports = withPlugins([withTM, withBundleAnalyzer], {

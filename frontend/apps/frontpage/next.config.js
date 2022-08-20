@@ -8,7 +8,6 @@ const withTM = require('next-transpile-modules')([
   'icons',
   'hooks',
   'request',
-  'themes',
 ]);
 
 const withMDX = require('@next/mdx')({

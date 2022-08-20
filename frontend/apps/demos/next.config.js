@@ -10,7 +10,6 @@ const withTM = require('next-transpile-modules')([
   'request',
   'footprint',
   'footprint-provider',
-  'themes',
 ]);
 
 module.exports = withPlugins([withTM, withBundleAnalyzer], {

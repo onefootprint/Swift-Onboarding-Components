@@ -4,7 +4,8 @@
     "baseUrl": ".",
     "paths": {
       "src/*": ["src/*"],
-      "global-constants": ["../../packages/global-constants/src/*"]
+      "global-constants": ["../../packages/global-constants/src/*"],
+      "themes": ["../../packages/themes/src/*"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],

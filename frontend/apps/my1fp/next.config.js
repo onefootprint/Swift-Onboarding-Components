@@ -14,7 +14,6 @@ const withTM = require('next-transpile-modules')([
   'footprint',
   'footprint-provider',
   'footprint-ui',
-  'themes',
   'types',
 ]);
 
