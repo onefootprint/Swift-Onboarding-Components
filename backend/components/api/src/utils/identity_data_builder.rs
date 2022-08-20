@@ -160,7 +160,7 @@ impl IdentityDataBuilder {
         }
 
         self.new_data.e_address_zip = self.seal(zip.into(), DataKind::Zip)?;
-        self.new_data.e_address_zip = self.seal(country.into(), DataKind::Country)?;
+        self.new_data.e_address_country = self.seal(country.into(), DataKind::Country)?;
         Ok(())
     }
 
