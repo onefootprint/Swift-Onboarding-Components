@@ -3,7 +3,8 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "src/*": ["src/*"]
+      "src/*": ["src/*"],
+      "global-constants": ["../../packages/global-constants/src/*"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],

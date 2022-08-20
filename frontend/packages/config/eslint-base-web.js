@@ -12,6 +12,7 @@ module.exports = {
     'airbnb-typescript',
     'plugin:import/recommended',
     'plugin:import/typescript',
+    'turbo',
     'prettier',
   ],
   plugins: ['@typescript-eslint', 'simple-import-sort', 'import'],

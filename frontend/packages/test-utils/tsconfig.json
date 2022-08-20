@@ -1,5 +1,11 @@
 {
   "extends": "tsconfig/react-library.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "global-constants": ["../../packages/global-constants/src/*"]
+    }
+  },
   "include": ["."],
   "exclude": ["dist", "build", "node_modules"]
 }
