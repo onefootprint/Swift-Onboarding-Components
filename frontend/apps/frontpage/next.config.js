@@ -3,12 +3,7 @@ const withPlugins = require('next-compose-plugins');
 const withBundleAnalyzer = require('@next/bundle-analyzer')({
   enabled: process.env.ANALYZE === 'true',
 });
-const withTM = require('next-transpile-modules')([
-  'ui',
-  'icons',
-  'hooks',
-  'request',
-]);
+const withTM = require('next-transpile-modules')(['ui', 'icons', 'hooks']);
 
 const withMDX = require('@next/mdx')({
   pageExtensions: ['ts', 'tsx', 'js', 'jsx', 'md', 'mdx'],

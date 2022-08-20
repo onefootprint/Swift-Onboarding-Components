@@ -7,7 +7,6 @@ const withTM = require('next-transpile-modules')([
   'ui',
   'icons',
   'hooks',
-  'request',
   'footprint',
   'footprint-provider',
 ]);

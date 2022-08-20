@@ -4,6 +4,7 @@
     "baseUrl": ".",
     "paths": {
       "global-constants": ["../../packages/global-constants/src/*"],
+      "request": ["../../packages/request/src/*"],
       "themes": ["../../packages/themes/src/*"]
     }
   },

@@ -1,10 +1,17 @@
 {
   "name": "request",
   "version": "0.0.0",
-  "main": "./src/index.ts",
-  "types": "./src/index.ts",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "sideEffects": false,
   "license": "MIT",
+  "files": [
+    "dist/**"
+  ],
   "scripts": {
+    "build": "tsup src/index.ts --format esm,cjs --dts",
+    "dev": "tsup src/index.ts --format esm,cjs --watch --dts",
     "test": "jest --coverage",
     "test:watch": "jest --watch",
     "lint": "eslint src --fix",
@@ -13,11 +20,12 @@
   },
   "devDependencies": {
     "@types/axios": "^0.14.0",
-    "axios": "^0.27.2",
     "axios-case-converter": "^0.9.0",
+    "axios": "^0.27.2",
     "config": "*",
     "global-constants": "*",
     "tsconfig": "*",
+    "tsup": "^6.2.2",
     "typescript": "^4.7.4"
   }
 }
