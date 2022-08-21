@@ -3,7 +3,8 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "global-constants": ["../../packages/global-constants/src/*"]
+      "ui": ["../ui/src/*"],
+      "themes": ["../themes/src/*"]
     }
   },
   "include": ["."],

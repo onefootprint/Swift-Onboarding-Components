@@ -2,8 +2,7 @@ import IcoClose24 from 'icons/ico/ico-close-24';
 import React from 'react';
 import { useLockBodyScroll } from 'react-use';
 import styled, { css } from 'styled-components';
-import { Typography } from 'ui';
-import Overlay from 'ui/src/components/internal/overlay/overlay';
+import { Overlay, Typography } from 'ui';
 
 type DemoVideoProps = {
   title: string;

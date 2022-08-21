@@ -7,7 +7,6 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
 // TODO: Transpile
 // https://linear.app/footprint/issue/FP-534/footprintjs-build
 const withTM = require('next-transpile-modules')([
-  'ui',
   'icons',
   'hooks',
   'footprint',

@@ -5,7 +5,8 @@
     "paths": {
       "src/*": ["src/*"],
       "global-constants": ["../../packages/global-constants/src/*"],
-      "themes": ["../../packages/themes/src/*"]
+      "themes": ["../../packages/themes/src/*"],
+      "ui": ["../../packages/ui/src/*"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],

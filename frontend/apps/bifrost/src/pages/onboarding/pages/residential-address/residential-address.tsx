@@ -5,7 +5,7 @@ import {
   ResidentialAddress as ResidentialAddressData,
   UserDataAttribute,
 } from 'src/utils/state-machine/types';
-import useToast from 'ui/src/components/toast/hooks/use-toast';
+import { useToast } from 'ui';
 
 import useSyncData from '../../../../hooks/use-sync-data';
 import useOnboardingMachine from '../../hooks/use-onboarding-machine';

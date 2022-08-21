@@ -5,7 +5,8 @@
     "paths": {
       "global-constants": ["../../packages/global-constants/src/*"],
       "request": ["../../packages/request/src/*"],
-      "themes": ["../../packages/themes/src/*"]
+      "themes": ["../../packages/themes/src/*"],
+      "ui": ["../../packages/ui/src/*"]
     }
   },
   "include": ["."],

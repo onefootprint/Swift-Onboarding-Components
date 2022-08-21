@@ -3,8 +3,7 @@ import React from 'react';
 import FieldOrPlaceholder from 'src/pages/users/components/field-or-placeholder';
 import { UserData } from 'src/pages/users/hooks/use-user-data';
 import styled, { css } from 'styled-components';
-import { Typography } from 'ui';
-import useSX, { SXStyleProps, SXStyles } from 'ui/src/hooks/use-sx';
+import { SXStyleProps, SXStyles, Typography, useSX } from 'ui';
 
 export type DataRow = {
   title: string;

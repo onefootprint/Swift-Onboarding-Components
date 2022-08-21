@@ -8,8 +8,8 @@ import styled, { css } from 'styled-components';
 import Box from '../box';
 import Button from '../button';
 import IconButton from '../icon-button';
-import Overlay from '../internal/overlay';
 import LinkButton from '../link-button';
+import Overlay from '../overlay';
 import Portal from '../portal';
 import Typography from '../typography';
 

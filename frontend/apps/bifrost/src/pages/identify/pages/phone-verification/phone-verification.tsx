@@ -3,11 +3,7 @@ import { useTranslation } from 'hooks';
 import React from 'react';
 import NavigationHeader from 'src/components/navigation-header';
 import styled, { css } from 'styled-components';
-import { Box } from 'ui';
-import {
-  getCountryByNumber,
-  getNumberByCountryValue,
-} from 'ui/src/components/phone-input/phone-input.utils';
+import { Box, getCountryByNumber, getNumberByCountryValue } from 'ui';
 
 import { Events } from '../../../../utils/state-machine/identify/types';
 import useIdentifyMachine from '../../hooks/use-identify-machine';

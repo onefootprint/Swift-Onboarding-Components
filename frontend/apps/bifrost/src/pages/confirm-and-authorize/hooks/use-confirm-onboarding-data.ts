@@ -2,7 +2,7 @@ import useTranslation from 'hooks/src/use-translation/use-translation';
 import { useBifrostMachine } from 'src/components/bifrost-machine-provider';
 import { Events } from 'src/hooks/use-bifrost-machine';
 import useOnboardingComplete from 'src/pages/confirm-and-authorize/hooks/use-onboarding-complete';
-import useToast from 'ui/src/components/toast/hooks/use-toast';
+import { useToast } from 'ui';
 
 import useSyncData from '../../../hooks/use-sync-data';
 

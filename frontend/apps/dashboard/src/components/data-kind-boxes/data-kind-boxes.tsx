@@ -1,8 +1,7 @@
 import React, { ChangeEvent } from 'react';
 import type { DataKind } from 'src/types';
 import styled, { css } from 'styled-components';
-import { Checkbox, Typography } from 'ui';
-import type { SXStyles } from 'ui/src/hooks/use-sx';
+import { Checkbox, SXStyles, Typography } from 'ui';
 
 type DataKindBoxesProps = {
   setFieldFor: (

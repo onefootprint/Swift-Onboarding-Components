@@ -1,5 +1,5 @@
 import json2mq from 'json2mq';
-import useMedia from 'react-use/lib/useMedia';
+import { useMedia } from 'react-use';
 import { useTheme } from 'styled-components';
 import type { Breakpoint } from 'themes';
 

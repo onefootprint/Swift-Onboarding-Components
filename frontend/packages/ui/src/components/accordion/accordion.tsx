@@ -1,4 +1,3 @@
-import { useAutoAnimate } from '@formkit/auto-animate/react';
 import type { Icon } from 'icons';
 import IcoChevronDown24 from 'icons/ico/ico-chevron-down-24';
 import { darken } from 'polished';
@@ -24,7 +23,6 @@ const Accordion = ({
   testID,
   title,
 }: AccordionProps) => {
-  const [animate] = useAutoAnimate<HTMLDivElement>();
   const summaryId = useId();
   const detailsId = useId();
   const contentRef = useRef<HTMLDivElement>(null);
@@ -34,7 +32,7 @@ const Accordion = ({
   };
 
   return (
-    <Details data-testid={testID} ref={animate}>
+    <Details data-testid={testID}>
       <Summary
         aria-controls={detailsId}
         aria-expanded={open}

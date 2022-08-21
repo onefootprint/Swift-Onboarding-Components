@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react';
 import styled, { css } from 'styled-components';
-import { createFontStyles } from 'ui/src/utils/mixins/mixins';
+import { createFontStyles } from 'ui';
 
 import { DataKinds, dataKindToDisplayName } from '../../types';
 
