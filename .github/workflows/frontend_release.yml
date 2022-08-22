@@ -6,6 +6,7 @@ on:
       - master
     paths:
       - 'frontend/packages/**'
+      - 'frontend/.changeset/**'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
