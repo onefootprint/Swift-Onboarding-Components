@@ -2,6 +2,10 @@ import { HeaderTitle } from 'footprint-ui';
 import { useTranslation } from 'hooks';
 import React from 'react';
 import { useForm } from 'react-hook-form';
+import {
+  isMissingResidentialAttribute,
+  isMissingSsnAttribute,
+} from 'src/utils/state-machine/onboarding/utils/missing-attributes';
 import { UserData, UserDataAttribute } from 'src/utils/state-machine/types';
 import styled, { css } from 'styled-components';
 import { Button, Grid, TextInput } from 'ui';
@@ -20,9 +24,10 @@ export type NameFormProps = {
 };
 
 const NameForm = ({ isMutationLoading, onSubmit }: NameFormProps) => {
+  const { t: cta } = useTranslation('pages.onboarding.cta');
   const { t } = useTranslation('pages.onboarding.basic-information');
   const [state] = useOnboardingMachine();
-  const { data } = state.context;
+  const { data, missingAttributes } = state.context;
 
   const {
     register,
@@ -42,6 +47,10 @@ const NameForm = ({ isMutationLoading, onSubmit }: NameFormProps) => {
     };
     onSubmit(basicInformation);
   };
+
+  const hasOtherMissingAttributes =
+    isMissingResidentialAttribute(missingAttributes) ||
+    isMissingSsnAttribute(missingAttributes);
 
   return (
     <>
@@ -69,7 +78,7 @@ const NameForm = ({ isMutationLoading, onSubmit }: NameFormProps) => {
           </Grid.Column>
         </Grid.Row>
         <Button type="submit" fullWidth loading={isMutationLoading}>
-          {t('form.cta')}
+          {hasOtherMissingAttributes ? cta('continue') : cta('complete')}
         </Button>
       </Form>
     </>

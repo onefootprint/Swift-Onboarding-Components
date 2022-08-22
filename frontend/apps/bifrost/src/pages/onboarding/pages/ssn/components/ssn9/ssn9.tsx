@@ -22,6 +22,7 @@ type SSN9Props = {
 const SSN9 = ({ isMutationLoading, onSubmit }: SSN9Props) => {
   const inputMasks = useInputMask('en-US');
   const { t } = useTranslation('pages.onboarding.ssn.full');
+  const { t: cta } = useTranslation('pages.onboarding.cta');
   const {
     register,
     handleSubmit,
@@ -68,7 +69,7 @@ const SSN9 = ({ isMutationLoading, onSubmit }: SSN9Props) => {
           ]}
         />
         <Button type="submit" fullWidth loading={isMutationLoading}>
-          {t('form.cta')}
+          {cta('complete')}
         </Button>
       </Form>
     </>

@@ -4,6 +4,7 @@ import { useTranslation } from 'hooks';
 import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import ProgressHeader from 'src/pages/onboarding/components/progress-header';
+import { isMissingSsnAttribute } from 'src/utils/state-machine/onboarding/utils/missing-attributes';
 import {
   ResidentialAddressFull,
   UserDataAttribute,
@@ -42,8 +43,9 @@ export type AddressFullProps = {
 
 const AddressFull = ({ isMutationLoading, onSubmit }: AddressFullProps) => {
   const [state] = useOnboardingMachine();
-  const { data } = state.context;
+  const { data, missingAttributes } = state.context;
   const { t } = useTranslation('pages.onboarding.residential-address.full');
+  const { t: cta } = useTranslation('pages.onboarding.cta');
   const {
     watch,
     control,
@@ -123,6 +125,8 @@ const AddressFull = ({ isMutationLoading, onSubmit }: AddressFullProps) => {
       }
     }
   };
+
+  const hasOtherMissingAttributes = isMissingSsnAttribute(missingAttributes);
 
   return (
     <>
@@ -225,7 +229,7 @@ const AddressFull = ({ isMutationLoading, onSubmit }: AddressFullProps) => {
           />
         )}
         <Button type="submit" fullWidth loading={isMutationLoading}>
-          {t('form.cta')}
+          {hasOtherMissingAttributes ? cta('continue') : cta('complete')}
         </Button>
       </Form>
     </>

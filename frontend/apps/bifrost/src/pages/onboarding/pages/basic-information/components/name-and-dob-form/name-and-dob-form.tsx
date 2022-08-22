@@ -4,6 +4,10 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import useOnboardingMachine from 'src/pages/onboarding/hooks/use-onboarding-machine';
 import {
+  isMissingResidentialAttribute,
+  isMissingSsnAttribute,
+} from 'src/utils/state-machine/onboarding/utils/missing-attributes';
+import {
   NameAndDobInformation,
   UserDataAttribute,
 } from 'src/utils/state-machine/types';
@@ -24,10 +28,11 @@ const NameAndDobForm = ({
   isMutationLoading,
   onSubmit,
 }: NameAndDobFormProps) => {
+  const { t: cta } = useTranslation('pages.onboarding.cta');
   const { t } = useTranslation('pages.onboarding.basic-information');
   const inputMasks = useInputMask('en-US');
   const [state] = useOnboardingMachine();
-  const { data } = state.context;
+  const { data, missingAttributes } = state.context;
 
   const {
     register,
@@ -49,6 +54,10 @@ const NameAndDobForm = ({
     };
     onSubmit(basicInformation);
   };
+
+  const hasOtherMissingAttributes =
+    isMissingResidentialAttribute(missingAttributes) ||
+    isMissingSsnAttribute(missingAttributes);
 
   return (
     <>
@@ -87,7 +96,7 @@ const NameAndDobForm = ({
           })}
         />
         <Button type="submit" fullWidth loading={isMutationLoading}>
-          {t('form.cta')}
+          {hasOtherMissingAttributes ? cta('continue') : cta('complete')}
         </Button>
       </Form>
     </>

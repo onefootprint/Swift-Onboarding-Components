@@ -4,6 +4,7 @@ import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import ProgressHeader from 'src/pages/onboarding/components/progress-header';
 import useOnboardingMachine from 'src/pages/onboarding/hooks/use-onboarding-machine';
+import { isMissingSsnAttribute } from 'src/utils/state-machine/onboarding/utils/missing-attributes';
 import {
   ResidentialZipCodeAndCountry,
   UserDataAttribute,
@@ -29,10 +30,11 @@ const AddressZipCodeAndCountry = ({
   onSubmit,
 }: AddressZipCodeAndCountryProps) => {
   const [state] = useOnboardingMachine();
-  const { data } = state.context;
+  const { data, missingAttributes } = state.context;
   const { t } = useTranslation(
     'pages.onboarding.residential-address.zip-code-and-country',
   );
+  const { t: cta } = useTranslation('pages.onboarding.cta');
   const {
     watch,
     control,
@@ -64,6 +66,8 @@ const AddressZipCodeAndCountry = ({
     setValue(UserDataAttribute.zip, '');
     setFocus(UserDataAttribute.zip);
   };
+
+  const hasOtherMissingAttributes = isMissingSsnAttribute(missingAttributes);
 
   return (
     <>
@@ -103,7 +107,7 @@ const AddressZipCodeAndCountry = ({
         />
 
         <Button type="submit" fullWidth loading={isMutationLoading}>
-          {t('form.cta')}
+          {hasOtherMissingAttributes ? cta('continue') : cta('complete')}
         </Button>
       </Form>
     </>

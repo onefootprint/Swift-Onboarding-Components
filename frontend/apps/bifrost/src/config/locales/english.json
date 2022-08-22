@@ -166,8 +166,7 @@
             "label": "Date of Birth",
             "placeholder": "MM/DD/YYYY",
             "error": "Date of birth cannot be empty or is invalid"
-          },
-          "cta": "Continue"
+          }
         },
         "sync-data-error": {
           "title": "An error occurred",
@@ -207,8 +206,7 @@
               "label": "State",
               "placeholder": "Select",
               "error": "State cannot be empty"
-            },
-            "cta": "Continue"
+            }
           }
         },
         "zip-code-and-country": {
@@ -224,8 +222,7 @@
               "label": "Zip code",
               "placeholder": "11206",
               "error": "Zip code cannot be empty"
-            },
-            "cta": "Continue"
+            }
           }
         },
         "sync-data-error": {
@@ -254,8 +251,7 @@
           "form": {
             "label": "SSN (Full)",
             "placeholder": "XXX-XX-XXXX",
-            "error": "SSN cannot be empty or is invalid",
-            "cta": "Continue"
+            "error": "SSN cannot be empty or is invalid"
           }
         },
         "last-four": {
@@ -264,8 +260,7 @@
           "form": {
             "label": "SSN (Last 4)",
             "placeholder": "XXXX",
-            "error": "SSN cannot be empty or is invalid",
-            "cta": "Continue"
+            "error": "SSN cannot be empty or is invalid"
           }
         },
         "sync-data-error": {
@@ -278,6 +273,10 @@
           "title": "Uh-oh!",
           "description": "There was an error while completing this request. Please contact the site admin."
         }
+      },
+      "cta": {
+        "continue": "Continue",
+        "complete": "Complete"
       }
     },
     "verification-success": {
