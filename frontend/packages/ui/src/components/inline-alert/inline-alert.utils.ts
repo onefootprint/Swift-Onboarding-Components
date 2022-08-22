@@ -34,7 +34,11 @@ export const getIconForVariant = (variant: InlineAlertVariant) => {
 };
 
 export const createVariantStyles = (variant: InlineAlertVariant) => {
-  const { backgroundColor, color } = inlineAlertVariantStyles[variant];
+  const style = inlineAlertVariantStyles[variant];
+  if (!style) {
+    return ``;
+  }
+  const { backgroundColor, color } = style;
 
   return css`
     ${({ theme }) => css`

@@ -1,6 +1,7 @@
 import React from 'react';
 import styled, { css } from 'styled-components';
 
+import useSX, { SXStyleProps, SXStyles } from '../../hooks/use-sx';
 import { createFontStyles } from '../../utils/mixins';
 import type { InlineAlertVariant } from './inline-alert.types';
 import { createVariantStyles, getIconForVariant } from './inline-alert.utils';
@@ -8,19 +9,24 @@ import { createVariantStyles, getIconForVariant } from './inline-alert.utils';
 export type InlineAlertProps = {
   children: React.ReactNode;
   variant: InlineAlertVariant;
+  sx?: SXStyleProps;
 };
 
-const InlineAlert = ({ children, variant }: InlineAlertProps) => {
+const InlineAlert = ({ children, variant = 'info', sx }: InlineAlertProps) => {
   const IconComponent = getIconForVariant(variant);
+  const sxStyles = useSX(sx);
   return (
-    <InlineAlertContainer role="alert" variant={variant}>
+    <InlineAlertContainer sx={sxStyles} role="alert" variant={variant}>
       <IconComponent color={variant} />
       {children}
     </InlineAlertContainer>
   );
 };
 
-const InlineAlertContainer = styled.div<{ variant: InlineAlertVariant }>`
+const InlineAlertContainer = styled.div<{
+  variant: InlineAlertVariant;
+  sx: SXStyles;
+}>`
   ${({ theme, variant }) => css`
     ${createFontStyles('body-2')};
     ${createVariantStyles(variant)};
@@ -35,6 +41,10 @@ const InlineAlertContainer = styled.div<{ variant: InlineAlertVariant }>`
       margin-right: ${theme.spacing[3]}px;
     }
   `};
+
+  ${({ sx }) => css`
+    ${sx};
+  `}
 `;
 
 export default InlineAlert;

@@ -1,5 +1,5 @@
+import Markdown, { MarkdownToJSX } from 'markdown-to-jsx';
 import React from 'react';
-import ReactMarkdown from 'react-markdown';
 import type { Article } from 'src/types/article';
 import styled, { css } from 'styled-components';
 import { createFontStyles } from 'ui';
@@ -8,6 +8,7 @@ import SEO from '../../components/seo';
 import A from './components/a';
 import ArticleHeader from './components/article-header';
 import Code from './components/code';
+import DocsInlineAlert from './components/docs-inline-alert';
 import H1 from './components/h1';
 import H2 from './components/h2';
 import Layout from './components/layout';
@@ -17,11 +18,22 @@ type ArticleProps = {
   article: Article;
 };
 
-const components = {
-  a: A,
-  code: Code,
-  h1: H1,
-  h2: H2,
+const overrides: MarkdownToJSX.Overrides = {
+  a: {
+    component: A,
+  },
+  code: {
+    component: Code,
+  },
+  h1: {
+    component: H1,
+  },
+  h2: {
+    component: H2,
+  },
+  'inline-alert': {
+    component: DocsInlineAlert,
+  },
 };
 
 const ArticlePage = ({ product, article }: ArticleProps) => (
@@ -37,8 +49,7 @@ const ArticlePage = ({ product, article }: ArticleProps) => (
           title={article.data.title}
           subtitle={article.data.readingTime.text}
         />
-        {/* @ts-ignore */}
-        <ReactMarkdown components={components}>{article.content}</ReactMarkdown>
+        <Markdown options={{ overrides }}>{article.content}</Markdown>
       </Container>
     </Layout>
   </>

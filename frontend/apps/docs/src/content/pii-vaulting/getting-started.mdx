@@ -11,7 +11,9 @@ meta: {
 
 ## Setup
 
-1. Go to the Footprint [developer dashboard](https://dashboard.onefootprint.com/developers) and generate a new **Secret API Key**. This will look something like `sk_test_CJvsN1kaZH3GGtYkaZH3GGtY`. Add this to the credential manager of your server-side app. **Warning: treat this key like a sensitive password!**
+1. Go to the Footprint [developer dashboard](https://dashboard.onefootprint.com/developers) and generate a new **Secret API Key**. This will look something like `sk_test_CJvsN1kaZH3GGtYkaZH3GGtY`. Add this to the credential manager of your server-side app. 
+
+<inline-alert variant='warning'>Treat this key like a sensitive password!</inline-alert>
 
 2. Check that your API key is working as expected, you should get back some information about this key.
 
@@ -41,7 +43,9 @@ curl -X POST https://api.onefootprint.com/users \
 }
 ```
 
-3. Save this `footprint_user_id` in your database tied to the individual user it was created for. It is the identifier you will send to request any user-specific information. ***Note: This value is safe to store in plaintext!***
+3. Save this `footprint_user_id` in your database tied to the individual user it was created for. It is the identifier you will send to request any user-specific information.
+
+<inline-alert variant='info'>This value is safe to store in plaintext!</inline-alert>
 
 ## Update a user vault
 

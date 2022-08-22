@@ -31,6 +31,8 @@ export { default as GoogleButton } from './google-button';
 export { default as Grid } from './grid';
 export * from './icon-button';
 export { default as IconButton } from './icon-button';
+export * from './inline-alert';
+export { default as InlineAlert } from './inline-alert';
 export * from './link-button';
 export { default as LinkButton } from './link-button';
 export * from './loading-indicator';

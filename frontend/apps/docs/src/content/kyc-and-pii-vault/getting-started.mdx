@@ -41,6 +41,8 @@ window.onFootprintComplete = function(token) {
 
 1. Go to the Footprint developer dashboard and generate a new Secret API Key. This will look something like `sk_test_CJvsN1kaZH3GGtYkaZH3GGtY`. Add this to the credential manager of your server-side app.
 
+<inline-alert variant='warning'>Treat this key like a sensitive password! It allows anyone to impersonate your company.</inline-alert>
+
 2. From step 5 above, you should create/modify your endpoint to receive the validation token from your frontend. In this endpoint, send the validation token to Footprint’s backend.
 
 ```bash
