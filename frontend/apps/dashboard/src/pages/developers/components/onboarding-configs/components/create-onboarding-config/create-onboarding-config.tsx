@@ -13,8 +13,10 @@ import type {
 } from './create-onboarding-config.types';
 import useCreateOnboardingConfig from './hooks/use-create-onboarding-config';
 import useCreateState, { Actions } from './hooks/use-create-state';
-import getSelectedDataKinds from './utils/get-selected-data-kinds';
-import transformDataKindFormToArray from './utils/transform-data-kind-form-to-array';
+import {
+  getSelectedDataOptions,
+  getSelectedDataOptionsList,
+} from './utils/get-selected-data-options';
 
 export type CreateOnboardingConfigProps = {
   open: boolean;
@@ -78,8 +80,8 @@ const CreateOnboardingConfig = ({
     mutation.mutate(
       {
         name: state.data.name,
-        mustCollectDataKinds: transformDataKindFormToArray(state.data.collect),
-        canAccessDataKinds: transformDataKindFormToArray(accessFormData),
+        mustCollectData: getSelectedDataOptionsList(state.data.collect),
+        canAccessData: getSelectedDataOptionsList(accessFormData),
       },
       {
         onSuccess: close,
@@ -125,9 +127,9 @@ const CreateOnboardingConfig = ({
       {state.step === 2 && (
         <AccessForm
           onSubmit={handleSubmitAccess}
-          fields={getSelectedDataKinds(state.data?.collect)}
+          fields={getSelectedDataOptions(state.data?.collect)}
           defaultValues={Object.fromEntries(
-            getSelectedDataKinds(state.data?.collect),
+            getSelectedDataOptions(state.data?.collect),
           )}
         />
       )}

@@ -2,8 +2,8 @@ import { useTranslation } from 'hooks';
 import React from 'react';
 import { Events } from 'src/utils/state-machine/onboarding';
 import {
+  CollectedDataOption,
   SSNInformation,
-  UserDataAttribute,
 } from 'src/utils/state-machine/types';
 import { useToast } from 'ui';
 
@@ -42,11 +42,14 @@ const SSN = () => {
     });
   };
 
-  if (missingAttributes.indexOf(UserDataAttribute.ssn4) > -1) {
+  if (missingAttributes.includes(CollectedDataOption.ssn4)) {
     return <SSN4 onSubmit={onSubmit} isMutationLoading={mutation.isLoading} />;
   }
 
-  return <SSN9 onSubmit={onSubmit} isMutationLoading={mutation.isLoading} />;
+  if (missingAttributes.includes(CollectedDataOption.ssn9)) {
+    return <SSN9 onSubmit={onSubmit} isMutationLoading={mutation.isLoading} />;
+  }
+  return <div />;
 };
 
 export default SSN;

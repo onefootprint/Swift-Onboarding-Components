@@ -1,5 +1,5 @@
 import { useReducer } from 'react';
-import { DataKinds } from 'src/types/data-kind';
+import { CollectedDataOption } from 'src/types';
 
 import type { DataKindForm } from '../create-onboarding-config.types';
 
@@ -27,8 +27,8 @@ const initialState = {
   data: {
     name: '',
     collect: {
-      [DataKinds.email]: true,
-      [DataKinds.phoneNumber]: true,
+      [CollectedDataOption.email]: true,
+      [CollectedDataOption.phoneNumber]: true,
     },
   },
 };

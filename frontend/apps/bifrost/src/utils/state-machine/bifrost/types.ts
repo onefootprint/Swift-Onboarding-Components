@@ -1,10 +1,10 @@
 import { DeviceInfo } from 'hooks';
 import {
+  CollectedDataOption,
   IdentifyType,
   OnboardingData,
   TenantInfo,
   UserData,
-  UserDataAttribute,
 } from 'src/utils/state-machine/types';
 
 export enum States {
@@ -62,9 +62,9 @@ export type BifrostEvent =
   | {
       type: Events.tenantInfoRequestSucceeded;
       payload: {
-        canAccessDataKinds: UserDataAttribute[];
+        canAccessData: CollectedDataOption[];
         isLive: boolean;
-        mustCollectDataKinds: UserDataAttribute[];
+        mustCollectData: CollectedDataOption[];
         name: string;
         orgName: string;
         pk: string;
@@ -87,7 +87,7 @@ export type BifrostEvent =
       data: {
         onboardingData: UserData;
         missingWebauthnCredentials: boolean;
-        missingAttributes: readonly UserDataAttribute[];
+        missingAttributes: readonly CollectedDataOption[];
         validationToken?: string;
       };
     }

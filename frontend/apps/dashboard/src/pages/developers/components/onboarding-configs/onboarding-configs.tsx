@@ -10,7 +10,7 @@ import OnboardingConfigsError from './components/onboarding-configs-error';
 import OnboardingConfigsLoading from './components/onboarding-configs-loading';
 import useOnboardingConfigs from './hooks/use-onboarding-configs';
 
-const OnboardingConfis = () => {
+const OnboardingConfigs = () => {
   const [isCreateDialogOpen, openCreateDialog, closeCreateDialog] =
     useToggle(false);
   const { t } = useTranslation('pages.developers.onboarding-configs');
@@ -46,4 +46,4 @@ const Header = styled.header`
   justify-content: space-between;
 `;
 
-export default OnboardingConfis;
+export default OnboardingConfigs;

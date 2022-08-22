@@ -1,104 +1,62 @@
-import { UserData, UserDataAttribute } from '../../types';
+import {
+  CollectedDataOption,
+  OptionToRequiredAttributes,
+  UserData,
+} from '../../types';
 import { States } from '../types';
 
-const BASIC_ATTRIBUTES = new Set([
-  UserDataAttribute.firstName,
-  UserDataAttribute.lastName,
-  UserDataAttribute.dob,
-]);
+// The list of CollectedDataOptions that may be input on the basic info screen
+const BASIC_ATTRIBUTES = [CollectedDataOption.name, CollectedDataOption.dob];
 
-const RESIDENTIAL_ATTRIBUTES = new Set([
-  UserDataAttribute.addressLine1,
-  UserDataAttribute.addressLine2,
-  UserDataAttribute.city,
-  UserDataAttribute.state,
-  UserDataAttribute.country,
-  UserDataAttribute.zip,
-]);
+// The list of CollectedDataOptions that may be input on the residential screen
+const RESIDENTIAL_ATTRIBUTES = [
+  CollectedDataOption.fullAddress,
+  CollectedDataOption.partialAddress,
+];
+
+// The list of CollectedDataOptions that may be input on the ssn screen
+const SSN_ATTRIBUTES = [CollectedDataOption.ssn9, CollectedDataOption.ssn4];
+
+// An attribute is missing if
+// (1) it must be collected for this onboarding session AND
+// (2) it hasn't yet been collected
+export const isMissing = (
+  attributes: readonly CollectedDataOption[],
+  mustCollect: readonly CollectedDataOption[],
+  collectedData?: UserData,
+) =>
+  attributes
+    .filter(option => mustCollect.includes(option))
+    .flatMap(option => OptionToRequiredAttributes[option])
+    .some(attr => !collectedData || !collectedData[attr]);
 
 export const isMissingBasicAttribute = (
-  missingAttributes: readonly UserDataAttribute[],
-  data?: UserData,
-) => {
-  if (!missingAttributes.length) {
-    return false;
-  }
-  if (!data) {
-    return missingAttributes.some((attribute: UserDataAttribute) =>
-      BASIC_ATTRIBUTES.has(attribute),
-    );
-  }
-  // Find out if there are any missing basic info attributes that haven't been filled in data yet
-  return missingAttributes.some(
-    (attribute: UserDataAttribute) =>
-      BASIC_ATTRIBUTES.has(attribute) && !data[attribute],
-  );
-};
+  mustCollect: readonly CollectedDataOption[],
+  collectedData?: UserData,
+) => isMissing(BASIC_ATTRIBUTES, mustCollect, collectedData);
 
 export const isMissingResidentialAttribute = (
-  missingAttributes: readonly UserDataAttribute[],
-  data?: UserData,
-) => {
-  if (!missingAttributes.length) {
-    return false;
-  }
-  if (!data) {
-    return missingAttributes.some((attribute: UserDataAttribute) =>
-      RESIDENTIAL_ATTRIBUTES.has(attribute),
-    );
-  }
-  // Find out if there are any missing residential info attributes that haven't been filled in data yet
-  return missingAttributes.some(
-    (attribute: UserDataAttribute) =>
-      RESIDENTIAL_ATTRIBUTES.has(attribute) && !data[attribute],
-  );
-};
+  mustCollect: readonly CollectedDataOption[],
+  collectedData?: UserData,
+) => isMissing(RESIDENTIAL_ATTRIBUTES, mustCollect, collectedData);
 
 export const isMissingSsnAttribute = (
-  missingAttributes: readonly UserDataAttribute[],
-  data?: UserData,
-) => {
-  if (!missingAttributes.length) {
-    return false;
-  }
-  const missingFullSsn = missingAttributes.indexOf(UserDataAttribute.ssn9) > -1;
-  const missingLast4Ssn =
-    missingAttributes.indexOf(UserDataAttribute.ssn4) > -1;
-
-  if (!missingFullSsn && !missingLast4Ssn) {
-    return false;
-  }
-
-  if (!data) {
-    return true;
-  }
-
-  if (missingFullSsn && !data[UserDataAttribute.ssn9]) {
-    return true;
-  }
-  if (missingLast4Ssn && !data[UserDataAttribute.ssn4]) {
-    return true;
-  }
-  return false;
-};
+  mustCollect: readonly CollectedDataOption[],
+  collectedData?: UserData,
+) => isMissing(SSN_ATTRIBUTES, mustCollect, collectedData);
 
 export const hasMissingAttributes = (
-  missingAttributes: readonly UserDataAttribute[],
-  data?: UserData,
-) => {
-  if (!missingAttributes.length) {
-    return false;
-  }
-  if (!data) {
-    return true;
-  }
-  return missingAttributes.some(
-    (attribute: UserDataAttribute) => !data[attribute],
+  mustCollect: readonly CollectedDataOption[],
+  collectedData?: UserData,
+) =>
+  mustCollect.some(option =>
+    OptionToRequiredAttributes[option].some(
+      attr => !collectedData || !collectedData[attr],
+    ),
   );
-};
 
 export const getMaxStepFromMissingAttributes = (
-  attributes: readonly UserDataAttribute[],
+  attributes: readonly CollectedDataOption[],
 ) => {
   if (!hasMissingAttributes(attributes)) {
     return 0;
@@ -117,7 +75,7 @@ export const getMaxStepFromMissingAttributes = (
 };
 
 export const getCurrentStepFromMissingAttributes = (
-  attributes: readonly UserDataAttribute[],
+  attributes: readonly CollectedDataOption[],
   state: States,
 ) => {
   if (!hasMissingAttributes(attributes)) {

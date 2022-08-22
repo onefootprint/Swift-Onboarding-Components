@@ -14,10 +14,15 @@ export enum DataKinds {
   country = 'country',
 }
 
-export enum VirtualDataKinds {
+export enum CollectedDataOption {
   name = 'name',
-  addressFull = 'address_full',
-  addressPartial = 'address_partial',
+  dob = 'dob',
+  ssn4 = 'ssn4',
+  ssn9 = 'ssn9',
+  fullAddress = 'full_address',
+  partialAddress = 'partial_address',
+  email = 'email',
+  phoneNumber = 'phone_number',
 }
 
 export type DataKind = keyof typeof DataKinds;

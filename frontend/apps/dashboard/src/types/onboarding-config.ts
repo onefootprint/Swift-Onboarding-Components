@@ -1,13 +1,13 @@
-import { DataKinds } from './data-kind';
+import { CollectedDataOption } from './data-kind';
 
 export type OnboardingConfig = {
-  canAccessDataKinds: DataKinds[];
+  canAccessData: CollectedDataOption[];
   createdAt: string;
   id: string;
   isLive: boolean;
   key: string;
   logoUrl: string | null;
-  mustCollectDataKinds: DataKinds[];
+  mustCollectData: CollectedDataOption[];
   name: string;
   orgName: string;
   status: 'enabled' | 'disabled';

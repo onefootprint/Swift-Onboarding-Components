@@ -1,16 +1,16 @@
-import { DataKinds, VirtualDataKinds } from 'src/types/data-kind';
+import { CollectedDataOption } from 'src/types/data-kind';
 
 export type NameFormData = {
   name: string;
 };
 
 export type DataKindForm = {
-  [DataKinds.dob]: boolean;
-  [DataKinds.email]: boolean;
-  [DataKinds.ssn4]: boolean;
-  [DataKinds.phoneNumber]: boolean;
-  [DataKinds.ssn9]: boolean;
-  [VirtualDataKinds.addressFull]: boolean;
-  [VirtualDataKinds.addressPartial]: boolean;
-  [VirtualDataKinds.name]: boolean;
+  [CollectedDataOption.dob]: boolean;
+  [CollectedDataOption.email]: boolean;
+  [CollectedDataOption.ssn4]: boolean;
+  [CollectedDataOption.phoneNumber]: boolean;
+  [CollectedDataOption.ssn9]: boolean;
+  [CollectedDataOption.fullAddress]: boolean;
+  [CollectedDataOption.partialAddress]: boolean;
+  [CollectedDataOption.name]: boolean;
 };

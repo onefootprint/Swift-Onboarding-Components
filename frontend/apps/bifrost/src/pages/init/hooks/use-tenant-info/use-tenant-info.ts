@@ -4,8 +4,8 @@ import { CLIENT_PUBLIC_KEY_HEADER } from 'src/config/constants';
 import useBifrostMachine from 'src/hooks/use-bifrost-machine';
 import { Events } from 'src/utils/state-machine/bifrost';
 import {
-  UserDataAttribute,
-  UserDataAttributeLabels,
+  CollectedDataOption,
+  CollectedDataOptionLabels,
 } from 'src/utils/state-machine/types';
 
 type TenantInfoRequest = {
@@ -13,9 +13,9 @@ type TenantInfoRequest = {
 };
 
 type TenantInfoResponse = {
-  canAccessDataKinds: UserDataAttribute[];
+  canAccessData: CollectedDataOption[];
   isLive: boolean;
-  mustCollectDataKinds: UserDataAttribute[];
+  mustCollectData: CollectedDataOption[];
   name: string;
   orgName: string;
 };
@@ -45,8 +45,8 @@ const useTenantInfo = (tenantPk: string) => {
         orgName,
         name,
         isLive,
-        mustCollectDataKinds,
-        canAccessDataKinds,
+        mustCollectData,
+        canAccessData,
       }) => {
         send({
           type: Events.tenantInfoRequestSucceeded,
@@ -55,11 +55,11 @@ const useTenantInfo = (tenantPk: string) => {
             orgName,
             name,
             isLive,
-            mustCollectDataKinds: mustCollectDataKinds.map(
-              (attr: string) => UserDataAttributeLabels[attr],
+            mustCollectData: mustCollectData.map(
+              (attr: string) => CollectedDataOptionLabels[attr],
             ),
-            canAccessDataKinds: canAccessDataKinds.map(
-              (attr: string) => UserDataAttributeLabels[attr],
+            canAccessData: canAccessData.map(
+              (attr: string) => CollectedDataOptionLabels[attr],
             ),
           },
         });

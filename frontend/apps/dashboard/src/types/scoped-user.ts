@@ -13,7 +13,7 @@ export type ScopedUser = {
 
 export type Onboarding = {
   status: OnboardingStatus;
-  canAccessDataKinds: DataKinds[];
+  canAccessData: DataKinds[];
   name: string;
   description?: string;
   insightEvent: InsightEvent;

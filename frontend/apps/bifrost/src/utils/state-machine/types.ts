@@ -16,21 +16,53 @@ export enum UserDataAttribute {
   zip = 'zip',
 }
 
+export enum CollectedDataOption {
+  name = 'name',
+  dob = 'dob',
+  ssn4 = 'ssn4',
+  ssn9 = 'ssn9',
+  fullAddress = 'full_address',
+  partialAddress = 'partial_address',
+  email = 'email',
+  phoneNumber = 'phone_number',
+}
+
 // Labels sent from the backend for each attribute
-export const UserDataAttributeLabels: Record<string, UserDataAttribute> = {
-  first_name: UserDataAttribute.firstName,
-  last_name: UserDataAttribute.lastName,
-  dob: UserDataAttribute.dob,
-  email: UserDataAttribute.email,
-  ssn9: UserDataAttribute.ssn9,
-  ssn4: UserDataAttribute.ssn4,
-  address_line1: UserDataAttribute.addressLine1,
-  address_line2: UserDataAttribute.addressLine2,
-  city: UserDataAttribute.city,
-  state: UserDataAttribute.state,
-  country: UserDataAttribute.country,
-  zip: UserDataAttribute.zip,
-  phone_number: UserDataAttribute.phone,
+export const CollectedDataOptionLabels: Record<string, CollectedDataOption> = {
+  name: CollectedDataOption.name,
+  dob: CollectedDataOption.dob,
+  email: CollectedDataOption.email,
+  ssn9: CollectedDataOption.ssn9,
+  ssn4: CollectedDataOption.ssn4,
+  full_address: CollectedDataOption.fullAddress,
+  partial_address: CollectedDataOption.partialAddress,
+  phone_number: CollectedDataOption.phoneNumber,
+};
+
+export const OptionToRequiredAttributes: Record<
+  CollectedDataOption,
+  UserDataAttribute[]
+> = {
+  [CollectedDataOption.name]: [
+    UserDataAttribute.firstName,
+    UserDataAttribute.lastName,
+  ],
+  [CollectedDataOption.dob]: [UserDataAttribute.dob],
+  [CollectedDataOption.ssn4]: [UserDataAttribute.ssn4],
+  [CollectedDataOption.ssn9]: [UserDataAttribute.ssn9],
+  [CollectedDataOption.fullAddress]: [
+    UserDataAttribute.addressLine1,
+    UserDataAttribute.city,
+    UserDataAttribute.state,
+    UserDataAttribute.zip,
+    UserDataAttribute.country,
+  ],
+  [CollectedDataOption.partialAddress]: [
+    UserDataAttribute.zip,
+    UserDataAttribute.country,
+  ],
+  [CollectedDataOption.email]: [UserDataAttribute.email],
+  [CollectedDataOption.phoneNumber]: [UserDataAttribute.phone],
 };
 
 export type UserData = Partial<{
@@ -106,15 +138,15 @@ export enum UserKind {
 
 export type OnboardingData = {
   missingWebauthnCredentials: boolean;
-  missingAttributes: readonly UserDataAttribute[]; // Initial set of attributes received from /onboarding
+  missingAttributes: readonly CollectedDataOption[]; // Initial set of attributes received from /onboarding
   data: UserData; // Filled user data
   validationToken?: string;
 };
 
 export type TenantInfo = {
-  canAccessDataKinds: UserDataAttribute[];
+  canAccessData: CollectedDataOption[];
   isLive?: boolean;
-  mustCollectDataKinds: UserDataAttribute[];
+  mustCollectData: CollectedDataOption[];
   name: string;
   orgName: string;
   pk: string;

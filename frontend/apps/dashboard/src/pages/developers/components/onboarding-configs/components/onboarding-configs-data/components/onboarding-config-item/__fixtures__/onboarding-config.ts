@@ -1,4 +1,4 @@
-import { DataKinds } from 'src/types/data-kind';
+import { CollectedDataOption } from 'src/types/data-kind';
 import type { OnboardingConfig } from 'src/types/onboarding-config';
 
 export const sandboxOnboardingConfig: OnboardingConfig = {
@@ -7,8 +7,8 @@ export const sandboxOnboardingConfig: OnboardingConfig = {
   name: 'Acme Bank',
   orgName: 'Acme Bank',
   logoUrl: null,
-  mustCollectDataKinds: [DataKinds.email],
-  canAccessDataKinds: [DataKinds.email],
+  mustCollectData: [CollectedDataOption.email],
+  canAccessData: [CollectedDataOption.email],
   isLive: false,
   createdAt: '7/20/22, 3:40 AM',
   status: 'enabled',
@@ -20,8 +20,8 @@ export const liveOnboardingKey: OnboardingConfig = {
   name: 'Lorem11',
   orgName: 'Acme Bank',
   logoUrl: null,
-  mustCollectDataKinds: [DataKinds.ssn9],
-  canAccessDataKinds: [DataKinds.ssn9],
+  mustCollectData: [CollectedDataOption.ssn9],
+  canAccessData: [CollectedDataOption.ssn9],
   isLive: true,
   createdAt: '8/10/22, 11:56 AM',
   status: 'disabled',

@@ -5,48 +5,48 @@ import {
   isMissingResidentialAttribute,
   isMissingSsnAttribute,
 } from 'src/utils/state-machine/onboarding/utils/missing-attributes';
-import { UserDataAttribute } from 'src/utils/state-machine/types';
+import { CollectedDataOption } from 'src/utils/state-machine/types';
 
 export const getMaxStepFromMissingAttributes = (
-  attributes: readonly UserDataAttribute[],
+  mustCollect: readonly CollectedDataOption[],
 ) => {
-  if (!hasMissingAttributes(attributes)) {
+  if (!hasMissingAttributes(mustCollect)) {
     return 0;
   }
   let maxStep = 0;
-  if (isMissingBasicAttribute(attributes)) {
+  if (isMissingBasicAttribute(mustCollect)) {
     maxStep += 1;
   }
-  if (isMissingResidentialAttribute(attributes)) {
+  if (isMissingResidentialAttribute(mustCollect)) {
     maxStep += 1;
   }
-  if (isMissingSsnAttribute(attributes)) {
+  if (isMissingSsnAttribute(mustCollect)) {
     maxStep += 1;
   }
   return maxStep;
 };
 
 export const getCurrentStepFromMissingAttributes = (
-  attributes: readonly UserDataAttribute[],
+  mustCollect: readonly CollectedDataOption[],
   state: States,
 ) => {
-  if (!hasMissingAttributes(attributes)) {
+  if (!hasMissingAttributes(mustCollect)) {
     return 0;
   }
   let currentStep = 0;
-  if (isMissingBasicAttribute(attributes)) {
+  if (isMissingBasicAttribute(mustCollect)) {
     currentStep += 1;
     if (state === States.basicInformation) {
       return currentStep;
     }
   }
-  if (isMissingResidentialAttribute(attributes)) {
+  if (isMissingResidentialAttribute(mustCollect)) {
     currentStep += 1;
     if (state === States.residentialAddress) {
       return currentStep;
     }
   }
-  if (isMissingSsnAttribute(attributes)) {
+  if (isMissingSsnAttribute(mustCollect)) {
     currentStep += 1;
     if (state === States.ssn) {
       return currentStep;

@@ -10,80 +10,32 @@ import IcoUserCircle24 from 'icons/ico/ico-user-circle-24';
 import React from 'react';
 import { useBifrostMachine } from 'src/components/bifrost-machine-provider';
 import NavigationHeader from 'src/components/navigation-header';
-import { UserDataAttribute } from 'src/utils/state-machine/types';
+import { CollectedDataOption } from 'src/utils/state-machine/types';
 import styled, { css } from 'styled-components';
 import { FootprintButton, Typography } from 'ui';
 
 import useConfirmOnboardingData from './hooks/use-confirm-onboarding-data';
 
-enum UserDataAttributeCategory {
-  name = 'Name',
-  email = 'Email',
-  phoneNumber = 'Phone Number',
-  ssn = 'SSN (Full)',
-  lastFourSsn = 'SSN (Last 4)',
-  dob = 'Date of Birth',
-  address = 'Address (Full)',
-  zipCodeAndCountry = 'Country & Zip Code',
-}
-
-const tenantCanAddressFullAddress = (attributes: UserDataAttribute[]) =>
-  attributes.indexOf(UserDataAttribute.addressLine1) > -1 ||
-  attributes.indexOf(UserDataAttribute.addressLine2) > -1 ||
-  attributes.indexOf(UserDataAttribute.city) > -1 ||
-  attributes.indexOf(UserDataAttribute.state) > -1;
-
-const CategoryByUserDataAttribute: Record<
-  UserDataAttribute | string,
-  UserDataAttributeCategory
-> = {
-  [UserDataAttribute.firstName]: UserDataAttributeCategory.name,
-  [UserDataAttribute.lastName]: UserDataAttributeCategory.name,
-  [UserDataAttribute.dob]: UserDataAttributeCategory.dob,
-  [UserDataAttribute.email]: UserDataAttributeCategory.email,
-  [UserDataAttribute.phone]: UserDataAttributeCategory.phoneNumber,
-  [UserDataAttribute.ssn9]: UserDataAttributeCategory.ssn,
-  [UserDataAttribute.ssn4]: UserDataAttributeCategory.lastFourSsn,
-  [UserDataAttribute.addressLine1]: UserDataAttributeCategory.address,
-  [UserDataAttribute.addressLine2]: UserDataAttributeCategory.address,
-  [UserDataAttribute.city]: UserDataAttributeCategory.address,
-  [UserDataAttribute.state]: UserDataAttributeCategory.address,
-  [UserDataAttribute.country]: UserDataAttributeCategory.address,
-  [UserDataAttribute.zip]: UserDataAttributeCategory.address,
+const IconByCollectedDataOption: Record<CollectedDataOption, JSX.Element> = {
+  [CollectedDataOption.name]: <IcoUserCircle24 />,
+  [CollectedDataOption.email]: <IcoEmail24 />,
+  [CollectedDataOption.phoneNumber]: <IcoPhone24 />,
+  [CollectedDataOption.ssn4]: <IcoFileText24 />,
+  [CollectedDataOption.ssn9]: <IcoFileText24 />,
+  [CollectedDataOption.dob]: <IcoCake24 />,
+  [CollectedDataOption.fullAddress]: <IcoBuilding24 />,
+  [CollectedDataOption.partialAddress]: <IcoBuilding24 />,
 };
 
-const IconsByUserDataAttributes: Record<
-  UserDataAttributeCategory,
-  JSX.Element
-> = {
-  [UserDataAttributeCategory.name]: <IcoUserCircle24 />,
-  [UserDataAttributeCategory.email]: <IcoEmail24 />,
-  [UserDataAttributeCategory.phoneNumber]: <IcoPhone24 />,
-  [UserDataAttributeCategory.ssn]: <IcoFileText24 />,
-  [UserDataAttributeCategory.lastFourSsn]: <IcoFileText24 />,
-  [UserDataAttributeCategory.dob]: <IcoCake24 />,
-  [UserDataAttributeCategory.address]: <IcoBuilding24 />,
-  [UserDataAttributeCategory.zipCodeAndCountry]: <IcoBuilding24 />,
-};
-
-const getCategoriesFromUserDataAttributes = (
-  attributes: UserDataAttribute[],
-) => {
-  const requiredData = attributes
-    .map((data: UserDataAttribute) => CategoryByUserDataAttribute[data])
-    .filter(attr => !!attr);
-  const categories = new Set<UserDataAttributeCategory>(requiredData);
-
-  // If the requested address data only includes zipcode & country, change the category
-  if (
-    categories.has(UserDataAttributeCategory.address) &&
-    !tenantCanAddressFullAddress(attributes)
-  ) {
-    categories.delete(UserDataAttributeCategory.address);
-    categories.add(UserDataAttributeCategory.zipCodeAndCountry);
-  }
-
-  return Array.from(categories);
+export const collectedDataOptionLabels: Record<CollectedDataOption, string> = {
+  [CollectedDataOption.name]: 'Name',
+  [CollectedDataOption.email]: 'Email',
+  [CollectedDataOption.phoneNumber]: 'Phone Number',
+  [CollectedDataOption.ssn4]: 'SSN (Last 4)',
+  [CollectedDataOption.ssn9]: 'SSN (Full)',
+  [CollectedDataOption.dob]: 'Date of Birth',
+  [CollectedDataOption.fullAddress]: 'Address (Full)',
+  [CollectedDataOption.partialAddress]: 'Country & Zip Code',
 };
 
 const ConfirmAndAuthorize = () => {
@@ -97,9 +49,8 @@ const ConfirmAndAuthorize = () => {
     confirmOnboardingData({ onComplete: handleConfirmOnboardingCompleted });
   };
 
-  const { canAccessDataKinds } = state.context.tenant;
-  const requiredCategories =
-    getCategoriesFromUserDataAttributes(canAccessDataKinds);
+  const { canAccessData } = state.context.tenant;
+  const requiredCategories = canAccessData;
 
   return (
     <>
@@ -110,14 +61,18 @@ const ConfirmAndAuthorize = () => {
           subtitle={t('subtitle', { tenantName: state.context.tenant.name })}
         />
         <CategoriesContainer>
-          {requiredCategories.map((category: UserDataAttributeCategory) => (
-            <Category key={category}>
-              <IconContainer>
-                {IconsByUserDataAttributes[category]}
-              </IconContainer>
-              <Typography variant="label-3">{category}</Typography>
-            </Category>
-          ))}
+          {requiredCategories.map(
+            (collectedDataOption: CollectedDataOption) => (
+              <Category key={collectedDataOption}>
+                <IconContainer>
+                  {IconByCollectedDataOption[collectedDataOption]}
+                </IconContainer>
+                <Typography variant="label-3">
+                  {collectedDataOptionLabels[collectedDataOption]}
+                </Typography>
+              </Category>
+            ),
+          )}
         </CategoriesContainer>
         <FootprintButton
           fullWidth

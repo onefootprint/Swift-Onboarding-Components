@@ -5,8 +5,8 @@ import {
   CLIENT_PUBLIC_KEY_HEADER,
 } from 'src/config/constants';
 import {
-  UserDataAttribute,
-  UserDataAttributeLabels,
+  CollectedDataOption,
+  CollectedDataOptionLabels,
 } from 'src/utils/state-machine/types';
 
 export type OnboardingRequest = {
@@ -15,7 +15,7 @@ export type OnboardingRequest = {
 };
 
 export type OnboardingResponse = {
-  missingAttributes: UserDataAttribute[];
+  missingAttributes: CollectedDataOption[];
   missingWebauthnCredentials: boolean;
   // A cryptographically generated auth token to authenticate a session
   // Returned only if the user has already authorized the configuration for tenant
@@ -36,7 +36,7 @@ const onboardingRequest = async (payload: OnboardingRequest) => {
   return {
     ...response.data,
     missingAttributes: response.data.missingAttributes.map(
-      (attr: string) => UserDataAttributeLabels[attr],
+      (attr: string) => CollectedDataOptionLabels[attr],
     ),
   };
 };

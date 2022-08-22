@@ -3,7 +3,7 @@ import React from 'react';
 import { Events } from 'src/utils/state-machine/onboarding';
 import {
   BasicInformation as BasicInformationData,
-  UserDataAttribute,
+  CollectedDataOption,
 } from 'src/utils/state-machine/types';
 import { useToast } from 'ui';
 
@@ -44,7 +44,8 @@ const BasicInformation = () => {
     });
   };
 
-  const requiresDob = missingAttributes.indexOf(UserDataAttribute.dob) > -1;
+  // TODO right now it is possible to only request the DOB
+  const requiresDob = missingAttributes.includes(CollectedDataOption.dob);
   if (requiresDob) {
     return (
       <NameAndDobForm

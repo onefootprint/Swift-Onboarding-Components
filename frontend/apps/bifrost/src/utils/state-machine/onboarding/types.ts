@@ -1,11 +1,11 @@
 import { DeviceInfo } from 'hooks';
 import {
   BasicInformation,
+  CollectedDataOption,
   ResidentialAddress,
   SSNInformation,
   TenantInfo,
   UserData,
-  UserDataAttribute,
 } from 'src/utils/state-machine/types';
 
 export enum States {
@@ -22,7 +22,7 @@ export enum States {
 export type MachineContext = {
   userFound: boolean;
   missingWebauthnCredentials: boolean;
-  missingAttributes: readonly UserDataAttribute[]; // Initial set of attributes received from /onboarding
+  missingAttributes: readonly CollectedDataOption[]; // Initial set of attributes received from /onboarding
   data: UserData; // Filled user data
   tenant: TenantInfo;
   device: DeviceInfo;
@@ -54,7 +54,7 @@ export type MachineEvents =
   | {
       type: Events.onboardingVerificationCompleted;
       payload: {
-        missingAttributes: readonly UserDataAttribute[];
+        missingAttributes: readonly CollectedDataOption[];
         missingWebauthnCredentials: boolean;
         validationToken?: string;
       };

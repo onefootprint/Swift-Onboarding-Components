@@ -2,14 +2,16 @@ import { useAutoAnimate } from '@formkit/auto-animate/react';
 import { useTranslation } from 'hooks';
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { DataKinds, VirtualDataKinds } from 'src/types/data-kind';
+import { CollectedDataOption, DataKinds } from 'src/types/data-kind';
 import { Box, Checkbox, RadioInput } from 'ui';
 
 import type { DataKindForm } from '../../create-onboarding-config.types';
 import FormTitle from '../form-title';
 
 type FormData = DataKindForm & {
-  addressKind?: VirtualDataKinds.addressFull | VirtualDataKinds.addressPartial;
+  addressKind?:
+    | CollectedDataOption.fullAddress
+    | CollectedDataOption.partialAddress;
   showAddressOptions: boolean;
   showSSNOptions: boolean;
   ssnKind?: DataKinds.ssn4 | DataKinds.ssn9;
@@ -28,15 +30,15 @@ const CollectForm = ({ defaultValues, onSubmit }: CollectFormProps) => {
   const [animateAddress] = useAutoAnimate<HTMLDivElement>();
   const [innerFields, setInnerFields] = useState({
     ssn: defaultValues.ssn4 || defaultValues.ssn9,
-    address: defaultValues.address_full || defaultValues.address_partial,
+    address: defaultValues.full_address || defaultValues.partial_address,
   });
 
   const getInitialAddressKind = () => {
-    if (defaultValues.address_full) {
-      return VirtualDataKinds.addressFull;
+    if (defaultValues.full_address) {
+      return CollectedDataOption.fullAddress;
     }
-    if (defaultValues.address_partial) {
-      return VirtualDataKinds.addressPartial;
+    if (defaultValues.partial_address) {
+      return CollectedDataOption.partialAddress;
     }
     return undefined;
   };
@@ -70,7 +72,10 @@ const CollectForm = ({ defaultValues, onSubmit }: CollectFormProps) => {
   const handleAddressChanged = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { checked } = event.target;
     setInnerFields(prevState => ({ ...prevState, address: checked }));
-    setValue('addressKind', checked ? VirtualDataKinds.addressFull : undefined);
+    setValue(
+      'addressKind',
+      checked ? CollectedDataOption.fullAddress : undefined,
+    );
   };
 
   const handleBeforeSubmit = (formData: FormData) => {
@@ -85,10 +90,10 @@ const CollectForm = ({ defaultValues, onSubmit }: CollectFormProps) => {
       ...rest,
       [DataKinds.ssn4]: ssnKind === DataKinds.ssn4,
       [DataKinds.ssn9]: ssnKind === DataKinds.ssn9,
-      [VirtualDataKinds.addressFull]:
-        addressKind === VirtualDataKinds.addressFull,
-      [VirtualDataKinds.addressPartial]:
-        addressKind === VirtualDataKinds.addressPartial,
+      [CollectedDataOption.fullAddress]:
+        addressKind === CollectedDataOption.fullAddress,
+      [CollectedDataOption.partialAddress]:
+        addressKind === CollectedDataOption.partialAddress,
     });
   };
 
@@ -102,10 +107,20 @@ const CollectForm = ({ defaultValues, onSubmit }: CollectFormProps) => {
         description={t('collect-form.description')}
         title={t('collect-form.title')}
       />
-      <Checkbox label={allT('data-kinds.phone_number')} disabled checked />
-      <Checkbox label={allT('data-kinds.email')} disabled checked />
-      <Checkbox label={allT('data-kinds.name')} {...register('name')} />
-      <Checkbox label={allT('data-kinds.dob')} {...register(DataKinds.dob)} />
+      <Checkbox
+        label={allT('collected-data-options.phone_number')}
+        disabled
+        checked
+      />
+      <Checkbox label={allT('collected-data-options.email')} disabled checked />
+      <Checkbox
+        label={allT('collected-data-options.name')}
+        {...register('name')}
+      />
+      <Checkbox
+        label={allT('collected-data-options.dob')}
+        {...register(DataKinds.dob)}
+      />
       <Checkbox
         label={t('collect-form.ssn')}
         {...register('showSSNOptions')}
@@ -136,13 +151,13 @@ const CollectForm = ({ defaultValues, onSubmit }: CollectFormProps) => {
         {innerFields.address && (
           <Box sx={{ marginLeft: 5, marginBottom: 3 }}>
             <RadioInput
-              value={VirtualDataKinds.addressFull}
-              label={t('collect-form.address_full')}
+              value={CollectedDataOption.fullAddress}
+              label={t('collect-form.full_address')}
               {...register('addressKind')}
             />
             <RadioInput
-              value={VirtualDataKinds.addressPartial}
-              label={t('collect-form.address_partial')}
+              value={CollectedDataOption.partialAddress}
+              label={t('collect-form.partial_address')}
               {...register('addressKind')}
             />
           </Box>

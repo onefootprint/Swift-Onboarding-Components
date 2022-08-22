@@ -26,7 +26,7 @@ const DecryptDialog = ({ user, onDecrypt }: DecryptDialogProps) => {
     ? Array.from(
         new Set(
           user.onboardings.flatMap(link =>
-            link.canAccessDataKinds.map(dataKind => dataKindToType[dataKind]),
+            link.canAccessData.map(dataKind => dataKindToType[dataKind]),
           ),
         ),
       )

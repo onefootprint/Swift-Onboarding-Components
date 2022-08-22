@@ -5,8 +5,8 @@ import useSessionUser, { AuthHeaders } from 'src/hooks/use-session-user';
 
 export type CreateOnboardingConfigRequest = {
   name: string;
-  mustCollectDataKinds: string[];
-  canAccessDataKinds: string[];
+  mustCollectData: string[];
+  canAccessData: string[];
 };
 
 export type GetOnboardingConfigResponse = string;

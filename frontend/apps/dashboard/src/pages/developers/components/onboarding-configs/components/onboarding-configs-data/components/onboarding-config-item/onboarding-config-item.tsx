@@ -76,10 +76,10 @@ const OnboardingConfigItem = ({ data }: OnboardingConfigItemProps) => {
               </Typography>
             </td>
             <td>
-              <TagList data-testid={`must-collect-data-kinds-${data.id}`}>
-                {data.mustCollectDataKinds.map(tag => (
+              <TagList data-testid={`must-collect-data-${data.id}`}>
+                {data.mustCollectData.map(tag => (
                   <Tag key={`must-access-${tag}`}>
-                    {allT(`data-kinds.${tag}`)}
+                    {allT(`collected-data-options.${tag}`)}
                   </Tag>
                 ))}
               </TagList>
@@ -93,10 +93,10 @@ const OnboardingConfigItem = ({ data }: OnboardingConfigItemProps) => {
               </Typography>
             </td>
             <td>
-              <TagList data-testid={`can-access-data-kinds-${data.id}`}>
-                {data.canAccessDataKinds.map(tag => (
+              <TagList data-testid={`can-access-data-${data.id}`}>
+                {data.canAccessData.map(tag => (
                   <Tag key={`can-access-${tag}`}>
-                    {allT(`data-kinds.${tag}`)}
+                    {allT(`collected-data-options.${tag}`)}
                   </Tag>
                 ))}
               </TagList>

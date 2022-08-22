@@ -1,7 +1,7 @@
 import { DeviceInfo } from 'hooks';
 import { interpret } from 'xstate';
 
-import { TenantInfo, UserDataAttribute } from '../types';
+import { CollectedDataOption, TenantInfo } from '../types';
 import createOnboardingMachine from './machine';
 import { Events, States } from './types';
 
@@ -9,19 +9,17 @@ describe('Onboarding Machine Tests', () => {
   const tenant: TenantInfo = {
     pk: 'pk',
     name: 'tenant',
-    mustCollectDataKinds: [
-      UserDataAttribute.firstName,
-      UserDataAttribute.lastName,
-      UserDataAttribute.email,
-      UserDataAttribute.city,
-      UserDataAttribute.ssn9,
+    mustCollectData: [
+      CollectedDataOption.name,
+      CollectedDataOption.email,
+      CollectedDataOption.fullAddress,
+      CollectedDataOption.ssn9,
     ],
-    canAccessDataKinds: [
-      UserDataAttribute.firstName,
-      UserDataAttribute.lastName,
-      UserDataAttribute.email,
-      UserDataAttribute.city,
-      UserDataAttribute.ssn9,
+    canAccessData: [
+      CollectedDataOption.name,
+      CollectedDataOption.email,
+      CollectedDataOption.fullAddress,
+      CollectedDataOption.ssn9,
     ],
     orgName: 'tenantOrg',
   };
@@ -70,13 +68,13 @@ describe('Onboarding Machine Tests', () => {
       let state = machine.send({
         type: Events.onboardingVerificationCompleted,
         payload: {
-          missingAttributes: [UserDataAttribute.firstName],
+          missingAttributes: [CollectedDataOption.name],
           missingWebauthnCredentials: true,
         },
       });
       expect(state.value).toEqual(States.additionalDataRequired);
       const { context } = state;
-      expect(context.missingAttributes).toEqual([UserDataAttribute.firstName]);
+      expect(context.missingAttributes).toEqual([CollectedDataOption.name]);
       expect(context.missingWebauthnCredentials).toEqual(true);
 
       state = machine.send({
@@ -95,9 +93,9 @@ describe('Onboarding Machine Tests', () => {
         type: Events.onboardingVerificationCompleted,
         payload: {
           missingAttributes: [
-            UserDataAttribute.firstName,
-            UserDataAttribute.country,
-            UserDataAttribute.ssn9,
+            CollectedDataOption.name,
+            CollectedDataOption.fullAddress,
+            CollectedDataOption.ssn9,
           ],
           missingWebauthnCredentials: false,
         },
@@ -105,9 +103,9 @@ describe('Onboarding Machine Tests', () => {
       expect(state.value).toEqual(States.additionalDataRequired);
       let { context } = state;
       expect(context.missingAttributes).toEqual([
-        UserDataAttribute.firstName,
-        UserDataAttribute.country,
-        UserDataAttribute.ssn9,
+        CollectedDataOption.name,
+        CollectedDataOption.fullAddress,
+        CollectedDataOption.ssn9,
       ]);
       expect(context.missingWebauthnCredentials).toEqual(false);
 
@@ -189,8 +187,8 @@ describe('Onboarding Machine Tests', () => {
         type: Events.onboardingVerificationCompleted,
         payload: {
           missingAttributes: [
-            UserDataAttribute.firstName,
-            UserDataAttribute.ssn9,
+            CollectedDataOption.name,
+            CollectedDataOption.ssn9,
           ],
           missingWebauthnCredentials: false,
         },
@@ -198,8 +196,8 @@ describe('Onboarding Machine Tests', () => {
       expect(state.value).toEqual(States.additionalDataRequired);
       let { context } = state;
       expect(context.missingAttributes).toEqual([
-        UserDataAttribute.firstName,
-        UserDataAttribute.ssn9,
+        CollectedDataOption.name,
+        CollectedDataOption.ssn9,
       ]);
       expect(context.missingWebauthnCredentials).toEqual(false);
 

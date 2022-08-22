@@ -2,8 +2,8 @@ import { useTranslation } from 'hooks';
 import React from 'react';
 import { Events } from 'src/utils/state-machine/onboarding';
 import {
+  CollectedDataOption,
   ResidentialAddress as ResidentialAddressData,
-  UserDataAttribute,
 } from 'src/utils/state-machine/types';
 import { useToast } from 'ui';
 
@@ -45,13 +45,7 @@ const ResidentialAddress = () => {
     });
   };
 
-  const requiresFullAddress =
-    missingAttributes.indexOf(UserDataAttribute.addressLine1) > -1 ||
-    missingAttributes.indexOf(UserDataAttribute.addressLine2) > -1 ||
-    missingAttributes.indexOf(UserDataAttribute.city) > -1 ||
-    missingAttributes.indexOf(UserDataAttribute.state) > -1;
-
-  if (requiresFullAddress) {
+  if (missingAttributes.includes(CollectedDataOption.fullAddress)) {
     return (
       <AddressFull
         onSubmit={handleSubmit}
@@ -59,13 +53,15 @@ const ResidentialAddress = () => {
       />
     );
   }
-
-  return (
-    <AddressZipCodeAndCountry
-      onSubmit={handleSubmit}
-      isMutationLoading={mutation.isLoading}
-    />
-  );
+  if (missingAttributes.includes(CollectedDataOption.partialAddress)) {
+    return (
+      <AddressZipCodeAndCountry
+        onSubmit={handleSubmit}
+        isMutationLoading={mutation.isLoading}
+      />
+    );
+  }
+  return <div />;
 };
 
 export default ResidentialAddress;

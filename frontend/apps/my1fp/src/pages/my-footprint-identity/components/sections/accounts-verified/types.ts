@@ -16,7 +16,7 @@ export enum UserDataAttribute {
 }
 
 export type AuthorizedOrgOnboarding = {
-  canAccessDataKinds: UserDataAttribute[];
+  canAccessData: UserDataAttribute[];
   insightEvent: InsightEvent;
   name: string;
   status: string;

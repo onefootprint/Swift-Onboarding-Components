@@ -1,7 +1,7 @@
 import { useTranslation } from 'hooks';
 import React from 'react';
 import { useForm } from 'react-hook-form';
-import { DataKinds, VirtualDataKinds } from 'src/types/data-kind';
+import { CollectedDataOption } from 'src/types/data-kind';
 import { Checkbox } from 'ui';
 
 import type { DataKindForm } from '../../create-onboarding-config.types';
@@ -30,49 +30,52 @@ const AccessForm = ({ defaultValues, onSubmit, fields }: AccessFormProps) => {
         title={t('access-form.title')}
         description={t('access-form.description')}
       />
-      {fields.has(DataKinds.phoneNumber) && (
+      {fields.has(CollectedDataOption.phoneNumber) && (
         <Checkbox
-          label={allT('data-kinds.phone_number')}
-          {...register(DataKinds.phoneNumber)}
+          label={allT('collected-data-options.phone_number')}
+          {...register(CollectedDataOption.phoneNumber)}
         />
       )}
-      {fields.has(DataKinds.email) && (
+      {fields.has(CollectedDataOption.email) && (
         <Checkbox
-          label={allT('data-kinds.email')}
-          {...register(DataKinds.email)}
+          label={allT('collected-data-options.email')}
+          {...register(CollectedDataOption.email)}
         />
       )}
-      {fields.has(VirtualDataKinds.name) && (
+      {fields.has(CollectedDataOption.name) && (
         <Checkbox
-          label={allT('data-kinds.name')}
-          {...register(VirtualDataKinds.name)}
+          label={allT('collected-data-options.name')}
+          {...register(CollectedDataOption.name)}
         />
       )}
-      {fields.has(DataKinds.dob) && (
-        <Checkbox label={allT('data-kinds.dob')} {...register(DataKinds.dob)} />
-      )}
-      {fields.has(DataKinds.ssn9) && (
+      {fields.has(CollectedDataOption.dob) && (
         <Checkbox
-          label={allT('data-kinds.ssn')}
-          {...register(DataKinds.ssn9)}
+          label={allT('collected-data-options.dob')}
+          {...register(CollectedDataOption.dob)}
         />
       )}
-      {fields.has(DataKinds.ssn4) && (
+      {fields.has(CollectedDataOption.ssn9) && (
         <Checkbox
-          label={allT('data-kinds.last_four_ssn')}
-          {...register(DataKinds.ssn4)}
+          label={allT('collected-data-options.ssn9')}
+          {...register(CollectedDataOption.ssn9)}
         />
       )}
-      {fields.has(VirtualDataKinds.addressFull) && (
+      {fields.has(CollectedDataOption.ssn4) && (
         <Checkbox
-          label={allT('data-kinds.address_full')}
-          {...register(VirtualDataKinds.addressFull)}
+          label={allT('collected-data-options.ssn4')}
+          {...register(CollectedDataOption.ssn4)}
         />
       )}
-      {fields.has(VirtualDataKinds.addressPartial) && (
+      {fields.has(CollectedDataOption.fullAddress) && (
         <Checkbox
-          label={allT('data-kinds.address_partial')}
-          {...register(VirtualDataKinds.addressPartial)}
+          label={allT('collected-data-options.full_address')}
+          {...register(CollectedDataOption.fullAddress)}
+        />
+      )}
+      {fields.has(CollectedDataOption.partialAddress) && (
+        <Checkbox
+          label={allT('collected-data-options.partial_address')}
+          {...register(CollectedDataOption.partialAddress)}
         />
       )}
     </form>

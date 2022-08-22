@@ -33,7 +33,7 @@ const useSyncData = () => {
       return;
     }
 
-    // Only one of ssn and last_four_ssn can ever be included in the request
+    // Only one of ssn9 and ssn4 can ever be included in the request
     const requestData: UserDataObj = {};
 
     if (data[UserDataAttribute.ssn9]) {

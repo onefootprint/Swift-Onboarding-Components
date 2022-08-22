@@ -80,16 +80,13 @@ describe('<OnboardingConfigs />', () => {
           });
           expect(createdAt).toBeInTheDocument();
           const mustCollectList = within(item).getByTestId(
-            `must-collect-data-kinds-${onboardingConfig.id}`,
+            `must-collect-data-${onboardingConfig.id}`,
           );
           expect(
-            within(mustCollectList).getByText('First name'),
-          ).toBeInTheDocument();
-          expect(
-            within(mustCollectList).getByText('Last name'),
+            within(mustCollectList).getByText('Full name'),
           ).toBeInTheDocument();
           const canAccessList = within(item).getByTestId(
-            `can-access-data-kinds-${onboardingConfig.id}`,
+            `can-access-data-${onboardingConfig.id}`,
           );
           expect(
             within(canAccessList).getByText('Date of Birth'),
