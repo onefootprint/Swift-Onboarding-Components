@@ -1,4 +1,4 @@
-import useTranslation from 'hooks/src/use-translation/use-translation';
+import { useTranslation } from 'hooks';
 import React from 'react';
 import styled from 'styled-components';
 import { LoadingIndicator, Typography } from 'ui';

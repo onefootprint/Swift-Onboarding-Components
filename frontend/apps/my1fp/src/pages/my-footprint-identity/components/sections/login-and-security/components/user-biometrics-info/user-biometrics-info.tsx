@@ -1,4 +1,4 @@
-import useTranslation from 'hooks/src/use-translation/use-translation';
+import { useTranslation } from 'hooks';
 import IcoClose16 from 'icons/ico/ico-close-16';
 import React from 'react';
 import useSessionUser from 'src/hooks/use-session-user';

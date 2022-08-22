@@ -3,10 +3,11 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "global-constants": ["../../packages/global-constants/src/*"],
-      "request": ["../../packages/request/src/*"],
-      "themes": ["../../packages/themes/src/*"],
-      "ui": ["../../packages/ui/src/*"]
+      "global-constants": ["../global-constants/src/*"],
+      "request": ["../request/src/*"],
+      "themes": ["../themes/src/*"],
+      "ui": ["../ui/src/*"],
+      "hooks": ["../hooks/src/*"]
     }
   },
   "include": ["."],

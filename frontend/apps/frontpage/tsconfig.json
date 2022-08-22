@@ -6,7 +6,8 @@
       "src/*": ["src/*"],
       "global-constants": ["../../packages/global-constants/src/*"],
       "themes": ["../../packages/themes/src/*"],
-      "ui": ["../../packages/ui/src/*"]
+      "ui": ["../../packages/ui/src/*"],
+      "hooks": ["../../packages/hooks/src/*"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],

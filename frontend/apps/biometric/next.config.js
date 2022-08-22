@@ -3,11 +3,7 @@ const withPlugins = require('next-compose-plugins');
 const withBundleAnalyzer = require('@next/bundle-analyzer')({
   enabled: process.env.ANALYZE === 'true',
 });
-const withTM = require('next-transpile-modules')([
-  'icons',
-  'hooks',
-  'footprint-ui',
-]);
+const withTM = require('next-transpile-modules')(['icons', 'footprint-ui']);
 
 module.exports = withPlugins([withTM, withBundleAnalyzer], {
   productionBrowserSourceMaps: true,
