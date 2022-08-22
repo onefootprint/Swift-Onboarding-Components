@@ -38,11 +38,10 @@ jobs:
         run: yarn install --frozen-lockfile
 
       - name: Create Release Pull Request or Publish to npm
-        working-directory: ./frontend
         uses: changesets/action@v1
-        with:
-          publish: yarn release
-          version: yarn version
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        with:
+          cwd: ./frontend
+          publish: yarn release
