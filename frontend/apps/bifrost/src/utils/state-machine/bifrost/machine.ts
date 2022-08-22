@@ -32,6 +32,7 @@ const initialContext: BifrostContext = {
 
 const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
   {
+    predictableActionArguments: true,
     id: 'bifrostMachine',
     initial: States.init,
     context: initialContext,

@@ -20,6 +20,7 @@ const createLivenessRegisterMachine = ({
 }: LivenessRegisterMachineArgs) =>
   createMachine<MachineContext, MachineEvents>(
     {
+      predictableActionArguments: true,
       id: 'livenessRegister',
       initial: States.init,
       context: {

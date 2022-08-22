@@ -12,6 +12,7 @@ const initialContext: MachineContext = {};
 
 const livenessCheckMachine = createMachine<MachineContext, MachineEvents>(
   {
+    predictableActionArguments: true,
     id: 'livenessCheck',
     initial: States.init,
     context: initialContext,

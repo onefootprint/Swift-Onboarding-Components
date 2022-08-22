@@ -11,6 +11,7 @@ import {
 export const createBiometricMachine = () =>
   createMachine<BiometricContext, BiometricEvent>(
     {
+      predictableActionArguments: true,
       id: 'biometric',
       initial: States.init,
       context: {

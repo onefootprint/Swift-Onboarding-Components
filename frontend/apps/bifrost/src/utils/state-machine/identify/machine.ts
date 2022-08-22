@@ -19,6 +19,7 @@ export type IdentifyMachineArgs = {
 const createIdentifyMachine = ({ identifyType, device }: IdentifyMachineArgs) =>
   createMachine<MachineContext, MachineEvents>(
     {
+      predictableActionArguments: true,
       id: 'identify',
       initial: States.emailIdentification,
       context: {

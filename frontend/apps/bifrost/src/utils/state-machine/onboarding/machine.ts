@@ -32,6 +32,7 @@ const createOnboardingMachine = ({
 }: OnboardingMachineArgs) =>
   createMachine<MachineContext, MachineEvents>(
     {
+      predictableActionArguments: true,
       id: 'onboarding',
       initial: States.onboardingVerification,
       context: {
