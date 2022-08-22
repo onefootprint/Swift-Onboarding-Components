@@ -18,13 +18,11 @@ def secret_key(workos_sandbox_tenant):
 
 
 @pytest.fixture(scope="session")
-def ob_configuration(
-    workos_sandbox_tenant, must_collect_data_kinds, can_access_data_kinds
-):
+def ob_configuration(workos_sandbox_tenant, must_collect_data, can_access_data):
     data = dict(
         name="Test OB config",
-        must_collect_data_kinds=must_collect_data_kinds,
-        can_access_data_kinds=can_access_data_kinds,
+        must_collect_data=must_collect_data,
+        can_access_data=can_access_data,
     )
     body = post("org/onboarding_configs", data, workos_sandbox_tenant.sk.key)
     return ObConfiguration.from_response(body["data"])
@@ -52,15 +50,14 @@ class TestDashboard:
             }
             body = post("users/decrypt", data, tenant.sk.key)
             attributes = body["data"]
-            print(attributes)
-            for data_kind, value in attributes.items():
-                assert expected_data[data_kind].upper() == value.upper()
+            for attribute, value in attributes.items():
+                assert expected_data[attribute].upper() == value.upper()
 
     def test_tenant_decrypt_no_permissions(self, user):
         tenant = user.tenant
         data = {
             "footprint_user_id": user.fp_user_id,
-            "attributes": ["city"],
+            "attributes": ["dob"],
             "reason": "Not doing a hecking decrypt",
         }
         post("users/decrypt", data, tenant.sk.key, status_code=401)
@@ -129,19 +126,16 @@ class TestDashboard:
         )
         assert config["key"] == ob_configuration.key.token
         assert config["name"] == ob_configuration.name
-        assert (
-            config["must_collect_data_kinds"]
-            == ob_configuration.must_collect_data_kinds
-        )
-        assert config["can_access_data_kinds"] == ob_configuration.can_access_data_kinds
+        assert config["must_collect_data"] == ob_configuration.must_collect_data
+        assert config["can_access_data"] == ob_configuration.can_access_data
         assert config["status"] == ob_configuration.status
         assert config["created_at"]
 
     def test_config_create(self, workos_sandbox_tenant, basic_user):
         data = dict(
             name="Acme Bank Loan",
-            must_collect_data_kinds=["ssn4"],
-            can_access_data_kinds=["ssn4"],
+            must_collect_data=["ssn4"],
+            can_access_data=["ssn4"],
         )
         body = post("org/onboarding_configs", data, workos_sandbox_tenant.sk.key)
         ob_config = body["data"]
@@ -153,15 +147,9 @@ class TestDashboard:
     @pytest.mark.parametrize(
         "must_collect,can_access,expected_status",
         [
-            (["last_name"], [], 400),  # Can't collect last name without first name
-            (
-                ["ssn4", "ssn9"],
-                [],
-                400,
-            ),  # Can't collect both last four SSN and whole SSN
-            (["address_line1"], [], 400),  # Can't collect only some address fields
-            (["zip", "country"], [], 200),  # Except for zip & country
-            (["zip"], [], 400),  # Country is always required along with zip
+            (["ssn4", "partial_address", "name"], [], 200),
+            (["ssn4", "ssn9"], [], 400),
+            (["full_address", "partial_address"], [], 400),
             (
                 ["first_name", "last_name"],
                 ["ssn9"],
@@ -175,8 +163,8 @@ class TestDashboard:
         # Test validation errors
         data = dict(
             name="Acme Bank Loan",
-            must_collect_data_kinds=must_collect,
-            can_access_data_kinds=can_access,
+            must_collect_data=must_collect,
+            can_access_data=can_access,
         )
         post(
             "org/onboarding_configs",

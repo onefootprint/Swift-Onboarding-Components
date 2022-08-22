@@ -96,8 +96,8 @@ async fn post_inner(
             ObConfiguration::list_for_scoped_user(&state.db_pool, scoped_user.id.clone()).await?;
         let can_access_kinds: HashSet<_> = ob_configs
             .into_iter()
-            .flat_map(|x| x.can_access_data_kinds)
-            .flat_map(|x| x.permissioning_kinds())
+            .flat_map(|x| x.can_access_data)
+            .flat_map(|x| x.attributes())
             .collect();
         if !can_access_kinds.is_superset(&attributes) {
             return Err(AuthError::UnauthorizedOperation.into());

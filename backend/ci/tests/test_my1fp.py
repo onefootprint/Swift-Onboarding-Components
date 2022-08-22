@@ -70,7 +70,7 @@ class TestMy1fp:
         assert not emails[0]["is_verified"]
         assert emails[0]["priority"] == "primary"
 
-    def test_authorized_tenants(self, my1fp_authed_user, can_access_data_kinds):
+    def test_authorized_tenants(self, my1fp_authed_user, can_access_data):
         # Get the user detail using the logged in context
         body = get("hosted/user/authorized_orgs", None, my1fp_authed_user.auth_token)
         authorized_orgs = body["data"]
@@ -78,9 +78,7 @@ class TestMy1fp:
         onboarding_info = authorized_orgs[0]["onboardings"][0]
         assert onboarding_info["name"] == "Acme Bank Card"
         assert onboarding_info["insight_event"]
-        assert set(onboarding_info["can_access_data_kinds"]) == set(
-            can_access_data_kinds
-        )
+        assert set(onboarding_info["can_access_data"]) == set(can_access_data)
 
     def test_access_events(self, my1fp_authed_user):
         tenant = my1fp_authed_user.tenant

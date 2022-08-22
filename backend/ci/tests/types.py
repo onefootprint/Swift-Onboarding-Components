@@ -22,8 +22,8 @@ class ObConfiguration(NamedTuple):
     id: str
     name: str
     status: str
-    must_collect_data_kinds: list
-    can_access_data_kinds: list
+    must_collect_data: list
+    can_access_data: list
 
     def from_response(resp):
         return ObConfiguration(
@@ -31,8 +31,8 @@ class ObConfiguration(NamedTuple):
             resp["id"],
             resp["name"],
             resp["status"],
-            resp["must_collect_data_kinds"],
-            resp["can_access_data_kinds"],
+            resp["must_collect_data"],
+            resp["can_access_data"],
         )
 
 

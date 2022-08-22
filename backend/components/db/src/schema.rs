@@ -123,11 +123,11 @@ table! {
         tenant_id -> Text,
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
-        must_collect_data_kinds -> Array<Text>,
-        can_access_data_kinds -> Array<Text>,
         is_live -> Bool,
         status -> Text,
         created_at -> Timestamptz,
+        must_collect_data -> Array<Text>,
+        can_access_data -> Array<Text>,
     }
 }
 

@@ -19,8 +19,9 @@ use chrono::Utc;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::ob_configuration::ObConfigurationQuery;
 use db::DbError;
+use itertools::Itertools;
 use newtypes::ApiKeyStatus;
-use newtypes::DataAttribute;
+use newtypes::CollectedDataOption;
 use newtypes::ObConfigurationId;
 use paperclip::actix::Apiv2Schema;
 use paperclip::actix::{api_v2_operation, get, patch, post, web, web::Json};
@@ -76,51 +77,36 @@ async fn get(
 #[serde(rename_all = "snake_case")]
 pub struct CreateOnboardingConfigurationRequest {
     name: String,
-    must_collect_data_kinds: Vec<DataAttribute>,
-    can_access_data_kinds: Vec<DataAttribute>,
+    must_collect_data: Vec<CollectedDataOption>,
+    can_access_data: Vec<CollectedDataOption>,
 }
 
 impl CreateOnboardingConfigurationRequest {
     fn validate(&self) -> Result<(), TenantError> {
-        let must_collect = &self.must_collect_data_kinds;
-        let contains_any = |kinds: &[DataAttribute]| kinds.iter().any(|x| must_collect.contains(x));
-        let contains_all = |kinds: &[DataAttribute]| kinds.iter().all(|x| must_collect.contains(x));
-        let contains_all_or_none = |kinds| contains_all(kinds) || !contains_any(kinds);
-
-        // acceptable states: all address fields or no address fields or just zip & country fields
-        let address_kinds = &[
-            DataAttribute::AddressLine1,
-            DataAttribute::AddressLine2,
-            DataAttribute::City,
-            DataAttribute::State,
-            DataAttribute::Country,
-            DataAttribute::Zip,
-        ];
-        let address_kinds_without_zip_and_country = &address_kinds
+        let invalid_config = self
+            .must_collect_data
             .iter()
             .cloned()
-            .filter(|x| x != &DataAttribute::Zip && x != &DataAttribute::Country)
-            .collect::<Vec<DataAttribute>>();
-        let contains_only_zip_and_country = must_collect.contains(&DataAttribute::Zip)
-            && must_collect.contains(&DataAttribute::Country)
-            && !contains_any(address_kinds_without_zip_and_country);
-
-        let err = if !contains_all_or_none(&[DataAttribute::FirstName, DataAttribute::LastName]) {
-            TenantError::ValidationError("Must request first name and last name together".to_owned())
-        } else if !(contains_all_or_none(address_kinds) || contains_only_zip_and_country) {
-            TenantError::ValidationError(
-                "Can only request all address fields, zip & country only, or none".to_owned(),
-            )
-        } else if must_collect.contains(&DataAttribute::Ssn4) && must_collect.contains(&DataAttribute::Ssn9) {
-            TenantError::ValidationError("Cannot request full SSN and last four of SSN".to_owned())
-        } else if !HashSet::<&DataAttribute>::from_iter(self.can_access_data_kinds.iter())
-            .is_subset(&HashSet::from_iter(must_collect.iter()))
-        {
-            TenantError::ValidationError("Decryptable fields must be a subset of collected fields".to_owned())
+            .map(|x| (x.parent(), x))
+            .sorted()
+            .group_by(|(p, _)| *p)
+            .into_iter()
+            .map(|(_, g)| g.map(|x| x.1).collect())
+            .find(|x: &Vec<_>| x.len() > 1);
+        if let Some(invalid_config) = invalid_config {
+            Err(TenantError::ValidationError(format!(
+                "Cannot provide both {} and {}",
+                invalid_config[0], invalid_config[1]
+            )))
+        } else if !HashSet::<&CollectedDataOption>::from_iter(self.can_access_data.iter()).is_subset(
+            &HashSet::<&CollectedDataOption>::from_iter(self.must_collect_data.iter()),
+        ) {
+            Err(TenantError::ValidationError(
+                "Decryptable fields must be a subset of collected fields".to_owned(),
+            ))
         } else {
-            return Ok(());
-        };
-        Err(err)
+            Ok(())
+        }
     }
 }
 
@@ -136,16 +122,16 @@ pub fn post(
     let tenant = auth.tenant().clone();
     let CreateOnboardingConfigurationRequest {
         name,
-        must_collect_data_kinds,
-        can_access_data_kinds,
+        must_collect_data,
+        can_access_data,
     } = request.into_inner();
 
     let obc = ObConfiguration::create(
         &state.db_pool,
         name,
         tenant.id.clone(),
-        must_collect_data_kinds,
-        can_access_data_kinds,
+        must_collect_data,
+        can_access_data,
         auth.is_live()?,
     )
     .await?;

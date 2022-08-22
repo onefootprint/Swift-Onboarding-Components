@@ -15,8 +15,8 @@ use db::assert_in_transaction;
 use db::models::user_vault::UserVault;
 use db::{errors::DbError, PgConnection};
 use newtypes::{
-    DataAttribute, DataPriority, EmailId, Fingerprint, PiiString, SealedVaultBytes, UserVaultId,
-    ValidatedPhoneNumber,
+    CollectedDataOption, DataAttribute, DataPriority, EmailId, Fingerprint, PiiString, SealedVaultBytes,
+    UserVaultId, ValidatedPhoneNumber,
 };
 
 use crate::errors::{ApiError, ApiResult};
@@ -142,13 +142,17 @@ impl UserVaultWrapper {
         Ok(validated_phone_number)
     }
 
-    pub fn missing_fields(&self, ob_config: &ObConfiguration) -> Vec<DataAttribute> {
+    pub fn missing_fields(&self, ob_config: &ObConfiguration) -> Vec<CollectedDataOption> {
         ob_config
-            .must_collect_data_kinds
+            .must_collect_data
             .iter()
+            .filter(|cdo| {
+                cdo.attributes()
+                    .iter()
+                    .filter(|d| d.is_required())
+                    .any(|d| !self.has_field(*d))
+            })
             .cloned()
-            .filter(|data_attribute| data_attribute.is_required())
-            .filter(|data_attribute| !self.has_field(*data_attribute))
             .collect()
     }
 }

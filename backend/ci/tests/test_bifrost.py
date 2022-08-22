@@ -37,7 +37,7 @@ def auth_token(twilio):
 
 
 @pytest.fixture(scope="session")
-def foo_tenant(must_collect_data_kinds, can_access_data_kinds):
+def foo_tenant(must_collect_data, can_access_data):
     org_data = {
         "name": "foo",
         "is_live": True,
@@ -45,15 +45,15 @@ def foo_tenant(must_collect_data_kinds, can_access_data_kinds):
 
     ob_data = {
         "name": "Foo Stocks",
-        "must_collect_data_kinds": must_collect_data_kinds,
-        "can_access_data_kinds": can_access_data_kinds,
+        "must_collect_data": must_collect_data,
+        "can_access_data": can_access_data,
     }
 
     return create_tenant(org_data, ob_data)
 
 
 @pytest.fixture(scope="session")
-def bar_tenant(must_collect_data_kinds, can_access_data_kinds):
+def bar_tenant(must_collect_data, can_access_data):
     org_data = {
         "name": "bar",
         "is_live": True,
@@ -61,8 +61,8 @@ def bar_tenant(must_collect_data_kinds, can_access_data_kinds):
 
     ob_data = {
         "name": "Bar Insurance",
-        "must_collect_data_kinds": must_collect_data_kinds,
-        "can_access_data_kinds": can_access_data_kinds,
+        "must_collect_data": must_collect_data,
+        "can_access_data": can_access_data,
     }
 
     return create_tenant(org_data, ob_data)
@@ -93,15 +93,10 @@ class TestBifrost:
     def test_onboarding_init(self, workos_tenant, auth_token):
         body = post("hosted/onboarding", None, workos_tenant.ob_config.key, auth_token)
         assert set(body["data"]["missing_attributes"]) == {
-            "first_name",
-            "last_name",
+            "name",
             "dob",
             "ssn9",
-            "address_line1",
-            "city",
-            "state",
-            "zip",
-            "country",
+            "full_address",
             "email",
         }
         assert body["data"]["missing_webauthn_credentials"] == True

@@ -1,6 +1,6 @@
 use chrono::{DateTime, Utc};
 use db::models::{ob_configuration::ObConfiguration, tenant::Tenant};
-use newtypes::{ApiKeyStatus, DataAttribute, ObConfigurationId, ObConfigurationKey};
+use newtypes::{ApiKeyStatus, CollectedDataOption, ObConfigurationId, ObConfigurationKey};
 use paperclip::actix::Apiv2Schema;
 
 #[derive(Debug, Clone, serde::Serialize, Apiv2Schema)]
@@ -10,8 +10,8 @@ pub struct ApiObConfig {
     name: String,
     org_name: String,
     logo_url: Option<String>,
-    must_collect_data_kinds: Vec<DataAttribute>,
-    can_access_data_kinds: Vec<DataAttribute>,
+    must_collect_data: Vec<CollectedDataOption>,
+    can_access_data: Vec<CollectedDataOption>,
     is_live: bool,
     created_at: DateTime<Utc>,
     status: ApiKeyStatus,
@@ -24,9 +24,9 @@ impl From<(ObConfiguration, Tenant)> for ApiObConfig {
             key,
             name,
             created_at,
-            must_collect_data_kinds,
+            must_collect_data,
             status,
-            can_access_data_kinds,
+            can_access_data,
             is_live,
             ..
         } = s.0;
@@ -41,8 +41,8 @@ impl From<(ObConfiguration, Tenant)> for ApiObConfig {
             name,
             org_name,
             logo_url,
-            must_collect_data_kinds,
-            can_access_data_kinds,
+            must_collect_data,
+            can_access_data,
             is_live,
             created_at,
             status,

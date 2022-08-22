@@ -20,30 +20,24 @@ from .webauthn_simulator import SoftWebauthnDevice
 
 
 @pytest.fixture(scope="session")
-def can_access_data_kinds():
-    # Everything but city
+def can_access_data():
+    # Everything but dob
     return [
-        "first_name",
-        "last_name",
-        "dob",
+        "name",
         "ssn9",
-        "address_line1",
-        "address_line2",
-        "state",
-        "zip",
-        "country",
+        "full_address",
         "email",
         "phone_number",
     ]
 
 
 @pytest.fixture(scope="session")
-def must_collect_data_kinds(can_access_data_kinds):
-    return can_access_data_kinds + ["city"]
+def must_collect_data(can_access_data):
+    return can_access_data + ["dob"]
 
 
 @pytest.fixture(scope="session")
-def workos_tenant(must_collect_data_kinds, can_access_data_kinds):
+def workos_tenant(must_collect_data, can_access_data):
     org_data = {
         "name": "Acme Bank",
         "is_live": True,
@@ -51,15 +45,15 @@ def workos_tenant(must_collect_data_kinds, can_access_data_kinds):
 
     ob_data = {
         "name": "Acme Bank Card",
-        "must_collect_data_kinds": must_collect_data_kinds,
-        "can_access_data_kinds": can_access_data_kinds,
+        "must_collect_data": must_collect_data,
+        "can_access_data": can_access_data,
     }
 
     return create_tenant(org_data, ob_data)
 
 
 @pytest.fixture(scope="session")
-def workos_sandbox_tenant(must_collect_data_kinds, can_access_data_kinds):
+def workos_sandbox_tenant(must_collect_data, can_access_data):
 
     org_data = {
         "name": "Acme Bank",
@@ -68,8 +62,8 @@ def workos_sandbox_tenant(must_collect_data_kinds, can_access_data_kinds):
 
     ob_data = {
         "name": "Acme Bank Card",
-        "must_collect_data_kinds": must_collect_data_kinds,
-        "can_access_data_kinds": can_access_data_kinds,
+        "must_collect_data": must_collect_data,
+        "can_access_data": can_access_data,
     }
 
     return create_tenant(org_data, ob_data)

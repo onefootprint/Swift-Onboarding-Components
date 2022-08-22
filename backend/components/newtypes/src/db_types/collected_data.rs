@@ -8,6 +8,11 @@ use super::DataAttribute;
 
 #[derive(
     Debug,
+    Eq,
+    PartialEq,
+    Ord,
+    PartialOrd,
+    Hash,
     Display,
     Clone,
     Copy,
@@ -35,6 +40,11 @@ crate::util::impl_enum_str_diesel!(CollectedData);
 
 #[derive(
     Debug,
+    Eq,
+    PartialEq,
+    Ord,
+    PartialOrd,
+    Hash,
     Display,
     Clone,
     Copy,
@@ -88,12 +98,7 @@ impl CollectedDataOption {
                 DataAttribute::Zip,
                 DataAttribute::Country,
             ],
-            Self::PartialAddress => vec![
-                DataAttribute::City,
-                DataAttribute::State,
-                DataAttribute::Zip,
-                DataAttribute::Country,
-            ],
+            Self::PartialAddress => vec![DataAttribute::Zip, DataAttribute::Country],
             Self::Email => vec![DataAttribute::Email],
             Self::PhoneNumber => vec![DataAttribute::PhoneNumber],
         }

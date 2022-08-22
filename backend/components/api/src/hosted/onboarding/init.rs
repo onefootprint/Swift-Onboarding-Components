@@ -8,7 +8,7 @@ use crate::utils::user_vault_wrapper::UserVaultWrapper;
 use crate::State;
 use db::models::onboarding::Onboarding;
 use db::models::webauthn_credential::WebauthnCredential;
-use newtypes::{DataAttribute, SessionAuthToken};
+use newtypes::{CollectedDataOption, SessionAuthToken};
 use paperclip::actix::{api_v2_operation, web, web::Json, Apiv2Schema};
 
 use super::create_onboarding_validation_token;
@@ -16,7 +16,7 @@ use super::create_onboarding_validation_token;
 #[derive(Debug, Clone, Apiv2Schema, serde::Serialize)]
 pub struct OnboardingResponse {
     /// Attributes needed to successfully onboard this user
-    missing_attributes: Vec<DataAttribute>,
+    missing_attributes: Vec<CollectedDataOption>,
     /// Whether or not webauthn credentials are needed for this user
     missing_webauthn_credentials: bool,
     // Populated if the user has already onboarded onto this tenant's ob_configuration
