@@ -4,7 +4,7 @@ use crate::{schema::identity_data, DbError};
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use diesel::{PgConnection, Queryable};
-use newtypes::{DataKind, FingerprintId, IdentityDataId, SealedVaultBytes, UserVaultId};
+use newtypes::{DataAttribute, FingerprintId, IdentityDataId, SealedVaultBytes, UserVaultId};
 use serde::{Deserialize, Serialize};
 use strum::IntoEnumIterator;
 
@@ -124,7 +124,7 @@ impl IdentityData {
     pub fn deactivate(
         &self,
         conn: &mut PgConnection,
-        remove_fingerprint_kinds: &[DataKind],
+        remove_fingerprint_kinds: &[DataAttribute],
     ) -> Result<Vec<FingerprintId>, DbError> {
         let removed = Fingerprint::deactivate(conn, &self.fingerprint_ids, remove_fingerprint_kinds)?;
         diesel::update(identity_data::table)
@@ -144,33 +144,33 @@ impl IdentityData {
 
 /// helper trait to access e_fields and metadata
 pub trait HasIdentityDataFields {
-    fn get_e_field(&self, data_kind: DataKind) -> Option<&SealedVaultBytes>;
+    fn get_e_field(&self, data_attribute: DataAttribute) -> Option<&SealedVaultBytes>;
 
-    fn has_field(&self, data_kind: DataKind) -> bool {
-        self.get_e_field(data_kind).is_some()
+    fn has_field(&self, data_attribute: DataAttribute) -> bool {
+        self.get_e_field(data_attribute).is_some()
     }
 
-    fn get_populated_fields(&self) -> Vec<DataKind> {
-        DataKind::iter().filter(|k| self.has_field(*k)).collect()
+    fn get_populated_fields(&self) -> Vec<DataAttribute> {
+        DataAttribute::iter().filter(|k| self.has_field(*k)).collect()
     }
 }
 
 impl HasIdentityDataFields for IdentityData {
-    fn get_e_field(&self, data_kind: DataKind) -> Option<&SealedVaultBytes> {
-        match data_kind {
-            DataKind::FirstName => self.e_first_name.as_ref(),
-            DataKind::LastName => self.e_last_name.as_ref(),
-            DataKind::Dob => self.e_dob.as_ref(),
-            DataKind::Ssn9 => self.e_ssn9.as_ref(),
-            DataKind::Ssn4 => self.e_ssn4.as_ref(),
-            DataKind::AddressLine1 => self.e_address_line1.as_ref(),
-            DataKind::AddressLine2 => self.e_address_line2.as_ref(),
-            DataKind::City => self.e_address_city.as_ref(),
-            DataKind::State => self.e_address_state.as_ref(),
-            DataKind::Zip => self.e_address_zip.as_ref(),
-            DataKind::Country => self.e_address_country.as_ref(),
-            DataKind::Email => None,
-            DataKind::PhoneNumber => None,
+    fn get_e_field(&self, data_attribute: DataAttribute) -> Option<&SealedVaultBytes> {
+        match data_attribute {
+            DataAttribute::FirstName => self.e_first_name.as_ref(),
+            DataAttribute::LastName => self.e_last_name.as_ref(),
+            DataAttribute::Dob => self.e_dob.as_ref(),
+            DataAttribute::Ssn9 => self.e_ssn9.as_ref(),
+            DataAttribute::Ssn4 => self.e_ssn4.as_ref(),
+            DataAttribute::AddressLine1 => self.e_address_line1.as_ref(),
+            DataAttribute::AddressLine2 => self.e_address_line2.as_ref(),
+            DataAttribute::City => self.e_address_city.as_ref(),
+            DataAttribute::State => self.e_address_state.as_ref(),
+            DataAttribute::Zip => self.e_address_zip.as_ref(),
+            DataAttribute::Country => self.e_address_country.as_ref(),
+            DataAttribute::Email => None,
+            DataAttribute::PhoneNumber => None,
         }
     }
 }
@@ -179,7 +179,7 @@ impl<T> HasIdentityDataFields for Option<T>
 where
     T: HasIdentityDataFields,
 {
-    fn get_e_field(&self, data_kind: DataKind) -> Option<&SealedVaultBytes> {
-        self.as_ref()?.get_e_field(data_kind)
+    fn get_e_field(&self, data_attribute: DataAttribute) -> Option<&SealedVaultBytes> {
+        self.as_ref()?.get_e_field(data_attribute)
     }
 }

@@ -10,7 +10,7 @@ use crate::utils::user_vault_wrapper::UserVaultWrapper;
 use crate::State;
 
 use newtypes::email::Email as EmailData;
-use newtypes::{DataKind, Fingerprinter};
+use newtypes::{DataAttribute, Fingerprinter};
 
 use paperclip::actix::{api_v2_operation, web, web::Json, Apiv2Schema};
 
@@ -46,7 +46,7 @@ pub async fn post(
     }
 
     let sh_data = state
-        .compute_fingerprint(DataKind::Email, email.to_piistring().clean_for_fingerprint())
+        .compute_fingerprint(DataAttribute::Email, email.to_piistring().clean_for_fingerprint())
         .await?;
     // grab our uvw
     let email_address = email.email.clone();

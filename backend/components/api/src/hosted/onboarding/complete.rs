@@ -17,7 +17,7 @@ use db::PgConnection;
 use itertools::Itertools;
 use newtypes::TenantId;
 use newtypes::ValidatedPhoneNumber;
-use newtypes::{AuditTrailEvent, DataKind, SessionAuthToken, Status, Vendor, VerificationInfo};
+use newtypes::{AuditTrailEvent, DataAttribute, SessionAuthToken, Status, Vendor, VerificationInfo};
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Apiv2Schema)]
@@ -120,28 +120,32 @@ fn initiate_verification(
     // TODO kick off user verification with data vendors
     let events = vec![
         VerificationInfo {
-            data_kinds: vec![DataKind::FirstName, DataKind::LastName, DataKind::Dob],
+            data_attributes: vec![
+                DataAttribute::FirstName,
+                DataAttribute::LastName,
+                DataAttribute::Dob,
+            ],
             vendor: Vendor::Experian,
         },
         VerificationInfo {
-            data_kinds: vec![DataKind::Country, DataKind::State],
+            data_attributes: vec![DataAttribute::Country, DataAttribute::State],
             vendor: Vendor::Socure,
         },
         VerificationInfo {
-            data_kinds: vec![
-                DataKind::AddressLine1,
-                DataKind::AddressLine2,
-                DataKind::City,
-                DataKind::Zip,
+            data_attributes: vec![
+                DataAttribute::AddressLine1,
+                DataAttribute::AddressLine2,
+                DataAttribute::City,
+                DataAttribute::Zip,
             ],
             vendor: Vendor::Idology,
         },
         VerificationInfo {
-            data_kinds: vec![DataKind::Ssn9],
+            data_attributes: vec![DataAttribute::Ssn9],
             vendor: Vendor::LexisNexis,
         },
         VerificationInfo {
-            data_kinds: vec![],
+            data_attributes: vec![],
             vendor: Vendor::Footprint,
         },
     ];

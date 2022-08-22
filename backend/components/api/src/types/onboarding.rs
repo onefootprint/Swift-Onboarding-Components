@@ -1,6 +1,6 @@
 use chrono::{DateTime, Utc};
 use db::models::onboarding::{Onboarding, OnboardingInfo};
-use newtypes::{DataKind, Status};
+use newtypes::{DataAttribute, Status};
 use paperclip::actix::Apiv2Schema;
 
 use super::insight_event::ApiInsightEvent;
@@ -10,7 +10,7 @@ pub struct ApiOnboarding {
     name: String,
     timestamp: DateTime<Utc>,
     status: Status,
-    can_access_data_kinds: Vec<DataKind>,
+    can_access_data_kinds: Vec<DataAttribute>,
     insight_event: ApiInsightEvent,
 }
 

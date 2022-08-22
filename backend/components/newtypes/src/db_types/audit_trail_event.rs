@@ -3,7 +3,7 @@ use diesel_as_jsonb::AsJsonb;
 use paperclip::actix::Apiv2Schema;
 use serde::{Deserialize, Serialize};
 
-use crate::{DataKind, Vendor};
+use crate::{DataAttribute, Vendor};
 
 #[derive(Debug, Clone, Serialize, Deserialize, Apiv2Schema, AsJsonb)]
 #[serde(rename_all = "snake_case")]
@@ -24,6 +24,7 @@ pub struct LivenessCheckInfo {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct VerificationInfo {
-    pub data_kinds: Vec<DataKind>,
+    #[serde(alias = "data_kinds")]
+    pub data_attributes: Vec<DataAttribute>,
     pub vendor: Vendor,
 }

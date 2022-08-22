@@ -6,17 +6,17 @@ use crate::hosted::user::decrypt;
 use crate::hosted::user::DecryptFieldsResult;
 use crate::types::response::ApiResponseData;
 use crate::State;
-use newtypes::DataKind;
+use newtypes::DataAttribute;
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 use std::collections::HashMap;
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
 struct UserDecryptRequest {
-    attributes: Vec<DataKind>,
+    attributes: Vec<DataAttribute>,
 }
 
-type UserDecryptResponse = HashMap<DataKind, Option<String>>;
+type UserDecryptResponse = HashMap<DataAttribute, Option<String>>;
 
 #[api_v2_operation(tags(Hosted))]
 #[post("/decrypt")]
@@ -27,7 +27,7 @@ fn handler(
     user_auth: UserAuth,
     request: Json<UserDecryptRequest>,
 ) -> actix_web::Result<Json<ApiResponseData<UserDecryptResponse>>, ApiError> {
-    let required_scope = if request.attributes.contains(&DataKind::Ssn9) {
+    let required_scope = if request.attributes.contains(&DataAttribute::Ssn9) {
         UserAuthScope::ExtendedProfile
     } else {
         UserAuthScope::BasicProfile
@@ -35,7 +35,7 @@ fn handler(
     let user_auth = user_auth.check_permissions(vec![required_scope])?;
 
     let DecryptFieldsResult {
-        decrypted_data_kinds: _,
+        decrypted_data_attributes: _,
         result_map,
     } = decrypt(
         &state,

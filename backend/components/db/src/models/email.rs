@@ -2,7 +2,7 @@ use crate::{schema::email, DbError};
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use diesel::Queryable;
-use newtypes::DataKind;
+use newtypes::DataAttribute;
 use newtypes::{
     DataPriority, EmailId, Fingerprint as FingerprintData, FingerprintId, SealedVaultBytes, UserVaultId,
 };
@@ -80,7 +80,7 @@ impl Email {
         let fingerprint_ids = Fingerprint::bulk_create(
             conn,
             &user_vault_id,
-            vec![(DataKind::Email, fingerprint, is_verified)],
+            vec![(DataAttribute::Email, fingerprint, is_verified)],
         )?;
         let new_row = NewEmail {
             user_vault_id,
@@ -117,7 +117,7 @@ impl Email {
         Ok(())
     }
 
-    pub fn data_items(self) -> Vec<(DataKind, SealedVaultBytes)> {
-        vec![(DataKind::Email, self.e_data)]
+    pub fn data_items(self) -> Vec<(DataAttribute, SealedVaultBytes)> {
+        vec![(DataAttribute::Email, self.e_data)]
     }
 }

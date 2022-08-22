@@ -1,0 +1,1 @@
+ALTER TABLE fingerprint RENAME COLUMN data_attribute TO data_kind;

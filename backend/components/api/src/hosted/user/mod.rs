@@ -1,6 +1,6 @@
 use crate::{errors::ApiError, utils::user_vault_wrapper::UserVaultWrapper, State};
 use db::models::{identity_data::HasIdentityDataFields, user_vault::UserVault};
-use newtypes::{DataKind, PiiString, SealedVaultBytes};
+use newtypes::{DataAttribute, PiiString, SealedVaultBytes};
 use paperclip::actix::web;
 use std::collections::HashMap;
 
@@ -29,40 +29,40 @@ pub fn routes() -> web::Scope {
 }
 
 pub struct DecryptFieldsResult {
-    pub decrypted_data_kinds: Vec<DataKind>,
-    pub result_map: HashMap<DataKind, Option<PiiString>>,
+    pub decrypted_data_attributes: Vec<DataAttribute>,
+    pub result_map: HashMap<DataAttribute, Option<PiiString>>,
 }
 
 pub async fn decrypt(
     state: &web::Data<State>,
     user_vault: UserVault,
-    data_kinds: Vec<DataKind>,
+    data_attributes: Vec<DataAttribute>,
 ) -> Result<DecryptFieldsResult, ApiError> {
     // Filter out fields that don't have values set on the user vault
     let uvw = state
         .db_pool
         .db_query(move |conn| UserVaultWrapper::build(conn, user_vault))
         .await??;
-    let (fields_to_decrypt, e_datas): (Vec<DataKind>, Vec<&SealedVaultBytes>) = data_kinds
+    let (fields_to_decrypt, e_datas): (Vec<DataAttribute>, Vec<&SealedVaultBytes>) = data_attributes
         .iter()
         .filter_map(|kind| uvw.get_e_field(*kind).map(|data| (kind, data)))
         .unzip();
 
     // Actually decrypt the fields
     let decrypt_response = uvw.decrypt(state, e_datas).await?;
-    let decrypted_data: HashMap<DataKind, PiiString> = decrypt_response
+    let decrypted_data: HashMap<DataAttribute, PiiString> = decrypt_response
         .into_iter()
         .enumerate()
         .map(|(i, result)| (fields_to_decrypt[i], result))
         .collect();
-    let result_map: HashMap<DataKind, Option<PiiString>> = data_kinds
+    let result_map: HashMap<DataAttribute, Option<PiiString>> = data_attributes
         .into_iter()
         .enumerate()
-        .map(|(_, data_kind)| (data_kind, decrypted_data.get(&data_kind).cloned()))
+        .map(|(_, data_attribute)| (data_attribute, decrypted_data.get(&data_attribute).cloned()))
         .collect();
-    let decrypted_data_kinds = result_map.iter().map(|(kind, _)| *kind).collect();
+    let decrypted_data_attributes = result_map.iter().map(|(kind, _)| *kind).collect();
     Ok(DecryptFieldsResult {
-        decrypted_data_kinds,
+        decrypted_data_attributes,
         result_map,
     })
 }

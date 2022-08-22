@@ -4,13 +4,14 @@ use crate::types::access_event::ApiAccessEvent;
 use crate::types::response::ApiResponseData;
 use crate::State;
 use db::access_event::AccessEventListItemForUser;
-use newtypes::DataKind;
+use newtypes::DataAttribute;
 use paperclip::actix::{api_v2_operation, get, web, web::Json, Apiv2Schema};
 
-#[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize, Apiv2Schema)]
+#[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
 struct AccessEventRequest {
-    data_kind: Option<DataKind>,
+    #[serde(alias = "data_kinds")]
+    data_attributes: Option<DataAttribute>,
 }
 
 type AccessEventResponse = Vec<ApiAccessEvent>;
@@ -18,7 +19,7 @@ type AccessEventResponse = Vec<ApiAccessEvent>;
 #[api_v2_operation(tags(Hosted))]
 #[get("/access_events")]
 /// Returns a list of AccessEvent logs that show which tenants have viewed the logged-in user's
-/// data. Optionally allows filtering on data_kind
+/// data. Optionally allows filtering on data_attribute
 /// Requires user authentication sent in the cookie after a successful /identify/verify call
 fn handler(
     state: web::Data<State>,
@@ -31,7 +32,7 @@ fn handler(
     let results = AccessEventListItemForUser::get(
         &state.db_pool,
         user_auth.data.user_vault_id,
-        request.data_kind.map(DataKind::from),
+        request.data_attributes.map(DataAttribute::from),
     )
     .await?
     .into_iter()

@@ -3,9 +3,7 @@ use std::fmt::{Debug, Display};
 use paperclip::actix::Apiv2Schema;
 use serde::{Deserialize, Serialize};
 
-use crate::{DataKind};
-
-
+use crate::DataAttribute;
 
 pub mod address;
 pub mod dob;
@@ -74,23 +72,23 @@ impl Debug for PiiString {
 }
 
 pub struct NewData {
-    pub data_kind: DataKind,
+    pub data_attribute: DataAttribute,
     pub data: PiiString,
 }
 
 impl NewData {
-    pub fn list<P: Into<PiiString>>(data: Vec<(DataKind, P)>) -> Vec<Self> {
+    pub fn list<P: Into<PiiString>>(data: Vec<(DataAttribute, P)>) -> Vec<Self> {
         data.into_iter()
-            .map(|(data_kind, pii)| Self {
-                data_kind,
+            .map(|(data_attribute, pii)| Self {
+                data_attribute,
                 data: pii.into(),
             })
             .collect()
     }
 
-    pub fn single<P: Into<PiiString>>(data_kind: DataKind, pii: P) -> Vec<Self> {
+    pub fn single<P: Into<PiiString>>(data_attribute: DataAttribute, pii: P) -> Vec<Self> {
         vec![Self {
-            data_kind,
+            data_attribute,
             data: pii.into(),
         }]
     }

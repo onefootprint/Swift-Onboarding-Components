@@ -1,6 +1,6 @@
 use chrono::{DateTime, Utc};
 use db::models::{onboarding::OnboardingInfo, scoped_user::ScopedUser};
-use newtypes::{DataKind, FootprintUserId};
+use newtypes::{DataAttribute, FootprintUserId};
 use paperclip::actix::Apiv2Schema;
 
 use super::onboarding::ApiOnboarding;
@@ -8,7 +8,7 @@ use super::onboarding::ApiOnboarding;
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize, Apiv2Schema)]
 pub struct ApiScopedUser {
     pub footprint_user_id: FootprintUserId,
-    pub populated_data_kinds: Vec<DataKind>,
+    pub populated_data_kinds: Vec<DataAttribute>,
     pub start_timestamp: DateTime<Utc>,
     pub ordering_id: i64,
     pub onboardings: Vec<ApiOnboarding>,
@@ -17,7 +17,7 @@ pub struct ApiScopedUser {
 
 impl ApiScopedUser {
     pub fn from(
-        populated_data_kinds: Vec<DataKind>,
+        populated_data_kinds: Vec<DataAttribute>,
         onboarding_info: &[OnboardingInfo],
         scoped_user: ScopedUser,
         is_portable: bool,

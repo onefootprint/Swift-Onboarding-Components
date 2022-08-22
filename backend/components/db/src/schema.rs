@@ -59,7 +59,7 @@ table! {
         deactivated_at -> Nullable<Timestamptz>,
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
-        data_kind -> Text,
+        data_attribute -> Text,
         is_unique -> Bool,
     }
 }

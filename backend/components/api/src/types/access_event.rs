@@ -1,6 +1,6 @@
 use chrono::{DateTime, Utc};
 use db::access_event::{AccessEventListItemForTenant, AccessEventListItemForUser};
-use newtypes::{DataKind, FootprintUserId, TenantId};
+use newtypes::{DataAttribute, FootprintUserId, TenantId};
 use paperclip::actix::Apiv2Schema;
 
 use crate::types::insight_event::ApiInsightEvent;
@@ -9,7 +9,7 @@ use crate::types::insight_event::ApiInsightEvent;
 pub struct ApiAccessEvent {
     pub fp_user_id: FootprintUserId,
     pub tenant_id: TenantId,
-    pub data_kinds: Vec<DataKind>,
+    pub data_kinds: Vec<DataAttribute>,
     pub reason: String,
     pub principal: Option<String>,
     pub timestamp: DateTime<Utc>,

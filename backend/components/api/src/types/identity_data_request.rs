@@ -8,7 +8,7 @@ use newtypes::address::FullAddressOrZip;
 use newtypes::dob::DateOfBirth;
 use newtypes::name::FullName;
 use newtypes::ssn::Ssn;
-use newtypes::{DataKind, Fingerprint};
+use newtypes::{DataAttribute, Fingerprint};
 
 use paperclip::actix::Apiv2Schema;
 
@@ -35,7 +35,7 @@ impl IdentityDataRequest {
     pub async fn fingerprints(
         &self,
         state: &State,
-    ) -> Result<Vec<(DataKind, Fingerprint, IsUnique)>, ApiError> {
+    ) -> Result<Vec<(DataAttribute, Fingerprint, IsUnique)>, ApiError> {
         let mut builder = FingerprintBuilder::new();
 
         let IdentityDataUpdate {
@@ -50,7 +50,7 @@ impl IdentityDataRequest {
         }
 
         if let Some(dob) = dob {
-            builder.add(dob.into(), DataKind::Dob);
+            builder.add(dob.into(), DataAttribute::Dob);
         }
 
         if let Some(ssn) = ssn {

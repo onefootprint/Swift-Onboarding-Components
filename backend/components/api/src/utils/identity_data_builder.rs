@@ -10,7 +10,7 @@ use newtypes::{
     dob::DateOfBirth,
     name::FullName,
     ssn::{Ssn, Ssn4, Ssn9},
-    DataKind, Fingerprint, PiiString, SealedVaultBytes, UserVaultId, VaultPublicKey,
+    DataAttribute, Fingerprint, PiiString, SealedVaultBytes, UserVaultId, VaultPublicKey,
 };
 
 use crate::errors::{user::UserError, ApiResult};
@@ -20,9 +20,9 @@ pub struct IdentityDataBuilder {
     is_portable: bool,
     existing_data: Option<IdentityData>,
     new_data: NewIdentityDataArgs,
-    fingerprint_kinds_to_clear: Vec<DataKind>,
+    fingerprint_kinds_to_clear: Vec<DataAttribute>,
     vault_public_key: VaultPublicKey,
-    fingerprints: Vec<(DataKind, Fingerprint, IsUnique)>,
+    fingerprints: Vec<(DataAttribute, Fingerprint, IsUnique)>,
 }
 
 impl IdentityDataBuilder {
@@ -31,7 +31,7 @@ impl IdentityDataBuilder {
         user_vault_id: UserVaultId,
         existing_data: Option<IdentityData>,
         vault_public_key: VaultPublicKey,
-        fingerprints: Vec<(DataKind, Fingerprint, IsUnique)>,
+        fingerprints: Vec<(DataAttribute, Fingerprint, IsUnique)>,
     ) -> Self {
         let new_identity_data = if let Some(id_data) = existing_data.clone() {
             NewIdentityDataArgs::from(id_data)
@@ -49,7 +49,7 @@ impl IdentityDataBuilder {
         }
     }
 
-    pub fn seal(&mut self, pii: PiiString, kind: DataKind) -> ApiResult<Option<SealedVaultBytes>> {
+    pub fn seal(&mut self, pii: PiiString, kind: DataAttribute) -> ApiResult<Option<SealedVaultBytes>> {
         let sealed = self.vault_public_key.seal_pii(&pii)?;
         self.fingerprint_kinds_to_clear.push(kind);
         Ok(Some(sealed))
@@ -65,45 +65,45 @@ impl IdentityDataBuilder {
             first_name,
             last_name,
         } = name;
-        self.new_data.e_first_name = self.seal(first_name.into(), DataKind::FirstName)?;
-        self.new_data.e_last_name = self.seal(last_name.into(), DataKind::LastName)?;
+        self.new_data.e_first_name = self.seal(first_name.into(), DataAttribute::FirstName)?;
+        self.new_data.e_last_name = self.seal(last_name.into(), DataAttribute::LastName)?;
         Ok(())
     }
 
     pub fn add_dob(&mut self, dob: DateOfBirth) -> ApiResult<()> {
-        if self.is_portable && self.existing_data.has_field(DataKind::Dob) {
+        if self.is_portable && self.existing_data.has_field(DataAttribute::Dob) {
             return Err(UserError::DataUpdateNotAllowed)?;
         }
 
-        self.new_data.e_dob = self.seal(dob.into(), DataKind::Dob)?;
+        self.new_data.e_dob = self.seal(dob.into(), DataAttribute::Dob)?;
         Ok(())
     }
 
     pub fn add_ssn9(&mut self, ssn9: Ssn9) -> ApiResult<()> {
         // verify the update is allowed
-        if self.is_portable && self.existing_data.has_field(DataKind::Ssn9) {
+        if self.is_portable && self.existing_data.has_field(DataAttribute::Ssn9) {
             return Err(UserError::DataUpdateNotAllowed)?;
         }
 
         if self.new_data.e_ssn4.is_none() {
             let ssn4 = Ssn4::from(&ssn9);
-            self.new_data.e_ssn4 = self.seal(ssn4.into(), DataKind::Ssn4)?;
+            self.new_data.e_ssn4 = self.seal(ssn4.into(), DataAttribute::Ssn4)?;
         }
 
-        self.new_data.e_ssn9 = self.seal(ssn9.into(), DataKind::Ssn9)?;
+        self.new_data.e_ssn9 = self.seal(ssn9.into(), DataAttribute::Ssn9)?;
 
         Ok(())
     }
 
     pub fn add_ssn4(&mut self, ssn4: Ssn4) -> ApiResult<()> {
         // verify the update is allowed
-        if self.is_portable && self.existing_data.has_field(DataKind::Ssn4)
-            || self.existing_data.has_field(DataKind::Ssn9)
+        if self.is_portable && self.existing_data.has_field(DataAttribute::Ssn4)
+            || self.existing_data.has_field(DataAttribute::Ssn9)
         {
             return Err(UserError::DataUpdateNotAllowed)?;
         }
 
-        self.new_data.e_ssn4 = self.seal(ssn4.into(), DataKind::Ssn4)?;
+        self.new_data.e_ssn4 = self.seal(ssn4.into(), DataAttribute::Ssn4)?;
         Ok(())
     }
 
@@ -129,16 +129,16 @@ impl IdentityDataBuilder {
             country,
         } = address;
 
-        self.new_data.e_address_line1 = self.seal(line_1.into(), DataKind::AddressLine1)?;
+        self.new_data.e_address_line1 = self.seal(line_1.into(), DataAttribute::AddressLine1)?;
         self.new_data.e_address_line2 = if let Some(line_2) = line_2 {
-            self.seal(line_2.into(), DataKind::AddressLine2)?
+            self.seal(line_2.into(), DataAttribute::AddressLine2)?
         } else {
             None
         };
-        self.new_data.e_address_city = self.seal(city.into(), DataKind::City)?;
-        self.new_data.e_address_state = self.seal(state.into(), DataKind::State)?;
-        self.new_data.e_address_zip = self.seal(zip.into(), DataKind::Zip)?;
-        self.new_data.e_address_country = self.seal(country.into(), DataKind::Country)?;
+        self.new_data.e_address_city = self.seal(city.into(), DataAttribute::City)?;
+        self.new_data.e_address_state = self.seal(state.into(), DataAttribute::State)?;
+        self.new_data.e_address_zip = self.seal(zip.into(), DataAttribute::Zip)?;
+        self.new_data.e_address_country = self.seal(country.into(), DataAttribute::Country)?;
 
         Ok(())
     }
@@ -146,12 +146,12 @@ impl IdentityDataBuilder {
     pub fn add_zip_and_country_only(&mut self, zip: Zip, country: Country) -> ApiResult<()> {
         if self.is_portable
             && [
-                DataKind::AddressLine1,
-                DataKind::AddressLine2,
-                DataKind::City,
-                DataKind::State,
-                DataKind::Zip,
-                DataKind::Country,
+                DataAttribute::AddressLine1,
+                DataAttribute::AddressLine2,
+                DataAttribute::City,
+                DataAttribute::State,
+                DataAttribute::Zip,
+                DataAttribute::Country,
             ]
             .iter()
             .any(|d| self.existing_data.has_field(*d))
@@ -159,8 +159,8 @@ impl IdentityDataBuilder {
             return Err(UserError::DataUpdateNotAllowed)?;
         }
 
-        self.new_data.e_address_zip = self.seal(zip.into(), DataKind::Zip)?;
-        self.new_data.e_address_country = self.seal(country.into(), DataKind::Country)?;
+        self.new_data.e_address_zip = self.seal(zip.into(), DataAttribute::Zip)?;
+        self.new_data.e_address_country = self.seal(country.into(), DataAttribute::Country)?;
         Ok(())
     }
 

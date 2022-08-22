@@ -12,18 +12,18 @@ use db::models::access_event::NewAccessEvent;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::user_vault::UserVault;
-use newtypes::{DataKind, FootprintUserId};
+use newtypes::{DataAttribute, FootprintUserId};
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 use std::collections::{HashMap, HashSet};
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
 struct UserDecryptRequest2 {
-    attributes: HashSet<DataKind>,
+    attributes: HashSet<DataAttribute>,
     reason: String,
 }
 
-type UserDecryptResponse = HashMap<DataKind, Option<String>>;
+type UserDecryptResponse = HashMap<DataAttribute, Option<String>>;
 
 #[api_v2_operation(tags(PublicApi))]
 #[post("/{footprint_user_id}/decrypt")]
@@ -53,7 +53,7 @@ async fn post2(
 #[serde(rename_all = "snake_case")]
 struct UserDecryptRequest {
     footprint_user_id: FootprintUserId,
-    attributes: HashSet<DataKind>,
+    attributes: HashSet<DataAttribute>,
     reason: String,
 }
 
@@ -105,14 +105,14 @@ async fn post_inner(
     }
 
     let DecryptFieldsResult {
-        decrypted_data_kinds,
+        decrypted_data_attributes,
         result_map,
     } = decrypt(&state, vault, attributes.into_iter().collect()).await?;
 
     // Create an AccessEvent log showing that the tenant accessed these fields
     NewAccessEvent {
         scoped_user_id: scoped_user.id.clone(),
-        data_kinds: decrypted_data_kinds.clone(),
+        data_kinds: decrypted_data_attributes.clone(),
         reason,
         principal: Some(auth.format_principal()),
         insight: CreateInsightEvent::from(insights),

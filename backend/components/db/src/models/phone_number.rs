@@ -3,8 +3,8 @@ use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use diesel::{PgConnection, Queryable};
 use newtypes::{
-    DataKind, DataPriority, Fingerprint as FingerprintData, FingerprintId, PhoneNumberId, SealedVaultBytes,
-    UserVaultId,
+    DataAttribute, DataPriority, Fingerprint as FingerprintData, FingerprintId, PhoneNumberId,
+    SealedVaultBytes, UserVaultId,
 };
 use serde::{Deserialize, Serialize};
 
@@ -84,7 +84,7 @@ impl PhoneNumber {
         let fingerprint_ids = Fingerprint::bulk_create(
             conn,
             &user_vault_id,
-            vec![(DataKind::PhoneNumber, fp_e164, is_verified)],
+            vec![(DataAttribute::PhoneNumber, fp_e164, is_verified)],
         )?;
 
         let new_row = NewPhoneNumber {
@@ -101,7 +101,7 @@ impl PhoneNumber {
         Ok(phone_number)
     }
 
-    pub fn data_items(self) -> Vec<(DataKind, SealedVaultBytes)> {
-        vec![(DataKind::PhoneNumber, self.e_e164)]
+    pub fn data_items(self) -> Vec<(DataAttribute, SealedVaultBytes)> {
+        vec![(DataAttribute::PhoneNumber, self.e_e164)]
     }
 }

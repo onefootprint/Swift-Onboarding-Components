@@ -9,7 +9,7 @@ use diesel::PgConnection;
 use diesel::{Insertable, Queryable};
 use newtypes::ApiKeyStatus;
 use newtypes::ScopedUserId;
-use newtypes::{DataKind, ObConfigurationId, ObConfigurationKey, TenantId};
+use newtypes::{DataAttribute, ObConfigurationId, ObConfigurationKey, TenantId};
 use serde::{Deserialize, Serialize};
 
 use super::tenant::Tenant;
@@ -23,8 +23,8 @@ pub struct ObConfiguration {
     pub tenant_id: TenantId,
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
-    pub must_collect_data_kinds: Vec<DataKind>,
-    pub can_access_data_kinds: Vec<DataKind>,
+    pub must_collect_data_kinds: Vec<DataAttribute>,
+    pub can_access_data_kinds: Vec<DataAttribute>,
     pub is_live: bool,
     pub status: ApiKeyStatus,
     pub created_at: DateTime<Utc>,
@@ -36,8 +36,8 @@ struct NewObConfiguration {
     key: ObConfigurationKey,
     name: String,
     tenant_id: TenantId,
-    must_collect_data_kinds: Vec<DataKind>,
-    can_access_data_kinds: Vec<DataKind>,
+    must_collect_data_kinds: Vec<DataAttribute>,
+    can_access_data_kinds: Vec<DataAttribute>,
     is_live: bool,
     status: ApiKeyStatus,
     created_at: DateTime<Utc>,
@@ -126,8 +126,8 @@ impl ObConfiguration {
         pool: &DbPool,
         name: String,
         tenant_id: TenantId,
-        must_collect_data_kinds: Vec<DataKind>,
-        can_access_data_kinds: Vec<DataKind>,
+        must_collect_data_kinds: Vec<DataAttribute>,
+        can_access_data_kinds: Vec<DataAttribute>,
         is_live: bool,
     ) -> Result<ObConfiguration, crate::DbError> {
         let config = NewObConfiguration {

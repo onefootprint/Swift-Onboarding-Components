@@ -20,7 +20,7 @@ use db::models::ob_configuration::ObConfiguration;
 use db::models::ob_configuration::ObConfigurationQuery;
 use db::DbError;
 use newtypes::ApiKeyStatus;
-use newtypes::DataKind;
+use newtypes::DataAttribute;
 use newtypes::ObConfigurationId;
 use paperclip::actix::Apiv2Schema;
 use paperclip::actix::{api_v2_operation, get, patch, post, web, web::Json};
@@ -76,44 +76,44 @@ async fn get(
 #[serde(rename_all = "snake_case")]
 pub struct CreateOnboardingConfigurationRequest {
     name: String,
-    must_collect_data_kinds: Vec<DataKind>,
-    can_access_data_kinds: Vec<DataKind>,
+    must_collect_data_kinds: Vec<DataAttribute>,
+    can_access_data_kinds: Vec<DataAttribute>,
 }
 
 impl CreateOnboardingConfigurationRequest {
     fn validate(&self) -> Result<(), TenantError> {
         let must_collect = &self.must_collect_data_kinds;
-        let contains_any = |kinds: &[DataKind]| kinds.iter().any(|x| must_collect.contains(x));
-        let contains_all = |kinds: &[DataKind]| kinds.iter().all(|x| must_collect.contains(x));
+        let contains_any = |kinds: &[DataAttribute]| kinds.iter().any(|x| must_collect.contains(x));
+        let contains_all = |kinds: &[DataAttribute]| kinds.iter().all(|x| must_collect.contains(x));
         let contains_all_or_none = |kinds| contains_all(kinds) || !contains_any(kinds);
 
         // acceptable states: all address fields or no address fields or just zip & country fields
         let address_kinds = &[
-            DataKind::AddressLine1,
-            DataKind::AddressLine2,
-            DataKind::City,
-            DataKind::State,
-            DataKind::Country,
-            DataKind::Zip,
+            DataAttribute::AddressLine1,
+            DataAttribute::AddressLine2,
+            DataAttribute::City,
+            DataAttribute::State,
+            DataAttribute::Country,
+            DataAttribute::Zip,
         ];
         let address_kinds_without_zip_and_country = &address_kinds
             .iter()
             .cloned()
-            .filter(|x| x != &DataKind::Zip && x != &DataKind::Country)
-            .collect::<Vec<DataKind>>();
-        let contains_only_zip_and_country = must_collect.contains(&DataKind::Zip)
-            && must_collect.contains(&DataKind::Country)
+            .filter(|x| x != &DataAttribute::Zip && x != &DataAttribute::Country)
+            .collect::<Vec<DataAttribute>>();
+        let contains_only_zip_and_country = must_collect.contains(&DataAttribute::Zip)
+            && must_collect.contains(&DataAttribute::Country)
             && !contains_any(address_kinds_without_zip_and_country);
 
-        let err = if !contains_all_or_none(&[DataKind::FirstName, DataKind::LastName]) {
+        let err = if !contains_all_or_none(&[DataAttribute::FirstName, DataAttribute::LastName]) {
             TenantError::ValidationError("Must request first name and last name together".to_owned())
         } else if !(contains_all_or_none(address_kinds) || contains_only_zip_and_country) {
             TenantError::ValidationError(
                 "Can only request all address fields, zip & country only, or none".to_owned(),
             )
-        } else if must_collect.contains(&DataKind::Ssn4) && must_collect.contains(&DataKind::Ssn9) {
+        } else if must_collect.contains(&DataAttribute::Ssn4) && must_collect.contains(&DataAttribute::Ssn9) {
             TenantError::ValidationError("Cannot request full SSN and last four of SSN".to_owned())
-        } else if !HashSet::<&DataKind>::from_iter(self.can_access_data_kinds.iter())
+        } else if !HashSet::<&DataAttribute>::from_iter(self.can_access_data_kinds.iter())
             .is_subset(&HashSet::from_iter(must_collect.iter()))
         {
             TenantError::ValidationError("Decryptable fields must be a subset of collected fields".to_owned())

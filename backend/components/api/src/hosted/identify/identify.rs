@@ -13,7 +13,7 @@ use crypto::serde_cbor;
 use db::models::user_vault::UserVault;
 use db::models::webauthn_credential::WebauthnCredential;
 use newtypes::email::Email;
-use newtypes::{DataKind, Fingerprinter, PhoneNumber, PiiString, UserVaultId};
+use newtypes::{DataAttribute, Fingerprinter, PhoneNumber, PiiString, UserVaultId};
 use paperclip::actix::{api_v2_operation, web, web::Json, Apiv2Schema};
 use webauthn_rs_core::proto::{Base64UrlSafeData, Credential, ParsedAttestation, ParsedAttestationData};
 use webauthn_rs_proto::{RegisteredExtensions, UserVerificationPolicy};
@@ -163,14 +163,14 @@ async fn get_user_by_identifier(
     identifier: Identifier,
     twilio_client: &TwilioClient,
 ) -> Result<Option<UserVault>, ApiError> {
-    let (data_kind, data) = match identifier {
+    let (data_attribute, data) = match identifier {
         Identifier::PhoneNumber(phone_number) => {
             let phone_number = twilio_client.standardize(&phone_number).await?;
-            (DataKind::PhoneNumber, phone_number.to_piistring())
+            (DataAttribute::PhoneNumber, phone_number.to_piistring())
         }
-        Identifier::Email(email) => (DataKind::Email, PiiString::from(email)),
+        Identifier::Email(email) => (DataAttribute::Email, PiiString::from(email)),
     };
-    let sh_data = state.compute_fingerprint(data_kind, data).await?;
+    let sh_data = state.compute_fingerprint(data_attribute, data).await?;
     // TODO should we only look for verified emails?
     let existing_user = db::user_vault::get_by_fingerprint(&state.db_pool, sh_data).await?;
     Ok(existing_user)

@@ -7,7 +7,7 @@ use crate::schema;
 use crate::DbPool;
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
-use newtypes::DataKind;
+use newtypes::DataAttribute;
 use newtypes::FootprintUserId;
 use newtypes::TenantId;
 use newtypes::UserVaultId;
@@ -19,7 +19,7 @@ pub struct AccessEventListQueryParams {
     pub search: Option<String>,
     pub timestamp_lte: Option<DateTime<Utc>>,
     pub timestamp_gte: Option<DateTime<Utc>>,
-    pub kinds: Vec<DataKind>,
+    pub attributes: Vec<DataAttribute>,
     pub is_live: bool,
 }
 
@@ -70,8 +70,9 @@ impl AccessEventListItemForTenant {
                     results = results.filter(schema::access_event::timestamp.ge(timestamp_gte))
                 }
 
-                if !params.kinds.is_empty() {
-                    results = results.filter(schema::access_event::data_kinds.overlaps_with(params.kinds));
+                if !params.attributes.is_empty() {
+                    results =
+                        results.filter(schema::access_event::data_kinds.overlaps_with(params.attributes));
                 }
 
                 if let Some(cursor) = cursor {
@@ -110,7 +111,7 @@ impl AccessEventListItemForUser {
     pub async fn get(
         pool: &DbPool,
         user_vault_id: UserVaultId,
-        kind: Option<DataKind>,
+        attribute: Option<DataAttribute>,
     ) -> Result<Vec<AccessEventListItemForUser>, DbError> {
         let result: Vec<(AccessEvent, ScopedUser, Tenant)> = pool
             .db_query(move |conn| {
@@ -123,8 +124,8 @@ impl AccessEventListItemForUser {
                     .filter(schema::scoped_user::user_vault_id.eq(user_vault_id))
                     .into_boxed();
 
-                if let Some(kind) = kind {
-                    results = results.filter(schema::access_event::data_kinds.contains(vec![kind]));
+                if let Some(attribute) = attribute {
+                    results = results.filter(schema::access_event::data_kinds.contains(vec![attribute]));
                 }
 
                 results.load(conn)

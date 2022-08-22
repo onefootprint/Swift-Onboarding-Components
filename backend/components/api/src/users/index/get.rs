@@ -14,7 +14,7 @@ use chrono::{DateTime, Utc};
 use db::models::identity_data::HasIdentityDataFields;
 use db::models::onboarding::Onboarding;
 use db::scoped_user::OnboardingListQueryParams;
-use newtypes::{DataKind, Fingerprint, Fingerprinter, FootprintUserId, PiiString, Status};
+use newtypes::{DataAttribute, Fingerprint, Fingerprinter, FootprintUserId, PiiString, Status};
 use paperclip::actix::{api_v2_operation, web, web::Json, Apiv2Schema};
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize, Apiv2Schema)]
@@ -57,8 +57,8 @@ pub fn get(
         Some(fingerprint) => {
             let cleaned_data = fingerprint.clean_for_fingerprint();
 
-            let fut_fingerprints =
-                DataKind::fingerprintable().map(|kind| state.compute_fingerprint(kind, cleaned_data.clone()));
+            let fut_fingerprints = DataAttribute::fingerprintable()
+                .map(|kind| state.compute_fingerprint(kind, cleaned_data.clone()));
             let fingerprints: Vec<Fingerprint> = futures::future::try_join_all(fut_fingerprints).await?;
             Some(fingerprints)
         }

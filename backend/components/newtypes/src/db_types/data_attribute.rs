@@ -30,7 +30,7 @@ use strum_macros::{AsRefStr, EnumIter, EnumString};
 #[strum(serialize_all = "PascalCase")]
 #[serde(rename_all = "snake_case")]
 #[diesel(sql_type = Text)]
-pub enum DataKind {
+pub enum DataAttribute {
     FirstName,
     LastName,
     Dob,
@@ -46,41 +46,41 @@ pub enum DataKind {
     Ssn4,
 }
 
-crate::util::impl_enum_str_diesel!(DataKind);
+crate::util::impl_enum_str_diesel!(DataAttribute);
 
-impl DataKind {
+impl DataAttribute {
     /// Returns true if we store a fingerprint of this value to allow exact match searching.
     pub fn allows_fingerprint(&self) -> bool {
         matches!(
             self,
-            DataKind::PhoneNumber
-                | DataKind::Email
-                | DataKind::Ssn9
-                | DataKind::FirstName
-                | DataKind::LastName
-                | DataKind::Ssn4
+            DataAttribute::PhoneNumber
+                | DataAttribute::Email
+                | DataAttribute::Ssn9
+                | DataAttribute::FirstName
+                | DataAttribute::LastName
+                | DataAttribute::Ssn4
         )
     }
 
     pub fn is_required(&self) -> bool {
-        !matches!(self, DataKind::AddressLine2)
+        !matches!(self, DataAttribute::AddressLine2)
     }
 
-    pub fn fingerprintable() -> impl Iterator<Item = DataKind> {
-        Self::iter().filter(DataKind::allows_fingerprint)
+    pub fn fingerprintable() -> impl Iterator<Item = DataAttribute> {
+        Self::iter().filter(DataAttribute::allows_fingerprint)
     }
 
-    pub fn permissioning_kinds(self) -> Vec<DataKind> {
+    pub fn permissioning_kinds(self) -> Vec<DataAttribute> {
         // Returns the list of DataKinds for which this kind yields permissions.
         // For example, ability to decrypt an Ssn also provides the ability to decrypt LastFourSsn
         match self {
-            DataKind::Ssn9 => vec![DataKind::Ssn9, DataKind::Ssn4],
+            DataAttribute::Ssn9 => vec![DataAttribute::Ssn9, DataAttribute::Ssn4],
             kind => vec![kind],
         }
     }
 }
 
-impl SaltedFingerprint for DataKind {
+impl SaltedFingerprint for DataAttribute {
     fn salt_pii_to_sign(&self, data: &PiiString) -> [u8; 32] {
         let self_name = self.to_string();
         let data_clean = data.clean_for_fingerprint();

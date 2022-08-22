@@ -15,7 +15,7 @@ use db::assert_in_transaction;
 use db::models::user_vault::UserVault;
 use db::{errors::DbError, PgConnection};
 use newtypes::{
-    DataKind, DataPriority, EmailId, Fingerprint, PiiString, SealedVaultBytes, UserVaultId,
+    DataAttribute, DataPriority, EmailId, Fingerprint, PiiString, SealedVaultBytes, UserVaultId,
     ValidatedPhoneNumber,
 };
 
@@ -142,23 +142,23 @@ impl UserVaultWrapper {
         Ok(validated_phone_number)
     }
 
-    pub fn missing_fields(&self, ob_config: &ObConfiguration) -> Vec<DataKind> {
+    pub fn missing_fields(&self, ob_config: &ObConfiguration) -> Vec<DataAttribute> {
         ob_config
             .must_collect_data_kinds
             .iter()
             .cloned()
-            .filter(|data_kind| data_kind.is_required())
-            .filter(|data_kind| !self.has_field(*data_kind))
+            .filter(|data_attribute| data_attribute.is_required())
+            .filter(|data_attribute| !self.has_field(*data_attribute))
             .collect()
     }
 }
 
 impl HasIdentityDataFields for UserVaultWrapper {
-    fn get_e_field(&self, data_kind: DataKind) -> Option<&SealedVaultBytes> {
+    fn get_e_field(&self, data_attribute: DataAttribute) -> Option<&SealedVaultBytes> {
         let id = self.identity_data.as_ref();
-        match data_kind {
-            DataKind::Email => self.email.as_ref().map(|e| &e.e_data),
-            DataKind::PhoneNumber => self.phone_number.as_ref().map(|p| &p.e_e164),
+        match data_attribute {
+            DataAttribute::Email => self.email.as_ref().map(|e| &e.e_data),
+            DataAttribute::PhoneNumber => self.phone_number.as_ref().map(|p| &p.e_e164),
             kind => id?.get_e_field(kind),
         }
     }
@@ -169,7 +169,7 @@ impl UserVaultWrapper {
         &mut self,
         conn: &mut PgConnection,
         update: IdentityDataUpdate,
-        fingerprints: Vec<(DataKind, Fingerprint, IsUnique)>,
+        fingerprints: Vec<(DataAttribute, Fingerprint, IsUnique)>,
     ) -> Result<(), ApiError> {
         self.assert_is_locked(conn)?;
         let mut builder = IdentityDataBuilder::new(
