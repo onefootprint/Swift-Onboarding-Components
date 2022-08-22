@@ -36,7 +36,6 @@ const useSyncData = () => {
     // Only one of ssn and last_four_ssn can ever be included in the request
     const requestData: UserDataObj = {};
 
-    console.log(data);
     if (data[UserDataAttribute.ssn9]) {
       requestData.ssn9 = data[UserDataAttribute.ssn9];
     } else if (data[UserDataAttribute.ssn4]) {
