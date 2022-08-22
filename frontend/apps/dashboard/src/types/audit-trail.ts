@@ -10,7 +10,7 @@ export type LivenessCheckInfo = {
 };
 
 export type VerificationInfo = {
-  dataKinds: DataKinds[];
+  dataAttributes: DataKinds[];
   vendor: Vendor;
 };
 

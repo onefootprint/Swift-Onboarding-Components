@@ -74,7 +74,7 @@ const detailsForVerificationEvent = (data: VerificationInfo) => {
     };
   }
   // Show the icon that represents the most fields
-  const icons = data.dataKinds.map(dataKind => iconForDataKind[dataKind]);
+  const icons = data.dataAttributes.map(dataKind => iconForDataKind[dataKind]);
   const HeaderIcon = icons
     .sort(
       (a: Icon, b: Icon) =>
@@ -85,10 +85,10 @@ const detailsForVerificationEvent = (data: VerificationInfo) => {
   const headerComponent = (
     <Typography variant="body-3">
       <>
-        {data.dataKinds.map((dataKind, i: number) => (
+        {data.dataAttributes.map((dataKind, i: number) => (
           <React.Fragment key={dataKind}>
             <Tag>{dataKindToDisplayName[dataKind]}</Tag>
-            {i !== data.dataKinds.length - 1 ? ', ' : ''}
+            {i !== data.dataAttributes.length - 1 ? ', ' : ''}
           </React.Fragment>
         ))}{' '}
         verified by{' '}
