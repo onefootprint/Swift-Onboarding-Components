@@ -5,7 +5,6 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
 });
 const withTM = require('next-transpile-modules')([
   'icons',
-  'footprint',
   'footprint-provider',
 ]);
 

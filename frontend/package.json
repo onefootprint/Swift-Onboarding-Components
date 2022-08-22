@@ -16,9 +16,12 @@
     "test": "turbo run test",
     "build:storybook": "turbo run build:storybook",
     "typecheck": "turbo run typecheck",
-    "clean": "turbo run clean && rm -rf node_modules"
+    "clean": "turbo run clean && rm -rf node_modules",
+    "version": "changeset version",
+    "release": "turbo run build --filter=@onefootprint/footprint... && changeset publish"
   },
   "devDependencies": {
+    "@changesets/cli": "^2.24.3",
     "esbuild": "^0.15.5",
     "esbuild-jest": "^0.5.0",
     "identity-obj-proxy": "^3.0.0",

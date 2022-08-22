@@ -18,8 +18,6 @@ const queryClient = new QueryClient({
   },
 });
 
-const { light } = themes;
-
 type WrapperProps = {
   children: React.ReactNode;
 };
@@ -28,7 +26,9 @@ export const Wrapper = ({ children }: WrapperProps) => (
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
       <FootprintProvider>
-        <DesignSystemProvider theme={light}>{children}</DesignSystemProvider>
+        <DesignSystemProvider theme={themes.light}>
+          {children}
+        </DesignSystemProvider>
       </FootprintProvider>
     </QueryClientProvider>
   </React.StrictMode>
@@ -36,7 +36,7 @@ export const Wrapper = ({ children }: WrapperProps) => (
 
 export const HookWrapper = ({ children }: WrapperProps) => (
   <React.StrictMode>
-    <ThemeProvider theme={light}>{children}</ThemeProvider>
+    <ThemeProvider theme={themes.light}>{children}</ThemeProvider>
   </React.StrictMode>
 );
 

@@ -3,9 +3,9 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "global-constants": ["../../packages/global-constants/src/*"],
-      "request": ["../../packages/request/src/*"],
-      "themes": ["../../packages/themes/src/*"]
+      "global-constants": ["../global-constants/src/*"],
+      "request": ["../request/src/*"],
+      "themes": ["../themes/src/*"]
     }
   },
   "include": ["."],

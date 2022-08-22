@@ -20,7 +20,7 @@
     "axios-case-converter": "^0.9.0",
     "constate": "^3.3.2",
     "focus-trap-react": "^9.0.2",
-    "footprint": "*",
+    "@onefootprint/footprint": "*",
     "footprint-ui": "*",
     "global-constants": "*",
     "hooks": "*",

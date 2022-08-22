@@ -8,7 +8,7 @@
       "themes": ["../../packages/themes/src/*"],
       "ui": ["../../packages/ui/src/*"],
       "hooks": ["../../packages/hooks/src/*"],
-      "footprint": ["../../packages/footprint/src/*"]
+      "@onefootprint/footprint": ["../../packages/footprint/src/*"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],

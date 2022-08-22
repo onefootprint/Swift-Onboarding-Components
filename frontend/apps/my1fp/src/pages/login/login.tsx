@@ -1,4 +1,4 @@
-import footprint from 'footprint';
+import footprint from '@onefootprint/footprint';
 import { useTranslation } from 'hooks';
 import LogoFpDefault from 'icons/ico/logo-fp-default';
 import { useRouter } from 'next/router';

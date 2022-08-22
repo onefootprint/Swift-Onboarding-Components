@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "@tryghost/content-api": "^1.11.0",
-    "footprint": "*",
+    "@onefootprint/footprint": "*",
     "global-constants": "*",
     "hooks": "*",
     "icons": "*",
