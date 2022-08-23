@@ -6,7 +6,6 @@ use crate::auth::IsLive;
 use crate::types::request::PaginatedRequest;
 use crate::types::response::ApiPaginatedResponseData;
 use crate::types::scoped_user::ApiScopedUser;
-use crate::utils::querystring::deserialize_stringified_list;
 use crate::utils::user_vault_wrapper::UserVaultWrapper;
 use crate::State;
 use crate::{auth::SessionContext, errors::ApiError};
@@ -14,6 +13,7 @@ use chrono::{DateTime, Utc};
 use db::models::identity_data::HasIdentityDataFields;
 use db::models::onboarding::Onboarding;
 use db::scoped_user::OnboardingListQueryParams;
+use newtypes::csv::deserialize_stringified_list;
 use newtypes::{DataAttribute, Fingerprint, Fingerprinter, FootprintUserId, PiiString, Status};
 use paperclip::actix::{api_v2_operation, web, web::Json, Apiv2Schema};
 

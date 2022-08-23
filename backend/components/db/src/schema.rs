@@ -116,6 +116,22 @@ table! {
     use diesel::sql_types::*;
     use newtypes::db_types::*;
 
+    kv_data (id) {
+        id -> Text,
+        user_vault_id -> Text,
+        tenant_id -> Text,
+        data_key -> Text,
+        e_data -> Bytea,
+        deactivated_at -> Nullable<Timestamptz>,
+        _created_at -> Timestamptz,
+        _updated_at -> Timestamptz,
+    }
+}
+
+table! {
+    use diesel::sql_types::*;
+    use newtypes::db_types::*;
+
     ob_configuration (id) {
         id -> Text,
         key -> Text,
@@ -324,6 +340,8 @@ joinable!(audit_trail -> user_vault (user_vault_id));
 joinable!(email -> user_vault (user_vault_id));
 joinable!(fingerprint -> user_vault (user_vault_id));
 joinable!(identity_data -> user_vault (user_vault_id));
+joinable!(kv_data -> tenant (tenant_id));
+joinable!(kv_data -> user_vault (user_vault_id));
 joinable!(ob_configuration -> tenant (tenant_id));
 joinable!(onboarding -> insight_event (insight_event_id));
 joinable!(onboarding -> ob_configuration (ob_configuration_id));
@@ -346,6 +364,7 @@ allow_tables_to_appear_in_same_query!(
     fingerprint,
     identity_data,
     insight_event,
+    kv_data,
     ob_configuration,
     onboarding,
     phone_number,

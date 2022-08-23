@@ -7,8 +7,8 @@ config:
       apiVersion: latest
       enclaveVersion: latest
     domain:
-      base: "dev.onefootprint.com"
-      prefix: "api."
+      base: dev.onefootprint.com
+      prefix: api.
     elastic:
       apiKey:
         secure: v1:lefOi07p1WAkmMbb:6IK3746SDP+nra5/Tpym+AisWeELd2cSzgcTNbdzxBcaSQ==
@@ -39,4 +39,4 @@ config:
       secretKey:
         secure: v1:UrxmsAzi5youwRK1:Jlywwi1ZR82IGh3ZSJe58HQmEni8yL5+Ff/3DPQbcMbN5qE2wTJ1Yuye4vhADlRDaCaZf5kBhZGWC3Uxx4SZ47wmg8b+C123NVk8K1ieVGqO6IYF4HTKNI8KsQFyv6MA3QbD
   infra:tailscaleKey:
-    secure: v1:NFf2LBsLI6bd0Qta:tedTb71dFLRiqgPNwqQuyeQCsWhBi7kVcVS+1dtClHmKMAhUGgDv0hGQZex6wmCnyejvwplXun8=
+    secure: v1:JCsJCNXUN5TiNETn:duRv1oyyH4zGdX8yClsUs1CUsRvFzWvswz7YzHZBS2yaIbOyPq9amd+45jMs3tCFNXlmJFf4D8k=

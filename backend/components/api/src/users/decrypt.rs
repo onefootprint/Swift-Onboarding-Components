@@ -12,7 +12,7 @@ use db::models::access_event::NewAccessEvent;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::user_vault::UserVault;
-use newtypes::{DataAttribute, FootprintUserId};
+use newtypes::{DataAttribute, FootprintUserId, PiiString};
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 use std::collections::{HashMap, HashSet};
 
@@ -23,7 +23,7 @@ struct UserDecryptRequest2 {
     reason: String,
 }
 
-type UserDecryptResponse = HashMap<DataAttribute, Option<String>>;
+type UserDecryptResponse = HashMap<DataAttribute, Option<PiiString>>;
 
 #[api_v2_operation(tags(PublicApi))]
 #[post("/{footprint_user_id}/decrypt")]
@@ -120,9 +120,5 @@ async fn post_inner(
     .save(&state.db_pool)
     .await?;
 
-    let result_map = result_map
-        .into_iter()
-        .map(|(k, v)| (k, v.map(|x| x.leak_to_string())))
-        .collect();
     Ok(Json(ApiResponseData { data: result_map }))
 }

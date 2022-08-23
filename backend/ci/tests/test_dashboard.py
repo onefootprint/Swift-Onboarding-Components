@@ -3,7 +3,7 @@ import pytest
 from urllib.parse import quote
 from typing import NamedTuple
 from tests.constants import EMAIL, FIELDS_TO_DECRYPT
-from tests.utils import get, post, patch, _gen_random_ssn
+from tests.utils import get, put, post, patch, _gen_random_ssn
 from tests.types import SecretApiKey, ObConfiguration
 from .auth import (
     TenantAuth,
@@ -253,8 +253,8 @@ class TestDashboard:
         )
 
     def test_portable_failed_data_write(self, user):
-        data = dict(reason="test", attributes=["first_name", "ssn9"])
-        body = post(f"users/{user.fp_user_id}/decrypt", data, user.tenant.sk.key)
+        data = dict(reason="test", fields=["first_name", "ssn9"])
+        body = post(f"users/{user.fp_user_id}/identity/decrypt", data, user.tenant.sk.key)
         print(body)
         assert body["data"]["first_name"]
 
@@ -268,7 +268,7 @@ class TestDashboard:
         }
 
         # ensure we cannot change data in a portable vault
-        post(
+        put(
             f"users/{user.fp_user_id}/data/identity",
             data,
             user.tenant.sk.key,

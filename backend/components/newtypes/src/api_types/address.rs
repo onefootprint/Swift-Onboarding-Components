@@ -1,4 +1,4 @@
-use crate::{pii_helper::newtype_to_pii, PiiString};
+use crate::{api_schema_helper::string_api_data_type_alias, pii_helper::newtype_to_pii, PiiString};
 
 pub use derive_more::{Add, Display, From, FromStr, Into};
 use paperclip::actix::Apiv2Schema;
@@ -26,36 +26,41 @@ pub enum FullAddressOrZip {
     ZipAndCountry { zip: Zip, country: Country },
 }
 
-#[derive(Debug, Clone, Hash, PartialEq, Eq, Serialize, Deserialize, Default, Apiv2Schema)]
+#[derive(Debug, Clone, Hash, PartialEq, Eq, Serialize, Deserialize, Default)]
 #[serde(try_from = "String")]
 /// String of either part 1 or 2 of your street address. We capitalize everything for standardization.
 /// cannot contain special characters, other than #
 pub struct AddressLine(PiiString);
 newtype_to_pii!(AddressLine);
+string_api_data_type_alias!(AddressLine);
 
-#[derive(Debug, Clone, Hash, PartialEq, Eq, Serialize, Deserialize, Default, Apiv2Schema)]
+#[derive(Debug, Clone, Hash, PartialEq, Eq, Serialize, Deserialize, Default)]
 /// String of your city, cannot contain special characters
 #[serde(try_from = "String")]
 pub struct City(PiiString);
 newtype_to_pii!(City);
+string_api_data_type_alias!(City);
 
-#[derive(Debug, Clone, Hash, PartialEq, Eq, Serialize, Deserialize, Default, Apiv2Schema)]
+#[derive(Debug, Clone, Hash, PartialEq, Eq, Serialize, Deserialize, Default)]
 #[serde(try_from = "String")]
 /// Name of your state or province, cannot contain special characters
 pub struct State(PiiString);
 newtype_to_pii!(State);
+string_api_data_type_alias!(State);
 
-#[derive(Debug, Clone, Hash, PartialEq, Eq, Serialize, Deserialize, Default, Apiv2Schema)]
+#[derive(Debug, Clone, Hash, PartialEq, Eq, Serialize, Deserialize, Default)]
 #[serde(try_from = "String")]
 /// String, alphanumeric zip code, can also contain - or spaces
 pub struct Zip(PiiString);
 newtype_to_pii!(Zip);
+string_api_data_type_alias!(Zip);
 
-#[derive(Debug, Clone, Hash, PartialEq, Eq, Serialize, Deserialize, Default, Apiv2Schema)]
+#[derive(Debug, Clone, Hash, PartialEq, Eq, Serialize, Deserialize, Default)]
 #[serde(try_from = "String")]
 /// 3 digit ISO country code
 pub struct Country(PiiString);
 newtype_to_pii!(Country);
+string_api_data_type_alias!(Country);
 
 lazy_static! {
     // regex that checks for bad characters

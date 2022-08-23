@@ -1,9 +1,14 @@
 use actix_web::Responder;
+use paperclip::actix::web::Json;
 use paperclip::{
     actix::Apiv2Schema,
     v2::{models::DataType, schema::TypedData},
 };
 use serde::Serialize;
+
+use crate::errors::ApiResult;
+
+pub type JsonApiResponse<T> = ApiResult<Json<ApiResponseData<T>>>;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Apiv2Schema)]
 #[openapi(description = "Empty response")]
@@ -17,6 +22,10 @@ pub struct ApiResponseData<T> {
 impl<T> ApiResponseData<T> {
     pub fn ok(data: T) -> Self {
         Self { data }
+    }
+
+    pub fn json(self) -> JsonApiResponse<T> {
+        ApiResult::Ok(Json(self))
     }
 }
 

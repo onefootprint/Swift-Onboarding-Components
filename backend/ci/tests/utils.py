@@ -46,6 +46,15 @@ def get(path, params=None, *auths, status_code=200):
         auths=auths,
     )
 
+def put(path, data=None, *auths, status_code=200):
+    return _make_request(
+        method=requests.put,
+        path=path,
+        data=data,
+        params=None,
+        status_code=status_code,
+        auths=auths,
+    )
 
 def post(path, data=None, *auths, status_code=200):
     return _make_request(

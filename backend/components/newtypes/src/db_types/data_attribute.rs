@@ -1,11 +1,10 @@
 use crate::{PiiString, SaltedFingerprint};
 use crypto::sha256;
-pub use derive_more::Display;
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use paperclip::actix::Apiv2Schema;
 use serde::{Deserialize, Serialize};
 use strum::IntoEnumIterator;
-use strum_macros::{AsRefStr, EnumIter, EnumString};
+use strum_macros::{AsRefStr, Display, EnumIter, EnumString};
 
 /// The type of data attribute
 #[derive(
@@ -71,7 +70,7 @@ impl DataAttribute {
     }
 
     pub fn permissioning_kinds(self) -> Vec<DataAttribute> {
-        // Returns the list of DataKinds for which this kind yields permissions.
+        // Returns the list of DataAttributes for which this kind yields permissions.
         // For example, ability to decrypt an Ssn also provides the ability to decrypt LastFourSsn
         match self {
             DataAttribute::Ssn9 => vec![DataAttribute::Ssn9, DataAttribute::Ssn4],

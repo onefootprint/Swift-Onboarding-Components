@@ -4,6 +4,7 @@ pub mod email;
 pub mod fingerprint;
 pub mod identity_data;
 pub mod insight_event;
+pub mod kv_data;
 pub mod ob_configuration;
 pub mod onboarding;
 pub mod phone_number;

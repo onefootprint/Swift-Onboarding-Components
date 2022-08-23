@@ -1,7 +1,7 @@
 use actix_web::{error::JsonPayloadError, http::StatusCode};
 use db::errors::DbError;
 use newtypes::Uuid;
-use paperclip::v2::schema::Apiv2Errors;
+use paperclip::actix::api_v2_errors;
 use thiserror::Error;
 use webauthn_rs_core::error::WebauthnError;
 use workos::WorkOsError;
@@ -20,6 +20,10 @@ use self::{challenge::ChallengeError, handoff::HandoffError};
 
 pub type ApiResult<T> = Result<T, ApiError>;
 
+#[api_v2_errors(
+    code=400 description="Invalid request",
+    code=401, description="Unauthorized: Can't read session from header",
+)]
 #[allow(clippy::large_enum_variant)]
 #[derive(Debug, Error)]
 pub enum ApiError {
@@ -73,6 +77,8 @@ pub enum ApiError {
     Twilio(#[from] twilio::error::Error),
     #[error("Not running in locked transaction")]
     UserNotLocked,
+    #[error("Endpoint not found")]
+    EndpointNotFound,
 }
 
 impl<T> From<WorkOsError<T>> for ApiError
@@ -146,6 +152,7 @@ impl actix_web::ResponseError for ApiError {
             | ApiError::SerdeCbor(_) => StatusCode::BAD_REQUEST,
             ApiError::WorkOsLoginError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::UserNotLocked => StatusCode::INTERNAL_SERVER_ERROR,
+            ApiError::EndpointNotFound => StatusCode::NOT_FOUND,
         }
     }
 
@@ -171,4 +178,3 @@ impl actix_web::ResponseError for ApiError {
         actix_web::HttpResponse::build(self.status_code()).json(response)
     }
 }
-impl Apiv2Errors for ApiError {}

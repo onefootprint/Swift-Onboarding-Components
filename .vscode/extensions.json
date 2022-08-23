@@ -12,6 +12,7 @@
         "naumovs.color-highlight",
         "dbaeumer.vscode-eslint",
         "esbenp.prettier-vscode",
-        "wayou.vscode-todo-highlight"
+        "wayou.vscode-todo-highlight",
+        "edonet.vscode-command-runner"
     ]
 }

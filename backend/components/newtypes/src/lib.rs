@@ -26,6 +26,8 @@ pub use self::fingerprint::*;
 
 pub mod secret_api_key;
 
+pub mod map_container;
+
 pub use uuid::Uuid;
 #[derive(Debug, Clone, thiserror::Error)]
 pub enum Error {
@@ -154,7 +156,8 @@ pub mod util {
                     custom_enum: MyEnum::case_3,
                 },
             ];
-            let db_url = std::env::var("DATABASE_URL").expect("couldn't parse DB url from environment");
+            let db_url = std::env::var("DATABASE_URL")
+                .unwrap_or_else(|_| "postgresql://localhost/footprint_db".to_string());
 
             let mut connection = PgConnection::establish(&db_url).expect("failed to connect to db");
 

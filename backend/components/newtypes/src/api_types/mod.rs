@@ -1,11 +1,11 @@
+use serde::{Deserialize, Serialize};
 use std::fmt::{Debug, Display};
 
-use paperclip::actix::Apiv2Schema;
-use serde::{Deserialize, Serialize};
-
+use self::api_schema_helper::string_api_data_type_alias;
 use crate::DataAttribute;
 
 pub mod address;
+pub mod csv;
 pub mod dob;
 pub mod email;
 pub mod name;
@@ -14,7 +14,7 @@ pub mod sandbox;
 pub mod ssn;
 
 /// Represents a string that hides PII
-#[derive(Clone, Serialize, Deserialize, Default, PartialEq, Eq, Hash, Apiv2Schema)]
+#[derive(Clone, Serialize, Deserialize, Default, PartialEq, Eq, Hash)]
 #[serde(transparent)]
 pub struct PiiString(String);
 
@@ -31,6 +31,31 @@ pub mod pii_helper {
     }
 
     pub(crate) use newtype_to_pii;
+}
+
+pub mod api_schema_helper {
+    macro_rules! string_api_data_type_alias {
+        ($type: ty) => {
+            impl paperclip::v2::schema::TypedData for $type {
+                fn data_type() -> paperclip::v2::models::DataType {
+                    paperclip::v2::models::DataType::String
+                }
+            }
+        };
+    }
+
+    macro_rules! api_data_type_alias {
+        ($type: ty, $id: ident) => {
+            impl paperclip::v2::schema::TypedData for $type {
+                fn data_type() -> paperclip::v2::models::DataType {
+                    paperclip::v2::models::DataType::$id
+                }
+            }
+        };
+    }
+
+    pub(crate) use api_data_type_alias;
+    pub(crate) use string_api_data_type_alias;
 }
 
 impl<T> From<T> for PiiString
@@ -70,6 +95,8 @@ impl Debug for PiiString {
         f.write_str("<redacted>")
     }
 }
+
+string_api_data_type_alias!(PiiString);
 
 pub struct NewData {
     pub data_attribute: DataAttribute,

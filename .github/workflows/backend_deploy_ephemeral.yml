@@ -3,11 +3,11 @@ on:
   pull_request:
     types: [labeled, reopened, opened, synchronize, edited]
     paths:
-      - "backend/components/**/*"
-      - "backend/infra/*"
-      - "backend/infra/**/*"
-      - "backend/*.dockerfile"
-      - ".github/workflows/*.yml"
+      - 'backend/components/**/*'
+      - 'backend/infra/*'
+      - 'backend/infra/**/*'
+      - 'backend/*.dockerfile'
+      - '.github/workflows/*.yml'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref }}
@@ -33,7 +33,7 @@ jobs:
     name: deploy ephemeral
     needs: [ephemeral_stack_name]
     uses: ./.github/workflows/backend_build_and_deploy.yml
-    # don't run for dependabot changes and only run when labeled ephemerla
+    # don't run for dependabot changes and only run when labeled ephemeral
     if: github.actor != 'dependabot[bot]' && contains( github.event.pull_request.labels.*.name, 'ephemeral')
     permissions:
       contents: write
@@ -42,8 +42,8 @@ jobs:
       environment: dev
       baseStackName: dev
       createStack: true
-      stackName: "dev-${{ needs.ephemeral_stack_name.outputs.stackName }}"
-      prefixDomain: "api-${{ needs.ephemeral_stack_name.outputs.stackName }}."
+      stackName: 'dev-${{ needs.ephemeral_stack_name.outputs.stackName }}'
+      prefixDomain: 'api-${{ needs.ephemeral_stack_name.outputs.stackName }}.'
 
     secrets:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -55,7 +55,7 @@ jobs:
       AWS_SECRETS_PROVIDER: ${{ secrets.AWS_SECRETS_PROVIDER }}
 
   run_tests:
-    name: "ephemeral integration tests"
+    name: 'ephemeral integration tests'
     needs: [deploy_ephemeral_stack]
     if: success()
     uses: ./.github/workflows/backend_remote_integration_tests.yml
@@ -63,7 +63,7 @@ jobs:
       contents: write
       pull-requests: write
     with:
-      testUrl: "${{ needs.deploy_ephemeral_stack.outputs.url }}"
+      testUrl: '${{ needs.deploy_ephemeral_stack.outputs.url }}'
       prNumber: ${{ github.event.number }}
       isPR: true
     secrets:

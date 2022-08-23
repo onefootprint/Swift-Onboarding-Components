@@ -6,6 +6,8 @@ import { Config } from "./config";
 import * as random from "@pulumi/random";
 import { StaticSecrets } from "./secrets";
 import * as vpcUtil from './vpc';
+import { EngineType } from "@pulumi/aws/rds";
+import * as inputs from "@pulumi/aws/types";
 
 export type DbConfig = {
     protectDeletion: boolean;
@@ -22,7 +24,8 @@ export type DbOutput = {
     - check `applyImmediately`
 */
 export async function CreateDB(vpcProvider: vpcUtil.VpcRegion, clusterName: string, constants: Config, secretsStore: StaticSecrets, dbConfig: DbConfig): Promise<DbOutput> {
-    const user = "postgres";
+    const user = "footprint";
+    const databaseName = "footprint";
 
     const auroraVpc = vpcProvider.vpc;
 
@@ -36,26 +39,44 @@ export async function CreateDB(vpcProvider: vpcUtil.VpcRegion, clusterName: stri
         egress: [{ protocol: "-1", fromPort: 0, toPort: 0, cidrBlocks: ["0.0.0.0/0"] }],
     });
 
-    const db = new aws.rds.Cluster(`aurora-${clusterName}`, {
+    const db = new aws.rds.Cluster(`aurora-v2-${clusterName}`, {
         clusterIdentifier: `db-${clusterName}`,
         dbSubnetGroupName: dbSubnetGroup.name,
-        databaseName: "footprint_db",
+        databaseName,
         storageEncrypted: true,
-        engineVersion: "10.18",
+        engineVersion: "14.3",
         allowMajorVersionUpgrade: false,
-        engine: "aurora-postgresql",
-        engineMode: "serverless",
+        engine: EngineType.AuroraPostgresql,
+        engineMode: "provisioned",
         masterPassword: secretsStore.dbPassword,
         masterUsername: user,
         applyImmediately: true,
-        scalingConfiguration: {
-            autoPause: false,
-            minCapacity: 2,
-        },
         snapshotIdentifier: await getSnapshotIdIfNeeded(),
         vpcSecurityGroupIds: [auroraVpcSecurityGroup.id],
         skipFinalSnapshot: !dbConfig.protectDeletion,
         deletionProtection: dbConfig.protectDeletion,
+        restoreToPointInTime: await getRestorePointIfNeeded(),
+        serverlessv2ScalingConfiguration: {
+            maxCapacity: 16,
+            minCapacity: 2,
+        },       
+        backupRetentionPeriod: 7,
+    });
+
+    const _dbInstance = new aws.rds.ClusterInstance(`${clusterName}-1`, {
+        clusterIdentifier: db.id,
+        instanceClass: "db.serverless",
+        engine: EngineType.AuroraPostgresql,
+        engineVersion: db.engineVersion,        
+        
+    });
+
+    const _dbInstance2 = new aws.rds.ClusterInstance(`${clusterName}-2`, {
+        clusterIdentifier: db.id,
+        instanceClass: "db.serverless",
+        engine: EngineType.AuroraPostgresql,
+        engineVersion: db.engineVersion,        
+        
     });
 
     const databaseUrl = pulumi.all([db.endpoint, secretsStore.dbPassword]).apply(([host, password]) => {
@@ -93,9 +114,41 @@ async function getSnapshotIdIfNeeded(): Promise<pulumi.Output<string> | undefine
         return undefined;
     }
     
+    // don't support for PG < 14
+    if (parseInt(parentCluster.engineVersion) < 14) {
+        return undefined;
+    }
+
     const snapshot = new aws.rds.ClusterSnapshot(`branch-snapshot-${clusterName}`, { dbClusterIdentifier: parentCluster.clusterIdentifier, dbClusterSnapshotIdentifier: `branch-${clusterName}-${pulumi.getStack()}`});
 
+
     return snapshot.id;
+}
+
+async function getRestorePointIfNeeded(): Promise<inputs.input.rds.ClusterRestoreToPointInTime | undefined> {
+    let config = new pulumi.Config();
+    let clusterName = config.get('restoreSnapshotFromClusterNamed');
+    if (clusterName === undefined) {
+        return undefined;
+    }
+
+    let parentCluster;
+    try {
+        parentCluster = await aws.rds.getCluster({ clusterIdentifier: `db-${clusterName}` });
+    } catch(error) {
+        console.log(`error getting DB cluster snapshot: ${error}`);
+        return undefined;
+    }
+    
+    // don't support for PG < 14
+    if (parseInt(parentCluster.engineVersion) < 14) {
+        return undefined;
+    }
+
+    return {
+        useLatestRestorableTime: true,
+        sourceClusterIdentifier: parentCluster.clusterIdentifier
+    }
 }
 
 export type DbJump = {
@@ -176,7 +229,7 @@ sudo yum install postgresql jq yum-utils -y
 sudo yum-config-manager --add-repo https://pkgs.tailscale.com/stable/centos/7/tailscale.repo
 sudo yum install tailscale nc -y
 sudo systemctl enable --now tailscaled
-sudo tailscale up --authkey "${tailscaleAuthKey}" --advertise-exit-node --hostname "${jumpHostname}" --advertise-routes=10.0.0.0/24,10.0.1.0/24 --accept-dns=false --ssh
+sudo tailscale up --authkey "${tailscaleAuthKey}" --ssh --advertise-exit-node --hostname "${jumpHostname}" --accept-dns=false 
 
 # setup tunnel helper
 cat <<'EOF' > db_proxy.sh

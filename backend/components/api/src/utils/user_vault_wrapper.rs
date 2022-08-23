@@ -1,11 +1,13 @@
 use db::models::fingerprint::IsUnique;
 use db::models::identity_data::{HasIdentityDataFields, IdentityData};
+use db::models::kv_data::{KeyValueData, NewKeyValueDataArgs};
 use enclave_proxy::DataTransform;
 
 use db::models::email::Email;
 use newtypes::email::Email as NewtypeEmail;
 use paperclip::actix::Apiv2Schema;
 
+use std::collections::HashMap;
 use std::marker::PhantomData;
 
 use db::models::ob_configuration::ObConfiguration;
@@ -16,7 +18,7 @@ use db::models::user_vault::UserVault;
 use db::{errors::DbError, PgConnection};
 use newtypes::{
     CollectedDataOption, DataAttribute, DataPriority, EmailId, Fingerprint, PiiString, SealedVaultBytes,
-    UserVaultId, ValidatedPhoneNumber,
+    UserVaultId, ValidatedPhoneNumber, TenantId, KvDataKey, KvScope,
 };
 
 use crate::errors::{ApiError, ApiResult};
@@ -213,6 +215,29 @@ impl UserVaultWrapper {
         let identity_data = IdentityData::create(conn, new_identity_data)?;
         self.identity_data = Some(identity_data);
 
+        Ok(())
+    }
+}
+
+impl UserVaultWrapper {
+    pub fn update_custom_data(
+        &self,
+        conn: &mut PgConnection,
+        tenant_id: TenantId,
+        update: HashMap<KvDataKey, PiiString>,
+    ) -> ApiResult<()> {
+        self.assert_is_locked(conn)?;
+
+        let update = update
+            .into_iter()
+            .map(|(data_key, pii)| {
+                let data_key = data_key.ensure_scoped(KvScope::Custom);
+                let e_data = self.user_vault.public_key.seal_pii(&pii)?;
+                Ok(NewKeyValueDataArgs { data_key, e_data })
+            })
+            .collect::<Result<Vec<_>, ApiError>>()?;
+
+        KeyValueData::update_or_insert(conn, self.user_vault.id.clone(), tenant_id, update)?;
         Ok(())
     }
 }

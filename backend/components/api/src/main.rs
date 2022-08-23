@@ -1,4 +1,4 @@
-use actix_web::{middleware::Logger, App, HttpServer};
+use actix_web::{middleware::Logger, App, HttpServer, ResponseError};
 use config::Config;
 use crypto::aead::ScopedSealingKey;
 use db::DbPool;
@@ -205,9 +205,14 @@ async fn main() -> std::io::Result<()> {
             .with_json_spec_at("/docs-spec")
             .with_json_spec_v3_at("/docs-spec-v3")
             .with_swagger_ui_at("/docs-ui")
+            .default_service(actix_web::web::to(default_not_found))
             .build()
     })
     .bind(("0.0.0.0", config.port))?
     .run()
     .await
+}
+
+async fn default_not_found() -> impl actix_web::Responder {
+    ApiError::EndpointNotFound.error_response()
 }

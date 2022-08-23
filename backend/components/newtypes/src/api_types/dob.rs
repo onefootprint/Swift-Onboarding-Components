@@ -1,14 +1,14 @@
 use chrono::Datelike;
 use chrono::NaiveDate;
 pub use derive_more::{Add, Display, From, FromStr, Into};
-use paperclip::v2::schema::TypedData;
+use paperclip::actix::Apiv2Schema;
 use serde::Deserialize;
 use serde::{self, Serialize};
 use std::fmt::Debug;
 
+use crate::api_schema_helper::api_data_type_alias;
 use crate::PiiString;
 
-#[doc = "Date of birth"]
 #[derive(Clone, Debug, Hash, PartialEq, Eq, Serialize, Deserialize, Default)]
 /// Date of birth. Day, month, and year are integers (not strings).
 /// Example of a valid dob struct:
@@ -22,16 +22,19 @@ pub struct Dob {
 #[derive(Clone, Hash, PartialEq, Eq, Serialize, Deserialize, Default)]
 #[serde(try_from = "u32")]
 pub struct Day(u32);
+api_data_type_alias!(Day, Number);
 
 #[derive(Clone, Hash, PartialEq, Eq, Serialize, Deserialize, Default)]
 #[serde(try_from = "u32")]
 pub struct Month(u32);
+api_data_type_alias!(Month, Number);
 
 #[derive(Clone, Hash, PartialEq, Eq, Serialize, Deserialize, Default)]
 #[serde(try_from = "i32")]
 pub struct Year(i32);
+api_data_type_alias!(Year, Number);
 
-#[derive(Clone, Debug, Hash, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Clone, Debug, Hash, PartialEq, Eq, Serialize, Deserialize, Apiv2Schema)]
 #[serde(try_from = "Dob")]
 /// Date of birth. Day, month, and year are integers (not strings).
 /// Example of a valid dob struct:
@@ -40,12 +43,6 @@ pub struct DateOfBirth {
     pub day: Day,
     pub month: Month,
     pub year: Year,
-}
-
-impl TypedData for DateOfBirth {
-    fn data_type() -> paperclip::v2::models::DataType {
-        paperclip::v2::models::DataType::String
-    }
 }
 
 impl TryFrom<Dob> for DateOfBirth {

@@ -92,5 +92,11 @@
     "javascript",
     "typescript",
     "typescriptreact",
-  ]
+  ],
+  "command-runner.terminal.name": "RunCommand",
+  "command-runner.terminal.autoClear": true,
+  "command-runner.terminal.autoFocus": true,
+  "command-runner.commands": {
+      "clippy fix": "cd backend && cargo clippy --fix --workspace --allow-dirty"
+  },
 }

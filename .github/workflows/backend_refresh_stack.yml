@@ -4,13 +4,13 @@ on:
   workflow_dispatch:
     inputs:
       stackName:
-        description: "Name of the stack to refresh"
+        description: 'Name of the stack to refresh'
         required: true
         type: string
-        default: "dev"
+        default: 'dev'
 
       environment:
-        description: "Environment to run against"
+        description: 'Environment to run against'
         type: environment
         required: true
 
@@ -38,7 +38,7 @@ jobs:
       - name: Setup Pulumi CLI
         uses: pulumi/setup-pulumi@v2.0.0
         with:
-          pulumi-version: 3.30.0
+          pulumi-version: 3.38.0
 
       - run: yarn install
         working-directory: ./backend/infra
@@ -48,6 +48,6 @@ jobs:
         with:
           command: refresh
           work-dir: ./backend/infra
-          stack-name: "footprint/${{ github.event.inputs.stackName }}"
+          stack-name: 'footprint/${{ github.event.inputs.stackName }}'
         env:
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}

@@ -6,11 +6,11 @@ use crate::auth::IsLive;
 use crate::types::access_event::ApiAccessEvent;
 use crate::types::request::PaginatedRequest;
 use crate::types::response::ApiPaginatedResponseData;
-use crate::utils::querystring::deserialize_stringified_list;
 use crate::State;
 use crate::{auth::SessionContext, errors::ApiError};
 use chrono::{DateTime, Utc};
 use db::access_event::{AccessEventListItemForTenant, AccessEventListQueryParams};
+use newtypes::csv::deserialize_stringified_list;
 use newtypes::{DataAttribute, FootprintUserId};
 use paperclip::actix::{api_v2_operation, get, web, web::Json, Apiv2Schema};
 
