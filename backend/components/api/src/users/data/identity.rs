@@ -190,7 +190,6 @@ pub async fn post_decrypt(
     // Create an AccessEvent log showing that the tenant accessed these fields
     NewAccessEvent {
         scoped_user_id: scoped_user.id.clone(),
-        data_kinds: decrypted_data_attributes.clone(),
         reason: request.reason,
         principal: Some(auth.format_principal()),
         insight: CreateInsightEvent::from(insights),

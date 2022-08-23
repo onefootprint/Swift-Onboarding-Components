@@ -1,6 +1,6 @@
 use chrono::{DateTime, Utc};
 use db::access_event::{AccessEventListItemForTenant, AccessEventListItemForUser};
-use newtypes::{AccessEventKind, DataAttribute, DataIdentifier, FootprintUserId, TenantId};
+use newtypes::{AccessEventKind, DataIdentifier, FootprintUserId, TenantId};
 use paperclip::actix::Apiv2Schema;
 
 use crate::types::insight_event::ApiInsightEvent;
@@ -9,7 +9,6 @@ use crate::types::insight_event::ApiInsightEvent;
 pub struct ApiAccessEvent {
     pub fp_user_id: FootprintUserId,
     pub tenant_id: TenantId,
-    pub data_kinds: Vec<DataAttribute>,
     pub reason: String,
     pub principal: Option<String>,
     pub timestamp: DateTime<Utc>,
@@ -30,7 +29,6 @@ impl From<AccessEventListItemForTenant> for ApiAccessEvent {
         ApiAccessEvent {
             fp_user_id: scoped_user.fp_user_id,
             tenant_id: scoped_user.tenant_id,
-            data_kinds: event.data_kinds,
             reason: event.reason,
             principal: event.principal,
             timestamp: event.timestamp,
@@ -53,7 +51,6 @@ impl From<AccessEventListItemForUser> for ApiAccessEvent {
         ApiAccessEvent {
             fp_user_id: scoped_user.fp_user_id,
             tenant_id: scoped_user.tenant_id,
-            data_kinds: event.data_kinds,
             reason: event.reason,
             principal: Some(tenant_name), // we don't want to leak any principal, just the tenant name
             timestamp: event.timestamp,

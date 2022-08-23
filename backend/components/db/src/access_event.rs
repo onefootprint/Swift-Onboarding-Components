@@ -8,7 +8,6 @@ use crate::DbPool;
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use newtypes::AccessEventKind;
-use newtypes::DataAttribute;
 use newtypes::DataIdentifier;
 use newtypes::FootprintUserId;
 use newtypes::TenantId;
@@ -21,7 +20,6 @@ pub struct AccessEventListQueryParams {
     pub search: Option<String>,
     pub timestamp_lte: Option<DateTime<Utc>>,
     pub timestamp_gte: Option<DateTime<Utc>>,
-    pub attributes: Vec<DataAttribute>,
     pub kind: Option<AccessEventKind>,
     pub targets: Vec<DataIdentifier>,
     pub is_live: bool,
@@ -72,11 +70,6 @@ impl AccessEventListItemForTenant {
 
                 if let Some(timestamp_gte) = params.timestamp_gte {
                     results = results.filter(schema::access_event::timestamp.ge(timestamp_gte))
-                }
-
-                if !params.attributes.is_empty() {
-                    results =
-                        results.filter(schema::access_event::data_kinds.overlaps_with(params.attributes));
                 }
 
                 if let Some(kind) = params.kind {

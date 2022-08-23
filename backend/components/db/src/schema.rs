@@ -11,7 +11,6 @@ table! {
         insight_event_id -> Uuid,
         reason -> Varchar,
         principal -> Nullable<Varchar>,
-        data_kinds -> Array<Text>,
         ordering_id -> Int8,
         kind -> Text,
         targets -> Array<Text>,

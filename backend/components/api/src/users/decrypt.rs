@@ -112,12 +112,11 @@ async fn post_inner(
     // Create an AccessEvent log showing that the tenant accessed these fields
     NewAccessEvent {
         scoped_user_id: scoped_user.id.clone(),
-        data_kinds: decrypted_data_attributes.clone(),
         reason,
         principal: Some(auth.format_principal()),
         insight: CreateInsightEvent::from(insights),
         kind: AccessEventKind::Decrypt,
-        targets: DataIdentifier::list(decrypted_data_attributes.clone()),
+        targets: DataIdentifier::list(decrypted_data_attributes),
     }
     .save(&state.db_pool)
     .await?;
