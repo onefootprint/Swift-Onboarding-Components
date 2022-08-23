@@ -1,4 +1,4 @@
-import { DataKinds } from './data-kind';
+import { CollectedDataOption, DataKinds } from './data-kind';
 import { InsightEvent } from './insight-event';
 import { OnboardingStatus } from './onboarding-status';
 
@@ -13,7 +13,8 @@ export type ScopedUser = {
 
 export type Onboarding = {
   status: OnboardingStatus;
-  canAccessData: DataKinds[];
+  canAccessData: CollectedDataOption[];
+  canAccessDataAttributes: DataKinds[];
   name: string;
   description?: string;
   insightEvent: InsightEvent;

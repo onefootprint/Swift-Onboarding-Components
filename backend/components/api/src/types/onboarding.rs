@@ -1,6 +1,6 @@
 use chrono::{DateTime, Utc};
 use db::models::onboarding::{Onboarding, OnboardingInfo};
-use newtypes::{CollectedDataOption, Status};
+use newtypes::{CollectedDataOption, DataAttribute, Status};
 use paperclip::actix::Apiv2Schema;
 
 use super::insight_event::ApiInsightEvent;
@@ -11,6 +11,7 @@ pub struct ApiOnboarding {
     timestamp: DateTime<Utc>,
     status: Status,
     can_access_data: Vec<CollectedDataOption>,
+    can_access_data_attributes: Vec<DataAttribute>,
     insight_event: ApiInsightEvent,
 }
 
@@ -26,11 +27,13 @@ impl From<OnboardingInfo> for ApiOnboarding {
             can_access_data,
             ..
         } = s.1;
+        let can_access_data_attributes = can_access_data.iter().flat_map(|x| x.attributes()).collect();
         Self {
             name,
             timestamp: start_timestamp,
             status,
             can_access_data,
+            can_access_data_attributes,
             insight_event: ApiInsightEvent::from(s.2),
         }
     }
