@@ -3,17 +3,22 @@
 use std::collections::{HashMap, HashSet};
 
 use crate::auth::key_context::secret_key::SecretTenantAuthContext;
-use crate::auth::{HasTenant, IsLive};
+use crate::auth::{HasTenant, IsLive, Principal};
 
 use crate::types::{ApiResponseData, EmptyResponse, JsonApiResponse};
 
+use crate::utils::insight_headers::InsightHeaders;
 use crate::utils::user_vault_wrapper::UserVaultWrapper;
 use crate::{errors::ApiError, State};
 
+use db::models::access_event::NewAccessEvent;
+use db::models::insight_event::CreateInsightEvent;
 use db::models::kv_data::KeyValueData;
 use db::models::user_vault::UserVault;
 use newtypes::csv::Csv;
-use newtypes::{flat_api_object_map_type, FootprintUserId, KvDataKey, PiiString};
+use newtypes::{
+    flat_api_object_map_type, AccessEventKind, DataIdentifier, FootprintUserId, KvDataKey, PiiString,
+};
 
 use paperclip::actix::{api_v2_operation, web, web::Json, web::Path, web::Query};
 use paperclip::actix::{post, Apiv2Schema};
@@ -136,24 +141,38 @@ pub async fn post_decrypt(
     path: Path<FootprintUserId>,
     request: Json<DecryptCustomFieldsRequest>,
     tenant_auth: SecretTenantAuthContext,
+    insights: InsightHeaders,
 ) -> JsonApiResponse<DecryptCustomDataResponse> {
     let footprint_user_id = path.into_inner();
     let is_live = tenant_auth.is_live()?;
     let tenant_id = tenant_auth.tenant().id.clone();
-    let fields: Vec<KvDataKey> = request.into_inner().fields;
+    let DecryptCustomFieldsRequest { fields, reason } = request.into_inner();
 
-    let (user_vault, _scoped_user, results) = state
+    let fields_copy = fields.clone();
+    let (user_vault, scoped_user, results) = state
         .db_pool
         .db_query(move |conn| -> Result<_, ApiError> {
             let (user_vault, scoped_user) =
                 UserVault::get_for_tenant(conn, &tenant_id, &footprint_user_id, is_live)?;
-            let found = KeyValueData::get_all(conn, user_vault.id.clone(), tenant_id, &fields)?;
+            let found = KeyValueData::get_all(conn, user_vault.id.clone(), tenant_id, &fields_copy)?;
             Ok((user_vault, scoped_user, found))
         })
         .await??;
 
     let decrypted = decrypt_inner(&state, user_vault, &results).await?;
     let output: HashMap<_, _> = results.into_iter().map(|kv| kv.data_key).zip(decrypted).collect();
+
+    // Create an AccessEvent log showing that the tenant accessed these fields
+    NewAccessEvent {
+        scoped_user_id: scoped_user.id.clone(),
+        reason,
+        principal: Some(tenant_auth.format_principal()),
+        insight: CreateInsightEvent::from(insights),
+        kind: AccessEventKind::Decrypt,
+        targets: fields.into_iter().map(DataIdentifier::Custom).collect(),
+    }
+    .save(&state.db_pool)
+    .await?;
 
     ApiResponseData::ok(DecryptCustomDataResponse::from(output)).json()
 }

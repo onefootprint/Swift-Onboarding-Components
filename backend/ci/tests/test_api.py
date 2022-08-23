@@ -33,23 +33,25 @@ class TestNonPortableVaultApi:
             f"users/{fp_id}/identity/decrypt", data, workos_sandbox_tenant.sk.key
         )
         data = body["data"]
-        print(data)
         assert data["first_name"] == "SANDBOX"
         assert data["zip"] == "10009"
         assert data["city"] == "Enclave".upper()
 
-
-class TestApiFormats:
-    def test_basic_auth(self, workos_sandbox_tenant):
-        response = requests.get(
-            url("org/api_keys/check"),
-            auth=HTTPBasicAuth(workos_sandbox_tenant.sk.key.token, ""),
+        # verify access events created
+        body = get(
+            "users/access_events",
+            dict(footprint_user_id=fp_id),
+            workos_sandbox_tenant.sk.key,
         )
-        assert response.status_code == 200
+        access_events = body["data"]
+        assert access_events[0]["kind"] == "decrypt"
+        assert set(access_events[0]["targets"]) == {
+            "identity.first_name",
+            "identity.zip",
+            "identity.city",
+        }
 
-
-class TestCustomDataApi:
-    def test_custom_data_basic_non_portable(self, workos_sandbox_tenant):
+    def test_custom_data(self, workos_sandbox_tenant):
         # create the vault
         body = post("users/", None, workos_sandbox_tenant.sk.key)
         user = body["data"]
@@ -77,3 +79,25 @@ class TestCustomDataApi:
         )
         assert response["data"]["ach_account_number"] == "123467890"
         assert response["data"]["cc4"] == "4242"
+
+        # verify access events created
+        body = get(
+            "users/access_events",
+            dict(footprint_user_id=fp_id),
+            workos_sandbox_tenant.sk.key,
+        )
+        access_events = body["data"]
+        assert access_events[0]["kind"] == "decrypt"
+        assert set(access_events[0]["targets"]) == {
+            "custom.ach_account_number",
+            "custom.cc4",
+        }
+
+
+class TestApiFormats:
+    def test_basic_auth(self, workos_sandbox_tenant):
+        response = requests.get(
+            url("org/api_keys/check"),
+            auth=HTTPBasicAuth(workos_sandbox_tenant.sk.key.token, ""),
+        )
+        assert response.status_code == 200
