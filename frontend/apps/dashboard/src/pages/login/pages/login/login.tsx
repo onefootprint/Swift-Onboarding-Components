@@ -1,3 +1,6 @@
+import { useTranslation } from 'hooks';
+import Head from 'next/head';
+import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React from 'react';
 import styled, { css } from 'styled-components';
@@ -6,7 +9,9 @@ import { Button, GoogleButton, LinkButton, Typography } from 'ui';
 import LogoAndText from '../../components/logo-and-text';
 
 const Login = () => {
+  const { t } = useTranslation('pages.login');
   const router = useRouter();
+
   const handleGoggleButtonClick = () => {
     const redirect = `${window.location.origin}/auth`;
     const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/org/auth/google_oauth?redirect_url=${redirect}`;
@@ -14,43 +19,48 @@ const Login = () => {
   };
 
   return (
-    <Container>
-      <LogoAndText text="Sign up or Log in" />
-      <Inner>
-        <GoogleButton fullWidth type="submit" onClick={handleGoggleButtonClick}>
-          Continue with Google
-        </GoogleButton>
-        <Button
-          onClick={() => router.push('/login/email')}
-          variant="secondary"
-          fullWidth
-        >
-          Continue with email
-        </Button>
-        <TextContainer>
-          <Typography variant="caption-2" color="tertiary">
-            By continuing you agree to our
-          </Typography>
-          <LinkButton
-            size="xxTiny"
-            href="https://onefootprint.com/terms-of-service"
-            target="_blank"
+    <>
+      <Head>
+        <title>{t('page-title')}</title>
+      </Head>
+      <Container>
+        <LogoAndText text={t('title')} />
+        <Inner>
+          <GoogleButton
+            fullWidth
+            type="submit"
+            onClick={handleGoggleButtonClick}
           >
-            Terms of Service
-          </LinkButton>
-          <Typography variant="caption-2" color="tertiary">
-            and
-          </Typography>
-          <LinkButton
-            size="xxTiny"
-            href="https://onefootprint.com/privacy-policy"
-            target="_blank"
+            {t('google')}
+          </GoogleButton>
+          <Button
+            onClick={() => router.push('/login/email')}
+            variant="secondary"
+            fullWidth
           >
-            Privacy Policy.
-          </LinkButton>
-        </TextContainer>
-      </Inner>
-    </Container>
+            {t('email')}
+          </Button>
+          <TextContainer>
+            <Typography variant="caption-2" color="tertiary">
+              By continuing you agree to our
+            </Typography>
+            <Link href="https://onefootprint.com/terms-of-service" passHref>
+              <LinkButton size="xxTiny" target="_blank">
+                Terms of Service
+              </LinkButton>
+            </Link>
+            <Typography variant="caption-2" color="tertiary">
+              and
+            </Typography>
+            <Link href="https://onefootprint.com/privacy-policy" passHref>
+              <LinkButton size="xxTiny" target="_blank">
+                Privacy Policy.
+              </LinkButton>
+            </Link>
+          </TextContainer>
+        </Inner>
+      </Container>
+    </>
   );
 };
 

@@ -1,3 +1,5 @@
+import { useTranslation } from 'hooks';
+import Head from 'next/head';
 import { useRouter } from 'next/router';
 import React from 'react';
 import { useForm } from 'react-hook-form';
@@ -9,12 +11,12 @@ import LogoAndText from '../../components/logo-and-text';
 import useLoginEmail, { EmailLoginRequest } from './hooks/use-login-email';
 
 type FormData = {
-  emailAddress: string;
+  email: string;
 };
 
 const EmailLogin = () => {
+  const { t } = useTranslation('pages.email-login');
   const router = useRouter();
-
   const mutateLoginEmail = useLoginEmail();
   const {
     register,
@@ -22,17 +24,16 @@ const EmailLogin = () => {
     formState: { errors },
   } = useForm<FormData>();
 
-  const onSubmit = (formData: FormData) => {
-    const { emailAddress } = formData;
+  const onSubmit = ({ email }: FormData) => {
     const request: EmailLoginRequest = {
-      emailAddress,
+      emailAddress: email,
       redirectUrl: `${window.location.origin}/auth`,
     };
     mutateLoginEmail.mutate(request, {
       onSuccess() {
         router.push({
           pathname: '/login/link-sent',
-          query: { email_address: emailAddress },
+          query: { email },
         });
       },
     });
@@ -40,33 +41,44 @@ const EmailLogin = () => {
 
   return (
     <>
+      <Head>
+        <title>{t('page-title')}</title>
+      </Head>
       <BackButton />
       <Container>
         <Form onSubmit={handleSubmit(onSubmit)}>
-          <LogoAndText text="Sign up or Log in" />
+          <LogoAndText text={t('title')} />
           <Inner>
             <TextInput
-              hasError={!!errors.emailAddress}
-              hintText={errors.emailAddress && 'Email is required'}
-              label="Email"
+              hasError={!!errors.email}
+              hintText={errors?.email?.message}
+              label={t('form.email.label')}
               placeholder="your.email@email.com"
               type="email"
-              {...register('emailAddress', { required: true })}
+              {...register('email', {
+                required: {
+                  value: true,
+                  message: t('form.email.errors.required'),
+                },
+                pattern: {
+                  value: /^\S+@\S+$/i,
+                  message: t('form.email.errors.pattern'),
+                },
+              })}
             />
             <Button
               fullWidth
               type="submit"
               loading={mutateLoginEmail.isLoading}
             >
-              Continue
+              {t('form.cta')}
             </Button>
             <Typography
               variant="caption-2"
               color="tertiary"
               sx={{ maxWidth: '350px', textAlign: 'center' }}
             >
-              No passwords, no problems. We&apos;ll send you an email with a
-              direct login link for a seamless and secure experience.
+              {t('instructions')}
             </Typography>
           </Inner>
         </Form>

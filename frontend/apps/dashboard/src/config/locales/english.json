@@ -42,6 +42,36 @@
     }
   },
   "pages": {
+    "login": {
+      "page-title": "Footprint Login | Sign in to the Footprint Dashboard",
+      "title": "Sign up or Log in",
+      "google": "Continue with Google",
+      "email": "Continue with email"
+    },
+    "email-login": {
+      "page-title": "Footprint Login | Sign in to the Footprint Dashboard",
+      "title": "Sign up or Log in",
+      "instructions": "No passwords, no problems. We'll send you an email with a direct login link for a seamless and secure experience.",
+      "form": {
+        "email": {
+          "label": "Email",
+          "errors": {
+            "required": "Please enter an email",
+            "pattern": "Email is not valid"
+          }
+        },
+        "cta": "Continue"
+      }
+    },
+    "link-sent": {
+      "page-title": "Footprint Login | Logging in to the Footprint Dashboard",
+      "title": "Magic link sent!",
+      "instructions": "We just sent you an email to {{email}}. Click that link to log in. It's secure and lightning fast!",
+      "cta": "Back home"
+    },
+    "auth": {
+      "page-title": "Footprint Login | Logging in to the Footprint Dashboard"
+    },
     "developers": {
       "page-title": "Footprint - Developers",
       "header": {

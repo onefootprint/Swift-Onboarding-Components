@@ -1,3 +1,5 @@
+import { useTranslation } from 'hooks';
+import Head from 'next/head';
 import { useRouter } from 'next/router';
 import React from 'react';
 import styled, { css } from 'styled-components';
@@ -6,24 +8,27 @@ import { Button, Typography } from 'ui';
 import LogoAndText from '../../components/logo-and-text';
 
 const LinkSent = () => {
+  const { t } = useTranslation('pages.link-sent');
   const router = useRouter();
+  const { email } = router.query;
 
   return (
-    <Container>
-      <Inner>
-        <LogoAndText text="Magic link sent!" />
-        <Typography variant="body-2" sx={{ marginBottom: 8 }}>
-          We just sent you an email to {` `}
-          <Typography variant="label-2" sx={{ display: 'inline' }}>
-            {router.query.email_address}
+    <>
+      <Head>
+        <title>{t('page-title')}</title>
+      </Head>
+      <Container>
+        <Inner>
+          <LogoAndText text={t('title')} />
+          <Typography variant="body-2" sx={{ marginBottom: 8 }}>
+            {t('instructions', { email })}
           </Typography>
-          . Click that link to log in. It&apos;s secure and lightning fast!
-        </Typography>
-        <Button onClick={() => router.push('/login')} fullWidth>
-          Back home
-        </Button>
-      </Inner>
-    </Container>
+          <Button onClick={() => router.push('/login')} fullWidth>
+            {t('cta')}
+          </Button>
+        </Inner>
+      </Container>
+    </>
   );
 };
 
