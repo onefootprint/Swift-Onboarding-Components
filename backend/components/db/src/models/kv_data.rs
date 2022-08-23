@@ -2,7 +2,7 @@ use crate::{schema::kv_data, DbError};
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use diesel::{Insertable, PgConnection, Queryable, RunQueryDsl};
-use newtypes::{KeyValueDataId, ScopedKvDataKey, SealedVaultBytes, TenantId, UserVaultId};
+use newtypes::{KeyValueDataId, KvDataKey, SealedVaultBytes, TenantId, UserVaultId};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Hash, Clone, Serialize, Deserialize, Queryable, Insertable)]
@@ -11,7 +11,7 @@ pub struct KeyValueData {
     pub id: KeyValueDataId,
     pub user_vault_id: UserVaultId,
     pub tenant_id: TenantId,
-    pub data_key: ScopedKvDataKey,
+    pub data_key: KvDataKey,
     pub e_data: SealedVaultBytes,
     pub deactivated_at: Option<DateTime<Utc>>,
     pub _created_at: DateTime<Utc>,
@@ -23,22 +23,23 @@ pub struct KeyValueData {
 struct NewKeyValueData {
     pub user_vault_id: UserVaultId,
     pub tenant_id: TenantId,
-    data_key: ScopedKvDataKey,
+    data_key: KvDataKey,
     e_data: SealedVaultBytes,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct NewKeyValueDataArgs {
-    pub data_key: ScopedKvDataKey,
+    pub data_key: KvDataKey,
     pub e_data: SealedVaultBytes,
 }
 
+// TODO do we need to have `custom.` in the key?
 impl KeyValueData {
     pub(crate) fn deactivate_bulk(
         conn: &mut PgConnection,
         user_vault_id: UserVaultId,
         tenant_id: TenantId,
-        data_keys: Vec<&ScopedKvDataKey>,
+        data_keys: Vec<&KvDataKey>,
     ) -> Result<(), DbError> {
         let _ = diesel::update(kv_data::table)
             .filter(kv_data::user_vault_id.eq(user_vault_id))
@@ -54,7 +55,7 @@ impl KeyValueData {
         conn: &mut PgConnection,
         user_vault_id: UserVaultId,
         tenant_id: TenantId,
-        data_keys: &[ScopedKvDataKey],
+        data_keys: &[KvDataKey],
     ) -> Result<Vec<Self>, DbError> {
         Ok(kv_data::table
             .filter(kv_data::user_vault_id.eq(user_vault_id))
@@ -111,7 +112,7 @@ mod tests {
         let user_vault = test_user_vault(&mut conn, true);
         let tenant = test_tenant(&mut conn);
 
-        let data_key = ScopedKvDataKey::from_str("custom.test1").unwrap();
+        let data_key = KvDataKey::from_str("custom.test1").unwrap();
         let data_keys = vec![data_key.clone()];
         let e_data1 = SealedVaultBytes(vec![0x01, 0x02, 0x03]);
         let e_data2 = SealedVaultBytes(vec![0x04, 0x05, 0x06]);

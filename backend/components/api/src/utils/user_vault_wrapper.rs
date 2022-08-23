@@ -17,8 +17,8 @@ use db::assert_in_transaction;
 use db::models::user_vault::UserVault;
 use db::{errors::DbError, PgConnection};
 use newtypes::{
-    CollectedDataOption, DataAttribute, DataPriority, EmailId, Fingerprint, PiiString, SealedVaultBytes,
-    UserVaultId, ValidatedPhoneNumber, TenantId, KvDataKey, KvScope,
+    CollectedDataOption, DataAttribute, DataPriority, EmailId, Fingerprint, KvDataKey, PiiString,
+    SealedVaultBytes, TenantId, UserVaultId, ValidatedPhoneNumber,
 };
 
 use crate::errors::{ApiError, ApiResult};
@@ -231,7 +231,6 @@ impl UserVaultWrapper {
         let update = update
             .into_iter()
             .map(|(data_key, pii)| {
-                let data_key = data_key.ensure_scoped(KvScope::Custom);
                 let e_data = self.user_vault.public_key.seal_pii(&pii)?;
                 Ok(NewKeyValueDataArgs { data_key, e_data })
             })

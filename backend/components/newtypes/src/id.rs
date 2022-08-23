@@ -1,6 +1,5 @@
 pub use derive_more::{Add, Display, From, FromStr, Into};
 use serde::{Deserialize, Serialize};
-use strum_macros::{AsRefStr, EnumString};
 use uuid::Uuid;
 
 /// This macro generates an Id type that wraps a string
@@ -83,44 +82,6 @@ define_newtype_id!(
 );
 
 define_newtype_id!(KvDataKey, String, "Represents the tag/key of key-value data");
-define_newtype_id!(
-    ScopedKvDataKey,
-    String,
-    "Represents the scoped tag/key of key-value data"
-);
-
-#[derive(Debug, Copy, Clone, AsRefStr, EnumString)]
-#[strum(serialize_all = "snake_case")]
-pub enum KvScope {
-    Identity,
-    Custom,
-}
-
-impl KvDataKey {
-    pub fn ensure_scoped(self, scope: KvScope) -> ScopedKvDataKey {
-        let prefix = format!("{}.", scope.as_ref());
-        if self.0.starts_with(&prefix) {
-            return ScopedKvDataKey(self.0);
-        }
-
-        ScopedKvDataKey(format!("{}{}", prefix, self.0))
-    }
-
-    pub fn clear_scope(self, scope: KvScope) -> KvDataKey {
-        ScopedKvDataKey(self.0).clear_scope(scope)
-    }
-}
-
-impl ScopedKvDataKey {
-    pub fn clear_scope(self, scope: KvScope) -> KvDataKey {
-        let prefix = format!("{}.", scope.as_ref());
-        if let Some(remaining) = self.0.strip_prefix(&prefix) {
-            return KvDataKey(remaining.to_string());
-        }
-
-        KvDataKey(self.0)
-    }
-}
 
 impl ObConfigurationKey {
     /// prefixed on LIVE keys

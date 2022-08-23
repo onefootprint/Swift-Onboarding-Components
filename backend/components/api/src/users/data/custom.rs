@@ -13,7 +13,7 @@ use crate::{errors::ApiError, State};
 use db::models::kv_data::KeyValueData;
 use db::models::user_vault::UserVault;
 use newtypes::csv::Csv;
-use newtypes::{flat_api_object_map_type, FootprintUserId, KvDataKey, KvScope, PiiString, ScopedKvDataKey};
+use newtypes::{flat_api_object_map_type, FootprintUserId, KvDataKey, PiiString};
 
 use paperclip::actix::{api_v2_operation, web, web::Json, web::Path, web::Query};
 use paperclip::actix::{post, Apiv2Schema};
@@ -86,32 +86,25 @@ pub async fn get(
     let footprint_user_id = path.into_inner();
     let is_live = tenant_auth.is_live()?;
 
-    let fields: Vec<ScopedKvDataKey> = request
-        .into_inner()
-        .fields
-        .iter()
-        .map(|k| k.clone().ensure_scoped(KvScope::Custom))
-        .collect();
-
-    let scoped_data_keys = fields.clone();
     let tenant_id = tenant_auth.tenant().id.clone();
+    let fields: Vec<KvDataKey> = request.into_inner().fields.0;
 
+    let fields_copy = fields.clone();
     let results = state
         .db_pool
         .db_query(move |conn| -> Result<_, ApiError> {
             let (user_vault, _) = UserVault::get_for_tenant(conn, &tenant_id, &footprint_user_id, is_live)?;
-            let found = KeyValueData::get_all(conn, user_vault.id, tenant_id, &scoped_data_keys)?;
+            let found = KeyValueData::get_all(conn, user_vault.id, tenant_id, &fields_copy)?;
             Ok(found)
         })
         .await??;
 
     // and these are the ones that have values in our vault
-    let result_fields: HashSet<ScopedKvDataKey> =
-        HashSet::from_iter(results.into_iter().map(|kv| kv.data_key));
+    let result_fields: HashSet<KvDataKey> = HashSet::from_iter(results.into_iter().map(|kv| kv.data_key));
 
     let output = HashMap::from_iter(fields.into_iter().map(|field| {
         let exists = result_fields.contains(&field);
-        (field.clear_scope(KvScope::Custom), exists)
+        (field, exists)
     }));
 
     ApiResponseData::ok(GetCustomDataResponse::from(output)).json()
@@ -147,28 +140,20 @@ pub async fn post_decrypt(
     let footprint_user_id = path.into_inner();
     let is_live = tenant_auth.is_live()?;
     let tenant_id = tenant_auth.tenant().id.clone();
-    let scoped_data_keys: Vec<ScopedKvDataKey> = request
-        .into_inner()
-        .fields
-        .into_iter()
-        .map(|k| k.ensure_scoped(KvScope::Custom))
-        .collect();
+    let fields: Vec<KvDataKey> = request.into_inner().fields;
 
-    let (user_vault, results) = state
+    let (user_vault, _scoped_user, results) = state
         .db_pool
         .db_query(move |conn| -> Result<_, ApiError> {
-            let (user_vault, _) = UserVault::get_for_tenant(conn, &tenant_id, &footprint_user_id, is_live)?;
-            let found = KeyValueData::get_all(conn, user_vault.id.clone(), tenant_id, &scoped_data_keys)?;
-            Ok((user_vault, found))
+            let (user_vault, scoped_user) =
+                UserVault::get_for_tenant(conn, &tenant_id, &footprint_user_id, is_live)?;
+            let found = KeyValueData::get_all(conn, user_vault.id.clone(), tenant_id, &fields)?;
+            Ok((user_vault, scoped_user, found))
         })
         .await??;
 
     let decrypted = decrypt_inner(&state, user_vault, &results).await?;
-    let fields_and_pii = results
-        .into_iter()
-        .map(|kv| kv.data_key.clear_scope(KvScope::Custom))
-        .zip(decrypted);
-    let output = HashMap::from_iter(fields_and_pii);
+    let output: HashMap<_, _> = results.into_iter().map(|kv| kv.data_key).zip(decrypted).collect();
 
     ApiResponseData::ok(DecryptCustomDataResponse::from(output)).json()
 }
