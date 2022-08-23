@@ -48,29 +48,20 @@ const StyledContainer = styled.div<{ sx: SXStyles }>`
 
     &[data-fluid='false'] {
       ${media.between('xs', 'sm')`
-        width: 100%;
-        padding-left: ${theme.grid.container.margin.xs}px;
-        padding-right: ${theme.grid.container.margin.xs}px;
+        width: calc(100% - ${theme.grid.container.margin.xs * 2}px);
       `}
       ${media.between('sm', 'md')`
-        width: ${theme.grid.container.maxWidth.sm}px;
-        padding-left: ${theme.grid.container.margin.sm}px;
-        padding-right: ${theme.grid.container.margin.sm}px;
+        width: calc(100% - ${theme.grid.container.margin.sm * 2}px);
       `}
       ${media.between('md', 'lg')`
-        width: ${theme.grid.container.maxWidth.md}px;
-        padding-left: ${theme.grid.container.margin.md}px;
-        padding-right: ${theme.grid.container.margin.md}px;
+        width: calc(100% - ${theme.grid.container.margin.md * 2}px);
       `}
       ${media.between('lg', 'xl')`
-        width: ${theme.grid.container.maxWidth.lg}px;
-        padding-left: ${theme.grid.container.margin.lg}px;
-        padding-right: ${theme.grid.container.margin.lg}px;
+        width: calc(100% - ${theme.grid.container.margin.lg * 2}px);
       `}
       ${media.greaterThan('xl')`
-        width: ${theme.grid.container.maxWidth.xl}px;
-        padding-left: ${theme.grid.container.margin.xl}px;
-        padding-right: ${theme.grid.container.margin.xl}px;
+        width: calc(100% - ${theme.grid.container.margin.xl * 2}px);
+        max-width: ${theme.grid.container.maxWidth.xl}px;
       `}
     }
   `}

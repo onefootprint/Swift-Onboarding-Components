@@ -16,7 +16,7 @@ const grid: Grids = {
       xl: 40,
       lg: 40,
       md: 24,
-      sm: 24,
+      sm: 16,
       xs: 16,
     },
     maxWidth: {
