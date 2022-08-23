@@ -100,6 +100,10 @@ const Item = styled.li`
 const AvatarContainer = styled.div`
   ${({ theme }) => css`
     margin-bottom: ${theme.spacing[7]}px;
+
+    img {
+      border-radius: ${theme.borderRadius[2]}px;
+    }
   `}
 `;
 

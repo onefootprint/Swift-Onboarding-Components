@@ -85,6 +85,13 @@ const Company = () => {
       twitter: 'https://twitter.com/elliottvforde',
     },
     {
+      name: 'Karen Mok',
+      avatarSrc: '/team/member-karen.png',
+      role: 'Chief of Staff',
+      linkedin: 'https://www.linkedin.com/in/karenjmok/',
+      twitter: 'https://twitter.com/themokstories',
+    },
+    {
       name: 'Omar Cameron',
       avatarSrc: '/team/member-omar.png',
       role: 'Sales',
