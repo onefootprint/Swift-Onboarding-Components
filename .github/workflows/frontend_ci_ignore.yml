@@ -1,0 +1,49 @@
+name: Frontend CI (skip)
+
+on:
+  push:
+    branches:
+      - master
+    paths-ignore:
+      - 'frontend/**'
+  pull_request:
+    paths-ignore:
+      - 'frontend/**'
+      - '.github/workflows/*.yml'
+
+jobs:
+  install-dependencies:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        node-version: [16.x]
+        os: [ubuntu-latest]
+    steps:
+      - run: echo "Not required"
+
+  lint:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        node-version: [16.x]
+        os: [ubuntu-latest]
+    steps:
+      - run: echo "Not required"
+
+  format:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        node-version: [16.x]
+        os: [ubuntu-latest]
+    steps:
+      - run: echo "Not required"
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        node-version: [16.x]
+        os: [ubuntu-latest]
+    needs: install-dependencies
+    steps:
+      - run: echo "Not required"
