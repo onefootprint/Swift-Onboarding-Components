@@ -3,8 +3,8 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "ui": ["*"],
-      "themes": ["*"]
+      "ui": ["../ui/src/"],
+      "themes": ["../themes/src/"]
     }
   },
   "include": ["."],

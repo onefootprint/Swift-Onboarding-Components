@@ -4,12 +4,12 @@
     "baseUrl": ".",
     "paths": {
       "src/*": ["src/*"],
+      "@onefootprint/footprint": ["../../packages/footprint/src/*"],
       "global-constants": ["../../packages/global-constants/src/*"],
+      "hooks": ["../../packages/hooks/src/*"],
       "request": ["../../packages/request/src/*"],
       "themes": ["../../packages/themes/src/*"],
-      "ui": ["../../packages/ui/src/*"],
-      "hooks": ["../../packages/hooks/src/*"],
-      "@onefootprint/footprint": ["../../packages/footprint/src/*"]
+      "ui": ["../../packages/ui/src/*"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],

@@ -4,10 +4,11 @@
     "baseUrl": ".",
     "paths": {
       "src/*": ["src/*"],
+      "footprint-provider": ["../../packages/footprint-provider/src/*"],
       "global-constants": ["../../packages/global-constants/src/*"],
+      "hooks": ["../../packages/hooks/src/*"],
       "request": ["../../packages/request/src/*"],
       "themes": ["../../packages/themes/src/*"],
-      "hooks": ["../../packages/hooks/src/*"],
       "ui": ["../../packages/ui/src/*"]
     }
   },

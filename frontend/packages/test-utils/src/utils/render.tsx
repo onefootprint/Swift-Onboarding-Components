@@ -2,7 +2,6 @@ import '@testing-library/jest-dom';
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render } from '@testing-library/react';
-import FootprintProvider from 'footprint-provider';
 import React from 'react';
 import { ThemeProvider } from 'styled-components';
 import themes from 'themes';
@@ -25,11 +24,9 @@ type WrapperProps = {
 export const Wrapper = ({ children }: WrapperProps) => (
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
-      <FootprintProvider>
-        <DesignSystemProvider theme={themes.light}>
-          {children}
-        </DesignSystemProvider>
-      </FootprintProvider>
+      <DesignSystemProvider theme={themes.light}>
+        {children}
+      </DesignSystemProvider>
     </QueryClientProvider>
   </React.StrictMode>
 );
