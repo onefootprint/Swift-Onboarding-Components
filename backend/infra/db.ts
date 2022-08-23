@@ -223,6 +223,8 @@ async function createDbJumpBox(
 #!/bin/bash
 
 sudo yum update -y
+sudo yum install amazon-linux-extras -y
+sudo amazon-linux-extras enable postgresql14 -y
 sudo yum install postgresql jq yum-utils -y
 
 # setup tailscale
