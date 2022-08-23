@@ -26,7 +26,7 @@ use strum_macros::{AsRefStr, Display, EnumIter, EnumString};
     EnumString,
     AsRefStr,
 )]
-#[strum(serialize_all = "PascalCase")]
+#[strum(serialize_all = "snake_case")]
 #[serde(rename_all = "snake_case")]
 #[diesel(sql_type = Text)]
 pub enum DataAttribute {
