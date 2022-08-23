@@ -14,6 +14,7 @@
     "format:fix": "prettier --write \"**/*.{ts,tsx,md}\"",
     "lint": "turbo run lint",
     "test": "turbo run test",
+    "set:dot-env": "turbo run set:dot-env",
     "build:storybook": "turbo run build:storybook",
     "typecheck": "turbo run typecheck",
     "clean": "turbo run clean && rm -rf node_modules",

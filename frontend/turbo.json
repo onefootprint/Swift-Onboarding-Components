@@ -45,6 +45,9 @@
     },
     "clean": {
       "cache": false
+    },
+    "set:dot-env": {
+      "cache": false
     }
   },
   "globalDependencies": ["$GITHUB_TOKEN", "tsconfig.json", ".env.*"]

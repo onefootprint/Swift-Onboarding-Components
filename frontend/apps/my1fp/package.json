@@ -11,7 +11,8 @@
     "test:watch": "jest --watch",
     "lint": "eslint src --fix",
     "typecheck": "yarn tsc --noEmit",
-    "clean": "rm -rf .turbo && rm -rf .next && rm -rf node_modules"
+    "clean": "rm -rf .turbo && rm -rf .next && rm -rf node_modules",
+    "set:dot-env": "vercel env pull"
   },
   "dependencies": {
     "@types/lodash": "^4.14.182",
