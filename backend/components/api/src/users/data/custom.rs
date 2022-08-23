@@ -37,12 +37,13 @@ pub async fn put(
     path: Path<FootprintUserId>,
     request: Json<PutCustomDataRequest>,
     tenant_auth: SecretTenantAuthContext,
+    insights: InsightHeaders,
 ) -> JsonApiResponse<EmptyResponse> {
     let footprint_user_id = path.into_inner();
     let tenant_id = tenant_auth.tenant().id.clone();
     let is_live = tenant_auth.is_live()?;
 
-    let (user_vault, _scoped_user) = state
+    let (user_vault, scoped_user) = state
         .db_pool
         .db_query(move |conn| UserVault::get_for_tenant(conn, &tenant_id, &footprint_user_id, is_live))
         .await??;
@@ -50,12 +51,21 @@ pub async fn put(
     let update = request.into_inner();
     let tenant_id = tenant_auth.tenant().id.clone();
 
-    // TODO: add updates to security log
-
     state
         .db_pool
         .db_transaction(move |conn| -> Result<_, ApiError> {
             let uvw = UserVaultWrapper::lock(conn, &user_vault.id)?;
+            // Create an AccessEvent log showing that the tenant updated these fields
+            NewAccessEvent {
+                scoped_user_id: scoped_user.id.clone(),
+                // TODO https://linear.app/footprint/issue/FP-1172/dont-require-a-reason-for-update-access-events
+                reason: "".to_owned(),
+                principal: Some(tenant_auth.format_principal()),
+                insight: CreateInsightEvent::from(insights),
+                kind: AccessEventKind::Update,
+                targets: update.keys().cloned().map(DataIdentifier::Custom).collect(),
+            }
+            .create(conn)?;
             uvw.update_custom_data(conn, tenant_id, update.into())?;
             Ok(())
         })

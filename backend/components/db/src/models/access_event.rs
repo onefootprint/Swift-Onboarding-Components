@@ -1,7 +1,7 @@
+use crate::schema::access_event;
 use crate::DbPool;
-use crate::{schema::access_event, DbError};
 use chrono::{DateTime, Utc};
-use diesel::{Connection, Insertable, Queryable, RunQueryDsl};
+use diesel::{Connection, Insertable, PgConnection, Queryable, RunQueryDsl};
 use newtypes::{AccessEventId, AccessEventKind, DataIdentifier, InsightEventId, ScopedUserId};
 use serde::{Deserialize, Serialize};
 
@@ -46,26 +46,26 @@ struct NewAccessEventWithInsight {
 
 impl NewAccessEvent {
     pub async fn save(self, pool: &DbPool) -> Result<(), crate::DbError> {
-        pool.db_query(move |conn| {
-            conn.transaction(|conn| -> Result<(), DbError> {
-                let insight_ev = self.insight.insert_with_conn(conn)?;
-                let event = NewAccessEventWithInsight {
-                    scoped_user_id: self.scoped_user_id,
-                    insight_event_id: insight_ev.id,
-                    reason: self.reason,
-                    principal: self.principal,
-                    kind: self.kind,
-                    targets: self.targets,
-                };
+        pool.db_query(move |conn| conn.transaction(|conn| self.create(conn)))
+            .await??;
+        Ok(())
+    }
 
-                diesel::insert_into(crate::schema::access_event::table)
-                    .values(event)
-                    .execute(conn)?;
+    pub fn create(self, conn: &mut PgConnection) -> Result<(), crate::DbError> {
+        let insight_ev = self.insight.insert_with_conn(conn)?;
+        let event = NewAccessEventWithInsight {
+            scoped_user_id: self.scoped_user_id,
+            insight_event_id: insight_ev.id,
+            reason: self.reason,
+            principal: self.principal,
+            kind: self.kind,
+            targets: self.targets,
+        };
 
-                Ok(())
-            })
-        })
-        .await??;
+        diesel::insert_into(crate::schema::access_event::table)
+            .values(event)
+            .execute(conn)?;
+
         Ok(())
     }
 }

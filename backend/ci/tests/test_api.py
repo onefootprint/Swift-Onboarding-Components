@@ -62,6 +62,19 @@ class TestNonPortableVaultApi:
         data = {"ach_account_number": "123467890", "cc4": "4242"}
         put(f"users/{fp_id}/data/custom", data, workos_sandbox_tenant.sk.key)
 
+        # verify access events created
+        body = get(
+            "users/access_events",
+            dict(footprint_user_id=fp_id),
+            workos_sandbox_tenant.sk.key,
+        )
+        access_events = body["data"]
+        assert access_events[0]["kind"] == "update"
+        assert set(access_events[0]["targets"]) == {
+            "custom.ach_account_number",
+            "custom.cc4",
+        }
+
         # check status of the data
         params = {"fields": "cc4,ach_account_number, insurance_id"}
         response = get(
