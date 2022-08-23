@@ -1,6 +1,6 @@
 use chrono::{DateTime, Utc};
 use db::access_event::{AccessEventListItemForTenant, AccessEventListItemForUser};
-use newtypes::{DataAttribute, FootprintUserId, TenantId};
+use newtypes::{AccessEventKind, DataAttribute, DataIdentifier, FootprintUserId, TenantId};
 use paperclip::actix::Apiv2Schema;
 
 use crate::types::insight_event::ApiInsightEvent;
@@ -15,6 +15,8 @@ pub struct ApiAccessEvent {
     pub timestamp: DateTime<Utc>,
     pub ordering_id: i64,
     pub insight_event: Option<ApiInsightEvent>,
+    pub kind: AccessEventKind,
+    pub targets: Vec<DataIdentifier>,
 }
 
 impl From<AccessEventListItemForTenant> for ApiAccessEvent {
@@ -34,6 +36,8 @@ impl From<AccessEventListItemForTenant> for ApiAccessEvent {
             timestamp: event.timestamp,
             ordering_id: event.ordering_id,
             insight_event: insight.map(ApiInsightEvent::from),
+            kind: event.kind,
+            targets: event.targets,
         }
     }
 }
@@ -55,6 +59,8 @@ impl From<AccessEventListItemForUser> for ApiAccessEvent {
             timestamp: event.timestamp,
             ordering_id: event.ordering_id,
             insight_event: None, // we don't want to expose tenant location to end user
+            kind: event.kind,
+            targets: event.targets,
         }
     }
 }

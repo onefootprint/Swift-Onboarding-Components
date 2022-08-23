@@ -12,7 +12,7 @@ use db::models::access_event::NewAccessEvent;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::user_vault::UserVault;
-use newtypes::{DataAttribute, FootprintUserId, PiiString};
+use newtypes::{AccessEventKind, DataAttribute, DataIdentifier, FootprintUserId, PiiString};
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 use std::collections::{HashMap, HashSet};
 
@@ -116,6 +116,8 @@ async fn post_inner(
         reason,
         principal: Some(auth.format_principal()),
         insight: CreateInsightEvent::from(insights),
+        kind: AccessEventKind::Decrypt,
+        targets: DataIdentifier::list(decrypted_data_attributes.clone()),
     }
     .save(&state.db_pool)
     .await?;

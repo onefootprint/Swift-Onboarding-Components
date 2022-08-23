@@ -20,7 +20,9 @@ use db::models::insight_event::CreateInsightEvent;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::user_vault::UserVault;
 use newtypes::csv::Csv;
-use newtypes::{flat_api_object_map_type, DataAttribute, FootprintUserId, PiiString};
+use newtypes::{
+    flat_api_object_map_type, AccessEventKind, DataAttribute, DataIdentifier, FootprintUserId, PiiString,
+};
 
 use paperclip::actix::Apiv2Schema;
 use paperclip::actix::{api_v2_operation, post, web, web::Json, web::Path};
@@ -192,6 +194,8 @@ pub async fn post_decrypt(
         reason: request.reason,
         principal: Some(auth.format_principal()),
         insight: CreateInsightEvent::from(insights),
+        kind: AccessEventKind::Decrypt,
+        targets: DataIdentifier::list(decrypted_data_attributes.clone()),
     }
     .save(&state.db_pool)
     .await?;

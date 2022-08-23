@@ -100,19 +100,22 @@ class TestDashboard:
         access_events = body["data"]
         assert len(access_events) == len(FIELDS_TO_DECRYPT)
         for i, expected_fields in enumerate(FIELDS_TO_DECRYPT[-1:0]):
-            assert set(access_events[i]["data_kinds"]) == set(expected_fields)
+            expected_targets = [f"identity.{k}" for k in expected_fields]
+            access_events[i]["kind"] == "decrypt"
+            assert set(access_events[i]["targets"]) == set(expected_targets)
 
         # Test filtering on kinds. We provide two different kinds, and we should get all access events
         # that contain at least one of these fields
         params = dict(
             footprint_user_id=user.fp_user_id,
-            data_kinds=",".join(["email", "address_line1"]),
+            targets=",".join(["identity.email", "identity.address_line1"]),
+            kind="decrypt",
         )
         body = get("users/access_events", params, tenant.sk.key)
         access_events = body["data"]
         assert len(access_events) == 2
-        assert "email" in set(access_events[0]["data_kinds"])
-        assert "address_line1" in set(access_events[1]["data_kinds"])
+        assert "identity.email" in set(access_events[0]["targets"])
+        assert "identity.address_line1" in set(access_events[1]["targets"])
 
         # Test filtering on timestamp - if we filter for events in the future, there shouldn't be any
         params = dict(timestamp_gte=arrow.utcnow().shift(days=1).isoformat())
@@ -254,7 +257,9 @@ class TestDashboard:
 
     def test_portable_failed_data_write(self, user):
         data = dict(reason="test", fields=["first_name", "ssn9"])
-        body = post(f"users/{user.fp_user_id}/identity/decrypt", data, user.tenant.sk.key)
+        body = post(
+            f"users/{user.fp_user_id}/identity/decrypt", data, user.tenant.sk.key
+        )
         print(body)
         assert body["data"]["first_name"]
 

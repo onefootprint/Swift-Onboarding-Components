@@ -13,6 +13,8 @@ table! {
         principal -> Nullable<Varchar>,
         data_kinds -> Array<Text>,
         ordering_id -> Int8,
+        kind -> Text,
+        targets -> Array<Text>,
     }
 }
 

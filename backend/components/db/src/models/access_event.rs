@@ -2,7 +2,7 @@ use crate::DbPool;
 use crate::{schema::access_event, DbError};
 use chrono::{DateTime, Utc};
 use diesel::{Connection, Insertable, Queryable, RunQueryDsl};
-use newtypes::{AccessEventId, DataAttribute, InsightEventId, ScopedUserId};
+use newtypes::{AccessEventId, AccessEventKind, DataAttribute, DataIdentifier, InsightEventId, ScopedUserId};
 use serde::{Deserialize, Serialize};
 
 use super::insight_event::CreateInsightEvent;
@@ -20,6 +20,8 @@ pub struct AccessEvent {
     pub principal: Option<String>,
     pub data_kinds: Vec<DataAttribute>,
     pub ordering_id: i64,
+    pub kind: AccessEventKind,
+    pub targets: Vec<DataIdentifier>,
 }
 
 #[derive(Debug, Clone)]
@@ -29,6 +31,8 @@ pub struct NewAccessEvent {
     pub reason: String,
     pub principal: Option<String>,
     pub insight: CreateInsightEvent,
+    pub kind: AccessEventKind,
+    pub targets: Vec<DataIdentifier>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
@@ -39,6 +43,8 @@ struct NewAccessEventWithInsight {
     insight_event_id: InsightEventId,
     reason: String,
     principal: Option<String>,
+    kind: AccessEventKind,
+    targets: Vec<DataIdentifier>,
 }
 
 impl NewAccessEvent {
@@ -52,6 +58,8 @@ impl NewAccessEvent {
                     insight_event_id: insight_ev.id,
                     reason: self.reason,
                     principal: self.principal,
+                    kind: self.kind,
+                    targets: self.targets,
                 };
 
                 diesel::insert_into(crate::schema::access_event::table)

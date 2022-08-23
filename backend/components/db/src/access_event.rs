@@ -7,7 +7,9 @@ use crate::schema;
 use crate::DbPool;
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
+use newtypes::AccessEventKind;
 use newtypes::DataAttribute;
+use newtypes::DataIdentifier;
 use newtypes::FootprintUserId;
 use newtypes::TenantId;
 use newtypes::UserVaultId;
@@ -20,6 +22,8 @@ pub struct AccessEventListQueryParams {
     pub timestamp_lte: Option<DateTime<Utc>>,
     pub timestamp_gte: Option<DateTime<Utc>>,
     pub attributes: Vec<DataAttribute>,
+    pub kind: Option<AccessEventKind>,
+    pub targets: Vec<DataIdentifier>,
     pub is_live: bool,
 }
 
@@ -75,6 +79,14 @@ impl AccessEventListItemForTenant {
                         results.filter(schema::access_event::data_kinds.overlaps_with(params.attributes));
                 }
 
+                if let Some(kind) = params.kind {
+                    results = results.filter(schema::access_event::kind.eq(kind))
+                }
+
+                if !params.targets.is_empty() {
+                    results = results.filter(schema::access_event::targets.overlaps_with(params.targets));
+                }
+
                 if let Some(cursor) = cursor {
                     results = results.filter(schema::access_event::ordering_id.le(cursor));
                 }
@@ -111,24 +123,17 @@ impl AccessEventListItemForUser {
     pub async fn get(
         pool: &DbPool,
         user_vault_id: UserVaultId,
-        attribute: Option<DataAttribute>,
     ) -> Result<Vec<AccessEventListItemForUser>, DbError> {
         let result: Vec<(AccessEvent, ScopedUser, Tenant)> = pool
             .db_query(move |conn| {
-                let mut results = schema::access_event::table
+                schema::access_event::table
                     .inner_join(schema::scoped_user::table)
                     .inner_join(
                         schema::tenant::table.on(schema::tenant::id.eq(schema::scoped_user::tenant_id)),
                     )
                     .order_by(schema::access_event::timestamp.desc())
                     .filter(schema::scoped_user::user_vault_id.eq(user_vault_id))
-                    .into_boxed();
-
-                if let Some(attribute) = attribute {
-                    results = results.filter(schema::access_event::data_kinds.contains(vec![attribute]));
-                }
-
-                results.load(conn)
+                    .load(conn)
             })
             .await??;
 

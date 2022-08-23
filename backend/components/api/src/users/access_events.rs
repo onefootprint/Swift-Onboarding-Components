@@ -11,6 +11,8 @@ use crate::{auth::SessionContext, errors::ApiError};
 use chrono::{DateTime, Utc};
 use db::access_event::{AccessEventListItemForTenant, AccessEventListQueryParams};
 use newtypes::csv::deserialize_stringified_list;
+use newtypes::AccessEventKind;
+use newtypes::DataIdentifier;
 use newtypes::{DataAttribute, FootprintUserId};
 use paperclip::actix::{api_v2_operation, get, web, web::Json, Apiv2Schema};
 
@@ -21,6 +23,10 @@ struct AccessEventRequest {
     #[serde(default)]
     #[serde(deserialize_with = "deserialize_stringified_list")]
     data_kinds: Vec<DataAttribute>,
+    kind: Option<AccessEventKind>,
+    #[serde(default)]
+    #[serde(deserialize_with = "deserialize_stringified_list")]
+    targets: Vec<DataIdentifier>,
     search: Option<String>,
     timestamp_lte: Option<DateTime<Utc>>,
     timestamp_gte: Option<DateTime<Utc>>,
@@ -43,6 +49,8 @@ fn get(
     let AccessEventRequest {
         footprint_user_id,
         data_kinds,
+        kind,
+        targets,
         search,
         timestamp_lte,
         timestamp_gte,
@@ -55,6 +63,8 @@ fn get(
         search,
         timestamp_lte,
         timestamp_gte,
+        kind,
+        targets,
         attributes: data_kinds,
         is_live: auth.is_live()?,
     };
