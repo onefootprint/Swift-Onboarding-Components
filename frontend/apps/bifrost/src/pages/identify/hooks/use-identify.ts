@@ -14,12 +14,13 @@ export type IdentifyRequest = {
     phoneNumber?: string;
   };
   identifyType: IdentifyType;
-  preferredChallengeKind: ChallengeKind;
+  preferredChallengeKind?: ChallengeKind;
 };
 
 export type IdentifyResponse = {
   userFound: boolean;
   challengeData?: ChallengeData;
+  availableChallengeKinds?: ChallengeKind[];
 };
 
 type PrivateChallengeData = {
@@ -34,6 +35,7 @@ type PrivateChallengeData = {
 type PrivateIdentifyResponse = {
   userFound: boolean;
   challengeData?: PrivateChallengeData;
+  availableChallengeKinds?: ChallengeKind[];
 };
 
 const identifyRequest = async (payload: IdentifyRequest) => {
@@ -44,10 +46,11 @@ const identifyRequest = async (payload: IdentifyRequest) => {
     url: '/hosted/identify',
     data: payload,
   });
-  const { userFound, challengeData } = response.data;
+  const { userFound, challengeData, availableChallengeKinds } = response.data;
 
   return {
     userFound,
+    availableChallengeKinds,
     challengeData: challengeData
       ? {
           challengeToken: challengeData.challengeToken,

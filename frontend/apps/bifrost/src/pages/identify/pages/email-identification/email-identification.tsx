@@ -1,53 +1,154 @@
+import { useRequestErrorToast } from 'hooks';
 import React, { useState } from 'react';
+import useIdentify, {
+  IdentifyResponse,
+} from 'src/pages/identify/hooks/use-identify';
+import {
+  ChallengeData,
+  ChallengeKind,
+  Events,
+} from 'src/utils/state-machine/identify/types';
 import { UserData, UserDataAttribute } from 'src/utils/state-machine/types';
 
-import { ChallengeKind } from '../../../../utils/state-machine/identify/types';
+import generateLoginDeviceResponse from '../../../../utils/biometric/login-challenge-response';
 import useIdentifyMachine from '../../hooks/use-identify-machine';
+import useIdentifyVerify, {
+  IdentifyVerifyResponse,
+} from '../../hooks/use-identify-verify';
 import ChallengePicker from './components/challenge-picker';
 import EmailIdentificationForm from './components/email-identification-form';
 import EmailIdentificationHeader from './components/email-identification-header';
-import useEmailIdentify from './hooks/use-email-identify';
 
 type FormData = Required<Pick<UserData, UserDataAttribute.email>>;
 
 const EmailIdentification = () => {
-  const { identifyEmail, isLoading } = useEmailIdentify();
-  const [state] = useIdentifyMachine();
+  const identifyMutation = useIdentify();
+  const identifyVerifyMutation = useIdentifyVerify();
+
+  const showRequestErrorToast = useRequestErrorToast();
+  const [state, send] = useIdentifyMachine();
   const {
-    context: { device },
+    context: { device, identifyType },
   } = state;
 
-  const supportsBiometric =
+  const deviceSupportsWebauthn =
     device.hasSupportForWebauthn && device.type === 'mobile';
   const [challengePickerVisible, setChallengePickerVisible] = useState(false);
   const [formData, setFormData] = useState({ [UserDataAttribute.email]: '' });
+  const isLoading =
+    identifyMutation.isLoading || identifyVerifyMutation.isLoading;
+
+  const handleBiometricChallenge = async (challengeData: ChallengeData) => {
+    const { biometricChallengeJson, challengeToken } = challengeData;
+    // TODO: log this error if we din't get a biometricChallengeJson
+    // https://linear.app/footprint/issue/FP-196
+    if (!biometricChallengeJson) {
+      return;
+    }
+    const challengeResponse = await generateLoginDeviceResponse(
+      biometricChallengeJson,
+    );
+    identifyVerifyMutation.mutate(
+      { challengeResponse, challengeToken },
+      {
+        onSuccess: ({ authToken }: IdentifyVerifyResponse) => {
+          send({
+            type: Events.biometricLoginSucceeded,
+            payload: {
+              authToken,
+            },
+          });
+        },
+        onError: () => {
+          send({ type: Events.biometricLoginFailed });
+        },
+      },
+    );
+  };
+
+  const identifyWithChallenge = (
+    email: string,
+    preferredChallengeKind: ChallengeKind,
+  ) => {
+    identifyMutation.mutate(
+      {
+        identifier: { email },
+        preferredChallengeKind,
+        identifyType,
+      },
+      {
+        onSuccess({ userFound, challengeData }) {
+          send({
+            type: Events.emailIdentificationCompleted,
+            payload: {
+              userFound,
+              challengeData,
+              email,
+            },
+          });
+
+          if (challengeData?.challengeKind === ChallengeKind.biometric) {
+            handleBiometricChallenge(challengeData);
+          }
+        },
+        onError: showRequestErrorToast,
+      },
+    );
+  };
+
+  const onSubmit = (data: FormData) => {
+    setFormData(data);
+
+    identifyMutation.mutate(
+      { identifier: { email: data.email }, identifyType },
+      {
+        onSuccess({ userFound, availableChallengeKinds }: IdentifyResponse) {
+          if (!userFound) {
+            send({
+              type: Events.emailIdentificationCompleted,
+              payload: {
+                userFound,
+                email: data.email,
+              },
+            });
+            return;
+          }
+
+          // Device doesn't support biometrics or the user account doesn't have biometric creds registered:
+          // No need to show the challenge picker, just initiate phone challenge
+          const biometricChallengeAllowed = availableChallengeKinds
+            ? availableChallengeKinds.includes(ChallengeKind.biometric)
+            : false;
+          if (!deviceSupportsWebauthn || !biometricChallengeAllowed) {
+            identifyWithChallenge(data.email, ChallengeKind.sms);
+            return;
+          }
+
+          // We need to ask the user what challenge kind they prefer
+          setChallengePickerVisible(true);
+        },
+        onError: showRequestErrorToast,
+      },
+    );
+  };
 
   const handleSelectSms = () => {
-    identifyEmail(formData.email, ChallengeKind.sms);
+    identifyWithChallenge(formData.email, ChallengeKind.sms);
   };
 
   const handleSelectBiometric = () => {
-    identifyEmail(formData.email, ChallengeKind.biometric);
+    identifyWithChallenge(formData.email, ChallengeKind.biometric);
   };
 
   const handleChallengePickerClose = () => {
     setChallengePickerVisible(false);
   };
 
-  const onSubmit = (data: FormData) => {
-    setFormData(data);
-    if (supportsBiometric) {
-      setChallengePickerVisible(true);
-    } else {
-      identifyEmail(data.email, ChallengeKind.sms);
-    }
-  };
-
   return (
     <>
       <EmailIdentificationHeader />
-      <EmailIdentificationForm onSubmit={onSubmit} isLoading={isLoading()} />
-      {supportsBiometric && (
+      <EmailIdentificationForm onSubmit={onSubmit} isLoading={isLoading} />
+      {deviceSupportsWebauthn && (
         <ChallengePicker
           open={challengePickerVisible}
           onClose={handleChallengePickerClose}

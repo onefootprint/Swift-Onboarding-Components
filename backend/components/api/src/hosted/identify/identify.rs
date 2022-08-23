@@ -22,7 +22,7 @@ use webauthn_rs_proto::{RegisteredExtensions, UserVerificationPolicy};
 #[serde(rename_all = "snake_case")]
 pub struct IdentifyRequest {
     identifier: Identifier,
-    preferred_challenge_kind: ChallengeKind,
+    preferred_challenge_kind: Option<ChallengeKind>,
     identify_type: IdentifyType,
 }
 
@@ -38,6 +38,7 @@ pub enum Identifier {
 pub struct IdentifyResponse {
     user_found: bool,
     challenge_data: Option<UserChallengeData>,
+    available_challenge_kinds: Option<Vec<ChallengeKind>>,
 }
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Serialize)]
@@ -77,26 +78,49 @@ pub async fn handler(
                 data: IdentifyResponse {
                     user_found: false,
                     challenge_data: None,
+                    available_challenge_kinds: None,
                 },
             }));
         };
 
-    // The user vault exists. Extract the phone number for the user
-    let uvw = state
+    let (uvw, creds) = state
         .db_pool
-        .db_query(move |conn| UserVaultWrapper::build(conn, existing_user))
+        .db_query(move |conn| -> Result<_, ApiError> {
+            let uvw = UserVaultWrapper::build(conn, existing_user)?;
+            let creds = WebauthnCredential::get_for_user_vault(conn, &uvw.user_vault.id)?;
+            Ok((uvw, creds))
+        })
         .await??;
+
+    let mut kinds: Vec<ChallengeKind> = Vec::new();
+    if uvw.phone_number.is_some() {
+        kinds.push(ChallengeKind::Sms);
+    }
+    if !creds.is_empty() {
+        kinds.push(ChallengeKind::Biometric);
+    }
+    let available_challenge_kinds: Option<Vec<ChallengeKind>> = Some(kinds);
+
+    // The user vault exists, return early if no challenge is requested
+    let preferred_challenge_kind = if let Some(kind) = preferred_challenge_kind {
+        kind
+    } else {
+        return Ok(Json(ApiResponseData {
+            data: IdentifyResponse {
+                user_found: true,
+                challenge_data: None,
+                available_challenge_kinds,
+            },
+        }));
+    };
+
+    // If we need to create a challenge, extract the phone number for the user
     let validated_phone_number = uvw.get_decrypted_primary_phone(&state).await?;
 
     // Initiate the challenge of the requested type
     let (challenge_kind, challenge_state_data, time_before_retry_s, biometric_challenge_json) =
         match preferred_challenge_kind {
             ChallengeKind::Biometric => {
-                let user_id = uvw.user_vault.id.clone();
-                let creds = state
-                    .db_pool
-                    .db_query(move |conn| WebauthnCredential::get_for_user_vault(conn, &user_id))
-                    .await??;
                 if !creds.is_empty() {
                     let challenge =
                         initiate_biometric_challenge_for_user(&state, &uvw.user_vault.id, creds).await?;
@@ -146,6 +170,7 @@ pub async fn handler(
     Ok(Json(ApiResponseData {
         data: IdentifyResponse {
             user_found: true,
+            available_challenge_kinds,
             challenge_data: Some(UserChallengeData {
                 challenge_kind,
                 challenge_token,

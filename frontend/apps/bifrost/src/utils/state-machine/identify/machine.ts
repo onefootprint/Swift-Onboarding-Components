@@ -32,11 +32,7 @@ const createIdentifyMachine = ({ identifyType, device }: IdentifyMachineArgs) =>
             [Events.emailIdentificationCompleted]: [
               {
                 target: States.phoneRegistration,
-                actions: [
-                  Actions.assignEmail,
-                  Actions.assignUserFound,
-                  Actions.assignChallenge,
-                ],
+                actions: [Actions.assignEmail, Actions.assignUserFound],
                 cond: (context, event) => !event.payload.userFound,
               },
               {

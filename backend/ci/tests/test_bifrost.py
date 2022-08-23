@@ -89,6 +89,7 @@ class TestBifrost:
         body = post("hosted/identify", data)
         assert not body["data"]["user_found"]
         assert not body["data"].get("challenge_data", dict())
+        assert not body["data"]["available_challenge_kinds"]
 
     def test_onboarding_init(self, workos_tenant, auth_token):
         body = post("hosted/onboarding", None, workos_tenant.ob_config.key, auth_token)
@@ -254,6 +255,10 @@ class TestBifrost:
         )
         body = post("hosted/identify", data)
         assert body["data"]["user_found"]
+        assert set(body["data"]["available_challenge_kinds"]) == {
+            "sms",
+            "biometric"
+        }
         assert (
             body["data"]["challenge_data"]["phone_number_last_two"] == PHONE_NUMBER[-2:]
         )
@@ -293,6 +298,23 @@ class TestBifrost:
         }
         body = post("hosted/identify/verify", data)
         assert body["data"]["kind"] == "user_inherited"
+
+    def test_identify_login_repeat_customer_no_challenge(self, auth_token):
+        # Not used in test, but want to make sure the user has been created before running this test
+        auth_token
+        # Identify the user by email
+        identifier = {"email": EMAIL}
+        data = dict(
+            identifier=identifier,
+            identify_type="onboarding",
+        )
+        body = post("hosted/identify", data)
+        assert body["data"]["user_found"]
+        assert not body["data"]["challenge_data"]
+        assert set(body["data"]["available_challenge_kinds"]) == {
+            "sms",
+            "biometric"
+        }
 
     def test_identify_repeat_customer(self, foo_tenant, bar_tenant, twilio, auth_token):
         # Not used in test, but want to make sure the user has been created before running this test
