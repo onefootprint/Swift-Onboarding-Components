@@ -24,7 +24,6 @@ pub struct LivenessCheckInfo {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct VerificationInfo {
-    #[serde(alias = "data_kinds")]
     pub data_attributes: Vec<DataAttribute>,
     pub vendor: Vendor,
 }
