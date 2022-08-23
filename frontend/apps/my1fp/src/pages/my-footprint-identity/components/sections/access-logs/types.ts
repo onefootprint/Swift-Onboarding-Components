@@ -16,7 +16,7 @@ export enum DataKinds {
   country = 'country',
 }
 
-export const dataKindToDisplayName: Record<DataKinds, String> = {
+export const dataKindToDisplayName: Record<string, String> = {
   [DataKinds.firstName]: 'First name',
   [DataKinds.lastName]: 'Last name',
   [DataKinds.email]: 'Email',
@@ -32,8 +32,14 @@ export const dataKindToDisplayName: Record<DataKinds, String> = {
   [DataKinds.country]: 'Country',
 };
 
+export enum AccessLogKind {
+  Decrypt = 'decrypt',
+  Update = 'update',
+}
+
 export type AccessLog = {
-  dataKinds: DataKinds[];
+  targets: string[];
+  kind: AccessLogKind;
   fpUserId: string;
   reason: string;
   tenantId: string;

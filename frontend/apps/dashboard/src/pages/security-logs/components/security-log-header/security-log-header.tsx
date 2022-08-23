@@ -10,8 +10,8 @@ type SecurityLogHeaderProps = {
 
 const SecurityLogHeader = ({ accessEvent }: SecurityLogHeaderProps) => (
   <Typography variant="body-3">
-    <FieldTagList dataKinds={accessEvent.dataKinds} />{' '}
-    {accessEvent.dataKinds.length > 1 ? 'were' : 'was'} accessed by{' '}
+    <FieldTagList targets={accessEvent.targets} />{' '}
+    {accessEvent.targets.length > 1 ? 'were' : 'was'} accessed by{' '}
     {accessEvent.principal || 'an automated process'}
   </Typography>
 );

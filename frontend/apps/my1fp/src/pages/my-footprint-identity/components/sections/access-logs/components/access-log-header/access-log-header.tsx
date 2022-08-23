@@ -17,8 +17,8 @@ const AccessLogHeader = ({ accessLog }: AccessLogHeaderProps) => {
   return (
     <Container>
       <Typography variant="body-3">
-        <FieldTagList dataKinds={accessLog.dataKinds} />{' '}
-        {accessLog.dataKinds.length > 1
+        <FieldTagList targets={accessLog.targets} />{' '}
+        {accessLog.targets.length > 1
           ? t('plural-kinds-accessed-by')
           : t('singular-kind-accessed-by')}{' '}
         <Typography variant="label-3" as="span">

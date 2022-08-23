@@ -1,8 +1,13 @@
-import { DataKinds } from './data-kind';
 import { InsightEvent } from './insight-event';
 
+export enum AccessEventKind {
+  Decrypt = 'decrypt',
+  Update = 'update',
+}
+
 export type AccessEvent = {
-  dataKinds: DataKinds[];
+  targets: string[];
+  kind: AccessEventKind;
   fpUserId: string;
   reason: string;
   tenantId: string;

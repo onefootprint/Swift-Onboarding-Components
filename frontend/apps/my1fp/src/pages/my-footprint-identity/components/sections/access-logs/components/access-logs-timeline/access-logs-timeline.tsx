@@ -16,7 +16,7 @@ const AccessLogsTimeline = ({ accessLogs }: AccessLogsTimelineProps) => (
       <AccessLogContainer
         key={`${accessLog.timestamp}-${accessLog.fpUserId}-${
           accessLog.tenantId
-        }-${accessLog.principal}-${accessLog.dataKinds.join('-')}`}
+        }-${accessLog.principal}-${accessLog.targets.join('-')}`}
       >
         <Connector>
           <Box

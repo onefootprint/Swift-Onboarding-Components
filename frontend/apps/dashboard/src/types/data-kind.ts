@@ -47,13 +47,13 @@ export const ALL_FIELDS: DataKind[] = [
   'state',
 ];
 
-export const dataKindToDisplayName: Record<DataKinds, String> = {
+export const dataKindToDisplayName: Record<string, String> = {
   [DataKinds.firstName]: 'First name',
   [DataKinds.lastName]: 'Last name',
   [DataKinds.email]: 'Email',
   [DataKinds.phoneNumber]: 'Phone number',
-  [DataKinds.ssn9]: 'SSN',
-  [DataKinds.ssn4]: 'SSN last four',
+  [DataKinds.ssn9]: 'SSN (Full)',
+  [DataKinds.ssn4]: 'SSN (Last 4)',
   [DataKinds.dob]: 'Date of birth',
   [DataKinds.addressLine1]: 'Address line 1',
   [DataKinds.addressLine2]: 'Address line 2',

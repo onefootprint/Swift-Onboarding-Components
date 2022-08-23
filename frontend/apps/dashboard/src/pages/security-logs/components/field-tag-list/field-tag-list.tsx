@@ -1,20 +1,34 @@
 import React from 'react';
-import { DataKinds, dataKindToDisplayName } from 'src/types';
+import { dataKindToDisplayName } from 'src/types';
 import { Tag } from 'ui';
 
 type FieldTagListProps = {
-  dataKinds: DataKinds[];
+  targets: string[];
 };
 
-const FieldTagList = ({ dataKinds }: FieldTagListProps) => (
+const FieldTagList = ({ targets }: FieldTagListProps) => (
   <>
-    {dataKinds.map((dataKind: DataKinds, i: number) => (
-      // eslint-disable-next-line react/no-array-index-key
-      <span key={`${dataKind}-${i}`}>
-        <Tag>{dataKindToDisplayName[dataKind]}</Tag>
-        {i !== dataKinds.length - 1 && <span>, </span>}
-      </span>
-    ))}
+    {targets.map((target: string, i: number) => {
+      const parts = target.split('.');
+      const prefix = parts[0];
+      let text;
+      if (prefix === 'identity') {
+        const dataAttribute = parts[parts.length - 1];
+        text = dataKindToDisplayName[dataAttribute];
+      } else if (prefix === 'custom') {
+        // TODO better formatting for custom data tags
+        text = target;
+      } else {
+        text = target;
+      }
+      return (
+        // eslint-disable-next-line react/no-array-index-key
+        <span key={`${target}-${i}`}>
+          <Tag>{text}</Tag>
+          {i !== targets.length - 1 && <span>, </span>}
+        </span>
+      );
+    })}
   </>
 );
 

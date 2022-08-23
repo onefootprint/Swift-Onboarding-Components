@@ -22,10 +22,13 @@ const getAccessEventsRequest = async ({
 }: QueryFunctionContext<QueryKey, string>) => {
   const [, filters, authHeaders] = queryKey as AccessEventQueryKey;
   const dateRangeFilters = dateRangeToFilterParams(filters);
+  // Map the selected data kinds to the targets expected by the backend
+  const targets = filters.dataKinds?.split(',').map(kind => `identity.${kind}`);
   // Join filter request args with the pageParam
   const params = {
     ...filters,
     ...dateRangeFilters,
+    targets,
     cursor: pageParam,
   };
   const { data: response } = await request<
