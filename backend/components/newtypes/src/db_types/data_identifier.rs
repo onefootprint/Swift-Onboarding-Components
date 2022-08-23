@@ -2,15 +2,14 @@ use std::str::FromStr;
 
 pub use derive_more::Display;
 use diesel::{pg::Pg, sql_types::Text, AsExpression, FromSqlRow};
-use paperclip::actix::Apiv2Schema;
 use strum_macros::{AsRefStr, EnumDiscriminants};
 use thiserror::Error;
 
-use crate::{DataAttribute, KvDataKey};
+use crate::{api_schema_helper::string_api_data_type_alias, DataAttribute, KvDataKey};
 
 /// Identifies a piece of data for a user vault
 #[derive(
-    Debug, Eq, PartialEq, Hash, Clone, Apiv2Schema, AsExpression, FromSqlRow, AsRefStr, EnumDiscriminants,
+    Debug, Eq, PartialEq, Ord, PartialOrd, Hash, Clone, AsExpression, FromSqlRow, AsRefStr, EnumDiscriminants,
 )]
 #[strum_discriminants(derive(strum_macros::EnumString), strum(serialize_all = "snake_case"))]
 #[strum(serialize_all = "snake_case")]
@@ -19,6 +18,8 @@ pub enum DataIdentifier {
     Identity(DataAttribute),
     Custom(KvDataKey),
 }
+
+string_api_data_type_alias!(DataIdentifier);
 
 #[derive(Debug, Error)]
 pub enum Error {
@@ -106,17 +107,17 @@ mod tests {
 
     #[test_case(DataIdentifier::Identity(DataAttribute::PhoneNumber) => "identity.phone_number")]
     #[test_case(DataIdentifier::Identity(DataAttribute::Email) => "identity.email")]
-    #[test_case(DataIdentifier::Custom(KvDataKey::from_str("flerp").unwrap()) => "custom.flerp")]
-    #[test_case(DataIdentifier::Custom(KvDataKey::from_str("hello.today.there.").unwrap()) => "custom.hello.today.there.")]
+    #[test_case(DataIdentifier::Custom(KvDataKey::escape_hatch("flerp".to_owned())) => "custom.flerp")]
+    #[test_case(DataIdentifier::Custom(KvDataKey::escape_hatch("hello.today.there.".to_owned())) => "custom.hello.today.there.")]
     fn test_to_string(identifier: DataIdentifier) -> String {
         identifier.to_string()
     }
 
     #[test_case("identity.phone_number" => DataIdentifier::Identity(DataAttribute::PhoneNumber))]
     #[test_case("identity.email" => DataIdentifier::Identity(DataAttribute::Email))]
-    #[test_case("custom.flerp" => DataIdentifier::Custom(KvDataKey::from_str("flerp").unwrap()))]
-    #[test_case("custom.hello.today.there." => DataIdentifier::Custom(KvDataKey::from_str("hello.today.there.").unwrap()))]
-    #[test_case("custom." => DataIdentifier::Custom(KvDataKey::from_str("").unwrap()))]
+    #[test_case("custom.flerp" => DataIdentifier::Custom(KvDataKey::escape_hatch("flerp".to_owned())))]
+    #[test_case("custom.hello.today.there." => DataIdentifier::Custom(KvDataKey::escape_hatch("hello.today.there.".to_owned())))]
+    #[test_case("custom." => DataIdentifier::Custom(KvDataKey::escape_hatch("".to_owned())))]
     fn test_from_str(input: &str) -> DataIdentifier {
         DataIdentifier::from_str(input).unwrap()
     }

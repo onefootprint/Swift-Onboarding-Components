@@ -3,8 +3,11 @@
 use std::collections::{HashMap, HashSet};
 
 use crate::auth::key_context::secret_key::SecretTenantAuthContext;
-use crate::auth::{HasTenant, IsLive, Principal};
+use crate::auth::session_data::workos::WorkOs;
+use crate::auth::Principal;
+use crate::auth::{Either, HasTenant, IsLive, SessionContext};
 
+use crate::errors::ApiResult;
 use crate::types::{ApiResponseData, EmptyResponse, JsonApiResponse};
 
 use crate::utils::insight_headers::InsightHeaders;
@@ -14,14 +17,16 @@ use crate::{errors::ApiError, State};
 use db::models::access_event::NewAccessEvent;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::kv_data::KeyValueData;
+use db::models::scoped_user::ScopedUser;
 use db::models::user_vault::UserVault;
+use db::PgConnection;
 use newtypes::csv::Csv;
 use newtypes::{
     flat_api_object_map_type, AccessEventKind, DataIdentifier, FootprintUserId, KvDataKey, PiiString,
 };
 
+use paperclip::actix::Apiv2Schema;
 use paperclip::actix::{api_v2_operation, web, web::Json, web::Path, web::Query};
-use paperclip::actix::{post, Apiv2Schema};
 use serde::{Deserialize, Serialize};
 
 flat_api_object_map_type!(
@@ -42,36 +47,44 @@ pub async fn put(
     let footprint_user_id = path.into_inner();
     let tenant_id = tenant_auth.tenant().id.clone();
     let is_live = tenant_auth.is_live()?;
-
-    let (user_vault, scoped_user) = state
-        .db_pool
-        .db_query(move |conn| UserVault::get_for_tenant(conn, &tenant_id, &footprint_user_id, is_live))
-        .await??;
-
     let update = request.into_inner();
-    let tenant_id = tenant_auth.tenant().id.clone();
+    let insight = CreateInsightEvent::from(insights);
 
     state
         .db_pool
         .db_transaction(move |conn| -> Result<_, ApiError> {
-            let uvw = UserVaultWrapper::lock(conn, &user_vault.id)?;
-            // Create an AccessEvent log showing that the tenant updated these fields
-            NewAccessEvent {
-                scoped_user_id: scoped_user.id.clone(),
-                // TODO https://linear.app/footprint/issue/FP-1172/dont-require-a-reason-for-update-access-events
-                reason: "".to_owned(),
-                principal: Some(tenant_auth.format_principal()),
-                insight: CreateInsightEvent::from(insights),
-                kind: AccessEventKind::Update,
-                targets: update.keys().cloned().map(DataIdentifier::Custom).collect(),
-            }
-            .create(conn)?;
-            uvw.update_custom_data(conn, tenant_id, update.into())?;
+            let (user_vault, scoped_user) =
+                UserVault::get_for_tenant(conn, &tenant_id, &footprint_user_id, is_live)?;
+            let mut uvw = UserVaultWrapper::lock(conn, &user_vault.id)?;
+            put_internal(conn, &mut uvw, &tenant_auth, &scoped_user, insight, update)?;
             Ok(())
         })
         .await?;
 
     ApiResponseData::ok(EmptyResponse).json()
+}
+
+pub fn put_internal(
+    conn: &mut PgConnection,
+    uvw: &mut UserVaultWrapper,
+    tenant_auth: &SecretTenantAuthContext,
+    scoped_user: &ScopedUser,
+    insight: CreateInsightEvent,
+    update: PutCustomDataRequest,
+) -> ApiResult<()> {
+    // Create an AccessEvent log showing that the tenant updated these fields
+    NewAccessEvent {
+        scoped_user_id: scoped_user.id.clone(),
+        // TODO https://linear.app/footprint/issue/FP-1172/dont-require-a-reason-for-update-access-events
+        reason: "".to_owned(),
+        principal: Some(tenant_auth.format_principal()),
+        insight,
+        kind: AccessEventKind::Update,
+        targets: update.keys().cloned().map(DataIdentifier::Custom).collect(),
+    }
+    .create(conn)?;
+    uvw.update_custom_data(conn, tenant_auth.tenant().id.clone(), update.into())?;
+    Ok(())
 }
 
 /**
@@ -81,7 +94,7 @@ pub async fn put(
 pub struct FieldsParams {
     /// Comma separated list of fields to check
     #[openapi(example = "ach_account_number,cc_last_4")]
-    fields: Csv<KvDataKey>,
+    pub fields: Csv<KvDataKey>,
 }
 
 flat_api_object_map_type!(
@@ -131,10 +144,10 @@ pub async fn get(
 #[derive(Debug, Serialize, Deserialize, Apiv2Schema)]
 pub struct DecryptCustomFieldsRequest {
     /// attributes to decrypt
-    fields: Vec<KvDataKey>,
+    pub fields: Vec<KvDataKey>,
 
     /// reason for the data decryption
-    reason: String,
+    pub reason: String,
 }
 
 flat_api_object_map_type!(
@@ -145,12 +158,11 @@ flat_api_object_map_type!(
 
 /// decrypt custom data
 #[api_v2_operation(tags(PublicApi))]
-#[post("/custom/decrypt")]
 pub async fn post_decrypt(
     state: web::Data<State>,
     path: Path<FootprintUserId>,
     request: Json<DecryptCustomFieldsRequest>,
-    tenant_auth: SecretTenantAuthContext,
+    tenant_auth: Either<SessionContext<WorkOs>, SecretTenantAuthContext>,
     insights: InsightHeaders,
 ) -> JsonApiResponse<DecryptCustomDataResponse> {
     let footprint_user_id = path.into_inner();

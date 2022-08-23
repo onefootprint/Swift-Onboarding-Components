@@ -86,23 +86,16 @@ impl ObConfiguration {
         Ok(count)
     }
 
-    pub async fn list_for_scoped_user(
-        pool: &DbPool,
+    pub fn list_for_scoped_user(
+        conn: &mut PgConnection,
         scoped_user_id: ScopedUserId,
     ) -> Result<Vec<ObConfiguration>, crate::DbError> {
-        let id = pool
-            .db_query(move |conn| -> Result<Vec<ObConfiguration>, crate::DbError> {
-                let obcs = ob_configuration::table
-                    .inner_join(onboarding::table)
-                    .filter(onboarding::scoped_user_id.eq(scoped_user_id))
-                    // TODO filter on active onboardings
-                    // https://linear.app/footprint/issue/FP-644/move-insight-event-id-status-onto-onboardinglink
-                    .select(ob_configuration::all_columns)
-                    .get_results(conn)?;
-                Ok(obcs)
-            })
-            .await??;
-        Ok(id)
+        let obcs = ob_configuration::table
+            .inner_join(onboarding::table)
+            .filter(onboarding::scoped_user_id.eq(scoped_user_id))
+            .select(ob_configuration::all_columns)
+            .get_results(conn)?;
+        Ok(obcs)
     }
 
     pub fn get_enabled(

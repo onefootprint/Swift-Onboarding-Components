@@ -1,13 +1,14 @@
 use db::models::fingerprint::IsUnique;
 use db::models::identity_data::{HasIdentityDataFields, IdentityData};
 use db::models::kv_data::{KeyValueData, NewKeyValueDataArgs};
+use db::models::scoped_user::ScopedUser;
 use enclave_proxy::DataTransform;
 
 use db::models::email::Email;
 use newtypes::email::Email as NewtypeEmail;
 use paperclip::actix::Apiv2Schema;
 
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::marker::PhantomData;
 
 use db::models::ob_configuration::ObConfiguration;
@@ -237,6 +238,34 @@ impl UserVaultWrapper {
             .collect::<Result<Vec<_>, ApiError>>()?;
 
         KeyValueData::update_or_insert(conn, self.user_vault.id.clone(), tenant_id, update)?;
+        Ok(())
+    }
+}
+
+impl UserVaultWrapper {
+    /// if the vault is PORTABLE: check permissions on the scoped user onboarding configuration
+    /// don't allow the tenant to know if data is set without having permission for the the value
+    pub fn ensure_scope_allows_access(
+        &self,
+        conn: &mut PgConnection,
+        scoped_user: &ScopedUser,
+        fields: HashSet<DataAttribute>,
+    ) -> ApiResult<()> {
+        // tenant's can do what they wish with NON-portable vaults they own
+        if !self.user_vault.is_portable {
+            return Ok(());
+        }
+
+        let ob_configs = ObConfiguration::list_for_scoped_user(conn, scoped_user.id.clone())?;
+        let can_access_kinds: HashSet<_> = ob_configs
+            .into_iter()
+            .flat_map(|x| x.can_access_data)
+            .flat_map(|x| x.attributes())
+            .collect();
+        if !can_access_kinds.is_superset(&fields) {
+            return Err(crate::auth::AuthError::UnauthorizedOperation.into());
+        }
+
         Ok(())
     }
 }

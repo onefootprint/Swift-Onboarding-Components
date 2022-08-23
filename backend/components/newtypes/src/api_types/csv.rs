@@ -1,3 +1,4 @@
+use crate::DataIdentifier;
 use crate::{api_schema_helper::string_api_data_type_alias, DataAttribute, KvDataKey};
 use derive_more::Deref;
 use serde::de::IntoDeserializer;
@@ -10,8 +11,19 @@ pub struct Csv<T>(#[serde(deserialize_with = "deserialize_stringified_list")] pu
 where
     T: DeserializeOwned;
 
+impl<T: DeserializeOwned> IntoIterator for Csv<T> {
+    type Item = T;
+
+    type IntoIter = std::vec::IntoIter<T>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.0.into_iter()
+    }
+}
+
 string_api_data_type_alias!(Csv<KvDataKey>);
 string_api_data_type_alias!(Csv<DataAttribute>);
+string_api_data_type_alias!(Csv<DataIdentifier>);
 
 /// serde_urlencoded, used by actix's web::Query, isn't very good at deserializing Vecs:
 /// https://github.com/nox/serde_urlencoded/issues/6

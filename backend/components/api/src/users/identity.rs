@@ -1,12 +1,13 @@
-//! Add data to a NON-portable user vault
+//! Add/get/decrypt identity data to a NON-portable user vault
 
 use std::collections::{HashMap, HashSet};
 
 use crate::auth::key_context::secret_key::SecretTenantAuthContext;
 use crate::auth::session_data::workos::WorkOs;
 use crate::auth::{AuthError, Either, HasTenant, IsLive, Principal, SessionContext};
+use crate::errors::ApiResult;
 use crate::hosted::user::DecryptFieldsResult;
-use crate::types::identity_data_request::IdentityDataRequest;
+use crate::types::identity_data_request::{ComputedFingerprints, IdentityDataRequest, IdentityDataUpdate};
 use crate::types::{ApiResponseData, EmptyResponse, JsonApiResponse};
 
 use crate::utils::insight_headers::InsightHeaders;
@@ -17,7 +18,9 @@ use actix_web::web::Query;
 use db::models::access_event::NewAccessEvent;
 use db::models::identity_data::HasIdentityDataFields;
 use db::models::insight_event::CreateInsightEvent;
-use db::models::ob_configuration::ObConfiguration;
+use db::PgConnection;
+
+use db::models::scoped_user::ScopedUser;
 use db::models::user_vault::UserVault;
 use newtypes::csv::Csv;
 use newtypes::{
@@ -25,7 +28,7 @@ use newtypes::{
 };
 
 use paperclip::actix::Apiv2Schema;
-use paperclip::actix::{api_v2_operation, post, web, web::Json, web::Path};
+use paperclip::actix::{api_v2_operation, web, web::Json, web::Path};
 use serde::{Deserialize, Serialize};
 
 /**
@@ -38,6 +41,7 @@ pub async fn put(
     path: Path<FootprintUserId>,
     request: Json<IdentityDataRequest>,
     tenant_auth: SecretTenantAuthContext,
+    insight: InsightHeaders,
 ) -> JsonApiResponse<EmptyResponse> {
     let footprint_user_id = path.into_inner();
     let tenant_id = tenant_auth.tenant().id.clone();
@@ -45,23 +49,60 @@ pub async fn put(
     let request = request.into_inner();
     let fingerprints = request.fingerprints(&state).await?;
     let update = request.update;
+    let insight = CreateInsightEvent::from(insight);
 
-    // TODO: add updates to security log
-
-    let _uvw = state
+    state
         .db_pool
-        .db_transaction(move |conn| -> Result<_, ApiError> {
-            let (user_vault, _) = UserVault::get_for_tenant(conn, &tenant_id, &footprint_user_id, is_live)?;
+        .db_transaction(move |conn| -> Result<(), ApiError> {
+            let (user_vault, scoped_user) =
+                UserVault::get_for_tenant(conn, &tenant_id, &footprint_user_id, is_live)?;
             let mut uvw = UserVaultWrapper::lock(conn, &user_vault.id)?;
-            if user_vault.is_portable {
-                return Err(AuthError::CannotModifyPortableUser.into());
-            }
-            uvw.update_identity_data(conn, update, fingerprints)?;
-            Ok(uvw)
+            put_internal(
+                conn,
+                &mut uvw,
+                &tenant_auth,
+                &scoped_user,
+                insight,
+                update,
+                fingerprints,
+            )?;
+            Ok(())
         })
         .await?;
 
     ApiResponseData::ok(EmptyResponse).json()
+}
+
+pub fn put_internal(
+    conn: &mut PgConnection,
+    uvw: &mut UserVaultWrapper,
+    tenant_auth: &SecretTenantAuthContext,
+    scoped_user: &ScopedUser,
+    insight: CreateInsightEvent,
+    update: IdentityDataUpdate,
+    fingerprints: ComputedFingerprints,
+) -> ApiResult<()> {
+    if uvw.user_vault.is_portable {
+        return Err(AuthError::CannotModifyPortableUser.into());
+    }
+
+    // Create an AccessEvent log showing that the tenant updated these fields
+    NewAccessEvent {
+        scoped_user_id: scoped_user.id.clone(),
+        // TODO https://linear.app/footprint/issue/FP-1172/dont-require-a-reason-for-update-access-events
+        reason: "".to_owned(),
+        principal: Some(tenant_auth.format_principal()),
+        insight,
+        kind: AccessEventKind::Update,
+        targets: fingerprints
+            .iter()
+            .map(|fp| fp.0)
+            .map(DataIdentifier::Identity)
+            .collect(),
+    }
+    .create(conn)?;
+    uvw.update_identity_data(conn, update, fingerprints)?;
+    Ok(())
 }
 
 /**
@@ -72,7 +113,7 @@ pub async fn put(
 pub struct FieldsParams {
     /// Comma separated list of fields to check
     #[openapi(example = "last_name, dob, ssn9")]
-    fields: Csv<DataAttribute>,
+    pub fields: Csv<DataAttribute>,
 }
 
 flat_api_object_map_type!(
@@ -94,31 +135,19 @@ pub async fn get(
     let is_live = tenant_auth.is_live()?;
     let fields = HashSet::from_iter(request.into_inner().fields.0);
 
-    let (uvw, scoped_user) = state
+    let fields_clone = fields.clone();
+    let uvw = state
         .db_pool
         .db_query(move |conn| -> Result<_, ApiError> {
             let (user_vault, scoped_user) =
                 UserVault::get_for_tenant(conn, &tenant_id, &footprint_user_id, is_live)?;
 
             let user_vault_wrapper = UserVaultWrapper::build(conn, user_vault)?;
-            Ok((user_vault_wrapper, scoped_user))
+            user_vault_wrapper.ensure_scope_allows_access(conn, &scoped_user, fields_clone)?;
+
+            Ok(user_vault_wrapper)
         })
         .await??;
-
-    // if the vault is PORTABLE: check permissions on the scoped user onboarding configuration
-    // don't allow the tenant to know if data is set without having permission for the the value
-    if uvw.user_vault.is_portable {
-        let ob_configs =
-            ObConfiguration::list_for_scoped_user(&state.db_pool, scoped_user.id.clone()).await?;
-        let can_access_kinds: HashSet<_> = ob_configs
-            .into_iter()
-            .flat_map(|x| x.can_access_data)
-            .flat_map(|x| x.attributes())
-            .collect();
-        if !can_access_kinds.is_superset(&fields) {
-            return Err(AuthError::UnauthorizedOperation.into());
-        }
-    }
 
     let output = HashMap::from_iter(fields.into_iter().map(|field| {
         let exists = uvw.has_field(field);
@@ -134,10 +163,10 @@ pub async fn get(
 #[derive(Debug, Serialize, Deserialize, Apiv2Schema)]
 pub struct DecryptIdentityFieldsRequest {
     /// attributes to decrypt
-    fields: HashSet<DataAttribute>,
+    pub fields: HashSet<DataAttribute>,
 
     /// reason for the data decryption
-    reason: String,
+    pub reason: String,
 }
 
 flat_api_object_map_type!(
@@ -148,7 +177,6 @@ flat_api_object_map_type!(
 
 /// decrypt custom data
 #[api_v2_operation(tags(PublicApi))]
-#[post("/identity/decrypt")]
 pub async fn post_decrypt(
     state: web::Data<State>,
     path: Path<FootprintUserId>,
@@ -160,32 +188,27 @@ pub async fn post_decrypt(
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
 
-    let (vault, scoped_user) = state
-        .db_pool
-        .db_query(move |conn| UserVault::get_for_tenant(conn, &tenant_id, &footprint_user_id, is_live))
-        .await??;
-
     let request = request.into_inner();
     let fields = request.fields;
 
-    // if the vault is PORTABLE: check permissions on the scoped user onboarding configuration
-    if vault.is_portable {
-        let ob_configs =
-            ObConfiguration::list_for_scoped_user(&state.db_pool, scoped_user.id.clone()).await?;
-        let can_access_kinds: HashSet<_> = ob_configs
-            .into_iter()
-            .flat_map(|x| x.can_access_data)
-            .flat_map(|x| x.attributes())
-            .collect();
-        if !can_access_kinds.is_superset(&fields) {
-            return Err(AuthError::UnauthorizedOperation.into());
-        }
-    }
+    let fields_clone = fields.clone();
+    let (uvw, scoped_user) = state
+        .db_pool
+        .db_query(move |conn| -> Result<_, ApiError> {
+            let (user_vault, scoped_user) =
+                UserVault::get_for_tenant(conn, &tenant_id, &footprint_user_id, is_live)?;
+
+            let user_vault_wrapper = UserVaultWrapper::build(conn, user_vault)?;
+            user_vault_wrapper.ensure_scope_allows_access(conn, &scoped_user, fields_clone)?;
+
+            Ok((user_vault_wrapper, scoped_user))
+        })
+        .await??;
 
     let DecryptFieldsResult {
         decrypted_data_attributes,
         result_map,
-    } = crate::hosted::user::decrypt(&state, vault, fields.into_iter().collect()).await?;
+    } = crate::hosted::user::decrypt(&state, uvw.user_vault, fields.into_iter().collect()).await?;
 
     // Create an AccessEvent log showing that the tenant accessed these fields
     NewAccessEvent {

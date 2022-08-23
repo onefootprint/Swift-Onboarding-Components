@@ -1,53 +1,22 @@
 use crate::auth::key_context::secret_key::SecretTenantAuthContext;
 use crate::auth::session_data::workos::WorkOs;
-use crate::auth::{AuthError, IsLive};
+use crate::auth::IsLive;
 use crate::auth::{Either, Principal};
 use crate::auth::{HasTenant, SessionContext};
 use crate::errors::ApiError;
 use crate::hosted::user::{decrypt, DecryptFieldsResult};
 use crate::types::response::ApiResponseData;
 use crate::utils::insight_headers::InsightHeaders;
+use crate::utils::user_vault_wrapper::UserVaultWrapper;
 use crate::State;
 use db::models::access_event::NewAccessEvent;
 use db::models::insight_event::CreateInsightEvent;
-use db::models::ob_configuration::ObConfiguration;
 use db::models::user_vault::UserVault;
 use newtypes::{AccessEventKind, DataAttribute, DataIdentifier, FootprintUserId, PiiString};
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 use std::collections::{HashMap, HashSet};
 
-#[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize, Apiv2Schema)]
-#[serde(rename_all = "snake_case")]
-struct UserDecryptRequest2 {
-    attributes: HashSet<DataAttribute>,
-    reason: String,
-}
-
 type UserDecryptResponse = HashMap<DataAttribute, Option<PiiString>>;
-
-#[api_v2_operation(tags(PublicApi))]
-#[post("/{footprint_user_id}/decrypt")]
-async fn post2(
-    state: web::Data<State>,
-    auth: Either<SessionContext<WorkOs>, SecretTenantAuthContext>,
-    path: web::Path<FootprintUserId>,
-    request: Json<UserDecryptRequest2>,
-    insights: InsightHeaders,
-) -> actix_web::Result<Json<ApiResponseData<UserDecryptResponse>>, ApiError> {
-    let UserDecryptRequest2 { attributes, reason } = request.into_inner();
-
-    post_inner(
-        state,
-        auth,
-        Json(UserDecryptRequest {
-            footprint_user_id: path.into_inner(),
-            attributes,
-            reason,
-        }),
-        insights,
-    )
-    .await
-}
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
@@ -84,30 +53,27 @@ async fn post_inner(
         attributes,
         reason,
     } = request.into_inner();
-    // look up tenant & user vault
-    let (vault, scoped_user) = state
-        .db_pool
-        .db_query(move |conn| UserVault::get_for_tenant(conn, &tenant_id, &footprint_user_id, is_live))
-        .await??;
 
-    // if the vault is PORTABLE: check permissions on the scoped user onboarding configuration
-    if vault.is_portable {
-        let ob_configs =
-            ObConfiguration::list_for_scoped_user(&state.db_pool, scoped_user.id.clone()).await?;
-        let can_access_kinds: HashSet<_> = ob_configs
-            .into_iter()
-            .flat_map(|x| x.can_access_data)
-            .flat_map(|x| x.attributes())
-            .collect();
-        if !can_access_kinds.is_superset(&attributes) {
-            return Err(AuthError::UnauthorizedOperation.into());
-        }
-    }
+    let fields_clone = attributes.clone();
+
+    // look up tenant & user vault
+    let (uvw, scoped_user) = state
+        .db_pool
+        .db_query(move |conn| -> Result<_, ApiError> {
+            let (user_vault, scoped_user) =
+                UserVault::get_for_tenant(conn, &tenant_id, &footprint_user_id, is_live)?;
+
+            let user_vault_wrapper = UserVaultWrapper::build(conn, user_vault)?;
+            user_vault_wrapper.ensure_scope_allows_access(conn, &scoped_user, fields_clone)?;
+
+            Ok((user_vault_wrapper, scoped_user))
+        })
+        .await??;
 
     let DecryptFieldsResult {
         decrypted_data_attributes,
         result_map,
-    } = decrypt(&state, vault, attributes.into_iter().collect()).await?;
+    } = decrypt(&state, uvw.user_vault, attributes.into_iter().collect()).await?;
 
     // Create an AccessEvent log showing that the tenant accessed these fields
     NewAccessEvent {

@@ -12,6 +12,8 @@ macro_rules! define_newtype_id {
             Hash,
             PartialEq,
             Eq,
+            Ord,
+            PartialOrd,
             Display,
             From,
             Into,
@@ -31,6 +33,14 @@ macro_rules! define_newtype_id {
 
             fn format() -> Option<paperclip::v2::models::DataTypeFormat> {
                 None
+            }
+        }
+
+        impl $name {
+            #[allow(unused)]
+            #[cfg(test)]
+            pub(crate) fn escape_hatch(v: $type) -> Self {
+                Self(v)
             }
         }
     };

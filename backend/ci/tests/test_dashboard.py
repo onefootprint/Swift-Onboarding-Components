@@ -274,7 +274,7 @@ class TestDashboard:
 
         # ensure we cannot change data in a portable vault
         put(
-            f"users/{user.fp_user_id}/data/identity",
+            f"users/{user.fp_user_id}/identity",
             data,
             user.tenant.sk.key,
             status_code=401,

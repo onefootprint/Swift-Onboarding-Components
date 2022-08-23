@@ -31,11 +31,9 @@ pub struct IdentityDataUpdate {
     pub address: Option<FullAddressOrZip>,
 }
 
+pub type ComputedFingerprints = Vec<(DataAttribute, Fingerprint, IsUnique)>;
 impl IdentityDataRequest {
-    pub async fn fingerprints(
-        &self,
-        state: &State,
-    ) -> Result<Vec<(DataAttribute, Fingerprint, IsUnique)>, ApiError> {
+    pub async fn fingerprints(&self, state: &State) -> Result<ComputedFingerprints, ApiError> {
         let mut builder = FingerprintBuilder::new();
 
         let IdentityDataUpdate {
