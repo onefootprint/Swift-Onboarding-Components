@@ -1,5 +1,4 @@
-import IcoClose16 from 'icons/ico/ico-close-16';
-import IcoCloseSmall16 from 'icons/ico/ico-close-small-16';
+import { IcoClose16, IcoCloseSmall16 } from 'icons';
 import React from 'react';
 import styled, { css } from 'styled-components';
 

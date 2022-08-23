@@ -1,4 +1,4 @@
-import IcoCode16 from 'icons/ico/ico-code-16';
+import { IcoCode16 } from 'icons';
 import React from 'react';
 import { customRender, screen, userEvent } from 'test-utils';
 import themes from 'themes';

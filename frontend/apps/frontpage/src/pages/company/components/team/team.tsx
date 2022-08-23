@@ -1,6 +1,4 @@
-import IcoArrowRightSmall24 from 'icons/ico/ico-arrow-right-small-24';
-import IcoLinkedin24 from 'icons/ico/ico-linkedin-24';
-import IcoTwitter24 from 'icons/ico/ico-twitter-24';
+import { IcoArrowRightSmall24, IcoLinkedin24, IcoTwitter24 } from 'icons';
 import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react';

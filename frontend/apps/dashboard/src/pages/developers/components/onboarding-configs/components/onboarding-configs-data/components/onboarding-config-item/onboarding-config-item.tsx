@@ -1,7 +1,6 @@
 import { DEMO_BASE_URL } from 'global-constants';
 import { useToggle, useTranslation } from 'hooks';
-import IcoArrowTopRight16 from 'icons/ico/ico-arrow-top-right-16';
-import IcoPencil16 from 'icons/ico/ico-pencil-16';
+import { IcoArrowTopRight16, IcoPencil16 } from 'icons';
 import React from 'react';
 import type { OnboardingConfig } from 'src/types/onboarding-config';
 import styled, { css } from 'styled-components';

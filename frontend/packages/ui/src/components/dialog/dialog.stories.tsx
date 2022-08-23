@@ -1,6 +1,5 @@
 import { Meta, Story } from '@storybook/react';
-import { icos } from 'icons';
-import IcoClose24 from 'icons/ico/ico-close-24';
+import { IcoClose24, icos } from 'icons';
 import React, { useState } from 'react';
 
 import Button from '../button';

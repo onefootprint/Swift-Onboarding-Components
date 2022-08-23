@@ -1,5 +1,5 @@
 import { useFootprintJs } from 'footprint-provider';
-import IcoClose24 from 'icons/ico/ico-close-24';
+import { IcoClose24 } from 'icons';
 import React from 'react';
 import { IconButton, useConfirmationDialog } from 'ui';
 

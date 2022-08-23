@@ -1,6 +1,5 @@
 import { useTranslation } from 'hooks';
-import IcoDatabase16 from 'icons/ico/ico-database-16';
-import IcoShield16 from 'icons/ico/ico-shield-16';
+import { IcoDatabase16, IcoShield16 } from 'icons';
 import React from 'react';
 import type { ProductArticle } from 'src/types/product';
 import styled, { css } from 'styled-components';

@@ -1,5 +1,5 @@
 import { useTranslation } from 'hooks';
-import IcoChevronLeftBig24 from 'icons/ico/ico-chevron-left-big-24';
+import { IcoChevronLeftBig24 } from 'icons';
 import Image from 'next/image';
 import React from 'react';
 import { useSwipeable } from 'react-swipeable';

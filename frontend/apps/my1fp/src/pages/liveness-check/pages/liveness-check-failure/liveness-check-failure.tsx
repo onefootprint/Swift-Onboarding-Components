@@ -1,5 +1,5 @@
 import { useTranslation } from 'hooks';
-import IcoForbid40 from 'icons/ico/ico-forbid-40';
+import { IcoForbid40 } from 'icons';
 import React from 'react';
 import styled, { css } from 'styled-components';
 import { Typography } from 'ui';

@@ -1,4 +1,4 @@
-import IcoClipboard24 from 'icons/ico/ico-clipboard-24';
+import { IcoClipboard24 } from 'icons';
 import React, { useEffect, useState } from 'react';
 import SyntaxHighlighter from 'react-syntax-highlighter';
 import styled, { css, useTheme } from 'styled-components';

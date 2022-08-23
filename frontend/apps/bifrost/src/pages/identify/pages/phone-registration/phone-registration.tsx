@@ -1,6 +1,6 @@
 import { HeaderTitle } from 'footprint-ui';
 import { useRequestErrorToast, useTranslation } from 'hooks';
-import IcoEmail24 from 'icons/ico/ico-email-24';
+import { IcoEmail24 } from 'icons';
 import React from 'react';
 import NavigationHeader from 'src/components/navigation-header';
 import useIdentify from 'src/pages/identify/hooks/use-identify';

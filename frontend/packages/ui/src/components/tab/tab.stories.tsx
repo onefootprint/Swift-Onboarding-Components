@@ -1,8 +1,5 @@
 import { ComponentMeta, Story } from '@storybook/react';
-import IcoCode16 from 'icons/ico/ico-code-16';
-import IcoFileText16 from 'icons/ico/ico-file-text-16';
-import IcoSettings16 from 'icons/ico/ico-settings-16';
-import IcoUsers16 from 'icons/ico/ico-users-16';
+import { IcoCode16, IcoFileText16, IcoSettings16, IcoUsers16 } from 'icons';
 import React from 'react';
 
 import Tab, { TabListProps } from '.';

@@ -1,4 +1,4 @@
-import IcoGoogleColored24 from 'icons/ico/ico-google-colored-24';
+import { IcoGoogleColored24 } from 'icons';
 import React from 'react';
 import styled, { css } from 'styled-components';
 

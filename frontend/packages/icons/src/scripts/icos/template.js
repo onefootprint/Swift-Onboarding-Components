@@ -5,7 +5,7 @@ const template = (
 import React from 'react';
 import { useTheme } from 'styled-components';
 
-import type { IconProps } from '../src/types';
+import type { IconProps } from '../types';
 
 const ${componentName} = ({ color = 'primary', className, testID }: IconProps) => {
   const theme = useTheme();

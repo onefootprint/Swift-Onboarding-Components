@@ -1,7 +1,5 @@
 import { ComponentMeta, Story } from '@storybook/react';
-import { icos } from 'icons';
-import IcoArrowRightSmall24 from 'icons/ico/ico-arrow-right-small-24';
-import IcoPlusSmall24 from 'icons/ico/ico-plus-small-24';
+import { IcoArrowRightSmall24, IcoPlusSmall24, icos } from 'icons';
 import React from 'react';
 
 import LinkButton, { LinkButtonProps } from './link-button';

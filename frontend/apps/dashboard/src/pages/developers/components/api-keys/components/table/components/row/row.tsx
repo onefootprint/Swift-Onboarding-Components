@@ -1,5 +1,5 @@
 import { useTranslation } from 'hooks';
-import IcoDotsHorizontal24 from 'icons/ico/ico-dots-horizontal-24';
+import { IcoDotsHorizontal24 } from 'icons';
 import React from 'react';
 import type { ApiKey } from 'src/types/api-key';
 import { Badge, Dropdown } from 'ui';

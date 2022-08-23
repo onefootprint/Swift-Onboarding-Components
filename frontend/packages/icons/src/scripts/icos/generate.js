@@ -6,8 +6,7 @@ const { last, startCase } = require('lodash');
 const template = require('./template');
 
 const INPUT_SVG_PATH = path.join(__dirname, '../../assets/ico/**/*.svg');
-const OUTPUT_PATH = path.join(__dirname, '../../../ico');
-const MAIN_PATH = path.join(__dirname, '../../');
+const OUTPUT_PATH = path.join(__dirname, '../../icos');
 
 const getFileName = path => last(path.split('/'));
 
@@ -46,19 +45,18 @@ const createIcoComponent = async icoPath => {
 
 const createTypesFile = async icoNames => {
   await fs.writeFileSync(
-    path.join(MAIN_PATH, 'icos.ts'),
+    path.join(OUTPUT_PATH, 'index.ts'),
     `/**
-      * THIS IS AN AUTO-GENERATED FILE, DO NOT EDIT MANUALLY
-      */
-      ${icoNames
-        .map(
-          icoName =>
-            `import ${getComponentName(icoName)} from "../ico/${icoName}";\n`,
-        )
-        .join('')}
-      export default {
-        ${icoNames.map(icoName => `  ${getComponentName(icoName)},\n`).join('')}
-        };
+    * THIS IS AN AUTO-GENERATED FILE, DO NOT EDIT MANUALLY
+    */
+    ${icoNames
+      .map(
+        icoName =>
+          `export { default as ${getComponentName(
+            icoName,
+          )}} from "./${icoName}";\n`,
+      )
+      .join('')}
     `,
   );
 };

@@ -1,5 +1,4 @@
-import IcoSpinner16 from 'icons/ico/ico-spinner-16';
-import IcoSpinner24 from 'icons/ico/ico-spinner-24';
+import { IcoSpinner16, IcoSpinner24 } from 'icons';
 import React from 'react';
 import styled, { keyframes } from 'styled-components';
 import type { Color } from 'themes';

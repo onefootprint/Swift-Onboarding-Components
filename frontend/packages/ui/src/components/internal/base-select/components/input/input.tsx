@@ -1,4 +1,4 @@
-import IcoSearch16 from 'icons/ico/ico-search-16';
+import { IcoSearch16 } from 'icons';
 import React from 'react';
 import { CommonPropsAndClassName, GroupBase } from 'react-select';
 import styled, { css } from 'styled-components';

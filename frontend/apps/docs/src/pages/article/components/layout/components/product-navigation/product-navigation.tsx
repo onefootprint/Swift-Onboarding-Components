@@ -1,6 +1,5 @@
 import { useTranslation } from 'hooks';
-import IcoHelp16 from 'icons/ico/ico-help-16';
-import IcoMessage16 from 'icons/ico/ico-message-16';
+import { IcoHelp16, IcoMessage16 } from 'icons';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React from 'react';

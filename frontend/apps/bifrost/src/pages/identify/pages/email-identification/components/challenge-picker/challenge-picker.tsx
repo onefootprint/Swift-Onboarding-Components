@@ -1,8 +1,6 @@
 import FocusTrap from 'focus-trap-react';
 import { useTranslation } from 'hooks';
-import IcoClose24 from 'icons/ico/ico-close-16';
-import IcoFaceid24 from 'icons/ico/ico-faceid-24';
-import IcoSmartphone24 from 'icons/ico/ico-smartphone-24';
+import { IcoClose24, IcoFaceid24, IcoSmartphone24 } from 'icons';
 import React, { useEffect, useState } from 'react';
 import { useIdentifyMachine } from 'src/components/identify-machine-provider';
 import { ChallengeKind } from 'src/utils/state-machine/identify/types';

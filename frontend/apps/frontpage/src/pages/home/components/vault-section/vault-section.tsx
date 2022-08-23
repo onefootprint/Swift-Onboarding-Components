@@ -1,8 +1,5 @@
 import { useTranslation } from 'hooks';
-import IcoDatabase24 from 'icons/ico/ico-database-24';
-import IcoEye24 from 'icons/ico/ico-eye-24';
-import IcoLock24 from 'icons/ico/ico-lock-24';
-import IcoShield24 from 'icons/ico/ico-shield-24';
+import { IcoDatabase24, IcoEye24, IcoLock24, IcoShield24 } from 'icons';
 import Image from 'next/image';
 import React from 'react';
 import styled, { css } from 'styled-components';

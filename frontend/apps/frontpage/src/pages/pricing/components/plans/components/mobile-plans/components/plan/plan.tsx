@@ -1,4 +1,4 @@
-import IcoCheckCircle24 from 'icons/ico/ico-check-circle-24';
+import { IcoCheckCircle24 } from 'icons';
 import React from 'react';
 import styled, { css } from 'styled-components';
 import { Box, Button, Typography } from 'ui';

@@ -1,7 +1,7 @@
 import { useFootprintJs } from 'footprint-provider';
 import { MY1FP_URL } from 'global-constants';
 import { useTranslation } from 'hooks';
-import IcoCheckCircle40 from 'icons/ico/ico-check-circle-40';
+import { IcoCheckCircle40 } from 'icons';
 import React, { useEffect } from 'react';
 import Confetti from 'react-confetti';
 import NavigationHeader from 'src/components/navigation-header';

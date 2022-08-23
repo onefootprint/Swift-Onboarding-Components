@@ -4,7 +4,7 @@ const template = (
 ) => tpl`
 import React from 'react';
 
-import type { FlagProps } from '../src/types';
+import type { FlagProps } from '../types';
 
 const ${componentName} = ({ className, testID }: FlagProps) => ${jsx}
  

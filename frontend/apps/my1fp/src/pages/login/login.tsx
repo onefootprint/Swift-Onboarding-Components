@@ -1,6 +1,6 @@
 import footprint from '@onefootprint/footprint';
 import { useTranslation } from 'hooks';
-import LogoFpDefault from 'icons/ico/logo-fp-default';
+import { LogoFpDefault } from 'icons';
 import { useRouter } from 'next/router';
 import React from 'react';
 import { getErrorMessage, RequestError } from 'request';

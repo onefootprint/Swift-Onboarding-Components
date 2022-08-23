@@ -1,4 +1,4 @@
-import IcoClose24 from 'icons/ico/ico-close-24';
+import { IcoClose24 } from 'icons';
 import React from 'react';
 import { useLockBodyScroll } from 'react-use';
 import styled, { css } from 'styled-components';

@@ -1,8 +1,6 @@
 import { HeaderTitle } from 'footprint-ui';
 import { useInputMask, useTranslation } from 'hooks';
-import IcoFileText24 from 'icons/ico/ico-file-text-24';
-import IcoLock24 from 'icons/ico/ico-lock-24';
-import IcoShield24 from 'icons/ico/ico-shield-24';
+import { IcoFileText24, IcoLock24, IcoShield24 } from 'icons';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import styled, { css } from 'styled-components';

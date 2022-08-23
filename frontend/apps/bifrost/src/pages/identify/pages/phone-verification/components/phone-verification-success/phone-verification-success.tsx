@@ -1,5 +1,5 @@
 import { useTranslation } from 'hooks';
-import IcoCheckCircle40 from 'icons/ico/ico-check-circle-40';
+import { IcoCheckCircle40 } from 'icons';
 import React from 'react';
 import styled, { css } from 'styled-components';
 import { Typography } from 'ui';

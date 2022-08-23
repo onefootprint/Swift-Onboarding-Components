@@ -1,5 +1,5 @@
 import { useIntl, useTranslation } from 'hooks';
-import IcoChevronLeftBig24 from 'icons/ico/ico-chevron-left-big-24';
+import { IcoChevronLeftBig24 } from 'icons';
 import Link from 'next/link';
 import React from 'react';
 import SEO from 'src/components/seo';

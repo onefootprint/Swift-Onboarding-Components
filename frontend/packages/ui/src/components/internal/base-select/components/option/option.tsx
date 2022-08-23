@@ -1,4 +1,4 @@
-import IcoCheck16 from 'icons/ico/ico-check-16';
+import { IcoCheck16 } from 'icons';
 import React from 'react';
 import Highlighter from 'react-highlight-words';
 import type { CommonPropsAndClassName, GroupBase } from 'react-select';

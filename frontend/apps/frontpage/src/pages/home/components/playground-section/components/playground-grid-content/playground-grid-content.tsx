@@ -1,4 +1,4 @@
-import IcoShield24 from 'icons/ico/ico-shield-24';
+import { IcoShield24 } from 'icons';
 import React from 'react';
 import CircleIcon from 'src/components/circle-icon';
 import styled from 'styled-components';

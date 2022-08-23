@@ -1,4 +1,4 @@
-import LogoFpDefault from 'icons/ico/logo-fp-default';
+import { LogoFpDefault } from 'icons';
 import isString from 'lodash/isString';
 import { useRouter } from 'next/router';
 import React, { useEffect } from 'react';

@@ -1,6 +1,5 @@
 import GoogleMapReact from 'google-map-react';
-import IcoCheckCircle16 from 'icons/ico/ico-check-circle-16';
-import IcoClose16 from 'icons/ico/ico-close-16';
+import { IcoCheckCircle16, IcoClose16 } from 'icons';
 import React from 'react';
 import { User } from 'src/pages/users/hooks/use-join-users';
 import { getRegionForInsightEvent } from 'src/types';

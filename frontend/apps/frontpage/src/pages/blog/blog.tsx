@@ -1,5 +1,5 @@
 import { useIntl, useTranslation } from 'hooks';
-import IcoArrowRightSmall24 from 'icons/ico/ico-arrow-right-small-24';
+import { IcoArrowRightSmall24 } from 'icons';
 import React from 'react';
 import { getInitialPosts } from 'src/utils/ghost';
 import styled, { css } from 'styled-components';

@@ -1,5 +1,4 @@
-import IcoMinusSmall24 from 'icons/ico/ico-minus-small-24';
-import IcoPlusSmall24 from 'icons/ico/ico-plus-small-24';
+import { IcoMinusSmall24, IcoPlusSmall24 } from 'icons';
 import { darken } from 'polished';
 import React, { useState } from 'react';
 import styled, { css } from 'styled-components';

@@ -1,6 +1,4 @@
-import IcoBuilding24 from 'icons/ico/ico-building-24';
-import IcoFileText224 from 'icons/ico/ico-file-text-2-24';
-import IcoUserCircle24 from 'icons/ico/ico-user-circle-24';
+import { IcoBuilding24, IcoFileText224, IcoUserCircle24 } from 'icons';
 import React from 'react';
 import { nameData, User } from 'src/pages/users/hooks/use-join-users';
 import DataContainer from 'src/pages/users/pages/detail/components/data-container';

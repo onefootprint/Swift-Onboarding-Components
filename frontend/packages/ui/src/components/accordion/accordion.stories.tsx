@@ -1,6 +1,5 @@
 import { Meta, Story } from '@storybook/react';
-import { icos } from 'icons';
-import IcoUserCircle24 from 'icons/ico/ico-user-circle-24';
+import { icos, IcoUserCircle24 } from 'icons';
 import React, { useState } from 'react';
 
 import Typography from '../typography';

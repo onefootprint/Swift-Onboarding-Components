@@ -1,4 +1,4 @@
-import IcoFileText16 from 'icons/ico/ico-file-text-16';
+import { IcoFileText16 } from 'icons';
 import React from 'react';
 import type { ArticleSection } from 'src/types/article';
 import styled, { css } from 'styled-components';

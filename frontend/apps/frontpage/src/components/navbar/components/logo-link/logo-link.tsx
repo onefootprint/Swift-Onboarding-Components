@@ -1,5 +1,5 @@
 import { useTranslation } from 'hooks';
-import LogoFpDefault from 'icons/ico/logo-fp-default';
+import { LogoFpDefault } from 'icons';
 import Link from 'next/link';
 import React from 'react';
 

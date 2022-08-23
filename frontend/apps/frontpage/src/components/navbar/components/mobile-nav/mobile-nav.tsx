@@ -1,5 +1,4 @@
-import IcoClose24 from 'icons/ico/ico-close-24';
-import IcoMenu24 from 'icons/ico/ico-menu-24';
+import { IcoClose24, IcoMenu24 } from 'icons';
 import Link from 'next/link';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useLockBodyScroll } from 'react-use';

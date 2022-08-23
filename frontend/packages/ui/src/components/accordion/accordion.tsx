@@ -1,5 +1,5 @@
 import type { Icon } from 'icons';
-import IcoChevronDown24 from 'icons/ico/ico-chevron-down-24';
+import { IcoChevronDown24 } from 'icons';
 import { darken } from 'polished';
 import React, { useId, useRef } from 'react';
 import styled, { css } from 'styled-components';

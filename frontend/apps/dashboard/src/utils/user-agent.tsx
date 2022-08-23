@@ -1,9 +1,11 @@
-import IcoAndroidColored24 from 'icons/ico/ico-android-colored-24';
-import IcoAppleColored24 from 'icons/ico/ico-apple-colored-24';
-import IcoCode24 from 'icons/ico/ico-code-24';
-import IcoLaptop24 from 'icons/ico/ico-laptop-24';
-import IcoPhone24 from 'icons/ico/ico-phone-24';
-import IcoUser24 from 'icons/ico/ico-user-24';
+import {
+  IcoAndroidColored24,
+  IcoAppleColored24,
+  IcoCode24,
+  IcoLaptop24,
+  IcoPhone24,
+  IcoUser24,
+} from 'icons';
 import React from 'react';
 import UAParser from 'ua-parser-js';
 

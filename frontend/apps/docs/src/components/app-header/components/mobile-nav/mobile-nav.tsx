@@ -1,8 +1,6 @@
 import { useAutoAnimate } from '@formkit/auto-animate/react';
 import { useTranslation } from 'hooks';
-import IcoClose24 from 'icons/ico/ico-close-24';
-import IcoMenu24 from 'icons/ico/ico-menu-24';
-import Logo from 'icons/ico/logo-fpdocs-default';
+import { IcoClose24, IcoMenu24, LogoFpdocsDefault } from 'icons';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useState } from 'react';
@@ -35,7 +33,7 @@ const MobileNav = ({ navItems, articles }: MobileNavProps) => {
       <Header>
         <Link href="/">
           <a href="/" aria-label={t('nav.home')}>
-            <Logo />
+            <LogoFpdocsDefault />
           </a>
         </Link>
         {articles && (

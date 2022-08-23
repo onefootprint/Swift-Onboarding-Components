@@ -1,6 +1,5 @@
 import { useTranslation } from 'hooks';
-import IcoChevronLeft24 from 'icons/ico/ico-chevron-left-24';
-import IcoClose24 from 'icons/ico/ico-close-16';
+import { IcoChevronLeft24, IcoClose24 } from 'icons';
 import React from 'react';
 import { Dialog, useConfirmationDialog } from 'ui';
 

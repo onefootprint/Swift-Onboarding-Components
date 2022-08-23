@@ -1,4 +1,4 @@
-import IcoLock16 from 'icons/ico/ico-lock-16';
+import { IcoLock16 } from 'icons';
 import React from 'react';
 import { Box, Typography } from 'ui';
 

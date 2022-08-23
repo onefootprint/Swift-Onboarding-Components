@@ -1,4 +1,4 @@
-import IcoChevronLeft16 from 'icons/ico/ico-chevron-left-16';
+import { IcoChevronLeft16 } from 'icons';
 import { useRouter } from 'next/router';
 import React from 'react';
 import styled, { css } from 'styled-components';

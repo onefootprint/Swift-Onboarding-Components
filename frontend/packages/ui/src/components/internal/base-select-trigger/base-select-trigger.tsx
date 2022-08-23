@@ -1,4 +1,4 @@
-import IcoChevronDown16 from 'icons/ico/ico-chevron-down-16';
+import { IcoChevronDown16 } from 'icons';
 import { darken, rgba } from 'polished';
 import React, { forwardRef } from 'react';
 import styled, { css } from 'styled-components';

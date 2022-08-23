@@ -1,4 +1,4 @@
-import IcoLink16 from 'icons/ico/ico-link-16';
+import { IcoLink16 } from 'icons';
 import kebabCase from 'lodash/kebabCase';
 import React from 'react';
 import styled, { css } from 'styled-components';

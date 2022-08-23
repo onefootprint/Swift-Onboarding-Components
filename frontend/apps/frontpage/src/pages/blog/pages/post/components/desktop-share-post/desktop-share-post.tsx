@@ -1,6 +1,4 @@
-import IcoFacebook24 from 'icons/ico/ico-facebook-24';
-import IcoLinkedin24 from 'icons/ico/ico-linkedin-24';
-import IcoTwitter24 from 'icons/ico/ico-twitter-24';
+import { IcoFacebook24, IcoLinkedin24, IcoTwitter24 } from 'icons';
 import React from 'react';
 import styled, { css } from 'styled-components';
 import { media } from 'ui';

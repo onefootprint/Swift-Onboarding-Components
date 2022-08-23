@@ -1,5 +1,4 @@
-import IcoFootprint24 from 'icons/ico/ico-footprint-24';
-import IcoUser24 from 'icons/ico/ico-user-24';
+import { IcoFootprint24, IcoUser24 } from 'icons';
 import React from 'react';
 import useSessionUser from 'src/hooks/use-session-user';
 import styled, { css } from 'styled-components';

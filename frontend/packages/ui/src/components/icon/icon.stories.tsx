@@ -1,6 +1,5 @@
 import { ComponentMeta, ComponentStory } from '@storybook/react';
-import { flags, icos } from 'icons';
-import IcoChevronDown16 from 'icons/ico/ico-chevron-down-16';
+import { flags, IcoChevronDown16, icos } from 'icons';
 import React from 'react';
 import { withDesign } from 'storybook-addon-designs';
 import themes from 'themes';

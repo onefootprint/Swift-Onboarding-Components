@@ -1,5 +1,5 @@
 import { useTranslation } from 'hooks';
-import IcoCheck24 from 'icons/ico/ico-check-24';
+import { IcoCheck24 } from 'icons';
 import React from 'react';
 import styled, { css } from 'styled-components';
 import { Typography } from 'ui';

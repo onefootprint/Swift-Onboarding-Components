@@ -1,4 +1,4 @@
-import IcoQuote40 from 'icons/ico/ico-quote-40';
+import { IcoQuote40 } from 'icons';
 import Image from 'next/image';
 import React from 'react';
 import styled from 'styled-components';

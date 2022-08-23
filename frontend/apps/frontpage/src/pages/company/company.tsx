@@ -1,10 +1,12 @@
 import { useTranslation } from 'hooks';
-import IcoChartUp40 from 'icons/ico/ico-chart-up-40';
-import IcoCheckCircle40 from 'icons/ico/ico-check-circle-40';
-import IcoEmojiHappy40 from 'icons/ico/ico-emoji-happy-40';
-import IcoHeart40 from 'icons/ico/ico-heart-40';
-import IcoLeaf40 from 'icons/ico/ico-leaf-40';
-import IcoShield40 from 'icons/ico/ico-shield-40';
+import {
+  IcoChartUp40,
+  IcoCheckCircle40,
+  IcoEmojiHappy40,
+  IcoHeart40,
+  IcoLeaf40,
+  IcoShield40,
+} from 'icons';
 import React from 'react';
 import styled, { css } from 'styled-components';
 import { media, Typography } from 'ui';

@@ -1,9 +1,11 @@
 import { useTranslation } from 'hooks';
 import type { Icon } from 'icons';
-import IcoBuilding24 from 'icons/ico/ico-building-24';
-import IcoFileText24 from 'icons/ico/ico-file-text-24';
-import IcoShield24 from 'icons/ico/ico-shield-24';
-import IcoUserCircle24 from 'icons/ico/ico-user-circle-24';
+import {
+  IcoBuilding24,
+  IcoFileText24,
+  IcoShield24,
+  IcoUserCircle24,
+} from 'icons';
 import React from 'react';
 
 import AccessLogs from '../components/sections/access-logs';

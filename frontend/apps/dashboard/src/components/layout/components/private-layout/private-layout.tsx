@@ -1,9 +1,11 @@
 import { useTranslation } from 'hooks';
-import IcoCode16 from 'icons/ico/ico-code-16';
-import IcoFileText16 from 'icons/ico/ico-file-text-16';
-import IcoUser24 from 'icons/ico/ico-user-24';
-import IcoUsers16 from 'icons/ico/ico-users-16';
-import LogoFpCompact from 'icons/ico/logo-fp-compact';
+import {
+  IcoCode16,
+  IcoFileText16,
+  IcoUser24,
+  IcoUsers16,
+  LogoFpCompact,
+} from 'icons';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React from 'react';

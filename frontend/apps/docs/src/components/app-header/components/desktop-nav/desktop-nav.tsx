@@ -1,5 +1,5 @@
 import { useTranslation } from 'hooks';
-import Logo from 'icons/ico/logo-fpdocs-default';
+import { LogoFpdocsDefault } from 'icons';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React from 'react';
@@ -21,7 +21,7 @@ const DesktopNav = ({ navItems }: DesktopNavProps) => {
       <Nav>
         <Link href="/">
           <a href="/" aria-label={t('nav.home')}>
-            <Logo />
+            <LogoFpdocsDefault />
           </a>
         </Link>
         <Tab.List>

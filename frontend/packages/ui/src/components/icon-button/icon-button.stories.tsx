@@ -1,6 +1,5 @@
 import { ComponentMeta, Story } from '@storybook/react';
-import { icos } from 'icons';
-import IcoClose24 from 'icons/ico/ico-close-24';
+import { IcoClose24 } from 'icons';
 import React from 'react';
 
 import IconButton, { IconButtonProps } from './icon-button';
@@ -22,7 +21,6 @@ export default {
     iconComponent: {
       control: 'select',
       description: 'Icon to be rendered',
-      options: Object.keys(icos),
       name: 'Icon *',
     },
     disabled: {
@@ -39,21 +37,17 @@ export default {
 const Template: Story<IconButtonProps> = ({
   'aria-label': ariaLabel,
   disabled,
-  iconComponent: Icon,
   onClick,
   testID,
-}: IconButtonProps) => {
-  const SelectedIcon = typeof Icon === 'string' ? icos[Icon] : Icon;
-  return (
-    <IconButton
-      aria-label={ariaLabel}
-      disabled={disabled}
-      iconComponent={SelectedIcon}
-      onClick={onClick}
-      testID={testID}
-    />
-  );
-};
+}: IconButtonProps) => (
+  <IconButton
+    aria-label={ariaLabel}
+    disabled={disabled}
+    iconComponent={IcoClose24}
+    onClick={onClick}
+    testID={testID}
+  />
+);
 
 export const Base = Template.bind({});
 Base.args = {

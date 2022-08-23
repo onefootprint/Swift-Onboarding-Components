@@ -1,5 +1,4 @@
-import IcoInfo24 from 'icons/ico/ico-info-24';
-import IcoWarning24 from 'icons/ico/ico-warning-24';
+import { IcoInfo24, IcoWarning24 } from 'icons';
 import { css } from 'styled-components';
 import type { BackgroundColor, Color } from 'themes';
 

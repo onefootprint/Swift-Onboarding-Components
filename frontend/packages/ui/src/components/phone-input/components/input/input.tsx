@@ -1,4 +1,4 @@
-import IcoChevronDown24 from 'icons/ico/ico-chevron-down-24';
+import { IcoChevronDown24 } from 'icons';
 import React, { forwardRef } from 'react';
 import styled, { css } from 'styled-components';
 import type { CountryCode } from 'types';

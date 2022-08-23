@@ -1,4 +1,4 @@
-import LogoFpDefault from 'icons/ico/logo-fp-default';
+import { LogoFpDefault } from 'icons';
 import React from 'react';
 import styled from 'styled-components';
 import { Typography } from 'ui';

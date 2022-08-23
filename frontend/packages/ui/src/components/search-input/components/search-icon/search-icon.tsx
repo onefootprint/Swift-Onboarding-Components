@@ -1,5 +1,4 @@
-import IcoSearch16 from 'icons/ico/ico-search-16';
-import IcoSearchSmall16 from 'icons/ico/ico-search-small-16';
+import { IcoSearch16, IcoSearchSmall16 } from 'icons';
 import React from 'react';
 import styled, { css } from 'styled-components';
 

@@ -1,4 +1,4 @@
-import IcoFootprint16 from 'icons/ico/ico-footprint-16';
+import { IcoFootprint16 } from 'icons';
 import React from 'react';
 import styled, { css } from 'styled-components';
 import { Typography } from 'ui';

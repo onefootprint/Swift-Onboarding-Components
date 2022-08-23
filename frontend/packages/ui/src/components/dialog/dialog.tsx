@@ -1,6 +1,5 @@
 import FocusTrap from 'focus-trap-react';
-import type { Icon } from 'icons';
-import IcoClose24 from 'icons/ico/ico-close-16';
+import { IcoClose24, Icon } from 'icons';
 import React from 'react';
 import { useKey, useLockBodyScroll } from 'react-use';
 import styled, { css } from 'styled-components';

@@ -1,6 +1,6 @@
 import FocusTrap from 'focus-trap-react';
 import { FootprintFooter } from 'footprint-ui';
-import IcoClose24 from 'icons/ico/ico-close-16';
+import { IcoClose24 } from 'icons';
 import React, { useState } from 'react';
 import { useKey, useLockBodyScroll } from 'react-use';
 import styled, { css } from 'styled-components';
