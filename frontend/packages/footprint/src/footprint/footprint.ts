@@ -1,6 +1,8 @@
 import type { Flow, Footprint, UIManager } from './types';
 import { FootprintEvents } from './types';
 
+console.log('works');
+
 export default class implements Footprint {
   private publicKey: string | null = null;
 
