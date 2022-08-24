@@ -3,8 +3,8 @@ use newtypes::PhoneNumber;
 
 #[derive(Envconfig, Clone)]
 pub struct Config {
-    #[envconfig(from = "SERVICE_ENVIRONMENT")]
-    pub service_environment: Option<String>,
+    #[envconfig(nested = true)]
+    pub service_config: ServiceEnvironmentConfig,
 
     #[envconfig(from = "PORT", default = "8000")]
     pub port: u16,
@@ -57,9 +57,6 @@ pub struct Config {
     #[envconfig(from = "RELYING_PARTY_ID", default = "localhost")]
     pub rp_id: String,
 
-    #[envconfig(from = "COOKIE_DOMAIN", default = "localhost")]
-    pub cookie_domain: String,
-
     #[envconfig(from = "TIME_S_BETWEEN_SMS_CHALLENGES", default = "8")]
     pub time_s_between_sms_challenges: i64,
 
@@ -106,14 +103,44 @@ pub struct Config {
     pub custodian_key: String,
 }
 
+fn load_from_env<T: Envconfig>() -> Result<T, Box<dyn std::error::Error>> {
+    // for dev it's easier to load a .env
+    let _dotenv = dotenv::dotenv()
+        .map(|p| eprintln!("load .env at: {}", p.as_path().display()))
+        .map_err(|e| eprintln!("error loading .env: {:?}", e));
+
+    Ok(T::init_from_env()?)
+}
+
 impl Config {
     pub fn load_from_env() -> Result<Self, Box<dyn std::error::Error>> {
-        // for dev it's easier to load a .env
-        let _dotenv = dotenv::dotenv()
-            .map(|p| eprintln!("load .env at: {}", p.as_path().display()))
-            .map_err(|e| eprintln!("error loading .env: {:?}", e));
+        load_from_env()
+    }
+}
 
-        Ok(Config::init_from_env()?)
+/// separate service config struct to load minimal memory footprint for sensitive values
+#[derive(Envconfig, Clone)]
+pub struct ServiceEnvironmentConfig {
+    #[envconfig(from = "SERVICE_ENVIRONMENT")]
+    pub environment: Option<String>,
+}
+
+lazy_static::lazy_static! {
+    pub static ref SERVICE_CONFIG:ServiceEnvironmentConfig = {
+        ServiceEnvironmentConfig::load_from_env().expect("failed to load service config")
+    };
+}
+
+impl ServiceEnvironmentConfig {
+    pub fn load_from_env() -> Result<Self, Box<dyn std::error::Error>> {
+        load_from_env()
+    }
+
+    pub fn is_production(&self) -> bool {
+        self.environment
+            .as_ref()
+            .map(|s| s.as_str() == "production")
+            .unwrap_or(false)
     }
 }
 

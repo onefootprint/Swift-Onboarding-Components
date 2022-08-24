@@ -231,12 +231,8 @@ impl WireMessage {
         Ok(serde_cbor::from_slice(&self.data)?)
     }
 
-    pub fn response(&self, request_id: Uuid) -> Result<EnclaveResponse, Error> {
+    pub fn response(&self) -> Result<EnclaveResponse, Error> {
         let response: EnclaveResponse = serde_cbor::from_slice(&self.data)?;
-        if response.request_id != request_id {
-            return Err(Error::MismatchedRequest);
-        }
-
         Ok(response)
     }
 

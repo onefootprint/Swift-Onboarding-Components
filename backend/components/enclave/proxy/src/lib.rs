@@ -7,8 +7,8 @@ pub use config::Config;
 pub use rpc::Error as EnclaveError;
 use rpc::WireMessage;
 pub use rpc::{
-    DataTransform, DecryptRequest, EnclavePayload, EnclaveResponse, EnvelopeDecrypt,
-    EnvelopeHmacSign, FnDecryption, HmacSignature, KmsCredentials, RpcPayload, RpcRequest,
+    DataTransform, DecryptRequest, EnclavePayload, EnclaveResponse, EnvelopeDecrypt, EnvelopeHmacSign,
+    FnDecryption, HmacSignature, KmsCredentials, RpcPayload, RpcRequest,
 };
 
 use pool::{Stream, StreamConnection};
@@ -97,9 +97,15 @@ pub async fn send_rpc_request(
     stream.write_all(&message).await?;
     stream.flush().await?;
 
-    let response = WireMessage::from_stream(stream)
-        .await?
-        .response(request.id)?;
+    loop {
+        tracing::info!("before reading enclave response stream");
+        let response = WireMessage::from_stream(stream).await?.response()?;
 
-    Ok(response.payload)
+        if response.request_id != request.id {
+            tracing::info!("request.id != response.request_id");
+            continue;
+        }
+
+        return Ok(response.payload);
+    }
 }

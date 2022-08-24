@@ -61,13 +61,13 @@ impl ErrorSink<enclave_proxy::Error> for EnclavePoolErrorSink {
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    let config = config::Config::load_from_env().expect("failed to load config");
+    let mut config = config::Config::load_from_env().expect("failed to load config");
 
     // telemetry
     let _controller = telemetry::init(&config).expect("failed to init telemetry layers");
 
     // sentry
-    let _guard = if let Some(env) = config.service_environment.clone() {
+    let _guard = if let Some(env) = config.service_config.environment.clone() {
         Some(sentry::init((
             config.sentry_url.as_str(),
             sentry::ClientOptions {
@@ -88,8 +88,8 @@ async fn main() -> std::io::Result<()> {
         };
         let pool = bb8::Pool::builder()
             .min_idle(Some(3))
-            .max_size(5)
-            .connection_timeout(Duration::from_secs(10))
+            .max_size(50)
+            .connection_timeout(Duration::from_secs(4))
             .test_on_check_out(false)
             .error_sink(Box::new(EnclavePoolErrorSink))
             .build(pool::StreamManager(manager))
@@ -135,7 +135,8 @@ async fn main() -> std::io::Result<()> {
 
         // our session key
         let (challenge_sealing_key, session_sealing_key) = {
-            let key = if let Some(hex_key) = &config.cookie_session_key_hex {
+            // take here removes it from the config
+            let key = if let Some(hex_key) = config.cookie_session_key_hex.take() {
                 crypto::hex::decode(hex_key).expect("invalid session cookie key")
             } else {
                 log::error!("WARNING GENERATING RANDOM SESSION KEY");

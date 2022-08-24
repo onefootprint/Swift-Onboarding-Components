@@ -18,9 +18,7 @@ class TestNonPortableVaultApi:
 
         # check that the data is there now
         params = {"fields": "first_name, last_name, zip, ssn9, city"}
-        response = get(
-            f"users/{fp_id}/identity", params, workos_sandbox_tenant.sk.key
-        )
+        response = get(f"users/{fp_id}/identity", params, workos_sandbox_tenant.sk.key)
         assert response["data"]["first_name"] == True
         assert response["data"]["last_name"] == True
         assert response["data"]["zip"] == True
@@ -77,9 +75,7 @@ class TestNonPortableVaultApi:
 
         # check status of the data
         params = {"fields": "cc4,ach_account_number, insurance_id"}
-        response = get(
-            f"users/{fp_id}/custom", params, workos_sandbox_tenant.sk.key
-        )
+        response = get(f"users/{fp_id}/custom", params, workos_sandbox_tenant.sk.key)
         assert response["data"]["ach_account_number"] == True
         assert response["data"]["cc4"] == True
         assert response["data"]["insurance_id"] == False
@@ -106,6 +102,7 @@ class TestNonPortableVaultApi:
             "custom.cc4",
         }
 
+
 class TestUnifiedVaultApi:
     def test_unified_vault_create_write_decrypt(self, workos_sandbox_tenant):
         # create the vault
@@ -117,27 +114,32 @@ class TestUnifiedVaultApi:
         # post data to it
         data = {
             "identity": build_user_data(),
-            "custom": {"ach_account_number": "123467890", "cc4": "4242"}
+            "custom": {"ach_account_number": "123467890", "cc4": "4242"},
         }
         put(f"users/{fp_id}", data, workos_sandbox_tenant.sk.key)
 
         # check that the data is there now
-        params = {"fields": "identity.last_name, identity.ssn9, custom.ach_account_number,custom.cc4, custom.insurance_id"}
-        response = get(
-            f"users/{fp_id}", params, workos_sandbox_tenant.sk.key
-        )        
-        assert response["data"]["identity"]["last_name"] == True        
+        params = {
+            "fields": "identity.last_name, identity.ssn9, custom.ach_account_number,custom.cc4, custom.insurance_id"
+        }
+        response = get(f"users/{fp_id}", params, workos_sandbox_tenant.sk.key)
+        assert response["data"]["identity"]["last_name"] == True
         assert response["data"]["identity"]["ssn9"] == True
         assert response["data"]["custom"]["ach_account_number"] == True
         assert response["data"]["custom"]["cc4"] == True
         assert response["data"]["custom"]["insurance_id"] == False
 
-
         # decrypt the data
-        data = dict(reason="test", fields=["identity.first_name", "identity.zip", "custom.ach_account_number", "custom.cc4"])
-        body = post(
-            f"users/{fp_id}/decrypt", data, workos_sandbox_tenant.sk.key
+        data = dict(
+            reason="test",
+            fields=[
+                "identity.first_name",
+                "identity.zip",
+                "custom.ach_account_number",
+                "custom.cc4",
+            ],
         )
+        body = post(f"users/{fp_id}/decrypt", data, workos_sandbox_tenant.sk.key)
         data = body["data"]
         assert data["identity"]["first_name"] == "SANDBOX"
         assert data["identity"]["zip"] == "10009"
@@ -152,14 +154,15 @@ class TestUnifiedVaultApi:
         )
         access_events = body["data"]
         assert access_events[0]["kind"] == "decrypt"
-        
-        events = set(access_events[0]["targets"]) | set(access_events[1]["targets"])    
+
+        events = set(access_events[0]["targets"]) | set(access_events[1]["targets"])
         assert events == {
             "identity.first_name",
             "identity.zip",
             "custom.ach_account_number",
             "custom.cc4",
         }
+
 
 class TestApiFormats:
     def test_basic_auth(self, workos_sandbox_tenant):

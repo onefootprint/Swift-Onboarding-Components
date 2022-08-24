@@ -38,5 +38,7 @@ config:
       defaultOrg: org_01G39KR1V1E52JEZV6BYNG590J
       secretKey:
         secure: v1:UrxmsAzi5youwRK1:Jlywwi1ZR82IGh3ZSJe58HQmEni8yL5+Ff/3DPQbcMbN5qE2wTJ1Yuye4vhADlRDaCaZf5kBhZGWC3Uxx4SZ47wmg8b+C123NVk8K1ieVGqO6IYF4HTKNI8KsQFyv6MA3QbD
+  infra:serverTailscaleKey:
+    secure: v1:UfYpRSy/H0RL5lcZ:1iCjNgCUpHsS3/6wbdqGB8WbQYcDDtmcqGrRTc9EYalbjfkwTsau2jpZGjRde5TUF9gE0KVHEOTq
   infra:tailscaleKey:
     secure: v1:JCsJCNXUN5TiNETn:duRv1oyyH4zGdX8yClsUs1CUsRvFzWvswz7YzHZBS2yaIbOyPq9amd+45jMs3tCFNXlmJFf4D8k=

@@ -156,6 +156,12 @@ async function userData(clusterName: string, constants: Config, config: NitroEnc
     const ecrEndpoint = `${current.accountId}.dkr.ecr.us-east-1.amazonaws.com`;
     const enclaveImage = `${current.accountId}.dkr.ecr.us-east-1.amazonaws.com/enclave_pkg:${constants.containers.enclaveVersion}`;
 
+    const pulumiConfig = new pulumi.Config();
+    const tailscaleAuthKey = pulumiConfig.get('serverTailscaleKey');
+    const hostName = `server-${pulumi.getStack()}`;
+
+
+
     // TODO: if enclave unhealthy after restart fail health check on ASG.
     return `
 #!/bin/bash
@@ -167,7 +173,17 @@ sudo yum update -y
 sudo amazon-linux-extras install -y aws-nitro-enclaves-cli
 sudo yum install aws-nitro-enclaves-cli-devel -y
 sudo yum install -y aws-cli
-sudo yum install -y jq
+sudo yum install -y jq yum-utils
+
+
+# setup tailscale
+sudo yum-config-manager --add-repo https://pkgs.tailscale.com/stable/centos/7/tailscale.repo
+sudo yum install tailscale nc -y
+sudo systemctl enable --now tailscaled
+sudo tailscale up --authkey "${tailscaleAuthKey}" --ssh --advertise-exit-node --hostname "${hostName}" --accept-dns=false 
+
+# setup enclave
+
 sudo usermod -aG ne $USER
 
 aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${ecrEndpoint}

@@ -13,10 +13,6 @@ Migrations:
 API:
   - backend/components/api/**/*
 
-ephemeral:
-  - backend/infra/**/*
-  - backend/infra/*
-
 Frontend:
   - frontend/**/*
 

@@ -7,13 +7,13 @@ config:
       apiVersion: latest
       enclaveVersion: latest
     domain:
-      base: "api.onefootprint.com"
+      base: api.onefootprint.com
       prefix: ""
     elastic:
       apiKey:
         secure: v1:XzHosuh3FHFZesM8:BFzoDFYHmZbxiai3KV6aR2zLW1ZoImnWTQoVodoiGnCH5g==
       apmEndpoint: 66e04f7b644c4d1c98e26e58b75de669.apm.us-east-2.aws.elastic-cloud.com:443
-    enclaveCertPCR8: "e865feba7ebc599a657c329387caa88db6b487591e249b65a8edf0ddf7a2bcf269f3a7aa952f56741b18bdafe6766b96"
+    enclaveCertPCR8: e865feba7ebc599a657c329387caa88db6b487591e249b65a8edf0ddf7a2bcf269f3a7aa952f56741b18bdafe6766b96
     resources:
       cpuUnits: 256
       instances: 2
@@ -38,5 +38,7 @@ config:
       defaultOrg: org_01G39KR1V1E52JEZV6BYNG590J
       secretKey:
         secure: v1:qBwY9xkQ5AxOOFFR:nJs8FBGP1lGvhsAUJ/ANgv2PKoIWYJovYxCyLtDBWa24r+sDRpLxD7EC3z6ZWcVOlBb2hoYuR4vJobSyQ/3FBe7jPAFqLDJhrL9m6LEsX0NFg6iP/hYMKnPCqVfE+L2YaE5m
+  infra:serverTailscaleKey:
+    secure: v1:r0ihTxE2RZeNZA6f:a0fQWhvRLVWUOA7zQ5k0DbjYA0rImo98HXcIdP+UK6JC6CcarrCtxIiPN7Djd7MbjZXsI+hEi0oy
   infra:tailscaleKey:
     secure: v1:bODV3p3yRWrT59pq:g2+0HB8ps3I4JR/lmPbZRMSjyv0j8udg6poBvTCKGGBk0VW26zDgoUNwsvm5NHALL+ymGcNqzVA=

@@ -9,6 +9,18 @@ mod ne;
 
 use crate::{EnvelopeDecrypt, FnDecryption, FnDecryptionSingle, KmsCredentials};
 
+/// init the enclave sdk if needed
+pub fn init() {
+    #[cfg(feature = "nitro")]
+    ne::init();
+}
+
+/// cleanup the enclave sdk if needed
+pub fn clean_up() {
+    #[cfg(feature = "nitro")]
+    ne::clean_up();
+}
+
 #[allow(clippy::large_enum_variant)]
 #[derive(Error, Debug)]
 pub enum Error {

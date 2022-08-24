@@ -160,7 +160,10 @@ impl actix_web::ResponseError for ApiError {
         let support_id = Uuid::new_v4();
         let status_code = self.status_code().as_u16();
 
-        let message = if status_code == StatusCode::INTERNAL_SERVER_ERROR {
+        // in prod, omit 500 errors from the client
+        let message = if status_code == StatusCode::INTERNAL_SERVER_ERROR
+            && crate::config::SERVICE_CONFIG.is_production()
+        {
             tracing::error!(error=?self, support_id=support_id.to_string(), status_code, "returning api ISE");
             "something went wrong".to_string()
         } else {

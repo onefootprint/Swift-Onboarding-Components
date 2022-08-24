@@ -4,8 +4,8 @@ use std::time::Duration;
 
 use config::Config;
 use enclave::{
-    enclave::handle_fn_decrypt, enclave::handle_hmac_sign, EnclavePayload, EnclaveResponse, RpcPayload,
-    WireMessage,
+    enclave::handle_fn_decrypt, enclave::handle_hmac_sign, enclave::init as init_enclave_sdk, EnclavePayload,
+    EnclaveResponse, RpcPayload, WireMessage,
 };
 
 #[allow(unused_imports)]
@@ -18,25 +18,38 @@ use tokio::{
 #[cfg(feature = "nitro")]
 use tokio_vsock::VsockListener;
 
-#[tokio::main]
-async fn main() -> std::io::Result<()> {
+fn main() -> std::io::Result<()> {
     env_logger::init();
     let config = Config::load_from_env().expect("failed to load env");
 
-    // for local development, use a local tcp socket instead of AF_VSOCK
-    #[cfg(not(feature = "nitro"))]
-    {
-        listen_tcp(&format!("127.0.0.1:{}", config.port)).await
-    }
+    init_enclave_sdk();
 
-    #[cfg(feature = "nitro")]
-    {
-        if config.use_local.is_some() {
+    // build runtime
+    let runtime = tokio::runtime::Builder::new_multi_thread()
+        .enable_all()
+        .worker_threads(2)
+        .thread_name("enclave-runtime")
+        .thread_stack_size(10 * 1024 * 1024)
+        .max_blocking_threads(2)
+        .build()
+        .unwrap();
+
+    runtime.block_on(async move {
+        // for local development, use a local tcp socket instead of AF_VSOCK
+        #[cfg(not(feature = "nitro"))]
+        {
             listen_tcp(&format!("127.0.0.1:{}", config.port)).await
-        } else {
-            listen_vsock(config.port as u32).await
         }
-    }
+
+        #[cfg(feature = "nitro")]
+        {
+            if config.use_local.is_some() {
+                listen_tcp(&format!("127.0.0.1:{}", config.port)).await
+            } else {
+                listen_vsock(config.port as u32).await
+            }
+        }
+    })
 }
 
 async fn listen_tcp(address: &str) -> std::io::Result<()> {
