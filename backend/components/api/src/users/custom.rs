@@ -75,9 +75,8 @@ pub fn put_internal(
     // Create an AccessEvent log showing that the tenant updated these fields
     NewAccessEvent {
         scoped_user_id: scoped_user.id.clone(),
-        // TODO https://linear.app/footprint/issue/FP-1172/dont-require-a-reason-for-update-access-events
-        reason: "".to_owned(),
-        principal: Some(tenant_auth.format_principal()),
+        reason: None,
+        principal: tenant_auth.format_principal(),
         insight,
         kind: AccessEventKind::Update,
         targets: update.keys().cloned().map(DataIdentifier::Custom).collect(),
@@ -187,8 +186,8 @@ pub async fn post_decrypt(
     // Create an AccessEvent log showing that the tenant accessed these fields
     NewAccessEvent {
         scoped_user_id: scoped_user.id.clone(),
-        reason,
-        principal: Some(tenant_auth.format_principal()),
+        reason: Some(reason),
+        principal: tenant_auth.format_principal(),
         insight: CreateInsightEvent::from(insights),
         kind: AccessEventKind::Decrypt,
         targets: fields.into_iter().map(DataIdentifier::Custom).collect(),

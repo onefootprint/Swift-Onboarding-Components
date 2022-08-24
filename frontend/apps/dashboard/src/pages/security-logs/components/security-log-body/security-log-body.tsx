@@ -69,7 +69,7 @@ const SecurityLogBody = ({ accessEvent }: SecurityLogBodyProps) => (
       <Box sx={{ marginBottom: 5 }}>
         <Typography variant="label-3">Reason</Typography>
       </Box>
-      <Typography variant="body-3">{accessEvent.reason}</Typography>
+      <Typography variant="body-3">{accessEvent.reason || '-'}</Typography>
     </div>
   </AccessEventBodyContainer>
 );

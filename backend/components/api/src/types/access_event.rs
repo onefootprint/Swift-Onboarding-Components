@@ -9,8 +9,8 @@ use crate::types::insight_event::ApiInsightEvent;
 pub struct ApiAccessEvent {
     pub fp_user_id: FootprintUserId,
     pub tenant_id: TenantId,
-    pub reason: String,
-    pub principal: Option<String>,
+    pub reason: Option<String>,
+    pub principal: String,
     pub timestamp: DateTime<Utc>,
     pub ordering_id: i64,
     pub insight_event: Option<ApiInsightEvent>,
@@ -52,7 +52,7 @@ impl From<AccessEventListItemForUser> for ApiAccessEvent {
             fp_user_id: scoped_user.fp_user_id,
             tenant_id: scoped_user.tenant_id,
             reason: event.reason,
-            principal: Some(tenant_name), // we don't want to leak any principal, just the tenant name
+            principal: tenant_name, // we don't want to leak any principal, just the tenant name
             timestamp: event.timestamp,
             ordering_id: event.ordering_id,
             insight_event: None, // we don't want to expose tenant location to end user

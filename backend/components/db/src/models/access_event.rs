@@ -16,8 +16,8 @@ pub struct AccessEvent {
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
     pub insight_event_id: InsightEventId,
-    pub reason: String,
-    pub principal: Option<String>,
+    pub reason: Option<String>,
+    pub principal: String,
     pub ordering_id: i64,
     pub kind: AccessEventKind,
     pub targets: Vec<DataIdentifier>,
@@ -26,8 +26,8 @@ pub struct AccessEvent {
 #[derive(Debug, Clone)]
 pub struct NewAccessEvent {
     pub scoped_user_id: ScopedUserId,
-    pub reason: String,
-    pub principal: Option<String>,
+    pub reason: Option<String>,
+    pub principal: String,
     pub insight: CreateInsightEvent,
     pub kind: AccessEventKind,
     pub targets: Vec<DataIdentifier>,
@@ -38,8 +38,8 @@ pub struct NewAccessEvent {
 struct NewAccessEventWithInsight {
     scoped_user_id: ScopedUserId,
     insight_event_id: InsightEventId,
-    reason: String,
-    principal: Option<String>,
+    reason: Option<String>,
+    principal: String,
     kind: AccessEventKind,
     targets: Vec<DataIdentifier>,
 }
