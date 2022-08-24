@@ -86,7 +86,6 @@ async fn main() -> std::io::Result<()> {
         let manager = StreamManager {
             config: config.clone(),
         };
-
         let pool = bb8::Pool::builder()
             .min_idle(Some(3))
             .max_size(5)
