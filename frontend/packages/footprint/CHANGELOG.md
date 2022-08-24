@@ -1,5 +1,11 @@
 # @onefootprint/footprint
 
+## 0.5.0
+
+### Minor Changes
+
+- fda3d9b0: Minor update
+
 ## 0.4.0
 
 ### Minor Changes
