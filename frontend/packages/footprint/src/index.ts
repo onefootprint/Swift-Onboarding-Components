@@ -2,7 +2,7 @@ import vanillaIntegration from './adapters/vanilla';
 import Footprint from './footprint';
 import UiManager from './footprint/ui-manager';
 
-const getUrl = (env = 'local', branchName?: string) => {
+const getUrl = (env = 'production', branchName?: string) => {
   if (env === 'local') {
     return 'http://localhost:3000/';
   }
