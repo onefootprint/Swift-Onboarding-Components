@@ -22,8 +22,23 @@ pub struct LivenessCheckInfo {
     pub location: Option<String>,
 }
 
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, Apiv2Schema, AsJsonb)]
+#[serde(rename_all = "snake_case")]
+pub enum VerificationInfoStatus {
+    Verified,
+    Failed,
+}
+
+impl Default for VerificationInfoStatus {
+    fn default() -> Self {
+        Self::Verified
+    }
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct VerificationInfo {
     pub data_attributes: Vec<DataAttribute>,
     pub vendor: Vendor,
+    #[serde(default)]
+    pub status: VerificationInfoStatus,
 }
