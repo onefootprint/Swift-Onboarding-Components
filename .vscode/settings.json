@@ -48,26 +48,26 @@
   "[typescriptreact]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode",
     "editor.codeActionsOnSave": {
-      "source.fixAll.eslint": true,
+      "source.fixAll.eslint": true
     },
     "editor.formatOnSave": true,
-    "editor.formatOnPaste": false,
+    "editor.formatOnPaste": false
   },
   "[typescript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode",
     "editor.codeActionsOnSave": {
-      "source.fixAll.eslint": true,
+      "source.fixAll.eslint": true
     },
     "editor.formatOnSave": true,
-    "editor.formatOnPaste": false,
+    "editor.formatOnPaste": false
   },
   "[javascript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode",
     "editor.codeActionsOnSave": {
-      "source.fixAll.eslint": true,
+      "source.fixAll.eslint": true
     },
     "editor.formatOnSave": true,
-    "editor.formatOnPaste": false,
+    "editor.formatOnPaste": false
   },
   "[python]": {
     "editor.defaultFormatter": "ms-python.python",
@@ -88,15 +88,12 @@
   "search.exclude": {
     "**/target/": true
   },
-  "eslint.validate": [
-    "javascript",
-    "typescript",
-    "typescriptreact",
-  ],
+  "eslint.workingDirectories": ["./frontend"],
+  "eslint.validate": ["javascript", "typescript", "typescriptreact"],
   "command-runner.terminal.name": "RunCommand",
   "command-runner.terminal.autoClear": true,
   "command-runner.terminal.autoFocus": true,
   "command-runner.commands": {
-      "clippy fix": "cd backend && cargo clippy --fix --workspace --allow-dirty"
-  },
+    "clippy fix": "cd backend && cargo clippy --fix --workspace --allow-dirty"
+  }
 }
