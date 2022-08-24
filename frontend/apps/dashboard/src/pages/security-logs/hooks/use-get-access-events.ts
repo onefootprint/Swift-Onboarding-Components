@@ -29,6 +29,7 @@ const getAccessEventsRequest = async ({
     ...filters,
     ...dateRangeFilters,
     targets,
+    kind: 'decrypt',
     cursor: pageParam,
   };
   const { data: response } = await request<
