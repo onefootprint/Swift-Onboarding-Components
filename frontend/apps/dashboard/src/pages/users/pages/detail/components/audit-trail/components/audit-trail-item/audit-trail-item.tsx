@@ -17,7 +17,6 @@ import {
   Vendor,
   vendorToDisplayName,
   VerificationInfo,
-  VerificationInfoStatus,
 } from 'src/types';
 import { Tag, Typography } from 'ui';
 
@@ -67,17 +66,11 @@ const detailsForLivenessEvent = (data: LivenessCheckInfo) => ({
 
 const detailsForVerificationEvent = (data: VerificationInfo) => {
   if (data.vendor === Vendor.footprint) {
-    const color =
-      data.status === VerificationInfoStatus.Verified ? 'success' : 'error';
-    const text =
-      data.status === VerificationInfoStatus.Verified
-        ? 'Verified by Footprint'
-        : 'Could not be verified by Footprint';
     return {
       iconComponent: <IcoFootprint16 />,
       headerComponent: (
-        <Typography variant="label-3" color={color}>
-          {text}
+        <Typography variant="label-3" color="success">
+          Verified by Footprint
         </Typography>
       ),
     };
@@ -91,12 +84,6 @@ const detailsForVerificationEvent = (data: VerificationInfo) => {
     )
     .pop()!;
   const iconComponent = <HeaderIcon />;
-  const text =
-    data.status === VerificationInfoStatus.Verified
-      ? ' verified by '
-      : ' marked as fraudulent by ';
-  const color =
-    data.status === VerificationInfoStatus.Verified ? 'neutral' : 'error';
   const headerComponent = (
     <Typography variant="body-3">
       <>
@@ -105,11 +92,9 @@ const detailsForVerificationEvent = (data: VerificationInfo) => {
             <Tag>{dataKindToDisplayName[dataKind]}</Tag>
             {i !== data.dataAttributes.length - 1 ? ', ' : ''}
           </React.Fragment>
-        ))}
-        <Typography variant="label-3" as="span" color={color}>
-          {text}
-        </Typography>
-        <Typography variant="label-3" as="span" color={color}>
+        ))}{' '}
+        verified by{' '}
+        <Typography variant="label-3" as="span">
           {vendorToDisplayName[data.vendor]}
         </Typography>
       </>

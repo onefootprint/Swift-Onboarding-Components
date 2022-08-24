@@ -17,7 +17,6 @@ use db::PgConnection;
 use itertools::Itertools;
 use newtypes::TenantId;
 use newtypes::ValidatedPhoneNumber;
-use newtypes::VerificationInfoStatus;
 use newtypes::{AuditTrailEvent, DataAttribute, SessionAuthToken, Status, Vendor, VerificationInfo};
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 
@@ -114,10 +113,6 @@ fn initiate_verification(
         Status::Verified
     };
     ob.update_status(conn, desired_status)?;
-    let final_status = match &desired_status {
-        Status::Verified => VerificationInfoStatus::Verified,
-        _ => VerificationInfoStatus::Failed,
-    };
 
     // Just create some fixture events for now
     // Don't make duplicate fixture events if the user onboards multiple times since it
@@ -131,12 +126,10 @@ fn initiate_verification(
                 DataAttribute::Dob,
             ],
             vendor: Vendor::Experian,
-            status: VerificationInfoStatus::Verified,
         },
         VerificationInfo {
             data_attributes: vec![DataAttribute::Country, DataAttribute::State],
             vendor: Vendor::Socure,
-            status: VerificationInfoStatus::Verified,
         },
         VerificationInfo {
             data_attributes: vec![
@@ -146,17 +139,14 @@ fn initiate_verification(
                 DataAttribute::Zip,
             ],
             vendor: Vendor::Idology,
-            status: VerificationInfoStatus::Verified,
         },
         VerificationInfo {
             data_attributes: vec![DataAttribute::Ssn9],
             vendor: Vendor::LexisNexis,
-            status: final_status,
         },
         VerificationInfo {
             data_attributes: vec![],
             vendor: Vendor::Footprint,
-            status: final_status,
         },
     ];
     events.into_iter().try_for_each(|e| {

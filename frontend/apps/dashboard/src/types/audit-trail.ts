@@ -9,15 +9,9 @@ export type LivenessCheckInfo = {
   location?: string;
 };
 
-export enum VerificationInfoStatus {
-  Verified = 'verified',
-  Failed = 'failed',
-}
-
 export type VerificationInfo = {
   dataAttributes: DataKinds[];
   vendor: Vendor;
-  status: VerificationInfoStatus;
 };
 
 export type AuditTrailEvent = {
