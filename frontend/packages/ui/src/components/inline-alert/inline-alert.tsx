@@ -3,6 +3,7 @@ import styled, { css } from 'styled-components';
 
 import useSX, { SXStyleProps, SXStyles } from '../../hooks/use-sx';
 import { createFontStyles } from '../../utils/mixins';
+import Box from '../box';
 import type { InlineAlertVariant } from './inline-alert.types';
 import { createVariantStyles, getIconForVariant } from './inline-alert.utils';
 
@@ -17,7 +18,14 @@ const InlineAlert = ({ children, variant = 'info', sx }: InlineAlertProps) => {
   const sxStyles = useSX(sx);
   return (
     <InlineAlertContainer sx={sxStyles} role="alert" variant={variant}>
-      <IconComponent color={variant} />
+      <Box
+        sx={{
+          display: 'flex',
+          marginRight: 3,
+        }}
+      >
+        <IconComponent color={variant} />
+      </Box>
       {children}
     </InlineAlertContainer>
   );
@@ -30,16 +38,10 @@ const InlineAlertContainer = styled.div<{
   ${({ theme, variant }) => css`
     ${createFontStyles('body-2')};
     ${createVariantStyles(variant)};
-    padding: ${theme.spacing[4]}px ${theme.spacing[5]}px;
-    text-align: center;
-    display: flex;
-    align-items: center;
-    width: 100%;
     border-radius: ${theme.borderRadius[2]}px;
-
-    > :first-child {
-      margin-right: ${theme.spacing[3]}px;
-    }
+    display: flex;
+    padding: ${theme.spacing[4]}px ${theme.spacing[5]}px;
+    width: 100%;
   `};
 
   ${({ sx }) => css`
