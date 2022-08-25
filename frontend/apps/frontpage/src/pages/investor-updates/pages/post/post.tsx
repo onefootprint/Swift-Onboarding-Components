@@ -16,7 +16,7 @@ export type PostProps = {
 };
 
 const Post = ({ post }: PostProps) => {
-  const { t } = useTranslation('pages.blog');
+  const { t } = useTranslation('pages.investor-updates');
   const { formatDateWithLongMonth } = useIntl();
 
   return (
@@ -31,7 +31,7 @@ const Post = ({ post }: PostProps) => {
           title: post.og_title,
           author: post.primary_author.name,
         }}
-        slug={`/blog/${post.slug}`}
+        slug={`/investor-updates/${post.slug}`}
         title={post.title}
         twitter={{
           description: post.twitter_description,
@@ -47,11 +47,11 @@ const Post = ({ post }: PostProps) => {
         <Container>
           <Inner>
             <Box sx={{ marginBottom: 8 }}>
-              <Link href="/blog" passHref>
+              <Link href="/investor-updates" passHref>
                 <LinkButton
                   iconPosition="left"
                   iconComponent={IcoChevronLeftBig24}
-                  href="/blog"
+                  href="/investor-updates"
                 >
                   {t('go-back')}
                 </LinkButton>
@@ -78,7 +78,7 @@ const Post = ({ post }: PostProps) => {
                 />
                 <DesktopSharePost
                   title={post.og_title}
-                  url={`https://www.onefootprint.com/blog/${post.slug}`}
+                  url={`https://www.onefootprint.com/investor-updates/${post.slug}`}
                 />
               </Box>
               <Typography variant="display-2" as="h1" sx={{ marginY: 9 }}>

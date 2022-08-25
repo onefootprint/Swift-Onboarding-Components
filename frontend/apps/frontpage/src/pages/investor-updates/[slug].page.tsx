@@ -3,7 +3,7 @@ import type { ParsedUrlQuery } from 'querystring';
 import { getAllPosts, getPostBySlug, PostType } from 'src/utils/ghost';
 
 export async function getStaticPaths() {
-  const posts = await getAllPosts(PostType.blog);
+  const posts = await getAllPosts(PostType.investorUpdate);
   const paths = posts.map(({ slug }) => ({ params: { slug } }));
   return { paths, fallback: false };
 }

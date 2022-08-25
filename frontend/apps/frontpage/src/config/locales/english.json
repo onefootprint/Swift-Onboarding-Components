@@ -44,7 +44,10 @@
       "subtitle": "Join our waitlist to get a chance at your first year of KYC + security for free.",
       "title": "Ready to get started?"
     },
-
+    "subscribe-to-newsletter": {
+      "title": "Subscribe to our newsletter",
+      "description": "Receive updates on new blog posts & investor updates"
+    },
     "investors": {
       "img-alt": "An image with all the investors",
       "subtitle": "Backed by the best founders & investors",
@@ -482,6 +485,20 @@
         "description": " | Updates, announcements, knowledge sharing",
         "twitter": "Footprint on Twitter"
       },
+      "post": {
+        "reading-time": "{{readingTime}} min. read"
+      }
+    },
+    "investor-updates": {
+      "html-title": "Footprint - Investor Updates",
+      "go-back": "Back",
+      "header-title-prefix": "Investor Update #",
+      "breadcrumb": {
+        "title": "Investor Updates",
+        "description": " | Updates we share with our investors",
+        "twitter": "Footprint on Twitter"
+      },
+      "read-more": "Read more",
       "post": {
         "reading-time": "{{readingTime}} min. read"
       }

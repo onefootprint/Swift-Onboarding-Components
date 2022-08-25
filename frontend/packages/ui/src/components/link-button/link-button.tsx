@@ -2,6 +2,7 @@ import type { Icon } from 'icons';
 import React, { forwardRef, HTMLAttributeAnchorTarget } from 'react';
 import styled, { css } from 'styled-components';
 
+import useSX, { SXStyleProps, SXStyles } from '../../hooks/use-sx';
 import { createFontStyles } from '../../utils/mixins';
 import { fontSize } from './link-button.constants';
 import type { LinkButtonSize, LinkButtonVariant } from './link-button.types';
@@ -24,6 +25,7 @@ export type LinkButtonProps = {
   testID?: string;
   variant?: LinkButtonVariant;
   disabled?: boolean;
+  sx?: SXStyleProps;
 };
 
 const LinkButton = forwardRef<HTMLAnchorElement, LinkButtonProps>(
@@ -40,9 +42,11 @@ const LinkButton = forwardRef<HTMLAnchorElement, LinkButtonProps>(
       testID,
       variant = 'default',
       disabled = false,
+      sx,
     }: LinkButtonProps,
     ref,
   ) => {
+    const sxStyles = useSX(sx);
     const renderedIcon = Icon && (
       <Icon color={variant === 'default' ? 'accent' : 'error'} />
     );
@@ -58,6 +62,7 @@ const LinkButton = forwardRef<HTMLAnchorElement, LinkButtonProps>(
         onClick={!disabled ? onClick : undefined}
         target={target}
         rel={target === '_blank' ? 'noopener noreferrer' : undefined}
+        sx={sxStyles}
       >
         {iconPosition === 'left' && renderedIcon}
         {children}
@@ -71,6 +76,7 @@ type LinkButtonStyleProps = Pick<LinkButtonProps, 'href'> & {
   size: LinkButtonSize;
   variant: LinkButtonVariant;
   disabled: boolean;
+  sx?: SXStyles;
 };
 
 export const LinkButtonStyled = styled.a.attrs<{
@@ -78,10 +84,11 @@ export const LinkButtonStyled = styled.a.attrs<{
   size: LinkButtonSize;
   variant: LinkButtonVariant;
   disabled: boolean;
+  sx: SXStyles;
 }>(({ href }) => ({
   as: href ? 'a' : 'button',
 }))<LinkButtonStyleProps>`
-  ${({ theme, size, href, variant, disabled }) => css`
+  ${({ theme, size, href, variant, disabled, sx }) => css`
     ${createFontStyles(fontSize[size])};
     align-items: center;
     background: transparent;
@@ -92,10 +99,16 @@ export const LinkButtonStyled = styled.a.attrs<{
     margin: 0;
     padding: 0;
     text-decoration: none;
+    ${sx};
 
-    span + svg,
-    svg + span {
-      margin-left: ${theme.spacing[2]}px;
+    svg {
+      &:last-child {
+        margin-left: ${theme.spacing[2]}px;
+      }
+
+      &:first-child {
+        margin-right: ${theme.spacing[2]}px;
+      }
     }
 
     ${disabled
