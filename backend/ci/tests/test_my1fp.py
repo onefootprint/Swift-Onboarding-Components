@@ -85,11 +85,10 @@ class TestMy1fp:
         # Decrypt as the tenant in order to generate some access events
         for attributes in FIELDS_TO_DECRYPT:
             data = {
-                "footprint_user_id": my1fp_authed_user.fp_user_id,
-                "attributes": attributes,
+                "fields": attributes,
                 "reason": "Doing a hecking decrypt",
             }
-            post("users/decrypt", data, tenant.sk.key)
+            post(f"users/{my1fp_authed_user.fp_user_id}/identity/decrypt", data, tenant.sk.key)
 
         # Get the user detail using the logged in context
         body = get("hosted/user/access_events", None, my1fp_authed_user.auth_token)

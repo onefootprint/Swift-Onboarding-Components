@@ -3,7 +3,6 @@ use paperclip::actix::web;
 pub mod access_events;
 pub mod audit_trail;
 pub mod custom;
-pub mod decrypt;
 pub mod identity;
 pub mod index;
 pub mod liveness;
@@ -19,7 +18,6 @@ pub fn routes() -> web::Scope {
         )
         .service(access_events::get)
         .service(audit_trail::get)
-        .service(decrypt::post)
         .service(liveness::get)
         .service(validate::validate)
         .service(

@@ -8,7 +8,7 @@ import useUserData from './use-user-data';
 
 export type DecryptUserRequest = {
   footprintUserId: string;
-  attributes: string[];
+  fields: string[];
   reason: string;
 };
 
@@ -20,8 +20,8 @@ const decryptUserRequest = async (
     RequestResponse<DecryptedUserAttributes>
   >({
     method: 'POST',
-    url: '/users/decrypt',
-    data,
+    url: `/users/${data.footprintUserId}/identity/decrypt`,
+    data: { fields: data.fields, reason: data.reason },
     headers: authHeaders,
   });
   return response.data;
@@ -52,7 +52,7 @@ const useDecryptUser = () => {
     // decrypted values
     const req: DecryptUserRequest = {
       footprintUserId: userId,
-      attributes: fieldsToDecrypt.map(x => DataKinds[x]),
+      fields: fieldsToDecrypt.map(x => DataKinds[x]),
       reason,
     };
     decryptUserMutation
