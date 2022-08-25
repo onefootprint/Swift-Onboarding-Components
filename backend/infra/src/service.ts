@@ -2,15 +2,15 @@ import { ec2, Region, route53, } from "@pulumi/aws";
 import * as awsx from "@pulumi/awsx";
 import * as aws from "@pulumi/aws";
 import * as pulumi from "@pulumi/pulumi"
-import { StaticSecrets } from "../secrets";
-import { CDN_PROTECTION_HEADER_NAME, Config } from "../config";
+import { StaticSecrets } from "./secrets";
+import { CDN_PROTECTION_HEADER_NAME, Config } from "./config";
 import { CreateCluster } from "./cluster";
 import { ServiceContainers } from "./containers";
-import { EnclaveKeyDescriptor } from "../enclave_key";
+import { EnclaveKeyDescriptor } from "./enclave_key";
 import * as crypto from "crypto";
-import { DbOutput } from "../db";
-import { VpcRegion } from "../vpc";
-import { HmacSigningKeyDescriptor } from "../hmac_key";
+import { DbOutput } from "./db";
+import { VpcRegion } from "./vpc";
+import { HmacSigningKeyDescriptor } from "./hmac_key";
 
 export type ServiceLoadBalancer = {
     lb: awsx.elasticloadbalancingv2.LoadBalancer,

@@ -46,6 +46,10 @@ pub struct State {
     session_sealing_key: ScopedSealingKey,
 }
 
+lazy_static::lazy_static! {
+    pub static ref GIT_HASH:&'static str = env!("GIT_HASH");
+}
+
 /// Record errors that occur from enclave pool connections
 #[derive(Debug, Clone)]
 struct EnclavePoolErrorSink;
@@ -194,6 +198,10 @@ async fn main() -> std::io::Result<()> {
             .wrap(actix_web::middleware::NormalizePath::trim())
             .wrap(Logger::default())
             .wrap(TracingLogger::<TelemetrySpanBuilder>::new())
+            .wrap(
+                actix_web::middleware::DefaultHeaders::new()
+                    .add(("X-Footprint-Server-Version", GIT_HASH.to_string())),
+            )
             .wrap(cors)
             .app_data(json_cfg)
             .wrap_api()

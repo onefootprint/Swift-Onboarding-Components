@@ -1,12 +1,12 @@
-import { HmacSigningKeyDescriptor } from './../hmac_key';
+import { HmacSigningKeyDescriptor } from './hmac_key';
 import * as awsx from "@pulumi/awsx";
 import * as aws from "@pulumi/aws";
 import * as pulumi from "@pulumi/pulumi"
-import { StaticSecrets } from "../secrets";
-import { Config } from "../config";
-import { EnclaveKeyDescriptor } from "../enclave_key";
+import { StaticSecrets } from "./secrets";
+import { Config } from "./config";
+import { EnclaveKeyDescriptor } from "./enclave_key";
 import { Region } from "@pulumi/aws";
-import { DbOutput } from "../db";
+import { DbOutput } from "./db";
 
 export abstract class ServiceContainers {
 

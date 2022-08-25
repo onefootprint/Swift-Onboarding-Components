@@ -37,7 +37,7 @@ on:
 
 jobs:
   run_tests:
-    name: run integration tests
+    name: remote integration tests
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -51,11 +51,15 @@ jobs:
       TWILIO_API_KEY_SECRET: ${{ secrets.TWILIO_API_KEY_SECRET }}
 
     steps:
-      - name: Sleep to wait for in-progress deploy
-        if: ${{ inputs.waitForDeploy }}
-        run: sleep 60
-
       - uses: actions/checkout@v3
+
+      - name: Wait for new deploy
+        if: ${{ inputs.waitForDeploy }}      
+        run: ./backend/util/scripts/server_version_wait.sh
+        shell: bash
+        env:
+          GIT_HASH: ${{ github.sha }}
+
       - name: Setup Python # Set Python version
         uses: actions/setup-python@v3
         with:

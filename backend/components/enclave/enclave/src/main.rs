@@ -1,7 +1,5 @@
 mod config;
 
-use std::time::Duration;
-
 use config::Config;
 use enclave::{
     enclave::handle_fn_decrypt, enclave::handle_hmac_sign, enclave::init as init_enclave_sdk, EnclavePayload,
@@ -89,7 +87,7 @@ fn stream_listen<S: AsyncRead + AsyncWrite + Unpin + Send + 'static>(stream: S) 
         let mut stream = stream;
         loop {
             match handle_stream(&mut stream).await {
-                Ok(_) => tokio::time::sleep(Duration::from_millis(100)).await,
+                Ok(_) => continue,
                 Err(e) => {
                     log::error!("handle stream error: {:?}", e);
                     return;

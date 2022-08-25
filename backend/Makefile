@@ -4,16 +4,17 @@
 account := $(shell aws sts get-caller-identity --query "Account" --output text)
 branch := $(shell git rev-parse --abbrev-ref HEAD | sed -r 's/\//-/g' | sed -r 's/_/-/g')
 commit := "$(branch)-$(shell git rev-parse --short HEAD)"
+commit_full := "$(shell git rev-parse HEAD)"
 
 
 api-release:
 	@echo "building release mode"
-	@docker run -v "cargo-cache:/root/.cargo/registry" -v "${PWD}:/volume" --rm -t clux/muslrust:stable cargo build -p footprint-core --features vsock --release
+	@docker run --env GIT_HASH="$(commit_full)" -v "cargo-cache:/root/.cargo/registry" -v "${PWD}:/volume" --rm -t clux/muslrust:stable cargo build -p footprint-core --features vsock --release
 	@cp ./target/x86_64-unknown-linux-musl/release/footprint-core ./out/footprint-core
 
 api-debug:
 	@echo "building debug mode"
-	@docker run -v "cargo-cache:/root/.cargo/registry" -v "${PWD}:/volume" --rm -t clux/muslrust:stable cargo build -p footprint-core --features vsock
+	@docker run --env GIT_HASH="$(commit_full)" -v "cargo-cache:/root/.cargo/registry" -v "${PWD}:/volume" --rm -t clux/muslrust:stable cargo build -p footprint-core --features vsock
 	@cp ./target/x86_64-unknown-linux-musl/debug/footprint-core ./out/footprint-core
 
 build-enclave-docker:

@@ -65,6 +65,7 @@ jobs:
     with:
       testUrl: '${{ needs.deploy_ephemeral_stack.outputs.url }}'
       prNumber: ${{ github.event.number }}
+      waitForDeploy: true
       isPR: true
     secrets:
       INTEGRATION_TEST_PHONE_NUMBER: ${{ secrets.INTEGRATION_TEST_PHONE_NUMBER }}

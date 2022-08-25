@@ -2,7 +2,7 @@ import * as aws from "@pulumi/aws";
 import { Region } from "@pulumi/aws";
 import * as awsx from "@pulumi/awsx";
 import * as pulumi from "@pulumi/pulumi"
-import { Config } from "../config";
+import { Config } from "./config";
 
 export type NitroEnclaveConfig = {
     cpus: number;
@@ -173,7 +173,7 @@ sudo yum update -y
 sudo amazon-linux-extras install -y aws-nitro-enclaves-cli
 sudo yum install aws-nitro-enclaves-cli-devel -y
 sudo yum install -y aws-cli
-sudo yum install -y jq yum-utils
+sudo yum install -y jq yum-utils httpd-tools
 
 
 # setup tailscale
