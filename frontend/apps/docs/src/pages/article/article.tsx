@@ -44,18 +44,16 @@ const ArticlePage = ({ product, article }: ArticleProps) => (
       title={article.data.meta.title}
     />
     <Layout product={product} article={article}>
-      <Container>
-        <ArticleHeader
-          title={article.data.title}
-          subtitle={article.data.readingTime.text}
-        />
-        <Markdown options={{ overrides }}>{article.content}</Markdown>
-      </Container>
+      <ArticleHeader
+        title={article.data.title}
+        subtitle={article.data.readingTime.text}
+      />
+      <Container options={{ overrides }}>{article.content}</Container>
     </Layout>
   </>
 );
 
-const Container = styled.div`
+const Container = styled(Markdown)`
   ${({ theme }) => css`
     ${createFontStyles('body-2')};
     color: ${theme.color.secondary};
@@ -95,8 +93,8 @@ const Container = styled.div`
     }
 
     pre > div {
-      margin-top: -${theme.spacing[4]}px;
-      margin-bottom: ${theme.spacing[7]}px;
+      margin-top: -${theme.spacing[3]}px;
+      margin-bottom: ${theme.spacing[8]}px;
     }
   `};
 `;
