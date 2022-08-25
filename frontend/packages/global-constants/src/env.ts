@@ -6,6 +6,9 @@ const getDemoUrl = (env = 'local', branchName?: string) => {
     return 'http://localhost:3002';
   }
   if (env === 'preview' && branchName) {
+    if (branchName === 'development') {
+      return `https://demo.preview.onefootprint.com`;
+    }
     const branchSlug = getBranchSlug(branchName);
     return `https://demo-git-${branchSlug}.preview.onefootprint.com`;
   }
@@ -20,6 +23,9 @@ const getBiometricUrl = (env = 'local', branchName?: string) => {
     );
   }
   if (env === 'preview' && branchName) {
+    if (branchName === 'development') {
+      return `https://biometric.preview.onefootprint.com`;
+    }
     const branchSlug = getBranchSlug(branchName);
     return `https://biometric-git-${branchSlug}.preview.onefootprint.com`;
   }
@@ -31,6 +37,9 @@ const getMy1fpUrl = (env = 'local', branchName?: string) => {
     return 'http://localhost:3004';
   }
   if (env === 'preview' && branchName) {
+    if (branchName === 'development') {
+      return `https://my1fp.preview.onefootprint.com`;
+    }
     const branchSlug = getBranchSlug(branchName);
     return `https://my1fp-git-${branchSlug}.preview.onefootprint.com`;
   }

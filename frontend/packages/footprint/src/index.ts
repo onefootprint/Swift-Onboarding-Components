@@ -10,6 +10,9 @@ const getUrl = (env = 'production', branchName?: string) => {
     return 'https://id.preview.onefootprint.com';
   }
   if (env === 'preview' && branchName) {
+    if (branchName === 'development') {
+      return `https://bifrost.preview.onefootprint.com`;
+    }
     const slugBranch = branchName.toLowerCase().split('/').join('-');
     return `https://bifrost-git-${slugBranch}.preview.onefootprint.com`;
   }
