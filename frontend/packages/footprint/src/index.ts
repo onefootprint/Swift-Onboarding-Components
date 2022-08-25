@@ -3,6 +3,10 @@ import Footprint from './footprint';
 import UiManager from './footprint/ui-manager';
 
 const getUrl = (env = 'production', branchName?: string) => {
+  console.log('get url');
+  console.log('env', env);
+  console.log('branchName', branchName);
+
   if (env === 'local') {
     return 'http://localhost:3000/';
   }
