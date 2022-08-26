@@ -72,6 +72,28 @@
     "auth": {
       "page-title": "Footprint Login | Logging in to the Footprint Dashboard"
     },
+    "users": {
+      "page-title": "Footprint | Users",
+      "header": {
+        "title": "Users"
+      },
+      "table": {
+        "aria-label": "Users table",
+        "search": {
+          "placeholder": "Search (exact match)..."
+        },
+        "empty-state": "No users found",
+        "header": {
+          "name": "Name",
+          "token": "Footprint Token",
+          "status": "Status",
+          "email": "Email",
+          "ssn": "SSN",
+          "phone-number": "Phone Number",
+          "start": "Date"
+        }
+      }
+    },
     "developers": {
       "page-title": "Footprint - Developers",
       "header": {

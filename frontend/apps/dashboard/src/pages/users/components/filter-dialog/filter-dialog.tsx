@@ -17,7 +17,7 @@ import {
   serializeDateRange,
   statusToDisplayText,
 } from 'src/types';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 import { Box, Button, Checkbox, Dialog, Divider, Typography } from 'ui';
 
 type FormValues = DateRangeSelectorFormValues & {
@@ -122,12 +122,8 @@ const UsersFilter = () => {
 };
 
 const FilterButtonContainer = styled.div`
-  height: 100%;
   display: flex;
   align-items: center;
-  ${({ theme }) => css`
-    margin-right: ${theme.spacing[6]}px;
-  `};
 `;
 
 export default UsersFilter;

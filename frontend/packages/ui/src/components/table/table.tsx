@@ -1,9 +1,10 @@
 import { Property } from 'csstype';
+import times from 'lodash/times';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
 import { createFontStyles } from '../../utils';
-import LoadingIndicator from '../loading-indicator';
+import Shimmer from '../shimmer';
 import Typography from '../typography';
 
 export type TableRow<T> = {
@@ -12,31 +13,36 @@ export type TableRow<T> = {
 };
 
 export type TableProps<T> = {
-  loadingAriaLabel?: string;
+  'aria-label': string;
   columns: { text: string; width?: Property.Width }[];
-  renderTr: (row: TableRow<T>) => JSX.Element;
-  getKeyForRow: (item: T) => string;
-  onRowClick?: (item: T) => void;
-  items?: Array<T>;
-  isLoading?: boolean;
   emptyStateText?: string;
+  getKeyForRow: (item: T) => string;
+  isLoading?: boolean;
+  items?: Array<T>;
+  onRowClick?: (item: T) => void;
+  renderTr: (row: TableRow<T>) => JSX.Element;
 };
 
 const Table = <T,>({
-  loadingAriaLabel = 'Loading...',
+  'aria-label': ariaLabel,
   columns,
-  renderTr,
-  getKeyForRow,
-  onRowClick,
-  items,
-  isLoading,
   emptyStateText = 'No results',
+  getKeyForRow,
+  isLoading,
+  items,
+  onRowClick,
+  renderTr,
 }: TableProps<T>) => {
   const shouldShowEmptyState = !isLoading && !items?.length;
   const shouldShowData = !isLoading && items;
+  const columnsCount = columns.length;
 
   return (
-    <TableContainer>
+    <TableContainer
+      aria-live="polite"
+      aria-busy={isLoading}
+      aria-label={ariaLabel}
+    >
       <thead>
         <tr>
           {columns.map(column => (
@@ -46,47 +52,52 @@ const Table = <T,>({
           ))}
         </tr>
       </thead>
-      <tbody>
-        {isLoading && (
-          <LoadingTr>
-            <td colSpan={columns.length}>
-              <LoadingIndicator aria-label={loadingAriaLabel} />
-            </td>
-          </LoadingTr>
-        )}
-        {shouldShowEmptyState && (
-          <EmptyTr>
-            <td colSpan={columns.length}>
-              <Typography variant="body-3">{emptyStateText}</Typography>
-            </td>
-          </EmptyTr>
-        )}
-        {shouldShowData &&
-          items.map((item: T, index: Number) => (
-            <Tr
-              data-testid={getKeyForRow(item)}
-              isRowClickable={!!onRowClick}
-              key={getKeyForRow(item)}
-              onClick={onRowClick && (() => onRowClick(item))}
-            >
-              {renderTr({ index, item })}
-            </Tr>
+      {isLoading ? (
+        <tbody>
+          {times(4).map(() => (
+            <tr key={Math.random()}>
+              {times(columnsCount).map(() => (
+                <td key={Math.random()}>
+                  <Shimmer aria-hidden sx={{ height: '24px', width: '100%' }} />
+                </td>
+              ))}
+            </tr>
           ))}
-      </tbody>
+        </tbody>
+      ) : (
+        <tbody>
+          {shouldShowEmptyState && (
+            <EmptyTr>
+              <td colSpan={columns.length}>
+                <Typography variant="body-3">{emptyStateText}</Typography>
+              </td>
+            </EmptyTr>
+          )}
+          {shouldShowData &&
+            items.map((item: T, index: Number) => (
+              <Tr
+                data-testid={getKeyForRow(item)}
+                data-clickable={!!onRowClick}
+                key={getKeyForRow(item)}
+                onClick={onRowClick && (() => onRowClick(item))}
+              >
+                {renderTr({ index, item })}
+              </Tr>
+            ))}
+        </tbody>
+      )}
     </TableContainer>
   );
 };
 
 const TableContainer = styled.table`
   ${({ theme }) => css`
-    width: 100%;
     border-collapse: separate;
-    min-width: 100%;
-    text-align: left;
-    border: 1px solid ${theme.borderColor.tertiary};
-    border-top: none;
     border-radius: ${theme.borderRadius[2]}px;
+    border: 1px solid ${theme.borderColor.tertiary};
     table-layout: fixed;
+    text-align: left;
+    width: 100%;
   `}
 
   ${({ theme }) => css`
@@ -108,20 +119,13 @@ const TableContainer = styled.table`
     ${({ theme }) => css`
       ${createFontStyles('caption-2')};
       background-color: ${theme.backgroundColor.secondary};
-      border-top: 1px solid ${theme.borderColor.tertiary};
+      border-bottom: 1px solid ${theme.borderColor.tertiary};
+      border-radius: ${theme.borderRadius[2]}px ${theme.borderRadius[2]}px 0 0;
       color: ${theme.color.secondary};
       padding: ${theme.spacing[4]}px ${theme.spacing[6]}px;
       position: sticky;
       text-transform: uppercase;
       top: 0;
-
-      &:first-child {
-        border-top-left-radius: ${theme.borderRadius[2]}px;
-      }
-
-      &:last-child {
-        border-top-right-radius: ${theme.borderRadius[2]}px;
-      }
     `}
   }
 
@@ -131,30 +135,18 @@ const TableContainer = styled.table`
   }
 `;
 
-const Tr = styled.tr<{
-  isRowClickable: boolean;
-}>`
-  ${({ theme, isRowClickable }) => css`
+const Tr = styled.tr`
+  ${({ theme }) => css`
     transition: 0.1s;
 
-    ${isRowClickable &&
-    css`
+    &[data-clickable='true'] {
       cursor: pointer;
 
-      :hover {
+      &:hover {
         background-color: ${theme.backgroundColor.secondary};
       }
-    `}
+    }
   `}
-`;
-
-const LoadingTr = styled.tr`
-  width: 100%;
-  justify-content: center;
-
-  td {
-    text-align: center;
-  }
 `;
 
 const EmptyTr = styled.tr`

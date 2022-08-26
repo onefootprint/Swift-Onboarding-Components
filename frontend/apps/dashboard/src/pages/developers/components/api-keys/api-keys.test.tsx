@@ -33,17 +33,12 @@ describe('<ApiKeys />', () => {
         renderDevelopers();
 
         await waitFor(() => {
-          const spinner = screen.getByRole('progressbar', {
-            name: 'Loading api keys...',
-          });
-          expect(spinner).toBeInTheDocument();
+          const table = screen.getByRole('table');
+          expect(table.getAttribute('aria-busy')).toBeTruthy();
         });
 
-        const table = within(screen.getByTestId('api-keys-section')).getByRole(
-          'table',
-        );
-
         await waitFor(() => {
+          const table = screen.getByRole('table');
           expect(
             within(table).getByText('Something went wrong'),
           ).toBeInTheDocument();
@@ -58,13 +53,14 @@ describe('<ApiKeys />', () => {
 
       it('should show a spinner and the data within the table', async () => {
         renderDevelopers();
-        const loading = screen.getByRole('progressbar', {
-          name: 'Loading api keys...',
+
+        await waitFor(() => {
+          const table = screen.getByRole('table');
+          const isLoading = table.getAttribute('aria-busy');
+          expect(isLoading).toBe('false');
         });
-        await waitForElementToBeRemoved(loading);
-        const table = within(screen.getByTestId('api-keys-section')).getByRole(
-          'table',
-        );
+
+        const table = screen.getByRole('table');
         const [firstApiKey] = listApiKeysFixture;
         const tr = within(table).getByTestId(firstApiKey.id);
 

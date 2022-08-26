@@ -4,12 +4,14 @@ import styled, { css, keyframes } from 'styled-components';
 import useSX, { SXStyleProps, SXStyles } from '../../hooks/use-sx';
 
 export type ShimmerProps = {
+  'aria-hidden'?: boolean;
   'aria-valuetext'?: string;
   sx?: SXStyleProps;
   testID?: string;
 };
 
 const Shimmer = ({
+  'aria-hidden': ariaHidden,
   testID,
   sx,
   'aria-valuetext': ariaValueText = 'Loading...',
@@ -17,6 +19,7 @@ const Shimmer = ({
   const sxStyles = useSX(sx);
   return (
     <ShimmerContainer
+      aria-hidden={ariaHidden}
       aria-busy="true"
       aria-valuemax={100}
       aria-valuemin={0}

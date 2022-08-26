@@ -22,13 +22,13 @@ const ApiKeysTable = () => {
   ];
 
   return (
-    <Table
+    <Table<ApiKey>
+      aria-label={t('table.aria-label')}
       columns={columns}
       emptyStateText={error ? getErrorMessage(error) : t('table.empty-state')}
       getKeyForRow={(apiKey: ApiKey) => apiKey.id}
       isLoading={isLoading}
       items={data}
-      loadingAriaLabel={t('table.loading.aria-label')}
       renderTr={renderTr}
     />
   );

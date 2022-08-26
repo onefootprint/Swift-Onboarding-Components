@@ -19,6 +19,7 @@ import {
   getDateRange,
   serializeDateRange,
 } from 'src/types';
+import styled from 'styled-components';
 import { Box, Button, Dialog, Divider, Typography } from 'ui';
 
 import { useFilters } from '../../hooks/use-filters';
@@ -115,11 +116,18 @@ const FilterDialog = () => {
           watch={watch as unknown as UseFormWatch<DateRangeSelectorFormValues>}
         />
       </Dialog>
-      <Button size="small" variant="secondary" onClick={openDialog}>
-        Filters
-      </Button>
+      <FilterButtonContainer>
+        <Button size="small" variant="secondary" onClick={openDialog}>
+          Filters
+        </Button>
+      </FilterButtonContainer>
     </>
   );
 };
+
+const FilterButtonContainer = styled.div`
+  display: flex;
+  align-items: center;
+`;
 
 export default FilterDialog;

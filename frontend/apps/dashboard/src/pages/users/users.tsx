@@ -1,9 +1,19 @@
+import { useTranslation } from 'hooks';
+import Head from 'next/head';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { statusToBadgeVariant, statusToDisplayText } from 'src/types';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 import type { TableRow } from 'ui';
-import { Badge, CodeInline, SearchInput, Table, Typography } from 'ui';
+import {
+  Badge,
+  Box,
+  CodeInline,
+  Divider,
+  SearchInput,
+  Table,
+  Typography,
+} from 'ui';
 
 import FieldOrPlaceholder from './components/field-or-placeholder';
 import UsersFilter from './components/filter-dialog';
@@ -11,19 +21,20 @@ import useGetUsers from './hooks/use-get-users';
 import { nameData, User } from './hooks/use-join-users';
 import Pagination from './pages/detail/components/pagination';
 
-const columns = [
-  { text: 'Name', width: '14%' },
-  { text: 'Footprint Token', width: '14%' },
-  { text: 'Status', width: '14%' },
-  { text: 'Email', width: '14%' },
-  { text: 'SSN', width: '14%' },
-  { text: 'Phone Number', width: '14%' },
-  { text: 'Date', width: '19%' },
-];
-
 const PAGE_SIZE = 10;
 
 const Users = () => {
+  const { t } = useTranslation('pages.users');
+  const columns = [
+    { text: t('table.header.name'), width: '14%' },
+    { text: t('table.header.token'), width: '14%' },
+    { text: t('table.header.status'), width: '14%' },
+    { text: t('table.header.email'), width: '14%' },
+    { text: t('table.header.ssn'), width: '14%' },
+    { text: t('table.header.phone-number'), width: '14%' },
+    { text: t('table.header.start'), width: '19%' },
+  ];
+  const [searchText, setSearchText] = useState<string>('');
   const {
     users,
     totalNumResults,
@@ -37,8 +48,6 @@ const Users = () => {
     setFilter,
   } = useGetUsers(PAGE_SIZE);
 
-  const [searchText, setSearchText] = useState<string>();
-
   const router = useRouter();
 
   // Bind the contents of the search text box to the querystring
@@ -48,23 +57,31 @@ const Users = () => {
 
   return (
     <>
-      <HeaderContainer>
-        <Typography variant="heading-2">Users</Typography>
-      </HeaderContainer>
-      <TableSearch>
-        <StyledSearchInput
-          placeholder="Search (exact match)..."
-          suffixElement={<UsersFilter />}
+      <Head>
+        <title>{t('page-title')}</title>
+      </Head>
+      <Typography variant="heading-2" sx={{ marginBottom: 5 }}>
+        {t('header.title')}
+      </Typography>
+      <SearchContainer>
+        <SearchInput
+          inputSize="compact"
+          sx={{ width: '300px' }}
           value={searchText}
-          inputSize="large"
           onChangeText={(text: string) =>
             setFilter({
               fingerprint: text,
             })
           }
         />
-      </TableSearch>
-      <Table
+        <UsersFilter />
+      </SearchContainer>
+      <Box sx={{ paddingY: 5 }}>
+        <Divider />
+      </Box>
+      <Table<User>
+        aria-label={t('table.aria-label')}
+        emptyStateText={t('table.empty-state')}
         items={users}
         isLoading={isLoading}
         getKeyForRow={(item: User) => item.footprintUserId}
@@ -131,31 +148,9 @@ const Users = () => {
   );
 };
 
-const HeaderContainer = styled.div`
-  ${({ theme }) => css`
-    margin-bottom: ${theme.spacing[5]}px;
-  `};
-`;
-
-const TableSearch = styled.div`
-  + table {
-    border-radius: 0;
-
-    th {
-      border-top: none;
-    }
-
-    th:first-child,
-    th:last-child {
-      border-radius: 0;
-    }
-  }
-`;
-
-const StyledSearchInput = styled(SearchInput)`
-  border-bottom-left-radius: 0;
-  border-bottom-right-radius: 0;
-  height: 52px;
+const SearchContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
 `;
 
 const CodeContainer = styled.div`

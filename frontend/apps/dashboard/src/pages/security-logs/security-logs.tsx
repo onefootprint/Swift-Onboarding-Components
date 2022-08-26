@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import Timeline from 'src/components/timeline';
 import { AccessEvent } from 'src/types';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 import { Box, Divider, SearchInput, Typography } from 'ui';
 
 import Dot from './components/dot';
@@ -49,7 +49,9 @@ const SecurityLogs = () => {
 
   return (
     <>
-      <Typography variant="heading-2">Security logs</Typography>
+      <Typography variant="heading-2" sx={{ marginBottom: 5 }}>
+        Security Logs
+      </Typography>
       <SearchAndFilterContainer>
         <SearchInput
           sx={{ width: '300px' }}
@@ -75,11 +77,7 @@ const SecurityLogs = () => {
 
 const SearchAndFilterContainer = styled.div`
   display: flex;
-  flex-direction: column wrap;
   justify-content: space-between;
-  ${({ theme }) => css`
-    margin-top: ${theme.spacing[5]}px;
-  `}
 `;
 
 export default SecurityLogs;
