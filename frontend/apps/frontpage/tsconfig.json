@@ -7,6 +7,7 @@
       "global-constants": ["../../packages/global-constants/src/*"],
       "themes": ["../../packages/themes/src/*"],
       "ui": ["../../packages/ui/src/*"],
+      "request": ["../../packages/request/src/*"],
       "hooks": ["../../packages/hooks/src/*"]
     }
   },

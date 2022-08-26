@@ -1,5 +1,6 @@
 import '@typeform/embed/build/css/popup.css';
 
+import { QueryClientProvider } from '@tanstack/react-query';
 import Head from 'next/head';
 import Script from 'next/script';
 import React from 'react';
@@ -12,6 +13,7 @@ import Layout from '../components/layout';
 import MDXProvider from '../components/mdx-provider';
 import { FATHOM_TRACKING_CODE } from '../config/constants';
 import configureReactI18next from '../config/initializers/react-i18next';
+import queryClient from '../config/initializers/react-query';
 
 configureReactI18next();
 
@@ -55,15 +57,17 @@ const App = ({ Component, pageProps }: AppProps) => (
         src="https://cdn.usefathom.com/script.js"
       />
     )}
-    <DesignSystemProvider theme={themes.light}>
-      <GlobalStyle />
-      <Layout>
-        <MDXProvider>
-          <Component {...pageProps} />
-        </MDXProvider>
-        <Drift appId="bp8bybvft4dm" />
-      </Layout>
-    </DesignSystemProvider>
+    <QueryClientProvider client={queryClient}>
+      <DesignSystemProvider theme={themes.light}>
+        <GlobalStyle />
+        <Layout>
+          <MDXProvider>
+            <Component {...pageProps} />
+          </MDXProvider>
+          <Drift appId="bp8bybvft4dm" />
+        </Layout>
+      </DesignSystemProvider>
+    </QueryClientProvider>
   </>
 );
 export default App;

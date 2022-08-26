@@ -46,7 +46,13 @@
     },
     "subscribe-to-newsletter": {
       "title": "Subscribe to our newsletter",
-      "description": "Receive updates on new blog posts & investor updates"
+      "description": "Receive updates on new blog posts & investor updates",
+      "form": {
+        "cta": "Subscribe",
+        "placeholder": "email@email.com",
+        "success": "Great, check your inbox and click the link we sent you to confirm your subscription!",
+        "error": "Sorry, something went wrong. Please try again."
+      }
     },
     "investors": {
       "img-alt": "An image with all the investors",
@@ -492,7 +498,7 @@
     "investor-updates": {
       "html-title": "Footprint - Investor Updates",
       "go-back": "Back",
-      "header-title-prefix": "Investor Update #",
+      "header-title-prefix": "Investor Update #{{index}}",
       "breadcrumb": {
         "title": "Investor Updates",
         "description": " | Updates we share with our investors",
@@ -500,7 +506,8 @@
       },
       "read-more": "Read more",
       "post": {
-        "reading-time": "{{readingTime}} min. read"
+        "reading-time": "{{readingTime}} min. read",
+        "update-index": " (Update #{{index}})"
       }
     }
   }

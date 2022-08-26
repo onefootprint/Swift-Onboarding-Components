@@ -4,10 +4,12 @@ import TwitterBreadcrumb from 'src/components/twitter-breadcrumb';
 import { getInitialPosts, PostType } from 'src/utils/ghost';
 import { Post } from 'src/utils/ghost/types';
 import styled, { css } from 'styled-components';
-import { Container, media } from 'ui';
+import { Container, Divider, media } from 'ui';
 
 import SEO from '../../components/seo';
+import SubscribeToNewsletter from '../../components/subscribe-to-newsletter/subscribe-to-newsletter';
 import InvestorUpdatePreview from './components/investor-update-preview';
+import INVESTOR_UPDATE_HIDE_CREATED_DATE_BEFORE from './constants';
 
 export const getStaticProps = async () => {
   const posts = await getInitialPosts(PostType.investorUpdate);
@@ -32,18 +34,29 @@ const InvestorUpdates = ({ posts }: InvestorUpdatesProps) => {
             twitterLabel={t('breadcrumb.twitter')}
           />
           <Posts>
-            {posts.map((post, index) => (
-              <InvestorUpdatePreview
-                index={posts.length - index}
-                href={`/investor-updates/${post.slug}`}
-                createdAt={formatDateWithLongMonth(new Date(post.created_at))}
-                excerpt={post.excerpt}
-                key={post.uuid}
-                title={post.title}
-              />
-            ))}
+            {posts.map((post, index) => {
+              const createdDate = new Date(post.created_at);
+              const shouldHideDate =
+                createdDate < INVESTOR_UPDATE_HIDE_CREATED_DATE_BEFORE;
+              const formattedCreatedDate = shouldHideDate
+                ? undefined
+                : formatDateWithLongMonth(createdDate);
+
+              return (
+                <InvestorUpdatePreview
+                  index={posts.length - index}
+                  href={`/investor-updates/${post.slug}`}
+                  createdAt={formattedCreatedDate}
+                  excerpt={post.excerpt}
+                  key={post.uuid}
+                  title={post.title}
+                />
+              );
+            })}
           </Posts>
+          <Divider />
         </Inner>
+        <SubscribeToNewsletter />
       </Container>
     </>
   );
@@ -64,7 +77,11 @@ const Inner = styled.div`
 const Posts = styled.div`
   ${({ theme }) => css`
     display: grid;
-    gap: ${theme.spacing[7]}px;
+    gap: ${theme.spacing[9]}px;
+
+    > :not(:last-child) {
+      border-bottom: 1px solid ${theme.borderColor.tertiary};
+    }
   `}
 `;
 

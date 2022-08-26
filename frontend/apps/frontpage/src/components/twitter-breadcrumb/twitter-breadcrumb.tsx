@@ -64,7 +64,7 @@ const BreadcrumbTitleContainer = styled.div`
 
 const BreadcrumbContainer = styled.div`
   ${({ theme }) => css`
-    margin-bottom: ${theme.spacing[7]}px;
+    margin-bottom: ${theme.spacing[9]}px;
   `}
 `;
 

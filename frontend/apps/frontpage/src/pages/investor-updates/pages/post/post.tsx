@@ -10,6 +10,7 @@ import { Box, Container, LinkButton, media, Typography } from 'ui';
 import DesktopSharePost from '../../../../components/desktop-share-post';
 import PostInfo from '../../../../components/post-info';
 import type { PostDetails } from '../../../../utils/ghost/types';
+import INVESTOR_UPDATE_HIDE_CREATED_DATE_BEFORE from '../../constants';
 
 export type PostProps = {
   post: PostDetails;
@@ -18,6 +19,11 @@ export type PostProps = {
 const Post = ({ post }: PostProps) => {
   const { t } = useTranslation('pages.investor-updates');
   const { formatDateWithLongMonth } = useIntl();
+  const createdDate = new Date(post.created_at);
+  const shouldHideDate = createdDate < INVESTOR_UPDATE_HIDE_CREATED_DATE_BEFORE;
+  const formattedCreatedDate = shouldHideDate
+    ? undefined
+    : formatDateWithLongMonth(new Date(post.created_at));
 
   return (
     <>
@@ -66,7 +72,7 @@ const Post = ({ post }: PostProps) => {
                 }}
               >
                 <PostInfo
-                  createdAt={formatDateWithLongMonth(new Date(post.created_at))}
+                  createdAt={formattedCreatedDate}
                   author={{
                     name: post.primary_author.name,
                     profileImage: post.primary_author.profile_image,
@@ -83,6 +89,7 @@ const Post = ({ post }: PostProps) => {
               </Box>
               <Typography variant="display-2" as="h1" sx={{ marginY: 9 }}>
                 {post.title}
+                {t('post.update-index', { index: post.meta_description })}
               </Typography>
             </Header>
             <PostContent html={post.html} />

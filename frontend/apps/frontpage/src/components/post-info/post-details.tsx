@@ -9,11 +9,11 @@ export type PostInfoProps = {
     name: string;
     profileImage: string;
   };
-  createdAt: string;
   readingTime: number;
   tag: {
     name: string;
   };
+  createdAt?: string;
 };
 
 const PostInfo = ({ author, createdAt, readingTime, tag }: PostInfoProps) => {
@@ -36,7 +36,7 @@ const PostInfo = ({ author, createdAt, readingTime, tag }: PostInfoProps) => {
         </Typography>
         <Typography variant="body-3" color="tertiary">
           {createdAt}
-          <Separator />
+          {createdAt && <Separator />}
           {t('post.reading-time', {
             readingTime,
           })}

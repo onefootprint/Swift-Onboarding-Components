@@ -13,8 +13,10 @@
     "set:dot-env": "vercel env pull"
   },
   "dependencies": {
+    "@tanstack/react-query": "^4.2.1",
     "@tryghost/content-api": "^1.11.0",
     "@typeform/embed": "^1.35.1",
+    "axios": "^0.27.2",
     "fathom-client": "^3.5.0",
     "global-constants": "*",
     "hooks": "*",
@@ -25,8 +27,10 @@
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-driftjs": "^1.2.2",
+    "react-hook-form": "^7.34.2",
     "react-swipeable": "^7.0.0",
     "react-use": "^17.3.2",
+    "request": "*",
     "styled-components": "^5.3.5",
     "themes": "*",
     "ui": "*"

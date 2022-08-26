@@ -1,6 +1,6 @@
 import React from 'react';
 import styled, { css } from 'styled-components';
-import { createFontStyles, media } from 'ui';
+import { createFontStyles } from 'ui';
 
 type PostContentProps = {
   html: string;
@@ -18,14 +18,6 @@ const Content = styled.div`
       max-width: 100%;
       object-fit: cover;
       object-position: left;
-    }
-
-    p,
-    h2,
-    h3 {
-      ${media.greaterThan('lg')`
-        padding: 0 ${theme.spacing[11]}px;
-      `}
     }
 
     h2,
@@ -80,6 +72,13 @@ const Content = styled.div`
       ${createFontStyles('heading-3')};
     }
 
+    li {
+      list-style-type: disc;
+      list-style-position: inside;
+      ${createFontStyles('body-1')};
+      margin-bottom: ${theme.spacing[9]}px;
+    }
+
     p {
       ${createFontStyles('body-1')};
 
@@ -90,6 +89,10 @@ const Content = styled.div`
 
     a {
       color: ${theme.color.accent};
+    }
+
+    strong {
+      ${createFontStyles('heading-3')}
     }
   `}
 `;
