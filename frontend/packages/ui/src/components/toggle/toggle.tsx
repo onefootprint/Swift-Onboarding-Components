@@ -127,6 +127,7 @@ const Button = styled.button<{ checked?: boolean }>`
     border-radius: ${theme.borderRadius[4]}px;
     border-style: solid;
     border-width: ${theme.borderWidth[2]}px;
+    cursor: pointer;
     height: 24px;
     outline-offset: ${theme.spacing[2]}px;
     padding: ${theme.spacing[1]}px;

@@ -113,6 +113,7 @@ const Header = styled.header`
 const CopyButton = styled.button`
   background: none;
   border: none;
+  cursor: pointer;
   padding: 0;
   display: flex;
 

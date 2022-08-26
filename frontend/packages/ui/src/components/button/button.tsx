@@ -79,6 +79,7 @@ const ButtonContainer = styled.button<{
     ${createLoadingStyles($loading)};
     align-items: center;
     border-radius: ${theme.borderRadius[2]}px;
+    cursor: pointer;
     display: flex;
     justify-content: center;
     outline-offset: ${theme.spacing[2]}px;

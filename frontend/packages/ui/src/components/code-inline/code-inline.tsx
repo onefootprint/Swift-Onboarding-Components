@@ -78,6 +78,11 @@ const Button = styled.button`
   border: none;
   margin: 0;
   padding: 0;
+  cursor: pointer;
+
+  &:disabled {
+    cursor: not-allowed;
+  }
 `;
 
 const CodeContent = styled.code`

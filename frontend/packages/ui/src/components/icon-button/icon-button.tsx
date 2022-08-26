@@ -39,14 +39,15 @@ const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
 
 const Container = styled.button`
   align-items: center;
+  background: none;
   border: none;
+  cursor: pointer;
   display: flex;
   height: 32px;
   justify-content: center;
   margin: 0;
   padding: 0;
   width: 32px;
-  background: none;
 
   ${({ theme }) => css`
     border-radius: ${theme.borderRadius[4]}px;

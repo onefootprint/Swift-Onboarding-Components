@@ -94,7 +94,7 @@ export const LinkButtonStyled = styled.a.attrs<{
     background: transparent;
     border: none;
     color: ${theme.color[variant === 'default' ? 'accent' : 'error']};
-    cursor: ${disabled ? 'auto' : 'cursor'};
+    cursor: ${disabled ? 'auto' : 'pointer'};
     display: inline-flex;
     margin: 0;
     padding: 0;
