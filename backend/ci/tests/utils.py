@@ -13,10 +13,18 @@ from .constants import CUSTODIAN_AUTH, EMAIL, PHONE_NUMBER
 
 url = lambda path: "{}/{}".format(os.environ.get("TEST_URL"), path)
 
+SERVER_VERSION_HEADER = "x-footprint-server-version"
+
 
 class HttpError(Exception):
     def __init__(self, code, message):
         self.code = code
+        super().__init__(message)
+
+
+class IncorrectServerVersion(Exception):
+    def __init__(self, expected_version, actual_version):
+        message = f"Expected server version {expected_version}, got {actual_version}"
         super().__init__(message)
 
 
@@ -33,7 +41,11 @@ def _make_request(method, path, data, params, status_code, auths):
             response.status_code,
             f"Incorrect status code in {method.__name__.upper()} {path}. Got {response.status_code}, expected {status_code}:\n{response.content}\nPath: {path}\nData: {data}\nParams: {params}\nHeaders: {headers}\nResponse: {response.content}",
         )
-    return response.json()
+    expected_version = os.environ.get("EXPECTED_SERVER_VERSION", None)
+    actual_version = response.headers.get(SERVER_VERSION_HEADER)
+    if expected_version and actual_version != expected_version:
+        raise IncorrectServerVersion(expected_version, actual_version)
+    return response
 
 
 def get(path, params=None, *auths, status_code=200):
@@ -44,7 +56,8 @@ def get(path, params=None, *auths, status_code=200):
         params=params,
         status_code=status_code,
         auths=auths,
-    )
+    ).json()
+
 
 def put(path, data=None, *auths, status_code=200):
     return _make_request(
@@ -54,7 +67,8 @@ def put(path, data=None, *auths, status_code=200):
         params=None,
         status_code=status_code,
         auths=auths,
-    )
+    ).json()
+
 
 def post(path, data=None, *auths, status_code=200):
     return _make_request(
@@ -64,7 +78,7 @@ def post(path, data=None, *auths, status_code=200):
         params=None,
         status_code=status_code,
         auths=auths,
-    )
+    ).json()
 
 
 def patch(path, data=None, *auths, status_code=200):
@@ -75,7 +89,7 @@ def patch(path, data=None, *auths, status_code=200):
         params=None,
         status_code=status_code,
         auths=auths,
-    )
+    ).json()
 
 
 def try_until_success(fn, timeout_s=5, retry_interval_s=1):

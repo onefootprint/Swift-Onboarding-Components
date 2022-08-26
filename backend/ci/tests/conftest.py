@@ -1,5 +1,7 @@
 import json
+import requests
 import os
+import time
 import pytest
 from twilio.rest import Client
 from .constants import (
@@ -9,14 +11,47 @@ from .constants import (
 )
 from .types import User
 from .utils import (
+    IncorrectServerVersion,
     _override_webauthn_attestation,
     _override_webauthn_challenge,
     build_user_data,
     post,
+    _make_request,
     create_tenant,
     create_basic_user,
 )
 from .webauthn_simulator import SoftWebauthnDevice
+
+
+@pytest.fixture(scope="session", autouse="true")
+def wait_for_deploy():
+    """
+    Run once per test session to make sure that the correct version of code is deployed
+    """
+    expected_version = os.environ.get("EXPECTED_SERVER_VERSION", None)
+    if not expected_version:
+        # Running locally, no need to wait for server version
+        return
+    num_successes = 0
+    failed_attempts = 0
+    REQUIRED_NUM_SUCCESS = 30
+    MAX_ATTEMPTS = 60
+    while num_successes < REQUIRED_NUM_SUCCESS:
+        try:
+            _make_request(requests.get, "/", None, None, 200, [])
+            num_successes += 1
+            time.sleep(1)
+        except IncorrectServerVersion as e:
+            print(e)
+            # Reset our success counter to make sure we have consecutive success
+            num_successes = 0
+            failed_attempts += 1
+            if failed_attempts == MAX_ATTEMPTS:
+                raise e
+            time.sleep(10)
+    print(
+        f"Correct server version {expected_version} found! Continuing to run tests..."
+    )
 
 
 @pytest.fixture(scope="session")

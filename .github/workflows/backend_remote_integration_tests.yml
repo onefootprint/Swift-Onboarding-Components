@@ -45,6 +45,7 @@ jobs:
     env:
       PR_NUMBER: ${{ inputs.prNumber }}
       TEST_URL: ${{ inputs.testUrl }}
+      EXPECTED_SERVER_VERSION: ${{ github.sha }}
       INTEGRATION_TEST_PHONE_NUMBER: ${{ secrets.INTEGRATION_TEST_PHONE_NUMBER }}
       TWILIO_ACCOUNT_SID: ${{ secrets.TWILIO_ACCOUNT_SID }}
       TWILIO_API_KEY: ${{ secrets.TWILIO_API_KEY }}
@@ -52,13 +53,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-
-      - name: Wait for new deploy
-        if: ${{ inputs.waitForDeploy }}      
-        run: ./backend/util/scripts/server_version_wait.sh
-        shell: bash
-        env:
-          GIT_HASH: ${{ github.sha }}
 
       - name: Setup Python # Set Python version
         uses: actions/setup-python@v3
