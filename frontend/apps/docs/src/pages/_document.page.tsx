@@ -9,6 +9,8 @@ import React from 'react';
 import { ServerStyleSheet } from 'styled-components';
 import { LoadFonts } from 'ui';
 
+import { COMMIT_SHA, DEPLOYMENT_URL } from '../config/constants';
+
 export default class MyDocument extends Document {
   static async getInitialProps(ctx: DocumentContext) {
     const sheet = new ServerStyleSheet();
@@ -35,6 +37,8 @@ export default class MyDocument extends Document {
       <Html>
         <Head>
           <LoadFonts />
+          <meta name="app-commit-sha" content={COMMIT_SHA} />
+          <meta name="app-deployment-url" content={DEPLOYMENT_URL} />
         </Head>
         <body>
           <Main />
