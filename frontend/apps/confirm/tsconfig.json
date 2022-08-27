@@ -5,10 +5,11 @@
     "paths": {
       "src/*": ["src/*"],
       "global-constants": ["../../packages/global-constants/src/*"],
+      "hooks": ["../../packages/hooks/src/*"],
+      "icons": ["../../packages/icons/src/*"],
       "request": ["../../packages/request/src/*"],
       "themes": ["../../packages/themes/src/*"],
-      "ui": ["../../packages/ui/src/*"],
-      "hooks": ["../../packages/hooks/src/*"]
+      "ui": ["../../packages/ui/src/*"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],

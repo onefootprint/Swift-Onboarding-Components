@@ -6,11 +6,7 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
 
 // TODO: Transpile
 // https://linear.app/footprint/issue/FP-534/footprintjs-build
-const withTM = require('next-transpile-modules')([
-  'icons',
-  'footprint-ui',
-  'types',
-]);
+const withTM = require('next-transpile-modules')(['footprint-ui', 'types']);
 
 module.exports = withPlugins([withTM, withBundleAnalyzer], {
   pageExtensions: ['page.tsx', 'page.ts', 'page.jsx', 'page.js'],

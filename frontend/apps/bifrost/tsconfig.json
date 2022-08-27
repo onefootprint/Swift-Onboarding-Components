@@ -9,7 +9,8 @@
       "hooks": ["../../packages/hooks/src/*"],
       "request": ["../../packages/request/src/*"],
       "themes": ["../../packages/themes/src/*"],
-      "ui": ["../../packages/ui/src/*"]
+      "ui": ["../../packages/ui/src/*"],
+      "icons": ["../../packages/icons/src/*"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],

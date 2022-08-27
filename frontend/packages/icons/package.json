@@ -1,11 +1,18 @@
 {
   "name": "icons",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "sideEffects": false,
   "license": "MIT",
-  "main": "./src/index.ts",
-  "types": "./src/index.ts",
+  "files": [
+    "dist/**"
+  ],
   "scripts": {
+    "build": "tsup src/index.ts --format esm,cjs --dts --minify",
+    "dev": "tsup src/index.ts --format esm,cjs --watch --dts",
     "lint": "eslint src --fix",
     "typecheck": "yarn tsc --noEmit",
     "generate:icos": "node ./src/scripts/icos/generate.js",
@@ -14,6 +21,7 @@
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
   },
   "devDependencies": {
+    "tsup": "^6.2.2",
     "@svgr/core": "^6.2.1",
     "@svgr/plugin-jsx": "^6.2.1",
     "@svgr/plugin-prettier": "^6.1.2",

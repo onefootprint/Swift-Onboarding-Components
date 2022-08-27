@@ -4,6 +4,7 @@
     "baseUrl": ".",
     "paths": {
       "ui": ["../ui/src/*"],
+      "icons": ["../icons/src/*"],
       "themes": ["../themes/src/*"]
     }
   },

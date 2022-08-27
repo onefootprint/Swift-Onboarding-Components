@@ -1,9 +1,5 @@
 /** @type {import('next').NextConfig} */
 const withPlugins = require('next-compose-plugins');
-const withBundleAnalyzer = require('@next/bundle-analyzer')({
-  enabled: process.env.ANALYZE === 'true',
-});
-const withTM = require('next-transpile-modules')(['icons']);
 
 const withMDX = require('@next/mdx')({
   pageExtensions: ['ts', 'tsx', 'js', 'jsx', 'md', 'mdx'],
@@ -15,7 +11,7 @@ const withMDX = require('@next/mdx')({
   },
 });
 
-module.exports = withPlugins([withTM, withMDX, withBundleAnalyzer], {
+module.exports = withPlugins([withMDX], {
   pageExtensions: ['page.tsx', 'page.ts', 'page.jsx', 'page.js', 'page.mdx'],
   reactStrictMode: true,
   compiler: {

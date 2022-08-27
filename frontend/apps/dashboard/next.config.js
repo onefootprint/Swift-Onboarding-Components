@@ -1,14 +1,9 @@
 /** @type {import('next').NextConfig} */
-const withPlugins = require('next-compose-plugins');
-const withBundleAnalyzer = require('@next/bundle-analyzer')({
-  enabled: process.env.ANALYZE === 'true',
-});
-const withTM = require('next-transpile-modules')(['icons']);
 
-module.exports = withPlugins([withTM, withBundleAnalyzer], {
+module.exports = {
   pageExtensions: ['page.tsx', 'page.ts', 'page.jsx', 'page.js'],
   reactStrictMode: false,
   compiler: {
     styledComponents: true,
   },
-});
+};
