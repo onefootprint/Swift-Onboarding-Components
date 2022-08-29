@@ -42,7 +42,7 @@
       },
       "new-tab-processing": {
         "title": "Liveness check pending",
-        "subtitle": "We opened a new browser tab on this device. Please complete your liveness check in there",
+        "subtitle": "We opened a new browser tab on this device. Please complete your liveness check in there.",
         "cancel": "Cancel"
       },
       "liveness-check-success": {
