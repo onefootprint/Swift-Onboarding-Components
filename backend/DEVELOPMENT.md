@@ -183,6 +183,18 @@ psql postgresql://postgres:<PASSWORD>@<JUMPBOX_IP>
 diesel --database-url postgresql://postgres:<PASSWORD>@<JUMPBOX_IP> print-schema
 ```
 
+## Wiping a db
+```
+psql -h <DBHOST> -d postgres -U footprint
+# enter the DB password
+
+select pg_terminate_backend(pid) from pg_stat_activity where query not like '%pg_stat_activity%' and usename='footprint';
+
+ALTER DATABASE footprint RENAME TO footprint_old;
+
+CREATE DATABASE footprint;
+```
+
 ## Running integration tests
 
 We have [integration tests](./ci/integration_tests.py) for the most common API flows. They are written in python using pytest. They run consecutively and store some state variables in the `request.config`, which is passed from test to test - therefore, they are required to all be executed in series.

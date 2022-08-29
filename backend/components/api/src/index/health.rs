@@ -38,7 +38,10 @@ pub struct EnclaveHealthResponse {
 #[api_v2_operation(tags(Private))]
 #[tracing::instrument(name = "enclave_health", skip(state))]
 #[get("/health/enclave")]
-async fn enclave(state: web::Data<State>) -> JsonApiResponse<EnclaveHealthResponse> {
+async fn enclave(
+    state: web::Data<State>,
+    _custodian: CustodianAuthContext,
+) -> JsonApiResponse<EnclaveHealthResponse> {
     let now = Instant::now();
 
     let (pk, sk) = state.enclave_client.generate_sealed_keypair().await?;
@@ -67,7 +70,10 @@ async fn enclave(state: web::Data<State>) -> JsonApiResponse<EnclaveHealthRespon
 #[api_v2_operation(tags(Private))]
 #[tracing::instrument(name = "enclave_health_decrypt", skip(state))]
 #[get("/health/enclave_decrypt")]
-async fn enclave_decrypt(state: web::Data<State>) -> JsonApiResponse<EnclaveHealthResponse> {
+async fn enclave_decrypt(
+    state: web::Data<State>,
+    _custodian: CustodianAuthContext,
+) -> JsonApiResponse<EnclaveHealthResponse> {
     let now = Instant::now();
 
     let test = newtypes::PiiString::from("test data");
