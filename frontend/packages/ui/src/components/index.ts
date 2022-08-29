@@ -29,6 +29,7 @@ export { default as FootprintButton } from './footprint-button';
 export * from './google-button';
 export { default as GoogleButton } from './google-button';
 export { default as Grid } from './grid';
+export { default as HoverCard } from './hover-card';
 export * from './icon-button';
 export { default as IconButton } from './icon-button';
 export * from './inline-alert';

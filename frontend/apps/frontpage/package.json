@@ -13,6 +13,7 @@
     "set:dot-env": "vercel env pull"
   },
   "dependencies": {
+    "@formkit/auto-animate": "^1.0.0-beta.3",
     "@tanstack/react-query": "^4.2.1",
     "@tryghost/content-api": "^1.11.0",
     "@typeform/embed": "^1.35.1",
