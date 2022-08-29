@@ -35,7 +35,7 @@ const stepCheck = () => {
 
   // Changes to any files in this app should trigger re-building
   const hasChangedApp = fileNameList.some(file =>
-    dirSet.some(dir => file.startsWith(dir)),
+    Array.from(dirSet).some(dir => file.startsWith(dir)),
   );
   // Changes to packages (ui components, types, hooks, etc.) should trigger building all apps
   const hasChangedPackages = fileNameList.some(file =>
