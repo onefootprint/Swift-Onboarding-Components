@@ -130,6 +130,8 @@ CREATE INDEX IF NOT EXISTS scoped_users_fp_id ON scoped_user(fp_user_id);
 CREATE INDEX IF NOT EXISTS scoped_users_tenant_id ON scoped_user(tenant_id);
 CREATE INDEX IF NOT EXISTS scoped_users_user_vault_id ON scoped_user(user_vault_id);
 CREATE UNIQUE INDEX IF NOT EXISTS scoped_users_unique_user_vault_id_tenant_id ON scoped_user(user_vault_id, tenant_id);
+-- Obfuscate the minimum ordering_id
+ALTER SEQUENCE scoped_user_ordering_id_seq START 100000;
 
 SELECT diesel_manage_updated_at('scoped_user');
 
@@ -197,6 +199,9 @@ CREATE TABLE access_event (
 
 CREATE INDEX IF NOT EXISTS access_events_scoped_user_id_data_kind ON access_event(scoped_user_id, data_kinds);
 CREATE INDEX IF NOT EXISTS access_events_insight_event_id ON access_event(insight_event_id);
+
+-- Obfuscate the minimum ordering_id
+ALTER SEQUENCE access_event_ordering_id_seq START 100000;
 
 SELECT diesel_manage_updated_at('access_event');
 
