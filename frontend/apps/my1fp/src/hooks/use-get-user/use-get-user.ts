@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import request, { RequestError, RequestResponse } from 'request';
+import request, { RequestError } from 'request';
 
 import { MY1FP_AUTH_HEADER } from '../../config/constants';
 import useSessionUser from '../use-session-user';
@@ -15,7 +15,7 @@ export type GetUserResponse = {
 };
 
 const getUser = async (payload: GetUserRequest) => {
-  const { data: response } = await request<RequestResponse<GetUserResponse>>({
+  const response = await request<GetUserResponse>({
     method: 'GET',
     url: '/hosted/user',
     headers: {

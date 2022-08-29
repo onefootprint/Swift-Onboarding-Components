@@ -1,5 +1,5 @@
 import { useMutation } from '@tanstack/react-query';
-import request, { RequestError, RequestResponse } from 'request';
+import request, { RequestError } from 'request';
 import { MY1FP_AUTH_HEADER } from 'src/config/constants';
 
 export type VerificationEmailRequest = {
@@ -12,9 +12,7 @@ export type VerificationEmailResponse = {
 };
 
 const verificationEmailRequest = async (payload: VerificationEmailRequest) => {
-  const { data: response } = await request<
-    RequestResponse<VerificationEmailResponse>
-  >({
+  const response = await request<VerificationEmailResponse>({
     method: 'post',
     url: '/hosted/user/email/challenge',
     data: {

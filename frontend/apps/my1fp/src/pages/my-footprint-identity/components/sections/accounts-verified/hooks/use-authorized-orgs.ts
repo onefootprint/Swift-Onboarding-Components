@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import request, { RequestError, RequestResponse } from 'request';
+import request, { RequestError } from 'request';
 import { MY1FP_AUTH_HEADER } from 'src/config/constants';
 import useSessionUser from 'src/hooks/use-session-user';
 
@@ -12,9 +12,7 @@ export type AuthorizedOrgsRequest = {
 export type AuthorizedOrgsResponse = AuthorizedOrg[];
 
 const getAuthorizedOrgs = async (payload: AuthorizedOrgsRequest) => {
-  const { data: response } = await request<
-    RequestResponse<AuthorizedOrgsResponse>
-  >({
+  const response = await request<AuthorizedOrgsResponse>({
     method: 'GET',
     url: '/hosted/user/authorized_orgs',
     headers: {

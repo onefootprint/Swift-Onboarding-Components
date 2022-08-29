@@ -9,6 +9,7 @@ pub struct TenantApiKeyResponse {
     name: String,
     status: ApiKeyStatus,
     created_at: DateTime<Utc>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     key: Option<SecretApiKey>,
     last_used_at: Option<DateTime<Utc>>,
     is_live: bool,

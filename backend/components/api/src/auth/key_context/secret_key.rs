@@ -16,10 +16,10 @@ use std::pin::Pin;
 #[openapi(
     apiKey,
     in = "header",
-    name = "X-Client-Secret-Key",
+    name = "X-Footprint-Secret-Key",
     description = "The client's secret key"
 )]
-/// SecretTenantAuthContext extracts a tenant's public key from the X-Client-Secret-Key header
+/// SecretTenantAuthContext extracts a tenant's public key from the X-Footprint-Secret-Key header
 /// which authenticates the client as a tenant.
 pub struct SecretTenantAuthContext {
     tenant: Tenant,
@@ -33,7 +33,7 @@ impl SecretTenantAuthContext {
     }
 }
 
-pub const HEADER_NAME: &str = "X-Client-Secret-Key";
+pub const HEADER_NAME: &str = "X-Footprint-Secret-Key";
 
 impl FromRequest for SecretTenantAuthContext {
     type Error = crate::ApiError;

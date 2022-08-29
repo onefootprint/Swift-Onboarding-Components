@@ -1,5 +1,5 @@
 import { useMutation } from '@tanstack/react-query';
-import request, { RequestError, RequestResponse } from 'request';
+import request, { RequestError } from 'request';
 import {
   ChallengeData,
   ChallengeKind,
@@ -39,9 +39,7 @@ type PrivateIdentifyResponse = {
 };
 
 const identifyRequest = async (payload: IdentifyRequest) => {
-  const { data: response } = await request<
-    RequestResponse<PrivateIdentifyResponse>
-  >({
+  const response = await request<PrivateIdentifyResponse>({
     method: 'POST',
     url: '/hosted/identify',
     data: payload,

@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { useIntl } from 'hooks';
-import request, { RequestError, RequestResponse } from 'request';
+import request, { PaginatedRequestResponse, RequestError } from 'request';
 import useSessionUser, { AuthHeaders } from 'src/hooks/use-session-user';
 import type { OnboardingConfig } from 'src/types/onboarding-config';
 
@@ -12,7 +12,7 @@ export type GetOnboardingConfigsResponse = OnboardingConfig[];
 
 const getApiKeys = async ({ authHeaders }: GetOnboardingConfigsRequest) => {
   const { data: response } = await request<
-    RequestResponse<GetOnboardingConfigsResponse>
+    PaginatedRequestResponse<GetOnboardingConfigsResponse>
   >({
     method: 'GET',
     url: '/org/onboarding_configs',

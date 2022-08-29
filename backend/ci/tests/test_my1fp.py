@@ -19,13 +19,13 @@ def my1fp_authed_user(user, twilio):
 
     def identify():
         body = post("hosted/identify", data)
-        assert body["data"]["user_found"]
+        assert body["user_found"]
         assert (
-            body["data"]["challenge_data"]["phone_number_last_two"]
+            body["challenge_data"]["phone_number_last_two"]
             == user.real_phone_number[-2:]
         )
-        assert body["data"]["challenge_data"]["challenge_kind"] == "sms"
-        return body["data"]["challenge_data"]["challenge_token"]
+        assert body["challenge_data"]["challenge_kind"] == "sms"
+        return body["challenge_data"]["challenge_token"]
 
     challenge_token = try_until_success(identify, 20, 1)
 
@@ -46,7 +46,7 @@ class TestMy1fp:
     def test_decrypt(self, my1fp_authed_user):
         data = {"attributes": ["phone_number", "email", "address_line1", "zip"]}
         body = post("hosted/user/decrypt", data, my1fp_authed_user.auth_token)
-        attributes = body["data"]
+        attributes = body
         assert attributes["phone_number"] == my1fp_authed_user.phone_number.replace(
             " ", ""
         )
@@ -63,17 +63,17 @@ class TestMy1fp:
     def test_user_detail(self, my1fp_authed_user):
         # Get the user detail using the logged in context
         body = get("hosted/user", None, my1fp_authed_user.auth_token)
-        phone_numbers = body["data"]["phone_numbers"]
+        phone_numbers = body["phone_numbers"]
         assert phone_numbers[0]["is_verified"]
         assert phone_numbers[0]["priority"] == "primary"
-        emails = body["data"]["emails"]
+        emails = body["emails"]
         assert not emails[0]["is_verified"]
         assert emails[0]["priority"] == "primary"
 
     def test_authorized_tenants(self, my1fp_authed_user, can_access_data):
         # Get the user detail using the logged in context
         body = get("hosted/user/authorized_orgs", None, my1fp_authed_user.auth_token)
-        authorized_orgs = body["data"]
+        authorized_orgs = body
 
         onboarding_info = authorized_orgs[0]["onboardings"][0]
         assert onboarding_info["name"] == "Acme Bank Card"
@@ -92,7 +92,7 @@ class TestMy1fp:
 
         # Get the user detail using the logged in context
         body = get("hosted/user/access_events", None, my1fp_authed_user.auth_token)
-        access_events = body["data"]
+        access_events = body
         assert len(access_events) == len(FIELDS_TO_DECRYPT)
         for i, expected_fields in enumerate(FIELDS_TO_DECRYPT[-1:0]):
             assert set(access_events[i]["data_kinds"]) == set(expected_fields)

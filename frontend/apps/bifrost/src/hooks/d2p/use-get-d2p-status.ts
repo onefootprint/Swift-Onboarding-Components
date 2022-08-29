@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import request, { RequestError, RequestResponse } from 'request';
+import request, { RequestError } from 'request';
 import { BIFROST_AUTH_HEADER } from 'src/config/constants';
 import { useLivenessRegisterMachine } from 'src/pages/liveness-register/components/machine-provider';
 
@@ -22,7 +22,7 @@ export type GetD2PResponse = {
 };
 
 const getD2PStatus = async (payload: GetD2PRequest) => {
-  const { data: response } = await request<RequestResponse<GetD2PResponse>>({
+  const response = await request<GetD2PResponse>({
     method: 'GET',
     url: '/hosted/onboarding/d2p/status',
     headers: {

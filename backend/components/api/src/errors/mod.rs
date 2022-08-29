@@ -79,6 +79,8 @@ pub enum ApiError {
     UserNotLocked,
     #[error("Endpoint not found")]
     EndpointNotFound,
+    #[error("Method not allowed for endpoint")]
+    MethodNotAllowed,
 }
 
 impl<T> From<WorkOsError<T>> for ApiError
@@ -153,6 +155,7 @@ impl actix_web::ResponseError for ApiError {
             ApiError::WorkOsLoginError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::UserNotLocked => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::EndpointNotFound => StatusCode::NOT_FOUND,
+            ApiError::MethodNotAllowed => StatusCode::METHOD_NOT_ALLOWED,
         }
     }
 

@@ -34,7 +34,7 @@ pub async fn post(
     if request.speculative {
         // We've already parsed the request and done validation on the input. Return a successful
         // response before writing anything to the DB
-        return Ok(Json(ApiResponseData::ok(EmptyResponse)));
+        return Ok(Json(EmptyResponse::ok()));
     }
 
     let user_vault = user_auth.user_vault(&state.db_pool).await?;

@@ -65,5 +65,5 @@ pub fn post(
         })
         .await??;
 
-    Ok(Json(ApiResponseData { data: EmptyResponse }))
+    Ok(Json(EmptyResponse::ok()))
 }

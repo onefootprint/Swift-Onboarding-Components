@@ -18,7 +18,7 @@ const AccessLogs = () => {
   }
 
   const accessLogs = (getAccessLogsQuery.data?.pages || []).reduce(
-    (allPages, page) => [...allPages, ...page.data],
+    (allPages, page) => [...allPages, ...page],
     [] as AccessLog[],
   );
   const isLoading =

@@ -40,5 +40,5 @@ fn handler(
 
     crate::utils::email::send_magic_link_dashboard_auth_email(&state, email.to_owned(), link).await?;
 
-    Ok(Json(ApiResponseData { data: EmptyResponse }))
+    Ok(Json(EmptyResponse::ok()))
 }

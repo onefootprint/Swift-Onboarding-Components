@@ -1,6 +1,6 @@
 import { useMutation } from '@tanstack/react-query';
 import { partial } from 'lodash';
-import request, { RequestError, RequestResponse } from 'request';
+import request, { RequestError } from 'request';
 import useSessionUser, { AuthHeaders } from 'src/hooks/use-session-user';
 import { DataKind, DataKinds, DecryptedUserAttributes } from 'src/types';
 
@@ -16,9 +16,7 @@ const decryptUserRequest = async (
   authHeaders: AuthHeaders,
   data: DecryptUserRequest,
 ) => {
-  const { data: response } = await request<
-    RequestResponse<DecryptedUserAttributes>
-  >({
+  const response = await request<DecryptedUserAttributes>({
     method: 'POST',
     url: `/users/${data.footprintUserId}/identity/decrypt`,
     data: { fields: data.fields, reason: data.reason },

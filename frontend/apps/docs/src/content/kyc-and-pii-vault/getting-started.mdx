@@ -39,15 +39,24 @@ window.onFootprintComplete = function(token) {
 
 ## Verify the Footprint token server-side
 
-1. Go to the Footprint developer dashboard and generate a new Secret API Key. This will look something like `sk_test_CJvsN1kaZH3GGtYkaZH3GGtY`. Add this to the credential manager of your server-side app.
+1. Go to the Footprint developer dashboard and generate a new Secret API Key. This will look something like `sk_test_CXUsbCR8j2kH6e5GeEl8eSBnQTIPCUaKpv`. Add this to the credential manager of your server-side app.
 
 <inline-alert variant='warning'>Treat this key like a sensitive password! It allows anyone to impersonate your company.</inline-alert>
+
+The Footprint API uses API keys to authenticate requests. You can view and manage your API keys in the developer dashboard. Go to the Footprint [developer dashboard](https://dashboard.onefootprint.com/developers) and generate a new **Secret API Key**. Test mode secret keys have the prefix `sk_test` and live mode secret keys have the prefix `sk_live`. 
+
+<inline-alert variant='warning'>Treat this key like a sensitive password! Your API keys carry many privileges, so be sure to keep them secure! Do not post your secret keys in publicly accessible places like GitHub or client-side code like web front-ends.</inline-alert>
+
+Authentication to the API is performed via HTTP Basic Auth. Provide your API key as the basic auth username value with no password. Alternatively, Footprint supports header-based auth via a custom header.
+If you need to authenticate via bearer auth (e.g., for a cross-origin request), use `-H "X-Footprint-Secret-Key: sk_test_CXUsbCR8j2kH6e5GeEl8eSBnQTIPCUaKpv"` instead of `-u <api_key>:`.
+
+<inline-alert variant='info'>All API requests must be made over HTTPS, calls made over plain HTTP will fail.</inline-alert>
 
 2. From step 5 above, you should create/modify your endpoint to receive the validation token from your frontend. In this endpoint, send the validation token to Footprint’s backend.
 
 ```bash
-curl -X POST https://api.onefootprint.com/id/validate \
-   -u sk_test_CJvsN1kaZH3GGtYkaZH3GGtY: \
+curl -X POST https://api.onefootprint.com/users/validate \
+   -u sk_test_CXUsbCR8j2kH6e5GeEl8eSBnQTIPCUaKpv: \
    -d '{"validation_token": "vtok_udLaWUxPBo3fss603v8kY8k9ssjboxfwI"}'
 ```
 
@@ -69,13 +78,21 @@ curl -X POST https://api.onefootprint.com/id/validate \
 
 ```bash
 curl -X GET -G https://api.onefootprint.com/users/fp_id_GSxJr68GAf5jUT3pdL9ndjf7TLkA3GCX/audit_trail \
-   -u sk_test_CJvsN1kaZH3GGtYkaZH3GGtY
+   -u sk_test_CXUsbCR8j2kH6e5GeEl8eSBnQTIPCUaKpv
 ```
 
 6. (Optionally) Decrypt identity fields from the user’s vault:
 
 ```bash
-curl -X POST https://api.onefootprint.com/users/decrypt \
-   -u sk_test_CJvsN1kaZH3GGtYkaZH3GGtY: \
-   -d '{"attributes": ["first_name", "last_name", "ssn4"}'
+curl -X POST https://api.onefootprint.com/users/fp_id_GSxJr68GAf5jUT3pdL9ndjf7TLkA3GCX/identity/decrypt \
+   -u sk_test_CXUsbCR8j2kH6e5GeEl8eSBnQTIPCUaKpv: \
+   -d '{"fields": ["dob", "last_name", "ssn4"}'
+```
+
+```json
+{
+   "dob": "1988-12-12",
+   "ssn4": "1212",
+   "last_name": "SMITH"
+}
 ```

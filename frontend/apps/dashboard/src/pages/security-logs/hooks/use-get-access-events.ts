@@ -32,7 +32,7 @@ const getAccessEventsRequest = async ({
     kind: 'decrypt',
     cursor: pageParam,
   };
-  const { data: response } = await request<
+  const response = await request<
     PaginatedRequestResponse<AccessEventsResponse>
   >({
     method: 'GET',
@@ -40,7 +40,7 @@ const getAccessEventsRequest = async ({
     params,
     headers: authHeaders,
   });
-  return response;
+  return response.data;
 };
 
 const useGetAccessEvents = () => {

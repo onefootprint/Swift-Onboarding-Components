@@ -1,5 +1,5 @@
 import { useMutation } from '@tanstack/react-query';
-import request, { RequestError, RequestResponse } from 'request';
+import request, { RequestError } from 'request';
 
 export type EmailLoginRequest = {
   emailAddress: string;
@@ -9,13 +9,11 @@ export type EmailLoginRequest = {
 export type EmailLoginResponse = {};
 
 const loginEmailRequest = async (payload: EmailLoginRequest) => {
-  const { data: response } = await request<RequestResponse<EmailLoginResponse>>(
-    {
-      method: 'POST',
-      url: '/org/auth/magic_link',
-      data: payload,
-    },
-  );
+  const response = await request<EmailLoginResponse>({
+    method: 'POST',
+    url: '/org/auth/magic_link',
+    data: payload,
+  });
   return response.data;
 };
 

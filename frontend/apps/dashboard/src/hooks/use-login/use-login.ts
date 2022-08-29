@@ -1,5 +1,5 @@
 import { useMutation } from '@tanstack/react-query';
-import request, { RequestError, RequestResponse } from 'request';
+import request, { RequestError } from 'request';
 
 export type LoginResponse = {
   auth: string;
@@ -12,7 +12,7 @@ export type LoginResponse = {
 };
 
 const login = async (code: string) => {
-  const { data: response } = await request<RequestResponse<LoginResponse>>({
+  const response = await request<LoginResponse>({
     method: 'POST',
     url: '/org/auth/login',
     data: { code },

@@ -1,5 +1,5 @@
 import { useMutation } from '@tanstack/react-query';
-import request, { RequestError, RequestResponse } from 'request';
+import request, { RequestError } from 'request';
 import {
   BIFROST_AUTH_HEADER,
   CLIENT_PUBLIC_KEY_HEADER,
@@ -18,9 +18,7 @@ export type OnboardingCompleteResponse = {
 const onboardingCompleteRequest = async (
   payload: OnboardingCompleteRequest,
 ) => {
-  const { data: response } = await request<
-    RequestResponse<OnboardingCompleteResponse>
-  >({
+  const response = await request<OnboardingCompleteResponse>({
     method: 'POST',
     url: '/hosted/onboarding/complete',
     headers: {

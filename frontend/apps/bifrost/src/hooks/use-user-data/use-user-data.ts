@@ -1,5 +1,5 @@
 import { useMutation } from '@tanstack/react-query';
-import request, { RequestError, RequestResponse } from 'request';
+import request, { RequestError } from 'request';
 import { BIFROST_AUTH_HEADER } from 'src/config/constants';
 
 export type UserDataObj = {
@@ -37,7 +37,7 @@ export type UserDataRequest = {
 export type UserDataResponse = { data: string };
 
 const userDataRequest = async (payload: UserDataRequest) => {
-  const { data: response } = await request<RequestResponse<UserDataResponse>>({
+  const response = await request<UserDataResponse>({
     method: 'POST',
     url: '/hosted/user/data/identity',
     data: {

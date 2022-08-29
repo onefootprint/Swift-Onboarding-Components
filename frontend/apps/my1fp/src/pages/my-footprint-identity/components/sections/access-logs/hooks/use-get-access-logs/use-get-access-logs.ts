@@ -3,7 +3,7 @@ import {
   QueryKey,
   useInfiniteQuery,
 } from '@tanstack/react-query';
-import request, { RequestError, RequestResponse } from 'request';
+import request, { RequestError } from 'request';
 import { MY1FP_AUTH_HEADER } from 'src/config/constants';
 
 import { AccessLog } from '../../types';
@@ -12,10 +12,7 @@ export type AccessLogsRequest = {
   authToken: string;
 };
 
-export type AccessLogsResponse = {
-  data: AccessLog[];
-  next?: string;
-};
+export type AccessLogsResponse = AccessLog[];
 
 type AccessLogQueryKey = [string, null, string];
 
@@ -24,7 +21,7 @@ const getAccessLogsRequest = async ({
   pageParam,
 }: QueryFunctionContext<QueryKey, string>) => {
   const [, , authToken] = queryKey as AccessLogQueryKey;
-  const { data: response } = await request<RequestResponse<AccessLog[]>>({
+  const response = await request<AccessLog[]>({
     method: 'GET',
     url: '/hosted/user/access_events',
     params: { cursor: pageParam, kind: 'decrypt' },
@@ -32,7 +29,7 @@ const getAccessLogsRequest = async ({
       [MY1FP_AUTH_HEADER]: authToken,
     },
   });
-  return response;
+  return response.data;
 };
 
 const useGetAccessLogs = (authToken?: string) =>
@@ -42,7 +39,8 @@ const useGetAccessLogs = (authToken?: string) =>
     {
       retry: false,
       enabled: !!authToken,
-      getNextPageParam: lastPage => lastPage.next,
+      // TODO: add pagination
+      getNextPageParam: () => null,
     },
   );
 

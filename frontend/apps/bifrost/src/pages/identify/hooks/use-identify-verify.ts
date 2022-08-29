@@ -1,5 +1,5 @@
 import { useMutation } from '@tanstack/react-query';
-import request, { RequestError, RequestResponse } from 'request';
+import request, { RequestError } from 'request';
 import { UserKind } from 'src/utils/state-machine/types';
 
 export type IdentifyVerifyRequest = {
@@ -13,9 +13,7 @@ export type IdentifyVerifyResponse = {
 };
 
 const identifyVerifyRequest = async (payload: IdentifyVerifyRequest) => {
-  const { data: response } = await request<
-    RequestResponse<IdentifyVerifyResponse>
-  >({
+  const response = await request<IdentifyVerifyResponse>({
     method: 'POST',
     url: '/hosted/identify/verify',
     data: payload,

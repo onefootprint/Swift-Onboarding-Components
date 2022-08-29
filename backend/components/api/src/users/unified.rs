@@ -87,7 +87,7 @@ pub async fn put(
         })
         .await?;
 
-    ApiResponseData::ok(EmptyResponse).json()
+    EmptyResponse::ok().json()
 }
 
 /**

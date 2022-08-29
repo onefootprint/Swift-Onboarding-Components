@@ -1,7 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
 import { useIntl } from 'hooks';
 import take from 'lodash/take';
-import request, { RequestError, RequestResponse } from 'request';
+import request, { RequestError } from 'request';
+import { PaginatedRequestResponse } from 'request/src';
 import useSessionUser, { AuthHeaders } from 'src/hooks/use-session-user';
 import type { ApiKey } from 'src/types/api-key';
 
@@ -12,13 +13,13 @@ export type GetApiKeysRequest = {
 export type GetApiKeysResponse = ApiKey[];
 
 const getApiKeys = async ({ authHeaders }: GetApiKeysRequest) => {
-  const { data: response } = await request<RequestResponse<GetApiKeysResponse>>(
-    {
-      method: 'GET',
-      url: '/org/api_keys',
-      headers: authHeaders,
-    },
-  );
+  const { data: response } = await request<
+    PaginatedRequestResponse<GetApiKeysResponse>
+  >({
+    method: 'GET',
+    url: '/org/api_keys',
+    headers: authHeaders,
+  });
   return response.data;
 };
 

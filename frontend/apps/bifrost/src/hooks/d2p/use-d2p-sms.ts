@@ -1,6 +1,6 @@
 import { useMutation } from '@tanstack/react-query';
 import { BIOMETRIC_BASE_URL } from 'global-constants';
-import request, { RequestError, RequestResponse } from 'request';
+import request, { RequestError } from 'request';
 import { BIFROST_AUTH_HEADER } from 'src/config/constants';
 
 export type D2PSmsRequest = {
@@ -8,7 +8,7 @@ export type D2PSmsRequest = {
 };
 
 const d2pSms = async (payload: D2PSmsRequest) => {
-  const { data: response } = await request<RequestResponse<{}>>({
+  const response = await request<{}>({
     method: 'POST',
     url: '/hosted/onboarding/d2p/sms',
     data: {

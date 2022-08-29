@@ -12,9 +12,10 @@ pub type JsonApiResponse<T> = ApiResult<Json<ApiResponseData<T>>>;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Apiv2Schema)]
 #[openapi(description = "Empty response")]
-pub struct EmptyResponse;
+pub struct EmptyResponse {}
 
 #[derive(Debug, Clone, serde::Serialize)]
+#[serde(transparent)]
 pub struct ApiResponseData<T> {
     pub data: T,
 }
@@ -29,12 +30,20 @@ impl<T> ApiResponseData<T> {
     }
 }
 
+impl EmptyResponse {
+    pub fn ok() -> ApiResponseData<EmptyResponse> {
+        ApiResponseData {
+            data: EmptyResponse {},
+        }
+    }
+}
+
 impl<T> paperclip::v2::schema::Apiv2Schema for ApiResponseData<T>
 where
     T: paperclip::v2::schema::Apiv2Schema,
 {
     fn name() -> Option<String> {
-        T::name().map(|n| format!("ApiResponseData<{}>", n))
+        T::name()
     }
 
     fn description() -> &'static str {
@@ -46,15 +55,7 @@ where
     }
 
     fn raw_schema() -> paperclip::v2::models::DefaultSchemaRaw {
-        let mut schema = paperclip::v2::models::DefaultSchemaRaw {
-            name: Self::name(),
-            description: Some(T::description().to_string()),
-            data_type: Some(DataType::Object),
-            // items: Some(Box::new(T::raw_schema())),
-            ..Default::default()
-        };
-        schema.properties.insert("data".into(), Box::new(T::raw_schema()));
-        schema
+        T::raw_schema()
     }
 }
 

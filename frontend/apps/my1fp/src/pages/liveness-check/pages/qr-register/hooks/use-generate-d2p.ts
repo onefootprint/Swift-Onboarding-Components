@@ -1,5 +1,5 @@
 import { useMutation } from '@tanstack/react-query';
-import request, { RequestError, RequestResponse } from 'request';
+import request, { RequestError } from 'request';
 import { MY1FP_AUTH_HEADER } from 'src/config/constants';
 
 export type D2PGenerateRequest = {
@@ -14,9 +14,7 @@ export type D2PGenerateResponse = {
 };
 
 const d2pGenerate = async (payload: D2PGenerateRequest) => {
-  const { data: response } = await request<
-    RequestResponse<D2PGenerateResponse>
-  >({
+  const response = await request<D2PGenerateResponse>({
     method: 'POST',
     url: '/hosted/onboarding/d2p/generate',
     data: payload,

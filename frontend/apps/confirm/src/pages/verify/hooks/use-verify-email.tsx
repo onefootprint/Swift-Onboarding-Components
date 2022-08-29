@@ -1,14 +1,14 @@
 import { useMutation } from '@tanstack/react-query';
-import request, { RequestError, RequestResponse } from 'request';
+import request, { RequestError } from 'request';
 
 export type UserDataRequest = {
   data: string;
 };
 
-export type UserDataResponse = RequestResponse<string>;
+export type UserDataResponse = {};
 
 const userDataRequest = async (payload: UserDataRequest) => {
-  const { data: response } = await request<RequestResponse<UserDataResponse>>({
+  const response = await request<UserDataResponse>({
     method: 'POST',
     url: '/hosted/user/email/verify',
     data: payload,

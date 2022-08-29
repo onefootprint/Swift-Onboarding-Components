@@ -1,5 +1,5 @@
 import { useMutation } from '@tanstack/react-query';
-import request, { RequestError, RequestResponse } from 'request';
+import request, { RequestError } from 'request';
 import { BIFROST_AUTH_HEADER } from 'src/config/constants';
 import generateRegisterDeviceResponse from 'src/utils/biometric/register-challenge-response';
 
@@ -13,12 +13,10 @@ export type BiometricRegisterResponse = {
 
 const biometricRegister = async (payload: BiometricRegisterRequest) => {
   const { authToken } = payload;
-  const { data: initResponse } = await request<
-    RequestResponse<{
-      challengeToken: string;
-      challengeJson: string;
-    }>
-  >({
+  const initResponse = await request<{
+    challengeToken: string;
+    challengeJson: string;
+  }>({
     method: 'POST',
     url: '/hosted/user/biometric/init',
     data: payload,
@@ -32,9 +30,7 @@ const biometricRegister = async (payload: BiometricRegisterRequest) => {
   );
   const { challengeToken } = initResponse.data;
 
-  const { data: response } = await request<
-    RequestResponse<BiometricRegisterResponse>
-  >({
+  const response = await request<BiometricRegisterResponse>({
     method: 'POST',
     url: '/hosted/user/biometric',
     data: {

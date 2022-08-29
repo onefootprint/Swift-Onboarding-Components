@@ -4,7 +4,7 @@ import { OnboardingStatus } from './onboarding-status';
 
 export type ScopedUser = {
   footprintUserId: string;
-  populatedDataKinds: DataKinds[];
+  identityDataAttributes: DataKinds[];
   startTimestamp: string;
   orderingId: string;
   onboardings: Onboarding[];

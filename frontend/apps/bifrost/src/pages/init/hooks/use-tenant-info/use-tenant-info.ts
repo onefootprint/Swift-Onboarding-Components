@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import request, { RequestError, RequestResponse } from 'request';
+import request, { RequestError } from 'request';
 import { CLIENT_PUBLIC_KEY_HEADER } from 'src/config/constants';
 import useBifrostMachine from 'src/hooks/use-bifrost-machine';
 import { Events } from 'src/utils/state-machine/bifrost';
@@ -21,15 +21,13 @@ type TenantInfoResponse = {
 };
 
 const getTenantInfo = async (payload: TenantInfoRequest) => {
-  const { data: response } = await request<RequestResponse<TenantInfoResponse>>(
-    {
-      method: 'GET',
-      url: '/org/onboarding_config',
-      headers: {
-        [CLIENT_PUBLIC_KEY_HEADER]: payload.tenantPk,
-      },
+  const response = await request<TenantInfoResponse>({
+    method: 'GET',
+    url: '/org/onboarding_config',
+    headers: {
+      [CLIENT_PUBLIC_KEY_HEADER]: payload.tenantPk,
     },
-  );
+  });
   return response.data;
 };
 

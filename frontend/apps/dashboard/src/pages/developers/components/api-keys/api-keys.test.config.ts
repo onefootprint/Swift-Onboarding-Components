@@ -26,9 +26,7 @@ export const withApiKeys = (data = listApiKeysFixture) =>
   mockRequest({
     method: 'get',
     path: '/org/api_keys',
-    response: {
-      data,
-    },
+    response: { data },
   });
 
 export const withApiKeysError = () =>
@@ -47,9 +45,7 @@ export const withCreateApiKeys = (data = createdApiKeyFixture) =>
   mockRequest({
     method: 'post',
     path: '/org/api_keys',
-    response: {
-      data,
-    },
+    response: data,
   });
 
 export const withCreateApiKeysError = () =>

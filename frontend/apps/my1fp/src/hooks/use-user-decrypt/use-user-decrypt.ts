@@ -1,5 +1,5 @@
 import { useMutation } from '@tanstack/react-query';
-import request, { RequestError, RequestResponse } from 'request';
+import request, { RequestError } from 'request';
 
 import { MY1FP_AUTH_HEADER } from '../../config/constants';
 
@@ -23,9 +23,7 @@ export type UserDecryptResponse = {
 };
 
 const decryptUserRequest = async (payload: UserDecryptRequest) => {
-  const { data: response } = await request<
-    RequestResponse<UserDecryptResponse>
-  >({
+  const response = await request<UserDecryptResponse>({
     method: 'POST',
     url: '/hosted/user/decrypt',
     data: {

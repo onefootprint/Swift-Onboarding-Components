@@ -15,7 +15,7 @@ class TenantAuth(BaseAuth):
 
 
 class TenantSecretAuth(BaseAuth):
-    HEADER_NAME = "x-client-secret-key"
+    HEADER_NAME = "X-Footprint-Secret-Key"
 
 
 class CustodianAuth(BaseAuth):

@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import request, { RequestError, RequestResponse } from 'request';
+import request, { RequestError } from 'request';
 import { MY1FP_AUTH_HEADER } from 'src/config/constants';
 import useSessionUser from 'src/hooks/use-session-user';
 import { InsightEvent } from 'src/types';
@@ -14,9 +14,7 @@ export type InsightEventEntry = {
 export type GetLivenessResponse = InsightEvent[];
 
 const getLiveness = async (payload: GetLivenessRequest) => {
-  const { data: response } = await request<
-    RequestResponse<InsightEventEntry[]>
-  >({
+  const response = await request<InsightEventEntry[]>({
     method: 'GET',
     url: '/hosted/user/liveness',
     headers: {

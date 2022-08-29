@@ -123,8 +123,8 @@ def identify_verify(
                 "challenge_token": challenge_token,
             }
             body = post("hosted/identify/verify", data)
-            assert body["data"]["kind"] == expected_kind
-            return FpAuth(body["data"]["auth_token"])
+            assert body["kind"] == expected_kind
+            return FpAuth(body["auth_token"])
         except HttpError as e:
             last_error = e
     if last_error:
@@ -140,7 +140,7 @@ def create_basic_user(twilio, suffix=None):
     def initiate_challenge():
         data = dict(phone_number=sandbox_phone_number, identify_type="onboarding")
         body = post("hosted/identify/challenge", data)
-        return body["data"]["challenge_token"]
+        return body["challenge_token"]
 
     challenge_token = try_until_success(
         initiate_challenge, 20
@@ -170,12 +170,12 @@ def create_basic_user(twilio, suffix=None):
 
 def create_tenant(org_data, ob_conf_data):
     body = post("private/client", org_data, CUSTODIAN_AUTH)
-    sk = SecretApiKey.from_response(body["data"]["key"])
+    sk = SecretApiKey.from_response(body["key"])
     print("\n======org info======")
     print(body)
 
     body = post("org/onboarding_configs", ob_conf_data, sk.key)
-    ob_config = ObConfiguration.from_response(body["data"])
+    ob_config = ObConfiguration.from_response(body)
     print("\n======org onboarding info======")
     print(body)
 
@@ -220,8 +220,8 @@ def clean_up_user(phone_number, email):
         identify_type="onboarding",
     )
     body = post("hosted/identify", data)
-    assert not body["data"]["user_found"]
-    assert not body["data"].get("challenge_data", dict())
+    assert not body["user_found"]
+    assert not body.get("challenge_data", dict())
 
 
 def _gen_random_n_digit_number(n):

@@ -1,5 +1,5 @@
 import { useMutation } from '@tanstack/react-query';
-import request, { RequestError, RequestResponse } from 'request';
+import request, { RequestError } from 'request';
 
 import { BIOMETRIC_AUTH_HEADER } from '../../config/constants';
 
@@ -16,7 +16,7 @@ export type UpdateD2PStatusRequest = {
 };
 
 const updateD2PStatus = async (payload: UpdateD2PStatusRequest) => {
-  const { data: response } = await request<RequestResponse<{}>>({
+  const response = await request<{}>({
     method: 'POST',
     url: '/hosted/onboarding/d2p/status',
     data: payload,

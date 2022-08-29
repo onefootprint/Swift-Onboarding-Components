@@ -1,5 +1,5 @@
 import { useMutation } from '@tanstack/react-query';
-import request, { RequestError, RequestResponse } from 'request';
+import request, { RequestError } from 'request';
 import { MY1FP_AUTH_HEADER } from 'src/config/constants';
 
 export enum D2PStatusUpdate {
@@ -15,7 +15,7 @@ export type UpdateD2PStatusRequest = {
 };
 
 const updateD2PStatus = async (payload: UpdateD2PStatusRequest) => {
-  const { data: response } = await request<RequestResponse<{}>>({
+  const response = await request<{}>({
     method: 'POST',
     url: '/hosted/onboarding/d2p/status',
     data: payload,

@@ -8,7 +8,7 @@ class TestNonPortableVaultApi:
     def test_vault_create_write_decrypt(self, workos_sandbox_tenant):
         # create the vault
         body = post("users/", None, workos_sandbox_tenant.sk.key)
-        user = body["data"]
+        user = body
         fp_id = user["footprint_user_id"]
         assert fp_id
 
@@ -19,18 +19,18 @@ class TestNonPortableVaultApi:
         # check that the data is there now
         params = {"fields": "first_name, last_name, zip, ssn9, city"}
         response = get(f"users/{fp_id}/identity", params, workos_sandbox_tenant.sk.key)
-        assert response["data"]["first_name"] == True
-        assert response["data"]["last_name"] == True
-        assert response["data"]["zip"] == True
-        assert response["data"]["ssn9"] == True
-        assert response["data"]["city"] == True
+        assert response["first_name"] == True
+        assert response["last_name"] == True
+        assert response["zip"] == True
+        assert response["ssn9"] == True
+        assert response["city"] == True
 
         # decrypt the data
         data = dict(reason="test", fields=["first_name", "zip", "city"])
         body = post(
             f"users/{fp_id}/identity/decrypt", data, workos_sandbox_tenant.sk.key
         )
-        data = body["data"]
+        data = body
         assert data["first_name"] == "SANDBOX"
         assert data["zip"] == "10009"
         assert data["city"] == "Enclave".upper()
@@ -52,7 +52,7 @@ class TestNonPortableVaultApi:
     def test_custom_data(self, workos_sandbox_tenant):
         # create the vault
         body = post("users/", None, workos_sandbox_tenant.sk.key)
-        user = body["data"]
+        user = body
         fp_id = user["footprint_user_id"]
         assert fp_id
 
@@ -76,9 +76,9 @@ class TestNonPortableVaultApi:
         # check status of the data
         params = {"fields": "cc4,ach_account_number, insurance_id"}
         response = get(f"users/{fp_id}/custom", params, workos_sandbox_tenant.sk.key)
-        assert response["data"]["ach_account_number"] == True
-        assert response["data"]["cc4"] == True
-        assert response["data"]["insurance_id"] == False
+        assert response["ach_account_number"] == True
+        assert response["cc4"] == True
+        assert response["insurance_id"] == False
 
         # decrypt the data
         # check status of the data
@@ -86,8 +86,8 @@ class TestNonPortableVaultApi:
         response = post(
             f"users/{fp_id}/custom/decrypt", data, workos_sandbox_tenant.sk.key
         )
-        assert response["data"]["ach_account_number"] == "123467890"
-        assert response["data"]["cc4"] == "4242"
+        assert response["ach_account_number"] == "123467890"
+        assert response["cc4"] == "4242"
 
         # verify access events created
         body = get(
@@ -107,7 +107,7 @@ class TestUnifiedVaultApi:
     def test_unified_vault_create_write_decrypt(self, workos_sandbox_tenant):
         # create the vault
         body = post("users/", None, workos_sandbox_tenant.sk.key)
-        user = body["data"]
+        user = body
         fp_id = user["footprint_user_id"]
         assert fp_id
 
@@ -123,11 +123,11 @@ class TestUnifiedVaultApi:
             "fields": "identity.last_name, identity.ssn9, custom.ach_account_number,custom.cc4, custom.insurance_id"
         }
         response = get(f"users/{fp_id}", params, workos_sandbox_tenant.sk.key)
-        assert response["data"]["identity"]["last_name"] == True
-        assert response["data"]["identity"]["ssn9"] == True
-        assert response["data"]["custom"]["ach_account_number"] == True
-        assert response["data"]["custom"]["cc4"] == True
-        assert response["data"]["custom"]["insurance_id"] == False
+        assert response["identity"]["last_name"] == True
+        assert response["identity"]["ssn9"] == True
+        assert response["custom"]["ach_account_number"] == True
+        assert response["custom"]["cc4"] == True
+        assert response["custom"]["insurance_id"] == False
 
         # decrypt the data
         data = dict(
@@ -140,7 +140,7 @@ class TestUnifiedVaultApi:
             ],
         )
         body = post(f"users/{fp_id}/decrypt", data, workos_sandbox_tenant.sk.key)
-        data = body["data"]
+        data = body
         assert data["identity"]["first_name"] == "SANDBOX"
         assert data["identity"]["zip"] == "10009"
         assert data["custom"]["ach_account_number"] == "123467890"

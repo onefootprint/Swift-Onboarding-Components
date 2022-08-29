@@ -1,5 +1,5 @@
 import { useMutation } from '@tanstack/react-query';
-import request, { RequestError, RequestResponse } from 'request';
+import request, { RequestError } from 'request';
 import {
   BIFROST_AUTH_HEADER,
   CLIENT_PUBLIC_KEY_HEADER,
@@ -23,19 +23,18 @@ export type OnboardingResponse = {
 };
 
 const onboardingRequest = async (payload: OnboardingRequest) => {
-  const { data: response } = await request<RequestResponse<OnboardingResponse>>(
-    {
-      method: 'POST',
-      url: '/hosted/onboarding',
-      headers: {
-        [BIFROST_AUTH_HEADER]: payload.authToken,
-        [CLIENT_PUBLIC_KEY_HEADER]: payload.tenantPk,
-      },
+  const response = await request<OnboardingResponse>({
+    method: 'POST',
+    url: '/hosted/onboarding',
+    headers: {
+      [BIFROST_AUTH_HEADER]: payload.authToken,
+      [CLIENT_PUBLIC_KEY_HEADER]: payload.tenantPk,
     },
-  );
+  });
+  const { data } = response;
   return {
-    ...response.data,
-    missingAttributes: response.data.missingAttributes.map(
+    ...data,
+    missingAttributes: data.missingAttributes.map(
       (attr: string) => CollectedDataOptionLabels[attr],
     ),
   };

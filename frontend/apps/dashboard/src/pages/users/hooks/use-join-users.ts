@@ -57,7 +57,9 @@ const useJoinUsers = (
               isLoading: decryptedData[dataKind]?.isLoading || false,
               exists:
                 decryptedData[dataKind]?.exists ||
-                scoped_user.populatedDataKinds.includes(DataKinds[dataKind]),
+                scoped_user.identityDataAttributes.includes(
+                  DataKinds[dataKind],
+                ),
             } as UserData,
           ]),
         );

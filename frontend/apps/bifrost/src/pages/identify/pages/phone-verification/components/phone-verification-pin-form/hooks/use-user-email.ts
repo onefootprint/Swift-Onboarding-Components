@@ -1,5 +1,5 @@
 import { useMutation } from '@tanstack/react-query';
-import request, { RequestError, RequestResponse } from 'request';
+import request, { RequestError } from 'request';
 import { BIFROST_AUTH_HEADER } from 'src/config/constants';
 
 export type UserEmailObj = {
@@ -12,10 +12,10 @@ export type UserEmailRequest = {
   speculative?: boolean;
 };
 
-export type UserEmailResponse = { data: string };
+export type UserEmailResponse = {};
 
 const userEmailRequest = async (payload: UserEmailRequest) => {
-  const { data: response } = await request<RequestResponse<UserEmailResponse>>({
+  const response = await request<UserEmailResponse>({
     method: 'POST',
     url: '/hosted/user/email',
     data: {

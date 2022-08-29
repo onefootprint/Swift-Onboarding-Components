@@ -36,7 +36,7 @@ const getScopedUsersRequest = async ({
     cursor: cursors[cursors.length - 1],
     pageSize,
   };
-  const { data: response } = await request<
+  const response = await request<
     PaginatedRequestResponse<ScopedUsersListResponse>
   >({
     method: 'GET',
@@ -44,7 +44,7 @@ const getScopedUsersRequest = async ({
     params: req,
     headers: authHeaders,
   });
-  return response;
+  return response.data;
 };
 
 const useGetScopedUsers = (pageSize: number) => {

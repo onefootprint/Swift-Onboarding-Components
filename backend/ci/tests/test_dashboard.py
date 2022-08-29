@@ -14,7 +14,7 @@ from .auth import (
 def secret_key(workos_sandbox_tenant):
     data = dict(name="Test secret key")
     body = post("org/api_keys", data, workos_sandbox_tenant.sk.key)
-    return SecretApiKey.from_response(body["data"])
+    return SecretApiKey.from_response(body)
 
 
 @pytest.fixture(scope="session")
@@ -25,7 +25,7 @@ def ob_configuration(workos_sandbox_tenant, must_collect_data, can_access_data):
         can_access_data=can_access_data,
     )
     body = post("org/onboarding_configs", data, workos_sandbox_tenant.sk.key)
-    return ObConfiguration.from_response(body["data"])
+    return ObConfiguration.from_response(body)
 
 
 class TestDashboard:
@@ -48,7 +48,7 @@ class TestDashboard:
                 "reason": "Doing a hecking decrypt",
             }
             body = post(f"users/{user.fp_user_id}/identity/decrypt", data, tenant.sk.key)
-            attributes = body["data"]
+            attributes = body
             for attribute, value in attributes.items():
                 assert expected_data[attribute].upper() == value.upper()
 
@@ -62,7 +62,7 @@ class TestDashboard:
 
     def test_get_org(self, user):
         body = get("org", None, user.tenant.sk.key)
-        tenant = body["data"]
+        tenant = body
         assert tenant["name"] == "Acme Bank"
         assert not tenant["is_sandbox_restricted"]
         tenant["logo_url"]
@@ -76,7 +76,7 @@ class TestDashboard:
         assert len(scoped_users)
         assert scoped_users[0]["footprint_user_id"] == user.fp_user_id
         assert set(["first_name", "last_name"]) < set(
-            scoped_users[0]["populated_data_kinds"]
+            scoped_users[0]["identity_data_attributes"]
         )
 
     def test_liveness_list(self, user):
@@ -84,7 +84,7 @@ class TestDashboard:
         body = get(
             "users/liveness", dict(footprint_user_id=user.fp_user_id), tenant.sk.key
         )
-        creds = body["data"]
+        creds = body
         assert len(creds)
         assert creds[0]["insight_event"]
 
@@ -139,11 +139,11 @@ class TestDashboard:
             can_access_data=["ssn4"],
         )
         body = post("org/onboarding_configs", data, workos_sandbox_tenant.sk.key)
-        ob_config = body["data"]
+        ob_config = body
         ob_config_key = TenantAuth(ob_config["key"])
 
         body = post("hosted/onboarding", None, basic_user.auth_token, ob_config_key)
-        assert body["data"]["missing_attributes"] == ["ssn4"]
+        assert body["missing_attributes"] == ["ssn4"]
 
     @pytest.mark.parametrize(
         "must_collect,can_access,expected_status",
@@ -192,7 +192,7 @@ class TestDashboard:
             data,
             workos_sandbox_tenant.sk.key,
         )
-        ob_config = body["data"]
+        ob_config = body
         assert ob_config["name"] == new_name
         assert ob_config["status"] == new_status
 
@@ -208,7 +208,7 @@ class TestDashboard:
 
     def test_api_key_check(self, secret_key):
         body = get("org/api_keys/check", None, secret_key.key)
-        assert body["data"]["id"] == secret_key.id
+        assert body["id"] == secret_key.id
 
     def test_api_key_list(self, secret_key):
         body = get("org/api_keys", None, secret_key.key)
@@ -216,12 +216,12 @@ class TestDashboard:
         assert key["name"] == secret_key.name
         assert key["status"] == secret_key.status
         assert key["created_at"]
-        assert not key["key"]
+        assert "key" not in key
         assert key["last_used_at"]
 
     def test_api_key_reveal(self, secret_key):
         body = get(f"org/api_keys/{secret_key.id}/reveal", None, secret_key.key)
-        key = body["data"]
+        key = body
         assert key["key"] == secret_key.key.token
         assert key["status"] == "enabled"
         assert key["name"] == "Test secret key"
@@ -234,7 +234,7 @@ class TestDashboard:
 
         # Update the name and status
         body = patch(f"org/api_keys/{secret_key.id}", data, secret_key.key)
-        key = body["data"]
+        key = body
         assert key["name"] == new_name
         assert key["status"] == "disabled"
 
@@ -242,8 +242,8 @@ class TestDashboard:
         body = get(
             f"org/api_keys/{secret_key.id}/reveal", None, workos_sandbox_tenant.sk.key
         )
-        assert body["data"]["name"] == new_name
-        assert body["data"]["status"] == "disabled"
+        assert body["name"] == new_name
+        assert body["status"] == "disabled"
 
         # Verify we can't use the disabled API key for anything anymore
         get(
@@ -259,7 +259,7 @@ class TestDashboard:
             f"users/{user.fp_user_id}/identity/decrypt", data, user.tenant.sk.key
         )
         print(body)
-        assert body["data"]["first_name"]
+        assert body["first_name"]
 
         data = {
             "dob": {

@@ -3,7 +3,7 @@ import {
   QueryKey,
   useQuery,
 } from '@tanstack/react-query';
-import request, { RequestError, RequestResponse } from 'request';
+import request, { RequestError } from 'request';
 import useSessionUser, { AuthHeaders } from 'src/hooks/use-session-user';
 import { AuditTrail } from 'src/types';
 
@@ -21,7 +21,7 @@ const getAuditTrailRequest = async ({
   queryKey,
 }: QueryFunctionContext<QueryKey, string>) => {
   const [, params, authHeaders] = queryKey as AuditTrailRequestQueryKey;
-  const { data: response } = await request<RequestResponse<AuditTrail[]>>({
+  const response = await request<AuditTrail[]>({
     method: 'GET',
     url: '/users/audit_trail',
     params,

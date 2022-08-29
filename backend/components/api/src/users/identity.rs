@@ -70,7 +70,7 @@ pub async fn put(
         })
         .await?;
 
-    ApiResponseData::ok(EmptyResponse).json()
+    EmptyResponse::ok().json()
 }
 
 pub fn put_internal(

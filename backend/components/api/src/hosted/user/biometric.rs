@@ -212,7 +212,7 @@ async fn complete(
         })
         .await?;
 
-    Ok(Json(ApiResponseData::ok(EmptyResponse)))
+    Ok(Json(EmptyResponse::ok()))
 }
 
 /// Storable app attestation metadata

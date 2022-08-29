@@ -20,7 +20,7 @@ async fn handler(
     if request.speculative {
         // We've already parsed the request and done validation on the input. Return a successful
         // response before writing anything to the DB
-        return Ok(Json(ApiResponseData::ok(EmptyResponse)));
+        return Ok(Json(EmptyResponse::ok()));
     }
 
     let request = request.into_inner();
@@ -36,5 +36,5 @@ async fn handler(
         })
         .await?;
 
-    Ok(Json(ApiResponseData::ok(EmptyResponse)))
+    Ok(Json(EmptyResponse::ok()))
 }

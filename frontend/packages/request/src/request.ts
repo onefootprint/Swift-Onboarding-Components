@@ -1,4 +1,4 @@
-import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
+import axios, { AxiosError, AxiosRequestConfig } from 'axios';
 import applyCaseMiddleware from 'axios-case-converter';
 
 const LOGOUT_ERROR = 'Session expired or does not exist';
@@ -13,17 +13,12 @@ export type RequestError = AxiosError<{
   error: FootprintServerError;
 }>;
 
-export type RequestResponse<T> = AxiosResponse<T>;
-
-export type PaginatedRequestResponse<T> = RequestResponse<T> & {
+export type PaginatedRequestResponse<T> = {
+  data: T;
   meta: {
     next?: string;
     count?: number;
   };
-};
-
-export type RequestSuccess<T> = {
-  data: T;
 };
 
 export const isFootprintError = (error: unknown): error is RequestError =>
@@ -50,9 +45,9 @@ export const isLogoutError = (error: unknown) => {
 export const getErrorMessage = (error: RequestError): string =>
   error.response?.data?.error?.message || error.message;
 
-const request = <TData = any>(requestConfig: AxiosRequestConfig = {}) => {
+const request = <Response = any>(requestConfig: AxiosRequestConfig = {}) => {
   const client = applyCaseMiddleware(axios.create());
-  return client.request<TData, RequestResponse<TData>>({
+  return client.request<Response>({
     baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
     timeout: 60000,
     withCredentials: true,

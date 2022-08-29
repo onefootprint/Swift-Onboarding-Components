@@ -8,7 +8,7 @@ use super::onboarding::ApiOnboarding;
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize, Apiv2Schema)]
 pub struct ApiScopedUser {
     pub footprint_user_id: FootprintUserId,
-    pub populated_data_kinds: Vec<DataAttribute>,
+    pub identity_data_attributes: Vec<DataAttribute>,
     pub start_timestamp: DateTime<Utc>,
     pub ordering_id: i64,
     pub onboardings: Vec<ApiOnboarding>,
@@ -17,7 +17,7 @@ pub struct ApiScopedUser {
 
 impl ApiScopedUser {
     pub fn from(
-        populated_data_kinds: Vec<DataAttribute>,
+        identity_data_attributes: Vec<DataAttribute>,
         onboarding_info: &[OnboardingInfo],
         scoped_user: ScopedUser,
         is_portable: bool,
@@ -31,7 +31,7 @@ impl ApiScopedUser {
 
         ApiScopedUser {
             footprint_user_id: fp_user_id,
-            populated_data_kinds,
+            identity_data_attributes,
             start_timestamp,
             ordering_id,
             is_portable,

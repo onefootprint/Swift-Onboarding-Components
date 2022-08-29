@@ -21,22 +21,20 @@ describe('<LoginAndSecurity />', () => {
       method: 'get',
       path: 'hosted/user',
       response: {
-        data: {
-          phoneNumbers: [
-            {
-              id: '123456789',
-              isVerified: true,
-              priority: 'primary',
-            },
-          ],
-          emails: [
-            {
-              id: '123456789',
-              isVerified: !!emailVerified,
-              priority: 'primary',
-            },
-          ],
-        },
+        phoneNumbers: [
+          {
+            id: '123456789',
+            isVerified: true,
+            priority: 'primary',
+          },
+        ],
+        emails: [
+          {
+            id: '123456789',
+            isVerified: !!emailVerified,
+            priority: 'primary',
+          },
+        ],
       },
     });
   };
@@ -45,16 +43,14 @@ describe('<LoginAndSecurity />', () => {
     mockRequest({
       method: 'get',
       path: 'hosted/user/liveness',
-      response: {
-        data: [
-          {
-            insightEvent: {
-              userAgent: 'iPhone 12',
-              timestamp: '01/01/2021',
-            },
+      response: [
+        {
+          insightEvent: {
+            userAgent: 'iPhone 12',
+            timestamp: '01/01/2021',
           },
-        ],
-      },
+        },
+      ],
     });
   };
 
@@ -62,9 +58,7 @@ describe('<LoginAndSecurity />', () => {
     mockRequest({
       method: 'get',
       path: 'hosted/user/liveness',
-      response: {
-        data: [],
-      },
+      response: [],
     });
   };
 
@@ -72,9 +66,7 @@ describe('<LoginAndSecurity />', () => {
     mockRequest({
       method: 'post',
       path: 'hosted/user/email/challenge',
-      response: {
-        data: 'Success',
-      },
+      response: {},
     });
   };
 

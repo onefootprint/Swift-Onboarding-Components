@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import request, { RequestError, RequestResponse } from 'request';
+import request, { RequestError } from 'request';
 import useSessionUser, { AuthHeaders } from 'src/hooks/use-session-user';
 import type { ApiKey } from 'src/types/api-key';
 
@@ -11,16 +11,14 @@ const updateApiKey = async (
   authHeaders: AuthHeaders,
   params: UpdateApiKeyRequest,
 ) => {
-  const { data: response } = await request<RequestResponse<GetApiKeysResponse>>(
-    {
-      headers: authHeaders,
-      method: 'PATCH',
-      url: `/org/api_keys/${params.id}`,
-      data: {
-        status: params.status,
-      },
+  const response = await request<GetApiKeysResponse>({
+    headers: authHeaders,
+    method: 'PATCH',
+    url: `/org/api_keys/${params.id}`,
+    data: {
+      status: params.status,
     },
-  );
+  });
   return response.data;
 };
 

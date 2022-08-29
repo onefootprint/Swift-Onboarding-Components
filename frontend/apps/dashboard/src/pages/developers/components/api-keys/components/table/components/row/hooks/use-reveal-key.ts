@@ -1,5 +1,5 @@
 import { useMutation } from '@tanstack/react-query';
-import request, { RequestError, RequestResponse } from 'request';
+import request, { RequestError } from 'request';
 import useSessionUser, { AuthHeaders } from 'src/hooks/use-session-user';
 import type { ApiKey } from 'src/types/api-key';
 
@@ -15,13 +15,11 @@ const revealApiKey = async (
   authHeaders: AuthHeaders,
   params: RevealApiKeyRequest,
 ) => {
-  const { data: response } = await request<RequestResponse<GetApiKeysResponse>>(
-    {
-      headers: authHeaders,
-      method: 'GET',
-      url: `/org/api_keys/${params.id}/reveal`,
-    },
-  );
+  const response = await request<GetApiKeysResponse>({
+    headers: authHeaders,
+    method: 'GET',
+    url: `/org/api_keys/${params.id}/reveal`,
+  });
   return response.data;
 };
 

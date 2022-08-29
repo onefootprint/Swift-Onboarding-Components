@@ -1,4 +1,7 @@
-use actix_web::{middleware::Logger, App, HttpServer, ResponseError};
+use actix_web::{
+    middleware::{Logger},
+    App, HttpServer, ResponseError,
+};
 use config::Config;
 use crypto::aead::ScopedSealingKey;
 use db::DbPool;
@@ -6,6 +9,7 @@ use enclave_proxy::{
     bb8::{self, ErrorSink},
     pool, StreamManager,
 };
+
 use signed_hash::SignedHashClient;
 use std::{borrow::Cow, sync::Arc, time::Duration};
 use telemetry::TelemetrySpanBuilder;

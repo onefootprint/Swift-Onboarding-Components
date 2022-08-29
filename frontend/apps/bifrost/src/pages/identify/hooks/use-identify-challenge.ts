@@ -1,5 +1,5 @@
 import { useMutation } from '@tanstack/react-query';
-import request, { RequestError, RequestResponse } from 'request';
+import request, { RequestError } from 'request';
 import { IdentifyType } from 'src/utils/state-machine/types';
 
 import getRetryDisabledUntil from './get-retry-disabled-until';
@@ -20,9 +20,7 @@ type PrivateIdentifyChallengeResponse = {
 };
 
 const identifyChallenge = async (payload: IdentifyChallengeRequest) => {
-  const { data: response } = await request<
-    RequestResponse<PrivateIdentifyChallengeResponse>
-  >({
+  const response = await request<PrivateIdentifyChallengeResponse>({
     method: 'POST',
     url: '/hosted/identify/challenge',
     data: payload,

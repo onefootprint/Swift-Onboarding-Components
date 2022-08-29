@@ -20,7 +20,7 @@ pub enum AuthError {
     ApiKeyNotFound,
     #[error("missing X-Onboarding-Config-Key")]
     MissingClientPublicAuthHeader,
-    #[error("missing X-Client-Secret-Key or HttpBasicAuth")]
+    #[error("missing X-Footprint-Secret-Key or HttpBasicAuth")]
     MissingSecretKeyAuth,
     #[error("missing X-Footprint-Custodian-Key")]
     MissingCustodianAuthHeader,
@@ -46,5 +46,4 @@ pub enum AuthError {
     MissingScope(Vec<UserAuthScope>),
     #[error("Cannot modify global properties on portable user")]
     CannotModifyPortableUser,
-
 }

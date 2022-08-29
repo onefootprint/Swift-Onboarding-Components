@@ -3,7 +3,7 @@ import {
   QueryKey,
   useQuery,
 } from '@tanstack/react-query';
-import request, { RequestError, RequestResponse } from 'request';
+import request, { RequestError } from 'request';
 import useSessionUser, { AuthHeaders } from 'src/hooks/use-session-user';
 import { InsightEvent } from 'src/types/insight-event';
 
@@ -25,7 +25,7 @@ const getLivenessRequest = async ({
   queryKey,
 }: QueryFunctionContext<QueryKey, string>) => {
   const [, params, authHeaders] = queryKey as LivenessRequestQueryKey;
-  const { data: response } = await request<RequestResponse<Liveness[]>>({
+  const response = await request<Liveness[]>({
     method: 'GET',
     url: '/users/liveness',
     params,

@@ -139,8 +139,8 @@ def user(workos_sandbox_tenant, twilio):
     # Register the biometric credential
     webauthn_device = SoftWebauthnDevice()
     body = post("hosted/user/biometric/init", None, basic_user.auth_token)
-    chal_token = body["data"]["challenge_token"]
-    chal = _override_webauthn_challenge(json.loads(body["data"]["challenge_json"]))
+    chal_token = body["challenge_token"]
+    chal = _override_webauthn_challenge(json.loads(body["challenge_json"]))
     attestation = webauthn_device.create(chal, os.environ.get("TEST_URL"))
     attestation = _override_webauthn_attestation(attestation)
     data = dict(
@@ -155,7 +155,7 @@ def user(workos_sandbox_tenant, twilio):
         workos_sandbox_tenant.ob_config.key,
         basic_user.auth_token,
     )
-    validation_token = body["data"]["validation_token"]
+    validation_token = body["validation_token"]
 
     # Get the fp_user_id
     body = post(
@@ -163,7 +163,7 @@ def user(workos_sandbox_tenant, twilio):
         dict(validation_token=validation_token),
         workos_sandbox_tenant.sk.key,
     )
-    fp_user_id = body["data"]["footprint_user_id"]
+    fp_user_id = body["footprint_user_id"]
     return User(
         auth_token=basic_user.auth_token,
         fp_user_id=fp_user_id,

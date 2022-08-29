@@ -35,5 +35,5 @@ fn handler(
     .update(&state.db_pool)
     .await?;
 
-    Ok(Json(ApiResponseData { data: EmptyResponse }))
+    Ok(Json(EmptyResponse::ok()))
 }

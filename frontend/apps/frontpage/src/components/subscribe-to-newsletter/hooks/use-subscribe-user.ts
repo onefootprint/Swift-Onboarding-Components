@@ -1,5 +1,5 @@
 import { useMutation } from '@tanstack/react-query';
-import request, { RequestError, RequestResponse } from 'request';
+import request, { RequestError } from 'request';
 
 type SubscribeUserResponse = {};
 
@@ -8,12 +8,12 @@ type SubscribeUserRequest = {
 };
 
 const subscribeUser = async (payload: SubscribeUserRequest) => {
-  const response = await request<RequestResponse<SubscribeUserResponse>>({
+  const response = await request<SubscribeUserResponse>({
     method: 'POST',
     url: '/api/subscribe-to-newsletter',
     data: payload,
   });
-  return response;
+  return response.data;
 };
 
 const useSubscribeUser = () =>
