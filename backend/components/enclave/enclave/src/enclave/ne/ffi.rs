@@ -45,7 +45,7 @@ pub struct aws_socket_endpoint {
     pub port: u16,
 }
 
-/// Imported SDK APIs
+// Imported SDK APIs
 extern "C" {
     /// Aws-C-Common
     pub fn aws_byte_buf_from_array(bytes: *mut c_void, len: c_size_t) -> aws_byte_buf;
@@ -83,7 +83,11 @@ extern "C" {
 
     pub fn aws_kms_decrypt_blocking(
         client: *mut aws_nitro_enclaves_kms_client,
+        key_id: *mut aws_string,
+        encryption_algorithm: *mut aws_string,
         ciphertext: *const aws_byte_buf,
         plaintext: *mut aws_byte_buf,
     ) -> c_int;
+
+    pub fn aws_nitro_enclaves_library_seed_entropy(bytes: c_size_t) -> c_int;
 }

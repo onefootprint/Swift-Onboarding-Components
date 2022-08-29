@@ -1,21 +1,35 @@
 use elliptic_curve::{pkcs8::DecodePublicKey, sec1::ToEncodedPoint};
 use sec1::der::Decodable;
 
+use crate::aead::ScopedSealingKey;
+
 use self::ec_decode_helper::EcPrivateKeyWrapper;
 
 pub fn public_key_der_to_raw_uncompressed(der_bytes: &[u8]) -> Result<Vec<u8>, crate::Error> {
-    let pk = p256::PublicKey::from_public_key_der(der_bytes)
-        .map_err(|_| crate::Error::InvalidDerP256PublicKey)?;
+    let pk =
+        p256::PublicKey::from_public_key_der(der_bytes).map_err(|_| crate::Error::InvalidDerP256PublicKey)?;
+    Ok(pk.to_encoded_point(false).as_ref().to_vec())
+}
+
+pub fn public_key_raw_uncompressed_validated(bytes: &[u8]) -> Result<Vec<u8>, crate::Error> {
+    let pk = p256::PublicKey::from_sec1_bytes(bytes).map_err(|_| crate::Error::InvalidSec1P256PublicKey)?;
     Ok(pk.to_encoded_point(false).as_ref().to_vec())
 }
 
 pub fn private_key_der_to_raw_uncompressed(der_bytes: &[u8]) -> Result<Vec<u8>, crate::Error> {
-    let EcPrivateKeyWrapper { private_key } =
-        ec_decode_helper::EcPrivateKeyWrapper::from_der(der_bytes)
-            .map_err(|_| crate::Error::InvalidDerP256PrivateKey)?;
+    let EcPrivateKeyWrapper { private_key } = ec_decode_helper::EcPrivateKeyWrapper::from_der(der_bytes)
+        .map_err(|_| crate::Error::InvalidDerP256PrivateKey)?;
     Ok(p256::SecretKey::from_be_bytes(private_key.private_key)?
         .to_be_bytes()
         .to_vec())
+}
+
+/// Scope for an enclave ikek
+pub const ENCLAVE_IKEK_SCOPE: &str = "enclave_ikek";
+
+/// parse bytes into an enaclave ikek scoped sealing key
+pub fn to_enclave_ikek_sealing_key(bytes: Vec<u8>) -> Result<ScopedSealingKey, crate::Error> {
+    ScopedSealingKey::new(bytes, ENCLAVE_IKEK_SCOPE)
 }
 
 mod ec_decode_helper {

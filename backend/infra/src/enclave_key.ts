@@ -2,10 +2,12 @@ import * as pulumi from "@pulumi/pulumi"
 import * as aws from "@pulumi/aws";
 import { Region } from "@pulumi/aws";
 import { Config } from "./config";
+import * as kms from '@aws-sdk/client-kms';
 
 export interface EnclaveKeyDescriptor {
     rootKeyId: pulumi.Output<string>;
     rootKeyArn: pulumi.Output<string>;
+    sealedIkek: pulumi.Output<string>;
     enclaveKmsCredentials: EnclaveKmsCredentials;
 }
 
@@ -60,6 +62,20 @@ export async function Initialize(config: Config, replicaRegions: Region[]): Prom
         description: `enclave master root key for ${pulumi.getStack()}-default-region`
     });
 
+    // generate our sealed enclave ikek
+    const sealedIkek = pulumi.all([rootKey.keyId]).apply(async ([rootKeyId])=> {
+        const kmsClient = new kms.KMSClient({region: Region.USEast1 });
+        const command = new kms.GenerateDataKeyWithoutPlaintextCommand({
+            KeyId: rootKeyId,
+            NumberOfBytes: 32,
+        });
+        const response = await kmsClient.send(command);
+        const ciphertext = response.CiphertextBlob;
+        const ciphertextHex = Buffer.from(ciphertext!).toString('hex');
+
+        return ciphertextHex
+    });
+    
     const replicas = replicaRegions.map(region => {
         const provider = new aws.Provider(`kms-provider-${region}`, { region });
         return new aws.kms.ReplicaKey(`enclave_root_key_replica-${region}`, {
@@ -76,6 +92,7 @@ export async function Initialize(config: Config, replicaRegions: Region[]): Prom
     return {
         rootKeyId: rootKey.id,
         rootKeyArn: rootKey.arn,
+        sealedIkek,
         enclaveKmsCredentials: {
             access_key_id: enclaveUserKey.id,
             access_secret_key: pulumi.secret(enclaveUserKey.secret),

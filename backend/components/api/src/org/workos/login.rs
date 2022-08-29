@@ -174,7 +174,7 @@ async fn create_tenant(
     workos_org_id: String,
     workos_profile_id: Option<String>,
 ) -> Result<Tenant, ApiError> {
-    let (ec_pk_uncompressed, e_priv_key) = crate::enclave::gen_keypair(state).await?;
+    let (ec_pk_uncompressed, e_priv_key) = state.enclave_client.generate_sealed_keypair().await?;
 
     // create a tenant
     let tenant = NewTenant {

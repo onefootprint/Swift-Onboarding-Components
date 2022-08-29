@@ -36,13 +36,14 @@ async fn post(
     if email_row.is_verified {
         return Err(ChallengeError::EmailAlreadyVerified.into());
     }
-    let email = crate::enclave::decrypt_bytes(
-        &state,
-        &email_row.e_data,
-        &user_vault.e_private_key,
-        enclave_proxy::DataTransform::Identity,
-    )
-    .await?;
+    let email = state
+        .enclave_client
+        .decrypt_bytes(
+            &email_row.e_data,
+            &user_vault.e_private_key,
+            enclave_proxy::DataTransform::Identity,
+        )
+        .await?;
     let email = EmailData::from_str(email.leak())?;
 
     send_email_challenge(&state, email_row.id, &email.email).await?;

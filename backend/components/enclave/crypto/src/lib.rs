@@ -18,6 +18,9 @@ pub enum Error {
     #[error("Bad key")]
     InvalidKey,
 
+    #[error("Bad key length")]
+    InvalidKeyLength,
+
     #[error("Bad ciphertext")]
     InvalidCiphertext,
 
@@ -35,6 +38,9 @@ pub enum Error {
 
     #[error("Invalid der public key")]
     InvalidDerP256PublicKey,
+
+    #[error("Invalid sec1 public key")]
+    InvalidSec1P256PublicKey,
 
     #[error("Invalid der private key")]
     InvalidDerP256PrivateKey,

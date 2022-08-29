@@ -1,4 +1,4 @@
-FROM alpine:3.14
+FROM alpine:3.16
 
 VOLUME /shared
 RUN mkdir -p /contents

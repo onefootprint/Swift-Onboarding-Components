@@ -1,8 +1,8 @@
 use crate::auth::key_context::custodian::CustodianAuthContext;
+use crate::errors::ApiError;
 use crate::types::response::ApiResponseData;
 use crate::types::secret_api_key::TenantApiKeyResponse;
 use crate::State;
-use crate::{enclave::gen_keypair, errors::ApiError};
 use db::models::tenant_api_key::TenantApiKey;
 use newtypes::secret_api_key::SecretApiKey;
 use newtypes::TenantId;
@@ -37,7 +37,7 @@ async fn post(
     _custodian: CustodianAuthContext,
     state: web::Data<State>,
 ) -> actix_web::Result<Json<ApiResponseData<NewClientResponse>>, ApiError> {
-    let (ec_pk_uncompressed, e_priv_key) = gen_keypair(&state).await?;
+    let (ec_pk_uncompressed, e_priv_key) = state.enclave_client.generate_sealed_keypair().await?;
 
     let NewClientRequest {
         name,

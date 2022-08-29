@@ -1,6 +1,6 @@
 # build the EIF
 
-FROM enclave_builder as builder
+FROM ne_builder2 as builder
 
 USER root
 

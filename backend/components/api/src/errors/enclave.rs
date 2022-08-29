@@ -13,4 +13,6 @@ pub enum EnclaveError {
     InvalidEnclaveDecryptResponse,
     #[error("cannot decode decrypted result from utf8 error: {0}")]
     CannotDecodeUtf8(#[from] std::str::Utf8Error),
+    #[error("crypto error: {0}")]
+    CryptoError(#[from] crypto::Error),
 }

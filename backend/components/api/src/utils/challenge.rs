@@ -1,7 +1,7 @@
 use std::str::FromStr;
 
 use chrono::{DateTime, Utc};
-use crypto::aead::ScopedSealingKey;
+use crypto::aead::{AeadSealedBytes, ScopedSealingKey};
 use newtypes::Base64Data;
 use paperclip::actix::Apiv2Schema;
 use serde::{de::DeserializeOwned, Deserialize, Serialize};
@@ -21,13 +21,13 @@ pub struct ChallengeToken(String);
 
 impl<C: Serialize + DeserializeOwned + std::fmt::Debug> Challenge<C> {
     pub fn seal(&self, key: &ScopedSealingKey) -> Result<ChallengeToken, ApiError> {
-        let vec = key.seal(self)?;
+        let vec = key.seal(self)?.0;
         Ok(ChallengeToken(Base64Data(vec).to_string()))
     }
 
     pub fn unseal(key: &ScopedSealingKey, sealed: &ChallengeToken) -> Result<Self, ApiError> {
-        let sealed = Base64Data::from_str(&sealed.0).map_err(crypto::Error::from)?.0;
-        let unsealed: Self = key.unseal(&sealed)?;
+        let sealed = AeadSealedBytes(Base64Data::from_str(&sealed.0).map_err(crypto::Error::from)?.0);
+        let unsealed: Self = key.unseal(sealed)?;
 
         if unsealed.expires_at < Utc::now() {
             return Err(ChallengeError::ChallengeExpired.into());

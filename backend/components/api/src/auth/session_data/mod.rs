@@ -13,11 +13,11 @@ pub mod workos;
 
 impl AuthSessionData {
     pub(crate) fn seal(&self, key: &ScopedSealingKey) -> Result<SealedSessionBytes, crypto::Error> {
-        Ok(SealedSessionBytes(key.seal(&self)?))
+        Ok(key.seal(&self)?.into())
     }
 
-    pub fn unseal(key: &ScopedSealingKey, sealed: &SealedSessionBytes) -> Result<Self, crypto::Error> {
-        let unsealed: Self = key.unseal(sealed.as_ref())?;
+    pub fn unseal(key: &ScopedSealingKey, sealed: SealedSessionBytes) -> Result<Self, crypto::Error> {
+        let unsealed: Self = key.unseal(sealed.into())?;
         Ok(unsealed)
     }
 }

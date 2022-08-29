@@ -22,7 +22,7 @@ build-enclave-docker:
 
 	@echo "building enclave"
 
-	@docker run -v "cargo-cache:/root/.cargo/registry" -v "${PWD}:/build" --rm -t enclave_builder:latest cargo build --target=x86_64-unknown-linux-musl -p enclave --no-default-features --features nitro --release
+	@docker run -v "cargo-cache:/home/ec2-user/.cargo/registry" -v "${PWD}:/build" --rm -t enclave_builder:latest cargo build --target=x86_64-unknown-linux-musl -p enclave --no-default-features --features nitro --release
 
 	@cp ./target/x86_64-unknown-linux-musl/release/enclave ./out/enclave
 
@@ -35,12 +35,13 @@ build-eif: build-enclave-docker
 
 	@nitro-cli build-enclave --docker-uri enclave:latest --output-file ./out/enclave.eif --private-key ../enclavekey.pem --signing-certificate ../cert.pem
 
-run-enclave-debug:
+run-enclave-debug: build-eif
+	@nitro-cli terminate-enclave --all
 	@echo "running enclave [debug mode]"
 	@nitro-cli run-enclave --eif-path ./out/enclave.eif --cpu-count 2 --memory 256 --enclave-cid 16 --debug-mode
-
+		
 run-enclave:
-	@echo "running enclave"
+	@echo "running enclave"	
 	@nitro-cli run-enclave --eif-path ./out/enclave.eif --cpu-count 2 --memory 256 --enclave-cid 16
 
 get-named-commit:

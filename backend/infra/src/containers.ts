@@ -35,6 +35,7 @@ export abstract class ServiceContainers {
                 enclaveKeyDescriptor.rootKeyId,
                 enclaveKeyDescriptor.enclaveKmsCredentials.access_key_id,
                 secretsStore.enclaveUserSecretKey.arn,
+                secretsStore.enclaveSealedIkek.arn,
                 database.databaseUrlSecretParam.arn,
                 secretsStore.cookieSessionKey.arn,
                 signingKeyDescriptor.rootKeyId,
@@ -42,7 +43,7 @@ export abstract class ServiceContainers {
                 secretsStore.twilioApiKey.arn,
                 secretsStore.twilioApiKeySecret.arn,
                 secretsStore.sendgridApiKey.arn,
-            ]).apply(([rootKeyId, enclaveAccessKeyId, enclaveUserArn, databaseUrlArn, cookieSessionKeyArn, signingKeyId, workosSecretKey, twilioApiKey, twilioApiKeySecret, sendgridApiKey]) => {
+            ]).apply(([rootKeyId, enclaveAccessKeyId, enclaveUserArn, enclaveSealedIkekArn, databaseUrlArn, cookieSessionKeyArn, signingKeyId, workosSecretKey, twilioApiKey, twilioApiKeySecret, sendgridApiKey]) => {
                 const def = [{
                     name,
                     image,
@@ -51,6 +52,10 @@ export abstract class ServiceContainers {
                         {
                             name: "ENCLAVE_AWS_SECRET_ACCESS_KEY",
                             valueFrom: enclaveUserArn
+                        },
+                        {
+                            name: "ENCLAVE_SEALED_IKEK_HEX",
+                            valueFrom: enclaveSealedIkekArn
                         },
                         {
                             name: "DATABASE_URL",

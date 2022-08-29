@@ -13,6 +13,12 @@ impl VaultPublicKey {
         let ec_pk_uncompressed = crypto::conversion::public_key_der_to_raw_uncompressed(bytes)?;
         Ok(Self(ec_pk_uncompressed))
     }
+
+    pub fn from_raw_uncompressed(bytes: &[u8]) -> Result<Self, crypto::Error> {
+        let ec_pk_uncompressed = crypto::conversion::public_key_raw_uncompressed_validated(bytes)?;
+        Ok(Self(ec_pk_uncompressed))
+    }
+
     /// unvalidated init
     pub fn unvalidated(bytes: Vec<u8>) -> Self {
         Self(bytes)

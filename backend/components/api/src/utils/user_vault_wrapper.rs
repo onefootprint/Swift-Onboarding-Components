@@ -119,13 +119,10 @@ impl UserVaultWrapper {
         state: &State,
         data: Vec<&SealedVaultBytes>,
     ) -> Result<Vec<PiiString>, ApiError> {
-        let decrypted_results = crate::enclave::decrypt_bytes_batch(
-            state,
-            data,
-            &self.user_vault.e_private_key,
-            DataTransform::Identity,
-        )
-        .await?;
+        let decrypted_results = state
+            .enclave_client
+            .decrypt_bytes_batch(data, &self.user_vault.e_private_key, DataTransform::Identity)
+            .await?;
         Ok(decrypted_results)
     }
 

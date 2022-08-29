@@ -13,6 +13,7 @@ export interface StaticSecrets {
     elasticApiKey: aws.ssm.Parameter;
     otelConfig: aws.ssm.Parameter;
     enclaveUserSecretKey: aws.ssm.Parameter;
+    enclaveSealedIkek: aws.ssm.Parameter;
     dbPassword: pulumi.Output<string>;
     cookieSessionKey: aws.ssm.Parameter;
     workosSecretKey: aws.ssm.Parameter;
@@ -83,6 +84,11 @@ export async function LoadSecrets(config: pulumi.Config, enclaveKeyDescriptor: E
             type: "SecureString",
             value: pulumi.secret(enclaveKeyDescriptor.enclaveKmsCredentials.access_secret_key),
             name: `/static_secrets/enclave-user-${stack}`,
+        }),
+        enclaveSealedIkek: new aws.ssm.Parameter(`ssm-param-enclave-sealed-ikek`, {
+            type: "SecureString",
+            value: pulumi.secret(enclaveKeyDescriptor.sealedIkek),
+            name: `/static_secrets/enclave-sealed-ikek-${stack}`,
         }),
         otelConfig: new aws.ssm.Parameter(`ssm-param-otelconfig`, {
             type: "SecureString",

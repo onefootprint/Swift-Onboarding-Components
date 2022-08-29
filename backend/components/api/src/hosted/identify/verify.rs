@@ -126,7 +126,7 @@ async fn create_new_user_vault(
     state: &web::Data<State>,
     phone_number: &ValidatedPhoneNumber,
 ) -> Result<UserVault, ApiError> {
-    let (public_key, e_private_key) = crate::enclave::gen_keypair(state).await?;
+    let (public_key, e_private_key) = state.enclave_client.generate_sealed_keypair().await?;
 
     let new_user = NewPortableUserVaultReq {
         e_private_key,

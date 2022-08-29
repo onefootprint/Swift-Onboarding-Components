@@ -9,29 +9,14 @@ pub struct Config {
     #[envconfig(from = "PORT", default = "8000")]
     pub port: u16,
 
-    #[envconfig(from = "ENCLAVE_PORT", default = "5000")]
-    pub enclave_port: u32,
-
-    #[envconfig(from = "ENCLAVE_CID", default = "16")]
-    pub enclave_cid: u32,
-
-    #[envconfig(from = "LOCAL")]
-    pub use_local: Option<String>,
-
-    #[envconfig(from = "AWS_ROOT_KEY_ID")]
-    pub enclave_root_key_id: String,
+    #[envconfig(nested = true)]
+    pub enclave_config: EnclaveConfig,
 
     #[envconfig(from = "AWS_HMAC_SIGNING_ROOT_KEY_ID")]
     pub signing_root_key_id: String,
 
     #[envconfig(from = "AWS_REGION")]
     pub aws_region: String,
-
-    #[envconfig(from = "ENCLAVE_AWS_ACCESS_KEY_ID")]
-    pub enclave_aws_access_key_id: String,
-
-    #[envconfig(from = "ENCLAVE_AWS_SECRET_ACCESS_KEY")]
-    pub enclave_aws_secret_access_key: String,
 
     #[envconfig(from = "DISABLE_OTEL")]
     pub disable_otel: Option<String>,
@@ -118,6 +103,31 @@ impl Config {
     }
 }
 
+/// Separated config for Enclave settings
+#[derive(Envconfig, Debug, Clone)]
+pub struct EnclaveConfig {
+    #[envconfig(from = "ENCLAVE_PORT", default = "5000")]
+    pub enclave_port: u32,
+
+    #[envconfig(from = "ENCLAVE_CID", default = "16")]
+    pub enclave_cid: u32,
+
+    #[envconfig(from = "ENCLAVE_LOCAL")]
+    pub use_local: Option<String>,
+
+    #[envconfig(from = "AWS_ROOT_KEY_ID")]
+    pub enclave_root_key_id: String,
+
+    #[envconfig(from = "ENCLAVE_AWS_ACCESS_KEY_ID")]
+    pub enclave_aws_access_key_id: String,
+
+    #[envconfig(from = "ENCLAVE_AWS_SECRET_ACCESS_KEY")]
+    pub enclave_aws_secret_access_key: String,
+
+    #[envconfig(from = "ENCLAVE_SEALED_IKEK_HEX")]
+    pub enclave_sealed_ikek_hex: String,
+}
+
 /// separate service config struct to load minimal memory footprint for sensitive values
 #[derive(Envconfig, Clone)]
 pub struct ServiceEnvironmentConfig {
@@ -144,7 +154,7 @@ impl ServiceEnvironmentConfig {
     }
 }
 
-impl enclave_proxy::StreamConfig for Config {
+impl enclave_proxy::StreamConfig for EnclaveConfig {
     #[cfg(feature = "vsock")]
     fn stream_type(&self) -> enclave_proxy::StreamType {
         if self.use_local.is_some() {

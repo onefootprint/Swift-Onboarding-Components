@@ -5,13 +5,10 @@ use actix_web::{
 use config::Config;
 use crypto::aead::ScopedSealingKey;
 use db::DbPool;
-use enclave_proxy::{
-    bb8::{self, ErrorSink},
-    pool, StreamManager,
-};
+use enclave_client::EnclaveClient;
 
 use signed_hash::SignedHashClient;
-use std::{borrow::Cow, sync::Arc, time::Duration};
+use std::{borrow::Cow, sync::Arc};
 use telemetry::TelemetrySpanBuilder;
 use tracing_actix_web::TracingLogger;
 use utils::email::SendgridClient;
@@ -21,10 +18,8 @@ mod signed_hash;
 mod telemetry;
 mod users;
 
-// TODO put IAM roles and permissions in pulumi
-
 mod auth;
-mod enclave;
+mod enclave_client;
 mod errors;
 mod hosted;
 mod index;
@@ -39,32 +34,18 @@ use paperclip::actix::{web, OpenApiExt};
 #[derive(Clone)]
 pub struct State {
     config: Config,
-    kms_client: aws_sdk_kms::Client,
     hmac_client: SignedHashClient,
     workos_client: Arc<WorkOs>,
     twilio_client: TwilioClient,
     sendgrid_client: SendgridClient,
     db_pool: DbPool,
-    enclave_connection_pool: bb8::Pool<pool::StreamManager<StreamManager<Config>>>,
+    enclave_client: EnclaveClient,
     challenge_sealing_key: ScopedSealingKey,
     session_sealing_key: ScopedSealingKey,
 }
 
 lazy_static::lazy_static! {
     pub static ref GIT_HASH:&'static str = env!("GIT_HASH");
-}
-
-/// Record errors that occur from enclave pool connections
-#[derive(Debug, Clone)]
-struct EnclavePoolErrorSink;
-impl ErrorSink<enclave_proxy::Error> for EnclavePoolErrorSink {
-    fn sink(&self, error: enclave_proxy::Error) {
-        tracing::error!(target: "enclave_pool_error", error=?error, "enclave connection pool error");
-    }
-
-    fn boxed_clone(&self) -> Box<(dyn ErrorSink<enclave_proxy::Error> + 'static)> {
-        Box::new(self.clone())
-    }
 }
 
 #[actix_web::main]
@@ -91,23 +72,12 @@ async fn main() -> std::io::Result<()> {
     std::env::set_var("RUST_BACKTRACE", "1");
 
     let state = {
-        let manager = StreamManager {
-            config: config.clone(),
-        };
-        let pool = bb8::Pool::builder()
-            .min_idle(Some(3))
-            .max_size(50)
-            .connection_timeout(Duration::from_secs(4))
-            .test_on_check_out(false)
-            .error_sink(Box::new(EnclavePoolErrorSink))
-            .build(pool::StreamManager(manager))
-            .await
-            .unwrap();
+        let enclave_client = EnclaveClient::new(config.clone()).await;
 
         let shared_config = aws_config::from_env().load().await;
         let kms_client = aws_sdk_kms::Client::new(&shared_config);
         let hmac_client = SignedHashClient {
-            client: kms_client.clone(),
+            client: kms_client,
             key_id: config.signing_root_key_id.clone(),
         };
 
@@ -158,8 +128,7 @@ async fn main() -> std::io::Result<()> {
 
         State {
             config: config.clone(),
-            enclave_connection_pool: pool,
-            kms_client,
+            enclave_client,
             hmac_client,
             workos_client: Arc::new(workos_client),
             twilio_client,

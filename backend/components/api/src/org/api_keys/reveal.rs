@@ -42,13 +42,14 @@ async fn get(
         .await??;
 
     let tenant = auth.tenant();
-    let decrypted_secret_key = crate::enclave::decrypt_bytes(
-        &state,
-        &key.e_secret_api_key,
-        &tenant.e_private_key,
-        DataTransform::Identity,
-    )
-    .await?;
+    let decrypted_secret_key = state
+        .enclave_client
+        .decrypt_bytes(
+            &key.e_secret_api_key,
+            &tenant.e_private_key,
+            DataTransform::Identity,
+        )
+        .await?;
 
     Ok(Json(ApiResponseData::ok(TenantApiKeyResponse::from((
         key,

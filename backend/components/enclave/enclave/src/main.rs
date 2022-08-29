@@ -2,8 +2,10 @@ mod config;
 
 use config::Config;
 use enclave::{
-    enclave::handle_fn_decrypt, enclave::handle_hmac_sign, enclave::init as init_enclave_sdk, EnclavePayload,
-    EnclaveResponse, RpcPayload, WireMessage,
+    enclave::handle_fn_decrypt,
+    enclave::init as init_enclave_sdk,
+    enclave::{handle_generate_data_keypair, handle_hmac_sign},
+    EnclavePayload, EnclaveResponse, RpcPayload, WireMessage,
 };
 
 #[allow(unused_imports)]
@@ -16,38 +18,30 @@ use tokio::{
 #[cfg(feature = "nitro")]
 use tokio_vsock::VsockListener;
 
-fn main() -> std::io::Result<()> {
+#[tokio::main]
+async fn main() -> std::io::Result<()> {
     env_logger::init();
     let config = Config::load_from_env().expect("failed to load env");
 
     init_enclave_sdk();
 
-    // build runtime
-    let runtime = tokio::runtime::Builder::new_multi_thread()
-        .enable_all()
-        .worker_threads(2)
-        .thread_name("enclave-runtime")
-        .thread_stack_size(10 * 1024 * 1024)
-        .max_blocking_threads(2)
-        .build()
-        .unwrap();
+    // for local development, use a local tcp socket instead of AF_VSOCK
+    #[cfg(not(feature = "nitro"))]
+    {
+        listen_tcp(&format!("127.0.0.1:{}", config.port)).await
+    }
 
-    runtime.block_on(async move {
-        // for local development, use a local tcp socket instead of AF_VSOCK
-        #[cfg(not(feature = "nitro"))]
-        {
+    #[cfg(feature = "nitro")]
+    {
+        if config.use_local.is_some() {
             listen_tcp(&format!("127.0.0.1:{}", config.port)).await
-        }
+        } else {
+            // spawn our loop to start seeding entropy via the NSM
+            enclave::enclave::spawn_seed_entropy_loop();
 
-        #[cfg(feature = "nitro")]
-        {
-            if config.use_local.is_some() {
-                listen_tcp(&format!("127.0.0.1:{}", config.port)).await
-            } else {
-                listen_vsock(config.port as u32).await
-            }
+            listen_vsock(config.port as u32).await
         }
-    })
+    }
 }
 
 async fn listen_tcp(address: &str) -> std::io::Result<()> {
@@ -65,14 +59,14 @@ async fn listen_tcp(address: &str) -> std::io::Result<()> {
 async fn listen_vsock(port: u32) -> std::io::Result<()> {
     let listener = VsockListener::bind(libc::VMADDR_CID_ANY, port)?;
 
-    log::debug!("Listening for VSOCK connections on port: {}", port);
+    log::info!("Listening for VSOCK connections on port: {}", port);
 
     let mut incoming = listener.incoming();
     while let Some(result) = incoming.next().await {
         match result {
             Ok(stream) => stream_listen(stream),
             Err(e) => {
-                log::debug!("Got error accepting connection: {:?}", e);
+                log::info!("Got error accepting connection: {:?}", e);
                 return Err(e);
             }
         }
@@ -132,6 +126,9 @@ async fn handle_stream<S: AsyncRead + AsyncWrite + Unpin + Send + 'static>(
 async fn handle_request(request: RpcPayload) -> Result<EnclavePayload, Box<dyn std::error::Error>> {
     let response = match request {
         RpcPayload::Ping(m) => EnclavePayload::Pong(m),
+        RpcPayload::GenerateDataKeypair(generate_request) => {
+            EnclavePayload::GenerateDataKeyPair(handle_generate_data_keypair(generate_request).await?)
+        }
         RpcPayload::HmacSign(sign_request) => {
             EnclavePayload::HmacSignature(handle_hmac_sign(sign_request).await?)
         }

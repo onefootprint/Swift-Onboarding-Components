@@ -22,6 +22,7 @@
     "fingerprintable",
     "Fpuser",
     "hmac",
+    "Ikek",
     "livecheck",
     "newtype",
     "newtypes",
@@ -83,13 +84,21 @@
   "files.watcherExclude": {
     "**/target/**": true
   },
-  "rust-analyzer.files.excludeDirs": ["**/target/**"],
+  "rust-analyzer.files.excludeDirs": [
+    "**/target/**"
+  ],
   "rust-analyzer.rustfmt.overrideCommand": null,
   "search.exclude": {
     "**/target/": true
   },
-  "eslint.workingDirectories": ["./frontend"],
-  "eslint.validate": ["javascript", "typescript", "typescriptreact"],
+  "eslint.workingDirectories": [
+    "./frontend"
+  ],
+  "eslint.validate": [
+    "javascript",
+    "typescript",
+    "typescriptreact"
+  ],
   "command-runner.terminal.name": "RunCommand",
   "command-runner.terminal.autoClear": true,
   "command-runner.terminal.autoFocus": true,

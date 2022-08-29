@@ -1,11 +1,14 @@
 use aes_gcm::aead::Payload;
 use aes_gcm::aead::{Aead, NewAead};
 use aes_gcm::{Aes256Gcm, Key, Nonce};
+use elliptic_curve::sec1::ToEncodedPoint;
 use p256::{ecdh::EphemeralSecret, EncodedPoint};
 use rand_core::{OsRng, RngCore};
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use std::str::FromStr;
+
+use crate::aead::{AeadSealedBytes, ScopedSealingKey};
 
 pub use self::seal::seal_ecies_p256_x963_sha256_aes_gcm;
 pub use self::unseal::unseal_ecies_p256_x963_sha256_aes_gcm;
@@ -129,13 +132,13 @@ pub mod unseal {
     use super::*;
     use elliptic_curve::{ecdh::diffie_hellman, sec1::ToEncodedPoint};
 
-    pub struct Plain(pub Vec<u8>);
+    pub struct Unsealed(pub Vec<u8>);
 
     /// raw private key BE
     pub fn unseal_ecies_p256_x963_sha256_aes_gcm(
         private_key_bytes: &[u8],
         sealed: EciesP256Sha256AesGcmSealed,
-    ) -> Result<Plain, crate::Error> {
+    ) -> Result<Unsealed, crate::Error> {
         // init our private key
         let private_key = p256::SecretKey::from_be_bytes(private_key_bytes)?;
         let public_key = private_key.public_key().to_encoded_point(false);
@@ -168,13 +171,33 @@ pub mod unseal {
             .decrypt(nonce, payload)
             .map_err(|_| crate::Error::AeadEncrypt)?;
 
-        Ok(Plain(plain))
+        Ok(Unsealed(plain))
+    }
+}
+
+#[derive(Serialize, Debug, Deserialize, Clone)]
+pub struct SealedEciesP256KeyPair {
+    pub sealed_private_key: AeadSealedBytes,
+    pub public_key_bytes: Vec<u8>,
+}
+
+impl ScopedSealingKey {
+    /// generate a key pair for use with ecies
+    pub fn generate_sealed_random_ecies_p256_key_pair(&self) -> Result<SealedEciesP256KeyPair, crate::Error> {
+        let sk = p256::SecretKey::random(&mut OsRng);
+        let sealed_private_key = self.seal_bytes(&sk.to_be_bytes())?;
+
+        let public_key_bytes = sk.public_key().to_encoded_point(false).as_bytes().to_vec();
+
+        Ok(SealedEciesP256KeyPair {
+            public_key_bytes,
+            sealed_private_key,
+        })
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use elliptic_curve::sec1::ToEncodedPoint;
 
     use super::*;
 
@@ -214,5 +237,30 @@ mod tests {
         )
         .unwrap();
         assert_eq!(unsealed.0, b"hello world".to_vec());
+    }
+
+    const TEST_SCOPE: &str = "test_scope";
+
+    fn random_key() -> [u8; 32] {
+        let mut key = [0u8; 32];
+        OsRng.fill_bytes(&mut key);
+        key
+    }
+
+    #[test]
+    fn test_generate_sealed_ecies_key() {
+        let sealing_key = ScopedSealingKey::new(random_key().to_vec(), TEST_SCOPE).unwrap();
+
+        let sealed_kp = sealing_key.generate_sealed_random_ecies_p256_key_pair().unwrap();
+
+        let unsealed_sk = sealing_key.unseal_bytes(sealed_kp.sealed_private_key).unwrap();
+
+        let message = b"hello world";
+        let sealed =
+            seal::seal_ecies_p256_x963_sha256_aes_gcm(&sealed_kp.public_key_bytes, message.to_vec()).unwrap();
+
+        let unsealed = unseal::unseal_ecies_p256_x963_sha256_aes_gcm(&unsealed_sk, sealed).unwrap();
+
+        assert_eq!(unsealed.0.as_slice(), message.as_slice());
     }
 }
