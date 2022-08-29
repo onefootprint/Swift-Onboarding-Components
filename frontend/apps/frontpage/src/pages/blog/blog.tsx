@@ -1,9 +1,10 @@
 import { useIntl, useTranslation } from 'hooks';
 import React from 'react';
+import SubscribeToNewsletter from 'src/components/subscribe-to-newsletter';
 import TwitterBreadcrumb from 'src/components/twitter-breadcrumb';
 import { getInitialPosts } from 'src/utils/ghost';
 import styled, { css } from 'styled-components';
-import { Container, media } from 'ui';
+import { Container, Divider, media } from 'ui';
 
 import SEO from '../../components/seo';
 import { PostType } from '../../utils/ghost/ghost';
@@ -72,11 +73,19 @@ const Blog = ({ posts }: BlogProps) => {
               />
             ))}
           </Posts>
+          <StyledDivider />
+          <SubscribeToNewsletter />
         </Inner>
       </Container>
     </>
   );
 };
+
+const StyledDivider = styled(Divider)`
+  ${({ theme }) => css`
+    margin-top: ${theme.spacing[10]}px;
+  `}
+`;
 
 const Inner = styled.div`
   ${({ theme }) => css`
