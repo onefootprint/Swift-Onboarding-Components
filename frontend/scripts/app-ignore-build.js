@@ -14,15 +14,16 @@ const abortBuild = () => {
 };
 
 // argv is a custom argument we pass on vercel (e.g frontend)
-// the second value is the directory that we're calling this script from
-const dir = process.argv[2] || path.basename(path.resolve());
+// the second value is a list of directories that should trigger a re-build
+const dirArray = process.argv[2] || '';
+const dirSet = new Set(dirArray.split(',').map(d => d.trim()));
 
 const stepCheck = () => {
   if (process.env.VERCEL_ENV === 'production') {
     return continueBuild();
   }
 
-  if (!dir) {
+  if (!dirSet.size) {
     return abortBuild();
   }
   // get all file names changed in last commit
@@ -31,7 +32,12 @@ const stepCheck = () => {
     .toString()
     .trim()
     .split('\n');
-  const hasChangedApp = fileNameList.some(file => file.startsWith(dir));
+
+  // Changes to any files in this app should trigger re-building
+  const hasChangedApp = fileNameList.some(file =>
+    dirSet.some(dir => file.startsWith(dir)),
+  );
+  // Changes to packages (ui components, types, hooks, etc.) should trigger building all apps
   const hasChangedPackages = fileNameList.some(file =>
     file.startsWith('frontend/packages'),
   );
