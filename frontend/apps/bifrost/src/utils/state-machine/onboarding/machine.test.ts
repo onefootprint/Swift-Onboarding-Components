@@ -59,30 +59,6 @@ describe('Onboarding Machine Tests', () => {
   });
 
   describe('When user has missing fields', () => {
-    it('If missing biometric credentials, starts liveness register', () => {
-      const machine = createMachine(true, {
-        type: 'mobile',
-        hasSupportForWebauthn: true,
-      });
-      machine.start();
-      let state = machine.send({
-        type: Events.onboardingVerificationCompleted,
-        payload: {
-          missingAttributes: [CollectedDataOption.name],
-          missingWebauthnCredentials: true,
-        },
-      });
-      expect(state.value).toEqual(States.additionalDataRequired);
-      const { context } = state;
-      expect(context.missingAttributes).toEqual([CollectedDataOption.name]);
-      expect(context.missingWebauthnCredentials).toEqual(true);
-
-      state = machine.send({
-        type: Events.additionalInfoRequired,
-      });
-      expect(state.value).toEqual(States.livenessRegister);
-    });
-
     it('If missing at least one attribute from each page, takes user to all pages in order', () => {
       const machine = createMachine(true, {
         type: 'mobile',
@@ -97,7 +73,7 @@ describe('Onboarding Machine Tests', () => {
             CollectedDataOption.fullAddress,
             CollectedDataOption.ssn9,
           ],
-          missingWebauthnCredentials: false,
+          missingWebauthnCredentials: true,
         },
       });
       expect(state.value).toEqual(States.additionalDataRequired);
@@ -107,7 +83,7 @@ describe('Onboarding Machine Tests', () => {
         CollectedDataOption.fullAddress,
         CollectedDataOption.ssn9,
       ]);
-      expect(context.missingWebauthnCredentials).toEqual(false);
+      expect(context.missingWebauthnCredentials).toEqual(true);
 
       state = machine.send({
         type: Events.additionalInfoRequired,
@@ -172,9 +148,9 @@ describe('Onboarding Machine Tests', () => {
           ssn9: '101010101',
         },
       });
-      expect(state.value).toEqual(States.onboardingComplete);
       context = state.context;
       expect(context.data.ssn9).toEqual('101010101');
+      expect(state.value).toEqual(States.livenessRegister);
     });
 
     it('Skips states without missing attributes', () => {

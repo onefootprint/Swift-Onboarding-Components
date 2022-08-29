@@ -78,10 +78,6 @@ const createOnboardingMachine = ({
               target: States.additionalDataRequired,
             },
             {
-              target: States.livenessRegister,
-              cond: context => context.missingWebauthnCredentials,
-            },
-            {
               target: States.basicInformation,
               cond: context =>
                 !userFound ||
@@ -104,6 +100,10 @@ const createOnboardingMachine = ({
                 isMissingSsnAttribute(context.missingAttributes, context.data),
             },
             {
+              target: States.livenessRegister,
+              cond: context => context.missingWebauthnCredentials,
+            },
+            {
               target: States.onboardingComplete,
             },
           ],
@@ -111,15 +111,6 @@ const createOnboardingMachine = ({
         [States.additionalDataRequired]: {
           on: {
             [Events.additionalInfoRequired]: [
-              {
-                target: States.livenessRegister,
-                description:
-                  'If there are other attributes missing in addition to webauthn for an existing user, take them to liveness register, since the user likely abandoned onboarding early.',
-                cond: context =>
-                  userFound &&
-                  context.missingWebauthnCredentials &&
-                  hasMissingAttributes(context.missingAttributes, context.data),
-              },
               {
                 target: States.basicInformation,
                 cond: context =>
@@ -143,6 +134,15 @@ const createOnboardingMachine = ({
                     context.missingAttributes,
                     context.data,
                   ),
+              },
+              {
+                target: States.livenessRegister,
+                description:
+                  'If there are other attributes missing in addition to webauthn for an existing user, take them to liveness register, since the user likely abandoned onboarding early.',
+                cond: context =>
+                  userFound &&
+                  context.missingWebauthnCredentials &&
+                  hasMissingAttributes(context.missingAttributes, context.data),
               },
               {
                 target: States.onboardingComplete,
@@ -159,30 +159,6 @@ const createOnboardingMachine = ({
                 authToken: context.authToken,
               }),
             onDone: [
-              {
-                target: States.basicInformation,
-                cond: context =>
-                  isMissingBasicAttribute(
-                    context.missingAttributes,
-                    context.data,
-                  ),
-              },
-              {
-                target: States.residentialAddress,
-                cond: context =>
-                  isMissingResidentialAttribute(
-                    context.missingAttributes,
-                    context.data,
-                  ),
-              },
-              {
-                target: States.ssn,
-                cond: context =>
-                  isMissingSsnAttribute(
-                    context.missingAttributes,
-                    context.data,
-                  ),
-              },
               {
                 target: States.onboardingComplete,
               },
@@ -211,6 +187,11 @@ const createOnboardingMachine = ({
                   ),
               },
               {
+                target: States.livenessRegister,
+                actions: [Actions.assignBasicInformation],
+                cond: context => context.missingWebauthnCredentials,
+              },
+              {
                 target: States.onboardingComplete,
                 actions: [Actions.assignBasicInformation],
               },
@@ -230,6 +211,11 @@ const createOnboardingMachine = ({
                   ),
               },
               {
+                target: States.livenessRegister,
+                actions: [Actions.assignResidentialAddress],
+                cond: context => context.missingWebauthnCredentials,
+              },
+              {
                 target: States.onboardingComplete,
                 actions: [Actions.assignResidentialAddress],
               },
@@ -246,6 +232,11 @@ const createOnboardingMachine = ({
         [States.ssn]: {
           on: {
             [Events.ssnSubmitted]: [
+              {
+                target: States.livenessRegister,
+                actions: [Actions.assignSsn],
+                cond: context => context.missingWebauthnCredentials,
+              },
               {
                 target: States.onboardingComplete,
                 actions: [Actions.assignSsn],
