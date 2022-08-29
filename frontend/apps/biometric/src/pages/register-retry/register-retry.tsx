@@ -58,11 +58,18 @@ const RegisterRetry = () => {
     );
   };
 
+  const handleSkip = () => {
+    send({ type: Events.canceled });
+  };
+
   return (
     <Container>
       <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
       <Button onClick={handleRegister} fullWidth>
         {t('cta')}
+      </Button>
+      <Button onClick={handleSkip} fullWidth>
+        {t('skip')}
       </Button>
     </Container>
   );

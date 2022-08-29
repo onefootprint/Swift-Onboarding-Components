@@ -10,8 +10,9 @@
     },
     "register-retry": {
       "title": "Biometrics not recognized",
-      "subtitle": "Please try again",
-      "cta": "Try again"
+      "subtitle": "You can try biometrics again or you can do this next time you use Footprint.",
+      "cta": "Try biometrics again",
+      "skip": "Do it later"
     },
     "success": {
       "title": "Successfully authenticated!",
