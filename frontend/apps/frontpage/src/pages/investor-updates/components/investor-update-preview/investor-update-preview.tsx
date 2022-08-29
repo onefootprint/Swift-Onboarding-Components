@@ -2,7 +2,7 @@ import { useTranslation } from 'hooks';
 import { IcoArrowRightSmall16 } from 'icons';
 import React from 'react';
 import styled, { css } from 'styled-components';
-import { LinkButton, Typography } from 'ui';
+import { LinkButton, media, Typography } from 'ui';
 
 type InvestorUpdatePreviewProps = {
   index: number;
@@ -22,9 +22,9 @@ const InvestorUpdatePreview = ({
   const { t } = useTranslation('pages.investor-updates');
 
   return (
-    <article>
+    <Article>
       <Header>
-        <Typography variant="label-2" sx={{ marginBottom: 2 }}>
+        <Typography variant="label-2" sx={{ marginBottom: 6 }}>
           {t('header-title-prefix', { index })}
         </Typography>
         {!!createdAt && (
@@ -47,9 +47,17 @@ const InvestorUpdatePreview = ({
           {t('read-more')}
         </LinkButton>
       </Content>
-    </article>
+    </Article>
   );
 };
+
+const Article = styled.article`
+  display: block;
+
+  ${media.greaterThan('md')`
+    display: flex;
+  `}
+`;
 
 const Content = styled.div`
   ${({ theme }) => css`
