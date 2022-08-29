@@ -1,13 +1,11 @@
 import { IcoClose24, IcoMenu24 } from 'icons';
+import Link from 'next/link';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useLockBodyScroll } from 'react-use';
 import styled, { css } from 'styled-components';
-import { Button, media, useMediaQuery } from 'ui';
+import { Button, createFontStyles, media, useMediaQuery } from 'ui';
 
-import { isNavBarLink, isNavBarMenu, NavBarEntry } from '../../types';
 import LogoLink from '../logo-link';
-import MobileNavBarLink from './components/mobile-navbar-link';
-import MobileNavbarMenu from './components/mobile-navbar-menu';
 
 type MobileNavProps = {
   onOpen: () => void;
@@ -16,10 +14,10 @@ type MobileNavProps = {
     text: string;
     onClick: () => void;
   };
-  entries: NavBarEntry[];
+  links: { text: string; href: string }[];
 };
 
-const MobileNav = ({ onOpen, onClose, cta, entries }: MobileNavProps) => {
+const MobileNav = ({ onOpen, onClose, cta, links }: MobileNavProps) => {
   const breakpoint = useMediaQuery({ minWidth: 'lg', maxWidth: 'xl' });
   const [isOpen, setOpen] = useState(false);
   useLockBodyScroll(isOpen);
@@ -60,31 +58,15 @@ const MobileNav = ({ onOpen, onClose, cta, entries }: MobileNavProps) => {
         </NavTriggerButton>
       </Header>
       <Content>
-        <nav>
-          {entries
-            .map(entry => {
-              if (isNavBarLink(entry)) {
-                return (
-                  <MobileNavBarLink
-                    key={entry.text}
-                    link={entry}
-                    onClick={handleLinkClick}
-                  />
-                );
-              }
-              if (isNavBarMenu(entry)) {
-                return (
-                  <MobileNavbarMenu
-                    menu={entry}
-                    key={entry.text}
-                    onClickItem={handleLinkClick}
-                  />
-                );
-              }
-              return null;
-            })
-            .filter(elem => !!elem)}
-        </nav>
+        <Nav>
+          {links.map(link => (
+            <Link href={link.href} key={link.text}>
+              <a href={link.href} onClick={handleLinkClick}>
+                {link.text}
+              </a>
+            </Link>
+          ))}
+        </Nav>
         <CtaContainer>
           <Button onClick={cta.onClick} fullWidth>
             {cta.text}
@@ -155,6 +137,18 @@ const NavTriggerButton = styled.button`
   margin: 0;
   padding: 0;
   width: 36px;
+`;
+
+const Nav = styled.nav`
+  ${({ theme }) => css`
+    a {
+      ${createFontStyles('label-1')};
+      color: ${theme.color.primary};
+      display: block;
+      padding: ${theme.spacing[4]}px ${theme.spacing[6]}px;
+      text-decoration: none;
+    }
+  `}
 `;
 
 const CtaContainer = styled.div`

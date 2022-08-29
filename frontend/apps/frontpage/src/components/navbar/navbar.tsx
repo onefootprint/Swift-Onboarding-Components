@@ -1,13 +1,10 @@
 import { useHasScroll, useToggle, useTranslation } from 'hooks';
-import IcoMegaphone24 from 'icons/src/icos/ico-megaphone-24';
-import IcoWriting24 from 'icons/src/icos/ico-writing-24';
 import React from 'react';
 import styled, { css } from 'styled-components';
 import { Banner, Container, media } from 'ui';
 
 import DesktopNav from './components/desktop-nav';
 import MobileNav from './components/mobile-nav';
-import { NavBarEntry } from './types';
 
 type NavbarProps = {
   cta: {
@@ -21,29 +18,13 @@ const Navbar = ({ cta }: NavbarProps) => {
   const hasScroll = useHasScroll();
   const { t } = useTranslation('components.navbar');
 
-  const entries: NavBarEntry[] = [
-    { text: t('entries.compare.text'), href: t('entries.compare.href') },
-    { text: t('entries.pricing.text'), href: t('entries.pricing.href') },
-    { text: t('entries.company.text'), href: t('entries.company.href') },
-    { text: t('entries.faq.text'), href: t('entries.faq.href') },
-    {
-      text: t('entries.writing.text'),
-      items: [
-        {
-          text: t('entries.writing.links.blog.text'),
-          href: t('entries.writing.links.blog.href'),
-          subtext: t('entries.writing.links.blog.subtext'),
-          icon: <IcoWriting24 />,
-        },
-        {
-          text: t('entries.writing.links.investor-updates.text'),
-          href: t('entries.writing.links.investor-updates.href'),
-          subtext: t('entries.writing.links.investor-updates.subtext'),
-          icon: <IcoMegaphone24 />,
-        },
-      ],
-    },
-    { text: t('entries.media.text'), href: t('entries.media.link') },
+  const links = [
+    { text: t('links.compare.text'), href: t('links.compare.href') },
+    { text: t('links.pricing.text'), href: t('links.pricing.href') },
+    { text: t('links.company.text'), href: t('links.company.href') },
+    { text: t('links.faq.text'), href: t('links.faq.href') },
+    { text: t('links.blog.text'), href: t('links.blog.href') },
+    { text: t('links.media.text'), href: t('links.media.href') },
   ];
 
   return (
@@ -69,14 +50,14 @@ const Navbar = ({ cta }: NavbarProps) => {
               text: cta.text,
               onClick: cta.onClick,
             }}
-            entries={entries}
+            links={links}
           />
           <DesktopNav
             cta={{
               text: cta.text,
               onClick: cta.onClick,
             }}
-            entries={entries}
+            links={links}
           />
         </Inner>
       </Container>

@@ -1,35 +1,27 @@
+import Link from 'next/link';
 import React from 'react';
 import styled, { css } from 'styled-components';
 import { Box, Button, createFontStyles, media } from 'ui';
 
-import { isNavBarLink, isNavBarMenu, NavBarEntry } from '../../types';
 import LogoLink from '../logo-link';
-import DesktopNavbarLink from './components/desktop-navbar-link';
-import DesktopNavbarMenu from './components/desktop-navbar-menu';
 
 type DesktopNavProps = {
   cta: {
     text: string;
     onClick: () => void;
   };
-  entries: NavBarEntry[];
+  links: { text: string; href: string }[];
 };
 
-const DesktopNav = ({ cta, entries }: DesktopNavProps) => (
+const DesktopNav = ({ cta, links }: DesktopNavProps) => (
   <Container>
     <LogoLink />
     <Nav>
-      {entries
-        .map(entry => {
-          if (isNavBarLink(entry)) {
-            return <DesktopNavbarLink link={entry} key={entry.text} />;
-          }
-          if (isNavBarMenu(entry)) {
-            return <DesktopNavbarMenu menu={entry} key={entry.text} />;
-          }
-          return null;
-        })
-        .filter(elem => !!elem)}
+      {links.map(link => (
+        <Link href={link.href} key={link.text}>
+          <a href={link.href}>{link.text}</a>
+        </Link>
+      ))}
     </Nav>
     <Box>
       <Button onClick={cta.onClick} fullWidth size="compact">
@@ -67,10 +59,6 @@ const Nav = styled.nav`
       &:hover {
         text-decoration: underline;
       }
-    }
-
-    button {
-      width: unset;
     }
   `}
 `;

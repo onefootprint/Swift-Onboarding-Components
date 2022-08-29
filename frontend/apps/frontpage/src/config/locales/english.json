@@ -8,41 +8,30 @@
       "logo": {
         "aria-label": "Go to Footprint's main page"
       },
-      "entries": {
+      "links": {
         "compare": {
-          "text": "Compare",
-          "href": "/compare"
+          "href": "/compare",
+          "text": "Compare"
         },
         "pricing": {
-          "text": "Pricing",
-          "href": "/pricing"
+          "href": "/pricing",
+          "text": "Pricing"
         },
-        "writing": {
-          "text": "Writing",
-          "links": {
-            "blog": {
-              "text": "Blog",
-              "href": "/blog",
-              "subtext": "News, announcements, knowledge sharing"
-            },
-            "investor-updates": {
-              "text": "Investor Updates",
-              "href": "/investor-updates",
-              "subtext": "Updates we share with our investors"
-            }
-          }
+        "blog": {
+          "href": "/blog",
+          "text": "Blog"
         },
         "company": {
-          "text": "Company",
-          "href": "/company"
+          "href": "/company",
+          "text": "Company"
         },
         "faq": {
-          "text": "FAQ",
-          "href": "/faq"
+          "href": "/faq",
+          "text": "FAQ"
         },
         "media": {
-          "text": "Media",
-          "href": "/media"
+          "href": "/media",
+          "text": "Media"
         }
       },
       "banner": {
