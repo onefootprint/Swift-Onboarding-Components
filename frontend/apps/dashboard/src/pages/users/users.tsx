@@ -27,12 +27,12 @@ const Users = () => {
   const { t } = useTranslation('pages.users');
   const columns = [
     { text: t('table.header.name'), width: '14%' },
-    { text: t('table.header.token'), width: '14%' },
-    { text: t('table.header.status'), width: '14%' },
-    { text: t('table.header.email'), width: '14%' },
-    { text: t('table.header.ssn'), width: '14%' },
+    { text: t('table.header.token'), width: '19%' },
+    { text: t('table.header.status'), width: '8%' },
+    { text: t('table.header.email'), width: '20%' },
+    { text: t('table.header.ssn'), width: '12%' },
     { text: t('table.header.phone-number'), width: '14%' },
-    { text: t('table.header.start'), width: '19%' },
+    { text: t('table.header.start'), width: '13%' },
   ];
   const [searchText, setSearchText] = useState<string>('');
   const {
