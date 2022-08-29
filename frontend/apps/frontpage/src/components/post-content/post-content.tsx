@@ -72,11 +72,14 @@ const Content = styled.div`
       ${createFontStyles('heading-3')};
     }
 
-    li {
-      list-style-type: disc;
-      list-style-position: inside;
-      ${createFontStyles('body-1')};
+    ul {
       margin-bottom: ${theme.spacing[9]}px;
+
+      li {
+        list-style-type: disc;
+        list-style-position: inside;
+        ${createFontStyles('body-1')};
+      }
     }
 
     p {
@@ -92,7 +95,13 @@ const Content = styled.div`
     }
 
     strong {
-      ${createFontStyles('heading-3')}
+      ${createFontStyles('label-1')}
+    }
+
+    hr {
+      background-color: ${theme.borderColor.tertiary};
+      height: ${theme.borderWidth[1]}px;
+      border: 0;
     }
   `}
 `;

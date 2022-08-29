@@ -47,6 +47,10 @@ const Breadcrumb = styled.div`
     ${media.greaterThan('lg')`
       margin: initial;
     `}
+
+    ${media.lessThan('md')`
+      border-radius: 0;
+    `}
   `}
 `;
 
