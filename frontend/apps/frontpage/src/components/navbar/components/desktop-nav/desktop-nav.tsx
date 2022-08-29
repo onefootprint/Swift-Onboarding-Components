@@ -1,27 +1,33 @@
-import Link from 'next/link';
 import React from 'react';
 import styled, { css } from 'styled-components';
 import { Box, Button, createFontStyles, media } from 'ui';
 
+import { isNavLink, isNavMenu, NavEntry } from '../../types';
 import LogoLink from '../logo-link';
+import DesktopNavLink from './components/desktop-nav-link/desktop-nav-link';
+import DesktopNavMenu from './components/desktop-nav-menu/desktop-nav-menu';
 
 type DesktopNavProps = {
   cta: {
     text: string;
     onClick: () => void;
   };
-  links: { text: string; href: string }[];
+  entries: NavEntry[];
 };
 
-const DesktopNav = ({ cta, links }: DesktopNavProps) => (
+const DesktopNav = ({ cta, entries }: DesktopNavProps) => (
   <Container>
     <LogoLink />
     <Nav>
-      {links.map(link => (
-        <Link href={link.href} key={link.text}>
-          <a href={link.href}>{link.text}</a>
-        </Link>
-      ))}
+      {entries.map(entry => {
+        if (isNavLink(entry)) {
+          return <DesktopNavLink link={entry} key={entry.text} />;
+        }
+        if (isNavMenu(entry)) {
+          return <DesktopNavMenu menu={entry} key={entry.text} />;
+        }
+        return null;
+      })}
     </Nav>
     <Box>
       <Button onClick={cta.onClick} fullWidth size="compact">
@@ -50,12 +56,10 @@ const Nav = styled.nav`
     align-items: center;
     display: flex;
     gap: ${theme.spacing[8]}px;
-
     a {
       ${createFontStyles('label-3')};
       color: ${theme.color.primary};
       text-decoration: none;
-
       &:hover {
         text-decoration: underline;
       }
