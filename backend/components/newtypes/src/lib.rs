@@ -56,14 +56,16 @@ pub enum PhoneError {
 
 #[derive(Debug, Clone, thiserror::Error)]
 pub enum DobError {
-    #[error("nonexistant date for dob %Y-%m-%d: {0}")]
+    #[error("Nonexistant date for dob %Y-%m-%d: {0}")]
     NonexistantDate(String),
-    #[error("invalid day for dob: {0}, day must be between 1 and 31")]
-    InvalidDay(u32),
-    #[error("invalid month for dob: {0}, month must be between 1 and 12")]
-    InvalidMonth(u32),
-    #[error("invalid year for dob: {0}, must not be born in the future or be impossibly old")]
-    InvalidYear(i32),
+    #[error("Invalid day for dob")]
+    InvalidDay,
+    #[error("Invalid month for dob")]
+    InvalidMonth,
+    #[error("Invalid year for dob")]
+    InvalidYear,
+    #[error("Cannot parse DOB")]
+    InvalidDob,
 }
 
 #[derive(Debug, Clone, thiserror::Error)]

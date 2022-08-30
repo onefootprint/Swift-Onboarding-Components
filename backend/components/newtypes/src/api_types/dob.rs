@@ -7,6 +7,7 @@ use serde::{self, Serialize};
 use std::fmt::Debug;
 
 use crate::api_schema_helper::api_data_type_alias;
+use crate::DobError;
 use crate::PiiString;
 
 #[derive(Clone, Debug, Hash, PartialEq, Eq, Serialize, Deserialize, Default)]
@@ -75,7 +76,26 @@ impl DateOfBirth {
 
     fn default_string_format(&self) -> PiiString {
         let (year, month, day) = (self.year.0, self.month.0, self.day.0);
-        PiiString::new(format!("{year}-{month}-{day}"))
+        PiiString::new(format!("{year:04}-{month:02}-{day:02}"))
+    }
+}
+
+impl TryFrom<PiiString> for DateOfBirth {
+    type Error = crate::Error;
+    fn try_from(s: PiiString) -> Result<Self, Self::Error> {
+        let parts: Vec<&str> = s.leak().split('-').collect();
+        if parts.len() != 3 {
+            return Err(DobError::InvalidDob.into());
+        }
+        let year: i32 = parts[0].parse().map_err(|_| DobError::InvalidYear)?;
+        let month: u32 = parts[1].parse().map_err(|_| DobError::InvalidMonth)?;
+        let day: u32 = parts[2].parse().map_err(|_| DobError::InvalidDay)?;
+        let result = Self {
+            day: Day::try_from(day)?,
+            month: Month::try_from(month)?,
+            year: Year::try_from(year)?,
+        };
+        Ok(result)
     }
 }
 
@@ -84,7 +104,7 @@ impl TryFrom<u32> for Day {
 
     fn try_from(value: u32) -> Result<Self, Self::Error> {
         if !(1..=31).contains(&value) {
-            return Err(crate::DobError::InvalidDay(value).into());
+            return Err(crate::DobError::InvalidDay.into());
         }
         Ok(Day(value))
     }
@@ -101,7 +121,7 @@ impl TryFrom<u32> for Month {
 
     fn try_from(value: u32) -> Result<Self, Self::Error> {
         if !(1..=12).contains(&value) {
-            return Err(crate::DobError::InvalidMonth(value).into());
+            return Err(crate::DobError::InvalidMonth.into());
         }
         Ok(Month(value))
     }
@@ -119,7 +139,7 @@ impl TryFrom<i32> for Year {
     fn try_from(value: i32) -> Result<Self, Self::Error> {
         let current_year = chrono::Utc::now().year();
         if value < 1900 || value > current_year {
-            return Err(crate::DobError::InvalidYear(value).into());
+            return Err(crate::DobError::InvalidYear.into());
         }
         Ok(Year(value))
     }
