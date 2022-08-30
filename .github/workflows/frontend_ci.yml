@@ -144,6 +144,6 @@ jobs:
           key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-yarn-
-      - name: Typechecj
+      - name: Typecheck
         working-directory: ./frontend
         run: yarn typecheck
