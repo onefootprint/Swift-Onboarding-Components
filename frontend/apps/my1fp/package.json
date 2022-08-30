@@ -15,7 +15,7 @@
     "set:dot-env": "vercel env pull"
   },
   "dependencies": {
-    "@onefootprint/footprint": "*",
+    "@onefootprint/footprint-js": "*",
     "@types/lodash": "^4.14.182",
     "@xstate/react": "^3.0.0",
     "axios": "^0.27.2",

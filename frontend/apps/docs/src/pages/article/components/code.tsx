@@ -8,7 +8,7 @@ type CodeProps = {
 };
 
 const Code = ({ inline, className, children }: CodeProps) => {
-  const language = className && className.replace('language-', '');
+  const language = className && className.replace('lang-', '');
   return inline || !language ? (
     <CodeInline disable>{children}</CodeInline>
   ) : (

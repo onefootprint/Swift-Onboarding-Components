@@ -1,4 +1,4 @@
-import footprint from '@onefootprint/footprint';
+import footprint from '@onefootprint/footprint-js';
 import Head from 'next/head';
 import React, { useState } from 'react';
 import styled, { css } from 'styled-components';

@@ -1,4 +1,4 @@
-import footprint from '@onefootprint/footprint';
+import footprint from '@onefootprint/footprint-js';
 import { useTranslation } from 'hooks';
 import { LogoFpDefault } from 'icons';
 import { useRouter } from 'next/router';

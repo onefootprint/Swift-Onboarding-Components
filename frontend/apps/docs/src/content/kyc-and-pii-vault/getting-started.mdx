@@ -20,7 +20,17 @@ meta: {
 3. Add the `footprint.js` script to your app.
 
 ```html
-<script crossorigin src="https://unpkg.com/onefootprint.js"></script>
+<script crossorigin src="https://unpkg.com/@onefootprint/footprint-js"></script>
+```
+
+or
+
+```bash
+# With NPM
+npm install @onefootprint/footprint-js
+
+# With yarn
+yarn add @onefootprint/footprint-js
 ```
 
 4. Embed the Footprint button.
@@ -32,7 +42,7 @@ meta: {
 5. Add your Footprint completion handler
 
 ```javascript
-window.onFootprintComplete = function(token) {
+window.onFootprintCompleted = function(token) {
 // TODO: Post the token to your server
 }
 ```
