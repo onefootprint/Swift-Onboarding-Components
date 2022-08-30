@@ -62,7 +62,7 @@ If you need to authenticate via bearer auth (e.g., for a cross-origin request), 
 
 <inline-alert variant='info'>All API requests must be made over HTTPS, calls made over plain HTTP will fail.</inline-alert>
 
-2. From step 5 above, you should create/modify your endpoint to receive the validation token from your frontend. In this endpoint, send the validation token to Footprint’s backend.
+2. You should create an endpoint on your backend to handle signups. It should receive the validation token given in step 5 above from your frontend and pass it to Footprint’s backend in order to authenticate and verify the user:
 
 ```bash
 curl -X POST https://api.onefootprint.com/users/validate \
@@ -101,8 +101,8 @@ curl -X POST https://api.onefootprint.com/users/fp_id_GSxJr68GAf5jUT3pdL9ndjf7TL
 
 ```json
 {
-   "dob": "1988-12-12",
+   "dob": "1988-12-25",
+   "last_name": "Smith"
    "ssn4": "1212",
-   "last_name": "SMITH"
 }
 ```

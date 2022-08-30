@@ -24,7 +24,7 @@ If you need to authenticate via bearer auth (e.g., for a cross-origin request), 
 
 ## Sanity check
 
-Check that your API key is working as expected, you should get back some information about this key.
+You can check that your API key is working as expected:
 
 <br/>
 <br/>
@@ -59,7 +59,7 @@ Save this `footprint_user_id`, associate it with the corresponding user in your 
 
 ## Update a user vault
 
-Footprint user vaults store two types of data attributes: structured and unstructured. Structured data are first-class attributes that Footprint automatically validates, tokenizes, and in some cases fingerprints to make it searchable. Unstructured data, are custom key-value attributes that are set by you that provide no extra validation. Unstructured data are keyed by the format: `custom.<key>` in Footprint’s API requests.
+Footprint user vaults store two types of data attributes: structured and unstructured. Structured data are first-class attributes that Footprint automatically validates, tokenizes, and in some cases fingerprints to make searchable. Unstructured data are custom key-value attributes that are provided by you and are not validated. Unstructured data are keyed by the format: `custom.<key>` in Footprint’s API requests.
 
 ```bash
 curl https://api.onefootprint.com/users/fp_id_GSxJr68GAf5jUT3pdL9ndjf7TLkA3GCX \
@@ -90,7 +90,7 @@ Check what fields exist on a user's vault.
 
 ```bash
 curl https://api.onefootprint.com/users/fp_id_GSxJr68GAf5jUT3pdL9ndjf7TLkA3GCX?fields=identity.ssn9,custom.ach_account \
-  	-u sk_test_CJvsN1kaZH3GGtYkaZH3GGtY: \
+  	-u sk_test_CJvsN1kaZH3GGtYkaZH3GGtY:
 ```
 
 ```json
@@ -124,9 +124,9 @@ curl https://api.onefootprint.com/users/fp_id_GSxJr68GAf5jUT3pdL9ndjf7TLkA3GCX/d
 ```json
 {
   "identity": {
-    "dob": "1988-12-12",
+    "last_name": "Smith"
+    "dob": "1988-12-25",
     "ssn9": "121211212",
-    "last_name": "SMITH"
   },
   "custom": {
     "ach_account": "111122224444"
@@ -136,7 +136,7 @@ curl https://api.onefootprint.com/users/fp_id_GSxJr68GAf5jUT3pdL9ndjf7TLkA3GCX/d
 
 ## Search across users' vaults
 
-Footprint lets you search across all of your user vaults by certain fields that are fingerprinted. This lets you easily search across all of your users vaults privately without building complicated decryption procedures.
+Footprint lets you search across all of your users' vaults by specific fields that are fingerprinted. This lets you easily search across all of your users vaults privately without building complicated decryption procedures.
 
 <br/>
 <br/>
