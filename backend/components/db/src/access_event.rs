@@ -60,7 +60,8 @@ impl AccessEventListItemForTenant {
                         schema::access_event::reason
                             .ilike(format!("%{}%", search))
                             .or(schema::access_event::principal.ilike(format!("%{}%", search)))
-                            .or(schema::scoped_user::fp_user_id.eq(search)),
+                            .or(schema::scoped_user::fp_user_id.eq(search.clone()))
+                            .or(schema::access_event::targets.overlaps_with(vec![search])),
                     )
                 }
 
