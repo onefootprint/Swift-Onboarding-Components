@@ -1,3 +1,4 @@
+import pytest
 from tests.utils import url
 from tests.utils import post, get, put, build_user_data
 import requests
@@ -5,6 +6,32 @@ from requests.auth import HTTPBasicAuth
 
 
 class TestNonPortableVaultApi:
+    @pytest.mark.parametrize(
+        "data",
+        [
+            {"ssn9": "12345678"},
+            {"ssn4": "123456789"},
+            {"ssn4": "123"},
+            {"name": {"first_name": "Hi"}},  # Also need last name
+            {"name": {"last_name": "Bye"}},  # Also need first name
+            {"dob": {"day": 1, "month": 1}},  # Also need year
+            {"address": {"zip": "12345"}},
+            {"address": {"line1": "1 Footprint Way"}},
+        ],
+    )
+    def test_identity_validation(self, workos_sandbox_tenant, data):
+        body = post("users/", None, workos_sandbox_tenant.sk.key)
+        user = body
+        fp_id = user["footprint_user_id"]
+        assert fp_id
+
+        put(
+            f"users/{fp_id}/identity",
+            data,
+            workos_sandbox_tenant.sk.key,
+            status_code=400,
+        )
+
     def test_vault_create_write_decrypt(self, workos_sandbox_tenant):
         # create the vault
         body = post("users/", None, workos_sandbox_tenant.sk.key)
