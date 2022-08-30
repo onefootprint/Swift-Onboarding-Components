@@ -20,7 +20,7 @@
     "typecheck": "turbo run typecheck",
     "clean": "turbo run clean && rm -rf node_modules",
     "version": "changeset version",
-    "release": "turbo run build --filter=@onefootprint/footprint-js... && changeset publish"
+    "release": "changeset publish"
   },
   "devDependencies": {
     "@changesets/cli": "^2.24.3",
