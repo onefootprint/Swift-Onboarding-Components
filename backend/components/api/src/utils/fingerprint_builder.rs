@@ -1,7 +1,7 @@
 use db::models::fingerprint::IsUnique;
 use futures::TryFutureExt;
 use newtypes::{
-    address::{Address, FullAddressOrZip},
+    address::{Address, FullAddressOrZip, ZipAndCountry},
     name::FullName,
     ssn::Ssn,
     DataAttribute, Fingerprint, Fingerprinter, PiiString,
@@ -59,7 +59,7 @@ impl FingerprintBuilder {
     pub fn add_address_or_zip(&mut self, address: FullAddressOrZip) {
         match address {
             FullAddressOrZip::Address(address) => self.add_address(address),
-            FullAddressOrZip::ZipAndCountry { zip, country } => {
+            FullAddressOrZip::ZipAndCountry(ZipAndCountry { zip, country }) => {
                 self.add(zip.into(), DataAttribute::Zip);
                 self.add(country.into(), DataAttribute::Country);
             }

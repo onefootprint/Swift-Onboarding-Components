@@ -19,11 +19,15 @@ pub struct Address {
 }
 
 #[derive(Clone, Debug, Hash, PartialEq, Eq, Serialize, Deserialize, Apiv2Schema)]
+pub struct ZipAndCountry {
+    pub zip: Zip,
+    pub country: Country,
+}
+
+#[derive(Clone, Debug, Hash, PartialEq, Eq)]
 pub enum FullAddressOrZip {
-    #[serde(rename = "address")]
     Address(Address),
-    #[serde(rename = "zip_address")]
-    ZipAndCountry { zip: Zip, country: Country },
+    ZipAndCountry(ZipAndCountry),
 }
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq, Serialize, Deserialize, Default)]

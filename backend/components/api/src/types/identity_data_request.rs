@@ -1,58 +1,67 @@
+use crate::errors::user::UserError;
 use crate::errors::ApiError;
 use crate::utils::fingerprint_builder::FingerprintBuilder;
 use crate::State;
 
 use db::models::fingerprint::IsUnique;
 
-use newtypes::address::FullAddressOrZip;
+use newtypes::address::{Address, FullAddressOrZip, ZipAndCountry};
 use newtypes::dob::DateOfBirth;
 use newtypes::name::FullName;
-use newtypes::ssn::Ssn;
+use newtypes::ssn::{Ssn, Ssn4, Ssn9};
 use newtypes::{DataAttribute, Fingerprint};
 
 use paperclip::actix::Apiv2Schema;
-use serde::Deserialize;
 
 /// Post user identity data
 #[derive(Debug, Clone, serde::Deserialize, Apiv2Schema)]
 pub struct IdentityDataRequest {
-    #[serde(flatten)]
-    pub update: IdentityDataUpdate,
+    pub name: Option<FullName>,
+    pub dob: Option<DateOfBirth>,
+    pub address: Option<Address>,
+    pub zip_address: Option<ZipAndCountry>,
+    pub ssn9: Option<Ssn9>,
+    pub ssn4: Option<Ssn4>,
     #[serde(default)]
     pub speculative: bool,
 }
 
-#[derive(Debug, Clone, serde::Deserialize, serde:: Serialize, Apiv2Schema)]
+impl TryFrom<IdentityDataRequest> for IdentityDataUpdate {
+    type Error = ApiError;
+    fn try_from(r: IdentityDataRequest) -> Result<Self, Self::Error> {
+        let IdentityDataRequest { name, dob, .. } = r;
+        let ssn = match (r.ssn9, r.ssn4) {
+            (Some(_), Some(_)) => return Err(UserError::InvalidIdentityDataUpdate.into()),
+            (Some(ssn9), None) => Some(Ssn::Ssn9(ssn9)),
+            (None, Some(ssn4)) => Some(Ssn::Ssn4(ssn4)),
+            (None, None) => None,
+        };
+        let address = match (r.address, r.zip_address) {
+            (Some(_), Some(_)) => return Err(UserError::InvalidIdentityDataUpdate.into()),
+            (Some(full_address), None) => Some(FullAddressOrZip::Address(full_address)),
+            (None, Some(zip_and_country)) => Some(FullAddressOrZip::ZipAndCountry(zip_and_country)),
+            (None, None) => None,
+        };
+        let result = Self {
+            name,
+            dob,
+            address,
+            ssn,
+        };
+        Ok(result)
+    }
+}
+
+#[derive(Debug, Clone)]
 pub struct IdentityDataUpdate {
     pub name: Option<FullName>,
     pub dob: Option<DateOfBirth>,
-    #[serde(flatten)]
     pub address: Option<FullAddressOrZip>,
-    // NOTE: don't move this from this position in the struct... Sometimes can break serde???
-    #[serde(deserialize_with = "deserialize_flat_option")]
-    #[serde(flatten)]
     pub ssn: Option<Ssn>,
 }
 
-fn deserialize_flat_option<'de, D, T>(deserializer: D) -> Result<Option<T>, D::Error>
-where
-    D: serde::Deserializer<'de>,
-    T: serde::Deserialize<'de>,
-{
-    // For a flattened Option<T>, if the value is Some(_) but an error occurs deserializing T,
-    // serde coerces this into Ok(None) rather than Err(_).
-    // This custom implementation makes sure that we bubble up an error parsing T
-    let v = Option::<serde_json::Value>::deserialize(deserializer)?;
-    println!("deserializing blah value {:?}", v);
-    let value = match v {
-        Some(v) => Some(T::deserialize(v).map_err(serde::de::Error::custom)?),
-        None => None,
-    };
-    Ok(value)
-}
-
 pub type ComputedFingerprints = Vec<(DataAttribute, Fingerprint, IsUnique)>;
-impl IdentityDataRequest {
+impl IdentityDataUpdate {
     pub async fn fingerprints(&self, state: &State) -> Result<ComputedFingerprints, ApiError> {
         let mut builder = FingerprintBuilder::new();
 
@@ -61,7 +70,7 @@ impl IdentityDataRequest {
             dob,
             ssn,
             address,
-        } = self.update.clone();
+        } = self.clone();
 
         if let Some(name) = name {
             builder.add_full_name(name);

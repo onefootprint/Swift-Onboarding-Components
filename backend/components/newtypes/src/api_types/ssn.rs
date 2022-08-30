@@ -6,12 +6,9 @@ use std::str::FromStr;
 use crate::pii_helper::newtype_to_pii;
 
 #[doc = "Social security number -- 9 digit or 4 digit numeric string"]
-#[derive(Debug, Clone, Hash, PartialEq, Eq, Serialize, Deserialize, Apiv2Schema)]
-/// 9 digit social security number
+#[derive(Debug, Clone, Hash, PartialEq, Eq, Apiv2Schema)]
 pub enum Ssn {
-    #[serde(rename = "ssn9")]
     Ssn9(Ssn9),
-    #[serde(rename = "ssn4")]
     Ssn4(Ssn4),
 }
 

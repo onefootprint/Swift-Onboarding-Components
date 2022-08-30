@@ -6,7 +6,7 @@ use db::{
     PgConnection,
 };
 use newtypes::{
-    address::{Address, Country, FullAddressOrZip, Zip},
+    address::{Address, Country, FullAddressOrZip, Zip, ZipAndCountry},
     dob::DateOfBirth,
     name::FullName,
     ssn::{Ssn, Ssn4, Ssn9},
@@ -169,7 +169,7 @@ impl IdentityDataBuilder {
             FullAddressOrZip::Address(address) => {
                 self.add_address(address)?;
             }
-            FullAddressOrZip::ZipAndCountry { zip, country } => {
+            FullAddressOrZip::ZipAndCountry(ZipAndCountry { zip, country }) => {
                 self.add_zip_and_country_only(zip, country)?;
             }
         }

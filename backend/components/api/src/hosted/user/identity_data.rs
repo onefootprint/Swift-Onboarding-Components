@@ -2,6 +2,7 @@ use crate::auth::session_data::user::UserAuthScope;
 use crate::auth::UserAuth;
 use crate::auth::VerifiedUserAuth;
 use crate::types::identity_data_request::IdentityDataRequest;
+use crate::types::identity_data_request::IdentityDataUpdate;
 use crate::types::response::ApiResponseData;
 use crate::types::EmptyResponse;
 use crate::utils::user_vault_wrapper::UserVaultWrapper;
@@ -24,8 +25,8 @@ async fn handler(
     }
 
     let request = request.into_inner();
-    let fingerprints = request.fingerprints(&state).await?;
-    let update = request.update;
+    let update = IdentityDataUpdate::try_from(request)?;
+    let fingerprints = update.fingerprints(&state).await?;
 
     state
         .db_pool

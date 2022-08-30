@@ -6,7 +6,7 @@ use crate::auth::key_context::secret_key::SecretTenantAuthContext;
 use crate::auth::session_data::workos::WorkOs;
 use crate::auth::{Either, HasTenant, IsLive, SessionContext};
 
-use crate::types::identity_data_request::IdentityDataRequest;
+use crate::types::identity_data_request::{IdentityDataRequest, IdentityDataUpdate};
 use crate::types::{ApiResponseData, EmptyResponse, JsonApiResponse};
 
 use crate::utils::insight_headers::InsightHeaders;
@@ -53,10 +53,12 @@ pub async fn put(
     let is_live = tenant_auth.is_live()?;
     let insight = CreateInsightEvent::from(insight);
 
-    let fingerprints = if let Some(identity) = request.identity.as_ref() {
-        identity.fingerprints(&state).await?
+    let (update, fingerprints) = if let Some(identity) = request.identity {
+        let update = IdentityDataUpdate::try_from(identity)?;
+        let fingerprints = update.fingerprints(&state).await?;
+        (Some(update), fingerprints)
     } else {
-        vec![]
+        (None, vec![])
     };
 
     //NOTE: these operations on the different parts of the user vault must be atomic
@@ -67,14 +69,14 @@ pub async fn put(
                 UserVault::get_for_tenant(conn, &tenant_id, &footprint_user_id, is_live)?;
             let mut uvw = UserVaultWrapper::lock(conn, &user_vault.id)?;
 
-            if let Some(identity_update) = request.identity {
+            if let Some(update) = update {
                 identity::put_internal(
                     conn,
                     &mut uvw,
                     &tenant_auth,
                     &scoped_user,
                     insight.clone(),
-                    identity_update.update,
+                    update,
                     fingerprints,
                 )?
             }

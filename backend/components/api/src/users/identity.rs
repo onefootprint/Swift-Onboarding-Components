@@ -47,8 +47,8 @@ pub async fn put(
     let tenant_id = tenant_auth.tenant().id.clone();
     let is_live = tenant_auth.is_live()?;
     let request = request.into_inner();
-    let fingerprints = request.fingerprints(&state).await?;
-    let update = request.update;
+    let update = IdentityDataUpdate::try_from(request)?;
+    let fingerprints = update.fingerprints(&state).await?;
     let insight = CreateInsightEvent::from(insight);
 
     state
