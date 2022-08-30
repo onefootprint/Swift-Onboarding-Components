@@ -42,7 +42,7 @@ const Navbar = ({ cta }: NavbarProps) => {
         },
       ],
     },
-    { text: t('entries.media.text'), href: t('entries.media.link') },
+    { text: t('entries.media.text'), href: t('entries.media.href') },
   ];
 
   return (
