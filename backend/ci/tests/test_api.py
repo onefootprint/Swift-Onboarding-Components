@@ -58,9 +58,9 @@ class TestNonPortableVaultApi:
             f"users/{fp_id}/identity/decrypt", data, workos_sandbox_tenant.sk.key
         )
         data = body
-        assert data["first_name"] == "SANDBOX"
+        assert data["first_name"] == "Sandbox"
         assert data["zip"] == "10009"
-        assert data["city"] == "Enclave".upper()
+        assert data["city"] == "Enclave"
 
         # verify access events created
         body = get(
@@ -168,7 +168,7 @@ class TestUnifiedVaultApi:
         )
         body = post(f"users/{fp_id}/decrypt", data, workos_sandbox_tenant.sk.key)
         data = body
-        assert data["identity"]["first_name"] == "SANDBOX"
+        assert data["identity"]["first_name"] == "Sandbox"
         assert data["identity"]["zip"] == "10009"
         assert data["custom"]["ach_account_number"] == "123467890"
         assert data["custom"]["cc4"] == "4242"

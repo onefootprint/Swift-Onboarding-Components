@@ -47,10 +47,12 @@ class TestDashboard:
                 "fields": attributes,
                 "reason": "Doing a hecking decrypt",
             }
-            body = post(f"users/{user.fp_user_id}/identity/decrypt", data, tenant.sk.key)
+            body = post(
+                f"users/{user.fp_user_id}/identity/decrypt", data, tenant.sk.key
+            )
             attributes = body
             for attribute, value in attributes.items():
-                assert expected_data[attribute].upper() == value.upper()
+                assert expected_data[attribute] == value
 
     def test_tenant_decrypt_no_permissions(self, user):
         tenant = user.tenant
@@ -58,7 +60,12 @@ class TestDashboard:
             "fields": ["dob"],
             "reason": "Not doing a hecking decrypt",
         }
-        post(f"users/{user.fp_user_id}/identity/decrypt", data, tenant.sk.key, status_code=401)
+        post(
+            f"users/{user.fp_user_id}/identity/decrypt",
+            data,
+            tenant.sk.key,
+            status_code=401,
+        )
 
     def test_get_org(self, user):
         body = get("org", None, user.tenant.sk.key)

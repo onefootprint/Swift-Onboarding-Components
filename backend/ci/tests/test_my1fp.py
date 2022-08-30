@@ -50,8 +50,8 @@ class TestMy1fp:
         assert attributes["phone_number"] == my1fp_authed_user.phone_number.replace(
             " ", ""
         )
-        assert attributes["email"].upper() == my1fp_authed_user.email.upper()
-        assert attributes["address_line1"].upper() == "1 FOOTPRINT WAY"
+        assert attributes["email"] == my1fp_authed_user.email
+        assert attributes["address_line1"] == "1 Footprint Way"
         assert attributes["zip"] == "10009"
 
     def test_unauthorized_my1fp_basic_session_decrypt(self, my1fp_authed_user):
@@ -88,7 +88,11 @@ class TestMy1fp:
                 "fields": attributes,
                 "reason": "Doing a hecking decrypt",
             }
-            post(f"users/{my1fp_authed_user.fp_user_id}/identity/decrypt", data, tenant.sk.key)
+            post(
+                f"users/{my1fp_authed_user.fp_user_id}/identity/decrypt",
+                data,
+                tenant.sk.key,
+            )
 
         # Get the user detail using the logged in context
         body = get("hosted/user/access_events", None, my1fp_authed_user.auth_token)

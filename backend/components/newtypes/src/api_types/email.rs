@@ -60,8 +60,7 @@ impl std::str::FromStr for Email {
             return Err(crate::Error::InvalidEmail);
         }
         Ok(Email {
-            // uppercase for consistency & readability
-            email: PiiString::from(email.to_uppercase()),
+            email: PiiString::from(email),
             suffix: sandbox_suffix.to_owned(),
         })
     }
@@ -128,26 +127,26 @@ mod tests {
         good_email1: (
             "{\"email\": \"beep_boop+@gmail.com\"}",
             Email {
-                email: PiiString::from("BEEP_BOOP+@GMAIL.COM"),
+                email: PiiString::from("beep_boop+@gmail.com"),
                 suffix: "".to_owned()
             },
-            "**********@GMAIL.COM",
+            "**********@gmail.com",
         ),
         good_email2: (
             "{\"email\": \"yoooooo.o.o@biz.real#sandbox1\"}",
             Email {
-                email: PiiString::from("YOOOOOO.O.O@BIZ.REAL"),
+                email: PiiString::from("yoooooo.o.o@biz.real"),
                 suffix: "sandbox1".to_owned()
             },
-            "***********@BIZ.REAL#sandbox1",
+            "***********@biz.real#sandbox1",
         ),
         good_email3: (
             "{\"email\": \"flerpderpmerp@onefootprint.com#1\"}",
             Email {
-                email: PiiString::from( "FLERPDERPMERP@ONEFOOTPRINT.COM"),
+                email: PiiString::from( "flerpderpmerp@onefootprint.com"),
                 suffix: "1".to_owned()
             },
-            "*************@ONEFOOTPRINT.COM#1",
+            "*************@onefootprint.com#1",
         ),
     }
 

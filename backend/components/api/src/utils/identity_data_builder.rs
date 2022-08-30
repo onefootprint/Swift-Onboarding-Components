@@ -58,7 +58,7 @@ impl IdentityDataBuilder {
     pub fn add_full_name(&mut self, name: FullName) -> ApiResult<()> {
         // require empty state for adding name
         if self.is_portable && !self.existing_data.get_populated_fields().is_empty() {
-            return Err(UserError::DataUpdateNotAllowed)?;
+            return Err(UserError::DataUpdateNotAllowed.into());
         }
 
         let FullName {
@@ -72,7 +72,7 @@ impl IdentityDataBuilder {
 
     pub fn add_dob(&mut self, dob: DateOfBirth) -> ApiResult<()> {
         if self.is_portable && self.existing_data.has_field(DataAttribute::Dob) {
-            return Err(UserError::DataUpdateNotAllowed)?;
+            return Err(UserError::DataUpdateNotAllowed.into());
         }
 
         self.new_data.e_dob = self.seal(dob.into(), DataAttribute::Dob)?;
@@ -82,7 +82,7 @@ impl IdentityDataBuilder {
     pub fn add_ssn9(&mut self, ssn9: Ssn9) -> ApiResult<()> {
         // verify the update is allowed
         if self.is_portable && self.existing_data.has_field(DataAttribute::Ssn9) {
-            return Err(UserError::DataUpdateNotAllowed)?;
+            return Err(UserError::DataUpdateNotAllowed.into());
         }
 
         if self.new_data.e_ssn4.is_none() {
@@ -100,7 +100,7 @@ impl IdentityDataBuilder {
         if self.is_portable && self.existing_data.has_field(DataAttribute::Ssn4)
             || self.existing_data.has_field(DataAttribute::Ssn9)
         {
-            return Err(UserError::DataUpdateNotAllowed)?;
+            return Err(UserError::DataUpdateNotAllowed.into());
         }
 
         self.new_data.e_ssn4 = self.seal(ssn4.into(), DataAttribute::Ssn4)?;
@@ -156,7 +156,7 @@ impl IdentityDataBuilder {
             .iter()
             .any(|d| self.existing_data.has_field(*d))
         {
-            return Err(UserError::DataUpdateNotAllowed)?;
+            return Err(UserError::DataUpdateNotAllowed.into());
         }
 
         self.new_data.e_address_zip = self.seal(zip.into(), DataAttribute::Zip)?;

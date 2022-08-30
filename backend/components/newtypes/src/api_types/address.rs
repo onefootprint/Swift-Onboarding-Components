@@ -87,7 +87,7 @@ impl TryFrom<String> for AddressLine {
         if INVALID_ADDRESS_CHARS.is_match(value.as_str()) {
             return Err(crate::AddressError::InvalidAddressCharacters(value).into());
         }
-        Ok(AddressLine(PiiString::new(value.to_uppercase())))
+        Ok(AddressLine(PiiString::new(value)))
     }
 }
 
@@ -98,7 +98,7 @@ impl TryFrom<String> for City {
         if INVALID_INPUT_CHARS.is_match(value.as_str()) {
             return Err(crate::AddressError::InvalidCharacters(value).into());
         }
-        Ok(City(PiiString::new(value.to_uppercase())))
+        Ok(City(PiiString::new(value)))
     }
 }
 
@@ -113,7 +113,7 @@ impl TryFrom<String> for State {
         if !ISO_3166_TWO_DIGIT_US_STATES.contains(&state.as_str()) {
             return Err(crate::AddressError::InvalidState(state).into());
         }
-        Ok(State(PiiString::new(value.to_uppercase())))
+        Ok(State(PiiString::new(state)))
     }
 }
 
@@ -195,7 +195,7 @@ mod tests {
         let bad_zip = "{\"line1\": \"1 footprint way\", \"city\": \"new york\",  \"state\": \"NY\", \"country\": \"us\", \"zip\": \"20009@\"}";
         let bad_country = "{\"line1\": \"1 footprint way\", \"city\": \"new york\",  \"state\": \"NY\", \"country\": \"USA\", \"zip\": \"20009\"}";
         let bad_address = "{\"line1\": \"1 footprint way\x00#\x00#\", \"city\": \"new york\",  \"state\": \"NY\", \"country\": \"us\", \"zip\": \"20009\"}";
-        let good_address = "{\"line1\": \"1 footprint way #201W\", \"city\": \"new york\",  \"state\": \"NY\", \"country\": \"us\", \"zip\": \"20009\"}";
+        let good_address = "{\"line1\": \"1 footprint way #201W\", \"city\": \"new york\",  \"state\": \"ny\", \"country\": \"us\", \"zip\": \"20009\"}";
         let bad_city = "{\"line1\": \"1 footprint way\", \"city\": \"new york\x00#!?\",  \"state\": \"NY\", \"country\": \"us\", \"zip\": \"20009\"}";
 
         let bad_zip: Result<Address, _> = serde_json::from_str(bad_zip);
@@ -215,9 +215,9 @@ mod tests {
         assert_eq!(
             address,
             Address {
-                line1: AddressLine(PiiString::new("1 FOOTPRINT WAY".to_string())),
+                line1: AddressLine(PiiString::new("1 footprint way".to_string())),
                 line2: None,
-                city: City(PiiString::new("NEW YORK".to_string())),
+                city: City(PiiString::new("new york".to_string())),
                 state: State(PiiString::new("NY".to_string())),
                 country: Country(PiiString::new("US".to_string())),
                 zip: Zip(PiiString::new("20009".to_string()))

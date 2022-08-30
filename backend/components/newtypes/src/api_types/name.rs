@@ -2,11 +2,10 @@ pub use derive_more::{Add, Display, From, FromStr, Into};
 use paperclip::actix::Apiv2Schema;
 use paperclip::v2::schema::TypedData;
 use serde::{Deserialize, Deserializer, Serialize};
-use std::fmt::{Debug};
+use std::fmt::Debug;
 use std::str::FromStr;
 
 use crate::pii_helper::newtype_to_pii;
-
 
 #[doc = "Full Name"]
 #[derive(Debug, Clone, Hash, PartialEq, Eq, Serialize, Deserialize, Default, Apiv2Schema)]
@@ -34,8 +33,7 @@ impl FromStr for Name {
     type Err = crate::Error;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        // uppercase for consistency / if we ever need to support searching by fingerprint
-        Ok(Name(s.to_uppercase()))
+        Ok(Name(s.to_owned()))
     }
 }
 
@@ -72,7 +70,7 @@ mod tests {
         assert_eq!(
             deserialized,
             Test {
-                name: Name("BOOP".to_owned())
+                name: Name("boop".to_owned())
             }
         );
 
