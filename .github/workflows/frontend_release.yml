@@ -39,7 +39,7 @@ jobs:
 
       - name: Build
         working-directory: ./frontend
-        run: yarn build
+        run: yarn build:packages
 
       - name: Create Release Pull Request or Publish to npm
         uses: changesets/action@v1
