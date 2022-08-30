@@ -20,7 +20,8 @@
   "devDependencies": {
     "@types/postmate": "^1.5.2",
     "@types/react-dom": "^18.0.6",
-    "config": "*",
+    "eslint-config-footprint": "*",
+    "jest-presets": "*",
     "tsconfig": "*",
     "tsup": "^6.2.2",
     "typescript": "^4.7.4"
@@ -30,5 +31,8 @@
     "postmate": "^1.5.2",
     "react-dom": "18.2.0",
     "constate": "^3.3.2"
+  },
+  "jest": {
+    "preset": "jest-presets/jest/web"
   }
 }

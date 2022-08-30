@@ -20,13 +20,14 @@
         "$NODE_ENV",
         "$REVALIDATE_SECRET_TOKEN"
       ],
-      "outputs": ["dist/**", "build/**", ".next/**"]
+      "outputs": ["dist/**", ".next/**", "public/dist/**"]
     },
     "test": {
       "dependsOn": ["^build"],
       "outputs": ["coverage/**"]
     },
     "lint": {
+      "dependsOn": ["^build"],
       "outputs": []
     },
     "typecheck": {

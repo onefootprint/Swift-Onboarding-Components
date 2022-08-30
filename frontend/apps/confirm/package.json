@@ -39,11 +39,14 @@
     "@types/node": "^17.0.12",
     "@types/react-dom": "^18.0.6",
     "@types/styled-components": "^5.1.25",
-    "config": "*",
-    "eslint": "7.32.0",
+    "eslint-config-footprint": "*",
+    "jest-presets": "*",
     "next-compose-plugins": "^2.2.1",
     "next-transpile-modules": "9.0.0",
     "tsconfig": "*",
     "typescript": "^4.7.4"
+  },
+  "jest": {
+    "preset": "jest-presets/jest/web"
   }
 }

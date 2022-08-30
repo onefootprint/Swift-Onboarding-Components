@@ -8,7 +8,7 @@ const template = require('./template');
 const INPUT_SVG_PATH = path.join(__dirname, '../../assets/ico/**/*.svg');
 const OUTPUT_PATH = path.join(__dirname, '../../icos');
 
-const getFileName = path => last(path.split('/'));
+const getFileName = filePath => last(filePath.split('/'));
 
 const getComponentName = fileName =>
   startCase(fileName.replace('.svg', '')).split(' ').join('');

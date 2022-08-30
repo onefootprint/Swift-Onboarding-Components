@@ -1,11 +1,4 @@
 module.exports = {
-  env: {
-    browser: true,
-    node: true,
-  },
-  parserOptions: {
-    sourceType: 'module',
-  },
   extends: [
     'next',
     'airbnb',
@@ -15,21 +8,21 @@ module.exports = {
     'turbo',
     'prettier',
   ],
-  plugins: ['@typescript-eslint', 'simple-import-sort', 'import'],
+
   settings: {
     next: {
-      rootDir: ['apps/*/', 'packages/*/'],
+      rootDir: ['apps/*/'],
     },
     'import/parsers': {
       '@typescript-eslint/parser': ['.ts', '.tsx'],
     },
     'import/resolver': {
       typescript: {
-        alwaysTryTypes: true,
-        project: ['apps/*/tsconfig.json'],
+        project: ['apps/*/tsconfig.json', 'packages/*/tsconfig.json'],
       },
     },
   },
+  plugins: ['@typescript-eslint', 'simple-import-sort', 'import'],
   rules: {
     'react/jsx-props-no-spreading': [
       'error',
@@ -100,16 +93,5 @@ module.exports = {
         ],
       },
     },
-  ],
-  ignorePatterns: [
-    '**/*.js',
-    '**/*.json',
-    'node_modules',
-    'public',
-    'styles',
-    '.next',
-    'coverage',
-    'dist',
-    '.turbo',
   ],
 };

@@ -23,14 +23,18 @@
     "@types/axios": "^0.14.0",
     "axios-case-converter": "^0.9.0",
     "axios": "^0.27.2",
-    "config": "*",
+    "jest-presets": "*",
     "global-constants": "*",
     "tsconfig": "*",
+    "eslint-config-footprint": "*",
     "tsup": "^6.2.2",
     "typescript": "^4.7.4"
   },
   "peerDependencies": {
     "axios": "^0.27.2",
     "axios-case-converter": "^0.9.0"
+  },
+  "jest": {
+    "preset": "jest-presets/jest/web"
   }
 }

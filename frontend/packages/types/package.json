@@ -11,8 +11,12 @@
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
   },
   "devDependencies": {
-    "config": "*",
+    "eslint-config-footprint": "*",
+    "jest-presets": "*",
     "tsconfig": "*",
     "typescript": "^4.7.4"
+  },
+  "jest": {
+    "preset": "jest-presets/jest/web"
   }
 }

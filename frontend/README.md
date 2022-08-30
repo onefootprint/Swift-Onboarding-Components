@@ -25,14 +25,13 @@ The monorepo is divided into two main folders:
 
 ### Develop
 
-To run a specific app, just run:
+Ideally, you should run commands from the root directory. To run a specific project, just run
 
 ```
-cd apps/desired-app
-yarn dev
+yarn dev --filter=dashboard
 ```
 
-If you prefer, you can also run `yarn dev` from the root folder. This will run a development server for each app we have.
+If you prefer, you can also run `yarn dev` without arguments. This will run a development server for each app we have.
 
 If you want to clean and re-install all dependencies, go to root folder and run `yarn clean && yarn dev` to restart the script.
 

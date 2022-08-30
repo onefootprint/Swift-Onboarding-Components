@@ -1,11 +1,11 @@
 import Head from 'next/head';
 import React, { useEffect, useState } from 'react';
-import PageGuard from 'src/components/page-guard';
 import { createGlobalStyle, css } from 'styled-components';
 import themes from 'themes';
 import { DesignSystemProvider } from 'ui';
 
 import Layout from '../components/layout';
+import PageGuard from '../components/page-guard';
 import configureReactI18next from '../config/initializers/react-i18next';
 import ReactQueryProvider from '../config/initializers/react-query-provider';
 import configureSentry from '../config/initializers/sentry';

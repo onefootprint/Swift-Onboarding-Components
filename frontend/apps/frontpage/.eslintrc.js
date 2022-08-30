@@ -1,7 +1,8 @@
 module.exports = {
-  ...require('config/eslint-base-web.js'),
+  root: true,
+  extends: ['footprint'],
   parserOptions: {
     tsconfigRootDir: __dirname,
-    project: './tsconfig.json',
+    project: ['./tsconfig.json'],
   },
 };
