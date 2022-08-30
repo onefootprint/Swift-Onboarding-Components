@@ -66,6 +66,7 @@ const CodeInline = ({
         data-testid={testID}
         onClick={disable ? undefined : handleClick}
         type="button"
+        className={disable ? 'disabled' : undefined}
       >
         <CodeContent>{children}</CodeContent>
       </Button>
@@ -80,8 +81,8 @@ const Button = styled.button`
   padding: 0;
   cursor: pointer;
 
-  &:disabled {
-    cursor: not-allowed;
+  &.disabled {
+    cursor: text;
   }
 `;
 
