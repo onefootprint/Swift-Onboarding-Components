@@ -1,5 +1,11 @@
 # @onefootprint/footprint
 
+## 0.2.0
+
+### Minor Changes
+
+- 36033ecc: Support for modules
+
 ## 0.1.0
 
 ### Minor Changes
