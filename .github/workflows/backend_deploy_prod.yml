@@ -15,7 +15,7 @@ concurrency:
   group: ${{ github.workflow }}-deploy-prod
 
 jobs:
-  deploy_stack_prod:
+  print_some_things:
     name: Print some things
     steps:
       - name: Print
