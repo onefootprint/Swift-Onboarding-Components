@@ -133,7 +133,7 @@ fn initiate_verification(
     };
     let verification_request = if desired_status == Status::Processing {
         let request = uvw
-            .build_verification_request(scoped_user_id, Vendor::LexisNexis)
+            .build_verification_request(scoped_user_id, Vendor::Idology)
             .save(conn)?;
         Some(request)
     } else {
