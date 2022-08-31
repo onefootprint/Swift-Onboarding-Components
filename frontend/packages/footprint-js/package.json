@@ -1,18 +1,25 @@
 {
   "name": "@onefootprint/footprint-js",
   "private": false,
-  "version": "0.1.0",
-  "main": "./dist/index.js",
-  "module": "./dist/index.mjs",
-  "types": "./dist/index.d.ts",
+  "version": "0.1.2",
+  "main": "./dist/footprint-js.umd.js",
+  "module": "./dist/footprint-js.esm.js",
+  "types": "./dist/footprint-js.d.ts",
+  "exports": {
+    ".": {
+      "require": "./dist/footprint-js.cjs.js",
+      "import": "./dist/footprint-js.esm.js",
+      "types": "./dist/footprint-js.d.ts"
+    }
+  },
   "sideEffects": false,
   "license": "MIT",
   "files": [
     "dist/**"
   ],
   "scripts": {
-    "build": "tsup src/index.ts --format esm,cjs --dts --minify",
-    "dev": "tsup src/index.ts --format esm,cjs --watch --dts",
+    "build": "tsup",
+    "dev": "tsup --watch",
     "lint": "eslint src --fix",
     "typecheck": "yarn tsc --noEmit",
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
