@@ -1,225 +1,270 @@
-import * as aws from "@pulumi/aws";
-import { Region } from "@pulumi/aws";
-import * as awsx from "@pulumi/awsx";
-import * as pulumi from "@pulumi/pulumi"
-import { Config } from "./config";
-import * as random from "@pulumi/random";
-import { StaticSecrets } from "./secrets";
+import * as aws from '@pulumi/aws';
+import { Region } from '@pulumi/aws';
+import * as awsx from '@pulumi/awsx';
+import * as pulumi from '@pulumi/pulumi';
+import { Config } from './config';
+import * as random from '@pulumi/random';
+import { StaticSecrets } from './secrets';
 import * as vpcUtil from './vpc';
-import { EngineType } from "@pulumi/aws/rds";
-import * as inputs from "@pulumi/aws/types";
+import { EngineType } from '@pulumi/aws/rds';
+import * as inputs from '@pulumi/aws/types';
 
 export type DbConfig = {
-    protectDeletion: boolean;
-}
+  protectDeletion: boolean;
+};
 
 export type DbOutput = {
-    databaseUrl: pulumi.Output<string>;
-    databaseUrlSecretParam: aws.ssm.Parameter;
-    db: aws.rds.Cluster;
-}
+  databaseUrl: pulumi.Output<string>;
+  databaseUrlSecretParam: aws.ssm.Parameter;
+  db: aws.rds.Cluster;
+};
 
 /** TODO: 
     - private network for jump-box
     - check `applyImmediately`
 */
-export async function CreateDB(vpcProvider: vpcUtil.VpcRegion, clusterIdentifier: string, constants: Config, secretsStore: StaticSecrets, dbConfig: DbConfig): Promise<DbOutput> {
-    const user = "footprint";
-    const databaseName = "footprint";
+export async function CreateDB(
+  vpcProvider: vpcUtil.VpcRegion,
+  clusterIdentifier: string,
+  constants: Config,
+  secretsStore: StaticSecrets,
+  dbConfig: DbConfig,
+): Promise<DbOutput> {
+  const user = 'footprint';
+  const databaseName = 'footprint';
 
-    const auroraVpc = vpcProvider.vpc;
+  const auroraVpc = vpcProvider.vpc;
 
-    const dbSubnetGroup = new aws.rds.SubnetGroup(`subnet-group-${clusterIdentifier}`, {
-        subnetIds: auroraVpc.publicSubnetIds
+  const dbSubnetGroup = new aws.rds.SubnetGroup(
+    `subnet-group-${clusterIdentifier}`,
+    {
+      subnetIds: auroraVpc.publicSubnetIds,
+    },
+  );
+
+  const auroraVpcSecurityGroup = new awsx.ec2.SecurityGroup(
+    `${clusterIdentifier}-aurora-sg`,
+    {
+      vpc: auroraVpc,
+      ingress: [
+        {
+          protocol: '-1',
+          fromPort: 5432,
+          toPort: 5432,
+          cidrBlocks: [auroraVpc.vpc.cidrBlock],
+        },
+      ],
+      egress: [
+        { protocol: '-1', fromPort: 0, toPort: 0, cidrBlocks: ['0.0.0.0/0'] },
+      ],
+    },
+  );
+
+  const db = new aws.rds.Cluster(`aurora-v2-${clusterIdentifier}`, {
+    clusterIdentifier: `${clusterIdentifier}`,
+    dbSubnetGroupName: dbSubnetGroup.name,
+    databaseName,
+    storageEncrypted: true,
+    engineVersion: '14.3',
+    allowMajorVersionUpgrade: false,
+    engine: EngineType.AuroraPostgresql,
+    engineMode: 'provisioned',
+    masterPassword: secretsStore.dbPassword,
+    masterUsername: user,
+    applyImmediately: true,
+    snapshotIdentifier: await getSnapshotIdIfNeeded(),
+    vpcSecurityGroupIds: [auroraVpcSecurityGroup.id],
+    skipFinalSnapshot: !dbConfig.protectDeletion,
+    deletionProtection: dbConfig.protectDeletion,
+    restoreToPointInTime: await getRestorePointIfNeeded(),
+    serverlessv2ScalingConfiguration: {
+      maxCapacity: 16,
+      minCapacity: 2,
+    },
+    backupRetentionPeriod: 7,
+  });
+
+  const _dbInstance = new aws.rds.ClusterInstance(`${clusterIdentifier}-1`, {
+    clusterIdentifier: db.id,
+    instanceClass: 'db.serverless',
+    engine: EngineType.AuroraPostgresql,
+    engineVersion: db.engineVersion,
+  });
+
+  const _dbInstance2 = new aws.rds.ClusterInstance(`${clusterIdentifier}-2`, {
+    clusterIdentifier: db.id,
+    instanceClass: 'db.serverless',
+    engine: EngineType.AuroraPostgresql,
+    engineVersion: db.engineVersion,
+  });
+
+  const databaseUrl = pulumi
+    .all([db.endpoint, secretsStore.dbPassword])
+    .apply(([host, password]) => {
+      return `postgresql://${user}:${password}@${host}`;
     });
 
-    const auroraVpcSecurityGroup = new awsx.ec2.SecurityGroup(`${clusterIdentifier}-aurora-sg`, {
-        vpc: auroraVpc,
-        ingress: [{ protocol: "-1", fromPort: 5432, toPort: 5432, cidrBlocks: [auroraVpc.vpc.cidrBlock] }],
-        egress: [{ protocol: "-1", fromPort: 0, toPort: 0, cidrBlocks: ["0.0.0.0/0"] }],
-    });
+  const databaseUrlSecretParam = new aws.ssm.Parameter(
+    `ssm-param-database-url-${clusterIdentifier}`,
+    {
+      type: 'SecureString',
+      value: databaseUrl,
+      name: `/static_secrets/db-url-${clusterIdentifier}`,
+    },
+  );
 
-    const db = new aws.rds.Cluster(`aurora-v2-${clusterIdentifier}`, {
-        clusterIdentifier: `${clusterIdentifier}`,
-        dbSubnetGroupName: dbSubnetGroup.name,
-        databaseName,
-        storageEncrypted: true,
-        engineVersion: "14.3",
-        allowMajorVersionUpgrade: false,
-        engine: EngineType.AuroraPostgresql,
-        engineMode: "provisioned",
-        masterPassword: secretsStore.dbPassword,
-        masterUsername: user,
-        applyImmediately: true,
-        snapshotIdentifier: await getSnapshotIdIfNeeded(),
-        vpcSecurityGroupIds: [auroraVpcSecurityGroup.id],
-        skipFinalSnapshot: !dbConfig.protectDeletion,
-        deletionProtection: dbConfig.protectDeletion,
-        restoreToPointInTime: await getRestorePointIfNeeded(),
-        serverlessv2ScalingConfiguration: {
-            maxCapacity: 16,
-            minCapacity: 2,
-        },       
-        backupRetentionPeriod: 7,
-    });
+  const jump = await createDbJumpBox(
+    clusterIdentifier,
+    constants,
+    databaseUrl,
+    auroraVpcSecurityGroup,
+    auroraVpc,
+  );
 
-    const _dbInstance = new aws.rds.ClusterInstance(`${clusterIdentifier}-1`, {
-        clusterIdentifier: db.id,
-        instanceClass: "db.serverless",
-        engine: EngineType.AuroraPostgresql,
-        engineVersion: db.engineVersion,        
-        
-    });
-
-    const _dbInstance2 = new aws.rds.ClusterInstance(`${clusterIdentifier}-2`, {
-        clusterIdentifier: db.id,
-        instanceClass: "db.serverless",
-        engine: EngineType.AuroraPostgresql,
-        engineVersion: db.engineVersion,        
-        
-    });
-
-    const databaseUrl = pulumi.all([db.endpoint, secretsStore.dbPassword]).apply(([host, password]) => {
-        return `postgresql://${user}:${password}@${host}`
-    });
-
-    const databaseUrlSecretParam = new aws.ssm.Parameter(`ssm-param-database-url-${clusterIdentifier}`, {
-        type: "SecureString",
-        value: databaseUrl,
-        name: `/static_secrets/db-url-${clusterIdentifier}`,
-    });
-
-    const jump = await createDbJumpBox(clusterIdentifier, constants, databaseUrl, auroraVpcSecurityGroup, auroraVpc);
-
-    
-    return {
-        databaseUrl,
-        db,
-        databaseUrlSecretParam,
-    };
+  return {
+    databaseUrl,
+    db,
+    databaseUrlSecretParam,
+  };
 }
 
-async function getSnapshotIdIfNeeded(): Promise<pulumi.Output<string> | undefined> {
-    let config = new pulumi.Config();
-    let clusterId = config.get('restoreSnapshotFromClusterNamed');
-    if (clusterId === undefined) {
-        return undefined;
-    }
+async function getSnapshotIdIfNeeded(): Promise<
+  pulumi.Output<string> | undefined
+> {
+  let config = new pulumi.Config();
+  let clusterId = config.get('restoreSnapshotFromClusterNamed');
+  if (clusterId === undefined) {
+    return undefined;
+  }
 
-    let parentCluster;
-    try {
-        parentCluster = await aws.rds.getCluster({ clusterIdentifier: `${clusterId}` });
-    } catch(error) {
-        console.log(`error getting DB cluster snapshot: ${error}`);
-        return undefined;
-    }
-    
-    // don't support for PG < 14
-    if (parseInt(parentCluster.engineVersion) < 14) {
-        return undefined;
-    }
+  let parentCluster;
+  try {
+    parentCluster = await aws.rds.getCluster({
+      clusterIdentifier: `${clusterId}`,
+    });
+  } catch (error) {
+    console.log(`error getting DB cluster snapshot: ${error}`);
+    return undefined;
+  }
 
-    const snapshot = new aws.rds.ClusterSnapshot(`branch-snapshot-${clusterId}`, { dbClusterIdentifier: parentCluster.clusterIdentifier, dbClusterSnapshotIdentifier: `branch-${clusterId}-${pulumi.getStack()}`});
+  // don't support for PG < 14
+  if (parseInt(parentCluster.engineVersion) < 14) {
+    return undefined;
+  }
 
+  const snapshot = new aws.rds.ClusterSnapshot(`branch-snapshot-${clusterId}`, {
+    dbClusterIdentifier: parentCluster.clusterIdentifier,
+    dbClusterSnapshotIdentifier: `branch-${clusterId}-${pulumi.getStack()}`,
+  });
 
-    return snapshot.id;
+  return snapshot.id;
 }
 
-async function getRestorePointIfNeeded(): Promise<inputs.input.rds.ClusterRestoreToPointInTime | undefined> {
-    let config = new pulumi.Config();
-    let clusterId = config.get('restoreSnapshotFromClusterNamed');
-    if (clusterId === undefined) {
-        return undefined;
-    }
+async function getRestorePointIfNeeded(): Promise<
+  inputs.input.rds.ClusterRestoreToPointInTime | undefined
+> {
+  let config = new pulumi.Config();
+  let clusterId = config.get('restoreSnapshotFromClusterNamed');
+  if (clusterId === undefined) {
+    return undefined;
+  }
 
-    let parentCluster;
-    try {
-        parentCluster = await aws.rds.getCluster({ clusterIdentifier: `db-${clusterId}` });
-    } catch(error) {
-        console.log(`error getting DB cluster snapshot: ${error}`);
-        return undefined;
-    }
-    
-    // don't support for PG < 14
-    if (parseInt(parentCluster.engineVersion) < 14) {
-        return undefined;
-    }
+  let parentCluster;
+  try {
+    parentCluster = await aws.rds.getCluster({
+      clusterIdentifier: `db-${clusterId}`,
+    });
+  } catch (error) {
+    console.log(`error getting DB cluster snapshot: ${error}`);
+    return undefined;
+  }
 
-    return {
-        useLatestRestorableTime: true,
-        sourceClusterIdentifier: parentCluster.clusterIdentifier
-    }
+  // don't support for PG < 14
+  if (parseInt(parentCluster.engineVersion) < 14) {
+    return undefined;
+  }
+
+  return {
+    useLatestRestorableTime: true,
+    sourceClusterIdentifier: parentCluster.clusterIdentifier,
+  };
 }
 
 export type DbJump = {
-    ip: pulumi.Output<string>;
-    dns: pulumi.Output<string>;
-}
+  ip: pulumi.Output<string>;
+  dns: pulumi.Output<string>;
+};
 /**
  * Aurora Serverless is not accessible so we need a jump box
  */
 async function createDbJumpBox(
-    clusterId: string,
-    constants: Config,
-    dbUrl: pulumi.Output<string>,
-    securityGroup: awsx.ec2.SecurityGroup,
-    vpc: awsx.ec2.Vpc
+  clusterId: string,
+  constants: Config,
+  dbUrl: pulumi.Output<string>,
+  securityGroup: awsx.ec2.SecurityGroup,
+  vpc: awsx.ec2.Vpc,
 ): Promise<aws.ec2.Instance> {
-    const size = "t2.micro";
+  const size = 't2.micro';
 
-    const jumpSg = new awsx.ec2.SecurityGroup(`jump-${clusterId}-sg`, {
-        vpc,
-        egress: [{ protocol: "-1", fromPort: 0, toPort: 0, cidrBlocks: ["0.0.0.0/0"] }],
-    });
+  const jumpSg = new awsx.ec2.SecurityGroup(`jump-${clusterId}-sg`, {
+    vpc,
+    egress: [
+      { protocol: '-1', fromPort: 0, toPort: 0, cidrBlocks: ['0.0.0.0/0'] },
+    ],
+  });
 
+  const dbSecretName = `/db-jump/db-url-${clusterId}`;
+  const dbSecret = new aws.ssm.Parameter(`ssm-param-jump-url-${clusterId}`, {
+    type: 'SecureString',
+    value: dbUrl,
+    name: dbSecretName,
+    overwrite: true,
+  });
 
-    const dbSecretName = `/db-jump/db-url-${clusterId}`;
-    const dbSecret = new aws.ssm.Parameter(`ssm-param-jump-url-${clusterId}`, {
-        type: "SecureString",
-        value: dbUrl,
-        name: dbSecretName,
-        overwrite: true
-    });
-
-    const instanceRole = new aws.iam.Role(`jump-role-${clusterId}`, {
-        assumeRolePolicy: {
-            Version: "2012-10-17",
-            Statement: [{
-                Sid: "",
-                Effect: "Allow",
-                Principal: {
-                    Service: "ec2.amazonaws.com",
-                },
-                Action: "sts:AssumeRole",
-            }],
+  const instanceRole = new aws.iam.Role(`jump-role-${clusterId}`, {
+    assumeRolePolicy: {
+      Version: '2012-10-17',
+      Statement: [
+        {
+          Sid: '',
+          Effect: 'Allow',
+          Principal: {
+            Service: 'ec2.amazonaws.com',
+          },
+          Action: 'sts:AssumeRole',
         },
-        inlinePolicies: [
+      ],
+    },
+    inlinePolicies: [
+      {
+        name: 'get_db_url',
+        policy: JSON.stringify({
+          Version: '2012-10-17',
+          Statement: [
             {
-                name: "get_db_url",
-                policy: JSON.stringify({
-                    Version: "2012-10-17",
-                    Statement: [{
-                        Action: [
-                            "ssm:GetParameter"
-                        ],
-                        Effect: "Allow",
-                        Resource: `arn:aws:ssm:*:*:parameter${dbSecretName}`,
-                    }],
-                }),
-            }
-        ]
-    });
+              Action: ['ssm:GetParameter'],
+              Effect: 'Allow',
+              Resource: `arn:aws:ssm:*:*:parameter${dbSecretName}`,
+            },
+          ],
+        }),
+      },
+    ],
+  });
 
-    const iamInstanceProfile = new aws.iam.InstanceProfile(`jump_profile-${clusterId}`, {
-        role: instanceRole.name
-    });
+  const iamInstanceProfile = new aws.iam.InstanceProfile(
+    `jump_profile-${clusterId}`,
+    {
+      role: instanceRole.name,
+    },
+  );
 
-    let config = new pulumi.Config();
-    let tailscaleAuthKey = config.get('tailscaleKey');
+  let config = new pulumi.Config();
+  let tailscaleAuthKey = config.get('tailscaleKey');
 
-    let jumpHostname = `jumpbox-${pulumi.getStack()}`;
+  let jumpHostname = `jumpbox-${pulumi.getStack()}`;
 
-    const userData = `
+  const userData = `
 #!/bin/bash
 
 sudo yum update -y
@@ -255,15 +300,15 @@ EOF
 
 chmod +x connect_db.sh`;
 
-    const jumpbox = new aws.ec2.Instance(`jumpbox-${clusterId}`, {
-        instanceType: size,
-        subnetId: (await vpc.publicSubnetIds)[0],
-        vpcSecurityGroupIds: [securityGroup.id, jumpSg.id],
-        ami: "ami-0f9fc25dd2506cf6d",
-        userData: Buffer.from(userData).toString('base64'),
-        associatePublicIpAddress: true,
-        iamInstanceProfile,
-    });
+  const jumpbox = new aws.ec2.Instance(`jumpbox-${clusterId}`, {
+    instanceType: size,
+    subnetId: (await vpc.publicSubnetIds)[0],
+    vpcSecurityGroupIds: [securityGroup.id, jumpSg.id],
+    ami: 'ami-0f9fc25dd2506cf6d',
+    userData: Buffer.from(userData).toString('base64'),
+    associatePublicIpAddress: true,
+    iamInstanceProfile,
+  });
 
-    return jumpbox;
+  return jumpbox;
 }

@@ -1,169 +1,229 @@
-import * as aws from "@pulumi/aws";
-import { Region } from "@pulumi/aws";
-import * as awsx from "@pulumi/awsx";
-import * as pulumi from "@pulumi/pulumi"
-import { Config } from "./config";
+import * as aws from '@pulumi/aws';
+import { Region } from '@pulumi/aws';
+import * as awsx from '@pulumi/awsx';
+import * as pulumi from '@pulumi/pulumi';
+import { Config } from './config';
 
 export type NitroEnclaveConfig = {
-    cpus: number;
-    memory: number;
-    cid: number;
-}
+  cpus: number;
+  memory: number;
+  cid: number;
+};
 
+export async function CreateCluster(
+  clusterName: string,
+  vpc: awsx.ec2.Vpc,
+  targetGroup: awsx.elasticloadbalancingv2.TargetGroup,
+  constants: Config,
+  nitroConfig: NitroEnclaveConfig,
+  region: Region,
+  provider: pulumi.ProviderResource,
+): Promise<awsx.ecs.Cluster> {
+  const instanceProfile = createInstanceRole(region, provider);
 
-export async function CreateCluster(clusterName: string, vpc: awsx.ec2.Vpc, targetGroup: awsx.elasticloadbalancingv2.TargetGroup, constants: Config, nitroConfig: NitroEnclaveConfig, region: Region, provider: pulumi.ProviderResource): Promise<awsx.ecs.Cluster> {
-    const instanceProfile = createInstanceRole(region, provider);
-
-    // get our base image AMI
-    const instanceAmi = await aws.ec2.getAmi({
-        mostRecent: true,
-        owners: ["amazon"],
-        filters: [{
-            name: "name",
-            values: ["amzn2-ami-ecs-hvm-*-x86_64-*"]
-        }]
-    }, { provider });
-
-    const instanceSecurityGroup = new awsx.ec2.SecurityGroup(`instance-sg-${clusterName}`, {
-        vpc,
-        ingress: [
-            { protocol: "-1", fromPort: 0, toPort: 0, cidrBlocks: [vpc.vpc.cidrBlock] },
-            { protocol: "-1", fromPort: 0, toPort: 0, self: true },
-        ],
-        egress: [{ protocol: "-1", fromPort: 0, toPort: 0, cidrBlocks: ["0.0.0.0/0"] }],
-    }, { provider });
-
-    const launchTemplate = new aws.ec2.LaunchTemplate(`template-ec2-${clusterName}`, {
-        instanceType: "c5a.xlarge",
-        userData: Buffer.from(await userData(clusterName, constants, nitroConfig)).toString('base64'),
-        enclaveOptions: {
-            enabled: true,
+  // get our base image AMI
+  const instanceAmi = await aws.ec2.getAmi(
+    {
+      mostRecent: true,
+      owners: ['amazon'],
+      filters: [
+        {
+          name: 'name',
+          values: ['amzn2-ami-ecs-hvm-*-x86_64-*'],
         },
-        imageId: instanceAmi.id,
-        iamInstanceProfile: {
-            arn: instanceProfile.arn,
+      ],
+    },
+    { provider },
+  );
+
+  const instanceSecurityGroup = new awsx.ec2.SecurityGroup(
+    `instance-sg-${clusterName}`,
+    {
+      vpc,
+      ingress: [
+        {
+          protocol: '-1',
+          fromPort: 0,
+          toPort: 0,
+          cidrBlocks: [vpc.vpc.cidrBlock],
         },
-        // keyName: pulumi.getStack().startsWith("dev") ? jumpKeypairName : undefined,
-        updateDefaultVersion: true,
-        vpcSecurityGroupIds: [instanceSecurityGroup.id],
-    }, { provider });
+        { protocol: '-1', fromPort: 0, toPort: 0, self: true },
+      ],
+      egress: [
+        { protocol: '-1', fromPort: 0, toPort: 0, cidrBlocks: ['0.0.0.0/0'] },
+      ],
+    },
+    { provider },
+  );
 
-    const autoScaling = new aws.autoscaling.Group(`autoscale-group-${clusterName}`, {
-        minSize: 2,
-        maxSize: 4,
-        desiredCapacity: 2,
-        launchTemplate: {
-            id: launchTemplate.id,
-            version: pulumi.output(launchTemplate.latestVersion).apply(v => `${v}`)
+  const launchTemplate = new aws.ec2.LaunchTemplate(
+    `template-ec2-${clusterName}`,
+    {
+      instanceType: 'c5a.xlarge',
+      userData: Buffer.from(
+        await userData(clusterName, constants, nitroConfig),
+      ).toString('base64'),
+      enclaveOptions: {
+        enabled: true,
+      },
+      imageId: instanceAmi.id,
+      iamInstanceProfile: {
+        arn: instanceProfile.arn,
+      },
+      // keyName: pulumi.getStack().startsWith("dev") ? jumpKeypairName : undefined,
+      updateDefaultVersion: true,
+      vpcSecurityGroupIds: [instanceSecurityGroup.id],
+    },
+    { provider },
+  );
+
+  const autoScaling = new aws.autoscaling.Group(
+    `autoscale-group-${clusterName}`,
+    {
+      minSize: 2,
+      maxSize: 4,
+      desiredCapacity: 2,
+      launchTemplate: {
+        id: launchTemplate.id,
+        version: pulumi.output(launchTemplate.latestVersion).apply(v => `${v}`),
+      },
+      healthCheckGracePeriod: 60,
+      targetGroupArns: [targetGroup.targetGroup.arn],
+      vpcZoneIdentifiers: vpc.privateSubnetIds,
+      protectFromScaleIn: false,
+      instanceRefresh: {
+        strategy: 'Rolling',
+        preferences: {
+          minHealthyPercentage: 80,
         },
-        healthCheckGracePeriod: 60,
-        targetGroupArns: [targetGroup.targetGroup.arn],
-        vpcZoneIdentifiers: vpc.privateSubnetIds,
-        protectFromScaleIn: false,
-        instanceRefresh: {
-            strategy: "Rolling",
-            preferences: {
-                minHealthyPercentage: 80,
-            },
-            triggers: ["tag"],
+        triggers: ['tag'],
+      },
+    },
+    { provider, dependsOn: [launchTemplate] },
+  );
+
+  const capacityProvider = new aws.ecs.CapacityProvider(
+    `capacity-${clusterName}`,
+    {
+      autoScalingGroupProvider: {
+        autoScalingGroupArn: autoScaling.arn,
+        managedTerminationProtection: 'DISABLED',
+        managedScaling: {
+          status: 'DISABLED',
         },
-    }, { provider, dependsOn: [launchTemplate] });
+      },
+    },
+    { provider },
+  );
 
-    const capacityProvider = new aws.ecs.CapacityProvider(`capacity-${clusterName}`, {
-        autoScalingGroupProvider: {
-            autoScalingGroupArn: autoScaling.arn,
-            managedTerminationProtection: "DISABLED",
-            managedScaling: {
-                status: "DISABLED"
-            }
-        }
-    }, { provider });
+  // create the cluster
+  const cluster = new awsx.ecs.Cluster(
+    `${clusterName}`,
+    {
+      name: clusterName,
+      vpc,
+    },
+    { provider },
+  );
 
-    // create the cluster
-    const cluster = new awsx.ecs.Cluster(`${clusterName}`, {
-        name: clusterName,
-        vpc,
-    }, { provider });
+  // this is used to tear down
+  const clusterCapacityProviders = new aws.ecs.ClusterCapacityProviders(
+    `cluster-capacity-${clusterName}`,
+    {
+      clusterName: cluster.cluster.name,
+      capacityProviders: [capacityProvider.name],
+    },
+    { provider },
+  );
 
-    // this is used to tear down
-    const clusterCapacityProviders = new aws.ecs.ClusterCapacityProviders(`cluster-capacity-${clusterName}`, {
-        clusterName: cluster.cluster.name,
-        capacityProviders: [capacityProvider.name]
-    }, { provider });
-
-
-    return cluster;
+  return cluster;
 }
 
 /**
  * the role for our cluster ec2 instances to run as
  */
-function createInstanceRole(region: Region, provider: pulumi.ProviderResource): aws.iam.InstanceProfile {
-    const ecsInstanceRole = new aws.iam.Role(`ecs-instance-role-${region}`, {
-        assumeRolePolicy: {
-            Version: "2012-10-17",
-            Statement: [{
-                Sid: "",
-                Effect: "Allow",
-                Principal: {
-                    Service: "ec2.amazonaws.com",
-                },
-                Action: "sts:AssumeRole",
-            }],
+function createInstanceRole(
+  region: Region,
+  provider: pulumi.ProviderResource,
+): aws.iam.InstanceProfile {
+  const ecsInstanceRole = new aws.iam.Role(`ecs-instance-role-${region}`, {
+    assumeRolePolicy: {
+      Version: '2012-10-17',
+      Statement: [
+        {
+          Sid: '',
+          Effect: 'Allow',
+          Principal: {
+            Service: 'ec2.amazonaws.com',
+          },
+          Action: 'sts:AssumeRole',
         },
-        inlinePolicies: [
+      ],
+    },
+    inlinePolicies: [
+      {
+        name: 'ecr_enclave_pull',
+        policy: JSON.stringify({
+          Version: '2012-10-17',
+          Statement: [
             {
-                name: "ecr_enclave_pull",
-                policy: JSON.stringify({
-                    Version: "2012-10-17",
-                    Statement: [{
-                        Action: [
-                            "ecr:Describe*",
-                            "ecr:BatchGetImage",
-                            "ecr:BatchCheckLayerAvailability",
-                            "ecr:GetDownloadUrlForLayer",
-                            "logs:CreateLogGroup",
-                            "logs:PutLogEvents",
-                            "logs:DescribeLogStreams",
-                            "logs:CreateLogStream",
-                            "logs:PutLogEvents"
-                        ],
-                        Effect: "Allow",
-                        Resource: "*",
-                    }],
-                }),
+              Action: [
+                'ecr:Describe*',
+                'ecr:BatchGetImage',
+                'ecr:BatchCheckLayerAvailability',
+                'ecr:GetDownloadUrlForLayer',
+                'logs:CreateLogGroup',
+                'logs:PutLogEvents',
+                'logs:DescribeLogStreams',
+                'logs:CreateLogStream',
+                'logs:PutLogEvents',
+              ],
+              Effect: 'Allow',
+              Resource: '*',
+            },
+          ],
+        }),
+      },
+    ],
+  });
 
-            }
-        ]
-    });
+  const _ecsInstanceRolePolicyAttachment = new aws.iam.RolePolicyAttachment(
+    `ecs-instance-role-policy-${region}`,
+    {
+      role: ecsInstanceRole.name,
+      policyArn:
+        'arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role',
+    },
+  );
 
-    const _ecsInstanceRolePolicyAttachment = new aws.iam.RolePolicyAttachment(`ecs-instance-role-policy-${region}`, {
-        role: ecsInstanceRole.name,
-        policyArn: "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role",
-    });
-
-    return new aws.iam.InstanceProfile(`ecs-iam-instance-profile-${region}`, {
-        role: ecsInstanceRole.name
-    }, { provider });
+  return new aws.iam.InstanceProfile(
+    `ecs-iam-instance-profile-${region}`,
+    {
+      role: ecsInstanceRole.name,
+    },
+    { provider },
+  );
 }
 
 /**
  * This is the "user_data" for booting up an EC2 machine to run our cluster tasks
  * It installs our enclave per the config.
  */
-async function userData(clusterName: string, constants: Config, config: NitroEnclaveConfig): Promise<string> {
-    const current = await aws.getCallerIdentity({});
-    const ecrEndpoint = `${current.accountId}.dkr.ecr.us-east-1.amazonaws.com`;
-    const enclaveImage = `${current.accountId}.dkr.ecr.us-east-1.amazonaws.com/enclave_pkg:${constants.containers.enclaveVersion}`;
+async function userData(
+  clusterName: string,
+  constants: Config,
+  config: NitroEnclaveConfig,
+): Promise<string> {
+  const current = await aws.getCallerIdentity({});
+  const ecrEndpoint = `${current.accountId}.dkr.ecr.us-east-1.amazonaws.com`;
+  const enclaveImage = `${current.accountId}.dkr.ecr.us-east-1.amazonaws.com/enclave_pkg:${constants.containers.enclaveVersion}`;
 
-    const pulumiConfig = new pulumi.Config();
-    const tailscaleAuthKey = pulumiConfig.get('serverTailscaleKey');
-    const hostName = `server-${pulumi.getStack()}`;
+  const pulumiConfig = new pulumi.Config();
+  const tailscaleAuthKey = pulumiConfig.get('serverTailscaleKey');
+  const hostName = `server-${pulumi.getStack()}`;
 
-
-
-    // TODO: if enclave unhealthy after restart fail health check on ASG.
-    return `
+  // TODO: if enclave unhealthy after restart fail health check on ASG.
+  return `
 #!/bin/bash
 
 echo -e "ECS_CLUSTER=${clusterName}\n" >> /etc/ecs/ecs.config
@@ -231,6 +291,4 @@ EOF
 sudo cp enclave_runner.service /etc/systemd/system/enclave_runner.service
 
 sudo systemctl start enclave_runner.service && sudo systemctl enable enclave_runner.service`;
-
 }
-
