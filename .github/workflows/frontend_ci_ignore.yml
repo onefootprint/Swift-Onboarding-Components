@@ -47,13 +47,3 @@ jobs:
     needs: install-dependencies
     steps:
       - run: echo "Not required"
-
-  typecheck:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        node-version: [16.x]
-        os: [ubuntu-latest]
-    needs: install-dependencies
-    steps:
-      - run: echo "Not required"
