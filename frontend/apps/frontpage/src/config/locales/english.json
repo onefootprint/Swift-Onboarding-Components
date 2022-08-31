@@ -521,6 +521,19 @@
         "update-index": " (Update #{{index}})"
       }
     },
+    "library": {
+      "html-title": "Footprint - Library",
+      "go-back": "Back",
+      "breadcrumb": {
+        "title": "Library",
+        "description": " | Learn about KYC, PII vaulting, and more",
+        "twitter": "Footprint on Twitter"
+      },
+      "read-more": "Read more",
+      "post": {
+        "reading-time": "{{readingTime}} min. read"
+      }
+    },
     "404": {
       "title": "Oops! Page couldn't be found.",
       "description": "We're sorry, but the requested page doesn't exist or was removed.",

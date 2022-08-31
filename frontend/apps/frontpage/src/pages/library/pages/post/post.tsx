@@ -10,20 +10,17 @@ import { Box, Container, LinkButton, media, Typography } from 'ui';
 import DesktopSharePost from '../../../../components/desktop-share-post';
 import PostInfo from '../../../../components/post-info';
 import type { PostDetails } from '../../../../utils/ghost/types';
-import INVESTOR_UPDATE_HIDE_CREATED_DATE_BEFORE from '../../constants';
 
 export type PostProps = {
   post: PostDetails;
 };
 
 const Post = ({ post }: PostProps) => {
-  const { t } = useTranslation('pages.investor-updates');
+  const { t } = useTranslation('pages.library');
   const { formatDateWithLongMonth } = useIntl();
-  const createdDate = new Date(post.created_at);
-  const shouldHideDate = createdDate < INVESTOR_UPDATE_HIDE_CREATED_DATE_BEFORE;
-  const formattedCreatedDate = shouldHideDate
-    ? undefined
-    : formatDateWithLongMonth(createdDate);
+  const formattedCreatedDate = formatDateWithLongMonth(
+    new Date(post.created_at),
+  );
 
   return (
     <>
@@ -37,7 +34,7 @@ const Post = ({ post }: PostProps) => {
           title: post.og_title,
           author: post.primary_author.name,
         }}
-        slug={`/investor-updates/${post.slug}`}
+        slug={`/library/${post.slug}`}
         title={post.title}
         twitter={{
           description: post.twitter_description,
@@ -53,11 +50,11 @@ const Post = ({ post }: PostProps) => {
         <Container>
           <Inner>
             <Box sx={{ marginBottom: 8 }}>
-              <Link href="/investor-updates" passHref>
+              <Link href="/library" passHref>
                 <LinkButton
                   iconPosition="left"
                   iconComponent={IcoChevronLeftBig24}
-                  href="/investor-updates"
+                  href="/library"
                 >
                   {t('go-back')}
                 </LinkButton>
@@ -84,12 +81,11 @@ const Post = ({ post }: PostProps) => {
                 />
                 <DesktopSharePost
                   title={post.og_title}
-                  url={`https://www.onefootprint.com/investor-updates/${post.slug}`}
+                  url={`https://www.onefootprint.com/library/${post.slug}`}
                 />
               </Box>
               <Typography variant="display-2" as="h1" sx={{ marginY: 9 }}>
                 {post.title}
-                {t('post.update-index', { index: post.meta_description })}
               </Typography>
             </Header>
             <PostContent html={post.html} />
