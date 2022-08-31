@@ -26,9 +26,6 @@ If you need to authenticate via bearer auth (e.g., for a cross-origin request), 
 
 You can check that your API key is working as expected:
 
-<br/>
-<br/>
-
 ```bash
 curl https://api.onefootprint.com/org/api_keys/check \
 	-u sk_test_CXUsbCR8j2kH6e5GeEl8eSBnQTIPCUaKpv: 
@@ -108,9 +105,6 @@ curl https://api.onefootprint.com/users/fp_id_GSxJr68GAf5jUT3pdL9ndjf7TLkA3GCX?f
 
 Footprint’s API provides attribute-level decryption. API keys are configurable to have certain attribute-level scopes.
 
-<br/>
-<br/>
-
 ```bash
 curl https://api.onefootprint.com/users/fp_id_GSxJr68GAf5jUT3pdL9ndjf7TLkA3GCX/decrypt \
 	-X POST \
@@ -137,9 +131,6 @@ curl https://api.onefootprint.com/users/fp_id_GSxJr68GAf5jUT3pdL9ndjf7TLkA3GCX/d
 ## Search across users' vaults
 
 Footprint lets you search across all of your users' vaults by specific fields that are fingerprinted. This lets you easily search across all of your users vaults privately without building complicated decryption procedures.
-
-<br/>
-<br/>
 
 ```bash
 curl -X POST https://api.onefootprint.com/users?fingerprint=10014 \

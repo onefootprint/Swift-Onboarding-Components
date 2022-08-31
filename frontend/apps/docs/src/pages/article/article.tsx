@@ -103,8 +103,7 @@ const Container = styled(Markdown)`
     }
 
     pre > div {
-      margin-top: -${theme.spacing[3]}px;
-      margin-bottom: ${theme.spacing[8]}px;
+      margin-bottom: ${theme.spacing[7]}px;
     }
   `};
 `;
