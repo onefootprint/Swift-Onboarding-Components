@@ -38,6 +38,7 @@ struct IdologyRequestData {
     email: Option<PiiString>,
     /// this must be 10 digits
     telephone: Option<PiiString>,
+    output: String,
 }
 
 impl TryFrom<IdvData> for IdologyRequestData {
@@ -86,6 +87,7 @@ impl TryFrom<IdvData> for IdologyRequestData {
             dob_day,
             email,
             telephone: phone_number,
+            output: "json".to_owned(),
         };
         Ok(request)
     }
@@ -167,7 +169,7 @@ impl IdologyClient {
     }
 
     /// ExpectId module
-    pub async fn verify_expectid(&self, idv_data: IdvData) -> Result<IdologySuccess, Error> {
+    pub async fn verify_expectid(&self, idv_data: IdvData) -> Result<serde_json::Value, Error> {
         let req_list = IdologyRequest {
             username: self.username.clone(),
             password: self.password.clone(),
@@ -182,15 +184,11 @@ impl IdologyClient {
             .await
             .map_err(|err| ReqwestError::SendError(err.to_string()))?;
 
-        let idology_response: IdologyResponse = response
-            .json::<IdologyResponse>()
+        let idology_response = response
+            .json::<serde_json::Value>()
             .await
             .map_err(ReqwestError::InternalError)?;
-
-        let idology_response = idology_response.response;
-        match idology_response {
-            IdologyResponseInner::Error(error) => Err(Error::IdologyErrorResponse(error)),
-            IdologyResponseInner::Success(success) => Ok(success),
-        }
+        // TODO parse as an IdologyResponse
+        Ok(idology_response)
     }
 }

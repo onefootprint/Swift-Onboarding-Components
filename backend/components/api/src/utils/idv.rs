@@ -61,7 +61,6 @@ pub async fn initiate_idv_request(
     match request.vendor {
         Vendor::Idology => {
             let result = state.idology_client.verify_expectid(data).await?;
-            let result = serde_json::value::to_value(result)?;
             state
                 .db_pool
                 .db_query(|conn| VerificationResult::create(conn, request.id, result))
