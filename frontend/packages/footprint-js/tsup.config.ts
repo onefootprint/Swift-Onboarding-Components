@@ -20,7 +20,7 @@ export default defineConfig(config => ({
   },
   env: {
     NODE_ENV: 'production',
-    NEXT_PUBLIC_VERCEL_ENV: '',
+    NEXT_PUBLIC_VERCEL_ENV: config.watch ? 'local' : 'production',
     NEXT_PUBLIC_VERCEL_GIT_COMMIT_REF: '',
   },
 }));

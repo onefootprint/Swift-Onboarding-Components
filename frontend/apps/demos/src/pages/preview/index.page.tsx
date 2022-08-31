@@ -26,8 +26,8 @@ export const getServerSideProps: GetServerSideProps = async ({ query }) => {
     return { notFound: true };
   }
   try {
-    const { data } = await getOnboardingConfig({ key: query.ob_key as string });
-    return { props: { tenant: data } };
+    const tenant = await getOnboardingConfig({ key: query.ob_key as string });
+    return { props: { tenant } };
   } catch (error) {
     return { notFound: true };
   }
