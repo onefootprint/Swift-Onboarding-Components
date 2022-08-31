@@ -14,6 +14,7 @@
     "build": "tsup src/index.ts --format esm,cjs --dts --minify",
     "dev": "tsup src/index.ts --format esm,cjs --watch --dts",
     "lint": "eslint src --fix",
+    "lint:fix": "eslint --fix \"**/*.{ts,tsx,md}\"",
     "typecheck": "yarn tsc --noEmit",
     "generate:icos": "node ./src/scripts/icos/generate.js",
     "generate:flags": "node ./src/scripts/flags/generate.js",

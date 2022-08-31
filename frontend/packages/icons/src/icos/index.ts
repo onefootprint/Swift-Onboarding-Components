@@ -20,6 +20,8 @@ export { default as IcoArrowUpRight16 } from './ico-arrow-up-right-16';
 export { default as IcoArrowUpRight24 } from './ico-arrow-up-right-24';
 export { default as IcoBolt16 } from './ico-bolt-16';
 export { default as IcoBolt24 } from './ico-bolt-24';
+export { default as IcoBook16 } from './ico-book-16';
+export { default as IcoBook24 } from './ico-book-24';
 export { default as IcoBuilding16 } from './ico-building-16';
 export { default as IcoBuilding24 } from './ico-building-24';
 export { default as IcoCake16 } from './ico-cake-16';
