@@ -2,7 +2,6 @@ name: Tag Ephemeral
 
 on:
   pull_request:
-    branches: [master]
     paths:
       - 'backend/infra/**/*'
       - 'backend/infra/*'
