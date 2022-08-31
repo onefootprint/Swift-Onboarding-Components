@@ -1,50 +1,53 @@
 import { IcoFileText16 } from 'icons';
-import React from 'react';
+import React, { useEffect } from 'react';
 import type { ArticleSection } from 'src/types/article';
 import styled, { css } from 'styled-components';
 import { Box, createFontStyles, media, Typography } from 'ui';
 
 import scrollSpy from './utils/scroll-spy';
 
-if (typeof window !== 'undefined') {
-  scrollSpy();
-}
-
 type ArticleSectionsProps = {
   sections: ArticleSection[];
 };
 
-const ArticleSections = ({ sections }: ArticleSectionsProps) => (
-  <Container>
-    <Header>
-      <Box>
-        <IcoFileText16 />
-      </Box>
-      <Typography variant="label-4">On this page</Typography>
-    </Header>
-    <nav>
-      <ul
-        id="article-sections-list"
-        style={
-          {
-            '--index-from-selected': 0,
-          } as React.CSSProperties
-        }
-      >
-        {sections.map(({ level, anchor, label, id }, index) => (
-          <li
-            data-level={level}
-            key={anchor}
-            data-scroll-id={id}
-            className={index === 0 ? 'active' : undefined}
-          >
-            <a href={anchor}>{label}</a>
-          </li>
-        ))}
-      </ul>
-    </nav>
-  </Container>
-);
+const ArticleSections = ({ sections }: ArticleSectionsProps) => {
+  useEffect(() => {
+    scrollSpy();
+  }, [sections]);
+
+  return (
+    <Container>
+      <Header>
+        <Box>
+          <IcoFileText16 />
+        </Box>
+        <Typography variant="label-4">On this page</Typography>
+      </Header>
+      <nav>
+        <ul
+          id="article-sections-list"
+          className="article-sections-list"
+          style={
+            {
+              '--index-from-selected': 0,
+            } as React.CSSProperties
+          }
+        >
+          {sections.map(({ level, anchor, label, id }, index) => (
+            <li
+              data-level={level}
+              key={anchor}
+              data-scroll-id={id}
+              className={index === 0 ? 'active' : undefined}
+            >
+              <a href={anchor}>{label}</a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+    </Container>
+  );
+};
 
 const Container = styled.aside`
   ${({ theme }) => css`
