@@ -26,10 +26,19 @@ const InlineAlert = ({ children, variant = 'info', sx }: InlineAlertProps) => {
       >
         <IconComponent color={variant} />
       </Box>
-      {children}
+      <ContentContainer variant={variant}>{children}</ContentContainer>
     </InlineAlertContainer>
   );
 };
+
+const ContentContainer = styled.div<{
+  variant: InlineAlertVariant;
+}>`
+  ${({ variant }) => css`
+    ${createVariantStyles(variant)};
+    display: inline-block;
+  `};
+`;
 
 const InlineAlertContainer = styled.div<{
   variant: InlineAlertVariant;

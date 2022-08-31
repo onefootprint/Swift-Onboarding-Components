@@ -11,7 +11,9 @@ import Code from './components/code';
 import DocsInlineAlert from './components/docs-inline-alert';
 import H1 from './components/h1';
 import H2 from './components/h2';
+import H3 from './components/h3';
 import Layout from './components/layout';
+import Strong from './components/strong';
 
 type ArticleProps = {
   product: any;
@@ -30,6 +32,12 @@ const overrides: MarkdownToJSX.Overrides = {
   },
   h2: {
     component: H2,
+  },
+  h3: {
+    component: H3,
+  },
+  strong: {
+    component: Strong,
   },
   'inline-alert': {
     component: DocsInlineAlert,
@@ -62,7 +70,9 @@ const Container = styled(Markdown)`
       margin-bottom: ${theme.spacing[7]}px;
     }
 
-    h2 {
+    h1,
+    h2,
+    h3 {
       margin-bottom: ${theme.spacing[7]}px;
 
       &:not(:first-of-type) {
