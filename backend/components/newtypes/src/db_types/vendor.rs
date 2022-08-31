@@ -4,6 +4,8 @@ use paperclip::actix::Apiv2Schema;
 use serde::{Deserialize, Serialize};
 use strum_macros::{AsRefStr, EnumString};
 
+use crate::util::impl_enum_str_diesel;
+
 #[derive(
     Debug,
     Display,
@@ -20,7 +22,7 @@ use strum_macros::{AsRefStr, EnumString};
     AsRefStr,
 )]
 #[serde(rename_all = "snake_case")]
-#[strum(serialize_all = "PascalCase")]
+#[strum(serialize_all = "snake_case")]
 #[diesel(sql_type = Text)]
 pub enum Vendor {
     Footprint,
@@ -30,13 +32,5 @@ pub enum Vendor {
     Experian,
 }
 
-impl<DB> diesel::serialize::ToSql<Text, DB> for Vendor
-where
-    DB: diesel::backend::Backend,
-    str: diesel::serialize::ToSql<Text, DB>,
-{
-    fn to_sql<'b>(&'b self, out: &mut diesel::serialize::Output<'b, '_, DB>) -> diesel::serialize::Result {
-        let s = self.as_ref();
-        s.to_sql(out)
-    }
-}
+
+impl_enum_str_diesel!(Vendor);

@@ -1,7 +1,12 @@
 use super::user_vault_wrapper::UserVaultWrapper;
 use crate::{errors::ApiError, State};
-use db::models::identity_data::HasIdentityDataFields;
-use newtypes::{DataAttribute, IdvData};
+use chrono::Utc;
+use db::models::{
+    identity_data::HasIdentityDataFields,
+    verification_request::{NewVerificationRequest, VerificationRequest},
+    verification_result::VerificationResult,
+};
+use newtypes::{DataAttribute, IdvData, ScopedUserId, Vendor};
 use std::collections::HashMap;
 use strum::IntoEnumIterator;
 
@@ -30,4 +35,39 @@ impl UserVaultWrapper {
         };
         Ok(request)
     }
+
+    pub fn build_verification_request(
+        &self,
+        scoped_user_id: ScopedUserId,
+        vendor: Vendor,
+    ) -> NewVerificationRequest {
+        NewVerificationRequest {
+            scoped_user_id,
+            vendor,
+            timestamp: Utc::now(),
+            email_id: self.email.as_ref().map(|e| e.id.clone()),
+            phone_number_id: self.phone_number.as_ref().map(|e| e.id.clone()),
+            identity_data_id: self.identity_data.as_ref().map(|e| e.id.clone()),
+        }
+    }
+}
+
+pub async fn initiate_idv_request(
+    state: &State,
+    request: VerificationRequest,
+    data: IdvData,
+) -> Result<(), ApiError> {
+    // TODO spawn a task to do this asynchronously
+    match request.vendor {
+        Vendor::Idology => {
+            let result = state.idology_client.verify_expectid(data).await?;
+            let result = serde_json::value::to_value(result)?;
+            state
+                .db_pool
+                .db_query(|conn| VerificationResult::create(conn, request.id, result))
+                .await??;
+        }
+        _ => return Err(ApiError::NotImplemented),
+    }
+    Ok(())
 }

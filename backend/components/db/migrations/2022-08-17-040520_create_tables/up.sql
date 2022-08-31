@@ -261,7 +261,8 @@ CREATE TABLE verification_request_user_data (
         FOREIGN KEY(request_id) 
         REFERENCES verification_request(id)
 );
- 
+
+
 CREATE INDEX IF NOT EXISTS fk_verification_request_user_data_request_id ON verification_request_user_data(request_id);
 
 --

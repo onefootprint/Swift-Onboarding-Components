@@ -86,6 +86,9 @@ pub struct Config {
 
     #[envconfig(from = "CUSTODIAN_KEY", default = "onefootprint")]
     pub custodian_key: String,
+
+    #[envconfig(nested = true)]
+    pub idology_config: IdologyConfig,
 }
 
 fn load_from_env<T: Envconfig>() -> Result<T, Box<dyn std::error::Error>> {
@@ -101,6 +104,15 @@ impl Config {
     pub fn load_from_env() -> Result<Self, Box<dyn std::error::Error>> {
         load_from_env()
     }
+}
+
+#[derive(Envconfig, Debug, Clone)]
+pub struct IdologyConfig {
+    #[envconfig(from = "IDOLOGY_USERNAME")]
+    pub username: String,
+
+    #[envconfig(from = "IDOLOGY_PASSWORD")]
+    pub password: String,
 }
 
 /// Separated config for Enclave settings

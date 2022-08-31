@@ -20,6 +20,8 @@ export interface StaticSecrets {
   twilioApiKey: aws.ssm.Parameter;
   twilioApiKeySecret: aws.ssm.Parameter;
   sendgridApiKey: aws.ssm.Parameter;
+  idologyUsername: aws.ssm.Parameter;
+  idologyPassword: aws.ssm.Parameter;
 }
 
 interface SecretConstants {
@@ -27,6 +29,7 @@ interface SecretConstants {
   workos: Workos;
   twilio: Twilio;
   sendgrid: Sendgrid;
+  idology: IDology;
 }
 
 interface ElasticSecrets {
@@ -44,6 +47,11 @@ interface Twilio {
 
 interface Sendgrid {
   apiKey: string;
+}
+
+interface IDology {
+  username: string;
+  password: string;
 }
 
 export async function LoadSecrets(
@@ -128,6 +136,14 @@ export async function LoadSecrets(
     sendgridApiKey: createSecretParameter(
       `sendgridApiKey-${stack}`,
       secretConstants.sendgrid.apiKey,
+    ),
+    idologyUsername: createSecretParameter(
+      `idologyUsername-${stack}`,
+      secretConstants.idology.username,
+    ),
+    idologyPassword: createSecretParameter(
+      `idologyPassword-${stack}`,
+      secretConstants.idology.password,
     ),
   };
 }

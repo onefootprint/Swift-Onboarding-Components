@@ -79,11 +79,6 @@ define_newtype_id!(
     "Identifier for a verification request"
 );
 define_newtype_id!(VerificationResultId, Uuid, "Identifier for a verification result");
-define_newtype_id!(
-    VerificationRequestUserDataId,
-    Uuid,
-    "Identifier for the junction table that joins verification requests and user data"
-);
 define_newtype_id!(AuditTrailId, Uuid, "Identifier for an audit trail");
 define_newtype_id!(
     KeyValueDataId,

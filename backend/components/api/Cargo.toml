@@ -43,7 +43,6 @@ aws-config = "0.47.0"
 aws-sdk-kms = "0.17.0"
 thiserror = "1.0"
 enclave_proxy = { path = "../enclave/proxy", default-features = false }
-db = { path = "../db" }
 
 serde_json = { version = "1.0" }
 serde_cbor = "0.11"
@@ -80,7 +79,9 @@ strum = { version = "0.24" }
 
 workos = "0.2"
 
+db = { path = "../db" }
 twilio = { path = "../twilio"}
+idv = { path = "../idv" }
 
 [dev-dependencies]
 test-case = "2.1.0"

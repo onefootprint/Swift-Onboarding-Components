@@ -1,4 +1,4 @@
-use newtypes::{PiiString, ValidatedPhoneNumber};
+use newtypes::ValidatedPhoneNumber;
 use std::fmt::Debug;
 
 use self::client::IdologyApiError;
@@ -10,7 +10,7 @@ pub enum Error {
     #[error("socure type conversion error: {0}")]
     ConversionEror(#[from] ConversionError),
     #[error("internal reqwest error: {0}")]
-    InernalReqwestError(#[from] ReqwestError),
+    ReqwestError(#[from] ReqwestError),
     // TODO: don't show this
     #[error("error from idology api: {0}")]
     IdologyErrorResponse(IdologyApiError),
@@ -24,6 +24,8 @@ pub enum ConversionError {
     MissingLastName,
     #[error("Address must be provided")]
     MissingAddress,
+    #[error("Could not parse DOB")]
+    CantParseDob,
     #[error("zip code is unsupported length for socure API validation")]
     UnsupportedZipFormat,
     #[error("phone number must be 10 digits")]
@@ -39,5 +41,5 @@ pub enum ReqwestError {
     #[error("error setting api headers: {0}")]
     InvalidHeader(#[from] reqwest::header::InvalidHeaderValue),
     #[error("error sending request to socure api: {0}")]
-    ReqwestSendError(String),
+    SendError(String),
 }

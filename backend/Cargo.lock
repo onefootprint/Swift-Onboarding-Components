@@ -1899,6 +1899,7 @@ dependencies = [
  "envconfig",
  "futures",
  "futures-util",
+ "idv",
  "itertools",
  "lazy_static",
  "log",
@@ -2356,6 +2357,20 @@ dependencies = [
  "matches",
  "unicode-bidi",
  "unicode-normalization",
+]
+
+[[package]]
+name = "idv"
+version = "0.1.0"
+dependencies = [
+ "actix-rt",
+ "chrono",
+ "dotenv",
+ "newtypes",
+ "reqwest",
+ "serde",
+ "serde_json",
+ "thiserror",
 ]
 
 [[package]]

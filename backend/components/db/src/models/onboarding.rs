@@ -120,6 +120,7 @@ impl Onboarding {
     }
 
     pub fn update_status(self, conn: &mut PgConnection, new_status: Status) -> Result<(), DbError> {
+        // Intentionally consume the value so the stale version is not used
         diesel::update(onboarding::table)
             .filter(onboarding::id.eq(&self.id))
             .set(onboarding::status.eq(new_status))

@@ -1,14 +1,14 @@
-use newtypes::PiiString;
+use newtypes::{dob::DateOfBirth, IdvData, PiiString};
 use std::fmt::{Debug, Display};
 
-use crate::IdologyReqwestError;
+use crate::idology::{ConversionError, Error, ReqwestError};
 
 #[derive(Clone)]
 pub struct IdologyClient {
     client: reqwest::Client,
     url: String,
-    username: String,
-    password: String,
+    username: PiiString,
+    password: PiiString,
 }
 
 impl std::fmt::Debug for IdologyClient {
@@ -62,8 +62,12 @@ impl TryFrom<IdvData> for IdologyRequestData {
         let last_name = last_name.ok_or(ConversionError::MissingLastName)?;
         let address = address_line1.ok_or(ConversionError::MissingAddress)?; // TODO
         let (dob_month, dob_year, dob_day) = if let Some(dob) = dob {
-            let dob = DateOfBirth::try_from(dob);
-            (dob.month.into(), dob.year.into(), dob.day.into())
+            let dob = DateOfBirth::try_from(dob).map_err(|_| ConversionError::CantParseDob)?;
+            (
+                Some(dob.month.into()),
+                Some(dob.year.into()),
+                Some(dob.day.into()),
+            )
         } else {
             (None, None, None)
         };
@@ -87,7 +91,7 @@ impl TryFrom<IdvData> for IdologyRequestData {
     }
 }
 
-#[derive(Debug, Clone, serde:Serialize)]
+#[derive(Debug, Clone, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 struct IdologyRequest {
     username: PiiString,
@@ -151,12 +155,7 @@ struct IdologyKeyAndMessage {
 }
 
 impl IdologyClient {
-    // TODO: figure out sandbox URL
-    pub fn new(
-        username: String,
-        password: String,
-        _sandbox: bool,
-    ) -> Result<Self, crate::IdologyReqwestError> {
+    pub fn new(username: PiiString, password: PiiString) -> Result<Self, ReqwestError> {
         let url = "https://web.idologylive.com/api/idiq.svc";
         let client = reqwest::Client::builder().build()?;
         Ok(Self {
@@ -168,31 +167,29 @@ impl IdologyClient {
     }
 
     /// ExpectId module
-    pub async fn verify_expectid(
-        &self,
-        identify_request: IdentifyRequest,
-    ) -> Result<IdologySuccess, crate::IdologyError> {
-        let req_list = IdologyRequest::new(
-            PiiString::from(&self.username),
-            PiiString::from(&self.password),
-            identify_request,
-        )?;
+    pub async fn verify_expectid(&self, idv_data: IdvData) -> Result<IdologySuccess, Error> {
+        let req_list = IdologyRequest {
+            username: self.username.clone(),
+            password: self.password.clone(),
+            age_to_check: 13, // TODO
+            data: IdologyRequestData::try_from(idv_data)?,
+        };
         let response = self
             .client
             .get(&self.url)
             .query(&req_list)
             .send()
             .await
-            .map_err(|err| crate::IdologyReqwestError::ReqwestSendError(err.to_string()))?;
+            .map_err(|err| ReqwestError::SendError(err.to_string()))?;
 
         let idology_response: IdologyResponse = response
             .json::<IdologyResponse>()
             .await
-            .map_err(IdologyReqwestError::InternalError)?;
+            .map_err(ReqwestError::InternalError)?;
 
         let idology_response = idology_response.response;
         match idology_response {
-            IdologyResponseInner::Error(error) => Err(crate::IdologyError::IdologyErrorResponse(error)),
+            IdologyResponseInner::Error(error) => Err(Error::IdologyErrorResponse(error)),
             IdologyResponseInner::Success(success) => Ok(success),
         }
     }

@@ -5,6 +5,7 @@ use crate::auth::VerifiedUserAuth;
 use crate::errors::onboarding::OnboardingError;
 use crate::errors::ApiError;
 use crate::types::response::ApiResponseData;
+use crate::utils::idv::initiate_idv_request;
 use crate::utils::insight_headers::InsightHeaders;
 use crate::utils::user_vault_wrapper::UserVaultWrapper;
 use crate::State;
@@ -12,6 +13,7 @@ use db::models::audit_trail::AuditTrail;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::onboarding::Onboarding;
 use db::models::scoped_user::ScopedUser;
+use db::models::verification_request::VerificationRequest;
 use db::models::webauthn_credential::WebauthnCredential;
 use db::PgConnection;
 use itertools::Itertools;
@@ -59,7 +61,7 @@ fn handler(
 
     let tenant_id = tenant_auth.tenant.id.clone();
     let session_key = state.session_sealing_key.clone();
-    let (validation_token, webauthn_creds) = state
+    let (validation_token, webauthn_creds, verification_request, uvw) = state
         .db_pool
         .db_transaction(move |conn| -> Result<_, ApiError> {
             let scoped_user = ScopedUser::get_or_create(
@@ -76,12 +78,18 @@ fn handler(
                 insight_event,
             )?;
             let ob_id = ob.id.clone();
-            initiate_verification(conn, ob, &uvw, &tenant_id, decrypted_phone)?;
+            let verification_request = initiate_verification(conn, ob, &uvw, &tenant_id, decrypted_phone)?;
             let validation_token = super::create_onboarding_validation_token(conn, &session_key, ob_id)?;
             let webauthn_creds = WebauthnCredential::get_for_user_vault(conn, &uvw.user_vault.id)?;
-            Ok((validation_token, webauthn_creds))
+            Ok((validation_token, webauthn_creds, verification_request, uvw))
         })
         .await?;
+
+    if let Some(verification_request) = verification_request {
+        let idv_data = uvw.build_idv_request(&state).await?;
+        initiate_idv_request(&state, verification_request, idv_data).await?;
+    }
+
     Ok(Json(ApiResponseData {
         data: CommitResponse {
             validation_token,
@@ -96,9 +104,10 @@ fn initiate_verification(
     uvw: &UserVaultWrapper,
     tenant_id: &TenantId,
     decrypted_phone: Option<ValidatedPhoneNumber>,
-) -> Result<(), ApiError> {
+) -> Result<Option<VerificationRequest>, ApiError> {
+    // TODO decide when to re-KYC
     if ob.status == Status::Verified {
-        return Ok(());
+        return Ok(None);
     }
 
     let desired_status = if let Some(decrypted_phone) = decrypted_phone {
@@ -107,22 +116,35 @@ fn initiate_verification(
             Status::Failed
         } else if decrypted_phone.suffix.starts_with("manualreview") {
             Status::ManualReview
+        } else if decrypted_phone.suffix.starts_with("idv") {
+            Status::Processing
         } else {
             Status::Verified
         }
     } else {
+        // TODO kick off user verification with data vendors
         Status::Verified
     };
+    let scoped_user_id = ob.scoped_user_id.clone();
     ob.update_status(conn, desired_status)?;
     let final_status = match &desired_status {
         Status::Verified => VerificationInfoStatus::Verified,
         _ => VerificationInfoStatus::Failed,
     };
+    let verification_request = if desired_status == Status::Processing {
+        let request = uvw
+            .build_verification_request(scoped_user_id, Vendor::LexisNexis)
+            .save(conn)?;
+        Some(request)
+    } else {
+        None
+    };
 
     // Just create some fixture events for now
     // Don't make duplicate fixture events if the user onboards multiple times since it
     // isn't very self-explanatory for the demo
-    // TODO kick off user verification with data vendors
+    // TODO kick off user verification with data vendors,
+    // and don't mark as verified until data verification with vendors is complete
     let events = vec![
         VerificationInfo {
             data_attributes: vec![
@@ -167,6 +189,5 @@ fn initiate_verification(
             Some(tenant_id.clone()),
         )
     })?;
-    // TODO don't mark as verified until data verification with vendors is complete
-    Ok(())
+    Ok(verification_request)
 }

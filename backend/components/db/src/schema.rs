@@ -287,17 +287,9 @@ table! {
         timestamp -> Timestamptz,
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
-    }
-}
-
-table! {
-    use diesel::sql_types::*;
-    use newtypes::db_types::*;
-
-    verification_request_user_data (id) {
-        id -> Uuid,
-        user_data_id -> Text,
-        request_id -> Uuid,
+        email_id -> Nullable<Text>,
+        phone_number_id -> Nullable<Text>,
+        identity_data_id -> Nullable<Text>,
     }
 }
 
@@ -352,8 +344,10 @@ joinable!(scoped_user -> tenant (tenant_id));
 joinable!(scoped_user -> user_vault (user_vault_id));
 joinable!(tenant_api_key -> tenant (tenant_id));
 joinable!(tenant_api_key_access_log -> tenant_api_key (tenant_api_key_id));
+joinable!(verification_request -> email (email_id));
+joinable!(verification_request -> identity_data (identity_data_id));
+joinable!(verification_request -> phone_number (phone_number_id));
 joinable!(verification_request -> scoped_user (scoped_user_id));
-joinable!(verification_request_user_data -> verification_request (request_id));
 joinable!(verification_result -> verification_request (request_id));
 joinable!(webauthn_credential -> insight_event (insight_event_id));
 joinable!(webauthn_credential -> user_vault (user_vault_id));
@@ -376,7 +370,6 @@ allow_tables_to_appear_in_same_query!(
     tenant_api_key_access_log,
     user_vault,
     verification_request,
-    verification_request_user_data,
     verification_result,
     webauthn_credential,
 );

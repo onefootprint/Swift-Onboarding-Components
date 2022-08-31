@@ -20,17 +20,17 @@ pub struct Dob {
     year: Year,
 }
 
-#[derive(Clone, Hash, PartialEq, Eq, Serialize, Deserialize, Default)]
+#[derive(Display, Clone, Hash, PartialEq, Eq, Serialize, Deserialize, Default)]
 #[serde(try_from = "u32")]
 pub struct Day(u32);
 api_data_type_alias!(Day, Number);
 
-#[derive(Clone, Hash, PartialEq, Eq, Serialize, Deserialize, Default)]
+#[derive(Display, Clone, Hash, PartialEq, Eq, Serialize, Deserialize, Default)]
 #[serde(try_from = "u32")]
 pub struct Month(u32);
 api_data_type_alias!(Month, Number);
 
-#[derive(Clone, Hash, PartialEq, Eq, Serialize, Deserialize, Default)]
+#[derive(Display, Clone, Hash, PartialEq, Eq, Serialize, Deserialize, Default)]
 #[serde(try_from = "i32")]
 pub struct Year(i32);
 api_data_type_alias!(Year, Number);

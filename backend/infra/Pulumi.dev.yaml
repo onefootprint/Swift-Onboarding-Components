@@ -14,6 +14,11 @@ config:
         secure: v1:lefOi07p1WAkmMbb:6IK3746SDP+nra5/Tpym+AisWeELd2cSzgcTNbdzxBcaSQ==
       apmEndpoint: 66e04f7b644c4d1c98e26e58b75de669.apm.us-east-2.aws.elastic-cloud.com:443
     enclaveCertPCR8: 48cb393ec504192fb147ffb2818c2a00c8e2d74659b509cc449a48ffe1c257a266b6a9f9ac356c4cd38a6c11825dd600
+    idology:
+      password:
+        secure: v1:Rk5EZ6keUqnw066d:fCNqWqMEzFq9Geie4rUOm5360TP4kXw2shCH1JNt
+      username:
+        secure: v1:3kpKRcKvbF9J5E1k:nwO8yMGnWkWig376jwmqCNpsunScZZiGxn/9DZJAGM84
     resources:
       cpuUnits: 256
       instances: 2

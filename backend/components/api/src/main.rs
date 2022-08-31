@@ -1,12 +1,10 @@
-use actix_web::{
-    middleware::{Logger},
-    App, HttpServer, ResponseError,
-};
+use actix_web::{middleware::Logger, App, HttpServer, ResponseError};
 use config::Config;
 use crypto::aead::ScopedSealingKey;
 use db::DbPool;
 use enclave_client::EnclaveClient;
 
+use idv::idology::client::IdologyClient;
 use signed_hash::SignedHashClient;
 use std::{borrow::Cow, sync::Arc};
 use telemetry::TelemetrySpanBuilder;
@@ -42,6 +40,7 @@ pub struct State {
     enclave_client: EnclaveClient,
     challenge_sealing_key: ScopedSealingKey,
     session_sealing_key: ScopedSealingKey,
+    idology_client: IdologyClient,
 }
 
 lazy_static::lazy_static! {
@@ -99,6 +98,12 @@ async fn main() -> std::io::Result<()> {
             config.sendgrid_magic_link_template_id.clone(),
         );
 
+        let idology_client = IdologyClient::new(
+            config.idology_config.username.clone().into(),
+            config.idology_config.password.clone().into(),
+        )
+        .unwrap();
+
         // let out = hmac_client
         //     .signed_hash(&vec![0xde, 0xad, 0xbe, 0xef])
         //     .await
@@ -136,6 +141,7 @@ async fn main() -> std::io::Result<()> {
             db_pool,
             challenge_sealing_key,
             session_sealing_key,
+            idology_client,
         }
     };
 
