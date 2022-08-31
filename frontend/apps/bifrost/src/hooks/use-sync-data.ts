@@ -1,6 +1,7 @@
 import { RequestError } from 'request/src';
 import useUserData, { UserDataObj } from 'src/hooks/use-user-data';
-import { UserData, UserDataAttribute } from 'src/utils/state-machine/types';
+import { UserData } from 'src/utils/state-machine/types';
+import { UserDataAttribute } from 'types';
 
 import { UserDataResponse } from './use-user-data/use-user-data';
 

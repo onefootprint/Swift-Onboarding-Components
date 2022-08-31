@@ -7,6 +7,7 @@ const Logout = () => {
 
   useEffect(() => {
     session.logOut();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return <Typography variant="body-1">You are logged out</Typography>;

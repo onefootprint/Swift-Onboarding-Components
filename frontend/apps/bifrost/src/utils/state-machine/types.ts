@@ -1,20 +1,5 @@
 import type { CountryCode } from 'types';
-
-export enum UserDataAttribute {
-  firstName = 'firstName',
-  lastName = 'lastName',
-  dob = 'dob',
-  email = 'email',
-  phone = 'phone_number',
-  ssn9 = 'ssn9',
-  ssn4 = 'ssn4',
-  addressLine1 = 'address_line1',
-  addressLine2 = 'address_line2',
-  city = 'city',
-  state = 'state',
-  country = 'country',
-  zip = 'zip',
-}
+import { UserDataAttribute } from 'types';
 
 export enum CollectedDataOption {
   name = 'name',
@@ -125,16 +110,6 @@ export type SSN9Information = {
 };
 
 export type SSNInformation = SSN4Information | SSN9Information;
-
-export enum IdentifyType {
-  onboarding = 'onboarding',
-  my1fp = 'my1fp',
-}
-
-export enum UserKind {
-  userInherited = 'user_inherited',
-  userCreated = 'user_created',
-}
 
 export type OnboardingData = {
   missingWebauthnCredentials: boolean;

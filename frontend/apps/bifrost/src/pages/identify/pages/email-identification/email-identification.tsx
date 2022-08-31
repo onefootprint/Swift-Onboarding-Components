@@ -8,7 +8,8 @@ import {
   ChallengeKind,
   Events,
 } from 'src/utils/state-machine/identify/types';
-import { UserData, UserDataAttribute } from 'src/utils/state-machine/types';
+import { UserData } from 'src/utils/state-machine/types';
+import { UserDataAttribute } from 'types';
 
 import generateLoginDeviceResponse from '../../../../utils/biometric/login-challenge-response';
 import useIdentifyMachine from '../../hooks/use-identify-machine';

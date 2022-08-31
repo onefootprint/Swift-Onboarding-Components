@@ -1,7 +1,8 @@
 import { DeviceInfo } from 'hooks';
+import { CollectedDataOption, TenantInfo } from 'src/utils/state-machine/types';
+import { UserDataAttribute } from 'types';
 import { interpret } from 'xstate';
 
-import { CollectedDataOption, TenantInfo } from '../types';
 import createOnboardingMachine from './machine';
 import { Events, States } from './types';
 
@@ -93,12 +94,15 @@ describe('Onboarding Machine Tests', () => {
       state = machine.send({
         type: Events.basicInformationSubmitted,
         payload: {
-          basicInformation: { firstName: 'Otto', lastName: 'Footprint' },
+          basicInformation: {
+            [UserDataAttribute.firstName]: 'Otto',
+            [UserDataAttribute.lastName]: 'Footprint',
+          },
         },
       });
       expect(state.value).toEqual(States.residentialAddress);
       context = state.context;
-      expect(context.data.firstName).toEqual('Otto');
+      expect(context.data[UserDataAttribute.firstName]).toEqual('Otto');
 
       // Navigate to prev
       state = machine.send({
@@ -108,11 +112,14 @@ describe('Onboarding Machine Tests', () => {
       state = machine.send({
         type: Events.basicInformationSubmitted,
         payload: {
-          basicInformation: { firstName: 'Diffie', lastName: 'Footprint' },
+          basicInformation: {
+            [UserDataAttribute.firstName]: 'Diffie',
+            [UserDataAttribute.lastName]: 'Footprint',
+          },
         },
       });
       context = state.context;
-      expect(context.data.firstName).toEqual('Diffie');
+      expect(context.data[UserDataAttribute.firstName]).toEqual('Diffie');
       expect(state.value).toEqual(States.residentialAddress);
 
       state = machine.send({
@@ -185,12 +192,15 @@ describe('Onboarding Machine Tests', () => {
       state = machine.send({
         type: Events.basicInformationSubmitted,
         payload: {
-          basicInformation: { firstName: 'Otto', lastName: 'Footprint' },
+          basicInformation: {
+            [UserDataAttribute.firstName]: 'Otto',
+            [UserDataAttribute.lastName]: 'Footprint',
+          },
         },
       });
       expect(state.value).toEqual(States.ssn);
       context = state.context;
-      expect(context.data.firstName).toEqual('Otto');
+      expect(context.data[UserDataAttribute.firstName]).toEqual('Otto');
 
       // Navigate to prev
       state = machine.send({
@@ -200,11 +210,14 @@ describe('Onboarding Machine Tests', () => {
       state = machine.send({
         type: Events.basicInformationSubmitted,
         payload: {
-          basicInformation: { firstName: 'Otto2', lastName: 'Footprint' },
+          basicInformation: {
+            [UserDataAttribute.firstName]: 'Otto2',
+            [UserDataAttribute.lastName]: 'Footprint',
+          },
         },
       });
       context = state.context;
-      expect(context.data.firstName).toEqual('Otto2');
+      expect(context.data[UserDataAttribute.firstName]).toEqual('Otto2');
       expect(state.value).toEqual(States.ssn);
 
       state = machine.send({

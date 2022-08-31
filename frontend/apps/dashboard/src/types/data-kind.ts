@@ -1,18 +1,4 @@
-export enum DataKinds {
-  firstName = 'first_name',
-  lastName = 'last_name',
-  email = 'email',
-  phoneNumber = 'phone_number',
-  ssn9 = 'ssn9',
-  ssn4 = 'ssn4',
-  dob = 'dob',
-  addressLine1 = 'address_line1',
-  addressLine2 = 'address_line2',
-  city = 'city',
-  state = 'state',
-  zip = 'zip',
-  country = 'country',
-}
+import { UserDataAttribute } from 'types';
 
 export enum CollectedDataOption {
   name = 'name',
@@ -25,17 +11,17 @@ export enum CollectedDataOption {
   phoneNumber = 'phone_number',
 }
 
-export type DataKind = keyof typeof DataKinds;
+export type DataKind = keyof typeof UserDataAttribute;
 
 export const dataKindToType = Object.fromEntries(
-  Object.entries(DataKinds).map(x => [x[1], x[0]]),
-) as Record<DataKinds, DataKind>;
+  Object.entries(UserDataAttribute).map(x => [x[1], x[0]]),
+) as Record<UserDataAttribute, DataKind>;
 
 export const ALL_FIELDS: DataKind[] = [
   'firstName',
   'lastName',
   'email',
-  'phoneNumber',
+  'phone',
   'ssn9',
   'ssn4',
   'dob',
@@ -48,19 +34,19 @@ export const ALL_FIELDS: DataKind[] = [
 ];
 
 export const dataKindToDisplayName: Record<string, String> = {
-  [DataKinds.firstName]: 'First name',
-  [DataKinds.lastName]: 'Last name',
-  [DataKinds.email]: 'Email',
-  [DataKinds.phoneNumber]: 'Phone number',
-  [DataKinds.ssn9]: 'SSN (Full)',
-  [DataKinds.ssn4]: 'SSN (Last 4)',
-  [DataKinds.dob]: 'Date of birth',
-  [DataKinds.addressLine1]: 'Address line 1',
-  [DataKinds.addressLine2]: 'Address line 2',
-  [DataKinds.city]: 'City',
-  [DataKinds.state]: 'State',
-  [DataKinds.zip]: 'Zip code',
-  [DataKinds.country]: 'Country',
+  [UserDataAttribute.firstName]: 'First name',
+  [UserDataAttribute.lastName]: 'Last name',
+  [UserDataAttribute.email]: 'Email',
+  [UserDataAttribute.phone]: 'Phone number',
+  [UserDataAttribute.ssn9]: 'SSN (Full)',
+  [UserDataAttribute.ssn4]: 'SSN (Last 4)',
+  [UserDataAttribute.dob]: 'Date of birth',
+  [UserDataAttribute.addressLine1]: 'Address line 1',
+  [UserDataAttribute.addressLine2]: 'Address line 2',
+  [UserDataAttribute.city]: 'City',
+  [UserDataAttribute.state]: 'State',
+  [UserDataAttribute.zip]: 'Zip code',
+  [UserDataAttribute.country]: 'Country',
 };
 
 export type DecryptedUserAttributes = Record<DataKind, string>;

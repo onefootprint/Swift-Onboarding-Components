@@ -4,7 +4,7 @@ import {
   ChallengeData,
   ChallengeKind,
 } from 'src/utils/state-machine/identify/types';
-import { IdentifyType } from 'src/utils/state-machine/types';
+import { IdentifyType } from 'types';
 
 import getRetryDisabledUntil from './get-retry-disabled-until';
 

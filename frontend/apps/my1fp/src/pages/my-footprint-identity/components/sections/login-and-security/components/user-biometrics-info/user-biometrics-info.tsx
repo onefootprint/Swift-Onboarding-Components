@@ -2,8 +2,8 @@ import { useTranslation } from 'hooks';
 import { IcoClose16 } from 'icons';
 import React from 'react';
 import useSessionUser from 'src/hooks/use-session-user';
-import { InsightEvent } from 'src/types';
 import styled from 'styled-components';
+import { InsightEvent } from 'types';
 import { Box, LoadingIndicator, Typography } from 'ui';
 
 import useGetLiveness, {

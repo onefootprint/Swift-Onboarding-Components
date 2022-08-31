@@ -2,11 +2,11 @@ import { useMemo } from 'react';
 import {
   ALL_FIELDS,
   DataKind,
-  DataKinds,
   OnboardingStatus,
   ScopedUser,
   statusToPriority,
 } from 'src/types';
+import { UserDataAttribute } from 'types';
 
 import { UserAttributes, UserData } from './use-user-data';
 
@@ -58,7 +58,7 @@ const useJoinUsers = (
               exists:
                 decryptedData[dataKind]?.exists ||
                 scoped_user.identityDataAttributes.includes(
-                  DataKinds[dataKind],
+                  UserDataAttribute[dataKind],
                 ),
             } as UserData,
           ]),

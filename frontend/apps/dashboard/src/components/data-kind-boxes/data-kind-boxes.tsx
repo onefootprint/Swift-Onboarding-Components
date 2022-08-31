@@ -36,9 +36,9 @@ const DataKindBoxes = ({
       />
       <Checkbox
         label="Phone number"
-        disabled={isFieldDisabled('phoneNumber')}
-        checked={isFieldSelected('phoneNumber')}
-        onChange={setFieldFor('phoneNumber')}
+        disabled={isFieldDisabled('phone')}
+        checked={isFieldSelected('phone')}
+        onChange={setFieldFor('phone')}
       />
     </DataGridItem>
     <DataGridItem sx={{ gridArea: '2 / 1 / span 1 / span 1' }}>

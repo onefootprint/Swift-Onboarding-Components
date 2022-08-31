@@ -2,8 +2,9 @@ import { useTranslation } from 'hooks';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import useIsSandbox from 'src/hooks/use-is-sandbox';
-import { UserData, UserDataAttribute } from 'src/utils/state-machine/types';
+import { UserData } from 'src/utils/state-machine/types';
 import styled, { css } from 'styled-components';
+import { UserDataAttribute } from 'types';
 import { Button, TextInput } from 'ui';
 
 import EMAIL_SANDBOX_REGEX from './email-identification-form.constants';

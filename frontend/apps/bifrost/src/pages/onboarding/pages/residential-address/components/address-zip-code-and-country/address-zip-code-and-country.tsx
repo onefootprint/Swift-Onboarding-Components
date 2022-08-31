@@ -5,11 +5,9 @@ import { Controller, useForm } from 'react-hook-form';
 import ProgressHeader from 'src/pages/onboarding/components/progress-header';
 import useOnboardingMachine from 'src/pages/onboarding/hooks/use-onboarding-machine';
 import { isMissingSsnAttribute } from 'src/utils/state-machine/onboarding/utils/missing-attributes';
-import {
-  ResidentialZipCodeAndCountry,
-  UserDataAttribute,
-} from 'src/utils/state-machine/types';
+import { ResidentialZipCodeAndCountry } from 'src/utils/state-machine/types';
 import styled, { css } from 'styled-components';
+import { UserDataAttribute } from 'types';
 import { Button, CountrySelect, CountrySelectOption, TextInput } from 'ui';
 
 import useInputValidations from '../../hooks/use-input-validations';

@@ -1,19 +1,4 @@
-import { InsightEvent } from 'src/types';
-
-export enum UserDataAttribute {
-  firstName = 'firstName',
-  lastName = 'lastName',
-  dob = 'dob',
-  email = 'email',
-  phone = 'phone_number',
-  ssn = 'ssn',
-  streetAddress = 'streetAddress',
-  streetAddress2 = 'streetAddress2',
-  city = 'city',
-  state = 'state',
-  country = 'country',
-  zip = 'zip',
-}
+import { InsightEvent, UserDataAttribute } from 'types';
 
 export type AuthorizedOrgOnboarding = {
   canAccessData: UserDataAttribute[];

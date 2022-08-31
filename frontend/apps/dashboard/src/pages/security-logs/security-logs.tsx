@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import Timeline from 'src/components/timeline';
-import { AccessEvent } from 'src/types';
 import styled from 'styled-components';
+import { AccessEvent } from 'types';
 import { Box, Divider, SearchInput, Typography } from 'ui';
 
 import Dot from './components/dot';

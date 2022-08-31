@@ -1,5 +1,5 @@
 import { DeviceInfo } from 'hooks';
-import { IdentifyType } from 'src/utils/state-machine/types';
+import { IdentifyType } from 'types';
 
 export enum States {
   emailIdentification = 'emailIdentification',

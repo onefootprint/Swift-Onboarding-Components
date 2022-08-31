@@ -1,7 +1,8 @@
 import React from 'react';
-import { AccessEvent, getRegionForInsightEvent } from 'src/types';
+import getRegionForInsightEvent from 'src/utils/insight-event-region';
 import { displayForUserAgent } from 'src/utils/user-agent';
 import styled, { css } from 'styled-components';
+import { AccessEvent } from 'types';
 import { Box, CodeInline, Typography } from 'ui';
 
 type SecurityLogBodyProps = {

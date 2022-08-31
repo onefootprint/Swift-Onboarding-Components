@@ -5,7 +5,7 @@ import {
 } from '@tanstack/react-query';
 import request, { RequestError } from 'request';
 import useSessionUser, { AuthHeaders } from 'src/hooks/use-session-user';
-import { InsightEvent } from 'src/types/insight-event';
+import { InsightEvent } from 'types';
 
 type LivenessRequestQueryString = {
   footprintUserId: string;

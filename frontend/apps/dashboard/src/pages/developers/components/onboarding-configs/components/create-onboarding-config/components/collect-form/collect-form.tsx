@@ -2,7 +2,8 @@ import { useAutoAnimate } from '@formkit/auto-animate/react';
 import { useTranslation } from 'hooks';
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { CollectedDataOption, DataKinds } from 'src/types/data-kind';
+import { CollectedDataOption } from 'src/types/data-kind';
+import { UserDataAttribute } from 'types';
 import { Box, Checkbox, RadioInput } from 'ui';
 
 import type { DataKindForm } from '../../create-onboarding-config.types';
@@ -14,7 +15,7 @@ type FormData = DataKindForm & {
     | CollectedDataOption.partialAddress;
   showAddressOptions: boolean;
   showSSNOptions: boolean;
-  ssnKind?: DataKinds.ssn4 | DataKinds.ssn9;
+  ssnKind?: UserDataAttribute.ssn4 | UserDataAttribute.ssn9;
 };
 
 type CollectFormProps = {
@@ -45,10 +46,10 @@ const CollectForm = ({ defaultValues, onSubmit }: CollectFormProps) => {
 
   const getInitialSSNKind = () => {
     if (defaultValues.ssn9) {
-      return DataKinds.ssn9;
+      return UserDataAttribute.ssn9;
     }
     if (defaultValues.ssn4) {
-      return DataKinds.ssn4;
+      return UserDataAttribute.ssn4;
     }
     return undefined;
   };
@@ -66,7 +67,7 @@ const CollectForm = ({ defaultValues, onSubmit }: CollectFormProps) => {
   const handleSSNKindsChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { checked } = event.target;
     setInnerFields(prevState => ({ ...prevState, ssn: checked }));
-    setValue('ssnKind', checked ? DataKinds.ssn9 : undefined);
+    setValue('ssnKind', checked ? UserDataAttribute.ssn9 : undefined);
   };
 
   const handleAddressChanged = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -88,8 +89,8 @@ const CollectForm = ({ defaultValues, onSubmit }: CollectFormProps) => {
     } = formData;
     onSubmit({
       ...rest,
-      [DataKinds.ssn4]: ssnKind === DataKinds.ssn4,
-      [DataKinds.ssn9]: ssnKind === DataKinds.ssn9,
+      [UserDataAttribute.ssn4]: ssnKind === UserDataAttribute.ssn4,
+      [UserDataAttribute.ssn9]: ssnKind === UserDataAttribute.ssn9,
       [CollectedDataOption.fullAddress]:
         addressKind === CollectedDataOption.fullAddress,
       [CollectedDataOption.partialAddress]:
@@ -119,7 +120,7 @@ const CollectForm = ({ defaultValues, onSubmit }: CollectFormProps) => {
       />
       <Checkbox
         label={allT('collected-data-options.dob')}
-        {...register(DataKinds.dob)}
+        {...register(UserDataAttribute.dob)}
       />
       <Checkbox
         label={t('collect-form.ssn')}
@@ -130,12 +131,12 @@ const CollectForm = ({ defaultValues, onSubmit }: CollectFormProps) => {
         {innerFields.ssn && (
           <Box sx={{ marginLeft: 5, marginBottom: 3 }}>
             <RadioInput
-              value={DataKinds.ssn9}
+              value={UserDataAttribute.ssn9}
               label={t('collect-form.ssn_full')}
               {...register('ssnKind')}
             />
             <RadioInput
-              value={DataKinds.ssn4}
+              value={UserDataAttribute.ssn4}
               label={t('collect-form.ssn_last_4')}
               {...register('ssnKind')}
             />

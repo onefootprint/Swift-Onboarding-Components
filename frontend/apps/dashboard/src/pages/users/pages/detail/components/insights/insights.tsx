@@ -2,7 +2,7 @@ import GoogleMapReact from 'google-map-react';
 import { IcoCheckCircle16, IcoClose16 } from 'icons';
 import React from 'react';
 import { User } from 'src/pages/users/hooks/use-join-users';
-import { getRegionForInsightEvent } from 'src/types';
+import getRegionForInsightEvent from 'src/utils/insight-event-region';
 import { displayForUserAgent, icoForUserAgent } from 'src/utils/user-agent';
 import styled, { css } from 'styled-components';
 import { Box, Divider, Shimmer, Typography } from 'ui';

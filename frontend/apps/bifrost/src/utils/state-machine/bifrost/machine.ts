@@ -1,4 +1,4 @@
-import { IdentifyType } from 'src/utils/state-machine/types';
+import { IdentifyType } from 'types';
 import { assign, createMachine } from 'xstate';
 
 import createIdentifyMachine from '../identify';

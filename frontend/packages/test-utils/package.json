@@ -27,7 +27,8 @@
     "tsconfig": "*",
     "tsup": "^6.2.2",
     "typescript": "^4.7.4",
-    "ui": "*"
+    "ui": "*",
+    "types": "*"
   },
   "jest": {
     "preset": "jest-presets/jest/web"

@@ -30,7 +30,8 @@
     "request": "*",
     "styled-components": "^5.3.5",
     "themes": "*",
-    "ui": "*"
+    "ui": "*",
+    "types": "*"
   },
   "devDependencies": {
     "@next/bundle-analyzer": "^12.1.6",

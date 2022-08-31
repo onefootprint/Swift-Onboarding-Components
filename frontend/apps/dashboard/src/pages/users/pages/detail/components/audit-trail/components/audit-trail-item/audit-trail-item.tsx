@@ -11,7 +11,6 @@ import { TimelineItem } from 'src/components/timeline/timeline';
 import {
   AuditTrail,
   AuditTrailEvent,
-  DataKinds,
   dataKindToDisplayName,
   LivenessCheckInfo,
   Vendor,
@@ -19,22 +18,23 @@ import {
   VerificationInfo,
   VerificationInfoStatus,
 } from 'src/types';
+import { UserDataAttribute } from 'types';
 import { Tag, Typography } from 'ui';
 
 const iconForDataKind = {
-  [DataKinds.firstName]: IcoUser16,
-  [DataKinds.lastName]: IcoUser16,
-  [DataKinds.email]: IcoUser16,
-  [DataKinds.phoneNumber]: IcoPhone16,
-  [DataKinds.ssn9]: IcoUser16,
-  [DataKinds.ssn4]: IcoUser16,
-  [DataKinds.dob]: IcoUser16,
-  [DataKinds.addressLine1]: IcoBuilding16,
-  [DataKinds.addressLine2]: IcoBuilding16,
-  [DataKinds.city]: IcoBuilding16,
-  [DataKinds.state]: IcoBuilding16,
-  [DataKinds.zip]: IcoBuilding16,
-  [DataKinds.country]: IcoBuilding16,
+  [UserDataAttribute.firstName]: IcoUser16,
+  [UserDataAttribute.lastName]: IcoUser16,
+  [UserDataAttribute.email]: IcoUser16,
+  [UserDataAttribute.phone]: IcoPhone16,
+  [UserDataAttribute.ssn9]: IcoUser16,
+  [UserDataAttribute.ssn4]: IcoUser16,
+  [UserDataAttribute.dob]: IcoUser16,
+  [UserDataAttribute.addressLine1]: IcoBuilding16,
+  [UserDataAttribute.addressLine2]: IcoBuilding16,
+  [UserDataAttribute.city]: IcoBuilding16,
+  [UserDataAttribute.state]: IcoBuilding16,
+  [UserDataAttribute.zip]: IcoBuilding16,
+  [UserDataAttribute.country]: IcoBuilding16,
 };
 
 const detailsForLivenessEvent = (data: LivenessCheckInfo) => ({
@@ -89,7 +89,14 @@ const detailsForVerificationEvent = (data: VerificationInfo) => {
       (a: Icon, b: Icon) =>
         icons.filter(v => v === a).length - icons.filter(v => v === b).length,
     )
-    .pop()!;
+    .pop();
+  if (!HeaderIcon) {
+    return {
+      headerComponent: null,
+      iconComponent: null,
+    };
+  }
+
   const iconComponent = <HeaderIcon />;
   const text =
     data.status === VerificationInfoStatus.Verified

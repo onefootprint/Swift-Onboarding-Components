@@ -1,6 +1,6 @@
 import { useMutation } from '@tanstack/react-query';
 import request, { RequestError } from 'request';
-import { IdentifyType } from 'src/utils/state-machine/types';
+import { IdentifyType } from 'types';
 
 import getRetryDisabledUntil from './get-retry-disabled-until';
 

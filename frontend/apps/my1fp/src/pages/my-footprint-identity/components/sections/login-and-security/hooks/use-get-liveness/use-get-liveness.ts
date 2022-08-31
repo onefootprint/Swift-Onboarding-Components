@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import request, { RequestError } from 'request';
 import { MY1FP_AUTH_HEADER } from 'src/config/constants';
 import useSessionUser from 'src/hooks/use-session-user';
-import { InsightEvent } from 'src/types';
+import { InsightEvent } from 'types';
 
 export type GetLivenessRequest = {
   authToken: string;

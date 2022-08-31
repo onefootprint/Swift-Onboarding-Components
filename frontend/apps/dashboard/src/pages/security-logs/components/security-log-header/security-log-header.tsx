@@ -1,5 +1,5 @@
 import React from 'react';
-import { AccessEvent } from 'src/types';
+import { AccessEvent } from 'types';
 import { Typography } from 'ui';
 
 import FieldTagList from '../field-tag-list';

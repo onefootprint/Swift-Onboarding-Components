@@ -1,6 +1,6 @@
 import { useMutation } from '@tanstack/react-query';
 import request, { RequestError } from 'request';
-import { UserKind } from 'src/utils/state-machine/types';
+import { IdentifyUserKind } from 'types';
 
 export type IdentifyVerifyRequest = {
   challengeResponse: string; // either biometric response or the 6 code digit sent via sms
@@ -8,7 +8,7 @@ export type IdentifyVerifyRequest = {
 };
 
 export type IdentifyVerifyResponse = {
-  kind: UserKind;
+  kind: IdentifyUserKind;
   authToken: string;
 };
 

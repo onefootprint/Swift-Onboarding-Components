@@ -2,7 +2,8 @@ import { useMutation } from '@tanstack/react-query';
 import { partial } from 'lodash';
 import request, { RequestError } from 'request';
 import useSessionUser, { AuthHeaders } from 'src/hooks/use-session-user';
-import { DataKind, DataKinds, DecryptedUserAttributes } from 'src/types';
+import { DataKind, DecryptedUserAttributes } from 'src/types';
+import { UserDataAttribute } from 'types';
 
 import useUserData from './use-user-data';
 
@@ -50,7 +51,7 @@ const useDecryptUser = () => {
     // decrypted values
     const req: DecryptUserRequest = {
       footprintUserId: userId,
-      fields: fieldsToDecrypt.map(x => DataKinds[x]),
+      fields: fieldsToDecrypt.map(x => UserDataAttribute[x]),
       reason,
     };
     decryptUserMutation

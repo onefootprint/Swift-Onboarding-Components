@@ -6,8 +6,9 @@ import {
   isMissingResidentialAttribute,
   isMissingSsnAttribute,
 } from 'src/utils/state-machine/onboarding/utils/missing-attributes';
-import { UserData, UserDataAttribute } from 'src/utils/state-machine/types';
+import { UserData } from 'src/utils/state-machine/types';
 import styled, { css } from 'styled-components';
+import { UserDataAttribute } from 'types';
 import { Button, Grid, TextInput } from 'ui';
 
 import ProgressHeader from '../../../../components/progress-header/progress-header';
@@ -42,8 +43,8 @@ const NameForm = ({ isMutationLoading, onSubmit }: NameFormProps) => {
 
   const onSubmitFormData = (formData: FormData) => {
     const basicInformation = {
-      firstName: formData.firstName,
-      lastName: formData.lastName,
+      [UserDataAttribute.firstName]: formData[UserDataAttribute.firstName],
+      [UserDataAttribute.lastName]: formData[UserDataAttribute.lastName],
     };
     onSubmit(basicInformation);
   };
@@ -60,8 +61,11 @@ const NameForm = ({ isMutationLoading, onSubmit }: NameFormProps) => {
         <Grid.Row>
           <Grid.Column col={6}>
             <TextInput
-              hasError={!!errors.firstName}
-              hintText={errors.firstName && t('form.first-name.error')}
+              hasError={!!errors[UserDataAttribute.firstName]}
+              hintText={
+                errors[UserDataAttribute.firstName] &&
+                t('form.first-name.error')
+              }
               label={t('form.first-name.label')}
               placeholder={t('form.first-name.placeholder')}
               {...register(UserDataAttribute.firstName, { required: true })}
@@ -69,8 +73,10 @@ const NameForm = ({ isMutationLoading, onSubmit }: NameFormProps) => {
           </Grid.Column>
           <Grid.Column col={6}>
             <TextInput
-              hasError={!!errors.lastName}
-              hintText={errors.lastName && t('form.last-name.error')}
+              hasError={!!errors[UserDataAttribute.lastName]}
+              hintText={
+                errors[UserDataAttribute.lastName] && t('form.last-name.error')
+              }
               label={t('form.last-name.label')}
               placeholder={t('form.last-name.placeholder')}
               {...register(UserDataAttribute.lastName, { required: true })}

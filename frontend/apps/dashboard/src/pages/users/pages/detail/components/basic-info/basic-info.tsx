@@ -23,7 +23,7 @@ const BasicInfo = ({ user }: BasicInfoProps) => {
           { title: 'Email', data: userAttributes.email },
           {
             title: 'Phone number',
-            data: userAttributes.phoneNumber,
+            data: userAttributes.phone,
           },
         ]}
       />

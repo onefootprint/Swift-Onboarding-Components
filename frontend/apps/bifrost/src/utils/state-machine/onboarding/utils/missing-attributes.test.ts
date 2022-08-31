@@ -1,4 +1,6 @@
-import { CollectedDataOption, UserDataAttribute } from '../../types';
+import { UserDataAttribute } from 'types';
+
+import { CollectedDataOption } from '../../types';
 import { States } from '../types';
 import {
   getCurrentStepFromMissingAttributes,

@@ -1,10 +1,11 @@
-import { CollectedDataOption, DataKinds } from './data-kind';
-import { InsightEvent } from './insight-event';
+import { InsightEvent, UserDataAttribute } from 'types';
+
+import { CollectedDataOption } from './data-kind';
 import { OnboardingStatus } from './onboarding-status';
 
 export type ScopedUser = {
   footprintUserId: string;
-  identityDataAttributes: DataKinds[];
+  identityDataAttributes: UserDataAttribute[];
   startTimestamp: string;
   orderingId: string;
   onboardings: Onboarding[];
@@ -14,7 +15,7 @@ export type ScopedUser = {
 export type Onboarding = {
   status: OnboardingStatus;
   canAccessData: CollectedDataOption[];
-  canAccessDataAttributes: DataKinds[];
+  canAccessDataAttributes: UserDataAttribute[];
   name: string;
   description?: string;
   insightEvent: InsightEvent;

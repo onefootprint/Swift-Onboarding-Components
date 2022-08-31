@@ -5,11 +5,9 @@ import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import ProgressHeader from 'src/pages/onboarding/components/progress-header';
 import { isMissingSsnAttribute } from 'src/utils/state-machine/onboarding/utils/missing-attributes';
-import {
-  ResidentialAddressFull,
-  UserDataAttribute,
-} from 'src/utils/state-machine/types';
+import { ResidentialAddressFull } from 'src/utils/state-machine/types';
 import styled, { css } from 'styled-components';
+import { UserDataAttribute } from 'types';
 import {
   AddressInput,
   Button,

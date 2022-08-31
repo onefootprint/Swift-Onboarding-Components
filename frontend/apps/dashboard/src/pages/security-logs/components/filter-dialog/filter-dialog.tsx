@@ -14,12 +14,12 @@ import DateRangeSelector, {
 } from 'src/components/date-range-selector';
 import {
   DataKind,
-  DataKinds,
   dataKindToType,
   getDateRange,
   serializeDateRange,
 } from 'src/types';
 import styled from 'styled-components';
+import { UserDataAttribute } from 'types';
 import { Box, Button, Dialog, Divider, Typography } from 'ui';
 
 import { useFilters } from '../../hooks/use-filters';
@@ -49,7 +49,7 @@ const FilterDialog = () => {
     }
     const fields = Object.entries(selectedFields)
       .filter(x => x[1])
-      .map(x => DataKinds[x[0] as DataKind])
+      .map(x => UserDataAttribute[x[0] as DataKind])
       .join(',');
     setFilter({
       dataKinds: fields,
@@ -69,7 +69,7 @@ const FilterDialog = () => {
     const dataKindsStr = filters.dataKinds || '';
     const initialSelectedFields = (
       dataKindsStr.length ? dataKindsStr.split(',') : []
-    ).map(x => dataKindToType[x as DataKinds]);
+    ).map(x => dataKindToType[x as UserDataAttribute]);
     clearSelectedFields(initialSelectedFields);
     const [dateRange, customDateStart, customDateEnd] = getDateRange(filters);
     setValue('dateRange', dateRange);

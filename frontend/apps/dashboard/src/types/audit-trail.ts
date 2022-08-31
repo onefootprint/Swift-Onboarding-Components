@@ -1,4 +1,5 @@
-import { DataKinds } from './data-kind';
+import { UserDataAttribute } from 'types';
+
 import { Vendor } from './vendor';
 
 export type LivenessCheckInfo = {
@@ -15,7 +16,7 @@ export enum VerificationInfoStatus {
 }
 
 export type VerificationInfo = {
-  dataAttributes: DataKinds[];
+  dataAttributes: UserDataAttribute[];
   vendor: Vendor;
   status: VerificationInfoStatus;
 };

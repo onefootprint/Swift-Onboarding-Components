@@ -1,7 +1,7 @@
 import { DeviceInfo } from 'hooks';
+import { IdentifyType } from 'types';
 import { interpret } from 'xstate';
 
-import { IdentifyType } from '../types';
 import createIdentifyMachine from './machine';
 import { ChallengeKind, Events, States } from './types';
 
