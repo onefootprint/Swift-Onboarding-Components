@@ -62,29 +62,6 @@ const getStaticProps: GetStaticProps = () => {
       excerpt:
         'Being a digital citizen requires using identity credentials, including SSN, DL, DOB, education and employment history, income, and more, online. Current verification processes are broken, though. They add...',
     },
-    {
-      id: '2',
-      imageAlt: 'Footprint logo',
-      url: 'https://www.finsmes.com/2022/08/footprint-raises-6m-in-seed-funding.html',
-      imageUrl: '/media/finsmes.png',
-      createdAt: 'Aug 3, 2022',
-      website: 'FINSMES',
-      title: 'Footprint Raises $6M in Seed Funding',
-      excerpt:
-        'Footprint, a NYC-based company that allows companies to securely onboard users, raised $6m in Seed funding.',
-    },
-    {
-      id: '1',
-      imageAlt: 'Footprint logo',
-      url: 'https://www.prweb.com/releases/2022/8/prweb18825423.htm',
-      imageUrl: '/media/pr-web.png',
-      createdAt: 'Aug 3, 2022',
-      website: 'PRWeb',
-      title:
-        'Footprint Emerges From Stealth to Create the Last Identity Form You Will Ever Fill Out',
-      excerpt:
-        'Footprint, a new company that allows companies with just five lines of code to frictionlessly and securely onboard users, launched today, with $6 million in Seed funding. The company wants to put peo...',
-    },
   ];
   return { props: { articles } };
 };
