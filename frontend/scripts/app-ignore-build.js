@@ -27,7 +27,7 @@ const stepCheck = () => {
     return abortBuild();
   }
   const fileNameList = childProcess
-    .execSync('git diff --name-only HEAD..origin/master')
+    .execSync('git diff --name-only HEAD~1')
     .toString()
     .trim()
     .split('\n');

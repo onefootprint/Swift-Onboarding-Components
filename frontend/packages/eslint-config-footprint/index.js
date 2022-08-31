@@ -42,6 +42,7 @@ module.exports = {
           'Select',
           'StyledField',
           'TextInput',
+          'TextArea',
         ],
       },
     ],
