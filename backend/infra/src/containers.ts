@@ -57,6 +57,8 @@ export abstract class ServiceContainers {
             secretsStore.twilioApiKey.arn,
             secretsStore.twilioApiKeySecret.arn,
             secretsStore.sendgridApiKey.arn,
+            secretsStore.idologyUsername,
+            secretsStore.idologyPassword,
           ])
           .apply(
             ([
@@ -71,6 +73,8 @@ export abstract class ServiceContainers {
               twilioApiKey,
               twilioApiKeySecret,
               sendgridApiKey,
+              idologyUsername,
+              idologyPassword,
             ]) => {
               const def = [
                 {
@@ -109,6 +113,14 @@ export abstract class ServiceContainers {
                     {
                       name: 'SENDGRID_API_KEY',
                       valueFrom: sendgridApiKey,
+                    },
+                    {
+                      name: 'IDOLOGY_USERNAME',
+                      value: idologyUsername,
+                    },
+                    {
+                      name: 'IDOLOGY_PASSWORD',
+                      value: idologyPassword,
                     },
                   ],
                   environment: [
