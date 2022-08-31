@@ -57,8 +57,8 @@ export abstract class ServiceContainers {
             secretsStore.twilioApiKey.arn,
             secretsStore.twilioApiKeySecret.arn,
             secretsStore.sendgridApiKey.arn,
-            secretsStore.idologyUsername,
-            secretsStore.idologyPassword,
+            secretsStore.idologyUsername.arn,
+            secretsStore.idologyPassword.arn,
           ])
           .apply(
             ([
