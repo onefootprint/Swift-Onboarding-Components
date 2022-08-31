@@ -26,9 +26,8 @@ const stepCheck = () => {
   if (!dirSet.size) {
     return abortBuild();
   }
-  // get all file names changed in last commit
   const fileNameList = childProcess
-    .execSync('git diff --name-only HEAD~1')
+    .execSync('git diff --name-only HEAD..origin/master')
     .toString()
     .trim()
     .split('\n');
