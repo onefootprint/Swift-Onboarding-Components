@@ -15,15 +15,6 @@ concurrency:
   group: ${{ github.workflow }}-deploy-prod
 
 jobs:
-  print_some_things:
-    name: Print some things
-    steps:
-      - name: Print
-        run: |
-          echo "${{github.event.workflow_run.conclusion}}"
-          echo "${{github.event.workflow_run.conclusion == 'success'}}"
-          echo "${{github.event.workflow_dispatch}}"
-
   deploy_stack_prod:
     name: Deploy stack
     if: ${{ github.event.workflow_run.conclusion == 'success' }} || ${{ github.event.workflow_dispatch }}
