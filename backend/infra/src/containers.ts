@@ -116,11 +116,11 @@ export abstract class ServiceContainers {
                     },
                     {
                       name: 'IDOLOGY_USERNAME',
-                      value: idologyUsername,
+                      valueFrom: idologyUsername,
                     },
                     {
                       name: 'IDOLOGY_PASSWORD',
-                      value: idologyPassword,
+                      valueFrom: idologyPassword,
                     },
                   ],
                   environment: [
