@@ -33,7 +33,7 @@ jobs:
         payload: |
           {
             "user": "${{ github.event.pusher.name }}",
-            "url": "https://github.com/onefootprint/monorepo/commit/${{ github.sha }}/checks
+            "url": "https://github.com/onefootprint/monorepo/commit/${{ github.sha }}/checks"
           }
       env:
         SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
