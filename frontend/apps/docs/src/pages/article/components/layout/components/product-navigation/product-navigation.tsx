@@ -40,12 +40,16 @@ const ProductNavigation = ({ name, articles }: ProductNavigationProps) => {
               <IcoMessage16 color="tertiary" />
               {t('feedback')}
             </a>
+            {/* TODO: Uncomment this when we support sending an email */}
+            {/* <SendFeedback /> */}
           </li>
           <li>
             <a href="mailto: support@onefootprint.com">
               <IcoHelp16 color="tertiary" />
               {t('help')}
             </a>
+            {/* TODO: Uncomment this when we support sending an email */}
+            {/* <NeedHelp /> */}
           </li>
         </SupportList>
         <ThemeControl>

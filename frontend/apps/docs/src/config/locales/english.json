@@ -19,6 +19,47 @@
           "close": "Close navigation"
         }
       }
+    },
+    "support-dialog": {
+      "form": {
+        "name": {
+          "label": "Full name",
+          "placeholder": "Jane Doe",
+          "errors": {
+            "required": "Your name is required"
+          }
+        },
+        "email": {
+          "label": "Email address",
+          "placeholder": "email@email.com",
+          "errors": {
+            "required": "Please provide a valid email address"
+          }
+        },
+        "message": {
+          "label": "Message",
+          "placeholder": "What do you need help with?",
+          "errors": {
+            "required": "A message is required"
+          }
+        },
+        "primary-button": "Send",
+        "secondary-button": "Cancel"
+      }
+    },
+    "need-help": {
+      "label": "Need help?",
+      "dialog": {
+        "title": "Need help?",
+        "description": "We're more than happy to help! Please let us know what you need help with and we'll get back to you as soon as possible."
+      }
+    },
+    "send-feedback": {
+      "label": "Send feedback",
+      "dialog": {
+        "title": "Send feedback",
+        "description": "We'd love to hear your thoughts on our docs!"
+      }
     }
   },
   "pages": {
