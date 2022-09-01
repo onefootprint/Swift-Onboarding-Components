@@ -2,8 +2,11 @@ import { useTranslation } from 'hooks';
 import { IcoHelp16 } from 'icons';
 import React, { useState } from 'react';
 
-import SupportDialog, { SupportFormData } from '../support-dialog';
+import SupportDialog from '../support-dialog';
 import SupportListItem from '../support-list-item';
+
+const GET_FORM_URL =
+  'https://getform.io/f/7500e0a7-0049-4cea-b1f0-001671e39abd';
 
 const NeedHelp = () => {
   const { t } = useTranslation('components.need-help');
@@ -17,12 +20,6 @@ const NeedHelp = () => {
     setShowDialog(false);
   };
 
-  const handleSubmit = (data: SupportFormData) => {
-    // TODO: implement creating a support ticket from docs page
-    console.log(data);
-    handleClose();
-  };
-
   return (
     <>
       <SupportListItem
@@ -33,9 +30,9 @@ const NeedHelp = () => {
       <SupportDialog
         title={t('dialog.title')}
         description={t('dialog.description')}
+        url={GET_FORM_URL}
         open={showDialog}
         onClose={handleClose}
-        onSubmit={handleSubmit}
       />
     </>
   );

@@ -1,3 +1,4 @@
+import { QueryClientProvider } from '@tanstack/react-query';
 import React, { useEffect, useState } from 'react';
 import { createGlobalStyle, css } from 'styled-components';
 import themes from 'themes';
@@ -6,6 +7,7 @@ import { useDarkMode } from 'usehooks-ts';
 
 import AppHeader from '../components/app-header';
 import configureReactI18next from '../config/initializers/react-i18next';
+import queryClient from '../config/initializers/react-query';
 
 configureReactI18next();
 
@@ -20,11 +22,13 @@ const App = ({ Component, pageProps }: AppProps) => {
   useEffect(() => setMounted(true), []);
 
   return mounted ? (
-    <DesignSystemProvider theme={isDarkMode ? themes.dark : themes.light}>
-      <GlobalStyle />
-      <AppHeader articles={pageProps.product?.articles} />
-      <Component {...pageProps} />
-    </DesignSystemProvider>
+    <QueryClientProvider client={queryClient}>
+      <DesignSystemProvider theme={isDarkMode ? themes.dark : themes.light}>
+        <GlobalStyle />
+        <AppHeader articles={pageProps.product?.articles} />
+        <Component {...pageProps} />
+      </DesignSystemProvider>
+    </QueryClientProvider>
   ) : null;
 };
 

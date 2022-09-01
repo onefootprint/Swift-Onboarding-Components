@@ -43,8 +43,14 @@
             "required": "A message is required"
           }
         },
-        "primary-button": "Send",
-        "secondary-button": "Cancel"
+        "send-button": "Send",
+        "cancel-button": "Cancel",
+        "close-button": "Close",
+        "submit-success": {
+          "title": "Message sent successfully!",
+          "description": "We'll get back to you as soon as possible."
+        },
+        "submit-error": "Oops, something went wrong. Please try again."
       }
     },
     "need-help": {

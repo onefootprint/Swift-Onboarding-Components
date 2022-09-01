@@ -1,11 +1,13 @@
 import { useTranslation } from 'hooks';
-import { IcoHelp16, IcoMessage16 } from 'icons';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React from 'react';
 import styled, { css } from 'styled-components';
 import { Box, createFontStyles, media, Toggle, Typography } from 'ui';
 import { useDarkMode } from 'usehooks-ts';
+
+import NeedHelp from './components/need-help';
+import SendFeedback from './components/send-feedback';
 
 type ProductNavigationProps = {
   name: string;
@@ -36,20 +38,10 @@ const ProductNavigation = ({ name, articles }: ProductNavigationProps) => {
       <Box>
         <SupportList>
           <li>
-            <a href="mailto: support@onefootprint.com">
-              <IcoMessage16 color="tertiary" />
-              {t('feedback')}
-            </a>
-            {/* TODO: Uncomment this when we support sending an email */}
-            {/* <SendFeedback /> */}
+            <SendFeedback />
           </li>
           <li>
-            <a href="mailto: support@onefootprint.com">
-              <IcoHelp16 color="tertiary" />
-              {t('help')}
-            </a>
-            {/* TODO: Uncomment this when we support sending an email */}
-            {/* <NeedHelp /> */}
+            <NeedHelp />
           </li>
         </SupportList>
         <ThemeControl>
