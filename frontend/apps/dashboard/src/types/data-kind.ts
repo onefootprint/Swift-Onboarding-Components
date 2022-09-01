@@ -1,4 +1,4 @@
-import { UserDataAttribute } from 'types';
+import { UserDataAttribute, UserDataAttributeKey } from 'types';
 
 export enum CollectedDataOption {
   name = 'name',
@@ -11,17 +11,15 @@ export enum CollectedDataOption {
   phoneNumber = 'phone_number',
 }
 
-export type DataKind = keyof typeof UserDataAttribute;
-
 export const dataKindToType = Object.fromEntries(
   Object.entries(UserDataAttribute).map(x => [x[1], x[0]]),
-) as Record<UserDataAttribute, DataKind>;
+) as Record<UserDataAttribute, UserDataAttributeKey>;
 
-export const ALL_FIELDS: DataKind[] = [
+export const ALL_FIELDS: UserDataAttributeKey[] = [
   'firstName',
   'lastName',
   'email',
-  'phone',
+  'phoneNumber',
   'ssn9',
   'ssn4',
   'dob',
@@ -37,7 +35,7 @@ export const dataKindToDisplayName: Record<string, String> = {
   [UserDataAttribute.firstName]: 'First name',
   [UserDataAttribute.lastName]: 'Last name',
   [UserDataAttribute.email]: 'Email',
-  [UserDataAttribute.phone]: 'Phone number',
+  [UserDataAttribute.phoneNumber]: 'Phone number',
   [UserDataAttribute.ssn9]: 'SSN (Full)',
   [UserDataAttribute.ssn4]: 'SSN (Last 4)',
   [UserDataAttribute.dob]: 'Date of birth',
@@ -49,4 +47,4 @@ export const dataKindToDisplayName: Record<string, String> = {
   [UserDataAttribute.country]: 'Country',
 };
 
-export type DecryptedUserAttributes = Record<DataKind, string>;
+export type DecryptedUserAttributes = Record<UserDataAttributeKey, string>;

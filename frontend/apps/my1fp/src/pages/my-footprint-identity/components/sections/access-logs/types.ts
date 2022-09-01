@@ -4,7 +4,7 @@ export const dataKindToDisplayName: Record<string, String> = {
   [UserDataAttribute.firstName]: 'First name',
   [UserDataAttribute.lastName]: 'Last name',
   [UserDataAttribute.email]: 'Email',
-  [UserDataAttribute.phone]: 'Phone number',
+  [UserDataAttribute.phoneNumber]: 'Phone number',
   [UserDataAttribute.ssn9]: 'SSN',
   [UserDataAttribute.ssn4]: 'SSN last four',
   [UserDataAttribute.dob]: 'Date of birth',

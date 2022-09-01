@@ -2,8 +2,8 @@ import { useMutation } from '@tanstack/react-query';
 import { partial } from 'lodash';
 import request, { RequestError } from 'request';
 import useSessionUser, { AuthHeaders } from 'src/hooks/use-session-user';
-import { DataKind, DecryptedUserAttributes } from 'src/types';
-import { UserDataAttribute } from 'types';
+import { DecryptedUserAttributes } from 'src/types';
+import { UserDataAttribute, UserDataAttributeKey } from 'types';
 
 import useUserData from './use-user-data';
 
@@ -41,7 +41,7 @@ const useDecryptUser = () => {
 
   const loadEncryptedAttributes = (
     userId: string,
-    fieldsToDecrypt: DataKind[],
+    fieldsToDecrypt: UserDataAttributeKey[],
     reason: string,
   ) => {
     // Immediately set these attributes as loading

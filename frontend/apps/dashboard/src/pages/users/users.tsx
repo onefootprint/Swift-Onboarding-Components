@@ -118,7 +118,7 @@ const Users = () => {
               />
             </td>
             <td>
-              <FieldOrPlaceholder data={item.attributes.phone} />
+              <FieldOrPlaceholder data={item.attributes.phoneNumber} />
             </td>
             <td>
               <Typography variant="body-3" color="primary">

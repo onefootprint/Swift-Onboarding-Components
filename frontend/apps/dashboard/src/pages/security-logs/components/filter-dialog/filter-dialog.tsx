@@ -12,13 +12,9 @@ import DateRangeSelector, {
   dateRangeSelectorFormSchema,
   DateRangeSelectorFormValues,
 } from 'src/components/date-range-selector';
-import {
-  DataKind,
-  dataKindToType,
-  getDateRange,
-  serializeDateRange,
-} from 'src/types';
+import { dataKindToType, getDateRange, serializeDateRange } from 'src/types';
 import styled from 'styled-components';
+import type { UserDataAttributeKey } from 'types';
 import { UserDataAttribute } from 'types';
 import { Box, Button, Dialog, Divider, Typography } from 'ui';
 
@@ -38,7 +34,7 @@ const FilterDialog = () => {
   const { selectedFields, setFieldFor, clearSelectedFields } =
     useDataKindSelectedFields();
 
-  const isFieldSelected = (...kinds: DataKind[]) =>
+  const isFieldSelected = (...kinds: UserDataAttributeKey[]) =>
     kinds.every(kind => selectedFields[kind]);
   const isFieldDisabled = () => false;
 
@@ -49,7 +45,7 @@ const FilterDialog = () => {
     }
     const fields = Object.entries(selectedFields)
       .filter(x => x[1])
-      .map(x => UserDataAttribute[x[0] as DataKind])
+      .map(x => UserDataAttribute[x[0] as UserDataAttributeKey])
       .join(',');
     setFilter({
       dataKinds: fields,

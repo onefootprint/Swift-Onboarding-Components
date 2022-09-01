@@ -47,7 +47,7 @@ export const OptionToRequiredAttributes: Record<
     UserDataAttribute.country,
   ],
   [CollectedDataOption.email]: [UserDataAttribute.email],
-  [CollectedDataOption.phoneNumber]: [UserDataAttribute.phone],
+  [CollectedDataOption.phoneNumber]: [UserDataAttribute.phoneNumber],
 };
 
 export type UserData = Partial<{
@@ -63,7 +63,7 @@ export type UserData = Partial<{
   [UserDataAttribute.state]: string;
   [UserDataAttribute.country]: CountryCode;
   [UserDataAttribute.zip]: string;
-  [UserDataAttribute.phone]: string;
+  [UserDataAttribute.phoneNumber]: string;
 }>;
 
 export type BasicInformation = NameInformation | NameAndDobInformation;

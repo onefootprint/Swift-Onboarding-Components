@@ -1,4 +1,6 @@
-import { partial } from 'lodash';
+import { useTranslation } from 'hooks';
+import partial from 'lodash/partial';
+import Head from 'next/head';
 import React from 'react';
 import UserHeader from 'src/pages/users/pages/detail/components/user-header';
 import styled, { css } from 'styled-components';
@@ -10,27 +12,25 @@ import BasicInfo from './components/basic-info';
 import Insights from './components/insights';
 
 const Detail = () => {
+  const { t } = useTranslation('pages.user-details');
   const { users, loadEncryptedAttributes } = useGetUsers(1);
   // TODO error handling when this data is empty
   // https://linear.app/footprint/issue/FP-202
   const user = users?.[0]!;
 
+  // TODO: replace with breadcrumb component
+  // https://linear.app/footprint/issue/FP-211/component-breadcrumb
   return (
     <>
-      {/* TODO: replace with breadcrumb component
-       https://linear.app/footprint/issue/FP-211/component-breadcrumb */}
-      <HeaderContainer>
-        <Typography
-          variant="label-2"
-          color="tertiary"
-          sx={{ userSelect: 'none' }}
-        >
-          Users /&nbsp;
+      <Head>
+        <title>{t('page-title')}</title>
+      </Head>
+      <Breadcrumb>
+        <Typography variant="label-2" color="tertiary">
+          {t('breadcrumb.users')}&nbsp;
         </Typography>
-        <Typography variant="label-2" sx={{ userSelect: 'none' }}>
-          Details
-        </Typography>
-      </HeaderContainer>
+        <Typography variant="label-2">{t('breadcrumb.details')}</Typography>
+      </Breadcrumb>
       {user && (
         <>
           <UserHeader
@@ -52,11 +52,11 @@ const Detail = () => {
   );
 };
 
-const HeaderContainer = styled.div`
+const Breadcrumb = styled.div`
   ${({ theme }) => css`
-    margin-bottom: ${theme.spacing[7]}px;
     display: flex;
     flex-direction: row;
+    margin-bottom: ${theme.spacing[7]}px;
   `};
 `;
 

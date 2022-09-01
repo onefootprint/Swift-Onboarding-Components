@@ -25,7 +25,7 @@ const iconForDataKind = {
   [UserDataAttribute.firstName]: IcoUser16,
   [UserDataAttribute.lastName]: IcoUser16,
   [UserDataAttribute.email]: IcoUser16,
-  [UserDataAttribute.phone]: IcoPhone16,
+  [UserDataAttribute.phoneNumber]: IcoPhone16,
   [UserDataAttribute.ssn9]: IcoUser16,
   [UserDataAttribute.ssn4]: IcoUser16,
   [UserDataAttribute.dob]: IcoUser16,
@@ -107,9 +107,9 @@ const detailsForVerificationEvent = (data: VerificationInfo) => {
   const headerComponent = (
     <Typography variant="body-3">
       <>
-        {data.dataAttributes.map((dataKind, i: number) => (
-          <React.Fragment key={dataKind}>
-            <Tag>{dataKindToDisplayName[dataKind]}</Tag>
+        {data.dataAttributes.map((userAttribute, i: number) => (
+          <React.Fragment key={userAttribute}>
+            <Tag>{dataKindToDisplayName[userAttribute]}</Tag>
             {i !== data.dataAttributes.length - 1 ? ', ' : ''}
           </React.Fragment>
         ))}

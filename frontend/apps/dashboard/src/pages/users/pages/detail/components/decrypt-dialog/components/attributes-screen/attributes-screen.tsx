@@ -1,16 +1,16 @@
 import React, { ChangeEvent } from 'react';
 import DataKindBoxes from 'src/components/data-kind-boxes';
-import type { DataKind } from 'src/types';
+import { UserDataAttributeKey } from 'types';
 import { Box, Checkbox, Divider, Typography } from 'ui';
 
 type AttributesScreenProps = {
   hasError: boolean;
-  isFieldSelected: (...kinds: DataKind[]) => boolean;
+  isFieldSelected: (...kinds: UserDataAttributeKey[]) => boolean;
   setFieldFor: (
-    ...kinds: DataKind[]
+    ...kinds: UserDataAttributeKey[]
   ) => (e: ChangeEvent<HTMLInputElement>) => void;
-  isFieldDisabled: (...kinds: DataKind[]) => boolean;
-  allDecryptableFields: DataKind[];
+  isFieldDisabled: (...kinds: UserDataAttributeKey[]) => boolean;
+  allDecryptableFields: UserDataAttributeKey[];
 };
 
 const AttributesScreen = ({

@@ -1,12 +1,11 @@
 import { useMemo } from 'react';
 import {
   ALL_FIELDS,
-  DataKind,
   OnboardingStatus,
   ScopedUser,
   statusToPriority,
 } from 'src/types';
-import { UserDataAttribute } from 'types';
+import { UserDataAttribute, UserDataAttributeKey } from 'types';
 
 import { UserAttributes, UserData } from './use-user-data';
 
@@ -50,15 +49,15 @@ const useJoinUsers = (
         // This object is composed by joining info from previous POST /users/decrypt calls and
         // GET /users calls
         const attributes = Object.fromEntries(
-          ALL_FIELDS.map((dataKind: DataKind) => [
-            dataKind,
+          ALL_FIELDS.map((userAttributeKey: UserDataAttributeKey) => [
+            userAttributeKey,
             {
-              value: decryptedData[dataKind]?.value,
-              isLoading: decryptedData[dataKind]?.isLoading || false,
+              value: decryptedData[userAttributeKey]?.value,
+              isLoading: decryptedData[userAttributeKey]?.isLoading || false,
               exists:
-                decryptedData[dataKind]?.exists ||
+                decryptedData[userAttributeKey]?.exists ||
                 scoped_user.identityDataAttributes.includes(
-                  UserDataAttribute[dataKind],
+                  UserDataAttribute[userAttributeKey],
                 ),
             } as UserData,
           ]),

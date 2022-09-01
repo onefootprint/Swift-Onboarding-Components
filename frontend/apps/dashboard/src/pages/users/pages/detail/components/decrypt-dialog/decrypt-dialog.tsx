@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import useDataKindSelectedFields from 'src/components/data-kind-boxes/hooks/use-data-kind-selected-fields';
 import { User } from 'src/pages/users/hooks/use-join-users';
-import { ALL_FIELDS, DataKind, dataKindToType } from 'src/types';
+import { ALL_FIELDS, dataKindToType } from 'src/types';
+import type { UserDataAttributeKey } from 'types';
 import { Button, Dialog } from 'ui';
 
 import AttributesScreen from './components/attributes-screen';
@@ -9,7 +10,7 @@ import ReasonScreen from './components/reason-screen';
 
 type DecryptDialogProps = {
   user: User;
-  onDecrypt: (fieldsToDecrypt: DataKind[], reason: string) => void;
+  onDecrypt: (fieldsToDecrypt: UserDataAttributeKey[], reason: string) => void;
 };
 
 const DecryptDialog = ({ user, onDecrypt }: DecryptDialogProps) => {
@@ -41,7 +42,7 @@ const DecryptDialog = ({ user, onDecrypt }: DecryptDialogProps) => {
     kind => user.attributes[kind]?.exists,
   );
 
-  const isFieldSelected = (...kinds: DataKind[]) =>
+  const isFieldSelected = (...kinds: UserDataAttributeKey[]) =>
     // Display box as checked if
     //   (1) the user checked it OR
     //   (2) it's decrypted OR
@@ -53,7 +54,7 @@ const DecryptDialog = ({ user, onDecrypt }: DecryptDialogProps) => {
         !user.attributes[kind]?.exists,
     );
 
-  const isFieldDisabled = (...kinds: DataKind[]) =>
+  const isFieldDisabled = (...kinds: UserDataAttributeKey[]) =>
     // Don't allow decrypting a field that is already decrypted
     kinds.every(
       kind => user.attributes[kind]?.value || !decryptableFields.includes(kind),
@@ -71,8 +72,8 @@ const DecryptDialog = ({ user, onDecrypt }: DecryptDialogProps) => {
   const onPrimaryButtonClick = () => {
     const fieldsToDecrypt = Object.entries(selectedFields)
       .filter(x => x[1])
-      .filter(x => !isFieldDisabled(x[0] as DataKind))
-      .map(x => x[0] as DataKind);
+      .filter(x => !isFieldDisabled(x[0] as UserDataAttributeKey))
+      .map(x => x[0] as UserDataAttributeKey);
     if (dialogScreen === 'attributes') {
       // Currently on the attributes screen
       if (!fieldsToDecrypt.length) {

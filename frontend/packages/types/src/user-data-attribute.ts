@@ -1,9 +1,9 @@
-enum UserDataAttribute {
+export enum UserDataAttribute {
   firstName = 'first_name',
   lastName = 'last_name',
-  dob = 'dob',
   email = 'email',
-  phone = 'phone_number',
+  phoneNumber = 'phone_number',
+  dob = 'dob',
   ssn9 = 'ssn9',
   ssn4 = 'ssn4',
   addressLine1 = 'address_line1',
@@ -14,4 +14,4 @@ enum UserDataAttribute {
   zip = 'zip',
 }
 
-export default UserDataAttribute;
+export type UserDataAttributeKey = keyof typeof UserDataAttribute;

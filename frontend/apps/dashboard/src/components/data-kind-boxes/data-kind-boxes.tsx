@@ -1,14 +1,14 @@
 import React, { ChangeEvent } from 'react';
-import type { DataKind } from 'src/types';
 import styled, { css } from 'styled-components';
+import { UserDataAttributeKey } from 'types';
 import { Checkbox, SXStyles, Typography } from 'ui';
 
 type DataKindBoxesProps = {
   setFieldFor: (
-    ...kinds: DataKind[]
+    ...kinds: UserDataAttributeKey[]
   ) => (e: ChangeEvent<HTMLInputElement>) => void;
-  isFieldSelected: (...kinds: DataKind[]) => boolean;
-  isFieldDisabled: (...kinds: DataKind[]) => boolean;
+  isFieldSelected: (...kinds: UserDataAttributeKey[]) => boolean;
+  isFieldDisabled: (...kinds: UserDataAttributeKey[]) => boolean;
 };
 
 const DataKindBoxes = ({
@@ -36,9 +36,9 @@ const DataKindBoxes = ({
       />
       <Checkbox
         label="Phone number"
-        disabled={isFieldDisabled('phone')}
-        checked={isFieldSelected('phone')}
-        onChange={setFieldFor('phone')}
+        disabled={isFieldDisabled('phoneNumber')}
+        checked={isFieldSelected('phoneNumber')}
+        onChange={setFieldFor('phoneNumber')}
       />
     </DataGridItem>
     <DataGridItem sx={{ gridArea: '2 / 1 / span 1 / span 1' }}>

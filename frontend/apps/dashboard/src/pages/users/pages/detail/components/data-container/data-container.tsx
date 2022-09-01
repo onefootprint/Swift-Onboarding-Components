@@ -8,18 +8,19 @@ import { SXStyleProps, SXStyles, Typography, useSX } from 'ui';
 export type DataRow = {
   title: string;
   data: UserData;
+  shouldShow: boolean;
 };
 
 type DataContainerProps = {
-  HeaderIcon: Icon;
-  header: string;
+  headerIcon: Icon;
   rows: DataRow[];
   sx?: SXStyleProps;
+  title: string;
 };
 
 const DataContainer = ({
-  HeaderIcon,
-  header,
+  headerIcon: HeaderIcon,
+  title,
   rows,
   sx,
 }: DataContainerProps) => {
@@ -28,23 +29,19 @@ const DataContainer = ({
     <StyledContainer sx={sxStyles}>
       <Header>
         <HeaderIcon />
-        <Typography variant="label-3" sx={{ userSelect: 'none' }}>
-          {header}
-        </Typography>
+        <Typography variant="label-3">{title}</Typography>
       </Header>
       <RowContainer>
-        {rows.map((item: DataRow) => (
-          <Row key={item.title}>
-            <Typography
-              variant="label-3"
-              color="tertiary"
-              sx={{ userSelect: 'none' }}
-            >
-              {item.title}
-            </Typography>
-            <FieldOrPlaceholder data={item.data} />
-          </Row>
-        ))}
+        {rows
+          .filter(row => row.shouldShow)
+          .map((item: DataRow) => (
+            <Row key={item.title}>
+              <Typography variant="label-3" color="tertiary">
+                {item.title}
+              </Typography>
+              <FieldOrPlaceholder data={item.data} />
+            </Row>
+          ))}
       </RowContainer>
     </StyledContainer>
   );
@@ -60,24 +57,24 @@ const StyledContainer = styled.div<{ sx: SXStyles }>`
   `}
 `;
 
-const Header = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
+const Header = styled.header`
   ${({ theme }) => css`
-    padding: ${theme.spacing[3]}px ${theme.spacing[5]}px;
-    gap: ${theme.spacing[2]}px;
+    align-items: center;
     background-color: ${theme.backgroundColor.secondary};
     border-bottom: 1px solid ${theme.borderColor.tertiary};
+    display: flex;
+    flex-direction: row;
+    gap: ${theme.spacing[2]}px;
+    padding: ${theme.spacing[3]}px ${theme.spacing[5]}px;
   `};
 `;
 
 const RowContainer = styled.div`
-  display: flex;
-  flex-direction: column;
   ${({ theme }) => css`
-    padding: ${theme.spacing[5]}px ${theme.spacing[7]}px;
+    display: flex;
+    flex-direction: column;
     gap: ${theme.spacing[4]}px;
+    padding: ${theme.spacing[5]}px ${theme.spacing[7]}px;
   `};
 `;
 
