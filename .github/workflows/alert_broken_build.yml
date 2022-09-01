@@ -7,19 +7,22 @@ on:
 
 jobs:
   wait:
+    name: "Wait for checks"
     runs-on: ubuntu-latest
     steps:
-    - name: Wait for other checks to succeed
+    - name: Wait for checks
       uses: lewagon/wait-on-check-action@v1.0.0
       with:
         ref: ${{ github.ref }}
-        running-workflow-name: 'Broken Build Alert'
+        running-workflow-name: 'Wait for checks'
         repo-token: ${{ secrets.GITHUB_TOKEN }}
         wait-interval: 10
+        allowed-conclusions: success,skipped,cancelled
+
       
   alert:
-    #if: always()
-    #needs: [wait]
+    if: always()
+    needs: [wait]
     runs-on: ubuntu-latest
     steps:
     - name: Notify on slack
@@ -29,7 +32,8 @@ jobs:
         # This data can be any valid JSON from a previous step in the GitHub Action
         payload: |
           {
-            "user": "${{ github.event.pusher.name }}"
+            "user": "${{ github.event.pusher.name }}",
+            "url": "https://github.com/onefootprint/monorepo/commit/${{ github.sha }}/checks
           }
       env:
         SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
