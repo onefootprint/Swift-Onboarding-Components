@@ -6,8 +6,8 @@ use db::models::{
     verification_request::{NewVerificationRequest, VerificationRequest},
     verification_result::VerificationResult,
 };
-use newtypes::{DataAttribute, IdvData, ScopedUserId, Vendor};
-use std::collections::HashMap;
+use newtypes::{email::Email, DataAttribute, IdvData, PhoneNumber, ScopedUserId, Vendor};
+use std::{collections::HashMap, str::FromStr};
 use strum::IntoEnumIterator;
 
 impl UserVaultWrapper {
@@ -19,6 +19,15 @@ impl UserVaultWrapper {
         let decrypted_values = self.decrypt(state, encrypted_values).await?;
         let mut decrypted_values: HashMap<DataAttribute, _> =
             keys.into_iter().zip(decrypted_values.into_iter()).collect();
+        // Remove sandbox suffixes
+        let email = decrypted_values
+            .remove(&DataAttribute::Email)
+            .map(|x| Email::from_str(x.leak()).map(|x| x.email))
+            .transpose()?;
+        let phone_number = decrypted_values
+            .remove(&DataAttribute::PhoneNumber)
+            .map(|x| PhoneNumber::from_str(x.leak()).map(|x| x.number))
+            .transpose()?;
         let request = IdvData {
             first_name: decrypted_values.remove(&DataAttribute::FirstName),
             last_name: decrypted_values.remove(&DataAttribute::LastName),
@@ -30,8 +39,8 @@ impl UserVaultWrapper {
             ssn4: decrypted_values.remove(&DataAttribute::Ssn4),
             ssn9: decrypted_values.remove(&DataAttribute::Ssn9),
             dob: decrypted_values.remove(&DataAttribute::Dob),
-            email: decrypted_values.remove(&DataAttribute::Email),
-            phone_number: decrypted_values.remove(&DataAttribute::PhoneNumber),
+            email,
+            phone_number,
         };
         Ok(request)
     }
