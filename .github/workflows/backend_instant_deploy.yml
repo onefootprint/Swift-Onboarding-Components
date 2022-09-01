@@ -1,0 +1,119 @@
+name: Backend Build and Deploy Stack
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'secrets environment to use'
+        type: string
+        required: true
+
+      stackName:
+        description: 'stack or possibly ephemeral stack name, i.e. dev'
+        type: string
+        required: true
+
+      shortHashVersion:
+        description: 'Short SHA of API server image version (or latest)'
+        type: string
+        required: false
+        default: 'latest'
+
+    secrets:
+      AWS_ACCESS_KEY_ID:
+        required: true
+      AWS_REGION:
+        required: true
+      AWS_SECRET_ACCESS_KEY:
+        required: true
+      AWS_SECRETS_PROVIDER:
+        required: true
+      ENCLAVE_SIGNING_KEY:
+        required: true
+      ENCLAVE_SIGNING_CERT:
+        required: true
+      PULUMI_ACCESS_TOKEN:
+        required: true
+jobs:
+  instant_deploy_stack:
+    name: deploy stack
+    runs-on: ubuntu-latest
+    outputs:
+      url: 'https://${{ steps.constants.outputs.url }}'
+    environment:
+      name: ${{ inputs.environment }}
+      url: 'https://${{ steps.constants.outputs.url }}'
+    steps:
+      - uses: actions/checkout@v2
+
+      # pulumi setup
+      - uses: actions/setup-node@v2
+        with:
+          node-version: 14.x
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-region: ${{ secrets.AWS_REGION }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Setup Pulumi CLI
+        uses: pulumi/setup-pulumi@v2.0.0
+        with:
+          pulumi-version: 3.38.0
+
+      - run: yarn install
+        working-directory: ./backend/infra
+
+      # get environment constants
+      - name: Extract Constants
+        shell: bash
+        working-directory: ./backend/infra
+        run: |
+          sub=$(pulumi config --stack footprint/${{ inputs.stackName }} get --path constants.domain.prefix)
+          base=$(pulumi config --stack footprint/${{ inputs.stackName }} get --path constants.domain.base)
+          url="${sub}${base}"
+          version="${branch}-${{ inputs.shortHashVersion }}"
+          echo "##[set-output name=url;]$(echo ${url})"
+          echo "##[set-output name=componentVersion;]$(echo ${version})"
+        id: constants
+        env:
+          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
+
+      - name: select stack
+        working-directory: ./backend/infra
+        run: pulumi stack select "footprint/${{ inputs.stackName }}"
+
+      - name: 'set api/enclave image version'
+        working-directory: ./backend/infra
+        run: |
+          pulumi config set --path constants.containers.apiVersion ${{ steps.constants.outputs.componentVersion }}
+          pulumi config set --path constants.containers.enclaveVersion ${{ steps.constants.outputs.componentVersion }}
+
+      # bring up the stack
+      - uses: pulumi/actions@v3
+        with:
+          command: up
+          work-dir: ./backend/infra
+          stack-name: 'footprint/${{ inputs.stackName }}'
+          message: 'Deployed to https://${{ steps.constants.outputs.url }} with component ${{ steps.constants.outputs.componentVersion }}'
+        env:
+          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
+
+  run_tests:
+    name: 'integration tests'
+    needs: [instant_deploy_stack]
+    if: success()
+    uses: ./.github/workflows/backend_remote_integration_tests.yml
+    permissions:
+      contents: write
+      pull-requests: write
+    with:
+      testUrl: '${{ needs.deploy_stack_dev.outputs.url }}'
+      isPR: false
+      waitForDeploy: true
+    secrets:
+      INTEGRATION_TEST_PHONE_NUMBER: ${{ secrets.INTEGRATION_TEST_PHONE_NUMBER }}
+      TWILIO_ACCOUNT_SID: ${{ secrets.TWILIO_ACCOUNT_SID }}
+      TWILIO_API_KEY: ${{ secrets.TWILIO_API_KEY }}
+      TWILIO_API_KEY_SECRET: ${{ secrets.TWILIO_API_KEY_SECRET }}

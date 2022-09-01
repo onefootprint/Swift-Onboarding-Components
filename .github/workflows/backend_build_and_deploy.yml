@@ -235,12 +235,6 @@ jobs:
           pulumi config set --path constants.containers.apiVersion ${{ steps.constants.outputs.componentVersion }}
           pulumi config set --path constants.containers.enclaveVersion ${{ steps.constants.outputs.componentVersion }}
 
-      - name: Create Stack DB Restore Snapshot
-        if: ${{ inputs.createStack }}
-        working-directory: ./backend/infra
-        run: |
-          pulumi config set restoreSnapshotFromClusterNamed "db-${{ inputs.baseStackName }}"
-
       # bring up the stack
       - uses: pulumi/actions@v3
         with:
