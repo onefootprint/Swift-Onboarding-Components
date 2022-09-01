@@ -26,6 +26,8 @@ jobs:
           echo "${{github.event.workflow_dispatch}}"
           echo "${{github.event.event_name}}"
           echo "${{github.event.event_name == 'workflow_dispatch'}}"
+          echo "${{github.event_name}}"
+          echo "${{github.event_name == 'workflow_dispatch'}}"
           echo "${{ toJson(github.event) }}"
 
   deploy_stack_prod:
