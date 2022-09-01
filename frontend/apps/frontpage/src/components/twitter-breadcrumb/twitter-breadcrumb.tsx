@@ -42,7 +42,7 @@ const Breadcrumb = styled.div`
     display: flex;
     justify-content: space-between;
     margin: 0 -${theme.spacing[5]}px 0;
-    padding: ${theme.spacing[4]}px ${theme.spacing[7]}px;
+    padding: ${theme.spacing[4]}px ${theme.spacing[5]}px;
 
     ${media.greaterThan('lg')`
       margin: initial;

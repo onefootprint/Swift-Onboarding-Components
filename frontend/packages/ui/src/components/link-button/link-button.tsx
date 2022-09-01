@@ -7,12 +7,14 @@ import { createFontStyles } from '../../utils/mixins';
 import { fontSize } from './link-button.constants';
 import type { LinkButtonSize, LinkButtonVariant } from './link-button.types';
 
+type IconPosition = 'left' | 'right';
+
 export type LinkButtonProps = {
   ariaLabel?: string;
   children: string;
   href?: string;
   iconComponent?: Icon;
-  iconPosition?: 'left' | 'right';
+  iconPosition?: IconPosition;
   onClick?: (
     event:
       | React.KeyboardEvent<HTMLAnchorElement>
@@ -63,6 +65,7 @@ const LinkButton = forwardRef<HTMLAnchorElement, LinkButtonProps>(
         target={target}
         rel={target === '_blank' ? 'noopener noreferrer' : undefined}
         sx={sxStyles}
+        iconPosition={iconPosition}
       >
         {iconPosition === 'left' && renderedIcon}
         {children}
@@ -77,6 +80,7 @@ type LinkButtonStyleProps = Pick<LinkButtonProps, 'href'> & {
   variant: LinkButtonVariant;
   disabled: boolean;
   sx?: SXStyles;
+  iconPosition: IconPosition;
 };
 
 export const LinkButtonStyled = styled.a.attrs<{
@@ -85,10 +89,11 @@ export const LinkButtonStyled = styled.a.attrs<{
   variant: LinkButtonVariant;
   disabled: boolean;
   sx: SXStyles;
+  iconPosition: IconPosition;
 }>(({ href }) => ({
   as: href ? 'a' : 'button',
 }))<LinkButtonStyleProps>`
-  ${({ theme, size, href, variant, disabled, sx }) => css`
+  ${({ theme, size, href, variant, disabled, sx, iconPosition }) => css`
     ${createFontStyles(fontSize[size])};
     align-items: center;
     background: transparent;
@@ -101,16 +106,6 @@ export const LinkButtonStyled = styled.a.attrs<{
     text-decoration: none;
     ${sx};
 
-    svg {
-      &:last-child {
-        margin-left: ${theme.spacing[2]}px;
-      }
-
-      &:first-child {
-        margin-right: ${theme.spacing[2]}px;
-      }
-    }
-
     ${disabled
       ? 'opacity: 0.45'
       : css`
@@ -120,13 +115,23 @@ export const LinkButtonStyled = styled.a.attrs<{
             ${href &&
             css`
               text-decoration: underline;
-            `};
+            `}
           }
 
           &:active {
             opacity: 0.85;
           }
         `}
+
+    svg {
+      ${iconPosition === 'left'
+        ? css`
+            margin-right: ${theme.spacing[2]}px;
+          `
+        : css`
+            margin-left: ${theme.spacing[2]}px;
+          `}
+    }
   `}
 `;
 

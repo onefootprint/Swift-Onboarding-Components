@@ -1,6 +1,6 @@
 import React from 'react';
 import styled, { css } from 'styled-components';
-import { createFontStyles } from 'ui';
+import { createFontStyles, media } from 'ui';
 
 type PostContentProps = {
   html: string;
@@ -13,11 +13,22 @@ const Content = styled.div`
   ${({ theme }) => css`
     color: ${theme.color.secondary};
 
+    ${media.greaterThan('sm')`
+      padding: 0 ${theme.spacing[11]}px;
+    `}
+
     img {
       margin-bottom: ${theme.spacing[9]}px;
       max-width: 100%;
+
       object-fit: cover;
       object-position: left;
+      height: auto;
+
+      ${media.greaterThan('sm')`
+        max-width: calc(100% + ${2 * theme.spacing[11]}px);
+        margin: ${theme.spacing[9]}px -${theme.spacing[11]}px;
+      `}
     }
 
     h2,

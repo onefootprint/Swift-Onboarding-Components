@@ -1,5 +1,6 @@
 import { useTranslation } from 'hooks';
 import { IcoArrowRightSmall16 } from 'icons';
+import Link from 'next/link';
 import React from 'react';
 import styled, { css } from 'styled-components';
 import { LinkButton, media, Typography } from 'ui';
@@ -34,9 +35,13 @@ const InvestorUpdatePreview = ({
         )}
       </Header>
       <Content>
-        <Typography variant="heading-1" sx={{ marginBottom: 8 }}>
-          {title}
-        </Typography>
+        <Link href={href}>
+          <a href={href}>
+            <Typography variant="heading-1" sx={{ marginBottom: 8 }}>
+              {title}
+            </Typography>
+          </a>
+        </Link>
         <Typography variant="body-2">{excerpt}</Typography>
         <LinkButton
           sx={{ marginTop: 7, cursor: 'pointer' }}
@@ -65,6 +70,10 @@ const Content = styled.div`
     flex-direction: column;
     height: 100%;
     padding-bottom: ${theme.spacing[9]}px;
+
+    a {
+      text-decoration: none;
+    }
   `}
 `;
 
