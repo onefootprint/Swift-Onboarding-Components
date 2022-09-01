@@ -1,0 +1,30 @@
+
+name: Broken Build Alert
+
+on:
+  push:
+    branches: [ "master" ]
+
+jobs:
+  wait:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: jitterbit/await-check-suites@v1
+      
+  alert:
+    if: always()
+    needs: [wait]
+    runs-on: ubuntu-latest
+    steps:
+    - name: Notify on slack
+      id: slack
+      uses: slackapi/slack-github-action@v1.21.0
+      with:
+        # This data can be any valid JSON from a previous step in the GitHub Action
+        payload: |
+          {
+            "user": "${{ github.event.pusher.email }}",
+          }
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
