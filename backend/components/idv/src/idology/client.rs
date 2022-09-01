@@ -178,7 +178,7 @@ impl IdologyClient {
         };
         let response = self
             .client
-            .get(&self.url)
+            .post(&self.url)
             .query(&req_list)
             .send()
             .await
