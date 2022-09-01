@@ -65,7 +65,7 @@ export abstract class ServiceContainers {
               rootKeyId,
               enclaveAccessKeyId,
               enclaveUserArn,
-              enclaveSealedIkekArn,
+              sealedIkekHexArn,
               databaseUrlArn,
               cookieSessionKeyArn,
               signingKeyId,
@@ -88,7 +88,7 @@ export abstract class ServiceContainers {
                     },
                     {
                       name: 'ENCLAVE_SEALED_IKEK_HEX',
-                      valueFrom: enclaveSealedIkekArn,
+                      valueFrom: sealedIkekHexArn,
                     },
                     {
                       name: 'DATABASE_URL',

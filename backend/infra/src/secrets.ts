@@ -102,11 +102,6 @@ export async function LoadSecrets(
       ),
       name: `/static_secrets/enclave-user-${stack}`,
     }),
-    enclaveSealedIkek: new aws.ssm.Parameter(`ssm-param-enclave-sealed-ikek`, {
-      type: 'SecureString',
-      value: pulumi.secret(enclaveKeyDescriptor.sealedIkek),
-      name: `/static_secrets/enclave-sealed-ikek-${stack}`,
-    }),
     otelConfig: new aws.ssm.Parameter(`ssm-param-otelconfig`, {
       type: 'SecureString',
       value: fs.readFileSync('./otel/config.yml', 'utf8'),
@@ -144,6 +139,10 @@ export async function LoadSecrets(
     idologyPassword: createSecretParameter(
       `idologyPassword-${stack}`,
       secretConstants.idology.password,
+    ),
+    enclaveSealedIkek: createSecretParameter(
+      `enclaveSealedIkek-${stack}`,
+      enclaveKeyDescriptor.sealedIkek.hexValue,
     ),
   };
 }

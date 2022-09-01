@@ -9,6 +9,11 @@ on:
       - 'backend/*.dockerfile'
       - '.github/workflows/*.yml'
 
+  workflow_run:
+    workflows: ['Tag Ephemeral']
+    types:
+      - completed
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref }}
 

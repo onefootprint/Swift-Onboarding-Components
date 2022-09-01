@@ -106,6 +106,7 @@ impl Config {
     }
 }
 
+/// Config for idology
 #[derive(Envconfig, Debug, Clone)]
 pub struct IdologyConfig {
     #[envconfig(from = "IDOLOGY_USERNAME")]
