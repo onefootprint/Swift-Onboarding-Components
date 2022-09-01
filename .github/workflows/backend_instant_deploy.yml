@@ -5,7 +5,7 @@ on:
     inputs:
       environment:
         description: 'secrets environment to use'
-        type: string
+        type: environment
         required: true
 
       stackName:
@@ -19,21 +19,6 @@ on:
         required: false
         default: 'latest'
 
-    secrets:
-      AWS_ACCESS_KEY_ID:
-        required: true
-      AWS_REGION:
-        required: true
-      AWS_SECRET_ACCESS_KEY:
-        required: true
-      AWS_SECRETS_PROVIDER:
-        required: true
-      ENCLAVE_SIGNING_KEY:
-        required: true
-      ENCLAVE_SIGNING_CERT:
-        required: true
-      PULUMI_ACCESS_TOKEN:
-        required: true
 jobs:
   instant_deploy_stack:
     name: deploy stack
