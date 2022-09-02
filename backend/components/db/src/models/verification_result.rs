@@ -29,15 +29,15 @@ impl VerificationResult {
         conn: &mut PgConnection,
         request_id: VerificationRequestId,
         response: serde_json::Value,
-    ) -> Result<(), DbError> {
+    ) -> Result<VerificationResult, DbError> {
         let new_result = NewVerificationResult {
             request_id,
             response,
             timestamp: Utc::now(),
         };
-        diesel::insert_into(verification_result::table)
+        let result = diesel::insert_into(verification_result::table)
             .values(new_result)
-            .execute(conn)?;
-        Ok(())
+            .get_result(conn)?;
+        Ok(result)
     }
 }

@@ -120,9 +120,17 @@ impl Onboarding {
     }
 
     pub fn update_status(self, conn: &mut PgConnection, new_status: Status) -> Result<(), DbError> {
+        Self::update_status_by_id(conn, &self.id, new_status)
+    }
+
+    pub fn update_status_by_id(
+        conn: &mut PgConnection,
+        id: &OnboardingId,
+        new_status: Status,
+    ) -> Result<(), DbError> {
         // Intentionally consume the value so the stale version is not used
         diesel::update(onboarding::table)
-            .filter(onboarding::id.eq(&self.id))
+            .filter(onboarding::id.eq(id))
             .set(onboarding::status.eq(new_status))
             .execute(conn)?;
         Ok(())

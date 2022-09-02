@@ -61,7 +61,7 @@ fn handler(
 
     let tenant_id = tenant_auth.tenant.id.clone();
     let session_key = state.session_sealing_key.clone();
-    let (validation_token, webauthn_creds, verification_request, uvw) = state
+    let (validation_token, webauthn_creds, verification_request, uvw, ob_id) = state
         .db_pool
         .db_transaction(move |conn| -> Result<_, ApiError> {
             let scoped_user = ScopedUser::get_or_create(
@@ -79,15 +79,16 @@ fn handler(
             )?;
             let ob_id = ob.id.clone();
             let verification_request = initiate_verification(conn, ob, &uvw, &tenant_id, decrypted_phone)?;
-            let validation_token = super::create_onboarding_validation_token(conn, &session_key, ob_id)?;
+            let validation_token =
+                super::create_onboarding_validation_token(conn, &session_key, ob_id.clone())?;
             let webauthn_creds = WebauthnCredential::get_for_user_vault(conn, &uvw.user_vault.id)?;
-            Ok((validation_token, webauthn_creds, verification_request, uvw))
+            Ok((validation_token, webauthn_creds, verification_request, uvw, ob_id))
         })
         .await?;
 
     if let Some(verification_request) = verification_request {
         let idv_data = uvw.build_idv_request(&state).await?;
-        initiate_idv_request(&state, verification_request, idv_data).await?;
+        initiate_idv_request(&state, ob_id, verification_request, idv_data).await?;
     }
 
     Ok(Json(ApiResponseData {
@@ -127,24 +128,22 @@ fn initiate_verification(
     };
     let scoped_user_id = ob.scoped_user_id.clone();
     ob.update_status(conn, desired_status)?;
-    let final_status = match &desired_status {
-        Status::Verified => VerificationInfoStatus::Verified,
-        _ => VerificationInfoStatus::Failed,
-    };
-    let verification_request = if desired_status == Status::Processing {
+    if desired_status == Status::Processing {
         let request = uvw
             .build_verification_request(scoped_user_id, Vendor::Idology)
             .save(conn)?;
-        Some(request)
-    } else {
-        None
-    };
+        return Ok(Some(request));
+    }
 
-    // Just create some fixture events for now
+    // If we're not kicking off a verification, just create some fixture events for now
     // Don't make duplicate fixture events if the user onboards multiple times since it
     // isn't very self-explanatory for the demo
     // TODO kick off user verification with data vendors,
     // and don't mark as verified until data verification with vendors is complete
+    let final_status = match &desired_status {
+        Status::Verified => VerificationInfoStatus::Verified,
+        _ => VerificationInfoStatus::Failed,
+    };
     let events = vec![
         VerificationInfo {
             data_attributes: vec![
@@ -189,5 +188,5 @@ fn initiate_verification(
             Some(tenant_id.clone()),
         )
     })?;
-    Ok(verification_request)
+    Ok(None)
 }

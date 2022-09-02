@@ -1,12 +1,15 @@
-use super::user_vault_wrapper::UserVaultWrapper;
+use super::{user_vault_wrapper::UserVaultWrapper, verification::get_reason_codes};
 use crate::{errors::ApiError, State};
 use chrono::Utc;
 use db::models::{
     identity_data::HasIdentityDataFields,
+    onboarding::Onboarding,
     verification_request::{NewVerificationRequest, VerificationRequest},
     verification_result::VerificationResult,
 };
-use newtypes::{email::Email, DataAttribute, IdvData, PhoneNumber, ScopedUserId, Vendor};
+use newtypes::{
+    email::Email, DataAttribute, IdvData, OnboardingId, PhoneNumber, ScopedUserId, Status, Vendor,
+};
 use std::{collections::HashMap, str::FromStr};
 use strum::IntoEnumIterator;
 
@@ -63,19 +66,32 @@ impl UserVaultWrapper {
 
 pub async fn initiate_idv_request(
     state: &State,
+    onboarding_id: OnboardingId,
     request: VerificationRequest,
     data: IdvData,
 ) -> Result<(), ApiError> {
     // TODO spawn a task to do this asynchronously
-    match request.vendor {
-        Vendor::Idology => {
-            let result = state.idology_client.verify_expectid(data).await?;
-            state
-                .db_pool
-                .db_query(|conn| VerificationResult::create(conn, request.id, result))
-                .await??;
-        }
+    let result = match request.vendor {
+        Vendor::Idology => state.idology_client.verify_expectid(data).await?,
         _ => return Err(ApiError::NotImplemented),
-    }
+    };
+    state
+        .db_pool
+        .db_transaction(move |conn| -> Result<_, ApiError> {
+            let result = VerificationResult::create(conn, request.id, result)?;
+            // TODO handle errors
+            let reason_codes = get_reason_codes(request.vendor, result)?;
+            // TODO more advanced decision engine... lol
+            // Some reason codes may not prevent us from marking the onboarding as verified either
+            // TODO create audit trails
+            let new_status = if reason_codes.is_empty() {
+                Status::Verified
+            } else {
+                Status::ManualReview
+            };
+            Onboarding::update_status_by_id(conn, &onboarding_id, new_status)?;
+            Ok(())
+        })
+        .await?;
     Ok(())
 }
