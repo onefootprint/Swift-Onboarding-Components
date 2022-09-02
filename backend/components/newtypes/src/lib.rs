@@ -27,9 +27,11 @@ pub use self::auth_token::*;
 pub mod fingerprint;
 pub use self::fingerprint::*;
 
+pub mod map_container;
 pub mod secret_api_key;
 
-pub mod map_container;
+pub mod reason_code;
+pub use reason_code::*;
 
 pub use uuid::Uuid;
 #[derive(Debug, Clone, thiserror::Error)]
