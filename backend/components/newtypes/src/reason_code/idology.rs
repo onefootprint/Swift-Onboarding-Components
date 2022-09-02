@@ -1,41 +1,6 @@
-use std::str::FromStr;
+use super::{Signal, SignalKind};
+use crate::DataAttribute;
 use strum_macros::EnumString;
-
-#[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
-#[serde(try_from = "&str")]
-#[serde(untagged)]
-pub enum ReasonCode {
-    IDology(IDologyReasonCode),
-    Other(String),
-}
-
-impl FromStr for ReasonCode {
-    type Err = crate::Error;
-    fn from_str(value: &str) -> Result<Self, Self::Err> {
-        Self::try_from(value)
-    }
-}
-
-impl TryFrom<&str> for ReasonCode {
-    type Error = crate::Error;
-    fn try_from(value: &str) -> Result<Self, Self::Error> {
-        let value = if let Ok(value) = IDologyReasonCode::from_str(value) {
-            ReasonCode::IDology(value)
-        } else {
-            ReasonCode::Other(value.to_owned())
-        };
-        Ok(value)
-    }
-}
-
-impl ToString for ReasonCode {
-    fn to_string(&self) -> String {
-        match self {
-            ReasonCode::IDology(idology) => idology.to_string(),
-            ReasonCode::Other(s) => s.to_owned(),
-        }
-    }
-}
 
 #[derive(Debug, strum::Display, Clone, Eq, PartialEq, serde::Deserialize, EnumString)]
 #[serde(try_from = "&str")]
@@ -372,6 +337,7 @@ pub enum IDologyReasonCode {
     #[doc = "The “age” of the mobile account (account creation date) falls within the specified time range that the Enterprise is configured to monitor."]
     MobileIdAgeAlert,
 
+    // TODO better parse these reason codes
     #[strum(to_string = "resultcode.mobile.change.event.[event]")]
     #[doc = "A change event has occurred on the mobile account within the specified time range that the Enterprise is configured to monitor. Possible Events: • Phone Number Change: resultcode.mobile.change.event.number  • Network Status Change: resultcode.mobile.change.event.status •   Number was ported: resultcode.mobile.change.event.ported •   Device Change: resultcode.mobile.change.event.device •   SIM Swap: resultcode.mobile.change.event.simswap"]
     MobileChangeEventevent,
@@ -430,23 +396,141 @@ impl serde::Serialize for IDologyReasonCode {
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use test_case::test_case;
+// Tries to assign some gauge of risk to each reason code. Some are purely info that have no risk,
+// others are high fraud signals.
+// You could imagine a simple risk algorithm starts from a score of 100 and subtracts out for risky reason codes.
+// Perhaps we take the max risk score (ie Alert(3) > Alert(2) per field/signal attribute, sum them up, and subtract from 100.
+impl IDologyReasonCode {
+    fn signal(self) -> Signal {
+        use DataAttribute::*;
+        use IDologyReasonCode::*;
+        use SignalKind::*;
+        // TODO should we make signal attribute for whole fields?
+        // These are frequent signal kinds and signal attributes that we may need to create
+        let identity = vec![]; // TODO
+        let ip_address = vec![]; // TODO
+        let document = vec![]; // TODO
+        let ssn = vec![Ssn4, Ssn9];
+        let whole_address = vec![AddressLine1, AddressLine2, City, State, Zip, Country];
+        let enterprise_blocked = Alert(5);
+        let network_alert = Alert(10);
 
-    use super::*;
+        let (kind, attributes) = match self {
+            CoppaAlert => (Alert(10), vec![Dob]),
+            AddressDoesNotMatch => (Alert(3), vec![AddressLine1]),
+            StreetNameDoesNotMatch => (Alert(2), vec![AddressLine1]),
+            StreetNumberDoesNotMatch => (Alert(2), vec![AddressLine1]),
+            InputAddressIsPoBox => (Info, whole_address),
+            LocatedAddressIsPoBox => (Info, whole_address),
+            // TODO parse warm-address-list value
+            WarmInputAddressAlert => (Alert(3), whole_address),
+            WarmAddressAlert => (Alert(3), whole_address),
+            ZipCodeDoesNotMatch => (Alert(1), vec![Zip]),
+            InputAddressIsNotDeliverable => (Alert(1), whole_address),
+            LocatedAddressIsNotDeliverable => (Alert(1), whole_address),
+            YobDoesNotMatch => (Alert(3), vec![Dob]),
+            YobDoesNotMatchWithin1YearTolerance => (Alert(2), vec![Dob]),
+            MobDoesNotMatch => (Alert(3), vec![Dob]),
+            MobNotAvailable => (NotFound, vec![Dob]),
+            // TODO how do we handle this?
+            MultipleRecordsFound => (TODO, vec![]),
+            NewerRecordFound => (Alert(1), whole_address),
+            HighRiskAddress => (Fraud(2), whole_address),
+            AddressVelocityAlert => (Alert(3), identity),
+            AddressStabilityAlert => (Alert(1), identity),
+            // TODO: This seems like more than a binary signal?
+            AddressLongevityAlert => (TODO, identity),
+            AddressLocationAlert => (NotImportant, vec![Zip]),
+            // TODO i don't think we provide this
+            AlternateAddressAlert => (NotImportant, whole_address),
+            DobyobNotAvailable => (NotFound, vec![Dob]),
+            SsnNotAvailable => (NotFound, ssn), // TODO how to treat Ssn?
+            SsnDoesNotMatch => (Alert(3), ssn),
+            SsnDoesNotMatchWithinTolerance => (Alert(1), ssn),
+            InputSsnIsItin => (Info, ssn), // I think ITIN is fine? what is an ITIN?
+            ItinLocated => (Info, ssn),
+            SsnTiedToMultipleNames => (Alert(3), ssn),
+            SubjectDeceased => (Fraud(1), identity), // Is this a strong fraud signal? Seems sketchy
+            StateDoesNotMatch => (Alert(1), vec![State]),
+            SsnIssuedPriorToDob => (Fraud(5), ssn), // IDology notes specifically this is a serious fraud signal
+            SsnIsInvalid => (InvalidRequest, ssn),
+            SingleAddressInFile => (Info, whole_address),
+            // TODO doesn't seem like a binary signal
+            DataStrengthAlert => (TODO, identity),
+            ActivationDateAlert => (NotImportant, vec![]),
+            LastNameDoesNotMatch => (Alert(1), vec![LastName]),
+            ThinFile => (Alert(1), identity),
+            BankruptcyFound => (Info, identity),
+            // Only matters if we set in the enterprise config
+            // TODO: do we want some signals to be an instant -> manual review?
+            AgeBelowMinimum => (enterprise_blocked, vec![Dob]),
+            AgeAboveMaximum => (enterprise_blocked, vec![Dob]),
+            AlertListAlertSsn => (enterprise_blocked, ssn),
+            AlertListAlertAddress => (enterprise_blocked, whole_address),
+            AlertListAlertAddressAndZip => (enterprise_blocked, whole_address),
+            AlertListAlertIpAddress => (enterprise_blocked, ip_address),
+            AlertListAlertPhoneNumber => (enterprise_blocked, vec![PhoneNumber]),
+            AlertListAlertEmailAddress => (enterprise_blocked, vec![Email]),
+            AlertListAlertEmailDomain => (enterprise_blocked, vec![Email]),
+            AlertListAlertDocumentNumber => (enterprise_blocked, document),
+            // TODO: how serious are these "network alert lists"?
+            NetworkAlertSsn => (network_alert, ssn),
+            NetworkAlertAddress => (network_alert, whole_address),
+            NetworkAlertAddressAndZip => (network_alert, whole_address),
+            NetworkAlertIpAddress => (network_alert, ip_address),
+            NetworkAlertEmail => (network_alert, vec![Email]),
+            NetworkAlertPhoneNumber => (network_alert, vec![PhoneNumber]),
+            NetworkAlertEmailDomain => (network_alert, vec![Email]),
+            NetworkAlertDocumentNumber => (network_alert, document),
 
-    #[test_case("idphone.not.available" => ReasonCode::IDology(IDologyReasonCode::PhoneNumberIsUnlistedOrUnavailable))]
-    #[test_case("resultcode.coppa.alert" => ReasonCode::IDology(IDologyReasonCode::CoppaAlert))]
-    #[test_case("flerpderp" => ReasonCode::Other("flerpderp".to_owned()))]
-    fn test_deserialize(input: &str) -> ReasonCode {
-        ReasonCode::from_str(input).unwrap()
-    }
+            IpStateDoesNotMatch => (Alert(1), ip_address),
+            InvalidIp => (InvalidRequest, ip_address),
+            IpNotLocated => (NotFound, ip_address),
+            HighRiskIpBot => (Fraud(3), ip_address),
+            HighRiskIpSpam => (Fraud(3), ip_address),
+            HighRiskIpTor => (Fraud(3), ip_address),
+            IpLocationNotAvailable => (Alert(1), ip_address),
+            // Only matters if set via enterprise configuration
+            LowRisk => (Alert(2), identity),
+            MediumRisk => (Alert(4), vec![]),
+            HighRisk => (Alert(6), vec![]),
+            // TODO how serious is this?
+            PaDobMatch => (Alert(2), vec![Dob]),
+            // Do these even matter? idgi
+            PaDobDoesNotMatch => (Info, vec![Dob]),
+            PaDobNotAvailable => (Info, vec![]),
 
-    #[test_case(ReasonCode::IDology(IDologyReasonCode::PhoneNumberIsUnlistedOrUnavailable) => r#""idphone.not.available""#)]
-    #[test_case(ReasonCode::IDology(IDologyReasonCode::CoppaAlert) => r#""resultcode.coppa.alert""#)]
-    #[test_case(ReasonCode::Other("flerpderp".to_owned()) => r#""flerpderp""#)]
-    fn test_serialize(input: ReasonCode) -> String {
-        serde_json::ser::to_string(&input).unwrap()
+            EmailOrDomainDoesNotExist => (Alert(1), vec![Email]),
+            DomainRecentlyVerified => (Alert(1), vec![Email]),
+            PrivateEmailDomain => (Info, vec![Email]), // Don't think this is a fraud signal
+            CorporateEmailDomain => (Info, vec![Email]),
+            EmailRecentlyVerified => (Alert(3), vec![Email]),
+            HighRiskEmailCountry => (Alert(5), vec![Email]),
+            HighRiskEmailFraud => (Fraud(5), vec![Email]),
+            HighRiskEmailTumbled => (Fraud(1), vec![Email]), // IDology notes they only send this for high risk emails
+            HighRiskEmailDisposable => (Alert(1), vec![Email]),
+            HighRiskEmailDomain => (Fraud(3), vec![Email]),
+            InvalidEmailAddress => (InvalidRequest, vec![Email]),
+            // TODO: Enterprise-specific
+            MobileIdAgeAlert => (enterprise_blocked, vec![Dob]),
+            // TODO not parsing these properly
+            MobileChangeEventevent => (TODO, vec![]),
+            MobileAccountTypeaccountType => (TODO, vec![]),
+            MobileAccountStatusstatus => (TODO, vec![]),
+            InvalidPhoneNumber => (InvalidRequest, vec![PhoneNumber]),
+            PhoneNumberMatch => (Info, vec![PhoneNumber]), // TODO should we have negative scores?
+            PhoneNumberDoesNotMatch => (Alert(2), vec![PhoneNumber]),
+            PhoneNumberIsUnlistedOrUnavailable => (NotFound, vec![PhoneNumber]),
+            MobileNumber => (Info, vec![PhoneNumber]),
+            VoipNumber => (Info, vec![PhoneNumber]),
+            // How bad are these?
+            InputPhoneNumberDoesNotMatchInputState => (Info, vec![PhoneNumber, State]),
+            InputPhoneNumberDoesNotMatchLocatedStateHistory => (Info, vec![PhoneNumber, State]),
+            InputPhoneNumberDoesNotMatchIpState => (
+                Alert(1),
+                vec![PhoneNumber].into_iter().chain(ip_address).collect(),
+            ),
+        };
+        Signal { kind, attributes }
     }
 }
