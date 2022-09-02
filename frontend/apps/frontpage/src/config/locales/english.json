@@ -29,6 +29,11 @@
               "text": "Investor Updates",
               "href": "/investor-updates",
               "subtext": "Updates we share with our investors"
+            },
+            "library": {
+              "text": "Library",
+              "href": "/library",
+              "subtext": "Learn about KYC, PII vaulting, and more"
             }
           }
         },

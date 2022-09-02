@@ -49,7 +49,7 @@ const Library = ({ posts }: InvestorUpdatesProps) => {
               />
             ))}
           </Posts>
-          <Divider />
+          <StyledDivider />
         </Inner>
         <SubscribeToNewsletter />
       </Container>
@@ -57,10 +57,16 @@ const Library = ({ posts }: InvestorUpdatesProps) => {
   );
 };
 
+const StyledDivider = styled(Divider)`
+  ${({ theme }) => css`
+    margin-top: ${theme.spacing[9]}px;
+  `}
+`;
+
 const Posts = styled.div`
   ${({ theme }) => css`
     display: grid;
-    gap: ${theme.spacing[7]}px;
+    gap: ${theme.spacing[9]}px;
 
     ${media.greaterThan('md')`
       grid-template-columns: repeat(2, 1fr);

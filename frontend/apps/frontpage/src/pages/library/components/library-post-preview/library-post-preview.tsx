@@ -117,7 +117,7 @@ const Content = styled.div`
     display: flex;
     flex-direction: column;
     flex-grow: 1;
-    padding: ${theme.spacing[7]}px;
+    padding: ${theme.spacing[7]}px 0;
   `}
 `;
 

@@ -1,5 +1,5 @@
 import { useHasScroll, useToggle, useTranslation } from 'hooks';
-import { IcoMegaphone24, IcoWriting24 } from 'icons';
+import { IcoBook24, IcoMegaphone24, IcoWriting24 } from 'icons';
 import React from 'react';
 import styled, { css } from 'styled-components';
 import { Banner, Container, media } from 'ui';
@@ -39,6 +39,12 @@ const Navbar = ({ cta }: NavbarProps) => {
           href: t('entries.writing.links.investor-updates.href'),
           subtext: t('entries.writing.links.investor-updates.subtext'),
           iconComponent: IcoMegaphone24,
+        },
+        {
+          text: t('entries.writing.links.library.text'),
+          href: t('entries.writing.links.library.href'),
+          subtext: t('entries.writing.links.library.subtext'),
+          iconComponent: IcoBook24,
         },
       ],
     },
