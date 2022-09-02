@@ -29,6 +29,7 @@ table! {
         timestamp -> Timestamptz,
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
+        verification_result_id -> Nullable<Uuid>,
     }
 }
 
@@ -330,6 +331,7 @@ joinable!(access_event -> insight_event (insight_event_id));
 joinable!(access_event -> scoped_user (scoped_user_id));
 joinable!(audit_trail -> tenant (tenant_id));
 joinable!(audit_trail -> user_vault (user_vault_id));
+joinable!(audit_trail -> verification_result (verification_result_id));
 joinable!(email -> user_vault (user_vault_id));
 joinable!(fingerprint -> user_vault (user_vault_id));
 joinable!(identity_data -> user_vault (user_vault_id));

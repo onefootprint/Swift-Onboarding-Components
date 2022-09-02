@@ -6,6 +6,7 @@ use crate::errors::onboarding::OnboardingError;
 use crate::errors::ApiError;
 use crate::types::response::ApiResponseData;
 use crate::utils::idv::initiate_idv_request;
+use crate::utils::idv::IdvRequestData;
 use crate::utils::insight_headers::InsightHeaders;
 use crate::utils::user_vault_wrapper::UserVaultWrapper;
 use crate::State;
@@ -61,7 +62,7 @@ fn handler(
 
     let tenant_id = tenant_auth.tenant.id.clone();
     let session_key = state.session_sealing_key.clone();
-    let (validation_token, webauthn_creds, verification_request, uvw, ob_id) = state
+    let (validation_token, webauthn_creds, idv_request_data) = state
         .db_pool
         .db_transaction(move |conn| -> Result<_, ApiError> {
             let scoped_user = ScopedUser::get_or_create(
@@ -73,7 +74,7 @@ fn handler(
             let insight_event = CreateInsightEvent::from(insights);
             let ob = Onboarding::get_or_create(
                 conn,
-                scoped_user.id,
+                scoped_user.id.clone(),
                 tenant_auth.ob_config.id.clone(),
                 insight_event,
             )?;
@@ -81,14 +82,21 @@ fn handler(
             let verification_request = initiate_verification(conn, ob, &uvw, &tenant_id, decrypted_phone)?;
             let validation_token =
                 super::create_onboarding_validation_token(conn, &session_key, ob_id.clone())?;
-            let webauthn_creds = WebauthnCredential::get_for_user_vault(conn, &uvw.user_vault.id)?;
-            Ok((validation_token, webauthn_creds, verification_request, uvw, ob_id))
+            let webauthn_creds = WebauthnCredential::get_for_user_vault(conn, &uvw.user_vault.id.clone())?;
+
+            let idv_request_data = verification_request.map(|r| IdvRequestData {
+                onboarding_id: ob_id,
+                user_vault_id: scoped_user.user_vault_id,
+                tenant_id: scoped_user.tenant_id,
+                request: r,
+                uvw,
+            });
+            Ok((validation_token, webauthn_creds, idv_request_data))
         })
         .await?;
 
-    if let Some(verification_request) = verification_request {
-        let idv_data = uvw.build_idv_request(&state).await?;
-        initiate_idv_request(&state, ob_id, verification_request, idv_data).await?;
+    if let Some(idv_request_data) = idv_request_data {
+        initiate_idv_request(&state, idv_request_data).await?;
     }
 
     Ok(Json(ApiResponseData {
@@ -186,6 +194,7 @@ fn initiate_verification(
             AuditTrailEvent::Verification(e),
             uvw.user_vault.id.clone(),
             Some(tenant_id.clone()),
+            None,
         )
     })?;
     Ok(None)

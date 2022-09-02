@@ -195,7 +195,7 @@ async fn complete(
                 ip_address: insights.ip_address.clone(),
                 location: insights.location(),
             });
-            AuditTrail::create(conn, event, user_auth.user_vault_id(), None)?;
+            AuditTrail::create(conn, event, user_auth.user_vault_id(), None, None)?;
 
             let insight_event = CreateInsightEvent::from(insights).insert_with_conn(conn)?;
             NewWebauthnCredential {

@@ -1,4 +1,4 @@
-use newtypes::{dob::DateOfBirth, IdvData, PiiString};
+use newtypes::{dob::DateOfBirth, DataAttribute, IdvData, PiiString};
 
 use crate::idology::{ConversionError, Error, ReqwestError};
 
@@ -84,6 +84,25 @@ impl TryFrom<IdvData> for IdologyRequestData {
             output: "json".to_owned(),
         };
         Ok(request)
+    }
+}
+
+impl IdologyClient {
+    // TODO is there a more typesafe way to keep this in sync with the mapper function above?
+    pub fn verified_data_attributes() -> Vec<DataAttribute> {
+        vec![
+            DataAttribute::FirstName,
+            DataAttribute::LastName,
+            DataAttribute::AddressLine1,
+            DataAttribute::City,
+            DataAttribute::State,
+            DataAttribute::Zip,
+            DataAttribute::Ssn4,
+            DataAttribute::Ssn9,
+            DataAttribute::Dob,
+            DataAttribute::Email,
+            DataAttribute::PhoneNumber,
+        ]
     }
 }
 

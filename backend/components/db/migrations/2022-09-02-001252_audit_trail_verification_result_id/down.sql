@@ -1,0 +1,1 @@
+ALTER TABLE audit_trail DROP COLUMN verification_result_id;

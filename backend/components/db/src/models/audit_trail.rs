@@ -6,6 +6,7 @@ use crate::{
 };
 use chrono::{DateTime, Utc};
 use diesel::{Insertable, PgConnection, QueryDsl, Queryable, RunQueryDsl};
+use newtypes::VerificationResultId;
 use newtypes::{AuditTrailEvent, AuditTrailId, FootprintUserId, TenantId, UserVaultId};
 use serde::{Deserialize, Serialize};
 
@@ -20,6 +21,7 @@ pub struct AuditTrail {
     pub timestamp: DateTime<Utc>,
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
+    pub verification_result_id: Option<VerificationResultId>,
 }
 
 impl AuditTrail {
@@ -52,6 +54,7 @@ struct NewAuditTrail {
     pub tenant_id: Option<TenantId>,
     pub event: AuditTrailEvent,
     pub timestamp: DateTime<Utc>,
+    pub verification_result_id: Option<VerificationResultId>,
 }
 
 impl AuditTrail {
@@ -60,12 +63,14 @@ impl AuditTrail {
         event: AuditTrailEvent,
         user_vault_id: UserVaultId,
         tenant_id: Option<TenantId>,
+        verification_result_id: Option<VerificationResultId>,
     ) -> Result<(), DbError> {
         let row = NewAuditTrail {
             user_vault_id,
             tenant_id,
             timestamp: chrono::Utc::now(),
             event,
+            verification_result_id,
         };
         diesel::insert_into(audit_trail::table)
             .values(row)
