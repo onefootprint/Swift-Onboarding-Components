@@ -46,6 +46,8 @@ pub enum Error {
     AddressError(#[from] AddressError),
     #[error("phone error: {0}")]
     PhoneError(#[from] PhoneError),
+    #[error("Serde error")]
+    SerdeError,
 }
 
 #[derive(Debug, Clone, thiserror::Error)]

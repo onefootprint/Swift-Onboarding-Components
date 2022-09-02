@@ -1,20 +1,13 @@
 use newtypes::{dob::DateOfBirth, IdvData, PiiString};
-use std::fmt::{Debug, Display};
 
 use crate::idology::{ConversionError, Error, ReqwestError};
 
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub struct IdologyClient {
     client: reqwest::Client,
     url: String,
     username: PiiString,
     password: PiiString,
-}
-
-impl std::fmt::Debug for IdologyClient {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.write_str("idology")
-    }
 }
 
 /// Idology request, we'll only use this for U.S. citizens for now
@@ -102,59 +95,6 @@ struct IdologyRequest {
     age_to_check: u32,
     #[serde(flatten)]
     data: IdologyRequestData,
-}
-
-#[derive(serde::Serialize, serde::Deserialize, Debug)]
-#[serde(rename_all = "kebab-case")]
-pub struct IdologyResponse {
-    response: IdologyResponseInner,
-}
-
-#[derive(serde::Serialize, serde::Deserialize, Debug)]
-#[serde(untagged)]
-enum IdologyResponseInner {
-    Error(IdologyApiError),
-    Success(IdologySuccess),
-}
-
-#[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
-#[serde(rename_all = "kebab-case")]
-pub struct IdologyApiError {
-    error: Option<String>,
-    /// this will be "failed" if the service is unreachable/down
-    failed: Option<String>,
-}
-
-impl Display for IdologyApiError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(
-            f,
-            "error_message: {:?}, failed_message : {:?}",
-            self.error, self.failed
-        )
-    }
-}
-
-#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
-#[serde(rename_all = "kebab-case")]
-pub struct IdologySuccess {
-    id_number: String,
-    summary_result: IdologyKeyAndMessage,
-    results: IdologyKeyAndMessage,
-    qualifiers: Qualifier,
-}
-
-#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
-#[serde(rename_all = "kebab-case")]
-struct Qualifier {
-    qualifier: IdologyKeyAndMessage,
-}
-
-#[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
-#[serde(rename_all = "kebab-case")]
-struct IdologyKeyAndMessage {
-    key: String,
-    message: String,
 }
 
 impl IdologyClient {

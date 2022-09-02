@@ -1,9 +1,8 @@
 use newtypes::ValidatedPhoneNumber;
 use std::fmt::Debug;
 
-use self::client::IdologyApiError;
-
 pub mod client;
+pub mod verification;
 
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
@@ -11,9 +10,8 @@ pub enum Error {
     ConversionEror(#[from] ConversionError),
     #[error("internal reqwest error: {0}")]
     ReqwestError(#[from] ReqwestError),
-    // TODO: don't show this
-    #[error("error from idology api: {0}")]
-    IdologyErrorResponse(IdologyApiError),
+    #[error("Json error: {0}")]
+    SerdeJson(#[from] serde_json::Error),
 }
 
 #[derive(Debug, thiserror::Error)]
