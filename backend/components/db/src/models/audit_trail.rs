@@ -10,6 +10,8 @@ use newtypes::VerificationResultId;
 use newtypes::{AuditTrailEvent, AuditTrailId, FootprintUserId, TenantId, UserVaultId};
 use serde::{Deserialize, Serialize};
 
+use super::verification_result::VerificationResult;
+
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
 #[diesel(table_name = audit_trail)]
 pub struct AuditTrail {
@@ -30,13 +32,14 @@ impl AuditTrail {
         tenant_id: &TenantId,
         footprint_user_id: &FootprintUserId,
         is_live: bool,
-    ) -> Result<Vec<AuditTrail>, DbError> {
+    ) -> Result<Vec<(AuditTrail, Option<VerificationResult>)>, DbError> {
         let user_vault_ids = schema::scoped_user::table
             .filter(schema::scoped_user::tenant_id.eq(tenant_id))
             .filter(schema::scoped_user::fp_user_id.eq(footprint_user_id))
             .filter(schema::scoped_user::is_live.eq(is_live))
             .select(schema::scoped_user::user_vault_id);
         let audit_trails = schema::audit_trail::table
+            .left_join(schema::verification_result::table)
             // Get all access events for this user, but filter out access events from other tenants
             .filter(schema::audit_trail::user_vault_id.eq_any(user_vault_ids))
             .filter(schema::audit_trail::tenant_id.is_null().or(
