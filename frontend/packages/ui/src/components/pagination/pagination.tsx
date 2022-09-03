@@ -1,25 +1,28 @@
 import React from 'react';
 import styled, { css } from 'styled-components';
-import { Box, Button, Typography } from 'ui';
 
-type PaginationProps = {
-  totalNumResults: number;
-  pageSize: number;
-  pageIndex: number;
-  onPrevPage: () => void;
-  onNextPage: () => void;
-  hasPrevPage: boolean;
+import Box from '../box';
+import Button from '../button';
+import Typography from '../typography';
+
+export type PaginationProps = {
   hasNextPage: boolean;
+  hasPrevPage: boolean;
+  onNextPage: () => void;
+  onPrevPage: () => void;
+  pageIndex: number;
+  pageSize: number;
+  totalNumResults: number;
 };
 
 const Pagination = ({
-  totalNumResults,
-  pageSize,
-  pageIndex,
-  onPrevPage,
-  onNextPage,
-  hasPrevPage,
   hasNextPage,
+  hasPrevPage,
+  onNextPage,
+  onPrevPage,
+  pageIndex,
+  pageSize,
+  totalNumResults,
 }: PaginationProps) => {
   const lowerBoundShownResults = pageIndex * pageSize + 1;
   const upperBoundShownResults = Math.min(

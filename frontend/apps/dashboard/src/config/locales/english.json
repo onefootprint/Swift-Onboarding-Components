@@ -100,6 +100,14 @@
         "users": "Users |",
         "details": "Details"
       },
+      "empty-state": {
+        "title": "Oops! User couldn't be found.",
+        "description": "We're sorry, but it looks like the user you're looking for doesn't exist.",
+        "cta": "Go back to users",
+        "image": {
+          "alt": "A penguin playing with his phone"
+        }
+      },
       "user-info": {
         "basic": {
           "title": "Basic data"

@@ -10,6 +10,7 @@ import {
   Box,
   CodeInline,
   Divider,
+  Pagination,
   SearchInput,
   Table,
   Typography,
@@ -19,7 +20,6 @@ import FieldOrPlaceholder from './components/field-or-placeholder';
 import UsersFilter from './components/filter-dialog';
 import useGetUsers from './hooks/use-get-users';
 import { nameData, User } from './hooks/use-join-users';
-import Pagination from './pages/detail/components/pagination';
 
 const PAGE_SIZE = 10;
 
