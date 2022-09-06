@@ -196,6 +196,8 @@ jobs:
       - name: select stack
         working-directory: ./backend/infra
         run: pulumi stack select "footprint/${{ inputs.stackName }}"
+        env:
+          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
 
       - name: 'override base domain'
         if: ${{ inputs.baseDomain || false }}
@@ -236,6 +238,8 @@ jobs:
         run: |
           pulumi config set --path constants.containers.apiVersion ${{ steps.constants.outputs.componentVersion }}
           pulumi config set --path constants.containers.enclaveVersion ${{ steps.constants.outputs.componentVersion }}
+        env:
+          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
 
       # preview the stack
       - uses: pulumi/actions@v3
