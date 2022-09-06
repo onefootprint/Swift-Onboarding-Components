@@ -1,17 +1,20 @@
-use super::{user_vault_wrapper::UserVaultWrapper, verification::get_reason_codes};
+use super::user_vault_wrapper::UserVaultWrapper;
 use crate::{errors::ApiError, State};
 use chrono::Utc;
-use db::models::{
-    audit_trail::AuditTrail,
-    identity_data::HasIdentityDataFields,
-    onboarding::Onboarding,
-    verification_request::{NewVerificationRequest, VerificationRequest},
-    verification_result::VerificationResult,
+use db::{
+    models::{
+        audit_trail::AuditTrail,
+        identity_data::HasIdentityDataFields,
+        onboarding::Onboarding,
+        verification_request::{NewVerificationRequest, VerificationRequest},
+        verification_result::VerificationResult,
+    },
+    PgConnection,
 };
-use idv::idology::client::IdologyClient;
+use idv::{idology::client::IdologyClient, verification::get_signals};
 use newtypes::{
-    email::Email, AuditTrailEvent, DataAttribute, IdvData, OnboardingId, PhoneNumber, ScopedUserId, Status,
-    TenantId, UserVaultId, Vendor, VerificationInfo, VerificationInfoStatus,
+    email::Email, AuditTrailEvent, DataAttribute, IdvData, OnboardingId, PhoneNumber, ScopedUserId, Signal,
+    Status, TenantId, UserVaultId, Vendor, VerificationInfo, VerificationInfoStatus,
 };
 use std::{collections::HashMap, str::FromStr};
 use strum::IntoEnumIterator;
@@ -87,7 +90,11 @@ pub async fn initiate_idv_request(state: &State, data: IdvRequestData) -> Result
     let idv_data = uvw.build_idv_request(state).await?;
 
     let result = match request.vendor {
-        Vendor::Idology => state.idology_client.verify_expectid(idv_data).await?,
+        Vendor::Idology => state
+            .idology_client
+            .verify_expectid(idv_data)
+            .await
+            .map_err(idv::Error::from)?,
         _ => return Err(ApiError::NotImplemented),
     };
     state
@@ -95,46 +102,11 @@ pub async fn initiate_idv_request(state: &State, data: IdvRequestData) -> Result
         .db_transaction(move |conn| -> Result<_, ApiError> {
             let result = VerificationResult::create(conn, request.id, result)?;
             let result_id = result.id.clone();
-            let new_status = match get_reason_codes(request.vendor, result) {
-                Ok(reason_codes) => {
-                    // TODO more advanced decision engine... lol
-                    // Some reason codes may not prevent us from marking the onboarding as verified either
-                    if reason_codes.is_empty() {
-                        Status::Verified
-                    } else {
-                        Status::ManualReview
-                    }
-                }
-                Err(_) => {
-                    // TODO better handling of errors. Probably want to retry some number of times,
-                    // but still save the error response for debugging
-                    Status::ManualReview
-                }
+            let (new_status, events) = match get_signals(request.vendor, result.response) {
+                Ok(signals) => process_success(signals, uvw, request.vendor)?,
+                Err(_) => process_error()?,
             };
             Onboarding::update_status_by_id(conn, &onboarding_id, new_status)?;
-            let verified_fields = IdologyClient::verified_data_attributes()
-                .into_iter()
-                .filter(|a| uvw.has_field(*a))
-                .collect();
-            let audit_trail_status = match new_status {
-                Status::Verified => VerificationInfoStatus::Verified,
-                _ => VerificationInfoStatus::Failed,
-            };
-            // TODO some fields may be verified while others are failed from a single request.
-            // https://linear.app/footprint/issue/FP-1260/differentiate-between-audit-trails-for-failedsuccessful-fields
-            // Need to extract this info from the reason codes
-            let events = vec![
-                VerificationInfo {
-                    data_attributes: verified_fields,
-                    vendor: request.vendor,
-                    status: audit_trail_status,
-                },
-                VerificationInfo {
-                    data_attributes: vec![],
-                    vendor: Vendor::Footprint,
-                    status: audit_trail_status,
-                },
-            ];
             events.into_iter().try_for_each(|e| {
                 AuditTrail::create(
                     conn,
@@ -148,4 +120,51 @@ pub async fn initiate_idv_request(state: &State, data: IdvRequestData) -> Result
         })
         .await?;
     Ok(())
+}
+
+fn process_success(
+    signals: Vec<Signal>,
+    uvw: UserVaultWrapper,
+    vendor: Vendor,
+) -> Result<(Status, Vec<VerificationInfo>), ApiError> {
+    // TODO more advanced decision engine... lol
+    let new_status = if signals.is_empty() {
+        Status::Verified
+    } else {
+        Status::ManualReview
+    };
+
+    let verified_fields = IdologyClient::verified_data_attributes()
+        .into_iter()
+        .filter(|a| uvw.has_field(*a))
+        .collect();
+    let audit_trail_status = match new_status {
+        Status::Verified => VerificationInfoStatus::Verified,
+        _ => VerificationInfoStatus::Failed,
+    };
+    // TODO some fields may be verified while others are failed from a single request.
+    // https://linear.app/footprint/issue/FP-1260/differentiate-between-audit-trails-for-failedsuccessful-fields
+    // Need to extract this info from the reason codes
+    let events = vec![
+        VerificationInfo {
+            data_attributes: verified_fields,
+            vendor,
+            status: audit_trail_status,
+        },
+        VerificationInfo {
+            data_attributes: vec![],
+            vendor: Vendor::Footprint,
+            status: audit_trail_status,
+        },
+    ];
+    Ok((new_status, events))
+}
+
+fn process_error() -> Result<(Status, Vec<VerificationInfo>), ApiError> {
+    let events = vec![VerificationInfo {
+        data_attributes: vec![],
+        vendor: Vendor::Footprint,
+        status: VerificationInfoStatus::Failed,
+    }];
+    Ok((Status::ManualReview, events))
 }

@@ -82,7 +82,7 @@ pub enum ApiError {
     #[error("Method not allowed for endpoint")]
     MethodNotAllowed,
     #[error("Idv error: {0}")]
-    IdvError(#[from] idv::idology::Error),
+    IdvError(#[from] idv::Error),
 }
 
 impl<T> From<WorkOsError<T>> for ApiError

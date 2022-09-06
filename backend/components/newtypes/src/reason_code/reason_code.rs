@@ -1,5 +1,7 @@
 use std::str::FromStr;
 
+use crate::{Signal, SignalKind};
+
 use super::IDologyReasonCode;
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
@@ -34,6 +36,18 @@ impl ToString for ReasonCode {
         match self {
             ReasonCode::IDology(idology) => idology.to_string(),
             ReasonCode::Other(s) => s.to_owned(),
+        }
+    }
+}
+
+impl ReasonCode {
+    pub fn signal(self) -> Signal {
+        match self {
+            ReasonCode::IDology(idology) => idology.signal(),
+            ReasonCode::Other(_) => Signal {
+                kind: SignalKind::TODO,
+                attributes: vec![],
+            },
         }
     }
 }

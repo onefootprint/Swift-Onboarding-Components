@@ -401,7 +401,7 @@ impl serde::Serialize for IDologyReasonCode {
 // You could imagine a simple risk algorithm starts from a score of 100 and subtracts out for risky reason codes.
 // Perhaps we take the max risk score (ie Alert(3) > Alert(2) per field/signal attribute, sum them up, and subtract from 100.
 impl IDologyReasonCode {
-    fn signal(self) -> Signal {
+    pub fn signal(self) -> Signal {
         use DataAttribute::*;
         use IDologyReasonCode::*;
         use SignalKind::*;
