@@ -13,9 +13,12 @@ pub struct TokenResponse {
     pub expires_at: DateTime<Utc>,
 }
 
-#[api_v2_operation(tags(Hosted))]
+#[api_v2_operation(
+    summary = "/hosted/user/token",
+    tags(Hosted),
+    description = "Returns information about a given auth token."
+)]
 #[get("token")]
-/// Returns information about a given auth token
 pub fn get(user_auth: UserAuth) -> actix_web::Result<Json<ApiResponseData<TokenResponse>>, ApiError> {
     let user_auth = user_auth.check_permissions(vec![UserAuthScope::SignUp, UserAuthScope::BasicProfile])?;
 

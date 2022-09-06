@@ -18,10 +18,12 @@ struct UserDecryptRequest {
 
 type UserDecryptResponse = HashMap<DataAttribute, Option<String>>;
 
-#[api_v2_operation(tags(Hosted))]
+#[api_v2_operation(
+    summary = "/hosted/user/decrypt",
+    tags(Hosted),
+    description = "Allows a user to decrypt their own data. Requires user auth provided in the header."
+)]
 #[post("/decrypt")]
-/// Allows a user to decrypt their own data.
-/// Requires user auth provided in the cookie.
 fn handler(
     state: web::Data<State>,
     user_auth: UserAuth,

@@ -13,11 +13,14 @@ struct LinkAuthRequest {
     redirect_url: String,
 }
 
-#[api_v2_operation(tags(Private))]
+#[api_v2_operation(
+    summary = "/org/auth/magic_link",
+    description = "Request to authenticate a user email. WorkOS will send the email a link to \
+    login. Once the user clicks the magic link, WorkOs will call the /workos/callback endpoint, \
+    at which point we authenticate the user",
+    tags(Private)
+)]
 #[post("/magic_link")]
-/// Request to authenticate a user email. WorkOS will send the email a link to login.
-/// Once the user clicks the magic link, WorkOs will call the /workos/callback endpoint,
-/// at which point we authenticate the user
 fn handler(
     state: web::Data<State>,
     request: Json<LinkAuthRequest>,

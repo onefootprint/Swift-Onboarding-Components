@@ -52,9 +52,12 @@ pub struct UserChallengeData {
     time_before_retry_s: i64,
 }
 
-#[api_v2_operation(tags(Hosted, Bifrost))]
-/// Tries to identify an existing user by either phone number or email. If the user is found,
-/// initiates a challenge of the requested type and returns relevant challenge data.
+#[api_v2_operation(
+    summary = "/hosted/identify",
+    tags(Hosted, Bifrost),
+    description = "Tries to identify an existing user by either phone number or email. If the user \
+    is found, initiates a challenge of the requested type and returns relevant challenge data."
+)]
 pub async fn handler(
     request: Json<IdentifyRequest>,
     state: web::Data<State>,

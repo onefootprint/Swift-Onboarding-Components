@@ -26,9 +26,12 @@ pub struct ValidateResponse {
     pub timestamp: DateTime<Utc>,
 }
 
-#[api_v2_operation(tags(PublicApi))]
+#[api_v2_operation(
+    summary = "/users/validate",
+    description = "Allows a tenant to view a customer's registered webauthn credentials.",
+    tags(PublicApi)
+)]
 #[post("/validate")]
-/// Allows a tenant to view a customer's registered webauthn credentials
 pub async fn validate(
     state: web::Data<State>,
     request: web::Json<ValidateRequest>,

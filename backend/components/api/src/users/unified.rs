@@ -35,10 +35,11 @@ pub struct UnifiedUserVaultPutRequest {
     custom: Option<PutCustomDataRequest>,
 }
 
-/**
- * Update (PUT) data in the identity vault
- */
-#[api_v2_operation(tags(PublicApi))]
+#[api_v2_operation(
+    summary = "/users/{footprint_user_id}",
+    description = "Updates data in the identity vault.",
+    tags(PublicApi)
+)]
 pub async fn put(
     state: web::Data<State>,
     path: Path<FootprintUserId>,
@@ -110,8 +111,11 @@ pub struct UnifiedUserVaultGetDataResponse {
     custom: GetCustomDataResponse,
 }
 
-/// check if fields exist
-#[api_v2_operation(tags(PublicApi))]
+#[api_v2_operation(
+    summary = "/users/{footprint_user_id}",
+    description = "Checks if fields exist.",
+    tags(PublicApi)
+)]
 pub async fn get(
     state: web::Data<State>,
     path: Path<FootprintUserId>,
@@ -181,8 +185,11 @@ pub struct UnifiedUserVaultDecryptResponse {
     custom: DecryptCustomDataResponse,
 }
 
-/// decrypt custom data
-#[api_v2_operation(tags(PublicApi))]
+#[api_v2_operation(
+    summary = "/users/{footprint_user_id}/custom/decrypt",
+    tags(PublicApi),
+    description = "Decrypts custom user data"
+)]
 pub async fn post_decrypt(
     state: web::Data<State>,
     path: Path<FootprintUserId>,

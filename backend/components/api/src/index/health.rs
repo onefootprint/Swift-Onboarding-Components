@@ -8,7 +8,11 @@ use newtypes::{EncryptedVaultPrivateKey, SealedVaultBytes};
 use paperclip::actix::{api_v2_operation, get, web, Apiv2Schema};
 use serde::{Deserialize, Serialize};
 
-#[api_v2_operation(tags(Private))]
+#[api_v2_operation(
+    summary = "/health",
+    tags(Private),
+    description = "Returns health of services running"
+)]
 #[tracing::instrument(name = "health", skip(state))]
 #[get("/health")]
 async fn handler(state: web::Data<State>) -> Result<String, ApiError> {
@@ -35,7 +39,11 @@ pub struct EnclaveHealthResponse {
     decrypt_ms: i128,
 }
 
-#[api_v2_operation(tags(Private))]
+#[api_v2_operation(
+    summary = "/health/enclave",
+    tags(Private),
+    description = "Returns enclave health"
+)]
 #[tracing::instrument(name = "enclave_health", skip(state))]
 #[get("/health/enclave")]
 async fn enclave(
@@ -67,7 +75,11 @@ async fn enclave(
     .json()
 }
 
-#[api_v2_operation(tags(Private))]
+#[api_v2_operation(
+    summary = "/health/enclave_decrypt",
+    description = "Checks health of enclave decrypt operation",
+    tags(Private)
+)]
 #[tracing::instrument(name = "enclave_health_decrypt", skip(state))]
 #[get("/health/enclave_decrypt")]
 async fn enclave_decrypt(
@@ -99,7 +111,7 @@ async fn enclave_decrypt(
     .json()
 }
 
-#[api_v2_operation(tags(Private))]
+#[api_v2_operation(summary = "/panic", tags(Private))]
 #[tracing::instrument(name = "panic")]
 #[get("/panic")]
 async fn panic_handler(_: CustodianAuthContext) -> &'static str {
@@ -107,7 +119,7 @@ async fn panic_handler(_: CustodianAuthContext) -> &'static str {
     panic!("at the disco");
 }
 
-#[api_v2_operation(tags(Private))]
+#[api_v2_operation(summary = "/fail", tags(Private))]
 #[tracing::instrument(name = "fail")]
 #[get("/fail")]
 async fn fail_handler() -> Result<&'static str, ApiError> {

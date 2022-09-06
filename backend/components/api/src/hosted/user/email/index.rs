@@ -22,8 +22,11 @@ pub struct AddEmailRequest {
     speculative: bool,
 }
 
-#[api_v2_operation(tags(Hosted))]
-/// Add an email to the account and send a challenge
+#[api_v2_operation(
+    summary = "/hosted/user/email",
+    tags(Hosted),
+    description = "Adds an email to the account and send a challenge."
+)]
 pub async fn post(
     state: web::Data<State>,
     user_auth: UserAuth,

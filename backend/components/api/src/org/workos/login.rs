@@ -37,9 +37,12 @@ struct DashboardAuthorizationResponse {
     sandbox_restricted: bool,
 }
 
-/// Called from the front-end with the WorkOS code. Returns
-/// the authorization token needed for future requests as well as user information
-#[api_v2_operation(tags(Private))]
+#[api_v2_operation(
+    summary = "/org/auth/login",
+    tags(Private),
+    description = "Called from the front-end with the WorkOS code. Returns the authorization \
+    token needed for future requests as well as user information"
+)]
 #[post("/login")]
 async fn handler(
     state: web::Data<State>,

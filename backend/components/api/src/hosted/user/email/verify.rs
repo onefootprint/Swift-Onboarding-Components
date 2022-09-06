@@ -15,10 +15,13 @@ struct EmailVerifyRequest {
     data: SessionAuthToken,
 }
 
-#[api_v2_operation(tags(Hosted))]
+#[api_v2_operation(
+    summary = "/hosted/user/email/verify",
+    tags(Hosted),
+    description = "Used to asynchronously verify a user's email address. Requires the token sent \
+    to the users email."
+)]
 #[post("/verify")]
-/// Used to asynchronously verify a user's email address.
-/// Requires the token sent to the users email
 async fn post(
     state: web::Data<State>,
     request: Json<EmailVerifyRequest>,

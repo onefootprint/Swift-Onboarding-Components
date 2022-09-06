@@ -29,8 +29,11 @@ struct NewClientResponse {
     key: TenantApiKeyResponse,
 }
 
-/// Create a new client (this endpoint will be private in prod TODO)
-#[api_v2_operation(tags(Private))]
+#[api_v2_operation(
+    summary = "/private/client",
+    description = "Creates a new client (this endpoint will be private in prod TODO).",
+    tags(Private)
+)]
 #[post("/client")]
 async fn post(
     request: web::Json<NewClientRequest>,

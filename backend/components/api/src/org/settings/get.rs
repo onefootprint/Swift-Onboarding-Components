@@ -15,8 +15,11 @@ struct GetTenantResponse {
     email_domains: Vec<String>,
 }
 
-/// get tenant settings
-#[api_v2_operation(tags(PublicApi))]
+#[api_v2_operation(
+    summary = "/org/settings",
+    description = "Returns tenant settings.",
+    tags(PublicApi)
+)]
 #[get("/")]
 fn handler(
     state: web::Data<State>,

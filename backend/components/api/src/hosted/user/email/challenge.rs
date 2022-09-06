@@ -19,9 +19,12 @@ struct RequestEmailVerifyRequest {
     id: EmailId,
 }
 
-#[api_v2_operation(tags(Hosted))]
+#[api_v2_operation(
+    summary = "/hosted/user/email/challenge",
+    tags(Hosted),
+    description = "Re-sends the email verification email for the given user data."
+)]
 #[post("/challenge")]
-/// Re-send the email verification email for the given user data
 async fn post(
     state: web::Data<State>,
     user_auth: UserAuth,

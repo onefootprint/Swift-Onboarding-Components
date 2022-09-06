@@ -9,9 +9,12 @@ use paperclip::actix::{api_v2_operation, get, web, web::Json};
 
 type LivenessResponse = Vec<ApiLiveness>;
 
-#[api_v2_operation(tags(Hosted))]
+#[api_v2_operation(
+    summary = "/hosted/user/liveness",
+    tags(Hosted),
+    description = "Allows a user to view their registered webauthn credentials"
+)]
 #[get("/liveness")]
-/// Allows a user to view their registered webauthn credentials
 fn get(
     state: web::Data<State>,
     user_auth: UserAuth,

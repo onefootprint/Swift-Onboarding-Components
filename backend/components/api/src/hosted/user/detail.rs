@@ -43,9 +43,12 @@ pub struct ApiUser {
     // TODO can expand this to include many other data kinds
 }
 
-#[api_v2_operation(tags(Hosted))]
-/// Returns a decrypted profile for the logged-in user
-/// Requires user authentication sent in the cookie after a successful /identify/verify call
+#[api_v2_operation(
+    summary = "/hosted/user/detail",
+    tags(Hosted),
+    description = "Returns a decrypted profile for the logged-in user. Requires user authentication \
+    from a successful /identify/verify call in the header."
+)]
 pub async fn handler(
     user_auth: UserAuth,
     state: web::Data<State>,

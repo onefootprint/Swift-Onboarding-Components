@@ -26,9 +26,12 @@ use newtypes::ObConfigurationId;
 use paperclip::actix::Apiv2Schema;
 use paperclip::actix::{api_v2_operation, get, patch, post, web, web::Json};
 
-#[api_v2_operation(tags(PublicApi))]
+#[api_v2_operation(
+    summary = "/org/onboarding_config",
+    tags(PublicApi),
+    description = " Uses tenant public key auth to return information about the tenant."
+)]
 #[get("/onboarding_config")]
-/// Uses tenant public key auth to return information about the tenant
 pub fn get_detail(
     auth: PublicTenantAuthContext,
 ) -> actix_web::Result<Json<ApiResponseData<ApiObConfig>>, ApiError> {
@@ -38,9 +41,12 @@ pub fn get_detail(
     )))))
 }
 
-#[api_v2_operation(tags(PublicApi))]
+#[api_v2_operation(
+    summary = "/org/onboarding_configs",
+    tags(PublicApi),
+    description = "Returns a list of onboarding configurations owned by the tenant."
+)]
 #[get("/onboarding_configs")]
-/// Return a list of onboarding configurations owned by the tenant
 async fn get(
     state: web::Data<State>,
     request: web::Query<PaginatedRequest<EmptyRequest, DateTime<Utc>>>,
@@ -110,9 +116,12 @@ impl CreateOnboardingConfigurationRequest {
     }
 }
 
-#[api_v2_operation(tags(PublicApi))]
+#[api_v2_operation(
+    summary = "/org/onboarding_configs",
+    description = "Creates a new onboarding configuration.",
+    tags(PublicApi)
+)]
 #[post("/onboarding_configs")]
-/// Create a new onboarding configuration
 pub fn post(
     state: web::Data<State>,
     auth: Either<SessionContext<WorkOs>, SecretTenantAuthContext>,
@@ -150,9 +159,12 @@ struct UpdateObConfigRequest {
     status: Option<ApiKeyStatus>,
 }
 
-#[api_v2_operation(tags(PublicApi))]
+#[api_v2_operation(
+    summary = "/org/onboarding_configs/{id}",
+    description = "Updates an existing onboarding configuration.",
+    tags(PublicApi)
+)]
 #[patch("/onboarding_configs/{id}")]
-/// Update an existing onboarding configuration
 async fn patch(
     state: web::Data<State>,
     auth: Either<SessionContext<WorkOs>, SecretTenantAuthContext>,

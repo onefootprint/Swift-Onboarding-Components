@@ -16,9 +16,12 @@ pub struct D2pSmsResponse {
     time_before_retry_s: i64,
 }
 
-#[api_v2_operation(tags(Hosted))]
+#[api_v2_operation(
+    summary = "/hosted/onboarding/d2p/sms",
+    tags(Hosted),
+    description = "Send an SMS with a link to the phone onboarding page."
+)]
 #[post("sms")]
-/// Send an SMS with a link to the phone onboarding page
 pub fn handler(
     user_auth: UserAuth,
     request: Json<D2pSmsRequest>,

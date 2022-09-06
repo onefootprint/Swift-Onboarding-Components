@@ -17,8 +17,11 @@ use newtypes::{ApiKeyStatus, TenantApiKeyId};
 use paperclip::actix::Apiv2Schema;
 use paperclip::actix::{api_v2_operation, patch, web, web::Json};
 
-/// List the tenant's secret API keys
-#[api_v2_operation(tags(PublicApi))]
+#[api_v2_operation(
+    summary = "/org/api_keys",
+    description = "Lists the tenant's secret API keys",
+    tags(PublicApi)
+)]
 pub async fn get(
     state: web::Data<State>,
     request: web::Query<PaginatedRequest<EmptyRequest, DateTime<Utc>>>,
@@ -57,8 +60,11 @@ pub struct CreateApiKeyRequest {
     name: String,
 }
 
-/// Generate a new secret tenant api key
-#[api_v2_operation(tags(PublicApi))]
+#[api_v2_operation(
+    summary = "/org/api_keys",
+    description = "Generates a new secret tenant api key.",
+    tags(PublicApi)
+)]
 pub async fn post(
     state: web::Data<State>,
     auth: Either<SessionContext<WorkOs>, SecretTenantAuthContext>,
@@ -94,8 +100,11 @@ pub struct UpdateApiKeyRequest {
     status: Option<ApiKeyStatus>,
 }
 
-/// Generate a new secret tenant api key
-#[api_v2_operation(tags(PublicApi))]
+#[api_v2_operation(
+    summary = "/org/api_keys/{id}",
+    description = "Generates a new secret tenant api key.",
+    tags(PublicApi)
+)]
 #[patch("/{id}")]
 pub async fn patch(
     state: web::Data<State>,

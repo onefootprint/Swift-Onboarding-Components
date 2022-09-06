@@ -35,8 +35,11 @@ flat_api_object_map_type!(
     example=r#"{ "ach_account_number": "1234567890", "cc_last_4": "4242" }"#
 );
 
-/// store custom data
-#[api_v2_operation(tags(PublicApi))]
+#[api_v2_operation(
+    summary = "/users/{footprint_user_id}/custom",
+    description = "Stores custom data.",
+    tags(PublicApi)
+)]
 pub async fn put(
     state: web::Data<State>,
     path: Path<FootprintUserId>,
@@ -102,8 +105,11 @@ flat_api_object_map_type!(
     example=r#"{ "ach_account_number": true, "cc_last_4": false }"#
 );
 
-/// check if fields exist
-#[api_v2_operation(tags(PublicApi))]
+#[api_v2_operation(
+    summary = "/users/{footprint_user_id}/custom",
+    description = "Checks if fields exist.",
+    tags(PublicApi)
+)]
 pub async fn get(
     state: web::Data<State>,
     path: Path<FootprintUserId>,
@@ -155,8 +161,11 @@ flat_api_object_map_type!(
     example=r#"{ "ach_account_number": "121212121212", "cc_last_4": "4242 }"#
 );
 
-/// decrypt custom data
-#[api_v2_operation(tags(PublicApi))]
+#[api_v2_operation(
+    summary = "/users/{footprint_user_id}/custom/decrypt",
+    description = "Decrypts custom data.",
+    tags(PublicApi)
+)]
 pub async fn post_decrypt(
     state: web::Data<State>,
     path: Path<FootprintUserId>,

@@ -19,8 +19,11 @@ struct RevealRequest {
     id: TenantApiKeyId,
 }
 
-/// Decrypt a specific tenant secret API key
-#[api_v2_operation(tags(PublicApi))]
+#[api_v2_operation(
+    summary = "/org/api_keys/{id}/reveal",
+    description = "Decrypts a specific tenant secret API key.",
+    tags(PublicApi)
+)]
 #[get("/{id}/reveal")]
 async fn get(
     state: web::Data<State>,

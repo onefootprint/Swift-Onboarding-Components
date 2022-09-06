@@ -32,10 +32,13 @@ struct CommitResponse {
     missing_webauthn_credentials: bool,
 }
 
-#[api_v2_operation(tags(Hosted, Bifrost))]
+#[api_v2_operation(
+    summary = "/hosted/onboarding/complete",
+    tags(Hosted, Bifrost),
+    description = "Finish onboarding the user. Returns the footprint_user_id for login. If any \
+    necessary attributes were not set, returns an error with the list of missing fields."
+)]
 #[post("/complete")]
-/// Finish onboarding the user. Returns the footprint_user_id for login. If any necessary
-/// attributes were not set, returns an error with the list of missing fields.
 fn handler(
     user_auth: UserAuth,
     tenant_auth: PublicTenantAuthContext,

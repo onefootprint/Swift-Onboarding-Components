@@ -36,12 +36,15 @@ pub struct VerifyResponse {
     auth_token: SessionAuthToken,
 }
 
-#[api_v2_operation(tags(Hosted, Bifrost))]
+#[api_v2_operation(
+    summary = "/hosted/identify/verify",
+    tags(Hosted, Bifrost),
+    description = "Verifies the response to either an SMS or biometric challenge. When the \
+    challenge response is verified, we will return an auth token for the user. If no user exists \
+    (which may only happen after a phone challenge), we will create a new user with the provided \
+    phone number"
+)]
 #[post("/verify")]
-/// Verifies the response to either an SMS or biometric challenge.
-/// When the challenge response is verified, we will return an auth token for the user.
-/// If no user exists (which may only happen after a phone challenge), we will create a new user
-/// with the provided phone number
 pub async fn handler(
     state: web::Data<State>,
     request: Json<VerifyRequest>,

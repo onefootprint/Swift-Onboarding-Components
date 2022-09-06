@@ -17,9 +17,12 @@ pub struct CleanupResponse {
     num_deleted_rows: usize,
 }
 
-#[api_v2_operation(tags(Private))]
+#[api_v2_operation(
+    summary = "/private/cleanup",
+    description = "Private endpoint to clean up specific integration test user information.",
+    tags(Private)
+)]
 #[post("/cleanup")]
-/// Private endpoint to clean up specific integration test user information
 async fn post(
     state: web::Data<State>,
     _custodian: CustodianAuthContext,

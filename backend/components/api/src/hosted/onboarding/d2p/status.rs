@@ -14,9 +14,12 @@ pub struct StatusResponse {
     status: D2pSessionStatus,
 }
 
-#[api_v2_operation(tags(Hosted))]
+#[api_v2_operation(
+    summary = "/hosted/onboarding/d2p/status",
+    tags(Hosted),
+    description = "Gets the status of the provided d2p session. Requires the d2p session token as the auth header."
+)]
 #[get("status")]
-/// Gets the status of the provided d2p session. Requires the d2p session token as the auth header.
 pub async fn get(
     state: web::Data<State>,
     user_auth: UserAuth,
@@ -40,9 +43,12 @@ pub struct UpdateStatusRequest {
     status: D2pSessionStatus,
 }
 
-#[api_v2_operation(tags(Hosted))]
+#[api_v2_operation(
+    summary = "/hosted/onboarding/d2p/status",
+    tags(Hosted),
+    description = "Update the status of the provided d2p session. Only allows updating to certain statuses."
+)]
 #[post("status")]
-/// Update the status of the provided d2p session. Only allows updating to certain statuses
 pub fn post(
     user_auth: UserAuth,
     request: Json<UpdateStatusRequest>,

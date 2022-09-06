@@ -31,11 +31,11 @@ use paperclip::actix::Apiv2Schema;
 use paperclip::actix::{api_v2_operation, web, web::Json, web::Path};
 use serde::{Deserialize, Serialize};
 
-/**
- * Update (PUT) data in the identity vault
- */
-
-#[api_v2_operation(tags(PublicApi))]
+#[api_v2_operation(
+    summary = "/users/{footprint_user_id}/identity",
+    description = "Updates data in the identity vault.",
+    tags(PublicApi)
+)]
 pub async fn put(
     state: web::Data<State>,
     path: Path<FootprintUserId>,
@@ -121,8 +121,11 @@ flat_api_object_map_type!(
     example=r#"{ "last_name": true, "dob": true, "ssn9": false }"#
 );
 
-/// check if fields exist
-#[api_v2_operation(tags(PublicApi))]
+#[api_v2_operation(
+    summary = "/users/{footprint_user_id}/identity",
+    description = "Checks if fields exist.",
+    tags(PublicApi)
+)]
 pub async fn get(
     state: web::Data<State>,
     path: Path<FootprintUserId>,
@@ -174,8 +177,11 @@ flat_api_object_map_type!(
     example=r#"{ "last_name": "smith", "ssn9": "121121212", "dob": "12-12-1990" }"#
 );
 
-/// decrypt custom data
-#[api_v2_operation(tags(PublicApi))]
+#[api_v2_operation(
+    summary = "/users/{footprint_user_id}/identity/decrypt",
+    description = "Decrypts custom data.",
+    tags(PublicApi)
+)]
 pub async fn post_decrypt(
     state: web::Data<State>,
     path: Path<FootprintUserId>,

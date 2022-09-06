@@ -8,11 +8,14 @@ use paperclip::actix::{api_v2_operation, get, web, web::Json};
 
 type AccessEventResponse = Vec<ApiAccessEvent>;
 
-#[api_v2_operation(tags(Hosted))]
+#[api_v2_operation(
+    summary = "/hosted/user/access_events",
+    tags(Hosted),
+    description = "Returns a list of AccessEvent logs that show which tenants have viewed the \
+    logged-in user's data. Optionally allows filtering on data_attribute. Requires user \
+    authentication sent in the cookie after a successful /identify/verify call."
+)]
 #[get("/access_events")]
-/// Returns a list of AccessEvent logs that show which tenants have viewed the logged-in user's
-/// data. Optionally allows filtering on data_attribute
-/// Requires user authentication sent in the cookie after a successful /identify/verify call
 fn handler(
     state: web::Data<State>,
     user_auth: UserAuth,

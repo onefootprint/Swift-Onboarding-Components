@@ -16,9 +16,12 @@ pub struct LivenessRequest {
     footprint_user_id: FootprintUserId,
 }
 
-#[api_v2_operation(tags(PublicApi))]
+#[api_v2_operation(
+    summary = "/users/liveness",
+    description = "Allows a tenant to view a customer's registered webauthn credentials.",
+    tags(PublicApi)
+)]
 #[get("/liveness")]
-/// Allows a tenant to view a customer's registered webauthn credentials
 pub async fn get(
     state: web::Data<State>,
     request: web::Query<LivenessRequest>,

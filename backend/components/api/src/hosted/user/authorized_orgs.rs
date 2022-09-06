@@ -21,8 +21,11 @@ pub struct ApiUserOnboarding {
     onboardings: Vec<ApiOnboarding>,
 }
 
-/// Returns a list of onboardings that a user has performed
-#[api_v2_operation(tags(Hosted))]
+#[api_v2_operation(
+    summary = "/hosted/user/authorized_orgs",
+    tags(Hosted),
+    description = "Returns a list of onboardings that a user has performed"
+)]
 #[get("authorized_orgs")]
 pub async fn handler(
     state: web::Data<State>,

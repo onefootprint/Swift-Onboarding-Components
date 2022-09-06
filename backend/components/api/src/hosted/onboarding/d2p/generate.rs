@@ -15,11 +15,14 @@ pub struct GenerateResponse {
     auth_token: SessionAuthToken,
 }
 
-#[api_v2_operation(tags(Hosted))]
+#[api_v2_operation(
+    summary = "/hosted/onboarding/d2p/generate",
+    tags(Hosted),
+    description = "Generates a new d2p session token for the currently authenticated user. The d2p \
+    session token has a limited scope, and also includes some status metadata for syncing state \
+    across the phone and desktop."
+)]
 #[post("generate")]
-/// Generates a new d2p session token for the currently authenticated user. The d2p session token
-/// has a limited scope, and also includes some status metadata for syncing state across the phone
-/// and desktop.
 pub async fn handler(
     state: web::Data<State>,
     user_auth: UserAuth,

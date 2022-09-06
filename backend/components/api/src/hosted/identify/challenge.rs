@@ -19,10 +19,14 @@ pub struct ChallengeResponse {
     time_before_retry_s: i64,
 }
 
-#[api_v2_operation(tags(Hosted, Bifrost))]
+#[api_v2_operation(
+    summary = "/hosted/identify/challenge",
+    tags(Hosted, Bifrost),
+    description = "Sends a challenge to the phone number and returns an HTTP 200. When the \
+    challenge is completed through the identify/verify endpoint, the client can get or create \
+    the user with this phone number."
+)]
 #[post("/challenge")]
-/// Sends a challenge to the phone number and returns an HTTP 200. When the challenge is completed
-/// through the identify/verify endpoint, we will get or create the user with this phone number
 pub async fn handler(
     request: Json<ChallengeRequest>,
     state: web::Data<State>,

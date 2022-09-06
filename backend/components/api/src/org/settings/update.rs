@@ -16,9 +16,12 @@ struct UpdateRequest {
     logo_url: Option<String>,
 }
 
-#[api_v2_operation(tags(PublicApi))]
+#[api_v2_operation(
+    summary = "/org/settings",
+    description = "Updates tenant configuration settings.",
+    tags(PublicApi)
+)]
 #[post("/")]
-/// Update tenant configuration settings
 fn handler(
     state: web::Data<State>,
     request: Json<UpdateRequest>,

@@ -31,11 +31,13 @@ struct AccessEventRequest {
 
 type AccessEventResponse = Vec<ApiAccessEvent>;
 
-#[api_v2_operation(tags(PublicApi))]
+#[api_v2_operation(
+    summary = "users/access_events",
+    description = " Allows a tenant to view a list of AccessEvent logs for a specific user's data. \
+    Optionally allows filtering on data_kind. Requires tenant secret key auth.",
+    tags(PublicApi)
+)]
 #[get("/access_events")]
-/// Allows a tenant to view a list of AccessEvent logs for a specific user's data. Optionally
-/// allows filtering on data_kind.
-/// Requires tenant secret key auth.
 fn get(
     state: web::Data<State>,
     request: web::Query<PaginatedRequest<AccessEventRequest, i64>>,

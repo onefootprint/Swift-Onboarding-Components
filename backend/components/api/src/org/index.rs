@@ -6,8 +6,11 @@ use crate::types::response::ApiResponseData;
 use crate::types::tenant::ApiTenant;
 use paperclip::actix::{api_v2_operation, web::Json};
 
-/// Return basic info about the authed tenant
-#[api_v2_operation(tags(PublicApi))]
+#[api_v2_operation(
+    summary = "/org",
+    tags(PublicApi),
+    description = "Returns basic info about the authed tenant"
+)]
 pub async fn get(
     auth: Either<SessionContext<WorkOs>, SecretTenantAuthContext>,
 ) -> actix_web::Result<Json<ApiResponseData<ApiTenant>>, ApiError> {

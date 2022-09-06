@@ -40,8 +40,11 @@ pub struct WebAuthnInitResponse {
     challenge_token: ChallengeToken,
 }
 
-/// Get a registration challenge
-#[api_v2_operation(tags(Hosted))]
+#[api_v2_operation(
+    summary = "/hosted/user/biometric/init",
+    description = "Generates a registration challenge.",
+    tags(Hosted)
+)]
 #[post("/biometric/init")]
 pub fn init(
     // TODO only allow registering webauthn credentials if you have no previous credentials OR if
@@ -102,8 +105,11 @@ struct WebauthnRegisterRequest {
     attested_metadata_json: Option<Base64Data>,
 }
 
-/// Response to a registration challenge
-#[api_v2_operation(tags(Hosted))]
+#[api_v2_operation(
+    summary = "/hosted/user/biometric",
+    tags(Hosted),
+    description = "Accepts a response to a registration challenge"
+)]
 #[post("/biometric")]
 async fn complete(
     request: Json<WebauthnRegisterRequest>,
