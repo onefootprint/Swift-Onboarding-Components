@@ -1,5 +1,4 @@
 import { HmacSigningKeyDescriptor } from './hmac_key';
-import * as awsx from '@pulumi/awsx';
 import * as aws from '@pulumi/aws';
 import * as pulumi from '@pulumi/pulumi';
 import { StaticSecrets } from './secrets';

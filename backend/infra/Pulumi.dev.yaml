@@ -6,6 +6,7 @@ config:
     containers:
       apiVersion: latest
       enclaveVersion: latest
+    deletionProtection: false
     domain:
       base: dev.onefootprint.com
       prefix: api.

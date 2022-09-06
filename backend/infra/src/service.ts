@@ -9,15 +9,14 @@ import { ServiceContainers } from './containers';
 import { EnclaveKeyDescriptor } from './enclave_key';
 import * as crypto from 'crypto';
 import { DbOutput } from './db';
-import { VpcRegion } from './vpc';
+import { FootprintVpc, Vpc } from './vpc';
 import { HmacSigningKeyDescriptor } from './hmac_key';
 
 export type ServiceLoadBalancer = {
-  lb: awsx.elasticloadbalancingv2.LoadBalancer;
+  lb: awsx.lb.LoadBalancer;
 };
 
 export type ServiceConfig = {
-  region: Region;
   certArn: pulumi.Output<string>;
   instanceCount: number;
   memoryMB: number;
@@ -36,7 +35,7 @@ const ServicePort = 8000;
  * Create our service on ECS
  */
 export async function Create(
-  vpcProvider: VpcRegion,
+  vpcProvider: FootprintVpc,
   config: ServiceConfig,
   constants: Config,
   secretsStore: StaticSecrets,
@@ -44,7 +43,7 @@ export async function Create(
   signingKeyDescriptor: HmacSigningKeyDescriptor,
   database: DbOutput,
 ): Promise<ServiceLoadBalancer> {
-  const region = config.region;
+  const region = vpcProvider.region;
   const serviceName = crypto
     .createHash('sha256')
     .update(`${config.serviceName}-${pulumi.getStack()}-${region}`)
@@ -55,18 +54,16 @@ export async function Create(
   const provider = vpcProvider.provider;
 
   // setup our load balancer and cloudfront CDN
-  const loadBalancerTargetGroup = createCdnFrontedLoadBalancer(
-    vpc,
+  const loadBalancerTargetGroup = await createCdnFrontedLoadBalancer(
+    vpcProvider,
     secretsStore,
     config,
-    constants,
-    provider,
   );
 
   // init our cluster
   const cluster = await CreateCluster(
     `cluster-${serviceName}`,
-    vpc,
+    vpcProvider,
     loadBalancerTargetGroup,
     constants,
     {
@@ -74,8 +71,6 @@ export async function Create(
       memory: 256,
       cpus: 2,
     },
-    region,
-    provider,
   );
 
   // declare the containers we want to run
@@ -143,19 +138,20 @@ export async function Create(
  * Create our application load balancer which will front the cluster
  * front the ALB with cloudfront and setup TLS on the domain
  */
-function createCdnFrontedLoadBalancer(
-  vpc: awsx.ec2.Vpc,
+async function createCdnFrontedLoadBalancer(
+  vpcProvider: FootprintVpc,
   secretsStore: StaticSecrets,
   config: ServiceConfig,
-  constants: Config,
-  provider: pulumi.ProviderResource,
-): awsx.elasticloadbalancingv2.TargetGroup {
-  const region = config.region;
+): Promise<awsx.lb.TargetGroup> {
+  const region = vpcProvider.region;
+  const vpc = vpcProvider.vpc;
+  const provider = vpcProvider.provider;
+
   const serviceName = `${config.serviceName}-${pulumi.getStack()}-${region}`;
 
   // init our ALB
   const loadBalancerSecurityGroup = new awsx.ec2.SecurityGroup(
-    `applbsg-${serviceName}`,
+    `app-lb-sg-${serviceName}`,
     {
       vpc,
       ingress: [
@@ -173,34 +169,43 @@ function createCdnFrontedLoadBalancer(
     { provider },
   );
 
-  // some names must be < 32 chars, so we hash the srvice name, take the first half
+  // some names must be < 32 chars, so we hash the srvice name, take 8
   const serviceNameHash = crypto
     .createHash('sha256')
     .update(serviceName)
     .digest('hex')
-    .substring(0, 16);
+    .substring(0, 8);
 
-  const loadBalancer = new awsx.elasticloadbalancingv2.ApplicationLoadBalancer(
-    `applb-${serviceNameHash}`,
+  const loadBalancer = new awsx.lb.ApplicationLoadBalancer(
+    `app-lb-${serviceNameHash}`,
     {
       vpc,
       securityGroups: [loadBalancerSecurityGroup],
+      subnets: await vpc.publicSubnetIds,
     },
     { provider },
   );
 
+  const targetGroup = new aws.lb.TargetGroup(`app-lb-tg-${serviceNameHash}`, {
+    vpcId: vpc.vpc.id,
+    targetType: 'instance',
+    port: ServicePort,
+    protocol: 'HTTP',
+    healthCheck: {
+      port: 'traffic-port',
+      path: '/health',
+    },
+  });
+
   const loadBalancerTargetGroup = loadBalancer.createTargetGroup(
-    `albtg-${serviceNameHash}`,
+    `lb-tg-${serviceNameHash}`,
     {
-      port: ServicePort,
-      vpc,
-      targetType: 'instance',
-      healthCheck: { path: '/health' },
+      targetGroup,
     },
   );
 
   const web = loadBalancerTargetGroup.createListener(
-    `alblisten-https-${serviceName}`,
+    `app-lb-https-${serviceName}`,
     {
       external: true,
       certificateArn: config.certArn,
@@ -221,7 +226,7 @@ function createCdnFrontedLoadBalancer(
 
   // ensure ALB requests are only coming from cloudfront
   const rule = web.addListenerRule(
-    `alblisten-cdntoken-rule-${serviceName}`,
+    `lb-cdntoken-rule-${serviceName}`,
     {
       actions: [
         {
@@ -243,7 +248,7 @@ function createCdnFrontedLoadBalancer(
 
   // redirect http to https
   loadBalancer.createListener(
-    `alblisten-httpredir-${serviceName}`,
+    `lb-httpredir-${serviceName}`,
     {
       protocol: 'HTTP',
       defaultAction: {
@@ -257,7 +262,7 @@ function createCdnFrontedLoadBalancer(
     { provider },
   );
 
-  const record = new route53.Record(`dnsrecord-alb-${serviceName}`, {
+  const record = new route53.Record(`dns-alb-${serviceName}`, {
     zoneId: config.hostedZoneId,
     type: 'A',
     name: config.domain,

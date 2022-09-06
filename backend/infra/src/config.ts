@@ -9,6 +9,7 @@ export interface Config {
   twilio: Twilio;
   sendgrid: Sendgrid;
   sentryUrl: string;
+  deletionProtection: boolean;
 }
 
 /**

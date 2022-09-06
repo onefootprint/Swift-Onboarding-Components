@@ -1,3 +1,4 @@
+import { FootprintVpc } from './vpc';
 import * as aws from '@pulumi/aws';
 import { Region } from '@pulumi/aws';
 import * as awsx from '@pulumi/awsx';
@@ -12,13 +13,15 @@ export type NitroEnclaveConfig = {
 
 export async function CreateCluster(
   clusterName: string,
-  vpc: awsx.ec2.Vpc,
-  targetGroup: awsx.elasticloadbalancingv2.TargetGroup,
+  vpcProvider: FootprintVpc,
+  targetGroup: awsx.lb.TargetGroup,
   constants: Config,
   nitroConfig: NitroEnclaveConfig,
-  region: Region,
-  provider: pulumi.ProviderResource,
 ): Promise<awsx.ecs.Cluster> {
+  const vpc = vpcProvider.vpc;
+  const provider = vpcProvider.provider;
+  const region = vpcProvider.region;
+
   const instanceProfile = createInstanceRole(region, provider);
 
   // get our base image AMI
@@ -36,8 +39,9 @@ export async function CreateCluster(
     { provider },
   );
 
+  
   const instanceSecurityGroup = new awsx.ec2.SecurityGroup(
-    `instance-sg-${clusterName}`,
+    `c-sg-${clusterName}`,
     {
       vpc,
       ingress: [
@@ -59,6 +63,7 @@ export async function CreateCluster(
   const launchTemplate = new aws.ec2.LaunchTemplate(
     `template-ec2-${clusterName}`,
     {
+      namePrefix: `instance-${clusterName}`,
       instanceType: 'c5a.xlarge',
       userData: Buffer.from(
         await userData(clusterName, constants, nitroConfig),
@@ -91,6 +96,7 @@ export async function CreateCluster(
       targetGroupArns: [targetGroup.targetGroup.arn],
       vpcZoneIdentifiers: vpc.privateSubnetIds,
       protectFromScaleIn: false,
+      healthCheckType: 'EC2',
       instanceRefresh: {
         strategy: 'Rolling',
         preferences: {

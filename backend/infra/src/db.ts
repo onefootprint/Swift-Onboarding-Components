@@ -5,7 +5,7 @@ import * as pulumi from '@pulumi/pulumi';
 import { Config } from './config';
 import * as random from '@pulumi/random';
 import { StaticSecrets } from './secrets';
-import * as vpcUtil from './vpc';
+import { FootprintVpc, Vpc } from './vpc';
 import { EngineType } from '@pulumi/aws/rds';
 import * as inputs from '@pulumi/aws/types';
 
@@ -19,12 +19,8 @@ export type DbOutput = {
   db: aws.rds.Cluster;
 };
 
-/** TODO: 
-    - private network for jump-box
-    - check `applyImmediately`
-*/
 export async function CreateDB(
-  vpcProvider: vpcUtil.VpcRegion,
+  vpcProvider: FootprintVpc,
   clusterIdentifier: string,
   constants: Config,
   secretsStore: StaticSecrets,
@@ -33,25 +29,18 @@ export async function CreateDB(
   const user = 'footprint';
   const databaseName = 'footprint';
 
-  const auroraVpc = vpcProvider.vpc;
+  const vpc = vpcProvider.vpc;
 
-  const dbSubnetGroup = new aws.rds.SubnetGroup(
-    `subnet-group-${clusterIdentifier}`,
+  const vpcSecurityGroup = new awsx.ec2.SecurityGroup(
+    `${clusterIdentifier}-db-sg`,
     {
-      subnetIds: auroraVpc.publicSubnetIds,
-    },
-  );
-
-  const auroraVpcSecurityGroup = new awsx.ec2.SecurityGroup(
-    `${clusterIdentifier}-aurora-sg`,
-    {
-      vpc: auroraVpc,
+      vpc: vpc,
       ingress: [
         {
           protocol: '-1',
           fromPort: 5432,
           toPort: 5432,
-          cidrBlocks: [auroraVpc.vpc.cidrBlock],
+          cidrBlocks: [vpc.vpc.cidrBlock],
         },
       ],
       egress: [
@@ -60,11 +49,15 @@ export async function CreateDB(
     },
   );
 
+  const subnet = new aws.rds.SubnetGroup(`${clusterIdentifier}-subnet-group`, {
+    subnetIds: await vpc.privateSubnetIds,
+  });
+
   const db = new aws.rds.Cluster(`aurora-v2-${clusterIdentifier}`, {
     clusterIdentifier: `${clusterIdentifier}`,
-    dbSubnetGroupName: dbSubnetGroup.name,
     databaseName,
     storageEncrypted: true,
+    dbSubnetGroupName: subnet.name,
     engineVersion: '14.3',
     allowMajorVersionUpgrade: false,
     engine: EngineType.AuroraPostgresql,
@@ -73,7 +66,7 @@ export async function CreateDB(
     masterUsername: user,
     applyImmediately: true,
     snapshotIdentifier: await getSnapshotIdIfNeeded(),
-    vpcSecurityGroupIds: [auroraVpcSecurityGroup.id],
+    vpcSecurityGroupIds: [vpcSecurityGroup.id],
     skipFinalSnapshot: !dbConfig.protectDeletion,
     deletionProtection: dbConfig.protectDeletion,
     restoreToPointInTime: await getRestorePointIfNeeded(),
@@ -117,8 +110,8 @@ export async function CreateDB(
     clusterIdentifier,
     constants,
     databaseUrl,
-    auroraVpcSecurityGroup,
-    auroraVpc,
+    vpcSecurityGroup,
+    vpcProvider,
   );
 
   return {
@@ -202,12 +195,12 @@ async function createDbJumpBox(
   constants: Config,
   dbUrl: pulumi.Output<string>,
   securityGroup: awsx.ec2.SecurityGroup,
-  vpc: awsx.ec2.Vpc,
+  vpcProvider: FootprintVpc,
 ): Promise<aws.ec2.Instance> {
   const size = 't2.micro';
 
-  const jumpSg = new awsx.ec2.SecurityGroup(`jump-${clusterId}-sg`, {
-    vpc,
+  const jumpSg = new awsx.ec2.SecurityGroup(`jumpbox-${clusterId}-sg`, {
+    vpc: vpcProvider.vpc,
     egress: [
       { protocol: '-1', fromPort: 0, toPort: 0, cidrBlocks: ['0.0.0.0/0'] },
     ],
@@ -273,12 +266,16 @@ sudo amazon-linux-extras enable postgresql14 -y
 sudo yum install postgresql jq yum-utils -y
 
 # setup tailscale
+echo 'net.ipv4.ip_forward = 1' | sudo tee -a /etc/sysctl.conf
+echo 'net.ipv6.conf.all.forwarding = 1' | sudo tee -a /etc/sysctl.conf
+sudo sysctl -p /etc/sysctl.conf
+
 sudo yum-config-manager --add-repo https://pkgs.tailscale.com/stable/centos/7/tailscale.repo
 sudo yum install tailscale nc -y
 sudo systemctl enable --now tailscaled
-sudo tailscale up --authkey "${tailscaleAuthKey}" --ssh --advertise-exit-node --hostname "${jumpHostname}" --accept-dns=false 
+sudo tailscale up --authkey "${tailscaleAuthKey}" --ssh --advertise-exit-node --hostname "${jumpHostname}" --advertise-routes=10.0.0.0/16
 
-# setup tunnel helper
+# setup db access helper
 cat <<'EOF' > db_proxy.sh
 #!/bin/sh
 export DB_SECRET_NAME="${dbSecretName}"
@@ -300,14 +297,14 @@ EOF
 
 chmod +x connect_db.sh`;
 
-  const jumpbox = new aws.ec2.Instance(`jumpbox-${clusterId}`, {
+  const jumpbox = new aws.ec2.Instance(`jump-${clusterId}`, {
     instanceType: size,
-    subnetId: (await vpc.publicSubnetIds)[0],
+    subnetId: (await vpcProvider.vpc.privateSubnetIds)[0],
     vpcSecurityGroupIds: [securityGroup.id, jumpSg.id],
     ami: 'ami-0f9fc25dd2506cf6d',
     userData: Buffer.from(userData).toString('base64'),
-    associatePublicIpAddress: true,
     iamInstanceProfile,
+    associatePublicIpAddress: false,
   });
 
   return jumpbox;

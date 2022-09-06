@@ -35,7 +35,7 @@ jobs:
       - name: Setup Pulumi CLI
         uses: pulumi/setup-pulumi@v2.0.0
         with:
-          pulumi-version: 3.38.0
+          pulumi-version: 3.39.1
 
       - run: npm install
         working-directory: ./backend/infra

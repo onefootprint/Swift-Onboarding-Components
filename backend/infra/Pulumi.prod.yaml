@@ -9,6 +9,7 @@ config:
     domain:
       base: api.onefootprint.com
       prefix: ""
+    deletionProtection: true
     elastic:
       apiKey:
         secure: v1:XzHosuh3FHFZesM8:BFzoDFYHmZbxiai3KV6aR2zLW1ZoImnWTQoVodoiGnCH5g==
@@ -44,6 +45,6 @@ config:
       secretKey:
         secure: v1:qBwY9xkQ5AxOOFFR:nJs8FBGP1lGvhsAUJ/ANgv2PKoIWYJovYxCyLtDBWa24r+sDRpLxD7EC3z6ZWcVOlBb2hoYuR4vJobSyQ/3FBe7jPAFqLDJhrL9m6LEsX0NFg6iP/hYMKnPCqVfE+L2YaE5m
   infra:serverTailscaleKey:
-    secure: v1:r0ihTxE2RZeNZA6f:a0fQWhvRLVWUOA7zQ5k0DbjYA0rImo98HXcIdP+UK6JC6CcarrCtxIiPN7Djd7MbjZXsI+hEi0oy
+    secure: v1:TpGKPahow+vWfc9V:ARTcJC1DUX8g58pQWNUVQN1jQzYkKJfNw34IaOg4LwcPZRt8nTuIOtmXUsZ451cH57XgQrfMQdRw
   infra:tailscaleKey:
     secure: v1:bODV3p3yRWrT59pq:g2+0HB8ps3I4JR/lmPbZRMSjyv0j8udg6poBvTCKGGBk0VW26zDgoUNwsvm5NHALL+ymGcNqzVA=

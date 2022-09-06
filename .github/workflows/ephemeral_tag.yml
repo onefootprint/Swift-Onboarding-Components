@@ -1,4 +1,4 @@
-name: Tag Ephemeral
+name: 'Tag Ephemeral'
 
 on:
   pull_request:

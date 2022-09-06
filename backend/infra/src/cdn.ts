@@ -1,10 +1,6 @@
-import { ec2, Region, route53 } from '@pulumi/aws';
-import * as awsx from '@pulumi/awsx';
-import { Output } from '@pulumi/pulumi';
+import { route53 } from '@pulumi/aws';
 import * as aws from '@pulumi/aws';
-import * as certHelper from './certs';
 import * as pulumi from '@pulumi/pulumi';
-import * as random from '@pulumi/random';
 
 export type CdnConfig = {
   certArn: pulumi.Output<string>;

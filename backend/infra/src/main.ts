@@ -23,6 +23,13 @@ export default async function main() {
   const otherRegions: Region[] = []; // [Region.USWest1];
   const regions = [primaryRegion, ...otherRegions];
 
+  // setup our vpcs and region providers
+  const vpcProviders = await Promise.all(
+    regions.map(region => {
+      return vpcUtil.CreateRegionalVPC(region, constants);
+    }),
+  );
+
   const hostedZone = await aws.route53.getZone({ name: constants.domain.base });
 
   // init the enclave key
@@ -35,11 +42,6 @@ export default async function main() {
   // setup or secrets param store
   const secretsStore = await secrets.LoadSecrets(config, enclaveKeyConfig);
 
-  // setup our vpcs and region providers
-  const vpcProviders = regions.map(region => {
-    return vpcUtil.CreateRegionalVPC(region);
-  });
-
   // setup database
   const database = await db.CreateDB(
     vpcProviders[0],
@@ -47,7 +49,7 @@ export default async function main() {
     constants,
     secretsStore,
     {
-      protectDeletion: false,
+      protectDeletion: constants.deletionProtection,
     },
   );
 
@@ -57,13 +59,11 @@ export default async function main() {
 
   // launch of core service
   const services = await Promise.all(
-    regions.map(async (region, index) => {
-      const vpcAndProvider = vpcProviders[index];
-
+    vpcProviders.map(async vpcAndProvider => {
       // mint a cert for this property
       const cert = await certs.CreateCertificate({
         domain: `${constants.domain.base}`,
-        region,
+        region: vpcAndProvider.region,
         hostedZoneId: hostedZone.id,
       });
 
@@ -77,7 +77,6 @@ export default async function main() {
           certArn: cert,
           domain: internalApiDomain,
           serviceName: 'fpc',
-          region,
           hostedZoneId: hostedZone.zoneId,
         },
         constants,
@@ -87,7 +86,7 @@ export default async function main() {
         database,
       );
 
-      return { service, cert, region };
+      return { service, cert, region: vpcAndProvider.region };
     }),
   );
 
