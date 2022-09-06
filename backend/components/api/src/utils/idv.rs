@@ -1,20 +1,17 @@
 use super::user_vault_wrapper::UserVaultWrapper;
 use crate::{errors::ApiError, State};
 use chrono::Utc;
-use db::{
-    models::{
-        audit_trail::AuditTrail,
-        identity_data::HasIdentityDataFields,
-        onboarding::Onboarding,
-        verification_request::{NewVerificationRequest, VerificationRequest},
-        verification_result::VerificationResult,
-    },
-    PgConnection,
+use db::models::{
+    audit_trail::AuditTrail,
+    identity_data::HasIdentityDataFields,
+    onboarding::Onboarding,
+    verification_request::{NewVerificationRequest, VerificationRequest},
+    verification_result::VerificationResult,
 };
 use idv::{idology::client::IdologyClient, verification::get_signals};
 use newtypes::{
     email::Email, AuditTrailEvent, DataAttribute, IdvData, OnboardingId, PhoneNumber, ScopedUserId, Signal,
-    Status, TenantId, UserVaultId, Vendor, VerificationInfo, VerificationInfoStatus,
+    SignalKind, Status, TenantId, UserVaultId, Vendor, VerificationInfo, VerificationInfoStatus,
 };
 use std::{collections::HashMap, str::FromStr};
 use strum::IntoEnumIterator;
@@ -127,36 +124,61 @@ fn process_success(
     uvw: UserVaultWrapper,
     vendor: Vendor,
 ) -> Result<(Status, Vec<VerificationInfo>), ApiError> {
-    // TODO more advanced decision engine... lol
-    let new_status = if signals.is_empty() {
-        Status::Verified
-    } else {
-        Status::ManualReview
-    };
-
-    let verified_fields = IdologyClient::verified_data_attributes()
+    // Create a map of DataAttribute -> Vec<SignalKind>
+    let mut attribute_to_signals = HashMap::<DataAttribute, Vec<_>>::new();
+    for signal in signals {
+        for attr in signal.attributes {
+            let signals_for_attr = attribute_to_signals.entry(attr).or_default();
+            signals_for_attr.push(signal.kind);
+        }
+    }
+    // Look at the maximum signal for each attribute. If it is more severe than INFO, we shouldn't
+    // include the field in the list of verified attributes in the audit log
+    let failed_attributes: Vec<_> = attribute_to_signals
+        .into_iter()
+        .filter_map(|(attr, signal_kinds)| {
+            let max_signal = signal_kinds.into_iter().max()?;
+            if max_signal <= SignalKind::Info {
+                // If we have a TODO, NotImportant, or Info signal on this piece of data, treat it as nothing
+                None
+            } else {
+                // If we have a NotFound, InvalidRequest, Alert, or Fraud signal on this piece of data, fail (for now)
+                Some(attr)
+            }
+        })
+        .collect();
+    let verified_fields: Vec<_> = IdologyClient::verified_data_attributes()
         .into_iter()
         .filter(|a| uvw.has_field(*a))
+        .filter(|a| !failed_attributes.contains(a))
         .collect();
-    let audit_trail_status = match new_status {
-        Status::Verified => VerificationInfoStatus::Verified,
-        _ => VerificationInfoStatus::Failed,
+
+    // TODO more advanced decision engine than just failing if there's info for any piece of data
+    let (new_status, final_audit_status) = if failed_attributes.is_empty() {
+        (Status::Verified, VerificationInfoStatus::Verified)
+    } else {
+        (Status::ManualReview, VerificationInfoStatus::Failed)
     };
-    // TODO some fields may be verified while others are failed from a single request.
-    // https://linear.app/footprint/issue/FP-1260/differentiate-between-audit-trails-for-failedsuccessful-fields
-    // Need to extract this info from the reason codes
     let events = vec![
-        VerificationInfo {
+        (!verified_fields.is_empty()).then_some(VerificationInfo {
             data_attributes: verified_fields,
             vendor,
-            status: audit_trail_status,
-        },
-        VerificationInfo {
+            status: VerificationInfoStatus::Verified,
+        }),
+        (!failed_attributes.is_empty()).then_some(VerificationInfo {
+            data_attributes: failed_attributes,
+            vendor,
+            status: VerificationInfoStatus::Failed,
+        }),
+        Some(VerificationInfo {
             data_attributes: vec![],
             vendor: Vendor::Footprint,
-            status: audit_trail_status,
-        },
-    ];
+            status: final_audit_status,
+        }),
+    ]
+    .into_iter()
+    .flatten()
+    .collect();
     Ok((new_status, events))
 }
 
