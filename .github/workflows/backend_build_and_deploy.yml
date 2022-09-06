@@ -214,6 +214,8 @@ jobs:
         shell: bash
         working-directory: ./backend/infra
         run: |
+          echo ${{ inputs.stackName }}
+          pulumi stack ls
           sub=$(pulumi config --stack footprint/${{ inputs.stackName }} get --path constants.domain.prefix)
           base=$(pulumi config --stack footprint/${{ inputs.stackName }} get --path constants.domain.base)
           url="${sub}${base}"
