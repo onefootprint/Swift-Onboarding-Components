@@ -11,6 +11,7 @@ export type CodeInlineProps = {
   testID?: string;
   tooltipText?: string;
   tooltipTextConfirmation?: string;
+  truncate?: boolean;
 };
 
 const HIDE_TIMEOUT = 600;
@@ -24,6 +25,7 @@ const CodeInline = ({
   testID,
   tooltipText = 'Copy to clipboard',
   tooltipTextConfirmation = 'Copied!',
+  truncate = false,
 }: CodeInlineProps) => {
   const [shouldShowConfirmation, setShowConfirmation] = useState(false);
 
@@ -68,7 +70,7 @@ const CodeInline = ({
         type="button"
         className={disable ? 'disabled' : undefined}
       >
-        <CodeContent>{children}</CodeContent>
+        <CodeContent truncate={truncate}>{children}</CodeContent>
       </Button>
     </Tooltip>
   );
@@ -86,8 +88,8 @@ const Button = styled.button`
   }
 `;
 
-const CodeContent = styled.code`
-  ${({ theme }) => css`
+const CodeContent = styled.code<{ truncate?: boolean }>`
+  ${({ theme, truncate }) => css`
     ${createFontStyles('snippet-2')};
     background: ${theme.backgroundColor.secondary};
     border-radius: ${theme.borderRadius[1]}px;
@@ -95,10 +97,19 @@ const CodeContent = styled.code`
     color: ${theme.color.error};
     display: block;
     height: 24px;
-    overflow: hidden;
     padding: ${theme.spacing[1]}px ${theme.spacing[2]}px;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    white-space: break-spaces;
+    flex-flow: wrap;
+    height: auto;
+    text-align: left;
+    word-break: break-word;
+
+    ${truncate &&
+    css`
+      overflow: hidden;
+      text-overflow: ellipsis;
+      word-break: unset;
+    `}
   `}
 `;
 

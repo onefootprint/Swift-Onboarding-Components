@@ -99,7 +99,7 @@ const Users = () => {
             </td>
             <td>
               <CodeContainer>
-                <CodeInline>{item.footprintUserId}</CodeInline>
+                <CodeInline truncate>{item.footprintUserId}</CodeInline>
               </CodeContainer>
             </td>
 
