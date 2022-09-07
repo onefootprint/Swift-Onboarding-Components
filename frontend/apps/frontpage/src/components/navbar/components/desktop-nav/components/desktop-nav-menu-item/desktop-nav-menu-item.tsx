@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import React from 'react';
 import styled, { css } from 'styled-components';
 import { createOverlayBackground, Typography } from 'ui';
@@ -11,8 +12,8 @@ type DesktopNavMenuItemProps = {
 
 const DesktopNavMenuItem = ({ item }: DesktopNavMenuItemProps) => (
   <Item>
-    <NavigationMenu.Link href={item.href}>
-      <ItemContainer href={item.href}>
+    <Link href={item.href} passHref>
+      <StyledLink href={item.href}>
         <item.iconComponent />
         <ItemText>
           <Typography variant="label-3">{item.text}</Typography>
@@ -20,8 +21,8 @@ const DesktopNavMenuItem = ({ item }: DesktopNavMenuItemProps) => (
             {item.subtext}
           </Typography>
         </ItemText>
-      </ItemContainer>
-    </NavigationMenu.Link>
+      </StyledLink>
+    </Link>
   </Item>
 );
 
@@ -56,7 +57,7 @@ const ItemText = styled.div`
   `}
 `;
 
-const ItemContainer = styled.a`
+const StyledLink = styled(NavigationMenu.Link)`
   text-decoration: none;
   display: flex;
   align-items: center;

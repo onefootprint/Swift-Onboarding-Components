@@ -29,7 +29,6 @@ const DesktopNavMenu = ({ menu }: DesktopNavbarMenuProps) => {
           <StyledContent>{items}</StyledContent>
         </NavigationMenu.Item>
       </NavigationMenu.List>
-
       <ViewportPosition>
         <NavigationMenu.Viewport />
       </ViewportPosition>
