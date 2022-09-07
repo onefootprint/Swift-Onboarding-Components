@@ -22,7 +22,7 @@ export type PaginatedRequestResponse<T> = {
 };
 
 export const isFootprintError = (error: unknown): error is RequestError =>
-  (error as RequestError).response?.statusText !== undefined;
+  (error as RequestError)?.response?.data !== undefined;
 
 export const isFootprintServerError = (
   error: unknown,
@@ -42,8 +42,12 @@ export const isLogoutError = (error: unknown) => {
   );
 };
 
-export const getErrorMessage = (error: RequestError): string =>
-  error.response?.data?.error?.message || error.message;
+export const getErrorMessage = (error: unknown): string => {
+  if (isFootprintError(error)) {
+    return error?.response?.data?.error?.message || error?.message;
+  }
+  return 'Something went wrong';
+};
 
 const request = <Response = any>(requestConfig: AxiosRequestConfig = {}) => {
   const client = applyCaseMiddleware(axios.create());

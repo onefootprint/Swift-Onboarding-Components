@@ -21,10 +21,6 @@ export const nameData = (attributes: UserAttributes) =>
       attributes.firstName?.value &&
       attributes.lastName?.value &&
       `${attributes.firstName?.value} ${attributes.lastName?.value}`,
-    isLoading:
-      attributes.firstName?.isLoading ||
-      attributes.lastName?.isLoading ||
-      false,
     exists: attributes.firstName?.exists && attributes.lastName?.exists,
   } as UserData);
 
@@ -53,7 +49,6 @@ const useJoinUsers = (
             userAttributeKey,
             {
               value: decryptedData[userAttributeKey]?.value,
-              isLoading: decryptedData[userAttributeKey]?.isLoading || false,
               exists:
                 decryptedData[userAttributeKey]?.exists ||
                 scoped_user.identityDataAttributes.includes(

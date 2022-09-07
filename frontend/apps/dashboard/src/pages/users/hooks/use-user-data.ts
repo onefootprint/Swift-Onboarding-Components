@@ -5,7 +5,6 @@ import { useMap } from 'usehooks-ts';
 
 export type UserData = {
   value?: string | null; // Undefined value is encrypted, null value is unset
-  isLoading: boolean;
   exists: boolean;
 };
 
@@ -24,6 +23,7 @@ const useUserDataImpl = () => {
   ) => {
     const currentDecryptedUser =
       decryptedUsers.get(userId) || ({} as UserAttributes);
+
     const newAttrs = Object.fromEntries(
       Object.entries(newDecryptedData).map(x => [
         x[0],

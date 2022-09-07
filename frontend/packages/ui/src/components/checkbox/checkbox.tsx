@@ -2,6 +2,7 @@ import React, { forwardRef, useId } from 'react';
 import styled, { css } from 'styled-components';
 
 import { createFontStyles } from '../../utils/mixins';
+import Box from '../box';
 import Hint from '../internal/hint';
 import { createCheckedStyled, createPseudoStyles } from './checkbox.utils';
 
@@ -45,7 +46,7 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
     const internalId = useId();
     const id = possibleId || internalId;
     return (
-      <Container>
+      <Box>
         <Label
           aria-describedby={hintText && `${id}-hint`}
           data-testid={testID}
@@ -82,18 +83,10 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
             {hintText}
           </StyledHint>
         )}
-      </Container>
+      </Box>
     );
   },
 );
-
-const Container = styled.div`
-  ${({ theme }) => css`
-    &:not(:last-child) {
-      margin-bottom: ${theme.spacing[3]}px;
-    }
-  `}
-`;
 
 const Label = styled.label<Pick<CheckboxProps, 'hasError'>>`
   ${({ theme, hasError }) => css`

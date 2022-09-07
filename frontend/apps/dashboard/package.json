@@ -15,13 +15,11 @@
     "set:dot-env": "vercel env pull"
   },
   "dependencies": {
-    "ui": "*",
-    "themes": "*",
-    "types": "*",
     "@formkit/auto-animate": "^1.0.0-beta.1",
     "@hookform/resolvers": "^2.9.2",
     "@sentry/browser": "^6.19.7",
     "@tanstack/react-query": "^4.0.10",
+    "@xstate/react": "^3.0.1",
     "axios": "^0.27.2",
     "axios-case-converter": "^0.9.0",
     "constate": "^3.3.2",
@@ -41,8 +39,12 @@
     "react-i18next": "^11.16.9",
     "request": "*",
     "styled-components": "^5.3.5",
+    "themes": "*",
+    "types": "*",
     "ua-parser-js": "^1.0.2",
+    "ui": "*",
     "usehooks-ts": "^2.5.3",
+    "xstate": "^4.33.5",
     "yup": "^0.32.11",
     "zustand": "^4.0.0-rc.1"
   },

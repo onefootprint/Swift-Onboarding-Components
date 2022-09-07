@@ -118,6 +118,48 @@
         "address": {
           "title": "Address data"
         }
+      },
+      "decrypt": {
+        "errors": {
+          "min-selected": {
+            "title": "Uh-oh!",
+            "description": "You need to select at least one field to continue."
+          }
+        },
+        "controls": {
+          "start": "Decrypt data",
+          "next": "Next",
+          "cancel": "Cancel"
+        },
+        "reason-dialog": {
+          "title": "Decrypt data",
+          "description": "Why are you decrypting this data?",
+          "form": {
+            "reason": {
+              "label": "Reason",
+              "placeholder": "Select...",
+              "errors": {
+                "required": "A reason is needed"
+              },
+              "options": {
+                "customer-support-inquiry": "Responding to customer support inquiry",
+                "customer-communication": "Sending communication to customer",
+                "customer-verification": "Verifying customer identity",
+                "auditor-review": "Auditor review",
+                "transation-over-5k": "Transaction over $5k",
+                "change-of-direct-deposit": "Change of direct deposit",
+                "other": "Other"
+              }
+            },
+            "custom-reason": {
+              "placeholder": "Type the reason here...",
+              "errors": {
+                "required": "A reason is needed"
+              }
+            }
+          },
+          "disclaimer": "Please note that all data attribute access are logged for security reasons."
+        }
       }
     },
     "developers": {

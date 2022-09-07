@@ -2,24 +2,20 @@ import React from 'react';
 import { User } from 'src/pages/users/hooks/use-join-users';
 import { statusToBadgeVariant, statusToDisplayText } from 'src/types';
 import styled, { css } from 'styled-components';
-import type { UserDataAttributeKey } from 'types';
 import { Badge, CodeInline, Typography } from 'ui';
 
-import DecryptDialog from '../decrypt-dialog';
+import DecryptControls from './components/decrypt-controls';
 
 type BasicInfoProps = {
   user: User;
-  onDecrypt: (fieldsToDecrypt: UserDataAttributeKey[], reason: string) => void;
 };
 
-const UserHeader = ({ user, onDecrypt }: BasicInfoProps) => {
+const UserHeader = ({ user }: BasicInfoProps) => {
   const { footprintUserId } = user;
   return (
     <HeaderContainer>
       <RowContainer>
-        <Typography variant="label-1" sx={{ userSelect: 'none' }}>
-          User info
-        </Typography>
+        <Typography variant="label-1">User info</Typography>
         <Badge variant={statusToBadgeVariant[user.status]}>
           {statusToDisplayText[user.status]}
         </Badge>
@@ -41,7 +37,7 @@ const UserHeader = ({ user, onDecrypt }: BasicInfoProps) => {
           </Typography>
           <CodeInline>{footprintUserId}</CodeInline>
         </RowContainer>
-        <DecryptDialog user={user} onDecrypt={onDecrypt} />
+        <DecryptControls />
       </SplitRow>
     </HeaderContainer>
   );

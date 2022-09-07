@@ -3,7 +3,7 @@ import { partial } from 'lodash';
 import request, { RequestError } from 'request';
 import useSessionUser, { AuthHeaders } from 'src/hooks/use-session-user';
 import { DecryptedUserAttributes } from 'src/types';
-import { UserDataAttribute, UserDataAttributeKey } from 'types';
+import { UserDataAttribute } from 'types';
 
 import useUserData from './use-user-data';
 
@@ -39,32 +39,33 @@ const useDecryptUser = () => {
     DecryptUserRequest
   >(partial(decryptUserRequest, authHeaders));
 
-  const loadEncryptedAttributes = (
-    userId: string,
-    fieldsToDecrypt: UserDataAttributeKey[],
-    reason: string,
-  ) => {
-    // Immediately set these attributes as loading
-    setLoading(userId, fieldsToDecrypt);
-
-    // Trigger the mutation to decrypt the data. Upon completion, update these attributes with the
-    // decrypted values
-    const req: DecryptUserRequest = {
-      footprintUserId: userId,
-      fields: fieldsToDecrypt.map(x => UserDataAttribute[x]),
-      reason,
-    };
-    decryptUserMutation
-      .mutateAsync(req)
-      .then((decryptedUserAttributes: DecryptedUserAttributes) => {
-        updateDecryptedUser(userId, decryptedUserAttributes);
-      })
-      .catch(() => setLoading(userId, fieldsToDecrypt, false));
-  };
+  const decryptUser = (payload: {
+    userId: string;
+    fields: UserDataAttribute[];
+    reason: string;
+  }): Promise<DecryptedUserAttributes> =>
+    new Promise((resolve, reject) => {
+      // Immediately set these attributes as loading
+      setLoading(payload.userId, []);
+      decryptUserMutation
+        .mutateAsync({
+          footprintUserId: payload.userId,
+          fields: payload.fields,
+          reason: payload.reason,
+        })
+        .then((decryptedUserAttributes: DecryptedUserAttributes) => {
+          updateDecryptedUser(payload.userId, decryptedUserAttributes);
+          resolve(decryptedUserAttributes);
+        })
+        .catch(() => {
+          setLoading(payload.userId, [], false);
+          reject();
+        });
+    });
 
   return {
     decryptedUsers,
-    loadEncryptedAttributes,
+    decryptUser,
   };
 };
 

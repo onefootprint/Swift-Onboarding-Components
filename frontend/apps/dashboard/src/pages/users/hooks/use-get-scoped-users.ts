@@ -3,7 +3,7 @@ import {
   QueryKey,
   useQuery,
 } from '@tanstack/react-query';
-import { omit } from 'lodash';
+import omit from 'lodash/omit';
 import request, { PaginatedRequestResponse, RequestError } from 'request';
 import useSessionUser, { AuthHeaders } from 'src/hooks/use-session-user';
 import {

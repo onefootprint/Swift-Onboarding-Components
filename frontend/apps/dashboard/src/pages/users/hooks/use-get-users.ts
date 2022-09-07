@@ -9,7 +9,7 @@ import useJoinUsers from './use-join-users';
 const useGetUsers = (pageSize: number) => {
   const getScopedUsers = useGetScopedUsers(pageSize);
   const [totalNumResults, setTotalNumResults] = useState(0);
-  const { decryptedUsers, loadEncryptedAttributes } = useDecryptUser();
+  const { decryptedUsers, decryptUser } = useDecryptUser();
   const { filters, setFilter, setCursors } = useFilters();
 
   useEffect(() => {
@@ -48,7 +48,7 @@ const useGetUsers = (pageSize: number) => {
     hasPrevPage: cursors.length > 0,
     filters,
     setFilter,
-    loadEncryptedAttributes,
+    decryptUser,
   };
 };
 

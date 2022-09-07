@@ -3,6 +3,7 @@ import { useTranslation } from 'hooks';
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { CollectedDataOption } from 'src/types/data-kind';
+import styled, { css } from 'styled-components';
 import { UserDataAttribute } from 'types';
 import { Box, Checkbox, RadioInput } from 'ui';
 
@@ -108,64 +109,81 @@ const CollectForm = ({ defaultValues, onSubmit }: CollectFormProps) => {
         description={t('collect-form.description')}
         title={t('collect-form.title')}
       />
-      <Checkbox
-        label={allT('collected-data-options.phone_number')}
-        disabled
-        checked
-      />
-      <Checkbox label={allT('collected-data-options.email')} disabled checked />
-      <Checkbox
-        label={allT('collected-data-options.name')}
-        {...register('name')}
-      />
-      <Checkbox
-        label={allT('collected-data-options.dob')}
-        {...register(UserDataAttribute.dob)}
-      />
-      <Checkbox
-        label={t('collect-form.ssn')}
-        {...register('showSSNOptions')}
-        onChange={handleSSNKindsChange}
-      />
-      <Box ref={animateSSN}>
-        {innerFields.ssn && (
-          <Box sx={{ marginLeft: 5, marginBottom: 3 }}>
-            <RadioInput
-              value={UserDataAttribute.ssn9}
-              label={t('collect-form.ssn_full')}
-              {...register('ssnKind')}
-            />
-            <RadioInput
-              value={UserDataAttribute.ssn4}
-              label={t('collect-form.ssn_last_4')}
-              {...register('ssnKind')}
-            />
+      <CheckboxContainer>
+        <Checkbox
+          label={allT('collected-data-options.phone_number')}
+          disabled
+          checked
+        />
+        <Checkbox
+          label={allT('collected-data-options.email')}
+          disabled
+          checked
+        />
+        <Checkbox
+          label={allT('collected-data-options.name')}
+          {...register('name')}
+        />
+        <Checkbox
+          label={allT('collected-data-options.dob')}
+          {...register(UserDataAttribute.dob)}
+        />
+        <Box>
+          <Checkbox
+            label={t('collect-form.ssn')}
+            {...register('showSSNOptions')}
+            onChange={handleSSNKindsChange}
+          />
+          <Box ref={animateSSN}>
+            {innerFields.ssn && (
+              <Box sx={{ marginLeft: 5, marginBottom: 3 }}>
+                <RadioInput
+                  value={UserDataAttribute.ssn9}
+                  label={t('collect-form.ssn_full')}
+                  {...register('ssnKind')}
+                />
+                <RadioInput
+                  value={UserDataAttribute.ssn4}
+                  label={t('collect-form.ssn_last_4')}
+                  {...register('ssnKind')}
+                />
+              </Box>
+            )}
           </Box>
-        )}
-      </Box>
-      <Checkbox
-        label={t('collect-form.address')}
-        {...register('showAddressOptions')}
-        onChange={handleAddressChanged}
-      />
-      <Box ref={animateAddress}>
-        {innerFields.address && (
-          <Box sx={{ marginLeft: 5, marginBottom: 3 }}>
-            <RadioInput
-              value={CollectedDataOption.fullAddress}
-              label={t('collect-form.full_address')}
-              {...register('addressKind')}
-            />
-            <RadioInput
-              value={CollectedDataOption.partialAddress}
-              label={t('collect-form.partial_address')}
-              {...register('addressKind')}
-            />
+        </Box>
+        <Box>
+          <Checkbox
+            label={t('collect-form.address')}
+            {...register('showAddressOptions')}
+            onChange={handleAddressChanged}
+          />
+          <Box ref={animateAddress}>
+            {innerFields.address && (
+              <Box sx={{ marginLeft: 5, marginBottom: 3 }}>
+                <RadioInput
+                  value={CollectedDataOption.fullAddress}
+                  label={t('collect-form.full_address')}
+                  {...register('addressKind')}
+                />
+                <RadioInput
+                  value={CollectedDataOption.partialAddress}
+                  label={t('collect-form.partial_address')}
+                  {...register('addressKind')}
+                />
+              </Box>
+            )}
           </Box>
-        )}
-      </Box>
+        </Box>
+      </CheckboxContainer>
     </form>
   );
 };
+
+const CheckboxContainer = styled.div`
+  ${({ theme }) => css`
+    display: grid;
+    gap: ${theme.spacing[3]}px;
+  `}
+`;
 
 export default CollectForm;
