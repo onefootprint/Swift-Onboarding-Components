@@ -1,5 +1,11 @@
 import { useHasScroll, useToggle, useTranslation } from 'hooks';
-import { IcoBook24, IcoMegaphone24, IcoWriting24 } from 'icons';
+import {
+  IcoBook24,
+  IcoFootprint24,
+  IcoMegaphone24,
+  IcoUsers24,
+  IcoWriting24,
+} from 'icons';
 import React from 'react';
 import styled, { css } from 'styled-components';
 import { Banner, Container, media } from 'ui';
@@ -23,7 +29,23 @@ const Navbar = ({ cta }: NavbarProps) => {
   const entries: NavEntry[] = [
     { text: t('entries.compare.text'), href: t('entries.compare.href') },
     { text: t('entries.pricing.text'), href: t('entries.pricing.href') },
-    { text: t('entries.company.text'), href: t('entries.company.href') },
+    {
+      text: t('entries.company.text'),
+      items: [
+        {
+          text: t('entries.company.links.about.text'),
+          href: t('entries.company.links.about.href'),
+          subtext: t('entries.company.links.about.subtext'),
+          iconComponent: IcoFootprint24,
+        },
+        {
+          text: t('entries.company.links.join-us.text'),
+          href: t('entries.company.links.join-us.href'),
+          subtext: t('entries.company.links.join-us.subtext'),
+          iconComponent: IcoUsers24,
+        },
+      ],
+    },
     { text: t('entries.faq.text'), href: t('entries.faq.href') },
     {
       text: t('entries.writing.text'),

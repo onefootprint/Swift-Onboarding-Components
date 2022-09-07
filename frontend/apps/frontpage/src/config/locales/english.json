@@ -39,7 +39,18 @@
         },
         "company": {
           "text": "Company",
-          "href": "/company"
+          "links": {
+            "about": {
+              "text": "About Footprint",
+              "href": "/company",
+              "subtext": "Learn more about our company & team"
+            },
+            "join-us": {
+              "text": "Join us",
+              "href": "https://onefootprint.notion.site/Join-us-at-Footprint-29e1b0de675840c39e79e9ffd587ca3c",
+              "subtext": "Help us bring back trust to the Internet"
+            }
+          }
         },
         "faq": {
           "text": "FAQ",

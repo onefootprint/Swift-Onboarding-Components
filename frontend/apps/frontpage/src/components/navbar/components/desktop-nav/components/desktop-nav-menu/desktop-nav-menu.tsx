@@ -37,7 +37,7 @@ const DesktopNavMenu = ({ menu }: DesktopNavbarMenuProps) => {
 };
 
 const StyledContent = styled(NavigationMenu.Content)`
-  width: 380px;
+  width: 384px;
 `;
 
 const StyledTrigger = styled(NavigationMenu.Trigger)`

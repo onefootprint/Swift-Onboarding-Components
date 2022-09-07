@@ -17,7 +17,7 @@ const DesktopNavMenuItem = ({ item }: DesktopNavMenuItemProps) => (
         <item.iconComponent />
         <ItemText>
           <Typography variant="label-3">{item.text}</Typography>
-          <Typography variant="body-4" color="tertiary">
+          <Typography variant="body-3" color="tertiary">
             {item.subtext}
           </Typography>
         </ItemText>
