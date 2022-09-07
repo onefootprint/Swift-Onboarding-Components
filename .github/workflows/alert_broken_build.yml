@@ -1,40 +1,41 @@
-
 name: Broken Build Alert
 
 on:
   push:
-    branches: [ "master" ]
+    branches: ['master']
+
+concurrency:
+  group: ${{ github.workflow }}-broken-alert
+  cancel-in-progress: true
 
 jobs:
   wait:
-    name: "Wait for checks"
+    name: 'Wait for checks'
     runs-on: ubuntu-latest
     steps:
-    - name: Wait for checks
-      uses: lewagon/wait-on-check-action@v1.0.0
-      with:
-        ref: ${{ github.sha }}
-        running-workflow-name: 'Wait for checks'
-        repo-token: ${{ secrets.GITHUB_TOKEN }}
-        wait-interval: 10
-        allowed-conclusions: success,skipped
+      - name: Wait for checks
+        uses: lewagon/wait-on-check-action@v1.0.0
+        with:
+          ref: ${{ github.sha }}
+          running-workflow-name: 'Wait for checks'
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          wait-interval: 10
+          allowed-conclusions: success,skipped
 
-      
   alert:
     if: failure()
     needs: [wait]
     runs-on: ubuntu-latest
     steps:
-    - name: Notify on slack
-      id: slack
-      uses: slackapi/slack-github-action@v1.21.0
-      with:
-        # This data can be any valid JSON from a previous step in the GitHub Action
-        payload: |
-          {
-            "user": "${{ github.event.pusher.name }}",
-            "url": "https://github.com/onefootprint/monorepo/commit/${{ github.sha }}/checks"
-          }
-      env:
-        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-
+      - name: Notify on slack
+        id: slack
+        uses: slackapi/slack-github-action@v1.21.0
+        with:
+          # This data can be any valid JSON from a previous step in the GitHub Action
+          payload: |
+            {
+              "user": "${{ github.event.pusher.name }}",
+              "url": "https://github.com/onefootprint/monorepo/commit/${{ github.sha }}/checks"
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
