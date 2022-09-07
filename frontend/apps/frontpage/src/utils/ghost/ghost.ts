@@ -11,6 +11,12 @@ export enum PostType {
   library = 'library',
 }
 
+export enum SlugByPostType {
+  blog = '/blog',
+  investorUpdate = '/investor-updates',
+  library = '/library',
+}
+
 export async function getInitialPosts(type?: PostType) {
   const posts = await ghost.posts.browse({
     include: ['tags', 'authors'],
@@ -22,6 +28,16 @@ export async function getAllPosts(type?: PostType) {
   const posts = await ghost.posts.browse({ limit: 'all', include: ['tags'] });
   return filterPosts(posts, type);
 }
+
+export const getSlugPrefix = (tagName?: string) => {
+  if (tagName === INVESTOR_UPDATES_TAG) {
+    return SlugByPostType.investorUpdate;
+  }
+  if (tagName === LIBRARY_TAG) {
+    return SlugByPostType.library;
+  }
+  return SlugByPostType.blog;
+};
 
 function filterPosts(posts: any[], type?: PostType) {
   if (type === PostType.blog) {
