@@ -23,6 +23,7 @@ const Page404 = () => {
                 layout="fixed"
                 src="/404.png"
                 width={298}
+                priority
               />
             )}
           />
