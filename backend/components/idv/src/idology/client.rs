@@ -1,4 +1,5 @@
-use newtypes::{dob::DateOfBirth, DataAttribute, IdvData, PiiString};
+use itertools::Itertools;
+use newtypes::{dob::DateOfBirth, IdvData, PiiString, SignalAttribute};
 
 use crate::idology::{ConversionError, Error, ReqwestError};
 
@@ -87,22 +88,27 @@ impl TryFrom<IdvData> for IdologyRequestData {
     }
 }
 
-impl IdologyClient {
-    // TODO is there a more typesafe way to keep this in sync with the mapper function above?
-    pub fn verified_data_attributes() -> Vec<DataAttribute> {
+impl IdologyRequestData {
+    pub fn attributes(&self) -> Vec<SignalAttribute> {
+        // Compose the list of attributes that are sent to IDology to be verified in this request
         vec![
-            DataAttribute::FirstName,
-            DataAttribute::LastName,
-            DataAttribute::AddressLine1,
-            DataAttribute::City,
-            DataAttribute::State,
-            DataAttribute::Zip,
-            DataAttribute::Ssn4,
-            DataAttribute::Ssn9,
-            DataAttribute::Dob,
-            DataAttribute::Email,
-            DataAttribute::PhoneNumber,
+            Some(SignalAttribute::Name),
+            Some(SignalAttribute::StreetAddress),
+            self.city.as_ref().map(|_| SignalAttribute::City),
+            self.state.as_ref().map(|_| SignalAttribute::State),
+            self.zip.as_ref().map(|_| SignalAttribute::Zip),
+            self.ssn_last4.as_ref().map(|_| SignalAttribute::Ssn),
+            self.ssn.as_ref().map(|_| SignalAttribute::Ssn),
+            self.dob_month.as_ref().map(|_| SignalAttribute::Dob),
+            self.dob_year.as_ref().map(|_| SignalAttribute::Dob),
+            self.dob_day.as_ref().map(|_| SignalAttribute::Dob),
+            self.email.as_ref().map(|_| SignalAttribute::Email),
+            self.telephone.as_ref().map(|_| SignalAttribute::PhoneNumber),
         ]
+        .into_iter()
+        .flatten()
+        .unique()
+        .collect()
     }
 }
 
@@ -128,13 +134,19 @@ impl IdologyClient {
         })
     }
 
-    /// ExpectId module
-    pub async fn verify_expectid(&self, idv_data: IdvData) -> Result<serde_json::Value, Error> {
+    /// Make a request to the ExpectID module. Returns the result from ExpectID and a vec of
+    /// attributes that were sent to IDology's ExpectID
+    pub async fn verify_expectid(
+        &self,
+        idv_data: IdvData,
+    ) -> Result<(serde_json::Value, Vec<SignalAttribute>), Error> {
+        let req_data = IdologyRequestData::try_from(idv_data)?;
+        let attributes = req_data.attributes();
         let req_list = IdologyRequest {
             username: self.username.clone(),
             password: self.password.clone(),
             age_to_check: 13, // TODO
-            data: IdologyRequestData::try_from(idv_data)?,
+            data: req_data,
         };
         let response = self
             .client
@@ -148,7 +160,6 @@ impl IdologyClient {
             .json::<serde_json::Value>()
             .await
             .map_err(ReqwestError::InternalError)?;
-        // TODO parse as an IdologyResponse
-        Ok(idology_response)
+        Ok((idology_response, attributes))
     }
 }

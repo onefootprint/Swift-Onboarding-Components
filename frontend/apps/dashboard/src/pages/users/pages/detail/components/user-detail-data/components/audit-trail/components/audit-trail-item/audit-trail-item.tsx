@@ -1,8 +1,10 @@
-import type { Icon } from 'icons';
 import {
   IcoBuilding16,
   IcoCheck16,
+  IcoFileText16,
   IcoFootprint16,
+  IcoLaptop16,
+  Icon,
   IcoPhone16,
   IcoUser16,
 } from 'icons';
@@ -11,30 +13,32 @@ import { TimelineItem } from 'src/components/timeline/timeline';
 import {
   AuditTrail,
   AuditTrailEvent,
-  dataKindToDisplayName,
   LivenessCheckInfo,
+  SignalAttribute,
+  signalAttributeToDisplayName,
   Vendor,
   vendorToDisplayName,
   VerificationInfo,
   VerificationInfoStatus,
 } from 'src/types';
-import { UserDataAttribute } from 'types';
 import { Tag, Typography } from 'ui';
 
-const iconForDataKind = {
-  [UserDataAttribute.firstName]: IcoUser16,
-  [UserDataAttribute.lastName]: IcoUser16,
-  [UserDataAttribute.email]: IcoUser16,
-  [UserDataAttribute.phoneNumber]: IcoPhone16,
-  [UserDataAttribute.ssn9]: IcoUser16,
-  [UserDataAttribute.ssn4]: IcoUser16,
-  [UserDataAttribute.dob]: IcoUser16,
-  [UserDataAttribute.addressLine1]: IcoBuilding16,
-  [UserDataAttribute.addressLine2]: IcoBuilding16,
-  [UserDataAttribute.city]: IcoBuilding16,
-  [UserDataAttribute.state]: IcoBuilding16,
-  [UserDataAttribute.zip]: IcoBuilding16,
-  [UserDataAttribute.country]: IcoBuilding16,
+const iconForAttribute: Record<SignalAttribute, Icon> = {
+  [SignalAttribute.name]: IcoUser16,
+  [SignalAttribute.email]: IcoUser16,
+  [SignalAttribute.phoneNumber]: IcoPhone16,
+  [SignalAttribute.ssn]: IcoUser16,
+  [SignalAttribute.dob]: IcoUser16,
+  [SignalAttribute.address]: IcoBuilding16,
+  [SignalAttribute.streetAddress]: IcoBuilding16,
+  [SignalAttribute.city]: IcoBuilding16,
+  [SignalAttribute.state]: IcoBuilding16,
+  [SignalAttribute.zip]: IcoBuilding16,
+  [SignalAttribute.country]: IcoBuilding16,
+
+  [SignalAttribute.identity]: IcoUser16,
+  [SignalAttribute.ipAddress]: IcoLaptop16,
+  [SignalAttribute.document]: IcoFileText16,
 };
 
 const detailsForLivenessEvent = (data: LivenessCheckInfo) => ({
@@ -83,7 +87,7 @@ const detailsForVerificationEvent = (data: VerificationInfo) => {
     };
   }
   // Show the icon that represents the most fields
-  const icons = data.dataAttributes.map(dataKind => iconForDataKind[dataKind]);
+  const icons = data.attributes.map(attribute => iconForAttribute[attribute]);
   const HeaderIcon = icons
     .sort(
       (a: Icon, b: Icon) =>
@@ -101,16 +105,16 @@ const detailsForVerificationEvent = (data: VerificationInfo) => {
   const text =
     data.status === VerificationInfoStatus.Verified
       ? ' verified by '
-      : ' marked as fraudulent by ';
+      : ' flagged by ';
   const color =
     data.status === VerificationInfoStatus.Verified ? 'neutral' : 'error';
   const headerComponent = (
     <Typography variant="body-3">
       <>
-        {data.dataAttributes.map((userAttribute, i: number) => (
+        {data.attributes.map((userAttribute, i: number) => (
           <React.Fragment key={userAttribute}>
-            <Tag>{dataKindToDisplayName[userAttribute]}</Tag>
-            {i !== data.dataAttributes.length - 1 ? ', ' : ''}
+            <Tag>{signalAttributeToDisplayName[userAttribute]}</Tag>
+            {i !== data.attributes.length - 1 ? ', ' : ''}
           </React.Fragment>
         ))}
         <Typography variant="label-3" as="span" color={color}>

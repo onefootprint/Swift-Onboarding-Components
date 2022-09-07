@@ -1,10 +1,12 @@
 mod idology;
 mod signal;
+mod signal_attribute;
 
 use std::str::FromStr;
 
 pub use idology::*;
 pub use signal::*;
+pub use signal_attribute::*;
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
 #[serde(try_from = "&str")]

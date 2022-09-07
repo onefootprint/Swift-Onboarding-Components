@@ -1,4 +1,4 @@
-use crate::DataAttribute;
+use crate::SignalAttribute;
 
 #[derive(Debug, Clone, Copy, Ord, PartialOrd, Eq, PartialEq)]
 pub enum SignalKind {
@@ -17,15 +17,10 @@ pub enum SignalKind {
     Fraud(u32),
 }
 
-pub enum SignalAttribute {
-    General,
-    DataAttribute(DataAttribute),
-}
-
+#[derive(Debug)]
 pub struct Signal {
     pub kind: SignalKind,
-    // TODO one day use more representative SignalAttribute
-    pub attributes: Vec<DataAttribute>,
+    pub attributes: Vec<SignalAttribute>,
 }
 
 #[cfg(test)]

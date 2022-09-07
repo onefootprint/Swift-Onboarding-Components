@@ -8,10 +8,11 @@ use db::models::{
     verification_request::{NewVerificationRequest, VerificationRequest},
     verification_result::VerificationResult,
 };
-use idv::{idology::client::IdologyClient, verification::get_signals};
+use idv::verification::get_signals;
 use newtypes::{
     email::Email, AuditTrailEvent, DataAttribute, IdvData, OnboardingId, PhoneNumber, ScopedUserId, Signal,
-    SignalKind, Status, TenantId, UserVaultId, Vendor, VerificationInfo, VerificationInfoStatus,
+    SignalAttribute, SignalKind, Status, TenantId, UserVaultId, Vendor, VerificationInfo,
+    VerificationInfoStatus,
 };
 use std::{collections::HashMap, str::FromStr};
 use strum::IntoEnumIterator;
@@ -86,7 +87,7 @@ pub async fn initiate_idv_request(state: &State, data: IdvRequestData) -> Result
     } = data;
     let idv_data = uvw.build_idv_request(state).await?;
 
-    let result = match request.vendor {
+    let (result, pending_attributes) = match request.vendor {
         Vendor::Idology => state
             .idology_client
             .verify_expectid(idv_data)
@@ -100,7 +101,7 @@ pub async fn initiate_idv_request(state: &State, data: IdvRequestData) -> Result
             let result = VerificationResult::create(conn, request.id, result)?;
             let result_id = result.id.clone();
             let (new_status, events) = match get_signals(request.vendor, result.response) {
-                Ok(signals) => process_success(signals, uvw, request.vendor)?,
+                Ok(signals) => process_success(signals, request.vendor, pending_attributes)?,
                 Err(_) => process_error()?,
             };
             Onboarding::update_status_by_id(conn, &onboarding_id, new_status)?;
@@ -121,11 +122,11 @@ pub async fn initiate_idv_request(state: &State, data: IdvRequestData) -> Result
 
 fn process_success(
     signals: Vec<Signal>,
-    uvw: UserVaultWrapper,
     vendor: Vendor,
+    pending_attributes: Vec<SignalAttribute>,
 ) -> Result<(Status, Vec<VerificationInfo>), ApiError> {
-    // Create a map of DataAttribute -> Vec<SignalKind>
-    let mut attribute_to_signals = HashMap::<DataAttribute, Vec<_>>::new();
+    // Create a map of SignalAttribute -> Vec<SignalKind>
+    let mut attribute_to_signals = HashMap::<SignalAttribute, Vec<_>>::new();
     for signal in signals {
         for attr in signal.attributes {
             let signals_for_attr = attribute_to_signals.entry(attr).or_default();
@@ -134,6 +135,7 @@ fn process_success(
     }
     // Look at the maximum signal for each attribute. If it is more severe than INFO, we shouldn't
     // include the field in the list of verified attributes in the audit log
+    // Note that there may be attributes in failed_attributes that aren't included in pending_attributes.
     let failed_attributes: Vec<_> = attribute_to_signals
         .into_iter()
         .filter_map(|(attr, signal_kinds)| {
@@ -147,9 +149,8 @@ fn process_success(
             }
         })
         .collect();
-    let verified_fields: Vec<_> = IdologyClient::verified_data_attributes()
+    let verified_fields: Vec<_> = pending_attributes
         .into_iter()
-        .filter(|a| uvw.has_field(*a))
         .filter(|a| !failed_attributes.contains(a))
         .collect();
 
@@ -161,17 +162,17 @@ fn process_success(
     };
     let events = vec![
         (!verified_fields.is_empty()).then_some(VerificationInfo {
-            data_attributes: verified_fields,
+            attributes: verified_fields,
             vendor,
             status: VerificationInfoStatus::Verified,
         }),
         (!failed_attributes.is_empty()).then_some(VerificationInfo {
-            data_attributes: failed_attributes,
+            attributes: failed_attributes,
             vendor,
             status: VerificationInfoStatus::Failed,
         }),
         Some(VerificationInfo {
-            data_attributes: vec![],
+            attributes: vec![],
             vendor: Vendor::Footprint,
             status: final_audit_status,
         }),
@@ -184,7 +185,7 @@ fn process_success(
 
 fn process_error() -> Result<(Status, Vec<VerificationInfo>), ApiError> {
     let events = vec![VerificationInfo {
-        data_attributes: vec![],
+        attributes: vec![],
         vendor: Vendor::Footprint,
         status: VerificationInfoStatus::Failed,
     }];

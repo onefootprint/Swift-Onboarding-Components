@@ -1,0 +1,26 @@
+use strum_macros::{Display, EnumString};
+
+#[derive(
+    Debug, Display, Clone, Copy, Eq, PartialEq, Hash, EnumString, serde::Serialize, serde::Deserialize,
+)]
+#[serde(try_from = "&str")]
+#[strum(serialize_all = "snake_case")]
+#[serde(rename_all = "snake_case")]
+/// Represents the granularity of data attributes that could be alerted on by a data vendor
+pub enum SignalAttribute {
+    Name,
+    Dob,
+    Ssn,
+    Address,
+    StreetAddress,
+    City,
+    State,
+    Zip,
+    Country,
+    Email,
+    PhoneNumber,
+
+    Identity,
+    IpAddress,
+    Document,
+}

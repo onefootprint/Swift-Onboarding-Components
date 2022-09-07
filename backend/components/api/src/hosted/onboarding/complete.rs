@@ -21,7 +21,7 @@ use itertools::Itertools;
 use newtypes::TenantId;
 use newtypes::ValidatedPhoneNumber;
 use newtypes::VerificationInfoStatus;
-use newtypes::{AuditTrailEvent, DataAttribute, SessionAuthToken, Status, Vendor, VerificationInfo};
+use newtypes::{AuditTrailEvent, SessionAuthToken, SignalAttribute, Status, Vendor, VerificationInfo};
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Apiv2Schema)]
@@ -157,36 +157,31 @@ fn initiate_verification(
     };
     let events = vec![
         VerificationInfo {
-            data_attributes: vec![
-                DataAttribute::FirstName,
-                DataAttribute::LastName,
-                DataAttribute::Dob,
-            ],
+            attributes: vec![SignalAttribute::Name, SignalAttribute::Dob],
             vendor: Vendor::Experian,
             status: VerificationInfoStatus::Verified,
         },
         VerificationInfo {
-            data_attributes: vec![DataAttribute::Country, DataAttribute::State],
+            attributes: vec![SignalAttribute::Country, SignalAttribute::State],
             vendor: Vendor::Socure,
             status: VerificationInfoStatus::Verified,
         },
         VerificationInfo {
-            data_attributes: vec![
-                DataAttribute::AddressLine1,
-                DataAttribute::AddressLine2,
-                DataAttribute::City,
-                DataAttribute::Zip,
+            attributes: vec![
+                SignalAttribute::StreetAddress,
+                SignalAttribute::City,
+                SignalAttribute::Zip,
             ],
             vendor: Vendor::Idology,
             status: VerificationInfoStatus::Verified,
         },
         VerificationInfo {
-            data_attributes: vec![DataAttribute::Ssn9],
+            attributes: vec![SignalAttribute::Ssn],
             vendor: Vendor::LexisNexis,
             status: final_status,
         },
         VerificationInfo {
-            data_attributes: vec![],
+            attributes: vec![],
             vendor: Vendor::Footprint,
             status: final_status,
         },

@@ -3,7 +3,7 @@ use diesel_as_jsonb::AsJsonb;
 use paperclip::actix::Apiv2Schema;
 use serde::{Deserialize, Serialize};
 
-use crate::{DataAttribute, Vendor};
+use crate::{SignalAttribute, Vendor};
 
 #[derive(Debug, Clone, Serialize, Deserialize, Apiv2Schema, AsJsonb)]
 #[serde(rename_all = "snake_case")]
@@ -37,8 +37,8 @@ impl Default for VerificationInfoStatus {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct VerificationInfo {
-    pub data_attributes: Vec<DataAttribute>,
-    pub vendor: Vendor,
     #[serde(default)]
+    pub attributes: Vec<SignalAttribute>,
+    pub vendor: Vendor,
     pub status: VerificationInfoStatus,
 }

@@ -1,5 +1,4 @@
-use super::{Signal, SignalKind};
-use crate::DataAttribute;
+use super::{Signal, SignalAttribute, SignalKind};
 use strum_macros::EnumString;
 
 #[derive(Debug, strum::Display, Clone, Eq, PartialEq, serde::Deserialize, EnumString)]
@@ -402,98 +401,92 @@ impl serde::Serialize for IDologyReasonCode {
 // Perhaps we take the max risk score (ie Alert(3) > Alert(2) per field/signal attribute, sum them up, and subtract from 100.
 impl IDologyReasonCode {
     pub fn signal(self) -> Signal {
-        use DataAttribute::*;
         use IDologyReasonCode::*;
+        use SignalAttribute::*;
         use SignalKind::*;
-        // TODO should we make signal attribute for whole fields?
         // These are frequent signal kinds and signal attributes that we may need to create
-        let identity = vec![]; // TODO
-        let ip_address = vec![]; // TODO
-        let document = vec![]; // TODO
-        let ssn = vec![Ssn4, Ssn9];
-        let whole_address = vec![AddressLine1, AddressLine2, City, State, Zip, Country];
         let enterprise_blocked = Alert(5);
         let network_alert = Alert(10);
 
         let (kind, attributes) = match self {
             CoppaAlert => (Alert(10), vec![Dob]),
-            AddressDoesNotMatch => (Alert(3), vec![AddressLine1]),
-            StreetNameDoesNotMatch => (Alert(2), vec![AddressLine1]),
-            StreetNumberDoesNotMatch => (Alert(2), vec![AddressLine1]),
-            InputAddressIsPoBox => (Info, whole_address),
-            LocatedAddressIsPoBox => (Info, whole_address),
+            AddressDoesNotMatch => (Alert(3), vec![StreetAddress]),
+            StreetNameDoesNotMatch => (Alert(2), vec![StreetAddress]),
+            StreetNumberDoesNotMatch => (Alert(2), vec![StreetAddress]),
+            InputAddressIsPoBox => (Info, vec![Address]),
+            LocatedAddressIsPoBox => (Info, vec![Address]),
             // TODO parse warm-address-list value
-            WarmInputAddressAlert => (Alert(3), whole_address),
-            WarmAddressAlert => (Alert(3), whole_address),
+            WarmInputAddressAlert => (Alert(3), vec![Address]),
+            WarmAddressAlert => (Alert(3), vec![Address]),
             ZipCodeDoesNotMatch => (Alert(1), vec![Zip]),
-            InputAddressIsNotDeliverable => (Alert(1), whole_address),
-            LocatedAddressIsNotDeliverable => (Alert(1), whole_address),
+            InputAddressIsNotDeliverable => (Alert(1), vec![Address]),
+            LocatedAddressIsNotDeliverable => (Alert(1), vec![Address]),
             YobDoesNotMatch => (Alert(3), vec![Dob]),
             YobDoesNotMatchWithin1YearTolerance => (Alert(2), vec![Dob]),
             MobDoesNotMatch => (Alert(3), vec![Dob]),
             MobNotAvailable => (NotFound, vec![Dob]),
             // TODO how do we handle this?
             MultipleRecordsFound => (TODO, vec![]),
-            NewerRecordFound => (Alert(1), whole_address),
-            HighRiskAddress => (Fraud(2), whole_address),
-            AddressVelocityAlert => (Alert(3), identity),
-            AddressStabilityAlert => (Alert(1), identity),
+            NewerRecordFound => (Alert(1), vec![Address]),
+            HighRiskAddress => (Fraud(2), vec![Address]),
+            AddressVelocityAlert => (Alert(3), vec![Identity]),
+            AddressStabilityAlert => (Alert(1), vec![Identity]),
             // TODO: This seems like more than a binary signal?
-            AddressLongevityAlert => (TODO, identity),
+            AddressLongevityAlert => (TODO, vec![Identity]),
             AddressLocationAlert => (NotImportant, vec![Zip]),
             // TODO i don't think we provide this
-            AlternateAddressAlert => (NotImportant, whole_address),
+            AlternateAddressAlert => (NotImportant, vec![Address]),
             DobyobNotAvailable => (NotFound, vec![Dob]),
-            SsnNotAvailable => (NotFound, ssn), // TODO how to treat Ssn?
-            SsnDoesNotMatch => (Alert(3), ssn),
-            SsnDoesNotMatchWithinTolerance => (Alert(1), ssn),
-            InputSsnIsItin => (Info, ssn), // I think ITIN is fine? what is an ITIN?
-            ItinLocated => (Info, ssn),
-            SsnTiedToMultipleNames => (Alert(3), ssn),
-            SubjectDeceased => (Fraud(1), identity), // Is this a strong fraud signal? Seems sketchy
+            SsnNotAvailable => (NotFound, vec![Ssn]), // TODO how to treat Ssn?
+            SsnDoesNotMatch => (Alert(3), vec![Ssn]),
+            SsnDoesNotMatchWithinTolerance => (Alert(1), vec![Ssn]),
+            InputSsnIsItin => (Info, vec![Ssn]), // I think ITIN is fine? what is an ITIN?
+            ItinLocated => (Info, vec![Ssn]),
+            SsnTiedToMultipleNames => (Alert(3), vec![Ssn]),
+            SubjectDeceased => (Fraud(1), vec![Identity]), // Is this a strong fraud signal? Seems sketchy
             StateDoesNotMatch => (Alert(1), vec![State]),
-            SsnIssuedPriorToDob => (Fraud(5), ssn), // IDology notes specifically this is a serious fraud signal
-            SsnIsInvalid => (InvalidRequest, ssn),
-            SingleAddressInFile => (Info, whole_address),
+            SsnIssuedPriorToDob => (Fraud(5), vec![Ssn]), // IDology notes specifically this is a serious fraud signal
+            SsnIsInvalid => (InvalidRequest, vec![Ssn]),
+            SingleAddressInFile => (Info, vec![Address]),
             // TODO doesn't seem like a binary signal
-            DataStrengthAlert => (TODO, identity),
+            DataStrengthAlert => (TODO, vec![Identity]),
             ActivationDateAlert => (NotImportant, vec![]),
-            LastNameDoesNotMatch => (Alert(1), vec![LastName]),
-            ThinFile => (Alert(1), identity),
-            BankruptcyFound => (Info, identity),
+            LastNameDoesNotMatch => (Alert(1), vec![Name]),
+            ThinFile => (Alert(1), vec![Identity]),
+            BankruptcyFound => (Info, vec![Identity]),
             // Only matters if we set in the enterprise config
             // TODO: do we want some signals to be an instant -> manual review?
             AgeBelowMinimum => (enterprise_blocked, vec![Dob]),
             AgeAboveMaximum => (enterprise_blocked, vec![Dob]),
-            AlertListAlertSsn => (enterprise_blocked, ssn),
-            AlertListAlertAddress => (enterprise_blocked, whole_address),
-            AlertListAlertAddressAndZip => (enterprise_blocked, whole_address),
-            AlertListAlertIpAddress => (enterprise_blocked, ip_address),
+            AlertListAlertSsn => (enterprise_blocked, vec![Ssn]),
+            AlertListAlertAddress => (enterprise_blocked, vec![Address]),
+            AlertListAlertAddressAndZip => (enterprise_blocked, vec![Address]),
+            AlertListAlertIpAddress => (enterprise_blocked, vec![IpAddress]),
             AlertListAlertPhoneNumber => (enterprise_blocked, vec![PhoneNumber]),
             AlertListAlertEmailAddress => (enterprise_blocked, vec![Email]),
             AlertListAlertEmailDomain => (enterprise_blocked, vec![Email]),
-            AlertListAlertDocumentNumber => (enterprise_blocked, document),
+            AlertListAlertDocumentNumber => (enterprise_blocked, vec![Document]),
             // TODO: how serious are these "network alert lists"?
-            NetworkAlertSsn => (network_alert, ssn),
-            NetworkAlertAddress => (network_alert, whole_address),
-            NetworkAlertAddressAndZip => (network_alert, whole_address),
-            NetworkAlertIpAddress => (network_alert, ip_address),
+            NetworkAlertSsn => (network_alert, vec![Ssn]),
+            NetworkAlertAddress => (network_alert, vec![Address]),
+            NetworkAlertAddressAndZip => (network_alert, vec![Address]),
+            NetworkAlertIpAddress => (network_alert, vec![IpAddress]),
             NetworkAlertEmail => (network_alert, vec![Email]),
             NetworkAlertPhoneNumber => (network_alert, vec![PhoneNumber]),
             NetworkAlertEmailDomain => (network_alert, vec![Email]),
-            NetworkAlertDocumentNumber => (network_alert, document),
+            NetworkAlertDocumentNumber => (network_alert, vec![Document]),
 
-            IpStateDoesNotMatch => (Alert(1), ip_address),
-            InvalidIp => (InvalidRequest, ip_address),
-            IpNotLocated => (NotFound, ip_address),
-            HighRiskIpBot => (Fraud(3), ip_address),
-            HighRiskIpSpam => (Fraud(3), ip_address),
-            HighRiskIpTor => (Fraud(3), ip_address),
-            IpLocationNotAvailable => (Alert(1), ip_address),
+            IpStateDoesNotMatch => (Alert(1), vec![IpAddress]),
+            InvalidIp => (InvalidRequest, vec![IpAddress]),
+            IpNotLocated => (NotFound, vec![IpAddress]),
+            HighRiskIpBot => (Fraud(3), vec![IpAddress]),
+            HighRiskIpSpam => (Fraud(3), vec![IpAddress]),
+            HighRiskIpTor => (Fraud(3), vec![IpAddress]),
+            IpLocationNotAvailable => (Alert(1), vec![IpAddress]),
             // Only matters if set via enterprise configuration
-            LowRisk => (Alert(2), identity),
-            MediumRisk => (Alert(4), vec![]),
-            HighRisk => (Alert(6), vec![]),
+            LowRisk => (Alert(2), vec![Identity]),
+            MediumRisk => (Alert(4), vec![Identity]),
+            HighRisk => (Alert(6), vec![Identity]),
             // TODO how serious is this?
             PaDobMatch => (Alert(2), vec![Dob]),
             // Do these even matter? idgi
@@ -526,10 +519,7 @@ impl IDologyReasonCode {
             // How bad are these?
             InputPhoneNumberDoesNotMatchInputState => (Info, vec![PhoneNumber, State]),
             InputPhoneNumberDoesNotMatchLocatedStateHistory => (Info, vec![PhoneNumber, State]),
-            InputPhoneNumberDoesNotMatchIpState => (
-                Alert(1),
-                vec![PhoneNumber].into_iter().chain(ip_address).collect(),
-            ),
+            InputPhoneNumberDoesNotMatchIpState => (Alert(1), vec![PhoneNumber, IpAddress]),
         };
         Signal { kind, attributes }
     }
