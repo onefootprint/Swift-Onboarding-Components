@@ -1,11 +1,11 @@
 import { useTranslation } from 'hooks';
+import Link from 'next/link';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import useIsSandbox from 'src/hooks/use-is-sandbox';
 import { UserData } from 'src/utils/state-machine/types';
-import styled, { css } from 'styled-components';
 import { UserDataAttribute } from 'types';
-import { Button, TextInput } from 'ui';
+import { Box, Button, TextInput, Typography } from 'ui';
 
 import EMAIL_SANDBOX_REGEX from './email-identification-form.constants';
 
@@ -36,38 +36,52 @@ const EmailIdentificationForm = ({
   };
 
   return (
-    <Form onSubmit={handleSubmit(onSubmit)} noValidate={isSandbox}>
-      <TextInput
-        hasError={!!errors.email}
-        hintText={getHintText()}
-        label={t('email.label')}
-        placeholder={t('email.placeholder')}
-        type="email"
-        {...register('email', {
-          required: {
-            value: true,
-            message: t('email.errors.required'),
-          },
-          pattern: isSandbox
-            ? {
-                value: EMAIL_SANDBOX_REGEX,
-                message: t('email.errors.pattern'),
-              }
-            : undefined,
-        })}
-      />
-      <Button fullWidth type="submit" loading={isLoading}>
+    <form onSubmit={handleSubmit(onSubmit)} noValidate={isSandbox}>
+      <Box sx={{ marginBottom: 7 }}>
+        <TextInput
+          hasError={!!errors.email}
+          hintText={getHintText()}
+          label={t('email.label')}
+          placeholder={t('email.placeholder')}
+          type="email"
+          {...register('email', {
+            required: {
+              value: true,
+              message: t('email.errors.required'),
+            },
+            pattern: isSandbox
+              ? {
+                  value: EMAIL_SANDBOX_REGEX,
+                  message: t('email.errors.pattern'),
+                }
+              : undefined,
+          })}
+        />
+      </Box>
+      <Button
+        fullWidth
+        loading={isLoading}
+        sx={{ marginBottom: 5 }}
+        type="submit"
+      >
         {t('cta')}
       </Button>
-    </Form>
+      <Typography
+        color="tertiary"
+        sx={{ textAlign: 'center' }}
+        variant="caption-1"
+      >
+        {t('terms.label')}&nbsp;
+        <Link
+          href="https://www.onefootprint.com/terms-of-service"
+          target="_blank"
+          rel="noreferrer noopener"
+        >
+          {t('terms.link')}
+        </Link>
+      </Typography>
+    </form>
   );
 };
-
-const Form = styled.form`
-  ${({ theme }) => css`
-    display: grid;
-    row-gap: ${theme.spacing[7]}px;
-  `}
-`;
 
 export default EmailIdentificationForm;

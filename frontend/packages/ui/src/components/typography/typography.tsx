@@ -70,6 +70,15 @@ const StyledTypography = styled.p<{
     ${createFontStyles(variant)}
     color: ${theme.color[$color]};
     ${sx};
+
+    a {
+      color: ${theme.color.accent};
+      text-decoration: none;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
   `}
 `;
 

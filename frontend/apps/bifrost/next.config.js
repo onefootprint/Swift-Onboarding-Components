@@ -12,4 +12,7 @@ module.exports = withPlugins([withTM, withBundleAnalyzer], {
   compiler: {
     styledComponents: true,
   },
+  experimental: {
+    newNextLinkBehavior: true,
+  },
 });
