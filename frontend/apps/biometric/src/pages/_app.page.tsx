@@ -22,7 +22,7 @@ type AppProps = {
 
 const App = ({ Component, pageProps }: AppProps) => {
   const router = useRouter();
-  const { hideAppClip } = router.query;
+  // const { hideAppClip } = router.query;
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -30,12 +30,12 @@ const App = ({ Component, pageProps }: AppProps) => {
         <DesignSystemProvider theme={themes.light}>
           <GlobalStyle />
           <Head>
-            {hideAppClip ? null : (
+            {/* {hideAppClip ? null : (
               <meta
                 name="apple-itunes-app"
                 content="app-id=1632436468, app-clip-bundle-id=com.onefootprint.my.live, app-clip-display=card"
               />
-            )}
+            )} */}
           </Head>
           <Header />
           <Component {...pageProps} />
