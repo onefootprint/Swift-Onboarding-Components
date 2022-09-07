@@ -7,7 +7,10 @@ import readingTime from 'reading-time';
 
 import type { Article } from '../types/article';
 
-const DOCS_PATH = path.join(process.cwd(), 'src/content/**/**.mdx');
+export enum DocsPage {
+  kycWithPii = 'kyc-with-pii',
+  pii = 'pii',
+}
 
 const getFilesPath = (filesPath: string): Promise<string[]> =>
   new Promise((resolve, reject) => {
@@ -58,23 +61,29 @@ const getAllMarkdownFiles = (contentPaths: string[]) =>
     }),
   );
 
-export const getAllArticles = async () => {
-  const filesPath = await getFilesPath(DOCS_PATH);
-  const articles = await getAllMarkdownFiles(filesPath);
+const generatePathForPage = (page: DocsPage) => {
+  const pathString = `src/content/${page}/**.mdx`;
+  return path.join(process.cwd(), pathString);
+};
+
+export const getArticlesForPage = async (page: DocsPage) => {
+  const docsPath = generatePathForPage(page);
+  const filesPath = await getFilesPath(docsPath);
+  const articles = getAllMarkdownFiles(filesPath);
   return articles;
 };
 
-export const getArticleBySlug = async (slug: string) => {
-  const articles = await getAllArticles();
-  return articles.find(article => article.data.slug === slug);
+export const getArticleBySlug = async (page: DocsPage, slug: string) => {
+  const articles = await getArticlesForPage(page);
+  return articles.find(article => article.data.slug === `/${page}/${slug}`);
 };
 
-export const getNavigation = async () => {
+export const getNavigation = async (page: DocsPage) => {
   const navigation = new Map<
     string,
     Set<{ title: string; position: number; slug: string }>
   >();
-  const articles = await getAllArticles();
+  const articles = await getArticlesForPage(page);
   articles.forEach(({ data: { product, title, position, slug } }) => {
     if (navigation.has(product)) {
       const set = navigation.get(product);

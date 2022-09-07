@@ -7,7 +7,7 @@ import { media } from 'ui';
 import ArticleSections from './components/article-sections';
 import ProductNavigation from './components/product-navigation';
 
-export type LayoutProps = {
+export type ArticleLayoutProps = {
   children: React.ReactNode;
   product: {
     name: string;
@@ -16,7 +16,7 @@ export type LayoutProps = {
   article: Article;
 };
 
-const Layout = ({ children, article, product }: LayoutProps) => (
+const ArticleLayout = ({ children, article, product }: ArticleLayoutProps) => (
   <Content>
     <ProductNavigation articles={product.articles} name={product.name} />
     <Main>
@@ -64,4 +64,4 @@ const ArticleContent = styled.article`
   `}
 `;
 
-export default Layout;
+export default ArticleLayout;

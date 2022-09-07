@@ -1,19 +1,19 @@
 import Markdown, { MarkdownToJSX } from 'markdown-to-jsx';
 import React from 'react';
+import SEO from 'src/components/seo';
 import type { Article } from 'src/types/article';
 import styled, { css } from 'styled-components';
 import { createFontStyles } from 'ui';
 
-import SEO from '../../components/seo';
-import A from './components/a';
 import ArticleHeader from './components/article-header';
-import Code from './components/code';
-import DocsInlineAlert from './components/docs-inline-alert';
-import H1 from './components/h1';
-import H2 from './components/h2';
-import H3 from './components/h3';
-import Layout from './components/layout';
-import Strong from './components/strong';
+import Layout from './components/article-layout';
+import A from './components/markdown-components/a';
+import Code from './components/markdown-components/code';
+import DocsInlineAlert from './components/markdown-components/docs-inline-alert';
+import H1 from './components/markdown-components/h1';
+import H2 from './components/markdown-components/h2';
+import H3 from './components/markdown-components/h3';
+import Strong from './components/markdown-components/strong';
 
 type ArticleProps = {
   product: any;

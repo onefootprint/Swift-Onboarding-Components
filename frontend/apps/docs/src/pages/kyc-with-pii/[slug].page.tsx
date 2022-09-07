@@ -2,25 +2,26 @@ import type { GetStaticProps } from 'next';
 import type { ParsedUrlQuery } from 'querystring';
 
 import {
-  getAllArticles,
+  DocsPage,
   getArticleBySlug,
+  getArticlesForPage,
   getNavigation,
-} from '../utils/articles';
+} from '../../utils/articles';
 
 export async function getStaticPaths() {
-  const pages = await getAllArticles();
+  const pages = await getArticlesForPage(DocsPage.kycWithPii);
   const paths = pages.map(({ data }) => data.slug);
   return { paths, fallback: 'blocking' };
 }
 
 type Params = ParsedUrlQuery & {
-  slug: string[];
+  slug: string;
 };
 
 export const getStaticProps: GetStaticProps<any, Params> = async context => {
   const { slug } = context.params!;
-  const article = await getArticleBySlug('/'.concat(slug.join('/')));
-  const navigation = await getNavigation();
+  const article = await getArticleBySlug(DocsPage.kycWithPii, slug);
+  const navigation = await getNavigation(DocsPage.kycWithPii);
   if (!article) {
     return { notFound: true };
   }
@@ -39,4 +40,4 @@ export const getStaticProps: GetStaticProps<any, Params> = async context => {
   };
 };
 
-export { default } from './article';
+export { default } from 'src/components/article';
