@@ -25,6 +25,8 @@ The monorepo is divided into two main folders:
 
 ### Develop
 
+To fetch the environment variables for each of the apps, you need to run `vercel link` from each of the `/apps/*` folders. Follow the prompts to link up apps with the footprint vercel apps with the same name. Afterwards, run `yarn set:dot-env` from the root directory which will create `.env` files for each app.
+
 Ideally, you should run commands from the root directory. To run a specific project, just run
 
 ```
