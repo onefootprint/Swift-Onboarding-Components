@@ -1,7 +1,6 @@
 use std::fmt::Debug;
 
 pub mod idology;
-pub mod verification;
 
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
