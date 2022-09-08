@@ -20,6 +20,7 @@ import {
   vendorToDisplayName,
   VerificationInfo,
   VerificationInfoStatus,
+  verificationInfoStatusToDisplayName,
 } from 'src/types';
 import { Tag, Typography } from 'ui';
 
@@ -102,10 +103,7 @@ const detailsForVerificationEvent = (data: VerificationInfo) => {
   }
 
   const iconComponent = <HeaderIcon />;
-  const text =
-    data.status === VerificationInfoStatus.Verified
-      ? ' verified by '
-      : ' flagged by ';
+  const text = verificationInfoStatusToDisplayName[data.status];
   const color =
     data.status === VerificationInfoStatus.Verified ? 'neutral' : 'error';
   const headerComponent = (
@@ -118,7 +116,7 @@ const detailsForVerificationEvent = (data: VerificationInfo) => {
           </React.Fragment>
         ))}
         <Typography variant="label-3" as="span" color={color}>
-          {text}
+          {` ${text} `}
         </Typography>
         <Typography variant="label-3" as="span" color={color}>
           {vendorToDisplayName[data.vendor]}

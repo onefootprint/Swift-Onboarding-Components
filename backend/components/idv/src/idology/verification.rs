@@ -23,8 +23,16 @@ fn process_success(
     response: IDologySuccess,
     pending_attributes: Vec<SignalAttribute>,
 ) -> Result<(Status, Vec<AuditTrailEvent>), super::Error> {
-    // TODO handle !response.id_located()
     // TODO is it concerning if there are no qualifiers?
+    if !response.id_located() {
+        // TODO probably want to waterfall to another vendor
+        let audit_trail = AuditTrailEvent::Verification(VerificationInfo {
+            attributes: vec![SignalAttribute::Identity],
+            vendor: Vendor::Idology,
+            status: VerificationInfoStatus::NotFound,
+        });
+        return Ok((Status::ManualReview, vec![audit_trail]));
+    }
 
     let qualifiers = if let Some(ref qualifiers) = response.qualifiers {
         qualifiers.parse_qualifiers()
@@ -125,7 +133,6 @@ impl IDologySuccess {
     }
 
     /// Whether the ID was located on IDology
-    #[allow(unused)]
     fn id_located(&self) -> bool {
         if let Some(ref results) = self.results {
             results.key.as_str() == "result.match"

@@ -46,7 +46,14 @@ export const signalAttributeToDisplayName: Record<string, String> = {
 export enum VerificationInfoStatus {
   Verified = 'verified',
   Failed = 'failed',
+  NotFound = 'not_found',
 }
+
+export const verificationInfoStatusToDisplayName: Record<string, string> = {
+  [VerificationInfoStatus.Verified]: 'verified by',
+  [VerificationInfoStatus.Failed]: 'flagged by',
+  [VerificationInfoStatus.NotFound]: 'unable to be located by',
+};
 
 export type VerificationInfo = {
   attributes: SignalAttribute[];

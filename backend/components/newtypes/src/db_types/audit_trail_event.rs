@@ -26,6 +26,7 @@ pub struct LivenessCheckInfo {
 #[serde(rename_all = "snake_case")]
 pub enum VerificationInfoStatus {
     Verified,
+    NotFound,
     Failed,
 }
 
