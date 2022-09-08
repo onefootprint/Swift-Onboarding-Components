@@ -9,8 +9,8 @@ use db::models::{
     verification_result::VerificationResult,
 };
 use newtypes::{
-    email::Email, DataAttribute, IdvData, OnboardingId, PhoneNumber, ScopedUserId, Signal, TenantId,
-    UserVaultId, Vendor,
+    email::Email, DataAttribute, IdvData, OnboardingId, PhoneNumber, ScopedUserId, TenantId, UserVaultId,
+    Vendor,
 };
 use std::{collections::HashMap, str::FromStr};
 use strum::IntoEnumIterator;

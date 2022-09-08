@@ -4,26 +4,33 @@ use newtypes::{
 };
 use std::{collections::HashMap, str::FromStr};
 
-fn parse_qualifiers(value: serde_json::Value) -> Result<Vec<ReasonCode>, super::Error> {
+fn parse_response(value: serde_json::Value) -> Result<IDologyResponse, super::Error> {
     let response: IDologyResponse = serde_json::value::from_value(value)?;
-    let results = response.response.qualifiers.parse_qualifiers();
-    Ok(results)
+    Ok(response)
 }
 
 pub fn process(
     value: serde_json::Value,
     pending_attributes: Vec<SignalAttribute>,
 ) -> Result<(Status, Vec<AuditTrailEvent>), super::Error> {
-    match parse_qualifiers(value) {
-        Ok(qualifiers) => process_success(qualifiers, pending_attributes),
+    match parse_response(value) {
+        Ok(response) => process_success(response.response, pending_attributes),
         Err(_) => Ok(process_error()),
     }
 }
 
 fn process_success(
-    qualifiers: Vec<ReasonCode>,
+    response: IDologySuccess,
     pending_attributes: Vec<SignalAttribute>,
 ) -> Result<(Status, Vec<AuditTrailEvent>), super::Error> {
+    // TODO handle !response.id_located()
+    // TODO is it concerning if there are no qualifiers?
+
+    let qualifiers = if let Some(ref qualifiers) = response.qualifiers {
+        qualifiers.parse_qualifiers()
+    } else {
+        vec![]
+    };
     let signals: Vec<_> = qualifiers.into_iter().map(|r| r.signal()).collect();
     // Create a map of SignalAttribute -> Vec<SignalKind>
     let mut attribute_to_signals = HashMap::<SignalAttribute, Vec<_>>::new();
@@ -54,11 +61,11 @@ fn process_success(
         .filter(|a| !failed_attributes.contains(a))
         .collect();
 
-    // TODO more advanced decision engine than just failing if there's info for any piece of data
-    let (new_status, final_audit_status) = if failed_attributes.is_empty() {
-        (Status::Verified, VerificationInfoStatus::Verified)
-    } else {
-        (Status::ManualReview, VerificationInfoStatus::Failed)
+    // TODO: determine our own response, don't just use what we get from IDology
+    let new_status = response.status();
+    let final_audit_status = match new_status {
+        Status::Verified => VerificationInfoStatus::Verified,
+        _ => VerificationInfoStatus::Failed,
     };
     let events = vec![
         (!verified_fields.is_empty()).then_some(VerificationInfo {
@@ -99,8 +106,33 @@ struct IDologyResponse {
 }
 
 #[derive(Debug, serde::Deserialize)]
+#[serde(rename_all = "kebab-case")]
 struct IDologySuccess {
-    qualifiers: IDologyQualifiers,
+    qualifiers: Option<IDologyQualifiers>,
+    // TODO should these be options?
+    results: Option<KeyResponse>,
+    summary_result: Option<KeyResponse>,
+}
+
+impl IDologySuccess {
+    /// IDology-determined status for verifying the customer
+    fn status(&self) -> Status {
+        match self.summary_result.as_ref().map(|x| x.key.as_str()) {
+            Some("id.success") => Status::Verified,
+            Some("id.failure") => Status::ManualReview,
+            _ => Status::ManualReview,
+        }
+    }
+
+    /// Whether the ID was located on IDology
+    #[allow(unused)]
+    fn id_located(&self) -> bool {
+        if let Some(ref results) = self.results {
+            results.key.as_str() == "result.match"
+        } else {
+            false
+        }
+    }
 }
 
 #[derive(Debug, serde::Deserialize)]
@@ -108,13 +140,25 @@ struct IDologyQualifiers {
     qualifier: serde_json::Value,
 }
 
+#[derive(Debug, serde::Deserialize)]
+struct KeyResponse {
+    key: String,
+}
+
+impl KeyResponse {
+    fn parse_key(value: serde_json::Value) -> Option<String> {
+        let response: Self = serde_json::value::from_value(value).ok()?;
+        Some(response.key)
+    }
+}
+
 impl IDologyQualifiers {
     fn parse_qualifiers(&self) -> Vec<ReasonCode> {
         // In the IDology API, the key named `qualifier` can either be a list of qualifiers OR
         // a single qualifier. Parse both cases here
         match self.qualifier {
-            serde_json::Value::Object(ref qualifier) => {
-                if let Some(qualifier) = Self::parse_qualifier(qualifier) {
+            serde_json::Value::Object(_) => {
+                if let Some(qualifier) = Self::parse_qualifier(self.qualifier.clone()) {
                     vec![qualifier]
                 } else {
                     vec![]
@@ -122,17 +166,16 @@ impl IDologyQualifiers {
             }
             serde_json::Value::Array(ref qualifier_list) => qualifier_list
                 .iter()
-                .filter_map(|x| x.as_object())
+                .cloned()
                 .flat_map(Self::parse_qualifier)
                 .collect(),
             _ => vec![],
         }
     }
 
-    fn parse_qualifier(qualifier: &serde_json::Map<String, serde_json::Value>) -> Option<ReasonCode> {
-        let key_value = qualifier.get("key")?;
-        let key_str = key_value.as_str()?;
-        ReasonCode::from_str(key_str).ok()
+    fn parse_qualifier(qualifier: serde_json::Value) -> Option<ReasonCode> {
+        let key = KeyResponse::parse_key(qualifier)?;
+        ReasonCode::from_str(key.as_str()).ok()
     }
 }
 
@@ -165,7 +208,8 @@ mod tests {
             }
           }
         );
-        let reason_codes = parse_qualifiers(response).expect("Could not parse response");
+        let response = parse_response(response).expect("Could not parse response");
+        let reason_codes = response.response.qualifiers.unwrap().parse_qualifiers();
         assert_eq!(
             reason_codes,
             vec![ReasonCode::IDology(IDologyReasonCode::IpNotLocated)],
@@ -200,7 +244,8 @@ mod tests {
             }
           }
         );
-        let reason_codes = parse_qualifiers(response).expect("Could not parse response");
+        let response = parse_response(response).expect("Could not parse response");
+        let reason_codes = response.response.qualifiers.unwrap().parse_qualifiers();
         let expected = vec![
             ReasonCode::IDology(IDologyReasonCode::IpNotLocated),
             ReasonCode::IDology(IDologyReasonCode::StreetNameDoesNotMatch),
@@ -218,7 +263,22 @@ mod tests {
             }
           }
         );
-        let reason_codes = parse_qualifiers(response).expect("Could not parse response");
-        assert_eq!(reason_codes, vec![]);
+        let response = parse_response(response).expect("Could not parse response");
+        assert_eq!(response.response.qualifiers.unwrap().parse_qualifiers().len(), 0);
+        assert!(response.response.results.is_none());
+        assert!(response.response.summary_result.is_none());
+    }
+
+    #[test]
+    fn test_idology_response_no_data() {
+        let response = json!({
+            "response": {
+                "id-number": "2972309",
+            }
+        });
+        let response = parse_response(response).expect("Could not parse response");
+        assert!(response.response.qualifiers.is_none());
+        assert!(response.response.results.is_none());
+        assert!(response.response.summary_result.is_none());
     }
 }
