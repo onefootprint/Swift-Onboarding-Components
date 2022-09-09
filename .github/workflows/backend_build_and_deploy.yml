@@ -273,7 +273,7 @@ jobs:
             })
             
   notify_slack:
-    if: ${{ success() && github.event_name != 'pull_request' }}
+    if: ${{ github.event_name == 'push' }}
     needs: [deploy_stack]
     runs-on: ubuntu-latest
     steps:
