@@ -33,6 +33,7 @@ use serde::{Deserialize, Serialize};
 
 #[api_v2_operation(
     summary = "/users/{footprint_user_id}/identity",
+    operation_id = "users-footprint_user_id-identity-post",
     description = "Updates data in the identity vault.",
     tags(PublicApi)
 )]
@@ -123,6 +124,7 @@ flat_api_object_map_type!(
 
 #[api_v2_operation(
     summary = "/users/{footprint_user_id}/identity",
+    operation_id = "users-footprint_user_id-identity",
     description = "Checks if fields exist.",
     tags(PublicApi)
 )]
@@ -179,6 +181,7 @@ flat_api_object_map_type!(
 
 #[api_v2_operation(
     summary = "/users/{footprint_user_id}/identity/decrypt",
+    operation_id = "users-footprint_user_id-identity-decrypt",
     description = "Decrypts custom data.",
     tags(PublicApi)
 )]

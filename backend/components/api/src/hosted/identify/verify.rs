@@ -38,6 +38,7 @@ pub struct VerifyResponse {
 
 #[api_v2_operation(
     summary = "/hosted/identify/verify",
+    operation_id = "hosted-identify-verify",
     tags(Hosted, Bifrost),
     description = "Verifies the response to either an SMS or biometric challenge. When the \
     challenge response is verified, we will return an auth token for the user. If no user exists \

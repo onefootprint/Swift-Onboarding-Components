@@ -39,6 +39,7 @@ struct DashboardAuthorizationResponse {
 
 #[api_v2_operation(
     summary = "/org/auth/login",
+    operation_id = "org-auth-login",
     tags(Private),
     description = "Called from the front-end with the WorkOS code. Returns the authorization \
     token needed for future requests as well as user information"

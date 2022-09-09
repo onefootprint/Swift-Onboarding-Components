@@ -17,7 +17,8 @@ struct RedirectUrl {
 }
 
 #[api_v2_operation(
-    summary = "/org/auth/google_auth",
+    summary = "/org/auth/google_oauth",
+    operation_id = "org-auth-google_oauth",
     description = "Request to authenticate via Google OAuth.",
     tags(Private)
 )]

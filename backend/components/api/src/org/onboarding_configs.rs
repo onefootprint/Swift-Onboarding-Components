@@ -28,6 +28,7 @@ use paperclip::actix::{api_v2_operation, get, patch, post, web, web::Json};
 
 #[api_v2_operation(
     summary = "/org/onboarding_config",
+    operation_id = "org-onboarding_config",
     tags(PublicApi),
     description = " Uses tenant public key auth to return information about the tenant."
 )]
@@ -43,6 +44,7 @@ pub fn get_detail(
 
 #[api_v2_operation(
     summary = "/org/onboarding_configs",
+    operation_id = "org-onboarding_configs",
     tags(PublicApi),
     description = "Returns a list of onboarding configurations owned by the tenant."
 )]
@@ -118,6 +120,7 @@ impl CreateOnboardingConfigurationRequest {
 
 #[api_v2_operation(
     summary = "/org/onboarding_configs",
+    operation_id = "org-onboarding_configs-post",
     description = "Creates a new onboarding configuration.",
     tags(PublicApi)
 )]
@@ -161,6 +164,7 @@ struct UpdateObConfigRequest {
 
 #[api_v2_operation(
     summary = "/org/onboarding_configs/{id}",
+    operation_id = "org-onboarding_configs-id",
     description = "Updates an existing onboarding configuration.",
     tags(PublicApi)
 )]

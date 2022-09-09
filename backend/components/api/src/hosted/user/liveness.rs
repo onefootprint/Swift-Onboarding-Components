@@ -11,6 +11,7 @@ type LivenessResponse = Vec<ApiLiveness>;
 
 #[api_v2_operation(
     summary = "/hosted/user/liveness",
+    operation_id = "hosted-user-liveness",
     tags(Hosted),
     description = "Allows a user to view their registered webauthn credentials"
 )]

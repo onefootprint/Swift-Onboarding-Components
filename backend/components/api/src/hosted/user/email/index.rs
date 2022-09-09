@@ -24,6 +24,7 @@ pub struct AddEmailRequest {
 
 #[api_v2_operation(
     summary = "/hosted/user/email",
+    operation_id = "hosted-user-email",
     tags(Hosted),
     description = "Adds an email to the account and send a challenge."
 )]

@@ -10,6 +10,7 @@ use paperclip::actix::{api_v2_operation, get, web, web::Json};
 
 #[api_v2_operation(
     summary = "/org/api_keys/check",
+    operation_id = "org-api_keys-check",
     description = "Checks that the api key is OK",
     tags(PublicApi)
 )]

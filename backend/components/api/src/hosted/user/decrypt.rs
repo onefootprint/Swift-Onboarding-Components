@@ -20,6 +20,7 @@ type UserDecryptResponse = HashMap<DataAttribute, Option<String>>;
 
 #[api_v2_operation(
     summary = "/hosted/user/decrypt",
+    operation_id = "hosted-user-decrypt",
     tags(Hosted),
     description = "Allows a user to decrypt their own data. Requires user auth provided in the header."
 )]

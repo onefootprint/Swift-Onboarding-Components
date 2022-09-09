@@ -42,6 +42,7 @@ pub struct WebAuthnInitResponse {
 
 #[api_v2_operation(
     summary = "/hosted/user/biometric/init",
+    operation_id = "hosted-user-biometric-init",
     description = "Generates a registration challenge.",
     tags(Hosted)
 )]
@@ -107,6 +108,7 @@ struct WebauthnRegisterRequest {
 
 #[api_v2_operation(
     summary = "/hosted/user/biometric",
+    operation_id = "hosted-user-biometric",
     tags(Hosted),
     description = "Accepts a response to a registration challenge"
 )]

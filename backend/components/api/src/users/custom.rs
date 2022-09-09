@@ -37,6 +37,7 @@ flat_api_object_map_type!(
 
 #[api_v2_operation(
     summary = "/users/{footprint_user_id}/custom",
+    operation_id = "users-footprint_user_id-custom-post",
     description = "Stores custom data.",
     tags(PublicApi)
 )]
@@ -107,6 +108,7 @@ flat_api_object_map_type!(
 
 #[api_v2_operation(
     summary = "/users/{footprint_user_id}/custom",
+    operation_id = "users-footprint_user_id-custom",
     description = "Checks if fields exist.",
     tags(PublicApi)
 )]
@@ -158,11 +160,12 @@ pub struct DecryptCustomFieldsRequest {
 flat_api_object_map_type!(
     DecryptCustomDataResponse<KvDataKey, PiiString>,
     description="A key-value map with the corresponding decrypted 'custom' values",
-    example=r#"{ "ach_account_number": "121212121212", "cc_last_4": "4242 }"#
+    example=r#"{ "ach_account_number": "121212121212", "cc_last_4": "4242" }"#
 );
 
 #[api_v2_operation(
     summary = "/users/{footprint_user_id}/custom/decrypt",
+    operation_id = "users-footprint_user_id-custom-decrypt-post",
     description = "Decrypts custom data.",
     tags(PublicApi)
 )]

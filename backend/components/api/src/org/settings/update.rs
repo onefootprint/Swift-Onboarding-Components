@@ -18,6 +18,7 @@ struct UpdateRequest {
 
 #[api_v2_operation(
     summary = "/org/settings",
+    operation_id = "org-settings-post",
     description = "Updates tenant configuration settings.",
     tags(PublicApi)
 )]

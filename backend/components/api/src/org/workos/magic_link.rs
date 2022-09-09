@@ -15,6 +15,7 @@ struct LinkAuthRequest {
 
 #[api_v2_operation(
     summary = "/org/auth/magic_link",
+    operation_id = "org-auth-magic_link",
     description = "Request to authenticate a user email. WorkOS will send the email a link to \
     login. Once the user clicks the magic link, WorkOs will call the /workos/callback endpoint, \
     at which point we authenticate the user",

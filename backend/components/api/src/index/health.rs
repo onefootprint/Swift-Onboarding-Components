@@ -5,17 +5,18 @@ use crate::{auth::key_context::custodian::CustodianAuthContext, types::JsonApiRe
 
 use actix_web::cookie::time::Instant;
 use newtypes::{EncryptedVaultPrivateKey, SealedVaultBytes};
-use paperclip::actix::{api_v2_operation, get, web, Apiv2Schema};
+use paperclip::actix::{api_v2_operation, get, web, web::Json, Apiv2Schema};
 use serde::{Deserialize, Serialize};
 
 #[api_v2_operation(
     summary = "/health",
+    operation_id = "health",
     tags(Private),
     description = "Returns health of services running"
 )]
 #[tracing::instrument(name = "health", skip(state))]
 #[get("/health")]
-async fn handler(state: web::Data<State>) -> Result<String, ApiError> {
+async fn handler(state: web::Data<State>) -> actix_web::Result<Json<ApiResponseData<String>>, ApiError> {
     let before_enclave = chrono::Utc::now().timestamp_millis();
     let _res = state.enclave_client.pong().await?;
     let after_enclave = chrono::Utc::now().timestamp_millis();
@@ -24,11 +25,13 @@ async fn handler(state: web::Data<State>) -> Result<String, ApiError> {
     db::health_check(&state.db_pool).await?;
     let after_db = chrono::Utc::now().timestamp_millis();
 
-    Ok(format!(
-        "Enclave: healthy RT {}ms\nDB: healthy RT {}ms",
-        after_enclave - before_enclave,
-        after_db - before_db
-    ))
+    Ok(Json(ApiResponseData {
+        data: format!(
+            "Enclave: healthy RT {}ms\nDB: healthy RT {}ms",
+            after_enclave - before_enclave,
+            after_db - before_db
+        ),
+    }))
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Apiv2Schema)]
@@ -41,6 +44,7 @@ pub struct EnclaveHealthResponse {
 
 #[api_v2_operation(
     summary = "/health/enclave",
+    operation_id = "health-enclave",
     tags(Private),
     description = "Returns enclave health"
 )]
@@ -77,6 +81,7 @@ async fn enclave(
 
 #[api_v2_operation(
     summary = "/health/enclave_decrypt",
+    operation_id = "health-enclave_decrypt",
     description = "Checks health of enclave decrypt operation",
     tags(Private)
 )]
@@ -111,18 +116,20 @@ async fn enclave_decrypt(
     .json()
 }
 
-#[api_v2_operation(summary = "/panic", tags(Private))]
+#[api_v2_operation(summary = "/panic", operation_id = "panic", tags(Private))]
 #[tracing::instrument(name = "panic")]
 #[get("/panic")]
-async fn panic_handler(_: CustodianAuthContext) -> &'static str {
+async fn panic_handler(
+    _: CustodianAuthContext,
+) -> actix_web::Result<Json<ApiResponseData<&'static str>>, ApiError> {
     tracing::debug!("about to panic");
     panic!("at the disco");
 }
 
-#[api_v2_operation(summary = "/fail", tags(Private))]
+#[api_v2_operation(summary = "/fail", operation_id = "fail", tags(Private))]
 #[tracing::instrument(name = "fail")]
 #[get("/fail")]
-async fn fail_handler() -> Result<&'static str, ApiError> {
+async fn fail_handler() -> actix_web::Result<Json<ApiResponseData<&'static str>>, ApiError> {
     tracing::debug!("about to fail");
     Err(ApiError::NotImplemented)
 }

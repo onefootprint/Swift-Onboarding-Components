@@ -17,6 +17,7 @@ pub struct GenerateResponse {
 
 #[api_v2_operation(
     summary = "/hosted/onboarding/d2p/generate",
+    operation_id = "hosted-onboarding-d2p-generate",
     tags(Hosted),
     description = "Generates a new d2p session token for the currently authenticated user. The d2p \
     session token has a limited scope, and also includes some status metadata for syncing state \

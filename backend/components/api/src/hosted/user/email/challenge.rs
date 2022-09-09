@@ -21,6 +21,7 @@ struct RequestEmailVerifyRequest {
 
 #[api_v2_operation(
     summary = "/hosted/user/email/challenge",
+    operation_id = "hosted-user-email-challenge",
     tags(Hosted),
     description = "Re-sends the email verification email for the given user data."
 )]

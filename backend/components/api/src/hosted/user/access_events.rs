@@ -10,6 +10,7 @@ type AccessEventResponse = Vec<ApiAccessEvent>;
 
 #[api_v2_operation(
     summary = "/hosted/user/access_events",
+    operation_id = "hosted-user-access_events",
     tags(Hosted),
     description = "Returns a list of AccessEvent logs that show which tenants have viewed the \
     logged-in user's data. Optionally allows filtering on data_attribute. Requires user \

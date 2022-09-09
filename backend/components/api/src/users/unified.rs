@@ -37,6 +37,7 @@ pub struct UnifiedUserVaultPutRequest {
 
 #[api_v2_operation(
     summary = "/users/{footprint_user_id}",
+    operation_id = "users-footprint_user_id-put",
     description = "Updates data in the identity vault.",
     tags(PublicApi)
 )]
@@ -113,6 +114,7 @@ pub struct UnifiedUserVaultGetDataResponse {
 
 #[api_v2_operation(
     summary = "/users/{footprint_user_id}",
+    operation_id = "users-footprint_user_id",
     description = "Checks if fields exist.",
     tags(PublicApi)
 )]
@@ -187,6 +189,7 @@ pub struct UnifiedUserVaultDecryptResponse {
 
 #[api_v2_operation(
     summary = "/users/{footprint_user_id}/custom/decrypt",
+    operation_id = "users-footprint_user_id-custom-decrypt",
     tags(PublicApi),
     description = "Decrypts custom user data"
 )]

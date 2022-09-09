@@ -21,6 +21,7 @@ pub struct ChallengeResponse {
 
 #[api_v2_operation(
     summary = "/hosted/identify/challenge",
+    operation_id = "hosted-identify-challenge",
     tags(Hosted, Bifrost),
     description = "Sends a challenge to the phone number and returns an HTTP 200. When the \
     challenge is completed through the identify/verify endpoint, the client can get or create \

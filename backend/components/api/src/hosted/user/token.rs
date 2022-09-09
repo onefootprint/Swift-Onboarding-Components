@@ -15,6 +15,7 @@ pub struct TokenResponse {
 
 #[api_v2_operation(
     summary = "/hosted/user/token",
+    operation_id = "hosted-user-token",
     tags(Hosted),
     description = "Returns information about a given auth token."
 )]

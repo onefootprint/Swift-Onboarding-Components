@@ -25,6 +25,7 @@ pub struct OnboardingResponse {
 
 #[api_v2_operation(
     summary = "/hosted/onboarding",
+    operation_id = "hosted-onboarding",
     tags(Hosted, Bifrost),
     description = "Gets or creates the onboarding for this (user, tenant) pair. Returns the list \
     of fields required to complete the onboarding for this tenant."

@@ -20,6 +20,7 @@ type AuditTrailResponse = Vec<ApiAuditTrail>;
 
 #[api_v2_operation(
     summary = "/users/audit_trail",
+    operation_id = "users-audit_trail",
     description = "Allows a tenant to view a customer's audit trail.",
     tags(PublicApi)
 )]

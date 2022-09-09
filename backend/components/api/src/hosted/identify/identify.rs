@@ -54,6 +54,7 @@ pub struct UserChallengeData {
 
 #[api_v2_operation(
     summary = "/hosted/identify",
+    operation_id = "hosted-identify",
     tags(Hosted, Bifrost),
     description = "Tries to identify an existing user by either phone number or email. If the user \
     is found, initiates a challenge of the requested type and returns relevant challenge data."

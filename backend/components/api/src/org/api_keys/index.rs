@@ -19,6 +19,7 @@ use paperclip::actix::{api_v2_operation, patch, web, web::Json};
 
 #[api_v2_operation(
     summary = "/org/api_keys",
+    operation_id = "org-api_keys",
     description = "Lists the tenant's secret API keys",
     tags(PublicApi)
 )]
@@ -62,6 +63,7 @@ pub struct CreateApiKeyRequest {
 
 #[api_v2_operation(
     summary = "/org/api_keys",
+    operation_id = "org-api_keys-post",
     description = "Generates a new secret tenant api key.",
     tags(PublicApi)
 )]
@@ -102,6 +104,7 @@ pub struct UpdateApiKeyRequest {
 
 #[api_v2_operation(
     summary = "/org/api_keys/{id}",
+    operation_id = "org-api_keys-id",
     description = "Generates a new secret tenant api key.",
     tags(PublicApi)
 )]

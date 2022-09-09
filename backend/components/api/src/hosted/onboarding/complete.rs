@@ -34,6 +34,7 @@ struct CommitResponse {
 
 #[api_v2_operation(
     summary = "/hosted/onboarding/complete",
+    operation_id = "hosted-onboarding-complete",
     tags(Hosted, Bifrost),
     description = "Finish onboarding the user. Returns the footprint_user_id for login. If any \
     necessary attributes were not set, returns an error with the list of missing fields."

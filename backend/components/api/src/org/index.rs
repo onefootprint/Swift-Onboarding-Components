@@ -8,6 +8,7 @@ use paperclip::actix::{api_v2_operation, web::Json};
 
 #[api_v2_operation(
     summary = "/org",
+    operation_id = "org",
     tags(PublicApi),
     description = "Returns basic info about the authed tenant"
 )]

@@ -17,6 +17,7 @@ struct GetTenantResponse {
 
 #[api_v2_operation(
     summary = "/org/settings",
+    operation_id = "org-settings",
     description = "Returns tenant settings.",
     tags(PublicApi)
 )]

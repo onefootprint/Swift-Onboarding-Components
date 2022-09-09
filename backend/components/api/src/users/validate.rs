@@ -28,6 +28,7 @@ pub struct ValidateResponse {
 
 #[api_v2_operation(
     summary = "/users/validate",
+    operation_id = "users-validate",
     description = "Allows a tenant to view a customer's registered webauthn credentials.",
     tags(PublicApi)
 )]

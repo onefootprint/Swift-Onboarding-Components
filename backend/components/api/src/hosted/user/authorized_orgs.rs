@@ -23,6 +23,7 @@ pub struct ApiUserOnboarding {
 
 #[api_v2_operation(
     summary = "/hosted/user/authorized_orgs",
+    operation_id = "hosted-user-authorized_orgs",
     tags(Hosted),
     description = "Returns a list of onboardings that a user has performed"
 )]

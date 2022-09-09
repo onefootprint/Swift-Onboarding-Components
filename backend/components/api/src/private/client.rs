@@ -31,6 +31,7 @@ struct NewClientResponse {
 
 #[api_v2_operation(
     summary = "/private/client",
+    operation_id = "private-client",
     description = "Creates a new client (this endpoint will be private in prod TODO).",
     tags(Private)
 )]

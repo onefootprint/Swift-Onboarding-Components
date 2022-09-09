@@ -19,6 +19,7 @@ pub struct CleanupResponse {
 
 #[api_v2_operation(
     summary = "/private/cleanup",
+    operation_id = "private-cleanup",
     description = "Private endpoint to clean up specific integration test user information.",
     tags(Private)
 )]

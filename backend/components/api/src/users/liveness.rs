@@ -18,6 +18,7 @@ pub struct LivenessRequest {
 
 #[api_v2_operation(
     summary = "/users/liveness",
+    operation_id = "users-liveness",
     description = "Allows a tenant to view a customer's registered webauthn credentials.",
     tags(PublicApi)
 )]

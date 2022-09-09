@@ -16,6 +16,7 @@ pub struct StatusResponse {
 
 #[api_v2_operation(
     summary = "/hosted/onboarding/d2p/status",
+    operation_id = "hosted-onboarding-d2p-status",
     tags(Hosted),
     description = "Gets the status of the provided d2p session. Requires the d2p session token as the auth header."
 )]
@@ -45,6 +46,7 @@ pub struct UpdateStatusRequest {
 
 #[api_v2_operation(
     summary = "/hosted/onboarding/d2p/status",
+    operation_id = "hosted-onboarding-d2p-status-post",
     tags(Hosted),
     description = "Update the status of the provided d2p session. Only allows updating to certain statuses."
 )]

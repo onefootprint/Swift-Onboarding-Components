@@ -21,6 +21,7 @@ struct RevealRequest {
 
 #[api_v2_operation(
     summary = "/org/api_keys/{id}/reveal",
+    operation_id = "org-api_keys-id-reveal",
     description = "Decrypts a specific tenant secret API key.",
     tags(PublicApi)
 )]

@@ -11,6 +11,7 @@ use paperclip::actix::{api_v2_operation, post, web, web::Json};
 
 #[api_v2_operation(
     summary = "/hosted/user/data/identity",
+    operation_id = "hosted-user-data-identity",
     tags(Hosted),
     description = "Updates data in the user vault."
 )]

@@ -45,6 +45,7 @@ pub struct ApiUser {
 
 #[api_v2_operation(
     summary = "/hosted/user/detail",
+    operation_id = "hosted-user-detail",
     tags(Hosted),
     description = "Returns a decrypted profile for the logged-in user. Requires user authentication \
     from a successful /identify/verify call in the header."
