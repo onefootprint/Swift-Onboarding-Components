@@ -5,7 +5,7 @@ use crate::auth::VerifiedUserAuth;
 use crate::errors::onboarding::OnboardingError;
 use crate::errors::ApiError;
 use crate::types::response::ApiResponseData;
-use crate::utils::idv::initiate_idv_request;
+use crate::utils::idv::initiate_idv_requests;
 use crate::utils::idv::IdvRequestData;
 use crate::utils::insight_headers::InsightHeaders;
 use crate::utils::user_vault_wrapper::UserVaultWrapper;
@@ -101,7 +101,7 @@ fn handler(
     // Fire off all IDV requests
     if !requests.is_empty() {
         let idv_data = uvw.build_idv_request(&state).await?;
-        let fut_requests = requests
+        let requests = requests
             .into_iter()
             .map(|r| IdvRequestData {
                 onboarding_id: ob_id.clone(),
@@ -110,8 +110,8 @@ fn handler(
                 request: r,
                 idv_data: idv_data.clone(),
             })
-            .map(|r| initiate_idv_request(&state, r));
-        futures::future::try_join_all(fut_requests).await?;
+            .collect();
+        initiate_idv_requests(&state, requests).await?;
     }
 
     Ok(Json(ApiResponseData {

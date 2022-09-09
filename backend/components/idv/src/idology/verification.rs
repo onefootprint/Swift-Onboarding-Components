@@ -4,6 +4,8 @@ use newtypes::{
 };
 use std::{collections::HashMap, str::FromStr};
 
+use crate::IdvResponse;
+
 fn parse_response(value: serde_json::Value) -> Result<IDologyResponse, super::Error> {
     let response: IDologyResponse = serde_json::value::from_value(value)?;
     Ok(response)
@@ -12,11 +14,16 @@ fn parse_response(value: serde_json::Value) -> Result<IDologyResponse, super::Er
 pub fn process(
     value: serde_json::Value,
     pending_attributes: Vec<SignalAttribute>,
-) -> Result<(Status, Vec<AuditTrailEvent>), super::Error> {
-    match parse_response(value) {
-        Ok(response) => process_success(response.response, pending_attributes),
-        Err(_) => Ok(process_error()),
-    }
+) -> Result<IdvResponse, super::Error> {
+    let (status, audit_events) = match parse_response(value.clone()) {
+        Ok(response) => process_success(response.response, pending_attributes)?,
+        Err(_) => process_error(),
+    };
+    Ok(IdvResponse {
+        status,
+        audit_events,
+        raw_response: value,
+    })
 }
 
 fn process_success(
