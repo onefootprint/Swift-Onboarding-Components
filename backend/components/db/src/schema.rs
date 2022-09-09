@@ -266,6 +266,16 @@ table! {
     use diesel::sql_types::*;
     use newtypes::db_types::*;
 
+    test_table (id) {
+        id -> Int4,
+        custom_enum -> Text,
+    }
+}
+
+table! {
+    use diesel::sql_types::*;
+    use newtypes::db_types::*;
+
     user_vault (id) {
         id -> Text,
         e_private_key -> Bytea,
@@ -283,7 +293,6 @@ table! {
 
     verification_request (id) {
         id -> Uuid,
-        scoped_user_id -> Text,
         vendor -> Text,
         timestamp -> Timestamptz,
         _created_at -> Timestamptz,
@@ -291,6 +300,7 @@ table! {
         email_id -> Nullable<Text>,
         phone_number_id -> Nullable<Text>,
         identity_data_id -> Nullable<Text>,
+        onboarding_id -> Uuid,
     }
 }
 
@@ -348,8 +358,8 @@ joinable!(tenant_api_key -> tenant (tenant_id));
 joinable!(tenant_api_key_access_log -> tenant_api_key (tenant_api_key_id));
 joinable!(verification_request -> email (email_id));
 joinable!(verification_request -> identity_data (identity_data_id));
+joinable!(verification_request -> onboarding (onboarding_id));
 joinable!(verification_request -> phone_number (phone_number_id));
-joinable!(verification_request -> scoped_user (scoped_user_id));
 joinable!(verification_result -> verification_request (request_id));
 joinable!(webauthn_credential -> insight_event (insight_event_id));
 joinable!(webauthn_credential -> user_vault (user_vault_id));
@@ -370,6 +380,7 @@ allow_tables_to_appear_in_same_query!(
     tenant,
     tenant_api_key,
     tenant_api_key_access_log,
+    test_table,
     user_vault,
     verification_request,
     verification_result,

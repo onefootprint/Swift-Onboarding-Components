@@ -2,14 +2,13 @@ use crate::schema::verification_request;
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use diesel::{Insertable, PgConnection};
-use newtypes::{EmailId, IdentityDataId, PhoneNumberId, ScopedUserId, Vendor, VerificationRequestId};
+use newtypes::{EmailId, IdentityDataId, OnboardingId, PhoneNumberId, Vendor, VerificationRequestId};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Identifiable)]
 #[diesel(table_name = verification_request)]
 pub struct VerificationRequest {
     pub id: VerificationRequestId,
-    pub scoped_user_id: ScopedUserId,
     pub vendor: Vendor,
     pub timestamp: DateTime<Utc>,
     pub _created_at: DateTime<Utc>,
@@ -17,12 +16,13 @@ pub struct VerificationRequest {
     pub email_id: Option<EmailId>,
     pub phone_number_id: Option<PhoneNumberId>,
     pub identity_data_id: Option<IdentityDataId>,
+    pub onboarding_id: OnboardingId,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
 #[diesel(table_name = verification_request)]
 pub struct NewVerificationRequest {
-    pub scoped_user_id: ScopedUserId,
+    pub onboarding_id: OnboardingId,
     pub vendor: Vendor,
     pub timestamp: DateTime<Utc>,
     pub email_id: Option<EmailId>,

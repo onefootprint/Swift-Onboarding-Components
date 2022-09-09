@@ -148,15 +148,12 @@ fn initiate_verification(
         // TODO kick off user verification with data vendors
         Status::Verified
     };
-    let scoped_user_id = ob.scoped_user_id.clone();
-    ob.update_status(conn, desired_status)?;
+    let ob = ob.update_status(conn, desired_status)?;
     if desired_status == Status::Processing {
         let idology_request = uvw
-            .build_verification_request(scoped_user_id.clone(), Vendor::Idology)
+            .build_verification_request(ob.id.clone(), Vendor::Idology)
             .save(conn)?;
-        let twilio_request = uvw
-            .build_verification_request(scoped_user_id, Vendor::Twilio)
-            .save(conn)?;
+        let twilio_request = uvw.build_verification_request(ob.id, Vendor::Twilio).save(conn)?;
         return Ok(vec![idology_request, twilio_request]);
     }
 

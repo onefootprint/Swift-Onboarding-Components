@@ -10,8 +10,8 @@ use db::models::{
 };
 use idv::IdvResponse;
 use newtypes::{
-    email::Email, AuditTrailEvent, DataAttribute, IdvData, OnboardingId, PhoneNumber, ScopedUserId, Status,
-    TenantId, UserVaultId, Vendor, VerificationInfo,
+    email::Email, AuditTrailEvent, DataAttribute, IdvData, OnboardingId, PhoneNumber, Status, TenantId,
+    UserVaultId, Vendor, VerificationInfo,
 };
 use std::{collections::HashMap, str::FromStr};
 use strum::IntoEnumIterator;
@@ -51,13 +51,9 @@ impl UserVaultWrapper {
         Ok(request)
     }
 
-    pub fn build_verification_request(
-        &self,
-        scoped_user_id: ScopedUserId,
-        vendor: Vendor,
-    ) -> NewVerificationRequest {
+    pub fn build_verification_request(&self, ob_id: OnboardingId, vendor: Vendor) -> NewVerificationRequest {
         NewVerificationRequest {
-            scoped_user_id,
+            onboarding_id: ob_id,
             vendor,
             timestamp: Utc::now(),
             email_id: self.email.as_ref().map(|e| e.id.clone()),

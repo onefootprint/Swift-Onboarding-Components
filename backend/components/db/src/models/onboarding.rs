@@ -113,7 +113,7 @@ impl Onboarding {
         Ok(ob)
     }
 
-    pub fn update_status(self, conn: &mut PgConnection, new_status: Status) -> Result<(), DbError> {
+    pub fn update_status(self, conn: &mut PgConnection, new_status: Status) -> Result<Self, DbError> {
         Self::update_status_by_id(conn, &self.id, new_status)
     }
 
@@ -121,12 +121,12 @@ impl Onboarding {
         conn: &mut PgConnection,
         id: &OnboardingId,
         new_status: Status,
-    ) -> Result<(), DbError> {
+    ) -> Result<Self, DbError> {
         // Intentionally consume the value so the stale version is not used
-        diesel::update(onboarding::table)
+        let result = diesel::update(onboarding::table)
             .filter(onboarding::id.eq(id))
             .set(onboarding::status.eq(new_status))
-            .execute(conn)?;
-        Ok(())
+            .get_result(conn)?;
+        Ok(result)
     }
 }
