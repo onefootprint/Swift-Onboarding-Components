@@ -66,3 +66,22 @@ jobs:
       TWILIO_ACCOUNT_SID: ${{ secrets.TWILIO_ACCOUNT_SID }}
       TWILIO_API_KEY: ${{ secrets.TWILIO_API_KEY }}
       TWILIO_API_KEY_SECRET: ${{ secrets.TWILIO_API_KEY_SECRET }}
+
+  notify_slack:
+    if: ${{ github.event_name == 'push' }}
+    needs: [deploy_stack_dev]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Notify on slack
+        id: slack
+        uses: slackapi/slack-github-action@v1.21.0
+        with:
+          payload: |
+            {
+              "user": "${{ github.event.pusher.name }}",
+              "environment": "[Backend DEV]",
+              "url": "${{ needs.deploy_stack_dev.outputs.url }}"
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.RELEASE_BOT_SLACK_WEBHOOK_URL }}
+            
