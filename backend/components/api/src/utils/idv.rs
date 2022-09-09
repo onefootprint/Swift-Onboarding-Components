@@ -160,8 +160,7 @@ async fn send_idv_request(state: &State, vendor: Vendor, idv_data: IdvData) -> R
                 .verify_expectid(idv_data)
                 .await
                 .map_err(idv::Error::from)?;
-            idv::idology::verification::process(raw_response.clone(), pending_attributes)
-                .map_err(idv::Error::from)?
+            idv::idology::verification::process(raw_response, pending_attributes).map_err(idv::Error::from)?
         }
         Vendor::Twilio => {
             // TODO make it easier to share twilio client between IDV + SMS sending

@@ -17,3 +17,6 @@ itertools = "0.10.1"
 levenshtein = "1.0.5"
 
 twilio = { path = "../twilio"}
+
+[dev-dependencies]
+test-case = "2.1.0"
