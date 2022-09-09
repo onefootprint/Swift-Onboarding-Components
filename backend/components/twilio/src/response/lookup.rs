@@ -1,4 +1,6 @@
-#[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
+use newtypes::ScrubbedPiiString;
+
+#[derive(Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
 pub struct LookupResponse {
     pub caller_name: Option<String>,
     pub carrier: Option<CarrierInformation>,
@@ -9,13 +11,13 @@ pub struct LookupResponse {
     pub url: String,
 }
 
-#[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
+#[derive(Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
 pub struct LookupV2Response {
     pub country_code: String,
-    pub national_format: String,
-    pub phone_number: String,
+    pub national_format: ScrubbedPiiString,
+    pub phone_number: ScrubbedPiiString,
     pub add_ons: Option<String>,
-    pub url: String,
+    pub url: ScrubbedPiiString,
     pub carrier: Option<CarrierInformation>,
     pub call_forwarding: Option<CallForwarding>,
     pub live_activity: Option<LiveActivity>,
@@ -26,7 +28,7 @@ pub struct LookupV2Response {
     pub name_str_distance: Option<usize>,
 }
 
-#[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
+#[derive(Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
 pub struct CarrierInformation {
     pub error_code: Option<String>,
     pub mobile_country_code: Option<String>,
@@ -35,7 +37,7 @@ pub struct CarrierInformation {
     pub type_: Option<String>,
 }
 
-#[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
+#[derive(Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
 pub struct CallForwarding {
     pub mobile_network_code: Option<String>,
     pub call_forwarding_enabled: Option<String>,
@@ -44,7 +46,7 @@ pub struct CallForwarding {
     pub error_code: Option<i64>,
 }
 
-#[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
+#[derive(Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
 pub struct LiveActivity {
     pub original_carrier: Option<String>,
     pub ported: Option<String>,
@@ -55,7 +57,7 @@ pub struct LiveActivity {
     pub error_code: Option<i64>,
 }
 
-#[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
+#[derive(Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
 pub struct SimSwap {
     pub mobile_country_code: Option<String>,
     pub mobile_network_code: Option<String>,
@@ -64,14 +66,14 @@ pub struct SimSwap {
     pub error_code: Option<i64>,
 }
 
-#[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
+#[derive(Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
 pub struct CallerName {
-    pub caller_name: Option<String>,
+    pub caller_name: Option<ScrubbedPiiString>,
     pub caller_type: Option<String>,
     pub error_code: Option<i64>,
 }
 
-#[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
+#[derive(Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
 pub struct LineTypeIntelligence {
     pub mobile_country_code: Option<String>,
     pub mobile_network_code: Option<String>,

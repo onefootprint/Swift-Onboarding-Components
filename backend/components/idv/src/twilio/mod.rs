@@ -1,6 +1,5 @@
 use levenshtein::levenshtein;
-use newtypes::{AuditTrailEvent, IdvData, SignalAttribute, Status, Vendor, VerificationInfo};
-use twilio::response::lookup::LookupV2Response;
+use newtypes::{AuditTrailEvent, IdvData, SignalAttribute, Vendor, VerificationInfo};
 
 use crate::IdvResponse;
 
@@ -12,13 +11,6 @@ pub enum Error {
     Twilio(#[from] twilio::error::Error),
     #[error("Json error: {0}")]
     JsonError(#[from] serde_json::Error),
-}
-
-#[derive(Debug)]
-pub struct Response {
-    pub raw_response: LookupV2Response,
-    pub status: Option<Status>,
-    pub audit_events: Vec<AuditTrailEvent>,
 }
 
 pub async fn lookup_v2(client: &twilio::Client, idv_data: IdvData) -> Result<IdvResponse, Error> {
@@ -37,7 +29,7 @@ pub async fn lookup_v2(client: &twilio::Client, idv_data: IdvData) -> Result<Idv
     {
         // TODO more detail here - maybe like distance for first name + last name independently
         let name = name.to_uppercase();
-        let caller_name = caller_name.to_uppercase();
+        let caller_name = caller_name.leak().to_uppercase();
         let str_distance = levenshtein(name.as_str(), caller_name.as_str());
         Some(str_distance)
     } else {

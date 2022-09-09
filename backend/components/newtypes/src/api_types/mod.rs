@@ -14,9 +14,28 @@ pub mod sandbox;
 pub mod ssn;
 
 /// Represents a string that hides PII
-#[derive(Clone, Serialize, Deserialize, Default, PartialEq, Eq, Hash)]
+#[derive(Clone, Deserialize, Serialize, Default, PartialEq, Eq, Hash)]
 #[serde(transparent)]
 pub struct PiiString(String);
+
+/// Like PiiString, but scrubs the serde::Serialize implementation
+#[derive(Clone, Serialize, Deserialize, Default, PartialEq, Eq, Hash)]
+#[serde(transparent)]
+pub struct ScrubbedPiiString(#[serde(serialize_with = "scrubbed_str")] PiiString);
+
+fn scrubbed_str<S>(_v: &PiiString, s: S) -> Result<S::Ok, S::Error>
+where
+    S: serde::Serializer,
+{
+    s.serialize_str("<SCRUBBED>")
+}
+
+impl std::ops::Deref for ScrubbedPiiString {
+    type Target = PiiString;
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
 
 /// helper macro to convert to PiiString
 pub mod pii_helper {
