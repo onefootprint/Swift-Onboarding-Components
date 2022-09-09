@@ -3,10 +3,10 @@ name: Backend Deploy Dev
 on:
   push:
     paths:
-      - "backend/infra/**"
-      - "backend/components/**"
-      - "backend/*.dockerfile"
-      - ".github/workflows/backend_*.yml"
+      - 'backend/infra/**'
+      - 'backend/components/**'
+      - 'backend/*.dockerfile'
+      - '.github/workflows/backend_*.yml'
 
     branches:
       - master
@@ -34,7 +34,7 @@ jobs:
       AWS_SECRETS_PROVIDER: ${{ secrets.AWS_SECRETS_PROVIDER }}
 
   sentry_release:
-    name: "Sentry Release Integration"
+    name: 'Sentry Release Integration'
     runs-on: ubuntu-latest
     needs: [deploy_stack_dev]
     environment: dev
@@ -50,7 +50,7 @@ jobs:
           environment: dev
 
   run_tests:
-    name: "integration tests"
+    name: 'integration tests'
     needs: [deploy_stack_dev]
     if: success()
     uses: ./.github/workflows/backend_remote_integration_tests.yml
@@ -58,7 +58,7 @@ jobs:
       contents: write
       pull-requests: write
     with:
-      testUrl: "${{ needs.deploy_stack_dev.outputs.url }}"
+      testUrl: '${{ needs.deploy_stack_dev.outputs.url }}'
       isPR: false
       waitForDeploy: true
     secrets:
@@ -66,22 +66,3 @@ jobs:
       TWILIO_ACCOUNT_SID: ${{ secrets.TWILIO_ACCOUNT_SID }}
       TWILIO_API_KEY: ${{ secrets.TWILIO_API_KEY }}
       TWILIO_API_KEY_SECRET: ${{ secrets.TWILIO_API_KEY_SECRET }}
-
-  notify_slack:
-    if: ${{ github.event_name == 'push' }}
-    needs: [deploy_stack_dev]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Notify on slack
-        id: slack
-        uses: slackapi/slack-github-action@v1.21.0
-        with:
-          payload: |
-            {
-              "user": "${{ github.event.pusher.name }}",
-              "environment": "[Backend DEV]",
-              "url": "${{ needs.deploy_stack_dev.outputs.url }}"
-            }
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.RELEASE_BOT_SLACK_WEBHOOK_URL }}
-            

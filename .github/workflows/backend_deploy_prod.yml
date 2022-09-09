@@ -5,7 +5,7 @@ on:
   # NOTE: for now we are auto-deploying to prod if tests pass!
   #
   workflow_run:
-    workflows: ["Backend Deploy Dev"]
+    workflows: ['Backend Deploy Dev']
     types:
       - completed
 
@@ -33,7 +33,7 @@ jobs:
       AWS_SECRETS_PROVIDER: ${{ secrets.AWS_SECRETS_PROVIDER }}
 
   sentry_release:
-    name: "Sentry Release Integration"
+    name: 'Sentry Release Integration'
     runs-on: ubuntu-latest
     needs: [deploy_stack_prod]
     environment: production
@@ -49,7 +49,7 @@ jobs:
           environment: production
 
   run_tests:
-    name: "integration tests"
+    name: 'integration tests'
     needs: [deploy_stack_prod]
     if: success()
     uses: ./.github/workflows/backend_remote_integration_tests.yml
@@ -57,7 +57,7 @@ jobs:
       contents: write
       pull-requests: write
     with:
-      testUrl: "${{ needs.deploy_stack_prod.outputs.url }}"
+      testUrl: '${{ needs.deploy_stack_prod.outputs.url }}'
       isPR: false
       waitForDeploy: true
     secrets:
@@ -67,7 +67,6 @@ jobs:
       TWILIO_API_KEY_SECRET: ${{ secrets.TWILIO_API_KEY_SECRET }}
 
   notify_slack:
-    if: ${{ github.event_name == 'push' }}
     needs: [deploy_stack_prod]
     runs-on: ubuntu-latest
     steps:
