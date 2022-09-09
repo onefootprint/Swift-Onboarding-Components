@@ -1552,21 +1552,6 @@
     minimatch "^3.0.4"
     strip-json-comments "^3.1.1"
 
-"@figspec/components@^1.0.0":
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/@figspec/components/-/components-1.0.1.tgz#47d7e24999974b18c6daa810299624d4370fc7da"
-  integrity sha512-UvnEamPEAMh9HExViqpobWmX25g1+soA9kcJu+It3VerMa7CeVyaIbQydNf1Gys5v/rxJVdTDRgQ7OXW2zAAig==
-  dependencies:
-    lit "^2.1.3"
-
-"@figspec/react@^1.0.0":
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/@figspec/react/-/react-1.0.2.tgz#56dbd409ac420f754eda41ecfeb89f41bb8bd48d"
-  integrity sha512-BG6TTySyyDPDeER1oHNNj7+UYu7NzXwqJM6Z2utJtvGGk/Vn4NzrSdDU+HVp04o0kDEEJd5hJbFgkH3uzqimPQ==
-  dependencies:
-    "@figspec/components" "^1.0.0"
-    "@lit-labs/react" "^1.0.2"
-
 "@floating-ui/core@^0.7.3":
   version "0.7.3"
   resolved "https://registry.yarnpkg.com/@floating-ui/core/-/core-0.7.3.tgz#d274116678ffae87f6b60e90f88cc4083eefab86"
@@ -1948,16 +1933,6 @@
   dependencies:
     "@jridgewell/resolve-uri" "^3.0.3"
     "@jridgewell/sourcemap-codec" "^1.4.10"
-
-"@lit-labs/react@^1.0.2":
-  version "1.0.8"
-  resolved "https://registry.yarnpkg.com/@lit-labs/react/-/react-1.0.8.tgz#faba6383e08e4349685fc58a2d316a225924e79a"
-  integrity sha512-5qQzixu/bVqI819cNgr/fY8KX0v5C3FmanMaT7Q8qzUJ+EpB4BsOSQwacdaWfNkm7SV4jkWerSHxa9hvncszCA==
-
-"@lit/reactive-element@^1.3.0", "@lit/reactive-element@^1.4.0":
-  version "1.4.1"
-  resolved "https://registry.yarnpkg.com/@lit/reactive-element/-/reactive-element-1.4.1.tgz#3f587eec5708692135bc9e94cf396130604979f3"
-  integrity sha512-qDv4851VFSaBWzpS02cXHclo40jsbAjRXnebNXpm0uVg32kCneZPo9RYVQtrTNICtZ+1wAYHu1ZtxWSWMbKrBw==
 
 "@manypkg/find-root@^1.1.0":
   version "1.1.0"
@@ -2818,7 +2793,7 @@
   dependencies:
     "@sinonjs/commons" "^1.7.0"
 
-"@storybook/addon-actions@6.5.10", "@storybook/addon-actions@^6.5.9":
+"@storybook/addon-actions@6.5.10", "@storybook/addon-actions@^6.5.10":
   version "6.5.10"
   resolved "https://registry.yarnpkg.com/@storybook/addon-actions/-/addon-actions-6.5.10.tgz#83ec807a899e0412cf98037647f256c45cc32bf5"
   integrity sha512-vpCnEu81fmtYzOf0QsRYoDuf9wXgVVl2VysE1dWRebRhIUDU0JurrthTnw322e38D4FzaoNGqZE7wnBYBohzZA==
@@ -2914,7 +2889,7 @@
     ts-dedent "^2.0.0"
     util-deprecate "^1.0.2"
 
-"@storybook/addon-essentials@^6.5.9":
+"@storybook/addon-essentials@^6.5.10":
   version "6.5.10"
   resolved "https://registry.yarnpkg.com/@storybook/addon-essentials/-/addon-essentials-6.5.10.tgz#d56f0f972e3bd5eae6c79b2126f510c5c020b62d"
   integrity sha512-PT2aiR4vgAyB0pl3HNBUa4/a7NDRxASxAazz7zt9ZDirkipDKfxwdcLeRoJzwSngVDWEhuz5/paN5x4eNp4Hww==
@@ -2935,7 +2910,7 @@
     regenerator-runtime "^0.13.7"
     ts-dedent "^2.0.0"
 
-"@storybook/addon-interactions@^6.5.9":
+"@storybook/addon-interactions@^6.5.10":
   version "6.5.10"
   resolved "https://registry.yarnpkg.com/@storybook/addon-interactions/-/addon-interactions-6.5.10.tgz#c1d635b972bb7d21ccfe9b3bd928916683d92b26"
   integrity sha512-+O/ZuQjonpFmTdFRqjCimQTx4S4c1+S3dYCn6gD/E4xzqlQn1BQaER3paX/aBUKb3oRaSO9RUQ+uxePM4zBEwA==
@@ -2956,7 +2931,7 @@
     polished "^4.2.2"
     ts-dedent "^2.2.0"
 
-"@storybook/addon-links@^6.5.9":
+"@storybook/addon-links@^6.5.10":
   version "6.5.10"
   resolved "https://registry.yarnpkg.com/@storybook/addon-links/-/addon-links-6.5.10.tgz#f66568fbc84b942032ac2de85f799d69fcf77922"
   integrity sha512-r3WzYIPz7WjHiaPObC2Tg6bHuZRBb/Kt/X+Eitw+jTqBel7ksvkO36tn81q8Eyj61qIdNQmUWAaX/0aewT0kLA==
@@ -3127,7 +3102,7 @@
     webpack-hot-middleware "^2.25.1"
     webpack-virtual-modules "^0.2.2"
 
-"@storybook/builder-webpack5@^6.5.9":
+"@storybook/builder-webpack5@^6.5.10":
   version "6.5.10"
   resolved "https://registry.yarnpkg.com/@storybook/builder-webpack5/-/builder-webpack5-6.5.10.tgz#de78a8a262410bbe65eecc62f2beaed1fe44dd5d"
   integrity sha512-Hcsm/TzGRXHndgQCftt+pzI7GQJRqAv8A8ie5b3aFcodhJfK0qzZsQD4Y4ZWxXh1I/xe5t74Kl2qUJ40PX+geA==
@@ -3492,7 +3467,7 @@
     webpack-dev-middleware "^3.7.3"
     webpack-virtual-modules "^0.2.2"
 
-"@storybook/manager-webpack5@^6.5.9":
+"@storybook/manager-webpack5@^6.5.10":
   version "6.5.10"
   resolved "https://registry.yarnpkg.com/@storybook/manager-webpack5/-/manager-webpack5-6.5.10.tgz#dff8e53615906284b68df013935e8a6234ddaafe"
   integrity sha512-uRo+6e5MiVOtyFVMYIKVqvpDveCjHyzXBfetSYR7rKEZoaDMEnLLiuF7DIH12lzxwmzCJ1gIc4lf5HFiTMNkgw==
@@ -3600,7 +3575,7 @@
     react-docgen-typescript "^2.1.1"
     tslib "^2.0.0"
 
-"@storybook/react@^6.5.9":
+"@storybook/react@^6.5.10":
   version "6.5.10"
   resolved "https://registry.yarnpkg.com/@storybook/react/-/react-6.5.10.tgz#6e9f5cf5e4c81d966774c08c87fb2414052db454"
   integrity sha512-m8S1qQrwA7pDGwdKEvL6LV3YKvSzVUY297Fq+xcTU3irnAy4sHDuFoLqV6Mi1510mErK1r8+rf+0R5rEXB219g==
@@ -4423,11 +4398,6 @@
   version "4.0.2"
   resolved "https://registry.yarnpkg.com/@types/tough-cookie/-/tough-cookie-4.0.2.tgz#6286b4c7228d58ab7866d19716f3696e03a09397"
   integrity sha512-Q5vtl1W5ue16D+nIaW8JWebSSraJVlK+EthKn7e7UcD4KWsaSJ8BqGPXNaPghgtcn/fhvrN17Tv8ksUsQpiplw==
-
-"@types/trusted-types@^2.0.2":
-  version "2.0.2"
-  resolved "https://registry.yarnpkg.com/@types/trusted-types/-/trusted-types-2.0.2.tgz#fc25ad9943bcac11cceb8168db4f275e0e72e756"
-  integrity sha512-F5DIZ36YVLE+PN+Zwws4kJogq47hNgX3Nx6WyDJ3kcplxyke3XIzB8uK5n/Lpm1HBsbGzd6nmGehL8cPekP+Tg==
 
 "@types/tryghost__content-api@^1.3.11":
   version "1.3.11"
@@ -11058,30 +11028,6 @@ listr2@^4.0.5:
     through "^2.3.8"
     wrap-ansi "^7.0.0"
 
-lit-element@^3.2.0:
-  version "3.2.2"
-  resolved "https://registry.yarnpkg.com/lit-element/-/lit-element-3.2.2.tgz#d148ab6bf4c53a33f707a5168e087725499e5f2b"
-  integrity sha512-6ZgxBR9KNroqKb6+htkyBwD90XGRiqKDHVrW/Eh0EZ+l+iC+u+v+w3/BA5NGi4nizAVHGYvQBHUDuSmLjPp7NQ==
-  dependencies:
-    "@lit/reactive-element" "^1.3.0"
-    lit-html "^2.2.0"
-
-lit-html@^2.2.0, lit-html@^2.3.0:
-  version "2.3.1"
-  resolved "https://registry.yarnpkg.com/lit-html/-/lit-html-2.3.1.tgz#56f15104ea75c0a702904893e3409d0e89e2a2b9"
-  integrity sha512-FyKH6LTW6aBdkfNhNSHyZTnLgJSTe5hMk7HFtc/+DcN1w74C215q8B+Cfxc2OuIEpBNcEKxgF64qL8as30FDHA==
-  dependencies:
-    "@types/trusted-types" "^2.0.2"
-
-lit@^2.1.3:
-  version "2.3.1"
-  resolved "https://registry.yarnpkg.com/lit/-/lit-2.3.1.tgz#2cf1c2042da1e44c7a7cc72dff2d72303fd26f48"
-  integrity sha512-TejktDR4mqG3qB32Y8Lm5Lye3c8SUehqz7qRsxe1PqGYL6me2Ef+jeQAEqh20BnnGncv4Yxy2njEIT0kzK1WCw==
-  dependencies:
-    "@lit/reactive-element" "^1.4.0"
-    lit-element "^3.2.0"
-    lit-html "^2.3.0"
-
 load-json-file@^1.0.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/load-json-file/-/load-json-file-1.1.0.tgz#956905708d58b4bab4c2261b04f59f31c99374c0"
@@ -14925,13 +14871,6 @@ store2@^2.12.0:
   resolved "https://registry.yarnpkg.com/store2/-/store2-2.14.2.tgz#56138d200f9fe5f582ad63bc2704dbc0e4a45068"
   integrity sha512-siT1RiqlfQnGqgT/YzXVUNsom9S0H1OX+dpdGN1xkyYATo4I6sep5NmsRD/40s3IIOvlCq6akxkqG82urIZW1w==
 
-storybook-addon-designs@^6.2.1:
-  version "6.3.1"
-  resolved "https://registry.yarnpkg.com/storybook-addon-designs/-/storybook-addon-designs-6.3.1.tgz#3505a08fdb5a755c970c047470749622db52a1cc"
-  integrity sha512-QCHZp4KuUikOq52MPiMfU8QifYTfhHar5vWlbcfkFDz1YrgGMy+QAEt5Y3Vdnffl4GKSK1lAsLuvTuzqTBRvnw==
-  dependencies:
-    "@figspec/react" "^1.0.0"
-
 stream-browserify@^2.0.1:
   version "2.0.2"
   resolved "https://registry.yarnpkg.com/stream-browserify/-/stream-browserify-2.0.2.tgz#87521d38a44aa7ee91ce1cd2a47df0cb49dd660b"
@@ -15931,10 +15870,10 @@ typedarray@^0.0.6:
   resolved "https://registry.yarnpkg.com/typedarray/-/typedarray-0.0.6.tgz#867ac74e3864187b1d3d47d996a78ec5c8830777"
   integrity sha512-/aCDEGatGvZ2BIk+HmLf4ifCJFwvKFNb9/JeZPMulfgFracn9QFcAf5GO8B/mweUjSoblS5In0cWhqpfs/5PQA==
 
-typescript@^4.7.4:
-  version "4.8.2"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.8.2.tgz#e3b33d5ccfb5914e4eeab6699cf208adee3fd790"
-  integrity sha512-C0I1UsrrDHo2fYI5oaCGbSejwX4ch+9Y5jTQELvovfmFkK3HHSZJB8MSJcWLmCUBzQBchCrZ9rMRV6GuNrvGtw==
+typescript@4.7.4:
+  version "4.7.4"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.7.4.tgz#1a88596d1cf47d59507a1bcdfb5b9dfe4d488235"
+  integrity sha512-C0WQT0gezHuw6AdY1M2jxUO83Rjf0HP7Sk1DtXj6j1EwkQNZrHAg2XPWlq62oqEhYvONq5pkC2Y9oPljWToLmQ==
 
 ua-parser-js@^1.0.2:
   version "1.0.2"

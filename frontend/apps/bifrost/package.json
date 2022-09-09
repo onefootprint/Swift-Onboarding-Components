@@ -58,7 +58,7 @@
     "react": "18.2.0",
     "styled-components": "^5.3.5",
     "tsconfig": "*",
-    "typescript": "^4.7.4",
+    "typescript": "4.7.4",
     "xstate": "^4.33.5"
   },
   "jest": {

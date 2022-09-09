@@ -1,7 +1,6 @@
 import { ComponentMeta, ComponentStory } from '@storybook/react';
 import { flags, IcoChevronDown16, icos } from 'icons';
 import React from 'react';
-import { withDesign } from 'storybook-addon-designs';
 import themes from 'themes';
 
 import Box from '../box';
@@ -14,7 +13,6 @@ export default {
     color: { control: 'select', options: Object.keys(themes.light.color) },
     testID: { control: 'text' },
   },
-  decorators: [withDesign],
 } as ComponentMeta<typeof IcoChevronDown16>;
 
 export const AllIcons: ComponentStory<typeof IcoChevronDown16> = ({
@@ -80,10 +78,3 @@ export const AllIcons: ComponentStory<typeof IcoChevronDown16> = ({
     </Box>
   </Box>
 );
-
-AllIcons.parameters = {
-  design: {
-    type: 'figma',
-    url: 'https://www.figma.com/file/ezOPgNR1iPizwCOB607XyX/Icons-%2B-Logos?node-id=1%3A7',
-  },
-};

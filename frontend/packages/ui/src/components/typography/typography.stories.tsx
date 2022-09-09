@@ -1,6 +1,5 @@
 import { Meta, Story } from '@storybook/react';
 import React from 'react';
-import { withDesign } from 'storybook-addon-designs';
 import themes from 'themes';
 
 import Typography, { TypographyProps } from './typography';
@@ -21,7 +20,6 @@ export default {
     },
     variant: { control: 'select', options: Object.keys(variantMapping) },
   },
-  decorators: [withDesign],
 } as Meta;
 
 const Template: Story<TypographyProps> = ({
