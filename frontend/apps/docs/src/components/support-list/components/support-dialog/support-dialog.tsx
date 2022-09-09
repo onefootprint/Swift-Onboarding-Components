@@ -4,8 +4,11 @@ import { useForm } from 'react-hook-form';
 import styled, { css } from 'styled-components';
 import { Dialog, TextArea, TextInput, Typography, useToast } from 'ui';
 
-import useSupportForm from '../../hooks/submit-support-form/use-support-form';
-import { FormField, SupportFormData } from '../../types';
+import useSupportForm from '../../../article/components/article-layout/components/product-navigation/hooks/submit-support-form/use-support-form';
+import {
+  FormField,
+  SupportFormData,
+} from '../../../article/components/article-layout/components/product-navigation/types';
 
 type SupportDialogProps = {
   url: string;

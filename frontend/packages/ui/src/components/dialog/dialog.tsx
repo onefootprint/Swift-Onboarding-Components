@@ -4,6 +4,7 @@ import React from 'react';
 import { useKey, useLockBodyScroll } from 'react-use';
 import styled, { css } from 'styled-components';
 
+import { media } from '../../utils';
 import Box from '../box';
 import Button from '../button';
 import IconButton from '../icon-button';
@@ -152,6 +153,12 @@ const DialogContainer = styled.div<{
     border-radius: ${theme.borderRadius[2]}px;
     box-shadow: ${theme.elevation[3]};
     z-index: ${theme.zIndex.dialog};
+
+    ${media.lessThan('sm')`
+      width: 100vw;
+      height: 100vh;
+      border-radius: 0;
+    `}
   `}
   ${({ size }) => {
     if (size === 'small') {

@@ -119,7 +119,7 @@ const Nav = styled.nav`
 
 const NavMenu = styled.div`
   ${({ theme }) => css`
-    --mobile-header-height: 68px;
+    --mobile-header-height: 46px;
     --mobile-nav-height: 48px;
 
     background: ${theme.backgroundColor.primary};

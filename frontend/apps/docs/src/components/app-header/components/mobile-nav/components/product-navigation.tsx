@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React from 'react';
+import SupportList from 'src/components/support-list';
 import type { ProductArticle } from 'src/types/product';
 import styled, { css } from 'styled-components';
 import { createFontStyles } from 'ui';
@@ -13,17 +14,32 @@ const ProductNavigation = ({ articles }: ProductNavigationProps) => {
   const router = useRouter();
 
   return (
-    <nav>
-      {articles.map(({ title, slug }) => (
-        <Link href={slug} key={slug}>
-          <Anchor href={slug} data-selected={router.asPath === slug}>
-            {title}
-          </Anchor>
-        </Link>
-      ))}
-    </nav>
+    <Container>
+      <nav>
+        {articles.map(({ title, slug }) => (
+          <Link href={slug} key={slug}>
+            <Anchor href={slug} data-selected={router.asPath === slug}>
+              {title}
+            </Anchor>
+          </Link>
+        ))}
+      </nav>
+      <SupportList />
+    </Container>
   );
 };
+
+const Container = styled.div`
+  ${({ theme }) => css`
+    row-gap: ${theme.spacing[5]}px;
+    display: flex;
+    flex-direction: column;
+
+    ul {
+      padding-top: ${theme.spacing[5]}px;
+    }
+  `}
+`;
 
 const Anchor = styled.a`
   ${({ theme }) => css`
