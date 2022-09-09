@@ -271,3 +271,22 @@ jobs:
               repo: context.repo.repo,
               body: 'Deployed to https://${{ steps.constants.outputs.url }} with component tag `${{ steps.constants.outputs.componentVersion }}`'
             })
+            
+  notify_slack:
+    if: ${{ success() && github.event_name != 'pull_request' }}
+    needs: [deploy_stack]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Notify on slack
+        id: slack
+        uses: slackapi/slack-github-action@v1.21.0
+        with:
+          payload: |
+            {
+              "user": "${{ github.event.pusher.name }}",
+              "environment": "${{ inputs.environment }}",
+              "url": "${{ needs.deploy_stack.outputs.url }}"
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.RELEASE_BOT_SLACK_WEBHOOK_URL }}
+            
