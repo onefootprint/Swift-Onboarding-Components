@@ -145,7 +145,7 @@ impl IdologyClient {
         let req_list = IdologyRequest {
             username: self.username.clone(),
             password: self.password.clone(),
-            age_to_check: 13, // TODO
+            age_to_check: 0, // Don't have IDology reject based on age
             data: req_data,
         };
         let response = self
