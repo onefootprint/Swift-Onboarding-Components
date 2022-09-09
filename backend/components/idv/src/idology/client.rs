@@ -1,5 +1,5 @@
 use itertools::Itertools;
-use newtypes::{dob::DateOfBirth, IdvData, PiiString, SignalAttribute};
+use newtypes::{dob::DateOfBirth, IdvData, PiiString, SignalScope};
 
 use crate::idology::{ConversionError, Error, ReqwestError};
 
@@ -89,21 +89,21 @@ impl TryFrom<IdvData> for IdologyRequestData {
 }
 
 impl IdologyRequestData {
-    pub fn attributes(&self) -> Vec<SignalAttribute> {
+    pub fn attributes(&self) -> Vec<SignalScope> {
         // Compose the list of attributes that are sent to IDology to be verified in this request
         vec![
-            Some(SignalAttribute::Name),
-            Some(SignalAttribute::StreetAddress),
-            self.city.as_ref().map(|_| SignalAttribute::City),
-            self.state.as_ref().map(|_| SignalAttribute::State),
-            self.zip.as_ref().map(|_| SignalAttribute::Zip),
-            self.ssn_last4.as_ref().map(|_| SignalAttribute::Ssn),
-            self.ssn.as_ref().map(|_| SignalAttribute::Ssn),
-            self.dob_month.as_ref().map(|_| SignalAttribute::Dob),
-            self.dob_year.as_ref().map(|_| SignalAttribute::Dob),
-            self.dob_day.as_ref().map(|_| SignalAttribute::Dob),
-            self.email.as_ref().map(|_| SignalAttribute::Email),
-            self.telephone.as_ref().map(|_| SignalAttribute::PhoneNumber),
+            Some(SignalScope::Name),
+            Some(SignalScope::StreetAddress),
+            self.city.as_ref().map(|_| SignalScope::City),
+            self.state.as_ref().map(|_| SignalScope::State),
+            self.zip.as_ref().map(|_| SignalScope::Zip),
+            self.ssn_last4.as_ref().map(|_| SignalScope::Ssn),
+            self.ssn.as_ref().map(|_| SignalScope::Ssn),
+            self.dob_month.as_ref().map(|_| SignalScope::Dob),
+            self.dob_year.as_ref().map(|_| SignalScope::Dob),
+            self.dob_day.as_ref().map(|_| SignalScope::Dob),
+            self.email.as_ref().map(|_| SignalScope::Email),
+            self.telephone.as_ref().map(|_| SignalScope::PhoneNumber),
         ]
         .into_iter()
         .flatten()
@@ -139,7 +139,7 @@ impl IdologyClient {
     pub async fn verify_expectid(
         &self,
         idv_data: IdvData,
-    ) -> Result<(serde_json::Value, Vec<SignalAttribute>), Error> {
+    ) -> Result<(serde_json::Value, Vec<SignalScope>), Error> {
         let req_data = IdologyRequestData::try_from(idv_data)?;
         let attributes = req_data.attributes();
         let req_list = IdologyRequest {

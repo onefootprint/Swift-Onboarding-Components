@@ -49,8 +49,8 @@ impl ReasonCode {
         match self {
             ReasonCode::IDology(idology) => idology.signal(),
             ReasonCode::Other(_) => Signal {
-                kind: SignalKind::TODO,
-                attributes: vec![],
+                kind: SignalSeverity::TODO,
+                scopes: vec![],
                 note: "Unknown reason code".to_owned(),
             },
         }

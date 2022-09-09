@@ -1,7 +1,7 @@
-use crate::SignalAttribute;
+use crate::SignalScope;
 
 #[derive(Debug, Clone, Copy, Ord, PartialOrd, Eq, PartialEq)]
-pub enum SignalKind {
+pub enum SignalSeverity {
     TODO,
     // Basically can ignore this information - it carries no weight
     NotImportant,
@@ -19,8 +19,8 @@ pub enum SignalKind {
 
 #[derive(Debug)]
 pub struct Signal {
-    pub kind: SignalKind,
-    pub attributes: Vec<SignalAttribute>,
+    pub kind: SignalSeverity,
+    pub scopes: Vec<SignalScope>,
     pub note: String,
 }
 
@@ -29,8 +29,8 @@ mod tests {
     use std::cmp::Ordering;
     use test_case::test_case;
 
-    use super::SignalKind;
-    use super::SignalKind::*;
+    use super::SignalSeverity;
+    use super::SignalSeverity::*;
 
     #[test_case(TODO, NotImportant => Ordering::Less)]
     #[test_case(NotImportant, Info => Ordering::Less)]
@@ -42,7 +42,7 @@ mod tests {
     #[test_case(Alert(1), Alert(1) => Ordering::Equal)]
     #[test_case(Fraud(5), Fraud(1) => Ordering::Greater)]
     #[test_case(Alert(500), Fraud(1) => Ordering::Less)]
-    fn test_cmp(a: SignalKind, b: SignalKind) -> Ordering {
+    fn test_cmp(a: SignalSeverity, b: SignalSeverity) -> Ordering {
         // We use the enum variant ordering to determine the highest priority signal for an attribute,
         // so add some tests that this doesn't change
         a.cmp(&b)

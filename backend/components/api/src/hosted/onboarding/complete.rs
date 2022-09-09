@@ -21,7 +21,7 @@ use itertools::Itertools;
 use newtypes::TenantId;
 use newtypes::ValidatedPhoneNumber;
 use newtypes::VerificationInfoStatus;
-use newtypes::{AuditTrailEvent, SessionAuthToken, SignalAttribute, Status, Vendor, VerificationInfo};
+use newtypes::{AuditTrailEvent, SessionAuthToken, SignalScope, Status, Vendor, VerificationInfo};
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Apiv2Schema)]
@@ -168,26 +168,22 @@ fn initiate_verification(
     };
     let events = vec![
         VerificationInfo {
-            attributes: vec![SignalAttribute::Name, SignalAttribute::Dob],
+            attributes: vec![SignalScope::Name, SignalScope::Dob],
             vendor: Vendor::Experian,
             status: VerificationInfoStatus::Verified,
         },
         VerificationInfo {
-            attributes: vec![SignalAttribute::Country, SignalAttribute::State],
+            attributes: vec![SignalScope::Country, SignalScope::State],
             vendor: Vendor::Socure,
             status: VerificationInfoStatus::Verified,
         },
         VerificationInfo {
-            attributes: vec![
-                SignalAttribute::StreetAddress,
-                SignalAttribute::City,
-                SignalAttribute::Zip,
-            ],
+            attributes: vec![SignalScope::StreetAddress, SignalScope::City, SignalScope::Zip],
             vendor: Vendor::Idology,
             status: VerificationInfoStatus::Verified,
         },
         VerificationInfo {
-            attributes: vec![SignalAttribute::Ssn],
+            attributes: vec![SignalScope::Ssn],
             vendor: Vendor::LexisNexis,
             status: final_status,
         },

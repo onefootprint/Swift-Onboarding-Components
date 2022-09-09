@@ -7,7 +7,7 @@ use strum_macros::{Display, EnumString};
 #[strum(serialize_all = "snake_case")]
 #[serde(rename_all = "snake_case")]
 /// Represents the granularity of data attributes that could be alerted on by a data vendor
-pub enum SignalAttribute {
+pub enum SignalScope {
     Name,
     Dob,
     Ssn,

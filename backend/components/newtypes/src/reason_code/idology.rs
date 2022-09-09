@@ -1,4 +1,4 @@
-use super::{Signal, SignalAttribute, SignalKind};
+use super::{Signal, SignalScope, SignalSeverity};
 use strum_macros::EnumString;
 
 #[derive(Debug, strum::Display, Clone, Eq, PartialEq, serde::Deserialize, EnumString)]
@@ -402,8 +402,8 @@ impl serde::Serialize for IDologyReasonCode {
 impl IDologyReasonCode {
     pub fn signal(self) -> Signal {
         use IDologyReasonCode::*;
-        use SignalAttribute::*;
-        use SignalKind::*;
+        use SignalScope::*;
+        use SignalSeverity::*;
         // These are frequent signal kinds and signal attributes that we may need to create
         let enterprise_blocked = Alert(5);
         let network_alert = Alert(10);
@@ -523,7 +523,7 @@ impl IDologyReasonCode {
         };
         Signal {
             kind,
-            attributes,
+            scopes: attributes,
             note: self.to_string(),
         }
     }

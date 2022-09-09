@@ -1,5 +1,5 @@
 use newtypes::{
-    AuditTrailEvent, ReasonCode, SignalAttribute, SignalKind, Status, Vendor, VerificationInfo,
+    AuditTrailEvent, ReasonCode, SignalScope, SignalSeverity, Status, Vendor, VerificationInfo,
     VerificationInfoStatus,
 };
 use std::{collections::HashMap, str::FromStr};
@@ -13,7 +13,7 @@ fn parse_response(value: serde_json::Value) -> Result<IDologyResponse, super::Er
 
 pub fn process(
     value: serde_json::Value,
-    pending_attributes: Vec<SignalAttribute>,
+    pending_attributes: Vec<SignalScope>,
 ) -> Result<IdvResponse, super::Error> {
     let (status, audit_events) = match parse_response(value.clone()) {
         Ok(response) => process_success(response.response, pending_attributes)?,
@@ -28,13 +28,13 @@ pub fn process(
 
 fn process_success(
     response: IDologySuccess,
-    pending_attributes: Vec<SignalAttribute>,
+    pending_attributes: Vec<SignalScope>,
 ) -> Result<(Option<Status>, Vec<AuditTrailEvent>), super::Error> {
     // TODO is it concerning if there are no qualifiers?
     if !response.id_located() {
         // TODO probably want to waterfall to another vendor
         let audit_trail = AuditTrailEvent::Verification(VerificationInfo {
-            attributes: vec![SignalAttribute::Identity],
+            attributes: vec![SignalScope::Identity],
             vendor: Vendor::Idology,
             status: VerificationInfoStatus::NotFound,
         });
@@ -47,10 +47,10 @@ fn process_success(
         vec![]
     };
     let signals: Vec<_> = qualifiers.into_iter().map(|r| r.signal()).collect();
-    // Create a map of SignalAttribute -> Vec<SignalKind>
-    let mut attribute_to_signals = HashMap::<SignalAttribute, Vec<_>>::new();
+    // Create a map of SignalScope -> Vec<SignalSeverity>
+    let mut attribute_to_signals = HashMap::<SignalScope, Vec<_>>::new();
     for signal in signals {
-        for attr in signal.attributes {
+        for attr in signal.scopes {
             let signals_for_attr = attribute_to_signals.entry(attr).or_default();
             signals_for_attr.push(signal.kind);
         }
@@ -62,7 +62,7 @@ fn process_success(
         .into_iter()
         .filter_map(|(attr, signal_kinds)| {
             let max_signal = signal_kinds.into_iter().max()?;
-            if max_signal <= SignalKind::Info {
+            if max_signal <= SignalSeverity::Info {
                 // If we have a TODO, NotImportant, or Info signal on this piece of data, treat it as nothing
                 None
             } else {

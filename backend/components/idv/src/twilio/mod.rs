@@ -1,5 +1,5 @@
 use levenshtein::levenshtein;
-use newtypes::{AuditTrailEvent, IdvData, SignalAttribute, Vendor, VerificationInfo};
+use newtypes::{AuditTrailEvent, IdvData, SignalScope, Vendor, VerificationInfo};
 
 use crate::IdvResponse;
 
@@ -41,7 +41,7 @@ pub async fn lookup_v2(client: &twilio::Client, idv_data: IdvData) -> Result<Idv
 
     // TODO read response from twilio
     let audit_events = vec![AuditTrailEvent::Verification(VerificationInfo {
-        attributes: vec![SignalAttribute::PhoneNumber],
+        attributes: vec![SignalScope::PhoneNumber],
         vendor: Vendor::Twilio,
         status: newtypes::VerificationInfoStatus::Verified,
     })];
