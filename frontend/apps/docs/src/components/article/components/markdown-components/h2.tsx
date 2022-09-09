@@ -11,12 +11,12 @@ type H2Props = {
 const H2 = ({ children }: H2Props) => {
   const id = kebabCase(children);
   return (
-    <Typography as="h2" color="primary" variant="heading-3">
-      <Anchor id={id} href={`#${id}`} rel="noopener">
+    <Anchor id={id} href={`#${id}`} rel="noopener">
+      <Typography as="h2" color="primary" variant="heading-3">
         {children}
         <IcoLink16 />
-      </Anchor>
-    </Typography>
+      </Typography>
+    </Anchor>
   );
 };
 

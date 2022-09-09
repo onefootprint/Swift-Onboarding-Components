@@ -1,3 +1,4 @@
+import { useTranslation } from 'hooks';
 import { IcoFileText16 } from 'icons';
 import React, { useEffect } from 'react';
 import type { ArticleSection } from 'src/types/article';
@@ -11,6 +12,7 @@ type ArticleSectionsProps = {
 };
 
 const ArticleSections = ({ sections }: ArticleSectionsProps) => {
+  const { t } = useTranslation('components.article-sections');
   useEffect(() => {
     scrollSpy();
   }, [sections]);
@@ -21,7 +23,7 @@ const ArticleSections = ({ sections }: ArticleSectionsProps) => {
         <Box>
           <IcoFileText16 />
         </Box>
-        <Typography variant="label-4">On this page</Typography>
+        <Typography variant="label-4">{t('title')}</Typography>
       </Header>
       <nav>
         <ul

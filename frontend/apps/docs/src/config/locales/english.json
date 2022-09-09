@@ -20,6 +20,9 @@
         }
       }
     },
+    "article-sections": {
+      "title": "On this page"
+    },
     "support-dialog": {
       "form": {
         "name": {

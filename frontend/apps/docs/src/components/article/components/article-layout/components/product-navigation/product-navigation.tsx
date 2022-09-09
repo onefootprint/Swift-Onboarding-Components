@@ -65,7 +65,7 @@ const Container = styled.aside`
       border-right: ${theme.borderWidth[1]}px solid ${theme.borderColor.tertiary};
       display: flex;
       flex-direction: column;
-      height: 100%;
+      height: calc(100vh - var(--header-height));
       justify-content: space-between;
       left: 0;
       padding: ${theme.spacing[7]}px ${theme.spacing[5]}px;
