@@ -30,7 +30,7 @@ pub enum Vendor {
     Socure,
     LexisNexis,
     Experian,
+    Twilio,
 }
-
 
 impl_enum_str_diesel!(Vendor);

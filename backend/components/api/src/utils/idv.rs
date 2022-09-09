@@ -71,7 +71,7 @@ pub struct IdvRequestData {
     pub user_vault_id: UserVaultId,
     pub tenant_id: TenantId,
     pub request: VerificationRequest,
-    pub uvw: UserVaultWrapper,
+    pub idv_data: IdvData,
 }
 
 pub async fn initiate_idv_request(state: &State, data: IdvRequestData) -> Result<(), ApiError> {
@@ -81,21 +81,32 @@ pub async fn initiate_idv_request(state: &State, data: IdvRequestData) -> Result
         user_vault_id,
         tenant_id,
         request,
-        uvw,
+        idv_data,
     } = data;
-    let idv_data = uvw.build_idv_request(state).await?;
 
     let (new_status, events, result) = match request.vendor {
         Vendor::Idology => {
-            let (result, pending_attributes) = state
+            let (json_result, pending_attributes) = state
                 .idology_client
                 .verify_expectid(idv_data)
                 .await
                 .map_err(idv::Error::from)?;
-            let (new_status, events) =
-                idv::idology::verification::process(result.clone(), pending_attributes)
+            let (new_status, audit_events) =
+                idv::idology::verification::process(json_result.clone(), pending_attributes)
                     .map_err(idv::Error::from)?;
-            (new_status, events, result)
+            (new_status, audit_events, json_result)
+        }
+        Vendor::Twilio => {
+            let idv::twilio::Response {
+                raw_response,
+                status,
+                audit_events,
+                // TODO make it easier to share twilio client between IDV + SMS sending
+            } = idv::twilio::lookup_v2(&state.twilio_client.client, idv_data)
+                .await
+                .map_err(idv::Error::from)?;
+            let json_result = serde_json::value::to_value(raw_response)?;
+            (status, audit_events, json_result)
         }
         _ => return Err(ApiError::NotImplemented),
     };

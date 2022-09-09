@@ -19,7 +19,7 @@ pub type SecondsBeforeRetry = Duration;
 pub struct TwilioClient {
     pub duration_between_challenges: Duration,
     pub rp_id: String,
-    client: twilio::Client,
+    pub client: twilio::Client,
 }
 
 impl TwilioClient {

@@ -66,7 +66,7 @@ fn handler(
 
     let tenant_id = tenant_auth.tenant.id.clone();
     let session_key = state.session_sealing_key.clone();
-    let (validation_token, webauthn_creds, idv_request_data) = state
+    let (validation_token, webauthn_creds, requests, ob_id, scoped_user, uvw) = state
         .db_pool
         .db_transaction(move |conn| -> Result<_, ApiError> {
             let scoped_user = ScopedUser::get_or_create(
@@ -83,24 +83,35 @@ fn handler(
                 insight_event,
             )?;
             let ob_id = ob.id.clone();
-            let verification_request = initiate_verification(conn, ob, &uvw, &tenant_id, decrypted_phone)?;
+            let requests = initiate_verification(conn, ob, &uvw, &tenant_id, decrypted_phone)?;
             let validation_token =
                 super::create_onboarding_validation_token(conn, &session_key, ob_id.clone())?;
             let webauthn_creds = WebauthnCredential::get_for_user_vault(conn, &uvw.user_vault.id.clone())?;
-
-            let idv_request_data = verification_request.map(|r| IdvRequestData {
-                onboarding_id: ob_id,
-                user_vault_id: scoped_user.user_vault_id,
-                tenant_id: scoped_user.tenant_id,
-                request: r,
+            Ok((
+                validation_token,
+                webauthn_creds,
+                requests,
+                ob_id,
+                scoped_user,
                 uvw,
-            });
-            Ok((validation_token, webauthn_creds, idv_request_data))
+            ))
         })
         .await?;
 
-    if let Some(idv_request_data) = idv_request_data {
-        initiate_idv_request(&state, idv_request_data).await?;
+    // Fire off all IDV requests
+    if !requests.is_empty() {
+        let idv_data = uvw.build_idv_request(&state).await?;
+        let fut_requests = requests
+            .into_iter()
+            .map(|r| IdvRequestData {
+                onboarding_id: ob_id.clone(),
+                user_vault_id: scoped_user.user_vault_id.clone(),
+                tenant_id: scoped_user.tenant_id.clone(),
+                request: r,
+                idv_data: idv_data.clone(),
+            })
+            .map(|r| initiate_idv_request(&state, r));
+        futures::future::try_join_all(fut_requests).await?;
     }
 
     Ok(Json(ApiResponseData {
@@ -117,10 +128,10 @@ fn initiate_verification(
     uvw: &UserVaultWrapper,
     tenant_id: &TenantId,
     decrypted_phone: Option<ValidatedPhoneNumber>,
-) -> Result<Option<VerificationRequest>, ApiError> {
+) -> Result<Vec<VerificationRequest>, ApiError> {
     // TODO decide when to re-KYC
     if ob.status == Status::Verified {
-        return Ok(None);
+        return Ok(vec![]);
     }
 
     let desired_status = if let Some(decrypted_phone) = decrypted_phone {
@@ -141,10 +152,13 @@ fn initiate_verification(
     let scoped_user_id = ob.scoped_user_id.clone();
     ob.update_status(conn, desired_status)?;
     if desired_status == Status::Processing {
-        let request = uvw
-            .build_verification_request(scoped_user_id, Vendor::Idology)
+        let idology_request = uvw
+            .build_verification_request(scoped_user_id.clone(), Vendor::Idology)
             .save(conn)?;
-        return Ok(Some(request));
+        let twilio_request = uvw
+            .build_verification_request(scoped_user_id, Vendor::Twilio)
+            .save(conn)?;
+        return Ok(vec![idology_request, twilio_request]);
     }
 
     // If we're not kicking off a verification, just create some fixture events for now
@@ -196,5 +210,5 @@ fn initiate_verification(
             None,
         )
     })?;
-    Ok(None)
+    Ok(vec![])
 }

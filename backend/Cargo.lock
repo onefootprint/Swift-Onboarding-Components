@@ -2372,6 +2372,7 @@ dependencies = [
  "serde",
  "serde_json",
  "thiserror",
+ "twilio",
 ]
 
 [[package]]

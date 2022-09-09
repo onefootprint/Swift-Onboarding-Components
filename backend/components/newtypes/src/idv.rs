@@ -1,6 +1,6 @@
 use crate::PiiString;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct IdvData {
     pub first_name: Option<PiiString>,
     pub last_name: Option<PiiString>,

@@ -4,6 +4,7 @@ export enum Vendor {
   socure = 'socure',
   lexisNexis = 'lexis_nexis',
   experian = 'experian',
+  twilio = 'twilio',
 }
 export const vendorToDisplayName: Record<Vendor, String> = {
   [Vendor.footprint]: 'Footprint',
@@ -11,4 +12,5 @@ export const vendorToDisplayName: Record<Vendor, String> = {
   [Vendor.socure]: 'Socure',
   [Vendor.lexisNexis]: 'LexisNexis',
   [Vendor.experian]: 'Experian',
+  [Vendor.twilio]: 'Twilio',
 };
