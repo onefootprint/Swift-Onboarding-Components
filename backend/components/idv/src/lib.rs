@@ -7,7 +7,7 @@ pub mod twilio;
 
 #[derive(Debug)]
 pub struct IdvResponse {
-    pub status: Status,
+    pub status: Option<Status>,
     pub audit_events: Vec<AuditTrailEvent>,
     pub raw_response: serde_json::Value,
 }

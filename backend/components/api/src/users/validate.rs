@@ -49,9 +49,10 @@ pub async fn validate(
         return Err(OnboardingError::ValidateTokenInvalidOrNotFound.into());
     };
 
-    let (ob, scoped_user) = Onboarding::get(&state.db_pool, ob_id)
-        .await?
-        .ok_or(OnboardingError::NoOnboarding)?;
+    let (ob, scoped_user) = state
+        .db_pool
+        .db_query(|conn| Onboarding::get(conn, ob_id))
+        .await??;
     if scoped_user.tenant_id != auth.tenant().id {
         return Err(OnboardingError::TenantMismatch.into());
     }

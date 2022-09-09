@@ -16,7 +16,7 @@ pub enum Error {
 #[derive(Debug)]
 pub struct Response {
     pub raw_response: LookupV2Response,
-    pub status: Status,
+    pub status: Option<Status>,
     pub audit_events: Vec<AuditTrailEvent>,
 }
 
@@ -35,7 +35,7 @@ pub async fn lookup_v2(client: &twilio::Client, idv_data: IdvData) -> Result<Idv
         status: newtypes::VerificationInfoStatus::Verified,
     })];
     Ok(IdvResponse {
-        status: Status::Verified,
+        status: None,
         audit_events,
         raw_response: serde_json::value::to_value(raw_response)?,
     })

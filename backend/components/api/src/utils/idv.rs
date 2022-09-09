@@ -10,8 +10,8 @@ use db::models::{
 };
 use idv::IdvResponse;
 use newtypes::{
-    email::Email, DataAttribute, IdvData, OnboardingId, PhoneNumber, ScopedUserId, Status, TenantId,
-    UserVaultId, Vendor,
+    email::Email, AuditTrailEvent, DataAttribute, IdvData, OnboardingId, PhoneNumber, ScopedUserId, Status,
+    TenantId, UserVaultId, Vendor, VerificationInfo,
 };
 use std::{collections::HashMap, str::FromStr};
 use strum::IntoEnumIterator;
@@ -68,23 +68,61 @@ impl UserVaultWrapper {
 }
 
 pub struct IdvRequestData {
-    pub onboarding_id: OnboardingId,
     pub user_vault_id: UserVaultId,
     pub tenant_id: TenantId,
     pub request: VerificationRequest,
     pub idv_data: IdvData,
 }
 
-pub async fn initiate_idv_requests(state: &State, requests: Vec<IdvRequestData>) -> Result<(), ApiError> {
+pub async fn initiate_idv_requests(
+    state: &State,
+    ob_id: OnboardingId,
+    requests: Vec<IdvRequestData>,
+) -> Result<(), ApiError> {
     // TODO spawn a task to do this asynchronously
     let fut_requests = requests.into_iter().map(|r| process_idv_request(state, r));
-    futures::future::try_join_all(fut_requests).await?;
+    let result_statuses = futures::future::try_join_all(fut_requests).await?;
+    save_final_result(state, ob_id, result_statuses).await?;
     Ok(())
 }
 
-async fn process_idv_request(state: &State, data: IdvRequestData) -> Result<(), ApiError> {
+async fn save_final_result(
+    state: &State,
+    ob_id: OnboardingId,
+    result_statuses: Vec<Option<Status>>,
+) -> Result<(), ApiError> {
+    // TODO build process to run this asynchronously if we crashed before getting here
+    let final_status = result_statuses
+        .into_iter()
+        .flatten()
+        .min()
+        .unwrap_or(Status::Failed);
+    state
+        .db_pool
+        .db_transaction(move |conn| -> Result<_, ApiError> {
+            Onboarding::update_status_by_id(conn, &ob_id, final_status)?;
+            if let Some(status) = final_status.audit_status() {
+                let (_, scoped_user) = Onboarding::get(conn, ob_id)?;
+                AuditTrail::create(
+                    conn,
+                    AuditTrailEvent::Verification(VerificationInfo {
+                        attributes: vec![],
+                        vendor: Vendor::Footprint,
+                        status,
+                    }),
+                    scoped_user.user_vault_id,
+                    Some(scoped_user.tenant_id),
+                    None,
+                )?;
+            }
+            Ok(())
+        })
+        .await?;
+    Ok(())
+}
+
+async fn process_idv_request(state: &State, data: IdvRequestData) -> Result<Option<Status>, ApiError> {
     let IdvRequestData {
-        onboarding_id,
         user_vault_id,
         tenant_id,
         request,
@@ -103,21 +141,19 @@ async fn process_idv_request(state: &State, data: IdvRequestData) -> Result<(), 
         .db_pool
         .db_transaction(move |conn| -> Result<_, ApiError> {
             let result = VerificationResult::create(conn, request.id, raw_response)?;
-            let result_id = result.id;
-            Onboarding::update_status_by_id(conn, &onboarding_id, status)?;
             audit_events.into_iter().try_for_each(|e| {
                 AuditTrail::create(
                     conn,
                     e,
                     user_vault_id.clone(),
                     Some(tenant_id.clone()),
-                    Some(result_id.clone()),
+                    Some(result.id.clone()),
                 )
             })?;
             Ok(())
         })
         .await?;
-    Ok(())
+    Ok(status)
 }
 
 async fn send_idv_request(state: &State, vendor: Vendor, idv_data: IdvData) -> Result<IdvResponse, ApiError> {

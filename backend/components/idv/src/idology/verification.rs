@@ -29,7 +29,7 @@ pub fn process(
 fn process_success(
     response: IDologySuccess,
     pending_attributes: Vec<SignalAttribute>,
-) -> Result<(Status, Vec<AuditTrailEvent>), super::Error> {
+) -> Result<(Option<Status>, Vec<AuditTrailEvent>), super::Error> {
     // TODO is it concerning if there are no qualifiers?
     if !response.id_located() {
         // TODO probably want to waterfall to another vendor
@@ -38,7 +38,7 @@ fn process_success(
             vendor: Vendor::Idology,
             status: VerificationInfoStatus::NotFound,
         });
-        return Ok((Status::ManualReview, vec![audit_trail]));
+        return Ok((Some(Status::ManualReview), vec![audit_trail]));
     }
 
     let qualifiers = if let Some(ref qualifiers) = response.qualifiers {
@@ -78,10 +78,6 @@ fn process_success(
 
     // TODO: determine our own response, don't just use what we get from IDology
     let new_status = response.status();
-    let final_audit_status = match new_status {
-        Status::Verified => VerificationInfoStatus::Verified,
-        _ => VerificationInfoStatus::Failed,
-    };
     let events = vec![
         (!verified_fields.is_empty()).then_some(VerificationInfo {
             attributes: verified_fields,
@@ -93,26 +89,21 @@ fn process_success(
             vendor: Vendor::Idology,
             status: VerificationInfoStatus::Failed,
         }),
-        Some(VerificationInfo {
-            attributes: vec![],
-            vendor: Vendor::Footprint,
-            status: final_audit_status,
-        }),
     ]
     .into_iter()
     .flatten()
     .map(AuditTrailEvent::Verification)
     .collect();
-    Ok((new_status, events))
+    Ok((Some(new_status), events))
 }
 
-fn process_error() -> (Status, Vec<AuditTrailEvent>) {
+fn process_error() -> (Option<Status>, Vec<AuditTrailEvent>) {
     let events = vec![AuditTrailEvent::Verification(VerificationInfo {
         attributes: vec![],
         vendor: Vendor::Footprint,
         status: VerificationInfoStatus::Failed,
     })];
-    (Status::ManualReview, events)
+    (Some(Status::ManualReview), events)
 }
 
 #[derive(Debug, serde::Deserialize)]
@@ -134,7 +125,7 @@ impl IDologySuccess {
     fn status(&self) -> Status {
         match self.summary_result.as_ref().map(|x| x.key.as_str()) {
             Some("id.success") => Status::Verified,
-            Some("id.failure") => Status::ManualReview,
+            Some("id.failure") => Status::Failed,
             _ => Status::ManualReview,
         }
     }

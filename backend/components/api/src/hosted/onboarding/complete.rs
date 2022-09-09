@@ -104,14 +104,13 @@ fn handler(
         let requests = requests
             .into_iter()
             .map(|r| IdvRequestData {
-                onboarding_id: ob_id.clone(),
                 user_vault_id: scoped_user.user_vault_id.clone(),
                 tenant_id: scoped_user.tenant_id.clone(),
                 request: r,
                 idv_data: idv_data.clone(),
             })
             .collect();
-        initiate_idv_requests(&state, requests).await?;
+        initiate_idv_requests(&state, ob_id, requests).await?;
     }
 
     Ok(Json(ApiResponseData {

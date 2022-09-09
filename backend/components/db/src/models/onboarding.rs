@@ -3,7 +3,7 @@ use super::scoped_user::ScopedUser;
 use crate::models::insight_event::InsightEvent;
 use crate::models::ob_configuration::ObConfiguration;
 use crate::schema::{onboarding, scoped_user};
-use crate::{DbError, DbPool};
+use crate::DbError;
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
@@ -38,17 +38,11 @@ struct NewOnboarding {
 pub type OnboardingInfo = (Onboarding, ObConfiguration, InsightEvent);
 
 impl Onboarding {
-    pub async fn get(pool: &DbPool, id: OnboardingId) -> Result<Option<(Onboarding, ScopedUser)>, DbError> {
-        let ob = pool
-            .db_query(|conn| -> Result<Option<(Onboarding, ScopedUser)>, DbError> {
-                let ob = onboarding::table
-                    .inner_join(scoped_user::table)
-                    .filter(onboarding::id.eq(id))
-                    .first(conn)
-                    .optional()?;
-                Ok(ob)
-            })
-            .await??;
+    pub fn get(conn: &mut PgConnection, id: OnboardingId) -> Result<(Onboarding, ScopedUser), DbError> {
+        let ob = onboarding::table
+            .inner_join(scoped_user::table)
+            .filter(onboarding::id.eq(id))
+            .first(conn)?;
         Ok(ob)
     }
 
