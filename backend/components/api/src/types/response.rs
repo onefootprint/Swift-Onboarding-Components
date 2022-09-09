@@ -8,7 +8,11 @@ use serde::Serialize;
 
 use crate::errors::ApiResult;
 
+/// return footprint api results
 pub type JsonApiResponse<T> = ApiResult<Json<ApiResponseData<T>>>;
+
+/// return string results
+pub type StringResponse = ApiResult<String>;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Apiv2Schema)]
 #[openapi(description = "Empty response")]

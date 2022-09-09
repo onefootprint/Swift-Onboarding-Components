@@ -1,13 +1,20 @@
-use crate::types::response::ApiResponseData;
-use crate::ApiError;
+use crate::types::{response::ApiResponseData, StringResponse};
+use crate::types::{EmptyResponse, JsonApiResponse};
 use actix_web::HttpRequest;
 
-use paperclip::actix::{api_v2_operation, get, web::Json};
+use paperclip::actix::{api_v2_operation, get};
 
 #[api_v2_operation(summary = "/", operation_id = "root", tags(Private))]
-#[tracing::instrument(name = "index", skip(req))]
+#[tracing::instrument(name = "index")]
 #[get("/")]
-async fn handler(req: HttpRequest) -> actix_web::Result<Json<ApiResponseData<String>>, ApiError> {
+async fn root() -> JsonApiResponse<EmptyResponse> {
+    ApiResponseData::ok(EmptyResponse {}).json()
+}
+
+#[tracing::instrument(name = "debug_headers", skip(req))]
+#[api_v2_operation(summary = "/headers", operation_id = "debug_headers", tags(Private))]
+#[get("/headers")]
+async fn headers(req: HttpRequest) -> StringResponse {
     let mut headers = req
         .headers()
         .iter()
@@ -24,10 +31,10 @@ async fn handler(req: HttpRequest) -> actix_web::Result<Json<ApiResponseData<Str
 
     let headers = headers.join("\n");
 
-    Ok(Json(ApiResponseData { data: headers }))
+    Ok(headers)
 }
 
 #[tracing::instrument(name = "log_headers")]
-fn log_headers(headers: &Vec<String>) {
+fn log_headers(headers_debug: &Vec<String>) {
     tracing::info!("got headers");
 }

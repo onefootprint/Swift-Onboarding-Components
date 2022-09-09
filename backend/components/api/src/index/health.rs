@@ -1,11 +1,11 @@
 use crate::errors::ApiError;
-use crate::types::ApiResponseData;
+use crate::types::{ApiResponseData, StringResponse};
 use crate::State;
 use crate::{auth::key_context::custodian::CustodianAuthContext, types::JsonApiResponse};
 
 use actix_web::cookie::time::Instant;
 use newtypes::{EncryptedVaultPrivateKey, SealedVaultBytes};
-use paperclip::actix::{api_v2_operation, get, web, web::Json, Apiv2Schema};
+use paperclip::actix::{api_v2_operation, get, web, Apiv2Schema};
 use serde::{Deserialize, Serialize};
 
 #[api_v2_operation(
@@ -16,7 +16,7 @@ use serde::{Deserialize, Serialize};
 )]
 #[tracing::instrument(name = "health", skip(state))]
 #[get("/health")]
-async fn handler(state: web::Data<State>) -> actix_web::Result<Json<ApiResponseData<String>>, ApiError> {
+async fn handler(state: web::Data<State>) -> StringResponse {
     let before_enclave = chrono::Utc::now().timestamp_millis();
     let _res = state.enclave_client.pong().await?;
     let after_enclave = chrono::Utc::now().timestamp_millis();
@@ -25,13 +25,11 @@ async fn handler(state: web::Data<State>) -> actix_web::Result<Json<ApiResponseD
     db::health_check(&state.db_pool).await?;
     let after_db = chrono::Utc::now().timestamp_millis();
 
-    Ok(Json(ApiResponseData {
-        data: format!(
-            "Enclave: healthy RT {}ms\nDB: healthy RT {}ms",
-            after_enclave - before_enclave,
-            after_db - before_db
-        ),
-    }))
+    Ok(format!(
+        "Enclave: healthy RT {}ms\nDB: healthy RT {}ms",
+        after_enclave - before_enclave,
+        after_db - before_db
+    ))
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Apiv2Schema)]
@@ -119,9 +117,7 @@ async fn enclave_decrypt(
 #[api_v2_operation(summary = "/panic", operation_id = "panic", tags(Private))]
 #[tracing::instrument(name = "panic")]
 #[get("/panic")]
-async fn panic_handler(
-    _: CustodianAuthContext,
-) -> actix_web::Result<Json<ApiResponseData<&'static str>>, ApiError> {
+async fn panic_handler(_: CustodianAuthContext) -> StringResponse {
     tracing::debug!("about to panic");
     panic!("at the disco");
 }
@@ -129,7 +125,7 @@ async fn panic_handler(
 #[api_v2_operation(summary = "/fail", operation_id = "fail", tags(Private))]
 #[tracing::instrument(name = "fail")]
 #[get("/fail")]
-async fn fail_handler() -> actix_web::Result<Json<ApiResponseData<&'static str>>, ApiError> {
+async fn fail_handler() -> StringResponse {
     tracing::debug!("about to fail");
     Err(ApiError::NotImplemented)
 }

@@ -6,7 +6,8 @@ mod index;
 
 pub fn routes(config: &mut ServiceConfig) {
     config
-        .service(index::handler)
+        .service(index::root)
+        .service(index::headers)
         .service(health::handler)
         .service(health::enclave)
         .service(health::enclave_decrypt)
