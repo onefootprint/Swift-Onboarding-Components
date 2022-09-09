@@ -14,5 +14,6 @@ thiserror = { version = "1.0" }
 chrono = "0.4"
 actix-rt = "2.7"
 itertools = "0.10.1"
+levenshtein = "1.0.5"
 
 twilio = { path = "../twilio"}

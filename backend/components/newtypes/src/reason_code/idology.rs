@@ -521,6 +521,10 @@ impl IDologyReasonCode {
             InputPhoneNumberDoesNotMatchLocatedStateHistory => (Info, vec![PhoneNumber, State]),
             InputPhoneNumberDoesNotMatchIpState => (Alert(1), vec![PhoneNumber, IpAddress]),
         };
-        Signal { kind, attributes }
+        Signal {
+            kind,
+            attributes,
+            note: self.to_string(),
+        }
     }
 }

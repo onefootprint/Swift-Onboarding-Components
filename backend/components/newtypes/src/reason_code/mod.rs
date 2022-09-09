@@ -51,6 +51,7 @@ impl ReasonCode {
             ReasonCode::Other(_) => Signal {
                 kind: SignalKind::TODO,
                 attributes: vec![],
+                note: "Unknown reason code".to_owned(),
             },
         }
     }

@@ -22,6 +22,8 @@ pub struct LookupV2Response {
     pub sim_swap: Option<SimSwap>,
     pub caller_name: Option<CallerName>,
     pub line_type_intelligence: Option<LineTypeIntelligence>,
+    // TODO this is a field we added ourselves, maybe put this somewhere else?
+    pub name_str_distance: Option<usize>,
 }
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize)]

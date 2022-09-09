@@ -1,3 +1,4 @@
+use levenshtein::levenshtein;
 use newtypes::{AuditTrailEvent, IdvData, SignalAttribute, Status, Vendor, VerificationInfo};
 use twilio::response::lookup::LookupV2Response;
 
@@ -21,13 +22,31 @@ pub struct Response {
 }
 
 pub async fn lookup_v2(client: &twilio::Client, idv_data: IdvData) -> Result<IdvResponse, Error> {
-    let phone_number = if let Some(phone_number) = idv_data.phone_number {
+    let phone_number = if let Some(ref phone_number) = idv_data.phone_number {
         phone_number
     } else {
         return Err(Error::PhoneNumberNotPopulated);
     };
-    // TODO scrub PII From raw_response
-    let raw_response = client.lookup_v2(phone_number.leak()).await?;
+    let mut response = client.lookup_v2(phone_number.leak()).await?;
+
+    let name_str_distance = if let Some((caller_name, name)) = response
+        .caller_name
+        .as_ref()
+        .and_then(|x| x.caller_name.as_ref())
+        .and_then(|caller_name| idv_data.name().map(|name| (caller_name, name)))
+    {
+        // TODO more detail here - maybe like distance for first name + last name independently
+        let name = name.to_uppercase();
+        let caller_name = caller_name.to_uppercase();
+        let str_distance = levenshtein(name.as_str(), caller_name.as_str());
+        Some(str_distance)
+    } else {
+        None
+    };
+    response.name_str_distance = name_str_distance;
+
+    let raw_response = serde_json::value::to_value(response)?;
+
     // TODO read response from twilio
     let audit_events = vec![AuditTrailEvent::Verification(VerificationInfo {
         attributes: vec![SignalAttribute::PhoneNumber],
@@ -37,6 +56,6 @@ pub async fn lookup_v2(client: &twilio::Client, idv_data: IdvData) -> Result<Idv
     Ok(IdvResponse {
         status: None,
         audit_events,
-        raw_response: serde_json::value::to_value(raw_response)?,
+        raw_response,
     })
 }

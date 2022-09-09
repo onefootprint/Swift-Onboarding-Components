@@ -21,6 +21,7 @@ pub enum SignalKind {
 pub struct Signal {
     pub kind: SignalKind,
     pub attributes: Vec<SignalAttribute>,
+    pub note: String,
 }
 
 #[cfg(test)]

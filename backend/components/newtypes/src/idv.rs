@@ -15,3 +15,15 @@ pub struct IdvData {
     pub email: Option<PiiString>,
     pub phone_number: Option<PiiString>,
 }
+
+impl IdvData {
+    pub fn name(&self) -> Option<String> {
+        match (self.first_name.as_ref(), self.last_name.as_ref()) {
+            (Some(first_name), Some(last_name)) => {
+                Some(format!("{} {}", first_name.leak(), last_name.leak()))
+            }
+            (Some(name), None) | (None, Some(name)) => Some(name.leak_to_string()),
+            (None, None) => None,
+        }
+    }
+}
