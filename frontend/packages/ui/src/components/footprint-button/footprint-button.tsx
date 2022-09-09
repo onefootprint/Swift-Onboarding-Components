@@ -3,9 +3,16 @@ import React from 'react';
 import styled, { css } from 'styled-components';
 
 import Button, { ButtonProps } from '../button';
+import Typography from '../typography';
+import { FootprintButtonSize } from './footprint-button.types';
+import footprintButtonFontVariantBySize from './footprint-button.utils';
 
-export type FootprintButtonProps = Omit<ButtonProps, 'children' | 'variant'> & {
+export type FootprintButtonProps = Omit<
+  ButtonProps,
+  'children' | 'variant' | 'size'
+> & {
   text?: string;
+  size?: FootprintButtonSize;
 };
 
 const FootprintButton = ({
@@ -31,7 +38,12 @@ const FootprintButton = ({
     variant="primary"
   >
     <StyledIcoFootprint color="septenary" />
-    {text}
+    <Typography
+      color="quinary"
+      variant={footprintButtonFontVariantBySize[size]}
+    >
+      {text}
+    </Typography>
   </Button>
 );
 
