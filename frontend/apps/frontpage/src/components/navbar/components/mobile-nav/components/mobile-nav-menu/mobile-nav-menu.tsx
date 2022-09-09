@@ -60,6 +60,7 @@ const MenuTitle = styled.div`
     justify-content: space-between;
     padding: ${theme.spacing[4]}px ${theme.spacing[6]}px;
     text-decoration: none;
+    cursor: pointer;
   `}
 `;
 
