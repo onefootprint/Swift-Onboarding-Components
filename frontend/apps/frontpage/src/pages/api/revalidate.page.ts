@@ -12,6 +12,7 @@ export default async function handler(
   }
   try {
     const slugPrefix = getSlugPrefix(req.body.post.current.primary_tag?.name);
+    await res.revalidate(slugPrefix);
     await res.revalidate(`${slugPrefix}/${req.body.post.current.slug}`);
     return res.json({ revalidated: true });
   } catch (err) {
