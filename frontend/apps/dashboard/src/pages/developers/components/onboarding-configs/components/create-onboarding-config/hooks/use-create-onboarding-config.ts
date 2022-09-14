@@ -2,20 +2,16 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRequestErrorToast } from 'hooks';
 import request, { RequestError } from 'request';
 import useSessionUser, { AuthHeaders } from 'src/hooks/use-session-user';
-
-export type CreateOnboardingConfigRequest = {
-  name: string;
-  mustCollectData: string[];
-  canAccessData: string[];
-};
-
-export type GetOnboardingConfigResponse = string;
+import {
+  OrgOnboardingConfigCreateRequest,
+  OrgOnboardingConfigCreateResponse,
+} from 'types';
 
 const createOnboardingConfig = async (
   authHeaders: AuthHeaders,
-  data: CreateOnboardingConfigRequest,
+  data: OrgOnboardingConfigCreateRequest,
 ) => {
-  const response = await request<GetOnboardingConfigResponse>({
+  const response = await request<OrgOnboardingConfigCreateResponse>({
     data,
     headers: authHeaders,
     method: 'POST',
@@ -30,11 +26,11 @@ const useCreateOnboardingConfig = () => {
   const queryClient = useQueryClient();
 
   return useMutation<
-    GetOnboardingConfigResponse,
+    OrgOnboardingConfigCreateResponse,
     RequestError,
-    CreateOnboardingConfigRequest
+    OrgOnboardingConfigCreateRequest
   >(
-    (data: CreateOnboardingConfigRequest) =>
+    (data: OrgOnboardingConfigCreateRequest) =>
       createOnboardingConfig(authHeaders, data),
     {
       onSettled: () => {

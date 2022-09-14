@@ -1,10 +1,9 @@
 import { useCountdown, useRequestErrorToast, useTranslation } from 'hooks';
 import React, { useEffect } from 'react';
-import useIdentify, {
-  IdentifyResponse,
-} from 'src/pages/identify/hooks/use-identify';
-import { ChallengeKind, Events } from 'src/utils/state-machine/identify/types';
+import useIdentify from 'src/pages/identify/hooks/use-identify';
+import { Events } from 'src/utils/state-machine/identify/types';
 import styled, { css } from 'styled-components';
+import { ChallengeKind, IdentifyResponse } from 'types';
 import { LinkButton, LoadingIndicator, Typography, useToast } from 'ui';
 
 import useIdentifyChallenge from '../../../../hooks/use-identify-challenge';
@@ -44,7 +43,9 @@ const ResendCodeButton = () => {
           challengeToken,
           retryDisabledUntil: challengeRetryDisabledUntil,
         }) => {
-          setDate(challengeRetryDisabledUntil);
+          if (challengeRetryDisabledUntil) {
+            setDate(challengeRetryDisabledUntil);
+          }
           toast.show({
             title: t('toast.success.title'),
             description: t('toast.success.description'),

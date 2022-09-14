@@ -3,13 +3,12 @@ import { useTranslation } from 'hooks';
 import React, { useEffect } from 'react';
 import { Events } from 'src/utils/state-machine/liveness-check';
 import styled, { css } from 'styled-components';
+import { D2PStatusUpdate } from 'types';
 import { LinkButton, LoadingIndicator } from 'ui';
 
 import { useLivenessCheckMachine } from '../../components/machine-provider';
 import useGetD2PStatus, { D2PStatus } from '../../hooks/d2p/use-get-d2p-status';
-import useUpdateD2PStatus, {
-  D2PStatusUpdate,
-} from '../../hooks/d2p/use-update-d2p-status';
+import useUpdateD2PStatus from '../../hooks/d2p/use-update-d2p-status';
 
 const QRCodeScanned = () => {
   const [state, send] = useLivenessCheckMachine();

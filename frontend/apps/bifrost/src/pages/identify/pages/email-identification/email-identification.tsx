@@ -1,21 +1,19 @@
 import { useRequestErrorToast } from 'hooks';
 import React, { useState } from 'react';
-import useIdentify, {
-  IdentifyResponse,
-} from 'src/pages/identify/hooks/use-identify';
+import useIdentify from 'src/pages/identify/hooks/use-identify';
+import { Events } from 'src/utils/state-machine/identify/types';
 import {
   ChallengeData,
   ChallengeKind,
-  Events,
-} from 'src/utils/state-machine/identify/types';
-import { UserData } from 'src/utils/state-machine/types';
-import { UserDataAttribute } from 'types';
+  IdentifyResponse,
+  IdentifyVerifyResponse,
+  UserData,
+  UserDataAttribute,
+} from 'types';
 
 import generateLoginDeviceResponse from '../../../../utils/biometric/login-challenge-response';
 import useIdentifyMachine from '../../hooks/use-identify-machine';
-import useIdentifyVerify, {
-  IdentifyVerifyResponse,
-} from '../../hooks/use-identify-verify';
+import useIdentifyVerify from '../../hooks/use-identify-verify';
 import ChallengePicker from './components/challenge-picker';
 import EmailIdentificationForm from './components/email-identification-form';
 import EmailIdentificationHeader from './components/email-identification-header';

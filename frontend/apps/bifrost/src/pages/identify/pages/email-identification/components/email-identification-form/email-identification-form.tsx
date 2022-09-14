@@ -3,8 +3,7 @@ import Link from 'next/link';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import useIsSandbox from 'src/hooks/use-is-sandbox';
-import { UserData } from 'src/utils/state-machine/types';
-import { UserDataAttribute } from 'types';
+import { UserData, UserDataAttribute } from 'types';
 import { Box, Button, TextInput, Typography } from 'ui';
 
 import EMAIL_SANDBOX_REGEX from './email-identification-form.constants';

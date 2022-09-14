@@ -2,24 +2,14 @@ import { useMutation } from '@tanstack/react-query';
 import base64url from 'base64url';
 import request, { RequestError } from 'request';
 import { BIOMETRIC_AUTH_HEADER } from 'src/config/constants';
-
-export type RegisterRequest = {
-  authToken: string;
-};
-
-export type RegisterResponse = {
-  data: string;
-};
-
-type ChallengeJson = {
-  userVaultId: string;
-  credentialId: string;
-  publicKey: PublicKeyCredentialCreationOptions;
-  attestationData: string[];
-};
+import {
+  BiometricRegisterChallengeJson,
+  BiometricRegisterRequest,
+  BiometricRegisterResponse,
+} from 'types';
 
 const generateDeviceResponse = async (challenge: string) => {
-  const challengeJson = JSON.parse(challenge) as ChallengeJson;
+  const challengeJson = JSON.parse(challenge) as BiometricRegisterChallengeJson;
   const { publicKey } = challengeJson;
   publicKey.challenge = base64url.toBuffer(
     publicKey.challenge as unknown as string,
@@ -48,7 +38,7 @@ const generateDeviceResponse = async (challenge: string) => {
   return JSON.stringify(pk);
 };
 
-const register = async (payload: RegisterRequest) => {
+const register = async (payload: BiometricRegisterRequest) => {
   const { authToken } = payload;
   const initResponse = await request<{
     challengeToken: string;
@@ -65,7 +55,7 @@ const register = async (payload: RegisterRequest) => {
   const { challengeToken, challengeJson } = initResponse.data;
   const deviceResponseJson = await generateDeviceResponse(challengeJson);
 
-  const response = await request<RegisterResponse>({
+  const response = await request<BiometricRegisterResponse>({
     method: 'POST',
     url: '/hosted/user/biometric',
     data: {
@@ -80,6 +70,10 @@ const register = async (payload: RegisterRequest) => {
 };
 
 const useRegister = () =>
-  useMutation<RegisterResponse, RequestError, RegisterRequest>(register);
+  useMutation<
+    BiometricRegisterResponse,
+    RequestError,
+    BiometricRegisterRequest
+  >(register);
 
 export default useRegister;

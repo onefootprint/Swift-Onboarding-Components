@@ -1,10 +1,8 @@
 import { useTranslation } from 'hooks';
 import React from 'react';
 import { Events } from 'src/utils/state-machine/onboarding';
-import {
-  CollectedDataOption,
-  ResidentialAddress as ResidentialAddressData,
-} from 'src/utils/state-machine/types';
+import { ResidentialAddress as ResidentialAddressData } from 'src/utils/state-machine/types';
+import { CollectedDataOption } from 'types';
 import { useToast } from 'ui';
 
 import useSyncData from '../../../../hooks/use-sync-data';

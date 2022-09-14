@@ -1,8 +1,8 @@
 import { useTranslation } from 'hooks';
 import React from 'react';
 import { useForm } from 'react-hook-form';
-import { CollectedDataOption } from 'src/types/data-kind';
 import styled, { css } from 'styled-components';
+import { CollectedDataOption } from 'types';
 import { Checkbox } from 'ui';
 
 import type { DataKindForm } from '../../create-onboarding-config.types';

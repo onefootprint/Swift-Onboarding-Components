@@ -1,5 +1,5 @@
 import { useQueryClient } from '@tanstack/react-query';
-import type { ApiKey } from 'src/types/api-key';
+import { ApiKey } from 'types';
 
 const useUpdateApiKeyCache = () => {
   const queryClient = useQueryClient();

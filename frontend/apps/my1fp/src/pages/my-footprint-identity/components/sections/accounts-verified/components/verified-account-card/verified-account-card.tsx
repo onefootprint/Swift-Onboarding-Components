@@ -1,9 +1,8 @@
 import Image from 'next/image';
 import React from 'react';
 import styled, { css } from 'styled-components';
+import { AuthorizedOrg, AuthorizedOrgOnboarding } from 'types';
 import { Typography } from 'ui';
-
-import { AuthorizedOrg, AuthorizedOrgOnboarding } from '../../types';
 
 type VerifiedAccountCardProps = {
   org: AuthorizedOrg;

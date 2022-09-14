@@ -4,16 +4,7 @@ import {
   BIFROST_AUTH_HEADER,
   CLIENT_PUBLIC_KEY_HEADER,
 } from 'src/config/constants';
-
-export type OnboardingCompleteRequest = {
-  authToken: string;
-  tenantPk: string;
-};
-
-export type OnboardingCompleteResponse = {
-  validationToken: string; // A cryptographically generated auth token to authenticate a session
-  missingWebauthnCredentials: boolean;
-};
+import { OnboardingCompleteRequest, OnboardingCompleteResponse } from 'types';
 
 const onboardingCompleteRequest = async (
   payload: OnboardingCompleteRequest,

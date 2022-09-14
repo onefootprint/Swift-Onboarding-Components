@@ -1,15 +1,13 @@
-import useIdentify, {
-  IdentifyResponse,
-} from 'src/pages/identify/hooks/use-identify';
-import useIdentityVerify, {
-  IdentifyVerifyResponse,
-} from 'src/pages/identify/hooks/use-identify-verify';
+import useIdentify from 'src/pages/identify/hooks/use-identify';
+import useIdentityVerify from 'src/pages/identify/hooks/use-identify-verify';
 import generateLoginDeviceResponse from 'src/utils/biometric/login-challenge-response';
+import { Events } from 'src/utils/state-machine/identify/types';
 import {
   ChallengeData,
   ChallengeKind,
-  Events,
-} from 'src/utils/state-machine/identify/types';
+  IdentifyResponse,
+  IdentifyVerifyResponse,
+} from 'types';
 
 import useIdentifyMachine from '../../../hooks/use-identify-machine';
 

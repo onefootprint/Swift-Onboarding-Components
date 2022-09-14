@@ -1,26 +1,8 @@
 import { useMutation } from '@tanstack/react-query';
 import request, { RequestError } from 'request';
+import { UserDecryptRequest, UserDecryptResponse } from 'types';
 
 import { MY1FP_AUTH_HEADER } from '../../config/constants';
-
-export type UserDecryptRequest = {
-  attributes: string[];
-  authToken: string;
-};
-
-export type UserDecryptResponse = {
-  city: string | null;
-  country: string | null;
-  dob: string | null;
-  email: string;
-  firstName: string | null;
-  lastName: string | null;
-  phoneNumber: string | null;
-  state: string | null;
-  streetAddress: string | null;
-  streetAddress2: string | null;
-  zip: string | null;
-};
 
 const decryptUserRequest = async (payload: UserDecryptRequest) => {
   const response = await request<UserDecryptResponse>({

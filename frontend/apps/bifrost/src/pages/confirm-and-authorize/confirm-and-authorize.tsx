@@ -12,8 +12,8 @@ import {
 import React from 'react';
 import { useBifrostMachine } from 'src/components/bifrost-machine-provider';
 import NavigationHeader from 'src/components/navigation-header';
-import { CollectedDataOption } from 'src/utils/state-machine/types';
 import styled, { css } from 'styled-components';
+import { CollectedDataOption } from 'types';
 import { FootprintButton, Typography } from 'ui';
 
 import useConfirmOnboardingData from './hooks/use-confirm-onboarding-data';

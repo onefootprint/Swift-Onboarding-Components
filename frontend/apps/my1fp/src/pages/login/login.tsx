@@ -5,12 +5,11 @@ import { useRouter } from 'next/router';
 import React from 'react';
 import { getErrorMessage, RequestError } from 'request';
 import styled, { css } from 'styled-components';
+import { UserDecryptResponse } from 'types';
 import { FootprintButton, LinkButton, Typography, useToast } from 'ui';
 
 import useUserSession from '../../hooks/use-session-user';
-import useUserDecrypt, {
-  UserDecryptResponse,
-} from '../../hooks/use-user-decrypt';
+import useUserDecrypt from '../../hooks/use-user-decrypt';
 import attributes from './login.constants';
 
 const Login = () => {

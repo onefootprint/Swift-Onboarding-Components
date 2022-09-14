@@ -1,11 +1,6 @@
 import { DeviceInfo } from 'hooks';
-import {
-  CollectedDataOption,
-  OnboardingData,
-  TenantInfo,
-  UserData,
-} from 'src/utils/state-machine/types';
-import { IdentifyType } from 'types';
+import { OnboardingData, TenantInfo } from 'src/utils/state-machine/types';
+import { CollectedDataOption, IdentifyType, UserData } from 'types';
 
 export enum States {
   init = 'Init',

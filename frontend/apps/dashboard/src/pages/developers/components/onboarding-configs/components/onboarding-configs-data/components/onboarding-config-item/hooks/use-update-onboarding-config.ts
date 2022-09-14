@@ -2,19 +2,17 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRequestErrorToast } from 'hooks';
 import request, { RequestError } from 'request';
 import useSessionUser, { AuthHeaders } from 'src/hooks/use-session-user';
-import type { OnboardingConfig } from 'src/types/onboarding-config';
-
-export type UpdateOnboardingConfigRequest = Partial<OnboardingConfig> & {
-  id: string;
-};
-
-export type UpdateOnboardingConfigResponse = OnboardingConfig;
+import {
+  OnboardingConfig,
+  OrgOnboardingConfigUpdateRequest,
+  OrgOnboardingConfigUpdateResponse,
+} from 'types';
 
 const updateOnboardingConfig = async (
   authHeaders: AuthHeaders,
-  onboardingConfig: UpdateOnboardingConfigRequest,
+  onboardingConfig: OrgOnboardingConfigUpdateRequest,
 ) => {
-  const response = await request<UpdateOnboardingConfigResponse>({
+  const response = await request<OrgOnboardingConfigUpdateResponse>({
     headers: authHeaders,
     method: 'PATCH',
     url: `/org/onboarding_configs/${onboardingConfig.id}`,
@@ -32,11 +30,11 @@ const useUpdateStatus = () => {
   const showErrorToast = useRequestErrorToast();
 
   return useMutation<
-    UpdateOnboardingConfigResponse,
+    OrgOnboardingConfigUpdateResponse,
     RequestError,
-    UpdateOnboardingConfigRequest
+    OrgOnboardingConfigUpdateRequest
   >(
-    (data: UpdateOnboardingConfigRequest) =>
+    (data: OrgOnboardingConfigUpdateRequest) =>
       updateOnboardingConfig(authHeaders, data),
     {
       onMutate: async updatedOnboardingConfig => {

@@ -3,8 +3,8 @@ import { useTranslation } from 'hooks';
 import { IcoClose24, IcoFaceid24, IcoSmartphone24 } from 'icons';
 import React, { useEffect, useState } from 'react';
 import { useIdentifyMachine } from 'src/components/identify-machine-provider';
-import { ChallengeKind } from 'src/utils/state-machine/identify/types';
 import styled, { css } from 'styled-components';
+import { ChallengeKind } from 'types';
 import { Button, Overlay, Typography } from 'ui';
 
 import ChallengeOption from './components/challenge-option';

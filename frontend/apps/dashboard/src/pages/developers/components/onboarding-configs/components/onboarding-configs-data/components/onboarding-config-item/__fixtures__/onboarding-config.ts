@@ -1,5 +1,4 @@
-import { CollectedDataOption } from 'src/types/data-kind';
-import type { OnboardingConfig } from 'src/types/onboarding-config';
+import { CollectedDataOption, OnboardingConfig } from 'types';
 
 export const sandboxOnboardingConfig: OnboardingConfig = {
   id: 'ob_config_id_sFMH49H7gtMLdbO4FjywO',

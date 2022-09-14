@@ -1,12 +1,5 @@
 import { UIState } from 'themes';
-
-export enum OnboardingStatus {
-  verified = 'verified',
-  manualReview = 'manual_review',
-  processing = 'processing',
-  failed = 'failed',
-  vaultOnly = 'vault-only',
-}
+import { OnboardingStatus } from 'types';
 
 export const statusToPriority = {
   [OnboardingStatus.verified]: 4,

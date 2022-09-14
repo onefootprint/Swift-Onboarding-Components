@@ -1,5 +1,5 @@
 import { DeviceInfo } from 'hooks';
-import { IdentifyType } from 'types';
+import { ChallengeData, IdentifyType } from 'types';
 
 export enum States {
   emailIdentification = 'emailIdentification',
@@ -8,20 +8,6 @@ export enum States {
   biometricLoginRetry = 'biometricLoginRetry',
   success = 'success',
 }
-
-export enum ChallengeKind {
-  sms = 'sms',
-  biometric = 'biometric',
-}
-
-export type ChallengeData = {
-  challengeToken: string;
-  challengeKind: ChallengeKind;
-  phoneNumberLastTwo?: string;
-  phoneCountry?: string;
-  biometricChallengeJson?: string;
-  retryDisabledUntil?: Date;
-};
 
 export type MachineContext = {
   device: DeviceInfo;

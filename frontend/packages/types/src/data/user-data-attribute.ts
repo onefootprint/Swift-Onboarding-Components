@@ -1,21 +1,20 @@
-import { UserDataAttribute, UserDataAttributeKey } from 'types';
-
-export enum CollectedDataOption {
-  name = 'name',
-  dob = 'dob',
-  ssn4 = 'ssn4',
-  ssn9 = 'ssn9',
-  fullAddress = 'full_address',
-  partialAddress = 'partial_address',
+export enum UserDataAttribute {
+  firstName = 'first_name',
+  lastName = 'last_name',
   email = 'email',
   phoneNumber = 'phone_number',
+  dob = 'dob',
+  ssn9 = 'ssn9',
+  ssn4 = 'ssn4',
+  addressLine1 = 'address_line1',
+  addressLine2 = 'address_line2',
+  city = 'city',
+  state = 'state',
+  country = 'country',
+  zip = 'zip',
 }
 
-export const dataKindToType = Object.fromEntries(
-  Object.entries(UserDataAttribute).map(x => [x[1], x[0]]),
-) as Record<UserDataAttribute, UserDataAttributeKey>;
-
-export const ALL_FIELDS: UserDataAttributeKey[] = [
+export const UserDataAttributeKeys: UserDataAttributeKey[] = [
   'firstName',
   'lastName',
   'email',
@@ -47,4 +46,4 @@ export const dataKindToDisplayName: Record<string, String> = {
   [UserDataAttribute.country]: 'Country',
 };
 
-export type DecryptedUserAttributes = Record<UserDataAttributeKey, string>;
+export type UserDataAttributeKey = keyof typeof UserDataAttribute;

@@ -1,11 +1,12 @@
 import { useMemo } from 'react';
+import { statusToPriority } from 'src/constants/onboarding-status-display';
 import {
-  ALL_FIELDS,
   OnboardingStatus,
   ScopedUser,
-  statusToPriority,
-} from 'src/types';
-import { UserDataAttribute, UserDataAttributeKey } from 'types';
+  UserDataAttribute,
+  UserDataAttributeKey,
+  UserDataAttributeKeys,
+} from 'types';
 
 import { UserAttributes, UserData } from './use-user-data';
 
@@ -45,17 +46,19 @@ const useJoinUsers = (
         // This object is composed by joining info from previous POST /users/decrypt calls and
         // GET /users calls
         const attributes = Object.fromEntries(
-          ALL_FIELDS.map((userAttributeKey: UserDataAttributeKey) => [
-            userAttributeKey,
-            {
-              value: decryptedData[userAttributeKey]?.value,
-              exists:
-                decryptedData[userAttributeKey]?.exists ||
-                scoped_user.identityDataAttributes.includes(
-                  UserDataAttribute[userAttributeKey],
-                ),
-            } as UserData,
-          ]),
+          UserDataAttributeKeys.map(
+            (userAttributeKey: UserDataAttributeKey) => [
+              userAttributeKey,
+              {
+                value: decryptedData[userAttributeKey]?.value,
+                exists:
+                  decryptedData[userAttributeKey]?.exists ||
+                  scoped_user.identityDataAttributes.includes(
+                    UserDataAttribute[userAttributeKey],
+                  ),
+              } as UserData,
+            ],
+          ),
         );
 
         // The status we display for the user is the maximum status of all the onboardings

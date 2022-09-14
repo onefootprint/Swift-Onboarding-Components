@@ -2,14 +2,7 @@ import { useMutation } from '@tanstack/react-query';
 import request, { RequestError } from 'request';
 import { BIFROST_AUTH_HEADER } from 'src/config/constants';
 import generateRegisterDeviceResponse from 'src/utils/biometric/register-challenge-response';
-
-export type BiometricRegisterRequest = {
-  authToken: string;
-};
-
-export type BiometricRegisterResponse = {
-  data: string;
-};
+import { BiometricRegisterRequest, BiometricRegisterResponse } from 'types';
 
 const biometricRegister = async (payload: BiometricRegisterRequest) => {
   const { authToken } = payload;

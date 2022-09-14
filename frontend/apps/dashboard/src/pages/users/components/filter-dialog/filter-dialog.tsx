@@ -10,14 +10,11 @@ import DateRangeSelector, {
   dateRangeSelectorFormSchema,
   DateRangeSelectorFormValues,
 } from 'src/components/date-range-selector';
+import { statusToDisplayText } from 'src/constants/onboarding-status-display';
 import { useFilters } from 'src/pages/users/hooks/use-filters';
-import {
-  getDateRange,
-  OnboardingStatus,
-  serializeDateRange,
-  statusToDisplayText,
-} from 'src/types';
+import { getDateRange, serializeDateRange } from 'src/utils/date-range';
 import styled from 'styled-components';
+import { OnboardingStatus } from 'types';
 import { Box, Button, Checkbox, Dialog, Divider, Typography } from 'ui';
 
 type FormValues = DateRangeSelectorFormValues & {

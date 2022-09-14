@@ -9,7 +9,7 @@ import {
   AccessEventFilters,
   useFilters,
 } from 'src/pages/security-logs/hooks/use-filters';
-import { dateRangeToFilterParams } from 'src/types';
+import { dateRangeToFilterParams } from 'src/utils/date-range';
 import { AccessEvent } from 'types';
 import { useDebounce } from 'usehooks-ts';
 

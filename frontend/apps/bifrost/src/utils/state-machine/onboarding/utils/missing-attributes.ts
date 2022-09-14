@@ -2,7 +2,8 @@ import {
   CollectedDataOption,
   OptionToRequiredAttributes,
   UserData,
-} from '../../types';
+} from 'types';
+
 import { States } from '../types';
 
 // The list of CollectedDataOptions that may be input on the basic info screen

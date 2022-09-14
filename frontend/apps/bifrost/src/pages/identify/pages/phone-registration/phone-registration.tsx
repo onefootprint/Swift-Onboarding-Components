@@ -5,8 +5,9 @@ import React from 'react';
 import NavigationHeader from 'src/components/navigation-header';
 import useIdentify from 'src/pages/identify/hooks/use-identify';
 import useIdentifyChallenge from 'src/pages/identify/hooks/use-identify-challenge';
-import { ChallengeKind, Events } from 'src/utils/state-machine/identify/types';
+import { Events } from 'src/utils/state-machine/identify/types';
 import styled, { css } from 'styled-components';
+import { ChallengeKind } from 'types';
 import { Box, LinkButton, Typography } from 'ui';
 
 import useIdentifyMachine from '../../hooks/use-identify-machine';

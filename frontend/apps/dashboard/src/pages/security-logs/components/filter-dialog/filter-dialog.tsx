@@ -12,7 +12,7 @@ import DateRangeSelector, {
   dateRangeSelectorFormSchema,
   DateRangeSelectorFormValues,
 } from 'src/components/date-range-selector';
-import { dataKindToType, getDateRange, serializeDateRange } from 'src/types';
+import { getDateRange, serializeDateRange } from 'src/utils/date-range';
 import styled from 'styled-components';
 import type { UserDataAttributeKey } from 'types';
 import { UserDataAttribute } from 'types';
@@ -23,6 +23,10 @@ import { useFilters } from '../../hooks/use-filters';
 type FormValues = DateRangeSelectorFormValues & {
   // TODO move checkboxes to useForm
 };
+
+export const dataKindToType = Object.fromEntries(
+  Object.entries(UserDataAttribute).map(x => [x[1], x[0]]),
+) as Record<UserDataAttribute, UserDataAttributeKey>;
 
 const FilterDialog = () => {
   const [showDialog, setShowDialog] = useState(false);

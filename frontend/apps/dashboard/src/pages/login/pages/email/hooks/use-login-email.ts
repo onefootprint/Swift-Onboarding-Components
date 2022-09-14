@@ -1,15 +1,9 @@
 import { useMutation } from '@tanstack/react-query';
 import request, { RequestError } from 'request';
+import { OrgAuthMagicLinkRequest, OrgAuthMagicLinkResponse } from 'types';
 
-export type EmailLoginRequest = {
-  emailAddress: string;
-  redirectUrl: string;
-};
-
-export type EmailLoginResponse = {};
-
-const loginEmailRequest = async (payload: EmailLoginRequest) => {
-  const response = await request<EmailLoginResponse>({
+const loginEmailRequest = async (payload: OrgAuthMagicLinkRequest) => {
+  const response = await request<OrgAuthMagicLinkResponse>({
     method: 'POST',
     url: '/org/auth/magic_link',
     data: payload,
@@ -18,7 +12,7 @@ const loginEmailRequest = async (payload: EmailLoginRequest) => {
 };
 
 const useLoginEmail = () =>
-  useMutation<EmailLoginResponse, RequestError, EmailLoginRequest>(
+  useMutation<OrgAuthMagicLinkResponse, RequestError, OrgAuthMagicLinkRequest>(
     loginEmailRequest,
   );
 

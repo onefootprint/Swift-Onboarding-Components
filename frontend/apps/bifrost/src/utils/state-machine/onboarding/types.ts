@@ -1,12 +1,11 @@
 import { DeviceInfo } from 'hooks';
 import {
   BasicInformation,
-  CollectedDataOption,
   ResidentialAddress,
   SSNInformation,
   TenantInfo,
-  UserData,
 } from 'src/utils/state-machine/types';
+import { CollectedDataOption, UserData } from 'types';
 
 export enum States {
   onboardingVerification = 'onboardingVerification',

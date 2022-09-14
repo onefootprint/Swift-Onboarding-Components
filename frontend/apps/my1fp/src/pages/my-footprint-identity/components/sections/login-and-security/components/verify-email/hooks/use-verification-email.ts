@@ -1,18 +1,10 @@
 import { useMutation } from '@tanstack/react-query';
 import request, { RequestError } from 'request';
 import { MY1FP_AUTH_HEADER } from 'src/config/constants';
+import { UserEmailChallengeRequest, UserEmailChallengeResponse } from 'types';
 
-export type VerificationEmailRequest = {
-  id: string;
-  authToken: string;
-};
-
-export type VerificationEmailResponse = {
-  success: boolean;
-};
-
-const verificationEmailRequest = async (payload: VerificationEmailRequest) => {
-  const response = await request<VerificationEmailResponse>({
+const verificationEmailRequest = async (payload: UserEmailChallengeRequest) => {
+  const response = await request<UserEmailChallengeResponse>({
     method: 'post',
     url: '/hosted/user/email/challenge',
     data: {
@@ -27,9 +19,9 @@ const verificationEmailRequest = async (payload: VerificationEmailRequest) => {
 
 const useVerificationEmail = () =>
   useMutation<
-    VerificationEmailResponse,
+    UserEmailChallengeResponse,
     RequestError,
-    VerificationEmailRequest
+    UserEmailChallengeRequest
   >(verificationEmailRequest);
 
 export default useVerificationEmail;

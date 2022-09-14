@@ -2,7 +2,10 @@ import { useTranslation } from 'hooks';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
-import { statusToBadgeVariant, statusToDisplayText } from 'src/types';
+import {
+  statusToBadgeVariant,
+  statusToDisplayText,
+} from 'src/constants/onboarding-status-display';
 import styled from 'styled-components';
 import type { TableRow } from 'ui';
 import {

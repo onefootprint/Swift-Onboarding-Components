@@ -2,9 +2,8 @@ import { useAutoAnimate } from '@formkit/auto-animate/react';
 import { useTranslation } from 'hooks';
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { CollectedDataOption } from 'src/types/data-kind';
 import styled, { css } from 'styled-components';
-import { UserDataAttribute } from 'types';
+import { CollectedDataOption, UserDataAttribute } from 'types';
 import { Box, Checkbox, RadioInput } from 'ui';
 
 import type { DataKindForm } from '../../create-onboarding-config.types';

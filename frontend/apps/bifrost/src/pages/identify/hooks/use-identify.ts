@@ -1,45 +1,11 @@
 import { useMutation } from '@tanstack/react-query';
 import request, { RequestError } from 'request';
-import {
-  ChallengeData,
-  ChallengeKind,
-} from 'src/utils/state-machine/identify/types';
-import { IdentifyType } from 'types';
+import { IdentifyRequest, IdentifyResponse } from 'types';
 
 import getRetryDisabledUntil from './get-retry-disabled-until';
 
-export type IdentifyRequest = {
-  identifier: {
-    email?: string;
-    phoneNumber?: string;
-  };
-  identifyType: IdentifyType;
-  preferredChallengeKind?: ChallengeKind;
-};
-
-export type IdentifyResponse = {
-  userFound: boolean;
-  challengeData?: ChallengeData;
-  availableChallengeKinds?: ChallengeKind[];
-};
-
-type PrivateChallengeData = {
-  challengeToken: string;
-  challengeKind: ChallengeKind;
-  phoneNumberLastTwo: string;
-  phoneCountry: string;
-  biometricChallengeJson?: string;
-  timeBeforeRetryS: number;
-};
-
-type PrivateIdentifyResponse = {
-  userFound: boolean;
-  challengeData?: PrivateChallengeData;
-  availableChallengeKinds?: ChallengeKind[];
-};
-
 const identifyRequest = async (payload: IdentifyRequest) => {
-  const response = await request<PrivateIdentifyResponse>({
+  const response = await request<IdentifyResponse>({
     method: 'POST',
     url: '/hosted/identify',
     data: payload,
@@ -51,13 +17,9 @@ const identifyRequest = async (payload: IdentifyRequest) => {
     availableChallengeKinds,
     challengeData: challengeData
       ? {
-          challengeToken: challengeData.challengeToken,
-          challengeKind: challengeData.challengeKind,
-          phoneNumberLastTwo: challengeData.phoneNumberLastTwo,
-          phoneCountry: challengeData.phoneCountry,
-          biometricChallengeJson: challengeData.biometricChallengeJson,
+          ...challengeData,
           retryDisabledUntil: getRetryDisabledUntil(
-            challengeData.timeBeforeRetryS,
+            challengeData.timeBeforeRetryS ?? 0,
           ),
         }
       : undefined,

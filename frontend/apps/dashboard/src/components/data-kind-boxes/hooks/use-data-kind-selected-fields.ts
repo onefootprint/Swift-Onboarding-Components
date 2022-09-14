@@ -1,9 +1,8 @@
 import { ChangeEvent, useReducer } from 'react';
-import { ALL_FIELDS } from 'src/types';
-import { UserDataAttributeKey } from 'types';
+import { UserDataAttributeKey, UserDataAttributeKeys } from 'types';
 
 const initialFields = Object.fromEntries(
-  ALL_FIELDS.map(x => [x, false]),
+  UserDataAttributeKeys.map(x => [x, false]),
 ) as SelectedFields;
 
 type SelectedFields = Record<UserDataAttributeKey, boolean>;

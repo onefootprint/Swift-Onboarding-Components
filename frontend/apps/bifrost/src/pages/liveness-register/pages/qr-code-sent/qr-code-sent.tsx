@@ -3,11 +3,10 @@ import { useTranslation } from 'hooks';
 import React, { useEffect } from 'react';
 import NavigationHeader from 'src/components/navigation-header';
 import useGetD2PStatus, { D2PStatus } from 'src/hooks/d2p/use-get-d2p-status';
-import useUpdateD2PStatus, {
-  D2PStatusUpdate,
-} from 'src/hooks/d2p/use-update-d2p-status';
+import useUpdateD2PStatus from 'src/hooks/d2p/use-update-d2p-status';
 import { Events } from 'src/utils/state-machine/liveness-register';
 import styled, { css } from 'styled-components';
+import { D2PStatusUpdate } from 'types';
 import { LinkButton, LoadingIndicator } from 'ui';
 
 import { useLivenessRegisterMachine } from '../../components/machine-provider';

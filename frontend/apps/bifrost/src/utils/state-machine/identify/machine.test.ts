@@ -1,9 +1,9 @@
 import { DeviceInfo } from 'hooks';
-import { IdentifyType } from 'types';
+import { ChallengeKind, IdentifyType } from 'types';
 import { interpret } from 'xstate';
 
 import createIdentifyMachine from './machine';
-import { ChallengeKind, Events, States } from './types';
+import { Events, States } from './types';
 
 describe('Identify Machine Tests', () => {
   const createMachine = (deviceInfo: DeviceInfo) =>

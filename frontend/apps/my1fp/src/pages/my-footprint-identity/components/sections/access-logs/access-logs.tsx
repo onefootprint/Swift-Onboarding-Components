@@ -2,11 +2,11 @@ import { useTranslation } from 'hooks';
 import React from 'react';
 import useSessionUser from 'src/hooks/use-session-user';
 import styled from 'styled-components';
+import { AccessLog } from 'types';
 import { LinkButton, LoadingIndicator, Typography } from 'ui';
 
 import AccessLogsTimeline from './components/access-logs-timeline';
 import useGetAccessLogs from './hooks/use-get-access-logs';
-import { AccessLog } from './types';
 
 const AccessLogs = () => {
   const { t } = useTranslation('pages.my-footprint-identity.access-logs');

@@ -4,7 +4,7 @@ import take from 'lodash/take';
 import request, { RequestError } from 'request';
 import { PaginatedRequestResponse } from 'request/src';
 import useSessionUser, { AuthHeaders } from 'src/hooks/use-session-user';
-import type { ApiKey } from 'src/types/api-key';
+import { ApiKey } from 'types';
 
 export type GetApiKeysRequest = {
   authHeaders: AuthHeaders;

@@ -1,12 +1,11 @@
 import { useRequestErrorToast, useTranslation } from 'hooks';
 import React from 'react';
 import { Events } from 'src/utils/state-machine/identify/types';
+import { IdentifyVerifyResponse } from 'types';
 import { PinInput } from 'ui';
 
 import useIdentifyMachine from '../../../../hooks/use-identify-machine';
-import useIdentifyVerify, {
-  IdentifyVerifyResponse,
-} from '../../../../hooks/use-identify-verify';
+import useIdentifyVerify from '../../../../hooks/use-identify-verify';
 import ResendCodeButton from '../resend-code-button/resend-code-button';
 import useUserEmail from './hooks/use-user-email';
 

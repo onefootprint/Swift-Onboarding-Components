@@ -1,7 +1,10 @@
 import React from 'react';
 import { getErrorMessage, RequestError } from 'request';
-import { DecryptedUserAttributes } from 'src/types';
-import { UserDataAttribute, UserDataAttributeKey } from 'types';
+import {
+  DecryptedUserAttributes,
+  UserDataAttribute,
+  UserDataAttributeKey,
+} from 'types';
 import { Box, Divider, useToast } from 'ui';
 import { useEffectOnce } from 'usehooks-ts';
 

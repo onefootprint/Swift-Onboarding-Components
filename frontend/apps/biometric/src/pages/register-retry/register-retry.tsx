@@ -1,6 +1,7 @@
 import { useTranslation } from 'hooks';
 import React, { useEffect } from 'react';
 import styled, { css } from 'styled-components';
+import { D2PStatusUpdate } from 'types';
 import { Button } from 'ui';
 
 import HeaderTitle from '../../components/header-title';
@@ -9,9 +10,7 @@ import useBiometricMachine, {
 } from '../../hooks/use-d2p-mobile-machine';
 import useGetD2PStatus, { D2PStatus } from '../../hooks/use-get-d2p-status';
 import useRegister from '../../hooks/use-register';
-import useUpdateD2pStatus, {
-  D2PStatusUpdate,
-} from '../../hooks/use-update-d2p-status';
+import useUpdateD2pStatus from '../../hooks/use-update-d2p-status';
 
 const RegisterRetry = () => {
   const { t } = useTranslation('pages.register-retry');

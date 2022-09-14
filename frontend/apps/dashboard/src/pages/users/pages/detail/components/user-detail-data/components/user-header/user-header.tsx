@@ -1,6 +1,9 @@
 import React from 'react';
+import {
+  statusToBadgeVariant,
+  statusToDisplayText,
+} from 'src/constants/onboarding-status-display';
 import { User } from 'src/pages/users/hooks/use-join-users';
-import { statusToBadgeVariant, statusToDisplayText } from 'src/types';
 import styled, { css } from 'styled-components';
 import { Badge, CodeInline, Typography } from 'ui';
 

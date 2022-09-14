@@ -1,5 +1,5 @@
 import { useReducer } from 'react';
-import { CollectedDataOption } from 'src/types';
+import { CollectedDataOption } from 'types';
 
 import type { DataKindForm } from '../create-onboarding-config.types';
 

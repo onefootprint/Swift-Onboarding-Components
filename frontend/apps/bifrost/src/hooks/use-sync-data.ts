@@ -1,9 +1,12 @@
 import { RequestError } from 'request/src';
-import useUserData, { UserDataObj } from 'src/hooks/use-user-data';
-import { UserData } from 'src/utils/state-machine/types';
-import { UserDataAttribute } from 'types';
+import {
+  UserData,
+  UserDataAttribute,
+  UserDataObj,
+  UserDataResponse,
+} from 'types';
 
-import { UserDataResponse } from './use-user-data/use-user-data';
+import useUserData from './use-user-data';
 
 const dataHasName = (data: UserData) =>
   data[UserDataAttribute.firstName] || data[UserDataAttribute.lastName];

@@ -4,11 +4,12 @@ import { useRouter } from 'next/router';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import styled, { css } from 'styled-components';
+import { OrgAuthMagicLinkRequest } from 'types';
 import { Button, TextInput, Typography } from 'ui';
 
 import BackButton from '../../components/back-button/back-button';
 import LogoAndText from '../../components/logo-and-text';
-import useLoginEmail, { EmailLoginRequest } from './hooks/use-login-email';
+import useLoginEmail from './hooks/use-login-email';
 
 type FormData = {
   email: string;
@@ -25,7 +26,7 @@ const EmailLogin = () => {
   } = useForm<FormData>();
 
   const onSubmit = ({ email }: FormData) => {
-    const request: EmailLoginRequest = {
+    const request: OrgAuthMagicLinkRequest = {
       emailAddress: email,
       redirectUrl: `${window.location.origin}/auth`,
     };

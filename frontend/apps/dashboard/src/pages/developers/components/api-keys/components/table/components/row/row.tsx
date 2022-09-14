@@ -1,7 +1,7 @@
 import { useTranslation } from 'hooks';
 import { IcoDotsHorizontal24 } from 'icons';
 import React from 'react';
-import type { ApiKey } from 'src/types/api-key';
+import type { ApiKey } from 'types';
 import { Badge, Dropdown } from 'ui';
 
 import KeyCell from './components/key-cell';

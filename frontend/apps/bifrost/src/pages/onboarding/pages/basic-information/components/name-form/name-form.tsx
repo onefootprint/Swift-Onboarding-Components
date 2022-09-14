@@ -6,9 +6,8 @@ import {
   isMissingResidentialAttribute,
   isMissingSsnAttribute,
 } from 'src/utils/state-machine/onboarding/utils/missing-attributes';
-import { UserData } from 'src/utils/state-machine/types';
 import styled, { css } from 'styled-components';
-import { UserDataAttribute } from 'types';
+import { UserData, UserDataAttribute } from 'types';
 import { Button, Grid, TextInput } from 'ui';
 
 import ProgressHeader from '../../../../components/progress-header/progress-header';

@@ -1,7 +1,7 @@
 import { useTranslation } from 'hooks';
 import React from 'react';
-import type { OnboardingConfig } from 'src/types/onboarding-config';
 import styled, { css } from 'styled-components';
+import { OnboardingConfig } from 'types';
 import { Typography } from 'ui';
 
 import OnboardingConfigItem from './components/onboarding-config-item';

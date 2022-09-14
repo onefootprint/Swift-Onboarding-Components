@@ -2,22 +2,20 @@ import { useMutation } from '@tanstack/react-query';
 import { partial } from 'lodash';
 import request, { RequestError } from 'request';
 import useSessionUser, { AuthHeaders } from 'src/hooks/use-session-user';
-import { DecryptedUserAttributes } from 'src/types';
-import { UserDataAttribute } from 'types';
+import {
+  DecryptedUserAttributes,
+  DecryptUserRequest,
+  DecryptUserResponse,
+  UserDataAttribute,
+} from 'types';
 
 import useUserData from './use-user-data';
-
-export type DecryptUserRequest = {
-  footprintUserId: string;
-  fields: string[];
-  reason: string;
-};
 
 const decryptUserRequest = async (
   authHeaders: AuthHeaders,
   data: DecryptUserRequest,
 ) => {
-  const response = await request<DecryptedUserAttributes>({
+  const response = await request<DecryptUserResponse>({
     method: 'POST',
     url: `/users/${data.footprintUserId}/identity/decrypt`,
     data: { fields: data.fields, reason: data.reason },
@@ -34,7 +32,7 @@ const useDecryptUser = () => {
   const { decryptedUsers, updateDecryptedUser, setLoading } = useUserData();
 
   const decryptUserMutation = useMutation<
-    DecryptedUserAttributes,
+    DecryptUserResponse,
     RequestError,
     DecryptUserRequest
   >(partial(decryptUserRequest, authHeaders));
@@ -43,7 +41,7 @@ const useDecryptUser = () => {
     userId: string;
     fields: UserDataAttribute[];
     reason: string;
-  }): Promise<DecryptedUserAttributes> =>
+  }): Promise<DecryptUserResponse> =>
     new Promise((resolve, reject) => {
       // Immediately set these attributes as loading
       setLoading(payload.userId, []);

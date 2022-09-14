@@ -6,6 +6,7 @@ export enum Vendor {
   experian = 'experian',
   twilio = 'twilio',
 }
+
 export const vendorToDisplayName: Record<Vendor, String> = {
   [Vendor.footprint]: 'Footprint',
   [Vendor.idology]: 'IDology',

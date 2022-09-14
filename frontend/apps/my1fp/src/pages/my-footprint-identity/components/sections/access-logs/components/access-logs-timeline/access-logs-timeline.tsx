@@ -1,8 +1,8 @@
 import React from 'react';
 import styled, { css } from 'styled-components';
+import { AccessLog } from 'types';
 import { Box } from 'ui';
 
-import { AccessLog } from '../../types';
 import AccessLogBody from '../access-log-body';
 import AccessLogHeader from '../access-log-header';
 

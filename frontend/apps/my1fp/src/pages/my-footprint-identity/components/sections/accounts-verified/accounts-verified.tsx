@@ -1,11 +1,11 @@
 import { useTranslation } from 'hooks';
 import React from 'react';
 import styled from 'styled-components';
+import { AuthorizedOrg } from 'types';
 import { LoadingIndicator, Typography } from 'ui';
 
 import VerifiedAccountCard from './components/verified-account-card';
 import useGetAuthorizedOrgs from './hooks/use-authorized-orgs';
-import { AuthorizedOrg } from './types';
 
 const AccountsVerified = () => {
   const { t } = useTranslation('pages.my-footprint-identity.access-logs');

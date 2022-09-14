@@ -1,4 +1,4 @@
-import { CollectedDataOption } from 'src/types/data-kind';
+import { CollectedDataOption } from 'types';
 
 export type NameFormData = {
   name: string;

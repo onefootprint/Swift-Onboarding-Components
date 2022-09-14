@@ -1,40 +1,7 @@
 import { useMutation } from '@tanstack/react-query';
 import request, { RequestError } from 'request';
 import { BIFROST_AUTH_HEADER } from 'src/config/constants';
-
-export type UserDataObj = {
-  address?: {
-    line1?: string;
-    line2?: string;
-    city?: string;
-    state?: string;
-    country?: string;
-    zip?: string;
-  };
-  zip_address?: {
-    country?: string;
-    zip?: string;
-  };
-  dob?: {
-    day?: number;
-    month?: number;
-    year?: number;
-  };
-  name?: {
-    firstName?: string;
-    lastName?: string;
-  };
-  ssn9?: string;
-  ssn4?: string;
-};
-
-export type UserDataRequest = {
-  data: UserDataObj;
-  authToken: string;
-  speculative?: boolean;
-};
-
-export type UserDataResponse = { data: string };
+import { UserDataRequest, UserDataResponse } from 'types';
 
 const userDataRequest = async (payload: UserDataRequest) => {
   const response = await request<UserDataResponse>({

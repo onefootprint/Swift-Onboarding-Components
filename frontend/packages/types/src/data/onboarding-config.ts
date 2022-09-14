@@ -1,4 +1,4 @@
-import { CollectedDataOption } from './data-kind';
+import { CollectedDataOption } from './collected-data-option';
 
 export type OnboardingConfig = {
   canAccessData: CollectedDataOption[];

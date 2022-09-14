@@ -1,11 +1,5 @@
 import base64url from 'base64url';
-
-type BiometricRegisterChallengeJson = {
-  userVaultId: string;
-  credentialId: string;
-  publicKey: PublicKeyCredentialCreationOptions;
-  attestationData: string[];
-};
+import { BiometricRegisterChallengeJson } from 'types';
 
 const createPublicKeyCredential = async (challenge: string) => {
   const challengeJson = JSON.parse(challenge) as BiometricRegisterChallengeJson;

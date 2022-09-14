@@ -21,7 +21,7 @@ import {
   VerificationInfo,
   VerificationInfoStatus,
   verificationInfoStatusToDisplayName,
-} from 'src/types';
+} from 'types';
 import { Tag, Typography } from 'ui';
 
 const iconForAttribute: Record<SignalAttribute, Icon> = {

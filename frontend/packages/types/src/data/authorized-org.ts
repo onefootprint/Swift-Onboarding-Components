@@ -1,4 +1,5 @@
-import { InsightEvent, UserDataAttribute } from 'types';
+import { InsightEvent } from './insight-event';
+import { UserDataAttribute } from './user-data-attribute';
 
 export type AuthorizedOrgOnboarding = {
   canAccessData: UserDataAttribute[];

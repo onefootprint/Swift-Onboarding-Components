@@ -2,8 +2,8 @@ import { DEMO_BASE_URL } from 'global-constants';
 import { useToggle, useTranslation } from 'hooks';
 import { IcoArrowTopRight16, IcoPencil16 } from 'icons';
 import React from 'react';
-import type { OnboardingConfig } from 'src/types/onboarding-config';
 import styled, { css } from 'styled-components';
+import { OnboardingConfig } from 'types';
 import { Badge, CodeInline, IconButton, LinkButton, Tag, Typography } from 'ui';
 
 import Table from '../../../table';

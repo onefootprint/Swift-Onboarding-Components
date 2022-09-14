@@ -1,17 +1,13 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import request, { RequestError } from 'request';
 import useSessionUser, { AuthHeaders } from 'src/hooks/use-session-user';
-import type { ApiKey } from 'src/types/api-key';
-
-export type UpdateApiKeyRequest = ApiKey;
-
-export type GetApiKeysResponse = ApiKey;
+import { ApiKey, OrgApiKeyUpdateRequest, OrgApiKeyUpdateResponse } from 'types';
 
 const updateApiKey = async (
   authHeaders: AuthHeaders,
-  params: UpdateApiKeyRequest,
+  params: OrgApiKeyUpdateRequest,
 ) => {
-  const response = await request<GetApiKeysResponse>({
+  const response = await request<OrgApiKeyUpdateResponse>({
     headers: authHeaders,
     method: 'PATCH',
     url: `/org/api_keys/${params.id}`,
@@ -27,10 +23,10 @@ const useUpdateStatus = (apiKey: ApiKey) => {
   const { authHeaders } = useSessionUser();
 
   const mutation = useMutation<
-    GetApiKeysResponse,
+    OrgApiKeyUpdateResponse,
     RequestError,
-    UpdateApiKeyRequest
-  >((data: UpdateApiKeyRequest) => updateApiKey(authHeaders, data), {
+    OrgApiKeyUpdateRequest
+  >((data: OrgApiKeyUpdateRequest) => updateApiKey(authHeaders, data), {
     onMutate: async updatedApiKey => {
       await queryClient.cancelQueries(['api-keys']);
       const previousApiKeys: ApiKey[] | undefined = queryClient.getQueryData([

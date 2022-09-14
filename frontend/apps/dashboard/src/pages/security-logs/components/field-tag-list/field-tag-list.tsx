@@ -1,5 +1,5 @@
 import React from 'react';
-import { dataKindToDisplayName } from 'src/types';
+import { dataKindToDisplayName } from 'types';
 import { Tag } from 'ui';
 
 type FieldTagListProps = {

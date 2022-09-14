@@ -1,9 +1,8 @@
 import { useTranslation } from 'hooks';
 import React from 'react';
 import styled, { css } from 'styled-components';
+import { AccessLog } from 'types';
 import { Box, Typography } from 'ui';
-
-import { AccessLog } from '../../types';
 
 type AccessLogBodyProps = {
   accessLog: AccessLog;

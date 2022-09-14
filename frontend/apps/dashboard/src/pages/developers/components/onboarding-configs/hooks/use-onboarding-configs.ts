@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useIntl } from 'hooks';
 import request, { PaginatedRequestResponse, RequestError } from 'request';
 import useSessionUser, { AuthHeaders } from 'src/hooks/use-session-user';
-import type { OnboardingConfig } from 'src/types/onboarding-config';
+import { OnboardingConfig } from 'types';
 
 export type GetOnboardingConfigsRequest = {
   authHeaders: AuthHeaders;

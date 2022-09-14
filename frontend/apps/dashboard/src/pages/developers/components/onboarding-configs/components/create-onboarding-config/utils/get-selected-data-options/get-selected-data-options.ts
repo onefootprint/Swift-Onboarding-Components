@@ -1,4 +1,4 @@
-import { CollectedDataOption } from 'src/types/data-kind';
+import { CollectedDataOption } from 'types';
 
 export const getSelectedDataOptionsList = (
   formData: Record<string, boolean | string | number> = {},

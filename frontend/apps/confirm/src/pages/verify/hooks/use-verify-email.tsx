@@ -1,14 +1,9 @@
 import { useMutation } from '@tanstack/react-query';
 import request, { RequestError } from 'request';
+import { UserEmailVerifyRequest, UserEmailVerifyResponse } from 'types';
 
-export type UserDataRequest = {
-  data: string;
-};
-
-export type UserDataResponse = {};
-
-const userDataRequest = async (payload: UserDataRequest) => {
-  const response = await request<UserDataResponse>({
+const userDataRequest = async (payload: UserEmailVerifyRequest) => {
+  const response = await request<UserEmailVerifyResponse>({
     method: 'POST',
     url: '/hosted/user/email/verify',
     data: payload,
@@ -17,6 +12,8 @@ const userDataRequest = async (payload: UserDataRequest) => {
 };
 
 const useVerifyEmail = () =>
-  useMutation<UserDataResponse, RequestError, UserDataRequest>(userDataRequest);
+  useMutation<UserEmailVerifyResponse, RequestError, UserEmailVerifyRequest>(
+    userDataRequest,
+  );
 
 export default useVerifyEmail;

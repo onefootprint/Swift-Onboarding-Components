@@ -1,18 +1,7 @@
 import { useMutation } from '@tanstack/react-query';
 import request, { RequestError } from 'request';
 import { BIFROST_AUTH_HEADER } from 'src/config/constants';
-
-export type UserEmailObj = {
-  email?: string;
-};
-
-export type UserEmailRequest = {
-  data: UserEmailObj;
-  authToken: string;
-  speculative?: boolean;
-};
-
-export type UserEmailResponse = {};
+import { UserEmailRequest, UserEmailResponse } from 'types';
 
 const userEmailRequest = async (payload: UserEmailRequest) => {
   const response = await request<UserEmailResponse>({

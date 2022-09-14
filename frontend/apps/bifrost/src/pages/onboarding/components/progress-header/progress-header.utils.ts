@@ -5,7 +5,7 @@ import {
   isMissingResidentialAttribute,
   isMissingSsnAttribute,
 } from 'src/utils/state-machine/onboarding/utils/missing-attributes';
-import { CollectedDataOption } from 'src/utils/state-machine/types';
+import { CollectedDataOption } from 'types';
 
 export const getMaxStepFromMissingAttributes = (
   mustCollect: readonly CollectedDataOption[],

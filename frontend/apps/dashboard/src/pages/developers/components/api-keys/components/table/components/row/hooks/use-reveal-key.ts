@@ -1,21 +1,15 @@
 import { useMutation } from '@tanstack/react-query';
 import request, { RequestError } from 'request';
 import useSessionUser, { AuthHeaders } from 'src/hooks/use-session-user';
-import type { ApiKey } from 'src/types/api-key';
+import { ApiKey, OrgApiKeyRevealRequest, OrgApiKeyRevealResponse } from 'types';
 
 import useUpdateApiKeyCache from './use-update-api-key-cache';
 
-export type RevealApiKeyRequest = {
-  id: string;
-};
-
-export type GetApiKeysResponse = ApiKey;
-
 const revealApiKey = async (
   authHeaders: AuthHeaders,
-  params: RevealApiKeyRequest,
+  params: OrgApiKeyRevealRequest,
 ) => {
-  const response = await request<GetApiKeysResponse>({
+  const response = await request<OrgApiKeyRevealResponse>({
     headers: authHeaders,
     method: 'GET',
     url: `/org/api_keys/${params.id}/reveal`,
@@ -28,10 +22,10 @@ const useRevealKey = (apiKey: ApiKey) => {
   const { authHeaders } = useSessionUser();
 
   const mutation = useMutation<
-    GetApiKeysResponse,
+    OrgApiKeyRevealResponse,
     RequestError,
-    RevealApiKeyRequest
-  >((data: RevealApiKeyRequest) => revealApiKey(authHeaders, data), {
+    OrgApiKeyRevealRequest
+  >((data: OrgApiKeyRevealRequest) => revealApiKey(authHeaders, data), {
     onSuccess: response => {
       updateApiCache(response);
     },

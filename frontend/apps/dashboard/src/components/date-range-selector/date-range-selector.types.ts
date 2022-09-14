@@ -1,4 +1,4 @@
-import { DateRange } from 'src/types';
+import { DateRange } from 'types';
 import * as yup from 'yup';
 
 export type DateRangeSelectorFormValues = {

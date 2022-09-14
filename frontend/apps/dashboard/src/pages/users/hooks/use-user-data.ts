@@ -1,6 +1,5 @@
 import constate from 'constate';
-import { DecryptedUserAttributes } from 'src/types';
-import type { UserDataAttributeKey } from 'types';
+import { DecryptedUserAttributes, UserDataAttributeKey } from 'types';
 import { useMap } from 'usehooks-ts';
 
 export type UserData = {

@@ -1,11 +1,10 @@
 import { useTranslation } from 'hooks';
 import React, { useEffect } from 'react';
+import { D2PStatusUpdate } from 'types';
 
 import HeaderTitle from '../../components/header-title';
 import useBiometricMachine from '../../hooks/use-d2p-mobile-machine';
-import useUpdateD2pStatus, {
-  D2PStatusUpdate,
-} from '../../hooks/use-update-d2p-status';
+import useUpdateD2pStatus from '../../hooks/use-update-d2p-status';
 
 const Unavailable = () => {
   const { t } = useTranslation('pages.unavailable');
