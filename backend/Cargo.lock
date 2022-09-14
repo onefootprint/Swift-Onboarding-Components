@@ -338,6 +338,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "android_system_properties"
+version = "0.1.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "819e7219dbd41043ac279b19830f2efc897156490d7fd6ea916720117ee66311"
+dependencies = [
+ "libc",
+]
+
+[[package]]
 name = "ansi_term"
 version = "0.12.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1226,15 +1235,17 @@ dependencies = [
 
 [[package]]
 name = "chrono"
-version = "0.4.19"
+version = "0.4.22"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "670ad68c9088c2a963aaa298cb369688cf3f9465ce5e2d4ca10e6e0098a1ce73"
+checksum = "bfd4d1b31faaa3a89d7934dbded3111da0d2ef28e3ebccdb4f0179f5929d1ef1"
 dependencies = [
- "libc",
+ "iana-time-zone",
+ "js-sys",
  "num-integer",
  "num-traits",
  "serde",
  "time 0.1.44",
+ "wasm-bindgen",
  "winapi",
 ]
 
@@ -1483,8 +1494,9 @@ dependencies = [
 
 [[package]]
 name = "deadpool"
-version = "0.9.4"
-source = "git+https://github.com/bikeshedder/deadpool?rev=f929e298383f022439575ea492d9a87e8de18ea2#f929e298383f022439575ea492d9a87e8de18ea2"
+version = "0.9.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "421fe0f90f2ab22016f32a9881be5134fdd71c65298917084b0c7477cbc3856e"
 dependencies = [
  "async-trait",
  "deadpool-runtime",
@@ -1496,8 +1508,9 @@ dependencies = [
 
 [[package]]
 name = "deadpool-diesel"
-version = "0.4.0-pre"
-source = "git+https://github.com/bikeshedder/deadpool?rev=f929e298383f022439575ea492d9a87e8de18ea2#f929e298383f022439575ea492d9a87e8de18ea2"
+version = "0.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "98dfc8fc3cdec5c9049948c6d6c33590c24d8c18e95732dfb7cda44e3f50b5d5"
 dependencies = [
  "deadpool",
  "deadpool-sync",
@@ -1507,7 +1520,8 @@ dependencies = [
 [[package]]
 name = "deadpool-runtime"
 version = "0.1.2"
-source = "git+https://github.com/bikeshedder/deadpool?rev=f929e298383f022439575ea492d9a87e8de18ea2#f929e298383f022439575ea492d9a87e8de18ea2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "eaa37046cc0f6c3cc6090fbdbf73ef0b8ef4cfcc37f6befc0020f63e8cf121e1"
 dependencies = [
  "tokio",
 ]
@@ -1515,7 +1529,8 @@ dependencies = [
 [[package]]
 name = "deadpool-sync"
 version = "0.1.0"
-source = "git+https://github.com/bikeshedder/deadpool?rev=f929e298383f022439575ea492d9a87e8de18ea2#f929e298383f022439575ea492d9a87e8de18ea2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b1bea344b64b32537fde6e0f0179b1ede34d435636719dd40fe6a0f28218a61c"
 dependencies = [
  "deadpool",
 ]
@@ -1579,9 +1594,9 @@ dependencies = [
 
 [[package]]
 name = "diesel"
-version = "2.0.0-rc.0"
+version = "2.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e531d0abf8147036383c88ce3785d9cda6fe1b8b1183021ffa01cf49c5819d24"
+checksum = "01e2adfd0a7a81070ed7beec0c62636458926326c16fedb77796d41e447b282d"
 dependencies = [
  "bigdecimal",
  "bitflags",
@@ -1597,6 +1612,7 @@ dependencies = [
  "pq-sys",
  "r2d2",
  "serde_json",
+ "time 0.3.11",
  "uuid 1.1.2",
 ]
 
@@ -1636,9 +1652,9 @@ dependencies = [
 
 [[package]]
 name = "diesel_derives"
-version = "2.0.0-rc.0"
+version = "2.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "212ba0cdc611523c37f26c7b3b4aedb4af7cbfe9239c4e7736a8a7c82284d77b"
+checksum = "22a7ab9d7967e6a1a247ea38aedf88ab808b4ac0c159576bc71866ab8f9f9250"
 dependencies = [
  "proc-macro-error",
  "proc-macro2 1.0.40",
@@ -2346,6 +2362,20 @@ dependencies = [
  "native-tls",
  "tokio",
  "tokio-native-tls",
+]
+
+[[package]]
+name = "iana-time-zone"
+version = "0.1.48"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "237a0714f28b1ee39ccec0770ccb544eb02c9ef2c82bb096230eefcffa6468b0"
+dependencies = [
+ "android_system_properties",
+ "core-foundation-sys",
+ "js-sys",
+ "once_cell",
+ "wasm-bindgen",
+ "winapi",
 ]
 
 [[package]]
