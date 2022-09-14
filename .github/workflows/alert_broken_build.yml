@@ -4,10 +4,6 @@ on:
   push:
     branches: ['master']
 
-concurrency:
-  group: ${{ github.workflow }}-broken-alert
-  cancel-in-progress: true
-
 jobs:
   wait:
     name: 'Wait for checks'
