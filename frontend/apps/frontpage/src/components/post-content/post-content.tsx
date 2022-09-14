@@ -114,6 +114,13 @@ const Content = styled.div`
       height: ${theme.borderWidth[1]}px;
       border: 0;
     }
+
+    figcaption {
+      ${createFontStyles('body-4')}
+      margin: -${theme.spacing[9]}px 0 ${theme.spacing[9]}px 0;
+      color: ${theme.color.quaternary};
+      text-align: center;
+    }
   `}
 `;
 
