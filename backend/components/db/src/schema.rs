@@ -266,6 +266,21 @@ table! {
     use diesel::sql_types::*;
     use newtypes::db_types::*;
 
+    tenant_role (id) {
+        id -> Text,
+        tenant_id -> Text,
+        name -> Text,
+        permissions -> Array<Text>,
+        _created_at -> Timestamptz,
+        _updated_at -> Timestamptz,
+        created_at -> Timestamptz,
+    }
+}
+
+table! {
+    use diesel::sql_types::*;
+    use newtypes::db_types::*;
+
     test_table (id) {
         id -> Int4,
         custom_enum -> Text,
@@ -356,6 +371,7 @@ joinable!(scoped_user -> tenant (tenant_id));
 joinable!(scoped_user -> user_vault (user_vault_id));
 joinable!(tenant_api_key -> tenant (tenant_id));
 joinable!(tenant_api_key_access_log -> tenant_api_key (tenant_api_key_id));
+joinable!(tenant_role -> tenant (tenant_id));
 joinable!(verification_request -> email (email_id));
 joinable!(verification_request -> identity_data (identity_data_id));
 joinable!(verification_request -> onboarding (onboarding_id));
@@ -380,6 +396,7 @@ allow_tables_to_appear_in_same_query!(
     tenant,
     tenant_api_key,
     tenant_api_key_access_log,
+    tenant_role,
     test_table,
     user_vault,
     verification_request,

@@ -48,6 +48,7 @@ macro_rules! define_newtype_id {
 
 // define our raw ids here
 define_newtype_id!(TenantId, String, "Identifier for a Tenant");
+define_newtype_id!(TenantRoleId, String, "Identifier for a TenantRole");
 define_newtype_id!(TenantApiKeyId, String, "Primary Key for an api key");
 define_newtype_id!(UserVaultId, String, "Identifier for a User Vault");
 

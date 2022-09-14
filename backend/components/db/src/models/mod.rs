@@ -11,6 +11,7 @@ pub mod phone_number;
 pub mod scoped_user;
 pub mod session;
 pub mod tenant;
+pub mod tenant_role;
 pub mod tenant_api_key;
 pub mod tenant_api_key_access_log;
 pub mod user_vault;
