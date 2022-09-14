@@ -3,14 +3,17 @@ use std::collections::HashSet;
 use crate::auth::session_data::workos::WorkOsSession;
 use crate::auth::session_data::AuthSessionData;
 use crate::errors::workos_login::WorkOsLoginError;
+use crate::errors::ApiResult;
 use crate::utils::email_domain;
 use crate::utils::session::AuthSession;
 use crate::State;
 use crate::{errors::ApiError, types::response::ApiResponseData};
-use chrono::Duration;
+use chrono::{Duration, Utc};
 use db::models::tenant::{NewTenant, Tenant};
+use db::models::tenant_role::NewTenantRole;
+use db::models::tenant_user::NewTenantUser;
 use db::tenant::{get_opt_by_workos_org_id, get_opt_by_workos_profile_id};
-use newtypes::SessionAuthToken;
+use newtypes::{SessionAuthToken, TenantPermission};
 use paperclip::actix::Apiv2Schema;
 use paperclip::actix::{api_v2_operation, post, web, web::Json};
 use workos::organizations::{
@@ -136,7 +139,14 @@ async fn find_or_create_tenant(state: &State, profile: &Profile) -> Result<(Tena
                 tracing::info!("matched workos auth by domain");
                 return Ok((tenant, false));
             } else {
-                let tenant = create_tenant(state, domain, org.id.to_string(), None).await?;
+                let tenant = create_tenant(
+                    state,
+                    domain,
+                    Some(org.id.to_string()),
+                    Some(profile.email.clone()),
+                    true,
+                )
+                .await?;
 
                 tracing::warn!("WARNING! failed to match workos by org id in the database so creating a new tenant! This is expected only for testing purposes.");
 
@@ -164,34 +174,61 @@ async fn find_or_create_tenant(state: &State, profile: &Profile) -> Result<(Tena
     let tenant = create_tenant(
         state,
         tenant_name,
-        org.id.to_string(),
-        Some(profile.id.to_string()),
+        Some(org.id.to_string()),
+        Some(profile.email.clone()),
+        true,
     )
     .await?;
 
     Ok((tenant, true))
 }
 
-async fn create_tenant(
+pub(crate) async fn create_tenant(
     state: &State,
     tenant_name: String,
-    workos_org_id: String,
-    workos_profile_id: Option<String>,
+    workos_org_id: Option<String>,
+    email: Option<String>,
+    sandbox_restricted: bool,
 ) -> Result<Tenant, ApiError> {
     let (ec_pk_uncompressed, e_priv_key) = state.enclave_client.generate_sealed_keypair().await?;
 
-    // create a tenant
-    let tenant = NewTenant {
-        name: tenant_name,
-        e_private_key: e_priv_key,
-        public_key: ec_pk_uncompressed,
-        workos_id: Some(workos_org_id),
-        workos_admin_profile_id: workos_profile_id,
-        logo_url: None,
-        sandbox_restricted: true,
-    }
-    .create(&state.db_pool)
-    .await?;
+    let tenant = state
+        .db_pool
+        .db_query(move |conn| -> ApiResult<_> {
+            // Create the tenant
+            let tenant = NewTenant {
+                name: tenant_name,
+                e_private_key: e_priv_key,
+                public_key: ec_pk_uncompressed,
+                workos_id: workos_org_id,
+                workos_admin_profile_id: None,
+                logo_url: None,
+                sandbox_restricted,
+            }
+            .save(conn)?;
+
+            // And the admin role that this user will inherit
+            let admin_role = NewTenantRole {
+                tenant_id: tenant.id.clone(),
+                name: "Admin".to_owned(),
+                permissions: vec![TenantPermission::Admin],
+                created_at: Utc::now(),
+            }
+            .save(conn)?;
+
+            if let Some(email) = email {
+                // And a new user that has admin permissions
+                NewTenantUser {
+                    tenant_role_id: admin_role.id,
+                    email,
+                    created_at: Utc::now(),
+                    last_login_at: Utc::now(),
+                }
+                .save(conn)?;
+            }
+            Ok(tenant)
+        })
+        .await??;
 
     Ok(tenant)
 }

@@ -37,19 +37,17 @@ pub struct NewTenant {
     pub e_private_key: EncryptedVaultPrivateKey,
     pub workos_id: Option<String>,
     pub logo_url: Option<String>,
+    // TODO can we rm this?
     pub workos_admin_profile_id: Option<String>,
     pub sandbox_restricted: bool,
 }
 
 impl NewTenant {
-    pub async fn create(self, pool: &DbPool) -> Result<Tenant, crate::DbError> {
-        pool.db_query(move |conn| {
-            let tenant = diesel::insert_into(tenant::table)
-                .values(&self)
-                .get_result::<Tenant>(conn)?;
-            Ok(tenant)
-        })
-        .await?
+    pub fn save(self, conn: &mut PgConnection) -> Result<Tenant, crate::DbError> {
+        let tenant = diesel::insert_into(tenant::table)
+            .values(&self)
+            .get_result::<Tenant>(conn)?;
+        Ok(tenant)
     }
 }
 

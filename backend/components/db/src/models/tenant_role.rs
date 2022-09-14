@@ -1,7 +1,8 @@
-use crate::schema::tenant_role;
+use crate::{schema::tenant_role, DbResult};
+use diesel::prelude::*;
 
 use chrono::{DateTime, Utc};
-use diesel::{Insertable, Queryable};
+use diesel::{Insertable, PgConnection, Queryable};
 use newtypes::{TenantId, TenantPermission, TenantRoleId};
 use serde::{Deserialize, Serialize};
 
@@ -24,4 +25,13 @@ pub struct NewTenantRole {
     pub name: String,
     pub permissions: Vec<TenantPermission>,
     pub created_at: DateTime<Utc>,
+}
+
+impl NewTenantRole {
+    pub fn save(&self, conn: &mut PgConnection) -> DbResult<TenantRole> {
+        let result = diesel::insert_into(tenant_role::table)
+            .values(self)
+            .get_result(conn)?;
+        Ok(result)
+    }
 }

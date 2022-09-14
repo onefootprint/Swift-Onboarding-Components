@@ -75,7 +75,9 @@ async fn test_db() {
         workos_admin_profile_id: None,
         sandbox_restricted: true,
     };
-    let _tenant = tenant.create(&pool).await.expect("couldn't create tenant");
+    pool.db_query(|conn| tenant.save(conn).expect("couldn't create tenant"))
+        .await
+        .expect("couldn't make DB query");
 
     crate::user_vault::create(
         &pool,

@@ -28,6 +28,8 @@ use user_vault::get_by_fingerprint;
 #[allow(unused_imports)]
 pub mod schema;
 
+pub type DbResult<T> = Result<T, DbError>;
+
 pub const MIGRATIONS: EmbeddedMigrations = embed_migrations!();
 
 #[derive(Clone)]

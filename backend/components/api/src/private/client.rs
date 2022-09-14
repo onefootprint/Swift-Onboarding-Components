@@ -1,14 +1,12 @@
-use crate::auth::key_context::custodian::CustodianAuthContext;
 use crate::errors::ApiError;
 use crate::types::response::ApiResponseData;
 use crate::types::secret_api_key::TenantApiKeyResponse;
 use crate::State;
+use crate::{auth::key_context::custodian::CustodianAuthContext, org::workos::login::create_tenant};
 use db::models::tenant_api_key::TenantApiKey;
 use newtypes::secret_api_key::SecretApiKey;
 use newtypes::TenantId;
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
-
-use db::models::tenant::NewTenant;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Apiv2Schema)]
 struct NewClientRequest {
@@ -17,8 +15,6 @@ struct NewClientRequest {
     workos_org_id: Option<String>,
     /// determines if a live api key is created or not
     is_live: bool,
-    /// logo url
-    logo_url: Option<String>,
 }
 
 #[derive(Debug, Clone, serde::Serialize, Apiv2Schema)]
@@ -41,31 +37,19 @@ async fn post(
     _custodian: CustodianAuthContext,
     state: web::Data<State>,
 ) -> actix_web::Result<Json<ApiResponseData<NewClientResponse>>, ApiError> {
-    let (ec_pk_uncompressed, e_priv_key) = state.enclave_client.generate_sealed_keypair().await?;
-
     let NewClientRequest {
         name,
         workos_org_id,
         is_live,
-        logo_url,
     } = request.into_inner();
 
-    let tenant = NewTenant {
-        name: name.clone(),
-        e_private_key: e_priv_key,
-        public_key: ec_pk_uncompressed,
-        workos_id: workos_org_id,
-        workos_admin_profile_id: None,
-        logo_url,
-        sandbox_restricted: false, // this is needed for our integration tests
-    }
-    .create(&state.db_pool)
-    .await?;
+    // TODO use util from workos
+    let tenant = create_tenant(&state, name, workos_org_id, None, false).await?;
 
     let secret_api_key = SecretApiKey::generate(is_live);
     let new_key = TenantApiKey::create(
         &state.db_pool,
-        "Secret key".to_owned(), // TODO
+        "Secret key".to_owned(),
         secret_api_key.fingerprint(&state.hmac_client).await?,
         secret_api_key.seal_to(&tenant.public_key)?,
         tenant.id.clone(),

@@ -1,7 +1,8 @@
-use crate::schema::tenant_user;
+use crate::{schema::tenant_user, DbResult};
+use diesel::prelude::*;
 
 use chrono::{DateTime, Utc};
-use diesel::{Insertable, Queryable};
+use diesel::{Insertable, PgConnection, Queryable};
 use newtypes::{TenantRoleId, TenantUserId};
 use serde::{Deserialize, Serialize};
 
@@ -24,4 +25,13 @@ pub struct NewTenantUser {
     pub email: String,
     pub created_at: DateTime<Utc>,
     pub last_login_at: DateTime<Utc>,
+}
+
+impl NewTenantUser {
+    pub fn save(&self, conn: &mut PgConnection) -> DbResult<TenantUser> {
+        let result = diesel::insert_into(tenant_user::table)
+            .values(self)
+            .get_result(conn)?;
+        Ok(result)
+    }
 }
