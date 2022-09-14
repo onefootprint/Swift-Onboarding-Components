@@ -57,18 +57,6 @@ impl Email {
         Ok(result)
     }
 
-    pub fn get_by_id(
-        conn: &mut PgConnection,
-        user_vault_id: &UserVaultId,
-        email_id: &EmailId,
-    ) -> Result<Self, DbError> {
-        let result = email::table
-            .filter(email::user_vault_id.eq(user_vault_id))
-            .filter(email::id.eq(email_id))
-            .first(conn)?;
-        Ok(result)
-    }
-
     pub fn create(
         conn: &mut PgConnection,
         user_vault_id: UserVaultId,

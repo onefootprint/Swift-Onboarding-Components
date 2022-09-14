@@ -89,8 +89,8 @@ impl TryFrom<IdvData> for IdologyRequestData {
 }
 
 impl IdologyRequestData {
-    pub fn attributes(&self) -> Vec<SignalScope> {
-        // Compose the list of attributes that are sent to IDology to be verified in this request
+    pub fn scopes(&self) -> Vec<SignalScope> {
+        // Compose the list of scopes that are sent to IDology to be verified in this request
         vec![
             Some(SignalScope::Name),
             Some(SignalScope::StreetAddress),
@@ -135,13 +135,13 @@ impl IdologyClient {
     }
 
     /// Make a request to the ExpectID module. Returns the result from ExpectID and a vec of
-    /// attributes that were sent to IDology's ExpectID
+    /// scopes that were sent to IDology's ExpectID
     pub async fn verify_expectid(
         &self,
         idv_data: IdvData,
     ) -> Result<(serde_json::Value, Vec<SignalScope>), Error> {
         let req_data = IdologyRequestData::try_from(idv_data)?;
-        let attributes = req_data.attributes();
+        let scopes = req_data.scopes();
         let req_list = IdologyRequest {
             username: self.username.clone(),
             password: self.password.clone(),
@@ -160,6 +160,6 @@ impl IdologyClient {
             .json::<serde_json::Value>()
             .await
             .map_err(ReqwestError::InternalError)?;
-        Ok((idology_response, attributes))
+        Ok((idology_response, scopes))
     }
 }

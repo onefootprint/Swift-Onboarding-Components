@@ -38,7 +38,7 @@ struct NewOnboarding {
 pub type OnboardingInfo = (Onboarding, ObConfiguration, InsightEvent);
 
 impl Onboarding {
-    pub fn get(conn: &mut PgConnection, id: OnboardingId) -> Result<(Onboarding, ScopedUser), DbError> {
+    pub fn get(conn: &mut PgConnection, id: &OnboardingId) -> Result<(Onboarding, ScopedUser), DbError> {
         let ob = onboarding::table
             .inner_join(scoped_user::table)
             .filter(onboarding::id.eq(id))

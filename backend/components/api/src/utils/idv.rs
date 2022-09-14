@@ -17,8 +17,7 @@ use std::{collections::HashMap, str::FromStr};
 use strum::IntoEnumIterator;
 
 impl UserVaultWrapper {
-    #[allow(unused)]
-    pub async fn build_idv_request(&self, state: &State) -> Result<IdvData, ApiError> {
+    pub async fn build_idv_data(&self, state: &State) -> Result<IdvData, ApiError> {
         let (keys, encrypted_values): (Vec<_>, Vec<_>) = DataAttribute::iter()
             .flat_map(|a| self.get_e_field(a).map(|v| (a, v)))
             .unzip();
@@ -63,20 +62,17 @@ impl UserVaultWrapper {
     }
 }
 
-pub struct IdvRequestData {
-    pub user_vault_id: UserVaultId,
-    pub tenant_id: TenantId,
-    pub request: VerificationRequest,
-    pub idv_data: IdvData,
-}
-
 pub async fn initiate_idv_requests(
     state: &State,
     ob_id: OnboardingId,
-    requests: Vec<IdvRequestData>,
+    user_vault_id: UserVaultId,
+    tenant_id: TenantId,
+    requests: Vec<VerificationRequest>,
 ) -> Result<(), ApiError> {
     // TODO spawn a task to do this asynchronously
-    let fut_requests = requests.into_iter().map(|r| process_idv_request(state, r));
+    let fut_requests = requests
+        .into_iter()
+        .map(|r| process_idv_request(state, user_vault_id.clone(), tenant_id.clone(), r));
     let result_statuses = futures::future::try_join_all(fut_requests).await?;
     save_final_result(state, ob_id, result_statuses).await?;
     Ok(())
@@ -98,7 +94,7 @@ async fn save_final_result(
         .db_transaction(move |conn| -> Result<_, ApiError> {
             Onboarding::update_status_by_id(conn, &ob_id, final_status)?;
             if let Some(status) = final_status.audit_status() {
-                let (_, scoped_user) = Onboarding::get(conn, ob_id)?;
+                let (_, scoped_user) = Onboarding::get(conn, &ob_id)?;
                 AuditTrail::create(
                     conn,
                     AuditTrailEvent::Verification(VerificationInfo {
@@ -117,26 +113,25 @@ async fn save_final_result(
     Ok(())
 }
 
-async fn process_idv_request(state: &State, data: IdvRequestData) -> Result<Option<Status>, ApiError> {
-    let IdvRequestData {
-        user_vault_id,
-        tenant_id,
-        request,
-        idv_data,
-    } = data;
-
+async fn process_idv_request(
+    state: &State,
+    user_vault_id: UserVaultId,
+    tenant_id: TenantId,
+    request: VerificationRequest,
+) -> Result<Option<Status>, ApiError> {
+    let request_id = request.id.clone();
     let IdvResponse {
         status,
         audit_events,
         raw_response,
-    } = send_idv_request(state, request.vendor, idv_data).await?;
+    } = send_idv_request(state, request).await?;
 
     // Atomically create the VerificationResult row, update the status of the onboarding, and
     // create new audit trails
     state
         .db_pool
         .db_transaction(move |conn| -> Result<_, ApiError> {
-            let result = VerificationResult::create(conn, request.id, raw_response)?;
+            let result = VerificationResult::create(conn, request_id, raw_response)?;
             audit_events.into_iter().try_for_each(|e| {
                 AuditTrail::create(
                     conn,
@@ -152,23 +147,36 @@ async fn process_idv_request(state: &State, data: IdvRequestData) -> Result<Opti
     Ok(status)
 }
 
-async fn send_idv_request(state: &State, vendor: Vendor, idv_data: IdvData) -> Result<IdvResponse, ApiError> {
+async fn send_idv_request(state: &State, request: VerificationRequest) -> Result<IdvResponse, ApiError> {
+    // Build the set of data we will send to the vendor by re-building the UVW from the DB using
+    // the pointers to pieces of user data saved on the VerificationRequest
+    // This is unnecessary right now, but will allow us to re-run this logic when this task is async
+    let vendor = request.vendor;
+    let uvw = state
+        .db_pool
+        .db_query(|conn| UserVaultWrapper::from_verification_request(conn, request))
+        .await??;
+    let data_to_verify = uvw.build_idv_data(state).await?;
+
+    // Make the request to the IDV vendor
     let result = match vendor {
         Vendor::Idology => {
-            let (raw_response, pending_attributes) = state
+            let (raw_response, signal_scopes) = state
                 .idology_client
-                .verify_expectid(idv_data)
+                .verify_expectid(data_to_verify)
                 .await
                 .map_err(idv::Error::from)?;
-            idv::idology::verification::process(raw_response, pending_attributes).map_err(idv::Error::from)?
+            idv::idology::verification::process(raw_response, signal_scopes).map_err(idv::Error::from)?
         }
         Vendor::Twilio => {
             // TODO make it easier to share twilio client between IDV + SMS sending
-            idv::twilio::lookup_v2(&state.twilio_client.client, idv_data)
+            idv::twilio::lookup_v2(&state.twilio_client.client, data_to_verify)
                 .await
                 .map_err(idv::Error::from)?
         }
         _ => return Err(ApiError::NotImplemented),
     };
+
+    // Process the response from the IDV vendor
     Ok(result)
 }

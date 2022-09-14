@@ -6,7 +6,6 @@ use crate::errors::onboarding::OnboardingError;
 use crate::errors::ApiError;
 use crate::types::response::ApiResponseData;
 use crate::utils::idv::initiate_idv_requests;
-use crate::utils::idv::IdvRequestData;
 use crate::utils::insight_headers::InsightHeaders;
 use crate::utils::user_vault_wrapper::UserVaultWrapper;
 use crate::State;
@@ -66,9 +65,10 @@ fn handler(
 
     let tenant_id = tenant_auth.tenant.id.clone();
     let session_key = state.session_sealing_key.clone();
-    let (validation_token, webauthn_creds, requests, ob_id, scoped_user, uvw) = state
+    let (validation_token, webauthn_creds, requests, ob_id, scoped_user) = state
         .db_pool
         .db_transaction(move |conn| -> Result<_, ApiError> {
+            // Create scoped user and onboarding if they don't exist
             let scoped_user = ScopedUser::get_or_create(
                 conn,
                 uvw.user_vault.id.clone(),
@@ -83,34 +83,33 @@ fn handler(
                 insight_event,
             )?;
             let ob_id = ob.id.clone();
-            let requests = initiate_verification(conn, ob, &uvw, &tenant_id, decrypted_phone)?;
+
+            // Save VerificationRequests in the DB
+            let requests_to_initiate = initiate_verification(conn, ob, &uvw, &tenant_id, decrypted_phone)?;
+            let requests_to_initiate = requests_to_initiate
+                .into_iter()
+                .map(|v| uvw.build_verification_request(ob_id.clone(), v))
+                .collect();
+            let requests = VerificationRequest::bulk_save(conn, requests_to_initiate)?;
+
+            // Create validation token
             let validation_token =
                 super::create_onboarding_validation_token(conn, &session_key, ob_id.clone())?;
             let webauthn_creds = WebauthnCredential::get_for_user_vault(conn, &uvw.user_vault.id.clone())?;
-            Ok((
-                validation_token,
-                webauthn_creds,
-                requests,
-                ob_id,
-                scoped_user,
-                uvw,
-            ))
+            Ok((validation_token, webauthn_creds, requests, ob_id, scoped_user))
         })
         .await?;
 
     // Fire off all IDV requests
     if !requests.is_empty() {
-        let idv_data = uvw.build_idv_request(&state).await?;
-        let requests = requests
-            .into_iter()
-            .map(|r| IdvRequestData {
-                user_vault_id: scoped_user.user_vault_id.clone(),
-                tenant_id: scoped_user.tenant_id.clone(),
-                request: r,
-                idv_data: idv_data.clone(),
-            })
-            .collect();
-        initiate_idv_requests(&state, ob_id, requests).await?;
+        initiate_idv_requests(
+            &state,
+            ob_id,
+            scoped_user.user_vault_id,
+            scoped_user.tenant_id,
+            requests,
+        )
+        .await?;
     }
 
     Ok(Json(ApiResponseData {
@@ -127,7 +126,7 @@ fn initiate_verification(
     uvw: &UserVaultWrapper,
     tenant_id: &TenantId,
     decrypted_phone: Option<ValidatedPhoneNumber>,
-) -> Result<Vec<VerificationRequest>, ApiError> {
+) -> Result<Vec<Vendor>, ApiError> {
     // TODO decide when to re-KYC
     if ob.status == Status::Verified {
         return Ok(vec![]);
@@ -148,13 +147,9 @@ fn initiate_verification(
         // TODO kick off user verification with data vendors
         Status::Verified
     };
-    let ob = ob.update_status(conn, desired_status)?;
+    ob.update_status(conn, desired_status)?;
     if desired_status == Status::Processing {
-        let idology_request = uvw
-            .build_verification_request(ob.id.clone(), Vendor::Idology)
-            .save(conn)?;
-        let twilio_request = uvw.build_verification_request(ob.id, Vendor::Twilio).save(conn)?;
-        return Ok(vec![idology_request, twilio_request]);
+        return Ok(vec![Vendor::Idology, Vendor::Twilio]);
     }
 
     // If we're not kicking off a verification, just create some fixture events for now

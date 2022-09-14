@@ -60,10 +60,10 @@ impl PhoneNumber {
         Ok(result)
     }
 
-    pub fn get_by_id(
+    pub fn get(
         conn: &mut PgConnection,
-        user_vault_id: &UserVaultId,
         phone_number_id: &PhoneNumberId,
+        user_vault_id: &UserVaultId,
     ) -> Result<Self, DbError> {
         let result = phone_number::table
             .filter(phone_number::user_vault_id.eq(user_vault_id))

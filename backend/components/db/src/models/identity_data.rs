@@ -111,12 +111,25 @@ impl From<IdentityData> for NewIdentityDataArgs {
 }
 
 impl IdentityData {
-    pub fn get(conn: &mut PgConnection, user_vault_id: &UserVaultId) -> Result<Option<Self>, DbError> {
+    pub fn get_active(conn: &mut PgConnection, user_vault_id: &UserVaultId) -> Result<Option<Self>, DbError> {
         let result: Option<Self> = identity_data::table
             .filter(identity_data::user_vault_id.eq(user_vault_id))
             .filter(identity_data::deactivated_at.is_null())
             .first(conn)
             .optional()?;
+
+        Ok(result)
+    }
+
+    pub fn get(
+        conn: &mut PgConnection,
+        id: &IdentityDataId,
+        user_vault_id: &UserVaultId,
+    ) -> Result<Self, DbError> {
+        let result = identity_data::table
+            .filter(identity_data::id.eq(id))
+            .filter(identity_data::user_vault_id.eq(user_vault_id))
+            .first(conn)?;
 
         Ok(result)
     }

@@ -1,7 +1,9 @@
 use db::models::fingerprint::IsUnique;
 use db::models::identity_data::{HasIdentityDataFields, IdentityData};
 use db::models::kv_data::{KeyValueData, NewKeyValueDataArgs};
+use db::models::onboarding::Onboarding;
 use db::models::scoped_user::ScopedUser;
+use db::models::verification_request::VerificationRequest;
 use enclave_proxy::DataTransform;
 
 use db::models::email::Email;
@@ -48,7 +50,7 @@ impl UserVaultWrapper {
         user_vault: UserVault,
         is_locked: bool,
     ) -> Result<Self, DbError> {
-        let identity_data = IdentityData::get(conn, &user_vault.id)?;
+        let identity_data = IdentityData::get_active(conn, &user_vault.id)?;
         let phone_number = PhoneNumber::get_primary(conn, &user_vault.id)?;
         let email = Email::get_primary(conn, &user_vault.id)?;
 
@@ -58,6 +60,36 @@ impl UserVaultWrapper {
             phone_number,
             email,
             is_locked,
+            phantom: PhantomData,
+        })
+    }
+
+    // Allows reconstructing a UserVaultWrapper at the time a VerificationRequest was made
+    pub fn from_verification_request(
+        conn: &mut PgConnection,
+        request: VerificationRequest,
+    ) -> Result<Self, DbError> {
+        let (_, scoped_user) = Onboarding::get(conn, &request.onboarding_id)?;
+        let user_vault = UserVault::get(conn, &scoped_user.user_vault_id)?;
+        let email = request
+            .email_id
+            .map(|id| Email::get(conn, &id, &user_vault.id))
+            .transpose()?
+            .map(|(email, _)| email);
+        let phone_number = request
+            .phone_number_id
+            .map(|id| PhoneNumber::get(conn, &id, &user_vault.id))
+            .transpose()?;
+        let identity_data = request
+            .identity_data_id
+            .map(|id| IdentityData::get(conn, &id, &user_vault.id))
+            .transpose()?;
+        Ok(Self {
+            identity_data,
+            user_vault,
+            phone_number,
+            email,
+            is_locked: false,
             phantom: PhantomData,
         })
     }

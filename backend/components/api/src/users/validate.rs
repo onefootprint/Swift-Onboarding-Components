@@ -51,7 +51,7 @@ pub async fn validate(
 
     let (ob, scoped_user) = state
         .db_pool
-        .db_query(|conn| Onboarding::get(conn, ob_id))
+        .db_query(move |conn| Onboarding::get(conn, &ob_id))
         .await??;
     if scoped_user.tenant_id != auth.tenant().id {
         return Err(OnboardingError::TenantMismatch.into());

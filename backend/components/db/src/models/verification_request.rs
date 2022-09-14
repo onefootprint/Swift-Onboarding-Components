@@ -30,11 +30,14 @@ pub struct NewVerificationRequest {
     pub identity_data_id: Option<IdentityDataId>,
 }
 
-impl NewVerificationRequest {
-    pub fn save(&self, conn: &mut PgConnection) -> Result<VerificationRequest, crate::DbError> {
+impl VerificationRequest {
+    pub fn bulk_save(
+        conn: &mut PgConnection,
+        requests: Vec<NewVerificationRequest>,
+    ) -> Result<Vec<Self>, crate::DbError> {
         let result = diesel::insert_into(verification_request::table)
-            .values(self)
-            .get_result(conn)?;
+            .values(requests)
+            .get_results(conn)?;
         Ok(result)
     }
 }
