@@ -4,6 +4,6 @@ use thiserror::Error;
 pub enum WorkOsLoginError {
     #[error("workos authorization url error: {0}")]
     AuthorizationUrlError(#[from] url::ParseError),
-    #[error("workos profile not associated with client")]
-    ProfileInvalid,
+    #[error("Workos profile has an org, but no tenant exists with the org")]
+    TenantForOrgDoesNotExist,
 }

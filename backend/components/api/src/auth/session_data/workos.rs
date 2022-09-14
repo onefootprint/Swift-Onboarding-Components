@@ -2,8 +2,11 @@ use crate::{
     auth::{AuthError, ExtractableAuthSession, HasTenant, Principal, SupportsIsLiveHeader},
     errors::ApiError,
 };
-use db::{models::tenant::Tenant, PgConnection};
-use newtypes::TenantId;
+use db::{
+    models::{tenant::Tenant, tenant_role::TenantRole, tenant_user::TenantUser},
+    PgConnection,
+};
+use newtypes::TenantUserId;
 use paperclip::actix::Apiv2Security;
 
 use super::AuthSessionData;
@@ -17,6 +20,8 @@ use super::AuthSessionData;
 )]
 pub struct WorkOs {
     tenant: Tenant,
+    tenant_role: TenantRole,
+    tenant_user: TenantUser,
     data: WorkOsSession,
 }
 
@@ -25,7 +30,7 @@ pub struct WorkOsSession {
     pub email: String,
     pub first_name: Option<String>,
     pub last_name: Option<String>,
-    pub tenant_id: TenantId,
+    pub tenant_user_id: TenantUserId,
 }
 
 impl ExtractableAuthSession for WorkOs {
@@ -40,8 +45,13 @@ impl ExtractableAuthSession for WorkOs {
                 return Err(AuthError::SessionTypeError.into());
             }
         };
-        let tenant = Tenant::get(conn, &data.tenant_id)?;
-        Ok(Self { data, tenant })
+        let (tenant, tenant_role, tenant_user) = Tenant::get_by_user(conn, &data.tenant_user_id)?;
+        Ok(Self {
+            data,
+            tenant,
+            tenant_role,
+            tenant_user,
+        })
     }
 }
 

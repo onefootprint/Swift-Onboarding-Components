@@ -43,8 +43,7 @@ async fn post(
         is_live,
     } = request.into_inner();
 
-    // TODO use util from workos
-    let tenant = create_tenant(&state, name, workos_org_id, None, false).await?;
+    let tenant = create_tenant(&state, name, workos_org_id, false).await?;
 
     let secret_api_key = SecretApiKey::generate(is_live);
     let new_key = TenantApiKey::create(

@@ -1,11 +1,14 @@
-use crate::DbPool;
 use crate::{schema::tenant, DbError};
+use crate::{DbPool, DbResult};
 use diesel::prelude::*;
 
 use chrono::{DateTime, Utc};
 use diesel::{Insertable, Queryable};
-use newtypes::{EncryptedVaultPrivateKey, TenantId, VaultPublicKey};
+use newtypes::{EncryptedVaultPrivateKey, TenantId, TenantUserId, VaultPublicKey};
 use serde::{Deserialize, Serialize};
+
+use super::tenant_role::TenantRole;
+use super::tenant_user::TenantUser;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
 #[diesel(table_name = tenant)]
@@ -23,9 +26,25 @@ pub struct Tenant {
 }
 
 impl Tenant {
-    pub fn get(conn: &mut PgConnection, id: &TenantId) -> Result<Self, DbError> {
-        let result = tenant::table.filter(tenant::id.eq(id)).first(conn)?;
-        Ok(result)
+    pub fn get_by_user(
+        conn: &mut PgConnection,
+        id: &TenantUserId,
+    ) -> Result<(Self, TenantRole, TenantUser), DbError> {
+        use crate::schema::{tenant_role, tenant_user};
+        let (role, tenant, user) = tenant_role::table
+            .inner_join(tenant::table)
+            .inner_join(tenant_user::table)
+            .filter(tenant_user::id.eq(id))
+            .first(conn)?;
+        Ok((tenant, role, user))
+    }
+
+    pub fn lock(conn: &mut PgConnection, id: &TenantId) -> DbResult<Self> {
+        let tenant = tenant::table
+            .for_no_key_update()
+            .filter(tenant::id.eq(id))
+            .first(conn)?;
+        Ok(tenant)
     }
 }
 

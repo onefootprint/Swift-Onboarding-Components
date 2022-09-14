@@ -12,11 +12,13 @@ mod ob_config_status;
 mod sealed_bytes;
 mod status;
 mod tenant_permission;
+mod tenant_user_email;
 mod vault_key_pair;
 mod vendor;
 
 pub use self::{
     access_event_kind::*, attestation_type::*, audit_trail_event::*, challenge::*, collected_data::*,
     d2p_session_status::*, data_attribute::*, data_identifier::*, data_priority::*, fingerprint::*,
-    ob_config_status::*, sealed_bytes::*, status::*, tenant_permission::*, vault_key_pair::*, vendor::*,
+    ob_config_status::*, sealed_bytes::*, status::*, tenant_permission::*, tenant_user_email::*,
+    vault_key_pair::*, vendor::*,
 };
