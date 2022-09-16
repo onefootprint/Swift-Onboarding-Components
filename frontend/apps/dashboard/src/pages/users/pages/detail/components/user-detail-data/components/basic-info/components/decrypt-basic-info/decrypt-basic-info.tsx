@@ -61,7 +61,14 @@ const DecryptBasicInfo = ({ user }: DecryptBasicInfoProps) => {
             <Checkbox
               {...register(UserDataAttribute.firstName)}
               disabled={isCheckboxDisabled(user.attributes.firstName.value)}
-              label={allT('collected-data-options.name')}
+              label={allT('user-data-attributes.first-name')}
+            />
+          )}
+          {user.identityDataAttributes.includes(UserDataAttribute.lastName) && (
+            <Checkbox
+              {...register(UserDataAttribute.lastName)}
+              disabled={isCheckboxDisabled(user.attributes.lastName.value)}
+              label={allT('user-data-attributes.last-name')}
             />
           )}
           {user.identityDataAttributes.includes(UserDataAttribute.email) && (
