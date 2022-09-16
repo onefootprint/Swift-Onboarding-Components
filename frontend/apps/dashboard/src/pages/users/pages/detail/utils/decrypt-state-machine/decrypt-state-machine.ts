@@ -1,124 +1,62 @@
-import { UserDataAttribute } from 'types';
 import { createMachine } from 'xstate';
 
-type Fields = Partial<Partial<Record<UserDataAttribute, boolean>>>;
-
-type DecryptContext = {
-  reason?: string;
-  fields?: Fields;
-};
-
-type DecryptEvent =
-  | {
-      type: 'HYDRATED';
-      payload: { fields: Fields };
-    }
-  | { type: 'STARTED' }
-  | { type: 'CANCELLED' }
-  | { type: 'SELECTED_FIELD' }
-  | {
-      type: 'SUBMITTED_FIELDS';
-      payload: { fields: Fields };
-    }
-  | {
-      type: 'SUBMITTED_REASON';
-      payload: { reason: string };
-    }
-  | { type: 'DECRYPT_SUCCEEDED' }
-  | { type: 'DECRYPT_FAILED' };
-
-type DecryptTypestate =
-  | {
-      value: 'IDLE';
-      context: DecryptContext;
-    }
-  | {
-      value: 'HYDRATED';
-      context: DecryptContext & {
-        fields: Fields;
-      };
-    }
-  | {
-      value: 'SELECTED_FIELD';
-      context: DecryptContext & {
-        fields: Fields;
-      };
-    }
-  | {
-      value: 'SELECTING_FIELDS';
-      context: DecryptContext & {
-        fields: Fields;
-      };
-    }
-  | {
-      value: 'CONFIRMING_REASON';
-      context: DecryptContext & {
-        reason: string;
-        fields: Fields;
-      };
-    }
-  | {
-      value: 'DECRYPTING';
-      context: DecryptContext & {
-        reason: string;
-        fields: Fields;
-      };
-    }
-  | {
-      value: 'DECRYPT_FAILED';
-      context: DecryptContext & {
-        reason: string;
-        fields: Fields;
-      };
-    };
+import {
+  Action,
+  Context,
+  Event,
+  Guard,
+  MachineEvents,
+  MachineStates,
+  State,
+} from './types';
 
 export const createDecryptStateMachine = () =>
-  createMachine<DecryptContext, DecryptEvent, DecryptTypestate>(
+  createMachine<Context, MachineEvents, MachineStates>(
     {
       id: 'user-decrypt-fields',
       predictableActionArguments: true,
-      initial: 'IDLE',
+      initial: State.idle,
       states: {
-        IDLE: {
+        [State.idle]: {
           on: {
-            HYDRATED: {
-              actions: 'assignInitialFields',
+            [Event.hydrated]: {
+              actions: Action.assignInitialFields,
             },
-            STARTED: {
-              target: 'SELECTING_FIELDS',
+            [Event.started]: {
+              target: State.selectingFields,
             },
           },
         },
-        SELECTING_FIELDS: {
+        [State.selectingFields]: {
           on: {
-            CANCELLED: {
-              target: 'IDLE',
+            [Event.canceled]: {
+              target: State.idle,
             },
-            SUBMITTED_FIELDS: {
-              target: 'CONFIRMING_REASON',
-              actions: 'assignField',
-              cond: 'hasAtLeastOneFieldSelected',
+            [Event.submittedFields]: {
+              target: State.confirmingReason,
+              actions: Action.assignField,
+              cond: Guard.hasAtLeastOneFieldSelected,
             },
           },
         },
-        CONFIRMING_REASON: {
+        [State.confirmingReason]: {
           on: {
-            CANCELLED: {
-              target: 'SELECTING_FIELDS',
+            [Event.canceled]: {
+              target: State.selectingFields,
             },
-            SUBMITTED_REASON: {
-              target: 'DECRYPTING',
-              actions: 'assignReason',
+            [Event.submittedReason]: {
+              target: State.decrypting,
+              actions: Action.assignReason,
             },
           },
         },
-        DECRYPTING: {
+        [State.decrypting]: {
           on: {
-            DECRYPT_SUCCEEDED: {
-              target: 'IDLE',
+            [Event.decryptSucceeded]: {
+              target: State.idle,
             },
-            DECRYPT_FAILED: {
-              target: 'CONFIRMING_REASON',
+            [Event.decryptFailed]: {
+              target: State.confirmingReason,
             },
           },
         },
@@ -126,8 +64,8 @@ export const createDecryptStateMachine = () =>
     },
     {
       guards: {
-        hasAtLeastOneFieldSelected: (context, event) => {
-          if (event.type === 'SUBMITTED_FIELDS') {
+        [Guard.hasAtLeastOneFieldSelected]: (context, event) => {
+          if (event.type === Event.submittedFields) {
             const { fields } = event.payload;
             const hasAnyFieldSelected = Object.keys(fields).length > 0;
             return hasAnyFieldSelected;
@@ -136,18 +74,18 @@ export const createDecryptStateMachine = () =>
         },
       },
       actions: {
-        assignInitialFields: (context, event) => {
-          if (event.type === 'HYDRATED') {
+        [Action.assignInitialFields]: (context, event) => {
+          if (event.type === Event.hydrated) {
             context.fields = event.payload.fields;
           }
         },
-        assignField: (context, event) => {
-          if (event.type === 'SUBMITTED_FIELDS') {
+        [Action.assignField]: (context, event) => {
+          if (event.type === Event.submittedFields) {
             context.fields = event.payload.fields;
           }
         },
-        assignReason: (context, event) => {
-          if (event.type === 'SUBMITTED_REASON') {
+        [Action.assignReason]: (context, event) => {
+          if (event.type === Event.submittedReason) {
             context.reason = event.payload.reason;
           }
         },
@@ -155,4 +93,5 @@ export const createDecryptStateMachine = () =>
     },
   );
 
-export default createDecryptStateMachine();
+const decryptStateMachine = createDecryptStateMachine();
+export default decryptStateMachine;

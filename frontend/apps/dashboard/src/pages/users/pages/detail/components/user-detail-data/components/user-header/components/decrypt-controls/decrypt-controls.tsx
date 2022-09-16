@@ -2,37 +2,41 @@ import { useTranslation } from 'hooks';
 import React from 'react';
 import { Box, Button } from 'ui';
 
-import { useDecryptMachine } from '../../../../../../utils/decrypt-state-machine';
+import { Event, State } from '../../../../../../utils/decrypt-state-machine';
+import { useDecryptMachine } from '../../../../../decrypt-machine-provider';
 import DecryptReasonDialog from '../decrypt-reason-dialog';
 
 const DecryptControls = () => {
   const { t } = useTranslation('pages.user-details.decrypt.controls');
   const [state, send] = useDecryptMachine();
 
+  const handleStart = () => {
+    send(Event.started);
+  };
+
+  const handleCancel = () => {
+    send(Event.canceled);
+  };
+
+  const decryptReasonDialogOpen =
+    state.matches(State.confirmingReason) || state.matches(State.decrypting);
+  const decryptSelectionInProgress =
+    state.matches(State.selectingFields) ||
+    state.matches(State.confirmingReason) ||
+    state.matches(State.decrypting);
+  const decryptIdle = state.matches(State.idle);
+  const decryptLoading = state.matches(State.decrypting);
+
   return (
     <>
-      {state.matches('IDLE') && (
-        <Button
-          size="small"
-          variant="secondary"
-          onClick={() => {
-            send('STARTED');
-          }}
-        >
+      {decryptIdle && (
+        <Button size="small" variant="secondary" onClick={handleStart}>
           {t('start')}
         </Button>
       )}
-      {(state.matches('SELECTING_FIELDS') ||
-        state.matches('CONFIRMING_REASON') ||
-        state.matches('DECRYPTING')) && (
+      {decryptSelectionInProgress && (
         <Box sx={{ display: 'flex', gap: 3 }}>
-          <Button
-            size="small"
-            variant="secondary"
-            onClick={() => {
-              send('CANCELLED');
-            }}
-          >
+          <Button size="small" variant="secondary" onClick={handleCancel}>
             {t('cancel')}
           </Button>
           <Button form="decrypt-form" size="small" type="submit">
@@ -41,11 +45,9 @@ const DecryptControls = () => {
         </Box>
       )}
       <DecryptReasonDialog
-        loading={state.matches('DECRYPTING')}
-        open={state.matches('CONFIRMING_REASON') || state.matches('DECRYPTING')}
-        onClose={() => {
-          send('CANCELLED');
-        }}
+        loading={decryptLoading}
+        open={decryptReasonDialogOpen}
+        onClose={handleCancel}
       />
     </>
   );

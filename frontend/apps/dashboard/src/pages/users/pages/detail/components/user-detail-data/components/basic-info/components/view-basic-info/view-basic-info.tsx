@@ -1,7 +1,7 @@
 import { useTranslation } from 'hooks';
 import { IcoBuilding24, IcoFileText224, IcoUserCircle24 } from 'icons';
 import React from 'react';
-import { User } from 'src/pages/users/hooks/use-join-users';
+import { nameData, User } from 'src/pages/users/hooks/use-join-users';
 import styled, { css } from 'styled-components';
 import { UserDataAttribute } from 'types';
 
@@ -29,18 +29,13 @@ const ViewBasicInfo = ({ user }: ViewBasicInfoProps) => {
         sx={{ gridArea: '1 / 1 / span 1 / span 1' }}
         title={t('user-info.basic.title')}
       >
-        {user.identityDataAttributes.includes(UserDataAttribute.firstName) && (
-          <DataRow
-            data={userAttributes.firstName}
-            title={allT('user-data-attributes.first-name')}
-          />
-        )}
-        {user.identityDataAttributes.includes(UserDataAttribute.lastName) && (
-          <DataRow
-            data={userAttributes.lastName}
-            title={allT('user-data-attributes.last-name')}
-          />
-        )}
+        {user.identityDataAttributes.includes(UserDataAttribute.firstName) &&
+          user.identityDataAttributes.includes(UserDataAttribute.lastName) && (
+            <DataRow
+              data={nameData(userAttributes)}
+              title={allT('collected-data-options.name')}
+            />
+          )}
         {user.identityDataAttributes.includes(UserDataAttribute.email) && (
           <DataRow
             title={allT('collected-data-options.email')}

@@ -2,7 +2,8 @@ import noop from 'lodash/noop';
 import React from 'react';
 import { Dialog } from 'ui';
 
-import { useDecryptMachine } from '../../../../../../utils/decrypt-state-machine';
+import { Event } from '../../../../../../utils/decrypt-state-machine';
+import { useDecryptMachine } from '../../../../../decrypt-machine-provider';
 import ReasonForm from './components/reason-form';
 
 type DecryptReasonDialogProps = {
@@ -19,7 +20,7 @@ const DecryptReasonDialog = ({
   const [, send] = useDecryptMachine();
 
   const handleSubmit = (reason: string) => {
-    send('SUBMITTED_REASON', { payload: { reason } });
+    send(Event.submittedReason, { payload: { reason } });
   };
 
   return (

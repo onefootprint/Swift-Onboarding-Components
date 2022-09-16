@@ -3,7 +3,8 @@ import { User } from 'src/pages/users/hooks/use-join-users';
 import { UserDataAttribute } from 'types';
 import { useUpdateEffect } from 'usehooks-ts';
 
-import { useDecryptMachine } from '../../../../utils/decrypt-state-machine';
+import { State } from '../../../../utils/decrypt-state-machine';
+import { useDecryptMachine } from '../../../decrypt-machine-provider';
 import DecryptBasicInfo from './components/decrypt-basic-info';
 import ViewBasicInfo from './components/view-basic-info';
 
@@ -18,12 +19,12 @@ type BasicInfoProps = {
 const BasicInfo = ({ user, onDecrypt }: BasicInfoProps) => {
   const [state] = useDecryptMachine();
   const showCheckboxes =
-    state.matches('SELECTING_FIELDS') ||
-    state.matches('CONFIRMING_REASON') ||
-    state.matches('DECRYPTING');
+    state.matches(State.selectingFields) ||
+    state.matches(State.confirmingReason) ||
+    state.matches(State.decrypting);
 
   useUpdateEffect(() => {
-    if (state.matches('DECRYPTING')) {
+    if (state.matches(State.decrypting)) {
       onDecrypt(state.context.fields, state.context.reason);
     }
   }, [state.value]);

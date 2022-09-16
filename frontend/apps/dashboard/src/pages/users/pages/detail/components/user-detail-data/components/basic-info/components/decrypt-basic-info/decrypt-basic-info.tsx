@@ -8,7 +8,8 @@ import styled, { css } from 'styled-components';
 import { UserDataAttribute } from 'types';
 import { Checkbox, useToast } from 'ui';
 
-import { useDecryptMachine } from '../../../../../../utils/decrypt-state-machine';
+import { Event } from '../../../../../../utils/decrypt-state-machine';
+import { useDecryptMachine } from '../../../../../decrypt-machine-provider';
 import getSectionsVisibility from '../../utils/get-sections-visibility';
 import DataContainer from '../data-container';
 
@@ -16,7 +17,12 @@ type DecryptBasicInfoProps = {
   user: User;
 };
 
-type FormData = Partial<Record<UserDataAttribute, boolean>>;
+const UserDataAttributeFullName = 'fullName';
+
+type FormData = Omit<
+  Record<UserDataAttribute, boolean>,
+  UserDataAttribute.firstName | UserDataAttribute.lastName
+> & { [UserDataAttributeFullName]: boolean };
 
 const DecryptBasicInfo = ({ user }: DecryptBasicInfoProps) => {
   const { t, allT } = useTranslation('pages.user-details');
@@ -33,7 +39,12 @@ const DecryptBasicInfo = ({ user }: DecryptBasicInfoProps) => {
     const fields = pickBy(formData);
     const hasAtLeastOneFieldSelected = Object.keys(fields).length > 0;
     if (hasAtLeastOneFieldSelected) {
-      send({ type: 'SUBMITTED_FIELDS', payload: { fields } });
+      if (fields[UserDataAttributeFullName]) {
+        delete fields[UserDataAttributeFullName];
+        fields[UserDataAttribute.firstName] = true;
+        fields[UserDataAttribute.lastName] = true;
+      }
+      send({ type: Event.submittedFields, payload: { fields } });
     } else {
       toast.show({
         description: t('decrypt.errors.min-selected.description'),
@@ -55,22 +66,16 @@ const DecryptBasicInfo = ({ user }: DecryptBasicInfoProps) => {
           sx={{ gridArea: '1 / 1 / span 1 / span 1' }}
           title={t('user-info.basic.title')}
         >
-          {user.identityDataAttributes.includes(
-            UserDataAttribute.firstName,
-          ) && (
-            <Checkbox
-              {...register(UserDataAttribute.firstName)}
-              disabled={isCheckboxDisabled(user.attributes.firstName.value)}
-              label={allT('user-data-attributes.first-name')}
-            />
-          )}
-          {user.identityDataAttributes.includes(UserDataAttribute.lastName) && (
-            <Checkbox
-              {...register(UserDataAttribute.lastName)}
-              disabled={isCheckboxDisabled(user.attributes.lastName.value)}
-              label={allT('user-data-attributes.last-name')}
-            />
-          )}
+          {user.identityDataAttributes.includes(UserDataAttribute.firstName) &&
+            user.identityDataAttributes.includes(
+              UserDataAttribute.lastName,
+            ) && (
+              <Checkbox
+                {...register(UserDataAttributeFullName)}
+                disabled={isCheckboxDisabled(user.attributes.firstName.value)}
+                label={allT('collected-data-options.name')}
+              />
+            )}
           {user.identityDataAttributes.includes(UserDataAttribute.email) && (
             <Checkbox
               {...register(UserDataAttribute.email)}

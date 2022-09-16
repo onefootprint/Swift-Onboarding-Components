@@ -5,10 +5,10 @@ import styled, { css } from 'styled-components';
 import { Typography } from 'ui';
 
 import useGetUsers from '../../hooks/use-get-users';
+import DecryptMachineProvider from './components/decrypt-machine-provider';
 import UserDetailsData from './components/user-detail-data';
 import UserDetailEmptyState from './components/user-detail-empty-state';
 import UserDetailsLoading from './components/user-detail-loading';
-import DecryptMachineProvider from './utils/decrypt-state-machine';
 
 const Detail = () => {
   const { t } = useTranslation('pages.user-details');

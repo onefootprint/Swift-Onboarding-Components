@@ -10,7 +10,8 @@ import { useEffectOnce } from 'usehooks-ts';
 
 import { User } from '../../../../hooks/use-join-users';
 import { UserData } from '../../../../hooks/use-user-data';
-import { useDecryptMachine } from '../../utils/decrypt-state-machine';
+import { Event } from '../../utils/decrypt-state-machine';
+import { useDecryptMachine } from '../decrypt-machine-provider';
 import AuditTrail from './components/audit-trail';
 import BasicInfo from './components/basic-info';
 import Insights from './components/insights';
@@ -29,7 +30,7 @@ const UserDetailsData = ({ user, decrypt }: UserDetailsDataProps) => {
   const toast = useToast();
   const [, send] = useDecryptMachine();
 
-  const hidratedFields = () => {
+  const hydrateFields = () => {
     const fields: Partial<Record<UserDataAttribute, boolean>> = {};
     Object.entries(user.attributes).forEach(([key, item]) => {
       if ((item as UserData).value !== undefined) {
@@ -37,10 +38,10 @@ const UserDetailsData = ({ user, decrypt }: UserDetailsDataProps) => {
       }
     });
     if (Object.keys(fields).length > 0) {
-      send({ type: 'HYDRATED', payload: { fields } });
+      send({ type: Event.hydrated, payload: { fields } });
     }
   };
-  useEffectOnce(hidratedFields);
+  useEffectOnce(hydrateFields);
 
   const handleDecrypt = async (
     fields: Partial<Record<UserDataAttribute, boolean>>,
@@ -52,9 +53,9 @@ const UserDetailsData = ({ user, decrypt }: UserDetailsDataProps) => {
         reason,
         userId: user.footprintUserId,
       });
-      send({ type: 'DECRYPT_SUCCEEDED' });
+      send({ type: Event.decryptSucceeded });
     } catch (error: unknown) {
-      send({ type: 'DECRYPT_FAILED' });
+      send({ type: Event.decryptFailed });
       toast.show({
         description: getErrorMessage(error as RequestError),
         title: 'Uh-oh!',
