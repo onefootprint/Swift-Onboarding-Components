@@ -46,15 +46,6 @@ cargo run -p enclave
 cargo run -p footprint-core
 ```
 
-Note: the enclave in production is a Nitro Enclave and is only reachable via `VSOCK` -- secure linux tunnels. If testing on an EC2 machine with the enclave loaded into the Nitro Enclave, test locally by adding the `vsock` feature for `footprint-core` and the `nitro` feature for `enclave`:
-
-````
-# build the enclave for use within the Nitro Enclave
-cargo build -p enclave --features nitro
-
-# runs the api crate in vsock mode, assuming the binary in the previous step is loaded into the Nitro Enclave
-cargo run -p footprint-core --features vsock
-
 ### Faster local development
 If you'd like to not have to manually restart the server process when you make changes, you can use this fancy [cargo-watch](https://crates.io/crates/cargo-watch) crate.
 
@@ -66,6 +57,17 @@ cargo install cargo-watch
 Then, you can start a watcher that will continuously compile and restart your server process as you make code changes.
 ```bash
 make watch-local
+```
+
+## Nitro testing
+Note: the enclave in production is a Nitro Enclave and is only reachable via `VSOCK` -- secure linux tunnels. If testing on an EC2 machine with the enclave loaded into the Nitro Enclave, test locally by adding the `vsock` feature for `footprint-core` and the `nitro` feature for `enclave`:
+
+```
+# build the enclave for use within the Nitro Enclave
+cargo build -p enclave --features nitro
+
+# runs the api crate in vsock mode, assuming the binary in the previous step is loaded into the Nitro Enclave
+cargo run -p footprint-core --features vsock
 ```
 
 ## Pulumi setup (for infra managment only)
