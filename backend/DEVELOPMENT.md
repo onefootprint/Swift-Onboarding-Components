@@ -4,6 +4,11 @@
 
 You'll need `openssl` and `postgres` to run the code locally.
 
+```sh
+brew install openssl
+brew install postgresql@14
+```
+
 ## Get AWS credentials
 
 AWS creds are used along with Pulumi (see below) and also for encrypting/decrypting the local development .env file
@@ -11,7 +16,7 @@ AWS creds are used along with Pulumi (see below) and also for encrypting/decrypt
 1. You'll need the [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html). With homebrew `$ brew install awscli`
 2. Generate your credentials in the AWS Console
    - Log in to the AWS Management console via [Rippling](https://www.rippling.com/) using Single Sign On for Amazon
-     b. Navigate to Services => Security, Identity, & Compliance => IAM
+   - Navigate to Services => Security, Identity, & Compliance => IAM
    - Click "users" on the left hand sidebar
    - Generate a new user (yourname). No need to add tags or anything, just copy the permissions from an existing user
    - Run `$ aws configure` and enter your access key and secret access key to configure your aws profile. Pulumi had trouble reading credentials I configured using the aws CLI, so I would also recommend setting your AWS_ACCESS_KEY_ID annd AWS_SECRET_KEY environment variables
@@ -26,24 +31,29 @@ make set-dot-env
 
 Next, ensure your postgres is running at you set your `DATABASE_URL` env.
 
-To run the core api crate:
-
+To run the server:
+```sh
+make run-local
 ```
+
+Under the hood this runs a local enclave and the `footprint-core` api server:
+
+```sh
 # starts up the local simulated enclave for encryption/decryption
-$ cargo run -p enclave
+cargo run -p enclave
 
 # runs the api crate
-$ cargo run -p footprint-core
+cargo run -p footprint-core
 ```
 
 Note: the enclave in production is a Nitro Enclave and is only reachable via `VSOCK` -- secure linux tunnels. If testing on an EC2 machine with the enclave loaded into the Nitro Enclave, test locally by adding the `vsock` feature for `footprint-core` and the `nitro` feature for `enclave`:
 
 ````
 # build the enclave for use within the Nitro Enclave
-$ cargo build -p enclave --features nitro
+cargo build -p enclave --features nitro
 
 # runs the api crate in vsock mode, assuming the binary in the previous step is loaded into the Nitro Enclave
-$ cargo run -p footprint-core --features vsock
+cargo run -p footprint-core --features vsock
 
 ### Faster local development
 If you'd like to not have to manually restart the server process when you make changes, you can use this fancy [cargo-watch](https://crates.io/crates/cargo-watch) crate.
@@ -54,13 +64,11 @@ cargo install cargo-watch
 ````
 
 Then, you can start a watcher that will continuously compile and restart your server process as you make code changes.
-
 ```bash
-cargo watch -x 'run -p footprint-core' -i ci
+make watch-local
 ```
 
-## Getting Pulumi setup
-
+## Pulumi setup (for infra managment only)
 Pulumi is our infra-as-code framework. All of the pulumi code is in /infra. For development, you'll interact with pulumi directly if you're adding/modifying config variables or secrets, if you're modifying infrastructure, or if you're building an ephemeral environment/stack.
 
 1. Install [pulumi](https://www.pulumi.com/docs/get-started/install/). With homebrew, run `$ brew install pulumi`
@@ -85,14 +93,11 @@ If you want to develop and test a new feature, and need to build the infrastruct
 2. Run pulumi locally to build the test stack. After logging in to pulumi (see step 5 of prerequisites) you can manually build a new stack
 
 ```
-# Copy infra config to properly named file
-$ cp Pulumi.dev.yaml Pulumi.${{ stackName }}.yaml
+# make sure you're on a feature branch
+$ git checkout -b my-feature
 
-# Create new dev stack
-$ pulumi stack init --secrets-provider awskms://4e61ea01-1193-475e-82ee-e9639743efd6?region=us-east-1 --copy-config-from "footprint/dev" "footprint/${{ stackName }}"
-
-# Select your new dev stack for infra deployment
-$ pulumi stack select footprint/${{ stackName }}
+# spin up an ephemeral stack
+$ cd infra/ && ./ephemeral-dev.sh
 
 # Deploy infrastructure to stack
 $ pulumi up
@@ -107,19 +112,15 @@ We use pulumi secrets to help us manage sensitive information we need to run our
 
 To add a secret to pulumi, do the following:
 
-```
+```sh
 $ cd infra/
-$ pulumi config set --secret SECRET_NAME SECRET_VALUE
-// open Pulumi.dev.yaml & move the generated secret value to whatever block is appropriate, following the existing structure
+$ pulumi --stack footprint/dev config set --secret <SECRET_NAME> <SECRET_VALUE?
+$ pulumi --stack footprint/prod config set --secret <SECRET_NAME> <SECRET_VALUE?
 ```
 
-To add the secret to the container environment, first edit secrets.ts to add your new secret to StaticSecrets. Then, go to container.ts in the /infra/service directory and add your new secret following the existing structure to the containerDef.
+- To add the secret to the container environment, first edit secrets.ts to add your new secret to StaticSecrets. Then, go to container.ts in the /infra/service directory and add your new secret following the existing structure to the containerDef.
 
-When pulumi runs, it will now add your secrets to the container environment! To read them in to the application, you get edit config.rs and main.rs in the api crate.
-
-## Codespaces development
-
-On the repo, open `code -> new codespace`. You can develop in the browser or open in vscode locally. **This environment has all that you need to do development locally (including secrets)**. If you want to do pulumi/infra work make sure you set your personal pulumi creds in settings -> codespaces -> secrets so they are installed on the machine.
+- When pulumi runs, it will now add your secrets to the container environment! To read them in to the application, you get edit config.rs and main.rs in the api crate.
 
 ## Database Schema + Migrations
 
@@ -161,27 +162,7 @@ Note: replace `jumpbox-dev` with `jumpbox-<ENV_NAME_HERE>`
 
 ## Using Diesel CLI on dev/dev-ephemeral DB
 
-You may want to run local diesel commands against a deployed db environment.
-In this case you need to do two things: 1) get the proper DATABASE_URL and 2) tunnel your network packets through tailscale through the jumpbox box.
-We provide helper script installed on the jumpbox to make this easy.
-
-1. Open a tunnel and setup port forwarding:
-
-```sh
-ssh -L 5432:localhost:5432 ec2-user@jumpbox-dev /db_proxy.sh
-```
-
-2. In a new terminal, check that `psql` works locally (using the password above):
-
-```sh
-psql postgresql://postgres:<PASSWORD>@<JUMPBOX_IP>
-```
-
-3. Finally use diesel as desired, for example
-
-```sh
-diesel --database-url postgresql://postgres:<PASSWORD>@<JUMPBOX_IP> print-schema
-```
+If you need to run local diesel commands against a deployed db environment, get the database url from the jumpbox and just use that with `psql`. It will work because of Tailscale magic route advertising.
 
 ## Wiping a db
 ```
@@ -227,5 +208,6 @@ TEST_URL="http://localhost:8000" pytest -x ci/tests
 ```
 
 ## Accessing Logs & Metrics
-
-We run a side car that exports logs to elastic cloud. Ask @agrinman for access! Loging via google SSO @onefootprint.com
+We run a side car that exports logs, telemtry, and tracing to elastic cloud.
+Link: https://onefootprint.kb.us-east-2.aws.elastic-cloud.com:9243/app/discover
+(Ask @agrinman for access if you need it, login via google SSO @onefootprint.com)
