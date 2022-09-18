@@ -1,8 +1,8 @@
-use crate::errors::DbError;
 use crate::models::phone_number::PhoneNumber;
 use crate::models::scoped_user::ScopedUser;
 use crate::models::user_vault::*;
 use crate::schema;
+use crate::{errors::DbError, models};
 use diesel::prelude::*;
 use newtypes::{DataPriority, Fingerprint, UserVaultId};
 
@@ -73,21 +73,42 @@ pub async fn get(pool: &crate::DbPool, uv_id: UserVaultId) -> Result<UserVault, 
     Ok(user)
 }
 
+#[tracing::instrument(skip(pool, sh_data))]
 pub async fn get_by_fingerprint(
     pool: &crate::DbPool,
     sh_data: Fingerprint,
 ) -> Result<Option<UserVault>, DbError> {
-    let result = pool
+    // we don't filter by is_unique here because we opportunistically
+    // want to identify users with not-yet-verified emails
+    // (provided they are the only such user in the system)
+    let results: Vec<(UserVault, models::fingerprint::Fingerprint)> = pool
         .db_query(move |conn| -> Result<_, DbError> {
             let result = schema::user_vault::table
                 .inner_join(schema::fingerprint::table)
                 .filter(schema::fingerprint::sh_data.eq(sh_data))
-                .select(schema::user_vault::all_columns)
-                .first(conn)
-                .optional()?;
+                .get_results(conn)?;
             Ok(result)
         })
         .await??;
 
-    Ok(result)
+    // we found more than 1 vault on this fingerprint
+    if results.len() > 1 {
+        // find the unique vaults for this fingerprint
+        let unique: Vec<UserVault> = results
+            .into_iter()
+            .filter(|(_, fp)| fp.is_unique)
+            .map(|(uv, _)| uv)
+            .collect();
+
+        if unique.len() == 1 {
+            return Ok(unique.into_iter().next());
+        }
+
+        // in this case, more than 1 vault have non-verified claims for this email address
+        // so we cannot be sure which user vault we are trying to identify
+        tracing::info!("found more than one vault for fingerprint");
+        return Ok(None);
+    }
+
+    Ok(results.into_iter().map(|(uv, _)| uv).next())
 }
