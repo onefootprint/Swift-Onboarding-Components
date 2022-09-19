@@ -3,7 +3,7 @@ use crate::auth::{session_data::user::UserAuthScope, VerifiedUserAuth};
 
 use crate::errors::user::UserError;
 use crate::errors::ApiError;
-use crate::types::response::ApiResponseData;
+use crate::types::response::ResponseData;
 use crate::types::EmptyResponse;
 use crate::utils::email::send_email_challenge;
 use crate::utils::user_vault_wrapper::UserVaultWrapper;
@@ -32,7 +32,7 @@ pub async fn post(
     state: web::Data<State>,
     user_auth: UserAuth,
     request: Json<AddEmailRequest>,
-) -> actix_web::Result<Json<ApiResponseData<EmptyResponse>>, ApiError> {
+) -> actix_web::Result<Json<ResponseData<EmptyResponse>>, ApiError> {
     let user_auth = user_auth.check_permissions(vec![UserAuthScope::SignUp])?;
 
     if request.speculative {
@@ -67,5 +67,5 @@ pub async fn post(
 
     send_email_challenge(&state, email_id, &email_address).await?;
 
-    Ok(Json(ApiResponseData::ok(EmptyResponse {})))
+    Ok(Json(ResponseData::ok(EmptyResponse {})))
 }

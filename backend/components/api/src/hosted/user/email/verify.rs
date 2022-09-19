@@ -1,5 +1,5 @@
 use crate::errors::challenge::ChallengeError;
-use crate::types::response::ApiResponseData;
+use crate::types::response::ResponseData;
 use crate::types::EmptyResponse;
 use crate::{auth::session_data::AuthSessionData, utils::session::AuthSession};
 
@@ -26,7 +26,7 @@ struct EmailVerifyRequest {
 async fn post(
     state: web::Data<State>,
     request: Json<EmailVerifyRequest>,
-) -> actix_web::Result<Json<ApiResponseData<EmptyResponse>>, ApiError> {
+) -> actix_web::Result<Json<ResponseData<EmptyResponse>>, ApiError> {
     let session = AuthSession::get(&state, &request.data)
         .await?
         .ok_or(ChallengeError::EmailVerificationTokenInvalidOrNotFound)?;
@@ -44,5 +44,5 @@ async fn post(
         .db_query(move |conn| Email::mark_verified(conn, &data.email_id))
         .await??;
 
-    Ok(Json(ApiResponseData::ok(EmptyResponse {})))
+    Ok(Json(ResponseData::ok(EmptyResponse {})))
 }

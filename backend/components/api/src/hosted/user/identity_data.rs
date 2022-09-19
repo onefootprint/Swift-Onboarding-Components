@@ -3,7 +3,7 @@ use crate::auth::UserAuth;
 use crate::auth::VerifiedUserAuth;
 use crate::types::identity_data_request::IdentityDataRequest;
 use crate::types::identity_data_request::IdentityDataUpdate;
-use crate::types::response::ApiResponseData;
+use crate::types::response::ResponseData;
 use crate::types::EmptyResponse;
 use crate::utils::user_vault_wrapper::UserVaultWrapper;
 use crate::{errors::ApiError, State};
@@ -20,7 +20,7 @@ async fn handler(
     state: web::Data<State>,
     user_auth: UserAuth,
     request: web::Json<IdentityDataRequest>,
-) -> actix_web::Result<Json<ApiResponseData<EmptyResponse>>, ApiError> {
+) -> actix_web::Result<Json<ResponseData<EmptyResponse>>, ApiError> {
     let user_auth = user_auth.check_permissions(vec![UserAuthScope::SignUp])?;
     if request.speculative {
         // We've already parsed the request and done validation on the input. Return a successful

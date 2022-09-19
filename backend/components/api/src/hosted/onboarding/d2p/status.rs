@@ -2,7 +2,7 @@ use crate::auth::session_data::user::UserAuthScope;
 use crate::auth::UserAuth;
 use crate::errors::handoff::HandoffError;
 use crate::errors::ApiError;
-use crate::types::response::ApiResponseData;
+use crate::types::response::ResponseData;
 use crate::types::EmptyResponse;
 use crate::utils::session::{HandoffRecord, JsonSession};
 use crate::State;
@@ -24,7 +24,7 @@ pub struct StatusResponse {
 pub async fn get(
     state: web::Data<State>,
     user_auth: UserAuth,
-) -> actix_web::Result<Json<ApiResponseData<StatusResponse>>, ApiError> {
+) -> actix_web::Result<Json<ResponseData<StatusResponse>>, ApiError> {
     let user_auth = user_auth.check_permissions(vec![UserAuthScope::Handoff])?;
 
     let session = &state
@@ -32,7 +32,7 @@ pub async fn get(
         .db_query(move |conn| JsonSession::<HandoffRecord>::get(conn, &user_auth.auth_token))
         .await??
         .ok_or(HandoffError::HandoffSessionNotFound)?;
-    Ok(Json(ApiResponseData {
+    Ok(Json(ResponseData {
         data: StatusResponse {
             status: session.data.status,
         },
@@ -55,7 +55,7 @@ pub fn post(
     user_auth: UserAuth,
     request: Json<UpdateStatusRequest>,
     state: web::Data<State>,
-) -> actix_web::Result<Json<ApiResponseData<EmptyResponse>>, ApiError> {
+) -> actix_web::Result<Json<ResponseData<EmptyResponse>>, ApiError> {
     let user_auth = user_auth.check_permissions(vec![UserAuthScope::Handoff])?;
 
     let UpdateStatusRequest { status } = request.into_inner();

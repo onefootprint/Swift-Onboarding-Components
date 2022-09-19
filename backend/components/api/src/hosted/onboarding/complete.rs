@@ -4,7 +4,7 @@ use crate::auth::UserAuth;
 use crate::auth::VerifiedUserAuth;
 use crate::errors::onboarding::OnboardingError;
 use crate::errors::ApiError;
-use crate::types::response::ApiResponseData;
+use crate::types::response::ResponseData;
 use crate::utils::idv::initiate_idv_requests;
 use crate::utils::insight_headers::InsightHeaders;
 use crate::utils::user_vault_wrapper::UserVaultWrapper;
@@ -44,7 +44,7 @@ fn handler(
     tenant_auth: PublicTenantAuthContext,
     insights: InsightHeaders,
     state: web::Data<State>,
-) -> actix_web::Result<Json<ApiResponseData<CommitResponse>>, ApiError> {
+) -> actix_web::Result<Json<ResponseData<CommitResponse>>, ApiError> {
     let user_auth = user_auth.check_permissions(vec![UserAuthScope::OrgOnboarding])?;
 
     let uvw = state
@@ -112,7 +112,7 @@ fn handler(
         .await?;
     }
 
-    Ok(Json(ApiResponseData {
+    Ok(Json(ResponseData {
         data: CommitResponse {
             validation_token,
             missing_webauthn_credentials: webauthn_creds.is_empty(),

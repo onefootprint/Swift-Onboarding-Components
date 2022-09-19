@@ -6,7 +6,7 @@ use crate::auth::key_context::secret_key::SecretTenantAuthContext;
 use crate::auth::{Either, TenantAuth, WorkOsAuth};
 
 use crate::types::identity_data_request::{IdentityDataRequest, IdentityDataUpdate};
-use crate::types::{ApiResponseData, EmptyResponse, JsonApiResponse};
+use crate::types::{EmptyResponse, JsonApiResponse, ResponseData};
 
 use crate::utils::insight_headers::InsightHeaders;
 use crate::utils::user_vault_wrapper::UserVaultWrapper;
@@ -163,7 +163,7 @@ pub async fn get(
         custom: custom_results.into_inner().data,
     };
 
-    ApiResponseData::ok(out).json()
+    ResponseData::ok(out).json()
 }
 
 /**
@@ -243,5 +243,5 @@ pub async fn post_decrypt(
         custom: custom_results.into_inner().data,
     };
 
-    ApiResponseData::ok(out).json()
+    ResponseData::ok(out).json()
 }

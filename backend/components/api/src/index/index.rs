@@ -1,4 +1,4 @@
-use crate::types::{response::ApiResponseData, StringResponse};
+use crate::types::{response::ResponseData, StringResponse};
 use crate::types::{EmptyResponse, JsonApiResponse};
 use actix_web::HttpRequest;
 
@@ -8,7 +8,7 @@ use paperclip::actix::{api_v2_operation, get};
 #[tracing::instrument(name = "index")]
 #[get("/")]
 async fn root() -> JsonApiResponse<EmptyResponse> {
-    ApiResponseData::ok(EmptyResponse {}).json()
+    ResponseData::ok(EmptyResponse {}).json()
 }
 
 #[tracing::instrument(name = "debug_headers", skip(req))]

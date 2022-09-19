@@ -1,7 +1,7 @@
 use crate::auth::session_data::user::UserAuthScope;
 use crate::auth::{UserAuth, VerifiedUserAuth};
 use crate::errors::ApiError;
-use crate::types::response::ApiResponseData;
+use crate::types::response::ResponseData;
 use chrono::{DateTime, Utc};
 use newtypes::UserVaultId;
 use paperclip::actix::{api_v2_operation, get, web::Json, Apiv2Schema};
@@ -20,10 +20,10 @@ pub struct TokenResponse {
     description = "Returns information about a given auth token."
 )]
 #[get("token")]
-pub fn get(user_auth: UserAuth) -> actix_web::Result<Json<ApiResponseData<TokenResponse>>, ApiError> {
+pub fn get(user_auth: UserAuth) -> actix_web::Result<Json<ResponseData<TokenResponse>>, ApiError> {
     let user_auth = user_auth.check_permissions(vec![UserAuthScope::SignUp, UserAuthScope::BasicProfile])?;
 
-    Ok(Json(ApiResponseData::ok(TokenResponse {
+    Ok(Json(ResponseData::ok(TokenResponse {
         user_vault_id: user_auth.user_vault_id(),
         scopes: user_auth.data.scopes,
         expires_at: user_auth.expires_at,

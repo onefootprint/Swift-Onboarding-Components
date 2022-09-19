@@ -3,9 +3,9 @@ use crate::auth::CheckTenantPermissions;
 use crate::auth::Either;
 use crate::auth::WorkOsAuth;
 use crate::errors::ApiError;
-use crate::types::access_event::ApiAccessEvent;
+use crate::types::access_event::FpAccessEvent;
 use crate::types::request::PaginatedRequest;
-use crate::types::response::ApiPaginatedResponseData;
+use crate::types::response::PaginatedResponseData;
 use crate::State;
 use chrono::{DateTime, Utc};
 use db::access_event::{AccessEventListItemForTenant, AccessEventListQueryParams};
@@ -29,7 +29,7 @@ struct AccessEventRequest {
     timestamp_gte: Option<DateTime<Utc>>,
 }
 
-type AccessEventResponse = Vec<ApiAccessEvent>;
+type AccessEventResponse = Vec<FpAccessEvent>;
 
 #[api_v2_operation(
     summary = "users/access_events",
@@ -43,7 +43,7 @@ fn get(
     state: web::Data<State>,
     request: web::Query<PaginatedRequest<AccessEventRequest, i64>>,
     auth: Either<WorkOsAuth, SecretTenantAuthContext>,
-) -> actix_web::Result<Json<ApiPaginatedResponseData<AccessEventResponse, i64>>, ApiError> {
+) -> actix_web::Result<Json<PaginatedResponseData<AccessEventResponse, i64>>, ApiError> {
     let auth = auth.check_permissions(vec![TenantPermission::Users])?;
     let page_size = request.page_size(&state);
     let cursor = request.cursor;
@@ -75,7 +75,7 @@ fn get(
     let response = results
         .into_iter()
         .take(page_size)
-        .map(ApiAccessEvent::from)
-        .collect::<Vec<ApiAccessEvent>>();
-    Ok(Json(ApiPaginatedResponseData::ok(response, cursor, None)))
+        .map(FpAccessEvent::from)
+        .collect::<Vec<FpAccessEvent>>();
+    Ok(Json(PaginatedResponseData::ok(response, cursor, None)))
 }

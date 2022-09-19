@@ -4,7 +4,7 @@ use newtypes::{secret_api_key::SecretApiKey, ApiKeyStatus, TenantApiKeyId};
 use paperclip::actix::Apiv2Schema;
 
 #[derive(Debug, Clone, serde::Serialize, Apiv2Schema)]
-pub struct TenantApiKeyResponse {
+pub struct FpTenantApiKey {
     id: TenantApiKeyId,
     name: String,
     status: ApiKeyStatus,
@@ -15,7 +15,7 @@ pub struct TenantApiKeyResponse {
     is_live: bool,
 }
 
-impl From<(TenantApiKey, Option<SecretApiKey>, Option<DateTime<Utc>>)> for TenantApiKeyResponse {
+impl From<(TenantApiKey, Option<SecretApiKey>, Option<DateTime<Utc>>)> for FpTenantApiKey {
     fn from(s: (TenantApiKey, Option<SecretApiKey>, Option<DateTime<Utc>>)) -> Self {
         let TenantApiKey {
             id,
@@ -37,19 +37,19 @@ impl From<(TenantApiKey, Option<SecretApiKey>, Option<DateTime<Utc>>)> for Tenan
     }
 }
 
-impl From<(Option<DateTime<Utc>>, TenantApiKey)> for TenantApiKeyResponse {
+impl From<(Option<DateTime<Utc>>, TenantApiKey)> for FpTenantApiKey {
     fn from(s: (Option<DateTime<Utc>>, TenantApiKey)) -> Self {
         Self::from((s.1, None, s.0))
     }
 }
 
-impl From<(TenantApiKey, Option<SecretApiKey>)> for TenantApiKeyResponse {
+impl From<(TenantApiKey, Option<SecretApiKey>)> for FpTenantApiKey {
     fn from(s: (TenantApiKey, Option<SecretApiKey>)) -> Self {
         Self::from((s.0, s.1, None))
     }
 }
 
-impl From<TenantApiKey> for TenantApiKeyResponse {
+impl From<TenantApiKey> for FpTenantApiKey {
     fn from(s: TenantApiKey) -> Self {
         Self::from((s, None, None))
     }

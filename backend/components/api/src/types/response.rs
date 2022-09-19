@@ -9,7 +9,7 @@ use serde::Serialize;
 use crate::errors::ApiResult;
 
 /// return footprint api results
-pub type JsonApiResponse<T> = ApiResult<Json<ApiResponseData<T>>>;
+pub type JsonApiResponse<T> = ApiResult<Json<ResponseData<T>>>;
 
 /// return string results
 pub type StringResponse = ApiResult<String>;
@@ -20,11 +20,11 @@ pub struct EmptyResponse {}
 
 #[derive(Debug, Clone, serde::Serialize)]
 #[serde(transparent)]
-pub struct ApiResponseData<T> {
+pub struct ResponseData<T> {
     pub data: T,
 }
 
-impl<T> ApiResponseData<T> {
+impl<T> ResponseData<T> {
     pub fn ok(data: T) -> Self {
         Self { data }
     }
@@ -35,14 +35,14 @@ impl<T> ApiResponseData<T> {
 }
 
 impl EmptyResponse {
-    pub fn ok() -> ApiResponseData<EmptyResponse> {
-        ApiResponseData {
+    pub fn ok() -> ResponseData<EmptyResponse> {
+        ResponseData {
             data: EmptyResponse {},
         }
     }
 }
 
-impl<T> paperclip::v2::schema::Apiv2Schema for ApiResponseData<T>
+impl<T> paperclip::v2::schema::Apiv2Schema for ResponseData<T>
 where
     T: paperclip::v2::schema::Apiv2Schema,
 {
@@ -63,10 +63,9 @@ where
     }
 }
 
-impl<T> paperclip::actix::OperationModifier for ApiResponseData<T> where T: paperclip::actix::OperationModifier
-{}
+impl<T> paperclip::actix::OperationModifier for ResponseData<T> where T: paperclip::actix::OperationModifier {}
 
-impl<T> Responder for ApiResponseData<T>
+impl<T> Responder for ResponseData<T>
 where
     T: Serialize,
 {
@@ -78,27 +77,27 @@ where
 }
 
 #[derive(Debug, Clone, serde::Serialize, Apiv2Schema)]
-pub struct ApiPaginatedResponseMeta<C> {
+pub struct PaginatedReponseMeta<C> {
     pub next: Option<C>,
     pub count: Option<i64>,
 }
 
 #[derive(Debug, Clone, serde::Serialize)]
-pub struct ApiPaginatedResponseData<T, C> {
+pub struct PaginatedResponseData<T, C> {
     pub data: T,
-    pub meta: ApiPaginatedResponseMeta<C>,
+    pub meta: PaginatedReponseMeta<C>,
 }
 
-impl<T, C: Clone> ApiPaginatedResponseData<T, C> {
+impl<T, C: Clone> PaginatedResponseData<T, C> {
     pub fn ok(data: T, next: Option<C>, count: Option<i64>) -> Self {
         Self {
             data,
-            meta: ApiPaginatedResponseMeta { next, count },
+            meta: PaginatedReponseMeta { next, count },
         }
     }
 }
 
-impl<T, C> Responder for ApiPaginatedResponseData<T, C>
+impl<T, C> Responder for PaginatedResponseData<T, C>
 where
     T: Serialize,
     C: Serialize,
@@ -110,7 +109,7 @@ where
     }
 }
 
-impl<T, C> paperclip::v2::schema::Apiv2Schema for ApiPaginatedResponseData<T, C>
+impl<T, C> paperclip::v2::schema::Apiv2Schema for PaginatedResponseData<T, C>
 where
     T: paperclip::v2::schema::Apiv2Schema,
     C: TypedData,
@@ -137,16 +136,15 @@ where
             ..Default::default()
         };
         schema.properties.insert("data".into(), Box::new(T::raw_schema()));
-        schema.properties.insert(
-            "meta".into(),
-            Box::new(ApiPaginatedResponseMeta::<C>::raw_schema()),
-        );
+        schema
+            .properties
+            .insert("meta".into(), Box::new(PaginatedReponseMeta::<C>::raw_schema()));
 
         schema
     }
 }
 
-impl<T, C> paperclip::actix::OperationModifier for ApiPaginatedResponseData<T, C>
+impl<T, C> paperclip::actix::OperationModifier for PaginatedResponseData<T, C>
 where
     T: paperclip::v2::schema::Apiv2Schema,
     C: TypedData,

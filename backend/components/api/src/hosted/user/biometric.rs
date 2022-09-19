@@ -1,7 +1,7 @@
 use crate::{
     auth::{session_data::user::UserAuthScope, UserAuth, VerifiedUserAuth},
     errors::{challenge::ChallengeError, ApiError},
-    types::{response::ApiResponseData, EmptyResponse},
+    types::{response::ResponseData, EmptyResponse},
     utils::{
         challenge::{Challenge, ChallengeToken},
         insight_headers::InsightHeaders,
@@ -53,7 +53,7 @@ pub fn init(
     // their own webauthn creds
     user_auth: UserAuth,
     state: web::Data<State>,
-) -> actix_web::Result<Json<ApiResponseData<WebAuthnInitResponse>>, ApiError> {
+) -> actix_web::Result<Json<ResponseData<WebAuthnInitResponse>>, ApiError> {
     let user_auth = user_auth.check_permissions(vec![UserAuthScope::SignUp, UserAuthScope::Handoff])?;
 
     let user_vault_id = user_auth.user_vault_id();
@@ -86,7 +86,7 @@ pub fn init(
         expires_at: Utc::now() + Duration::minutes(5),
         data: reg_state,
     };
-    let response = ApiResponseData::ok(WebAuthnInitResponse {
+    let response = ResponseData::ok(WebAuthnInitResponse {
         challenge_json: serde_json::to_string(&challenge)?,
         challenge_token: challenge_data.seal(&state.challenge_sealing_key)?,
     });
@@ -118,7 +118,7 @@ async fn complete(
     user_auth: UserAuth,
     insights: InsightHeaders,
     state: web::Data<State>,
-) -> actix_web::Result<Json<ApiResponseData<EmptyResponse>>, ApiError> {
+) -> actix_web::Result<Json<ResponseData<EmptyResponse>>, ApiError> {
     let user_auth = user_auth.check_permissions(vec![UserAuthScope::SignUp, UserAuthScope::Handoff])?;
 
     let challenge_data = Challenge::unseal(&state.challenge_sealing_key, &request.challenge_token)?;

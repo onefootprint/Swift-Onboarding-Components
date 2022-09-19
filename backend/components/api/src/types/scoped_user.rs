@@ -3,19 +3,19 @@ use db::models::{onboarding::OnboardingInfo, scoped_user::ScopedUser};
 use newtypes::{DataAttribute, FootprintUserId};
 use paperclip::actix::Apiv2Schema;
 
-use super::onboarding::ApiOnboarding;
+use super::onboarding::FpOnboarding;
 
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize, Apiv2Schema)]
-pub struct ApiScopedUser {
+pub struct FpScopedUser {
     pub footprint_user_id: FootprintUserId,
     pub identity_data_attributes: Vec<DataAttribute>,
     pub start_timestamp: DateTime<Utc>,
     pub ordering_id: i64,
-    pub onboardings: Vec<ApiOnboarding>,
+    pub onboardings: Vec<FpOnboarding>,
     pub is_portable: bool,
 }
 
-impl ApiScopedUser {
+impl FpScopedUser {
     pub fn from(
         identity_data_attributes: Vec<DataAttribute>,
         onboarding_info: &[OnboardingInfo],
@@ -29,7 +29,7 @@ impl ApiScopedUser {
             ..
         } = scoped_user;
 
-        ApiScopedUser {
+        FpScopedUser {
             footprint_user_id: fp_user_id,
             identity_data_attributes,
             start_timestamp,
@@ -37,7 +37,7 @@ impl ApiScopedUser {
             is_portable,
             onboardings: onboarding_info
                 .iter()
-                .map(|x| ApiOnboarding::from(x.clone()))
+                .map(|x| FpOnboarding::from(x.clone()))
                 .collect(),
         }
     }

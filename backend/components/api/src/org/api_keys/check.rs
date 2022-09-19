@@ -1,9 +1,7 @@
 use crate::errors::ApiError;
-use crate::types::response::ApiResponseData;
+use crate::types::response::ResponseData;
 use crate::State;
-use crate::{
-    auth::key_context::secret_key::SecretTenantAuthContext, types::secret_api_key::TenantApiKeyResponse,
-};
+use crate::{auth::key_context::secret_key::SecretTenantAuthContext, types::secret_api_key::FpTenantApiKey};
 
 use chrono::Utc;
 use paperclip::actix::{api_v2_operation, get, web, web::Json};
@@ -18,7 +16,7 @@ use paperclip::actix::{api_v2_operation, get, web, web::Json};
 async fn get(
     _state: web::Data<State>,
     auth: SecretTenantAuthContext,
-) -> actix_web::Result<Json<ApiResponseData<TenantApiKeyResponse>>, ApiError> {
-    let response = TenantApiKeyResponse::from((Some(Utc::now()), auth.api_key().clone()));
-    Ok(Json(ApiResponseData::ok(response)))
+) -> actix_web::Result<Json<ResponseData<FpTenantApiKey>>, ApiError> {
+    let response = FpTenantApiKey::from((Some(Utc::now()), auth.api_key().clone()));
+    Ok(Json(ResponseData::ok(response)))
 }

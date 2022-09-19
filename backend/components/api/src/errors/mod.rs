@@ -14,7 +14,7 @@ pub mod tenant;
 pub mod user;
 pub mod workos_login;
 
-use crate::types::error::{ApiResponseError, ApiResponseErrorInfo};
+use crate::types::error::{ApiResponseError, FpResponseErrorInfo};
 
 use self::{challenge::ChallengeError, handoff::HandoffError};
 
@@ -178,7 +178,7 @@ impl actix_web::ResponseError for ApiError {
         };
 
         let response = ApiResponseError {
-            error: ApiResponseErrorInfo {
+            error: FpResponseErrorInfo {
                 status_code,
                 message,
                 support_id,

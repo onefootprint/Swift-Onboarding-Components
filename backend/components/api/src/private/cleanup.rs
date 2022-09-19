@@ -1,6 +1,6 @@
 use crate::auth::key_context::custodian::CustodianAuthContext;
 use crate::errors::ApiError;
-use crate::types::response::ApiResponseData;
+use crate::types::response::ResponseData;
 use crate::State;
 use newtypes::{DataAttribute, Fingerprinter};
 use paperclip::actix::Apiv2Schema;
@@ -28,7 +28,7 @@ async fn post(
     state: web::Data<State>,
     _custodian: CustodianAuthContext,
     request: web::Json<PhoneNumber>,
-) -> actix_web::Result<Json<ApiResponseData<CleanupResponse>>, ApiError> {
+) -> actix_web::Result<Json<ResponseData<CleanupResponse>>, ApiError> {
     // allowed deletion #s
     let allowed_deletion_numbers: Vec<newtypes::PhoneNumber> = vec![
         "16504600700",    // belce
@@ -60,5 +60,5 @@ async fn post(
         .await?;
     let num_deleted_rows = db::private_cleanup_integration_tests(&state.db_pool, sh_data).await?;
 
-    Ok(Json(ApiResponseData::ok(CleanupResponse { num_deleted_rows })))
+    Ok(Json(ResponseData::ok(CleanupResponse { num_deleted_rows })))
 }

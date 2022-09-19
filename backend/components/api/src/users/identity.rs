@@ -7,7 +7,7 @@ use crate::auth::{AuthError, CheckTenantPermissions, Either, TenantAuth, WorkOsA
 use crate::errors::ApiResult;
 use crate::hosted::user::DecryptFieldsResult;
 use crate::types::identity_data_request::{ComputedFingerprints, IdentityDataRequest, IdentityDataUpdate};
-use crate::types::{ApiResponseData, EmptyResponse, JsonApiResponse};
+use crate::types::{EmptyResponse, JsonApiResponse, ResponseData};
 
 use crate::utils::insight_headers::InsightHeaders;
 use crate::utils::user_vault_wrapper::UserVaultWrapper;
@@ -159,7 +159,7 @@ pub async fn get(
         (field, exists)
     }));
 
-    ApiResponseData::ok(GetIdentityDataResponse::from(output)).json()
+    ResponseData::ok(GetIdentityDataResponse::from(output)).json()
 }
 
 /**
@@ -232,5 +232,5 @@ pub async fn post_decrypt(
     .save(&state.db_pool)
     .await?;
 
-    ApiResponseData::ok(DecryptIdentityDataResponse::from(result_map)).json()
+    ResponseData::ok(DecryptIdentityDataResponse::from(result_map)).json()
 }

@@ -7,7 +7,7 @@ use crate::errors::ApiResult;
 use crate::utils::email_domain;
 use crate::utils::session::AuthSession;
 use crate::State;
-use crate::{errors::ApiError, types::response::ApiResponseData};
+use crate::{errors::ApiError, types::response::ResponseData};
 use chrono::Duration;
 use db::models::tenant::{NewTenant, Tenant};
 use db::models::tenant_role::TenantRole;
@@ -51,7 +51,7 @@ struct DashboardAuthorizationResponse {
 async fn handler(
     state: web::Data<State>,
     code: web::Json<Code>,
-) -> actix_web::Result<Json<ApiResponseData<DashboardAuthorizationResponse>>, ApiError> {
+) -> actix_web::Result<Json<ResponseData<DashboardAuthorizationResponse>>, ApiError> {
     let code = &code.code;
 
     let GetProfileAndTokenResponse { profile, .. } = &state
@@ -76,7 +76,7 @@ async fn handler(
     });
     let auth_token = AuthSession::create(&state, session_data, Duration::hours(8)).await?;
 
-    Ok(Json(ApiResponseData {
+    Ok(Json(ResponseData {
         data: DashboardAuthorizationResponse {
             email: profile.email.clone(),
             auth: auth_token,

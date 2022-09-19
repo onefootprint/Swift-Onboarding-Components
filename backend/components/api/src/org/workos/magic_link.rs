@@ -1,4 +1,4 @@
-use crate::types::response::ApiResponseData;
+use crate::types::response::ResponseData;
 use crate::State;
 use crate::{errors::ApiError, types::EmptyResponse};
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
@@ -25,7 +25,7 @@ struct LinkAuthRequest {
 fn handler(
     state: web::Data<State>,
     request: Json<LinkAuthRequest>,
-) -> actix_web::Result<Json<ApiResponseData<EmptyResponse>>, ApiError> {
+) -> actix_web::Result<Json<ResponseData<EmptyResponse>>, ApiError> {
     let email = &request.email_address;
 
     let session = &state

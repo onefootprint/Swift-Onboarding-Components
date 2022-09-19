@@ -6,7 +6,7 @@ use crate::auth::key_context::secret_key::SecretTenantAuthContext;
 use crate::auth::{CheckTenantPermissions, Either, TenantAuth, WorkOsAuth};
 
 use crate::errors::ApiResult;
-use crate::types::{ApiResponseData, EmptyResponse, JsonApiResponse};
+use crate::types::{EmptyResponse, JsonApiResponse, ResponseData};
 
 use crate::utils::insight_headers::InsightHeaders;
 use crate::utils::user_vault_wrapper::UserVaultWrapper;
@@ -142,7 +142,7 @@ pub async fn get(
         (field, exists)
     }));
 
-    ApiResponseData::ok(GetCustomDataResponse::from(output)).json()
+    ResponseData::ok(GetCustomDataResponse::from(output)).json()
 }
 
 /**
@@ -208,7 +208,7 @@ pub async fn post_decrypt(
     .save(&state.db_pool)
     .await?;
 
-    ApiResponseData::ok(DecryptCustomDataResponse::from(output)).json()
+    ResponseData::ok(DecryptCustomDataResponse::from(output)).json()
 }
 
 async fn decrypt_inner(

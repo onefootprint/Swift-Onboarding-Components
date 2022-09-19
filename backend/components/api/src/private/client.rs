@@ -1,6 +1,6 @@
 use crate::errors::ApiError;
-use crate::types::response::ApiResponseData;
-use crate::types::secret_api_key::TenantApiKeyResponse;
+use crate::types::response::ResponseData;
+use crate::types::secret_api_key::FpTenantApiKey;
 use crate::State;
 use crate::{auth::key_context::custodian::CustodianAuthContext, org::workos::login::create_tenant};
 use db::models::tenant_api_key::TenantApiKey;
@@ -22,7 +22,7 @@ struct NewClientResponse {
     /// unique identifier for this client
     org_id: TenantId,
     /// api key for org-level api access
-    key: TenantApiKeyResponse,
+    key: FpTenantApiKey,
 }
 
 #[api_v2_operation(
@@ -36,7 +36,7 @@ async fn post(
     request: web::Json<NewClientRequest>,
     _custodian: CustodianAuthContext,
     state: web::Data<State>,
-) -> actix_web::Result<Json<ApiResponseData<NewClientResponse>>, ApiError> {
+) -> actix_web::Result<Json<ResponseData<NewClientResponse>>, ApiError> {
     let NewClientRequest {
         name,
         workos_org_id,
@@ -56,10 +56,10 @@ async fn post(
     )
     .await?;
 
-    Ok(Json(ApiResponseData {
+    Ok(Json(ResponseData {
         data: NewClientResponse {
             org_id: tenant.id,
-            key: TenantApiKeyResponse::from((new_key, Some(secret_api_key))),
+            key: FpTenantApiKey::from((new_key, Some(secret_api_key))),
         },
     }))
 }

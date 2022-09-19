@@ -1,8 +1,8 @@
 use crate::auth::key_context::secret_key::SecretTenantAuthContext;
 use crate::auth::{CheckTenantPermissions, Either, WorkOsAuth};
 use crate::errors::ApiError;
-use crate::types::response::ApiResponseData;
-use crate::types::secret_api_key::TenantApiKeyResponse;
+use crate::types::response::ResponseData;
+use crate::types::secret_api_key::FpTenantApiKey;
 use crate::State;
 use db::models::tenant_api_key::TenantApiKey;
 use db::models::tenant_api_key_access_log::TenantApiKeyAccessLog;
@@ -28,7 +28,7 @@ async fn get(
     state: web::Data<State>,
     request: web::Path<RevealRequest>,
     auth: Either<WorkOsAuth, SecretTenantAuthContext>,
-) -> actix_web::Result<Json<ApiResponseData<TenantApiKeyResponse>>, ApiError> {
+) -> actix_web::Result<Json<ResponseData<FpTenantApiKey>>, ApiError> {
     let auth = auth.check_permissions(vec![TenantPermission::ApiKeys])?;
     // TODO more strict auth for viewing secret keys using a SecretTenantAuthContext
     let is_live = auth.is_live()?;
@@ -54,7 +54,7 @@ async fn get(
         )
         .await?;
 
-    Ok(Json(ApiResponseData::ok(TenantApiKeyResponse::from((
+    Ok(Json(ResponseData::ok(FpTenantApiKey::from((
         key,
         Some(SecretApiKey::from(decrypted_secret_key.leak().to_string())),
         last_used_at,

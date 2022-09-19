@@ -3,19 +3,19 @@ use db::models::onboarding::{Onboarding, OnboardingInfo};
 use newtypes::{CollectedDataOption, DataAttribute, Status};
 use paperclip::actix::Apiv2Schema;
 
-use super::insight_event::ApiInsightEvent;
+use super::insight_event::FpInsightEvent;
 
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize, Apiv2Schema)]
-pub struct ApiOnboarding {
+pub struct FpOnboarding {
     name: String,
     timestamp: DateTime<Utc>,
     status: Status,
     can_access_data: Vec<CollectedDataOption>,
     can_access_data_attributes: Vec<DataAttribute>,
-    insight_event: ApiInsightEvent,
+    insight_event: FpInsightEvent,
 }
 
-impl From<OnboardingInfo> for ApiOnboarding {
+impl From<OnboardingInfo> for FpOnboarding {
     fn from(s: OnboardingInfo) -> Self {
         let Onboarding {
             start_timestamp,
@@ -34,7 +34,7 @@ impl From<OnboardingInfo> for ApiOnboarding {
             status,
             can_access_data,
             can_access_data_attributes,
-            insight_event: ApiInsightEvent::from(s.2),
+            insight_event: FpInsightEvent::from(s.2),
         }
     }
 }

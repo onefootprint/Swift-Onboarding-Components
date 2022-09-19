@@ -1,17 +1,17 @@
 use db::models::{insight_event::InsightEvent, webauthn_credential::WebauthnCredential};
 use paperclip::actix::Apiv2Schema;
 
-use super::insight_event::ApiInsightEvent;
+use super::insight_event::FpInsightEvent;
 
 #[derive(Debug, Clone, serde::Serialize, Apiv2Schema)]
-pub struct ApiLiveness {
-    pub insight_event: ApiInsightEvent,
+pub struct FpLiveness {
+    pub insight_event: FpInsightEvent,
 }
 
-impl From<(WebauthnCredential, InsightEvent)> for ApiLiveness {
+impl From<(WebauthnCredential, InsightEvent)> for FpLiveness {
     fn from(s: (WebauthnCredential, InsightEvent)) -> Self {
         Self {
-            insight_event: ApiInsightEvent::from(s.1),
+            insight_event: FpInsightEvent::from(s.1),
         }
     }
 }

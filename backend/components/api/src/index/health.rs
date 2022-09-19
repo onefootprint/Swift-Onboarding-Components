@@ -1,5 +1,5 @@
 use crate::errors::ApiError;
-use crate::types::{ApiResponseData, StringResponse};
+use crate::types::{ResponseData, StringResponse};
 use crate::State;
 use crate::{auth::key_context::custodian::CustodianAuthContext, types::JsonApiResponse};
 
@@ -69,7 +69,7 @@ async fn enclave(
 
     let unseal_time = now.elapsed();
 
-    ApiResponseData::ok(EnclaveHealthResponse {
+    ResponseData::ok(EnclaveHealthResponse {
         success: test == unsealed,
         keypair_gen_ms,
         decrypt_ms: (unseal_time - seal_time).whole_milliseconds(),
@@ -106,7 +106,7 @@ async fn enclave_decrypt(
 
     let unseal_time = now.elapsed();
 
-    ApiResponseData::ok(EnclaveHealthResponse {
+    ResponseData::ok(EnclaveHealthResponse {
         success: test == unsealed,
         keypair_gen_ms: None,
         decrypt_ms: (unseal_time - seal_time).whole_milliseconds(),

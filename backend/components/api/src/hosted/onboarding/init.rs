@@ -3,7 +3,7 @@ use crate::auth::VerifiedUserAuth;
 use crate::auth::{key_context::ob_public_key::PublicTenantAuthContext, UserAuth};
 use crate::errors::onboarding::OnboardingError;
 use crate::errors::ApiError;
-use crate::types::response::ApiResponseData;
+use crate::types::response::ResponseData;
 use crate::utils::user_vault_wrapper::UserVaultWrapper;
 use crate::State;
 use db::models::onboarding::Onboarding;
@@ -34,7 +34,7 @@ pub fn handler(
     state: web::Data<State>,
     tenant_auth: PublicTenantAuthContext,
     user_auth: UserAuth,
-) -> actix_web::Result<Json<ApiResponseData<OnboardingResponse>>, ApiError> {
+) -> actix_web::Result<Json<ResponseData<OnboardingResponse>>, ApiError> {
     let user_auth = user_auth.check_permissions(vec![UserAuthScope::OrgOnboarding])?;
 
     let ob_config_id = tenant_auth.ob_config.id.clone();
@@ -58,7 +58,7 @@ pub fn handler(
         })
         .await??;
 
-    Ok(Json(ApiResponseData {
+    Ok(Json(ResponseData {
         data: OnboardingResponse {
             missing_attributes: uvw.missing_fields(&tenant_auth.ob_config),
             missing_webauthn_credentials: webauthn_creds.is_empty(),

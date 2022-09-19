@@ -3,7 +3,7 @@ use db::models::insight_event::InsightEvent;
 use paperclip::actix::Apiv2Schema;
 
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize, Apiv2Schema)]
-pub struct ApiInsightEvent {
+pub struct FpInsightEvent {
     // TODO id?
     pub timestamp: DateTime<Utc>,
     pub ip_address: Option<String>,
@@ -19,7 +19,7 @@ pub struct ApiInsightEvent {
     pub user_agent: Option<String>,
 }
 
-impl From<InsightEvent> for ApiInsightEvent {
+impl From<InsightEvent> for FpInsightEvent {
     fn from(e: InsightEvent) -> Self {
         let InsightEvent {
             city,
@@ -36,7 +36,7 @@ impl From<InsightEvent> for ApiInsightEvent {
             user_agent,
             ..
         } = e;
-        ApiInsightEvent {
+        FpInsightEvent {
             timestamp,
             ip_address,
             city,

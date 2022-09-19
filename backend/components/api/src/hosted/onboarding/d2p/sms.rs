@@ -1,7 +1,7 @@
 use crate::auth::session_data::user::UserAuthScope;
 use crate::auth::{UserAuth, VerifiedUserAuth};
 use crate::errors::ApiError;
-use crate::types::response::ApiResponseData;
+use crate::types::response::ResponseData;
 use crate::utils::user_vault_wrapper::UserVaultWrapper;
 use crate::State;
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
@@ -27,7 +27,7 @@ pub fn handler(
     user_auth: UserAuth,
     request: Json<D2pSmsRequest>,
     state: web::Data<State>,
-) -> actix_web::Result<Json<ApiResponseData<D2pSmsResponse>>, ApiError> {
+) -> actix_web::Result<Json<ResponseData<D2pSmsResponse>>, ApiError> {
     let user_auth = user_auth.check_permissions(vec![UserAuthScope::Handoff])?;
     let user_vault_id = user_auth.user_vault_id();
 
@@ -47,7 +47,7 @@ pub fn handler(
         )
         .await?;
 
-    Ok(Json(ApiResponseData::ok(D2pSmsResponse {
+    Ok(Json(ResponseData::ok(D2pSmsResponse {
         time_before_retry_s: time_before_retry_s.num_seconds(),
     })))
 }

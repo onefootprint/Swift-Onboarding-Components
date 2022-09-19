@@ -3,7 +3,7 @@ use crate::auth::session_data::AuthSessionData;
 use crate::auth::{key_context::secret_key::SecretTenantAuthContext, TenantAuth};
 use crate::errors::onboarding::OnboardingError;
 use crate::errors::ApiError;
-use crate::types::response::ApiResponseData;
+use crate::types::response::ResponseData;
 use crate::utils::session::AuthSession;
 use crate::State;
 use chrono::{DateTime, Utc};
@@ -36,7 +36,7 @@ pub async fn validate(
     state: web::Data<State>,
     request: web::Json<ValidateRequest>,
     auth: SecretTenantAuthContext,
-) -> actix_web::Result<Json<ApiResponseData<ValidateResponse>>, ApiError> {
+) -> actix_web::Result<Json<ResponseData<ValidateResponse>>, ApiError> {
     let session = AuthSession::get(&state, &request.validation_token)
         .await?
         .ok_or(OnboardingError::ValidateTokenInvalidOrNotFound)?
@@ -59,7 +59,7 @@ pub async fn validate(
         return Err(OnboardingError::InvalidSandboxState.into());
     }
 
-    Ok(Json(ApiResponseData::ok(ValidateResponse {
+    Ok(Json(ResponseData::ok(ValidateResponse {
         onboarding_configuration_id: ob.ob_configuration_id,
         footprint_user_id: scoped_user.fp_user_id,
         status: ob.status,

@@ -4,7 +4,7 @@ use crate::errors::challenge::ChallengeError;
 
 use crate::errors::ApiError;
 use crate::hosted::identify::{IdentifyChallengeData, IdentifyChallengeState, IdentifyType};
-use crate::types::response::ApiResponseData;
+use crate::types::response::ResponseData;
 use crate::utils::challenge::{Challenge, ChallengeToken};
 use crate::utils::liveness::LivenessWebauthnConfig;
 use crate::utils::session::AuthSession;
@@ -49,7 +49,7 @@ pub struct VerifyResponse {
 pub async fn handler(
     state: web::Data<State>,
     request: Json<VerifyRequest>,
-) -> actix_web::Result<Json<ApiResponseData<VerifyResponse>>, ApiError> {
+) -> actix_web::Result<Json<ResponseData<VerifyResponse>>, ApiError> {
     let challenge_state =
         Challenge::<IdentifyChallengeState>::unseal(&state.challenge_sealing_key, &request.challenge_token)?
             .data;
@@ -78,7 +78,7 @@ pub async fn handler(
     let data = UserSession::create(user_vault_id, scopes);
     let auth_token = AuthSession::create(&state, data, duration).await?;
 
-    Ok(Json(ApiResponseData {
+    Ok(Json(ResponseData {
         data: VerifyResponse {
             kind: user_kind,
             auth_token,

@@ -3,7 +3,7 @@ use super::{
 };
 use crate::errors::onboarding::OnboardingError;
 use crate::errors::ApiError;
-use crate::types::response::ApiResponseData;
+use crate::types::response::ResponseData;
 use crate::utils::challenge::{Challenge, ChallengeToken};
 use crate::utils::liveness::LivenessWebauthnConfig;
 use crate::utils::twilio::TwilioClient;
@@ -62,7 +62,7 @@ pub struct UserChallengeData {
 pub async fn handler(
     request: Json<IdentifyRequest>,
     state: web::Data<State>,
-) -> actix_web::Result<Json<ApiResponseData<IdentifyResponse>>, ApiError> {
+) -> actix_web::Result<Json<ResponseData<IdentifyResponse>>, ApiError> {
     let IdentifyRequest {
         identifier,
         preferred_challenge_kind,
@@ -78,7 +78,7 @@ pub async fn handler(
             existing_user
         } else {
             // The user vault doesn't exist. Just return that the user wasn't found
-            return Ok(Json(ApiResponseData {
+            return Ok(Json(ResponseData {
                 data: IdentifyResponse {
                     user_found: false,
                     challenge_data: None,
@@ -109,7 +109,7 @@ pub async fn handler(
     let preferred_challenge_kind = if let Some(kind) = preferred_challenge_kind {
         kind
     } else {
-        return Ok(Json(ApiResponseData {
+        return Ok(Json(ResponseData {
             data: IdentifyResponse {
                 user_found: true,
                 challenge_data: None,
@@ -171,7 +171,7 @@ pub async fn handler(
     }
     .seal(&state.challenge_sealing_key)?;
 
-    Ok(Json(ApiResponseData {
+    Ok(Json(ResponseData {
         data: IdentifyResponse {
             user_found: true,
             available_challenge_kinds,

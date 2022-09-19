@@ -1,6 +1,6 @@
 use super::IdentifyType;
 use crate::hosted::identify::IdentifyChallengeData;
-use crate::types::response::ApiResponseData;
+use crate::types::response::ResponseData;
 use crate::utils::challenge::{Challenge, ChallengeToken};
 use crate::State;
 use crate::{errors::ApiError, hosted::identify::IdentifyChallengeState};
@@ -31,7 +31,7 @@ pub struct ChallengeResponse {
 pub async fn handler(
     request: Json<ChallengeRequest>,
     state: web::Data<State>,
-) -> actix_web::Result<Json<ApiResponseData<ChallengeResponse>>, ApiError> {
+) -> actix_web::Result<Json<ResponseData<ChallengeResponse>>, ApiError> {
     // clean phone number
     let req = request.into_inner();
 
@@ -53,7 +53,7 @@ pub async fn handler(
     }
     .seal(&state.challenge_sealing_key)?;
 
-    Ok(Json(ApiResponseData {
+    Ok(Json(ResponseData {
         data: ChallengeResponse {
             challenge_token,
             time_before_retry_s: time_before_retry_s.num_seconds(),

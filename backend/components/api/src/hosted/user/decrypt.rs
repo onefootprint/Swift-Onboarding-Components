@@ -4,7 +4,7 @@ use crate::auth::VerifiedUserAuth;
 use crate::errors::ApiError;
 use crate::hosted::user::decrypt;
 use crate::hosted::user::DecryptFieldsResult;
-use crate::types::response::ApiResponseData;
+use crate::types::response::ResponseData;
 use crate::State;
 use newtypes::DataAttribute;
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
@@ -29,7 +29,7 @@ fn handler(
     state: web::Data<State>,
     user_auth: UserAuth,
     request: Json<UserDecryptRequest>,
-) -> actix_web::Result<Json<ApiResponseData<UserDecryptResponse>>, ApiError> {
+) -> actix_web::Result<Json<ResponseData<UserDecryptResponse>>, ApiError> {
     let required_scope = if request.attributes.contains(&DataAttribute::Ssn9) {
         UserAuthScope::ExtendedProfile
     } else {
@@ -51,5 +51,5 @@ fn handler(
         .into_iter()
         .map(|(k, v)| (k, v.map(|x| x.leak_to_string())))
         .collect();
-    Ok(Json(ApiResponseData { data: result_map }))
+    Ok(Json(ResponseData { data: result_map }))
 }

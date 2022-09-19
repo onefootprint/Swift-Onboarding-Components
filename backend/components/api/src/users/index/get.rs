@@ -4,8 +4,8 @@ use crate::auth::Either;
 use crate::auth::WorkOsAuth;
 use crate::errors::ApiError;
 use crate::types::request::PaginatedRequest;
-use crate::types::response::ApiPaginatedResponseData;
-use crate::types::scoped_user::ApiScopedUser;
+use crate::types::response::PaginatedResponseData;
+use crate::types::scoped_user::FpScopedUser;
 use crate::utils::user_vault_wrapper::UserVaultWrapper;
 use crate::State;
 use chrono::{DateTime, Utc};
@@ -29,7 +29,7 @@ pub struct UsersRequest {
     timestamp_gte: Option<DateTime<Utc>>,
 }
 
-type UsersResponse = Vec<ApiScopedUser>;
+type UsersResponse = Vec<FpScopedUser>;
 
 #[api_v2_operation(
     summary = "/users",
@@ -43,7 +43,7 @@ pub fn get(
     state: web::Data<State>,
     request: web::Query<PaginatedRequest<UsersRequest, i64>>,
     auth: Either<WorkOsAuth, SecretTenantAuthContext>,
-) -> actix_web::Result<Json<ApiPaginatedResponseData<UsersResponse, i64>>, ApiError> {
+) -> actix_web::Result<Json<PaginatedResponseData<UsersResponse, i64>>, ApiError> {
     let auth = auth.check_permissions(vec![TenantPermission::Users])?;
     let tenant = auth.tenant();
 
@@ -109,7 +109,7 @@ pub fn get(
         .zip(uvws.into_iter())
         .take(page_size)
         .map(|(su, uvw)| {
-            ApiScopedUser::from(
+            FpScopedUser::from(
                 uvw.get_populated_fields(),
                 obs.get(&su.id).unwrap_or(&empty_vec),
                 su,
@@ -118,5 +118,5 @@ pub fn get(
         })
         .collect();
 
-    Ok(Json(ApiPaginatedResponseData::ok(scoped_users, cursor, count)))
+    Ok(Json(PaginatedResponseData::ok(scoped_users, cursor, count)))
 }

@@ -1,6 +1,6 @@
 use crate::auth::{CheckTenantPermissions, WorkOsAuth};
 use crate::errors::ApiError;
-use crate::types::response::ApiResponseData;
+use crate::types::response::ResponseData;
 use crate::types::EmptyResponse;
 use crate::State;
 use db::models::tenant::UpdateTenantNameOrLogo;
@@ -27,7 +27,7 @@ fn handler(
     state: web::Data<State>,
     request: Json<UpdateRequest>,
     auth: WorkOsAuth,
-) -> actix_web::Result<Json<ApiResponseData<EmptyResponse>>, ApiError> {
+) -> actix_web::Result<Json<ResponseData<EmptyResponse>>, ApiError> {
     let auth = auth.check_permissions(vec![TenantPermission::OrgSettings])?;
     let request = request.into_inner();
 

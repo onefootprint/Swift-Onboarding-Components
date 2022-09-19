@@ -4,7 +4,7 @@ use newtypes::{ApiKeyStatus, CollectedDataOption, ObConfigurationId, ObConfigura
 use paperclip::actix::Apiv2Schema;
 
 #[derive(Debug, Clone, serde::Serialize, Apiv2Schema)]
-pub struct ApiObConfig {
+pub struct FpObConfig {
     id: ObConfigurationId,
     key: ObConfigurationKey,
     name: String,
@@ -17,7 +17,7 @@ pub struct ApiObConfig {
     status: ApiKeyStatus,
 }
 
-impl From<(ObConfiguration, Tenant)> for ApiObConfig {
+impl From<(ObConfiguration, Tenant)> for FpObConfig {
     fn from(s: (ObConfiguration, Tenant)) -> Self {
         let ObConfiguration {
             id,

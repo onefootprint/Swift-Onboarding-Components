@@ -3,8 +3,8 @@
 use crate::auth::key_context::secret_key::SecretTenantAuthContext;
 use crate::auth::TenantAuth;
 use crate::errors::ApiError;
-use crate::types::scoped_user::ApiScopedUser;
-use crate::types::ApiResponseData;
+use crate::types::scoped_user::FpScopedUser;
+use crate::types::ResponseData;
 use crate::State;
 use db::models::user_vault::NewNonPortableUserVaultReq;
 use paperclip::actix::{api_v2_operation, web, web::Json};
@@ -18,7 +18,7 @@ use paperclip::actix::{api_v2_operation, web, web::Json};
 pub async fn post(
     state: web::Data<State>,
     auth: SecretTenantAuthContext,
-) -> actix_web::Result<Json<ApiResponseData<ApiScopedUser>>, ApiError> {
+) -> actix_web::Result<Json<ResponseData<FpScopedUser>>, ApiError> {
     let (public_key, e_private_key) = state.enclave_client.generate_sealed_keypair().await?;
 
     let request = NewNonPortableUserVaultReq {
@@ -30,7 +30,7 @@ pub async fn post(
 
     let scoped = db::user_vault::create_non_portable(&state.db_pool, request).await?;
 
-    Ok(Json(ApiResponseData::ok(ApiScopedUser::from(
+    Ok(Json(ResponseData::ok(FpScopedUser::from(
         vec![],
         &[],
         scoped,

@@ -1,13 +1,13 @@
 use crate::auth::session_data::user::UserAuthScope;
 use crate::auth::{UserAuth, VerifiedUserAuth};
 use crate::errors::ApiError;
-use crate::types::liveness::ApiLiveness;
-use crate::types::response::ApiResponseData;
+use crate::types::liveness::FpLiveness;
+use crate::types::response::ResponseData;
 use crate::State;
 use db::models::webauthn_credential::WebauthnCredential;
 use paperclip::actix::{api_v2_operation, get, web, web::Json};
 
-type LivenessResponse = Vec<ApiLiveness>;
+type LivenessResponse = Vec<FpLiveness>;
 
 #[api_v2_operation(
     summary = "/hosted/user/liveness",
@@ -19,7 +19,7 @@ type LivenessResponse = Vec<ApiLiveness>;
 fn get(
     state: web::Data<State>,
     user_auth: UserAuth,
-) -> actix_web::Result<Json<ApiResponseData<LivenessResponse>>, ApiError> {
+) -> actix_web::Result<Json<ResponseData<LivenessResponse>>, ApiError> {
     let user_auth = user_auth.check_permissions(vec![UserAuthScope::BasicProfile])?;
 
     let creds = state
@@ -27,6 +27,6 @@ fn get(
         .db_query(move |conn| WebauthnCredential::list(conn, &user_auth.user_vault_id()))
         .await??;
 
-    let response = creds.into_iter().map(ApiLiveness::from).collect::<Vec<_>>();
-    Ok(Json(ApiResponseData::ok(response)))
+    let response = creds.into_iter().map(FpLiveness::from).collect::<Vec<_>>();
+    Ok(Json(ResponseData::ok(response)))
 }

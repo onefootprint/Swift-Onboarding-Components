@@ -2,7 +2,7 @@ use crate::auth::session_data::user::{UserAuthScope, UserSession};
 use crate::auth::UserAuth;
 use crate::auth::VerifiedUserAuth;
 use crate::errors::ApiError;
-use crate::types::response::ApiResponseData;
+use crate::types::response::ResponseData;
 use crate::utils::session::JsonSession;
 use crate::utils::session::{AuthSession, HandoffRecord};
 use crate::State;
@@ -27,7 +27,7 @@ pub struct GenerateResponse {
 pub async fn handler(
     state: web::Data<State>,
     user_auth: UserAuth,
-) -> actix_web::Result<Json<ApiResponseData<GenerateResponse>>, ApiError> {
+) -> actix_web::Result<Json<ResponseData<GenerateResponse>>, ApiError> {
     let user_auth = user_auth.check_permissions(vec![UserAuthScope::SignUp])?;
 
     let session_sealing_key = state.session_sealing_key.clone();
@@ -48,7 +48,7 @@ pub async fn handler(
         })
         .await??;
 
-    Ok(Json(ApiResponseData {
+    Ok(Json(ResponseData {
         data: GenerateResponse { auth_token },
     }))
 }

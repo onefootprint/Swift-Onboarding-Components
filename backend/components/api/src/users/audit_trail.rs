@@ -3,8 +3,8 @@ use crate::auth::CheckTenantPermissions;
 use crate::auth::Either;
 use crate::auth::WorkOsAuth;
 use crate::errors::ApiError;
-use crate::types::audit_trail::ApiAuditTrail;
-use crate::types::response::ApiResponseData;
+use crate::types::audit_trail::FpAuditTrail;
+use crate::types::response::ResponseData;
 use crate::State;
 use db::models::audit_trail::AuditTrail;
 use newtypes::FootprintUserId;
@@ -16,7 +16,7 @@ struct AuditTrailRequest {
     footprint_user_id: FootprintUserId,
 }
 
-type AuditTrailResponse = Vec<ApiAuditTrail>;
+type AuditTrailResponse = Vec<FpAuditTrail>;
 
 #[api_v2_operation(
     summary = "/users/audit_trail",
@@ -29,7 +29,7 @@ fn get(
     state: web::Data<State>,
     request: web::Query<AuditTrailRequest>,
     auth: Either<WorkOsAuth, SecretTenantAuthContext>,
-) -> actix_web::Result<Json<ApiResponseData<AuditTrailResponse>>, ApiError> {
+) -> actix_web::Result<Json<ResponseData<AuditTrailResponse>>, ApiError> {
     let auth = auth.check_permissions(vec![TenantPermission::ApiKeys])?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
@@ -41,6 +41,6 @@ fn get(
         })
         .await??;
 
-    let response = logs.into_iter().map(ApiAuditTrail::from).collect::<Vec<_>>();
-    Ok(Json(ApiResponseData::ok(response)))
+    let response = logs.into_iter().map(FpAuditTrail::from).collect::<Vec<_>>();
+    Ok(Json(ResponseData::ok(response)))
 }

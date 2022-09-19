@@ -2,13 +2,13 @@ use db::models::tenant::Tenant;
 use paperclip::actix::Apiv2Schema;
 
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize, Apiv2Schema)]
-pub struct ApiTenant {
+pub struct FpTenant {
     name: String,
     logo_url: Option<String>,
     is_sandbox_restricted: bool,
 }
 
-impl From<Tenant> for ApiTenant {
+impl From<Tenant> for FpTenant {
     fn from(t: Tenant) -> Self {
         let Tenant {
             name,

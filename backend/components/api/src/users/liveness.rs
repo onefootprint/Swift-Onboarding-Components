@@ -3,8 +3,8 @@ use crate::auth::CheckTenantPermissions;
 use crate::auth::Either;
 use crate::auth::WorkOsAuth;
 use crate::errors::ApiError;
-use crate::types::liveness::ApiLiveness;
-use crate::types::response::ApiResponseData;
+use crate::types::liveness::FpLiveness;
+use crate::types::response::ResponseData;
 use crate::State;
 use db::models::webauthn_credential::WebauthnCredential;
 use newtypes::FootprintUserId;
@@ -27,7 +27,7 @@ pub async fn get(
     state: web::Data<State>,
     request: web::Query<LivenessRequest>,
     auth: Either<WorkOsAuth, SecretTenantAuthContext>,
-) -> actix_web::Result<Json<ApiResponseData<Vec<ApiLiveness>>>, ApiError> {
+) -> actix_web::Result<Json<ResponseData<Vec<FpLiveness>>>, ApiError> {
     let auth = auth.check_permissions(vec![TenantPermission::Users])?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
@@ -39,6 +39,6 @@ pub async fn get(
         })
         .await??;
 
-    let response = creds.into_iter().map(ApiLiveness::from).collect::<Vec<_>>();
-    Ok(Json(ApiResponseData::ok(response)))
+    let response = creds.into_iter().map(FpLiveness::from).collect::<Vec<_>>();
+    Ok(Json(ResponseData::ok(response)))
 }
