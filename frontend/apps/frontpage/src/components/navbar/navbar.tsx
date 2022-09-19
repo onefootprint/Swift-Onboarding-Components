@@ -29,6 +29,7 @@ const Navbar = ({ cta }: NavbarProps) => {
   const entries: NavEntry[] = [
     { text: t('entries.compare.text'), href: t('entries.compare.href') },
     { text: t('entries.pricing.text'), href: t('entries.pricing.href') },
+    { text: t('entries.docs.text'), href: t('entries.docs.href') },
     {
       text: t('entries.company.text'),
       items: [

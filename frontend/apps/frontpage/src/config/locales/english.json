@@ -17,6 +17,10 @@
           "text": "Pricing",
           "href": "/pricing"
         },
+        "docs": {
+          "text": "Docs",
+          "href": "https://docs.onefootprint.com/"
+        },
         "writing": {
           "text": "Writing",
           "links": {
@@ -96,6 +100,10 @@
         "privacy-policy": {
           "href": "/privacy-policy",
           "text": "Privacy"
+        },
+        "docs": {
+          "href": "https://docs.onefootprint.com/",
+          "text": "Docs"
         },
         "status": {
           "href": "https://footprint.instatus.com/",

@@ -54,6 +54,11 @@ const Layout = ({ children }: LayoutProps) => {
               newWindow: false,
             },
             {
+              text: t('footer.links.docs.text'),
+              href: t('footer.links.docs.href'),
+              newWindow: true,
+            },
+            {
               text: t('footer.links.status.text'),
               href: t('footer.links.status.href'),
               newWindow: true,
