@@ -76,6 +76,9 @@ impl ParsedWorkOs {
     }
 
     pub fn can_decrypt(self, attributes: Vec<DataAttribute>) -> Result<WorkOs, AuthError> {
+        if self.0.tenant_role.permissions.contains(&TenantPermission::Admin) {
+            return Ok(self.0);
+        }
         let can_access_attributes: HashSet<_> = self
             .0
             .tenant_role
