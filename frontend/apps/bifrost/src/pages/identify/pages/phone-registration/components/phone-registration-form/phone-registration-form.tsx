@@ -32,7 +32,7 @@ const PhoneRegistrationForm = ({
     formState: { errors },
   } = useForm<FormData>();
 
-  const getHintText = () => {
+  const getHint = () => {
     if (errors.phone) {
       return errors.phone.message;
     }
@@ -44,7 +44,7 @@ const PhoneRegistrationForm = ({
       <PhoneInput
         disableMask={isSandbox}
         hasError={!!errors.phone}
-        hintText={getHintText()}
+        hint={getHint()}
         label={t('phone.label')}
         placeholder={t('phone.placeholder')}
         onReset={() => {

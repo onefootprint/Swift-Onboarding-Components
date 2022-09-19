@@ -17,7 +17,7 @@ export type BaseSelectProps<Option extends BaseSelectOption> = {
   disabled?: boolean;
   emptyStateText?: string;
   hasError?: boolean;
-  hintText?: string;
+  hint?: string;
   id?: string;
   label?: string;
   name?: string;
@@ -42,7 +42,7 @@ const BaseSelect = <Option extends BaseSelectOption>({
   emptyStateText = 'No results found',
   OptionComponent = Option,
   hasError,
-  hintText,
+  hint,
   id,
   label,
   name,
@@ -169,9 +169,7 @@ const BaseSelect = <Option extends BaseSelectOption>({
           </DropdownMenu>
         )}
       </Dropdown>
-      {hintText && (
-        <Hint color={hasError ? 'error' : 'tertiary'}>{hintText}</Hint>
-      )}
+      {hint && <Hint color={hasError ? 'error' : 'tertiary'}>{hint}</Hint>}
     </Box>
   );
 };

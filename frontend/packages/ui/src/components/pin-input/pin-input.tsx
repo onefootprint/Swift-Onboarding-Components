@@ -10,14 +10,14 @@ import { getNextValue, isNumber } from './pin-input.utils';
 
 export type PinInputProps = {
   hasError?: boolean;
-  hintText?: string;
+  hint?: string;
   onComplete: (value: string) => void;
   testID?: string;
 };
 
 const PinInput = ({
   hasError = false,
-  hintText,
+  hint,
   onComplete,
   testID,
 }: PinInputProps) => {
@@ -109,9 +109,7 @@ const PinInput = ({
           );
         })}
       </PinContainer>
-      {!!hintText && (
-        <Hint color={hasError ? 'error' : 'primary'}>{hintText}</Hint>
-      )}
+      {!!hint && <Hint color={hasError ? 'error' : 'primary'}>{hint}</Hint>}
     </Container>
   );
 };

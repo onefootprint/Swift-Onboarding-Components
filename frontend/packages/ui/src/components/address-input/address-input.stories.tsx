@@ -19,7 +19,7 @@ export default {
       required: false,
       table: { defaultValue: { summary: 'false' } },
     },
-    hintText: {
+    hint: {
       control: 'text',
       description: 'Display an informative text below the input',
       required: false,
@@ -53,7 +53,7 @@ export default {
 const Template: Story<AddressInputProps> = ({
   disabled,
   hasError,
-  hintText,
+  hint,
   label,
   onChangeText,
   onSelect,
@@ -73,7 +73,7 @@ const Template: Story<AddressInputProps> = ({
       country="US"
       disabled={disabled}
       hasError={hasError}
-      hintText={hintText}
+      hint={hint}
       label={label}
       onChangeText={handleChangeText}
       onSelect={onSelect}
@@ -87,7 +87,7 @@ const Template: Story<AddressInputProps> = ({
 export const Base = Template.bind({});
 Base.args = {
   disabled: false,
-  hintText: '',
+  hint: '',
   label: 'Address line 1',
   onSelect: console.log,
   placeholder: 'Street and house number',
@@ -106,7 +106,7 @@ WithInitialValue.args = {
 
 export const WithHint = Template.bind({});
 WithHint.args = {
-  hintText: 'Hint',
+  hint: 'Hint',
   label: 'Address line 1',
   onSelect: console.log,
   placeholder: 'Street and house number',
@@ -116,7 +116,7 @@ WithHint.args = {
 export const WithError = Template.bind({});
 WithError.args = {
   hasError: true,
-  hintText: 'Hint',
+  hint: 'Hint',
   label: 'Address line 1',
   onSelect: console.log,
   placeholder: 'Street and house number',

@@ -11,7 +11,7 @@ export type CheckboxProps = {
   defaultChecked?: boolean;
   disabled?: boolean;
   hasError?: boolean;
-  hintText?: string;
+  hint?: string;
   id?: string;
   label: string;
   name?: string;
@@ -30,7 +30,7 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
       defaultChecked,
       disabled,
       hasError,
-      hintText,
+      hint,
       id: possibleId,
       label,
       name,
@@ -48,7 +48,7 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
     return (
       <Box>
         <Label
-          aria-describedby={hintText && `${id}-hint`}
+          aria-describedby={hint && `${id}-hint`}
           data-testid={testID}
           hasError={hasError}
           htmlFor={id}
@@ -74,13 +74,13 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
           />
           {label}
         </Label>
-        {hintText && (
+        {hint && (
           <StyledHint
             color={hasError ? 'error' : 'tertiary'}
             id={`${id}-hint`}
             variant="body-3"
           >
-            {hintText}
+            {hint}
           </StyledHint>
         )}
       </Box>

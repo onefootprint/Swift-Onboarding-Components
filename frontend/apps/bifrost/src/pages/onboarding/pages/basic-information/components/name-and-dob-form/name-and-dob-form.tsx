@@ -66,7 +66,7 @@ const NameAndDobForm = ({
           <Grid.Column col={6}>
             <TextInput
               hasError={!!errors[UserDataAttribute.firstName]}
-              hintText={
+              hint={
                 errors[UserDataAttribute.firstName] &&
                 t('form.first-name.error')
               }
@@ -78,7 +78,7 @@ const NameAndDobForm = ({
           <Grid.Column col={6}>
             <TextInput
               hasError={!!errors[UserDataAttribute.lastName]}
-              hintText={
+              hint={
                 errors[UserDataAttribute.lastName] && t('form.last-name.error')
               }
               label={t('form.last-name.label')}
@@ -89,7 +89,7 @@ const NameAndDobForm = ({
         </Grid.Row>
         <TextInput
           hasError={!!errors[UserDataAttribute.dob]}
-          hintText={errors[UserDataAttribute.dob] && t('form.dob.error')}
+          hint={errors[UserDataAttribute.dob] && t('form.dob.error')}
           label={t('form.dob.label')}
           mask={inputMasks.dob}
           placeholder={t('form.dob.placeholder')}

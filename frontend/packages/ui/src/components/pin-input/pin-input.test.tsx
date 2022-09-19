@@ -7,14 +7,14 @@ import PinInput, { PinInputProps } from './pin-input';
 describe('<PinInput />', () => {
   const renderPinInput = ({
     hasError = false,
-    hintText,
+    hint,
     onComplete = jest.fn(),
     testID = 'pin-input-test-id',
   }: Partial<PinInputProps>) =>
     customRender(
       <PinInput
         hasError={hasError}
-        hintText={hintText}
+        hint={hint}
         onComplete={onComplete}
         testID={testID}
       />,
@@ -26,7 +26,7 @@ describe('<PinInput />', () => {
   });
 
   it('should render the hint text', () => {
-    renderPinInput({ hintText: 'hint' });
+    renderPinInput({ hint: 'hint' });
     expect(screen.getByText('hint')).toBeInTheDocument();
   });
 
@@ -44,7 +44,7 @@ describe('<PinInput />', () => {
     it('should add an error border to the hint', () => {
       renderPinInput({
         hasError: true,
-        hintText: 'Hint',
+        hint: 'Hint',
       });
       const hint = screen.getByText('Hint');
       expect(hint).toHaveStyle({

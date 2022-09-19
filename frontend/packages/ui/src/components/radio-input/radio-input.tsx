@@ -10,7 +10,7 @@ export type RadioInputProps = {
   defaultChecked?: boolean;
   disabled?: boolean;
   hasError?: boolean;
-  hintText?: string;
+  hint?: string;
   id?: string;
   label: string;
   name?: string;
@@ -29,7 +29,7 @@ const RadioInput = forwardRef<HTMLInputElement, RadioInputProps>(
       defaultChecked,
       disabled,
       hasError,
-      hintText,
+      hint,
       id: possibleId,
       label,
       name,
@@ -47,7 +47,7 @@ const RadioInput = forwardRef<HTMLInputElement, RadioInputProps>(
     return (
       <Container>
         <Label
-          aria-describedby={hintText && `${id}-hint`}
+          aria-describedby={hint && `${id}-hint`}
           data-testid={testID}
           hasError={hasError}
           htmlFor={id}
@@ -73,13 +73,13 @@ const RadioInput = forwardRef<HTMLInputElement, RadioInputProps>(
           />
           {label}
         </Label>
-        {hintText && (
+        {hint && (
           <StyledHint
             color={hasError ? 'error' : 'tertiary'}
             id={`${id}-hint`}
             variant="body-3"
           >
-            {hintText}
+            {hint}
           </StyledHint>
         )}
       </Container>

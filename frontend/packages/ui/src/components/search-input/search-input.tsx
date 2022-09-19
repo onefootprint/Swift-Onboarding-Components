@@ -8,13 +8,7 @@ import type { Size } from './search-input.types';
 
 type BaseProps = Omit<
   InputProps,
-  | 'disabled'
-  | 'hasError'
-  | 'hintText'
-  | 'label'
-  | 'mask'
-  | 'placeholder'
-  | 'type'
+  'disabled' | 'hasError' | 'hint' | 'label' | 'mask' | 'placeholder' | 'type'
 >;
 
 export type SearchInputProps = BaseProps & {

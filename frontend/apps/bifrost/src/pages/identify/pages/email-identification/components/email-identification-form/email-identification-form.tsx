@@ -27,7 +27,7 @@ const EmailIdentificationForm = ({
     formState: { errors },
   } = useForm<FormData>();
 
-  const getHintText = () => {
+  const getHint = () => {
     if (errors.email) {
       return errors.email.message;
     }
@@ -39,7 +39,7 @@ const EmailIdentificationForm = ({
       <Box sx={{ marginBottom: 7 }}>
         <TextInput
           hasError={!!errors.email}
-          hintText={getHintText()}
+          hint={getHint()}
           label={t('email.label')}
           placeholder={t('email.placeholder')}
           type="email"

@@ -38,7 +38,7 @@ const SubscribeToNewsletter = () => {
           <FieldsContainer>
             <TextInput
               hasError={!!errors.email}
-              hintText={errors.email && t('form.error')}
+              hint={errors.email && t('form.error')}
               placeholder={t('form.placeholder')}
               autoComplete="false"
               required

@@ -8,7 +8,7 @@ describe('<TextInput />', () => {
   const renderTextInput = ({
     disabled,
     hasError,
-    hintText,
+    hint,
     label = 'label-text',
     mask,
     onChange = jest.fn(),
@@ -21,7 +21,7 @@ describe('<TextInput />', () => {
       <TextInput
         disabled={disabled}
         hasError={hasError}
-        hintText={hintText}
+        hint={hint}
         label={label}
         mask={mask}
         onChange={onChange}
@@ -53,7 +53,7 @@ describe('<TextInput />', () => {
   });
 
   it('should render the hint text', () => {
-    renderTextInput({ hintText: 'hint' });
+    renderTextInput({ hint: 'hint' });
     expect(screen.getByText('hint')).toBeInTheDocument();
   });
 
@@ -72,7 +72,7 @@ describe('<TextInput />', () => {
     it('should add an error border to the hint', () => {
       renderTextInput({
         hasError: true,
-        hintText: 'Hint',
+        hint: 'Hint',
       });
       const hint = screen.getByText('Hint');
       expect(hint).toHaveStyle({

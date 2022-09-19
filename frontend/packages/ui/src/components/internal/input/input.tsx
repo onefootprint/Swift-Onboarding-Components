@@ -28,7 +28,7 @@ const BaseInput = forwardRef<HTMLInputElement, AllInputProps>(
       fontVariant = 'body-3',
       hasError,
       hasFocus,
-      hintText,
+      hint,
       id: baseID,
       label,
       mask,
@@ -89,9 +89,7 @@ const BaseInput = forwardRef<HTMLInputElement, AllInputProps>(
             <SuffixContainer>{suffixComponent}</SuffixContainer>
           )}
         </InputContainer>
-        {hintText && (
-          <Hint color={hasError ? 'error' : 'tertiary'}>{hintText}</Hint>
-        )}
+        {hint && <Hint color={hasError ? 'error' : 'tertiary'}>{hint}</Hint>}
       </div>
     );
   },

@@ -19,7 +19,7 @@ export default {
       required: false,
       table: { defaultValue: { summary: 'false' } },
     },
-    hintText: {
+    hint: {
       control: 'text',
       description: 'Display an informative text below the input',
       required: false,
@@ -57,7 +57,7 @@ export default {
 const Template: Story<TextAreaProps> = ({
   disabled,
   hasError,
-  hintText,
+  hint,
   label,
   maxLength,
   minLength,
@@ -78,7 +78,7 @@ const Template: Story<TextAreaProps> = ({
     <TextArea
       disabled={disabled}
       hasError={hasError}
-      hintText={hintText}
+      hint={hint}
       label={label}
       maxLength={maxLength}
       minLength={minLength}
@@ -94,7 +94,7 @@ const Template: Story<TextAreaProps> = ({
 export const Base = Template.bind({});
 Base.args = {
   disabled: false,
-  hintText: '',
+  hint: '',
   label: 'Specify the reason',
   onChange: console.log,
   onChangeText: console.log,

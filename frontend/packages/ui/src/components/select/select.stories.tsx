@@ -12,7 +12,7 @@ export default {
 const Template: Story<SelectProps> = ({
   disabled,
   hasError,
-  hintText,
+  hint,
   label,
   onChange,
   options = STATES,
@@ -36,7 +36,7 @@ const Template: Story<SelectProps> = ({
     <Select
       disabled={disabled}
       hasError={hasError}
-      hintText={hintText}
+      hint={hint}
       label={label}
       onChange={handleSelect}
       options={options}
@@ -52,7 +52,7 @@ export const Base = Template.bind({});
 Base.args = {
   disabled: false,
   hasError: false,
-  hintText: '',
+  hint: '',
   label: 'State',
   onChange: console.log,
   options: STATES,

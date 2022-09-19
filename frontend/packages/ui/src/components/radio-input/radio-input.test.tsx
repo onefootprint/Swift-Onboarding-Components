@@ -9,7 +9,7 @@ describe('<RadioInput />', () => {
     checked,
     disabled,
     hasError,
-    hintText,
+    hint,
     id,
     label = 'label',
     name,
@@ -22,7 +22,7 @@ describe('<RadioInput />', () => {
         checked={checked}
         disabled={disabled}
         hasError={hasError}
-        hintText={hintText}
+        hint={hint}
         id={id}
         label={label}
         name={name}
@@ -57,7 +57,7 @@ describe('<RadioInput />', () => {
     });
 
     it('should render the hint text', () => {
-      renderInputRadio({ hintText: 'hint' });
+      renderInputRadio({ hint: 'hint' });
       expect(screen.getByText('hint')).toBeInTheDocument();
     });
 
@@ -76,7 +76,7 @@ describe('<RadioInput />', () => {
       it('should add an error border to the hint', () => {
         renderInputRadio({
           hasError: true,
-          hintText: 'Hint',
+          hint: 'Hint',
         });
         const hint = screen.getByText('Hint');
         expect(hint).toHaveStyle({

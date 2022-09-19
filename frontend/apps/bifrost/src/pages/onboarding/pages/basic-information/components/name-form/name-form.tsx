@@ -61,7 +61,7 @@ const NameForm = ({ isMutationLoading, onSubmit }: NameFormProps) => {
           <Grid.Column col={6}>
             <TextInput
               hasError={!!errors[UserDataAttribute.firstName]}
-              hintText={
+              hint={
                 errors[UserDataAttribute.firstName] &&
                 t('form.first-name.error')
               }
@@ -73,7 +73,7 @@ const NameForm = ({ isMutationLoading, onSubmit }: NameFormProps) => {
           <Grid.Column col={6}>
             <TextInput
               hasError={!!errors[UserDataAttribute.lastName]}
-              hintText={
+              hint={
                 errors[UserDataAttribute.lastName] && t('form.last-name.error')
               }
               label={t('form.last-name.label')}

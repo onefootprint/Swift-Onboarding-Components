@@ -34,7 +34,7 @@ const SSN9 = ({ isMutationLoading, onSubmit }: SSN9Props) => {
         <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
         <TextInput
           hasError={!!errors.ssn9}
-          hintText={errors.ssn9 && t('form.error')}
+          hint={errors.ssn9 && t('form.error')}
           label={t('form.label')}
           mask={inputMasks.ssn}
           placeholder={t('form.placeholder')}

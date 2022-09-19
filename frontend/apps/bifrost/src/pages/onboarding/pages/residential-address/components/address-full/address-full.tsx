@@ -150,7 +150,7 @@ const AddressFull = ({ isMutationLoading, onSubmit }: AddressFullProps) => {
         <AddressInput
           country={country.value}
           hasError={!!errors[UserDataAttribute.addressLine1]}
-          hintText={
+          hint={
             errors[UserDataAttribute.addressLine1] &&
             t('form.address-line-1.error')
           }
@@ -170,7 +170,7 @@ const AddressFull = ({ isMutationLoading, onSubmit }: AddressFullProps) => {
             <TextInput
               autoComplete="address-level2"
               hasError={!!errors[UserDataAttribute.city]}
-              hintText={errors[UserDataAttribute.city] && t('form.city.error')}
+              hint={errors[UserDataAttribute.city] && t('form.city.error')}
               label={t('form.city.label')}
               placeholder={t('form.city.placeholder')}
               {...register(UserDataAttribute.city, { required: true })}
@@ -180,9 +180,7 @@ const AddressFull = ({ isMutationLoading, onSubmit }: AddressFullProps) => {
             <TextInput
               autoComplete="postal-code"
               hasError={!!errors[UserDataAttribute.zip]}
-              hintText={
-                errors[UserDataAttribute.zip] && t('form.zipCode.error')
-              }
+              hint={errors[UserDataAttribute.zip] && t('form.zipCode.error')}
               label={t('form.zipCode.label')}
               mask={zipcode.mask}
               maxLength={zipcode.maxLength}
@@ -220,7 +218,7 @@ const AddressFull = ({ isMutationLoading, onSubmit }: AddressFullProps) => {
           <TextInput
             autoComplete="address-level1"
             hasError={!!errors[UserDataAttribute.state]}
-            hintText={errors[UserDataAttribute.state] && t('form.state.error')}
+            hint={errors[UserDataAttribute.state] && t('form.state.error')}
             label={t('form.state.label')}
             placeholder={t('form.state.placeholder')}
             {...register(UserDataAttribute.state)}

@@ -61,7 +61,7 @@ const CreateDialog = ({ open, onClose }: CreateDialogProps) => {
         <TextInput
           autoFocus
           hasError={!!errors.name}
-          hintText={errors?.name?.message}
+          hint={errors?.name?.message}
           label={t('form.name.label')}
           placeholder={t('form.name.placeholder')}
           {...register('name', {

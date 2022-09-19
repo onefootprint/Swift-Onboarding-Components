@@ -44,7 +44,7 @@ const ReasonForm = ({ onSubmit }: ReasonFormProps) => {
             isSearchable={false}
             label={t('form.reason.label')}
             hasError={!!fieldState.error}
-            hintText={fieldState.error && t('form.reason.errors.required')}
+            hint={fieldState.error && t('form.reason.errors.required')}
             onBlur={field.onBlur}
             onChange={option => {
               setShowCustomReason(
@@ -91,7 +91,7 @@ const ReasonForm = ({ onSubmit }: ReasonFormProps) => {
         <Box sx={{ marginTop: 4 }}>
           <TextArea
             hasError={!!errors.customReason}
-            hintText={
+            hint={
               errors.customReason && t('form.custom-reason.errors.required')
             }
             placeholder={t('form.custom-reason.placeholder')}

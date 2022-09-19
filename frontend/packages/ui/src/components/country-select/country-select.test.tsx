@@ -11,7 +11,7 @@ describe('<CountrySelect />', () => {
     disabled,
     emptyStateText,
     hasError,
-    hintText,
+    hint,
     id = 'some id',
     label = 'label text',
     onChange = jest.fn(),
@@ -25,7 +25,7 @@ describe('<CountrySelect />', () => {
         disabled={disabled}
         emptyStateText={emptyStateText}
         hasError={hasError}
-        hintText={hintText}
+        hint={hint}
         id={id}
         label={label}
         onChange={onChange}
@@ -119,9 +119,9 @@ describe('<CountrySelect />', () => {
 
   describe('when there is a hint', () => {
     it('should render the hint text', () => {
-      const hintText = 'This is an important message';
-      renderCountrySelect({ hintText });
-      expect(screen.getByText(hintText)).toBeInTheDocument();
+      const hint = 'This is an important message';
+      renderCountrySelect({ hint });
+      expect(screen.getByText(hint)).toBeInTheDocument();
     });
   });
 
@@ -141,7 +141,7 @@ describe('<CountrySelect />', () => {
     it('should add an error border to the hint', () => {
       renderCountrySelect({
         hasError: true,
-        hintText: 'Hint',
+        hint: 'Hint',
       });
       const hint = screen.getByText('Hint');
       expect(hint).toHaveStyle({

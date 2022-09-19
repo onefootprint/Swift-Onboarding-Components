@@ -25,7 +25,7 @@ export default {
       required: false,
       table: { defaultValue: { summary: 'false' } },
     },
-    hintText: {
+    hint: {
       control: 'text',
       description: 'Display an informative text below the input',
       required: false,
@@ -78,7 +78,7 @@ export default {
 const Template: Story<TextInputProps> = ({
   disabled,
   hasError,
-  hintText,
+  hint,
   label,
   mask,
   maxLength,
@@ -99,7 +99,7 @@ const Template: Story<TextInputProps> = ({
     <TextInput
       disabled={disabled}
       hasError={hasError}
-      hintText={hintText}
+      hint={hint}
       label={label}
       mask={mask}
       maxLength={maxLength}
@@ -118,7 +118,7 @@ export const Base = Template.bind({});
 Base.args = {
   mask: undefined,
   disabled: false,
-  hintText: '',
+  hint: '',
   label: 'Email',
   maxLength: 100,
   minLength: 0,

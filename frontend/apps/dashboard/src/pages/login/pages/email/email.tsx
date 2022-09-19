@@ -52,7 +52,7 @@ const EmailLogin = () => {
           <Inner>
             <TextInput
               hasError={!!errors.email}
-              hintText={errors?.email?.message}
+              hint={errors?.email?.message}
               label={t('form.email.label')}
               placeholder="your.email@email.com"
               type="email"

@@ -56,11 +56,11 @@ const SupportDialog = ({
     );
   };
 
-  const getNameHintText = () =>
+  const getNameHint = () =>
     errors.name ? t('form.name.errors.required') : undefined;
-  const getEmailHintText = () =>
+  const getEmailHint = () =>
     errors.email ? t('form.email.errors.required') : undefined;
-  const getMessageHintText = () =>
+  const getMessageHint = () =>
     errors.message ? t('form.message.errors.required') : undefined;
 
   const formId = 'support-dialog-id';
@@ -93,7 +93,7 @@ const SupportDialog = ({
         <Typography variant="body-2">{description}</Typography>
         <TextInput
           hasError={!!errors.name}
-          hintText={getNameHintText()}
+          hint={getNameHint()}
           label={t('form.name.label')}
           placeholder={t('form.name.placeholder')}
           type="text"
@@ -106,7 +106,7 @@ const SupportDialog = ({
         />
         <TextInput
           hasError={!!errors.email}
-          hintText={getEmailHintText()}
+          hint={getEmailHint()}
           label={t('form.email.label')}
           placeholder={t('form.email.placeholder')}
           type="email"
@@ -119,7 +119,7 @@ const SupportDialog = ({
         />
         <TextArea
           hasError={!!errors.message}
-          hintText={getMessageHintText()}
+          hint={getMessageHint()}
           label={t('form.message.label')}
           placeholder={t('form.message.placeholder')}
           // eslint-disable-next-line react/jsx-props-no-spreading

@@ -31,7 +31,7 @@ const NameForm = ({ defaultValues, onSubmit }: NameFormProps) => {
       <TextInput
         autoFocus
         hasError={!!errors.name}
-        hintText={errors?.name?.message}
+        hint={errors?.name?.message}
         label={t('name.label')}
         placeholder={t('name.placeholder')}
         {...register('name', {

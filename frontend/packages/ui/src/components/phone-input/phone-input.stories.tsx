@@ -12,7 +12,7 @@ export default {
 const Template: Story<PhoneInputProps> = ({
   disabled,
   hasError,
-  hintText,
+  hint,
   onChange,
   onChangeText,
   onReset,
@@ -36,7 +36,7 @@ const Template: Story<PhoneInputProps> = ({
     <PhoneInput
       disabled={disabled}
       hasError={hasError}
-      hintText={hintText}
+      hint={hint}
       label="Phone"
       onChange={handleChange}
       onChangeText={onChangeText}
@@ -52,7 +52,7 @@ export const Base = Template.bind({});
 Base.args = {
   disabled: false,
   hasError: false,
-  hintText: 'Enter your phone number',
+  hint: 'Enter your phone number',
   onChange: console.log,
   onChangeText: console.log,
   placeholder: '202 555 5555',

@@ -19,7 +19,7 @@ const Select = <Option extends SelectOption = SelectOption>({
   disabled,
   emptyStateText,
   hasError,
-  hintText,
+  hint,
   id,
   label,
   name,
@@ -48,7 +48,7 @@ const Select = <Option extends SelectOption = SelectOption>({
     disabled={disabled}
     emptyStateText={emptyStateText}
     hasError={hasError}
-    hintText={hintText}
+    hint={hint}
     id={id}
     label={label}
     name={name}

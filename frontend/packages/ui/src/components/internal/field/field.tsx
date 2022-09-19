@@ -10,7 +10,7 @@ import { createFontStyles } from '../../../utils/mixins';
 export type FieldProps = {
   hasError?: boolean;
   hasFocus?: boolean;
-  hintText?: string;
+  hint?: string;
   label?: string;
   onChangeText?: (nextValue: string) => void;
   placeholder: string;

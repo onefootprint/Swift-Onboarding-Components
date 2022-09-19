@@ -21,7 +21,7 @@ describe('<Select />', () => {
     disabled,
     emptyStateText,
     hasError,
-    hintText,
+    hint,
     id = 'some id',
     label = 'label text',
     onChange = jest.fn(),
@@ -36,7 +36,7 @@ describe('<Select />', () => {
         disabled={disabled}
         emptyStateText={emptyStateText}
         hasError={hasError}
-        hintText={hintText}
+        hint={hint}
         id={id}
         label={label}
         onChange={onChange}
@@ -146,9 +146,9 @@ describe('<Select />', () => {
 
   describe('when there is a hint', () => {
     it('should render the hint text', () => {
-      const hintText = 'This is an important message';
-      renderSelect({ hintText });
-      expect(screen.getByText(hintText)).toBeInTheDocument();
+      const hint = 'This is an important message';
+      renderSelect({ hint });
+      expect(screen.getByText(hint)).toBeInTheDocument();
     });
   });
 
@@ -168,7 +168,7 @@ describe('<Select />', () => {
     it('should add an error border to the hint', () => {
       renderSelect({
         hasError: true,
-        hintText: 'Hint',
+        hint: 'Hint',
       });
       const hint = screen.getByText('Hint');
       expect(hint).toHaveStyle({

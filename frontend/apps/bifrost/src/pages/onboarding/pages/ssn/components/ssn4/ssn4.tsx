@@ -32,7 +32,7 @@ const SSN4 = ({ isMutationLoading, onSubmit }: SSN4Props) => {
         <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
         <TextInput
           hasError={!!errors.ssn4}
-          hintText={errors.ssn4 && t('form.error')}
+          hint={errors.ssn4 && t('form.error')}
           label={t('form.label')}
           mask={inputMasks.lastFourSsn}
           placeholder={t('form.placeholder')}

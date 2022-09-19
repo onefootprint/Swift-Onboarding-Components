@@ -92,7 +92,7 @@ const AddressZipCodeAndCountry = ({
         <TextInput
           autoComplete="postal-code"
           hasError={!!errors.zip}
-          hintText={errors.zip && t('form.zipCode.error')}
+          hint={errors.zip && t('form.zipCode.error')}
           label={t('form.zipCode.label')}
           mask={zipcode.mask}
           maxLength={zipcode.maxLength}

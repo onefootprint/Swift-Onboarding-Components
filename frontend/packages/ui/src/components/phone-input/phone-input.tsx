@@ -15,7 +15,7 @@ const PhoneInput = forwardRef<HTMLInputElement, PhoneInputProps>(
     {
       disableMask,
       hasError,
-      hintText,
+      hint,
       onReset,
       searchPlaceholder,
       selectEmptyStateText,
@@ -52,7 +52,7 @@ const PhoneInput = forwardRef<HTMLInputElement, PhoneInputProps>(
         onChange={handleCountryChange}
         OptionComponent={Option}
         options={COUNTRIES}
-        hintText={hintText}
+        hint={hint}
         hasError={hasError}
         searchPlaceholder={searchPlaceholder}
         value={selectedCountry}

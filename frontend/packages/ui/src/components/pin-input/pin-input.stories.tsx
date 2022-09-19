@@ -17,7 +17,7 @@ export default {
       required: false,
       table: { defaultValue: { summary: 'false' } },
     },
-    hintText: {
+    hint: {
       control: 'text',
       description: 'Display an informative text below the input',
       required: false,
@@ -35,13 +35,13 @@ export default {
 
 const Template: Story<PinInputProps> = ({
   hasError: baseHasError = false,
-  hintText: baseHintText,
+  hint: basehint,
   onComplete,
   testID,
 }: PinInputProps) => {
   const [loading, setLoading] = useState(false);
   const [hasError, setError] = useState(false);
-  const [hintText, setHintText] = useState('');
+  const [hint, sethint] = useState('');
 
   const handleComplete = (pin: string) => {
     onComplete(pin);
@@ -49,7 +49,7 @@ const Template: Story<PinInputProps> = ({
     setTimeout(() => {
       setError(true);
       setLoading(false);
-      setHintText('Incorrect verification code');
+      sethint('Incorrect verification code');
     }, 1500);
   };
 
@@ -82,7 +82,7 @@ const Template: Story<PinInputProps> = ({
         ) : (
           <PinInput
             hasError={baseHasError || hasError}
-            hintText={baseHintText || hintText}
+            hint={basehint || hint}
             onComplete={handleComplete}
             testID={testID}
           />
@@ -98,7 +98,7 @@ const Template: Story<PinInputProps> = ({
 export const Base = Template.bind({});
 Base.args = {
   hasError: false,
-  hintText: '',
+  hint: '',
   onComplete: console.log,
   testID: 'pin-input-test-id',
 };
@@ -106,6 +106,6 @@ Base.args = {
 export const WithError = Template.bind({});
 WithError.args = {
   hasError: true,
-  hintText: 'Incorrect verification code',
+  hint: 'Incorrect verification code',
   onComplete: console.log,
 };

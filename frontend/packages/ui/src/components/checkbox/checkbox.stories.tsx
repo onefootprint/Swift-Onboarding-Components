@@ -35,7 +35,7 @@ const Template: Story<CheckboxProps> = ({
   checked: checkedProp,
   disabled,
   hasError,
-  hintText,
+  hint,
   id,
   label,
   name,
@@ -59,7 +59,7 @@ const Template: Story<CheckboxProps> = ({
       checked={checked}
       disabled={disabled}
       hasError={hasError}
-      hintText={hintText}
+      hint={hint}
       id={id}
       label={label}
       name={name}
@@ -75,7 +75,7 @@ Base.args = {
   checked: false,
   disabled: false,
   hasError: false,
-  hintText: '',
+  hint: '',
   id: 'checkbox-id',
   label: 'This is a checkbox label',
   name: 'checkbox-name',

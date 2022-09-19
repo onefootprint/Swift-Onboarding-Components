@@ -84,7 +84,7 @@ const PhoneVerificationPinForm = ({
       <PinInput
         onComplete={handlePinCompleted}
         hasError={identifyVerifyMutation.isError}
-        hintText={
+        hint={
           identifyVerifyMutation.isError ? t('error.description') : undefined
         }
       />

@@ -14,7 +14,7 @@ const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
     {
       testID,
       hasError,
-      hintText,
+      hint,
       id: baseID,
       label,
       onChange,
@@ -49,9 +49,7 @@ const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
           placeholder={placeholder}
           ref={ref}
         />
-        {hintText && (
-          <Hint color={hasError ? 'error' : 'tertiary'}>{hintText}</Hint>
-        )}
+        {hint && <Hint color={hasError ? 'error' : 'tertiary'}>{hint}</Hint>}
       </Box>
     );
   },

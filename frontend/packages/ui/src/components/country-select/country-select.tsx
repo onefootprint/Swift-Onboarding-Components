@@ -24,7 +24,7 @@ const CountrySelect = ({
   disabled,
   emptyStateText,
   hasError,
-  hintText,
+  hint,
   id,
   label,
   name,
@@ -39,7 +39,7 @@ const CountrySelect = ({
     disabled={disabled}
     emptyStateText={emptyStateText}
     hasError={hasError}
-    hintText={hintText}
+    hint={hint}
     id={id}
     label={label}
     name={name}

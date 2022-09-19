@@ -8,7 +8,7 @@ describe('<TextArea />', () => {
   const renderTextArea = ({
     disabled,
     hasError,
-    hintText,
+    hint,
     label = 'label-text',
     onChange = jest.fn(),
     onChangeText = jest.fn(),
@@ -20,7 +20,7 @@ describe('<TextArea />', () => {
       <TextArea
         disabled={disabled}
         hasError={hasError}
-        hintText={hintText}
+        hint={hint}
         label={label}
         onChange={onChange}
         onChangeText={onChangeText}
@@ -51,7 +51,7 @@ describe('<TextArea />', () => {
   });
 
   it('should render the hint text', () => {
-    renderTextArea({ hintText: 'hint' });
+    renderTextArea({ hint: 'hint' });
     expect(screen.getByText('hint')).toBeInTheDocument();
   });
 
@@ -70,7 +70,7 @@ describe('<TextArea />', () => {
     it('should add an error border to the hint', () => {
       renderTextArea({
         hasError: true,
-        hintText: 'Hint',
+        hint: 'Hint',
       });
       const hint = screen.getByText('Hint');
       expect(hint).toHaveStyle({

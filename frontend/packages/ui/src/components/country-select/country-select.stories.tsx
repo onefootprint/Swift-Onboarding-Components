@@ -35,7 +35,7 @@ export default {
       description: 'Label to be displayed, above the select',
       required: true,
     },
-    hintText: {
+    hint: {
       control: 'text',
       description: 'Display an informative text below the input',
       required: false,
@@ -73,7 +73,7 @@ const Template: Story<CountrySelectProps> = ({
   disabled,
   emptyStateText,
   hasError,
-  hintText,
+  hint,
   id,
   label,
   onChange,
@@ -98,7 +98,7 @@ const Template: Story<CountrySelectProps> = ({
       disabled={disabled}
       emptyStateText={emptyStateText}
       hasError={hasError}
-      hintText={hintText}
+      hint={hint}
       id={id}
       label={label}
       onChange={handleSelect}
@@ -115,7 +115,7 @@ Base.args = {
   disabled: false,
   emptyStateText: 'No results :(',
   hasError: false,
-  hintText: 'Hint',
+  hint: 'Hint',
   id: 'select-field',
   label: 'Country',
   onChange: console.log,
