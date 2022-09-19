@@ -8,6 +8,7 @@ use crate::types::response::ApiResponseData;
 use crate::State;
 use db::models::webauthn_credential::WebauthnCredential;
 use newtypes::FootprintUserId;
+use newtypes::TenantPermission;
 use paperclip::actix::{api_v2_operation, get, web, web::Json, Apiv2Schema};
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, Apiv2Schema)]
@@ -27,7 +28,7 @@ pub async fn get(
     request: web::Query<LivenessRequest>,
     auth: Either<WorkOsAuth, SecretTenantAuthContext>,
 ) -> actix_web::Result<Json<ApiResponseData<Vec<ApiLiveness>>>, ApiError> {
-    let auth = auth.check_permissions(vec![])?; // TODO
+    let auth = auth.check_permissions(vec![TenantPermission::Users])?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
 

@@ -4,7 +4,7 @@ use paperclip::actix::Apiv2Schema;
 use serde::{Deserialize, Serialize};
 use strum_macros::{AsRefStr, EnumString};
 
-use crate::util::impl_enum_str_diesel;
+use crate::{util::impl_enum_str_diesel, CollectedDataOption};
 
 #[derive(
     Debug,
@@ -24,13 +24,19 @@ use crate::util::impl_enum_str_diesel;
 #[strum(serialize_all = "snake_case")]
 #[diesel(sql_type = Text)]
 pub enum TenantPermission {
+    Basic,
     Admin,
     OnboardingConfiguration,
     ApiKeys,
     OrgSettings,
     SecurityLogs,
     Users,
-    Decrypt(String),
+    // Allows decrypting all custom attributes
+    // TODO more fine-grained decryption controls
+    DecryptCustom,
+    // Similarly to how we store permissions on an OnboardingConfiguration, we denote the set of
+    // decryptable fields with CollectedDataOption
+    Decrypt(CollectedDataOption),
 }
 
 impl_enum_str_diesel!(TenantPermission);

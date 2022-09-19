@@ -8,6 +8,7 @@ use crate::types::response::ApiResponseData;
 use crate::State;
 use db::models::audit_trail::AuditTrail;
 use newtypes::FootprintUserId;
+use newtypes::TenantPermission;
 use paperclip::actix::{api_v2_operation, get, web, web::Json, Apiv2Schema};
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, Apiv2Schema)]
@@ -29,7 +30,7 @@ fn get(
     request: web::Query<AuditTrailRequest>,
     auth: Either<WorkOsAuth, SecretTenantAuthContext>,
 ) -> actix_web::Result<Json<ApiResponseData<AuditTrailResponse>>, ApiError> {
-    let auth = auth.check_permissions(vec![])?; // TODO
+    let auth = auth.check_permissions(vec![TenantPermission::ApiKeys])?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
 

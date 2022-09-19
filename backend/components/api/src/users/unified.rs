@@ -121,7 +121,7 @@ pub async fn get(
     state: web::Data<State>,
     path: Path<FootprintUserId>,
     request: Query<FieldsParams>,
-    tenant_auth: SecretTenantAuthContext,
+    tenant_auth: Either<WorkOsAuth, SecretTenantAuthContext>,
 ) -> JsonApiResponse<UnifiedUserVaultGetDataResponse> {
     let footprint_id = path.into_inner();
     let request = request.into_inner();

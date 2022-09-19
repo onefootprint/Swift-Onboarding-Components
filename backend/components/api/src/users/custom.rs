@@ -21,6 +21,7 @@ use db::PgConnection;
 use newtypes::csv::Csv;
 use newtypes::{
     flat_api_object_map_type, AccessEventKind, DataIdentifier, FootprintUserId, KvDataKey, PiiString,
+    TenantPermission,
 };
 
 use paperclip::actix::Apiv2Schema;
@@ -114,8 +115,9 @@ pub async fn get(
     state: web::Data<State>,
     path: Path<FootprintUserId>,
     request: Query<FieldsParams>,
-    tenant_auth: SecretTenantAuthContext,
+    tenant_auth: Either<WorkOsAuth, SecretTenantAuthContext>,
 ) -> JsonApiResponse<GetCustomDataResponse> {
+    let tenant_auth = tenant_auth.check_permissions(vec![TenantPermission::Users])?;
     let footprint_user_id = path.into_inner();
     let is_live = tenant_auth.is_live()?;
 
@@ -174,7 +176,7 @@ pub async fn post_decrypt(
     tenant_auth: Either<WorkOsAuth, SecretTenantAuthContext>,
     insights: InsightHeaders,
 ) -> JsonApiResponse<DecryptCustomDataResponse> {
-    let tenant_auth = tenant_auth.check_permissions(vec![])?; // TODO
+    let tenant_auth = tenant_auth.check_permissions(vec![TenantPermission::DecryptCustom])?;
     let footprint_user_id = path.into_inner();
     let is_live = tenant_auth.is_live()?;
     let tenant_id = tenant_auth.tenant().id.clone();

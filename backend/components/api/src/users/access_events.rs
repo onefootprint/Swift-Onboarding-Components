@@ -13,6 +13,7 @@ use newtypes::csv::deserialize_stringified_list;
 use newtypes::AccessEventKind;
 use newtypes::DataIdentifier;
 use newtypes::FootprintUserId;
+use newtypes::TenantPermission;
 use paperclip::actix::{api_v2_operation, get, web, web::Json, Apiv2Schema};
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize, Apiv2Schema)]
@@ -43,7 +44,7 @@ fn get(
     request: web::Query<PaginatedRequest<AccessEventRequest, i64>>,
     auth: Either<WorkOsAuth, SecretTenantAuthContext>,
 ) -> actix_web::Result<Json<ApiPaginatedResponseData<AccessEventResponse, i64>>, ApiError> {
-    let auth = auth.check_permissions(vec![])?; // TODO
+    let auth = auth.check_permissions(vec![TenantPermission::Users])?;
     let page_size = request.page_size(&state);
     let cursor = request.cursor;
     let AccessEventRequest {

@@ -15,7 +15,7 @@ use paperclip::actix::{api_v2_operation, web::Json};
 pub async fn get(
     auth: Either<WorkOsAuth, SecretTenantAuthContext>,
 ) -> actix_web::Result<Json<ApiResponseData<ApiTenant>>, ApiError> {
-    let auth = auth.check_permissions(vec![])?;
+    let auth = auth.check_permissions(vec![])?; // No permissions needed to access this endpoint
     let tenant = auth.tenant().clone();
 
     Ok(Json(ApiResponseData::ok(ApiTenant::from(tenant))))

@@ -70,6 +70,13 @@ pub enum CollectedDataOption {
     PhoneNumber,
 }
 
+impl Default for CollectedDataOption {
+    fn default() -> Self {
+        // TODO this is needed for TenantPermission to be an EnumString
+        panic!("No default for CollectedDataOption")
+    }
+}
+
 crate::util::impl_enum_str_diesel!(CollectedDataOption);
 
 impl CollectedDataOption {

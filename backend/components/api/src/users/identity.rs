@@ -24,6 +24,7 @@ use db::models::user_vault::UserVault;
 use newtypes::csv::Csv;
 use newtypes::{
     flat_api_object_map_type, AccessEventKind, DataAttribute, DataIdentifier, FootprintUserId, PiiString,
+    TenantPermission,
 };
 
 use paperclip::actix::Apiv2Schema;
@@ -131,9 +132,9 @@ pub async fn get(
     state: web::Data<State>,
     path: Path<FootprintUserId>,
     request: Query<FieldsParams>,
-    tenant_auth: SecretTenantAuthContext,
+    tenant_auth: Either<WorkOsAuth, SecretTenantAuthContext>,
 ) -> JsonApiResponse<GetIdentityDataResponse> {
-    let tenant_auth = tenant_auth.check_permissions(vec![])?; // TODO
+    let tenant_auth = tenant_auth.check_permissions(vec![TenantPermission::Users])?;
     let footprint_user_id = path.into_inner();
     let tenant_id = tenant_auth.tenant().id.clone();
     let is_live = tenant_auth.is_live()?;
@@ -192,13 +193,13 @@ pub async fn post_decrypt(
     auth: Either<WorkOsAuth, SecretTenantAuthContext>,
     insights: InsightHeaders,
 ) -> JsonApiResponse<DecryptIdentityDataResponse> {
-    let auth = auth.check_permissions(vec![])?; // TODO
+    let request = request.into_inner();
+    let fields = request.fields;
+    let auth = auth.can_decrypt(fields.iter().cloned().collect())?;
+
     let footprint_user_id = path.into_inner();
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
-
-    let request = request.into_inner();
-    let fields = request.fields;
 
     let fields_clone = fields.clone();
     let (uvw, scoped_user) = state

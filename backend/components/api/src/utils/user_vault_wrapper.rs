@@ -286,13 +286,13 @@ impl UserVaultWrapper {
         }
 
         let ob_configs = ObConfiguration::list_for_scoped_user(conn, scoped_user.id.clone())?;
-        let can_access_kinds: HashSet<_> = ob_configs
+        let can_access_attributes: HashSet<_> = ob_configs
             .into_iter()
             .flat_map(|x| x.can_access_data)
             .flat_map(|x| x.attributes())
             .collect();
-        if !can_access_kinds.is_superset(&fields) {
-            return Err(crate::auth::AuthError::UnauthorizedOperation.into());
+        if !can_access_attributes.is_superset(&fields) {
+            return Err(crate::auth::AuthError::ObConfigMissingDecryptPermission.into());
         }
 
         Ok(())

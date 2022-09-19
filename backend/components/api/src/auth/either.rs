@@ -3,6 +3,7 @@ use std::pin::Pin;
 use actix_web::FromRequest;
 use db::models::tenant::Tenant;
 use futures_util::Future;
+use newtypes::DataAttribute;
 use paperclip::actix::Apiv2Security;
 
 use crate::errors::ApiError;
@@ -105,6 +106,13 @@ where
         match self {
             Either::Left(l) => l.check_permissions(permissions),
             Either::Right(r) => r.check_permissions(permissions),
+        }
+    }
+
+    fn can_decrypt(self, attributes: Vec<DataAttribute>) -> Result<Box<dyn TenantAuth>, AuthError> {
+        match self {
+            Either::Left(l) => l.can_decrypt(attributes),
+            Either::Right(r) => r.can_decrypt(attributes),
         }
     }
 }

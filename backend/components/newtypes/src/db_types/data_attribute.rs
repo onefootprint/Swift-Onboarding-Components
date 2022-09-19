@@ -68,15 +68,6 @@ impl DataAttribute {
     pub fn fingerprintable() -> impl Iterator<Item = DataAttribute> {
         Self::iter().filter(DataAttribute::allows_fingerprint)
     }
-
-    pub fn permissioning_kinds(self) -> Vec<DataAttribute> {
-        // Returns the list of DataAttributes for which this kind yields permissions.
-        // For example, ability to decrypt an Ssn also provides the ability to decrypt LastFourSsn
-        match self {
-            DataAttribute::Ssn9 => vec![DataAttribute::Ssn9, DataAttribute::Ssn4],
-            kind => vec![kind],
-        }
-    }
 }
 
 impl SaltedFingerprint for DataAttribute {

@@ -4,6 +4,7 @@ use crate::types::response::ApiResponseData;
 use crate::types::EmptyResponse;
 use crate::State;
 use db::models::tenant::UpdateTenantNameOrLogo;
+use newtypes::TenantPermission;
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize, Apiv2Schema)]
@@ -27,7 +28,7 @@ fn handler(
     request: Json<UpdateRequest>,
     auth: WorkOsAuth,
 ) -> actix_web::Result<Json<ApiResponseData<EmptyResponse>>, ApiError> {
-    let auth = auth.check_permissions(vec![])?; // TODO
+    let auth = auth.check_permissions(vec![TenantPermission::OrgSettings])?;
     let request = request.into_inner();
 
     // update the tenant name

@@ -8,6 +8,7 @@ use db::models::tenant_api_key::TenantApiKey;
 use futures_util::Future;
 
 use newtypes::secret_api_key::SecretApiKey;
+use newtypes::DataAttribute;
 use paperclip::actix::Apiv2Security;
 use std::pin::Pin;
 
@@ -97,6 +98,12 @@ impl CheckTenantPermissions for SecretTenantAuthContext {
         self,
         _permissions: Vec<newtypes::TenantPermission>,
     ) -> Result<Box<dyn TenantAuth>, AuthError> {
+        // TODO permissions for API keys
+        Ok(Box::new(self))
+    }
+
+    fn can_decrypt(self, _attributes: Vec<DataAttribute>) -> Result<Box<dyn TenantAuth>, AuthError> {
+        // TODO permissions for API keys
         Ok(Box::new(self))
     }
 }

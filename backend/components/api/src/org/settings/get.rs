@@ -2,6 +2,7 @@ use crate::auth::{CheckTenantPermissions, WorkOsAuth};
 use crate::errors::ApiError;
 use crate::types::response::ApiResponseData;
 use crate::State;
+use newtypes::TenantPermission;
 use paperclip::actix::{api_v2_operation, get, web, web::Json, Apiv2Schema};
 use workos::organizations::{GetOrganization, OrganizationId};
 
@@ -25,7 +26,7 @@ fn handler(
     state: web::Data<State>,
     auth: WorkOsAuth,
 ) -> actix_web::Result<Json<ApiResponseData<GetTenantResponse>>, ApiError> {
-    let auth = auth.check_permissions(vec![])?; // TODO
+    let auth = auth.check_permissions(vec![TenantPermission::OrgSettings])?;
     let tenant = auth.tenant();
 
     let email_domains = if let Some(org_id) = tenant.workos_id.as_ref() {

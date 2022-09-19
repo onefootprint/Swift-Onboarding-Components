@@ -1,3 +1,5 @@
+use std::collections::HashSet;
+
 use crate::{
     auth::{AuthError, ExtractableAuthSession},
     errors::ApiError,
@@ -6,12 +8,11 @@ use db::{
     models::{tenant::Tenant, tenant_role::TenantRole, tenant_user::TenantUser},
     PgConnection,
 };
-use newtypes::{TenantPermission, TenantUserId};
+use newtypes::{DataAttribute, TenantPermission, TenantUserId};
 use paperclip::actix::Apiv2Security;
 
 use super::AuthSessionData;
 
-// Intentionally private
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
 pub struct WorkOs {
     tenant: Tenant,
@@ -66,9 +67,31 @@ impl ExtractableAuthSession for ParsedWorkOs {
 }
 
 impl ParsedWorkOs {
-    pub fn check_permissions(self, _permissions: Vec<TenantPermission>) -> Result<WorkOs, AuthError> {
-        // TODO check permissions on self
-        Ok(self.0)
+    pub fn check_permissions(self, permissions: Vec<TenantPermission>) -> Result<WorkOs, AuthError> {
+        if let Some(missing_permission) = permissions.into_iter().find(|p| !self.0.has_permission(p)) {
+            Err(AuthError::MissingTenantPermission(missing_permission))
+        } else {
+            Ok(self.0)
+        }
+    }
+
+    pub fn can_decrypt(self, attributes: Vec<DataAttribute>) -> Result<WorkOs, AuthError> {
+        let can_access_attributes: HashSet<_> = self
+            .0
+            .tenant_role
+            .permissions
+            .iter()
+            .filter_map(|p| match p {
+                TenantPermission::Decrypt(attribute) => Some(attribute),
+                _ => None,
+            })
+            .flat_map(|x| x.attributes())
+            .collect();
+        if !can_access_attributes.is_superset(&HashSet::from_iter(attributes.into_iter())) {
+            Err(AuthError::RoleMissingDecryptPermission)
+        } else {
+            Ok(self.0)
+        }
     }
 }
 
@@ -88,5 +111,11 @@ impl WorkOs {
             Some(name) => format!("{} ({})", name, self.data.email),
             None => self.data.email.clone(),
         }
+    }
+
+    fn has_permission(&self, permission: &TenantPermission) -> bool {
+        let role_permissions = &self.tenant_role.permissions;
+        // The authed user has an admin permission, they can perform any operation
+        role_permissions.contains(&TenantPermission::Admin) || role_permissions.contains(permission)
     }
 }

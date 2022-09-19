@@ -1,4 +1,4 @@
-use newtypes::TenantPermission;
+use newtypes::{DataAttribute, TenantPermission};
 
 use super::{
     session_data::workos::ParsedWorkOs, AuthError, CheckTenantPermissions, SessionContext, TenantAuth,
@@ -12,6 +12,11 @@ impl CheckTenantPermissions for WorkOsAuth {
     /// that is accessible
     fn check_permissions(self, permissions: Vec<TenantPermission>) -> Result<Box<dyn TenantAuth>, AuthError> {
         let result = self.map(|c| c.check_permissions(permissions))?;
+        Ok(Box::new(result))
+    }
+
+    fn can_decrypt(self, attributes: Vec<DataAttribute>) -> Result<Box<dyn TenantAuth>, AuthError> {
+        let result = self.map(|c| c.can_decrypt(attributes))?;
         Ok(Box::new(result))
     }
 }

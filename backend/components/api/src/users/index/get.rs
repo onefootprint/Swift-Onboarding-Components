@@ -13,6 +13,7 @@ use db::models::identity_data::HasIdentityDataFields;
 use db::models::onboarding::Onboarding;
 use db::scoped_user::OnboardingListQueryParams;
 use newtypes::csv::deserialize_stringified_list;
+use newtypes::TenantPermission;
 use newtypes::{DataAttribute, Fingerprint, Fingerprinter, FootprintUserId, PiiString, Status};
 use paperclip::actix::{api_v2_operation, web, web::Json, Apiv2Schema};
 
@@ -43,7 +44,7 @@ pub fn get(
     request: web::Query<PaginatedRequest<UsersRequest, i64>>,
     auth: Either<WorkOsAuth, SecretTenantAuthContext>,
 ) -> actix_web::Result<Json<ApiPaginatedResponseData<UsersResponse, i64>>, ApiError> {
-    let auth = auth.check_permissions(vec![])?; // TODO
+    let auth = auth.check_permissions(vec![TenantPermission::Users])?;
     let tenant = auth.tenant();
 
     let cursor = request.cursor;

@@ -8,7 +8,7 @@ use db::models::tenant_api_key::TenantApiKey;
 use db::models::tenant_api_key_access_log::TenantApiKeyAccessLog;
 use enclave_proxy::DataTransform;
 use newtypes::secret_api_key::SecretApiKey;
-use newtypes::TenantApiKeyId;
+use newtypes::{TenantApiKeyId, TenantPermission};
 use paperclip::actix::{api_v2_operation, get, web, web::Json, Apiv2Schema};
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize, Apiv2Schema)]
@@ -29,8 +29,8 @@ async fn get(
     request: web::Path<RevealRequest>,
     auth: Either<WorkOsAuth, SecretTenantAuthContext>,
 ) -> actix_web::Result<Json<ApiResponseData<TenantApiKeyResponse>>, ApiError> {
-    let auth = auth.check_permissions(vec![])?; // TODO
-                                                // TODO more strict auth for viewing secret keys
+    let auth = auth.check_permissions(vec![TenantPermission::ApiKeys])?;
+    // TODO more strict auth for viewing secret keys using a SecretTenantAuthContext
     let is_live = auth.is_live()?;
     let tenant_id = auth.tenant().id.clone();
     let (key, last_used_at) = state

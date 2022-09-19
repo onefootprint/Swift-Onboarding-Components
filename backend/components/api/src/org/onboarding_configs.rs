@@ -18,9 +18,9 @@ use db::models::ob_configuration::ObConfiguration;
 use db::models::ob_configuration::ObConfigurationQuery;
 use db::DbError;
 use itertools::Itertools;
-use newtypes::ApiKeyStatus;
 use newtypes::CollectedDataOption;
 use newtypes::ObConfigurationId;
+use newtypes::{ApiKeyStatus, TenantPermission};
 use paperclip::actix::Apiv2Schema;
 use paperclip::actix::{api_v2_operation, get, patch, post, web, web::Json};
 
@@ -52,7 +52,7 @@ async fn get(
     request: web::Query<PaginatedRequest<EmptyRequest, DateTime<Utc>>>,
     auth: Either<WorkOsAuth, SecretTenantAuthContext>,
 ) -> actix_web::Result<Json<ApiPaginatedResponseData<Vec<ApiObConfig>, DateTime<Utc>>>, ApiError> {
-    let auth = auth.check_permissions(vec![])?; // TODO
+    let auth = auth.check_permissions(vec![TenantPermission::OnboardingConfiguration])?;
     let tenant = auth.tenant();
     let cursor = request.cursor;
     let page_size = request.page_size(&state);
@@ -129,7 +129,7 @@ pub fn post(
     auth: Either<WorkOsAuth, SecretTenantAuthContext>,
     request: Json<CreateOnboardingConfigurationRequest>,
 ) -> actix_web::Result<Json<ApiResponseData<ApiObConfig>>, ApiError> {
-    let auth = auth.check_permissions(vec![])?; // TODO
+    let auth = auth.check_permissions(vec![TenantPermission::OnboardingConfiguration])?;
     request.validate()?;
     let tenant = auth.tenant().clone();
     let CreateOnboardingConfigurationRequest {
@@ -175,7 +175,7 @@ async fn patch(
     path: web::Path<UpdateObConfigPath>,
     request: web::Json<UpdateObConfigRequest>,
 ) -> actix_web::Result<Json<ApiResponseData<ApiObConfig>>, ApiError> {
-    let auth = auth.check_permissions(vec![])?; // TODO
+    let auth = auth.check_permissions(vec![TenantPermission::OnboardingConfiguration])?;
     let tenant = auth.tenant().clone();
     let is_live = auth.is_live()?;
     let UpdateObConfigPath { id } = path.into_inner();

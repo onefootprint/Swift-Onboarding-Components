@@ -3,7 +3,7 @@ use db::{
     models::{tenant::Tenant, user_vault::UserVault},
     DbPool, PgConnection,
 };
-use newtypes::{TenantPermission, UserVaultId};
+use newtypes::{DataAttribute, TenantPermission, UserVaultId};
 
 use crate::errors::ApiError;
 
@@ -34,4 +34,5 @@ pub trait TenantAuth {
 
 pub trait CheckTenantPermissions {
     fn check_permissions(self, permissions: Vec<TenantPermission>) -> Result<Box<dyn TenantAuth>, AuthError>;
+    fn can_decrypt(self, attributes: Vec<DataAttribute>) -> Result<Box<dyn TenantAuth>, AuthError>;
 }
