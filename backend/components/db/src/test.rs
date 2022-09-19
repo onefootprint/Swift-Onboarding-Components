@@ -49,7 +49,6 @@ pub(crate) fn test_tenant(conn: &mut PgConnection) -> Tenant {
             e_private_key: EncryptedVaultPrivateKey(vec![]),
             workos_id: None,
             logo_url: None,
-            workos_admin_profile_id: None,
             sandbox_restricted: false,
         })
         .get_result(conn)
@@ -72,7 +71,6 @@ async fn test_db() {
         public_key: VaultPublicKey::unvalidated("public key".as_bytes().to_vec()),
         logo_url: None,
         workos_id: None,
-        workos_admin_profile_id: None,
         sandbox_restricted: true,
     };
     pool.db_query(|conn| tenant.save(conn).expect("couldn't create tenant"))

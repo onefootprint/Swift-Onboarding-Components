@@ -218,7 +218,6 @@ pub(crate) async fn create_tenant(
                 e_private_key: e_priv_key,
                 public_key: ec_pk_uncompressed,
                 workos_id: workos_org_id,
-                workos_admin_profile_id: None,
                 logo_url: None,
                 sandbox_restricted,
             }

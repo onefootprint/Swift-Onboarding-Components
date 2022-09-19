@@ -21,7 +21,6 @@ pub struct Tenant {
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
     pub logo_url: Option<String>,
-    pub workos_admin_profile_id: Option<String>,
     pub sandbox_restricted: bool,
 }
 
@@ -56,8 +55,6 @@ pub struct NewTenant {
     pub e_private_key: EncryptedVaultPrivateKey,
     pub workos_id: Option<String>,
     pub logo_url: Option<String>,
-    // TODO can we rm this?
-    pub workos_admin_profile_id: Option<String>,
     pub sandbox_restricted: bool,
 }
 

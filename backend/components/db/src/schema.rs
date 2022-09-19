@@ -226,7 +226,6 @@ table! {
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
         logo_url -> Nullable<Text>,
-        workos_admin_profile_id -> Nullable<Text>,
         sandbox_restricted -> Bool,
     }
 }
