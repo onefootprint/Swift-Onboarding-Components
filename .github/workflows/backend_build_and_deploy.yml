@@ -241,6 +241,15 @@ jobs:
         env:
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
 
+      # refresh the state
+      - uses: pulumi/actions@v3
+        with:
+          command: refresh
+          work-dir: ./backend/infra
+          stack-name: 'footprint/${{ inputs.stackName }}'
+        env:
+          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
+
       # preview the stack
       - uses: pulumi/actions@v3
         with:

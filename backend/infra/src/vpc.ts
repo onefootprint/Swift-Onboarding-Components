@@ -17,32 +17,88 @@ export type FootprintVpc = {
   region: Region;
   provider: aws.Provider;
   cidrBlock: string;
+  publicSubnetIds: pulumi.Output<string>[];
+  privateSubnetIds: pulumi.Output<string>[];
 };
 
 const NUM_AZ = 2;
-const CIDR_BLOCK = '10.0.0.0/16';
+const DEFAULT_CIDR_BLOCK = '10.0.0.0/16';
+const DEV_CIDR_BLOCK = '10.1.0.0/16';
+const PROD_CIDR_BLOCK = '10.2.0.0/16';
+const STACK_CIDR_BLOCK = '10.3.0.0/16';
 
-export async function CreateRegionalVPC(region: Region, config: Config): Promise<FootprintVpc> {
+export async function CreateRegionalVPC(
+  region: Region,
+  config: Config,
+): Promise<FootprintVpc> {
   const stack = pulumi.getStack();
   const provider = new aws.Provider(`vpc-provider-${region}`, {
     region,
     defaultTags: { tags: { env: stack } },
   });
 
+  
+  // use default dev-ephemeral VPC for ephemeral environments (this is fixed to footprint dev account)
+  if (stack.startsWith('dev-')) {
+    const vpc = awsx.ec2.Vpc.fromExistingIds(
+      'dev-ephemeral',
+      {
+        vpcId: 'vpc-0016cfc859affc477',
+        publicSubnetIds: [
+          'subnet-0cb884df4f18bcd1b',
+          'subnet-076486592d6cc15dd',
+        ],
+        privateSubnetIds: [
+          'subnet-00d87d9e19567a0e6',
+          'subnet-0451c81e3508c50f0',
+        ],
+        internetGatewayId: 'igw-06ceacc83403de268',
+        natGatewayIds: ['nat-0759ff9be4fc255ad', 'nat-0e8aa04bcde0b6a8f'],
+      },
+      { provider },
+    );
+
+    return {
+      vpc,
+      provider,
+      region,
+      cidrBlock: DEFAULT_CIDR_BLOCK,
+      publicSubnetIds: await vpc.publicSubnetIds,
+      privateSubnetIds: await vpc.privateSubnetIds,
+    };
+  }
+
+  // otherwise create an isolated VPC
+  const vpcStack = `vpc-${stack}-${region}`;
+  let cidrBlock: string;
+  let protect: boolean = true;
+
+  if (stack === 'prod') {
+    cidrBlock = PROD_CIDR_BLOCK;
+  } else if (stack === 'dev') {
+    cidrBlock = DEV_CIDR_BLOCK;
+  } else {
+    cidrBlock = STACK_CIDR_BLOCK;
+    // don't protect unknown stack vpcs
+    protect = false;
+  }
+
   const vpc = new awsx.ec2.Vpc(
-    `vpc-${stack}-${region}`,
+    vpcStack,
     {
       tags: { stack: stack },
       numberOfAvailabilityZones: NUM_AZ,
-      cidrBlock: CIDR_BLOCK,
+      cidrBlock,
     },
-    { provider, protect: config.deletionProtection },
+    { provider, protect: config.deletionProtection || protect },
   );
 
   return {
     vpc,
     provider,
     region,
-    cidrBlock: CIDR_BLOCK,
+    cidrBlock,
+    publicSubnetIds: await vpc.publicSubnetIds,
+    privateSubnetIds: await vpc.privateSubnetIds,
   };
 }

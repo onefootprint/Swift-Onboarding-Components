@@ -181,7 +181,7 @@ async function createCdnFrontedLoadBalancer(
     {
       vpc,
       securityGroups: [loadBalancerSecurityGroup],
-      subnets: await vpc.publicSubnetIds,
+      subnets: vpcProvider.publicSubnetIds,
     },
     { provider },
   );

@@ -50,7 +50,7 @@ export async function CreateDB(
   );
 
   const subnet = new aws.rds.SubnetGroup(`${clusterIdentifier}-subnet-group`, {
-    subnetIds: await vpc.privateSubnetIds,
+    subnetIds: vpcProvider.privateSubnetIds,
   });
 
   const db = new aws.rds.Cluster(`aurora-v2-${clusterIdentifier}`, {
@@ -273,7 +273,7 @@ sudo sysctl -p /etc/sysctl.conf
 sudo yum-config-manager --add-repo https://pkgs.tailscale.com/stable/centos/7/tailscale.repo
 sudo yum install tailscale nc -y
 sudo systemctl enable --now tailscaled
-sudo tailscale up --authkey "${tailscaleAuthKey}" --ssh --advertise-exit-node --hostname "${jumpHostname}" --advertise-routes=10.0.0.0/16
+sudo tailscale up --authkey "${tailscaleAuthKey}" --ssh --advertise-exit-node --hostname "${jumpHostname}" --advertise-routes=${vpcProvider.cidrBlock}
 
 # setup db access helper
 cat <<'EOF' > db_proxy.sh
@@ -299,7 +299,7 @@ chmod +x connect_db.sh`;
 
   const jumpbox = new aws.ec2.Instance(`jump-${clusterId}`, {
     instanceType: size,
-    subnetId: (await vpcProvider.vpc.privateSubnetIds)[0],
+    subnetId: vpcProvider.privateSubnetIds[0],
     vpcSecurityGroupIds: [securityGroup.id, jumpSg.id],
     ami: 'ami-0f9fc25dd2506cf6d',
     userData: Buffer.from(userData).toString('base64'),

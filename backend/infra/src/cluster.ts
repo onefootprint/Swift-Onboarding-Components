@@ -94,7 +94,7 @@ export async function CreateCluster(
       },
       healthCheckGracePeriod: 60,
       targetGroupArns: [targetGroup.targetGroup.arn],
-      vpcZoneIdentifiers: vpc.privateSubnetIds,
+      vpcZoneIdentifiers: vpcProvider.privateSubnetIds,
       protectFromScaleIn: false,
       healthCheckType: 'EC2',
       instanceRefresh: {
