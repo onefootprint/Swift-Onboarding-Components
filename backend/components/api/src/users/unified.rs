@@ -4,7 +4,7 @@ use std::collections::HashSet;
 
 use crate::auth::key_context::secret_key::SecretTenantAuthContext;
 use crate::auth::session_data::workos::WorkOs;
-use crate::auth::{Either, HasTenant, IsLive, SessionContext};
+use crate::auth::{Either, SessionContext, TenantAuth};
 
 use crate::types::identity_data_request::{IdentityDataRequest, IdentityDataUpdate};
 use crate::types::{ApiResponseData, EmptyResponse, JsonApiResponse};

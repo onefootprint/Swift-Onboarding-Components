@@ -19,18 +19,6 @@ pub trait VerifiedUserAuth {
     }
 }
 
-/// A helper trait to get a Tenant on combined objects
-pub trait HasTenant {
-    fn tenant(&self) -> &Tenant;
-}
-
-/// A helper trait to extract whether the auth session is for sandbox or production data
-pub trait IsLive {
-    fn is_live(&self) -> Result<bool, ApiError>;
-}
-
-pub trait SupportsIsLiveHeader {}
-
 /// Allows an auth session to be extracted from an actix request using the extractor SessionContext utility
 pub trait ExtractableAuthSession: Sized + Send + Sync + 'static {
     fn header_names() -> Vec<&'static str>;
@@ -38,7 +26,8 @@ pub trait ExtractableAuthSession: Sized + Send + Sync + 'static {
     fn try_from(auth_session: AuthSessionData, conn: &mut PgConnection) -> Result<Self, ApiError>;
 }
 
-/// Principal that is behind the SessionContext
-pub trait Principal {
+pub trait TenantAuth {
+    fn tenant(&self) -> &Tenant;
     fn format_principal(&self) -> String;
+    fn is_live(&self) -> Result<bool, ApiError>;
 }

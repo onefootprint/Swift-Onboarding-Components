@@ -1,8 +1,7 @@
 use crate::auth::key_context::secret_key::SecretTenantAuthContext;
 use crate::auth::session_data::workos::WorkOs;
 use crate::auth::Either;
-use crate::auth::HasTenant;
-use crate::auth::IsLive;
+use crate::auth::TenantAuth;
 use crate::types::request::PaginatedRequest;
 use crate::types::response::ApiPaginatedResponseData;
 use crate::types::scoped_user::ApiScopedUser;

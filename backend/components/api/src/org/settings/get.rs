@@ -1,5 +1,5 @@
 use crate::auth::session_data::workos::WorkOs;
-use crate::auth::{HasTenant, SessionContext};
+use crate::auth::{SessionContext, TenantAuth};
 use crate::errors::ApiError;
 use crate::types::response::ApiResponseData;
 use crate::State;

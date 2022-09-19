@@ -7,7 +7,7 @@ use paperclip::actix::Apiv2Security;
 
 use crate::errors::ApiError;
 
-use super::{AuthError, HasTenant, IsLive, Principal};
+use super::{AuthError, TenantAuth};
 
 #[derive(Debug, Clone, Apiv2Security)]
 #[openapi(apiKey)]
@@ -66,10 +66,10 @@ where
     }
 }
 
-impl<A, B> HasTenant for Either<A, B>
+impl<A, B> TenantAuth for Either<A, B>
 where
-    A: HasTenant,
-    B: HasTenant,
+    A: TenantAuth,
+    B: TenantAuth,
 {
     fn tenant(&self) -> &Tenant {
         match self {
@@ -77,30 +77,18 @@ where
             Either::Right(s) => s.tenant(),
         }
     }
-}
 
-impl<A, B> IsLive for Either<A, B>
-where
-    A: IsLive,
-    B: IsLive,
-{
-    fn is_live(&self) -> Result<bool, ApiError> {
-        match self {
-            Either::Left(l) => l.is_live(),
-            Either::Right(r) => r.is_live(),
-        }
-    }
-}
-
-impl<A, B> Principal for Either<A, B>
-where
-    A: Principal,
-    B: Principal,
-{
     fn format_principal(&self) -> String {
         match self {
             Either::Left(l) => l.format_principal(),
             Either::Right(r) => r.format_principal(),
+        }
+    }
+
+    fn is_live(&self) -> Result<bool, ApiError> {
+        match self {
+            Either::Left(l) => l.is_live(),
+            Either::Right(r) => r.is_live(),
         }
     }
 }

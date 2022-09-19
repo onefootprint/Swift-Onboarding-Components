@@ -1,5 +1,5 @@
 use crate::{
-    auth::{AuthError, ExtractableAuthSession, HasTenant, Principal, SupportsIsLiveHeader},
+    auth::{AuthError, ExtractableAuthSession},
     errors::ApiError,
 };
 use db::{
@@ -55,14 +55,12 @@ impl ExtractableAuthSession for WorkOs {
     }
 }
 
-impl HasTenant for WorkOs {
-    fn tenant(&self) -> &Tenant {
+impl WorkOs {
+    pub fn tenant(&self) -> &Tenant {
         &self.tenant
     }
-}
 
-impl Principal for WorkOs {
-    fn format_principal(&self) -> String {
+    pub fn format_principal(&self) -> String {
         // Show "Name (email)" as the principal if the name is set, otherwise just email
         let name = match (&self.data.first_name, &self.data.last_name) {
             (Some(first_name), Some(last_name)) => Some(format!("{} {}", first_name, last_name)),
@@ -75,5 +73,3 @@ impl Principal for WorkOs {
         }
     }
 }
-
-impl SupportsIsLiveHeader for WorkOs {}

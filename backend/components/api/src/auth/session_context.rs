@@ -10,7 +10,8 @@ use paperclip::actix::Apiv2Security;
 use crate::{errors::ApiError, utils::session::AuthSession, State};
 
 use super::{
-    AuthError, ExtractableAuthSession, HasTenant, IsLive, Principal, SupportsIsLiveHeader, VerifiedUserAuth,
+    session_data::workos::WorkOs, AuthError, ExtractableAuthSession, TenantAuth,
+    VerifiedUserAuth,
 };
 
 /// Abstract Session Context Type
@@ -92,19 +93,7 @@ where
     }
 }
 
-impl<C> HasTenant for SessionContext<C>
-where
-    C: HasTenant,
-{
-    fn tenant(&self) -> &Tenant {
-        self.data.tenant()
-    }
-}
-
-impl<C> IsLive for SessionContext<C>
-where
-    C: SupportsIsLiveHeader + HasTenant,
-{
+impl TenantAuth for SessionContext<WorkOs> {
     fn is_live(&self) -> Result<bool, ApiError> {
         let is_live: Option<bool> = self
             .headers
@@ -122,12 +111,11 @@ where
         // otherwise return the default of the sent header or live if not restricted
         Ok(is_live.unwrap_or(!is_sandbox_restricted))
     }
-}
 
-impl<C> Principal for SessionContext<C>
-where
-    C: Principal,
-{
+    fn tenant(&self) -> &Tenant {
+        self.data.tenant()
+    }
+
     fn format_principal(&self) -> String {
         self.data.format_principal()
     }

@@ -4,7 +4,7 @@ use std::collections::{HashMap, HashSet};
 
 use crate::auth::key_context::secret_key::SecretTenantAuthContext;
 use crate::auth::session_data::workos::WorkOs;
-use crate::auth::{AuthError, Either, HasTenant, IsLive, Principal, SessionContext};
+use crate::auth::{AuthError, Either, SessionContext, TenantAuth};
 use crate::errors::ApiResult;
 use crate::hosted::user::DecryptFieldsResult;
 use crate::types::identity_data_request::{ComputedFingerprints, IdentityDataRequest, IdentityDataUpdate};

@@ -1,5 +1,4 @@
-use crate::auth::{AuthError, IsLive};
-use crate::auth::{HasTenant, Principal};
+use crate::auth::{AuthError, TenantAuth};
 use crate::{errors::ApiError, State};
 use actix_web::http::header::Header;
 use actix_web::{web, FromRequest};
@@ -75,24 +74,20 @@ fn parse_auth_key(req: &actix_web::HttpRequest) -> Result<SecretApiKey, ApiError
     Ok(tenant_sk_input)
 }
 
-impl HasTenant for SecretTenantAuthContext {
+impl TenantAuth for SecretTenantAuthContext {
     fn tenant(&self) -> &Tenant {
         &self.tenant
     }
-}
 
-impl IsLive for SecretTenantAuthContext {
+    fn format_principal(&self) -> String {
+        format!("ApiKey<{}>", self.api_key.name)
+    }
+
     fn is_live(&self) -> Result<bool, ApiError> {
         if self.tenant.sandbox_restricted && self.api_key.is_live {
             return Err(AuthError::SandboxRestricted.into());
         }
 
         Ok(self.api_key.is_live)
-    }
-}
-
-impl Principal for SecretTenantAuthContext {
-    fn format_principal(&self) -> String {
-        format!("ApiKey<{}>", self.api_key.name)
     }
 }

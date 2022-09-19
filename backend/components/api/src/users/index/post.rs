@@ -1,8 +1,7 @@
 //! Create a NON-portable user vault for a tenant
 
 use crate::auth::key_context::secret_key::SecretTenantAuthContext;
-use crate::auth::HasTenant;
-use crate::auth::IsLive;
+use crate::auth::TenantAuth;
 use crate::errors::ApiError;
 use crate::types::scoped_user::ApiScopedUser;
 use crate::types::ApiResponseData;
