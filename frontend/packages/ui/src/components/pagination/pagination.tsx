@@ -35,12 +35,14 @@ const Pagination = ({
     >
       <Box sx={{ display: 'flex', alignItems: 'center' }}>
         {totalNumResults ? (
-          <Typography variant="label-3">
+          <Typography variant="body-3" color="secondary">
             Showing {lowerBoundShownResults} to {upperBoundShownResults} of{' '}
             {totalNumResults} results
           </Typography>
         ) : (
-          <Typography variant="label-3">No results</Typography>
+          <Typography variant="body-3" color="secondary">
+            No results
+          </Typography>
         )}
       </Box>
       <ButtonContainer>
