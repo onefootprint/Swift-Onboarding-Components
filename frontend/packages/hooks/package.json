@@ -24,7 +24,7 @@
     "global-constants": "*",
     "jest-presets": "*",
     "react-dom": "18.2.0",
-    "react-i18next": "^11.16.9",
+    "react-i18next": "^11.18.6",
     "react": "18.2.0",
     "request": "*",
     "tsconfig": "*",
