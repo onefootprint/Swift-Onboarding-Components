@@ -1,11 +1,11 @@
 import { Meta, Story } from '@storybook/react';
 import React, { useEffect, useState } from 'react';
 
-import RadioInput, { RadioInputProps } from './radio-input';
+import Radio, { RadioProps } from './radio';
 
 export default {
-  component: RadioInput,
-  title: 'Components/RadioInput',
+  component: Radio,
+  title: 'Components/Radio',
   argTypes: {
     label: {
       control: 'text',
@@ -35,7 +35,7 @@ export default {
   },
 } as Meta;
 
-const Template: Story<RadioInputProps> = ({
+const Template: Story<RadioProps> = ({
   checked: checkedProp,
   disabled,
   hasError,
@@ -46,7 +46,7 @@ const Template: Story<RadioInputProps> = ({
   onChange,
   required,
   testID,
-}: RadioInputProps) => {
+}: RadioProps) => {
   const [checked, setChecked] = useState(checkedProp);
 
   useEffect(() => {
@@ -59,7 +59,7 @@ const Template: Story<RadioInputProps> = ({
   };
 
   return (
-    <RadioInput
+    <Radio
       checked={checked}
       disabled={disabled}
       hasError={hasError}
@@ -81,7 +81,7 @@ Base.args = {
   hasError: false,
   hint: '',
   id: 'radio-button-id',
-  label: 'This is a RadioInput label',
+  label: 'This is a Radio label',
   name: 'checkbox-name',
   onChange: console.log,
   required: false,

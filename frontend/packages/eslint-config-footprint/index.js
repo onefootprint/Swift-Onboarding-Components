@@ -37,7 +37,7 @@ module.exports = {
           'Input',
           'PhoneInput',
           'PinInput',
-          'RadioInput',
+          'Radio',
           'SearchInput',
           'Select',
           'StyledField',

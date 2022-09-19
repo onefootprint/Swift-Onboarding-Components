@@ -1,7 +1,7 @@
 import React from 'react';
 import { FieldErrors, UseFormRegister, UseFormWatch } from 'react-hook-form';
 import { DateRange, dateRangeToDisplayText } from 'types';
-import { Box, RadioInput, TextInput } from 'ui';
+import { Box, Radio, TextInput } from 'ui';
 
 import { DateRangeSelectorFormValues } from './date-range-selector.types';
 
@@ -27,7 +27,7 @@ const DateRangeSelector = ({
         DateRange.lastMonth,
         DateRange.custom,
       ].map(value => (
-        <RadioInput
+        <Radio
           key={value}
           value={value}
           label={dateRangeToDisplayText[value]}

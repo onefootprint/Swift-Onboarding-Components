@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import styled, { css } from 'styled-components';
 import { CollectedDataOption, UserDataAttribute } from 'types';
-import { Box, Checkbox, RadioInput } from 'ui';
+import { Box, Checkbox, Radio } from 'ui';
 
 import type { DataKindForm } from '../../create-onboarding-config.types';
 import FormTitle from '../form-title';
@@ -136,12 +136,12 @@ const CollectForm = ({ defaultValues, onSubmit }: CollectFormProps) => {
           <Box ref={animateSSN}>
             {innerFields.ssn && (
               <Box sx={{ marginLeft: 5, marginBottom: 3 }}>
-                <RadioInput
+                <Radio
                   value={UserDataAttribute.ssn9}
                   label={t('collect-form.ssn_full')}
                   {...register('ssnKind')}
                 />
-                <RadioInput
+                <Radio
                   value={UserDataAttribute.ssn4}
                   label={t('collect-form.ssn_last_4')}
                   {...register('ssnKind')}
@@ -159,12 +159,12 @@ const CollectForm = ({ defaultValues, onSubmit }: CollectFormProps) => {
           <Box ref={animateAddress}>
             {innerFields.address && (
               <Box sx={{ marginLeft: 5, marginBottom: 3 }}>
-                <RadioInput
+                <Radio
                   value={CollectedDataOption.fullAddress}
                   label={t('collect-form.full_address')}
                   {...register('addressKind')}
                 />
-                <RadioInput
+                <Radio
                   value={CollectedDataOption.partialAddress}
                   label={t('collect-form.partial_address')}
                   {...register('addressKind')}

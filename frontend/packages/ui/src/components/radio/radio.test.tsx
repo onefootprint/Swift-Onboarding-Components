@@ -2,10 +2,10 @@ import React from 'react';
 import { customRender, screen, userEvent } from 'test-utils';
 import themes from 'themes';
 
-import RadioInput, { RadioInputProps } from './radio-input';
+import Radio, { RadioProps } from './radio';
 
-describe('<RadioInput />', () => {
-  const renderInputRadio = ({
+describe('<Radio />', () => {
+  const renderRadio = ({
     checked,
     disabled,
     hasError,
@@ -16,9 +16,9 @@ describe('<RadioInput />', () => {
     onChange = jest.fn(),
     required,
     testID,
-  }: Partial<RadioInputProps>) =>
+  }: Partial<RadioProps>) =>
     customRender(
-      <RadioInput
+      <Radio
         checked={checked}
         disabled={disabled}
         hasError={hasError}
@@ -32,23 +32,23 @@ describe('<RadioInput />', () => {
       />,
     );
 
-  describe('<RadioInput />', () => {
+  describe('<Radio />', () => {
     it('should assign a testID', () => {
-      renderInputRadio({
-        testID: 'RadioInput-test-id',
+      renderRadio({
+        testID: 'radio-test-id',
       });
-      expect(screen.getByTestId('RadioInput-test-id')).toBeInTheDocument();
+      expect(screen.getByTestId('radio-test-id')).toBeInTheDocument();
     });
 
     it('should render the label', () => {
-      renderInputRadio({
+      renderRadio({
         label: 'label',
       });
       expect(screen.getByLabelText('label')).toBeInTheDocument();
     });
 
     it('should check', () => {
-      renderInputRadio({
+      renderRadio({
         label: 'label',
         checked: true,
       });
@@ -57,13 +57,13 @@ describe('<RadioInput />', () => {
     });
 
     it('should render the hint text', () => {
-      renderInputRadio({ hint: 'hint' });
+      renderRadio({ hint: 'hint' });
       expect(screen.getByText('hint')).toBeInTheDocument();
     });
 
     describe('when it has an error', () => {
       it('should add an error border to the input', () => {
-        renderInputRadio({
+        renderRadio({
           hasError: true,
           label: 'label',
         });
@@ -74,7 +74,7 @@ describe('<RadioInput />', () => {
       });
 
       it('should add an error border to the hint', () => {
-        renderInputRadio({
+        renderRadio({
           hasError: true,
           hint: 'Hint',
         });
@@ -85,10 +85,10 @@ describe('<RadioInput />', () => {
       });
     });
 
-    describe('when clicking on the RadioInput', () => {
+    describe('when clicking on the radio', () => {
       it('should trigger onChange event', async () => {
         const onChangeMockFn = jest.fn();
-        renderInputRadio({
+        renderRadio({
           onChange: onChangeMockFn,
           label: 'label',
         });
@@ -100,7 +100,7 @@ describe('<RadioInput />', () => {
       describe('when it is disabled', () => {
         it('should not trigger onChangeText event', async () => {
           const onChangeMockFn = jest.fn();
-          renderInputRadio({
+          renderRadio({
             disabled: true,
             label: 'label',
             onChange: onChangeMockFn,

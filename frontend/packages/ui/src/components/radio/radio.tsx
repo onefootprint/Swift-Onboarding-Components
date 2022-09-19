@@ -3,9 +3,9 @@ import styled, { css } from 'styled-components';
 
 import { createFontStyles } from '../../utils/mixins';
 import Hint from '../internal/hint';
-import { createCheckedStyled, createPseudoStyles } from './radio-input.utils';
+import { createCheckedStyled, createPseudoStyles } from './radio.utils';
 
-export type RadioInputProps = {
+export type RadioProps = {
   checked?: boolean;
   defaultChecked?: boolean;
   disabled?: boolean;
@@ -22,7 +22,7 @@ export type RadioInputProps = {
   value?: any;
 };
 
-const RadioInput = forwardRef<HTMLInputElement, RadioInputProps>(
+const Radio = forwardRef<HTMLInputElement, RadioProps>(
   (
     {
       checked,
@@ -39,7 +39,7 @@ const RadioInput = forwardRef<HTMLInputElement, RadioInputProps>(
       required,
       testID,
       value,
-    }: RadioInputProps,
+    }: RadioProps,
     ref,
   ) => {
     const internalId = useId();
@@ -95,7 +95,7 @@ const Container = styled.div`
   `}
 `;
 
-const Label = styled.label<Pick<RadioInputProps, 'hasError'>>`
+const Label = styled.label<Pick<RadioProps, 'hasError'>>`
   ${({ theme, hasError }) => css`
     ${createFontStyles('body-3')};
     align-items: center;
@@ -105,7 +105,7 @@ const Label = styled.label<Pick<RadioInputProps, 'hasError'>>`
   `}
 `;
 
-const Input = styled.input<Pick<RadioInputProps, 'hasError'>>`
+const Input = styled.input<Pick<RadioProps, 'hasError'>>`
   ${({ theme }) => css`
     appearance: none;
     background-color: ${theme.backgroundColor.primary};
@@ -181,4 +181,4 @@ const StyledHint = styled(Hint)`
   `}
 `;
 
-export default RadioInput;
+export default Radio;
