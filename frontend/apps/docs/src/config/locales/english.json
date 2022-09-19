@@ -14,6 +14,10 @@
         "home": "Go to the home page",
         "kyc-with-pii": "KYC + PII Vault",
         "pii": "PII Vault",
+        "docs": {
+          "mobile": "API",
+          "desktop": "API Reference"
+        },
         "nav-toggle": {
           "open": "Open navigation",
           "close": "Close navigation"

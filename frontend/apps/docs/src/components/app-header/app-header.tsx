@@ -1,5 +1,5 @@
 import { useTranslation } from 'hooks';
-import { IcoDatabase16, IcoShield16 } from 'icons';
+import { IcoArrowUpRight16, IcoDatabase16, IcoShield16 } from 'icons';
 import React from 'react';
 import type { ProductArticle } from 'src/types/product';
 import styled, { css } from 'styled-components';
@@ -26,10 +26,26 @@ const PageHeader = ({ articles }: PageHeaderProps) => {
     },
   ];
 
+  const desktopLinks = [
+    {
+      href: 'https://onefootprint.stoplight.io/docs/footprint/36c0a7469ddb2-org',
+      Icon: IcoArrowUpRight16,
+      text: t('nav.docs.desktop'),
+    },
+  ];
+
+  const mobileLinks = [
+    {
+      href: 'https://onefootprint.stoplight.io/docs/footprint/36c0a7469ddb2-org',
+      Icon: IcoArrowUpRight16,
+      text: t('nav.docs.mobile'),
+    },
+  ];
+
   return (
     <Header>
-      <DesktopNav navItems={navItems} />
-      <MobileNav navItems={navItems} articles={articles} />
+      <DesktopNav navItems={navItems} links={desktopLinks} />
+      <MobileNav navItems={navItems} articles={articles} links={mobileLinks} />
     </Header>
   );
 };

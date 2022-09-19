@@ -6,7 +6,7 @@ import { useRouter } from 'next/router';
 import React, { useState } from 'react';
 import type { ProductArticle } from 'src/types/product';
 import styled, { css } from 'styled-components';
-import { Box, media, Tab } from 'ui';
+import { Box, LinkButton, media, Tab } from 'ui';
 import { useLockedBody } from 'usehooks-ts';
 
 import type { NavItem } from '../../app-header.types';
@@ -15,9 +15,10 @@ import ProductNavigation from './components/product-navigation';
 type MobileNavProps = {
   navItems: NavItem[];
   articles?: ProductArticle[];
+  links: NavItem[];
 };
 
-const MobileNav = ({ navItems, articles }: MobileNavProps) => {
+const MobileNav = ({ navItems, articles, links }: MobileNavProps) => {
   const router = useRouter();
   const { t } = useTranslation('components.header');
   const [isExpanded, setIsExpanded] = useState(false);
@@ -31,22 +32,40 @@ const MobileNav = ({ navItems, articles }: MobileNavProps) => {
   return (
     <Container>
       <Header>
-        <Link href="/">
-          <a href="/" aria-label={t('nav.home')}>
-            <LogoFpdocsDefault />
-          </a>
-        </Link>
-        {articles && (
-          <NavTriggerButton
-            type="button"
-            onClick={handleToggleNav}
-            aria-label={
-              isExpanded ? t('nav.nav-toggle.close') : t('nav.nav-toggle.open')
-            }
-            aria-expanded={isExpanded}
-          >
-            {isExpanded ? <IcoClose24 /> : <IcoMenu24 />}
-          </NavTriggerButton>
+        <InternalNavContainer>
+          {articles && (
+            <NavTriggerButton
+              type="button"
+              onClick={handleToggleNav}
+              aria-label={
+                isExpanded
+                  ? t('nav.nav-toggle.close')
+                  : t('nav.nav-toggle.open')
+              }
+              aria-expanded={isExpanded}
+            >
+              {isExpanded ? <IcoClose24 /> : <IcoMenu24 />}
+            </NavTriggerButton>
+          )}
+          <Link href="/">
+            <a href="/" aria-label={t('nav.home')}>
+              <LogoFpdocsDefault />
+            </a>
+          </Link>
+        </InternalNavContainer>
+        {links.length && (
+          <div>
+            {links.map(({ href, text, Icon }) => (
+              <LinkButton
+                href={href}
+                iconComponent={Icon}
+                size="compact"
+                target="_blank"
+              >
+                {text}
+              </LinkButton>
+            ))}
+          </div>
         )}
       </Header>
       <Nav>
@@ -81,29 +100,35 @@ const Container = styled.div`
   `}
 `;
 
+const InternalNavContainer = styled.div`
+  align-items: center;
+  display: flex;
+
+  > a {
+    display: flex;
+  }
+`;
+
 const Header = styled.div`
   ${({ theme }) => css`
     align-items: center;
     display: flex;
-    gap: ${theme.spacing[8]}px;
     justify-content: space-between;
-    height: 48px;
-    padding: 0 ${theme.spacing[5]}px;
-
-    > a {
-      display: flex;
-    }
+    padding: ${theme.spacing[5]}px;
   `};
 `;
 
 const NavTriggerButton = styled.button`
-  background: none;
-  border: none;
-  cursor: pointer;
-  height: 36px;
-  margin: 0;
-  padding: 0;
-  width: 36px;
+  ${({ theme }) => css`
+    background: none;
+    border: none;
+    cursor: pointer;
+    height: 24px;
+    margin: 0;
+    padding: 0;
+    width: 24px;
+    margin-right: ${theme.spacing[4]}px;
+  `};
 `;
 
 const Nav = styled.nav`

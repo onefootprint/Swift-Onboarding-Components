@@ -4,45 +4,71 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React from 'react';
 import styled, { css } from 'styled-components';
-import { media, Tab } from 'ui';
+import { LinkButton, media, Tab } from 'ui';
 
 import type { NavItem } from '../../app-header.types';
 
 type DesktopNavProps = {
   navItems: NavItem[];
+  links: NavItem[];
 };
 
-const DesktopNav = ({ navItems }: DesktopNavProps) => {
+const DesktopNav = ({ navItems, links }: DesktopNavProps) => {
   const router = useRouter();
   const { t } = useTranslation('components.header');
 
   return (
     <Container>
       <Nav>
-        <Link href="/">
-          <a href="/" aria-label={t('nav.home')}>
-            <LogoFpdocsDefault />
-          </a>
-        </Link>
-        <Tab.List>
-          {navItems.map(({ href, Icon, text }) => (
-            <Link href={href} key={text} passHref>
-              <Tab.Item
-                iconComponent={Icon}
-                selected={router.asPath.startsWith(href)}
-              >
-                {text}
-              </Tab.Item>
-            </Link>
+        <InternalNavContainer>
+          <Link href="/">
+            <a href="/" aria-label={t('nav.home')}>
+              <LogoFpdocsDefault />
+            </a>
+          </Link>
+          <Tab.List>
+            {navItems.map(({ href, Icon, text }) => (
+              <Link href={href} key={text} passHref>
+                <Tab.Item
+                  iconComponent={Icon}
+                  selected={router.asPath.startsWith(href)}
+                >
+                  {text}
+                </Tab.Item>
+              </Link>
+            ))}
+          </Tab.List>
+        </InternalNavContainer>
+        <div>
+          {links.map(({ href, Icon, text }) => (
+            <LinkButton
+              href={href}
+              iconComponent={Icon}
+              size="compact"
+              target="_blank"
+            >
+              {text}
+            </LinkButton>
           ))}
-        </Tab.List>
+        </div>
       </Nav>
     </Container>
   );
 };
 
+const InternalNavContainer = styled.div`
+  ${({ theme }) => css`
+    align-items: center;
+    justify-content: space-between;
+    align-items: center;
+    display: flex;
+    gap: ${theme.spacing[8]}px;
+  `};
+`;
+
 const Container = styled.div`
   ${({ theme }) => css`
+    width: 100%;
     align-items: center;
     border-bottom: ${theme.borderWidth[1]}px solid ${theme.borderColor.tertiary};
     display: none;
@@ -62,6 +88,8 @@ const Container = styled.div`
 
 const Nav = styled.nav`
   ${({ theme }) => css`
+    width: 100%;
+    justify-content: space-between;
     align-items: center;
     display: flex;
     gap: ${theme.spacing[8]}px;
