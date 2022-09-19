@@ -4,11 +4,10 @@ use diesel::prelude::*;
 use chrono::{DateTime, Utc};
 use diesel::{Insertable, PgConnection, Queryable};
 use newtypes::{TenantId, TenantPermission, TenantRoleId};
-use serde::{Deserialize, Serialize};
 
 use super::tenant::Tenant;
 
-#[derive(Debug, Clone, Serialize, Deserialize, Queryable)]
+#[derive(Debug, Clone, Queryable)]
 #[diesel(table_name = tenant_role)]
 pub struct TenantRole {
     pub id: TenantRoleId,
@@ -44,7 +43,7 @@ impl TenantRole {
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
+#[derive(Debug, Clone, Insertable)]
 #[diesel(table_name = tenant_role)]
 pub struct NewTenantRole {
     pub tenant_id: TenantId,

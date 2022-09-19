@@ -5,7 +5,9 @@ use diesel::{pg::Pg, sql_types::Text, AsExpression, FromSqlRow};
 use strum_macros::{AsRefStr, EnumDiscriminants};
 use thiserror::Error;
 
-use crate::{api_schema_helper::string_api_data_type_alias, DataAttribute, KvDataKey};
+use crate::{
+    api_schema_helper::string_api_data_type_alias, util::impl_enum_string_diesel, DataAttribute, KvDataKey,
+};
 
 /// Identifies a piece of data for a user vault
 #[derive(
@@ -87,18 +89,7 @@ impl DataIdentifier {
     }
 }
 
-impl diesel::serialize::ToSql<Text, Pg> for DataIdentifier {
-    fn to_sql<'b>(&'b self, out: &mut diesel::serialize::Output<'b, '_, Pg>) -> diesel::serialize::Result {
-        <String as diesel::serialize::ToSql<Text, Pg>>::to_sql(&self.to_string(), &mut out.reborrow())
-    }
-}
-
-impl diesel::deserialize::FromSql<Text, diesel::pg::Pg> for DataIdentifier {
-    fn from_sql(value: diesel::pg::PgValue<'_>) -> diesel::deserialize::Result<Self> {
-        let str = String::from_sql(value)?;
-        Ok(Self::from_str(&str)?)
-    }
-}
+impl_enum_string_diesel!(DataIdentifier);
 
 #[cfg(test)]
 mod tests {

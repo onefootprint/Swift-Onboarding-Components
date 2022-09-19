@@ -48,6 +48,8 @@ pub enum Error {
     PhoneError(#[from] PhoneError),
     #[error("Serde error")]
     SerdeError,
+    #[error("Error deserializing")]
+    DeserializeError,
 }
 
 #[derive(Debug, Clone, thiserror::Error)]
@@ -88,6 +90,7 @@ pub enum AddressError {
 
 #[macro_use]
 pub mod util {
+    // Derive to_sql using the type's as_ref() method and from_sql with the type's from_str method
     macro_rules! impl_enum_str_diesel {
         ($type:ty) => {
             impl<DB> diesel::serialize::ToSql<Text, DB> for $type
@@ -106,6 +109,30 @@ pub mod util {
             impl diesel::deserialize::FromSql<Text, diesel::pg::Pg> for $type {
                 fn from_sql(value: diesel::pg::PgValue<'_>) -> diesel::deserialize::Result<Self> {
                     use std::str::FromStr;
+                    let str = String::from_sql(value)?;
+                    Ok(Self::from_str(&str)?)
+                }
+            }
+        };
+    }
+
+    // Derive to_sql using the type's to_string() method and from_sql with the type's from_str method
+    macro_rules! impl_enum_string_diesel {
+        ($type:ty) => {
+            impl diesel::serialize::ToSql<Text, Pg> for $type {
+                fn to_sql<'b>(
+                    &'b self,
+                    out: &mut diesel::serialize::Output<'b, '_, Pg>,
+                ) -> diesel::serialize::Result {
+                    <String as diesel::serialize::ToSql<Text, Pg>>::to_sql(
+                        &self.to_string(),
+                        &mut out.reborrow(),
+                    )
+                }
+            }
+
+            impl diesel::deserialize::FromSql<Text, diesel::pg::Pg> for $type {
+                fn from_sql(value: diesel::pg::PgValue<'_>) -> diesel::deserialize::Result<Self> {
                     let str = String::from_sql(value)?;
                     Ok(Self::from_str(&str)?)
                 }
@@ -199,4 +226,5 @@ pub mod util {
         }
     }
     pub(crate) use impl_enum_str_diesel;
+    pub(crate) use impl_enum_string_diesel;
 }

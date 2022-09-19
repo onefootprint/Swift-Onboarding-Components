@@ -13,10 +13,11 @@ use paperclip::actix::Apiv2Security;
 
 use super::AuthSessionData;
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
+#[derive(Debug, Clone)]
 pub struct WorkOs {
     tenant: Tenant,
     tenant_role: TenantRole,
+    #[allow(dead_code)]
     tenant_user: TenantUser,
     data: WorkOsSession,
 }
@@ -26,8 +27,7 @@ pub struct WorkOs {
 /// Notably, this struct isn't very useful since the entire nested WorkOs is hidden. If you
 /// want to do something useful, you likely have to enforce permissions by calling
 /// `check_permissions`, which will give you the more useful nested WorkOs
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, Apiv2Security)]
-#[serde(transparent)]
+#[derive(Debug, Clone, Apiv2Security)]
 #[openapi(
     apiKey,
     in = "header",
