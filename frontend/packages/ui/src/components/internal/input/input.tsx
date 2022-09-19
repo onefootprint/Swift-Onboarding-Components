@@ -9,8 +9,8 @@ import Hint from '../hint';
 import Label from '../label';
 
 export type InternalInputProps = {
-  prefixElement?: React.ReactNode;
-  suffixElement?: React.ReactNode;
+  prefixComponent?: React.ReactNode;
+  suffixComponent?: React.ReactNode;
   fontVariant?: FontVariant;
 };
 
@@ -35,9 +35,9 @@ const BaseInput = forwardRef<HTMLInputElement, AllInputProps>(
       onChange,
       onChangeText,
       placeholder,
-      prefixElement,
+      prefixComponent,
       required,
-      suffixElement,
+      suffixComponent,
       sx,
       testID,
       ...props
@@ -62,7 +62,9 @@ const BaseInput = forwardRef<HTMLInputElement, AllInputProps>(
       <div>
         {label && <Label htmlFor={id}>{label}</Label>}
         <InputContainer>
-          {prefixElement && <PrefixContainer>{prefixElement}</PrefixContainer>}
+          {prefixComponent && (
+            <PrefixContainer>{prefixComponent}</PrefixContainer>
+          )}
           <StyledField
             {...props}
             $hasError={hasError}
@@ -83,7 +85,9 @@ const BaseInput = forwardRef<HTMLInputElement, AllInputProps>(
             ref={mask ? undefined : ref}
             htmlRef={mask ? ref : undefined}
           />
-          {suffixElement && <SuffixContainer>{suffixElement}</SuffixContainer>}
+          {suffixComponent && (
+            <SuffixContainer>{suffixComponent}</SuffixContainer>
+          )}
         </InputContainer>
         {hintText && (
           <Hint color={hasError ? 'error' : 'tertiary'}>{hintText}</Hint>

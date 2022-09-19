@@ -22,7 +22,7 @@ export type SearchInputProps = BaseProps & {
   inputSize?: Size;
   onReset?: () => void;
   placeholder?: string;
-  suffixElement?: React.ReactNode;
+  suffixComponent?: React.ReactNode;
 };
 
 const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
@@ -34,7 +34,7 @@ const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
       onChangeText,
       onReset,
       placeholder = 'Search...',
-      suffixElement: SuffixElement,
+      suffixComponent,
       value,
       sx,
       ...remainingProps
@@ -47,8 +47,8 @@ const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
     };
 
     const renderSuffix = () => {
-      if (SuffixElement) {
-        return SuffixElement;
+      if (suffixComponent) {
+        return suffixComponent;
       }
       if (value) {
         return (
@@ -69,9 +69,9 @@ const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
         fontVariant={inputSize === 'compact' ? 'body-4' : 'body-3'}
         onChange={onChange}
         onChangeText={onChangeText}
-        prefixElement={<SearchIcon size={inputSize} />}
+        prefixComponent={<SearchIcon size={inputSize} />}
         ref={ref}
-        suffixElement={renderSuffix()}
+        suffixComponent={renderSuffix()}
         sx={{
           paddingLeft: sizeToInputPadding[inputSize],
           height: sizeToHeight[inputSize],

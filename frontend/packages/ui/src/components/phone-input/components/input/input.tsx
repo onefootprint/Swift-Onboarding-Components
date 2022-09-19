@@ -51,7 +51,7 @@ const PhoneInput = forwardRef<HTMLInputElement, InputProps>(
           mask={hasMask ? mask : { prefix }}
           placeholder=""
           readOnly={isLoading}
-          prefixElement={
+          prefixComponent={
             <Trigger
               onClick={isLoading ? undefined : selectTrigger.onClick}
               ref={selectTrigger.ref}
@@ -65,7 +65,7 @@ const PhoneInput = forwardRef<HTMLInputElement, InputProps>(
             </Trigger>
           }
           ref={ref}
-          suffixElement={
+          suffixComponent={
             isLoading && (
               <LoadingContainer>
                 <LoadingIndicator color="quaternary" size="compact" />
