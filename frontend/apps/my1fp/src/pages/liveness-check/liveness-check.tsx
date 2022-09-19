@@ -2,9 +2,9 @@ import FocusTrap from 'focus-trap-react';
 import { FootprintFooter } from 'footprint-ui';
 import { IcoClose24 } from 'icons';
 import React, { useState } from 'react';
-import { useKey, useLockBodyScroll } from 'react-use';
 import styled, { css } from 'styled-components';
 import { IconButton } from 'ui';
+import { useEventListener, useLockedBody } from 'usehooks-ts';
 
 import LivenessCheckMachineProvider from './components/machine-provider';
 import LivenessCheckDialogBody from './pages/liveness-check-dialog-body';
@@ -17,8 +17,12 @@ const LIVENESS_DIALOG_CLOSE_DELAY = 1500;
 
 const LivenessCheck = ({ onClose }: LivenessCheckProps) => {
   const [isDialogOpen, setDialogOpen] = useState(true);
-  useLockBodyScroll(isDialogOpen);
-  useKey('Escape', onClose);
+  useLockedBody(isDialogOpen);
+  useEventListener('keydown', event => {
+    if (event.key === 'Escape') {
+      onClose();
+    }
+  });
 
   const handleDoneLiveness = () => {
     setTimeout(() => {

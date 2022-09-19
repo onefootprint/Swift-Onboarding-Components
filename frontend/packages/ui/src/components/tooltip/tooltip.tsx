@@ -1,8 +1,8 @@
 import type { Placement } from '@popperjs/core';
 import React, { useCallback, useState } from 'react';
 import { usePopper } from 'react-popper';
-import { useUpdateEffect } from 'react-use';
 import styled, { css, useTheme } from 'styled-components';
+import { useUpdateEffect } from 'usehooks-ts';
 
 import { createFontStyles } from '../../utils/mixins';
 import useGetElementRef from './hooks/use-get-element-ref';

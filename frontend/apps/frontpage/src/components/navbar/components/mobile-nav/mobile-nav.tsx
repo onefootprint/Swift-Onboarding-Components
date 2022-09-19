@@ -1,8 +1,8 @@
 import { IcoClose24, IcoMenu24 } from 'icons';
 import React, { useCallback, useEffect, useState } from 'react';
-import { useLockBodyScroll } from 'react-use';
 import styled, { css } from 'styled-components';
 import { Button, media, useMediaQuery } from 'ui';
+import { useLockedBody } from 'usehooks-ts';
 
 import { isNavLink, isNavMenu, NavEntry } from '../../types';
 import LogoLink from '../logo-link';
@@ -22,7 +22,7 @@ type MobileNavProps = {
 const MobileNav = ({ onOpen, onClose, cta, entries }: MobileNavProps) => {
   const breakpoint = useMediaQuery({ minWidth: 'lg', maxWidth: 'xl' });
   const [isOpen, setOpen] = useState(false);
-  useLockBodyScroll(isOpen);
+  useLockedBody(isOpen);
 
   const close = useCallback(() => {
     setOpen(false);

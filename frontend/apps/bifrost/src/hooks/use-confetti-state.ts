@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import useTimeoutFn from 'react-use/lib/useTimeoutFn';
+import { useTimeout } from 'usehooks-ts';
 
 const ANIMATION_DELAY = 0;
 const ANIMATION_DURATION = 5000;
@@ -31,8 +31,8 @@ const useConfettiState = () => {
     }));
   };
 
-  useTimeoutFn(setSize, ANIMATION_DELAY);
-  useTimeoutFn(stopAnimation, ANIMATION_DURATION);
+  useTimeout(setSize, ANIMATION_DELAY);
+  useTimeout(stopAnimation, ANIMATION_DURATION);
 
   return state;
 };

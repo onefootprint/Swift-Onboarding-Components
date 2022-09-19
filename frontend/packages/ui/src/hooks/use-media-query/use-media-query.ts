@@ -1,22 +1,18 @@
 import json2mq from 'json2mq';
-import { useMedia } from 'react-use';
 import { useTheme } from 'styled-components';
 import type { Breakpoint } from 'themes';
+import { useMediaQuery as useMediaQueryTs } from 'usehooks-ts';
 
-const useMediaQuery = (
-  query: {
-    minWidth?: Breakpoint;
-    maxWidth?: Breakpoint;
-  },
-  defaultValue = false,
-) => {
+const useMediaQuery = (query: {
+  minWidth?: Breakpoint;
+  maxWidth?: Breakpoint;
+}) => {
   const theme = useTheme();
-  return useMedia(
+  return useMediaQueryTs(
     json2mq({
       minWidth: query.minWidth ? theme.breakpoint[query.minWidth] : false,
       maxWidth: query.maxWidth ? theme.breakpoint[query.maxWidth] : false,
     }),
-    defaultValue,
   );
 };
 

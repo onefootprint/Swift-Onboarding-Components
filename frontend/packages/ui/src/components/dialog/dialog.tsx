@@ -1,8 +1,8 @@
 import FocusTrap from 'focus-trap-react';
 import { IcoClose24, Icon } from 'icons';
 import React from 'react';
-import { useKey, useLockBodyScroll } from 'react-use';
 import styled, { css } from 'styled-components';
+import { useEventListener, useLockedBody } from 'usehooks-ts';
 
 import { media } from '../../utils';
 import Box from '../box';
@@ -72,8 +72,12 @@ const Dialog = ({
   testID,
   title,
 }: DialogProps) => {
-  useLockBodyScroll(open);
-  useKey('Escape', onClose);
+  useLockedBody(open);
+  useEventListener('keydown', event => {
+    if (event.key === 'Escape') {
+      onClose();
+    }
+  });
 
   return open ? (
     <Portal selector="#footprint-portal">

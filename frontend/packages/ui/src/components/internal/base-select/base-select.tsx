@@ -1,7 +1,7 @@
 import React, { useCallback, useRef, useState } from 'react';
 import ReactSelect, { defaultTheme, OptionProps } from 'react-select';
-import { useClickAway, useKey } from 'react-use';
 import styled, { css, useTheme } from 'styled-components';
+import { useEventListener, useOnClickOutside } from 'usehooks-ts';
 
 import Box from '../../box';
 import Hint from '../hint';
@@ -66,9 +66,12 @@ const BaseSelect = <Option extends BaseSelectOption>({
     setOpen(false);
   };
 
-  useKey('Tab', closeDropdown);
-  useKey('Escape', closeDropdown);
-  useClickAway(containerRef, closeDropdown);
+  useEventListener('keydown', event => {
+    if (event.key === 'Tab' || event.key === 'Escape') {
+      closeDropdown();
+    }
+  });
+  useOnClickOutside(containerRef, closeDropdown);
 
   const handleFakeSelectFocus = () => {
     triggerRef.current?.focus();

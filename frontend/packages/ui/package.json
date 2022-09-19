@@ -28,7 +28,6 @@
     "@popperjs/core": "^2.11.5",
     "@radix-ui/react-dropdown-menu": "^1.0.0",
     "cleave.js": "^1.6.0",
-    "jest-presets": "*",
     "constate": "^3.3.2",
     "csstype": "^3.1.0",
     "downshift": "^6.1.7",
@@ -36,6 +35,7 @@
     "global-constants": "*",
     "google-libphonenumber": "^3.2.29",
     "icons": "*",
+    "jest-presets": "*",
     "json2mq": "^0.2.0",
     "lodash": "^4.17.21",
     "polished": "^4.2.2",
@@ -44,11 +44,11 @@
     "react-popper": "^2.3.0",
     "react-select": "^5.3.2",
     "react-syntax-highlighter": "^15.5.0",
-    "react-use": "^17.3.2",
     "react-window": "^1.8.7",
     "styled-media-query": "^2.1.2",
     "themes": "*",
-    "use-places-autocomplete": "^2.0.0"
+    "use-places-autocomplete": "^2.0.0",
+    "usehooks-ts": "^2.6.0"
   },
   "devDependencies": {
     "@storybook/addon-actions": "^6.5.10",
@@ -71,8 +71,8 @@
     "@types/styled-components": "^5.1.25",
     "csstype": "^3.1.0",
     "eslint-config-footprint": "*",
-    "react-dom": "18.2.0",
     "react": "18.2.0",
+    "react-dom": "18.2.0",
     "styled-components": "^5.3.5",
     "tsconfig": "*",
     "tsup": "^6.2.2",
@@ -80,10 +80,10 @@
     "webpack": "*"
   },
   "peerDependencies": {
+    "polished": "4.x",
     "react": "18.x",
     "react-dom": "18.x",
-    "styled-components": "5.x",
-    "polished": "4.x"
+    "styled-components": "5.x"
   },
   "jest": {
     "preset": "jest-presets/jest/web"

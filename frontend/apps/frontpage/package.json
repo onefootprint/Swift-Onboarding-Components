@@ -31,11 +31,11 @@
     "react-driftjs": "^1.2.2",
     "react-hook-form": "^7.34.2",
     "react-swipeable": "^7.0.0",
-    "react-use": "^17.3.2",
     "request": "*",
     "styled-components": "^5.3.5",
     "themes": "*",
-    "ui": "*"
+    "ui": "*",
+    "usehooks-ts": "^2.6.0"
   },
   "devDependencies": {
     "@mdx-js/loader": "^2.1.1",

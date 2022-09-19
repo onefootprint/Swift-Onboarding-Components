@@ -1,8 +1,8 @@
 import { IcoClose24 } from 'icons';
 import React from 'react';
-import { useLockBodyScroll } from 'react-use';
 import styled, { css } from 'styled-components';
 import { Overlay, Typography } from 'ui';
+import { useLockedBody } from 'usehooks-ts';
 
 type DemoVideoProps = {
   title: string;
@@ -12,7 +12,7 @@ type DemoVideoProps = {
 };
 
 const DemoVideo = ({ open, title, link, onClose }: DemoVideoProps) => {
-  useLockBodyScroll(open);
+  useLockedBody(open);
 
   return open ? (
     <Overlay onClick={onClose} aria-modal>

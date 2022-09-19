@@ -28,12 +28,12 @@
     "polished": "^4.2.2",
     "qrcode.react": "^3.0.2",
     "react-confetti": "^6.1.0",
-    "react-use": "^17.4.0",
     "request": "*",
     "themes": "*",
-    "ui": "*",
     "types": "*",
-    "use-places-autocomplete": "^4.0.0"
+    "ui": "*",
+    "use-places-autocomplete": "^4.0.0",
+    "usehooks-ts": "^2.6.0"
   },
   "devDependencies": {
     "@next/bundle-analyzer": "^12.1.6",
