@@ -3,8 +3,7 @@
 use std::collections::{HashMap, HashSet};
 
 use crate::auth::key_context::secret_key::SecretTenantAuthContext;
-use crate::auth::session_data::workos::WorkOs;
-use crate::auth::{Either, SessionContext, TenantAuth};
+use crate::auth::{CheckTenantPermissions, Either, TenantAuth, WorkOsAuth};
 
 use crate::errors::ApiResult;
 use crate::types::{ApiResponseData, EmptyResponse, JsonApiResponse};
@@ -172,9 +171,10 @@ pub async fn post_decrypt(
     state: web::Data<State>,
     path: Path<FootprintUserId>,
     request: Json<DecryptCustomFieldsRequest>,
-    tenant_auth: Either<SessionContext<WorkOs>, SecretTenantAuthContext>,
+    tenant_auth: Either<WorkOsAuth, SecretTenantAuthContext>,
     insights: InsightHeaders,
 ) -> JsonApiResponse<DecryptCustomDataResponse> {
+    let tenant_auth = tenant_auth.check_permissions(vec![])?; // TODO
     let footprint_user_id = path.into_inner();
     let is_live = tenant_auth.is_live()?;
     let tenant_id = tenant_auth.tenant().id.clone();

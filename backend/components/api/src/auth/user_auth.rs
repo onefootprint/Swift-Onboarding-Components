@@ -3,7 +3,7 @@ use super::{
     AuthError, SessionContext,
 };
 
-/// A shorthand for the commonly used ParsableUserSession context
+/// A shorthand for the commonly used ParsedUserSession context
 pub type UserAuth = SessionContext<ParsedUserSession>;
 
 impl UserAuth {
@@ -13,20 +13,6 @@ impl UserAuth {
         self,
         scopes: Vec<UserAuthScope>,
     ) -> Result<SessionContext<UserSession>, AuthError> {
-        let SessionContext {
-            data,
-            auth_token,
-            expires_at,
-            headers,
-            phantom,
-        } = self;
-        let result = SessionContext {
-            data: data.check_permissions(scopes)?,
-            auth_token,
-            expires_at,
-            headers,
-            phantom,
-        };
-        Ok(result)
+        self.map(|c| c.check_permissions(scopes))
     }
 }

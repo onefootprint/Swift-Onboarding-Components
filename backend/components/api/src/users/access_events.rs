@@ -1,12 +1,12 @@
 use crate::auth::key_context::secret_key::SecretTenantAuthContext;
-use crate::auth::session_data::workos::WorkOs;
+use crate::auth::CheckTenantPermissions;
 use crate::auth::Either;
-use crate::auth::TenantAuth;
+use crate::auth::WorkOsAuth;
+use crate::errors::ApiError;
 use crate::types::access_event::ApiAccessEvent;
 use crate::types::request::PaginatedRequest;
 use crate::types::response::ApiPaginatedResponseData;
 use crate::State;
-use crate::{auth::SessionContext, errors::ApiError};
 use chrono::{DateTime, Utc};
 use db::access_event::{AccessEventListItemForTenant, AccessEventListQueryParams};
 use newtypes::csv::deserialize_stringified_list;
@@ -41,8 +41,9 @@ type AccessEventResponse = Vec<ApiAccessEvent>;
 fn get(
     state: web::Data<State>,
     request: web::Query<PaginatedRequest<AccessEventRequest, i64>>,
-    auth: Either<SessionContext<WorkOs>, SecretTenantAuthContext>,
+    auth: Either<WorkOsAuth, SecretTenantAuthContext>,
 ) -> actix_web::Result<Json<ApiPaginatedResponseData<AccessEventResponse, i64>>, ApiError> {
+    let auth = auth.check_permissions(vec![])?; // TODO
     let page_size = request.page_size(&state);
     let cursor = request.cursor;
     let AccessEventRequest {

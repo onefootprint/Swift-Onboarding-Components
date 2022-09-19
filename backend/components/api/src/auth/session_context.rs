@@ -9,10 +9,7 @@ use paperclip::actix::Apiv2Security;
 
 use crate::{errors::ApiError, utils::session::AuthSession, State};
 
-use super::{
-    session_data::workos::WorkOs, AuthError, ExtractableAuthSession, TenantAuth,
-    VerifiedUserAuth,
-};
+use super::{session_data::workos::WorkOs, AuthError, ExtractableAuthSession, TenantAuth, VerifiedUserAuth};
 
 /// Abstract Session Context Type
 #[derive(Debug, Clone, Apiv2Security)]
@@ -81,6 +78,29 @@ where
                 phantom: PhantomData,
             })
         })
+    }
+}
+
+impl<A> SessionContext<A> {
+    pub fn map<B, F, E>(self, f: F) -> Result<SessionContext<B>, E>
+    where
+        F: FnOnce(A) -> Result<B, E>,
+    {
+        let SessionContext {
+            data,
+            auth_token,
+            expires_at,
+            headers,
+            phantom,
+        } = self;
+        let result = SessionContext {
+            data: f(data)?,
+            auth_token,
+            expires_at,
+            headers,
+            phantom,
+        };
+        Ok(result)
     }
 }
 

@@ -7,7 +7,7 @@ use paperclip::actix::Apiv2Security;
 
 use crate::errors::ApiError;
 
-use super::{AuthError, TenantAuth};
+use super::{AuthError, CheckTenantPermissions, TenantAuth};
 
 #[derive(Debug, Clone, Apiv2Security)]
 #[openapi(apiKey)]
@@ -89,6 +89,22 @@ where
         match self {
             Either::Left(l) => l.is_live(),
             Either::Right(r) => r.is_live(),
+        }
+    }
+}
+
+impl<A, B> CheckTenantPermissions for Either<A, B>
+where
+    A: CheckTenantPermissions,
+    B: CheckTenantPermissions,
+{
+    fn check_permissions(
+        self,
+        permissions: Vec<newtypes::TenantPermission>,
+    ) -> Result<Box<dyn TenantAuth>, AuthError> {
+        match self {
+            Either::Left(l) => l.check_permissions(permissions),
+            Either::Right(r) => r.check_permissions(permissions),
         }
     }
 }

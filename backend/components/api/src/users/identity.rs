@@ -3,8 +3,7 @@
 use std::collections::{HashMap, HashSet};
 
 use crate::auth::key_context::secret_key::SecretTenantAuthContext;
-use crate::auth::session_data::workos::WorkOs;
-use crate::auth::{AuthError, Either, SessionContext, TenantAuth};
+use crate::auth::{AuthError, CheckTenantPermissions, Either, TenantAuth, WorkOsAuth};
 use crate::errors::ApiResult;
 use crate::hosted::user::DecryptFieldsResult;
 use crate::types::identity_data_request::{ComputedFingerprints, IdentityDataRequest, IdentityDataUpdate};
@@ -134,6 +133,7 @@ pub async fn get(
     request: Query<FieldsParams>,
     tenant_auth: SecretTenantAuthContext,
 ) -> JsonApiResponse<GetIdentityDataResponse> {
+    let tenant_auth = tenant_auth.check_permissions(vec![])?; // TODO
     let footprint_user_id = path.into_inner();
     let tenant_id = tenant_auth.tenant().id.clone();
     let is_live = tenant_auth.is_live()?;
@@ -189,9 +189,10 @@ pub async fn post_decrypt(
     state: web::Data<State>,
     path: Path<FootprintUserId>,
     request: Json<DecryptIdentityFieldsRequest>,
-    auth: Either<SessionContext<WorkOs>, SecretTenantAuthContext>,
+    auth: Either<WorkOsAuth, SecretTenantAuthContext>,
     insights: InsightHeaders,
 ) -> JsonApiResponse<DecryptIdentityDataResponse> {
+    let auth = auth.check_permissions(vec![])?; // TODO
     let footprint_user_id = path.into_inner();
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;

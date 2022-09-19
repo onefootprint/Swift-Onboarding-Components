@@ -1,4 +1,4 @@
-use crate::auth::{AuthError, TenantAuth};
+use crate::auth::{AuthError, CheckTenantPermissions, TenantAuth};
 use crate::{errors::ApiError, State};
 use actix_web::http::header::Header;
 use actix_web::{web, FromRequest};
@@ -89,5 +89,14 @@ impl TenantAuth for SecretTenantAuthContext {
         }
 
         Ok(self.api_key.is_live)
+    }
+}
+
+impl CheckTenantPermissions for SecretTenantAuthContext {
+    fn check_permissions(
+        self,
+        _permissions: Vec<newtypes::TenantPermission>,
+    ) -> Result<Box<dyn TenantAuth>, AuthError> {
+        Ok(Box::new(self))
     }
 }

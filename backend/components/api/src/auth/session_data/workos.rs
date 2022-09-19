@@ -6,24 +6,34 @@ use db::{
     models::{tenant::Tenant, tenant_role::TenantRole, tenant_user::TenantUser},
     PgConnection,
 };
-use newtypes::TenantUserId;
+use newtypes::{TenantPermission, TenantUserId};
 use paperclip::actix::Apiv2Security;
 
 use super::AuthSessionData;
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, Apiv2Security)]
-#[openapi(
-    apiKey,
-    in = "header",
-    name = "X-Fp-Dashboard-Authorization",
-    description = "Auth token for a dashboard user"
-)]
+// Intentionally private
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
 pub struct WorkOs {
     tenant: Tenant,
     tenant_role: TenantRole,
     tenant_user: TenantUser,
     data: WorkOsSession,
 }
+
+/// Nests a private WorkOs and implements traits required to extract this session from an
+/// actix request.
+/// Notably, this struct isn't very useful since the entire nested WorkOs is hidden. If you
+/// want to do something useful, you likely have to enforce permissions by calling
+/// `check_permissions`, which will give you the more useful nested WorkOs
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, Apiv2Security)]
+#[serde(transparent)]
+#[openapi(
+    apiKey,
+    in = "header",
+    name = "X-Fp-Dashboard-Authorization",
+    description = "Auth token for a dashboard user"
+)]
+pub struct ParsedWorkOs(WorkOs);
 
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
 pub struct WorkOsSession {
@@ -33,7 +43,7 @@ pub struct WorkOsSession {
     pub tenant_user_id: TenantUserId,
 }
 
-impl ExtractableAuthSession for WorkOs {
+impl ExtractableAuthSession for ParsedWorkOs {
     fn header_names() -> Vec<&'static str> {
         vec!["X-Fp-Dashboard-Authorization"]
     }
@@ -46,12 +56,19 @@ impl ExtractableAuthSession for WorkOs {
             }
         };
         let (tenant, tenant_role, tenant_user) = Tenant::get_by_user(conn, &data.tenant_user_id)?;
-        Ok(Self {
+        Ok(Self(WorkOs {
             data,
             tenant,
             tenant_role,
             tenant_user,
-        })
+        }))
+    }
+}
+
+impl ParsedWorkOs {
+    pub fn check_permissions(self, _permissions: Vec<TenantPermission>) -> Result<WorkOs, AuthError> {
+        // TODO check permissions on self
+        Ok(self.0)
     }
 }
 

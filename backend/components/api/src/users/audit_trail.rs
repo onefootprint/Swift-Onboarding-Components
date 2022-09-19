@@ -1,11 +1,11 @@
 use crate::auth::key_context::secret_key::SecretTenantAuthContext;
-use crate::auth::session_data::workos::WorkOs;
+use crate::auth::CheckTenantPermissions;
 use crate::auth::Either;
-use crate::auth::{ TenantAuth};
+use crate::auth::WorkOsAuth;
+use crate::errors::ApiError;
 use crate::types::audit_trail::ApiAuditTrail;
 use crate::types::response::ApiResponseData;
 use crate::State;
-use crate::{auth::SessionContext, errors::ApiError};
 use db::models::audit_trail::AuditTrail;
 use newtypes::FootprintUserId;
 use paperclip::actix::{api_v2_operation, get, web, web::Json, Apiv2Schema};
@@ -27,8 +27,9 @@ type AuditTrailResponse = Vec<ApiAuditTrail>;
 fn get(
     state: web::Data<State>,
     request: web::Query<AuditTrailRequest>,
-    auth: Either<SessionContext<WorkOs>, SecretTenantAuthContext>,
+    auth: Either<WorkOsAuth, SecretTenantAuthContext>,
 ) -> actix_web::Result<Json<ApiResponseData<AuditTrailResponse>>, ApiError> {
+    let auth = auth.check_permissions(vec![])?; // TODO
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
 

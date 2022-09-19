@@ -1,7 +1,5 @@
 use crate::auth::key_context::secret_key::SecretTenantAuthContext;
-use crate::auth::session_data::workos::WorkOs;
-use crate::auth::Either;
-use crate::auth::{SessionContext, TenantAuth};
+use crate::auth::{CheckTenantPermissions, Either, WorkOsAuth};
 use crate::errors::ApiError;
 use crate::types::secret_api_key::TenantApiKeyResponse;
 use crate::types::EmptyRequest;
@@ -26,8 +24,9 @@ use paperclip::actix::{api_v2_operation, patch, web, web::Json};
 pub async fn get(
     state: web::Data<State>,
     request: web::Query<PaginatedRequest<EmptyRequest, DateTime<Utc>>>,
-    auth: Either<SessionContext<WorkOs>, SecretTenantAuthContext>,
+    auth: Either<WorkOsAuth, SecretTenantAuthContext>,
 ) -> actix_web::Result<Json<ApiPaginatedResponseData<Vec<TenantApiKeyResponse>, DateTime<Utc>>>, ApiError> {
+    let auth = auth.check_permissions(vec![])?; // TODO
     let page_size = request.page_size(&state);
     let cursor = request.cursor;
 
@@ -69,9 +68,10 @@ pub struct CreateApiKeyRequest {
 )]
 pub async fn post(
     state: web::Data<State>,
-    auth: Either<SessionContext<WorkOs>, SecretTenantAuthContext>,
+    auth: Either<WorkOsAuth, SecretTenantAuthContext>,
     request: web::Json<CreateApiKeyRequest>,
 ) -> actix_web::Result<Json<ApiResponseData<TenantApiKeyResponse>>, ApiError> {
+    let auth = auth.check_permissions(vec![])?; // TODO
     let is_live = auth.is_live()?;
     let secret_key = SecretApiKey::generate(is_live);
     let tenant = auth.tenant();
@@ -111,10 +111,11 @@ pub struct UpdateApiKeyRequest {
 #[patch("/{id}")]
 pub async fn patch(
     state: web::Data<State>,
-    auth: Either<SessionContext<WorkOs>, SecretTenantAuthContext>,
+    auth: Either<WorkOsAuth, SecretTenantAuthContext>,
     path: web::Path<UpdateApiKeyPath>,
     request: web::Json<UpdateApiKeyRequest>,
 ) -> actix_web::Result<Json<ApiResponseData<TenantApiKeyResponse>>, ApiError> {
+    let auth = auth.check_permissions(vec![])?; // TODO
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
     let UpdateApiKeyPath { id } = path.into_inner();

@@ -1,13 +1,13 @@
 use crate::auth::key_context::secret_key::SecretTenantAuthContext;
-use crate::auth::session_data::workos::WorkOs;
+use crate::auth::CheckTenantPermissions;
 use crate::auth::Either;
-use crate::auth::TenantAuth;
+use crate::auth::WorkOsAuth;
+use crate::errors::ApiError;
 use crate::types::request::PaginatedRequest;
 use crate::types::response::ApiPaginatedResponseData;
 use crate::types::scoped_user::ApiScopedUser;
 use crate::utils::user_vault_wrapper::UserVaultWrapper;
 use crate::State;
-use crate::{auth::SessionContext, errors::ApiError};
 use chrono::{DateTime, Utc};
 use db::models::identity_data::HasIdentityDataFields;
 use db::models::onboarding::Onboarding;
@@ -41,8 +41,9 @@ type UsersResponse = Vec<ApiScopedUser>;
 pub fn get(
     state: web::Data<State>,
     request: web::Query<PaginatedRequest<UsersRequest, i64>>,
-    auth: Either<SessionContext<WorkOs>, SecretTenantAuthContext>,
+    auth: Either<WorkOsAuth, SecretTenantAuthContext>,
 ) -> actix_web::Result<Json<ApiPaginatedResponseData<UsersResponse, i64>>, ApiError> {
+    let auth = auth.check_permissions(vec![])?; // TODO
     let tenant = auth.tenant();
 
     let cursor = request.cursor;

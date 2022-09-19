@@ -3,8 +3,7 @@
 use std::collections::HashSet;
 
 use crate::auth::key_context::secret_key::SecretTenantAuthContext;
-use crate::auth::session_data::workos::WorkOs;
-use crate::auth::{Either, SessionContext, TenantAuth};
+use crate::auth::{Either, TenantAuth, WorkOsAuth};
 
 use crate::types::identity_data_request::{IdentityDataRequest, IdentityDataUpdate};
 use crate::types::{ApiResponseData, EmptyResponse, JsonApiResponse};
@@ -197,7 +196,7 @@ pub async fn post_decrypt(
     state: web::Data<State>,
     path: Path<FootprintUserId>,
     request: Json<DecryptUnifiedFieldsRequest>,
-    auth: Either<SessionContext<WorkOs>, SecretTenantAuthContext>,
+    auth: Either<WorkOsAuth, SecretTenantAuthContext>,
     insights: InsightHeaders,
 ) -> JsonApiResponse<UnifiedUserVaultDecryptResponse> {
     let footprint_id = path.into_inner();

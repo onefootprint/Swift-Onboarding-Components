@@ -3,11 +3,11 @@ use db::{
     models::{tenant::Tenant, user_vault::UserVault},
     DbPool, PgConnection,
 };
-use newtypes::UserVaultId;
+use newtypes::{TenantPermission, UserVaultId};
 
 use crate::errors::ApiError;
 
-use super::session_data::AuthSessionData;
+use super::{session_data::AuthSessionData, AuthError};
 
 /// A helper trait to extract a user vault id on combined types
 #[async_trait]
@@ -30,4 +30,8 @@ pub trait TenantAuth {
     fn tenant(&self) -> &Tenant;
     fn format_principal(&self) -> String;
     fn is_live(&self) -> Result<bool, ApiError>;
+}
+
+pub trait CheckTenantPermissions {
+    fn check_permissions(self, permissions: Vec<TenantPermission>) -> Result<Box<dyn TenantAuth>, AuthError>;
 }

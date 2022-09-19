@@ -2,9 +2,8 @@ use std::collections::HashSet;
 
 use crate::auth::key_context::ob_public_key::PublicTenantAuthContext;
 use crate::auth::key_context::secret_key::SecretTenantAuthContext;
-use crate::auth::session_data::workos::WorkOs;
-use crate::auth::Either;
-use crate::auth::{SessionContext, TenantAuth};
+use crate::auth::WorkOsAuth;
+use crate::auth::{CheckTenantPermissions, Either};
 use crate::errors::tenant::TenantError;
 use crate::errors::ApiError;
 use crate::types::ob_config::ApiObConfig;
@@ -51,8 +50,9 @@ pub fn get_detail(
 async fn get(
     state: web::Data<State>,
     request: web::Query<PaginatedRequest<EmptyRequest, DateTime<Utc>>>,
-    auth: Either<SessionContext<WorkOs>, SecretTenantAuthContext>,
+    auth: Either<WorkOsAuth, SecretTenantAuthContext>,
 ) -> actix_web::Result<Json<ApiPaginatedResponseData<Vec<ApiObConfig>, DateTime<Utc>>>, ApiError> {
+    let auth = auth.check_permissions(vec![])?; // TODO
     let tenant = auth.tenant();
     let cursor = request.cursor;
     let page_size = request.page_size(&state);
@@ -126,9 +126,10 @@ impl CreateOnboardingConfigurationRequest {
 #[post("/onboarding_configs")]
 pub fn post(
     state: web::Data<State>,
-    auth: Either<SessionContext<WorkOs>, SecretTenantAuthContext>,
+    auth: Either<WorkOsAuth, SecretTenantAuthContext>,
     request: Json<CreateOnboardingConfigurationRequest>,
 ) -> actix_web::Result<Json<ApiResponseData<ApiObConfig>>, ApiError> {
+    let auth = auth.check_permissions(vec![])?; // TODO
     request.validate()?;
     let tenant = auth.tenant().clone();
     let CreateOnboardingConfigurationRequest {
@@ -170,10 +171,11 @@ struct UpdateObConfigRequest {
 #[patch("/onboarding_configs/{id}")]
 async fn patch(
     state: web::Data<State>,
-    auth: Either<SessionContext<WorkOs>, SecretTenantAuthContext>,
+    auth: Either<WorkOsAuth, SecretTenantAuthContext>,
     path: web::Path<UpdateObConfigPath>,
     request: web::Json<UpdateObConfigRequest>,
 ) -> actix_web::Result<Json<ApiResponseData<ApiObConfig>>, ApiError> {
+    let auth = auth.check_permissions(vec![])?; // TODO
     let tenant = auth.tenant().clone();
     let is_live = auth.is_live()?;
     let UpdateObConfigPath { id } = path.into_inner();

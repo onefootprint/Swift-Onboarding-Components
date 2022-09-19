@@ -1,5 +1,4 @@
-use crate::auth::session_data::workos::WorkOs;
-use crate::auth::{SessionContext, TenantAuth};
+use crate::auth::{CheckTenantPermissions, WorkOsAuth};
 use crate::errors::ApiError;
 use crate::types::response::ApiResponseData;
 use crate::State;
@@ -24,8 +23,9 @@ struct GetTenantResponse {
 #[get("/")]
 fn handler(
     state: web::Data<State>,
-    auth: SessionContext<WorkOs>,
+    auth: WorkOsAuth,
 ) -> actix_web::Result<Json<ApiResponseData<GetTenantResponse>>, ApiError> {
+    let auth = auth.check_permissions(vec![])?; // TODO
     let tenant = auth.tenant();
 
     let email_domains = if let Some(org_id) = tenant.workos_id.as_ref() {

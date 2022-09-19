@@ -1,7 +1,5 @@
 use crate::auth::key_context::secret_key::SecretTenantAuthContext;
-use crate::auth::session_data::workos::WorkOs;
-use crate::auth::Either;
-use crate::auth::{SessionContext, TenantAuth};
+use crate::auth::{CheckTenantPermissions, Either, WorkOsAuth};
 use crate::errors::ApiError;
 use crate::types::response::ApiResponseData;
 use crate::types::secret_api_key::TenantApiKeyResponse;
@@ -29,9 +27,10 @@ struct RevealRequest {
 async fn get(
     state: web::Data<State>,
     request: web::Path<RevealRequest>,
-    auth: Either<SessionContext<WorkOs>, SecretTenantAuthContext>,
+    auth: Either<WorkOsAuth, SecretTenantAuthContext>,
 ) -> actix_web::Result<Json<ApiResponseData<TenantApiKeyResponse>>, ApiError> {
-    // TODO more strict auth for viewing secret keys
+    let auth = auth.check_permissions(vec![])?; // TODO
+                                                // TODO more strict auth for viewing secret keys
     let is_live = auth.is_live()?;
     let tenant_id = auth.tenant().id.clone();
     let (key, last_used_at) = state
