@@ -37,7 +37,8 @@
     "private-layout": {
       "sandbox-banner": {
         "title": "Sandbox mode.",
-        "disable": "Disable"
+        "disable": "Disable",
+        "tooltip": "To access live data you have to activate your account first. Please contact us to do so."
       }
     }
   },

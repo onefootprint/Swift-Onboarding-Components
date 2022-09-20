@@ -1,4 +1,3 @@
-import { useTranslation } from 'hooks';
 import {
   IcoCode16,
   IcoFileText16,
@@ -9,10 +8,11 @@ import {
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React from 'react';
-import useSandboxMode from 'src/hooks/use-sandbox-mode';
 import useSessionUser from 'src/hooks/use-session-user';
 import styled, { css } from 'styled-components';
-import { Banner, Container, Dropdown, Tab, Typography } from 'ui';
+import { Container, Dropdown, Tab, Typography } from 'ui';
+
+import SandboxBanner from './components/sandbox-banner';
 
 const routes = [
   { href: '/users', Icon: IcoUsers16, text: 'Users' },
@@ -25,25 +25,14 @@ type PrivateLayoutProps = {
 };
 
 const PrivateLayout = ({ children }: PrivateLayoutProps) => {
-  const { t } = useTranslation('components.private-layout');
   const router = useRouter();
-  const sandboxMode = useSandboxMode();
   const { data, logOut } = useSessionUser();
 
   return (
     <>
       <PrivateLayoutContainer data-testid="private-layout">
         <header>
-          {sandboxMode.isSandbox && (
-            <SandboxBannerContainer>
-              <Banner variant="warning">
-                {t('sandbox-banner.title')}
-                <button type="button" onClick={sandboxMode.toggle}>
-                  {t('sandbox-banner.disable')}
-                </button>
-              </Banner>
-            </SandboxBannerContainer>
-          )}
+          <SandboxBanner />
           <Container>
             <Footprint>
               <Link href="/users">
@@ -111,12 +100,6 @@ const PrivateLayout = ({ children }: PrivateLayoutProps) => {
 
 const PrivateLayoutContainer = styled.div`
   flex: 1 0 auto;
-`;
-
-const SandboxBannerContainer = styled.div`
-  ${({ theme }) => css`
-    border-bottom: 1px solid ${theme.borderColor.tertiary};
-  `};
 `;
 
 const Footprint = styled.div`

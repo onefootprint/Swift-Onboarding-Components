@@ -1,0 +1,40 @@
+import { useTranslation } from 'hooks';
+import React from 'react';
+import useSandboxMode from 'src/hooks/use-sandbox-mode';
+import styled, { css } from 'styled-components';
+import { Banner, Box, Tooltip } from 'ui';
+
+const SandboxBanner = () => {
+  const { t } = useTranslation('components.private-layout.sandbox-banner');
+  const { isSandbox, toggle, canToggle } = useSandboxMode();
+
+  return isSandbox ? (
+    <SandboxBannerContainer>
+      <Banner variant="warning">
+        {t('title')}
+        <Tooltip disabled={canToggle} size="compact" text={t('tooltip')}>
+          <Box as="span">
+            <button type="button" onClick={toggle} disabled={!canToggle}>
+              {t('disable')}
+            </button>
+          </Box>
+        </Tooltip>
+      </Banner>
+    </SandboxBannerContainer>
+  ) : null;
+};
+
+const SandboxBannerContainer = styled.div`
+  ${({ theme }) => css`
+    border-bottom: 1px solid ${theme.borderColor.tertiary};
+
+    button {
+      &:disabled {
+        cursor: default;
+        opacity: 0.7;
+      }
+    }
+  `};
+`;
+
+export default SandboxBanner;
