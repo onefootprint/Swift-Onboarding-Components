@@ -1,3 +1,4 @@
+use crate::assert_in_transaction;
 use crate::models::tenant_api_key_access_log::TenantApiKeyAccessLog;
 use crate::schema::tenant_api_key::BoxedQuery;
 use crate::{schema::tenant_api_key, DbError, DbPool};
@@ -138,6 +139,7 @@ impl TenantApiKey {
         name: Option<String>,
         status: Option<ApiKeyStatus>,
     ) -> Result<Self, DbError> {
+        assert_in_transaction(conn)?;
         let update = TenantApiKeyUpdate { name, status };
         let results: Vec<Self> = diesel::update(tenant_api_key::table)
             .filter(tenant_api_key::id.eq(id))

@@ -1,7 +1,7 @@
 use crate::schema::ob_configuration::BoxedQuery;
 use crate::schema::{ob_configuration, onboarding, tenant};
-use crate::DbError;
 use crate::DbPool;
+use crate::{assert_in_transaction, DbError};
 use chrono::{DateTime, Utc};
 use diesel::pg::Pg;
 use diesel::prelude::*;
@@ -151,6 +151,7 @@ impl ObConfiguration {
         name: Option<String>,
         status: Option<ApiKeyStatus>,
     ) -> Result<Self, DbError> {
+        assert_in_transaction(conn)?; // Otherwise could create updates to multiple rows accidentally
         let update = ObConfigurationUpdate { name, status };
         let results: Vec<Self> = diesel::update(ob_configuration::table)
             .filter(ob_configuration::id.eq(id))

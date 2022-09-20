@@ -3,13 +3,18 @@ use crate::auth::WorkOsAuth;
 use crate::errors::ApiError;
 use crate::types::tenant_user::FpTenantUser;
 use crate::types::EmptyRequest;
+use crate::types::EmptyResponse;
+use crate::types::JsonApiResponse;
 use crate::types::PaginatedRequest;
 use crate::types::PaginatedResponseData;
 use crate::State;
 use chrono::{DateTime, Utc};
 use db::models::tenant_user::TenantUser;
 use newtypes::TenantPermission;
-use paperclip::actix::{api_v2_operation, get, web, web::Json};
+use newtypes::TenantRoleId;
+use newtypes::TenantUserId;
+use paperclip::actix::Apiv2Schema;
+use paperclip::actix::{api_v2_operation, get, patch, web, web::Json};
 
 #[api_v2_operation(
     summary = "/org/users",
@@ -41,4 +46,36 @@ async fn get(
         .map(FpTenantUser::from)
         .collect::<Vec<FpTenantUser>>();
     Ok(Json(PaginatedResponseData::ok(results, cursor, None)))
+}
+
+#[derive(Debug, serde::Deserialize, Apiv2Schema)]
+struct UpdateTenantUserRequest {
+    role_id: Option<TenantRoleId>,
+    // TODO add status
+}
+
+#[api_v2_operation(
+    summary = "/org/users",
+    operation_id = "org-users-patch",
+    tags(Private),
+    description = "Updates the provided user."
+)]
+#[patch("/users/{tenant_user_id}")]
+async fn patch(
+    state: web::Data<State>,
+    request: web::Json<UpdateTenantUserRequest>,
+    user_id: web::Path<TenantUserId>,
+    auth: WorkOsAuth,
+) -> JsonApiResponse<EmptyResponse> {
+    let auth = auth.check_permissions(vec![TenantPermission::Admin])?;
+    let tenant = auth.tenant();
+
+    let tenant_id = tenant.id.clone();
+    let UpdateTenantUserRequest { role_id } = request.into_inner();
+    state
+        .db_pool
+        .db_transaction(move |conn| TenantUser::update(conn, &tenant_id, &user_id, role_id))
+        .await?;
+
+    EmptyResponse::ok().json()
 }

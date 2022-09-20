@@ -1,10 +1,11 @@
 use chrono::{DateTime, Utc};
 use db::models::{tenant_role::TenantRole, tenant_user::TenantUser};
-use newtypes::TenantRoleId;
+use newtypes::{TenantRoleId, TenantUserId};
 use paperclip::actix::Apiv2Schema;
 
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize, Apiv2Schema)]
 pub struct FpTenantUser {
+    id: TenantUserId,
     email: String,
     last_login_at: DateTime<Utc>,
     created_at: DateTime<Utc>,
@@ -15,6 +16,7 @@ pub struct FpTenantUser {
 impl From<(TenantUser, TenantRole)> for FpTenantUser {
     fn from(t: (TenantUser, TenantRole)) -> Self {
         let TenantUser {
+            id,
             email,
             last_login_at,
             created_at,
@@ -26,6 +28,7 @@ impl From<(TenantUser, TenantRole)> for FpTenantUser {
             ..
         } = t.1;
         Self {
+            id,
             email: email.0,
             last_login_at,
             created_at,

@@ -1,7 +1,8 @@
 use crate::{
+    assert_in_transaction,
     models::tenant_role::TenantRole,
     schema::{tenant_role, tenant_user},
-    DbResult,
+    DbError, DbResult,
 };
 use diesel::prelude::*;
 
@@ -49,7 +50,7 @@ impl TenantUser {
         conn: &mut PgConnection,
         email: TenantUserEmail,
         tenant_role_id: TenantRoleId,
-    ) -> DbResult<TenantUser> {
+    ) -> DbResult<Self> {
         let new_user = NewTenantUser {
             tenant_role_id,
             email,
@@ -59,6 +60,30 @@ impl TenantUser {
         let result = diesel::insert_into(tenant_user::table)
             .values(new_user)
             .get_result(conn)?;
+        Ok(result)
+    }
+
+    pub fn update(
+        conn: &mut PgConnection,
+        tenant_id: &TenantId,
+        id: &TenantUserId,
+        tenant_role_id: Option<TenantRoleId>,
+    ) -> DbResult<Self> {
+        assert_in_transaction(conn)?; // Otherwise could create updates to multiple rows accidentally
+        let user_update = TenantUserUpdate { tenant_role_id };
+        let role_ids = tenant_role::table
+            .filter(tenant_role::tenant_id.eq(tenant_id))
+            .select(tenant_role::id);
+        let results: Vec<Self> = diesel::update(tenant_user::table)
+            .filter(tenant_user::tenant_role_id.eq_any(role_ids))
+            .filter(tenant_user::id.eq(id))
+            .set(user_update)
+            .load(conn)?;
+
+        if results.len() > 1 {
+            return Err(DbError::IncorrectNumberOfRowsUpdated);
+        }
+        let result = results.into_iter().next().ok_or(DbError::UpdateTargetNotFound)?;
         Ok(result)
     }
 
@@ -85,9 +110,15 @@ impl TenantUser {
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
 #[diesel(table_name = tenant_user)]
-pub struct NewTenantUser {
-    pub tenant_role_id: TenantRoleId,
-    pub email: TenantUserEmail,
-    pub created_at: DateTime<Utc>,
-    pub last_login_at: DateTime<Utc>,
+struct NewTenantUser {
+    tenant_role_id: TenantRoleId,
+    email: TenantUserEmail,
+    created_at: DateTime<Utc>,
+    last_login_at: DateTime<Utc>,
+}
+
+#[derive(AsChangeset)]
+#[diesel(table_name = tenant_user)]
+struct TenantUserUpdate {
+    tenant_role_id: Option<TenantRoleId>,
 }
