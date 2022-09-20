@@ -1,9 +1,13 @@
-use crate::{models::tenant_role::TenantRole, schema::tenant_user, DbResult};
+use crate::{
+    models::tenant_role::TenantRole,
+    schema::{tenant_role, tenant_user},
+    DbResult,
+};
 use diesel::prelude::*;
 
 use chrono::{DateTime, Utc};
 use diesel::{Insertable, PgConnection, Queryable};
-use newtypes::{TenantRoleId, TenantUserEmail, TenantUserId};
+use newtypes::{TenantId, TenantRoleId, TenantUserEmail, TenantUserId};
 use serde::{Deserialize, Serialize};
 
 use super::tenant::Tenant;
@@ -26,7 +30,6 @@ impl TenantUser {
         email: TenantUserEmail,
     ) -> DbResult<Option<(TenantUser, Tenant)>> {
         use crate::schema::tenant;
-        use crate::schema::tenant_role;
         let result: Option<(TenantRole, TenantUser, Tenant)> = tenant_role::table
             .inner_join(tenant_user::table)
             .inner_join(tenant::table)
@@ -57,6 +60,26 @@ impl TenantUser {
             .values(new_user)
             .get_result(conn)?;
         Ok(result)
+    }
+
+    pub fn list(
+        conn: &mut PgConnection,
+        tenant_id: &TenantId,
+        cursor: Option<DateTime<Utc>>,
+        page_size: i64,
+    ) -> DbResult<Vec<(Self, TenantRole)>> {
+        let mut query = tenant_user::table
+            .inner_join(tenant_role::table)
+            .filter(tenant_role::tenant_id.eq(tenant_id))
+            .into_boxed()
+            .order_by(tenant_user::created_at.asc())
+            .limit(page_size);
+
+        if let Some(cursor) = cursor {
+            query = query.filter(tenant_user::created_at.ge(cursor))
+        }
+        let results = query.get_results(conn)?;
+        Ok(results)
     }
 }
 

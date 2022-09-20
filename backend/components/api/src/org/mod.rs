@@ -4,6 +4,7 @@ pub mod api_keys;
 pub mod index;
 pub mod onboarding_configs;
 pub mod settings;
+pub mod users;
 pub mod workos;
 
 pub fn routes() -> web::Scope {
@@ -13,6 +14,7 @@ pub fn routes() -> web::Scope {
         .service(onboarding_configs::get_detail)
         .service(onboarding_configs::patch)
         .service(onboarding_configs::post)
+        .service(users::get)
         .service(settings::routes())
         .service(workos::routes())
         .service(api_keys::routes())

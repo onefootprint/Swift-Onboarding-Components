@@ -1,5 +1,5 @@
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, DieselNewType, Default)]
-pub struct TenantUserEmail(String);
+pub struct TenantUserEmail(pub String);
 
 impl From<String> for TenantUserEmail {
     fn from(s: String) -> Self {
