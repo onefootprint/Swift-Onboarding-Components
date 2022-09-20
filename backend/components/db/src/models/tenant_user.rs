@@ -21,18 +21,24 @@ pub struct TenantUser {
 }
 
 impl TenantUser {
-    pub fn get_by_email(
+    pub fn login_by_email(
         conn: &mut PgConnection,
         email: TenantUserEmail,
     ) -> DbResult<Option<(TenantUser, Tenant)>> {
         use crate::schema::tenant;
         use crate::schema::tenant_role;
-        let result: Option<(TenantRole, _, _)> = tenant_role::table
+        let result: Option<(TenantRole, TenantUser, Tenant)> = tenant_role::table
             .inner_join(tenant_user::table)
             .inner_join(tenant::table)
             .filter(tenant_user::email.eq(email))
             .first(conn)
             .optional()?;
+        if let Some((_, u, _)) = result.as_ref() {
+            diesel::update(tenant_user::table)
+                .filter(tenant_user::id.eq(&u.id))
+                .set(tenant_user::last_login_at.eq(Utc::now()))
+                .get_result::<TenantUser>(conn)?;
+        }
         Ok(result.map(|(_, tenant_user, tenant)| (tenant_user, tenant)))
     }
 

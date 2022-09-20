@@ -100,7 +100,7 @@ async fn find_or_create_user(
     let email2 = profile.email.clone();
     let existing_user = state
         .db_pool
-        .db_query(move |conn| TenantUser::get_by_email(conn, email.into()))
+        .db_query(move |conn| TenantUser::login_by_email(conn, email.into()))
         .await??;
     if let Some((tenant_user, tenant)) = existing_user {
         return Ok((tenant, tenant_user, false));
