@@ -1,9 +1,9 @@
 import useBifrostMachine from '../use-bifrost-machine';
 
-const useIsSandbox = () => {
+const useSandboxMode = () => {
   const [state] = useBifrostMachine();
   const { tenant } = state.context;
-  return tenant.isLive === false;
+  return { isSandbox: tenant.isLive === false };
 };
 
-export default useIsSandbox;
+export default useSandboxMode;

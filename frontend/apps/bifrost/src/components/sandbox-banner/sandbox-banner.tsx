@@ -3,10 +3,10 @@ import React from 'react';
 import styled, { css } from 'styled-components';
 import { Banner } from 'ui';
 
-import useIsSandbox from '../../hooks/use-is-sandbox';
+import useSandboxMode from '../../hooks/use-sandbox-mode';
 
 const SandboxBanner = () => {
-  const isSandbox = useIsSandbox();
+  const { isSandbox } = useSandboxMode();
   const { t } = useTranslation('components.sandbox-banner');
 
   return isSandbox ? (

@@ -1,7 +1,7 @@
 import { useTranslation } from 'hooks';
 import React from 'react';
 import { useForm } from 'react-hook-form';
-import useIsSandbox from 'src/hooks/use-is-sandbox';
+import useSandboxMode from 'src/hooks/use-sandbox-mode';
 import styled, { css } from 'styled-components';
 import { Button, PhoneInput } from 'ui';
 
@@ -23,7 +23,7 @@ const PhoneRegistrationForm = ({
   isLoading,
   onSubmit,
 }: PhoneRegistrationFormProps) => {
-  const isSandbox = useIsSandbox();
+  const { isSandbox } = useSandboxMode();
   const { t } = useTranslation('pages.phone-registration.form');
   const {
     setValue,

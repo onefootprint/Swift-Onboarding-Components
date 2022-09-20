@@ -2,7 +2,7 @@ import { useTranslation } from 'hooks';
 import Link from 'next/link';
 import React from 'react';
 import { useForm } from 'react-hook-form';
-import useIsSandbox from 'src/hooks/use-is-sandbox';
+import useSandboxMode from 'src/hooks/use-sandbox-mode';
 import { UserData, UserDataAttribute } from 'types';
 import { Box, Button, TextInput, Typography } from 'ui';
 
@@ -19,7 +19,7 @@ const EmailIdentificationForm = ({
   isLoading,
   onSubmit,
 }: EmailIdentificationFormProps) => {
-  const isSandbox = useIsSandbox();
+  const { isSandbox } = useSandboxMode();
   const { t } = useTranslation('pages.email-identification.form');
   const {
     register,
