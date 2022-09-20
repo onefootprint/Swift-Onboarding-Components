@@ -3,7 +3,7 @@ use diesel::prelude::*;
 
 use chrono::{DateTime, Utc};
 use diesel::{Insertable, PgConnection, Queryable};
-use newtypes::{CollectedDataOption, TenantId, TenantPermission, TenantPermissionList, TenantRoleId};
+use newtypes::{TenantId, TenantPermission, TenantPermissionList, TenantRoleId};
 
 use super::tenant::Tenant;
 

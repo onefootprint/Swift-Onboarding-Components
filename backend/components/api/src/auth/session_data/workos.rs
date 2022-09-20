@@ -1,5 +1,3 @@
-use std::collections::HashSet;
-
 use crate::{
     auth::{AuthError, ExtractableAuthSession},
     errors::ApiError,
@@ -68,7 +66,10 @@ impl ExtractableAuthSession for ParsedWorkOs {
 
 impl ParsedWorkOs {
     pub fn check_permissions(self, permissions: Vec<TenantPermission>) -> Result<WorkOs, AuthError> {
-        if let Some(missing_permission) = permissions.into_iter().find(|p| !self.0.has_permission(p)) {
+        if let Some(missing_permission) = permissions
+            .into_iter()
+            .find(|p| !self.0.tenant_role.permissions.has_permission(p))
+        {
             Err(AuthError::MissingTenantPermission(missing_permission.into()))
         } else {
             Ok(self.0)
@@ -76,25 +77,10 @@ impl ParsedWorkOs {
     }
 
     pub fn can_decrypt(self, attributes: Vec<DataAttribute>) -> Result<WorkOs, AuthError> {
-        if self.0.tenant_role.permissions.contains(&TenantPermission::Admin) {
-            return Ok(self.0);
-        }
-        let can_access_attributes: HashSet<_> = self
-            .0
-            .tenant_role
-            .permissions
-            .iter()
-            .filter_map(|p| match p {
-                TenantPermission::Decrypt { attributes } => Some(attributes),
-                _ => None,
-            })
-            .flatten()
-            .flat_map(|x| x.attributes())
-            .collect();
-        if !can_access_attributes.is_superset(&HashSet::from_iter(attributes.into_iter())) {
-            Err(AuthError::RoleMissingDecryptPermission)
-        } else {
+        if self.0.tenant_role.permissions.can_decrypt(attributes) {
             Ok(self.0)
+        } else {
+            Err(AuthError::RoleMissingDecryptPermission)
         }
     }
 }
@@ -115,10 +101,5 @@ impl WorkOs {
             Some(name) => format!("{} ({})", name, self.data.email),
             None => self.data.email.clone(),
         }
-    }
-
-    fn has_permission(&self, permission: &TenantPermission) -> bool {
-        let role_permissions = &self.tenant_role.permissions;
-        role_permissions.contains(&TenantPermission::Admin) || role_permissions.contains(permission)
     }
 }
