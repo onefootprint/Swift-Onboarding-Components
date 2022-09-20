@@ -19,6 +19,7 @@ pub fn routes() -> web::Scope {
         .service(users::patch)
         .service(roles::get)
         .service(roles::post)
+        .service(roles::patch)
         .service(settings::routes())
         .service(workos::routes())
         .service(api_keys::routes())

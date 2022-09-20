@@ -10,9 +10,9 @@ use crate::types::ResponseData;
 use crate::State;
 use chrono::{DateTime, Utc};
 use db::models::tenant_role::TenantRole;
-use newtypes::TenantPermission;
+use newtypes::{TenantPermission, TenantRoleId};
 use paperclip::actix::Apiv2Schema;
-use paperclip::actix::{api_v2_operation, get, post, web, web::Json};
+use paperclip::actix::{api_v2_operation, get, patch, post, web, web::Json};
 
 #[api_v2_operation(
     summary = "/org/roles",
@@ -73,6 +73,40 @@ async fn post(
         .db_pool
         .db_query(move |conn| TenantRole::create(conn, tenant_id, name, permissions))
         .await??;
+
+    let result = FpTenantRole::from(result);
+    ResponseData::ok(result).json()
+}
+
+#[derive(Debug, serde::Deserialize, Apiv2Schema)]
+struct UpdateTenantRoleRequest {
+    name: Option<String>,
+    permissions: Option<Vec<TenantPermission>>,
+}
+
+#[api_v2_operation(
+    summary = "/org/roles",
+    operation_id = "org-roles-patch",
+    tags(Private),
+    description = "Updates the provided role."
+)]
+#[patch("/roles/{tenant_role_id}")]
+async fn patch(
+    state: web::Data<State>,
+    request: web::Json<UpdateTenantRoleRequest>,
+    role_id: web::Path<TenantRoleId>,
+    auth: WorkOsAuth,
+) -> JsonApiResponse<FpTenantRole> {
+    let auth = auth.check_permissions(vec![TenantPermission::Admin])?;
+    let tenant = auth.tenant();
+
+    let tenant_id = tenant.id.clone();
+    let UpdateTenantRoleRequest { name, permissions } = request.into_inner();
+    let permissions = permissions.map(|p| p.into());
+    let result = state
+        .db_pool
+        .db_transaction(move |conn| TenantRole::update(conn, &tenant_id, &role_id, name, permissions))
+        .await?;
 
     let result = FpTenantRole::from(result);
     ResponseData::ok(result).json()

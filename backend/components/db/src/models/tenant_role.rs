@@ -1,4 +1,4 @@
-use crate::{assert_in_transaction, schema::tenant_role, DbResult};
+use crate::{assert_in_transaction, schema::tenant_role, DbError, DbResult};
 use diesel::prelude::*;
 
 use chrono::{DateTime, Utc};
@@ -52,6 +52,28 @@ impl TenantRole {
         Ok(result)
     }
 
+    pub fn update(
+        conn: &mut PgConnection,
+        tenant_id: &TenantId,
+        id: &TenantRoleId,
+        name: Option<String>,
+        permissions: Option<TenantPermissionList>,
+    ) -> DbResult<Self> {
+        assert_in_transaction(conn)?; // Otherwise could create updates to multiple rows accidentally
+        let update = TenantRoleUpdate { name, permissions };
+        let results: Vec<Self> = diesel::update(tenant_role::table)
+            .filter(tenant_role::id.eq(id))
+            .filter(tenant_role::tenant_id.eq(tenant_id))
+            .set(update)
+            .load(conn)?;
+
+        if results.len() > 1 {
+            return Err(DbError::IncorrectNumberOfRowsUpdated);
+        }
+        let result = results.into_iter().next().ok_or(DbError::UpdateTargetNotFound)?;
+        Ok(result)
+    }
+
     pub fn list(
         conn: &mut PgConnection,
         tenant_id: &TenantId,
@@ -88,4 +110,11 @@ impl NewTenantRole {
             .get_result(conn)?;
         Ok(result)
     }
+}
+
+#[derive(AsChangeset)]
+#[diesel(table_name = tenant_role)]
+struct TenantRoleUpdate {
+    name: Option<String>,
+    permissions: Option<TenantPermissionList>,
 }
