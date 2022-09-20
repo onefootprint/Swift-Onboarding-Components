@@ -1,4 +1,4 @@
-use newtypes::TenantPermission;
+use newtypes::TenantPermissionDiscriminants;
 use thiserror::Error;
 
 use self::session_data::user::UserAuthScope;
@@ -46,7 +46,7 @@ pub enum AuthError {
     #[error("Not allowed: requires one of the following scopes: {0:?}")]
     MissingScope(Vec<UserAuthScope>),
     #[error("Not allowed: required permission is missing: {0}")]
-    MissingTenantPermission(TenantPermission),
+    MissingTenantPermission(TenantPermissionDiscriminants),
     #[error("Not allowed: role does not have permissions to decrypt attributes")]
     RoleMissingDecryptPermission,
     #[error("Not allowed: onboarding configuration does not have permissions to decrypt attributes")]

@@ -269,7 +269,7 @@ table! {
         id -> Text,
         tenant_id -> Text,
         name -> Text,
-        permissions -> Array<Text>,
+        permissions -> Jsonb,
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
         created_at -> Timestamptz,

@@ -69,7 +69,7 @@ impl ExtractableAuthSession for ParsedWorkOs {
 impl ParsedWorkOs {
     pub fn check_permissions(self, permissions: Vec<TenantPermission>) -> Result<WorkOs, AuthError> {
         if let Some(missing_permission) = permissions.into_iter().find(|p| !self.0.has_permission(p)) {
-            Err(AuthError::MissingTenantPermission(missing_permission))
+            Err(AuthError::MissingTenantPermission(missing_permission.into()))
         } else {
             Ok(self.0)
         }
@@ -85,9 +85,10 @@ impl ParsedWorkOs {
             .permissions
             .iter()
             .filter_map(|p| match p {
-                TenantPermission::Decrypt(attribute) => Some(attribute),
+                TenantPermission::Decrypt { attributes } => Some(attributes),
                 _ => None,
             })
+            .flatten()
             .flat_map(|x| x.attributes())
             .collect();
         if !can_access_attributes.is_superset(&HashSet::from_iter(attributes.into_iter())) {
@@ -118,7 +119,6 @@ impl WorkOs {
 
     fn has_permission(&self, permission: &TenantPermission) -> bool {
         let role_permissions = &self.tenant_role.permissions;
-        // The authed user has an admin permission, they can perform any operation
         role_permissions.contains(&TenantPermission::Admin) || role_permissions.contains(permission)
     }
 }

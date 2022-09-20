@@ -1,0 +1,3 @@
+ALTER TABLE tenant_role DROP COLUMN permissions;
+ALTER TABLE tenant_role ADD COLUMN permissions TEXT[] NOT NULL DEFAULT CAST(ARRAY[] AS TEXT[]);
+ALTER TABLE tenant_role ALTER COLUMN permissions DROP DEFAULT;

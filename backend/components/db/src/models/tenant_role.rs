@@ -3,7 +3,7 @@ use diesel::prelude::*;
 
 use chrono::{DateTime, Utc};
 use diesel::{Insertable, PgConnection, Queryable};
-use newtypes::{TenantId, TenantPermission, TenantRoleId};
+use newtypes::{CollectedDataOption, TenantId, TenantPermission, TenantPermissionList, TenantRoleId};
 
 use super::tenant::Tenant;
 
@@ -13,7 +13,7 @@ pub struct TenantRole {
     pub id: TenantRoleId,
     pub tenant_id: TenantId,
     pub name: String,
-    pub permissions: Vec<TenantPermission>,
+    pub permissions: TenantPermissionList,
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
     pub created_at: DateTime<Utc>,
@@ -25,7 +25,7 @@ impl TenantRole {
         Tenant::lock(conn, &tenant_id)?;
         let role = tenant_role::table
             .filter(tenant_role::tenant_id.eq(&tenant_id))
-            .filter(tenant_role::permissions.eq(vec![TenantPermission::Admin]))
+            .filter(tenant_role::permissions.eq(TenantPermissionList(vec![TenantPermission::Admin])))
             .first::<Self>(conn)
             .optional()?;
         let role = if let Some(role) = role {
@@ -34,7 +34,7 @@ impl TenantRole {
             NewTenantRole {
                 tenant_id,
                 name: "Admin".to_owned(),
-                permissions: vec![TenantPermission::Admin],
+                permissions: vec![TenantPermission::Admin].into(),
                 created_at: Utc::now(),
             }
             .save(conn)?
@@ -48,7 +48,7 @@ impl TenantRole {
 pub struct NewTenantRole {
     pub tenant_id: TenantId,
     pub name: String,
-    pub permissions: Vec<TenantPermission>,
+    pub permissions: TenantPermissionList,
     pub created_at: DateTime<Utc>,
 }
 
