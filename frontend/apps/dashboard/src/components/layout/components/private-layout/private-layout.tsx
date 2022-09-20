@@ -10,7 +10,7 @@ import { useRouter } from 'next/router';
 import React from 'react';
 import useSessionUser from 'src/hooks/use-session-user';
 import styled, { css } from 'styled-components';
-import { Container, Dropdown, Tab, Typography } from 'ui';
+import { Container, Dropdown, Tab, Tabs, Typography } from 'ui';
 
 import SandboxBanner from './components/sandbox-banner';
 
@@ -65,19 +65,19 @@ const PrivateLayout = ({ children }: PrivateLayoutProps) => {
           </Container>
           <Nav>
             <Container>
-              <Tab.List>
+              <Tabs variant="pill">
                 {routes.map(({ href, Icon, text }) => (
-                  <Link href={href} key={text}>
-                    <Tab.Item
+                  <Link href={href} key={text} passHref>
+                    <Tab
                       href={href}
-                      iconComponent={Icon}
                       selected={router.pathname.startsWith(href)}
                     >
+                      <Icon />
                       {text}
-                    </Tab.Item>
+                    </Tab>
                   </Link>
                 ))}
-              </Tab.List>
+              </Tabs>
             </Container>
           </Nav>
         </header>

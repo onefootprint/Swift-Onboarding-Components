@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React from 'react';
 import styled, { css } from 'styled-components';
-import { LinkButton, media, Tab } from 'ui';
+import { LinkButton, media, Tab, Tabs } from 'ui';
 
 import type { NavItem } from '../../app-header.types';
 
@@ -26,18 +26,16 @@ const DesktopNav = ({ navItems, links }: DesktopNavProps) => {
               <LogoFpdocsDefault />
             </a>
           </Link>
-          <Tab.List>
+          <Tabs variant="pill">
             {navItems.map(({ href, Icon, text }) => (
               <Link href={href} key={text} passHref>
-                <Tab.Item
-                  iconComponent={Icon}
-                  selected={router.asPath.startsWith(href)}
-                >
+                <Tab selected={router.asPath.startsWith(href)}>
+                  <Icon />
                   {text}
-                </Tab.Item>
+                </Tab>
               </Link>
             ))}
-          </Tab.List>
+          </Tabs>
         </InternalNavContainer>
         <div>
           {links.map(({ href, Icon, text }) => (

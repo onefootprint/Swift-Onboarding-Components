@@ -6,7 +6,7 @@ import { useRouter } from 'next/router';
 import React, { useState } from 'react';
 import type { ProductArticle } from 'src/types/product';
 import styled, { css } from 'styled-components';
-import { Box, LinkButton, media, Tab } from 'ui';
+import { Box, LinkButton, media, Tab, Tabs } from 'ui';
 import { useLockedBody } from 'usehooks-ts';
 
 import type { NavItem } from '../../app-header.types';
@@ -69,19 +69,16 @@ const MobileNav = ({ navItems, articles, links }: MobileNavProps) => {
         )}
       </Header>
       <Nav>
-        <Tab.List>
+        <Tabs variant="pill">
           {navItems.map(({ href, Icon, text }) => (
             <Link href={href} key={text}>
-              <Tab.Item
-                href={href}
-                iconComponent={Icon}
-                selected={router.asPath.startsWith(href)}
-              >
+              <Tab href={href} selected={router.asPath.startsWith(href)}>
+                <Icon />
                 {text}
-              </Tab.Item>
+              </Tab>
             </Link>
           ))}
-        </Tab.List>
+        </Tabs>
       </Nav>
       <Box ref={animateNavMenu}>
         {isExpanded && articles && (
