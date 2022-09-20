@@ -11,6 +11,7 @@ pub mod response;
 pub mod scoped_user;
 pub mod secret_api_key;
 pub mod tenant;
+pub mod tenant_role;
 pub mod tenant_user;
 
 pub use request::*;

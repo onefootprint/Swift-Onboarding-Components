@@ -41,6 +41,25 @@ impl TenantRole {
         };
         Ok(role)
     }
+
+    pub fn list(
+        conn: &mut PgConnection,
+        tenant_id: &TenantId,
+        cursor: Option<DateTime<Utc>>,
+        page_size: i64,
+    ) -> DbResult<Vec<Self>> {
+        let mut query = tenant_role::table
+            .filter(tenant_role::tenant_id.eq(tenant_id))
+            .into_boxed()
+            .order_by(tenant_role::created_at.asc())
+            .limit(page_size);
+
+        if let Some(cursor) = cursor {
+            query = query.filter(tenant_role::created_at.ge(cursor))
+        }
+        let results = query.get_results(conn)?;
+        Ok(results)
+    }
 }
 
 #[derive(Debug, Clone, Insertable)]
