@@ -5,10 +5,6 @@ node_modules
 .pnp
 .pnp.js
 
-# vercel
-.vercel
-apps/**/.vercel
-
 # testing
 coverage
 

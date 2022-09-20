@@ -15,19 +15,27 @@ fi
 
 # Useful packages
 brew update
+brew install openssl
+brew install postgresql@14
+brew install awscli
 brew install jq
 brew install wget
-brew install visual-studio-code
+
+if [[ $(command -v code) == "" ]]; then
+ brew install visual-studio-code
+fi
+
 brew install node@16
 
 # Yarn
 corepack enable
 npm install -g yarn
-
-brew install pnpm
+npm install -g vercel
 
 # Developer tools
-xcode-select --install
+if [[ $(command -v xcode-select) == "" ]]; then
+ xcode-select --install
+fi
 
 ## Set github user name and email
 echo 'Setting up github config:'
