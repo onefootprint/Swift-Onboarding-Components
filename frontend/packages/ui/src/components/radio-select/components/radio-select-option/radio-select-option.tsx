@@ -1,23 +1,29 @@
 import { Icon } from 'icons/src/types';
 import React from 'react';
 import styled, { css } from 'styled-components';
-import { Typography } from 'ui';
 
-export type ChallengeOptionProps = {
+import Typography from '../../../typography';
+
+export type RadioSelectOptionFields = {
   title: string;
   description: string;
-  selected: boolean;
-  onClick: () => void;
   IconComponent: Icon;
+  value: string;
 };
 
-const ChallengeOption = ({
+export type RadioSelectOptionProps = RadioSelectOptionFields & {
+  onClick: () => void;
+  selected: boolean;
+};
+
+const RadioSelectOption = ({
+  value,
   title,
   description,
   selected,
   onClick,
   IconComponent,
-}: ChallengeOptionProps) => {
+}: RadioSelectOptionProps) => {
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();
     onClick();
@@ -25,6 +31,7 @@ const ChallengeOption = ({
 
   return (
     <Option
+      key={value}
       selected={selected}
       onClick={handleClick}
       aria-selected={selected}
@@ -104,4 +111,4 @@ const Option = styled.button<{ selected?: boolean }>`
   `}
 `;
 
-export default ChallengeOption;
+export default RadioSelectOption;

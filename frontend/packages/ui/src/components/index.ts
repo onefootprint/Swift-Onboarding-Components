@@ -51,6 +51,8 @@ export * from './portal';
 export { default as Portal } from './portal';
 export * from './radio';
 export { default as Radio } from './radio';
+export { default as RadioSelect } from './radio-select';
+export * from './radio-select';
 export * from './search-input';
 export { default as SearchInput } from './search-input';
 export * from './select';

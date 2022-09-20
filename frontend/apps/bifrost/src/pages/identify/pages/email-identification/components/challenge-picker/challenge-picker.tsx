@@ -5,9 +5,13 @@ import React, { useEffect, useState } from 'react';
 import { useIdentifyMachine } from 'src/components/identify-machine-provider';
 import styled, { css } from 'styled-components';
 import { ChallengeKind } from 'types';
-import { Button, Overlay, Typography } from 'ui';
-
-import ChallengeOption from './components/challenge-option';
+import {
+  Button,
+  Overlay,
+  RadioSelect,
+  RadioSelectOptionFields,
+  Typography,
+} from 'ui';
 
 const iOSPlatforms = [
   'iPad Simulator',
@@ -84,6 +88,24 @@ const ChallengePicker = ({
     return null;
   }
 
+  const iOS = iOSPlatforms.includes(navigator.platform);
+  const options: RadioSelectOptionFields[] = [
+    {
+      title: t('sms.title'),
+      description: t('sms.description'),
+      IconComponent: IcoSmartphone24,
+      value: ChallengeKind.sms,
+    },
+    {
+      title: t('biometric.title'),
+      description: iOS
+        ? t('biometric.description-ios')
+        : t('biometric.description-default'),
+      IconComponent: IcoFaceid24,
+      value: ChallengeKind.biometric,
+    },
+  ];
+
   const handleComplete = () => {
     if (challengeKind === ChallengeKind.sms) {
       onSelectSms();
@@ -92,15 +114,10 @@ const ChallengePicker = ({
     }
   };
 
-  const handleSelectSms = () => {
-    setChallengeKind(ChallengeKind.sms);
+  const handleSelect = (value: string) => {
+    setChallengeKind(value as ChallengeKind);
   };
 
-  const handleSelectBiometric = () => {
-    setChallengeKind(ChallengeKind.biometric);
-  };
-
-  const iOS = iOSPlatforms.includes(navigator.platform);
   return (
     <FocusTrap active={open}>
       <StyledOverlay onClick={onClose} aria-modal className={visibleState}>
@@ -113,26 +130,11 @@ const ChallengePicker = ({
           </Header>
           <Body>
             <Typography variant="body-2">{t('title')}</Typography>
-            <OptionsContainer>
-              <ChallengeOption
-                title={t('sms.title')}
-                description={t('sms.description')}
-                IconComponent={IcoSmartphone24}
-                onClick={handleSelectSms}
-                selected={challengeKind === ChallengeKind.sms}
-              />
-              <ChallengeOption
-                title={t('biometric.title')}
-                description={
-                  iOS
-                    ? t('biometric.description-ios')
-                    : t('biometric.description-default')
-                }
-                IconComponent={IcoFaceid24}
-                onClick={handleSelectBiometric}
-                selected={challengeKind === ChallengeKind.biometric}
-              />
-            </OptionsContainer>
+            <RadioSelect
+              options={options}
+              defaultSelected={challengeKind}
+              onSelect={handleSelect}
+            />
             <Button fullWidth onClick={handleComplete}>
               {t('cta')}
             </Button>
@@ -204,12 +206,6 @@ const Body = styled.div`
     flex-direction: column;
     text-align: center;
   `}
-`;
-
-const OptionsContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  text-align: left;
 `;
 
 export default ChallengePicker;
