@@ -3,19 +3,22 @@ use crate::auth::WorkOsAuth;
 use crate::errors::ApiError;
 use crate::types::tenant_role::FpTenantRole;
 use crate::types::EmptyRequest;
+use crate::types::JsonApiResponse;
 use crate::types::PaginatedRequest;
 use crate::types::PaginatedResponseData;
+use crate::types::ResponseData;
 use crate::State;
 use chrono::{DateTime, Utc};
 use db::models::tenant_role::TenantRole;
 use newtypes::TenantPermission;
-use paperclip::actix::{api_v2_operation, get, web, web::Json};
+use paperclip::actix::Apiv2Schema;
+use paperclip::actix::{api_v2_operation, get, post, web, web::Json};
 
 #[api_v2_operation(
     summary = "/org/roles",
     operation_id = "org-roles",
     tags(Private),
-    description = "Returns a list of dashboard roles for the tenant."
+    description = "Returns a list of IAM roles for the tenant."
 )]
 #[get("/roles")]
 async fn get(
@@ -41,4 +44,36 @@ async fn get(
         .map(FpTenantRole::from)
         .collect::<Vec<FpTenantRole>>();
     Ok(Json(PaginatedResponseData::ok(results, cursor, None)))
+}
+
+#[derive(Debug, serde::Deserialize, Apiv2Schema)]
+struct CreateTenantRoleRequest {
+    name: String,
+    permissions: Vec<TenantPermission>,
+}
+
+#[api_v2_operation(
+    summary = "/org/roles",
+    operation_id = "org-roles-create",
+    tags(Private),
+    description = "Create a new IAM role for the tenant."
+)]
+#[post("/roles")]
+async fn post(
+    state: web::Data<State>,
+    request: web::Json<CreateTenantRoleRequest>,
+    auth: WorkOsAuth,
+) -> JsonApiResponse<FpTenantRole> {
+    let auth = auth.check_permissions(vec![TenantPermission::Admin])?;
+    let tenant = auth.tenant();
+
+    let tenant_id = tenant.id.clone();
+    let CreateTenantRoleRequest { name, permissions } = request.into_inner();
+    let result = state
+        .db_pool
+        .db_query(move |conn| TenantRole::create(conn, tenant_id, name, permissions))
+        .await??;
+
+    let result = FpTenantRole::from(result);
+    ResponseData::ok(result).json()
 }

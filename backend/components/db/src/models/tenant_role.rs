@@ -31,15 +31,25 @@ impl TenantRole {
         let role = if let Some(role) = role {
             role
         } else {
-            NewTenantRole {
-                tenant_id,
-                name: "Admin".to_owned(),
-                permissions: vec![TenantPermission::Admin].into(),
-                created_at: Utc::now(),
-            }
-            .save(conn)?
+            Self::create(conn, tenant_id, "Admin".to_owned(), vec![TenantPermission::Admin])?
         };
         Ok(role)
+    }
+
+    pub fn create(
+        conn: &mut PgConnection,
+        tenant_id: TenantId,
+        name: String,
+        permissions: Vec<TenantPermission>,
+    ) -> DbResult<Self> {
+        let result = NewTenantRole {
+            tenant_id,
+            name,
+            permissions: permissions.into(),
+            created_at: Utc::now(),
+        }
+        .save(conn)?;
+        Ok(result)
     }
 
     pub fn list(

@@ -17,6 +17,7 @@ pub fn routes() -> web::Scope {
         .service(onboarding_configs::post)
         .service(users::get)
         .service(roles::get)
+        .service(roles::post)
         .service(settings::routes())
         .service(workos::routes())
         .service(api_keys::routes())
