@@ -35,6 +35,6 @@ for (pathName, pathDef) in paths.items():
 
 data['paths'] = newPaths;
 
-f = open("public-api.json", "w")
+f = open("out/public-api.json", "w")
 f.write(json.dumps(data))
 f.close()

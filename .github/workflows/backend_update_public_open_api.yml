@@ -1,0 +1,42 @@
+name: Backend Update Public Open API
+
+on:
+  workflow_run:
+    workflows: ['Backend Deploy Production']
+    paths:
+      - 'backend/components/**'
+    types:
+      - completed
+  pull_request:
+    paths:
+      - '.github/workflows/backend_update_public_open_api.yml'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  upload:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        node-version: [16.x]
+        os: [ubuntu-latest]
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v3
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Generate public open api spec
+        working-directory: ./backend
+        run: python scripts/update-open-api.py
+        shell: bash
+
+      - name: Push files to Stoplight
+        working-directory: ./backend/out
+        run: |
+          npx @stoplight/cli@5 push --ci-token ${{secrets.STOPLIGHT_TOKEN}}
