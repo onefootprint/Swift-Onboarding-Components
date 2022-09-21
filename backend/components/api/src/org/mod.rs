@@ -16,6 +16,7 @@ pub fn routes() -> web::Scope {
         .service(onboarding_configs::patch)
         .service(onboarding_configs::post)
         .service(users::get)
+        .service(users::post)
         .service(users::patch)
         .service(roles::get)
         .service(roles::post)

@@ -49,10 +49,17 @@ impl TenantUser {
     pub fn create(
         conn: &mut PgConnection,
         email: TenantUserEmail,
+        tenant_id: &TenantId,
         tenant_role_id: TenantRoleId,
-    ) -> DbResult<Self> {
+    ) -> DbResult<(Self, TenantRole)> {
+        // Make sure the role we are using belongs to the tenant, otherwise could invite self to
+        // another tenant's role
+        let tenant_role: TenantRole = tenant_role::table
+            .filter(tenant_role::tenant_id.eq(tenant_id))
+            .filter(tenant_role::id.eq(&tenant_role_id))
+            .first(conn)?;
         let new_user = NewTenantUser {
-            tenant_role_id,
+            tenant_role_id: tenant_role.id.clone(),
             email,
             created_at: Utc::now(),
             last_login_at: Utc::now(),
@@ -60,7 +67,7 @@ impl TenantUser {
         let result = diesel::insert_into(tenant_user::table)
             .values(new_user)
             .get_result(conn)?;
-        Ok(result)
+        Ok((result, tenant_role))
     }
 
     pub fn update(

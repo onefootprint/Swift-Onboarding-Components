@@ -1,3 +1,4 @@
+use crate::errors::ApiResult;
 use crate::types::response::ResponseData;
 use crate::State;
 use crate::{errors::ApiError, types::EmptyResponse};
@@ -26,14 +27,27 @@ fn handler(
     state: web::Data<State>,
     request: Json<LinkAuthRequest>,
 ) -> actix_web::Result<Json<ResponseData<EmptyResponse>>, ApiError> {
-    let email = &request.email_address;
+    let LinkAuthRequest {
+        email_address,
+        redirect_url,
+    } = request.into_inner();
+    // TODO infer redirect_url from host header?
+    create_and_send_magic_link(&state, &email_address, &redirect_url).await?;
 
-    let session = &state
+    Ok(Json(EmptyResponse::ok()))
+}
+
+pub(crate) async fn create_and_send_magic_link(
+    state: &State,
+    email: &str,
+    redirect_url: &str,
+) -> ApiResult<()> {
+    let session = state
         .workos_client
         .passwordless()
         .create_passwordless_session(&CreatePasswordlessSessionParams {
             r#type: CreatePasswordlessSessionType::MagicLink { email },
-            redirect_uri: Some(&request.redirect_url),
+            redirect_uri: Some(redirect_url),
             state: None,
         })
         .await?;
@@ -42,7 +56,6 @@ fn handler(
         PasswordlessSessionType::MagicLink { email: _, link } => link.clone(),
     };
 
-    crate::utils::email::send_magic_link_dashboard_auth_email(&state, email.to_owned(), link).await?;
-
-    Ok(Json(EmptyResponse::ok()))
+    crate::utils::email::send_magic_link_dashboard_auth_email(state, email.to_owned(), link).await?;
+    Ok(())
 }

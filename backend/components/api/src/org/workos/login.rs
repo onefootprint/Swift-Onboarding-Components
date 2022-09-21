@@ -115,7 +115,8 @@ async fn find_or_create_user(
             // Get or create the admin role for this tenant
             // TODO: we shouldn't always give a new user admin permissions
             let admin_role = TenantRole::get_or_create_admin_role(conn, tenant_id)?;
-            let tenant_user = TenantUser::create(conn, email2.into(), admin_role.id)?;
+            let (tenant_user, _) =
+                TenantUser::create(conn, email2.into(), &admin_role.tenant_id, admin_role.id)?;
             Ok(tenant_user)
         })
         .await?;

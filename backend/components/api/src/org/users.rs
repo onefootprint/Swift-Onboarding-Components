@@ -1,12 +1,14 @@
 use crate::auth::CheckTenantPermissions;
 use crate::auth::WorkOsAuth;
 use crate::errors::ApiError;
+use crate::org::workos::magic_link::create_and_send_magic_link;
 use crate::types::tenant_user::FpTenantUser;
 use crate::types::EmptyRequest;
 use crate::types::EmptyResponse;
 use crate::types::JsonApiResponse;
 use crate::types::PaginatedRequest;
 use crate::types::PaginatedResponseData;
+use crate::types::ResponseData;
 use crate::State;
 use chrono::{DateTime, Utc};
 use db::models::tenant_user::TenantUser;
@@ -14,7 +16,7 @@ use newtypes::TenantPermission;
 use newtypes::TenantRoleId;
 use newtypes::TenantUserId;
 use paperclip::actix::Apiv2Schema;
-use paperclip::actix::{api_v2_operation, get, patch, web, web::Json};
+use paperclip::actix::{api_v2_operation, get, patch, post, web, web::Json};
 
 #[api_v2_operation(
     summary = "/org/users",
@@ -46,6 +48,47 @@ async fn get(
         .map(FpTenantUser::from)
         .collect::<Vec<FpTenantUser>>();
     Ok(Json(PaginatedResponseData::ok(results, cursor, None)))
+}
+
+#[derive(Debug, serde::Deserialize, Apiv2Schema)]
+struct CreateTenantUserRequest {
+    // TODO make email unique per tenant
+    email: String,
+    role_id: TenantRoleId,
+    redirect_url: String, // The URL to the dashboard where the invite login link should be sent
+}
+
+#[api_v2_operation(
+    summary = "/org/users",
+    operation_id = "org-users-create",
+    tags(Private),
+    description = "Create a new IAM user for the tenant. Sends an invite link via WorkOs"
+)]
+#[post("/users")]
+async fn post(
+    state: web::Data<State>,
+    request: web::Json<CreateTenantUserRequest>,
+    auth: WorkOsAuth,
+) -> JsonApiResponse<FpTenantUser> {
+    let auth = auth.check_permissions(vec![TenantPermission::Admin])?;
+    let tenant = auth.tenant();
+
+    let tenant_id = tenant.id.clone();
+    let CreateTenantUserRequest {
+        email,
+        role_id,
+        redirect_url,
+    } = request.into_inner();
+    let (user, role) = state
+        .db_pool
+        .db_query(move |conn| TenantUser::create(conn, email.into(), &tenant_id, role_id))
+        .await??;
+
+    // TODO use a different email template for inviting a teammate
+    create_and_send_magic_link(&state, &user.email.0, &redirect_url).await?;
+
+    let result = FpTenantUser::from((user, role));
+    ResponseData::ok(result).json()
 }
 
 #[derive(Debug, serde::Deserialize, Apiv2Schema)]
