@@ -19,7 +19,9 @@
     "icons": "*",
     "styled-media-query": "^2.1.2",
     "themes": "*",
-    "ui": "*"
+    "ui": "*",
+    "types": "*",
+    "hooks": "*"
   },
   "devDependencies": {
     "@storybook/addon-actions": "^6.5.10",
