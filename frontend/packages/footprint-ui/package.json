@@ -16,6 +16,7 @@
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
   },
   "dependencies": {
+    "@xstate/react": "^3.0.1",
     "constate": "^3.3.2",
     "hooks": "*",
     "icons": "*",
@@ -23,7 +24,9 @@
     "styled-media-query": "^2.1.2",
     "themes": "*",
     "types": "*",
-    "ui": "*"
+    "ui": "*",
+    "usehooks-ts": "2.6.0",
+    "xstate": "^4.33.6"
   },
   "devDependencies": {
     "@storybook/addon-actions": "^6.5.10",

@@ -1,7 +1,13 @@
-import { BasePluginProps } from '../base-plugin';
+import React from 'react';
 
-export type IdScanProps = BasePluginProps<{}>;
+import IdScanFlow from './components/id-scan-flow';
+import { MachineProvider } from './components/machine-provider';
+import { IdScanProps } from './id-scan.types';
 
-const IdScan = () => {};
+const IdScan = ({ context, onDone }: IdScanProps) => (
+  <MachineProvider>
+    <IdScanFlow context={context} onDone={onDone} />
+  </MachineProvider>
+);
 
 export default IdScan;
