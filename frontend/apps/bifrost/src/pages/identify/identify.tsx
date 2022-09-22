@@ -1,10 +1,10 @@
+import { withProvider } from 'footprint-ui';
 import has from 'lodash/has';
 import React from 'react';
 import MachineProvider, {
   useIdentifyMachine,
 } from 'src/components/identify-machine-provider';
 import { States } from 'src/utils/state-machine/identify';
-import withProvider from 'src/utils/with-provider';
 
 import BiometricLoginRetry from './pages/biometric-login-retry';
 import EmailIdentification from './pages/email-identification';

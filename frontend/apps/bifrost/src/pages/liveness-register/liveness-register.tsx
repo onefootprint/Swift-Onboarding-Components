@@ -1,7 +1,7 @@
+import { withProvider } from 'footprint-ui';
 import has from 'lodash/has';
 import React from 'react';
 import { States } from 'src/utils/state-machine/liveness-register';
-import withProvider from 'src/utils/with-provider';
 
 import LivenessRegisterMachineProvider from './components/machine-provider';
 import useLivenessRegisterMachine from './hooks/use-liveness-register';

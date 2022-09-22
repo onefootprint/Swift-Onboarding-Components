@@ -1,12 +1,12 @@
 import React from 'react';
 
-const withMachineProvider = (
+const withProvider = (
   Provider: React.FC<{ children: React.ReactNode }>,
-  Page: React.FC<{}>,
+  Component: React.FC<{}>,
 ) => (
   <Provider>
-    <Page />
+    <Component />
   </Provider>
 );
 
-export default withMachineProvider;
+export default withProvider;

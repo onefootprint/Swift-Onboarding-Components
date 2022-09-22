@@ -1,7 +1,7 @@
+import { withProvider } from 'footprint-ui';
 import has from 'lodash/has';
 import React from 'react';
 import { States } from 'src/utils/state-machine/onboarding';
-import withProvider from 'src/utils/with-provider';
 
 import LivenessRegister from '../liveness-register';
 import MachineProvider, {
