@@ -3,19 +3,13 @@ import request, { RequestError } from 'request';
 import { CLIENT_PUBLIC_KEY_HEADER } from 'src/config/constants';
 import useBifrostMachine from 'src/hooks/use-bifrost-machine';
 import { Events } from 'src/utils/state-machine/bifrost';
-import { CollectedDataOption, CollectedDataOptionLabels } from 'types';
+import { CollectedDataOptionLabels, OnboardingConfig } from 'types';
 
 type TenantInfoRequest = {
   tenantPk: string;
 };
 
-type TenantInfoResponse = {
-  canAccessData: CollectedDataOption[];
-  isLive: boolean;
-  mustCollectData: CollectedDataOption[];
-  name: string;
-  orgName: string;
-};
+type TenantInfoResponse = OnboardingConfig;
 
 const getTenantInfo = async (payload: TenantInfoRequest) => {
   const response = await request<TenantInfoResponse>({

@@ -21,6 +21,7 @@ export * from './onboarding-config';
 export { default as OnboardingStatus } from './onboarding-status';
 export * from './scoped-user';
 export * from './signal-attribute';
+export * from './tenant-info';
 export * from './user-data';
 export * from './user-data-attribute';
 export * from './user-data-object';

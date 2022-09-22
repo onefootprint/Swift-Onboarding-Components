@@ -1,8 +1,8 @@
 import { DeviceInfo } from 'hooks';
+import { TenantInfo } from 'types';
 import { assign, createMachine } from 'xstate';
 
 import createLivenessRegisterMachine from '../liveness-register';
-import { TenantInfo } from '../types';
 import {
   Actions,
   Events,

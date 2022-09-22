@@ -17,7 +17,7 @@ const initialContext: BifrostContext = {
   },
   tenant: {
     canAccessData: [],
-    isLive: undefined,
+    isLive: false,
     mustCollectData: [],
     name: '',
     orgName: '',

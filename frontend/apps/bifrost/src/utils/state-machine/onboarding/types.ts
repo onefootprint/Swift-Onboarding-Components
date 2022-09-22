@@ -3,9 +3,8 @@ import {
   BasicInformation,
   ResidentialAddress,
   SSNInformation,
-  TenantInfo,
 } from 'src/utils/state-machine/types';
-import { CollectedDataOption, UserData } from 'types';
+import { CollectedDataOption, TenantInfo, UserData } from 'types';
 
 export enum States {
   onboardingVerification = 'onboardingVerification',

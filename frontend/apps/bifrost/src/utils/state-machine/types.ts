@@ -51,12 +51,3 @@ export type OnboardingData = {
   data: UserData; // Filled user data
   validationToken?: string;
 };
-
-export type TenantInfo = {
-  canAccessData: CollectedDataOption[];
-  isLive?: boolean;
-  mustCollectData: CollectedDataOption[];
-  name: string;
-  orgName: string;
-  pk: string;
-};

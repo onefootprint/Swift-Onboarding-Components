@@ -1,6 +1,6 @@
 import { DeviceInfo } from 'hooks';
-import { OnboardingData, TenantInfo } from 'src/utils/state-machine/types';
-import { CollectedDataOption, IdentifyType, UserData } from 'types';
+import { OnboardingData } from 'src/utils/state-machine/types';
+import { CollectedDataOption, IdentifyType, TenantInfo, UserData } from 'types';
 
 export enum States {
   init = 'Init',
@@ -56,14 +56,7 @@ export type BifrostEvent =
   | { type: Events.authenticationFlowStarted }
   | {
       type: Events.tenantInfoRequestSucceeded;
-      payload: {
-        canAccessData: CollectedDataOption[];
-        isLive: boolean;
-        mustCollectData: CollectedDataOption[];
-        name: string;
-        orgName: string;
-        pk: string;
-      };
+      payload: TenantInfo;
     }
   | {
       type: Events.tenantInfoRequestFailed;

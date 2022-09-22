@@ -1,6 +1,5 @@
 import { DeviceInfo } from 'hooks';
-import { TenantInfo } from 'src/utils/state-machine/types';
-import { CollectedDataOption, UserDataAttribute } from 'types';
+import { CollectedDataOption, TenantInfo, UserDataAttribute } from 'types';
 import { interpret } from 'xstate';
 
 import createOnboardingMachine from './machine';
