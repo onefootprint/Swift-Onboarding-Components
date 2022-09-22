@@ -1,4 +1,4 @@
-import { withProvider } from 'footprint-ui';
+import { withProvider } from 'footprint-elements';
 import has from 'lodash/has';
 import React from 'react';
 import MachineProvider, {

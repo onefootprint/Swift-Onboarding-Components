@@ -1,4 +1,4 @@
-import { NavigationHeader } from 'footprint-ui';
+import { NavigationHeader } from 'footprint-elements';
 import React from 'react';
 import { Events } from 'src/utils/state-machine/onboarding';
 import { Stepper } from 'ui';

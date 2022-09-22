@@ -1,5 +1,5 @@
 import FocusTrap from 'focus-trap-react';
-import { FootprintFooter } from 'footprint-ui';
+import { FootprintFooter } from 'footprint-elements';
 import { IcoClose24 } from 'icons';
 import React, { useState } from 'react';
 import styled, { css } from 'styled-components';

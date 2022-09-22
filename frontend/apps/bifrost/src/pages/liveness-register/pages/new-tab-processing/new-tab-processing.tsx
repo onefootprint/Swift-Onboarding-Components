@@ -1,4 +1,4 @@
-import { HeaderTitle, NavigationHeader } from 'footprint-ui';
+import { HeaderTitle, NavigationHeader } from 'footprint-elements';
 import { useTranslation } from 'hooks';
 import React from 'react';
 import useGetD2PStatus, { D2PStatus } from 'src/hooks/d2p/use-get-d2p-status';

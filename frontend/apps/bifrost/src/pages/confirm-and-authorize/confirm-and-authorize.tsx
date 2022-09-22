@@ -1,5 +1,5 @@
 import { useIsMutating } from '@tanstack/react-query';
-import { HeaderTitle, NavigationHeader } from 'footprint-ui';
+import { HeaderTitle, NavigationHeader } from 'footprint-elements';
 import { useTranslation } from 'hooks';
 import {
   IcoBuilding24,

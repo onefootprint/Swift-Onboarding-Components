@@ -1,4 +1,4 @@
-import { useFootprintJs } from 'footprint-ui';
+import { useFootprintJs } from 'footprint-elements';
 import React from 'react';
 import useBifrostMachine from 'src/hooks/use-bifrost-machine';
 import { LoadingIndicator } from 'ui';

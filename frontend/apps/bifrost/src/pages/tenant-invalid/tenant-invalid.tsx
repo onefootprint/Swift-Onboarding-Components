@@ -1,4 +1,4 @@
-import { NavigationHeader } from 'footprint-ui';
+import { NavigationHeader } from 'footprint-elements';
 import { useTranslation } from 'hooks';
 import React from 'react';
 import styled from 'styled-components';

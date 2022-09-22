@@ -1,4 +1,4 @@
-import { NavigationHeader, useFootprintJs } from 'footprint-ui';
+import { NavigationHeader, useFootprintJs } from 'footprint-elements';
 import { useTranslation } from 'hooks';
 import { IcoCheckCircle40 } from 'icons';
 import React, { useEffect } from 'react';

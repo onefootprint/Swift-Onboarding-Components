@@ -1,4 +1,4 @@
-import { NavigationHeader, useFootprintJs } from 'footprint-ui';
+import { NavigationHeader, useFootprintJs } from 'footprint-elements';
 import { MY1FP_URL } from 'global-constants';
 import { useTranslation } from 'hooks';
 import { IcoCheckCircle40 } from 'icons';

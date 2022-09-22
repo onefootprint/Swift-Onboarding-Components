@@ -1,5 +1,5 @@
 import { QueryClientProvider } from '@tanstack/react-query';
-import { FootprintFooter, FootprintJsProvider } from 'footprint-ui';
+import { FootprintFooter, FootprintJsProvider } from 'footprint-elements';
 import Head from 'next/head';
 import Script from 'next/script';
 import React from 'react';

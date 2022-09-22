@@ -1,4 +1,4 @@
-import { HeaderTitle } from 'footprint-ui';
+import { HeaderTitle } from 'footprint-elements';
 import { useTranslation } from 'hooks';
 import React from 'react';
 import { useForm } from 'react-hook-form';

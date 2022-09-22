@@ -1,4 +1,4 @@
-import { HeaderTitle } from 'footprint-ui';
+import { HeaderTitle } from 'footprint-elements';
 import { useTranslation } from 'hooks';
 import { QRCodeSVG } from 'qrcode.react';
 import React, { useEffect } from 'react';

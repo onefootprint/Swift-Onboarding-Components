@@ -1,4 +1,4 @@
-import { HeaderTitle, NavigationHeader } from 'footprint-ui';
+import { HeaderTitle, NavigationHeader } from 'footprint-elements';
 import { useRequestErrorToast, useTranslation } from 'hooks';
 import { IcoEmail24 } from 'icons';
 import React from 'react';
