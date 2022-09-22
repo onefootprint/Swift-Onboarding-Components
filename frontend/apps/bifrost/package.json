@@ -20,7 +20,6 @@
     "axios-case-converter": "^0.9.0",
     "base64url": "^3.0.1",
     "focus-trap-react": "^9.0.2",
-    "footprint-provider": "*",
     "footprint-ui": "*",
     "global-constants": "*",
     "hooks": "*",

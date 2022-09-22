@@ -1,5 +1,5 @@
 import { useIsMutating } from '@tanstack/react-query';
-import { HeaderTitle } from 'footprint-ui';
+import { HeaderTitle, NavigationHeader } from 'footprint-ui';
 import { useTranslation } from 'hooks';
 import {
   IcoBuilding24,
@@ -11,7 +11,6 @@ import {
 } from 'icons';
 import React from 'react';
 import { useBifrostMachine } from 'src/components/bifrost-machine-provider';
-import NavigationHeader from 'src/components/navigation-header';
 import styled, { css } from 'styled-components';
 import { CollectedDataOption } from 'types';
 import { FootprintButton, Typography } from 'ui';

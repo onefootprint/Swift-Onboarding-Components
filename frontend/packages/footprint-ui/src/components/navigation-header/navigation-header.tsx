@@ -2,8 +2,8 @@ import React from 'react';
 import styled, { css } from 'styled-components';
 import { Box, Portal } from 'ui';
 
-import NavigationBackButton from '../navigation-back-button';
-import NavigationCloseButton from '../navigation-close-button';
+import NavigationBackButton from './components/navigation-back-button';
+import NavigationCloseButton from './components/navigation-close-button';
 
 export type NavigationHeaderProps = {
   children?: React.ReactNode;

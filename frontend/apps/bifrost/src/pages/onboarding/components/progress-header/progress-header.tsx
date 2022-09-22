@@ -1,5 +1,5 @@
+import { NavigationHeader } from 'footprint-ui';
 import React from 'react';
-import NavigationHeader from 'src/components/navigation-header';
 import { Events } from 'src/utils/state-machine/onboarding';
 import { Stepper } from 'ui';
 

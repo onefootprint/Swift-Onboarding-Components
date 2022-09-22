@@ -1,7 +1,8 @@
-import { useFootprintJs } from 'footprint-provider';
 import { IcoClose24 } from 'icons';
 import React from 'react';
 import { IconButton, useConfirmationDialog } from 'ui';
+
+import { useFootprintJs } from '../../../footprint-js-provider';
 
 export type NavigationCloseButtonProps = {
   confirm?: boolean;

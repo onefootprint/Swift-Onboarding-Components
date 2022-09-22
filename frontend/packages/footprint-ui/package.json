@@ -16,12 +16,14 @@
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
   },
   "dependencies": {
+    "constate": "^3.3.2",
+    "hooks": "*",
     "icons": "*",
+    "postmate": "^1.5.2",
     "styled-media-query": "^2.1.2",
     "themes": "*",
-    "ui": "*",
     "types": "*",
-    "hooks": "*"
+    "ui": "*"
   },
   "devDependencies": {
     "@storybook/addon-actions": "^6.5.10",
@@ -34,8 +36,8 @@
     "@storybook/testing-library": "^0.0.11",
     "eslint-config-footprint": "*",
     "jest-presets": "*",
-    "react-dom": "18.2.0",
     "react": "18.2.0",
+    "react-dom": "18.2.0",
     "styled-components": "^5.3.5",
     "tsconfig": "*",
     "typescript": "4.7.4",

@@ -1,7 +1,6 @@
-import { HeaderTitle } from 'footprint-ui';
+import { HeaderTitle, NavigationHeader } from 'footprint-ui';
 import { useTranslation } from 'hooks';
 import React from 'react';
-import NavigationHeader from 'src/components/navigation-header';
 import styled, { css } from 'styled-components';
 import { Button } from 'ui';
 

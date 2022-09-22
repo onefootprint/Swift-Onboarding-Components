@@ -1,7 +1,6 @@
-import { HeaderTitle } from 'footprint-ui';
+import { HeaderTitle, NavigationHeader } from 'footprint-ui';
 import { useTranslation } from 'hooks';
 import React, { useEffect } from 'react';
-import NavigationHeader from 'src/components/navigation-header';
 import createBiometricUrl from 'src/utils/create-biometric-url';
 import { Events } from 'src/utils/state-machine/liveness-register';
 import styled, { css } from 'styled-components';

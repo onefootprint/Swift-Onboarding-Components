@@ -1,6 +1,6 @@
 import constate from 'constate';
 
-import useLocalFootprint from './use-footprint';
+import useLocalFootprint from './hooks/use-footprint-js';
 
 const [Provider, useFootprintJs] = constate(useLocalFootprint);
 

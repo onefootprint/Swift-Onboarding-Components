@@ -1,6 +1,5 @@
 import { QueryClientProvider } from '@tanstack/react-query';
-import FootprintProvider from 'footprint-provider';
-import { FootprintFooter } from 'footprint-ui';
+import { FootprintFooter, FootprintJsProvider } from 'footprint-ui';
 import Head from 'next/head';
 import Script from 'next/script';
 import React from 'react';
@@ -35,7 +34,7 @@ const App = ({ Component, pageProps }: AppProps) => (
       <BifrostMachineProvider>
         <DesignSystemProvider theme={themes.light}>
           <GlobalStyle />
-          <FootprintProvider>
+          <FootprintJsProvider>
             <Container>
               <SandboxBanner />
               <Content id="content">
@@ -44,7 +43,7 @@ const App = ({ Component, pageProps }: AppProps) => (
               </Content>
               <FootprintFooter />
             </Container>
-          </FootprintProvider>
+          </FootprintJsProvider>
         </DesignSystemProvider>
       </BifrostMachineProvider>
     </QueryClientProvider>

@@ -1,7 +1,7 @@
 import Postmate from 'postmate';
 import { useEffect, useState } from 'react';
 
-const useFootprint = () => {
+const useFootprintJs = () => {
   const [postmate, setPostmate] = useState<Postmate.ChildAPI>();
   const isReady = !!postmate;
 
@@ -49,4 +49,4 @@ const useFootprint = () => {
   };
 };
 
-export default useFootprint;
+export default useFootprintJs;
