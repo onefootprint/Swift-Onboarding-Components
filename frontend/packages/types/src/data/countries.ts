@@ -1,249 +1,493 @@
-export enum Country {
-  AD = 'Andorra',
-  AE = 'United Arab Emirates',
-  AF = 'Afghanistan',
-  AG = 'Antigua And Barbuda',
-  AI = 'Anguilla',
-  AL = 'Albania',
-  AM = 'Armenia',
-  AO = 'Angola',
-  AR = 'Argentina',
-  AS = 'American Samoa',
-  AT = 'Austria',
-  AU = 'Australia',
-  AW = 'Aruba',
-  AX = 'Aland Islands',
-  AZ = 'Azerbaijan',
-  BA = 'Bosnia And Herzegovina',
-  BB = 'Barbados',
-  BD = 'Bangladesh',
-  BE = 'Belgium',
-  BF = 'Burkina Faso',
-  BG = 'Bulgaria',
-  BH = 'Bahrain',
-  BI = 'Burundi',
-  BJ = 'Benin',
-  BL = 'Saint Barthelemy',
-  BM = 'Bermuda',
-  BN = 'Brunei Darussalam',
-  BO = 'Bolivia',
-  BR = 'Brazil',
-  BS = 'Bahamas',
-  BT = 'Bhutan',
-  BV = 'Bouvet Island',
-  BW = 'Botswana',
-  BY = 'Belarus',
-  BZ = 'Belize',
-  CA = 'Canada',
-  CC = 'Cocos Keeling Islands',
-  CD = 'Democratic Republic of the Congo',
-  CF = 'Central African Republic',
-  CG = 'Congo',
-  CH = 'Switzerland',
-  CI = "Côte d'Ivoire",
-  CK = 'Cook Islands',
-  CL = 'Chile',
-  CM = 'Cameroon',
-  CN = 'China',
-  CO = 'Colombia',
-  CR = 'Costa Rica',
-  CU = 'Cuba',
-  CV = 'Cape Verde',
-  CW = 'Curaçao',
-  CX = 'Christmas Island',
-  CY = 'Cyprus',
-  CZ = 'Czech Republic',
-  DE = 'Germany',
-  DJ = 'Djibouti',
-  DK = 'Denmark',
-  DM = 'Dominica',
-  DO = 'Dominican Republic',
-  DZ = 'Algeria',
-  EC = 'Ecuador',
-  EE = 'Estonia',
-  EG = 'Egypt',
-  EH = 'Western Sahara',
-  ER = 'Eritrea',
-  ES = 'Spain',
-  ET = 'Ethiopia',
-  FI = 'Finland',
-  FJ = 'Fiji',
-  FK = 'Falkland Islands (Malvinas)',
-  FM = 'Micronesia, Federated States of',
-  FO = 'Faroe Islands',
-  FR = 'France',
-  GA = 'Gabon',
-  GB = 'United Kingdom',
-  GD = 'Grenada',
-  GE = 'Georgia',
-  GF = 'French Guiana',
-  GG = 'Guernsey',
-  GH = 'Ghana',
-  GI = 'Gibraltar',
-  GL = 'Greenland',
-  GM = 'Gambia',
-  GN = 'Guinea',
-  GP = 'Guadeloupe',
-  GQ = 'Equatorial Guinea',
-  GR = 'Greece',
-  GS = 'South Georgia And Sandwich Isl',
-  GT = 'Guatemala',
-  GU = 'Guam',
-  GW = 'Guinea-Bissau',
-  GY = 'Guyana',
-  HK = 'Hong Kong',
-  HM = 'Heard Island Mcdonald Islands',
-  HN = 'Honduras',
-  HR = 'Croatia',
-  HT = 'Haiti',
-  HU = 'Hungary',
-  ID = 'Indonesia',
-  IE = 'Ireland',
-  IL = 'Israel',
-  IM = 'Isle Of Man',
-  IN = 'India',
-  IO = 'British Indian Ocean Territory',
-  IQ = 'Iraq',
-  IR = 'Iran',
-  IS = 'Iceland',
-  IT = 'Italy',
-  JE = 'Jersey',
-  JM = 'Jamaica',
-  JO = 'Jordan',
-  JP = 'Japan',
-  KE = 'Kenya',
-  KG = 'Kyrgyzstan',
-  KH = 'Cambodia',
-  KI = 'Kiribati',
-  KM = 'Comoros',
-  KN = 'Saint Kitts And Nevis',
-  KR = 'South Korea',
-  KW = 'Kuwait',
-  KY = 'Cayman Islands',
-  KZ = 'Kazakhstan',
-  LA = "Lao People's Democratic Republic",
-  LB = 'Lebanon',
-  LC = 'Saint Lucia',
-  LI = 'Liechtenstein',
-  LK = 'Sri Lanka',
-  LR = 'Liberia',
-  LS = 'Lesotho',
-  LT = 'Lithuania',
-  LU = 'Luxembourg',
-  LV = 'Latvia',
-  LY = 'Libyan Arab Jamahiriya',
-  MA = 'Morocco',
-  MC = 'Monaco',
-  MD = 'Moldova',
-  ME = 'Montenegro',
-  MF = 'Saint Martin',
-  MG = 'Madagascar',
-  MH = 'Marshall Islands',
-  MK = 'Republic of Macedonia',
-  ML = 'Mali',
-  MM = 'Myanmar',
-  MN = 'Mongolia',
-  MO = 'Macao',
-  MP = 'Northern Mariana Islands',
-  MQ = 'Martinique',
-  MR = 'Mauritania',
-  MS = 'Montserrat',
-  MT = 'Malta',
-  MU = 'Mauritius',
-  MV = 'Maldives',
-  MW = 'Malawi',
-  MX = 'Mexico',
-  MY = 'Malaysia',
-  MZ = 'Mozambique',
-  NA = 'Namibia',
-  NC = 'New Caledonia',
-  NE = 'Niger',
-  NF = 'Norfolk Island',
-  NG = 'Nigeria',
-  NI = 'Nicaragua',
-  NL = 'Netherlands',
-  NO = 'Norway',
-  NP = 'Nepal',
-  NR = 'Nauru',
-  NU = 'Niue',
-  NZ = 'New Zealand',
-  OM = 'Oman',
-  PA = 'Panama',
-  PE = 'Peru',
-  PF = 'French Polynesia',
-  PG = 'Papua New Guinea',
-  PH = 'Philippines',
-  PK = 'Pakistan',
-  PL = 'Poland',
-  PM = 'Saint Pierre And Miquelon',
-  PN = 'Pitcairn',
-  PR = 'Puerto Rico',
-  PS = 'Palestinian Territory',
-  PT = 'Portugal',
-  PW = 'Palau',
-  PY = 'Paraguay',
-  QA = 'Qatar',
-  RE = 'Reunion',
-  RO = 'Romania',
-  RS = 'Serbia',
-  RU = 'Russia',
-  RW = 'Rwanda',
-  SA = 'Saudi Arabia',
-  SB = 'Solomon Islands',
-  SC = 'Seychelles',
-  SE = 'Sweden',
-  SG = 'Singapore',
-  SH = 'Saint Helena',
-  SI = 'Slovenia',
-  SJ = 'Svalbard And Jan Mayen',
-  SK = 'Slovakia',
-  SL = 'Sierra Leone',
-  SM = 'San Marino',
-  SN = 'Senegal',
-  SO = 'Somalia',
-  SR = 'Suriname',
-  SS = 'South Sudan',
-  ST = 'Sao Tome And Principe',
-  SV = 'El Salvador',
-  SX = 'Sint Maarten',
-  SY = 'Syrian Arab Republic',
-  SZ = 'Swaziland',
-  TC = 'Turks And Caicos Islands',
-  TD = 'Chad',
-  TF = 'French Southern Territories',
-  TG = 'Togo',
-  TH = 'Thailand',
-  TJ = 'Tajikistan',
-  TK = 'Tokelau',
-  TL = 'Timor Leste',
-  TM = 'Turkmenistan',
-  TN = 'Tunisia',
-  TO = 'Tonga',
-  TR = 'Turkey',
-  TT = 'Trinidad And Tobago',
-  TV = 'Tuvalu',
-  TW = 'Taiwan',
-  TZ = 'Tanzania',
-  UA = 'Ukraine',
-  UG = 'Uganda',
-  UM = 'United States Outlying Islands',
-  US = 'United States',
-  UY = 'Uruguay',
-  UZ = 'Uzbekistan',
-  VA = 'Holy See Vatican City State',
-  VC = 'Saint Vincent And Grenadines',
-  VE = 'Venezuela',
-  VG = 'Virgin Islands British',
-  VI = 'Virgin Islands',
-  VN = 'Viet Nam',
-  VU = 'Vanuatu',
-  WF = 'Wallis And Futuna',
-  WS = 'Samoa',
-  YE = 'Yemen',
-  YT = 'Mayotte',
-  ZA = 'South Africa',
-  ZM = 'Zambia',
-  ZW = 'Zimbabwe',
-}
+export type CountryCode =
+  | 'US'
+  | 'AF'
+  | 'AX'
+  | 'AL'
+  | 'DZ'
+  | 'AS'
+  | 'AD'
+  | 'AO'
+  | 'AI'
+  | 'AG'
+  | 'AR'
+  | 'AM'
+  | 'AW'
+  | 'AU'
+  | 'AT'
+  | 'AZ'
+  | 'BS'
+  | 'BH'
+  | 'BD'
+  | 'BB'
+  | 'BY'
+  | 'BE'
+  | 'BZ'
+  | 'BJ'
+  | 'BM'
+  | 'BT'
+  | 'BO'
+  | 'BA'
+  | 'BW'
+  | 'BV'
+  | 'BR'
+  | 'IO'
+  | 'BN'
+  | 'BG'
+  | 'BF'
+  | 'BI'
+  | 'KH'
+  | 'CM'
+  | 'CA'
+  | 'CV'
+  | 'KY'
+  | 'CF'
+  | 'TD'
+  | 'CL'
+  | 'CN'
+  | 'CX'
+  | 'CC'
+  | 'CO'
+  | 'KM'
+  | 'CG'
+  | 'CK'
+  | 'CR'
+  | 'CI'
+  | 'HR'
+  | 'CU'
+  | 'CW'
+  | 'CY'
+  | 'CZ'
+  | 'CD'
+  | 'DK'
+  | 'DJ'
+  | 'DM'
+  | 'DO'
+  | 'EC'
+  | 'EG'
+  | 'SV'
+  | 'GQ'
+  | 'ER'
+  | 'EE'
+  | 'ET'
+  | 'FK'
+  | 'FO'
+  | 'FJ'
+  | 'FI'
+  | 'FR'
+  | 'GF'
+  | 'PF'
+  | 'TF'
+  | 'GA'
+  | 'GM'
+  | 'GE'
+  | 'DE'
+  | 'GH'
+  | 'GI'
+  | 'GR'
+  | 'GL'
+  | 'GD'
+  | 'GP'
+  | 'GU'
+  | 'GT'
+  | 'GG'
+  | 'GN'
+  | 'GW'
+  | 'GY'
+  | 'HT'
+  | 'HM'
+  | 'VA'
+  | 'HN'
+  | 'HK'
+  | 'HU'
+  | 'IS'
+  | 'IN'
+  | 'ID'
+  | 'IR'
+  | 'IQ'
+  | 'IE'
+  | 'IM'
+  | 'IL'
+  | 'IT'
+  | 'JM'
+  | 'JP'
+  | 'JE'
+  | 'JO'
+  | 'KZ'
+  | 'KE'
+  | 'KI'
+  | 'KW'
+  | 'KG'
+  | 'LA'
+  | 'LV'
+  | 'LB'
+  | 'LS'
+  | 'LR'
+  | 'LY'
+  | 'LI'
+  | 'LT'
+  | 'LU'
+  | 'MO'
+  | 'MG'
+  | 'MW'
+  | 'MY'
+  | 'MV'
+  | 'ML'
+  | 'MT'
+  | 'MH'
+  | 'MQ'
+  | 'MR'
+  | 'MU'
+  | 'YT'
+  | 'MX'
+  | 'FM'
+  | 'MD'
+  | 'MC'
+  | 'MN'
+  | 'ME'
+  | 'MS'
+  | 'MA'
+  | 'MZ'
+  | 'MM'
+  | 'NA'
+  | 'NR'
+  | 'NP'
+  | 'NL'
+  | 'NC'
+  | 'NZ'
+  | 'NI'
+  | 'NE'
+  | 'NG'
+  | 'NU'
+  | 'NF'
+  | 'MP'
+  | 'NO'
+  | 'OM'
+  | 'PK'
+  | 'PW'
+  | 'PS'
+  | 'PA'
+  | 'PG'
+  | 'PY'
+  | 'PE'
+  | 'PH'
+  | 'PN'
+  | 'PL'
+  | 'PT'
+  | 'PR'
+  | 'QA'
+  | 'MK'
+  | 'RE'
+  | 'RO'
+  | 'RU'
+  | 'RW'
+  | 'BL'
+  | 'SH'
+  | 'KN'
+  | 'LC'
+  | 'MF'
+  | 'PM'
+  | 'VC'
+  | 'WS'
+  | 'SM'
+  | 'ST'
+  | 'SA'
+  | 'SN'
+  | 'RS'
+  | 'SC'
+  | 'SL'
+  | 'SG'
+  | 'SX'
+  | 'SK'
+  | 'SI'
+  | 'SB'
+  | 'SO'
+  | 'ZA'
+  | 'GS'
+  | 'KR'
+  | 'SS'
+  | 'ES'
+  | 'LK'
+  | 'SR'
+  | 'SJ'
+  | 'SZ'
+  | 'SE'
+  | 'CH'
+  | 'SY'
+  | 'TW'
+  | 'TJ'
+  | 'TZ'
+  | 'TH'
+  | 'TL'
+  | 'TG'
+  | 'TK'
+  | 'TO'
+  | 'TT'
+  | 'TN'
+  | 'TR'
+  | 'TM'
+  | 'TC'
+  | 'TV'
+  | 'UG'
+  | 'UA'
+  | 'AE'
+  | 'GB'
+  | 'UM'
+  | 'UY'
+  | 'UZ'
+  | 'VU'
+  | 'VE'
+  | 'VN'
+  | 'VI'
+  | 'VG'
+  | 'WF'
+  | 'EH'
+  | 'YE'
+  | 'ZM'
+  | 'ZW';
 
-export type CountryCode = keyof typeof Country;
+export type CountryCode3 =
+  | 'USA'
+  | 'AFG'
+  | 'ALA'
+  | 'ALB'
+  | 'DZA'
+  | 'ASM'
+  | 'AND'
+  | 'AGO'
+  | 'AGO'
+  | 'ATG'
+  | 'ARG'
+  | 'ARM'
+  | 'ABW'
+  | 'AUS'
+  | 'AUT'
+  | 'AZE'
+  | 'BHS'
+  | 'BHR'
+  | 'BGD'
+  | 'BRB'
+  | 'BLR'
+  | 'BEL'
+  | 'BLZ'
+  | 'BEN'
+  | 'BMU'
+  | 'BTN'
+  | 'BOL'
+  | 'BIH'
+  | 'BWA'
+  | 'BVT'
+  | 'BRA'
+  | 'IOT'
+  | 'BRN'
+  | 'BGR'
+  | 'BFA'
+  | 'BDI'
+  | 'KHM'
+  | 'CMR'
+  | 'CAN'
+  | 'CPV'
+  | 'CYM'
+  | 'CAF'
+  | 'TCD'
+  | 'CHL'
+  | 'CHN'
+  | 'CXR'
+  | 'CCK'
+  | 'COL'
+  | 'COM'
+  | 'COG'
+  | 'COK'
+  | 'CRI'
+  | 'CIV'
+  | 'HRV'
+  | 'CUB'
+  | 'CUW'
+  | 'CYP'
+  | 'CZE'
+  | 'COD'
+  | 'DNK'
+  | 'DJI'
+  | 'DMA'
+  | 'DOM'
+  | 'ECU'
+  | 'EGY'
+  | 'SLV'
+  | 'GNQ'
+  | 'ERI'
+  | 'EST'
+  | 'ETH'
+  | 'FLK'
+  | 'FRO'
+  | 'FJI'
+  | 'FIN'
+  | 'FRA'
+  | 'GUF'
+  | 'PYF'
+  | 'ATF'
+  | 'GAB'
+  | 'GMB'
+  | 'GEO'
+  | 'DEU'
+  | 'GHA'
+  | 'GIB'
+  | 'GRC'
+  | 'GRL'
+  | 'GRD'
+  | 'GLP'
+  | 'GUM'
+  | 'GTM'
+  | 'GGY'
+  | 'GIN'
+  | 'GNB'
+  | 'GUY'
+  | 'HTI'
+  | 'HMD'
+  | 'VAT'
+  | 'HND'
+  | 'HKG'
+  | 'HUN'
+  | 'ISL'
+  | 'IND'
+  | 'IDN'
+  | 'IRN'
+  | 'IRQ'
+  | 'IRL'
+  | 'IMN'
+  | 'ISR'
+  | 'ITA'
+  | 'JAM'
+  | 'JPN'
+  | 'JEY'
+  | 'JOR'
+  | 'KAZ'
+  | 'KEN'
+  | 'KIR'
+  | 'KWT'
+  | 'KGZ'
+  | 'LAO'
+  | 'LVA'
+  | 'LBN'
+  | 'LSO'
+  | 'LBR'
+  | 'LBY'
+  | 'LIE'
+  | 'LTU'
+  | 'LUX'
+  | 'MAC'
+  | 'MDG'
+  | 'MWI'
+  | 'MYS'
+  | 'MDV'
+  | 'MLI'
+  | 'MLT'
+  | 'MHL'
+  | 'MTQ'
+  | 'MRT'
+  | 'MUS'
+  | 'MYT'
+  | 'MEX'
+  | 'FSM'
+  | 'MDA'
+  | 'MCO'
+  | 'MNG'
+  | 'MNE'
+  | 'MSR'
+  | 'MAR'
+  | 'MOZ'
+  | 'MMR'
+  | 'NAM'
+  | 'NRU'
+  | 'NPL'
+  | 'NLD'
+  | 'NCL'
+  | 'NZL'
+  | 'NIC'
+  | 'NER'
+  | 'NGA'
+  | 'NIU'
+  | 'NFK'
+  | 'MNP'
+  | 'NOR'
+  | 'OMN'
+  | 'PAK'
+  | 'PLW'
+  | 'PSE'
+  | 'PAN'
+  | 'PNG'
+  | 'PRY'
+  | 'PER'
+  | 'PHL'
+  | 'PCN'
+  | 'POL'
+  | 'PRT'
+  | 'PRI'
+  | 'QAT'
+  | 'MKD'
+  | 'REU'
+  | 'ROU'
+  | 'RUS'
+  | 'RWA'
+  | 'BLM'
+  | 'SHN'
+  | 'KNA'
+  | 'LCA'
+  | 'MAF'
+  | 'SPM'
+  | 'VCT'
+  | 'WSM'
+  | 'SMR'
+  | 'STP'
+  | 'SAU'
+  | 'SEN'
+  | 'SRB'
+  | 'SYC'
+  | 'SLE'
+  | 'SGP'
+  | 'SXM'
+  | 'SVK'
+  | 'SVN'
+  | 'SLB'
+  | 'SOM'
+  | 'ZAF'
+  | 'SGS'
+  | 'KOR'
+  | 'SSD'
+  | 'ESP'
+  | 'LKA'
+  | 'SUR'
+  | 'SJM'
+  | 'SWZ'
+  | 'SWE'
+  | 'CHE'
+  | 'SYR'
+  | 'TWN'
+  | 'TJK'
+  | 'TZA'
+  | 'THA'
+  | 'TLS'
+  | 'TGO'
+  | 'TKL'
+  | 'TON'
+  | 'TTO'
+  | 'TUN'
+  | 'TUR'
+  | 'TKM'
+  | 'TCA'
+  | 'TUV'
+  | 'UGA'
+  | 'UKR'
+  | 'ARE'
+  | 'GBR'
+  | 'UMI'
+  | 'URY'
+  | 'UZB'
+  | 'VUT'
+  | 'VEN'
+  | 'VNM'
+  | 'VIR'
+  | 'VGB'
+  | 'WLF'
+  | 'ESH'
+  | 'YEM'
+  | 'ZMB'
+  | 'ZWE';

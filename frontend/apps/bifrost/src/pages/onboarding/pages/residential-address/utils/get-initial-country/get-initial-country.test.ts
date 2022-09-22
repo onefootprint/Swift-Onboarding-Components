@@ -5,6 +5,7 @@ describe('getInitialCountry', () => {
     expect(getInitialCountry()).toEqual({
       value: 'US',
       label: 'United States',
+      value3: 'USA',
     });
   });
 
@@ -12,6 +13,7 @@ describe('getInitialCountry', () => {
     expect(getInitialCountry('BR')).toEqual({
       value: 'BR',
       label: 'Brazil',
+      value3: 'BRA',
     });
   });
 });

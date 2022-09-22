@@ -17,6 +17,9 @@
     "typecheck": "yarn tsc --noEmit",
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
   },
+  "dependencies": {
+    "types": "*"
+  },
   "devDependencies": {
     "eslint-config-footprint": "*",
     "jest-presets": "*",
