@@ -7,6 +7,8 @@ export enum States {
   takeOrUploadFrontPhoto = 'takeOrUploadFrontPhoto',
   takeOrUploadBackPhoto = 'takeOrUploadBackPhoto',
   processingPhoto = 'processingPhoto',
+  retryFrontPhoto = 'retryFrontPhoto',
+  retryBackPhoto = 'retryBackPhoto',
   success = 'success',
   failure = 'failure',
 }
@@ -25,8 +27,7 @@ export enum Actions {
   assignIdCountryAndType = 'assignIdCountryAndType',
   assignFrontImage = 'assignFrontImage',
   assignBackImage = 'assignBackImage',
-  assignFrontImageError = 'assignFrontImageError',
-  assignBackImageError = 'assignBackImageError',
+  assignImageErrors = 'assignImageErrors',
 }
 
 export type MachineContext = {
@@ -38,8 +39,8 @@ export type MachineContext = {
   country?: string; // TODO: replace with 3 char country alpha code
   frontImage?: string; // Base64 encoded
   backImage?: string; // Base64 encoded
-  error?: IdScanBadImageError;
-  retryCount: number;
+  frontImageError?: IdScanBadImageError;
+  backImageError?: IdScanBadImageError;
 };
 
 export type MachineEvents =

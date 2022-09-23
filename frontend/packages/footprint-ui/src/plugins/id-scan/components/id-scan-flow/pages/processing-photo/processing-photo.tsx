@@ -9,7 +9,7 @@ import { HeaderTitle } from '../../../../../../components';
 import IdScanDocTypeToLabel from '../../../../constants/doc-type-labels';
 import { Events } from '../../../../utils/state-machine/types';
 import { useIdScanMachine } from '../../../machine-provider';
-import useCheckPhotoStatus from './hooks/use-check-photo-status';
+import useSubmitPhoto from './hooks/use-submit-photo';
 
 enum Status {
   loading,
@@ -22,40 +22,50 @@ const TRANSITION_DELAY = 3000;
 const ProcessingPhoto = () => {
   const { t } = useTranslation('pages.processing-photo');
   const [state, send] = useIdScanMachine();
-  const type = state.context.type
-    ? IdScanDocTypeToLabel[state.context.type]
+  const { type, frontImage, backImage } = state.context;
+  const docType = type
+    ? IdScanDocTypeToLabel[type]
     : t('default-document-label');
   const [status, setStatus] = useState<Status>(Status.loading);
 
-  useCheckPhotoStatus({
-    onSuccess: () => {
-      setStatus(Status.success);
-      setTimeout(() => {
-        send({
-          type: Events.imageSucceeded,
-        });
-      }, TRANSITION_DELAY);
+  useSubmitPhoto(
+    {
+      front: frontImage,
+      back: backImage,
     },
-    onError: (
-      frontImageError?: IdScanBadImageError,
-      backImageError?: IdScanBadImageError,
-    ) => {
-      setStatus(Status.error);
-      setTimeout(() => {
-        send({
-          type: Events.imageFailed,
-          payload: {
-            frontImageError,
-            backImageError,
-          },
-        });
-      }, TRANSITION_DELAY);
+    {
+      onSuccess: () => {
+        setStatus(Status.success);
+        setTimeout(() => {
+          send({
+            type: Events.imageSucceeded,
+          });
+        }, TRANSITION_DELAY);
+      },
+      onError: (
+        frontImageError?: IdScanBadImageError,
+        backImageError?: IdScanBadImageError,
+      ) => {
+        setStatus(Status.error);
+        setTimeout(() => {
+          send({
+            type: Events.imageFailed,
+            payload: {
+              frontImageError,
+              backImageError,
+            },
+          });
+        }, TRANSITION_DELAY);
+      },
     },
-  });
+  );
 
   return (
     <Container>
-      <HeaderTitle title={t('title', { type })} subtitle={t('subtitle')} />
+      <HeaderTitle
+        title={t('title', { type: docType })}
+        subtitle={t('subtitle')}
+      />
       {status === Status.loading && (
         <>
           <LoadingIndicator />

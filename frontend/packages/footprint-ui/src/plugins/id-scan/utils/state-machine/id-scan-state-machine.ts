@@ -13,9 +13,7 @@ const createIdScanMachine = () =>
     {
       id: 'idScan',
       initial: States.init,
-      context: {
-        retryCount: 0,
-      },
+      context: {},
       states: {
         [States.init]: {
           on: {
@@ -56,13 +54,47 @@ const createIdScanMachine = () =>
             },
             [Events.imageFailed]: [
               {
-                target: States.failure, // TODO: replace with retry,
-                actions: [
-                  Actions.assignFrontImageError,
-                  Actions.assignBackImageError,
-                ],
+                target: States.retryFrontPhoto,
+                actions: [Actions.assignImageErrors],
+                cond: (context, event) => !!event.payload.frontImageError,
+              },
+              {
+                target: States.retryBackPhoto,
+                actions: [Actions.assignImageErrors],
+                cond: (context, event) => !!event.payload.backImageError,
+              },
+              {
+                target: States.failure,
+                actions: [Actions.assignImageErrors],
+                // TODO: sync up with backend, we are assuming that if no errors are returned, it exceeded retry limit
+                cond: (context, event) =>
+                  !event.payload.backImageError &&
+                  !event.payload.frontImageError,
               },
             ],
+          },
+        },
+        [States.retryFrontPhoto]: {
+          on: {
+            [Events.receivedFrontImage]: [
+              {
+                target: States.takeOrUploadBackPhoto,
+                actions: Actions.assignFrontImage,
+                cond: context => !!context.backImageError,
+              },
+              {
+                target: States.processingPhoto,
+                actions: Actions.assignFrontImage,
+              },
+            ],
+          },
+        },
+        [States.retryBackPhoto]: {
+          on: {
+            [Events.receivedBackImage]: {
+              target: States.processingPhoto,
+              actions: Actions.assignBackImage,
+            },
           },
         },
         [States.success]: {
@@ -99,6 +131,13 @@ const createIdScanMachine = () =>
         [Actions.assignBackImage]: assign((context, event) => {
           if (event.type === Events.receivedBackImage) {
             context.backImage = event.payload.image;
+          }
+          return context;
+        }),
+        [Actions.assignImageErrors]: assign((context, event) => {
+          if (event.type === Events.imageFailed) {
+            context.frontImageError = event.payload.frontImageError;
+            context.backImageError = event.payload.backImageError;
           }
           return context;
         }),

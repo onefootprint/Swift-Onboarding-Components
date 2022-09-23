@@ -1,10 +1,13 @@
+import useTranslation from 'hooks/src/use-translation/use-translation';
 import React from 'react';
 
+import IdScanDocTypeToLabel from '../../../../constants/doc-type-labels';
 import { Events } from '../../../../utils/state-machine/types';
 import { useIdScanMachine } from '../../../machine-provider';
 import TakeOrUploadPhoto from '../../../take-or-upload-photo';
 
 const TakeOrUploadFrontPhoto = () => {
+  const { t } = useTranslation('pages.take-or-upload-photo.front');
   const [state, send] = useIdScanMachine();
   const { type } = state.context;
   if (!type) {
@@ -21,7 +24,16 @@ const TakeOrUploadFrontPhoto = () => {
   };
 
   return (
-    <TakeOrUploadPhoto side="front" type={type} onComplete={handleComplete} />
+    <TakeOrUploadPhoto
+      title={t('title', {
+        type: IdScanDocTypeToLabel[type],
+      })}
+      subtitle={t('subtitle', {
+        type: IdScanDocTypeToLabel[type],
+      })}
+      showGuidelines
+      onComplete={handleComplete}
+    />
   );
 };
 

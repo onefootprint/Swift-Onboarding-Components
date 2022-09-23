@@ -1,17 +1,16 @@
 import { useTranslation } from 'hooks';
 import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
-import { IdScanDocType } from 'types';
 import { Button } from 'ui';
 
 import { HeaderTitle } from '../../../../components';
-import IdScanDocTypeToLabel from '../../constants/doc-type-labels';
 import MissingPermissions from '../missing-permissions';
 import ScanGuidelines from '../scan-guidelines';
 
 type TakeOrUploadPhotoProps = {
-  type: IdScanDocType;
-  side: 'front' | 'back';
+  title: string;
+  subtitle: string;
+  showGuidelines?: boolean;
   onComplete: (image: string) => void;
 };
 
@@ -21,8 +20,9 @@ enum SelectionType {
 }
 
 const TakeOrUploadPhoto = ({
-  type,
-  side,
+  title,
+  subtitle,
+  showGuidelines,
   onComplete,
 }: TakeOrUploadPhotoProps) => {
   const { t } = useTranslation('components.take-or-upload-photo');
@@ -64,17 +64,8 @@ const TakeOrUploadPhoto = ({
   return (
     <>
       <Container>
-        <HeaderTitle
-          title={t('title', {
-            type: IdScanDocTypeToLabel[type],
-            side: side.toUpperCase(),
-          })}
-          subtitle={t('subtitle', {
-            type: IdScanDocTypeToLabel[type],
-            side: side.toUpperCase(),
-          })}
-        />
-        <ScanGuidelines />
+        <HeaderTitle title={title} subtitle={subtitle} />
+        {showGuidelines && <ScanGuidelines />}
         <ButtonsContainer>
           <Button
             onClick={() => {

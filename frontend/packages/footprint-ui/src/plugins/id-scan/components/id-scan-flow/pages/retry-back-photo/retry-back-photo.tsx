@@ -1,16 +1,17 @@
 import { useTranslation } from 'hooks';
 import React from 'react';
 
+import BadImageErrorLabel from '../../../../constants/bad-image-error-label';
 import IdScanDocTypeToLabel from '../../../../constants/doc-type-labels';
 import { Events } from '../../../../utils/state-machine/types';
 import { useIdScanMachine } from '../../../machine-provider';
 import TakeOrUploadPhoto from '../../../take-or-upload-photo';
 
-const TakeOrUploadBackPhoto = () => {
-  const { t } = useTranslation('pages.take-or-upload-photo.back');
+const RetryBackPhoto = () => {
   const [state, send] = useIdScanMachine();
-  const { type } = state.context;
-  if (!type) {
+  const { t } = useTranslation('pages.retry-photo.back');
+  const { backImageError, type } = state.context;
+  if (!backImageError || !type) {
     return null;
   }
 
@@ -28,13 +29,10 @@ const TakeOrUploadBackPhoto = () => {
       title={t('title', {
         type: IdScanDocTypeToLabel[type],
       })}
-      subtitle={t('subtitle', {
-        type: IdScanDocTypeToLabel[type],
-      })}
-      showGuidelines
+      subtitle={BadImageErrorLabel[backImageError]}
       onComplete={handleComplete}
     />
   );
 };
 
-export default TakeOrUploadBackPhoto;
+export default RetryBackPhoto;
