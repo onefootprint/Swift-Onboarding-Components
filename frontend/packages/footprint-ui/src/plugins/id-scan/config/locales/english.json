@@ -3,10 +3,12 @@
     "errors": {}
   },
   "components": {
-    "missing-camera-permissions": {
-      "title": "Allow access to your camera",
-      "description": "This lets you take photos of your document, and we can use them to properly verify your ID.",
-      "action-required": "Open settings to update camera permissions."
+    "missing-permissions": {
+      "title": "Allow access to your {{permissionName}}",
+      "subtitle": "This lets you submit photos of your document, and we can use them to properly verify your ID.",
+      "camera-permission-name": "camera",
+      "photo-lib-permission-name": "photo library",
+      "action-required": "Open settings to update {{permissionName}} permissions."
     },
     "scan-guidelines": {
       "check-lighting": {
@@ -48,6 +50,12 @@
         },
         "cta": "Continue"
       }
+    },
+    "take-or-upload-photo": {
+      "title": "Submit your {{type}} ({{side}})",
+      "subtitle": "Upload or take a photo of the {{side}} of your {{type}}.",
+      "take": "Take photo",
+      "upload": "Upload photo"
     }
   }
 }

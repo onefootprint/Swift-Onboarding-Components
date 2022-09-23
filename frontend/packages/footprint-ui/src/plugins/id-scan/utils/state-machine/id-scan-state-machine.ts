@@ -27,12 +27,26 @@ const createIdScanMachine = () =>
         },
         [States.idCountryAndTypeSelection]: {
           on: {
-            [Events.idCountryAndTypeSelected]: [
-              {
-                target: States.success,
-                actions: Actions.assignIdCountryAndType,
-              },
-            ],
+            [Events.idCountryAndTypeSelected]: {
+              target: States.takeOrUploadFrontPhoto,
+              actions: Actions.assignIdCountryAndType,
+            },
+          },
+        },
+        [States.takeOrUploadFrontPhoto]: {
+          on: {
+            [Events.receivedFrontImage]: {
+              target: States.takeOrUploadBackPhoto,
+              actions: Actions.assignFrontImage,
+            },
+          },
+        },
+        [States.takeOrUploadBackPhoto]: {
+          on: {
+            [Events.receivedBackImage]: {
+              target: States.success,
+              actions: Actions.assignBackImage,
+            },
           },
         },
         [States.success]: {
@@ -54,6 +68,18 @@ const createIdScanMachine = () =>
           if (event.type === Events.idCountryAndTypeSelected) {
             context.type = event.payload.type;
             context.country = event.payload.country;
+          }
+          return context;
+        }),
+        [Actions.assignFrontImage]: assign((context, event) => {
+          if (event.type === Events.receivedFrontImage) {
+            context.frontImage = event.payload.image;
+          }
+          return context;
+        }),
+        [Actions.assignBackImage]: assign((context, event) => {
+          if (event.type === Events.receivedBackImage) {
+            context.backImage = event.payload.image;
           }
           return context;
         }),

@@ -6,27 +6,34 @@ import { BottomSheet, Typography } from 'ui';
 
 import { HeaderTitle } from '../../../../components';
 
-type MissingCameraPermissionsProps = {
+type MissingPermissionsProps = {
+  permissionName: string;
   open: boolean;
   onClose: () => void;
 };
 
-const MissingCameraPermissions = ({
+const MissingPermissions = ({
+  permissionName,
   open,
   onClose,
-}: MissingCameraPermissionsProps) => {
-  const { t } = useTranslation('components.missing-camera-permissions');
+}: MissingPermissionsProps) => {
+  const { t } = useTranslation('components.missing-permissions');
   return (
     <BottomSheet open={open} onClose={onClose} title="">
       <Body>
         <IlluLightPhoneWithId />
         <TextContainer>
-          <HeaderTitle title="title" subtitle="description" />
+          <HeaderTitle
+            title={t('title', { permissionName })}
+            subtitle={t('subtitle')}
+          />
           {/* 
             TODO: Check if settings can be opened here.
             https://linear.app/footprint/issue/FP-1422/check-whether-settings-on-phone-can-be-opened-automatically-if-camera
            */}
-          <Typography variant="body-2">{t('action-required')}</Typography>
+          <Typography variant="body-2">
+            {t('action-required', { permissionName })}
+          </Typography>
         </TextContainer>
       </Body>
     </BottomSheet>
@@ -49,4 +56,4 @@ const TextContainer = styled.div`
   `}
 `;
 
-export default MissingCameraPermissions;
+export default MissingPermissions;
