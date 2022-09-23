@@ -8,12 +8,16 @@ import { HeaderTitle } from '../../../../components';
 
 type MissingCameraPermissionsProps = {
   open: boolean;
+  onClose: () => void;
 };
 
-const MissingCameraPermissions = ({ open }: MissingCameraPermissionsProps) => {
+const MissingCameraPermissions = ({
+  open,
+  onClose,
+}: MissingCameraPermissionsProps) => {
   const { t } = useTranslation('components.missing-camera-permissions');
   return (
-    <BottomSheet open={open}>
+    <BottomSheet open={open} onClose={onClose} title="">
       <Body>
         <IlluLightPhoneWithId />
         <TextContainer>
@@ -22,7 +26,7 @@ const MissingCameraPermissions = ({ open }: MissingCameraPermissionsProps) => {
             TODO: Check if settings can be opened here.
             https://linear.app/footprint/issue/FP-1422/check-whether-settings-on-phone-can-be-opened-automatically-if-camera
            */}
-          <Typography>{t('action-required')}</Typography>
+          <Typography variant="body-2">{t('action-required')}</Typography>
         </TextContainer>
       </Body>
     </BottomSheet>

@@ -59,7 +59,9 @@ describe('<BottomSheet />', () => {
         closeButton = screen.getByRole('button', { name: 'Close' });
         expect(closeButton).toBeInTheDocument();
       });
-      await userEvent.click(closeButton);
+      if (closeButton) {
+        await userEvent.click(closeButton);
+      }
       expect(onCloseMockFn).toHaveBeenCalled();
     });
 

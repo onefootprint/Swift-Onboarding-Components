@@ -1,13 +1,13 @@
-import type { Icon as TIcon } from 'icons';
+import type { Icon } from 'icons';
 import React from 'react';
 import styled, { css } from 'styled-components';
 import { Box, Typography } from 'ui';
 
-type DisclaimerProps = {
-  items: { title: string; description: string; Icon: TIcon }[];
+export type InfoBoxProps = {
+  items: { title: string; description: string; Icon: Icon }[];
 };
 
-const Disclaimer = ({ items }: DisclaimerProps) => (
+const InfoBox = ({ items }: InfoBoxProps) => (
   <Container>
     {items.map(({ title, description, Icon }) => (
       <Item title={title} key={title}>
@@ -56,4 +56,4 @@ const IconContainer = styled.div`
   `}
 `;
 
-export default Disclaimer;
+export default InfoBox;

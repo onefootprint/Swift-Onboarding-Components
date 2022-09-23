@@ -1,4 +1,4 @@
-import { HeaderTitle } from 'footprint-elements';
+import { HeaderTitle, InfoBox } from 'footprint-elements';
 import { useInputMask, useTranslation } from 'hooks';
 import { IcoFileText24, IcoLock24, IcoShield24 } from 'icons';
 import React from 'react';
@@ -8,7 +8,6 @@ import { Button, TextInput } from 'ui';
 
 import { SSN9Information } from '../../../../../../utils/state-machine/types';
 import ProgressHeader from '../../../../components/progress-header';
-import Disclaimer from '../disclaimer';
 
 type FormData = SSN9Information;
 
@@ -47,7 +46,7 @@ const SSN9 = ({ isMutationLoading, onSubmit }: SSN9Props) => {
             pattern: /^(?!(000|666|9))(\d{3}-?(?!(00))\d{2}-?(?!(0000))\d{4})$/,
           })}
         />
-        <Disclaimer
+        <InfoBox
           items={[
             {
               title: t('disclaimer.security.title'),
