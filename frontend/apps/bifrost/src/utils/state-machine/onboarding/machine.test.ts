@@ -7,6 +7,7 @@ import { Events, States } from './types';
 
 describe('Onboarding Machine Tests', () => {
   const tenant: TenantInfo = {
+    isLive: true,
     pk: 'pk',
     name: 'tenant',
     mustCollectData: [
