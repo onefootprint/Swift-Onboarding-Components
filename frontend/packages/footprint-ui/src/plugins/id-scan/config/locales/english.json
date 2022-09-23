@@ -2,7 +2,13 @@
   "global": {
     "errors": {}
   },
-  "components": {},
+  "components": {
+    "missing-camera-permissions": {
+      "title": "Allow access to your camera",
+      "description": "This lets you take photos of your document, and we can use them to properly verify your ID.",
+      "action-required": "Open settings to update camera permissions."
+    }
+  },
   "pages": {
     "country-and-type-selection": {
       "title": "Scan or upload your ID",

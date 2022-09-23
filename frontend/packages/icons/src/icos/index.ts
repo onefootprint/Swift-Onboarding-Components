@@ -169,6 +169,7 @@ export { default as IcoWarning16 } from './ico-warning-16';
 export { default as IcoWarning24 } from './ico-warning-24';
 export { default as IcoWriting16 } from './ico-writing-16';
 export { default as IcoWriting24 } from './ico-writing-24';
+export { default as IlluLightPhoneWithId } from './illu-light-phone-with-id';
 export { default as LogoFpCompact } from './logo-fp-compact';
 export { default as LogoFpDefault } from './logo-fp-default';
 export { default as LogoFpLarge } from './logo-fp-large';
