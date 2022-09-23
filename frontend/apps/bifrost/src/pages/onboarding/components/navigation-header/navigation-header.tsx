@@ -1,17 +1,12 @@
-import { NavigationHeader } from 'footprint-elements';
+import { NavigationHeader as FootprintNavigationHeader } from 'footprint-elements';
 import React from 'react';
 import { Events } from 'src/utils/state-machine/onboarding';
-import { Stepper } from 'ui';
 
 import useOnboardingMachine from '../../hooks/use-onboarding-machine';
-import {
-  getCurrentStepFromMissingAttributes,
-  getMaxStepFromMissingAttributes,
-} from './progress-header.utils';
+import getCurrentStepFromMissingAttributes from './navigation-header.utils';
 
-const ProgressHeader = () => {
+const NavigationHeader = () => {
   const [state, send] = useOnboardingMachine();
-  const max = getMaxStepFromMissingAttributes(state.context.missingAttributes);
   const value = getCurrentStepFromMissingAttributes(
     state.context.missingAttributes,
     state.value,
@@ -23,16 +18,14 @@ const ProgressHeader = () => {
   };
 
   return (
-    <NavigationHeader
+    <FootprintNavigationHeader
       button={{
         confirmClose: shouldShowCloseButton,
         onClick: shouldShowCloseButton ? undefined : handleBackButtonClick,
         variant: shouldShowCloseButton ? 'close' : 'back',
       }}
-    >
-      <Stepper max={max} value={value} />
-    </NavigationHeader>
+    />
   );
 };
 
-export default ProgressHeader;
+export default NavigationHeader;

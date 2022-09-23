@@ -10,7 +10,7 @@ import styled, { css } from 'styled-components';
 import { UserData, UserDataAttribute } from 'types';
 import { Button, Grid, TextInput } from 'ui';
 
-import ProgressHeader from '../../../../components/progress-header/progress-header';
+import NavigationHeader from '../../../../components/navigation-header/navigation-header';
 import useOnboardingMachine from '../../../../hooks/use-onboarding-machine';
 
 export type NameData = Required<
@@ -54,7 +54,7 @@ const NameForm = ({ isMutationLoading, onSubmit }: NameFormProps) => {
 
   return (
     <>
-      <ProgressHeader />
+      <NavigationHeader />
       <Form onSubmit={handleSubmit(onSubmitFormData)}>
         <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
         <Grid.Row>

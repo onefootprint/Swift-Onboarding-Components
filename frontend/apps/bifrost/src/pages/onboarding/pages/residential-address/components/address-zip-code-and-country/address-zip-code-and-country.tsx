@@ -2,7 +2,7 @@ import { HeaderTitle } from 'footprint-elements';
 import { useTranslation } from 'hooks';
 import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import ProgressHeader from 'src/pages/onboarding/components/progress-header';
+import NavigationHeader from 'src/pages/onboarding/components/navigation-header';
 import useOnboardingMachine from 'src/pages/onboarding/hooks/use-onboarding-machine';
 import { isMissingSsnAttribute } from 'src/utils/state-machine/onboarding/utils/missing-attributes';
 import { ResidentialZipCodeAndCountry } from 'src/utils/state-machine/types';
@@ -69,7 +69,7 @@ const AddressZipCodeAndCountry = ({
 
   return (
     <>
-      <ProgressHeader />
+      <NavigationHeader />
       <Form onSubmit={handleSubmit(onSubmitFormData)}>
         <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
         <Controller

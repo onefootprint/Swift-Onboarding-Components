@@ -3,7 +3,7 @@ import { STATES } from 'global-constants';
 import { useTranslation } from 'hooks';
 import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import ProgressHeader from 'src/pages/onboarding/components/progress-header';
+import NavigationHeader from 'src/pages/onboarding/components/navigation-header';
 import { isMissingSsnAttribute } from 'src/utils/state-machine/onboarding/utils/missing-attributes';
 import { ResidentialAddressFull } from 'src/utils/state-machine/types';
 import styled, { css } from 'styled-components';
@@ -128,7 +128,7 @@ const AddressFull = ({ isMutationLoading, onSubmit }: AddressFullProps) => {
 
   return (
     <>
-      <ProgressHeader />
+      <NavigationHeader />
       <Form onSubmit={handleSubmit(onSubmitFormData)}>
         <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
         <Controller

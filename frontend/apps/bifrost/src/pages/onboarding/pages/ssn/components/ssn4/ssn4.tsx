@@ -6,7 +6,7 @@ import styled, { css } from 'styled-components';
 import { Button, TextInput } from 'ui';
 
 import { SSN4Information } from '../../../../../../utils/state-machine/types';
-import ProgressHeader from '../../../../components/progress-header';
+import NavigationHeader from '../../../../components/navigation-header';
 
 type FormData = SSN4Information;
 
@@ -27,7 +27,7 @@ const SSN4 = ({ isMutationLoading, onSubmit }: SSN4Props) => {
 
   return (
     <>
-      <ProgressHeader />
+      <NavigationHeader />
       <Form onSubmit={handleSubmit(onSubmit)}>
         <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
         <TextInput

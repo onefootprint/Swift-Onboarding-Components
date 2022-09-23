@@ -12,7 +12,7 @@ import styled, { css } from 'styled-components';
 import { UserDataAttribute } from 'types';
 import { Button, Grid, TextInput } from 'ui';
 
-import ProgressHeader from '../../../../components/progress-header/progress-header';
+import NavigationHeader from '../../../../components/navigation-header/navigation-header';
 import validateDob from '../../utils/validate-dob/validate-dob';
 
 type FormData = NameAndDobInformation;
@@ -59,7 +59,7 @@ const NameAndDobForm = ({
 
   return (
     <>
-      <ProgressHeader />
+      <NavigationHeader />
       <Form onSubmit={handleSubmit(onSubmitFormData)}>
         <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
         <Grid.Row>

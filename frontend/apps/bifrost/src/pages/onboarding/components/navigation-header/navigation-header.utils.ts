@@ -7,26 +7,7 @@ import {
 } from 'src/utils/state-machine/onboarding/utils/missing-attributes';
 import { CollectedDataOption } from 'types';
 
-export const getMaxStepFromMissingAttributes = (
-  mustCollect: readonly CollectedDataOption[],
-) => {
-  if (!hasMissingAttributes(mustCollect)) {
-    return 0;
-  }
-  let maxStep = 0;
-  if (isMissingBasicAttribute(mustCollect)) {
-    maxStep += 1;
-  }
-  if (isMissingResidentialAttribute(mustCollect)) {
-    maxStep += 1;
-  }
-  if (isMissingSsnAttribute(mustCollect)) {
-    maxStep += 1;
-  }
-  return maxStep;
-};
-
-export const getCurrentStepFromMissingAttributes = (
+const getCurrentStepFromMissingAttributes = (
   mustCollect: readonly CollectedDataOption[],
   state: States,
 ) => {
@@ -54,3 +35,5 @@ export const getCurrentStepFromMissingAttributes = (
   }
   return currentStep;
 };
+
+export default getCurrentStepFromMissingAttributes;
