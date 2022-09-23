@@ -66,6 +66,7 @@ const LinkButton = forwardRef<HTMLAnchorElement, LinkButtonProps>(
         rel={target === '_blank' ? 'noopener noreferrer' : undefined}
         sx={sxStyles}
         iconPosition={iconPosition}
+        type={href ? undefined : 'button'}
       >
         {iconPosition === 'left' && renderedIcon}
         {children}

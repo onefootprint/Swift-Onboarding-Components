@@ -1,5 +1,5 @@
 import { DeviceInfo } from 'hooks';
-import { IdScanBadImageError, IdScanDocType, TenantInfo } from 'types';
+import { IdScanBadImageError, IdScanDocType } from 'types';
 
 export enum States {
   init = 'init',
@@ -20,8 +20,7 @@ export enum Actions {
 export type MachineContext = {
   // Plugin context
   authToken?: string;
-  tenantInfo?: TenantInfo;
-  deviceInfo?: DeviceInfo;
+  device?: DeviceInfo;
   // Machine generated
   type?: IdScanDocType;
   country?: string; // TODO: replace with 3 char country alpha code
@@ -35,8 +34,7 @@ export type MachineEvents =
       type: Events.receivedContext;
       payload: {
         authToken: string;
-        tenantInfo: TenantInfo;
-        deviceInfo: DeviceInfo;
+        device: DeviceInfo;
       };
     }
   | {

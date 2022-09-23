@@ -157,7 +157,7 @@ describe('Onboarding Machine Tests', () => {
       });
       context = state.context;
       expect(context.data.ssn9).toEqual('101010101');
-      expect(state.value).toEqual(States.livenessRegister);
+      expect(state.value).toEqual(States.webAuthn);
     });
 
     it('Skips states without missing attributes', () => {

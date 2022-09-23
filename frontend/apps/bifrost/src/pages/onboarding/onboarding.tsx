@@ -1,12 +1,10 @@
-import { withProvider } from 'footprint-elements';
+import { WebAuthn, withProvider } from 'footprint-elements';
 import has from 'lodash/has';
 import React from 'react';
 import { States } from 'src/utils/state-machine/onboarding';
 
-import LivenessRegister from '../liveness-register';
-import MachineProvider, {
-  useOnboardingMachine,
-} from './components/machine-provider';
+import MachineProvider from './components/machine-provider';
+import useOnboardingMachine, { Events } from './hooks/use-onboarding-machine';
 import AdditionalInfoRequired from './pages/additional-info-required';
 import BasicInformation from './pages/basic-information';
 import OnboardingVerification from './pages/onboarding-verification/onboarding-verification';
@@ -18,12 +16,27 @@ type Page = {
 };
 
 const Onboarding = () => {
-  const [state] = useOnboardingMachine();
+  const [state, send] = useOnboardingMachine();
   const valueCasted = state.value as States;
+
+  if (state.matches(States.webAuthn)) {
+    return (
+      <WebAuthn
+        context={{
+          authToken: state.context.authToken,
+          device: state.context.device,
+        }}
+        metadata={{}}
+        onDone={() => {
+          send({ type: Events.webAuthnCompleted });
+        }}
+      />
+    );
+  }
+
   const pages: Page = {
     [States.onboardingVerification]: OnboardingVerification,
     [States.additionalDataRequired]: AdditionalInfoRequired,
-    [States.livenessRegister]: LivenessRegister,
     [States.basicInformation]: BasicInformation,
     [States.residentialAddress]: ResidentialAddress,
     [States.ssn]: SSN,

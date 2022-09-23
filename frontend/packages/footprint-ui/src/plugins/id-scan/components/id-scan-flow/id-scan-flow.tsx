@@ -17,8 +17,7 @@ const IdScanFlow = ({ context, onDone }: IdScanFlowProps) => {
       type: Events.receivedContext,
       payload: {
         authToken: context.authToken,
-        tenantInfo: context.tenantInfo,
-        deviceInfo: context.deviceInfo,
+        device: context.device,
       },
     });
   });

@@ -3,13 +3,13 @@ import { TenantInfo } from 'types';
 
 export type PluginContext<T> = {
   authToken: string;
-  tenantInfo: TenantInfo;
-  deviceInfo: DeviceInfo;
-  customData: T;
+  customData?: T;
+  device: DeviceInfo;
+  tenantInfo?: TenantInfo;
 };
 
-export type BasePluginProps<T> = {
+export type BasePluginProps<T = void> = {
   context: PluginContext<T>;
-  customMetadata: any;
+  metadata: any;
   onDone: () => void;
 };

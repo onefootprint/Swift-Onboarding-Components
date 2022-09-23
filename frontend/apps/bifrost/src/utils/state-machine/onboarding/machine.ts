@@ -2,7 +2,6 @@ import { DeviceInfo } from 'hooks';
 import { TenantInfo } from 'types';
 import { assign, createMachine } from 'xstate';
 
-import createLivenessRegisterMachine from '../liveness-register';
 import {
   Actions,
   Events,
@@ -100,7 +99,7 @@ const createOnboardingMachine = ({
                 isMissingSsnAttribute(context.missingAttributes, context.data),
             },
             {
-              target: States.livenessRegister,
+              target: States.webAuthn,
               cond: context => context.missingWebauthnCredentials,
             },
             {
@@ -136,7 +135,7 @@ const createOnboardingMachine = ({
                   ),
               },
               {
-                target: States.livenessRegister,
+                target: States.webAuthn,
                 description:
                   'If there are other attributes missing in addition to webauthn for an existing user, take them to liveness register, since the user likely abandoned onboarding early.',
                 cond: context =>
@@ -150,19 +149,11 @@ const createOnboardingMachine = ({
             ],
           },
         },
-        [States.livenessRegister]: {
-          invoke: {
-            id: 'livenessRegister',
-            src: context =>
-              createLivenessRegisterMachine({
-                device: context.device,
-                authToken: context.authToken,
-              }),
-            onDone: [
-              {
-                target: States.onboardingComplete,
-              },
-            ],
+        [States.webAuthn]: {
+          on: {
+            [Events.webAuthnCompleted]: {
+              target: States.onboardingComplete,
+            },
           },
         },
         [States.basicInformation]: {
@@ -187,7 +178,7 @@ const createOnboardingMachine = ({
                   ),
               },
               {
-                target: States.livenessRegister,
+                target: States.webAuthn,
                 actions: [Actions.assignBasicInformation],
                 cond: context => context.missingWebauthnCredentials,
               },
@@ -211,7 +202,7 @@ const createOnboardingMachine = ({
                   ),
               },
               {
-                target: States.livenessRegister,
+                target: States.webAuthn,
                 actions: [Actions.assignResidentialAddress],
                 cond: context => context.missingWebauthnCredentials,
               },
@@ -233,7 +224,7 @@ const createOnboardingMachine = ({
           on: {
             [Events.ssnSubmitted]: [
               {
-                target: States.livenessRegister,
+                target: States.webAuthn,
                 actions: [Actions.assignSsn],
                 cond: context => context.missingWebauthnCredentials,
               },
