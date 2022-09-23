@@ -5,6 +5,7 @@ import { IdScanDocType } from 'types';
 import { Button } from 'ui';
 
 import { HeaderTitle } from '../../../../components';
+import IdScanDocTypeToLabel from '../../constants/doc-type-labels';
 import MissingPermissions from '../missing-permissions';
 import ScanGuidelines from '../scan-guidelines';
 
@@ -12,12 +13,6 @@ type TakeOrUploadPhotoProps = {
   type: IdScanDocType;
   side: 'front' | 'back';
   onComplete: (image: string) => void;
-};
-
-const IdScanDocTypeToLabel: Record<IdScanDocType, string> = {
-  [IdScanDocType.driversLicense]: "driver's license",
-  [IdScanDocType.idCard]: 'ID card',
-  [IdScanDocType.passport]: 'passport',
 };
 
 enum SelectionType {

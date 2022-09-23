@@ -44,12 +44,31 @@ const createIdScanMachine = () =>
         [States.takeOrUploadBackPhoto]: {
           on: {
             [Events.receivedBackImage]: {
-              target: States.success,
+              target: States.processingPhoto,
               actions: Actions.assignBackImage,
             },
           },
         },
+        [States.processingPhoto]: {
+          on: {
+            [Events.imageSucceeded]: {
+              target: States.success,
+            },
+            [Events.imageFailed]: [
+              {
+                target: States.failure, // TODO: replace with retry,
+                actions: [
+                  Actions.assignFrontImageError,
+                  Actions.assignBackImageError,
+                ],
+              },
+            ],
+          },
+        },
         [States.success]: {
+          type: 'final',
+        },
+        [States.failure]: {
           type: 'final',
         },
       },

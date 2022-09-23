@@ -6,7 +6,9 @@ export enum States {
   idCountryAndTypeSelection = 'idCountryAndTypeSelection',
   takeOrUploadFrontPhoto = 'takeOrUploadFrontPhoto',
   takeOrUploadBackPhoto = 'takeOrUploadBackPhoto',
+  processingPhoto = 'processingPhoto',
   success = 'success',
+  failure = 'failure',
 }
 
 export enum Events {
@@ -14,6 +16,8 @@ export enum Events {
   idCountryAndTypeSelected = 'idCountryAndTypeSelected',
   receivedFrontImage = 'receivedFrontImage',
   receivedBackImage = 'receivedBackImage',
+  imageSucceeded = 'imageSucceeded',
+  imageFailed = 'imageFailed',
 }
 
 export enum Actions {
@@ -21,6 +25,8 @@ export enum Actions {
   assignIdCountryAndType = 'assignIdCountryAndType',
   assignFrontImage = 'assignFrontImage',
   assignBackImage = 'assignBackImage',
+  assignFrontImageError = 'assignFrontImageError',
+  assignBackImageError = 'assignBackImageError',
 }
 
 export type MachineContext = {
@@ -61,5 +67,15 @@ export type MachineEvents =
       type: Events.receivedBackImage;
       payload: {
         image: string;
+      };
+    }
+  | {
+      type: Events.imageSucceeded;
+    }
+  | {
+      type: Events.imageFailed;
+      payload: {
+        frontImageError?: IdScanBadImageError;
+        backImageError?: IdScanBadImageError;
       };
     };
