@@ -16,11 +16,15 @@
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
   },
   "dependencies": {
+    "@tanstack/react-query": "^4.3.9",
     "@xstate/react": "^3.0.1",
     "constate": "^3.3.2",
+    "global-constants": "*",
     "hooks": "*",
+    "i18next": "^21.9.2",
     "icons": "*",
     "postmate": "^1.5.2",
+    "react-i18next": "^11.18.6",
     "styled-media-query": "^2.1.2",
     "themes": "*",
     "types": "*",

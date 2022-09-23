@@ -50,7 +50,7 @@ export const COUNTRIES: CountryRecord[] = [
   {
     value: 'AI',
     label: 'Anguilla',
-    value3: 'AGO',
+    value3: 'AIA',
   },
   {
     value: 'AG',

@@ -254,7 +254,7 @@ export type CountryCode3 =
   | 'ASM'
   | 'AND'
   | 'AGO'
-  | 'AGO'
+  | 'AIA'
   | 'ATG'
   | 'ARG'
   | 'ARM'

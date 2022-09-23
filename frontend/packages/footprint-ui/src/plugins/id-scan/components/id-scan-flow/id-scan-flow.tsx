@@ -4,6 +4,7 @@ import { useEffectOnce } from 'usehooks-ts';
 import { IdScanProps } from '../../id-scan.types';
 import { Events, States } from '../../utils/state-machine/types';
 import { useIdScanMachine } from '../machine-provider';
+import IdCountryAndTypeSelection from './pages/country-and-type-selection';
 
 type IdScanFlowProps = Pick<IdScanProps, 'context' | 'onDone'>;
 
@@ -29,11 +30,10 @@ const IdScanFlow = ({ context, onDone }: IdScanFlowProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.done]);
 
-  // TODO: implement different pages
   if (state.matches(States.idCountryAndTypeSelection)) {
-    // return <IdCountryAndTypeSelection />;
-    return <div>idCountryAndTypeSelection</div>;
+    return <IdCountryAndTypeSelection />;
   }
-  return <div />;
+
+  return null;
 };
 export default IdScanFlow;

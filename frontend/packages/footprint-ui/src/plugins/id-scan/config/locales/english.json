@@ -1,0 +1,33 @@
+{
+  "global": {
+    "errors": {}
+  },
+  "components": {},
+  "pages": {
+    "country-and-type-selection": {
+      "title": "Scan or upload your ID",
+      "subtitle": "We need some more information about your identity.",
+      "form": {
+        "country": "Issuing country",
+        "type": {
+          "passport": {
+            "title": "Passport",
+            "description": "Photo page",
+            "value": "passport"
+          },
+          "idCard": {
+            "title": "Identity card",
+            "description": "Front & Back",
+            "value": "idCard"
+          },
+          "driversLicense": {
+            "title": "Driver's license",
+            "description": "Front & Back",
+            "value": "driversLicense"
+          }
+        },
+        "cta": "Continue"
+      }
+    }
+  }
+}

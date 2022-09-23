@@ -1,4 +1,4 @@
-import { Icon } from 'icons/src/types';
+import { Icon } from 'icons';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
@@ -84,7 +84,6 @@ const Option = styled.button<{ selected?: boolean }>`
     text-align: left;
     cursor: pointer;
     margin: 0;
-    border-radius: ${theme.borderRadius[2]}px;
     border: 1px solid ${theme.borderColor.tertiary};
     padding: ${theme.spacing[5]}px;
     display: flex;
@@ -99,12 +98,13 @@ const Option = styled.button<{ selected?: boolean }>`
       border-radius: 0 0 ${theme.borderRadius[2]}px ${theme.borderRadius[2]}px;
     }
 
-    &:not(:last-child) {
+    &:not(:first-child) {
       margin-top: -1px; // because of the borders
     }
 
     ${selected &&
     css`
+      z-index: 1;
       background-color: #4a24db14;
       border: 1px solid ${theme.borderColor.secondary};
     `}
