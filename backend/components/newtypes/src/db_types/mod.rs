@@ -7,6 +7,7 @@ mod data_attribute;
 mod data_identifier;
 mod data_priority;
 mod fingerprint;
+mod kyc_status;
 mod ob_config_status;
 mod sealed_bytes;
 mod status;
@@ -18,6 +19,6 @@ mod vendor;
 pub use self::{
     access_event_kind::*, attestation_type::*, audit_trail_event::*, collected_data::*,
     d2p_session_status::*, data_attribute::*, data_identifier::*, data_priority::*, fingerprint::*,
-    ob_config_status::*, sealed_bytes::*, status::*, tenant_permission::*, tenant_user_email::*,
-    vault_key_pair::*, vendor::*,
+    kyc_status::*, ob_config_status::*, sealed_bytes::*, status::*, tenant_permission::*,
+    tenant_user_email::*, vault_key_pair::*, vendor::*,
 };

@@ -8,7 +8,9 @@ use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
 use itertools::Itertools;
-use newtypes::{InsightEventId, ObConfigurationId, OnboardingId, ScopedUserId, Status, UserVaultId};
+use newtypes::{
+    InsightEventId, KycStatus, ObConfigurationId, OnboardingId, ScopedUserId, Status, UserVaultId,
+};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
@@ -23,6 +25,9 @@ pub struct Onboarding {
     pub _updated_at: DateTime<Utc>,
     pub status: Status,
     pub insight_event_id: InsightEventId,
+    pub kyc_status: KycStatus,
+    pub is_liveness_skipped: bool,
+    pub is_authorized: bool,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
@@ -33,6 +38,9 @@ struct NewOnboarding {
     start_timestamp: DateTime<Utc>,
     status: Status,
     insight_event_id: InsightEventId,
+    kyc_status: KycStatus,
+    is_liveness_skipped: bool,
+    is_authorized: bool,
 }
 
 pub type OnboardingInfo = (Onboarding, ObConfiguration, InsightEvent);
@@ -106,6 +114,9 @@ impl Onboarding {
             start_timestamp: Utc::now(),
             status: Status::Processing,
             insight_event_id: insight_event.id,
+            kyc_status: KycStatus::New,
+            is_liveness_skipped: false,
+            is_authorized: false,
         };
         let ob = diesel::insert_into(onboarding::table)
             .values(new_ob)
