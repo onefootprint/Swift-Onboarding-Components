@@ -80,6 +80,10 @@
       "back": {
         "title": "Resubmit your {{type}} (BACK)"
       }
+    },
+    "id-scan-failed": {
+      "title": "Document couldn't be verified",
+      "subtitle": "We'll review your identity and reach out to you shortly."
     }
   }
 }
