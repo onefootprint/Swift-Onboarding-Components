@@ -149,8 +149,7 @@ class TestDashboard:
         ob_config = body
         ob_config_key = TenantAuth(ob_config["key"])
 
-        body = post("hosted/onboarding", None, basic_user.auth_token, ob_config_key)
-        assert body["missing_attributes"] == ["ssn4"]
+        post("hosted/onboarding", None, basic_user.auth_token, ob_config_key)
 
     @pytest.mark.parametrize(
         "must_collect,can_access,expected_status",
