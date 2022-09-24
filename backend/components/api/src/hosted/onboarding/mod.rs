@@ -12,11 +12,13 @@ use crate::{
 pub mod complete;
 pub mod d2p;
 pub mod post;
+pub mod status;
 
 pub fn routes() -> web::Scope {
     web::scope("/onboarding")
         .service(web::resource("").route(web::post().to(post::handler)))
         .service(complete::handler)
+        .service(status::handler)
         .service(d2p::routes())
 }
 

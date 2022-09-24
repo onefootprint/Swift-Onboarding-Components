@@ -92,19 +92,23 @@ class TestBifrost:
         assert not body["available_challenge_kinds"]
 
     def test_onboarding_init(self, workos_tenant, auth_token):
-        post("hosted/onboarding", None, workos_tenant.ob_config.key, auth_token)
-        # TODO
-        """
-        assert set(body["missing_attributes"]) == {
+        body = post("hosted/onboarding", None, workos_tenant.ob_config.key, auth_token)
+        assert not body["validation_token"]
+
+        body = get(
+            "hosted/onboarding/status", None, workos_tenant.ob_config.key, auth_token
+        )
+
+        req = lambda kind: next(r for r in body["requirements"] if r["kind"] == kind)
+        identity_check_req = req("identity_check")
+        assert set(identity_check_req["missing_attributes"]) == {
             "name",
             "dob",
             "ssn9",
             "full_address",
             "email",
         }
-        assert body["missing_webauthn_credentials"] == True
-        assert not body["validation_token"]
-        """
+        assert req("liveness")
 
         # Shouldn't be able to complete the onboarding until user data is provided
         post(
@@ -257,13 +261,8 @@ class TestBifrost:
         )
         body = post("hosted/identify", data)
         assert body["user_found"]
-        assert set(body["available_challenge_kinds"]) == {
-            "sms",
-            "biometric"
-        }
-        assert (
-            body["challenge_data"]["phone_number_last_two"] == PHONE_NUMBER[-2:]
-        )
+        assert set(body["available_challenge_kinds"]) == {"sms", "biometric"}
+        assert body["challenge_data"]["phone_number_last_two"] == PHONE_NUMBER[-2:]
         assert body["challenge_data"]["phone_country"] == "US"
         assert body["challenge_data"]["challenge_kind"] == "biometric"
         assert body["challenge_data"]["biometric_challenge_json"]
@@ -313,10 +312,7 @@ class TestBifrost:
         body = post("hosted/identify", data)
         assert body["user_found"]
         assert not body["challenge_data"]
-        assert set(body["available_challenge_kinds"]) == {
-            "sms",
-            "biometric"
-        }
+        assert set(body["available_challenge_kinds"]) == {"sms", "biometric"}
 
     def test_identify_repeat_customer(self, foo_tenant, bar_tenant, twilio, auth_token):
         # Not used in test, but want to make sure the user has been created before running this test
@@ -332,10 +328,7 @@ class TestBifrost:
         def identify():
             body = post("hosted/identify", data)
             assert body["user_found"]
-            assert (
-                body["challenge_data"]["phone_number_last_two"]
-                == PHONE_NUMBER[-2:]
-            )
+            assert body["challenge_data"]["phone_number_last_two"] == PHONE_NUMBER[-2:]
             assert body["challenge_data"]["challenge_kind"] == "sms"
             return body["challenge_data"]["challenge_token"]
 
