@@ -11,7 +11,7 @@ export type BottomSheetProps = {
   open: boolean;
   onClose: () => void;
   children: React.ReactNode;
-  title: string;
+  title?: string;
   testID?: string;
   closeAriaLabel?: string;
 };
@@ -29,7 +29,7 @@ const BottomSheet = ({
   open,
   onClose,
   children,
-  title: headerTitle,
+  title,
   closeAriaLabel = 'Close',
   testID,
 }: BottomSheetProps) => {
@@ -65,7 +65,7 @@ const BottomSheet = ({
     <FocusTrap active={open}>
       <StyledOverlay onClick={onClose} aria-modal className={visibleState}>
         <Sheet className={visibleState} role="dialog" data-testid={testID}>
-          <Header>
+          <Header hasBorder={!!title}>
             <CloseContainer onClick={onClose}>
               <IconButton
                 aria-label={closeAriaLabel}
@@ -73,7 +73,7 @@ const BottomSheet = ({
                 onClick={onClose}
               />
             </CloseContainer>
-            <Typography variant="label-2">{headerTitle}</Typography>
+            {title && <Typography variant="label-2">{title}</Typography>}
           </Header>
           <Body>{children}</Body>
         </Sheet>
@@ -124,14 +124,19 @@ const Sheet = styled.div`
   `}
 `;
 
-const Header = styled.div`
-  ${({ theme }) => css`
-    border-bottom: 1px solid ${theme.borderColor.tertiary};
+const Header = styled.div<{ hasBorder: boolean }>`
+  ${({ theme, hasBorder }) => css`
+    height: 56px;
     padding: ${theme.spacing[5]}px;
     display: flex;
     justify-content: center;
     align-items: center;
     position: relative;
+
+    ${hasBorder &&
+    css`
+      border-bottom: 1px solid ${theme.borderColor.tertiary};
+    `}
   `}
 `;
 

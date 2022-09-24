@@ -6,8 +6,6 @@
     "missing-permissions": {
       "title": "Allow access to your {{permissionName}}",
       "subtitle": "This lets you submit photos of your document, and we can use them to properly verify your ID.",
-      "camera-permission-name": "camera",
-      "photo-lib-permission-name": "photo library",
       "action-required": "Open settings to update {{permissionName}} permissions."
     },
     "scan-guidelines": {
@@ -25,6 +23,8 @@
       }
     },
     "take-or-upload-photo": {
+      "camera-permission-name": "camera",
+      "photo-lib-permission-name": "photo library",
       "take": "Take photo",
       "upload": "Upload photo"
     }

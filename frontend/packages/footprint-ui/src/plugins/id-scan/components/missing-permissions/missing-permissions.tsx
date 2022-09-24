@@ -31,7 +31,10 @@ const MissingPermissions = ({
             TODO: Check if settings can be opened here.
             https://linear.app/footprint/issue/FP-1422/check-whether-settings-on-phone-can-be-opened-automatically-if-camera
            */}
-          <Typography variant="body-2">
+          <Typography
+            variant="body-2"
+            sx={{ textAlign: 'center', marginTop: 9 }}
+          >
             {t('action-required', { permissionName })}
           </Typography>
         </TextContainer>
@@ -44,6 +47,7 @@ const Body = styled.div`
   ${({ theme }) => css`
     padding: ${theme.spacing[7]}px 0;
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
   `}

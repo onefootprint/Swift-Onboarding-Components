@@ -68,6 +68,7 @@ const TakeOrUploadPhoto = ({
         {showGuidelines && <ScanGuidelines />}
         <ButtonsContainer>
           <Button
+            fullWidth
             onClick={() => {
               handleSelection(SelectionType.take);
             }}
@@ -75,6 +76,7 @@ const TakeOrUploadPhoto = ({
             {t('take')}
           </Button>
           <Button
+            fullWidth
             variant="secondary"
             onClick={() => {
               handleSelection(SelectionType.upload);
@@ -97,6 +99,7 @@ const TakeOrUploadPhoto = ({
 
 const ButtonsContainer = styled.div`
   ${({ theme }) => css`
+    width: 100%;
     display: flex;
     flex-direction: column;
     row-gap: ${theme.spacing[4]}px;
