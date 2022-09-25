@@ -18,11 +18,11 @@
     "docs",
     "@onefootprint/global-constants",
     "footprint-elements",
-    "@onefootprint/ui",
-    "@onefootprint/icons",
+    "ui",
+    "icons",
     "@onefootprint/hooks",
-    "@onefootprint/request",
-    "@onefootprint/test-utils",
-    "@onefootprint/themes"
+    "request",
+    "test-utils",
+    "themes"
   ]
 }
