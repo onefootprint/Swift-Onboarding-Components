@@ -37,7 +37,6 @@ export async function CreateRegionalVPC(
     defaultTags: { tags: { env: stack } },
   });
 
-  
   // use default dev-ephemeral VPC for ephemeral environments (this is fixed to footprint dev account)
   if (stack.startsWith('dev-')) {
     const vpc = awsx.ec2.Vpc.fromExistingIds(

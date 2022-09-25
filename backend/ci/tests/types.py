@@ -1,5 +1,5 @@
 from typing import NamedTuple
-from tests.auth import TenantAuth, TenantSecretAuth
+from tests.auth import PublishableOnboardingKey, TenantSecretAuth
 
 
 class SecretApiKey(NamedTuple):
@@ -18,7 +18,7 @@ class SecretApiKey(NamedTuple):
 
 
 class ObConfiguration(NamedTuple):
-    key: TenantAuth
+    key: PublishableOnboardingKey
     id: str
     name: str
     status: str
@@ -27,7 +27,7 @@ class ObConfiguration(NamedTuple):
 
     def from_response(resp):
         return ObConfiguration(
-            TenantAuth(resp["key"]),
+            PublishableOnboardingKey(resp["key"]),
             resp["id"],
             resp["name"],
             resp["status"],

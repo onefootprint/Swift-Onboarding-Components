@@ -6,12 +6,15 @@ use futures_util::Future;
 use newtypes::ObConfigurationKey;
 use paperclip::actix::Apiv2Header;
 
-use crate::{auth::AuthError, State};
+use crate::{
+    auth::{session_data::ob_session::ParsedOnboardingSession, AuthError, Either, SessionContext},
+    State,
+};
 
 #[derive(Debug, Clone, Apiv2Header)]
-/// SecretTenantAuthContext extracts a tenant's public key from the X-Onboarding-Config-Key header
-/// which authenticates the client as a tenant.
-pub struct PublicTenantAuthContext {
+/// Extracts a publishable key from the X-Onboarding-Config-Key header
+/// which indicates the tenant and onboarding configuration context
+pub struct PublicOnboardingContext {
     #[allow(unused)]
     #[openapi(
         name = "X-Onboarding-Config-Key",
@@ -28,7 +31,7 @@ pub struct PublicTenantAuthContext {
 
 const HEADER_NAME: &str = "X-Onboarding-Config-Key";
 
-impl FromRequest for PublicTenantAuthContext {
+impl FromRequest for PublicOnboardingContext {
     type Error = crate::ApiError;
     type Future = Pin<Box<dyn Future<Output = Result<Self, Self::Error>>>>;
 
@@ -50,7 +53,7 @@ impl FromRequest for PublicTenantAuthContext {
                 .db_query(|conn| ObConfiguration::get_enabled(conn, key))
                 .await??
                 .ok_or(AuthError::ApiKeyNotFound)?;
-            Ok(PublicTenantAuthContext {
+            Ok(PublicOnboardingContext {
                 onboarding_key: ob_config.key.clone(),
                 tenant,
                 ob_config,
@@ -61,5 +64,21 @@ impl FromRequest for PublicTenantAuthContext {
 
     fn extract(req: &actix_web::HttpRequest) -> Self::Future {
         Self::from_request(req, &mut actix_web::dev::Payload::None)
+    }
+}
+
+impl Either<PublicOnboardingContext, SessionContext<ParsedOnboardingSession>> {
+    pub fn ob_config(&self) -> &ObConfiguration {
+        match self {
+            Either::Left(l) => &l.ob_config,
+            Either::Right(r) => &r.data.ob_config,
+        }
+    }
+
+    pub fn tenant(&self) -> &Tenant {
+        match self {
+            Either::Left(l) => &l.tenant,
+            Either::Right(r) => &r.data.tenant,
+        }
     }
 }

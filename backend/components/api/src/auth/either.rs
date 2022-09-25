@@ -4,14 +4,12 @@ use actix_web::FromRequest;
 use db::models::tenant::Tenant;
 use futures_util::Future;
 use newtypes::DataAttribute;
-use paperclip::actix::Apiv2Security;
 
 use crate::errors::ApiError;
 
 use super::{AuthError, CheckTenantPermissions, TenantAuth};
 
-#[derive(Debug, Clone, Apiv2Security)]
-#[openapi(apiKey)]
+#[derive(Debug, Clone)]
 /// Abstract Session Context Type
 pub enum Either<A, B> {
     Left(A),
@@ -65,6 +63,33 @@ where
             }
         })
     }
+}
+
+impl<A: paperclip::v2::schema::Apiv2Schema, B: paperclip::v2::schema::Apiv2Schema>
+    paperclip::v2::schema::Apiv2Schema for Either<A, B>
+{
+    fn name() -> Option<String> {
+        let a = A::name().unwrap_or(String::new());
+        let b = B::name().unwrap_or(String::new());
+        Some(format!("Either {a} or {b}"))
+    }
+
+    fn security_scheme() -> Option<paperclip::v2::models::SecurityScheme> {
+        Some(paperclip::v2::models::SecurityScheme {
+            type_: "apiKey".to_string(),
+            name: None,
+            in_: None,
+            flow: None,
+            auth_url: None,
+            token_url: None,
+            scopes: std::collections::BTreeMap::new(),
+            description: Some(format!("One of: {:} or {:}", A::description(), B::description())),
+        })
+    }
+}
+impl<A: paperclip::v2::schema::Apiv2Schema, B: paperclip::v2::schema::Apiv2Schema>
+    paperclip::actix::OperationModifier for Either<A, B>
+{
 }
 
 impl<A, B> TenantAuth for Either<A, B>

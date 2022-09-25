@@ -2,7 +2,8 @@ use paperclip::actix::web;
 
 pub mod api_keys;
 pub mod index;
-pub mod onboarding_configs;
+pub mod ob_config;
+pub mod ob_session;
 pub mod roles;
 pub mod settings;
 pub mod users;
@@ -11,10 +12,11 @@ pub mod workos;
 pub fn routes() -> web::Scope {
     web::scope("/org")
         .service(web::resource("").route(web::get().to(index::get)))
-        .service(onboarding_configs::get)
-        .service(onboarding_configs::get_detail)
-        .service(onboarding_configs::patch)
-        .service(onboarding_configs::post)
+        .service(ob_config::get)
+        .service(ob_config::get_detail)
+        .service(ob_config::patch)
+        .service(ob_config::post)
+        .service(ob_session::post)
         .service(users::get)
         .service(users::post)
         .service(users::patch)

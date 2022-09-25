@@ -1,9 +1,10 @@
 use std::collections::HashSet;
 
-use crate::auth::key_context::ob_public_key::PublicTenantAuthContext;
+use crate::auth::key_context::ob_public_key::PublicOnboardingContext;
 use crate::auth::key_context::secret_key::SecretTenantAuthContext;
-use crate::auth::WorkOsAuth;
+use crate::auth::session_data::ob_session::ParsedOnboardingSession;
 use crate::auth::{CheckTenantPermissions, Either};
+use crate::auth::{SessionContext, WorkOsAuth};
 use crate::errors::tenant::TenantError;
 use crate::errors::ApiError;
 use crate::types::ob_config::FpObConfig;
@@ -32,11 +33,11 @@ use paperclip::actix::{api_v2_operation, get, patch, post, web, web::Json};
 )]
 #[get("/onboarding_config")]
 pub fn get_detail(
-    auth: PublicTenantAuthContext,
+    onboarding_context: Either<PublicOnboardingContext, SessionContext<ParsedOnboardingSession>>,
 ) -> actix_web::Result<Json<ResponseData<FpObConfig>>, ApiError> {
     Ok(Json(ResponseData::ok(FpObConfig::from((
-        auth.ob_config,
-        auth.tenant,
+        onboarding_context.ob_config().clone(),
+        onboarding_context.tenant().clone(),
     )))))
 }
 

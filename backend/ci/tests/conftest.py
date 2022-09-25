@@ -2,6 +2,7 @@ import json
 import requests
 import os
 import time
+from .auth import OnboardingSessionToken
 import pytest
 from twilio.rest import Client
 from .constants import (
@@ -179,3 +180,9 @@ def user(workos_sandbox_tenant, twilio):
         email=basic_user.email,
         tenant=workos_sandbox_tenant,
     )
+
+@pytest.fixture(scope="module")
+def ob_session_token(workos_tenant):
+    data = { "onboarding_config_id": workos_tenant.ob_config.id }
+    body = post("org/onboarding_session", data, workos_tenant.sk.key)
+    return OnboardingSessionToken(body["session_token"])

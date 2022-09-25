@@ -1,6 +1,8 @@
+use crate::auth::key_context::ob_public_key::PublicOnboardingContext;
+use crate::auth::session_data::ob_session::ParsedOnboardingSession;
 use crate::auth::session_data::user::UserAuthScope;
-use crate::auth::VerifiedUserAuth;
-use crate::auth::{key_context::ob_public_key::PublicTenantAuthContext, UserAuth};
+use crate::auth::UserAuth;
+use crate::auth::{Either, SessionContext, VerifiedUserAuth};
 use crate::errors::onboarding::OnboardingError;
 use crate::errors::ApiError;
 use crate::types::response::ResponseData;
@@ -29,7 +31,7 @@ pub struct OnboardingResponse {
 )]
 pub fn handler(
     state: web::Data<State>,
-    tenant_auth: PublicTenantAuthContext,
+    onboarding_context: Either<PublicOnboardingContext, SessionContext<ParsedOnboardingSession>>,
     user_auth: UserAuth,
     insights: InsightHeaders,
 ) -> actix_web::Result<Json<ResponseData<OnboardingResponse>>, ApiError> {
@@ -40,19 +42,23 @@ pub fn handler(
         .db_pool
         .db_transaction(move |conn| -> Result<_, ApiError> {
             let uvw = UserVaultWrapper::get(conn, &user_auth.user_vault_id())?;
-            if tenant_auth.ob_config.is_live != uvw.user_vault.is_live {
+            if onboarding_context.ob_config().is_live != uvw.user_vault.is_live {
                 return Err(OnboardingError::InvalidSandboxState.into());
             }
 
             let scoped_user = ScopedUser::get_or_create(
                 conn,
                 uvw.user_vault.id,
-                tenant_auth.tenant.id.clone(),
-                tenant_auth.ob_config.is_live,
+                onboarding_context.tenant().id.clone(),
+                onboarding_context.ob_config().is_live,
             )?;
             let insight_event = CreateInsightEvent::from(insights);
-            let ob =
-                Onboarding::get_or_create(conn, scoped_user.id, tenant_auth.ob_config.id, insight_event)?;
+            let ob = Onboarding::get_or_create(
+                conn,
+                scoped_user.id,
+                onboarding_context.ob_config().id.clone(),
+                insight_event,
+            )?;
             // TODO create a document request if necessary
             // https://linear.app/footprint/issue/FP-1414/create-documentrequest-rows
 

@@ -6,7 +6,7 @@ from tests.constants import EMAIL, FIELDS_TO_DECRYPT
 from tests.utils import get, put, post, patch, _gen_random_ssn
 from tests.types import SecretApiKey, ObConfiguration
 from .auth import (
-    TenantAuth,
+    PublishableOnboardingKey,
 )
 
 
@@ -147,7 +147,7 @@ class TestDashboard:
         )
         body = post("org/onboarding_configs", data, workos_sandbox_tenant.sk.key)
         ob_config = body
-        ob_config_key = TenantAuth(ob_config["key"])
+        ob_config_key = PublishableOnboardingKey(ob_config["key"])
 
         post("hosted/onboarding", None, basic_user.auth_token, ob_config_key)
 

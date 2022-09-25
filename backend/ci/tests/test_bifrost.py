@@ -91,12 +91,17 @@ class TestBifrost:
         assert not body.get("challenge_data", dict())
         assert not body["available_challenge_kinds"]
 
-    def test_onboarding_init(self, workos_tenant, auth_token):
-        body = post("hosted/onboarding", None, workos_tenant.ob_config.key, auth_token)
+    @pytest.mark.parametrize("token_type", ["publishable", "session"])
+    def test_onboarding_init(self, workos_tenant, token_type, ob_session_token, auth_token):
+        ob_auth = {
+            "publishable": workos_tenant.ob_config.key,
+            "session": ob_session_token,
+        }[token_type]
+        body = post("hosted/onboarding", None, ob_auth, auth_token)
         assert not body["validation_token"]
 
         body = get(
-            "hosted/onboarding/status", None, workos_tenant.ob_config.key, auth_token
+            "hosted/onboarding/status", None, ob_auth, auth_token
         )
 
         req = lambda kind: next(r for r in body["requirements"] if r["kind"] == kind)

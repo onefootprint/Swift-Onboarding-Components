@@ -23,7 +23,7 @@ use serde::{Deserialize, Serialize};
 pub struct SessionAuthToken(String);
 
 impl SessionAuthToken {
-    const PREFIX: &'static str = "vtok_";
+    const PREFIX: &'static str = "tok_";
     const LEN_RANDOM_CHARS: usize = 34;
 
     /// generates a random new auth token

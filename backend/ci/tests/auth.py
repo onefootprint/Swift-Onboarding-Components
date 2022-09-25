@@ -10,8 +10,11 @@ class FpAuth(BaseAuth):
     HEADER_NAME = "x-fp-authorization"
     
 
-class TenantAuth(BaseAuth):
+class PublishableOnboardingKey(BaseAuth):
     HEADER_NAME = "X-Onboarding-Config-Key"
+
+class OnboardingSessionToken(BaseAuth):
+    HEADER_NAME = "X-Onboarding-Session-Token"
 
 
 class TenantSecretAuth(BaseAuth):

@@ -7,6 +7,7 @@ use newtypes::SealedSessionBytes;
 use serde::{Deserialize, Serialize};
 
 pub mod email_verify;
+pub mod ob_session;
 pub mod user;
 pub mod validate_user;
 pub mod workos;
@@ -37,4 +38,7 @@ pub enum AuthSessionData {
 
     /// Used to prove to a tenant that a user is authed with footprint
     ValidateUserToken(ValidateUserToken),
+
+    /// Used to provide a single use onboarding session token for bifrost initialization
+    OnboardingSession(ob_session::OnboardingSession),
 }

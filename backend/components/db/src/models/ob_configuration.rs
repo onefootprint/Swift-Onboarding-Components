@@ -115,6 +115,26 @@ impl ObConfiguration {
         Ok(result)
     }
 
+    pub fn get_enabled_by_id(
+        conn: &mut PgConnection,
+        id: ObConfigurationId,
+        tenant_id: TenantId,
+        is_live: bool,
+    ) -> Result<(ObConfiguration, Tenant), crate::DbError> {
+        let result: (ObConfiguration, Tenant) = ob_configuration::table
+            .inner_join(tenant::table)
+            .filter(ob_configuration::id.eq(id))
+            .filter(ob_configuration::tenant_id.eq(tenant_id))
+            .filter(ob_configuration::is_live.eq(is_live))
+            .first(conn)?;
+
+        if result.0.status != ApiKeyStatus::Enabled {
+            return Err(DbError::ApiKeyDisabled);
+        }
+
+        Ok(result)
+    }
+
     pub async fn create(
         pool: &DbPool,
         name: String,

@@ -1,5 +1,8 @@
-use crate::auth::key_context::ob_public_key::PublicTenantAuthContext;
+use crate::auth::key_context::ob_public_key::PublicOnboardingContext;
+use crate::auth::session_data::ob_session::ParsedOnboardingSession;
 use crate::auth::session_data::user::UserAuthScope;
+use crate::auth::Either;
+use crate::auth::SessionContext;
 use crate::auth::UserAuth;
 use crate::auth::VerifiedUserAuth;
 use crate::errors::onboarding::OnboardingError;
@@ -41,7 +44,7 @@ struct CommitResponse {
 #[post("/complete")]
 fn handler(
     user_auth: UserAuth,
-    tenant_auth: PublicTenantAuthContext,
+    onboarding_context: Either<PublicOnboardingContext, SessionContext<ParsedOnboardingSession>>,
     insights: InsightHeaders,
     state: web::Data<State>,
 ) -> actix_web::Result<Json<ResponseData<CommitResponse>>, ApiError> {
@@ -51,7 +54,7 @@ fn handler(
         .db_pool
         .db_query(move |conn| UserVaultWrapper::get(conn, &user_auth.user_vault_id()))
         .await??;
-    let missing_fields = uvw.missing_fields(&tenant_auth.ob_config);
+    let missing_fields = uvw.missing_fields(onboarding_context.ob_config());
     if !missing_fields.is_empty() {
         return Err(OnboardingError::UserMissingRequiredFields(missing_fields.iter().join(", ")).into());
     }
@@ -63,7 +66,7 @@ fn handler(
         None
     };
 
-    let tenant_id = tenant_auth.tenant.id.clone();
+    let tenant_id = onboarding_context.tenant().id.clone();
     let session_key = state.session_sealing_key.clone();
     let (validation_token, webauthn_creds, requests, ob_id, scoped_user) = state
         .db_pool
@@ -72,14 +75,14 @@ fn handler(
             let scoped_user = ScopedUser::get_or_create(
                 conn,
                 uvw.user_vault.id.clone(),
-                tenant_auth.tenant.id.clone(),
-                tenant_auth.ob_config.is_live,
+                onboarding_context.tenant().id.clone(),
+                onboarding_context.ob_config().is_live,
             )?;
             let insight_event = CreateInsightEvent::from(insights);
             let ob = Onboarding::get_or_create(
                 conn,
                 scoped_user.id.clone(),
-                tenant_auth.ob_config.id.clone(),
+                onboarding_context.ob_config().id.clone(),
                 insight_event,
             )?;
             let ob_id = ob.id.clone();

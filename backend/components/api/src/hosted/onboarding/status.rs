@@ -1,6 +1,10 @@
+use crate::auth::key_context::ob_public_key::PublicOnboardingContext;
+use crate::auth::session_data::ob_session::ParsedOnboardingSession;
 use crate::auth::session_data::user::UserAuthScope;
+use crate::auth::Either;
+use crate::auth::SessionContext;
+use crate::auth::UserAuth;
 use crate::auth::VerifiedUserAuth;
-use crate::auth::{key_context::ob_public_key::PublicTenantAuthContext, UserAuth};
 use crate::errors::onboarding::OnboardingError;
 use crate::errors::ApiError;
 use crate::types::response::ResponseData;
@@ -26,7 +30,7 @@ pub struct OnboardingStatusResponse {
 #[get("/status")]
 pub fn handler(
     state: web::Data<State>,
-    tenant_auth: PublicTenantAuthContext,
+    onboarding_context: Either<PublicOnboardingContext, SessionContext<ParsedOnboardingSession>>,
     user_auth: UserAuth,
 ) -> actix_web::Result<Json<ResponseData<OnboardingStatusResponse>>, ApiError> {
     let user_auth = user_auth.check_permissions(vec![UserAuthScope::OrgOnboarding])?;
@@ -35,10 +39,11 @@ pub fn handler(
         .db_pool
         .db_query(move |conn| -> Result<_, ApiError> {
             let uvw = UserVaultWrapper::get(conn, &user_auth.user_vault_id())?;
-            let onboarding = Onboarding::get_by_config(conn, &uvw.user_vault.id, &tenant_auth.ob_config.id)?
-                .ok_or(OnboardingError::NoOnboarding)?;
+            let onboarding =
+                Onboarding::get_by_config(conn, &uvw.user_vault.id, &onboarding_context.ob_config().id)?
+                    .ok_or(OnboardingError::NoOnboarding)?;
             let creds = WebauthnCredential::get_for_user_vault(conn, &user_auth.data.user_vault_id)?;
-            let missing_attributes = uvw.missing_fields(&tenant_auth.ob_config);
+            let missing_attributes = uvw.missing_fields(onboarding_context.ob_config());
             let requirements = vec![
                 (onboarding.kyc_status == KycStatus::New)
                     .then_some(OnboardingRequirement::IdentityCheck { missing_attributes }),
