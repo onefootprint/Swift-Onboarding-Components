@@ -1,4 +1,4 @@
-import { UserDataAttribute } from 'types';
+import { UserDataAttribute } from '@onefootprint/types';
 
 const getSectionsVisibility = (userDataAttributes: UserDataAttribute[]) => ({
   basic: true,

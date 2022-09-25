@@ -1,4 +1,4 @@
-import { CountryCode3, IdScanDocType } from 'types';
+import { CountryCode3, IdScanDocType } from '@onefootprint/types';
 
 // TODO: Belce fill this up when you want to do a mindless task
 // For now all entries are the same.

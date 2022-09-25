@@ -1,12 +1,12 @@
-import { useMutation } from '@tanstack/react-query';
-import base64url from 'base64url';
-import request, { RequestError } from 'request';
-import { BIOMETRIC_AUTH_HEADER } from 'src/config/constants';
 import {
   BiometricRegisterChallengeJson,
   BiometricRegisterRequest,
   BiometricRegisterResponse,
-} from 'types';
+} from '@onefootprint/types';
+import { useMutation } from '@tanstack/react-query';
+import base64url from 'base64url';
+import request, { RequestError } from 'request';
+import { BIOMETRIC_AUTH_HEADER } from 'src/config/constants';
 
 const generateDeviceResponse = async (challenge: string) => {
   const challengeJson = JSON.parse(challenge) as BiometricRegisterChallengeJson;

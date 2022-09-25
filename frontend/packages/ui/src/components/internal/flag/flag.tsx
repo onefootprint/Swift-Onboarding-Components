@@ -1,7 +1,7 @@
+import type { CountryCode } from '@onefootprint/types';
 import { flags } from 'icons';
 import capitalize from 'lodash/capitalize';
 import React from 'react';
-import type { CountryCode } from 'types';
 
 export type FlagProps = {
   className?: string;

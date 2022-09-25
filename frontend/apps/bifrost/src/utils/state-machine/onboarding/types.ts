@@ -1,10 +1,10 @@
+import { CollectedDataOption, TenantInfo, UserData } from '@onefootprint/types';
 import { DeviceInfo } from 'hooks';
 import {
   BasicInformation,
   ResidentialAddress,
   SSNInformation,
 } from 'src/utils/state-machine/types';
-import { CollectedDataOption, TenantInfo, UserData } from 'types';
 
 export enum States {
   onboardingVerification = 'onboardingVerification',

@@ -1,6 +1,9 @@
+import {
+  UpdateD2PStatusRequest,
+  UpdateD2PStatusResponse,
+} from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
 import request, { RequestError } from 'request';
-import { UpdateD2PStatusRequest, UpdateD2PStatusResponse } from 'types';
 
 import { BIOMETRIC_AUTH_HEADER } from '../../config/constants';
 

@@ -1,3 +1,4 @@
+import { UserDataAttribute } from '@onefootprint/types';
 import { HeaderTitle } from 'footprint-elements';
 import { useTranslation } from 'hooks';
 import React from 'react';
@@ -7,7 +8,6 @@ import useOnboardingMachine from 'src/pages/onboarding/hooks/use-onboarding-mach
 import { isMissingSsnAttribute } from 'src/utils/state-machine/onboarding/utils/missing-attributes';
 import { ResidentialZipCodeAndCountry } from 'src/utils/state-machine/types';
 import styled, { css } from 'styled-components';
-import { UserDataAttribute } from 'types';
 import { Button, CountrySelect, CountrySelectOption, TextInput } from 'ui';
 
 import useInputValidations from '../../hooks/use-input-validations';

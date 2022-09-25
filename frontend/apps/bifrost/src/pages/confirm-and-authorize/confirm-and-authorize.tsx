@@ -1,3 +1,4 @@
+import { CollectedDataOption } from '@onefootprint/types';
 import { useIsMutating } from '@tanstack/react-query';
 import { HeaderTitle, NavigationHeader } from 'footprint-elements';
 import { useTranslation } from 'hooks';
@@ -12,7 +13,6 @@ import {
 import React from 'react';
 import { useBifrostMachine } from 'src/components/bifrost-machine-provider';
 import styled, { css } from 'styled-components';
-import { CollectedDataOption } from 'types';
 import { FootprintButton, Typography } from 'ui';
 
 import useConfirmOnboardingData from './hooks/use-confirm-onboarding-data';

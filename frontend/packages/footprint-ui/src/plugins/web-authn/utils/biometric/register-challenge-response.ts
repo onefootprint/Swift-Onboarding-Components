@@ -1,5 +1,5 @@
+import { BiometricRegisterChallengeJson } from '@onefootprint/types';
 import base64url from 'base64url';
-import { BiometricRegisterChallengeJson } from 'types';
 
 const createPublicKeyCredential = async (challenge: string) => {
   const challengeJson = JSON.parse(challenge) as BiometricRegisterChallengeJson;

@@ -1,10 +1,10 @@
+import { OrgAuthLoginResponse } from '@onefootprint/types';
 import { useTranslation } from 'hooks';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import React, { useEffect } from 'react';
 import useLogin from 'src/hooks/use-login';
 import useSessionUser from 'src/hooks/use-session-user';
-import { OrgAuthLoginResponse } from 'types';
 import { Box, LoadingIndicator } from 'ui';
 
 const Auth = () => {

@@ -1,4 +1,4 @@
-import { CollectedDataOption } from 'types';
+import { CollectedDataOption } from '@onefootprint/types';
 
 export const getSelectedDataOptionsList = (
   formData: Record<string, boolean | string | number> = {},

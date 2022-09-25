@@ -1,3 +1,4 @@
+import { AccessLog } from '@onefootprint/types';
 import {
   QueryFunctionContext,
   QueryKey,
@@ -5,7 +6,6 @@ import {
 } from '@tanstack/react-query';
 import request, { RequestError } from 'request';
 import { MY1FP_AUTH_HEADER } from 'src/config/constants';
-import { AccessLog } from 'types';
 
 export type AccessLogsRequest = {
   authToken: string;

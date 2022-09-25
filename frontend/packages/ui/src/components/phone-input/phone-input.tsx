@@ -1,7 +1,7 @@
 import { COUNTRIES, REGION_CODES } from '@onefootprint/global-constants';
+import type { CountryCode } from '@onefootprint/types';
 import React, { forwardRef, useEffect, useRef, useState } from 'react';
 import mergeRefs from 'react-merge-refs';
-import type { CountryCode } from 'types';
 
 import BaseSelect, { BaseSelectOption } from '../internal/base-select';
 import Input from './components/input';

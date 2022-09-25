@@ -1,6 +1,6 @@
+import { OrgAuthLoginRequest, OrgAuthLoginResponse } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
 import request, { RequestError } from 'request';
-import { OrgAuthLoginRequest, OrgAuthLoginResponse } from 'types';
 
 const login = async (code: string) => {
   const response = await request<OrgAuthLoginResponse>({

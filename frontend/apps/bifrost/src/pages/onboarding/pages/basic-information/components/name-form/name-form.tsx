@@ -1,3 +1,4 @@
+import { UserData, UserDataAttribute } from '@onefootprint/types';
 import { HeaderTitle } from 'footprint-elements';
 import { useTranslation } from 'hooks';
 import React from 'react';
@@ -7,7 +8,6 @@ import {
   isMissingSsnAttribute,
 } from 'src/utils/state-machine/onboarding/utils/missing-attributes';
 import styled, { css } from 'styled-components';
-import { UserData, UserDataAttribute } from 'types';
 import { Button, Grid, TextInput } from 'ui';
 
 import NavigationHeader from '../../../../components/navigation-header/navigation-header';

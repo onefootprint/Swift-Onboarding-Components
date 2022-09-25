@@ -1,4 +1,5 @@
 import { yupResolver } from '@hookform/resolvers/yup';
+import { OnboardingStatus } from '@onefootprint/types';
 import React, { useState } from 'react';
 import {
   FieldErrors,
@@ -14,7 +15,6 @@ import { statusToDisplayText } from 'src/constants/onboarding-status-display';
 import { useFilters } from 'src/pages/users/hooks/use-filters';
 import { getDateRange, serializeDateRange } from 'src/utils/date-range';
 import styled from 'styled-components';
-import { OnboardingStatus } from 'types';
 import { Box, Button, Checkbox, Dialog, Divider, Typography } from 'ui';
 
 type FormValues = DateRangeSelectorFormValues & {

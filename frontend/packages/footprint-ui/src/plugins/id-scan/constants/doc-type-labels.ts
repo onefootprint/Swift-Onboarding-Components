@@ -1,4 +1,4 @@
-import { IdScanDocType } from 'types';
+import { IdScanDocType } from '@onefootprint/types';
 
 const IdScanDocTypeToLabel: Record<IdScanDocType, string> = {
   [IdScanDocType.driversLicense]: "driver's license",

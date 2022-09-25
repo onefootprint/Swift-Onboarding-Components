@@ -1,10 +1,10 @@
-import { RequestError } from 'request/src';
 import {
   UserData,
   UserDataAttribute,
   UserDataObj,
   UserDataResponse,
-} from 'types';
+} from '@onefootprint/types';
+import { RequestError } from 'request/src';
 
 import useUserData from './use-user-data';
 

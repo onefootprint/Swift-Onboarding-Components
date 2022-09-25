@@ -1,6 +1,6 @@
+import { dataKindToDisplayName } from '@onefootprint/types';
 import React, { Fragment } from 'react';
 import styled, { css } from 'styled-components';
-import { dataKindToDisplayName } from 'types';
 import { createFontStyles } from 'ui';
 
 type FieldTagListProps = {

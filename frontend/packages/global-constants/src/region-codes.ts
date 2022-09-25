@@ -1,4 +1,4 @@
-import type { CountryCode } from 'types';
+import type { CountryCode } from '@onefootprint/types';
 
 const REGION_CODES: Record<CountryCode, string> = {
   AD: '+376',

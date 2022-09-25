@@ -1,4 +1,4 @@
-import { UserDataAttribute } from 'types';
+import { UserDataAttribute } from '@onefootprint/types';
 
 import getSectionsVisibility from './get-sections-visibility';
 

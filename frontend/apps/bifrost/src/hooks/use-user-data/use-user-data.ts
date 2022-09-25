@@ -1,7 +1,7 @@
+import { UserDataRequest, UserDataResponse } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
 import request, { RequestError } from 'request';
 import { BIFROST_AUTH_HEADER } from 'src/config/constants';
-import { UserDataRequest, UserDataResponse } from 'types';
 
 const userDataRequest = async (payload: UserDataRequest) => {
   const response = await request<UserDataResponse>({

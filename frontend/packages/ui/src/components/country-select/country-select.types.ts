@@ -1,4 +1,4 @@
-import type { CountryCode } from 'types';
+import type { CountryCode } from '@onefootprint/types';
 
 import type { BaseSelectOption } from '../internal/base-select/base-select.types';
 

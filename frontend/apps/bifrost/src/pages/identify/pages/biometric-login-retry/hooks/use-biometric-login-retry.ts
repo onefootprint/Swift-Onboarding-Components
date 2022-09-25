@@ -1,13 +1,13 @@
-import useIdentify from 'src/pages/identify/hooks/use-identify';
-import useIdentityVerify from 'src/pages/identify/hooks/use-identify-verify';
-import generateLoginDeviceResponse from 'src/utils/biometric/login-challenge-response';
-import { Events } from 'src/utils/state-machine/identify/types';
 import {
   ChallengeData,
   ChallengeKind,
   IdentifyResponse,
   IdentifyVerifyResponse,
-} from 'types';
+} from '@onefootprint/types';
+import useIdentify from 'src/pages/identify/hooks/use-identify';
+import useIdentityVerify from 'src/pages/identify/hooks/use-identify-verify';
+import generateLoginDeviceResponse from 'src/utils/biometric/login-challenge-response';
+import { Events } from 'src/utils/state-machine/identify/types';
 
 import useIdentifyMachine from '../../../hooks/use-identify-machine';
 

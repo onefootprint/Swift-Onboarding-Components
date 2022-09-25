@@ -1,10 +1,10 @@
+import { OrgAuthMagicLinkRequest } from '@onefootprint/types';
 import { useTranslation } from 'hooks';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import styled, { css } from 'styled-components';
-import { OrgAuthMagicLinkRequest } from 'types';
 import { Button, TextInput, Typography } from 'ui';
 
 import BackButton from '../../components/back-button/back-button';

@@ -1,6 +1,6 @@
+import { D2PStatusUpdate } from '@onefootprint/types';
 import { useTranslation } from 'hooks';
 import React, { useEffect } from 'react';
-import { D2PStatusUpdate } from 'types';
 
 import HeaderTitle from '../../components/header-title';
 import useBiometricMachine from '../../hooks/use-d2p-mobile-machine';

@@ -1,5 +1,5 @@
+import { ApiKey } from '@onefootprint/types';
 import { useQueryClient } from '@tanstack/react-query';
-import { ApiKey } from 'types';
 
 const useUpdateApiKeyCache = () => {
   const queryClient = useQueryClient();

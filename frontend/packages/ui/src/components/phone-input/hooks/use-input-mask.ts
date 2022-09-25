@@ -1,5 +1,5 @@
+import type { CountryCode } from '@onefootprint/types';
 import { useState } from 'react';
-import type { CountryCode } from 'types';
 
 const useInputMask = (countryCode: CountryCode) => {
   const [currentCode, setCode] = useState<CountryCode | undefined>();

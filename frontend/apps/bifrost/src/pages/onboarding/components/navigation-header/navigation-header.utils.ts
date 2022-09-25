@@ -1,3 +1,4 @@
+import { CollectedDataOption } from '@onefootprint/types';
 import { States } from 'src/utils/state-machine/onboarding/types';
 import {
   hasMissingAttributes,
@@ -5,7 +6,6 @@ import {
   isMissingResidentialAttribute,
   isMissingSsnAttribute,
 } from 'src/utils/state-machine/onboarding/utils/missing-attributes';
-import { CollectedDataOption } from 'types';
 
 const getCurrentStepFromMissingAttributes = (
   mustCollect: readonly CollectedDataOption[],

@@ -1,7 +1,7 @@
+import type { CountryCode } from '@onefootprint/types';
 import { IcoChevronDown24 } from 'icons';
 import React, { forwardRef } from 'react';
 import styled, { css } from 'styled-components';
-import type { CountryCode } from 'types';
 
 import Flag from '../../../internal/flag';
 import Input from '../../../internal/input';

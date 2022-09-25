@@ -1,4 +1,4 @@
-import { CountryCode, CountryCode3 } from 'types';
+import { CountryCode, CountryCode3 } from '@onefootprint/types';
 
 export type CountryRecord = {
   value: CountryCode;

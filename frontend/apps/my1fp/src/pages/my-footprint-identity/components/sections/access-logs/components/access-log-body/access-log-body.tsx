@@ -1,7 +1,7 @@
+import { AccessLog } from '@onefootprint/types';
 import { useTranslation } from 'hooks';
 import React from 'react';
 import styled, { css } from 'styled-components';
-import { AccessLog } from 'types';
 import { Box, Typography } from 'ui';
 
 type AccessLogBodyProps = {

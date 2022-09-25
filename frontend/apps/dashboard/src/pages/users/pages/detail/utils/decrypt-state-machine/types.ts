@@ -1,4 +1,4 @@
-import { UserDataAttribute } from 'types';
+import { UserDataAttribute } from '@onefootprint/types';
 
 export enum State {
   idle = 'idle',

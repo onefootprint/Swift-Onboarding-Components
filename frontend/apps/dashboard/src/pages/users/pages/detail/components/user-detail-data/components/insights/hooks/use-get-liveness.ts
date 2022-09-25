@@ -1,3 +1,4 @@
+import { InsightEvent } from '@onefootprint/types';
 import {
   QueryFunctionContext,
   QueryKey,
@@ -5,7 +6,6 @@ import {
 } from '@tanstack/react-query';
 import request, { RequestError } from 'request';
 import useSessionUser, { AuthHeaders } from 'src/hooks/use-session-user';
-import { InsightEvent } from 'types';
 
 type LivenessRequestQueryString = {
   footprintUserId: string;

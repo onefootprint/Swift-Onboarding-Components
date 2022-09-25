@@ -35,7 +35,7 @@
     "request": "*",
     "styled-components": "^5.3.5",
     "themes": "*",
-    "types": "*",
+    "@onefootprint/types": "*",
     "ui": "*",
     "usehooks-ts": "^2.6.0",
     "xstate": "^4.33.5",

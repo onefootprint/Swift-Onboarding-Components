@@ -1,4 +1,4 @@
-import { DateRange } from 'types';
+import { DateRange } from '@onefootprint/types';
 import * as yup from 'yup';
 
 export type DateRangeSelectorFormValues = {

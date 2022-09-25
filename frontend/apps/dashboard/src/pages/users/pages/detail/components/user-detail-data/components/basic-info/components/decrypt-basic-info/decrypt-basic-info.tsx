@@ -1,3 +1,4 @@
+import { UserDataAttribute } from '@onefootprint/types';
 import { useTranslation } from 'hooks';
 import { IcoBuilding24, IcoFileText224, IcoUserCircle24 } from 'icons';
 import pickBy from 'lodash/pickBy';
@@ -5,7 +6,6 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import { User } from 'src/pages/users/hooks/use-join-users';
 import styled, { css } from 'styled-components';
-import { UserDataAttribute } from 'types';
 import { Checkbox, useToast } from 'ui';
 
 import { Event } from '../../../../../../utils/decrypt-state-machine';

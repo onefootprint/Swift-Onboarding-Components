@@ -1,7 +1,7 @@
+import { D2PStatusUpdate } from '@onefootprint/types';
 import { useTranslation } from 'hooks';
 import React, { useEffect } from 'react';
 import styled, { css } from 'styled-components';
-import { D2PStatusUpdate } from 'types';
 import { Button } from 'ui';
 
 import HeaderTitle from '../../components/header-title';

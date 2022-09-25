@@ -1,7 +1,7 @@
+import { OnboardingConfig } from '@onefootprint/types';
 import { useTranslation } from 'hooks';
 import React from 'react';
 import styled, { css } from 'styled-components';
-import { OnboardingConfig } from 'types';
 import { Typography } from 'ui';
 
 import OnboardingConfigItem from './components/onboarding-config-item';

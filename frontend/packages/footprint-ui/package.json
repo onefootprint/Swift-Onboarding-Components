@@ -31,7 +31,7 @@
     "request": "*",
     "styled-media-query": "^2.1.2",
     "themes": "*",
-    "types": "*",
+    "@onefootprint/types": "*",
     "ui": "*",
     "usehooks-ts": "2.6.0",
     "xstate": "^4.33.6"

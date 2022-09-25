@@ -1,8 +1,8 @@
+import { AuthorizedOrg } from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
 import request, { RequestError } from 'request';
 import { MY1FP_AUTH_HEADER } from 'src/config/constants';
 import useSessionUser from 'src/hooks/use-session-user';
-import { AuthorizedOrg } from 'types';
 
 export type AuthorizedOrgsRequest = {
   authToken: string;

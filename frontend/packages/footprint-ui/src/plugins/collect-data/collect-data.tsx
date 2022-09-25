@@ -1,4 +1,4 @@
-import { CollectedDataOption } from 'types';
+import { CollectedDataOption } from '@onefootprint/types';
 
 import { BasePluginProps } from '../base-plugin';
 

@@ -1,6 +1,6 @@
+import { DateRange, dateRangeToDisplayText } from '@onefootprint/types';
 import React from 'react';
 import { FieldErrors, UseFormRegister, UseFormWatch } from 'react-hook-form';
-import { DateRange, dateRangeToDisplayText } from 'types';
 import { Box, Radio, TextInput } from 'ui';
 
 import { DateRangeSelectorFormValues } from './date-range-selector.types';

@@ -1,8 +1,8 @@
 import { BIOMETRIC_BASE_URL } from '@onefootprint/global-constants';
+import { D2PSmsRequest, D2PSmsResponse } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
 import request, { RequestError } from 'request';
 import { MY1FP_AUTH_HEADER } from 'src/config/constants';
-import { D2PSmsRequest, D2PSmsResponse } from 'types';
 
 const d2pSms = async (payload: D2PSmsRequest) => {
   const response = await request<{}>({

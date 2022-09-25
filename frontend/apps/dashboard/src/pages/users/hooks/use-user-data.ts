@@ -1,5 +1,8 @@
+import {
+  DecryptedUserAttributes,
+  UserDataAttributeKey,
+} from '@onefootprint/types';
 import constate from 'constate';
-import { DecryptedUserAttributes, UserDataAttributeKey } from 'types';
 import { useMap } from 'usehooks-ts';
 
 export type UserData = {

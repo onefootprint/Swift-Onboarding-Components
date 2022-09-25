@@ -1,6 +1,6 @@
+import { UserDataAttribute } from '@onefootprint/types';
 import React from 'react';
 import { User } from 'src/pages/users/hooks/use-join-users';
-import { UserDataAttribute } from 'types';
 import { useUpdateEffect } from 'usehooks-ts';
 
 import { State } from '../../../../utils/decrypt-state-machine';

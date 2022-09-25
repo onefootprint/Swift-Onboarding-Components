@@ -1,9 +1,9 @@
+import { ChallengeKind, IdentifyResponse } from '@onefootprint/types';
 import { useCountdown, useRequestErrorToast, useTranslation } from 'hooks';
 import React, { useEffect } from 'react';
 import useIdentify from 'src/pages/identify/hooks/use-identify';
 import { Events } from 'src/utils/state-machine/identify/types';
 import styled, { css } from 'styled-components';
-import { ChallengeKind, IdentifyResponse } from 'types';
 import { LinkButton, LoadingIndicator, Typography, useToast } from 'ui';
 
 import useIdentifyChallenge from '../../../../hooks/use-identify-challenge';

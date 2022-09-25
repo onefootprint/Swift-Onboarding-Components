@@ -1,6 +1,9 @@
+import {
+  BiometricRegisterRequest,
+  BiometricRegisterResponse,
+} from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
 import request, { RequestError } from 'request';
-import { BiometricRegisterRequest, BiometricRegisterResponse } from 'types';
 
 import { BIFROST_AUTH_HEADER } from '../config/constants';
 import generateRegisterDeviceResponse from '../utils/biometric/register-challenge-response';

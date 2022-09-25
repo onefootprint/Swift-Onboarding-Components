@@ -2,7 +2,7 @@ import {
   CollectedDataOption,
   OptionToRequiredAttributes,
   UserData,
-} from 'types';
+} from '@onefootprint/types';
 
 import { States } from '../types';
 

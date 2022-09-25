@@ -18,14 +18,14 @@
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
   },
   "dependencies": {
-    "types": "*"
+    "@onefootprint/types": "*"
   },
   "devDependencies": {
     "eslint-config-footprint": "*",
     "jest-presets": "*",
     "tsconfig": "*",
     "tsup": "^6.2.2",
-    "types": "*",
+    "@onefootprint/types": "*",
     "typescript": "4.7.4"
   },
   "jest": {

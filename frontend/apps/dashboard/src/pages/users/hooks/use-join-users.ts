@@ -1,12 +1,12 @@
-import { useMemo } from 'react';
-import { statusToPriority } from 'src/constants/onboarding-status-display';
 import {
   OnboardingStatus,
   ScopedUser,
   UserDataAttribute,
   UserDataAttributeKey,
   UserDataAttributeKeys,
-} from 'types';
+} from '@onefootprint/types';
+import { useMemo } from 'react';
+import { statusToPriority } from 'src/constants/onboarding-status-display';
 
 import { UserAttributes, UserData } from './use-user-data';
 

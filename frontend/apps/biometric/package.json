@@ -34,7 +34,7 @@
     "styled-components": "^5.3.5",
     "themes": "*",
     "ui": "*",
-    "types": "*",
+    "@onefootprint/types": "*",
     "xstate": "^4.33.6"
   },
   "devDependencies": {

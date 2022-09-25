@@ -1,5 +1,8 @@
+import {
+  UserDataAttributeKey,
+  UserDataAttributeKeys,
+} from '@onefootprint/types';
 import { ChangeEvent, useReducer } from 'react';
-import { UserDataAttributeKey, UserDataAttributeKeys } from 'types';
 
 const initialFields = Object.fromEntries(
   UserDataAttributeKeys.map(x => [x, false]),

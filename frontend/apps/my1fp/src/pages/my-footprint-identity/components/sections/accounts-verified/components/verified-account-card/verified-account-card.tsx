@@ -1,7 +1,7 @@
+import { AuthorizedOrg, AuthorizedOrgOnboarding } from '@onefootprint/types';
 import Image from 'next/image';
 import React from 'react';
 import styled, { css } from 'styled-components';
-import { AuthorizedOrg, AuthorizedOrgOnboarding } from 'types';
 import { Typography } from 'ui';
 
 type VerifiedAccountCardProps = {

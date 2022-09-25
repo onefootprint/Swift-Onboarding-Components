@@ -1,3 +1,4 @@
+import { AccessEvent } from '@onefootprint/types';
 import {
   QueryFunctionContext,
   QueryKey,
@@ -10,7 +11,6 @@ import {
   useFilters,
 } from 'src/pages/security-logs/hooks/use-filters';
 import { dateRangeToFilterParams } from 'src/utils/date-range';
-import { AccessEvent } from 'types';
 import { useDebounce } from 'usehooks-ts';
 
 type AccessEventsResponse = AccessEvent[];

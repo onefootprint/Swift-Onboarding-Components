@@ -1,6 +1,9 @@
+import {
+  IdentifyVerifyRequest,
+  IdentifyVerifyResponse,
+} from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
 import request, { RequestError } from 'request';
-import { IdentifyVerifyRequest, IdentifyVerifyResponse } from 'types';
 
 const identifyVerifyRequest = async (payload: IdentifyVerifyRequest) => {
   const response = await request<IdentifyVerifyResponse>({

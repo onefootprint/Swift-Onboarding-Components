@@ -1,4 +1,8 @@
-import { CollectedDataOption, UserData, UserDataAttribute } from 'types';
+import {
+  CollectedDataOption,
+  UserData,
+  UserDataAttribute,
+} from '@onefootprint/types';
 
 export type BasicInformation = NameInformation | NameAndDobInformation;
 

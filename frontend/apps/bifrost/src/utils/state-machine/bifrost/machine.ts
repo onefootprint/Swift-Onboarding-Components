@@ -1,4 +1,4 @@
-import { IdentifyType } from 'types';
+import { IdentifyType } from '@onefootprint/types';
 import { assign, createMachine } from 'xstate';
 
 import createIdentifyMachine from '../identify';

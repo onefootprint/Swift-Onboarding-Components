@@ -1,7 +1,7 @@
+import { UserEmailRequest, UserEmailResponse } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
 import request, { RequestError } from 'request';
 import { BIFROST_AUTH_HEADER } from 'src/config/constants';
-import { UserEmailRequest, UserEmailResponse } from 'types';
 
 const userEmailRequest = async (payload: UserEmailRequest) => {
   const response = await request<UserEmailResponse>({

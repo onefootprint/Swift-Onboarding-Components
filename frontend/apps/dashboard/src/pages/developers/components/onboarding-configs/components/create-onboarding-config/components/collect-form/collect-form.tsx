@@ -1,9 +1,9 @@
 import { useAutoAnimate } from '@formkit/auto-animate/react';
+import { CollectedDataOption, UserDataAttribute } from '@onefootprint/types';
 import { useTranslation } from 'hooks';
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import styled, { css } from 'styled-components';
-import { CollectedDataOption, UserDataAttribute } from 'types';
 import { Box, Checkbox, Radio } from 'ui';
 
 import type { DataKindForm } from '../../create-onboarding-config.types';

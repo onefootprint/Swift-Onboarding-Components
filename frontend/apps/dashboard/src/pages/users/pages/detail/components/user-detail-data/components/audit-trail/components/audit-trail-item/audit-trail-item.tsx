@@ -1,4 +1,16 @@
 import {
+  AuditTrail,
+  AuditTrailEvent,
+  LivenessCheckInfo,
+  SignalAttribute,
+  signalAttributeToDisplayName,
+  Vendor,
+  vendorToDisplayName,
+  VerificationInfo,
+  VerificationInfoStatus,
+  verificationInfoStatusToDisplayName,
+} from '@onefootprint/types';
+import {
   IcoBuilding16,
   IcoCheck16,
   IcoFileText16,
@@ -10,18 +22,6 @@ import {
 } from 'icons';
 import React from 'react';
 import { TimelineItem } from 'src/components/timeline/timeline';
-import {
-  AuditTrail,
-  AuditTrailEvent,
-  LivenessCheckInfo,
-  SignalAttribute,
-  signalAttributeToDisplayName,
-  Vendor,
-  vendorToDisplayName,
-  VerificationInfo,
-  VerificationInfoStatus,
-  verificationInfoStatusToDisplayName,
-} from 'types';
 import { Tag, Typography } from 'ui';
 
 const iconForAttribute: Record<SignalAttribute, Icon> = {

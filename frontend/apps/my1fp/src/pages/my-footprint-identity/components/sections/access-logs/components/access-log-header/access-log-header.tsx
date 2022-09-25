@@ -1,7 +1,7 @@
+import { AccessLog } from '@onefootprint/types';
 import { useTranslation } from 'hooks';
 import React from 'react';
 import styled from 'styled-components';
-import { AccessLog } from 'types';
 import { Typography } from 'ui';
 
 import FieldTagList from '../field-tag-list';

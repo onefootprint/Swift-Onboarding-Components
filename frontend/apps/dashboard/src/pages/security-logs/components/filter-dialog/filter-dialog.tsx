@@ -1,4 +1,6 @@
 import { yupResolver } from '@hookform/resolvers/yup';
+import type { UserDataAttributeKey } from '@onefootprint/types';
+import { UserDataAttribute } from '@onefootprint/types';
 import React, { useState } from 'react';
 import {
   FieldErrors,
@@ -14,8 +16,6 @@ import DateRangeSelector, {
 } from 'src/components/date-range-selector';
 import { getDateRange, serializeDateRange } from 'src/utils/date-range';
 import styled from 'styled-components';
-import type { UserDataAttributeKey } from 'types';
-import { UserDataAttribute } from 'types';
 import { Box, Button, Dialog, Divider, Typography } from 'ui';
 
 import { useFilters } from '../../hooks/use-filters';

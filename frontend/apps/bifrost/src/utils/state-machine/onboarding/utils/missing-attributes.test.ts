@@ -1,4 +1,4 @@
-import { CollectedDataOption, UserDataAttribute } from 'types';
+import { CollectedDataOption, UserDataAttribute } from '@onefootprint/types';
 
 import { States } from '../types';
 import {

@@ -1,4 +1,4 @@
-import { IdScanBadImageError } from 'types';
+import { IdScanBadImageError } from '@onefootprint/types';
 
 const useSubmitPhoto = (
   photos: {

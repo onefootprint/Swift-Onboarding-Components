@@ -1,4 +1,4 @@
-import type { CountryCode } from 'types';
+import type { CountryCode } from '@onefootprint/types';
 
 const useInputValidations = (countryCode: CountryCode) => {
   if (countryCode === 'US') {

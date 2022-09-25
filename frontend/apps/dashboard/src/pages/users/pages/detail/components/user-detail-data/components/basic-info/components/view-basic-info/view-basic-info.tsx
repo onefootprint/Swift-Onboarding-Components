@@ -1,9 +1,9 @@
+import { UserDataAttribute } from '@onefootprint/types';
 import { useTranslation } from 'hooks';
 import { IcoBuilding24, IcoFileText224, IcoUserCircle24 } from 'icons';
 import React from 'react';
 import { nameData, User } from 'src/pages/users/hooks/use-join-users';
 import styled, { css } from 'styled-components';
-import { UserDataAttribute } from 'types';
 
 import getSectionsVisibility from '../../utils/get-sections-visibility';
 import DataContainer from '../data-container';

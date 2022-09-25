@@ -1,3 +1,4 @@
+import { ScopedUser } from '@onefootprint/types';
 import {
   QueryFunctionContext,
   QueryKey,
@@ -12,7 +13,6 @@ import {
   useFilters,
 } from 'src/pages/users/hooks/use-filters';
 import { dateRangeToFilterParams } from 'src/utils/date-range';
-import { ScopedUser } from 'types';
 
 type ScopedUsersListQueryKey = [
   string,

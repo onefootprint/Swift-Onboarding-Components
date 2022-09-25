@@ -1,6 +1,6 @@
+import { UserDataAttributeKey } from '@onefootprint/types';
 import React, { ChangeEvent } from 'react';
 import styled, { css } from 'styled-components';
-import { UserDataAttributeKey } from 'types';
 import { Checkbox, SXStyles, Typography } from 'ui';
 
 type DataKindBoxesProps = {

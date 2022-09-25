@@ -1,5 +1,5 @@
+import { ChallengeKind, IdentifyType } from '@onefootprint/types';
 import { DeviceInfo } from 'hooks';
-import { ChallengeKind, IdentifyType } from 'types';
 import { interpret } from 'xstate';
 
 import createIdentifyMachine from './machine';

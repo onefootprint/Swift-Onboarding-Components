@@ -1,5 +1,5 @@
+import { TenantInfo } from '@onefootprint/types';
 import { DeviceInfo } from 'hooks';
-import { TenantInfo } from 'types';
 import { assign, createMachine } from 'xstate';
 
 import {

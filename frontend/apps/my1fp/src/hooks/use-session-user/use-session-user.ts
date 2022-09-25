@@ -1,4 +1,4 @@
-import { InsightEvent } from 'types';
+import { InsightEvent } from '@onefootprint/types';
 import create from 'zustand';
 import { persist } from 'zustand/middleware';
 

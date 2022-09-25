@@ -29,7 +29,7 @@
     "react-confetti": "^6.1.0",
     "request": "*",
     "themes": "*",
-    "types": "*",
+    "@onefootprint/types": "*",
     "ui": "*",
     "use-places-autocomplete": "^4.0.0",
     "usehooks-ts": "^2.6.0"

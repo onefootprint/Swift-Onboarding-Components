@@ -1,4 +1,5 @@
 import { STATES } from '@onefootprint/global-constants';
+import { UserDataAttribute } from '@onefootprint/types';
 import { HeaderTitle } from 'footprint-elements';
 import { useTranslation } from 'hooks';
 import React from 'react';
@@ -7,7 +8,6 @@ import NavigationHeader from 'src/pages/onboarding/components/navigation-header'
 import { isMissingSsnAttribute } from 'src/utils/state-machine/onboarding/utils/missing-attributes';
 import { ResidentialAddressFull } from 'src/utils/state-machine/types';
 import styled, { css } from 'styled-components';
-import { UserDataAttribute } from 'types';
 import {
   AddressInput,
   Button,

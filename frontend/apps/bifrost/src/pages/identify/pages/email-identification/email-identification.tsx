@@ -1,7 +1,3 @@
-import { useRequestErrorToast } from 'hooks';
-import React, { useState } from 'react';
-import useIdentify from 'src/pages/identify/hooks/use-identify';
-import { Events } from 'src/utils/state-machine/identify/types';
 import {
   ChallengeData,
   ChallengeKind,
@@ -9,7 +5,11 @@ import {
   IdentifyVerifyResponse,
   UserData,
   UserDataAttribute,
-} from 'types';
+} from '@onefootprint/types';
+import { useRequestErrorToast } from 'hooks';
+import React, { useState } from 'react';
+import useIdentify from 'src/pages/identify/hooks/use-identify';
+import { Events } from 'src/utils/state-machine/identify/types';
 
 import generateLoginDeviceResponse from '../../../../utils/biometric/login-challenge-response';
 import useIdentifyMachine from '../../hooks/use-identify-machine';

@@ -1,4 +1,4 @@
-import { DateRange } from 'types';
+import { DateRange } from '@onefootprint/types';
 
 type DateRangeQuery = {
   dateRange?: string;
