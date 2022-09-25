@@ -1,5 +1,5 @@
+import { BIOMETRIC_BASE_URL } from '@onefootprint/global-constants';
 import { useMutation } from '@tanstack/react-query';
-import { BIOMETRIC_BASE_URL } from 'global-constants';
 import request, { RequestError } from 'request';
 import { D2PSmsRequest, D2PSmsResponse } from 'types';
 

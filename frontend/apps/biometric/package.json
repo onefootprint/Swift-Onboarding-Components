@@ -22,7 +22,7 @@
     "base64url": "^3.0.1",
     "constate": "^3.3.2",
     "footprint-elements": "*",
-    "global-constants": "*",
+    "@onefootprint/global-constants": "*",
     "hooks": "*",
     "icons": "*",
     "lodash": "^4.17.21",

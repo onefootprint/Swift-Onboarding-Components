@@ -1,4 +1,4 @@
-import { COUNTRIES, REGION_CODES } from 'global-constants';
+import { COUNTRIES, REGION_CODES } from '@onefootprint/global-constants';
 import React, { forwardRef, useEffect, useRef, useState } from 'react';
 import mergeRefs from 'react-merge-refs';
 import type { CountryCode } from 'types';

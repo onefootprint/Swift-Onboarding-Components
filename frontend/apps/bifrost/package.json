@@ -21,7 +21,7 @@
     "base64url": "^3.0.1",
     "focus-trap-react": "^9.0.2",
     "footprint-elements": "*",
-    "global-constants": "*",
+    "@onefootprint/global-constants": "*",
     "hooks": "*",
     "icons": "*",
     "polished": "^4.2.2",

@@ -1,5 +1,5 @@
+import { STATES } from '@onefootprint/global-constants';
 import { HeaderTitle } from 'footprint-elements';
-import { STATES } from 'global-constants';
 import { useTranslation } from 'hooks';
 import React from 'react';
 import { Controller, useForm } from 'react-hook-form';

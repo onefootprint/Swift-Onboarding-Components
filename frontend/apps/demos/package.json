@@ -16,7 +16,7 @@
   "dependencies": {
     "@tryghost/content-api": "^1.11.0",
     "@onefootprint/footprint-js": "*",
-    "global-constants": "*",
+    "@onefootprint/global-constants": "*",
     "hooks": "*",
     "icons": "*",
     "next": "12.3.0",

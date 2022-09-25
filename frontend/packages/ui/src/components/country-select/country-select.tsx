@@ -1,4 +1,4 @@
-import { COUNTRIES } from 'global-constants';
+import { COUNTRIES } from '@onefootprint/global-constants';
 import React from 'react';
 import styled, { css } from 'styled-components';
 import type { CountryCode } from 'types';

@@ -1,4 +1,4 @@
-import { COUNTRIES as options } from 'global-constants';
+import { COUNTRIES as options } from '@onefootprint/global-constants';
 import take from 'lodash/take';
 import React from 'react';
 import { customRender, screen, userEvent } from 'test-utils';

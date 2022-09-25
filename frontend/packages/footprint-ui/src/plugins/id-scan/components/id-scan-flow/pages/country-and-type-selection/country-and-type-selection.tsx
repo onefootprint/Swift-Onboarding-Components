@@ -1,9 +1,9 @@
 import {
   AcceptedIdDocTypesByCountry,
   COUNTRIES,
+  CountryRecord,
   DEFAULT_COUNTRY,
-} from 'global-constants';
-import { CountryRecord } from 'global-constants/src/countries';
+} from '@onefootprint/global-constants';
 import { useTranslation } from 'hooks';
 import { IcoCar24, IcoIdCard24, IcoPassport24 } from 'icons';
 import React, { useState } from 'react';

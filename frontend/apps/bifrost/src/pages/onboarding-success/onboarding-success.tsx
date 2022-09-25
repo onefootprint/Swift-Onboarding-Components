@@ -1,5 +1,5 @@
+import { MY1FP_URL } from '@onefootprint/global-constants';
 import { NavigationHeader, useFootprintJs } from 'footprint-elements';
-import { MY1FP_URL } from 'global-constants';
 import { useTranslation } from 'hooks';
 import { IcoCheckCircle40 } from 'icons';
 import React, { useEffect } from 'react';

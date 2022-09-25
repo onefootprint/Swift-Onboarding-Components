@@ -20,7 +20,7 @@
     "@typeform/embed": "^1.35.1",
     "axios": "^0.27.2",
     "fathom-client": "^3.5.0",
-    "global-constants": "*",
+    "@onefootprint/global-constants": "*",
     "hooks": "*",
     "icons": "*",
     "lodash": "^4.17.21",

@@ -1,6 +1,6 @@
 /* eslint-disable react/jsx-props-no-spreading */
+import { DEFAULT_COUNTRY } from '@onefootprint/global-constants';
 import { useCombobox } from 'downshift';
-import { DEFAULT_COUNTRY } from 'global-constants';
 import noop from 'lodash/noop';
 import take from 'lodash/take';
 import React, { forwardRef, useRef } from 'react';

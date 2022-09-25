@@ -1,4 +1,4 @@
-import { BIOMETRIC_BASE_URL } from 'global-constants';
+import { BIOMETRIC_BASE_URL } from '@onefootprint/global-constants';
 
 const createBiometricUrl = (scopedAuthToken: string, deviceType?: string) => {
   if (deviceType) {

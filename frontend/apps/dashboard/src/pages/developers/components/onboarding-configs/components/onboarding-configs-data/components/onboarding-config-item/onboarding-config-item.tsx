@@ -1,4 +1,4 @@
-import { DEMO_BASE_URL } from 'global-constants';
+import { DEMO_BASE_URL } from '@onefootprint/global-constants';
 import { useToggle, useTranslation } from 'hooks';
 import { IcoArrowTopRight16, IcoPencil16 } from 'icons';
 import React from 'react';

@@ -16,7 +16,7 @@
     "bifrost",
     "demo",
     "docs",
-    "global-constants",
+    "@onefootprint/global-constants",
     "footprint-elements",
     "ui",
     "icons",

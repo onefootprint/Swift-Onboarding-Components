@@ -1,4 +1,8 @@
-import { COUNTRIES, DEFAULT_COUNTRY, REGION_CODES } from 'global-constants';
+import {
+  COUNTRIES,
+  DEFAULT_COUNTRY,
+  REGION_CODES,
+} from '@onefootprint/global-constants';
 import { PhoneNumberUtil } from 'google-libphonenumber';
 
 const phoneUtils = PhoneNumberUtil.getInstance();

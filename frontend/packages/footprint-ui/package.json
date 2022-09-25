@@ -20,7 +20,7 @@
     "@xstate/react": "^3.0.1",
     "base64url": "^3.0.1",
     "constate": "^3.3.2",
-    "global-constants": "*",
+    "@onefootprint/global-constants": "*",
     "hooks": "*",
     "i18next": "^21.9.2",
     "icons": "*",
