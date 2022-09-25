@@ -1,5 +1,5 @@
+import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
 import { IdentifyVerifyResponse } from '@onefootprint/types';
-import { useRequestErrorToast, useTranslation } from 'hooks';
 import React from 'react';
 import { Events } from 'src/utils/state-machine/identify/types';
 import { PinInput } from 'ui';

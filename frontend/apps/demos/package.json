@@ -17,7 +17,7 @@
     "@tryghost/content-api": "^1.11.0",
     "@onefootprint/footprint-js": "*",
     "@onefootprint/global-constants": "*",
-    "hooks": "*",
+    "@onefootprint/hooks": "*",
     "icons": "*",
     "next": "12.3.0",
     "polished": "^4.2.2",

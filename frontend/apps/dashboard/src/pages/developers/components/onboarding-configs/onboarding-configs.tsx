@@ -1,4 +1,4 @@
-import { useToggle, useTranslation } from 'hooks';
+import { useToggle, useTranslation } from '@onefootprint/hooks';
 import React from 'react';
 import { getErrorMessage } from 'request';
 import styled from 'styled-components';

@@ -1,5 +1,5 @@
+import { useInputMask, useTranslation } from '@onefootprint/hooks';
 import { HeaderTitle } from 'footprint-elements';
-import { useInputMask, useTranslation } from 'hooks';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import styled, { css } from 'styled-components';

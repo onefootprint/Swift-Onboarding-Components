@@ -1,4 +1,4 @@
-import { useTranslation } from 'hooks';
+import { useTranslation } from '@onefootprint/hooks';
 import { IcoForbid40 } from 'icons';
 import React, { useEffect } from 'react';
 import useOnboarding from 'src/hooks/use-onboarding';

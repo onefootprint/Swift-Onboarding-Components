@@ -1,4 +1,4 @@
-import { useTranslation } from 'hooks';
+import { useTranslation } from '@onefootprint/hooks';
 import React, { useState } from 'react';
 import useSessionUser from 'src/hooks/use-session-user';
 import LivenessCheck from 'src/pages/liveness-check';

@@ -18,7 +18,7 @@
     "axios": "^0.27.2",
     "axios-case-converter": "^0.9.0",
     "@onefootprint/global-constants": "*",
-    "hooks": "*",
+    "@onefootprint/hooks": "*",
     "i18next": "^21.9.2",
     "icons": "*",
     "lodash": "^4.17.21",

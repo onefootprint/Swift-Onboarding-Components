@@ -1,6 +1,6 @@
+import { useIntl } from '@onefootprint/hooks';
 import { ApiKey } from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
-import { useIntl } from 'hooks';
 import take from 'lodash/take';
 import request, { RequestError } from 'request';
 import { PaginatedRequestResponse } from 'request/src';

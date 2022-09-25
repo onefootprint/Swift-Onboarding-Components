@@ -1,4 +1,4 @@
-import { useTranslation } from 'hooks';
+import { useTranslation } from '@onefootprint/hooks';
 import { IcoChevronLeft24, IcoClose24 } from 'icons';
 import React from 'react';
 import { Dialog, useConfirmationDialog } from 'ui';

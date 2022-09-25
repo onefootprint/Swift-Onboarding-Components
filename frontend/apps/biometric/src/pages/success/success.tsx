@@ -1,4 +1,4 @@
-import { useCountdown, useTranslation } from 'hooks';
+import { useCountdown, useTranslation } from '@onefootprint/hooks';
 import React, { useEffect } from 'react';
 
 import HeaderTitle from '../../components/header-title';

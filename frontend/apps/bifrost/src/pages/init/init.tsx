@@ -1,4 +1,4 @@
-import { DeviceInfo, useDeviceInfo } from 'hooks';
+import { DeviceInfo, useDeviceInfo } from '@onefootprint/hooks';
 import React from 'react';
 import useBifrostMachine from 'src/hooks/use-bifrost-machine';
 import { Events } from 'src/utils/state-machine/bifrost';

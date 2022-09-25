@@ -1,5 +1,5 @@
+import { useTranslation } from '@onefootprint/hooks';
 import { ChallengeKind } from '@onefootprint/types';
-import { useTranslation } from 'hooks';
 import { IcoFaceid24, IcoSmartphone24 } from 'icons';
 import React, { useState } from 'react';
 import { useIdentifyMachine } from 'src/components/identify-machine-provider';

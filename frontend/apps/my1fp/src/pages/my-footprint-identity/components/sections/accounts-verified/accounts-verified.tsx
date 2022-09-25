@@ -1,5 +1,5 @@
+import { useTranslation } from '@onefootprint/hooks';
 import { AuthorizedOrg } from '@onefootprint/types';
-import { useTranslation } from 'hooks';
 import React from 'react';
 import styled from 'styled-components';
 import { LoadingIndicator, Typography } from 'ui';

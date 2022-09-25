@@ -1,6 +1,6 @@
 import { useAutoAnimate } from '@formkit/auto-animate/react';
+import { useTranslation } from '@onefootprint/hooks';
 import { CollectedDataOption, UserDataAttribute } from '@onefootprint/types';
-import { useTranslation } from 'hooks';
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import styled, { css } from 'styled-components';

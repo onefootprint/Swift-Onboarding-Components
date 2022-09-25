@@ -1,4 +1,4 @@
-import { useTranslation } from 'hooks';
+import { useTranslation } from '@onefootprint/hooks';
 import {
   IcoChartUp40,
   IcoCheckCircle40,

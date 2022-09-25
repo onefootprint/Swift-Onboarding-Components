@@ -1,4 +1,4 @@
-import { useTranslation } from 'hooks';
+import { useTranslation } from '@onefootprint/hooks';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { Dialog, TextInput } from 'ui';

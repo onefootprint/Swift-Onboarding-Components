@@ -1,4 +1,4 @@
-import { DeviceInfo } from 'hooks';
+import { DeviceInfo } from '@onefootprint/hooks';
 
 export enum States {
   init = 'Init',

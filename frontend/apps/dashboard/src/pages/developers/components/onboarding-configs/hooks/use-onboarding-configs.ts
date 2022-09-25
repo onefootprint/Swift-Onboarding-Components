@@ -1,6 +1,6 @@
+import { useIntl } from '@onefootprint/hooks';
 import { OnboardingConfig } from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
-import { useIntl } from 'hooks';
 import request, { PaginatedRequestResponse, RequestError } from 'request';
 import useSessionUser, { AuthHeaders } from 'src/hooks/use-session-user';
 

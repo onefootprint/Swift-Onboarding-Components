@@ -1,6 +1,6 @@
+import { useTranslation } from '@onefootprint/hooks';
 import { D2PStatusUpdate } from '@onefootprint/types';
 import { HeaderTitle } from 'footprint-elements';
-import { useTranslation } from 'hooks';
 import React, { useEffect } from 'react';
 import { Events } from 'src/utils/state-machine/liveness-check';
 import styled, { css } from 'styled-components';

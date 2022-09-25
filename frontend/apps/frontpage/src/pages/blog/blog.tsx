@@ -1,4 +1,4 @@
-import { useIntl, useTranslation } from 'hooks';
+import { useIntl, useTranslation } from '@onefootprint/hooks';
 import React from 'react';
 import SubscribeToNewsletter from 'src/components/subscribe-to-newsletter';
 import TwitterBreadcrumb from 'src/components/twitter-breadcrumb';

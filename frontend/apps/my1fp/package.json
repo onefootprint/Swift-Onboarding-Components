@@ -24,7 +24,7 @@
     "focus-trap-react": "^9.0.2",
     "footprint-elements": "*",
     "@onefootprint/global-constants": "*",
-    "hooks": "*",
+    "@onefootprint/hooks": "*",
     "icons": "*",
     "lodash": "^4.17.21",
     "next": "12.3.0",

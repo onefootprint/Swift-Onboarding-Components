@@ -1,10 +1,10 @@
+import { DeviceInfo } from '@onefootprint/hooks';
 import {
   CollectedDataOption,
   IdentifyType,
   TenantInfo,
   UserData,
 } from '@onefootprint/types';
-import { DeviceInfo } from 'hooks';
 import { OnboardingData } from 'src/utils/state-machine/types';
 
 export enum States {

@@ -1,5 +1,5 @@
+import { DeviceInfo } from '@onefootprint/hooks';
 import { ChallengeData, IdentifyType } from '@onefootprint/types';
-import { DeviceInfo } from 'hooks';
 
 export enum States {
   emailIdentification = 'emailIdentification',

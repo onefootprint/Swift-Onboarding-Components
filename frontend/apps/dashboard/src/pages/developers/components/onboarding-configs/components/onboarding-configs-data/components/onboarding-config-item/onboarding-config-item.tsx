@@ -1,6 +1,6 @@
 import { DEMO_BASE_URL } from '@onefootprint/global-constants';
+import { useToggle, useTranslation } from '@onefootprint/hooks';
 import { OnboardingConfig } from '@onefootprint/types';
-import { useToggle, useTranslation } from 'hooks';
 import { IcoArrowTopRight16, IcoPencil16 } from 'icons';
 import React from 'react';
 import styled, { css } from 'styled-components';

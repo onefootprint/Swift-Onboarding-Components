@@ -1,4 +1,4 @@
-import { useTranslation } from 'hooks';
+import { useTranslation } from '@onefootprint/hooks';
 import Head from 'next/head';
 import React from 'react';
 import useSandboxMode from 'src/hooks/use-sandbox-mode';

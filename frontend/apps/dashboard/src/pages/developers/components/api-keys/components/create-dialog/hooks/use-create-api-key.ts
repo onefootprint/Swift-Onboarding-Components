@@ -1,9 +1,9 @@
+import { useRequestErrorToast } from '@onefootprint/hooks';
 import {
   OrgCreateApiKeyRequest,
   OrgCreateApiKeysResponse,
 } from '@onefootprint/types';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useRequestErrorToast } from 'hooks';
 import request, { RequestError } from 'request';
 import useSessionUser, { AuthHeaders } from 'src/hooks/use-session-user';
 

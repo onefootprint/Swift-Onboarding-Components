@@ -1,5 +1,5 @@
+import { DeviceInfo } from '@onefootprint/hooks';
 import { TenantInfo } from '@onefootprint/types';
-import { DeviceInfo } from 'hooks';
 
 export type PluginContext<T> = {
   authToken: string;

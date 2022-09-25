@@ -1,4 +1,4 @@
-import { useTranslation } from 'hooks';
+import { useTranslation } from '@onefootprint/hooks';
 import type { Icon } from 'icons';
 import {
   IcoBuilding24,

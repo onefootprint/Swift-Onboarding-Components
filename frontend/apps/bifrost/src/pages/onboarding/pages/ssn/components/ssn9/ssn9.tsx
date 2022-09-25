@@ -1,5 +1,5 @@
+import { useInputMask, useTranslation } from '@onefootprint/hooks';
 import { HeaderTitle, InfoBox } from 'footprint-elements';
-import { useInputMask, useTranslation } from 'hooks';
 import { IcoFileText24, IcoLock24, IcoShield24 } from 'icons';
 import React from 'react';
 import { useForm } from 'react-hook-form';

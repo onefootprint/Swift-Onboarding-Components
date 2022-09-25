@@ -1,5 +1,5 @@
+import { useTranslation } from '@onefootprint/hooks';
 import { createPopup } from '@typeform/embed';
-import { useTranslation } from 'hooks';
 import React from 'react';
 import styled, { css } from 'styled-components';
 import { media } from 'ui';

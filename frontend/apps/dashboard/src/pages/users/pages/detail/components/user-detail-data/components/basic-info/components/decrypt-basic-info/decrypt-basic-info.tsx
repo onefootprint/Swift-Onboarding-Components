@@ -1,5 +1,5 @@
+import { useTranslation } from '@onefootprint/hooks';
 import { UserDataAttribute } from '@onefootprint/types';
-import { useTranslation } from 'hooks';
 import { IcoBuilding24, IcoFileText224, IcoUserCircle24 } from 'icons';
 import pickBy from 'lodash/pickBy';
 import React from 'react';

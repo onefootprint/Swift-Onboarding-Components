@@ -1,5 +1,5 @@
+import { useTranslation } from '@onefootprint/hooks';
 import { HeaderTitle } from 'footprint-elements';
-import { useTranslation } from 'hooks';
 import React, { useEffect } from 'react';
 import useSessionUser from 'src/hooks/use-session-user';
 import { Events } from 'src/utils/state-machine/liveness-check';

@@ -1,4 +1,4 @@
-import { useTranslation } from 'hooks';
+import { useTranslation } from '@onefootprint/hooks';
 import { LogoFpDefault } from 'icons';
 import Link from 'next/link';
 import React from 'react';

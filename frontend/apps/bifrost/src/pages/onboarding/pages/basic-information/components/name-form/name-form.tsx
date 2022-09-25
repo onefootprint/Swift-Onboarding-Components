@@ -1,6 +1,6 @@
+import { useTranslation } from '@onefootprint/hooks';
 import { UserData, UserDataAttribute } from '@onefootprint/types';
 import { HeaderTitle } from 'footprint-elements';
-import { useTranslation } from 'hooks';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import {

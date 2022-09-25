@@ -1,7 +1,7 @@
+import { useTranslation } from '@onefootprint/hooks';
 import { CollectedDataOption } from '@onefootprint/types';
 import { useIsMutating } from '@tanstack/react-query';
 import { HeaderTitle, NavigationHeader } from 'footprint-elements';
-import { useTranslation } from 'hooks';
 import {
   IcoBuilding24,
   IcoCake24,

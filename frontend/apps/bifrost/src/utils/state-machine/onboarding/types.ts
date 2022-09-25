@@ -1,5 +1,5 @@
+import { DeviceInfo } from '@onefootprint/hooks';
 import { CollectedDataOption, TenantInfo, UserData } from '@onefootprint/types';
-import { DeviceInfo } from 'hooks';
 import {
   BasicInformation,
   ResidentialAddress,

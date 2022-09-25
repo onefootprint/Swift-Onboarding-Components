@@ -1,4 +1,4 @@
-import { DeviceInfo, useDeviceInfo } from 'hooks';
+import { DeviceInfo, useDeviceInfo } from '@onefootprint/hooks';
 import has from 'lodash/has';
 import React, { useEffect } from 'react';
 import { Events, States } from 'src/utils/state-machine/liveness-check/types';

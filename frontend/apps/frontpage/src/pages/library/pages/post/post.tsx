@@ -1,4 +1,4 @@
-import { useIntl, useTranslation } from 'hooks';
+import { useIntl, useTranslation } from '@onefootprint/hooks';
 import { IcoChevronLeftBig24 } from 'icons';
 import Link from 'next/link';
 import React from 'react';

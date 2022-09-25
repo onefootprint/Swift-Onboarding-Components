@@ -1,6 +1,6 @@
+import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
 import { ChallengeKind } from '@onefootprint/types';
 import { HeaderTitle, NavigationHeader } from 'footprint-elements';
-import { useRequestErrorToast, useTranslation } from 'hooks';
 import { IcoEmail24 } from 'icons';
 import React from 'react';
 import useIdentify from 'src/pages/identify/hooks/use-identify';

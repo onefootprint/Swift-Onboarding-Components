@@ -23,7 +23,7 @@
     "constate": "^3.3.2",
     "footprint-elements": "*",
     "@onefootprint/global-constants": "*",
-    "hooks": "*",
+    "@onefootprint/hooks": "*",
     "icons": "*",
     "lodash": "^4.17.21",
     "next": "12.3.0",

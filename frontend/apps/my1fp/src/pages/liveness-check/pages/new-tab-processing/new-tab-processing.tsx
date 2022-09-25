@@ -1,5 +1,5 @@
+import { useTranslation } from '@onefootprint/hooks';
 import { HeaderTitle } from 'footprint-elements';
-import { useTranslation } from 'hooks';
 import React from 'react';
 import { useLivenessCheckMachine } from 'src/pages/liveness-check/components/machine-provider';
 import { Events } from 'src/utils/state-machine/liveness-check';

@@ -1,4 +1,4 @@
-import { useTranslation } from 'hooks';
+import { useTranslation } from '@onefootprint/hooks';
 import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
 import { Accordion, Container, Typography } from 'ui';

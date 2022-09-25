@@ -1,5 +1,5 @@
+import { DeviceInfo } from '@onefootprint/hooks';
 import { IdScanBadImageError, IdScanDocType } from '@onefootprint/types';
-import { DeviceInfo } from 'hooks';
 
 export enum States {
   init = 'init',

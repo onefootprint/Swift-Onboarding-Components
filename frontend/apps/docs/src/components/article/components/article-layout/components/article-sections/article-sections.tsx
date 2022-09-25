@@ -1,4 +1,4 @@
-import { useTranslation } from 'hooks';
+import { useTranslation } from '@onefootprint/hooks';
 import { IcoFileText16 } from 'icons';
 import React, { useEffect } from 'react';
 import type { ArticleSection } from 'src/types/article';

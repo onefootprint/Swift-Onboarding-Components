@@ -1,6 +1,6 @@
 import footprint from '@onefootprint/footprint-js';
+import { useTranslation } from '@onefootprint/hooks';
 import { UserDecryptResponse } from '@onefootprint/types';
-import { useTranslation } from 'hooks';
 import { LogoFpDefault } from 'icons';
 import { useRouter } from 'next/router';
 import React from 'react';

@@ -1,5 +1,9 @@
+import {
+  useCountdown,
+  useRequestErrorToast,
+  useTranslation,
+} from '@onefootprint/hooks';
 import { ChallengeKind, IdentifyResponse } from '@onefootprint/types';
-import { useCountdown, useRequestErrorToast, useTranslation } from 'hooks';
 import React, { useEffect } from 'react';
 import useIdentify from 'src/pages/identify/hooks/use-identify';
 import { Events } from 'src/utils/state-machine/identify/types';

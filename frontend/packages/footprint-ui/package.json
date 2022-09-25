@@ -21,7 +21,7 @@
     "base64url": "^3.0.1",
     "constate": "^3.3.2",
     "@onefootprint/global-constants": "*",
-    "hooks": "*",
+    "@onefootprint/hooks": "*",
     "i18next": "^21.9.2",
     "icons": "*",
     "lodash": "^4.17.21",

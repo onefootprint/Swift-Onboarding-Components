@@ -22,7 +22,7 @@
     "focus-trap-react": "^9.0.2",
     "footprint-elements": "*",
     "@onefootprint/global-constants": "*",
-    "hooks": "*",
+    "@onefootprint/hooks": "*",
     "icons": "*",
     "polished": "^4.2.2",
     "qrcode.react": "^3.0.2",

@@ -1,5 +1,5 @@
+import { useTranslation } from '@onefootprint/hooks';
 import { CollectedDataOption } from '@onefootprint/types';
-import { useTranslation } from 'hooks';
 import React from 'react';
 import { Events } from 'src/utils/state-machine/onboarding';
 import { BasicInformation as BasicInformationData } from 'src/utils/state-machine/types';

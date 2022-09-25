@@ -1,4 +1,4 @@
-import { useToggle, useTranslation } from 'hooks';
+import { useToggle, useTranslation } from '@onefootprint/hooks';
 import React from 'react';
 import styled, { css } from 'styled-components';
 import { Box, Button, Divider, Typography } from 'ui';

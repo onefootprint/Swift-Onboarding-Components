@@ -1,4 +1,4 @@
-import { useHasScroll, useToggle, useTranslation } from 'hooks';
+import { useHasScroll, useToggle, useTranslation } from '@onefootprint/hooks';
 import {
   IcoBook24,
   IcoFootprint24,

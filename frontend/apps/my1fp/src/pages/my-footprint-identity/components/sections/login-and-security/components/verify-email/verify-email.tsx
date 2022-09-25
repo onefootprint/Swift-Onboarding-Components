@@ -1,4 +1,4 @@
-import { useTranslation } from 'hooks';
+import { useTranslation } from '@onefootprint/hooks';
 import React from 'react';
 import useSessionUser from 'src/hooks/use-session-user';
 import { Box, LinkButton, LoadingIndicator, Typography, useToast } from 'ui';

@@ -1,6 +1,6 @@
+import { useInputMask, useTranslation } from '@onefootprint/hooks';
 import { UserDataAttribute } from '@onefootprint/types';
 import { HeaderTitle } from 'footprint-elements';
-import { useInputMask, useTranslation } from 'hooks';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import useOnboardingMachine from 'src/pages/onboarding/hooks/use-onboarding-machine';

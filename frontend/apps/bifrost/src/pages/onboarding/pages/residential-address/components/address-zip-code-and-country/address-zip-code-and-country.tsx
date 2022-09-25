@@ -1,6 +1,6 @@
+import { useTranslation } from '@onefootprint/hooks';
 import { UserDataAttribute } from '@onefootprint/types';
 import { HeaderTitle } from 'footprint-elements';
-import { useTranslation } from 'hooks';
 import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import NavigationHeader from 'src/pages/onboarding/components/navigation-header';

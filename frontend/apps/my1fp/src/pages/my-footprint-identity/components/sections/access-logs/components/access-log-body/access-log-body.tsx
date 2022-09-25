@@ -1,5 +1,5 @@
+import { useTranslation } from '@onefootprint/hooks';
 import { AccessLog } from '@onefootprint/types';
-import { useTranslation } from 'hooks';
 import React from 'react';
 import styled, { css } from 'styled-components';
 import { Box, Typography } from 'ui';

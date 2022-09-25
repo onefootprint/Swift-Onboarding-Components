@@ -1,5 +1,5 @@
+import { useTranslation } from '@onefootprint/hooks';
 import { D2PStatusUpdate } from '@onefootprint/types';
-import { useTranslation } from 'hooks';
 import React, { useEffect } from 'react';
 import styled, { css } from 'styled-components';
 import { Button } from 'ui';

@@ -1,9 +1,9 @@
+import { DeviceInfo } from '@onefootprint/hooks';
 import {
   CollectedDataOption,
   TenantInfo,
   UserDataAttribute,
 } from '@onefootprint/types';
-import { DeviceInfo } from 'hooks';
 import { interpret } from 'xstate';
 
 import createOnboardingMachine from './machine';

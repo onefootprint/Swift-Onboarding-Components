@@ -1,4 +1,4 @@
-import { useTranslation } from 'hooks';
+import { useTranslation } from '@onefootprint/hooks';
 import React, { useState } from 'react';
 import Field from 'src/components/field';
 import FieldGroup from 'src/components/field-group';

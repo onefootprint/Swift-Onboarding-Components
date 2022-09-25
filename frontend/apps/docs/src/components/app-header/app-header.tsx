@@ -1,4 +1,4 @@
-import { useTranslation } from 'hooks';
+import { useTranslation } from '@onefootprint/hooks';
 import { IcoArrowUpRight16, IcoDatabase16, IcoShield16 } from 'icons';
 import React from 'react';
 import type { ProductArticle } from 'src/types/product';

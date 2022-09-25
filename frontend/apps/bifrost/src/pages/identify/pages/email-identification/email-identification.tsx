@@ -1,3 +1,4 @@
+import { useRequestErrorToast } from '@onefootprint/hooks';
 import {
   ChallengeData,
   ChallengeKind,
@@ -6,7 +7,6 @@ import {
   UserData,
   UserDataAttribute,
 } from '@onefootprint/types';
-import { useRequestErrorToast } from 'hooks';
 import React, { useState } from 'react';
 import useIdentify from 'src/pages/identify/hooks/use-identify';
 import { Events } from 'src/utils/state-machine/identify/types';

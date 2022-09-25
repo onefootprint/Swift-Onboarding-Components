@@ -1,4 +1,4 @@
-import { useTranslation } from 'hooks';
+import { useTranslation } from '@onefootprint/hooks';
 import React from 'react';
 
 import IdScanDocTypeToLabel from '../../../../constants/doc-type-labels';

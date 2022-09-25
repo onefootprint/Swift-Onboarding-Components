@@ -4,8 +4,8 @@ import {
   CountryRecord,
   DEFAULT_COUNTRY,
 } from '@onefootprint/global-constants';
+import { useTranslation } from '@onefootprint/hooks';
 import { CountryCode, IdScanDocType } from '@onefootprint/types';
-import { useTranslation } from 'hooks';
 import { IcoCar24, IcoIdCard24, IcoPassport24 } from 'icons';
 import React, { useState } from 'react';
 import styled, { css } from 'styled-components';

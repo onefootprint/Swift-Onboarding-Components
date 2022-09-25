@@ -1,5 +1,5 @@
+import { useTranslation } from '@onefootprint/hooks';
 import { NavigationHeader, useFootprintJs } from 'footprint-elements';
-import { useTranslation } from 'hooks';
 import { IcoCheckCircle40 } from 'icons';
 import React, { useEffect } from 'react';
 import Confetti from 'react-confetti';

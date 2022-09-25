@@ -1,4 +1,4 @@
-import { useTranslation } from 'hooks';
+import { useTranslation } from '@onefootprint/hooks';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import React from 'react';

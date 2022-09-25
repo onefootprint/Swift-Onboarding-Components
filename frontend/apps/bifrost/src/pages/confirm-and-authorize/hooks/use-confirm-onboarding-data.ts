@@ -1,4 +1,4 @@
-import { useTranslation } from 'hooks';
+import { useTranslation } from '@onefootprint/hooks';
 import { useBifrostMachine } from 'src/components/bifrost-machine-provider';
 import { Events } from 'src/hooks/use-bifrost-machine';
 import useOnboardingComplete from 'src/pages/confirm-and-authorize/hooks/use-onboarding-complete';

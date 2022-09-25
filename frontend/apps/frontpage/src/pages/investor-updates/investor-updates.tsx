@@ -1,4 +1,4 @@
-import { useIntl, useTranslation } from 'hooks';
+import { useIntl, useTranslation } from '@onefootprint/hooks';
 import React from 'react';
 import TwitterBreadcrumb from 'src/components/twitter-breadcrumb';
 import { getInitialPosts, PostType } from 'src/utils/ghost';

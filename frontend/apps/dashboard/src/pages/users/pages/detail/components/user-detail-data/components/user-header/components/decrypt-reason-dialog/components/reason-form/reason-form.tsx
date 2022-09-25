@@ -1,4 +1,4 @@
-import { useTranslation } from 'hooks';
+import { useTranslation } from '@onefootprint/hooks';
 import React, { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { Box, Divider, Select, SelectOption, TextArea, Typography } from 'ui';

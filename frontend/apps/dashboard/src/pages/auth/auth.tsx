@@ -1,5 +1,5 @@
+import { useTranslation } from '@onefootprint/hooks';
 import { OrgAuthLoginResponse } from '@onefootprint/types';
-import { useTranslation } from 'hooks';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import React, { useEffect } from 'react';
