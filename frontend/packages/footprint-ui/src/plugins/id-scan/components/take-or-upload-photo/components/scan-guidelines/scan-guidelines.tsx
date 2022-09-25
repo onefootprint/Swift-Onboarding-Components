@@ -2,7 +2,7 @@ import { useTranslation } from '@onefootprint/hooks';
 import { IcoSmartphone24, IcoSquareFrame24, IcoSun24 } from 'icons';
 import React from 'react';
 
-import InfoBox from '../../../../components/info-box';
+import InfoBox from '../../../../../../components/info-box';
 
 const ScanGuidelines = () => {
   const { t } = useTranslation('components.scan-guidelines');

@@ -11,6 +11,7 @@ import {
 const createIdScanMachine = () =>
   createMachine<MachineContext, MachineEvents>(
     {
+      predictableActionArguments: true,
       id: 'idScan',
       initial: States.init,
       context: {},

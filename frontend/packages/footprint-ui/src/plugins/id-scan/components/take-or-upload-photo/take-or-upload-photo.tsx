@@ -5,7 +5,9 @@ import { Button } from 'ui';
 
 import { HeaderTitle } from '../../../../components';
 import MissingPermissions from '../missing-permissions';
-import ScanGuidelines from '../scan-guidelines';
+import Camera from './components/camera';
+import Prompt from './components/prompt/prompt';
+import UploadPreview from './components/upload-preview/upload-preview';
 
 type TakeOrUploadPhotoProps = {
   title: string;
@@ -14,10 +16,20 @@ type TakeOrUploadPhotoProps = {
   onComplete: (image: string) => void;
 };
 
-enum SelectionType {
-  take,
-  upload,
+enum Mode {
+  take = 'take',
+  upload = 'upload',
 }
+
+const convertImageBlobToBase64 = (image: Blob) =>
+  new Promise(resolve => {
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const base64 = reader.result;
+      resolve(base64);
+    };
+    reader.readAsDataURL(image);
+  });
 
 const TakeOrUploadPhoto = ({
   title,
@@ -26,6 +38,8 @@ const TakeOrUploadPhoto = ({
   onComplete,
 }: TakeOrUploadPhotoProps) => {
   const { t } = useTranslation('components.take-or-upload-photo');
+  const [image, setImage] = useState<Blob | undefined>();
+  const [mode, setMode] = useState<Mode | undefined>();
   const [missingCameraPermissions, setMissingCameraPermissions] =
     useState(false);
   const [missingLibraryPermissions, setMissingLibraryPermissions] =
@@ -36,56 +50,62 @@ const TakeOrUploadPhoto = ({
     ? t('camera-permission-name')
     : t('photo-lib-permission-name');
 
-  const checkIfMissingPermissions = (selection: SelectionType) => {
-    if (selection === SelectionType.take) {
-      setMissingCameraPermissions(true);
-    } else {
-      setMissingLibraryPermissions(true);
-    }
-    // TODO: Check if missing permissions
-    return true;
-  };
-
-  const handleSelection = (selection: SelectionType) => {
-    const isMissing = checkIfMissingPermissions(selection);
-    if (isMissing) {
-      return;
-    }
-
-    // TODO: Send back the photo received
-    onComplete('');
-  };
-
   const handleCloseMissingPermissions = () => {
     setMissingCameraPermissions(false);
     setMissingLibraryPermissions(false);
   };
 
+  const handleCameraError = () => {
+    // https://linear.app/footprint/issue/FP-1444/handle-different-usermedia-errors-beyond-missing-permissions
+    // TODO: handle different errors differently
+    // For now assume it is all because of missing permissions
+    setMode(undefined);
+    setMissingCameraPermissions(true);
+  };
+
+  const handleUpload = () => {
+    // https://linear.app/footprint/issue/FP-1441/implement-photo-upload-logic
+    // TODO: implement upload, for now, just show missing permissions
+    setMissingLibraryPermissions(true);
+    // setMode(Mode.upload);
+  };
+
+  const handleSubmit = async () => {
+    if (!image) {
+      return;
+    }
+    const imageString = (await convertImageBlobToBase64(image)) as string;
+    onComplete(imageString);
+  };
+
   return (
-    <>
-      <Container>
-        <HeaderTitle title={title} subtitle={subtitle} />
-        {showGuidelines && <ScanGuidelines />}
-        <ButtonsContainer>
-          <Button
-            fullWidth
-            onClick={() => {
-              handleSelection(SelectionType.take);
-            }}
-          >
-            {t('take')}
-          </Button>
-          <Button
-            fullWidth
-            variant="secondary"
-            onClick={() => {
-              handleSelection(SelectionType.upload);
-            }}
-          >
-            {t('upload')}
-          </Button>
-        </ButtonsContainer>
-      </Container>
+    <Container>
+      <HeaderTitle title={title} subtitle={subtitle} />
+      {!mode && (
+        <Prompt
+          onSelectTake={() => setMode(Mode.take)}
+          onSelectUpload={handleUpload}
+          showGuidelines={showGuidelines}
+        />
+      )}
+      {mode === Mode.take && (
+        <Camera
+          onError={handleCameraError}
+          onCapture={setImage}
+          onClear={() => setImage(undefined)}
+        />
+      )}
+      {mode === Mode.upload && image && (
+        <UploadPreview
+          src={URL.createObjectURL(image)}
+          onReupload={handleUpload}
+        />
+      )}
+      {mode && image && (
+        <Button onClick={handleSubmit} fullWidth>
+          {t('continue')}
+        </Button>
+      )}
       {hasMissingPermission && (
         <MissingPermissions
           permissionName={missingPermissionName}
@@ -93,22 +113,9 @@ const TakeOrUploadPhoto = ({
           onClose={handleCloseMissingPermissions}
         />
       )}
-    </>
+    </Container>
   );
 };
-
-const ButtonsContainer = styled.div`
-  ${({ theme }) => css`
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    row-gap: ${theme.spacing[4]}px;
-
-    > * {
-      width: 100%;
-    }
-  `}
-`;
 
 const Container = styled.div`
   ${({ theme }) => css`
@@ -117,6 +124,10 @@ const Container = styled.div`
     row-gap: ${theme.spacing[7]}px;
     justify-content: center;
     align-items: center;
+
+    > button {
+      margin-top: -${theme.spacing[4]}px;
+    }
   `}
 `;
 

@@ -25,8 +25,16 @@
     "take-or-upload-photo": {
       "camera-permission-name": "camera",
       "photo-lib-permission-name": "photo library",
-      "take": "Take photo",
-      "upload": "Upload photo"
+      "take-photo": {
+        "title": "Take photo",
+        "take": "Take photo",
+        "retake": "Take another photo"
+      },
+      "upload-photo": {
+        "title": "Upload photo",
+        "reupload": "Upload another photo"
+      },
+      "continue": "Continue"
     }
   },
   "pages": {

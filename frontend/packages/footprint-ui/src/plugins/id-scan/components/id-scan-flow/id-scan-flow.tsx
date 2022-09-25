@@ -9,8 +9,8 @@ import IdScanFailed from './pages/id-scan-failed';
 import ProcessingPhoto from './pages/processing-photo/processing-photo';
 import RetryBackPhoto from './pages/retry-back-photo/retry-back-photo';
 import RetryFrontPhoto from './pages/retry-front-photo/retry-front-photo';
-import TakeOrUploadBackPhoto from './pages/take-or-upload-back-photo/take-or-upload-back-photo';
-import TakeOrUploadFrontPhoto from './pages/take-or-upload-front-photo/take-or-upload-front-photo';
+import TakeOrUploadBackPhoto from './pages/take-or-upload-back-photo';
+import TakeOrUploadFrontPhoto from './pages/take-or-upload-front-photo';
 
 type IdScanFlowProps = Pick<IdScanProps, 'context' | 'onDone'>;
 

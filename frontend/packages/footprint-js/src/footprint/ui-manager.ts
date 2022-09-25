@@ -45,7 +45,7 @@ export default class implements UIManager {
     });
     child.frame.setAttribute(
       'allow',
-      'otp-credentials; publickey-credentials-get *',
+      'otp-credentials; publickey-credentials-get *; camera *;',
     );
     handleOnIframeLoaded();
     child.on(FootprintEvents.closed, () => this.hide());

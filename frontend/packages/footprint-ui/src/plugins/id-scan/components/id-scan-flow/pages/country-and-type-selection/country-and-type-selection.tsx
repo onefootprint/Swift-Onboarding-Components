@@ -41,7 +41,7 @@ const CountryAndTypeSelection = () => {
   };
 
   const handleDocTypeChange = (value: string) => {
-    setDocType(value as IdScanDocType);
+    setDocType(IdScanDocType[value as keyof typeof IdScanDocType]);
   };
 
   const optionByDocType: Record<IdScanDocType, RadioSelectOptionFields> = {
