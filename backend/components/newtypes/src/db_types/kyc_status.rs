@@ -3,7 +3,7 @@ use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use serde::{Deserialize, Serialize};
 use strum_macros::{AsRefStr, EnumString};
 
-use crate::VerificationInfoStatus;
+use crate::{requirement_status::RequirementStatus, VerificationInfoStatus};
 
 /// The type of data attribute
 #[derive(
@@ -44,6 +44,18 @@ impl KycStatus {
             Self::StepUpRequired => Some(VerificationInfoStatus::Failed),
             Self::Success => Some(VerificationInfoStatus::Verified),
             Self::Failed => Some(VerificationInfoStatus::Failed),
+        }
+    }
+
+    /// Api-visible status that hides KYC failures from the client side.
+    pub fn public_status(&self) -> RequirementStatus {
+        match self {
+            Self::New => RequirementStatus::Pending,
+            Self::Pending => RequirementStatus::Pending,
+            Self::ManualReview => RequirementStatus::Complete,
+            Self::StepUpRequired => RequirementStatus::Complete,
+            Self::Success => RequirementStatus::Complete,
+            Self::Failed => RequirementStatus::Complete,
         }
     }
 }

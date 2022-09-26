@@ -242,7 +242,17 @@ class TestBifrost:
         post("hosted/user/biometric", data, d2p_auth_token, status_code=400)
 
     def test_onboarding_kyc(self, workos_tenant, auth_token):
+        body = get(
+            "hosted/onboarding/kyc", None, workos_tenant.ob_config.key, auth_token
+        )
+        assert body["status"] == "pending"
+
         post("hosted/onboarding/kyc", None, workos_tenant.ob_config.key, auth_token)
+
+        body = get(
+            "hosted/onboarding/kyc", None, workos_tenant.ob_config.key, auth_token
+        )
+        assert body["status"] == "complete"
 
     def test_onboarding_complete(self, workos_tenant, auth_token):
         body = post(

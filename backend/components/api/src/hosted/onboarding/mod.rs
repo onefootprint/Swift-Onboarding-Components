@@ -21,6 +21,7 @@ pub fn routes() -> web::Scope {
         .service(web::resource("").route(web::post().to(post::handler)))
         .service(complete::handler)
         .service(status::handler)
+        .service(kyc::get)
         .service(kyc::post)
         .service(skip_liveness::post)
         .service(d2p::routes())

@@ -4,7 +4,7 @@ use crate::auth::{session_data::user::UserAuthScope, UserAuth};
 use crate::auth::{Either, SessionContext, VerifiedUserAuth};
 use crate::errors::onboarding::OnboardingError;
 use crate::errors::ApiError;
-use crate::types::{EmptyResponse, JsonApiResponse};
+use crate::types::{EmptyResponse, JsonApiResponse, ResponseData};
 use crate::utils::idv::initiate_idv_requests;
 use crate::utils::user_vault_wrapper::UserVaultWrapper;
 use crate::State;
@@ -12,11 +12,47 @@ use db::models::audit_trail::AuditTrail;
 use db::models::onboarding::{Onboarding, OnboardingUpdate};
 use db::models::verification_request::VerificationRequest;
 use db::{assert_in_transaction, PgConnection};
+use newtypes::requirement_status::RequirementStatus;
 use newtypes::{
     AuditTrailEvent, KycStatus, SignalScope, TenantId, ValidatedPhoneNumber, Vendor, VerificationInfo,
     VerificationInfoStatus,
 };
-use paperclip::actix::{api_v2_operation, post, web};
+use paperclip::actix::{api_v2_operation, get, post, web, Apiv2Schema};
+
+#[derive(Debug, serde::Serialize, Apiv2Schema)]
+struct StatusResponse {
+    status: RequirementStatus,
+}
+
+#[api_v2_operation(
+    summary = "/hosted/onboarding/kyc-get",
+    operation_id = "hosted-onboarding-kyc",
+    tags(Hosted),
+    description = "Check the status of KYC checks for a user"
+)]
+#[get("/kyc")]
+fn get(
+    state: web::Data<State>,
+    user_auth: UserAuth,
+    onboarding_context: Either<PublicOnboardingContext, SessionContext<ParsedOnboardingSession>>,
+) -> JsonApiResponse<StatusResponse> {
+    let user_auth = user_auth.check_permissions(vec![UserAuthScope::OrgOnboarding])?;
+
+    let ob = state
+        .db_pool
+        .db_query(move |conn| -> Result<_, ApiError> {
+            let ob_config = onboarding_context.ob_config();
+            let ob = Onboarding::get_by_config(conn, &user_auth.user_vault_id(), &ob_config.id)?
+                .ok_or(OnboardingError::NoOnboarding)?;
+            Ok(ob)
+        })
+        .await??;
+
+    let response = StatusResponse {
+        status: ob.kyc_status.public_status(),
+    };
+    ResponseData::ok(response).json()
+}
 
 #[api_v2_operation(
     summary = "/hosted/onboarding/kyc",
