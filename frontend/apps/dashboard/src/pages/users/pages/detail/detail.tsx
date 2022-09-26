@@ -29,7 +29,7 @@ const Detail = () => {
         <Typography variant="label-2">{t('breadcrumb.details')}</Typography>
       </Breadcrumb>
       <DecryptMachineProvider>
-        {isLoading ?? <UserDetailsLoading />}
+        {isLoading && <UserDetailsLoading />}
         {shouldShowData && (
           <UserDetailsData user={user} decrypt={decryptUser} />
         )}
