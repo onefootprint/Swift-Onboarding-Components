@@ -3,17 +3,19 @@ product: KYC + PII Vault
 title: Getting started
 slug: /kyc-with-pii/getting-started
 position: 1
-meta: {
-   title: KYC + PII Vault - Getting started,
-   description: Getting started with KYC and PII Vault
-}
+meta:
+  {
+    title: KYC + PII Vault - Getting started,
+    description: Getting started with KYC and PII Vault,
+  }
 ---
 
 ## Add Footprint.js to your app
 
 1. Go to the Footprint [developer dashboard](https://dashboard.onefootprint.com/developers) and create a new `Onboarding configuration`
-   * Select the “standard” list of IDV fields to collect or customize the fields.
-   * Select the “standard” list of IDV fields you require access to decrypt.
+
+   - Select the “standard” list of IDV fields to collect or customize the fields.
+   - Select the “standard” list of IDV fields you require access to decrypt.
 
 2. Grab the onboarding Publishable Key, for example `pk_test_yflLnFW219f9bC0pdyGd`.
 
@@ -42,9 +44,9 @@ yarn add @onefootprint/footprint-js
 5. Add your Footprint completion handler
 
 ```javascript
-window.onFootprintCompleted = function(token) {
-// TODO: Post the token to your server
-}
+window.onFootprintCompleted = function (token) {
+  // TODO: Post the token to your server
+};
 ```
 
 ## Verify the Footprint token server-side
@@ -53,7 +55,7 @@ window.onFootprintCompleted = function(token) {
 
 <inline-alert variant='warning'>Treat this key like a sensitive password! It allows anyone to impersonate your company.</inline-alert>
 
-The Footprint API uses API keys to authenticate requests. You can view and manage your API keys in the developer dashboard. Go to the Footprint [developer dashboard](https://dashboard.onefootprint.com/developers) and generate a new **Secret API Key**. Test mode secret keys have the prefix `sk_test` and live mode secret keys have the prefix `sk_live`. 
+The Footprint API uses API keys to authenticate requests. You can view and manage your API keys in the developer dashboard. Go to the Footprint [developer dashboard](https://dashboard.onefootprint.com/developers) and generate a new **Secret API Key**. Test mode secret keys have the prefix `sk_test` and live mode secret keys have the prefix `sk_live`.
 
 <inline-alert variant='warning'>Treat this key like a sensitive password! Your API keys carry many privileges, so be sure to keep them secure! Do not post your secret keys in publicly accessible places like GitHub or client-side code like web front-ends.</inline-alert>
 
@@ -74,11 +76,11 @@ curl -X POST https://api.onefootprint.com/users/validate \
 
 ```json
 {
-   "data": {
-      "footprint_user_id": "fp_id_GSxJr68GAf5jUT3pdL9ndjf7TLkA3GCX",
-      "status": "verified",
-      "timestamp": "2022-07-30T05:39:33.723Z"
-   }
+  "data": {
+    "footprint_user_id": "fp_id_GSxJr68GAf5jUT3pdL9ndjf7TLkA3GCX",
+    "status": "verified",
+    "timestamp": "2022-07-30T05:39:33.723Z"
+  }
 }
 ```
 
@@ -87,8 +89,8 @@ curl -X POST https://api.onefootprint.com/users/validate \
 5. (Optionally) Fetch the user’s audit trail for detailed results on the identity verification:
 
 ```bash
-curl -X GET -G https://api.onefootprint.com/users/fp_id_GSxJr68GAf5jUT3pdL9ndjf7TLkA3GCX/audit_trail \
-   -u sk_test_CXUsbCR8j2kH6e5GeEl8eSBnQTIPCUaKpv
+curl -X GET -G https://api.onefootprint.com/users/audit_trail?footprint_user_id=fp_id_GSxJr68GAf5jUT3pdL9ndjf7TLkA3GCX \
+   -u sk_test_CXUsbCR8j2kH6e5GeEl8eSBnQTIPCUaKpv:
 ```
 
 6. (Optionally) Decrypt identity fields from the user’s vault:
@@ -96,7 +98,7 @@ curl -X GET -G https://api.onefootprint.com/users/fp_id_GSxJr68GAf5jUT3pdL9ndjf7
 ```bash
 curl -X POST https://api.onefootprint.com/users/fp_id_GSxJr68GAf5jUT3pdL9ndjf7TLkA3GCX/identity/decrypt \
    -u sk_test_CXUsbCR8j2kH6e5GeEl8eSBnQTIPCUaKpv: \
-   -d '{"fields": ["dob", "last_name", "ssn4"}'
+   -d '{"fields": ["dob", "last_name", "ssn4"], "reason": "getting started test"}'
 ```
 
 ```json
