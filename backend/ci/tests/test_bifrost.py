@@ -117,7 +117,7 @@ class TestBifrost:
 
         # Shouldn't be able to complete the onboarding until user data is provided
         post(
-            "hosted/onboarding/complete",
+            "hosted/onboarding/authorize",
             None,
             workos_tenant.ob_config.key,
             auth_token,
@@ -254,13 +254,12 @@ class TestBifrost:
         )
         assert body["status"] == "complete"
 
-    def test_onboarding_complete(self, workos_tenant, auth_token):
+    def test_onboarding_authorize(self, workos_tenant, auth_token):
         body = post(
-            "hosted/onboarding/complete", None, workos_tenant.ob_config.key, auth_token
+            "hosted/onboarding/authorize", None, workos_tenant.ob_config.key, auth_token
         )
         validation_token = body["validation_token"]
 
-        assert body["missing_webauthn_credentials"] == False
         assert validation_token
 
         # test the validate api call
@@ -270,17 +269,16 @@ class TestBifrost:
         assert body["status"]
 
     def test_onboard_onto_same_tenant(self, workos_tenant, auth_token):
-        return  # TODO restore this test when fixed
         body = post("hosted/onboarding", None, workos_tenant.ob_config.key, auth_token)
         validation_token = body["validation_token"]
         data = dict(validation_token=validation_token)
         body = post("users/validate", data, workos_tenant.sk.key)
         assert body["footprint_user_id"]
 
-        # We won't ever actually hit onboarding/complete if the tenant has already onboarded,
+        # We won't ever actually hit onboarding/authorize if the tenant has already onboarded,
         # but if we do, we should no-op and succeed
         body = post(
-            "hosted/onboarding/complete", None, workos_tenant.ob_config.key, auth_token
+            "hosted/onboarding/authorize", None, workos_tenant.ob_config.key, auth_token
         )
         validation_token = body["validation_token"]
         data = dict(validation_token=validation_token)
@@ -386,9 +384,9 @@ class TestBifrost:
 
             post("hosted/onboarding/kyc", None, tenant.ob_config.key, auth_token)
 
-            # complete onboarding for user
+            # authorize onboarding for user
             body = post(
-                "hosted/onboarding/complete", None, tenant.ob_config.key, auth_token
+                "hosted/onboarding/authorize", None, tenant.ob_config.key, auth_token
             )
             validation_token = body["validation_token"]
             assert validation_token
@@ -419,7 +417,7 @@ class TestBifrostSandbox:
         basic_user = create_basic_user(twilio, suffix)
         user_data = build_user_data()
 
-        # Initialize the onboarding, poopulate data, complete the onboarding
+        # Initialize the onboarding, poopulate data, authorize the onboarding
         post(
             "hosted/onboarding",
             None,
@@ -428,6 +426,12 @@ class TestBifrostSandbox:
         )
         post("hosted/user/data/identity", user_data, basic_user.auth_token)
         post(
+            "hosted/onboarding/skip_liveness",
+            None,
+            workos_sandbox_tenant.ob_config.key,
+            basic_user.auth_token,
+        )
+        post(
             "hosted/onboarding/kyc",
             None,
             workos_sandbox_tenant.ob_config.key,
@@ -435,7 +439,7 @@ class TestBifrostSandbox:
         )
 
         body = post(
-            "hosted/onboarding/complete",
+            "hosted/onboarding/authorize",
             None,
             workos_sandbox_tenant.ob_config.key,
             basic_user.auth_token,

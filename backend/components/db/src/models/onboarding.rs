@@ -65,6 +65,13 @@ impl OnboardingUpdate {
             ..Self::default()
         }
     }
+
+    pub fn is_authorized(is_authorized: bool) -> Self {
+        Self {
+            is_authorized: Some(is_authorized),
+            ..Self::default()
+        }
+    }
 }
 
 pub type OnboardingInfo = (Onboarding, ObConfiguration, InsightEvent);

@@ -157,9 +157,9 @@ def user(workos_sandbox_tenant, twilio):
         basic_user.auth_token,
     )
 
-    # Complete the onboarding
+    # Authorize and complete the onboarding
     body = post(
-        "hosted/onboarding/complete",
+        "hosted/onboarding/authorize",
         None,
         workos_sandbox_tenant.ob_config.key,
         basic_user.auth_token,

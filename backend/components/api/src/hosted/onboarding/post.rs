@@ -12,7 +12,7 @@ use crate::State;
 use db::models::insight_event::CreateInsightEvent;
 use db::models::onboarding::Onboarding;
 use db::models::scoped_user::ScopedUser;
-use newtypes::{SessionAuthToken, Status};
+use newtypes::SessionAuthToken;
 use paperclip::actix::{api_v2_operation, web, web::Json, Apiv2Schema};
 
 use super::create_onboarding_validation_token;
@@ -63,8 +63,9 @@ pub fn handler(
             // https://linear.app/footprint/issue/FP-1414/create-documentrequest-rows
 
             // If the user has already onboarded onto this same ob config, return a validation token
-            let validation_token = (ob.status == Status::Verified)
-                .then_some(create_onboarding_validation_token(conn, &session_key, ob.id)?);
+            let validation_token =
+                ob.is_authorized
+                    .then_some(create_onboarding_validation_token(conn, &session_key, ob.id)?);
             Ok(validation_token)
         })
         .await?;
