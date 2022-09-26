@@ -17,6 +17,13 @@ const Content = styled.div`
       padding: 0 ${theme.spacing[11]}px;
     `}
 
+    figure {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
+
     img {
       margin-bottom: ${theme.spacing[9]}px;
       max-width: 100%;
