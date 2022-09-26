@@ -83,6 +83,16 @@ const Content = styled.div`
       ${createFontStyles('heading-3')};
     }
 
+    ol {
+      margin-bottom: ${theme.spacing[9]}px;
+
+      li {
+        list-style-type: decimal;
+        list-style-position: inside;
+        ${createFontStyles('body-1')};
+      }
+    }
+
     ul {
       margin-bottom: ${theme.spacing[9]}px;
 
