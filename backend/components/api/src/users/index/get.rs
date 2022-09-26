@@ -13,8 +13,9 @@ use db::models::identity_data::HasIdentityDataFields;
 use db::models::onboarding::Onboarding;
 use db::scoped_user::OnboardingListQueryParams;
 use newtypes::csv::deserialize_stringified_list;
+use newtypes::KycStatus;
 use newtypes::TenantPermission;
-use newtypes::{DataAttribute, Fingerprint, Fingerprinter, FootprintUserId, PiiString, Status};
+use newtypes::{DataAttribute, Fingerprint, Fingerprinter, FootprintUserId, PiiString};
 use paperclip::actix::{api_v2_operation, web, web::Json, Apiv2Schema};
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize, Apiv2Schema)]
@@ -22,7 +23,7 @@ use paperclip::actix::{api_v2_operation, web, web::Json, Apiv2Schema};
 pub struct UsersRequest {
     #[serde(default)]
     #[serde(deserialize_with = "deserialize_stringified_list")]
-    statuses: Vec<Status>,
+    statuses: Vec<KycStatus>,
     fingerprint: Option<PiiString>,
     footprint_user_id: Option<FootprintUserId>,
     timestamp_lte: Option<DateTime<Utc>>,

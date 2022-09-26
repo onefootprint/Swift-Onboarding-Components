@@ -130,18 +130,18 @@ fn initiate_verification(
         } else if decrypted_phone.suffix.starts_with("manualreview") {
             KycStatus::ManualReview
         } else if decrypted_phone.suffix.starts_with("idv") {
-            KycStatus::Pending
+            KycStatus::Processing
         } else {
-            KycStatus::Success
+            KycStatus::Verified
         }
     } else {
         // TODO kick off user verification with data vendors
-        KycStatus::Success
+        KycStatus::Verified
     };
 
-    // Create the VerificationRequest and mark the onboarding's kyc_status as Pending in one transaction
+    // Create the VerificationRequest and mark the onboarding's kyc_status as Processing in one transaction
     let ob = ob.update(conn, OnboardingUpdate::kyc_status(desired_status))?;
-    if desired_status == KycStatus::Pending {
+    if desired_status == KycStatus::Processing {
         let requests_to_initiate = vec![Vendor::Idology, Vendor::Twilio];
         let requests_to_initiate = requests_to_initiate
             .into_iter()
@@ -157,7 +157,7 @@ fn initiate_verification(
     // TODO kick off user verification with data vendors,
     // and don't mark as verified until data verification with vendors is complete
     let final_status = match &desired_status {
-        KycStatus::Success => VerificationInfoStatus::Verified,
+        KycStatus::Verified => VerificationInfoStatus::Verified,
         _ => VerificationInfoStatus::Failed,
     };
     let events = vec![

@@ -124,7 +124,7 @@ impl IDologySuccess {
     /// IDology-determined status for verifying the customer
     fn status(&self) -> KycStatus {
         match self.summary_result.as_ref().map(|x| x.key.as_str()) {
-            Some("id.success") => KycStatus::Success,
+            Some("id.success") => KycStatus::Verified,
             Some("id.failure") => KycStatus::Failed,
             _ => KycStatus::ManualReview,
         }

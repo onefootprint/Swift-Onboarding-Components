@@ -452,5 +452,4 @@ class TestBifrostSandbox:
             dict(validation_token=validation_token),
             workos_sandbox_tenant.sk.key,
         )
-        return  # TODO fix
         assert body["status"] == expected_status

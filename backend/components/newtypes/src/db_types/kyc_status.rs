@@ -1,5 +1,6 @@
 pub use derive_more::Display;
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
+use paperclip::actix::Apiv2Schema;
 use serde::{Deserialize, Serialize};
 use strum_macros::{AsRefStr, EnumString};
 
@@ -21,16 +22,17 @@ use crate::{requirement_status::RequirementStatus, VerificationInfoStatus};
     FromSqlRow,
     EnumString,
     AsRefStr,
+    Apiv2Schema,
 )]
 #[strum(serialize_all = "snake_case")]
 #[serde(rename_all = "snake_case")]
 #[diesel(sql_type = Text)]
 pub enum KycStatus {
     New,
-    Pending,
+    Processing,
     ManualReview,
     StepUpRequired,
-    Success,
+    Verified,
     Failed,
 }
 
@@ -39,10 +41,10 @@ impl KycStatus {
         // Based on the Status of the onboarding, infer the status to use for the final audit trail event
         match self {
             Self::New => None,
-            Self::Pending => None,
+            Self::Processing => None,
             Self::ManualReview => Some(VerificationInfoStatus::Failed),
             Self::StepUpRequired => Some(VerificationInfoStatus::Failed),
-            Self::Success => Some(VerificationInfoStatus::Verified),
+            Self::Verified => Some(VerificationInfoStatus::Verified),
             Self::Failed => Some(VerificationInfoStatus::Failed),
         }
     }
@@ -51,10 +53,10 @@ impl KycStatus {
     pub fn public_status(&self) -> RequirementStatus {
         match self {
             Self::New => RequirementStatus::Pending,
-            Self::Pending => RequirementStatus::Pending,
+            Self::Processing => RequirementStatus::Pending,
             Self::ManualReview => RequirementStatus::Complete,
             Self::StepUpRequired => RequirementStatus::Complete,
-            Self::Success => RequirementStatus::Complete,
+            Self::Verified => RequirementStatus::Complete,
             Self::Failed => RequirementStatus::Complete,
         }
     }
@@ -70,14 +72,14 @@ mod tests {
     use super::KycStatus;
     use super::KycStatus::*;
 
-    #[test_case(New, Pending => Ordering::Less)]
-    #[test_case(Pending, ManualReview => Ordering::Less)]
-    #[test_case(Pending, StepUpRequired => Ordering::Less)]
-    #[test_case(Pending, Failed => Ordering::Less)]
+    #[test_case(New, Processing => Ordering::Less)]
+    #[test_case(Processing, ManualReview => Ordering::Less)]
+    #[test_case(Processing, StepUpRequired => Ordering::Less)]
+    #[test_case(Processing, Failed => Ordering::Less)]
     #[test_case(ManualReview, Failed => Ordering::Less)]
-    #[test_case(ManualReview, Success => Ordering::Less)]
+    #[test_case(ManualReview, Verified => Ordering::Less)]
     #[test_case(StepUpRequired, Failed=> Ordering::Less)]
-    #[test_case(StepUpRequired, Success=> Ordering::Less)]
+    #[test_case(StepUpRequired, Verified=> Ordering::Less)]
     fn test_cmp(a: KycStatus, b: KycStatus) -> Ordering {
         // We rely on the ordering of KycStatuses, so test them here
         a.cmp(&b)

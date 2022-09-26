@@ -1,6 +1,6 @@
 use chrono::{DateTime, Utc};
 use db::models::onboarding::{Onboarding, OnboardingInfo};
-use newtypes::{CollectedDataOption, DataAttribute, Status};
+use newtypes::{CollectedDataOption, DataAttribute, KycStatus};
 use paperclip::actix::Apiv2Schema;
 
 use super::insight_event::FpInsightEvent;
@@ -9,7 +9,7 @@ use super::insight_event::FpInsightEvent;
 pub struct FpOnboarding {
     name: String,
     timestamp: DateTime<Utc>,
-    status: Status,
+    kyc_status: KycStatus,
     can_access_data: Vec<CollectedDataOption>,
     can_access_data_attributes: Vec<DataAttribute>,
     insight_event: FpInsightEvent,
@@ -19,7 +19,7 @@ impl From<OnboardingInfo> for FpOnboarding {
     fn from(s: OnboardingInfo) -> Self {
         let Onboarding {
             start_timestamp,
-            status,
+            kyc_status,
             ..
         } = s.0;
         let db::models::ob_configuration::ObConfiguration {
@@ -31,7 +31,7 @@ impl From<OnboardingInfo> for FpOnboarding {
         Self {
             name,
             timestamp: start_timestamp,
-            status,
+            kyc_status,
             can_access_data,
             can_access_data_attributes,
             insight_event: FpInsightEvent::from(s.2),

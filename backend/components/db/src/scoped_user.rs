@@ -4,13 +4,13 @@ use crate::{errors::DbError, schema::scoped_user::BoxedQuery};
 use chrono::{DateTime, Utc};
 use diesel::pg::Pg;
 use diesel::prelude::*;
-use newtypes::{Fingerprint, FootprintUserId, Status, TenantId};
+use newtypes::{Fingerprint, FootprintUserId, KycStatus, TenantId};
 
 #[derive(Clone)]
 pub struct OnboardingListQueryParams {
     pub tenant_id: TenantId,
     pub is_live: bool,
-    pub statuses: Vec<Status>,
+    pub statuses: Vec<KycStatus>,
     pub fingerprints: Option<Vec<Fingerprint>>,
     pub footprint_user_id: Option<FootprintUserId>,
     pub timestamp_lte: Option<DateTime<Utc>>,
@@ -26,7 +26,7 @@ pub fn list_for_tenant_query<'a>(params: OnboardingListQueryParams) -> BoxedQuer
     if !params.statuses.is_empty() {
         // TODO https://linear.app/footprint/issue/FP-661/adapt-orgonboardings-to-support-multiple-ob-configurations-per
         let matching_ob_ids = schema::onboarding::table
-            .filter(schema::onboarding::status.eq_any(params.statuses))
+            .filter(schema::onboarding::kyc_status.eq_any(params.statuses))
             .select(schema::onboarding::scoped_user_id)
             .distinct();
         query = query.filter(schema::scoped_user::id.eq_any(matching_ob_ids))

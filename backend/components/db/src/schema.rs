@@ -160,7 +160,6 @@ table! {
         start_timestamp -> Timestamptz,
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
-        status -> Text,
         insight_event_id -> Uuid,
         kyc_status -> Text,
         is_liveness_skipped -> Bool,
