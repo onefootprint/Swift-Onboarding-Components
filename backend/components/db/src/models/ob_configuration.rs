@@ -86,13 +86,14 @@ impl ObConfiguration {
         Ok(count)
     }
 
-    pub fn list_for_scoped_user(
+    pub fn list_authorized_for_user(
         conn: &mut PgConnection,
         scoped_user_id: ScopedUserId,
     ) -> Result<Vec<ObConfiguration>, crate::DbError> {
         let obcs = ob_configuration::table
             .inner_join(onboarding::table)
             .filter(onboarding::scoped_user_id.eq(scoped_user_id))
+            .filter(onboarding::is_authorized.eq(true))
             .select(ob_configuration::all_columns)
             .get_results(conn)?;
         Ok(obcs)

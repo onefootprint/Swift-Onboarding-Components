@@ -285,7 +285,7 @@ impl UserVaultWrapper {
             return Ok(());
         }
 
-        let ob_configs = ObConfiguration::list_for_scoped_user(conn, scoped_user.id.clone())?;
+        let ob_configs = ObConfiguration::list_authorized_for_user(conn, scoped_user.id.clone())?;
         let can_access_attributes: HashSet<_> = ob_configs
             .into_iter()
             .flat_map(|x| x.can_access_data)
