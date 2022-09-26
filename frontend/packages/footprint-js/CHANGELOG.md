@@ -1,5 +1,11 @@
 # @onefootprint/footprint
 
+## 0.3.0
+
+### Minor Changes
+
+- 9e53f207: Fix font styles
+
 ## 0.2.0
 
 ### Minor Changes
