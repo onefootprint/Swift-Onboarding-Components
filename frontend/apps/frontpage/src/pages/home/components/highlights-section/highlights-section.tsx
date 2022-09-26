@@ -55,7 +55,7 @@ const ItemsContainer = styled.div`
     grid-template-rows: 3 1fr;
     row-gap: ${theme.spacing[5]}px;
 
-    ${media.greaterThan('lg')`
+    ${media.greaterThan('md')`
       grid-template-columns: repeat(3, 1fr);
       grid-template-rows: 1 1fr;
       column-gap: ${theme.spacing[5]}px;
