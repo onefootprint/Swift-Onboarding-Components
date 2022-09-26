@@ -4,6 +4,8 @@ export const createCSSClasses = () => {
   const style = document.createElement('style');
   style.type = 'text/css';
   style.innerHTML = `
+    @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@500&display=swap');
+  
     .footprint-body-locked {
       overflow: hidden;
     }

@@ -49,6 +49,28 @@ window.onFootprintCompleted = function (token) {
 };
 ```
 
+6. To customize the button placement, the easiest way is to wrap the button in a div and apply the styles to this div:
+
+```html
+<style>
+  .container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+  }
+</style>
+
+<div class="container">
+  <div
+    id="footprint-button"
+    data-public-key="ob_test_IY68VIBMzzClUrpFY1Pf5J"
+  ></div>
+</div>
+```
+
+Click [here](https://github.com/onefootprint/examples/tree/master/frontend-vanilla-js) to check out a full example.
+
 ## Verify the Footprint token server-side
 
 1. Go to the Footprint developer dashboard and generate a new Secret API Key. This will look something like `sk_test_CXUsbCR8j2kH6e5GeEl8eSBnQTIPCUaKpv`. Add this to the credential manager of your server-side app.
