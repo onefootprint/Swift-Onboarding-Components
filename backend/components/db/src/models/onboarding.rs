@@ -3,7 +3,7 @@ use super::scoped_user::ScopedUser;
 use crate::models::insight_event::InsightEvent;
 use crate::models::ob_configuration::ObConfiguration;
 use crate::schema::{onboarding, scoped_user};
-use crate::DbError;
+use crate::{DbError, DbResult};
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
@@ -41,6 +41,14 @@ struct NewOnboarding {
     kyc_status: KycStatus,
     is_liveness_skipped: bool,
     is_authorized: bool,
+}
+
+#[derive(Debug, AsChangeset, Default)]
+#[diesel(table_name = onboarding)]
+pub struct OnboardingUpdate {
+    pub kyc_status: Option<KycStatus>,
+    pub is_liveness_skipped: Option<bool>,
+    pub is_authorized: Option<bool>,
 }
 
 pub type OnboardingInfo = (Onboarding, ObConfiguration, InsightEvent);
@@ -124,10 +132,21 @@ impl Onboarding {
         Ok(ob)
     }
 
+    pub fn update(self, conn: &mut PgConnection, update: OnboardingUpdate) -> DbResult<Self> {
+        // Intentionally consume the value so the stale version is not used
+        let result = diesel::update(onboarding::table)
+            .filter(onboarding::id.eq(self.id))
+            .set(update)
+            .get_result(conn)?;
+        Ok(result)
+    }
+
+    // TODO rm
     pub fn update_status(self, conn: &mut PgConnection, new_status: Status) -> Result<Self, DbError> {
         Self::update_status_by_id(conn, &self.id, new_status)
     }
 
+    // TODO rm
     pub fn update_status_by_id(
         conn: &mut PgConnection,
         id: &OnboardingId,

@@ -92,7 +92,9 @@ class TestBifrost:
         assert not body["available_challenge_kinds"]
 
     @pytest.mark.parametrize("token_type", ["publishable", "session"])
-    def test_onboarding_init(self, workos_tenant, token_type, ob_session_token, auth_token):
+    def test_onboarding_init(
+        self, workos_tenant, token_type, ob_session_token, auth_token
+    ):
         ob_auth = {
             "publishable": workos_tenant.ob_config.key,
             "session": ob_session_token,
@@ -100,9 +102,7 @@ class TestBifrost:
         body = post("hosted/onboarding", None, ob_auth, auth_token)
         assert not body["validation_token"]
 
-        body = get(
-            "hosted/onboarding/status", None, ob_auth, auth_token
-        )
+        body = get("hosted/onboarding/status", None, ob_auth, auth_token)
 
         req = lambda kind: next(r for r in body["requirements"] if r["kind"] == kind)
         identity_check_req = req("identity_check")
@@ -123,6 +123,26 @@ class TestBifrost:
             auth_token,
             status_code=400,
         )
+
+    def test_skip_liveness(self, auth_token, workos_tenant):
+        # Liveness requirement exists
+        body = get(
+            "hosted/onboarding/status", None, workos_tenant.ob_config.key, auth_token
+        )
+        assert list(r for r in body["requirements"] if r["kind"] == "liveness")
+
+        post(
+            "hosted/onboarding/skip_liveness",
+            None,
+            workos_tenant.ob_config.key,
+            auth_token,
+        )
+
+        # After skipping, liveness requirement does not exist
+        body = get(
+            "hosted/onboarding/status", None, workos_tenant.ob_config.key, auth_token
+        )
+        assert not list(r for r in body["requirements"] if r["kind"] == "liveness")
 
     def test_user_data(self, auth_token):
         # Test failed validation

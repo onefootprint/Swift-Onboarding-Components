@@ -83,6 +83,8 @@ pub enum ApiError {
     MethodNotAllowed,
     #[error("Idv error: {0}")]
     IdvError(#[from] idv::Error),
+    #[error("{0}")]
+    Custom(String),
 }
 
 impl<T> From<WorkOsError<T>> for ApiError
@@ -159,6 +161,7 @@ impl actix_web::ResponseError for ApiError {
             ApiError::EndpointNotFound => StatusCode::NOT_FOUND,
             ApiError::MethodNotAllowed => StatusCode::METHOD_NOT_ALLOWED,
             ApiError::IdvError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            ApiError::Custom(_) => StatusCode::BAD_REQUEST,
         }
     }
 
