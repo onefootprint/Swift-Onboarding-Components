@@ -9,6 +9,9 @@ brew install openssl
 brew install postgresql@14
 ```
 
+Install Rust:
+- Instructions here: https://rustup.rs
+
 ## Get AWS credentials
 
 AWS creds are used along with Pulumi (see below) and also for encrypting/decrypting the local development .env file
