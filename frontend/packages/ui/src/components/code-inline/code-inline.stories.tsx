@@ -22,6 +22,11 @@ export default {
       description: 'Disable copy',
       required: false,
     },
+    truncate: {
+      control: 'boolean',
+      description: 'Prevent to break the line',
+      required: false,
+    },
     testID: {
       control: 'text',
       description: 'Append an attribute data-testid for testing purposes',
@@ -52,6 +57,7 @@ const Template: Story<CodeInlineProps> = ({
   testID,
   tooltipText,
   tooltipTextConfirmation,
+  truncate,
 }: CodeInlineProps) => (
   <CodeInline
     buttonAriaLabel={buttonAriaLabel}
@@ -59,6 +65,7 @@ const Template: Story<CodeInlineProps> = ({
     testID={testID}
     tooltipText={tooltipText}
     tooltipTextConfirmation={tooltipTextConfirmation}
+    truncate={truncate}
   >
     {children}
   </CodeInline>
@@ -67,9 +74,10 @@ const Template: Story<CodeInlineProps> = ({
 export const Base = Template.bind({});
 Base.args = {
   buttonAriaLabel: 'Copy',
-  disable: false,
   children: 'fp_xm7T6MqhfRBkxL0DPOpfwM4',
+  disable: false,
   testID: 'code-test-id',
   tooltipText: 'Copy to clipboard',
   tooltipTextConfirmation: 'Copied!',
+  truncate: false,
 };

@@ -25,7 +25,7 @@ const CodeInline = ({
   testID,
   tooltipText = 'Copy to clipboard',
   tooltipTextConfirmation = 'Copied!',
-  truncate = false,
+  truncate,
 }: CodeInlineProps) => {
   const [shouldShowConfirmation, setShowConfirmation] = useState(false);
 
@@ -56,9 +56,10 @@ const CodeInline = ({
     }, HIDE_TIMEOUT);
   };
 
-  return (
+  return disable ? (
+    <CodeContent data-truncate={truncate}>{children}</CodeContent>
+  ) : (
     <Tooltip
-      disabled={disable}
       placement="right"
       size="compact"
       text={shouldShowConfirmation ? tooltipTextConfirmation : tooltipText}
@@ -68,9 +69,8 @@ const CodeInline = ({
         data-testid={testID}
         onClick={disable ? undefined : handleClick}
         type="button"
-        className={disable ? 'disabled' : undefined}
       >
-        <CodeContent truncate={truncate}>{children}</CodeContent>
+        <CodeContent data-truncate={truncate}>{children}</CodeContent>
       </Button>
     </Tooltip>
   );
@@ -79,37 +79,32 @@ const CodeInline = ({
 const Button = styled.button`
   background: none;
   border: none;
+  cursor: pointer;
   margin: 0;
   padding: 0;
-  cursor: pointer;
-
-  &.disabled {
-    cursor: text;
-  }
 `;
 
-const CodeContent = styled.code<{ truncate?: boolean }>`
-  ${({ theme, truncate }) => css`
+const CodeContent = styled.code`
+  ${({ theme }) => css`
     ${createFontStyles('snippet-2')};
     background: ${theme.backgroundColor.secondary};
     border-radius: ${theme.borderRadius[1]}px;
     border: ${theme.borderWidth[1]}px solid ${theme.borderColor.tertiary};
     color: ${theme.color.error};
-    display: block;
-    height: 24px;
-    padding: ${theme.spacing[1]}px ${theme.spacing[2]}px;
-    white-space: break-spaces;
+    display: inline-block;
     flex-flow: wrap;
+    height: 24px;
     height: auto;
+    padding: ${theme.spacing[1]}px ${theme.spacing[2]}px;
     text-align: left;
+    white-space: break-spaces;
     word-break: break-word;
 
-    ${truncate &&
-    css`
+    &[data-truncate='true'] {
       overflow: hidden;
       text-overflow: ellipsis;
       word-break: unset;
-    `}
+    }
   `}
 `;
 

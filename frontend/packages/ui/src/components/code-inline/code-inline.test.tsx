@@ -80,34 +80,31 @@ describe('<CodeInline />', () => {
   });
 
   describe('when disabled', () => {
-    it('should not show a tooltip', async () => {
+    it('should not show the button', async () => {
       renderCodeInline({
+        children: 'fp_xm7T6MqhfRBkxL0DPOpfwM4',
         tooltipText: 'Copy to clipboard',
         buttonAriaLabel: 'Copy',
         disable: true,
       });
-      const code = screen.getByRole('button', { name: 'Copy' });
-      await userEvent.hover(code);
-      const tooltip = screen.queryByRole('tooltip', {
-        name: 'Copy to clipboard',
-      });
-      expect(tooltip).not.toBeInTheDocument();
+      const code = screen.queryByRole('button', { name: 'Copy' });
+      expect(code).not.toBeInTheDocument();
     });
 
-    it('should not trigger onClick handler', async () => {
-      const { writeTestMockFn } = createClipboardSpy();
+    it('should not show the tooltip', async () => {
       renderCodeInline({
+        children: 'fp_xm7T6MqhfRBkxL0DPOpfwM4',
         tooltipText: 'Copy to clipboard',
         buttonAriaLabel: 'Copy',
         disable: true,
       });
-      const code = screen.getByRole('button', { name: 'Copy' });
+      const code = screen.getByText('fp_xm7T6MqhfRBkxL0DPOpfwM4');
       await userEvent.click(code);
       const tooltip = screen.queryByRole('tooltip', {
         name: 'Copy to clipboard',
       });
       expect(tooltip).not.toBeInTheDocument();
-      expect(writeTestMockFn).not.toHaveBeenCalled();
+      expect(tooltip).not.toBeInTheDocument();
     });
   });
 });
