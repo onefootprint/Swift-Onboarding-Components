@@ -11,6 +11,7 @@ use crate::{
 
 pub mod complete;
 pub mod d2p;
+pub mod kyc;
 pub mod post;
 pub mod skip_liveness;
 pub mod status;
@@ -20,6 +21,7 @@ pub fn routes() -> web::Scope {
         .service(web::resource("").route(web::post().to(post::handler)))
         .service(complete::handler)
         .service(status::handler)
+        .service(kyc::post)
         .service(skip_liveness::post)
         .service(d2p::routes())
 }

@@ -4,13 +4,13 @@ use chrono::Utc;
 use db::models::{
     audit_trail::AuditTrail,
     identity_data::HasIdentityDataFields,
-    onboarding::Onboarding,
+    onboarding::{Onboarding, OnboardingUpdate},
     verification_request::{NewVerificationRequest, VerificationRequest},
     verification_result::VerificationResult,
 };
 use idv::IdvResponse;
 use newtypes::{
-    email::Email, AuditTrailEvent, DataAttribute, IdvData, OnboardingId, PhoneNumber, Status, TenantId,
+    email::Email, AuditTrailEvent, DataAttribute, IdvData, KycStatus, OnboardingId, PhoneNumber, TenantId,
     UserVaultId, Vendor, VerificationInfo,
 };
 use std::{collections::HashMap, str::FromStr};
@@ -81,18 +81,19 @@ pub async fn initiate_idv_requests(
 async fn save_final_result(
     state: &State,
     ob_id: OnboardingId,
-    result_statuses: Vec<Option<Status>>,
+    result_statuses: Vec<Option<KycStatus>>,
 ) -> Result<(), ApiError> {
     // TODO build process to run this asynchronously if we crashed before getting here
+    // TODO probably don't want to default to failed
     let final_status = result_statuses
         .into_iter()
         .flatten()
         .min()
-        .unwrap_or(Status::Failed);
+        .unwrap_or(KycStatus::Failed);
     state
         .db_pool
         .db_transaction(move |conn| -> Result<_, ApiError> {
-            Onboarding::update_status_by_id(conn, &ob_id, final_status)?;
+            Onboarding::update_by_id(conn, &ob_id, OnboardingUpdate::kyc_status(final_status))?;
             if let Some(status) = final_status.audit_status() {
                 let (_, scoped_user) = Onboarding::get(conn, &ob_id)?;
                 AuditTrail::create(
@@ -118,7 +119,7 @@ async fn process_idv_request(
     user_vault_id: UserVaultId,
     tenant_id: TenantId,
     request: VerificationRequest,
-) -> Result<Option<Status>, ApiError> {
+) -> Result<Option<KycStatus>, ApiError> {
     let request_id = request.id.clone();
     let IdvResponse {
         status,

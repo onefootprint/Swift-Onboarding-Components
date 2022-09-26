@@ -1,5 +1,5 @@
 use newtypes::{
-    AuditTrailEvent, ReasonCode, SignalScope, SignalSeverity, Status, Vendor, VerificationInfo,
+    AuditTrailEvent, KycStatus, ReasonCode, SignalScope, SignalSeverity, Vendor, VerificationInfo,
     VerificationInfoStatus,
 };
 use std::{collections::HashMap, str::FromStr};
@@ -29,7 +29,7 @@ pub fn process(
 fn process_success(
     response: IDologySuccess,
     pending_attributes: Vec<SignalScope>,
-) -> Result<(Option<Status>, Vec<AuditTrailEvent>), super::Error> {
+) -> Result<(Option<KycStatus>, Vec<AuditTrailEvent>), super::Error> {
     // TODO is it concerning if there are no qualifiers?
     if !response.id_located() {
         // TODO probably want to waterfall to another vendor
@@ -38,7 +38,7 @@ fn process_success(
             vendor: Vendor::Idology,
             status: VerificationInfoStatus::NotFound,
         });
-        return Ok((Some(Status::ManualReview), vec![audit_trail]));
+        return Ok((Some(KycStatus::ManualReview), vec![audit_trail]));
     }
 
     let qualifiers = if let Some(ref qualifiers) = response.qualifiers {
@@ -97,13 +97,13 @@ fn process_success(
     Ok((Some(new_status), events))
 }
 
-fn process_error() -> (Option<Status>, Vec<AuditTrailEvent>) {
+fn process_error() -> (Option<KycStatus>, Vec<AuditTrailEvent>) {
     let events = vec![AuditTrailEvent::Verification(VerificationInfo {
         attributes: vec![],
         vendor: Vendor::Footprint,
         status: VerificationInfoStatus::Failed,
     })];
-    (Some(Status::ManualReview), events)
+    (Some(KycStatus::ManualReview), events)
 }
 
 #[derive(Debug, serde::Deserialize)]
@@ -122,11 +122,11 @@ struct IDologySuccess {
 
 impl IDologySuccess {
     /// IDology-determined status for verifying the customer
-    fn status(&self) -> Status {
+    fn status(&self) -> KycStatus {
         match self.summary_result.as_ref().map(|x| x.key.as_str()) {
-            Some("id.success") => Status::Verified,
-            Some("id.failure") => Status::Failed,
-            _ => Status::ManualReview,
+            Some("id.success") => KycStatus::Success,
+            Some("id.failure") => KycStatus::Failed,
+            _ => KycStatus::ManualReview,
         }
     }
 

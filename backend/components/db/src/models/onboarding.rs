@@ -3,7 +3,7 @@ use super::scoped_user::ScopedUser;
 use crate::models::insight_event::InsightEvent;
 use crate::models::ob_configuration::ObConfiguration;
 use crate::schema::{onboarding, scoped_user};
-use crate::{DbError, DbResult};
+use crate::{assert_in_transaction, DbError, DbResult};
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
@@ -51,6 +51,22 @@ pub struct OnboardingUpdate {
     pub is_authorized: Option<bool>,
 }
 
+impl OnboardingUpdate {
+    pub fn kyc_status(status: KycStatus) -> Self {
+        Self {
+            kyc_status: Some(status),
+            ..Self::default()
+        }
+    }
+
+    pub fn is_liveness_skipped(is_liveness_skipped: bool) -> Self {
+        Self {
+            is_liveness_skipped: Some(is_liveness_skipped),
+            ..Self::default()
+        }
+    }
+}
+
 pub type OnboardingInfo = (Onboarding, ObConfiguration, InsightEvent);
 
 impl Onboarding {
@@ -82,6 +98,22 @@ impl Onboarding {
             .into_iter()
             .map(|g| (g.0, g.1.collect()))
             .collect();
+        Ok(result)
+    }
+
+    pub fn lock_by_config(
+        conn: &mut PgConnection,
+        user_vault_id: &UserVaultId,
+        ob_configuration_id: &ObConfigurationId,
+    ) -> Result<Option<(Onboarding, ScopedUser)>, DbError> {
+        assert_in_transaction(conn)?;
+        let result = onboarding::table
+            .inner_join(scoped_user::table)
+            .filter(scoped_user::user_vault_id.eq(user_vault_id))
+            .filter(onboarding::ob_configuration_id.eq(ob_configuration_id))
+            .for_no_key_update()
+            .first(conn)
+            .optional()?;
         Ok(result)
     }
 
@@ -134,28 +166,19 @@ impl Onboarding {
 
     pub fn update(self, conn: &mut PgConnection, update: OnboardingUpdate) -> DbResult<Self> {
         // Intentionally consume the value so the stale version is not used
-        let result = diesel::update(onboarding::table)
-            .filter(onboarding::id.eq(self.id))
-            .set(update)
-            .get_result(conn)?;
+        let result = Self::update_by_id(conn, &self.id, update)?;
         Ok(result)
     }
 
-    // TODO rm
-    pub fn update_status(self, conn: &mut PgConnection, new_status: Status) -> Result<Self, DbError> {
-        Self::update_status_by_id(conn, &self.id, new_status)
-    }
-
-    // TODO rm
-    pub fn update_status_by_id(
+    pub fn update_by_id(
         conn: &mut PgConnection,
         id: &OnboardingId,
-        new_status: Status,
-    ) -> Result<Self, DbError> {
+        update: OnboardingUpdate,
+    ) -> DbResult<Self> {
         // Intentionally consume the value so the stale version is not used
         let result = diesel::update(onboarding::table)
             .filter(onboarding::id.eq(id))
-            .set(onboarding::status.eq(new_status))
+            .set(update)
             .get_result(conn)?;
         Ok(result)
     }

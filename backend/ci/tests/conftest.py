@@ -149,6 +149,14 @@ def user(workos_sandbox_tenant, twilio):
     )
     post("hosted/user/biometric", data, basic_user.auth_token)
 
+    # Run the KYC check
+    post(
+        "hosted/onboarding/kyc",
+        None,
+        workos_sandbox_tenant.ob_config.key,
+        basic_user.auth_token,
+    )
+
     # Complete the onboarding
     body = post(
         "hosted/onboarding/complete",

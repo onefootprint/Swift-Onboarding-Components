@@ -298,16 +298,6 @@ table! {
     use diesel::sql_types::*;
     use newtypes::db_types::*;
 
-    test_table (id) {
-        id -> Int4,
-        custom_enum -> Text,
-    }
-}
-
-table! {
-    use diesel::sql_types::*;
-    use newtypes::db_types::*;
-
     user_vault (id) {
         id -> Text,
         e_private_key -> Bytea,
@@ -416,7 +406,6 @@ allow_tables_to_appear_in_same_query!(
     tenant_api_key_access_log,
     tenant_role,
     tenant_user,
-    test_table,
     user_vault,
     verification_request,
     verification_result,

@@ -4,7 +4,7 @@ use paperclip::actix::Apiv2Schema;
 use serde::{Deserialize, Serialize};
 use strum_macros::{AsRefStr, EnumString};
 
-use crate::{util::impl_enum_str_diesel, VerificationInfoStatus};
+use crate::util::impl_enum_str_diesel;
 
 /// Determines what integration the app has.
 ///
@@ -19,8 +19,6 @@ use crate::{util::impl_enum_str_diesel, VerificationInfoStatus};
     Apiv2Schema,
     PartialEq,
     Eq,
-    Ord,
-    PartialOrd,
     AsExpression,
     FromSqlRow,
     EnumString,
@@ -42,34 +40,4 @@ impl Default for Status {
     }
 }
 
-impl Status {
-    pub fn audit_status(&self) -> Option<VerificationInfoStatus> {
-        // Based on the Status of the onboarding, infer the status to use for the final audit trail event
-        match self {
-            Self::Processing => None,
-            Self::ManualReview => Some(VerificationInfoStatus::Failed),
-            Self::Failed => Some(VerificationInfoStatus::Failed),
-            Self::Verified => Some(VerificationInfoStatus::Verified),
-        }
-    }
-}
-
 impl_enum_str_diesel!(Status);
-
-#[cfg(test)]
-mod tests {
-    use std::cmp::Ordering;
-    use test_case::test_case;
-
-    use super::Status;
-    use super::Status::*;
-
-    #[test_case(Processing, ManualReview => Ordering::Less)]
-    #[test_case(Processing, Failed => Ordering::Less)]
-    #[test_case(Failed, Verified => Ordering::Less)]
-    #[test_case(ManualReview, Verified => Ordering::Less)]
-    fn test_cmp(a: Status, b: Status) -> Ordering {
-        // We rely on the ordering of Statuses, so test them here
-        a.cmp(&b)
-    }
-}

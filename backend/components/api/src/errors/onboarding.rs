@@ -1,3 +1,4 @@
+use newtypes::KycStatus;
 use thiserror::Error;
 
 #[derive(Debug, Error)]
@@ -14,6 +15,8 @@ pub enum OnboardingError {
     InvalidSandboxState,
     #[error("Onboarding does not exist")]
     NoOnboarding,
+    #[error("Onboarding is in wrong KYC state: {0}")]
+    WrongKycState(KycStatus),
     #[error("Tenant does not match")]
     TenantMismatch,
 }

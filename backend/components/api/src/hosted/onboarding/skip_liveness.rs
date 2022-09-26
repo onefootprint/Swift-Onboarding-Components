@@ -25,23 +25,18 @@ fn post(
 
     state
         .db_pool
-        .db_query(move |conn| -> Result<_, ApiError> {
+        .db_transaction(move |conn| -> Result<_, ApiError> {
             let ob_config = onboarding_context.ob_config();
-            let onboarding = Onboarding::get_by_config(conn, &user_auth.user_vault_id(), &ob_config.id)?
-                .ok_or(OnboardingError::NoOnboarding)?;
+            let (onboarding, _) =
+                Onboarding::lock_by_config(conn, &user_auth.user_vault_id(), &ob_config.id)?
+                    .ok_or(OnboardingError::NoOnboarding)?;
             if onboarding.is_authorized {
                 return Err(ApiError::Custom("Cannot edit completed onobarding".to_owned()));
             }
-            onboarding.update(
-                conn,
-                OnboardingUpdate {
-                    is_liveness_skipped: Some(true),
-                    ..OnboardingUpdate::default()
-                },
-            )?;
+            onboarding.update(conn, OnboardingUpdate::is_liveness_skipped(true))?;
             Ok(())
         })
-        .await??;
+        .await?;
 
     EmptyResponse::ok().json()
 }
