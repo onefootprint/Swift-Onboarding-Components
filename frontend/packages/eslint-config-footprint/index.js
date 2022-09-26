@@ -28,6 +28,7 @@ module.exports = {
       'error',
       {
         exceptions: [
+          'FormProvider',
           'AddressInput',
           'App',
           'BaseInput',

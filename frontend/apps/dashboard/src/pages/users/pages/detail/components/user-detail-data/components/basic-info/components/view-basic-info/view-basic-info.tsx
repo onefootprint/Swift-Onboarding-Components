@@ -6,7 +6,7 @@ import { nameData, User } from 'src/pages/users/hooks/use-join-users';
 import styled, { css } from 'styled-components';
 
 import getSectionsVisibility from '../../utils/get-sections-visibility';
-import DataContainer from '../data-container';
+import DataContainer from './components/data-container';
 import DataRow from './components/data-row';
 
 type ViewBasicInfoProps = {

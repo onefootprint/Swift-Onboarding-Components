@@ -94,7 +94,7 @@ export const LinkButtonStyled = styled.a.attrs<{
 }>(({ href }) => ({
   as: href ? 'a' : 'button',
 }))<LinkButtonStyleProps>`
-  ${({ theme, size, href, variant, disabled, sx, iconPosition }) => css`
+  ${({ theme, size, variant, disabled, sx, iconPosition }) => css`
     ${createFontStyles(fontSize[size])};
     align-items: center;
     background: transparent;
@@ -107,22 +107,17 @@ export const LinkButtonStyled = styled.a.attrs<{
     text-decoration: none;
     ${sx};
 
-    ${disabled
-      ? 'opacity: 0.45'
-      : css`
-          &:hover {
-            opacity: 0.7;
+    &:hover {
+      opacity: 0.7;
+    }
 
-            ${href &&
-            css`
-              text-decoration: underline;
-            `}
-          }
+    &:active {
+      opacity: 0.85;
+    }
 
-          &:active {
-            opacity: 0.85;
-          }
-        `}
+    &:disabled {
+      opacity: 0.45;
+    }
 
     svg {
       ${iconPosition === 'left'
