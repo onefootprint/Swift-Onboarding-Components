@@ -22,17 +22,20 @@ AWS creds are used along with Pulumi (see below) and also for encrypting/decrypt
    - Navigate to Services => Security, Identity, & Compliance => IAM
    - Click "users" on the left hand sidebar
    - Generate a new user (yourname). No need to add tags or anything, just copy the permissions from an existing user
-   - Run `$ aws configure` and enter your access key and secret access key to configure your aws profile. Pulumi had trouble reading credentials I configured using the aws CLI, so I would also recommend setting your AWS_ACCESS_KEY_ID annd AWS_SECRET_KEY environment variables
+   - Run `$ aws configure` and enter your access key and secret access key to configure your aws profile. Pulumi had trouble reading credentials I configured using the aws CLI, so I would also recommend setting your AWS_ACCESS_KEY_ID annd AWS_SECRET_ACCESS_KEY environment variables
 
 ## Local development
 
-First, get your .env file setup. This is stored encrypted in git. To decrypt it, make sure you have AWS creds above, and run:
+First, get your .env file setup. This is stored encrypted in git. To decrypt it, make sure you have AWS creds above, and run the following from `backend/`:
 
 ```sh
 make set-dot-env
 ```
 
-Next, ensure your postgres is running at you set your `DATABASE_URL` env.
+
+
+Next, ensure your postgres is running 
+- run `createdb footprint_db` (e.g. the last part of the `DATABASE_URL` from your `.env`. Ensure this works by running `psql -d footprint_db`. 
 
 To run the server:
 ```sh
