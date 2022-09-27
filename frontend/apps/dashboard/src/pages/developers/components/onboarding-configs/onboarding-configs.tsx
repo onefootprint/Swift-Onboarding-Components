@@ -29,7 +29,7 @@ const OnboardingConfigs = () => {
           {t('header.cta')}
         </Button>
       </Header>
-      <Box sx={{ margin: 7 }}>
+      <Box sx={{ marginY: 7 }}>
         <Divider />
       </Box>
       {data && <OnboardingConfigsData data={data} />}
