@@ -22,7 +22,7 @@ pub struct TenantUser {
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
     pub created_at: DateTime<Utc>,
-    pub last_login_at: DateTime<Utc>,
+    pub last_login_at: Option<DateTime<Utc>>,
 }
 
 impl TenantUser {
@@ -62,7 +62,8 @@ impl TenantUser {
             tenant_role_id: tenant_role.id.clone(),
             email,
             created_at: Utc::now(),
-            last_login_at: Utc::now(),
+            // init to None since they haven't logged in yet!
+            last_login_at: None,
         };
         let result = diesel::insert_into(tenant_user::table)
             .values(new_user)
@@ -121,7 +122,7 @@ struct NewTenantUser {
     tenant_role_id: TenantRoleId,
     email: TenantUserEmail,
     created_at: DateTime<Utc>,
-    last_login_at: DateTime<Utc>,
+    last_login_at: Option<DateTime<Utc>>,
 }
 
 #[derive(AsChangeset)]

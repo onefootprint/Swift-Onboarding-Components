@@ -1,0 +1,1 @@
+ALTER TABLE tenant_user ALTER COLUMN last_login_at SET NOT NULL;

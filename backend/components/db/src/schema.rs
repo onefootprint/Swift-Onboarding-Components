@@ -289,7 +289,7 @@ table! {
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
         created_at -> Timestamptz,
-        last_login_at -> Timestamptz,
+        last_login_at -> Nullable<Timestamptz>,
     }
 }
 
