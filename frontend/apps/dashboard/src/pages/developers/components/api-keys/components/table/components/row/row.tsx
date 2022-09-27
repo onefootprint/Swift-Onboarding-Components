@@ -2,7 +2,7 @@ import { useTranslation } from '@onefootprint/hooks';
 import type { ApiKey } from '@onefootprint/types';
 import { IcoDotsHorizontal24 } from 'icons';
 import React from 'react';
-import { Badge, Dropdown } from 'ui';
+import { Badge, Box, Dropdown } from 'ui';
 
 import KeyCell from './components/key-cell';
 import useReveal from './hooks/use-reveal-key';
@@ -30,19 +30,26 @@ const Row = ({ apiKey }: RowProps) => {
         <Badge variant={isEnabled ? 'success' : 'error'}>{apiKey.status}</Badge>
       </td>
       <td>
-        <Dropdown.Root>
-          <Dropdown.Trigger aria-label={t('aria-label')}>
-            <IcoDotsHorizontal24 />
-          </Dropdown.Trigger>
-          <Dropdown.Content align="end">
-            <Dropdown.Item onSelect={reveal.toggle}>
-              {apiKey.key ? t('reveal.hide') : t('reveal.show')}
-            </Dropdown.Item>
-            <Dropdown.Item onSelect={status.toggle}>
-              {isEnabled ? t('status.disable') : t('status.enable')}
-            </Dropdown.Item>
-          </Dropdown.Content>
-        </Dropdown.Root>
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'flex-end',
+          }}
+        >
+          <Dropdown.Root>
+            <Dropdown.Trigger aria-label={t('aria-label')}>
+              <IcoDotsHorizontal24 />
+            </Dropdown.Trigger>
+            <Dropdown.Content align="end">
+              <Dropdown.Item onSelect={reveal.toggle}>
+                {apiKey.key ? t('reveal.hide') : t('reveal.show')}
+              </Dropdown.Item>
+              <Dropdown.Item onSelect={status.toggle}>
+                {isEnabled ? t('status.disable') : t('status.enable')}
+              </Dropdown.Item>
+            </Dropdown.Content>
+          </Dropdown.Root>
+        </Box>
       </td>
     </>
   );
