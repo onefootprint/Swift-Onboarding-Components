@@ -4,7 +4,15 @@ import { OnboardingConfig } from '@onefootprint/types';
 import { IcoArrowTopRight16, IcoPencil16 } from 'icons';
 import React from 'react';
 import styled, { css } from 'styled-components';
-import { Badge, CodeInline, IconButton, LinkButton, Tag, Typography } from 'ui';
+import {
+  Badge,
+  Box,
+  CodeInline,
+  IconButton,
+  LinkButton,
+  Tag,
+  Typography,
+} from 'ui';
 
 import Table from '../../../table';
 import EditDialog from './components/edit-dialog';
@@ -113,14 +121,21 @@ const OnboardingConfigItem = ({ data }: OnboardingConfigItemProps) => {
             </td>
             <td>
               {data.isLive ? null : (
-                <LinkButton
-                  href={`${DEMO_BASE_URL}/preview?ob_key=${data.key}`}
-                  iconComponent={IcoArrowTopRight16}
-                  size="xTiny"
-                  target="_blank"
+                <Box
+                  sx={{
+                    display: 'flex',
+                    justifyContent: 'flex-end',
+                  }}
                 >
-                  {t('key.cta')}
-                </LinkButton>
+                  <LinkButton
+                    href={`${DEMO_BASE_URL}/preview?ob_key=${data.key}`}
+                    iconComponent={IcoArrowTopRight16}
+                    size="xTiny"
+                    target="_blank"
+                  >
+                    {t('key.cta')}
+                  </LinkButton>
+                </Box>
               )}
             </td>
           </tr>
