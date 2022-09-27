@@ -93,14 +93,29 @@ const Table = <T,>({
 const TableContainer = styled.table`
   ${({ theme }) => css`
     border-collapse: separate;
-    border-radius: ${theme.borderRadius[2]}px;
     border: 1px solid ${theme.borderColor.tertiary};
+    border-radius: ${theme.borderRadius[2]}px;
     table-layout: fixed;
     text-align: left;
     width: 100%;
-  `}
 
-  ${({ theme }) => css`
+    th {
+      ${createFontStyles('caption-2')};
+      background: ${theme.backgroundColor.secondary};
+      border-bottom: 1px solid ${theme.borderColor.tertiary};
+      color: ${theme.color.secondary};
+      padding: ${theme.spacing[4]}px ${theme.spacing[6]}px;
+      text-transform: uppercase;
+
+      &:first-child {
+        border-top-left-radius: ${theme.borderRadius[2]}px;
+      }
+
+      &:last-child {
+        border-top-right-radius: ${theme.borderRadius[2]}px;
+      }
+    }
+
     td {
       ${createFontStyles('body-3')};
       color: ${theme.color.primary};
@@ -109,30 +124,26 @@ const TableContainer = styled.table`
       vertical-align: middle;
     }
 
-    tr:not(:last-child) td,
-    th {
-      border-bottom: 1px solid ${theme.borderColor.tertiary};
+    tbody tr {
+      &:not(:last-child) {
+        td {
+          border-bottom: 1px solid ${theme.borderColor.tertiary};
+        }
+      }
+
+      &:last-child {
+        td {
+          &:first-child {
+            border-bottom-left-radius: ${theme.borderRadius[2]}px;
+          }
+
+          &:last-child {
+            border-bottom-right-radius: ${theme.borderRadius[2]}px;
+          }
+        }
+      }
     }
   `}
-
-  th {
-    ${({ theme }) => css`
-      ${createFontStyles('caption-2')};
-      background-color: ${theme.backgroundColor.secondary};
-      border-bottom: 1px solid ${theme.borderColor.tertiary};
-      border-radius: ${theme.borderRadius[2]}px ${theme.borderRadius[2]}px 0 0;
-      color: ${theme.color.secondary};
-      padding: ${theme.spacing[4]}px ${theme.spacing[6]}px;
-      position: sticky;
-      text-transform: uppercase;
-      top: 0;
-    `}
-  }
-
-  p {
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
 `;
 
 const Tr = styled.tr`
