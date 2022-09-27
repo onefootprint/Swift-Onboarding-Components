@@ -19,13 +19,16 @@ const dirArray = process.argv[2] || '';
 const dirSet = new Set(dirArray.split(',').map(d => d.trim()));
 
 const stepCheck = () => {
+  if (process.env.DISABLE_PROD_BUILD === 'true') {
+    return abortBuild();
+  }
+  if (!dirSet.size) {
+    return abortBuild();
+  }
   if (process.env.VERCEL_ENV === 'production') {
     return continueBuild();
   }
 
-  if (!dirSet.size) {
-    return abortBuild();
-  }
   const fileNameList = childProcess
     .execSync('git diff --name-only HEAD~1')
     .toString()
