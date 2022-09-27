@@ -7,7 +7,7 @@ use paperclip::actix::Apiv2Schema;
 pub struct FpTenantUser {
     id: TenantUserId,
     email: String,
-    last_login_at: DateTime<Utc>,
+    last_login_at: Option<DateTime<Utc>>,
     created_at: DateTime<Utc>,
     role_name: String,
     role_id: TenantRoleId,
