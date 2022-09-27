@@ -71,6 +71,13 @@ const Company = () => {
       twitter: 'https://twitter.com/belce_dogru',
     },
     {
+      name: 'Dave Argoff',
+      avatarSrc: '/team/member-dave.png',
+      role: 'Engineering',
+      linkedin: 'https://www.linkedin.com/in/dave-argoff-54059a64/',
+      twitter: 'https://twitter.com/daveargoff',
+    },
+    {
       name: 'Eli Wachs',
       avatarSrc: '/team/member-eli.png',
       role: 'Co-founder, CEO',
