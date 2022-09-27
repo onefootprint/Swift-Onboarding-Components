@@ -1,5 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { IcoChevronLeft24, IcoClose24 } from 'icons';
+import { IcoChevronLeftBig24, IcoClose24 } from 'icons';
 import React from 'react';
 import { Dialog, useConfirmationDialog } from 'ui';
 
@@ -106,7 +106,7 @@ const CreateOnboardingConfig = ({
         onClick: handleClose,
       }}
       onClose={state.step === 0 ? handleClose : handleBack}
-      closeIconComponent={state.step === 0 ? IcoClose24 : IcoChevronLeft24}
+      closeIconComponent={state.step === 0 ? IcoClose24 : IcoChevronLeftBig24}
       open={open}
     >
       {state.step === 0 && (
