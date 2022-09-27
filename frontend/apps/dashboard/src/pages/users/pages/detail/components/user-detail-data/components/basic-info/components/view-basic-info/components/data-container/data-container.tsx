@@ -51,7 +51,7 @@ const Header = styled.header`
     border-radius: ${theme.spacing[2]}px ${theme.spacing[2]}px 0 0;
     display: flex;
     flex-direction: row;
-    gap: ${theme.spacing[2]}px;
+    gap: ${theme.spacing[3]}px;
     padding: ${theme.spacing[3]}px ${theme.spacing[5]}px;
   `};
 `;
