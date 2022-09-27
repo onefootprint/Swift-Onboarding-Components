@@ -40,6 +40,9 @@ impl TenantUser {
         if let Some((_, u, _)) = result.as_ref() {
             diesel::update(tenant_user::table)
                 .filter(tenant_user::id.eq(&u.id))
+                // TODO(argoff ask): Why doesn't compiler complain if I don't use Some() here? (it doesn't complain if I use Some() either...)
+                // I think it's because we are inserting PG types, and NULLABLE is a column constraint (e.g. _column can be null_), rather than a specific type like Option
+                // which we'd have to unwrap/get
                 .set(tenant_user::last_login_at.eq(Utc::now()))
                 .get_result::<TenantUser>(conn)?;
         }
