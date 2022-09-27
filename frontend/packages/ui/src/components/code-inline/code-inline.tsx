@@ -67,6 +67,7 @@ const CodeInline = ({
       <Button
         aria-label={buttonAriaLabel}
         data-testid={testID}
+        data-truncate={truncate}
         onClick={disable ? undefined : handleClick}
         type="button"
       >
@@ -82,6 +83,10 @@ const Button = styled.button`
   cursor: pointer;
   margin: 0;
   padding: 0;
+
+  &[data-truncate='true'] {
+    width: 100%;
+  }
 `;
 
 const CodeContent = styled.code`
@@ -103,6 +108,7 @@ const CodeContent = styled.code`
     &[data-truncate='true'] {
       overflow: hidden;
       text-overflow: ellipsis;
+      width: 100%;
       word-break: unset;
     }
   `}

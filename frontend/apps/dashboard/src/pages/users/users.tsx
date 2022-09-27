@@ -101,9 +101,7 @@ const Users = () => {
               <FieldOrPlaceholder data={nameData(item.attributes)} />
             </td>
             <td>
-              <CodeContainer>
-                <CodeInline truncate>{item.footprintUserId}</CodeInline>
-              </CodeContainer>
+              <CodeInline truncate>{item.footprintUserId}</CodeInline>
             </td>
 
             <td>
@@ -154,12 +152,6 @@ const Users = () => {
 const SearchContainer = styled.div`
   display: flex;
   justify-content: space-between;
-`;
-
-const CodeContainer = styled.div`
-  button {
-    width: 100%;
-  }
 `;
 
 export default Users;
