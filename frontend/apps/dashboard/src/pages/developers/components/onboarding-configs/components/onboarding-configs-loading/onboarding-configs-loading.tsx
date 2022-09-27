@@ -21,7 +21,7 @@ const OnboardingConfigsLoading = () => {
             <th>
               <Shimmer
                 sx={{
-                  backgroundColor: 'neutral',
+                  backgroundColor: 'senary',
                   height: '24px',
                   marginBottom: 2,
                   width: '200px',
@@ -31,7 +31,7 @@ const OnboardingConfigsLoading = () => {
                 sx={{
                   height: '20px',
                   width: '230px',
-                  backgroundColor: 'neutral',
+                  backgroundColor: 'senary',
                 }}
               />
             </th>
@@ -47,7 +47,7 @@ const OnboardingConfigsLoading = () => {
                   sx={{
                     height: '20px',
                     width: '53px',
-                    backgroundColor: 'neutral',
+                    backgroundColor: 'senary',
                   }}
                 />
               </Box>
