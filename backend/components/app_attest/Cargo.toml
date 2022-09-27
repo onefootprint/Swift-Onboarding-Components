@@ -1,15 +1,15 @@
 [package]
 name = "app-attest"
-version = "0.1.0"
-edition = "2021"
-
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
 
 [dependencies]
-base64 = "0.13"
-serde = { version = "1.0", features = ["derive"] }
-serde_cbor = "0.11"
-thiserror = "1.0"
-serde_bytes = "0.11"
-openssl = "0.10"
+base64 = { workspace = true }
+serde = { workspace = true }
+serde_cbor = { workspace = true }
+thiserror = { workspace = true }
+serde_bytes = { workspace = true }
+openssl = { workspace = true }
 byteorder = "1.3.4"
 x509-parser = "0.13"

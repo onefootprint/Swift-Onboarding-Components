@@ -1,29 +1,30 @@
 [package]
 name = "newtypes"
-version = "0.1.0"
-edition = "2021"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
 
 [dependencies]
-serde = { version = "1.0", features = ["derive"] }
+serde = { workspace = true }
 derive_more = "0.99.17"
-paperclip = { version = "0.7.1", features = ["actix4"] }
-serde_json = "1.0"
-thiserror = {version = "1.0"}
-chrono = {version = "0.4",  features = ["serde"] }
-strum_macros = { version = "0.24" }
-strum = { version = "0.24", features = ["derive"] }
-serde_derive = { version = "1.0"}
-base64 = "0.13"
+paperclip = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+chrono = { workspace = true }
+strum_macros = { workspace = true }
+strum = { workspace = true }
+serde_derive = { workspace = true }
+base64 = { workspace = true }
 regex = "1.5"
-async-trait = "0.1"
+async-trait = { workspace = true }
 crypto = { path = "../enclave/crypto" }
 lazy_static = "1.0"
-uuid = { version = "1.1.2", features = ["serde", "v4"] }
+uuid = { workspace = true }
 
 # diesel
-diesel-derive-newtype = "2.0.0-rc.0"
-diesel = { version = "2.0.0", features = ["postgres", "extras"] }
-diesel-derive-enum = {  rev = "e6aa69856245f083645a0087527236a6bff42c18", git="https://github.com/adwhit/diesel-derive-enum",  features = ["postgres"] }
+diesel-derive-newtype = { workspace = true }
+diesel = { workspace = true }
+diesel-derive-enum = { workspace = true }
 diesel_as_jsonb = "1.0.0"
 
 [dev-dependencies]

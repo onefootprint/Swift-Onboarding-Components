@@ -1,22 +1,22 @@
 [package]
 name = "idv"
-version = "0.1.0"
-edition = "2021"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
 
 
 [dependencies]
 newtypes = { path = "../newtypes" }
-reqwest = {version = "0.11", features=["json"]}
-dotenv = "0.15.0"
-serde = { version = "1.0", features = ["derive"] }
-serde_json = { version = "1.0" }
-thiserror = { version = "1.0" }
-chrono = "0.4"
-actix-rt = "2.7"
-itertools = "0.10.1"
+reqwest = { workspace = true }
+dotenv = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+chrono = { workspace = true }
+itertools = { workspace = true }
 levenshtein = "1.0.5"
-
 twilio = { path = "../twilio"}
 
 [dev-dependencies]
 test-case = "2.1.0"
+actix-rt = "2.7.0"
