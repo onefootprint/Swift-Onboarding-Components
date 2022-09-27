@@ -5,7 +5,7 @@ import {
 import { useMutation } from '@tanstack/react-query';
 import request, { RequestError } from 'request';
 
-import { BIOMETRIC_AUTH_HEADER } from '../../config/constants';
+import { HANDOFF_AUTH_HEADER } from '../../config/constants';
 
 const updateD2PStatus = async (payload: UpdateD2PStatusRequest) => {
   const response = await request<{}>({
@@ -13,7 +13,7 @@ const updateD2PStatus = async (payload: UpdateD2PStatusRequest) => {
     url: '/hosted/onboarding/d2p/status',
     data: payload,
     headers: {
-      [BIOMETRIC_AUTH_HEADER]: payload.authToken,
+      [HANDOFF_AUTH_HEADER]: payload.authToken,
     },
   });
   return response.data;

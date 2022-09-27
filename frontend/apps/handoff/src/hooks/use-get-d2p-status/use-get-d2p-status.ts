@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import request, { RequestError } from 'request';
-import { BIOMETRIC_AUTH_HEADER } from 'src/config/constants';
+import { HANDOFF_AUTH_HEADER } from 'src/config/constants';
 import useBiometricMachine from 'src/hooks/use-d2p-mobile-machine';
 
 const D2P_STATUS_FETCH_INTERVAL = 1000;
@@ -26,7 +26,7 @@ const getD2PStatus = async (payload: GetD2PRequest) => {
     method: 'GET',
     url: '/hosted/onboarding/d2p/status',
     headers: {
-      [BIOMETRIC_AUTH_HEADER]: payload.authToken,
+      [HANDOFF_AUTH_HEADER]: payload.authToken,
     },
   });
   return response.data;

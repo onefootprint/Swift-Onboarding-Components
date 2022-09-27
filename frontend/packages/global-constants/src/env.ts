@@ -15,21 +15,20 @@ const getDemoUrl = (env = 'local', branchName?: string) => {
   return 'https://demo.onefootprint.com';
 };
 
-const getBiometricUrl = (env = 'local', branchName?: string) => {
+const getHandoffUrl = (env = 'local', branchName?: string) => {
   if (env === 'local') {
     return (
-      process.env.NEXT_PUBLIC_LOCAL_BIOMETRIC_BASE_URL ||
-      'http://localhost:3005'
+      process.env.NEXT_PUBLIC_LOCAL_HANDOFF_BASE_URL || 'http://localhost:3005'
     );
   }
   if (env === 'preview' && branchName) {
     if (branchName === 'development') {
-      return `https://biometric.preview.onefootprint.com`;
+      return `https://handoff.preview.onefootprint.com`;
     }
     const branchSlug = getBranchSlug(branchName);
-    return `https://biometric-git-${branchSlug}.preview.onefootprint.com`;
+    return `https://handoff-git-${branchSlug}.preview.onefootprint.com`;
   }
-  return 'https://biometric.onefootprint.com';
+  return 'https://handoff.onefootprint.com';
 };
 
 const getMy1fpUrl = (env = 'local', branchName?: string) => {
@@ -51,7 +50,7 @@ export const IS_SERVER = typeof window === 'undefined';
 export const IS_DEV = process.env.NODE_ENV === 'development';
 export const IS_PROD = !IS_DEV;
 
-export const BIOMETRIC_BASE_URL = getBiometricUrl(
+export const HANDOFF_BASE_URL = getHandoffUrl(
   process.env.NEXT_PUBLIC_VERCEL_ENV,
   process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_REF,
 );

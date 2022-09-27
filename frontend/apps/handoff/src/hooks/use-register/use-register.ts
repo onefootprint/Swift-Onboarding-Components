@@ -6,7 +6,7 @@ import {
 import { useMutation } from '@tanstack/react-query';
 import base64url from 'base64url';
 import request, { RequestError } from 'request';
-import { BIOMETRIC_AUTH_HEADER } from 'src/config/constants';
+import { HANDOFF_AUTH_HEADER } from 'src/config/constants';
 
 const generateDeviceResponse = async (challenge: string) => {
   const challengeJson = JSON.parse(challenge) as BiometricRegisterChallengeJson;
@@ -48,7 +48,7 @@ const register = async (payload: BiometricRegisterRequest) => {
     url: '/hosted/user/biometric/init',
     data: payload,
     headers: {
-      [BIOMETRIC_AUTH_HEADER]: authToken,
+      [HANDOFF_AUTH_HEADER]: authToken,
     },
   });
 
@@ -63,7 +63,7 @@ const register = async (payload: BiometricRegisterRequest) => {
       challengeToken,
     },
     headers: {
-      [BIOMETRIC_AUTH_HEADER]: authToken,
+      [HANDOFF_AUTH_HEADER]: authToken,
     },
   });
   return response.data;
