@@ -1,15 +1,15 @@
 [package]
 name = "crypto"
-version.workspace = true
-edition.workspace = true
-authors.workspace = true
+version = "0.1.0"
+edition = "2021"
+
 
 [dependencies]
-base64 = { workspace = true }
-serde = { workspace = true }
-serde_cbor = { workspace = true }
-thiserror = { workspace = true }
-hex = { workspace = true }
+base64 = "0.13"
+serde = { version = "1.0", features = ["derive"] }
+serde_cbor = "0.11"
+thiserror = "1.0"
+hex = "0.4"
 aes-gcm = "0.9.4"
 sha2 = "0.10.2"
 p256 = { version = "0.10.1", features = ["ecdh", "pem", "pkcs8"] }
@@ -18,5 +18,5 @@ elliptic-curve = "0.11.12"
 aead = "0.4.3"
 sec1 = "0.2.1"
 hmac = "0.12.1"
-rand = { workspace = true }
+rand = { version = "0.8"}
 chacha20poly1305 = "0.9.0"
