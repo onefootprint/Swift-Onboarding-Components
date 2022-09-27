@@ -30,7 +30,7 @@ fn get(
     request: web::Query<AuditTrailRequest>,
     auth: Either<WorkOsAuth, SecretTenantAuthContext>,
 ) -> actix_web::Result<Json<ResponseData<AuditTrailResponse>>, ApiError> {
-    let auth = auth.check_permissions(vec![TenantPermission::ApiKeys])?;
+    let auth = auth.check_permissions(vec![TenantPermission::AuditTrail])?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
 
@@ -39,6 +39,32 @@ fn get(
         .db_query(move |conn| {
             AuditTrail::get_for_tenant(conn, &tenant_id, &request.footprint_user_id, is_live)
         })
+        .await??;
+
+    let response = logs.into_iter().map(FpAuditTrail::from).collect::<Vec<_>>();
+    Ok(Json(ResponseData::ok(response)))
+}
+
+#[api_v2_operation(
+    summary = "/users/{footprint_user_id}/audit_trail",
+    operation_id = "users-audit_trail2",
+    description = "Allows a tenant to view a customer's audit trail.",
+    tags(PublicApi)
+)]
+#[get("/{footprint_user_id}/audit_trail")]
+fn get2(
+    state: web::Data<State>,
+    path: web::Path<FootprintUserId>,
+    auth: Either<WorkOsAuth, SecretTenantAuthContext>,
+) -> actix_web::Result<Json<ResponseData<AuditTrailResponse>>, ApiError> {
+    let auth = auth.check_permissions(vec![TenantPermission::AuditTrail])?;
+    let tenant_id = auth.tenant().id.clone();
+    let is_live = auth.is_live()?;
+    let footprint_user_id = path.into_inner();
+
+    let logs = state
+        .db_pool
+        .db_query(move |conn| AuditTrail::get_for_tenant(conn, &tenant_id, &footprint_user_id, is_live))
         .await??;
 
     let response = logs.into_iter().map(FpAuditTrail::from).collect::<Vec<_>>();

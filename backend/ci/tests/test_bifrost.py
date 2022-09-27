@@ -283,7 +283,11 @@ class TestBifrost:
         validation_token = body["validation_token"]
         data = dict(validation_token=validation_token)
         body = post("users/validate", data, workos_tenant.sk.key)
-        assert body["footprint_user_id"]
+        footprint_user_id = body["footprint_user_id"]
+        assert footprint_user_id
+
+        body = get(f"users/{footprint_user_id}/audit_trail", None, workos_tenant.sk.key)
+        assert len(body) > 0
 
     def test_identify_login_repeat_customer_biometric(self, auth_token):
         # Not used in test, but want to make sure the user has been created before running this test
@@ -401,7 +405,6 @@ class TestBifrost:
         assert (
             foo_fp_user_id != bar_fp_user_id
         ), "Onboarding onto different tenants should give different fp_user_id"
-
 
 class TestBifrostSandbox:
     @pytest.mark.parametrize(

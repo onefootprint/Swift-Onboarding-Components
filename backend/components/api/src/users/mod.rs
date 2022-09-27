@@ -18,6 +18,7 @@ pub fn routes() -> web::Scope {
         )
         .service(access_events::get)
         .service(audit_trail::get)
+        .service(audit_trail::get2)
         .service(liveness::get)
         .service(validate::validate)
         .service(
