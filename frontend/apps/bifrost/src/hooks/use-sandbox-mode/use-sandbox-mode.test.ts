@@ -8,6 +8,7 @@ describe('useSandboxMode', () => {
   describe('when it is using a live key', () => {
     it('should return false', () => {
       bifrostMachine.context.tenant.isLive = true;
+      bifrostMachine.context.tenant.pk = 'key';
       const { result } = renderHook(() => useSandboxMode(), {
         wrapper: BifrostMachineProvider,
       });
@@ -18,6 +19,7 @@ describe('useSandboxMode', () => {
   describe('when it is using a sandbox key', () => {
     it('should return false', () => {
       bifrostMachine.context.tenant.isLive = false;
+      bifrostMachine.context.tenant.pk = 'key';
       const { result } = renderHook(() => useSandboxMode(), {
         wrapper: BifrostMachineProvider,
       });

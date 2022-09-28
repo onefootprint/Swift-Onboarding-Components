@@ -37,6 +37,7 @@ const Init = () => {
         <Input />
       </Box>
       <Button />
+      <TermsOfService />
     </Box>
   );
 };
@@ -70,8 +71,12 @@ const Label = () => (
   <Shimmer sx={{ width: '37px', height: '19.5px', marginBottom: 3 }} />
 );
 
+const TermsOfService = () => <Shimmer sx={{ width: '100%', height: '16px' }} />;
+
 const Input = () => <Shimmer sx={{ width: '100%', height: '40px' }} />;
 
-const Button = () => <Shimmer sx={{ width: '100%', height: '48px' }} />;
+const Button = () => (
+  <Shimmer sx={{ width: '100%', height: '48px', marginBottom: 5 }} />
+);
 
 export default Init;

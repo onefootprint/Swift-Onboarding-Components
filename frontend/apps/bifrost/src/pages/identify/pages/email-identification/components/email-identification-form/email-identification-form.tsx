@@ -1,10 +1,9 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { UserData, UserDataAttribute } from '@onefootprint/types';
-import Link from 'next/link';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import useSandboxMode from 'src/hooks/use-sandbox-mode';
-import { Box, Button, TextInput, Typography } from 'ui';
+import { Box, Button, TextInput } from 'ui';
 
 import EMAIL_SANDBOX_REGEX from './email-identification-form.constants';
 
@@ -65,20 +64,6 @@ const EmailIdentificationForm = ({
       >
         {t('cta')}
       </Button>
-      <Typography
-        color="tertiary"
-        sx={{ textAlign: 'center' }}
-        variant="caption-1"
-      >
-        {t('terms.label')}&nbsp;
-        <Link
-          href="https://www.onefootprint.com/terms-of-service"
-          target="_blank"
-          rel="noreferrer noopener"
-        >
-          {t('terms.link')}
-        </Link>
-      </Typography>
     </form>
   );
 };

@@ -1,4 +1,4 @@
-import { useRequestErrorToast } from '@onefootprint/hooks';
+import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
 import {
   ChallengeData,
   ChallengeKind,
@@ -7,9 +7,11 @@ import {
   UserData,
   UserDataAttribute,
 } from '@onefootprint/types';
+import Link from 'next/link';
 import React, { useState } from 'react';
 import useIdentify from 'src/pages/identify/hooks/use-identify';
 import { Events } from 'src/utils/state-machine/identify/types';
+import { Typography } from 'ui';
 
 import generateLoginDeviceResponse from '../../../../utils/biometric/login-challenge-response';
 import useIdentifyMachine from '../../hooks/use-identify-machine';
@@ -21,6 +23,7 @@ import EmailIdentificationHeader from './components/email-identification-header'
 type FormData = Required<Pick<UserData, UserDataAttribute.email>>;
 
 const EmailIdentification = () => {
+  const { t } = useTranslation('pages.email-identification');
   const identifyMutation = useIdentify();
   const identifyVerifyMutation = useIdentifyVerify();
 
@@ -147,6 +150,20 @@ const EmailIdentification = () => {
     <>
       <EmailIdentificationHeader />
       <EmailIdentificationForm onSubmit={onSubmit} isLoading={isLoading} />
+      <Typography
+        color="tertiary"
+        sx={{ textAlign: 'center' }}
+        variant="caption-1"
+      >
+        {t('terms.label')}&nbsp;
+        <Link
+          href="https://www.onefootprint.com/terms-of-service"
+          target="_blank"
+          rel="noreferrer noopener"
+        >
+          {t('terms.link')}
+        </Link>
+      </Typography>
       {deviceSupportsWebauthn && (
         <ChallengePicker
           open={challengePickerVisible}

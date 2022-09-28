@@ -8,6 +8,7 @@ import SandboxBanner from './sandbox-banner';
 describe('<SandboxBanner />', () => {
   const renderSandboxBanner = (options: { isLive: boolean }) => {
     bifrostMachine.context.tenant.isLive = options.isLive;
+    bifrostMachine.context.tenant.pk = 'pk';
     customRender(
       <BifrostMachineProvider>
         <SandboxBanner />
