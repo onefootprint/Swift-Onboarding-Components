@@ -29,6 +29,9 @@ const SandboxBannerContainer = styled.div`
     border-bottom: 1px solid ${theme.borderColor.tertiary};
 
     button {
+      padding: 0;
+      margin-left: ${theme.spacing[2]}px;
+
       &:disabled {
         cursor: default;
         opacity: 0.7;
