@@ -83,9 +83,13 @@ pub fn get(
     let (scoped_users, obs, uvws, count) = state
         .db_pool
         .db_query(move |conn| -> Result<_, ApiError> {
-            let scoped_users =
-                db::scoped_user::list_for_tenant(conn, query_params.clone(), cursor, (page_size + 1) as i64)?;
-            let count = db::scoped_user::count_for_tenant(conn, query_params).map(Some)?;
+            let scoped_users = db::scoped_user::list_authorized_for_tenant(
+                conn,
+                query_params.clone(),
+                cursor,
+                (page_size + 1) as i64,
+            )?;
+            let count = db::scoped_user::count_authorized_for_tenant(conn, query_params).map(Some)?;
             let (scoped_user_ids, user_vault_ids): (_, Vec<_>) =
                 scoped_users.iter().map(|ob| (&ob.id, &ob.user_vault_id)).unzip();
             // TODO bulk fetch user vault wrapper endpoint to save many DB queries

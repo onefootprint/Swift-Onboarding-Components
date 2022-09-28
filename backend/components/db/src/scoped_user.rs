@@ -17,19 +17,24 @@ pub struct OnboardingListQueryParams {
     pub timestamp_gte: Option<DateTime<Utc>>,
 }
 
-pub fn list_for_tenant_query<'a>(params: OnboardingListQueryParams) -> BoxedQuery<'a, Pg> {
+pub fn list_authorized_for_tenant_query<'a>(params: OnboardingListQueryParams) -> BoxedQuery<'a, Pg> {
+    let authorized_ids = schema::onboarding::table
+        .filter(schema::onboarding::is_authorized.eq(true))
+        .select(schema::onboarding::scoped_user_id)
+        .distinct();
+
     let mut query = schema::scoped_user::table
         .filter(schema::scoped_user::tenant_id.eq(params.tenant_id))
         .filter(schema::scoped_user::is_live.eq(params.is_live))
+        .filter(schema::scoped_user::id.eq_any(authorized_ids))
         .into_boxed();
 
     if !params.statuses.is_empty() {
-        // TODO https://linear.app/footprint/issue/FP-661/adapt-orgonboardings-to-support-multiple-ob-configurations-per
-        let matching_ob_ids = schema::onboarding::table
+        let matching_ids = schema::onboarding::table
             .filter(schema::onboarding::kyc_status.eq_any(params.statuses))
             .select(schema::onboarding::scoped_user_id)
             .distinct();
-        query = query.filter(schema::scoped_user::id.eq_any(matching_ob_ids))
+        query = query.filter(schema::scoped_user::id.eq_any(matching_ids))
     }
 
     if let Some(footprint_user_id) = params.footprint_user_id {
@@ -57,19 +62,24 @@ pub fn list_for_tenant_query<'a>(params: OnboardingListQueryParams) -> BoxedQuer
     query
 }
 
-pub fn count_for_tenant(conn: &mut PgConnection, params: OnboardingListQueryParams) -> Result<i64, DbError> {
-    let count = list_for_tenant_query(params).count().get_result(conn)?;
+pub fn count_authorized_for_tenant(
+    conn: &mut PgConnection,
+    params: OnboardingListQueryParams,
+) -> Result<i64, DbError> {
+    let count = list_authorized_for_tenant_query(params)
+        .count()
+        .get_result(conn)?;
     Ok(count)
 }
 
 /// lists all scoped_users across all configurations
-pub fn list_for_tenant(
+pub fn list_authorized_for_tenant(
     conn: &mut PgConnection,
     params: OnboardingListQueryParams,
     cursor: Option<i64>,
     page_size: i64,
 ) -> Result<Vec<ScopedUser>, DbError> {
-    let mut scoped_users = list_for_tenant_query(params)
+    let mut scoped_users = list_authorized_for_tenant_query(params)
         .order_by(schema::scoped_user::ordering_id.desc())
         .limit(page_size);
 
