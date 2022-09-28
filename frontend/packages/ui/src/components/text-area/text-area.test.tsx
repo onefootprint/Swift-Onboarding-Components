@@ -1,5 +1,5 @@
+import { customRender, screen, userEvent } from '@onefootprint/test-utils';
 import React from 'react';
-import { customRender, screen, userEvent } from 'test-utils';
 import themes from 'themes';
 
 import TextArea, { TextAreaProps } from './text-area';

@@ -1,5 +1,5 @@
+import { customRender, screen, userEvent } from '@onefootprint/test-utils';
 import React from 'react';
-import { customRender, screen, userEvent } from 'test-utils';
 
 import Button, { ButtonProps } from './button';
 

@@ -1,6 +1,6 @@
+import { customRender, screen } from '@onefootprint/test-utils';
 import React from 'react';
 import { UserSessionMetadata, useStore } from 'src/hooks/use-session-user';
-import { customRender, screen } from 'test-utils';
 
 import Identity from './identity';
 

@@ -1,10 +1,10 @@
-import React from 'react';
 import {
   createClipboardSpy,
   customRender,
   screen,
   userEvent,
-} from 'test-utils';
+} from '@onefootprint/test-utils';
+import React from 'react';
 
 import ToastProvider from '../toast/toast-provider';
 import CodeInline, { CodeInlineProps } from './code-inline';

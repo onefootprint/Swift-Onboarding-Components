@@ -1,5 +1,5 @@
+import { customRender, screen } from '@onefootprint/test-utils';
 import React from 'react';
-import { customRender, screen } from 'test-utils';
 
 import bifrostMachine from '../../utils/state-machine/bifrost';
 import { BifrostMachineProvider } from '../bifrost-machine-provider';

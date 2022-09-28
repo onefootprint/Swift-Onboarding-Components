@@ -1,4 +1,4 @@
-import { mockRequest } from 'test-utils';
+import { mockRequest } from '@onefootprint/test-utils';
 
 export const listApiKeysFixture = [
   {

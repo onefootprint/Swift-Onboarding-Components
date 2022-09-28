@@ -22,7 +22,7 @@
     "icons",
     "@onefootprint/hooks",
     "request",
-    "test-utils",
+    "@onefootprint/test-utils",
     "themes"
   ]
 }

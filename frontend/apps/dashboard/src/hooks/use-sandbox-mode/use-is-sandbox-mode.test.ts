@@ -1,4 +1,4 @@
-import { act, renderHook } from 'test-utils';
+import { act, renderHook } from '@onefootprint/test-utils';
 
 import { useStore } from '../use-session-user';
 import useIsSandbox from './use-sandbox-mode';

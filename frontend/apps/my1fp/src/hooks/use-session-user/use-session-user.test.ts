@@ -1,4 +1,4 @@
-import { act, renderHook } from 'test-utils';
+import { act, renderHook } from '@onefootprint/test-utils';
 
 import useSessionUser, {
   UserSession,

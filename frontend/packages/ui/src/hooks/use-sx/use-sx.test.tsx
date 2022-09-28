@@ -1,4 +1,4 @@
-import { HookWrapper, renderHook } from 'test-utils';
+import { HookWrapper, renderHook } from '@onefootprint/test-utils';
 import themes from 'themes';
 
 import useSX from './use-sx';

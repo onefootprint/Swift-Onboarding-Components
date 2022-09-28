@@ -1,4 +1,4 @@
-import { renderHook } from 'test-utils';
+import { renderHook } from '@onefootprint/test-utils';
 
 import { BifrostMachineProvider } from '../../components/bifrost-machine-provider';
 import bifrostMachine from '../../utils/state-machine/bifrost';

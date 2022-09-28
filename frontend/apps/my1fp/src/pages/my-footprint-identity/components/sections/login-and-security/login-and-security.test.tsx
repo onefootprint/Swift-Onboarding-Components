@@ -1,12 +1,12 @@
-import React from 'react';
-import { UserSession, useStore } from 'src/hooks/use-session-user';
 import {
   customRender,
   mockRequest,
   screen,
   userEvent,
   waitFor,
-} from 'test-utils';
+} from '@onefootprint/test-utils';
+import React from 'react';
+import { UserSession, useStore } from 'src/hooks/use-session-user';
 
 import { UserSessionMetadata } from '../../../../../hooks/use-session-user/use-session-user';
 import LoginAndSecurity from './login-and-security';

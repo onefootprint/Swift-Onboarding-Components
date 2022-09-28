@@ -1,4 +1,3 @@
-import React from 'react';
 import {
   customRender,
   screen,
@@ -6,7 +5,8 @@ import {
   waitFor,
   waitForElementToBeRemoved,
   within,
-} from 'test-utils';
+} from '@onefootprint/test-utils';
+import React from 'react';
 
 import OnboardingConfigs from './onboarding-configs';
 import {

@@ -1,5 +1,10 @@
+import {
+  customRender,
+  screen,
+  userEvent,
+  waitFor,
+} from '@onefootprint/test-utils';
 import React from 'react';
-import { customRender, screen, userEvent, waitFor } from 'test-utils';
 
 import { useStore } from '../../hooks/use-session-user';
 import Developers from './developers';

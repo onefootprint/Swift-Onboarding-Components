@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
 import {
   customRender,
   screen,
   userEvent,
   waitForElementToBeRemoved,
-} from 'test-utils';
+} from '@onefootprint/test-utils';
+import React, { useState } from 'react';
 
 import Button from '../button';
 import ToastProvider, { useToast } from './toast-provider';

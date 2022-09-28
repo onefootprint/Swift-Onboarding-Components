@@ -1,7 +1,7 @@
+import { customRender, screen, userEvent } from '@onefootprint/test-utils';
 import IcoAndroidColored16 from 'icons/src/icos/ico-android-colored-16';
 import IcoAppleColored16 from 'icons/src/icos/ico-apple-colored-16';
 import React from 'react';
-import { customRender, screen, userEvent } from 'test-utils';
 
 import RadioSelect, { RadioSelectProps } from './radio-select';
 

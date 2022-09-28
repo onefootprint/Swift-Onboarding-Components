@@ -1,6 +1,6 @@
+import { customRender, screen, userEvent } from '@onefootprint/test-utils';
 import React from 'react';
 import { useStore } from 'src/hooks/use-session-user';
-import { customRender, screen, userEvent } from 'test-utils';
 
 import SandboxBanner from './sandbox-banner';
 

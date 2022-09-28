@@ -80,7 +80,7 @@ module.exports = {
       },
       files: [
         '**/?(*.)+(spec|test).[jt]s?(x)',
-        '**/test-utils/**/**.[jt]s?(x)',
+        '**/@onefootprint/test-utils/**/**.[jt]s?(x)',
       ],
       extends: ['plugin:testing-library/react', 'plugin:jest/recommended'],
       rules: {
@@ -89,7 +89,7 @@ module.exports = {
           {
             devDependencies: [
               '**/?(*.)+(spec|test).[jt]s?(x)',
-              '**/test-utils/**/**.[jt]s?(x)',
+              '**/@onefootprint/test-utils/**/**.[jt]s?(x)',
             ],
           },
         ],

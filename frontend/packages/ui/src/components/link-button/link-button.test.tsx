@@ -1,6 +1,6 @@
+import { customRender, screen, userEvent } from '@onefootprint/test-utils';
 import { IcoArrowRightSmall24 } from 'icons';
 import React from 'react';
-import { customRender, screen, userEvent } from 'test-utils';
 import themes, { Color } from 'themes';
 
 import LinkButton, { LinkButtonProps } from './link-button';

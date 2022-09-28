@@ -1,5 +1,5 @@
+import { customRender, screen } from '@onefootprint/test-utils';
 import React from 'react';
-import { customRender, screen } from 'test-utils';
 
 import Tag, { TagProps } from './tag';
 

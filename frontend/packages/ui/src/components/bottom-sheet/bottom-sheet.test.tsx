@@ -1,5 +1,10 @@
+import {
+  customRender,
+  screen,
+  userEvent,
+  waitFor,
+} from '@onefootprint/test-utils';
 import React from 'react';
-import { customRender, screen, userEvent, waitFor } from 'test-utils';
 
 import BottomSheet, { BottomSheetProps } from './bottom-sheet';
 
