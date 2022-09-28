@@ -55,7 +55,7 @@
     "@types/react-dom": "^18.0.6",
     "@types/styled-components": "^5.1.25",
     "eslint-config-footprint": "*",
-    "jest-presets": "*",
+    "@onefootprint/jest-presets": "*",
     "next-compose-plugins": "^2.2.1",
     "next-transpile-modules": "9.0.0",
     "@onefootprint/test-utils": "*",
@@ -63,7 +63,7 @@
     "typescript": "4.7.4"
   },
   "jest": {
-    "preset": "jest-presets/jest/web",
+    "preset": "@onefootprint/jest-presets/jest/web",
     "setupFiles": [
       "<rootDir>/src/config/initializers/react-i18next-test.ts"
     ]

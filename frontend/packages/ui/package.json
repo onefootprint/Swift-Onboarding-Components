@@ -35,7 +35,7 @@
     "@onefootprint/global-constants": "*",
     "google-libphonenumber": "^3.2.29",
     "icons": "*",
-    "jest-presets": "*",
+    "@onefootprint/jest-presets": "*",
     "json2mq": "^0.2.0",
     "lodash": "^4.17.21",
     "polished": "^4.2.2",
@@ -86,6 +86,6 @@
     "styled-components": "5.x"
   },
   "jest": {
-    "preset": "jest-presets/jest/web"
+    "preset": "@onefootprint/jest-presets/jest/web"
   }
 }

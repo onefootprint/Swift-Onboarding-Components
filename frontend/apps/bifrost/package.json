@@ -45,7 +45,7 @@
     "constate": "^3.3.2",
     "eslint-config-footprint": "*",
     "i18next": "^21.9.2",
-    "jest-presets": "*",
+    "@onefootprint/jest-presets": "*",
     "lodash": "^4.17.21",
     "next-compose-plugins": "^2.2.1",
     "next-transpile-modules": "9.0.0",
@@ -60,7 +60,7 @@
     "xstate": "^4.33.6"
   },
   "jest": {
-    "preset": "jest-presets/jest/web",
+    "preset": "@onefootprint/jest-presets/jest/web",
     "setupFiles": [
       "<rootDir>/src/config/initializers/react-i18next-test.ts"
     ]

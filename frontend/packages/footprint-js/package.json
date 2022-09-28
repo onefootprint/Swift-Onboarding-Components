@@ -27,7 +27,7 @@
   "devDependencies": {
     "@types/postmate": "^1.5.2",
     "eslint-config-footprint": "*",
-    "jest-presets": "*",
+    "@onefootprint/jest-presets": "*",
     "postmate": "^1.5.2",
     "tsconfig": "*",
     "tsup": "^6.2.2",
@@ -38,6 +38,6 @@
     "access": "public"
   },
   "jest": {
-    "preset": "jest-presets/jest/web"
+    "preset": "@onefootprint/jest-presets/jest/web"
   }
 }
