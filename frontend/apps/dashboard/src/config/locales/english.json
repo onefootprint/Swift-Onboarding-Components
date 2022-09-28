@@ -35,6 +35,9 @@
   },
   "components": {
     "private-layout": {
+      "nav-dropdown": {
+        "log-out": "Log out"
+      },
       "sandbox-banner": {
         "title": "Sandbox mode.",
         "disable": "Disable",

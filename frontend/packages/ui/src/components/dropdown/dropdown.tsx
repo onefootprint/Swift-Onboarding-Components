@@ -42,6 +42,7 @@ const StyledDropdownContent = styled(RadixDropdown.Content)`
 const StyledDropdownItem = styled(RadixDropdown.Item)`
   ${({ theme }) => css`
     ${createFontStyles('body-3')};
+    cursor: pointer;
     color: ${theme.color.primary};
     padding: ${theme.spacing[2]}px ${theme.spacing[5]}px;
     outline: none;

@@ -1,17 +1,12 @@
-import {
-  IcoCode16,
-  IcoFileText16,
-  IcoUser24,
-  IcoUsers16,
-  LogoFpCompact,
-} from 'icons';
+import { IcoCode16, IcoFileText16, IcoUsers16, LogoFpCompact } from 'icons';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React from 'react';
 import useSessionUser from 'src/hooks/use-session-user';
 import styled, { css } from 'styled-components';
-import { Container, Dropdown, Tab, Tabs, Typography } from 'ui';
+import { Container, Tab, Tabs, Typography } from 'ui';
 
+import NavDropdown from './components/nav-dropdown';
 import SandboxBanner from './components/sandbox-banner';
 
 const routes = [
@@ -26,7 +21,7 @@ type PrivateLayoutProps = {
 
 const PrivateLayout = ({ children }: PrivateLayoutProps) => {
   const router = useRouter();
-  const { data, logOut } = useSessionUser();
+  const { data } = useSessionUser();
 
   return (
     <>
@@ -40,27 +35,7 @@ const PrivateLayout = ({ children }: PrivateLayoutProps) => {
                   <LogoFpCompact />
                 </a>
               </Link>
-              <SuffixContainer>
-                <Dropdown.Root>
-                  <Dropdown.Trigger aria-label="Account">
-                    <IcoUser24 />
-                  </Dropdown.Trigger>
-                  <Dropdown.Portal>
-                    <Dropdown.Content align="end">
-                      <Dropdown.Item>
-                        <Typography variant="label-3">
-                          {data?.firstName} {data?.lastName}
-                        </Typography>
-                        <Typography variant="body-3" color="secondary">
-                          {data?.email}
-                        </Typography>
-                      </Dropdown.Item>
-                      <Dropdown.Divider />
-                      <Dropdown.Item onSelect={logOut}>Log out</Dropdown.Item>
-                    </Dropdown.Content>
-                  </Dropdown.Portal>
-                </Dropdown.Root>
-              </SuffixContainer>
+              <NavDropdown />
             </Footprint>
           </Container>
           <Nav>
@@ -109,15 +84,6 @@ const Footprint = styled.div`
   ${({ theme }) => css`
     padding: ${theme.spacing[4]}px 0;
   `};
-`;
-
-const SuffixContainer = styled.div`
-  position: absolute;
-  top: 0;
-  right: 0;
-  height: 100%;
-  display: flex;
-  align-items: center;
 `;
 
 const Nav = styled.nav`
