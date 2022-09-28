@@ -1,7 +1,7 @@
 import { DEMO_BASE_URL } from '@onefootprint/global-constants';
 import { useToggle, useTranslation } from '@onefootprint/hooks';
 import { OnboardingConfig } from '@onefootprint/types';
-import { IcoArrowTopRight16, IcoPencil16 } from 'icons';
+import { IcoArrowTopRight16, IcoInfo16, IcoPencil16 } from 'icons';
 import React from 'react';
 import styled, { css } from 'styled-components';
 import {
@@ -11,6 +11,7 @@ import {
   IconButton,
   LinkButton,
   Tag,
+  Tooltip,
   Typography,
 } from 'ui';
 
@@ -78,9 +79,26 @@ const OnboardingConfigItem = ({ data }: OnboardingConfigItemProps) => {
         <tbody>
           <tr>
             <td>
-              <Typography color="tertiary" variant="body-3">
-                {t('required-data.label')}
-              </Typography>
+              <Box
+                sx={{
+                  alignItems: 'center',
+                  display: 'flex',
+                  flexDirection: 'row',
+                  gap: 3,
+                }}
+              >
+                <Typography color="tertiary" variant="body-3">
+                  {t('required-data.label')}
+                </Typography>
+                <Tooltip
+                  text={t('required-data.tooltip')}
+                  placement="bottom-start"
+                >
+                  <Box>
+                    <IcoInfo16 />
+                  </Box>
+                </Tooltip>
+              </Box>
             </td>
             <td>
               <TagList data-testid={`must-collect-data-${data.id}`}>
@@ -95,9 +113,26 @@ const OnboardingConfigItem = ({ data }: OnboardingConfigItemProps) => {
           </tr>
           <tr>
             <td>
-              <Typography color="tertiary" variant="body-3">
-                {t('access-data.label')}
-              </Typography>
+              <Box
+                sx={{
+                  alignItems: 'center',
+                  display: 'flex',
+                  flexDirection: 'row',
+                  gap: 3,
+                }}
+              >
+                <Typography color="tertiary" variant="body-3">
+                  {t('access-data.label')}
+                </Typography>
+                <Tooltip
+                  text={t('access-data.tooltip')}
+                  placement="bottom-start"
+                >
+                  <Box>
+                    <IcoInfo16 />
+                  </Box>
+                </Tooltip>
+              </Box>
             </td>
             <td>
               <TagList data-testid={`can-access-data-${data.id}`}>

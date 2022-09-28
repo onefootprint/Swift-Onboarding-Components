@@ -253,11 +253,11 @@
           },
           "required-data": {
             "label": "Required data to be collected",
-            "tooltip": ""
+            "tooltip": "These are the data attributes you require us to collect during onboarding to verify the user's identity."
           },
           "access-data": {
             "label": "Access permission scope",
-            "tooltip": "Attributes you'll have access to after user onboardings."
+            "tooltip": "These are the data attributes you have read access to after a user onboarding."
           },
           "key": {
             "label": "Onboarding publishable key",
