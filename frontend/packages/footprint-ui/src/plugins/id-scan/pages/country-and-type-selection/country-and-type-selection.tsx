@@ -18,9 +18,9 @@ import {
   RadioSelectOptionFields,
 } from 'ui';
 
-import { HeaderTitle } from '../../../../../../components';
-import { Events } from '../../../../utils/state-machine/types';
-import { useIdScanMachine } from '../../../machine-provider';
+import HeaderTitle from '../../../../components/header-title';
+import { useIdScanMachine } from '../../components/machine-provider';
+import { Events } from '../../utils/state-machine/types';
 
 const getCountryFromCode = (countryCode: CountryCode) => {
   const match = COUNTRIES.find(country => country.value === countryCode);

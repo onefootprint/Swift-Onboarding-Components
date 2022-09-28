@@ -16,13 +16,14 @@ type WebAuthnPluginProps = BasePluginProps;
 
 const App = ({ context, onDone }: WebAuthnPluginProps) => {
   const [, send] = useWebAuthnMachine();
+  const { authToken, device } = context;
 
   useEffectOnce(() => {
     send({
       type: Events.receivedContext,
       payload: {
-        authToken: context.authToken,
-        device: context.device,
+        authToken,
+        device,
       },
     });
   });

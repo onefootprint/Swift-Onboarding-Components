@@ -5,10 +5,10 @@ import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
 import { LoadingIndicator, Typography } from 'ui';
 
-import { HeaderTitle } from '../../../../../../components';
-import IdScanDocTypeToLabel from '../../../../constants/doc-type-labels';
-import { Events } from '../../../../utils/state-machine/types';
-import { useIdScanMachine } from '../../../machine-provider';
+import HeaderTitle from '../../../../components/header-title';
+import { useIdScanMachine } from '../../components/machine-provider';
+import IdScanDocTypeToLabel from '../../constants/doc-type-labels';
+import { Events } from '../../utils/state-machine/types';
 import useSubmitPhoto from './hooks/use-submit-photo';
 
 enum Status {

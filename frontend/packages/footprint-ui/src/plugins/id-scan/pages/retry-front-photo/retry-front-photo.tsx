@@ -1,11 +1,11 @@
 import { useTranslation } from '@onefootprint/hooks';
 import React from 'react';
 
-import BadImageErrorLabel from '../../../../constants/bad-image-error-label';
-import IdScanDocTypeToLabel from '../../../../constants/doc-type-labels';
-import { Events } from '../../../../utils/state-machine/types';
-import { useIdScanMachine } from '../../../machine-provider';
-import TakeOrUploadPhoto from '../../../take-or-upload-photo';
+import { useIdScanMachine } from '../../components/machine-provider';
+import TakeOrUploadPhoto from '../../components/take-or-upload-photo';
+import BadImageErrorLabel from '../../constants/bad-image-error-label';
+import IdScanDocTypeToLabel from '../../constants/doc-type-labels';
+import { Events } from '../../utils/state-machine/types';
 
 const RetryFrontPhoto = () => {
   const [state, send] = useIdScanMachine();

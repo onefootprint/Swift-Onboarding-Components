@@ -2,7 +2,7 @@ import { useTranslation } from '@onefootprint/hooks';
 import React from 'react';
 import styled from 'styled-components';
 
-import { HeaderTitle } from '../../../../../../components';
+import HeaderTitle from '../../../../components/header-title';
 
 const IdScanFailed = () => {
   const { t } = useTranslation('pages.id-scan-failed');
