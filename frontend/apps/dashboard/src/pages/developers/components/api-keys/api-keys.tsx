@@ -24,7 +24,9 @@ const ApiKeys = () => {
           {t('header.cta')}
         </Button>
       </Header>
-      <StyledDivider />
+      <Box sx={{ marginY: 5 }}>
+        <Divider />
+      </Box>
       <Table />
       <CreateDialog open={isCreateDialogOpen} onClose={closeCreateDialog} />
     </section>
@@ -37,12 +39,6 @@ const Header = styled.header`
     display: flex;
     gap: ${theme.spacing[2]}px;
     justify-content: space-between;
-  `}
-`;
-
-const StyledDivider = styled(Divider)`
-  ${({ theme }) => css`
-    margin: ${theme.spacing[7]}px 0;
   `}
 `;
 
