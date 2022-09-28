@@ -1,4 +1,4 @@
-use actix_web::{error::JsonPayloadError, http::StatusCode};
+use actix_web::{error::{JsonPayloadError, QueryPayloadError, UrlencodedError}, http::StatusCode};
 use db::errors::DbError;
 use newtypes::Uuid;
 use paperclip::actix::api_v2_errors;
@@ -69,6 +69,10 @@ pub enum ApiError {
     CannotDecodeUtf8(#[from] std::str::Utf8Error),
     #[error("json body invalid: {0}")]
     InvalidJsonBody(JsonPayloadError),
+    #[error("query parameters are invalid: {0}")]
+    InvalidQueryParam(QueryPayloadError),
+    #[error("form body invalid: {0}")]
+    InvalidFormError(UrlencodedError),
     #[error("json error: {0}")]
     SerdeJson(#[from] serde_json::Error),
     #[error("cbor error: {0}")]
@@ -154,6 +158,8 @@ impl actix_web::ResponseError for ApiError {
             ApiError::Webauthn(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::CannotDecodeUtf8(_)
             | ApiError::InvalidJsonBody(_)
+            | ApiError::InvalidFormError(_)
+            | ApiError::InvalidQueryParam(_)
             | ApiError::SerdeJson(_)
             | ApiError::SerdeCbor(_) => StatusCode::BAD_REQUEST,
             ApiError::WorkOsLoginError(_) => StatusCode::INTERNAL_SERVER_ERROR,

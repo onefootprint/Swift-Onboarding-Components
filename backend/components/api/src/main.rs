@@ -166,6 +166,13 @@ async fn main() -> std::io::Result<()> {
             // use custom error handler
             .error_handler(|err, _req| actix_web::Error::from(ApiError::InvalidJsonBody(err)));
 
+        let query_cfg = web::QueryConfig::default()
+            .error_handler(|err, _req| actix_web::Error::from(ApiError::InvalidQueryParam(err)));
+
+        let form_cfg = web::FormConfig::default()
+            .limit(32_768)
+            .error_handler(|err, _req| actix_web::Error::from(ApiError::InvalidFormError(err)));
+
         App::new()
             .app_data(web::Data::new(state.clone()))
             .wrap(
@@ -183,6 +190,8 @@ async fn main() -> std::io::Result<()> {
             )
             .wrap(cors)
             .app_data(json_cfg)
+            .app_data(query_cfg)
+            .app_data(form_cfg)
             .wrap_api()
             .configure(index::routes)
             .service(private::routes())
