@@ -12,6 +12,7 @@ import styled, { css } from 'styled-components';
 import { media, Typography } from 'ui';
 
 import SEO from '../../components/seo';
+import CompanyPhotos from './components/company-photos';
 import Team from './components/team';
 import Values from './components/values';
 
@@ -120,6 +121,17 @@ const Company = () => {
     },
   ];
 
+  const companyPhotos = [
+    {
+      alt: 'Fall 2022 Offsite Destination',
+      src: '/company/offsite.png',
+    },
+    {
+      alt: 'Team Dinner',
+      src: '/company/dinner.png',
+    },
+  ];
+
   return (
     <>
       <SEO title={t('html-title')} slug="/company" />
@@ -132,6 +144,9 @@ const Company = () => {
             {t('subtitle')}
           </Typography>
         </HeroContainer>
+        <CompanyPhotosContainer>
+          <CompanyPhotos photos={companyPhotos} />
+        </CompanyPhotosContainer>
         <ValuesContainer>
           <Values
             title={t('values.title')}
@@ -151,6 +166,16 @@ const Company = () => {
     </>
   );
 };
+
+const CompanyPhotosContainer = styled.div`
+  ${({ theme }) => css`
+    margin-bottom: ${theme.spacing[10]}px;
+
+    ${media.greaterThan('lg')`
+      margin-bottom: ${theme.spacing[11]}px;
+    `}
+  `}
+`;
 
 const Container = styled.div`
   ${({ theme }) => css`
