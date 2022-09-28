@@ -8,6 +8,7 @@ export const statusToPriority = {
   [OnboardingStatus.failed]: 4,
   [OnboardingStatus.verified]: 5,
   [OnboardingStatus.vaultOnly]: 6,
+  [OnboardingStatus.new]: 7,
 };
 
 export const statusToBadgeVariant: Record<OnboardingStatus, UIState> = {

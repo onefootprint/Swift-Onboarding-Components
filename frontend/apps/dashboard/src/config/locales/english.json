@@ -81,6 +81,34 @@
       "header": {
         "title": "Users"
       },
+      "filters": {
+        "cta_zero": "Filters",
+        "cta_one": "Filters · {{count}}",
+        "cta_other": "Filters · {{count}}",
+        "dialog": {
+          "title": "Filters",
+          "clear": "Clear",
+          "cta": "Apply",
+          "form": {
+            "status": {
+              "title": "Status",
+              "new": "New",
+              "manual-review": "Manual Review",
+              "processing": "Processing",
+              "failed": "Failed"
+            },
+            "date-range": {
+              "title": "Date range",
+              "all-time": "All time",
+              "today": "Today",
+              "current-month": "Current month",
+              "last-week": "Last week",
+              "last-month": "Last month",
+              "custom": "custom"
+            }
+          }
+        }
+      },
       "table": {
         "aria-label": "Users table",
         "search": {

@@ -87,13 +87,7 @@ const Radio = forwardRef<HTMLInputElement, RadioProps>(
   },
 );
 
-const Container = styled.div`
-  ${({ theme }) => css`
-    &:not(:last-child) {
-      margin-bottom: ${theme.spacing[3]}px;
-    }
-  `}
-`;
+const Container = styled.div``;
 
 const Label = styled.label<Pick<RadioProps, 'hasError'>>`
   ${({ theme, hasError }) => css`

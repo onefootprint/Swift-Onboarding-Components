@@ -1,5 +1,5 @@
 enum OnboardingStatus {
-  new = 'verified',
+  new = 'new',
   verified = 'verified',
   manualReview = 'manual_review',
   stepUpRequired = 'step_up_required',

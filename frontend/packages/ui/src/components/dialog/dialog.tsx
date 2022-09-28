@@ -24,8 +24,10 @@ type DialogButton = {
 };
 
 type DialogLinkButton = {
+  form?: string;
   label: string;
   onClick?: () => void;
+  type?: 'button' | 'submit' | 'reset';
 };
 
 type Size = 'small' | 'compact' | 'default' | 'large';
@@ -106,7 +108,12 @@ const Dialog = ({
             <Footer>
               <Box>
                 {linkButton && (
-                  <LinkButton onClick={linkButton.onClick} size="compact">
+                  <LinkButton
+                    onClick={linkButton.onClick}
+                    size="compact"
+                    type={linkButton.type}
+                    form={linkButton.form}
+                  >
                     {linkButton.label}
                   </LinkButton>
                 )}

@@ -1,4 +1,5 @@
-import { omit, omitBy } from 'lodash';
+import omit from 'lodash/omit';
+import omitBy from 'lodash/omitBy';
 import { useRouter } from 'next/router';
 
 export type ScopedUserListFilters = {
@@ -23,6 +24,20 @@ export const getCursors = (req: ScopedUsersListQuerystring) =>
 
 export const useFilters = () => {
   const router = useRouter();
+
+  const getFiltersCount = () => {
+    const getDateFiltersCount = () => (router.query.dateRange ? 1 : 0);
+
+    const getStatusFiltersCount = () => {
+      if (router.query.statuses && typeof router.query.statuses === 'string') {
+        return router.query.statuses.split(',').length;
+      }
+      return 0;
+    };
+
+    return getDateFiltersCount() + getStatusFiltersCount();
+  };
+
   const setQuerystring = (query: ScopedUsersListQuerystring) => {
     // Also clean up query params if values are empty
     router.push({ query: omitBy(query, x => !x) }, undefined, {
@@ -38,7 +53,9 @@ export const useFilters = () => {
     // When we set the cursors, keep the previous filter params and only replace the cursors
     setQuerystring({ ...router.query, cursors: cursors.join(',') });
   };
+
   return {
+    filtersCount: getFiltersCount(),
     filters: router.query as ScopedUsersListQuerystring,
     setFilter,
     setCursors,

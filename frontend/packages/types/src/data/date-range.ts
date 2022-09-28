@@ -7,6 +7,8 @@ export enum DateRange {
   custom = 'custom',
 }
 
+// TODO: REMOVE
+// linear.app/footprint/issue/FP-1480/refactor-security-logs-filter-dialog
 export const dateRangeToDisplayText = {
   [DateRange.allTime]: 'All time',
   [DateRange.today]: 'Today',

@@ -28,6 +28,8 @@ export type LinkButtonProps = {
   variant?: LinkButtonVariant;
   disabled?: boolean;
   sx?: SXStyleProps;
+  type?: 'button' | 'submit' | 'reset';
+  form?: string;
 };
 
 const LinkButton = forwardRef<HTMLAnchorElement, LinkButtonProps>(
@@ -35,16 +37,18 @@ const LinkButton = forwardRef<HTMLAnchorElement, LinkButtonProps>(
     {
       ariaLabel,
       children,
+      disabled = false,
+      form,
       href,
       iconComponent: Icon,
       iconPosition = 'right',
       onClick,
       size = 'default',
+      sx,
       target,
       testID,
+      type = 'button',
       variant = 'default',
-      disabled = false,
-      sx,
     }: LinkButtonProps,
     ref,
   ) => {
@@ -66,7 +70,10 @@ const LinkButton = forwardRef<HTMLAnchorElement, LinkButtonProps>(
         rel={target === '_blank' ? 'noopener noreferrer' : undefined}
         sx={sxStyles}
         iconPosition={iconPosition}
-        type={href ? undefined : 'button'}
+        type={href ? undefined : type}
+        // TODO: https://linear.app/footprint/issue/FP-1479/split-linkbutton-and-link-component
+        // @ts-ignore
+        form={href ? undefined : form}
       >
         {iconPosition === 'left' && renderedIcon}
         {children}

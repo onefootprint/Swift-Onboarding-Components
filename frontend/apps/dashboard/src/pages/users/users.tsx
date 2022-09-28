@@ -7,20 +7,21 @@ import {
   statusToDisplayText,
 } from 'src/constants/onboarding-status-display';
 import styled from 'styled-components';
-import type { TableRow } from 'ui';
 import {
   Badge,
   Box,
+  Button,
   CodeInline,
   Divider,
   Pagination,
   SearchInput,
   Table,
+  TableRow,
   Typography,
 } from 'ui';
 
 import FieldOrPlaceholder from './components/field-or-placeholder';
-import UsersFilter from './components/filter-dialog';
+import Filters from './components/filters';
 import useGetUsers from './hooks/use-get-users';
 import { nameData, User } from './hooks/use-join-users';
 
@@ -77,7 +78,13 @@ const Users = () => {
             })
           }
         />
-        <UsersFilter />
+        <Filters
+          renderCta={({ onClick, filtersCount }) => (
+            <Button size="small" variant="secondary" onClick={onClick}>
+              {t('filters.cta', { count: filtersCount })}
+            </Button>
+          )}
+        />
       </SearchContainer>
       <Box sx={{ paddingY: 5 }}>
         <Divider />
