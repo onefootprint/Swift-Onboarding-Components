@@ -33,7 +33,7 @@
     "react-swipeable": "^7.0.0",
     "request": "*",
     "styled-components": "^5.3.5",
-    "themes": "*",
+    "@onefootprint/themes": "*",
     "ui": "*",
     "usehooks-ts": "^2.6.0"
   },

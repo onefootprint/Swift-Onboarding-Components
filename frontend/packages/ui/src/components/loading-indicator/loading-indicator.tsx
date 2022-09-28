@@ -1,7 +1,7 @@
+import type { Color } from '@onefootprint/themes';
 import { IcoSpinner16, IcoSpinner24 } from 'icons';
 import React from 'react';
 import styled, { keyframes } from 'styled-components';
-import type { Color } from 'themes';
 
 export type LoadingIndicatorProps = {
   'aria-label'?: string;

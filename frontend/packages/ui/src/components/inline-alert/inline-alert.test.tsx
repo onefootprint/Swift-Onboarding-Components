@@ -1,7 +1,7 @@
 import { customRender, screen } from '@onefootprint/test-utils';
+import type { BackgroundColor, Color } from '@onefootprint/themes';
+import themes from '@onefootprint/themes';
 import React from 'react';
-import type { BackgroundColor, Color } from 'themes';
-import themes from 'themes';
 
 import InlineAlert, { InlineAlertProps } from './inline-alert';
 

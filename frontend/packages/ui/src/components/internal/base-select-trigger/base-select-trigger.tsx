@@ -1,8 +1,8 @@
+import { BorderColor } from '@onefootprint/themes';
 import { IcoChevronDown16 } from 'icons';
 import { darken, rgba } from 'polished';
 import React, { forwardRef } from 'react';
 import styled, { css } from 'styled-components';
-import { BorderColor } from 'themes';
 
 import { createFontStyles } from '../../../utils/mixins';
 

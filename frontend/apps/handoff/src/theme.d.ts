@@ -1,6 +1,6 @@
 import 'styled-components';
 
-import { Theme } from 'themes';
+import { Theme } from '@onefootprint/themes';
 
 declare module 'styled-components' {
   export interface DefaultTheme extends Theme {}

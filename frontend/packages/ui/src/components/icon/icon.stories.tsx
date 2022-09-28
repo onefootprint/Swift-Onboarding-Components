@@ -1,7 +1,7 @@
+import themes from '@onefootprint/themes';
 import { ComponentMeta, ComponentStory } from '@storybook/react';
 import { flags, IcoChevronDown16, icos } from 'icons';
 import React from 'react';
-import themes from 'themes';
 
 import Box from '../box';
 import Typography from '../typography';

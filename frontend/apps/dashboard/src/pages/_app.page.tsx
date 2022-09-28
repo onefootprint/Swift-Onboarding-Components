@@ -1,7 +1,7 @@
+import themes from '@onefootprint/themes';
 import Head from 'next/head';
 import React, { useEffect, useState } from 'react';
 import { createGlobalStyle, css } from 'styled-components';
-import themes from 'themes';
 import { DesignSystemProvider } from 'ui';
 
 import Layout from '../components/layout';

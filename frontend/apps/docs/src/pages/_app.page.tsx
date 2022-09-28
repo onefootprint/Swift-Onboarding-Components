@@ -1,7 +1,7 @@
+import themes from '@onefootprint/themes';
 import { QueryClientProvider } from '@tanstack/react-query';
 import React, { useEffect, useState } from 'react';
 import { createGlobalStyle, css } from 'styled-components';
-import themes from 'themes';
 import { DesignSystemProvider, media } from 'ui';
 import { useDarkMode } from 'usehooks-ts';
 

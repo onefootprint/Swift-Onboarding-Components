@@ -1,6 +1,6 @@
 import { customRender, screen } from '@onefootprint/test-utils';
+import themes from '@onefootprint/themes';
 import React from 'react';
-import themes from 'themes';
 
 import LoadingIndicator, { LoadingIndicatorProps } from './loading-indicator';
 

@@ -34,7 +34,7 @@
     "react-dom": "18.2.0",
     "request": "*",
     "styled-components": "^5.3.5",
-    "themes": "*",
+    "@onefootprint/themes": "*",
     "@onefootprint/types": "*",
     "ui": "*",
     "usehooks-ts": "^2.6.0",

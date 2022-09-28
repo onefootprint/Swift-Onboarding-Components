@@ -1,4 +1,3 @@
-import { css } from 'styled-components';
 import type {
   BackgroundColor,
   BorderColor,
@@ -6,7 +5,8 @@ import type {
   FontVariant,
   Overlay,
   Spacing,
-} from 'themes';
+} from '@onefootprint/themes';
+import { css } from 'styled-components';
 
 import { createFontStyles, createOverlayBackground } from '../../utils/mixins';
 import type { ButtonSize, ButtonVariant } from './button.types';

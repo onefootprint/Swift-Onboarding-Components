@@ -1,5 +1,5 @@
+import type { BackgroundColor, Color, Overlay } from '@onefootprint/themes';
 import { css } from 'styled-components';
-import type { BackgroundColor, Color, Overlay } from 'themes';
 
 import { createOverlayBackground } from '../../utils/mixins';
 

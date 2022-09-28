@@ -1,7 +1,7 @@
+import { FontVariant } from '@onefootprint/themes';
 import { CleaveOptions } from 'cleave.js/options';
 import React, { forwardRef, InputHTMLAttributes } from 'react';
 import styled, { css } from 'styled-components';
-import { FontVariant } from 'themes';
 
 import useSx, { SXStyleProps, SXStyles } from '../../../hooks/use-sx';
 import Field, { FieldProps } from '../field';

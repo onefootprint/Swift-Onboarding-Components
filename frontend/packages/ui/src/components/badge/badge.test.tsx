@@ -1,6 +1,6 @@
 import { customRender, screen } from '@onefootprint/test-utils';
+import themes, { UIState } from '@onefootprint/themes';
 import React from 'react';
-import themes, { UIState } from 'themes';
 
 import Badge, { BadgeProps } from './badge';
 

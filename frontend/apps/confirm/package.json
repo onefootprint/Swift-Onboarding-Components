@@ -29,7 +29,7 @@
     "react-i18next": "^11.18.6",
     "request": "*",
     "styled-components": "^5.3.5",
-    "themes": "*",
+    "@onefootprint/themes": "*",
     "ui": "*",
     "@onefootprint/types": "*"
   },

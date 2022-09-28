@@ -1,6 +1,6 @@
 import { customRender, screen, userEvent } from '@onefootprint/test-utils';
+import themes from '@onefootprint/themes';
 import React from 'react';
-import themes from 'themes';
 
 import TextInput, { TextInputProps } from './text-input';
 

@@ -1,6 +1,6 @@
+import { Color, FontVariant } from '@onefootprint/themes';
 import React, { forwardRef } from 'react';
 import styled, { css } from 'styled-components';
-import { Color, FontVariant } from 'themes';
 
 import useSX, { SXStyleProps, SXStyles } from '../../hooks/use-sx';
 import { createFontStyles } from '../../utils/mixins';

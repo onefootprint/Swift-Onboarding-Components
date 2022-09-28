@@ -1,6 +1,6 @@
+import type { Breakpoint } from '@onefootprint/themes';
 import json2mq from 'json2mq';
 import { useTheme } from 'styled-components';
-import type { Breakpoint } from 'themes';
 import { useMediaQuery as useMediaQueryTs } from 'usehooks-ts';
 
 const useMediaQuery = (query: {

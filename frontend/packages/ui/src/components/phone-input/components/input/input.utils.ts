@@ -1,4 +1,4 @@
-import type { Color } from 'themes';
+import type { Color } from '@onefootprint/themes';
 
 const getIndicatorColor = (hasError: boolean, hasFocus: boolean): Color => {
   if (hasError) {

@@ -1,8 +1,8 @@
 import { COUNTRIES as options } from '@onefootprint/global-constants';
 import { customRender, screen, userEvent } from '@onefootprint/test-utils';
+import themes from '@onefootprint/themes';
 import take from 'lodash/take';
 import React from 'react';
-import themes from 'themes';
 
 import Select, { CountrySelectProps } from './country-select';
 

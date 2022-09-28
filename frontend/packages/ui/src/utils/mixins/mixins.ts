@@ -1,5 +1,5 @@
+import { BackgroundColor, FontVariant, Overlay } from '@onefootprint/themes';
 import { css } from 'styled-components';
-import { BackgroundColor, FontVariant, Overlay } from 'themes';
 
 export const createFontStyles = (variant: FontVariant) => css`
   ${({ theme }) => css`

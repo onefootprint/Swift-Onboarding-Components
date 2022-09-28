@@ -1,4 +1,4 @@
-import type { Spacings } from 'themes';
+import type { Spacings } from '@onefootprint/themes';
 
 import type { Size } from './search-input.types';
 

@@ -1,4 +1,4 @@
-import type { FontVariant } from 'themes';
+import type { FontVariant } from '@onefootprint/themes';
 
 import { FootprintButtonSize } from './footprint-button.types';
 

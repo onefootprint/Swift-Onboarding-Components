@@ -30,7 +30,7 @@
     "react-i18next": "^11.18.6",
     "request": "*",
     "styled-media-query": "^2.1.2",
-    "themes": "*",
+    "@onefootprint/themes": "*",
     "@onefootprint/types": "*",
     "ui": "*",
     "usehooks-ts": "2.6.0",

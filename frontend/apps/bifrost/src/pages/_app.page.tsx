@@ -1,10 +1,10 @@
+import themes from '@onefootprint/themes';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { FootprintFooter, FootprintJsProvider } from 'footprint-elements';
 import Head from 'next/head';
 import Script from 'next/script';
 import React from 'react';
 import styled, { createGlobalStyle, css } from 'styled-components';
-import themes from 'themes';
 import { DesignSystemProvider, media } from 'ui';
 
 import { BifrostMachineProvider } from '../components/bifrost-machine-provider';

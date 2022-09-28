@@ -1,6 +1,6 @@
+import themes from '@onefootprint/themes';
 import { ComponentMeta, Story } from '@storybook/react';
 import React from 'react';
-import themes from 'themes';
 
 import LoadingIndicator, { LoadingIndicatorProps } from './loading-indicator';
 

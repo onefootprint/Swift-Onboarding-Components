@@ -1,5 +1,5 @@
+import { UIState } from '@onefootprint/themes';
 import { OnboardingStatus } from '@onefootprint/types';
-import { UIState } from 'themes';
 
 export const statusToPriority = {
   [OnboardingStatus.processing]: 1,

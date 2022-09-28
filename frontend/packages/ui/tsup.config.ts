@@ -7,6 +7,6 @@ export default defineConfig({
     'polished',
     'styled-components',
     'icons',
-    'themes',
+    '@onefootprint/themes',
   ],
 });

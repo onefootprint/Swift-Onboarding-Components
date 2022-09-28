@@ -1,4 +1,3 @@
-import * as CSS from 'csstype';
 import type {
   BackgroundColor,
   BorderColor,
@@ -7,7 +6,8 @@ import type {
   Color,
   Elevation,
   Spacing,
-} from 'themes';
+} from '@onefootprint/themes';
+import * as CSS from 'csstype';
 
 export type CustomStyleProps = {
   backgroundColor?: BackgroundColor;

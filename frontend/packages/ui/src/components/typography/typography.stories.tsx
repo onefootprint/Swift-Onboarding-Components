@@ -1,6 +1,6 @@
+import themes from '@onefootprint/themes';
 import { Meta, Story } from '@storybook/react';
 import React from 'react';
-import themes from 'themes';
 
 import Typography, { TypographyProps } from './typography';
 import variantMapping from './typography.constants';

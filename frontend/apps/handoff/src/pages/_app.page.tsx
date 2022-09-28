@@ -1,9 +1,9 @@
+import themes from '@onefootprint/themes';
 import { QueryClientProvider } from '@tanstack/react-query';
 import Head from 'next/head';
 // import { useRouter } from 'next/router';
 import React from 'react';
 import { createGlobalStyle, css } from 'styled-components';
-import themes from 'themes';
 import { DesignSystemProvider } from 'ui';
 
 import Header from '../components/header';

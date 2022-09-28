@@ -1,5 +1,5 @@
 import React from 'react';
-import themes from 'themes';
+import themes from '@onefootprint/themes';
 import { DesignSystemProvider } from '../src/utils/design-system-provider';
 
 export const parameters = {
