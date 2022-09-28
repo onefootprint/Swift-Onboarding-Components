@@ -10,6 +10,7 @@ export enum States {
   onboardingVerification = 'onboardingVerification',
   initOnboarding = 'initOnboarding',
   additionalDataRequired = 'additionalDataRequired',
+  d2p = 'd2p',
   webAuthn = 'webAuthn',
   basicInformation = 'basicInformation',
   residentialAddress = 'residentialAddress',
@@ -32,6 +33,7 @@ export enum Events {
   onboardingVerificationCompleted = 'onboardingVerificationCompleted',
   onboardingStarted = 'onboardingStarted',
   webAuthnCompleted = 'webAuthnCompleted',
+  d2pCompleted = 'd2pCompleted',
   additionalInfoRequired = 'additionalInfoRequired',
   basicInformationSubmitted = 'basicInformationSubmitted',
   residentialAddressSubmitted = 'residentialAddressSubmitted',
@@ -60,6 +62,7 @@ export type MachineEvents =
     }
   | { type: Events.onboardingStarted }
   | { type: Events.webAuthnCompleted }
+  | { type: Events.d2pCompleted }
   | { type: Events.additionalInfoRequired }
   | {
       type: Events.basicInformationSubmitted;

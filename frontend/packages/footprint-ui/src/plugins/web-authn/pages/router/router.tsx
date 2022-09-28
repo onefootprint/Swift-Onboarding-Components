@@ -4,9 +4,6 @@ import useWebAuthnMachine from '../../hooks/use-web-authn-machine';
 import { States } from '../../utils/machine';
 import NewTabProcessing from '../new-tab-processing';
 import NewTabRequest from '../new-tab-request';
-import QRCodeScanned from '../qr-code-scanned';
-import QRCodeSent from '../qr-code-sent';
-import QRRegister from '../qr-register';
 
 type RouterProps = {
   onDone: () => void;
@@ -30,18 +27,6 @@ const Router = ({ onDone }: RouterProps) => {
 
   if (state.matches(States.newTabRequest)) {
     return <NewTabRequest />;
-  }
-
-  if (state.matches(States.qrCodeScanned)) {
-    return <QRCodeScanned />;
-  }
-
-  if (state.matches(States.qrCodeSent)) {
-    return <QRCodeSent />;
-  }
-
-  if (state.matches(States.qrRegister)) {
-    return <QRRegister />;
   }
 
   return null;

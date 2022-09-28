@@ -6,19 +6,33 @@ import { LinkButton, LoadingIndicator } from 'ui';
 
 import HeaderTitle from '../../../../components/header-title';
 import NavigationHeader from '../../../../components/navigation-header';
+import { useD2PMachine } from '../../components/machine-provider';
 import useGetD2PStatus, { D2PStatus } from '../../hooks/use-get-d2p-status';
 import useUpdateD2PStatus from '../../hooks/use-update-d2p-status';
-import useWebAuthnMachine from '../../hooks/use-web-authn-machine';
-import { Events } from '../../utils/machine';
+import { Events } from '../../utils/state-machine/types';
 
 const QRCodeSent = () => {
   const { t } = useTranslation('pages.qr-code-sent');
-  const [state, send] = useWebAuthnMachine();
+  const [state, send] = useD2PMachine();
+  const { missingRequirements } = state.context;
   const updateD2PStatusMutation = useUpdateD2PStatus();
   const statusResponse = useGetD2PStatus();
 
+  const { webAuthn, idScan } = missingRequirements;
+  let translationSource = '';
+  if (webAuthn && idScan) {
+    translationSource = 'liveness-with-id-scan';
+  } else if (webAuthn) {
+    translationSource = 'liveness';
+  } else {
+    translationSource = 'id-scan';
+  }
+
   const handleCancel = () => {
     const authToken = state.context.scopedAuthToken;
+    if (!authToken) {
+      return;
+    }
     updateD2PStatusMutation.mutate(
       { authToken, status: D2PStatusUpdate.canceled },
       {
@@ -65,7 +79,10 @@ const QRCodeSent = () => {
     <>
       <NavigationHeader button={{ variant: 'close', confirmClose: true }} />
       <Container>
-        <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
+        <HeaderTitle
+          title={t(`${translationSource}.title`)}
+          subtitle={t('subtitle')}
+        />
         <LoadingIndicator />
         <LinkButton onClick={handleCancel}>{t('cancel')}</LinkButton>
       </Container>

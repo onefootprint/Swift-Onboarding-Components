@@ -41,72 +41,8 @@ const createWebAuthnMachine = () =>
             },
             {
               target: States.webAuthnFailed,
-              cond: context =>
-                context.device.type === 'mobile' &&
-                !context.device.hasSupportForWebauthn,
-            },
-            {
-              target: States.qrRegister,
             },
           ],
-        },
-        [States.qrRegister]: {
-          on: {
-            [Events.scopedAuthTokenGenerated]: {
-              actions: [Actions.assignScopedAuthToken],
-            },
-            [Events.qrCodeLinkSentViaSms]: {
-              target: States.qrCodeSent,
-            },
-            [Events.qrCodeScanned]: {
-              target: States.qrCodeScanned,
-            },
-            [Events.qrRegisterSucceeded]: {
-              target: States.webAuthnSucceeded,
-            },
-            [Events.qrRegisterFailed]: {
-              target: States.webAuthnFailed,
-            },
-            [Events.statusPollingErrored]: {
-              actions: [Actions.clearScopedAuthToken],
-            },
-          },
-        },
-        [States.qrCodeScanned]: {
-          on: {
-            [Events.qrCodeCanceled]: {
-              target: States.qrRegister,
-              actions: [Actions.clearScopedAuthToken],
-            },
-            [Events.qrRegisterSucceeded]: {
-              target: States.webAuthnSucceeded,
-            },
-            [Events.qrRegisterFailed]: {
-              target: States.webAuthnFailed,
-            },
-            [Events.statusPollingErrored]: {
-              target: States.qrRegister,
-              actions: [Actions.clearScopedAuthToken],
-            },
-          },
-        },
-        [States.qrCodeSent]: {
-          on: {
-            [Events.qrCodeCanceled]: {
-              target: States.qrRegister,
-              actions: [Actions.clearScopedAuthToken],
-            },
-            [Events.qrRegisterSucceeded]: {
-              target: States.webAuthnSucceeded,
-            },
-            [Events.qrRegisterFailed]: {
-              target: States.webAuthnFailed,
-            },
-            [Events.statusPollingErrored]: {
-              target: States.qrRegister,
-              actions: [Actions.clearScopedAuthToken],
-            },
-          },
         },
         [States.newTabRequest]: {
           on: {
@@ -173,10 +109,7 @@ const createWebAuthnMachine = () =>
           return context;
         }),
         [Actions.clearScopedAuthToken]: assign((context, event) => {
-          if (
-            event.type === Events.statusPollingErrored ||
-            event.type === Events.qrCodeCanceled
-          ) {
+          if (event.type === Events.statusPollingErrored) {
             context.scopedAuthToken = '';
           }
           return context;

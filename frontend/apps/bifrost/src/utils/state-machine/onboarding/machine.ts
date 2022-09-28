@@ -23,6 +23,9 @@ export type OnboardingMachineArgs = {
   authToken?: string;
 };
 
+const supportsWebAuthn = (context: MachineContext) =>
+  context.device.type === 'mobile' && !!context.device.hasSupportForWebauthn;
+
 const createOnboardingMachine = ({
   userFound,
   device,
@@ -100,6 +103,11 @@ const createOnboardingMachine = ({
             },
             {
               target: States.webAuthn,
+              cond: context =>
+                context.missingWebauthnCredentials && supportsWebAuthn(context),
+            },
+            {
+              target: States.d2p,
               cond: context => context.missingWebauthnCredentials,
             },
             {
@@ -141,19 +149,25 @@ const createOnboardingMachine = ({
                 cond: context =>
                   userFound &&
                   context.missingWebauthnCredentials &&
+                  hasMissingAttributes(
+                    context.missingAttributes,
+                    context.data,
+                  ) &&
+                  supportsWebAuthn(context),
+              },
+              {
+                target: States.d2p,
+                description:
+                  'If we need to do webauthn but need to do a transfer first',
+                cond: context =>
+                  userFound &&
+                  context.missingWebauthnCredentials &&
                   hasMissingAttributes(context.missingAttributes, context.data),
               },
               {
                 target: States.onboardingComplete,
               },
             ],
-          },
-        },
-        [States.webAuthn]: {
-          on: {
-            [Events.webAuthnCompleted]: {
-              target: States.onboardingComplete,
-            },
           },
         },
         [States.basicInformation]: {
@@ -180,6 +194,13 @@ const createOnboardingMachine = ({
               {
                 target: States.webAuthn,
                 actions: [Actions.assignBasicInformation],
+                cond: context =>
+                  context.missingWebauthnCredentials &&
+                  supportsWebAuthn(context),
+              },
+              {
+                target: States.d2p,
+                actions: [Actions.assignBasicInformation],
                 cond: context => context.missingWebauthnCredentials,
               },
               {
@@ -204,6 +225,13 @@ const createOnboardingMachine = ({
               {
                 target: States.webAuthn,
                 actions: [Actions.assignResidentialAddress],
+                cond: context =>
+                  context.missingWebauthnCredentials &&
+                  supportsWebAuthn(context),
+              },
+              {
+                target: States.d2p,
+                actions: [Actions.assignResidentialAddress],
                 cond: context => context.missingWebauthnCredentials,
               },
               {
@@ -226,6 +254,13 @@ const createOnboardingMachine = ({
               {
                 target: States.webAuthn,
                 actions: [Actions.assignSsn],
+                cond: context =>
+                  context.missingWebauthnCredentials &&
+                  supportsWebAuthn(context),
+              },
+              {
+                target: States.d2p,
+                actions: [Actions.assignSsn],
                 cond: context => context.missingWebauthnCredentials,
               },
               {
@@ -245,6 +280,20 @@ const createOnboardingMachine = ({
                   isMissingBasicAttribute(context.missingAttributes),
               },
             ],
+          },
+        },
+        [States.d2p]: {
+          on: {
+            [Events.d2pCompleted]: {
+              target: States.onboardingComplete,
+            },
+          },
+        },
+        [States.webAuthn]: {
+          on: {
+            [Events.webAuthnCompleted]: {
+              target: States.onboardingComplete,
+            },
           },
         },
         [States.onboardingComplete]: {

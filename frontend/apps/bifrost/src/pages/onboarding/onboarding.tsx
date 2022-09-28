@@ -1,4 +1,4 @@
-import { WebAuthn, withProvider } from 'footprint-elements';
+import { D2PPlugin, WebAuthn, withProvider } from 'footprint-elements';
 import has from 'lodash/has';
 import React from 'react';
 import { States } from 'src/utils/state-machine/onboarding';
@@ -17,14 +17,37 @@ type Page = {
 
 const Onboarding = () => {
   const [state, send] = useOnboardingMachine();
+  const { authToken, device, tenant, missingWebauthnCredentials } =
+    state.context;
   const valueCasted = state.value as States;
 
+  if (state.matches(States.d2p)) {
+    return (
+      <D2PPlugin
+        context={{
+          authToken,
+          device,
+          tenant,
+          customData: {
+            missingRequirements: {
+              webAuthn: !!missingWebauthnCredentials,
+              idScan: true, // TODO: derive this from the requirements sent from API
+            },
+          },
+        }}
+        metadata={{}}
+        onDone={() => {
+          send({ type: Events.d2pCompleted });
+        }}
+      />
+    );
+  }
   if (state.matches(States.webAuthn)) {
     return (
       <WebAuthn
         context={{
-          authToken: state.context.authToken,
-          device: state.context.device,
+          authToken,
+          device,
         }}
         metadata={{}}
         onDone={() => {

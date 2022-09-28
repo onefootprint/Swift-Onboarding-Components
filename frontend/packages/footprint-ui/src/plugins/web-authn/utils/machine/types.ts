@@ -5,9 +5,6 @@ export enum States {
   deviceSupport = 'deviceSupport',
   newTabRequest = 'newTabRequest',
   newTabProcessing = 'newTabProcessing',
-  qrRegister = 'qrRegister',
-  qrCodeScanned = 'qrCodeScanned',
-  qrCodeSent = 'qrCodeSent',
   webAuthnSucceeded = 'webAuthnSucceeded',
   webAuthnFailed = 'webAuthnFailed',
 }
@@ -21,15 +18,7 @@ export type MachineContext = {
 
 export enum Events {
   receivedContext = 'receivedContext',
-
   scopedAuthTokenGenerated = 'scopedAuthTokenGenerated',
-
-  // Desktop to phone verification
-  qrCodeLinkSentViaSms = 'qrCodeLinkSentViaSms',
-  qrCodeScanned = 'qrCodeScanned',
-  qrCodeCanceled = 'qrCodeCanceled',
-  qrRegisterSucceeded = 'qrRegisterSucceeded',
-  qrRegisterFailed = 'qrRegisterFailed',
 
   // New tab verification
   newTabOpened = 'newTabOpened',
@@ -62,11 +51,6 @@ export type MachineEvents =
         scopedAuthToken: string;
       };
     }
-  | { type: Events.qrCodeCanceled }
-  | { type: Events.qrCodeLinkSentViaSms }
-  | { type: Events.qrCodeScanned }
-  | { type: Events.qrRegisterSucceeded }
-  | { type: Events.qrRegisterFailed }
   | { type: Events.statusPollingErrored }
   | {
       type: Events.newTabOpened;

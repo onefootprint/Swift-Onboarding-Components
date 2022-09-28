@@ -3,7 +3,7 @@ import { D2PSmsRequest, D2PSmsResponse } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
 import request, { RequestError } from 'request';
 
-import { BIFROST_AUTH_HEADER } from '../config/constants';
+import BIFROST_AUTH_HEADER from '../config/constants';
 
 const d2pSms = async (payload: D2PSmsRequest) => {
   const response = await request<{}>({
