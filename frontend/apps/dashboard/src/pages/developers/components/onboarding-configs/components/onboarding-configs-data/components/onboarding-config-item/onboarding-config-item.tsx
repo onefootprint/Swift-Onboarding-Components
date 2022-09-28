@@ -130,7 +130,7 @@ const OnboardingConfigItem = ({ data }: OnboardingConfigItemProps) => {
                   <LinkButton
                     href={`${DEMO_BASE_URL}/preview?ob_key=${data.key}`}
                     iconComponent={IcoArrowTopRight16}
-                    size="xTiny"
+                    size="compact"
                     target="_blank"
                   >
                     {t('key.cta')}
