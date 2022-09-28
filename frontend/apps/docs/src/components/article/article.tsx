@@ -74,9 +74,13 @@ const Container = styled(Markdown)`
     h2,
     h3 {
       margin-bottom: ${theme.spacing[7]}px;
+    }
 
-      &:not(:first-of-type) {
-        margin-top: ${theme.spacing[10]}px;
+    a {
+      &:not(:first-child) {
+        h2 {
+          margin-top: ${theme.spacing[10]}px;
+        }
       }
     }
 
