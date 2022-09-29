@@ -1,5 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { IcoLogOut24, IcoUser24 } from 'icons';
+import { IcoLogOut24, IcoUser24 } from '@onefootprint/icons';
 import React from 'react';
 import useSessionUser from 'src/hooks/use-session-user';
 import styled, { css } from 'styled-components';

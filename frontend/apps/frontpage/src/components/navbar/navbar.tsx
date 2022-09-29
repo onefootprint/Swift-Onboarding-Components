@@ -5,7 +5,7 @@ import {
   IcoMegaphone24,
   IcoUsers24,
   IcoWriting24,
-} from 'icons';
+} from '@onefootprint/icons';
 import React from 'react';
 import styled, { css } from 'styled-components';
 import { Banner, Container, media } from 'ui';

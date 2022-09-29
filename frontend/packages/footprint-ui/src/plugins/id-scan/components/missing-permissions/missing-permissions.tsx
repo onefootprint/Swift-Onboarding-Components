@@ -1,5 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { IlluLightPhoneWithId } from 'icons';
+import { IlluLightPhoneWithId } from '@onefootprint/icons';
 import React from 'react';
 import styled, { css } from 'styled-components';
 import { BottomSheet, Typography } from 'ui';

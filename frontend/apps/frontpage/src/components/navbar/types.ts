@@ -1,4 +1,4 @@
-import type { Icon } from 'icons';
+import type { Icon } from '@onefootprint/icons';
 
 export type NavEntry = NavLink | NavMenu;
 export type NavLink = {

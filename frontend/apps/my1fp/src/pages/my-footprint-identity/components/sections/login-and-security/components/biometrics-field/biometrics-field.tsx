@@ -1,5 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { IcoCheckCircle16 } from 'icons';
+import { IcoCheckCircle16 } from '@onefootprint/icons';
 import React from 'react';
 import styled from 'styled-components';
 import { Typography } from 'ui';

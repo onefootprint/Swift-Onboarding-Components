@@ -1,4 +1,4 @@
-import { IcoChevronLeftBig24 } from 'icons';
+import { IcoChevronLeftBig24 } from '@onefootprint/icons';
 import React from 'react';
 import { IconButton } from 'ui';
 

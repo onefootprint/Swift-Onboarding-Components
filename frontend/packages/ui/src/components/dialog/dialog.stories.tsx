@@ -1,5 +1,5 @@
+import { IcoClose24, icos } from '@onefootprint/icons';
 import { Meta, Story } from '@storybook/react';
-import { IcoClose24, icos } from 'icons';
 import React, { useState } from 'react';
 
 import Button from '../button';

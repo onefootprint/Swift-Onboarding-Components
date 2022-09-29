@@ -1,6 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
+import { IcoCheckCircle40, IcoClose40 } from '@onefootprint/icons';
 import { IdScanBadImageError } from '@onefootprint/types';
-import { IcoCheckCircle40, IcoClose40 } from 'icons';
 import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
 import { LoadingIndicator, Typography } from 'ui';

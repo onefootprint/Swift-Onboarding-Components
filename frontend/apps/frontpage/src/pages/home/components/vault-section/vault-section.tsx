@@ -1,5 +1,10 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { IcoDatabase24, IcoEye24, IcoLock24, IcoShield24 } from 'icons';
+import {
+  IcoDatabase24,
+  IcoEye24,
+  IcoLock24,
+  IcoShield24,
+} from '@onefootprint/icons';
 import Image from 'next/image';
 import React from 'react';
 import styled, { css } from 'styled-components';

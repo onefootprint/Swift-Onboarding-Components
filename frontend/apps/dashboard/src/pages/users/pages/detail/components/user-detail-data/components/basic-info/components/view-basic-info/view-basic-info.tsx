@@ -1,6 +1,10 @@
 import { useTranslation } from '@onefootprint/hooks';
+import {
+  IcoBuilding24,
+  IcoFileText224,
+  IcoUserCircle24,
+} from '@onefootprint/icons';
 import { UserDataAttribute } from '@onefootprint/types';
-import { IcoBuilding24, IcoFileText224, IcoUserCircle24 } from 'icons';
 import React from 'react';
 import { nameData, User } from 'src/pages/users/hooks/use-join-users';
 import styled, { css } from 'styled-components';

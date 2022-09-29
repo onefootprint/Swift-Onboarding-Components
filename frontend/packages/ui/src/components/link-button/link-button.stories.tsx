@@ -1,5 +1,9 @@
+import {
+  IcoArrowRightSmall24,
+  IcoPlusSmall24,
+  icos,
+} from '@onefootprint/icons';
 import { ComponentMeta, Story } from '@storybook/react';
-import { IcoArrowRightSmall24, IcoPlusSmall24, icos } from 'icons';
 import React from 'react';
 
 import LinkButton, { LinkButtonProps } from './link-button';

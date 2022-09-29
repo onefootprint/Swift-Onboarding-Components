@@ -1,5 +1,5 @@
+import { IcoChevronDown24 } from '@onefootprint/icons';
 import type { CountryCode } from '@onefootprint/types';
-import { IcoChevronDown24 } from 'icons';
 import React, { forwardRef } from 'react';
 import styled, { css } from 'styled-components';
 

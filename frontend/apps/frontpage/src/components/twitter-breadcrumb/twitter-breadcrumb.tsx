@@ -1,4 +1,4 @@
-import { IcoArrowRightSmall24 } from 'icons';
+import { IcoArrowRightSmall24 } from '@onefootprint/icons';
 import React from 'react';
 import styled, { css } from 'styled-components';
 import { LinkButton, media, Typography } from 'ui';

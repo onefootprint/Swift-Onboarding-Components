@@ -1,5 +1,5 @@
 import { useAutoAnimate } from '@formkit/auto-animate/react';
-import { IcoChevronDown16 } from 'icons';
+import { IcoChevronDown16 } from '@onefootprint/icons';
 import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
 import { Box, createFontStyles } from 'ui';

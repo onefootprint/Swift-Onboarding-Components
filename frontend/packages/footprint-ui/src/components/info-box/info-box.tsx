@@ -1,4 +1,4 @@
-import type { Icon } from 'icons';
+import type { Icon } from '@onefootprint/icons';
 import React from 'react';
 import styled, { css } from 'styled-components';
 import { Box, Typography } from 'ui';

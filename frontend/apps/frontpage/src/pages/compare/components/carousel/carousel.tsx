@@ -1,5 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { IcoChevronLeftBig24 } from 'icons';
+import { IcoChevronLeftBig24 } from '@onefootprint/icons';
 import Image from 'next/image';
 import React from 'react';
 import { useSwipeable } from 'react-swipeable';

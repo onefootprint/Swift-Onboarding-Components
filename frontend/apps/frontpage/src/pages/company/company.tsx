@@ -6,7 +6,7 @@ import {
   IcoHeart40,
   IcoLeaf40,
   IcoShield40,
-} from 'icons';
+} from '@onefootprint/icons';
 import React from 'react';
 import styled, { css } from 'styled-components';
 import { media, Typography } from 'ui';

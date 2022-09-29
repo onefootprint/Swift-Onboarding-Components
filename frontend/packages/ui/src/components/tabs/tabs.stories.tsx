@@ -1,5 +1,5 @@
+import { IcoCode16, IcoFileText16, IcoSettings16 } from '@onefootprint/icons';
 import { ComponentMeta, Story } from '@storybook/react';
-import { IcoCode16, IcoFileText16, IcoSettings16 } from 'icons';
 import React from 'react';
 
 import { Tab, TabListProps, Tabs } from '.';

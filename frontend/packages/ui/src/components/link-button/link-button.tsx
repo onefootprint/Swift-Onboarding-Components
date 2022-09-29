@@ -1,4 +1,4 @@
-import type { Icon } from 'icons';
+import type { Icon } from '@onefootprint/icons';
 import React, { forwardRef, HTMLAttributeAnchorTarget } from 'react';
 import styled, { css } from 'styled-components';
 

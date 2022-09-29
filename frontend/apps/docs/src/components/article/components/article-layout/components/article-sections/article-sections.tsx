@@ -1,5 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { IcoFileText16 } from 'icons';
+import { IcoFileText16 } from '@onefootprint/icons';
 import React, { useEffect } from 'react';
 import type { ArticleSection } from 'src/types/article';
 import styled, { css } from 'styled-components';

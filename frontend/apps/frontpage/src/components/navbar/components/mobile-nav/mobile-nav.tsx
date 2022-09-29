@@ -1,4 +1,4 @@
-import { IcoClose24, IcoMenu24 } from 'icons';
+import { IcoClose24, IcoMenu24 } from '@onefootprint/icons';
 import React, { useCallback, useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { Button, media, useMediaQuery } from 'ui';

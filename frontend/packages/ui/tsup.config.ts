@@ -6,7 +6,7 @@ export default defineConfig({
     'react-dom',
     'polished',
     'styled-components',
-    'icons',
+    '@onefootprint/icons',
     '@onefootprint/themes',
   ],
 });

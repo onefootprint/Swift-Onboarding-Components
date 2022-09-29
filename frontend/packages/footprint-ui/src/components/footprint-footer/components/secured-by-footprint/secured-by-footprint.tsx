@@ -1,4 +1,4 @@
-import { IcoFootprint16 } from 'icons';
+import { IcoFootprint16 } from '@onefootprint/icons';
 import React from 'react';
 import styled, { css } from 'styled-components';
 import { Typography } from 'ui';

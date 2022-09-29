@@ -1,5 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { IcoHelp16 } from 'icons';
+import { IcoHelp16 } from '@onefootprint/icons';
 import React, { useState } from 'react';
 
 import SupportDialog from '../support-dialog';

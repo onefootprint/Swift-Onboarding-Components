@@ -1,5 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { LogoFpdocsDefault } from 'icons';
+import { LogoFpdocsDefault } from '@onefootprint/icons';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React from 'react';

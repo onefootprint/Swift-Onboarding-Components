@@ -1,5 +1,9 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { IcoArrowUpRight16, IcoDatabase16, IcoShield16 } from 'icons';
+import {
+  IcoArrowUpRight16,
+  IcoDatabase16,
+  IcoShield16,
+} from '@onefootprint/icons';
 import React from 'react';
 import type { ProductArticle } from 'src/types/product';
 import styled, { css } from 'styled-components';

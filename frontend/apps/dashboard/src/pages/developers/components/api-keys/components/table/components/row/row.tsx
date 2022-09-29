@@ -1,6 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
+import { IcoDotsHorizontal24 } from '@onefootprint/icons';
 import type { ApiKey } from '@onefootprint/types';
-import { IcoDotsHorizontal24 } from 'icons';
 import React from 'react';
 import { Badge, Box, Dropdown } from 'ui';
 

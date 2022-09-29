@@ -1,5 +1,5 @@
-import type { Icon } from 'icons';
-import { IcoChevronDown24 } from 'icons';
+import type { Icon } from '@onefootprint/icons';
+import { IcoChevronDown24 } from '@onefootprint/icons';
 import { darken } from 'polished';
 import React, { useId, useRef } from 'react';
 import styled, { css } from 'styled-components';

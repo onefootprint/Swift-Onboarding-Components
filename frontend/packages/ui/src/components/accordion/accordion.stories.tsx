@@ -1,5 +1,5 @@
+import { icos, IcoUserCircle24 } from '@onefootprint/icons';
 import { Meta, Story } from '@storybook/react';
-import { icos, IcoUserCircle24 } from 'icons';
 import React, { useState } from 'react';
 
 import Typography from '../typography';

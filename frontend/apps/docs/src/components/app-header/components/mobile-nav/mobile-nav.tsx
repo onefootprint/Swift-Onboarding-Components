@@ -1,6 +1,6 @@
 import { useAutoAnimate } from '@formkit/auto-animate/react';
 import { useTranslation } from '@onefootprint/hooks';
-import { IcoClose24, IcoMenu24, LogoFpdocsDefault } from 'icons';
+import { IcoClose24, IcoMenu24, LogoFpdocsDefault } from '@onefootprint/icons';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useState } from 'react';

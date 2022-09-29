@@ -1,4 +1,4 @@
-import { IcoLink16 } from 'icons';
+import { IcoLink16 } from '@onefootprint/icons';
 import kebabCase from 'lodash/kebabCase';
 import React from 'react';
 import styled, { css } from 'styled-components';

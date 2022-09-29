@@ -1,4 +1,4 @@
-import { IcoQuote40 } from 'icons';
+import { IcoQuote40 } from '@onefootprint/icons';
 import Image from 'next/image';
 import React from 'react';
 import styled from 'styled-components';

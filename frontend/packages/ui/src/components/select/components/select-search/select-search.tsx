@@ -1,4 +1,4 @@
-import { IcoSearch16 } from 'icons';
+import { IcoSearch16 } from '@onefootprint/icons';
 import React from 'react';
 import styled, { css } from 'styled-components';
 

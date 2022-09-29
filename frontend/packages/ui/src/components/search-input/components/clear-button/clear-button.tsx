@@ -1,4 +1,4 @@
-import { IcoClose16, IcoCloseSmall16 } from 'icons';
+import { IcoClose16, IcoCloseSmall16 } from '@onefootprint/icons';
 import React from 'react';
 import styled, { css } from 'styled-components';
 

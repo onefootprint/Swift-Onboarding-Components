@@ -1,5 +1,5 @@
+import { IcoClose24, Icon } from '@onefootprint/icons';
 import FocusTrap from 'focus-trap-react';
-import { IcoClose24, Icon } from 'icons';
 import React from 'react';
 import styled, { css } from 'styled-components';
 import { useEventListener, useLockedBody } from 'usehooks-ts';

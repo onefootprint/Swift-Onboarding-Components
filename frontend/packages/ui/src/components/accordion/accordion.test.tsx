@@ -1,5 +1,5 @@
+import { IcoFileText24 } from '@onefootprint/icons';
 import { customRender, screen, userEvent } from '@onefootprint/test-utils';
-import { IcoFileText24 } from 'icons';
 import React from 'react';
 
 import Accordion, { AccordionProps } from './accordion';

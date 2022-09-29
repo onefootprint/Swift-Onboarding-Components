@@ -1,6 +1,6 @@
+import { flags, IcoChevronDown16, icos } from '@onefootprint/icons';
 import themes from '@onefootprint/themes';
 import { ComponentMeta, ComponentStory } from '@storybook/react';
-import { flags, IcoChevronDown16, icos } from 'icons';
 import React from 'react';
 
 import Box from '../box';

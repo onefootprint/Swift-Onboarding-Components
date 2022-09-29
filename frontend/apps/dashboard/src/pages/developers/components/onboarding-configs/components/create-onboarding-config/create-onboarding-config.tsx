@@ -1,5 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { IcoChevronLeftBig24, IcoClose24 } from 'icons';
+import { IcoChevronLeftBig24, IcoClose24 } from '@onefootprint/icons';
 import React from 'react';
 import { Dialog, useConfirmationDialog } from 'ui';
 

@@ -1,5 +1,5 @@
+import { IcoClose24 } from '@onefootprint/icons';
 import { customRender, screen, userEvent } from '@onefootprint/test-utils';
-import { IcoClose24 } from 'icons';
 import React from 'react';
 
 import IconButton, { IconButtonProps } from './icon-button';

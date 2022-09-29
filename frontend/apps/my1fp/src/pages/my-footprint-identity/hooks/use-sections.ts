@@ -1,11 +1,11 @@
 import { useTranslation } from '@onefootprint/hooks';
-import type { Icon } from 'icons';
+import type { Icon } from '@onefootprint/icons';
 import {
   IcoBuilding24,
   IcoFileText24,
   IcoShield24,
   IcoUserCircle24,
-} from 'icons';
+} from '@onefootprint/icons';
 import React from 'react';
 
 import AccessLogs from '../components/sections/access-logs';

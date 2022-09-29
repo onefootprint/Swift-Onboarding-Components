@@ -1,4 +1,14 @@
 import {
+  IcoBuilding16,
+  IcoCheck16,
+  IcoFileText16,
+  IcoFootprint16,
+  IcoLaptop16,
+  Icon,
+  IcoPhone16,
+  IcoUser16,
+} from '@onefootprint/icons';
+import {
   AuditTrail,
   AuditTrailEvent,
   LivenessCheckInfo,
@@ -10,16 +20,6 @@ import {
   VerificationInfoStatus,
   verificationInfoStatusToDisplayName,
 } from '@onefootprint/types';
-import {
-  IcoBuilding16,
-  IcoCheck16,
-  IcoFileText16,
-  IcoFootprint16,
-  IcoLaptop16,
-  Icon,
-  IcoPhone16,
-  IcoUser16,
-} from 'icons';
 import React from 'react';
 import { TimelineItem } from 'src/components/timeline/timeline';
 import { Tag, Typography } from 'ui';

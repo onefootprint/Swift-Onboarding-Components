@@ -1,4 +1,4 @@
-import type { Icon } from 'icons';
+import type { Icon } from '@onefootprint/icons';
 import React from 'react';
 import CircleIcon from 'src/components/circle-icon';
 import styled, { css } from 'styled-components';

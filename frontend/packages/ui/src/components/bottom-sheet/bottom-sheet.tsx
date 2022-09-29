@@ -1,5 +1,5 @@
+import { IcoClose24 } from '@onefootprint/icons';
 import FocusTrap from 'focus-trap-react';
-import { IcoClose24 } from 'icons';
 import React, { useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
 

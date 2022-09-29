@@ -19,7 +19,7 @@
     "@onefootprint/global-constants",
     "footprint-elements",
     "ui",
-    "icons",
+    "@onefootprint/icons",
     "@onefootprint/hooks",
     "request",
     "@onefootprint/test-utils",

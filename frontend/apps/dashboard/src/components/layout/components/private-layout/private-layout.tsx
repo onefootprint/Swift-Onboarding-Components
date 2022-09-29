@@ -1,4 +1,9 @@
-import { IcoCode16, IcoFileText16, IcoUsers16, LogoFpCompact } from 'icons';
+import {
+  IcoCode16,
+  IcoFileText16,
+  IcoUsers16,
+  LogoFpCompact,
+} from '@onefootprint/icons';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React from 'react';

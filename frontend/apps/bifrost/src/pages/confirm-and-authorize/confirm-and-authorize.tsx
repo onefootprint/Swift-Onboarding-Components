@@ -1,7 +1,4 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { CollectedDataOption } from '@onefootprint/types';
-import { useIsMutating } from '@tanstack/react-query';
-import { HeaderTitle, NavigationHeader } from 'footprint-elements';
 import {
   IcoBuilding24,
   IcoCake24,
@@ -9,7 +6,10 @@ import {
   IcoFileText24,
   IcoPhone24,
   IcoUserCircle24,
-} from 'icons';
+} from '@onefootprint/icons';
+import { CollectedDataOption } from '@onefootprint/types';
+import { useIsMutating } from '@tanstack/react-query';
+import { HeaderTitle, NavigationHeader } from 'footprint-elements';
 import React from 'react';
 import { useBifrostMachine } from 'src/components/bifrost-machine-provider';
 import styled, { css } from 'styled-components';

@@ -24,7 +24,7 @@
     "footprint-elements": "*",
     "@onefootprint/global-constants": "*",
     "@onefootprint/hooks": "*",
-    "icons": "*",
+    "@onefootprint/icons": "*",
     "lodash": "^4.17.21",
     "next": "12.3.0",
     "polished": "^4.2.2",

@@ -1,6 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
+import { IcoUserCircle24 } from '@onefootprint/icons';
 import { UserDataAttribute } from '@onefootprint/types';
-import { IcoUserCircle24 } from 'icons';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 import { User } from 'src/pages/users/hooks/use-join-users';

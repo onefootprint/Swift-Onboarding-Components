@@ -1,4 +1,8 @@
-import { IcoArrowRightSmall24, IcoLinkedin24, IcoTwitter24 } from 'icons';
+import {
+  IcoArrowRightSmall24,
+  IcoLinkedin24,
+  IcoTwitter24,
+} from '@onefootprint/icons';
 import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react';

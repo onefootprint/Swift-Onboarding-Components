@@ -1,4 +1,4 @@
-import { Icon } from 'icons';
+import { Icon } from '@onefootprint/icons';
 import React from 'react';
 import { UserData } from 'src/pages/users/hooks/use-user-data';
 import styled, { css } from 'styled-components';

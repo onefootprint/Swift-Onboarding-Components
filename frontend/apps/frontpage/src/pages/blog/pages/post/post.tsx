@@ -1,5 +1,5 @@
 import { useIntl, useTranslation } from '@onefootprint/hooks';
-import { IcoChevronLeftBig24 } from 'icons';
+import { IcoChevronLeftBig24 } from '@onefootprint/icons';
 import Link from 'next/link';
 import React from 'react';
 import PostContent from 'src/components/post-content';

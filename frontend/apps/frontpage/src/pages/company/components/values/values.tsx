@@ -1,4 +1,4 @@
-import type { Icon } from 'icons';
+import type { Icon } from '@onefootprint/icons';
 import rgba from 'polished/lib/color/rgba';
 import React from 'react';
 import styled, { css } from 'styled-components';

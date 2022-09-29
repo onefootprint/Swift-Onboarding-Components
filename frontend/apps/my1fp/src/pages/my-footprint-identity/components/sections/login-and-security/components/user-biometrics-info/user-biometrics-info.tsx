@@ -1,6 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
+import { IcoClose16 } from '@onefootprint/icons';
 import { InsightEvent } from '@onefootprint/types';
-import { IcoClose16 } from 'icons';
 import React from 'react';
 import useSessionUser from 'src/hooks/use-session-user';
 import styled from 'styled-components';

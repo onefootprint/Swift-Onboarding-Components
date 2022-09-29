@@ -1,4 +1,4 @@
-import { IcoMinusSmall24, IcoPlusSmall24 } from 'icons';
+import { IcoMinusSmall24, IcoPlusSmall24 } from '@onefootprint/icons';
 import { darken } from 'polished';
 import React, { useState } from 'react';
 import styled, { css } from 'styled-components';

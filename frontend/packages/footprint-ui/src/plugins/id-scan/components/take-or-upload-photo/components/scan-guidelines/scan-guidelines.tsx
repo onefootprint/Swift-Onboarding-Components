@@ -1,5 +1,9 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { IcoSmartphone24, IcoSquareFrame24, IcoSun24 } from 'icons';
+import {
+  IcoSmartphone24,
+  IcoSquareFrame24,
+  IcoSun24,
+} from '@onefootprint/icons';
 import React from 'react';
 
 import InfoBox from '../../../../../../components/info-box';

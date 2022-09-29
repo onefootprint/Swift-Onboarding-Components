@@ -5,7 +5,7 @@ import {
   IcoLaptop24,
   IcoPhone24,
   IcoUser24,
-} from 'icons';
+} from '@onefootprint/icons';
 import React from 'react';
 import UAParser from 'ua-parser-js';
 

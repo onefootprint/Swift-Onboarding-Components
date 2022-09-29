@@ -1,4 +1,4 @@
-import { IcoChevronLeft16 } from 'icons';
+import { IcoChevronLeft16 } from '@onefootprint/icons';
 import { useRouter } from 'next/router';
 import React from 'react';
 import styled, { css } from 'styled-components';

@@ -1,4 +1,4 @@
-import { IcoClose24 } from 'icons';
+import { IcoClose24 } from '@onefootprint/icons';
 import React from 'react';
 import styled, { css } from 'styled-components';
 import { Overlay, Typography } from 'ui';

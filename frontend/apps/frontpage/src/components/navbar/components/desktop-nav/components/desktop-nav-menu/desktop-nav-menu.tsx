@@ -1,4 +1,4 @@
-import { IcoChevronDown16 } from 'icons';
+import { IcoChevronDown16 } from '@onefootprint/icons';
 import React from 'react';
 import styled, { css } from 'styled-components';
 import { Typography } from 'ui';

@@ -1,4 +1,4 @@
-import { IcoLock16 } from 'icons';
+import { IcoLock16 } from '@onefootprint/icons';
 import React from 'react';
 import { Box, Typography } from 'ui';
 

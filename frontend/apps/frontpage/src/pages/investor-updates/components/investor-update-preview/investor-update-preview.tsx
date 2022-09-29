@@ -1,5 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { IcoArrowRightSmall16 } from 'icons';
+import { IcoArrowRightSmall16 } from '@onefootprint/icons';
 import Link from 'next/link';
 import React from 'react';
 import styled, { css } from 'styled-components';

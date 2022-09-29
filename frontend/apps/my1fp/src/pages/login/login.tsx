@@ -1,8 +1,8 @@
 import footprint from '@onefootprint/footprint-js';
 import { useTranslation } from '@onefootprint/hooks';
+import { LogoFpDefault } from '@onefootprint/icons';
 import { getErrorMessage, RequestError } from '@onefootprint/request';
 import { UserDecryptResponse } from '@onefootprint/types';
-import { LogoFpDefault } from 'icons';
 import { useRouter } from 'next/router';
 import React from 'react';
 import styled, { css } from 'styled-components';
