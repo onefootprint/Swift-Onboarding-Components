@@ -23,6 +23,7 @@ pub struct TenantUser {
     pub _updated_at: DateTime<Utc>,
     pub created_at: DateTime<Utc>,
     pub last_login_at: Option<DateTime<Utc>>,
+    pub tenant_id: TenantId,
 }
 
 impl TenantUser {
@@ -49,13 +50,13 @@ impl TenantUser {
     pub fn create(
         conn: &mut PgConnection,
         email: TenantUserEmail,
-        tenant_id: &TenantId,
+        tenant_id: TenantId,
         tenant_role_id: TenantRoleId,
     ) -> DbResult<(Self, TenantRole)> {
         // Make sure the role we are using belongs to the tenant, otherwise could invite self to
         // another tenant's role
         let tenant_role: TenantRole = tenant_role::table
-            .filter(tenant_role::tenant_id.eq(tenant_id))
+            .filter(tenant_role::tenant_id.eq(&tenant_id))
             .filter(tenant_role::id.eq(&tenant_role_id))
             .first(conn)?;
         let new_user = NewTenantUser {
@@ -64,6 +65,7 @@ impl TenantUser {
             created_at: Utc::now(),
             // init to None since they haven't logged in yet!
             last_login_at: None,
+            tenant_id,
         };
         let result = diesel::insert_into(tenant_user::table)
             .values(new_user)
@@ -78,12 +80,16 @@ impl TenantUser {
         tenant_role_id: Option<TenantRoleId>,
     ) -> DbResult<Self> {
         assert_in_transaction(conn)?; // Otherwise could create updates to multiple rows accidentally
+        if let Some(tenant_role_id) = tenant_role_id.as_ref() {
+            // Make sure the role we are using belongs to the tenant, otherwise could update permissions to work on another tenant's role
+            tenant_role::table
+                .filter(tenant_role::tenant_id.eq(tenant_id))
+                .filter(tenant_role::id.eq(tenant_role_id))
+                .first::<TenantRole>(conn)?;
+        }
         let user_update = TenantUserUpdate { tenant_role_id };
-        let role_ids = tenant_role::table
-            .filter(tenant_role::tenant_id.eq(tenant_id))
-            .select(tenant_role::id);
         let results: Vec<Self> = diesel::update(tenant_user::table)
-            .filter(tenant_user::tenant_role_id.eq_any(role_ids))
+            .filter(tenant_user::tenant_id.eq(tenant_id))
             .filter(tenant_user::id.eq(id))
             .set(user_update)
             .load(conn)?;
@@ -103,7 +109,7 @@ impl TenantUser {
     ) -> DbResult<Vec<(Self, TenantRole)>> {
         let mut query = tenant_user::table
             .inner_join(tenant_role::table)
-            .filter(tenant_role::tenant_id.eq(tenant_id))
+            .filter(tenant_user::tenant_id.eq(tenant_id))
             .into_boxed()
             .order_by(tenant_user::created_at.asc())
             .limit(page_size);
@@ -123,6 +129,7 @@ struct NewTenantUser {
     email: TenantUserEmail,
     created_at: DateTime<Utc>,
     last_login_at: Option<DateTime<Utc>>,
+    tenant_id: TenantId,
 }
 
 #[derive(AsChangeset)]

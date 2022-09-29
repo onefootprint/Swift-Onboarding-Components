@@ -52,7 +52,6 @@ async fn get(
 
 #[derive(Debug, serde::Deserialize, Apiv2Schema)]
 struct CreateTenantUserRequest {
-    // TODO make email unique per tenant
     email: String,
     role_id: TenantRoleId,
     redirect_url: String, // The URL to the dashboard where the invite login link should be sent
@@ -81,7 +80,7 @@ async fn post(
     } = request.into_inner();
     let (user, role) = state
         .db_pool
-        .db_query(move |conn| TenantUser::create(conn, email.into(), &tenant_id, role_id))
+        .db_query(move |conn| TenantUser::create(conn, email.into(), tenant_id, role_id))
         .await??;
 
     // TODO use a different email template for inviting a teammate

@@ -290,6 +290,7 @@ table! {
         _updated_at -> Timestamptz,
         created_at -> Timestamptz,
         last_login_at -> Nullable<Timestamptz>,
+        tenant_id -> Text,
     }
 }
 
@@ -378,6 +379,7 @@ joinable!(scoped_user -> user_vault (user_vault_id));
 joinable!(tenant_api_key -> tenant (tenant_id));
 joinable!(tenant_api_key_access_log -> tenant_api_key (tenant_api_key_id));
 joinable!(tenant_role -> tenant (tenant_id));
+joinable!(tenant_user -> tenant (tenant_id));
 joinable!(tenant_user -> tenant_role (tenant_role_id));
 joinable!(verification_request -> email (email_id));
 joinable!(verification_request -> identity_data (identity_data_id));
