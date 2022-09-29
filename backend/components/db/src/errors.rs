@@ -65,6 +65,9 @@ pub enum DbError {
     #[error("This API key is disabled")]
     ApiKeyDisabled,
 
+    #[error("User is deactivated. Please contact your administor for assistance.")]
+    TenantUserDeactivated,
+
     #[error("Not in transaction")]
     NotInTransaction,
 }

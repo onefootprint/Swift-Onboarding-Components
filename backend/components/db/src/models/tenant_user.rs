@@ -24,6 +24,7 @@ pub struct TenantUser {
     pub created_at: DateTime<Utc>,
     pub last_login_at: Option<DateTime<Utc>>,
     pub tenant_id: TenantId,
+    pub deactivated_at: Option<DateTime<Utc>>,
 }
 
 impl TenantUser {
@@ -39,12 +40,28 @@ impl TenantUser {
             .first(conn)
             .optional()?;
         if let Some((_, u, _)) = result.as_ref() {
+            if u.deactivated_at.is_some() {
+                return Err(DbError::TenantUserDeactivated);
+            }
             diesel::update(tenant_user::table)
                 .filter(tenant_user::id.eq(&u.id))
                 .set(tenant_user::last_login_at.eq(Utc::now()))
                 .get_result::<TenantUser>(conn)?;
         }
         Ok(result.map(|(_, tenant_user, tenant)| (tenant_user, tenant)))
+    }
+
+    pub fn login_by_id(conn: &mut PgConnection, id: &TenantUserId) -> DbResult<(Tenant, TenantRole, Self)> {
+        use crate::schema::tenant;
+        let (role, tenant, user): (_, _, Self) = tenant_role::table
+            .inner_join(tenant::table)
+            .inner_join(tenant_user::table)
+            .filter(tenant_user::id.eq(id))
+            .first(conn)?;
+        if user.deactivated_at.is_some() {
+            return Err(DbError::TenantUserDeactivated);
+        }
+        Ok((tenant, role, user))
     }
 
     pub fn create(
@@ -77,21 +94,20 @@ impl TenantUser {
         conn: &mut PgConnection,
         tenant_id: &TenantId,
         id: &TenantUserId,
-        tenant_role_id: Option<TenantRoleId>,
+        update: TenantUserUpdate,
     ) -> DbResult<Self> {
         assert_in_transaction(conn)?; // Otherwise could create updates to multiple rows accidentally
-        if let Some(tenant_role_id) = tenant_role_id.as_ref() {
+        if let Some(tenant_role_id) = update.tenant_role_id.as_ref() {
             // Make sure the role we are using belongs to the tenant, otherwise could update permissions to work on another tenant's role
             tenant_role::table
                 .filter(tenant_role::tenant_id.eq(tenant_id))
                 .filter(tenant_role::id.eq(tenant_role_id))
                 .first::<TenantRole>(conn)?;
         }
-        let user_update = TenantUserUpdate { tenant_role_id };
         let results: Vec<Self> = diesel::update(tenant_user::table)
             .filter(tenant_user::tenant_id.eq(tenant_id))
             .filter(tenant_user::id.eq(id))
-            .set(user_update)
+            .set(update)
             .load(conn)?;
 
         if results.len() > 1 {
@@ -132,8 +148,9 @@ struct NewTenantUser {
     tenant_id: TenantId,
 }
 
-#[derive(AsChangeset)]
+#[derive(AsChangeset, Default)]
 #[diesel(table_name = tenant_user)]
-struct TenantUserUpdate {
-    tenant_role_id: Option<TenantRoleId>,
+pub struct TenantUserUpdate {
+    pub tenant_role_id: Option<TenantRoleId>,
+    pub deactivated_at: Option<Option<DateTime<Utc>>>,
 }

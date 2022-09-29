@@ -54,7 +54,7 @@ impl ExtractableAuthSession for ParsedWorkOs {
                 return Err(AuthError::SessionTypeError.into());
             }
         };
-        let (tenant, tenant_role, tenant_user) = Tenant::get_by_user(conn, &data.tenant_user_id)?;
+        let (tenant, tenant_role, tenant_user) = TenantUser::login_by_id(conn, &data.tenant_user_id)?;
         Ok(Self(WorkOs {
             data,
             tenant,

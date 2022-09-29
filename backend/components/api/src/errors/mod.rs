@@ -1,4 +1,7 @@
-use actix_web::{error::{JsonPayloadError, QueryPayloadError, UrlencodedError}, http::StatusCode};
+use actix_web::{
+    error::{JsonPayloadError, QueryPayloadError, UrlencodedError},
+    http::StatusCode,
+};
 use db::errors::DbError;
 use newtypes::Uuid;
 use paperclip::actix::api_v2_errors;
@@ -129,6 +132,7 @@ fn status_code_for_db_error(e: &DbError) -> StatusCode {
         DbError::InvalidDataGroupForKind => StatusCode::INTERNAL_SERVER_ERROR,
         DbError::CouldNotCreateGroupUuid => StatusCode::INTERNAL_SERVER_ERROR,
         DbError::ApiKeyDisabled => StatusCode::UNAUTHORIZED,
+        DbError::TenantUserDeactivated => StatusCode::UNAUTHORIZED,
         DbError::NotInTransaction => StatusCode::INTERNAL_SERVER_ERROR,
     }
 }

@@ -291,6 +291,7 @@ table! {
         created_at -> Timestamptz,
         last_login_at -> Nullable<Timestamptz>,
         tenant_id -> Text,
+        deactivated_at -> Nullable<Timestamptz>,
     }
 }
 

@@ -11,7 +11,7 @@ use crate::types::PaginatedResponseData;
 use crate::types::ResponseData;
 use crate::State;
 use chrono::{DateTime, Utc};
-use db::models::tenant_user::TenantUser;
+use db::models::tenant_user::{TenantUser, TenantUserUpdate};
 use newtypes::TenantPermission;
 use newtypes::TenantRoleId;
 use newtypes::TenantUserId;
@@ -93,7 +93,6 @@ async fn post(
 #[derive(Debug, serde::Deserialize, Apiv2Schema)]
 struct UpdateTenantUserRequest {
     role_id: Option<TenantRoleId>,
-    // TODO add status
 }
 
 #[api_v2_operation(
@@ -114,9 +113,41 @@ async fn patch(
 
     let tenant_id = tenant.id.clone();
     let UpdateTenantUserRequest { role_id } = request.into_inner();
+    let update = TenantUserUpdate {
+        tenant_role_id: role_id,
+        ..TenantUserUpdate::default()
+    };
     state
         .db_pool
-        .db_transaction(move |conn| TenantUser::update(conn, &tenant_id, &user_id, role_id))
+        .db_transaction(move |conn| TenantUser::update(conn, &tenant_id, &user_id, update))
+        .await?;
+
+    EmptyResponse::ok().json()
+}
+
+#[api_v2_operation(
+    summary = "/org/users/deactivate",
+    operation_id = "org-users-deactivate",
+    tags(Private),
+    description = "Updates the provided user."
+)]
+#[post("/users/{tenant_user_id}/deactivate")]
+async fn deactivate(
+    state: web::Data<State>,
+    user_id: web::Path<TenantUserId>,
+    auth: WorkOsAuth,
+) -> JsonApiResponse<EmptyResponse> {
+    let auth = auth.check_permissions(vec![TenantPermission::Admin])?;
+    let tenant = auth.tenant();
+
+    let tenant_id = tenant.id.clone();
+    let update = TenantUserUpdate {
+        deactivated_at: Some(Some(Utc::now())),
+        ..TenantUserUpdate::default()
+    };
+    state
+        .db_pool
+        .db_transaction(move |conn| TenantUser::update(conn, &tenant_id, &user_id, update))
         .await?;
 
     EmptyResponse::ok().json()

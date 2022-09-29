@@ -20,6 +20,7 @@ pub fn routes() -> web::Scope {
         .service(users::get)
         .service(users::post)
         .service(users::patch)
+        .service(users::deactivate)
         .service(roles::get)
         .service(roles::post)
         .service(roles::patch)
