@@ -1,4 +1,7 @@
-use crate::auth::{AuthError, CheckTenantPermissions, TenantAuth};
+use crate::auth::{
+    tenant::{CheckTenantPermissions, TenantAuth},
+    AuthError,
+};
 use crate::{errors::ApiError, State};
 use actix_web::http::header::Header;
 use actix_web::{web, FromRequest};

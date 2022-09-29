@@ -1,6 +1,6 @@
-use crate::auth::session_data::user::{UserAuthScope, UserSession};
-use crate::auth::UserAuth;
-use crate::auth::VerifiedUserAuth;
+use crate::auth::user::UserAuth;
+use crate::auth::user::UserAuth;
+use crate::auth::user::{UserAuthScope, UserSession};
 use crate::errors::ApiError;
 use crate::types::response::ResponseData;
 use crate::utils::session::JsonSession;

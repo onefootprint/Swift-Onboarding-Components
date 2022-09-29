@@ -1,5 +1,8 @@
 use crate::{
-    auth::{AuthError, ExtractableAuthSession},
+    auth::{
+        session::{AuthSessionData, ExtractableAuthSession},
+        AuthError, SessionContext,
+    },
     errors::ApiError,
 };
 use db::{
@@ -9,7 +12,7 @@ use db::{
 use newtypes::{DataAttribute, TenantPermission, TenantUserId};
 use paperclip::actix::Apiv2Security;
 
-use super::AuthSessionData;
+use super::{CheckTenantPermissions, TenantAuth};
 
 #[derive(Debug, Clone)]
 pub struct WorkOs {
@@ -107,5 +110,67 @@ impl WorkOs {
             Some(name) => format!("{} ({})", name, self.data.email),
             None => self.data.email.clone(),
         }
+    }
+}
+
+/// A shorthand for the commonly used ParsedWorkOs context
+pub type WorkOsAuthContext = SessionContext<ParsedWorkOs>;
+
+// These are the same methods as the CheckTenantPermission implementation below - but some methods
+// need to check auth without converting the WorkOsAuth to a trait object of dyn TenantAuth
+impl WorkOsAuthContext {
+    /// Verifies that the auth token has one of the required scopes. If so, returns a WorkOs
+    /// that is accessible
+    pub fn check_permissions(
+        self,
+        permissions: Vec<TenantPermission>,
+    ) -> Result<SessionContext<WorkOs>, AuthError> {
+        let result = self.map(|c| c.check_permissions(permissions))?;
+        Ok(result)
+    }
+
+    pub fn can_decrypt(self, attributes: Vec<DataAttribute>) -> Result<SessionContext<WorkOs>, AuthError> {
+        let result = self.map(|c| c.can_decrypt(attributes))?;
+        Ok(result)
+    }
+}
+
+impl CheckTenantPermissions for WorkOsAuthContext {
+    fn check_permissions(self, permissions: Vec<TenantPermission>) -> Result<Box<dyn TenantAuth>, AuthError> {
+        self.check_permissions(permissions)
+            .map(|auth| Box::new(auth) as Box<dyn TenantAuth>)
+    }
+
+    fn can_decrypt(self, attributes: Vec<DataAttribute>) -> Result<Box<dyn TenantAuth>, AuthError> {
+        self.can_decrypt(attributes)
+            .map(|auth| Box::new(auth) as Box<dyn TenantAuth>)
+    }
+}
+
+impl TenantAuth for SessionContext<WorkOs> {
+    fn is_live(&self) -> Result<bool, ApiError> {
+        let is_live: Option<bool> = self
+            .headers
+            .0
+            .get("x-is-live".to_owned())
+            .and_then(|hv| hv.to_str().map(|s| s.to_string()).ok())
+            .and_then(|v| v.trim().parse::<bool>().ok());
+
+        // error if the tenant is sandbox-restricted but is requesting live data
+        let is_sandbox_restricted = self.data.tenant().sandbox_restricted;
+        if is_sandbox_restricted && is_live == Some(true) {
+            return Err(AuthError::SandboxRestricted.into());
+        }
+
+        // otherwise return the default of the sent header or live if not restricted
+        Ok(is_live.unwrap_or(!is_sandbox_restricted))
+    }
+
+    fn tenant(&self) -> &Tenant {
+        self.data.tenant()
+    }
+
+    fn format_principal(&self) -> String {
+        self.data.format_principal()
     }
 }

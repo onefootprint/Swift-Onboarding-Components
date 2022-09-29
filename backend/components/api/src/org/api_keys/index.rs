@@ -1,5 +1,5 @@
-use crate::auth::key_context::secret_key::SecretTenantAuthContext;
-use crate::auth::{CheckTenantPermissions, Either, WorkOsAuth};
+use crate::auth::tenant::{CheckTenantPermissions, SecretTenantAuthContext, WorkOsAuthContext};
+use crate::auth::Either;
 use crate::errors::ApiError;
 use crate::types::secret_api_key::FpTenantApiKey;
 use crate::types::EmptyRequest;
@@ -24,7 +24,7 @@ use paperclip::actix::{api_v2_operation, patch, web, web::Json};
 pub async fn get(
     state: web::Data<State>,
     request: web::Query<PaginatedRequest<EmptyRequest, DateTime<Utc>>>,
-    auth: Either<WorkOsAuth, SecretTenantAuthContext>,
+    auth: Either<WorkOsAuthContext, SecretTenantAuthContext>,
 ) -> actix_web::Result<Json<PaginatedResponseData<Vec<FpTenantApiKey>, DateTime<Utc>>>, ApiError> {
     let auth = auth.check_permissions(vec![TenantPermission::ApiKeys])?;
     let page_size = request.page_size(&state);
@@ -68,7 +68,7 @@ pub struct CreateApiKeyRequest {
 )]
 pub async fn post(
     state: web::Data<State>,
-    auth: Either<WorkOsAuth, SecretTenantAuthContext>,
+    auth: Either<WorkOsAuthContext, SecretTenantAuthContext>,
     request: web::Json<CreateApiKeyRequest>,
 ) -> actix_web::Result<Json<ResponseData<FpTenantApiKey>>, ApiError> {
     let auth = auth.check_permissions(vec![TenantPermission::ApiKeys])?;
@@ -111,7 +111,7 @@ pub struct UpdateApiKeyRequest {
 #[patch("/{id}")]
 pub async fn patch(
     state: web::Data<State>,
-    auth: Either<WorkOsAuth, SecretTenantAuthContext>,
+    auth: Either<WorkOsAuthContext, SecretTenantAuthContext>,
     path: web::Path<UpdateApiKeyPath>,
     request: web::Json<UpdateApiKeyRequest>,
 ) -> actix_web::Result<Json<ResponseData<FpTenantApiKey>>, ApiError> {

@@ -1,5 +1,5 @@
 use super::{BiometricChallengeState, PhoneChallengeState};
-use crate::auth::session_data::user::{UserAuthScope, UserSession};
+use crate::auth::user::{UserAuthScope, UserSession};
 use crate::errors::challenge::ChallengeError;
 
 use crate::errors::ApiError;

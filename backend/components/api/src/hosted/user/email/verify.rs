@@ -1,7 +1,7 @@
 use crate::errors::challenge::ChallengeError;
 use crate::types::response::ResponseData;
 use crate::types::EmptyResponse;
-use crate::{auth::session_data::AuthSessionData, utils::session::AuthSession};
+use crate::{auth::session::AuthSessionData, utils::session::AuthSession};
 
 use crate::errors::ApiError;
 use crate::State;

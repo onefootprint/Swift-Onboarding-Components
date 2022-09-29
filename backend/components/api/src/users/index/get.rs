@@ -1,7 +1,7 @@
-use crate::auth::key_context::secret_key::SecretTenantAuthContext;
-use crate::auth::CheckTenantPermissions;
+use crate::auth::tenant::CheckTenantPermissions;
+use crate::auth::tenant::SecretTenantAuthContext;
+use crate::auth::tenant::WorkOsAuthContext;
 use crate::auth::Either;
-use crate::auth::WorkOsAuth;
 use crate::errors::ApiError;
 use crate::types::request::PaginatedRequest;
 use crate::types::response::PaginatedResponseData;
@@ -43,7 +43,7 @@ type UsersResponse = Vec<FpScopedUser>;
 pub fn get(
     state: web::Data<State>,
     request: web::Query<PaginatedRequest<UsersRequest, i64>>,
-    auth: Either<WorkOsAuth, SecretTenantAuthContext>,
+    auth: Either<WorkOsAuthContext, SecretTenantAuthContext>,
 ) -> actix_web::Result<Json<PaginatedResponseData<UsersResponse, i64>>, ApiError> {
     let auth = auth.check_permissions(vec![TenantPermission::Users])?;
     let tenant = auth.tenant();

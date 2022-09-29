@@ -1,7 +1,7 @@
-use crate::auth::key_context::secret_key::SecretTenantAuthContext;
-use crate::auth::CheckTenantPermissions;
+use crate::auth::tenant::CheckTenantPermissions;
+use crate::auth::tenant::SecretTenantAuthContext;
+use crate::auth::tenant::WorkOsAuthContext;
 use crate::auth::Either;
-use crate::auth::WorkOsAuth;
 use crate::errors::ApiError;
 use crate::types::audit_trail::FpAuditTrail;
 use crate::types::response::ResponseData;
@@ -28,7 +28,7 @@ type AuditTrailResponse = Vec<FpAuditTrail>;
 fn get(
     state: web::Data<State>,
     request: web::Query<AuditTrailRequest>,
-    auth: Either<WorkOsAuth, SecretTenantAuthContext>,
+    auth: Either<WorkOsAuthContext, SecretTenantAuthContext>,
 ) -> actix_web::Result<Json<ResponseData<AuditTrailResponse>>, ApiError> {
     let auth = auth.check_permissions(vec![TenantPermission::AuditTrail])?;
     let tenant_id = auth.tenant().id.clone();
@@ -55,7 +55,7 @@ fn get(
 fn get2(
     state: web::Data<State>,
     path: web::Path<FootprintUserId>,
-    auth: Either<WorkOsAuth, SecretTenantAuthContext>,
+    auth: Either<WorkOsAuthContext, SecretTenantAuthContext>,
 ) -> actix_web::Result<Json<ResponseData<AuditTrailResponse>>, ApiError> {
     let auth = auth.check_permissions(vec![TenantPermission::AuditTrail])?;
     let tenant_id = auth.tenant().id.clone();

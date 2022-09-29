@@ -2,8 +2,11 @@
 
 use std::collections::HashSet;
 
-use crate::auth::key_context::secret_key::SecretTenantAuthContext;
-use crate::auth::{Either, TenantAuth, WorkOsAuth};
+use crate::auth::tenant::SecretTenantAuthContext;
+use crate::auth::{
+    tenant::{TenantAuth, WorkOsAuthContext},
+    Either,
+};
 
 use crate::types::identity_data_request::{IdentityDataRequest, IdentityDataUpdate};
 use crate::types::{EmptyResponse, JsonApiResponse, ResponseData};
@@ -121,7 +124,7 @@ pub async fn get(
     state: web::Data<State>,
     path: Path<FootprintUserId>,
     request: Query<FieldsParams>,
-    tenant_auth: Either<WorkOsAuth, SecretTenantAuthContext>,
+    tenant_auth: Either<WorkOsAuthContext, SecretTenantAuthContext>,
 ) -> JsonApiResponse<UnifiedUserVaultGetDataResponse> {
     let footprint_id = path.into_inner();
     let request = request.into_inner();
@@ -196,7 +199,7 @@ pub async fn post_decrypt(
     state: web::Data<State>,
     path: Path<FootprintUserId>,
     request: Json<DecryptUnifiedFieldsRequest>,
-    auth: Either<WorkOsAuth, SecretTenantAuthContext>,
+    auth: Either<WorkOsAuthContext, SecretTenantAuthContext>,
     insights: InsightHeaders,
 ) -> JsonApiResponse<UnifiedUserVaultDecryptResponse> {
     let footprint_id = path.into_inner();

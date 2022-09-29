@@ -7,7 +7,7 @@ use newtypes::ObConfigurationKey;
 use paperclip::actix::Apiv2Header;
 
 use crate::{
-    auth::{session_data::ob_session::ParsedOnboardingSession, AuthError, Either, SessionContext},
+    auth::{tenant::ParsedOnboardingSession, AuthError, Either, SessionContext},
     State,
 };
 

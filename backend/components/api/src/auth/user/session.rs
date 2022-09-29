@@ -1,25 +1,16 @@
 use db::PgConnection;
 use newtypes::UserVaultId;
-use paperclip::actix::{Apiv2Schema, Apiv2Security};
+use paperclip::actix::Apiv2Security;
 
+use super::UserAuthScope;
 use crate::{
-    auth::{session_data::AuthSessionData, AuthError, ExtractableAuthSession, VerifiedUserAuth},
+    auth::{
+        session::{AuthSessionData, ExtractableAuthSession},
+        user::UserAuth,
+        AuthError, SessionContext,
+    },
     errors::ApiError,
 };
-
-#[derive(serde::Serialize, serde::Deserialize, PartialEq, Eq, Debug, Clone, Copy, Apiv2Schema)]
-#[serde(rename = "snake_case")]
-pub enum UserAuthScope {
-    // This is just the initial scope - we will update this to have scopes that represent perms for
-    // all the different kinds of user tokens in the future
-    All,
-    SignUp,
-    OrgOnboarding,
-    BasicProfile,
-    ExtendedProfile,
-    SensitiveProfile,
-    Handoff,
-}
 
 /// A user-specific session. Permissions for the session are defined by the set of scopes.
 /// IMPORTANT: Purposefully doesn't implement TryFrom<AuthSessionData> or HeaderName to prevent
@@ -43,7 +34,7 @@ impl UserSession {
     }
 }
 
-impl VerifiedUserAuth for UserSession {
+impl UserAuth for UserSession {
     fn user_vault_id(&self) -> UserVaultId {
         self.user_vault_id.clone()
     }
@@ -84,5 +75,19 @@ impl ParsedUserSession {
         } else {
             Err(AuthError::MissingScope(scopes))
         }
+    }
+}
+
+/// A shorthand for the commonly used ParsedUserSession context
+pub type UserAuth = SessionContext<ParsedUserSession>;
+
+impl UserAuth {
+    /// Verifies that the auth token has one of the required scopes. If so, returns a UserAuth
+    /// that is accessible
+    pub fn check_permissions(
+        self,
+        scopes: Vec<UserAuthScope>,
+    ) -> Result<SessionContext<UserSession>, AuthError> {
+        self.map(|c| c.check_permissions(scopes))
     }
 }

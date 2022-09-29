@@ -1,10 +1,10 @@
-use crate::auth::key_context::ob_public_key::PublicOnboardingContext;
-use crate::auth::session_data::ob_session::ParsedOnboardingSession;
-use crate::auth::session_data::user::UserAuthScope;
+use crate::auth::tenant::ParsedOnboardingSession;
+use crate::auth::tenant::PublicOnboardingContext;
+use crate::auth::user::UserAuth;
+use crate::auth::user::UserAuth;
+use crate::auth::user::UserAuthScope;
 use crate::auth::Either;
 use crate::auth::SessionContext;
-use crate::auth::UserAuth;
-use crate::auth::VerifiedUserAuth;
 use crate::errors::ApiError;
 use crate::hosted::onboarding::get_requirements;
 use crate::types::response::ResponseData;

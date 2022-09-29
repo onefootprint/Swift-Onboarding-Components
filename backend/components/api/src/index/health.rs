@@ -1,7 +1,7 @@
 use crate::errors::ApiError;
 use crate::types::{ResponseData, StringResponse};
 use crate::State;
-use crate::{auth::key_context::custodian::CustodianAuthContext, types::JsonApiResponse};
+use crate::{auth::custodian::CustodianAuthContext, types::JsonApiResponse};
 
 use actix_web::cookie::time::Instant;
 use newtypes::{EncryptedVaultPrivateKey, SealedVaultBytes};

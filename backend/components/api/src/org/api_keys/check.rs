@@ -1,7 +1,7 @@
 use crate::errors::ApiError;
 use crate::types::response::ResponseData;
 use crate::State;
-use crate::{auth::key_context::secret_key::SecretTenantAuthContext, types::secret_api_key::FpTenantApiKey};
+use crate::{auth::tenant::SecretTenantAuthContext, types::secret_api_key::FpTenantApiKey};
 
 use chrono::Utc;
 use paperclip::actix::{api_v2_operation, get, web, web::Json};

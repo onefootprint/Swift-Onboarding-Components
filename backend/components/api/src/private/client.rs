@@ -2,7 +2,7 @@ use crate::errors::ApiError;
 use crate::types::response::ResponseData;
 use crate::types::secret_api_key::FpTenantApiKey;
 use crate::State;
-use crate::{auth::key_context::custodian::CustodianAuthContext, org::workos::login::create_tenant};
+use crate::{auth::custodian::CustodianAuthContext, org::workos::login::create_tenant};
 use db::models::tenant_api_key::TenantApiKey;
 use newtypes::secret_api_key::SecretApiKey;
 use newtypes::TenantId;

@@ -5,12 +5,8 @@ use db::{
 use newtypes::{ObConfigurationId, TenantId};
 use paperclip::actix::Apiv2Security;
 
-use crate::{
-    auth::{AuthError, ExtractableAuthSession},
-    errors::ApiError,
-};
-
-use super::AuthSessionData;
+use crate::auth::session::{AuthSessionData, ExtractableAuthSession};
+use crate::{auth::AuthError, errors::ApiError};
 
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
 pub struct OnboardingSession {

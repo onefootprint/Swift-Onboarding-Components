@@ -1,6 +1,4 @@
-use crate::auth::UserAuth;
-use crate::auth::{session_data::user::UserAuthScope, VerifiedUserAuth};
-
+use crate::auth::user::{UserAuth, UserAuth, UserAuthScope};
 use crate::errors::user::UserError;
 use crate::errors::ApiError;
 use crate::types::response::ResponseData;

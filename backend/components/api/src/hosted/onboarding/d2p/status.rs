@@ -1,5 +1,5 @@
-use crate::auth::session_data::user::UserAuthScope;
-use crate::auth::UserAuth;
+use crate::auth::user::UserAuth;
+use crate::auth::user::UserAuthScope;
 use crate::errors::handoff::HandoffError;
 use crate::errors::ApiError;
 use crate::types::response::ResponseData;

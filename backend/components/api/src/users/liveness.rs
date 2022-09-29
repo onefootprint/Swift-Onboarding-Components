@@ -1,7 +1,7 @@
-use crate::auth::key_context::secret_key::SecretTenantAuthContext;
-use crate::auth::CheckTenantPermissions;
+use crate::auth::tenant::CheckTenantPermissions;
+use crate::auth::tenant::SecretTenantAuthContext;
+use crate::auth::tenant::WorkOsAuthContext;
 use crate::auth::Either;
-use crate::auth::WorkOsAuth;
 use crate::errors::ApiError;
 use crate::types::liveness::FpLiveness;
 use crate::types::response::ResponseData;
@@ -26,7 +26,7 @@ pub struct LivenessRequest {
 pub async fn get(
     state: web::Data<State>,
     request: web::Query<LivenessRequest>,
-    auth: Either<WorkOsAuth, SecretTenantAuthContext>,
+    auth: Either<WorkOsAuthContext, SecretTenantAuthContext>,
 ) -> actix_web::Result<Json<ResponseData<Vec<FpLiveness>>>, ApiError> {
     let auth = auth.check_permissions(vec![TenantPermission::Users])?;
     let tenant_id = auth.tenant().id.clone();

@@ -1,16 +1,6 @@
-use self::{
-    email_verify::EmailVerifySession, user::UserSession, validate_user::ValidateUserToken,
-    workos::WorkOsSession,
-};
 use crypto::aead::ScopedSealingKey;
 use newtypes::SealedSessionBytes;
 use serde::{Deserialize, Serialize};
-
-pub mod email_verify;
-pub mod ob_session;
-pub mod user;
-pub mod validate_user;
-pub mod workos;
 
 impl AuthSessionData {
     pub(crate) fn seal(&self, key: &ScopedSealingKey) -> Result<SealedSessionBytes, crypto::Error> {
@@ -28,17 +18,17 @@ impl AuthSessionData {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub enum AuthSessionData {
     /// workos login to tenant admin
-    WorkOs(WorkOsSession),
+    WorkOs(crate::auth::tenant::WorkOsSession),
 
     /// user-specific sessions
-    User(UserSession),
+    User(crate::auth::user::UserSession),
 
     /// Used for validating email challenges
-    EmailVerify(EmailVerifySession),
+    EmailVerify(crate::auth::user::EmailVerifySession),
 
     /// Used to prove to a tenant that a user is authed with footprint
-    ValidateUserToken(ValidateUserToken),
+    ValidateUserToken(crate::auth::user::ValidateUserToken),
 
     /// Used to provide a single use onboarding session token for bifrost initialization
-    OnboardingSession(ob_session::OnboardingSession),
+    OnboardingSession(crate::auth::tenant::OnboardingSession),
 }

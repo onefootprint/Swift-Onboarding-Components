@@ -1,10 +1,12 @@
 use std::collections::HashSet;
 
-use crate::auth::key_context::ob_public_key::PublicOnboardingContext;
-use crate::auth::key_context::secret_key::SecretTenantAuthContext;
-use crate::auth::session_data::ob_session::ParsedOnboardingSession;
-use crate::auth::{CheckTenantPermissions, Either};
-use crate::auth::{SessionContext, WorkOsAuth};
+use crate::auth::tenant::ParsedOnboardingSession;
+use crate::auth::tenant::PublicOnboardingContext;
+use crate::auth::tenant::SecretTenantAuthContext;
+use crate::auth::{
+    tenant::{CheckTenantPermissions, WorkOsAuthContext},
+    Either, SessionContext,
+};
 use crate::errors::tenant::TenantError;
 use crate::errors::ApiError;
 use crate::types::ob_config::FpObConfig;
@@ -51,7 +53,7 @@ pub fn get_detail(
 async fn get(
     state: web::Data<State>,
     request: web::Query<PaginatedRequest<EmptyRequest, DateTime<Utc>>>,
-    auth: Either<WorkOsAuth, SecretTenantAuthContext>,
+    auth: Either<WorkOsAuthContext, SecretTenantAuthContext>,
 ) -> actix_web::Result<Json<PaginatedResponseData<Vec<FpObConfig>, DateTime<Utc>>>, ApiError> {
     let auth = auth.check_permissions(vec![TenantPermission::OnboardingConfiguration])?;
     let tenant = auth.tenant();
@@ -127,7 +129,7 @@ impl CreateOnboardingConfigurationRequest {
 #[post("/onboarding_configs")]
 pub fn post(
     state: web::Data<State>,
-    auth: Either<WorkOsAuth, SecretTenantAuthContext>,
+    auth: Either<WorkOsAuthContext, SecretTenantAuthContext>,
     request: Json<CreateOnboardingConfigurationRequest>,
 ) -> actix_web::Result<Json<ResponseData<FpObConfig>>, ApiError> {
     let auth = auth.check_permissions(vec![TenantPermission::OnboardingConfiguration])?;
@@ -172,7 +174,7 @@ struct UpdateObConfigRequest {
 #[patch("/onboarding_configs/{id}")]
 async fn patch(
     state: web::Data<State>,
-    auth: Either<WorkOsAuth, SecretTenantAuthContext>,
+    auth: Either<WorkOsAuthContext, SecretTenantAuthContext>,
     path: web::Path<UpdateObConfigPath>,
     request: web::Json<UpdateObConfigRequest>,
 ) -> actix_web::Result<Json<ResponseData<FpObConfig>>, ApiError> {

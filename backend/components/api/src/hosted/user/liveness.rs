@@ -1,5 +1,4 @@
-use crate::auth::session_data::user::UserAuthScope;
-use crate::auth::{UserAuth, VerifiedUserAuth};
+use crate::auth::user::{UserAuth, UserAuth, UserAuthScope};
 use crate::errors::ApiError;
 use crate::types::liveness::FpLiveness;
 use crate::types::response::ResponseData;

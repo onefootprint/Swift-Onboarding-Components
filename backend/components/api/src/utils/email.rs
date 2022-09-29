@@ -1,5 +1,5 @@
-use crate::auth::session_data::email_verify::EmailVerifySession;
-use crate::auth::session_data::AuthSessionData;
+use crate::auth::session::AuthSessionData;
+use crate::auth::user::EmailVerifySession;
 use crate::errors::ApiError;
 use crate::State;
 use crypto::random::gen_random_alphanumeric_code;

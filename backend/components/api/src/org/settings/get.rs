@@ -1,4 +1,4 @@
-use crate::auth::{TenantAuth, WorkOsAuth};
+use crate::auth::tenant::{TenantAuth, WorkOsAuthContext};
 use crate::errors::ApiError;
 use crate::types::response::ResponseData;
 use crate::State;
@@ -24,7 +24,7 @@ struct GetTenantResponse {
 #[get("/")]
 fn handler(
     state: web::Data<State>,
-    auth: WorkOsAuth,
+    auth: WorkOsAuthContext,
 ) -> actix_web::Result<Json<ResponseData<GetTenantResponse>>, ApiError> {
     let auth = auth.check_permissions(vec![TenantPermission::OrgSettings])?;
     let tenant = auth.tenant();

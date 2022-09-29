@@ -12,7 +12,8 @@ use newtypes::{
 use paperclip::actix::web;
 
 use crate::{
-    auth::session_data::{validate_user::ValidateUserToken, AuthSessionData},
+    auth::session::AuthSessionData,
+    auth::user::ValidateUserToken,
     errors::{onboarding::OnboardingError, ApiResult},
     utils::{session::AuthSession, user_vault_wrapper::UserVaultWrapper},
 };

@@ -1,4 +1,4 @@
-use crate::auth::key_context::custodian::CustodianAuthContext;
+use crate::auth::custodian::CustodianAuthContext;
 use crate::errors::ApiError;
 use crate::types::response::ResponseData;
 use crate::State;

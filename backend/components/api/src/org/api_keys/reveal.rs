@@ -1,5 +1,5 @@
-use crate::auth::key_context::secret_key::SecretTenantAuthContext;
-use crate::auth::{CheckTenantPermissions, Either, WorkOsAuth};
+use crate::auth::tenant::{CheckTenantPermissions, SecretTenantAuthContext, WorkOsAuthContext};
+use crate::auth::Either;
 use crate::errors::ApiError;
 use crate::types::response::ResponseData;
 use crate::types::secret_api_key::FpTenantApiKey;
@@ -27,7 +27,7 @@ struct RevealRequest {
 async fn get(
     state: web::Data<State>,
     request: web::Path<RevealRequest>,
-    auth: Either<WorkOsAuth, SecretTenantAuthContext>,
+    auth: Either<WorkOsAuthContext, SecretTenantAuthContext>,
 ) -> actix_web::Result<Json<ResponseData<FpTenantApiKey>>, ApiError> {
     let auth = auth.check_permissions(vec![TenantPermission::ApiKeys])?;
     // TODO more strict auth for viewing secret keys using a SecretTenantAuthContext

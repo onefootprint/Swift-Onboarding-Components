@@ -1,8 +1,8 @@
-use crate::auth::key_context::secret_key::SecretTenantAuthContext;
-use crate::auth::session_data::ob_session::OnboardingSession;
-use crate::auth::session_data::AuthSessionData;
+use crate::auth::session::AuthSessionData;
+use crate::auth::tenant::OnboardingSession;
+use crate::auth::tenant::SecretTenantAuthContext;
 
-use crate::auth::CheckTenantPermissions;
+use crate::auth::tenant::CheckTenantPermissions;
 
 use crate::types::response::ResponseData;
 

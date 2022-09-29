@@ -7,7 +7,10 @@ use newtypes::DataAttribute;
 
 use crate::errors::ApiError;
 
-use super::{AuthError, CheckTenantPermissions, TenantAuth};
+use super::{
+    tenant::{CheckTenantPermissions, TenantAuth},
+    AuthError,
+};
 
 #[derive(Debug, Clone)]
 /// Abstract Session Context Type
@@ -69,8 +72,8 @@ impl<A: paperclip::v2::schema::Apiv2Schema, B: paperclip::v2::schema::Apiv2Schem
     paperclip::v2::schema::Apiv2Schema for Either<A, B>
 {
     fn name() -> Option<String> {
-        let a = A::name().unwrap_or(String::new());
-        let b = B::name().unwrap_or(String::new());
+        let a = A::name().unwrap_or_default();
+        let b = B::name().unwrap_or_default();
         Some(format!("Either {a} or {b}"))
     }
 

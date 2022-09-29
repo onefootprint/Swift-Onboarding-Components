@@ -2,8 +2,8 @@
 
 use std::collections::{HashMap, HashSet};
 
-use crate::auth::key_context::secret_key::SecretTenantAuthContext;
-use crate::auth::{CheckTenantPermissions, Either, TenantAuth, WorkOsAuth};
+use crate::auth::tenant::{CheckTenantPermissions, SecretTenantAuthContext, TenantAuth, WorkOsAuthContext};
+use crate::auth::Either;
 
 use crate::errors::ApiResult;
 use crate::types::{EmptyResponse, JsonApiResponse, ResponseData};
@@ -115,7 +115,7 @@ pub async fn get(
     state: web::Data<State>,
     path: Path<FootprintUserId>,
     request: Query<FieldsParams>,
-    tenant_auth: Either<WorkOsAuth, SecretTenantAuthContext>,
+    tenant_auth: Either<WorkOsAuthContext, SecretTenantAuthContext>,
 ) -> JsonApiResponse<GetCustomDataResponse> {
     let tenant_auth = tenant_auth.check_permissions(vec![TenantPermission::Users])?;
     let footprint_user_id = path.into_inner();
@@ -173,7 +173,7 @@ pub async fn post_decrypt(
     state: web::Data<State>,
     path: Path<FootprintUserId>,
     request: Json<DecryptCustomFieldsRequest>,
-    tenant_auth: Either<WorkOsAuth, SecretTenantAuthContext>,
+    tenant_auth: Either<WorkOsAuthContext, SecretTenantAuthContext>,
     insights: InsightHeaders,
 ) -> JsonApiResponse<DecryptCustomDataResponse> {
     let tenant_auth = tenant_auth.check_permissions(vec![TenantPermission::DecryptCustom])?;

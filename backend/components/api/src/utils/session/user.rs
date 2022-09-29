@@ -4,7 +4,7 @@ use db::{models::session::Session, PgConnection};
 use newtypes::{SealedSessionBytes, SessionAuthToken};
 
 use crate::{
-    auth::{session_data::AuthSessionData, AuthError},
+    auth::{session::AuthSessionData, AuthError},
     State,
 };
 

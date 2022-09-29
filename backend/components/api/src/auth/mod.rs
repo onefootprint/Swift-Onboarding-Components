@@ -1,21 +1,16 @@
 use newtypes::TenantPermissionDiscriminants;
 use thiserror::Error;
 
-use self::session_data::user::UserAuthScope;
+use self::user::UserAuthScope;
 
+pub mod custodian;
+pub mod session;
+pub use session::SessionContext;
 mod either;
-pub mod key_context;
-mod session_context;
-pub mod session_data;
-mod tenant_auth;
-mod traits;
-mod user_auth;
-
 pub use self::either::Either;
-pub use session_context::SessionContext;
-pub use tenant_auth::WorkOsAuth;
-pub use traits::*;
-pub use user_auth::UserAuth;
+pub mod tenant;
+mod traits;
+pub mod user;
 
 #[derive(Debug, Error)]
 pub enum AuthError {
