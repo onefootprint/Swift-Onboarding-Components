@@ -11,25 +11,29 @@ fn parse_response(value: serde_json::Value) -> Result<IDologyResponse, super::Er
     Ok(response)
 }
 
+pub type IdNumber = String;
+
 pub fn process(
     value: serde_json::Value,
     pending_attributes: Vec<SignalScope>,
-) -> Result<IdvResponse, super::Error> {
-    let (status, audit_events) = match parse_response(value.clone()) {
+) -> Result<(IdvResponse, Option<IdNumber>), super::Error> {
+    let (status, audit_events, id_number) = match parse_response(value.clone()) {
         Ok(response) => process_success(response.response, pending_attributes)?,
         Err(_) => process_error(),
     };
-    Ok(IdvResponse {
+    let idv_response = IdvResponse {
         status,
         audit_events,
         raw_response: value,
-    })
+    };
+    // For now, if we return a non-null id_number, this indicates that we should create a DocumentRequest
+    Ok((idv_response, id_number))
 }
 
 fn process_success(
     response: IDologySuccess,
     pending_attributes: Vec<SignalScope>,
-) -> Result<(Option<KycStatus>, Vec<AuditTrailEvent>), super::Error> {
+) -> Result<(Option<KycStatus>, Vec<AuditTrailEvent>, Option<IdNumber>), super::Error> {
     // TODO is it concerning if there are no qualifiers?
     if !response.id_located() {
         // TODO probably want to waterfall to another vendor
@@ -38,7 +42,13 @@ fn process_success(
             vendor: Vendor::Idology,
             status: VerificationInfoStatus::NotFound,
         });
-        return Ok((Some(KycStatus::ManualReview), vec![audit_trail]));
+        // TODO do we have to do this if response.id_located()?
+        let id_number = if response.is_id_scan_required() {
+            response.id_number
+        } else {
+            None
+        };
+        return Ok((Some(KycStatus::ManualReview), vec![audit_trail], id_number));
     }
 
     let qualifiers = if let Some(ref qualifiers) = response.qualifiers {
@@ -94,16 +104,16 @@ fn process_success(
     .flatten()
     .map(AuditTrailEvent::Verification)
     .collect();
-    Ok((Some(new_status), events))
+    Ok((Some(new_status), events, None))
 }
 
-fn process_error() -> (Option<KycStatus>, Vec<AuditTrailEvent>) {
+fn process_error() -> (Option<KycStatus>, Vec<AuditTrailEvent>, Option<IdNumber>) {
     let events = vec![AuditTrailEvent::Verification(VerificationInfo {
         attributes: vec![],
         vendor: Vendor::Footprint,
         status: VerificationInfoStatus::Failed,
     })];
-    (Some(KycStatus::ManualReview), events)
+    (Some(KycStatus::ManualReview), events, None)
 }
 
 #[derive(Debug, serde::Deserialize)]
@@ -118,6 +128,8 @@ struct IDologySuccess {
     // TODO should these be options?
     results: Option<KeyResponse>,
     summary_result: Option<KeyResponse>,
+    id_number: Option<IdNumber>,
+    id_scan: Option<String>,
 }
 
 impl IDologySuccess {
@@ -136,6 +148,14 @@ impl IDologySuccess {
             results.key.as_str() == "result.match"
         } else {
             false
+        }
+    }
+
+    /// Whether IDology tells us that we need to upload an ID scan
+    fn is_id_scan_required(&self) -> bool {
+        match self.id_scan {
+            Some(ref id_scan) => id_scan.as_str() == "yes",
+            None => false,
         }
     }
 }

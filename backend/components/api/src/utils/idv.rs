@@ -3,6 +3,7 @@ use crate::{errors::ApiError, State};
 use chrono::Utc;
 use db::models::{
     audit_trail::AuditTrail,
+    document_request::DocumentRequest,
     identity_data::HasIdentityDataFields,
     onboarding::{Onboarding, OnboardingUpdate},
     verification_request::{NewVerificationRequest, VerificationRequest},
@@ -72,7 +73,7 @@ pub async fn initiate_idv_requests(
     // TODO spawn a task to do this asynchronously
     let fut_requests = requests
         .into_iter()
-        .map(|r| process_idv_request(state, user_vault_id.clone(), tenant_id.clone(), r));
+        .map(|r| process_idv_request(state, user_vault_id.clone(), tenant_id.clone(), ob_id.clone(), r));
     let result_statuses = futures::future::try_join_all(fut_requests).await?;
     save_final_result(state, ob_id, result_statuses).await?;
     Ok(())
@@ -118,14 +119,18 @@ async fn process_idv_request(
     state: &State,
     user_vault_id: UserVaultId,
     tenant_id: TenantId,
+    ob_id: OnboardingId,
     request: VerificationRequest,
 ) -> Result<Option<KycStatus>, ApiError> {
     let request_id = request.id.clone();
-    let IdvResponse {
-        status,
-        audit_events,
-        raw_response,
-    } = send_idv_request(state, request).await?;
+    let (
+        IdvResponse {
+            status,
+            audit_events,
+            raw_response,
+        },
+        collect_document_id_number,
+    ) = send_idv_request(state, request).await?;
 
     // Atomically create the VerificationResult row, update the status of the onboarding, and
     // create new audit trails
@@ -142,13 +147,19 @@ async fn process_idv_request(
                     Some(result.id.clone()),
                 )
             })?;
+            if let Some(collect_document_id_number) = collect_document_id_number {
+                DocumentRequest::create(conn, ob_id, Some(collect_document_id_number))?;
+            }
             Ok(())
         })
         .await?;
     Ok(status)
 }
 
-async fn send_idv_request(state: &State, request: VerificationRequest) -> Result<IdvResponse, ApiError> {
+async fn send_idv_request(
+    state: &State,
+    request: VerificationRequest,
+) -> Result<(IdvResponse, Option<String>), ApiError> {
     // Build the set of data we will send to the vendor by re-building the UVW from the DB using
     // the pointers to pieces of user data saved on the VerificationRequest
     // This is unnecessary right now, but will allow us to re-run this logic when this task is async
@@ -171,9 +182,10 @@ async fn send_idv_request(state: &State, request: VerificationRequest) -> Result
         }
         Vendor::Twilio => {
             // TODO make it easier to share twilio client between IDV + SMS sending
-            idv::twilio::lookup_v2(&state.twilio_client.client, data_to_verify)
+            let idv_response = idv::twilio::lookup_v2(&state.twilio_client.client, data_to_verify)
                 .await
-                .map_err(idv::Error::from)?
+                .map_err(idv::Error::from)?;
+            (idv_response, None)
         }
         _ => return Err(ApiError::NotImplemented),
     };
