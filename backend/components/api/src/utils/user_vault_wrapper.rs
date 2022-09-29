@@ -64,6 +64,50 @@ impl UserVaultWrapper {
         })
     }
 
+    // In order to minimize database queries, we would like to be able to bulk fetch
+    // various data elements for a set of Users.
+    fn multi_build_internal(
+        conn: &mut PgConnection,
+        user_vaults: Vec<UserVault>,
+        is_locked: bool,
+    ) -> Result<Vec<Self>, DbError> {
+        let uv_ids: Vec<UserVaultId> = user_vaults.iter().map(|uv| uv.id.clone()).collect();
+
+        // For each data source, fetch data _for all users_ in the `user_vaults` list in a single DB transaction.
+        // We then build a HashMap of UserVaultId -> Data object in order to build our final
+        // UserVaultWrapper for each User
+        let mut identity_data: HashMap<UserVaultId, IdentityData> =
+            IdentityData::bulk_get_active(conn, &uv_ids)?
+                .into_iter()
+                .map(|id| (id.user_vault_id.clone(), id))
+                .collect();
+        let mut phone_number: HashMap<UserVaultId, PhoneNumber> =
+            PhoneNumber::bulk_get_primary(conn, &uv_ids)?
+                .into_iter()
+                .map(|phone| (phone.user_vault_id.clone(), phone))
+                .collect();
+        let mut email: HashMap<UserVaultId, Email> = Email::bulk_get_primary(conn, &uv_ids)?
+            .into_iter()
+            .map(|email| (email.user_vault_id.clone(), email))
+            .collect();
+
+        // Map over our UserVaults, assembling the UserVaultWrappers from the data we fetched above
+        Ok(user_vaults
+            .into_iter()
+            .map(move |uv| {
+                let uv_id = uv.id.clone();
+                Self {
+                    identity_data: identity_data.remove(&uv_id),
+                    user_vault: uv,
+                    phone_number: phone_number.remove(&uv_id),
+                    email: email.remove(&uv_id),
+                    is_locked,
+                    phantom: PhantomData,
+                }
+            })
+            .collect())
+    }
+
     // Allows reconstructing a UserVaultWrapper at the time a VerificationRequest was made
     pub fn from_verification_request(
         conn: &mut PgConnection,
@@ -107,6 +151,12 @@ impl UserVaultWrapper {
     pub fn get(conn: &mut PgConnection, id: &UserVaultId) -> Result<Self, DbError> {
         let user_vault = UserVault::get(conn, id)?;
         let uvw = Self::build_internal(conn, user_vault, false)?;
+        Ok(uvw)
+    }
+
+    pub fn multi_get(conn: &mut PgConnection, ids: Vec<&UserVaultId>) -> Result<Vec<Self>, DbError> {
+        let user_vaults = UserVault::multi_get(conn, ids)?;
+        let uvw = Self::multi_build_internal(conn, user_vaults, false)?;
         Ok(uvw)
     }
 

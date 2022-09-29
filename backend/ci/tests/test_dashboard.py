@@ -81,9 +81,12 @@ class TestDashboard:
         body = get("users", dict(fp_user_id=user.fp_user_id), tenant.sk.key)
         scoped_users = body["data"]
         assert len(scoped_users)
-        assert scoped_users[0]["footprint_user_id"] == user.fp_user_id
+        
+        scoped_user = list(filter(lambda su: su["footprint_user_id"] == user.fp_user_id, scoped_users))
+        assert len(scoped_user) == 1
+        
         assert set(["first_name", "last_name"]) < set(
-            scoped_users[0]["identity_data_attributes"]
+            scoped_user[0]["identity_data_attributes"]
         )
 
     def test_liveness_list(self, user):

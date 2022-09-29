@@ -51,12 +51,27 @@ impl PhoneNumber {
         conn: &mut PgConnection,
         user_vault_id: &UserVaultId,
     ) -> Result<Option<Self>, DbError> {
+        tracing::info!("fetching phone number for user_vault_id");
         let result = phone_number::table
             .filter(phone_number::user_vault_id.eq(user_vault_id))
             .filter(phone_number::deactivated_at.is_null())
             .filter(phone_number::priority.eq(DataPriority::Primary))
             .first(conn)
             .optional()?;
+        Ok(result)
+    }
+
+    pub fn bulk_get_primary(
+        conn: &mut PgConnection,
+        user_vault_ids: &Vec<UserVaultId>,
+    ) -> Result<Vec<Self>, DbError> {
+        tracing::info!("bulk fetching phone numbers for user_vault_ids");
+        let result = phone_number::table
+            .filter(phone_number::user_vault_id.eq_any(user_vault_ids))
+            .filter(phone_number::deactivated_at.is_null())
+            .filter(phone_number::priority.eq(DataPriority::Primary))
+            .load::<Self>(conn)?;
+
         Ok(result)
     }
 

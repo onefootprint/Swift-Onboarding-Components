@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use crate::auth::tenant::CheckTenantPermissions;
 use crate::auth::tenant::SecretTenantAuthContext;
 use crate::auth::tenant::WorkOsAuthContext;
@@ -12,9 +14,11 @@ use chrono::{DateTime, Utc};
 use db::models::identity_data::HasIdentityDataFields;
 use db::models::onboarding::Onboarding;
 use db::scoped_user::OnboardingListQueryParams;
+use itertools::Itertools;
 use newtypes::csv::deserialize_stringified_list;
 use newtypes::KycStatus;
 use newtypes::TenantPermission;
+use newtypes::UserVaultId;
 use newtypes::{DataAttribute, Fingerprint, Fingerprinter, FootprintUserId, PiiString};
 use paperclip::actix::{api_v2_operation, web, web::Json, Apiv2Schema};
 
@@ -80,7 +84,7 @@ pub fn get(
         timestamp_lte,
         timestamp_gte,
     };
-    let (scoped_users, obs, uvws, count) = state
+    let (mut scoped_users, obs, mut uvws, count) = state
         .db_pool
         .db_query(move |conn| -> Result<_, ApiError> {
             let scoped_users = db::scoped_user::list_authorized_for_tenant(
@@ -92,12 +96,7 @@ pub fn get(
             let count = db::scoped_user::count_authorized_for_tenant(conn, query_params).map(Some)?;
             let (scoped_user_ids, user_vault_ids): (_, Vec<_>) =
                 scoped_users.iter().map(|ob| (&ob.id, &ob.user_vault_id)).unzip();
-            // TODO bulk fetch user vault wrapper endpoint to save many DB queries
-            // https://linear.app/footprint/issue/FP-1004/create-util-to-bulk-hydrate-uvws
-            let uvws: Vec<UserVaultWrapper> = user_vault_ids
-                .into_iter()
-                .map(|id| UserVaultWrapper::get(conn, id))
-                .collect::<Result<_, _>>()?;
+            let uvws: Vec<UserVaultWrapper> = UserVaultWrapper::multi_get(conn, user_vault_ids)?;
             let obs = Onboarding::get_for_scoped_users(conn, scoped_user_ids)?;
 
             Ok((scoped_users, obs, uvws, count))
@@ -109,11 +108,19 @@ pub fn get(
         .cursor_item(&state, &scoped_users)
         .map(|su| su.ordering_id);
     let empty_vec = vec![];
+
+    // Since we zip these Vecs together, we should ensure they are in the same order.
+    // scoped_users.sort_by_key(|su| su.user_vault_id.clone());
+    let mut uvw_map: HashMap<UserVaultId, UserVaultWrapper> = uvws
+        .into_iter()
+        .map(move |uvw| (uvw.user_vault.id.clone(), uvw))
+        .collect();
+
     let scoped_users = scoped_users
         .into_iter()
-        .zip(uvws.into_iter())
         .take(page_size)
-        .map(|(su, uvw)| {
+        .map(|su| {
+            let uvw = uvw_map.remove(&su.user_vault_id).unwrap();
             FpScopedUser::from(
                 uvw.get_populated_fields(),
                 obs.get(&su.id).unwrap_or(&empty_vec),

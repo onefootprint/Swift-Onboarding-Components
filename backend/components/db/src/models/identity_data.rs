@@ -112,11 +112,25 @@ impl From<IdentityData> for NewIdentityDataArgs {
 
 impl IdentityData {
     pub fn get_active(conn: &mut PgConnection, user_vault_id: &UserVaultId) -> Result<Option<Self>, DbError> {
+        tracing::info!("fetching identity data for user_vault_id");
         let result: Option<Self> = identity_data::table
             .filter(identity_data::user_vault_id.eq(user_vault_id))
             .filter(identity_data::deactivated_at.is_null())
             .first(conn)
             .optional()?;
+
+        Ok(result)
+    }
+
+    pub fn bulk_get_active(
+        conn: &mut PgConnection,
+        user_vault_ids: &Vec<UserVaultId>,
+    ) -> Result<Vec<Self>, DbError> {
+        tracing::info!("bulk fetching identity data for user_vault_ids");
+        let result: Vec<Self> = identity_data::table
+            .filter(identity_data::user_vault_id.eq_any(user_vault_ids))
+            .filter(identity_data::deactivated_at.is_null())
+            .load::<Self>(conn)?;
 
         Ok(result)
     }

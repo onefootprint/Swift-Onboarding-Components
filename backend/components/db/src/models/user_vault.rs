@@ -30,6 +30,13 @@ impl UserVault {
         Ok(user)
     }
 
+    pub fn multi_get(conn: &mut PgConnection, id: Vec<&UserVaultId>) -> Result<Vec<Self>, DbError> {
+        let users = user_vault::table
+            .filter(user_vault::id.eq_any(id))
+            .load::<Self>(conn)?;
+        Ok(users)
+    }
+
     pub fn lock(conn: &mut PgConnection, id: &UserVaultId) -> Result<Self, DbError> {
         assert_in_transaction(conn)?; // Doesn't make sense to lock outside of a txn
         let user = user_vault::table
