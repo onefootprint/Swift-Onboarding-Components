@@ -111,6 +111,7 @@ impl TenantUser {
                 .first::<TenantRole>(conn)?;
         }
         let results: Vec<Self> = diesel::update(tenant_user::table)
+            .filter(tenant_user::deactivated_at.is_null())
             .filter(tenant_user::tenant_id.eq(tenant_id))
             .filter(tenant_user::id.eq(id))
             .set(update)
@@ -123,7 +124,7 @@ impl TenantUser {
         Ok(result)
     }
 
-    pub fn list(
+    pub fn list_active(
         conn: &mut PgConnection,
         tenant_id: &TenantId,
         cursor: Option<DateTime<Utc>>,
@@ -132,6 +133,7 @@ impl TenantUser {
         let mut query = tenant_user::table
             .inner_join(tenant_role::table)
             .filter(tenant_user::tenant_id.eq(tenant_id))
+            .filter(tenant_user::deactivated_at.is_null())
             .into_boxed()
             .order_by(tenant_user::created_at.asc())
             .limit(page_size);

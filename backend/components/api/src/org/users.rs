@@ -39,7 +39,7 @@ async fn get(
     let tenant_id = tenant.id.clone();
     let results = state
         .db_pool
-        .db_query(move |conn| TenantUser::list(conn, &tenant_id, cursor, (page_size + 1) as i64))
+        .db_query(move |conn| TenantUser::list_active(conn, &tenant_id, cursor, (page_size + 1) as i64))
         .await??;
 
     let cursor = request.cursor_item(&state, &results).map(|x| x.0.created_at);
