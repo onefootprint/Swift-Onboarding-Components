@@ -21,7 +21,7 @@
     "ui",
     "@onefootprint/icons",
     "@onefootprint/hooks",
-    "request",
+    "@onefootprint/request",
     "@onefootprint/test-utils",
     "@onefootprint/themes"
   ]
