@@ -1,8 +1,8 @@
 use crate::auth::tenant::ParsedOnboardingSession;
 use crate::auth::tenant::PublicOnboardingContext;
 use crate::auth::user::UserAuth;
+use crate::auth::user::UserAuthContext;
 use crate::auth::user::UserAuthScope;
-use crate::auth::user::VerifiedUserAuth;
 use crate::auth::Either;
 use crate::auth::SessionContext;
 use crate::errors::ApiError;
@@ -27,7 +27,7 @@ pub struct OnboardingStatusResponse {
 pub fn get(
     state: web::Data<State>,
     onboarding_context: Either<PublicOnboardingContext, SessionContext<ParsedOnboardingSession>>,
-    user_auth: UserAuth,
+    user_auth: UserAuthContext,
 ) -> actix_web::Result<Json<ResponseData<OnboardingStatusResponse>>, ApiError> {
     let user_auth = user_auth.check_permissions(vec![UserAuthScope::OrgOnboarding])?;
 

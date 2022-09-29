@@ -1,5 +1,5 @@
 use crate::auth::user::UserAuth;
-use crate::auth::user::VerifiedUserAuth;
+use crate::auth::user::UserAuthContext;
 use crate::auth::user::{UserAuthScope, UserSession};
 use crate::errors::ApiError;
 use crate::types::response::ResponseData;
@@ -26,7 +26,7 @@ pub struct GenerateResponse {
 #[post("generate")]
 pub async fn handler(
     state: web::Data<State>,
-    user_auth: UserAuth,
+    user_auth: UserAuthContext,
 ) -> actix_web::Result<Json<ResponseData<GenerateResponse>>, ApiError> {
     let user_auth = user_auth.check_permissions(vec![UserAuthScope::SignUp])?;
 

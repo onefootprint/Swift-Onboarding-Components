@@ -1,6 +1,6 @@
 use std::str::FromStr;
 
-use crate::auth::user::{UserAuth, UserAuthScope, VerifiedUserAuth};
+use crate::auth::user::{UserAuth, UserAuthContext, UserAuthScope};
 use crate::errors::challenge::ChallengeError;
 use crate::errors::ApiError;
 use crate::types::response::ResponseData;
@@ -27,7 +27,7 @@ struct RequestEmailVerifyRequest {
 #[post("/challenge")]
 async fn post(
     state: web::Data<State>,
-    user_auth: UserAuth,
+    user_auth: UserAuthContext,
     request: Json<RequestEmailVerifyRequest>,
 ) -> actix_web::Result<Json<ResponseData<EmptyResponse>>, ApiError> {
     let user_auth = user_auth.check_permissions(vec![UserAuthScope::BasicProfile])?;

@@ -1,4 +1,4 @@
-use crate::auth::user::{UserAuth, UserAuthScope, VerifiedUserAuth};
+use crate::auth::user::{UserAuth, UserAuthContext, UserAuthScope};
 use crate::errors::ApiError;
 use crate::types::liveness::FpLiveness;
 use crate::types::response::ResponseData;
@@ -17,7 +17,7 @@ type LivenessResponse = Vec<FpLiveness>;
 #[get("/liveness")]
 fn get(
     state: web::Data<State>,
-    user_auth: UserAuth,
+    user_auth: UserAuthContext,
 ) -> actix_web::Result<Json<ResponseData<LivenessResponse>>, ApiError> {
     let user_auth = user_auth.check_permissions(vec![UserAuthScope::BasicProfile])?;
 

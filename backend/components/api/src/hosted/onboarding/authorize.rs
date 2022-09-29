@@ -1,8 +1,8 @@
 use crate::auth::tenant::ParsedOnboardingSession;
 use crate::auth::tenant::PublicOnboardingContext;
 use crate::auth::user::UserAuth;
+use crate::auth::user::UserAuthContext;
 use crate::auth::user::UserAuthScope;
-use crate::auth::user::VerifiedUserAuth;
 use crate::auth::Either;
 use crate::auth::SessionContext;
 use crate::errors::onboarding::OnboardingError;
@@ -28,7 +28,7 @@ struct CommitResponse {
 )]
 #[post("/authorize")]
 fn post(
-    user_auth: UserAuth,
+    user_auth: UserAuthContext,
     onboarding_context: Either<PublicOnboardingContext, SessionContext<ParsedOnboardingSession>>,
     state: web::Data<State>,
 ) -> actix_web::Result<Json<ResponseData<CommitResponse>>, ApiError> {

@@ -4,7 +4,7 @@ use std::collections::{HashMap, HashSet};
 
 use crate::auth::tenant::SecretTenantAuthContext;
 use crate::auth::{
-    tenant::{CheckTenantPermissions, VerifiedTenantAuth, WorkOsAuthContext},
+    tenant::{CheckTenantPermissions, TenantAuth, WorkOsAuthContext},
     AuthError, Either,
 };
 use crate::errors::ApiResult;

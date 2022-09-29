@@ -1,4 +1,4 @@
-use crate::auth::user::{UserAuth, UserAuthScope, VerifiedUserAuth};
+use crate::auth::user::{UserAuth, UserAuthContext, UserAuthScope};
 use crate::errors::ApiError;
 use crate::types::onboarding::FpOnboarding;
 use crate::types::response::ResponseData;
@@ -29,7 +29,7 @@ pub struct FpUserOnboarding {
 #[get("authorized_orgs")]
 pub async fn handler(
     state: web::Data<State>,
-    user_auth: UserAuth,
+    user_auth: UserAuthContext,
 ) -> actix_web::Result<Json<ResponseData<AuthorizedOrgsResponse>>, ApiError> {
     let user_auth = user_auth.check_permissions(vec![UserAuthScope::BasicProfile])?;
 

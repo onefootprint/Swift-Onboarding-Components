@@ -1,4 +1,4 @@
-use crate::auth::user::{UserAuth, UserAuthScope, VerifiedUserAuth};
+use crate::auth::user::{UserAuth, UserAuthContext, UserAuthScope};
 use crate::errors::ApiError;
 use crate::types::response::ResponseData;
 use crate::utils::user_vault_wrapper::UserVaultWrapper;
@@ -50,7 +50,7 @@ pub struct FpUser {
     from a successful /identify/verify call in the header."
 )]
 pub async fn handler(
-    user_auth: UserAuth,
+    user_auth: UserAuthContext,
     state: web::Data<State>,
 ) -> actix_web::Result<Json<ResponseData<FpUser>>, ApiError> {
     let user_auth = user_auth.check_permissions(vec![UserAuthScope::BasicProfile])?;

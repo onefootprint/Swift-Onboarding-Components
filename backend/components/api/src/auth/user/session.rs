@@ -6,7 +6,7 @@ use super::UserAuthScope;
 use crate::{
     auth::{
         session::{AuthSessionData, ExtractableAuthSession},
-        user::VerifiedUserAuth,
+        user::UserAuth,
         AuthError, SessionContext,
     },
     errors::ApiError,
@@ -34,7 +34,7 @@ impl UserSession {
     }
 }
 
-impl VerifiedUserAuth for UserSession {
+impl UserAuth for UserSession {
     fn user_vault_id(&self) -> UserVaultId {
         self.user_vault_id.clone()
     }
@@ -79,9 +79,9 @@ impl ParsedUserSession {
 }
 
 /// A shorthand for the commonly used ParsedUserSession context
-pub type UserAuth = SessionContext<ParsedUserSession>;
+pub type UserAuthContext = SessionContext<ParsedUserSession>;
 
-impl UserAuth {
+impl UserAuthContext {
     /// Verifies that the auth token has one of the required scopes. If so, returns a UserAuth
     /// that is accessible
     pub fn check_permissions(

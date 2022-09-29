@@ -1,5 +1,5 @@
 use crate::auth::session::AuthSessionData;
-use crate::auth::tenant::{SecretTenantAuthContext, VerifiedTenantAuth};
+use crate::auth::tenant::{SecretTenantAuthContext, TenantAuth};
 use crate::auth::user::ValidateUserToken;
 use crate::errors::onboarding::OnboardingError;
 use crate::errors::ApiError;

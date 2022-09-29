@@ -1,6 +1,6 @@
 use crate::auth::tenant::ParsedOnboardingSession;
 use crate::auth::tenant::PublicOnboardingContext;
-use crate::auth::user::{UserAuth, UserAuthScope, VerifiedUserAuth};
+use crate::auth::user::{UserAuth, UserAuthContext, UserAuthScope};
 use crate::auth::{Either, SessionContext};
 use crate::errors::onboarding::OnboardingError;
 use crate::errors::ApiError;
@@ -18,7 +18,7 @@ use paperclip::actix::{api_v2_operation, post, web};
 #[post("/skip_liveness")]
 fn post(
     state: web::Data<State>,
-    user_auth: UserAuth,
+    user_auth: UserAuthContext,
     onboarding_context: Either<PublicOnboardingContext, SessionContext<ParsedOnboardingSession>>,
 ) -> JsonApiResponse<EmptyResponse> {
     let user_auth = user_auth.check_permissions(vec![UserAuthScope::OrgOnboarding])?;

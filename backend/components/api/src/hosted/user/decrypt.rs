@@ -1,6 +1,6 @@
 use crate::auth::user::UserAuth;
+use crate::auth::user::UserAuthContext;
 use crate::auth::user::UserAuthScope;
-use crate::auth::user::VerifiedUserAuth;
 use crate::errors::ApiError;
 use crate::hosted::user::decrypt;
 use crate::hosted::user::DecryptFieldsResult;
@@ -27,7 +27,7 @@ type UserDecryptResponse = HashMap<DataAttribute, Option<String>>;
 #[post("/decrypt")]
 fn handler(
     state: web::Data<State>,
-    user_auth: UserAuth,
+    user_auth: UserAuthContext,
     request: Json<UserDecryptRequest>,
 ) -> actix_web::Result<Json<ResponseData<UserDecryptResponse>>, ApiError> {
     let required_scope = if request.attributes.contains(&DataAttribute::Ssn9) {

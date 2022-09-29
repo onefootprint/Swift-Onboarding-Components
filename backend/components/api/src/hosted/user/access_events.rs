@@ -1,4 +1,4 @@
-use crate::auth::user::{UserAuth, UserAuthScope};
+use crate::auth::user::{UserAuthContext, UserAuthScope};
 use crate::errors::ApiError;
 use crate::types::access_event::FpAccessEvent;
 use crate::types::response::ResponseData;
@@ -19,7 +19,7 @@ type AccessEventResponse = Vec<FpAccessEvent>;
 #[get("/access_events")]
 fn handler(
     state: web::Data<State>,
-    user_auth: UserAuth,
+    user_auth: UserAuthContext,
 ) -> actix_web::Result<Json<ResponseData<AccessEventResponse>>, ApiError> {
     let user_auth = user_auth.check_permissions(vec![UserAuthScope::BasicProfile])?;
 

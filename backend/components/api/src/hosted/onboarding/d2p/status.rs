@@ -1,4 +1,4 @@
-use crate::auth::user::UserAuth;
+use crate::auth::user::UserAuthContext;
 use crate::auth::user::UserAuthScope;
 use crate::errors::handoff::HandoffError;
 use crate::errors::ApiError;
@@ -23,7 +23,7 @@ pub struct StatusResponse {
 #[get("status")]
 pub async fn get(
     state: web::Data<State>,
-    user_auth: UserAuth,
+    user_auth: UserAuthContext,
 ) -> actix_web::Result<Json<ResponseData<StatusResponse>>, ApiError> {
     let user_auth = user_auth.check_permissions(vec![UserAuthScope::Handoff])?;
 
@@ -52,7 +52,7 @@ pub struct UpdateStatusRequest {
 )]
 #[post("status")]
 pub fn post(
-    user_auth: UserAuth,
+    user_auth: UserAuthContext,
     request: Json<UpdateStatusRequest>,
     state: web::Data<State>,
 ) -> actix_web::Result<Json<ResponseData<EmptyResponse>>, ApiError> {

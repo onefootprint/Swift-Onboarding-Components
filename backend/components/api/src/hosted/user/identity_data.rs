@@ -1,6 +1,6 @@
 use crate::auth::user::UserAuth;
+use crate::auth::user::UserAuthContext;
 use crate::auth::user::UserAuthScope;
-use crate::auth::user::VerifiedUserAuth;
 use crate::types::identity_data_request::IdentityDataRequest;
 use crate::types::identity_data_request::IdentityDataUpdate;
 use crate::types::response::ResponseData;
@@ -18,7 +18,7 @@ use paperclip::actix::{api_v2_operation, post, web, web::Json};
 #[post("/data/identity")]
 async fn handler(
     state: web::Data<State>,
-    user_auth: UserAuth,
+    user_auth: UserAuthContext,
     request: web::Json<IdentityDataRequest>,
 ) -> actix_web::Result<Json<ResponseData<EmptyResponse>>, ApiError> {
     let user_auth = user_auth.check_permissions(vec![UserAuthScope::SignUp])?;

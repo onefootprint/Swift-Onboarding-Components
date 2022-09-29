@@ -12,7 +12,7 @@ use db::{
 use newtypes::{DataAttribute, TenantPermission, TenantUserId};
 use paperclip::actix::Apiv2Security;
 
-use super::{CheckTenantPermissions, VerifiedTenantAuth};
+use super::{CheckTenantPermissions, TenantAuth};
 
 #[derive(Debug, Clone)]
 pub struct WorkOs {
@@ -136,21 +136,18 @@ impl WorkOsAuthContext {
 }
 
 impl CheckTenantPermissions for WorkOsAuthContext {
-    fn check_permissions(
-        self,
-        permissions: Vec<TenantPermission>,
-    ) -> Result<Box<dyn VerifiedTenantAuth>, AuthError> {
+    fn check_permissions(self, permissions: Vec<TenantPermission>) -> Result<Box<dyn TenantAuth>, AuthError> {
         self.check_permissions(permissions)
-            .map(|auth| Box::new(auth) as Box<dyn VerifiedTenantAuth>)
+            .map(|auth| Box::new(auth) as Box<dyn TenantAuth>)
     }
 
-    fn can_decrypt(self, attributes: Vec<DataAttribute>) -> Result<Box<dyn VerifiedTenantAuth>, AuthError> {
+    fn can_decrypt(self, attributes: Vec<DataAttribute>) -> Result<Box<dyn TenantAuth>, AuthError> {
         self.can_decrypt(attributes)
-            .map(|auth| Box::new(auth) as Box<dyn VerifiedTenantAuth>)
+            .map(|auth| Box::new(auth) as Box<dyn TenantAuth>)
     }
 }
 
-impl VerifiedTenantAuth for SessionContext<WorkOs> {
+impl TenantAuth for SessionContext<WorkOs> {
     fn is_live(&self) -> Result<bool, ApiError> {
         let is_live: Option<bool> = self
             .headers

@@ -1,4 +1,4 @@
-use crate::auth::user::{UserAuth, UserAuthScope, VerifiedUserAuth};
+use crate::auth::user::{UserAuth, UserAuthContext, UserAuthScope};
 use crate::errors::ApiError;
 use crate::types::response::ResponseData;
 use chrono::{DateTime, Utc};
@@ -19,7 +19,7 @@ pub struct TokenResponse {
     description = "Returns information about a given auth token."
 )]
 #[get("token")]
-pub fn get(user_auth: UserAuth) -> actix_web::Result<Json<ResponseData<TokenResponse>>, ApiError> {
+pub fn get(user_auth: UserAuthContext) -> actix_web::Result<Json<ResponseData<TokenResponse>>, ApiError> {
     let user_auth = user_auth.check_permissions(vec![UserAuthScope::SignUp, UserAuthScope::BasicProfile])?;
 
     Ok(Json(ResponseData::ok(TokenResponse {

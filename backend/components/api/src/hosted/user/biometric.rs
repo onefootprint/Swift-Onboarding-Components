@@ -1,5 +1,5 @@
 use crate::{
-    auth::user::{UserAuth, UserAuthScope, VerifiedUserAuth},
+    auth::user::{UserAuth, UserAuthContext, UserAuthScope},
     errors::{challenge::ChallengeError, ApiError},
     types::{response::ResponseData, EmptyResponse},
     utils::{
@@ -51,7 +51,7 @@ pub fn init(
     // TODO only allow registering webauthn credentials if you have no previous credentials OR if
     // you logged into this session via webauthn. Otherwise, someone who SIM swaps you can register
     // their own webauthn creds
-    user_auth: UserAuth,
+    user_auth: UserAuthContext,
     state: web::Data<State>,
 ) -> actix_web::Result<Json<ResponseData<WebAuthnInitResponse>>, ApiError> {
     let user_auth = user_auth.check_permissions(vec![UserAuthScope::SignUp, UserAuthScope::Handoff])?;
@@ -115,7 +115,7 @@ struct WebauthnRegisterRequest {
 #[post("/biometric")]
 async fn complete(
     request: Json<WebauthnRegisterRequest>,
-    user_auth: UserAuth,
+    user_auth: UserAuthContext,
     insights: InsightHeaders,
     state: web::Data<State>,
 ) -> actix_web::Result<Json<ResponseData<EmptyResponse>>, ApiError> {

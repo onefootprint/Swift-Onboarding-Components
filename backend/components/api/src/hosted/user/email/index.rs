@@ -1,4 +1,4 @@
-use crate::auth::user::{UserAuth, UserAuthScope, VerifiedUserAuth};
+use crate::auth::user::{UserAuth, UserAuthContext, UserAuthScope};
 use crate::errors::user::UserError;
 use crate::errors::ApiError;
 use crate::types::response::ResponseData;
@@ -28,7 +28,7 @@ pub struct AddEmailRequest {
 )]
 pub async fn post(
     state: web::Data<State>,
-    user_auth: UserAuth,
+    user_auth: UserAuthContext,
     request: Json<AddEmailRequest>,
 ) -> actix_web::Result<Json<ResponseData<EmptyResponse>>, ApiError> {
     let user_auth = user_auth.check_permissions(vec![UserAuthScope::SignUp])?;

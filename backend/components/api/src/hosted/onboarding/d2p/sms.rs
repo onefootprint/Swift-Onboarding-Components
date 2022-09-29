@@ -1,4 +1,4 @@
-use crate::auth::user::{UserAuth, UserAuthScope, VerifiedUserAuth};
+use crate::auth::user::{UserAuth, UserAuthContext, UserAuthScope};
 use crate::errors::ApiError;
 use crate::types::response::ResponseData;
 use crate::utils::user_vault_wrapper::UserVaultWrapper;
@@ -23,7 +23,7 @@ pub struct D2pSmsResponse {
 )]
 #[post("sms")]
 pub fn handler(
-    user_auth: UserAuth,
+    user_auth: UserAuthContext,
     request: Json<D2pSmsRequest>,
     state: web::Data<State>,
 ) -> actix_web::Result<Json<ResponseData<D2pSmsResponse>>, ApiError> {
