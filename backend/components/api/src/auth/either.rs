@@ -8,7 +8,7 @@ use newtypes::DataAttribute;
 use crate::errors::ApiError;
 
 use super::{
-    tenant::{CheckTenantPermissions, TenantAuth},
+    tenant::{CheckTenantPermissions, VerifiedTenantAuth},
     AuthError,
 };
 
@@ -95,10 +95,10 @@ impl<A: paperclip::v2::schema::Apiv2Schema, B: paperclip::v2::schema::Apiv2Schem
 {
 }
 
-impl<A, B> TenantAuth for Either<A, B>
+impl<A, B> VerifiedTenantAuth for Either<A, B>
 where
-    A: TenantAuth,
-    B: TenantAuth,
+    A: VerifiedTenantAuth,
+    B: VerifiedTenantAuth,
 {
     fn tenant(&self) -> &Tenant {
         match self {
@@ -130,14 +130,14 @@ where
     fn check_permissions(
         self,
         permissions: Vec<newtypes::TenantPermission>,
-    ) -> Result<Box<dyn TenantAuth>, AuthError> {
+    ) -> Result<Box<dyn VerifiedTenantAuth>, AuthError> {
         match self {
             Either::Left(l) => l.check_permissions(permissions),
             Either::Right(r) => r.check_permissions(permissions),
         }
     }
 
-    fn can_decrypt(self, attributes: Vec<DataAttribute>) -> Result<Box<dyn TenantAuth>, AuthError> {
+    fn can_decrypt(self, attributes: Vec<DataAttribute>) -> Result<Box<dyn VerifiedTenantAuth>, AuthError> {
         match self {
             Either::Left(l) => l.can_decrypt(attributes),
             Either::Right(r) => r.can_decrypt(attributes),

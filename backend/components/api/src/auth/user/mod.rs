@@ -28,7 +28,7 @@ pub enum UserAuthScope {
 
 /// A helper trait to extract a user vault id on combined types
 #[async_trait]
-pub trait UserAuth {
+pub trait VerifiedUserAuth {
     fn user_vault_id(&self) -> UserVaultId;
 
     async fn user_vault(&self, pool: &DbPool) -> Result<UserVault, ApiError> {
@@ -36,9 +36,9 @@ pub trait UserAuth {
     }
 }
 
-impl<A> UserAuth for SessionContext<A>
+impl<A> VerifiedUserAuth for SessionContext<A>
 where
-    A: UserAuth,
+    A: VerifiedUserAuth,
 {
     fn user_vault_id(&self) -> UserVaultId {
         self.data.user_vault_id()

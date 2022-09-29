@@ -1,5 +1,5 @@
 use crate::{
-    auth::user::{UserAuth, UserAuth, UserAuthScope},
+    auth::user::{UserAuth, UserAuthScope, VerifiedUserAuth},
     errors::{challenge::ChallengeError, ApiError},
     types::{response::ResponseData, EmptyResponse},
     utils::{

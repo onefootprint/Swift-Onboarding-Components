@@ -1,5 +1,5 @@
 use crate::auth::{
-    tenant::{CheckTenantPermissions, TenantAuth},
+    tenant::{CheckTenantPermissions, VerifiedTenantAuth},
     AuthError,
 };
 use crate::{errors::ApiError, State};
@@ -78,7 +78,7 @@ fn parse_auth_key(req: &actix_web::HttpRequest) -> Result<SecretApiKey, ApiError
     Ok(tenant_sk_input)
 }
 
-impl TenantAuth for SecretTenantAuthContext {
+impl VerifiedTenantAuth for SecretTenantAuthContext {
     fn tenant(&self) -> &Tenant {
         &self.tenant
     }
@@ -100,12 +100,12 @@ impl CheckTenantPermissions for SecretTenantAuthContext {
     fn check_permissions(
         self,
         _permissions: Vec<newtypes::TenantPermission>,
-    ) -> Result<Box<dyn TenantAuth>, AuthError> {
+    ) -> Result<Box<dyn VerifiedTenantAuth>, AuthError> {
         // TODO permissions for API keys
         Ok(Box::new(self))
     }
 
-    fn can_decrypt(self, _attributes: Vec<DataAttribute>) -> Result<Box<dyn TenantAuth>, AuthError> {
+    fn can_decrypt(self, _attributes: Vec<DataAttribute>) -> Result<Box<dyn VerifiedTenantAuth>, AuthError> {
         // TODO permissions for API keys
         Ok(Box::new(self))
     }

@@ -1,6 +1,6 @@
 use crate::auth::user::UserAuth;
-use crate::auth::user::UserAuth;
 use crate::auth::user::UserAuthScope;
+use crate::auth::user::VerifiedUserAuth;
 use crate::errors::ApiError;
 use crate::hosted::user::decrypt;
 use crate::hosted::user::DecryptFieldsResult;

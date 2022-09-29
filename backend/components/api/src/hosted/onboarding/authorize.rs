@@ -1,8 +1,8 @@
 use crate::auth::tenant::ParsedOnboardingSession;
 use crate::auth::tenant::PublicOnboardingContext;
 use crate::auth::user::UserAuth;
-use crate::auth::user::UserAuth;
 use crate::auth::user::UserAuthScope;
+use crate::auth::user::VerifiedUserAuth;
 use crate::auth::Either;
 use crate::auth::SessionContext;
 use crate::errors::onboarding::OnboardingError;

@@ -1,6 +1,6 @@
 use crate::auth::tenant::ParsedOnboardingSession;
 use crate::auth::tenant::PublicOnboardingContext;
-use crate::auth::user::{UserAuth, UserAuth, UserAuthScope};
+use crate::auth::user::{UserAuth, UserAuthScope, VerifiedUserAuth};
 use crate::auth::{Either, SessionContext};
 use crate::errors::onboarding::OnboardingError;
 use crate::errors::ApiError;

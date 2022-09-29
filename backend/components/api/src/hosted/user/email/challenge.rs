@@ -1,6 +1,6 @@
 use std::str::FromStr;
 
-use crate::auth::user::{UserAuth, UserAuth, UserAuthScope};
+use crate::auth::user::{UserAuth, UserAuthScope, VerifiedUserAuth};
 use crate::errors::challenge::ChallengeError;
 use crate::errors::ApiError;
 use crate::types::response::ResponseData;

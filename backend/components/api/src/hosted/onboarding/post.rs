@@ -2,7 +2,7 @@ use crate::auth::tenant::ParsedOnboardingSession;
 use crate::auth::tenant::PublicOnboardingContext;
 use crate::auth::user::UserAuth;
 use crate::auth::user::UserAuthScope;
-use crate::auth::{user::UserAuth, Either, SessionContext};
+use crate::auth::{user::VerifiedUserAuth, Either, SessionContext};
 use crate::errors::onboarding::OnboardingError;
 use crate::errors::ApiError;
 use crate::types::response::ResponseData;

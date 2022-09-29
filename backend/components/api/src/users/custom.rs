@@ -2,7 +2,9 @@
 
 use std::collections::{HashMap, HashSet};
 
-use crate::auth::tenant::{CheckTenantPermissions, SecretTenantAuthContext, TenantAuth, WorkOsAuthContext};
+use crate::auth::tenant::{
+    CheckTenantPermissions, SecretTenantAuthContext, VerifiedTenantAuth, WorkOsAuthContext,
+};
 use crate::auth::Either;
 
 use crate::errors::ApiResult;

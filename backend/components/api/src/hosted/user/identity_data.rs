@@ -1,6 +1,6 @@
 use crate::auth::user::UserAuth;
-use crate::auth::user::UserAuth;
 use crate::auth::user::UserAuthScope;
+use crate::auth::user::VerifiedUserAuth;
 use crate::types::identity_data_request::IdentityDataRequest;
 use crate::types::identity_data_request::IdentityDataUpdate;
 use crate::types::response::ResponseData;

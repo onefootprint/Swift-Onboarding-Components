@@ -1,4 +1,4 @@
-use crate::auth::user::{UserAuth, UserAuth, UserAuthScope};
+use crate::auth::user::{UserAuth, UserAuthScope, VerifiedUserAuth};
 use crate::errors::ApiError;
 use crate::types::response::ResponseData;
 use chrono::{DateTime, Utc};

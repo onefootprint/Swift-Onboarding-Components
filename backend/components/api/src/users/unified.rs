@@ -4,7 +4,7 @@ use std::collections::HashSet;
 
 use crate::auth::tenant::SecretTenantAuthContext;
 use crate::auth::{
-    tenant::{TenantAuth, WorkOsAuthContext},
+    tenant::{VerifiedTenantAuth, WorkOsAuthContext},
     Either,
 };
 

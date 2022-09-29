@@ -6,7 +6,7 @@ use super::UserAuthScope;
 use crate::{
     auth::{
         session::{AuthSessionData, ExtractableAuthSession},
-        user::UserAuth,
+        user::VerifiedUserAuth,
         AuthError, SessionContext,
     },
     errors::ApiError,
@@ -34,7 +34,7 @@ impl UserSession {
     }
 }
 
-impl UserAuth for UserSession {
+impl VerifiedUserAuth for UserSession {
     fn user_vault_id(&self) -> UserVaultId {
         self.user_vault_id.clone()
     }

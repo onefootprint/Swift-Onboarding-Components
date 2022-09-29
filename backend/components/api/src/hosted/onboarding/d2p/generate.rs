@@ -1,5 +1,5 @@
 use crate::auth::user::UserAuth;
-use crate::auth::user::UserAuth;
+use crate::auth::user::VerifiedUserAuth;
 use crate::auth::user::{UserAuthScope, UserSession};
 use crate::errors::ApiError;
 use crate::types::response::ResponseData;

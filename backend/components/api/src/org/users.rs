@@ -1,4 +1,4 @@
-use crate::auth::tenant::TenantAuth;
+use crate::auth::tenant::VerifiedTenantAuth;
 use crate::auth::tenant::WorkOsAuthContext;
 use crate::errors::tenant::TenantError;
 use crate::errors::ApiError;
