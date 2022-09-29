@@ -39,10 +39,8 @@ impl TenantUser {
             .filter(tenant_user::email.eq(email))
             .first(conn)
             .optional()?;
-        if let Some((_, u, _)) = result.as_ref() {
-            if u.deactivated_at.is_some() {
-                return Err(DbError::TenantUserDeactivated);
-            }
+        if let Some((r, u, _)) = result.as_ref() {
+            u.validate_login(&r)?;
             diesel::update(tenant_user::table)
                 .filter(tenant_user::id.eq(&u.id))
                 .set(tenant_user::last_login_at.eq(Utc::now()))
@@ -58,10 +56,18 @@ impl TenantUser {
             .inner_join(tenant_user::table)
             .filter(tenant_user::id.eq(id))
             .first(conn)?;
-        if user.deactivated_at.is_some() {
+        user.validate_login(&role)?;
+        Ok((tenant, role, user))
+    }
+
+    fn validate_login(&self, role: &TenantRole) -> DbResult<()> {
+        if self.deactivated_at.is_some() {
             return Err(DbError::TenantUserDeactivated);
         }
-        Ok((tenant, role, user))
+        if role.tenant_id != self.tenant_id {
+            return Err(DbError::TenantRoleMismatch);
+        }
+        Ok(())
     }
 
     pub fn create(

@@ -68,6 +68,9 @@ pub enum DbError {
     #[error("User is deactivated. Please contact your administor for assistance.")]
     TenantUserDeactivated,
 
+    #[error("User and role belong to different tenants.")]
+    TenantRoleMismatch,
+
     #[error("Not in transaction")]
     NotInTransaction,
 }
