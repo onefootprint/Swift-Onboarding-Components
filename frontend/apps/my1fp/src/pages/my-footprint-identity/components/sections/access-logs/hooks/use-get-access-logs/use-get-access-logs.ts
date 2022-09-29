@@ -1,10 +1,10 @@
+import request, { RequestError } from '@onefootprint/request';
 import { AccessLog } from '@onefootprint/types';
 import {
   QueryFunctionContext,
   QueryKey,
   useInfiniteQuery,
 } from '@tanstack/react-query';
-import request, { RequestError } from 'request';
 import { MY1FP_AUTH_HEADER } from 'src/config/constants';
 
 export type AccessLogsRequest = {

@@ -1,10 +1,13 @@
+import request, {
+  PaginatedRequestResponse,
+  RequestError,
+} from '@onefootprint/request';
 import { AccessEvent } from '@onefootprint/types';
 import {
   QueryFunctionContext,
   QueryKey,
   useInfiniteQuery,
 } from '@tanstack/react-query';
-import request, { PaginatedRequestResponse, RequestError } from 'request';
 import useSessionUser, { AuthHeaders } from 'src/hooks/use-session-user';
 import {
   AccessEventFilters,

@@ -31,7 +31,7 @@
     "react-driftjs": "^1.2.2",
     "react-hook-form": "^7.34.2",
     "react-swipeable": "^7.0.0",
-    "request": "*",
+    "@onefootprint/request": "*",
     "styled-components": "^5.3.5",
     "@onefootprint/themes": "*",
     "ui": "*",

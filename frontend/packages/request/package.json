@@ -1,5 +1,5 @@
 {
-  "name": "request",
+  "name": "@onefootprint/request",
   "private": true,
   "version": "0.0.0",
   "main": "./dist/index.js",

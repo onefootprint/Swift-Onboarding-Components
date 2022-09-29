@@ -1,10 +1,10 @@
+import request, { RequestError } from '@onefootprint/request';
 import {
   ApiKey,
   OrgApiKeyRevealRequest,
   OrgApiKeyRevealResponse,
 } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
-import request, { RequestError } from 'request';
 import useSessionUser, { AuthHeaders } from 'src/hooks/use-session-user';
 
 import useUpdateApiKeyCache from './use-update-api-key-cache';

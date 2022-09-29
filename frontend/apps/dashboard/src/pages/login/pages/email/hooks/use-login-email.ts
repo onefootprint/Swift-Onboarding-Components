@@ -1,9 +1,9 @@
+import request, { RequestError } from '@onefootprint/request';
 import {
   OrgAuthMagicLinkRequest,
   OrgAuthMagicLinkResponse,
 } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
-import request, { RequestError } from 'request';
 
 const loginEmailRequest = async (payload: OrgAuthMagicLinkRequest) => {
   const response = await request<OrgAuthMagicLinkResponse>({

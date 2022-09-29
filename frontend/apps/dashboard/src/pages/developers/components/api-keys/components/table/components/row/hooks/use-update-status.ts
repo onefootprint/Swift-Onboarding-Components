@@ -1,10 +1,10 @@
+import request, { RequestError } from '@onefootprint/request';
 import {
   ApiKey,
   OrgApiKeyUpdateRequest,
   OrgApiKeyUpdateResponse,
 } from '@onefootprint/types';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import request, { RequestError } from 'request';
 import useSessionUser, { AuthHeaders } from 'src/hooks/use-session-user';
 
 const updateApiKey = async (

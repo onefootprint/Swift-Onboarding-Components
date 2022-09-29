@@ -1,10 +1,10 @@
+import request, { RequestError } from '@onefootprint/request';
 import {
   CollectedDataOptionLabels,
   OnboardingRequest,
   OnboardingResponse,
 } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
-import request, { RequestError } from 'request';
 import {
   BIFROST_AUTH_HEADER,
   CLIENT_PUBLIC_KEY_HEADER,

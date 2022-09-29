@@ -1,9 +1,11 @@
 import { useIntl } from '@onefootprint/hooks';
+import request, {
+  PaginatedRequestResponse,
+  RequestError,
+} from '@onefootprint/request';
 import { ApiKey } from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
 import take from 'lodash/take';
-import request, { RequestError } from 'request';
-import { PaginatedRequestResponse } from 'request/src';
 import useSessionUser, { AuthHeaders } from 'src/hooks/use-session-user';
 
 export type GetApiKeysRequest = {

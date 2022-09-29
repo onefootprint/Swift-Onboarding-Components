@@ -1,3 +1,4 @@
+import request, { RequestError } from '@onefootprint/request';
 import {
   BiometricRegisterChallengeJson,
   BiometricRegisterRequest,
@@ -5,7 +6,6 @@ import {
 } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
 import base64url from 'base64url';
-import request, { RequestError } from 'request';
 import { HANDOFF_AUTH_HEADER } from 'src/config/constants';
 
 const generateDeviceResponse = async (challenge: string) => {

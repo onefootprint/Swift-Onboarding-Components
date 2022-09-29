@@ -1,5 +1,5 @@
+import request, { RequestError } from '@onefootprint/request';
 import { useQuery } from '@tanstack/react-query';
-import request, { RequestError } from 'request';
 import { HANDOFF_AUTH_HEADER } from 'src/config/constants';
 import useBiometricMachine from 'src/hooks/use-d2p-mobile-machine';
 

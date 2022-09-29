@@ -1,7 +1,7 @@
+import { isFootprintError, isLogoutError } from '@onefootprint/request';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useRouter } from 'next/router';
 import React from 'react';
-import { isFootprintError, isLogoutError } from 'request';
 import useSessionUser from 'src/hooks/use-session-user';
 import { useToast } from 'ui';
 

@@ -1,6 +1,6 @@
 import { useToggle, useTranslation } from '@onefootprint/hooks';
+import { getErrorMessage } from '@onefootprint/request';
 import React from 'react';
-import { getErrorMessage } from 'request';
 import styled from 'styled-components';
 import { Box, Button, Divider, Typography } from 'ui';
 

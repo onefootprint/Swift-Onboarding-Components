@@ -1,4 +1,4 @@
-import { getErrorMessage, RequestError } from 'request';
+import { getErrorMessage, RequestError } from '@onefootprint/request';
 import { useToast } from 'ui';
 
 const useRequestErrorToast = () => {

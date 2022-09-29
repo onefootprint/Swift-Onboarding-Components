@@ -1,9 +1,9 @@
+import request, { RequestError } from '@onefootprint/request';
 import {
   IdentifyChallengeRequest,
   IdentifyChallengeResponse,
 } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
-import request, { RequestError } from 'request';
 
 import getRetryDisabledUntil from './get-retry-disabled-until';
 

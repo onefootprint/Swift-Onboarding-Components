@@ -1,10 +1,10 @@
 import footprint from '@onefootprint/footprint-js';
 import { useTranslation } from '@onefootprint/hooks';
+import { getErrorMessage, RequestError } from '@onefootprint/request';
 import { UserDecryptResponse } from '@onefootprint/types';
 import { LogoFpDefault } from 'icons';
 import { useRouter } from 'next/router';
 import React from 'react';
-import { getErrorMessage, RequestError } from 'request';
 import styled, { css } from 'styled-components';
 import { FootprintButton, LinkButton, Typography, useToast } from 'ui';
 

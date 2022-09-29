@@ -1,6 +1,6 @@
+import request, { RequestError } from '@onefootprint/request';
 import { UserDecryptRequest, UserDecryptResponse } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
-import request, { RequestError } from 'request';
 
 import { MY1FP_AUTH_HEADER } from '../../config/constants';
 

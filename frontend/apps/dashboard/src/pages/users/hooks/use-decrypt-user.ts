@@ -1,3 +1,4 @@
+import request, { RequestError } from '@onefootprint/request';
 import {
   DecryptedUserAttributes,
   DecryptUserRequest,
@@ -6,7 +7,6 @@ import {
 } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
 import { partial } from 'lodash';
-import request, { RequestError } from 'request';
 import useSessionUser, { AuthHeaders } from 'src/hooks/use-session-user';
 
 import useUserData from './use-user-data';

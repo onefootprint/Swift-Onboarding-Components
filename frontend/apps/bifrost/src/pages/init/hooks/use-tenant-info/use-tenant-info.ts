@@ -1,9 +1,9 @@
+import request, { RequestError } from '@onefootprint/request';
 import {
   CollectedDataOptionLabels,
   OnboardingConfig,
 } from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
-import request, { RequestError } from 'request';
 import { CLIENT_PUBLIC_KEY_HEADER } from 'src/config/constants';
 import useBifrostMachine from 'src/hooks/use-bifrost-machine';
 import { Events } from 'src/utils/state-machine/bifrost';

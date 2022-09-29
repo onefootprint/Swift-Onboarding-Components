@@ -1,5 +1,5 @@
+import request, { RequestError } from '@onefootprint/request';
 import { useQuery } from '@tanstack/react-query';
-import request, { RequestError } from 'request';
 
 import { MY1FP_AUTH_HEADER } from '../../config/constants';
 import useSessionUser from '../use-session-user';

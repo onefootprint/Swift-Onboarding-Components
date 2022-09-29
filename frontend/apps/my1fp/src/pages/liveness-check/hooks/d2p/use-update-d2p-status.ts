@@ -1,9 +1,9 @@
+import request, { RequestError } from '@onefootprint/request';
 import {
   UpdateD2PStatusRequest,
   UpdateD2PStatusResponse,
 } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
-import request, { RequestError } from 'request';
 import { MY1FP_AUTH_HEADER } from 'src/config/constants';
 
 const updateD2PStatus = async (payload: UpdateD2PStatusRequest) => {

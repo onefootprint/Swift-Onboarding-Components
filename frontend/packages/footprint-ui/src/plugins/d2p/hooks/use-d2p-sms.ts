@@ -1,7 +1,7 @@
 import { HANDOFF_BASE_URL } from '@onefootprint/global-constants';
+import request, { RequestError } from '@onefootprint/request';
 import { D2PSmsRequest, D2PSmsResponse } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
-import request, { RequestError } from 'request';
 
 import BIFROST_AUTH_HEADER from '../config/constants';
 

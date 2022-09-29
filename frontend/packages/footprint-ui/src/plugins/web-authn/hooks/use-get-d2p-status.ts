@@ -1,5 +1,5 @@
+import request, { RequestError } from '@onefootprint/request';
 import { useQuery } from '@tanstack/react-query';
-import request, { RequestError } from 'request';
 
 import { BIFROST_AUTH_HEADER } from '../config/constants';
 import useWebAuthnMachine from './use-web-authn-machine';

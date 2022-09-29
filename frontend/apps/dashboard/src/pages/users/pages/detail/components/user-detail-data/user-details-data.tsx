@@ -1,10 +1,10 @@
+import { getErrorMessage, RequestError } from '@onefootprint/request';
 import {
   DecryptedUserAttributes,
   UserDataAttribute,
   UserDataAttributeKey,
 } from '@onefootprint/types';
 import React from 'react';
-import { getErrorMessage, RequestError } from 'request';
 import { Box, Divider, useToast } from 'ui';
 import { useEffectOnce } from 'usehooks-ts';
 

@@ -1,9 +1,9 @@
+import request, { RequestError } from '@onefootprint/request';
 import {
   UserEmailChallengeRequest,
   UserEmailChallengeResponse,
 } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
-import request, { RequestError } from 'request';
 import { MY1FP_AUTH_HEADER } from 'src/config/constants';
 
 const verificationEmailRequest = async (payload: UserEmailChallengeRequest) => {

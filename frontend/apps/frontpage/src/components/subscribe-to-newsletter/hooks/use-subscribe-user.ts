@@ -1,5 +1,5 @@
+import request, { RequestError } from '@onefootprint/request';
 import { useMutation } from '@tanstack/react-query';
-import request, { RequestError } from 'request';
 
 type SubscribeUserResponse = {};
 

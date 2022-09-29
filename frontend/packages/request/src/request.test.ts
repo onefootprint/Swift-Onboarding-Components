@@ -1,6 +1,6 @@
 import { getErrorMessage, RequestError } from './request';
 
-describe('request', () => {
+describe('@onefootprint/request', () => {
   describe('getErrorMessage', () => {
     it('should return the error message', () => {
       const error = {
