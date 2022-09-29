@@ -37,6 +37,21 @@ table! {
     use diesel::sql_types::*;
     use newtypes::db_types::*;
 
+    document_request (id) {
+        id -> Text,
+        onboarding_id -> Uuid,
+        ref_id -> Nullable<Text>,
+        status -> Text,
+        created_at -> Timestamptz,
+        _created_at -> Timestamptz,
+        _updated_at -> Timestamptz,
+    }
+}
+
+table! {
+    use diesel::sql_types::*;
+    use newtypes::db_types::*;
+
     email (id) {
         id -> Text,
         user_vault_id -> Text,
@@ -365,6 +380,7 @@ joinable!(access_event -> scoped_user (scoped_user_id));
 joinable!(audit_trail -> tenant (tenant_id));
 joinable!(audit_trail -> user_vault (user_vault_id));
 joinable!(audit_trail -> verification_result (verification_result_id));
+joinable!(document_request -> onboarding (onboarding_id));
 joinable!(email -> user_vault (user_vault_id));
 joinable!(fingerprint -> user_vault (user_vault_id));
 joinable!(identity_data -> user_vault (user_vault_id));
@@ -393,6 +409,7 @@ joinable!(webauthn_credential -> user_vault (user_vault_id));
 allow_tables_to_appear_in_same_query!(
     access_event,
     audit_trail,
+    document_request,
     email,
     fingerprint,
     identity_data,
