@@ -1,5 +1,6 @@
-use crate::auth::CheckTenantPermissions;
+use crate::auth::TenantAuth;
 use crate::auth::WorkOsAuth;
+use crate::errors::tenant::TenantError;
 use crate::errors::ApiError;
 use crate::org::workos::magic_link::create_and_send_magic_link;
 use crate::types::tenant_user::FpTenantUser;
@@ -139,8 +140,13 @@ async fn deactivate(
 ) -> JsonApiResponse<EmptyResponse> {
     let auth = auth.check_permissions(vec![TenantPermission::Admin])?;
     let tenant = auth.tenant();
-
     let tenant_id = tenant.id.clone();
+    let user_id = user_id.into_inner();
+
+    if auth.data.tenant_user().id == user_id {
+        return Err(TenantError::CannotDeactivateCurrentUser.into());
+    }
+
     let update = TenantUserUpdate {
         deactivated_at: Some(Some(Utc::now())),
         ..TenantUserUpdate::default()

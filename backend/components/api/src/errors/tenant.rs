@@ -4,4 +4,6 @@ use thiserror::Error;
 pub enum TenantError {
     #[error("Validation error: {0}")]
     ValidationError(String),
+    #[error("Cannot deactivate the currently logged-in user")]
+    CannotDeactivateCurrentUser,
 }

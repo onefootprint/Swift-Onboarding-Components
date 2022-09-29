@@ -20,6 +20,12 @@ pub struct WorkOs {
     data: WorkOsSession,
 }
 
+impl WorkOs {
+    pub fn tenant_user(&self) -> &TenantUser {
+        &self.tenant_user
+    }
+}
+
 /// Nests a private WorkOs and implements traits required to extract this session from an
 /// actix request.
 /// Notably, this struct isn't very useful since the entire nested WorkOs is hidden. If you
