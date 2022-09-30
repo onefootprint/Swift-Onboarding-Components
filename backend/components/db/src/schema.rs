@@ -133,6 +133,24 @@ table! {
     use diesel::sql_types::*;
     use newtypes::db_types::*;
 
+    identity_document (id) {
+        id -> Text,
+        request_id -> Text,
+        user_vault_id -> Text,
+        front_image_s3_url -> Nullable<Text>,
+        back_image_s3_url -> Nullable<Text>,
+        document_type -> Text,
+        country_code -> Text,
+        created_at -> Timestamptz,
+        _created_at -> Timestamptz,
+        _updated_at -> Timestamptz,
+    }
+}
+
+table! {
+    use diesel::sql_types::*;
+    use newtypes::db_types::*;
+
     kv_data (id) {
         id -> Text,
         user_vault_id -> Text,
