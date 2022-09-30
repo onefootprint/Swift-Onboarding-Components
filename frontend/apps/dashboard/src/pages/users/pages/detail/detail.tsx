@@ -1,8 +1,8 @@
 import { useTranslation } from '@onefootprint/hooks';
 import Head from 'next/head';
+import Link from 'next/link';
 import React from 'react';
-import styled, { css } from 'styled-components';
-import { Typography } from 'ui';
+import { Box, Breadcrumb, BreadcrumbItem } from 'ui';
 
 import useGetUsers from '../../hooks/use-get-users';
 import DecryptMachineProvider from './components/decrypt-machine-provider';
@@ -22,12 +22,14 @@ const Detail = () => {
       <Head>
         <title>{t('page-title')}</title>
       </Head>
-      <Breadcrumb>
-        <Typography variant="label-2" color="tertiary">
-          {t('breadcrumb.users')}&nbsp;
-        </Typography>
-        <Typography variant="label-2">{t('breadcrumb.details')}</Typography>
-      </Breadcrumb>
+      <Box sx={{ marginBottom: 8 }}>
+        <Breadcrumb aria-label={t('breadcrumb.title')}>
+          <BreadcrumbItem href="/users" as={Link}>
+            {t('breadcrumb.users')}
+          </BreadcrumbItem>
+          <BreadcrumbItem>{t('breadcrumb.details')}</BreadcrumbItem>
+        </Breadcrumb>
+      </Box>
       <DecryptMachineProvider>
         {isLoading && <UserDetailsLoading />}
         {shouldShowData && (
@@ -38,13 +40,5 @@ const Detail = () => {
     </>
   );
 };
-
-const Breadcrumb = styled.div`
-  ${({ theme }) => css`
-    display: flex;
-    flex-direction: row;
-    margin-bottom: ${theme.spacing[7]}px;
-  `};
-`;
 
 export default Detail;

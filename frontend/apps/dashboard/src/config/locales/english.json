@@ -129,7 +129,8 @@
     "user-details": {
       "page-title": "Footprint | User details",
       "breadcrumb": {
-        "users": "Users |",
+        "title": "User details breadcrumb",
+        "users": "Users",
         "details": "Details"
       },
       "empty-state": {

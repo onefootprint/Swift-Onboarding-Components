@@ -1,0 +1,31 @@
+import React from 'react';
+import styled from 'styled-components';
+
+import Typography from '../typography';
+
+export type BreadcrumbItemProps = {
+  as?: React.ComponentType<any>;
+  href?: string;
+  children: string;
+};
+
+const BreadcrumbItem = ({ as, href, children }: BreadcrumbItemProps) => {
+  const hasLink = !!href;
+  return hasLink ? (
+    <li>
+      <Anchor href={href} as={as}>
+        <Typography color="tertiary" variant="body-3">
+          {children}
+        </Typography>
+      </Anchor>
+    </li>
+  ) : (
+    <li>
+      <Typography variant="label-3">{children}</Typography>
+    </li>
+  );
+};
+
+const Anchor = styled.a``;
+
+export default BreadcrumbItem;

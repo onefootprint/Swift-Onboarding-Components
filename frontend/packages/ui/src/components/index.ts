@@ -10,6 +10,8 @@ export * from './bottom-sheet';
 export { default as BottomSheet } from './bottom-sheet';
 export * from './box';
 export { default as Box } from './box';
+export * from './breadcrumb';
+export { default as Breadcrumb } from './breadcrumb';
 export * from './button';
 export { default as Button } from './button';
 export * from './checkbox';

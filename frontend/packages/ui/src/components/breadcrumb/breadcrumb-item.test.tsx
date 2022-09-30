@@ -1,0 +1,26 @@
+import { customRender, screen } from '@onefootprint/test-utils';
+import React from 'react';
+
+import BreadcrumbItem, { BreadcrumbItemProps } from './breadcrumb-item';
+
+describe('<BreadcrumbItem />', () => {
+  const renderBreadcrumbItem = ({
+    children = 'lorem',
+    href = '#',
+  }: Partial<BreadcrumbItemProps>) =>
+    customRender(<BreadcrumbItem href={href}>{children}</BreadcrumbItem>);
+
+  it('should render the content', () => {
+    renderBreadcrumbItem({ children: 'lorem' });
+    expect(screen.getByText('lorem')).toBeInTheDocument();
+  });
+
+  it('should assign the href', () => {
+    renderBreadcrumbItem({
+      children: 'lorem',
+      href: 'https://onefootprint.com/',
+    });
+    const link = screen.getByRole('link') as HTMLAnchorElement;
+    expect(link.href).toBe('https://onefootprint.com/');
+  });
+});

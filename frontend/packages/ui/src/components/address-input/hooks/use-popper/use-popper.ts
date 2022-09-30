@@ -9,7 +9,7 @@ const usePopper = () => {
     null,
   );
   const popper = useBasePopper(referenceElement, popperElement, {
-    modifiers: [{ name: 'offset', options: { offset: [0, theme.spacing[3]] } }],
+    modifiers: [{ name: 'offset', options: { offset: [0, theme.spacing[2]] } }],
   });
 
   return {

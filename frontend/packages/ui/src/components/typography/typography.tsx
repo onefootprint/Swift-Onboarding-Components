@@ -16,7 +16,8 @@ type TypographyTag =
   | 'h6'
   | 'label'
   | 'div'
-  | 'span';
+  | 'span'
+  | 'li';
 
 export type TypographyProps = {
   as?: TypographyTag;

@@ -6,4 +6,7 @@ module.exports = {
   compiler: {
     styledComponents: true,
   },
+  experimental: {
+    newNextLinkBehavior: true,
+  },
 };
