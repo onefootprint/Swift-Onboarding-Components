@@ -134,6 +134,8 @@ fn status_code_for_db_error(e: &DbError) -> StatusCode {
         DbError::ApiKeyDisabled => StatusCode::UNAUTHORIZED,
         DbError::TenantUserDeactivated => StatusCode::UNAUTHORIZED,
         DbError::TenantRoleMismatch => StatusCode::UNAUTHORIZED,
+        DbError::TenantRoleDeactivated => StatusCode::UNAUTHORIZED,
+        DbError::TenantRoleHasUsers(_) => StatusCode::BAD_REQUEST,
         DbError::NotInTransaction => StatusCode::INTERNAL_SERVER_ERROR,
     }
 }

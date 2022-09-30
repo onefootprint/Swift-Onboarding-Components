@@ -81,8 +81,8 @@ async fn post(
     } = request.into_inner();
     let (user, role) = state
         .db_pool
-        .db_query(move |conn| TenantUser::create(conn, email.into(), tenant_id, role_id))
-        .await??;
+        .db_transaction(move |conn| TenantUser::create(conn, email.into(), tenant_id, role_id))
+        .await?;
 
     // TODO use a different email template for inviting a teammate
     create_and_send_magic_link(&state, &user.email.0, &redirect_url).await?;

@@ -40,7 +40,7 @@ impl TenantUser {
             .first(conn)
             .optional()?;
         if let Some((r, u, _)) = result.as_ref() {
-            u.validate_login(&r)?;
+            u.validate_login(r)?;
             diesel::update(tenant_user::table)
                 .filter(tenant_user::id.eq(&u.id))
                 .set(tenant_user::last_login_at.eq(Utc::now()))
@@ -64,6 +64,9 @@ impl TenantUser {
         if self.deactivated_at.is_some() {
             return Err(DbError::TenantUserDeactivated);
         }
+        if role.deactivated_at.is_some() {
+            return Err(DbError::TenantRoleDeactivated);
+        }
         if role.tenant_id != self.tenant_id {
             return Err(DbError::TenantRoleMismatch);
         }
@@ -78,10 +81,7 @@ impl TenantUser {
     ) -> DbResult<(Self, TenantRole)> {
         // Make sure the role we are using belongs to the tenant, otherwise could invite self to
         // another tenant's role
-        let tenant_role: TenantRole = tenant_role::table
-            .filter(tenant_role::tenant_id.eq(&tenant_id))
-            .filter(tenant_role::id.eq(&tenant_role_id))
-            .first(conn)?;
+        let tenant_role = TenantRole::get_active(conn, &tenant_role_id, &tenant_id)?;
         let new_user = NewTenantUser {
             tenant_role_id: tenant_role.id.clone(),
             email,
@@ -105,10 +105,7 @@ impl TenantUser {
         assert_in_transaction(conn)?; // Otherwise could create updates to multiple rows accidentally
         if let Some(tenant_role_id) = update.tenant_role_id.as_ref() {
             // Make sure the role we are using belongs to the tenant, otherwise could update permissions to work on another tenant's role
-            tenant_role::table
-                .filter(tenant_role::tenant_id.eq(tenant_id))
-                .filter(tenant_role::id.eq(tenant_role_id))
-                .first::<TenantRole>(conn)?;
+            TenantRole::get_active(conn, tenant_role_id, tenant_id)?;
         }
         let results: Vec<Self> = diesel::update(tenant_user::table)
             .filter(tenant_user::deactivated_at.is_null())

@@ -290,6 +290,7 @@ table! {
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
         created_at -> Timestamptz,
+        deactivated_at -> Nullable<Timestamptz>,
     }
 }
 

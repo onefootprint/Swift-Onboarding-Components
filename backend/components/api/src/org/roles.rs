@@ -34,7 +34,7 @@ async fn get(
     let tenant_id = tenant.id.clone();
     let results = state
         .db_pool
-        .db_query(move |conn| TenantRole::list(conn, &tenant_id, cursor, (page_size + 1) as i64))
+        .db_query(move |conn| TenantRole::list_active(conn, &tenant_id, cursor, (page_size + 1) as i64))
         .await??;
 
     let cursor = request.cursor_item(&state, &results).map(|x| x.created_at);
@@ -106,6 +106,31 @@ async fn patch(
     let result = state
         .db_pool
         .db_transaction(move |conn| TenantRole::update(conn, &tenant_id, &role_id, name, permissions))
+        .await?;
+
+    let result = FpTenantRole::from(result);
+    ResponseData::ok(result).json()
+}
+
+#[api_v2_operation(
+    summary = "/org/roles/deactivate",
+    operation_id = "org-roles-deactivate",
+    tags(Private),
+    description = "Deactivates the provided role."
+)]
+#[post("/roles/{tenant_role_id}/deactivate")]
+async fn deactivate(
+    state: web::Data<State>,
+    role_id: web::Path<TenantRoleId>,
+    auth: WorkOsAuthContext,
+) -> JsonApiResponse<FpTenantRole> {
+    let auth = auth.check_permissions(vec![TenantPermission::Admin])?;
+    let tenant = auth.tenant();
+    let tenant_id = tenant.id.clone();
+
+    let result = state
+        .db_pool
+        .db_transaction(move |conn| TenantRole::deactivate(conn, &role_id, &tenant_id))
         .await?;
 
     let result = FpTenantRole::from(result);
