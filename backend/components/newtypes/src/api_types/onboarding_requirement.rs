@@ -1,6 +1,7 @@
 use paperclip::actix::Apiv2Schema;
 
 use crate::CollectedDataOption;
+use crate::DocumentRequestId;
 
 #[derive(Debug, Clone, serde::Serialize, Apiv2Schema)]
 #[serde(tag = "kind")]
@@ -10,5 +11,8 @@ pub enum OnboardingRequirement {
         missing_attributes: Vec<CollectedDataOption>,
     },
     Liveness,
-    CollectDocument, // TODO
+    // TODO(argoff) add `DocumentRequestReason` here once we add it to the DocumentRequest table
+    CollectDocument {
+        document_request_id: DocumentRequestId,
+    },
 }

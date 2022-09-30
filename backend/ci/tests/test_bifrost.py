@@ -24,7 +24,6 @@ from tests.webauthn_simulator import SoftWebauthnDevice
 
 WEBAUTHN_DEVICE = SoftWebauthnDevice()
 
-
 @pytest.fixture(scope="module")
 def auth_token(twilio):
     # Test the SMS challenge flow, return the resulting auth token of the user created with the number
@@ -103,7 +102,7 @@ class TestBifrost:
         assert not body["validation_token"]
 
         body = get("hosted/onboarding/status", None, ob_auth, auth_token)
-
+        
         req = lambda kind: next(r for r in body["requirements"] if r["kind"] == kind)
         identity_check_req = req("identity_check")
         assert set(identity_check_req["missing_attributes"]) == {

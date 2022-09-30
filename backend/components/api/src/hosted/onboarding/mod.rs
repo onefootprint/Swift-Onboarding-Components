@@ -2,7 +2,8 @@ use chrono::Duration;
 use crypto::aead::ScopedSealingKey;
 use db::{
     models::{
-        ob_configuration::ObConfiguration, onboarding::Onboarding, webauthn_credential::WebauthnCredential,
+        document_request::DocumentRequest, ob_configuration::ObConfiguration, onboarding::Onboarding,
+        webauthn_credential::WebauthnCredential,
     },
     DbError, PgConnection,
 };
@@ -60,14 +61,24 @@ pub fn get_requirements(
         .ok_or(OnboardingError::NoOnboarding)?;
     let creds = WebauthnCredential::get_for_user_vault(conn, user_vault_id)?;
     let missing_attributes = uvw.missing_fields(ob_config);
+    // Document requirements are determined by the presence of DocumentRequest database objects.
+    // In various places in the codebase, we will determine if a DocumentRequest should be created
+    //    -For example, when IDology cannot verify a user using just inputted data, they may ask for a document. In that instance
+    //      we will create a DocumentRequest row.
+    let document_request_requirements = DocumentRequest::get_active_requests(conn, onboarding.id.clone())?
+        .into_iter()
+        .map(|request| OnboardingRequirement::CollectDocument {
+            document_request_id: request.id,
+        });
     let requirements = vec![
         (onboarding.kyc_status == KycStatus::New)
             .then_some(OnboardingRequirement::IdentityCheck { missing_attributes }),
         (creds.is_empty() && !onboarding.is_liveness_skipped).then_some(OnboardingRequirement::Liveness),
-        // TODO generate CollectDocument requirement
     ]
     .into_iter()
     .flatten()
+    .chain(document_request_requirements)
     .collect();
+
     Ok((requirements, onboarding))
 }

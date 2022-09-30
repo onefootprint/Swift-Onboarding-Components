@@ -14,7 +14,6 @@ use chrono::{DateTime, Utc};
 use db::models::identity_data::HasIdentityDataFields;
 use db::models::onboarding::Onboarding;
 use db::scoped_user::OnboardingListQueryParams;
-use itertools::Itertools;
 use newtypes::csv::deserialize_stringified_list;
 use newtypes::KycStatus;
 use newtypes::TenantPermission;
@@ -84,7 +83,7 @@ pub fn get(
         timestamp_lte,
         timestamp_gte,
     };
-    let (mut scoped_users, obs, mut uvws, count) = state
+    let (scoped_users, obs, uvws, count) = state
         .db_pool
         .db_query(move |conn| -> Result<_, ApiError> {
             let scoped_users = db::scoped_user::list_authorized_for_tenant(

@@ -34,6 +34,15 @@ impl DocumentRequest {
             .get_result::<DocumentRequest>(conn)?;
         Ok(result)
     }
+
+    pub fn get_active_requests(conn: &mut PgConnection, onboarding_id: OnboardingId) -> DbResult<Vec<Self>> {
+        let results = document_request::table
+            .filter(document_request::onboarding_id.eq(onboarding_id))
+            .filter(document_request::status.eq(DocumentRequestStatus::Pending))
+            .load::<Self>(conn)?;
+
+        Ok(results)
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
