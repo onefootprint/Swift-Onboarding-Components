@@ -1,7 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
 import React from 'react';
 import { useForm } from 'react-hook-form';
-import { Dialog, TextInput } from 'ui';
+import { Dialog, TextInput, useToast } from 'ui';
 
 import useCreateApiKey from './hooks/use-create-api-key';
 
@@ -15,6 +15,7 @@ type FormData = { name: string };
 const CreateDialog = ({ open, onClose }: CreateDialogProps) => {
   const createApiKeyMutation = useCreateApiKey();
   const { t } = useTranslation('pages.developers.api-keys.create');
+  const toast = useToast();
   const {
     reset,
     register,
@@ -30,6 +31,10 @@ const CreateDialog = ({ open, onClose }: CreateDialogProps) => {
   const handleBeforeSubmit = (formData: FormData) => {
     createApiKeyMutation.mutate(formData, {
       onSuccess: () => {
+        toast.show({
+          title: t('feedback.success.title'),
+          description: t('feedback.success.description'),
+        });
         handleClose();
       },
     });

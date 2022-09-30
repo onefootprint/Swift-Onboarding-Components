@@ -28,7 +28,7 @@ const useOnboardingConfigs = () => {
   const { formatDateWithTime } = useIntl();
   const { authHeaders } = useSessionUser();
   return useQuery<GetOnboardingConfigsResponse, RequestError>(
-    ['onboarding-configs'],
+    ['onboarding-configs', authHeaders],
     () => getApiKeys({ authHeaders }),
     {
       select: response =>

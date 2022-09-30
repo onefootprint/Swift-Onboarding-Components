@@ -38,12 +38,12 @@ const useUpdateStatus = () => {
       updateOnboardingConfig(authHeaders, data),
     {
       onMutate: async updatedOnboardingConfig => {
-        await queryClient.cancelQueries(['onboarding-configs']);
+        await queryClient.cancelQueries(['onboarding-configs', authHeaders]);
 
         const prevOnboardingConfigs: OnboardingConfig[] | undefined =
-          queryClient.getQueryData(['onboarding-configs']);
+          queryClient.getQueryData(['onboarding-configs', authHeaders]);
 
-        queryClient.setQueryData(['onboarding-configs'], () =>
+        queryClient.setQueryData(['onboarding-configs', authHeaders], () =>
           prevOnboardingConfigs?.map(onboardingConfig => {
             if (onboardingConfig.id === updatedOnboardingConfig.id) {
               return { ...onboardingConfig, ...updatedOnboardingConfig };

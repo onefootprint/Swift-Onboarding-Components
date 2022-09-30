@@ -29,7 +29,7 @@ const useApiKeys = () => {
   const { formatDateWithTime } = useIntl();
   const { authHeaders } = useSessionUser();
   return useQuery<GetApiKeysResponse, RequestError>(
-    ['api-keys'],
+    ['api-keys', authHeaders],
     () => getApiKeys({ authHeaders }),
     {
       select: response =>

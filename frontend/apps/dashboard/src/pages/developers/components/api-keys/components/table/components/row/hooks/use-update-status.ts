@@ -32,11 +32,11 @@ const useUpdateStatus = (apiKey: ApiKey) => {
     OrgApiKeyUpdateRequest
   >((data: OrgApiKeyUpdateRequest) => updateApiKey(authHeaders, data), {
     onMutate: async updatedApiKey => {
-      await queryClient.cancelQueries(['api-keys']);
+      await queryClient.cancelQueries(['api-keys', authHeaders]);
       const previousApiKeys: ApiKey[] | undefined = queryClient.getQueryData([
         'api-keys',
       ]);
-      queryClient.setQueryData(['api-keys'], () => {
+      queryClient.setQueryData(['api-keys', authHeaders], () => {
         const apiKeys = previousApiKeys?.map(_apiKey => {
           if (_apiKey.id === updatedApiKey.id) {
             return updatedApiKey;

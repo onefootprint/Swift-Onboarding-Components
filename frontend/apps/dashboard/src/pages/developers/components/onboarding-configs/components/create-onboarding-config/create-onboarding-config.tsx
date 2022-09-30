@@ -1,7 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoChevronLeftBig24, IcoClose24 } from '@onefootprint/icons';
 import React from 'react';
-import { Dialog, useConfirmationDialog } from 'ui';
+import { Dialog, useConfirmationDialog, useToast } from 'ui';
 
 import AccessForm from './components/access-form';
 import CollectForm from './components/collect-form';
@@ -29,6 +29,7 @@ const CreateOnboardingConfig = ({
   const [state, dispatch] = useCreateState();
   const mutation = useCreateOnboardingConfig();
   const confirmationDialog = useConfirmationDialog();
+  const toast = useToast();
   const { t, allT } = useTranslation(
     'pages.developers.onboarding-configs.create',
   );
@@ -83,7 +84,13 @@ const CreateOnboardingConfig = ({
         canAccessData: getSelectedDataOptionsList(accessFormData),
       },
       {
-        onSuccess: close,
+        onSuccess: () => {
+          toast.show({
+            title: t('feedback.success.title'),
+            description: t('feedback.success.description'),
+          });
+          close();
+        },
       },
     );
   };
