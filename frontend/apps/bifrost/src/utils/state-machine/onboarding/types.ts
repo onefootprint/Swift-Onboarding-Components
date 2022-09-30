@@ -1,26 +1,25 @@
 import { DeviceInfo } from '@onefootprint/hooks';
 import { CollectedDataOption, TenantInfo, UserData } from '@onefootprint/types';
-import {
-  BasicInformation,
-  ResidentialAddress,
-  SSNInformation,
-} from 'src/utils/state-machine/types';
 
 export enum States {
+  // TODO: create the onboarding requirements machine for states below next
+  additionalInfoRequired = 'additionalInfoRequired',
   onboardingVerification = 'onboardingVerification',
   initOnboarding = 'initOnboarding',
-  additionalDataRequired = 'additionalDataRequired',
+  onboardingComplete = 'onboardingComplete',
+
+  // Plugins
+  collectKycData = 'collectKycData',
   d2p = 'd2p',
   webAuthn = 'webAuthn',
-  basicInformation = 'basicInformation',
-  residentialAddress = 'residentialAddress',
-  ssn = 'ssn',
-  onboardingComplete = 'onboardingComplete',
+  idScan = 'idScan',
 }
 
 export type MachineContext = {
   userFound: boolean;
+  // TODO: update these requirements based on what is returned from the backend
   missingWebauthnCredentials: boolean;
+  missingIdScan: boolean;
   missingAttributes: readonly CollectedDataOption[]; // Initial set of attributes received from /onboarding
   data: UserData; // Filled user data
   tenant: TenantInfo;
@@ -30,25 +29,23 @@ export type MachineContext = {
 };
 
 export enum Events {
+  // TODO: create the onboarding requirements machine for events below next
+  additionalInfoRequired = 'additionalInfoRequired',
   onboardingVerificationCompleted = 'onboardingVerificationCompleted',
   onboardingStarted = 'onboardingStarted',
+
+  // Plugin completion
   webAuthnCompleted = 'webAuthnCompleted',
   d2pCompleted = 'd2pCompleted',
-  additionalInfoRequired = 'additionalInfoRequired',
-  basicInformationSubmitted = 'basicInformationSubmitted',
-  residentialAddressSubmitted = 'residentialAddressSubmitted',
-  ssnSubmitted = 'ssnSubmitted',
-  navigatedToPrevPage = 'navigatedToPrevPage',
+  idScanCompleted = 'idScanCompleted',
+  collectKycDataCompleted = 'collectKycDataCompleted',
 }
 
 export enum Actions {
   assignMissingAttributes = 'assignMissingAttributes',
   assignMissingWebauthnCredentials = 'assignMissingWebauthnCredentials',
+  assignMissingIdScan = 'assignMissingIdScan',
   assignValidationToken = 'assignValidationToken',
-
-  assignBasicInformation = 'assignBasicInformation',
-  assignResidentialAddress = 'assignResidentialAddress',
-  assignSsn = 'assignSsn',
 }
 
 export type MachineEvents =
@@ -58,24 +55,12 @@ export type MachineEvents =
         missingAttributes: readonly CollectedDataOption[];
         missingWebauthnCredentials: boolean;
         validationToken?: string;
+        missingIdScan: boolean;
       };
     }
+  | { type: Events.additionalInfoRequired }
   | { type: Events.onboardingStarted }
   | { type: Events.webAuthnCompleted }
   | { type: Events.d2pCompleted }
-  | { type: Events.additionalInfoRequired }
-  | {
-      type: Events.basicInformationSubmitted;
-      payload: { basicInformation: BasicInformation };
-    }
-  | {
-      type: Events.residentialAddressSubmitted;
-      payload: {
-        residentialAddress: ResidentialAddress;
-      };
-    }
-  | {
-      type: Events.ssnSubmitted;
-      payload: SSNInformation;
-    }
-  | { type: Events.navigatedToPrevPage };
+  | { type: Events.idScanCompleted }
+  | { type: Events.collectKycDataCompleted };

@@ -3,18 +3,19 @@ import { TenantInfo } from '@onefootprint/types';
 import { assign, createMachine } from 'xstate';
 
 import {
+  requiresAdditionalInfo,
+  shouldRunCollectKycData,
+  shouldRunD2P,
+  shouldRunIdScan,
+  shouldRunWebauthn,
+} from './machine.utils';
+import {
   Actions,
   Events,
   MachineContext,
   MachineEvents,
   States,
 } from './types';
-import {
-  hasMissingAttributes,
-  isMissingBasicAttribute,
-  isMissingResidentialAttribute,
-  isMissingSsnAttribute,
-} from './utils/missing-attributes';
 
 export type OnboardingMachineArgs = {
   userFound: boolean;
@@ -22,9 +23,6 @@ export type OnboardingMachineArgs = {
   tenant: TenantInfo;
   authToken?: string;
 };
-
-const supportsWebAuthn = (context: MachineContext) =>
-  context.device.type === 'mobile' && !!context.device.hasSupportForWebauthn;
 
 const createOnboardingMachine = ({
   userFound,
@@ -41,6 +39,7 @@ const createOnboardingMachine = ({
         userFound,
         missingAttributes: [],
         missingWebauthnCredentials: false,
+        missingIdScan: false,
         data: {},
         device,
         authToken,
@@ -57,6 +56,7 @@ const createOnboardingMachine = ({
                   Actions.assignValidationToken,
                   Actions.assignMissingAttributes,
                   Actions.assignMissingWebauthnCredentials,
+                  Actions.assignMissingIdScan,
                 ],
               },
               {
@@ -65,6 +65,7 @@ const createOnboardingMachine = ({
                   Actions.assignValidationToken,
                   Actions.assignMissingAttributes,
                   Actions.assignMissingWebauthnCredentials,
+                  Actions.assignMissingIdScan,
                 ],
               },
             ],
@@ -73,211 +74,55 @@ const createOnboardingMachine = ({
         [States.initOnboarding]: {
           always: [
             {
-              cond: context =>
-                userFound &&
-                (context.missingAttributes.length > 0 ||
-                  context.missingWebauthnCredentials),
-              target: States.additionalDataRequired,
+              cond: context => requiresAdditionalInfo(context),
+              target: States.additionalInfoRequired,
             },
             {
-              target: States.basicInformation,
-              cond: context =>
-                !userFound ||
-                isMissingBasicAttribute(
-                  context.missingAttributes,
-                  context.data,
-                ),
-            },
-            {
-              target: States.residentialAddress,
-              cond: context =>
-                isMissingResidentialAttribute(
-                  context.missingAttributes,
-                  context.data,
-                ),
-            },
-            {
-              target: States.ssn,
-              cond: context =>
-                isMissingSsnAttribute(context.missingAttributes, context.data),
+              target: States.collectKycData,
+              cond: context => shouldRunCollectKycData(context),
             },
             {
               target: States.webAuthn,
-              cond: context =>
-                context.missingWebauthnCredentials && supportsWebAuthn(context),
+              cond: context => shouldRunWebauthn(context),
+            },
+            {
+              target: States.idScan,
+              cond: context => shouldRunIdScan(context),
             },
             {
               target: States.d2p,
-              cond: context => context.missingWebauthnCredentials,
+              cond: context => shouldRunD2P(context),
             },
             {
               target: States.onboardingComplete,
             },
           ],
         },
-        [States.additionalDataRequired]: {
+        [States.additionalInfoRequired]: {
           on: {
             [Events.additionalInfoRequired]: [
               {
-                target: States.basicInformation,
-                cond: context =>
-                  isMissingBasicAttribute(
-                    context.missingAttributes,
-                    context.data,
-                  ),
-              },
-              {
-                target: States.residentialAddress,
-                cond: context =>
-                  isMissingResidentialAttribute(
-                    context.missingAttributes,
-                    context.data,
-                  ),
-              },
-              {
-                target: States.ssn,
-                cond: context =>
-                  isMissingSsnAttribute(
-                    context.missingAttributes,
-                    context.data,
-                  ),
+                target: States.collectKycData,
+                cond: context => shouldRunCollectKycData(context),
               },
               {
                 target: States.webAuthn,
                 description:
                   'If there are other attributes missing in addition to webauthn for an existing user, take them to liveness register, since the user likely abandoned onboarding early.',
-                cond: context =>
-                  userFound &&
-                  context.missingWebauthnCredentials &&
-                  hasMissingAttributes(
-                    context.missingAttributes,
-                    context.data,
-                  ) &&
-                  supportsWebAuthn(context),
+                cond: context => shouldRunWebauthn(context),
+              },
+              {
+                target: States.idScan,
+                cond: context => shouldRunIdScan(context),
               },
               {
                 target: States.d2p,
                 description:
                   'If we need to do webauthn but need to do a transfer first',
-                cond: context =>
-                  userFound &&
-                  context.missingWebauthnCredentials &&
-                  hasMissingAttributes(context.missingAttributes, context.data),
+                cond: context => shouldRunD2P(context),
               },
               {
                 target: States.onboardingComplete,
-              },
-            ],
-          },
-        },
-        [States.basicInformation]: {
-          on: {
-            [Events.basicInformationSubmitted]: [
-              {
-                target: States.residentialAddress,
-                actions: [Actions.assignBasicInformation],
-                cond: context =>
-                  isMissingResidentialAttribute(
-                    context.missingAttributes,
-                    context.data,
-                  ),
-              },
-              {
-                target: States.ssn,
-                actions: [Actions.assignBasicInformation],
-                cond: context =>
-                  isMissingSsnAttribute(
-                    context.missingAttributes,
-                    context.data,
-                  ),
-              },
-              {
-                target: States.webAuthn,
-                actions: [Actions.assignBasicInformation],
-                cond: context =>
-                  context.missingWebauthnCredentials &&
-                  supportsWebAuthn(context),
-              },
-              {
-                target: States.d2p,
-                actions: [Actions.assignBasicInformation],
-                cond: context => context.missingWebauthnCredentials,
-              },
-              {
-                target: States.onboardingComplete,
-                actions: [Actions.assignBasicInformation],
-              },
-            ],
-          },
-        },
-        [States.residentialAddress]: {
-          on: {
-            [Events.residentialAddressSubmitted]: [
-              {
-                target: States.ssn,
-                actions: [Actions.assignResidentialAddress],
-                cond: context =>
-                  isMissingSsnAttribute(
-                    context.missingAttributes,
-                    context.data,
-                  ),
-              },
-              {
-                target: States.webAuthn,
-                actions: [Actions.assignResidentialAddress],
-                cond: context =>
-                  context.missingWebauthnCredentials &&
-                  supportsWebAuthn(context),
-              },
-              {
-                target: States.d2p,
-                actions: [Actions.assignResidentialAddress],
-                cond: context => context.missingWebauthnCredentials,
-              },
-              {
-                target: States.onboardingComplete,
-                actions: [Actions.assignResidentialAddress],
-              },
-            ],
-            [Events.navigatedToPrevPage]: [
-              {
-                target: States.basicInformation,
-                cond: context =>
-                  isMissingBasicAttribute(context.missingAttributes),
-              },
-            ],
-          },
-        },
-        [States.ssn]: {
-          on: {
-            [Events.ssnSubmitted]: [
-              {
-                target: States.webAuthn,
-                actions: [Actions.assignSsn],
-                cond: context =>
-                  context.missingWebauthnCredentials &&
-                  supportsWebAuthn(context),
-              },
-              {
-                target: States.d2p,
-                actions: [Actions.assignSsn],
-                cond: context => context.missingWebauthnCredentials,
-              },
-              {
-                target: States.onboardingComplete,
-                actions: [Actions.assignSsn],
-              },
-            ],
-            [Events.navigatedToPrevPage]: [
-              {
-                target: States.residentialAddress,
-                cond: context =>
-                  isMissingResidentialAttribute(context.missingAttributes),
-              },
-              {
-                target: States.basicInformation,
-                cond: context =>
-                  isMissingBasicAttribute(context.missingAttributes),
               },
             ],
           },
@@ -291,7 +136,41 @@ const createOnboardingMachine = ({
         },
         [States.webAuthn]: {
           on: {
-            [Events.webAuthnCompleted]: {
+            [Events.webAuthnCompleted]: [
+              {
+                target: States.idScan,
+                cond: context => shouldRunIdScan(context),
+              },
+              {
+                target: States.onboardingComplete,
+              },
+            ],
+          },
+        },
+        [States.collectKycData]: {
+          on: {
+            [Events.collectKycDataCompleted]: [
+              {
+                target: States.webAuthn,
+                cond: context => shouldRunWebauthn(context),
+              },
+              {
+                target: States.idScan,
+                cond: context => shouldRunIdScan(context),
+              },
+              {
+                target: States.d2p,
+                cond: context => shouldRunD2P(context),
+              },
+              {
+                target: States.onboardingComplete,
+              },
+            ],
+          },
+        },
+        [States.idScan]: {
+          on: {
+            [Events.idScanCompleted]: {
               target: States.onboardingComplete,
             },
           },
@@ -325,39 +204,16 @@ const createOnboardingMachine = ({
           }
           return context;
         }),
+        [Actions.assignMissingIdScan]: assign((context, event) => {
+          if (event.type === Events.onboardingVerificationCompleted) {
+            context.missingIdScan = event.payload.missingIdScan;
+          }
+          return context;
+        }),
         [Actions.assignValidationToken]: assign((context, event) => {
           if (event.type === Events.onboardingVerificationCompleted) {
             context.validationToken = event.payload.validationToken;
           }
-          return context;
-        }),
-        [Actions.assignBasicInformation]: assign((context, event) => {
-          if (event.type === Events.basicInformationSubmitted) {
-            context.data = {
-              ...context.data,
-              ...event.payload.basicInformation,
-            };
-          }
-          return context;
-        }),
-        [Actions.assignResidentialAddress]: assign((context, event) => {
-          if (event.type === Events.residentialAddressSubmitted) {
-            context.data = {
-              ...context.data,
-              ...event.payload.residentialAddress,
-            };
-          }
-          return context;
-        }),
-        [Actions.assignSsn]: assign((context, event) => {
-          if (event.type !== Events.ssnSubmitted) {
-            return context;
-          }
-          context.data = {
-            ...context.data,
-            ...event.payload,
-          };
-
           return context;
         }),
       },

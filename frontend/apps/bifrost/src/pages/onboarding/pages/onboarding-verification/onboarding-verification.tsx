@@ -8,8 +8,9 @@ import { LoadingIndicator, Typography } from 'ui';
 
 import useOnboardingMachine from '../../hooks/use-onboarding-machine';
 
+// TODO: Move this to the new onboarding requirements page to check for the plugins required later.
 const OnboardingVerification = () => {
-  const { t } = useTranslation('pages.registration.onboarding-verification');
+  const { t } = useTranslation('pages.onboarding-verification');
   const [state, send] = useOnboardingMachine();
   const { context } = state;
   const { authToken } = context;
@@ -34,6 +35,7 @@ const OnboardingVerification = () => {
               missingAttributes,
               missingWebauthnCredentials,
               validationToken,
+              missingIdScan: false, // TODO: derive this from data returned by backend
             },
           });
         },

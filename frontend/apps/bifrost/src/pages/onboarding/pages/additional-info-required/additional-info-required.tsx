@@ -7,6 +7,7 @@ import { Button } from 'ui';
 
 import useOnboardingMachine from '../../hooks/use-onboarding-machine';
 
+// TODO: Move this to the new onboarding requirements page to check for the plugins required later.
 const AdditionalInfoRequired = () => {
   const { t } = useTranslation('pages.onboarding.additional-info-required');
   const [state, send] = useOnboardingMachine();
