@@ -13,14 +13,18 @@ import { Events } from './utils/state-machine/types';
 
 const App = ({ context, onDone }: IdScanProps) => {
   const [, send] = useIdScanMachine();
-  const { authToken, device } = context;
+  const { authToken, device, customData } = context;
 
   useEffectOnce(() => {
+    if (!customData?.documentRequestId) {
+      return;
+    }
     send({
       type: Events.receivedContext,
       payload: {
         authToken,
         device,
+        documentRequestId: customData.documentRequestId,
       },
     });
   });

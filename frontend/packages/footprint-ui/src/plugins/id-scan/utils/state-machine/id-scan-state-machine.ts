@@ -1,5 +1,6 @@
 import { assign, createMachine } from 'xstate';
 
+import ImagesRequiredByDocType from '../../constants/images-required-by-doc-type';
 import {
   Actions,
   Events,
@@ -34,10 +35,20 @@ const createIdScanMachine = () =>
         },
         [States.takeOrUploadFrontPhoto]: {
           on: {
-            [Events.receivedFrontImage]: {
-              target: States.takeOrUploadBackPhoto,
-              actions: Actions.assignFrontImage,
-            },
+            [Events.receivedFrontImage]: [
+              {
+                target: States.takeOrUploadBackPhoto,
+                actions: Actions.assignFrontImage,
+                cond: context => {
+                  const { type } = context;
+                  return type ? !!ImagesRequiredByDocType[type].back : false;
+                },
+              },
+              {
+                target: States.processingPhoto,
+                actions: Actions.assignFrontImage,
+              },
+            ],
           },
         },
         [States.takeOrUploadBackPhoto]: {
@@ -110,9 +121,10 @@ const createIdScanMachine = () =>
       actions: {
         [Actions.assignContext]: assign((context, event) => {
           if (event.type === Events.receivedContext) {
-            const { authToken, device } = event.payload;
+            const { authToken, device, documentRequestId } = event.payload;
             context.authToken = authToken;
             context.device = device;
+            context.documentRequestId = documentRequestId;
           }
           return context;
         }),

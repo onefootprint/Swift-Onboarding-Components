@@ -17,10 +17,9 @@ const App = ({ context, onDone }: D2PPluginProps) => {
   const { authToken, device, customData } = context;
 
   useEffectOnce(() => {
-    if (!customData?.missingRequirements) {
+    if (!customData) {
       return;
     }
-
     send({
       type: Events.receivedContext,
       payload: {

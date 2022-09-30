@@ -1,15 +1,17 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoCheckCircle40, IcoClose40 } from '@onefootprint/icons';
-import { IdScanBadImageError } from '@onefootprint/types';
+import { GetDocStatusResponse, IdScanBadImageError } from '@onefootprint/types';
 import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
 import { LoadingIndicator, Typography } from 'ui';
+import { useEffectOnce } from 'usehooks-ts';
 
 import HeaderTitle from '../../../../components/header-title';
 import { useIdScanMachine } from '../../components/machine-provider';
 import IdScanDocTypeToLabel from '../../constants/doc-type-labels';
 import { Events } from '../../utils/state-machine/types';
-import useSubmitPhoto from './hooks/use-submit-photo';
+import useGetDocStatus from './hooks/use-get-doc-status';
+import useSubmitDoc from './hooks/use-submit-doc';
 
 enum Status {
   loading,
@@ -22,43 +24,86 @@ const TRANSITION_DELAY = 3000;
 const ProcessingPhoto = () => {
   const { t } = useTranslation('pages.processing-photo');
   const [state, send] = useIdScanMachine();
-  const { type, frontImage, backImage } = state.context;
+  const { type, documentRequestId, country, authToken, frontImage, backImage } =
+    state.context;
   const docType = type
     ? IdScanDocTypeToLabel[type]
     : t('default-document-label');
   const [status, setStatus] = useState<Status>(Status.loading);
+  const submitDocMutation = useSubmitDoc();
+  const [statusPollingDisabled, setStatusPollingDisabled] = useState(true);
 
-  useSubmitPhoto(
-    {
-      front: frontImage,
-      back: backImage,
-    },
-    {
-      onSuccess: () => {
-        setStatus(Status.success);
-        setTimeout(() => {
-          send({
-            type: Events.imageSucceeded,
-          });
-        }, TRANSITION_DELAY);
+  const handleDocStatusUpdate = (response: GetDocStatusResponse) => {
+    if (response.status === 'pending') {
+      return;
+    }
+    handleDocSuccess();
+  };
+  useGetDocStatus({
+    disabled: statusPollingDisabled,
+    onSuccess: handleDocStatusUpdate,
+  });
+
+  const handleDocSuccess = () => {
+    setStatus(Status.success);
+    setTimeout(() => {
+      send({
+        type: Events.imageSucceeded,
+      });
+    }, TRANSITION_DELAY);
+  };
+
+  const handleDocError = (
+    frontImageError?: IdScanBadImageError,
+    backImageError?: IdScanBadImageError,
+  ) => {
+    setStatus(Status.error);
+    setTimeout(() => {
+      send({
+        type: Events.imageFailed,
+        payload: {
+          frontImageError,
+          backImageError,
+        },
+      });
+    }, TRANSITION_DELAY);
+  };
+
+  const handlePendingStatus = () => {
+    setStatusPollingDisabled(false);
+  };
+
+  useEffectOnce(() => {
+    if (!frontImage || !authToken || !documentRequestId || !type || !country) {
+      return;
+    }
+    submitDocMutation.mutate(
+      {
+        frontImage,
+        backImage,
+        authToken,
+        id: documentRequestId,
+        documentType: type,
+        countryCode: country,
       },
-      onError: (
-        frontImageError?: IdScanBadImageError,
-        backImageError?: IdScanBadImageError,
-      ) => {
-        setStatus(Status.error);
-        setTimeout(() => {
-          send({
-            type: Events.imageFailed,
-            payload: {
-              frontImageError,
-              backImageError,
-            },
-          });
-        }, TRANSITION_DELAY);
+      {
+        onSuccess({ status: docStatus, error }) {
+          if (!error && docStatus === 'complete') {
+            handleDocSuccess();
+            return;
+          }
+          if (error) {
+            const { frontImageError, backImageError } = error;
+            handleDocError(frontImageError, backImageError);
+            return;
+          }
+          if (docStatus === 'pending') {
+            handlePendingStatus();
+          }
+        },
       },
-    },
-  );
+    );
+  });
 
   return (
     <Container>

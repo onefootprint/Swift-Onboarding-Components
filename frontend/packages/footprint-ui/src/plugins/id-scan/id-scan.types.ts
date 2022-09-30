@@ -1,3 +1,7 @@
 import { BasePluginProps } from '../base-plugin';
 
-export type IdScanProps = BasePluginProps<{}>;
+type IdScanCustomData = {
+  documentRequestId: string;
+};
+
+export type IdScanProps = BasePluginProps<IdScanCustomData>;
