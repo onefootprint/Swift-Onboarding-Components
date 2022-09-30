@@ -81,10 +81,12 @@ class TestDashboard:
         body = get("users", dict(fp_user_id=user.fp_user_id), tenant.sk.key)
         scoped_users = body["data"]
         assert len(scoped_users)
-        
-        scoped_user = list(filter(lambda su: su["footprint_user_id"] == user.fp_user_id, scoped_users))
+
+        scoped_user = list(
+            filter(lambda su: su["footprint_user_id"] == user.fp_user_id, scoped_users)
+        )
         assert len(scoped_user) == 1
-        
+
         assert set(["first_name", "last_name"]) < set(
             scoped_user[0]["identity_data_attributes"]
         )
@@ -286,3 +288,96 @@ class TestDashboard:
             user.tenant.sk.key,
             status_code=401,
         )
+
+
+@pytest.fixture(scope="session")
+def limited_role(workos_sandbox_tenant):
+    role_data = dict(
+        name="Test limited role",
+        permissions=[dict(kind="users"), dict(kind="security_logs")],
+    )
+    body = post("org/roles", role_data, workos_sandbox_tenant.auth_token)
+    assert body["name"] == role_data["name"]
+    assert set(i["kind"] for i in body["permissions"]) == set(
+        i["kind"] for i in role_data["permissions"]
+    )
+    return body
+
+
+@pytest.fixture(scope="session")
+def admin_role(workos_sandbox_tenant):
+    body = get("org/roles", None, workos_sandbox_tenant.auth_token)
+    roles = body["data"]
+    return next(i for i in roles if i["permissions"][0]["kind"] == "admin")
+
+
+@pytest.fixture(scope="session")
+def tenant_user(workos_sandbox_tenant, admin_role):
+    user_data = dict(
+        email="integrationtest+1@onefootprint.com",
+        role_id=admin_role["id"],
+        redirect_url="http://localhost:3001/auth",
+    )
+    body = post("org/users", user_data, workos_sandbox_tenant.auth_token)
+    assert not body["last_login_at"]
+    assert body["role_id"] == admin_role["id"]
+    return body
+
+
+class TestDashboardUsers:
+    def test_update_roles(self, workos_sandbox_tenant, limited_role, admin_role):
+        role_id = limited_role["id"]
+        patch_data = dict(
+            name="New role name", permissions=[{"kind": "onboarding_configuration"}]
+        )
+        patch(f"org/roles/{role_id}", patch_data, workos_sandbox_tenant.auth_token)
+
+        body = get("org/roles", None, workos_sandbox_tenant.auth_token)
+        role_ids = set(r["id"] for r in body["data"])
+        assert role_id in role_ids
+        assert admin_role["id"] in role_ids
+        role = next(r for r in body["data"] if r["id"] == role_id)
+        assert role["name"] == patch_data["name"]
+        assert set(i["kind"] for i in role["permissions"]) == set(
+            i["kind"] for i in patch_data["permissions"]
+        )
+
+    def test_update_user_role(self, workos_sandbox_tenant, tenant_user, limited_role):
+        user_id = tenant_user["id"]
+        user_data = dict(role_id=limited_role["id"])
+        patch(f"org/users/{user_id}", user_data, workos_sandbox_tenant.auth_token)
+
+        body = get(f"org/users", None, workos_sandbox_tenant.auth_token)
+        user = next(u for u in body["data"] if u["id"] == user_id)
+        assert user["role_id"] == limited_role["id"]
+
+    def test_deactivate_role_and_user(
+        self, workos_sandbox_tenant, tenant_user, limited_role
+    ):
+        role_id = limited_role["id"]
+        user_id = tenant_user["id"]
+        # Make sure the tenant_user is using the limited role
+        user_data = dict(role_id=limited_role["id"])
+        patch(f"org/users/{user_id}", user_data, workos_sandbox_tenant.auth_token)
+
+        # Can't deactivate role that has activate users
+        post(
+            f"org/roles/{role_id}/deactivate",
+            None,
+            workos_sandbox_tenant.auth_token,
+            status_code=400,
+        )
+
+        # So we deactivate the user
+        post(f"org/users/{user_id}/deactivate", None, workos_sandbox_tenant.auth_token)
+
+        # And now we can deactivate it
+        post(f"org/roles/{role_id}/deactivate", None, workos_sandbox_tenant.auth_token)
+
+        # Make sure the deactivated user isn't displayed anymore
+        body = get("org/users", None, workos_sandbox_tenant.auth_token)
+        assert user_id not in set(u["id"] for u in body["data"])
+
+        # Make sure the deactivated role isn't displayed anymore
+        body = get("org/roles", None, workos_sandbox_tenant.auth_token)
+        assert role_id not in set(u["id"] for u in body["data"])
