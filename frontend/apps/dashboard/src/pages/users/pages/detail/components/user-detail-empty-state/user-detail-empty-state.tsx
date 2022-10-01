@@ -1,8 +1,8 @@
 import { useTranslation } from '@onefootprint/hooks';
+import { Box, EmptyState } from '@onefootprint/ui';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import React from 'react';
-import { Box, EmptyState } from 'ui';
 
 const UserDetailEmptyState = () => {
   const router = useRouter();

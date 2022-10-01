@@ -1,10 +1,10 @@
 import { useIntl, useTranslation } from '@onefootprint/hooks';
+import { Container, Divider, media } from '@onefootprint/ui';
 import React from 'react';
 import SubscribeToNewsletter from 'src/components/subscribe-to-newsletter';
 import TwitterBreadcrumb from 'src/components/twitter-breadcrumb';
 import { getInitialPosts } from 'src/utils/ghost';
 import styled, { css } from 'styled-components';
-import { Container, Divider, media } from 'ui';
 
 import SEO from '../../components/seo';
 import { PostType } from '../../utils/ghost/ghost';

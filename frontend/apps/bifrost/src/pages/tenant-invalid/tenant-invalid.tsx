@@ -1,8 +1,8 @@
 import { useTranslation } from '@onefootprint/hooks';
+import { Typography } from '@onefootprint/ui';
 import { NavigationHeader } from 'footprint-elements';
 import React from 'react';
 import styled from 'styled-components';
-import { Typography } from 'ui';
 
 const TenantInvalid = () => {
   const { t } = useTranslation('pages.tenant-invalid');

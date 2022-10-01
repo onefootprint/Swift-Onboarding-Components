@@ -1,8 +1,8 @@
 import { IcoLink16 } from '@onefootprint/icons';
+import { Typography } from '@onefootprint/ui';
 import kebabCase from 'lodash/kebabCase';
 import React from 'react';
 import styled, { css } from 'styled-components';
-import { Typography } from 'ui';
 
 type H1Props = {
   children: string;

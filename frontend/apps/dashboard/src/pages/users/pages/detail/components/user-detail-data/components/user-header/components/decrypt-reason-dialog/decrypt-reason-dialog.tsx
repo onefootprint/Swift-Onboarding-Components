@@ -1,6 +1,6 @@
+import { Dialog } from '@onefootprint/ui';
 import noop from 'lodash/noop';
 import React from 'react';
-import { Dialog } from 'ui';
 
 import { Event } from '../../../../../../utils/decrypt-state-machine';
 import { useDecryptMachine } from '../../../../../decrypt-machine-provider';

@@ -1,8 +1,8 @@
 import { useTranslation } from '@onefootprint/hooks';
+import { Banner, Box, Tooltip } from '@onefootprint/ui';
 import React from 'react';
 import useSandboxMode from 'src/hooks/use-sandbox-mode';
 import styled, { css } from 'styled-components';
-import { Banner, Box, Tooltip } from 'ui';
 
 const SandboxBanner = () => {
   const { t } = useTranslation('components.private-layout.sandbox-banner');

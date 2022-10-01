@@ -1,6 +1,6 @@
+import { Box, Portal } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
-import { Box, Portal } from 'ui';
 
 import NavigationBackButton from './components/navigation-back-button';
 import NavigationCloseButton from './components/navigation-close-button';

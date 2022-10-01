@@ -1,6 +1,6 @@
+import { Typography } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
-import { Typography } from 'ui';
 
 import SecuredByFootprint from './components/secured-by-footprint';
 import type { Link } from './footprint-footer.types';

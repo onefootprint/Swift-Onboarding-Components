@@ -1,9 +1,9 @@
 import { useInputMask, useTranslation } from '@onefootprint/hooks';
 import { IcoFileText24, IcoLock24, IcoShield24 } from '@onefootprint/icons';
+import { Button, TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import styled, { css } from 'styled-components';
-import { Button, TextInput } from 'ui';
 
 import HeaderTitle from '../../../../../../components/header-title';
 import InfoBox from '../../../../../../components/info-box';

@@ -1,9 +1,9 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { UserData, UserDataAttribute } from '@onefootprint/types';
+import { Box, Button, TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import useSandboxMode from 'src/hooks/use-sandbox-mode';
-import { Box, Button, TextInput } from 'ui';
 
 import EMAIL_SANDBOX_REGEX from './email-identification-form.constants';
 

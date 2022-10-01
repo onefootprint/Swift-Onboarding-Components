@@ -1,8 +1,8 @@
 import { Icon } from '@onefootprint/icons';
+import { SXStyleProps, SXStyles, Typography, useSX } from '@onefootprint/ui';
 import React from 'react';
 import { UserData } from 'src/pages/users/hooks/use-user-data';
 import styled, { css } from 'styled-components';
-import { SXStyleProps, SXStyles, Typography, useSX } from 'ui';
 
 export type DataRow = {
   title: string;

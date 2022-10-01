@@ -1,6 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
+import { Typography } from '@onefootprint/ui';
 import React from 'react';
-import { Typography } from 'ui';
 
 const VerifyError = () => {
   const { t } = useTranslation('pages.verify.error');

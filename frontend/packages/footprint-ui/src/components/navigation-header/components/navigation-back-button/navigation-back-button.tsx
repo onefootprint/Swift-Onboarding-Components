@@ -1,6 +1,6 @@
 import { IcoChevronLeftBig24 } from '@onefootprint/icons';
+import { IconButton } from '@onefootprint/ui';
 import React from 'react';
-import { IconButton } from 'ui';
 
 export type NavigationBackButtonProps = {
   onClick?: () => void;

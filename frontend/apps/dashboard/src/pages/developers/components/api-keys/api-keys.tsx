@@ -1,7 +1,7 @@
 import { useToggle, useTranslation } from '@onefootprint/hooks';
+import { Box, Button, Divider, Typography } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
-import { Box, Button, Divider, Typography } from 'ui';
 
 import CreateDialog from './components/create-dialog';
 import Table from './components/table';

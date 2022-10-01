@@ -3,10 +3,15 @@ import { useTranslation } from '@onefootprint/hooks';
 import { LogoFpDefault } from '@onefootprint/icons';
 import { getErrorMessage, RequestError } from '@onefootprint/request';
 import { UserDecryptResponse } from '@onefootprint/types';
+import {
+  FootprintButton,
+  LinkButton,
+  Typography,
+  useToast,
+} from '@onefootprint/ui';
 import { useRouter } from 'next/router';
 import React from 'react';
 import styled, { css } from 'styled-components';
-import { FootprintButton, LinkButton, Typography, useToast } from 'ui';
 
 import useUserSession from '../../hooks/use-session-user';
 import useUserDecrypt from '../../hooks/use-user-decrypt';

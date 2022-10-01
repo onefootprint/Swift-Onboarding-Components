@@ -1,7 +1,7 @@
 import type { Icon } from '@onefootprint/icons';
+import { Box, Typography } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
-import { Box, Typography } from 'ui';
 
 export type InfoBoxProps = {
   items: { title: string; description: string; Icon: Icon }[];

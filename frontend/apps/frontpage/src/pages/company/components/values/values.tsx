@@ -1,8 +1,8 @@
 import type { Icon } from '@onefootprint/icons';
+import { media, Typography } from '@onefootprint/ui';
 import rgba from 'polished/lib/color/rgba';
 import React from 'react';
 import styled, { css } from 'styled-components';
-import { media, Typography } from 'ui';
 
 type ValuesProps = {
   title: string;

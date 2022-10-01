@@ -1,8 +1,8 @@
 import type { Icon } from '@onefootprint/icons';
+import { Typography } from '@onefootprint/ui';
 import React from 'react';
 import CircleIcon from 'src/components/circle-icon';
 import styled, { css } from 'styled-components';
-import { Typography } from 'ui';
 
 type VaultArticleProps = {
   content: string;

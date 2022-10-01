@@ -1,7 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoChevronLeftBig24, IcoClose24 } from '@onefootprint/icons';
+import { Dialog, useConfirmationDialog, useToast } from '@onefootprint/ui';
 import React from 'react';
-import { Dialog, useConfirmationDialog, useToast } from 'ui';
 
 import AccessForm from './components/access-form';
 import CollectForm from './components/collect-form';

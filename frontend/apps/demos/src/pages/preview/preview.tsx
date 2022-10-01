@@ -1,8 +1,8 @@
 import footprint from '@onefootprint/footprint-js';
+import { Box, FootprintButton, media, Typography } from '@onefootprint/ui';
 import Head from 'next/head';
 import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
-import { Box, FootprintButton, media, Typography } from 'ui';
 
 type PreviewProps = {
   tenant: {

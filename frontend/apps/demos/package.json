@@ -25,7 +25,7 @@
     "react-dom": "18.2.0",
     "styled-components": "^5.3.5",
     "@onefootprint/themes": "*",
-    "ui": "*"
+    "@onefootprint/ui": "*"
   },
   "devDependencies": {
     "@next/bundle-analyzer": "^12.1.6",

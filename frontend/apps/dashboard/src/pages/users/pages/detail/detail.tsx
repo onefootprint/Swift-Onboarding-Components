@@ -1,8 +1,8 @@
 import { useTranslation } from '@onefootprint/hooks';
+import { Box, Breadcrumb, BreadcrumbItem } from '@onefootprint/ui';
 import Head from 'next/head';
 import Link from 'next/link';
 import React from 'react';
-import { Box, Breadcrumb, BreadcrumbItem } from 'ui';
 
 import useGetUsers from '../../hooks/use-get-users';
 import DecryptMachineProvider from './components/decrypt-machine-provider';

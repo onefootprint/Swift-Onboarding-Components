@@ -1,7 +1,7 @@
+import { createOverlayBackground, Typography } from '@onefootprint/ui';
 import Link from 'next/link';
 import React from 'react';
 import styled, { css } from 'styled-components';
-import { createOverlayBackground, Typography } from 'ui';
 
 import { NavMenuItem } from '../../../../types';
 import NavigationMenu from '../navigation-menu';

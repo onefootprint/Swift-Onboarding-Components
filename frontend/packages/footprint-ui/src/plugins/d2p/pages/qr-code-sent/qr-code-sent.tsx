@@ -1,8 +1,8 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { D2PStatusUpdate } from '@onefootprint/types';
+import { LinkButton, LoadingIndicator } from '@onefootprint/ui';
 import React, { useEffect } from 'react';
 import styled, { css } from 'styled-components';
-import { LinkButton, LoadingIndicator } from 'ui';
 
 import HeaderTitle from '../../../../components/header-title';
 import NavigationHeader from '../../../../components/navigation-header';

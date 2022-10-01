@@ -1,7 +1,7 @@
 import { AccessLog } from '@onefootprint/types';
+import { Box } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
-import { Box } from 'ui';
 
 import AccessLogBody from '../access-log-body';
 import AccessLogHeader from '../access-log-header';

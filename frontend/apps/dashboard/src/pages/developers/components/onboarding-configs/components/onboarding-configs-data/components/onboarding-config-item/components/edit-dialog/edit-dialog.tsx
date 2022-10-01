@@ -1,7 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
+import { Dialog, TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { useForm } from 'react-hook-form';
-import { Dialog, TextInput } from 'ui';
 
 type FormData = { name: string };
 

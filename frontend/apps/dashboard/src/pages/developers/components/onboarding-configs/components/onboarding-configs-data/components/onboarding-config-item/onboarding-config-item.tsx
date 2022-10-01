@@ -6,8 +6,6 @@ import {
   IcoPencil16,
 } from '@onefootprint/icons';
 import { OnboardingConfig } from '@onefootprint/types';
-import React from 'react';
-import styled, { css } from 'styled-components';
 import {
   Badge,
   Box,
@@ -17,7 +15,9 @@ import {
   Tag,
   Tooltip,
   Typography,
-} from 'ui';
+} from '@onefootprint/ui';
+import React from 'react';
+import styled, { css } from 'styled-components';
 
 import Table from '../../../table';
 import EditDialog from './components/edit-dialog';

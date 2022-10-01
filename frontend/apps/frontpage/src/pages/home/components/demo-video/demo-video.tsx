@@ -1,7 +1,7 @@
 import { IcoClose24 } from '@onefootprint/icons';
+import { Overlay, Typography } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
-import { Overlay, Typography } from 'ui';
 import { useLockedBody } from 'usehooks-ts';
 
 type DemoVideoProps = {

@@ -30,7 +30,7 @@
     "@onefootprint/request": "*",
     "@onefootprint/themes": "*",
     "@onefootprint/types": "*",
-    "ui": "*",
+    "@onefootprint/ui": "*",
     "use-places-autocomplete": "^4.0.0",
     "usehooks-ts": "^2.6.0"
   },

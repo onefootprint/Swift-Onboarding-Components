@@ -1,7 +1,7 @@
+import { Typography } from '@onefootprint/ui';
 import Image from 'next/image';
 import React from 'react';
 import styled, { css } from 'styled-components';
-import { Typography } from 'ui';
 
 type CompetitorAnalysisProps = {
   anchor: string;

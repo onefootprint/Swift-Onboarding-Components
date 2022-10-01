@@ -1,5 +1,5 @@
+import { LoadingIndicator } from '@onefootprint/ui';
 import React from 'react';
-import { LoadingIndicator } from 'ui';
 
 const VerifyLoading = () => <LoadingIndicator />;
 

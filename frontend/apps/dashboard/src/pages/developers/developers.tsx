@@ -1,9 +1,9 @@
 import { useTranslation } from '@onefootprint/hooks';
+import { Box, Toggle, Tooltip, Typography } from '@onefootprint/ui';
 import Head from 'next/head';
 import React from 'react';
 import useSandboxMode from 'src/hooks/use-sandbox-mode';
 import styled, { css } from 'styled-components';
-import { Box, Toggle, Tooltip, Typography } from 'ui';
 
 import ApiKeys from './components/api-keys';
 import OnboardingConfigs from './components/onboarding-configs';

@@ -1,9 +1,9 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoCheckCircle40 } from '@onefootprint/icons';
 import { IdentifyType } from '@onefootprint/types';
+import { Typography } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
-import { Typography } from 'ui';
 
 import useIdentifyMachine from '../../../../hooks/use-identify-machine';
 

@@ -1,8 +1,8 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { getErrorMessage } from '@onefootprint/request';
 import type { ApiKey } from '@onefootprint/types';
+import { Table, TableRow } from '@onefootprint/ui';
 import React from 'react';
-import { Table, TableRow } from 'ui';
 
 import Row from './components/row';
 import useApiKeys from './hooks/use-api-keys';

@@ -1,7 +1,7 @@
 import { UserDataAttributeKey } from '@onefootprint/types';
+import { Checkbox, SXStyles, Typography } from '@onefootprint/ui';
 import React, { ChangeEvent } from 'react';
 import styled, { css } from 'styled-components';
-import { Checkbox, SXStyles, Typography } from 'ui';
 
 type DataKindBoxesProps = {
   setFieldFor: (

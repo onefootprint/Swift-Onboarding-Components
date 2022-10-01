@@ -1,8 +1,8 @@
 import { useTranslation } from '@onefootprint/hooks';
+import { media } from '@onefootprint/ui';
 import { createPopup } from '@typeform/embed';
 import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
-import { media } from 'ui';
 
 import SEO from '../../components/seo';
 import DemoVideo from './components/demo-video';

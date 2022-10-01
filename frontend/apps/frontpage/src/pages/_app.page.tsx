@@ -1,13 +1,13 @@
 import '@typeform/embed/build/css/popup.css';
 
 import themes from '@onefootprint/themes';
+import { DesignSystemProvider, media } from '@onefootprint/ui';
 import { QueryClientProvider } from '@tanstack/react-query';
 import Head from 'next/head';
 import Script from 'next/script';
 import React from 'react';
 import Drift from 'react-driftjs';
 import { createGlobalStyle, css } from 'styled-components';
-import { DesignSystemProvider, media } from 'ui';
 
 import Layout from '../components/layout';
 import MDXProvider from '../components/mdx-provider';

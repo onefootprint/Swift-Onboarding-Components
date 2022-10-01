@@ -1,8 +1,8 @@
 import themes from '@onefootprint/themes';
+import { DesignSystemProvider } from '@onefootprint/ui';
 import Head from 'next/head';
 import React, { useEffect, useState } from 'react';
 import { createGlobalStyle, css } from 'styled-components';
-import { DesignSystemProvider } from 'ui';
 
 import Layout from '../components/layout';
 import PageGuard from '../components/page-guard';

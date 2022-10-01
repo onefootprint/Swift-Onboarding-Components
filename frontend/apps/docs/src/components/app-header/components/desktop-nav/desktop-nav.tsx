@@ -1,10 +1,10 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { LogoFpdocsDefault } from '@onefootprint/icons';
+import { LinkButton, media, Tab, Tabs } from '@onefootprint/ui';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React from 'react';
 import styled, { css } from 'styled-components';
-import { LinkButton, media, Tab, Tabs } from 'ui';
 
 import type { NavItem } from '../../app-header.types';
 

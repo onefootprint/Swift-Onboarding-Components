@@ -1,10 +1,10 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoCheckCircle40 } from '@onefootprint/icons';
+import { Box, LinkButton, Typography } from '@onefootprint/ui';
 import { NavigationHeader, useFootprintJs } from 'footprint-elements';
 import React, { useEffect } from 'react';
 import Confetti from 'react-confetti';
 import styled from 'styled-components';
-import { Box, LinkButton, Typography } from 'ui';
 
 import useBifrostMachine from '../../hooks/use-bifrost-machine/use-bifrost-machine';
 import useConfettiState from '../../hooks/use-confetti-state';

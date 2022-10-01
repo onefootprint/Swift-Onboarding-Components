@@ -1,7 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { CollectedDataOption } from '@onefootprint/types';
+import { useToast } from '@onefootprint/ui';
 import React from 'react';
-import { useToast } from 'ui';
 
 import { useCollectKycDataMachine } from '../../components/machine-provider';
 import useSyncData from '../../hooks/use-sync-data';

@@ -1,8 +1,8 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { AuthorizedOrg } from '@onefootprint/types';
+import { LoadingIndicator, Typography } from '@onefootprint/ui';
 import React from 'react';
 import styled from 'styled-components';
-import { LoadingIndicator, Typography } from 'ui';
 
 import VerifiedAccountCard from './components/verified-account-card';
 import useGetAuthorizedOrgs from './hooks/use-authorized-orgs';

@@ -1,6 +1,6 @@
+import { Typography } from '@onefootprint/ui';
 import React from 'react';
 import EncryptedCell from 'src/components/encrypted-cell';
-import { Typography } from 'ui';
 
 import { UserData } from '../../hooks/use-user-data';
 

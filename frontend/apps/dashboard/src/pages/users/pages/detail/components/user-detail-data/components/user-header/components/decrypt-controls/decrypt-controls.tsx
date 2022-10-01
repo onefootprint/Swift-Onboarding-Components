@@ -1,6 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
+import { Box, Button } from '@onefootprint/ui';
 import React from 'react';
-import { Box, Button } from 'ui';
 
 import { Event, State } from '../../../../../../utils/decrypt-state-machine';
 import { useDecryptMachine } from '../../../../../decrypt-machine-provider';

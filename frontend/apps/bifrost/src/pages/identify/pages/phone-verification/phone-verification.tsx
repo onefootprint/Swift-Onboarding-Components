@@ -1,8 +1,12 @@
 import { useTranslation } from '@onefootprint/hooks';
+import {
+  Box,
+  getCountryByNumber,
+  getNumberByCountryValue,
+} from '@onefootprint/ui';
 import { HeaderTitle, NavigationHeader } from 'footprint-elements';
 import React from 'react';
 import styled, { css } from 'styled-components';
-import { Box, getCountryByNumber, getNumberByCountryValue } from 'ui';
 
 import { Events } from '../../../../utils/state-machine/identify/types';
 import useIdentifyMachine from '../../hooks/use-identify-machine';

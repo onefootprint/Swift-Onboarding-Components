@@ -1,7 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { DateRange, OnboardingStatus } from '@onefootprint/types';
+import { Box, Dialog } from '@onefootprint/ui';
 import React, { useState } from 'react';
-import { Box, Dialog } from 'ui';
 
 import { useFilters } from '../../hooks/use-filters';
 import Form, { FormData } from './components/form';

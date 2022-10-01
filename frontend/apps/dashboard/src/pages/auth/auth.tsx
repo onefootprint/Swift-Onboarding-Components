@@ -1,11 +1,11 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { OrgAuthLoginResponse } from '@onefootprint/types';
+import { Box, LoadingIndicator } from '@onefootprint/ui';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import React, { useEffect } from 'react';
 import useLogin from 'src/hooks/use-login';
 import useSessionUser from 'src/hooks/use-session-user';
-import { Box, LoadingIndicator } from 'ui';
 
 const Auth = () => {
   const { t } = useTranslation('pages.auth');

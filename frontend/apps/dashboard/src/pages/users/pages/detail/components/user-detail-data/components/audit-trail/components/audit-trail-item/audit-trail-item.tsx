@@ -20,9 +20,9 @@ import {
   VerificationInfoStatus,
   verificationInfoStatusToDisplayName,
 } from '@onefootprint/types';
+import { Tag, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { TimelineItem } from 'src/components/timeline/timeline';
-import { Tag, Typography } from 'ui';
 
 const iconForAttribute: Record<SignalAttribute, Icon> = {
   [SignalAttribute.name]: IcoUser16,

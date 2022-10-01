@@ -1,7 +1,7 @@
+import { Typography } from '@onefootprint/ui';
 import React from 'react';
 import useSessionUser from 'src/hooks/use-session-user';
 import styled, { css } from 'styled-components';
-import { Typography } from 'ui';
 
 import createAddressLine from './utils/create-address-line';
 

@@ -1,8 +1,8 @@
+import { media } from '@onefootprint/ui';
 import React from 'react';
 import type { Article } from 'src/types/article';
 import type { ProductArticle } from 'src/types/product';
 import styled, { css } from 'styled-components';
-import { media } from 'ui';
 
 import ArticleSections from './components/article-sections';
 import ProductNavigation from './components/product-navigation';

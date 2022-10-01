@@ -1,8 +1,8 @@
 import { useToggle, useTranslation } from '@onefootprint/hooks';
 import { getErrorMessage } from '@onefootprint/request';
+import { Box, Button, Divider, Typography } from '@onefootprint/ui';
 import React from 'react';
 import styled from 'styled-components';
-import { Box, Button, Divider, Typography } from 'ui';
 
 import CreateDialog from './components/create-onboarding-config';
 import OnboardingConfigsData from './components/onboarding-configs-data';

@@ -1,9 +1,9 @@
 import { useTranslation } from '@onefootprint/hooks';
+import { Button, PhoneInput } from '@onefootprint/ui';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import useSandboxMode from 'src/hooks/use-sandbox-mode';
 import styled, { css } from 'styled-components';
-import { Button, PhoneInput } from 'ui';
 
 import {
   PHONE_REGEX,

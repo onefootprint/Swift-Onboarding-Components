@@ -1,10 +1,10 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { D2PStatusUpdate } from '@onefootprint/types';
+import { LinkButton, LoadingIndicator } from '@onefootprint/ui';
 import { HeaderTitle } from 'footprint-elements';
 import React, { useEffect } from 'react';
 import { Events } from 'src/utils/state-machine/liveness-check';
 import styled, { css } from 'styled-components';
-import { LinkButton, LoadingIndicator } from 'ui';
 
 import { useLivenessCheckMachine } from '../../components/machine-provider';
 import useGetD2PStatus, { D2PStatus } from '../../hooks/d2p/use-get-d2p-status';

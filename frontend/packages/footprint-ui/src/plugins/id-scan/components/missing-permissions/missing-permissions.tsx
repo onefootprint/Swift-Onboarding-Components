@@ -1,8 +1,8 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IlluLightPhoneWithId } from '@onefootprint/icons';
+import { BottomSheet, Typography } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
-import { BottomSheet, Typography } from 'ui';
 
 import { HeaderTitle } from '../../../../components';
 

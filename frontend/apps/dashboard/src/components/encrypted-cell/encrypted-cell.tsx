@@ -1,6 +1,6 @@
 import { IcoLock16 } from '@onefootprint/icons';
+import { Box, Typography } from '@onefootprint/ui';
 import React from 'react';
-import { Box, Typography } from 'ui';
 
 const EncryptedCell = () => (
   <Box sx={{ display: 'flex' }}>

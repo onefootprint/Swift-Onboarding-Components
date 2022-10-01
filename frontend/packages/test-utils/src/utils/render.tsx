@@ -5,7 +5,7 @@ import { render } from '@testing-library/react';
 import React from 'react';
 import { ThemeProvider } from 'styled-components';
 import themes from '@onefootprint/themes';
-import { DesignSystemProvider } from 'ui';
+import { DesignSystemProvider } from '@onefootprint/ui';
 
 import throwOnConsoleErrors from './console-error';
 

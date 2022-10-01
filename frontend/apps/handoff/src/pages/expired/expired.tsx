@@ -1,7 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
+import { Button } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
-import { Button } from 'ui';
 
 import HeaderTitle from '../../components/header-title';
 import useOpener from '../../hooks/use-opener';

@@ -1,8 +1,8 @@
 import { AccessEvent } from '@onefootprint/types';
+import { Box, Divider, SearchInput, Typography } from '@onefootprint/ui';
 import React, { useEffect } from 'react';
 import Timeline from 'src/components/timeline';
 import styled from 'styled-components';
-import { Box, Divider, SearchInput, Typography } from 'ui';
 
 import Dot from './components/dot';
 import FilterDialog from './components/filter-dialog';

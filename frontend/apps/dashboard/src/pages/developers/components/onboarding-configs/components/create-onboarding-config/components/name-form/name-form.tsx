@@ -1,7 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
+import { TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { useForm } from 'react-hook-form';
-import { TextInput } from 'ui';
 
 import type { NameFormData } from '../../create-onboarding-config.types';
 

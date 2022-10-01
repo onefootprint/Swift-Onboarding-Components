@@ -1,8 +1,8 @@
 import { useTranslation } from '@onefootprint/hooks';
+import { Button, Container, media, Typography } from '@onefootprint/ui';
 import Image from 'next/image';
 import React from 'react';
 import styled, { css } from 'styled-components';
-import { Button, Container, media, Typography } from 'ui';
 
 type HeroSectionProps = {
   onRequestAccess: () => void;

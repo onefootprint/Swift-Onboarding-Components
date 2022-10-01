@@ -1,11 +1,17 @@
 import { useIntl, useTranslation } from '@onefootprint/hooks';
 import { IcoChevronLeftBig24 } from '@onefootprint/icons';
+import {
+  Box,
+  Container,
+  LinkButton,
+  media,
+  Typography,
+} from '@onefootprint/ui';
 import Link from 'next/link';
 import React from 'react';
 import PostContent from 'src/components/post-content';
 import SEO from 'src/components/seo';
 import styled, { css } from 'styled-components';
-import { Box, Container, LinkButton, media, Typography } from 'ui';
 
 import DesktopSharePost from '../../../../components/desktop-share-post';
 import PostInfo from '../../../../components/post-info';

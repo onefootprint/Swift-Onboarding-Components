@@ -41,7 +41,7 @@
     "@onefootprint/themes": "*",
     "@onefootprint/types": "*",
     "ua-parser-js": "^1.0.2",
-    "ui": "*",
+    "@onefootprint/ui": "*",
     "usehooks-ts": "^2.5.3",
     "xstate": "^4.33.6",
     "yup": "^0.32.11",

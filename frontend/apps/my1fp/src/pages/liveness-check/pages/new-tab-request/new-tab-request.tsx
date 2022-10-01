@@ -1,10 +1,10 @@
 import { useTranslation } from '@onefootprint/hooks';
+import { Button } from '@onefootprint/ui';
 import { HeaderTitle } from 'footprint-elements';
 import React, { useEffect } from 'react';
 import useSessionUser from 'src/hooks/use-session-user';
 import { Events } from 'src/utils/state-machine/liveness-check';
 import styled, { css } from 'styled-components';
-import { Button } from 'ui';
 
 import { useLivenessCheckMachine } from '../../components/machine-provider';
 import useGenerateScopedAuthToken from '../../hooks/d2p/use-generate-scoped-auth-token';

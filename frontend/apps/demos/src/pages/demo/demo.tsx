@@ -1,8 +1,14 @@
 import footprint from '@onefootprint/footprint-js';
+import {
+  Box,
+  createFontStyles,
+  FootprintButton,
+  media,
+  Typography,
+} from '@onefootprint/ui';
 import Head from 'next/head';
 import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
-import { Box, createFontStyles, FootprintButton, media, Typography } from 'ui';
 
 footprint.init({ publicKey: process.env.NEXT_PUBLIC_TENANT_KEY });
 

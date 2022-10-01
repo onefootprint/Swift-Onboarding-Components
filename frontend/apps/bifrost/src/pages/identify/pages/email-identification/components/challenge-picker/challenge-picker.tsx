@@ -1,16 +1,16 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoFaceid24, IcoSmartphone24 } from '@onefootprint/icons';
 import { ChallengeKind } from '@onefootprint/types';
-import React, { useState } from 'react';
-import { useIdentifyMachine } from 'src/components/identify-machine-provider';
-import styled, { css } from 'styled-components';
 import {
   BottomSheet,
   Button,
   RadioSelect,
   RadioSelectOptionFields,
   Typography,
-} from 'ui';
+} from '@onefootprint/ui';
+import React, { useState } from 'react';
+import { useIdentifyMachine } from 'src/components/identify-machine-provider';
+import styled, { css } from 'styled-components';
 
 const iOSPlatforms = [
   'iPad Simulator',

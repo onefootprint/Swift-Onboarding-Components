@@ -1,10 +1,16 @@
 import { useTranslation } from '@onefootprint/hooks';
+import {
+  Box,
+  createFontStyles,
+  media,
+  Toggle,
+  Typography,
+} from '@onefootprint/ui';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React from 'react';
 import SupportList from 'src/components/support-list';
 import styled, { css } from 'styled-components';
-import { Box, createFontStyles, media, Toggle, Typography } from 'ui';
 import { useDarkMode } from 'usehooks-ts';
 
 type ProductNavigationProps = {

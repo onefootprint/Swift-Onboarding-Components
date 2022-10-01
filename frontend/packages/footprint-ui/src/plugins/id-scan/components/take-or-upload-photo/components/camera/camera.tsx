@@ -1,7 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
+import { Button, LoadingIndicator } from '@onefootprint/ui';
 import React, { useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
-import { Button, LoadingIndicator } from 'ui';
 
 // https://linear.app/footprint/issue/FP-1442/resize-camera-dynamically
 // TODO: uncomment below for resizing dynamically

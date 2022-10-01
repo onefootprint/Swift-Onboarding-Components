@@ -1,8 +1,8 @@
 import { useTranslation } from '@onefootprint/hooks';
+import { Button, media, Typography } from '@onefootprint/ui';
 import React from 'react';
 import FaqItem from 'src/components/faq-item';
 import styled, { css } from 'styled-components';
-import { Button, media, Typography } from 'ui';
 
 import SEO from '../../components/seo';
 

@@ -1,8 +1,8 @@
 import { useTranslation } from '@onefootprint/hooks';
+import { Button } from '@onefootprint/ui';
 import { HeaderTitle, NavigationHeader } from 'footprint-elements';
 import React from 'react';
 import styled, { css } from 'styled-components';
-import { Button } from 'ui';
 
 import useBiometricLoginRetry from './hooks/use-biometric-login-retry';
 

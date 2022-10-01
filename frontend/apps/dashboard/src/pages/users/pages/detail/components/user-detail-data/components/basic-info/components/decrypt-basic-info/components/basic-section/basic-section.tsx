@@ -1,10 +1,10 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoFileText224 } from '@onefootprint/icons';
 import { UserDataAttribute } from '@onefootprint/types';
+import { Checkbox, LinkButton } from '@onefootprint/ui';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 import { User } from 'src/pages/users/hooks/use-join-users';
-import { Checkbox, LinkButton } from 'ui';
 
 import DataContainer from '../data-container';
 import useFormState from './hooks/use-form-state';

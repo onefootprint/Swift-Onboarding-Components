@@ -3,9 +3,9 @@ import {
   IcoLinkedin24,
   IcoTwitter24,
 } from '@onefootprint/icons';
+import { media } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
-import { media } from 'ui';
 
 type DesktopSharePostProps = {
   title: string;

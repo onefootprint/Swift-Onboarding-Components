@@ -1,7 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
+import { Box, LoadingIndicator, Typography } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
-import { Box, LoadingIndicator, Typography } from 'ui';
 
 const PhoneVerificationLoading = () => {
   const { t } = useTranslation('pages.phone-verification.form.loading');

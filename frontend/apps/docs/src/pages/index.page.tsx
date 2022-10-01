@@ -1,5 +1,5 @@
+import { Container, Typography } from '@onefootprint/ui';
 import React from 'react';
-import { Container, Typography } from 'ui';
 
 const Root = () => (
   <Container>

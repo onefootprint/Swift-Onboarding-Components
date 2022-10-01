@@ -1,5 +1,5 @@
+import { Box, Typography } from '@onefootprint/ui';
 import React from 'react';
-import { Box, Typography } from 'ui';
 
 export type FieldProps = {
   label: string;

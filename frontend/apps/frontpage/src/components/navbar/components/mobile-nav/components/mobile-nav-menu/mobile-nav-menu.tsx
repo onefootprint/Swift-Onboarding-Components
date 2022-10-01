@@ -1,8 +1,8 @@
 import { useAutoAnimate } from '@formkit/auto-animate/react';
 import { IcoChevronDown16 } from '@onefootprint/icons';
+import { Box, createFontStyles } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
-import { Box, createFontStyles } from 'ui';
 
 import { NavMenu } from '../../../../types';
 import MobileNavMenuItem from '../mobile-nav-menu-item';

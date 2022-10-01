@@ -1,8 +1,8 @@
 import { useTranslation } from '@onefootprint/hooks';
+import { Button, media, TextInput, Typography } from '@onefootprint/ui';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import styled, { css } from 'styled-components';
-import { Button, media, TextInput, Typography } from 'ui';
 
 import useSubscribeUser from './hooks/use-subscribe-user';
 

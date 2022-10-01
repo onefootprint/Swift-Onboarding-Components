@@ -1,8 +1,8 @@
 import { IcoFootprint24, IcoUser24 } from '@onefootprint/icons';
+import { Container, IconButton, Typography } from '@onefootprint/ui';
 import React from 'react';
 import useSessionUser from 'src/hooks/use-session-user';
 import styled, { css } from 'styled-components';
-import { Container, IconButton, Typography } from 'ui';
 
 const Header = () => {
   const { logOut } = useSessionUser();

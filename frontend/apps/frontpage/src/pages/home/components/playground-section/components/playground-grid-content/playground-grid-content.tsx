@@ -1,8 +1,8 @@
 import { IcoShield24 } from '@onefootprint/icons';
+import { media, Typography } from '@onefootprint/ui';
 import React from 'react';
 import CircleIcon from 'src/components/circle-icon';
 import styled from 'styled-components';
-import { media, Typography } from 'ui';
 
 type PlaygroundGridContentProps = {
   title: string;

@@ -1,8 +1,8 @@
 import { IcoQuote40 } from '@onefootprint/icons';
+import { Container, Typography } from '@onefootprint/ui';
 import Image from 'next/image';
 import React from 'react';
 import styled from 'styled-components';
-import { Container, Typography } from 'ui';
 
 type TestimonialAuthor = {
   name: string;

@@ -1,9 +1,9 @@
 import { useInputMask, useTranslation } from '@onefootprint/hooks';
 import { UserDataAttribute } from '@onefootprint/types';
+import { Button, Grid, TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import styled, { css } from 'styled-components';
-import { Button, Grid, TextInput } from 'ui';
 
 import HeaderTitle from '../../../../../../components/header-title';
 import { useCollectKycDataMachine } from '../../../../components/machine-provider';

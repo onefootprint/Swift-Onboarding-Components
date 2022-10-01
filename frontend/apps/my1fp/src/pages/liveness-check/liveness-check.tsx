@@ -1,9 +1,9 @@
 import { IcoClose24 } from '@onefootprint/icons';
+import { IconButton } from '@onefootprint/ui';
 import FocusTrap from 'focus-trap-react';
 import { FootprintFooter } from 'footprint-elements';
 import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
-import { IconButton } from 'ui';
 import { useEventListener, useLockedBody } from 'usehooks-ts';
 
 import LivenessCheckMachineProvider from './components/machine-provider';

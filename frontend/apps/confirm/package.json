@@ -30,7 +30,7 @@
     "@onefootprint/request": "*",
     "styled-components": "^5.3.5",
     "@onefootprint/themes": "*",
-    "ui": "*",
+    "@onefootprint/ui": "*",
     "@onefootprint/types": "*"
   },
   "devDependencies": {

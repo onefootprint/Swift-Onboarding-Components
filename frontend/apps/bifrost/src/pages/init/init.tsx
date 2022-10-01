@@ -1,9 +1,9 @@
 import { DeviceInfo, useDeviceInfo } from '@onefootprint/hooks';
+import { Box, Portal, Shimmer } from '@onefootprint/ui';
 import React from 'react';
 import useBifrostMachine from 'src/hooks/use-bifrost-machine';
 import { Events } from 'src/utils/state-machine/bifrost';
 import styled, { css } from 'styled-components';
-import { Box, Portal, Shimmer } from 'ui';
 
 import useAuthenticationFlow from './hooks/use-authentication-flow';
 import useTenantInfo from './hooks/use-tenant-info';

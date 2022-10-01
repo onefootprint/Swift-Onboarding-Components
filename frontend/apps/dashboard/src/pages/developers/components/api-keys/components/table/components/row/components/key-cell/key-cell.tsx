@@ -1,6 +1,6 @@
+import { CodeInline, Shimmer } from '@onefootprint/ui';
 import React from 'react';
 import EncryptedCell from 'src/components/encrypted-cell';
-import { CodeInline, Shimmer } from 'ui';
 
 type KeyCellProps = {
   isLoading: boolean;

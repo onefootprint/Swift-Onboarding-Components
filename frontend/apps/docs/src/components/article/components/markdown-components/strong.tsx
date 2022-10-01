@@ -1,5 +1,5 @@
+import { createFontStyles } from '@onefootprint/ui';
 import styled from 'styled-components';
-import { createFontStyles } from 'ui';
 
 const Strong = styled.span<{ children: string }>`
   ${createFontStyles('label-2')};

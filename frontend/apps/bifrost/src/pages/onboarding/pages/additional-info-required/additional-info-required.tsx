@@ -1,9 +1,9 @@
 import { useTranslation } from '@onefootprint/hooks';
+import { Button } from '@onefootprint/ui';
 import { HeaderTitle, NavigationHeader } from 'footprint-elements';
 import React from 'react';
 import { Events, MachineContext } from 'src/utils/state-machine/onboarding';
 import styled, { css } from 'styled-components';
-import { Button } from 'ui';
 
 import useOnboardingMachine from '../../hooks/use-onboarding-machine';
 

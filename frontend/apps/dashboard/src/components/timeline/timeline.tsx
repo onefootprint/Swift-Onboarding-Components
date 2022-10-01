@@ -1,6 +1,6 @@
+import { LoadingIndicator, Typography } from '@onefootprint/ui';
 import React, { Fragment } from 'react';
 import styled, { css } from 'styled-components';
-import { LoadingIndicator, Typography } from 'ui';
 
 export type TimelineItem = {
   timestamp: string;

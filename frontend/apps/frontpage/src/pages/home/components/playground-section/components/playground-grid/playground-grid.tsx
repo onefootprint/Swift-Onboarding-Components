@@ -1,7 +1,7 @@
+import { media, Typography } from '@onefootprint/ui';
 import times from 'lodash/times';
 import React from 'react';
 import styled, { css } from 'styled-components';
-import { media, Typography } from 'ui';
 
 import PlaygroundSquare from './components/playground-square';
 import { selectedSquares, settings } from './playground-grid.constants';

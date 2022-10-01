@@ -1,8 +1,8 @@
 import { useTranslation } from '@onefootprint/hooks';
+import { Box, Typography } from '@onefootprint/ui';
 import Image from 'next/image';
 import React from 'react';
 import styled, { css } from 'styled-components';
-import { Box, Typography } from 'ui';
 
 export type PostInfoProps = {
   author: {

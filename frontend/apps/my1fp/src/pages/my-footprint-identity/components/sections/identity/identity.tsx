@@ -1,10 +1,10 @@
 import { useTranslation } from '@onefootprint/hooks';
+import { LinkButton } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import Field from 'src/components/field';
 import FieldGroup from 'src/components/field-group';
 import useSessionUser from 'src/hooks/use-session-user';
 import styled from 'styled-components';
-import { LinkButton } from 'ui';
 
 const getFullName = (firstName: string | null, lastName: string | null) =>
   firstName && lastName ? `${firstName} ${lastName}` : '';

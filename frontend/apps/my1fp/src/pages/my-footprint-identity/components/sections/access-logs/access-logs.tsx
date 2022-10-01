@@ -1,9 +1,9 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { AccessLog } from '@onefootprint/types';
+import { LinkButton, LoadingIndicator, Typography } from '@onefootprint/ui';
 import React from 'react';
 import useSessionUser from 'src/hooks/use-session-user';
 import styled from 'styled-components';
-import { LinkButton, LoadingIndicator, Typography } from 'ui';
 
 import AccessLogsTimeline from './components/access-logs-timeline';
 import useGetAccessLogs from './hooks/use-get-access-logs';

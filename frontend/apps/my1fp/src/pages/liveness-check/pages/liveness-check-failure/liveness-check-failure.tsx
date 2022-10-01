@@ -1,8 +1,8 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoForbid40 } from '@onefootprint/icons';
+import { Typography } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
-import { Typography } from 'ui';
 
 const LivenessCheckFailure = () => {
   const { t } = useTranslation('pages.liveness-check.liveness-check-failure');

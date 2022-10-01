@@ -1,5 +1,5 @@
+import { Box } from '@onefootprint/ui';
 import React from 'react';
-import { Box } from 'ui';
 
 const Dot = () => (
   <Box

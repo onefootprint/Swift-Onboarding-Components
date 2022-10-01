@@ -1,8 +1,8 @@
 import { useTranslation } from '@onefootprint/hooks';
+import { Button, Divider, Shimmer, Typography } from '@onefootprint/ui';
 import { QRCodeSVG } from 'qrcode.react';
 import React, { useEffect } from 'react';
 import styled, { css } from 'styled-components';
-import { Button, Divider, Shimmer, Typography } from 'ui';
 
 import HeaderTitle from '../../../../components/header-title';
 import NavigationHeader from '../../../../components/navigation-header';

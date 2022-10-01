@@ -1,6 +1,6 @@
+import { Box, Divider, Shimmer } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
-import { Box, Divider, Shimmer } from 'ui';
 
 const UserDetailsLoading = () => (
   <Box>

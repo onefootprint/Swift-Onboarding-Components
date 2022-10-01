@@ -1,8 +1,14 @@
 import { useTranslation } from '@onefootprint/hooks';
+import {
+  Dialog,
+  TextArea,
+  TextInput,
+  Typography,
+  useToast,
+} from '@onefootprint/ui';
 import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import styled, { css } from 'styled-components';
-import { Dialog, TextArea, TextInput, Typography, useToast } from 'ui';
 
 import useSupportForm from '../../../article/components/article-layout/components/product-navigation/hooks/submit-support-form/use-support-form';
 import {

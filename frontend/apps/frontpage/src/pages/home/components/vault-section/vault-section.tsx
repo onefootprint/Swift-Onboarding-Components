@@ -5,10 +5,10 @@ import {
   IcoLock24,
   IcoShield24,
 } from '@onefootprint/icons';
+import { Container, media, Typography } from '@onefootprint/ui';
 import Image from 'next/image';
 import React from 'react';
 import styled, { css } from 'styled-components';
-import { Container, media, Typography } from 'ui';
 
 import VaultArticle from './components/vault-article';
 

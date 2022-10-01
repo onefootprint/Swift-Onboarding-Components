@@ -1,9 +1,9 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { CollectedDataOption } from '@onefootprint/types';
+import { Checkbox } from '@onefootprint/ui';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import styled, { css } from 'styled-components';
-import { Checkbox } from 'ui';
 
 import type { DataKindForm } from '../../create-onboarding-config.types';
 import FormTitle from '../form-title';

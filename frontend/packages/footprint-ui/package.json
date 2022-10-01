@@ -33,7 +33,7 @@
     "react-hook-form": "^7.36.1",
     "react-i18next": "^11.18.6",
     "styled-media-query": "^2.1.2",
-    "ui": "*",
+    "@onefootprint/ui": "*",
     "use-places-autocomplete": "^4.0.0",
     "usehooks-ts": "2.6.0",
     "xstate": "^4.33.6"

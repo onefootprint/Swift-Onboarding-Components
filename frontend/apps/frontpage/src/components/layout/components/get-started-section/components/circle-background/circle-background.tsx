@@ -1,6 +1,6 @@
+import { media } from '@onefootprint/ui';
 import React from 'react';
 import styled from 'styled-components';
-import { media } from 'ui';
 
 const CircleBackground = () => (
   <Container>

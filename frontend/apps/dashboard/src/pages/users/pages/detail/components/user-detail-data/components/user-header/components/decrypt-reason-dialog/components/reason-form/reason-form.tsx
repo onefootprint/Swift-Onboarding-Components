@@ -1,7 +1,14 @@
 import { useTranslation } from '@onefootprint/hooks';
+import {
+  Box,
+  Divider,
+  Select,
+  SelectOption,
+  TextArea,
+  Typography,
+} from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import { Box, Divider, Select, SelectOption, TextArea, Typography } from 'ui';
 
 type FormData = {
   reason?: SelectOption;

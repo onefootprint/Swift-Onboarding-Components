@@ -1,6 +1,6 @@
 import { dataKindToDisplayName } from '@onefootprint/types';
+import { Tag } from '@onefootprint/ui';
 import React from 'react';
-import { Tag } from 'ui';
 
 type FieldTagListProps = {
   targets: string[];

@@ -1,7 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
+import { Banner } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
-import { Banner } from 'ui';
 
 import useSandboxMode from '../../hooks/use-sandbox-mode';
 

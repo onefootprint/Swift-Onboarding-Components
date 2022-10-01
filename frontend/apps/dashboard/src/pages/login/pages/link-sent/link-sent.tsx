@@ -1,9 +1,9 @@
 import { useTranslation } from '@onefootprint/hooks';
+import { Button, Typography } from '@onefootprint/ui';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import React from 'react';
 import styled, { css } from 'styled-components';
-import { Button, Typography } from 'ui';
 
 import LogoAndText from '../../components/logo-and-text';
 

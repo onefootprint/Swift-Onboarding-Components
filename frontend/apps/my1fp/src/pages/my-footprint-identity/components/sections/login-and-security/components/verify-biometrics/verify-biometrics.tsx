@@ -1,8 +1,8 @@
 import { useTranslation } from '@onefootprint/hooks';
+import { Box, LinkButton, LoadingIndicator } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import useSessionUser from 'src/hooks/use-session-user';
 import LivenessCheck from 'src/pages/liveness-check';
-import { Box, LinkButton, LoadingIndicator } from 'ui';
 
 import useGetLiveness from '../../hooks/use-get-liveness/use-get-liveness';
 

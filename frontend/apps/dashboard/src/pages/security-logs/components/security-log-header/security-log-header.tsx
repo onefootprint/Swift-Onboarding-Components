@@ -1,6 +1,6 @@
 import { AccessEvent } from '@onefootprint/types';
+import { Typography } from '@onefootprint/ui';
 import React from 'react';
-import { Typography } from 'ui';
 
 import FieldTagList from '../field-tag-list';
 

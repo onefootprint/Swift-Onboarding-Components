@@ -1,8 +1,8 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoDotsHorizontal24 } from '@onefootprint/icons';
 import type { ApiKey } from '@onefootprint/types';
+import { Badge, Box, Dropdown } from '@onefootprint/ui';
 import React from 'react';
-import { Badge, Box, Dropdown } from 'ui';
 
 import KeyCell from './components/key-cell';
 import useReveal from './hooks/use-reveal-key';

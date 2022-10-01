@@ -1,6 +1,6 @@
+import { Box, Button, createFontStyles, media } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
-import { Box, Button, createFontStyles, media } from 'ui';
 
 import { isNavLink, isNavMenu, NavEntry } from '../../types';
 import LogoLink from '../logo-link';

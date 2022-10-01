@@ -4,8 +4,8 @@ import {
   UserDataAttribute,
   UserDataAttributeKey,
 } from '@onefootprint/types';
+import { Box, Divider, useToast } from '@onefootprint/ui';
 import React from 'react';
-import { Box, Divider, useToast } from 'ui';
 import { useEffectOnce } from 'usehooks-ts';
 
 import { User } from '../../../../hooks/use-join-users';

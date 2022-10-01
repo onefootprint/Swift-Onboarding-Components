@@ -1,6 +1,5 @@
+import { InlineAlert, InlineAlertVariant } from '@onefootprint/ui';
 import React from 'react';
-import { InlineAlert } from 'ui';
-import { InlineAlertVariant } from 'ui/src/components/inline-alert/inline-alert.types';
 
 type DocsInlineAlertProps = {
   children: string;

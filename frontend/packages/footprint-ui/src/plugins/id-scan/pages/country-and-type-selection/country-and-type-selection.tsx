@@ -7,8 +7,6 @@ import {
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoCar24, IcoIdCard24, IcoPassport24 } from '@onefootprint/icons';
 import { CountryCode, IdScanDocType } from '@onefootprint/types';
-import React, { useState } from 'react';
-import styled, { css } from 'styled-components';
 import {
   Button,
   CountrySelect,
@@ -16,7 +14,9 @@ import {
   Divider,
   RadioSelect,
   RadioSelectOptionFields,
-} from 'ui';
+} from '@onefootprint/ui';
+import React, { useState } from 'react';
+import styled, { css } from 'styled-components';
 
 import HeaderTitle from '../../../../components/header-title';
 import { useIdScanMachine } from '../../components/machine-provider';

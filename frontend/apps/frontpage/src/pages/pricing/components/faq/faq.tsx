@@ -1,7 +1,7 @@
+import { media, Typography } from '@onefootprint/ui';
 import React from 'react';
 import FaqItem from 'src/components/faq-item';
 import styled, { css } from 'styled-components';
-import { media, Typography } from 'ui';
 
 type FaqProps = {
   title: string;

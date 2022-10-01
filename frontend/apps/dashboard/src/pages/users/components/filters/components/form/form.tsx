@@ -1,8 +1,8 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { DateRange, OnboardingStatus } from '@onefootprint/types';
+import { Checkbox, Radio } from '@onefootprint/ui';
 import React from 'react';
 import { useForm } from 'react-hook-form';
-import { Checkbox, Radio } from 'ui';
 
 import Fieldset from './components/fieldset';
 

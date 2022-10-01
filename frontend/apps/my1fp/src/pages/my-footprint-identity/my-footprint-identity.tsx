@@ -1,7 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
+import { Accordion, Container, Typography } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
-import { Accordion, Container, Typography } from 'ui';
 
 import Footer from './components/footer';
 import Header from './components/header';

@@ -4,12 +4,12 @@ import {
   IcoUsers16,
   LogoFpCompact,
 } from '@onefootprint/icons';
+import { Container, Tab, Tabs, Typography } from '@onefootprint/ui';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React from 'react';
 import useSessionUser from 'src/hooks/use-session-user';
 import styled, { css } from 'styled-components';
-import { Container, Tab, Tabs, Typography } from 'ui';
 
 import NavDropdown from './components/nav-dropdown';
 import SandboxBanner from './components/sandbox-banner';

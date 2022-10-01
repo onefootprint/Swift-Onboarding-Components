@@ -1,8 +1,8 @@
+import { Typography } from '@onefootprint/ui';
 import React from 'react';
 import FieldOrPlaceholder from 'src/pages/users/components/field-or-placeholder';
 import { UserData } from 'src/pages/users/hooks/use-user-data';
 import styled from 'styled-components';
-import { Typography } from 'ui';
 
 export type DataRowProps = {
   title: string;

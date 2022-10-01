@@ -1,6 +1,6 @@
 import { IcoClose24 } from '@onefootprint/icons';
+import { IconButton, useConfirmationDialog } from '@onefootprint/ui';
 import React from 'react';
-import { IconButton, useConfirmationDialog } from 'ui';
 
 import { useFootprintJs } from '../../../footprint-js-provider';
 

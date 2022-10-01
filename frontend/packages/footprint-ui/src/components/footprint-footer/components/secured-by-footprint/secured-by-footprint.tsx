@@ -1,7 +1,7 @@
 import { IcoFootprint16 } from '@onefootprint/icons';
+import { Typography } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
-import { Typography } from 'ui';
 
 const SecuredByFootprint = () => (
   <Container>

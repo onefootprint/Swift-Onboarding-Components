@@ -1,7 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
+import { Dialog, TextInput, useToast } from '@onefootprint/ui';
 import React from 'react';
 import { useForm } from 'react-hook-form';
-import { Dialog, TextInput, useToast } from 'ui';
 
 import useCreateApiKey from './hooks/use-create-api-key';
 

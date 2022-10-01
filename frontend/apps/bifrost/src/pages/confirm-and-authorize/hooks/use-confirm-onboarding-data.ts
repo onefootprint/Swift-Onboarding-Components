@@ -1,8 +1,8 @@
 import { useTranslation } from '@onefootprint/hooks';
+import { useToast } from '@onefootprint/ui';
 import { useBifrostMachine } from 'src/components/bifrost-machine-provider';
 import { Events } from 'src/hooks/use-bifrost-machine';
 import useOnboardingComplete from 'src/pages/confirm-and-authorize/hooks/use-onboarding-complete';
-import { useToast } from 'ui';
 
 import useSyncData from '../../../hooks/use-sync-data';
 

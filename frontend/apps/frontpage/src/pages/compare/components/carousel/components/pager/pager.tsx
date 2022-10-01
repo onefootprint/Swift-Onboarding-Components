@@ -1,7 +1,7 @@
+import { media } from '@onefootprint/ui';
 import times from 'lodash/times';
 import React from 'react';
 import styled, { css } from 'styled-components';
-import { media } from 'ui';
 
 export type PagerProps = {
   max: number;

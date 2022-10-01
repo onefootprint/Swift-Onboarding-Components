@@ -1,6 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
+import { Box, Shimmer, Typography } from '@onefootprint/ui';
 import React from 'react';
-import { Box, Shimmer, Typography } from 'ui';
 
 import Table from '../table';
 

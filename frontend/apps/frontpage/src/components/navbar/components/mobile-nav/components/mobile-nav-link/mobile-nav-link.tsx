@@ -1,7 +1,7 @@
+import { createFontStyles } from '@onefootprint/ui';
 import Link from 'next/link';
 import React from 'react';
 import styled, { css } from 'styled-components';
-import { createFontStyles } from 'ui';
 
 import { NavLink } from '../../../../types';
 

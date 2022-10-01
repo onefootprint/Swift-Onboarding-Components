@@ -1,6 +1,6 @@
+import { Typography } from '@onefootprint/ui';
 import React from 'react';
 import styled from 'styled-components';
-import { Typography } from 'ui';
 
 export type HeaderTitleProps = {
   title: string;

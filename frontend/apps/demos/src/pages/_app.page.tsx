@@ -1,9 +1,9 @@
 import themes from '@onefootprint/themes';
+import { DesignSystemProvider } from '@onefootprint/ui';
 import { QueryClientProvider } from '@tanstack/react-query';
 import Head from 'next/head';
 import React from 'react';
 import { createGlobalStyle } from 'styled-components';
-import { DesignSystemProvider } from 'ui';
 
 import configureReactI18next from '../config/initializers/react-i18next';
 import queryClient from '../config/initializers/react-query';

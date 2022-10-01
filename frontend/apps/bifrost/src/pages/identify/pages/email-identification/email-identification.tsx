@@ -7,11 +7,11 @@ import {
   UserData,
   UserDataAttribute,
 } from '@onefootprint/types';
+import { Typography } from '@onefootprint/ui';
 import Link from 'next/link';
 import React, { useState } from 'react';
 import useIdentify from 'src/pages/identify/hooks/use-identify';
 import { Events } from 'src/utils/state-machine/identify/types';
-import { Typography } from 'ui';
 
 import generateLoginDeviceResponse from '../../../../utils/biometric/login-challenge-response';
 import useIdentifyMachine from '../../hooks/use-identify-machine';

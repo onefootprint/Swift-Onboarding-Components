@@ -1,7 +1,7 @@
+import { Button, Container, media, Typography } from '@onefootprint/ui';
 import Image from 'next/image';
 import React from 'react';
 import styled, { css } from 'styled-components';
-import { Button, Container, media, Typography } from 'ui';
 
 import CircleBackground from './components/circle-background';
 

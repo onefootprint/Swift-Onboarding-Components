@@ -1,7 +1,7 @@
+import { Button, Typography } from '@onefootprint/ui';
 import { createPopup } from '@typeform/embed';
 import React from 'react';
 import styled from 'styled-components';
-import { Button, Typography } from 'ui';
 
 const { toggle: toggleTypeform } = createPopup('COZNk70C');
 

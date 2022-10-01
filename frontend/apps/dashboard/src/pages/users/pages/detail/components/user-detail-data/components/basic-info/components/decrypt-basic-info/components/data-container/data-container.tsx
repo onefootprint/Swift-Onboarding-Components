@@ -1,7 +1,13 @@
 import { Icon } from '@onefootprint/icons';
+import {
+  Box,
+  SXStyleProps,
+  SXStyles,
+  Typography,
+  useSX,
+} from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
-import { Box, SXStyleProps, SXStyles, Typography, useSX } from 'ui';
 
 type DataContainerProps = {
   iconComponent: Icon;

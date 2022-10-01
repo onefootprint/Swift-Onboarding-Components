@@ -1,8 +1,8 @@
+import { Box, media, Typography } from '@onefootprint/ui';
 import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react';
 import styled, { css } from 'styled-components';
-import { Box, media, Typography } from 'ui';
 
 export type LibraryPostPreviewProps = {
   author: { avatarImgUrl: string; name: string };

@@ -1,8 +1,8 @@
 import { IcoMinusSmall24, IcoPlusSmall24 } from '@onefootprint/icons';
+import { createFontStyles, Typography } from '@onefootprint/ui';
 import { darken } from 'polished';
 import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
-import { createFontStyles, Typography } from 'ui';
 
 type FaqItemProps = {
   title: string;

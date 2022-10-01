@@ -1,10 +1,10 @@
 import { useTranslation } from '@onefootprint/hooks';
+import { Button, GoogleButton, LinkButton, Typography } from '@onefootprint/ui';
 import Head from 'next/head';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React from 'react';
 import styled, { css } from 'styled-components';
-import { Button, GoogleButton, LinkButton, Typography } from 'ui';
 
 import LogoAndText from '../../components/logo-and-text';
 

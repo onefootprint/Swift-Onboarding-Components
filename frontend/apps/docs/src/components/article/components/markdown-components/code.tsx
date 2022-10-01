@@ -1,5 +1,5 @@
+import { CodeBlock, CodeInline } from '@onefootprint/ui';
 import React from 'react';
-import { CodeBlock, CodeInline } from 'ui';
 
 type CodeProps = {
   inline?: boolean;

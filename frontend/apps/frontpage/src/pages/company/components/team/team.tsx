@@ -3,11 +3,11 @@ import {
   IcoLinkedin24,
   IcoTwitter24,
 } from '@onefootprint/icons';
+import { LinkButton, media, Typography } from '@onefootprint/ui';
 import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react';
 import styled, { css } from 'styled-components';
-import { LinkButton, media, Typography } from 'ui';
 
 type TeamProps = {
   title: string;

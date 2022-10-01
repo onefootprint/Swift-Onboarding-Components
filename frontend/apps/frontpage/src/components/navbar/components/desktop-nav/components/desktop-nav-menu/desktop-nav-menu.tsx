@@ -1,7 +1,7 @@
 import { IcoChevronDown16 } from '@onefootprint/icons';
+import { Typography } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
-import { Typography } from 'ui';
 
 import { NavMenu } from '../../../../types';
 import DesktopNavMenuItem from '../desktop-nav-menu-item';

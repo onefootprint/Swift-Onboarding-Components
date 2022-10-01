@@ -1,7 +1,13 @@
 import { useTranslation } from '@onefootprint/hooks';
+import {
+  Box,
+  LinkButton,
+  LoadingIndicator,
+  Typography,
+  useToast,
+} from '@onefootprint/ui';
 import React from 'react';
 import useSessionUser from 'src/hooks/use-session-user';
-import { Box, LinkButton, LoadingIndicator, Typography, useToast } from 'ui';
 
 import { UserIdentification } from '../../../../../../../hooks/use-session-user/use-session-user';
 import useVerificationEmail from './hooks/use-verification-email';

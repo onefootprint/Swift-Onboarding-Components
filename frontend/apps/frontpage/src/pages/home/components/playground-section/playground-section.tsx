@@ -1,7 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
+import { Container, media } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
-import { Container, media } from 'ui';
 
 import PlaygroundGrid from './components/playground-grid';
 import PlaygroundGrigContent from './components/playground-grid-content';

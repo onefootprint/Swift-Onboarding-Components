@@ -1,10 +1,10 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoChevronLeftBig24 } from '@onefootprint/icons';
+import { Button, media, Tooltip } from '@onefootprint/ui';
 import Image from 'next/image';
 import React from 'react';
 import { useSwipeable } from 'react-swipeable';
 import styled, { css } from 'styled-components';
-import { Button, media, Tooltip } from 'ui';
 
 import Pager from './components/pager';
 import useCarouselIndex from './hooks/use-carousel-index';

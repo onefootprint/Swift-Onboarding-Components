@@ -1,7 +1,7 @@
 import { IcoCheckCircle24 } from '@onefootprint/icons';
+import { Button, Typography } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
-import { Button, Typography } from 'ui';
 
 type Feature =
   | 'accessControl'

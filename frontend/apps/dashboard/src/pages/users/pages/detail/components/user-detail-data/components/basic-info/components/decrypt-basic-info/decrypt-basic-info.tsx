@@ -1,11 +1,11 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { UserDataAttribute } from '@onefootprint/types';
+import { useToast } from '@onefootprint/ui';
 import pickBy from 'lodash/pickBy';
 import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { User } from 'src/pages/users/hooks/use-join-users';
 import styled, { css } from 'styled-components';
-import { useToast } from 'ui';
 
 import { Event } from '../../../../../../utils/decrypt-state-machine';
 import { useDecryptMachine } from '../../../../../decrypt-machine-provider';

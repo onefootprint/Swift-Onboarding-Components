@@ -1,10 +1,10 @@
 import themes from '@onefootprint/themes';
+import { DesignSystemProvider } from '@onefootprint/ui';
 import Head from 'next/head';
 import React, { useEffect, useState } from 'react';
 import { I18nextProvider } from 'react-i18next';
 import My1FPQueryClientProvider from 'src/components/my1fp-query-client-provider';
 import { createGlobalStyle } from 'styled-components';
-import { DesignSystemProvider } from 'ui';
 
 import PageGuard from '../components/page-guard';
 import configureReactI18next from '../config/initializers/react-i18next';

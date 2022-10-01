@@ -1,7 +1,7 @@
 import { IcoClose24, IcoMenu24 } from '@onefootprint/icons';
+import { Button, media, useMediaQuery } from '@onefootprint/ui';
 import React, { useCallback, useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
-import { Button, media, useMediaQuery } from 'ui';
 import { useLockedBody } from 'usehooks-ts';
 
 import { isNavLink, isNavMenu, NavEntry } from '../../types';

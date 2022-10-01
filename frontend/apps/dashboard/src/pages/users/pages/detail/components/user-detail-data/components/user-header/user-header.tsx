@@ -1,3 +1,4 @@
+import { Badge, CodeInline, Typography } from '@onefootprint/ui';
 import React from 'react';
 import {
   statusToBadgeVariant,
@@ -5,7 +6,6 @@ import {
 } from 'src/constants/onboarding-status-display';
 import { User } from 'src/pages/users/hooks/use-join-users';
 import styled, { css } from 'styled-components';
-import { Badge, CodeInline, Typography } from 'ui';
 
 import DecryptControls from './components/decrypt-controls';
 

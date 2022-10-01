@@ -1,9 +1,9 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoCheckCircle40, IcoClose40 } from '@onefootprint/icons';
 import { GetDocStatusResponse, IdScanBadImageError } from '@onefootprint/types';
+import { LoadingIndicator, Typography } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
-import { LoadingIndicator, Typography } from 'ui';
 import { useEffectOnce } from 'usehooks-ts';
 
 import HeaderTitle from '../../../../components/header-title';

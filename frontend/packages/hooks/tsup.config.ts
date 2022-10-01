@@ -6,7 +6,7 @@ export default defineConfig({
     'react',
     'react-dom',
     'react-i18next',
-    'ui',
+    '@onefootprint/ui',
     '@onefootprint/request',
   ],
 });

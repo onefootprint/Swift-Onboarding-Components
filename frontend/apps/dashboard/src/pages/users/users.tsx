@@ -1,12 +1,4 @@
 import { useTranslation } from '@onefootprint/hooks';
-import Head from 'next/head';
-import { useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react';
-import {
-  statusToBadgeVariant,
-  statusToDisplayText,
-} from 'src/constants/onboarding-status-display';
-import styled from 'styled-components';
 import {
   Badge,
   Box,
@@ -18,7 +10,15 @@ import {
   Table,
   TableRow,
   Typography,
-} from 'ui';
+} from '@onefootprint/ui';
+import Head from 'next/head';
+import { useRouter } from 'next/router';
+import React, { useEffect, useState } from 'react';
+import {
+  statusToBadgeVariant,
+  statusToDisplayText,
+} from 'src/constants/onboarding-status-display';
+import styled from 'styled-components';
 
 import FieldOrPlaceholder from './components/field-or-placeholder';
 import Filters from './components/filters';

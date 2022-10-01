@@ -1,12 +1,12 @@
 import { useAutoAnimate } from '@formkit/auto-animate/react';
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoClose24, IcoMenu24, LogoFpdocsDefault } from '@onefootprint/icons';
+import { Box, LinkButton, media, Tab, Tabs } from '@onefootprint/ui';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useState } from 'react';
 import type { ProductArticle } from 'src/types/product';
 import styled, { css } from 'styled-components';
-import { Box, LinkButton, media, Tab, Tabs } from 'ui';
 import { useLockedBody } from 'usehooks-ts';
 
 import type { NavItem } from '../../app-header.types';

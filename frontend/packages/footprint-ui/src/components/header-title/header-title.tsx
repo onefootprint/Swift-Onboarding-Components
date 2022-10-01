@@ -1,5 +1,5 @@
+import { Box, SXStyleProps, Typography } from '@onefootprint/ui';
 import React from 'react';
-import { Box, SXStyleProps, Typography } from 'ui';
 
 export type HeaderTitleProps = {
   title: string;
