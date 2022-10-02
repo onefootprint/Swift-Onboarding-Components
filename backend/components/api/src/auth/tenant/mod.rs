@@ -1,5 +1,5 @@
 mod ob_public_key;
-use db::models::tenant::Tenant;
+use db::models::{tenant::Tenant, tenant_user::TenantUser};
 pub use ob_public_key::*;
 mod secret_key;
 pub use secret_key::*;
@@ -16,6 +16,7 @@ pub trait TenantAuth {
     fn tenant(&self) -> &Tenant;
     fn format_principal(&self) -> String;
     fn is_live(&self) -> Result<bool, ApiError>;
+    fn tenant_user(&self) -> Option<&TenantUser>;
 }
 
 pub trait CheckTenantPermissions {

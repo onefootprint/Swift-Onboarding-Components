@@ -6,8 +6,8 @@ use crate::{errors::ApiError, State};
 use actix_web::http::header::Header;
 use actix_web::{web, FromRequest};
 use actix_web_httpauth::headers::authorization::{Authorization, Basic};
-use db::models::tenant::Tenant;
 use db::models::tenant_api_key::TenantApiKey;
+use db::models::{tenant::Tenant, tenant_user::TenantUser};
 use futures_util::Future;
 
 use newtypes::secret_api_key::SecretApiKey;
@@ -93,6 +93,10 @@ impl TenantAuth for SecretTenantAuthContext {
         }
 
         Ok(self.api_key.is_live)
+    }
+
+    fn tenant_user(&self) -> Option<&TenantUser> {
+        None
     }
 }
 

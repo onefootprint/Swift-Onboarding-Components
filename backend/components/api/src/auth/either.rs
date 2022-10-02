@@ -1,7 +1,7 @@
 use std::pin::Pin;
 
 use actix_web::FromRequest;
-use db::models::tenant::Tenant;
+use db::models::{tenant::Tenant, tenant_user::TenantUser};
 use futures_util::Future;
 use newtypes::DataAttribute;
 
@@ -118,6 +118,13 @@ where
         match self {
             Either::Left(l) => l.is_live(),
             Either::Right(r) => r.is_live(),
+        }
+    }
+
+    fn tenant_user(&self) -> Option<&TenantUser> {
+        match self {
+            Either::Left(l) => l.tenant_user(),
+            Either::Right(r) => r.tenant_user(),
         }
     }
 }

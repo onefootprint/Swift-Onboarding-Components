@@ -1,4 +1,4 @@
-use crate::auth::tenant::TenantAuth;
+use crate::auth::tenant::CheckTenantPermissions;
 use crate::auth::tenant::WorkOsAuthContext;
 use crate::errors::tenant::TenantError;
 use crate::errors::ApiError;
@@ -143,8 +143,10 @@ async fn deactivate(
     let tenant_id = tenant.id.clone();
     let user_id = user_id.into_inner();
 
-    if auth.data.tenant_user().id == user_id {
-        return Err(TenantError::CannotDeactivateCurrentUser.into());
+    if let Some(tenant_user) = auth.tenant_user() {
+        if tenant_user.id == user_id {
+            return Err(TenantError::CannotDeactivateCurrentUser.into());
+        }
     }
 
     let update = TenantUserUpdate {

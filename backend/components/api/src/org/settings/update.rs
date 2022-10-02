@@ -1,4 +1,4 @@
-use crate::auth::tenant::{TenantAuth, WorkOsAuthContext};
+use crate::auth::tenant::{CheckTenantPermissions, WorkOsAuthContext};
 use crate::errors::ApiError;
 use crate::types::response::ResponseData;
 use crate::types::EmptyResponse;

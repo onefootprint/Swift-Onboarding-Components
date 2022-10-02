@@ -23,12 +23,6 @@ pub struct WorkOs {
     data: WorkOsSession,
 }
 
-impl WorkOs {
-    pub fn tenant_user(&self) -> &TenantUser {
-        &self.tenant_user
-    }
-}
-
 /// Nests a private WorkOs and implements traits required to extract this session from an
 /// actix request.
 /// Notably, this struct isn't very useful since the entire nested WorkOs is hidden. If you
@@ -116,34 +110,17 @@ impl WorkOs {
 /// A shorthand for the commonly used ParsedWorkOs context
 pub type WorkOsAuthContext = SessionContext<ParsedWorkOs>;
 
-// These are the same methods as the CheckTenantPermission implementation below - but some methods
-// need to check auth without converting the WorkOsAuth to a trait object of dyn TenantAuth
-impl WorkOsAuthContext {
+impl CheckTenantPermissions for WorkOsAuthContext {
     /// Verifies that the auth token has one of the required scopes. If so, returns a WorkOs
     /// that is accessible
-    pub fn check_permissions(
-        self,
-        permissions: Vec<TenantPermission>,
-    ) -> Result<SessionContext<WorkOs>, AuthError> {
-        let result = self.map(|c| c.check_permissions(permissions))?;
-        Ok(result)
-    }
-
-    pub fn can_decrypt(self, attributes: Vec<DataAttribute>) -> Result<SessionContext<WorkOs>, AuthError> {
-        let result = self.map(|c| c.can_decrypt(attributes))?;
-        Ok(result)
-    }
-}
-
-impl CheckTenantPermissions for WorkOsAuthContext {
     fn check_permissions(self, permissions: Vec<TenantPermission>) -> Result<Box<dyn TenantAuth>, AuthError> {
-        self.check_permissions(permissions)
-            .map(|auth| Box::new(auth) as Box<dyn TenantAuth>)
+        let result = self.map(|c| c.check_permissions(permissions))?;
+        Ok(Box::new(result))
     }
 
     fn can_decrypt(self, attributes: Vec<DataAttribute>) -> Result<Box<dyn TenantAuth>, AuthError> {
-        self.can_decrypt(attributes)
-            .map(|auth| Box::new(auth) as Box<dyn TenantAuth>)
+        let result = self.map(|c| c.can_decrypt(attributes))?;
+        Ok(Box::new(result))
     }
 }
 
@@ -172,5 +149,9 @@ impl TenantAuth for SessionContext<WorkOs> {
 
     fn format_principal(&self) -> String {
         self.data.format_principal()
+    }
+
+    fn tenant_user(&self) -> Option<&TenantUser> {
+        Some(&self.data.tenant_user)
     }
 }

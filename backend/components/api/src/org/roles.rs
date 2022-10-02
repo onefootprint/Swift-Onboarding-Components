@@ -1,4 +1,4 @@
-use crate::auth::tenant::TenantAuth;
+use crate::auth::tenant::CheckTenantPermissions;
 use crate::auth::tenant::WorkOsAuthContext;
 use crate::errors::ApiError;
 use crate::types::tenant_role::FpTenantRole;
