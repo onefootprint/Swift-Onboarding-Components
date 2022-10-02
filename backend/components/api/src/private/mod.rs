@@ -1,10 +1,10 @@
 use paperclip::actix::web;
 
 pub mod cleanup;
-pub mod client;
+pub mod tenant;
 
 pub fn routes() -> web::Scope {
     web::scope("/private")
         .service(cleanup::post)
-        .service(client::post)
+        .service(tenant::post)
 }

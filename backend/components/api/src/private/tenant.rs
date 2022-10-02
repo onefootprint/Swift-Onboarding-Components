@@ -1,11 +1,17 @@
-use crate::errors::ApiError;
+use crate::auth::session::AuthSessionData;
+use crate::auth::tenant::WorkOsSession;
+use crate::errors::{ApiError, ApiResult};
 use crate::types::response::ResponseData;
 use crate::types::secret_api_key::FpTenantApiKey;
+use crate::utils::session::AuthSession;
 use crate::State;
 use crate::{auth::custodian::CustodianAuthContext, org::workos::login::create_tenant};
+use chrono::Duration;
 use db::models::tenant_api_key::TenantApiKey;
+use db::models::tenant_role::TenantRole;
+use db::models::tenant_user::TenantUser;
 use newtypes::secret_api_key::SecretApiKey;
-use newtypes::TenantId;
+use newtypes::{SessionAuthToken, TenantId};
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize, Apiv2Schema)]
@@ -19,19 +25,18 @@ struct NewClientRequest {
 
 #[derive(Debug, Clone, serde::Serialize, Apiv2Schema)]
 struct NewClientResponse {
-    /// unique identifier for this client
     org_id: TenantId,
-    /// api key for org-level api access
     key: FpTenantApiKey,
+    auth_token: SessionAuthToken,
 }
 
 #[api_v2_operation(
-    summary = "/private/client",
-    operation_id = "private-client",
-    description = "Creates a new client (this endpoint will be private in prod TODO).",
+    summary = "/private/tenant",
+    operation_id = "private-tenant",
+    description = "Creates a new tenant (this endpoint will be private in prod TODO).",
     tags(Private)
 )]
-#[post("/client")]
+#[post("/tenant")]
 async fn post(
     request: web::Json<NewClientRequest>,
     _custodian: CustodianAuthContext,
@@ -44,6 +49,28 @@ async fn post(
     } = request.into_inner();
 
     let tenant = create_tenant(&state, name, workos_org_id, false).await?;
+    let key = state.session_sealing_key.clone();
+    let tenant_id = tenant.id.clone();
+    let auth_token = state
+        .db_pool
+        .db_transaction(move |conn| -> ApiResult<_> {
+            let admin_role = TenantRole::get_or_create_admin_role(conn, tenant_id)?;
+            let (tenant_user, _) = TenantUser::create(
+                conn,
+                "integrationtests@onefootprint.com".to_owned().into(),
+                admin_role.tenant_id,
+                admin_role.id,
+            )?;
+            let session_data = AuthSessionData::WorkOs(WorkOsSession {
+                email: tenant_user.email.0,
+                first_name: Some("Footprint".to_owned()),
+                last_name: Some("Test".to_owned()),
+                tenant_user_id: tenant_user.id,
+            });
+            let auth_token = AuthSession::create_sync(conn, &key, session_data, Duration::minutes(15))?;
+            Ok(auth_token)
+        })
+        .await?;
 
     let secret_api_key = SecretApiKey::generate(is_live);
     let new_key = TenantApiKey::create(
@@ -60,6 +87,7 @@ async fn post(
         data: NewClientResponse {
             org_id: tenant.id,
             key: FpTenantApiKey::from((new_key, Some(secret_api_key))),
+            auth_token,
         },
     }))
 }

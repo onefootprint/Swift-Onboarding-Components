@@ -8,7 +8,7 @@ import time
 import os
 
 from .types import ObConfiguration, SecretApiKey, Tenant, BasicUser
-from .auth import FpAuth
+from .auth import DashboardAuth, FpAuth
 from .constants import CUSTODIAN_AUTH, EMAIL, PHONE_NUMBER
 
 url = lambda path: "{}/{}".format(os.environ.get("TEST_URL"), path)
@@ -169,8 +169,9 @@ def create_basic_user(twilio, suffix=None):
 
 
 def create_tenant(org_data, ob_conf_data):
-    body = post("private/client", org_data, CUSTODIAN_AUTH)
+    body = post("private/tenant", org_data, CUSTODIAN_AUTH)
     sk = SecretApiKey.from_response(body["key"])
+    auth_token = DashboardAuth(body["auth_token"])
     print("\n======org info======")
     print(body)
 
@@ -182,6 +183,7 @@ def create_tenant(org_data, ob_conf_data):
     return Tenant(
         ob_config=ob_config,
         sk=sk,
+        auth_token=auth_token,
     )
 
 

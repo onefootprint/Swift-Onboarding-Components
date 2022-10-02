@@ -1,5 +1,5 @@
 from typing import NamedTuple
-from tests.auth import PublishableOnboardingKey, TenantSecretAuth
+from tests.auth import PublishableOnboardingKey, TenantSecretAuth, DashboardAuth
 
 
 class SecretApiKey(NamedTuple):
@@ -39,6 +39,7 @@ class ObConfiguration(NamedTuple):
 class Tenant(NamedTuple):
     ob_config: ObConfiguration
     sk: SecretApiKey
+    auth_token: DashboardAuth
 
 
 class BasicUser(NamedTuple):

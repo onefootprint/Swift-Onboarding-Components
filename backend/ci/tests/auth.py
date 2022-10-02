@@ -8,10 +8,11 @@ class BaseAuth:
 
 class FpAuth(BaseAuth):
     HEADER_NAME = "x-fp-authorization"
-    
+
 
 class PublishableOnboardingKey(BaseAuth):
     HEADER_NAME = "X-Onboarding-Config-Key"
+
 
 class OnboardingSessionToken(BaseAuth):
     HEADER_NAME = "X-Onboarding-Session-Token"
@@ -22,4 +23,8 @@ class TenantSecretAuth(BaseAuth):
 
 
 class CustodianAuth(BaseAuth):
-    HEADER_NAME = "x-footprint-custodian-key" 
+    HEADER_NAME = "x-footprint-custodian-key"
+
+
+class DashboardAuth(BaseAuth):
+    HEADER_NAME = "x-fp-dashboard-authorization"
