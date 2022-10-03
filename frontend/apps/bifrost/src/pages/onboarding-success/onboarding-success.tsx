@@ -19,7 +19,7 @@ const OnboardingSuccess = () => {
   const [state] = useBifrostMachine();
 
   useEffect(() => {
-    const { validationToken } = state.context.onboarding;
+    const { validationToken } = state.context;
     if (!validationToken) {
       return () => {};
     }

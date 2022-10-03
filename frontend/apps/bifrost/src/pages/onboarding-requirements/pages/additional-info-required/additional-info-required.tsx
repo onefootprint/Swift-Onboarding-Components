@@ -2,15 +2,17 @@ import { useTranslation } from '@onefootprint/hooks';
 import { Button } from '@onefootprint/ui';
 import { HeaderTitle, NavigationHeader } from 'footprint-elements';
 import React from 'react';
-import { Events, MachineContext } from 'src/utils/state-machine/onboarding';
+import {
+  Events,
+  MachineContext,
+} from 'src/utils/state-machine/onboarding-requirements';
 import styled, { css } from 'styled-components';
 
-import useOnboardingMachine from '../../hooks/use-onboarding-machine';
+import useOnboardingRequirementsMachine from '../../hooks/use-onboarding-requirements-machine';
 
-// TODO: Move this to the new onboarding requirements page to check for the plugins required later.
 const AdditionalInfoRequired = () => {
   const { t } = useTranslation('pages.onboarding.additional-info-required');
-  const [state, send] = useOnboardingMachine();
+  const [state, send] = useOnboardingRequirementsMachine();
   const context = state.context as MachineContext;
   const handleClick = () => {
     send({

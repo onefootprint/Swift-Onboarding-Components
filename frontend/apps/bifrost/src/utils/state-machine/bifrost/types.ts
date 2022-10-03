@@ -1,17 +1,10 @@
 import { DeviceInfo } from '@onefootprint/hooks';
-import {
-  CollectedDataOption,
-  IdentifyType,
-  TenantInfo,
-  UserData,
-} from '@onefootprint/types';
-import { OnboardingData } from 'src/utils/state-machine/types';
+import { IdentifyType, TenantInfo } from '@onefootprint/types';
 
 export enum States {
   init = 'Init',
   identify = 'identify',
   tenantInvalid = 'tenantInvalid',
-  confirmAndAuthorize = 'confirmAndAuthorize',
   authenticationSuccess = 'authenticationSuccess',
   onboarding = 'onboarding',
   onboardingSuccess = 'onboardingSuccess',
@@ -21,7 +14,6 @@ export enum States {
 export enum Events {
   tenantInfoRequestSucceeded = 'tenantInfoRequestSucceeded',
   tenantInfoRequestFailed = 'tenantInfoRequestFailed',
-  sharedDataConfirmed = 'sharedDataConfirmed',
   authenticationFlowStarted = 'authenticationFlowStarted',
   authenticationSucceeded = 'authenticationSucceeded',
   deviceInfoIdentified = 'deviceInfoIdentified',
@@ -30,7 +22,6 @@ export enum Events {
 }
 
 export enum Actions {
-  // Identify & Challenge
   assignIdentifyType = 'assignIdentifyType',
   assignEmail = 'assignEmail',
   assignPhone = 'assignPhone',
@@ -38,12 +29,7 @@ export enum Actions {
   assignAuthToken = 'assignAuthToken',
   assignDeviceInfo = 'assignDeviceInfo',
   assignTenantInfo = 'assignTenantInfo',
-
-  // Onboarding
-  assignOnboardingData = 'assignOnboardingData',
   assignValidationToken = 'assignValidationToken',
-  assignMissingAttributes = 'assignMissingAttributes',
-  assignMissingWebauthnCredentials = 'assignMissingWebauthnCredentials',
 }
 
 export type BifrostContext = {
@@ -51,10 +37,10 @@ export type BifrostContext = {
   device: DeviceInfo;
   email: string;
   identifyType: IdentifyType;
-  onboarding: OnboardingData;
   phone?: string;
   tenant: TenantInfo;
   userFound: boolean;
+  validationToken?: string;
 };
 
 export type BifrostEvent =
@@ -78,19 +64,10 @@ export type BifrostEvent =
   | {
       type: Events.onboardingCompleted;
       data: {
-        onboardingData: UserData;
-        missingWebauthnCredentials: boolean;
-        missingAttributes: readonly CollectedDataOption[];
         validationToken?: string;
       };
     }
   | {
       type: Events.deviceInfoIdentified;
       payload: DeviceInfo;
-    }
-  | {
-      type: Events.sharedDataConfirmed;
-      payload: {
-        validationToken: string;
-      };
     };

@@ -1,9 +1,5 @@
 import request, { RequestError } from '@onefootprint/request';
-import {
-  CollectedDataOptionLabels,
-  OnboardingRequest,
-  OnboardingResponse,
-} from '@onefootprint/types';
+import { OnboardingRequest, OnboardingResponse } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
 import {
   BIFROST_AUTH_HEADER,
@@ -19,13 +15,7 @@ const onboardingRequest = async (payload: OnboardingRequest) => {
       [CLIENT_PUBLIC_KEY_HEADER]: payload.tenantPk,
     },
   });
-  const { data } = response;
-  return {
-    ...data,
-    missingAttributes: data.missingAttributes.map(
-      (attr: string) => CollectedDataOptionLabels[attr],
-    ),
-  };
+  return response.data;
 };
 
 const useOnboarding = () =>

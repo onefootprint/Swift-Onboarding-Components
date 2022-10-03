@@ -8,14 +8,14 @@ import {
   IcoUserCircle24,
 } from '@onefootprint/icons';
 import { CollectedDataOption } from '@onefootprint/types';
-import { FootprintButton, Typography } from '@onefootprint/ui';
+import { FootprintButton, Typography, useToast } from '@onefootprint/ui';
 import { useIsMutating } from '@tanstack/react-query';
 import { HeaderTitle, NavigationHeader } from 'footprint-elements';
 import React from 'react';
-import { useBifrostMachine } from 'src/components/bifrost-machine-provider';
+import useOnboardingMachine from 'src/hooks/use-onboarding-machine';
+import useOnboardingAuthorize from 'src/pages/onboarding/pages/authorize/hooks/use-onboarding-authorize';
+import { Events } from 'src/utils/state-machine/onboarding/types';
 import styled, { css } from 'styled-components';
-
-import useConfirmOnboardingData from './hooks/use-confirm-onboarding-data';
 
 const IconByCollectedDataOption: Record<CollectedDataOption, JSX.Element> = {
   [CollectedDataOption.name]: <IcoUserCircle24 />,
@@ -39,15 +39,38 @@ export const collectedDataOptionLabels: Record<CollectedDataOption, string> = {
   [CollectedDataOption.partialAddress]: 'Country & Zip Code',
 };
 
-const ConfirmAndAuthorize = () => {
-  const confirmOnboardingData = useConfirmOnboardingData();
+const Authorize = () => {
+  const onboardingAuthorizeMutation = useOnboardingAuthorize();
+  const toast = useToast();
+  const { t } = useTranslation('pages.authorize');
   const isMutating = useIsMutating();
-  const { t } = useTranslation('pages.confirm-and-authorize');
-  const [state] = useBifrostMachine();
+  const [state, send] = useOnboardingMachine();
+  const {
+    authToken,
+    tenant: { pk: tenantPk },
+  } = state.context;
 
   const handleClick = () => {
-    const handleConfirmOnboardingCompleted = () => {};
-    confirmOnboardingData({ onComplete: handleConfirmOnboardingCompleted });
+    onboardingAuthorizeMutation.mutate(
+      { authToken, tenantPk },
+      {
+        onSuccess: ({ validationToken }) => {
+          send({
+            type: Events.authorized,
+            payload: {
+              validationToken,
+            },
+          });
+        },
+        onError() {
+          toast.show({
+            title: t('onboarding-complete-error.title'),
+            description: t('onboarding-complete-error.description'),
+            variant: 'error',
+          });
+        },
+      },
+    );
   };
 
   const { canAccessData } = state.context.tenant;
@@ -119,4 +142,4 @@ const CategoriesContainer = styled.div`
   `}
 `;
 
-export default ConfirmAndAuthorize;
+export default Authorize;

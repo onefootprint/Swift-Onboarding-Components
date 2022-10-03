@@ -23,11 +23,6 @@ const initialContext: BifrostContext = {
     orgName: '',
     pk: '',
   },
-  onboarding: {
-    missingAttributes: [],
-    missingWebauthnCredentials: true,
-    data: {},
-  },
 };
 
 const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
@@ -97,52 +92,8 @@ const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
               tenant: context.tenant,
             }),
           onDone: [
-            // TODO: uncomment when we start using multiple config keys in demos
-            // https://linear.app/footprint/issue/FP-991/start-using-multiple-config-keys-one-per-demo-tenant-in-demos
-            // {
-            //   target: States.verificationSuccess,
-            //   actions: [
-            //     Actions.assignOnboardingData,
-            //     Actions.assignValidationToken,
-            //     Actions.assignMissingWebauthnCredentials,
-            //     Actions.assignMissingAttributes,
-            //   ],
-            //   description:
-            //     'If validation token exists, it means the user has already filled this onboarding config for the tenant, so we can take a shortcut here',
-            //   cond: (context, event) => !!event.data.validationToken,
-            // },
-            {
-              target: States.confirmAndAuthorize,
-              actions: [
-                Actions.assignOnboardingData,
-                Actions.assignValidationToken,
-                Actions.assignMissingWebauthnCredentials,
-                Actions.assignMissingAttributes,
-              ],
-            },
-          ],
-        },
-      },
-      [States.confirmAndAuthorize]: {
-        on: {
-          [Events.sharedDataConfirmed]: [
-            // TODO: uncomment when we start using multiple config keys in demos
-            // Replace this with the onboardingSuccess one below
-            // https://linear.app/footprint/issue/FP-991/start-using-multiple-config-keys-one-per-demo-tenant-in-demos
-            // {
-            //   target: States.onboardingSuccess,
-            //   actions: [Actions.assignValidationToken],
-            //   cond: (context, event) => !event.payload.validationToken,
-            // },
             {
               target: States.onboardingSuccess,
-              cond: context =>
-                !context.userFound ||
-                context.onboarding.missingAttributes.length > 0,
-              actions: [Actions.assignValidationToken],
-            },
-            {
-              target: States.verificationSuccess,
               actions: [Actions.assignValidationToken],
             },
           ],
@@ -157,6 +108,7 @@ const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
       [States.onboardingSuccess]: {
         type: 'final',
       },
+      // TODO: when do we go to verification success
       [States.verificationSuccess]: {
         type: 'final',
       },
@@ -173,7 +125,6 @@ const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
       [Actions.assignEmail]: assign((context, event) => {
         if (event.type === Events.identifyCompleted && event.data.email) {
           context.email = event.data.email;
-          context.onboarding.data.email = event.data.email;
         }
         return context;
       }),
@@ -218,32 +169,8 @@ const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
         return context;
       }),
       [Actions.assignValidationToken]: assign((context, event) => {
-        if (event.type === Events.sharedDataConfirmed) {
-          context.onboarding.validationToken = event.payload.validationToken;
-        }
         if (event.type === Events.onboardingCompleted) {
-          context.onboarding.validationToken = event.data.validationToken;
-        }
-        return context;
-      }),
-      [Actions.assignOnboardingData]: assign((context, event) => {
-        if (event.type === Events.onboardingCompleted) {
-          context.onboarding.data = { ...event.data.onboardingData };
-        }
-        return context;
-      }),
-      [Actions.assignMissingWebauthnCredentials]: assign((context, event) => {
-        if (event.type === Events.onboardingCompleted) {
-          context.onboarding.missingWebauthnCredentials =
-            event.data.missingWebauthnCredentials;
-        }
-        return context;
-      }),
-      [Actions.assignMissingAttributes]: assign((context, event) => {
-        if (event.type === Events.onboardingCompleted) {
-          context.onboarding.missingAttributes = [
-            ...event.data.missingAttributes,
-          ];
+          context.validationToken = event.data.validationToken;
         }
         return context;
       }),

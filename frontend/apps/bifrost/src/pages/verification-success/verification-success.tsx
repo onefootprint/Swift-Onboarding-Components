@@ -18,7 +18,7 @@ const VerificationSuccess = () => {
   const { running, width, height } = useConfettiState();
 
   useEffect(() => {
-    const { validationToken } = state.context.onboarding;
+    const { validationToken } = state.context;
     if (!validationToken) {
       return () => {};
     }

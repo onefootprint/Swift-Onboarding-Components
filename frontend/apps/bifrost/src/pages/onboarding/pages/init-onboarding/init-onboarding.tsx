@@ -6,10 +6,9 @@ import useOnboarding from 'src/hooks/use-onboarding';
 import { Events } from 'src/utils/state-machine/onboarding';
 import styled, { css } from 'styled-components';
 
-import useOnboardingMachine from '../../hooks/use-onboarding-machine';
+import useOnboardingMachine from '../../../../hooks/use-onboarding-machine';
 
-// TODO: Move this to the new onboarding requirements page to check for the plugins required later.
-const OnboardingVerification = () => {
+const InitOnboarding = () => {
   const { t } = useTranslation('pages.onboarding-verification');
   const [state, send] = useOnboardingMachine();
   const { context } = state;
@@ -24,18 +23,11 @@ const OnboardingVerification = () => {
     onboardingMutation.mutate(
       { authToken, tenantPk },
       {
-        onSuccess: ({
-          missingAttributes,
-          missingWebauthnCredentials,
-          validationToken,
-        }) => {
+        onSuccess: ({ validationToken }) => {
           send({
-            type: Events.onboardingVerificationCompleted,
+            type: Events.onboardingInitialized,
             payload: {
-              missingAttributes,
-              missingWebauthnCredentials,
               validationToken,
-              missingIdScan: false, // TODO: derive this from data returned by backend
             },
           });
         },
@@ -85,4 +77,4 @@ const Container = styled.div`
   `}
 `;
 
-export default OnboardingVerification;
+export default InitOnboarding;

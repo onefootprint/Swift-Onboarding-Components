@@ -1,7 +1,7 @@
 import request, { RequestError } from '@onefootprint/request';
 import {
-  OnboardingCompleteRequest,
-  OnboardingCompleteResponse,
+  OnboardingAuthorizeRequest,
+  OnboardingAuthorizeResponse,
 } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
 import {
@@ -9,12 +9,10 @@ import {
   CLIENT_PUBLIC_KEY_HEADER,
 } from 'src/config/constants';
 
-const onboardingCompleteRequest = async (
-  payload: OnboardingCompleteRequest,
-) => {
-  const response = await request<OnboardingCompleteResponse>({
+const onboardingAuthorize = async (payload: OnboardingAuthorizeRequest) => {
+  const response = await request<OnboardingAuthorizeResponse>({
     method: 'POST',
-    url: '/hosted/onboarding/complete',
+    url: '/hosted/onboarding/authorize',
     headers: {
       [BIFROST_AUTH_HEADER]: payload.authToken,
       [CLIENT_PUBLIC_KEY_HEADER]: payload.tenantPk,
@@ -23,11 +21,11 @@ const onboardingCompleteRequest = async (
   return response.data;
 };
 
-const useOnboardingComplete = () =>
+const useOnboardingAuthorize = () =>
   useMutation<
-    OnboardingCompleteResponse,
+    OnboardingAuthorizeResponse,
     RequestError,
-    OnboardingCompleteRequest
-  >(onboardingCompleteRequest);
+    OnboardingAuthorizeRequest
+  >(onboardingAuthorize);
 
-export default useOnboardingComplete;
+export default useOnboardingAuthorize;
