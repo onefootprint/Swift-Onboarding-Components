@@ -16,8 +16,8 @@ export type RequestError = AxiosError<{
 export type PaginatedRequestResponse<T> = {
   data: T;
   meta: {
-    next?: string;
-    count?: number;
+    next: string | null;
+    count: number;
   };
 };
 

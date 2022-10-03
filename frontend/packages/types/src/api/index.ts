@@ -3,6 +3,8 @@ export * from './d2p-generate';
 export * from './d2p-sms';
 export * from './decrypt-user';
 export * from './get-doc-status';
+export * from './get-risk-signal-details';
+export * from './get-risk-signals';
 export * from './identify';
 export * from './identify-challenge';
 export * from './identify-verify';

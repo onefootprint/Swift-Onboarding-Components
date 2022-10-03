@@ -32,7 +32,7 @@ const Insights = ({ user }: InsightsProps) => {
 
   return (
     <>
-      <Typography variant="label-1" sx={{ userSelect: 'none' }}>
+      <Typography variant="label-1" as="h2">
         Device insights
       </Typography>
       <Box

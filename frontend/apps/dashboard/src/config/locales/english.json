@@ -197,6 +197,40 @@
           },
           "disclaimer": "Please note that all data attribute access are logged for security reasons."
         }
+      },
+      "risk-signals": {
+        "title": "Risk signals",
+        "empty-state": "No risk signals found",
+        "severity": {
+          "high": "High",
+          "medium": "Medium",
+          "low": "Low"
+        },
+        "table": {
+          "aria-label": "Risk signals",
+          "empty-state": "No risk signals found",
+          "header": {
+            "severity": "Severity",
+            "scope": "Scope",
+            "note": "Note"
+          }
+        },
+        "details": {
+          "overview": {
+            "title": "Overview",
+            "data-vendor": "Data vendor",
+            "severity": "Severity",
+            "scope": "Scope",
+            "note": "Note",
+            "note-details": "Note details"
+          },
+          "related-signals": {
+            "title": "Related signals"
+          },
+          "raw-response": {
+            "title": "Raw response"
+          }
+        }
       }
     },
     "developers": {

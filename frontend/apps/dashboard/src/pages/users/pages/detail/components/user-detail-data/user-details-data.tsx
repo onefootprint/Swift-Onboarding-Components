@@ -15,6 +15,7 @@ import { useDecryptMachine } from '../decrypt-machine-provider';
 import AuditTrail from './components/audit-trail';
 import BasicInfo from './components/basic-info';
 import Insights from './components/insights';
+import RiskSignals from './components/risk-signals';
 import UserHeader from './components/user-header';
 
 type UserDetailsDataProps = {
@@ -70,16 +71,21 @@ const UserDetailsData = ({ user, decrypt }: UserDetailsDataProps) => {
       <Box sx={{ marginY: 5 }}>
         <Divider />
       </Box>
-      <BasicInfo user={user} onDecrypt={handleDecrypt} />
+      <Box sx={{ marginBottom: 9 }}>
+        <BasicInfo user={user} onDecrypt={handleDecrypt} />
+      </Box>
       {user.isPortable ? (
-        <Box sx={{ marginTop: 9 }}>
-          <AuditTrail user={user} />
-        </Box>
-      ) : null}
-      {user.isPortable ? (
-        <Box sx={{ marginTop: 9 }}>
-          <Insights user={user} />
-        </Box>
+        <>
+          <Box sx={{ marginBottom: 9 }}>
+            <AuditTrail user={user} />
+          </Box>
+          <Box sx={{ marginBottom: 9 }}>
+            <RiskSignals />
+          </Box>
+          <Box>
+            <Insights user={user} />
+          </Box>
+        </>
       ) : null}
     </>
   );

@@ -14,7 +14,7 @@ const AuditTrail = ({ user }: AuditTrailProps) => {
   const getAuditTrail = useGetAuditTrail(user.footprintUserId);
   return (
     <>
-      <Typography variant="label-1" sx={{ userSelect: 'none' }}>
+      <Typography variant="label-1" as="h2">
         Audit trail
       </Typography>
       <Box sx={{ marginTop: 5, marginBottom: 5 }}>
