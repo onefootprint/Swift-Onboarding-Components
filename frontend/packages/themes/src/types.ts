@@ -195,6 +195,7 @@ export type ZIndexes = {
   sticky: number;
   dialog: number;
   overlay: number;
+  drawer: number;
   toast: number;
 };
 

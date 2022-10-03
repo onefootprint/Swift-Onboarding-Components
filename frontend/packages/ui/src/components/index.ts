@@ -27,6 +27,8 @@ export { default as CountrySelect } from './country-select';
 export * from './dialog';
 export { default as Dialog } from './dialog';
 export { default as Divider } from './divider';
+export * from './drawer';
+export { default as Drawer } from './drawer';
 export { default as Dropdown } from './dropdown';
 export * from './empty-state';
 export { default as EmptyState } from './empty-state';

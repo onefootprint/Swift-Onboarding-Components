@@ -39,6 +39,8 @@ const BottomSheet = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // TODO: Move to react-transition-group
+  // https://linear.app/footprint/issue/FP-1516/add-react-transition-group
   useEffect(() => {
     if (visibleState === State.opening || visibleState === State.closing) {
       return;
