@@ -5,7 +5,7 @@ import {
 } from '@onefootprint/types';
 import { interpret } from 'xstate';
 
-import createCollectKycDataMachine from './machine';
+import createCollectKycDataMachine from './collect-kyc-data-state-machine';
 import { Events, States } from './types';
 
 describe('Onboarding Machine Tests', () => {

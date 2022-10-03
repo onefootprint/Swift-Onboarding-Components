@@ -123,29 +123,6 @@
     "cta": {
       "continue": "Continue",
       "complete": "Complete"
-    },
-    "confirm": {
-      "title": "Confirm your personal data",
-      "subtitle": "Please make sure that your personal data is accurate and there are no typos before continuing.",
-      "edit": "Edit",
-      "basic-info": {
-        "title": "Basic data",
-        "first-name": "First name",
-        "last-name": "Last name",
-        "dob": "Date of birth"
-      },
-      "address": {
-        "title": "Address"
-      },
-      "identity": {
-        "title": "Identity data",
-        "ssn9": "SSN (Full)",
-        "ssn4": "SSN (Last 4)"
-      },
-      "edit-sheet": {
-        "title": "Edit {{name}}",
-        "save": "Save"
-      }
     }
   }
 }

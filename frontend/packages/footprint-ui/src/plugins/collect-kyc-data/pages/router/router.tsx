@@ -3,7 +3,6 @@ import React, { useEffect } from 'react';
 import { useCollectKycDataMachine } from '../../components/machine-provider';
 import { States } from '../../utils/state-machine/types';
 import BasicInformation from '../basic-information';
-import Confirm from '../confirm';
 import Address from '../residential-address';
 import Ssn from '../ssn';
 
@@ -24,14 +23,13 @@ const Router = ({ onDone }: RouterProps) => {
   if (state.matches(States.basicInformation)) {
     return <BasicInformation />;
   }
+
   if (state.matches(States.residentialAddress)) {
     return <Address />;
   }
+
   if (state.matches(States.ssn)) {
     return <Ssn />;
-  }
-  if (state.matches(States.confirm)) {
-    return <Confirm />;
   }
 
   return null;

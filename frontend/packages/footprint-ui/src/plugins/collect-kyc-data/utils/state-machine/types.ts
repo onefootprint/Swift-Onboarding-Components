@@ -61,7 +61,6 @@ export enum States {
   basicInformation = 'basicInformation',
   residentialAddress = 'residentialAddress',
   ssn = 'ssn',
-  confirm = 'confirm',
   completed = 'completed',
 }
 
@@ -81,8 +80,6 @@ export enum Events {
   residentialAddressSubmitted = 'residentialAddressSubmitted',
   ssnSubmitted = 'ssnSubmitted',
   navigatedToPrevPage = 'navigatedToPrevPage',
-  confirmed = 'confirmed',
-  edited = 'edited',
 }
 
 export enum Actions {
@@ -90,7 +87,6 @@ export enum Actions {
   assignBasicInformation = 'assignBasicInformation',
   assignResidentialAddress = 'assignResidentialAddress',
   assignSsn = 'assignSsn',
-  assignEditedData = 'assignEditedData',
 }
 
 export type MachineEvents =
@@ -117,11 +113,4 @@ export type MachineEvents =
       type: Events.ssnSubmitted;
       payload: SSNInformation;
     }
-  | { type: Events.navigatedToPrevPage }
-  | { type: Events.confirmed }
-  | {
-      type: Events.edited;
-      payload: {
-        data: UserData;
-      };
-    };
+  | { type: Events.navigatedToPrevPage };
