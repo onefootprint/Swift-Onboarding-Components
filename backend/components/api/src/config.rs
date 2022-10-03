@@ -89,6 +89,9 @@ pub struct Config {
 
     #[envconfig(nested = true)]
     pub idology_config: IdologyConfig,
+
+    #[envconfig(from = "S3_BUCKET_NAME", default = "footprint-dev-test")]
+    pub s3_bucket_name: String,
 }
 
 fn load_from_env<T: Envconfig>() -> Result<T, Box<dyn std::error::Error>> {

@@ -39,7 +39,10 @@ futures-util = { version = "0.3", default-features = false, features = ["std"] }
 futures = "0.3"
 serde = { version = "1.0", features = ["derive"] }
 crypto = { path = "../enclave/crypto" }
+# Note: Updating to latest aws-config crate (^0.49) will break some types 
+# in the 0.17 versions of aws sdks
 aws-config = "0.47.0"
+aws-sdk-s3 = "0.17.0"
 aws-sdk-kms = "0.17.0"
 thiserror = "1.0"
 enclave_proxy = { path = "../enclave/proxy", default-features = false }

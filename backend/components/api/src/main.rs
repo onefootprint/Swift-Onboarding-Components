@@ -23,6 +23,7 @@ mod hosted;
 mod index;
 mod org;
 mod private;
+mod s3;
 mod types;
 mod utils;
 
@@ -41,6 +42,7 @@ pub struct State {
     challenge_sealing_key: ScopedSealingKey,
     session_sealing_key: ScopedSealingKey,
     idology_client: IdologyClient,
+    s3_client: s3::S3Client,
 }
 
 lazy_static::lazy_static! {
@@ -74,6 +76,9 @@ async fn main() -> std::io::Result<()> {
         let enclave_client = EnclaveClient::new(config.clone()).await;
 
         let shared_config = aws_config::from_env().load().await;
+        let s3_client = s3::S3Client {
+            client: aws_sdk_s3::Client::new(&shared_config),
+        };
         let kms_client = aws_sdk_kms::Client::new(&shared_config);
         let hmac_client = SignedHashClient {
             client: kms_client,
@@ -142,6 +147,7 @@ async fn main() -> std::io::Result<()> {
             challenge_sealing_key,
             session_sealing_key,
             idology_client,
+            s3_client,
         }
     };
 

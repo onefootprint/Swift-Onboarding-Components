@@ -50,6 +50,7 @@ pub async fn handler(
     state: web::Data<State>,
     request: Json<VerifyRequest>,
 ) -> actix_web::Result<Json<ResponseData<VerifyResponse>>, ApiError> {
+    // Note: Challenge::unseal checks for challenge token expiry as well
     let challenge_state =
         Challenge::<IdentifyChallengeState>::unseal(&state.challenge_sealing_key, &request.challenge_token)?
             .data;
