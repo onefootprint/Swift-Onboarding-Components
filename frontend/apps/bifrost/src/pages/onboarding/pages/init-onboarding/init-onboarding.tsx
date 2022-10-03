@@ -9,7 +9,7 @@ import styled, { css } from 'styled-components';
 import useOnboardingMachine from '../../../../hooks/use-onboarding-machine';
 
 const InitOnboarding = () => {
-  const { t } = useTranslation('pages.onboarding-verification');
+  const { t } = useTranslation('pages.init-onboarding');
   const [state, send] = useOnboardingMachine();
   const { context } = state;
   const { authToken } = context;

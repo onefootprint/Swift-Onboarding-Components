@@ -1,5 +1,5 @@
 import { DeviceInfo } from '@onefootprint/hooks';
-import { OnboardingRequirements, TenantInfo } from '@onefootprint/types';
+import { TenantInfo } from '@onefootprint/types';
 import { assign, createMachine } from 'xstate';
 
 import {
@@ -55,36 +55,70 @@ const createOnboardingRequirementsMachine = ({
             [Events.onboardingRequirementsReceived]: [
               {
                 cond: (context, event) =>
-                  event.payload.requirements.length === 0,
-                target: States.success,
-              },
-              {
-                cond: (context, event) =>
                   requiresAdditionalInfo(
                     context.userFound,
-                    event.payload.requirements,
+                    event.payload.missingKycData,
+                    event.payload.missingIdDocument,
                   ),
                 target: States.additionalInfoRequired,
+                actions: [
+                  Actions.assignMissingKycData,
+                  Actions.assignMissingLiveness,
+                  Actions.assignMissingIdDocument,
+                ],
               },
               {
                 target: States.collectKycData,
                 cond: (context, event) =>
                   shouldRunCollectKycData(event.payload.missingKycData),
+                actions: [
+                  Actions.assignMissingKycData,
+                  Actions.assignMissingLiveness,
+                  Actions.assignMissingIdDocument,
+                ],
               },
               {
                 target: States.webAuthn,
                 cond: (context, event) =>
-                  shouldRunWebauthn(event.payload.requirements, context.device),
+                  shouldRunWebauthn(
+                    event.payload.missingLiveness,
+                    context.device,
+                  ),
+                actions: [
+                  Actions.assignMissingKycData,
+                  Actions.assignMissingLiveness,
+                  Actions.assignMissingIdDocument,
+                ],
               },
               {
                 target: States.idScan,
                 cond: (context, event) =>
-                  shouldRunIdScan(event.payload.requirements, context.device),
+                  shouldRunIdScan(
+                    event.payload.missingIdDocument,
+                    context.device,
+                  ),
+                actions: [
+                  Actions.assignMissingKycData,
+                  Actions.assignMissingLiveness,
+                  Actions.assignMissingIdDocument,
+                ],
               },
               {
                 target: States.d2p,
                 cond: (context, event) =>
-                  shouldRunD2P(event.payload.requirements, context.device),
+                  shouldRunD2P(
+                    event.payload.missingIdDocument,
+                    event.payload.missingLiveness,
+                    context.device,
+                  ),
+                actions: [
+                  Actions.assignMissingKycData,
+                  Actions.assignMissingLiveness,
+                  Actions.assignMissingIdDocument,
+                ],
+              },
+              {
+                target: States.success,
               },
             ],
           },
@@ -111,6 +145,9 @@ const createOnboardingRequirementsMachine = ({
                 description:
                   'If we need to do webauthn but need to do a transfer first',
                 cond: context => shouldRunD2PFromContext(context),
+              },
+              {
+                target: States.success,
               },
             ],
           },
@@ -171,37 +208,21 @@ const createOnboardingRequirementsMachine = ({
     {
       actions: {
         [Actions.assignMissingKycData]: assign((context, event) => {
-          if (event.type !== Events.onboardingRequirementsReceived) {
-            return context;
-          }
-          const { requirements, missingKycData } = event.payload;
-          if (
-            requirements.includes(OnboardingRequirements.collectKycData) &&
-            missingKycData?.length
-          ) {
-            context.missingKycData = [...missingKycData];
+          if (event.type === Events.onboardingRequirementsReceived) {
+            context.missingKycData = [...event.payload.missingKycData];
           }
           return context;
         }),
         [Actions.assignMissingLiveness]: assign((context, event) => {
-          if (event.type !== Events.onboardingRequirementsReceived) {
-            return context;
-          }
-          const { requirements } = event.payload;
-          if (requirements.includes(OnboardingRequirements.liveness)) {
-            context.missingLiveness = true;
+          if (event.type === Events.onboardingRequirementsReceived) {
+            context.missingLiveness = event.payload.missingLiveness;
           }
           return context;
         }),
         [Actions.assignMissingIdDocument]: assign((context, event) => {
-          if (event.type !== Events.onboardingRequirementsReceived) {
-            return context;
+          if (event.type === Events.onboardingRequirementsReceived) {
+            context.missingIdDocument = event.payload.missingIdDocument;
           }
-          const { requirements } = event.payload;
-          if (requirements.includes(OnboardingRequirements.collectDocument)) {
-            context.missingLiveness = true;
-          }
-
           return context;
         }),
       },

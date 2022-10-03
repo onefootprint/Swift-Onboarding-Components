@@ -1,4 +1,10 @@
-import { D2P, IdScan, WebAuthn, withProvider } from 'footprint-elements';
+import {
+  CollectKycData,
+  D2P,
+  IdScan,
+  WebAuthn,
+  withProvider,
+} from 'footprint-elements';
 import React from 'react';
 import {
   Events,
@@ -16,8 +22,10 @@ const OnboardingRequirements = () => {
     authToken,
     device,
     tenant,
+    missingKycData,
     missingWebauthnCredentials,
     missingIdDocument,
+    userFound,
   } = state.context;
 
   if (state.matches(States.checkOnboardingRequirements)) {
@@ -28,14 +36,19 @@ const OnboardingRequirements = () => {
   }
   if (state.matches(States.collectKycData)) {
     return (
-      <WebAuthn
+      <CollectKycData
         context={{
           authToken,
           device,
+          tenant,
+          customData: {
+            missingAttributes: missingKycData,
+            userFound,
+          },
         }}
         metadata={{}}
         onDone={() => {
-          send({ type: Events.webAuthnCompleted });
+          send({ type: Events.collectKycDataCompleted });
         }}
       />
     );

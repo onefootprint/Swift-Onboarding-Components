@@ -1,8 +1,5 @@
 import { DeviceInfo } from '@onefootprint/hooks';
-import {
-  CollectedDataOption,
-  OnboardingRequirements,
-} from '@onefootprint/types';
+import { CollectedDataOption } from '@onefootprint/types';
 
 import { MachineContext } from './types';
 
@@ -16,57 +13,39 @@ export const shouldRunCollectKycData = (
 ) => missingKycData.length > 0;
 
 export const shouldRunWebauthnFromContext = (context: MachineContext) => {
-  const {
-    missingLiveness,
-    device: { type, hasSupportForWebauthn },
-  } = context;
-  return missingLiveness && type === 'mobile' && hasSupportForWebauthn;
+  const { missingLiveness, device } = context;
+  return shouldRunWebauthn(missingLiveness, device);
 };
 
 export const shouldRunWebauthn = (
-  requirements: OnboardingRequirements[],
+  missingLiveness: boolean,
   device: DeviceInfo,
 ) =>
-  requirements.includes(OnboardingRequirements.liveness) &&
-  device.type === 'mobile' &&
-  device.hasSupportForWebauthn;
+  missingLiveness && device.type === 'mobile' && device.hasSupportForWebauthn;
 
 export const shouldRunIdScanFromContext = (context: MachineContext) => {
-  const {
-    missingIdDocument,
-    device: { type },
-  } = context;
-  return missingIdDocument && type === 'mobile';
+  const { missingIdDocument, device } = context;
+  return shouldRunIdScan(missingIdDocument, device);
 };
 
 export const shouldRunIdScan = (
-  requirements: OnboardingRequirements[],
+  missingIdDocument: boolean,
   device: DeviceInfo,
-) =>
-  requirements.includes(OnboardingRequirements.collectDocument) &&
-  device.type === 'mobile';
+) => missingIdDocument && device.type === 'mobile';
 
 export const shouldRunD2PFromContext = (context: MachineContext) => {
-  const {
-    missingIdDocument,
-    missingLiveness,
-    device: { type },
-  } = context;
-  return (missingIdDocument || missingLiveness) && type !== 'mobile';
+  const { missingIdDocument, missingLiveness, device } = context;
+  return shouldRunD2P(missingIdDocument, missingLiveness, device);
 };
 
 export const shouldRunD2P = (
-  requirements: OnboardingRequirements[],
+  missingIdDocument: boolean,
+  missingLiveness: boolean,
   device: DeviceInfo,
-) =>
-  (requirements.includes(OnboardingRequirements.collectDocument) ||
-    requirements.includes(OnboardingRequirements.liveness)) &&
-  device.type !== 'mobile';
+) => (missingIdDocument || missingLiveness) && device.type !== 'mobile';
 
 export const requiresAdditionalInfo = (
   userFound: boolean,
-  requirements: OnboardingRequirements[],
-) =>
-  userFound &&
-  (requirements.includes(OnboardingRequirements.collectKycData) ||
-    requirements.includes(OnboardingRequirements.collectDocument));
+  missingKycData: readonly CollectedDataOption[],
+  missingIdDocument: boolean,
+) => userFound && (missingKycData.length > 0 || missingIdDocument);

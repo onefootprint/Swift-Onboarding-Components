@@ -1,13 +1,18 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoForbid40 } from '@onefootprint/icons';
-import { OnboardingStatusResponse } from '@onefootprint/types/src/api/onboarding-status';
+import {
+  OnboardingRequirement,
+  OnboardingRequirementKind,
+  OnboardingStatusResponse,
+} from '@onefootprint/types';
+import { CollectedDataOption } from '@onefootprint/types/src/data/collected-data-option';
 import { LoadingIndicator, Typography } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { Events } from 'src/utils/state-machine/onboarding-requirements';
 import styled, { css } from 'styled-components';
 
 import useOnboardingRequirementsMachine from '../../hooks/use-onboarding-requirements-machine';
-import useGetOnboardingStatus from './hooks/use-onboarding-status';
+import useGetOnboardingStatus from './hooks/use-get-onboarding-status';
 
 const CheckOnboardingRequirements = () => {
   const { t } = useTranslation('pages.check-onboarding-requirements');
@@ -15,12 +20,32 @@ const CheckOnboardingRequirements = () => {
   const [error, setError] = useState(false);
 
   const handleSuccess = (response: OnboardingStatusResponse) => {
-    const { requirements, missingKycData } = response;
+    const { requirements } = response;
+
+    let missingLiveness = false;
+    let missingIdDocument = false;
+    let missingKycData: CollectedDataOption[] = [];
+
+    requirements.forEach((req: OnboardingRequirement) => {
+      if (req.kind === OnboardingRequirementKind.collectKycData) {
+        if (req.missingAttributes.length) {
+          missingKycData = [...req.missingAttributes];
+        }
+      }
+      if (req.kind === OnboardingRequirementKind.liveness) {
+        missingLiveness = true;
+      }
+      if (req.kind === OnboardingRequirementKind.collectDocument) {
+        missingIdDocument = true;
+      }
+    });
+
     send({
       type: Events.onboardingRequirementsReceived,
       payload: {
-        requirements,
-        missingKycData: missingKycData ?? [],
+        missingLiveness,
+        missingIdDocument,
+        missingKycData,
       },
     });
   };

@@ -1,10 +1,5 @@
 import { DeviceInfo } from '@onefootprint/hooks';
-import {
-  CollectedDataOption,
-  OnboardingRequirements,
-  TenantInfo,
-  UserData,
-} from '@onefootprint/types';
+import { CollectedDataOption, TenantInfo, UserData } from '@onefootprint/types';
 
 export enum States {
   checkOnboardingRequirements = 'checkOnboardingRequirements',
@@ -47,8 +42,9 @@ export type MachineEvents =
   | {
       type: Events.onboardingRequirementsReceived;
       payload: {
-        requirements: OnboardingRequirements[];
-        missingKycData: CollectedDataOption[];
+        missingLiveness: boolean;
+        missingIdDocument: boolean;
+        missingKycData: readonly CollectedDataOption[];
       };
     }
   | { type: Events.webAuthnCompleted }

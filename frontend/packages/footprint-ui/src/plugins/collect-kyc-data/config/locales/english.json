@@ -1,10 +1,5 @@
 {
   "pages": {
-    "additional-info-required": {
-      "title": "Additional data is required",
-      "subtitle": "In addition to the data we already have on you, {{tenantName}} requires some more information to verify your identity.",
-      "cta": "Continue"
-    },
     "basic-information": {
       "title": "Basic Data",
       "subtitle": "We're legally required to collect this information.",
@@ -123,12 +118,6 @@
       "sync-data-error": {
         "title": "An error occurred",
         "description": "An error occurred while saving data. Please fix the inputs and try again."
-      }
-    },
-    "onboarding-verification": {
-      "error": {
-        "title": "Uh-oh!",
-        "description": "There was an error while completing this request. Please contact the site admin."
       }
     },
     "cta": {

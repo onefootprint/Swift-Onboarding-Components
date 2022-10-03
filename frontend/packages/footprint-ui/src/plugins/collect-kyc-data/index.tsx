@@ -1,10 +1,9 @@
-import { CollectedDataOption } from '@onefootprint/types';
 import { QueryClientProvider } from '@tanstack/react-query';
 import React from 'react';
 import { I18nextProvider } from 'react-i18next';
 import { useEffectOnce } from 'usehooks-ts';
 
-import { BasePluginProps } from '../base-plugin';
+import { CollectKycDataProps } from './collect-kyc-data.types';
 import {
   MachineProvider,
   useCollectKycDataMachine,
@@ -16,12 +15,7 @@ import { Events } from './utils/state-machine/types';
 
 const i18n = configureReactI18next();
 
-type WebAuthnPluginProps = BasePluginProps<{
-  userFound: boolean;
-  missingAttributes: CollectedDataOption[];
-}>;
-
-const App = ({ context, onDone }: WebAuthnPluginProps) => {
+const App = ({ context, onDone }: CollectKycDataProps) => {
   const [, send] = useCollectKycDataMachine();
   const { authToken, customData, tenant } = context;
 
@@ -50,7 +44,7 @@ const App = ({ context, onDone }: WebAuthnPluginProps) => {
   );
 };
 
-const AppWithMachine = ({ context, metadata, onDone }: WebAuthnPluginProps) => (
+const AppWithMachine = ({ context, metadata, onDone }: CollectKycDataProps) => (
   <MachineProvider>
     <App context={context} metadata={metadata} onDone={onDone} />
   </MachineProvider>
