@@ -106,23 +106,19 @@ const createCollectKycDataMachine = () =>
                 actions: [Actions.assignResidentialAddress],
               },
             ],
-            [Events.navigatedToPrevPage]: [
-              {
-                target: States.basicInformation,
-                cond: context =>
-                  isMissingBasicAttribute(context.missingAttributes),
-              },
-            ],
+            [Events.navigatedToPrevPage]: {
+              target: States.basicInformation,
+              cond: context =>
+                isMissingBasicAttribute(context.missingAttributes),
+            },
           },
         },
         [States.ssn]: {
           on: {
-            [Events.ssnSubmitted]: [
-              {
-                target: States.confirm,
-                actions: [Actions.assignSsn],
-              },
-            ],
+            [Events.ssnSubmitted]: {
+              target: States.confirm,
+              actions: [Actions.assignSsn],
+            },
             [Events.navigatedToPrevPage]: [
               {
                 target: States.residentialAddress,
@@ -139,24 +135,23 @@ const createCollectKycDataMachine = () =>
         },
         [States.confirm]: {
           on: {
+            [Events.basicInformationSubmitted]: {
+              actions: [Actions.assignBasicInformation],
+            },
+            [Events.residentialAddressSubmitted]: {
+              actions: [Actions.assignResidentialAddress],
+            },
+            [Events.ssnSubmitted]: {
+              actions: [Actions.assignSsn],
+            },
             [Events.confirmed]: [
               {
+                actions: [Actions.assignKycPending],
                 target: States.completed,
+                cond: (context, event) => !event.payload?.kycPending,
               },
-            ],
-            [Events.basicInformationSubmitted]: [
               {
-                actions: [Actions.assignBasicInformation],
-              },
-            ],
-            [Events.residentialAddressSubmitted]: [
-              {
-                actions: [Actions.assignResidentialAddress],
-              },
-            ],
-            [Events.ssnSubmitted]: [
-              {
-                actions: [Actions.assignSsn],
+                actions: [Actions.assignKycPending],
               },
             ],
           },
@@ -205,6 +200,12 @@ const createCollectKycDataMachine = () =>
             ...context.data,
             ...event.payload,
           };
+          return context;
+        }),
+        [Actions.assignKycPending]: assign((context, event) => {
+          if (event.type === Events.confirmed) {
+            context.kycPending = event.payload?.kycPending;
+          }
           return context;
         }),
       },

@@ -132,6 +132,18 @@ describe('Onboarding Machine Tests', () => {
 
       state = machine.send({
         type: Events.confirmed,
+        payload: {
+          kycPending: true,
+        },
+      });
+      context = state.context;
+      expect(state.value).toEqual(States.confirm);
+
+      state = machine.send({
+        type: Events.confirmed,
+        payload: {
+          kycPending: false,
+        },
       });
       context = state.context;
       expect(state.value).toEqual(States.completed);

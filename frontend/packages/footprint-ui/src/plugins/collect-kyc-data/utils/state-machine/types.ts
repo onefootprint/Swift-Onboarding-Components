@@ -73,6 +73,7 @@ export type MachineContext = {
   // Machine generated
   missingAttributes: CollectedDataOption[];
   data: UserData;
+  kycPending?: boolean;
 };
 
 export enum Events {
@@ -89,6 +90,7 @@ export enum Actions {
   assignBasicInformation = 'assignBasicInformation',
   assignResidentialAddress = 'assignResidentialAddress',
   assignSsn = 'assignSsn',
+  assignKycPending = 'assignKycPending',
 }
 
 export type MachineEvents =
@@ -116,4 +118,9 @@ export type MachineEvents =
       payload: SSNInformation;
     }
   | { type: Events.navigatedToPrevPage }
-  | { type: Events.confirmed };
+  | {
+      type: Events.confirmed;
+      payload?: {
+        kycPending: boolean;
+      };
+    };
