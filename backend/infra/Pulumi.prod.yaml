@@ -44,6 +44,10 @@ config:
       defaultOrg: org_01G39KR1V1E52JEZV6BYNG590J
       secretKey:
         secure: v1:qBwY9xkQ5AxOOFFR:nJs8FBGP1lGvhsAUJ/ANgv2PKoIWYJovYxCyLtDBWa24r+sDRpLxD7EC3z6ZWcVOlBb2hoYuR4vJobSyQ/3FBe7jPAFqLDJhrL9m6LEsX0NFg6iP/hYMKnPCqVfE+L2YaE5m
+    s3:
+      documentImagesBucket:
+        prefix: opaque-documents
+        envVarName: DOCUMENT_S3_BUCKET
   infra:serverTailscaleKey:
     secure: v1:TpGKPahow+vWfc9V:ARTcJC1DUX8g58pQWNUVQN1jQzYkKJfNw34IaOg4LwcPZRt8nTuIOtmXUsZ451cH57XgQrfMQdRw
   infra:tailscaleKey:

@@ -92,6 +92,8 @@ pub enum ApiError {
     IdvError(#[from] idv::Error),
     #[error("{0}")]
     Custom(String),
+    #[error("S3 error: {0}")]
+    S3Error(#[from] crate::s3::S3Error),
 }
 
 impl<T> From<WorkOsError<T>> for ApiError
@@ -145,6 +147,7 @@ impl actix_web::ResponseError for ApiError {
         match self {
             ApiError::AuthError(_) => StatusCode::UNAUTHORIZED,
             ApiError::KmsError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            ApiError::S3Error(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::Crypto(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::EnclaveError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::Database(e) => status_code_for_db_error(e),

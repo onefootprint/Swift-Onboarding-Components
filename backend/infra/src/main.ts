@@ -10,6 +10,7 @@ import * as enclaveKey from './enclave_key';
 import * as db from './db';
 import * as vpcUtil from './vpc';
 import * as hmacSigningKey from './hmac_key';
+import * as s3 from './s3';
 
 /**
  * Main infra entry point
@@ -29,6 +30,8 @@ export default async function main() {
       return vpcUtil.CreateRegionalVPC(region, constants);
     }),
   );
+  // 2022-10-03 - we use one region (us-east-1)
+  const UsEast1vpcProvider = vpcProviders[0];
 
   const hostedZone = await aws.route53.getZone({ name: constants.domain.base });
 
@@ -44,7 +47,7 @@ export default async function main() {
 
   // setup database
   const database = await db.CreateDB(
-    vpcProviders[0],
+    UsEast1vpcProvider,
     `db-${pulumi.getStack()}`,
     constants,
     secretsStore,
@@ -56,6 +59,9 @@ export default async function main() {
   // extract our api domain
   const apiDomain = `${constants.domain.prefix}${constants.domain.base}`;
   const internalApiDomain = `internal.${apiDomain}`;
+
+  // Create our s3 buckets
+  const s3Buckets = s3.CreateBuckets(UsEast1vpcProvider, constants);
 
   // launch of core service
   const services = await Promise.all(
@@ -84,6 +90,7 @@ export default async function main() {
         enclaveKeyConfig,
         hmacSigningKeyConfig,
         database,
+        s3Buckets,
       );
 
       return { service, cert, region: vpcAndProvider.region };

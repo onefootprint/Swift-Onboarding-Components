@@ -11,6 +11,7 @@ import * as crypto from 'crypto';
 import { DbOutput } from './db';
 import { FootprintVpc, Vpc } from './vpc';
 import { HmacSigningKeyDescriptor } from './hmac_key';
+import * as s3 from './s3';
 
 export type ServiceLoadBalancer = {
   lb: awsx.lb.LoadBalancer;
@@ -26,6 +27,10 @@ export type ServiceConfig = {
   domain: string;
 };
 
+export type AWSPolicyConfig = {
+  name: string;
+  policy: string;
+};
 /**
  * The service port container
  */
@@ -42,6 +47,7 @@ export async function Create(
   enclaveKeyDescriptor: EnclaveKeyDescriptor,
   signingKeyDescriptor: HmacSigningKeyDescriptor,
   database: DbOutput,
+  s3Buckets: s3.S3Buckets,
 ): Promise<ServiceLoadBalancer> {
   const region = vpcProvider.region;
   const serviceName = crypto
@@ -83,6 +89,7 @@ export async function Create(
     region,
     cluster,
     database,
+    s3Buckets,
   );
 
   // setup the task
@@ -95,6 +102,7 @@ export async function Create(
     serviceName,
     enclaveKeyDescriptor,
     signingKeyDescriptor,
+    s3Buckets,
   );
 
   const taskDefinition = new aws.ecs.TaskDefinition(
@@ -354,7 +362,10 @@ function createTaskContainerRole(
   serviceName: string,
   enclaveKeyDescriptor: EnclaveKeyDescriptor,
   signingKeyDescriptor: HmacSigningKeyDescriptor,
+  s3Buckets: s3.S3Buckets,
 ): pulumi.Output<aws.iam.Role> {
+  const s3Policies: AWSPolicyConfig[] = [s3Buckets.documentImages.policy];
+
   const role = pulumi
     .all([enclaveKeyDescriptor.rootKeyArn, signingKeyDescriptor.rootKeyArn])
     .apply(([enclaveRootKeyArn, signingRootKeyArn]) => {
@@ -442,7 +453,8 @@ function createTaskContainerRole(
               ],
             }),
           },
-        ],
+          // Add in our s3 Policies to inlinePolicies
+        ].concat(s3Policies),
       });
     });
 

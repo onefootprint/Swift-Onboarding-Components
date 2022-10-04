@@ -6,6 +6,7 @@ import { Config } from './config';
 import { EnclaveKeyDescriptor } from './enclave_key';
 import { Region } from '@pulumi/aws';
 import { DbOutput } from './db';
+import * as s3 from './s3';
 
 export abstract class ServiceContainers {
   static async apiMain(
@@ -17,6 +18,7 @@ export abstract class ServiceContainers {
     region: Region,
     parent: pulumi.Resource,
     database: DbOutput,
+    s3Buckets: s3.S3Buckets,
   ): Promise<pulumi.Output<string>> {
     const name = 'fpc';
 
@@ -194,6 +196,10 @@ export abstract class ServiceContainers {
                     {
                       name: 'INTEGRATION_TEST_PHONE_NUMBER',
                       value: constants.twilio.integrationTestPhoneNumber,
+                    },
+                    {
+                      name: s3Buckets.documentImages.bucketName,
+                      value: s3Buckets.documentImages.envVarName,
                     },
                   ],
                   links: ['otelcollect:otelcollect'],

@@ -2,12 +2,6 @@ name: Backend Ephemeral Stack
 on:
   pull_request:
     types: [labeled, reopened, opened, synchronize, edited]
-    paths:
-      - 'backend/components/**/*'
-      - 'backend/infra/*'
-      - 'backend/infra/**/*'
-      - 'backend/*.dockerfile'
-      - '.github/workflows/*.yml'
 
   workflow_run:
     workflows: ['Tag Ephemeral']

@@ -7,6 +7,7 @@ export interface Config {
   rpId: string;
   workos: Workos;
   twilio: Twilio;
+  s3: S3;
   sendgrid: Sendgrid;
   sentryUrl: string;
   deletionProtection: boolean;
@@ -46,6 +47,14 @@ export interface Twilio {
   accountSid: string;
   phoneNumber: string;
   integrationTestPhoneNumber: string;
+}
+
+export interface S3ConfigValue {
+  prefix: string;
+  envVarName: string;
+}
+export interface S3 {
+  documentImagesBucket: S3ConfigValue;
 }
 
 export interface Sendgrid {
