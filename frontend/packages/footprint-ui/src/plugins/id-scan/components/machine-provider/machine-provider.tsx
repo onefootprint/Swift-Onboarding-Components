@@ -1,7 +1,7 @@
 import { useMachine } from '@xstate/react';
 import constate from 'constate';
 
-import idScanMachine from '../../utils/state-machine/id-scan-state-machine';
+import idScanMachine from '../../utils/state-machine/machine';
 
 const useLocalIdScanMachine = () => useMachine(idScanMachine);
 

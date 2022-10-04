@@ -1,7 +1,7 @@
 import { useMachine } from '@xstate/react';
 import constate from 'constate';
 
-import D2PMachine from '../../utils/state-machine/d2p-state-machine';
+import D2PMachine from '../../utils/state-machine/machine';
 
 const useLocalD2PMachine = () => useMachine(D2PMachine);
 
