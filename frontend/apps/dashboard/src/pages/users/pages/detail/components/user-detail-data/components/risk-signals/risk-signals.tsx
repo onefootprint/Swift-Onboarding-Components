@@ -5,14 +5,17 @@ import { Table, TableRow, Typography } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
+import Details from './components/details';
+import useFilters from './components/details/hooks/use-filters';
 import Row from './components/row';
 import useRiskSignals from './hooks/use-risk-signals';
 
 const renderTr = ({ item }: TableRow<RiskSignal>) => <Row riskSignal={item} />;
 
 const RiskSignals = () => {
-  const { isLoading, error, data: response } = useRiskSignals();
   const { t } = useTranslation('pages.user-details.risk-signals');
+  const { isLoading, error, data: response } = useRiskSignals();
+  const filters = useFilters();
   const columns = [
     { text: t('table.header.severity'), width: '15%' },
     { text: t('table.header.scope'), width: '15%' },
@@ -20,7 +23,10 @@ const RiskSignals = () => {
   ];
 
   const handleRowClick = (riskSignal: RiskSignal) => {
-    console.log(riskSignal.id);
+    filters.push({
+      risk_signal_id: riskSignal.id,
+      risk_signal_note: riskSignal.note,
+    });
   };
 
   return (
@@ -40,6 +46,7 @@ const RiskSignals = () => {
         items={response?.data}
         renderTr={renderTr}
       />
+      <Details />
     </section>
   );
 };

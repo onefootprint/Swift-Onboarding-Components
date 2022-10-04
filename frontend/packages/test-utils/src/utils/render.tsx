@@ -10,9 +10,14 @@ import { DesignSystemProvider } from '@onefootprint/ui';
 import throwOnConsoleErrors from './console-error';
 
 const queryClient = new QueryClient({
+  logger: {
+    log: console.log,
+    warn: console.warn,
+    error: process.env.NODE_ENV === 'test' ? () => {} : console.error,
+  },
   defaultOptions: {
     queries: {
-      retry: 0,
+      retry: false,
     },
   },
 });

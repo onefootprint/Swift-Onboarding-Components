@@ -1,7 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { IcoInfo16 } from '@onefootprint/icons';
+import { IcoChevronRight24 } from '@onefootprint/icons';
 import type { RiskSignal } from '@onefootprint/types';
-import { Badge, Box, Tooltip } from '@onefootprint/ui';
+import { Badge, Box } from '@onefootprint/ui';
 import React from 'react';
 
 type RowProps = {
@@ -24,15 +24,15 @@ const Row = ({ riskSignal }: RowProps) => {
           <Badge variant="info">{t('low')}</Badge>
         )}
       </td>
-      <td>{riskSignal.scope}</td>
+      <td>{riskSignal.note}</td>
       <td>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
-          {riskSignal.note}
-          <Tooltip text={riskSignal.noteDetails}>
-            <Box sx={{ display: 'flex' }}>
-              <IcoInfo16 />
-            </Box>
-          </Tooltip>
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'flex-end',
+          }}
+        >
+          <IcoChevronRight24 />
         </Box>
       </td>
     </>

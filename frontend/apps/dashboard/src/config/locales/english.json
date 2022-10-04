@@ -1,4 +1,8 @@
 {
+  "notifications": {
+    "error": "Uh-oh!",
+    "success": "Yay!"
+  },
   "save": "Save",
   "close": "Close",
   "back": "Go back",
@@ -225,10 +229,15 @@
             "note-details": "Note details"
           },
           "related-signals": {
-            "title": "Related signals"
+            "title": "Related signals",
+            "table": {
+              "aria-label": "Related risk signals"
+            }
           },
           "raw-response": {
-            "title": "Raw response"
+            "title": "Raw response",
+            "show": "Show",
+            "hide": "Hide"
           }
         }
       }

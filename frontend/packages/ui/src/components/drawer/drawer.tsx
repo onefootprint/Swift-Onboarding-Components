@@ -21,7 +21,7 @@ export type DrawerProps = {
   title: string;
 };
 
-const Dialog = ({
+const Drawer = ({
   children,
   closeAriaLabel = 'Close',
   closeIconComponent = IcoClose24,
@@ -90,7 +90,7 @@ const DrawerContainer = styled.div`
     position: fixed;
     right: 0;
     width: 500px;
-    transition: all 0.2s ease-in-out;
+    transition: transform 0.2s ease-in-out;
     z-index: ${theme.zIndex.drawer};
 
     ${media.lessThan('sm')`
@@ -132,7 +132,9 @@ const CloseContainer = styled.div`
 const Body = styled.div`
   ${({ theme }) => css`
     padding: ${theme.spacing[7]}px;
+    height: calc(100% - 56px);
+    overflow: auto;
   `}
 `;
 
-export default Dialog;
+export default Drawer;

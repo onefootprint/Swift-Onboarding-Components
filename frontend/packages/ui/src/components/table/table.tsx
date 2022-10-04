@@ -13,8 +13,9 @@ export type TableRow<T> = {
 };
 
 export type TableProps<T> = {
+  hideThead?: boolean;
   'aria-label': string;
-  columns: { text: string; width?: Property.Width }[];
+  columns: { id?: string; text: string; width?: Property.Width }[];
   emptyStateText?: string;
   getKeyForRow: (item: T) => string;
   isLoading?: boolean;
@@ -24,6 +25,7 @@ export type TableProps<T> = {
 };
 
 const Table = <T,>({
+  hideThead,
   'aria-label': ariaLabel,
   columns,
   emptyStateText = 'No results',
@@ -43,15 +45,22 @@ const Table = <T,>({
       aria-busy={isLoading}
       aria-label={ariaLabel}
     >
-      <thead>
-        <tr>
-          {columns.map(column => (
-            <th key={column.text} style={{ width: column.width }}>
-              {column.text}
-            </th>
-          ))}
-        </tr>
-      </thead>
+      <colgroup>
+        {columns.map(column => (
+          <col key={column.id || column.text} style={{ width: column.width }} />
+        ))}
+      </colgroup>
+
+      {hideThead ? null : (
+        <thead>
+          <tr>
+            {columns.map(column => (
+              <th key={column.id || column.text}>{column.text}</th>
+            ))}
+          </tr>
+        </thead>
+      )}
+
       {isLoading ? (
         <tbody>
           {times(4).map(() => (

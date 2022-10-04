@@ -35,7 +35,7 @@ const requestHelper = ({
   const caller = rest[method];
   const URL = fullPath ? path : combineURL(API_BASE_URL ?? '', path);
   return caller(URL, (_req, res, ctx) =>
-    res(ctx.delay(delay), ctx.status(statusCode), ctx.json(response)),
+    res(ctx.status(statusCode), ctx.delay(delay), ctx.json(response)),
   );
 };
 

@@ -4,7 +4,8 @@ import React from 'react';
 import Table, { TableProps } from './table';
 
 describe('<Table />', () => {
-  const renderTab = ({
+  const renderTable = ({
+    hideThead,
     'aria-label': ariaLabel = 'Table',
     onRowClick,
     emptyStateText,
@@ -24,6 +25,7 @@ describe('<Table />', () => {
         columns={columns}
         emptyStateText={emptyStateText}
         getKeyForRow={(item: any) => item.id}
+        hideThead={hideThead}
         isLoading={isLoading}
         items={items}
         onRowClick={onRowClick}
@@ -38,13 +40,13 @@ describe('<Table />', () => {
 
   describe('<Table />', () => {
     it('should render the aria-label', () => {
-      renderTab({ 'aria-label': 'Users table' });
+      renderTable({ 'aria-label': 'Users table' });
       expect(screen.getByLabelText('Users table')).toBeInTheDocument();
     });
 
     describe('when it is loading', () => {
       it('should show a loading indicator', () => {
-        renderTab({ isLoading: true });
+        renderTable({ isLoading: true });
         expect(
           screen.getByRole('table').getAttribute('aria-busy'),
         ).toBeTruthy();
@@ -53,8 +55,21 @@ describe('<Table />', () => {
 
     describe('when it does not have results', () => {
       it('should show an empty state', () => {
-        renderTab({ items: [], emptyStateText: 'No results found' });
+        renderTable({ items: [], emptyStateText: 'No results found' });
         expect(screen.getByText('No results found')).toBeInTheDocument();
+      });
+    });
+
+    describe('when hideThead is set', () => {
+      it('should not render the table head', () => {
+        renderTable({
+          'aria-label': 'table',
+          items: [],
+          emptyStateText: 'No results found',
+          hideThead: true,
+        });
+        const table = screen.getByLabelText('table');
+        expect(table.querySelector('thead')).not.toBeInTheDocument();
       });
     });
   });

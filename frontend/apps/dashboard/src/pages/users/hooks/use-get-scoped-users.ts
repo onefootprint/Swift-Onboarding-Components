@@ -55,11 +55,16 @@ const useGetScopedUsers = (pageSize: number) => {
   const { authHeaders } = useSessionUser();
   const { filters } = useFilters();
 
+  const query: Record<string, any> = {};
+  if (filters.footprint_user_id) {
+    query.footprint_user_id = filters.footprint_user_id;
+  }
+
   return useQuery<
     PaginatedRequestResponse<ScopedUsersListResponse>,
     RequestError
   >(
-    ['paginatedScopedUsers', filters, authHeaders, pageSize],
+    ['paginatedScopedUsers', query, authHeaders, pageSize],
     getScopedUsersRequest,
     {
       retry: false,

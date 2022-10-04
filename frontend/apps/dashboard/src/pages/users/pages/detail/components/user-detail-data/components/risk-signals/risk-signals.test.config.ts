@@ -1,6 +1,6 @@
 import { mockRequest } from '@onefootprint/test-utils';
 
-export const riskSignalsResponse = {
+export const riskSignalsFixture = {
   data: [
     {
       id: '1',
@@ -65,7 +65,7 @@ export const withRiskSignals = () =>
     method: 'get',
     fullPath: true,
     path: 'https://demo7616817.mockable.io/risk-signals',
-    response: riskSignalsResponse,
+    response: riskSignalsFixture,
   });
 
 export const withRiskSignalsError = () =>

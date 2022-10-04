@@ -1,6 +1,8 @@
 import {
+  createUseRouterSpy,
   customRender,
   screen,
+  userEvent,
   waitFor,
   within,
 } from '@onefootprint/test-utils';
@@ -8,12 +10,18 @@ import React from 'react';
 
 import RiskSignals from './risk-signals';
 import {
-  riskSignalsResponse,
+  riskSignalsFixture,
   withRiskSignals,
   withRiskSignalsError,
 } from './risk-signals.test.config';
 
+const useRouterSpy = createUseRouterSpy();
+
 describe('<RiskSignals />', () => {
+  beforeEach(() => {
+    useRouterSpy({ pathname: '/users/detail', query: {} });
+  });
+
   const renderRiskSignals = () => {
     customRender(<RiskSignals />);
   };
@@ -55,7 +63,7 @@ describe('<RiskSignals />', () => {
           expect(isLoading).toBe('false');
         });
 
-        const { data } = riskSignalsResponse;
+        const { data } = riskSignalsFixture;
         const [firstRiskSignal] = data;
         const tr = screen.getByTestId(firstRiskSignal.id);
         expect(tr).toBeInTheDocument();
@@ -70,6 +78,37 @@ describe('<RiskSignals />', () => {
 
         const note = within(tr).getByText(firstRiskSignal.note);
         expect(note).toBeInTheDocument();
+      });
+
+      describe('when clicking on the table row', () => {
+        it('should append risk signal id and note to the url', async () => {
+          const pushMockFn = jest.fn();
+          useRouterSpy({
+            pathname: '/users/detail',
+            query: {},
+            push: pushMockFn,
+          });
+          renderRiskSignals();
+
+          const [firstRiskSignal] = riskSignalsFixture.data;
+          const table = screen.getByRole('table');
+          await waitFor(() => {
+            const note = within(table).getByText(firstRiskSignal.note);
+            expect(note).toBeInTheDocument();
+          });
+          await userEvent.click(within(table).getByText(firstRiskSignal.note));
+
+          expect(pushMockFn).toHaveBeenCalledWith(
+            {
+              query: {
+                risk_signal_id: firstRiskSignal.id,
+                risk_signal_note: firstRiskSignal.note,
+              },
+            },
+            undefined,
+            { shallow: true },
+          );
+        });
       });
     });
   });
