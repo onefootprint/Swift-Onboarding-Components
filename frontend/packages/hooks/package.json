@@ -18,20 +18,20 @@
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
   },
   "devDependencies": {
+    "@onefootprint/global-constants": "*",
+    "@onefootprint/jest-presets": "*",
+    "@onefootprint/request": "*",
+    "@onefootprint/types": "*",
+    "@onefootprint/ui": "*",
     "@types/react-dom": "^18.0.6",
     "@types/ua-parser-js": "^0.7.36",
     "eslint-config-footprint": "*",
-    "@onefootprint/global-constants": "*",
-    "@onefootprint/jest-presets": "*",
     "react-dom": "18.2.0",
     "react-i18next": "^11.18.6",
     "react": "18.2.0",
-    "@onefootprint/request": "*",
     "tsconfig": "*",
     "tsup": "^6.2.2",
-    "typescript": "4.7.4",
-    "@onefootprint/ui": "*",
-    "@onefootprint/types": "*"
+    "typescript": "4.7.4"
   },
   "dependencies": {
     "ua-parser-js": "^1.0.2"

@@ -25,13 +25,13 @@
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
   },
   "devDependencies": {
+    "@onefootprint/jest-presets": "*",
+    "@onefootprint/types": "*",
     "@types/postmate": "^1.5.2",
     "eslint-config-footprint": "*",
-    "@onefootprint/jest-presets": "*",
     "postmate": "^1.5.2",
     "tsconfig": "*",
     "tsup": "^6.2.2",
-    "@onefootprint/types": "*",
     "typescript": "4.7.4"
   },
   "publishConfig": {

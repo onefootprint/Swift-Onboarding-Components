@@ -18,9 +18,9 @@
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
   },
   "devDependencies": {
+    "@onefootprint/jest-presets": "*",
     "@onefootprint/types": "*",
     "eslint-config-footprint": "*",
-    "@onefootprint/jest-presets": "*",
     "tsconfig": "*",
     "tsup": "^6.2.2",
     "typescript": "4.7.4"

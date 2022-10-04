@@ -20,13 +20,13 @@
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
   },
   "devDependencies": {
+    "@onefootprint/global-constants": "*",
+    "@onefootprint/jest-presets": "*",
     "@types/axios": "^0.14.0",
     "axios-case-converter": "^0.9.0",
     "axios": "^0.27.2",
-    "@onefootprint/jest-presets": "*",
-    "@onefootprint/global-constants": "*",
-    "tsconfig": "*",
     "eslint-config-footprint": "*",
+    "tsconfig": "*",
     "tsup": "^6.2.2",
     "typescript": "4.7.4"
   },
