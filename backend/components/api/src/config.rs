@@ -2,12 +2,6 @@ use envconfig::Envconfig;
 use newtypes::PhoneNumber;
 
 #[derive(Envconfig, Clone)]
-
-/// (2022-10-04) Note: to see where many of these env variables originate, see
-/// the Pulumi container task definition in `backend/infra/src/containers.ts`
-///
-/// Our dev .env files are generated/modeled after the pulumi definitions to mimic
-/// actual AWS server behavior
 pub struct Config {
     #[envconfig(nested = true)]
     pub service_config: ServiceEnvironmentConfig,
@@ -96,8 +90,8 @@ pub struct Config {
     #[envconfig(nested = true)]
     pub idology_config: IdologyConfig,
 
-    #[envconfig(from = "DOCUMENT_S3_BUCKET", default = "footprint-dev-test")]
-    pub document_s3_bucket: String,
+    #[envconfig(from = "S3_BUCKET_NAME", default = "footprint-dev-test")]
+    pub s3_bucket_name: String,
 }
 
 fn load_from_env<T: Envconfig>() -> Result<T, Box<dyn std::error::Error>> {
