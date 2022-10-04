@@ -2,7 +2,7 @@ import request, { RequestError } from '@onefootprint/request';
 import { useQuery } from '@tanstack/react-query';
 
 import { BIFROST_AUTH_HEADER } from '../config/constants';
-import useWebAuthnMachine from './use-web-authn-machine';
+import useLivenessMachine from './use-liveness-machine';
 
 const D2P_STATUS_FETCH_INTERVAL = 1000;
 
@@ -39,7 +39,7 @@ const useGetD2PStatus = (
     onError?: (error: RequestError) => void;
   } = {},
 ) => {
-  const [state] = useWebAuthnMachine();
+  const [state] = useLivenessMachine();
   const scopedAuthToken = state.context.scopedAuthToken || '';
 
   return useQuery<GetD2PResponse, RequestError>(

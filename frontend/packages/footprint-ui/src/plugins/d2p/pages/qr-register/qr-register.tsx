@@ -25,11 +25,11 @@ const QRRegister = () => {
   const shouldShowQRCodeLoading =
     d2pGenerateMutation.isLoading || !state.context.scopedAuthToken;
 
-  const { webAuthn, idScan } = missingRequirements;
+  const { liveness, idScan } = missingRequirements;
   let translationSource = '';
-  if (webAuthn && idScan) {
+  if (liveness && idScan) {
     translationSource = 'liveness-with-id-scan';
-  } else if (webAuthn) {
+  } else if (liveness) {
     translationSource = 'liveness';
   } else {
     translationSource = 'id-scan';

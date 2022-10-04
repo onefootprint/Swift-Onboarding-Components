@@ -2,7 +2,7 @@ import {
   CollectKycData,
   D2P,
   IdScan,
-  WebAuthn,
+  Liveness,
   withProvider,
 } from 'footprint-elements';
 import React from 'react';
@@ -23,7 +23,7 @@ const OnboardingRequirements = () => {
     device,
     tenant,
     missingKycData,
-    missingWebauthnCredentials,
+    missingLiveness,
     missingIdDocument,
     userFound,
   } = state.context;
@@ -62,7 +62,7 @@ const OnboardingRequirements = () => {
           tenant,
           customData: {
             missingRequirements: {
-              webAuthn: !!missingWebauthnCredentials,
+              liveness: !!missingLiveness,
               idScan: !!missingIdDocument,
             },
           },
@@ -74,16 +74,16 @@ const OnboardingRequirements = () => {
       />
     );
   }
-  if (state.matches(States.webAuthn)) {
+  if (state.matches(States.liveness)) {
     return (
-      <WebAuthn
+      <Liveness
         context={{
           authToken,
           device,
         }}
         metadata={{}}
         onDone={() => {
-          send({ type: Events.webAuthnCompleted });
+          send({ type: Events.livenessCompleted });
         }}
       />
     );

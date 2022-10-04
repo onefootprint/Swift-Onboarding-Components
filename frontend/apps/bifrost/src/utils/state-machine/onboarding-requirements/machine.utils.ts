@@ -12,12 +12,12 @@ export const shouldRunCollectKycData = (
   missingKycData: readonly CollectedDataOption[],
 ) => missingKycData.length > 0;
 
-export const shouldRunWebauthnFromContext = (context: MachineContext) => {
+export const shouldRunLivenessFromContext = (context: MachineContext) => {
   const { missingLiveness, device } = context;
-  return shouldRunWebauthn(missingLiveness, device);
+  return shouldRunLiveness(missingLiveness, device);
 };
 
-export const shouldRunWebauthn = (
+export const shouldRunLiveness = (
   missingLiveness: boolean,
   device: DeviceInfo,
 ) =>

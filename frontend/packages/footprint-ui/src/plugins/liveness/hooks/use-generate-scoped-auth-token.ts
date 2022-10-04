@@ -1,10 +1,10 @@
 import { Events } from '../utils/machine';
 import useD2PGenerate from './use-d2p-generate';
-import useWebAuthNMachine from './use-web-authn-machine';
+import useLivenessMachine from './use-liveness-machine';
 
 const useGenerateScopedAuthToken = () => {
   const d2pGenerateMutation = useD2PGenerate();
-  const [, send] = useWebAuthNMachine();
+  const [, send] = useLivenessMachine();
 
   return (authToken: string) => {
     d2pGenerateMutation.mutate(

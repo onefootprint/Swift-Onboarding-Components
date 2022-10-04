@@ -1,7 +1,7 @@
 import { BasePluginProps } from '../base-plugin';
 
 export type HandoffRequirements = {
-  webAuthn?: boolean;
+  liveness?: boolean;
   idScan?: boolean;
 };
 

@@ -10,8 +10,8 @@ import {
   shouldRunD2PFromContext,
   shouldRunIdScan,
   shouldRunIdScanFromContext,
-  shouldRunWebauthn,
-  shouldRunWebauthnFromContext,
+  shouldRunLiveness,
+  shouldRunLivenessFromContext,
 } from './machine.utils';
 import {
   Actions,
@@ -78,9 +78,9 @@ const createOnboardingRequirementsMachine = ({
                 ],
               },
               {
-                target: States.webAuthn,
+                target: States.liveness,
                 cond: (context, event) =>
-                  shouldRunWebauthn(
+                  shouldRunLiveness(
                     event.payload.missingLiveness,
                     context.device,
                   ),
@@ -131,10 +131,10 @@ const createOnboardingRequirementsMachine = ({
                 cond: context => shouldRunCollectKycDataFromContext(context),
               },
               {
-                target: States.webAuthn,
+                target: States.liveness,
                 description:
                   'If there are other attributes missing in addition to webauthn for an existing user, take them to liveness register, since the user likely abandoned onboarding early.',
-                cond: context => shouldRunWebauthnFromContext(context),
+                cond: context => shouldRunLivenessFromContext(context),
               },
               {
                 target: States.idScan,
@@ -156,8 +156,8 @@ const createOnboardingRequirementsMachine = ({
           on: {
             [Events.collectKycDataCompleted]: [
               {
-                target: States.webAuthn,
-                cond: context => shouldRunWebauthnFromContext(context),
+                target: States.liveness,
+                cond: context => shouldRunLivenessFromContext(context),
               },
               {
                 target: States.idScan,
@@ -180,9 +180,9 @@ const createOnboardingRequirementsMachine = ({
             },
           },
         },
-        [States.webAuthn]: {
+        [States.liveness]: {
           on: {
-            [Events.webAuthnCompleted]: [
+            [Events.livenessCompleted]: [
               {
                 target: States.idScan,
                 cond: context => shouldRunIdScanFromContext(context),

@@ -7,15 +7,15 @@ import { BasePluginProps } from '../base-plugin';
 import MachineProvider from './components/machine-provider';
 import configureReactI18next from './config/initializers/react-i18next';
 import queryClient from './config/initializers/react-query';
-import useWebAuthnMachine, { Events } from './hooks/use-web-authn-machine';
+import useLivenessMachine, { Events } from './hooks/use-liveness-machine';
 import Router from './pages/router';
 
 const i18n = configureReactI18next();
 
-type WebAuthnPluginProps = BasePluginProps;
+type LivenessPluginProps = BasePluginProps;
 
-const App = ({ context, onDone }: WebAuthnPluginProps) => {
-  const [, send] = useWebAuthnMachine();
+const App = ({ context, onDone }: LivenessPluginProps) => {
+  const [, send] = useLivenessMachine();
   const { authToken, device } = context;
 
   useEffectOnce(() => {
@@ -37,7 +37,7 @@ const App = ({ context, onDone }: WebAuthnPluginProps) => {
   );
 };
 
-const AppWithMachine = ({ context, metadata, onDone }: WebAuthnPluginProps) => (
+const AppWithMachine = ({ context, metadata, onDone }: LivenessPluginProps) => (
   <MachineProvider>
     <App context={context} metadata={metadata} onDone={onDone} />
   </MachineProvider>

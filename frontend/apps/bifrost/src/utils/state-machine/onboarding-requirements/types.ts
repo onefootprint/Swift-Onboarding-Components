@@ -6,7 +6,7 @@ export enum States {
   additionalInfoRequired = 'additionalInfoRequired',
   collectKycData = 'collectKycData',
   d2p = 'd2p',
-  webAuthn = 'webAuthn',
+  liveness = 'liveness',
   idScan = 'idScan',
   success = 'success',
 }
@@ -25,7 +25,7 @@ export type MachineContext = {
 export enum Events {
   onboardingRequirementsReceived = 'onboardingRequirementsReceived',
   additionalInfoRequired = 'additionalInfoRequired',
-  webAuthnCompleted = 'webAuthnCompleted',
+  livenessCompleted = 'livenessCompleted',
   d2pCompleted = 'd2pCompleted',
   idScanCompleted = 'idScanCompleted',
   collectKycDataCompleted = 'collectKycDataCompleted',
@@ -47,7 +47,7 @@ export type MachineEvents =
         missingKycData: readonly CollectedDataOption[];
       };
     }
-  | { type: Events.webAuthnCompleted }
+  | { type: Events.livenessCompleted }
   | { type: Events.d2pCompleted }
   | { type: Events.idScanCompleted }
   | { type: Events.collectKycDataCompleted };

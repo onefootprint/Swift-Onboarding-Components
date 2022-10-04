@@ -6,13 +6,13 @@ import styled, { css } from 'styled-components';
 import HeaderTitle from '../../../../components/header-title';
 import NavigationHeader from '../../../../components/navigation-header';
 import useGenerateScopedAuthToken from '../../hooks/use-generate-scoped-auth-token';
-import useWebAuthnMachine from '../../hooks/use-web-authn-machine';
+import useLivenessMachine from '../../hooks/use-liveness-machine';
 import createBiometricUrl from '../../utils/create-biometric-url';
 import { Events } from '../../utils/machine';
 
 const NewTabRequest = () => {
   const { t } = useTranslation('pages.new-tab-requested');
-  const [state, send] = useWebAuthnMachine();
+  const [state, send] = useLivenessMachine();
   const { authToken, scopedAuthToken } = state.context;
   const generateScopedAuthToken = useGenerateScopedAuthToken();
 

@@ -8,11 +8,11 @@ import {
   States,
 } from './types';
 
-const createWebAuthnMachine = () =>
+const createLivenessMachine = () =>
   createMachine<MachineContext, MachineEvents>(
     {
       predictableActionArguments: true,
-      id: 'webAuthn',
+      id: 'liveness',
       initial: States.init,
       context: {
         authToken: '',
@@ -40,7 +40,8 @@ const createWebAuthnMachine = () =>
                 context.device.hasSupportForWebauthn,
             },
             {
-              target: States.webAuthnFailed,
+              // TODO; call api
+              target: States.failure,
             },
           ],
         },
@@ -61,10 +62,11 @@ const createWebAuthnMachine = () =>
               target: States.newTabRequest,
             },
             [Events.newTabRegisterSucceeded]: {
-              target: States.webAuthnSucceeded,
+              target: States.success,
             },
+            // TODO; call api
             [Events.newTabRegisterFailed]: {
-              target: States.webAuthnFailed,
+              target: States.failure,
             },
             [Events.statusPollingErrored]: {
               target: States.newTabRequest,
@@ -72,10 +74,11 @@ const createWebAuthnMachine = () =>
             },
           },
         },
-        [States.webAuthnSucceeded]: {
+        [States.success]: {
           type: 'final',
         },
-        [States.webAuthnFailed]: {
+        // TODO; call api
+        [States.failure]: {
           type: 'final',
         },
       },
@@ -118,4 +121,4 @@ const createWebAuthnMachine = () =>
     },
   );
 
-export default createWebAuthnMachine;
+export default createLivenessMachine;

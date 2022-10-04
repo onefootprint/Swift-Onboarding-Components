@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 
-import useWebAuthnMachine from '../../hooks/use-web-authn-machine';
+import useLivenessMachine from '../../hooks/use-liveness-machine';
 import { States } from '../../utils/machine';
 import NewTabProcessing from '../new-tab-processing';
 import NewTabRequest from '../new-tab-request';
@@ -10,10 +10,8 @@ type RouterProps = {
 };
 
 const Router = ({ onDone }: RouterProps) => {
-  const [state] = useWebAuthnMachine();
-  const isDone =
-    state.matches(States.webAuthnSucceeded) ||
-    state.matches(States.webAuthnFailed);
+  const [state] = useLivenessMachine();
+  const isDone = state.matches(States.success) || state.matches(States.failure);
 
   useEffect(() => {
     if (isDone) {

@@ -5,6 +5,6 @@ import machine from '../../utils/machine';
 
 const useLocalMachine = () => useMachine(machine);
 
-export const [MachineProvider, useWebAuthnMachine] = constate(useLocalMachine);
+export const [MachineProvider, useLivenessMachine] = constate(useLocalMachine);
 
 export default MachineProvider;

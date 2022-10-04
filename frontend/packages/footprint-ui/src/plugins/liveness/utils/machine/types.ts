@@ -5,8 +5,8 @@ export enum States {
   deviceSupport = 'deviceSupport',
   newTabRequest = 'newTabRequest',
   newTabProcessing = 'newTabProcessing',
-  webAuthnSucceeded = 'webAuthnSucceeded',
-  webAuthnFailed = 'webAuthnFailed',
+  success = 'success',
+  failure = 'failure',
 }
 
 export type MachineContext = {

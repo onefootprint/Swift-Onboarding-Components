@@ -6,12 +6,12 @@ import styled, { css } from 'styled-components';
 import HeaderTitle from '../../../../components/header-title';
 import NavigationHeader from '../../../../components/navigation-header';
 import useGetD2PStatus, { D2PStatus } from '../../hooks/use-get-d2p-status';
-import useWebAuthnMachine from '../../hooks/use-web-authn-machine';
+import useLivenessMachine from '../../hooks/use-liveness-machine';
 import { Events } from '../../utils/machine';
 
 const NewTabProcessing = () => {
   const { t } = useTranslation('pages.new-tab-processing');
-  const [state, send] = useWebAuthnMachine();
+  const [state, send] = useLivenessMachine();
   useGetD2PStatus({
     onSuccess: ({ status }) => {
       if (status === D2PStatus.completed) {
