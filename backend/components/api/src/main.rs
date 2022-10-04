@@ -79,6 +79,10 @@ async fn main() -> std::io::Result<()> {
         let s3_client = s3::S3Client {
             client: aws_sdk_s3::Client::new(&shared_config),
         };
+        s3_client
+            .check_bucket_access_on_server_start(vec![config.document_s3_bucket.clone()])
+            .await
+            .expect("S3 initialization failed!");
         let kms_client = aws_sdk_kms::Client::new(&shared_config);
         let hmac_client = SignedHashClient {
             client: kms_client,

@@ -21,7 +21,7 @@ pub struct S3Client {
 ///   - Actions that can be performed in S3 https://docs.aws.amazon.com/AmazonS3/latest/API/API_Operations_Amazon_Simple_Storage_Service.html
 impl S3Client {
     /// List buckets
-    pub async fn list_buckets(self) -> Result<Vec<Bucket>, S3Error> {
+    pub async fn list_buckets(&self) -> Result<Vec<Bucket>, S3Error> {
         let resp = self.client.list_buckets().send().await?;
         let buckets = resp.buckets().unwrap_or_default().to_vec();
 
@@ -29,7 +29,7 @@ impl S3Client {
     }
 
     /// Delete a set of objects by keys in a particular S3 bucket
-    pub async fn delete_objects(self, bucket: &str, keys: Vec<String>) -> Result<(), S3Error> {
+    pub async fn delete_objects(&self, bucket: &str, keys: Vec<String>) -> Result<(), S3Error> {
         let delete_objects: Vec<ObjectIdentifier> = keys
             .iter()
             .map(|k| ObjectIdentifier::builder().set_key(Some(k.to_owned())).build())
@@ -51,7 +51,7 @@ impl S3Client {
 
     /// Put an object in S3 at the path specified by `s3://{bucket}/{key}`
     ///    - Note: S3 is a flat heirarchy, but key can use `/` in the name to mimic a directory structure
-    pub async fn put_object<T>(self, bucket: &String, key: &String, object: T) -> Result<String, S3Error>
+    pub async fn put_object<T>(&self, bucket: &String, key: &String, object: T) -> Result<String, S3Error>
     where
         aws_sdk_s3::types::ByteStream: std::convert::From<T>,
     {
@@ -71,6 +71,28 @@ impl S3Client {
     }
 }
 
+impl S3Client {
+    // Small helper to check buckets so server start will fail, rather than having run-time errors
+    // (e.g. IAM gets messed up for an AWS ID, or we change AWS ID and forget to set permissions, or something)
+    pub async fn check_bucket_access_on_server_start(
+        &self,
+        expected_buckets: Vec<String>,
+    ) -> Result<(), S3Error> {
+        let buckets: Vec<String> = self
+            .list_buckets()
+            .await?
+            .into_iter()
+            .filter_map(move |b| b.name)
+            .collect();
+
+        if buckets >= expected_buckets {
+            Ok(())
+        } else {
+            Err(S3Error::BucketNotFound)
+        }
+    }
+}
+
 #[derive(Debug, Error)]
 pub enum S3Error {
     #[error("ListBucketsError")]
@@ -81,4 +103,6 @@ pub enum S3Error {
     PutObject(#[from] aws_sdk_s3::types::SdkError<aws_sdk_s3::error::PutObjectError>),
     #[error("PresigningConfigError")]
     PresigningConfig(#[from] aws_sdk_s3::presigning::config::Error),
+    #[error("BucketNotFound")]
+    BucketNotFound,
 }
