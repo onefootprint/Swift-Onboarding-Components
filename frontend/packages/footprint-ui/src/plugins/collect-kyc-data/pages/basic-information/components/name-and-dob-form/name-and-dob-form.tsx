@@ -20,11 +20,13 @@ type FormData = NameAndDobInformation;
 export type NameAndDobFormProps = {
   isMutationLoading: boolean;
   onSubmit: (data: NameAndDobInformation) => void;
+  ctaLabel?: string;
 };
 
 const NameAndDobForm = ({
   isMutationLoading,
   onSubmit,
+  ctaLabel,
 }: NameAndDobFormProps) => {
   const { t: cta } = useTranslation('pages.cta');
   const { t } = useTranslation('pages.basic-information');
@@ -99,7 +101,8 @@ const NameAndDobForm = ({
           })}
         />
         <Button type="submit" fullWidth loading={isMutationLoading}>
-          {hasOtherMissingAttributes ? cta('continue') : cta('complete')}
+          {ctaLabel ??
+            (hasOtherMissingAttributes ? cta('continue') : cta('complete'))}
         </Button>
       </Form>
     </>

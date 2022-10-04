@@ -63,10 +63,19 @@ const BottomSheet = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
+  const handleClick = (e: React.MouseEvent<HTMLElement>) => {
+    e.stopPropagation();
+  };
+
   return visibleState === State.closed ? null : (
     <FocusTrap active={open}>
       <StyledOverlay onClick={onClose} aria-modal className={visibleState}>
-        <Sheet className={visibleState} role="dialog" data-testid={testID}>
+        <Sheet
+          onClick={handleClick}
+          className={visibleState}
+          role="dialog"
+          data-testid={testID}
+        >
           <Header hasBorder={!!title}>
             <CloseContainer onClick={onClose}>
               <IconButton

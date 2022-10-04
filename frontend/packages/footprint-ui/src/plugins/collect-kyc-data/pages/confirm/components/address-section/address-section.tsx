@@ -5,6 +5,7 @@ import { UserDataAttribute } from '@onefootprint/types';
 import React, { useState } from 'react';
 
 import { useCollectKycDataMachine } from '../../../../components/machine-provider';
+import ResidentialAddress from '../../../residential-address/residential-address';
 import EditSheet from '../edit-sheet';
 import Section from '../section';
 import createAddressLine from './utils/create-address-line';
@@ -45,8 +46,7 @@ const AddressSection = () => {
   const handleCloseEdit = () => {
     setEdit(false);
   };
-  const handleSaveEdit = () => {
-    // TODO: implement calling sync data speculatively here
+  const handleComplete = () => {
     setEdit(false);
   };
 
@@ -62,9 +62,11 @@ const AddressSection = () => {
         open={!!edit}
         onClose={handleCloseEdit}
         name={t('address.title')}
-        onSave={handleSaveEdit}
       >
-        {/* TODO: implement editing content */}
+        <ResidentialAddress
+          ctaLabel={t('edit-sheet.save')}
+          onComplete={handleComplete}
+        />
       </EditSheet>
     </>
   );

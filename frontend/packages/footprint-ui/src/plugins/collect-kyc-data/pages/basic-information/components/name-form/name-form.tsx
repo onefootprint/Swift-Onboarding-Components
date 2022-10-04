@@ -21,9 +21,10 @@ type FormData = NameData;
 export type NameFormProps = {
   isMutationLoading: boolean;
   onSubmit: (data: NameData) => void;
+  ctaLabel?: string;
 };
 
-const NameForm = ({ isMutationLoading, onSubmit }: NameFormProps) => {
+const NameForm = ({ isMutationLoading, ctaLabel, onSubmit }: NameFormProps) => {
   const { t: cta } = useTranslation('pages.cta');
   const { t } = useTranslation('pages.basic-information');
   const [state] = useCollectKycDataMachine();
@@ -83,7 +84,8 @@ const NameForm = ({ isMutationLoading, onSubmit }: NameFormProps) => {
           </Grid.Column>
         </Grid.Row>
         <Button type="submit" fullWidth loading={isMutationLoading}>
-          {hasOtherMissingAttributes ? cta('continue') : cta('complete')}
+          {ctaLabel ??
+            (hasOtherMissingAttributes ? cta('continue') : cta('complete'))}
         </Button>
       </Form>
     </>

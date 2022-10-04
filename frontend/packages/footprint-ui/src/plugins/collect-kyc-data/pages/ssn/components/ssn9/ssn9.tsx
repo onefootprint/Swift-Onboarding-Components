@@ -15,9 +15,16 @@ type FormData = SSN9Information;
 type SSN9Props = {
   isMutationLoading: boolean;
   onSubmit: (formData: FormData) => void;
+  ctaLabel?: string;
+  hideDisclaimer?: boolean;
 };
 
-const SSN9 = ({ isMutationLoading, onSubmit }: SSN9Props) => {
+const SSN9 = ({
+  hideDisclaimer,
+  ctaLabel,
+  isMutationLoading,
+  onSubmit,
+}: SSN9Props) => {
   const inputMasks = useInputMask('en-US');
   const { t } = useTranslation('pages.ssn.full');
   const { t: cta } = useTranslation('pages.cta');
@@ -47,27 +54,29 @@ const SSN9 = ({ isMutationLoading, onSubmit }: SSN9Props) => {
             pattern: /^(?!(000|666|9))(\d{3}-?(?!(00))\d{2}-?(?!(0000))\d{4})$/,
           })}
         />
-        <InfoBox
-          items={[
-            {
-              title: t('disclaimer.security.title'),
-              description: t('disclaimer.security.description'),
-              Icon: IcoShield24,
-            },
-            {
-              title: t('disclaimer.privacy.title'),
-              description: t('disclaimer.privacy.description'),
-              Icon: IcoLock24,
-            },
-            {
-              title: t('disclaimer.credit-score.title'),
-              description: t('disclaimer.credit-score.description'),
-              Icon: IcoFileText24,
-            },
-          ]}
-        />
+        {!hideDisclaimer && (
+          <InfoBox
+            items={[
+              {
+                title: t('disclaimer.security.title'),
+                description: t('disclaimer.security.description'),
+                Icon: IcoShield24,
+              },
+              {
+                title: t('disclaimer.privacy.title'),
+                description: t('disclaimer.privacy.description'),
+                Icon: IcoLock24,
+              },
+              {
+                title: t('disclaimer.credit-score.title'),
+                description: t('disclaimer.credit-score.description'),
+                Icon: IcoFileText24,
+              },
+            ]}
+          />
+        )}
         <Button type="submit" fullWidth loading={isMutationLoading}>
-          {cta('complete')}
+          {ctaLabel ?? cta('complete')}
         </Button>
       </Form>
     </>

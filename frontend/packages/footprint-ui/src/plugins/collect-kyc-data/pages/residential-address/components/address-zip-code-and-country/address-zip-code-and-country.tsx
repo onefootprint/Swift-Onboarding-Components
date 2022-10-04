@@ -26,11 +26,13 @@ type FormData = {
 export type AddressZipCodeAndCountryProps = {
   isMutationLoading: boolean;
   onSubmit: (residentialAddress: ResidentialZipCodeAndCountry) => void;
+  ctaLabel?: string;
 };
 
 const AddressZipCodeAndCountry = ({
   isMutationLoading,
   onSubmit,
+  ctaLabel,
 }: AddressZipCodeAndCountryProps) => {
   const [state] = useCollectKycDataMachine();
   const { data, missingAttributes } = state.context;
@@ -110,7 +112,8 @@ const AddressZipCodeAndCountry = ({
         />
 
         <Button type="submit" fullWidth loading={isMutationLoading}>
-          {hasOtherMissingAttributes ? cta('continue') : cta('complete')}
+          {ctaLabel ??
+            (hasOtherMissingAttributes ? cta('continue') : cta('complete'))}
         </Button>
       </Form>
     </>

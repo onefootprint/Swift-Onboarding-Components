@@ -4,6 +4,7 @@ import { UserDataAttribute } from '@onefootprint/types';
 import React, { useState } from 'react';
 
 import { useCollectKycDataMachine } from '../../../../components/machine-provider';
+import BasicInformation from '../../../basic-information';
 import EditSheet from '../edit-sheet';
 import Section from '../section';
 
@@ -12,8 +13,8 @@ const BasicInfoSection = () => {
   const [state] = useCollectKycDataMachine();
   const { data } = state.context;
   const [edit, setEdit] = useState(false);
-
   const basicInfo = [];
+
   const firstName = data[UserDataAttribute.firstName];
   if (firstName) {
     basicInfo.push({
@@ -21,6 +22,7 @@ const BasicInfoSection = () => {
       subtext: firstName,
     });
   }
+
   const lastName = data[UserDataAttribute.lastName];
   if (lastName) {
     basicInfo.push({
@@ -46,8 +48,7 @@ const BasicInfoSection = () => {
   const handleCloseEdit = () => {
     setEdit(false);
   };
-  const handleSaveEdit = () => {
-    // TODO: implement calling sync data speculatively here
+  const handleComplete = () => {
     setEdit(false);
   };
 
@@ -63,9 +64,11 @@ const BasicInfoSection = () => {
         open={!!edit}
         onClose={handleCloseEdit}
         name={t('basic-info.title')}
-        onSave={handleSaveEdit}
       >
-        {/* TODO: implement editing content */}
+        <BasicInformation
+          ctaLabel={t('edit-sheet.save')}
+          onComplete={handleComplete}
+        />
       </EditSheet>
     </>
   );

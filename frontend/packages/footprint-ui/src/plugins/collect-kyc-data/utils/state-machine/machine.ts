@@ -144,9 +144,21 @@ const createCollectKycDataMachine = () =>
                 target: States.completed,
               },
             ],
-            [Events.edited]: {
-              actions: [Actions.assignEditedData],
-            },
+            [Events.basicInformationSubmitted]: [
+              {
+                actions: [Actions.assignBasicInformation],
+              },
+            ],
+            [Events.residentialAddressSubmitted]: [
+              {
+                actions: [Actions.assignResidentialAddress],
+              },
+            ],
+            [Events.ssnSubmitted]: [
+              {
+                actions: [Actions.assignSsn],
+              },
+            ],
           },
         },
         [States.completed]: {
@@ -193,15 +205,6 @@ const createCollectKycDataMachine = () =>
             ...context.data,
             ...event.payload,
           };
-          return context;
-        }),
-        [Actions.assignEditedData]: assign((context, event) => {
-          if (event.type === Events.edited) {
-            context.data = {
-              ...context.data,
-              ...event.payload.data,
-            };
-          }
           return context;
         }),
       },

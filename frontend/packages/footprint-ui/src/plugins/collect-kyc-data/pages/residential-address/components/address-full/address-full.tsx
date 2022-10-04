@@ -37,9 +37,14 @@ type FormData = {
 export type AddressFullProps = {
   isMutationLoading: boolean;
   onSubmit: (residentialAddress: ResidentialAddressFull) => void;
+  ctaLabel?: string;
 };
 
-const AddressFull = ({ isMutationLoading, onSubmit }: AddressFullProps) => {
+const AddressFull = ({
+  isMutationLoading,
+  ctaLabel,
+  onSubmit,
+}: AddressFullProps) => {
   const [state] = useCollectKycDataMachine();
   const { data, missingAttributes } = state.context;
   const { t } = useTranslation('pages.residential-address.full');
@@ -225,7 +230,8 @@ const AddressFull = ({ isMutationLoading, onSubmit }: AddressFullProps) => {
           />
         )}
         <Button type="submit" fullWidth loading={isMutationLoading}>
-          {hasOtherMissingAttributes ? cta('continue') : cta('complete')}
+          {ctaLabel ??
+            (hasOtherMissingAttributes ? cta('continue') : cta('complete'))}
         </Button>
       </Form>
     </>

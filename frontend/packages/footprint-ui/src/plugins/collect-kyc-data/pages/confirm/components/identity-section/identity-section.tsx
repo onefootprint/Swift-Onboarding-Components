@@ -4,6 +4,7 @@ import { UserDataAttribute } from '@onefootprint/types';
 import React, { useState } from 'react';
 
 import { useCollectKycDataMachine } from '../../../../components/machine-provider';
+import SSN from '../../../ssn';
 import EditSheet from '../edit-sheet';
 import Section from '../section';
 
@@ -37,8 +38,7 @@ const IdentitySection = () => {
   const handleCloseEdit = () => {
     setEdit(false);
   };
-  const handleSaveEdit = () => {
-    // TODO: implement calling sync data speculatively here
+  const handleComplete = () => {
     setEdit(false);
   };
 
@@ -54,9 +54,12 @@ const IdentitySection = () => {
         open={!!edit}
         onClose={handleCloseEdit}
         name={t('identity.title')}
-        onSave={handleSaveEdit}
       >
-        {/* TODO: implement editing content */}
+        <SSN
+          hideDisclaimer
+          ctaLabel={t('edit-sheet.save')}
+          onComplete={handleComplete}
+        />
       </EditSheet>
     </>
   );

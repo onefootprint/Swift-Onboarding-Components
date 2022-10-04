@@ -13,9 +13,10 @@ type FormData = SSN4Information;
 type SSN4Props = {
   isMutationLoading: boolean;
   onSubmit: (formData: FormData) => void;
+  ctaLabel?: string;
 };
 
-const SSN4 = ({ isMutationLoading, onSubmit }: SSN4Props) => {
+const SSN4 = ({ ctaLabel, isMutationLoading, onSubmit }: SSN4Props) => {
   const inputMasks = useInputMask('en-US');
   const { t } = useTranslation('pages.ssn.last-four');
   const { t: cta } = useTranslation('pages.cta');
@@ -44,7 +45,7 @@ const SSN4 = ({ isMutationLoading, onSubmit }: SSN4Props) => {
           })}
         />
         <Button type="submit" fullWidth loading={isMutationLoading}>
-          {cta('complete')}
+          {ctaLabel ?? cta('complete')}
         </Button>
       </Form>
     </>

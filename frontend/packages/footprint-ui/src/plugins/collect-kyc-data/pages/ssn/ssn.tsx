@@ -9,7 +9,13 @@ import { Events, SSNInformation } from '../../utils/state-machine/types';
 import SSN4 from './components/ssn4';
 import SSN9 from './components/ssn9';
 
-const SSN = () => {
+type SSNProps = {
+  ctaLabel?: string;
+  onComplete?: () => void;
+  hideDisclaimer?: boolean;
+};
+
+const SSN = ({ hideDisclaimer, ctaLabel, onComplete }: SSNProps) => {
   const [state, send] = useCollectKycDataMachine();
   const { authToken, missingAttributes } = state.context;
   const { mutation, syncData } = useSyncData();
@@ -22,6 +28,7 @@ const SSN = () => {
         type: Events.ssnSubmitted,
         payload: ssnInfo,
       });
+      onComplete?.();
     };
 
     const handleError = () => {
@@ -43,11 +50,24 @@ const SSN = () => {
   };
 
   if (missingAttributes.includes(CollectedDataOption.ssn4)) {
-    return <SSN4 onSubmit={onSubmit} isMutationLoading={mutation.isLoading} />;
+    return (
+      <SSN4
+        ctaLabel={ctaLabel}
+        onSubmit={onSubmit}
+        isMutationLoading={mutation.isLoading}
+      />
+    );
   }
 
   if (missingAttributes.includes(CollectedDataOption.ssn9)) {
-    return <SSN9 onSubmit={onSubmit} isMutationLoading={mutation.isLoading} />;
+    return (
+      <SSN9
+        hideDisclaimer={hideDisclaimer}
+        ctaLabel={ctaLabel}
+        onSubmit={onSubmit}
+        isMutationLoading={mutation.isLoading}
+      />
+    );
   }
   return <div />;
 };

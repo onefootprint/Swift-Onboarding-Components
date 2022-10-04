@@ -12,7 +12,15 @@ import {
 import AddressFull from './components/address-full';
 import AddressZipCodeAndCountry from './components/address-zip-code-and-country';
 
-const ResidentialAddress = () => {
+type ResidentialAddressProps = {
+  ctaLabel?: string;
+  onComplete?: () => void;
+};
+
+const ResidentialAddress = ({
+  ctaLabel,
+  onComplete,
+}: ResidentialAddressProps) => {
   const { t } = useTranslation('pages.residential-address');
   const [state, send] = useCollectKycDataMachine();
   const { missingAttributes } = state.context;
@@ -28,6 +36,7 @@ const ResidentialAddress = () => {
           residentialAddress,
         },
       });
+      onComplete?.();
     };
 
     const handleError = () => {
@@ -53,6 +62,7 @@ const ResidentialAddress = () => {
       <AddressFull
         onSubmit={handleSubmit}
         isMutationLoading={mutation.isLoading}
+        ctaLabel={ctaLabel}
       />
     );
   }
@@ -61,6 +71,7 @@ const ResidentialAddress = () => {
       <AddressZipCodeAndCountry
         onSubmit={handleSubmit}
         isMutationLoading={mutation.isLoading}
+        ctaLabel={ctaLabel}
       />
     );
   }

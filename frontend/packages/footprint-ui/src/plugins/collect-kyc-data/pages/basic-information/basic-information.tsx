@@ -12,7 +12,12 @@ import {
 import NameAndDobForm from './components/name-and-dob-form';
 import NameForm from './components/name-form';
 
-const BasicInformation = () => {
+type BasicInformationProps = {
+  ctaLabel?: string;
+  onComplete?: () => void;
+};
+
+const BasicInformation = ({ ctaLabel, onComplete }: BasicInformationProps) => {
   const [state, send] = useCollectKycDataMachine();
   const { authToken, missingAttributes } = state.context;
   const { mutation, syncData } = useSyncData();
@@ -27,6 +32,7 @@ const BasicInformation = () => {
           basicInformation,
         },
       });
+      onComplete?.();
     };
 
     const handleError = () => {
@@ -54,12 +60,17 @@ const BasicInformation = () => {
       <NameAndDobForm
         onSubmit={onSubmit}
         isMutationLoading={mutation.isLoading}
+        ctaLabel={ctaLabel}
       />
     );
   }
 
   return (
-    <NameForm onSubmit={onSubmit} isMutationLoading={mutation.isLoading} />
+    <NameForm
+      onSubmit={onSubmit}
+      isMutationLoading={mutation.isLoading}
+      ctaLabel={ctaLabel}
+    />
   );
 };
 
