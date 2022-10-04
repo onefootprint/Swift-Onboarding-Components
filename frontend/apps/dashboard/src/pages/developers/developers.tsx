@@ -19,7 +19,7 @@ const Developers = () => {
       </Head>
       <Header>
         <Box>
-          <Typography variant="heading-2" as="h2" sx={{ marginBottom: 2 }}>
+          <Typography variant="heading-3" as="h2" sx={{ marginBottom: 2 }}>
             {t('header.title')}
           </Typography>
           <Typography

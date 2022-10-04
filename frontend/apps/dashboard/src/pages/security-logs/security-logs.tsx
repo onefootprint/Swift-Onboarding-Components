@@ -49,8 +49,8 @@ const SecurityLogs = () => {
 
   return (
     <>
-      <Typography variant="heading-2" sx={{ marginBottom: 5 }}>
-        Security Logs
+      <Typography variant="heading-3" sx={{ marginBottom: 5 }}>
+        Security logs
       </Typography>
       <SearchAndFilterContainer>
         <SearchInput
