@@ -2,7 +2,7 @@ import React, { forwardRef } from 'react';
 import styled from 'styled-components';
 
 export type TabItemPros = {
-  as?: 'button' | 'a';
+  as?: React.ComponentType<any> | string;
   children: React.ReactNode;
   href?: string;
   onClick?: React.MouseEventHandler<HTMLAnchorElement | HTMLButtonElement>;
@@ -10,10 +10,7 @@ export type TabItemPros = {
 };
 
 const TabItem = forwardRef<HTMLAnchorElement, TabItemPros>(
-  (
-    { as = 'a', children, href, onClick, selected = false }: TabItemPros,
-    ref,
-  ) => (
+  ({ as, children, href, onClick, selected = false }: TabItemPros, ref) => (
     <TabItemContainer
       aria-selected={selected}
       as={as}

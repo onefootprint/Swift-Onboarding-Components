@@ -47,15 +47,14 @@ const PrivateLayout = ({ children }: PrivateLayoutProps) => {
             <Container>
               <Tabs variant="pill">
                 {routes.map(({ href, Icon, text }) => (
-                  <Link href={href} key={text} passHref>
-                    <Tab
-                      href={href}
-                      selected={router.pathname.startsWith(href)}
-                    >
-                      <Icon />
-                      {text}
-                    </Tab>
-                  </Link>
+                  <Tab
+                    href={href}
+                    selected={router.pathname.startsWith(href)}
+                    as={Link}
+                  >
+                    <Icon />
+                    {text}
+                  </Tab>
                 ))}
               </Tabs>
             </Container>
