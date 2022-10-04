@@ -5,7 +5,7 @@ import { getAllPosts, getPostBySlug, PostType } from 'src/utils/ghost';
 export async function getStaticPaths() {
   const posts = await getAllPosts(PostType.library);
   const paths = posts.map(({ slug }) => ({ params: { slug } }));
-  return { paths, fallback: false };
+  return { paths, fallback: 'blocking' };
 }
 
 type Params = ParsedUrlQuery & {
