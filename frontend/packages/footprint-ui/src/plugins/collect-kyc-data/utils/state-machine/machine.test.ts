@@ -5,7 +5,7 @@ import {
 } from '@onefootprint/types';
 import { interpret } from 'xstate';
 
-import createCollectKycDataMachine from './collect-kyc-data-state-machine';
+import createCollectKycDataMachine from './machine';
 import { Events, States } from './types';
 
 describe('Onboarding Machine Tests', () => {
@@ -128,6 +128,12 @@ describe('Onboarding Machine Tests', () => {
       });
       context = state.context;
       expect(context.data.ssn9).toEqual('101010101');
+      expect(state.value).toEqual(States.confirm);
+
+      state = machine.send({
+        type: Events.confirmed,
+      });
+      context = state.context;
       expect(state.value).toEqual(States.completed);
     });
 
@@ -182,9 +188,15 @@ describe('Onboarding Machine Tests', () => {
           ssn9: '101010101',
         },
       });
-      expect(state.value).toEqual(States.completed);
       context = state.context;
       expect(context.data.ssn9).toEqual('101010101');
+      expect(state.value).toEqual(States.confirm);
+
+      state = machine.send({
+        type: Events.confirmed,
+      });
+      context = state.context;
+      expect(state.value).toEqual(States.completed);
     });
   });
 

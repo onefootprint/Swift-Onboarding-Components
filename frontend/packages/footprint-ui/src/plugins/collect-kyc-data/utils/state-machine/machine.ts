@@ -83,7 +83,7 @@ const createCollectKycDataMachine = () =>
                   ),
               },
               {
-                target: States.completed,
+                target: States.confirm,
                 actions: [Actions.assignBasicInformation],
               },
             ],
@@ -102,7 +102,7 @@ const createCollectKycDataMachine = () =>
                   ),
               },
               {
-                target: States.completed,
+                target: States.confirm,
                 actions: [Actions.assignResidentialAddress],
               },
             ],
@@ -119,7 +119,7 @@ const createCollectKycDataMachine = () =>
           on: {
             [Events.ssnSubmitted]: [
               {
-                target: States.completed,
+                target: States.confirm,
                 actions: [Actions.assignSsn],
               },
             ],
@@ -135,6 +135,18 @@ const createCollectKycDataMachine = () =>
                   isMissingBasicAttribute(context.missingAttributes),
               },
             ],
+          },
+        },
+        [States.confirm]: {
+          on: {
+            [Events.confirmed]: [
+              {
+                target: States.completed,
+              },
+            ],
+            [Events.edited]: {
+              actions: [Actions.assignEditedData],
+            },
           },
         },
         [States.completed]: {
@@ -181,7 +193,15 @@ const createCollectKycDataMachine = () =>
             ...context.data,
             ...event.payload,
           };
-
+          return context;
+        }),
+        [Actions.assignEditedData]: assign((context, event) => {
+          if (event.type === Events.edited) {
+            context.data = {
+              ...context.data,
+              ...event.payload.data,
+            };
+          }
           return context;
         }),
       },
