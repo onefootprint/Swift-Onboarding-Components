@@ -28,6 +28,7 @@ import { nameData, User } from './hooks/use-join-users';
 const PAGE_SIZE = 10;
 
 const Users = () => {
+  const router = useRouter();
   const { t } = useTranslation('pages.users');
   const columns = [
     { text: t('table.header.name'), width: '14%' },
@@ -51,8 +52,6 @@ const Users = () => {
     filters,
     setFilter,
   } = useGetUsers(PAGE_SIZE);
-
-  const router = useRouter();
 
   // Bind the contents of the search text box to the querystring
   useEffect(() => {
@@ -143,15 +142,17 @@ const Users = () => {
           </>
         )}
       />
-      <Pagination
-        totalNumResults={totalNumResults}
-        pageSize={PAGE_SIZE}
-        pageIndex={pageIndex}
-        onNextPage={loadNextPage}
-        onPrevPage={loadPrevPage}
-        hasNextPage={hasNextPage}
-        hasPrevPage={hasPrevPage}
-      />
+      {totalNumResults > 0 && (
+        <Pagination
+          totalNumResults={totalNumResults}
+          pageSize={PAGE_SIZE}
+          pageIndex={pageIndex}
+          onNextPage={loadNextPage}
+          onPrevPage={loadPrevPage}
+          hasNextPage={hasNextPage}
+          hasPrevPage={hasPrevPage}
+        />
+      )}
     </>
   );
 };

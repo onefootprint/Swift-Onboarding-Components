@@ -31,6 +31,7 @@ const getScopedUsersRequest = async ({
 }: QueryFunctionContext<QueryKey, string>) => {
   const [, params, authHeaders, pageSize] = queryKey as ScopedUsersListQueryKey;
   const dateRangeFilters = dateRangeToFilterParams(params);
+
   // cursors is a stack of cursors for all pages visited. Use the cursor on the top of the stack
   // (the current page) when asking the backend for results
   const cursors = getCursors(params);
@@ -58,6 +59,12 @@ const useGetScopedUsers = (pageSize: number) => {
   const query: Record<string, any> = {};
   if (filters.footprint_user_id) {
     query.footprint_user_id = filters.footprint_user_id;
+  }
+  if (filters.statuses) {
+    query.statuses = filters.statuses;
+  }
+  if (filters.dateRange) {
+    query.dateRange = filters.dateRange;
   }
 
   return useQuery<

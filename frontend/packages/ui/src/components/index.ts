@@ -41,6 +41,8 @@ export * from './icon-button';
 export { default as IconButton } from './icon-button';
 export * from './inline-alert';
 export { default as InlineAlert } from './inline-alert';
+export * from './input-date-range-picker';
+export { default as InputDateRangePicker } from './input-date-range-picker';
 export * from './link-button';
 export { default as LinkButton } from './link-button';
 export * from './loading-indicator';

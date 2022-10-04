@@ -2,9 +2,11 @@ import { useTranslation } from '@onefootprint/hooks';
 import { DateRange, OnboardingStatus } from '@onefootprint/types';
 import { Box, Dialog } from '@onefootprint/ui';
 import React, { useState } from 'react';
+import { getDateRange } from 'src/utils/date-range';
 
 import { useFilters } from '../../hooks/use-filters';
 import Form, { FormData } from './components/form';
+import { NEXT_WEEK, TODAY } from './filters.constants';
 
 type FiltersProps = {
   renderCta: (options: {
@@ -17,6 +19,7 @@ const Filters = ({ renderCta }: FiltersProps) => {
   const { t } = useTranslation('pages.users.filters.dialog');
   const { setFilter, filtersCount, filters } = useFilters();
   const [open, setOpen] = useState(false);
+  const [dataRange, from, to] = getDateRange(filters);
 
   const handleToggle = () => {
     setOpen(prevOpen => !prevOpen);
@@ -55,7 +58,11 @@ const Filters = ({ renderCta }: FiltersProps) => {
         <Form
           onSubmit={handleSubmit}
           defaultValues={{
-            dateRange: (filters.dateRange as DateRange) || DateRange.allTime,
+            customDate: {
+              from: from ? new Date(from) : TODAY,
+              to: to ? new Date(to) : NEXT_WEEK,
+            },
+            dateRange: (dataRange as DateRange) || DateRange.allTime,
             statuses: (filters.statuses
               ? filters.statuses.split(',')
               : []) as OnboardingStatus[],
