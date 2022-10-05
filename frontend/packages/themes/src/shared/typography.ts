@@ -46,7 +46,7 @@ const typographies: Typographies = {
     fontWeight: 700,
   },
   'body-1': {
-    fontSize: '18px',
+    fontSize: '17px',
     lineHeight: '28px',
     fontFamily: 'DM Sans',
     fontWeight: 400,
@@ -70,7 +70,7 @@ const typographies: Typographies = {
     fontWeight: 400,
   },
   'label-1': {
-    fontSize: '18px',
+    fontSize: '17px',
     lineHeight: '28px',
     fontFamily: 'DM Sans',
     fontWeight: 500,
