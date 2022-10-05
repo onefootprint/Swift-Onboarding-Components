@@ -1,18 +1,11 @@
 import { Icon } from '@onefootprint/icons';
-import {
-  Box,
-  SXStyleProps,
-  SXStyles,
-  Typography,
-  useSX,
-} from '@onefootprint/ui';
+import { Box, Typography } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
 type DataContainerProps = {
   iconComponent: Icon;
   children: React.ReactNode;
-  sx?: SXStyleProps;
   title: string;
   renderCta: () => React.ReactNode;
 };
@@ -21,29 +14,25 @@ const DataContainer = ({
   iconComponent: IconComponent,
   title,
   children,
-  sx,
   renderCta,
-}: DataContainerProps) => {
-  const sxStyles = useSX(sx);
-  return (
-    <StyledContainer sx={sxStyles}>
-      <Header>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
-          <IconComponent />
-          <Typography variant="label-3">{title}</Typography>
-        </Box>
-        {renderCta()}
-      </Header>
-      <RowContainer>{children}</RowContainer>
-    </StyledContainer>
-  );
-};
+}: DataContainerProps) => (
+  <StyledContainer>
+    <Header>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+        <IconComponent />
+        <Typography variant="label-3">{title}</Typography>
+      </Box>
+      {renderCta()}
+    </Header>
+    <RowContainer>{children}</RowContainer>
+  </StyledContainer>
+);
 
-const StyledContainer = styled.div<{ sx: SXStyles }>`
-  ${({ theme, sx }) => css`
+const StyledContainer = styled.div`
+  ${({ theme }) => css`
     border: 1px solid ${theme.borderColor.tertiary};
     border-radius: ${theme.spacing[2]}px;
-    ${sx};
+    height: 100%;
   `};
 `;
 

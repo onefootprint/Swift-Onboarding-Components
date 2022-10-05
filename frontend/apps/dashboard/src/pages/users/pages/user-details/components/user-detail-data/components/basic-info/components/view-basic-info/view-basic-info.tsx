@@ -5,6 +5,7 @@ import {
   IcoUserCircle24,
 } from '@onefootprint/icons';
 import { UserDataAttribute } from '@onefootprint/types';
+import { Box } from '@onefootprint/ui';
 import React from 'react';
 import { nameData, User } from 'src/pages/users/hooks/use-join-users';
 import styled, { css } from 'styled-components';
@@ -21,16 +22,13 @@ const ViewBasicInfo = ({ user }: ViewBasicInfoProps) => {
   const { t, allT } = useTranslation('pages.user-details');
   const userAttributes = user.attributes;
   const sectionsVisibility = getSectionsVisibility(user.identityDataAttributes);
+  const showIdentity = sectionsVisibility.identity;
+  const showAddress = sectionsVisibility.address;
 
   return (
-    <DataGrid
-      data-show-only-basic-data={
-        !sectionsVisibility.address && !sectionsVisibility.identity
-      }
-    >
+    <DataGrid>
       <DataContainer
         headerIcon={IcoFileText224}
-        sx={{ gridArea: '1 / 1 / span 1 / span 1' }}
         title={t('user-info.basic.title')}
       >
         {user.identityDataAttributes.includes(UserDataAttribute.firstName) &&
@@ -55,12 +53,9 @@ const ViewBasicInfo = ({ user }: ViewBasicInfoProps) => {
           />
         )}
       </DataContainer>
-      {sectionsVisibility.identity && (
+      {showIdentity && (
         <DataContainer
           headerIcon={IcoUserCircle24}
-          sx={{
-            gridArea: '1 / 2 / span 1 / span 1',
-          }}
           title={t('user-info.identity.title')}
         >
           {user.identityDataAttributes.includes(UserDataAttribute.ssn9) && (
@@ -83,57 +78,61 @@ const ViewBasicInfo = ({ user }: ViewBasicInfoProps) => {
           )}
         </DataContainer>
       )}
-      {sectionsVisibility.address && (
-        <DataContainer
+      {showAddress && (
+        <Box
           sx={{
-            gridArea: sectionsVisibility.identity
-              ? '2 / 1 / span 1 / span 1'
-              : '1 / 2 / span 1 / span 1',
+            gridRow: showIdentity ? '1 / span 2' : undefined,
+            gridColumn: '2 / 2',
           }}
-          headerIcon={IcoBuilding24}
-          title={t('user-info.address.title')}
         >
-          {user.identityDataAttributes.includes(UserDataAttribute.country) && (
-            <DataRow
-              title={allT('user-data-attributes.country')}
-              data={userAttributes.country}
-            />
-          )}
-          {user.identityDataAttributes.includes(
-            UserDataAttribute.addressLine1,
-          ) && (
-            <DataRow
-              title={allT('user-data-attributes.address-line1')}
-              data={userAttributes.addressLine1}
-            />
-          )}
-          {user.identityDataAttributes.includes(
-            UserDataAttribute.addressLine2,
-          ) && (
-            <DataRow
-              data={userAttributes.addressLine2}
-              title={allT('user-data-attributes.address-line2')}
-            />
-          )}
-          {user.identityDataAttributes.includes(UserDataAttribute.city) && (
-            <DataRow
-              title={allT('user-data-attributes.city')}
-              data={userAttributes.city}
-            />
-          )}
-          {user.identityDataAttributes.includes(UserDataAttribute.zip) && (
-            <DataRow
-              title={allT('user-data-attributes.zip')}
-              data={userAttributes.zip}
-            />
-          )}
-          {user.identityDataAttributes.includes(UserDataAttribute.state) && (
-            <DataRow
-              title={allT('user-data-attributes.state')}
-              data={userAttributes.state}
-            />
-          )}
-        </DataContainer>
+          <DataContainer
+            headerIcon={IcoBuilding24}
+            title={t('user-info.address.title')}
+          >
+            {user.identityDataAttributes.includes(
+              UserDataAttribute.country,
+            ) && (
+              <DataRow
+                title={allT('user-data-attributes.country')}
+                data={userAttributes.country}
+              />
+            )}
+            {user.identityDataAttributes.includes(
+              UserDataAttribute.addressLine1,
+            ) && (
+              <DataRow
+                title={allT('user-data-attributes.address-line1')}
+                data={userAttributes.addressLine1}
+              />
+            )}
+            {user.identityDataAttributes.includes(
+              UserDataAttribute.addressLine2,
+            ) && (
+              <DataRow
+                data={userAttributes.addressLine2}
+                title={allT('user-data-attributes.address-line2')}
+              />
+            )}
+            {user.identityDataAttributes.includes(UserDataAttribute.city) && (
+              <DataRow
+                title={allT('user-data-attributes.city')}
+                data={userAttributes.city}
+              />
+            )}
+            {user.identityDataAttributes.includes(UserDataAttribute.zip) && (
+              <DataRow
+                title={allT('user-data-attributes.zip')}
+                data={userAttributes.zip}
+              />
+            )}
+            {user.identityDataAttributes.includes(UserDataAttribute.state) && (
+              <DataRow
+                title={allT('user-data-attributes.state')}
+                data={userAttributes.state}
+              />
+            )}
+          </DataContainer>
+        </Box>
       )}
     </DataGrid>
   );
@@ -141,11 +140,9 @@ const ViewBasicInfo = ({ user }: ViewBasicInfoProps) => {
 
 const DataGrid = styled.div`
   ${({ theme }) => css`
-    &[data-show-only-basic-data='false'] {
-      display: grid;
-      gap: ${theme.spacing[5]}px;
-      grid-template: auto auto / repeat(2, minmax(0, 1fr));
-    }
+    display: grid;
+    gap: ${theme.spacing[5]}px;
+    grid-template-columns: repeat(2, 1fr);
   `};
 `;
 

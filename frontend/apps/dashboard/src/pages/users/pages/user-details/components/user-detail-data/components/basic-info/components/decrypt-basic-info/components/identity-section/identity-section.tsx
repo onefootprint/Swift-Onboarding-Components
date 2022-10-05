@@ -45,9 +45,6 @@ const IdentitySection = ({ user }: IdentitySectionProps) => {
   return (
     <DataContainer
       iconComponent={IcoUserCircle24}
-      sx={{
-        gridArea: '1 / 2 / span 1 / span 1',
-      }}
       title={t('identity.title')}
       renderCta={() =>
         areAllFieldsDisabled ? null : (

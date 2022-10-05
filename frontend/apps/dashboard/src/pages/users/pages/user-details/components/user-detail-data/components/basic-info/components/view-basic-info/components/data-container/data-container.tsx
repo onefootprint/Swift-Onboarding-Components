@@ -1,5 +1,5 @@
 import { Icon } from '@onefootprint/icons';
-import { SXStyleProps, SXStyles, Typography, useSX } from '@onefootprint/ui';
+import { Typography } from '@onefootprint/ui';
 import React from 'react';
 import { UserData } from 'src/pages/users/hooks/use-user-data';
 import styled, { css } from 'styled-components';
@@ -13,7 +13,6 @@ export type DataRow = {
 type DataContainerProps = {
   headerIcon: Icon;
   children: React.ReactNode;
-  sx?: SXStyleProps;
   title: string;
 };
 
@@ -21,25 +20,21 @@ const DataContainer = ({
   headerIcon: HeaderIcon,
   title,
   children,
-  sx,
-}: DataContainerProps) => {
-  const sxStyles = useSX(sx);
-  return (
-    <StyledContainer sx={sxStyles}>
-      <Header>
-        <HeaderIcon />
-        <Typography variant="label-3">{title}</Typography>
-      </Header>
-      <RowContainer>{children}</RowContainer>
-    </StyledContainer>
-  );
-};
+}: DataContainerProps) => (
+  <StyledContainer>
+    <Header>
+      <HeaderIcon />
+      <Typography variant="label-3">{title}</Typography>
+    </Header>
+    <RowContainer>{children}</RowContainer>
+  </StyledContainer>
+);
 
-const StyledContainer = styled.div<{ sx: SXStyles }>`
-  ${({ theme, sx }) => css`
+const StyledContainer = styled.div`
+  ${({ theme }) => css`
+    height: 100%;
     border: 1px solid ${theme.borderColor.tertiary};
     border-radius: ${theme.spacing[2]}px;
-    ${sx};
   `};
 `;
 

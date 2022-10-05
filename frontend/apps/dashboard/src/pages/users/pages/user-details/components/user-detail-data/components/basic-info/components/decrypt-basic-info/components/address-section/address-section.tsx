@@ -53,9 +53,6 @@ const AddressSection = ({ user }: AddressSectionProps) => {
 
   return (
     <DataContainer
-      sx={{
-        gridArea: '2 / 1 / span 1 / span 1',
-      }}
       iconComponent={IcoBuilding24}
       title={t('address.title')}
       renderCta={() =>

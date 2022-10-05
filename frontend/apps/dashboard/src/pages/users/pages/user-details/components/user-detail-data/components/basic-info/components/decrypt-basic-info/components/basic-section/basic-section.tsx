@@ -45,7 +45,6 @@ const BasicSection = ({ user }: BasicSectionProps) => {
   return (
     <DataContainer
       iconComponent={IcoFileText224}
-      sx={{ gridArea: '1 / 1 / span 1 / span 1' }}
       title={t('basic.title')}
       renderCta={() =>
         areAllFieldsDisabled ? null : (

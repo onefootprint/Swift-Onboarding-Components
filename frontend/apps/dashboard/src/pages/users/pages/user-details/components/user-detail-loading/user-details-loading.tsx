@@ -54,25 +54,31 @@ const UserDetailsLoading = () => (
     >
       <Divider />
     </Box>
-    <Grid>
+    <DataGrid>
       <Box id="basic-data">
         <Shimmer sx={{ height: '159px', width: '632px' }} />
       </Box>
       <Box id="identity-data">
         <Shimmer sx={{ height: '159px', width: '632px' }} />
       </Box>
-      <Box id="address-data">
-        <Shimmer sx={{ height: '255px', width: '632px' }} />
+      <Box
+        id="address-data"
+        sx={{
+          gridRow: '1 / span 2',
+          gridColumn: '2 / 2',
+        }}
+      >
+        <Shimmer sx={{ height: '334px', width: '632px' }} />
       </Box>
-    </Grid>
+    </DataGrid>
   </Box>
 );
 
-const Grid = styled.div`
+const DataGrid = styled.div`
   ${({ theme }) => css`
     display: grid;
     gap: ${theme.spacing[5]}px;
-    grid-template: auto auto / repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(2, 1fr);
   `};
 `;
 

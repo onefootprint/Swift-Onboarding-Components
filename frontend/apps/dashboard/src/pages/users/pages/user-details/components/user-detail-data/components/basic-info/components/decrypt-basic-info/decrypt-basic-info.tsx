@@ -1,6 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { UserDataAttribute } from '@onefootprint/types';
-import { useToast } from '@onefootprint/ui';
+import { Box, useToast } from '@onefootprint/ui';
 import pickBy from 'lodash/pickBy';
 import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
@@ -32,6 +32,8 @@ const DecryptBasicInfo = ({ user }: DecryptBasicInfoProps) => {
   const { handleSubmit } = formMethods;
   const toast = useToast();
   const sectionsVisibility = getSectionsVisibility(user.identityDataAttributes);
+  const showIdentity = sectionsVisibility.identity;
+  const showAddress = sectionsVisibility.address;
 
   const handleBeforeSubmit = (formData: FormData) => {
     const fields = pickBy(formData);
@@ -53,14 +55,19 @@ const DecryptBasicInfo = ({ user }: DecryptBasicInfoProps) => {
   return (
     <form onSubmit={handleSubmit(handleBeforeSubmit)} id="decrypt-form">
       <FormProvider {...formMethods}>
-        <DataGrid
-          data-show-only-basic-data={
-            !sectionsVisibility.address && !sectionsVisibility.identity
-          }
-        >
+        <DataGrid>
           <BasicSection user={user} />
-          {sectionsVisibility.identity && <IdentitySection user={user} />}
-          {sectionsVisibility.address && <AddressSection user={user} />}
+          {showIdentity && <IdentitySection user={user} />}
+          {showAddress && (
+            <Box
+              sx={{
+                gridRow: showIdentity ? '1 / span 2' : undefined,
+                gridColumn: '2 / 2',
+              }}
+            >
+              <AddressSection user={user} />
+            </Box>
+          )}
         </DataGrid>
       </FormProvider>
     </form>
@@ -69,11 +76,9 @@ const DecryptBasicInfo = ({ user }: DecryptBasicInfoProps) => {
 
 const DataGrid = styled.div`
   ${({ theme }) => css`
-    &[data-show-only-basic-data='false'] {
-      display: grid;
-      gap: ${theme.spacing[5]}px;
-      grid-template: auto auto / repeat(2, minmax(0, 1fr));
-    }
+    display: grid;
+    gap: ${theme.spacing[5]}px;
+    grid-template-columns: repeat(2, 1fr);
   `};
 `;
 
