@@ -7,7 +7,7 @@ use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
 pub struct D2pSmsRequest {
-    base_url: String,
+    url: String,
 }
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Serialize)]
@@ -38,12 +38,7 @@ pub fn handler(
 
     let time_before_retry_s = state
         .twilio_client
-        .send_d2p(
-            &state,
-            &phone_number,
-            request.base_url.clone(),
-            user_auth.auth_token,
-        )
+        .send_d2p(&state, &phone_number, request.url.clone())
         .await?;
 
     Ok(Json(ResponseData::ok(D2pSmsResponse {

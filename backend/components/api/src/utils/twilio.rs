@@ -92,12 +92,11 @@ impl TwilioClient {
         &self,
         state: &State,
         destination: &ValidatedPhoneNumber,
-        base_url: String,
-        auth_token: SessionAuthToken,
+        url: String,
     ) -> Result<SecondsBeforeRetry, ApiError> {
         let message_body = format!(
-            "Hello from {}! Continue signing up for your account here: {}#{}",
-            self.rp_id, base_url, auth_token
+            "Hello from {}! Continue signing up for your account here: {}",
+            self.rp_id, url
         );
 
         RateLimit {
