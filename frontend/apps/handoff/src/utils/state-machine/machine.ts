@@ -2,14 +2,14 @@ import { assign, createMachine } from 'xstate';
 
 import {
   Actions,
-  BiometricContext,
-  BiometricEvent,
   Events,
+  MachineContext,
+  MachineEvents,
   States,
 } from './types';
 
-export const createBiometricMachine = () =>
-  createMachine<BiometricContext, BiometricEvent>(
+export const createHandoffMachine = () =>
+  createMachine<MachineContext, MachineEvents>(
     {
       predictableActionArguments: true,
       id: 'biometric',
@@ -21,10 +21,10 @@ export const createBiometricMachine = () =>
       states: {
         [States.init]: {
           on: {
-            [Events.authTokenReceived]: [
+            [Events.paramsReceived]: [
               {
                 description: 'If we are still waiting on device info to be set',
-                actions: [Actions.assignAuthToken],
+                actions: [Actions.assignAuthToken, Actions.assignTenantPk],
                 cond: context => !context.device,
               },
               {
@@ -112,7 +112,7 @@ export const createBiometricMachine = () =>
         },
         [States.expired]: {
           on: {
-            [Events.authTokenReceived]: {
+            [Events.paramsReceived]: {
               target: States.register,
               actions: [Actions.assignAuthToken],
             },
@@ -132,8 +132,14 @@ export const createBiometricMachine = () =>
           return context;
         }),
         [Actions.assignAuthToken]: assign((context, event) => {
-          if (event.type === Events.authTokenReceived) {
+          if (event.type === Events.paramsReceived) {
             context.authToken = event.payload.authToken;
+          }
+          return context;
+        }),
+        [Actions.assignTenantPk]: assign((context, event) => {
+          if (event.type === Events.paramsReceived) {
+            context.tenantPk = event.payload.tenantPk;
           }
           return context;
         }),
@@ -147,6 +153,6 @@ export const createBiometricMachine = () =>
     },
   );
 
-const biometricMachine = createBiometricMachine();
+const handoffMachine = createHandoffMachine();
 
-export default biometricMachine;
+export default handoffMachine;

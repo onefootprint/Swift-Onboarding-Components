@@ -1,3 +1,3 @@
-export { default as biometricMachine } from './machine';
+export { default } from './machine';
 export * from './machine';
 export * from './types';

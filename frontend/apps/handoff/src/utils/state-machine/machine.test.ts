@@ -1,12 +1,12 @@
 import { interpret } from 'xstate';
 
-import { createBiometricMachine } from './machine';
+import { createHandoffMachine } from './machine';
 import { Events, States } from './types';
 
 describe('Biometric Machine Tests', () => {
   describe('Correctly initializes the state machine', () => {
     it('Initial context is correct', () => {
-      const machine = interpret(createBiometricMachine());
+      const machine = interpret(createHandoffMachine());
       machine.start();
       // Check that the initial context was set correctly from the args
       const { state } = machine;
@@ -20,7 +20,7 @@ describe('Biometric Machine Tests', () => {
 
   describe('When device info is identified first', () => {
     it('Waits for auth token', () => {
-      const machine = interpret(createBiometricMachine());
+      const machine = interpret(createHandoffMachine());
       let { state } = machine.start();
 
       expect(state.value).toBe(States.init);
@@ -40,7 +40,7 @@ describe('Biometric Machine Tests', () => {
       expect(state.value).toBe(States.init);
 
       state = machine.send({
-        type: Events.authTokenReceived,
+        type: Events.paramsReceived,
         payload: {
           authToken: 'authToken',
         },
@@ -52,7 +52,7 @@ describe('Biometric Machine Tests', () => {
     });
 
     it('mobile device has no webauthn support', () => {
-      const machine = interpret(createBiometricMachine());
+      const machine = interpret(createHandoffMachine());
       let { state } = machine.start();
       expect(state.value).toBe(States.init);
 
@@ -71,7 +71,7 @@ describe('Biometric Machine Tests', () => {
     });
 
     it('non-mobile device has webauthn supprt', () => {
-      const machine = interpret(createBiometricMachine());
+      const machine = interpret(createHandoffMachine());
       let { state } = machine.start();
       expect(state.value).toBe(States.init);
 
@@ -92,11 +92,11 @@ describe('Biometric Machine Tests', () => {
 
   describe('If auth token is identified first', () => {
     it('Waits for device info', () => {
-      const machine = interpret(createBiometricMachine());
+      const machine = interpret(createHandoffMachine());
       let { state } = machine.start();
 
       state = machine.send({
-        type: Events.authTokenReceived,
+        type: Events.paramsReceived,
         payload: {
           authToken: 'authToken',
         },
@@ -123,7 +123,7 @@ describe('Biometric Machine Tests', () => {
 
   describe('When registering', () => {
     it('Successful attempt', () => {
-      const machine = interpret(createBiometricMachine());
+      const machine = interpret(createHandoffMachine());
       machine.start();
 
       let state = machine.send({
@@ -135,7 +135,7 @@ describe('Biometric Machine Tests', () => {
       });
 
       state = machine.send({
-        type: Events.authTokenReceived,
+        type: Events.paramsReceived,
         payload: {
           authToken: 'authToken',
         },
@@ -150,7 +150,7 @@ describe('Biometric Machine Tests', () => {
     });
 
     it('Successful after retry attempt', () => {
-      const machine = interpret(createBiometricMachine());
+      const machine = interpret(createHandoffMachine());
       machine.start();
 
       let state = machine.send({
@@ -162,7 +162,7 @@ describe('Biometric Machine Tests', () => {
       });
 
       state = machine.send({
-        type: Events.authTokenReceived,
+        type: Events.paramsReceived,
         payload: {
           authToken: 'authToken',
         },
@@ -188,7 +188,7 @@ describe('Biometric Machine Tests', () => {
     });
 
     it('Cancelled attempt', () => {
-      const machine = interpret(createBiometricMachine());
+      const machine = interpret(createHandoffMachine());
       machine.start();
 
       let state = machine.send({
@@ -200,7 +200,7 @@ describe('Biometric Machine Tests', () => {
       });
 
       state = machine.send({
-        type: Events.authTokenReceived,
+        type: Events.paramsReceived,
         payload: {
           authToken: 'authToken',
         },
@@ -220,7 +220,7 @@ describe('Biometric Machine Tests', () => {
     });
 
     it('Expired auth token', () => {
-      const machine = interpret(createBiometricMachine());
+      const machine = interpret(createHandoffMachine());
       machine.start();
 
       let state = machine.send({
@@ -232,7 +232,7 @@ describe('Biometric Machine Tests', () => {
       });
 
       state = machine.send({
-        type: Events.authTokenReceived,
+        type: Events.paramsReceived,
         payload: {
           authToken: 'authToken',
         },

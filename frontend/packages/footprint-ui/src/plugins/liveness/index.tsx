@@ -16,7 +16,7 @@ type LivenessPluginProps = BasePluginProps;
 
 const App = ({ context, onDone }: LivenessPluginProps) => {
   const [, send] = useLivenessMachine();
-  const { authToken, device } = context;
+  const { authToken, device, tenant } = context;
 
   useEffectOnce(() => {
     send({
@@ -24,6 +24,7 @@ const App = ({ context, onDone }: LivenessPluginProps) => {
       payload: {
         authToken,
         device,
+        tenant,
       },
     });
   });

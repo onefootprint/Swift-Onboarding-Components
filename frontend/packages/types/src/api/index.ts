@@ -19,6 +19,7 @@ export * from './org-auth-magic-link';
 export * from './org-create-api-key';
 export * from './org-onboarding-configs-create';
 export * from './org-onboarding-configs-update';
+export * from './skip-liveness';
 export * from './start-kyc';
 export * from './submit-doc';
 export * from './update-d2p-status';

@@ -1,4 +1,5 @@
 import { DeviceInfo } from '@onefootprint/hooks';
+import { TenantInfo } from '@onefootprint/types';
 
 import { HandoffRequirements } from '../../d2p.types';
 
@@ -33,6 +34,7 @@ export type MachineContext = {
   // Plugin context
   authToken?: string;
   scopedAuthToken?: string;
+  tenant?: TenantInfo;
   device?: DeviceInfo;
   missingRequirements: HandoffRequirements;
 };
@@ -43,6 +45,7 @@ export type MachineEvents =
       payload: {
         authToken: string;
         device: DeviceInfo;
+        tenant: TenantInfo;
         missingRequirements: HandoffRequirements;
       };
     }

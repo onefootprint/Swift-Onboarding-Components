@@ -1,11 +1,11 @@
 import { useMachine } from '@xstate/react';
 import constate from 'constate';
-import { biometricMachine } from 'src/utils/state-machine';
+import handoffMachine from 'src/utils/state-machine';
 
-const useLocalBiometricMachine = () => useMachine(biometricMachine);
+const useLocalHandoffMachine = () => useMachine(handoffMachine);
 
-export const [BiometricMachineProvider, useBiometricMachine] = constate(
-  useLocalBiometricMachine,
+export const [HandoffMachineProvider, useHandoffMachine] = constate(
+  useLocalHandoffMachine,
 );
 
-export default BiometricMachineProvider;
+export default HandoffMachineProvider;

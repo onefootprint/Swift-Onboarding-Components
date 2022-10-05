@@ -1,6 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { Button } from '@onefootprint/ui';
-import { HeaderTitle } from 'footprint-elements';
+import { createHandoffUrl, HeaderTitle } from 'footprint-elements';
 import React, { useEffect } from 'react';
 import useSessionUser from 'src/hooks/use-session-user';
 import { Events } from 'src/utils/state-machine/liveness-check';
@@ -8,7 +8,6 @@ import styled, { css } from 'styled-components';
 
 import { useLivenessCheckMachine } from '../../components/machine-provider';
 import useGenerateScopedAuthToken from '../../hooks/d2p/use-generate-scoped-auth-token';
-import createBiometricUrl from '../../utils/create-biometric-url';
 
 const NewTabRequest = () => {
   const { t } = useTranslation('pages.liveness-check.new-tab-request');
@@ -29,11 +28,7 @@ const NewTabRequest = () => {
     if (!scopedAuthToken) {
       return;
     }
-    const deviceType = state.context.device?.type;
-    const tab = window.open(
-      createBiometricUrl(scopedAuthToken, deviceType),
-      '_blank',
-    );
+    const tab = window.open(createHandoffUrl(scopedAuthToken), '_blank');
     if (tab) {
       send({ type: Events.newTabOpened, payload: { tab } });
     } else {

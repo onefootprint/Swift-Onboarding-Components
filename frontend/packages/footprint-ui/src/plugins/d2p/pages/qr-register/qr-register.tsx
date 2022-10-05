@@ -6,18 +6,19 @@ import styled, { css } from 'styled-components';
 
 import HeaderTitle from '../../../../components/header-title';
 import NavigationHeader from '../../../../components/navigation-header';
+import createHandoffUrl from '../../../../utils/create-handoff-url';
 import { useD2PMachine } from '../../components/machine-provider';
 import useD2PGenerate from '../../hooks/use-d2p-generate';
 import useD2PSms from '../../hooks/use-d2p-sms';
 import useGenerateScopedAuthToken from '../../hooks/use-generate-scoped-auth-token';
 import useGetD2PStatus, { D2PStatus } from '../../hooks/use-get-d2p-status';
-import createHandoffUrl from '../../utils/create-handoff-url';
 import { Events } from '../../utils/state-machine/types';
 
 const QRRegister = () => {
   const { t } = useTranslation('pages.qr-register');
   const [state, send] = useD2PMachine();
-  const { authToken, scopedAuthToken, missingRequirements } = state.context;
+  const { authToken, scopedAuthToken, missingRequirements, tenant } =
+    state.context;
   const d2pGenerateMutation = useD2PGenerate();
   const d2pSmsMutation = useD2PSms();
   const statusResponse = useGetD2PStatus();
@@ -96,7 +97,7 @@ const QRRegister = () => {
           {shouldShowQRCodeLoading || !scopedAuthToken ? (
             <Shimmer sx={{ height: '128px', width: '128px' }} />
           ) : (
-            <QRCodeSVG value={createHandoffUrl(scopedAuthToken)} />
+            <QRCodeSVG value={createHandoffUrl(scopedAuthToken, tenant?.pk)} />
           )}
         </QRCodeContainer>
         <Typography variant="body-4" color="tertiary">

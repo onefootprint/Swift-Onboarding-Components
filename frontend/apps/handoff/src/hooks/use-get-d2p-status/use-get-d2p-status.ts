@@ -1,7 +1,7 @@
 import request, { RequestError } from '@onefootprint/request';
 import { useQuery } from '@tanstack/react-query';
 import { HANDOFF_AUTH_HEADER } from 'src/config/constants';
-import useBiometricMachine from 'src/hooks/use-d2p-mobile-machine';
+import useHandoffMachine from 'src/hooks/use-handoff-machine';
 
 const D2P_STATUS_FETCH_INTERVAL = 1000;
 
@@ -33,7 +33,7 @@ const getD2PStatus = async (payload: GetD2PRequest) => {
 };
 
 const useGetD2PStatus = () => {
-  const [state] = useBiometricMachine();
+  const [state] = useHandoffMachine();
   const { authToken } = state.context;
   return useQuery<GetD2PResponse, RequestError>(
     [authToken],

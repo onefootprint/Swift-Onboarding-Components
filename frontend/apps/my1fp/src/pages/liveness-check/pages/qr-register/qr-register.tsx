@@ -1,6 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { Button, Divider, Shimmer, Typography } from '@onefootprint/ui';
-import { HeaderTitle } from 'footprint-elements';
+import { createHandoffUrl, HeaderTitle } from 'footprint-elements';
 import { QRCodeSVG } from 'qrcode.react';
 import React, { useEffect } from 'react';
 import useSessionUser from 'src/hooks/use-session-user';
@@ -10,7 +10,6 @@ import styled, { css } from 'styled-components';
 import { useLivenessCheckMachine } from '../../components/machine-provider';
 import useGenerateScopedAuthToken from '../../hooks/d2p/use-generate-scoped-auth-token';
 import useGetD2PStatus, { D2PStatus } from '../../hooks/d2p/use-get-d2p-status';
-import createBiometricUrl from '../../utils/create-biometric-url';
 import useD2PSms from './hooks/use-d2p-sms';
 import useD2PGenerate from './hooks/use-generate-d2p';
 
@@ -85,7 +84,7 @@ const QRRegister = () => {
         {shouldShowQRCodeLoading || !scopedAuthToken ? (
           <Shimmer sx={{ height: '128px', width: '128px' }} />
         ) : (
-          <QRCodeSVG value={createBiometricUrl(scopedAuthToken)} />
+          <QRCodeSVG value={createHandoffUrl(scopedAuthToken)} />
         )}
       </QRCodeContainer>
       <Typography variant="body-4" color="tertiary">

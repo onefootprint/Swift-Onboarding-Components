@@ -11,7 +11,7 @@ export enum States {
 }
 
 export enum Events {
-  authTokenReceived = 'authTokenReceived',
+  paramsReceived = 'paramsReceived',
   deviceInfoIdentified = 'deviceInfoIdentified',
   registerFailed = 'registerFailed',
   registerSucceeded = 'registerSucceeded',
@@ -22,16 +22,21 @@ export enum Events {
 export enum Actions {
   assignDeviceInfo = 'assignDeviceInfo',
   assignAuthToken = 'assignAuthToken',
+  assignTenantPk = 'assignTenantPk',
   clearAuthToken = 'clearAuthToken',
 }
 
-export type BiometricContext = {
+export type MachineContext = {
   device?: DeviceInfo;
+  tenantPk?: string;
   authToken: string;
 };
 
-export type BiometricEvent =
-  | { type: Events.authTokenReceived; payload: { authToken: string } }
+export type MachineEvents =
+  | {
+      type: Events.paramsReceived;
+      payload: { authToken: string; tenantPk?: string };
+    }
   | {
       type: Events.deviceInfoIdentified;
       payload: DeviceInfo;

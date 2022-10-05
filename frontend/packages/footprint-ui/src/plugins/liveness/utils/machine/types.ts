@@ -1,10 +1,12 @@
 import { DeviceInfo } from '@onefootprint/hooks';
+import { TenantInfo } from '@onefootprint/types';
 
 export enum States {
   init = 'init',
   deviceSupport = 'deviceSupport',
   newTabRequest = 'newTabRequest',
   newTabProcessing = 'newTabProcessing',
+  skipLiveness = 'skipLiveness',
   success = 'success',
   failure = 'failure',
 }
@@ -13,20 +15,19 @@ export type MachineContext = {
   device: DeviceInfo;
   authToken: string;
   scopedAuthToken: string;
+  tenant?: TenantInfo;
   tab?: Window;
 };
 
 export enum Events {
   receivedContext = 'receivedContext',
   scopedAuthTokenGenerated = 'scopedAuthTokenGenerated',
-
-  // New tab verification
   newTabOpened = 'newTabOpened',
   newTabRegisterSucceeded = 'newTabRegisterSucceeded',
   newTabRegisterFailed = 'newTabRegisterFailed',
   newTabRegisterCanceled = 'newTabRegisterCanceled',
-
   statusPollingErrored = 'statusPollingErrored',
+  livenessSkipped = 'livenessSkipped',
 }
 
 export enum Actions {
@@ -43,6 +44,7 @@ export type MachineEvents =
       payload: {
         device: DeviceInfo;
         authToken: string;
+        tenant: TenantInfo;
       };
     }
   | {
@@ -59,5 +61,6 @@ export type MachineEvents =
       };
     }
   | { type: Events.newTabRegisterFailed }
+  | { type: Events.livenessSkipped }
   | { type: Events.newTabRegisterSucceeded }
   | { type: Events.newTabRegisterCanceled };

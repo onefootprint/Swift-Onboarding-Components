@@ -14,7 +14,7 @@ const i18n = configureReactI18next();
 
 const App = ({ context, onDone }: D2PPluginProps) => {
   const [, send] = useD2PMachine();
-  const { authToken, device, customData } = context;
+  const { authToken, device, customData, tenant } = context;
 
   useEffectOnce(() => {
     if (!customData) {
@@ -25,6 +25,7 @@ const App = ({ context, onDone }: D2PPluginProps) => {
       payload: {
         authToken,
         device,
+        tenant,
         missingRequirements: { ...customData.missingRequirements },
       },
     });

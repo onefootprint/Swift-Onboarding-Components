@@ -4,6 +4,7 @@ import useLivenessMachine from '../../hooks/use-liveness-machine';
 import { States } from '../../utils/machine';
 import NewTabProcessing from '../new-tab-processing';
 import NewTabRequest from '../new-tab-request';
+import SkipLiveness from '../skip-liveness';
 
 type RouterProps = {
   onDone: () => void;
@@ -25,6 +26,10 @@ const Router = ({ onDone }: RouterProps) => {
 
   if (state.matches(States.newTabRequest)) {
     return <NewTabRequest />;
+  }
+
+  if (state.matches(States.skipLiveness)) {
+    return <SkipLiveness />;
   }
 
   return null;

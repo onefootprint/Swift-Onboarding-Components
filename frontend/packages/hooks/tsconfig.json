@@ -1,5 +1,5 @@
 {
   "extends": "tsconfig/react-library.json",
-  "include": ["."],
+  "include": [".", "../footprint-ui/src/utils/create-handoff-url"],
   "exclude": ["dist", "build", "node_modules"]
 }

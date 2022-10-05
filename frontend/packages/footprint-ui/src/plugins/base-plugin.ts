@@ -5,7 +5,7 @@ export type PluginContext<T> = {
   authToken: string;
   customData?: T;
   device: DeviceInfo;
-  tenant?: TenantInfo;
+  tenant: TenantInfo;
 };
 
 export type BasePluginProps<T = void> = {

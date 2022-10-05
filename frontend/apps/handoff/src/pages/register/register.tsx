@@ -5,16 +5,14 @@ import React, { useEffect } from 'react';
 import styled, { css } from 'styled-components';
 
 import HeaderTitle from '../../components/header-title';
-import useBiometricMachine, {
-  Events,
-} from '../../hooks/use-d2p-mobile-machine';
 import useGetD2PStatus, { D2PStatus } from '../../hooks/use-get-d2p-status';
+import useHandoffMachine, { Events } from '../../hooks/use-handoff-machine';
 import useBiometricRegister from '../../hooks/use-register';
 import useUpdateD2pStatus from '../../hooks/use-update-d2p-status';
 
 const Register = () => {
   const { t } = useTranslation('pages.register');
-  const [state, send] = useBiometricMachine();
+  const [state, send] = useHandoffMachine();
   const biometricRegisterMutation = useBiometricRegister();
   const updateD2PStatusMutation = useUpdateD2pStatus();
   const statusResponse = useGetD2PStatus();

@@ -5,15 +5,15 @@ import styled, { css } from 'styled-components';
 
 import HeaderTitle from '../../../../components/header-title';
 import NavigationHeader from '../../../../components/navigation-header';
+import createHandoffUrl from '../../../../utils/create-handoff-url';
 import useGenerateScopedAuthToken from '../../hooks/use-generate-scoped-auth-token';
 import useLivenessMachine from '../../hooks/use-liveness-machine';
-import createBiometricUrl from '../../utils/create-biometric-url';
 import { Events } from '../../utils/machine';
 
 const NewTabRequest = () => {
   const { t } = useTranslation('pages.new-tab-requested');
   const [state, send] = useLivenessMachine();
-  const { authToken, scopedAuthToken } = state.context;
+  const { authToken, scopedAuthToken, tenant } = state.context;
   const generateScopedAuthToken = useGenerateScopedAuthToken();
 
   useEffect(() => {
@@ -24,9 +24,8 @@ const NewTabRequest = () => {
   }, [authToken]);
 
   const handleClick = () => {
-    const deviceType = state.context.device.type;
     const tab = window.open(
-      createBiometricUrl(scopedAuthToken, deviceType),
+      createHandoffUrl(scopedAuthToken, tenant?.pk),
       '_blank',
     );
     if (tab) {

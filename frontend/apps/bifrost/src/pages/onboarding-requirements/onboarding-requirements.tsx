@@ -80,6 +80,7 @@ const OnboardingRequirements = () => {
         context={{
           authToken,
           device,
+          tenant,
         }}
         metadata={{}}
         onDone={() => {
@@ -94,6 +95,7 @@ const OnboardingRequirements = () => {
         context={{
           authToken,
           device,
+          tenant,
         }}
         metadata={{}}
         onDone={() => {

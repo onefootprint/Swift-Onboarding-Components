@@ -40,8 +40,7 @@ const createLivenessMachine = () =>
                 context.device.hasSupportForWebauthn,
             },
             {
-              // TODO; call api
-              target: States.failure,
+              target: States.skipLiveness,
             },
           ],
         },
@@ -64,9 +63,8 @@ const createLivenessMachine = () =>
             [Events.newTabRegisterSucceeded]: {
               target: States.success,
             },
-            // TODO; call api
             [Events.newTabRegisterFailed]: {
-              target: States.failure,
+              target: States.skipLiveness,
             },
             [Events.statusPollingErrored]: {
               target: States.newTabRequest,
@@ -74,10 +72,16 @@ const createLivenessMachine = () =>
             },
           },
         },
+        [States.skipLiveness]: {
+          on: {
+            [Events.livenessSkipped]: {
+              target: States.failure,
+            },
+          },
+        },
         [States.success]: {
           type: 'final',
         },
-        // TODO; call api
         [States.failure]: {
           type: 'final',
         },
@@ -87,9 +91,10 @@ const createLivenessMachine = () =>
       actions: {
         [Actions.assignInitialContext]: assign((context, event) => {
           if (event.type === Events.receivedContext) {
-            const { device, authToken } = event.payload;
+            const { device, authToken, tenant } = event.payload;
             context.device = device;
             context.authToken = authToken;
+            context.tenant = tenant;
           }
           return context;
         }),
