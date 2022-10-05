@@ -72,6 +72,18 @@ module.exports = {
     'import/newline-after-import': 'error',
     'import/no-duplicates': 'error',
     '@next/next/no-html-link-for-pages': 'off',
+    '@typescript-eslint/naming-convention': [
+      'error',
+      {
+        selector: 'property',
+        format: null,
+        filter: {
+          // you can expand this regex to add more allowed names
+          regex: '^(paths|components|operations|external)$',
+          match: false,
+        },
+      },
+    ],
   },
   overrides: [
     {
