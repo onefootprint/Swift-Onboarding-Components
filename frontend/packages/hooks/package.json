@@ -31,7 +31,7 @@
     "react": "18.2.0",
     "tsconfig": "*",
     "tsup": "^6.2.2",
-    "typescript": "4.7.4"
+    "typescript": "4.8.4"
   },
   "dependencies": {
     "ua-parser-js": "^1.0.2"

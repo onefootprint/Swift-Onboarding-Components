@@ -60,7 +60,7 @@
     "next-transpile-modules": "9.0.0",
     "@onefootprint/test-utils": "*",
     "tsconfig": "*",
-    "typescript": "4.7.4"
+    "typescript": "4.8.4"
   },
   "jest": {
     "preset": "@onefootprint/jest-presets/jest/web",
