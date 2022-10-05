@@ -36,9 +36,7 @@ const PrivateLayout = ({ children }: PrivateLayoutProps) => {
           <Container>
             <Footprint>
               <Link href="/users">
-                <a href="/users">
-                  <LogoFpCompact />
-                </a>
+                <LogoFpCompact />
               </Link>
               <NavDropdown />
             </Footprint>
@@ -48,9 +46,10 @@ const PrivateLayout = ({ children }: PrivateLayoutProps) => {
               <Tabs variant="pill">
                 {routes.map(({ href, Icon, text }) => (
                   <Tab
-                    href={href}
-                    selected={router.pathname.startsWith(href)}
                     as={Link}
+                    href={href}
+                    key={href}
+                    selected={router.pathname.startsWith(href)}
                   >
                     <Icon />
                     {text}
@@ -86,7 +85,7 @@ const Footprint = styled.div`
   `};
 `;
 
-const Nav = styled.nav`
+const Nav = styled.div`
   ${({ theme }) => css`
     border-top: 1px solid ${theme.borderColor.tertiary};
     border-bottom: 1px solid ${theme.borderColor.tertiary};
