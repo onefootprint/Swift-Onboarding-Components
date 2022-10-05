@@ -43,6 +43,3 @@ storybook-static
 
 # Env
 apps/**/.env
-
-# Generated types
-packages/types/api.ts
