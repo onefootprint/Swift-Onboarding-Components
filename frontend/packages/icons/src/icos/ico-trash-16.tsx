@@ -11,6 +11,7 @@ const IcoTrash16 = ({ color = 'primary', className, testID }: IconProps) => {
       height={16}
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
+      role="img"
       data-testid={testID}
       className={className}
       aria-hidden="true"
