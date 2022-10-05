@@ -1,24 +1,20 @@
 import { useTranslation } from '@onefootprint/hooks';
 import {
   Badge,
-  Box,
   Button,
   CodeInline,
-  Divider,
   Pagination,
-  SearchInput,
   Table,
   TableRow,
   Typography,
 } from '@onefootprint/ui';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import {
   statusToBadgeVariant,
   statusToDisplayText,
 } from 'src/constants/onboarding-status-display';
-import styled from 'styled-components';
 
 import FieldOrPlaceholder from './components/field-or-placeholder';
 import Filters from './components/filters';
@@ -39,7 +35,6 @@ const Users = () => {
     { text: t('table.header.phone-number'), width: '14%' },
     { text: t('table.header.start'), width: '13%' },
   ];
-  const [searchText, setSearchText] = useState<string>('');
   const {
     users,
     totalNumResults,
@@ -53,11 +48,6 @@ const Users = () => {
     setFilter,
   } = useGetUsers(PAGE_SIZE);
 
-  // Bind the contents of the search text box to the querystring
-  useEffect(() => {
-    setSearchText(filters.fingerprint || '');
-  }, [filters]);
-
   return (
     <>
       <Head>
@@ -66,29 +56,20 @@ const Users = () => {
       <Typography variant="heading-3" sx={{ marginBottom: 5 }}>
         {t('header.title')}
       </Typography>
-      <SearchContainer>
-        <SearchInput
-          inputSize="compact"
-          sx={{ width: '300px' }}
-          value={searchText}
-          onChangeText={(text: string) =>
-            setFilter({
-              fingerprint: text,
-            })
-          }
-        />
-        <Filters
-          renderCta={({ onClick, filtersCount }) => (
-            <Button size="small" variant="secondary" onClick={onClick}>
-              {t('filters.cta', { count: filtersCount })}
-            </Button>
-          )}
-        />
-      </SearchContainer>
-      <Box sx={{ paddingY: 5 }}>
-        <Divider />
-      </Box>
       <Table<User>
+        search={filters.fingerprint}
+        onChangeSearchText={fingerprint => {
+          setFilter({ fingerprint });
+        }}
+        renderActions={() => (
+          <Filters
+            renderCta={({ onClick, filtersCount }) => (
+              <Button size="small" variant="secondary" onClick={onClick}>
+                {t('filters.cta', { count: filtersCount })}
+              </Button>
+            )}
+          />
+        )}
         aria-label={t('table.aria-label')}
         emptyStateText={t('table.empty-state')}
         items={users}
@@ -115,7 +96,6 @@ const Users = () => {
                 {statusToDisplayText[item.status!]}
               </Badge>
             </td>
-
             <td>
               <FieldOrPlaceholder data={item.attributes.email} />
             </td>
@@ -156,10 +136,5 @@ const Users = () => {
     </>
   );
 };
-
-const SearchContainer = styled.div`
-  display: flex;
-  justify-content: space-between;
-`;
 
 export default Users;

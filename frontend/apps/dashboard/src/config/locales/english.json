@@ -3,6 +3,14 @@
     "error": "Uh-oh!",
     "success": "Yay!"
   },
+  "filters": {
+    "title": "Filters",
+    "apply": "Apply",
+    "clear": "Clear",
+    "cta_zero": "Filters",
+    "cta_one": "Filters · {{count}}",
+    "cta_other": "Filters · {{count}}"
+  },
   "save": "Save",
   "close": "Close",
   "back": "Go back",
@@ -202,7 +210,7 @@
           "disclaimer": "Please note that all data attribute access are logged for security reasons."
         }
       },
-      "risk-signals": {
+      "signals": {
         "title": "Risk signals",
         "empty-state": "No risk signals found",
         "severity": {
@@ -217,6 +225,14 @@
             "severity": "Severity",
             "scope": "Scope",
             "note": "Note"
+          }
+        },
+        "filters": {
+          "severity": {
+            "title": "Severity"
+          },
+          "scope": {
+            "title": "Scope"
           }
         },
         "details": {

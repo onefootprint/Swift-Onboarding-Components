@@ -4,8 +4,7 @@ import { DateRange, OnboardingStatus } from '@onefootprint/types';
 import { Box, Checkbox, InputDateRangePicker, Radio } from '@onefootprint/ui';
 import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
-
-import Fieldset from './components/fieldset';
+import Fieldset from 'src/components/fieldset';
 
 export type FormData = {
   customDate: { from: Date; to: Date };

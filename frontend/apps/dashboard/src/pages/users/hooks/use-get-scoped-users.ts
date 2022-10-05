@@ -66,6 +66,9 @@ const useGetScopedUsers = (pageSize: number) => {
   if (filters.dateRange) {
     query.dateRange = filters.dateRange;
   }
+  if (filters.fingerprint) {
+    query.fingerprint = filters.fingerprint;
+  }
 
   return useQuery<
     PaginatedRequestResponse<ScopedUsersListResponse>,
