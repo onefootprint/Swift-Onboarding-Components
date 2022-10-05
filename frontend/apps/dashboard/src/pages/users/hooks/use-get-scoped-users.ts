@@ -10,11 +10,10 @@ import {
 } from '@tanstack/react-query';
 import omit from 'lodash/omit';
 import useSessionUser, { AuthHeaders } from 'src/hooks/use-session-user';
-import {
+import useUserFilters, {
   getCursors,
   ScopedUsersListQuerystring,
-  useFilters,
-} from 'src/pages/users/hooks/use-filters';
+} from 'src/pages/users/hooks/user-users-filters';
 import { dateRangeToFilterParams } from 'src/utils/date-range';
 
 type ScopedUsersListQueryKey = [
@@ -54,7 +53,7 @@ const getScopedUsersRequest = async ({
 
 const useGetScopedUsers = (pageSize: number) => {
   const { authHeaders } = useSessionUser();
-  const { filters } = useFilters();
+  const { filters } = useUserFilters();
 
   const query: Record<string, any> = {};
   if (filters.footprint_user_id) {

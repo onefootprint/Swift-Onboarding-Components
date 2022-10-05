@@ -23,7 +23,6 @@ describe('<SignalsDetails />', () => {
       pathname: '/users/detail',
       query: {
         signal_id: riskSignalDetailsFixture.id,
-        signal_note: riskSignalDetailsFixture.note,
       },
     });
   });
@@ -91,7 +90,6 @@ describe('<SignalsDetails />', () => {
           pathname: '/users/detail',
           query: {
             signal_id: riskSignalDetailsFixture.id,
-            signal_note: riskSignalDetailsFixture.note,
           },
           push: pushMockFn,
         });
@@ -107,7 +105,6 @@ describe('<SignalsDetails />', () => {
           {
             query: {
               signal_id: firstRelatedSignal.id,
-              signal_note: firstRelatedSignal.note,
             },
           },
           undefined,

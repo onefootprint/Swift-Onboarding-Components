@@ -1,65 +1,50 @@
-import omitBy from 'lodash/omitBy';
-import { useRouter } from 'next/router';
-import { ParsedUrlQuery } from 'querystring';
+import useFilters, { countString } from 'src/hooks/use-filters';
 
-export type QueryParams = {
-  signal_severity?: string;
-  signal_scope?: string;
+export type SignalDetailsQueryParams = {
   signal_id?: string;
-  signal_note?: string;
-  signal_search?: string;
 };
 
-const initialQueryParams: QueryParams = {
-  signal_severity: undefined,
-  signal_scope: undefined,
+export type SignalListQueryParams = {
+  signal_note?: string;
+  signal_scope?: string;
+  signal_search?: string;
+  signal_severity?: string;
+};
+
+export type SignalsQueryParams = SignalDetailsQueryParams &
+  SignalListQueryParams;
+
+const defaultQueryParams: SignalsQueryParams = {
   signal_id: undefined,
   signal_note: undefined,
+  signal_scope: undefined,
   signal_search: undefined,
+  signal_severity: undefined,
 };
 
-const clean = (prevQuery: ParsedUrlQuery, newQuery: ParsedUrlQuery) =>
-  omitBy({ ...prevQuery, ...newQuery }, query => !query);
-
 const useSignalFilters = () => {
-  const router = useRouter();
+  const filters = useFilters<SignalsQueryParams>(defaultQueryParams);
 
   const getFiltersCount = () => {
-    const severity = countString(router.query.signal_severity);
-    const scope = countString(router.query.signal_scope);
+    const severity = countString(filters.query.signal_severity);
+    const scope = countString(filters.query.signal_scope);
     return severity + scope;
   };
 
-  const push = (newQuery: QueryParams) => {
-    router.push({ query: clean(router.query, newQuery) }, undefined, {
-      shallow: true,
-    });
-  };
-
-  const reset = () => {
-    router.push({ query: clean(router.query, initialQueryParams) }, undefined, {
-      shallow: true,
-    });
-  };
-
   return {
-    query: router.query as QueryParams,
-    push,
-    reset,
     count: getFiltersCount(),
+    push: filters.push,
+    query: {
+      signal_id: filters.query.signal_id,
+      signal_note: filters.query.signal_note,
+      signal_scope: filters.query.signal_scope,
+      signal_search: filters.query.signal_search,
+      signal_severity: filters.query.signal_severity,
+    },
+    reset: filters.reset,
   };
 };
 
-export const stringToArray = (value?: string) => {
-  if (!value) return [];
-  return value.split(',');
-};
-
-export const countString = (value?: any) => {
-  if (value && typeof value === 'string') {
-    return value.split(',').length;
-  }
-  return 0;
-};
+export { stringToArray } from 'src/hooks/use-filters';
 
 export default useSignalFilters;

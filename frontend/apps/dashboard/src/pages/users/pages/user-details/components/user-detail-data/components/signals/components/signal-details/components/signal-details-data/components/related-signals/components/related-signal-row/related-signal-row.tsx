@@ -4,12 +4,12 @@ import type { RiskSignal } from '@onefootprint/types';
 import { Badge, Box } from '@onefootprint/ui';
 import React from 'react';
 
-type RowProps = {
+type RelatedSignalRowProps = {
   riskSignal: RiskSignal;
 };
 
-const Row = ({ riskSignal }: RowProps) => {
-  const { t } = useTranslation('pages.user-details.risk-signals.severity');
+const RelatedSignalRow = ({ riskSignal }: RelatedSignalRowProps) => {
+  const { t } = useTranslation('pages.user-details.signals.severity');
 
   return (
     <>
@@ -39,4 +39,4 @@ const Row = ({ riskSignal }: RowProps) => {
   );
 };
 
-export default Row;
+export default RelatedSignalRow;

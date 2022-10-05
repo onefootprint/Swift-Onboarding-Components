@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 
 import useDecryptUser from './use-decrypt-user';
-import { getCursors, useFilters } from './use-filters';
 import useGetScopedUsers from './use-get-scoped-users';
 import useJoinUsers from './use-join-users';
+import useFilters, { getCursors } from './user-users-filters';
 
 // Higher-order hook that combines all util hooks required for fetching users and decrypting data
 const useGetUsers = (pageSize: number) => {

@@ -4,8 +4,8 @@ import { Table, TableRow, Typography } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-import useFilters from '../../../../../../hooks/use-signals-filters';
-import Row from './components/row';
+import useSignalsFilters from '../../../../../../hooks/use-signals-filters';
+import Row from './components/related-signal-row';
 
 type RelatedSignalsProps = {
   relatedSignals: RiskSignalDetails['relatedSignals'];
@@ -14,21 +14,16 @@ type RelatedSignalsProps = {
 const renderTr = ({ item }: TableRow<RiskSignal>) => <Row riskSignal={item} />;
 
 const RelatedSignals = ({ relatedSignals }: RelatedSignalsProps) => {
-  const filters = useFilters();
-  const { t } = useTranslation(
-    'pages.user-details.signals.details.related-signals',
-  );
+  const filters = useSignalsFilters();
+  const { t } = useTranslation('pages.user-details.signals.details.signals');
   const columns = [
     { id: 'severity', text: '', width: '20%' },
     { id: 'note', text: '', width: '65%' },
     { id: 'actions', text: '', width: '15%' },
   ];
 
-  const handleClick = (relatedRiskSignal: RiskSignal) => {
-    filters.push({
-      signal_id: relatedRiskSignal.id,
-      signal_note: relatedRiskSignal.note,
-    });
+  const handleClick = (relatedSignal: RiskSignal) => {
+    filters.push({ signal_id: relatedSignal.id });
   };
 
   return (
@@ -39,7 +34,7 @@ const RelatedSignals = ({ relatedSignals }: RelatedSignalsProps) => {
       <Table<RiskSignal>
         aria-label={t('table.aria-label')}
         columns={columns}
-        getKeyForRow={(riskSignal: RiskSignal) => riskSignal.id}
+        getKeyForRow={(signal: RiskSignal) => signal.id}
         hideThead
         items={relatedSignals}
         onRowClick={handleClick}

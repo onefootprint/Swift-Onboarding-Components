@@ -9,7 +9,7 @@ import SignalDetails from './components/signal-details';
 import SignalFilters from './components/signal-filters';
 import SignalRow from './components/signal-row';
 import useRiskSignals from './hooks/use-signals';
-import useFilters from './hooks/use-signals-filters';
+import useSignalsFilters from './hooks/use-signals-filters';
 
 const renderTr = ({ item }: TableRow<RiskSignal>) => (
   <SignalRow signal={item} />
@@ -18,7 +18,7 @@ const renderTr = ({ item }: TableRow<RiskSignal>) => (
 const RiskSignals = () => {
   const { t, allT } = useTranslation('pages.user-details.signals');
   const { isLoading, error, data: response } = useRiskSignals();
-  const filters = useFilters();
+  const filters = useSignalsFilters();
   const columns = [
     { text: t('table.header.severity'), width: '15%' },
     { text: t('table.header.scope'), width: '15%' },
@@ -26,10 +26,7 @@ const RiskSignals = () => {
   ];
 
   const handleRowClick = (riskSignal: RiskSignal) => {
-    filters.push({
-      signal_id: riskSignal.id,
-      signal_note: riskSignal.note,
-    });
+    filters.push({ signal_id: riskSignal.id });
   };
 
   return (

@@ -25,7 +25,7 @@ const PAGE_SIZE = 10;
 
 const Users = () => {
   const router = useRouter();
-  const { t } = useTranslation('pages.users');
+  const { t, allT } = useTranslation('pages.users');
   const columns = [
     { text: t('table.header.name'), width: '14%' },
     { text: t('table.header.token'), width: '19%' },
@@ -65,7 +65,7 @@ const Users = () => {
           <Filters
             renderCta={({ onClick, filtersCount }) => (
               <Button size="small" variant="secondary" onClick={onClick}>
-                {t('filters.cta', { count: filtersCount })}
+                {allT('filters.cta', { count: filtersCount })}
               </Button>
             )}
           />

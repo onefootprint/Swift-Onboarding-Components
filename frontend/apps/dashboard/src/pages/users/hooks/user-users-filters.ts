@@ -22,7 +22,7 @@ export type ScopedUsersListQuerystring = ScopedUserListFilters & {
 export const getCursors = (req: ScopedUsersListQuerystring) =>
   req.cursors ? req.cursors.split(',') : [];
 
-export const useFilters = () => {
+const useUserFilters = () => {
   const router = useRouter();
 
   const getFiltersCount = () => {
@@ -61,3 +61,5 @@ export const useFilters = () => {
     setCursors,
   };
 };
+
+export default useUserFilters;

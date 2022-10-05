@@ -102,7 +102,6 @@ describe('<Signals />', () => {
             {
               query: {
                 signal_id: firstRiskSignal.id,
-                signal_note: firstRiskSignal.note,
               },
             },
             undefined,
