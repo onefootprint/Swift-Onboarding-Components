@@ -65,11 +65,7 @@ const PrivateLayout = ({ children }: PrivateLayoutProps) => {
         </section>
       </PrivateLayoutContainer>
       <Footer>
-        <Typography
-          color="tertiary"
-          variant="label-4"
-          sx={{ marginTop: 7, textAlign: 'center' }}
-        >
+        <Typography color="tertiary" variant="label-4">
           Footprint ❤️ {data?.tenantName}
         </Typography>
       </Footer>
@@ -82,10 +78,10 @@ const PrivateLayoutContainer = styled.div`
 `;
 
 const Footprint = styled.div`
-  position: relative;
-  display: flex;
-  align-items: center;
   ${({ theme }) => css`
+    position: relative;
+    display: flex;
+    align-items: center;
     padding: ${theme.spacing[4]}px 0;
   `};
 `;
@@ -102,7 +98,13 @@ const Nav = styled.nav`
 
 const Footer = styled.footer`
   ${({ theme }) => css`
-    margin: ${theme.spacing[5]}px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    p {
+      margin: ${theme.spacing[7]}px 0 ${theme.spacing[5]}px;
+    }
   `};
 `;
 
