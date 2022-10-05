@@ -8,6 +8,7 @@
   ],
   "scripts": {
     "build": "turbo run build",
+    "prebuild": "yarn generate:types",
     "predev": "yarn install && yarn build:packages",
     "dev": "turbo run dev --parallel --continue",
     "build:packages": "turbo run build --filter=./packages/*",
@@ -20,7 +21,8 @@
     "typecheck": "turbo run typecheck",
     "clean": "turbo run clean && rm -rf node_modules",
     "version": "changeset version",
-    "release": "changeset publish"
+    "release": "changeset publish",
+    "generate:types": "npx openapi-typescript https://api.onefootprint.com/docs-spec-v3 --output ./packages/types/api.ts --export-type"
   },
   "devDependencies": {
     "@changesets/cli": "^2.24.3",
