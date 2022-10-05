@@ -58,7 +58,7 @@ jobs:
   # build the main api image
   build_api:
     name: Build API container
-    runs-on: ubuntu-latest
+    runs-on: [ beast, linux ]
     environment: ${{ inputs.environment }}
     steps:
       - uses: actions/checkout@v2
