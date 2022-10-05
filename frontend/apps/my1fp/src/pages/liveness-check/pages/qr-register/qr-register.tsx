@@ -84,7 +84,7 @@ const QRRegister = () => {
         {shouldShowQRCodeLoading || !scopedAuthToken ? (
           <Shimmer sx={{ height: '128px', width: '128px' }} />
         ) : (
-          <QRCodeSVG value={createHandoffUrl(scopedAuthToken)} />
+          <QRCodeSVG value={createHandoffUrl({ authToken: scopedAuthToken })} />
         )}
       </QRCodeContainer>
       <Typography variant="body-4" color="tertiary">

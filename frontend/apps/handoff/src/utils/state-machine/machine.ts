@@ -12,7 +12,7 @@ export const createHandoffMachine = () =>
   createMachine<MachineContext, MachineEvents>(
     {
       predictableActionArguments: true,
-      id: 'biometric',
+      id: 'handoff',
       initial: States.init,
       context: {
         device: undefined,

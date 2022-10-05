@@ -6,7 +6,7 @@ import styled, { css } from 'styled-components';
 
 import HeaderTitle from '../../../../components/header-title';
 import NavigationHeader from '../../../../components/navigation-header';
-import createHandoffUrl from '../../../../utils/create-handoff-url';
+import { createHandoffUrl } from '../../../../utils/handoff-url';
 import { useD2PMachine } from '../../components/machine-provider';
 import useD2PGenerate from '../../hooks/use-d2p-generate';
 import useD2PSms from '../../hooks/use-d2p-sms';
@@ -97,7 +97,12 @@ const QRRegister = () => {
           {shouldShowQRCodeLoading || !scopedAuthToken ? (
             <Shimmer sx={{ height: '128px', width: '128px' }} />
           ) : (
-            <QRCodeSVG value={createHandoffUrl(scopedAuthToken, tenant?.pk)} />
+            <QRCodeSVG
+              value={createHandoffUrl({
+                authToken: scopedAuthToken,
+                tenantPk: tenant?.pk,
+              })}
+            />
           )}
         </QRCodeContainer>
         <Typography variant="body-4" color="tertiary">

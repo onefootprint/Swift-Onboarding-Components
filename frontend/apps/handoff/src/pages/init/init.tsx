@@ -1,14 +1,26 @@
 import { DeviceInfo, useDeviceInfo } from '@onefootprint/hooks';
 import { LoadingIndicator } from '@onefootprint/ui';
+import { HandoffUrlQuery, useParseHandoffUrl } from 'footprint-elements';
 import React from 'react';
 import useHandoffMachine from 'src/hooks/use-handoff-machine';
 import { Events } from 'src/utils/state-machine';
 
-import useAuthToken from './hooks/use-parse-router-path';
-
 const Init = () => {
   const [, send] = useHandoffMachine();
-  useAuthToken();
+
+  useParseHandoffUrl({
+    onSuccess: (query: HandoffUrlQuery) => {
+      const { authToken, tenantPk } = query;
+      send({
+        type: Events.paramsReceived,
+        payload: {
+          authToken,
+          tenantPk,
+        },
+      });
+    },
+  });
+
   useDeviceInfo((info: DeviceInfo) => {
     send({
       type: Events.deviceInfoIdentified,

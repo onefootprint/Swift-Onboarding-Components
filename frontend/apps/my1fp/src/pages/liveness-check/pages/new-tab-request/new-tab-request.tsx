@@ -28,7 +28,10 @@ const NewTabRequest = () => {
     if (!scopedAuthToken) {
       return;
     }
-    const tab = window.open(createHandoffUrl(scopedAuthToken), '_blank');
+    const tab = window.open(
+      createHandoffUrl({ authToken: scopedAuthToken }),
+      '_blank',
+    );
     if (tab) {
       send({ type: Events.newTabOpened, payload: { tab } });
     } else {

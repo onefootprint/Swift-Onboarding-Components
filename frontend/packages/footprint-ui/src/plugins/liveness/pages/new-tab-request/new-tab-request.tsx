@@ -5,7 +5,7 @@ import styled, { css } from 'styled-components';
 
 import HeaderTitle from '../../../../components/header-title';
 import NavigationHeader from '../../../../components/navigation-header';
-import createHandoffUrl from '../../../../utils/create-handoff-url';
+import { createHandoffUrl } from '../../../../utils/handoff-url';
 import useGenerateScopedAuthToken from '../../hooks/use-generate-scoped-auth-token';
 import useLivenessMachine from '../../hooks/use-liveness-machine';
 import { Events } from '../../utils/machine';
@@ -25,7 +25,7 @@ const NewTabRequest = () => {
 
   const handleClick = () => {
     const tab = window.open(
-      createHandoffUrl(scopedAuthToken, tenant?.pk),
+      createHandoffUrl({ authToken: scopedAuthToken, tenantPk: tenant?.pk }),
       '_blank',
     );
     if (tab) {
