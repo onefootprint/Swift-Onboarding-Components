@@ -98,7 +98,7 @@ const OnboardingConfigItem = ({ data }: OnboardingConfigItemProps) => {
                   text={t('required-data.tooltip')}
                   placement="bottom-start"
                 >
-                  <Box>
+                  <Box sx={{ display: 'flex' }}>
                     <IcoInfo16 />
                   </Box>
                 </Tooltip>
@@ -132,7 +132,7 @@ const OnboardingConfigItem = ({ data }: OnboardingConfigItemProps) => {
                   text={t('access-data.tooltip')}
                   placement="bottom-start"
                 >
-                  <Box>
+                  <Box sx={{ display: 'flex' }}>
                     <IcoInfo16 />
                   </Box>
                 </Tooltip>
