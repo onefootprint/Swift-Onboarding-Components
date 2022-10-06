@@ -4,6 +4,7 @@ export * from './d2p-sms';
 export * from './decrypt-user';
 export * from './get-doc-status';
 export * from './get-kyc-status';
+export * from './get-onboarding-config';
 export * from './get-risk-signal-details';
 export * from './get-risk-signals';
 export * from './identify';
