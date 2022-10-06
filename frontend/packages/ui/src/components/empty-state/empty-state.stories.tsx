@@ -32,8 +32,7 @@ export default {
 
 const Template: Story<EmptyStateProps> = ({
   description,
-  iconComponent: Icon,
-  renderHeader,
+  iconComponent: Icon = IcoQuote40,
   testID,
   title,
 }: EmptyStateProps) => {
@@ -42,16 +41,38 @@ const Template: Story<EmptyStateProps> = ({
     <EmptyState
       description={description}
       iconComponent={SelectedIcon}
-      renderHeader={renderHeader}
       testID={testID}
       title={title}
     />
   );
 };
 
+const HeaderTemplate: Story<EmptyStateProps> = ({
+  description,
+  renderHeader = () => <h1>Custom Header</h1>,
+  testID,
+  title,
+}: EmptyStateProps) => (
+  <EmptyState
+    description={description}
+    renderHeader={renderHeader}
+    testID={testID}
+    title={title}
+  />
+);
+
 export const Base = Template.bind({});
 Base.args = {
-  title: 'Title',
   description: 'Description',
   iconComponent: IcoQuote40,
+  title: 'Title',
+  testID: 'empty-state-test-id',
+};
+
+export const WithCustomHeader = HeaderTemplate.bind({});
+WithCustomHeader.args = {
+  description: 'Description',
+  renderHeader: () => <h1>Custom Header</h1>,
+  title: 'Title',
+  testID: 'empty-state-test-id',
 };
