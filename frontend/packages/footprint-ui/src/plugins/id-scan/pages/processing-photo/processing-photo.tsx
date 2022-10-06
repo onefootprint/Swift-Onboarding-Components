@@ -13,7 +13,7 @@ import { Events } from '../../utils/state-machine/types';
 import useGetDocStatus from './hooks/use-get-doc-status';
 import useSubmitDoc from './hooks/use-submit-doc';
 
-enum Status {
+enum DisplayStatus {
   loading,
   success,
   error,
@@ -24,28 +24,46 @@ const TRANSITION_DELAY = 3000;
 const ProcessingPhoto = () => {
   const { t } = useTranslation('pages.processing-photo');
   const [state, send] = useIdScanMachine();
-  const { type, documentRequestId, country, authToken, frontImage, backImage } =
+  const { type, tenant, country, authToken, frontImage, backImage } =
     state.context;
   const docType = type
     ? IdScanDocTypeToLabel[type]
     : t('default-document-label');
-  const [status, setStatus] = useState<Status>(Status.loading);
+  const [displayStatus, setDisplayStatus] = useState<DisplayStatus>(
+    DisplayStatus.loading,
+  );
   const submitDocMutation = useSubmitDoc();
-  const [statusPollingDisabled, setStatusPollingDisabled] = useState(true);
 
-  const handleDocStatusUpdate = (response: GetDocStatusResponse) => {
-    if (response.status === 'pending') {
+  useEffectOnce(() => {
+    if (!frontImage || !authToken || !tenant || !type || !country) {
       return;
     }
-    handleDocSuccess();
-  };
+    submitDocMutation.mutate({
+      frontImage,
+      backImage,
+      authToken,
+      tenantPk: tenant?.pk,
+      documentType: type,
+      countryCode: country,
+    });
+  });
+
   useGetDocStatus({
-    disabled: statusPollingDisabled,
-    onSuccess: handleDocStatusUpdate,
+    onSuccess: (response: GetDocStatusResponse) => {
+      const { status, frontImageError, backImageError } = response;
+      if (status === 'pending') {
+        return;
+      }
+      if (frontImageError || backImageError) {
+        handleDocError(frontImageError, backImageError);
+        return;
+      }
+      handleDocSuccess();
+    },
   });
 
   const handleDocSuccess = () => {
-    setStatus(Status.success);
+    setDisplayStatus(DisplayStatus.success);
     setTimeout(() => {
       send({
         type: Events.imageSucceeded,
@@ -57,7 +75,7 @@ const ProcessingPhoto = () => {
     frontImageError?: IdScanBadImageError,
     backImageError?: IdScanBadImageError,
   ) => {
-    setStatus(Status.error);
+    setDisplayStatus(DisplayStatus.error);
     setTimeout(() => {
       send({
         type: Events.imageFailed,
@@ -69,55 +87,19 @@ const ProcessingPhoto = () => {
     }, TRANSITION_DELAY);
   };
 
-  const handlePendingStatus = () => {
-    setStatusPollingDisabled(false);
-  };
-
-  useEffectOnce(() => {
-    if (!frontImage || !authToken || !documentRequestId || !type || !country) {
-      return;
-    }
-    submitDocMutation.mutate(
-      {
-        frontImage,
-        backImage,
-        authToken,
-        id: documentRequestId,
-        documentType: type,
-        countryCode: country,
-      },
-      {
-        onSuccess({ status: docStatus, error }) {
-          if (!error && docStatus === 'complete') {
-            handleDocSuccess();
-            return;
-          }
-          if (error) {
-            const { frontImageError, backImageError } = error;
-            handleDocError(frontImageError, backImageError);
-            return;
-          }
-          if (docStatus === 'pending') {
-            handlePendingStatus();
-          }
-        },
-      },
-    );
-  });
-
   return (
     <Container>
       <HeaderTitle
         title={t('title', { type: docType })}
         subtitle={t('subtitle')}
       />
-      {status === Status.loading && (
+      {displayStatus === DisplayStatus.loading && (
         <>
           <LoadingIndicator />
           <Typography variant="label-3">{t('loading')}</Typography>
         </>
       )}
-      {status === Status.success && (
+      {displayStatus === DisplayStatus.success && (
         <>
           <IcoCheckCircle40 color="success" />
           <Typography variant="label-3" color="success">
@@ -125,7 +107,7 @@ const ProcessingPhoto = () => {
           </Typography>
         </>
       )}
-      {status === Status.error && (
+      {displayStatus === DisplayStatus.error && (
         <>
           <IcoClose40 color="error" />
           <Typography variant="label-3" color="error">

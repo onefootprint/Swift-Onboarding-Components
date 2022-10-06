@@ -1,6 +1,10 @@
 import { DeviceInfo } from '@onefootprint/hooks';
-import { IdScanBadImageError, IdScanDocType } from '@onefootprint/types';
-import { CountryCode3 } from '@onefootprint/types/src/data/countries';
+import {
+  CountryCode3,
+  IdScanBadImageError,
+  IdScanDocType,
+  TenantInfo,
+} from '@onefootprint/types';
 
 export enum States {
   init = 'init',
@@ -35,7 +39,7 @@ export type MachineContext = {
   // Plugin context
   authToken?: string;
   device?: DeviceInfo;
-  documentRequestId?: string;
+  tenant?: TenantInfo;
   // Machine generated
   type?: IdScanDocType;
   country?: CountryCode3;
@@ -51,7 +55,7 @@ export type MachineEvents =
       payload: {
         authToken: string;
         device: DeviceInfo;
-        documentRequestId: string;
+        tenant: TenantInfo;
       };
     }
   | {

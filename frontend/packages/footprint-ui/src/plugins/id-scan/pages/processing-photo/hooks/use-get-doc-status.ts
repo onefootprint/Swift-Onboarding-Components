@@ -3,17 +3,21 @@ import { GetDocStatusRequest, GetDocStatusResponse } from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
 
 import { useIdScanMachine } from '../../../components/machine-provider';
-import BIFROST_AUTH_HEADER from '../../../config/constants';
+import {
+  BIFROST_AUTH_HEADER,
+  CLIENT_PUBLIC_KEY_HEADER,
+} from '../../../config/constants';
 
 const DOC_STATUS_FETCH_INTERVAL = 1000;
 
 const getDocStatus = async (payload: GetDocStatusRequest) => {
-  const { authToken, id } = payload;
+  const { authToken, tenantPk } = payload;
   const response = await request<GetDocStatusResponse>({
     method: 'GET',
-    url: `/hosted/user/document/${id}`,
+    url: `/hosted/user/document`,
     headers: {
       [BIFROST_AUTH_HEADER]: authToken,
+      [CLIENT_PUBLIC_KEY_HEADER]: tenantPk,
     },
   });
   return response.data;
@@ -21,21 +25,20 @@ const getDocStatus = async (payload: GetDocStatusRequest) => {
 
 const useGetDocStatus = (
   options: {
-    disabled?: boolean;
     onSuccess?: (data: GetDocStatusResponse) => void;
     onError?: (error: RequestError) => void;
   } = {},
 ) => {
   const [state] = useIdScanMachine();
   const authToken = state.context.authToken ?? '';
-  const id = state.context.documentRequestId ?? '';
+  const tenantPk = state.context.tenant?.pk ?? '';
 
   return useQuery<GetDocStatusResponse, RequestError>(
     ['doc-status', authToken],
-    () => getDocStatus({ id, authToken }),
+    () => getDocStatus({ tenantPk, authToken }),
     {
       refetchInterval: DOC_STATUS_FETCH_INTERVAL,
-      enabled: !!authToken && !!id && !options.disabled,
+      enabled: !!authToken && !!tenantPk,
       onSuccess: options.onSuccess,
       onError: options.onError,
     },

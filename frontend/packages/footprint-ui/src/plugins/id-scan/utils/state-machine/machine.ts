@@ -121,10 +121,10 @@ const createIdScanMachine = () =>
       actions: {
         [Actions.assignContext]: assign((context, event) => {
           if (event.type === Events.receivedContext) {
-            const { authToken, device, documentRequestId } = event.payload;
+            const { authToken, device, tenant } = event.payload;
             context.authToken = authToken;
             context.device = device;
-            context.documentRequestId = documentRequestId;
+            context.tenant = tenant;
           }
           return context;
         }),
