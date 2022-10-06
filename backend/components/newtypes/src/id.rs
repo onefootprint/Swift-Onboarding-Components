@@ -90,6 +90,7 @@ define_newtype_id!(
 
 define_newtype_id!(KvDataKey, String, "Represents the tag/key of key-value data");
 define_newtype_id!(DocumentRequestId, String, "Identifier for a DocumentRequest");
+define_newtype_id!(IdentityDocumentId, String, "Identifier for an IdentityDocument");
 
 impl ObConfigurationKey {
     /// prefixed on LIVE keys
