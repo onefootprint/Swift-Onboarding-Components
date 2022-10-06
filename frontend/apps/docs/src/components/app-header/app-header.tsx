@@ -32,7 +32,7 @@ const PageHeader = ({ articles }: PageHeaderProps) => {
 
   const desktopLinks = [
     {
-      href: 'https://onefootprint.stoplight.io/docs/footprint-public-docs/1f6bffaf405b1-org',
+      href: 'https://api-docs.onefootprint.com/docs/footprint-public-docs/1f6bffaf405b1-org',
       Icon: IcoArrowUpRight16,
       text: t('nav.docs.desktop'),
     },
@@ -40,7 +40,7 @@ const PageHeader = ({ articles }: PageHeaderProps) => {
 
   const mobileLinks = [
     {
-      href: 'https://onefootprint.stoplight.io/docs/footprint-public-docs/1f6bffaf405b1-org',
+      href: 'https://api-docs.onefootprint.com/docs/footprint-public-docs/1f6bffaf405b1-org',
       Icon: IcoArrowUpRight16,
       text: t('nav.docs.mobile'),
     },
