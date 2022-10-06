@@ -34,7 +34,7 @@ pub async fn handler(
     let auth_token = state
         .db_pool
         .db_query(move |conn| -> Result<_, ApiError> {
-            let expires_in = Duration::minutes(3);
+            let expires_in = Duration::minutes(10);
             let data = UserSession::create(
                 user_auth.user_vault_id(),
                 vec![UserAuthScope::Handoff, UserAuthScope::OrgOnboarding],
