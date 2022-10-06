@@ -1,4 +1,3 @@
-import { HANDOFF_BASE_URL } from '@onefootprint/global-constants';
 import request, { RequestError } from '@onefootprint/request';
 import { D2PSmsRequest, D2PSmsResponse } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
@@ -10,7 +9,7 @@ const d2pSms = async (payload: D2PSmsRequest) => {
     method: 'POST',
     url: '/hosted/onboarding/d2p/sms',
     data: {
-      baseUrl: HANDOFF_BASE_URL,
+      url: payload.url,
     },
     headers: {
       [BIFROST_AUTH_HEADER]: payload.authToken,

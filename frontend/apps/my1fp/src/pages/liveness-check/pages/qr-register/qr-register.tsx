@@ -16,7 +16,7 @@ import useD2PGenerate from './hooks/use-generate-d2p';
 const QRRegister = () => {
   const { t } = useTranslation('pages.liveness-check.qr-register');
   const [state, send] = useLivenessCheckMachine();
-  const { scopedAuthToken } = state.context;
+  const { scopedAuthToken, device } = state.context;
   const { session } = useSessionUser();
   const authToken = session?.authToken;
 
@@ -60,12 +60,16 @@ const QRRegister = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [statusResponse?.data?.status]);
 
+  const url = createHandoffUrl({
+    authToken: scopedAuthToken ?? '',
+    opener: device?.type,
+  });
   const handleSendLinkToPhone = () => {
     if (!scopedAuthToken) {
       return;
     }
     d2pSmsMutation.mutate(
-      { authToken: scopedAuthToken },
+      { authToken: scopedAuthToken, url },
       {
         onSuccess() {
           send({ type: Events.qrCodeLinkSentViaSms });
@@ -84,7 +88,7 @@ const QRRegister = () => {
         {shouldShowQRCodeLoading || !scopedAuthToken ? (
           <Shimmer sx={{ height: '128px', width: '128px' }} />
         ) : (
-          <QRCodeSVG value={createHandoffUrl({ authToken: scopedAuthToken })} />
+          <QRCodeSVG value={url} />
         )}
       </QRCodeContainer>
       <Typography variant="body-4" color="tertiary">

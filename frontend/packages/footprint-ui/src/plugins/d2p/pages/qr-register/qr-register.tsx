@@ -17,7 +17,7 @@ import { Events } from '../../utils/state-machine/types';
 const QRRegister = () => {
   const { t } = useTranslation('pages.qr-register');
   const [state, send] = useD2PMachine();
-  const { authToken, scopedAuthToken, missingRequirements, tenant } =
+  const { authToken, scopedAuthToken, missingRequirements, tenant, device } =
     state.context;
   const d2pGenerateMutation = useD2PGenerate();
   const d2pSmsMutation = useD2PSms();
@@ -68,12 +68,17 @@ const QRRegister = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [statusResponse?.data?.status]);
 
+  const url = createHandoffUrl({
+    authToken: scopedAuthToken ?? '',
+    tenantPk: tenant?.pk,
+    opener: device?.type,
+  });
   const handleSendLinkToPhone = () => {
     if (!scopedAuthToken) {
       return;
     }
     d2pSmsMutation.mutate(
-      { authToken: scopedAuthToken },
+      { authToken: scopedAuthToken, url },
       {
         onSuccess() {
           send({ type: Events.qrCodeLinkSentViaSms });
@@ -97,12 +102,7 @@ const QRRegister = () => {
           {shouldShowQRCodeLoading || !scopedAuthToken ? (
             <Shimmer sx={{ height: '128px', width: '128px' }} />
           ) : (
-            <QRCodeSVG
-              value={createHandoffUrl({
-                authToken: scopedAuthToken,
-                tenantPk: tenant?.pk,
-              })}
-            />
+            <QRCodeSVG value={url} />
           )}
         </QRCodeContainer>
         <Typography variant="body-4" color="tertiary">
