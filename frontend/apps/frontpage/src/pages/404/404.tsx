@@ -12,7 +12,7 @@ const Page404 = () => {
         <EmptyState
           title={t('title')}
           description={t('description')}
-          renderImage={() => (
+          renderHeader={() => (
             <Image
               alt={t('image.alt')}
               height={212.62}

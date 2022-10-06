@@ -1,3 +1,4 @@
+import { IcoArrowRightSmall24 } from '@onefootprint/icons';
 import { customRender, screen, userEvent } from '@onefootprint/test-utils';
 import React from 'react';
 
@@ -5,25 +6,30 @@ import EmptyState, { EmptyStateProps } from './empty-state';
 
 describe('<EmptyState />', () => {
   const renderEmptyState = ({
-    title = 'banner content',
+    cta = { label: 'cta', onClick: () => {} },
     description = 'warning',
-    cta = {
-      label: 'cta',
-      onClick: () => {},
-    },
-    renderImage,
+    iconComponent,
+    renderHeader,
+    testID,
+    title = 'banner content',
   }: Partial<EmptyStateProps>) =>
     customRender(
+      // Types won't work well in this case, as the component
+      // do not accept renderHeader and iconComponent at the same time
+      // @ts-ignore
       <EmptyState
-        title={title}
-        description={description}
         cta={cta}
-        renderImage={renderImage}
+        description={description}
+        iconComponent={iconComponent}
+        renderHeader={renderHeader}
+        testID={testID}
+        title={title}
       />,
     );
 
   it('should render the title', () => {
     renderEmptyState({ title: "Oops! User couldn't be found." });
+
     expect(
       screen.getByText("Oops! User couldn't be found."),
     ).toBeInTheDocument();
@@ -34,6 +40,7 @@ describe('<EmptyState />', () => {
       description:
         "We're sorry, but it looks like the user you're looking for doesn't exist.",
     });
+
     expect(
       screen.getByText(
         "We're sorry, but it looks like the user you're looking for doesn't exist.",
@@ -41,18 +48,39 @@ describe('<EmptyState />', () => {
     ).toBeInTheDocument();
   });
 
-  describe('when clicking on the cta', () => {
-    it('should trigger onClick', async () => {
-      const onClickMockFn = jest.fn();
+  it('should trigger onClick when clicking on the cta', async () => {
+    const onClickMockFn = jest.fn();
+    renderEmptyState({
+      cta: {
+        label: 'Go back',
+        onClick: onClickMockFn,
+      },
+    });
+    const cta = screen.getByText('Go back');
+    await userEvent.click(cta);
+
+    expect(onClickMockFn).toHaveBeenCalled();
+  });
+
+  describe('when passing an Icon', () => {
+    it('should render the Icon', () => {
       renderEmptyState({
-        cta: {
-          label: 'Go back',
-          onClick: onClickMockFn,
-        },
+        iconComponent: IcoArrowRightSmall24,
+        testID: 'empty-state',
       });
-      const cta = screen.getByText('Go back');
-      await userEvent.click(cta);
-      expect(onClickMockFn).toHaveBeenCalled();
+
+      const emptyState = screen.getByTestId('empty-state');
+      expect(emptyState).toContainHTML('svg');
+    });
+  });
+
+  describe('when rendering the header', () => {
+    it('should render the header', () => {
+      renderEmptyState({
+        renderHeader: () => <div>foo</div>,
+      });
+
+      expect(screen.getByText('foo')).toBeInTheDocument();
     });
   });
 });

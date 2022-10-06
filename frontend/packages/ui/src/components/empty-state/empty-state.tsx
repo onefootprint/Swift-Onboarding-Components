@@ -1,26 +1,37 @@
+import type { Icon } from '@onefootprint/icons';
 import React from 'react';
 
 import Box from '../box';
 import Button from '../button';
 import Typography from '../typography';
 
-export type EmptyStateProps = {
-  title: string;
-  description: string;
-  cta?: {
-    label: string;
-    onClick: () => void;
-  };
-  renderImage?: () => React.ReactNode;
+type OnlyIcon = {
+  iconComponent: Icon;
+  renderHeader?: never;
 };
 
+type OnlyImage = {
+  iconComponent?: never;
+  renderHeader: () => React.ReactNode;
+};
+
+export type EmptyStateProps = {
+  cta?: { label: string; onClick: () => void };
+  description: string;
+  title: string;
+  testID?: string;
+} & (OnlyIcon | OnlyImage);
+
 const EmptyState = ({
-  title,
-  description,
   cta,
-  renderImage,
+  description,
+  iconComponent: Icon,
+  renderHeader,
+  title,
+  testID,
 }: EmptyStateProps) => (
   <Box
+    testID={testID}
     sx={{
       alignItems: 'center',
       display: 'flex',
@@ -29,7 +40,12 @@ const EmptyState = ({
       textAlign: 'center',
     }}
   >
-    {renderImage && <Box sx={{ marginBottom: 9 }}>{renderImage()}</Box>}
+    {Icon && (
+      <Box sx={{ marginBottom: 7 }}>
+        <Icon />
+      </Box>
+    )}
+    {renderHeader && <Box sx={{ marginBottom: 9 }}>{renderHeader()}</Box>}
     <Typography variant="heading-3" sx={{ marginBottom: 5 }}>
       {title}
     </Typography>

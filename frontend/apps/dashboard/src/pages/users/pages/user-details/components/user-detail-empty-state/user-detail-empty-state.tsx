@@ -10,7 +10,7 @@ const UserDetailEmptyState = () => {
   return (
     <Box sx={{ marginTop: 11 }}>
       <EmptyState
-        renderImage={() => (
+        renderHeader={() => (
           <Image alt={t('image.cta')} height={212} src="/404.png" width={298} />
         )}
         title={t('title')}
