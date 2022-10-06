@@ -1,4 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
+import { D2PStatus } from '@onefootprint/types';
 import { Button, Divider, Shimmer, Typography } from '@onefootprint/ui';
 import { QRCodeSVG } from 'qrcode.react';
 import React, { useEffect } from 'react';
@@ -11,7 +12,7 @@ import { useD2PMachine } from '../../components/machine-provider';
 import useD2PGenerate from '../../hooks/use-d2p-generate';
 import useD2PSms from '../../hooks/use-d2p-sms';
 import useGenerateScopedAuthToken from '../../hooks/use-generate-scoped-auth-token';
-import useGetD2PStatus, { D2PStatus } from '../../hooks/use-get-d2p-status';
+import useGetD2PStatus from '../../hooks/use-get-d2p-status';
 import { Events } from '../../utils/state-machine/types';
 
 const QRRegister = () => {

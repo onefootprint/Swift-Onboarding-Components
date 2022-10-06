@@ -2,6 +2,7 @@ export * from './biometric-register';
 export * from './d2p-generate';
 export * from './d2p-sms';
 export * from './decrypt-user';
+export * from './get-d2p-status';
 export * from './get-doc-status';
 export * from './get-kyc-status';
 export * from './get-onboarding-config';

@@ -1,5 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { D2PStatusUpdate } from '@onefootprint/types';
+import { D2PStatus, D2PStatusUpdate } from '@onefootprint/types';
 import { LinkButton, LoadingIndicator } from '@onefootprint/ui';
 import React, { useEffect } from 'react';
 import styled, { css } from 'styled-components';
@@ -7,7 +7,7 @@ import styled, { css } from 'styled-components';
 import HeaderTitle from '../../../../components/header-title';
 import NavigationHeader from '../../../../components/navigation-header';
 import { useD2PMachine } from '../../components/machine-provider';
-import useGetD2PStatus, { D2PStatus } from '../../hooks/use-get-d2p-status';
+import useGetD2PStatus from '../../hooks/use-get-d2p-status';
 import useUpdateD2PStatus from '../../hooks/use-update-d2p-status';
 import { Events } from '../../utils/state-machine/types';
 

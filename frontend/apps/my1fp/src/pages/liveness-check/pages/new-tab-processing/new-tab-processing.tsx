@@ -1,4 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
+import { D2PStatus } from '@onefootprint/types';
 import { LinkButton, LoadingIndicator } from '@onefootprint/ui';
 import { HeaderTitle } from 'footprint-elements';
 import React from 'react';
@@ -6,7 +7,7 @@ import { useLivenessCheckMachine } from 'src/pages/liveness-check/components/mac
 import { Events } from 'src/utils/state-machine/liveness-check';
 import styled, { css } from 'styled-components';
 
-import useGetD2PStatus, { D2PStatus } from '../../hooks/d2p/use-get-d2p-status';
+import useGetD2PStatus from '../../hooks/d2p/use-get-d2p-status';
 
 const NewTabProcessing = () => {
   const { t } = useTranslation('pages.new-tab-processing');

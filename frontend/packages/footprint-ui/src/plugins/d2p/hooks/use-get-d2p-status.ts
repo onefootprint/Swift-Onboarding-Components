@@ -1,26 +1,11 @@
 import request, { RequestError } from '@onefootprint/request';
+import { GetD2PRequest, GetD2PResponse } from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
 
 import { useD2PMachine } from '../components/machine-provider';
 import BIFROST_AUTH_HEADER from '../config/constants';
 
 const D2P_STATUS_FETCH_INTERVAL = 1000;
-
-export type GetD2PRequest = {
-  scopedAuthToken: string;
-};
-
-export enum D2PStatus {
-  waiting = 'waiting',
-  inProgress = 'in_progress',
-  canceled = 'canceled',
-  failed = 'failed',
-  completed = 'completed',
-}
-
-export type GetD2PResponse = {
-  status: D2PStatus;
-};
 
 const getD2PStatus = async (payload: GetD2PRequest) => {
   const response = await request<GetD2PResponse>({

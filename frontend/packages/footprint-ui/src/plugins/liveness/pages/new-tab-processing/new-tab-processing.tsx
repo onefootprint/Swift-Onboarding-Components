@@ -1,11 +1,12 @@
 import { useTranslation } from '@onefootprint/hooks';
+import { D2PStatus } from '@onefootprint/types';
 import { LinkButton, LoadingIndicator } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
 import HeaderTitle from '../../../../components/header-title';
 import NavigationHeader from '../../../../components/navigation-header';
-import useGetD2PStatus, { D2PStatus } from '../../hooks/use-get-d2p-status';
+import useGetD2PStatus from '../../hooks/use-get-d2p-status';
 import useLivenessMachine from '../../hooks/use-liveness-machine';
 import { Events } from '../../utils/machine';
 

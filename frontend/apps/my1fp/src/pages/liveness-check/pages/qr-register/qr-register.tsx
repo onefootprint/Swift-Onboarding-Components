@@ -1,4 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
+import { D2PStatus } from '@onefootprint/types';
 import { Button, Divider, Shimmer, Typography } from '@onefootprint/ui';
 import { createHandoffUrl, HeaderTitle } from 'footprint-elements';
 import { QRCodeSVG } from 'qrcode.react';
@@ -9,7 +10,7 @@ import styled, { css } from 'styled-components';
 
 import { useLivenessCheckMachine } from '../../components/machine-provider';
 import useGenerateScopedAuthToken from '../../hooks/d2p/use-generate-scoped-auth-token';
-import useGetD2PStatus, { D2PStatus } from '../../hooks/d2p/use-get-d2p-status';
+import useGetD2PStatus from '../../hooks/d2p/use-get-d2p-status';
 import useD2PSms from './hooks/use-d2p-sms';
 import useD2PGenerate from './hooks/use-generate-d2p';
 
