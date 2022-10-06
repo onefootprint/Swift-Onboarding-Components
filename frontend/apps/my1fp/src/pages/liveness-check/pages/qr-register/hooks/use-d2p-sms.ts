@@ -1,7 +1,7 @@
 import request, { RequestError } from '@onefootprint/request';
 import { D2PSmsRequest, D2PSmsResponse } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
-import { MY1FP_AUTH_HEADER } from 'src/config/constants';
+import { AUTH_HEADER } from 'src/config/constants';
 
 const d2pSms = async (payload: D2PSmsRequest) => {
   const response = await request<{}>({
@@ -11,7 +11,7 @@ const d2pSms = async (payload: D2PSmsRequest) => {
       url: payload.url,
     },
     headers: {
-      [MY1FP_AUTH_HEADER]: payload.authToken,
+      [AUTH_HEADER]: payload.authToken,
     },
   });
   return response.data;

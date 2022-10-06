@@ -1,7 +1,7 @@
 import request, { RequestError } from '@onefootprint/request';
 import { UserDataRequest, UserDataResponse } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
-import { BIFROST_AUTH_HEADER } from 'src/config/constants';
+import { AUTH_HEADER } from 'src/config/constants';
 
 const userDataRequest = async (payload: UserDataRequest) => {
   const response = await request<UserDataResponse>({
@@ -12,7 +12,7 @@ const userDataRequest = async (payload: UserDataRequest) => {
       speculative: !!payload.speculative,
     },
     headers: {
-      [BIFROST_AUTH_HEADER]: payload.authToken,
+      [AUTH_HEADER]: payload.authToken,
     },
   });
   return response.data;

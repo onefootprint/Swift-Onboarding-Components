@@ -5,7 +5,7 @@ import {
 } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
 
-import { BIFROST_AUTH_HEADER } from '../config/constants';
+import { AUTH_HEADER } from '../config/constants';
 
 const updateD2PStatus = async (payload: UpdateD2PStatusRequest) => {
   const response = await request<{}>({
@@ -13,7 +13,7 @@ const updateD2PStatus = async (payload: UpdateD2PStatusRequest) => {
     url: '/hosted/onboarding/d2p/status',
     data: payload,
     headers: {
-      [BIFROST_AUTH_HEADER]: payload.authToken,
+      [AUTH_HEADER]: payload.authToken,
     },
   });
   return response.data;

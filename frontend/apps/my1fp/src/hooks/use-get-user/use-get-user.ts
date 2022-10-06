@@ -1,7 +1,7 @@
 import request, { RequestError } from '@onefootprint/request';
 import { useQuery } from '@tanstack/react-query';
 
-import { MY1FP_AUTH_HEADER } from '../../config/constants';
+import { AUTH_HEADER } from '../../config/constants';
 import useSessionUser from '../use-session-user';
 import { UserIdentification } from '../use-session-user/use-session-user';
 
@@ -19,7 +19,7 @@ const getUser = async (payload: GetUserRequest) => {
     method: 'GET',
     url: '/hosted/user',
     headers: {
-      [MY1FP_AUTH_HEADER]: payload.authToken,
+      [AUTH_HEADER]: payload.authToken,
     },
   });
   return response.data;

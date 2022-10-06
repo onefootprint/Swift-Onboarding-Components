@@ -2,7 +2,7 @@ import request, { RequestError } from '@onefootprint/request';
 import { UserDecryptRequest, UserDecryptResponse } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
 
-import { MY1FP_AUTH_HEADER } from '../../config/constants';
+import { AUTH_HEADER } from '../../config/constants';
 
 const decryptUserRequest = async (payload: UserDecryptRequest) => {
   const response = await request<UserDecryptResponse>({
@@ -12,7 +12,7 @@ const decryptUserRequest = async (payload: UserDecryptRequest) => {
       attributes: payload.attributes,
     },
     headers: {
-      [MY1FP_AUTH_HEADER]: payload.authToken,
+      [AUTH_HEADER]: payload.authToken,
     },
   });
   return response.data;

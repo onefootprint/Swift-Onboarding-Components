@@ -2,7 +2,7 @@ import request, { RequestError } from '@onefootprint/request';
 import { GetD2PRequest, GetD2PResponse } from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
 
-import { BIFROST_AUTH_HEADER } from '../config/constants';
+import { AUTH_HEADER } from '../config/constants';
 import useLivenessMachine from './use-liveness-machine';
 
 const D2P_STATUS_FETCH_INTERVAL = 1000;
@@ -12,7 +12,7 @@ const getD2PStatus = async (payload: GetD2PRequest) => {
     method: 'GET',
     url: '/hosted/onboarding/d2p/status',
     headers: {
-      [BIFROST_AUTH_HEADER]: payload.scopedAuthToken,
+      [AUTH_HEADER]: payload.scopedAuthToken,
     },
   });
   return response.data;

@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 
 import { useIdScanMachine } from '../../../components/machine-provider';
 import {
-  BIFROST_AUTH_HEADER,
+  AUTH_HEADER,
   CLIENT_PUBLIC_KEY_HEADER,
 } from '../../../config/constants';
 
@@ -16,7 +16,7 @@ const getDocStatus = async (payload: GetDocStatusRequest) => {
     method: 'GET',
     url: `/hosted/user/document`,
     headers: {
-      [BIFROST_AUTH_HEADER]: authToken,
+      [AUTH_HEADER]: authToken,
       [CLIENT_PUBLIC_KEY_HEADER]: tenantPk,
     },
   });

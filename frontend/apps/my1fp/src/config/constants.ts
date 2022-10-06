@@ -6,4 +6,4 @@ export const LOGGED_OUT_ROUTES = ['/login'];
 export const DEFAULT_LOGGED_IN_ROUTE = '/';
 export const DEFAULT_LOGGED_OUT_ROUTE = '/login';
 
-export const MY1FP_AUTH_HEADER = 'x-fp-authorization';
+export const AUTH_HEADER = 'x-fp-authorization';

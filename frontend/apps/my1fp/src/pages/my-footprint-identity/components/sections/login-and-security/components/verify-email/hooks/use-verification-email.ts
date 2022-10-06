@@ -4,7 +4,7 @@ import {
   UserEmailChallengeResponse,
 } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
-import { MY1FP_AUTH_HEADER } from 'src/config/constants';
+import { AUTH_HEADER } from 'src/config/constants';
 
 const verificationEmailRequest = async (payload: UserEmailChallengeRequest) => {
   const response = await request<UserEmailChallengeResponse>({
@@ -14,7 +14,7 @@ const verificationEmailRequest = async (payload: UserEmailChallengeRequest) => {
       id: payload.id,
     },
     headers: {
-      [MY1FP_AUTH_HEADER]: payload.authToken,
+      [AUTH_HEADER]: payload.authToken,
     },
   });
   return response.data;

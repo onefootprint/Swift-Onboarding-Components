@@ -5,7 +5,7 @@ import {
 } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
 
-import { BIFROST_AUTH_HEADER } from '../config/constants';
+import { AUTH_HEADER } from '../config/constants';
 import generateRegisterDeviceResponse from '../utils/biometric/register-challenge-response';
 
 const biometricRegister = async (payload: BiometricRegisterRequest) => {
@@ -18,7 +18,7 @@ const biometricRegister = async (payload: BiometricRegisterRequest) => {
     url: '/hosted/user/biometric/init',
     data: payload,
     headers: {
-      [BIFROST_AUTH_HEADER]: authToken,
+      [AUTH_HEADER]: authToken,
     },
   });
 
@@ -35,7 +35,7 @@ const biometricRegister = async (payload: BiometricRegisterRequest) => {
       challengeToken,
     },
     headers: {
-      [BIFROST_AUTH_HEADER]: authToken,
+      [AUTH_HEADER]: authToken,
     },
   });
   return response.data;

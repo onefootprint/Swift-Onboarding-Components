@@ -5,7 +5,7 @@ import {
   QueryKey,
   useInfiniteQuery,
 } from '@tanstack/react-query';
-import { MY1FP_AUTH_HEADER } from 'src/config/constants';
+import { AUTH_HEADER } from 'src/config/constants';
 
 export type AccessLogsRequest = {
   authToken: string;
@@ -25,7 +25,7 @@ const getAccessLogsRequest = async ({
     url: '/hosted/user/access_events',
     params: { cursor: pageParam, kind: 'decrypt' },
     headers: {
-      [MY1FP_AUTH_HEADER]: authToken,
+      [AUTH_HEADER]: authToken,
     },
   });
   return response.data;

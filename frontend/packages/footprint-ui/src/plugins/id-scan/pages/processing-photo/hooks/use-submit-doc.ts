@@ -3,7 +3,7 @@ import { SubmitDocRequest, SubmitDocResponse } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
 
 import {
-  BIFROST_AUTH_HEADER,
+  AUTH_HEADER,
   CLIENT_PUBLIC_KEY_HEADER,
 } from '../../../config/constants';
 
@@ -26,7 +26,7 @@ const submitDoc = async (payload: SubmitDocRequest) => {
       countryCode,
     },
     headers: {
-      [BIFROST_AUTH_HEADER]: authToken,
+      [AUTH_HEADER]: authToken,
       [CLIENT_PUBLIC_KEY_HEADER]: tenantPk,
     },
   });

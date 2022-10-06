@@ -1,7 +1,7 @@
 import request, { RequestError } from '@onefootprint/request';
 import { AuthorizedOrg } from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
-import { MY1FP_AUTH_HEADER } from 'src/config/constants';
+import { AUTH_HEADER } from 'src/config/constants';
 import useSessionUser from 'src/hooks/use-session-user';
 
 export type AuthorizedOrgsRequest = {
@@ -15,7 +15,7 @@ const getAuthorizedOrgs = async (payload: AuthorizedOrgsRequest) => {
     method: 'GET',
     url: '/hosted/user/authorized_orgs',
     headers: {
-      [MY1FP_AUTH_HEADER]: payload.authToken,
+      [AUTH_HEADER]: payload.authToken,
     },
   });
   return response.data;

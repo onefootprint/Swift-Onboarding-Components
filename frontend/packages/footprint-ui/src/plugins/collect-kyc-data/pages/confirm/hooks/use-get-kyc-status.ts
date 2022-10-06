@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 
 import { useCollectKycDataMachine } from '../../../components/machine-provider';
 import {
-  BIFROST_AUTH_HEADER,
+  AUTH_HEADER,
   CLIENT_PUBLIC_KEY_HEADER,
 } from '../../../config/contants';
 
@@ -15,7 +15,7 @@ const getKycStatus = async (payload: GetKycStatusRequest) => {
     method: 'GET',
     url: '/hosted/onboarding/kyc',
     headers: {
-      [BIFROST_AUTH_HEADER]: payload.authToken,
+      [AUTH_HEADER]: payload.authToken,
       [CLIENT_PUBLIC_KEY_HEADER]: payload.tenantPk,
     },
   });

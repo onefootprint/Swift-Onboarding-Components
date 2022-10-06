@@ -1,3 +1,3 @@
-const BIFROST_AUTH_HEADER = 'x-fp-authorization';
+const AUTH_HEADER = 'x-fp-authorization';
 
-export default BIFROST_AUTH_HEADER;
+export default AUTH_HEADER;

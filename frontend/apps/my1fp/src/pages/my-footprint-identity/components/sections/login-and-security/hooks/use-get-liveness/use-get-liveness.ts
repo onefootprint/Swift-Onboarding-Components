@@ -1,7 +1,7 @@
 import request, { RequestError } from '@onefootprint/request';
 import { InsightEvent } from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
-import { MY1FP_AUTH_HEADER } from 'src/config/constants';
+import { AUTH_HEADER } from 'src/config/constants';
 import useSessionUser from 'src/hooks/use-session-user';
 
 export type GetLivenessRequest = {
@@ -18,7 +18,7 @@ const getLiveness = async (payload: GetLivenessRequest) => {
     method: 'GET',
     url: '/hosted/user/liveness',
     headers: {
-      [MY1FP_AUTH_HEADER]: payload.authToken,
+      [AUTH_HEADER]: payload.authToken,
     },
   });
 
