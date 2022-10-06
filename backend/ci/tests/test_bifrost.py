@@ -24,6 +24,7 @@ from tests.webauthn_simulator import SoftWebauthnDevice
 
 WEBAUTHN_DEVICE = SoftWebauthnDevice()
 
+
 @pytest.fixture(scope="module")
 def auth_token(twilio):
     # Test the SMS challenge flow, return the resulting auth token of the user created with the number
@@ -102,7 +103,7 @@ class TestBifrost:
         assert not body["validation_token"]
 
         body = get("hosted/onboarding/status", None, ob_auth, auth_token)
-        
+
         req = lambda kind: next(r for r in body["requirements"] if r["kind"] == kind)
         identity_check_req = req("identity_check")
         assert set(identity_check_req["missing_attributes"]) == {
@@ -197,7 +198,7 @@ class TestBifrost:
         d2p_auth_token = FpAuth(body["auth_token"])
 
         # Send the d2p token to the user via SMS
-        data = dict(base_url="https://onefootprint.com/")
+        data = dict(url="https://onefootprint.com/#{}".format(d2p_auth_token))
         post("hosted/onboarding/d2p/sms", data, d2p_auth_token)
 
         def _update_status(status, status_code=200):
@@ -404,6 +405,7 @@ class TestBifrost:
         assert (
             foo_fp_user_id != bar_fp_user_id
         ), "Onboarding onto different tenants should give different fp_user_id"
+
 
 class TestBifrostSandbox:
     @pytest.mark.parametrize(
