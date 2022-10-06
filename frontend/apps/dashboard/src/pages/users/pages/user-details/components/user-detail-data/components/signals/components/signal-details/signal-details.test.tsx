@@ -37,6 +37,11 @@ describe('<SignalsDetails />', () => {
       renderRiskSignalDetails();
 
       await waitFor(() => {
+        const loadingTitle = screen.getByText('Loading...');
+        expect(loadingTitle).toBeInTheDocument();
+      });
+
+      await waitFor(() => {
         const drawer = screen.getByTestId('risk-signal-details-loading');
         expect(drawer.getAttribute('aria-busy')).toBeTruthy();
       });
@@ -64,8 +69,8 @@ describe('<SignalsDetails />', () => {
         screen.queryByTestId('risk-signal-details-loading'),
       );
 
-      const note = screen.getByText(riskSignalDetailsFixture.note);
-      expect(note).toBeInTheDocument();
+      const titleAndNote = screen.queryAllByText(riskSignalDetailsFixture.note);
+      expect(titleAndNote).toHaveLength(2);
 
       const dataVendor = screen.getByText(riskSignalDetailsFixture.dataVendor);
       expect(dataVendor).toBeInTheDocument();

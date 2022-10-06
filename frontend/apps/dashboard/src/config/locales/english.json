@@ -1,5 +1,6 @@
 {
   "notifications": {
+    "loading": "Loading...",
     "error": "Uh-oh!",
     "success": "Yay!"
   },

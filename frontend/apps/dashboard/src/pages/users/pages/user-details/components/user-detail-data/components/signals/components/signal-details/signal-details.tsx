@@ -1,3 +1,4 @@
+import { useTranslation } from '@onefootprint/hooks';
 import { getErrorMessage } from '@onefootprint/request';
 import { Drawer } from '@onefootprint/ui';
 import React from 'react';
@@ -9,12 +10,20 @@ import SignalDetailLoading from './components/signal-details-loading';
 import useRiskSignalDetails from './hooks/use-risk-signal-details';
 
 const SignalDetails = () => {
+  const { t } = useTranslation();
   const { query, reset } = useSignalsFilters();
   const isOpen = !!query.signal_id;
   const { data, isLoading, error } = useRiskSignalDetails(query.signal_id);
 
+  const getDrawerTitle = () => {
+    if (data) {
+      return data.note;
+    }
+    return isLoading ? t('notifications.loading') : t('notifications.error');
+  };
+
   return (
-    <Drawer open={isOpen} title="Warm Address Alert" onClose={reset}>
+    <Drawer open={isOpen} title={getDrawerTitle()} onClose={reset}>
       <>
         {data && <SignalDetailsData riskSignal={data} />}
         {isLoading && <SignalDetailLoading />}
