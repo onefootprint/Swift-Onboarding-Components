@@ -405,7 +405,23 @@ class TestBifrost:
         assert (
             foo_fp_user_id != bar_fp_user_id
         ), "Onboarding onto different tenants should give different fp_user_id"
+    
+    
+    def test_document_request(self, auth_token, workos_tenant):
+        assert auth_token is not None
+        data = {
+            "front_image": "b64_123",
+            "back_image": "b64_345",
+            "document_type": "passport",
+            "country_code": "USA",
+        }
+        body = post(f"hosted/user/document/", data, auth_token, workos_tenant.ob_config.key)
+        assert body == {}
 
+        # Temporary
+        expected = {'status': {'kind': 'error'}, 'front_image_error': None, 'back_image_error': 'blurry'}
+        get_body = get(f"hosted/user/document/back_error", data, auth_token, workos_tenant.ob_config.key)
+        assert get_body == expected
 
 class TestBifrostSandbox:
     @pytest.mark.parametrize(

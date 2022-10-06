@@ -1,5 +1,6 @@
 pub mod access_event;
 pub mod audit_trail;
+pub mod document;
 pub mod error;
 pub mod identity_data_request;
 pub mod insight_event;

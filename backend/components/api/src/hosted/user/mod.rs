@@ -9,6 +9,7 @@ pub mod authorized_orgs;
 pub mod biometric;
 pub mod decrypt;
 pub mod detail;
+pub mod document;
 pub mod email;
 pub mod identity_data;
 pub mod liveness;
@@ -23,6 +24,8 @@ pub fn routes() -> web::Scope {
         .service(access_events::handler)
         .service(biometric::init)
         .service(biometric::complete)
+        .service(document::get)
+        .service(document::post)
         .service(liveness::get)
         .service(token::get)
         .service(email::routes())
