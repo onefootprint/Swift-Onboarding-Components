@@ -50,6 +50,12 @@ type PrimaryAndLinkButtons = {
   linkButton: DialogLinkButton;
 };
 
+type NoButtons = {
+  primaryButton?: never;
+  secondaryButton?: never;
+  linkButton?: never;
+};
+
 export type DialogProps = {
   children?: React.ReactNode;
   closeAriaLabel?: string;
@@ -59,7 +65,7 @@ export type DialogProps = {
   size?: Size;
   testID?: string;
   title: string;
-} & (OnlyPrimaryButton | OnlyButtons | PrimaryAndLinkButtons);
+} & (OnlyPrimaryButton | OnlyButtons | PrimaryAndLinkButtons | NoButtons);
 
 const Dialog = ({
   children,
@@ -105,50 +111,52 @@ const Dialog = ({
               <Typography variant="label-2">{title}</Typography>
             </Header>
             <Body>{children}</Body>
-            <Footer>
-              <Box>
-                {linkButton && (
-                  <LinkButton
-                    onClick={linkButton.onClick}
-                    size="compact"
-                    type={linkButton.type}
-                    form={linkButton.form}
-                  >
-                    {linkButton.label}
-                  </LinkButton>
-                )}
-              </Box>
-              <ButtonsContainer>
-                {secondaryButton && (
-                  <Button
-                    disabled={secondaryButton.disabled}
-                    form={secondaryButton.form}
-                    loading={secondaryButton.loading}
-                    loadingAriaLabel={secondaryButton.loadingAriaLabel}
-                    onClick={secondaryButton.onClick}
-                    size="compact"
-                    type={secondaryButton.type}
-                    variant="secondary"
-                  >
-                    {secondaryButton.label}
-                  </Button>
-                )}
-                {primaryButton && (
-                  <Button
-                    disabled={primaryButton.disabled}
-                    form={primaryButton.form}
-                    loading={primaryButton.loading}
-                    loadingAriaLabel={primaryButton.loadingAriaLabel}
-                    onClick={primaryButton.onClick}
-                    size="compact"
-                    type={primaryButton.type}
-                    variant="primary"
-                  >
-                    {primaryButton.label}
-                  </Button>
-                )}
-              </ButtonsContainer>
-            </Footer>
+            {linkButton || primaryButton || secondaryButton ? (
+              <Footer>
+                <Box>
+                  {linkButton && (
+                    <LinkButton
+                      onClick={linkButton.onClick}
+                      size="compact"
+                      type={linkButton.type}
+                      form={linkButton.form}
+                    >
+                      {linkButton.label}
+                    </LinkButton>
+                  )}
+                </Box>
+                <ButtonsContainer>
+                  {secondaryButton && (
+                    <Button
+                      disabled={secondaryButton.disabled}
+                      form={secondaryButton.form}
+                      loading={secondaryButton.loading}
+                      loadingAriaLabel={secondaryButton.loadingAriaLabel}
+                      onClick={secondaryButton.onClick}
+                      size="compact"
+                      type={secondaryButton.type}
+                      variant="secondary"
+                    >
+                      {secondaryButton.label}
+                    </Button>
+                  )}
+                  {primaryButton && (
+                    <Button
+                      disabled={primaryButton.disabled}
+                      form={primaryButton.form}
+                      loading={primaryButton.loading}
+                      loadingAriaLabel={primaryButton.loadingAriaLabel}
+                      onClick={primaryButton.onClick}
+                      size="compact"
+                      type={primaryButton.type}
+                      variant="primary"
+                    >
+                      {primaryButton.label}
+                    </Button>
+                  )}
+                </ButtonsContainer>
+              </Footer>
+            ) : null}
           </DialogContainer>
         </Overlay>
       </FocusTrap>

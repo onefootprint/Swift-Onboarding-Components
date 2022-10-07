@@ -11,8 +11,9 @@ import { nameData, User } from 'src/pages/users/hooks/use-join-users';
 import styled, { css } from 'styled-components';
 
 import getSectionsVisibility from '../../utils/get-sections-visibility';
-import DataContainer from './components/data-container';
+import RiskSignalsOverview from '../risk-signals-overview';
 import DataRow from './components/data-row';
+import DataSection from './components/data-section';
 
 type ViewBasicInfoProps = {
   user: User;
@@ -27,8 +28,30 @@ const ViewBasicInfo = ({ user }: ViewBasicInfoProps) => {
 
   return (
     <DataGrid>
-      <DataContainer
-        headerIcon={IcoFileText224}
+      <DataSection
+        iconComponent={IcoFileText224}
+        renderFooter={() => (
+          <RiskSignalsOverview
+            high={[]}
+            medium={[
+              {
+                id: '1',
+                severity: 'medium',
+                scope: 'Identity',
+                note: 'High Risk Email Domain',
+                noteDetails: 'Lorem Ipsum dolor simet at magna lorem ipsum',
+              },
+              {
+                id: '2',
+                severity: 'medium',
+                scope: 'Phone number',
+                note: 'VoIP Number',
+                noteDetails: 'Lorem Ipsum dolor simet at magna lorem ipsum',
+              },
+            ]}
+            low={[]}
+          />
+        )}
         title={t('user-info.basic.title')}
       >
         {user.identityDataAttributes.includes(UserDataAttribute.firstName) &&
@@ -52,10 +75,33 @@ const ViewBasicInfo = ({ user }: ViewBasicInfoProps) => {
             data={userAttributes.phoneNumber}
           />
         )}
-      </DataContainer>
+      </DataSection>
       {showIdentity && (
-        <DataContainer
-          headerIcon={IcoUserCircle24}
+        <DataSection
+          iconComponent={IcoUserCircle24}
+          renderFooter={() => (
+            <RiskSignalsOverview
+              high={[
+                {
+                  id: '1',
+                  severity: 'high',
+                  scope: 'Identity',
+                  note: 'SSN Issued Prior to DOB',
+                  noteDetails: 'Lorem Ipsum dolor simet at magna lorem ipsum',
+                },
+              ]}
+              medium={[
+                {
+                  id: '2',
+                  severity: 'medium',
+                  scope: 'Identity',
+                  note: 'SSN tied to multiple names',
+                  noteDetails: 'Lorem Ipsum dolor simet at magna lorem ipsum',
+                },
+              ]}
+              low={[]}
+            />
+          )}
           title={t('user-info.identity.title')}
         >
           {user.identityDataAttributes.includes(UserDataAttribute.ssn9) && (
@@ -76,7 +122,7 @@ const ViewBasicInfo = ({ user }: ViewBasicInfoProps) => {
               data={userAttributes.dob}
             />
           )}
-        </DataContainer>
+        </DataSection>
       )}
       {showAddress && (
         <Box
@@ -85,8 +131,39 @@ const ViewBasicInfo = ({ user }: ViewBasicInfoProps) => {
             gridColumn: '2 / 2',
           }}
         >
-          <DataContainer
-            headerIcon={IcoBuilding24}
+          <DataSection
+            renderFooter={() => (
+              <RiskSignalsOverview
+                high={[
+                  {
+                    id: '1',
+                    severity: 'high',
+                    scope: 'Address',
+                    note: 'Warm Address Alert',
+                    noteDetails: 'Lorem Ipsum dolor simet at magna lorem ipsum',
+                  },
+                ]}
+                medium={[
+                  {
+                    id: '2',
+                    severity: 'medium',
+                    scope: 'Address',
+                    note: 'Street Name Does Not Match',
+                    noteDetails: 'Lorem Ipsum dolor simet at magna lorem ipsum',
+                  },
+                ]}
+                low={[
+                  {
+                    id: '3',
+                    severity: 'low',
+                    scope: 'Address',
+                    note: 'Zip Code Does Not Match',
+                    noteDetails: 'Lorem Ipsum dolor simet at magna lorem ipsum',
+                  },
+                ]}
+              />
+            )}
+            iconComponent={IcoBuilding24}
             title={t('user-info.address.title')}
           >
             {user.identityDataAttributes.includes(
@@ -131,7 +208,7 @@ const ViewBasicInfo = ({ user }: ViewBasicInfoProps) => {
                 data={userAttributes.state}
               />
             )}
-          </DataContainer>
+          </DataSection>
         </Box>
       )}
     </DataGrid>

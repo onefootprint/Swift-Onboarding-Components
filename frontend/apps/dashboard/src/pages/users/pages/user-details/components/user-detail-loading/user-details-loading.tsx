@@ -56,10 +56,10 @@ const UserDetailsLoading = () => (
     </Box>
     <DataGrid>
       <Box id="basic-data">
-        <Shimmer sx={{ height: '159px', width: '632px' }} />
+        <Shimmer sx={{ height: '212px', width: '632px' }} />
       </Box>
       <Box id="identity-data">
-        <Shimmer sx={{ height: '159px', width: '632px' }} />
+        <Shimmer sx={{ height: '212px', width: '632px' }} />
       </Box>
       <Box
         id="address-data"
@@ -68,7 +68,7 @@ const UserDetailsLoading = () => (
           gridColumn: '2 / 2',
         }}
       >
-        <Shimmer sx={{ height: '334px', width: '632px' }} />
+        <Shimmer sx={{ height: '440px', width: '632px' }} />
       </Box>
     </DataGrid>
   </Box>

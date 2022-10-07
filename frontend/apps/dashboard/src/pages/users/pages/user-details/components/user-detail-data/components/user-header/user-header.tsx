@@ -47,10 +47,10 @@ const UserHeader = ({ user }: BasicInfoProps) => {
 };
 
 const HeaderContainer = styled.div`
-  display: flex;
-  flex-direction: column;
   ${({ theme }) => css`
-    gap: ${theme.spacing[3]}px;
+    display: flex;
+    flex-direction: column;
+    gap: ${theme.spacing[2]}px;
   `};
 `;
 

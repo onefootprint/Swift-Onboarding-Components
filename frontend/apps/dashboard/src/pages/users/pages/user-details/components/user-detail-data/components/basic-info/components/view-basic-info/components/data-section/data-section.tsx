@@ -1,37 +1,37 @@
 import { Icon } from '@onefootprint/icons';
 import { Typography } from '@onefootprint/ui';
 import React from 'react';
-import { UserData } from 'src/pages/users/hooks/use-user-data';
 import styled, { css } from 'styled-components';
 
-export type DataRow = {
-  title: string;
-  data: UserData;
-  shouldShow: boolean;
-};
-
-type DataContainerProps = {
-  headerIcon: Icon;
+type DataSectionProps = {
   children: React.ReactNode;
+  iconComponent: Icon;
+  renderFooter: () => React.ReactNode;
   title: string;
 };
 
-const DataContainer = ({
-  headerIcon: HeaderIcon,
+const DataSection = ({
+  iconComponent: IconComponent,
   title,
   children,
-}: DataContainerProps) => (
-  <StyledContainer>
+  renderFooter,
+}: DataSectionProps) => (
+  <DataSectionContainer>
     <Header>
-      <HeaderIcon />
+      <IconComponent />
       <Typography variant="label-3">{title}</Typography>
     </Header>
-    <RowContainer>{children}</RowContainer>
-  </StyledContainer>
+    <Inner>
+      <Fieldset>{children}</Fieldset>
+      <Footer>{renderFooter()}</Footer>
+    </Inner>
+  </DataSectionContainer>
 );
 
-const StyledContainer = styled.div`
+const DataSectionContainer = styled.div`
   ${({ theme }) => css`
+    display: flex;
+    flex-direction: column;
     height: 100%;
     border: 1px solid ${theme.borderColor.tertiary};
     border-radius: ${theme.spacing[2]}px;
@@ -51,13 +51,31 @@ const Header = styled.header`
   `};
 `;
 
-const RowContainer = styled.div`
+const Inner = styled.div`
+  ${({ theme }) => css`
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    justify-content: space-between;
+    padding: ${theme.spacing[5]}px ${theme.spacing[7]}px ${theme.spacing[4]}px;
+  `};
+`;
+
+const Fieldset = styled.fieldset`
   ${({ theme }) => css`
     display: flex;
     flex-direction: column;
     gap: ${theme.spacing[4]}px;
-    padding: ${theme.spacing[5]}px ${theme.spacing[7]}px;
   `};
 `;
 
-export default DataContainer;
+const Footer = styled.footer`
+  ${({ theme }) => css`
+    display: flex;
+    padding-top: ${theme.spacing[4]}px;
+    margin-top: ${theme.spacing[7]}px;
+    border-top: 1px solid ${theme.borderColor.tertiary};
+  `};
+`;
+
+export default DataSection;

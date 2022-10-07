@@ -167,6 +167,24 @@
         },
         "address": {
           "title": "Address data"
+        },
+        "risks": {
+          "cta": "See details",
+          "empty-state": "No risk signals",
+          "low_one": "{{count}} <a>Low</a> risk signal",
+          "low_other": "{{count}} <a>Low</a> risk signals",
+          "medium_one": "{{count}} <a>Medium</a> risk signal",
+          "medium_other": "{{count}} <a>Medium</a> risk signals",
+          "high_one": "{{count}} <a>High</a> risk signal",
+          "high_other": "{{count}} <a>High</a> risk signals",
+          "low-medium": "{{mediumCount}} <a>Medium</a> and {{lowCount}} <b>Low</b> risk signals",
+          "low-high": "{{highCount}} <a>High</a> and {{lowCount}} <b>Low</b> risk signals",
+          "medium-high": "{{highCount}} <a>High</a> and {{mediumCount}} <b>Medium</b> risk signals",
+          "low-medium-high": "{{highCount}} <a>High</a>, {{mediumCount}} <b>Medium</b> and {{lowCount}} <c>Low</c> risk signals",
+          "list-dialog": {
+            "title": "Identity data's risk signal",
+            "description": "Select a risk signal"
+          }
         }
       },
       "decrypt": {
