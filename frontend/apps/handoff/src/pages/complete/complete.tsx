@@ -1,24 +1,37 @@
 import { useCountdown, useTranslation } from '@onefootprint/hooks';
-import React, { useEffect } from 'react';
+import { D2PStatusUpdate } from '@onefootprint/types';
+import React from 'react';
+import useUpdateD2pStatus from 'src/hooks/use-update-d2p-status';
+import { useEffectOnce } from 'usehooks-ts';
 
 import HeaderTitle from '../../components/header-title';
+import useHandoffMachine from '../../hooks/use-handoff-machine';
 import useOpener from '../../hooks/use-opener';
 
 const SUCCESS_COUNTER_SECONDS = 3;
 
-const Success = () => {
-  const { t } = useTranslation('pages.success');
+const Complete = () => {
+  const { t } = useTranslation('pages.complete');
   const opener = useOpener();
+  const updateD2PStatusMutation = useUpdateD2pStatus();
+  const [state] = useHandoffMachine();
+  const { authToken } = state.context;
+
   const shouldShowCounter = opener === 'mobile';
   const { countdown, setSeconds } = useCountdown({
     disabled: !shouldShowCounter,
     onCompleted: () => window.close(),
   });
 
-  useEffect(() => {
+  useEffectOnce(() => {
+    if (authToken) {
+      updateD2PStatusMutation.mutate({
+        authToken,
+        status: D2PStatusUpdate.completed,
+      });
+    }
     setSeconds(SUCCESS_COUNTER_SECONDS);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  });
 
   return (
     <HeaderTitle
@@ -32,4 +45,4 @@ const Success = () => {
   );
 };
 
-export default Success;
+export default Complete;

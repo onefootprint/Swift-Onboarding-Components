@@ -7,6 +7,7 @@ import {
   MachineEvents,
   States,
 } from './types';
+import StatusReceivedTransitions from './utils';
 
 export const createHandoffMachine = () =>
   createMachine<MachineContext, MachineEvents>(
@@ -14,55 +15,35 @@ export const createHandoffMachine = () =>
       predictableActionArguments: true,
       id: 'handoff',
       initial: States.init,
-      context: {
-        device: undefined,
-        authToken: '',
-      },
+      context: {},
       states: {
         [States.init]: {
           on: {
-            [Events.paramsReceived]: [
+            [Events.authTokenReceived]: [
               {
-                description: 'If we are still waiting on device info to be set',
+                cond: context => !!context.device && !!context.tenant,
                 actions: [Actions.assignAuthToken, Actions.assignTenantPk],
-                cond: context => !context.device,
+                target: States.checkRequirements,
               },
               {
-                description:
-                  'If auth token is set, and device supports biometric',
-                target: States.register,
-                actions: [Actions.assignAuthToken],
-                cond: (context, event) =>
-                  !!event.payload.authToken &&
-                  context.device?.type === 'mobile' &&
-                  context.device?.hasSupportForWebauthn,
+                actions: [Actions.assignAuthToken, Actions.assignTenantPk],
+              },
+            ],
+            [Events.tenantInfoReceived]: [
+              {
+                cond: context => !!context.device && !!context.authToken,
+                actions: [Actions.assignTenant],
+                target: States.checkRequirements,
               },
               {
-                description:
-                  "If auth token is set, but device doesn't support biometrics",
-                target: States.unavailable,
-                actions: [Actions.assignAuthToken],
+                actions: [Actions.assignTenant],
               },
             ],
             [Events.deviceInfoIdentified]: [
               {
-                description:
-                  'If auth token is set, and device supports biometric',
-                target: States.register,
-                cond: (context, event) =>
-                  !!context.authToken &&
-                  event.payload.type === 'mobile' &&
-                  event.payload.hasSupportForWebauthn,
+                cond: context => !!context.tenant && !!context.authToken,
                 actions: [Actions.assignDeviceInfo],
-              },
-              {
-                description:
-                  "If device is not mobile or doesn't support biometrics, no need to wait on auth token",
-                target: States.unavailable,
-                cond: (context, event) =>
-                  event.payload.type !== 'mobile' ||
-                  !event.payload.hasSupportForWebauthn,
-                actions: [Actions.assignDeviceInfo],
+                target: States.checkRequirements,
               },
               {
                 actions: [Actions.assignDeviceInfo],
@@ -70,53 +51,56 @@ export const createHandoffMachine = () =>
             ],
           },
         },
-        [States.register]: {
+        [States.checkRequirements]: {
           on: {
-            [Events.registerFailed]: {
-              target: States.registerRetry,
-            },
-            [Events.registerSucceeded]: {
-              target: States.success,
-            },
-            [Events.canceled]: {
-              target: States.canceled,
-            },
-            [Events.statusPollingErrored]: {
-              target: States.expired,
-              actions: [Actions.clearAuthToken],
-            },
+            [Events.requirementsReceived]: [
+              {
+                target: States.liveness,
+                actions: [Actions.assignRequirements],
+                cond: (context, event) => !!event.payload.missingLiveness,
+              },
+              {
+                target: States.idScan,
+                actions: [Actions.assignRequirements],
+                cond: (context, event) => !!event.payload.missingIdDocument,
+              },
+              {
+                target: States.complete,
+              },
+            ],
+            ...StatusReceivedTransitions,
           },
         },
-        [States.registerRetry]: {
+        [States.liveness]: {
           on: {
-            [Events.registerSucceeded]: {
-              target: States.success,
-            },
-            [Events.canceled]: {
-              target: States.canceled,
-            },
-            [Events.statusPollingErrored]: {
-              target: States.expired,
-              actions: [Actions.clearAuthToken],
-            },
+            [Events.livenessCompleted]: [
+              {
+                target: States.idScan,
+                cond: context => !!context.requirements?.missingIdDocument,
+              },
+              {
+                target: States.complete,
+              },
+            ],
+            ...StatusReceivedTransitions,
           },
+        },
+        [States.idScan]: {
+          on: {
+            [Events.idScanCompleted]: {
+              target: States.complete,
+            },
+            ...StatusReceivedTransitions,
+          },
+        },
+        [States.expired]: {
+          type: 'final',
         },
         [States.canceled]: {
           type: 'final',
         },
-        [States.unavailable]: {
+        [States.complete]: {
           type: 'final',
-        },
-        [States.success]: {
-          type: 'final',
-        },
-        [States.expired]: {
-          on: {
-            [Events.paramsReceived]: {
-              target: States.register,
-              actions: [Actions.assignAuthToken],
-            },
-          },
         },
       },
     },
@@ -132,20 +116,28 @@ export const createHandoffMachine = () =>
           return context;
         }),
         [Actions.assignAuthToken]: assign((context, event) => {
-          if (event.type === Events.paramsReceived) {
+          if (event.type === Events.authTokenReceived) {
             context.authToken = event.payload.authToken;
           }
           return context;
         }),
+        [Actions.assignRequirements]: assign((context, event) => {
+          if (event.type === Events.requirementsReceived) {
+            context.requirements = {
+              ...event.payload,
+            };
+          }
+          return context;
+        }),
         [Actions.assignTenantPk]: assign((context, event) => {
-          if (event.type === Events.paramsReceived) {
+          if (event.type === Events.authTokenReceived) {
             context.tenantPk = event.payload.tenantPk;
           }
           return context;
         }),
-        [Actions.clearAuthToken]: assign((context, event) => {
-          if (event.type === Events.statusPollingErrored) {
-            context.authToken = '';
+        [Actions.assignTenant]: assign((context, event) => {
+          if (event.type === Events.tenantInfoReceived) {
+            context.tenant = event.payload.tenant;
           }
           return context;
         }),

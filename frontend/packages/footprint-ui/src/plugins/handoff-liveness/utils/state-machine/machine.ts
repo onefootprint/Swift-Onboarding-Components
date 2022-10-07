@@ -37,45 +37,42 @@ export const createHandoffLivenessMachine = () =>
         },
         [States.register]: {
           on: {
-            [Events.registerFailed]: {
-              target: States.registerRetry,
+            [Events.failed]: {
+              target: States.retry,
             },
-            [Events.registerSucceeded]: {
+            [Events.succeeded]: {
               target: States.success,
-            },
-            [Events.canceled]: {
-              target: States.canceled,
-            },
-            [Events.statusPollingErrored]: {
-              target: States.expired,
-              actions: [Actions.clearAuthToken],
             },
           },
         },
-        [States.registerRetry]: {
+        [States.retry]: {
           on: {
-            [Events.registerSucceeded]: {
+            [Events.failed]: {
+              target: States.retry,
+            },
+            [Events.skipped]: {
+              target: States.completed,
+            },
+            [Events.succeeded]: {
               target: States.success,
             },
-            [Events.canceled]: {
-              target: States.canceled,
-            },
-            [Events.statusPollingErrored]: {
-              target: States.expired,
-              actions: [Actions.clearAuthToken],
-            },
           },
-        },
-        [States.canceled]: {
-          type: 'final',
         },
         [States.unavailable]: {
-          type: 'final',
+          on: {
+            [Events.completed]: {
+              target: States.completed,
+            },
+          },
         },
         [States.success]: {
-          type: 'final',
+          on: {
+            [Events.completed]: {
+              target: States.completed,
+            },
+          },
         },
-        [States.expired]: {
+        [States.completed]: {
           type: 'final',
         },
       },
@@ -88,12 +85,6 @@ export const createHandoffLivenessMachine = () =>
             context.authToken = authToken;
             context.device = device;
             context.tenant = tenant;
-          }
-          return context;
-        }),
-        [Actions.clearAuthToken]: assign((context, event) => {
-          if (event.type === Events.statusPollingErrored) {
-            context.authToken = '';
           }
           return context;
         }),

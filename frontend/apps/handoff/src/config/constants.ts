@@ -3,5 +3,5 @@ export const DEPLOYMENT_URL = process.env.NEXT_PUBLIC_VERCEL_URL;
 export const SENTRY_DSN = process.env.NEXT_PUBLIC_SENTRY_DSN;
 export const VERCEL_ENV = process.env.NEXT_PUBLIC_VERCEL_ENV;
 
-export const HANDOFF_AUTH_HEADER = 'x-fp-authorization';
+export const AUTH_HEADER = 'x-fp-authorization';
 export const CLIENT_PUBLIC_KEY_HEADER = 'X-Onboarding-Config-Key';

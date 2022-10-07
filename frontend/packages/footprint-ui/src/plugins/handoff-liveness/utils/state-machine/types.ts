@@ -4,25 +4,22 @@ import { TenantInfo } from '@onefootprint/types';
 export enum States {
   init = 'init',
   register = 'register',
-  registerRetry = 'registerRetry',
+  retry = 'retry',
   unavailable = 'unavailable',
   success = 'success',
-  canceled = 'canceled',
-  expired = 'expired',
+  completed = 'completed',
 }
 
 export enum Events {
   receivedContext = 'receivedContext',
-  registerFailed = 'registerFailed',
-  registerSucceeded = 'registerSucceeded',
-  canceled = 'canceled',
-  statusPollingErrored = 'statusPollingErrored',
+  failed = 'failed',
+  succeeded = 'succeeded',
+  skipped = 'skipped',
+  completed = 'completed',
 }
 
 export enum Actions {
   assignContext = 'assignContext',
-  assignAuthToken = 'assignAuthToken',
-  clearAuthToken = 'clearAuthToken',
 }
 
 export type MachineContext = {
@@ -40,7 +37,7 @@ export type MachineEvents =
         device: DeviceInfo;
       };
     }
-  | { type: Events.registerFailed }
-  | { type: Events.registerSucceeded }
-  | { type: Events.canceled }
-  | { type: Events.statusPollingErrored };
+  | { type: Events.failed }
+  | { type: Events.skipped }
+  | { type: Events.succeeded }
+  | { type: Events.completed };

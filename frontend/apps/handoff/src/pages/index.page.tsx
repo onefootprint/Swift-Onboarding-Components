@@ -1,40 +1,71 @@
-import has from 'lodash/has';
+import { HandoffLiveness, IdScan } from 'footprint-elements';
 import React from 'react';
+import useGetD2pStatus from 'src/hooks/use-get-d2p-status';
 import useHandoffMachine from 'src/hooks/use-handoff-machine';
-import { States } from 'src/utils/state-machine';
+import { Events, States } from 'src/utils/state-machine';
 
 import Canceled from './canceled';
+import CheckRequirements from './check-requirements';
+import Success from './complete';
 import Expired from './expired';
 import Init from './init';
-import Register from './register';
-import RegisterRetry from './register-retry';
-import Success from './success';
-import Unavailable from './unavailable';
-
-type Page = {
-  [page in States]?: () => JSX.Element;
-};
 
 const Root = () => {
-  const [state] = useHandoffMachine();
-  const valueCasted = state.value as States;
-  const pages: Page = {
-    [States.init]: Init,
-    [States.register]: Register,
-    [States.registerRetry]: RegisterRetry,
-    [States.unavailable]: Unavailable,
-    [States.success]: Success,
-    [States.canceled]: Canceled,
-    [States.expired]: Expired,
-  };
-  if (has(pages, valueCasted)) {
-    const Page = pages[valueCasted];
+  const [state, send] = useHandoffMachine();
+  const { authToken, device, tenant } = state.context;
+  useGetD2pStatus();
 
-    if (Page) {
-      return <Page />;
-    }
+  if (state.matches(States.init)) {
+    return <Init />;
   }
-  // TODO: SHOW 404
+  if (state.matches(States.complete)) {
+    return <Success />;
+  }
+  if (state.matches(States.canceled)) {
+    return <Canceled />;
+  }
+  if (state.matches(States.expired)) {
+    return <Expired />;
+  }
+  if (state.matches(States.checkRequirements)) {
+    return <CheckRequirements />;
+  }
+  if (state.matches(States.liveness)) {
+    if (!authToken || !device || !tenant) {
+      return null;
+    }
+    return (
+      <HandoffLiveness
+        context={{
+          authToken,
+          device,
+          tenant,
+        }}
+        metadata={{}}
+        onDone={() => {
+          send({ type: Events.livenessCompleted });
+        }}
+      />
+    );
+  }
+  if (state.matches(States.idScan)) {
+    if (!authToken || !device || !tenant) {
+      return null;
+    }
+    return (
+      <IdScan
+        context={{
+          authToken,
+          device,
+          tenant,
+        }}
+        metadata={{}}
+        onDone={() => {
+          send({ type: Events.idScanCompleted });
+        }}
+      />
+    );
+  }
   return null;
 };
 

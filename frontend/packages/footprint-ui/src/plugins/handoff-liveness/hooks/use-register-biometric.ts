@@ -6,7 +6,10 @@ import {
 } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
 import base64url from 'base64url';
-import { HANDOFF_AUTH_HEADER } from 'src/config/constants';
+
+import { useHandoffLivenessMachine } from '../components/machine-provider';
+import { AUTH_HEADER } from '../config/constants';
+import { Events } from '../utils/state-machine/types';
 
 const generateDeviceResponse = async (challenge: string) => {
   const challengeJson = JSON.parse(challenge) as BiometricRegisterChallengeJson;
@@ -38,7 +41,7 @@ const generateDeviceResponse = async (challenge: string) => {
   return JSON.stringify(pk);
 };
 
-const register = async (payload: BiometricRegisterRequest) => {
+const biometricInit = async (payload: BiometricRegisterRequest) => {
   const { authToken } = payload;
   const initResponse = await request<{
     challengeToken: string;
@@ -48,7 +51,7 @@ const register = async (payload: BiometricRegisterRequest) => {
     url: '/hosted/user/biometric/init',
     data: payload,
     headers: {
-      [HANDOFF_AUTH_HEADER]: authToken,
+      [AUTH_HEADER]: authToken,
     },
   });
 
@@ -63,17 +66,40 @@ const register = async (payload: BiometricRegisterRequest) => {
       challengeToken,
     },
     headers: {
-      [HANDOFF_AUTH_HEADER]: authToken,
+      [AUTH_HEADER]: authToken,
     },
   });
   return response.data;
 };
 
-const useRegister = () =>
+const useBiometricInit = () =>
   useMutation<
     BiometricRegisterResponse,
     RequestError,
     BiometricRegisterRequest
-  >(register);
+  >(biometricInit);
 
-export default useRegister;
+const useRegisterBiometric = () => {
+  const [state, send] = useHandoffLivenessMachine();
+  const biometricInitMutation = useBiometricInit();
+  const { authToken } = state.context;
+
+  return () => {
+    if (!authToken) {
+      return;
+    }
+    biometricInitMutation.mutate(
+      { authToken },
+      {
+        onSuccess() {
+          send({ type: Events.succeeded });
+        },
+        onError() {
+          send({ type: Events.failed });
+        },
+      },
+    );
+  };
+};
+
+export default useRegisterBiometric;

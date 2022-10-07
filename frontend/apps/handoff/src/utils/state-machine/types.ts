@@ -1,47 +1,80 @@
 import { DeviceInfo } from '@onefootprint/hooks';
+import { D2PStatus, TenantInfo } from '@onefootprint/types';
 
 export enum States {
   init = 'init',
-  register = 'register',
-  registerRetry = 'registerRetry',
-  unavailable = 'unavailable',
-  success = 'success',
+  checkRequirements = 'checkRequirements',
+  liveness = 'liveness',
+  idScan = 'idScan',
   canceled = 'canceled',
   expired = 'expired',
+  complete = 'complete',
 }
 
 export enum Events {
-  paramsReceived = 'paramsReceived',
+  authTokenReceived = 'authTokenReceived',
+  tenantInfoReceived = 'tenantInfoReceived', // Fetching tenant by tenant pk is complete
   deviceInfoIdentified = 'deviceInfoIdentified',
-  registerFailed = 'registerFailed',
-  registerSucceeded = 'registerSucceeded',
-  canceled = 'canceled',
-  statusPollingErrored = 'statusPollingErrored',
+  requirementsReceived = 'requirementsReceived', // Fetching onboarding requirements is complete
+  livenessCompleted = 'livenessCompleted',
+  idScanCompleted = 'idScanCompleted',
+  statusReceived = 'statusReceived', // Fetching d2p status is complete
 }
 
 export enum Actions {
   assignDeviceInfo = 'assignDeviceInfo',
   assignAuthToken = 'assignAuthToken',
   assignTenantPk = 'assignTenantPk',
-  clearAuthToken = 'clearAuthToken',
+  assignTenant = 'assignTenant',
+  assignRequirements = 'assignRequirements',
 }
 
 export type MachineContext = {
   device?: DeviceInfo;
+  tenant?: TenantInfo;
   tenantPk?: string;
-  authToken: string;
+  authToken?: string;
+  requirements?: {
+    missingIdDocument?: boolean;
+    missingLiveness?: boolean;
+  };
 };
 
 export type MachineEvents =
   | {
-      type: Events.paramsReceived;
-      payload: { authToken: string; tenantPk?: string };
+      type: Events.authTokenReceived;
+      payload: {
+        authToken: string;
+        tenantPk?: string;
+      };
+    }
+  | {
+      type: Events.tenantInfoReceived;
+      payload: {
+        tenant: TenantInfo;
+      };
     }
   | {
       type: Events.deviceInfoIdentified;
       payload: DeviceInfo;
     }
-  | { type: Events.registerFailed }
-  | { type: Events.registerSucceeded }
-  | { type: Events.canceled }
-  | { type: Events.statusPollingErrored };
+  | {
+      type: Events.statusReceived;
+      payload: {
+        isError?: boolean;
+        status?: D2PStatus;
+      };
+    }
+  | {
+      type: Events.requirementsReceived;
+      payload: {
+        missingIdDocument?: boolean;
+        missingLiveness?: boolean;
+      };
+    }
+  | {
+      type: Events.livenessCompleted;
+    }
+  | {
+      type: Events.idScanCompleted;
+    };

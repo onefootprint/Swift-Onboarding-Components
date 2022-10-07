@@ -3,26 +3,15 @@
     "errors": {}
   },
   "pages": {
-    "register": {
-      "title": "Liveness check",
-      "subtitle": "We need to verify that you're a real person.",
-      "cta": "Launch Verification"
-    },
-    "register-retry": {
-      "title": "Biometrics not recognized",
-      "subtitle": "You can try biometrics again or you can do this next time you use Footprint.",
-      "cta": "Try biometrics again",
-      "skip": "Do it later"
-    },
-    "success": {
-      "title": "Successfully authenticated!",
+    "complete": {
+      "title": "Completed",
       "subtitle": {
         "with-countdown": "This page will close in {{seconds}} seconds...",
         "without-countdown": "Please continue on your computer."
       }
     },
     "expired": {
-      "title": "Liveness check expired",
+      "title": "Session expired",
       "subtitle": {
         "mobile": "For security reasons, this session has timed out. Please go back to the previous page.",
         "desktop": "For security reasons, this link has timed out. Please go back to your computer to generate a new link."
@@ -30,15 +19,11 @@
       "cta": "Go back"
     },
     "canceled": {
-      "title": "Liveness check canceled",
+      "title": "Session canceled",
       "subtitle": {
         "mobile": "Please return to the previous page.",
         "desktop": "Please go back to your computer."
       }
-    },
-    "unavailable": {
-      "title": "No biometric authentication available",
-      "subtitle": "Unfortunately your device doesn't support biometric authentication. Please continue on your computer."
     }
   }
 }
