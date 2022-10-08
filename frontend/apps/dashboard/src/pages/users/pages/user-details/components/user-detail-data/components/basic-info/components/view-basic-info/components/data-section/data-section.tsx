@@ -6,7 +6,7 @@ import styled, { css } from 'styled-components';
 type DataSectionProps = {
   children: React.ReactNode;
   iconComponent: Icon;
-  renderFooter: () => React.ReactNode;
+  // renderFooter: () => React.ReactNode;
   title: string;
 };
 
@@ -14,8 +14,8 @@ const DataSection = ({
   iconComponent: IconComponent,
   title,
   children,
-  renderFooter,
-}: DataSectionProps) => (
+}: // renderFooter,
+DataSectionProps) => (
   <DataSectionContainer>
     <Header>
       <IconComponent />
@@ -23,7 +23,7 @@ const DataSection = ({
     </Header>
     <Inner>
       <Fieldset>{children}</Fieldset>
-      <Footer>{renderFooter()}</Footer>
+      {/* <Footer>{renderFooter()}</Footer> */}
     </Inner>
   </DataSectionContainer>
 );
@@ -69,13 +69,13 @@ const Fieldset = styled.fieldset`
   `};
 `;
 
-const Footer = styled.footer`
-  ${({ theme }) => css`
-    display: flex;
-    padding-top: ${theme.spacing[4]}px;
-    margin-top: ${theme.spacing[7]}px;
-    border-top: 1px solid ${theme.borderColor.tertiary};
-  `};
-`;
+// const Footer = styled.footer`
+//   ${({ theme }) => css`
+//     display: flex;
+//     padding-top: ${theme.spacing[4]}px;
+//     margin-top: ${theme.spacing[7]}px;
+//     border-top: 1px solid ${theme.borderColor.tertiary};
+//   `};
+// `;
 
 export default DataSection;
