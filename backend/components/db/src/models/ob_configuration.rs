@@ -28,6 +28,8 @@ pub struct ObConfiguration {
     pub created_at: DateTime<Utc>,
     pub must_collect_data: Vec<CollectedDataOption>,
     pub can_access_data: Vec<CollectedDataOption>,
+    pub must_collect_identity_document: bool,
+    pub can_access_identity_document_images: bool,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
@@ -36,11 +38,15 @@ struct NewObConfiguration {
     key: ObConfigurationKey,
     name: String,
     tenant_id: TenantId,
-    must_collect_data: Vec<CollectedDataOption>,
-    can_access_data: Vec<CollectedDataOption>,
     is_live: bool,
     status: ApiKeyStatus,
     created_at: DateTime<Utc>,
+
+    must_collect_data: Vec<CollectedDataOption>,
+    can_access_data: Vec<CollectedDataOption>,
+
+    must_collect_identity_document: bool,
+    can_access_identity_document_images: bool,
 }
 
 #[derive(AsChangeset)]
@@ -142,6 +148,8 @@ impl ObConfiguration {
         tenant_id: TenantId,
         must_collect_data: Vec<CollectedDataOption>,
         can_access_data: Vec<CollectedDataOption>,
+        must_collect_identity_document: bool,
+        can_access_identity_document_images: bool,
         is_live: bool,
     ) -> Result<ObConfiguration, crate::DbError> {
         let config = NewObConfiguration {
@@ -149,6 +157,8 @@ impl ObConfiguration {
             name,
             tenant_id,
             must_collect_data,
+            must_collect_identity_document,
+            can_access_identity_document_images,
             can_access_data,
             is_live,
             status: ApiKeyStatus::Enabled,

@@ -1,0 +1,1 @@
+DROP TABLE requirement_verification_request_junction;

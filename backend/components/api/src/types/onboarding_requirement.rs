@@ -1,7 +1,6 @@
+use db::models::requirement::Requirement;
+use newtypes::{CollectedDataOption, DocumentRequestId};
 use paperclip::actix::Apiv2Schema;
-
-use crate::CollectedDataOption;
-use crate::DocumentRequestId;
 
 #[derive(Debug, Clone, serde::Serialize, Apiv2Schema)]
 #[serde(tag = "kind")]
@@ -15,4 +14,10 @@ pub enum OnboardingRequirement {
     CollectDocument {
         document_request_id: DocumentRequestId,
     },
+}
+
+impl From<Requirement> for OnboardingRequirement {
+    fn from(_: Requirement) -> Self {
+        todo!()
+    }
 }

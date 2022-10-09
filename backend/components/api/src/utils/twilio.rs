@@ -7,7 +7,7 @@ use crate::{
 };
 use chrono::{Duration, Utc};
 use crypto::sha256;
-use newtypes::{PhoneNumber, SessionAuthToken, ValidatedPhoneNumber};
+use newtypes::{PhoneNumber, ValidatedPhoneNumber};
 
 use self::rate_limit::RateLimit;
 

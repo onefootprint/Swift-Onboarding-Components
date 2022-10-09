@@ -10,6 +10,8 @@ pub mod kv_data;
 pub mod ob_configuration;
 pub mod onboarding;
 pub mod phone_number;
+pub mod requirement;
+pub mod requirement_vrequest_junction;
 pub mod scoped_user;
 pub mod session;
 pub mod tenant;

@@ -17,3 +17,4 @@ pub mod tenant_user;
 
 pub use request::*;
 pub use response::*;
+pub mod onboarding_requirement;

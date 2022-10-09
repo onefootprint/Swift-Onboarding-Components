@@ -89,6 +89,10 @@ pub struct CreateOnboardingConfigurationRequest {
     name: String,
     must_collect_data: Vec<CollectedDataOption>,
     can_access_data: Vec<CollectedDataOption>,
+    #[serde(default)]
+    must_collect_identity_document: bool,
+    #[serde(default)]
+    can_access_identity_document_images: bool,
 }
 
 impl CreateOnboardingConfigurationRequest {
@@ -113,6 +117,10 @@ impl CreateOnboardingConfigurationRequest {
         ) {
             Err(TenantError::ValidationError(
                 "Decryptable fields must be a subset of collected fields".to_owned(),
+            ))
+        } else if self.can_access_identity_document_images && !self.must_collect_identity_document {
+            Err(TenantError::ValidationError(
+                "Cannot access document images without collecting them".to_owned(),
             ))
         } else {
             Ok(())
@@ -139,6 +147,8 @@ pub fn post(
         name,
         must_collect_data,
         can_access_data,
+        must_collect_identity_document,
+        can_access_identity_document_images,
     } = request.into_inner();
 
     let obc = ObConfiguration::create(
@@ -147,6 +157,8 @@ pub fn post(
         tenant.id.clone(),
         must_collect_data,
         can_access_data,
+        must_collect_identity_document,
+        can_access_identity_document_images,
         auth.is_live()?,
     )
     .await?;

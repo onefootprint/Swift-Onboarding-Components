@@ -7,9 +7,9 @@ use crate::auth::Either;
 use crate::auth::SessionContext;
 use crate::errors::ApiError;
 use crate::hosted::onboarding::get_requirements;
+use crate::types::onboarding_requirement::OnboardingRequirement;
 use crate::types::response::ResponseData;
 use crate::State;
-use newtypes::onboarding_requirement::OnboardingRequirement;
 use paperclip::actix::{api_v2_operation, get, web, web::Json, Apiv2Schema};
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Serialize)]
@@ -34,7 +34,7 @@ pub fn get(
     let (requirements, _) = state
         .db_pool
         .db_query(move |conn| {
-            get_requirements(conn, &user_auth.user_vault_id(), &onboarding_context.ob_config())
+            get_requirements(conn, &user_auth.user_vault_id(), onboarding_context.ob_config())
         })
         .await??;
 

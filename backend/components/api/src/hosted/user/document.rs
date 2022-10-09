@@ -1,7 +1,7 @@
 use crate::auth::user::{UserAuthContext, UserAuthScope};
 use crate::errors::ApiError;
 use crate::types::document::{
-    DocumentErrorReason, DocumentRequest, DocumentResponse, DocumentResponseStatus,
+    DocumentErrorReason, DocumentResponse, DocumentResponseStatus,
 };
 use crate::types::response::{EmptyResponse, ResponseData};
 use actix_web::web::Path;

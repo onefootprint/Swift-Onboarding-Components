@@ -12,7 +12,6 @@ pub struct IdentityDocument {
     pub id: IdentityDocumentId,
     pub request_id: DocumentRequestId,
     pub user_vault_id: UserVaultId,
-    pub e_decryption_key: SealedVaultBytes,
     pub front_image_s3_url: Option<String>,
     pub back_image_s3_url: Option<String>,
     pub document_type: String,
@@ -20,6 +19,7 @@ pub struct IdentityDocument {
     pub created_at: DateTime<Utc>,
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
+    pub e_decryption_key: SealedVaultBytes,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]

@@ -26,6 +26,7 @@ mod private;
 mod s3;
 mod types;
 mod utils;
+mod decision;
 
 use crate::{errors::ApiError, utils::twilio::TwilioClient};
 use paperclip::actix::{web, OpenApiExt};

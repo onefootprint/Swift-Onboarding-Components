@@ -9,7 +9,6 @@ pub mod csv;
 pub mod dob;
 pub mod email;
 pub mod name;
-pub mod onboarding_requirement;
 pub mod phone_number;
 pub mod requirement_status;
 pub mod sandbox;

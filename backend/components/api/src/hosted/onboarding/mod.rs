@@ -7,16 +7,14 @@ use db::{
     },
     DbError, PgConnection,
 };
-use newtypes::{
-    onboarding_requirement::OnboardingRequirement, KycStatus, OnboardingId, SessionAuthToken, UserVaultId,
-};
+use newtypes::{KycStatus, OnboardingId, SessionAuthToken, UserVaultId};
 use paperclip::actix::web;
 
 use crate::{
     auth::session::AuthSessionData,
     auth::user::ValidateUserToken,
     errors::{onboarding::OnboardingError, ApiResult},
-    utils::{session::AuthSession, user_vault_wrapper::UserVaultWrapper},
+    utils::{session::AuthSession, user_vault_wrapper::UserVaultWrapper}, types::onboarding_requirement::OnboardingRequirement,
 };
 
 pub mod authorize;

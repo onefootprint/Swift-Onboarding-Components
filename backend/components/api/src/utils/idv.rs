@@ -59,6 +59,7 @@ impl UserVaultWrapper {
             email_id: self.email.as_ref().map(|e| e.id.clone()),
             phone_number_id: self.phone_number.as_ref().map(|e| e.id.clone()),
             identity_data_id: self.identity_data.as_ref().map(|e| e.id.clone()),
+            identity_document_id: None,
         }
     }
 }

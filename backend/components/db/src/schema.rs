@@ -110,6 +110,25 @@ table! {
     use diesel::sql_types::*;
     use newtypes::db_types::*;
 
+    identity_document (id) {
+        id -> Text,
+        request_id -> Text,
+        user_vault_id -> Text,
+        front_image_s3_url -> Nullable<Text>,
+        back_image_s3_url -> Nullable<Text>,
+        document_type -> Text,
+        country_code -> Text,
+        created_at -> Timestamptz,
+        _created_at -> Timestamptz,
+        _updated_at -> Timestamptz,
+        e_decryption_key -> Bytea,
+    }
+}
+
+table! {
+    use diesel::sql_types::*;
+    use newtypes::db_types::*;
+
     insight_event (id) {
         id -> Uuid,
         timestamp -> Timestamptz,
@@ -124,25 +143,6 @@ table! {
         time_zone -> Nullable<Varchar>,
         user_agent -> Nullable<Varchar>,
         city -> Nullable<Varchar>,
-        _created_at -> Timestamptz,
-        _updated_at -> Timestamptz,
-    }
-}
-
-table! {
-    use diesel::sql_types::*;
-    use newtypes::db_types::*;
-
-    identity_document (id) {
-        id -> Text,
-        request_id -> Text,
-        user_vault_id -> Text,
-        e_decryption_key -> Bytea,
-        front_image_s3_url -> Nullable<Text>,
-        back_image_s3_url -> Nullable<Text>,
-        document_type -> Text,
-        country_code -> Text,
-        created_at -> Timestamptz,
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
     }
@@ -180,6 +180,8 @@ table! {
         created_at -> Timestamptz,
         must_collect_data -> Array<Text>,
         can_access_data -> Array<Text>,
+        must_collect_identity_document -> Bool,
+        can_access_identity_document_images -> Bool,
     }
 }
 
@@ -216,6 +218,38 @@ table! {
         deactivated_at -> Nullable<Timestamptz>,
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
+    }
+}
+
+table! {
+    use diesel::sql_types::*;
+    use newtypes::db_types::*;
+
+    requirement (id) {
+        id -> Text,
+        kind -> Text,
+        status -> Text,
+        initiator -> Text,
+        user_vault_id -> Text,
+        fulfilled_at -> Nullable<Timestamptz>,
+        fulfilled_by_requirement_id -> Nullable<Text>,
+        onboarding_id -> Nullable<Uuid>,
+        created_at -> Timestamptz,
+        deactivated_at -> Nullable<Timestamptz>,
+        error_message -> Nullable<Text>,
+        _created_at -> Timestamptz,
+        _updated_at -> Timestamptz,
+    }
+}
+
+table! {
+    use diesel::sql_types::*;
+    use newtypes::db_types::*;
+
+    requirement_verification_request_junction (id) {
+        id -> Uuid,
+        verification_request_id -> Uuid,
+        requirement_id -> Text,
     }
 }
 
@@ -359,6 +393,7 @@ table! {
         phone_number_id -> Nullable<Text>,
         identity_data_id -> Nullable<Text>,
         onboarding_id -> Uuid,
+        identity_document_id -> Nullable<Text>,
     }
 }
 
@@ -404,6 +439,7 @@ joinable!(document_request -> onboarding (onboarding_id));
 joinable!(email -> user_vault (user_vault_id));
 joinable!(fingerprint -> user_vault (user_vault_id));
 joinable!(identity_data -> user_vault (user_vault_id));
+joinable!(identity_document -> document_request (request_id));
 joinable!(kv_data -> tenant (tenant_id));
 joinable!(kv_data -> user_vault (user_vault_id));
 joinable!(ob_configuration -> tenant (tenant_id));
@@ -411,6 +447,10 @@ joinable!(onboarding -> insight_event (insight_event_id));
 joinable!(onboarding -> ob_configuration (ob_configuration_id));
 joinable!(onboarding -> scoped_user (scoped_user_id));
 joinable!(phone_number -> user_vault (user_vault_id));
+joinable!(requirement -> onboarding (onboarding_id));
+joinable!(requirement -> user_vault (user_vault_id));
+joinable!(requirement_verification_request_junction -> requirement (requirement_id));
+joinable!(requirement_verification_request_junction -> verification_request (verification_request_id));
 joinable!(scoped_user -> tenant (tenant_id));
 joinable!(scoped_user -> user_vault (user_vault_id));
 joinable!(tenant_api_key -> tenant (tenant_id));
@@ -420,6 +460,7 @@ joinable!(tenant_user -> tenant (tenant_id));
 joinable!(tenant_user -> tenant_role (tenant_role_id));
 joinable!(verification_request -> email (email_id));
 joinable!(verification_request -> identity_data (identity_data_id));
+joinable!(verification_request -> identity_document (identity_document_id));
 joinable!(verification_request -> onboarding (onboarding_id));
 joinable!(verification_request -> phone_number (phone_number_id));
 joinable!(verification_result -> verification_request (request_id));
@@ -439,6 +480,8 @@ allow_tables_to_appear_in_same_query!(
     ob_configuration,
     onboarding,
     phone_number,
+    requirement,
+    requirement_verification_request_junction,
     scoped_user,
     session,
     tenant,
