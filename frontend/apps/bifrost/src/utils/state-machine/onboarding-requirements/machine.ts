@@ -6,12 +6,10 @@ import {
   requiresAdditionalInfo,
   shouldRunCollectKycData,
   shouldRunCollectKycDataFromContext,
-  shouldRunD2P,
-  shouldRunD2PFromContext,
   shouldRunIdScan,
   shouldRunIdScanFromContext,
-  shouldRunLiveness,
-  shouldRunLivenessFromContext,
+  shouldRunTransfer,
+  shouldRunTransferFromContext,
 } from './machine.utils';
 import {
   Actions,
@@ -78,19 +76,6 @@ const createOnboardingRequirementsMachine = ({
                 ],
               },
               {
-                target: States.liveness,
-                cond: (context, event) =>
-                  shouldRunLiveness(
-                    event.payload.missingLiveness,
-                    context.device,
-                  ),
-                actions: [
-                  Actions.assignMissingKycData,
-                  Actions.assignMissingLiveness,
-                  Actions.assignMissingIdDocument,
-                ],
-              },
-              {
                 target: States.idScan,
                 cond: (context, event) =>
                   shouldRunIdScan(
@@ -104,9 +89,9 @@ const createOnboardingRequirementsMachine = ({
                 ],
               },
               {
-                target: States.d2p,
+                target: States.transfer,
                 cond: (context, event) =>
-                  shouldRunD2P(
+                  shouldRunTransfer(
                     event.payload.missingIdDocument,
                     event.payload.missingLiveness,
                     context.device,
@@ -131,20 +116,14 @@ const createOnboardingRequirementsMachine = ({
                 cond: context => shouldRunCollectKycDataFromContext(context),
               },
               {
-                target: States.liveness,
+                target: States.transfer,
                 description:
-                  'If there are other attributes missing in addition to webauthn for an existing user, take them to liveness register, since the user likely abandoned onboarding early.',
-                cond: context => shouldRunLivenessFromContext(context),
+                  'If we need to do webauthn but need to do a transfer first',
+                cond: context => shouldRunTransferFromContext(context),
               },
               {
                 target: States.idScan,
                 cond: context => shouldRunIdScanFromContext(context),
-              },
-              {
-                target: States.d2p,
-                description:
-                  'If we need to do webauthn but need to do a transfer first',
-                cond: context => shouldRunD2PFromContext(context),
               },
               {
                 target: States.success,
@@ -156,16 +135,12 @@ const createOnboardingRequirementsMachine = ({
           on: {
             [Events.collectKycDataCompleted]: [
               {
-                target: States.liveness,
-                cond: context => shouldRunLivenessFromContext(context),
+                target: States.transfer,
+                cond: context => shouldRunTransferFromContext(context),
               },
               {
                 target: States.idScan,
                 cond: context => shouldRunIdScanFromContext(context),
-              },
-              {
-                target: States.d2p,
-                cond: context => shouldRunD2PFromContext(context),
               },
               {
                 target: States.checkOnboardingRequirements,
@@ -173,24 +148,11 @@ const createOnboardingRequirementsMachine = ({
             ],
           },
         },
-        [States.d2p]: {
+        [States.transfer]: {
           on: {
-            [Events.d2pCompleted]: {
+            [Events.transferCompleted]: {
               target: States.checkOnboardingRequirements,
             },
-          },
-        },
-        [States.liveness]: {
-          on: {
-            [Events.livenessCompleted]: [
-              {
-                target: States.idScan,
-                cond: context => shouldRunIdScanFromContext(context),
-              },
-              {
-                target: States.checkOnboardingRequirements,
-              },
-            ],
           },
         },
         [States.idScan]: {

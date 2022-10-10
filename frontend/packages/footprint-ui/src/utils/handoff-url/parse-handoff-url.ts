@@ -20,6 +20,7 @@ const useParseHandoffUrl = (options: {
     } catch {
       options.onError?.();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router.asPath]);
 };
 

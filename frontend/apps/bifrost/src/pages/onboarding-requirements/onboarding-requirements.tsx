@@ -1,8 +1,7 @@
 import {
   CollectKycData,
-  D2P,
   IdScan,
-  Liveness,
+  Transfer,
   withProvider,
 } from 'footprint-elements';
 import React from 'react';
@@ -53,9 +52,9 @@ const OnboardingRequirements = () => {
       />
     );
   }
-  if (state.matches(States.d2p)) {
+  if (state.matches(States.transfer)) {
     return (
-      <D2P
+      <Transfer
         context={{
           authToken,
           device,
@@ -69,22 +68,7 @@ const OnboardingRequirements = () => {
         }}
         metadata={{}}
         onDone={() => {
-          send({ type: Events.d2pCompleted });
-        }}
-      />
-    );
-  }
-  if (state.matches(States.liveness)) {
-    return (
-      <Liveness
-        context={{
-          authToken,
-          device,
-          tenant,
-        }}
-        metadata={{}}
-        onDone={() => {
-          send({ type: Events.livenessCompleted });
+          send({ type: Events.transferCompleted });
         }}
       />
     );

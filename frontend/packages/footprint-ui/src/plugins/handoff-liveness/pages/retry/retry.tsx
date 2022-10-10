@@ -4,10 +4,10 @@ import { useIsMutating } from '@tanstack/react-query';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-import useSkipLiveness from '../../../liveness/hooks/use-skip-liveness';
 import HeaderTitle from '../../components/header-title';
 import { useHandoffLivenessMachine } from '../../components/machine-provider';
 import useRegisterBiometric from '../../hooks/use-register-biometric';
+import useSkipLiveness from '../../hooks/use-skip-liveness';
 import { Events } from '../../utils/state-machine/types';
 
 const Retry = () => {

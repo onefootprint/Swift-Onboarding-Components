@@ -12,17 +12,6 @@ export const shouldRunCollectKycData = (
   missingKycData: readonly CollectedDataOption[],
 ) => missingKycData.length > 0;
 
-export const shouldRunLivenessFromContext = (context: MachineContext) => {
-  const { missingLiveness, device } = context;
-  return shouldRunLiveness(missingLiveness, device);
-};
-
-export const shouldRunLiveness = (
-  missingLiveness: boolean,
-  device: DeviceInfo,
-) =>
-  missingLiveness && device.type === 'mobile' && device.hasSupportForWebauthn;
-
 export const shouldRunIdScanFromContext = (context: MachineContext) => {
   const { missingIdDocument, device } = context;
   return shouldRunIdScan(missingIdDocument, device);
@@ -33,12 +22,12 @@ export const shouldRunIdScan = (
   device: DeviceInfo,
 ) => missingIdDocument && device.type === 'mobile';
 
-export const shouldRunD2PFromContext = (context: MachineContext) => {
+export const shouldRunTransferFromContext = (context: MachineContext) => {
   const { missingIdDocument, missingLiveness, device } = context;
-  return shouldRunD2P(missingIdDocument, missingLiveness, device);
+  return shouldRunTransfer(missingIdDocument, missingLiveness, device);
 };
 
-export const shouldRunD2P = (
+export const shouldRunTransfer = (
   missingIdDocument: boolean,
   missingLiveness: boolean,
   device: DeviceInfo,

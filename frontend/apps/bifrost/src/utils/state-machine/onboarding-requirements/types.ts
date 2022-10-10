@@ -5,8 +5,7 @@ export enum States {
   checkOnboardingRequirements = 'checkOnboardingRequirements',
   additionalInfoRequired = 'additionalInfoRequired',
   collectKycData = 'collectKycData',
-  d2p = 'd2p',
-  liveness = 'liveness',
+  transfer = 'transfer',
   idScan = 'idScan',
   success = 'success',
 }
@@ -25,8 +24,7 @@ export type MachineContext = {
 export enum Events {
   onboardingRequirementsReceived = 'onboardingRequirementsReceived',
   additionalInfoRequired = 'additionalInfoRequired',
-  livenessCompleted = 'livenessCompleted',
-  d2pCompleted = 'd2pCompleted',
+  transferCompleted = 'transferCompleted',
   idScanCompleted = 'idScanCompleted',
   collectKycDataCompleted = 'collectKycDataCompleted',
 }
@@ -47,7 +45,6 @@ export type MachineEvents =
         missingKycData: readonly CollectedDataOption[];
       };
     }
-  | { type: Events.livenessCompleted }
-  | { type: Events.d2pCompleted }
+  | { type: Events.transferCompleted }
   | { type: Events.idScanCompleted }
   | { type: Events.collectKycDataCompleted };
