@@ -8,6 +8,7 @@
   ],
   "scripts": {
     "build": "turbo run build",
+    "predev": "yarn install && yarn build:packages",
     "dev": "turbo run dev --parallel --continue",
     "build:packages": "turbo run build --filter=./packages/*",
     "format": "prettier --check \"**/*.{ts,tsx,md}\"",
