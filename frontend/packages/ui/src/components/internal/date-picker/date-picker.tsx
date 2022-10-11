@@ -1,15 +1,15 @@
 import React from 'react';
-import { DayPicker, DayPickerProps } from 'react-day-picker';
+import { DayPicker, DayPickerSingleProps } from 'react-day-picker';
 import { useTheme } from 'styled-components';
 
 import CustomCaption from './components/custom-caption';
 
 export type DatePickerProps = {
-  disabled?: DayPickerProps['disabled'];
-  initialFocus?: DayPickerProps['initialFocus'];
-  value?: DayPickerProps['selected'];
+  disabled?: DayPickerSingleProps['disabled'];
+  initialFocus?: DayPickerSingleProps['initialFocus'];
+  value?: DayPickerSingleProps['selected'];
   onChange?: (nextDate?: Date) => void;
-  defaultMonth?: DayPickerProps['defaultMonth'];
+  defaultMonth?: DayPickerSingleProps['defaultMonth'];
 };
 
 const cellSize = 40;

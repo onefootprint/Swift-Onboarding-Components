@@ -97,8 +97,8 @@ const Template: Story<DialogProps> = ({
   closeIconComponent: CloseIconComponent,
   onClose,
   open: initialOpen,
-  primaryButton,
-  secondaryButton,
+  primaryButton = { label: 'Primary' },
+  secondaryButton = { label: 'Secondary' },
   size,
   testID,
   title,
@@ -160,7 +160,47 @@ Base.args = {
   title: 'Title',
 };
 
-export const OnlyPrimary = Template.bind({});
+const OnlyPrimaryTemplate: Story<DialogProps> = ({
+  children,
+  closeIconComponent: CloseIconComponent,
+  onClose,
+  open: initialOpen,
+  primaryButton = { label: 'Primary' },
+  size,
+  testID,
+  title,
+}: DialogProps) => {
+  const [open, setOpen] = useState(initialOpen);
+  const SelectedIcon =
+    typeof CloseIconComponent === 'string'
+      ? icos[CloseIconComponent]
+      : CloseIconComponent;
+
+  return (
+    <>
+      <Dialog
+        closeIconComponent={SelectedIcon}
+        linkButton={undefined}
+        onClose={() => {
+          setOpen(false);
+          onClose();
+        }}
+        open={open}
+        primaryButton={primaryButton}
+        size={size}
+        testID={testID}
+        title={title}
+      >
+        <Typography variant="body-4">{children}</Typography>
+      </Dialog>
+      <Button onClick={() => setOpen(true)} size="default">
+        Open dialog
+      </Button>
+    </>
+  );
+};
+
+export const OnlyPrimary = OnlyPrimaryTemplate.bind({});
 OnlyPrimary.args = {
   open: false,
   size: 'default',
@@ -176,8 +216,8 @@ OnlyPrimary.args = {
 const LinkTemplate: Story<DialogProps> = ({
   title,
   onClose,
-  primaryButton,
-  linkButton,
+  primaryButton = { label: 'Primary' },
+  linkButton = { label: 'Link' },
   size,
   testID,
   open: initialVisibility,
