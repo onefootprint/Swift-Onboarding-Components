@@ -1,5 +1,3 @@
-export type Flow = 'authentication' | 'onboarding';
-
 export enum FootprintEvents {
   closed = 'closed',
   completed = 'completed',

@@ -15,14 +15,6 @@ const initialContext: BifrostContext = {
     type: 'mobile',
     hasSupportForWebauthn: false,
   },
-  tenant: {
-    canAccessData: [],
-    isLive: false,
-    mustCollectData: [],
-    name: '',
-    orgName: '',
-    pk: '',
-  },
 };
 
 const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
@@ -60,17 +52,19 @@ const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
             }),
           onDone: [
             {
-              target: States.authenticationSuccess,
+              target: States.onboarding,
               actions: [
                 Actions.assignAuthToken,
                 Actions.assignEmail,
                 Actions.assignPhone,
                 Actions.assignUserFound,
               ],
-              cond: context => context.identifyType === IdentifyType.my1fp,
+              cond: context =>
+                !!context.tenant &&
+                context.identifyType === IdentifyType.onboarding,
             },
             {
-              target: States.onboarding,
+              target: States.authenticationSuccess,
               actions: [
                 Actions.assignAuthToken,
                 Actions.assignEmail,
@@ -89,7 +83,7 @@ const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
               userFound: context.userFound,
               device: context.device,
               authToken: context.authToken,
-              tenant: context.tenant,
+              tenant: context.tenant!,
             }),
           onDone: [
             {

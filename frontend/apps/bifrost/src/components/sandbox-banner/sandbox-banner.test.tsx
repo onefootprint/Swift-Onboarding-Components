@@ -1,4 +1,5 @@
 import { customRender, screen } from '@onefootprint/test-utils';
+import { CollectedDataOption, TenantInfo } from '@onefootprint/types';
 import React from 'react';
 
 import bifrostMachine from '../../utils/state-machine/bifrost';
@@ -7,8 +8,15 @@ import SandboxBanner from './sandbox-banner';
 
 describe('<SandboxBanner />', () => {
   const renderSandboxBanner = (options: { isLive: boolean }) => {
-    bifrostMachine.context.tenant.isLive = options.isLive;
-    bifrostMachine.context.tenant.pk = 'pk';
+    const tenant: TenantInfo = {
+      isLive: options.isLive,
+      pk: 'key',
+      name: 'tenant',
+      mustCollectData: [CollectedDataOption.name],
+      canAccessData: [CollectedDataOption.name],
+      orgName: 'tenantOrg',
+    };
+    bifrostMachine.context.tenant = tenant;
     customRender(
       <BifrostMachineProvider>
         <SandboxBanner />

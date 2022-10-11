@@ -38,7 +38,7 @@ export type BifrostContext = {
   email: string;
   identifyType: IdentifyType;
   phone?: string;
-  tenant: TenantInfo;
+  tenant?: TenantInfo;
   userFound: boolean;
   validationToken?: string;
 };
