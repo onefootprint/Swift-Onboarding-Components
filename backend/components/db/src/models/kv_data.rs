@@ -104,7 +104,8 @@ mod tests {
     use std::str::FromStr;
 
     use super::*;
-    use crate::test::{test_db_conn, test_tenant, test_user_vault};
+    use crate::test::{test_tenant, test_user_vault};
+    use crate::test_helpers::test_db_conn;
 
     #[test]
     fn test_update_or_insert() {

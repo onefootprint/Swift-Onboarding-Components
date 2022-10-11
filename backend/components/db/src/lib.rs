@@ -7,6 +7,7 @@ extern crate diesel;
 extern crate diesel_migrations;
 
 pub mod errors;
+pub mod test_helpers;
 
 #[allow(clippy::extra_unused_lifetimes)]
 pub mod models;
