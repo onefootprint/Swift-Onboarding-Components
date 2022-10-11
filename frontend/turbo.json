@@ -18,41 +18,28 @@
         "$NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA",
         "$NEXT_PUBLIC_VERCEL_URL",
         "$NODE_ENV",
-        "$REVALIDATE_SECRET_TOKEN"
+        "$REVALIDATE_SECRET_TOKEN",
+        "$IS_LOCAL",
+        "$IS_VERCEL_ENV_DEV",
+        "$IS_VERCEL_ENV_PREV"
       ],
-      "outputs": [
-        "dist/**",
-        ".next/**",
-        "public/dist/**"
-      ]
+      "outputs": ["dist/**", ".next/**", "public/dist/**"]
     },
     "test": {
-      "dependsOn": [
-        "^build"
-      ],
-      "outputs": [
-        "coverage/**"
-      ]
+      "dependsOn": ["^build"],
+      "outputs": ["coverage/**"]
     },
     "lint": {
-      "dependsOn": [
-        "^build"
-      ],
+      "dependsOn": ["^build"],
       "outputs": []
     },
     "typecheck": {
-      "dependsOn": [
-        "^build"
-      ],
+      "dependsOn": ["^build"],
       "outputs": []
     },
     "build:storybook": {
-      "dependsOn": [
-        "^build"
-      ],
-      "outputs": [
-        "storybook-static/**"
-      ]
+      "dependsOn": ["^build"],
+      "outputs": ["storybook-static/**"]
     },
     "format": {
       "outputs": []
@@ -67,9 +54,5 @@
       "cache": false
     }
   },
-  "globalDependencies": [
-    "$GITHUB_TOKEN",
-    "tsconfig.json",
-    ".env.*"
-  ]
+  "globalDependencies": ["$GITHUB_TOKEN", "tsconfig.json", ".env.*"]
 }

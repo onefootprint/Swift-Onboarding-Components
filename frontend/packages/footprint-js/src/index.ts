@@ -1,27 +1,20 @@
 import initFootprint from './footprint';
 import vanillaIntegration from './utils/vanilla-integration';
 
-const getUrl = (env = 'production', branchName?: string) => {
-  if (env === 'local') {
-    return 'http://localhost:3000/';
+const getUrl = () => {
+  if (process.env.IS_LOCAL) {
+    return 'url:local';
   }
-  if (env === 'development') {
-    return 'https://id.preview.onefootprint.com';
+  if (process.env.IS_VERCEL_ENV_DEV) {
+    return 'url:dev';
   }
-  if (env === 'preview' && branchName) {
-    if (branchName === 'development') {
-      return `https://id.preview.onefootprint.com`;
-    }
-    const slugBranch = branchName.toLowerCase().split('/').join('-');
-    return `https://bifrost-git-${slugBranch}.preview.onefootprint.com`;
+  if (process.env.IS_VERCEL_ENV_PREV) {
+    return 'url:preview';
   }
-  return 'https://id.onefootprint.com';
+  return 'url:prod';
 };
 
-const url = getUrl(
-  process.env.NEXT_PUBLIC_VERCEL_ENV,
-  process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_REF,
-);
+const url = getUrl();
 const footprint = initFootprint(url);
-vanillaIntegration(footprint)();
+vanillaIntegration(footprint);
 export default footprint;

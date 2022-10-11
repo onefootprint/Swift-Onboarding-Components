@@ -1,13 +1,13 @@
 import { Footprint } from '../footprint-types';
 import { createButton } from './ui-manager';
 
-const IS_SSR = typeof window === 'undefined';
-
 const defer = (callback: () => void) => {
   window.setTimeout(callback, 0);
 };
 
-const vanillaIntegration = (footprint: Footprint) => {
+const startVanillaIntegration = (footprint: Footprint) => {
+  if (typeof window === 'undefined') return;
+
   const handleButtonClicked = async (publicKey: string) => {
     await footprint.show({
       publicKey,
@@ -44,14 +44,7 @@ const vanillaIntegration = (footprint: Footprint) => {
     defer(createButtonAndListen);
   };
 
-  const waitDomToLoad = () => {
-    if (IS_SSR) return;
-    document.addEventListener('DOMContentLoaded', () => handlePageLoaded());
-  };
-
-  return () => {
-    waitDomToLoad();
-  };
+  document.addEventListener('DOMContentLoaded', () => handlePageLoaded());
 };
 
-export default vanillaIntegration;
+export default startVanillaIntegration;

@@ -2,14 +2,14 @@
   "name": "@onefootprint/footprint-js",
   "private": false,
   "type": "module",
-  "version": "0.0.4",
+  "version": "0.0.6",
   "main": "./dist/footprint-js.umd.cjs",
   "module": "./dist/footprint-js.js",
   "types": "./dist/footprint-js.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/footprint-js.js",
       "require": "./dist/footprint-js.umd.cjs",
+      "import": "./dist/footprint-js.js",
       "types": "./dist/footprint-js.d.ts"
     },
     "./dist/style.css": {

@@ -28,9 +28,11 @@ yarn add @onefootprint/footprint-js
 yarn add @onefootprint/footprint-react
 ```
 
-4. Embed the Footprint button, passing the Publishable Key and the callback functions:
+4. Import the styles file and embed the Footprint button, passing the Publishable Key and the callback functions:
 
 ```typescript
+import "@onefootprint/footprint-js/dist/style.css";
+
 import { FootprintButton } from '@onefooprint/footprint-react';
 
 const Page = () => {
@@ -38,7 +40,7 @@ const Page = () => {
     console.log(validationToken)
   }
 
-  const handleUserCanceled = () => {
+  const handleCanceled = () => {
     console.log('user canceled')
   }
 
@@ -47,13 +49,14 @@ const Page = () => {
       <FootprintButton
         publicKey="ob_test_WNgSBRR7uxoT8JRDBBflgw"
         onCompleted={handleCompleted}
-        onCanceled={handleUserCanceled}
+        onCanceled={handleCanceled}
       />
     </main>
   )
 }
 ```
 
-Click [here](https://github.com/onefootprint/examples/tree/master/frontend-react-next) to check out a full example.
+Click [here](https://github.com/onefootprint/examples/tree/master/frontend-react-cra) to check out a full example. We also have some examples using [Next.js](https://github.com/onefootprint/examples/tree/master/frontend-react-typescript-next)
+
 
 
