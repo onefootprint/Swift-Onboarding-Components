@@ -3,14 +3,14 @@ import React from 'react';
 import { useEffectOnce } from 'usehooks-ts';
 
 import HeaderTitle from '../../components/header-title';
-import { useHandoffLivenessMachine } from '../../components/machine-provider';
+import { useLivenessMachine } from '../../components/machine-provider';
 import { Events } from '../../utils/state-machine/types';
 
 const TRANSITION_DELAY = 3000;
 
 const Success = () => {
   const { t } = useTranslation('pages.success');
-  const [, send] = useHandoffLivenessMachine();
+  const [, send] = useLivenessMachine();
 
   useEffectOnce(() => {
     setTimeout(() => {

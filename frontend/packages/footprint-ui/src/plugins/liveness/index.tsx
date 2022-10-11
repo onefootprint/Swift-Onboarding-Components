@@ -4,17 +4,17 @@ import { I18nextProvider } from 'react-i18next';
 import { useEffectOnce } from 'usehooks-ts';
 
 import MachineProvider from './components/machine-provider';
-import { useHandoffLivenessMachine } from './components/machine-provider/machine-provider';
+import { useLivenessMachine } from './components/machine-provider/machine-provider';
 import configureReactI18next from './config/initializers/react-i18next';
 import queryClient from './config/initializers/react-query';
 import Router from './pages/router';
-import { HandoffLivenessProps } from './types';
+import { LivenessProps } from './types';
 import { Events } from './utils/state-machine/types';
 
 const i18n = configureReactI18next();
 
-const App = ({ context, onDone }: HandoffLivenessProps) => {
-  const [, send] = useHandoffLivenessMachine();
+const App = ({ context, onDone }: LivenessProps) => {
+  const [, send] = useLivenessMachine();
   const { authToken, device, tenant } = context;
 
   useEffectOnce(() => {
@@ -37,11 +37,7 @@ const App = ({ context, onDone }: HandoffLivenessProps) => {
   );
 };
 
-const AppWithMachine = ({
-  context,
-  metadata,
-  onDone,
-}: HandoffLivenessProps) => (
+const AppWithMachine = ({ context, metadata, onDone }: LivenessProps) => (
   <MachineProvider>
     <App context={context} metadata={metadata} onDone={onDone} />
   </MachineProvider>

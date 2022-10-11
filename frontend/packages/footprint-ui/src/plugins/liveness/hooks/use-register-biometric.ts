@@ -7,7 +7,7 @@ import {
 import { useMutation } from '@tanstack/react-query';
 import base64url from 'base64url';
 
-import { useHandoffLivenessMachine } from '../components/machine-provider';
+import { useLivenessMachine } from '../components/machine-provider';
 import { AUTH_HEADER } from '../config/constants';
 import { Events } from '../utils/state-machine/types';
 
@@ -80,7 +80,7 @@ const useBiometricInit = () =>
   >(biometricInit);
 
 const useRegisterBiometric = () => {
-  const [state, send] = useHandoffLivenessMachine();
+  const [state, send] = useLivenessMachine();
   const biometricInitMutation = useBiometricInit();
   const { authToken } = state.context;
 

@@ -1,4 +1,4 @@
-import { HandoffLiveness, IdScan } from 'footprint-elements';
+import { IdScan, Liveness } from 'footprint-elements';
 import React from 'react';
 import useGetD2pStatus from 'src/hooks/use-get-d2p-status';
 import useHandoffMachine from 'src/hooks/use-handoff-machine';
@@ -35,7 +35,7 @@ const Root = () => {
       return null;
     }
     return (
-      <HandoffLiveness
+      <Liveness
         context={{
           authToken,
           device,

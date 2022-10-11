@@ -8,11 +8,11 @@ import {
   States,
 } from './types';
 
-export const createHandoffLivenessMachine = () =>
+export const createLivenessMachine = () =>
   createMachine<MachineContext, MachineEvents>(
     {
       predictableActionArguments: true,
-      id: 'handoffLiveness',
+      id: 'liveness',
       initial: States.init,
       context: {},
       states: {
@@ -92,6 +92,6 @@ export const createHandoffLivenessMachine = () =>
     },
   );
 
-const handoffLivenessMachine = createHandoffLivenessMachine();
+const LivenessMachine = createLivenessMachine();
 
-export default handoffLivenessMachine;
+export default LivenessMachine;

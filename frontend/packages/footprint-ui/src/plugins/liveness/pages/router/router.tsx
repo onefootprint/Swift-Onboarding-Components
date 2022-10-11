@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 
-import { useHandoffLivenessMachine } from '../../components/machine-provider';
+import { useLivenessMachine } from '../../components/machine-provider';
 import { States } from '../../utils/state-machine/types';
 import Register from '../register';
 import Retry from '../retry';
@@ -12,7 +12,7 @@ type RouterProps = {
 };
 
 const Router = ({ onDone }: RouterProps) => {
-  const [state] = useHandoffLivenessMachine();
+  const [state] = useLivenessMachine();
   const isDone = state.matches(States.completed);
 
   useEffect(() => {
