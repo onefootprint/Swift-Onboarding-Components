@@ -123,8 +123,8 @@ const createIdScanMachine = () =>
           if (event.type === Events.receivedContext) {
             const { authToken, device, tenant } = event.payload;
             context.authToken = authToken;
-            context.device = device;
-            context.tenant = tenant;
+            context.device = { ...device };
+            context.tenant = { ...tenant };
           }
           return context;
         }),

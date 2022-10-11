@@ -31,7 +31,12 @@ export const shouldRunTransfer = (
   missingIdDocument: boolean,
   missingLiveness: boolean,
   device: DeviceInfo,
-) => (missingIdDocument || missingLiveness) && device.type !== 'mobile';
+) => {
+  if (device.type === 'mobile') {
+    return missingLiveness;
+  }
+  return missingIdDocument || missingLiveness;
+};
 
 export const requiresAdditionalInfo = (
   userFound: boolean,

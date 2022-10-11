@@ -1,3 +1,4 @@
+import { QueryClientProvider } from '@tanstack/react-query';
 import React from 'react';
 import { I18nextProvider } from 'react-i18next';
 import { useEffectOnce } from 'usehooks-ts';
@@ -7,6 +8,7 @@ import {
   useIdScanMachine,
 } from './components/machine-provider';
 import configureReactI18next from './config/initializers/react-i18next';
+import queryClient from './config/initializers/react-query';
 import { IdScanProps } from './id-scan.types';
 import Router from './pages/router';
 import { Events } from './utils/state-machine/types';
@@ -28,9 +30,9 @@ const App = ({ context, onDone }: IdScanProps) => {
 
   return (
     <I18nextProvider i18n={configureReactI18next()}>
-      <MachineProvider>
+      <QueryClientProvider client={queryClient}>
         <Router onDone={onDone} />
-      </MachineProvider>
+      </QueryClientProvider>
     </I18nextProvider>
   );
 };
