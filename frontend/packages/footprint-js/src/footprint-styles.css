@@ -1,0 +1,86 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@500&display=swap');
+
+.footprint-body-locked {
+  overflow: hidden;
+}
+.footprint-overlay {
+  align-items: center;
+  background: rgba(0, 0, 0, 0.3);
+  display: flex;
+  height: 100%;
+  justify-content: center;
+  left: 0;
+  overflow-y: hidden;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 50000;
+}
+
+@keyframes footprint-rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.footprint-loading-indicator {
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: 4px;
+  padding: 16px;
+}
+
+.footprint-loading-spin {
+  animation: footprint-rotate 0.8s linear infinite;
+}
+
+.footprint-modal {
+  height: 100%;
+  left: 0;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 50001;
+}
+
+.footprint-button {
+  -webkit-box-align: center;
+  align-items: center;
+  background-color: rgb(14, 20, 56);
+  border-radius: 6px;
+  border: 0px;
+  box-shadow: rgb(0 0 0 / 0%) 0px 1px 1px, transparent 0px 0px 0px 1px;
+  color: rgb(255, 255, 255);
+  cursor: pointer;
+  display: flex;
+  -webkit-box-pack: center;
+  justify-content: center;
+  text-decoration: none;
+  font-family: 'DM Sans';
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 24px;
+  padding: 12px 24px;
+}
+
+.footprint-button:hover {
+  background: linear-gradient(
+      rgba(255, 255, 255, 0.14),
+      rgba(255, 255, 255, 0.14)
+    ),
+    linear-gradient(rgb(14, 20, 56), rgb(14, 20, 56));
+}
+
+.footprint-button:active {
+  background: linear-gradient(
+      rgba(255, 255, 255, 0.18),
+      rgba(255, 255, 255, 0.18)
+    ),
+    linear-gradient(rgb(14, 20, 56), rgb(14, 20, 56));
+}
+
+.footprint-button svg {
+  margin-right: 8px;
+}

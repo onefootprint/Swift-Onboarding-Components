@@ -1,16 +1,8 @@
-import footprint from '@onefootprint/footprint-js';
-import {
-  Box,
-  createFontStyles,
-  FootprintButton,
-  media,
-  Typography,
-} from '@onefootprint/ui';
+import { FootprintButton } from '@onefootprint/footprint-react';
+import { Box, createFontStyles, media, Typography } from '@onefootprint/ui';
 import Head from 'next/head';
 import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
-
-footprint.init({ publicKey: process.env.NEXT_PUBLIC_TENANT_KEY });
 
 export type DemoProps = {
   page: {
@@ -23,17 +15,10 @@ export type DemoProps = {
   };
 };
 
+const publicKey = process.env.NEXT_PUBLIC_TENANT_KEY as string;
+
 const Demo = ({ page }: DemoProps) => {
   const [showConfirmation, setConfirmation] = useState(false);
-
-  const handleClick = () => {
-    footprint.show({
-      onCompleted(validationToken) {
-        console.log('validationToken', validationToken);
-        setConfirmation(true);
-      },
-    });
-  };
 
   return (
     <>
@@ -61,7 +46,16 @@ const Demo = ({ page }: DemoProps) => {
             <>
               <Content dangerouslySetInnerHTML={{ __html: page.html }} />
               <ButtonContainer>
-                <FootprintButton fullWidth onClick={handleClick} />
+                <FootprintButton
+                  publicKey={publicKey}
+                  onCompleted={(validationToken: string) => {
+                    setConfirmation(true);
+                    console.log('on completed', validationToken);
+                  }}
+                  onCanceled={() => {
+                    console.log('user canceled!');
+                  }}
+                />
               </ButtonContainer>
             </>
           )}
@@ -132,12 +126,7 @@ const Content = styled.div`
 `;
 
 const ButtonContainer = styled.div`
-  width: 100%;
   margin: 0 auto;
-
-  ${media.greaterThan('sm')`
-    width: 380px;
-  `}
 `;
 
 export default Demo;

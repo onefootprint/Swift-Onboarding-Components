@@ -1,5 +1,5 @@
-import footprint from '@onefootprint/footprint-js';
-import { Box, FootprintButton, media, Typography } from '@onefootprint/ui';
+import { FootprintButton } from '@onefootprint/footprint-react';
+import { Box, media, Typography } from '@onefootprint/ui';
 import Head from 'next/head';
 import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
@@ -14,16 +14,6 @@ type PreviewProps = {
 
 const Preview = ({ tenant }: PreviewProps) => {
   const [showConfirmation, setConfirmation] = useState(false);
-
-  const handleClick = () => {
-    footprint.init({ publicKey: tenant.key });
-    footprint.show({
-      onCompleted(validationToken) {
-        console.log('validationToken', validationToken);
-        setConfirmation(true);
-      },
-    });
-  };
 
   return (
     <>
@@ -62,7 +52,13 @@ const Preview = ({ tenant }: PreviewProps) => {
                 please see our privacy policy.
               </Typography>
               <ButtonContainer>
-                <FootprintButton fullWidth onClick={handleClick} />
+                <FootprintButton
+                  publicKey={tenant.key}
+                  onCompleted={validationToken => {
+                    console.log('validationToken', validationToken);
+                    setConfirmation(true);
+                  }}
+                />
               </ButtonContainer>
             </>
           )}
@@ -112,12 +108,7 @@ const Inner = styled.div`
 `;
 
 const ButtonContainer = styled.div`
-  width: 100%;
   margin: 0 auto;
-
-  ${media.greaterThan('sm')`
-    width: 380px;
-  `}
 `;
 
 export default Preview;

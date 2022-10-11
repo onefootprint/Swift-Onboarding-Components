@@ -1,14 +1,17 @@
-import { IS_SSR } from '../config/constants';
-import { Footprint } from '../footprint/types';
+import { Footprint } from '../footprint-types';
+import { createButton } from './ui-manager';
+
+const IS_SSR = typeof window === 'undefined';
 
 const defer = (callback: () => void) => {
   window.setTimeout(callback, 0);
 };
 
 const vanillaIntegration = (footprint: Footprint) => {
-  const handleButtonClicked = async () => {
+  const handleButtonClicked = async (publicKey: string) => {
     await footprint.show({
-      onUserCanceled: () => {
+      publicKey,
+      onCanceled: () => {
         window.onFootprintCanceled?.();
       },
       onCompleted: (validationToken: string) => {
@@ -32,11 +35,10 @@ const vanillaIntegration = (footprint: Footprint) => {
   };
 
   const initFootprint = (publicKey: string, container: HTMLElement) => {
-    footprint.init({ publicKey });
     const createButtonAndListen = () => {
-      const button = footprint.createButton(container);
+      const button = createButton(container);
       button.addEventListener('click', () => {
-        handleButtonClicked();
+        handleButtonClicked(publicKey);
       });
     };
     defer(createButtonAndListen);

@@ -1,6 +1,5 @@
-import vanillaIntegration from './adapters/vanilla';
-import Footprint from './footprint';
-import UiManager from './footprint/ui-manager';
+import initFootprint from './footprint';
+import vanillaIntegration from './utils/vanilla-integration';
 
 const getUrl = (env = 'production', branchName?: string) => {
   if (env === 'local') {
@@ -23,9 +22,6 @@ const url = getUrl(
   process.env.NEXT_PUBLIC_VERCEL_ENV,
   process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_REF,
 );
-
-const uiManager = new UiManager();
-const footprint = new Footprint(url, uiManager);
+const footprint = initFootprint(url);
 vanillaIntegration(footprint)();
-
 export default footprint;

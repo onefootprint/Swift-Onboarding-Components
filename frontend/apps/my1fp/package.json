@@ -15,7 +15,7 @@
     "set:dot-env": "vercel env pull"
   },
   "dependencies": {
-    "@onefootprint/footprint-js": "*",
+    "@onefootprint/footprint-js": "0.0.3",
     "@onefootprint/global-constants": "*",
     "@onefootprint/hooks": "*",
     "@onefootprint/icons": "*",

@@ -20,16 +20,12 @@ const useFootprintJs = () => {
     }
   };
 
-  const authenticate = (vtok: string) => {
-    sendEvent('authenticated', vtok);
-  };
-
   const close = () => {
     sendEvent('closed');
   };
 
-  const complete = (validationToken: string) => {
-    sendEvent('completed', validationToken);
+  const complete = (token: string) => {
+    sendEvent('completed', token);
   };
 
   const cancel = () => {
@@ -42,7 +38,6 @@ const useFootprintJs = () => {
 
   return {
     isReady,
-    authenticate,
     close,
     complete,
     cancel,

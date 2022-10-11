@@ -53,7 +53,7 @@ const Login = () => {
 
   const handleClick = () => {
     footprint.show({
-      onAuthenticated: (authToken: string) => {
+      onCompleted(authToken: string) {
         userDecryptMutation.mutate(
           { authToken, attributes },
           {

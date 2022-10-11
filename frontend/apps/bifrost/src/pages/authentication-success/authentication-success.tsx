@@ -9,7 +9,7 @@ const AuthenticationSuccess = () => {
   const { authToken } = state.context;
 
   const emitTokenAndClose = (vtok: string) => {
-    footprint.authenticate(vtok);
+    footprint.complete(vtok);
     footprint.close();
   };
 

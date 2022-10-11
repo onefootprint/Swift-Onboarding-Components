@@ -1,3 +1,5 @@
+import '@onefootprint/footprint-js/dist/style.css';
+
 import themes from '@onefootprint/themes';
 import { DesignSystemProvider } from '@onefootprint/ui';
 import { QueryClientProvider } from '@tanstack/react-query';
