@@ -19,6 +19,7 @@ export enum SlugByPostType {
 
 export async function getInitialPosts(type?: PostType) {
   const posts = await ghost.posts.browse({
+    limit: 'all',
     include: ['tags', 'authors'],
   });
   return filterPosts(posts, type);
