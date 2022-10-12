@@ -196,6 +196,11 @@ pub async fn private_cleanup_integration_tests(
             )
             .execute(conn)?;
 
+            deleted_rows += diesel::delete(
+                schema::requirement::table.filter(schema::requirement::user_vault_id.eq(&uv.id)),
+            )
+            .execute(conn)?;
+
             // grab scoped_users, delete access events and onboardings
             let obs: Vec<ScopedUser> = schema::scoped_user::table
                 .filter(schema::scoped_user::user_vault_id.eq(&uv.id))
