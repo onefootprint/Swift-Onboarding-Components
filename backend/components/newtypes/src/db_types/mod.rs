@@ -10,7 +10,8 @@ mod document_request_status;
 mod fingerprint;
 mod kyc_status;
 mod ob_config_status;
-mod requirement;
+// Temporary while me move shared types to a common crate. Db types shouldn't be exposed publicly
+pub mod requirement;
 mod sealed_bytes;
 mod tenant_permission;
 mod tenant_user_email;

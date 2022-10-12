@@ -1,6 +1,7 @@
 use crate::auth::user::UserAuth;
 use crate::auth::user::UserAuthContext;
 use crate::auth::user::UserAuthScope;
+use crate::decision;
 use crate::types::identity_data_request::IdentityDataRequest;
 use crate::types::identity_data_request::IdentityDataUpdate;
 use crate::types::response::ResponseData;
@@ -36,7 +37,9 @@ async fn handler(
         .db_pool
         .db_transaction(move |conn| -> Result<_, ApiError> {
             let mut uvw = UserVaultWrapper::lock(conn, &user_auth.user_vault_id())?;
-            uvw.update_identity_data(conn, update, fingerprints)?;
+            uvw.update_identity_data(conn, update.clone(), fingerprints)?;
+            // Update our requirements
+            decision::update_requirement_statuses_to_processing(conn, Some(&update), &uvw.user_vault.id)?;
             Ok(())
         })
         .await?;

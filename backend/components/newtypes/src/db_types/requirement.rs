@@ -38,6 +38,7 @@ pub enum RequirementKind {
     IdentityDocument,
     Liveness,
 }
+crate::util::impl_enum_str_diesel!(RequirementKind);
 
 /// The type of requirement
 #[derive(
@@ -68,6 +69,7 @@ pub enum RequirementStatus2 {
     Retry,
     Fulfilled,
 }
+crate::util::impl_enum_str_diesel!(RequirementStatus2);
 
 /// Who initiated this requirement
 #[derive(
@@ -97,3 +99,4 @@ pub enum RequirementInitiator {
     Tenant,
     StepUp,
 }
+crate::util::impl_enum_str_diesel!(RequirementInitiator);

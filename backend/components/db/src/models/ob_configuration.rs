@@ -14,7 +14,7 @@ use serde::{Deserialize, Serialize};
 
 use super::tenant::Tenant;
 
-#[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
+#[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable, Default)]
 #[diesel(table_name = ob_configuration)]
 pub struct ObConfiguration {
     pub id: ObConfigurationId,
@@ -32,7 +32,7 @@ pub struct ObConfiguration {
     pub can_access_identity_document_images: bool,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
+#[derive(Debug, Clone, Serialize, Deserialize, Insertable, Default)]
 #[diesel(table_name = ob_configuration)]
 struct NewObConfiguration {
     key: ObConfigurationKey,

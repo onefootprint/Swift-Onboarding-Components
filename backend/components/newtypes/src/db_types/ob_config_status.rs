@@ -27,4 +27,10 @@ pub enum ApiKeyStatus {
     Enabled,
 }
 
+impl Default for ApiKeyStatus {
+    fn default() -> Self {
+        ApiKeyStatus::Disabled
+    }
+}
+
 impl_enum_str_diesel!(ApiKeyStatus);

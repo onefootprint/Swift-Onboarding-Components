@@ -3,15 +3,16 @@ use crate::auth::tenant::PublicOnboardingContext;
 use crate::auth::user::UserAuthContext;
 use crate::auth::user::UserAuthScope;
 use crate::auth::{user::UserAuth, Either, SessionContext};
-use crate::decision::DecisionClient;
+use crate::decision;
 use crate::errors::onboarding::OnboardingError;
 use crate::errors::ApiError;
-use crate::types::onboarding_requirement::OnboardingRequirement;
+use crate::types::requirement_kind::RequirementKind;
 use crate::types::response::ResponseData;
 use crate::utils::insight_headers::InsightHeaders;
 use crate::utils::user_vault_wrapper::UserVaultWrapper;
 use crate::State;
 use db::models::insight_event::CreateInsightEvent;
+use newtypes::db_types::requirement::RequirementKind as DbRequirementKind;
 
 use db::models::onboarding::Onboarding;
 
@@ -24,7 +25,7 @@ use super::create_onboarding_validation_token;
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Serialize)]
 pub struct OnboardingResponse {
-    requirements: Vec<OnboardingRequirement>,
+    requirements: Vec<RequirementKind>,
     /// Populated if the user has already onboarded onto this tenant's ob_configuration
     validation_token: Option<SessionAuthToken>,
 }
@@ -54,7 +55,7 @@ pub fn handler(
 
             let scoped_user = ScopedUser::get_or_create(
                 conn,
-                uvw.user_vault.id,
+                uvw.user_vault.id.clone(),
                 onboarding_context.tenant().id.clone(),
                 onboarding_context.ob_config().is_live,
             )?;
@@ -68,26 +69,26 @@ pub fn handler(
                 insight_event,
             )?;
 
-            let decision_client = DecisionClient {
+            let requirements: Vec<DbRequirementKind> = decision::create_requirements(
                 conn,
-                onboarding: &ob,
-                ob_config: onboarding_context.ob_config(),
-                scoped_user: &scoped_user,
-            };
-
-            let requirements = decision_client.create_requirements()?;
+                &uvw.user_vault.id,
+                &ob.id,
+                onboarding_context.ob_config(),
+            )?
+            .into_iter()
+            .map(|r| r.kind)
+            .collect();
 
             // If the user has already onboarded onto this same ob config, return a validation token
-            let validation_token = (ob.is_authorized && requirements.is_empty())
-                .then_some(create_onboarding_validation_token(conn, &session_key, ob.id)?);
+            // TODO: add in requirements here once we mark as fulfilled
+            let validation_token =
+                ob.is_authorized
+                    .then_some(create_onboarding_validation_token(conn, &session_key, ob.id)?);
             Ok((validation_token, requirements))
         })
         .await?;
 
-    let requirements = requirements
-        .into_iter()
-        .map(OnboardingRequirement::from)
-        .collect();
+    let requirements = requirements.into_iter().map(RequirementKind::from).collect();
 
     ResponseData::ok(OnboardingResponse {
         validation_token,
