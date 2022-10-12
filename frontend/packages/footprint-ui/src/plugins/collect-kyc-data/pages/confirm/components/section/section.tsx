@@ -58,6 +58,7 @@ const SectionContent = styled.div`
 
 const Container = styled.div`
   ${({ theme }) => css`
+    width: 100%;
     border: 1px solid ${theme.borderColor.tertiary};
     border-radius: ${theme.borderRadius[2]}px;
     padding: ${theme.spacing[6]}px;
@@ -70,6 +71,7 @@ const Container = styled.div`
 
 const Header = styled.div`
   ${({ theme }) => css`
+    width: 100%;
     display: flex;
     justify-content: space-between;
     align-items: center;
