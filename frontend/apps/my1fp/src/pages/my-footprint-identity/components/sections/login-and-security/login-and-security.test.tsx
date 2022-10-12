@@ -13,9 +13,7 @@ import LoginAndSecurity from './login-and-security';
 
 const originalState = useStore.getState();
 
-// TODO:
-// https://linear.app/footprint/issue/FP-1423/fix-test-translation-issue
-describe.skip('<LoginAndSecurity />', () => {
+describe('<LoginAndSecurity />', () => {
   const renderLoginAndSecurity = () => customRender(<LoginAndSecurity />);
 
   const withUserQuery = (emailVerified?: boolean) => {

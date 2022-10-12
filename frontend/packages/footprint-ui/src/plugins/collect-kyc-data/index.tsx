@@ -8,12 +8,12 @@ import {
   MachineProvider,
   useCollectKycDataMachine,
 } from './components/machine-provider';
-import configureReactI18next from './config/initializers/react-i18next';
+import configureI18next from './config/initializers/i18next';
 import queryClient from './config/initializers/react-query';
 import Router from './pages/router';
 import { Events } from './utils/state-machine/types';
 
-const i18n = configureReactI18next();
+const i18n = configureI18next();
 
 const App = ({ context, onDone }: CollectKycDataProps) => {
   const [, send] = useCollectKycDataMachine();

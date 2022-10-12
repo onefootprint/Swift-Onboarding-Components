@@ -7,7 +7,7 @@ import {
   MachineProvider,
   useIdScanMachine,
 } from './components/machine-provider';
-import configureReactI18next from './config/initializers/react-i18next';
+import configureI18next from './config/initializers/i18next';
 import queryClient from './config/initializers/react-query';
 import { IdScanProps } from './id-scan.types';
 import Router from './pages/router';
@@ -29,7 +29,7 @@ const App = ({ context, onDone }: IdScanProps) => {
   });
 
   return (
-    <I18nextProvider i18n={configureReactI18next()}>
+    <I18nextProvider i18n={configureI18next()}>
       <QueryClientProvider client={queryClient}>
         <Router onDone={onDone} />
       </QueryClientProvider>

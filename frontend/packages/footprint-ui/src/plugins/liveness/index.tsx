@@ -5,13 +5,13 @@ import { useEffectOnce } from 'usehooks-ts';
 
 import MachineProvider from './components/machine-provider';
 import { useLivenessMachine } from './components/machine-provider/machine-provider';
-import configureReactI18next from './config/initializers/react-i18next';
+import configureI18next from './config/initializers/i18next';
 import queryClient from './config/initializers/react-query';
 import Router from './pages/router';
 import { LivenessProps } from './types';
 import { Events } from './utils/state-machine/types';
 
-const i18n = configureReactI18next();
+const i18n = configureI18next();
 
 const App = ({ context, onDone }: LivenessProps) => {
   const [, send] = useLivenessMachine();

@@ -2,7 +2,6 @@ import themes from '@onefootprint/themes';
 import { DesignSystemProvider } from '@onefootprint/ui';
 import Head from 'next/head';
 import React, { useEffect, useState } from 'react';
-import { I18nextProvider } from 'react-i18next';
 import My1FPQueryClientProvider from 'src/components/my1fp-query-client-provider';
 import { createGlobalStyle } from 'styled-components';
 
@@ -12,7 +11,7 @@ import configureSentry from '../config/initializers/sentry';
 import MachineProvider from './liveness-check/components/machine-provider';
 
 configureSentry();
-const i18n = configureReactI18next();
+configureReactI18next();
 
 type AppProps = {
   Component: React.FC;
@@ -32,18 +31,16 @@ const App = ({ Component, pageProps }: AppProps) => {
           content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
         />
       </Head>
-      <I18nextProvider i18n={i18n}>
-        <MachineProvider>
-          <DesignSystemProvider theme={themes.light}>
-            <My1FPQueryClientProvider>
-              <GlobalStyle />
-              <PageGuard>
-                <Component {...pageProps} />
-              </PageGuard>
-            </My1FPQueryClientProvider>
-          </DesignSystemProvider>
-        </MachineProvider>
-      </I18nextProvider>
+      <MachineProvider>
+        <DesignSystemProvider theme={themes.light}>
+          <My1FPQueryClientProvider>
+            <GlobalStyle />
+            <PageGuard>
+              <Component {...pageProps} />
+            </PageGuard>
+          </My1FPQueryClientProvider>
+        </DesignSystemProvider>
+      </MachineProvider>
     </>
   );
 };
