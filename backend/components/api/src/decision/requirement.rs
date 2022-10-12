@@ -2,7 +2,7 @@ use db::{
     assert_in_transaction,
     models::{
         ob_configuration::ObConfiguration,
-        requirement::{AlreadyFulfilledRequirementConfig, CreateRequirementConfig, Requirement},
+        requirement::{CreateRequirementConfig, Requirement},
     },
     DbResult, PgConnection,
 };
@@ -24,20 +24,11 @@ pub(super) fn create_requirements(
     assert_in_transaction(conn)?;
 
     // Get requirements to create and requirements already satisfied
-    let (onboarding_requirements, already_satisfied_requirements) =
-        helpers::get_onboarding_requirement_configs(ob_config);
+    let requirements_to_create = helpers::get_onboarding_requirement_configs(ob_config);
 
-    // Create new Requirements
+    // Create new Requirements. The configs determine if they should be created as "fulfilled" already
     let requirements_created =
-        Requirement::create_from_configs(conn, onboarding_requirements, user_vault_id, Some(onboarding_id))?;
-
-    // TODO: implement
-    // Mark already fulfilled Requirements as fulfilled
-    Requirement::mark_requirements_as_fulfilled_by_requirement(
-        conn,
-        already_satisfied_requirements,
-        user_vault_id,
-    )?;
+        Requirement::create_from_configs(conn, requirements_to_create, user_vault_id, Some(onboarding_id))?;
 
     Ok(requirements_created)
 }
@@ -108,9 +99,9 @@ mod helpers {
 
     // If we have already collected some information from this user, so we may not need to require collection of certain data again
     // We therefore check the requested onboarding requirement this function
-    pub(super) fn get_requirement_kinds_already_satisfied(
+    pub(super) fn get_onboarding_requirement_kinds_already_satisfied(
         ob_config_requirements: Vec<RequirementKind>,
-    ) -> Vec<AlreadyFulfilledRequirementConfig> {
+    ) -> Vec<CreateRequirementConfig> {
         // TODO:
         //   1) set fulfilled_at
         //   2) set fulfilled_by_requirement_id
@@ -122,21 +113,24 @@ mod helpers {
     /// In the future, previously satisfied requirements, step ups, etc
     pub(super) fn get_onboarding_requirement_configs(
         ob_config: &ObConfiguration,
-    ) -> (
-        Vec<CreateRequirementConfig>,
-        Vec<AlreadyFulfilledRequirementConfig>,
-    ) {
-        // First, get the request requirements
+    ) -> Vec<CreateRequirementConfig> {
+        // First, get the requested requirements
         let ob_config_requirements: Vec<RequirementKind> = requirements_from_onboarding_config(ob_config);
+
         // Then, get already satisfied requirements.
-        // Note: these are considered "satisfied by Footprint"
-        let already_completed_requirements: Vec<AlreadyFulfilledRequirementConfig> =
-            get_requirement_kinds_already_satisfied(ob_config_requirements.clone());
+        // A couple of notes:
+        //    - **This only checks for onboarding requirements already satisfied**. risk::get_onboarding_step_up_requirement_kinds will
+        //       decide if it needs/doesn't need Liveness or other things
+        //    - these are considered "satisfied by Footprint"
+        //    - This is kept broken out for clarity and in case we want to have more involved logic
+        let already_completed_onboarding_requirements: Vec<CreateRequirementConfig> =
+            get_onboarding_requirement_kinds_already_satisfied(ob_config_requirements.clone());
+
         // Compute the requirements we need to collect (ob_config_requirements - already_completed_requirements)
         let onboarding_requirements_not_satisfied: Vec<RequirementKind> =
             HashSet::<RequirementKind>::from_iter(ob_config_requirements.into_iter())
                 .difference(&HashSet::<RequirementKind>::from_iter(
-                    already_completed_requirements.iter().map(|r| r.kind),
+                    already_completed_onboarding_requirements.iter().map(|r| r.kind),
                 ))
                 .copied()
                 .into_iter()
@@ -145,18 +139,18 @@ mod helpers {
         // Lastly, get risk-related requirements
         let risk_requirements: Vec<CreateRequirementConfig> =
             risk::get_onboarding_step_up_requirement_kinds();
-        let onboarding_requirements: Vec<CreateRequirementConfig> = onboarding_requirements_not_satisfied
+
+        onboarding_requirements_not_satisfied
             .into_iter()
             .map(|kind| CreateRequirementConfig {
                 kind,
                 initiator: RequirementInitiator::Tenant,
+                fulfilled_at: None,
+                fulfilled_by_requirement_id: None,
             })
             .chain(risk_requirements.into_iter())
-            .collect();
-
-        (onboarding_requirements, already_completed_requirements)
-
-        // Assemble final list of requirements
+            .chain(already_completed_onboarding_requirements.into_iter())
+            .collect()
     }
 
     pub(super) fn get_requirement_kinds_from_identity_data(
@@ -226,30 +220,31 @@ mod tests {
             CreateRequirementConfig {
                 kind: RequirementKind::Name,
                 initiator: RequirementInitiator::Tenant,
+                fulfilled_at: None,
+                fulfilled_by_requirement_id: None,
             },
             CreateRequirementConfig {
                 kind: RequirementKind::IdentityDocument,
                 initiator: RequirementInitiator::Tenant,
+                fulfilled_at: None,
+                fulfilled_by_requirement_id: None,
             },
             CreateRequirementConfig {
                 kind: RequirementKind::Liveness,
                 initiator: RequirementInitiator::Footprint,
+                fulfilled_at: None,
+                fulfilled_by_requirement_id: None,
             },
         ];
-        let mut expected_already_created: Vec<AlreadyFulfilledRequirementConfig> = vec![];
 
-        let (mut res_created, mut res_already_created) =
-            helpers::get_onboarding_requirement_configs(ob_config);
+        let mut res_created = helpers::get_onboarding_requirement_configs(ob_config);
 
         // need the sorts so order is deterministic. Could use HashSets but that's
         // also ugle
         res_created.sort_by_key(|r| r.kind);
         expected_create_configs.sort_by_key(|r| r.kind);
-        res_already_created.sort_by_key(|r| r.kind);
-        expected_already_created.sort_by_key(|r| r.kind);
 
         assert_eq!(res_created, expected_create_configs);
-        assert_eq!(res_already_created, expected_already_created);
     }
 
     #[test]

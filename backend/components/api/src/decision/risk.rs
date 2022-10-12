@@ -8,6 +8,8 @@ pub(super) fn get_onboarding_step_up_requirement_kinds() -> Vec<CreateRequiremen
     vec![CreateRequirementConfig {
         kind: RequirementKind::Liveness,
         initiator: newtypes::RequirementInitiator::Footprint,
+        fulfilled_at: None,
+        fulfilled_by_requirement_id: None,
     }]
 }
 
