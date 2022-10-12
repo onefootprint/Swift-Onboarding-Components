@@ -6,18 +6,17 @@ use crate::auth::{user::UserAuth, Either, SessionContext};
 use crate::decision;
 use crate::errors::onboarding::OnboardingError;
 use crate::errors::ApiError;
-use crate::types::requirement_kind::RequirementKind;
 use crate::types::response::ResponseData;
 use crate::utils::insight_headers::InsightHeaders;
 use crate::utils::user_vault_wrapper::UserVaultWrapper;
 use crate::State;
 use db::models::insight_event::CreateInsightEvent;
-use newtypes::db_types::requirement::RequirementKind as DbRequirementKind;
 
 use db::models::onboarding::Onboarding;
 
 use db::models::scoped_user::ScopedUser;
 
+use newtypes::requirement_kind::RequirementKind;
 use newtypes::SessionAuthToken;
 use paperclip::actix::{api_v2_operation, web, web::Json, Apiv2Schema};
 
@@ -69,7 +68,7 @@ pub fn handler(
                 insight_event,
             )?;
 
-            let requirements: Vec<DbRequirementKind> = decision::create_requirements(
+            let requirements: Vec<RequirementKind> = decision::create_requirements(
                 conn,
                 &uvw.user_vault.id,
                 &ob.id,

@@ -10,6 +10,7 @@ pub mod dob;
 pub mod email;
 pub mod name;
 pub mod phone_number;
+pub mod requirement_kind;
 pub mod requirement_status;
 pub mod sandbox;
 pub mod ssn;
