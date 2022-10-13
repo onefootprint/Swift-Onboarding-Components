@@ -1,6 +1,6 @@
 use crate::auth::tenant::{CheckTenantPermissions, SecretTenantAuthContext, WorkOsAuthContext};
 use crate::auth::Either;
-use crate::errors::{ApiError};
+use crate::errors::ApiError;
 use crate::types::response::ResponseData;
 use crate::types::JsonApiResponse;
 use crate::utils::db2api::DbToApi;
@@ -29,7 +29,7 @@ async fn get(
     state: web::Data<State>,
     request: web::Path<RevealRequest>,
     auth: Either<WorkOsAuthContext, SecretTenantAuthContext>,
-) -> JsonApiResponse<api_types::SecretApiKey> {
+) -> JsonApiResponse<api_wire_types::SecretApiKey> {
     let auth = auth.check_permissions(vec![TenantPermission::ApiKeys])?;
     // TODO more strict auth for viewing secret keys using a SecretTenantAuthContext
     let is_live = auth.is_live()?;
@@ -55,7 +55,7 @@ async fn get(
         )
         .await?;
 
-    Ok(Json(ResponseData::ok(api_types::SecretApiKey::from_db((
+    Ok(Json(ResponseData::ok(api_wire_types::SecretApiKey::from_db((
         key,
         Some(SecretApiKey::from(decrypted_secret_key.leak().to_string())),
         last_used_at,

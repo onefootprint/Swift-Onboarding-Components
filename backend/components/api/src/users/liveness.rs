@@ -28,7 +28,7 @@ pub async fn get(
     state: web::Data<State>,
     request: web::Query<LivenessRequest>,
     auth: Either<WorkOsAuthContext, SecretTenantAuthContext>,
-) -> actix_web::Result<Json<ResponseData<Vec<api_types::LivenessEvent>>>, ApiError> {
+) -> actix_web::Result<Json<ResponseData<Vec<api_wire_types::LivenessEvent>>>, ApiError> {
     let auth = auth.check_permissions(vec![TenantPermission::Users])?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
@@ -42,15 +42,15 @@ pub async fn get(
 
     let response = creds
         .into_iter()
-        .map(api_types::LivenessEvent::from_db)
+        .map(api_wire_types::LivenessEvent::from_db)
         .collect::<Vec<_>>();
     Ok(Json(ResponseData::ok(response)))
 }
 
-impl DbToApi<(WebauthnCredential, InsightEvent)> for api_types::LivenessEvent {
+impl DbToApi<(WebauthnCredential, InsightEvent)> for api_wire_types::LivenessEvent {
     fn from_db((_, insight_event): (WebauthnCredential, InsightEvent)) -> Self {
         Self {
-            insight_event: api_types::InsightEvent::from_db(insight_event),
+            insight_event: api_wire_types::InsightEvent::from_db(insight_event),
         }
     }
 }

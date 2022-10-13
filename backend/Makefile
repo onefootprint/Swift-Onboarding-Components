@@ -116,5 +116,5 @@ run-integration-tests:
 	TEST_URL="http://localhost:8000" pytest ci/tests
 
 generate-api-types:
-	@cd components/api_types && cargo test
-	@cd components/api_types/ts-gen && yarn && yarn build
+	@cd components/api_wire_types && cargo test
+	@cd components/api_wire_types/ts-gen && yarn && yarn build

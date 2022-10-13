@@ -19,7 +19,7 @@ use paperclip::actix::{api_v2_operation, web, web::Json};
 pub async fn post(
     state: web::Data<State>,
     auth: SecretTenantAuthContext,
-) -> actix_web::Result<Json<ResponseData<api_types::User>>, ApiError> {
+) -> actix_web::Result<Json<ResponseData<api_wire_types::User>>, ApiError> {
     let (public_key, e_private_key) = state.enclave_client.generate_sealed_keypair().await?;
 
     let request = NewNonPortableUserVaultReq {
@@ -31,10 +31,10 @@ pub async fn post(
 
     let scoped = db::user_vault::create_non_portable(&state.db_pool, request).await?;
 
-    Ok(Json(ResponseData::ok(api_types::User::from_db(scoped))))
+    Ok(Json(ResponseData::ok(api_wire_types::User::from_db(scoped))))
 }
 
-impl DbToApi<ScopedUser> for api_types::User {
+impl DbToApi<ScopedUser> for api_wire_types::User {
     fn from_db(target: ScopedUser) -> Self {
         let ScopedUser {
             id: _,

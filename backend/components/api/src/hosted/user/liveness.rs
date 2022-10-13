@@ -6,7 +6,7 @@ use crate::State;
 use db::models::webauthn_credential::WebauthnCredential;
 use paperclip::actix::{api_v2_operation, get, web, web::Json};
 
-type LivenessResponse = Vec<api_types::LivenessEvent>;
+type LivenessResponse = Vec<api_wire_types::LivenessEvent>;
 
 #[api_v2_operation(
     summary = "/hosted/user/liveness",
@@ -28,7 +28,7 @@ fn get(
 
     let response = creds
         .into_iter()
-        .map(api_types::LivenessEvent::from_db)
+        .map(api_wire_types::LivenessEvent::from_db)
         .collect::<Vec<_>>();
     Ok(Json(ResponseData::ok(response)))
 }

@@ -6,7 +6,7 @@ use crate::State;
 use db::access_event::AccessEventListItemForUser;
 use paperclip::actix::{api_v2_operation, get, web, web::Json};
 
-type AccessEventResponse = Vec<api_types::AccessEvent>;
+type AccessEventResponse = Vec<api_wire_types::AccessEvent>;
 
 #[api_v2_operation(
     summary = "/hosted/user/access_events",
@@ -27,13 +27,13 @@ fn handler(
     let results = AccessEventListItemForUser::get(&state.db_pool, user_auth.data.user_vault_id)
         .await?
         .into_iter()
-        .map(api_types::AccessEvent::from_db)
+        .map(api_wire_types::AccessEvent::from_db)
         .collect();
 
     Ok(Json(ResponseData { data: results }))
 }
 
-impl DbToApi<AccessEventListItemForUser> for api_types::AccessEvent {
+impl DbToApi<AccessEventListItemForUser> for api_wire_types::AccessEvent {
     fn from_db(evt: AccessEventListItemForUser) -> Self {
         let AccessEventListItemForUser {
             event,
@@ -41,7 +41,7 @@ impl DbToApi<AccessEventListItemForUser> for api_types::AccessEvent {
             scoped_user,
         } = evt;
 
-        api_types::AccessEvent {
+        api_wire_types::AccessEvent {
             fp_user_id: scoped_user.fp_user_id,
             tenant_id: scoped_user.tenant_id,
             reason: event.reason,

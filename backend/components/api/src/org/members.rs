@@ -31,8 +31,10 @@ async fn get(
     state: web::Data<State>,
     request: web::Query<PaginatedRequest<EmptyRequest, DateTime<Utc>>>,
     auth: WorkOsAuthContext,
-) -> actix_web::Result<Json<PaginatedResponseData<Vec<api_types::OrganizationMember>, DateTime<Utc>>>, ApiError>
-{
+) -> actix_web::Result<
+    Json<PaginatedResponseData<Vec<api_wire_types::OrganizationMember>, DateTime<Utc>>>,
+    ApiError,
+> {
     let auth = auth.check_permissions(vec![TenantPermission::OrgSettings])?;
     let tenant = auth.tenant();
     let cursor = request.cursor;
@@ -48,8 +50,8 @@ async fn get(
     let results = results
         .into_iter()
         .take(page_size)
-        .map(api_types::OrganizationMember::from_db)
-        .collect::<Vec<api_types::OrganizationMember>>();
+        .map(api_wire_types::OrganizationMember::from_db)
+        .collect::<Vec<api_wire_types::OrganizationMember>>();
     Ok(Json(PaginatedResponseData::ok(results, cursor, None)))
 }
 
@@ -71,7 +73,7 @@ async fn post(
     state: web::Data<State>,
     request: web::Json<CreateTenantUserRequest>,
     auth: WorkOsAuthContext,
-) -> JsonApiResponse<api_types::OrganizationMember> {
+) -> JsonApiResponse<api_wire_types::OrganizationMember> {
     let auth = auth.check_permissions(vec![TenantPermission::Admin])?;
     let tenant = auth.tenant();
 
@@ -89,7 +91,7 @@ async fn post(
     // TODO use a different email template for inviting a teammate
     create_and_send_magic_link(&state, &user.email.0, &redirect_url).await?;
 
-    let result = api_types::OrganizationMember::from_db((user, role));
+    let result = api_wire_types::OrganizationMember::from_db((user, role));
     ResponseData::ok(result).json()
 }
 
@@ -163,7 +165,7 @@ async fn deactivate(
     EmptyResponse::ok().json()
 }
 
-impl DbToApi<(TenantUser, TenantRole)> for api_types::OrganizationMember {
+impl DbToApi<(TenantUser, TenantRole)> for api_wire_types::OrganizationMember {
     fn from_db((user, role): (TenantUser, TenantRole)) -> Self {
         let TenantUser {
             id,

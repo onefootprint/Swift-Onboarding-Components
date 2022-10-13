@@ -1,5 +1,5 @@
 [package]
-name = "api_types"
+name = "api_wire_types"
 version = "0.1.0"
 edition = "2021"
 

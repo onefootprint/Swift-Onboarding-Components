@@ -1,6 +1,6 @@
 use crate::auth::tenant::{CheckTenantPermissions, SecretTenantAuthContext, WorkOsAuthContext};
 use crate::auth::Either;
-use crate::errors::{ApiResult};
+use crate::errors::ApiResult;
 use crate::types::PaginatedRequest;
 use crate::types::{EmptyRequest, JsonApiResponse};
 use crate::types::{PaginatedResponseData, ResponseData};
@@ -15,7 +15,7 @@ use newtypes::{ApiKeyStatus, TenantApiKeyId, TenantPermission};
 use paperclip::actix::Apiv2Schema;
 use paperclip::actix::{api_v2_operation, patch, web, web::Json};
 
-type ApiKeysResponse = Json<PaginatedResponseData<Vec<api_types::SecretApiKey>, DateTime<Utc>>>;
+type ApiKeysResponse = Json<PaginatedResponseData<Vec<api_wire_types::SecretApiKey>, DateTime<Utc>>>;
 
 #[api_v2_operation(
     summary = "/org/api_keys",
@@ -55,8 +55,8 @@ pub async fn get(
             let last_used = id_to_last_used.get(&x.id).copied();
             (x, None, last_used)
         })
-        .map(api_types::SecretApiKey::from_db)
-        .collect::<Vec<api_types::SecretApiKey>>();
+        .map(api_wire_types::SecretApiKey::from_db)
+        .collect::<Vec<api_wire_types::SecretApiKey>>();
     Ok(Json(PaginatedResponseData::ok(keys, cursor, Some(count))))
 }
 
@@ -75,7 +75,7 @@ pub async fn post(
     state: web::Data<State>,
     auth: Either<WorkOsAuthContext, SecretTenantAuthContext>,
     request: web::Json<CreateApiKeyRequest>,
-) -> JsonApiResponse<api_types::SecretApiKey> {
+) -> JsonApiResponse<api_wire_types::SecretApiKey> {
     let auth = auth.check_permissions(vec![TenantPermission::ApiKeys])?;
     let is_live = auth.is_live()?;
     let secret_key = SecretApiKey::generate(is_live);
@@ -90,7 +90,7 @@ pub async fn post(
     )
     .await?;
 
-    Ok(Json(ResponseData::ok(api_types::SecretApiKey::from_db((
+    Ok(Json(ResponseData::ok(api_wire_types::SecretApiKey::from_db((
         new_key,
         Some(secret_key),
         None,
@@ -120,7 +120,7 @@ pub async fn patch(
     auth: Either<WorkOsAuthContext, SecretTenantAuthContext>,
     path: web::Path<UpdateApiKeyPath>,
     request: web::Json<UpdateApiKeyRequest>,
-) -> JsonApiResponse<api_types::SecretApiKey> {
+) -> JsonApiResponse<api_wire_types::SecretApiKey> {
     let auth = auth.check_permissions(vec![TenantPermission::ApiKeys])?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
@@ -131,7 +131,7 @@ pub async fn patch(
         .db_transaction(move |conn| TenantApiKey::update(conn, id, tenant_id, is_live, name, status))
         .await?;
 
-    Ok(Json(ResponseData::ok(api_types::SecretApiKey::from_db((
+    Ok(Json(ResponseData::ok(api_wire_types::SecretApiKey::from_db((
         result, None, None,
     )))))
 }

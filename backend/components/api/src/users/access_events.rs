@@ -30,7 +30,7 @@ struct AccessEventRequest {
     timestamp_gte: Option<DateTime<Utc>>,
 }
 
-type AccessEventResponse = Vec<api_types::AccessEvent>;
+type AccessEventResponse = Vec<api_wire_types::AccessEvent>;
 
 #[api_v2_operation(
     summary = "users/access_events",
@@ -76,12 +76,12 @@ fn get(
     let response = results
         .into_iter()
         .take(page_size)
-        .map(api_types::AccessEvent::from_db)
-        .collect::<Vec<api_types::AccessEvent>>();
+        .map(api_wire_types::AccessEvent::from_db)
+        .collect::<Vec<api_wire_types::AccessEvent>>();
     Ok(Json(PaginatedResponseData::ok(response, cursor, None)))
 }
 
-impl DbToApi<AccessEventListItemForTenant> for api_types::AccessEvent {
+impl DbToApi<AccessEventListItemForTenant> for api_wire_types::AccessEvent {
     fn from_db(evt: AccessEventListItemForTenant) -> Self {
         let AccessEventListItemForTenant {
             event,
@@ -89,21 +89,21 @@ impl DbToApi<AccessEventListItemForTenant> for api_types::AccessEvent {
             insight,
         } = evt;
 
-        api_types::AccessEvent {
+        api_wire_types::AccessEvent {
             fp_user_id: scoped_user.fp_user_id,
             tenant_id: scoped_user.tenant_id,
             reason: event.reason,
             principal: event.principal,
             timestamp: event.timestamp,
             ordering_id: event.ordering_id,
-            insight_event: insight.map(api_types::InsightEvent::from_db),
+            insight_event: insight.map(api_wire_types::InsightEvent::from_db),
             kind: event.kind,
             targets: event.targets,
         }
     }
 }
 
-impl DbToApi<InsightEvent> for api_types::InsightEvent {
+impl DbToApi<InsightEvent> for api_wire_types::InsightEvent {
     fn from_db(e: InsightEvent) -> Self {
         let InsightEvent {
             city,
@@ -121,7 +121,7 @@ impl DbToApi<InsightEvent> for api_types::InsightEvent {
             ..
         } = e;
 
-        api_types::InsightEvent {
+        api_wire_types::InsightEvent {
             timestamp,
             ip_address,
             city,

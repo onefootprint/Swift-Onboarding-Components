@@ -15,14 +15,16 @@ use paperclip::actix::{api_v2_operation, web::Json};
 )]
 pub async fn get(
     auth: Either<WorkOsAuthContext, SecretTenantAuthContext>,
-) -> JsonApiResponse<api_types::Organization> {
+) -> JsonApiResponse<api_wire_types::Organization> {
     let auth = auth.check_permissions(vec![])?; // No permissions needed to access this endpoint
     let tenant = auth.tenant().clone();
 
-    Ok(Json(ResponseData::ok(api_types::Organization::from_db(tenant))))
+    Ok(Json(ResponseData::ok(api_wire_types::Organization::from_db(
+        tenant,
+    ))))
 }
 
-impl DbToApi<Tenant> for api_types::Organization {
+impl DbToApi<Tenant> for api_wire_types::Organization {
     fn from_db(t: Tenant) -> Self {
         let Tenant {
             name,

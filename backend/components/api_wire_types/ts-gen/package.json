@@ -1,7 +1,7 @@
 {
   "name": "ts-gen",
   "version": "1.0.0",
-  "description": "Generate typescript types for api_types",
+  "description": "Generate typescript types for api_wire_types",
   "main": "index.js",
   "typings": "index.d.ts",
   "scripts": {

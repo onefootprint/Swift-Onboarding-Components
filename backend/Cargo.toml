@@ -12,5 +12,5 @@ members = [
     "components/newtypes",
     "components/app_attest",
     "components/twilio",
-    "components/api_types",
+    "components/api_wire_types",
 ]

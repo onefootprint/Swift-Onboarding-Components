@@ -26,7 +26,7 @@ struct NewClientRequest {
 #[derive(Debug, Clone, serde::Serialize, Apiv2Schema)]
 struct NewClientResponse {
     org_id: TenantId,
-    key: api_types::SecretApiKey,
+    key: api_wire_types::SecretApiKey,
     auth_token: SessionAuthToken,
 }
 
@@ -86,7 +86,7 @@ async fn post(
     Ok(Json(ResponseData {
         data: NewClientResponse {
             org_id: tenant.id,
-            key: api_types::SecretApiKey::from_db((new_key, Some(secret_api_key), None)),
+            key: api_wire_types::SecretApiKey::from_db((new_key, Some(secret_api_key), None)),
             auth_token,
         },
     }))

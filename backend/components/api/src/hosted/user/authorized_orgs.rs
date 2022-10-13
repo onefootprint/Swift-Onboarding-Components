@@ -17,7 +17,7 @@ pub struct FpUserOnboarding {
     tenant_id: TenantId,
     name: String,
     logo_url: Option<String>,
-    onboardings: Vec<api_types::Onboarding>,
+    onboardings: Vec<api_wire_types::Onboarding>,
 }
 
 #[api_v2_operation(
@@ -53,7 +53,7 @@ pub async fn handler(
                 .get(&scoped_user.id)
                 .unwrap_or(&vec![])
                 .iter()
-                .map(|x| api_types::Onboarding::from_db(x.clone()))
+                .map(|x| api_wire_types::Onboarding::from_db(x.clone()))
                 .collect(),
             id: scoped_user.id,
         })
@@ -61,7 +61,7 @@ pub async fn handler(
     Ok(Json(ResponseData::ok(results)))
 }
 
-impl DbToApi<OnboardingInfo> for api_types::Onboarding {
+impl DbToApi<OnboardingInfo> for api_wire_types::Onboarding {
     fn from_db((onboarding, config, insight): OnboardingInfo) -> Self {
         let Onboarding {
             start_timestamp,
@@ -74,13 +74,13 @@ impl DbToApi<OnboardingInfo> for api_types::Onboarding {
             ..
         } = config;
         let can_access_data_attributes = can_access_data.iter().flat_map(|x| x.attributes()).collect();
-        api_types::Onboarding {
+        api_wire_types::Onboarding {
             name,
             timestamp: start_timestamp,
             kyc_status,
             can_access_data,
             can_access_data_attributes,
-            insight_event: api_types::InsightEvent::from_db(insight),
+            insight_event: api_wire_types::InsightEvent::from_db(insight),
         }
     }
 }

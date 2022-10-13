@@ -15,7 +15,7 @@ use newtypes::{TenantPermission, TenantRoleId};
 use paperclip::actix::Apiv2Schema;
 use paperclip::actix::{api_v2_operation, get, patch, post, web, web::Json};
 
-type RolesResponse = Json<PaginatedResponseData<Vec<api_types::OrganizationRole>, DateTime<Utc>>>;
+type RolesResponse = Json<PaginatedResponseData<Vec<api_wire_types::OrganizationRole>, DateTime<Utc>>>;
 
 #[api_v2_operation(
     summary = "/org/roles",
@@ -44,8 +44,8 @@ async fn get(
     let results = results
         .into_iter()
         .take(page_size)
-        .map(api_types::OrganizationRole::from_db)
-        .collect::<Vec<api_types::OrganizationRole>>();
+        .map(api_wire_types::OrganizationRole::from_db)
+        .collect::<Vec<api_wire_types::OrganizationRole>>();
     Ok(Json(PaginatedResponseData::ok(results, cursor, None)))
 }
 
@@ -66,7 +66,7 @@ async fn post(
     state: web::Data<State>,
     request: web::Json<CreateTenantRoleRequest>,
     auth: WorkOsAuthContext,
-) -> JsonApiResponse<api_types::OrganizationRole> {
+) -> JsonApiResponse<api_wire_types::OrganizationRole> {
     let auth = auth.check_permissions(vec![TenantPermission::Admin])?;
     let tenant = auth.tenant();
 
@@ -77,7 +77,7 @@ async fn post(
         .db_query(move |conn| TenantRole::create(conn, tenant_id, name, permissions))
         .await??;
 
-    let result = api_types::OrganizationRole::from_db(result);
+    let result = api_wire_types::OrganizationRole::from_db(result);
     ResponseData::ok(result).json()
 }
 
@@ -99,7 +99,7 @@ async fn patch(
     request: web::Json<UpdateTenantRoleRequest>,
     role_id: web::Path<TenantRoleId>,
     auth: WorkOsAuthContext,
-) -> JsonApiResponse<api_types::OrganizationRole> {
+) -> JsonApiResponse<api_wire_types::OrganizationRole> {
     let auth = auth.check_permissions(vec![TenantPermission::Admin])?;
     let tenant = auth.tenant();
 
@@ -111,7 +111,7 @@ async fn patch(
         .db_transaction(move |conn| TenantRole::update(conn, &tenant_id, &role_id, name, permissions))
         .await?;
 
-    let result = api_types::OrganizationRole::from_db(result);
+    let result = api_wire_types::OrganizationRole::from_db(result);
     ResponseData::ok(result).json()
 }
 
@@ -126,7 +126,7 @@ async fn deactivate(
     state: web::Data<State>,
     role_id: web::Path<TenantRoleId>,
     auth: WorkOsAuthContext,
-) -> JsonApiResponse<api_types::OrganizationRole> {
+) -> JsonApiResponse<api_wire_types::OrganizationRole> {
     let auth = auth.check_permissions(vec![TenantPermission::Admin])?;
     let tenant = auth.tenant();
     let tenant_id = tenant.id.clone();
@@ -136,11 +136,11 @@ async fn deactivate(
         .db_transaction(move |conn| TenantRole::deactivate(conn, &role_id, &tenant_id))
         .await?;
 
-    let result = api_types::OrganizationRole::from_db(result);
+    let result = api_wire_types::OrganizationRole::from_db(result);
     ResponseData::ok(result).json()
 }
 
-impl DbToApi<TenantRole> for api_types::OrganizationRole {
+impl DbToApi<TenantRole> for api_wire_types::OrganizationRole {
     fn from_db(target: TenantRole) -> Self {
         let TenantRole {
             id,

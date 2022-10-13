@@ -35,7 +35,7 @@ pub struct UsersRequest {
     timestamp_gte: Option<DateTime<Utc>>,
 }
 
-type UsersResponse = Vec<api_types::User>;
+type UsersResponse = Vec<api_wire_types::User>;
 
 #[api_v2_operation(
     summary = "/users",
@@ -122,7 +122,7 @@ pub fn get(
         .take(page_size)
         .map(|su| {
             let uvw = uvw_map.remove(&su.user_vault_id).unwrap();
-            <api_types::User as DbToApi<UserDetail>>::from_db((
+            <api_wire_types::User as DbToApi<UserDetail>>::from_db((
                 uvw.get_populated_fields(),
                 obs.get(&su.id).unwrap_or(&empty_vec),
                 su,
@@ -136,7 +136,7 @@ pub fn get(
 
 type UserDetail<'a> = (Vec<DataAttribute>, &'a [OnboardingInfo], ScopedUser, bool);
 
-impl<'a> DbToApi<UserDetail<'a>> for api_types::User {
+impl<'a> DbToApi<UserDetail<'a>> for api_wire_types::User {
     fn from_db((identity_data_attributes, onboarding_info, scoped_user, is_portable): UserDetail) -> Self {
         let ScopedUser {
             fp_user_id,
@@ -145,7 +145,7 @@ impl<'a> DbToApi<UserDetail<'a>> for api_types::User {
             ..
         } = scoped_user;
 
-        api_types::User {
+        api_wire_types::User {
             footprint_user_id: fp_user_id,
             identity_data_attributes,
             start_timestamp,
@@ -153,7 +153,7 @@ impl<'a> DbToApi<UserDetail<'a>> for api_types::User {
             is_portable,
             onboardings: onboarding_info
                 .iter()
-                .map(|x| api_types::Onboarding::from_db(x.clone()))
+                .map(|x| api_wire_types::Onboarding::from_db(x.clone()))
                 .collect(),
         }
     }
