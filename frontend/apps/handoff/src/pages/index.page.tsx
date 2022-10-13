@@ -6,7 +6,7 @@ import { Events, States } from 'src/utils/state-machine';
 
 import Canceled from './canceled';
 import CheckRequirements from './check-requirements';
-import Success from './complete';
+import Complete from './complete';
 import Expired from './expired';
 import Init from './init';
 
@@ -19,7 +19,7 @@ const Root = () => {
     return <Init />;
   }
   if (state.matches(States.complete)) {
-    return <Success />;
+    return <Complete />;
   }
   if (state.matches(States.canceled)) {
     return <Canceled />;
