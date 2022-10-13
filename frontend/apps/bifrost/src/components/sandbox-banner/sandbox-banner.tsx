@@ -18,6 +18,9 @@ const SandboxBanner = () => {
 
 const Container = styled.div`
   ${({ theme }) => css`
+    position: sticky;
+    top: 0;
+    z-index: ${theme.zIndex.sticky};
     border-bottom: ${theme.borderWidth[1]}px solid ${theme.borderColor.tertiary};
 
     > [role='alert'] {

@@ -4,6 +4,8 @@ import { useTimeout } from 'usehooks-ts';
 const ANIMATION_DELAY = 0;
 const ANIMATION_DURATION = 5000;
 
+export const CONFETTI_CONTAINER_ID = 'footprint-confetti-container';
+
 const useConfettiState = () => {
   const [state, setState] = useState<{
     height: number | undefined;
@@ -16,7 +18,7 @@ const useConfettiState = () => {
   });
 
   const setSize = () => {
-    const container = document.getElementById('content');
+    const container = document.getElementById(CONFETTI_CONTAINER_ID);
     setState(currentState => ({
       ...currentState,
       height: container?.offsetHeight,

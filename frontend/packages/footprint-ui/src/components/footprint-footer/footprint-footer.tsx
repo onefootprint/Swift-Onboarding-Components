@@ -37,6 +37,8 @@ const FootprintFooter = () => {
 
 const Container = styled.div`
   ${({ theme }) => css`
+    position: sticky;
+    bottom: 0;
     background-color: ${theme.backgroundColor.secondary};
     border-radius: 0 0 ${theme.borderRadius[2]}px ${theme.borderRadius[2]}px;
     border-top: ${theme.borderWidth[1]}px solid ${theme.borderColor.tertiary};

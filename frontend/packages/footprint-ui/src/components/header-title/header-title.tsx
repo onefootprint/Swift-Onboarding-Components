@@ -12,7 +12,7 @@ const HeaderTitle = ({ title, subtitle, sx }: HeaderTitleProps) => (
     <Typography
       as="h2"
       color="primary"
-      sx={{ marginBottom: 2 }}
+      sx={{ marginBottom: 3 }}
       variant="heading-3"
     >
       {title}

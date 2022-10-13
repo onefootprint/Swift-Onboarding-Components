@@ -1,4 +1,4 @@
-import { Box, Portal } from '@onefootprint/ui';
+import { Box, media, Portal } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
@@ -38,8 +38,12 @@ const Container = styled.div`
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     align-items: center;
-    margin-bottom: ${theme.spacing[3]}px;
-    padding: ${theme.spacing[5]}px 0 ${theme.spacing[3]}px;
+    padding: ${theme.spacing[5]}px 0;
+    background: ${theme.backgroundColor.primary};
+
+    ${media.greaterThan('md')`
+      padding:  ${theme.spacing[4]}px 0;
+    `}
 
     button {
       position: relative;
