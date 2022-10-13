@@ -54,7 +54,7 @@ impl TwilioClient {
         destination: &ValidatedPhoneNumber,
     ) -> Result<(PhoneChallengeState, SecondsBeforeRetry), ApiError> {
         let code = crypto::random::gen_rand_n_digit_code(6);
-        let message_body = format!("Your {} verification code is {}. Don't share your code with anyone. We will never contact you to request this code.", &self.rp_id, &code);
+        let message_body = format!("Your Footprint verification code is: {}. Don't share your code with anyone, we will never contact you to request this code.", &code);
 
         RateLimit {
             state,
@@ -95,8 +95,8 @@ impl TwilioClient {
         url: String,
     ) -> Result<SecondsBeforeRetry, ApiError> {
         let message_body = format!(
-            "Hello from {}! Continue signing up for your account here: {}",
-            self.rp_id, url
+            "Continue account verification using this link: {}",
+            url
         );
 
         RateLimit {
