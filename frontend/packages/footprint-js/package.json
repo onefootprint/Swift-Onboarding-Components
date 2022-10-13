@@ -23,7 +23,7 @@
     "dist"
   ],
   "scripts": {
-    "dev": "vite",
+    "dev": "vite build --watch --mode development",
     "build": "yarn typecheck && vite build",
     "lint": "eslint src --fix",
     "typecheck": "yarn tsc --noEmit",
