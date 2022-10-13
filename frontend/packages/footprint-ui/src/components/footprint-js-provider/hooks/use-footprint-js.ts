@@ -1,3 +1,4 @@
+import { FootprintEvents } from '@onefootprint/footprint-js';
 import Postmate from 'postmate';
 import { useEffect, useState } from 'react';
 
@@ -21,15 +22,15 @@ const useFootprintJs = () => {
   };
 
   const close = () => {
-    sendEvent('closed');
+    sendEvent(FootprintEvents.closed);
   };
 
   const complete = (token: string) => {
-    sendEvent('completed', token);
+    sendEvent(FootprintEvents.completed, token);
   };
 
   const cancel = () => {
-    sendEvent('userCanceled');
+    sendEvent(FootprintEvents.canceled);
   };
 
   useEffect(() => {
