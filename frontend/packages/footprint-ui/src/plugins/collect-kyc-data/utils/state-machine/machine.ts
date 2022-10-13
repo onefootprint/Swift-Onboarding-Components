@@ -144,6 +144,23 @@ const createCollectKycDataMachine = () =>
             [Events.ssnSubmitted]: {
               actions: [Actions.assignSsn],
             },
+            [Events.navigatedToPrevPage]: [
+              {
+                target: States.ssn,
+                cond: context =>
+                  isMissingSsnAttribute(context.missingAttributes),
+              },
+              {
+                target: States.residentialAddress,
+                cond: context =>
+                  isMissingResidentialAttribute(context.missingAttributes),
+              },
+              {
+                target: States.basicInformation,
+                cond: context =>
+                  isMissingBasicAttribute(context.missingAttributes),
+              },
+            ],
             [Events.confirmed]: [
               {
                 actions: [Actions.assignKycPending],
