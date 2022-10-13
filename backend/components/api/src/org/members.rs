@@ -3,15 +3,16 @@ use crate::auth::tenant::WorkOsAuthContext;
 use crate::errors::tenant::TenantError;
 use crate::errors::ApiError;
 use crate::org::workos::magic_link::create_and_send_magic_link;
-use crate::types::tenant_user::FpTenantUser;
 use crate::types::EmptyRequest;
 use crate::types::EmptyResponse;
 use crate::types::JsonApiResponse;
 use crate::types::PaginatedRequest;
 use crate::types::PaginatedResponseData;
 use crate::types::ResponseData;
+use crate::utils::db2api::DbToApi;
 use crate::State;
 use chrono::{DateTime, Utc};
+use db::models::tenant_role::TenantRole;
 use db::models::tenant_user::{TenantUser, TenantUserUpdate};
 use newtypes::TenantPermission;
 use newtypes::TenantRoleId;
@@ -20,17 +21,18 @@ use paperclip::actix::Apiv2Schema;
 use paperclip::actix::{api_v2_operation, get, patch, post, web, web::Json};
 
 #[api_v2_operation(
-    summary = "/org/users",
-    operation_id = "org-users",
+    summary = "/org/members",
+    operation_id = "org-members",
     tags(Private),
-    description = "Returns a list of dashboard users for the tenant."
+    description = "Returns a list of dashboard members for the tenant."
 )]
-#[get("/users")]
+#[get("/members")]
 async fn get(
     state: web::Data<State>,
     request: web::Query<PaginatedRequest<EmptyRequest, DateTime<Utc>>>,
     auth: WorkOsAuthContext,
-) -> actix_web::Result<Json<PaginatedResponseData<Vec<FpTenantUser>, DateTime<Utc>>>, ApiError> {
+) -> actix_web::Result<Json<PaginatedResponseData<Vec<api_types::OrganizationMember>, DateTime<Utc>>>, ApiError>
+{
     let auth = auth.check_permissions(vec![TenantPermission::OrgSettings])?;
     let tenant = auth.tenant();
     let cursor = request.cursor;
@@ -46,8 +48,8 @@ async fn get(
     let results = results
         .into_iter()
         .take(page_size)
-        .map(FpTenantUser::from)
-        .collect::<Vec<FpTenantUser>>();
+        .map(api_types::OrganizationMember::from_db)
+        .collect::<Vec<api_types::OrganizationMember>>();
     Ok(Json(PaginatedResponseData::ok(results, cursor, None)))
 }
 
@@ -59,17 +61,17 @@ struct CreateTenantUserRequest {
 }
 
 #[api_v2_operation(
-    summary = "/org/users",
+    summary = "/org/members",
     operation_id = "org-users-create",
     tags(Private),
     description = "Create a new IAM user for the tenant. Sends an invite link via WorkOs"
 )]
-#[post("/users")]
+#[post("/members")]
 async fn post(
     state: web::Data<State>,
     request: web::Json<CreateTenantUserRequest>,
     auth: WorkOsAuthContext,
-) -> JsonApiResponse<FpTenantUser> {
+) -> JsonApiResponse<api_types::OrganizationMember> {
     let auth = auth.check_permissions(vec![TenantPermission::Admin])?;
     let tenant = auth.tenant();
 
@@ -87,7 +89,7 @@ async fn post(
     // TODO use a different email template for inviting a teammate
     create_and_send_magic_link(&state, &user.email.0, &redirect_url).await?;
 
-    let result = FpTenantUser::from((user, role));
+    let result = api_types::OrganizationMember::from_db((user, role));
     ResponseData::ok(result).json()
 }
 
@@ -97,12 +99,12 @@ struct UpdateTenantUserRequest {
 }
 
 #[api_v2_operation(
-    summary = "/org/users",
+    summary = "/org/members",
     operation_id = "org-users-patch",
     tags(Private),
     description = "Updates the provided user."
 )]
-#[patch("/users/{tenant_user_id}")]
+#[patch("/members/{tenant_user_id}")]
 async fn patch(
     state: web::Data<State>,
     request: web::Json<UpdateTenantUserRequest>,
@@ -127,12 +129,12 @@ async fn patch(
 }
 
 #[api_v2_operation(
-    summary = "/org/users/deactivate",
+    summary = "/org/members/deactivate",
     operation_id = "org-users-deactivate",
     tags(Private),
     description = "Updates the provided user."
 )]
-#[post("/users/{tenant_user_id}/deactivate")]
+#[post("/members/{tenant_user_id}/deactivate")]
 async fn deactivate(
     state: web::Data<State>,
     user_id: web::Path<TenantUserId>,
@@ -159,4 +161,29 @@ async fn deactivate(
         .await?;
 
     EmptyResponse::ok().json()
+}
+
+impl DbToApi<(TenantUser, TenantRole)> for api_types::OrganizationMember {
+    fn from_db((user, role): (TenantUser, TenantRole)) -> Self {
+        let TenantUser {
+            id,
+            email,
+            last_login_at,
+            created_at,
+            ..
+        } = user;
+        let TenantRole {
+            name: role_name,
+            id: role_id,
+            ..
+        } = role;
+        Self {
+            id,
+            email: email.0,
+            last_login_at,
+            created_at,
+            role_name,
+            role_id,
+        }
+    }
 }

@@ -1,0 +1,21 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "CollectedData",
+  "type": "string",
+  "enum": [
+    "name",
+    "dob",
+    "ssn",
+    "address",
+    "email",
+    "phone_number"
+  ],
+  "tsEnumNames": [
+    "name",
+    "dob",
+    "ssn",
+    "address",
+    "email",
+    "phone_number"
+  ]
+}

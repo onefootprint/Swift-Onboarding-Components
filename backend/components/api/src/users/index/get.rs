@@ -7,12 +7,14 @@ use crate::auth::Either;
 use crate::errors::ApiError;
 use crate::types::request::PaginatedRequest;
 use crate::types::response::PaginatedResponseData;
-use crate::types::scoped_user::FpScopedUser;
+use crate::utils::db2api::DbToApi;
 use crate::utils::user_vault_wrapper::UserVaultWrapper;
 use crate::State;
 use chrono::{DateTime, Utc};
 use db::models::identity_data::HasIdentityDataFields;
 use db::models::onboarding::Onboarding;
+use db::models::onboarding::OnboardingInfo;
+use db::models::scoped_user::ScopedUser;
 use db::scoped_user::OnboardingListQueryParams;
 use newtypes::csv::deserialize_stringified_list;
 use newtypes::KycStatus;
@@ -33,7 +35,7 @@ pub struct UsersRequest {
     timestamp_gte: Option<DateTime<Utc>>,
 }
 
-type UsersResponse = Vec<FpScopedUser>;
+type UsersResponse = Vec<api_types::User>;
 
 #[api_v2_operation(
     summary = "/users",
@@ -120,14 +122,39 @@ pub fn get(
         .take(page_size)
         .map(|su| {
             let uvw = uvw_map.remove(&su.user_vault_id).unwrap();
-            FpScopedUser::from(
+            <api_types::User as DbToApi<UserDetail>>::from_db((
                 uvw.get_populated_fields(),
                 obs.get(&su.id).unwrap_or(&empty_vec),
                 su,
                 uvw.user_vault.is_portable,
-            )
+            ))
         })
         .collect();
 
     Ok(Json(PaginatedResponseData::ok(scoped_users, cursor, count)))
+}
+
+type UserDetail<'a> = (Vec<DataAttribute>, &'a [OnboardingInfo], ScopedUser, bool);
+
+impl<'a> DbToApi<UserDetail<'a>> for api_types::User {
+    fn from_db((identity_data_attributes, onboarding_info, scoped_user, is_portable): UserDetail) -> Self {
+        let ScopedUser {
+            fp_user_id,
+            start_timestamp,
+            ordering_id,
+            ..
+        } = scoped_user;
+
+        api_types::User {
+            footprint_user_id: fp_user_id,
+            identity_data_attributes,
+            start_timestamp,
+            ordering_id,
+            is_portable,
+            onboardings: onboarding_info
+                .iter()
+                .map(|x| api_types::Onboarding::from_db(x.clone()))
+                .collect(),
+        }
+    }
 }

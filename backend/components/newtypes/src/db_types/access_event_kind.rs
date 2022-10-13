@@ -1,6 +1,7 @@
 pub use derive_more::Display;
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use paperclip::actix::Apiv2Schema;
+use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use strum_macros::{AsRefStr, EnumString};
 
@@ -22,6 +23,7 @@ use strum_macros::{AsRefStr, EnumString};
     FromSqlRow,
     EnumString,
     AsRefStr,
+    JsonSchema,
 )]
 #[strum(serialize_all = "snake_case")]
 #[serde(rename_all = "snake_case")]

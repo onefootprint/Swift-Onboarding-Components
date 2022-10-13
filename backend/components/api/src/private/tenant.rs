@@ -2,7 +2,7 @@ use crate::auth::session::AuthSessionData;
 use crate::auth::tenant::WorkOsSession;
 use crate::errors::{ApiError, ApiResult};
 use crate::types::response::ResponseData;
-use crate::types::secret_api_key::FpTenantApiKey;
+use crate::utils::db2api::DbToApi;
 use crate::utils::session::AuthSession;
 use crate::State;
 use crate::{auth::custodian::CustodianAuthContext, org::workos::login::create_tenant};
@@ -26,7 +26,7 @@ struct NewClientRequest {
 #[derive(Debug, Clone, serde::Serialize, Apiv2Schema)]
 struct NewClientResponse {
     org_id: TenantId,
-    key: FpTenantApiKey,
+    key: api_types::SecretApiKey,
     auth_token: SessionAuthToken,
 }
 
@@ -86,7 +86,7 @@ async fn post(
     Ok(Json(ResponseData {
         data: NewClientResponse {
             org_id: tenant.id,
-            key: FpTenantApiKey::from((new_key, Some(secret_api_key))),
+            key: api_types::SecretApiKey::from_db((new_key, Some(secret_api_key), None)),
             auth_token,
         },
     }))

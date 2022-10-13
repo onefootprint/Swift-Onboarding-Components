@@ -6,7 +6,7 @@ pub mod ob_config;
 pub mod ob_session;
 pub mod roles;
 pub mod settings;
-pub mod users;
+pub mod members;
 pub mod workos;
 
 pub fn routes() -> web::Scope {
@@ -17,10 +17,10 @@ pub fn routes() -> web::Scope {
         .service(ob_config::patch)
         .service(ob_config::post)
         .service(ob_session::post)
-        .service(users::get)
-        .service(users::post)
-        .service(users::patch)
-        .service(users::deactivate)
+        .service(members::get)
+        .service(members::post)
+        .service(members::patch)
+        .service(members::deactivate)
         .service(roles::get)
         .service(roles::post)
         .service(roles::patch)

@@ -3,9 +3,10 @@ use crate::auth::tenant::SecretTenantAuthContext;
 use crate::auth::tenant::WorkOsAuthContext;
 use crate::auth::Either;
 use crate::errors::ApiError;
-use crate::types::liveness::FpLiveness;
 use crate::types::response::ResponseData;
+use crate::utils::db2api::DbToApi;
 use crate::State;
+use db::models::insight_event::InsightEvent;
 use db::models::webauthn_credential::WebauthnCredential;
 use newtypes::FootprintUserId;
 use newtypes::TenantPermission;
@@ -27,7 +28,7 @@ pub async fn get(
     state: web::Data<State>,
     request: web::Query<LivenessRequest>,
     auth: Either<WorkOsAuthContext, SecretTenantAuthContext>,
-) -> actix_web::Result<Json<ResponseData<Vec<FpLiveness>>>, ApiError> {
+) -> actix_web::Result<Json<ResponseData<Vec<api_types::LivenessEvent>>>, ApiError> {
     let auth = auth.check_permissions(vec![TenantPermission::Users])?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
@@ -39,6 +40,17 @@ pub async fn get(
         })
         .await??;
 
-    let response = creds.into_iter().map(FpLiveness::from).collect::<Vec<_>>();
+    let response = creds
+        .into_iter()
+        .map(api_types::LivenessEvent::from_db)
+        .collect::<Vec<_>>();
     Ok(Json(ResponseData::ok(response)))
+}
+
+impl DbToApi<(WebauthnCredential, InsightEvent)> for api_types::LivenessEvent {
+    fn from_db((_, insight_event): (WebauthnCredential, InsightEvent)) -> Self {
+        Self {
+            insight_event: api_types::InsightEvent::from_db(insight_event),
+        }
+    }
 }

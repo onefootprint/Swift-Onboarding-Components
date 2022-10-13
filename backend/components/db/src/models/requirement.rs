@@ -3,7 +3,7 @@ use crate::DbResult;
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable, RunQueryDsl};
-use newtypes::api_types::requirement_kind::RequirementKind;
+use newtypes::RequirementKind;
 use newtypes::{OnboardingId, RequirementId, RequirementInitiator, RequirementStatus2, UserVaultId};
 use serde::{Deserialize, Serialize};
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]

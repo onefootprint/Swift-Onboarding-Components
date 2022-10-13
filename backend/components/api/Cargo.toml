@@ -86,5 +86,7 @@ db = { path = "../db" }
 twilio = { path = "../twilio"}
 idv = { path = "../idv" }
 
+api_types = { path = "../api_types" }
+
 [dev-dependencies]
 test-case = "2.1.0"

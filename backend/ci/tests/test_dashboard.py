@@ -318,7 +318,7 @@ def tenant_user(workos_sandbox_tenant, admin_role):
         role_id=admin_role["id"],
         redirect_url="http://localhost:3001/auth",
     )
-    body = post("org/users", user_data, workos_sandbox_tenant.auth_token)
+    body = post("org/members", user_data, workos_sandbox_tenant.auth_token)
     assert not body["last_login_at"]
     assert body["role_id"] == admin_role["id"]
     return body
@@ -345,9 +345,9 @@ class TestDashboardUsers:
     def test_update_user_role(self, workos_sandbox_tenant, tenant_user, limited_role):
         user_id = tenant_user["id"]
         user_data = dict(role_id=limited_role["id"])
-        patch(f"org/users/{user_id}", user_data, workos_sandbox_tenant.auth_token)
+        patch(f"org/members/{user_id}", user_data, workos_sandbox_tenant.auth_token)
 
-        body = get(f"org/users", None, workos_sandbox_tenant.auth_token)
+        body = get(f"org/members", None, workos_sandbox_tenant.auth_token)
         user = next(u for u in body["data"] if u["id"] == user_id)
         assert user["role_id"] == limited_role["id"]
 
@@ -358,7 +358,7 @@ class TestDashboardUsers:
         user_id = tenant_user["id"]
         # Make sure the tenant_user is using the limited role
         user_data = dict(role_id=limited_role["id"])
-        patch(f"org/users/{user_id}", user_data, workos_sandbox_tenant.auth_token)
+        patch(f"org/members/{user_id}", user_data, workos_sandbox_tenant.auth_token)
 
         # Can't deactivate role that has activate users
         post(
@@ -369,13 +369,13 @@ class TestDashboardUsers:
         )
 
         # So we deactivate the user
-        post(f"org/users/{user_id}/deactivate", None, workos_sandbox_tenant.auth_token)
+        post(f"org/members/{user_id}/deactivate", None, workos_sandbox_tenant.auth_token)
 
         # And now we can deactivate it
         post(f"org/roles/{role_id}/deactivate", None, workos_sandbox_tenant.auth_token)
 
         # Make sure the deactivated user isn't displayed anymore
-        body = get("org/users", None, workos_sandbox_tenant.auth_token)
+        body = get("org/members", None, workos_sandbox_tenant.auth_token)
         assert user_id not in set(u["id"] for u in body["data"])
 
         # Make sure the deactivated role isn't displayed anymore

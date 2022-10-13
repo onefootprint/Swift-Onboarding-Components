@@ -1,6 +1,7 @@
 pub use derive_more::Display;
 use diesel::{sql_types::Text, AsExpression, FromSqlRow};
 use paperclip::actix::Apiv2Schema;
+use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use strum_macros::{AsRefStr, EnumString};
 
@@ -23,6 +24,7 @@ use super::DataAttribute;
     FromSqlRow,
     EnumString,
     AsRefStr,
+    JsonSchema,
 )]
 #[strum(serialize_all = "PascalCase")]
 #[serde(rename_all = "snake_case")]
@@ -55,6 +57,7 @@ crate::util::impl_enum_str_diesel!(CollectedData);
     FromSqlRow,
     EnumString,
     AsRefStr,
+    JsonSchema,
 )]
 #[strum(serialize_all = "PascalCase")]
 #[serde(rename_all = "snake_case")]

@@ -3,9 +3,10 @@
 use crate::auth::tenant::SecretTenantAuthContext;
 use crate::auth::tenant::TenantAuth;
 use crate::errors::ApiError;
-use crate::types::scoped_user::FpScopedUser;
 use crate::types::ResponseData;
+use crate::utils::db2api::DbToApi;
 use crate::State;
+use db::models::scoped_user::ScopedUser;
 use db::models::user_vault::NewNonPortableUserVaultReq;
 use paperclip::actix::{api_v2_operation, web, web::Json};
 
@@ -18,7 +19,7 @@ use paperclip::actix::{api_v2_operation, web, web::Json};
 pub async fn post(
     state: web::Data<State>,
     auth: SecretTenantAuthContext,
-) -> actix_web::Result<Json<ResponseData<FpScopedUser>>, ApiError> {
+) -> actix_web::Result<Json<ResponseData<api_types::User>>, ApiError> {
     let (public_key, e_private_key) = state.enclave_client.generate_sealed_keypair().await?;
 
     let request = NewNonPortableUserVaultReq {
@@ -30,10 +31,30 @@ pub async fn post(
 
     let scoped = db::user_vault::create_non_portable(&state.db_pool, request).await?;
 
-    Ok(Json(ResponseData::ok(FpScopedUser::from(
-        vec![],
-        &[],
-        scoped,
-        false,
-    ))))
+    Ok(Json(ResponseData::ok(api_types::User::from_db(scoped))))
+}
+
+impl DbToApi<ScopedUser> for api_types::User {
+    fn from_db(target: ScopedUser) -> Self {
+        let ScopedUser {
+            id: _,
+            fp_user_id,
+            user_vault_id: _,
+            tenant_id: _,
+            _created_at,
+            _updated_at,
+            ordering_id,
+            start_timestamp,
+            is_live: _,
+        } = target;
+
+        Self {
+            footprint_user_id: fp_user_id,
+            identity_data_attributes: vec![],
+            start_timestamp,
+            ordering_id,
+            onboardings: vec![],
+            is_portable: false,
+        }
+    }
 }

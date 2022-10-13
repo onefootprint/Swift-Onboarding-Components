@@ -1,0 +1,36 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "DataAttribute",
+  "description": "The type of data attribute",
+  "type": "string",
+  "enum": [
+    "first_name",
+    "last_name",
+    "dob",
+    "ssn9",
+    "address_line1",
+    "address_line2",
+    "city",
+    "state",
+    "zip",
+    "country",
+    "email",
+    "phone_number",
+    "ssn4"
+  ],
+  "tsEnumNames": [
+    "first_name",
+    "last_name",
+    "dob",
+    "ssn9",
+    "address_line1",
+    "address_line2",
+    "city",
+    "state",
+    "zip",
+    "country",
+    "email",
+    "phone_number",
+    "ssn4"
+  ]
+}

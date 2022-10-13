@@ -9,16 +9,17 @@ use crate::auth::{
 };
 use crate::errors::tenant::TenantError;
 use crate::errors::ApiError;
-use crate::types::ob_config::FpObConfig;
 use crate::types::response::ResponseData;
 use crate::types::EmptyRequest;
 use crate::types::PaginatedRequest;
 use crate::types::PaginatedResponseData;
+use crate::utils::db2api::DbToApi;
 use crate::State;
 use chrono::DateTime;
 use chrono::Utc;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::ob_configuration::ObConfigurationQuery;
+use db::models::tenant::Tenant;
 use db::DbError;
 use itertools::Itertools;
 use newtypes::CollectedDataOption;
@@ -36,11 +37,13 @@ use paperclip::actix::{api_v2_operation, get, patch, post, web, web::Json};
 #[get("/onboarding_config")]
 pub fn get_detail(
     onboarding_context: Either<PublicOnboardingContext, SessionContext<ParsedOnboardingSession>>,
-) -> actix_web::Result<Json<ResponseData<FpObConfig>>, ApiError> {
-    Ok(Json(ResponseData::ok(FpObConfig::from((
-        onboarding_context.ob_config().clone(),
-        onboarding_context.tenant().clone(),
-    )))))
+) -> actix_web::Result<Json<ResponseData<api_types::OnboardingConfiguration>>, ApiError> {
+    Ok(Json(ResponseData::ok(
+        api_types::OnboardingConfiguration::from_db((
+            onboarding_context.ob_config().clone(),
+            onboarding_context.tenant().clone(),
+        )),
+    )))
 }
 
 #[api_v2_operation(
@@ -54,7 +57,10 @@ async fn get(
     state: web::Data<State>,
     request: web::Query<PaginatedRequest<EmptyRequest, DateTime<Utc>>>,
     auth: Either<WorkOsAuthContext, SecretTenantAuthContext>,
-) -> actix_web::Result<Json<PaginatedResponseData<Vec<FpObConfig>, DateTime<Utc>>>, ApiError> {
+) -> actix_web::Result<
+    Json<PaginatedResponseData<Vec<api_types::OnboardingConfiguration>, DateTime<Utc>>>,
+    ApiError,
+> {
     let auth = auth.check_permissions(vec![TenantPermission::OnboardingConfiguration])?;
     let tenant = auth.tenant();
     let cursor = request.cursor;
@@ -78,8 +84,8 @@ async fn get(
         .into_iter()
         .take(page_size)
         .map(|x| (x, tenant.clone()))
-        .map(FpObConfig::from)
-        .collect::<Vec<FpObConfig>>();
+        .map(api_types::OnboardingConfiguration::from_db)
+        .collect::<Vec<api_types::OnboardingConfiguration>>();
     Ok(Json(PaginatedResponseData::ok(configs, cursor, Some(count))))
 }
 
@@ -139,7 +145,7 @@ pub fn post(
     state: web::Data<State>,
     auth: Either<WorkOsAuthContext, SecretTenantAuthContext>,
     request: Json<CreateOnboardingConfigurationRequest>,
-) -> actix_web::Result<Json<ResponseData<FpObConfig>>, ApiError> {
+) -> actix_web::Result<Json<ResponseData<api_types::OnboardingConfiguration>>, ApiError> {
     let auth = auth.check_permissions(vec![TenantPermission::OnboardingConfiguration])?;
     request.validate()?;
     let tenant = auth.tenant().clone();
@@ -163,7 +169,9 @@ pub fn post(
     )
     .await?;
 
-    Ok(Json(ResponseData::ok(FpObConfig::from((obc, tenant)))))
+    Ok(Json(ResponseData::ok(
+        api_types::OnboardingConfiguration::from_db((obc, tenant)),
+    )))
 }
 
 #[derive(Debug, Clone, Apiv2Schema, serde::Deserialize)]
@@ -189,7 +197,7 @@ async fn patch(
     auth: Either<WorkOsAuthContext, SecretTenantAuthContext>,
     path: web::Path<UpdateObConfigPath>,
     request: web::Json<UpdateObConfigRequest>,
-) -> actix_web::Result<Json<ResponseData<FpObConfig>>, ApiError> {
+) -> actix_web::Result<Json<ResponseData<api_types::OnboardingConfiguration>>, ApiError> {
     let auth = auth.check_permissions(vec![TenantPermission::OnboardingConfiguration])?;
     let tenant = auth.tenant().clone();
     let is_live = auth.is_live()?;
@@ -201,5 +209,40 @@ async fn patch(
         .db_transaction(move |conn| ObConfiguration::update(conn, id, tenant_id, is_live, name, status))
         .await?;
 
-    Ok(Json(ResponseData::ok(FpObConfig::from((result, tenant)))))
+    Ok(Json(ResponseData::ok(
+        api_types::OnboardingConfiguration::from_db((result, tenant)),
+    )))
+}
+
+impl DbToApi<(ObConfiguration, Tenant)> for api_types::OnboardingConfiguration {
+    fn from_db((ob_config, tenant): (ObConfiguration, Tenant)) -> Self {
+        let ObConfiguration {
+            id,
+            key,
+            name,
+            created_at,
+            must_collect_data,
+            status,
+            can_access_data,
+            is_live,
+            ..
+        } = ob_config;
+        let Tenant {
+            name: org_name,
+            logo_url,
+            ..
+        } = tenant;
+        Self {
+            id,
+            key,
+            name,
+            org_name,
+            logo_url,
+            must_collect_data,
+            can_access_data,
+            is_live,
+            created_at,
+            status,
+        }
+    }
 }

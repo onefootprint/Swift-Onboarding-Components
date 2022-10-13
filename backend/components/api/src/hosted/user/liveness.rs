@@ -1,12 +1,12 @@
 use crate::auth::user::{UserAuth, UserAuthContext, UserAuthScope};
 use crate::errors::ApiError;
-use crate::types::liveness::FpLiveness;
 use crate::types::response::ResponseData;
+use crate::utils::db2api::DbToApi;
 use crate::State;
 use db::models::webauthn_credential::WebauthnCredential;
 use paperclip::actix::{api_v2_operation, get, web, web::Json};
 
-type LivenessResponse = Vec<FpLiveness>;
+type LivenessResponse = Vec<api_types::LivenessEvent>;
 
 #[api_v2_operation(
     summary = "/hosted/user/liveness",
@@ -26,6 +26,9 @@ fn get(
         .db_query(move |conn| WebauthnCredential::list(conn, &user_auth.user_vault_id()))
         .await??;
 
-    let response = creds.into_iter().map(FpLiveness::from).collect::<Vec<_>>();
+    let response = creds
+        .into_iter()
+        .map(api_types::LivenessEvent::from_db)
+        .collect::<Vec<_>>();
     Ok(Json(ResponseData::ok(response)))
 }

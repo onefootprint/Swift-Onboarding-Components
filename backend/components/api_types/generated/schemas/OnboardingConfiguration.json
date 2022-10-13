@@ -1,0 +1,81 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "OnboardingConfiguration",
+  "description": "Describes a liveness event that took place",
+  "type": "object",
+  "required": [
+    "canAccessData",
+    "createdAt",
+    "id",
+    "isLive",
+    "key",
+    "mustCollectData",
+    "name",
+    "orgName",
+    "status"
+  ],
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "key": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "orgName": {
+      "type": "string"
+    },
+    "logoUrl": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "mustCollectData": {
+      "type": "array",
+      "items": {
+        "tsType": "CollectedDataOption"
+      }
+    },
+    "canAccessData": {
+      "type": "array",
+      "items": {
+        "tsType": "CollectedDataOption"
+      }
+    },
+    "isLive": {
+      "type": "boolean"
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "status": {
+      "tsType": "ApiKeyStatus"
+    }
+  },
+  "definitions": {
+    "CollectedDataOption": {
+      "type": "string",
+      "enum": [
+        "name",
+        "dob",
+        "ssn4",
+        "ssn9",
+        "full_address",
+        "partial_address",
+        "email",
+        "phone_number"
+      ]
+    },
+    "ApiKeyStatus": {
+      "type": "string",
+      "enum": [
+        "disabled",
+        "enabled"
+      ]
+    }
+  }
+}

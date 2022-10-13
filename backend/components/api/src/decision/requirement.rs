@@ -8,7 +8,7 @@ use db::{
 };
 
 use newtypes::{
-    requirement_kind::RequirementKind, OnboardingId, RequirementInitiator, RequirementStatus2, UserVaultId,
+    RequirementKind, OnboardingId, RequirementInitiator, RequirementStatus2, UserVaultId,
 };
 
 use crate::types::identity_data_request::IdentityDataUpdate;
@@ -191,7 +191,7 @@ mod helpers {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use newtypes::api_types;
+    use newtypes::fields;
     use newtypes::{name::FullName, name::Name, CollectedDataOption};
     use std::str::FromStr;
 
@@ -271,10 +271,10 @@ mod tests {
             }),
             address: None,
             ssn: None,
-            dob: Some(api_types::dob::DateOfBirth {
-                day: api_types::dob::Day::try_from(1).unwrap(),
-                month: api_types::dob::Month::try_from(1).unwrap(),
-                year: api_types::dob::Year::try_from(1990).unwrap(),
+            dob: Some(fields::dob::DateOfBirth {
+                day: fields::dob::Day::try_from(1).unwrap(),
+                month: fields::dob::Month::try_from(1).unwrap(),
+                year: fields::dob::Year::try_from(1990).unwrap(),
             }),
         };
 

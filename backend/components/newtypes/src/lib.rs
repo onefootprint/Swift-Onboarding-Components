@@ -11,8 +11,8 @@ pub use self::phone_number::*;
 pub mod idv;
 pub use idv::*;
 
-pub mod api_types;
-pub use api_types::*;
+pub mod fields;
+pub use fields::*;
 
 pub mod db_types;
 pub use db_types::*;

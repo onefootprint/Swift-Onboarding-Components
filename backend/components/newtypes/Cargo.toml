@@ -19,6 +19,7 @@ async-trait = "0.1"
 crypto = { path = "../enclave/crypto" }
 lazy_static = "1.0"
 uuid = { version = "1.1.2", features = ["serde", "v4"] }
+schemars = { version = "0.8", features = ["chrono", "uuid1", "preserve_order"]}
 
 # diesel
 diesel-derive-newtype = "2.0.0-rc.0"

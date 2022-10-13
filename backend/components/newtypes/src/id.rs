@@ -1,4 +1,5 @@
 pub use derive_more::{Add, Display, From, FromStr, Into};
+use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
@@ -22,6 +23,7 @@ macro_rules! define_newtype_id {
             Deserialize,
             Default,
             DieselNewType,
+            JsonSchema,
         )]
         #[serde(transparent)]
         pub struct $name($type);

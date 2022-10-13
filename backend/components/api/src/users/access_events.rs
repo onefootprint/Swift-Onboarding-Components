@@ -3,12 +3,13 @@ use crate::auth::tenant::SecretTenantAuthContext;
 use crate::auth::tenant::WorkOsAuthContext;
 use crate::auth::Either;
 use crate::errors::ApiError;
-use crate::types::access_event::FpAccessEvent;
 use crate::types::request::PaginatedRequest;
 use crate::types::response::PaginatedResponseData;
+use crate::utils::db2api::DbToApi;
 use crate::State;
 use chrono::{DateTime, Utc};
 use db::access_event::{AccessEventListItemForTenant, AccessEventListQueryParams};
+use db::models::insight_event::InsightEvent;
 use newtypes::csv::deserialize_stringified_list;
 use newtypes::AccessEventKind;
 use newtypes::DataIdentifier;
@@ -29,7 +30,7 @@ struct AccessEventRequest {
     timestamp_gte: Option<DateTime<Utc>>,
 }
 
-type AccessEventResponse = Vec<FpAccessEvent>;
+type AccessEventResponse = Vec<api_types::AccessEvent>;
 
 #[api_v2_operation(
     summary = "users/access_events",
@@ -75,7 +76,64 @@ fn get(
     let response = results
         .into_iter()
         .take(page_size)
-        .map(FpAccessEvent::from)
-        .collect::<Vec<FpAccessEvent>>();
+        .map(api_types::AccessEvent::from_db)
+        .collect::<Vec<api_types::AccessEvent>>();
     Ok(Json(PaginatedResponseData::ok(response, cursor, None)))
+}
+
+impl DbToApi<AccessEventListItemForTenant> for api_types::AccessEvent {
+    fn from_db(evt: AccessEventListItemForTenant) -> Self {
+        let AccessEventListItemForTenant {
+            event,
+            scoped_user,
+            insight,
+        } = evt;
+
+        api_types::AccessEvent {
+            fp_user_id: scoped_user.fp_user_id,
+            tenant_id: scoped_user.tenant_id,
+            reason: event.reason,
+            principal: event.principal,
+            timestamp: event.timestamp,
+            ordering_id: event.ordering_id,
+            insight_event: insight.map(api_types::InsightEvent::from_db),
+            kind: event.kind,
+            targets: event.targets,
+        }
+    }
+}
+
+impl DbToApi<InsightEvent> for api_types::InsightEvent {
+    fn from_db(e: InsightEvent) -> Self {
+        let InsightEvent {
+            city,
+            timestamp,
+            ip_address,
+            country,
+            region,
+            region_name,
+            latitude,
+            longitude,
+            metro_code,
+            postal_code,
+            time_zone,
+            user_agent,
+            ..
+        } = e;
+
+        api_types::InsightEvent {
+            timestamp,
+            ip_address,
+            city,
+            country,
+            region,
+            region_name,
+            latitude,
+            longitude,
+            metro_code,
+            postal_code,
+            time_zone,
+            user_agent,
+        }
+    }
 }

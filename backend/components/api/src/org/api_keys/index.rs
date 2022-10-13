@@ -1,10 +1,10 @@
 use crate::auth::tenant::{CheckTenantPermissions, SecretTenantAuthContext, WorkOsAuthContext};
 use crate::auth::Either;
-use crate::errors::ApiError;
-use crate::types::secret_api_key::FpTenantApiKey;
-use crate::types::EmptyRequest;
+use crate::errors::{ApiResult};
 use crate::types::PaginatedRequest;
+use crate::types::{EmptyRequest, JsonApiResponse};
 use crate::types::{PaginatedResponseData, ResponseData};
+use crate::utils::db2api::DbToApi;
 use crate::State;
 use chrono::{DateTime, Utc};
 use db::models::tenant_api_key::{ApiKeyListQuery, TenantApiKey};
@@ -14,6 +14,8 @@ use newtypes::secret_api_key::SecretApiKey;
 use newtypes::{ApiKeyStatus, TenantApiKeyId, TenantPermission};
 use paperclip::actix::Apiv2Schema;
 use paperclip::actix::{api_v2_operation, patch, web, web::Json};
+
+type ApiKeysResponse = Json<PaginatedResponseData<Vec<api_types::SecretApiKey>, DateTime<Utc>>>;
 
 #[api_v2_operation(
     summary = "/org/api_keys",
@@ -25,7 +27,7 @@ pub async fn get(
     state: web::Data<State>,
     request: web::Query<PaginatedRequest<EmptyRequest, DateTime<Utc>>>,
     auth: Either<WorkOsAuthContext, SecretTenantAuthContext>,
-) -> actix_web::Result<Json<PaginatedResponseData<Vec<FpTenantApiKey>, DateTime<Utc>>>, ApiError> {
+) -> ApiResult<ApiKeysResponse> {
     let auth = auth.check_permissions(vec![TenantPermission::ApiKeys])?;
     let page_size = request.page_size(&state);
     let cursor = request.cursor;
@@ -49,9 +51,12 @@ pub async fn get(
     let keys = keys
         .into_iter()
         .take(page_size)
-        .map(|x| (id_to_last_used.get(&x.id).copied(), x))
-        .map(FpTenantApiKey::from)
-        .collect::<Vec<FpTenantApiKey>>();
+        .map(|x| {
+            let last_used = id_to_last_used.get(&x.id).copied();
+            (x, None, last_used)
+        })
+        .map(api_types::SecretApiKey::from_db)
+        .collect::<Vec<api_types::SecretApiKey>>();
     Ok(Json(PaginatedResponseData::ok(keys, cursor, Some(count))))
 }
 
@@ -70,7 +75,7 @@ pub async fn post(
     state: web::Data<State>,
     auth: Either<WorkOsAuthContext, SecretTenantAuthContext>,
     request: web::Json<CreateApiKeyRequest>,
-) -> actix_web::Result<Json<ResponseData<FpTenantApiKey>>, ApiError> {
+) -> JsonApiResponse<api_types::SecretApiKey> {
     let auth = auth.check_permissions(vec![TenantPermission::ApiKeys])?;
     let is_live = auth.is_live()?;
     let secret_key = SecretApiKey::generate(is_live);
@@ -85,9 +90,10 @@ pub async fn post(
     )
     .await?;
 
-    Ok(Json(ResponseData::ok(FpTenantApiKey::from((
+    Ok(Json(ResponseData::ok(api_types::SecretApiKey::from_db((
         new_key,
         Some(secret_key),
+        None,
     )))))
 }
 
@@ -114,7 +120,7 @@ pub async fn patch(
     auth: Either<WorkOsAuthContext, SecretTenantAuthContext>,
     path: web::Path<UpdateApiKeyPath>,
     request: web::Json<UpdateApiKeyRequest>,
-) -> actix_web::Result<Json<ResponseData<FpTenantApiKey>>, ApiError> {
+) -> JsonApiResponse<api_types::SecretApiKey> {
     let auth = auth.check_permissions(vec![TenantPermission::ApiKeys])?;
     let tenant_id = auth.tenant().id.clone();
     let is_live = auth.is_live()?;
@@ -125,5 +131,7 @@ pub async fn patch(
         .db_transaction(move |conn| TenantApiKey::update(conn, id, tenant_id, is_live, name, status))
         .await?;
 
-    Ok(Json(ResponseData::ok(FpTenantApiKey::from(result))))
+    Ok(Json(ResponseData::ok(api_types::SecretApiKey::from_db((
+        result, None, None,
+    )))))
 }

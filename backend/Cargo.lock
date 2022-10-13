@@ -362,6 +362,20 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "bb07d2053ccdbe10e2af2995a2f116c1330396493dc1269f6a91d0ae82e19704"
 
 [[package]]
+name = "api_types"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "newtypes",
+ "paperclip",
+ "paste",
+ "schemars",
+ "serde",
+ "serde_json",
+ "uuid 1.1.2",
+]
+
+[[package]]
 name = "app-attest"
 version = "0.1.0"
 dependencies = [
@@ -1783,6 +1797,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "77c90badedccf4105eca100756a0b1289e191f6fcbdadd3cee1d2f614f97da8f"
 
 [[package]]
+name = "dyn-clone"
+version = "1.0.9"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4f94fa09c2aeea5b8839e414b7b841bf429fd25b9c522116ac97ee87856d88b2"
+
+[[package]]
 name = "ecdsa"
 version = "0.13.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1973,6 +1993,7 @@ dependencies = [
  "actix-cors",
  "actix-web",
  "actix-web-httpauth",
+ "api_types",
  "app-attest",
  "async-trait",
  "aws-config 0.47.0",
@@ -2834,6 +2855,7 @@ dependencies = [
  "lazy_static",
  "paperclip",
  "regex",
+ "schemars",
  "serde",
  "serde_derive",
  "serde_json",
@@ -3222,9 +3244,9 @@ dependencies = [
 
 [[package]]
 name = "paste"
-version = "1.0.7"
+version = "1.0.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0c520e05135d6e763148b6426a837e239041653ba7becd2e538c076c738025fc"
+checksum = "b1de2e551fb905ac83f73f7aedf2f0cb4a0da7e35efa24a202a936269f1f18e1"
 
 [[package]]
 name = "pem"
@@ -3796,6 +3818,33 @@ dependencies = [
 ]
 
 [[package]]
+name = "schemars"
+version = "0.8.11"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2a5fb6c61f29e723026dc8e923d94c694313212abbecbbe5f55a7748eec5b307"
+dependencies = [
+ "chrono",
+ "dyn-clone",
+ "indexmap",
+ "schemars_derive",
+ "serde",
+ "serde_json",
+ "uuid 1.1.2",
+]
+
+[[package]]
+name = "schemars_derive"
+version = "0.8.11"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f188d036977451159430f3b8dc82ec76364a42b7e289c2b18a9a18f4470058e9"
+dependencies = [
+ "proc-macro2 1.0.40",
+ "quote 1.0.20",
+ "serde_derive_internals",
+ "syn 1.0.98",
+]
+
+[[package]]
 name = "scopeguard"
 version = "1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3998,6 +4047,17 @@ name = "serde_derive"
 version = "1.0.138"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "023e9b1467aef8a10fb88f25611870ada9800ef7e22afce356bb0d2387b6f27c"
+dependencies = [
+ "proc-macro2 1.0.40",
+ "quote 1.0.20",
+ "syn 1.0.98",
+]
+
+[[package]]
+name = "serde_derive_internals"
+version = "0.26.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "85bf8229e7920a9f636479437026331ce11aa132b4dde37d121944a44d6e5f3c"
 dependencies = [
  "proc-macro2 1.0.40",
  "quote 1.0.20",

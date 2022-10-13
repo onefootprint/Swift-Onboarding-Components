@@ -1,0 +1,208 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "User",
+  "description": "Describes a liveness event that took place",
+  "type": "object",
+  "required": [
+    "footprintUserId",
+    "identityDataAttributes",
+    "isPortable",
+    "onboardings",
+    "orderingId",
+    "startTimestamp"
+  ],
+  "properties": {
+    "footprintUserId": {
+      "type": "string"
+    },
+    "identityDataAttributes": {
+      "type": "array",
+      "items": {
+        "tsType": "DataAttribute"
+      }
+    },
+    "startTimestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "orderingId": {
+      "type": "integer",
+      "format": "int64"
+    },
+    "onboardings": {
+      "type": "array",
+      "items": {
+        "tsType": "Onboarding"
+      }
+    },
+    "isPortable": {
+      "type": "boolean"
+    }
+  },
+  "definitions": {
+    "DataAttribute": {
+      "description": "The type of data attribute",
+      "type": "string",
+      "enum": [
+        "first_name",
+        "last_name",
+        "dob",
+        "ssn9",
+        "address_line1",
+        "address_line2",
+        "city",
+        "state",
+        "zip",
+        "country",
+        "email",
+        "phone_number",
+        "ssn4"
+      ]
+    },
+    "Onboarding": {
+      "description": "Describes a liveness event that took place",
+      "type": "object",
+      "required": [
+        "canAccessData",
+        "canAccessDataAttributes",
+        "insightEvent",
+        "kycStatus",
+        "name",
+        "timestamp"
+      ],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "kycStatus": {
+          "tsType": "KycStatus"
+        },
+        "canAccessData": {
+          "type": "array",
+          "items": {
+            "tsType": "CollectedDataOption"
+          }
+        },
+        "canAccessDataAttributes": {
+          "type": "array",
+          "items": {
+            "tsType": "DataAttribute"
+          }
+        },
+        "insightEvent": {
+          "tsType": "InsightEvent"
+        }
+      }
+    },
+    "KycStatus": {
+      "description": "The type of data attribute",
+      "type": "string",
+      "enum": [
+        "new",
+        "processing",
+        "manual_review",
+        "step_up_required",
+        "verified",
+        "failed"
+      ]
+    },
+    "CollectedDataOption": {
+      "type": "string",
+      "enum": [
+        "name",
+        "dob",
+        "ssn4",
+        "ssn9",
+        "full_address",
+        "partial_address",
+        "email",
+        "phone_number"
+      ]
+    },
+    "InsightEvent": {
+      "description": "Describes a device insight event with locations and IP of the event",
+      "type": "object",
+      "required": [
+        "timestamp"
+      ],
+      "properties": {
+        "timestamp": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "ipAddress": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "city": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "country": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "region": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "regionName": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "latitude": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "format": "double"
+        },
+        "longitude": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "format": "double"
+        },
+        "metroCode": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "postalCode": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "timeZone": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "userAgent": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    }
+  }
+}

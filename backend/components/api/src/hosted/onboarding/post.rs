@@ -16,7 +16,7 @@ use db::models::onboarding::Onboarding;
 
 use db::models::scoped_user::ScopedUser;
 
-use newtypes::requirement_kind::RequirementKind;
+use newtypes::RequirementKind;
 use newtypes::SessionAuthToken;
 use paperclip::actix::{api_v2_operation, web, web::Json, Apiv2Schema};
 

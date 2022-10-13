@@ -1,5 +1,5 @@
 use db::{models::requirement::CreateRequirementConfig, PgConnection};
-use newtypes::{requirement_kind::RequirementKind, RequirementStatus2};
+use newtypes::{RequirementKind, RequirementStatus2};
 
 /// Controls what additional requirements we may add during onboarding
 pub(super) fn get_onboarding_step_up_requirement_kinds() -> Vec<CreateRequirementConfig> {

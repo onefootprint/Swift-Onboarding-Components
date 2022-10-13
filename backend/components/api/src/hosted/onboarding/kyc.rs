@@ -12,10 +12,9 @@ use db::models::audit_trail::AuditTrail;
 use db::models::onboarding::{Onboarding, OnboardingUpdate};
 use db::models::verification_request::VerificationRequest;
 use db::{assert_in_transaction, PgConnection};
-use newtypes::requirement_status::RequirementStatus;
 use newtypes::{
-    AuditTrailEvent, KycStatus, SignalScope, TenantId, ValidatedPhoneNumber, Vendor, VerificationInfo,
-    VerificationInfoStatus,
+    AuditTrailEvent, KycStatus, RequirementStatus, SignalScope, TenantId, ValidatedPhoneNumber, Vendor,
+    VerificationInfo, VerificationInfoStatus,
 };
 use paperclip::actix::{api_v2_operation, get, post, web, Apiv2Schema};
 

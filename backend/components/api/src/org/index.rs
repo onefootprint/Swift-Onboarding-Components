@@ -1,9 +1,10 @@
 use crate::auth::tenant::SecretTenantAuthContext;
 use crate::auth::tenant::{CheckTenantPermissions, WorkOsAuthContext};
 use crate::auth::Either;
-use crate::errors::ApiError;
 use crate::types::response::ResponseData;
-use crate::types::tenant::FpTenant;
+use crate::types::JsonApiResponse;
+use crate::utils::db2api::DbToApi;
+use db::models::tenant::Tenant;
 use paperclip::actix::{api_v2_operation, web::Json};
 
 #[api_v2_operation(
@@ -14,9 +15,25 @@ use paperclip::actix::{api_v2_operation, web::Json};
 )]
 pub async fn get(
     auth: Either<WorkOsAuthContext, SecretTenantAuthContext>,
-) -> actix_web::Result<Json<ResponseData<FpTenant>>, ApiError> {
+) -> JsonApiResponse<api_types::Organization> {
     let auth = auth.check_permissions(vec![])?; // No permissions needed to access this endpoint
     let tenant = auth.tenant().clone();
 
-    Ok(Json(ResponseData::ok(FpTenant::from(tenant))))
+    Ok(Json(ResponseData::ok(api_types::Organization::from_db(tenant))))
+}
+
+impl DbToApi<Tenant> for api_types::Organization {
+    fn from_db(t: Tenant) -> Self {
+        let Tenant {
+            name,
+            logo_url,
+            sandbox_restricted,
+            ..
+        } = t;
+        Self {
+            name,
+            logo_url,
+            is_sandbox_restricted: sandbox_restricted,
+        }
+    }
 }

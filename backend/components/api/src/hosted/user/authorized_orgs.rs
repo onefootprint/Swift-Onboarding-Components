@@ -1,9 +1,9 @@
 use crate::auth::user::{UserAuth, UserAuthContext, UserAuthScope};
 use crate::errors::ApiError;
-use crate::types::onboarding::FpOnboarding;
 use crate::types::response::ResponseData;
+use crate::utils::db2api::DbToApi;
 use crate::State;
-use db::models::onboarding::Onboarding;
+use db::models::onboarding::{Onboarding, OnboardingInfo};
 use db::models::scoped_user::ScopedUser;
 use newtypes::{ScopedUserId, TenantId};
 use paperclip::actix::{api_v2_operation, get, web, web::Json, Apiv2Schema};
@@ -17,7 +17,7 @@ pub struct FpUserOnboarding {
     tenant_id: TenantId,
     name: String,
     logo_url: Option<String>,
-    onboardings: Vec<FpOnboarding>,
+    onboardings: Vec<api_types::Onboarding>,
 }
 
 #[api_v2_operation(
@@ -53,10 +53,34 @@ pub async fn handler(
                 .get(&scoped_user.id)
                 .unwrap_or(&vec![])
                 .iter()
-                .map(|x| FpOnboarding::from(x.clone()))
+                .map(|x| api_types::Onboarding::from_db(x.clone()))
                 .collect(),
             id: scoped_user.id,
         })
         .collect();
     Ok(Json(ResponseData::ok(results)))
+}
+
+impl DbToApi<OnboardingInfo> for api_types::Onboarding {
+    fn from_db((onboarding, config, insight): OnboardingInfo) -> Self {
+        let Onboarding {
+            start_timestamp,
+            kyc_status,
+            ..
+        } = onboarding;
+        let db::models::ob_configuration::ObConfiguration {
+            name,
+            can_access_data,
+            ..
+        } = config;
+        let can_access_data_attributes = can_access_data.iter().flat_map(|x| x.attributes()).collect();
+        api_types::Onboarding {
+            name,
+            timestamp: start_timestamp,
+            kyc_status,
+            can_access_data,
+            can_access_data_attributes,
+            insight_event: api_types::InsightEvent::from_db(insight),
+        }
+    }
 }

@@ -5,12 +5,22 @@ use diesel::sql_types::Jsonb;
 use diesel::{AsExpression, FromSqlRow};
 use diesel_as_jsonb::AsJsonb;
 use paperclip::actix::Apiv2Schema;
+use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use strum::EnumDiscriminants;
 use strum_macros::Display;
 
 #[derive(
-    Debug, Clone, Apiv2Schema, PartialEq, Eq, Serialize, Deserialize, AsExpression, EnumDiscriminants,
+    Debug,
+    Clone,
+    Apiv2Schema,
+    PartialEq,
+    Eq,
+    Serialize,
+    Deserialize,
+    AsExpression,
+    EnumDiscriminants,
+    JsonSchema,
 )]
 #[strum_discriminants(derive(Display))]
 #[diesel(sql_type = Jsonb)]
@@ -32,7 +42,7 @@ pub enum TenantPermission {
     Decrypt { attributes: Vec<CollectedDataOption> },
 }
 
-#[derive(Debug, Clone, Apiv2Schema, PartialEq, Eq, Serialize, Deserialize, AsJsonb)]
+#[derive(Debug, Clone, Apiv2Schema, PartialEq, Eq, Serialize, Deserialize, AsJsonb, JsonSchema)]
 #[serde(transparent)]
 pub struct TenantPermissionList(pub Vec<TenantPermission>);
 
