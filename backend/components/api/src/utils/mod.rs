@@ -4,7 +4,6 @@ pub mod email;
 pub mod email_domain;
 pub mod fingerprint_builder;
 pub mod identity_data_builder;
-pub mod idv;
 pub mod insight_headers;
 pub mod liveness;
 pub mod session;

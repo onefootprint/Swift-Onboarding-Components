@@ -2,20 +2,14 @@ use crate::auth::tenant::ParsedOnboardingSession;
 use crate::auth::tenant::PublicOnboardingContext;
 use crate::auth::user::{UserAuth, UserAuthContext, UserAuthScope};
 use crate::auth::{Either, SessionContext};
+use crate::decision::verification_request;
 use crate::errors::onboarding::OnboardingError;
 use crate::errors::ApiError;
 use crate::types::{EmptyResponse, JsonApiResponse, ResponseData};
-use crate::utils::idv::initiate_idv_requests;
 use crate::utils::user_vault_wrapper::UserVaultWrapper;
 use crate::State;
-use db::models::audit_trail::AuditTrail;
-use db::models::onboarding::{Onboarding, OnboardingUpdate};
-use db::models::verification_request::VerificationRequest;
-use db::{assert_in_transaction, PgConnection};
-use newtypes::{
-    AuditTrailEvent, KycStatus, RequirementStatus, SignalScope, TenantId, ValidatedPhoneNumber, Vendor,
-    VerificationInfo, VerificationInfoStatus,
-};
+use db::models::onboarding::Onboarding;
+use newtypes::{KycStatus, RequirementStatus};
 use paperclip::actix::{self, api_v2_operation, web, Apiv2Schema};
 
 #[derive(Debug, serde::Serialize, Apiv2Schema)]
@@ -82,7 +76,8 @@ pub async fn post(
                 return Err(OnboardingError::WrongKycState(ob.kyc_status).into());
             }
             let ob_id = ob.id.clone();
-            let requests = initiate_verification(conn, ob, &uvw, &tenant_id, decrypted_phone)?;
+            let requests =
+                verification_request::initiate_verification(conn, ob, &uvw, &tenant_id, decrypted_phone)?;
             Ok((requests, su, ob_id))
         })
         .await?;
@@ -90,7 +85,7 @@ pub async fn post(
     // Fire off all IDV requests. Now that the requests are saved in the DB, even if we crash here,
     // we know where to continue processing.
     if !requests.is_empty() {
-        initiate_idv_requests(
+        verification_request::initiate_idv_requests(
             &state,
             ob_id,
             scoped_user.user_vault_id,
@@ -101,89 +96,4 @@ pub async fn post(
     }
 
     EmptyResponse::ok().json()
-}
-
-fn initiate_verification(
-    conn: &mut PgConnection,
-    ob: Onboarding,
-    uvw: &UserVaultWrapper,
-    tenant_id: &TenantId,
-    decrypted_phone: Option<ValidatedPhoneNumber>,
-) -> Result<Vec<VerificationRequest>, ApiError> {
-    // TODO decide when to re-KYC
-    assert_in_transaction(conn)?;
-    let desired_status = if let Some(decrypted_phone) = decrypted_phone {
-        // This is a sandbox user vault. Check for pre-set validation cases
-        if decrypted_phone.suffix.starts_with("fail") {
-            KycStatus::Failed
-        } else if decrypted_phone.suffix.starts_with("manualreview") {
-            KycStatus::ManualReview
-        } else if decrypted_phone.suffix.starts_with("idv") {
-            KycStatus::Processing
-        } else {
-            KycStatus::Verified
-        }
-    } else {
-        // TODO kick off user verification with data vendors
-        KycStatus::Verified
-    };
-
-    // Create the VerificationRequest and mark the onboarding's kyc_status as Processing in one transaction
-    let ob = ob.update(conn, OnboardingUpdate::kyc_status(desired_status))?;
-    if desired_status == KycStatus::Processing {
-        let requests_to_initiate = vec![Vendor::Idology, Vendor::Twilio];
-        let requests_to_initiate = requests_to_initiate
-            .into_iter()
-            .map(|v| uvw.build_verification_request(ob.id.clone(), v))
-            .collect();
-        let requests = VerificationRequest::bulk_save(conn, requests_to_initiate)?;
-        return Ok(requests);
-    }
-
-    // If we're not kicking off a verification, just create some fixture events for now
-    // Don't make duplicate fixture events if the user onboards multiple times since it
-    // isn't very self-explanatory for the demo
-    // TODO kick off user verification with data vendors,
-    // and don't mark as verified until data verification with vendors is complete
-    let final_status = match &desired_status {
-        KycStatus::Verified => VerificationInfoStatus::Verified,
-        _ => VerificationInfoStatus::Failed,
-    };
-    let events = vec![
-        VerificationInfo {
-            attributes: vec![SignalScope::Name, SignalScope::Dob],
-            vendor: Vendor::Experian,
-            status: VerificationInfoStatus::Verified,
-        },
-        VerificationInfo {
-            attributes: vec![SignalScope::Country, SignalScope::State],
-            vendor: Vendor::Socure,
-            status: VerificationInfoStatus::Verified,
-        },
-        VerificationInfo {
-            attributes: vec![SignalScope::StreetAddress, SignalScope::City, SignalScope::Zip],
-            vendor: Vendor::Idology,
-            status: VerificationInfoStatus::Verified,
-        },
-        VerificationInfo {
-            attributes: vec![SignalScope::Ssn],
-            vendor: Vendor::LexisNexis,
-            status: final_status,
-        },
-        VerificationInfo {
-            attributes: vec![],
-            vendor: Vendor::Footprint,
-            status: final_status,
-        },
-    ];
-    events.into_iter().try_for_each(|e| {
-        AuditTrail::create(
-            conn,
-            AuditTrailEvent::Verification(e),
-            uvw.user_vault.id.clone(),
-            Some(tenant_id.clone()),
-            None,
-        )
-    })?;
-    Ok(vec![])
 }
