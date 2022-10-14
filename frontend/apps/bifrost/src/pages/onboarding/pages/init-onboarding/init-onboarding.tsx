@@ -1,27 +1,30 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoForbid40 } from '@onefootprint/icons';
 import { LoadingIndicator, Typography } from '@onefootprint/ui';
-import React, { useEffect } from 'react';
+import React from 'react';
 import useOnboarding from 'src/hooks/use-onboarding';
 import { Events } from 'src/utils/state-machine/onboarding';
 import styled, { css } from 'styled-components';
+import { useEffectOnce } from 'usehooks-ts';
 
 import useOnboardingMachine from '../../../../hooks/use-onboarding-machine';
 
 const InitOnboarding = () => {
   const { t } = useTranslation('pages.init-onboarding');
   const [state, send] = useOnboardingMachine();
-  const { context } = state;
-  const { authToken } = context;
-  const onboardingMutation = useOnboarding();
-  const tenantPk = context.tenant.pk;
 
-  useEffect(() => {
-    if (!authToken || !tenantPk) {
+  const {
+    tenant: { pk },
+    authToken,
+  } = state.context;
+  const onboardingMutation = useOnboarding();
+
+  useEffectOnce(() => {
+    if (!authToken || !pk || onboardingMutation.isLoading) {
       return;
     }
     onboardingMutation.mutate(
-      { authToken, tenantPk },
+      { authToken, tenantPk: pk },
       {
         onSuccess: ({ validationToken }) => {
           send({
@@ -33,10 +36,9 @@ const InitOnboarding = () => {
         },
       },
     );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [authToken, tenantPk]);
+  });
 
-  if (!context.tenant.pk || !context.authToken || onboardingMutation.isError) {
+  if (!pk || !authToken || onboardingMutation.isError) {
     return (
       <Container>
         <TitleContainer>
