@@ -37,7 +37,7 @@ const Pagination = ({
         {totalNumResults ? (
           <Typography variant="body-3" color="secondary">
             Showing {lowerBoundShownResults} to {upperBoundShownResults} of{' '}
-            {totalNumResults} results
+            {totalNumResults} total results
           </Typography>
         ) : (
           <Typography variant="body-3" color="secondary">
