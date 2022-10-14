@@ -23,8 +23,7 @@ const getAuditTrailRequest = async ({
   const [, params, authHeaders] = queryKey as AuditTrailRequestQueryKey;
   const response = await request<AuditTrail[]>({
     method: 'GET',
-    url: '/users/audit_trail',
-    params,
+    url: `/users/${params.footprintUserId}/audit_trail`,
     headers: authHeaders,
   });
   return response.data;

@@ -89,7 +89,7 @@ class TestMy1fp:
                 "reason": "Doing a hecking decrypt",
             }
             post(
-                f"users/{my1fp_authed_user.fp_user_id}/identity/decrypt",
+                f"users/{my1fp_authed_user.fp_user_id}/vault/identity/decrypt",
                 data,
                 tenant.sk.key,
             )

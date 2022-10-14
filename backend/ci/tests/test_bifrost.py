@@ -264,7 +264,7 @@ class TestBifrost:
 
         # test the validate api call
         data = dict(validation_token=validation_token)
-        body = post("users/validate", data, workos_tenant.sk.key)
+        body = post("onboarding/session/validate", data, workos_tenant.sk.key)
         assert body["footprint_user_id"]
         assert body["status"]
 
@@ -272,7 +272,7 @@ class TestBifrost:
         body = post("hosted/onboarding", None, workos_tenant.ob_config.key, auth_token)
         validation_token = body["validation_token"]
         data = dict(validation_token=validation_token)
-        body = post("users/validate", data, workos_tenant.sk.key)
+        body = post("onboarding/session/validate", data, workos_tenant.sk.key)
         assert body["footprint_user_id"]
 
         # We won't ever actually hit onboarding/authorize if the tenant has already onboarded,
@@ -282,7 +282,7 @@ class TestBifrost:
         )
         validation_token = body["validation_token"]
         data = dict(validation_token=validation_token)
-        body = post("users/validate", data, workos_tenant.sk.key)
+        body = post("onboarding/session/validate", data, workos_tenant.sk.key)
         footprint_user_id = body["footprint_user_id"]
         assert footprint_user_id
 
@@ -397,7 +397,7 @@ class TestBifrost:
 
             # test the validate api call
             data = dict(validation_token=validation_token)
-            body = post("users/validate", data, tenant.sk.key)
+            body = post("onboarding/session/validate", data, tenant.sk.key)
             return body["footprint_user_id"]
 
         foo_fp_user_id = onboard_onto_tenant(foo_tenant)
@@ -405,8 +405,7 @@ class TestBifrost:
         assert (
             foo_fp_user_id != bar_fp_user_id
         ), "Onboarding onto different tenants should give different fp_user_id"
-    
-    
+
     def test_document_request(self, auth_token, workos_tenant):
         assert auth_token is not None
         data = {
@@ -415,13 +414,25 @@ class TestBifrost:
             "document_type": "passport",
             "country_code": "USA",
         }
-        body = post(f"hosted/user/document/", data, auth_token, workos_tenant.ob_config.key)
+        body = post(
+            f"hosted/user/document/", data, auth_token, workos_tenant.ob_config.key
+        )
         assert body == {}
 
         # Temporary
-        expected = {'status': {'kind': 'error'}, 'front_image_error': None, 'back_image_error': 'blurry'}
-        get_body = get(f"hosted/user/document/back_error", data, auth_token, workos_tenant.ob_config.key)
+        expected = {
+            "status": {"kind": "error"},
+            "front_image_error": None,
+            "back_image_error": "blurry",
+        }
+        get_body = get(
+            f"hosted/user/document/back_error",
+            data,
+            auth_token,
+            workos_tenant.ob_config.key,
+        )
         assert get_body == expected
+
 
 class TestBifrostSandbox:
     @pytest.mark.parametrize(
@@ -468,7 +479,7 @@ class TestBifrostSandbox:
 
         # Get the status
         body = post(
-            "users/validate",
+            "onboarding/session/validate",
             dict(validation_token=validation_token),
             workos_sandbox_tenant.sk.key,
         )

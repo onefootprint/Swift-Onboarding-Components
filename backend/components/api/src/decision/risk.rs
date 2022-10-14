@@ -15,9 +15,9 @@ pub(super) fn get_onboarding_step_up_requirement_kinds() -> Vec<CreateRequiremen
 
 /// Determines whether we can move Requirement of kind RequirementKind to status RequirementStatus
 pub(super) fn can_update_status_for_kind(
-    conn: &mut PgConnection,
-    status: RequirementStatus2,
-    kind: &RequirementKind,
+    _conn: &mut PgConnection,
+    _status: RequirementStatus2,
+    _kind: &RequirementKind,
 ) -> bool {
     true
 }

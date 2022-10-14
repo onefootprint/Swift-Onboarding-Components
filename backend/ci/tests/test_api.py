@@ -26,7 +26,7 @@ class TestNonPortableVaultApi:
         assert fp_id
 
         put(
-            f"users/{fp_id}/identity",
+            f"users/{fp_id}/vault/identity",
             data,
             workos_sandbox_tenant.sk.key,
             status_code=400,
@@ -41,11 +41,11 @@ class TestNonPortableVaultApi:
 
         # post data to it
         data = build_user_data()
-        put(f"users/{fp_id}/identity", data, workos_sandbox_tenant.sk.key)
+        put(f"users/{fp_id}/vault/identity", data, workos_sandbox_tenant.sk.key)
 
         # check that the data is there now
         params = {"fields": "first_name, last_name, zip, ssn9, city"}
-        response = get(f"users/{fp_id}/identity", params, workos_sandbox_tenant.sk.key)
+        response = get(f"users/{fp_id}/vault/identity", params, workos_sandbox_tenant.sk.key)
         assert response["first_name"] == True
         assert response["last_name"] == True
         assert response["zip"] == True
@@ -55,7 +55,7 @@ class TestNonPortableVaultApi:
         # decrypt the data
         data = dict(reason="test", fields=["first_name", "zip", "city"])
         body = post(
-            f"users/{fp_id}/identity/decrypt", data, workos_sandbox_tenant.sk.key
+            f"users/{fp_id}/vault/identity/decrypt", data, workos_sandbox_tenant.sk.key
         )
         data = body
         assert data["first_name"] == "Sandbox"
@@ -64,7 +64,7 @@ class TestNonPortableVaultApi:
 
         # verify access events created
         body = get(
-            "users/access_events",
+            "org/access_events",
             dict(footprint_user_id=fp_id),
             workos_sandbox_tenant.sk.key,
         )
@@ -85,11 +85,11 @@ class TestNonPortableVaultApi:
 
         # post data to it
         data = {"ach_account_number": "123467890", "cc4": "4242"}
-        put(f"users/{fp_id}/custom", data, workos_sandbox_tenant.sk.key)
+        put(f"users/{fp_id}/vault/custom", data, workos_sandbox_tenant.sk.key)
 
         # verify access events created
         body = get(
-            "users/access_events",
+            "org/access_events",
             dict(footprint_user_id=fp_id),
             workos_sandbox_tenant.sk.key,
         )
@@ -102,7 +102,7 @@ class TestNonPortableVaultApi:
 
         # check status of the data
         params = {"fields": "cc4,ach_account_number, insurance_id"}
-        response = get(f"users/{fp_id}/custom", params, workos_sandbox_tenant.sk.key)
+        response = get(f"users/{fp_id}/vault/custom", params, workos_sandbox_tenant.sk.key)
         assert response["ach_account_number"] == True
         assert response["cc4"] == True
         assert response["insurance_id"] == False
@@ -111,14 +111,14 @@ class TestNonPortableVaultApi:
         # check status of the data
         data = dict(reason="test", fields=["cc4", "ach_account_number"])
         response = post(
-            f"users/{fp_id}/custom/decrypt", data, workos_sandbox_tenant.sk.key
+            f"users/{fp_id}/vault/custom/decrypt", data, workos_sandbox_tenant.sk.key
         )
         assert response["ach_account_number"] == "123467890"
         assert response["cc4"] == "4242"
 
         # verify access events created
         body = get(
-            "users/access_events",
+            "org/access_events",
             dict(footprint_user_id=fp_id),
             workos_sandbox_tenant.sk.key,
         )
@@ -143,13 +143,13 @@ class TestUnifiedVaultApi:
             "identity": build_user_data(),
             "custom": {"ach_account_number": "123467890", "cc4": "4242"},
         }
-        put(f"users/{fp_id}", data, workos_sandbox_tenant.sk.key)
+        put(f"users/{fp_id}/vault", data, workos_sandbox_tenant.sk.key)
 
         # check that the data is there now
         params = {
             "fields": "identity.last_name, identity.ssn9, custom.ach_account_number,custom.cc4, custom.insurance_id"
         }
-        response = get(f"users/{fp_id}", params, workos_sandbox_tenant.sk.key)
+        response = get(f"users/{fp_id}/vault", params, workos_sandbox_tenant.sk.key)
         assert response["identity"]["last_name"] == True
         assert response["identity"]["ssn9"] == True
         assert response["custom"]["ach_account_number"] == True
@@ -166,7 +166,7 @@ class TestUnifiedVaultApi:
                 "custom.cc4",
             ],
         )
-        body = post(f"users/{fp_id}/decrypt", data, workos_sandbox_tenant.sk.key)
+        body = post(f"users/{fp_id}/vault/decrypt", data, workos_sandbox_tenant.sk.key)
         data = body
         assert data["identity"]["first_name"] == "Sandbox"
         assert data["identity"]["zip"] == "10009"
@@ -175,7 +175,7 @@ class TestUnifiedVaultApi:
 
         # verify access events created
         body = get(
-            "users/access_events",
+            "org/access_events",
             dict(footprint_user_id=fp_id),
             workos_sandbox_tenant.sk.key,
         )

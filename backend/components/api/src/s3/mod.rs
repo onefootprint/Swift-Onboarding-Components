@@ -2,6 +2,7 @@ use aws_sdk_s3::model::{Bucket, Delete, ObjectIdentifier};
 use aws_sdk_s3::types::ByteStream;
 use thiserror::Error;
 
+#[allow(unused)]
 const S3_PATH_PREFIX: &str = "s3://";
 
 #[derive(Clone)]
@@ -28,6 +29,7 @@ impl S3Client {
         Ok(buckets)
     }
 
+    #[allow(unused)]
     /// Delete a set of objects by keys in a particular S3 bucket
     pub async fn delete_objects(&self, bucket: &str, keys: Vec<String>) -> Result<(), S3Error> {
         let delete_objects: Vec<ObjectIdentifier> = keys
@@ -49,6 +51,7 @@ impl S3Client {
         Ok(())
     }
 
+    #[allow(unused)]
     /// Put an object in S3 at the path specified by `s3://{bucket}/{key}`
     ///    - Note: S3 is a flat heirarchy, but key can use `/` in the name to mimic a directory structure
     pub async fn put_object<T>(&self, bucket: &String, key: &String, object: T) -> Result<String, S3Error>

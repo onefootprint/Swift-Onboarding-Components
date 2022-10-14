@@ -168,7 +168,7 @@ def user(workos_sandbox_tenant, twilio):
 
     # Get the fp_user_id
     body = post(
-        "users/validate",
+        "onboarding/session/validate",
         dict(validation_token=validation_token),
         workos_sandbox_tenant.sk.key,
     )
@@ -189,8 +189,9 @@ def user(workos_sandbox_tenant, twilio):
         tenant=workos_sandbox_tenant,
     )
 
+
 @pytest.fixture(scope="module")
 def ob_session_token(workos_tenant):
-    data = { "onboarding_config_id": workos_tenant.ob_config.id }
-    body = post("org/onboarding_session", data, workos_tenant.sk.key)
+    data = {"onboarding_config_id": workos_tenant.ob_config.id}
+    body = post("onboarding/session", data, workos_tenant.sk.key)
     return OnboardingSessionToken(body["session_token"])

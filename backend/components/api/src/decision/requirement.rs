@@ -100,7 +100,7 @@ mod helpers {
     // If we have already collected some information from this user, so we may not need to require collection of certain data again
     // We therefore check the requested onboarding requirement this function
     pub(super) fn get_onboarding_requirement_kinds_already_satisfied(
-        ob_config_requirements: Vec<RequirementKind>,
+        _ob_config_requirements: Vec<RequirementKind>,
     ) -> Vec<CreateRequirementConfig> {
         // TODO:
         //   1) set fulfilled_at

@@ -48,7 +48,7 @@ class TestDashboard:
                 "reason": "Doing a hecking decrypt",
             }
             body = post(
-                f"users/{user.fp_user_id}/identity/decrypt", data, tenant.sk.key
+                f"users/{user.fp_user_id}/vault/identity/decrypt", data, tenant.sk.key
             )
             attributes = body
             for attribute, value in attributes.items():
@@ -61,7 +61,7 @@ class TestDashboard:
             "reason": "Not doing a hecking decrypt",
         }
         post(
-            f"users/{user.fp_user_id}/identity/decrypt",
+            f"users/{user.fp_user_id}/vault/identity/decrypt",
             data,
             tenant.sk.key,
             status_code=401,
@@ -93,9 +93,8 @@ class TestDashboard:
 
     def test_liveness_list(self, user):
         tenant = user.tenant
-        body = get(
-            "users/liveness", dict(footprint_user_id=user.fp_user_id), tenant.sk.key
-        )
+        print(user.fp_user_id)
+        body = get(f"users/{user.fp_user_id}/liveness", None, tenant.sk.key)
         creds = body
         assert len(creds)
         assert creds[0]["insight_event"]
@@ -103,7 +102,7 @@ class TestDashboard:
     def test_access_events_list(self, user):
         tenant = user.tenant
         body = get(
-            "users/access_events",
+            "org/access_events",
             dict(footprint_user_id=user.fp_user_id),
             tenant.sk.key,
         )
@@ -121,7 +120,7 @@ class TestDashboard:
             targets=",".join(["identity.email", "identity.address_line1"]),
             kind="decrypt",
         )
-        body = get("users/access_events", params, tenant.sk.key)
+        body = get("org/access_events", params, tenant.sk.key)
         access_events = body["data"]
         assert len(access_events) == 2
         assert "identity.email" in set(access_events[0]["targets"])
@@ -129,7 +128,7 @@ class TestDashboard:
 
         # Test filtering on timestamp - if we filter for events in the future, there shouldn't be any
         params = dict(timestamp_gte=arrow.utcnow().shift(days=1).isoformat())
-        body = get("users/access_events", params, tenant.sk.key)
+        body = get("org/access_events", params, tenant.sk.key)
         assert not body["data"]
 
     def test_config_list(self, workos_sandbox_tenant, ob_configuration):
@@ -267,7 +266,7 @@ class TestDashboard:
     def test_portable_failed_data_write(self, user):
         data = dict(reason="test", fields=["first_name", "ssn9"])
         body = post(
-            f"users/{user.fp_user_id}/identity/decrypt", data, user.tenant.sk.key
+            f"users/{user.fp_user_id}/vault/identity/decrypt", data, user.tenant.sk.key
         )
         print(body)
         assert body["first_name"]
@@ -283,7 +282,7 @@ class TestDashboard:
 
         # ensure we cannot change data in a portable vault
         put(
-            f"users/{user.fp_user_id}/identity",
+            f"users/{user.fp_user_id}/vault/identity",
             data,
             user.tenant.sk.key,
             status_code=401,
@@ -369,7 +368,9 @@ class TestDashboardUsers:
         )
 
         # So we deactivate the user
-        post(f"org/members/{user_id}/deactivate", None, workos_sandbox_tenant.auth_token)
+        post(
+            f"org/members/{user_id}/deactivate", None, workos_sandbox_tenant.auth_token
+        )
 
         # And now we can deactivate it
         post(f"org/roles/{role_id}/deactivate", None, workos_sandbox_tenant.auth_token)

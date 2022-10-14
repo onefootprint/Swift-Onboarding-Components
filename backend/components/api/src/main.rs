@@ -14,19 +14,16 @@ use workos::{ApiKey, WorkOs};
 mod config;
 mod signed_hash;
 mod telemetry;
-mod users;
 
 mod auth;
+mod decision;
 mod enclave_client;
 mod errors;
-mod hosted;
-mod index;
-mod org;
-mod private;
+mod routes;
+use self::routes::*;
 mod s3;
 mod types;
 mod utils;
-mod decision;
 
 use crate::{errors::ApiError, utils::twilio::TwilioClient};
 use paperclip::actix::{web, OpenApiExt};
@@ -43,6 +40,7 @@ pub struct State {
     challenge_sealing_key: ScopedSealingKey,
     session_sealing_key: ScopedSealingKey,
     idology_client: IdologyClient,
+    #[allow(unused)]
     s3_client: s3::S3Client,
 }
 
@@ -205,10 +203,11 @@ async fn main() -> std::io::Result<()> {
             .app_data(form_cfg)
             .wrap_api()
             .configure(index::routes)
-            .service(private::routes())
-            .service(org::routes())
-            .service(hosted::routes())
-            .service(users::routes())
+            .configure(private::routes)
+            .configure(org::routes)
+            .configure(onboarding::routes)
+            .configure(users::routes)
+            .configure(hosted::routes)
             .with_json_spec_at("/docs-spec")
             .with_json_spec_v3_at("/docs-spec-v3")
             .with_swagger_ui_at("/docs-ui")
