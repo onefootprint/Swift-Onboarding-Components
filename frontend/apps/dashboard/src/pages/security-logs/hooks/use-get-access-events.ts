@@ -40,7 +40,7 @@ const getAccessEventsRequest = async ({
     PaginatedRequestResponse<AccessEventsResponse>
   >({
     method: 'GET',
-    url: '/org/access_events',
+    url: '/users/access_events',
     params,
     headers: authHeaders,
   });

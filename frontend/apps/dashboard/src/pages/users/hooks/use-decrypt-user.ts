@@ -17,7 +17,7 @@ const decryptUserRequest = async (
 ) => {
   const response = await request<DecryptUserResponse>({
     method: 'POST',
-    url: `/users/${data.footprintUserId}/vault/identity/decrypt`,
+    url: `/users/${data.footprintUserId}/identity/decrypt`,
     data: { fields: data.fields, reason: data.reason },
     headers: authHeaders,
   });
