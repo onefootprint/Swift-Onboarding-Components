@@ -22,9 +22,17 @@ export type NameFormProps = {
   isMutationLoading: boolean;
   onSubmit: (data: NameData) => void;
   ctaLabel?: string;
+  hideTitle?: boolean;
+  hideNavHeader?: boolean;
 };
 
-const NameForm = ({ isMutationLoading, ctaLabel, onSubmit }: NameFormProps) => {
+const NameForm = ({
+  isMutationLoading,
+  ctaLabel,
+  hideTitle,
+  hideNavHeader,
+  onSubmit,
+}: NameFormProps) => {
   const { t: cta } = useTranslation('pages.cta');
   const { t } = useTranslation('pages.basic-information');
   const [state] = useCollectKycDataMachine();
@@ -55,9 +63,11 @@ const NameForm = ({ isMutationLoading, ctaLabel, onSubmit }: NameFormProps) => {
 
   return (
     <>
-      <NavigationHeader />
+      {!hideNavHeader && <NavigationHeader />}
       <Form onSubmit={handleSubmit(onSubmitFormData)}>
-        <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
+        {!hideTitle && (
+          <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
+        )}
         <Grid.Row>
           <Grid.Column col={6}>
             <TextInput

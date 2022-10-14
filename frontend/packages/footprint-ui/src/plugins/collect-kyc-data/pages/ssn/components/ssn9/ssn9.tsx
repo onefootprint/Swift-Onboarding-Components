@@ -17,12 +17,16 @@ type SSN9Props = {
   onSubmit: (formData: FormData) => void;
   ctaLabel?: string;
   hideDisclaimer?: boolean;
+  hideTitle?: boolean;
+  hideNavHeader?: boolean;
 };
 
 const SSN9 = ({
   hideDisclaimer,
   ctaLabel,
   isMutationLoading,
+  hideTitle,
+  hideNavHeader,
   onSubmit,
 }: SSN9Props) => {
   const inputMasks = useInputMask('en-US');
@@ -36,9 +40,11 @@ const SSN9 = ({
 
   return (
     <>
-      <NavigationHeader />
+      {!hideNavHeader && <NavigationHeader />}
       <Form onSubmit={handleSubmit(onSubmit)}>
-        <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
+        {!hideTitle && (
+          <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
+        )}
         <TextInput
           hasError={!!errors.ssn9}
           hint={errors.ssn9 && t('form.error')}
@@ -76,7 +82,7 @@ const SSN9 = ({
           />
         )}
         <Button type="submit" fullWidth loading={isMutationLoading}>
-          {ctaLabel ?? cta('complete')}
+          {ctaLabel ?? cta('continue')}
         </Button>
       </Form>
     </>

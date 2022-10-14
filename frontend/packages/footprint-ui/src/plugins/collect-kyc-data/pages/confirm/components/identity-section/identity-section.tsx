@@ -56,9 +56,11 @@ const IdentitySection = () => {
         name={t('identity.title')}
       >
         <SSN
-          hideDisclaimer
           ctaLabel={t('edit-sheet.save')}
           onComplete={handleComplete}
+          hideDisclaimer
+          hideTitle
+          hideNavHeader
         />
       </EditSheet>
     </>

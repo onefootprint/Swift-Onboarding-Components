@@ -13,11 +13,18 @@ import NameAndDobForm from './components/name-and-dob-form';
 import NameForm from './components/name-form';
 
 type BasicInformationProps = {
+  hideTitle?: boolean;
+  hideNavHeader?: boolean;
   ctaLabel?: string;
   onComplete?: () => void;
 };
 
-const BasicInformation = ({ ctaLabel, onComplete }: BasicInformationProps) => {
+const BasicInformation = ({
+  ctaLabel,
+  hideTitle: hideHeader,
+  hideNavHeader,
+  onComplete,
+}: BasicInformationProps) => {
   const [state, send] = useCollectKycDataMachine();
   const { authToken, missingAttributes } = state.context;
   const { mutation, syncData } = useSyncData();
@@ -53,7 +60,6 @@ const BasicInformation = ({ ctaLabel, onComplete }: BasicInformationProps) => {
     });
   };
 
-  // TODO right now it is possible to only request the DOB
   const requiresDob = missingAttributes.includes(CollectedDataOption.dob);
   if (requiresDob) {
     return (
@@ -61,6 +67,8 @@ const BasicInformation = ({ ctaLabel, onComplete }: BasicInformationProps) => {
         onSubmit={onSubmit}
         isMutationLoading={mutation.isLoading}
         ctaLabel={ctaLabel}
+        hideTitle={hideHeader}
+        hideNavHeader={hideNavHeader}
       />
     );
   }
@@ -70,6 +78,8 @@ const BasicInformation = ({ ctaLabel, onComplete }: BasicInformationProps) => {
       onSubmit={onSubmit}
       isMutationLoading={mutation.isLoading}
       ctaLabel={ctaLabel}
+      hideTitle={hideHeader}
+      hideNavHeader={hideNavHeader}
     />
   );
 };

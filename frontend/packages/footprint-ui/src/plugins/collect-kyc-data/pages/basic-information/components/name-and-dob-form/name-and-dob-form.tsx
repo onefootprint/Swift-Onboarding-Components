@@ -21,12 +21,16 @@ export type NameAndDobFormProps = {
   isMutationLoading: boolean;
   onSubmit: (data: NameAndDobInformation) => void;
   ctaLabel?: string;
+  hideTitle?: boolean;
+  hideNavHeader?: boolean;
 };
 
 const NameAndDobForm = ({
   isMutationLoading,
   onSubmit,
   ctaLabel,
+  hideTitle,
+  hideNavHeader,
 }: NameAndDobFormProps) => {
   const { t: cta } = useTranslation('pages.cta');
   const { t } = useTranslation('pages.basic-information');
@@ -61,9 +65,11 @@ const NameAndDobForm = ({
 
   return (
     <>
-      <NavigationHeader />
+      {!hideNavHeader && <NavigationHeader />}
       <Form onSubmit={handleSubmit(onSubmitFormData)}>
-        <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
+        {!hideTitle && (
+          <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
+        )}
         <Grid.Row>
           <Grid.Column col={6}>
             <TextInput

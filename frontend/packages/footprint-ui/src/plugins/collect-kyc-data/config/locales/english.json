@@ -121,8 +121,7 @@
       }
     },
     "cta": {
-      "continue": "Continue",
-      "complete": "Complete"
+      "continue": "Continue"
     },
     "confirm": {
       "title": "Confirm your personal data",
@@ -139,7 +138,7 @@
         "title": "Address"
       },
       "identity": {
-        "title": "Identity data",
+        "title": "Identity",
         "ssn9": "SSN (Full)",
         "ssn4": "SSN (Last 4)"
       },

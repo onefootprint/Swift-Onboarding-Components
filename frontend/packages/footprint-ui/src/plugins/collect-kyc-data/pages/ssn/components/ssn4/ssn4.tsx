@@ -14,9 +14,17 @@ type SSN4Props = {
   isMutationLoading: boolean;
   onSubmit: (formData: FormData) => void;
   ctaLabel?: string;
+  hideTitle?: boolean;
+  hideNavHeader?: boolean;
 };
 
-const SSN4 = ({ ctaLabel, isMutationLoading, onSubmit }: SSN4Props) => {
+const SSN4 = ({
+  ctaLabel,
+  isMutationLoading,
+  hideTitle,
+  hideNavHeader,
+  onSubmit,
+}: SSN4Props) => {
   const inputMasks = useInputMask('en-US');
   const { t } = useTranslation('pages.ssn.last-four');
   const { t: cta } = useTranslation('pages.cta');
@@ -28,9 +36,11 @@ const SSN4 = ({ ctaLabel, isMutationLoading, onSubmit }: SSN4Props) => {
 
   return (
     <>
-      <NavigationHeader />
+      {!hideNavHeader && <NavigationHeader />}
       <Form onSubmit={handleSubmit(onSubmit)}>
-        <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
+        {!hideTitle && (
+          <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
+        )}
         <TextInput
           hasError={!!errors.ssn4}
           hint={errors.ssn4 && t('form.error')}
@@ -45,7 +55,7 @@ const SSN4 = ({ ctaLabel, isMutationLoading, onSubmit }: SSN4Props) => {
           })}
         />
         <Button type="submit" fullWidth loading={isMutationLoading}>
-          {ctaLabel ?? cta('complete')}
+          {ctaLabel ?? cta('continue')}
         </Button>
       </Form>
     </>

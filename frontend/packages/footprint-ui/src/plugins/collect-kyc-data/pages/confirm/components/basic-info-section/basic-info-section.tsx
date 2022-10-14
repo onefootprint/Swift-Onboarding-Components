@@ -68,6 +68,8 @@ const BasicInfoSection = () => {
         <BasicInformation
           ctaLabel={t('edit-sheet.save')}
           onComplete={handleComplete}
+          hideTitle
+          hideNavHeader
         />
       </EditSheet>
     </>

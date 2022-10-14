@@ -18,7 +18,6 @@ import styled, { css } from 'styled-components';
 import HeaderTitle from '../../../../../../components/header-title';
 import { useCollectKycDataMachine } from '../../../../components/machine-provider';
 import NavigationHeader from '../../../../components/navigation-header';
-import { isMissingSsnAttribute } from '../../../../utils/missing-attributes';
 import { ResidentialAddressFull } from '../../../../utils/state-machine/types';
 import useInputValidations from '../../hooks/use-input-validations';
 import getAddressComponent from '../../utils/get-address-components/get-address-components';
@@ -38,15 +37,19 @@ export type AddressFullProps = {
   isMutationLoading: boolean;
   onSubmit: (residentialAddress: ResidentialAddressFull) => void;
   ctaLabel?: string;
+  hideTitle?: boolean;
+  hideNavHeader?: boolean;
 };
 
 const AddressFull = ({
   isMutationLoading,
   ctaLabel,
   onSubmit,
+  hideTitle,
+  hideNavHeader,
 }: AddressFullProps) => {
   const [state] = useCollectKycDataMachine();
-  const { data, missingAttributes } = state.context;
+  const { data } = state.context;
   const { t } = useTranslation('pages.residential-address.full');
   const { t: cta } = useTranslation('pages.cta');
   const {
@@ -129,13 +132,13 @@ const AddressFull = ({
     }
   };
 
-  const hasOtherMissingAttributes = isMissingSsnAttribute(missingAttributes);
-
   return (
     <>
-      <NavigationHeader />
+      {!hideNavHeader && <NavigationHeader />}
       <Form onSubmit={handleSubmit(onSubmitFormData)}>
-        <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
+        {!hideTitle && (
+          <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
+        )}
         <Controller
           control={control}
           name={UserDataAttribute.country}
@@ -230,8 +233,7 @@ const AddressFull = ({
           />
         )}
         <Button type="submit" fullWidth loading={isMutationLoading}>
-          {ctaLabel ??
-            (hasOtherMissingAttributes ? cta('continue') : cta('complete'))}
+          {ctaLabel ?? cta('continue')}
         </Button>
       </Form>
     </>

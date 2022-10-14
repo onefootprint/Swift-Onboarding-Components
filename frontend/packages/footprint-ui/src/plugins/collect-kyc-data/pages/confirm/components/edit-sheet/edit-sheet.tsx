@@ -12,7 +12,11 @@ type EditSheetProps = {
 const EditSheet = ({ name, children, open, onClose }: EditSheetProps) => {
   const { t } = useTranslation('pages.confirm.edit-sheet');
   return (
-    <BottomSheet open={open} onClose={onClose} title={t('title', { name })}>
+    <BottomSheet
+      open={open}
+      onClose={onClose}
+      title={t('title', { name: name.toLowerCase() })}
+    >
       {children}
     </BottomSheet>
   );

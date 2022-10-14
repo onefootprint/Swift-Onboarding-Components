@@ -66,6 +66,8 @@ const AddressSection = () => {
         <ResidentialAddress
           ctaLabel={t('edit-sheet.save')}
           onComplete={handleComplete}
+          hideTitle
+          hideNavHeader
         />
       </EditSheet>
     </>

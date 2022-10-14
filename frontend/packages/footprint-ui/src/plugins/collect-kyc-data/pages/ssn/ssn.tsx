@@ -10,12 +10,20 @@ import SSN4 from './components/ssn4';
 import SSN9 from './components/ssn9';
 
 type SSNProps = {
-  ctaLabel?: string;
   onComplete?: () => void;
+  ctaLabel?: string;
   hideDisclaimer?: boolean;
+  hideTitle?: boolean;
+  hideNavHeader?: boolean;
 };
 
-const SSN = ({ hideDisclaimer, ctaLabel, onComplete }: SSNProps) => {
+const SSN = ({
+  hideDisclaimer,
+  ctaLabel,
+  hideTitle,
+  hideNavHeader,
+  onComplete,
+}: SSNProps) => {
   const [state, send] = useCollectKycDataMachine();
   const { authToken, missingAttributes } = state.context;
   const { mutation, syncData } = useSyncData();
@@ -52,9 +60,11 @@ const SSN = ({ hideDisclaimer, ctaLabel, onComplete }: SSNProps) => {
   if (missingAttributes.includes(CollectedDataOption.ssn4)) {
     return (
       <SSN4
-        ctaLabel={ctaLabel}
         onSubmit={onSubmit}
         isMutationLoading={mutation.isLoading}
+        ctaLabel={ctaLabel}
+        hideTitle={hideTitle}
+        hideNavHeader={hideNavHeader}
       />
     );
   }
@@ -62,10 +72,12 @@ const SSN = ({ hideDisclaimer, ctaLabel, onComplete }: SSNProps) => {
   if (missingAttributes.includes(CollectedDataOption.ssn9)) {
     return (
       <SSN9
-        hideDisclaimer={hideDisclaimer}
-        ctaLabel={ctaLabel}
         onSubmit={onSubmit}
         isMutationLoading={mutation.isLoading}
+        hideDisclaimer={hideDisclaimer}
+        ctaLabel={ctaLabel}
+        hideTitle={hideTitle}
+        hideNavHeader={hideNavHeader}
       />
     );
   }
