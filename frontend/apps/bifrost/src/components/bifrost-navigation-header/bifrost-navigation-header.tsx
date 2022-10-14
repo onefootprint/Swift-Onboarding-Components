@@ -21,15 +21,14 @@ const BifrostNavigationHeader = () => {
 const Header = styled.header<{ isSandbox: boolean; hasScroll: boolean }>`
   ${({ theme }) => css`
     padding: 0 ${theme.spacing[5]}px;
-    height: 65px; // Height of navigation header in mobile
+    height: var(--navigation-header-height);
     position: sticky;
     z-index: ${theme.zIndex.sticky};
-    background: ${theme.backgroundColor.primary};
     top: 0;
 
     ${media.greaterThan('md')`
       padding: 0 ${theme.spacing[4]}px;
-      height: 57px; // Height of navigation header in md
+      height: var(--navigation-header-height);
     `}
   `}
 
@@ -42,6 +41,7 @@ const Header = styled.header<{ isSandbox: boolean; hasScroll: boolean }>`
   ${({ theme, hasScroll }) =>
     hasScroll &&
     css`
+      background: ${theme.backgroundColor.primary};
       border-bottom: 1px solid ${theme.borderColor.primary};
     `}
 `;

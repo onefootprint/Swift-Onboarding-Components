@@ -1,12 +1,12 @@
 import { useCallback, useEffect, useState } from 'react';
 
-export const BIFROST_SCROLLABLE_CONTAINER_ID = 'bifrost-scrollable-container'; // TODO: unify
+import { BIFROST_CONTAINER_ID } from '../../components/content-with-header-and-footer';
 
 const useBifrostHasScroll = () => {
   const [hasScroll, setHasScroll] = useState(false);
 
   const handleScroll = useCallback(() => {
-    const container = document.getElementById(BIFROST_SCROLLABLE_CONTAINER_ID);
+    const container = document.getElementById(BIFROST_CONTAINER_ID);
     if (!container) {
       return;
     }
@@ -15,7 +15,7 @@ const useBifrostHasScroll = () => {
 
   useEffect(() => {
     handleScroll();
-    const container = document.getElementById(BIFROST_SCROLLABLE_CONTAINER_ID);
+    const container = document.getElementById(BIFROST_CONTAINER_ID);
     container?.addEventListener('scroll', handleScroll);
   });
 

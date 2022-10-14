@@ -50,6 +50,15 @@ const App = ({ Component, pageProps }: AppProps) => (
 );
 
 const GlobalStyle = createGlobalStyle`
+  html {
+    --navigation-header-height: 65px;
+
+    ${media.greaterThan('md')`
+      --navigation-header-height: 57px;
+    `}
+  }
+
+  }
   html,
   body {
     height: 100%;

@@ -39,7 +39,6 @@ const Container = styled.div`
     grid-template-columns: repeat(3, 1fr);
     align-items: center;
     padding: ${theme.spacing[5]}px 0;
-    background: ${theme.backgroundColor.primary};
 
     ${media.greaterThan('md')`
       padding:  ${theme.spacing[4]}px 0;

@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { useTimeout } from 'usehooks-ts';
 
+import { BIFROST_CONTAINER_ID } from '../components/content-with-header-and-footer';
+
 const ANIMATION_DELAY = 0;
 const ANIMATION_DURATION = 5000;
-
-export const CONFETTI_CONTAINER_ID = 'footprint-confetti-container';
 
 const useConfettiState = () => {
   const [state, setState] = useState<{
@@ -18,7 +18,7 @@ const useConfettiState = () => {
   });
 
   const setSize = () => {
-    const container = document.getElementById(CONFETTI_CONTAINER_ID);
+    const container = document.getElementById(BIFROST_CONTAINER_ID);
     setState(currentState => ({
       ...currentState,
       height: container?.offsetHeight,

@@ -1,12 +1,11 @@
 import { media } from '@onefootprint/ui';
 import { FootprintFooter } from 'footprint-elements';
 import React from 'react';
-import { BIFROST_SCROLLABLE_CONTAINER_ID } from 'src/hooks/use-bifrost-has-scroll/use-bifrost-has-scroll';
-import { CONFETTI_CONTAINER_ID } from 'src/hooks/use-confetti-state';
 import styled, { css } from 'styled-components';
 
 import BifrostNavigationHeader from '../bifrost-navigation-header';
 import SandboxBanner from '../sandbox-banner';
+import BIFROST_CONTAINER_ID from './constants';
 
 type ContentWithHeaderAndFooterProps = {
   children: React.ReactNode;
@@ -15,10 +14,10 @@ type ContentWithHeaderAndFooterProps = {
 const ContentWithHeaderAndFooter = ({
   children,
 }: ContentWithHeaderAndFooterProps) => (
-  <Container id={BIFROST_SCROLLABLE_CONTAINER_ID}>
+  <Container id={BIFROST_CONTAINER_ID}>
     <SandboxBanner />
     <BifrostNavigationHeader />
-    <Content id={CONFETTI_CONTAINER_ID}>{children}</Content>
+    <Content>{children}</Content>
     <FootprintFooter />
   </Container>
 );
