@@ -122,6 +122,7 @@ table! {
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
         e_decryption_key -> Bytea,
+        onboarding_id -> Nullable<Uuid>,
     }
 }
 
@@ -440,6 +441,7 @@ joinable!(email -> user_vault (user_vault_id));
 joinable!(fingerprint -> user_vault (user_vault_id));
 joinable!(identity_data -> user_vault (user_vault_id));
 joinable!(identity_document -> document_request (request_id));
+joinable!(identity_document -> onboarding (onboarding_id));
 joinable!(kv_data -> tenant (tenant_id));
 joinable!(kv_data -> user_vault (user_vault_id));
 joinable!(ob_configuration -> tenant (tenant_id));

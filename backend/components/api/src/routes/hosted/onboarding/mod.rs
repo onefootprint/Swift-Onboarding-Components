@@ -2,12 +2,12 @@ use chrono::Duration;
 use crypto::aead::ScopedSealingKey;
 use db::{
     models::{
-        document_request::DocumentRequest, ob_configuration::ObConfiguration, onboarding::Onboarding,
-        webauthn_credential::WebauthnCredential,
+        document_request::DocumentRequest, identity_document::IdentityDocument,
+        ob_configuration::ObConfiguration, onboarding::Onboarding, webauthn_credential::WebauthnCredential,
     },
     DbError, PgConnection,
 };
-use newtypes::{KycStatus, OnboardingId, SessionAuthToken, UserVaultId};
+use newtypes::{CollectedDataOption, KycStatus, OnboardingId, SessionAuthToken, UserVaultId};
 use paperclip::actix::web;
 
 use crate::{
@@ -17,6 +17,8 @@ use crate::{
     types::onboarding_requirement::OnboardingRequirement,
     utils::{session::AuthSession, user_vault_wrapper::UserVaultWrapper},
 };
+use itertools::Itertools;
+use paperclip::actix::Apiv2Schema;
 
 pub mod authorize;
 pub mod d2p;
@@ -80,4 +82,38 @@ pub fn get_requirements(
     .collect();
 
     Ok((requirements, onboarding))
+}
+
+/// This function gets all the fields the User needs to authorize the Tenant having access to.
+/// Since we don't know the type of the document until the User selects it and we process it, we
+/// need to check the IdentityDocument table for documents gathered during the onboarding
+#[derive(Debug, Clone, Apiv2Schema, serde::Serialize)]
+pub struct AuthorizeFields {
+    collected_data: Vec<CollectedDataOption>,
+    identity_document_types: Vec<String>,
+}
+pub fn get_fields_to_authorize(
+    conn: &mut PgConnection,
+    user_vault_id: &UserVaultId,
+    ob_config: &ObConfiguration,
+) -> ApiResult<AuthorizeFields> {
+    let onboarding = Onboarding::get_by_config(conn, user_vault_id, &ob_config.id)?
+        .ok_or(OnboardingError::NoOnboarding)?;
+
+    let mut identity_documents: Vec<String> = vec![];
+    if ob_config.can_access_identity_document_images {
+        // Note: since we might have collected multiple documents in a given onboarding, and we'd like to authorize all of them
+        identity_documents = IdentityDocument::get_for_onboarding_id(conn, onboarding.id)?
+            .into_iter()
+            .map(|id| id.document_type)
+            .unique()
+            .collect()
+    }
+
+    let res = AuthorizeFields {
+        collected_data: ob_config.can_access_data.clone(),
+        identity_document_types: identity_documents,
+    };
+
+    Ok(res)
 }
