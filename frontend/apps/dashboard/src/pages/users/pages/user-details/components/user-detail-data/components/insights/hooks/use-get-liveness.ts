@@ -27,7 +27,7 @@ const getLivenessRequest = async ({
   const [, params, authHeaders] = queryKey as LivenessRequestQueryKey;
   const response = await request<Liveness[]>({
     method: 'GET',
-    url: `/users/liveness`,
+    url: `/users/${params.footprintUserId}/liveness`,
     params,
     headers: authHeaders,
   });
