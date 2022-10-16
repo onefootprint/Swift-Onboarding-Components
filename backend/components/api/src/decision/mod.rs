@@ -6,6 +6,7 @@ use newtypes::{OnboardingId, UserVaultId};
 
 use crate::types::identity_data_request::IdentityDataUpdate;
 
+pub mod engine;
 mod requirement;
 pub mod risk;
 pub mod verification_request;
