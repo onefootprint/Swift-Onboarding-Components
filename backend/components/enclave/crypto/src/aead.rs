@@ -1,7 +1,7 @@
 use std::fmt::Debug;
 
-use aead::Payload;
-use chacha20poly1305::aead::{Aead, NewAead};
+use aead::Aead;
+use aead::{KeyInit, Payload};
 use chacha20poly1305::{Key, XChaCha20Poly1305, XNonce};
 use rand_core::{OsRng, RngCore};
 use serde::de::DeserializeOwned;
@@ -71,6 +71,7 @@ fn seal_aead_scoped_with_nonce(
         msg: data,
         aad: scope.as_bytes(),
     };
+
     let cipher_text_and_tag = cipher
         .encrypt(nonce, payload)
         .map_err(|_| crate::Error::AeadEncrypt)?;

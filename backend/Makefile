@@ -6,28 +6,42 @@ branch := $(shell git rev-parse --abbrev-ref HEAD | sed -r 's/\//-/g' | sed -r '
 commit := "$(branch)-$(shell git rev-parse --short HEAD)"
 commit_full := "$(shell git rev-parse HEAD)"
 
+RUST_VERSION := "1.64.0"
 
+# Builds the API crate into a musl binary
 api-release:
 	@echo "building release mode"
-	@docker run --env GIT_HASH="$(commit_full)" -v "cargo-cache:/root/.cargo/registry" -v "${PWD}:/volume" --rm -t clux/muslrust:stable cargo build -p footprint-core --features vsock --release
+	@docker run --env GIT_HASH="$(commit_full)" -v "cargo-cache:/root/.cargo/registry" -v "${PWD}:/volume" --rm -t "clux/muslrust:${RUST_VERSION}" cargo build -p footprint-core --features vsock --release
 	@cp ./target/x86_64-unknown-linux-musl/release/footprint-core ./out/footprint-core
 
 api-debug:
 	@echo "building debug mode"
-	@docker run --env GIT_HASH="$(commit_full)" -v "cargo-cache:/root/.cargo/registry" -v "${PWD}:/volume" --rm -t clux/muslrust:stable cargo build -p footprint-core --features vsock
+	@docker run --env GIT_HASH="$(commit_full)" -v "cargo-cache:/root/.cargo/registry" -v "${PWD}:/volume" --rm -t "clux/muslrust:${RUST_VERSION}" cargo build -p footprint-core --features vsock
 	@cp ./target/x86_64-unknown-linux-musl/debug/footprint-core ./out/footprint-core
 
+# Builds the builder that will help us build enclave docker images
+build-enclave-builder:
+	@docker build -t ne_builder2 \
+			--build-arg USER=$(whoami) \
+			--build-arg USER_ID=$(id -u) \
+			--build-arg GROUP_ID=$(id -g) \
+			--build-arg RUST_TOOLCHAIN="${RUST_VERSION}" \
+			--build-arg CTR_HOME="/home/ec2-user" \
+			-f enclave_build.dockerfile .
+
+# Builds the actual enclave image
 build-enclave-docker:
 	rm -f ./out/enclave
 
 	@echo "building enclave"
 
-	@docker run -v "cargo-cache:/home/ec2-user/.cargo/registry" -v "${PWD}:/build" --rm -t enclave_builder:latest cargo build --target=x86_64-unknown-linux-musl -p enclave --no-default-features --features nitro --release
+	@docker run -v "cargo-cache:/home/ec2-user/.cargo/registry" -v "${PWD}:/build" --rm -t ne_builder2:latest cargo build --target=x86_64-unknown-linux-musl -p enclave --no-default-features --features nitro --release
 
 	@cp ./target/x86_64-unknown-linux-musl/release/enclave ./out/enclave
 
 	@docker build -f enclave.dockerfile -t enclave .
 
+# Packages the enclave image into an EIF
 build-eif: build-enclave-docker
 	rm -f ./out/enclave.eif
 

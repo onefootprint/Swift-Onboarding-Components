@@ -1,5 +1,4 @@
 use aes_gcm::aead::Payload;
-use aes_gcm::aead::{Aead, NewAead};
 use aes_gcm::{Aes256Gcm, Key, Nonce};
 use elliptic_curve::sec1::ToEncodedPoint;
 use p256::{ecdh::EphemeralSecret, EncodedPoint};
@@ -72,6 +71,8 @@ fn x963_kdf_sha256_32(shared_key: &[u8], shared_info: &[u8]) -> [u8; 32] {
 
 #[allow(clippy::module_inception)]
 pub mod seal {
+    use aes_gcm::{aes::Aes256, KeyInit, aead::Aead};
+
     use super::*;
 
     /// Anon ECDH0-based sealing under the public key (ECIESEncryptionCofactorVariableIVX963SHA256AESGCM)
@@ -104,10 +105,10 @@ pub mod seal {
 
         let shared_key = {
             let pre_shared = ephemeral_private_key.diffie_hellman(&peer_public_key);
-            x963_kdf_sha256_32(pre_shared.as_bytes(), ephemeral_public_key.as_bytes())
+            x963_kdf_sha256_32(pre_shared.raw_secret_bytes(), ephemeral_public_key.as_bytes())
         };
 
-        let key = Key::from_slice(&shared_key);
+        let key = Key::<Aes256>::from_slice(&shared_key);
         let cipher = Aes256Gcm::new(key);
         let nonce = Nonce::from_slice(&iv);
 
@@ -130,6 +131,7 @@ pub mod seal {
 
 pub mod unseal {
     use super::*;
+    use aes_gcm::{aead::Aead, KeyInit, aes::Aes256};
     use elliptic_curve::{ecdh::diffie_hellman, sec1::ToEncodedPoint};
 
     pub struct Unsealed(pub Vec<u8>);
@@ -156,10 +158,10 @@ pub mod unseal {
         // ecdh
         let shared_key = {
             let pre_shared = diffie_hellman(private_key.to_nonzero_scalar(), peer_public_key.as_affine());
-            x963_kdf_sha256_32(pre_shared.as_bytes(), &ephemeral_public_key)
+            x963_kdf_sha256_32(pre_shared.raw_secret_bytes(), &ephemeral_public_key)
         };
 
-        let key = Key::from_slice(&shared_key);
+        let key = Key::<Aes256>::from_slice(&shared_key);
         let cipher = Aes256Gcm::new(key);
         let nonce = Nonce::from_slice(&iv);
         let payload = Payload {

@@ -1,5 +1,5 @@
 use elliptic_curve::{pkcs8::DecodePublicKey, sec1::ToEncodedPoint};
-use sec1::der::Decodable;
+use sec1::der::Decode;
 
 use crate::aead::ScopedSealingKey;
 
@@ -42,7 +42,11 @@ mod ec_decode_helper {
 
     use core::fmt;
     use sec1::{
-        der::{self, Decodable, Decoder},
+        der::{
+            self,
+            asn1::{Any, OctetStringRef},
+            Decode, Reader,
+        },
         EcPrivateKey,
     };
 
@@ -52,16 +56,16 @@ mod ec_decode_helper {
         pub private_key: EcPrivateKey<'a>,
     }
 
-    impl<'a> Decodable<'a> for EcPrivateKeyWrapper<'a> {
-        fn decode(decoder: &mut Decoder<'a>) -> der::Result<Self> {
+    impl<'a> Decode<'a> for EcPrivateKeyWrapper<'a> {
+        fn decode<R: der::Reader<'a>>(decoder: &mut R) -> der::Result<Self> {
             decoder.sequence(|decoder| {
-                if decoder.uint8()? != 0 {
+                if decoder.decode::<u8>()? != 0u8 {
                     return Err(der::Tag::Integer.value_error());
                 }
 
-                let _ = decoder.any()?;
+                let _: Any = decoder.decode()?;
 
-                let ec_private_key = decoder.octet_string()?.as_bytes();
+                let ec_private_key = decoder.decode::<OctetStringRef>()?.as_bytes();
                 let private_key = EcPrivateKey::from_der(ec_private_key)?;
 
                 Ok(EcPrivateKeyWrapper { private_key })

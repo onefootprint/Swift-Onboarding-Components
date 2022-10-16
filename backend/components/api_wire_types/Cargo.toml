@@ -1,30 +1,18 @@
 [package]
 name = "api_wire_types"
-version = "0.1.0"
-edition = "2021"
+version = { workspace = true }
+edition = { workspace = true }
+authors = { workspace = true }
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 newtypes = {path = "../newtypes" }
-
-chrono = {version = "0.4",  features = ["serde"] }
-
-serde = { version = "1.0", features = ["derive"] }
-serde_json = "1.0"
-
-paperclip = { version = "0.7.1", features = [
-    "actix4",
-    "swagger-ui",
-    "actix4-validator",
-    "uuid",
-    "chrono",
-    "actix-session",
-    "v3"
-] }
-
-uuid = { version = "1.1.2", features = ["serde", "v4"] }
-
-schemars = { version = "0.8", features = ["chrono", "uuid1", "preserve_order"]}
+chrono = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+paperclip = { workspace = true }
+uuid = { workspace = true }
+schemars = { workspace = true }
 
 paste = "1.0"

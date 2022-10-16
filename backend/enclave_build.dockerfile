@@ -194,9 +194,8 @@ RUN git clone "https://github.com/aws/aws-nitro-enclaves-nsm-api" \
 
 
 # AWS Nitro Enclaves SDK
-# ENV AWS_NE_SDK_VER="v0.2.0"
-# ENV AWS_NE_SDK_VER="60f5db556255f093a03980edce64208e2a92a017"
-ENV AWS_NE_SDK_VER="v0.3.0"
+# ENV AWS_NE_SDK_VER="v0.3.0"
+ENV AWS_NE_SDK_VER="719654bd8251925d06fb606e32be910b08642412"
 RUN git clone "https://github.com/onefootprint/aws-nitro-enclaves-sdk-c" \
     && cd aws-nitro-enclaves-sdk-c \
     && git reset --hard $AWS_NE_SDK_VER \
