@@ -2,7 +2,7 @@ import constate from 'constate';
 import React from 'react';
 
 import { Typography } from '../../components';
-import Dialog from '../../components/dialog';
+import BaseDialog from '../../components/internal/base-dialog';
 import useConfirmationDialog from './hooks/use-confirmation-dialog';
 
 export type ConfirmationDialogProps = {
@@ -27,8 +27,9 @@ const ConfirmationDialog = ({ children }: ConfirmationDialogProps) => {
     <>
       {children}
       {confirmationDialog ? (
-        <Dialog
+        <BaseDialog
           open
+          isResponsive={false}
           size="small"
           title={confirmationDialog.title}
           onClose={hide}
@@ -52,7 +53,7 @@ const ConfirmationDialog = ({ children }: ConfirmationDialogProps) => {
           >
             {confirmationDialog.description}
           </Typography>
-        </Dialog>
+        </BaseDialog>
       ) : null}
     </>
   );
