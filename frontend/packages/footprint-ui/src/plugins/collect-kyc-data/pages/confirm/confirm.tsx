@@ -5,24 +5,28 @@ import {
   StartKycResponse,
 } from '@onefootprint/types';
 import { Button, useToast } from '@onefootprint/ui';
-import React from 'react';
+import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import { HeaderTitle } from '../../../../components';
-import { useCollectKycDataMachine } from '../../components/machine-provider';
-import NavigationHeader from '../../components/navigation-header';
+import NavigationHeader from '../../../../components/navigation-header';
+import useCollectKycDataMachine, {
+  Events,
+} from '../../hooks/use-collect-kyc-data-machine';
 import useSyncData from '../../hooks/use-sync-data';
-import { Events } from '../../utils/state-machine/types';
 import AddressSection from './components/address-section';
 import BasicInfoSection from './components/basic-info-section';
+import EditSheet, { EditSection } from './components/edit-sheet';
 import IdentitySection from './components/identity-section';
 import useGetKycStatus from './hooks/use-get-kyc-status';
 import useStartKyc from './hooks/use-start-kyc';
 
 const Confirm = () => {
-  const { t } = useTranslation('pages.confirm');
+  const { t } = useTranslation('pages.confirm.summary');
   const [state, send] = useCollectKycDataMachine();
-  const { authToken, data, tenant } = state.context;
+  const { authToken, data, tenant, device } = state.context;
+  const isMobile = device?.type === 'mobile';
+  const [editContent, setEditContent] = useState<EditSection | undefined>();
   const { mutation, syncData } = useSyncData();
   const startKycMutation = useStartKyc();
   const toast = useToast();
@@ -80,20 +84,57 @@ const Confirm = () => {
     });
   };
 
+  const handlePrev = () => {
+    send({ type: Events.navigatedToPrevPage });
+  };
+
+  const handleBasicInfoEdit = () => {
+    if (isMobile) {
+      setEditContent(EditSection.basicInfo);
+    } else {
+      send({ type: Events.editBasicInfo });
+    }
+  };
+
+  const handleAddressEdit = () => {
+    if (isMobile) {
+      setEditContent(EditSection.address);
+    } else {
+      send({ type: Events.editAddress });
+    }
+  };
+
+  const handleIdentityEdit = () => {
+    if (isMobile) {
+      setEditContent(EditSection.identity);
+    } else {
+      send({ type: Events.editSsn });
+    }
+  };
+
+  const handleCloseEdit = () => {
+    setEditContent(undefined);
+  };
+
   return (
     <>
-      <NavigationHeader />
+      <NavigationHeader button={{ variant: 'back', onClick: handlePrev }} />
       <Container>
         <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
         <SectionsContainer>
-          <BasicInfoSection />
-          <AddressSection />
-          <IdentitySection />
+          <BasicInfoSection onEdit={handleBasicInfoEdit} />
+          <AddressSection onEdit={handleAddressEdit} />
+          <IdentitySection onEdit={handleIdentityEdit} />
         </SectionsContainer>
         <Button fullWidth onClick={handleConfirm} loading={mutation.isLoading}>
           {t('cta')}
         </Button>
       </Container>
+      <EditSheet
+        open={!!editContent}
+        onClose={handleCloseEdit}
+        section={editContent}
+      />
     </>
   );
 };

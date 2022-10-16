@@ -1,3 +1,4 @@
+import { DeviceInfo } from '@onefootprint/hooks';
 import {
   CollectedDataOption,
   TenantInfo,
@@ -31,6 +32,10 @@ describe('Onboarding Machine Tests', () => {
   const createMachine = (
     userFound: boolean,
     missingAttributes: CollectedDataOption[],
+    device: DeviceInfo = {
+      type: 'mobile',
+      hasSupportForWebauthn: false,
+    },
   ) => {
     const machine = interpret(createCollectKycDataMachine());
     machine.start();
@@ -41,6 +46,7 @@ describe('Onboarding Machine Tests', () => {
         authToken: 'authToken',
         tenant,
         missingAttributes,
+        device,
       },
     });
     return machine;
@@ -141,9 +147,6 @@ describe('Onboarding Machine Tests', () => {
 
       state = machine.send({
         type: Events.confirmed,
-        payload: {
-          kycPending: false,
-        },
       });
       context = state.context;
       expect(state.value).toEqual(States.completed);

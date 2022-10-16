@@ -135,15 +135,28 @@ const createCollectKycDataMachine = () =>
         },
         [States.confirm]: {
           on: {
-            [Events.basicInformationSubmitted]: {
-              actions: [Actions.assignBasicInformation],
+            [Events.editBasicInfo]: {
+              target: States.basicInfoEditDesktop,
+              cond: context => context.device?.type !== 'mobile',
             },
-            [Events.residentialAddressSubmitted]: {
-              actions: [Actions.assignResidentialAddress],
+            [Events.editAddress]: {
+              target: States.addressEditDesktop,
+              cond: context => context.device?.type !== 'mobile',
             },
-            [Events.ssnSubmitted]: {
-              actions: [Actions.assignSsn],
+            [Events.editSsn]: {
+              target: States.ssnEditDesktop,
+              cond: context => context.device?.type !== 'mobile',
             },
+            [Events.confirmed]: [
+              {
+                target: States.completed,
+                actions: [Actions.assignKycPending],
+                cond: (context, event) => !event.payload?.kycPending,
+              },
+              {
+                actions: [Actions.assignKycPending],
+              },
+            ],
             [Events.navigatedToPrevPage]: [
               {
                 target: States.ssn,
@@ -161,16 +174,60 @@ const createCollectKycDataMachine = () =>
                   isMissingBasicAttribute(context.missingAttributes),
               },
             ],
-            [Events.confirmed]: [
+          },
+        },
+        [States.basicInfoEditDesktop]: {
+          on: {
+            [Events.basicInformationSubmitted]: [
               {
-                actions: [Actions.assignKycPending],
-                target: States.completed,
-                cond: (context, event) => !event.payload?.kycPending,
+                target: States.confirm,
+                cond: context => context.device?.type !== 'mobile',
+                actions: [Actions.assignBasicInformation],
               },
               {
-                actions: [Actions.assignKycPending],
+                actions: [Actions.assignBasicInformation],
               },
             ],
+            [Events.returnToSummary]: {
+              target: States.confirm,
+              cond: context => context.device?.type !== 'mobile',
+            },
+          },
+        },
+        [States.addressEditDesktop]: {
+          on: {
+            [Events.basicInformationSubmitted]: [
+              {
+                target: States.confirm,
+                cond: context => context.device?.type !== 'mobile',
+                actions: [Actions.assignResidentialAddress],
+              },
+              {
+                actions: [Actions.assignResidentialAddress],
+              },
+            ],
+            [Events.returnToSummary]: {
+              target: States.confirm,
+              cond: context => context.device?.type !== 'mobile',
+            },
+          },
+        },
+        [States.ssnEditDesktop]: {
+          on: {
+            [Events.ssnSubmitted]: [
+              {
+                target: States.confirm,
+                cond: context => context.device?.type !== 'mobile',
+                actions: [Actions.assignSsn],
+              },
+              {
+                actions: [Actions.assignSsn],
+              },
+            ],
+            [Events.returnToSummary]: {
+              target: States.confirm,
+              cond: context => context.device?.type !== 'mobile',
+            },
           },
         },
         [States.completed]: {
@@ -182,8 +239,9 @@ const createCollectKycDataMachine = () =>
       actions: {
         [Actions.assignInitialContext]: assign((context, event) => {
           if (event.type === Events.receivedContext) {
-            const { authToken, userFound, tenant, missingAttributes } =
+            const { authToken, device, userFound, tenant, missingAttributes } =
               event.payload;
+            context.device = device;
             context.authToken = authToken;
             context.userFound = userFound;
             context.tenant = { ...tenant };

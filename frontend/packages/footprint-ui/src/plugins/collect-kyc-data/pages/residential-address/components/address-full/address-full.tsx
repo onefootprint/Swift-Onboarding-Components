@@ -18,7 +18,7 @@ import styled, { css } from 'styled-components';
 import HeaderTitle from '../../../../../../components/header-title';
 import { useCollectKycDataMachine } from '../../../../components/machine-provider';
 import NavigationHeader from '../../../../components/navigation-header';
-import { ResidentialAddressFull } from '../../../../utils/state-machine/types';
+import { ResidentialAddressFull } from '../../../../utils/data-types';
 import useInputValidations from '../../hooks/use-input-validations';
 import getAddressComponent from '../../utils/get-address-components/get-address-components';
 import getInitialCountry from '../../utils/get-initial-country/get-initial-country';

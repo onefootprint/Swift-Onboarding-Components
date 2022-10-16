@@ -10,7 +10,7 @@ import {
   States,
 } from './types';
 
-export type IdentifyMachineArgs = {
+type IdentifyMachineArgs = {
   identifyType: IdentifyType;
   device: DeviceInfo;
 };

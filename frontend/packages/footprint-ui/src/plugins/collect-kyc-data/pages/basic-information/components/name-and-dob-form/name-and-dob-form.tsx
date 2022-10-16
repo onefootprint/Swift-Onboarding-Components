@@ -8,11 +8,11 @@ import styled, { css } from 'styled-components';
 import HeaderTitle from '../../../../../../components/header-title';
 import { useCollectKycDataMachine } from '../../../../components/machine-provider';
 import NavigationHeader from '../../../../components/navigation-header/navigation-header';
+import { NameAndDobInformation } from '../../../../utils/data-types';
 import {
   isMissingResidentialAttribute,
   isMissingSsnAttribute,
 } from '../../../../utils/missing-attributes';
-import { NameAndDobInformation } from '../../../../utils/state-machine/types';
 import validateDob from '../../utils/validate-dob/validate-dob';
 
 type FormData = NameAndDobInformation;

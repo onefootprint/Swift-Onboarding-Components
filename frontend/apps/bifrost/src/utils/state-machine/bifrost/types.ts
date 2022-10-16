@@ -34,7 +34,7 @@ export enum Actions {
 
 export type BifrostContext = {
   authToken?: string;
-  device: DeviceInfo;
+  device?: DeviceInfo;
   email: string;
   identifyType: IdentifyType;
   phone?: string;

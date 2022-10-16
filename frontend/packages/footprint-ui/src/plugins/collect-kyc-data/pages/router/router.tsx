@@ -4,6 +4,9 @@ import { useCollectKycDataMachine } from '../../components/machine-provider';
 import { States } from '../../utils/state-machine/types';
 import BasicInformation from '../basic-information';
 import Confirm from '../confirm';
+import EditAddressDesktop from '../edit-address-desktop';
+import EditBasicInfoDesktop from '../edit-basic-info-desktop';
+import EditSsnDesktop from '../edit-ssn-desktop';
 import Address from '../residential-address';
 import Ssn from '../ssn';
 
@@ -32,6 +35,15 @@ const Router = ({ onDone }: RouterProps) => {
   }
   if (state.matches(States.confirm)) {
     return <Confirm />;
+  }
+  if (state.matches(States.basicInfoEditDesktop)) {
+    return <EditBasicInfoDesktop />;
+  }
+  if (state.matches(States.addressEditDesktop)) {
+    return <EditAddressDesktop />;
+  }
+  if (state.matches(States.ssnEditDesktop)) {
+    return <EditSsnDesktop />;
   }
 
   return null;

@@ -5,10 +5,8 @@ import React from 'react';
 
 import { useCollectKycDataMachine } from '../../components/machine-provider';
 import useSyncData from '../../hooks/use-sync-data';
-import {
-  BasicInformation as BasicInformationData,
-  Events,
-} from '../../utils/state-machine/types';
+import { BasicInformation as BasicInformationData } from '../../utils/data-types';
+import { Events } from '../../utils/state-machine/types';
 import NameAndDobForm from './components/name-and-dob-form';
 import NameForm from './components/name-form';
 

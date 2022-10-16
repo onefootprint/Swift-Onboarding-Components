@@ -1,18 +1,20 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoFileText24 } from '@onefootprint/icons';
 import { UserDataAttribute } from '@onefootprint/types';
-import React, { useState } from 'react';
+import React from 'react';
 
-import { useCollectKycDataMachine } from '../../../../components/machine-provider';
-import BasicInformation from '../../../basic-information';
-import EditSheet from '../edit-sheet';
+import useCollectKycDataMachine from '../../../../hooks/use-collect-kyc-data-machine';
 import Section from '../section';
 
-const BasicInfoSection = () => {
+type BasicInfoSectionProps = {
+  onEdit: () => void;
+};
+
+const BasicInfoSection = ({ onEdit }: BasicInfoSectionProps) => {
   const { t } = useTranslation('pages.confirm');
   const [state] = useCollectKycDataMachine();
   const { data } = state.context;
-  const [edit, setEdit] = useState(false);
+
   const basicInfo = [];
 
   const firstName = data[UserDataAttribute.firstName];
@@ -30,6 +32,7 @@ const BasicInfoSection = () => {
       subtext: lastName,
     });
   }
+
   const dob = data[UserDataAttribute.dob];
   if (dob) {
     basicInfo.push({
@@ -43,36 +46,16 @@ const BasicInfoSection = () => {
   }
 
   const handleEdit = () => {
-    setEdit(true);
-  };
-  const handleCloseEdit = () => {
-    setEdit(false);
-  };
-  const handleComplete = () => {
-    setEdit(false);
+    onEdit();
   };
 
   return (
-    <>
-      <Section
-        title={t('basic-info.title')}
-        onEdit={handleEdit}
-        IconComponent={IcoFileText24}
-        items={basicInfo}
-      />
-      <EditSheet
-        open={!!edit}
-        onClose={handleCloseEdit}
-        name={t('basic-info.title')}
-      >
-        <BasicInformation
-          ctaLabel={t('edit-sheet.save')}
-          onComplete={handleComplete}
-          hideTitle
-          hideNavHeader
-        />
-      </EditSheet>
-    </>
+    <Section
+      title={t('basic-info.title')}
+      onEdit={handleEdit}
+      IconComponent={IcoFileText24}
+      items={basicInfo}
+    />
   );
 };
 

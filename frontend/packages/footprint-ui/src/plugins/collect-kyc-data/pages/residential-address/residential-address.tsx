@@ -5,10 +5,8 @@ import React from 'react';
 
 import { useCollectKycDataMachine } from '../../components/machine-provider';
 import useSyncData from '../../hooks/use-sync-data';
-import {
-  Events,
-  ResidentialAddress as ResidentialAddressData,
-} from '../../utils/state-machine/types';
+import { ResidentialAddress as ResidentialAddressData } from '../../utils/data-types';
+import { Events } from '../../utils/state-machine/types';
 import AddressFull from './components/address-full';
 import AddressZipCodeAndCountry from './components/address-zip-code-and-country';
 

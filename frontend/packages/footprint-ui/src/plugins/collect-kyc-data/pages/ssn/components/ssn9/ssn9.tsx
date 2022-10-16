@@ -8,7 +8,7 @@ import styled, { css } from 'styled-components';
 import HeaderTitle from '../../../../../../components/header-title';
 import InfoBox from '../../../../../../components/info-box';
 import NavigationHeader from '../../../../components/navigation-header';
-import { SSN9Information } from '../../../../utils/state-machine/types';
+import { SSN9Information } from '../../../../utils/data-types';
 
 type FormData = SSN9Information;
 

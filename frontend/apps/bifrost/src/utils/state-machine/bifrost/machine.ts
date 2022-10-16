@@ -11,10 +11,6 @@ const initialContext: BifrostContext = {
   phone: undefined,
   authToken: undefined,
   userFound: false,
-  device: {
-    type: 'mobile',
-    hasSupportForWebauthn: false,
-  },
 };
 
 const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
@@ -47,7 +43,7 @@ const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
           id: 'identify',
           src: context =>
             createIdentifyMachine({
-              device: { ...context.device },
+              device: { ...context.device! },
               identifyType: context.identifyType,
             }),
           onDone: [
@@ -81,7 +77,7 @@ const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
           src: context =>
             createOnboardingMachine({
               userFound: context.userFound,
-              device: context.device,
+              device: context.device!,
               authToken: context.authToken,
               tenant: context.tenant!,
             }),

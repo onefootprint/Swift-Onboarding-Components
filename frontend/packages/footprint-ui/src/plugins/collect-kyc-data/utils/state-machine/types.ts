@@ -1,54 +1,11 @@
+import { DeviceInfo } from '@onefootprint/hooks';
+import { CollectedDataOption, TenantInfo, UserData } from '@onefootprint/types';
+
 import {
-  CollectedDataOption,
-  TenantInfo,
-  UserData,
-  UserDataAttribute,
-} from '@onefootprint/types';
-
-export type BasicInformation = NameInformation | NameAndDobInformation;
-
-export type NameInformation = Required<
-  Pick<UserData, UserDataAttribute.firstName | UserDataAttribute.lastName>
->;
-
-export type NameAndDobInformation = Required<
-  Pick<
-    UserData,
-    | UserDataAttribute.firstName
-    | UserDataAttribute.lastName
-    | UserDataAttribute.dob
-  >
->;
-
-export type ResidentialAddress =
-  | ResidentialZipCodeAndCountry
-  | ResidentialAddressFull;
-
-export type ResidentialZipCodeAndCountry = Required<
-  Pick<UserData, UserDataAttribute.country | UserDataAttribute.zip>
->;
-
-export type ResidentialAddressFull = Required<
-  Pick<
-    UserData,
-    | UserDataAttribute.country
-    | UserDataAttribute.addressLine1
-    | UserDataAttribute.addressLine2
-    | UserDataAttribute.city
-    | UserDataAttribute.zip
-    | UserDataAttribute.state
-  >
->;
-
-export type SSN4Information = {
-  [UserDataAttribute.ssn4]: string;
-};
-
-export type SSN9Information = {
-  [UserDataAttribute.ssn9]: string;
-};
-
-export type SSNInformation = SSN4Information | SSN9Information;
+  BasicInformation,
+  ResidentialAddress,
+  SSNInformation,
+} from '../data-types';
 
 export type OnboardingData = {
   missingAttributes: CollectedDataOption[];
@@ -57,16 +14,23 @@ export type OnboardingData = {
 };
 
 export enum States {
+  // Initial Collection
   init = 'init',
   basicInformation = 'basicInformation',
   residentialAddress = 'residentialAddress',
   ssn = 'ssn',
+  // Confirm
   confirm = 'confirm',
+  basicInfoEditDesktop = 'basicInfoEditDesktop',
+  addressEditDesktop = 'addressEditDesktop',
+  ssnEditDesktop = 'ssnEditDesktop',
+
   completed = 'completed',
 }
 
 export type MachineContext = {
   // Plugin context
+  device?: DeviceInfo;
   tenant?: TenantInfo;
   authToken?: string;
   userFound?: boolean;
@@ -83,6 +47,10 @@ export enum Events {
   ssnSubmitted = 'ssnSubmitted',
   navigatedToPrevPage = 'navigatedToPrevPage',
   confirmed = 'confirmed',
+  editBasicInfo = 'editBasicInfo',
+  editAddress = 'editAddress',
+  editSsn = 'editSsn',
+  returnToSummary = 'returnToSummary',
 }
 
 export enum Actions {
@@ -100,6 +68,7 @@ export type MachineEvents =
         authToken: string;
         missingAttributes: CollectedDataOption[];
         userFound: boolean;
+        device: DeviceInfo;
         tenant: TenantInfo;
       };
     }
@@ -121,6 +90,10 @@ export type MachineEvents =
   | {
       type: Events.confirmed;
       payload?: {
-        kycPending: boolean;
+        kycPending?: boolean;
       };
-    };
+    }
+  | { type: Events.editBasicInfo }
+  | { type: Events.editAddress }
+  | { type: Events.editSsn }
+  | { type: Events.returnToSummary };

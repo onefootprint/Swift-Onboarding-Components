@@ -13,7 +13,7 @@ import styled, { css } from 'styled-components';
 import HeaderTitle from '../../../../../../components/header-title';
 import { useCollectKycDataMachine } from '../../../../components/machine-provider';
 import NavigationHeader from '../../../../components/navigation-header';
-import { ResidentialZipCodeAndCountry } from '../../../../utils/state-machine/types';
+import { ResidentialZipCodeAndCountry } from '../../../../utils/data-types';
 import useInputValidations from '../../hooks/use-input-validations';
 import getInitialCountry from '../../utils/get-initial-country';
 

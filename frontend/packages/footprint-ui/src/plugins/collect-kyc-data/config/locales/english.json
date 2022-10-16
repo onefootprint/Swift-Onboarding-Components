@@ -124,10 +124,12 @@
       "continue": "Continue"
     },
     "confirm": {
-      "title": "Confirm your personal data",
-      "subtitle": "Please make sure that your personal data is accurate and there are no typos before continuing.",
-      "edit": "Edit",
-      "cta": "Confirm & Continue",
+      "summary": {
+        "title": "Confirm your personal data",
+        "subtitle": "Please make sure that your personal data is accurate and there are no typos before continuing.",
+        "edit": "Edit",
+        "cta": "Confirm & Continue"
+      },
       "basic-info": {
         "title": "Basic data",
         "first-name": "First name",
@@ -144,7 +146,12 @@
       },
       "edit-sheet": {
         "title": "Edit {{name}}",
-        "save": "Save"
+        "save": "Save",
+        "name": {
+          "basic-info": "basic information",
+          "address": "address",
+          "identity": "identity"
+        }
       },
       "error": {
         "title": "Oops, something went wrong.",

@@ -1,5 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { UserData, UserDataAttribute } from '@onefootprint/types';
+import { UserDataAttribute } from '@onefootprint/types';
 import { Button, Grid, TextInput } from '@onefootprint/ui';
 import React from 'react';
 import { useForm } from 'react-hook-form';
@@ -8,19 +8,17 @@ import styled, { css } from 'styled-components';
 import HeaderTitle from '../../../../../../components/header-title';
 import { useCollectKycDataMachine } from '../../../../components/machine-provider';
 import NavigationHeader from '../../../../components/navigation-header/navigation-header';
+import { NameInformation } from '../../../../utils/data-types';
 import {
   isMissingResidentialAttribute,
   isMissingSsnAttribute,
 } from '../../../../utils/missing-attributes';
 
-export type NameData = Required<
-  Pick<UserData, UserDataAttribute.firstName | UserDataAttribute.lastName>
->;
-type FormData = NameData;
+type FormData = NameInformation;
 
 export type NameFormProps = {
   isMutationLoading: boolean;
-  onSubmit: (data: NameData) => void;
+  onSubmit: (data: NameInformation) => void;
   ctaLabel?: string;
   hideTitle?: boolean;
   hideNavHeader?: boolean;

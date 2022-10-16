@@ -6,7 +6,7 @@ import styled, { css } from 'styled-components';
 
 import HeaderTitle from '../../../../../../components/header-title';
 import NavigationHeader from '../../../../components/navigation-header';
-import { SSN4Information } from '../../../../utils/state-machine/types';
+import { SSN4Information } from '../../../../utils/data-types';
 
 type FormData = SSN4Information;
 

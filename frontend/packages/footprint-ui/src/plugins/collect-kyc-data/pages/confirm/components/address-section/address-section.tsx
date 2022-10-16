@@ -2,19 +2,20 @@ import { useTranslation } from '@onefootprint/hooks';
 import { IcoBuilding24 } from '@onefootprint/icons';
 import { Color } from '@onefootprint/themes';
 import { UserDataAttribute } from '@onefootprint/types';
-import React, { useState } from 'react';
+import React from 'react';
 
-import { useCollectKycDataMachine } from '../../../../components/machine-provider';
-import ResidentialAddress from '../../../residential-address/residential-address';
-import EditSheet from '../edit-sheet';
+import useCollectKycDataMachine from '../../../../hooks/use-collect-kyc-data-machine';
 import Section from '../section';
 import createAddressLine from './utils/create-address-line';
 
-const AddressSection = () => {
+type AddressSectionProps = {
+  onEdit: () => void;
+};
+
+const AddressSection = ({ onEdit }: AddressSectionProps) => {
   const { t } = useTranslation('pages.confirm');
   const [state] = useCollectKycDataMachine();
   const { data } = state.context;
-  const [edit, setEdit] = useState(false);
 
   const address = [];
   const addressLine1 = data[UserDataAttribute.addressLine1];
@@ -41,36 +42,16 @@ const AddressSection = () => {
   }
 
   const handleEdit = () => {
-    setEdit(true);
-  };
-  const handleCloseEdit = () => {
-    setEdit(false);
-  };
-  const handleComplete = () => {
-    setEdit(false);
+    onEdit();
   };
 
   return (
-    <>
-      <Section
-        title={t('address.title')}
-        onEdit={handleEdit}
-        IconComponent={IcoBuilding24}
-        items={address}
-      />
-      <EditSheet
-        open={!!edit}
-        onClose={handleCloseEdit}
-        name={t('address.title')}
-      >
-        <ResidentialAddress
-          ctaLabel={t('edit-sheet.save')}
-          onComplete={handleComplete}
-          hideTitle
-          hideNavHeader
-        />
-      </EditSheet>
-    </>
+    <Section
+      title={t('address.title')}
+      onEdit={handleEdit}
+      IconComponent={IcoBuilding24}
+      items={address}
+    />
   );
 };
 

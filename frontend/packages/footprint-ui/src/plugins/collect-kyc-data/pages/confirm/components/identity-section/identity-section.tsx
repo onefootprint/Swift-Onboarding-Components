@@ -1,18 +1,19 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoUserCircle24 } from '@onefootprint/icons';
 import { UserDataAttribute } from '@onefootprint/types';
-import React, { useState } from 'react';
+import React from 'react';
 
-import { useCollectKycDataMachine } from '../../../../components/machine-provider';
-import SSN from '../../../ssn';
-import EditSheet from '../edit-sheet';
+import useCollectKycDataMachine from '../../../../hooks/use-collect-kyc-data-machine';
 import Section from '../section';
 
-const IdentitySection = () => {
+type IdentitySectionProps = {
+  onEdit: () => void;
+};
+
+const IdentitySection = ({ onEdit }: IdentitySectionProps) => {
   const { t } = useTranslation('pages.confirm');
   const [state] = useCollectKycDataMachine();
   const { data } = state.context;
-  const [edit, setEdit] = useState(false);
 
   const identity = [];
   const ssn9 = data[UserDataAttribute.ssn9];
@@ -33,37 +34,16 @@ const IdentitySection = () => {
   }
 
   const handleEdit = () => {
-    setEdit(true);
-  };
-  const handleCloseEdit = () => {
-    setEdit(false);
-  };
-  const handleComplete = () => {
-    setEdit(false);
+    onEdit();
   };
 
   return (
-    <>
-      <Section
-        title={t('identity.title')}
-        onEdit={handleEdit}
-        IconComponent={IcoUserCircle24}
-        items={identity}
-      />
-      <EditSheet
-        open={!!edit}
-        onClose={handleCloseEdit}
-        name={t('identity.title')}
-      >
-        <SSN
-          ctaLabel={t('edit-sheet.save')}
-          onComplete={handleComplete}
-          hideDisclaimer
-          hideTitle
-          hideNavHeader
-        />
-      </EditSheet>
-    </>
+    <Section
+      title={t('identity.title')}
+      onEdit={handleEdit}
+      IconComponent={IcoUserCircle24}
+      items={identity}
+    />
   );
 };
 

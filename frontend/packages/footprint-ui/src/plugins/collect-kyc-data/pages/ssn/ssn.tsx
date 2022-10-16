@@ -5,7 +5,8 @@ import React from 'react';
 
 import { useCollectKycDataMachine } from '../../components/machine-provider';
 import useSyncData from '../../hooks/use-sync-data';
-import { Events, SSNInformation } from '../../utils/state-machine/types';
+import { SSNInformation } from '../../utils/data-types';
+import { Events } from '../../utils/state-machine/types';
 import SSN4 from './components/ssn4';
 import SSN9 from './components/ssn9';
 

@@ -19,7 +19,7 @@ type SectionProps = {
 };
 
 const Section = ({ title, IconComponent, onEdit, items }: SectionProps) => {
-  const { t } = useTranslation('pages.confirm');
+  const { t } = useTranslation('pages.confirm.summary');
   return (
     <Container>
       <Header>
