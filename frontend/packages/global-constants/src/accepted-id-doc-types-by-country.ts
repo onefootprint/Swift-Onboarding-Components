@@ -1,19 +1,12 @@
 import { CountryCode3, IdScanDocType } from '@onefootprint/types';
 
-// TODO: Belce fill this up when you want to do a mindless task
-// For now all entries are the same.
-// https://linear.app/footprint/issue/FP-1369/add-country-accepted-doc-type-list-from-idology-as-json-to-codebase
 const AcceptedIdDocTypesByCountry: Record<CountryCode3, IdScanDocType[]> = {
   USA: [
     IdScanDocType.passport,
     IdScanDocType.idCard,
     IdScanDocType.driversLicense,
   ],
-  AFG: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
+  AFG: [IdScanDocType.passport],
   ALA: [
     IdScanDocType.passport,
     IdScanDocType.idCard,
@@ -24,36 +17,16 @@ const AcceptedIdDocTypesByCountry: Record<CountryCode3, IdScanDocType[]> = {
     IdScanDocType.idCard,
     IdScanDocType.driversLicense,
   ],
-  DZA: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
-  ASM: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
-  AND: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
-  AGO: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
+  DZA: [IdScanDocType.passport],
+  ASM: [IdScanDocType.driversLicense],
+  AND: [IdScanDocType.passport, IdScanDocType.driversLicense],
+  AGO: [IdScanDocType.passport, IdScanDocType.driversLicense],
   AIA: [
     IdScanDocType.passport,
     IdScanDocType.idCard,
     IdScanDocType.driversLicense,
   ],
-  ATG: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
+  ATG: [IdScanDocType.passport, IdScanDocType.driversLicense],
   ARG: [
     IdScanDocType.passport,
     IdScanDocType.idCard,
@@ -64,81 +37,37 @@ const AcceptedIdDocTypesByCountry: Record<CountryCode3, IdScanDocType[]> = {
     IdScanDocType.idCard,
     IdScanDocType.driversLicense,
   ],
-  ABW: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
-  AUS: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
+  ABW: [IdScanDocType.driversLicense],
+  AUS: [IdScanDocType.passport, IdScanDocType.idCard],
   AUT: [
     IdScanDocType.passport,
     IdScanDocType.idCard,
     IdScanDocType.driversLicense,
   ],
-  AZE: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
-  BHS: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
+  AZE: [IdScanDocType.passport],
+  BHS: [IdScanDocType.passport, IdScanDocType.driversLicense],
   BHR: [
     IdScanDocType.passport,
     IdScanDocType.idCard,
     IdScanDocType.driversLicense,
   ],
-  BGD: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
+  BGD: [IdScanDocType.passport, IdScanDocType.driversLicense],
   BRB: [
     IdScanDocType.passport,
     IdScanDocType.idCard,
     IdScanDocType.driversLicense,
   ],
-  BLR: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
+  BLR: [IdScanDocType.passport, IdScanDocType.driversLicense],
   BEL: [
     IdScanDocType.passport,
     IdScanDocType.idCard,
     IdScanDocType.driversLicense,
   ],
-  BLZ: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
-  BEN: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
-  BMU: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
-  BTN: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
-  BOL: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
+  BLZ: [IdScanDocType.passport, IdScanDocType.driversLicense],
+  BEN: [IdScanDocType.passport],
+  BMU: [IdScanDocType.passport, IdScanDocType.driversLicense],
+  BTN: [IdScanDocType.passport],
+  BOL: [IdScanDocType.passport, IdScanDocType.idCard],
   BIH: [
     IdScanDocType.passport,
     IdScanDocType.idCard,
@@ -174,51 +103,23 @@ const AcceptedIdDocTypesByCountry: Record<CountryCode3, IdScanDocType[]> = {
     IdScanDocType.idCard,
     IdScanDocType.driversLicense,
   ],
-  BFA: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
-  BDI: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
-  KHM: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
-  CMR: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
+  BFA: [IdScanDocType.passport, IdScanDocType.idCard],
+  BDI: [IdScanDocType.passport],
+  KHM: [IdScanDocType.passport, IdScanDocType.driversLicense],
+  CMR: [IdScanDocType.passport, IdScanDocType.idCard],
   CAN: [
     IdScanDocType.passport,
     IdScanDocType.idCard,
     IdScanDocType.driversLicense,
   ],
-  CPV: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
-  CYM: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
+  CPV: [IdScanDocType.passport],
+  CYM: [IdScanDocType.driversLicense],
   CAF: [
     IdScanDocType.passport,
     IdScanDocType.idCard,
     IdScanDocType.driversLicense,
   ],
-  TCD: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
+  TCD: [IdScanDocType.passport],
   CHL: [
     IdScanDocType.passport,
     IdScanDocType.idCard,
@@ -229,11 +130,7 @@ const AcceptedIdDocTypesByCountry: Record<CountryCode3, IdScanDocType[]> = {
     IdScanDocType.idCard,
     IdScanDocType.driversLicense,
   ],
-  CXR: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
+  CXR: [IdScanDocType.idCard, IdScanDocType.driversLicense],
   CCK: [
     IdScanDocType.passport,
     IdScanDocType.idCard,
@@ -244,46 +141,22 @@ const AcceptedIdDocTypesByCountry: Record<CountryCode3, IdScanDocType[]> = {
     IdScanDocType.idCard,
     IdScanDocType.driversLicense,
   ],
-  COM: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
-  COG: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
-  COK: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
+  COM: [IdScanDocType.passport],
+  COG: [IdScanDocType.passport],
+  COK: [IdScanDocType.driversLicense],
   CRI: [
     IdScanDocType.passport,
     IdScanDocType.idCard,
     IdScanDocType.driversLicense,
   ],
-  CIV: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
+  CIV: [IdScanDocType.passport],
   HRV: [
     IdScanDocType.passport,
     IdScanDocType.idCard,
     IdScanDocType.driversLicense,
   ],
-  CUB: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
-  CUW: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
+  CUB: [IdScanDocType.passport],
+  CUW: [IdScanDocType.driversLicense],
   CYP: [
     IdScanDocType.passport,
     IdScanDocType.idCard,
@@ -294,26 +167,14 @@ const AcceptedIdDocTypesByCountry: Record<CountryCode3, IdScanDocType[]> = {
     IdScanDocType.idCard,
     IdScanDocType.driversLicense,
   ],
-  COD: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
+  COD: [IdScanDocType.passport],
   DNK: [
     IdScanDocType.passport,
     IdScanDocType.idCard,
     IdScanDocType.driversLicense,
   ],
-  DJI: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
-  DMA: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
+  DJI: [IdScanDocType.passport],
+  DMA: [IdScanDocType.passport],
   DOM: [
     IdScanDocType.passport,
     IdScanDocType.idCard,
@@ -324,36 +185,20 @@ const AcceptedIdDocTypesByCountry: Record<CountryCode3, IdScanDocType[]> = {
     IdScanDocType.idCard,
     IdScanDocType.driversLicense,
   ],
-  EGY: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
+  EGY: [IdScanDocType.passport, IdScanDocType.idCard],
   SLV: [
     IdScanDocType.passport,
     IdScanDocType.idCard,
     IdScanDocType.driversLicense,
   ],
-  GNQ: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
-  ERI: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
+  GNQ: [IdScanDocType.passport],
+  ERI: [IdScanDocType.passport],
   EST: [
     IdScanDocType.passport,
     IdScanDocType.idCard,
     IdScanDocType.driversLicense,
   ],
-  ETH: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
+  ETH: [IdScanDocType.passport],
   FLK: [
     IdScanDocType.passport,
     IdScanDocType.idCard,
@@ -364,11 +209,7 @@ const AcceptedIdDocTypesByCountry: Record<CountryCode3, IdScanDocType[]> = {
     IdScanDocType.idCard,
     IdScanDocType.driversLicense,
   ],
-  FJI: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
+  FJI: [IdScanDocType.passport, IdScanDocType.driversLicense],
   FIN: [
     IdScanDocType.passport,
     IdScanDocType.idCard,
@@ -394,16 +235,8 @@ const AcceptedIdDocTypesByCountry: Record<CountryCode3, IdScanDocType[]> = {
     IdScanDocType.idCard,
     IdScanDocType.driversLicense,
   ],
-  GAB: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
-  GMB: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
+  GAB: [IdScanDocType.passport],
+  GMB: [IdScanDocType.passport],
   GEO: [
     IdScanDocType.passport,
     IdScanDocType.idCard,
@@ -434,11 +267,7 @@ const AcceptedIdDocTypesByCountry: Record<CountryCode3, IdScanDocType[]> = {
     IdScanDocType.idCard,
     IdScanDocType.driversLicense,
   ],
-  GRD: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
+  GRD: [IdScanDocType.passport, IdScanDocType.driversLicense],
   GLP: [
     IdScanDocType.passport,
     IdScanDocType.idCard,
@@ -459,56 +288,28 @@ const AcceptedIdDocTypesByCountry: Record<CountryCode3, IdScanDocType[]> = {
     IdScanDocType.idCard,
     IdScanDocType.driversLicense,
   ],
-  GIN: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
-  GNB: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
-  GUY: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
-  HTI: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
+  GIN: [IdScanDocType.passport],
+  GNB: [IdScanDocType.passport],
+  GUY: [IdScanDocType.passport],
+  HTI: [IdScanDocType.passport, IdScanDocType.idCard],
   HMD: [
     IdScanDocType.passport,
     IdScanDocType.idCard,
     IdScanDocType.driversLicense,
   ],
-  VAT: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
+  VAT: [IdScanDocType.passport],
   HND: [
     IdScanDocType.passport,
     IdScanDocType.idCard,
     IdScanDocType.driversLicense,
   ],
-  HKG: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
+  HKG: [IdScanDocType.idCard],
   HUN: [
     IdScanDocType.passport,
     IdScanDocType.idCard,
     IdScanDocType.driversLicense,
   ],
-  ISL: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
+  ISL: [IdScanDocType.passport, IdScanDocType.driversLicense],
   IND: [
     IdScanDocType.passport,
     IdScanDocType.idCard,
@@ -519,16 +320,8 @@ const AcceptedIdDocTypesByCountry: Record<CountryCode3, IdScanDocType[]> = {
     IdScanDocType.idCard,
     IdScanDocType.driversLicense,
   ],
-  IRN: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
-  IRQ: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
+  IRN: [IdScanDocType.passport],
+  IRQ: [IdScanDocType.passport],
   IRL: [
     IdScanDocType.passport,
     IdScanDocType.idCard,
@@ -549,11 +342,7 @@ const AcceptedIdDocTypesByCountry: Record<CountryCode3, IdScanDocType[]> = {
     IdScanDocType.idCard,
     IdScanDocType.driversLicense,
   ],
-  JAM: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
+  JAM: [IdScanDocType.passport, IdScanDocType.driversLicense],
   JPN: [
     IdScanDocType.passport,
     IdScanDocType.idCard,
@@ -564,21 +353,13 @@ const AcceptedIdDocTypesByCountry: Record<CountryCode3, IdScanDocType[]> = {
     IdScanDocType.idCard,
     IdScanDocType.driversLicense,
   ],
-  JOR: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
+  JOR: [IdScanDocType.passport, IdScanDocType.idCard],
   KAZ: [
     IdScanDocType.passport,
     IdScanDocType.idCard,
     IdScanDocType.driversLicense,
   ],
-  KEN: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
+  KEN: [IdScanDocType.passport, IdScanDocType.idCard],
   KIR: [
     IdScanDocType.passport,
     IdScanDocType.idCard,
@@ -589,41 +370,17 @@ const AcceptedIdDocTypesByCountry: Record<CountryCode3, IdScanDocType[]> = {
     IdScanDocType.idCard,
     IdScanDocType.driversLicense,
   ],
-  KGZ: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
-  LAO: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
+  KGZ: [IdScanDocType.passport, IdScanDocType.driversLicense],
+  LAO: [IdScanDocType.passport],
   LVA: [
     IdScanDocType.passport,
     IdScanDocType.idCard,
     IdScanDocType.driversLicense,
   ],
-  LBN: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
-  LSO: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
-  LBR: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
-  LBY: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
+  LBN: [IdScanDocType.passport],
+  LSO: [IdScanDocType.passport],
+  LBR: [IdScanDocType.passport],
+  LBY: [IdScanDocType.passport],
   LIE: [
     IdScanDocType.passport,
     IdScanDocType.idCard,
@@ -639,16 +396,8 @@ const AcceptedIdDocTypesByCountry: Record<CountryCode3, IdScanDocType[]> = {
     IdScanDocType.idCard,
     IdScanDocType.driversLicense,
   ],
-  MAC: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
-  MDG: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
+  MAC: [IdScanDocType.idCard],
+  MDG: [IdScanDocType.passport],
   MWI: [
     IdScanDocType.passport,
     IdScanDocType.idCard,
@@ -659,36 +408,20 @@ const AcceptedIdDocTypesByCountry: Record<CountryCode3, IdScanDocType[]> = {
     IdScanDocType.idCard,
     IdScanDocType.driversLicense,
   ],
-  MDV: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
-  MLI: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
+  MDV: [IdScanDocType.passport],
+  MLI: [IdScanDocType.passport],
   MLT: [
     IdScanDocType.passport,
     IdScanDocType.idCard,
     IdScanDocType.driversLicense,
   ],
-  MHL: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
+  MHL: [IdScanDocType.passport],
   MTQ: [
     IdScanDocType.passport,
     IdScanDocType.idCard,
     IdScanDocType.driversLicense,
   ],
-  MRT: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
+  MRT: [IdScanDocType.passport, IdScanDocType.idCard],
   MUS: [
     IdScanDocType.passport,
     IdScanDocType.idCard,
@@ -704,66 +437,30 @@ const AcceptedIdDocTypesByCountry: Record<CountryCode3, IdScanDocType[]> = {
     IdScanDocType.idCard,
     IdScanDocType.driversLicense,
   ],
-  FSM: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
+  FSM: [IdScanDocType.passport],
   MDA: [
     IdScanDocType.passport,
     IdScanDocType.idCard,
     IdScanDocType.driversLicense,
   ],
-  MCO: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
-  MNG: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
-  MNE: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
-  MSR: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
+  MCO: [IdScanDocType.passport, IdScanDocType.idCard],
+  MNG: [IdScanDocType.passport, IdScanDocType.driversLicense],
+  MNE: [IdScanDocType.passport, IdScanDocType.idCard],
+  MSR: [IdScanDocType.passport],
   MAR: [
     IdScanDocType.passport,
     IdScanDocType.idCard,
     IdScanDocType.driversLicense,
   ],
-  MOZ: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
-  MMR: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
-  NAM: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
+  MOZ: [IdScanDocType.passport, IdScanDocType.idCard],
+  MMR: [IdScanDocType.passport, IdScanDocType.driversLicense],
+  NAM: [IdScanDocType.passport],
   NRU: [
     IdScanDocType.passport,
     IdScanDocType.idCard,
     IdScanDocType.driversLicense,
   ],
-  NPL: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
+  NPL: [IdScanDocType.passport],
   NLD: [
     IdScanDocType.passport,
     IdScanDocType.idCard,
@@ -779,16 +476,8 @@ const AcceptedIdDocTypesByCountry: Record<CountryCode3, IdScanDocType[]> = {
     IdScanDocType.idCard,
     IdScanDocType.driversLicense,
   ],
-  NIC: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
-  NER: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
+  NIC: [IdScanDocType.passport, IdScanDocType.idCard],
+  NER: [IdScanDocType.passport],
   NGA: [
     IdScanDocType.passport,
     IdScanDocType.idCard,
@@ -804,11 +493,7 @@ const AcceptedIdDocTypesByCountry: Record<CountryCode3, IdScanDocType[]> = {
     IdScanDocType.idCard,
     IdScanDocType.driversLicense,
   ],
-  MNP: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
+  MNP: [IdScanDocType.driversLicense],
   NOR: [
     IdScanDocType.passport,
     IdScanDocType.idCard,
@@ -819,36 +504,16 @@ const AcceptedIdDocTypesByCountry: Record<CountryCode3, IdScanDocType[]> = {
     IdScanDocType.idCard,
     IdScanDocType.driversLicense,
   ],
-  PAK: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
-  PLW: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
-  PSE: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
+  PAK: [IdScanDocType.passport, IdScanDocType.idCard],
+  PLW: [IdScanDocType.passport],
+  PSE: [IdScanDocType.passport],
   PAN: [
     IdScanDocType.passport,
     IdScanDocType.idCard,
     IdScanDocType.driversLicense,
   ],
-  PNG: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
-  PRY: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
+  PNG: [IdScanDocType.passport],
+  PRY: [IdScanDocType.passport, IdScanDocType.idCard],
   PER: [
     IdScanDocType.passport,
     IdScanDocType.idCard,
@@ -874,11 +539,7 @@ const AcceptedIdDocTypesByCountry: Record<CountryCode3, IdScanDocType[]> = {
     IdScanDocType.idCard,
     IdScanDocType.driversLicense,
   ],
-  PRI: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
+  PRI: [IdScanDocType.idCard, IdScanDocType.driversLicense],
   QAT: [
     IdScanDocType.passport,
     IdScanDocType.idCard,
@@ -899,11 +560,7 @@ const AcceptedIdDocTypesByCountry: Record<CountryCode3, IdScanDocType[]> = {
     IdScanDocType.idCard,
     IdScanDocType.driversLicense,
   ],
-  RUS: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
+  RUS: [IdScanDocType.passport, IdScanDocType.driversLicense],
   RWA: [
     IdScanDocType.passport,
     IdScanDocType.idCard,
@@ -919,16 +576,8 @@ const AcceptedIdDocTypesByCountry: Record<CountryCode3, IdScanDocType[]> = {
     IdScanDocType.idCard,
     IdScanDocType.driversLicense,
   ],
-  KNA: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
-  LCA: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
+  KNA: [IdScanDocType.passport, IdScanDocType.driversLicense],
+  LCA: [IdScanDocType.passport, IdScanDocType.driversLicense],
   MAF: [
     IdScanDocType.passport,
     IdScanDocType.idCard,
@@ -939,61 +588,29 @@ const AcceptedIdDocTypesByCountry: Record<CountryCode3, IdScanDocType[]> = {
     IdScanDocType.idCard,
     IdScanDocType.driversLicense,
   ],
-  VCT: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
-  WSM: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
-  SMR: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
-  STP: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
+  VCT: [IdScanDocType.passport],
+  WSM: [IdScanDocType.passport],
+  SMR: [IdScanDocType.passport],
+  STP: [IdScanDocType.passport],
   SAU: [
     IdScanDocType.passport,
     IdScanDocType.idCard,
     IdScanDocType.driversLicense,
   ],
-  SEN: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
+  SEN: [IdScanDocType.passport, IdScanDocType.idCard],
   SRB: [
     IdScanDocType.passport,
     IdScanDocType.idCard,
     IdScanDocType.driversLicense,
   ],
-  SYC: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
-  SLE: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
+  SYC: [IdScanDocType.passport],
+  SLE: [IdScanDocType.passport],
   SGP: [
     IdScanDocType.passport,
     IdScanDocType.idCard,
     IdScanDocType.driversLicense,
   ],
-  SXM: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
+  SXM: [IdScanDocType.driversLicense],
   SVK: [
     IdScanDocType.passport,
     IdScanDocType.idCard,
@@ -1004,16 +621,8 @@ const AcceptedIdDocTypesByCountry: Record<CountryCode3, IdScanDocType[]> = {
     IdScanDocType.idCard,
     IdScanDocType.driversLicense,
   ],
-  SLB: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
-  SOM: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
+  SLB: [IdScanDocType.passport],
+  SOM: [IdScanDocType.passport],
   ZAF: [
     IdScanDocType.passport,
     IdScanDocType.idCard,
@@ -1029,36 +638,20 @@ const AcceptedIdDocTypesByCountry: Record<CountryCode3, IdScanDocType[]> = {
     IdScanDocType.idCard,
     IdScanDocType.driversLicense,
   ],
-  SSD: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
+  SSD: [IdScanDocType.passport],
   ESP: [
     IdScanDocType.passport,
     IdScanDocType.idCard,
     IdScanDocType.driversLicense,
   ],
-  LKA: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
-  SUR: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
+  LKA: [IdScanDocType.passport, IdScanDocType.driversLicense],
+  SUR: [IdScanDocType.passport],
   SJM: [
     IdScanDocType.passport,
     IdScanDocType.idCard,
     IdScanDocType.driversLicense,
   ],
-  SWZ: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
+  SWZ: [IdScanDocType.passport],
   SWE: [
     IdScanDocType.passport,
     IdScanDocType.idCard,
@@ -1069,21 +662,13 @@ const AcceptedIdDocTypesByCountry: Record<CountryCode3, IdScanDocType[]> = {
     IdScanDocType.idCard,
     IdScanDocType.driversLicense,
   ],
-  SYR: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
+  SYR: [IdScanDocType.passport],
   TWN: [
     IdScanDocType.passport,
     IdScanDocType.idCard,
     IdScanDocType.driversLicense,
   ],
-  TJK: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
+  TJK: [IdScanDocType.passport],
   TZA: [
     IdScanDocType.passport,
     IdScanDocType.idCard,
@@ -1099,21 +684,13 @@ const AcceptedIdDocTypesByCountry: Record<CountryCode3, IdScanDocType[]> = {
     IdScanDocType.idCard,
     IdScanDocType.driversLicense,
   ],
-  TGO: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
+  TGO: [IdScanDocType.passport],
   TKL: [
     IdScanDocType.passport,
     IdScanDocType.idCard,
     IdScanDocType.driversLicense,
   ],
-  TON: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
+  TON: [IdScanDocType.passport, IdScanDocType.idCard],
   TTO: [
     IdScanDocType.passport,
     IdScanDocType.idCard,
@@ -1129,31 +706,11 @@ const AcceptedIdDocTypesByCountry: Record<CountryCode3, IdScanDocType[]> = {
     IdScanDocType.idCard,
     IdScanDocType.driversLicense,
   ],
-  TKM: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
-  TCA: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
-  TUV: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
-  UGA: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
-  UKR: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
+  TKM: [IdScanDocType.passport],
+  TCA: [IdScanDocType.driversLicense],
+  TUV: [IdScanDocType.passport],
+  UGA: [IdScanDocType.passport, IdScanDocType.driversLicense],
+  UKR: [IdScanDocType.passport, IdScanDocType.driversLicense],
   ARE: [
     IdScanDocType.passport,
     IdScanDocType.idCard,
@@ -1169,21 +726,9 @@ const AcceptedIdDocTypesByCountry: Record<CountryCode3, IdScanDocType[]> = {
     IdScanDocType.idCard,
     IdScanDocType.driversLicense,
   ],
-  URY: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
-  UZB: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
-  VUT: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
+  URY: [IdScanDocType.passport, IdScanDocType.idCard],
+  UZB: [IdScanDocType.passport],
+  VUT: [IdScanDocType.driversLicense],
   VEN: [
     IdScanDocType.passport,
     IdScanDocType.idCard,
@@ -1214,21 +759,9 @@ const AcceptedIdDocTypesByCountry: Record<CountryCode3, IdScanDocType[]> = {
     IdScanDocType.idCard,
     IdScanDocType.driversLicense,
   ],
-  YEM: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
-  ZMB: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
-  ZWE: [
-    IdScanDocType.passport,
-    IdScanDocType.idCard,
-    IdScanDocType.driversLicense,
-  ],
+  YEM: [IdScanDocType.passport],
+  ZMB: [IdScanDocType.passport, IdScanDocType.driversLicense],
+  ZWE: [IdScanDocType.passport],
 };
 
 export default AcceptedIdDocTypesByCountry;
