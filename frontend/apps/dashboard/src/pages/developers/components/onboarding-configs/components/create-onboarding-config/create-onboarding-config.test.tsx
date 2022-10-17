@@ -52,10 +52,12 @@ describe('<CreateDialog />', () => {
       const continueButton = screen.getByRole('button', { name: 'Continue' });
       await userEvent.click(continueButton);
 
-      const errorMessage = screen.getByText(
-        'Please enter a name for your onboarding configuration.',
-      );
-      expect(errorMessage).toBeInTheDocument();
+      await waitFor(() => {
+        const errorMessage = screen.getByText(
+          'Please enter a name for your onboarding configuration.',
+        );
+        expect(errorMessage).toBeInTheDocument();
+      });
     });
 
     it('should move to the collect data section after filling out a valid name', async () => {
