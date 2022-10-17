@@ -1,6 +1,7 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { Typography } from '@onefootprint/ui';
 import React from 'react';
+import styled, { css } from 'styled-components';
 
 import NavigationHeader from '../../../../components/navigation-header';
 import useCollectKycDataMachine, {
@@ -23,14 +24,23 @@ const EditBasicInfoDesktop = () => {
           {t('edit-sheet.title', { name: t('basic-info.title').toLowerCase() })}
         </Typography>
       </NavigationHeader>
-      <BasicInformation
-        ctaLabel={t('edit-sheet.save')}
-        onComplete={handlePrev}
-        hideTitle
-        hideNavHeader
-      />
+      <Container>
+        <BasicInformation
+          ctaLabel={t('edit-sheet.save')}
+          onComplete={handlePrev}
+          hideTitle
+          hideNavHeader
+        />
+      </Container>
     </>
   );
 };
+
+const Container = styled.div`
+  ${({ theme }) => css`
+    margin-top: ${theme.spacing[7]}px;
+    border-top: 1px solid ${theme.borderColor.tertiary};
+  `};
+`;
 
 export default EditBasicInfoDesktop;

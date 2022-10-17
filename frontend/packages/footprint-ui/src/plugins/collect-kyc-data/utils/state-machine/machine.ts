@@ -143,8 +143,8 @@ const createCollectKycDataMachine = () =>
               target: States.addressEditDesktop,
               cond: context => context.device?.type !== 'mobile',
             },
-            [Events.editSsn]: {
-              target: States.ssnEditDesktop,
+            [Events.editIdentity]: {
+              target: States.identityEditDesktop,
               cond: context => context.device?.type !== 'mobile',
             },
             [Events.confirmed]: [
@@ -212,7 +212,7 @@ const createCollectKycDataMachine = () =>
             },
           },
         },
-        [States.ssnEditDesktop]: {
+        [States.identityEditDesktop]: {
           on: {
             [Events.ssnSubmitted]: [
               {

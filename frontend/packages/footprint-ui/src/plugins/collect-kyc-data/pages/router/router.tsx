@@ -6,7 +6,7 @@ import BasicInformation from '../basic-information';
 import Confirm from '../confirm';
 import EditAddressDesktop from '../edit-address-desktop';
 import EditBasicInfoDesktop from '../edit-basic-info-desktop';
-import EditSsnDesktop from '../edit-ssn-desktop';
+import EditIdentityDesktop from '../edit-identity-desktop';
 import Address from '../residential-address';
 import Ssn from '../ssn';
 
@@ -42,8 +42,8 @@ const Router = ({ onDone }: RouterProps) => {
   if (state.matches(States.addressEditDesktop)) {
     return <EditAddressDesktop />;
   }
-  if (state.matches(States.ssnEditDesktop)) {
-    return <EditSsnDesktop />;
+  if (state.matches(States.identityEditDesktop)) {
+    return <EditIdentityDesktop />;
   }
 
   return null;

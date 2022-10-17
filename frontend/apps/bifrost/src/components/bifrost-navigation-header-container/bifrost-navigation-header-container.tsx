@@ -5,7 +5,7 @@ import styled, { css } from 'styled-components';
 
 import useBifrostHasScroll from '../../hooks/use-bifrost-has-scroll';
 
-const BifrostNavigationHeader = () => {
+const BifrostNavigationHeaderContainer = () => {
   const hasScroll = useBifrostHasScroll();
   const { isSandbox } = useSandboxMode();
 
@@ -42,8 +42,8 @@ const Header = styled.header<{ isSandbox: boolean; hasScroll: boolean }>`
     hasScroll &&
     css`
       background: ${theme.backgroundColor.primary};
-      border-bottom: 1px solid ${theme.borderColor.primary};
+      border-bottom: 1px solid ${theme.borderColor.tertiary};
     `}
 `;
 
-export default BifrostNavigationHeader;
+export default BifrostNavigationHeaderContainer;

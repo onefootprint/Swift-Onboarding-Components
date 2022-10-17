@@ -108,7 +108,7 @@ const Confirm = () => {
     if (isMobile) {
       setEditContent(EditSection.identity);
     } else {
-      send({ type: Events.editSsn });
+      send({ type: Events.editIdentity });
     }
   };
 
@@ -157,7 +157,7 @@ const SectionsContainer = styled.div`
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    row-gap: ${theme.spacing[8]}px;
+    row-gap: ${theme.spacing[5]}px;
   `}
 `;
 

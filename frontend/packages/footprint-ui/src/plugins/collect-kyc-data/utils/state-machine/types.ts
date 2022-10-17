@@ -23,7 +23,7 @@ export enum States {
   confirm = 'confirm',
   basicInfoEditDesktop = 'basicInfoEditDesktop',
   addressEditDesktop = 'addressEditDesktop',
-  ssnEditDesktop = 'ssnEditDesktop',
+  identityEditDesktop = 'identityEditDesktop',
 
   completed = 'completed',
 }
@@ -49,7 +49,7 @@ export enum Events {
   confirmed = 'confirmed',
   editBasicInfo = 'editBasicInfo',
   editAddress = 'editAddress',
-  editSsn = 'editSsn',
+  editIdentity = 'editIdentity',
   returnToSummary = 'returnToSummary',
 }
 
@@ -95,5 +95,5 @@ export type MachineEvents =
     }
   | { type: Events.editBasicInfo }
   | { type: Events.editAddress }
-  | { type: Events.editSsn }
+  | { type: Events.editIdentity }
   | { type: Events.returnToSummary };

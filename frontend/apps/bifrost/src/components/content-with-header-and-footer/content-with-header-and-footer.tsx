@@ -3,7 +3,7 @@ import { FootprintFooter } from 'footprint-elements';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-import BifrostNavigationHeader from '../bifrost-navigation-header';
+import BifrostNavigationHeaderContainer from '../bifrost-navigation-header-container';
 import SandboxBanner from '../sandbox-banner';
 import BIFROST_CONTAINER_ID from './constants';
 
@@ -16,7 +16,7 @@ const ContentWithHeaderAndFooter = ({
 }: ContentWithHeaderAndFooterProps) => (
   <Container id={BIFROST_CONTAINER_ID}>
     <SandboxBanner />
-    <BifrostNavigationHeader />
+    <BifrostNavigationHeaderContainer />
     <Content>{children}</Content>
     <FootprintFooter />
   </Container>
