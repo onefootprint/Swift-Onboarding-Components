@@ -128,6 +128,14 @@ export async function Create(
       launchType: 'EC2',
       desiredCount: config.instanceCount,
       taskDefinition: taskDefinition.arn,
+      deploymentController: {
+        type: 'ECS',
+      },
+      deploymentCircuitBreaker: {
+        enable: true,
+        rollback: true,
+      },
+      deploymentMinimumHealthyPercent: 100,
       loadBalancers: [
         {
           containerName: config.serviceName,
