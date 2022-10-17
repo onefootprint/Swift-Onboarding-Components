@@ -247,7 +247,7 @@ class TestBifrost:
         )
         assert body["status"] == "pending"
 
-        post("hosted/onboarding/kyc", None, workos_tenant.ob_config.key, auth_token)
+        post("hosted/onboarding/submit", None, workos_tenant.ob_config.key, auth_token)
 
         body = get(
             "hosted/onboarding/kyc", None, workos_tenant.ob_config.key, auth_token
@@ -386,7 +386,7 @@ class TestBifrost:
             # Start onboarding for user
             post("hosted/onboarding", None, tenant.ob_config.key, auth_token)
 
-            post("hosted/onboarding/kyc", None, tenant.ob_config.key, auth_token)
+            post("hosted/onboarding/submit", None, tenant.ob_config.key, auth_token)
 
             # authorize onboarding for user
             body = post(
@@ -463,7 +463,7 @@ class TestBifrostSandbox:
             basic_user.auth_token,
         )
         post(
-            "hosted/onboarding/kyc",
+            "hosted/onboarding/submit",
             None,
             workos_sandbox_tenant.ob_config.key,
             basic_user.auth_token,

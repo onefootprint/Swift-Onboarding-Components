@@ -10,7 +10,7 @@ import {
 const startKyc = async (payload: StartKycRequest) => {
   const response = await request<StartKycResponse>({
     method: 'POST',
-    url: '/hosted/onboarding/kyc',
+    url: '/hosted/onboarding/submit',
     headers: {
       [AUTH_HEADER]: payload.authToken,
       [CLIENT_PUBLIC_KEY_HEADER]: payload.tenantPk,

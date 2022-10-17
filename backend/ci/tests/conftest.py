@@ -151,7 +151,7 @@ def user(workos_sandbox_tenant, twilio):
 
     # Run the KYC check
     post(
-        "hosted/onboarding/kyc",
+        "hosted/onboarding/submit",
         None,
         workos_sandbox_tenant.ob_config.key,
         basic_user.auth_token,

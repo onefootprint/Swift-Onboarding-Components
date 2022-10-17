@@ -41,8 +41,11 @@ pub async fn get(
     ResponseData::ok(response).json()
 }
 
-#[api_v2_operation(tags(Hosted), description = "Initiate KYC checks for a user")]
-#[actix::post("/hosted/onboarding/kyc")]
+#[api_v2_operation(
+    tags(Hosted),
+    description = "Indicate data collection has finished and is ready to be processed by Footprint"
+)]
+#[actix::post("/hosted/onboarding/submit")]
 pub async fn post(
     state: web::Data<State>,
     user_auth: UserAuthContext,
