@@ -2,20 +2,30 @@ import { useTranslation } from '@onefootprint/hooks';
 import {
   IcoBuilding24,
   IcoCake24,
+  IcoCar24,
   IcoEmail24,
   IcoFileText24,
+  IcoIdCard24,
+  IcoPassport24,
   IcoPhone24,
   IcoUserCircle24,
 } from '@onefootprint/icons';
-import { CollectedDataOption } from '@onefootprint/types';
-import { FootprintButton, Typography, useToast } from '@onefootprint/ui';
+import { CollectedDataOption, IdScanDocType } from '@onefootprint/types';
+import {
+  FootprintButton,
+  LoadingIndicator,
+  Typography,
+  useToast,
+} from '@onefootprint/ui';
 import { useIsMutating } from '@tanstack/react-query';
 import { HeaderTitle, NavigationHeader } from 'footprint-elements';
-import React from 'react';
+import React, { useState } from 'react';
 import useOnboardingMachine from 'src/hooks/use-onboarding-machine';
 import useOnboardingAuthorize from 'src/pages/onboarding/pages/authorize/hooks/use-onboarding-authorize';
 import { Events } from 'src/utils/state-machine/onboarding/types';
 import styled, { css } from 'styled-components';
+
+import useGetOnboardingStatus from './hooks/get-onboarding-status';
 
 const IconByCollectedDataOption: Record<CollectedDataOption, JSX.Element> = {
   [CollectedDataOption.name]: <IcoUserCircle24 />,
@@ -28,15 +38,10 @@ const IconByCollectedDataOption: Record<CollectedDataOption, JSX.Element> = {
   [CollectedDataOption.partialAddress]: <IcoBuilding24 />,
 };
 
-export const collectedDataOptionLabels: Record<CollectedDataOption, string> = {
-  [CollectedDataOption.name]: 'Name',
-  [CollectedDataOption.email]: 'Email',
-  [CollectedDataOption.phoneNumber]: 'Phone Number',
-  [CollectedDataOption.ssn4]: 'SSN (Last 4)',
-  [CollectedDataOption.ssn9]: 'SSN (Full)',
-  [CollectedDataOption.dob]: 'Date of Birth',
-  [CollectedDataOption.fullAddress]: 'Address (Full)',
-  [CollectedDataOption.partialAddress]: 'Country & Zip Code',
+const IconByIdDocType: Record<IdScanDocType, JSX.Element> = {
+  [IdScanDocType.idCard]: <IcoIdCard24 />,
+  [IdScanDocType.driversLicense]: <IcoCar24 />,
+  [IdScanDocType.passport]: <IcoPassport24 />,
 };
 
 const Authorize = () => {
@@ -45,10 +50,25 @@ const Authorize = () => {
   const { t } = useTranslation('pages.authorize');
   const isMutating = useIsMutating();
   const [state, send] = useOnboardingMachine();
+  const [collectedDocs, setCollectedDocs] = useState<IdScanDocType[]>();
   const {
     authToken,
     tenant: { pk: tenantPk },
   } = state.context;
+
+  const statusQuery = useGetOnboardingStatus({
+    onSuccess: ({ fieldsToAuthorize }) => {
+      setCollectedDocs(fieldsToAuthorize?.identityDocumentType ?? []);
+    },
+  });
+
+  if (statusQuery.isLoading) {
+    return (
+      <Container>
+        <LoadingIndicator />
+      </Container>
+    );
+  }
 
   const handleClick = () => {
     onboardingAuthorizeMutation.mutate(
@@ -76,6 +96,23 @@ const Authorize = () => {
   const { canAccessData } = state.context.tenant;
   const requiredCategories = canAccessData;
 
+  const collectedDataOptionLabels: Record<CollectedDataOption, string> = {
+    [CollectedDataOption.name]: t('data-labels.name'),
+    [CollectedDataOption.email]: t('data-labels.email'),
+    [CollectedDataOption.phoneNumber]: t('data-labels.phone'),
+    [CollectedDataOption.ssn4]: t('data-labels.ssn4'),
+    [CollectedDataOption.ssn9]: t('data-labels.ssn9'),
+    [CollectedDataOption.dob]: t('data-labels.dob'),
+    [CollectedDataOption.fullAddress]: t('data-labels.address-full'),
+    [CollectedDataOption.partialAddress]: t('data-labels.address-partial'),
+  };
+
+  const docTypeLabels: Record<IdScanDocType, string> = {
+    [IdScanDocType.idCard]: t('data-labels.id-card'),
+    [IdScanDocType.driversLicense]: t('data-labels.passport'),
+    [IdScanDocType.passport]: t('data-labels.driversLicense'),
+  };
+
   return (
     <>
       <NavigationHeader button={{ variant: 'close', confirmClose: true }} />
@@ -97,6 +134,14 @@ const Authorize = () => {
               </Category>
             ),
           )}
+          {collectedDocs?.map((collectedDoc: IdScanDocType) => (
+            <Category key={collectedDoc}>
+              <IconContainer>{IconByIdDocType[collectedDoc]}</IconContainer>
+              <Typography variant="label-3">
+                {docTypeLabels[collectedDoc]}
+              </Typography>
+            </Category>
+          ))}
         </CategoriesContainer>
         <FootprintButton
           fullWidth

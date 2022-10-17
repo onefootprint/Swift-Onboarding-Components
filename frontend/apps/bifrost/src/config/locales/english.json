@@ -115,6 +115,19 @@
       "onboarding-complete-error": {
         "title": "An error occurred",
         "description": "An error occurred while completing onboarding. Please try again."
+      },
+      "data-labels": {
+        "name": "Name",
+        "email": "Email",
+        "phone": "Phone Number",
+        "ssn4": "SSN (Last 4)",
+        "ssn9": "SSN (Full)",
+        "dob": "Date of Birth",
+        "address-full": "Address (Full)",
+        "address-partial": "Country & Zip Code",
+        "id-card": "ID Card",
+        "passport": "Passport",
+        "driversLicense": "Driver's License"
       }
     },
     "tenant-invalid": {

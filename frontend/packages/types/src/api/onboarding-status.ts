@@ -1,4 +1,5 @@
 import { CollectedDataOption } from '../data/collected-data-option';
+import IdScanDocType from '../data/id-scan-doc-type';
 
 export enum OnboardingRequirementKind {
   liveness = 'liveness',
@@ -29,6 +30,12 @@ export type OnboardingStatusRequest = {
   tenantPk: string;
 };
 
+export type AuthorizeFields = {
+  collectedData: CollectedDataOption[];
+  identityDocumentType: IdScanDocType[];
+};
+
 export type OnboardingStatusResponse = {
   requirements: OnboardingRequirement[];
+  fieldsToAuthorize?: AuthorizeFields;
 };
