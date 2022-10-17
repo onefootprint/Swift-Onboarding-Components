@@ -19,6 +19,7 @@ pub enum DocumentResponseStatus {
     Pending,
     Complete,
     Error,
+    RetryLimitExceeded,
 }
 
 #[derive(Debug, Clone, serde::Serialize, Apiv2Schema)]

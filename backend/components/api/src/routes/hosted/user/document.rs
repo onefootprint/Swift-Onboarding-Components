@@ -66,6 +66,11 @@ fn get_response_for_testing(error_requested: &str) -> DocumentResponse {
             front_image_error: None,
             back_image_error: None,
         },
+        "retry_limit" => DocumentResponse {
+            status: DocumentResponseStatus::RetryLimitExceeded,
+            front_image_error: None,
+            back_image_error: None,
+        },
         _ => DocumentResponse {
             status: DocumentResponseStatus::Complete,
             front_image_error: None,
