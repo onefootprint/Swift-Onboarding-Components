@@ -9,7 +9,9 @@ use crate::types::identity_data_request::IdentityDataUpdate;
 pub mod engine;
 mod requirement;
 pub mod risk;
+pub(self) mod utils;
 pub mod verification_request;
+pub(self) mod verification_result;
 ////////////////////////
 /// Decision Engine
 ////////////////////////

@@ -1,12 +1,26 @@
 use crate::utils::user_vault_wrapper::UserVaultWrapper;
 use crate::{errors::ApiError, State};
 use chrono::Utc;
-use db::models::{identity_data::HasIdentityDataFields, verification_request::NewVerificationRequest};
+use db::models::{
+    identity_data::HasIdentityDataFields, verification_request::NewVerificationRequest,
+    verification_request::VerificationRequest,
+};
 use newtypes::{email::Email, DataAttribute, IdvData, OnboardingId, PhoneNumber, Vendor};
 use std::{collections::HashMap, str::FromStr};
 use strum::IntoEnumIterator;
 
-pub(super) async fn build_idv_data(uvw: &UserVaultWrapper, state: &State) -> Result<IdvData, ApiError> {
+pub async fn build_idv_data_from_verification_request(
+    state: &State,
+    request: VerificationRequest,
+) -> Result<IdvData, ApiError> {
+    // Build the set of data we will send to the vendor by re-building the UVW from the DB using
+    // the pointers to pieces of user data saved on the VerificationRequest
+    // This is unnecessary right now, but will allow us to re-run this logic when this task is async
+    let uvw = state
+        .db_pool
+        .db_query(|conn| UserVaultWrapper::from_verification_request(conn, request))
+        .await??;
+
     let (keys, encrypted_values): (Vec<_>, Vec<_>) = DataAttribute::iter()
         .flat_map(|a| uvw.get_e_field(a).map(|v| (a, v)))
         .unzip();

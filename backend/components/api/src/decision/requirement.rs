@@ -7,9 +7,7 @@ use db::{
     DbResult, PgConnection,
 };
 
-use newtypes::{
-    RequirementKind, OnboardingId, RequirementInitiator, RequirementStatus2, UserVaultId,
-};
+use newtypes::{OnboardingId, RequirementInitiator, RequirementKind, RequirementStatus2, UserVaultId};
 
 use crate::types::identity_data_request::IdentityDataUpdate;
 
