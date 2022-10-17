@@ -58,5 +58,4 @@ const FlagKm = ({ className, testID }: FlagProps) => (
     </g>
   </svg>
 );
-
 export default FlagKm;

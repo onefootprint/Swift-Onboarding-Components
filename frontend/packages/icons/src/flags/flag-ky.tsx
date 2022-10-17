@@ -167,5 +167,4 @@ const FlagKy = ({ className, testID }: FlagProps) => (
     </defs>
   </svg>
 );
-
 export default FlagKy;

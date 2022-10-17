@@ -93,5 +93,4 @@ const FlagAu = ({ className, testID }: FlagProps) => (
     />
   </svg>
 );
-
 export default FlagAu;

@@ -23,5 +23,4 @@ const IcoQuote40 = ({ color = 'primary', className, testID }: IconProps) => {
     </svg>
   );
 };
-
 export default IcoQuote40;

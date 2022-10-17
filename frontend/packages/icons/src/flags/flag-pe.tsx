@@ -156,5 +156,4 @@ const FlagPe = ({ className, testID }: FlagProps) => (
     </g>
   </svg>
 );
-
 export default FlagPe;

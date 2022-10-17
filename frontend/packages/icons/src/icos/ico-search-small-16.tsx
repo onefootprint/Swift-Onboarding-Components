@@ -30,5 +30,4 @@ const IcoSearchSmall16 = ({
     </svg>
   );
 };
-
 export default IcoSearchSmall16;

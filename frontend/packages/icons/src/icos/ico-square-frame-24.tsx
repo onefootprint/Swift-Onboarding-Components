@@ -29,5 +29,4 @@ const IcoSquareFrame24 = ({
     </svg>
   );
 };
-
 export default IcoSquareFrame24;

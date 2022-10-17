@@ -36,5 +36,4 @@ const IcoUserCircle16 = ({
     </svg>
   );
 };
-
 export default IcoUserCircle16;

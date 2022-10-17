@@ -252,5 +252,4 @@ const FlagSh = ({ className, testID }: FlagProps) => (
     </defs>
   </svg>
 );
-
 export default FlagSh;

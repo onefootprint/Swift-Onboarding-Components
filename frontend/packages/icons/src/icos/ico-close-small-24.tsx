@@ -29,5 +29,4 @@ const IcoCloseSmall24 = ({
     </svg>
   );
 };
-
 export default IcoCloseSmall24;

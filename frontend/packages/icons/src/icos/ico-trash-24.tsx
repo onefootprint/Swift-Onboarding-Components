@@ -25,5 +25,4 @@ const IcoTrash24 = ({ color = 'primary', className, testID }: IconProps) => {
     </svg>
   );
 };
-
 export default IcoTrash24;

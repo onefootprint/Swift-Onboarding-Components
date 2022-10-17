@@ -94,5 +94,4 @@ const FlagIm = ({ className, testID }: FlagProps) => (
     </g>
   </svg>
 );
-
 export default FlagIm;

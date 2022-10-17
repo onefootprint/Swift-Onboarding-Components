@@ -302,5 +302,4 @@ const FlagTm = ({ className, testID }: FlagProps) => (
     </g>
   </svg>
 );
-
 export default FlagTm;

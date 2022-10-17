@@ -178,5 +178,4 @@ const FlagSm = ({ className, testID }: FlagProps) => (
     </g>
   </svg>
 );
-
 export default FlagSm;

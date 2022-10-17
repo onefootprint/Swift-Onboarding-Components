@@ -36,5 +36,4 @@ const IlluLightPhoneWithId = ({
     </svg>
   );
 };
-
 export default IlluLightPhoneWithId;

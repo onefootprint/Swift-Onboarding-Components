@@ -25,5 +25,4 @@ const IcoChartUp40 = ({ color = 'primary', className, testID }: IconProps) => {
     </svg>
   );
 };
-
 export default IcoChartUp40;

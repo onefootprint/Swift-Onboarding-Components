@@ -21,7 +21,7 @@ const IcoChevronDown24 = ({
       aria-hidden="true"
     >
       <path
-        d="M15.25 10.75 12 14.25l-3.25-3.5"
+        d="m16 9.85-4 4.308L8 9.85"
         stroke={theme.color[color]}
         strokeWidth={1.5}
         strokeLinecap="round"
@@ -30,5 +30,4 @@ const IcoChevronDown24 = ({
     </svg>
   );
 };
-
 export default IcoChevronDown24;

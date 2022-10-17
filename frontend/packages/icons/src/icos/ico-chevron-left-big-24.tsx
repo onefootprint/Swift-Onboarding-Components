@@ -30,5 +30,4 @@ const IcoChevronLeftBig24 = ({
     </svg>
   );
 };
-
 export default IcoChevronLeftBig24;

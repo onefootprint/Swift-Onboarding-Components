@@ -23,5 +23,4 @@ const LogoFpDefault = ({ color = 'primary', className, testID }: IconProps) => {
     </svg>
   );
 };
-
 export default LogoFpDefault;

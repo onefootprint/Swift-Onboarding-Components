@@ -55,5 +55,4 @@ const FlagAx = ({ className, testID }: FlagProps) => (
     </g>
   </svg>
 );
-
 export default FlagAx;

@@ -69,5 +69,4 @@ const FlagBt = ({ className, testID }: FlagProps) => (
     </defs>
   </svg>
 );
-
 export default FlagBt;

@@ -29,5 +29,4 @@ const IcoCheck24 = ({ color = 'primary', className, testID }: IconProps) => {
     </svg>
   );
 };
-
 export default IcoCheck24;

@@ -32,5 +32,4 @@ const IcoSettings16 = ({ color = 'primary', className, testID }: IconProps) => {
     </svg>
   );
 };
-
 export default IcoSettings16;

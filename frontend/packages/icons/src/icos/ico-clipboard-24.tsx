@@ -29,5 +29,4 @@ const IcoClipboard24 = ({
     </svg>
   );
 };
-
 export default IcoClipboard24;

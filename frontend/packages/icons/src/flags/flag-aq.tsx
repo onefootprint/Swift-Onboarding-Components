@@ -85,5 +85,4 @@ const FlagAq = ({ className, testID }: FlagProps) => (
     </defs>
   </svg>
 );
-
 export default FlagAq;

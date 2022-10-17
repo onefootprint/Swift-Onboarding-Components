@@ -30,5 +30,4 @@ const IcoMinusSmall24 = ({
     </svg>
   );
 };
-
 export default IcoMinusSmall24;

@@ -37,5 +37,4 @@ const IcoSmartphone16 = ({
     </svg>
   );
 };
-
 export default IcoSmartphone16;

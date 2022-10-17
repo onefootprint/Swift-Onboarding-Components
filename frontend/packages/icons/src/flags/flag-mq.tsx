@@ -26,5 +26,4 @@ const FlagMq = ({ className, testID }: FlagProps) => (
     />
   </svg>
 );
-
 export default FlagMq;

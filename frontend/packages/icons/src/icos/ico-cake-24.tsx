@@ -25,5 +25,4 @@ const IcoCake24 = ({ color = 'primary', className, testID }: IconProps) => {
     </svg>
   );
 };
-
 export default IcoCake24;

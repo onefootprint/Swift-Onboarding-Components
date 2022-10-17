@@ -110,5 +110,4 @@ const FlagAd = ({ className, testID }: FlagProps) => (
     </g>
   </svg>
 );
-
 export default FlagAd;

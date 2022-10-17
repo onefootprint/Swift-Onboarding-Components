@@ -85,5 +85,4 @@ const FlagGl = ({ className, testID }: FlagProps) => (
     </g>
   </svg>
 );
-
 export default FlagGl;

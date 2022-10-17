@@ -96,5 +96,4 @@ const FlagGbUkm = ({ className, testID }: FlagProps) => (
     </g>
   </svg>
 );
-
 export default FlagGbUkm;

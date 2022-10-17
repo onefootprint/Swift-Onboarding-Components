@@ -69,5 +69,4 @@ const FlagOm = ({ className, testID }: FlagProps) => (
     </g>
   </svg>
 );
-
 export default FlagOm;

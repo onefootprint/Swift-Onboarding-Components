@@ -29,5 +29,4 @@ const IcoEmojiHappy40 = ({
     </svg>
   );
 };
-
 export default IcoEmojiHappy40;

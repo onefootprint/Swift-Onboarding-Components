@@ -85,5 +85,4 @@ const FlagDj = ({ className, testID }: FlagProps) => (
     </g>
   </svg>
 );
-
 export default FlagDj;

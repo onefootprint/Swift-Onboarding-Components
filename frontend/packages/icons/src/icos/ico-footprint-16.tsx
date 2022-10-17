@@ -27,5 +27,4 @@ const IcoFootprint16 = ({
     </svg>
   );
 };
-
 export default IcoFootprint16;

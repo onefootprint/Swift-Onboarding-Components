@@ -32,5 +32,4 @@ const IcoLeaf16 = ({ color = 'primary', className, testID }: IconProps) => {
     </svg>
   );
 };
-
 export default IcoLeaf16;

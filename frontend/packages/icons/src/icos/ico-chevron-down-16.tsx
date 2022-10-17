@@ -30,5 +30,4 @@ const IcoChevronDown16 = ({
     </svg>
   );
 };
-
 export default IcoChevronDown16;

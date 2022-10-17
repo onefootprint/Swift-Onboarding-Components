@@ -31,5 +31,4 @@ const IcoToggleKnob16 = ({
     </svg>
   );
 };
-
 export default IcoToggleKnob16;

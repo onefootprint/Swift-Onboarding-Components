@@ -83,5 +83,4 @@ const FlagDm = ({ className, testID }: FlagProps) => (
     </g>
   </svg>
 );
-
 export default FlagDm;

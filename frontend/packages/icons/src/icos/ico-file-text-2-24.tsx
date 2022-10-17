@@ -29,5 +29,4 @@ const IcoFileText224 = ({
     </svg>
   );
 };
-
 export default IcoFileText224;

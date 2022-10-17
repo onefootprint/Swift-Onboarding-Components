@@ -25,5 +25,4 @@ const IcoDatabase16 = ({ color = 'primary', className, testID }: IconProps) => {
     </svg>
   );
 };
-
 export default IcoDatabase16;

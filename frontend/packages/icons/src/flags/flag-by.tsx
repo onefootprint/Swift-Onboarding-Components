@@ -53,5 +53,4 @@ const FlagBy = ({ className, testID }: FlagProps) => (
     </g>
   </svg>
 );
-
 export default FlagBy;

@@ -30,5 +30,4 @@ const IcoFingerprint16 = ({
     </svg>
   );
 };
-
 export default IcoFingerprint16;

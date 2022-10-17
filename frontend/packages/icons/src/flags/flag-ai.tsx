@@ -130,5 +130,4 @@ const FlagAi = ({ className, testID }: FlagProps) => (
     </g>
   </svg>
 );
-
 export default FlagAi;

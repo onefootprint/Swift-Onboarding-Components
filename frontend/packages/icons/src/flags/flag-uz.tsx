@@ -51,5 +51,4 @@ const FlagUz = ({ className, testID }: FlagProps) => (
     </g>
   </svg>
 );
-
 export default FlagUz;

@@ -25,5 +25,4 @@ const IcoMessage24 = ({ color = 'primary', className, testID }: IconProps) => {
     </svg>
   );
 };
-
 export default IcoMessage24;

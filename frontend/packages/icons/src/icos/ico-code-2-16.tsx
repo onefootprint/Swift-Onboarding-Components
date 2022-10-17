@@ -25,5 +25,4 @@ const IcoCode216 = ({ color = 'primary', className, testID }: IconProps) => {
     </svg>
   );
 };
-
 export default IcoCode216;

@@ -33,5 +33,4 @@ const IcoCheckSmall16 = ({
     </svg>
   );
 };
-
 export default IcoCheckSmall16;

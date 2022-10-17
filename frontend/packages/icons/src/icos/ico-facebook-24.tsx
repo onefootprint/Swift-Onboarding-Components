@@ -23,5 +23,4 @@ const IcoFacebook24 = ({ color = 'primary', className, testID }: IconProps) => {
     </svg>
   );
 };
-
 export default IcoFacebook24;

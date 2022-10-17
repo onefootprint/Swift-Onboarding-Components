@@ -29,5 +29,4 @@ const IcoDotsHorizontal24 = ({
     </svg>
   );
 };
-
 export default IcoDotsHorizontal24;

@@ -30,5 +30,4 @@ const IcoSpinner16 = ({ color = 'primary', className, testID }: IconProps) => {
     </svg>
   );
 };
-
 export default IcoSpinner16;

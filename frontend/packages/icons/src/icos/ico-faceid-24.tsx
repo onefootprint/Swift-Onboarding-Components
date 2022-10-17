@@ -39,5 +39,4 @@ const IcoFaceid24 = ({ color = 'primary', className, testID }: IconProps) => {
     </svg>
   );
 };
-
 export default IcoFaceid24;

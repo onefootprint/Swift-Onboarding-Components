@@ -29,5 +29,4 @@ const IcoArrowRightSmall16 = ({
     </svg>
   );
 };
-
 export default IcoArrowRightSmall16;

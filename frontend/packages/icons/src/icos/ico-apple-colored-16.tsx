@@ -19,5 +19,4 @@ const IcoAppleColored16 = ({ className, testID }: IconProps) => (
     />
   </svg>
 );
-
 export default IcoAppleColored16;

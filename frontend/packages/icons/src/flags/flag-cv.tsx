@@ -86,5 +86,4 @@ const FlagCv = ({ className, testID }: FlagProps) => (
     </defs>
   </svg>
 );
-
 export default FlagCv;

@@ -32,5 +32,4 @@ const FlagCa = ({ className, testID }: FlagProps) => (
     </g>
   </svg>
 );
-
 export default FlagCa;

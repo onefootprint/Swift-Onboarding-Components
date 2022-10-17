@@ -29,5 +29,4 @@ const IcoCheckCircle24 = ({
     </svg>
   );
 };
-
 export default IcoCheckCircle24;

@@ -65,5 +65,4 @@ const FlagZm = ({ className, testID }: FlagProps) => (
     </g>
   </svg>
 );
-
 export default FlagZm;

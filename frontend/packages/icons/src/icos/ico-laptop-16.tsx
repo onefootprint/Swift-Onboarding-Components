@@ -25,5 +25,4 @@ const IcoLaptop16 = ({ color = 'primary', className, testID }: IconProps) => {
     </svg>
   );
 };
-
 export default IcoLaptop16;

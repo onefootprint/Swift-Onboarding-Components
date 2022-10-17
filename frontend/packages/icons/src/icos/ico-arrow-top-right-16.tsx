@@ -29,5 +29,4 @@ const IcoArrowTopRight16 = ({
     </svg>
   );
 };
-
 export default IcoArrowTopRight16;

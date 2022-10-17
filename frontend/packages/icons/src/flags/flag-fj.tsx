@@ -201,5 +201,4 @@ const FlagFj = ({ className, testID }: FlagProps) => (
     </g>
   </svg>
 );
-
 export default FlagFj;

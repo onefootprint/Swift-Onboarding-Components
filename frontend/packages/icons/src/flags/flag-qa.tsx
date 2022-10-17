@@ -34,5 +34,4 @@ const FlagQa = ({ className, testID }: FlagProps) => (
     </g>
   </svg>
 );
-
 export default FlagQa;

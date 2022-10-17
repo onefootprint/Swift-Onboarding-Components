@@ -25,5 +25,4 @@ const IcoSun24 = ({ color = 'primary', className, testID }: IconProps) => {
     </svg>
   );
 };
-
 export default IcoSun24;

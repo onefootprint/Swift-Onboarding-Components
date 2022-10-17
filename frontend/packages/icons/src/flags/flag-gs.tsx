@@ -233,5 +233,4 @@ const FlagGs = ({ className, testID }: FlagProps) => (
     </defs>
   </svg>
 );
-
 export default FlagGs;

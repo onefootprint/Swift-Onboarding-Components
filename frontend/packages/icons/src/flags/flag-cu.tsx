@@ -85,5 +85,4 @@ const FlagCu = ({ className, testID }: FlagProps) => (
     </g>
   </svg>
 );
-
 export default FlagCu;

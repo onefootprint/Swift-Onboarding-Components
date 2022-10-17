@@ -25,5 +25,4 @@ const IcoShield40 = ({ color = 'primary', className, testID }: IconProps) => {
     </svg>
   );
 };
-
 export default IcoShield40;

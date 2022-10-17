@@ -36,5 +36,4 @@ const IcoMegaphone16 = ({
     </svg>
   );
 };
-
 export default IcoMegaphone16;

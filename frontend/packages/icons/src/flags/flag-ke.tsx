@@ -90,5 +90,4 @@ const FlagKe = ({ className, testID }: FlagProps) => (
     </g>
   </svg>
 );
-
 export default FlagKe;

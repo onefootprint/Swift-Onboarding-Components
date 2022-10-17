@@ -91,5 +91,4 @@ const FlagBo = ({ className, testID }: FlagProps) => (
     </g>
   </svg>
 );
-
 export default FlagBo;

@@ -25,5 +25,4 @@ const IcoClose40 = ({ color = 'primary', className, testID }: IconProps) => {
     </svg>
   );
 };
-
 export default IcoClose40;

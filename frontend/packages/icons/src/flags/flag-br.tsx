@@ -121,5 +121,4 @@ const FlagBr = ({ className, testID }: FlagProps) => (
     </defs>
   </svg>
 );
-
 export default FlagBr;

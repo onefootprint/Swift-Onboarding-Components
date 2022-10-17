@@ -31,5 +31,4 @@ const LogoFpdocsDefault = ({
     </svg>
   );
 };
-
 export default LogoFpdocsDefault;

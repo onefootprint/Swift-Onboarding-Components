@@ -29,5 +29,4 @@ const IcoPlusSmall16 = ({
     </svg>
   );
 };
-
 export default IcoPlusSmall16;

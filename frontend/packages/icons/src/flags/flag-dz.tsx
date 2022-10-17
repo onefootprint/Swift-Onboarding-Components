@@ -33,5 +33,4 @@ const FlagDz = ({ className, testID }: FlagProps) => (
     />
   </svg>
 );
-
 export default FlagDz;

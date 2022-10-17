@@ -25,5 +25,4 @@ const IcoHelp16 = ({ color = 'primary', className, testID }: IconProps) => {
     </svg>
   );
 };
-
 export default IcoHelp16;

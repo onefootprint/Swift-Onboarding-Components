@@ -29,5 +29,4 @@ const IcoUserCircle24 = ({
     </svg>
   );
 };
-
 export default IcoUserCircle24;

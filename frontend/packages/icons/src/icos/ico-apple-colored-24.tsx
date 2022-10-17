@@ -19,5 +19,4 @@ const IcoAppleColored24 = ({ className, testID }: IconProps) => (
     />
   </svg>
 );
-
 export default IcoAppleColored24;

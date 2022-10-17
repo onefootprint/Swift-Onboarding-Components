@@ -83,5 +83,4 @@ const FlagAw = ({ className, testID }: FlagProps) => (
     </defs>
   </svg>
 );
-
 export default FlagAw;

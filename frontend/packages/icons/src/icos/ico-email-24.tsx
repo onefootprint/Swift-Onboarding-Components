@@ -25,5 +25,4 @@ const IcoEmail24 = ({ color = 'primary', className, testID }: IconProps) => {
     </svg>
   );
 };
-
 export default IcoEmail24;

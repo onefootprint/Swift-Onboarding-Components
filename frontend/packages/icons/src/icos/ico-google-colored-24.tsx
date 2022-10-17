@@ -31,5 +31,4 @@ const IcoGoogleColored24 = ({ className, testID }: IconProps) => (
     />
   </svg>
 );
-
 export default IcoGoogleColored24;

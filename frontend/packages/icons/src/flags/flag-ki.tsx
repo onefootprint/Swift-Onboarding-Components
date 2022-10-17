@@ -96,5 +96,4 @@ const FlagKi = ({ className, testID }: FlagProps) => (
     </g>
   </svg>
 );
-
 export default FlagKi;

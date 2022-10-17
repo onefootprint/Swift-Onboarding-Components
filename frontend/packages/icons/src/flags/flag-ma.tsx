@@ -40,5 +40,4 @@ const FlagMa = ({ className, testID }: FlagProps) => (
     </g>
   </svg>
 );
-
 export default FlagMa;

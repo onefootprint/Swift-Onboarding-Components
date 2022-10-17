@@ -25,5 +25,4 @@ const IcoLayer0116 = ({ color = 'primary', className, testID }: IconProps) => {
     </svg>
   );
 };
-
 export default IcoLayer0116;

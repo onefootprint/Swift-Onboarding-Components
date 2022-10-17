@@ -94,5 +94,4 @@ const FlagHm = ({ className, testID }: FlagProps) => (
     <path d="m14.846 51.778 1.5.025" stroke="#979797" strokeWidth={2} />
   </svg>
 );
-
 export default FlagHm;

@@ -34,5 +34,4 @@ const FlagLy = ({ className, testID }: FlagProps) => (
     </g>
   </svg>
 );
-
 export default FlagLy;

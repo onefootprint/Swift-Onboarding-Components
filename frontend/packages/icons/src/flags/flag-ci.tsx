@@ -24,5 +24,4 @@ const FlagCi = ({ className, testID }: FlagProps) => (
     </g>
   </svg>
 );
-
 export default FlagCi;

@@ -27,5 +27,4 @@ const IcoHeart24 = ({ color = 'primary', className, testID }: IconProps) => {
     </svg>
   );
 };
-
 export default IcoHeart24;

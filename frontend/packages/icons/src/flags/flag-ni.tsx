@@ -112,5 +112,4 @@ const FlagNi = ({ className, testID }: FlagProps) => (
     </g>
   </svg>
 );
-
 export default FlagNi;

@@ -26,5 +26,4 @@ const IcoBolt16 = ({ color = 'primary', className, testID }: IconProps) => {
     </svg>
   );
 };
-
 export default IcoBolt16;

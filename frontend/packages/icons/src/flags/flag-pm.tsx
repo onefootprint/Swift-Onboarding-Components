@@ -55,5 +55,4 @@ const FlagPm = ({ className, testID }: FlagProps) => (
     />
   </svg>
 );
-
 export default FlagPm;

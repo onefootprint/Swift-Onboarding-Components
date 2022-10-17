@@ -38,5 +38,4 @@ const FlagTj = ({ className, testID }: FlagProps) => (
     </g>
   </svg>
 );
-
 export default FlagTj;

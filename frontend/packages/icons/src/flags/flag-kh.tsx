@@ -372,5 +372,4 @@ const FlagKh = ({ className, testID }: FlagProps) => (
     />
   </svg>
 );
-
 export default FlagKh;

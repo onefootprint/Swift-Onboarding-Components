@@ -29,5 +29,4 @@ const IcoCrosshair16 = ({
     </svg>
   );
 };
-
 export default IcoCrosshair16;

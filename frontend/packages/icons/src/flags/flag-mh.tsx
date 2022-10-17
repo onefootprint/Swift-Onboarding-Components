@@ -61,5 +61,4 @@ const FlagMh = ({ className, testID }: FlagProps) => (
     </g>
   </svg>
 );
-
 export default FlagMh;
