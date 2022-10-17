@@ -1,6 +1,10 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoCheckCircle40, IcoClose40 } from '@onefootprint/icons';
-import { GetDocStatusResponse, IdScanBadImageError } from '@onefootprint/types';
+import {
+  DocStatusType,
+  GetDocStatusResponse,
+  IdScanBadImageError,
+} from '@onefootprint/types';
 import { LoadingIndicator, Typography } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
@@ -51,14 +55,16 @@ const ProcessingPhoto = () => {
   useGetDocStatus({
     onSuccess: (response: GetDocStatusResponse) => {
       const { status, frontImageError, backImageError } = response;
-      if (status === 'pending') {
-        return;
-      }
-      if (frontImageError || backImageError) {
+      if (status === DocStatusType.retryLimitExceeded) {
+        handleRetryLimitExceeded();
+      } else if (
+        status === DocStatusType.error &&
+        (frontImageError || backImageError)
+      ) {
         handleDocError(frontImageError, backImageError);
-        return;
+      } else if (status === DocStatusType.complete) {
+        handleDocSuccess();
       }
-      handleDocSuccess();
     },
   });
 
@@ -78,11 +84,20 @@ const ProcessingPhoto = () => {
     setDisplayStatus(DisplayStatus.error);
     setTimeout(() => {
       send({
-        type: Events.imageFailed,
+        type: Events.imageErrored,
         payload: {
           frontImageError,
           backImageError,
         },
+      });
+    }, TRANSITION_DELAY);
+  };
+
+  const handleRetryLimitExceeded = () => {
+    setDisplayStatus(DisplayStatus.error);
+    setTimeout(() => {
+      send({
+        type: Events.retryLimitExceeded,
       });
     }, TRANSITION_DELAY);
   };

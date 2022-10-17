@@ -64,7 +64,7 @@ const createIdScanMachine = () =>
             [Events.imageSucceeded]: {
               target: States.success,
             },
-            [Events.imageFailed]: [
+            [Events.imageErrored]: [
               {
                 target: States.retryFrontPhoto,
                 actions: [Actions.assignImageErrors],
@@ -77,13 +77,11 @@ const createIdScanMachine = () =>
               },
               {
                 target: States.failure,
-                actions: [Actions.assignImageErrors],
-                // TODO: sync up with backend, we are assuming that if no errors are returned, it exceeded retry limit
-                cond: (context, event) =>
-                  !event.payload.backImageError &&
-                  !event.payload.frontImageError,
               },
             ],
+            [Events.retryLimitExceeded]: {
+              target: States.failure,
+            },
           },
         },
         [States.retryFrontPhoto]: {
@@ -148,7 +146,7 @@ const createIdScanMachine = () =>
           return context;
         }),
         [Actions.assignImageErrors]: assign((context, event) => {
-          if (event.type === Events.imageFailed) {
+          if (event.type === Events.imageErrored) {
             context.frontImageError = event.payload.frontImageError;
             context.backImageError = event.payload.backImageError;
           }

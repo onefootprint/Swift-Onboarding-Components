@@ -5,8 +5,15 @@ export type GetDocStatusRequest = {
   tenantPk: string;
 };
 
+export enum DocStatusType {
+  pending = 'pending',
+  complete = 'complete',
+  error = 'error',
+  retryLimitExceeded = 'retry_limit_exceeded',
+}
+
 export type GetDocStatusResponse = {
-  status: 'pending' | 'complete';
+  status: DocStatusType;
   frontImageError?: IdScanBadImageError;
   backImageError?: IdScanBadImageError;
 };

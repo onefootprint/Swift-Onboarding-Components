@@ -24,7 +24,8 @@ export enum Events {
   receivedFrontImage = 'receivedFrontImage',
   receivedBackImage = 'receivedBackImage',
   imageSucceeded = 'imageSucceeded',
-  imageFailed = 'imageFailed',
+  imageErrored = 'imageErrored',
+  retryLimitExceeded = 'retryLimitExceeded',
 }
 
 export enum Actions {
@@ -80,8 +81,9 @@ export type MachineEvents =
   | {
       type: Events.imageSucceeded;
     }
+  | { type: Events.retryLimitExceeded }
   | {
-      type: Events.imageFailed;
+      type: Events.imageErrored;
       payload: {
         frontImageError?: IdScanBadImageError;
         backImageError?: IdScanBadImageError;
