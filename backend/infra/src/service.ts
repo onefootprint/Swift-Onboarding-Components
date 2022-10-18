@@ -144,7 +144,7 @@ export async function Create(
         },
       ],
     },
-    { provider, dependsOn: [loadBalancerTargetGroup] },
+    { provider, dependsOn: [loadBalancerTargetGroup, database.db] },
   );
 
   return { lb: loadBalancerTargetGroup.loadBalancer };

@@ -46,6 +46,51 @@ export async function Create(
     },
   );
 
+  // add basic security headers
+  const responsePolicy = new aws.cloudfront.ResponseHeadersPolicy(
+    'app-cdn-origin-response-policy',
+    {
+      comment: 'security headers',
+      customHeadersConfig: {
+        items: [
+          {
+            header: 'server',
+            value: 'footprint',
+            override: true,
+          },
+        ],
+      },
+      securityHeadersConfig: {
+        strictTransportSecurity: {
+          accessControlMaxAgeSec: 31536000,
+          includeSubdomains: true,
+          override: true,
+        },
+        contentSecurityPolicy: {
+          contentSecurityPolicy:
+            "default-src 'self';base-uri 'self';block-all-mixed-content;font-src 'self' https: data:;frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests",
+          override: false,
+        },
+        frameOptions: {
+          override: false,
+          frameOption: 'SAMEORIGIN',
+        },
+        contentTypeOptions: {
+          override: true,
+        },
+        xssProtection: {
+          protection: true,
+          modeBlock: true,
+          override: true,
+        },
+        referrerPolicy: {
+          referrerPolicy: 'origin-when-cross-origin',
+          override: true,
+        },
+      },
+    },
+  );
+
   const cachePolicy = new aws.cloudfront.CachePolicy(
     'app-cdn-origin-cache-policy',
     {
@@ -102,6 +147,7 @@ export async function Create(
       cachedMethods: ['HEAD', 'GET', 'OPTIONS'],
       originRequestPolicyId: requestPolicy.id,
       cachePolicyId: cachePolicy.id,
+      responseHeadersPolicyId: responsePolicy.id,
     },
 
     restrictions: {
