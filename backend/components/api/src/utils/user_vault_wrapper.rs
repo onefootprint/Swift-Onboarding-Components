@@ -4,6 +4,7 @@ use db::models::kv_data::{KeyValueData, NewKeyValueDataArgs};
 use db::models::onboarding::Onboarding;
 use db::models::scoped_user::ScopedUser;
 use db::models::verification_request::VerificationRequest;
+use db::TxnPgConnection;
 use enclave_proxy::DataTransform;
 
 use db::models::email::Email;
@@ -16,7 +17,6 @@ use std::marker::PhantomData;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::phone_number::PhoneNumber;
 
-use db::assert_in_transaction;
 use db::models::user_vault::UserVault;
 use db::{errors::DbError, PgConnection};
 use newtypes::{
@@ -142,7 +142,7 @@ impl UserVaultWrapper {
         Self::build_internal(conn, user_vault, false)
     }
 
-    pub fn lock(conn: &mut PgConnection, id: &UserVaultId) -> Result<Self, DbError> {
+    pub fn lock(conn: &mut TxnPgConnection, id: &UserVaultId) -> Result<Self, DbError> {
         let user_vault = UserVault::lock(conn, id)?;
         let uvw = Self::build_internal(conn, user_vault, true)?;
         Ok(uvw)
@@ -160,8 +160,8 @@ impl UserVaultWrapper {
         Ok(uvw)
     }
 
-    pub fn assert_is_locked(&self, conn: &mut PgConnection) -> Result<(), ApiError> {
-        assert_in_transaction(conn)?;
+    pub fn assert_is_locked(&self, _conn: &mut TxnPgConnection) -> Result<(), ApiError> {
+        // Accept _conn to make sure we pass in a TxnPgConnection, not PgConnection
         if !self.is_locked {
             Err(ApiError::UserNotLocked)
         } else {
@@ -173,7 +173,7 @@ impl UserVaultWrapper {
 impl UserVaultWrapper {
     pub fn add_email(
         &mut self,
-        conn: &mut PgConnection,
+        conn: &mut TxnPgConnection,
         email: NewtypeEmail,
         fingerprint: Fingerprint,
     ) -> ApiResult<EmailId> {
@@ -253,7 +253,7 @@ impl HasIdentityDataFields for UserVaultWrapper {
 impl UserVaultWrapper {
     pub fn update_identity_data(
         &mut self,
-        conn: &mut PgConnection,
+        conn: &mut TxnPgConnection,
         update: IdentityDataUpdate,
         fingerprints: Vec<(DataAttribute, Fingerprint, IsUnique)>,
     ) -> Result<(), ApiError> {
@@ -302,7 +302,7 @@ impl UserVaultWrapper {
 impl UserVaultWrapper {
     pub fn update_custom_data(
         &self,
-        conn: &mut PgConnection,
+        conn: &mut TxnPgConnection,
         tenant_id: TenantId,
         update: HashMap<KvDataKey, PiiString>,
     ) -> ApiResult<()> {

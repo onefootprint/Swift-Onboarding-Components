@@ -3,7 +3,7 @@ use super::scoped_user::ScopedUser;
 use crate::models::insight_event::InsightEvent;
 use crate::models::ob_configuration::ObConfiguration;
 use crate::schema::{onboarding, scoped_user};
-use crate::{assert_in_transaction, DbError, DbResult};
+use crate::{DbError, DbResult, TxnPgConnection};
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
@@ -105,17 +105,16 @@ impl Onboarding {
     }
 
     pub fn lock_by_config(
-        conn: &mut PgConnection,
+        conn: &mut TxnPgConnection,
         user_vault_id: &UserVaultId,
         ob_configuration_id: &ObConfigurationId,
     ) -> Result<Option<(Onboarding, ScopedUser)>, DbError> {
-        assert_in_transaction(conn)?;
         let result = onboarding::table
             .inner_join(scoped_user::table)
             .filter(scoped_user::user_vault_id.eq(user_vault_id))
             .filter(onboarding::ob_configuration_id.eq(ob_configuration_id))
             .for_no_key_update()
-            .first(conn)
+            .first(conn.conn())
             .optional()?;
         Ok(result)
     }

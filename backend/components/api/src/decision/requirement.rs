@@ -1,10 +1,9 @@
 use db::{
-    assert_in_transaction,
     models::{
         ob_configuration::ObConfiguration,
         requirement::{CreateRequirementConfig, Requirement},
     },
-    DbResult, PgConnection,
+    DbResult, TxnPgConnection,
 };
 
 use newtypes::{OnboardingId, RequirementInitiator, RequirementKind, RequirementStatus2, UserVaultId};
@@ -14,13 +13,11 @@ use crate::types::identity_data_request::IdentityDataUpdate;
 use super::risk;
 
 pub(super) fn create_requirements(
-    conn: &mut PgConnection,
+    conn: &mut TxnPgConnection,
     user_vault_id: &UserVaultId,
     onboarding_id: &OnboardingId,
     ob_config: &ObConfiguration,
 ) -> DbResult<Vec<Requirement>> {
-    assert_in_transaction(conn)?;
-
     // Get requirements to create and requirements already satisfied
     let requirements_to_create = helpers::get_onboarding_requirement_configs(ob_config);
 
@@ -32,7 +29,7 @@ pub(super) fn create_requirements(
 }
 
 pub(super) fn update_requirement_statuses_to_processing(
-    conn: &mut PgConnection,
+    conn: &mut TxnPgConnection,
     user_vault_id: &UserVaultId,
     identity_data: Option<&IdentityDataUpdate>,
 ) -> DbResult<Vec<Requirement>> {
@@ -42,7 +39,6 @@ pub(super) fn update_requirement_statuses_to_processing(
     if identity_data.is_none() {
         return Ok(vec![]);
     }
-    assert_in_transaction(conn)?;
 
     // Unwrap is ok here since we check non-none above
     let identity_data_kinds = helpers::get_requirement_kinds_from_identity_data(identity_data.unwrap());

@@ -18,7 +18,7 @@ pub async fn create(pool: &crate::DbPool, new_user: NewPortableUserVaultReq) -> 
             };
             let user_vault = diesel::insert_into(schema::user_vault::table)
                 .values(new_user_vault)
-                .get_result::<UserVault>(conn)?;
+                .get_result::<UserVault>(conn.conn())?;
             PhoneNumber::create(
                 conn,
                 user_vault.id.clone(),
@@ -57,7 +57,7 @@ pub async fn create_non_portable(
             };
             let user_vault = diesel::insert_into(schema::user_vault::table)
                 .values(new_user_vault)
-                .get_result::<UserVault>(conn)?;
+                .get_result::<UserVault>(conn.conn())?;
 
             // create the scoped user
             let scoped_user = ScopedUser::get_or_create(conn, user_vault.id, tenant_id, is_live)?;

@@ -17,7 +17,7 @@ use db::models::insight_event::CreateInsightEvent;
 use db::models::kv_data::KeyValueData;
 use db::models::scoped_user::ScopedUser;
 use db::models::user_vault::UserVault;
-use db::PgConnection;
+use db::TxnPgConnection;
 use newtypes::csv::Csv;
 use newtypes::{
     flat_api_object_map_type, AccessEventKind, DataIdentifier, FootprintUserId, KvDataKey, PiiString,
@@ -64,7 +64,7 @@ pub async fn put(
 }
 
 pub fn put_internal(
-    conn: &mut PgConnection,
+    conn: &mut TxnPgConnection,
     uvw: &mut UserVaultWrapper,
     tenant_auth: &SecretTenantAuthContext,
     scoped_user: &ScopedUser,

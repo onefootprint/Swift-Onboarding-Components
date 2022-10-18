@@ -1,4 +1,4 @@
-use crate::{assert_in_transaction, schema::tenant_role, DbError, DbResult};
+use crate::{schema::tenant_role, DbError, DbResult, TxnPgConnection};
 use diesel::prelude::*;
 
 use chrono::{DateTime, Utc};
@@ -21,13 +21,12 @@ pub struct TenantRole {
 }
 
 impl TenantRole {
-    pub fn get_or_create_admin_role(conn: &mut PgConnection, tenant_id: TenantId) -> DbResult<Self> {
-        assert_in_transaction(conn)?; // Doesn't make sense to lock outside of a txn
+    pub fn get_or_create_admin_role(conn: &mut TxnPgConnection, tenant_id: TenantId) -> DbResult<Self> {
         Tenant::lock(conn, &tenant_id)?;
         let role = tenant_role::table
             .filter(tenant_role::tenant_id.eq(&tenant_id))
             .filter(tenant_role::permissions.eq(TenantPermissionList(vec![TenantPermission::Admin])))
-            .first::<Self>(conn)
+            .first::<Self>(conn.conn())
             .optional()?;
         let role = if let Some(role) = role {
             role
@@ -53,29 +52,27 @@ impl TenantRole {
         Ok(result)
     }
 
-    pub fn get_active(conn: &mut PgConnection, id: &TenantRoleId, tenant_id: &TenantId) -> DbResult<Self> {
-        assert_in_transaction(conn)?;
+    pub fn get_active(conn: &mut TxnPgConnection, id: &TenantRoleId, tenant_id: &TenantId) -> DbResult<Self> {
         let role: TenantRole = tenant_role::table
             .filter(tenant_role::tenant_id.eq(tenant_id))
             .filter(tenant_role::id.eq(id))
             .for_no_key_update() // Make sure someone doesn't deactivate the role while we are using it
-            .first(conn)?;
+            .first(conn.conn())?;
         if role.deactivated_at.is_some() {
             return Err(DbError::TenantRoleDeactivated);
         }
         Ok(role)
     }
 
-    pub fn deactivate(conn: &mut PgConnection, id: &TenantRoleId, tenant_id: &TenantId) -> DbResult<Self> {
+    pub fn deactivate(conn: &mut TxnPgConnection, id: &TenantRoleId, tenant_id: &TenantId) -> DbResult<Self> {
         use crate::schema::tenant_user;
-        assert_in_transaction(conn)?; // Otherwise could create updates to multiple rows accidentally
         let role = Self::get_active(conn, id, tenant_id)?;
         // Make sure there are no users using this role before deactivating
         let num_active_users: i64 = tenant_user::table
             .filter(tenant_user::tenant_role_id.eq(&role.id))
             .filter(tenant_user::deactivated_at.is_null())
             .count()
-            .get_result(conn)?;
+            .get_result(conn.conn())?;
         if num_active_users > 0 {
             return Err(DbError::TenantRoleHasUsers(num_active_users));
         }
@@ -87,7 +84,7 @@ impl TenantRole {
             .filter(tenant_role::id.eq(id))
             .filter(tenant_role::tenant_id.eq(tenant_id))
             .set(update)
-            .load(conn)?;
+            .load(conn.conn())?;
 
         if results.len() > 1 {
             return Err(DbError::IncorrectNumberOfRowsUpdated);
@@ -97,13 +94,12 @@ impl TenantRole {
     }
 
     pub fn update(
-        conn: &mut PgConnection,
+        conn: &mut TxnPgConnection,
         tenant_id: &TenantId,
         id: &TenantRoleId,
         name: Option<String>,
         permissions: Option<TenantPermissionList>,
     ) -> DbResult<Self> {
-        assert_in_transaction(conn)?; // Otherwise could create updates to multiple rows accidentally
         let update = TenantRoleUpdate {
             name,
             permissions,
@@ -113,7 +109,7 @@ impl TenantRole {
             .filter(tenant_role::id.eq(id))
             .filter(tenant_role::tenant_id.eq(tenant_id))
             .set(update)
-            .load(conn)?;
+            .load(conn.conn())?;
 
         if results.len() > 1 {
             return Err(DbError::IncorrectNumberOfRowsUpdated);

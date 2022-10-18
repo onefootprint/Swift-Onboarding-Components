@@ -12,12 +12,14 @@ pub mod test_helpers;
 #[allow(clippy::extra_unused_lifetimes)]
 pub mod models;
 
+mod connection;
+pub use connection::TxnPgConnection;
+
 use std::time::Duration;
 
 pub use crate::errors::DbError;
 use deadpool::managed::{Hook, HookError};
 use deadpool_diesel::postgres::{Manager, Pool, Runtime};
-use diesel::connection::{AnsiTransactionManager, TransactionManager};
 pub use diesel::prelude::PgConnection;
 use diesel::prelude::*;
 use diesel_migrations::EmbeddedMigrations;
@@ -54,7 +56,7 @@ impl DbPool {
 
     pub async fn db_transaction<F, R, E>(&self, f: F) -> Result<R, E>
     where
-        F: FnOnce(&mut PgConnection) -> Result<R, E> + Send + 'static,
+        F: FnOnce(&mut TxnPgConnection) -> Result<R, E> + Send + 'static,
         E: From<DbError> + Send + 'static,
         R: Send + 'static,
     {
@@ -63,7 +65,8 @@ impl DbPool {
                 c.build_transaction()
                     .run(|conn| -> Result<_, TransactionError<E>> {
                         // Any error returned by f() is an ApplicationError
-                        f(conn).map_err(|e| TransactionError::ApplicationError(e))
+                        let mut conn = TxnPgConnection::new(conn);
+                        f(&mut conn).map_err(|e| TransactionError::ApplicationError(e))
                     })
             })
             .await?;
@@ -72,14 +75,6 @@ impl DbPool {
             TransactionError::ApplicationError(e) => e,
             TransactionError::DbError(e) => E::from(DbError::from(e)),
         })
-    }
-}
-
-pub fn assert_in_transaction(conn: &mut PgConnection) -> Result<(), DbError> {
-    let depth = AnsiTransactionManager::transaction_manager_status_mut(conn).transaction_depth()?;
-    match depth {
-        None => Err(DbError::NotInTransaction),
-        Some(_) => Ok(()),
     }
 }
 

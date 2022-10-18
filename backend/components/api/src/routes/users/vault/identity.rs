@@ -20,7 +20,7 @@ use actix_web::web::Query;
 use db::models::access_event::NewAccessEvent;
 use db::models::identity_data::HasIdentityDataFields;
 use db::models::insight_event::CreateInsightEvent;
-use db::PgConnection;
+use db::TxnPgConnection;
 
 use db::models::scoped_user::ScopedUser;
 use db::models::user_vault::UserVault;
@@ -77,7 +77,7 @@ pub async fn put(
 }
 
 pub fn put_internal(
-    conn: &mut PgConnection,
+    conn: &mut TxnPgConnection,
     uvw: &mut UserVaultWrapper,
     tenant_auth: &SecretTenantAuthContext,
     scoped_user: &ScopedUser,

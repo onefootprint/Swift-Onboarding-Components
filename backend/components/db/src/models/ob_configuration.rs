@@ -1,7 +1,7 @@
 use crate::schema::ob_configuration::BoxedQuery;
 use crate::schema::{ob_configuration, onboarding, tenant};
-use crate::DbPool;
-use crate::{assert_in_transaction, DbError};
+use crate::DbError;
+use crate::{DbPool, TxnPgConnection};
 use chrono::{DateTime, Utc};
 use diesel::pg::Pg;
 use diesel::prelude::*;
@@ -175,21 +175,20 @@ impl ObConfiguration {
     }
 
     pub fn update(
-        conn: &mut PgConnection,
+        conn: &mut TxnPgConnection,
         id: ObConfigurationId,
         tenant_id: TenantId,
         is_live: bool,
         name: Option<String>,
         status: Option<ApiKeyStatus>,
     ) -> Result<Self, DbError> {
-        assert_in_transaction(conn)?; // Otherwise could create updates to multiple rows accidentally
         let update = ObConfigurationUpdate { name, status };
         let results: Vec<Self> = diesel::update(ob_configuration::table)
             .filter(ob_configuration::id.eq(id))
             .filter(ob_configuration::tenant_id.eq(tenant_id))
             .filter(ob_configuration::is_live.eq(is_live))
             .set(update)
-            .load(conn)?;
+            .load(conn.conn())?;
 
         if results.len() > 1 {
             return Err(DbError::IncorrectNumberOfRowsUpdated);

@@ -1,13 +1,12 @@
 use crate::{errors::ApiError, utils::user_vault_wrapper::UserVaultWrapper};
 
 use db::{
-    assert_in_transaction,
     models::{
         audit_trail::AuditTrail,
         onboarding::{Onboarding, OnboardingUpdate},
         verification_request::VerificationRequest,
     },
-    PgConnection,
+    TxnPgConnection,
 };
 use newtypes::{
     AuditTrailEvent, KycStatus, SignalScope, TenantId, Vendor, VerificationInfo, VerificationInfoStatus,
@@ -19,7 +18,7 @@ pub(super) mod make_request;
 /// Build verification requests from the UserVaultWrapper and save.
 /// We save so that if something happens, we can always replay the requests
 pub fn build_verification_requests_and_checkpoint(
-    conn: &mut PgConnection,
+    conn: &mut TxnPgConnection,
     ob: Onboarding,
     uvw: &UserVaultWrapper,
     tenant_id: &TenantId,
@@ -27,8 +26,6 @@ pub fn build_verification_requests_and_checkpoint(
     vendors: Vec<Vendor>,
 ) -> Result<Vec<VerificationRequest>, ApiError> {
     // TODO decide when to re-KYC
-    assert_in_transaction(conn)?;
-
     // Create the VerificationRequest and mark the onboarding's kyc_status
     let ob = ob.update(conn, OnboardingUpdate::kyc_status(desired_status))?;
 

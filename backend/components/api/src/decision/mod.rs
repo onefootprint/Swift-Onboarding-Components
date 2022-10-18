@@ -1,6 +1,6 @@
 use db::{
     models::{ob_configuration::ObConfiguration, requirement::Requirement},
-    DbResult, PgConnection,
+    DbResult, TxnPgConnection,
 };
 use newtypes::{OnboardingId, UserVaultId};
 
@@ -58,7 +58,7 @@ pub(self) mod verification_result;
 
 /// Create requirements, checking if we have already satisfied them and adding any risk-related requirements
 pub fn create_requirements(
-    conn: &mut PgConnection,
+    conn: &mut TxnPgConnection,
     user_vault_id: &UserVaultId,
     onboarding_id: &OnboardingId,
     ob_config: &ObConfiguration,
@@ -69,7 +69,7 @@ pub fn create_requirements(
 /// Update statuses of Requirements to processing, checking if we can do so
 /// TODO: we need to add who or what is updating the status
 pub fn update_requirement_statuses_to_processing(
-    conn: &mut PgConnection,
+    conn: &mut TxnPgConnection,
     identity_data: Option<&IdentityDataUpdate>,
     user_vault_id: &UserVaultId,
 ) -> DbResult<Vec<Requirement>> {

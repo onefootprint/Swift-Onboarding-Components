@@ -1,6 +1,6 @@
-use crate::assert_in_transaction;
 use crate::models::tenant_api_key_access_log::TenantApiKeyAccessLog;
 use crate::schema::tenant_api_key::BoxedQuery;
+use crate::TxnPgConnection;
 use crate::{schema::tenant_api_key, DbError, DbPool};
 use chrono::{DateTime, Utc};
 use diesel::pg::Pg;
@@ -132,21 +132,20 @@ impl TenantApiKey {
     }
 
     pub fn update(
-        conn: &mut PgConnection,
+        conn: &mut TxnPgConnection,
         id: TenantApiKeyId,
         tenant_id: TenantId,
         is_live: bool,
         name: Option<String>,
         status: Option<ApiKeyStatus>,
     ) -> Result<Self, DbError> {
-        assert_in_transaction(conn)?;
         let update = TenantApiKeyUpdate { name, status };
         let results: Vec<Self> = diesel::update(tenant_api_key::table)
             .filter(tenant_api_key::id.eq(id))
             .filter(tenant_api_key::tenant_id.eq(tenant_id))
             .filter(tenant_api_key::is_live.eq(is_live))
             .set(update)
-            .load(conn)?;
+            .load(conn.conn())?;
 
         if results.len() > 1 {
             return Err(DbError::IncorrectNumberOfRowsUpdated);

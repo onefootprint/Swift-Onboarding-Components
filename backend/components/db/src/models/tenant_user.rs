@@ -1,8 +1,7 @@
 use crate::{
-    assert_in_transaction,
     models::tenant_role::TenantRole,
     schema::{tenant_role, tenant_user},
-    DbError, DbResult,
+    DbError, DbResult, TxnPgConnection,
 };
 use diesel::prelude::*;
 
@@ -74,7 +73,7 @@ impl TenantUser {
     }
 
     pub fn create(
-        conn: &mut PgConnection,
+        conn: &mut TxnPgConnection,
         email: TenantUserEmail,
         tenant_id: TenantId,
         tenant_role_id: TenantRoleId,
@@ -92,17 +91,16 @@ impl TenantUser {
         };
         let result = diesel::insert_into(tenant_user::table)
             .values(new_user)
-            .get_result(conn)?;
+            .get_result(conn.conn())?;
         Ok((result, tenant_role))
     }
 
     pub fn update(
-        conn: &mut PgConnection,
+        conn: &mut TxnPgConnection,
         tenant_id: &TenantId,
         id: &TenantUserId,
         update: TenantUserUpdate,
     ) -> DbResult<Self> {
-        assert_in_transaction(conn)?; // Otherwise could create updates to multiple rows accidentally
         if let Some(tenant_role_id) = update.tenant_role_id.as_ref() {
             // Make sure the role we are using belongs to the tenant, otherwise could update permissions to work on another tenant's role
             TenantRole::get_active(conn, tenant_role_id, tenant_id)?;
@@ -112,7 +110,7 @@ impl TenantUser {
             .filter(tenant_user::tenant_id.eq(tenant_id))
             .filter(tenant_user::id.eq(id))
             .set(update)
-            .load(conn)?;
+            .load(conn.conn())?;
 
         if results.len() > 1 {
             return Err(DbError::IncorrectNumberOfRowsUpdated);
