@@ -340,7 +340,7 @@
           "face-id": "Free use of our market-leading FaceID biometrics",
           "dashboard": "Dashboard that brings together your KYC + PII storage",
           "one-click": "Supports one-click",
-          "first-year-free": "First year free"
+          "first-year-free": "First year free *"
         },
         "options": {
           "pii": {
@@ -358,8 +358,7 @@
               "title": "All the benefits of PII Security Suite, and:"
             }
           }
-        },
-        "guarantee": "If we can’t integrate it in an afternoon, we’ll give you 1,000 free verifications."
+        }
       },
       "faq": {
         "title": "Frequently asked questions",

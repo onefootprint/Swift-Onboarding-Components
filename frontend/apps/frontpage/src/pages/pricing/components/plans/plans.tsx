@@ -1,29 +1,16 @@
-import { useTranslation } from '@onefootprint/hooks';
-import { media, Typography } from '@onefootprint/ui';
+import { media } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
 import DesktopPlans from './components/desktop-plans';
 import MobilePlans from './components/mobile-plans';
 
-const Plans = () => {
-  const { t } = useTranslation('pages.pricing.plans');
-  return (
-    <>
-      <PlansContainer>
-        <MobilePlans />
-        <DesktopPlans />
-      </PlansContainer>
-      <Typography
-        color="secondary"
-        variant="body-2"
-        sx={{ textAlign: 'center' }}
-      >
-        {t('guarantee')}
-      </Typography>
-    </>
-  );
-};
+const Plans = () => (
+  <PlansContainer>
+    <MobilePlans />
+    <DesktopPlans />
+  </PlansContainer>
+);
 
 const PlansContainer = styled.div`
   ${({ theme }) => css`
