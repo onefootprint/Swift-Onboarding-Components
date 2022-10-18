@@ -1,14 +1,16 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "Severity",
+  "title": "RiskSeverity",
   "description": "Describes the severity of of a risk signal",
   "type": "string",
   "enum": [
+    "info",
     "low",
     "medium",
     "high"
   ],
   "tsEnumNames": [
+    "info",
     "low",
     "medium",
     "high"

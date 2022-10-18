@@ -1,3 +1,4 @@
+use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use std::fmt::{Debug, Display};
 
@@ -14,7 +15,7 @@ pub mod sandbox;
 pub mod ssn;
 
 /// Represents a string that hides PII
-#[derive(Clone, Deserialize, Serialize, Default, PartialEq, Eq, Hash)]
+#[derive(Clone, Deserialize, Serialize, Default, PartialEq, Eq, Hash, JsonSchema)]
 #[serde(transparent)]
 pub struct PiiString(String);
 

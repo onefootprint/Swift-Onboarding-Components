@@ -7,7 +7,7 @@ use diesel::prelude::*;
 
 use chrono::{DateTime, Utc};
 use diesel::{Insertable, PgConnection, Queryable};
-use newtypes::{TenantId, TenantRoleId, TenantUserEmail, TenantUserId};
+use newtypes::{OrgMemberEmail, TenantId, TenantRoleId, TenantUserId};
 use serde::{Deserialize, Serialize};
 
 use super::tenant::Tenant;
@@ -17,7 +17,7 @@ use super::tenant::Tenant;
 pub struct TenantUser {
     pub id: TenantUserId,
     pub tenant_role_id: TenantRoleId,
-    pub email: TenantUserEmail,
+    pub email: OrgMemberEmail,
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
     pub created_at: DateTime<Utc>,
@@ -29,7 +29,7 @@ pub struct TenantUser {
 impl TenantUser {
     pub fn login_by_email(
         conn: &mut PgConnection,
-        email: TenantUserEmail,
+        email: OrgMemberEmail,
     ) -> DbResult<Option<(TenantUser, Tenant)>> {
         use crate::schema::tenant;
         let result: Option<(TenantRole, TenantUser, Tenant)> = tenant_role::table
@@ -74,7 +74,7 @@ impl TenantUser {
 
     pub fn create(
         conn: &mut TxnPgConnection,
-        email: TenantUserEmail,
+        email: OrgMemberEmail,
         tenant_id: TenantId,
         tenant_role_id: TenantRoleId,
     ) -> DbResult<(Self, TenantRole)> {
@@ -145,7 +145,7 @@ impl TenantUser {
 #[diesel(table_name = tenant_user)]
 struct NewTenantUser {
     tenant_role_id: TenantRoleId,
-    email: TenantUserEmail,
+    email: OrgMemberEmail,
     created_at: DateTime<Utc>,
     last_login_at: Option<DateTime<Utc>>,
     tenant_id: TenantId,

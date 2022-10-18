@@ -1,0 +1,54 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ListUsersRequest",
+  "type": "object",
+  "properties": {
+    "statuses": {
+      "default": [],
+      "type": "array",
+      "items": {
+        "tsType": "KycStatus"
+      }
+    },
+    "fingerprint": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "footprint_user_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "timestamp_lte": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "timestamp_gte": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    }
+  },
+  "definitions": {
+    "KycStatus": {
+      "description": "The type of data attribute",
+      "type": "string",
+      "enum": [
+        "new",
+        "processing",
+        "manual_review",
+        "step_up_required",
+        "verified",
+        "failed"
+      ]
+    }
+  }
+}

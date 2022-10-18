@@ -1,8 +1,8 @@
 pub mod insight_event;
 pub use self::insight_event::*;
 
-pub mod severity;
-pub use self::severity::*;
+pub mod risk_severity;
+pub use self::risk_severity::*;
 
 pub mod risk_signal;
 pub use self::risk_signal::*;
@@ -33,3 +33,13 @@ pub use self::org_member::*;
 
 pub mod org_role;
 pub use self::org_role::*;
+
+pub mod requirement;
+pub use self::requirement::*;
+
+pub mod decision;
+pub use self::decision::*;
+
+pub mod timeline_event;
+pub use self::timeline_event::*;
+

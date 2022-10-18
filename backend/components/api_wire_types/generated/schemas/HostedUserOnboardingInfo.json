@@ -1,101 +1,33 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "Onboarding",
-  "description": "Describes a liveness event that took place",
+  "title": "HostedUserOnboardingInfo",
+  "description": "Describes an onboarding of a user vault to a tenant",
   "type": "object",
   "required": [
-    "canAccessData",
-    "canAccessDataAttributes",
-    "canAccessIdentityDocumentImages",
-    "complianceStatus",
-    "configId",
-    "decisionId",
-    "id",
-    "insightEvent",
-    "isLivenessSkipped",
+    "can_access_data",
+    "insight_event",
     "name",
-    "timestamp",
-    "verificationStatus"
+    "timestamp"
   ],
   "properties": {
-    "id": {
-      "type": "string",
-      "format": "uuid"
-    },
-    "configId": {
-      "type": "string"
-    },
     "name": {
       "type": "string"
+    },
+    "insight_event": {
+      "tsType": "InsightEvent"
     },
     "timestamp": {
       "type": "string",
       "format": "date-time"
     },
-    "canAccessData": {
+    "can_access_data": {
       "type": "array",
       "items": {
         "tsType": "CollectedDataOption"
       }
-    },
-    "canAccessDataAttributes": {
-      "type": "array",
-      "items": {
-        "tsType": "DataAttribute"
-      }
-    },
-    "canAccessIdentityDocumentImages": {
-      "type": "boolean"
-    },
-    "insightEvent": {
-      "tsType": "InsightEvent"
-    },
-    "isLivenessSkipped": {
-      "type": "boolean"
-    },
-    "verificationStatus": {
-      "tsType": "VerificationStatus"
-    },
-    "complianceStatus": {
-      "tsType": "ComplianceStatus"
-    },
-    "decisionId": {
-      "type": "string"
     }
   },
   "definitions": {
-    "CollectedDataOption": {
-      "type": "string",
-      "enum": [
-        "name",
-        "dob",
-        "ssn4",
-        "ssn9",
-        "full_address",
-        "partial_address",
-        "email",
-        "phone_number"
-      ]
-    },
-    "DataAttribute": {
-      "description": "The type of data attribute",
-      "type": "string",
-      "enum": [
-        "first_name",
-        "last_name",
-        "dob",
-        "ssn9",
-        "address_line1",
-        "address_line2",
-        "city",
-        "state",
-        "zip",
-        "country",
-        "email",
-        "phone_number",
-        "ssn4"
-      ]
-    },
     "InsightEvent": {
       "description": "Describes a device insight event with locations and IP of the event",
       "type": "object",
@@ -177,22 +109,17 @@
         }
       }
     },
-    "VerificationStatus": {
-      "description": "The type of requirement",
+    "CollectedDataOption": {
       "type": "string",
       "enum": [
-        "failed",
-        "processing",
-        "manual_review",
-        "verified"
-      ]
-    },
-    "ComplianceStatus": {
-      "description": "The type of requirement",
-      "type": "string",
-      "enum": [
-        "alerts",
-        "compliant"
+        "name",
+        "dob",
+        "ssn4",
+        "ssn9",
+        "full_address",
+        "partial_address",
+        "email",
+        "phone_number"
       ]
     }
   }

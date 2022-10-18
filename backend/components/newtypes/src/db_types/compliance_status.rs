@@ -28,16 +28,8 @@ use strum_macros::{AsRefStr, Display, EnumIter, EnumString};
 #[strum(serialize_all = "snake_case")]
 #[serde(rename_all = "snake_case")]
 #[diesel(sql_type = Text)]
-pub enum RequirementKind {
-    Name,
-    Dob,
-    Ssn4,
-    Ssn9,
-    FullAddress,
-    PartialAddress,
-    Email,
-    PhoneNumber,
-    IdentityDocument,
-    Liveness,
+pub enum ComplianceStatus {
+    Alerts,
+    Compliant,
 }
-crate::util::impl_enum_str_diesel!(RequirementKind);
+crate::util::impl_enum_str_diesel!(ComplianceStatus);

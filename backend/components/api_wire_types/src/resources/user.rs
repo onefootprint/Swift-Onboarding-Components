@@ -9,7 +9,9 @@ pub struct User {
     pub identity_data_attributes: Vec<DataAttribute>,
     pub start_timestamp: DateTime<Utc>,
     pub ordering_id: i64,
+    pub requirements: Vec<Requirement>,
     pub onboardings: Vec<Onboarding>,
+    pub decisions: Vec<Decision>,
     pub is_portable: bool,
 }
 

@@ -39,6 +39,10 @@ macro_rules! define_newtype_id {
         }
 
         impl $name {
+            pub fn test_data(v: $type) -> Self {
+                Self(v)
+            }
+
             #[allow(unused)]
             #[cfg(test)]
             pub(crate) fn escape_hatch(v: $type) -> Self {
@@ -49,10 +53,10 @@ macro_rules! define_newtype_id {
 }
 
 // define our raw ids here
-define_newtype_id!(TenantId, String, "Identifier for a Tenant");
-define_newtype_id!(TenantRoleId, String, "Identifier for a TenantRole");
-define_newtype_id!(TenantUserId, String, "Identifier for a TenantUser");
-define_newtype_id!(TenantApiKeyId, String, "Primary Key for an api key");
+define_newtype_id!(TenantId, String, "Identifier for a Org");
+define_newtype_id!(TenantRoleId, String, "Identifier for a Org role");
+define_newtype_id!(TenantUserId, String, "Identifier for a Org user");
+define_newtype_id!(TenantApiKeyId, String, "Identifier for an org api key");
 define_newtype_id!(UserVaultId, String, "Identifier for a User Vault");
 
 define_newtype_id!(FingerprintId, Uuid, "Identifier for a fingerprint");
@@ -94,6 +98,8 @@ define_newtype_id!(KvDataKey, String, "Represents the tag/key of key-value data"
 define_newtype_id!(DocumentRequestId, String, "Identifier for a DocumentRequest");
 define_newtype_id!(IdentityDocumentId, String, "Identifier for an IdentityDocument");
 define_newtype_id!(RequirementId, String, "Identifier for a Requirement");
+define_newtype_id!(DecisionId, String, "Identifier for a decision");
+define_newtype_id!(RiskSignalId, String, "Identifier for a risk signal");
 
 impl ObConfigurationKey {
     /// prefixed on LIVE keys

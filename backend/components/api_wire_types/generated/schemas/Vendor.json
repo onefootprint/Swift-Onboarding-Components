@@ -1,0 +1,21 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Vendor",
+  "type": "string",
+  "enum": [
+    "footprint",
+    "idology",
+    "socure",
+    "lexis_nexis",
+    "experian",
+    "twilio"
+  ],
+  "tsEnumNames": [
+    "footprint",
+    "idology",
+    "socure",
+    "lexis_nexis",
+    "experian",
+    "twilio"
+  ]
+}

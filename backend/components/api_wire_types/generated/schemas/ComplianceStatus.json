@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ComplianceStatus",
+  "description": "The type of requirement",
+  "type": "string",
+  "enum": [
+    "alerts",
+    "compliant"
+  ],
+  "tsEnumNames": [
+    "alerts",
+    "compliant"
+  ]
+}

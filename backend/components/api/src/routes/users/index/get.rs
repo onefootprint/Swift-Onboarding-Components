@@ -10,30 +10,24 @@ use crate::types::response::PaginatedResponseData;
 use crate::utils::db2api::DbToApi;
 use crate::utils::user_vault_wrapper::UserVaultWrapper;
 use crate::State;
-use chrono::{DateTime, Utc};
+use api_wire_types::ListUsersRequest;
+use chrono::{Utc};
 use db::models::identity_data::HasIdentityDataFields;
 use db::models::onboarding::Onboarding;
 use db::models::onboarding::OnboardingInfo;
 use db::models::scoped_user::ScopedUser;
 use db::scoped_user::OnboardingListQueryParams;
-use newtypes::csv::deserialize_stringified_list;
-use newtypes::KycStatus;
+
+use newtypes::DecisionId;
+
+use newtypes::OnboardingId;
+use newtypes::RequirementId;
+use newtypes::RequirementKind;
 use newtypes::TenantPermission;
 use newtypes::UserVaultId;
-use newtypes::{DataAttribute, Fingerprint, Fingerprinter, FootprintUserId, PiiString};
-use paperclip::actix::{api_v2_operation, get, web, web::Json, Apiv2Schema};
-
-#[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize, Apiv2Schema)]
-#[serde(rename_all = "snake_case")]
-pub struct UsersRequest {
-    #[serde(default)]
-    #[serde(deserialize_with = "deserialize_stringified_list")]
-    statuses: Vec<KycStatus>,
-    fingerprint: Option<PiiString>,
-    footprint_user_id: Option<FootprintUserId>,
-    timestamp_lte: Option<DateTime<Utc>>,
-    timestamp_gte: Option<DateTime<Utc>>,
-}
+use newtypes::Vendor;
+use newtypes::{DataAttribute, Fingerprint, Fingerprinter};
+use paperclip::actix::{api_v2_operation, get, web, web::Json};
 
 type UsersResponse = Vec<api_wire_types::User>;
 
@@ -46,7 +40,7 @@ type UsersResponse = Vec<api_wire_types::User>;
 #[get("/users")]
 pub async fn get(
     state: web::Data<State>,
-    request: web::Query<PaginatedRequest<UsersRequest, i64>>,
+    request: web::Query<PaginatedRequest<ListUsersRequest, i64>>,
     auth: Either<WorkOsAuthContext, SecretTenantAuthContext>,
 ) -> actix_web::Result<Json<PaginatedResponseData<UsersResponse, i64>>, ApiError> {
     let auth = auth.check_permissions(vec![TenantPermission::Users])?;
@@ -54,7 +48,7 @@ pub async fn get(
 
     let cursor = request.cursor;
     let page_size = request.page_size(&state);
-    let UsersRequest {
+    let ListUsersRequest {
         statuses,
         fingerprint,
         footprint_user_id,
@@ -146,14 +140,86 @@ impl<'a> DbToApi<UserDetail<'a>> for api_wire_types::User {
 
         api_wire_types::User {
             footprint_user_id: fp_user_id,
-            identity_data_attributes,
             start_timestamp,
+            identity_data_attributes,
             ordering_id,
             is_portable,
             onboardings: onboarding_info
                 .iter()
                 .map(|x| api_wire_types::Onboarding::from_db(x.clone()))
                 .collect(),
+
+            // TODO: needs real data
+            requirements: vec![
+                RequirementKind::Name,
+                RequirementKind::Dob,
+                RequirementKind::FullAddress,
+                RequirementKind::Ssn9,
+                RequirementKind::Liveness,
+            ]
+            .into_iter()
+            .map(|kind| api_wire_types::Requirement {
+                id: RequirementId::default(),
+                onboarding_id: OnboardingId::default(),
+                kind,
+                initiator: newtypes::RequirementInitiator::Tenant,
+                status: api_wire_types::RequirementVerificationStatus::Verified,
+                vendors: vec![Vendor::Idology, Vendor::Twilio],
+                risk_signal_ids: vec![],
+                fulfilled_at: Utc::now(),
+            })
+            .collect(),
+            decisions: vec![api_wire_types::Decision {
+                id: DecisionId::default(),
+                verification_status: newtypes::VerificationStatus::Verified,
+                compliance_status: newtypes::ComplianceStatus::Compliant,
+                source: api_wire_types::DecisionSource::Footprint,
+                timestamp: Utc::now(),
+            }],
+        }
+    }
+}
+
+impl DbToApi<OnboardingInfo> for api_wire_types::Onboarding {
+    fn from_db((onboarding, config, insight): OnboardingInfo) -> Self {
+        let Onboarding {
+            start_timestamp,
+            is_liveness_skipped,
+            kyc_status,
+            ..
+        } = onboarding;
+        let db::models::ob_configuration::ObConfiguration {
+            name,
+            can_access_data,
+            can_access_identity_document_images,
+            ..
+        } = config;
+        let can_access_data_attributes = can_access_data.iter().flat_map(|x| x.attributes()).collect();
+        api_wire_types::Onboarding {
+            name,
+            timestamp: start_timestamp,
+
+            can_access_data,
+            can_access_data_attributes,
+            insight_event: api_wire_types::InsightEvent::from_db(insight),
+
+            id: onboarding.id,
+            config_id: config.id,
+            can_access_identity_document_images,
+            is_liveness_skipped,
+
+            // TODO: replace kyc_status with new DB updates
+            verification_status: match kyc_status {
+                newtypes::KycStatus::New
+                | newtypes::KycStatus::StepUpRequired
+                | newtypes::KycStatus::Processing => newtypes::VerificationStatus::Processing,
+                newtypes::KycStatus::ManualReview => newtypes::VerificationStatus::ManualReview,
+                newtypes::KycStatus::Verified => newtypes::VerificationStatus::Verified,
+                newtypes::KycStatus::Failed => newtypes::VerificationStatus::Failed,
+            },
+            // TODO: fix with real data
+            compliance_status: newtypes::ComplianceStatus::Compliant,
+            decision_id: DecisionId::default(),
         }
     }
 }

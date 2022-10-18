@@ -1,0 +1,38 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "DecisionSource",
+  "oneOf": [
+    {
+      "type": "object",
+      "required": [
+        "kind"
+      ],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "footprint"
+          ]
+        }
+      }
+    },
+    {
+      "type": "object",
+      "required": [
+        "kind",
+        "member"
+      ],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "organization"
+          ]
+        },
+        "member": {
+          "type": "string"
+        }
+      }
+    }
+  ]
+}

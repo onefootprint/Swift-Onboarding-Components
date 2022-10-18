@@ -55,6 +55,14 @@ export const enum CollectedDataOption {
 }
 
 /**
+ * The type of requirement
+ */
+export const enum ComplianceStatus {
+  alerts = "alerts",
+  compliant = "compliant"
+}
+
+/**
  * The type of data attribute
  */
 export const enum DataAttribute {
@@ -71,6 +79,49 @@ export const enum DataAttribute {
   email = "email",
   phone_number = "phone_number",
   ssn4 = "ssn4"
+}
+
+export interface Decision {
+  id: string;
+  verification_status: VerificationStatus;
+  compliance_status: ComplianceStatus;
+  source: DecisionSource;
+  timestamp: string;
+}
+
+export interface DecisionEvent {
+  decisionId: string;
+}
+
+export type DecisionSource =
+  | {
+      kind: "footprint";
+    }
+  | {
+      kind: "organization";
+      member: string;
+    };
+
+/**
+ * Describes an onboarding of a user vault to a tenant
+ */
+export interface HostedAuthorizedOrgs {
+  id: string;
+  tenant_id: string;
+  name: string;
+  logo_url?: string | null;
+  timestamp: string;
+  onboardings: HostedUserOnboardingInfo[];
+}
+
+/**
+ * Describes an onboarding of a user vault to a tenant
+ */
+export interface HostedUserOnboardingInfo {
+  name: string;
+  insight_event: InsightEvent;
+  timestamp: string;
+  can_access_data: CollectedDataOption[];
 }
 
 /**
@@ -103,6 +154,14 @@ export const enum KycStatus {
   failed = "failed"
 }
 
+export interface ListUsersRequest {
+  statuses?: KycStatus[];
+  fingerprint?: string | null;
+  footprint_user_id?: string | null;
+  timestamp_lte?: string | null;
+  timestamp_gte?: string | null;
+}
+
 /**
  * Describes a liveness event that took place
  */
@@ -114,12 +173,18 @@ export interface LivenessEvent {
  * Describes a liveness event that took place
  */
 export interface Onboarding {
+  id: string;
+  configId: string;
   name: string;
   timestamp: string;
-  kycStatus: KycStatus;
   canAccessData: CollectedDataOption[];
   canAccessDataAttributes: DataAttribute[];
+  canAccessIdentityDocumentImages: boolean;
   insightEvent: InsightEvent;
+  isLivenessSkipped: boolean;
+  verificationStatus: VerificationStatus;
+  complianceStatus: ComplianceStatus;
+  decisionId: string;
 }
 
 /**
@@ -136,6 +201,10 @@ export interface OnboardingConfiguration {
   isLive: boolean;
   createdAt: string;
   status: ApiKeyStatus;
+}
+
+export interface OnboardingEvent {
+  onboardingId: string;
 }
 
 /**
@@ -169,12 +238,78 @@ export interface OrganizationRole {
   createdAt: string;
 }
 
+export interface Requirement {
+  id: string;
+  onboardingId: string;
+  kind: RequirementKind;
+  initiator: RequirementInitiator;
+  status: RequirementVerificationStatus;
+  vendors: Vendor[];
+  riskSignalIds: string[];
+  fulfilledAt: string;
+}
+
+export interface RequirementFulfilledEvent {
+  requirementId: string;
+  vendors: Vendor[];
+  /**
+   * contains meta data about the event
+   */
+  attributes: {
+    [k: string]: string;
+  };
+}
+
+/**
+ * Who initiated this requirement
+ */
+export const enum RequirementInitiator {
+  footprint = "footprint",
+  tenant = "tenant",
+  step_up = "step_up"
+}
+
+/**
+ * The type of requirement
+ */
+export const enum RequirementKind {
+  name = "name",
+  dob = "dob",
+  ssn4 = "ssn4",
+  ssn9 = "ssn9",
+  full_address = "full_address",
+  partial_address = "partial_address",
+  email = "email",
+  phone_number = "phone_number",
+  identity_document = "identity_document",
+  liveness = "liveness"
+}
+
+export const enum RequirementVerificationStatus {
+  Failed = "Failed",
+  Verified = "Verified"
+}
+
+/**
+ * Describes the severity of of a risk signal
+ */
+export const enum RiskSeverity {
+  info = "info",
+  low = "low",
+  medium = "medium",
+  high = "high"
+}
+
 /**
  * A risk event
  */
 export interface RiskSignal {
   id: string;
-  level: Severity;
+  decisionId: string;
+  reasonCode: string;
+  note: string;
+  severity: RiskSeverity;
+  vendors: Vendor[];
   timestamp: string;
 }
 
@@ -189,15 +324,6 @@ export interface SecretApiKey {
   key?: string | null;
   lastUsedAt?: string | null;
   isLive: boolean;
-}
-
-/**
- * Describes the severity of of a risk signal
- */
-export const enum Severity {
-  low = "low",
-  medium = "medium",
-  high = "high"
 }
 
 export type TenantPermission =
@@ -233,11 +359,61 @@ export type TenantPermission =
 /**
  * Describes a liveness event that took place
  */
+export interface TimelineEvent {
+  event: TimelineEventKind;
+  timestamp: string;
+}
+
+export type TimelineEventKind =
+  | {
+      kind: "requirement_fulfilled";
+      requirementId: string;
+      vendors: Vendor[];
+      /**
+       * contains meta data about the event
+       */
+      attributes: {
+        [k: string]: string;
+      };
+    }
+  | {
+      kind: "decision";
+      decisionId: string;
+    }
+  | {
+      kind: "onboard";
+      onboardingId: string;
+    };
+
+/**
+ * Describes a liveness event that took place
+ */
 export interface User {
   footprintUserId: string;
   identityDataAttributes: DataAttribute[];
   startTimestamp: string;
   orderingId: number;
+  requirements: Requirement[];
   onboardings: Onboarding[];
+  decisions: Decision[];
   isPortable: boolean;
+}
+
+export const enum Vendor {
+  footprint = "footprint",
+  idology = "idology",
+  socure = "socure",
+  lexis_nexis = "lexis_nexis",
+  experian = "experian",
+  twilio = "twilio"
+}
+
+/**
+ * The type of requirement
+ */
+export const enum VerificationStatus {
+  failed = "failed",
+  processing = "processing",
+  manual_review = "manual_review",
+  verified = "verified"
 }

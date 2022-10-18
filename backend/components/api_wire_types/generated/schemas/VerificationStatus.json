@@ -1,0 +1,18 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "VerificationStatus",
+  "description": "The type of requirement",
+  "type": "string",
+  "enum": [
+    "failed",
+    "processing",
+    "manual_review",
+    "verified"
+  ],
+  "tsEnumNames": [
+    "failed",
+    "processing",
+    "manual_review",
+    "verified"
+  ]
+}

@@ -1,24 +1,18 @@
 use crate::auth::user::{UserAuth, UserAuthContext, UserAuthScope};
 use crate::errors::ApiError;
 use crate::types::response::ResponseData;
+
 use crate::utils::db2api::DbToApi;
 use crate::State;
-use db::models::onboarding::{Onboarding, OnboardingInfo};
+
+use api_wire_types::hosted::{HostedAuthorizedOrgs, HostedUserOnboardingInfo};
+use api_wire_types::InsightEvent;
+use db::models::onboarding::Onboarding;
 use db::models::scoped_user::ScopedUser;
-use newtypes::{ScopedUserId, TenantId};
-use paperclip::actix::{self, api_v2_operation, web, web::Json, Apiv2Schema};
 
-type AuthorizedOrgsResponse = Vec<FpUserOnboarding>;
+use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
-/// Describes an onboarding of a user vault to a tenant
-#[derive(Debug, Clone, serde::Deserialize, serde::Serialize, Apiv2Schema)]
-pub struct FpUserOnboarding {
-    id: ScopedUserId,
-    tenant_id: TenantId,
-    name: String,
-    logo_url: Option<String>,
-    onboardings: Vec<api_wire_types::Onboarding>,
-}
+type AuthorizedOrgsResponse = Vec<HostedAuthorizedOrgs>;
 
 #[api_v2_operation(
     tags(Hosted),
@@ -43,42 +37,24 @@ pub async fn get(
         .await??;
     let results = scoped_users
         .into_iter()
-        .map(|(scoped_user, tenant)| FpUserOnboarding {
+        .map(|(scoped_user, tenant)| HostedAuthorizedOrgs {
             tenant_id: scoped_user.tenant_id,
             name: tenant.name,
             logo_url: tenant.logo_url,
+            timestamp: scoped_user.start_timestamp,
             onboardings: obs
                 .get(&scoped_user.id)
                 .unwrap_or(&vec![])
                 .iter()
-                .map(|x| api_wire_types::Onboarding::from_db(x.clone()))
+                .map(|(ob, conf, insight)| HostedUserOnboardingInfo {
+                    name: conf.name.clone(),
+                    insight_event: InsightEvent::from_db(insight.clone()),
+                    timestamp: ob.start_timestamp,
+                    can_access_data: conf.can_access_data.clone(),
+                })
                 .collect(),
             id: scoped_user.id,
         })
         .collect();
     Ok(Json(ResponseData::ok(results)))
-}
-
-impl DbToApi<OnboardingInfo> for api_wire_types::Onboarding {
-    fn from_db((onboarding, config, insight): OnboardingInfo) -> Self {
-        let Onboarding {
-            start_timestamp,
-            kyc_status,
-            ..
-        } = onboarding;
-        let db::models::ob_configuration::ObConfiguration {
-            name,
-            can_access_data,
-            ..
-        } = config;
-        let can_access_data_attributes = can_access_data.iter().flat_map(|x| x.attributes()).collect();
-        api_wire_types::Onboarding {
-            name,
-            timestamp: start_timestamp,
-            kyc_status,
-            can_access_data,
-            can_access_data_attributes,
-            insight_event: api_wire_types::InsightEvent::from_db(insight),
-        }
-    }
 }

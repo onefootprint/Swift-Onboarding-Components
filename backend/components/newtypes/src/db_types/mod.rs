@@ -2,6 +2,7 @@ mod access_event_kind;
 mod attestation_type;
 mod audit_trail_event;
 mod collected_data;
+mod compliance_status;
 mod d2p_session_status;
 mod data_attribute;
 mod data_identifier;
@@ -10,19 +11,20 @@ mod document_request_status;
 mod fingerprint;
 mod kyc_status;
 mod ob_config_status;
-mod requirement;
+mod requirement_status2;
 mod requirement_kind;
 mod requirement_status;
 mod sealed_bytes;
 mod tenant_permission;
-mod tenant_user_email;
+mod org_member_email;
 mod vault_key_pair;
 mod vendor;
+mod verification_status;
 
 pub use self::{
     access_event_kind::*, attestation_type::*, audit_trail_event::*, collected_data::*,
-    d2p_session_status::*, data_attribute::*, data_identifier::*, data_priority::*,
-    document_request_status::*, fingerprint::*, kyc_status::*, ob_config_status::*, requirement::*,
-    requirement_kind::*, requirement_status::*, sealed_bytes::*, tenant_permission::*, tenant_user_email::*,
-    vault_key_pair::*, vendor::*,
+    compliance_status::*, d2p_session_status::*, data_attribute::*, data_identifier::*,
+    data_priority::*, document_request_status::*, fingerprint::*, kyc_status::*, ob_config_status::*,
+    requirement_status2::*, requirement_kind::*, requirement_status::*, sealed_bytes::*, tenant_permission::*,
+    org_member_email::*, vault_key_pair::*, vendor::*, verification_status::*,
 };

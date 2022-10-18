@@ -5,12 +5,21 @@ use crate::*;
 #[schemars(rename_all = "camelCase")]
 
 pub struct Onboarding {
+    pub id: OnboardingId,
+    pub config_id: ObConfigurationId,
+
     pub name: String,
     pub timestamp: DateTime<Utc>,
-    pub kyc_status: KycStatus,
     pub can_access_data: Vec<CollectedDataOption>,
     pub can_access_data_attributes: Vec<DataAttribute>,
+    pub can_access_identity_document_images: bool,
+
     pub insight_event: InsightEvent,
+    pub is_liveness_skipped: bool,
+
+    pub verification_status: VerificationStatus,
+    pub compliance_status: ComplianceStatus,
+    pub decision_id: DecisionId,
 }
 
 export_schema!(Onboarding);

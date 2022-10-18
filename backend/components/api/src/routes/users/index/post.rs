@@ -54,6 +54,8 @@ impl DbToApi<ScopedUser> for api_wire_types::User {
             ordering_id,
             onboardings: vec![],
             is_portable: false,
+            requirements: vec![],
+            decisions: vec![],
         }
     }
 }

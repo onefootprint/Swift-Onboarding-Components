@@ -4,16 +4,35 @@
   "description": "A risk event",
   "type": "object",
   "required": [
+    "decisionId",
     "id",
-    "level",
-    "timestamp"
+    "note",
+    "reasonCode",
+    "severity",
+    "timestamp",
+    "vendors"
   ],
   "properties": {
     "id": {
       "type": "string"
     },
-    "level": {
-      "tsType": "Severity"
+    "decisionId": {
+      "type": "string"
+    },
+    "reasonCode": {
+      "type": "string"
+    },
+    "note": {
+      "type": "string"
+    },
+    "severity": {
+      "tsType": "RiskSeverity"
+    },
+    "vendors": {
+      "type": "array",
+      "items": {
+        "tsType": "Vendor"
+      }
     },
     "timestamp": {
       "type": "string",
@@ -21,13 +40,25 @@
     }
   },
   "definitions": {
-    "Severity": {
+    "RiskSeverity": {
       "description": "Describes the severity of of a risk signal",
       "type": "string",
       "enum": [
+        "info",
         "low",
         "medium",
         "high"
+      ]
+    },
+    "Vendor": {
+      "type": "string",
+      "enum": [
+        "footprint",
+        "idology",
+        "socure",
+        "lexis_nexis",
+        "experian",
+        "twilio"
       ]
     }
   }

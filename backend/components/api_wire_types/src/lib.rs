@@ -5,6 +5,11 @@ use serde::{Deserialize, Serialize};
 mod newtype_exports;
 
 pub mod resources;
+pub(crate) use newtypes::*;
+pub use resources::*;
+pub mod hosted;
+pub mod requests;
+pub use self::requests::*;
 
 #[macro_use]
 pub mod util {
@@ -80,7 +85,3 @@ pub mod util {
     pub(crate) use export_schema;
 }
 pub(crate) use self::util::export_schema;
-
-pub use resources::*;
-
-pub(crate) use newtypes::*;
