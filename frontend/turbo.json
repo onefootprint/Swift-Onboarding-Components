@@ -5,8 +5,12 @@
       "dependsOn": [
         "^build",
         "$API_BASE_URL",
+        "$FORCE_FOOTPRINT_JS_TO_USE_LOCAL",
         "$GHOST_API_URL",
         "$GHOST_CONTENT_API_KEY",
+        "$IS_LOCAL",
+        "$IS_VERCEL_ENV_DEV",
+        "$IS_VERCEL_ENV_PREV",
         "$NEXT_PUBLIC_API_BASE_URL",
         "$NEXT_PUBLIC_FATHOM_TRACKING_CODE",
         "$NEXT_PUBLIC_GOOGLE_MAPS_KEY",
@@ -18,16 +22,21 @@
         "$NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA",
         "$NEXT_PUBLIC_VERCEL_URL",
         "$NODE_ENV",
-        "$REVALIDATE_SECRET_TOKEN",
-        "$IS_LOCAL",
-        "$IS_VERCEL_ENV_DEV",
-        "$IS_VERCEL_ENV_PREV"
+        "$REVALIDATE_SECRET_TOKEN"
       ],
       "outputs": ["dist/**", ".next/**", "public/dist/**"]
     },
     "test": {
       "dependsOn": ["^build"],
       "outputs": ["coverage/**"]
+    },
+    "start": {
+      "dependsOn": [],
+      "outputs": []
+    },
+    "test:e2e": {
+      "dependsOn": [],
+      "outputs": []
     },
     "lint": {
       "dependsOn": ["^build"],

@@ -20,7 +20,11 @@
     "typecheck": "turbo run typecheck",
     "clean": "turbo run clean && rm -rf node_modules",
     "version": "changeset version",
-    "release": "changeset publish"
+    "release": "changeset publish",
+    "start:demo": "turbo run start --filter=demo...",
+    "start:bifrost": "turbo run start --filter=bifrost...",
+    "test:e2e": "turbo run test:e2e",
+    "test:e2e:ci": "start-server-and-test start:bifrost http://localhost:3000 start:demo http://localhost:3002 test:e2e"
   },
   "devDependencies": {
     "@changesets/cli": "^2.24.3",
@@ -33,9 +37,10 @@
     "jest-watch-typeahead": "^1.1.0",
     "lint-staged": "^13.0.3",
     "prettier": "^2.7.1",
+    "start-server-and-test": "^1.14.0",
+    "tsup": "6.2.3",
     "turbo": "1.4.7",
-    "webpack": "^5.72.0",
-    "tsup": "6.2.3"
+    "webpack": "^5.72.0"
   },
   "lint-staged": {
     "*.{jsx,js,ts,tsx}": [

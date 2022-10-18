@@ -7,11 +7,12 @@
     "dev:https": "local-ssl-proxy --source 4005 --target 3002",
     "build": "next build",
     "build:analyze": "ANALYZE=true yarn build",
-    "start": "next start",
+    "start": "next start -p 3002",
     "lint": "eslint src --fix",
     "typecheck": "yarn tsc --noEmit",
     "clean": "rm -rf .turbo && rm -rf .next && rm -rf node_modules",
-    "set:dot-env": "vercel env pull"
+    "set:dot-env": "vercel env pull",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "@onefootprint/footprint-js": "*",
@@ -24,13 +25,14 @@
     "@tryghost/content-api": "^1.11.0",
     "next": "12.3.1",
     "polished": "^4.2.2",
-    "react-dom": "18.2.0",
     "react": "18.2.0",
+    "react-dom": "18.2.0",
     "styled-components": "^5.3.6"
   },
   "devDependencies": {
     "@next/bundle-analyzer": "^12.1.6",
     "@onefootprint/jest-presets": "*",
+    "@playwright/test": "^1.27.1",
     "@sentry/browser": "^6.19.7",
     "@tanstack/react-query": "^4.9.0",
     "@types/node": "^17.0.12",
