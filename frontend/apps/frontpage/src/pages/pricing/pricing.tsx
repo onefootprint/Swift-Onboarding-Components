@@ -9,6 +9,8 @@ import Plans from './components/plans';
 
 const Pricing = () => {
   const { t } = useTranslation('pages.pricing');
+  const { t: faq } = useTranslation('pages.pricing.faq.questions');
+
   return (
     <>
       <SEO title={t('html-title')} slug="/pricing" />
@@ -37,39 +39,54 @@ const Pricing = () => {
           title={t('faq.title')}
           items={[
             {
-              content: t('faq.questions.credits.content'),
               id: 'credits',
-              title: t('faq.questions.credits.title'),
+              content: faq('credits.content'),
+              title: faq('credits.title'),
             },
             {
-              content: t('faq.questions.get-first-year-free.content'),
-              id: 'get-first-year-free',
-              title: t('faq.questions.get-first-year-free.title'),
+              id: 'one-click-kyc-difference',
+              content: faq('one-click-kyc-difference.content'),
+              title: faq('one-click-kyc-difference.title'),
             },
             {
-              content: t('faq.questions.one-click-charge.content'),
               id: 'one-click-charge',
-              title: t('faq.questions.one-click-charge.title'),
+              content: faq('one-click-charge.content'),
+              title: faq('one-click-charge.title'),
             },
             {
-              content: t('faq.questions.competitor-pricing.content'),
+              id: 'how-to-recoup',
+              content: faq('how-to-recoup.content'),
+              title: faq('how-to-recoup.title'),
+            },
+            {
               id: 'competitor-pricing',
-              title: t('faq.questions.competitor-pricing.title'),
+              content: faq('competitor-pricing.content'),
+              title: faq('competitor-pricing.title'),
             },
             {
-              content: t('faq.questions.business-model.content'),
+              id: 'step-up-pricing',
+              content: faq('step-up-pricing.content'),
+              title: faq('step-up-pricing.title'),
+            },
+            {
+              id: 'failure-charge',
+              content: faq('failure-charge.content'),
+              title: faq('failure-charge.title'),
+            },
+            {
               id: 'business-model',
-              title: t('faq.questions.business-model.title'),
+              content: faq('business-model.content'),
+              title: faq('business-model.title'),
             },
             {
-              content: t('faq.questions.disclose-pricing.content'),
               id: 'disclose-pricing',
-              title: t('faq.questions.disclose-pricing.title'),
+              content: faq('disclose-pricing.content'),
+              title: faq('disclose-pricing.title'),
             },
             {
-              content: t('faq.questions.drivers-license-scans.content'),
               id: 'drivers-license-scans',
-              title: t('faq.questions.drivers-license-scans.title'),
+              content: faq('drivers-license-scans.content'),
+              title: faq('drivers-license-scans.title'),
             },
           ]}
         />
