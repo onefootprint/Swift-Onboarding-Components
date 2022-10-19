@@ -69,11 +69,6 @@ pub fn build_verification_requests_and_checkpoint(
             vendor: Vendor::LexisNexis,
             status: final_status,
         },
-        VerificationInfo {
-            attributes: vec![],
-            vendor: Vendor::Footprint,
-            status: final_status,
-        },
     ];
     events.into_iter().try_for_each(|e| {
         AuditTrail::create(
