@@ -1,6 +1,7 @@
 use db::{models::requirement::CreateRequirementConfig, PgConnection};
 use newtypes::{
-    AuditTrailEvent, KycStatus, OnboardingId, RequirementKind, RequirementStatus2, Vendor, VerificationInfo,
+    AuditTrailEvent, OnboardingId, OnboardingStatus, RequirementKind, RequirementStatus2, Vendor,
+    VerificationInfo,
 };
 
 use db::models::{
@@ -34,7 +35,7 @@ pub(super) fn can_update_status_for_kind(
 pub async fn create_final_decision(
     state: &State,
     ob_id: OnboardingId,
-    result_statuses: Vec<Option<KycStatus>>,
+    result_statuses: Vec<Option<OnboardingStatus>>,
 ) -> Result<(), ApiError> {
     // TODO build process to run this asynchronously if we crashed before getting here
 
@@ -42,7 +43,7 @@ pub async fn create_final_decision(
         .db_pool
         .db_transaction(move |conn| -> Result<_, ApiError> {
             let (current_ob, scoped_user) = Onboarding::get(conn, &ob_id)?;
-            let current_status = current_ob.kyc_status;
+            let current_status = current_ob.status;
 
             let final_status = result_statuses
                 .into_iter()
@@ -54,7 +55,7 @@ pub async fn create_final_decision(
                 .unwrap_or(current_status);
 
             if final_status != current_status {
-                Onboarding::update_by_id(conn, &ob_id, OnboardingUpdate::kyc_status(final_status))?;
+                Onboarding::update_by_id(conn, &ob_id, OnboardingUpdate::status(final_status))?;
             }
 
             if let Some(status) = final_status.audit_status() {

@@ -198,9 +198,38 @@ table! {
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
         insight_event_id -> Uuid,
-        kyc_status -> Text,
+        status -> Text,
         is_liveness_skipped -> Bool,
         is_authorized -> Bool,
+        latest_decision_id -> Nullable<Text>,
+    }
+}
+
+table! {
+    use diesel::sql_types::*;
+    use newtypes::db_types::*;
+
+    onboarding_decision (id) {
+        id -> Text,
+        onboarding_id -> Uuid,
+        logic_git_hash -> Text,
+        tenant_user_id -> Nullable<Text>,
+        verification_status -> Text,
+        compliance_status -> Text,
+        created_at -> Timestamptz,
+        _created_at -> Timestamptz,
+        _updated_at -> Timestamptz,
+    }
+}
+
+table! {
+    use diesel::sql_types::*;
+    use newtypes::db_types::*;
+
+    onboarding_decision_verification_result_junction (id) {
+        id -> Uuid,
+        verification_result_id -> Uuid,
+        onboarding_decision_id -> Text,
     }
 }
 
@@ -251,6 +280,23 @@ table! {
         id -> Uuid,
         verification_request_id -> Uuid,
         requirement_id -> Text,
+    }
+}
+
+table! {
+    use diesel::sql_types::*;
+    use newtypes::db_types::*;
+
+    risk_signal (id) {
+        id -> Text,
+        scope -> Array<Text>,
+        onboarding_decision_id -> Text,
+        reason_code -> Text,
+        description -> Text,
+        created_at -> Timestamptz,
+        deactivated_at -> Nullable<Timestamptz>,
+        _created_at -> Timestamptz,
+        _updated_at -> Timestamptz,
     }
 }
 
@@ -447,12 +493,16 @@ joinable!(kv_data -> user_vault (user_vault_id));
 joinable!(ob_configuration -> tenant (tenant_id));
 joinable!(onboarding -> insight_event (insight_event_id));
 joinable!(onboarding -> ob_configuration (ob_configuration_id));
+joinable!(onboarding -> onboarding_decision (latest_decision_id));
 joinable!(onboarding -> scoped_user (scoped_user_id));
+joinable!(onboarding_decision -> tenant_user (tenant_user_id));
+joinable!(onboarding_decision_verification_result_junction -> onboarding_decision (onboarding_decision_id));
+joinable!(onboarding_decision_verification_result_junction -> verification_result (verification_result_id));
 joinable!(phone_number -> user_vault (user_vault_id));
-joinable!(requirement -> onboarding (onboarding_id));
 joinable!(requirement -> user_vault (user_vault_id));
 joinable!(requirement_verification_request_junction -> requirement (requirement_id));
 joinable!(requirement_verification_request_junction -> verification_request (verification_request_id));
+joinable!(risk_signal -> onboarding_decision (onboarding_decision_id));
 joinable!(scoped_user -> tenant (tenant_id));
 joinable!(scoped_user -> user_vault (user_vault_id));
 joinable!(tenant_api_key -> tenant (tenant_id));
@@ -481,9 +531,12 @@ allow_tables_to_appear_in_same_query!(
     kv_data,
     ob_configuration,
     onboarding,
+    onboarding_decision,
+    onboarding_decision_verification_result_junction,
     phone_number,
     requirement,
     requirement_verification_request_junction,
+    risk_signal,
     scoped_user,
     session,
     tenant,

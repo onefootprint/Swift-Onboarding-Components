@@ -9,7 +9,7 @@ mod data_identifier;
 mod data_priority;
 mod document_request_status;
 mod fingerprint;
-mod kyc_status;
+mod onboarding_status;
 mod ob_config_status;
 mod requirement_status2;
 mod requirement_kind;
@@ -24,7 +24,7 @@ mod verification_status;
 pub use self::{
     access_event_kind::*, attestation_type::*, audit_trail_event::*, collected_data::*,
     compliance_status::*, d2p_session_status::*, data_attribute::*, data_identifier::*,
-    data_priority::*, document_request_status::*, fingerprint::*, kyc_status::*, ob_config_status::*,
+    data_priority::*, document_request_status::*, fingerprint::*, onboarding_status::*, ob_config_status::*,
     requirement_status2::*, requirement_kind::*, requirement_status::*, sealed_bytes::*, tenant_permission::*,
     org_member_email::*, vault_key_pair::*, vendor::*, verification_status::*,
 };

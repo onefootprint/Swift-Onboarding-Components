@@ -11,14 +11,14 @@ use crate::utils::db2api::DbToApi;
 use crate::utils::user_vault_wrapper::UserVaultWrapper;
 use crate::State;
 use api_wire_types::ListUsersRequest;
-use chrono::{Utc};
+use chrono::Utc;
 use db::models::identity_data::HasIdentityDataFields;
 use db::models::onboarding::Onboarding;
 use db::models::onboarding::OnboardingInfo;
 use db::models::scoped_user::ScopedUser;
 use db::scoped_user::OnboardingListQueryParams;
 
-use newtypes::DecisionId;
+use newtypes::OnboardingDecisionId;
 
 use newtypes::OnboardingId;
 use newtypes::RequirementId;
@@ -170,7 +170,7 @@ impl<'a> DbToApi<UserDetail<'a>> for api_wire_types::User {
             })
             .collect(),
             decisions: vec![api_wire_types::Decision {
-                id: DecisionId::default(),
+                id: OnboardingDecisionId::default(),
                 verification_status: newtypes::VerificationStatus::Verified,
                 compliance_status: newtypes::ComplianceStatus::Compliant,
                 source: api_wire_types::DecisionSource::Footprint,
@@ -185,7 +185,7 @@ impl DbToApi<OnboardingInfo> for api_wire_types::Onboarding {
         let Onboarding {
             start_timestamp,
             is_liveness_skipped,
-            kyc_status,
+            status,
             ..
         } = onboarding;
         let db::models::ob_configuration::ObConfiguration {
@@ -208,18 +208,7 @@ impl DbToApi<OnboardingInfo> for api_wire_types::Onboarding {
             can_access_identity_document_images,
             is_liveness_skipped,
 
-            // TODO: replace kyc_status with new DB updates
-            verification_status: match kyc_status {
-                newtypes::KycStatus::New
-                | newtypes::KycStatus::StepUpRequired
-                | newtypes::KycStatus::Processing => newtypes::VerificationStatus::Processing,
-                newtypes::KycStatus::ManualReview => newtypes::VerificationStatus::ManualReview,
-                newtypes::KycStatus::Verified => newtypes::VerificationStatus::Verified,
-                newtypes::KycStatus::Failed => newtypes::VerificationStatus::Failed,
-            },
-            // TODO: fix with real data
-            compliance_status: newtypes::ComplianceStatus::Compliant,
-            decision_id: DecisionId::default(),
+            status,
         }
     }
 }

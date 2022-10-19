@@ -1,5 +1,5 @@
 use newtypes::{
-    AuditTrailEvent, KycStatus, ReasonCode, SignalScope, SignalSeverity, Vendor, VerificationInfo,
+    AuditTrailEvent, OnboardingStatus, ReasonCode, SignalScope, SignalSeverity, Vendor, VerificationInfo,
     VerificationInfoStatus,
 };
 use std::{collections::HashMap, str::FromStr};
@@ -33,7 +33,7 @@ pub fn process(
 fn process_success(
     response: IDologySuccess,
     pending_attributes: Vec<SignalScope>,
-) -> Result<(Option<KycStatus>, Vec<AuditTrailEvent>, Option<IdNumber>), super::Error> {
+) -> Result<(Option<OnboardingStatus>, Vec<AuditTrailEvent>, Option<IdNumber>), super::Error> {
     // TODO is it concerning if there are no qualifiers?
     if !response.id_located() {
         // TODO probably want to waterfall to another vendor
@@ -48,7 +48,7 @@ fn process_success(
         } else {
             None
         };
-        return Ok((Some(KycStatus::ManualReview), vec![audit_trail], id_number));
+        return Ok((Some(OnboardingStatus::ManualReview), vec![audit_trail], id_number));
     }
 
     let qualifiers = if let Some(ref qualifiers) = response.qualifiers {
@@ -107,13 +107,13 @@ fn process_success(
     Ok((Some(new_status), events, None))
 }
 
-fn process_error() -> (Option<KycStatus>, Vec<AuditTrailEvent>, Option<IdNumber>) {
+fn process_error() -> (Option<OnboardingStatus>, Vec<AuditTrailEvent>, Option<IdNumber>) {
     let events = vec![AuditTrailEvent::Verification(VerificationInfo {
         attributes: vec![],
         vendor: Vendor::Footprint,
         status: VerificationInfoStatus::Failed,
     })];
-    (Some(KycStatus::ManualReview), events, None)
+    (Some(OnboardingStatus::ManualReview), events, None)
 }
 
 #[derive(Debug, serde::Deserialize)]
@@ -134,11 +134,11 @@ struct IDologySuccess {
 
 impl IDologySuccess {
     /// IDology-determined status for verifying the customer
-    fn status(&self) -> KycStatus {
+    fn status(&self) -> OnboardingStatus {
         match self.summary_result.as_ref().map(|x| x.key.as_str()) {
-            Some("id.success") => KycStatus::Verified,
-            Some("id.failure") => KycStatus::Failed,
-            _ => KycStatus::ManualReview,
+            Some("id.success") => OnboardingStatus::Verified,
+            Some("id.failure") => OnboardingStatus::Failed,
+            _ => OnboardingStatus::ManualReview,
         }
     }
 

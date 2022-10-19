@@ -29,7 +29,7 @@ use crate::{RequirementStatus, VerificationInfoStatus};
 #[strum(serialize_all = "snake_case")]
 #[serde(rename_all = "snake_case")]
 #[diesel(sql_type = Text)]
-pub enum KycStatus {
+pub enum OnboardingStatus {
     New,
     Processing,
     ManualReview,
@@ -38,7 +38,7 @@ pub enum KycStatus {
     Failed,
 }
 
-impl KycStatus {
+impl OnboardingStatus {
     pub fn audit_status(&self) -> Option<VerificationInfoStatus> {
         // Based on the Status of the onboarding, infer the status to use for the final audit trail event
         match self {
@@ -64,15 +64,15 @@ impl KycStatus {
     }
 }
 
-crate::util::impl_enum_str_diesel!(KycStatus);
+crate::util::impl_enum_str_diesel!(OnboardingStatus);
 
 #[cfg(test)]
 mod tests {
     use std::cmp::Ordering;
     use test_case::test_case;
 
-    use super::KycStatus;
-    use super::KycStatus::*;
+    use super::OnboardingStatus;
+    use super::OnboardingStatus::*;
 
     #[test_case(New, Processing => Ordering::Less)]
     #[test_case(Processing, ManualReview => Ordering::Less)]
@@ -82,7 +82,7 @@ mod tests {
     #[test_case(ManualReview, Verified => Ordering::Less)]
     #[test_case(StepUpRequired, Failed=> Ordering::Less)]
     #[test_case(StepUpRequired, Verified=> Ordering::Less)]
-    fn test_cmp(a: KycStatus, b: KycStatus) -> Ordering {
+    fn test_cmp(a: OnboardingStatus, b: OnboardingStatus) -> Ordering {
         // We rely on the ordering of KycStatuses, so test them here
         a.cmp(&b)
     }

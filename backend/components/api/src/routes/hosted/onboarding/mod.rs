@@ -7,7 +7,7 @@ use db::{
     },
     DbError, PgConnection,
 };
-use newtypes::{CollectedDataOption, KycStatus, OnboardingId, SessionAuthToken, UserVaultId};
+use newtypes::{CollectedDataOption, OnboardingId, OnboardingStatus, SessionAuthToken, UserVaultId};
 use paperclip::actix::web;
 
 use crate::{
@@ -72,7 +72,7 @@ pub fn get_requirements(
             document_request_id: request.id,
         });
     let requirements = vec![
-        (onboarding.kyc_status == KycStatus::New)
+        (onboarding.status == OnboardingStatus::New)
             .then_some(OnboardingRequirement::IdentityCheck { missing_attributes }),
         (creds.is_empty() && !onboarding.is_liveness_skipped).then_some(OnboardingRequirement::Liveness),
     ]

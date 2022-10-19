@@ -8,7 +8,10 @@ use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
 use itertools::Itertools;
-use newtypes::{InsightEventId, KycStatus, ObConfigurationId, OnboardingId, ScopedUserId, UserVaultId};
+use newtypes::{
+    InsightEventId, ObConfigurationId, OnboardingDecisionId, OnboardingId, OnboardingStatus, ScopedUserId,
+    UserVaultId,
+};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
@@ -22,9 +25,10 @@ pub struct Onboarding {
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
     pub insight_event_id: InsightEventId,
-    pub kyc_status: KycStatus,
+    pub status: OnboardingStatus,
     pub is_liveness_skipped: bool,
     pub is_authorized: bool,
+    pub latest_decision_id: Option<OnboardingDecisionId>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
@@ -34,7 +38,7 @@ struct NewOnboarding {
     ob_configuration_id: ObConfigurationId,
     start_timestamp: DateTime<Utc>,
     insight_event_id: InsightEventId,
-    kyc_status: KycStatus,
+    status: OnboardingStatus,
     is_liveness_skipped: bool,
     is_authorized: bool,
 }
@@ -42,15 +46,15 @@ struct NewOnboarding {
 #[derive(Debug, AsChangeset, Default)]
 #[diesel(table_name = onboarding)]
 pub struct OnboardingUpdate {
-    pub kyc_status: Option<KycStatus>,
+    pub status: Option<OnboardingStatus>,
     pub is_liveness_skipped: Option<bool>,
     pub is_authorized: Option<bool>,
 }
 
 impl OnboardingUpdate {
-    pub fn kyc_status(status: KycStatus) -> Self {
+    pub fn status(status: OnboardingStatus) -> Self {
         Self {
-            kyc_status: Some(status),
+            status: Some(status),
             ..Self::default()
         }
     }
@@ -155,7 +159,7 @@ impl Onboarding {
             ob_configuration_id,
             start_timestamp: Utc::now(),
             insight_event_id: insight_event.id,
-            kyc_status: KycStatus::New,
+            status: OnboardingStatus::New,
             is_liveness_skipped: false,
             is_authorized: false,
         };

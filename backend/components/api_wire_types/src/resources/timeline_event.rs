@@ -36,7 +36,7 @@ export_schema!(RequirementFulfilledEvent);
 #[derive(Debug, Clone, Deserialize, Serialize, Apiv2Schema, JsonSchema)]
 #[schemars(rename_all = "camelCase")]
 pub struct DecisionEvent {
-    pub decision_id: DecisionId,
+    pub decision_id: OnboardingDecisionId,
 }
 export_schema!(DecisionEvent);
 

@@ -5,7 +5,7 @@ use crate::{
 };
 
 use db::models::{onboarding::Onboarding, verification_request::VerificationRequest};
-use newtypes::{KycStatus, TenantId, UserVaultId, Vendor};
+use newtypes::{OnboardingStatus, TenantId, UserVaultId, Vendor};
 
 use super::*;
 /// The Engine module is the main entry point into running our verification logic
@@ -44,8 +44,8 @@ pub async fn run(
             let (ob, _) = Onboarding::lock_by_config(conn, &uvw.user_vault.id, &ob_config.id)?
                 .ok_or(OnboardingError::NoOnboarding)?;
             // Can only start KYC checks for onboardings whose KYC checks have not yet been started
-            if ob.kyc_status != KycStatus::New {
-                return Err(OnboardingError::WrongKycState(ob.kyc_status).into());
+            if ob.status != OnboardingStatus::New {
+                return Err(OnboardingError::WrongKycState(ob.status).into());
             }
             let ob_id = ob.id.clone();
             // We need to figure out which vendors to send which pieces of data...
@@ -92,7 +92,7 @@ async fn make_idv_request(
     request: VerificationRequest,
     user_vault_id: UserVaultId,
     tenant_id: TenantId,
-) -> Result<Option<KycStatus>, ApiError> {
+) -> Result<Option<OnboardingStatus>, ApiError> {
     let request_id = request.id.clone();
 
     // TODO: could have different logic for different vendors?

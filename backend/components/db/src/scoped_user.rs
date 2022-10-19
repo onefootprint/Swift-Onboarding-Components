@@ -4,13 +4,13 @@ use crate::{errors::DbError, schema::scoped_user::BoxedQuery};
 use chrono::{DateTime, Utc};
 use diesel::pg::Pg;
 use diesel::prelude::*;
-use newtypes::{Fingerprint, FootprintUserId, KycStatus, TenantId};
+use newtypes::{Fingerprint, FootprintUserId, OnboardingStatus, TenantId};
 
 #[derive(Clone)]
 pub struct OnboardingListQueryParams {
     pub tenant_id: TenantId,
     pub is_live: bool,
-    pub statuses: Vec<KycStatus>,
+    pub statuses: Vec<OnboardingStatus>,
     pub fingerprints: Option<Vec<Fingerprint>>,
     pub footprint_user_id: Option<FootprintUserId>,
     pub timestamp_lte: Option<DateTime<Utc>>,
@@ -31,7 +31,7 @@ pub fn list_authorized_for_tenant_query<'a>(params: OnboardingListQueryParams) -
 
     if !params.statuses.is_empty() {
         let matching_ids = schema::onboarding::table
-            .filter(schema::onboarding::kyc_status.eq_any(params.statuses))
+            .filter(schema::onboarding::status.eq_any(params.statuses))
             .select(schema::onboarding::scoped_user_id)
             .distinct();
         query = query.filter(schema::scoped_user::id.eq_any(matching_ids))

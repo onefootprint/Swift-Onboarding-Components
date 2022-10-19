@@ -36,7 +36,7 @@ pub async fn get(
         .await??;
 
     let response = StatusResponse {
-        status: ob.kyc_status.public_status(),
+        status: ob.status.public_status(),
     };
     ResponseData::ok(response).json()
 }

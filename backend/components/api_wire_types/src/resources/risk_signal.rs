@@ -5,7 +5,7 @@ use crate::*;
 #[schemars(rename_all = "camelCase")]
 pub struct RiskSignal {
     pub id: RiskSignalId,
-    pub decision_id: DecisionId,
+    pub decision_id: OnboardingDecisionId,
     pub reason_code: String,
     pub note: String,
     pub severity: RiskSeverity,

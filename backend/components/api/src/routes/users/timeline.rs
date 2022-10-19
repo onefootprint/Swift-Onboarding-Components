@@ -15,9 +15,8 @@ use api_wire_types::TimelineEvent;
 use api_wire_types::TimelineEventKind;
 use chrono::Utc;
 
-
-use newtypes::DecisionId;
 use newtypes::FootprintUserId;
+use newtypes::OnboardingDecisionId;
 use newtypes::OnboardingId;
 use newtypes::RequirementId;
 use newtypes::TenantPermission;
@@ -54,7 +53,7 @@ pub async fn get(
         },
         TimelineEvent {
             event: TimelineEventKind::Decision(DecisionEvent {
-                decision_id: DecisionId::test_data("d1".into()),
+                decision_id: OnboardingDecisionId::test_data("d1".into()),
             }),
             timestamp: Utc::now(),
         },

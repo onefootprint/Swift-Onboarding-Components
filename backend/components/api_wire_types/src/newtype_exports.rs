@@ -12,4 +12,4 @@ export_schema!(ComplianceStatus);
 export_schema!(Vendor);
 export_schema!(RequirementKind);
 export_schema!(RequirementInitiator);
-export_schema!(KycStatus);
+export_schema!(OnboardingStatus);

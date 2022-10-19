@@ -13,8 +13,8 @@ use api_wire_types::RiskSignal;
 
 use chrono::Utc;
 
-use newtypes::DecisionId;
 use newtypes::FootprintUserId;
+use newtypes::OnboardingDecisionId;
 
 use newtypes::RiskSignalId;
 use newtypes::TenantPermission;
@@ -42,7 +42,7 @@ pub async fn get(
     //TODO: stub render real data
     let _sig = RiskSignal {
         id: RiskSignalId::test_data("rs1".into()),
-        decision_id: DecisionId::test_data("d1".into()),
+        decision_id: OnboardingDecisionId::test_data("d1".into()),
         reason_code: "ssn.deceased".into(),
         note: "Lorem ipsum".into(),
         severity: RiskSeverity::High,

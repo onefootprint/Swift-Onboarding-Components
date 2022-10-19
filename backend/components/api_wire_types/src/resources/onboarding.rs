@@ -17,9 +17,7 @@ pub struct Onboarding {
     pub insight_event: InsightEvent,
     pub is_liveness_skipped: bool,
 
-    pub verification_status: VerificationStatus,
-    pub compliance_status: ComplianceStatus,
-    pub decision_id: DecisionId,
+    pub status: OnboardingStatus,
 }
 
 export_schema!(Onboarding);

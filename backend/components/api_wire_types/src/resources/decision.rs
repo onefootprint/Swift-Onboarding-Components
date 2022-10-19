@@ -2,7 +2,7 @@ use crate::*;
 
 #[derive(Debug, Clone, Deserialize, Serialize, Apiv2Schema, JsonSchema)]
 pub struct Decision {
-    pub id: DecisionId,
+    pub id: OnboardingDecisionId,
     pub verification_status: VerificationStatus,
     pub compliance_status: ComplianceStatus,
     pub source: DecisionSource,

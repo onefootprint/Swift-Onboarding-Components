@@ -9,7 +9,8 @@ use db::{
     TxnPgConnection,
 };
 use newtypes::{
-    AuditTrailEvent, KycStatus, SignalScope, TenantId, Vendor, VerificationInfo, VerificationInfoStatus,
+    AuditTrailEvent, OnboardingStatus, SignalScope, TenantId, Vendor, VerificationInfo,
+    VerificationInfoStatus,
 };
 
 pub(super) mod build_request;
@@ -22,14 +23,14 @@ pub fn build_verification_requests_and_checkpoint(
     ob: Onboarding,
     uvw: &UserVaultWrapper,
     tenant_id: &TenantId,
-    desired_status: KycStatus,
+    desired_status: OnboardingStatus,
     vendors: Vec<Vendor>,
 ) -> Result<Vec<VerificationRequest>, ApiError> {
     // TODO decide when to re-KYC
     // Create the VerificationRequest and mark the onboarding's kyc_status
-    let ob = ob.update(conn, OnboardingUpdate::kyc_status(desired_status))?;
+    let ob = ob.update(conn, OnboardingUpdate::status(desired_status))?;
 
-    if desired_status == KycStatus::Processing {
+    if desired_status == OnboardingStatus::Processing {
         let requests_to_initiate = vendors
             .into_iter()
             .map(|v| build_request::build_verification_request(uvw, ob.id.clone(), v))
@@ -44,7 +45,7 @@ pub fn build_verification_requests_and_checkpoint(
     // TODO kick off user verification with data vendors,
     // and don't mark as verified until data verification with vendors is complete
     let final_status = match &desired_status {
-        KycStatus::Verified => VerificationInfoStatus::Verified,
+        OnboardingStatus::Verified => VerificationInfoStatus::Verified,
         _ => VerificationInfoStatus::Failed,
     };
     let events = vec![
