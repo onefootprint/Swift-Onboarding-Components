@@ -7,6 +7,8 @@ use crate::auth::Either;
 use crate::errors::ApiError;
 use crate::types::request::PaginatedRequest;
 use crate::types::response::PaginatedResponseData;
+use crate::types::JsonApiResponse;
+use crate::types::ResponseData;
 use crate::utils::db2api::DbToApi;
 use crate::utils::user_vault_wrapper::UserVaultWrapper;
 use crate::State;
@@ -18,12 +20,14 @@ use db::models::onboarding_decision::OnboardingDecision;
 use db::models::scoped_user::ScopedUser;
 use db::scoped_user::OnboardingListQueryParams;
 
+use newtypes::FootprintUserId;
 use newtypes::TenantPermission;
 use newtypes::UserVaultId;
 use newtypes::{DataAttribute, Fingerprint, Fingerprinter};
 use paperclip::actix::{api_v2_operation, get, web, web::Json};
 
-type UsersResponse = Vec<api_wire_types::User>;
+type UsersDetailResponse = api_wire_types::User;
+type UsersListResponse = Vec<UsersDetailResponse>;
 
 #[api_v2_operation(
     description = "Allows a tenant to view a list of their Onboardings, effectively showing all \
@@ -36,7 +40,7 @@ pub async fn get(
     state: web::Data<State>,
     request: web::Query<PaginatedRequest<ListUsersRequest, i64>>,
     auth: Either<WorkOsAuthContext, SecretTenantAuthContext>,
-) -> actix_web::Result<Json<PaginatedResponseData<UsersResponse, i64>>, ApiError> {
+) -> actix_web::Result<Json<PaginatedResponseData<UsersListResponse, i64>>, ApiError> {
     let auth = auth.check_permissions(vec![TenantPermission::Users])?;
     let tenant = auth.tenant();
 
@@ -119,6 +123,52 @@ pub async fn get(
         .collect();
 
     Ok(Json(PaginatedResponseData::ok(scoped_users, cursor, count)))
+}
+
+#[api_v2_operation(
+    description = "Allows a tenant to view a specific user",
+    tags(Users, PublicApi)
+)]
+#[get("/users/{footprint_user_id}")]
+pub async fn get_detail(
+    state: web::Data<State>,
+    footprint_user_id: web::Path<FootprintUserId>,
+    auth: Either<WorkOsAuthContext, SecretTenantAuthContext>,
+) -> actix_web::Result<JsonApiResponse<UsersDetailResponse>, ApiError> {
+    let auth = auth.check_permissions(vec![TenantPermission::Users])?;
+    let tenant = auth.tenant();
+
+    let query_params = OnboardingListQueryParams {
+        tenant_id: tenant.id.clone(),
+        is_live: auth.is_live()?,
+        statuses: vec![],
+        fingerprints: None,
+        footprint_user_id: Some(footprint_user_id.into_inner()),
+        timestamp_lte: None,
+        timestamp_gte: None,
+    };
+    let (su, obs, uvw) = state
+        .db_pool
+        .db_query(move |conn| -> Result<_, ApiError> {
+            let su = db::scoped_user::list_authorized_for_tenant(conn, query_params, None, 1)?
+                .pop()
+                .ok_or(ApiError::ResourceNotFound)?;
+            let uvw = UserVaultWrapper::get(conn, &su.user_vault_id)?;
+            let obs = Onboarding::get_for_scoped_users(conn, vec![&su.id])?
+                .remove(&su.id)
+                .ok_or(ApiError::ResourceNotFound)?;
+
+            Ok((su, obs, uvw))
+        })
+        .await??;
+
+    let response = <api_wire_types::User as DbToApi<UserDetail>>::from_db((
+        uvw.get_populated_fields(),
+        &obs,
+        su,
+        uvw.user_vault.is_portable,
+    ));
+    Ok(ResponseData::ok(response).json())
 }
 
 type UserDetail<'a> = (Vec<DataAttribute>, &'a [OnboardingInfo], ScopedUser, bool);

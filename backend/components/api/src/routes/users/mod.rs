@@ -10,6 +10,7 @@ pub mod vault;
 pub fn routes(config: &mut web::ServiceConfig) {
     config
         .service(index::get)
+        .service(index::get_detail)
         .service(index::post)
         .service(audit_trail::get)
         .service(liveness::get)

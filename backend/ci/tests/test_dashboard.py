@@ -74,7 +74,7 @@ class TestDashboard:
         assert not tenant["is_sandbox_restricted"]
         tenant["logo_url"]
 
-    def test_scoped_users_list(self, user):
+    def test_get_users_list(self, user):
         tenant = user.tenant
         # TODO don't filter on fp_user_id in this test. We only do it to ensure it doesn't flake in dev
         # https://linear.app/footprint/issue/FP-390/integration-tests-for-onboarding-list-break-in-dev
@@ -87,6 +87,13 @@ class TestDashboard:
 
         assert set(["first_name", "last_name"]) < set(
             scoped_user[0]["identity_data_attributes"]
+        )
+
+    def test_get_users_detail(self, user):
+        tenant = user.tenant
+        scoped_user = get(f"users/{user.fp_user_id}", None, tenant.sk.key)
+        assert set(["first_name", "last_name"]) < set(
+            scoped_user["identity_data_attributes"]
         )
 
     def test_liveness_list(self, user):
