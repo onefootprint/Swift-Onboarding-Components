@@ -6,23 +6,16 @@ use crate::auth::Either;
 use crate::types::response::ResponseData;
 use crate::types::JsonApiResponse;
 
+use crate::utils::db2api::DbToApi;
 use crate::State;
 
-use api_wire_types::RiskSeverity;
-use api_wire_types::RiskSignal;
-
-use chrono::Utc;
-
+use db::models::risk_signal::RiskSignal;
 use newtypes::FootprintUserId;
-use newtypes::OnboardingDecisionId;
-
-use newtypes::RiskSignalId;
 use newtypes::TenantPermission;
 
-use newtypes::Vendor;
 use paperclip::actix::{api_v2_operation, get, web};
 
-type RiskSignalsResponse = Vec<RiskSignal>;
+type RiskSignalsResponse = Vec<api_wire_types::RiskSignal>;
 
 #[api_v2_operation(
     description = "Lists the risk signals for a footprint user.",
@@ -30,26 +23,47 @@ type RiskSignalsResponse = Vec<RiskSignal>;
 )]
 #[get("/users/{footprint_user_id}/risk_signals")]
 pub async fn get(
-    _state: web::Data<State>,
-    _request: web::Path<FootprintUserId>,
+    state: web::Data<State>,
+    request: web::Path<FootprintUserId>,
     auth: Either<WorkOsAuthContext, SecretTenantAuthContext>,
 ) -> JsonApiResponse<RiskSignalsResponse> {
-    let _auth = auth.check_permissions(vec![TenantPermission::Users])?;
-    // let tenant_id = auth.tenant().id.clone();
-    // let is_live = auth.is_live()?;
-    // let footprint_user_id = request.into_inner();
+    let auth = auth.check_permissions(vec![TenantPermission::Users])?;
+    let tenant_id = auth.tenant().id.clone();
+    let is_live = auth.is_live()?;
+    let footprint_user_id = request.into_inner();
 
-    //TODO: stub render real data
-    let _sig = RiskSignal {
-        id: RiskSignalId::test_data("rs1".into()),
-        decision_id: OnboardingDecisionId::test_data("d1".into()),
-        reason_code: "ssn.deceased".into(),
-        note: "Lorem ipsum".into(),
-        severity: RiskSeverity::High,
-        vendors: vec![Vendor::Idology],
-        timestamp: Utc::now(),
-    };
-    let timeline_events = vec![];
+    let signals = state
+        .db_pool
+        .db_query(move |conn| RiskSignal::list(conn, &footprint_user_id, &tenant_id, is_live))
+        .await??;
+    let signals = signals
+        .into_iter()
+        .map(<api_wire_types::RiskSignal as DbToApi<RiskSignal>>::from_db)
+        .collect();
 
-    ResponseData::ok(timeline_events).json()
+    ResponseData::ok(signals).json()
+}
+
+impl DbToApi<RiskSignal> for api_wire_types::RiskSignal {
+    fn from_db(target: RiskSignal) -> Self {
+        let RiskSignal {
+            id,
+            onboarding_decision_id,
+            reason_code,
+            created_at,
+            deactivated_at,
+            ..
+        } = target;
+        Self {
+            id,
+            onboarding_decision_id,
+            reason_code,
+            note: reason_code.note(),
+            // TODO better serialization of severity
+            severity: reason_code.severity(),
+            scopes: reason_code.scopes(),
+            timestamp: created_at,
+            deactivated_at,
+        }
+    }
 }

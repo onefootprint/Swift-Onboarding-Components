@@ -5,11 +5,12 @@ use crate::*;
 #[schemars(rename_all = "camelCase")]
 pub struct RiskSignal {
     pub id: RiskSignalId,
-    pub decision_id: OnboardingDecisionId,
-    pub reason_code: String,
+    pub onboarding_decision_id: OnboardingDecisionId,
+    pub reason_code: FootprintReasonCode,
     pub note: String,
-    pub severity: RiskSeverity,
-    pub vendors: Vec<Vendor>,
+    pub severity: SignalSeverity,
+    pub scopes: Vec<SignalScope>,
     pub timestamp: chrono::DateTime<Utc>,
+    pub deactivated_at: Option<chrono::DateTime<Utc>>,
 }
 export_schema!(RiskSignal);

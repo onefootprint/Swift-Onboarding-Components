@@ -1,7 +1,20 @@
+use paperclip::actix::Apiv2Schema;
+use schemars::JsonSchema;
 use strum_macros::{Display, EnumString};
 
 #[derive(
-    Debug, Display, Clone, Copy, Eq, PartialEq, Hash, EnumString, serde::Serialize, serde::Deserialize,
+    Debug,
+    Display,
+    Clone,
+    Copy,
+    Eq,
+    PartialEq,
+    Hash,
+    EnumString,
+    serde::Serialize,
+    serde::Deserialize,
+    Apiv2Schema,
+    JsonSchema,
 )]
 #[serde(try_from = "&str")]
 #[strum(serialize_all = "snake_case")]
