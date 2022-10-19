@@ -2,6 +2,7 @@ import React, { forwardRef, useId, useRef } from 'react';
 import mergeRefs from 'react-merge-refs';
 import styled, { css } from 'styled-components';
 
+import useSX, { SXStyleProps, SXStyles } from '../../hooks/use-sx';
 import { createFontStyles, createOverlayBackground } from '../../utils/mixins';
 
 export type ToggleProps = {
@@ -11,11 +12,13 @@ export type ToggleProps = {
   disabled?: boolean;
   id?: string;
   label?: string;
+  labelPlacement?: 'left' | 'right';
   name?: string;
   onBlur?: (event: React.FocusEvent<HTMLButtonElement>) => void;
   onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
   onFocus?: (event: React.FocusEvent<HTMLButtonElement>) => void;
   required?: boolean;
+  sx?: SXStyleProps;
 };
 
 const Switch = forwardRef<HTMLInputElement, ToggleProps>(
@@ -23,6 +26,7 @@ const Switch = forwardRef<HTMLInputElement, ToggleProps>(
     {
       'aria-label': ariaLabel,
       label,
+      labelPlacement = 'left',
       checked: initialChecked,
       defaultChecked,
       disabled,
@@ -32,6 +36,7 @@ const Switch = forwardRef<HTMLInputElement, ToggleProps>(
       onChange,
       onFocus,
       required,
+      sx,
     }: ToggleProps,
     ref,
   ) => {
@@ -40,6 +45,7 @@ const Switch = forwardRef<HTMLInputElement, ToggleProps>(
     const isControlled = typeof initialChecked !== 'undefined';
     const checked = isControlled ? initialChecked : defaultChecked || false;
     const localRef = useRef<HTMLInputElement>(null);
+    const sxStyles = useSX(sx);
 
     const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
       // This will trigger a native change event, so we can use web standards
@@ -63,8 +69,12 @@ const Switch = forwardRef<HTMLInputElement, ToggleProps>(
     };
 
     return (
-      <ToggleContainer>
-        {label && <Label htmlFor={id}>{label}</Label>}
+      <ToggleContainer data-placement={labelPlacement} sx={sxStyles}>
+        {label && (
+          <Label data-placement={labelPlacement} htmlFor={id}>
+            {label}
+          </Label>
+        )}
         <Input
           aria-hidden="true"
           checked={isControlled ? checked : undefined}
@@ -96,17 +106,39 @@ const Switch = forwardRef<HTMLInputElement, ToggleProps>(
   },
 );
 
-const ToggleContainer = styled.div`
+const ToggleContainer = styled.div<{
+  sx: SXStyles;
+}>`
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
+
+  &[data-placement='left'] {
+    flex-direction: row;
+  }
+
+  &[data-placement='right'] {
+    flex-direction: row-reverse;
+  }
+
+  ${({ sx }) => css`
+    ${sx}
+  `}
 `;
 
 const Label = styled.label`
   ${({ theme }) => css`
     ${createFontStyles('label-3')};
     color: ${theme.color.primary};
-    margin-right: ${theme.spacing[3]}px;
+    cursor: pointer;
+
+    &[data-placement='left'] {
+      margin-right: ${theme.spacing[3]}px;
+    }
+
+    &[data-placement='right'] {
+      margin-left: ${theme.spacing[3]}px;
+    }
   `}
 `;
 

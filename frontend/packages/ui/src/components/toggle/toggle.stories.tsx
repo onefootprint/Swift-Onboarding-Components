@@ -38,6 +38,15 @@ export default {
       description: 'Toggle label',
       required: false,
     },
+    labelPlacement: {
+      control: {
+        type: 'select',
+      },
+      type: { name: 'string', required: false },
+      description: 'Label placement',
+      options: ['left', 'right'],
+      table: { defaultValue: { summary: 'left' } },
+    },
     required: {
       control: 'boolean',
       description:
@@ -70,6 +79,7 @@ const Template: Story<ToggleProps> = ({
   disabled,
   id,
   label,
+  labelPlacement,
   name,
   onBlur,
   onChange,
@@ -85,6 +95,7 @@ const Template: Story<ToggleProps> = ({
       disabled={disabled}
       id={id}
       label={label}
+      labelPlacement={labelPlacement}
       name={name}
       onBlur={onBlur}
       onChange={event => {
@@ -105,6 +116,7 @@ Base.args = {
   disabled: false,
   id: 'toggle-id',
   label: 'Toggle',
+  labelPlacement: 'left',
   name: 'toggle',
   onBlur: console.log,
   onChange: console.log,

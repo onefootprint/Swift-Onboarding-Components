@@ -46,6 +46,7 @@ const ProductNavigation = ({ name, articles }: ProductNavigationProps) => {
             label={t('dark-mode')}
             checked={isDarkMode}
             onChange={toggle}
+            sx={{ justifyContent: 'space-between' }}
           />
         </ThemeControl>
       </Box>
