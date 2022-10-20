@@ -13,15 +13,15 @@ const withMDX = require('@next/mdx')({
 
 const ContentSecurityPolicy = `
   child-src onefootprint.com;
-  connect-src 'self' vitals.vercel-insights.com *.pusher.com wss://*.pusher.com vercel.live *.usefathom.com *.ingest.sentry.io www.youtube.com js.driftt.com; 
+  connect-src 'self' vitals.vercel-insights.com *.pusher.com wss://*.pusher.com vercel.live usefathom.com *.usefathom.com *.ingest.sentry.io www.youtube.com js.driftt.com; 
   default-src 'self' vitals.vercel-insights.com;
   font-src 'self' fonts.googleapis.com fonts.gstatic.com;
   form-action 'self';
   frame-ancestors 'self';
   frame-src 'self' vercel.live www.youtube.com js.driftt.com form.typeform.com;
-  img-src 'self' data: footprint-blog.ghost.io assets.vercel.com vercel.live vercel.com *.usefathom.com;
+  img-src 'self' data: footprint-blog.ghost.io assets.vercel.com vercel.live vercel.com usefathom.com *.usefathom.com;
   media-src 'self' https;
-  script-src 'self' 'unsafe-inline' 'unsafe-eval' js.driftt.com *.usefathom.com vercel.live vitals.vercel-insights.com tagmanager.google.com www.googletagmanager.com platform.twitter.com www.youtube.com static.ads-twitter.com connect.facebook.net www.facebook.com;
+  script-src 'self' 'unsafe-inline' 'unsafe-eval' js.driftt.com usefathom.com *.usefathom.com vercel.live vitals.vercel-insights.com tagmanager.google.com www.googletagmanager.com platform.twitter.com www.youtube.com static.ads-twitter.com connect.facebook.net www.facebook.com;
   style-src 'self' 'unsafe-inline' tagmanager.google.com fonts.googleapis.com;
   worker-src 'self' blob:;
 `;
