@@ -7,7 +7,7 @@ import Head from 'next/head';
 import Script from 'next/script';
 import React from 'react';
 import Drift from 'react-driftjs';
-import { createGlobalStyle, css } from 'styled-components';
+import { createGlobalStyle } from 'styled-components';
 
 import Layout from '../components/layout';
 import MDXProvider from '../components/mdx-provider';
@@ -23,16 +23,13 @@ type AppProps = {
 };
 
 const GlobalStyle = createGlobalStyle`
-${({ theme }) => css`
   html {
-    // TODO: Remove this extra spacing due to the announcement
-    --header-height: ${theme.spacing[10] + theme.spacing[11]}px;
+    --header-height: 72px;
 
     ${media.greaterThan('lg')`
-        --header-height:  ${theme.spacing[13] + theme.spacing[3]}px;
+      --header-height: 64px;
     `}
   }
-`};
 `;
 
 const App = ({ Component, pageProps }: AppProps) => (

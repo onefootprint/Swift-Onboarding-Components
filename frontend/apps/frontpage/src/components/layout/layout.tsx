@@ -76,10 +76,15 @@ const Layout = ({ children }: LayoutProps) => {
 };
 
 const Content = styled.section`
-  > *:first-child {
-    // TODO: Remove this extra spacing due to the announcement
-    padding-top: var(--header-height);
-  }
+  ${({ theme }) => css`
+    > *:first-child {
+      padding-top: calc(var(--header-height) + ${theme.spacing[9]}px);
+
+      ${media.greaterThan('lg')`
+        padding-top: calc(var(--header-height) + ${theme.spacing[10]}px);
+      `}
+    }
+  `}
 `;
 
 const FooterContainer = styled.section`
