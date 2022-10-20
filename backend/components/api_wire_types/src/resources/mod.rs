@@ -37,8 +37,5 @@ pub use self::org_member::*;
 pub mod org_role;
 pub use self::org_role::*;
 
-pub mod requirement;
-pub use self::requirement::*;
-
 pub mod timeline_event;
 pub use self::timeline_event::*;

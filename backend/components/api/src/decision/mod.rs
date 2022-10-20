@@ -23,9 +23,6 @@ use db::models::ob_configuration::ObConfiguration;
 /// mod.rs
 ///   - public interfaces for creating and managing requirements
 ///
-/// requirement.rs
-///   - implementation of working with requirements
-///
 /// risk.rs
 ///   - risk-based step ups
 ///   - additional auth challenges
@@ -35,17 +32,15 @@ use db::models::ob_configuration::ObConfiguration;
 ///   - Handle waterfalling
 ///
 /// result.rs
-///   - To be implement, handle results from vendors, mark requirements as fulfilled/requiring retry
+///   - To be implement, handle results from vendors
 ///   - add step ups
 ///   - decide to waterfall to other vendors
 ///
-/// decision_engine.rs
+/// engine.rs
 ///   - To be implemented, Fn<Results, UserVaultId, Risk> -> (OnboardingDecision, FootprintDecision)
 ///
 ////////////////////////
 pub mod engine;
-mod requirement;
-pub use requirement::{create_requirements, update_requirement_statuses_to_processing};
 pub mod risk;
 pub(self) mod utils;
 pub mod verification_request;
