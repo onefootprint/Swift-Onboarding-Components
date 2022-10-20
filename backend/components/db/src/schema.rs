@@ -289,10 +289,8 @@ table! {
 
     risk_signal (id) {
         id -> Text,
-        scope -> Array<Text>,
         onboarding_decision_id -> Text,
         reason_code -> Text,
-        description -> Text,
         created_at -> Timestamptz,
         deactivated_at -> Nullable<Timestamptz>,
         _created_at -> Timestamptz,

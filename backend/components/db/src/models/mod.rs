@@ -13,6 +13,7 @@ pub mod onboarding_decision;
 pub mod phone_number;
 pub mod requirement;
 pub mod requirement_vrequest_junction;
+pub mod risk_signal;
 pub mod scoped_user;
 pub mod session;
 pub mod tenant;

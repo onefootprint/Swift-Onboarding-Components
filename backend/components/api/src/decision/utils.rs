@@ -1,6 +1,17 @@
-use newtypes::OnboardingStatus;
+use db::{
+    models::{audit_trail::AuditTrail, onboarding_decision::OnboardingDecision, risk_signal::RiskSignal},
+    PgConnection,
+};
+use newtypes::{
+    AuditTrailEvent, ComplianceStatus, FootprintReasonCode, OnboardingId, OnboardingStatus, SignalScope,
+    TenantId, UserVaultId, Vendor, VerificationInfo, VerificationInfoStatus, VerificationStatus,
+};
 
-use crate::{errors::ApiError, utils::user_vault_wrapper::UserVaultWrapper, State};
+use crate::{
+    errors::{ApiError, ApiResult},
+    utils::user_vault_wrapper::UserVaultWrapper,
+    State,
+};
 
 // Logic to figure out test status from some of the identity data we collected during onboarding
 // As of 2022-10-15 we do this by looking at the phone number
@@ -31,4 +42,87 @@ pub(super) async fn get_desired_status_for_testing(
     };
 
     Ok(desired_status)
+}
+
+pub(super) fn create_test_fixture_data(
+    conn: &mut PgConnection,
+    user_vault_id: UserVaultId,
+    tenant_id: TenantId,
+    ob_id: OnboardingId,
+    desired_status: OnboardingStatus,
+) -> ApiResult<()> {
+    let decision_status = match desired_status {
+        OnboardingStatus::Verified => VerificationStatus::Verified,
+        OnboardingStatus::Failed => VerificationStatus::Failed,
+        OnboardingStatus::ManualReview => VerificationStatus::ManualReview,
+        _ => VerificationStatus::Failed,
+    };
+    let decision = OnboardingDecision::create(
+        conn,
+        ob_id,
+        "TODO GIT HASH".to_owned(),
+        None,
+        decision_status,
+        ComplianceStatus::Compliant,
+    )?;
+    let reason_codes = match desired_status {
+        OnboardingStatus::Failed => vec![
+            FootprintReasonCode::SubjectDeceased,
+            FootprintReasonCode::SsnIssuedPriorToDob,
+        ],
+        OnboardingStatus::Verified => vec![
+            FootprintReasonCode::MobileNumber,
+            FootprintReasonCode::CorporateEmailDomain,
+        ],
+        OnboardingStatus::ManualReview => vec![
+            FootprintReasonCode::SsnDoesNotMatchWithinTolerance,
+            FootprintReasonCode::LastNameDoesNotMatch,
+        ],
+        _ => vec![],
+    };
+    RiskSignal::bulk_create(conn, decision.id, reason_codes)?;
+
+    // Create old AuditTrail events
+    // TODO these will probably go away
+    let final_status = match &desired_status {
+        OnboardingStatus::Verified => VerificationInfoStatus::Verified,
+        _ => VerificationInfoStatus::Failed,
+    };
+    let events = vec![
+        VerificationInfo {
+            attributes: vec![SignalScope::Name, SignalScope::Dob],
+            vendor: Vendor::Experian,
+            status: VerificationInfoStatus::Verified,
+        },
+        VerificationInfo {
+            attributes: vec![SignalScope::Country, SignalScope::State],
+            vendor: Vendor::Socure,
+            status: VerificationInfoStatus::Verified,
+        },
+        VerificationInfo {
+            attributes: vec![SignalScope::StreetAddress, SignalScope::City, SignalScope::Zip],
+            vendor: Vendor::Idology,
+            status: VerificationInfoStatus::Verified,
+        },
+        VerificationInfo {
+            attributes: vec![SignalScope::Ssn],
+            vendor: Vendor::LexisNexis,
+            status: final_status,
+        },
+        VerificationInfo {
+            attributes: vec![],
+            vendor: Vendor::Footprint,
+            status: final_status,
+        },
+    ];
+    events.into_iter().try_for_each(|e| {
+        AuditTrail::create(
+            conn,
+            AuditTrailEvent::Verification(e),
+            user_vault_id.clone(),
+            Some(tenant_id.clone()),
+            None,
+        )
+    })?;
+    Ok(())
 }

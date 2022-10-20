@@ -4,15 +4,9 @@ use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use strum_macros::{AsRefStr, Display, EnumIter, EnumString};
 
-/// The type of requirement
 #[derive(
     Debug,
-    Eq,
-    PartialEq,
-    Ord,
-    PartialOrd,
     Display,
-    Hash,
     Clone,
     Copy,
     Deserialize,
@@ -28,9 +22,13 @@ use strum_macros::{AsRefStr, Display, EnumIter, EnumString};
 #[strum(serialize_all = "snake_case")]
 #[serde(rename_all = "snake_case")]
 #[diesel(sql_type = Text)]
-pub enum VerificationStatus {
-    Failed,
-    ManualReview,
-    Verified,
+pub enum FootprintReasonCode {
+    // TODO these are just test values
+    SubjectDeceased,
+    SsnIssuedPriorToDob,
+    MobileNumber,
+    CorporateEmailDomain,
+    SsnDoesNotMatchWithinTolerance,
+    LastNameDoesNotMatch,
 }
-crate::util::impl_enum_str_diesel!(VerificationStatus);
+crate::util::impl_enum_str_diesel!(FootprintReasonCode);
