@@ -421,7 +421,7 @@
               "label": "Onboarding configuration name",
               "placeholder": "User ID verification",
               "errors": {
-                "required": "Please enter a name for your onboarding configuration."
+                "required": "Please enter a name for the onboarding configuration."
               }
             }
           },
