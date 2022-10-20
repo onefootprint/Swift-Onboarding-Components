@@ -2,10 +2,10 @@ import { Onboarding } from './onboarding';
 import { UserDataAttribute } from './user-data-attribute';
 
 export type ScopedUser = {
-  footprintUserId: string;
+  id: string;
+  isPortable: boolean;
   identityDataAttributes: UserDataAttribute[];
   startTimestamp: string;
-  orderingId: string;
   onboardings: Onboarding[];
-  isPortable: boolean;
+  orderingId: string;
 };

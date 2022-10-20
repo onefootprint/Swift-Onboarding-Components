@@ -16,7 +16,7 @@ type InsightsProps = {
 };
 
 const Insights = ({ user }: InsightsProps) => {
-  const getLiveness = useGetLiveness(user.footprintUserId);
+  const getLiveness = useGetLiveness(user.id);
 
   const biometricCred = getLiveness.data?.[0];
 

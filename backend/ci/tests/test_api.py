@@ -22,7 +22,7 @@ class TestNonPortableVaultApi:
     def test_identity_validation(self, workos_sandbox_tenant, data):
         body = post("users/", None, workos_sandbox_tenant.sk.key)
         user = body
-        fp_id = user["footprint_user_id"]
+        fp_id = user["id"]
         assert fp_id
 
         put(
@@ -36,7 +36,7 @@ class TestNonPortableVaultApi:
         # create the vault
         body = post("users/", None, workos_sandbox_tenant.sk.key)
         user = body
-        fp_id = user["footprint_user_id"]
+        fp_id = user["id"]
         assert fp_id
 
         # post data to it
@@ -45,7 +45,9 @@ class TestNonPortableVaultApi:
 
         # check that the data is there now
         params = {"fields": "first_name, last_name, zip, ssn9, city"}
-        response = get(f"users/{fp_id}/vault/identity", params, workos_sandbox_tenant.sk.key)
+        response = get(
+            f"users/{fp_id}/vault/identity", params, workos_sandbox_tenant.sk.key
+        )
         assert response["first_name"] == True
         assert response["last_name"] == True
         assert response["zip"] == True
@@ -80,7 +82,7 @@ class TestNonPortableVaultApi:
         # create the vault
         body = post("users/", None, workos_sandbox_tenant.sk.key)
         user = body
-        fp_id = user["footprint_user_id"]
+        fp_id = user["id"]
         assert fp_id
 
         # post data to it
@@ -102,7 +104,9 @@ class TestNonPortableVaultApi:
 
         # check status of the data
         params = {"fields": "cc4,ach_account_number, insurance_id"}
-        response = get(f"users/{fp_id}/vault/custom", params, workos_sandbox_tenant.sk.key)
+        response = get(
+            f"users/{fp_id}/vault/custom", params, workos_sandbox_tenant.sk.key
+        )
         assert response["ach_account_number"] == True
         assert response["cc4"] == True
         assert response["insurance_id"] == False
@@ -135,7 +139,7 @@ class TestUnifiedVaultApi:
         # create the vault
         body = post("users/", None, workos_sandbox_tenant.sk.key)
         user = body
-        fp_id = user["footprint_user_id"]
+        fp_id = user["id"]
         assert fp_id
 
         # post data to it

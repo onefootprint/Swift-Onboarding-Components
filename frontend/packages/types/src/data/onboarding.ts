@@ -1,14 +1,21 @@
 import { CollectedDataOption } from './collected-data-option';
 import { InsightEvent } from './insight-event';
+import { OnboardingDecision } from './onboarding-decision';
 import OnboardingStatus from './onboarding-status';
 import { UserDataAttribute } from './user-data-attribute';
 
 export type Onboarding = {
+  id: string;
+  name: string;
+  configId: string;
   status: OnboardingStatus;
+  timestamp: string;
+  isLivenessSkipped: boolean;
+  insightEvent: InsightEvent;
+
   canAccessData: CollectedDataOption[];
   canAccessDataAttributes: UserDataAttribute[];
-  name: string;
-  description?: string;
-  insightEvent: InsightEvent;
-  timestamp: string;
+  canAccessIdentityDocumentImages: boolean;
+
+  latestDecision?: OnboardingDecision;
 };

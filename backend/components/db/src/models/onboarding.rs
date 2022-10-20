@@ -1,4 +1,5 @@
 use super::insight_event::CreateInsightEvent;
+use super::onboarding_decision::OnboardingDecision;
 use super::scoped_user::ScopedUser;
 use crate::models::insight_event::InsightEvent;
 use crate::models::ob_configuration::ObConfiguration;
@@ -74,7 +75,12 @@ impl OnboardingUpdate {
     }
 }
 
-pub type OnboardingInfo = (Onboarding, ObConfiguration, InsightEvent);
+pub type OnboardingInfo = (
+    Onboarding,
+    ObConfiguration,
+    InsightEvent,
+    Option<OnboardingDecision>,
+);
 
 impl Onboarding {
     pub fn get(conn: &mut PgConnection, id: &OnboardingId) -> Result<(Onboarding, ScopedUser), DbError> {
@@ -89,10 +95,11 @@ impl Onboarding {
         conn: &mut PgConnection,
         scoped_user_ids: Vec<&ScopedUserId>,
     ) -> Result<HashMap<ScopedUserId, Vec<OnboardingInfo>>, DbError> {
-        use crate::schema::{insight_event, ob_configuration};
+        use crate::schema::{insight_event, ob_configuration, onboarding_decision};
         let obs: Vec<OnboardingInfo> = onboarding::table
             .inner_join(ob_configuration::table)
             .inner_join(insight_event::table)
+            .left_join(onboarding_decision::table)
             .filter(onboarding::scoped_user_id.eq_any(scoped_user_ids))
             .order_by(onboarding::scoped_user_id)
             .load(conn)?;
@@ -101,7 +108,7 @@ impl Onboarding {
         // group_by only groups adjacent items, so this requires that the vec is sorted by scoped_user_id
         let result = obs
             .into_iter()
-            .group_by(|(link, _, _)| link.scoped_user_id.clone())
+            .group_by(|(link, _, _, _)| link.scoped_user_id.clone())
             .into_iter()
             .map(|g| (g.0, g.1.collect()))
             .collect();

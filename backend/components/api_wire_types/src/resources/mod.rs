@@ -19,6 +19,9 @@ pub use self::onboarding::*;
 pub mod onboarding_configuration;
 pub use self::onboarding_configuration::*;
 
+pub mod onboarding_decision;
+pub use self::onboarding_decision::*;
+
 pub mod secret_api_key;
 pub use self::secret_api_key::*;
 
@@ -37,9 +40,5 @@ pub use self::org_role::*;
 pub mod requirement;
 pub use self::requirement::*;
 
-pub mod decision;
-pub use self::decision::*;
-
 pub mod timeline_event;
 pub use self::timeline_event::*;
-

@@ -11,21 +11,15 @@ use crate::utils::db2api::DbToApi;
 use crate::utils::user_vault_wrapper::UserVaultWrapper;
 use crate::State;
 use api_wire_types::ListUsersRequest;
-use chrono::Utc;
 use db::models::identity_data::HasIdentityDataFields;
 use db::models::onboarding::Onboarding;
 use db::models::onboarding::OnboardingInfo;
+use db::models::onboarding_decision::OnboardingDecision;
 use db::models::scoped_user::ScopedUser;
 use db::scoped_user::OnboardingListQueryParams;
 
-use newtypes::OnboardingDecisionId;
-
-use newtypes::OnboardingId;
-use newtypes::RequirementId;
-use newtypes::RequirementKind;
 use newtypes::TenantPermission;
 use newtypes::UserVaultId;
-use newtypes::Vendor;
 use newtypes::{DataAttribute, Fingerprint, Fingerprinter};
 use paperclip::actix::{api_v2_operation, get, web, web::Json};
 
@@ -139,49 +133,21 @@ impl<'a> DbToApi<UserDetail<'a>> for api_wire_types::User {
         } = scoped_user;
 
         api_wire_types::User {
-            footprint_user_id: fp_user_id,
-            start_timestamp,
-            identity_data_attributes,
-            ordering_id,
+            id: fp_user_id,
             is_portable,
+            identity_data_attributes,
+            start_timestamp,
             onboardings: onboarding_info
                 .iter()
                 .map(|x| api_wire_types::Onboarding::from_db(x.clone()))
                 .collect(),
-
-            // TODO: needs real data
-            requirements: vec![
-                RequirementKind::Name,
-                RequirementKind::Dob,
-                RequirementKind::FullAddress,
-                RequirementKind::Ssn9,
-                RequirementKind::Liveness,
-            ]
-            .into_iter()
-            .map(|kind| api_wire_types::Requirement {
-                id: RequirementId::default(),
-                onboarding_id: OnboardingId::default(),
-                kind,
-                initiator: newtypes::RequirementInitiator::Tenant,
-                status: api_wire_types::RequirementVerificationStatus::Verified,
-                vendors: vec![Vendor::Idology, Vendor::Twilio],
-                risk_signal_ids: vec![],
-                fulfilled_at: Utc::now(),
-            })
-            .collect(),
-            decisions: vec![api_wire_types::Decision {
-                id: OnboardingDecisionId::default(),
-                verification_status: newtypes::VerificationStatus::Verified,
-                compliance_status: newtypes::ComplianceStatus::Compliant,
-                source: api_wire_types::DecisionSource::Footprint,
-                timestamp: Utc::now(),
-            }],
+            ordering_id,
         }
     }
 }
 
 impl DbToApi<OnboardingInfo> for api_wire_types::Onboarding {
-    fn from_db((onboarding, config, insight): OnboardingInfo) -> Self {
+    fn from_db((onboarding, config, insight, decision): OnboardingInfo) -> Self {
         let Onboarding {
             start_timestamp,
             is_liveness_skipped,
@@ -196,19 +162,37 @@ impl DbToApi<OnboardingInfo> for api_wire_types::Onboarding {
         } = config;
         let can_access_data_attributes = can_access_data.iter().flat_map(|x| x.attributes()).collect();
         api_wire_types::Onboarding {
+            id: onboarding.id,
             name,
+            config_id: config.id,
+            status,
             timestamp: start_timestamp,
-
+            is_liveness_skipped,
+            insight_event: api_wire_types::InsightEvent::from_db(insight),
             can_access_data,
             can_access_data_attributes,
-            insight_event: api_wire_types::InsightEvent::from_db(insight),
-
-            id: onboarding.id,
-            config_id: config.id,
             can_access_identity_document_images,
-            is_liveness_skipped,
+            latest_decision: decision.map(api_wire_types::OnboardingDecision::from_db),
+        }
+    }
+}
 
-            status,
+impl DbToApi<OnboardingDecision> for api_wire_types::OnboardingDecision {
+    fn from_db(decision: OnboardingDecision) -> Self {
+        let OnboardingDecision {
+            id,
+            verification_status,
+            compliance_status,
+            tenant_user_id,
+            created_at,
+            ..
+        } = decision;
+        api_wire_types::OnboardingDecision {
+            id,
+            verification_status,
+            compliance_status,
+            tenant_user_id,
+            timestamp: created_at,
         }
     }
 }

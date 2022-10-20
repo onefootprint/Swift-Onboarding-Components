@@ -11,7 +11,7 @@ type AuditTrailProps = {
 };
 
 const AuditTrail = ({ user }: AuditTrailProps) => {
-  const getAuditTrail = useGetAuditTrail(user.footprintUserId);
+  const getAuditTrail = useGetAuditTrail(user.id);
   return (
     <>
       <Typography variant="label-1" as="h2">

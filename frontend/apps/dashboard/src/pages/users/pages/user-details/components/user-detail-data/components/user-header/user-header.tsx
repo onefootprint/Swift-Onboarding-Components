@@ -14,7 +14,7 @@ type BasicInfoProps = {
 };
 
 const UserHeader = ({ user }: BasicInfoProps) => {
-  const { footprintUserId } = user;
+  const { id: footprintUserId } = user;
   return (
     <HeaderContainer>
       <RowContainer>

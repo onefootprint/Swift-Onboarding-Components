@@ -52,7 +52,7 @@ const UserDetailsData = ({ user, decrypt }: UserDetailsDataProps) => {
       await decrypt({
         fields: [...(Object.keys(fields) as UserDataAttribute[])],
         reason,
-        userId: user.footprintUserId,
+        userId: user.id,
       });
       send({ type: Event.decryptSucceeded });
     } catch (error: unknown) {

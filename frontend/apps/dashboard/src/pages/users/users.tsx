@@ -74,11 +74,11 @@ const Users = () => {
         emptyStateText={t('table.empty-state')}
         items={users}
         isLoading={isLoading}
-        getKeyForRow={(item: User) => item.footprintUserId}
+        getKeyForRow={(item: User) => item.id}
         onRowClick={(item: User) => {
           router.push({
             pathname: 'users/detail',
-            query: { footprint_user_id: item.footprintUserId },
+            query: { footprint_user_id: item.id },
           });
         }}
         columns={columns}
@@ -88,7 +88,7 @@ const Users = () => {
               <FieldOrPlaceholder data={nameData(item.attributes)} />
             </td>
             <td>
-              <CodeInline truncate>{item.footprintUserId}</CodeInline>
+              <CodeInline truncate>{item.id}</CodeInline>
             </td>
 
             <td>

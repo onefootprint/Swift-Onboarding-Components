@@ -9,6 +9,7 @@ pub mod insight_event;
 pub mod kv_data;
 pub mod ob_configuration;
 pub mod onboarding;
+pub mod onboarding_decision;
 pub mod phone_number;
 pub mod requirement;
 pub mod requirement_vrequest_junction;

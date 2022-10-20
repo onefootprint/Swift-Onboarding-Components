@@ -82,9 +82,7 @@ class TestDashboard:
         scoped_users = body["data"]
         assert len(scoped_users)
 
-        scoped_user = list(
-            filter(lambda su: su["footprint_user_id"] == user.fp_user_id, scoped_users)
-        )
+        scoped_user = list(filter(lambda su: su["id"] == user.fp_user_id, scoped_users))
         assert len(scoped_user) == 1
 
         assert set(["first_name", "last_name"]) < set(

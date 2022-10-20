@@ -48,14 +48,12 @@ impl DbToApi<ScopedUser> for api_wire_types::User {
         } = target;
 
         Self {
-            footprint_user_id: fp_user_id,
+            id: fp_user_id,
+            is_portable: false,
             identity_data_attributes: vec![],
             start_timestamp,
-            ordering_id,
             onboardings: vec![],
-            is_portable: false,
-            requirements: vec![],
-            decisions: vec![],
+            ordering_id,
         }
     }
 }

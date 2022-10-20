@@ -46,7 +46,7 @@ pub async fn get(
                 .get(&scoped_user.id)
                 .unwrap_or(&vec![])
                 .iter()
-                .map(|(ob, conf, insight)| HostedUserOnboardingInfo {
+                .map(|(ob, conf, insight, _)| HostedUserOnboardingInfo {
                     name: conf.name.clone(),
                     insight_event: InsightEvent::from_db(insight.clone()),
                     timestamp: ob.start_timestamp,

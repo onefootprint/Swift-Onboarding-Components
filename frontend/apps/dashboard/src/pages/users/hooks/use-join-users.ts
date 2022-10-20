@@ -38,8 +38,7 @@ const useJoinUsers = (
     () =>
       scoped_users?.map((scoped_user: ScopedUser) => {
         const decryptedData =
-          decryptedUsers.get(scoped_user.footprintUserId) ||
-          ({} as UserAttributes);
+          decryptedUsers.get(scoped_user.id) || ({} as UserAttributes);
         // Create a UserData for every type of DataKind for this user. The UserData contains
         // the value of the attribute if decrypted, otherwise information on whether the value
         // is set for the user and whether we're currently fetching the decrypted value.
