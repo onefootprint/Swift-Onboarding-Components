@@ -4,10 +4,10 @@ on:
   #
   # NOTE: for now we are auto-deploying to prod if tests pass!
   #
-  # workflow_run:
-  #   workflows: ['Backend Deploy Dev']
-  #   types:
-  #     - completed
+  workflow_run:
+    workflows: ['Backend Deploy Dev']
+    types:
+      - completed
 
   workflow_dispatch:
 
