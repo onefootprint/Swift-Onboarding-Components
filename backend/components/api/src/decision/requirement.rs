@@ -12,7 +12,8 @@ use crate::types::identity_data_request::IdentityDataUpdate;
 
 use super::risk;
 
-pub(super) fn create_requirements(
+/// Create requirements, checking if we have already satisfied them and adding any risk-related requirements
+pub fn create_requirements(
     conn: &mut TxnPgConnection,
     user_vault_id: &UserVaultId,
     onboarding_id: &OnboardingId,
@@ -28,7 +29,9 @@ pub(super) fn create_requirements(
     Ok(requirements_created)
 }
 
-pub(super) fn update_requirement_statuses_to_processing(
+/// Update statuses of Requirements to processing, checking if we can do so
+/// TODO: we need to add who or what is updating the status
+pub fn update_requirement_statuses_to_processing(
     conn: &mut TxnPgConnection,
     user_vault_id: &UserVaultId,
     identity_data: Option<&IdentityDataUpdate>,

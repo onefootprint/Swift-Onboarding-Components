@@ -8,7 +8,7 @@ use crate::types::response::ResponseData;
 use crate::types::EmptyResponse;
 use crate::utils::user_vault_wrapper::UserVaultWrapper;
 use crate::{errors::ApiError, State};
-use paperclip::actix::{api_v2_operation, self, web, web::Json};
+use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
 #[api_v2_operation(tags(Hosted), description = "Updates data in the user vault.")]
 #[actix::post("/hosted/user/data/identity")]
@@ -34,7 +34,7 @@ async fn post(
             let mut uvw = UserVaultWrapper::lock(conn, &user_auth.user_vault_id())?;
             uvw.update_identity_data(conn, update.clone(), fingerprints)?;
             // Update our requirements
-            decision::update_requirement_statuses_to_processing(conn, Some(&update), &uvw.user_vault.id)?;
+            decision::update_requirement_statuses_to_processing(conn, &uvw.user_vault.id, Some(&update))?;
             Ok(())
         })
         .await?;
