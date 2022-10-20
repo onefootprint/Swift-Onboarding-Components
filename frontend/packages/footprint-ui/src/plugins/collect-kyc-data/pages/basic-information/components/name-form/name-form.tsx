@@ -9,10 +9,6 @@ import HeaderTitle from '../../../../../../components/header-title';
 import { useCollectKycDataMachine } from '../../../../components/machine-provider';
 import NavigationHeader from '../../../../components/navigation-header/navigation-header';
 import { NameInformation } from '../../../../utils/data-types';
-import {
-  isMissingResidentialAttribute,
-  isMissingSsnAttribute,
-} from '../../../../utils/missing-attributes';
 
 type FormData = NameInformation;
 
@@ -34,7 +30,7 @@ const NameForm = ({
   const { t: cta } = useTranslation('pages.cta');
   const { t } = useTranslation('pages.basic-information');
   const [state] = useCollectKycDataMachine();
-  const { data, missingAttributes } = state.context;
+  const { data } = state.context;
 
   const {
     register,
@@ -54,10 +50,6 @@ const NameForm = ({
     };
     onSubmit(basicInformation);
   };
-
-  const hasOtherMissingAttributes =
-    isMissingResidentialAttribute(missingAttributes) ||
-    isMissingSsnAttribute(missingAttributes);
 
   return (
     <>
@@ -92,8 +84,7 @@ const NameForm = ({
           </Grid.Column>
         </Grid.Row>
         <Button type="submit" fullWidth loading={isMutationLoading}>
-          {ctaLabel ??
-            (hasOtherMissingAttributes ? cta('continue') : cta('complete'))}
+          {ctaLabel ?? cta('continue')}
         </Button>
       </Form>
     </>

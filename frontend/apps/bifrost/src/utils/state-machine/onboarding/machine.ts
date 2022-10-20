@@ -39,8 +39,15 @@ const createOnboardingMachine = ({
         [States.initOnboarding]: {
           on: {
             [Events.onboardingInitialized]: [
+              // TODO: Replace this with the one below. For now, for the demo, we are unconditionally
+              // showing the authorize screen everytime the user signs-in even if they previously onboarded.
+              // {
+              //   target: States.success,
+              //   cond: (context, event) => !!event.payload.validationToken,
+              //   actions: [Actions.assignValidationToken],
+              // },
               {
-                target: States.success,
+                target: States.authorize,
                 cond: (context, event) => !!event.payload.validationToken,
                 actions: [Actions.assignValidationToken],
               },

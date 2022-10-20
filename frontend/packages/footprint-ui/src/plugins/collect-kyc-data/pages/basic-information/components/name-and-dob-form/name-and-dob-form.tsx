@@ -9,10 +9,6 @@ import HeaderTitle from '../../../../../../components/header-title';
 import { useCollectKycDataMachine } from '../../../../components/machine-provider';
 import NavigationHeader from '../../../../components/navigation-header/navigation-header';
 import { NameAndDobInformation } from '../../../../utils/data-types';
-import {
-  isMissingResidentialAttribute,
-  isMissingSsnAttribute,
-} from '../../../../utils/missing-attributes';
 import validateDob from '../../utils/validate-dob/validate-dob';
 
 type FormData = NameAndDobInformation;
@@ -36,7 +32,7 @@ const NameAndDobForm = ({
   const { t } = useTranslation('pages.basic-information');
   const inputMasks = useInputMask('en-US');
   const [state] = useCollectKycDataMachine();
-  const { data, missingAttributes } = state.context;
+  const { data } = state.context;
 
   const {
     register,
@@ -58,10 +54,6 @@ const NameAndDobForm = ({
     };
     onSubmit(basicInformation);
   };
-
-  const hasOtherMissingAttributes =
-    isMissingResidentialAttribute(missingAttributes) ||
-    isMissingSsnAttribute(missingAttributes);
 
   return (
     <>
@@ -107,8 +99,7 @@ const NameAndDobForm = ({
           })}
         />
         <Button type="submit" fullWidth loading={isMutationLoading}>
-          {ctaLabel ??
-            (hasOtherMissingAttributes ? cta('continue') : cta('complete'))}
+          {ctaLabel ?? cta('continue')}
         </Button>
       </Form>
     </>
