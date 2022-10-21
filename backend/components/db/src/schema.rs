@@ -413,6 +413,20 @@ table! {
     use diesel::sql_types::*;
     use newtypes::db_types::*;
 
+    user_timeline (id) {
+        id -> Text,
+        onboarding_id -> Uuid,
+        event -> Jsonb,
+        timestamp -> Timestamptz,
+        _created_at -> Timestamptz,
+        _updated_at -> Timestamptz,
+    }
+}
+
+table! {
+    use diesel::sql_types::*;
+    use newtypes::db_types::*;
+
     user_vault (id) {
         id -> Text,
         e_private_key -> Bytea,
@@ -508,6 +522,7 @@ joinable!(tenant_api_key_access_log -> tenant_api_key (tenant_api_key_id));
 joinable!(tenant_role -> tenant (tenant_id));
 joinable!(tenant_user -> tenant (tenant_id));
 joinable!(tenant_user -> tenant_role (tenant_role_id));
+joinable!(user_timeline -> onboarding (onboarding_id));
 joinable!(verification_request -> email (email_id));
 joinable!(verification_request -> identity_data (identity_data_id));
 joinable!(verification_request -> identity_document (identity_document_id));
@@ -542,6 +557,7 @@ allow_tables_to_appear_in_same_query!(
     tenant_api_key_access_log,
     tenant_role,
     tenant_user,
+    user_timeline,
     user_vault,
     verification_request,
     verification_result,

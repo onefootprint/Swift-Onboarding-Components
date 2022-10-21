@@ -88,6 +88,7 @@ define_newtype_id!(
 );
 define_newtype_id!(VerificationResultId, Uuid, "Identifier for a verification result");
 define_newtype_id!(AuditTrailId, Uuid, "Identifier for an audit trail");
+define_newtype_id!(UserTimelineId, String, "Identifier for a user timeline entry");
 define_newtype_id!(
     KeyValueDataId,
     String,
