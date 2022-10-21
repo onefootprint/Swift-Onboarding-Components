@@ -8,11 +8,12 @@ import React from 'react';
 import { createGlobalStyle } from 'styled-components';
 
 import configureReactI18next from '../config/initializers/react-i18next';
-import queryClient from '../config/initializers/react-query';
+import configureReactQuery from '../config/initializers/react-query';
 import configureSentry from '../config/initializers/sentry';
 
 configureSentry();
 configureReactI18next();
+const queryClient = configureReactQuery();
 
 type AppProps = {
   Component: React.FC;

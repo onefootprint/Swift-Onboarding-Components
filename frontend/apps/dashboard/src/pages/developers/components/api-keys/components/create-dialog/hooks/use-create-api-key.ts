@@ -32,7 +32,7 @@ const useCreateApiKey = () => {
   >((data: OrgCreateApiKeyRequest) => createApiKey(authHeaders, data), {
     onError: showErrorToast,
     onSettled: () => {
-      queryClient.invalidateQueries(['api-keys']);
+      queryClient.invalidateQueries(['api-keys', authHeaders]);
     },
   });
 };

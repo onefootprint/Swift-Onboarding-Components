@@ -75,14 +75,14 @@ const GlobalStyle = createGlobalStyle`
 
 const DesignSystemProvider = ({ children, theme }: BootstrapProps) => (
   <ThemeProvider theme={theme}>
-    <ConfirmationDialogProvider>
-      <ToastProvider>
-        <GlobalStyle />
-        {children}
-      </ToastProvider>
-    </ConfirmationDialogProvider>
-    <div id="footprint-portal" />
-    <div id="footprint-toast-portal" />
+    <>
+      <GlobalStyle />
+      <ConfirmationDialogProvider>
+        <ToastProvider>{children}</ToastProvider>
+      </ConfirmationDialogProvider>
+      <div id="footprint-portal" />
+      <div id="footprint-toast-portal" />
+    </>
   </ThemeProvider>
 );
 

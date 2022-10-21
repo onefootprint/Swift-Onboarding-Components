@@ -1,5 +1,6 @@
 import themes from '@onefootprint/themes';
 import { DesignSystemProvider } from '@onefootprint/ui';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import Head from 'next/head';
 import React, { useEffect, useState } from 'react';
 import { createGlobalStyle, css } from 'styled-components';
@@ -29,8 +30,9 @@ const App = ({ Component, pageProps }: AppProps) => {
       <Head>
         <meta name="viewport" content="width=900,maximum-scale=1.0" />
       </Head>
-      <DesignSystemProvider theme={themes.light}>
-        <ReactQueryProvider>
+      <ReactQueryProvider>
+        <DesignSystemProvider theme={themes.light}>
+          <ReactQueryDevtools initialIsOpen={false} />
           <UserDataProvider>
             <GlobalStyle />
             <PageGuard>
@@ -39,8 +41,8 @@ const App = ({ Component, pageProps }: AppProps) => {
               </Layout>
             </PageGuard>
           </UserDataProvider>
-        </ReactQueryProvider>
-      </DesignSystemProvider>
+        </DesignSystemProvider>
+      </ReactQueryProvider>
     </>
   );
 };
