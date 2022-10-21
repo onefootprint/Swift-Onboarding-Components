@@ -22,7 +22,7 @@ import useGetKycStatus from './hooks/use-get-kyc-status';
 import useStartKyc from './hooks/use-start-kyc';
 
 const Confirm = () => {
-  const { t } = useTranslation('pages.confirm.summary');
+  const { t } = useTranslation('pages.confirm');
   const [state, send] = useCollectKycDataMachine();
   const { authToken, data, tenant, device } = state.context;
   const isMobile = device?.type === 'mobile';
@@ -120,14 +120,17 @@ const Confirm = () => {
     <>
       <NavigationHeader button={{ variant: 'back', onClick: handlePrev }} />
       <Container>
-        <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
+        <HeaderTitle
+          title={t('summary.title')}
+          subtitle={t('summary.subtitle')}
+        />
         <SectionsContainer>
           <BasicInfoSection onEdit={handleBasicInfoEdit} />
           <AddressSection onEdit={handleAddressEdit} />
           <IdentitySection onEdit={handleIdentityEdit} />
         </SectionsContainer>
         <Button fullWidth onClick={handleConfirm} loading={mutation.isLoading}>
-          {t('cta')}
+          {t('summary.cta')}
         </Button>
       </Container>
       <EditSheet
