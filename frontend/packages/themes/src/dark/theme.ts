@@ -43,7 +43,7 @@ const theme: DefaultTheme = {
     error: primitives.red500,
   },
   color: {
-    primary: primitives.brandSleep,
+    primary: primitives.gray1000,
     secondary: primitives.gray800,
     tertiary: primitives.gray500,
     quaternary: primitives.gray400,
