@@ -24,7 +24,7 @@ pub use diesel::prelude::PgConnection;
 use diesel::prelude::*;
 use diesel_migrations::EmbeddedMigrations;
 use errors::TransactionError;
-use newtypes::{Fingerprint, OnboardingDecisionId};
+use newtypes::Fingerprint;
 use user_vault::get_by_fingerprint;
 
 #[allow(unused_imports)]
@@ -205,12 +205,6 @@ pub async fn private_cleanup_integration_tests(
                     let ob_ids = onboarding::table
                         .filter(onboarding::scoped_user_id.eq_any(su_ids))
                         .select(onboarding::id);
-
-                    // This is really janky - since we have a cyclical dependency, have to clear out latest_decision_id before we delete decisions
-                    diesel::update(onboarding::table)
-                        .filter(onboarding::scoped_user_id.eq_any(su_ids))
-                        .set(onboarding::latest_decision_id.eq(Option::<OnboardingDecisionId>::None))
-                        .execute(conn.conn())?;
 
                     // Onboarding decisions
                     {

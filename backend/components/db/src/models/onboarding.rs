@@ -11,8 +11,7 @@ use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
 use itertools::Itertools;
 use newtypes::{
-    InsightEventId, ObConfigurationId, OnboardingDecisionId, OnboardingId, OnboardingStatus, ScopedUserId,
-    UserVaultId,
+    InsightEventId, ObConfigurationId, OnboardingId, OnboardingStatus, ScopedUserId, UserVaultId,
 };
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
@@ -30,7 +29,6 @@ pub struct Onboarding {
     pub status: OnboardingStatus,
     pub is_liveness_skipped: bool,
     pub is_authorized: bool,
-    pub latest_decision_id: Option<OnboardingDecisionId>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
@@ -51,7 +49,6 @@ pub struct OnboardingUpdate {
     pub status: Option<OnboardingStatus>,
     pub is_liveness_skipped: Option<bool>,
     pub is_authorized: Option<bool>,
-    pub latest_decision_id: Option<Option<OnboardingDecisionId>>,
 }
 
 impl OnboardingUpdate {
@@ -72,13 +69,6 @@ impl OnboardingUpdate {
     pub fn is_authorized(is_authorized: bool) -> Self {
         Self {
             is_authorized: Some(is_authorized),
-            ..Self::default()
-        }
-    }
-
-    pub fn latest_decision_id(latest_decision_id: Option<OnboardingDecisionId>) -> Self {
-        Self {
-            latest_decision_id: Some(latest_decision_id),
             ..Self::default()
         }
     }
@@ -108,12 +98,12 @@ impl Onboarding {
         let obs: Vec<OnboardingInfo> = onboarding::table
             .inner_join(ob_configuration::table)
             .inner_join(insight_event::table)
-            // Get the latest decision and its tenant_user, if any
-            // TODO it's ambiguous how we perform this join
+            // Get the active decision and its tenant_user, if any
             .left_join(
                 onboarding_decision::table.left_join(tenant_user::table)
             )
             .filter(onboarding::scoped_user_id.eq_any(scoped_user_ids))
+            .filter(onboarding_decision::deactivated_at.is_null())
             .order_by(onboarding::scoped_user_id)
             .load(conn)?;
 
@@ -140,6 +130,14 @@ impl Onboarding {
             .for_no_key_update()
             .first(conn.conn())
             .optional()?;
+        Ok(result)
+    }
+
+    pub fn lock(conn: &mut TxnPgConnection, id: &OnboardingId) -> Result<Self, DbError> {
+        let result = onboarding::table
+            .filter(onboarding::id.eq(id))
+            .for_no_key_update()
+            .get_result(conn.conn())?;
         Ok(result)
     }
 

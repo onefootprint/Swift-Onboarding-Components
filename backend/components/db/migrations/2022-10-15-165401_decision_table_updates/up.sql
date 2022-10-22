@@ -17,11 +17,11 @@ CREATE TABLE onboarding_decision (
     _created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     _updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     
-    CONSTRAINT fk_onboarding_id
+    CONSTRAINT fk_onboarding_decision_onboarding_id
         FOREIGN KEY(onboarding_id) 
         REFERENCES onboarding(id),
 
-    CONSTRAINT fk_tenant_user_id
+    CONSTRAINT fk_onboarding_decision_tenant_user_id
         FOREIGN KEY(tenant_user_id) 
         REFERENCES tenant_user(id)
 );
@@ -36,11 +36,11 @@ CREATE TABLE onboarding_decision_verification_result_junction(
     verification_result_id uuid NOT NULL,
     onboarding_decision_id TEXT NOT NULL,
 
-    CONSTRAINT fk_verification_result_id
+    CONSTRAINT fk_onboarding_decision_verification_result_junction_verification_result_id
         FOREIGN KEY(verification_result_id) 
         REFERENCES verification_result(id),
 
-    CONSTRAINT fk_decision_id
+    CONSTRAINT fk_onboarding_decision_verification_result_junction_onboarding_decision_id
         FOREIGN KEY(onboarding_decision_id) 
         REFERENCES onboarding_decision(id)
 );
@@ -76,11 +76,11 @@ CREATE TABLE risk_signal (
     _created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     _updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     
-    CONSTRAINT fk_onboarding_decision
+    CONSTRAINT fk_risk_signal_onboarding_decision_id
         FOREIGN KEY(onboarding_decision_id) 
         REFERENCES onboarding_decision(id)
 );
 
-CREATE INDEX IF NOT EXISTS risk_decision_id_index ON risk_signal(onboarding_decision_id);
+CREATE INDEX IF NOT EXISTS risk_signal_onboarding_decision_id_index ON risk_signal(onboarding_decision_id);
 
 SELECT diesel_manage_updated_at('risk_signal');

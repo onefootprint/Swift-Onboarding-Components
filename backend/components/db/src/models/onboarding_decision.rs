@@ -9,7 +9,7 @@ use newtypes::{
 };
 use serde::{Deserialize, Serialize};
 
-use super::onboarding::{Onboarding, OnboardingUpdate};
+use super::onboarding::Onboarding;
 use super::user_timeline::UserTimeline;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable)]
@@ -24,6 +24,7 @@ pub struct OnboardingDecision {
     pub created_at: DateTime<Utc>,
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
+    pub deactivated_at: Option<DateTime<Utc>>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
@@ -47,6 +48,17 @@ impl OnboardingDecision {
         verification_status: VerificationStatus,
         compliance_status: ComplianceStatus,
     ) -> DbResult<Self> {
+        // Lock Onboarding so a new decision isn't added while we deactivate the old
+        Onboarding::lock(conn, &onboarding_id)?;
+
+        // Deactivate the last decision
+        diesel::update(onboarding_decision::table)
+            .filter(onboarding_decision::onboarding_id.eq(&onboarding_id))
+            .filter(onboarding_decision::deactivated_at.is_null())
+            .set(onboarding_decision::deactivated_at.eq(Utc::now()))
+            .execute(conn.conn())?;
+
+        // Create the new decision
         let new = NewOnboardingDecision {
             onboarding_id: onboarding_id.clone(),
             logic_git_hash,
@@ -66,11 +78,6 @@ impl OnboardingDecision {
             },
             user_vault_id.clone(),
             Some(onboarding_id.clone()),
-        )?;
-        Onboarding::update_by_id(
-            conn,
-            &onboarding_id,
-            OnboardingUpdate::latest_decision_id(Some(result.id.clone())),
         )?;
         Ok(result)
     }

@@ -201,7 +201,6 @@ table! {
         status -> Text,
         is_liveness_skipped -> Bool,
         is_authorized -> Bool,
-        latest_decision_id -> Nullable<Text>,
     }
 }
 
@@ -219,6 +218,7 @@ table! {
         created_at -> Timestamptz,
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
+        deactivated_at -> Nullable<Timestamptz>,
     }
 }
 
@@ -506,12 +506,13 @@ joinable!(kv_data -> user_vault (user_vault_id));
 joinable!(ob_configuration -> tenant (tenant_id));
 joinable!(onboarding -> insight_event (insight_event_id));
 joinable!(onboarding -> ob_configuration (ob_configuration_id));
-joinable!(onboarding -> onboarding_decision (latest_decision_id));
 joinable!(onboarding -> scoped_user (scoped_user_id));
+joinable!(onboarding_decision -> onboarding (onboarding_id));
 joinable!(onboarding_decision -> tenant_user (tenant_user_id));
 joinable!(onboarding_decision_verification_result_junction -> onboarding_decision (onboarding_decision_id));
 joinable!(onboarding_decision_verification_result_junction -> verification_result (verification_result_id));
 joinable!(phone_number -> user_vault (user_vault_id));
+joinable!(requirement -> onboarding (onboarding_id));
 joinable!(requirement -> user_vault (user_vault_id));
 joinable!(requirement_verification_request_junction -> requirement (requirement_id));
 joinable!(requirement_verification_request_junction -> verification_request (verification_request_id));
