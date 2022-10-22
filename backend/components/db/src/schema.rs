@@ -415,11 +415,12 @@ table! {
 
     user_timeline (id) {
         id -> Text,
-        onboarding_id -> Uuid,
+        onboarding_id -> Nullable<Uuid>,
         event -> Jsonb,
         timestamp -> Timestamptz,
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
+        user_vault_id -> Text,
     }
 }
 
@@ -523,6 +524,7 @@ joinable!(tenant_role -> tenant (tenant_id));
 joinable!(tenant_user -> tenant (tenant_id));
 joinable!(tenant_user -> tenant_role (tenant_role_id));
 joinable!(user_timeline -> onboarding (onboarding_id));
+joinable!(user_timeline -> user_vault (user_vault_id));
 joinable!(verification_request -> email (email_id));
 joinable!(verification_request -> identity_data (identity_data_id));
 joinable!(verification_request -> identity_document (identity_document_id));
