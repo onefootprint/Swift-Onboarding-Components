@@ -1,6 +1,6 @@
 use crate::*;
 
-/// Describes a liveness event that took place
+/// Describes the outcome of an onboarding decision that took place on the user
 #[derive(Debug, Clone, Deserialize, Serialize, Apiv2Schema, JsonSchema)]
 #[schemars(rename_all = "camelCase")]
 
