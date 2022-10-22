@@ -78,6 +78,7 @@ impl DbToApi<RiskSignal> for api_wire_types::RiskSignal {
             reason_code,
             created_at,
             deactivated_at,
+            vendors,
             ..
         } = target;
         Self {
@@ -90,6 +91,7 @@ impl DbToApi<RiskSignal> for api_wire_types::RiskSignal {
             scopes: reason_code.scopes(),
             timestamp: created_at,
             deactivated_at,
+            vendors,
         }
     }
 }

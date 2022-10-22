@@ -82,7 +82,11 @@ pub(super) fn create_test_fixture_data(
         ],
         _ => vec![],
     };
-    RiskSignal::bulk_create(conn, decision.id, reason_codes)?;
+    let signals = reason_codes
+        .into_iter()
+        .map(|r| (r, vec![Vendor::Idology]))
+        .collect();
+    RiskSignal::bulk_create(conn, decision.id, signals)?;
 
     // Create old AuditTrail events
     let final_status = match &desired_status {

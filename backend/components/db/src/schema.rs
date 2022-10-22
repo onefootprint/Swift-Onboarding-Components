@@ -295,6 +295,7 @@ table! {
         deactivated_at -> Nullable<Timestamptz>,
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
+        vendors -> Array<Text>,
     }
 }
 

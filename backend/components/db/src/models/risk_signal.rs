@@ -3,7 +3,7 @@ use crate::DbResult;
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use diesel::{Insertable, PgConnection, Queryable};
-use newtypes::{FootprintReasonCode, FootprintUserId, OnboardingDecisionId, RiskSignalId, TenantId};
+use newtypes::{FootprintReasonCode, FootprintUserId, OnboardingDecisionId, RiskSignalId, TenantId, Vendor};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable)]
@@ -16,6 +16,7 @@ pub struct RiskSignal {
     pub deactivated_at: Option<DateTime<Utc>>,
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
+    pub vendors: Vec<Vendor>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
@@ -23,6 +24,7 @@ pub struct RiskSignal {
 pub struct NewRiskSignal {
     pub onboarding_decision_id: OnboardingDecisionId,
     pub reason_code: FootprintReasonCode,
+    pub vendors: Vec<Vendor>,
     pub created_at: DateTime<Utc>,
 }
 
@@ -30,13 +32,14 @@ impl RiskSignal {
     pub fn bulk_create(
         conn: &mut PgConnection,
         onboarding_decision_id: OnboardingDecisionId,
-        reason_codes: Vec<FootprintReasonCode>,
+        signals: Vec<(FootprintReasonCode, Vec<Vendor>)>,
     ) -> DbResult<Vec<Self>> {
-        let new: Vec<_> = reason_codes
+        let new: Vec<_> = signals
             .into_iter()
-            .map(|reason_code| NewRiskSignal {
+            .map(|(reason_code, vendors)| NewRiskSignal {
                 onboarding_decision_id: onboarding_decision_id.clone(),
                 reason_code,
+                vendors,
                 created_at: Utc::now(),
             })
             .collect();

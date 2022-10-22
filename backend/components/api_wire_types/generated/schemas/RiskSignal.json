@@ -10,7 +10,8 @@
     "reasonCode",
     "scopes",
     "severity",
-    "timestamp"
+    "timestamp",
+    "vendors"
   ],
   "properties": {
     "id": {
@@ -44,6 +45,12 @@
         "null"
       ],
       "format": "date-time"
+    },
+    "vendors": {
+      "type": "array",
+      "items": {
+        "tsType": "Vendor"
+      }
     }
   },
   "definitions": {
@@ -118,6 +125,17 @@
         "identity",
         "ip_address",
         "document"
+      ]
+    },
+    "Vendor": {
+      "type": "string",
+      "enum": [
+        "footprint",
+        "idology",
+        "socure",
+        "lexis_nexis",
+        "experian",
+        "twilio"
       ]
     }
   }
