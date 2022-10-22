@@ -173,7 +173,8 @@ pub async fn private_cleanup_integration_tests(
                 access_event, audit_trail, document_request, email, fingerprint, identity_data,
                 identity_document, onboarding, onboarding_decision,
                 onboarding_decision_verification_result_junction, phone_number, requirement, risk_signal,
-                scoped_user, user_vault, verification_request, verification_result, webauthn_credential,
+                scoped_user, user_timeline, user_vault, verification_request, verification_result,
+                webauthn_credential,
             };
             let mut deleted_rows = 0;
 
@@ -188,6 +189,10 @@ pub async fn private_cleanup_integration_tests(
 
             deleted_rows += diesel::delete(audit_trail::table)
                 .filter(audit_trail::user_vault_id.eq(&uv.id))
+                .execute(conn.conn())?;
+
+            deleted_rows += diesel::delete(user_timeline::table)
+                .filter(user_timeline::user_vault_id.eq(&uv.id))
                 .execute(conn.conn())?;
 
             // Scoped users
