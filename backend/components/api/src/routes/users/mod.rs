@@ -15,7 +15,8 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(audit_trail::get)
         .service(liveness::get)
         .service(timeline::get)
-        .service(risk_signals::get);
+        .service(risk_signals::get)
+        .service(risk_signals::get_detail);
 
     vault::routes(config);
 }

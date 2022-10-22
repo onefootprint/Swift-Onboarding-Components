@@ -46,27 +46,48 @@ impl RiskSignal {
         Ok(result)
     }
 
+    fn query<'a>(
+        footprint_user_id: &'a FootprintUserId,
+        tenant_id: &'a TenantId,
+        is_live: bool,
+    ) -> risk_signal::BoxedQuery<'a, diesel::pg::Pg> {
+        use crate::schema::{onboarding, onboarding_decision, scoped_user};
+        let onboarding_decision_ids = onboarding_decision::table
+            .inner_join(
+                onboarding::table
+                    .inner_join(scoped_user::table)
+                    // Must provide explicit ON since onboarding::latest_decision_id is used by default
+                    .on(onboarding_decision::onboarding_id.eq(onboarding::id)),
+            )
+            .filter(scoped_user::fp_user_id.eq(footprint_user_id))
+            .filter(scoped_user::tenant_id.eq(tenant_id))
+            .filter(scoped_user::is_live.eq(is_live))
+            .select(onboarding_decision::id);
+        risk_signal::table
+            .filter(risk_signal::onboarding_decision_id.eq_any(onboarding_decision_ids))
+            .into_boxed()
+    }
+
     pub fn list(
         conn: &mut PgConnection,
         footprint_user_id: &FootprintUserId,
         tenant_id: &TenantId,
         is_live: bool,
     ) -> DbResult<Vec<Self>> {
-        use crate::schema::{onboarding, onboarding_decision, scoped_user};
-        let results = risk_signal::table
-            .inner_join(
-                onboarding_decision::table.inner_join(
-                    onboarding::table
-                        .inner_join(scoped_user::table)
-                        // Must provide explicit ON since onboarding::latest_decision_id is used by default
-                        .on(onboarding_decision::onboarding_id.eq(onboarding::id)),
-                ),
-            )
-            .filter(scoped_user::fp_user_id.eq(footprint_user_id))
-            .filter(scoped_user::tenant_id.eq(tenant_id))
-            .filter(scoped_user::is_live.eq(is_live))
-            .select(risk_signal::all_columns)
-            .load::<Self>(conn)?;
+        let results = Self::query(footprint_user_id, tenant_id, is_live).load::<Self>(conn)?;
         Ok(results)
+    }
+
+    pub fn get(
+        conn: &mut PgConnection,
+        id: &RiskSignalId,
+        footprint_user_id: &FootprintUserId,
+        tenant_id: &TenantId,
+        is_live: bool,
+    ) -> DbResult<Self> {
+        let result = Self::query(footprint_user_id, tenant_id, is_live)
+            .filter(risk_signal::id.eq(id))
+            .get_result::<Self>(conn)?;
+        Ok(result)
     }
 }
