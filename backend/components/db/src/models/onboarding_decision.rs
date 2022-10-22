@@ -1,9 +1,15 @@
+use crate::TxnPgConnection;
 use crate::{schema::onboarding_decision, DbResult};
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
-use diesel::{Insertable, PgConnection, Queryable};
-use newtypes::{ComplianceStatus, OnboardingDecisionId, OnboardingId, TenantUserId, VerificationStatus};
+use diesel::{Insertable, Queryable};
+use newtypes::{
+    ComplianceStatus, OnboardingDecisionId, OnboardingDecisionInfo, OnboardingId, TenantUserId, UserVaultId,
+    VerificationStatus,
+};
 use serde::{Deserialize, Serialize};
+
+use super::user_timeline::UserTimeline;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable)]
 #[diesel(table_name = onboarding_decision)]
@@ -32,7 +38,8 @@ pub struct NewOnboardingDecision {
 
 impl OnboardingDecision {
     pub fn create(
-        conn: &mut PgConnection,
+        conn: &mut TxnPgConnection,
+        user_vault_id: UserVaultId,
         onboarding_id: OnboardingId,
         logic_git_hash: String,
         tenant_user_id: Option<TenantUserId>,
@@ -40,7 +47,7 @@ impl OnboardingDecision {
         compliance_status: ComplianceStatus,
     ) -> DbResult<Self> {
         let new = NewOnboardingDecision {
-            onboarding_id,
+            onboarding_id: onboarding_id.clone(),
             logic_git_hash,
             tenant_user_id,
             verification_status,
@@ -49,7 +56,16 @@ impl OnboardingDecision {
         };
         let result = diesel::insert_into(onboarding_decision::table)
             .values(new)
-            .get_result::<Self>(conn)?;
+            .get_result::<Self>(conn.conn())?;
+        // Create UserTimeline event for the decision
+        UserTimeline::create(
+            conn,
+            OnboardingDecisionInfo {
+                id: result.id.clone(),
+            },
+            user_vault_id.clone(),
+            Some(onboarding_id),
+        )?;
         Ok(result)
     }
 }

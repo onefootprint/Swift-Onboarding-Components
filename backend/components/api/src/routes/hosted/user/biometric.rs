@@ -12,13 +12,13 @@ use crate::{
 use app_attest::error::AttestationError;
 use chrono::{Duration, Utc};
 use crypto::sha256;
-use db::models::insight_event::CreateInsightEvent;
 use db::models::{
     audit_trail::AuditTrail,
     user_vault::UserVault,
     webauthn_credential::{NewWebauthnCredential, WebauthnCredential},
 };
-use newtypes::{AttestationType, AuditTrailEvent};
+use db::models::{insight_event::CreateInsightEvent, user_timeline::UserTimeline};
+use newtypes::{AttestationType, AuditTrailEvent, BiometricRegisteredInfo};
 use newtypes::{Base64Data, LivenessCheckInfo};
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 use serde::{Deserialize, Serialize};
@@ -196,7 +196,7 @@ pub async fn complete_post(
             AuditTrail::create(conn, event, user_auth.user_vault_id(), None, None)?;
 
             let insight_event = CreateInsightEvent::from(insights).insert_with_conn(conn)?;
-            NewWebauthnCredential {
+            let new_credential = NewWebauthnCredential {
                 user_vault_id: user_auth.user_vault_id(),
                 credential_id: cred.cred_id.0,
                 public_key,
@@ -206,6 +206,16 @@ pub async fn complete_post(
                 insight_event_id: insight_event.id,
             }
             .save(conn)?;
+
+            UserTimeline::create(
+                conn,
+                BiometricRegisteredInfo {
+                    id: new_credential.id,
+                },
+                user_auth.user_vault_id(),
+                // TODO include ob_id if credential made during onboarding
+                None,
+            )?;
             Ok(())
         })
         .await?;

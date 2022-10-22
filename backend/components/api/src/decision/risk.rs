@@ -34,6 +34,7 @@ pub async fn create_final_decision(
             }
 
             if let Some(status) = final_status.audit_status() {
+                // TODO create timeline
                 AuditTrail::create(
                     conn,
                     AuditTrailEvent::Verification(VerificationInfo {

@@ -85,10 +85,10 @@ pub struct NewWebauthnCredential {
 }
 
 impl NewWebauthnCredential {
-    pub fn save(self, conn: &mut PgConnection) -> Result<(), crate::DbError> {
-        diesel::insert_into(webauthn_credential::table)
+    pub fn save(self, conn: &mut PgConnection) -> Result<WebauthnCredential, crate::DbError> {
+        let result = diesel::insert_into(webauthn_credential::table)
             .values(self)
-            .execute(conn)?;
-        Ok(())
+            .get_result(conn)?;
+        Ok(result)
     }
 }

@@ -15,6 +15,30 @@ pub enum UserTimelineEvent {
     OnboardingDecision(OnboardingDecisionInfo),
 }
 
+impl From<DataCollectedInfo> for UserTimelineEvent {
+    fn from(s: DataCollectedInfo) -> Self {
+        Self::DataCollected(s)
+    }
+}
+
+impl From<BiometricRegisteredInfo> for UserTimelineEvent {
+    fn from(s: BiometricRegisteredInfo) -> Self {
+        Self::BiometricRegistered(s)
+    }
+}
+
+impl From<DocumentUploadedInfo> for UserTimelineEvent {
+    fn from(s: DocumentUploadedInfo) -> Self {
+        Self::DocumentUploaded(s)
+    }
+}
+
+impl From<OnboardingDecisionInfo> for UserTimelineEvent {
+    fn from(s: OnboardingDecisionInfo) -> Self {
+        Self::OnboardingDecision(s)
+    }
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct DataCollectedInfo {
     pub attributes: Vec<CollectedDataOption>,
@@ -22,15 +46,15 @@ pub struct DataCollectedInfo {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct BiometricRegisteredInfo {
-    pub credential_id: WebauthnCredentialId,
+    pub id: WebauthnCredentialId,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct DocumentUploadedInfo {
-    pub document_id: IdentityDocumentId,
+    pub id: IdentityDocumentId,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct OnboardingDecisionInfo {
-    pub decision_id: OnboardingDecisionId,
+    pub id: OnboardingDecisionId,
 }

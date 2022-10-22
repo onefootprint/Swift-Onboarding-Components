@@ -1,6 +1,6 @@
 use db::{
     models::{audit_trail::AuditTrail, onboarding_decision::OnboardingDecision, risk_signal::RiskSignal},
-    PgConnection,
+    TxnPgConnection,
 };
 use newtypes::{
     AuditTrailEvent, ComplianceStatus, FootprintReasonCode, OnboardingId, OnboardingStatus, SignalScope,
@@ -45,7 +45,7 @@ pub(super) async fn get_desired_status_for_testing(
 }
 
 pub(super) fn create_test_fixture_data(
-    conn: &mut PgConnection,
+    conn: &mut TxnPgConnection,
     user_vault_id: UserVaultId,
     tenant_id: TenantId,
     ob_id: OnboardingId,
@@ -59,12 +59,14 @@ pub(super) fn create_test_fixture_data(
     };
     let decision = OnboardingDecision::create(
         conn,
-        ob_id,
+        user_vault_id.clone(),
+        ob_id.clone(),
         "TODO GIT HASH".to_owned(),
         None,
         decision_status,
         ComplianceStatus::Compliant,
     )?;
+    // Create some risk signals
     let reason_codes = match desired_status {
         OnboardingStatus::Failed => vec![
             FootprintReasonCode::SubjectDeceased,
@@ -83,7 +85,6 @@ pub(super) fn create_test_fixture_data(
     RiskSignal::bulk_create(conn, decision.id, reason_codes)?;
 
     // Create old AuditTrail events
-    // TODO these will probably go away
     let final_status = match &desired_status {
         OnboardingStatus::Verified => VerificationInfoStatus::Verified,
         _ => VerificationInfoStatus::Failed,
