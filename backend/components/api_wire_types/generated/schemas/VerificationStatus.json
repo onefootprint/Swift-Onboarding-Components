@@ -5,13 +5,11 @@
   "type": "string",
   "enum": [
     "failed",
-    "processing",
     "manual_review",
     "verified"
   ],
   "tsEnumNames": [
     "failed",
-    "processing",
     "manual_review",
     "verified"
   ]

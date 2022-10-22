@@ -4,18 +4,19 @@
   "description": "Describes a liveness event that took place",
   "type": "object",
   "required": [
-    "decisions",
-    "footprintUserId",
+    "id",
     "identityDataAttributes",
     "isPortable",
     "onboardings",
     "orderingId",
-    "requirements",
     "startTimestamp"
   ],
   "properties": {
-    "footprintUserId": {
+    "id": {
       "type": "string"
+    },
+    "isPortable": {
+      "type": "boolean"
     },
     "identityDataAttributes": {
       "type": "array",
@@ -27,30 +28,15 @@
       "type": "string",
       "format": "date-time"
     },
-    "orderingId": {
-      "type": "integer",
-      "format": "int64"
-    },
-    "requirements": {
-      "type": "array",
-      "items": {
-        "tsType": "Requirement"
-      }
-    },
     "onboardings": {
       "type": "array",
       "items": {
         "tsType": "Onboarding"
       }
     },
-    "decisions": {
-      "type": "array",
-      "items": {
-        "tsType": "Decision"
-      }
-    },
-    "isPortable": {
-      "type": "boolean"
+    "orderingId": {
+      "type": "integer",
+      "format": "int64"
     }
   },
   "definitions": {
@@ -73,96 +59,6 @@
         "ssn4"
       ]
     },
-    "Requirement": {
-      "type": "object",
-      "required": [
-        "fulfilledAt",
-        "id",
-        "initiator",
-        "kind",
-        "onboardingId",
-        "riskSignalIds",
-        "status",
-        "vendors"
-      ],
-      "properties": {
-        "id": {
-          "type": "string"
-        },
-        "onboardingId": {
-          "type": "string",
-          "format": "uuid"
-        },
-        "kind": {
-          "tsType": "RequirementKind"
-        },
-        "initiator": {
-          "tsType": "RequirementInitiator"
-        },
-        "status": {
-          "tsType": "RequirementVerificationStatus"
-        },
-        "vendors": {
-          "type": "array",
-          "items": {
-            "tsType": "Vendor"
-          }
-        },
-        "riskSignalIds": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "fulfilledAt": {
-          "type": "string",
-          "format": "date-time"
-        }
-      }
-    },
-    "RequirementKind": {
-      "description": "The type of requirement",
-      "type": "string",
-      "enum": [
-        "name",
-        "dob",
-        "ssn4",
-        "ssn9",
-        "full_address",
-        "partial_address",
-        "email",
-        "phone_number",
-        "identity_document",
-        "liveness"
-      ]
-    },
-    "RequirementInitiator": {
-      "description": "Who initiated this requirement",
-      "type": "string",
-      "enum": [
-        "footprint",
-        "tenant",
-        "step_up"
-      ]
-    },
-    "RequirementVerificationStatus": {
-      "type": "string",
-      "enum": [
-        "Failed",
-        "Verified"
-      ]
-    },
-    "Vendor": {
-      "type": "string",
-      "enum": [
-        "footprint",
-        "idology",
-        "socure",
-        "lexis_nexis",
-        "experian",
-        "twilio"
-      ]
-    },
     "Onboarding": {
       "description": "Describes a liveness event that took place",
       "type": "object",
@@ -170,30 +66,37 @@
         "canAccessData",
         "canAccessDataAttributes",
         "canAccessIdentityDocumentImages",
-        "complianceStatus",
         "configId",
-        "decisionId",
         "id",
         "insightEvent",
         "isLivenessSkipped",
         "name",
-        "timestamp",
-        "verificationStatus"
+        "status",
+        "timestamp"
       ],
       "properties": {
         "id": {
           "type": "string",
           "format": "uuid"
         },
+        "name": {
+          "type": "string"
+        },
         "configId": {
           "type": "string"
         },
-        "name": {
-          "type": "string"
+        "status": {
+          "tsType": "OnboardingStatus"
         },
         "timestamp": {
           "type": "string",
           "format": "date-time"
+        },
+        "isLivenessSkipped": {
+          "type": "boolean"
+        },
+        "insightEvent": {
+          "tsType": "InsightEvent"
         },
         "canAccessData": {
           "type": "array",
@@ -210,34 +113,28 @@
         "canAccessIdentityDocumentImages": {
           "type": "boolean"
         },
-        "insightEvent": {
-          "tsType": "InsightEvent"
-        },
-        "isLivenessSkipped": {
-          "type": "boolean"
-        },
-        "verificationStatus": {
-          "tsType": "VerificationStatus"
-        },
-        "complianceStatus": {
-          "tsType": "ComplianceStatus"
-        },
-        "decisionId": {
-          "type": "string"
+        "latestDecision": {
+          "anyOf": [
+            {
+              "tsType": "OnboardingDecision"
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       }
     },
-    "CollectedDataOption": {
+    "OnboardingStatus": {
+      "description": "The type of data attribute",
       "type": "string",
       "enum": [
-        "name",
-        "dob",
-        "ssn4",
-        "ssn9",
-        "full_address",
-        "partial_address",
-        "email",
-        "phone_number"
+        "new",
+        "processing",
+        "manual_review",
+        "step_up_required",
+        "verified",
+        "failed"
       ]
     },
     "InsightEvent": {
@@ -321,12 +218,53 @@
         }
       }
     },
+    "CollectedDataOption": {
+      "type": "string",
+      "enum": [
+        "name",
+        "dob",
+        "ssn4",
+        "ssn9",
+        "full_address",
+        "partial_address",
+        "email",
+        "phone_number"
+      ]
+    },
+    "OnboardingDecision": {
+      "description": "Describes a liveness event that took place",
+      "type": "object",
+      "required": [
+        "complianceStatus",
+        "id",
+        "source",
+        "timestamp",
+        "verificationStatus"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "verificationStatus": {
+          "tsType": "VerificationStatus"
+        },
+        "complianceStatus": {
+          "tsType": "ComplianceStatus"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "source": {
+          "tsType": "DecisionSource"
+        }
+      }
+    },
     "VerificationStatus": {
       "description": "The type of requirement",
       "type": "string",
       "enum": [
         "failed",
-        "processing",
         "manual_review",
         "verified"
       ]
@@ -338,34 +276,6 @@
         "alerts",
         "compliant"
       ]
-    },
-    "Decision": {
-      "type": "object",
-      "required": [
-        "compliance_status",
-        "id",
-        "source",
-        "timestamp",
-        "verification_status"
-      ],
-      "properties": {
-        "id": {
-          "type": "string"
-        },
-        "verification_status": {
-          "tsType": "VerificationStatus"
-        },
-        "compliance_status": {
-          "tsType": "ComplianceStatus"
-        },
-        "source": {
-          "tsType": "DecisionSource"
-        },
-        "timestamp": {
-          "type": "string",
-          "format": "date-time"
-        }
-      }
     },
     "DecisionSource": {
       "oneOf": [

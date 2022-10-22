@@ -8,9 +8,8 @@ pub struct OnboardingDecision {
     pub id: OnboardingDecisionId,
     pub verification_status: VerificationStatus,
     pub compliance_status: ComplianceStatus,
-    pub tenant_user_id: Option<TenantUserId>,
     pub timestamp: DateTime<Utc>,
-    // TODO nest decision source
+    pub source: DecisionSource,
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize, Apiv2Schema, JsonSchema)]

@@ -7,7 +7,7 @@
       "default": [],
       "type": "array",
       "items": {
-        "tsType": "KycStatus"
+        "tsType": "OnboardingStatus"
       }
     },
     "fingerprint": {
@@ -38,7 +38,7 @@
     }
   },
   "definitions": {
-    "KycStatus": {
+    "OnboardingStatus": {
       "description": "The type of data attribute",
       "type": "string",
       "enum": [

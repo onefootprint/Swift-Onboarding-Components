@@ -4,61 +4,120 @@
   "description": "A risk event",
   "type": "object",
   "required": [
-    "decisionId",
     "id",
     "note",
+    "onboardingDecisionId",
     "reasonCode",
+    "scopes",
     "severity",
-    "timestamp",
-    "vendors"
+    "timestamp"
   ],
   "properties": {
     "id": {
       "type": "string"
     },
-    "decisionId": {
+    "onboardingDecisionId": {
       "type": "string"
     },
     "reasonCode": {
-      "type": "string"
+      "tsType": "FootprintReasonCode"
     },
     "note": {
       "type": "string"
     },
     "severity": {
-      "tsType": "RiskSeverity"
+      "tsType": "SignalSeverity"
     },
-    "vendors": {
+    "scopes": {
       "type": "array",
       "items": {
-        "tsType": "Vendor"
+        "tsType": "SignalScope"
       }
     },
     "timestamp": {
       "type": "string",
       "format": "date-time"
+    },
+    "deactivatedAt": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
     }
   },
   "definitions": {
-    "RiskSeverity": {
-      "description": "Describes the severity of of a risk signal",
+    "FootprintReasonCode": {
       "type": "string",
       "enum": [
-        "info",
-        "low",
-        "medium",
-        "high"
+        "subject_deceased",
+        "ssn_issued_prior_to_dob",
+        "mobile_number",
+        "corporate_email_domain",
+        "ssn_does_not_match_within_tolerance",
+        "last_name_does_not_match"
       ]
     },
-    "Vendor": {
+    "SignalSeverity": {
+      "oneOf": [
+        {
+          "type": "string",
+          "enum": [
+            "TODO",
+            "NotImportant",
+            "Info",
+            "NotFound",
+            "InvalidRequest"
+          ]
+        },
+        {
+          "type": "object",
+          "required": [
+            "Alert"
+          ],
+          "properties": {
+            "Alert": {
+              "type": "integer",
+              "format": "uint32",
+              "minimum": 0.0
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "Fraud"
+          ],
+          "properties": {
+            "Fraud": {
+              "type": "integer",
+              "format": "uint32",
+              "minimum": 0.0
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
+    },
+    "SignalScope": {
+      "description": "Represents the granularity of data attributes that could be alerted on by a data vendor",
       "type": "string",
       "enum": [
-        "footprint",
-        "idology",
-        "socure",
-        "lexis_nexis",
-        "experian",
-        "twilio"
+        "name",
+        "dob",
+        "ssn",
+        "address",
+        "street_address",
+        "city",
+        "state",
+        "zip",
+        "country",
+        "email",
+        "phone_number",
+        "identity",
+        "ip_address",
+        "document"
       ]
     }
   }

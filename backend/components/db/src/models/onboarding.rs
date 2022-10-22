@@ -1,6 +1,7 @@
 use super::insight_event::CreateInsightEvent;
 use super::onboarding_decision::OnboardingDecision;
 use super::scoped_user::ScopedUser;
+use super::tenant_user::TenantUser;
 use crate::models::insight_event::InsightEvent;
 use crate::models::ob_configuration::ObConfiguration;
 use crate::schema::{onboarding, scoped_user};
@@ -50,6 +51,7 @@ pub struct OnboardingUpdate {
     pub status: Option<OnboardingStatus>,
     pub is_liveness_skipped: Option<bool>,
     pub is_authorized: Option<bool>,
+    pub latest_decision_id: Option<Option<OnboardingDecisionId>>,
 }
 
 impl OnboardingUpdate {
@@ -73,13 +75,20 @@ impl OnboardingUpdate {
             ..Self::default()
         }
     }
+
+    pub fn latest_decision_id(latest_decision_id: Option<OnboardingDecisionId>) -> Self {
+        Self {
+            latest_decision_id: Some(latest_decision_id),
+            ..Self::default()
+        }
+    }
 }
 
 pub type OnboardingInfo = (
     Onboarding,
     ObConfiguration,
     InsightEvent,
-    Option<OnboardingDecision>,
+    Option<(OnboardingDecision, Option<TenantUser>)>,
 );
 
 impl Onboarding {
@@ -95,11 +104,15 @@ impl Onboarding {
         conn: &mut PgConnection,
         scoped_user_ids: Vec<&ScopedUserId>,
     ) -> Result<HashMap<ScopedUserId, Vec<OnboardingInfo>>, DbError> {
-        use crate::schema::{insight_event, ob_configuration, onboarding_decision};
+        use crate::schema::{insight_event, ob_configuration, onboarding_decision, tenant_user};
         let obs: Vec<OnboardingInfo> = onboarding::table
             .inner_join(ob_configuration::table)
             .inner_join(insight_event::table)
-            .left_join(onboarding_decision::table)
+            // Get the latest decision and its tenant_user, if any
+            // TODO it's ambiguous how we perform this join
+            .left_join(
+                onboarding_decision::table.left_join(tenant_user::table)
+            )
             .filter(onboarding::scoped_user_id.eq_any(scoped_user_ids))
             .order_by(onboarding::scoped_user_id)
             .load(conn)?;

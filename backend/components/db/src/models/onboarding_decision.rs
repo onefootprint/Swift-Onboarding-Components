@@ -9,6 +9,7 @@ use newtypes::{
 };
 use serde::{Deserialize, Serialize};
 
+use super::onboarding::{Onboarding, OnboardingUpdate};
 use super::user_timeline::UserTimeline;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable)]
@@ -64,7 +65,12 @@ impl OnboardingDecision {
                 id: result.id.clone(),
             },
             user_vault_id.clone(),
-            Some(onboarding_id),
+            Some(onboarding_id.clone()),
+        )?;
+        Onboarding::update_by_id(
+            conn,
+            &onboarding_id,
+            OnboardingUpdate::latest_decision_id(Some(result.id.clone())),
         )?;
         Ok(result)
     }

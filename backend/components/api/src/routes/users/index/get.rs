@@ -12,12 +12,14 @@ use crate::types::ResponseData;
 use crate::utils::db2api::DbToApi;
 use crate::utils::user_vault_wrapper::UserVaultWrapper;
 use crate::State;
+use api_wire_types::DecisionSource;
 use api_wire_types::ListUsersRequest;
 use db::models::identity_data::HasIdentityDataFields;
 use db::models::onboarding::Onboarding;
 use db::models::onboarding::OnboardingInfo;
 use db::models::onboarding_decision::OnboardingDecision;
 use db::models::scoped_user::ScopedUser;
+use db::models::tenant_user::TenantUser;
 use db::scoped_user::OnboardingListQueryParams;
 
 use newtypes::FootprintUserId;
@@ -227,22 +229,29 @@ impl DbToApi<OnboardingInfo> for api_wire_types::Onboarding {
     }
 }
 
-impl DbToApi<OnboardingDecision> for api_wire_types::OnboardingDecision {
-    fn from_db(decision: OnboardingDecision) -> Self {
+impl DbToApi<(OnboardingDecision, Option<TenantUser>)> for api_wire_types::OnboardingDecision {
+    fn from_db(d: (OnboardingDecision, Option<TenantUser>)) -> Self {
+        let (decision, tenant_user) = d;
         let OnboardingDecision {
             id,
             verification_status,
             compliance_status,
-            tenant_user_id,
             created_at,
             ..
         } = decision;
+        let source = if let Some(tenant_user) = tenant_user {
+            DecisionSource::Organization {
+                member: tenant_user.email,
+            }
+        } else {
+            DecisionSource::Footprint
+        };
         api_wire_types::OnboardingDecision {
             id,
             verification_status,
             compliance_status,
-            tenant_user_id,
             timestamp: created_at,
+            source,
         }
     }
 }
