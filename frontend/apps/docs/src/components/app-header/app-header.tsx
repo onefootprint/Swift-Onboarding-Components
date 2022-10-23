@@ -19,11 +19,13 @@ const PageHeader = ({ articles }: PageHeaderProps) => {
   const { t } = useTranslation('components.header');
   const navItems = [
     {
+      baseHref: '/kyc-with-pii',
       href: '/kyc-with-pii/getting-started',
       Icon: IcoShield16,
       text: t('nav.kyc-with-pii'),
     },
     {
+      baseHref: '/pii',
       href: '/pii/getting-started',
       Icon: IcoDatabase16,
       text: t('nav.pii'),

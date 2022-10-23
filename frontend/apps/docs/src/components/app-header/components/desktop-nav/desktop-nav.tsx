@@ -6,11 +6,11 @@ import { useRouter } from 'next/router';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-import type { NavItem } from '../../app-header.types';
+import type { LinkItem, NavItem } from '../../app-header.types';
 
 type DesktopNavProps = {
   navItems: NavItem[];
-  links: NavItem[];
+  links: LinkItem[];
 };
 
 const DesktopNav = ({ navItems, links }: DesktopNavProps) => {
@@ -27,9 +27,9 @@ const DesktopNav = ({ navItems, links }: DesktopNavProps) => {
             </a>
           </Link>
           <Tabs variant="pill">
-            {navItems.map(({ href, Icon, text }) => (
+            {navItems.map(({ baseHref, href, Icon, text }) => (
               <Link href={href} key={text} passHref>
-                <Tab selected={router.asPath.startsWith(href)}>
+                <Tab selected={router.asPath.startsWith(baseHref)}>
                   <Icon />
                   {text}
                 </Tab>
@@ -37,18 +37,19 @@ const DesktopNav = ({ navItems, links }: DesktopNavProps) => {
             ))}
           </Tabs>
         </InternalNavContainer>
-        <div>
+        <>
           {links.map(({ href, Icon, text }) => (
             <LinkButton
               href={href}
               iconComponent={Icon}
               size="compact"
               target="_blank"
+              key={text}
             >
               {text}
             </LinkButton>
           ))}
-        </div>
+        </>
       </Nav>
     </Container>
   );

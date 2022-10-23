@@ -3,23 +3,21 @@ import { useTranslation } from '@onefootprint/hooks';
 import { IcoClose24, IcoMenu24, LogoFpdocsDefault } from '@onefootprint/icons';
 import { Box, LinkButton, media, Tab, Tabs } from '@onefootprint/ui';
 import Link from 'next/link';
-import { useRouter } from 'next/router';
 import React, { useState } from 'react';
 import type { ProductArticle } from 'src/types/product';
 import styled, { css } from 'styled-components';
 import { useLockedBody } from 'usehooks-ts';
 
-import type { NavItem } from '../../app-header.types';
+import type { LinkItem, NavItem } from '../../app-header.types';
 import ProductNavigation from './components/product-navigation';
 
 type MobileNavProps = {
   navItems: NavItem[];
   articles?: ProductArticle[];
-  links: NavItem[];
+  links: LinkItem[];
 };
 
 const MobileNav = ({ navItems, articles, links }: MobileNavProps) => {
-  const router = useRouter();
   const { t } = useTranslation('components.header');
   const [isExpanded, setIsExpanded] = useState(false);
   const [animateNavMenu] = useAutoAnimate<HTMLDivElement>();
@@ -59,6 +57,7 @@ const MobileNav = ({ navItems, articles, links }: MobileNavProps) => {
               <LinkButton
                 href={href}
                 iconComponent={Icon}
+                key={text}
                 size="compact"
                 target="_blank"
               >
@@ -70,9 +69,9 @@ const MobileNav = ({ navItems, articles, links }: MobileNavProps) => {
       </Header>
       <Nav>
         <Tabs variant="pill">
-          {navItems.map(({ href, Icon, text }) => (
-            <Link href={href} key={text}>
-              <Tab href={href} selected={router.asPath.startsWith(href)}>
+          {navItems.map(({ baseHref, href, Icon, text }) => (
+            <Link href={href} key={text} passHref>
+              <Tab selected={href.startsWith(baseHref)}>
                 <Icon />
                 {text}
               </Tab>
