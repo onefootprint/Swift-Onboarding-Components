@@ -98,7 +98,7 @@ If you need to authenticate via bearer auth (e.g., for a cross-origin request), 
 2. You should create an endpoint on your backend to handle signups. It should receive the validation token given in step 5 above from your frontend and pass it to Footprint’s backend in order to authenticate and verify the user:
 
 ```bash
-curl -X POST https://api.onefootprint.com/users/validate \
+curl -X POST https://api.onefootprint.com/onboarding/session/validate \
    -u sk_test_CXUsbCR8j2kH6e5GeEl8eSBnQTIPCUaKpv: \
    -d '{"validation_token": "vtok_udLaWUxPBo3fss603v8kY8k9ssjboxfwI"}'
 ```
@@ -120,14 +120,14 @@ curl -X POST https://api.onefootprint.com/users/validate \
 5. (Optionally) Fetch the user’s audit trail for detailed results on the identity verification:
 
 ```bash
-curl -X GET -G https://api.onefootprint.com/users/audit_trail?footprint_user_id=fp_id_GSxJr68GAf5jUT3pdL9ndjf7TLkA3GCX \
+curl -X GET -G https://api.onefootprint.com/users/fp_id_GSxJr68GAf5jUT3pdL9ndjf7TLkA3GCX/audit_trail \
    -u sk_test_CXUsbCR8j2kH6e5GeEl8eSBnQTIPCUaKpv:
 ```
 
 6. (Optionally) Decrypt identity fields from the user’s vault:
 
 ```bash
-curl -X POST https://api.onefootprint.com/users/fp_id_GSxJr68GAf5jUT3pdL9ndjf7TLkA3GCX/identity/decrypt \
+curl -X POST https://api.onefootprint.com/users/fp_id_GSxJr68GAf5jUT3pdL9ndjf7TLkA3GCX/vault/identity/decrypt \
    -u sk_test_CXUsbCR8j2kH6e5GeEl8eSBnQTIPCUaKpv: \
    -d '{"fields": ["dob", "last_name", "ssn4"], "reason": "getting started test"}'
 ```
