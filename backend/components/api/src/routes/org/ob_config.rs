@@ -217,6 +217,8 @@ impl DbToApi<(ObConfiguration, Tenant)> for api_wire_types::OnboardingConfigurat
             status,
             can_access_data,
             is_live,
+            must_collect_identity_document,
+            can_access_identity_document_images,
             ..
         } = ob_config;
         let Tenant {
@@ -232,6 +234,8 @@ impl DbToApi<(ObConfiguration, Tenant)> for api_wire_types::OnboardingConfigurat
             logo_url,
             must_collect_data,
             can_access_data,
+            must_collect_identity_document,
+            can_access_identity_document_images,
             is_live,
             created_at,
             status,
