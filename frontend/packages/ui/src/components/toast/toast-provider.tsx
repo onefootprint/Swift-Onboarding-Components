@@ -15,9 +15,9 @@ const [Provider, useContext] = constate(useLocalToast);
 const ToastManager = () => {
   const { toasts, hide } = useContext();
 
-  const handleCloseClick = (id: string, onHide?: () => void) => () => {
+  const handleCloseClick = (id: string, onClose?: () => void) => () => {
     hide(id);
-    onHide?.();
+    onClose?.();
   };
 
   return (
@@ -26,21 +26,23 @@ const ToastManager = () => {
         {toasts.map(
           ({
             closeAriaLabel,
+            cta,
             description,
             id,
             leaving,
-            onHide,
+            onClose,
             testID,
             title,
             variant,
           }) => (
             <Toast
               closeAriaLabel={closeAriaLabel}
+              cta={cta}
               description={description}
               id={id}
               key={id}
               leaving={leaving}
-              onHide={handleCloseClick(id, onHide)}
+              onClose={handleCloseClick(id, onClose)}
               testID={testID}
               title={title}
               variant={variant}

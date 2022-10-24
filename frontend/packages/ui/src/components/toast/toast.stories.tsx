@@ -42,6 +42,13 @@ export default {
       type: { name: 'string', required: true },
       description: 'Toast description',
     },
+    cta: {
+      control: {
+        type: 'object',
+      },
+      type: { name: 'string', required: true },
+      description: 'Toast cta',
+    },
     testID: {
       control: {
         type: 'text',
@@ -49,7 +56,7 @@ export default {
       type: { name: 'string', required: false },
       description: 'Append an attribute data-testid for testing purposes',
     },
-    onHide: {
+    onClose: {
       control: {
         type: 'function',
       },
@@ -60,9 +67,10 @@ export default {
 } as Meta;
 
 const Template: Story<ToastProps> = ({
+  cta,
   closeAriaLabel,
   description,
-  onHide,
+  onClose,
   testID,
   title,
   variant,
@@ -74,10 +82,11 @@ const Template: Story<ToastProps> = ({
     const nextId = toast.show({
       closeAriaLabel,
       description,
-      onHide,
+      onClose,
       testID,
       title,
       variant,
+      cta,
     });
     setIds(currentIds => [...currentIds, nextId]);
   };
@@ -102,10 +111,16 @@ export const Base = Template.bind({});
 Base.args = {
   closeAriaLabel: 'Close',
   description: 'Toast description',
-  onHide: () => {
+  onClose: () => {
     console.log('toast was closed');
   },
   testID: 'input-test-id',
   title: 'Toast title',
   variant: 'default',
+  cta: {
+    label: 'Continue',
+    onClick: () => {
+      console.log('cta was clicked');
+    },
+  },
 };
