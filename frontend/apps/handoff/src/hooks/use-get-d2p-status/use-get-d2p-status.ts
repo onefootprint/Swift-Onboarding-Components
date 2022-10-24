@@ -45,7 +45,7 @@ const useGetD2PStatus = () => {
     [authToken],
     () => getD2PStatus({ scopedAuthToken: authToken ?? '' }),
     {
-      enabled: !!authToken,
+      enabled: !!authToken && !state.done,
       refetchInterval: D2P_STATUS_FETCH_INTERVAL,
       onSuccess: handleSuccess,
       onError: handleError,
