@@ -1,4 +1,5 @@
 name: Frontend Smoke Tests
+
 on:
   push:
     branches:
@@ -7,10 +8,7 @@ on:
       - 'frontend/**'
   pull_request:
     paths:
-      - 'frontend/packages/**'
-      - 'frontend/apps/demo/**'
-      - 'frontend/apps/handoff/**'
-      - 'frontend/apps/bifrost/**'
+      - 'frontend/**'
       - '.github/workflows/*.yml'
 
 concurrency:
