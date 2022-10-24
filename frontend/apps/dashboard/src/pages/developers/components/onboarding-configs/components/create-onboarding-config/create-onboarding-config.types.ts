@@ -4,13 +4,17 @@ export type NameFormData = {
   name: string;
 };
 
-export type DataKindForm = {
-  [CollectedDataOption.dob]: boolean;
+export type KycDataFormData = {
   [CollectedDataOption.email]: boolean;
-  [CollectedDataOption.ssn4]: boolean;
   [CollectedDataOption.phoneNumber]: boolean;
-  [CollectedDataOption.ssn9]: boolean;
-  [CollectedDataOption.fullAddress]: boolean;
-  [CollectedDataOption.partialAddress]: boolean;
-  [CollectedDataOption.name]: boolean;
+  [CollectedDataOption.dob]?: boolean;
+  [CollectedDataOption.ssn4]?: boolean;
+  [CollectedDataOption.ssn9]?: boolean;
+  [CollectedDataOption.fullAddress]?: boolean;
+  [CollectedDataOption.partialAddress]?: boolean;
+  [CollectedDataOption.name]?: boolean;
+};
+
+export type IdDocFormData = {
+  idDocRequired?: boolean;
 };

@@ -4,10 +4,10 @@ import { Dialog, useConfirmationDialog, useToast } from '@onefootprint/ui';
 import React from 'react';
 
 import AccessForm from './components/access-form';
-import CollectForm from './components/collect-form';
+import CollectForm, { CollectFormData } from './components/collect-form';
 import NameForm from './components/name-form';
 import type {
-  DataKindForm,
+  KycDataFormData,
   NameFormData,
 } from './create-onboarding-config.types';
 import useCreateOnboardingConfig from './hooks/use-create-onboarding-config';
@@ -68,19 +68,33 @@ const CreateOnboardingConfig = ({
   const handleSubmitName = (formData: NameFormData) => {
     dispatch({
       type: Actions.next,
-      payload: { data: { name: formData.name } },
+      payload: {
+        data: {
+          name: formData.name,
+        },
+      },
     });
   };
 
-  const handleSubmitCollect = (formData: DataKindForm) => {
-    dispatch({ type: Actions.next, payload: { data: { collect: formData } } });
+  const handleSubmitCollect = (formData: CollectFormData) => {
+    const { kycData, idDoc } = formData;
+    dispatch({
+      type: Actions.next,
+      payload: {
+        data: {
+          kycData,
+          idDoc,
+        },
+      },
+    });
   };
 
-  const handleSubmitAccess = (accessFormData: DataKindForm) => {
+  const handleSubmitAccess = (accessFormData: KycDataFormData) => {
     mutation.mutate(
       {
         name: state.data.name,
-        mustCollectData: getSelectedDataOptionsList(state.data.collect),
+        mustCollectData: getSelectedDataOptionsList(state.data.kycData),
+        mustCollectIdentityDocument: !!state.data.idDoc.idDocRequired,
         canAccessData: getSelectedDataOptionsList(accessFormData),
       },
       {
@@ -127,15 +141,18 @@ const CreateOnboardingConfig = ({
       {state.step === 1 && (
         <CollectForm
           onSubmit={handleSubmitCollect}
-          defaultValues={state.data.collect}
+          defaultValues={{
+            kycData: state.data.kycData,
+            idDoc: state.data.idDoc,
+          }}
         />
       )}
       {state.step === 2 && (
         <AccessForm
           onSubmit={handleSubmitAccess}
-          fields={getSelectedDataOptions(state.data?.collect)}
+          fields={getSelectedDataOptions(state.data.kycData)}
           defaultValues={Object.fromEntries(
-            getSelectedDataOptions(state.data?.collect),
+            getSelectedDataOptions(state.data.kycData),
           )}
         />
       )}

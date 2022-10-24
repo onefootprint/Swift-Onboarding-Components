@@ -225,6 +225,10 @@ describe('<CreateDialog />', () => {
           const addressCheckbox = screen.getByLabelText('Address');
           await userEvent.click(addressCheckbox);
 
+          await waitFor(() => {
+            expect(screen.getByLabelText('Full')).toBeInTheDocument();
+          });
+
           const addressRadio = screen.getByLabelText('Full');
           await userEvent.click(addressRadio);
 

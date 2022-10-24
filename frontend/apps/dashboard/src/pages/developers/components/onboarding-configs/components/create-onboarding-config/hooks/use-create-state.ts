@@ -1,7 +1,10 @@
 import { CollectedDataOption } from '@onefootprint/types';
 import { useReducer } from 'react';
 
-import type { DataKindForm } from '../create-onboarding-config.types';
+import type {
+  IdDocFormData,
+  KycDataFormData,
+} from '../create-onboarding-config.types';
 
 export enum Actions {
   next = 'NEXT',
@@ -14,22 +17,26 @@ type Action =
   | { type: Actions.back }
   | { type: Actions.reset };
 
+type StateData = {
+  name: string;
+  kycData: KycDataFormData;
+  idDoc: IdDocFormData;
+};
+
 type State = {
   step: number;
-  data: {
-    name: string;
-    collect: DataKindForm;
-  };
+  data: StateData;
 };
 
 const initialState = {
   step: 0,
   data: {
     name: '',
-    collect: {
+    kycData: {
       [CollectedDataOption.email]: true,
       [CollectedDataOption.phoneNumber]: true,
     },
+    idDoc: {},
   },
 };
 
@@ -67,7 +74,15 @@ const getFormId = (step: number) => {
 };
 
 const useCreateState = () => {
-  const [state, dispatch] = useReducer(reducer, initialState);
+  const [state, dispatch] = useReducer<
+    (
+      state: State,
+      action: Action,
+    ) => {
+      step: number;
+      data: StateData;
+    }
+  >(reducer, initialState);
   return [{ ...state, formId: getFormId(state.step) }, dispatch] as const;
 };
 export default useCreateState;

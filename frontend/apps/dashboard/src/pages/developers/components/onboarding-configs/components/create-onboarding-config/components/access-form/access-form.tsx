@@ -5,15 +5,15 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import styled, { css } from 'styled-components';
 
-import type { DataKindForm } from '../../create-onboarding-config.types';
+import type { KycDataFormData } from '../../create-onboarding-config.types';
 import FormTitle from '../form-title';
 
-type FormData = DataKindForm;
+type FormData = KycDataFormData;
 
 type AccessFormProps = {
-  defaultValues?: DataKindForm;
+  defaultValues?: KycDataFormData;
   fields: Map<string, boolean>;
-  onSubmit: (formData: DataKindForm) => void;
+  onSubmit: (formData: KycDataFormData) => void;
 };
 
 const AccessForm = ({ defaultValues, onSubmit, fields }: AccessFormProps) => {

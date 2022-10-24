@@ -394,14 +394,23 @@
             }
           },
           "collect-form": {
-            "title": "Collected data",
-            "description": "Select the attributes you require us to collect during onboarding to verify the user's identity.",
-            "ssn": "SSN",
-            "ssn_full": "Full",
-            "ssn_last_4": "Last 4",
-            "address": "Address",
-            "full_address": "Full",
-            "partial_address": "Country & Zip Code"
+            "collected-data": {
+              "title": "Collected data",
+              "description": "Select the attributes you require us to collect during onboarding to verify the user's identity.",
+              "ssn": "SSN",
+              "ssn_full": "Full",
+              "ssn_last_4": "Last 4",
+              "address": "Address",
+              "full_address": "Full",
+              "partial_address": "Country & Zip Code"
+            },
+            "id-doc": {
+              "title": "ID Document",
+              "description": "If you wish, you may always require an ID document to be collected during onboarding. If you decide not to, please be aware that we might still need to ask some users to do so as part of our step-up verification flow.",
+              "toggle-label": "Always require",
+              "supported-docs": "For the full list of countries and document types we support, please go",
+              "supported-docs-link": "here."
+            }
           },
           "access-form": {
             "title": "Authorized scopes",
