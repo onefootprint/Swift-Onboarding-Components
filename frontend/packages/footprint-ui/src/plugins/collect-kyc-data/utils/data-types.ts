@@ -1,10 +1,15 @@
 import { UserData, UserDataAttribute } from '@onefootprint/types';
 
-export type BasicInformation = NameInformation | NameAndDobInformation;
+export type BasicInformation =
+  | NameInformation
+  | NameAndDobInformation
+  | DobInformation;
 
 export type NameInformation = Required<
   Pick<UserData, UserDataAttribute.firstName | UserDataAttribute.lastName>
 >;
+
+export type DobInformation = Required<Pick<UserData, UserDataAttribute.dob>>;
 
 export type NameAndDobInformation = Required<
   Pick<

@@ -1,42 +1,26 @@
-import { useTranslation } from '@onefootprint/hooks';
 import { UserDataAttribute } from '@onefootprint/types';
-import { Button, Grid, TextInput } from '@onefootprint/ui';
 import React from 'react';
-import { useForm } from 'react-hook-form';
+import { FormProvider, useForm } from 'react-hook-form';
 import styled, { css } from 'styled-components';
 
-import HeaderTitle from '../../../../../../components/header-title';
 import { useCollectKycDataMachine } from '../../../../components/machine-provider';
-import NavigationHeader from '../../../../components/navigation-header/navigation-header';
 import { NameInformation } from '../../../../utils/data-types';
+import CtaButton from '../cta-button';
+import NameFields from '../name-fields';
 
 type FormData = NameInformation;
 
-export type NameFormProps = {
-  isMutationLoading: boolean;
+type NameFormProps = {
+  isLoading: boolean;
   onSubmit: (data: NameInformation) => void;
   ctaLabel?: string;
-  hideTitle?: boolean;
-  hideNavHeader?: boolean;
 };
 
-const NameForm = ({
-  isMutationLoading,
-  ctaLabel,
-  hideTitle,
-  hideNavHeader,
-  onSubmit,
-}: NameFormProps) => {
-  const { t: cta } = useTranslation('pages.cta');
-  const { t } = useTranslation('pages.basic-information');
+const NameForm = ({ isLoading, ctaLabel, onSubmit }: NameFormProps) => {
   const [state] = useCollectKycDataMachine();
   const { data } = state.context;
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<FormData>({
+  const methods = useForm<FormData>({
     defaultValues: {
       [UserDataAttribute.firstName]: data[UserDataAttribute.firstName],
       [UserDataAttribute.lastName]: data[UserDataAttribute.lastName],
@@ -52,42 +36,12 @@ const NameForm = ({
   };
 
   return (
-    <>
-      {!hideNavHeader && <NavigationHeader />}
-      <Form onSubmit={handleSubmit(onSubmitFormData)}>
-        {!hideTitle && (
-          <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
-        )}
-        <Grid.Row>
-          <Grid.Column col={6}>
-            <TextInput
-              hasError={!!errors[UserDataAttribute.firstName]}
-              hint={
-                errors[UserDataAttribute.firstName] &&
-                t('form.first-name.error')
-              }
-              label={t('form.first-name.label')}
-              placeholder={t('form.first-name.placeholder')}
-              {...register(UserDataAttribute.firstName, { required: true })}
-            />
-          </Grid.Column>
-          <Grid.Column col={6}>
-            <TextInput
-              hasError={!!errors[UserDataAttribute.lastName]}
-              hint={
-                errors[UserDataAttribute.lastName] && t('form.last-name.error')
-              }
-              label={t('form.last-name.label')}
-              placeholder={t('form.last-name.placeholder')}
-              {...register(UserDataAttribute.lastName, { required: true })}
-            />
-          </Grid.Column>
-        </Grid.Row>
-        <Button type="submit" fullWidth loading={isMutationLoading}>
-          {ctaLabel ?? cta('continue')}
-        </Button>
+    <FormProvider {...methods}>
+      <Form onSubmit={methods.handleSubmit(onSubmitFormData)}>
+        <NameFields />
+        <CtaButton isLoading={isLoading} label={ctaLabel} />
       </Form>
-    </>
+    </FormProvider>
   );
 };
 

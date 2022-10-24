@@ -3,24 +3,25 @@ import { CollectedDataOption } from '@onefootprint/types';
 import { useToast } from '@onefootprint/ui';
 import React from 'react';
 
+import HeaderTitle from '../../../../components/header-title';
 import { useCollectKycDataMachine } from '../../components/machine-provider';
+import NavigationHeader from '../../components/navigation-header';
 import useSyncData from '../../hooks/use-sync-data';
 import { BasicInformation as BasicInformationData } from '../../utils/data-types';
 import { Events } from '../../utils/state-machine/types';
+import DobForm from './components/dob-form';
 import NameAndDobForm from './components/name-and-dob-form';
 import NameForm from './components/name-form';
 
 type BasicInformationProps = {
-  hideTitle?: boolean;
-  hideNavHeader?: boolean;
+  hideHeader?: boolean;
   ctaLabel?: string;
   onComplete?: () => void;
 };
 
 const BasicInformation = ({
   ctaLabel,
-  hideTitle: hideHeader,
-  hideNavHeader,
+  hideHeader,
   onComplete,
 }: BasicInformationProps) => {
   const [state, send] = useCollectKycDataMachine();
@@ -58,27 +59,51 @@ const BasicInformation = ({
     });
   };
 
+  const requiresName = missingAttributes.includes(CollectedDataOption.name);
   const requiresDob = missingAttributes.includes(CollectedDataOption.dob);
-  if (requiresDob) {
+
+  const renderForm = () => {
+    if (requiresName && requiresDob) {
+      return (
+        <NameAndDobForm
+          onSubmit={onSubmit}
+          isLoading={mutation.isLoading}
+          ctaLabel={ctaLabel}
+        />
+      );
+    }
+    if (requiresName) {
+      return (
+        <NameForm
+          onSubmit={onSubmit}
+          isLoading={mutation.isLoading}
+          ctaLabel={ctaLabel}
+        />
+      );
+    }
     return (
-      <NameAndDobForm
+      <DobForm
         onSubmit={onSubmit}
-        isMutationLoading={mutation.isLoading}
+        isLoading={mutation.isLoading}
         ctaLabel={ctaLabel}
-        hideTitle={hideHeader}
-        hideNavHeader={hideNavHeader}
       />
     );
-  }
+  };
 
   return (
-    <NameForm
-      onSubmit={onSubmit}
-      isMutationLoading={mutation.isLoading}
-      ctaLabel={ctaLabel}
-      hideTitle={hideHeader}
-      hideNavHeader={hideNavHeader}
-    />
+    <>
+      {hideHeader ? null : (
+        <>
+          <HeaderTitle
+            title={t('title')}
+            subtitle={t('subtitle')}
+            sx={{ marginBottom: 7 }}
+          />
+          <NavigationHeader />
+        </>
+      )}
+      {renderForm()}
+    </>
   );
 };
 

@@ -29,12 +29,7 @@ const EditSheet = ({ section, open, onClose }: EditSheetProps) => {
       title={t('title', { name: t(`name.${section}`) })}
     >
       {section === EditSection.basicInfo && (
-        <BasicInformation
-          ctaLabel={ctaLabel}
-          onComplete={onClose}
-          hideTitle
-          hideNavHeader
-        />
+        <BasicInformation ctaLabel={ctaLabel} onComplete={onClose} hideHeader />
       )}
       {section === EditSection.address && (
         <ResidentialAddress

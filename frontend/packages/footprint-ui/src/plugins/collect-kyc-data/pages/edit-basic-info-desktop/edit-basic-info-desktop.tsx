@@ -28,8 +28,7 @@ const EditBasicInfoDesktop = () => {
         <BasicInformation
           ctaLabel={t('edit-sheet.save')}
           onComplete={handlePrev}
-          hideTitle
-          hideNavHeader
+          hideHeader
         />
       </Container>
     </>

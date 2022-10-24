@@ -4,39 +4,30 @@ import { FormProvider, useForm } from 'react-hook-form';
 import styled, { css } from 'styled-components';
 
 import { useCollectKycDataMachine } from '../../../../components/machine-provider';
-import { NameAndDobInformation } from '../../../../utils/data-types';
+import { DobInformation } from '../../../../utils/data-types';
 import CtaButton from '../cta-button';
 import DobField from '../dob-field';
-import NameFields from '../name-fields';
 
-type FormData = NameAndDobInformation;
+type FormData = DobInformation;
 
-type NameAndDobFormProps = {
+type DobFormProps = {
   isLoading: boolean;
-  onSubmit: (data: NameAndDobInformation) => void;
+  onSubmit: (data: DobInformation) => void;
   ctaLabel?: string;
 };
 
-const NameAndDobForm = ({
-  isLoading,
-  onSubmit,
-  ctaLabel,
-}: NameAndDobFormProps) => {
+const DobForm = ({ isLoading, onSubmit, ctaLabel }: DobFormProps) => {
   const [state] = useCollectKycDataMachine();
   const { data } = state.context;
 
   const methods = useForm<FormData>({
     defaultValues: {
-      [UserDataAttribute.firstName]: data[UserDataAttribute.firstName],
-      [UserDataAttribute.lastName]: data[UserDataAttribute.lastName],
       [UserDataAttribute.dob]: data[UserDataAttribute.dob],
     },
   });
 
   const onSubmitFormData = (formData: FormData) => {
     const basicInformation = {
-      [UserDataAttribute.firstName]: formData[UserDataAttribute.firstName],
-      [UserDataAttribute.lastName]: formData[UserDataAttribute.lastName],
       [UserDataAttribute.dob]: formData[UserDataAttribute.dob],
     };
     onSubmit(basicInformation);
@@ -45,7 +36,6 @@ const NameAndDobForm = ({
   return (
     <FormProvider {...methods}>
       <Form onSubmit={methods.handleSubmit(onSubmitFormData)}>
-        <NameFields />
         <DobField />
         <CtaButton isLoading={isLoading} label={ctaLabel} />
       </Form>
@@ -59,5 +49,4 @@ const Form = styled.form`
     row-gap: ${theme.spacing[7]}px;
   `}
 `;
-
-export default NameAndDobForm;
+export default DobForm;
