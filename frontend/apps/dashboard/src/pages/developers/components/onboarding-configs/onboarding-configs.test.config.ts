@@ -7,6 +7,7 @@ export const onboardingConfig = {
   org_name: 'Acme Bank',
   logo_url: null,
   must_collect_data: ['name', 'dob'],
+  must_collect_identity_document: true,
   can_access_data: ['dob'],
   is_live: true,
   created_at: '2022-07-20T01:52:36.984290Z',

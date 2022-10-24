@@ -78,6 +78,7 @@ describe('<OnboardingConfigs />', () => {
           const createdAt = within(item).getByText('7/20/22, 1:52 AM', {
             exact: false,
           });
+
           expect(createdAt).toBeInTheDocument();
           const mustCollectList = within(item).getByTestId(
             `must-collect-data-${onboardingConfig.id}`,
@@ -88,6 +89,19 @@ describe('<OnboardingConfigs />', () => {
           const canAccessList = within(item).getByTestId(
             `can-access-data-${onboardingConfig.id}`,
           );
+
+          const idDocRowTitle = within(item).getByTestId(
+            `id-doc-${onboardingConfig.id}`,
+          );
+          expect(idDocRowTitle).toBeInTheDocument();
+          expect(idDocRowTitle.textContent).toEqual('ID document');
+
+          const idDocRowStatus = within(item).getByTestId(
+            `id-doc-status-${onboardingConfig.id}`,
+          );
+          expect(idDocRowStatus).toBeInTheDocument();
+          expect(idDocRowStatus.textContent).toEqual('Required');
+
           expect(
             within(canAccessList).getByText('Date of Birth'),
           ).toBeInTheDocument();

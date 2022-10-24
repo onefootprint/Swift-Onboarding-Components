@@ -8,6 +8,7 @@ export type OnboardingConfig = {
   key: string;
   logoUrl: string | null;
   mustCollectData: CollectedDataOption[];
+  mustCollectIdentityDocument: boolean;
   name: string;
   orgName: string;
   status: 'enabled' | 'disabled';

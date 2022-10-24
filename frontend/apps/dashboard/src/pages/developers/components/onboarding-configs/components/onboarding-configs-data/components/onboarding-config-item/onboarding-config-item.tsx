@@ -5,6 +5,7 @@ import React from 'react';
 import Table from '../../../table';
 import AccessPermissionScopeRow from './components/access-permission-scope-row';
 import EditDialog from './components/edit-dialog';
+import IdDocRow from './components/id-doc-row';
 import NameRow from './components/name-row';
 import OnboardingPublishableKeyRow from './components/onboarding-publishable-key-row';
 import RequiredDataToBeCollectedRow from './components/required-data-to-be-collected-row';
@@ -36,6 +37,7 @@ const OnboardingConfigItem = ({ data }: OnboardingConfigItemProps) => {
         </thead>
         <tbody>
           <RequiredDataToBeCollectedRow data={data} />
+          <IdDocRow data={data} />
           <AccessPermissionScopeRow data={data} />
           <OnboardingPublishableKeyRow data={data} />
           <StatusRow data={data} />
