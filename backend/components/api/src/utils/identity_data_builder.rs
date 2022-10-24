@@ -10,7 +10,8 @@ use newtypes::{
     dob::DateOfBirth,
     name::FullName,
     ssn::{Ssn, Ssn4, Ssn9},
-    DataAttribute, Fingerprint, PiiString, SealedVaultBytes, UserVaultId, VaultPublicKey,
+    CollectedDataOption, DataAttribute, Fingerprint, PiiString, SealedVaultBytes, UserVaultId,
+    VaultPublicKey,
 };
 
 use crate::errors::{user::UserError, ApiResult};
@@ -23,6 +24,7 @@ pub struct IdentityDataBuilder {
     fingerprint_kinds_to_clear: Vec<DataAttribute>,
     vault_public_key: VaultPublicKey,
     fingerprints: Vec<(DataAttribute, Fingerprint, IsUnique)>,
+    collected_data: Vec<CollectedDataOption>,
 }
 
 impl IdentityDataBuilder {
@@ -46,6 +48,7 @@ impl IdentityDataBuilder {
             fingerprint_kinds_to_clear: vec![],
             vault_public_key,
             fingerprints,
+            collected_data: vec![],
         }
     }
 
@@ -67,6 +70,7 @@ impl IdentityDataBuilder {
         } = name;
         self.new_data.e_first_name = self.seal(first_name.into(), DataAttribute::FirstName)?;
         self.new_data.e_last_name = self.seal(last_name.into(), DataAttribute::LastName)?;
+        self.collected_data.push(CollectedDataOption::Name);
         Ok(())
     }
 
@@ -76,6 +80,7 @@ impl IdentityDataBuilder {
         }
 
         self.new_data.e_dob = self.seal(dob.into(), DataAttribute::Dob)?;
+        self.collected_data.push(CollectedDataOption::Dob);
         Ok(())
     }
 
@@ -91,6 +96,7 @@ impl IdentityDataBuilder {
         }
 
         self.new_data.e_ssn9 = self.seal(ssn9.into(), DataAttribute::Ssn9)?;
+        self.collected_data.push(CollectedDataOption::Ssn9);
 
         Ok(())
     }
@@ -104,6 +110,7 @@ impl IdentityDataBuilder {
         }
 
         self.new_data.e_ssn4 = self.seal(ssn4.into(), DataAttribute::Ssn4)?;
+        self.collected_data.push(CollectedDataOption::Ssn4);
         Ok(())
     }
 
@@ -139,6 +146,7 @@ impl IdentityDataBuilder {
         self.new_data.e_address_state = self.seal(state.into(), DataAttribute::State)?;
         self.new_data.e_address_zip = self.seal(zip.into(), DataAttribute::Zip)?;
         self.new_data.e_address_country = self.seal(country.into(), DataAttribute::Country)?;
+        self.collected_data.push(CollectedDataOption::FullAddress);
 
         Ok(())
     }
@@ -161,6 +169,7 @@ impl IdentityDataBuilder {
 
         self.new_data.e_address_zip = self.seal(zip.into(), DataAttribute::Zip)?;
         self.new_data.e_address_country = self.seal(country.into(), DataAttribute::Country)?;
+        self.collected_data.push(CollectedDataOption::PartialAddress);
         Ok(())
     }
 
@@ -177,7 +186,10 @@ impl IdentityDataBuilder {
         Ok(())
     }
 
-    pub fn finish(mut self, conn: &mut PgConnection) -> ApiResult<NewIdentityDataArgs> {
+    pub fn finish(
+        mut self,
+        conn: &mut PgConnection,
+    ) -> ApiResult<(NewIdentityDataArgs, Vec<CollectedDataOption>)> {
         // sunset the old identity data and remove fingerprints
         if let Some(existing) = self.existing_data {
             let fp_to_remove = existing.deactivate(conn, &self.fingerprint_kinds_to_clear)?;
@@ -191,6 +203,6 @@ impl IdentityDataBuilder {
         )?;
         self.new_data.add_fingerprint_ids(new_fingerprint_ids);
 
-        Ok(self.new_data)
+        Ok((self.new_data, self.collected_data))
     }
 }

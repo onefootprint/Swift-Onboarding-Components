@@ -3,6 +3,7 @@ use db::models::identity_data::{HasIdentityDataFields, IdentityData};
 use db::models::kv_data::{KeyValueData, NewKeyValueDataArgs};
 use db::models::onboarding::Onboarding;
 use db::models::scoped_user::ScopedUser;
+use db::models::user_timeline::UserTimeline;
 use db::models::verification_request::VerificationRequest;
 use db::TxnPgConnection;
 use enclave_proxy::DataTransform;
@@ -20,8 +21,8 @@ use db::models::phone_number::PhoneNumber;
 use db::models::user_vault::UserVault;
 use db::{errors::DbError, PgConnection};
 use newtypes::{
-    CollectedDataOption, DataAttribute, DataPriority, EmailId, Fingerprint, KvDataKey, PiiString,
-    SealedVaultBytes, TenantId, UserVaultId, ValidatedPhoneNumber,
+    CollectedDataOption, DataAttribute, DataCollectedInfo, DataPriority, EmailId, Fingerprint, KvDataKey,
+    PiiString, SealedVaultBytes, TenantId, UserVaultId, ValidatedPhoneNumber,
 };
 
 use crate::errors::{ApiError, ApiResult};
@@ -289,10 +290,22 @@ impl UserVaultWrapper {
             builder.add_full_address_or_zip(address)?;
         }
 
-        let new_identity_data = builder.finish(conn)?;
-
+        let (new_identity_data, collected_data) = builder.finish(conn)?;
         // finally create our new fingerprint
         let identity_data = IdentityData::create(conn, new_identity_data)?;
+
+        if !collected_data.is_empty() {
+            // Create a timeline event that shows all the new data that was added
+            UserTimeline::create(
+                conn,
+                DataCollectedInfo {
+                    attributes: collected_data,
+                },
+                self.user_vault.id.clone(),
+                // TODO include ob_id if data is added during onboarding
+                None,
+            )?;
+        }
         self.identity_data = Some(identity_data);
 
         Ok(())
