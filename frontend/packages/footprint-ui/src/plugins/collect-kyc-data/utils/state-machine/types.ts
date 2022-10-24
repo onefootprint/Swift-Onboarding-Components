@@ -25,6 +25,7 @@ export enum States {
   addressEditDesktop = 'addressEditDesktop',
   identityEditDesktop = 'identityEditDesktop',
 
+  startKyc = 'startKyc',
   completed = 'completed',
 }
 

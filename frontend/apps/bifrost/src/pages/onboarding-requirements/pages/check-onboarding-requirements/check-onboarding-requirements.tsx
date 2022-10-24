@@ -24,13 +24,11 @@ const CheckOnboardingRequirements = () => {
 
     let missingLiveness = false;
     let missingIdDocument = false;
-    let missingKycData: CollectedDataOption[] = [];
+    let missingKycData: CollectedDataOption[] | undefined;
 
     requirements.forEach((req: OnboardingRequirement) => {
       if (req.kind === OnboardingRequirementKind.collectKycData) {
-        if (req.missingAttributes.length) {
-          missingKycData = [...req.missingAttributes];
-        }
+        missingKycData = req.missingAttributes;
       }
       if (req.kind === OnboardingRequirementKind.liveness) {
         missingLiveness = true;

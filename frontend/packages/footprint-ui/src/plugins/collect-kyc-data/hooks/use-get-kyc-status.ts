@@ -2,11 +2,8 @@ import request, { RequestError } from '@onefootprint/request';
 import { GetKycStatusRequest, GetKycStatusResponse } from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
 
-import { useCollectKycDataMachine } from '../../../components/machine-provider';
-import {
-  AUTH_HEADER,
-  CLIENT_PUBLIC_KEY_HEADER,
-} from '../../../config/contants';
+import { useCollectKycDataMachine } from '../components/machine-provider';
+import { AUTH_HEADER, CLIENT_PUBLIC_KEY_HEADER } from '../config/contants';
 
 const KYC_STATUS_FETCH_INTERVAL = 1000;
 

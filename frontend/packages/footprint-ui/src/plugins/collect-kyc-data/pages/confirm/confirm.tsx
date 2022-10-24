@@ -13,13 +13,13 @@ import NavigationHeader from '../../../../components/navigation-header';
 import useCollectKycDataMachine, {
   Events,
 } from '../../hooks/use-collect-kyc-data-machine';
+import useGetKycStatus from '../../hooks/use-get-kyc-status';
+import useStartKyc from '../../hooks/use-start-kyc';
 import useSyncData from '../../hooks/use-sync-data';
 import AddressSection from './components/address-section';
 import BasicInfoSection from './components/basic-info-section';
 import EditSheet, { EditSection } from './components/edit-sheet';
 import IdentitySection from './components/identity-section';
-import useGetKycStatus from './hooks/use-get-kyc-status';
-import useStartKyc from './hooks/use-start-kyc';
 
 const Confirm = () => {
   const { t } = useTranslation('pages.confirm');

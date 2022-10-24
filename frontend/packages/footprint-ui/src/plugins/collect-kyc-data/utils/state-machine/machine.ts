@@ -31,7 +31,6 @@ const createCollectKycDataMachine = () =>
                 target: States.basicInformation,
                 actions: Actions.assignInitialContext,
                 cond: (context, event) =>
-                  !event.payload.userFound ||
                   isMissingBasicAttribute(
                     event.payload.missingAttributes,
                     context.data,
@@ -56,7 +55,22 @@ const createCollectKycDataMachine = () =>
                   ),
               },
               {
+                target: States.startKyc,
+                actions: Actions.assignInitialContext,
+              },
+            ],
+          },
+        },
+        [States.startKyc]: {
+          on: {
+            [Events.confirmed]: [
+              {
                 target: States.completed,
+                actions: [Actions.assignKycPending],
+                cond: (context, event) => !event.payload?.kycPending,
+              },
+              {
+                actions: [Actions.assignKycPending],
               },
             ],
           },

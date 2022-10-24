@@ -14,7 +14,7 @@ export type MachineContext = {
   userFound: boolean;
   missingLiveness: boolean;
   missingIdDocument: boolean;
-  missingKycData: readonly CollectedDataOption[]; // Initial set of attributes received from /onboarding
+  missingKycData?: readonly CollectedDataOption[]; // Initial set of attributes received from /onboarding
   kycData: UserData; // Filled user data
   tenant: TenantInfo;
   device: DeviceInfo;
@@ -42,7 +42,7 @@ export type MachineEvents =
       payload: {
         missingLiveness: boolean;
         missingIdDocument: boolean;
-        missingKycData: readonly CollectedDataOption[];
+        missingKycData?: readonly CollectedDataOption[];
       };
     }
   | { type: Events.transferCompleted }

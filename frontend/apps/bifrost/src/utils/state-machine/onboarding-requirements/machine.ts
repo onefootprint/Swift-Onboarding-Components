@@ -41,7 +41,6 @@ const createOnboardingRequirementsMachine = ({
         userFound,
         missingLiveness: false,
         missingIdDocument: false,
-        missingKycData: [],
         kycData: {},
         device,
         authToken,
@@ -55,8 +54,8 @@ const createOnboardingRequirementsMachine = ({
                 cond: (context, event) =>
                   requiresAdditionalInfo(
                     context.userFound,
-                    event.payload.missingKycData,
                     event.payload.missingIdDocument,
+                    event.payload.missingKycData,
                   ),
                 target: States.additionalInfoRequired,
                 actions: [
@@ -171,7 +170,7 @@ const createOnboardingRequirementsMachine = ({
       actions: {
         [Actions.assignMissingKycData]: assign((context, event) => {
           if (event.type === Events.onboardingRequirementsReceived) {
-            context.missingKycData = [...event.payload.missingKycData];
+            context.missingKycData = event.payload.missingKycData;
           }
           return context;
         }),

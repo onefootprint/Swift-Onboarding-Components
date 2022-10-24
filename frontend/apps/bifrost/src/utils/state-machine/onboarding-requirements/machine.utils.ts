@@ -9,8 +9,8 @@ export const shouldRunCollectKycDataFromContext = (context: MachineContext) => {
 };
 
 export const shouldRunCollectKycData = (
-  missingKycData: readonly CollectedDataOption[],
-) => missingKycData.length > 0;
+  missingKycData?: readonly CollectedDataOption[],
+) => typeof missingKycData !== 'undefined';
 
 export const shouldRunIdScanFromContext = (context: MachineContext) => {
   const { missingIdDocument, device } = context;
@@ -40,6 +40,6 @@ export const shouldRunTransfer = (
 
 export const requiresAdditionalInfo = (
   userFound: boolean,
-  missingKycData: readonly CollectedDataOption[],
   missingIdDocument: boolean,
-) => userFound && (missingKycData.length > 0 || missingIdDocument);
+  missingKycData?: readonly CollectedDataOption[],
+) => userFound && (!!missingKycData?.length || missingIdDocument);

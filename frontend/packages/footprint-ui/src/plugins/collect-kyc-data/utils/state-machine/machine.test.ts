@@ -218,7 +218,12 @@ describe('Onboarding Machine Tests', () => {
   describe('When user has onboarded to tenant with current configuration', () => {
     it('Onboarding ends', () => {
       const machine = createMachine(true, []);
-      const { state } = machine;
+      let { state } = machine;
+      expect(state.value).toEqual(States.startKyc);
+
+      state = machine.send({
+        type: Events.confirmed,
+      });
       expect(state.value).toEqual(States.completed);
     });
   });
