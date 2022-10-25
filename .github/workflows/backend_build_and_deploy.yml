@@ -55,11 +55,29 @@ on:
       PULUMI_ACCESS_TOKEN:
         required: true
 jobs:
+  extract_commit:
+    name: Extract commit hash
+    runs-on: [beast, linux]
+    outputs:
+      componentVersion: '${{ steps.constants.outputs.componentVersion }}'
+    steps:
+      - uses: actions/checkout@v2
+      - name: Extract commit hash
+        shell: bash
+        run: |
+          git --version
+          branch="$(echo ${{ github.head_ref || github.ref_name }} | sed -r 's/\//-/g' | sed -r 's/_/-/g')"
+          version="${branch}-$(git rev-parse --short HEAD)"
+          echo "##[set-output name=componentVersion;]$(echo ${version})"
+        id: constants
+
   # build the main api image
   build_api:
     name: Build API container
     runs-on: [beast, linux]
     environment: ${{ inputs.environment }}
+    needs: [extract_commit]
+    if: success()
     steps:
       - uses: actions/checkout@v2
 
@@ -92,14 +110,14 @@ jobs:
           make api-release
           account="$(aws sts get-caller-identity --query "Account" --output text)"
           branch="$(echo ${{ github.head_ref || github.ref_name }} | sed -r 's/\//-/g' | sed -r 's/_/-/g')"
-          commit="${branch}-$(git rev-parse --short HEAD)"
+          componentVersion="${{ jobs.extract_commit.outputs.componentVersion }}"
           echo "using account ${account}"
-          echo "create image tagged as ${commit}"
-          docker build -t "api:${commit}" -f api.dockerfile .
+          echo "create image tagged as ${componentVersion}"
+          docker build -t "api:${componentVersion}" -f api.dockerfile .
           aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${account}.dkr.ecr.us-east-1.amazonaws.com
-          docker tag api:${commit} ${account}.dkr.ecr.us-east-1.amazonaws.com/api:${commit}
-          docker tag api:${commit} ${account}.dkr.ecr.us-east-1.amazonaws.com/api:latest
-          docker push ${account}.dkr.ecr.us-east-1.amazonaws.com/api:${commit}
+          docker tag api:${componentVersion} ${account}.dkr.ecr.us-east-1.amazonaws.com/api:${componentVersion}
+          docker tag api:${componentVersion} ${account}.dkr.ecr.us-east-1.amazonaws.com/api:latest
+          docker push ${account}.dkr.ecr.us-east-1.amazonaws.com/api:${componentVersion}
           docker push ${account}.dkr.ecr.us-east-1.amazonaws.com/api:latest
 
       # workaround: move the cargo cache to somewhere it can be cached
@@ -115,6 +133,8 @@ jobs:
     name: Build Signed EIF
     runs-on: eif-builder
     environment: ${{ inputs.environment }}
+    needs: [extract_commit]
+    if: success()
     steps:
       - uses: actions/checkout@v2
 
@@ -132,17 +152,18 @@ jobs:
         run: |
           echo "${{ secrets.ENCLAVE_SIGNING_KEY }}" > ../enclavekey.pem
           echo "${{ secrets.ENCLAVE_SIGNING_CERT }}" > ../cert.pem
+          git --version
           make build-eif
           account="$(aws sts get-caller-identity --query "Account" --output text)"
           branch="$(echo ${{ github.head_ref || github.ref_name }} | sed -r 's/\//-/g' | sed -r 's/_/-/g')"
-          commit="${branch}-$(git rev-parse --short HEAD)"
+          componentVersion="${{ jobs.extract_commit.outputs.componentVersion }}"
           echo "using account ${account}"
-          echo "create image tagged as ${commit}"
-          docker build -t "enclave_pkg:${commit}" -f enclave_package.dockerfile .
+          echo "create image tagged as ${componentVersion}"
+          docker build -t "enclave_pkg:${componentVersion}" -f enclave_package.dockerfile .
           aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${account}.dkr.ecr.us-east-1.amazonaws.com
-          docker tag enclave_pkg:${commit} ${account}.dkr.ecr.us-east-1.amazonaws.com/enclave_pkg:${commit}
-          docker tag enclave_pkg:${commit} ${account}.dkr.ecr.us-east-1.amazonaws.com/enclave_pkg:latest
-          docker push ${account}.dkr.ecr.us-east-1.amazonaws.com/enclave_pkg:${commit}
+          docker tag enclave_pkg:${componentVersion} ${account}.dkr.ecr.us-east-1.amazonaws.com/enclave_pkg:${componentVersion}
+          docker tag enclave_pkg:${componentVersion} ${account}.dkr.ecr.us-east-1.amazonaws.com/enclave_pkg:latest
+          docker push ${account}.dkr.ecr.us-east-1.amazonaws.com/enclave_pkg:${componentVersion}
           docker push ${account}.dkr.ecr.us-east-1.amazonaws.com/enclave_pkg:latest
 
       # cleanup: remove keys
@@ -220,6 +241,7 @@ jobs:
         shell: bash
         working-directory: ./backend/infra
         run: |
+          git --version
           echo ${{ inputs.stackName }}
           pulumi stack ls
           sub=$(pulumi config --stack footprint/${{ inputs.stackName }} get --path constants.domain.prefix)
@@ -228,7 +250,6 @@ jobs:
           branch="$(echo ${{ github.head_ref || github.ref_name }} | sed -r 's/\//-/g' | sed -r 's/_/-/g')"
           version="${branch}-$(git rev-parse --short HEAD)"
           echo "##[set-output name=url;]$(echo ${url})"
-          echo "##[set-output name=componentVersion;]$(echo ${version})"
         id: constants
         env:
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
@@ -236,8 +257,8 @@ jobs:
       - name: 'set api/enclave image version'
         working-directory: ./backend/infra
         run: |
-          pulumi config set --path constants.containers.apiVersion ${{ steps.constants.outputs.componentVersion }}
-          pulumi config set --path constants.containers.enclaveVersion ${{ steps.constants.outputs.componentVersion }}
+          pulumi config set --path constants.containers.apiVersion ${{ jobs.extract_commit.outputs.componentVersion }}
+          pulumi config set --path constants.containers.enclaveVersion ${{ jobs.extract_commit.outputs.componentVersion }}
         env:
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
 
@@ -265,7 +286,7 @@ jobs:
           command: up
           work-dir: ./backend/infra
           stack-name: 'footprint/${{ inputs.stackName }}'
-          message: 'Deployed to https://${{ steps.constants.outputs.url }} with component ${{ steps.constants.outputs.componentVersion }}'
+          message: 'Deployed to https://${{ steps.constants.outputs.url }} with component ${{ jobs.extract_commit.outputs.componentVersion }}'
         env:
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
 
@@ -278,5 +299,5 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: 'Deployed to https://${{ steps.constants.outputs.url }} with component tag `${{ steps.constants.outputs.componentVersion }}`'
+              body: 'Deployed to https://${{ steps.constants.outputs.url }} with component tag `${{ jobs.extract_commit.outputs.componentVersion }}`'
             })
