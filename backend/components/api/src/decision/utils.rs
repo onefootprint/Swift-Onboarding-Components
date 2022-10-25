@@ -60,8 +60,8 @@ pub(super) fn create_test_fixture_data(
     let decision = OnboardingDecision::create(
         conn,
         user_vault_id.clone(),
-        ob_id.clone(),
-        "TODO GIT HASH".to_owned(),
+        ob_id,
+        crate::GIT_HASH.to_string(),
         None,
         decision_status,
         ComplianceStatus::Compliant,
