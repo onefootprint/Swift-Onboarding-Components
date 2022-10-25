@@ -1,0 +1,12 @@
+{
+  "tokenSetOrder": [
+    "global",
+    "light",
+    "dark",
+    "components/fp-button",
+    "components/buttons",
+    "components/dialog",
+    "components/inputs",
+    "components/select"
+  ]
+}

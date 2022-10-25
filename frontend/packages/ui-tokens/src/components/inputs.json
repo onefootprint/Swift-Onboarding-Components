@@ -1,0 +1,32 @@
+{
+  "color": {
+    "inputs": {
+      "initial": {
+        "background": {
+          "value": "{semantic.bg.primary}",
+          "type": "color"
+        },
+        "border": {
+          "value": "{semantic.border.primary}",
+          "type": "color"
+        },
+        "text-placeholder": {
+          "value": "{semantic.text.quaternary}",
+          "type": "color"
+        },
+        "text-top-label": {
+          "value": "{semantic.text.primary}",
+          "type": "color"
+        }
+      }
+    }
+  },
+  "sizing": {
+    "input": {
+      "fp": {
+        "value": "40",
+        "type": "sizing"
+      }
+    }
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "color": {
+    "select": {
+      "initial": {
+        "background": {
+          "value": "{semantic.bg.primary}",
+          "type": "color"
+        },
+        "border": {
+          "value": "{semantic.border.primary}",
+          "type": "color"
+        },
+        "text-top-label": {
+          "value": "{semantic.text.primary}",
+          "type": "color"
+        },
+        "text-placeholder": {
+          "value": "{semantic.text.quaternary}",
+          "type": "color"
+        },
+        "icon": {
+          "value": "{semantic.text.primary}",
+          "type": "color"
+        },
+        "text-label": {
+          "value": "{semantic.text.primary}",
+          "type": "color"
+        }
+      }
+    }
+  },
+  "borderRadius": {
+    "value": "100",
+    "type": "borderRadius"
+  }
+}
