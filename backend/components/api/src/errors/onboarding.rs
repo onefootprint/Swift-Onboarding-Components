@@ -1,4 +1,4 @@
-use newtypes::OnboardingStatus;
+use newtypes::{CollectedDataOption, OnboardingStatus};
 use thiserror::Error;
 
 #[derive(Debug, Error)]
@@ -19,4 +19,6 @@ pub enum OnboardingError {
     TenantMismatch,
     #[error("Unmet onboarding requirements")]
     UnmetRequirements,
+    #[error("Required attributes are not set: {0:?}")]
+    MissingAttributes(Vec<CollectedDataOption>),
 }

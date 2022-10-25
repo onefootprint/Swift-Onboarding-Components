@@ -43,6 +43,11 @@ pub async fn run(
         .db_transaction(move |conn| -> Result<_, ApiError> {
             let (ob, _) = Onboarding::lock_by_config(conn, &uvw.user_vault.id, &ob_config.id)?
                 .ok_or(OnboardingError::NoOnboarding)?;
+            // Can only start KYC checks for onboarding that has all required fields
+            let missing_attributes = uvw.missing_fields(&ob_config);
+            if !missing_attributes.is_empty() {
+                return Err(OnboardingError::MissingAttributes(missing_attributes).into());
+            }
             // Can only start KYC checks for onboardings whose KYC checks have not yet been started
             if ob.status != OnboardingStatus::New {
                 return Err(OnboardingError::WrongKycState(ob.status).into());
