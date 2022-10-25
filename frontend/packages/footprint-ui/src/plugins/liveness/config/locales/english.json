@@ -17,7 +17,7 @@
     },
     "unavailable": {
       "title": "Biometric authentication unavailable",
-      "subtitle": "Unfortunately your device doesn't support biometric authentication. Please continue on your computer."
+      "subtitle": "Unfortunately your device doesn't support biometric authentication."
     },
     "success": {
       "title": "Biometric authentication successful!",

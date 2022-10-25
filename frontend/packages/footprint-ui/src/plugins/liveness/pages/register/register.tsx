@@ -1,21 +1,44 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { Button } from '@onefootprint/ui';
-import { useIsMutating } from '@tanstack/react-query';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
 import HeaderTitle from '../../components/header-title';
-import useRegisterBiometric from '../../hooks/use-register-biometric';
+import { useLivenessMachine } from '../../components/machine-provider';
+import useBiometricInit from '../../hooks/use-register-biometric';
+import { Events } from '../../utils/state-machine/types';
 
 const Register = () => {
   const { t } = useTranslation('pages.register');
-  const isMutating = useIsMutating();
-  const registerBiometric = useRegisterBiometric();
+  const [state, send] = useLivenessMachine();
+  const { authToken } = state.context;
+  const biometricInitMutation = useBiometricInit();
+
+  const handleClick = () => {
+    if (!authToken) {
+      return;
+    }
+    biometricInitMutation.mutate(
+      { authToken },
+      {
+        onSuccess() {
+          send({ type: Events.succeeded });
+        },
+        onError() {
+          send({ type: Events.failed });
+        },
+      },
+    );
+  };
 
   return (
     <Container>
       <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
-      <Button loading={!!isMutating} onClick={registerBiometric} fullWidth>
+      <Button
+        loading={biometricInitMutation.isLoading}
+        onClick={handleClick}
+        fullWidth
+      >
         {t('cta')}
       </Button>
     </Container>

@@ -7,9 +7,7 @@ import {
 import { useMutation } from '@tanstack/react-query';
 import base64url from 'base64url';
 
-import { useLivenessMachine } from '../components/machine-provider';
 import { AUTH_HEADER } from '../config/constants';
-import { Events } from '../utils/state-machine/types';
 
 const generateDeviceResponse = async (challenge: string) => {
   const challengeJson = JSON.parse(challenge) as BiometricRegisterChallengeJson;
@@ -79,27 +77,4 @@ const useBiometricInit = () =>
     BiometricRegisterRequest
   >(biometricInit);
 
-const useRegisterBiometric = () => {
-  const [state, send] = useLivenessMachine();
-  const biometricInitMutation = useBiometricInit();
-  const { authToken } = state.context;
-
-  return () => {
-    if (!authToken) {
-      return;
-    }
-    biometricInitMutation.mutate(
-      { authToken },
-      {
-        onSuccess() {
-          send({ type: Events.succeeded });
-        },
-        onError() {
-          send({ type: Events.failed });
-        },
-      },
-    );
-  };
-};
-
-export default useRegisterBiometric;
+export default useBiometricInit;

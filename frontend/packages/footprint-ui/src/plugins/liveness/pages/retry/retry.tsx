@@ -1,12 +1,11 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { Button } from '@onefootprint/ui';
-import { useIsMutating } from '@tanstack/react-query';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
 import HeaderTitle from '../../components/header-title';
 import { useLivenessMachine } from '../../components/machine-provider';
-import useRegisterBiometric from '../../hooks/use-register-biometric';
+import useBiometricInit from '../../hooks/use-register-biometric';
 import useSkipLiveness from '../../hooks/use-skip-liveness';
 import { Events } from '../../utils/state-machine/types';
 
@@ -14,8 +13,7 @@ const Retry = () => {
   const { t } = useTranslation('pages.retry');
   const [state, send] = useLivenessMachine();
   const { authToken, tenant } = state.context;
-  const isMutating = useIsMutating();
-  const registerBiometric = useRegisterBiometric();
+  const biometricInitMutation = useBiometricInit();
   const skipLivenessMutation = useSkipLiveness();
 
   const handleSkip = () => {
@@ -32,10 +30,31 @@ const Retry = () => {
     );
   };
 
+  const handleRetry = () => {
+    if (!authToken) {
+      return;
+    }
+    biometricInitMutation.mutate(
+      { authToken },
+      {
+        onSuccess() {
+          send({ type: Events.succeeded });
+        },
+        onError() {
+          send({ type: Events.failed });
+        },
+      },
+    );
+  };
+
   return (
     <Container>
       <HeaderTitle title={t('title')} subtitle={t('subtitle')} />
-      <Button onClick={registerBiometric} loading={!!isMutating} fullWidth>
+      <Button
+        onClick={handleRetry}
+        loading={biometricInitMutation.isLoading}
+        fullWidth
+      >
         {t('cta')}
       </Button>
       <Button
