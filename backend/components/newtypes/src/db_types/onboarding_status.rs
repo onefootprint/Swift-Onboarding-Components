@@ -13,7 +13,6 @@ use crate::{RequirementStatus, VerificationInfoStatus};
     Display,
     Clone,
     Copy,
-    Default,
     Eq,
     PartialEq,
     Ord,
@@ -36,7 +35,6 @@ pub enum OnboardingStatus {
     ManualReview,
     StepUpRequired,
     Verified,
-    #[default]
     Failed,
 }
 

@@ -12,7 +12,6 @@ use crate::util::impl_enum_str_diesel;
     Display,
     Clone,
     Copy,
-    Hash,
     Deserialize,
     Serialize,
     Apiv2Schema,
@@ -22,7 +21,7 @@ use crate::util::impl_enum_str_diesel;
     FromSqlRow,
     EnumString,
     AsRefStr,
-    JsonSchema,
+    JsonSchema
 )]
 #[serde(rename_all = "snake_case")]
 #[strum(serialize_all = "snake_case")]

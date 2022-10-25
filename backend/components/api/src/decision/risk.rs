@@ -5,21 +5,15 @@ use db::models::{
     onboarding::{Onboarding, OnboardingUpdate},
 };
 
-use super::features::*;
 use crate::{errors::ApiError, State};
 
-/// Create our final decision from the features we created, set final onboarding status, and emit risk signals
 pub async fn create_final_decision(
     state: &State,
     ob_id: OnboardingId,
-    features: FeatureVector,
+    result_statuses: Vec<Option<OnboardingStatus>>,
 ) -> Result<(), ApiError> {
     // TODO build process to run this asynchronously if we crashed before getting here
-    // TODO: for now, just take status
-    // TODO: use more features!
-    let result_statuses: Vec<Option<OnboardingStatus>> = features.statuses();
-    // TODO: Create our risk signals!
-    // Save status
+
     state
         .db_pool
         .db_transaction(move |conn| -> Result<_, ApiError> {
@@ -40,7 +34,7 @@ pub async fn create_final_decision(
             }
 
             if let Some(status) = final_status.audit_status() {
-                // TODO: create timeline
+                // TODO create timeline
                 AuditTrail::create(
                     conn,
                     AuditTrailEvent::Verification(VerificationInfo {

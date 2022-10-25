@@ -5,7 +5,6 @@ use crate::{
 };
 
 use db::models::{onboarding::Onboarding, verification_request::VerificationRequest};
-use idv::VendorResponse;
 use newtypes::{OnboardingStatus, TenantId, UserVaultId, Vendor};
 
 use super::*;
@@ -67,23 +66,38 @@ pub async fn run(
         })
         .await?;
 
-    // Build our IDV Vendor requests
-    let future_results = requests.into_iter().map(|r| make_idv_request(state, r));
+    // Fire off all IDV requests. Now that the requests are saved in the DB, even if we crash here,
+    // we know where to continue processing.
+    let uvw = state
+        .db_pool
+        .db_query(move |conn| UserVaultWrapper::get(conn, &uvw_id))
+        .await??;
+    // TODO: Figure out which requirements are present and save to junction table
+    // Try to make this in one DB transaction, which I think means we should bulk create outside the closure, but
+    // it may require more refactoring
 
-    // Make requests
-    // TODO: if any of the requests fail, this joined future will fail. Handle individual vendor failures separately
-    let results = futures::future::try_join_all(future_results).await?;
+    let future_results = requests
+        .into_iter()
+        .map(|r| make_idv_request(state, r, uvw.user_vault.id.clone(), tenant_id.clone()));
 
-    // From our results, create a FeatureVector for the final decision output
-    let features = features::create_features(results);
-
-    // Create our final decision from the features we created, set final onboarding status, and emit risk signals
-    risk::create_final_decision(state, ob_id, features).await?;
+    // Make requests!
+    let result_statuses = futures::future::try_join_all(future_results).await?;
+    // ***** TODO HERE ****
+    // - Mark requirements as fulfilled
+    // - Insert deciding final status (now it's same logic as before)
+    // - Step ups
+    // - Waterfalls
+    risk::create_final_decision(state, ob_id, result_statuses).await?;
 
     Ok(())
 }
 
-async fn make_idv_request(state: &State, request: VerificationRequest) -> Result<VendorResponse, ApiError> {
+async fn make_idv_request(
+    state: &State,
+    request: VerificationRequest,
+    user_vault_id: UserVaultId,
+    tenant_id: TenantId,
+) -> Result<Option<OnboardingStatus>, ApiError> {
     let request_id = request.id.clone();
 
     // TODO: could have different logic for different vendors?
@@ -93,9 +107,12 @@ async fn make_idv_request(state: &State, request: VerificationRequest) -> Result
 
     // TODO: mark requirement statuses as fulfilled. I don't totally like it going in here but it's ok for now
     // TODO: handle collect doc - remove?
-    let vendor_response = verification_request::make_request::send_idv_request(state, request, data).await?;
+    let (idv_response, _) =
+        verification_request::make_request::send_idv_request(state, request, data).await?;
+    let status = idv_response.status;
 
-    verification_result::save_verification_result(state, request_id, vendor_response.clone()).await?;
+    verification_result::save_verification_result(state, user_vault_id, tenant_id, request_id, idv_response)
+        .await?;
 
-    Ok(vendor_response)
+    Ok(status)
 }

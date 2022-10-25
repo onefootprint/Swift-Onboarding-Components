@@ -413,9 +413,8 @@ impl IDologyReasonCode {
             AddressDoesNotMatch => (Alert(3), vec![StreetAddress]),
             StreetNameDoesNotMatch => (Alert(2), vec![StreetAddress]),
             StreetNumberDoesNotMatch => (Alert(2), vec![StreetAddress]),
-            // Entered or found PO box is sketchy
-            InputAddressIsPoBox => (Alert(4), vec![Address]),
-            LocatedAddressIsPoBox => (Alert(5), vec![Address]),
+            InputAddressIsPoBox => (Info, vec![Address]),
+            LocatedAddressIsPoBox => (Info, vec![Address]),
             // TODO parse warm-address-list value
             WarmInputAddressAlert => (Alert(3), vec![Address]),
             WarmAddressAlert => (Alert(3), vec![Address]),
@@ -427,7 +426,6 @@ impl IDologyReasonCode {
             MobDoesNotMatch => (Alert(3), vec![Dob]),
             MobNotAvailable => (NotFound, vec![Dob]),
             // TODO how do we handle this?
-            //   Idology docs recommend sending KBA questions
             MultipleRecordsFound => (TODO, vec![]),
             NewerRecordFound => (Alert(1), vec![Address]),
             HighRiskAddress => (Fraud(2), vec![Address]),
