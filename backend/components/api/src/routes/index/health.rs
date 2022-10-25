@@ -12,17 +12,16 @@ use serde::{Deserialize, Serialize};
 #[tracing::instrument(name = "health", skip(state))]
 #[get("/health")]
 async fn handler(state: web::Data<State>) -> StringResponse {
-    let before_enclave = chrono::Utc::now().timestamp_millis();
-    let _res = state.enclave_client.pong().await?;
-    let after_enclave = chrono::Utc::now().timestamp_millis();
+    // let before_enclave = chrono::Utc::now().timestamp_millis();
+    // let _res = state.enclave_client.pong().await?;
+    // let after_enclave = chrono::Utc::now().timestamp_millis();
 
     let before_db = chrono::Utc::now().timestamp_millis();
     db::health_check(&state.db_pool).await?;
     let after_db = chrono::Utc::now().timestamp_millis();
 
     Ok(format!(
-        "Enclave: healthy RT {}ms\nDB: healthy RT {}ms",
-        after_enclave - before_enclave,
+        "Enclave: not checking\nDB: healthy RT {}ms",
         after_db - before_db
     ))
 }
