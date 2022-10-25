@@ -14,13 +14,13 @@ const StatusReceivedTransitions: TransitionsConfig<
     },
     {
       target: States.canceled,
-      cond: (context, event) =>
-        event.payload.status === D2PStatus.canceled ||
-        event.payload.status === D2PStatus.failed,
+      cond: (context, event) => event.payload.status === D2PStatus.canceled,
     },
     {
       target: States.complete,
-      cond: (context, event) => event.payload.status === D2PStatus.completed,
+      cond: (context, event) =>
+        event.payload.status === D2PStatus.completed ||
+        event.payload.status === D2PStatus.failed,
     },
   ],
 };

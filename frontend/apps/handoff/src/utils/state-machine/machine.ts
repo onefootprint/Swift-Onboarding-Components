@@ -49,6 +49,11 @@ export const createHandoffMachine = () =>
                 actions: [Actions.assignDeviceInfo],
               },
             ],
+            [Events.d2pAlreadyCompleted]: [
+              {
+                target: States.complete,
+              },
+            ],
           },
         },
         [States.checkRequirements]: {

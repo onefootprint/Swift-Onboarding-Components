@@ -13,27 +13,34 @@ const Init = () => {
   const [, send] = useHandoffMachine();
   const updateD2PStatusMutation = useUpdateD2PStatus();
 
-  const updateD2P = (authToken: string) => {
-    if (authToken) {
-      updateD2PStatusMutation.mutate({
-        authToken,
-        status: D2PStatusUpdate.inProgress,
-      });
-    }
-  };
-
   useParseHandoffUrl({
     onSuccess: (query: HandoffUrlQuery) => {
       const { authToken, tenantPk } = query;
       // Tell the api that d2p is in progress now
-      updateD2P(authToken);
-      send({
-        type: Events.authTokenReceived,
-        payload: {
+      updateD2PStatusMutation.mutate(
+        {
           authToken,
-          tenantPk,
+          status: D2PStatusUpdate.inProgress,
         },
-      });
+        {
+          onError() {
+            // If the handoff was already completed, we will get an error about
+            // trying to transition the status backwards
+            send({
+              type: Events.d2pAlreadyCompleted,
+            });
+          },
+          onSettled() {
+            send({
+              type: Events.authTokenReceived,
+              payload: {
+                authToken,
+                tenantPk,
+              },
+            });
+          },
+        },
+      );
     },
   });
 

@@ -42,7 +42,7 @@ const useGetD2PStatus = () => {
   };
 
   return useQuery<GetD2PResponse, RequestError>(
-    [authToken],
+    [authToken, state.done, 'get-d2p-status'],
     () => getD2PStatus({ scopedAuthToken: authToken ?? '' }),
     {
       enabled: !!authToken && !state.done,

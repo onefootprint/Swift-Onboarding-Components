@@ -31,6 +31,7 @@ export const createLivenessMachine = () =>
               },
               {
                 target: States.unavailable,
+                actions: Actions.assignContext,
               },
             ],
           },

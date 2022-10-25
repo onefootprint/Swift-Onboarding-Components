@@ -19,6 +19,7 @@ export enum Events {
   livenessCompleted = 'livenessCompleted',
   idScanCompleted = 'idScanCompleted',
   statusReceived = 'statusReceived', // Fetching d2p status is complete
+  d2pAlreadyCompleted = 'd2pAlreadyCompleted',
 }
 
 export enum Actions {
@@ -41,6 +42,9 @@ export type MachineContext = {
 };
 
 export type MachineEvents =
+  | {
+      type: Events.d2pAlreadyCompleted;
+    }
   | {
       type: Events.authTokenReceived;
       payload: {
