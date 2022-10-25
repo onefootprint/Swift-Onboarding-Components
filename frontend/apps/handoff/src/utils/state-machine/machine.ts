@@ -54,6 +54,7 @@ export const createHandoffMachine = () =>
                 target: States.complete,
               },
             ],
+            ...StatusReceivedTransitions,
           },
         },
         [States.checkRequirements]: {
