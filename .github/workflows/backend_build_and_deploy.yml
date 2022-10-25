@@ -180,7 +180,7 @@ jobs:
     environment:
       name: ${{ inputs.environment }}
       url: 'https://${{ steps.constants.outputs.url }}'
-    needs: [build_api, build_eif]
+    needs: [build_api, build_eif, extract_commit]
     if: success()
     steps:
       - uses: actions/checkout@v2
