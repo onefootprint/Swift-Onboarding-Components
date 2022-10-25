@@ -1,78 +1,41 @@
 import { mockRequest } from '@onefootprint/test-utils';
 
-export const signalsFixture = {
-  data: [
-    {
-      id: '1',
-      severity: 'high',
-      scope: 'identity',
-      note: 'SSN tied to multiple names',
-      noteDetails: 'Lorem Ipsum dolor simet at magna lorem ipsum',
-    },
-    {
-      id: '2',
-      severity: 'high',
-      scope: 'Address',
-      note: 'Warm Address Alert',
-      noteDetails: 'Lorem Ipsum dolor simet at magna lorem ipsum',
-    },
-    {
-      id: '3',
-      severity: 'medium',
-      scope: 'Email address',
-      note: 'High Risk Email Domain',
-      noteDetails: 'Lorem Ipsum dolor simet at magna lorem ipsum',
-    },
-    {
-      id: '4',
-      severity: 'medium',
-      scope: 'Phone number',
-      note: 'VoIP Number',
-      noteDetails: 'Lorem Ipsum dolor simet at magna lorem ipsum',
-    },
-    {
-      id: '5',
-      severity: 'low',
-      scope: 'Identity',
-      note: 'IP Location Not Available',
-      noteDetails: 'Lorem Ipsum dolor simet at magna lorem ipsum',
-    },
-    {
-      id: '6',
-      severity: 'low',
-      scope: 'Address',
-      note: 'Street Name Does Not Match',
-      noteDetails: 'Lorem Ipsum dolor simet at magna lorem ipsum',
-    },
-    {
-      id: '7',
-      severity: 'low',
-      scope: 'Address',
-      note: 'Zip Code Does Not Match',
-      noteDetails: 'Lorem Ipsum dolor simet at magna lorem ipsum',
-    },
-  ],
-  meta: {
-    next: null,
-    count: 7,
+export const signalsFixture = [
+  {
+    id: 'sig_ryxauTlDX8hIm3wVRmm',
+    onboarding_decision_id: 'decision_d4uTQ1FIh6cKvDxeRJzyZK',
+    reason_code: 'mobile_number',
+    note: "The consumer's phone number is possibly a wireless mobile number.",
+    severity: 'Info',
+    scopes: ['phone_number'],
+    timestamp: '2022-10-24T21:56:12.682238Z',
+    deactivated_at: null,
+    vendors: ['idology'],
   },
-};
+  {
+    id: 'sig_sh610Ggqf7xUOkBSUL8NcC',
+    onboarding_decision_id: 'decision_d4uTQ1FIh6cKvDxeRJzyZK',
+    reason_code: 'corporate_email_domain',
+    note: 'Indicates that the domain of the email address has been identified as belonging to a corporate entity.',
+    severity: 'Info',
+    scopes: ['email'],
+    timestamp: '2022-10-24T21:56:12.682238Z',
+    deactivated_at: null,
+    vendors: ['idology'],
+  },
+];
 
-// TODO: Integrate real api
-// https://linear.app/footprint/issue/FP-1518/integrate-real-api
 export const withSignals = () =>
   mockRequest({
     method: 'get',
-    fullPath: true,
-    path: 'https://demo7616817.mockable.io/risk-signals',
+    path: '/users/fp_id_yCZehsWNeywHnk5JqL20u/risk_signals',
     response: signalsFixture,
   });
 
 export const withSignalsError = () =>
   mockRequest({
     method: 'get',
-    fullPath: true,
-    path: 'https://demo7616817.mockable.io/risk-signals',
+    path: '/users/fp_id_yCZehsWNeywHnk5JqL20u/risk_signals',
     statusCode: 400,
     response: {
       error: {

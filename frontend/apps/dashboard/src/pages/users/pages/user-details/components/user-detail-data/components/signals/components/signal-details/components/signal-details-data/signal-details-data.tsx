@@ -1,32 +1,33 @@
-import type { RiskSignalDetails } from '@onefootprint/types';
+import type { RiskSignal } from '@onefootprint/types';
 import { Box } from '@onefootprint/ui';
 import React from 'react';
 
 import Overview from './components/overview';
-import RawResponse from './components/raw-response';
-import RelatedSignals from './components/related-signals';
 
 type SignalDetailsDataProps = {
-  riskSignal: RiskSignalDetails;
+  riskSignal: RiskSignal;
 };
 
 const SignalDetailsData = ({ riskSignal }: SignalDetailsDataProps) => (
   <>
     <Box sx={{ marginBottom: 9 }}>
       <Overview
-        dataVendor={riskSignal.dataVendor}
         note={riskSignal.note}
-        noteDetails={riskSignal.noteDetails}
-        scope={riskSignal.scope}
+        scopes={riskSignal.scopes}
         severity={riskSignal.severity}
+        vendors={riskSignal.vendors}
       />
     </Box>
-    <Box sx={{ marginBottom: 9 }}>
+    {/* 
+      TODO: https://linear.app/footprint/issue/FP-1690/risk-signal-details-show-related-signals
+      <Box sx={{ marginBottom: 9 }}>
       <RelatedSignals relatedSignals={riskSignal.relatedSignals} />
-    </Box>
-    <Box>
+    </Box> */}
+    {/* 
+      TODO: https://linear.app/footprint/issue/FP-1689/risk-signal-details-show-raw-response
+      <Box>
       <RawResponse rawResponse={riskSignal.rawResponse} />
-    </Box>
+    </Box> */}
   </>
 );
 

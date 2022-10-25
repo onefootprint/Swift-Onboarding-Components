@@ -1,5 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
-import type { RiskSignal, RiskSignalDetails } from '@onefootprint/types';
+import type { RiskSignal } from '@onefootprint/types';
 import { Table, TableRow, Typography } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
@@ -8,7 +8,7 @@ import useSignalsFilters from '../../../../../../hooks/use-signals-filters';
 import Row from './components/related-signal-row';
 
 type RelatedSignalsProps = {
-  relatedSignals: RiskSignalDetails['relatedSignals'];
+  relatedSignals: RiskSignal['related'];
 };
 
 const renderTr = ({ item }: TableRow<RiskSignal>) => <Row riskSignal={item} />;

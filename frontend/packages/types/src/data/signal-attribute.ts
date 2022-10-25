@@ -15,6 +15,8 @@ export enum SignalAttribute {
   document = 'document',
 }
 
+// TODO: Remove and use translations
+// https://linear.app/footprint/issue/FP-1684/deprecate-signalattributetodisplayname
 export const signalAttributeToDisplayName: Record<string, String> = {
   [SignalAttribute.name]: 'Name',
   [SignalAttribute.email]: 'Email',

@@ -22,6 +22,7 @@ export * from './liveness-check-info';
 export * from './onboarding';
 export * from './onboarding-config';
 export { default as OnboardingStatus } from './onboarding-status';
+export * from './risk-signal';
 export * from './scoped-user';
 export * from './signal-attribute';
 export * from './tenant-info';

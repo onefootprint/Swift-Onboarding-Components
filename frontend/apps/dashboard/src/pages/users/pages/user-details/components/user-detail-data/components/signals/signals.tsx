@@ -17,11 +17,11 @@ const renderTr = ({ item }: TableRow<RiskSignal>) => (
 
 const RiskSignals = () => {
   const { t, allT } = useTranslation('pages.user-details.signals');
-  const { isLoading, error, data: response } = useRiskSignals();
+  const { isLoading, error, data } = useRiskSignals();
   const filters = useSignalsFilters();
   const columns = [
     { text: t('table.header.severity'), width: '15%' },
-    { text: t('table.header.scope'), width: '15%' },
+    { text: t('table.header.scopes'), width: '15%' },
     { text: t('table.header.note'), width: '70%' },
   ];
 
@@ -42,7 +42,7 @@ const RiskSignals = () => {
         emptyStateText={error ? getErrorMessage(error) : t('table.empty-state')}
         getKeyForRow={(signal: RiskSignal) => signal.id}
         isLoading={isLoading}
-        items={response?.data}
+        items={data}
         onChangeSearchText={search => {
           filters.push({ signal_search: search });
         }}

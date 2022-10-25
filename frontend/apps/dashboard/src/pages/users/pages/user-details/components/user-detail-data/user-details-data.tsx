@@ -15,7 +15,7 @@ import { useDecryptMachine } from '../decrypt-machine-provider';
 import AuditTrail from './components/audit-trail';
 import BasicInfo from './components/basic-info';
 import Insights from './components/insights';
-// import RiskSignals from './components/signals';
+import RiskSignals from './components/signals';
 import UserHeader from './components/user-header';
 
 type UserDetailsDataProps = {
@@ -79,9 +79,9 @@ const UserDetailsData = ({ user, decrypt }: UserDetailsDataProps) => {
           <Box sx={{ marginBottom: 9 }}>
             <AuditTrail user={user} />
           </Box>
-          {/* <Box sx={{ marginBottom: 9 }}>
+          <Box sx={{ marginBottom: 9 }}>
             <RiskSignals />
-          </Box> */}
+          </Box>
           <Box>
             <Insights user={user} />
           </Box>

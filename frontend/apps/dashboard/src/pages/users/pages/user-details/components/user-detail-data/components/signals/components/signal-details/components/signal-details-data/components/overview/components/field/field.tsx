@@ -3,15 +3,15 @@ import React from 'react';
 
 type FieldProps = {
   label: string;
-  value: string;
+  children: React.ReactNode;
 };
 
-const Field = ({ label, value }: FieldProps) => (
+const Field = ({ label, children }: FieldProps) => (
   <Box>
     <Typography variant="label-3" color="tertiary" sx={{ marginBottom: 2 }}>
       {label}
     </Typography>
-    <Typography variant="body-3">{value}</Typography>
+    <Typography variant="body-3">{children}</Typography>
   </Box>
 );
 

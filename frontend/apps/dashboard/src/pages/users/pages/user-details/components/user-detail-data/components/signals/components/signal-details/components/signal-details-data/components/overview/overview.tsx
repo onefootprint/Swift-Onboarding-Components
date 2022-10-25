@@ -1,27 +1,23 @@
 import { useTranslation } from '@onefootprint/hooks';
-import type { RiskSignalDetails } from '@onefootprint/types';
+import type { RiskSignal } from '@onefootprint/types';
 import { Grid, Typography } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
+import SeverityBadge from '../../../../../severity-badge';
 import Field from './components/field';
 
 type OverviewProps = {
-  dataVendor: RiskSignalDetails['dataVendor'];
-  note: RiskSignalDetails['note'];
-  noteDetails: RiskSignalDetails['noteDetails'];
-  scope: RiskSignalDetails['scope'];
-  severity: RiskSignalDetails['severity'];
+  note: RiskSignal['note'];
+  scopes: RiskSignal['scopes'];
+  severity: RiskSignal['severity'];
+  vendors: RiskSignal['vendors'];
 };
 
-const Overview = ({
-  dataVendor,
-  note,
-  noteDetails,
-  scope,
-  severity,
-}: OverviewProps) => {
-  const { t } = useTranslation('pages.user-details.signals.details.overview');
+const Overview = ({ vendors, note, scopes, severity }: OverviewProps) => {
+  const { t, allT } = useTranslation(
+    'pages.user-details.signals.details.overview',
+  );
 
   return (
     <section>
@@ -29,17 +25,24 @@ const Overview = ({
         <Typography variant="label-2">{t('title')}</Typography>
       </Header>
       <Fieldset>
-        <Field label={t('data-vendor')} value={dataVendor} />
+        <Field label={t('vendors')}>{vendors.toString()}</Field>
         <Grid.Row>
           <Grid.Column col={6}>
-            <Field label={t('severity')} value={severity} />
+            <Field label={t('severity')}>
+              <SeverityBadge severity={severity} />
+            </Field>
           </Grid.Column>
           <Grid.Column col={6}>
-            <Field label={t('scope')} value={scope} />
+            <Field label={t('scopes')}>
+              {scopes
+                .map(signalAttribute =>
+                  allT(`signal-attributes.${signalAttribute}`),
+                )
+                .toString()}
+            </Field>
           </Grid.Column>
         </Grid.Row>
-        <Field label={t('note')} value={note} />
-        <Field label={t('note-details')} value={noteDetails} />
+        <Field label={t('note')}>{note}</Field>
       </Fieldset>
     </section>
   );

@@ -46,6 +46,22 @@
     "email": "Email",
     "phone_number": "Phone number"
   },
+  "signal-attributes": {
+    "name": "Full name",
+    "dob": "Date of Birth",
+    "ssn": "SSN",
+    "address": "Address",
+    "street_address": "Street Address",
+    "city": "Address",
+    "state": "Address",
+    "zip": "Address",
+    "country": "Address",
+    "email": "Address",
+    "phone_number": "Phone number",
+    "identity": "Identity",
+    "ip_address": "IP Address",
+    "document": "Document"
+  },
   "components": {
     "private-layout": {
       "nav-dropdown": {
@@ -233,16 +249,16 @@
         "title": "Risk signals",
         "empty-state": "No risk signals found",
         "severity": {
-          "high": "High",
-          "medium": "Medium",
-          "low": "Low"
+          "info": "Info",
+          "warning": "Warning",
+          "fraud": "Fraud"
         },
         "table": {
           "aria-label": "Risk signals",
           "empty-state": "No risk signals found",
           "header": {
             "severity": "Severity",
-            "scope": "Scope",
+            "scopes": "Scopes",
             "note": "Note"
           }
         },
@@ -257,11 +273,10 @@
         "details": {
           "overview": {
             "title": "Overview",
-            "data-vendor": "Data vendor",
+            "vendors": "Data vendors",
             "severity": "Severity",
-            "scope": "Scope",
-            "note": "Note",
-            "note-details": "Note details"
+            "scopes": "Scopes",
+            "note": "Note"
           },
           "related-signals": {
             "title": "Related signals",

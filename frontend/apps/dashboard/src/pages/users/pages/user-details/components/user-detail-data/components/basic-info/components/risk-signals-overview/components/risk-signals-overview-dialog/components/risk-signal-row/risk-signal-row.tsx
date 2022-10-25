@@ -1,6 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoChevronRight24 } from '@onefootprint/icons';
-import type { RiskSignal } from '@onefootprint/types';
+import { RiskSignal, RiskSignalSeverity } from '@onefootprint/types';
 import { Badge, Box } from '@onefootprint/ui';
 import React from 'react';
 
@@ -14,14 +14,14 @@ const RiskSignalRow = ({ riskSignal }: RiskSignalRowProps) => {
   return (
     <>
       <td>
-        {riskSignal.severity === 'high' && (
-          <Badge variant="error">{t('high')}</Badge>
+        {riskSignal.severity === RiskSignalSeverity.Fraud && (
+          <Badge variant="error">{t('fraud')}</Badge>
         )}
-        {riskSignal.severity === 'medium' && (
-          <Badge variant="warning">{t('medium')}</Badge>
+        {riskSignal.severity === RiskSignalSeverity.Warning && (
+          <Badge variant="warning">{t('warning')}</Badge>
         )}
-        {riskSignal.severity === 'low' && (
-          <Badge variant="info">{t('low')}</Badge>
+        {riskSignal.severity === RiskSignalSeverity.Info && (
+          <Badge variant="info">{t('info')}</Badge>
         )}
       </td>
       <td>{riskSignal.note}</td>

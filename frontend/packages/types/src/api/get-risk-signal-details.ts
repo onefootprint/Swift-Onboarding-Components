@@ -1,10 +1,12 @@
-export type RiskSignalDetails = {
-  id: string;
-  severity: 'low' | 'medium' | 'high';
-  scope: string;
-  note: string;
-  noteDetails: string;
-  dataVendor: string;
-  relatedSignals: RiskSignalDetails[];
-  rawResponse: string;
+import { RiskSignal } from '../data/risk-signal';
+
+export type GetRiskSignalDetailsRequest = {
+  userId: string | string[];
+  riskSignalId: string;
+  authHeaders: {
+    'x-fp-dashboard-authorization': string;
+    'x-is-live': string;
+  };
 };
+
+export type GetRiskSignalDetailsResponse = RiskSignal;

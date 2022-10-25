@@ -1,26 +1,23 @@
-import request, { PaginatedRequestResponse } from '@onefootprint/request';
-import type { RiskSignal } from '@onefootprint/types';
+import request from '@onefootprint/request';
+import type {
+  GetRiskSignalsRequest,
+  GetRiskSignalsResponse,
+} from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
-import useSessionUser, { AuthHeaders } from 'src/hooks/use-session-user';
+import useSessionUser from 'src/hooks/use-session-user';
 
-import useSignalFilters, { SignalListQueryParams } from './use-signals-filters';
+import useUserId from '../../../../../hooks/use-user-id';
+import useSignalFilters from './use-signals-filters';
 
-export type GetSignalsRequest = {
-  authHeaders: AuthHeaders;
-  params: SignalListQueryParams;
-};
-
-export type GetSignalsResponse = PaginatedRequestResponse<RiskSignal[]>;
-
-// TODO: Integrate real api
-// https://linear.app/footprint/issue/FP-1518/integrate-real-api
-const getSignals = async ({ authHeaders, params }: GetSignalsRequest) => {
-  const { data: response } = await request<GetSignalsResponse>({
-    baseURL: 'https://demo7616817.mockable.io',
+const getSignals = async ({
+  authHeaders,
+  userId,
+  params,
+}: GetRiskSignalsRequest) => {
+  const { data: response } = await request<GetRiskSignalsResponse>({
     headers: authHeaders,
     method: 'GET',
-    url: '/risk-signals',
-    withCredentials: false,
+    url: `/users/${userId}/risk_signals`,
     params,
   });
   return response;
@@ -29,6 +26,7 @@ const getSignals = async ({ authHeaders, params }: GetSignalsRequest) => {
 const useSignals = () => {
   const filters = useSignalFilters();
   const { authHeaders } = useSessionUser();
+  const userId = useUserId();
   const params = {
     signal_note: filters.query.signal_note,
     signal_scope: filters.query.signal_scope,
@@ -36,8 +34,10 @@ const useSignals = () => {
     signal_severity: filters.query.signal_severity,
   };
 
-  return useQuery(['riskSignals', authHeaders, params], () =>
-    getSignals({ authHeaders, params }),
+  return useQuery(
+    ['riskSignals', authHeaders, userId, params],
+    () => getSignals({ authHeaders, userId, params }),
+    { enabled: !!userId && typeof userId === 'string' },
   );
 };
 

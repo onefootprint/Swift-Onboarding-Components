@@ -9,17 +9,19 @@ import {
 import React from 'react';
 
 import Signals from './signals';
-import {
-  signalsFixture,
-  withSignals,
-  withSignalsError,
-} from './signals.test.config';
+import { withSignals, withSignalsError } from './signals.test.config';
 
 const useRouterSpy = createUseRouterSpy();
 
 describe('<Signals />', () => {
   beforeEach(() => {
-    useRouterSpy({ pathname: '/users/detail', query: {} });
+    useRouterSpy({
+      pathname:
+        '/users/detailusers/detail?footprint_user_id=fp_id_yCZehsWNeywHnk5JqL20u',
+      query: {
+        footprint_user_id: 'fp_id_yCZehsWNeywHnk5JqL20u',
+      },
+    });
   });
 
   const renderSignals = () => {
@@ -63,20 +65,18 @@ describe('<Signals />', () => {
           expect(isLoading).toBe('false');
         });
 
-        const { data } = signalsFixture;
-        const [firstRiskSignal] = data;
-        const tr = screen.getByTestId(firstRiskSignal.id);
+        const tr = screen.getByTestId('sig_ryxauTlDX8hIm3wVRmm');
         expect(tr).toBeInTheDocument();
 
-        const severity = within(tr).getByText(firstRiskSignal.severity, {
-          exact: false,
-        });
+        const severity = within(tr).getByText('Info');
         expect(severity).toBeInTheDocument();
 
-        const scope = within(tr).getByText(firstRiskSignal.scope);
-        expect(scope).toBeInTheDocument();
+        const scopes = within(tr).getByText('Phone number');
+        expect(scopes).toBeInTheDocument();
 
-        const note = within(tr).getByText(firstRiskSignal.note);
+        const note = within(tr).getByText(
+          "The consumer's phone number is possibly a wireless mobile number.",
+        );
         expect(note).toBeInTheDocument();
       });
 
@@ -84,24 +84,28 @@ describe('<Signals />', () => {
         it('should append risk signal id and note to the url', async () => {
           const pushMockFn = jest.fn();
           useRouterSpy({
-            pathname: '/users/detail',
-            query: {},
+            pathname:
+              '/users/detailusers/detail?footprint_user_id=fp_id_yCZehsWNeywHnk5JqL20u',
+            query: {
+              footprint_user_id: 'fp_id_yCZehsWNeywHnk5JqL20u',
+            },
             push: pushMockFn,
           });
           renderSignals();
 
-          const [firstRiskSignal] = signalsFixture.data;
-          const table = screen.getByRole('table');
           await waitFor(() => {
-            const note = within(table).getByText(firstRiskSignal.note);
-            expect(note).toBeInTheDocument();
+            const table = screen.getByRole('table');
+            const isLoading = table.getAttribute('aria-busy');
+            expect(isLoading).toBe('false');
           });
-          await userEvent.click(within(table).getByText(firstRiskSignal.note));
 
+          const tr = screen.getByTestId('sig_ryxauTlDX8hIm3wVRmm');
+          await userEvent.click(tr);
           expect(pushMockFn).toHaveBeenCalledWith(
             {
               query: {
-                signal_id: firstRiskSignal.id,
+                signal_id: 'sig_ryxauTlDX8hIm3wVRmm',
+                footprint_user_id: 'fp_id_yCZehsWNeywHnk5JqL20u',
               },
             },
             undefined,

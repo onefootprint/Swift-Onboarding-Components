@@ -59,7 +59,9 @@ const Drawer = ({
                   onClick={onClose}
                 />
               </CloseContainer>
-              <Typography variant="label-2">{title}</Typography>
+              <Typography variant="label-2" as="h2">
+                {title}
+              </Typography>
             </Header>
             <Body>{children}</Body>
           </DrawerContainer>
@@ -116,9 +118,15 @@ const Header = styled.header`
     align-items: center;
     border-bottom: ${theme.borderWidth[1]}px solid ${theme.borderColor.tertiary};
     justify-content: center;
-    padding: 0 ${theme.spacing[5]}px;
+    padding: 0 ${theme.spacing[10]}px;
     height: 56px;
     position: relative;
+
+    h2 {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
   `}
 `;
 

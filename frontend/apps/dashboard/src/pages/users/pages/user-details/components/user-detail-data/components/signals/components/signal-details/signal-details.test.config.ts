@@ -1,46 +1,28 @@
 import { mockRequest } from '@onefootprint/test-utils';
 
 export const riskSignalDetailsFixture = {
-  id: '1',
-  severity: 'high',
-  scope: 'identity',
-  note: 'SSN tied to multiple names',
-  noteDetails: 'The submitted street name does not match the located data.',
-  dataVendor: 'Ideology',
-  relatedSignals: [
-    {
-      id: '1001',
-      severity: 'high',
-      scope: 'Address',
-      note: 'Warm Address Alert Lorem',
-      noteDetails: 'Lorem Ipsum dolor simet at magna lorem ipsum',
-    },
-    {
-      id: '1002',
-      severity: 'medium',
-      scope: 'Email address',
-      note: 'High Risk Email Domain',
-      noteDetails: 'Lorem Ipsum dolor simet at magna lorem ipsum',
-    },
-  ],
-  rawResponse: '{ \n "idNumber":4287950518 \n}',
+  id: 'sig_ryxauTlDX8hIm3wVRmm',
+  onboarding_decision_id: 'decision_d4uTQ1FIh6cKvDxeRJzyZK',
+  reason_code: 'mobile_number',
+  note: "The consumer's phone number is possibly a wireless mobile number.",
+  severity: 'Info',
+  scopes: ['phone_number'],
+  timestamp: '2022-10-24T21:56:12.682238Z',
+  deactivated_at: null,
+  vendors: ['idology'],
 };
 
-// TODO: Integrate real api
-// https://linear.app/footprint/issue/FP-1518/integrate-real-api
 export const withRiskSignalDetails = () =>
   mockRequest({
     method: 'get',
-    fullPath: true,
-    path: 'http://demo7616817.mockable.io/risk-signals-details',
+    path: '/users/fp_id_yCZehsWNeywHnk5JqL20u/risk_signals/sig_ryxauTlDX8hIm3wVRmm',
     response: riskSignalDetailsFixture,
   });
 
 export const withRiskSignalDetailsError = () =>
   mockRequest({
     method: 'get',
-    fullPath: true,
-    path: 'http://demo7616817.mockable.io/risk-signals-details',
+    path: '/users/fp_id_yCZehsWNeywHnk5JqL20u/risk_signals/sig_ryxauTlDX8hIm3wVRmm',
     statusCode: 400,
     response: {
       error: {
