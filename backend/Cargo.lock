@@ -2041,6 +2041,7 @@ dependencies = [
  "idv",
  "itertools",
  "lazy_static",
+ "levenshtein",
  "log",
  "mime",
  "newtypes",

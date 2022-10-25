@@ -2,6 +2,7 @@ use newtypes::ValidatedPhoneNumber;
 use std::fmt::Debug;
 
 pub mod client;
+pub mod request;
 pub mod verification;
 
 #[derive(Debug, thiserror::Error)]

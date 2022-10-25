@@ -2,7 +2,7 @@ use std::time::Duration;
 
 use request::send_message::SendMessage;
 use reqwest::{RequestBuilder, Method, IntoUrl};
-use response::{decode_response, lookup::{LookupResponse, LookupV2Response}, message::Message};
+use response::{decode_response, lookup::{LookupResponse}, message::Message};
 
 pub mod error;
 pub mod request;
@@ -68,7 +68,7 @@ impl Client {
     }
 
     /// lookup information on a phone number
-    pub async fn lookup_v2(&self, phone_number: &str) -> crate::response::Result<LookupV2Response> {
+    pub async fn lookup_v2(&self, phone_number: &str) -> crate::response::Result<serde_json::Value> {
         let url = format!("https://lookups.twilio.com/v2/PhoneNumbers/{phone_number}?Fields=caller_name,sim_swap,call_forwarding,live_activity,line_type_intelligence");
 
         let response = self
@@ -76,7 +76,9 @@ impl Client {
             .send()
             .await?;
 
-        decode_response(response).await
+        let twilio_response = decode_response(response).await?;
+
+        Ok(twilio_response)
     }
 
     /// send an sms message

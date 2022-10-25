@@ -34,7 +34,7 @@ pub enum OldSignalSeverity {
     Fraud(u32),
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct Signal {
     pub kind: OldSignalSeverity,
     pub scopes: Vec<SignalScope>,
