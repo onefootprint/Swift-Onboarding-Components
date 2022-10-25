@@ -49,7 +49,7 @@ impl ReasonCode {
         match self {
             ReasonCode::IDology(idology) => idology.signal(),
             ReasonCode::Other(_) => Signal {
-                kind: SignalSeverity::TODO,
+                kind: OldSignalSeverity::TODO,
                 scopes: vec![],
                 note: "Unknown reason code".to_owned(),
             },

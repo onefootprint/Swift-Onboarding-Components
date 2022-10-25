@@ -1,5 +1,5 @@
 use newtypes::{
-    AuditTrailEvent, OnboardingStatus, ReasonCode, SignalScope, SignalSeverity, Vendor, VerificationInfo,
+    AuditTrailEvent, OldSignalSeverity, OnboardingStatus, ReasonCode, SignalScope, Vendor, VerificationInfo,
     VerificationInfoStatus,
 };
 use std::{collections::HashMap, str::FromStr};
@@ -72,7 +72,7 @@ fn process_success(
         .into_iter()
         .filter_map(|(attr, signal_kinds)| {
             let max_signal = signal_kinds.into_iter().max()?;
-            if max_signal <= SignalSeverity::Info {
+            if max_signal <= OldSignalSeverity::Info {
                 // If we have a TODO, NotImportant, or Info signal on this piece of data, treat it as nothing
                 None
             } else {

@@ -18,7 +18,7 @@ use strum_macros::Display;
     Serialize,
     Deserialize,
 )]
-pub enum SignalSeverity {
+pub enum OldSignalSeverity {
     TODO,
     // Basically can ignore this information - it carries no weight
     NotImportant,
@@ -36,7 +36,7 @@ pub enum SignalSeverity {
 
 #[derive(Debug)]
 pub struct Signal {
-    pub kind: SignalSeverity,
+    pub kind: OldSignalSeverity,
     pub scopes: Vec<SignalScope>,
     pub note: String,
 }
@@ -46,8 +46,8 @@ mod tests {
     use std::cmp::Ordering;
     use test_case::test_case;
 
-    use super::SignalSeverity;
-    use super::SignalSeverity::*;
+    use super::OldSignalSeverity;
+    use super::OldSignalSeverity::*;
 
     #[test_case(TODO, NotImportant => Ordering::Less)]
     #[test_case(NotImportant, Info => Ordering::Less)]
@@ -59,7 +59,7 @@ mod tests {
     #[test_case(Alert(1), Alert(1) => Ordering::Equal)]
     #[test_case(Fraud(5), Fraud(1) => Ordering::Greater)]
     #[test_case(Alert(500), Fraud(1) => Ordering::Less)]
-    fn test_cmp(a: SignalSeverity, b: SignalSeverity) -> Ordering {
+    fn test_cmp(a: OldSignalSeverity, b: OldSignalSeverity) -> Ordering {
         // We use the enum variant ordering to determine the highest priority signal for an attribute,
         // so add some tests that this doesn't change
         a.cmp(&b)

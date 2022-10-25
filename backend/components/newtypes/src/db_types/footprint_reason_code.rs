@@ -4,7 +4,7 @@ use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use strum_macros::{AsRefStr, Display, EnumIter, EnumString};
 
-use crate::{SignalScope, SignalSeverity};
+use crate::SignalScope;
 
 #[derive(
     Debug,
@@ -35,6 +35,14 @@ pub enum FootprintReasonCode {
 }
 crate::util::impl_enum_str_diesel!(FootprintReasonCode);
 
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Deserialize, Serialize, Apiv2Schema, JsonSchema)]
+#[serde(rename_all = "snake_case")]
+pub enum SignalSeverity {
+    Low,
+    Medium,
+    High,
+}
+
 impl FootprintReasonCode {
     pub fn scopes(&self) -> Vec<SignalScope> {
         match self {
@@ -47,7 +55,7 @@ impl FootprintReasonCode {
         }
     }
 
-    pub fn note(&self) -> String {
+    pub fn description(&self) -> String {
         match self {
             Self::SubjectDeceased => "Records indicate that the subject in question is deceased.",
             Self::SsnIssuedPriorToDob => "This indicates that the SSN number was issued before the individual’s DOB, a serious fraud flag.",
@@ -60,12 +68,28 @@ impl FootprintReasonCode {
 
     pub fn severity(&self) -> SignalSeverity {
         match self {
-            Self::SubjectDeceased => SignalSeverity::Fraud(1),
-            Self::SsnIssuedPriorToDob => SignalSeverity::Fraud(1),
-            Self::MobileNumber => SignalSeverity::Info,
-            Self::CorporateEmailDomain => SignalSeverity::Info,
-            Self::SsnDoesNotMatchWithinTolerance => SignalSeverity::Alert(1),
-            Self::LastNameDoesNotMatch => SignalSeverity::Alert(1),
+            Self::SubjectDeceased => SignalSeverity::High,
+            Self::SsnIssuedPriorToDob => SignalSeverity::High,
+            Self::MobileNumber => SignalSeverity::Low,
+            Self::CorporateEmailDomain => SignalSeverity::Low,
+            Self::SsnDoesNotMatchWithinTolerance => SignalSeverity::Medium,
+            Self::LastNameDoesNotMatch => SignalSeverity::Medium,
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use test_case::test_case;
+
+    use super::SignalSeverity;
+    use std::cmp::Ordering;
+
+    #[test_case(SignalSeverity::Low, SignalSeverity::High => Ordering::Less)]
+    #[test_case(SignalSeverity::Low, SignalSeverity::Medium => Ordering::Less)]
+    #[test_case(SignalSeverity::Medium, SignalSeverity::High => Ordering::Less)]
+    fn test_cmp_signal_severity(s1: SignalSeverity, s2: SignalSeverity) -> Ordering {
+        // Test ordering since we rely on it to sort risk signals
+        s1.cmp(&s2)
     }
 }

@@ -9,7 +9,9 @@ use crate::types::JsonApiResponse;
 use crate::utils::db2api::DbToApi;
 use crate::State;
 
+use api_wire_types::RiskSignalFilters;
 use db::models::risk_signal::RiskSignal;
+use itertools::Itertools;
 use newtypes::FootprintUserId;
 use newtypes::RiskSignalId;
 use newtypes::TenantPermission;
@@ -27,6 +29,7 @@ type RiskSignalsListResponse = Vec<RiskSignalsDetailResponse>;
 pub async fn get(
     state: web::Data<State>,
     request: web::Path<FootprintUserId>,
+    filters: web::Query<RiskSignalFilters>,
     auth: Either<WorkOsAuthContext, SecretTenantAuthContext>,
 ) -> JsonApiResponse<RiskSignalsListResponse> {
     let auth = auth.check_permissions(vec![TenantPermission::Users])?;
@@ -38,12 +41,45 @@ pub async fn get(
         .db_pool
         .db_query(move |conn| RiskSignal::list(conn, &footprint_user_id, &tenant_id, is_live))
         .await??;
+    // TODO this is fine to do in RAM when there aren't many signals. Will be harder with pagination.
+    // Maybe we should store the note, severity, and scopes in the DB
+    let signals = filter_and_sort(signals, filters.into_inner());
     let signals = signals
         .into_iter()
         .map(<api_wire_types::RiskSignal as DbToApi<RiskSignal>>::from_db)
         .collect();
 
     ResponseData::ok(signals).json()
+}
+
+fn filter_and_sort(signals: Vec<RiskSignal>, filters: RiskSignalFilters) -> Vec<RiskSignal> {
+    signals
+        .into_iter()
+        .filter(|signal| {
+            let rc = signal.reason_code;
+            if !filters.scope.is_empty() && !rc.scopes().iter().any(|x| filters.scope.contains(x)) {
+                return false;
+            }
+            if !filters.severity.is_empty() && !filters.severity.contains(&rc.severity()) {
+                return false;
+            }
+            if let Some(ref description) = filters.description {
+                if !rc
+                    .description()
+                    .to_ascii_lowercase()
+                    .contains(&description.to_ascii_lowercase())
+                {
+                    return false;
+                }
+            }
+            true
+        })
+        .sorted_by(|s1, s2| {
+            let s1 = s1.reason_code.severity();
+            let s2 = s2.reason_code.severity();
+            s1.cmp(&s2).reverse()
+        })
+        .collect()
 }
 
 #[api_v2_operation(
@@ -85,7 +121,7 @@ impl DbToApi<RiskSignal> for api_wire_types::RiskSignal {
             id,
             onboarding_decision_id,
             reason_code,
-            note: reason_code.note(),
+            description: reason_code.description(),
             // TODO better serialization of severity
             severity: reason_code.severity(),
             scopes: reason_code.scopes(),
