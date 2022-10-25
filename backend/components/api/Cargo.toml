@@ -83,5 +83,7 @@ idv = { path = "../idv" }
 
 api_wire_types = { path = "../api_wire_types" }
 
+levenshtein = "1.0.5"
+
 [dev-dependencies]
 test-case = "2.1.0"
