@@ -1,5 +1,4 @@
 import { IcoCloseSmall16, IcoInfo16 } from '@onefootprint/icons';
-import FocusTrap from 'focus-trap-react';
 import React from 'react';
 import styled, { css, keyframes } from 'styled-components';
 
@@ -18,50 +17,48 @@ const Toast = ({
   title,
   variant = 'default',
 }: ToastProps) => (
-  <FocusTrap>
-    <ToastContainer role="alert" data-leaving={leaving} data-testid={testID}>
-      <Box>
-        <StyledIcoInfo16 color={variant === 'error' ? 'error' : undefined} />
-      </Box>
-      <Box sx={{ flexGrow: 1 }}>
-        <Typography
-          color={variant === 'error' ? 'error' : 'primary'}
-          variant="label-3"
-          sx={{ marginBottom: 2 }}
-        >
-          {title}
-        </Typography>
-        <Typography color="tertiary" variant="body-3">
-          {description}
-        </Typography>
-        {cta && (
-          <Box
-            sx={{
-              marginTop: 4,
-            }}
-          >
-            <LinkButton
-              onClick={() => {
-                onClose?.();
-                cta.onClick?.();
-              }}
-              size="compact"
-            >
-              {cta.label}
-            </LinkButton>
-          </Box>
-        )}
-      </Box>
-      <button
-        aria-label={closeAriaLabel}
-        onClick={onClose}
-        tabIndex={0}
-        type="button"
+  <ToastContainer role="alert" data-leaving={leaving} data-testid={testID}>
+    <Box>
+      <StyledIcoInfo16 color={variant === 'error' ? 'error' : undefined} />
+    </Box>
+    <Box sx={{ flexGrow: 1 }}>
+      <Typography
+        color={variant === 'error' ? 'error' : 'primary'}
+        variant="label-3"
+        sx={{ marginBottom: 2 }}
       >
-        <IcoCloseSmall16 />
-      </button>
-    </ToastContainer>
-  </FocusTrap>
+        {title}
+      </Typography>
+      <Typography color="tertiary" variant="body-3">
+        {description}
+      </Typography>
+      {cta && (
+        <Box
+          sx={{
+            marginTop: 4,
+          }}
+        >
+          <LinkButton
+            onClick={() => {
+              onClose?.();
+              cta.onClick?.();
+            }}
+            size="compact"
+          >
+            {cta.label}
+          </LinkButton>
+        </Box>
+      )}
+    </Box>
+    <button
+      aria-label={closeAriaLabel}
+      onClick={onClose}
+      tabIndex={0}
+      type="button"
+    >
+      <IcoCloseSmall16 />
+    </button>
+  </ToastContainer>
 );
 
 const slideIn = keyframes`
