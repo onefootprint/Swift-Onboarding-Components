@@ -43,11 +43,6 @@ const Container = styled.div`
     ${media.greaterThan('md')`
       padding:  ${theme.spacing[4]}px 0;
     `}
-
-    button {
-      position: relative;
-      left: -${theme.spacing[3]}px;
-    }
   `}
 `;
 
