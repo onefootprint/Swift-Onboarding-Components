@@ -63,7 +63,10 @@ pub async fn post(
             let session = JsonSession::<HandoffRecord>::get(conn, &user_auth.auth_token)?
                 .ok_or(HandoffError::HandoffSessionNotFound)?;
             if status.priority() <= session.data.status.priority() {
-                return Err(HandoffError::InvalidStatusTransition.into());
+                return Err(HandoffError::InvalidStatusTransition(
+                    serde_json::ser::to_string(&status).unwrap(),
+                )
+                .into());
             }
             let handoff_record = HandoffRecord { status };
             JsonSession::update_or_create(conn, &user_auth.auth_token, &handoff_record, session.expires_at)?;
