@@ -40,7 +40,8 @@ pub async fn post(
             let (requirements, ob) =
                 get_requirements(conn, &user_auth.user_vault_id(), onboarding_context.ob_config())?;
             if !requirements.is_empty() {
-                return Err(OnboardingError::UnmetRequirements.into());
+                let unmet_requirements = requirements.into_iter().map(|x| x.into()).collect();
+                return Err(OnboardingError::UnmetRequirements(unmet_requirements).into());
             }
 
             // Mark the onboarding as authorized and create validation token

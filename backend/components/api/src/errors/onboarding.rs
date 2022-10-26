@@ -1,6 +1,8 @@
 use newtypes::{CollectedDataOption, OnboardingStatus};
 use thiserror::Error;
 
+use crate::types::onboarding_requirement::OnboardingRequirementDiscriminant;
+
 #[derive(Debug, Error)]
 pub enum OnboardingError {
     #[error("token invalid or not found")]
@@ -17,8 +19,8 @@ pub enum OnboardingError {
     WrongKycState(OnboardingStatus),
     #[error("Tenant does not match")]
     TenantMismatch,
-    #[error("Unmet onboarding requirements")]
-    UnmetRequirements,
+    #[error("Unmet onboarding requirements: {0:?}")]
+    UnmetRequirements(Vec<OnboardingRequirementDiscriminant>),
     #[error("Required attributes are not set: {0:?}")]
     MissingAttributes(Vec<CollectedDataOption>),
 }

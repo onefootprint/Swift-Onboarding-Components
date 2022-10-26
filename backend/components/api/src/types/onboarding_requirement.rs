@@ -1,7 +1,9 @@
 use newtypes::{CollectedDataOption, DocumentRequestId};
 use paperclip::actix::Apiv2Schema;
+use strum::EnumDiscriminants;
 
-#[derive(Debug, Clone, serde::Serialize, Apiv2Schema)]
+#[derive(Debug, Clone, serde::Serialize, Apiv2Schema, EnumDiscriminants)]
+#[strum_discriminants(name(OnboardingRequirementDiscriminant))]
 #[serde(tag = "kind")]
 #[serde(rename_all = "snake_case")]
 pub enum OnboardingRequirement {
