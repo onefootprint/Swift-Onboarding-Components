@@ -33,7 +33,6 @@ const VerifiedAccountCard = ({ org }: VerifiedAccountCardProps) => {
             height={110}
             width={180}
             priority
-            layout="fixed"
           />
         ) : (
           <Typography variant="label-3">{org.name}</Typography>

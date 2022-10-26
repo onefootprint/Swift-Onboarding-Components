@@ -12,15 +12,13 @@ type CompanyPhotosDesktopProps = {
 const CompanyPhotosDesktop = ({ photos }: CompanyPhotosDesktopProps) => (
   <Container>
     {photos.map(photo => (
-      <Image
-        key={photo.alt}
+      <StyledImage
         alt={photo.alt}
         height={500}
-        layout="fixed"
+        key={photo.alt}
+        priority
         src={photo.src}
         width={628}
-        objectFit="cover"
-        priority
       />
     ))}
   </Container>
@@ -46,6 +44,10 @@ const Container = styled.div`
       margin: 0 -${theme.spacing[12]}px;
     `}
   `}
+`;
+
+const StyledImage = styled(Image)`
+  object-fit: cover;
 `;
 
 export default CompanyPhotosDesktop;

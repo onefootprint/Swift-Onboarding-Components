@@ -44,7 +44,6 @@ const Team = ({ title, cta, description, items }: TeamProps) => (
             <Image
               alt={item.name}
               height={160}
-              layout="fixed"
               src={item.avatarSrc}
               width={160}
               priority
@@ -56,17 +55,13 @@ const Team = ({ title, cta, description, items }: TeamProps) => (
           </Typography>
           <SocialContainer>
             {item.twitter && (
-              <Link href={item.twitter}>
-                <a href={item.twitter} target="_blank" rel="noreferrer">
-                  <IcoTwitter24 />
-                </a>
+              <Link href={item.twitter} target="_blank" rel="noreferrer">
+                <IcoTwitter24 />
               </Link>
             )}
             {item.linkedin && (
-              <Link href={item.linkedin}>
-                <a href={item.linkedin} target="_blank" rel="noreferrer">
-                  <IcoLinkedin24 />
-                </a>
+              <Link href={item.linkedin} target="_blank" rel="noreferrer">
+                <IcoLinkedin24 />
               </Link>
             )}
           </SocialContainer>

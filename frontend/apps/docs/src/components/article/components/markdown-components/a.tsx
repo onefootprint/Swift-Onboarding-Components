@@ -8,14 +8,12 @@ type AProps = {
 };
 
 const a = ({ children, href }: AProps) => (
-  <Link href={href}>
-    <Anchor href={href} target="_blank" rel="noopener noreferrer">
-      {children}
-    </Anchor>
-  </Link>
+  <StyledLink href={href} target="_blank" rel="noopener noreferrer">
+    {children}
+  </StyledLink>
 );
 
-const Anchor = styled.a`
+const StyledLink = styled(Link)`
   ${({ theme }) => css`
     color: ${theme.color.accent};
     text-decoration: none;

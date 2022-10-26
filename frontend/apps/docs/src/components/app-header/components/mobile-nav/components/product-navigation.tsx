@@ -17,11 +17,13 @@ const ProductNavigation = ({ articles }: ProductNavigationProps) => {
     <Container>
       <nav>
         {articles.map(({ title, slug }) => (
-          <Link href={slug} key={slug}>
-            <Anchor href={slug} data-selected={router.asPath === slug}>
-              {title}
-            </Anchor>
-          </Link>
+          <StyledLink
+            href={slug}
+            key={slug}
+            data-selected={router.asPath === slug}
+          >
+            {title}
+          </StyledLink>
         ))}
       </nav>
       <SupportList />
@@ -41,7 +43,7 @@ const Container = styled.div`
   `}
 `;
 
-const Anchor = styled.a`
+const StyledLink = styled(Link)`
   ${({ theme }) => css`
     ${createFontStyles('label-3')};
     border-radius: ${theme.borderRadius[2]}px;

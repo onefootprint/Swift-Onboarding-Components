@@ -24,7 +24,6 @@ const PostInfo = ({ author, createdAt, readingTime, tag }: PostInfoProps) => {
       <Avatar
         alt={author.name}
         height={44}
-        layout="fixed"
         src={author.profileImage}
         width={44}
       />

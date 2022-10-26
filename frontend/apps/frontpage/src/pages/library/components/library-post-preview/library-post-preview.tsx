@@ -30,17 +30,14 @@ const LibraryPostPreview = ({
           <FeatureImage
             alt={featureImageAlt}
             height={228}
-            layout="responsive"
-            objectFit="cover"
             src={featureImageUrl}
             width={468}
           />
         </FeatureImageDesktopContainer>
         <FeatureImageMobileContainer>
           <FeatureImage
+            alt={featureImageAlt}
             height={228}
-            layout="responsive"
-            objectFit="cover"
             src={featureImageUrl}
             width={358}
           />
@@ -68,7 +65,6 @@ const LibraryPostPreview = ({
               <Avatar
                 alt={author.name}
                 height={16}
-                layout="fixed"
                 src={author.avatarImgUrl}
                 width={16}
               />
@@ -95,6 +91,7 @@ const Anchor = styled.a`
 const FeatureImage = styled(Image)`
   ${({ theme }) => css`
     border-radius: ${theme.borderRadius[2]}px;
+    object-fit: cover;
   `}
 `;
 

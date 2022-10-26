@@ -1,17 +1,22 @@
 /** @type {import('next').NextConfig} */
-const withPlugins = require('next-compose-plugins');
-const withBundleAnalyzer = require('@next/bundle-analyzer')({
-  enabled: process.env.ANALYZE === 'true',
-});
 
-// TODO: Transpile
-// https://linear.app/footprint/issue/FP-534/footprintjs-build
-const withTM = require('next-transpile-modules')(['footprint-elements']);
-
-module.exports = withPlugins([withTM, withBundleAnalyzer], {
+module.exports = {
   pageExtensions: ['page.tsx', 'page.ts', 'page.jsx', 'page.js'],
   reactStrictMode: true,
   compiler: {
     styledComponents: true,
   },
-});
+  experimental: {
+    transpilePackages: [
+      'footprint-elements',
+      '@onefootprint/ui',
+      '@onefootprint/themes',
+      '@onefootprint/icons',
+      '@onefootprint/global-constants',
+      '@onefootprint/icons',
+      '@onefootprint/hooks',
+      '@onefootprint/request',
+      '@onefootprint/types',
+    ],
+  },
+};

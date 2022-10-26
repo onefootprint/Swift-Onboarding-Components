@@ -9,6 +9,18 @@ module.exports = {
   images: {
     domains: ['footprint-blog.ghost.io', 'static.ghost.org'],
   },
+  experimental: {
+    transpilePackages: [
+      '@onefootprint/ui',
+      '@onefootprint/themes',
+      '@onefootprint/icons',
+      '@onefootprint/global-constants',
+      '@onefootprint/icons',
+      '@onefootprint/hooks',
+      '@onefootprint/request',
+      '@onefootprint/types',
+    ],
+  },
   async redirects() {
     return [
       {

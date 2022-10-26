@@ -2,17 +2,13 @@
   "name": "@onefootprint/themes",
   "private": true,
   "version": "0.0.0",
-  "main": "./dist/index.js",
-  "module": "./dist/index.mjs",
-  "types": "./dist/index.d.ts",
-  "sideEffects": false,
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
   "license": "MIT",
   "files": [
     "dist/**"
   ],
   "scripts": {
-    "build": "tsup src/index.ts --format esm,cjs --dts --minify",
-    "dev": "tsup src/index.ts --format esm,cjs --watch --dts",
     "lint": "eslint src --fix",
     "typecheck": "yarn tsc --noEmit",
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
@@ -23,7 +19,6 @@
     "eslint-config-footprint": "*",
     "polished": "^4.2.2",
     "tsconfig": "*",
-    "tsup": "^6.2.3",
     "typescript": "4.8.4"
   },
   "jest": {

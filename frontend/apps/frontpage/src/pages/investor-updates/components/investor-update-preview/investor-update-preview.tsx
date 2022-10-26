@@ -36,11 +36,9 @@ const InvestorUpdatePreview = ({
       </Header>
       <Content>
         <Link href={href}>
-          <a href={href}>
-            <Typography variant="heading-1" sx={{ marginBottom: 8 }}>
-              {title}
-            </Typography>
-          </a>
+          <Typography variant="heading-1" sx={{ marginBottom: 8 }}>
+            {title}
+          </Typography>
         </Link>
         <Typography variant="body-2">{excerpt}</Typography>
         <LinkButton

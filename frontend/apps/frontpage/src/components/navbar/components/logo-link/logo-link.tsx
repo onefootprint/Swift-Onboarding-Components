@@ -11,10 +11,8 @@ const LogoLink = ({ onClick }: LogoLinkProps) => {
   const { t } = useTranslation('components.navbar.logo');
 
   return (
-    <Link href="/">
-      <a href="/" aria-label={t('aria-label')} onClick={onClick}>
-        <LogoFpDefault />
-      </a>
+    <Link href="/" aria-label={t('aria-label')} onClick={onClick}>
+      <LogoFpDefault />
     </Link>
   );
 };

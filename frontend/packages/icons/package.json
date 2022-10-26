@@ -1,18 +1,11 @@
 {
   "name": "@onefootprint/icons",
   "private": true,
-  "version": "1.0.0",
-  "main": "./dist/index.js",
-  "module": "./dist/index.mjs",
-  "types": "./dist/index.d.ts",
-  "sideEffects": false,
+  "version": "0.0.0",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
   "license": "MIT",
-  "files": [
-    "dist/**"
-  ],
   "scripts": {
-    "build": "tsup src/index.ts --format esm,cjs --dts --minify",
-    "dev": "tsup src/index.ts --format esm,cjs --watch --dts",
     "lint": "eslint src --fix",
     "lint:fix": "eslint --fix \"**/*.{ts,tsx,md}\"",
     "typecheck": "yarn tsc --noEmit",
@@ -39,7 +32,6 @@
     "react": "18.2.0",
     "styled-components": "^5.3.6",
     "tsconfig": "*",
-    "tsup": "^6.2.3",
     "typescript": "4.8.4"
   },
   "jest": {

@@ -25,7 +25,6 @@ const GetStartedSection = ({
           <SmallPenguinContainer>
             <Image
               alt="Footprint Penguin"
-              layout="fixed"
               height={106}
               src="/footer/penguin-mobile.png"
               width={192}
@@ -34,7 +33,6 @@ const GetStartedSection = ({
           <LargePenguinContainer>
             <Image
               alt="Footprint Penguin"
-              layout="fixed"
               height={202}
               src="/footer/penguin-desktop.png"
               width={150}

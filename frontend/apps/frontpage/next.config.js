@@ -1,4 +1,5 @@
 /** @type {import('next').NextConfig} */
+
 const withPlugins = require('next-compose-plugins');
 
 const withMDX = require('@next/mdx')({
@@ -74,6 +75,18 @@ module.exports = withPlugins([withMDX], {
   reactStrictMode: true,
   compiler: {
     styledComponents: true,
+  },
+  experimental: {
+    transpilePackages: [
+      '@onefootprint/ui',
+      '@onefootprint/themes',
+      '@onefootprint/icons',
+      '@onefootprint/global-constants',
+      '@onefootprint/icons',
+      '@onefootprint/hooks',
+      '@onefootprint/request',
+      '@onefootprint/types',
+    ],
   },
   images: {
     domains: [

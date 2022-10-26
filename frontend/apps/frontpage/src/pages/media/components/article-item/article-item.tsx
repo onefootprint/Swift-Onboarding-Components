@@ -38,13 +38,7 @@ const ArticleItem = ({
         </Typography>
       </Content>
       <Picture>
-        <Image
-          alt={imageAlt}
-          height={128}
-          layout="fixed"
-          src={imageUrl}
-          width={128}
-        />
+        <Image alt={imageAlt} height={128} src={imageUrl} width={128} />
       </Picture>
     </Anchor>
   </article>

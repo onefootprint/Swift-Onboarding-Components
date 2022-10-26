@@ -15,13 +15,7 @@ const HighlightItem = ({
 }: HighlightItemProps) => (
   <Container>
     <ImageContainer>
-      <Image
-        alt={imgAlt}
-        height={160}
-        layout="responsive"
-        src={imgSrc}
-        width={336}
-      />
+      <Image alt={imgAlt} height={160} src={imgSrc} width={336} />
     </ImageContainer>
     <Content>
       <Typography

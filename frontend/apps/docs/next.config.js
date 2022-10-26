@@ -56,6 +56,18 @@ module.exports = {
   compiler: {
     styledComponents: true,
   },
+  experimental: {
+    transpilePackages: [
+      '@onefootprint/ui',
+      '@onefootprint/themes',
+      '@onefootprint/icons',
+      '@onefootprint/global-constants',
+      '@onefootprint/icons',
+      '@onefootprint/hooks',
+      '@onefootprint/request',
+      '@onefootprint/types',
+    ],
+  },
   async headers() {
     return [
       {

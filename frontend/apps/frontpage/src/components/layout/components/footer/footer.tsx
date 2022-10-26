@@ -26,15 +26,9 @@ const Footer = ({ copyright, links }: FooterProps) => (
                 rel="noopener noreferrer"
                 target={link.newWindow ? '_blank' : undefined}
               >
-                <a
-                  href={link.href}
-                  rel="noopener noreferrer"
-                  target={link.newWindow ? '_blank' : undefined}
-                >
-                  <Typography variant="body-3" color="senary">
-                    {link.text}
-                  </Typography>
-                </a>
+                <Typography variant="body-3" color="senary">
+                  {link.text}
+                </Typography>
               </Link>
             </li>
           ))}
@@ -42,7 +36,6 @@ const Footer = ({ copyright, links }: FooterProps) => (
         <Image
           height={40}
           width={40}
-          layout="fixed"
           alt="SOC 2 badge"
           src="/footer/soc-2-badge.png"
         />

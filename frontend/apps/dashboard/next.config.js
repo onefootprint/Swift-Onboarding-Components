@@ -57,7 +57,16 @@ module.exports = {
     styledComponents: true,
   },
   experimental: {
-    newNextLinkBehavior: true,
+    transpilePackages: [
+      '@onefootprint/ui',
+      '@onefootprint/themes',
+      '@onefootprint/icons',
+      '@onefootprint/global-constants',
+      '@onefootprint/icons',
+      '@onefootprint/hooks',
+      '@onefootprint/request',
+      '@onefootprint/types',
+    ],
   },
   async headers() {
     return [

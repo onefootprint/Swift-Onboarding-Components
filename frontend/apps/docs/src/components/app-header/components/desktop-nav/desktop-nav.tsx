@@ -21,10 +21,8 @@ const DesktopNav = ({ navItems, links }: DesktopNavProps) => {
     <Container>
       <Nav>
         <InternalNavContainer>
-          <Link href="/">
-            <a href="/" aria-label={t('nav.home')}>
-              <LogoFpdocsDefault />
-            </a>
+          <Link href="/" aria-label={t('nav.home')}>
+            <LogoFpdocsDefault />
           </Link>
           <Tabs variant="pill">
             {navItems.map(({ baseHref, href, Icon, text }) => (

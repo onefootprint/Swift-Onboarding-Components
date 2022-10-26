@@ -32,13 +32,7 @@ const Testimonial = ({ quote, author }: TestimonialProps) => {
           {quote}
         </Typography>
         <AuthorContainer>
-          <Image
-            alt={imgAlt}
-            height={48}
-            layout="fixed"
-            src={imgSrc}
-            width={48}
-          />
+          <Image alt={imgAlt} height={48} src={imgSrc} width={48} />
           <AuthorContentContainer>
             <Typography variant="heading-3" color="primary" as="div">
               {name}

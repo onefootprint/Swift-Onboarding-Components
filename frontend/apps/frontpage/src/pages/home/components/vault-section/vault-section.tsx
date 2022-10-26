@@ -62,7 +62,6 @@ const VaultSection = () => {
           <Image
             alt={t('articles.main.alt-img')}
             height={391}
-            layout="responsive"
             src="/vault/main-article.png"
             width={484}
           />

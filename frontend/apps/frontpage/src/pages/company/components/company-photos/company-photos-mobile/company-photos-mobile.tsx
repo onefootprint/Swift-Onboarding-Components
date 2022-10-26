@@ -17,14 +17,12 @@ const CompanyPhotosMobile = ({ photos }: CompanyPhotosMobileProps) => {
 
   return (
     <Container>
-      <Image
+      <StyledImage
         key={selectedPhoto.alt}
         alt={selectedPhoto.alt}
         height={340}
-        layout="fixed"
         src={selectedPhoto.src}
         width={358}
-        objectFit="cover"
         priority
       />
       <PagerContainer>
@@ -65,6 +63,10 @@ const PagerContainer = styled.div`
     justify-content: center;
     margin-top: ${theme.spacing[4]}px;
   `}
+`;
+
+const StyledImage = styled(Image)`
+  object-fit: cover;
 `;
 
 export default CompanyPhotosMobile;

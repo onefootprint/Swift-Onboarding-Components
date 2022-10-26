@@ -45,7 +45,6 @@ const HeroSection = ({ onRequestAccess, onWatchDemo }: HeroSectionProps) => {
           <Image
             alt={t('imgAlt')}
             height={371}
-            layout="responsive"
             src="/hero/hero-mobile.png"
             width={320}
             priority
@@ -55,7 +54,6 @@ const HeroSection = ({ onRequestAccess, onWatchDemo }: HeroSectionProps) => {
           <Image
             alt={t('imgAlt')}
             height={682}
-            layout="responsive"
             src="/hero/hero-desktop.png"
             width={1280}
             priority

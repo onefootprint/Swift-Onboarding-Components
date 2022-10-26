@@ -45,10 +45,8 @@ const MobileNav = ({ navItems, articles, links }: MobileNavProps) => {
               {isExpanded ? <IcoClose24 /> : <IcoMenu24 />}
             </NavTriggerButton>
           )}
-          <Link href="/">
-            <a href="/" aria-label={t('nav.home')}>
-              <LogoFpdocsDefault />
-            </a>
+          <Link href="/" aria-label={t('nav.home')}>
+            <LogoFpdocsDefault />
           </Link>
         </InternalNavContainer>
         {links.length && (

@@ -9,7 +9,6 @@ const PenguinSeparator = () => (
       <Image
         alt="Footprint Penguin"
         height={236}
-        layout="responsive"
         priority
         src="/home/penguin-floating-mobile.png"
         width={390}

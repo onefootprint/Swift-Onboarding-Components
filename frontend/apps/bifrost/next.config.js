@@ -1,11 +1,6 @@
 /** @type {import('next').NextConfig} */
-const withPlugins = require('next-compose-plugins');
-const withBundleAnalyzer = require('@next/bundle-analyzer')({
-  enabled: process.env.ANALYZE === 'true',
-});
-const withTM = require('next-transpile-modules')(['footprint-elements']);
 
-module.exports = withPlugins([withTM, withBundleAnalyzer], {
+module.exports = {
   productionBrowserSourceMaps: true,
   pageExtensions: ['page.tsx', 'page.ts', 'page.jsx', 'page.js'],
   reactStrictMode: true,
@@ -13,6 +8,16 @@ module.exports = withPlugins([withTM, withBundleAnalyzer], {
     styledComponents: true,
   },
   experimental: {
-    newNextLinkBehavior: true,
+    transpilePackages: [
+      'footprint-elements',
+      '@onefootprint/ui',
+      '@onefootprint/themes',
+      '@onefootprint/icons',
+      '@onefootprint/global-constants',
+      '@onefootprint/icons',
+      '@onefootprint/hooks',
+      '@onefootprint/request',
+      '@onefootprint/types',
+    ],
   },
-});
+};

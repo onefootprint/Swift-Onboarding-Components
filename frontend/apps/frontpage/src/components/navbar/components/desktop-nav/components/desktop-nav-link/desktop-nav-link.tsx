@@ -7,9 +7,7 @@ type DesktopNavLinkProps = {
   link: NavLink;
 };
 const DesktopNavLink = ({ link }: DesktopNavLinkProps) => (
-  <Link href={link.href}>
-    <a href={link.href}>{link.text}</a>
-  </Link>
+  <Link href={link.href}>{link.text}</Link>
 );
 
 export default DesktopNavLink;

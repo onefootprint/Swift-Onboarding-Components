@@ -36,14 +36,7 @@ const InvestorsSection = ({
       </Typography>
     </ContentContainer>
     <ImageContainer>
-      <Image
-        alt={imgAlt}
-        height={305}
-        layout="responsive"
-        src={imgSrc}
-        width={700}
-        priority
-      />
+      <Image alt={imgAlt} height={305} src={imgSrc} width={700} priority />
     </ImageContainer>
   </Container>
 );

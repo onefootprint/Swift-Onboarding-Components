@@ -20,7 +20,6 @@ const Page404 = () => {
               <Image
                 alt={t('image.alt')}
                 height={212.62}
-                layout="fixed"
                 src="/404.png"
                 width={298}
                 priority
