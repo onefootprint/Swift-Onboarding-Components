@@ -121,7 +121,7 @@ const ButtonPickerContainer = styled.button`
   ${({ theme }) => css`
     ${createFontStyles('body-4')};
     background: none;
-    border-radius: ${theme.borderRadius[2]}px;
+    border-radius: ${theme.borderRadius.default}px;
     border: none;
     cursor: pointer;
     padding: ${theme.spacing[1]}px ${theme.spacing[3]}px;

@@ -60,7 +60,7 @@ const Container = styled.div`
 
 const Avatar = styled(Image)`
   ${({ theme }) => css`
-    border-radius: ${theme.borderRadius[4]}px;
+    border-radius: ${theme.borderRadius.full}px;
   `}
 `;
 

@@ -34,19 +34,19 @@ const Square = styled.li<{ lastColumn: boolean; isSelected: boolean }>`
     transition: background 100ms ease 0s;
 
     &:first-child {
-      border-top-left-radius: ${theme.borderRadius[2]}px;
+      border-top-left-radius: ${theme.borderRadius.default}px;
     }
 
     &:last-child {
-      border-bottom-right-radius: ${theme.borderRadius[2]}px;
+      border-bottom-right-radius: ${theme.borderRadius.default}px;
     }
 
     &:nth-child(12) {
-      border-bottom-left-radius: ${theme.borderRadius[2]}px;
+      border-bottom-left-radius: ${theme.borderRadius.default}px;
     }
 
     &:nth-child(325) {
-      border-top-right-radius: ${theme.borderRadius[2]}px;
+      border-top-right-radius: ${theme.borderRadius.default}px;
     }
 
     &:nth-child(12n) {

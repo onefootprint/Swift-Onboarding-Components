@@ -53,7 +53,7 @@ const InputDateRangePicker = ({
 const InputContainer = styled.div`
   ${({ theme }) => css`
     align-items: center;
-    border-radius: ${theme.borderRadius[2]}px;
+    border-radius: ${theme.borderRadius.default}px;
     border: 1px solid ${theme.borderColor.primary};
     display: inline-flex;
     gap: ${theme.spacing[4]}px;

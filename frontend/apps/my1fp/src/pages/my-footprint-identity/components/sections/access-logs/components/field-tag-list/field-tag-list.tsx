@@ -37,7 +37,7 @@ const StyledTag = styled.span`
   ${({ theme }) => css`
     ${createFontStyles('label-4')};
     background-color: ${theme.backgroundColor.neutral};
-    border-radius: ${theme.borderRadius[1]}px;
+    border-radius: ${theme.borderRadius.compact}px;
     color: ${theme.color.neutral};
     padding: ${theme.spacing[1]}px ${theme.spacing[2]}px;
   `};

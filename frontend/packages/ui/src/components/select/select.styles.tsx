@@ -10,7 +10,7 @@ const DropdownContainer = styled.div<{ withPaddingTop: boolean }>`
   ${({ theme }) => css`
     z-index: ${theme.zIndex.dropdown};
     background: ${theme.backgroundColor.primary};
-    border-radius: ${theme.borderRadius[2]}px;
+    border-radius: ${theme.borderRadius.default}px;
     border: ${theme.borderWidth[1]}px solid ${theme.borderColor.primary};
     box-shadow: ${theme.elevation[2]};
     width: 100%;
@@ -25,7 +25,7 @@ const DropdownContainer = styled.div<{ withPaddingTop: boolean }>`
 
 const ListContainer = styled.div`
   ${({ theme }) => css`
-    border-radius: ${theme.borderRadius[2]}px;
+    border-radius: ${theme.borderRadius.default}px;
     max-height: 180px;
     overflow: auto;
   `}

@@ -88,7 +88,7 @@ const Container = styled.article``;
 
 const StyledLink = styled(Link)`
   ${({ theme }) => css`
-    border-radius: ${theme.borderRadius[2]}px;
+    border-radius: ${theme.borderRadius.default}px;
     border: ${theme.borderWidth[1]}px solid ${theme.borderColor.tertiary};
     box-shadow: ${theme.elevation[1]};
     display: flex;
@@ -99,7 +99,8 @@ const StyledLink = styled(Link)`
 `;
 const FeatureImage = styled(Image)`
   ${({ theme }) => css`
-    border-radius: ${theme.borderRadius[2]}px ${theme.borderRadius[2]}px 0 0;
+    border-radius: ${theme.borderRadius.default}px
+      ${theme.borderRadius.default}px 0 0;
     object-fit: cover;
   `}
 `;
@@ -149,7 +150,7 @@ const Footer = styled.footer`
 
 const Avatar = styled(Image)`
   ${({ theme }) => css`
-    border-radius: ${theme.borderRadius[4]}px;
+    border-radius: ${theme.borderRadius.full}px;
   `}
 `;
 

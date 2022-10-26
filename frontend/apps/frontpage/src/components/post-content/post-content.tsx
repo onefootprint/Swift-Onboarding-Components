@@ -52,7 +52,7 @@ const Content = styled.div`
 
     table {
       border-collapse: separate;
-      border-radius: ${theme.borderRadius[2]}px;
+      border-radius: ${theme.borderRadius.default}px;
       border: 1px solid ${theme.borderColor.tertiary};
       margin-bottom: ${theme.spacing[9]}px;
       table-layout: fixed;
@@ -71,7 +71,8 @@ const Content = styled.div`
         ${createFontStyles('caption-1')};
         background: ${theme.backgroundColor.secondary};
         border-bottom: 1px solid ${theme.borderColor.tertiary};
-        border-radius: ${theme.borderRadius[2]}px ${theme.borderRadius[2]}px 0 0;
+        border-radius: ${theme.borderRadius.default}px
+          ${theme.borderRadius.default}px 0 0;
         color: ${theme.color.primary};
         text-align: left;
         text-transform: uppercase;

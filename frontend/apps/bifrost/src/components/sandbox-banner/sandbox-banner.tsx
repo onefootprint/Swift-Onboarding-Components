@@ -24,7 +24,8 @@ const Container = styled.div`
     border-bottom: ${theme.borderWidth[1]}px solid ${theme.borderColor.tertiary};
 
     > [role='alert'] {
-      border-radius: ${theme.borderRadius[2]}px ${theme.borderRadius[2]}px 0 0;
+      border-radius: ${theme.borderRadius.default}px
+        ${theme.borderRadius.default}px 0 0;
     }
   `};
 `;

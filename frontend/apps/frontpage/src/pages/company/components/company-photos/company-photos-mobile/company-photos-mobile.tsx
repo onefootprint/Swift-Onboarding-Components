@@ -44,7 +44,7 @@ const Container = styled.div`
     flex-direction: column;
 
     img {
-      border-radius: ${theme.borderRadius[2]}px;
+      border-radius: ${theme.borderRadius.default}px;
     }
 
     > span {

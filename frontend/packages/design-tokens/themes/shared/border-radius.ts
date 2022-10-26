@@ -1,11 +1,12 @@
 import type { BorderRadiuses } from '../types';
+import * as globals from '../../output/global';
 
 const borderRadius: BorderRadiuses = {
-  0: 0,
-  1: 4,
-  2: 6,
-  3: 24,
-  4: 1000,
+  none: 0,
+  compact: globals.borderRadiusCompact,
+  default: globals.borderRadiusDefault,
+  large: globals.borderRadiusLarge,
+  full: globals.borderRadiusFull,
 };
 
 export default borderRadius;

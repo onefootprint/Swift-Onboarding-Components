@@ -101,7 +101,7 @@ const AvatarContainer = styled.div`
     margin-bottom: ${theme.spacing[7]}px;
 
     img {
-      border-radius: ${theme.borderRadius[2]}px;
+      border-radius: ${theme.borderRadius.default}px;
     }
   `}
 `;

@@ -93,7 +93,7 @@ const Container = styled.div`
     justify-content: center;
     align-items: center;
     border: 1px solid ${theme.borderColor.tertiary};
-    border-radius: ${theme.borderRadius[2]}px;
+    border-radius: ${theme.borderRadius.default}px;
     overflow: hidden;
   `}
 `;

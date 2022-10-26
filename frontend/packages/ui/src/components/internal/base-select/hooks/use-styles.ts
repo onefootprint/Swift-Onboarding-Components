@@ -19,7 +19,7 @@ const useStyles = () => {
       outline: 0,
       position: 'relative',
       transition: 'all 100ms',
-      borderRadius: `${theme.borderRadius[2]}px ${theme.borderRadius[2]}px 0 0`,
+      borderRadius: `${theme.borderRadius.default}px ${theme.borderRadius.default}px 0 0`,
       background: '#fff',
       height: 40,
       '&:hover': {

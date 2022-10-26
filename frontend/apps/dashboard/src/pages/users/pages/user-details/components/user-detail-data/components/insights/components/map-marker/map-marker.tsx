@@ -26,7 +26,7 @@ const MapMarkerContainer = styled.div`
     background-color: ${rgba(theme.backgroundColor.accent, 0.1)};
     width: 324px;
     height: 324px;
-    border-radius: ${theme.borderRadius[4]}px;
+    border-radius: ${theme.borderRadius.full}px;
   `};
 `;
 
@@ -36,7 +36,7 @@ const MapMarkerDot = styled.div`
     border: 2px solid #fff;
     width: 16px;
     height: 16px;
-    border-radius: ${theme.borderRadius[4]}px;
+    border-radius: ${theme.borderRadius.full}px;
   `};
 `;
 

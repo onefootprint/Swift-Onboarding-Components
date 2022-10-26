@@ -29,7 +29,7 @@ const DesktopNavMenuItem = ({ item }: DesktopNavMenuItemProps) => (
 const Item = styled.div`
   ${({ theme }) => css`
     padding: ${theme.spacing[3]}px ${theme.spacing[4]}px;
-    border-radius: ${theme.borderRadius[2]}px;
+    border-radius: ${theme.borderRadius.default}px;
     :hover,
     :focus {
       ${createOverlayBackground('darken-1', 'primary')};

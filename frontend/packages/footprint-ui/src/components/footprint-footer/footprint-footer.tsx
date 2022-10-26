@@ -41,7 +41,8 @@ const Container = styled.div`
     z-index: ${theme.zIndex.sticky};
     bottom: 0;
     background-color: ${theme.backgroundColor.secondary};
-    border-radius: 0 0 ${theme.borderRadius[2]}px ${theme.borderRadius[2]}px;
+    border-radius: 0 0 ${theme.borderRadius.default}px
+      ${theme.borderRadius.default}px;
     border-top: ${theme.borderWidth[1]}px solid ${theme.borderColor.tertiary};
     display: flex;
     flex-direction: row;

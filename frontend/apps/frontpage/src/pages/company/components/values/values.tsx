@@ -67,7 +67,7 @@ const ItemsContainer = styled.ul`
 const Item = styled.li`
   ${({ theme }) => css`
     background: ${theme.backgroundColor.secondary};
-    border-radius: ${theme.borderRadius[2]}px;
+    border-radius: ${theme.borderRadius.default}px;
     padding: ${theme.spacing[8]}px;
   `}
 `;
@@ -76,7 +76,7 @@ const IconContainer = styled.div`
   ${({ theme }) => css`
     align-items: center;
     background: ${rgba('#CBC1F6', 0.6)};
-    border-radius: ${theme.borderRadius[4]}px;
+    border-radius: ${theme.borderRadius.full}px;
     display: flex;
     height: 56px;
     justify-content: center;

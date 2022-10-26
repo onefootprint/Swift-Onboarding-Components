@@ -37,7 +37,7 @@ const Container = styled.nav`
       a,
       button {
         ${createFontStyles('body-4')};
-        border-radius: ${theme.borderRadius[3]}px;
+        border-radius: ${theme.borderRadius.large}px;
         color: ${theme.color.primary};
         display: flex;
         gap: ${theme.spacing[2]}px;

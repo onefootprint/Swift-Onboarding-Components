@@ -119,11 +119,11 @@ export type Spacings = {
 export type Spacing = keyof Spacings;
 
 export type BorderRadiuses = {
-  0: number;
-  1: number;
-  2: number;
-  3: number;
-  4: number;
+  none: number;
+  compact: number;
+  default: number;
+  large: number;
+  full: number;
 };
 
 export type BorderRadius = keyof BorderRadiuses;

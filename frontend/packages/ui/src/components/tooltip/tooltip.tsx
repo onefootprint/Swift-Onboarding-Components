@@ -96,7 +96,7 @@ const TooltipContainer = styled.span<{ size: Size }>`
   ${({ theme, size }) => css`
     ${createFontStyles(size === 'default' ? 'body-4' : 'caption-2')};
     background: ${theme.backgroundColor.tertiary};
-    border-radius: ${theme.borderRadius[2]}px;
+    border-radius: ${theme.borderRadius.default}px;
     box-shadow: ${theme.elevation[2]};
     color: ${theme.color.quinary};
     max-width: 220px;

@@ -30,7 +30,7 @@ const FaqItem = ({ title, content }: FaqItemProps) => {
 
 const Details = styled.details`
   ${({ theme }) => css`
-    border-radius: ${theme.borderRadius[2]}px;
+    border-radius: ${theme.borderRadius.default}px;
     border: ${theme.borderWidth[1]}px solid ${theme.borderColor.tertiary};
 
     &:hover {

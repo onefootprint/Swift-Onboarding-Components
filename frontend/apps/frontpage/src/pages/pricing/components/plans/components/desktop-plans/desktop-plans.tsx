@@ -128,7 +128,8 @@ const PlanContainer = styled(Column)`
 
 const PIIContainer = styled(PlanContainer)`
   ${({ theme }) => css`
-    border-radius: ${theme.borderRadius[2]}px 0 0 ${theme.borderRadius[2]}px;
+    border-radius: ${theme.borderRadius.default}px 0 0
+      ${theme.borderRadius.default}px;
     border-right: unset;
   `}
 `;
@@ -136,7 +137,8 @@ const PIIContainer = styled(PlanContainer)`
 const KYCAndPIIContainer = styled(PlanContainer)`
   ${({ theme }) => css`
     background: ${theme.backgroundColor.secondary};
-    border-radius: 0 ${theme.borderRadius[2]}px ${theme.borderRadius[2]}px 0;
+    border-radius: 0 ${theme.borderRadius.default}px
+      ${theme.borderRadius.default}px 0;
   `}
 `;
 

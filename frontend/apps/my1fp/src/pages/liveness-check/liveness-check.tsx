@@ -66,7 +66,7 @@ const LivenessCheck = ({ onClose }: LivenessCheckProps) => {
 const DialogContainer = styled.div`
   ${({ theme }) => css`
     background-color: ${theme.backgroundColor.primary};
-    border-radius: ${theme.borderRadius[2]}px;
+    border-radius: ${theme.borderRadius.default}px;
     box-shadow: ${theme.elevation[3]};
     z-index: ${theme.zIndex.dialog};
     width: 650px;

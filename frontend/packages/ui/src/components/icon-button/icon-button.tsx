@@ -50,7 +50,7 @@ const Container = styled.button`
   width: 32px;
 
   ${({ theme }) => css`
-    border-radius: ${theme.borderRadius[4]}px;
+    border-radius: ${theme.borderRadius.full}px;
   `}
 
   &:disabled {

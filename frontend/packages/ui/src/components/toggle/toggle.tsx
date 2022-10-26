@@ -156,7 +156,7 @@ const Button = styled.button<{ checked?: boolean }>`
   ${({ theme, checked }) => css`
     background: ${theme.backgroundColor[checked ? 'accent' : 'secondary']};
     border-color: ${theme.borderColor[checked ? 'transparent' : 'primary']};
-    border-radius: ${theme.borderRadius[4]}px;
+    border-radius: ${theme.borderRadius.full}px;
     border-style: solid;
     border-width: ${theme.borderWidth[2]}px;
     cursor: pointer;
@@ -185,7 +185,7 @@ const StyledIcoToggleKnob16 = styled.div<{
 }>`
   ${({ theme, disabled, checked }) => css`
     background: ${theme.color[checked ? 'quinary' : 'tertiary']};
-    border-radius: ${theme.borderRadius[4]}px;
+    border-radius: ${theme.borderRadius.full}px;
     display: block;
     height: 16px;
     transform: ${checked ? 'translateX(12px)' : 'translateX(0px)'};

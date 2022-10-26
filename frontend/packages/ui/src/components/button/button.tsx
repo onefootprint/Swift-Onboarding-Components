@@ -86,7 +86,7 @@ const ButtonContainer = styled.button<{
     ${createFullWidthStyles($fullWidth)};
     ${createLoadingStyles($loading)};
     align-items: center;
-    border-radius: ${theme.borderRadius[2]}px;
+    border-radius: ${theme.borderRadius.default}px;
     cursor: pointer;
     display: flex;
     justify-content: center;

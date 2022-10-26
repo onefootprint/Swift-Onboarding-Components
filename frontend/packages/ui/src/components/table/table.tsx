@@ -121,7 +121,7 @@ const Table = <T,>({
 const TableContainer = styled.table`
   ${({ theme }) => css`
     border-collapse: separate;
-    border-radius: ${theme.borderRadius[2]}px;
+    border-radius: ${theme.borderRadius.default}px;
     border: 1px solid ${theme.borderColor.tertiary};
     table-layout: fixed;
     text-align: left;
@@ -136,11 +136,11 @@ const TableContainer = styled.table`
       text-transform: uppercase;
 
       &:first-child {
-        border-top-left-radius: ${theme.borderRadius[2]}px;
+        border-top-left-radius: ${theme.borderRadius.default}px;
       }
 
       &:last-child {
-        border-top-right-radius: ${theme.borderRadius[2]}px;
+        border-top-right-radius: ${theme.borderRadius.default}px;
       }
     }
 
@@ -162,11 +162,11 @@ const TableContainer = styled.table`
       &:last-child {
         td {
           &:first-child {
-            border-bottom-left-radius: ${theme.borderRadius[2]}px;
+            border-bottom-left-radius: ${theme.borderRadius.default}px;
           }
 
           &:last-child {
-            border-bottom-right-radius: ${theme.borderRadius[2]}px;
+            border-bottom-right-radius: ${theme.borderRadius.default}px;
           }
         }
       }

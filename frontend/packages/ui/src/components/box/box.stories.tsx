@@ -67,7 +67,7 @@ Base.args = {
   sx: {
     alignItems: 'center',
     backgroundColor: 'tertiary',
-    borderRadius: 2,
+    borderRadius: 'default',
     display: 'flex',
     justifyContent: 'center',
     paddingY: 10,

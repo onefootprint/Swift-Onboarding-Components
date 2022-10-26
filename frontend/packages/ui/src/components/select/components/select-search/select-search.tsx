@@ -81,8 +81,8 @@ const Input = styled.input`
   ${({ theme }) => css`
     ${createFontStyles('body-3')};
     background: ${theme.backgroundColor.primary};
-    border-top-left-radius: ${theme.borderRadius[2]}px;
-    border-top-right-radius: ${theme.borderRadius[2]}px;
+    border-top-left-radius: ${theme.borderRadius.default}px;
+    border-top-right-radius: ${theme.borderRadius.default}px;
     border: none;
     color: ${theme.color.primary};
     height: 100%;

@@ -64,7 +64,7 @@ const InstructionsContainer = styled.div`
 
 const Grid = styled.ul<{ columns: number; rows: number; size: string }>`
   ${({ theme, columns, rows, size }) => css`
-    border-radius: ${theme.borderRadius[2]}px;
+    border-radius: ${theme.borderRadius.default}px;
     border: ${theme.borderWidth[1]}px dashed #a2d3aa;
     display: inline-grid;
     grid-auto-flow: column;

@@ -16,7 +16,7 @@ const Badge = styled.span.attrs<BadgeProps>(({ testID }) => ({
   ${({ theme, variant }) => css`
     ${createFontStyles('caption-1')};
     background-color: ${theme.backgroundColor[variant]};
-    border-radius: ${theme.borderRadius[3]}px;
+    border-radius: ${theme.borderRadius.large}px;
     border: 0;
     color: ${theme.color[variant]};
     padding: ${theme.spacing[2]}px ${theme.spacing[3]}px;

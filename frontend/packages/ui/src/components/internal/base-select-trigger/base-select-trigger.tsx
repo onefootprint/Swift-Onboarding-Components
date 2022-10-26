@@ -50,7 +50,7 @@ const BaseSelectTriggerContainer = styled.button<BaseSelectTriggerProps>`
       ${createFontStyles('body-3')};
       align-items: center;
       background: ${theme.backgroundColor.primary};
-      border-radius: ${theme.borderRadius[2]}px;
+      border-radius: ${theme.borderRadius.default}px;
       border: 1px solid ${theme.borderColor[defaultBorderColor]};
       color: ${theme.color.primary};
       display: flex;

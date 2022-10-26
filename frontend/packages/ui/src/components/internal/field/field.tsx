@@ -42,7 +42,7 @@ const Field = styled(Cleave).attrs<{ as?: 'textarea' | 'input' }>(({ as }) => ({
     return css`
       ${createFontStyles(fontVariant || 'body-3')};
       background-color: ${theme.backgroundColor.primary};
-      border-radius: ${theme.borderRadius[2]}px;
+      border-radius: ${theme.borderRadius.default}px;
       border: ${theme.borderWidth[1]}px solid
         ${theme.borderColor[defaultBorderColor]};
       color: ${theme.color.primary};

@@ -93,7 +93,7 @@ const CodeContent = styled.code`
   ${({ theme }) => css`
     ${createFontStyles('snippet-2')};
     background: ${theme.backgroundColor.secondary};
-    border-radius: ${theme.borderRadius[1]}px;
+    border-radius: ${theme.borderRadius.compact}px;
     border: ${theme.borderWidth[1]}px solid ${theme.borderColor.tertiary};
     color: ${theme.color.error};
     display: inline-block;

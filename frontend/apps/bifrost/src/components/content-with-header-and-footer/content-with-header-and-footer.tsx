@@ -25,7 +25,7 @@ const ContentWithHeaderAndFooter = ({
 const Container = styled.div`
   ${({ theme }) => css`
     background: ${theme.backgroundColor.primary};
-    border-radius: ${theme.borderRadius[2]}px;
+    border-radius: ${theme.borderRadius.default}px;
     display: flex;
     flex-direction: column;
     height: 100vh;

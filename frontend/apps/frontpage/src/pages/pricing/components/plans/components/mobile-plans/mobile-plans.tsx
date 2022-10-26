@@ -65,7 +65,7 @@ const Container = styled.div`
 const PlanContainer = styled.div`
   ${({ theme }) => css`
     border: ${theme.borderWidth[1]}px solid ${theme.borderColor.tertiary};
-    border-radius: ${theme.borderRadius[2]}px;
+    border-radius: ${theme.borderRadius.default}px;
   `}
 `;
 

@@ -46,7 +46,7 @@ const Container = styled.div`
 const StyledLink = styled(Link)`
   ${({ theme }) => css`
     ${createFontStyles('label-3')};
-    border-radius: ${theme.borderRadius[2]}px;
+    border-radius: ${theme.borderRadius.default}px;
     display: block;
     padding: ${theme.spacing[3]}px ${theme.spacing[4]}px;
     text-decoration: none;

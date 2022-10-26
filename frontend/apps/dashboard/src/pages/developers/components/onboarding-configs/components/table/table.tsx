@@ -3,7 +3,7 @@ import styled, { css } from 'styled-components';
 const Table = styled.table`
   ${({ theme }) => css`
     border-collapse: separate;
-    border-radius: ${theme.borderRadius[2]}px;
+    border-radius: ${theme.borderRadius.default}px;
     border: 1px solid ${theme.borderColor.tertiary};
     width: 100%;
 
@@ -13,7 +13,8 @@ const Table = styled.table`
         padding: ${theme.spacing[5]}px ${theme.spacing[6]}px;
         border-bottom: 1px solid ${theme.borderColor.tertiary};
         vertical-align: middle;
-        border-radius: ${theme.borderRadius[2]}px ${theme.borderRadius[2]}px 0 0;
+        border-radius: ${theme.borderRadius.default}px
+          ${theme.borderRadius.default}px 0 0;
 
         &:first-child {
           text-align: left;

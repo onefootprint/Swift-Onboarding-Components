@@ -108,7 +108,7 @@ const Header = styled.div`
 const Article = styled.article`
   ${({ theme }) => css`
     background: ${theme.backgroundColor.secondary};
-    border-radius: ${theme.borderRadius[2]}px;
+    border-radius: ${theme.borderRadius.default}px;
     padding: ${theme.spacing[6]}px;
 
     ${media.between('sm', 'lg')`

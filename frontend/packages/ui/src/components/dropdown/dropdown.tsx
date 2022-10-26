@@ -8,7 +8,7 @@ const StyledDropdownTrigger = styled(RadixDropdown.Trigger)`
   ${({ theme }) => css`
     align-items: center;
     background: none;
-    border-radius: ${theme.borderRadius[4]}px;
+    border-radius: ${theme.borderRadius.full}px;
     border: none;
     cursor: pointer;
     display: flex;
@@ -31,7 +31,7 @@ const StyledDropdownTrigger = styled(RadixDropdown.Trigger)`
 const StyledDropdownContent = styled(RadixDropdown.Content)`
   ${({ theme }) => css`
     background: ${theme.backgroundColor.primary};
-    border-radius: ${theme.borderRadius[2]}px;
+    border-radius: ${theme.borderRadius.default}px;
     border: 1px solid ${theme.borderColor.tertiary};
     box-shadow: ${theme.elevation[2]};
     min-width: 200px;

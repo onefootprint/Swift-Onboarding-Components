@@ -82,7 +82,7 @@ const ToastContainer = styled.div`
     width: 380px;
     align-items: flex-start;
     background: ${theme.backgroundColor.primary};
-    border-radius: ${theme.borderRadius[2]}px;
+    border-radius: ${theme.borderRadius.default}px;
     border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
     box-shadow: ${theme.elevation[2]};
     display: flex;

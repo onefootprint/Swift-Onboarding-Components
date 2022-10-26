@@ -158,7 +158,7 @@ const Container = styled.div`
 const Dropdown = styled.ul`
   ${({ theme }) => css`
     background: ${theme.backgroundColor.primary};
-    border-radius: ${theme.borderRadius[2]}px;
+    border-radius: ${theme.borderRadius.default}px;
     border: ${theme.borderWidth[1]}px solid ${theme.borderColor.primary};
     box-shadow: ${theme.elevation[2]};
     max-height: 330px;

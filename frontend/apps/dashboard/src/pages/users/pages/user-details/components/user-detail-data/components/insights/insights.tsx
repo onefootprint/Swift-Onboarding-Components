@@ -50,7 +50,7 @@ const Insights = ({ user }: InsightsProps) => {
           sx={{
             height: '384px',
             width: '100%',
-            borderRadius: 2,
+            borderRadius: 'default',
             overflow: 'hidden',
             position: 'relative',
           }}
@@ -157,7 +157,7 @@ const FloatingBox = styled.div`
     background-color: ${theme.backgroundColor.primary};
     border: 1px solid ${theme.borderColor.tertiary};
     padding: ${theme.spacing[7]}px;
-    border-radius: ${theme.borderRadius[2]}px;
+    border-radius: ${theme.borderRadius.default}px;
   `};
 `;
 

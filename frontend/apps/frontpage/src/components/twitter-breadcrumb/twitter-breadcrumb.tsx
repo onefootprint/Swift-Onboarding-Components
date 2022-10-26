@@ -38,7 +38,7 @@ const TwitterBreadcrumb = ({
 const Breadcrumb = styled.div`
   ${({ theme }) => css`
     background: ${theme.backgroundColor.secondary};
-    border-radius: ${theme.borderRadius[2]}px;
+    border-radius: ${theme.borderRadius.default}px;
     display: flex;
     justify-content: space-between;
     margin: 0 -${theme.spacing[5]}px 0;

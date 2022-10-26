@@ -39,7 +39,7 @@ const Pager = ({ max, value, onClick }: PagerProps) => {
 const Container = styled.div`
   ${({ theme }) => css`
     background: ${theme.backgroundColor.secondary};
-    border-radius: ${theme.borderRadius[3]}px;
+    border-radius: ${theme.borderRadius.large}px;
     border: ${theme.borderWidth[1]}px solid ${theme.borderColor.tertiary};
     display: inline-flex;
     gap: ${theme.spacing[2]}px;
@@ -54,7 +54,7 @@ const Container = styled.div`
 const Button = styled.button<{ active: boolean }>`
   ${({ active, theme }) => css`
     background: ${theme.color.primary};
-    border-radius: ${theme.borderRadius[4]}px;
+    border-radius: ${theme.borderRadius.full}px;
     border: none;
     cursor: pointer;
     height: ${theme.spacing[3]}px;

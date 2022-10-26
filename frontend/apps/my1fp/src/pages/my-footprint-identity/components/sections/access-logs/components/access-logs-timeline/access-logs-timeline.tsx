@@ -25,7 +25,7 @@ const AccessLogsTimeline = ({ accessLogs }: AccessLogsTimelineProps) => (
               minWidth: '6px',
               height: '6px',
               backgroundColor: 'tertiary',
-              borderRadius: 2,
+              borderRadius: 'default',
               marginTop: 3,
               marginBottom: 3,
             }}
@@ -70,7 +70,7 @@ const Line = styled.div`
   ${({ theme }) => css`
     height: 100%;
     width: 2px;
-    border-radius: ${theme.borderRadius[2]}px;
+    border-radius: ${theme.borderRadius.default}px;
     background-color: ${theme.backgroundColor.senary};
   `};
 `;

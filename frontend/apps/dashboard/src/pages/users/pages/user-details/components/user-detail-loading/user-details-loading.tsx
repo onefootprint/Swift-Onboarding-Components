@@ -18,7 +18,9 @@ const UserDetailsLoading = () => (
           <Shimmer sx={{ height: '28px', width: '75px' }} />
         </Box>
         <Box id="user-status">
-          <Shimmer sx={{ height: '24px', width: '64px', borderRadius: 3 }} />
+          <Shimmer
+            sx={{ height: '24px', width: '64px', borderRadius: 'large' }}
+          />
         </Box>
       </Box>
       <Box

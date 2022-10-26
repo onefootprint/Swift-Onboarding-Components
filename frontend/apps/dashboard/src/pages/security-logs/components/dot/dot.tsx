@@ -7,7 +7,7 @@ const Dot = () => (
       width: '6px',
       height: '6px',
       backgroundColor: 'tertiary',
-      borderRadius: 2,
+      borderRadius: 'default',
     }}
   />
 );

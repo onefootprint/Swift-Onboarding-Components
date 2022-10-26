@@ -90,7 +90,7 @@ const Anchor = styled.a`
 
 const FeatureImage = styled(Image)`
   ${({ theme }) => css`
-    border-radius: ${theme.borderRadius[2]}px;
+    border-radius: ${theme.borderRadius.default}px;
     object-fit: cover;
   `}
 `;
@@ -140,7 +140,7 @@ const Footer = styled.footer`
 
 const Avatar = styled(Image)`
   ${({ theme }) => css`
-    border-radius: ${theme.borderRadius[4]}px;
+    border-radius: ${theme.borderRadius.full}px;
   `}
 `;
 

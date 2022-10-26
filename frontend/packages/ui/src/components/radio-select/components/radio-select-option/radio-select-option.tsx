@@ -91,11 +91,13 @@ const Option = styled.button<{ selected?: boolean }>`
     align-items: center;
 
     &:first-child {
-      border-radius: ${theme.borderRadius[2]}px ${theme.borderRadius[2]}px 0 0;
+      border-radius: ${theme.borderRadius.default}px
+        ${theme.borderRadius.default}px 0 0;
     }
 
     &:last-child {
-      border-radius: 0 0 ${theme.borderRadius[2]}px ${theme.borderRadius[2]}px;
+      border-radius: 0 0 ${theme.borderRadius.default}px
+        ${theme.borderRadius.default}px;
     }
 
     &:not(:first-child) {

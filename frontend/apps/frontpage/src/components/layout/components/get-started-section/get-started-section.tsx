@@ -79,7 +79,7 @@ const GetStartedSection = ({
 const Inner = styled.div`
   ${({ theme }) => css`
     background-color: ${theme.backgroundColor.quaternary};
-    border-radius: ${theme.borderRadius[2]}px;
+    border-radius: ${theme.borderRadius.default}px;
     padding: ${theme.spacing[9]}px ${theme.spacing[8]}px;
     position: relative;
     overflow: hidden;
