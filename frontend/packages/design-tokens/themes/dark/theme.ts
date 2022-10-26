@@ -1,5 +1,6 @@
 import { rgba } from 'polished';
 import type { DefaultTheme } from 'styled-components';
+import * as dark from '../../output/dark';
 
 import borderRadius from '../shared/border-radius';
 import borderWidth from '../shared/border-width';
@@ -9,7 +10,6 @@ import spacing from '../shared/spacing';
 import typography from '../shared/typography';
 import zIndex from '../shared/z-index';
 import codeHighlight from './code-highlight';
-import primitives from './primitives';
 
 const theme: DefaultTheme = {
   grid,
@@ -22,40 +22,40 @@ const theme: DefaultTheme = {
   codeHighlight,
   backgroundColor: {
     transparent: 'transparent',
-    primary: primitives.gray0,
-    secondary: primitives.gray50,
-    tertiary: primitives.brandSleep,
-    quaternary: primitives.brandThink,
-    quinary: primitives.brandGo,
-    senary: primitives.gray100,
-    accent: primitives.purple500,
-    error: primitives.red50,
-    info: primitives.blue50,
-    success: primitives.green50,
-    warning: primitives.yellow50,
-    neutral: primitives.gray50,
+    primary: dark.primitivesGray0,
+    secondary: dark.primitivesGray50,
+    tertiary: dark.primitivesBrandSleep,
+    quaternary: dark.primitivesBrandThink,
+    quinary: dark.primitivesBrandGo,
+    senary: dark.primitivesGray100,
+    accent: dark.primitivesPurple500,
+    error: dark.primitivesRed50,
+    info: dark.primitivesBlue50,
+    success: dark.primitivesGreen50,
+    warning: dark.primitivesYellow50,
+    neutral: dark.primitivesGray50,
   },
   borderColor: {
     transparent: 'transparent',
-    primary: primitives.gray150,
-    secondary: primitives.purple500,
-    tertiary: primitives.gray100,
-    error: primitives.red500,
+    primary: dark.primitivesGray150,
+    secondary: dark.primitivesPurple500,
+    tertiary: dark.primitivesGray100,
+    error: dark.primitivesRed500,
   },
   color: {
-    primary: primitives.gray1000,
-    secondary: primitives.gray800,
-    tertiary: primitives.gray500,
-    quaternary: primitives.gray400,
-    quinary: primitives.gray0,
-    senary: primitives.brandThink,
-    septenary: primitives.brandGo,
-    accent: primitives.purple600,
-    error: primitives.red600,
-    info: primitives.blue600,
-    success: primitives.green600,
-    warning: primitives.yellow800,
-    neutral: primitives.gray800,
+    primary: dark.primitivesGray1000,
+    secondary: dark.primitivesGray800,
+    tertiary: dark.primitivesGray500,
+    quaternary: dark.primitivesGray400,
+    quinary: dark.primitivesGray0,
+    senary: dark.primitivesBrandThink,
+    septenary: dark.primitivesBrandGo,
+    accent: dark.primitivesPurple500,
+    error: dark.primitivesRed600,
+    info: dark.primitivesBlue600,
+    success: dark.primitivesGreen600,
+    warning: dark.primitivesYellow800,
+    neutral: dark.primitivesGray800,
   },
   elevation: {
     0: 'none',
@@ -63,13 +63,15 @@ const theme: DefaultTheme = {
     2: '0px 1px 8px rgba(0, 0, 0, 0.14)',
     3: '0px 1px 12px rgba(0, 0, 0, 0.18)',
   },
+  // TODO: Remove
+  // https://linear.app/footprint/issue/FP-1728/bifrost-customization-remove-overlay-from-theme
   overlay: {
-    'lighten-1': rgba(primitives.gray0, 0.14),
-    'lighten-2': rgba(primitives.gray0, 0.18),
-    'darken-1': rgba(primitives.gray1000, 0.04),
-    'darken-2': rgba(primitives.gray1000, 0.08),
-    'error-1': rgba(primitives.red500, 0.07),
-    'error-2': rgba(primitives.red500, 0.15),
+    'lighten-1': rgba(dark.primitivesGray0, 0.14),
+    'lighten-2': rgba(dark.primitivesGray0, 0.18),
+    'darken-1': rgba(dark.primitivesGray1000, 0.04),
+    'darken-2': rgba(dark.primitivesGray1000, 0.08),
+    'error-1': rgba(dark.primitivesRed500, 0.07),
+    'error-2': rgba(dark.primitivesRed500, 0.15),
   },
 };
 
