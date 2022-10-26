@@ -39,7 +39,6 @@ export async function CreateCluster(
     { provider },
   );
 
-  
   const instanceSecurityGroup = new awsx.ec2.SecurityGroup(
     `c-sg-${clusterName}`,
     {
@@ -178,6 +177,20 @@ function createInstanceRole(
                 'ecr:BatchGetImage',
                 'ecr:BatchCheckLayerAvailability',
                 'ecr:GetDownloadUrlForLayer',
+              ],
+              Effect: 'Allow',
+              Resource: '*',
+            },
+          ],
+        }),
+      },
+      {
+        name: 'cloudwatch_logging',
+        policy: JSON.stringify({
+          Version: '2012-10-17',
+          Statement: [
+            {
+              Action: [
                 'logs:CreateLogGroup',
                 'logs:PutLogEvents',
                 'logs:DescribeLogStreams',
@@ -241,6 +254,40 @@ sudo yum install aws-nitro-enclaves-cli-devel -y
 sudo yum install -y aws-cli
 sudo yum install -y jq yum-utils httpd-tools
 
+# install log agent on ec2 instance
+sudo yum install -y awslogs
+sudo mkdir -p /var/lib/awslogs/state/
+
+# Define our log conf files
+# see https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/AgentReference.html
+cat <<'EOF' > /etc/awslogs/awslogs.conf
+[general]
+state_file=/var/lib/awslogs/state/agent-state
+
+[/var/log/awslogs]
+log_group_name=/ec2/fpc_aws_logs
+log_stream_name={instance_id}
+time_zone=UTC
+file=/var/log/awslogs*
+initial_position=start_of_file
+
+[/var/log/boot]
+log_group_name=/ec2/fpc_boot_logs
+log_stream_name={instance_id}
+time_zone=UTC
+file=/var/log/boot*
+initial_position=start_of_file
+
+[/var/log/nitro_enclaves]
+log_group_name=/ec2/fpc_enclave_logs
+log_stream_name={instance_id}
+time_zone=UTC
+file=/var/log/nitro_enclaves/*
+initial_position=start_of_file
+EOF
+
+# start logging daemon
+sudo systemctl start awslogsd
 
 # setup tailscale
 sudo yum-config-manager --add-repo https://pkgs.tailscale.com/stable/centos/7/tailscale.repo
