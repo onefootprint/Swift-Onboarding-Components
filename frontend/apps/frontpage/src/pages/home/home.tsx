@@ -136,8 +136,8 @@ const HighlightsContainer = styled.section`
     `}
 
     ${media.greaterThan('lg')`
-      padding: ${theme.spacing[13]}px 0;
-      row-gap: ${theme.spacing[13]}px;
+      padding: ${theme.spacing[14]}px 0;
+      row-gap: ${theme.spacing[14]}px;
     `}
   `}
 `;

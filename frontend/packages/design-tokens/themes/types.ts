@@ -114,6 +114,7 @@ export type Spacings = {
   12: number;
   13: number;
   14: number;
+  15: number;
 };
 
 export type Spacing = keyof Spacings;

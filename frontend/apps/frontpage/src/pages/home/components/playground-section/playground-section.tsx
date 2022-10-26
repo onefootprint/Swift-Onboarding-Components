@@ -29,10 +29,10 @@ const Gradient = styled.section`
   background-size: cover;
 
   ${({ theme }) => css`
-    padding: ${theme.spacing[14]}px 0;
+    padding: ${theme.spacing[15]}px 0;
 
     ${media.greaterThan('lg')`
-      padding: ${theme.spacing[14]}px 0;
+      padding: ${theme.spacing[15]}px 0;
     `}
   `}
 

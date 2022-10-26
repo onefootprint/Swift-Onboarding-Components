@@ -152,7 +152,7 @@ const CompetitorAnalysisContainer = styled.div`
     margin-bottom: ${theme.spacing[11]}px;
 
     ${media.greaterThan('lg')`
-      margin-bottom: ${theme.spacing[13]}px;
+      margin-bottom: ${theme.spacing[14]}px;
     `}
   `}
 `;

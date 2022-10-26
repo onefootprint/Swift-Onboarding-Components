@@ -46,7 +46,7 @@ const Inner = styled.div`
     padding-bottom: ${theme.spacing[10]}px;
 
     ${media.greaterThan('lg')`
-      padding-bottom: ${theme.spacing[13]}px;
+      padding-bottom: ${theme.spacing[14]}px;
     `}
   `}
 `;

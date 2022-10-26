@@ -93,7 +93,7 @@ const FooterContainer = styled.section`
     background: ${theme.backgroundColor.tertiary};
 
     ${media.greaterThan('lg')`
-      padding-top: ${theme.spacing[13]}px;
+      padding-top: ${theme.spacing[14]}px;
     `}
   `}
 `;

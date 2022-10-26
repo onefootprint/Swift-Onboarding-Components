@@ -57,7 +57,7 @@ const Inner = styled.div`
     ${media.greaterThan('md')`
       flex-direction: row;
       justify-content: space-between;
-      margin-top: ${theme.spacing[13]}px;
+      margin-top: ${theme.spacing[14]}px;
       padding: ${theme.spacing[6]}px 0;
       text-align: unset;
     `}
