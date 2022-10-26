@@ -459,6 +459,14 @@
           "cancel": "Cancel"
         }
       }
+    },
+    "settings": {
+      "page-title": "Settings",
+      "header": {
+        "title": "Settings"
+      },
+      "business-profile": {},
+      "team-roles": {}
     }
   }
 }
