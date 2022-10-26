@@ -49,6 +49,11 @@ async fn main() -> std::io::Result<()> {
         None
     };
 
+    // Add custom sentry tags here!
+    sentry::configure_scope(|scope| {
+        scope.set_tag("footprint-server-version", crate::GIT_HASH.to_string());
+    });
+
     std::env::set_var("RUST_BACKTRACE", "1");
 
     let state = State::init_or_die(config.clone()).await;
