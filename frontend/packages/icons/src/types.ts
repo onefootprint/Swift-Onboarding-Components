@@ -1,4 +1,4 @@
-import { Color } from '@onefootprint/themes';
+import { Color } from '@onefootprint/design-tokens';
 
 export type IconProps = {
   color?: Color;

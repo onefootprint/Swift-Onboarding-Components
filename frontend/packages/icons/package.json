@@ -16,7 +16,7 @@
   },
   "devDependencies": {
     "@onefootprint/jest-presets": "*",
-    "@onefootprint/themes": "*",
+    "@onefootprint/design-tokens": "*",
     "@svgr/core": "^6.2.1",
     "@svgr/plugin-jsx": "^6.2.1",
     "@svgr/plugin-prettier": "^6.1.2",

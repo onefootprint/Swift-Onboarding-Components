@@ -1,5 +1,5 @@
+import themes from '@onefootprint/design-tokens';
 import { HookWrapper, renderHook } from '@onefootprint/test-utils';
-import themes from '@onefootprint/themes';
 
 import useSX from './use-sx';
 

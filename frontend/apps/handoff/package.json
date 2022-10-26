@@ -18,7 +18,7 @@
     "@onefootprint/hooks": "*",
     "@onefootprint/icons": "*",
     "@onefootprint/request": "*",
-    "@onefootprint/themes": "*",
+    "@onefootprint/design-tokens": "*",
     "@onefootprint/types": "*",
     "@onefootprint/ui": "*",
     "@sentry/nextjs": "^7.1.1",

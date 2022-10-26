@@ -1,5 +1,5 @@
+import themes from '@onefootprint/design-tokens';
 import { flags, IcoChevronDown16, icos } from '@onefootprint/icons';
-import themes from '@onefootprint/themes';
 import { ComponentMeta, ComponentStory } from '@storybook/react';
 import React from 'react';
 

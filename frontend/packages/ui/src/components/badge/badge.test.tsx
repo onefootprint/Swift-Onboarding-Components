@@ -1,5 +1,5 @@
+import themes, { UIState } from '@onefootprint/design-tokens';
 import { customRender, screen } from '@onefootprint/test-utils';
-import themes, { UIState } from '@onefootprint/themes';
 import React from 'react';
 
 import Badge, { BadgeProps } from './badge';

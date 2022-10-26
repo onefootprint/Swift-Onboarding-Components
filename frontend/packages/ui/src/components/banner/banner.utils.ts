@@ -1,4 +1,4 @@
-import type { BackgroundColor, Color } from '@onefootprint/themes';
+import type { BackgroundColor, Color } from '@onefootprint/design-tokens';
 import { css } from 'styled-components';
 
 import type { BannerVariant } from './banner.types';

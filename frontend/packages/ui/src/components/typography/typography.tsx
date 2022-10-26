@@ -1,4 +1,4 @@
-import { Color, FontVariant } from '@onefootprint/themes';
+import { Color, FontVariant } from '@onefootprint/design-tokens';
 import React, { forwardRef } from 'react';
 import styled, { css } from 'styled-components';
 

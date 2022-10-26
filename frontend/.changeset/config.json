@@ -23,6 +23,6 @@
     "@onefootprint/hooks",
     "@onefootprint/request",
     "@onefootprint/test-utils",
-    "@onefootprint/themes"
+    "@onefootprint/design-tokens"
   ]
 }

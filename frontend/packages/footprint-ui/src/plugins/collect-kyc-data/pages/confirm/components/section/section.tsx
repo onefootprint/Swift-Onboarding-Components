@@ -1,6 +1,6 @@
+import { Color } from '@onefootprint/design-tokens';
 import { useTranslation } from '@onefootprint/hooks';
 import { Icon } from '@onefootprint/icons';
-import { Color } from '@onefootprint/themes';
 import { LinkButton, Typography } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';

@@ -10,7 +10,7 @@
   },
   "devDependencies": {
     "@onefootprint/jest-presets": "*",
-    "@onefootprint/themes": "*",
+    "@onefootprint/design-tokens": "*",
     "@onefootprint/types": "*",
     "@onefootprint/ui": "*",
     "@tanstack/react-query": "^4.9.0",

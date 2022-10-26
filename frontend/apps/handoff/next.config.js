@@ -10,7 +10,7 @@ module.exports = {
     transpilePackages: [
       'footprint-elements',
       '@onefootprint/ui',
-      '@onefootprint/themes',
+      '@onefootprint/design-tokens',
       '@onefootprint/icons',
       '@onefootprint/global-constants',
       '@onefootprint/icons',

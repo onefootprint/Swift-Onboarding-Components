@@ -1,5 +1,5 @@
+import themes from '@onefootprint/design-tokens';
 import { customRender, screen, userEvent } from '@onefootprint/test-utils';
-import themes from '@onefootprint/themes';
 import React from 'react';
 
 import Select, { SelectProps } from './select';

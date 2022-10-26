@@ -1,4 +1,4 @@
-import { Color } from '@onefootprint/themes';
+import { Color } from '@onefootprint/design-tokens';
 import { Typography } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';

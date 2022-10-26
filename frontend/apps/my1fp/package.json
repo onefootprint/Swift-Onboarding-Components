@@ -20,7 +20,7 @@
     "@onefootprint/hooks": "*",
     "@onefootprint/icons": "*",
     "@onefootprint/request": "*",
-    "@onefootprint/themes": "*",
+    "@onefootprint/design-tokens": "*",
     "@onefootprint/types": "*",
     "@onefootprint/ui": "*",
     "@types/lodash": "^4.14.182",

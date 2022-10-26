@@ -5,7 +5,7 @@ import type {
   FontVariant,
   Overlay,
   Spacing,
-} from '@onefootprint/themes';
+} from '@onefootprint/design-tokens';
 import { css } from 'styled-components';
 
 import { createFontStyles, createOverlayBackground } from '../../utils/mixins';

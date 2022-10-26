@@ -1,6 +1,6 @@
+import themes from '@onefootprint/design-tokens';
 import { COUNTRIES as options } from '@onefootprint/global-constants';
 import { customRender, screen, userEvent } from '@onefootprint/test-utils';
-import themes from '@onefootprint/themes';
 import take from 'lodash/take';
 import React from 'react';
 

@@ -21,7 +21,7 @@
     "@onefootprint/hooks": "*",
     "@onefootprint/icons": "*",
     "@onefootprint/request": "*",
-    "@onefootprint/themes": "*",
+    "@onefootprint/design-tokens": "*",
     "@onefootprint/types": "*",
     "@tanstack/react-query": "^4.9.0",
     "@xstate/react": "^3.0.1",

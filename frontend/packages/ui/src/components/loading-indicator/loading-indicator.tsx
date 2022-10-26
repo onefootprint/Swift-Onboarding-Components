@@ -1,5 +1,5 @@
+import type { Color } from '@onefootprint/design-tokens';
 import { IcoSpinner16, IcoSpinner24 } from '@onefootprint/icons';
-import type { Color } from '@onefootprint/themes';
 import React from 'react';
 import styled, { keyframes } from 'styled-components';
 

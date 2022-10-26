@@ -4,7 +4,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render } from '@testing-library/react';
 import React from 'react';
 import { ThemeProvider } from 'styled-components';
-import themes from '@onefootprint/themes';
+import themes from '@onefootprint/design-tokens';
 import { DesignSystemProvider } from '@onefootprint/ui';
 
 import throwOnConsoleErrors from './console-error';

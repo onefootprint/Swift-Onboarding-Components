@@ -1,0 +1,17 @@
+{
+  "source": ["tokens/**/*.json"],
+  "platforms": {
+    "css": {
+      "transformGroup": "js",
+      "files": [
+        {
+          "format": "javascript/es6",
+          "destination": "output/variables.js",
+          "options": {
+            "outputReferences": true
+          }
+        }
+      ]
+    }
+  }
+}

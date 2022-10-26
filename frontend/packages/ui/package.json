@@ -21,7 +21,7 @@
     "@onefootprint/global-constants": "*",
     "@onefootprint/icons": "*",
     "@onefootprint/jest-presets": "*",
-    "@onefootprint/themes": "*",
+    "@onefootprint/design-tokens": "*",
     "@popperjs/core": "^2.11.5",
     "@radix-ui/react-dropdown-menu": "^1.0.0",
     "cleave.js": "^1.6.0",

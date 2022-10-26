@@ -1,4 +1,4 @@
-import themes from '@onefootprint/themes';
+import themes from '@onefootprint/design-tokens';
 import { DesignSystemProvider } from '@onefootprint/ui';
 import Head from 'next/head';
 import React, { useEffect, useState } from 'react';

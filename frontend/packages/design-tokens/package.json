@@ -1,0 +1,22 @@
+{
+  "name": "@onefootprint/design-tokens",
+  "private": true,
+  "version": "0.0.0",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "license": "MIT",
+  "scripts": {
+    "generate:buttons": "token-transformer figma/components/buttons.json tokens/buttons.json",
+    "generate:globals": "token-transformer figma/global.json tokens/global.json",
+    "generate:light": "token-transformer figma/light.json tokens/light.json",
+    "generate:dark": "token-transformer figma/dark.json tokens/dark.json",
+    "generate:style": "node scripts/build.js",
+    "generate": "yarn generate:globals && yarn generate:light && yarn generate:dark && yarn generate:style",
+    "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
+  },
+  "devDependencies": {
+    "style-dictionary": "^3.7.1",
+    "token-transformer": "^0.0.27",
+    "typescript": "4.8.4"
+  }
+}

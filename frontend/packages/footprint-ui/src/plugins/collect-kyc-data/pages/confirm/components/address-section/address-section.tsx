@@ -1,6 +1,6 @@
+import { Color } from '@onefootprint/design-tokens';
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoBuilding24 } from '@onefootprint/icons';
-import { Color } from '@onefootprint/themes';
 import { UserDataAttribute } from '@onefootprint/types';
 import React from 'react';
 

@@ -1,4 +1,4 @@
-import themes from '@onefootprint/themes';
+import themes from '@onefootprint/design-tokens';
 import { Meta, Story } from '@storybook/react';
 import React from 'react';
 

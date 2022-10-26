@@ -1,4 +1,4 @@
-import type { ThemeKey } from '@onefootprint/themes';
+import type { ThemeKey } from '@onefootprint/design-tokens';
 
 import type { CustomStyleProps, SXStylesKeys } from './use-sx.types';
 

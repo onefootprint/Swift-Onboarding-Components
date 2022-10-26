@@ -60,7 +60,7 @@ module.exports = {
   experimental: {
     transpilePackages: [
       '@onefootprint/ui',
-      '@onefootprint/themes',
+      '@onefootprint/design-tokens',
       '@onefootprint/icons',
       '@onefootprint/global-constants',
       '@onefootprint/icons',

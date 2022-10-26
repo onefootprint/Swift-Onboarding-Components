@@ -20,7 +20,7 @@
     "@onefootprint/global-constants": "*",
     "@onefootprint/hooks": "*",
     "@onefootprint/icons": "*",
-    "@onefootprint/themes": "*",
+    "@onefootprint/design-tokens": "*",
     "@onefootprint/ui": "*",
     "@tryghost/content-api": "^1.11.0",
     "next": "13.0.0",

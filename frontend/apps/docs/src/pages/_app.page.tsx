@@ -1,4 +1,4 @@
-import themes from '@onefootprint/themes';
+import themes from '@onefootprint/design-tokens';
 import { DesignSystemProvider, media } from '@onefootprint/ui';
 import { QueryClientProvider } from '@tanstack/react-query';
 import React, { useEffect, useState } from 'react';

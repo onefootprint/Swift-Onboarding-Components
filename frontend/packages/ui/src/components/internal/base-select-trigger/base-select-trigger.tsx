@@ -1,5 +1,5 @@
+import { BorderColor } from '@onefootprint/design-tokens';
 import { IcoChevronDown16 } from '@onefootprint/icons';
-import { BorderColor } from '@onefootprint/themes';
 import { darken, rgba } from 'polished';
 import React, { forwardRef } from 'react';
 import styled, { css } from 'styled-components';

@@ -1,6 +1,6 @@
+import type { BackgroundColor, Color } from '@onefootprint/design-tokens';
+import themes from '@onefootprint/design-tokens';
 import { customRender, screen } from '@onefootprint/test-utils';
-import type { BackgroundColor, Color } from '@onefootprint/themes';
-import themes from '@onefootprint/themes';
 import React from 'react';
 
 import Badge, { BannerProps } from './banner';

@@ -1,4 +1,4 @@
-import { FontVariant } from '@onefootprint/themes';
+import { FontVariant } from '@onefootprint/design-tokens';
 import { CleaveOptions } from 'cleave.js/options';
 import React, { forwardRef, InputHTMLAttributes } from 'react';
 import styled, { css } from 'styled-components';

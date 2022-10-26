@@ -1,4 +1,4 @@
-import { UIState } from '@onefootprint/themes';
+import { UIState } from '@onefootprint/design-tokens';
 import { OnboardingStatus } from '@onefootprint/types';
 
 export const statusToPriority = {

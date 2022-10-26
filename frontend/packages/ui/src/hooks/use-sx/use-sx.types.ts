@@ -6,7 +6,7 @@ import type {
   Color,
   Elevation,
   Spacing,
-} from '@onefootprint/themes';
+} from '@onefootprint/design-tokens';
 import * as CSS from 'csstype';
 
 export type CustomStyleProps = {

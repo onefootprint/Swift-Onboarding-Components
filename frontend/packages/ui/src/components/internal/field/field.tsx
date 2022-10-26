@@ -1,4 +1,4 @@
-import { BorderColor, FontVariant } from '@onefootprint/themes';
+import { BorderColor, FontVariant } from '@onefootprint/design-tokens';
 import { CleaveOptions } from 'cleave.js/options';
 import Cleave from 'cleave.js/react';
 import { darken, rgba } from 'polished';
