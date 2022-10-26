@@ -41,7 +41,7 @@
     "dob": "Date of Birth",
     "ssn9": "SSN (Full)",
     "ssn4": "SSN (Last 4)",
-    "full_address": "Address (Full)",
+    "full_address": "Address",
     "partial_address": "Address (Country & Zip Code)",
     "email": "Email",
     "phone_number": "Phone number"

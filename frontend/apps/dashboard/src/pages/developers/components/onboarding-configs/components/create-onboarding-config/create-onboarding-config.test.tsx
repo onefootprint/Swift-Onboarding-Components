@@ -219,18 +219,11 @@ describe('<CreateDialog />', () => {
 
     describe('when selecting the address', () => {
       describe('when collecting the full address', () => {
-        it('should show the Address (full) field', async () => {
+        it('should show the Address field', async () => {
           await renderCreateDialogOnTheCollectDataSection();
 
           const addressCheckbox = screen.getByLabelText('Address');
           await userEvent.click(addressCheckbox);
-
-          await waitFor(() => {
-            expect(screen.getByLabelText('Full')).toBeInTheDocument();
-          });
-
-          const addressRadio = screen.getByLabelText('Full');
-          await userEvent.click(addressRadio);
 
           const continueButton = screen.getByRole('button', {
             name: 'Continue',
@@ -241,12 +234,13 @@ describe('<CreateDialog />', () => {
             expect(screen.getByTestId('access-form')).toBeVisible();
           });
 
-          const addressFullCheckbox = screen.getByLabelText('Address (Full)');
+          const addressFullCheckbox = screen.getByLabelText('Address');
           expect(addressFullCheckbox).toBeInTheDocument();
         });
       });
 
-      describe('when collecting the partial address', () => {
+      // TODO: https://linear.app/footprint/issue/FP-1607/improve-toggle-react-hook-form-integration
+      describe.skip('when collecting the partial address', () => {
         it('should show the Address (Country & Zip Code) field', async () => {
           await renderCreateDialogOnTheCollectDataSection();
 

@@ -68,18 +68,19 @@ const AccessForm = ({ defaultValues, onSubmit, fields }: AccessFormProps) => {
             {...register(CollectedDataOption.ssn4)}
           />
         )}
+        {/* TODO: https://linear.app/footprint/issue/FP-1607/improve-toggle-react-hook-form-integration */}
         {fields.has(CollectedDataOption.fullAddress) && (
           <Checkbox
             label={allT('collected-data-options.full_address')}
             {...register(CollectedDataOption.fullAddress)}
           />
         )}
-        {fields.has(CollectedDataOption.partialAddress) && (
+        {/* {fields.has(CollectedDataOption.partialAddress) && (
           <Checkbox
             label={allT('collected-data-options.partial_address')}
             {...register(CollectedDataOption.partialAddress)}
           />
-        )}
+        )} */}
       </CheckboxContainer>
     </form>
   );

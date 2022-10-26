@@ -19,10 +19,6 @@ export type CollectFormData = {
 
 type FormData = KycDataFormData &
   IdDocFormData & {
-    addressKind?:
-      | CollectedDataOption.fullAddress
-      | CollectedDataOption.partialAddress;
-    showAddressOptions: boolean;
     showSSNOptions: boolean;
     ssnKind?: UserDataAttribute.ssn4 | UserDataAttribute.ssn9;
   };
@@ -43,16 +39,6 @@ const CollectForm = ({ defaultValues, onSubmit }: CollectFormProps) => {
     address: defaultKycData.full_address || defaultKycData.partial_address,
   });
 
-  const getInitialAddressKind = () => {
-    if (defaultKycData.full_address) {
-      return CollectedDataOption.fullAddress;
-    }
-    if (defaultKycData.partial_address) {
-      return CollectedDataOption.partialAddress;
-    }
-    return undefined;
-  };
-
   const getInitialSSNKind = () => {
     if (defaultKycData.ssn9) {
       return UserDataAttribute.ssn9;
@@ -67,8 +53,6 @@ const CollectForm = ({ defaultValues, onSubmit }: CollectFormProps) => {
     defaultValues: {
       ...defaultKycData,
       ...defaultIdDocData,
-      addressKind: getInitialAddressKind(),
-      showAddressOptions: innerFields.address,
       showSSNOptions: innerFields.ssn,
       ssnKind: getInitialSSNKind(),
     },
@@ -78,15 +62,6 @@ const CollectForm = ({ defaultValues, onSubmit }: CollectFormProps) => {
     const { checked } = event.target;
     setInnerFields(prevState => ({ ...prevState, ssn: checked }));
     setValue('ssnKind', checked ? UserDataAttribute.ssn9 : undefined);
-  };
-
-  const handleAddressChanged = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { checked } = event.target;
-    setInnerFields(prevState => ({ ...prevState, address: checked }));
-    setValue(
-      'addressKind',
-      checked ? CollectedDataOption.fullAddress : undefined,
-    );
   };
 
   const handleBeforeSubmit = (formData: FormData) => {
@@ -99,10 +74,7 @@ const CollectForm = ({ defaultValues, onSubmit }: CollectFormProps) => {
         [CollectedDataOption.name]: formData[CollectedDataOption.name],
         [UserDataAttribute.ssn4]: formData.ssnKind === UserDataAttribute.ssn4,
         [UserDataAttribute.ssn9]: formData.ssnKind === UserDataAttribute.ssn9,
-        [CollectedDataOption.fullAddress]:
-          formData.addressKind === CollectedDataOption.fullAddress,
-        [CollectedDataOption.partialAddress]:
-          formData.addressKind === CollectedDataOption.partialAddress,
+        [CollectedDataOption.fullAddress]: true,
       },
       idDoc: {
         idDocRequired: formData.idDocRequired,
@@ -135,7 +107,8 @@ const CollectForm = ({ defaultValues, onSubmit }: CollectFormProps) => {
         />
         <Checkbox
           label={allT('collected-data-options.name')}
-          {...register('name')}
+          disabled
+          checked
         />
         <Checkbox
           label={allT('collected-data-options.dob')}
@@ -160,24 +133,9 @@ const CollectForm = ({ defaultValues, onSubmit }: CollectFormProps) => {
             />
           </RadioGroupContainer>
         </Box>
+        {/* TODO: https://linear.app/footprint/issue/FP-1696/relax-the-constraints-on-dashboard-onboarding-config-creation-collect */}
         <Box>
-          <Checkbox
-            label={t('collected-data.address')}
-            {...register('showAddressOptions')}
-            onChange={handleAddressChanged}
-          />
-          <RadioGroupContainer isExpanded={!!innerFields.address}>
-            <Radio
-              value={CollectedDataOption.fullAddress}
-              label={t('collected-data.full_address')}
-              {...register('addressKind')}
-            />
-            <Radio
-              value={CollectedDataOption.partialAddress}
-              label={t('collected-data.partial_address')}
-              {...register('addressKind')}
-            />
-          </RadioGroupContainer>
+          <Checkbox label={t('collected-data.address')} disabled checked />
         </Box>
       </CheckboxContainer>
       <StyledDivider />
