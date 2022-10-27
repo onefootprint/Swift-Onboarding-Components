@@ -25,7 +25,7 @@ export type TableProps<T> = {
   onRowClick?: (item: T) => void;
   renderActions?: () => React.ReactNode;
   renderTr: (row: TableRow<T>) => JSX.Element;
-  search?: string;
+  initialSearch?: string;
 };
 
 const Table = <T,>({
@@ -40,7 +40,7 @@ const Table = <T,>({
   onRowClick,
   renderActions,
   renderTr,
-  search,
+  initialSearch,
 }: TableProps<T>) => {
   const shouldRenderFilters = onChangeSearchText || renderActions;
   const shouldShowEmptyState = !isLoading && !items?.length;
@@ -50,7 +50,10 @@ const Table = <T,>({
   return (
     <>
       {shouldRenderFilters ? (
-        <TableFilters value={search} onChangeText={onChangeSearchText}>
+        <TableFilters
+          initialValue={initialSearch}
+          onChangeText={onChangeSearchText}
+        >
           {renderActions?.()}
         </TableFilters>
       ) : null}

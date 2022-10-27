@@ -28,10 +28,9 @@ const useSignals = () => {
   const { authHeaders } = useSessionUser();
   const userId = useUserId();
   const params = {
-    signal_note: filters.query.signal_note,
-    signal_scope: filters.query.signal_scope,
-    signal_search: filters.query.signal_search,
-    signal_severity: filters.query.signal_severity,
+    scope: filters.query.signal_scope,
+    description: filters.query.signal_description,
+    severity: filters.query.signal_severity,
   };
 
   return useQuery(

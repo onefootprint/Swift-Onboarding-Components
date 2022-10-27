@@ -57,7 +57,7 @@ const Users = () => {
         {t('header.title')}
       </Typography>
       <Table<User>
-        search={filters.fingerprint}
+        initialSearch={filters.fingerprint}
         onChangeSearchText={fingerprint => {
           setFilter({ fingerprint });
         }}

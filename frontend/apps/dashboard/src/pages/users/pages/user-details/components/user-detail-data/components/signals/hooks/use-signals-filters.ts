@@ -5,9 +5,8 @@ export type SignalDetailsQueryParams = {
 };
 
 export type SignalListQueryParams = {
-  signal_note?: string;
   signal_scope?: string;
-  signal_search?: string;
+  signal_description?: string;
   signal_severity?: string;
 };
 
@@ -16,9 +15,8 @@ export type SignalsQueryParams = SignalDetailsQueryParams &
 
 const defaultQueryParams: SignalsQueryParams = {
   signal_id: undefined,
-  signal_note: undefined,
   signal_scope: undefined,
-  signal_search: undefined,
+  signal_description: undefined,
   signal_severity: undefined,
 };
 
@@ -36,9 +34,8 @@ const useSignalFilters = () => {
     push: filters.push,
     query: {
       signal_id: filters.query.signal_id,
-      signal_note: filters.query.signal_note,
       signal_scope: filters.query.signal_scope,
-      signal_search: filters.query.signal_search,
+      signal_description: filters.query.signal_description,
       signal_severity: filters.query.signal_severity,
     },
     reset: filters.reset,

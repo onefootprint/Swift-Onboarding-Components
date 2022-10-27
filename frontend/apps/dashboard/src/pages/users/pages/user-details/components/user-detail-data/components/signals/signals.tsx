@@ -29,6 +29,10 @@ const RiskSignals = () => {
     filters.push({ signal_id: riskSignal.id });
   };
 
+  const handleSearchChange = (search: string) => {
+    filters.push({ signal_description: search });
+  };
+
   return (
     <section>
       <Header>
@@ -43,9 +47,7 @@ const RiskSignals = () => {
         getKeyForRow={(signal: RiskSignal) => signal.id}
         isLoading={isLoading}
         items={data}
-        onChangeSearchText={search => {
-          filters.push({ signal_search: search });
-        }}
+        onChangeSearchText={handleSearchChange}
         onRowClick={handleRowClick}
         renderActions={() => (
           <SignalFilters
@@ -57,7 +59,7 @@ const RiskSignals = () => {
           />
         )}
         renderTr={renderTr}
-        search={filters.query.signal_search}
+        initialSearch={filters.query.signal_description}
       />
       <SignalDetails />
     </section>

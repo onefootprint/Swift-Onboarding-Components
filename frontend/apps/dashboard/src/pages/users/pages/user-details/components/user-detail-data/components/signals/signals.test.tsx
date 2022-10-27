@@ -28,6 +28,16 @@ describe('<Signals />', () => {
     customRender(<Signals />);
   };
 
+  const renderSignalsAndWaitData = async () => {
+    renderSignals();
+
+    await waitFor(() => {
+      const table = screen.getByRole('table');
+      const isLoading = table.getAttribute('aria-busy');
+      expect(isLoading).toBe('false');
+    });
+  };
+
   describe('listing the signals', () => {
     describe('when the request fails', () => {
       beforeAll(() => {
@@ -57,13 +67,7 @@ describe('<Signals />', () => {
       });
 
       it('should show a spinner and the data within the table', async () => {
-        renderSignals();
-
-        await waitFor(() => {
-          const table = screen.getByRole('table');
-          const isLoading = table.getAttribute('aria-busy');
-          expect(isLoading).toBe('false');
-        });
+        await renderSignalsAndWaitData();
 
         const tr = screen.getByTestId('sig_ryxauTlDX8hIm3wVRmm');
         expect(tr).toBeInTheDocument();
@@ -81,7 +85,7 @@ describe('<Signals />', () => {
       });
 
       describe('when clicking on the table row', () => {
-        it('should append risk signal id and note to the url', async () => {
+        it('should append signal_id', async () => {
           const pushMockFn = jest.fn();
           useRouterSpy({
             pathname:
@@ -91,13 +95,7 @@ describe('<Signals />', () => {
             },
             push: pushMockFn,
           });
-          renderSignals();
-
-          await waitFor(() => {
-            const table = screen.getByRole('table');
-            const isLoading = table.getAttribute('aria-busy');
-            expect(isLoading).toBe('false');
-          });
+          await renderSignalsAndWaitData();
 
           const tr = screen.getByTestId('sig_ryxauTlDX8hIm3wVRmm');
           await userEvent.click(tr);
@@ -111,6 +109,204 @@ describe('<Signals />', () => {
             undefined,
             { shallow: true },
           );
+        });
+      });
+
+      describe('when filtering', () => {
+        describe('when typing on the table search', () => {
+          it('should append signal_description', async () => {
+            const pushMockFn = jest.fn();
+            useRouterSpy({
+              pathname:
+                '/users/detailusers/detail?footprint_user_id=fp_id_yCZehsWNeywHnk5JqL20u',
+              query: {
+                footprint_user_id: 'fp_id_yCZehsWNeywHnk5JqL20u',
+              },
+              push: pushMockFn,
+            });
+            await renderSignalsAndWaitData();
+
+            const search = screen.getByPlaceholderText('Search...');
+            await userEvent.type(search, 'lorem');
+            await waitFor(() => {
+              expect(pushMockFn).toHaveBeenCalledWith(
+                {
+                  query: {
+                    footprint_user_id: 'fp_id_yCZehsWNeywHnk5JqL20u',
+                    signal_description: 'lorem',
+                  },
+                },
+                undefined,
+                { shallow: true },
+              );
+            });
+          });
+        });
+
+        describe('when there is a signal_description', () => {
+          it('should display the text on the table search', async () => {
+            const pushMockFn = jest.fn();
+            useRouterSpy({
+              pathname:
+                '/users/detailusers/detail?footprint_user_id=fp_id_yCZehsWNeywHnk5JqL20u',
+              query: {
+                footprint_user_id: 'fp_id_yCZehsWNeywHnk5JqL20u',
+                signal_description: 'lorem',
+              },
+              push: pushMockFn,
+            });
+            await renderSignalsAndWaitData();
+
+            const search = screen.getByDisplayValue('lorem');
+            expect(search).toBeInTheDocument();
+          });
+        });
+
+        describe('when selecting a severity', () => {
+          it('should append a signal_severity', async () => {
+            const pushMockFn = jest.fn();
+            useRouterSpy({
+              pathname:
+                '/users/detailusers/detail?footprint_user_id=fp_id_yCZehsWNeywHnk5JqL20u',
+              query: {
+                footprint_user_id: 'fp_id_yCZehsWNeywHnk5JqL20u',
+              },
+              push: pushMockFn,
+            });
+            await renderSignalsAndWaitData();
+
+            const filterButton = screen.getByRole('button', {
+              name: 'Filters',
+            });
+            await userEvent.click(filterButton);
+
+            const dialog = screen.getByRole('dialog', { name: 'Filters' });
+            const mediumSeverityCheckbox =
+              within(dialog).getByLabelText('Medium');
+            await userEvent.click(mediumSeverityCheckbox);
+
+            const submitButton = within(dialog).getByRole('button', {
+              name: 'Apply',
+            });
+            await userEvent.click(submitButton);
+
+            expect(pushMockFn).toHaveBeenCalledWith(
+              {
+                query: {
+                  footprint_user_id: 'fp_id_yCZehsWNeywHnk5JqL20u',
+                  signal_severity: 'medium',
+                },
+              },
+              undefined,
+              { shallow: true },
+            );
+          });
+        });
+
+        describe('when selecting a scope', () => {
+          it('should append a signal_severity', async () => {
+            const pushMockFn = jest.fn();
+            useRouterSpy({
+              pathname:
+                '/users/detailusers/detail?footprint_user_id=fp_id_yCZehsWNeywHnk5JqL20u',
+              query: {
+                footprint_user_id: 'fp_id_yCZehsWNeywHnk5JqL20u',
+              },
+              push: pushMockFn,
+            });
+            await renderSignalsAndWaitData();
+
+            const filterButton = screen.getByRole('button', {
+              name: 'Filters',
+            });
+            await userEvent.click(filterButton);
+
+            const dialog = screen.getByRole('dialog', { name: 'Filters' });
+            const scope = within(dialog).getByLabelText('Email');
+            await userEvent.click(scope);
+
+            const submitButton = within(dialog).getByRole('button', {
+              name: 'Apply',
+            });
+            await userEvent.click(submitButton);
+
+            expect(pushMockFn).toHaveBeenCalledWith(
+              {
+                query: {
+                  footprint_user_id: 'fp_id_yCZehsWNeywHnk5JqL20u',
+                  signal_scope: 'email',
+                },
+              },
+              undefined,
+              { shallow: true },
+            );
+          });
+        });
+
+        describe('when there are risk signal filters in the URL', () => {
+          it('should indicate the number of filters selected', async () => {
+            const pushMockFn = jest.fn();
+            useRouterSpy({
+              pathname:
+                '/users/detailusers/detail?footprint_user_id=fp_id_yCZehsWNeywHnk5JqL20u',
+              query: {
+                signal_scope: 'email',
+                signal_severity: 'high',
+                footprint_user_id: 'fp_id_yCZehsWNeywHnk5JqL20u',
+              },
+              push: pushMockFn,
+            });
+            await renderSignalsAndWaitData();
+
+            const filterButton = screen.getByRole('button', {
+              name: 'Filters · 2',
+            });
+            expect(filterButton).toBeInTheDocument();
+          });
+        });
+
+        describe('when reseting the filters', () => {
+          it('should remove all the signal filters from the URL', async () => {
+            const pushMockFn = jest.fn();
+            useRouterSpy({
+              pathname:
+                '/users/detailusers/detail?footprint_user_id=fp_id_yCZehsWNeywHnk5JqL20u',
+              query: {
+                signal_scope: 'email',
+                signal_severity: 'high',
+                footprint_user_id: 'fp_id_yCZehsWNeywHnk5JqL20u',
+              },
+              push: pushMockFn,
+            });
+            await renderSignalsAndWaitData();
+
+            const filterButton = screen.getByRole('button', {
+              name: 'Filters · 2',
+            });
+            await userEvent.click(filterButton);
+
+            const dialog = screen.getByRole('dialog', { name: 'Filters' });
+
+            const resetButton = within(dialog).getByRole('button', {
+              name: 'Clear',
+            });
+            await userEvent.click(resetButton);
+
+            const submitButton = within(dialog).getByRole('button', {
+              name: 'Apply',
+            });
+            await userEvent.click(submitButton);
+
+            expect(pushMockFn).toHaveBeenCalledWith(
+              {
+                query: {
+                  footprint_user_id: 'fp_id_yCZehsWNeywHnk5JqL20u',
+                },
+              },
+              undefined,
+              { shallow: true },
+            );
+          });
         });
       });
     });

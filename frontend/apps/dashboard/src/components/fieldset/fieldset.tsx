@@ -1,4 +1,4 @@
-import { Typography } from '@onefootprint/ui';
+import { Grid, Typography } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
@@ -31,6 +31,12 @@ const Content = styled.div`
     display: flex;
     flex-direction: column;
     gap: ${theme.spacing[3]}px;
+
+    ${Grid.Column} {
+      display: flex;
+      flex-direction: column;
+      gap: ${theme.spacing[3]}px;
+    }
   `};
 `;
 
