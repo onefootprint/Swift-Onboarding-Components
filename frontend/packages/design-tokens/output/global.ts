@@ -1,32 +1,11 @@
 /**
  * Do not edit directly
- * Generated on Wed, 26 Oct 2022 15:44:45 GMT
+ * Generated on Thu, 27 Oct 2022 00:57:35 GMT
  */
 
-export const elevation1 = {
-  color: '#0000001f',
-  type: 'dropShadow',
-  x: 0,
-  y: 1,
-  blur: 4,
-  spread: 0,
-};
-export const elevation2 = {
-  color: '#00000024',
-  type: 'dropShadow',
-  x: 0,
-  y: 1,
-  blur: 8,
-  spread: 0,
-};
-export const elevation3 = {
-  color: '#0000002e',
-  type: 'dropShadow',
-  x: 0,
-  y: 1,
-  blur: 12,
-  spread: 0,
-};
+export const elevation1 = '0px 1px 4px rgba(0, 0, 0, 0.12156862745098039)';
+export const elevation2 = '0px 1px 8px rgba(0, 0, 0, 0.1411764705882353)';
+export const elevation3 = '0px 1px 12px rgba(0, 0, 0, 0.1803921568627451)';
 export const fontFamilyDefault = 'DM Sans';
 export const fontFamilyCode = 'Source Code Pro';
 export const typographyDisplay1 = {

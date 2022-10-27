@@ -171,7 +171,7 @@ export type BorderWidths = {
 
 export type BorderWidth = keyof BorderWidths;
 
-type Elevations = {
+export type Elevations = {
   0: string;
   1: string;
   2: string;

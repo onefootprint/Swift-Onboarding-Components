@@ -1,6 +1,6 @@
 /**
  * Do not edit directly
- * Generated on Wed, 26 Oct 2022 15:44:45 GMT
+ * Generated on Thu, 27 Oct 2022 00:57:35 GMT
  */
 
 export const primitivesBrandSleep = '#0e1438';

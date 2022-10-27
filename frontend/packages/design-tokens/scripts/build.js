@@ -1,14 +1,15 @@
 const styleDictionary = require('style-dictionary');
+const color = require('color');
 
 styleDictionary.registerTransform({
-  name: 'sizes/px',
-  type: 'value',
-  matcher: function (prop) {
-    console.log('prop', prop);
-    return ['spacing'].includes(prop.attributes.category);
-  },
-  transformer: function (prop) {
-    return parseFloat(prop.original.value) + 'px';
+  type: `value`,
+  transitive: true,
+  name: `transformHexToRgb`,
+  matcher: token => token.type === 'boxShadow',
+  transformer: token => {
+    const { value } = token;
+    const rgbaColor = color(value.color).rgb().string();
+    return `${value.x}px ${value.y}px ${value.blur}px ${rgbaColor}`;
   },
 });
 
@@ -18,11 +19,11 @@ const getDefaultConfig = theme => {
 
     platforms: {
       web: {
-        transforms: ['name/cti/camel'],
+        transforms: ['name/cti/camel', 'transformHexToRgb'],
         buildPath: `output/`,
         files: [
           {
-            destination: `${theme}.js`,
+            destination: `${theme}.ts`,
             format: 'javascript/es6',
             selector: `.${theme}-theme`,
           },

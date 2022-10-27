@@ -5,6 +5,7 @@ import * as dark from '../../output/dark';
 import borderRadius from '../shared/border-radius';
 import borderWidth from '../shared/border-width';
 import breakpoint from '../shared/breakpoint';
+import elevation from '../shared/elevation';
 import grid from '../shared/grid';
 import spacing from '../shared/spacing';
 import typography from '../shared/typography';
@@ -20,6 +21,7 @@ const theme: DefaultTheme = {
   borderWidth,
   zIndex,
   codeHighlight,
+  elevation,
   backgroundColor: {
     transparent: 'transparent',
     primary: dark.primitivesGray0,
@@ -56,12 +58,6 @@ const theme: DefaultTheme = {
     success: dark.primitivesGreen600,
     warning: dark.primitivesYellow800,
     neutral: dark.primitivesGray800,
-  },
-  elevation: {
-    0: 'none',
-    1: '0px 1px 4px rgba(0, 0, 0, 0.12)',
-    2: '0px 1px 8px rgba(0, 0, 0, 0.14)',
-    3: '0px 1px 12px rgba(0, 0, 0, 0.18)',
   },
   // TODO: Remove
   // https://linear.app/footprint/issue/FP-1728/bifrost-customization-remove-overlay-from-theme

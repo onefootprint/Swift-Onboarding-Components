@@ -15,6 +15,8 @@
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
   },
   "devDependencies": {
+    "@types/color": "^3.0.3",
+    "color": "^4.2.3",
     "style-dictionary": "^3.7.1",
     "token-transformer": "^0.0.27",
     "typescript": "4.8.4"
