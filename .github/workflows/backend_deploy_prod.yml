@@ -59,7 +59,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         with:
-          ref: ${{ needs.extract_commit_hash.outputs.commitHashToDeploy }}'
+          ref: ${{ needs.extract_commit_hash.outputs.commitHashToDeploy }}
       - name: Create Sentry release
         uses: getsentry/action-release@v1
         env:
