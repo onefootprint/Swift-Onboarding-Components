@@ -34,6 +34,11 @@ on:
         type: string
         required: false
 
+      commitHash:
+        description: 'hash of commit that we will be deploying'
+        type: string
+        required: false
+
     outputs:
       url:
         description: 'stack url'
@@ -62,6 +67,8 @@ jobs:
       componentVersion: '${{ steps.constants.outputs.componentVersion }}'
     steps:
       - uses: actions/checkout@v2
+        with:
+          ref: ${{ inputs.commitHash }}'
       - name: Extract commit hash
         shell: bash
         run: |
@@ -80,6 +87,8 @@ jobs:
     if: success()
     steps:
       - uses: actions/checkout@v2
+        with:
+          ref: ${{ inputs.commitHash }}'
 
       - name: Cache docker cargo cache
         uses: actions/cache@v3
@@ -136,6 +145,8 @@ jobs:
     if: success()
     steps:
       - uses: actions/checkout@v2
+        with:
+          ref: ${{ inputs.commitHash }}'
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -182,6 +193,8 @@ jobs:
     if: success()
     steps:
       - uses: actions/checkout@v2
+        with:
+          ref: ${{ inputs.commitHash }}'
 
       # pulumi setup
       - uses: actions/setup-node@v2

@@ -40,6 +40,7 @@ jobs:
       environment: production
       baseStackName: prod
       stackName: prod
+      commitHash: ${{ needs.extract_commit_hash.outputs.commitHashToDeploy }}'
     secrets:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_REGION: ${{ secrets.AWS_REGION }}
@@ -57,6 +58,8 @@ jobs:
     environment: production
     steps:
       - uses: actions/checkout@v2
+        with:
+          ref: ${{ needs.extract_commit_hash.outputs.commitHashToDeploy }}'
       - name: Create Sentry release
         uses: getsentry/action-release@v1
         env:
