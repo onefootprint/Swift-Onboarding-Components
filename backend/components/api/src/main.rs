@@ -55,7 +55,6 @@ async fn main() -> std::io::Result<()> {
     });
 
     std::env::set_var("RUST_BACKTRACE", "1");
-
     let state = State::init_or_die(config.clone()).await;
 
     log::info!("starting server on port {}", config.port);
