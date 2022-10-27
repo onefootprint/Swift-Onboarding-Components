@@ -21,10 +21,9 @@ jobs:
      steps:
        - name: Print
          run: |
-           echo "${{github.event}}"
-           echo "${{ toJson(github.event) }}"
-           echo "${{github.event_name}}"
            echo "${{ toJson(github) }}"
+           echo "${{ github.event_name }}"
+           echo "${{ github.workflow_run.head_commit.id || github.sha }}"
 
   deploy_stack_prod:
     name: Deploy stack
