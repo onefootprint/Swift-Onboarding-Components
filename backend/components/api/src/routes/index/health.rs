@@ -8,21 +8,33 @@ use newtypes::{EncryptedVaultPrivateKey, SealedVaultBytes};
 use paperclip::actix::{api_v2_operation, get, web, Apiv2Schema};
 use serde::{Deserialize, Serialize};
 
-#[api_v2_operation(tags(Private), description = "Returns health of services running")]
-#[tracing::instrument(name = "health", skip(state))]
+#[api_v2_operation(tags(Private), description = "Returns 200 if the API server is running")]
 #[get("/health")]
-async fn handler(state: web::Data<State>) -> StringResponse {
-    // let before_enclave = chrono::Utc::now().timestamp_millis();
-    // let _res = state.enclave_client.pong().await?;
-    // let after_enclave = chrono::Utc::now().timestamp_millis();
+async fn handler() -> StringResponse {
+    // The strategy here is to only measure the health of the API server process, not its dependencies.
+
+    // Be very careful what checks you add to this endpoint. A failed response here will cause the API
+    // server process to be restarted, which is usually more harmful than a single dependency
+    // being down.
+    Ok("".to_string())
+}
+
+#[api_v2_operation(tags(Private), description = "Returns health of services running")]
+#[tracing::instrument(name = "status", skip(state))]
+#[get("/status")]
+async fn status(state: web::Data<State>) -> StringResponse {
+    let before_enclave = chrono::Utc::now().timestamp_millis();
+    state.enclave_client.pong().await?;
+    let after_enclave = chrono::Utc::now().timestamp_millis();
 
     let before_db = chrono::Utc::now().timestamp_millis();
     db::health_check(&state.db_pool).await?;
     let after_db = chrono::Utc::now().timestamp_millis();
 
     Ok(format!(
-        "Enclave: not checking\nDB: healthy RT {}ms",
-        after_db - before_db
+        "Enclave: {}ms\nDB: healthy RT {}ms",
+        after_enclave - before_enclave,
+        after_db - before_db,
     ))
 }
 
