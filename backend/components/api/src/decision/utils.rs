@@ -1,10 +1,16 @@
 use db::{
-    models::{audit_trail::AuditTrail, onboarding_decision::OnboardingDecision, risk_signal::RiskSignal},
+    models::{
+        audit_trail::AuditTrail,
+        onboarding_decision::{NewOnboardingDecision, OnboardingDecision},
+        risk_signal::RiskSignal,
+        verification_request::VerificationRequest,
+        verification_result::VerificationResult,
+    },
     TxnPgConnection,
 };
 use newtypes::{
     AuditTrailEvent, ComplianceStatus, FootprintReasonCode, OnboardingId, OnboardingStatus, SignalScope,
-    TenantId, UserVaultId, Vendor, VerificationInfo, VerificationInfoStatus, VerificationStatus,
+    TenantId, Vendor, VerificationInfo, VerificationInfoStatus, VerificationStatus,
 };
 
 use crate::{
@@ -12,6 +18,8 @@ use crate::{
     utils::user_vault_wrapper::UserVaultWrapper,
     State,
 };
+
+use super::verification_request::build_request;
 
 // Logic to figure out test status from some of the identity data we collected during onboarding
 // As of 2022-10-15 we do this by looking at the phone number
@@ -46,7 +54,7 @@ pub(super) async fn get_desired_status_for_testing(
 
 pub(super) fn create_test_fixture_data(
     conn: &mut TxnPgConnection,
-    user_vault_id: UserVaultId,
+    uvw: &UserVaultWrapper,
     tenant_id: TenantId,
     ob_id: OnboardingId,
     desired_status: OnboardingStatus,
@@ -57,15 +65,49 @@ pub(super) fn create_test_fixture_data(
         OnboardingStatus::ManualReview => VerificationStatus::ManualReview,
         _ => VerificationStatus::Failed,
     };
-    let decision = OnboardingDecision::create(
-        conn,
-        user_vault_id.clone(),
-        ob_id,
-        crate::GIT_HASH.to_string(),
-        None,
-        decision_status,
-        ComplianceStatus::Compliant,
-    )?;
+    // Create some mock verification request and results
+    let request = build_request::build_verification_request(uvw, ob_id.clone(), Vendor::Idology);
+    let request = VerificationRequest::bulk_save(conn, vec![request])?
+        .pop()
+        .ok_or(ApiError::ResourceNotFound)?;
+    let raw_response = serde_json::json!({
+        "response": {
+            "id-number": "3010453",
+            "summary-result": {
+                "key": "id.success",
+                "message": "Pass"
+            },
+            "results": {
+                "key": "result.match",
+                "message": "ID Located"
+            },
+            "qualifiers": {
+                "qualifier": [
+                    {
+                        "key": "idphone.wireless",
+                        "message": "Possible Wireless Number"
+                    },
+                    {
+                        "key": "resultcode.corporate.email.domain",
+                        "message": "Indicates that the domain of the email address has been identified as belonging to a corporate entity.",
+                    },
+                ]
+            }
+        }
+    });
+    // NOTE: the raw fixture response we create here won't necessarily match the risk signals we create
+    let result = VerificationResult::create(conn, request.id, raw_response)?;
+    // Create the decision itself
+    let new_decision = NewOnboardingDecision {
+        user_vault_id: uvw.user_vault.id.clone(),
+        onboarding_id: ob_id,
+        logic_git_hash: crate::GIT_HASH.to_string(),
+        tenant_user_id: None,
+        verification_status: decision_status,
+        compliance_status: ComplianceStatus::Compliant,
+        result_ids: vec![result.id],
+    };
+    let decision = OnboardingDecision::create(conn, new_decision)?;
     // Create some risk signals
     let reason_codes = match desired_status {
         OnboardingStatus::Failed => vec![
@@ -119,7 +161,7 @@ pub(super) fn create_test_fixture_data(
         AuditTrail::create(
             conn,
             AuditTrailEvent::Verification(e),
-            user_vault_id.clone(),
+            uvw.user_vault.id.clone(),
             Some(tenant_id.clone()),
             None,
         )
