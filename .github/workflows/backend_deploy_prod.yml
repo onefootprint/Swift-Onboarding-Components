@@ -15,6 +15,17 @@ concurrency:
   group: ${{ github.workflow }}-deploy-prod
 
 jobs:
+  print_some_things:
+     runs-on: ubuntu-latest
+     name: Print some things
+     steps:
+       - name: Print
+         run: |
+           echo "${{github.event}}"
+           echo "${{ toJson(github.event) }}"
+           echo "${{github.event_name}}"
+           echo "${{ toJson(github) }}"
+
   deploy_stack_prod:
     name: Deploy stack
     if: (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success') || github.event_name == 'workflow_dispatch'
