@@ -465,8 +465,33 @@
       "header": {
         "title": "Settings"
       },
-      "business-profile": {},
-      "team-roles": {}
+      "business-profile": {
+        "header": {
+          "title": "Business profile",
+          "subtitle": "Manage your business details"
+        },
+        "logo": {
+          "alt": "Company logo",
+          "change-logo": "Change logo"
+        },
+        "company": {
+          "name": "Company name",
+          "address": "Address",
+          "edit": "Edit"
+        }
+      },
+      "team-roles": {
+        "header": {
+          "title": "Team & Roles",
+          "subtitle": "Manage who is a member of your team and their roles",
+          "invite-teammates": "Invite teammates",
+          "create-role": "Create role"
+        },
+        "tabs": {
+          "people": "People",
+          "access-control": "Access control"
+        }
+      }
     }
   }
 }

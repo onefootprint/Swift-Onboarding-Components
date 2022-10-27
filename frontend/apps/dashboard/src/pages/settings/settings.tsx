@@ -20,7 +20,7 @@ const Settings = () => {
           {t('header.title')}
         </Typography>
       </Header>
-      <Box sx={{ marginBottom: 9 }}>
+      <Box sx={{ marginBottom: 10 }}>
         <BusinessProfile />
       </Box>
       <Box>
