@@ -5,7 +5,6 @@ use crate::{
 };
 
 use db::models::{onboarding::Onboarding, verification_request::VerificationRequest};
-use idv::VendorResponse;
 use newtypes::{OnboardingStatus, TenantId, UserVaultId, Vendor};
 
 use super::*;
@@ -83,7 +82,10 @@ pub async fn run(
     Ok(())
 }
 
-async fn make_idv_request(state: &State, request: VerificationRequest) -> Result<VendorResponse, ApiError> {
+async fn make_idv_request(
+    state: &State,
+    request: VerificationRequest,
+) -> Result<vendor_result::VendorResult, ApiError> {
     let request_id = request.id.clone();
 
     // TODO: could have different logic for different vendors?
@@ -95,7 +97,15 @@ async fn make_idv_request(state: &State, request: VerificationRequest) -> Result
     // TODO: handle collect doc - remove?
     let vendor_response = verification_request::make_request::send_idv_request(state, request, data).await?;
 
-    verification_result::save_verification_result(state, request_id, vendor_response.clone()).await?;
+    let verification_result =
+        verification_result::save_verification_result(state, request_id.clone(), vendor_response.clone())
+            .await?;
 
-    Ok(vendor_response)
+    let result = vendor_result::VendorResult {
+        response: vendor_response,
+        verification_result_id: verification_result.id,
+        verification_request_id: request_id,
+    };
+
+    Ok(result)
 }

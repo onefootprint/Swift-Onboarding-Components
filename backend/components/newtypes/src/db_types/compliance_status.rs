@@ -24,12 +24,19 @@ use strum_macros::{AsRefStr, Display, EnumIter, EnumString};
     FromSqlRow,
     AsRefStr,
     JsonSchema,
+    Default,
 )]
 #[strum(serialize_all = "snake_case")]
 #[serde(rename_all = "snake_case")]
 #[diesel(sql_type = Text)]
 pub enum ComplianceStatus {
-    Alerts,
-    Compliant,
+    // "we screened the user and it came back with no red flags"
+    NoFlagsFound,
+    // "potential compliance issue"
+    NeedsReview,
+    // "this check wasn't requested to be performed or it's not functionality built"
+    // 2022-10-26 This is the default value until we start screen with ExpectID PA or other vendors
+    #[default]
+    NotApplicable,
 }
 crate::util::impl_enum_str_diesel!(ComplianceStatus);

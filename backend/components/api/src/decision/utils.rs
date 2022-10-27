@@ -104,10 +104,11 @@ pub(super) fn create_test_fixture_data(
         logic_git_hash: crate::GIT_HASH.to_string(),
         tenant_user_id: None,
         verification_status: decision_status,
-        compliance_status: ComplianceStatus::Compliant,
+        compliance_status: ComplianceStatus::NoFlagsFound,
         result_ids: vec![result.id],
     };
     let decision = OnboardingDecision::create(conn, new_decision)?;
+
     // Create some risk signals
     let reason_codes = match desired_status {
         OnboardingStatus::Failed => vec![

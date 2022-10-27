@@ -44,5 +44,6 @@ pub mod engine;
 pub(self) mod features;
 pub mod risk;
 pub(self) mod utils;
+pub mod vendor_result;
 pub mod verification_request;
 pub(self) mod verification_result;

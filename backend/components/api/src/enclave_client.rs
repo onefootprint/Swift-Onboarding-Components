@@ -65,6 +65,7 @@ impl EnclaveClient {
     }
 
     /// play ping-pong
+    #[allow(dead_code)]
     pub async fn pong(&self) -> Result<String, EnclaveError> {
         let mut conn = self.pool.get().await?;
         let req = enclave_proxy::RpcRequest::new(RpcPayload::Ping("test".into()));

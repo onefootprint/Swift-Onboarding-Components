@@ -2,7 +2,7 @@ use newtypes::{OnboardingStatus, ReasonCode};
 use std::str::FromStr;
 
 // Given a raw response, deserialize
-pub(super) fn parse_response(value: serde_json::Value) -> Result<IDologyResponse, super::Error> {
+pub fn parse_response(value: serde_json::Value) -> Result<IDologyResponse, super::Error> {
     let response: IDologyResponse = serde_json::value::from_value(value)?;
     Ok(response)
 }

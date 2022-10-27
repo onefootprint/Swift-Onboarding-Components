@@ -12,7 +12,6 @@ use crate::util::impl_enum_str_diesel;
     Display,
     Clone,
     Copy,
-    Hash,
     Deserialize,
     Serialize,
     Apiv2Schema,

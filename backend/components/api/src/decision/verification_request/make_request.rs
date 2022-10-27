@@ -18,6 +18,5 @@ pub async fn send_idv_request(
         _ => return Err(ApiError::NotImplemented),
     };
 
-    // Process the response from the IDV vendor
     Ok(result)
 }
