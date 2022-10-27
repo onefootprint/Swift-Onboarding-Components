@@ -1,5 +1,5 @@
-import type { Elevations } from '../types';
 import { elevation1, elevation2, elevation3 } from '../../output/global';
+import type { Elevations } from '../types';
 
 const elevations: Elevations = {
   0: 'none',

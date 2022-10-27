@@ -8,10 +8,12 @@
   "scripts": {
     "lint": "eslint src --fix",
     "lint:fix": "eslint --fix \"**/*.{ts,tsx,md}\"",
+    "format:fix": "prettier --write \"./**/*.{ts,tsx,md}\"",
     "typecheck": "yarn tsc --noEmit",
     "generate:icos": "node ./src/scripts/icos/generate.js",
     "generate:flags": "node ./src/scripts/flags/generate.js",
-    "generate": "yarn generate:icos && yarn generate:flags && prettier --write \"./**/*.{ts,tsx,md}\" && eslint --fix \"./**/*.{ts,tsx,md}\"",
+    "generate": "yarn generate:icos && yarn generate:flags",
+    "postgenerate": "yarn format:fix && yarn lint:fix",
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
   },
   "devDependencies": {

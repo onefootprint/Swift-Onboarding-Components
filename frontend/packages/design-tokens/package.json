@@ -6,17 +6,25 @@
   "types": "./src/index.ts",
   "license": "MIT",
   "scripts": {
-    "generate:buttons": "token-transformer figma/components/buttons.json tokens/buttons.json",
-    "generate:globals": "token-transformer figma/global.json tokens/global.json",
-    "generate:light": "token-transformer figma/light.json tokens/light.json",
-    "generate:dark": "token-transformer figma/dark.json tokens/dark.json",
-    "generate:style": "node scripts/build.js",
+    "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
+    "format:fix": "prettier --write \"./**/*.{ts,tsx,md}\"",
+    "generate:buttons": "token-transformer src/figma/components/buttons.json src/tokens/buttons.json",
+    "generate:dark": "token-transformer src/figma/dark.json src/tokens/dark.json",
+    "generate:globals": "token-transformer src/figma/global.json src/tokens/global.json",
+    "generate:light": "token-transformer src/figma/light.json src/tokens/light.json",
+    "generate:style": "node src/scripts/build.js",
     "generate": "yarn generate:globals && yarn generate:light && yarn generate:dark && yarn generate:style",
-    "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
+    "lint:fix": "eslint --fix \"**/*.{ts,tsx,md}\"",
+    "lint": "eslint src --fix",
+    "postgenerate": "yarn format:fix && yarn lint:fix",
+    "typecheck": "yarn tsc --noEmit"
   },
   "devDependencies": {
     "@types/color": "^3.0.3",
     "color": "^4.2.3",
+    "csstype": "^3.1.1",
+    "eslint-config-footprint": "*",
+    "polished": "^4.2.2",
     "style-dictionary": "^3.7.1",
     "token-transformer": "^0.0.27",
     "typescript": "4.8.4"

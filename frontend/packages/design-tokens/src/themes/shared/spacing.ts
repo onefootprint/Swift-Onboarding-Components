@@ -1,5 +1,5 @@
-import type { Spacings } from '../types';
 import * as globals from '../../output/global';
+import type { Spacings } from '../types';
 
 const spacings: Spacings = {
   0: globals.spacing0,

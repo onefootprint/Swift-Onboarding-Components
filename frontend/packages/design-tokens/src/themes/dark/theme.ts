@@ -1,7 +1,7 @@
 import { rgba } from 'polished';
 import type { DefaultTheme } from 'styled-components';
-import * as dark from '../../output/dark';
 
+import * as dark from '../../output/dark';
 import borderRadius from '../shared/border-radius';
 import borderWidth from '../shared/border-width';
 import breakpoint from '../shared/breakpoint';

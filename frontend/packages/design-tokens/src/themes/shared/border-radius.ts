@@ -1,5 +1,5 @@
-import type { BorderRadiuses } from '../types';
 import * as globals from '../../output/global';
+import type { BorderRadiuses } from '../types';
 
 const borderRadius: BorderRadiuses = {
   none: 0,

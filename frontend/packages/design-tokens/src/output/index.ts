@@ -1,5 +1,5 @@
 import * as dark from './dark';
-import * as light from './light';
 import * as global from './global';
+import * as light from './light';
 
-export { dark, light, global };
+export { dark, global, light };
