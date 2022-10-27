@@ -109,7 +109,6 @@ jobs:
         run: |
           make api-release
           account="$(aws sts get-caller-identity --query "Account" --output text)"
-          branch="$(echo ${{ github.head_ref || github.ref_name }} | sed -r 's/\//-/g' | sed -r 's/_/-/g')"
           componentVersion="${{ needs.extract_commit.outputs.componentVersion }}"
           echo "using account ${account}"
           echo "create image tagged as ${componentVersion}"
@@ -155,7 +154,6 @@ jobs:
           git --version
           make build-eif
           account="$(aws sts get-caller-identity --query "Account" --output text)"
-          branch="$(echo ${{ github.head_ref || github.ref_name }} | sed -r 's/\//-/g' | sed -r 's/_/-/g')"
           componentVersion="${{ needs.extract_commit.outputs.componentVersion }}"
           echo "using account ${account}"
           echo "create image tagged as ${componentVersion}"
@@ -247,8 +245,6 @@ jobs:
           sub=$(pulumi config --stack footprint/${{ inputs.stackName }} get --path constants.domain.prefix)
           base=$(pulumi config --stack footprint/${{ inputs.stackName }} get --path constants.domain.base)
           url="${sub}${base}"
-          branch="$(echo ${{ github.head_ref || github.ref_name }} | sed -r 's/\//-/g' | sed -r 's/_/-/g')"
-          version="${branch}-$(git rev-parse --short HEAD)"
           echo "##[set-output name=url;]$(echo ${url})"
         id: constants
         env:

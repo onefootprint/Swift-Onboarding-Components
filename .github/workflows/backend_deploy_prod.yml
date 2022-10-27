@@ -15,19 +15,26 @@ concurrency:
   group: ${{ github.workflow }}-deploy-prod
 
 jobs:
-  print_some_things:
-     runs-on: ubuntu-latest
-     name: Print some things
-     steps:
-       - name: Print
-         run: |
-           echo "${{ toJson(github) }}"
-           echo "${{ github.event_name }}"
-           echo "${{ github.workflow_run.head_commit.id || github.sha }}"
+  extract_commit_hash:
+    runs-on: ubuntu-latest
+    if: (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success') || github.event_name == 'workflow_dispatch'
+    name: Compute commit hash
+    outputs:
+      commitHashToDeploy: '${{ steps.constants.outputs.commitHashToDeploy }}'
+    steps:
+      - name: Hash
+        shell: bash
+        id: constants
+        run: |
+          echo "commit hash from workflow_run ${{ github.event.workflow_run.head_commit.id }}"
+          echo "commit hash over branch HEAD ${{ github.sha }}"
+          commit_hash="${{ github.event.workflow_run.head_commit.id || github.sha }}"
+          echo "##[set-output name=commitHashToDeploy;]$(echo ${commit_hash})"
 
   deploy_stack_prod:
     name: Deploy stack
-    if: (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success') || github.event_name == 'workflow_dispatch'
+    needs: [extract_commit_hash]
+    if: success()
     uses: ./.github/workflows/backend_build_and_deploy.yml
     with:
       environment: production
@@ -45,7 +52,8 @@ jobs:
   sentry_release:
     name: 'Sentry Release Integration'
     runs-on: ubuntu-latest
-    needs: [deploy_stack_prod]
+    if: success()
+    needs: [extract_commit_hash, deploy_stack_prod]
     environment: production
     steps:
       - uses: actions/checkout@v2
