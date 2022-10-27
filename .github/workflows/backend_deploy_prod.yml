@@ -16,6 +16,10 @@ concurrency:
 
 jobs:
   extract_commit_hash:
+    # Since the prod deploy job can be triggered by either a successful prod deploy or a manual trigger,
+    # we have to extract out the commit hash that is meant to be deployed by each job run.
+    # The special case is when the prod deploy is triggered by a successful dev deploy: we look at
+    # the commit that was used to run the successful dev deploy.
     runs-on: ubuntu-latest
     if: (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success') || github.event_name == 'workflow_dispatch'
     name: Compute commit hash
