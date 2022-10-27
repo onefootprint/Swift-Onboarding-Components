@@ -1,7 +1,7 @@
 import { rgba } from 'polished';
 import type { DefaultTheme } from 'styled-components';
 
-import * as dark from '../../output/dark';
+import * as t from '../../output/light';
 import borderRadius from '../shared/border-radius';
 import borderWidth from '../shared/border-width';
 import breakpoint from '../shared/breakpoint';
@@ -24,50 +24,110 @@ const theme: DefaultTheme = {
   elevation,
   backgroundColor: {
     transparent: 'transparent',
-    primary: dark.primitivesGray0,
-    secondary: dark.primitivesGray50,
-    tertiary: dark.primitivesBrandSleep,
-    quaternary: dark.primitivesBrandThink,
-    quinary: dark.primitivesBrandGo,
-    senary: dark.primitivesGray100,
-    accent: dark.primitivesPurple500,
-    error: dark.primitivesRed50,
-    info: dark.primitivesBlue50,
-    success: dark.primitivesGreen50,
-    warning: dark.primitivesYellow50,
-    neutral: dark.primitivesGray50,
+    primary: t.primitivesGray0,
+    secondary: t.primitivesGray50,
+    tertiary: t.primitivesBrandSleep,
+    quaternary: t.primitivesBrandThink,
+    quinary: t.primitivesBrandGo,
+    senary: t.primitivesGray100,
+    accent: t.primitivesPurple500,
+    error: t.primitivesRed50,
+    info: t.primitivesBlue50,
+    success: t.primitivesGreen50,
+    warning: t.primitivesYellow50,
+    neutral: t.primitivesGray50,
   },
   borderColor: {
     transparent: 'transparent',
-    primary: dark.primitivesGray150,
-    secondary: dark.primitivesPurple500,
-    tertiary: dark.primitivesGray100,
-    error: dark.primitivesRed500,
+    primary: t.primitivesGray150,
+    secondary: t.primitivesPurple500,
+    tertiary: t.primitivesGray100,
+    error: t.primitivesRed500,
   },
   color: {
-    primary: dark.primitivesGray1000,
-    secondary: dark.primitivesGray800,
-    tertiary: dark.primitivesGray500,
-    quaternary: dark.primitivesGray400,
-    quinary: dark.primitivesGray0,
-    senary: dark.primitivesBrandThink,
-    septenary: dark.primitivesBrandGo,
-    accent: dark.primitivesPurple500,
-    error: dark.primitivesRed600,
-    info: dark.primitivesBlue600,
-    success: dark.primitivesGreen600,
-    warning: dark.primitivesYellow800,
-    neutral: dark.primitivesGray800,
+    primary: t.primitivesGray1000,
+    secondary: t.primitivesGray800,
+    tertiary: t.primitivesGray500,
+    quaternary: t.primitivesGray400,
+    quinary: t.primitivesGray0,
+    senary: t.primitivesBrandThink,
+    septenary: t.primitivesBrandGo,
+    accent: t.primitivesPurple500,
+    error: t.primitivesRed600,
+    info: t.primitivesBlue600,
+    success: t.primitivesGreen600,
+    warning: t.primitivesYellow800,
+    neutral: t.primitivesGray800,
+  },
+  components: {
+    linkButton: {
+      variant: {
+        default: {
+          color: {
+            text: {
+              initial: t.linkButtonDefaultInitialText,
+              active: t.linkButtonDefaultActiveText,
+              hover: t.linkButtonDefaultHoverText,
+              disabled: t.linkButtonDefaultDisabledText,
+            },
+            icon: {
+              initial: t.linkButtonDefaultInitialIcon,
+              active: t.linkButtonDefaultActiveIcon,
+              hover: t.linkButtonDefaultHoverIcon,
+              disabled: t.linkButtonDefaultDisabledIcon,
+            },
+          },
+        },
+        destructive: {
+          color: {
+            text: {
+              initial: t.linkButtonDestructiveInitialText,
+              active: t.linkButtonDestructiveActiveText,
+              hover: t.linkButtonDestructiveHoverText,
+              disabled: t.linkButtonDestructiveDisabledText,
+            },
+            icon: {
+              initial: t.linkButtonDestructiveInitialIcon,
+              active: t.linkButtonDestructiveActiveIcon,
+              hover: t.linkButtonDestructiveHoverIcon,
+              disabled: t.linkButtonDestructiveDisabledIcon,
+            },
+          },
+        },
+      },
+      size: {
+        default: {
+          height: t.linkButtonSizingDefault,
+          typography: t.linkButtonTypographyDefault,
+        },
+        compact: {
+          height: t.linkButtonSizingCompact,
+          typography: t.linkButtonTypographyCompact,
+        },
+        tiny: {
+          height: t.linkButtonSizingTiny,
+          typography: t.linkButtonTypographyTiny,
+        },
+        xTiny: {
+          height: t.linkButtonSizingXTiny,
+          typography: t.linkButtonTypographyXTiny,
+        },
+        xxTiny: {
+          height: t.linkButtonSizingXxTiny,
+          typography: t.linkButtonTypographyXxTiny,
+        },
+      },
+    },
   },
   // TODO: Remove
   // https://linear.app/footprint/issue/FP-1728/bifrost-customization-remove-overlay-from-theme
   overlay: {
-    'lighten-1': rgba(dark.primitivesGray0, 0.14),
-    'lighten-2': rgba(dark.primitivesGray0, 0.18),
-    'darken-1': rgba(dark.primitivesGray1000, 0.04),
-    'darken-2': rgba(dark.primitivesGray1000, 0.08),
-    'error-1': rgba(dark.primitivesRed500, 0.07),
-    'error-2': rgba(dark.primitivesRed500, 0.15),
+    'lighten-1': rgba(t.primitivesGray0, 0.14),
+    'lighten-2': rgba(t.primitivesGray0, 0.18),
+    'darken-1': rgba(t.primitivesGray1000, 0.04),
+    'darken-2': rgba(t.primitivesGray1000, 0.08),
+    'error-1': rgba(t.primitivesRed500, 0.07),
+    'error-2': rgba(t.primitivesRed500, 0.15),
   },
 };
 

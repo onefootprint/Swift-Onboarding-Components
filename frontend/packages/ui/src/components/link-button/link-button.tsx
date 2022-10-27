@@ -3,8 +3,7 @@ import React, { forwardRef, HTMLAttributeAnchorTarget } from 'react';
 import styled, { css } from 'styled-components';
 
 import useSX, { SXStyleProps, SXStyles } from '../../hooks/use-sx';
-import { createFontStyles } from '../../utils/mixins';
-import { fontSize } from './link-button.constants';
+import { createTypography } from '../../utils/mixins';
 import type { LinkButtonSize, LinkButtonVariant } from './link-button.types';
 
 type IconPosition = 'left' | 'right';
@@ -58,19 +57,22 @@ const LinkButton = forwardRef<HTMLAnchorElement, LinkButtonProps>(
     );
     return (
       <LinkButtonStyled
-        size={size}
-        ref={ref}
-        variant={variant}
-        disabled={disabled}
         aria-label={ariaLabel}
+        className="fp-link-button"
+        data-icon-position={iconPosition}
+        data-size={size}
         data-testid={testID}
+        data-variant={variant}
+        disabled={disabled}
         href={!disabled ? href : undefined}
         onClick={!disabled ? onClick : undefined}
-        target={target}
+        ref={ref}
         rel={target === '_blank' ? 'noopener noreferrer' : undefined}
+        size={size}
         sx={sxStyles}
-        iconPosition={iconPosition}
+        target={target}
         type={href ? undefined : type}
+        variant={variant}
         // TODO: https://linear.app/footprint/issue/FP-1479/split-linkbutton-and-link-component
         // @ts-ignore
         form={href ? undefined : form}
@@ -88,7 +90,6 @@ type LinkButtonStyleProps = Pick<LinkButtonProps, 'href'> & {
   variant: LinkButtonVariant;
   disabled: boolean;
   sx?: SXStyles;
-  iconPosition: IconPosition;
 };
 
 export const LinkButtonStyled = styled.a.attrs<{
@@ -97,45 +98,55 @@ export const LinkButtonStyled = styled.a.attrs<{
   variant: LinkButtonVariant;
   disabled: boolean;
   sx: SXStyles;
-  iconPosition: IconPosition;
 }>(({ href }) => ({
   as: href ? 'a' : 'button',
 }))<LinkButtonStyleProps>`
-  ${({ theme, size, variant, disabled, sx, iconPosition }) => css`
-    ${createFontStyles(fontSize[size])};
-    align-items: center;
-    background: transparent;
-    border: none;
-    color: ${theme.color[variant === 'default' ? 'accent' : 'error']};
-    cursor: ${disabled ? 'auto' : 'pointer'};
-    display: inline-flex;
-    margin: 0;
-    padding: 0;
-    text-decoration: none;
-    ${sx};
+  ${({ theme, size, variant, disabled, sx }) => {
+    const {
+      components: { linkButton },
+    } = theme;
 
-    &:hover {
-      opacity: 0.7;
-    }
+    return css`
+      ${createTypography(linkButton.size[size].typography)};
+      align-items: center;
+      background: transparent;
+      border: none;
+      color: ${linkButton.variant[variant].color.text.initial};
+      cursor: ${disabled ? 'auto' : 'pointer'};
+      display: inline-flex;
+      height: ${linkButton.size[size].height}px;
+      margin: 0;
+      padding: 0;
+      text-decoration: none;
+      ${sx};
 
-    &:active {
-      opacity: 0.85;
-    }
+      &:hover,
+      &:hover path {
+        color: ${linkButton.variant[variant].color.text.hover};
+        fill: ${linkButton.variant[variant].color.text.hover};
+      }
 
-    &:disabled {
-      opacity: 0.45;
-    }
+      &:active,
+      &:active path {
+        color: ${linkButton.variant[variant].color.text.active};
+        fill: ${linkButton.variant[variant].color.text.active};
+      }
 
-    svg {
-      ${iconPosition === 'left'
-        ? css`
-            margin-right: ${theme.spacing[2]}px;
-          `
-        : css`
-            margin-left: ${theme.spacing[2]}px;
-          `}
-    }
-  `}
+      &:disabled,
+      &:disabled path {
+        color: ${linkButton.variant[variant].color.text.disabled};
+        fill: ${linkButton.variant[variant].color.text.disabled};
+      }
+
+      &[data-icon-position='left'] svg {
+        margin-right: ${theme.spacing[2]}px;
+      }
+
+      &[data-icon-position='right'] svg {
+        margin-left: ${theme.spacing[2]}px;
+      }
+    `;
+  }}
 `;
 
 export default LinkButton;

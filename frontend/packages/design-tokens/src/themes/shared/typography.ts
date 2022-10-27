@@ -1,4 +1,4 @@
-import * as t from '../../output/global';
+import * as t from '../../output/light';
 import type { Typographies } from '../types';
 
 const typographies: Typographies = {
@@ -93,16 +93,28 @@ const typographies: Typographies = {
     fontWeight: t.typographyLabel4.fontWeight,
   },
   'caption-1': {
-    fontSize: t.typographyCaption1Regular.fontSize,
-    lineHeight: t.typographyCaption1Regular.lineHeight,
-    fontFamily: t.typographyCaption1Regular.fontFamily,
-    fontWeight: t.typographyCaption1Regular.fontWeight,
+    fontSize: t.typographyCaption1.fontSize,
+    lineHeight: t.typographyCaption1.lineHeight,
+    fontFamily: t.typographyCaption1.fontFamily,
+    fontWeight: t.typographyCaption1.fontWeight,
   },
   'caption-2': {
-    fontSize: t.typographyCaption2Regular.fontSize,
-    lineHeight: t.typographyCaption2Regular.lineHeight,
-    fontFamily: t.typographyCaption2Regular.fontFamily,
-    fontWeight: t.typographyCaption2Regular.fontWeight,
+    fontSize: t.typographyCaption2.fontSize,
+    lineHeight: t.typographyCaption2.lineHeight,
+    fontFamily: t.typographyCaption2.fontFamily,
+    fontWeight: t.typographyCaption2.fontWeight,
+  },
+  'caption-3': {
+    fontSize: t.typographyCaption3.fontSize,
+    lineHeight: t.typographyCaption3.lineHeight,
+    fontFamily: t.typographyCaption3.fontFamily,
+    fontWeight: t.typographyCaption3.fontWeight,
+  },
+  'caption-4': {
+    fontSize: t.typographyCaption4.fontSize,
+    lineHeight: t.typographyCaption4.lineHeight,
+    fontFamily: t.typographyCaption4.fontFamily,
+    fontWeight: t.typographyCaption4.fontWeight,
   },
   'snippet-1': {
     fontSize: t.typographySnippet1.fontSize,

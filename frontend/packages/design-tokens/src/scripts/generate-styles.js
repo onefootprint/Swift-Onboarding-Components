@@ -38,29 +38,26 @@ styleDictionary.registerTransform({
   },
 });
 
-const getDefaultConfig = theme => ({
-  source: [`src/tokens/${theme}.json`],
-
-  platforms: {
-    web: {
-      transforms: [
-        'name/cti/camel',
-        'transformHexToRgb',
-        'transformTypography',
-      ],
-      buildPath: `src/output/`,
-      files: [
-        {
-          destination: `${theme}.ts`,
-          format: 'javascript/es6',
-          selector: `.${theme}-theme`,
-        },
-      ],
+['light'].forEach(theme => {
+  const config = {
+    source: [`src/tokens/${theme}.json`],
+    platforms: {
+      web: {
+        transforms: [
+          'name/cti/camel',
+          'transformHexToRgb',
+          'transformTypography',
+        ],
+        buildPath: `src/output/`,
+        files: [
+          {
+            destination: `${theme}.ts`,
+            format: 'javascript/es6',
+            selector: `.${theme}-theme`,
+          },
+        ],
+      },
     },
-  },
-});
-
-['global', 'light', 'dark'].forEach(theme => {
-  const config = getDefaultConfig(theme);
+  };
   styleDictionary.extend(config).buildPlatform('web');
 });

@@ -1,5 +1,5 @@
 {
-  "dialog": {
+  "bifrost-dialog": {
     "header": {
       "bg": {
         "value": "{semantic.bg.surface2}",
@@ -61,55 +61,57 @@
         "value": "{semantic.border.tertiary}",
         "type": "color"
       }
-    }
-  },
-  "elevation": {
-    "dialog": {
+    },
+    "elevation": {
       "value": "{elevation.2}",
       "type": "boxShadow"
-    }
-  },
-  "border-radius": {
-    "dialog": {
-      "value": "{bifrost-dialog.border-radius}",
-      "type": "borderRadius"
-    }
-  },
-  "typography": {
-    "header": {
-      "title": {
-        "value": "{typography.label2}",
-        "type": "typography"
-      }
     },
-    "body": {
-      "title": {
-        "value": "{typography.heading3}",
-        "type": "typography"
+    "border-radius": {
+      "value": "{border-radius.default}",
+      "type": "borderRadius"
+    },
+    "typography": {
+      "header": {
+        "title": {
+          "value": "{typography.label2}",
+          "type": "typography"
+        }
       },
-      "subtitle": {
-        "value": "{typography.body2}",
-        "type": "typography"
+      "body": {
+        "title": {
+          "value": "{typography.heading3}",
+          "type": "typography"
+        },
+        "subtitle": {
+          "value": "{typography.body2}",
+          "type": "typography"
+        },
+        "label-default": {
+          "value": "{typography.label2}",
+          "type": "typography"
+        },
+        "label-compact": {
+          "value": "{typography.label3}",
+          "type": "typography"
+        },
+        "body-default": {
+          "value": "{typography.body2}",
+          "type": "typography"
+        },
+        "body-compact": {
+          "value": "{typography.body3}",
+          "type": "typography"
+        },
+        "body-tiny": {
+          "value": "{typography.body4}",
+          "type": "typography"
+        }
       },
-      "label-default": {
-        "value": "{typography.label2}",
-        "type": "typography"
-      },
-      "label-compact": {
-        "value": "{typography.label3}",
-        "type": "typography"
-      },
-      "body-default": {
-        "value": "{typography.body2}",
-        "type": "typography"
-      },
-      "body-compact": {
-        "value": "{typography.body3}",
-        "type": "typography"
-      },
-      "body-tiny": {
-        "value": "{typography.body4}",
-        "type": "typography"
+      "footer": {
+        "footer": {
+          "value": "{typography.caption1}",
+          "type": "typography"
+        }
       }
     }
   }

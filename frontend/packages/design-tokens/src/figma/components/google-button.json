@@ -1,54 +1,58 @@
 {
-  "fp-button": {
+  "google-button": {
     "initial": {
       "bg": {
-        "value": "{semantic.bg.tertiary}",
+        "value": "{semantic.bg.primary}",
         "type": "color"
       },
       "text": {
-        "value": "{semantic.text.quinary}",
+        "value": "{semantic.text.primary}",
         "type": "color"
       },
-      "icon": {
-        "value": "{semantic.text.septenary}",
+      "border": {
+        "value": "{semantic.border.primary}",
         "type": "color"
       }
     },
     "hover": {
       "bg": {
-        "value": "{primitives.darkblue.800}",
+        "value": "{primitives.gray.50}",
         "type": "color"
       },
       "text": {
-        "value": "{semantic.text.quinary}",
+        "value": "{semantic.text.primary}",
         "type": "color"
       },
-      "icon": {
-        "value": "{semantic.text.septenary}",
+      "border": {
+        "value": "{semantic.border.primary}",
         "type": "color"
       }
     },
     "active": {
       "bg": {
-        "value": "{primitives.darkblue.800}",
+        "value": "{primitives.gray.50}",
         "type": "color"
       },
       "text": {
-        "value": "{semantic.text.quinary}",
+        "value": "{semantic.text.primary}",
         "type": "color"
       },
-      "icon": {
-        "value": "{semantic.text.septenary}",
+      "border": {
+        "value": "{semantic.border.primary}",
         "type": "color"
       }
     },
     "loading": {
       "bg": {
-        "value": "{semantic.bg.tertiary}",
+        "value": "{semantic.bg.primary}",
         "type": "color"
       },
       "icon": {
-        "value": "{semantic.text.quinary}",
+        "value": "{semantic.text.primary}",
+        "type": "color"
+      },
+      "border": {
+        "value": "{semantic.border.primary}",
         "type": "color"
       }
     },
@@ -82,11 +86,11 @@
         "type": "typography"
       },
       "default": {
-        "value": "{typography.label1}",
+        "value": "{typography.label2}",
         "type": "typography"
       },
       "compact": {
-        "value": "{typography.label2}",
+        "value": "{typography.label3}",
         "type": "typography"
       }
     }

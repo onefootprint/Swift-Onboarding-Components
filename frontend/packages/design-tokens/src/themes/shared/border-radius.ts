@@ -1,12 +1,12 @@
-import * as globals from '../../output/global';
+import * as t from '../../output/light';
 import type { BorderRadiuses } from '../types';
 
 const borderRadius: BorderRadiuses = {
   none: 0,
-  compact: globals.borderRadiusCompact,
-  default: globals.borderRadiusDefault,
-  large: globals.borderRadiusLarge,
-  full: globals.borderRadiusFull,
+  compact: t.borderRadiusCompact,
+  default: t.borderRadiusDefault,
+  large: t.borderRadiusLarge,
+  full: t.borderRadiusFull,
 };
 
 export default borderRadius;

@@ -3,7 +3,6 @@ import { DesignSystemProvider, media } from '@onefootprint/ui';
 import { QueryClientProvider } from '@tanstack/react-query';
 import React, { useEffect, useState } from 'react';
 import { createGlobalStyle, css } from 'styled-components';
-import { useDarkMode } from 'usehooks-ts';
 
 import AppHeader from '../components/app-header';
 import configureReactI18next from '../config/initializers/react-i18next';
@@ -17,13 +16,12 @@ type AppProps = {
 };
 
 const App = ({ Component, pageProps }: AppProps) => {
-  const { isDarkMode } = useDarkMode();
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
 
   return mounted ? (
     <QueryClientProvider client={queryClient}>
-      <DesignSystemProvider theme={isDarkMode ? themes.dark : themes.light}>
+      <DesignSystemProvider theme={themes.light}>
         <GlobalStyle />
         <AppHeader articles={pageProps.product?.articles} />
         <Component {...pageProps} />

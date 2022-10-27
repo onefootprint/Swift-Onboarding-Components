@@ -1,11 +1,11 @@
-import { elevation1, elevation2, elevation3 } from '../../output/global';
+import * as t from '../../output/light';
 import type { Elevations } from '../types';
 
 const elevations: Elevations = {
   0: 'none',
-  1: elevation1,
-  2: elevation2,
-  3: elevation3,
+  1: t.elevation1,
+  2: t.elevation2,
+  3: t.elevation3,
 };
 
 export default elevations;

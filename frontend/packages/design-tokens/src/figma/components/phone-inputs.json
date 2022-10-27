@@ -1,7 +1,7 @@
 {
-  "select": {
+  "phone-inputs": {
     "icon-inactive": {
-      "value": "{semantic.text.primary}",
+      "value": "{semantic.text.quaternary}",
       "type": "color"
     },
     "icon-active": {

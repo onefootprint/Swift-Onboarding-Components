@@ -3,10 +3,16 @@
     "global",
     "light",
     "dark",
+    "components/date-range-input",
     "components/fp-button",
     "components/buttons",
-    "components/dialog",
-    "components/inputs",
-    "components/select"
+    "components/google-button",
+    "components/link-button",
+    "components/base-inputs",
+    "components/phone-inputs",
+    "components/select",
+    "components/bifrost-dialog",
+    "components/confirmation-dialog",
+    "components/dialog"
   ]
 }

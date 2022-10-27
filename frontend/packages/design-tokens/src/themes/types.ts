@@ -27,6 +27,8 @@ export type FontVariant =
   | 'label-4'
   | 'caption-1'
   | 'caption-2'
+  | 'caption-3'
+  | 'caption-4'
   | 'snippet-1'
   | 'snippet-2';
 
@@ -214,6 +216,91 @@ export type Theme = {
   spacing: Spacings;
   typography: Typographies;
   zIndex: ZIndexes;
+  components: {
+    linkButton: {
+      variant: {
+        default: {
+          color: {
+            text: {
+              initial: string;
+              active: string;
+              hover: string;
+              disabled: string;
+            };
+            icon: {
+              initial: string;
+              active: string;
+              hover: string;
+              disabled: string;
+            };
+          };
+        };
+        destructive: {
+          color: {
+            text: {
+              initial: string;
+              active: string;
+              hover: string;
+              disabled: string;
+            };
+            icon: {
+              initial: string;
+              active: string;
+              hover: string;
+              disabled: string;
+            };
+          };
+        };
+      };
+      size: {
+        default: {
+          height: number;
+          typography: {
+            fontFamily: string;
+            fontWeight: number;
+            lineHeight: string;
+            fontSize: string;
+          };
+        };
+        compact: {
+          height: number;
+          typography: {
+            fontFamily: string;
+            fontWeight: number;
+            lineHeight: string;
+            fontSize: string;
+          };
+        };
+        tiny: {
+          height: number;
+          typography: {
+            fontFamily: string;
+            fontWeight: number;
+            lineHeight: string;
+            fontSize: string;
+          };
+        };
+        xTiny: {
+          height: number;
+          typography: {
+            fontFamily: string;
+            fontWeight: number;
+            lineHeight: string;
+            fontSize: string;
+          };
+        };
+        xxTiny: {
+          height: number;
+          typography: {
+            fontFamily: string;
+            fontWeight: number;
+            lineHeight: string;
+            fontSize: string;
+          };
+        };
+      };
+    };
+  };
 };
 
 export type ThemeKey = keyof Theme;
