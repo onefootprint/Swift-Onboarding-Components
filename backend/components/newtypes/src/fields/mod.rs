@@ -116,6 +116,12 @@ impl Debug for PiiString {
     }
 }
 
+impl Debug for ScrubbedPiiString {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        self.0.fmt(f)
+    }
+}
+
 string_api_data_type_alias!(PiiString);
 
 pub struct NewData {

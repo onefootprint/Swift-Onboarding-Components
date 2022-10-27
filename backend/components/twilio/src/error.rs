@@ -12,6 +12,8 @@ pub enum Error {
     NotDelivered,
     #[error("api error: {0}")]
     Api(ApiErrorResponse),
+    #[error("Json error: {0}")]
+    SerdeJson(#[from] serde_json::Error),
 }
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Deserialize, serde::Serialize, Error)]
