@@ -8,32 +8,32 @@ use crate::{CollectedDataOption, IdentityDocumentId, OnboardingDecisionId, Webau
 #[derive(Debug, Clone, Serialize, Deserialize, Apiv2Schema, AsJsonb)]
 #[serde(rename_all = "snake_case")]
 #[serde(tag = "kind", content = "data")]
-pub enum UserTimelineEvent {
+pub enum DbUserTimelineEvent {
     DataCollected(DataCollectedInfo),
     BiometricRegistered(BiometricRegisteredInfo),
     DocumentUploaded(DocumentUploadedInfo),
     OnboardingDecision(OnboardingDecisionInfo),
 }
 
-impl From<DataCollectedInfo> for UserTimelineEvent {
+impl From<DataCollectedInfo> for DbUserTimelineEvent {
     fn from(s: DataCollectedInfo) -> Self {
         Self::DataCollected(s)
     }
 }
 
-impl From<BiometricRegisteredInfo> for UserTimelineEvent {
+impl From<BiometricRegisteredInfo> for DbUserTimelineEvent {
     fn from(s: BiometricRegisteredInfo) -> Self {
         Self::BiometricRegistered(s)
     }
 }
 
-impl From<DocumentUploadedInfo> for UserTimelineEvent {
+impl From<DocumentUploadedInfo> for DbUserTimelineEvent {
     fn from(s: DocumentUploadedInfo) -> Self {
         Self::DocumentUploaded(s)
     }
 }
 
-impl From<OnboardingDecisionInfo> for UserTimelineEvent {
+impl From<OnboardingDecisionInfo> for DbUserTimelineEvent {
     fn from(s: OnboardingDecisionInfo) -> Self {
         Self::OnboardingDecision(s)
     }

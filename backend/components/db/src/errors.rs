@@ -50,6 +50,9 @@ pub enum DbError {
     #[error("Update target not found")]
     UpdateTargetNotFound,
 
+    #[error("Related object not found")]
+    RelatedObjectNotFound,
+
     #[error("Invalid data group set for data kind. For instance, data group address may be set for ssn")]
     InvalidDataGroupForKind,
 

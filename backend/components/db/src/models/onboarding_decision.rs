@@ -10,6 +10,7 @@ use newtypes::{
 use serde::{Deserialize, Serialize};
 
 use super::onboarding::Onboarding;
+use super::tenant_user::TenantUser;
 use super::user_timeline::UserTimeline;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable)]
@@ -76,9 +77,22 @@ impl OnboardingDecision {
             OnboardingDecisionInfo {
                 id: result.id.clone(),
             },
-            user_vault_id.clone(),
+            user_vault_id,
             Some(onboarding_id.clone()),
         )?;
         Ok(result)
+    }
+
+    pub fn get_bulk(
+        conn: &mut PgConnection,
+        ids: Vec<&OnboardingDecisionId>,
+    ) -> DbResult<Vec<(Self, Option<TenantUser>)>> {
+        use crate::schema::tenant_user;
+        let results = onboarding_decision::table
+            .left_join(tenant_user::table)
+            .filter(onboarding_decision::id.eq_any(ids))
+            .get_results(conn)?;
+
+        Ok(results)
     }
 }
