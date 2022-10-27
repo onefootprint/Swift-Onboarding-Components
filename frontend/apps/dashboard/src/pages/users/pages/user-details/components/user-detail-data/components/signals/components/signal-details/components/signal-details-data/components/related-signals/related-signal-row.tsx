@@ -8,7 +8,7 @@ import useSignalsFilters from '../../../../../../hooks/use-signals-filters';
 import Row from './components/related-signal-row';
 
 type RelatedSignalsProps = {
-  relatedSignals: RiskSignal['related'];
+  relatedSignals: RiskSignal[];
 };
 
 const renderTr = ({ item }: TableRow<RiskSignal>) => <Row riskSignal={item} />;

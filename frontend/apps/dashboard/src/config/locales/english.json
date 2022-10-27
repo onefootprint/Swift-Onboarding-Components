@@ -249,9 +249,9 @@
         "title": "Risk signals",
         "empty-state": "No risk signals found",
         "severity": {
-          "info": "Info",
-          "warning": "Warning",
-          "fraud": "Fraud"
+          "low": "Low",
+          "medium": "Medium",
+          "high": "High"
         },
         "table": {
           "aria-label": "Risk signals",
@@ -259,7 +259,7 @@
           "header": {
             "severity": "Severity",
             "scopes": "Scopes",
-            "note": "Note"
+            "description": "Description"
           }
         },
         "filters": {
@@ -276,7 +276,7 @@
             "vendors": "Data vendors",
             "severity": "Severity",
             "scopes": "Scopes",
-            "note": "Note"
+            "description": "Description"
           },
           "related-signals": {
             "title": "Related signals",

@@ -14,14 +14,14 @@ const RiskSignalSeverityBadge = ({
 
   return (
     <>
-      {severity === RiskSignalSeverity.Fraud && (
-        <Badge variant="error">{t('fraud')}</Badge>
+      {severity === RiskSignalSeverity.High && (
+        <Badge variant="error">{t('high')}</Badge>
       )}
-      {severity === RiskSignalSeverity.Warning && (
-        <Badge variant="warning">{t('warning')}</Badge>
+      {severity === RiskSignalSeverity.Medium && (
+        <Badge variant="warning">{t('medium')}</Badge>
       )}
-      {severity === RiskSignalSeverity.Info && (
-        <Badge variant="info">{t('info')}</Badge>
+      {severity === RiskSignalSeverity.Low && (
+        <Badge variant="info">{t('low')}</Badge>
       )}
     </>
   );

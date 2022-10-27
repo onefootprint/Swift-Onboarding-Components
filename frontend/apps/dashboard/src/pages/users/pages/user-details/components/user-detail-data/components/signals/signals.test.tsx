@@ -68,7 +68,7 @@ describe('<Signals />', () => {
         const tr = screen.getByTestId('sig_ryxauTlDX8hIm3wVRmm');
         expect(tr).toBeInTheDocument();
 
-        const severity = within(tr).getByText('Info');
+        const severity = within(tr).getByText('Low');
         expect(severity).toBeInTheDocument();
 
         const scopes = within(tr).getByText('Phone number');

@@ -24,7 +24,7 @@ const SignalRow = ({ signal }: SignalRowProps) => {
       </td>
       <td>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
-          {signal.note}
+          {signal.description}
         </Box>
       </td>
     </>

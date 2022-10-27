@@ -12,7 +12,7 @@ const SignalDetailsData = ({ riskSignal }: SignalDetailsDataProps) => (
   <>
     <Box sx={{ marginBottom: 9 }}>
       <Overview
-        note={riskSignal.note}
+        description={riskSignal.description}
         scopes={riskSignal.scopes}
         severity={riskSignal.severity}
         vendors={riskSignal.vendors}

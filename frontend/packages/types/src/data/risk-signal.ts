@@ -1,20 +1,19 @@
 import { SignalAttribute } from './signal-attribute';
 
 export enum RiskSignalSeverity {
-  Info = 'Info',
-  Warning = 'Warning',
-  Fraud = 'Fraud',
+  Low = 'low',
+  Medium = 'medium',
+  High = 'high',
 }
 
 export type RiskSignal = {
   deactivated_at: Date | null;
+  description: string;
   id: string;
-  note: string;
   onboardingDecisionId: string;
   reasonCode: string;
   scopes: SignalAttribute[];
   severity: RiskSignalSeverity;
-  timestamp: Date;
+  timestamp: string;
   vendors: string[];
-  related: RiskSignal[];
 };

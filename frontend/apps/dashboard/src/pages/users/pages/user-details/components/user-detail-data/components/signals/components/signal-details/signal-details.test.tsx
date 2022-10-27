@@ -68,10 +68,10 @@ describe('<SignalsDetails />', () => {
         screen.queryByTestId('risk-signal-details-loading'),
       );
 
-      const titleAndNote = screen.queryAllByText(
+      const titleAndDescription = screen.queryAllByText(
         "The consumer's phone number is possibly a wireless mobile number.",
       );
-      expect(titleAndNote).toHaveLength(2);
+      expect(titleAndDescription).toHaveLength(2);
 
       const vendors = screen.getByText('idology');
       expect(vendors).toBeInTheDocument();

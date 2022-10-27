@@ -17,7 +17,7 @@ const SignalDetails = () => {
 
   const getDrawerTitle = () => {
     if (data) {
-      return data.note;
+      return data.description;
     }
     return isLoading ? t('notifications.loading') : t('notifications.error');
   };

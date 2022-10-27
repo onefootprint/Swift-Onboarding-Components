@@ -5,6 +5,7 @@ import {
   userEvent,
   within,
 } from '@onefootprint/test-utils';
+import { RiskSignalSeverity, SignalAttribute } from '@onefootprint/types';
 import React from 'react';
 
 import RiskSignalsOverview, {
@@ -46,11 +47,16 @@ describe('<RiskSignalsOverview />', () => {
         medium: [],
         low: [
           {
-            id: '1',
-            severity: 'low',
-            scope: 'identity',
-            note: 'SSN tied to multiple names',
-            noteDetails: 'Lorem Ipsum dolor simet at magna lorem ipsum',
+            id: 'sig_ryxauTlDX8hIm3wVRmm',
+            severity: RiskSignalSeverity.Low,
+            scopes: [SignalAttribute.phoneNumber],
+            reasonCode: 'mobile_number',
+            description:
+              "The consumer's phone number is possibly a wireless mobile number.",
+            deactivated_at: null,
+            onboardingDecisionId: 'decision_d4uTQ1FIh6cKvDxeRJzyZK',
+            vendors: ['idology'],
+            timestamp: '2022-10-24T21:56:12.682238Z',
           },
         ],
       });
@@ -63,20 +69,30 @@ describe('<RiskSignalsOverview />', () => {
         high: [],
         medium: [
           {
-            id: '1',
-            severity: 'medium',
-            scope: 'identity',
-            note: 'SSN tied to multiple names',
-            noteDetails: 'Lorem Ipsum dolor simet at magna lorem ipsum',
+            id: 'sig_ryxauTlDX8hIm3wVRmm',
+            severity: RiskSignalSeverity.Medium,
+            scopes: [SignalAttribute.phoneNumber],
+            reasonCode: 'mobile_number',
+            description:
+              "The consumer's phone number is possibly a wireless mobile number.",
+            deactivated_at: null,
+            onboardingDecisionId: 'decision_d4uTQ1FIh6cKvDxeRJzyZK',
+            vendors: ['idology'],
+            timestamp: '2022-10-24T21:56:12.682238Z',
           },
         ],
         low: [
           {
-            id: '2',
-            severity: 'low',
-            scope: 'identity',
-            note: 'SSN Issued Prior to DOB',
-            noteDetails: 'Lorem Ipsum dolor simet at magna lorem ipsum',
+            id: 'sig_sh610Ggqf7xUOkBSUL8NcC',
+            onboardingDecisionId: 'decision_d4uTQ1FIh6cKvDxeRJzyZK',
+            reasonCode: 'corporate_email_domain',
+            description:
+              'Indicates that the domain of the email address has been identified as belonging to a corporate entity.',
+            severity: RiskSignalSeverity.Low,
+            scopes: [SignalAttribute.email],
+            timestamp: '2022-10-24T21:56:12.682238Z',
+            deactivated_at: null,
+            vendors: ['idology'],
           },
         ],
       });
@@ -87,10 +103,13 @@ describe('<RiskSignalsOverview />', () => {
       const listDialog = screen.getByRole('dialog');
       expect(listDialog).toBeInTheDocument();
 
-      expect(
-        screen.getByText('SSN tied to multiple names'),
-      ).toBeInTheDocument();
-      expect(screen.getByText('SSN Issued Prior to DOB')).toBeInTheDocument();
+      const firstSignalDescription =
+        "The consumer's phone number is possibly a wireless mobile number.";
+      expect(screen.getByText(firstSignalDescription)).toBeInTheDocument();
+
+      const secondSignalDescription =
+        'Indicates that the domain of the email address has been identified as belonging to a corporate entity.';
+      expect(screen.getByText(secondSignalDescription)).toBeInTheDocument();
     });
 
     describe('when clicking on the risk signal row', () => {
@@ -106,11 +125,16 @@ describe('<RiskSignalsOverview />', () => {
           high: [],
           medium: [
             {
-              id: '1',
-              severity: 'medium',
-              scope: 'identity',
-              note: 'SSN tied to multiple names',
-              noteDetails: 'Lorem Ipsum dolor simet at magna lorem ipsum',
+              id: 'sig_ryxauTlDX8hIm3wVRmm',
+              severity: RiskSignalSeverity.Medium,
+              scopes: [SignalAttribute.phoneNumber],
+              reasonCode: 'mobile_number',
+              description:
+                "The consumer's phone number is possibly a wireless mobile number.",
+              deactivated_at: null,
+              onboardingDecisionId: 'decision_d4uTQ1FIh6cKvDxeRJzyZK',
+              vendors: ['idology'],
+              timestamp: '2022-10-24T21:56:12.682238Z',
             },
           ],
           low: [],
@@ -122,15 +146,15 @@ describe('<RiskSignalsOverview />', () => {
         const listDialog = screen.getByRole('dialog');
         expect(listDialog).toBeInTheDocument();
 
-        const riskSignalRow = within(listDialog).getByText(
-          'SSN tied to multiple names',
-        );
+        const description =
+          "The consumer's phone number is possibly a wireless mobile number.";
+        const riskSignalRow = within(listDialog).getByText(description);
         await userEvent.click(riskSignalRow);
 
         expect(pushMockFn).toHaveBeenCalledWith(
           {
             query: {
-              signal_id: '1',
+              signal_id: 'sig_ryxauTlDX8hIm3wVRmm',
             },
           },
           undefined,
@@ -146,11 +170,16 @@ describe('<RiskSignalsOverview />', () => {
           medium: [],
           low: [
             {
-              id: '1',
-              severity: 'low',
-              scope: 'identity',
-              note: 'SSN tied to multiple names',
-              noteDetails: 'Lorem Ipsum dolor simet at magna lorem ipsum',
+              id: 'sig_ryxauTlDX8hIm3wVRmm',
+              severity: RiskSignalSeverity.Low,
+              scopes: [SignalAttribute.phoneNumber],
+              reasonCode: 'mobile_number',
+              description:
+                "The consumer's phone number is possibly a wireless mobile number.",
+              deactivated_at: null,
+              onboardingDecisionId: 'decision_d4uTQ1FIh6cKvDxeRJzyZK',
+              vendors: ['idology'],
+              timestamp: '2022-10-24T21:56:12.682238Z',
             },
           ],
         });
@@ -165,18 +194,28 @@ describe('<RiskSignalsOverview />', () => {
           medium: [],
           low: [
             {
-              id: '1',
-              severity: 'low',
-              scope: 'identity',
-              note: 'SSN tied to multiple names',
-              noteDetails: 'Lorem Ipsum dolor simet at magna lorem ipsum',
+              id: 'sig_ryxauTlDX8hIm3wVRmm',
+              severity: RiskSignalSeverity.Low,
+              scopes: [SignalAttribute.phoneNumber],
+              reasonCode: 'mobile_number',
+              description:
+                "The consumer's phone number is possibly a wireless mobile number.",
+              deactivated_at: null,
+              onboardingDecisionId: 'decision_d4uTQ1FIh6cKvDxeRJzyZK',
+              vendors: ['idology'],
+              timestamp: '2022-10-24T21:56:12.682238Z',
             },
             {
-              id: '2',
-              severity: 'low',
-              scope: 'identity',
-              note: 'Lorem tied to multiple names',
-              noteDetails: 'Lorem Ipsum dolor simet at magna lorem ipsum',
+              id: 'sig_sh610Ggqf7xUOkBSUL8NcC',
+              onboardingDecisionId: 'decision_d4uTQ1FIh6cKvDxeRJzyZK',
+              reasonCode: 'corporate_email_domain',
+              description:
+                'Indicates that the domain of the email address has been identified as belonging to a corporate entity.',
+              severity: RiskSignalSeverity.Low,
+              scopes: [SignalAttribute.email],
+              timestamp: '2022-10-24T21:56:12.682238Z',
+              deactivated_at: null,
+              vendors: ['idology'],
             },
           ],
         });
@@ -192,11 +231,16 @@ describe('<RiskSignalsOverview />', () => {
           high: [],
           medium: [
             {
-              id: '1',
-              severity: 'low',
-              scope: 'identity',
-              note: 'SSN tied to multiple names',
-              noteDetails: 'Lorem Ipsum dolor simet at magna lorem ipsum',
+              id: 'sig_ryxauTlDX8hIm3wVRmm',
+              severity: RiskSignalSeverity.Low,
+              scopes: [SignalAttribute.phoneNumber],
+              reasonCode: 'mobile_number',
+              description:
+                "The consumer's phone number is possibly a wireless mobile number.",
+              deactivated_at: null,
+              onboardingDecisionId: 'decision_d4uTQ1FIh6cKvDxeRJzyZK',
+              vendors: ['idology'],
+              timestamp: '2022-10-24T21:56:12.682238Z',
             },
           ],
           low: [],
@@ -211,18 +255,28 @@ describe('<RiskSignalsOverview />', () => {
           high: [],
           medium: [
             {
-              id: '1',
-              severity: 'low',
-              scope: 'identity',
-              note: 'SSN tied to multiple names',
-              noteDetails: 'Lorem Ipsum dolor simet at magna lorem ipsum',
+              id: 'sig_ryxauTlDX8hIm3wVRmm',
+              severity: RiskSignalSeverity.Medium,
+              scopes: [SignalAttribute.phoneNumber],
+              reasonCode: 'mobile_number',
+              description:
+                "The consumer's phone number is possibly a wireless mobile number.",
+              deactivated_at: null,
+              onboardingDecisionId: 'decision_d4uTQ1FIh6cKvDxeRJzyZK',
+              vendors: ['idology'],
+              timestamp: '2022-10-24T21:56:12.682238Z',
             },
             {
-              id: '2',
-              severity: 'low',
-              scope: 'identity',
-              note: 'Lorem tied to multiple names',
-              noteDetails: 'Lorem Ipsum dolor simet at magna lorem ipsum',
+              id: 'sig_sh610Ggqf7xUOkBSUL8NcC',
+              onboardingDecisionId: 'decision_d4uTQ1FIh6cKvDxeRJzyZK',
+              reasonCode: 'corporate_email_domain',
+              description:
+                'Indicates that the domain of the email address has been identified as belonging to a corporate entity.',
+              severity: RiskSignalSeverity.Medium,
+              scopes: [SignalAttribute.email],
+              timestamp: '2022-10-24T21:56:12.682238Z',
+              deactivated_at: null,
+              vendors: ['idology'],
             },
           ],
           low: [],
@@ -238,11 +292,16 @@ describe('<RiskSignalsOverview />', () => {
         renderRiskSignalsOverview({
           high: [
             {
-              id: '1',
-              severity: 'low',
-              scope: 'identity',
-              note: 'SSN tied to multiple names',
-              noteDetails: 'Lorem Ipsum dolor simet at magna lorem ipsum',
+              id: 'sig_ryxauTlDX8hIm3wVRmm',
+              severity: RiskSignalSeverity.High,
+              scopes: [SignalAttribute.phoneNumber],
+              reasonCode: 'mobile_number',
+              description:
+                "The consumer's phone number is possibly a wireless mobile number.",
+              deactivated_at: null,
+              onboardingDecisionId: 'decision_d4uTQ1FIh6cKvDxeRJzyZK',
+              vendors: ['idology'],
+              timestamp: '2022-10-24T21:56:12.682238Z',
             },
           ],
           medium: [],
@@ -257,18 +316,28 @@ describe('<RiskSignalsOverview />', () => {
         renderRiskSignalsOverview({
           high: [
             {
-              id: '1',
-              severity: 'low',
-              scope: 'identity',
-              note: 'SSN tied to multiple names',
-              noteDetails: 'Lorem Ipsum dolor simet at magna lorem ipsum',
+              id: 'sig_ryxauTlDX8hIm3wVRmm',
+              severity: RiskSignalSeverity.High,
+              scopes: [SignalAttribute.phoneNumber],
+              reasonCode: 'mobile_number',
+              description:
+                "The consumer's phone number is possibly a wireless mobile number.",
+              deactivated_at: null,
+              onboardingDecisionId: 'decision_d4uTQ1FIh6cKvDxeRJzyZK',
+              vendors: ['idology'],
+              timestamp: '2022-10-24T21:56:12.682238Z',
             },
             {
-              id: '2',
-              severity: 'low',
-              scope: 'identity',
-              note: 'Lorem tied to multiple names',
-              noteDetails: 'Lorem Ipsum dolor simet at magna lorem ipsum',
+              id: 'sig_sh610Ggqf7xUOkBSUL8NcC',
+              onboardingDecisionId: 'decision_d4uTQ1FIh6cKvDxeRJzyZK',
+              reasonCode: 'corporate_email_domain',
+              description:
+                'Indicates that the domain of the email address has been identified as belonging to a corporate entity.',
+              severity: RiskSignalSeverity.High,
+              scopes: [SignalAttribute.email],
+              timestamp: '2022-10-24T21:56:12.682238Z',
+              deactivated_at: null,
+              vendors: ['idology'],
             },
           ],
           medium: [],
@@ -286,20 +355,30 @@ describe('<RiskSignalsOverview />', () => {
           high: [],
           medium: [
             {
-              id: '2',
-              severity: 'low',
-              scope: 'identity',
-              note: 'Lorem tied to multiple names',
-              noteDetails: 'Lorem Ipsum dolor simet at magna lorem ipsum',
+              id: 'sig_ryxauTlDX8hIm3wVRmm',
+              severity: RiskSignalSeverity.Medium,
+              scopes: [SignalAttribute.phoneNumber],
+              reasonCode: 'mobile_number',
+              description:
+                "The consumer's phone number is possibly a wireless mobile number.",
+              deactivated_at: null,
+              onboardingDecisionId: 'decision_d4uTQ1FIh6cKvDxeRJzyZK',
+              vendors: ['idology'],
+              timestamp: '2022-10-24T21:56:12.682238Z',
             },
           ],
           low: [
             {
-              id: '1',
-              severity: 'low',
-              scope: 'identity',
-              note: 'SSN tied to multiple names',
-              noteDetails: 'Lorem Ipsum dolor simet at magna lorem ipsum',
+              id: 'sig_sh610Ggqf7xUOkBSUL8NcC',
+              onboardingDecisionId: 'decision_d4uTQ1FIh6cKvDxeRJzyZK',
+              reasonCode: 'corporate_email_domain',
+              description:
+                'Indicates that the domain of the email address has been identified as belonging to a corporate entity.',
+              severity: RiskSignalSeverity.Low,
+              scopes: [SignalAttribute.email],
+              timestamp: '2022-10-24T21:56:12.682238Z',
+              deactivated_at: null,
+              vendors: ['idology'],
             },
           ],
         });
@@ -314,21 +393,31 @@ describe('<RiskSignalsOverview />', () => {
         renderRiskSignalsOverview({
           high: [
             {
-              id: '2',
-              severity: 'low',
-              scope: 'identity',
-              note: 'Lorem tied to multiple names',
-              noteDetails: 'Lorem Ipsum dolor simet at magna lorem ipsum',
+              id: 'sig_ryxauTlDX8hIm3wVRmm',
+              severity: RiskSignalSeverity.High,
+              scopes: [SignalAttribute.phoneNumber],
+              reasonCode: 'mobile_number',
+              description:
+                "The consumer's phone number is possibly a wireless mobile number.",
+              deactivated_at: null,
+              onboardingDecisionId: 'decision_d4uTQ1FIh6cKvDxeRJzyZK',
+              vendors: ['idology'],
+              timestamp: '2022-10-24T21:56:12.682238Z',
             },
           ],
           medium: [],
           low: [
             {
-              id: '1',
-              severity: 'low',
-              scope: 'identity',
-              note: 'SSN tied to multiple names',
-              noteDetails: 'Lorem Ipsum dolor simet at magna lorem ipsum',
+              id: 'sig_sh610Ggqf7xUOkBSUL8NcC',
+              onboardingDecisionId: 'decision_d4uTQ1FIh6cKvDxeRJzyZK',
+              reasonCode: 'corporate_email_domain',
+              description:
+                'Indicates that the domain of the email address has been identified as belonging to a corporate entity.',
+              severity: RiskSignalSeverity.Low,
+              scopes: [SignalAttribute.email],
+              timestamp: '2022-10-24T21:56:12.682238Z',
+              deactivated_at: null,
+              vendors: ['idology'],
             },
           ],
         });
@@ -343,20 +432,30 @@ describe('<RiskSignalsOverview />', () => {
         renderRiskSignalsOverview({
           high: [
             {
-              id: '2',
-              severity: 'low',
-              scope: 'identity',
-              note: 'Lorem tied to multiple names',
-              noteDetails: 'Lorem Ipsum dolor simet at magna lorem ipsum',
+              id: 'sig_ryxauTlDX8hIm3wVRmm',
+              severity: RiskSignalSeverity.High,
+              scopes: [SignalAttribute.phoneNumber],
+              reasonCode: 'mobile_number',
+              description:
+                "The consumer's phone number is possibly a wireless mobile number.",
+              deactivated_at: null,
+              onboardingDecisionId: 'decision_d4uTQ1FIh6cKvDxeRJzyZK',
+              vendors: ['idology'],
+              timestamp: '2022-10-24T21:56:12.682238Z',
             },
           ],
           medium: [
             {
-              id: '1',
-              severity: 'low',
-              scope: 'identity',
-              note: 'SSN tied to multiple names',
-              noteDetails: 'Lorem Ipsum dolor simet at magna lorem ipsum',
+              id: 'sig_sh610Ggqf7xUOkBSUL8NcC',
+              onboardingDecisionId: 'decision_d4uTQ1FIh6cKvDxeRJzyZK',
+              reasonCode: 'corporate_email_domain',
+              description:
+                'Indicates that the domain of the email address has been identified as belonging to a corporate entity.',
+              severity: RiskSignalSeverity.Medium,
+              scopes: [SignalAttribute.email],
+              timestamp: '2022-10-24T21:56:12.682238Z',
+              deactivated_at: null,
+              vendors: ['idology'],
             },
           ],
           low: [],
@@ -372,29 +471,44 @@ describe('<RiskSignalsOverview />', () => {
         renderRiskSignalsOverview({
           high: [
             {
-              id: '2',
-              severity: 'low',
-              scope: 'identity',
-              note: 'Lorem tied to multiple names',
-              noteDetails: 'Lorem Ipsum dolor simet at magna lorem ipsum',
+              id: 'sig_ryxauTlDX8hIm3wVRmm',
+              severity: RiskSignalSeverity.High,
+              scopes: [SignalAttribute.phoneNumber],
+              reasonCode: 'mobile_number',
+              description:
+                "The consumer's phone number is possibly a wireless mobile number.",
+              deactivated_at: null,
+              onboardingDecisionId: 'decision_d4uTQ1FIh6cKvDxeRJzyZK',
+              vendors: ['idology'],
+              timestamp: '2022-10-24T21:56:12.682238Z',
             },
           ],
           medium: [
             {
-              id: '1',
-              severity: 'low',
-              scope: 'identity',
-              note: 'SSN tied to multiple names',
-              noteDetails: 'Lorem Ipsum dolor simet at magna lorem ipsum',
+              id: 'sig_sh610Ggqf7xUOkBSUL8NcC',
+              onboardingDecisionId: 'decision_d4uTQ1FIh6cKvDxeRJzyZK',
+              reasonCode: 'corporate_email_domain',
+              description:
+                'Indicates that the domain of the email address has been identified as belonging to a corporate entity.',
+              severity: RiskSignalSeverity.Medium,
+              scopes: [SignalAttribute.email],
+              timestamp: '2022-10-24T21:56:12.682238Z',
+              deactivated_at: null,
+              vendors: ['idology'],
             },
           ],
           low: [
             {
-              id: '2',
-              severity: 'low',
-              scope: 'identity',
-              note: 'Magna tied to multiple names',
-              noteDetails: 'Lorem Ipsum dolor simet at magna lorem ipsum',
+              id: 'sig_l124S610Gg1427xUOkBSUL8NcC',
+              onboardingDecisionId: 'decision_d4uTQ1FIh6cKvDxeRJzyZK',
+              reasonCode: 'corporate_email_domain',
+              description:
+                'Indicates that the domain of the email address has been identified as belonging to a corporate entity.',
+              severity: RiskSignalSeverity.Low,
+              scopes: [SignalAttribute.name],
+              timestamp: '2022-10-24T21:56:12.682238Z',
+              deactivated_at: null,
+              vendors: ['idology'],
             },
           ],
         });

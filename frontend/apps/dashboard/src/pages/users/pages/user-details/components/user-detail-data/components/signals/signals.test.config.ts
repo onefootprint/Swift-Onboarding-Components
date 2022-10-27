@@ -1,24 +1,31 @@
 import { mockRequest } from '@onefootprint/test-utils';
+import {
+  RiskSignal,
+  RiskSignalSeverity,
+  SignalAttribute,
+} from '@onefootprint/types';
 
-export const signalsFixture = [
+export const signalsFixture: RiskSignal[] = [
   {
     id: 'sig_ryxauTlDX8hIm3wVRmm',
-    onboarding_decision_id: 'decision_d4uTQ1FIh6cKvDxeRJzyZK',
-    reason_code: 'mobile_number',
-    note: "The consumer's phone number is possibly a wireless mobile number.",
-    severity: 'Info',
-    scopes: ['phone_number'],
-    timestamp: '2022-10-24T21:56:12.682238Z',
+    severity: RiskSignalSeverity.Low,
+    scopes: [SignalAttribute.phoneNumber],
+    reasonCode: 'mobile_number',
+    description:
+      "The consumer's phone number is possibly a wireless mobile number.",
     deactivated_at: null,
+    onboardingDecisionId: 'decision_d4uTQ1FIh6cKvDxeRJzyZK',
     vendors: ['idology'],
+    timestamp: '2022-10-24T21:56:12.682238Z',
   },
   {
     id: 'sig_sh610Ggqf7xUOkBSUL8NcC',
-    onboarding_decision_id: 'decision_d4uTQ1FIh6cKvDxeRJzyZK',
-    reason_code: 'corporate_email_domain',
-    note: 'Indicates that the domain of the email address has been identified as belonging to a corporate entity.',
-    severity: 'Info',
-    scopes: ['email'],
+    onboardingDecisionId: 'decision_d4uTQ1FIh6cKvDxeRJzyZK',
+    reasonCode: 'corporate_email_domain',
+    description:
+      'Indicates that the domain of the email address has been identified as belonging to a corporate entity.',
+    severity: RiskSignalSeverity.Low,
+    scopes: [SignalAttribute.email],
     timestamp: '2022-10-24T21:56:12.682238Z',
     deactivated_at: null,
     vendors: ['idology'],

@@ -14,17 +14,17 @@ const RiskSignalRow = ({ riskSignal }: RiskSignalRowProps) => {
   return (
     <>
       <td>
-        {riskSignal.severity === RiskSignalSeverity.Fraud && (
-          <Badge variant="error">{t('fraud')}</Badge>
+        {riskSignal.severity === RiskSignalSeverity.High && (
+          <Badge variant="error">{t('high')}</Badge>
         )}
-        {riskSignal.severity === RiskSignalSeverity.Warning && (
-          <Badge variant="warning">{t('warning')}</Badge>
+        {riskSignal.severity === RiskSignalSeverity.Medium && (
+          <Badge variant="warning">{t('medium')}</Badge>
         )}
-        {riskSignal.severity === RiskSignalSeverity.Info && (
-          <Badge variant="info">{t('info')}</Badge>
+        {riskSignal.severity === RiskSignalSeverity.Low && (
+          <Badge variant="info">{t('low')}</Badge>
         )}
       </td>
-      <td>{riskSignal.note}</td>
+      <td>{riskSignal.description}</td>
       <td>
         <Box
           sx={{

@@ -22,7 +22,7 @@ const RiskSignals = () => {
   const columns = [
     { text: t('table.header.severity'), width: '15%' },
     { text: t('table.header.scopes'), width: '15%' },
-    { text: t('table.header.note'), width: '70%' },
+    { text: t('table.header.description'), width: '70%' },
   ];
 
   const handleRowClick = (riskSignal: RiskSignal) => {

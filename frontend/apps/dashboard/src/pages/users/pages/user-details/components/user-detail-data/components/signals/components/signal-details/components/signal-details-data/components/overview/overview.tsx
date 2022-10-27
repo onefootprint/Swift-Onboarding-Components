@@ -8,13 +8,18 @@ import SeverityBadge from '../../../../../severity-badge';
 import Field from './components/field';
 
 type OverviewProps = {
-  note: RiskSignal['note'];
+  description: RiskSignal['description'];
   scopes: RiskSignal['scopes'];
   severity: RiskSignal['severity'];
   vendors: RiskSignal['vendors'];
 };
 
-const Overview = ({ vendors, note, scopes, severity }: OverviewProps) => {
+const Overview = ({
+  vendors,
+  description,
+  scopes,
+  severity,
+}: OverviewProps) => {
   const { t, allT } = useTranslation(
     'pages.user-details.signals.details.overview',
   );
@@ -42,7 +47,7 @@ const Overview = ({ vendors, note, scopes, severity }: OverviewProps) => {
             </Field>
           </Grid.Column>
         </Grid.Row>
-        <Field label={t('note')}>{note}</Field>
+        <Field label={t('description')}>{description}</Field>
       </Fieldset>
     </section>
   );

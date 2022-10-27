@@ -14,7 +14,7 @@ const RelatedSignalRow = ({ riskSignal }: RelatedSignalRowProps) => (
     <td>
       <SeverityBadge severity={riskSignal.severity} />
     </td>
-    <td>{riskSignal.note}</td>
+    <td>{riskSignal.description}</td>
     <td>
       <Box
         sx={{
