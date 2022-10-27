@@ -2,13 +2,13 @@
 
 const ContentSecurityPolicy = `
   child-src onefootprint.com;
-  connect-src 'self' vitals.vercel-insights.com *.usefathom.com *.ingest.sentry.io; 
+  connect-src 'self' vitals.vercel-insights.com *.usefathom.com *.ingest.sentry.io *.pusher.com wss://*.pusher.com vercel.live; 
   default-src 'self' vitals.vercel-insights.com;
   font-src 'self' fonts.googleapis.com fonts.gstatic.com;
   form-action 'self';
   frame-ancestors 'self';
-  frame-src 'self' http://localhost:3000 vercel.live;
-  img-src 'self' data: assets.vercel.com footprint-blog.ghost.io;
+  frame-src 'self' *.onefootprint.com http://localhost:3000 vercel.live;
+  img-src 'self' data: assets.vercel.com vercel.live footprint-blog.ghost.io vercel.com;
   media-src 'self' https;
   script-src 'self' 'unsafe-inline' 'unsafe-eval' *.usefathom.com vercel.live vitals.vercel-insights.com;
   style-src 'self' 'unsafe-inline' fonts.googleapis.com;
