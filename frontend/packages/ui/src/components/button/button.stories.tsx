@@ -2,7 +2,6 @@ import { Meta, Story } from '@storybook/react';
 import React from 'react';
 
 import Button, { ButtonProps } from './button';
-import { buttonSizes } from './button.utils';
 
 export default {
   component: Button,
@@ -30,7 +29,7 @@ export default {
     },
     size: {
       control: 'select',
-      options: buttonSizes,
+      options: ['default', 'compact', 'small', 'large'],
       description: 'Button size',
     },
     testID: {

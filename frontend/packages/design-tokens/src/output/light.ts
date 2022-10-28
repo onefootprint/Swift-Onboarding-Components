@@ -1,6 +1,6 @@
 /**
  * Do not edit directly
- * Generated on Thu, 27 Oct 2022 23:21:09 GMT
+ * Generated on Fri, 28 Oct 2022 14:08:20 GMT
  */
 
 export const primitivesBrandSleep = '#0e1438';
@@ -117,6 +117,7 @@ export const semanticBorderPrimary = '#d4d4d4';
 export const semanticBorderSecondary = '#4a24db';
 export const semanticBorderTertiary = '#e2e2e2';
 export const semanticBorderError = '#bf140a';
+export const elevation0 = '0px 0px 0px rgb(0, 0, 0)';
 export const elevation1 = '0px 1px 4px rgba(0, 0, 0, 0.12156862745098039)';
 export const elevation2 = '0px 1px 8px rgba(0, 0, 0, 0.1411764705882353)';
 export const elevation3 = '0px 1px 12px rgba(0, 0, 0, 0.1803921568627451)';
@@ -297,10 +298,10 @@ export const typographyBodyBodyTiny = {
   lineHeight: '20px',
   fontSize: '14px',
 };
-export const borderRadiusCompact = 4;
-export const borderRadiusDefault = 6;
-export const borderRadiusLarge = 16;
 export const borderRadiusFull = 100;
+export const borderRadiusLarge = 16;
+export const borderRadiusDefault = 6;
+export const borderRadiusCompact = 4;
 export const borderRadiusDialog = 6;
 export const spacing0 = 0;
 export const spacing1 = 2;
@@ -329,6 +330,7 @@ export const opacity800 = 0.64;
 export const opacity900 = 0.8;
 export const opacity1000 = 1;
 export const opacityTransparent = 0;
+export const borderWidthDefault = 1;
 export const selectIconInactive = '#000000';
 export const selectIconActive = '#4a24db';
 export const selectIconActiveError = '#991008';
@@ -386,6 +388,23 @@ export const linkButtonTypographyXxTiny = {
   lineHeight: '16px',
   fontSize: '12px',
 };
+export const iconButtonBorderWidth = 1;
+export const iconButtonHeightLarge = 40;
+export const iconButtonHeightDefault = 32;
+export const iconButtonBorderRadius = 100;
+export const iconButtonInitialBg = '#ffffff';
+export const iconButtonInitialIcon = '#000000';
+export const iconButtonInitialBorder = 0;
+export const iconButtonHoverBg = '#f7f7f7';
+export const iconButtonHoverIcon = '#000000';
+export const iconButtonHoverBorder = 0;
+export const iconButtonActiveBg = '#e2e2e2';
+export const iconButtonActiveIcon = '#000000';
+export const iconButtonActiveBorder = 0;
+export const iconButtonDisabledBg = '#f7f7f7';
+export const iconButtonDisabledIcon = '#8d8d8d';
+export const iconButtonDisabledBorder = 0;
+export const iconButtonElevation = '0px 0px 0px rgb(0, 0, 0)';
 export const googleButtonInitialBg = '#ffffff';
 export const googleButtonInitialText = '#000000';
 export const googleButtonInitialBorder = '#d4d4d4';
@@ -398,11 +417,13 @@ export const googleButtonActiveBorder = '#d4d4d4';
 export const googleButtonLoadingBg = '#ffffff';
 export const googleButtonLoadingIcon = '#000000';
 export const googleButtonLoadingBorder = '#d4d4d4';
-export const googleButtonSizingLarge = 60;
-export const googleButtonSizingDefault = 48;
-export const googleButtonSizingCompact = 40;
+export const googleButtonHeightLarge = 60;
+export const googleButtonHeightDefault = 48;
+export const googleButtonHeightCompact = 40;
 export const googleButtonBorderRadius = 6;
-export const googleButtonSpacingPaddingsHorizontal = 24;
+export const googleButtonSpacingPaddingsHorizontalLarge = 24;
+export const googleButtonSpacingPaddingsHorizontalDefault = 24;
+export const googleButtonSpacingPaddingsHorizontalCompact = 24;
 export const googleButtonTypographyLarge = {
   fontFamily: 'DM Sans',
   fontWeight: 500,
@@ -421,6 +442,10 @@ export const googleButtonTypographyCompact = {
   lineHeight: '20px',
   fontSize: '15px',
 };
+export const buttonBorderWidth = 1;
+export const buttonElevationInitial = '0px 0px 0px rgb(0, 0, 0)';
+export const buttonElevationHover = '0px 0px 0px rgb(0, 0, 0)';
+export const buttonElevationActive = '0px 0px 0px rgb(0, 0, 0)';
 export const fpButtonInitialBg = '#0e1438';
 export const fpButtonInitialText = '#ffffff';
 export const fpButtonInitialIcon = '#76fb8f';
@@ -432,11 +457,13 @@ export const fpButtonActiveText = '#ffffff';
 export const fpButtonActiveIcon = '#76fb8f';
 export const fpButtonLoadingBg = '#0e1438';
 export const fpButtonLoadingIcon = '#ffffff';
-export const fpButtonSizingLarge = 60;
-export const fpButtonSizingDefault = 48;
-export const fpButtonSizingCompact = 40;
+export const fpButtonHeightLarge = 60;
+export const fpButtonHeightDefault = 48;
+export const fpButtonHeightCompact = 40;
 export const fpButtonBorderRadius = 6;
-export const fpButtonSpacingPaddingsHorizontal = 24;
+export const fpButtonSpacingPaddingsHorizontalLarge = 24;
+export const fpButtonSpacingPaddingsHorizontalDefault = 24;
+export const fpButtonSpacingPaddingsHorizontalCompact = 24;
 export const fpButtonTypographyLarge = {
   fontFamily: 'DM Sans',
   fontWeight: 500,
@@ -499,14 +526,19 @@ export const confirmationDialogTypographyBodyBodyDefault = {
 };
 export const buttonsPrimaryInitialBg = '#0e1438';
 export const buttonsPrimaryInitialText = '#ffffff';
+export const buttonsPrimaryInitialBorder = '#d4d4d400';
 export const buttonsPrimaryHoverBg = '#18234f';
 export const buttonsPrimaryHoverText = '#ffffff';
+export const buttonsPrimaryHoverBorder = '#d4d4d400';
 export const buttonsPrimaryActiveBg = '#18234f';
 export const buttonsPrimaryActiveText = '#ffffff';
+export const buttonsPrimaryActiveBorder = '#d4d4d400';
 export const buttonsPrimaryDisabledBg = '#f7f7f7';
 export const buttonsPrimaryDisabledText = '#8d8d8d';
+export const buttonsPrimaryDisabledBorder = '#d4d4d400';
 export const buttonsPrimaryLoadingBg = '#0e1438';
 export const buttonsPrimaryLoadingIcon = '#ffffff';
+export const buttonsPrimaryLoadingBorder = '#d4d4d400';
 export const buttonsSecondaryInitialBg = '#ffffff';
 export const buttonsSecondaryInitialText = '#000000';
 export const buttonsSecondaryInitialBorder = '#d4d4d4';
@@ -522,13 +554,15 @@ export const buttonsSecondaryDisabledBorder = '#e2e2e2';
 export const buttonsSecondaryLoadingBg = '#ffffff';
 export const buttonsSecondaryLoadingIcon = '#000000';
 export const buttonsSecondaryLoadingBorder = '#d4d4d4';
-export const buttonsSizingLarge = 60;
-export const buttonsSizingDefault = 48;
-export const buttonsSizingCompact = 40;
-export const buttonsSizingSmall = 32;
+export const buttonsHeightLarge = 60;
+export const buttonsHeightDefault = 48;
+export const buttonsHeightCompact = 40;
+export const buttonsHeightSmall = 32;
 export const buttonsBorderRadius = 6;
+export const buttonsSpacingPaddingsHorizontalLarge = 24;
 export const buttonsSpacingPaddingsHorizontalDefault = 24;
-export const buttonsSpacingPaddingsHorizontalCompact = 12;
+export const buttonsSpacingPaddingsHorizontalCompact = 24;
+export const buttonsSpacingPaddingsHorizontalSmall = 12;
 export const buttonsTypographyLarge = {
   fontFamily: 'DM Sans',
   fontWeight: 500,
@@ -702,11 +736,12 @@ export const baseInputsDisabledBorder = '#e2e2e2';
 export const baseInputsDisabledInputContent = '#8d8d8d';
 export const baseInputsDisabledTopLabel = '#000000';
 export const baseInputsDisabledHint = '#707070';
-export const baseInputsSizingLarge = 140;
-export const baseInputsSizingDefault = 40;
-export const baseInputsSizingCompact = 32;
+export const baseInputsHeightTextArea = 140;
+export const baseInputsHeightDefault = 40;
+export const baseInputsHeightCompact = 32;
 export const baseInputsBorderRadius = 6;
-export const baseInputsSpacingPaddingsHorizontal = 16;
+export const baseInputsSpacingPaddingsHorizontalDefault = 16;
+export const baseInputsSpacingPaddingsHorizontalCompact = 16;
 export const baseInputsTypographyDefaultLabel = {
   fontFamily: 'DM Sans',
   fontWeight: 500,
@@ -751,9 +786,10 @@ export const tokenSetOrder4 = 'components/fp-button';
 export const tokenSetOrder5 = 'components/buttons';
 export const tokenSetOrder6 = 'components/google-button';
 export const tokenSetOrder7 = 'components/link-button';
-export const tokenSetOrder8 = 'components/base-inputs';
-export const tokenSetOrder9 = 'components/phone-inputs';
-export const tokenSetOrder10 = 'components/select';
-export const tokenSetOrder11 = 'components/bifrost-dialog';
-export const tokenSetOrder12 = 'components/confirmation-dialog';
-export const tokenSetOrder13 = 'components/dialog';
+export const tokenSetOrder8 = 'components/icon-button';
+export const tokenSetOrder9 = 'components/base-inputs';
+export const tokenSetOrder10 = 'components/phone-inputs';
+export const tokenSetOrder11 = 'components/select';
+export const tokenSetOrder12 = 'components/bifrost-dialog';
+export const tokenSetOrder13 = 'components/confirmation-dialog';
+export const tokenSetOrder14 = 'components/dialog';

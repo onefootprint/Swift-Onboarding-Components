@@ -1,5 +1,5 @@
 import * as t from '../../output/light';
-import type { Typographies } from '../types';
+import type { Typographies } from '../types/types';
 
 const typographies: Typographies = {
   'display-1': {

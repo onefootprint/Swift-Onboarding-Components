@@ -1,5 +1,5 @@
 import * as t from '../../output/light';
-import type { Elevations } from '../types';
+import type { Elevations } from '../types/types';
 
 const elevations: Elevations = {
   0: 'none',

@@ -1,5 +1,5 @@
 import * as t from '../../output/light';
-import type { BorderRadiuses } from '../types';
+import type { BorderRadiuses } from '../types/types';
 
 const borderRadius: BorderRadiuses = {
   none: 0,

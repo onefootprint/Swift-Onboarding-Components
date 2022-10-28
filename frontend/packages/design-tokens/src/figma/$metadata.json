@@ -8,6 +8,7 @@
     "components/buttons",
     "components/google-button",
     "components/link-button",
+    "components/icon-button",
     "components/base-inputs",
     "components/phone-inputs",
     "components/select",

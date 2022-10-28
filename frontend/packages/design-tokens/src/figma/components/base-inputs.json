@@ -340,8 +340,8 @@
         "type": "color"
       }
     },
-    "sizing": {
-      "large": {
+    "height": {
+      "text-area": {
         "value": "140",
         "type": "sizing"
       },
@@ -359,7 +359,11 @@
       "type": "borderRadius"
     },
     "spacing": {
-      "paddings-horizontal": {
+      "paddings-horizontal-default": {
+        "value": "{spacing.5}",
+        "type": "spacing"
+      },
+      "paddings-horizontal-compact": {
         "value": "{spacing.5}",
         "type": "spacing"
       }

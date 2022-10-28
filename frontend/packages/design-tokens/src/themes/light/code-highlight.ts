@@ -1,4 +1,4 @@
-import type { CodeHighlight } from '../types';
+import type { CodeHighlight } from '../types/types';
 
 const codeHighlight: CodeHighlight = {
   hljs: {

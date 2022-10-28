@@ -1,5 +1,5 @@
 import * as t from '../../output/light';
-import type { Spacings } from '../types';
+import type { Spacings } from '../types/types';
 
 const spacings: Spacings = {
   0: t.spacing0,

@@ -1,5 +1,7 @@
 import * as CSS from 'csstype';
 
+import type { Button } from './components/button';
+
 export type UIStates = {
   accent: string;
   error: string;
@@ -300,6 +302,7 @@ export type Theme = {
         };
       };
     };
+    button: Button;
   };
 };
 

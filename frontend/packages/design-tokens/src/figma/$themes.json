@@ -16,7 +16,8 @@
       "components/base-inputs": "enabled",
       "components/date-range-input": "enabled",
       "components/phone-inputs": "enabled",
-      "components/select": "enabled"
+      "components/select": "enabled",
+      "components/icon-button": "enabled"
     },
     "$figmaStyleReferences": {
       "color.select.initial.background": "S:077a2b433c1cafe9407041ada99f2d07420ca53a,",

@@ -2,14 +2,9 @@ import React, { forwardRef } from 'react';
 import styled, { css } from 'styled-components';
 
 import useSX, { SXStyleProps, SXStyles } from '../../hooks/use-sx';
+import { createTypography } from '../../utils/mixins';
 import LoadingIndicator from '../loading-indicator';
 import type { ButtonSize, ButtonVariant } from './button.types';
-import {
-  createFullWidthStyles,
-  createLoadingStyles,
-  createSizeStyles,
-  createVariantStyles,
-} from './button.utils';
 
 export type ButtonProps = {
   children: React.ReactNode;
@@ -47,18 +42,21 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     const sxStyles = useSX(sx);
     return (
       <ButtonContainer
-        $fullWidth={fullWidth}
-        $loading={loading}
-        $size={size}
-        $variant={variant}
+        className="fp-button"
+        data-full-width={fullWidth}
+        data-loading={loading}
+        data-size={size}
         data-testid={testID}
+        data-variant={variant}
         disabled={disabled}
         form={form}
         onClick={onClick}
         ref={ref}
+        size={size}
+        sx={sxStyles}
         tabIndex={0}
         type={type}
-        sx={sxStyles}
+        variant={variant}
       >
         {loading ? (
           <LoadingIndicator
@@ -74,27 +72,71 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 );
 
 const ButtonContainer = styled.button<{
-  $fullWidth?: boolean;
-  $loading?: boolean;
-  $size: ButtonSize;
-  $variant: ButtonVariant;
+  size: ButtonSize;
+  variant: ButtonVariant;
   sx?: SXStyles;
 }>`
-  ${({ theme, $variant, $fullWidth, $size, $loading, sx }) => css`
-    ${createSizeStyles($size)};
-    ${createVariantStyles($variant)};
-    ${createFullWidthStyles($fullWidth)};
-    ${createLoadingStyles($loading)};
-    align-items: center;
-    border-radius: ${theme.borderRadius.default}px;
-    cursor: pointer;
-    display: flex;
-    justify-content: center;
-    outline-offset: ${theme.spacing[2]}px;
-    text-decoration: none;
-    user-select: none;
-    ${sx};
-  `}
+  ${({ theme, variant, size, sx }) => {
+    const {
+      components: { button },
+    } = theme;
+
+    return css`
+      ${createTypography(button.size[size].typography)};
+      box-shadow: ${button.globals.elevation.initial};
+      align-items: center;
+      background-color: ${button.variant[variant].bg.initial};
+      border-color: ${button.variant[variant].border.initial};
+      border-radius: ${button.size[size].borderRadius}px;
+      border-style: solid;
+      border-width: ${button.globals.borderWidth}px;
+      color: ${button.variant[variant].color.initial};
+      cursor: pointer;
+      display: flex;
+      height: ${button.size[size].height}px;
+      justify-content: center;
+      outline-offset: ${button.globals.outlineOffset}px;
+      padding: 0 ${button.size[size].paddingHorizontal}px;
+      text-decoration: none;
+      user-select: none;
+      ${sx};
+
+      &:hover {
+        box-shadow: ${button.globals.elevation.initial};
+        background-color: ${button.variant[variant].bg.hover};
+        border-color: ${button.variant[variant].border.hover};
+        color: ${button.variant[variant].color.hover};
+      }
+
+      &:active {
+        box-shadow: ${button.globals.elevation.active};
+        background-color: ${button.variant[variant].bg.active};
+        border-color: ${button.variant[variant].border.active};
+        color: ${button.variant[variant].color.active};
+      }
+
+      &:disabled {
+        cursor: not-allowed;
+        background-color: ${button.variant[variant].bg.disabled};
+        border-color: ${button.variant[variant].border.disabled};
+        color: ${button.variant[variant].color.disabled};
+      }
+
+      &[data-loading='true'] {
+        background-color: ${button.variant[variant].bg.loading};
+        color: ${button.variant[variant].color.loading};
+        pointer-event: none;
+
+        path {
+          fill: ${button.variant[variant].color.loading};
+        }
+      }
+
+      &[data-full-width='true'] {
+        width: 100%;
+      }
+    `;
+  }}
 `;
 
 export default Button;

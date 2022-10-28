@@ -1,5 +1,16 @@
 {
   "elevation": {
+    "0": {
+      "value": {
+        "x": "0",
+        "y": "0",
+        "blur": "0",
+        "spread": "0",
+        "color": "#000000",
+        "type": "dropShadow"
+      },
+      "type": "boxShadow"
+    },
     "1": {
       "value": {
         "color": "#0000001f",
@@ -320,20 +331,20 @@
     }
   },
   "border-radius": {
-    "compact": {
-      "value": "4",
-      "type": "borderRadius"
-    },
-    "default": {
-      "value": "6",
+    "full": {
+      "value": "100",
       "type": "borderRadius"
     },
     "large": {
       "value": "16",
       "type": "borderRadius"
     },
-    "full": {
-      "value": "100",
+    "default": {
+      "value": "6",
+      "type": "borderRadius"
+    },
+    "compact": {
+      "value": "4",
       "type": "borderRadius"
     }
   },
@@ -447,6 +458,12 @@
     "transparent": {
       "value": "0",
       "type": "opacity"
+    }
+  },
+  "border-width": {
+    "default": {
+      "value": "1",
+      "type": "borderWidth"
     }
   }
 }

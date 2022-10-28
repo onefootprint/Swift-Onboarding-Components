@@ -52,7 +52,7 @@
         "type": "color"
       }
     },
-    "sizing": {
+    "height": {
       "large": {
         "value": "60",
         "type": "sizing"
@@ -71,7 +71,15 @@
       "type": "borderRadius"
     },
     "spacing": {
-      "paddings-horizontal": {
+      "paddings-horizontal-large": {
+        "value": "{spacing.7}",
+        "type": "spacing"
+      },
+      "paddings-horizontal-default": {
+        "value": "{spacing.7}",
+        "type": "spacing"
+      },
+      "paddings-horizontal-compact": {
         "value": "{spacing.7}",
         "type": "spacing"
       }

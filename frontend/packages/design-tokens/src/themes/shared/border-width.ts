@@ -1,4 +1,4 @@
-import type { BorderWidths } from '../types';
+import type { BorderWidths } from '../types/types';
 
 const borderWidths: BorderWidths = {
   0: 0,

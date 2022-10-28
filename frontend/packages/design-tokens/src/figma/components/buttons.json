@@ -9,6 +9,10 @@
         "text": {
           "value": "{semantic.text.quinary}",
           "type": "color"
+        },
+        "border": {
+          "value": "rgba({semantic.border.primary}, {opacity.transparent})",
+          "type": "color"
         }
       },
       "hover": {
@@ -18,6 +22,10 @@
         },
         "text": {
           "value": "{semantic.text.quinary}",
+          "type": "color"
+        },
+        "border": {
+          "value": "rgba({semantic.border.primary}, {opacity.transparent})",
           "type": "color"
         }
       },
@@ -29,6 +37,10 @@
         "text": {
           "value": "{semantic.text.quinary}",
           "type": "color"
+        },
+        "border": {
+          "value": "rgba({semantic.border.primary}, {opacity.transparent})",
+          "type": "color"
         }
       },
       "disabled": {
@@ -39,6 +51,10 @@
         "text": {
           "value": "{semantic.text.quaternary}",
           "type": "color"
+        },
+        "border": {
+          "value": "rgba({semantic.border.primary}, {opacity.transparent})",
+          "type": "color"
         }
       },
       "loading": {
@@ -48,6 +64,10 @@
         },
         "icon": {
           "value": "{semantic.text.quinary}",
+          "type": "color"
+        },
+        "border": {
+          "value": "rgba({semantic.border.primary}, {opacity.transparent})",
           "type": "color"
         }
       }
@@ -124,7 +144,7 @@
         }
       }
     },
-    "sizing": {
+    "height": {
       "large": {
         "value": "60",
         "type": "sizing"
@@ -147,11 +167,19 @@
       "type": "borderRadius"
     },
     "spacing": {
+      "paddings-horizontal-large": {
+        "value": "{spacing.7}",
+        "type": "spacing"
+      },
       "paddings-horizontal-default": {
         "value": "{spacing.7}",
         "type": "spacing"
       },
       "paddings-horizontal-compact": {
+        "value": "{spacing.7}",
+        "type": "spacing"
+      },
+      "paddings-horizontal-small": {
         "value": "{spacing.4}",
         "type": "spacing"
       }
@@ -172,6 +200,26 @@
       "small": {
         "value": "{typography.label4}",
         "type": "typography"
+      }
+    }
+  },
+  "button": {
+    "border-width": {
+      "value": "{border-width.default}",
+      "type": "borderWidth"
+    },
+    "elevation": {
+      "initial": {
+        "value": "{elevation.0}",
+        "type": "boxShadow"
+      },
+      "hover": {
+        "value": "{elevation.0}",
+        "type": "boxShadow"
+      },
+      "active": {
+        "value": "{elevation.0}",
+        "type": "boxShadow"
       }
     }
   }
