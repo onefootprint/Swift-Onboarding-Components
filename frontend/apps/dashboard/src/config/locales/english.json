@@ -490,6 +490,41 @@
         "tabs": {
           "people": "People",
           "access-control": "Access control"
+        },
+        "create-role": {
+          "title": "Create role",
+          "form": {
+            "cta": "Submit",
+            "cancel": "Cancel",
+            "name": {
+              "label": "Role",
+              "placeholder": "Role name",
+              "errors": {
+                "required": "The role name is required."
+              }
+            },
+            "permissions": {
+              "label": "Permissions",
+              "admin": "Admin",
+              "onboarding-configuration": "Onboarding configuration",
+              "api-keys": "API keys",
+              "audit-trail": "Audit trail",
+              "org-settings": "Modify organization settings",
+              "security-logs": "View security logs",
+              "users": "View user list & details",
+              "decrypt": "Decrypt certain attributes",
+              "decrypt-custom": "Decrypt all data"
+            }
+          },
+          "toast": {
+            "success": {
+              "title": "Role created successfully!",
+              "description": "\"{{name}}\" is now available as a specific role."
+            }
+          }
+        },
+        "invite-teammates": {
+          "title": "Invite teammates"
         }
       }
     }
