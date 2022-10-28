@@ -1,6 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { Box, Typography } from '@onefootprint/ui';
-import Image from 'next/image';
+import Image from 'next/legacy/image';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
@@ -26,6 +26,7 @@ const PostInfo = ({ author, createdAt, readingTime, tag }: PostInfoProps) => {
         height={44}
         src={author.profileImage}
         width={44}
+        layout="fixed"
       />
       <Box>
         <Typography variant="label-2">

@@ -1,6 +1,6 @@
 import { IcoQuote40 } from '@onefootprint/icons';
 import { Container, Typography } from '@onefootprint/ui';
-import Image from 'next/image';
+import Image from 'next/legacy/image';
 import React from 'react';
 import styled from 'styled-components';
 
@@ -32,7 +32,13 @@ const Testimonial = ({ quote, author }: TestimonialProps) => {
           {quote}
         </Typography>
         <AuthorContainer>
-          <Image alt={imgAlt} height={48} src={imgSrc} width={48} />
+          <Image
+            alt={imgAlt}
+            height={48}
+            layout="fixed"
+            src={imgSrc}
+            width={48}
+          />
           <AuthorContentContainer>
             <Typography variant="heading-3" color="primary" as="div">
               {name}

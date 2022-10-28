@@ -1,5 +1,5 @@
 import { Box, media, Typography } from '@onefootprint/ui';
-import Image from 'next/image';
+import Image from 'next/legacy/image';
 import Link from 'next/link';
 import React from 'react';
 import styled, { css } from 'styled-components';
@@ -11,7 +11,6 @@ export type PostPreviewProps = {
   featureImageAlt: string;
   featureImageUrl: string;
   href: string;
-  isFeatured?: boolean;
   primaryTag: string;
   title: string;
 };
@@ -23,7 +22,6 @@ const PostPreview = ({
   featureImageAlt,
   featureImageUrl,
   href,
-  isFeatured,
   primaryTag,
   title,
 }: PostPreviewProps) => (
@@ -32,15 +30,18 @@ const PostPreview = ({
       <FeatureImageDesktopContainer>
         <FeatureImage
           alt={featureImageAlt}
-          height={isFeatured ? 460 : 228}
+          height={228}
+          layout="responsive"
+          objectFit="cover"
           src={featureImageUrl}
-          width={isFeatured ? 960 : 468}
+          width={468}
         />
       </FeatureImageDesktopContainer>
       <FeatureImageMobileContainer>
         <FeatureImage
-          alt={featureImageAlt}
           height={228}
+          layout="responsive"
+          objectFit="cover"
           src={featureImageUrl}
           width={358}
         />

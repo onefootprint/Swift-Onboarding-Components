@@ -1,5 +1,5 @@
 import { Box, media, Typography } from '@onefootprint/ui';
-import Image from 'next/image';
+import Image from 'next/legacy/image';
 import Link from 'next/link';
 import React from 'react';
 import styled, { css } from 'styled-components';
@@ -24,64 +24,64 @@ const LibraryPostPreview = ({
   title,
 }: LibraryPostPreviewProps) => (
   <Container>
-    <Link href={href} passHref>
-      <Anchor>
-        <FeatureImageDesktopContainer>
-          <FeatureImage
-            alt={featureImageAlt}
-            height={228}
-            src={featureImageUrl}
-            width={468}
-          />
-        </FeatureImageDesktopContainer>
-        <FeatureImageMobileContainer>
-          <FeatureImage
-            alt={featureImageAlt}
-            height={228}
-            src={featureImageUrl}
-            width={358}
-          />
-        </FeatureImageMobileContainer>
-        <Content>
-          <Header>
-            <Typography color="primary" variant="heading-2">
-              {title}
+    <StyledLink href={href}>
+      <FeatureImageDesktopContainer>
+        <FeatureImage
+          alt={featureImageAlt}
+          height={228}
+          src={featureImageUrl}
+          width={468}
+          layout="responsive"
+        />
+      </FeatureImageDesktopContainer>
+      <FeatureImageMobileContainer>
+        <FeatureImage
+          alt={featureImageAlt}
+          height={228}
+          src={featureImageUrl}
+          width={358}
+          layout="responsive"
+        />
+      </FeatureImageMobileContainer>
+      <Content>
+        <Header>
+          <Typography color="primary" variant="heading-2">
+            {title}
+          </Typography>
+        </Header>
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            flexGrow: 1,
+            justifyContent: 'space-between',
+          }}
+        >
+          <Body>
+            <Typography color="secondary" variant="body-2">
+              {excerpt}
             </Typography>
-          </Header>
-          <Box
-            sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              flexGrow: 1,
-              justifyContent: 'space-between',
-            }}
-          >
-            <Body>
-              <Typography color="secondary" variant="body-2">
-                {excerpt}
-              </Typography>
-            </Body>
-            <Footer>
-              <Avatar
-                alt={author.name}
-                height={16}
-                src={author.avatarImgUrl}
-                width={16}
-              />
-              <Typography color="tertiary" variant="body-4">
-                {author.name} | <time>{createdAt}</time>
-              </Typography>
-            </Footer>
-          </Box>
-        </Content>
-      </Anchor>
-    </Link>
+          </Body>
+          <Footer>
+            <Avatar
+              alt={author.name}
+              height={16}
+              src={author.avatarImgUrl}
+              width={16}
+            />
+            <Typography color="tertiary" variant="body-4">
+              {author.name} | <time>{createdAt}</time>
+            </Typography>
+          </Footer>
+        </Box>
+      </Content>
+    </StyledLink>
   </Container>
 );
 
 const Container = styled.article``;
 
-const Anchor = styled.a`
+const StyledLink = styled(Link)`
   display: flex;
   flex-direction: column;
   height: 100%;

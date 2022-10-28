@@ -37,7 +37,6 @@ const Blog = ({ posts }: BlogProps) => {
           />
           <FeaturedPost>
             <PostPreview
-              isFeatured
               href={`/blog/${featuredPost.slug}`}
               author={{
                 avatarImgUrl: featuredPost.primary_author.profile_image,

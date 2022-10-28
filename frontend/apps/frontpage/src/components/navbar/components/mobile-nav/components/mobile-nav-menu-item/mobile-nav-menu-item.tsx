@@ -11,14 +11,12 @@ type MobileNavMenuItemProps = {
 };
 
 const MobileNavMenuItem = ({ item, onClick }: MobileNavMenuItemProps) => (
-  <Link href={item.href}>
-    <StyledLink href={item.href} onClick={onClick}>
-      {item.text}
-    </StyledLink>
-  </Link>
+  <StyledLink href={item.href} onClick={onClick}>
+    {item.text}
+  </StyledLink>
 );
 
-const StyledLink = styled.a`
+const StyledLink = styled(Link)`
   ${({ theme }) => css`
     ${createFontStyles('body-1')};
     color: ${theme.color.secondary};

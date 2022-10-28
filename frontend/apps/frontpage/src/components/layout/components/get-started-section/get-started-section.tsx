@@ -1,5 +1,5 @@
 import { Button, Container, media, Typography } from '@onefootprint/ui';
-import Image from 'next/image';
+import Image from 'next/legacy/image';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
@@ -25,6 +25,7 @@ const GetStartedSection = ({
           <SmallPenguinContainer>
             <Image
               alt="Footprint Penguin"
+              layout="fixed"
               height={106}
               src="/footer/penguin-mobile.png"
               width={192}
@@ -33,6 +34,7 @@ const GetStartedSection = ({
           <LargePenguinContainer>
             <Image
               alt="Footprint Penguin"
+              layout="fixed"
               height={202}
               src="/footer/penguin-desktop.png"
               width={150}

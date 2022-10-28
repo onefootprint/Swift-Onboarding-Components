@@ -1,5 +1,5 @@
 import { media } from '@onefootprint/ui';
-import Image from 'next/image';
+import Image from 'next/legacy/image';
 import React from 'react';
 import styled from 'styled-components';
 
@@ -11,6 +11,7 @@ const PenguinSeparator = () => (
         height={236}
         priority
         src="/home/penguin-floating-mobile.png"
+        layout="responsive"
         width={390}
       />
     </SmallImageContainer>

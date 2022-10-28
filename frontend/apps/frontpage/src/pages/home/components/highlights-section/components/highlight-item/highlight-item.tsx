@@ -1,5 +1,5 @@
 import { Typography } from '@onefootprint/ui';
-import Image from 'next/image';
+import Image from 'next/legacy/image';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
@@ -15,7 +15,13 @@ const HighlightItem = ({
 }: HighlightItemProps) => (
   <Container>
     <ImageContainer>
-      <Image alt={imgAlt} height={160} src={imgSrc} width={336} />
+      <Image
+        alt={imgAlt}
+        height={160}
+        src={imgSrc}
+        width={336}
+        layout="responsive"
+      />
     </ImageContainer>
     <Content>
       <Typography

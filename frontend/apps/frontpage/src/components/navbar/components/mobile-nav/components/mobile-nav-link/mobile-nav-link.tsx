@@ -11,14 +11,12 @@ type MobileNavLinkProps = {
 };
 
 const MobileNavLink = ({ link, onClick }: MobileNavLinkProps) => (
-  <Link href={link.href}>
-    <StyledLink href={link.href} onClick={onClick}>
-      {link.text}
-    </StyledLink>
-  </Link>
+  <StyledLink href={link.href} onClick={onClick}>
+    {link.text}
+  </StyledLink>
 );
 
-const StyledLink = styled.a`
+const StyledLink = styled(Link)`
   ${({ theme }) => css`
     ${createFontStyles('label-1')};
     color: ${theme.color.primary};

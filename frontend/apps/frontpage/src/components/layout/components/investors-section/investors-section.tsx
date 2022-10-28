@@ -1,5 +1,5 @@
 import { Container, media, Typography } from '@onefootprint/ui';
-import Image from 'next/image';
+import Image from 'next/legacy/image';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
@@ -36,7 +36,14 @@ const InvestorsSection = ({
       </Typography>
     </ContentContainer>
     <ImageContainer>
-      <Image alt={imgAlt} height={305} src={imgSrc} width={700} priority />
+      <Image
+        alt={imgAlt}
+        height={305}
+        layout="responsive"
+        src={imgSrc}
+        width={700}
+        priority
+      />
     </ImageContainer>
   </Container>
 );
