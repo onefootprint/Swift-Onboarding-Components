@@ -2,6 +2,13 @@ import { resolve } from 'path';
 import { defineConfig } from 'vite';
 import dts from 'vite-plugin-dts';
 
+const CURRENT_REMOTE_BRANCH = process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_REF;
+
+const getBranchAsSlug = (branchName?: string) => {
+  if (!branchName) return '';
+  return branchName.replaceAll('/', '-');
+};
+
 export default defineConfig(({ mode }) => ({
   build: {
     lib: {
@@ -22,7 +29,9 @@ export default defineConfig(({ mode }) => ({
     }),
   ],
   define: {
-    'url:preview': `https://bifrost-git-${process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_REF}.preview.onefootprint.com`,
+    'url:preview': `https://bifrost-git-${getBranchAsSlug(
+      CURRENT_REMOTE_BRANCH,
+    )}.preview.onefootprint.com`,
     'url:local': 'http://localhost:3000/',
     'url:dev': 'https://id.preview.onefootprint.com',
     'url:prod': 'https://id.onefootprint.com',
@@ -32,10 +41,10 @@ export default defineConfig(({ mode }) => ({
       process.env.FORCE_FOOTPRINT_JS_TO_USE_LOCAL === 'true',
     'process.env.IS_PROD': mode === 'production',
     'process.env.IS_VERCEL_ENV_DEV':
-      process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_REF === 'development' &&
+      CURRENT_REMOTE_BRANCH === 'development' &&
       process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview',
     'process.env.IS_VERCEL_ENV_PREV':
-      process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_REF !== 'development' &&
+      CURRENT_REMOTE_BRANCH !== 'development' &&
       process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview',
   },
 }));
