@@ -6,9 +6,9 @@ use diesel::prelude::*;
 use diesel::{PgConnection, Queryable};
 use newtypes::{DataAttribute, FingerprintId, IdentityDataId, SealedVaultBytes, UserVaultId};
 use serde::{Deserialize, Serialize};
-use strum::IntoEnumIterator;
 
 use super::fingerprint::Fingerprint;
+use crate::HasDataAttributeFields;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable)]
 #[diesel(table_name = identity_data)]
@@ -169,20 +169,7 @@ impl IdentityData {
     }
 }
 
-/// helper trait to access e_fields and metadata
-pub trait HasIdentityDataFields {
-    fn get_e_field(&self, data_attribute: DataAttribute) -> Option<&SealedVaultBytes>;
-
-    fn has_field(&self, data_attribute: DataAttribute) -> bool {
-        self.get_e_field(data_attribute).is_some()
-    }
-
-    fn get_populated_fields(&self) -> Vec<DataAttribute> {
-        DataAttribute::iter().filter(|k| self.has_field(*k)).collect()
-    }
-}
-
-impl HasIdentityDataFields for IdentityData {
+impl HasDataAttributeFields for IdentityData {
     fn get_e_field(&self, data_attribute: DataAttribute) -> Option<&SealedVaultBytes> {
         match data_attribute {
             DataAttribute::FirstName => self.e_first_name.as_ref(),
@@ -196,15 +183,14 @@ impl HasIdentityDataFields for IdentityData {
             DataAttribute::State => self.e_address_state.as_ref(),
             DataAttribute::Zip => self.e_address_zip.as_ref(),
             DataAttribute::Country => self.e_address_country.as_ref(),
-            DataAttribute::Email => None,
-            DataAttribute::PhoneNumber => None,
+            _ => None,
         }
     }
 }
 
-impl<T> HasIdentityDataFields for Option<T>
+impl<T> HasDataAttributeFields for Option<T>
 where
-    T: HasIdentityDataFields,
+    T: HasDataAttributeFields,
 {
     fn get_e_field(&self, data_attribute: DataAttribute) -> Option<&SealedVaultBytes> {
         self.as_ref()?.get_e_field(data_attribute)

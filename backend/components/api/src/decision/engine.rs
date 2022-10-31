@@ -5,9 +5,9 @@ use crate::{
 };
 
 use db::models::{onboarding::Onboarding, verification_request::VerificationRequest};
-use newtypes::{OnboardingStatus, TenantId, UserVaultId, Vendor};
+use newtypes::{OnboardingStatus, TenantId, UserVaultId, Vendor, VendorAPI};
 
-use super::*;
+use super::{verification_request::build_request, *};
 /// The Engine module is the main entry point into running our verification logic
 ///
 ///
@@ -35,7 +35,6 @@ pub async fn run(
     // Check if the user is a sandbox user. Sandbox users have the final KYC state encoded in their
     // phone number's sandbox suffix
     let desired_status = utils::get_desired_status_for_testing(state, &uvw).await?;
-    let vendors = vec![Vendor::Idology, Vendor::Twilio];
 
     // Build our VerificationRequests and save outputs
     let (requests, ob_id) = state
@@ -53,14 +52,19 @@ pub async fn run(
                 return Err(OnboardingError::WrongKycState(ob.status).into());
             }
             let ob_id = ob.id.clone();
-            // We need to figure out which vendors to send which pieces of data...
+
+            // From the data in the vault, figure out which vendors we need to send to
+            let available_vendor_apis = user_vault_helper::get_vendor_apis_from_user_vault_wrapper(&uvw)?;
+            // From the possible vendors, select which ones we're sending to (logic TBD)
+            let vendor_apis = verification_request::choose_vendor_apis(available_vendor_apis);
+
             let requests = verification_request::build_verification_requests_and_checkpoint(
                 conn,
                 ob,
                 &uvw,
                 &tenantid,
                 desired_status,
-                vendors,
+                vendor_apis,
             )?;
             Ok((requests, ob_id))
         })

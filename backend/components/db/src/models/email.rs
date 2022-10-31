@@ -10,6 +10,7 @@ use serde::{Deserialize, Serialize};
 
 use super::fingerprint::Fingerprint;
 use super::user_vault::UserVault;
+use crate::HasDataAttributeFields;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable)]
 #[diesel(table_name = email)]
@@ -122,5 +123,14 @@ impl Email {
 
     pub fn data_items(self) -> Vec<(DataAttribute, SealedVaultBytes)> {
         vec![(DataAttribute::Email, self.e_data)]
+    }
+}
+
+impl HasDataAttributeFields for Email {
+    fn get_e_field(&self, data_attribute: DataAttribute) -> Option<&SealedVaultBytes> {
+        match data_attribute {
+            DataAttribute::Email => Some(&self.e_data),
+            _ => None,
+        }
     }
 }

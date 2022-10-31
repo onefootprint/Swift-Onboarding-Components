@@ -1,10 +1,9 @@
 use crate::utils::user_vault_wrapper::UserVaultWrapper;
 use crate::{errors::ApiError, State};
 use chrono::Utc;
-use db::models::{
-    identity_data::HasIdentityDataFields, verification_request::NewVerificationRequest,
-    verification_request::VerificationRequest,
-};
+use db::models::{verification_request::NewVerificationRequest, verification_request::VerificationRequest};
+use db::HasDataAttributeFields;
+use newtypes::VendorAPI;
 use newtypes::{email::Email, DataAttribute, IdvData, OnboardingId, PhoneNumber, Vendor};
 use std::{collections::HashMap, str::FromStr};
 use strum::IntoEnumIterator;
@@ -56,15 +55,16 @@ pub async fn build_idv_data_from_verification_request(
 pub fn build_verification_request(
     uvw: &UserVaultWrapper,
     ob_id: OnboardingId,
-    vendor: Vendor,
+    vendor_api: VendorAPI,
 ) -> NewVerificationRequest {
     NewVerificationRequest {
         onboarding_id: ob_id,
-        vendor,
+        vendor: Vendor::from(vendor_api),
         timestamp: Utc::now(),
         email_id: uvw.email.as_ref().map(|e| e.id.clone()),
         phone_number_id: uvw.phone_number.as_ref().map(|e| e.id.clone()),
         identity_data_id: uvw.identity_data.as_ref().map(|e| e.id.clone()),
         identity_document_id: None,
+        vendor_api,
     }
 }

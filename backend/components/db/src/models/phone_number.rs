@@ -11,6 +11,7 @@ use serde::{Deserialize, Serialize};
 use crate::DbError;
 
 use super::fingerprint::Fingerprint;
+use crate::HasDataAttributeFields;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable)]
 #[diesel(table_name = phone_number)]
@@ -118,5 +119,14 @@ impl PhoneNumber {
 
     pub fn data_items(self) -> Vec<(DataAttribute, SealedVaultBytes)> {
         vec![(DataAttribute::PhoneNumber, self.e_e164)]
+    }
+}
+
+impl HasDataAttributeFields for PhoneNumber {
+    fn get_e_field(&self, data_attribute: DataAttribute) -> Option<&SealedVaultBytes> {
+        match data_attribute {
+            DataAttribute::PhoneNumber => Some(&self.e_e164),
+            _ => None,
+        }
     }
 }

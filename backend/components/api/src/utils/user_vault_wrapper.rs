@@ -1,11 +1,11 @@
 use db::models::fingerprint::IsUnique;
-use db::models::identity_data::{HasIdentityDataFields, IdentityData};
+use db::models::identity_data::IdentityData;
 use db::models::kv_data::{KeyValueData, NewKeyValueDataArgs};
 use db::models::onboarding::Onboarding;
 use db::models::scoped_user::ScopedUser;
 use db::models::user_timeline::UserTimeline;
 use db::models::verification_request::VerificationRequest;
-use db::TxnPgConnection;
+use db::{DbResult, TxnPgConnection};
 use enclave_proxy::DataTransform;
 
 use db::models::email::Email;
@@ -28,8 +28,10 @@ use newtypes::{
 use crate::errors::{ApiError, ApiResult};
 use crate::types::identity_data_request::IdentityDataUpdate;
 use crate::State;
+use itertools::Itertools;
 
 use super::identity_data_builder::IdentityDataBuilder;
+use db::HasDataAttributeFields;
 
 pub struct UserVaultWrapper {
     pub user_vault: UserVault,
@@ -37,7 +39,8 @@ pub struct UserVaultWrapper {
     pub phone_number: Option<PhoneNumber>,
     pub email: Option<Email>,
     is_locked: bool,
-    phantom: PhantomData<()>,
+    // Represents whether we have fetched the appropriate data
+    is_hydrated: PhantomData<()>,
 }
 
 #[derive(Debug, Clone, Eq, PartialEq, serde::Serialize, serde::Deserialize, Apiv2Schema)]
@@ -61,7 +64,7 @@ impl UserVaultWrapper {
             phone_number,
             email,
             is_locked,
-            phantom: PhantomData,
+            is_hydrated: PhantomData,
         })
     }
 
@@ -103,7 +106,7 @@ impl UserVaultWrapper {
                     phone_number: phone_number.remove(&uv_id),
                     email: email.remove(&uv_id),
                     is_locked,
-                    phantom: PhantomData,
+                    is_hydrated: PhantomData,
                 }
             })
             .collect())
@@ -135,7 +138,7 @@ impl UserVaultWrapper {
             phone_number,
             email,
             is_locked: false,
-            phantom: PhantomData,
+            is_hydrated: PhantomData,
         })
     }
 
@@ -240,13 +243,30 @@ impl UserVaultWrapper {
     }
 }
 
-impl HasIdentityDataFields for UserVaultWrapper {
+impl HasDataAttributeFields for UserVaultWrapper {
     fn get_e_field(&self, data_attribute: DataAttribute) -> Option<&SealedVaultBytes> {
         let id = self.identity_data.as_ref();
+        let email = self.email.as_ref();
+        let phone = self.phone_number.as_ref();
         match data_attribute {
-            DataAttribute::Email => self.email.as_ref().map(|e| &e.e_data),
-            DataAttribute::PhoneNumber => self.phone_number.as_ref().map(|p| &p.e_e164),
-            kind => id?.get_e_field(kind),
+            // identity
+            DataAttribute::FirstName => id?.get_e_field(data_attribute),
+            DataAttribute::LastName => id?.get_e_field(data_attribute),
+            DataAttribute::Dob => id?.get_e_field(data_attribute),
+            DataAttribute::Ssn9 => id?.get_e_field(data_attribute),
+            DataAttribute::AddressLine1 => id?.get_e_field(data_attribute),
+            DataAttribute::AddressLine2 => id?.get_e_field(data_attribute),
+            DataAttribute::City => id?.get_e_field(data_attribute),
+            DataAttribute::State => id?.get_e_field(data_attribute),
+            DataAttribute::Zip => id?.get_e_field(data_attribute),
+            DataAttribute::Country => id?.get_e_field(data_attribute),
+            DataAttribute::Ssn4 => id?.get_e_field(data_attribute),
+            // email
+            DataAttribute::Email => email?.get_e_field(data_attribute),
+            // phone
+            DataAttribute::PhoneNumber => phone?.get_e_field(data_attribute),
+            // identity docs (TBU)
+            DataAttribute::IdentityDocument => None,
         }
     }
 }

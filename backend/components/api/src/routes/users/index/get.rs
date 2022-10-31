@@ -14,13 +14,13 @@ use crate::utils::user_vault_wrapper::UserVaultWrapper;
 use crate::State;
 use api_wire_types::DecisionSource;
 use api_wire_types::ListUsersRequest;
-use db::models::identity_data::HasIdentityDataFields;
 use db::models::onboarding::Onboarding;
 use db::models::onboarding::OnboardingInfo;
 use db::models::onboarding_decision::OnboardingDecision;
 use db::models::scoped_user::ScopedUser;
 use db::models::tenant_user::TenantUser;
 use db::scoped_user::OnboardingListQueryParams;
+use db::HasDataAttributeFields;
 
 use newtypes::FootprintUserId;
 use newtypes::TenantPermission;

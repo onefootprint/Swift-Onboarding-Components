@@ -1,0 +1,1 @@
+ALTER TABLE verification_request DROP COLUMN vendor_api;

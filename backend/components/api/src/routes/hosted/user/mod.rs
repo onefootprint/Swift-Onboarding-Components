@@ -1,5 +1,5 @@
 use crate::{errors::ApiError, utils::user_vault_wrapper::UserVaultWrapper, State};
-use db::models::{identity_data::HasIdentityDataFields, user_vault::UserVault};
+use db::{models::user_vault::UserVault, HasDataAttributeFields};
 use newtypes::{DataAttribute, PiiString, SealedVaultBytes};
 use paperclip::actix::web;
 use std::collections::HashMap;

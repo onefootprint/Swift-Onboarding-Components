@@ -7,7 +7,7 @@ use db::{
     },
     TxnPgConnection,
 };
-use newtypes::{OnboardingStatus, TenantId, Vendor};
+use newtypes::{OnboardingStatus, TenantId, VendorAPI};
 
 use super::utils;
 
@@ -22,7 +22,7 @@ pub fn build_verification_requests_and_checkpoint(
     uvw: &UserVaultWrapper,
     tenant_id: &TenantId,
     desired_status: OnboardingStatus,
-    vendors: Vec<Vendor>,
+    vendor_apis: Vec<VendorAPI>,
 ) -> Result<Vec<VerificationRequest>, ApiError> {
     // TODO decide when to re-KYC
     // Create the VerificationRequest and mark the onboarding's kyc_status
@@ -30,7 +30,7 @@ pub fn build_verification_requests_and_checkpoint(
 
     let requests_to_initiate = if desired_status == OnboardingStatus::Processing {
         // Create real VerificationRequests because we are kicking off IDV verification
-        let requests_to_save = vendors
+        let requests_to_save = vendor_apis
             .into_iter()
             .map(|v| build_request::build_verification_request(uvw, ob.id.clone(), v))
             .collect();
@@ -45,4 +45,9 @@ pub fn build_verification_requests_and_checkpoint(
         vec![]
     };
     Ok(requests_to_initiate)
+}
+
+/// Placeholder for more dynamically choosing which APIs to route to based on available data
+pub fn choose_vendor_apis(available_vendor_apis_from_vault_data: Vec<VendorAPI>) -> Vec<VendorAPI> {
+    available_vendor_apis_from_vault_data
 }

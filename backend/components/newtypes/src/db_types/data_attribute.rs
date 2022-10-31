@@ -45,6 +45,7 @@ pub enum DataAttribute {
     Email,
     PhoneNumber,
     Ssn4,
+    IdentityDocument,
 }
 
 crate::util::impl_enum_str_diesel!(DataAttribute);

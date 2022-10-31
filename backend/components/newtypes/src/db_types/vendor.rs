@@ -36,3 +36,41 @@ pub enum Vendor {
 }
 
 impl_enum_str_diesel!(Vendor);
+
+#[derive(
+    Debug,
+    Display,
+    Clone,
+    Copy,
+    Deserialize,
+    Hash,
+    Serialize,
+    Apiv2Schema,
+    PartialEq,
+    Eq,
+    AsExpression,
+    FromSqlRow,
+    EnumString,
+    AsRefStr,
+    JsonSchema,
+)]
+#[serde(rename_all = "snake_case")]
+#[strum(serialize_all = "snake_case")]
+#[diesel(sql_type = Text)]
+/// Represents the API for the request we'll make
+pub enum VendorAPI {
+    IdologyExpectID,
+    IdologyScanVerify,
+    TwilioLookupV2,
+}
+impl_enum_str_diesel!(VendorAPI);
+
+impl From<VendorAPI> for Vendor {
+    fn from(api: VendorAPI) -> Self {
+        match api {
+            VendorAPI::IdologyExpectID => Self::Idology,
+            VendorAPI::IdologyScanVerify => Self::Idology,
+            VendorAPI::TwilioLookupV2 => Self::Twilio,
+        }
+    }
+}

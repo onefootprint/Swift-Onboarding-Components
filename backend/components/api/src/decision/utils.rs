@@ -10,7 +10,7 @@ use db::{
 };
 use newtypes::{
     AuditTrailEvent, ComplianceStatus, FootprintReasonCode, OnboardingId, OnboardingStatus, SignalScope,
-    TenantId, Vendor, VerificationInfo, VerificationInfoStatus, VerificationStatus,
+    TenantId, Vendor, VendorAPI, VerificationInfo, VerificationInfoStatus, VerificationStatus,
 };
 
 use crate::{
@@ -66,7 +66,7 @@ pub(super) fn create_test_fixture_data(
         _ => VerificationStatus::Failed,
     };
     // Create some mock verification request and results
-    let request = build_request::build_verification_request(uvw, ob_id.clone(), Vendor::Idology);
+    let request = build_request::build_verification_request(uvw, ob_id.clone(), VendorAPI::IdologyExpectID);
     let request = VerificationRequest::bulk_save(conn, vec![request])?
         .pop()
         .ok_or(ApiError::ResourceNotFound)?;

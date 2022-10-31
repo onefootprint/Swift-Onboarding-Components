@@ -18,8 +18,8 @@ use crate::{errors::ApiError, State};
 
 use actix_web::web::Query;
 use db::models::access_event::NewAccessEvent;
-use db::models::identity_data::HasIdentityDataFields;
 use db::models::insight_event::CreateInsightEvent;
+use db::HasDataAttributeFields;
 use db::TxnPgConnection;
 
 use db::models::scoped_user::ScopedUser;

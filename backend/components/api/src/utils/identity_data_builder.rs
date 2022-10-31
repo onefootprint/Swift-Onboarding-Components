@@ -1,9 +1,9 @@
 use db::{
     models::{
         fingerprint::IsUnique,
-        identity_data::{HasIdentityDataFields, IdentityData, NewIdentityDataArgs},
+        identity_data::{IdentityData, NewIdentityDataArgs},
     },
-    PgConnection,
+    HasDataAttributeFields, PgConnection,
 };
 use newtypes::{
     address::{Address, Country, FullAddressOrZip, Zip, ZipAndCountry},

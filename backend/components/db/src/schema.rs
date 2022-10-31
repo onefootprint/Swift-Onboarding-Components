@@ -455,6 +455,7 @@ table! {
         identity_data_id -> Nullable<Text>,
         onboarding_id -> Uuid,
         identity_document_id -> Nullable<Text>,
+        vendor_api -> Text,
     }
 }
 
