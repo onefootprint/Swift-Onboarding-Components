@@ -16,7 +16,7 @@ async fn handler() -> StringResponse {
     // Be very careful what checks you add to this endpoint. A failed response here will cause the API
     // server process to be restarted, which is usually more harmful than a single dependency
     // being down.
-    Ok("".to_string())
+    Ok("ok".to_string())
 }
 
 #[api_v2_operation(tags(Private), description = "Returns health of services running")]

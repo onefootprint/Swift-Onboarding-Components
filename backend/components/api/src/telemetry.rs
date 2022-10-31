@@ -105,6 +105,8 @@ impl RootSpanBuilder for TelemetrySpanBuilder {
             timestamp,
         } = InsightHeaders::parse_from_request(request.headers());
 
+        let server_git_hash = crate::GIT_HASH.to_string();
+
         let span = root_span!(
             request,
             route, 
@@ -120,6 +122,7 @@ impl RootSpanBuilder for TelemetrySpanBuilder {
             time_zone,
             user_agent,
             timestamp=%timestamp,
+            server_git_hash,
             "request start");
         span
     }
