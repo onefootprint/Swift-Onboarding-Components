@@ -8,11 +8,11 @@ import AddressSection from './components/address-section';
 import BasicSection from './components/basic-section';
 import IdentitySection from './components/identity-section';
 
-type ViewBasicInfoProps = {
+type ViewVaultDataProps = {
   user: User;
 };
 
-const ViewBasicInfo = ({ user }: ViewBasicInfoProps) => {
+const ViewVaultData = ({ user }: ViewVaultDataProps) => {
   const sectionsVisibility = getSectionsVisibility(user.identityDataAttributes);
   const showIdentity = sectionsVisibility.identity;
   const showAddress = sectionsVisibility.address;
@@ -54,4 +54,4 @@ const DataGrid = styled.div`
   `};
 `;
 
-export default ViewBasicInfo;
+export default ViewVaultData;

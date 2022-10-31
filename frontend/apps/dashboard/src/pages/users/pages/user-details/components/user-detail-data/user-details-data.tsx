@@ -13,10 +13,10 @@ import { UserData } from '../../../../hooks/use-user-data';
 import { Event } from '../../utils/decrypt-state-machine';
 import { useDecryptMachine } from '../decrypt-machine-provider';
 import AuditTrail from './components/audit-trail';
-import BasicInfo from './components/basic-info';
 import Insights from './components/insights';
 import RiskSignals from './components/signals';
 import UserHeader from './components/user-header';
+import VaultData from './components/vault-data';
 
 type UserDetailsDataProps = {
   user: User;
@@ -72,7 +72,7 @@ const UserDetailsData = ({ user, decrypt }: UserDetailsDataProps) => {
         <Divider />
       </Box>
       <Box sx={{ marginBottom: 9 }}>
-        <BasicInfo user={user} onDecrypt={handleDecrypt} />
+        <VaultData user={user} onDecrypt={handleDecrypt} />
       </Box>
       {user.isPortable ? (
         <>

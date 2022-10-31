@@ -5,10 +5,10 @@ import { useUpdateEffect } from 'usehooks-ts';
 
 import { State } from '../../../../utils/decrypt-state-machine';
 import { useDecryptMachine } from '../../../decrypt-machine-provider';
-import DecryptBasicInfo from './components/decrypt-basic-info';
-import ViewBasicInfo from './components/view-basic-info';
+import DecryptBasicInfo from './components/decrypt-vault-data';
+import ViewBasicInfo from './components/view-vault-data';
 
-type BasicInfoProps = {
+type VaultDataProps = {
   user: User;
   onDecrypt: (
     fields: Partial<Record<UserDataAttribute, boolean>>,
@@ -16,7 +16,7 @@ type BasicInfoProps = {
   ) => void;
 };
 
-const BasicInfo = ({ user, onDecrypt }: BasicInfoProps) => {
+const VaultData = ({ user, onDecrypt }: VaultDataProps) => {
   const [state] = useDecryptMachine();
   const showCheckboxes =
     state.matches(State.selectingFields) ||
@@ -36,4 +36,4 @@ const BasicInfo = ({ user, onDecrypt }: BasicInfoProps) => {
   );
 };
 
-export default BasicInfo;
+export default VaultData;

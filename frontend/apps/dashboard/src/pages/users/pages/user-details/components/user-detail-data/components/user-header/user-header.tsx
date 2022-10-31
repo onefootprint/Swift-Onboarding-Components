@@ -9,11 +9,11 @@ import styled, { css } from 'styled-components';
 
 import DecryptControls from './components/decrypt-controls';
 
-type BasicInfoProps = {
+type UserHeaderProps = {
   user: User;
 };
 
-const UserHeader = ({ user }: BasicInfoProps) => {
+const UserHeader = ({ user }: UserHeaderProps) => {
   const { id: footprintUserId } = user;
   return (
     <HeaderContainer>

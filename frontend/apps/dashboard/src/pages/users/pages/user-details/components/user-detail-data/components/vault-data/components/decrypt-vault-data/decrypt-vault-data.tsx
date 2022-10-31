@@ -14,7 +14,7 @@ import AddressSection from './components/address-section';
 import BasicSection from './components/basic-section';
 import IdentitySection from './components/identity-section';
 
-type DecryptBasicInfoProps = {
+type DecryptVaultDataProps = {
   user: User;
 };
 
@@ -23,7 +23,7 @@ type FormData = Omit<
   UserDataAttribute.firstName | UserDataAttribute.lastName
 >;
 
-const DecryptBasicInfo = ({ user }: DecryptBasicInfoProps) => {
+const DecryptVaultData = ({ user }: DecryptVaultDataProps) => {
   const { t } = useTranslation('pages.user-details');
   const [state, send] = useDecryptMachine();
   const formMethods = useForm<FormData>({
@@ -82,4 +82,4 @@ const DataGrid = styled.div`
   `};
 `;
 
-export default DecryptBasicInfo;
+export default DecryptVaultData;
