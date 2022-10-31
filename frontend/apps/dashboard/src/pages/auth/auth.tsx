@@ -45,7 +45,7 @@ const Auth = () => {
           tenantName,
           sandboxRestricted,
         });
-        router.push('/');
+        router.push('/users');
       },
     });
   });
