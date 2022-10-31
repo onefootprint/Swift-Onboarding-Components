@@ -7,16 +7,17 @@ import {
 } from '@onefootprint/types';
 import { CollectedDataOption } from '@onefootprint/types/src/data/collected-data-option';
 import { LoadingIndicator, Typography } from '@onefootprint/ui';
+import { useGetOnboardingStatus } from 'footprint-elements';
 import React, { useState } from 'react';
 import { Events } from 'src/utils/state-machine/onboarding-requirements';
 import styled, { css } from 'styled-components';
 
 import useOnboardingRequirementsMachine from '../../hooks/use-onboarding-requirements-machine';
-import useGetOnboardingStatus from './hooks/use-get-onboarding-status';
 
 const CheckOnboardingRequirements = () => {
   const { t } = useTranslation('pages.check-onboarding-requirements');
-  const [, send] = useOnboardingRequirementsMachine();
+  const [state, send] = useOnboardingRequirementsMachine();
+  const { authToken, tenant } = state.context;
   const [error, setError] = useState(false);
 
   const handleSuccess = (response: OnboardingStatusResponse) => {
@@ -52,7 +53,7 @@ const CheckOnboardingRequirements = () => {
     setError(true);
   };
 
-  useGetOnboardingStatus({
+  useGetOnboardingStatus(authToken, tenant.pk, {
     onSuccess: handleSuccess,
     onError: handleError,
   });

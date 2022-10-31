@@ -1,7 +1,7 @@
 import { useCountdown, useTranslation } from '@onefootprint/hooks';
 import { D2PStatusUpdate } from '@onefootprint/types';
+import { useUpdateD2PStatus } from 'footprint-elements';
 import React from 'react';
-import useUpdateD2pStatus from 'src/hooks/use-update-d2p-status';
 import { useEffectOnce } from 'usehooks-ts';
 
 import HeaderTitle from '../../components/header-title';
@@ -13,7 +13,7 @@ const SUCCESS_COUNTER_SECONDS = 3;
 const Complete = () => {
   const { t } = useTranslation('pages.complete');
   const opener = useOpener();
-  const updateD2PStatusMutation = useUpdateD2pStatus();
+  const updateD2PStatusMutation = useUpdateD2PStatus();
   const [state] = useHandoffMachine();
   const { authToken } = state.context;
 

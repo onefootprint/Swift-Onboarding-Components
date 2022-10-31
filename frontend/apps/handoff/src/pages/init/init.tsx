@@ -1,12 +1,15 @@
 import { DeviceInfo, useDeviceInfo } from '@onefootprint/hooks';
 import { D2PStatusUpdate, TenantInfo } from '@onefootprint/types';
 import { LoadingIndicator } from '@onefootprint/ui';
-import { HandoffUrlQuery, useParseHandoffUrl } from 'footprint-elements';
+import {
+  HandoffUrlQuery,
+  useParseHandoffUrl,
+  useUpdateD2PStatus,
+} from 'footprint-elements';
 import React from 'react';
 import useHandoffMachine from 'src/hooks/use-handoff-machine';
 import { Events } from 'src/utils/state-machine';
 
-import useUpdateD2PStatus from '../../hooks/use-update-d2p-status';
 import useTenantInfo from './hooks/use-tenant-info';
 
 const Init = () => {

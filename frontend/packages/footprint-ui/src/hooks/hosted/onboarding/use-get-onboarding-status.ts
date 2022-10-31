@@ -4,11 +4,11 @@ import {
   OnboardingStatusResponse,
 } from '@onefootprint/types';
 import { useQuery } from '@tanstack/react-query';
-import { AUTH_HEADER, CLIENT_PUBLIC_KEY_HEADER } from 'src/config/constants';
 
-import useOnboardingRequirementsMachine from '../../../hooks/use-onboarding-requirements-machine';
-
-const ONBOARDING_STATUS_FETCH_INTERVAL = 1000;
+import {
+  AUTH_HEADER,
+  ONBOARDING_CONFIG_KEY_HEADER,
+} from '../../../config/constants';
 
 const getOnboardingStatus = async (payload: OnboardingStatusRequest) => {
   const response = await request<OnboardingStatusResponse>({
@@ -16,34 +16,28 @@ const getOnboardingStatus = async (payload: OnboardingStatusRequest) => {
     url: '/hosted/onboarding/status',
     headers: {
       [AUTH_HEADER]: payload.authToken,
-      [CLIENT_PUBLIC_KEY_HEADER]: payload.tenantPk,
+      [ONBOARDING_CONFIG_KEY_HEADER]: payload.tenantPk,
     },
   });
   return response.data;
 };
 
 const useGetOnboardingStatus = (
+  authToken: string,
+  tenantPk: string,
   options: {
     onSuccess?: (data: OnboardingStatusResponse) => void;
     onError?: (error: RequestError) => void;
   } = {},
-) => {
-  const [state] = useOnboardingRequirementsMachine();
-  const {
-    authToken,
-    tenant: { pk: tenantPk },
-  } = state.context;
-
-  return useQuery<OnboardingStatusResponse, RequestError>(
+) =>
+  useQuery<OnboardingStatusResponse, RequestError>(
     ['onboarding-status', authToken, tenantPk],
     () => getOnboardingStatus({ authToken, tenantPk }),
     {
-      refetchInterval: ONBOARDING_STATUS_FETCH_INTERVAL,
-      enabled: !!authToken,
+      enabled: !!authToken && !!tenantPk,
       onSuccess: options.onSuccess,
       onError: options.onError,
     },
   );
-};
 
 export default useGetOnboardingStatus;

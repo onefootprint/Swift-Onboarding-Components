@@ -18,14 +18,16 @@ import {
   useToast,
 } from '@onefootprint/ui';
 import { useIsMutating } from '@tanstack/react-query';
-import { HeaderTitle, NavigationHeader } from 'footprint-elements';
+import {
+  HeaderTitle,
+  NavigationHeader,
+  useGetOnboardingStatus,
+  useOnboardingAuthorize,
+} from 'footprint-elements';
 import React, { useState } from 'react';
 import useOnboardingMachine from 'src/hooks/use-onboarding-machine';
-import useOnboardingAuthorize from 'src/pages/onboarding/pages/authorize/hooks/use-onboarding-authorize';
 import { Events } from 'src/utils/state-machine/onboarding/types';
 import styled, { css } from 'styled-components';
-
-import useGetOnboardingStatus from './hooks/get-onboarding-status';
 
 const IconByCollectedDataOption: Record<CollectedDataOption, JSX.Element> = {
   [CollectedDataOption.name]: <IcoUserCircle24 />,
@@ -56,7 +58,7 @@ const Authorize = () => {
     tenant: { pk: tenantPk },
   } = state.context;
 
-  const statusQuery = useGetOnboardingStatus({
+  const statusQuery = useGetOnboardingStatus(authToken, tenantPk, {
     onSuccess: ({ fieldsToAuthorize }) => {
       setCollectedDocs(fieldsToAuthorize?.identityDocumentType ?? []);
     },

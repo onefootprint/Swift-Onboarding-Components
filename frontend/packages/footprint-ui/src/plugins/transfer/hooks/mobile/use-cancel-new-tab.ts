@@ -1,6 +1,6 @@
 import { D2PStatusUpdate } from '@onefootprint/types';
 
-import useUpdateD2PStatus from '../use-update-d2p-status';
+import { useUpdateD2PStatus } from '../../../../hooks';
 import useMobileMachine, { Events } from './use-mobile-machine';
 
 const useCancelNewTab = () => {

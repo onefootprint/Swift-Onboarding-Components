@@ -1,14 +1,13 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { D2PStatus, D2PStatusUpdate } from '@onefootprint/types';
 import { LinkButton, LoadingIndicator } from '@onefootprint/ui';
-import { HeaderTitle } from 'footprint-elements';
+import { HeaderTitle, useUpdateD2PStatus } from 'footprint-elements';
 import React, { useEffect } from 'react';
 import { Events } from 'src/utils/state-machine/liveness-check';
 import styled, { css } from 'styled-components';
 
 import { useLivenessCheckMachine } from '../../components/machine-provider';
 import useGetD2PStatus from '../../hooks/d2p/use-get-d2p-status';
-import useUpdateD2PStatus from '../../hooks/d2p/use-update-d2p-status';
 
 const QRCodeScanned = () => {
   const [state, send] = useLivenessCheckMachine();

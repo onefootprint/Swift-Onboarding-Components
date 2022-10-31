@@ -1,25 +1,20 @@
 import { useTranslation } from '@onefootprint/hooks';
-import {
-  GetKycStatusResponse,
-  KycStatus,
-  StartKycResponse,
-} from '@onefootprint/types';
+import { KycStatus, StartKycResponse } from '@onefootprint/types';
 import { LoadingIndicator, useToast } from '@onefootprint/ui';
 import React from 'react';
 import styled from 'styled-components';
 import { useEffectOnce } from 'usehooks-ts';
 
+import { useGetKycStatus, useOnboardingSubmit } from '../../../../hooks';
 import useCollectKycDataMachine, {
   Events,
 } from '../../hooks/use-collect-kyc-data-machine';
-import useGetKycStatus from '../../hooks/use-get-kyc-status';
-import useStartKyc from '../../hooks/use-start-kyc';
 
 const StartKyc = () => {
   const { t } = useTranslation('pages.confirm');
   const [state, send] = useCollectKycDataMachine();
-  const { tenant, authToken } = state.context;
-  const startKycMutation = useStartKyc();
+  const { tenant, kycPending, authToken } = state.context;
+  const startKycMutation = useOnboardingSubmit();
   const toast = useToast();
 
   useEffectOnce(() => {
@@ -58,9 +53,9 @@ const StartKyc = () => {
     });
   };
 
-  useGetKycStatus({
-    onSuccess: (response: GetKycStatusResponse) =>
-      handleKycSuccess(response.status),
+  const kycStatusPollingEnabled = !!kycPending;
+  useGetKycStatus(kycStatusPollingEnabled, authToken ?? '', tenant?.pk ?? '', {
+    onSuccess: response => handleKycSuccess(response.status),
     onError: handleError,
   });
 

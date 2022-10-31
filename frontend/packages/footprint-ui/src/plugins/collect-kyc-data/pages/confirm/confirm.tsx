@@ -1,20 +1,15 @@
 import { useTranslation } from '@onefootprint/hooks';
-import {
-  GetKycStatusResponse,
-  KycStatus,
-  StartKycResponse,
-} from '@onefootprint/types';
+import { KycStatus, StartKycResponse } from '@onefootprint/types';
 import { Button, useToast } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import { HeaderTitle } from '../../../../components';
 import NavigationHeader from '../../../../components/navigation-header';
+import { useGetKycStatus, useOnboardingSubmit } from '../../../../hooks';
 import useCollectKycDataMachine, {
   Events,
 } from '../../hooks/use-collect-kyc-data-machine';
-import useGetKycStatus from '../../hooks/use-get-kyc-status';
-import useStartKyc from '../../hooks/use-start-kyc';
 import useSyncData from '../../hooks/use-sync-data';
 import AddressSection from './components/address-section';
 import BasicInfoSection from './components/basic-info-section';
@@ -24,11 +19,11 @@ import IdentitySection from './components/identity-section';
 const Confirm = () => {
   const { t } = useTranslation('pages.confirm');
   const [state, send] = useCollectKycDataMachine();
-  const { authToken, data, tenant, device } = state.context;
+  const { authToken, data, tenant, kycPending, device } = state.context;
   const isMobile = device?.type === 'mobile';
   const [editContent, setEditContent] = useState<EditSection | undefined>();
   const { mutation, syncData } = useSyncData();
-  const startKycMutation = useStartKyc();
+  const startKycMutation = useOnboardingSubmit();
   const toast = useToast();
 
   const handleError = () => {
@@ -52,9 +47,9 @@ const Confirm = () => {
     });
   };
 
-  useGetKycStatus({
-    onSuccess: (response: GetKycStatusResponse) =>
-      handleKycSuccess(response.status),
+  const kycStatusPollingEnabled = !!kycPending;
+  useGetKycStatus(kycStatusPollingEnabled, authToken ?? '', tenant?.pk ?? '', {
+    onSuccess: response => handleKycSuccess(response.status),
     onError: handleError,
   });
 

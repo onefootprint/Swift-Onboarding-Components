@@ -4,16 +4,16 @@ import {
   OnboardingStatusResponse,
 } from '@onefootprint/types';
 import { LoadingIndicator } from '@onefootprint/ui';
+import { useGetOnboardingStatus } from 'footprint-elements';
 import React from 'react';
 import useHandoffMachine from 'src/hooks/use-handoff-machine';
 import { Events } from 'src/utils/state-machine';
 
-import useGetOnboardingStatus from './hooks/use-get-onboarding-status';
-
 const CheckRequirements = () => {
-  const [, send] = useHandoffMachine();
+  const [state, send] = useHandoffMachine();
+  const { authToken, tenant } = state.context;
 
-  useGetOnboardingStatus({
+  useGetOnboardingStatus(authToken ?? '', tenant?.pk ?? '', {
     onSuccess: (response: OnboardingStatusResponse) => {
       const { requirements } = response;
       let missingLiveness = false;

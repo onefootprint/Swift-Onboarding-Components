@@ -1,6 +1,6 @@
 import { D2PStatusUpdate } from '@onefootprint/types';
 
-import useUpdateD2PStatus from '../use-update-d2p-status';
+import { useUpdateD2PStatus } from '../../../../hooks';
 import useDesktopMachine, { Events } from './use-desktop-machine';
 
 const useCancelD2P = () => {

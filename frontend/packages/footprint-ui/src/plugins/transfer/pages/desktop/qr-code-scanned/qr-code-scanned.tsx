@@ -5,11 +5,11 @@ import styled, { css } from 'styled-components';
 
 import HeaderTitle from '../../../../../components/header-title';
 import NavigationHeader from '../../../../../components/navigation-header';
+import { useGetD2PStatus } from '../../../../../hooks';
 import useCancelD2P from '../../../hooks/desktop/use-cancel-d2p';
 import useDesktopMachine from '../../../hooks/desktop/use-desktop-machine';
 import useHandleD2PStatusUpdate from '../../../hooks/desktop/use-handle-d2p-status-update';
 import useTranslationSourceForRequirements from '../../../hooks/desktop/use-translation-source-for-requirements';
-import useGetD2PStatus from '../../../hooks/use-get-d2p-status';
 
 const QRCodeScanned = () => {
   const [state] = useDesktopMachine();
@@ -18,7 +18,7 @@ const QRCodeScanned = () => {
   const translationSource = useTranslationSourceForRequirements();
   const cancelD2P = useCancelD2P();
   const { handleSuccess, handleError } = useHandleD2PStatusUpdate();
-  useGetD2PStatus(scopedAuthToken ?? '', {
+  useGetD2PStatus(true, scopedAuthToken ?? '', {
     onSuccess: handleSuccess,
     onError: handleError,
   });

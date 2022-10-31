@@ -1,6 +1,6 @@
 import { D2PStatus, GetD2PResponse } from '@onefootprint/types';
 
-import useGetD2pStatus from '../use-get-d2p-status';
+import { useGetD2PStatus } from '../../../../hooks';
 import useMobileMachine, { Events } from './use-mobile-machine';
 
 const useNewTabStatusUpdate = () => {
@@ -34,7 +34,7 @@ const useNewTabStatusUpdate = () => {
     });
   };
 
-  useGetD2pStatus(scopedAuthToken ?? '', {
+  useGetD2PStatus(true, scopedAuthToken ?? '', {
     onSuccess: handleSuccess,
     onError: handleError,
   });

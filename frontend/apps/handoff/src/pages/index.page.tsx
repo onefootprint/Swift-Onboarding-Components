@@ -1,6 +1,6 @@
-import { IdScan, Liveness } from 'footprint-elements';
+import { GetD2PResponse } from '@onefootprint/types';
+import { IdScan, Liveness, useGetD2PStatus } from 'footprint-elements';
 import React from 'react';
-import useGetD2pStatus from 'src/hooks/use-get-d2p-status';
 import useHandoffMachine from 'src/hooks/use-handoff-machine';
 import { Events, States } from 'src/utils/state-machine';
 
@@ -13,7 +13,30 @@ import Init from './init';
 const Root = () => {
   const [state, send] = useHandoffMachine();
   const { authToken, device, tenant } = state.context;
-  useGetD2pStatus();
+
+  const handleSuccess = (data: GetD2PResponse) => {
+    send({
+      type: Events.statusReceived,
+      payload: {
+        status: data.status,
+      },
+    });
+  };
+
+  const handleError = () => {
+    send({
+      type: Events.statusReceived,
+      payload: {
+        isError: true,
+      },
+    });
+  };
+
+  const pollingEnabled = !state.done;
+  useGetD2PStatus(pollingEnabled, authToken ?? '', {
+    onSuccess: handleSuccess,
+    onError: handleError,
+  });
 
   if (state.matches(States.init)) {
     return <Init />;

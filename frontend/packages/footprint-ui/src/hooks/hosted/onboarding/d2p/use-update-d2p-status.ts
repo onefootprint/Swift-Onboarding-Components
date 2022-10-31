@@ -1,14 +1,14 @@
-import request, { RequestError } from '@onefootprint/request';
+import request from '@onefootprint/request';
 import {
   UpdateD2PStatusRequest,
   UpdateD2PStatusResponse,
 } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
 
-import { AUTH_HEADER } from '../config/constants';
+import { AUTH_HEADER } from '../../../../config/constants';
 
 const updateD2PStatus = async (payload: UpdateD2PStatusRequest) => {
-  const response = await request<{}>({
+  const response = await request<UpdateD2PStatusResponse>({
     method: 'POST',
     url: '/hosted/onboarding/d2p/status',
     data: payload,
@@ -19,9 +19,6 @@ const updateD2PStatus = async (payload: UpdateD2PStatusRequest) => {
   return response.data;
 };
 
-const useUpdateD2PStatus = () =>
-  useMutation<UpdateD2PStatusResponse, RequestError, UpdateD2PStatusRequest>(
-    updateD2PStatus,
-  );
+const useUpdateD2PStatus = () => useMutation(updateD2PStatus);
 
 export default useUpdateD2PStatus;
