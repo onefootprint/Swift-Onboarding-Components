@@ -11,6 +11,7 @@ export interface StaticSecrets {
   cloudfrontSecret: pulumi.Output<string>;
   secretsPolicyArn: pulumi.Output<string>;
   elasticApiKey: aws.ssm.Parameter;
+  elasticApmAgentKey: aws.ssm.Parameter;
   otelConfig: aws.ssm.Parameter;
   enclaveUserSecretKey: aws.ssm.Parameter;
   enclaveSealedIkek: aws.ssm.Parameter;
@@ -34,6 +35,7 @@ interface SecretConstants {
 
 interface ElasticSecrets {
   apiKey: string;
+  apmAgentKey: string;
 }
 
 interface Workos {
@@ -95,6 +97,10 @@ export async function LoadSecrets(
       `elasticApiKey-${stack}`,
       secretConstants.elastic.apiKey,
     ),
+    elasticApmAgentKey: createSecretParameter(
+      `elasticApmAgentKey-${stack}`,
+      secretConstants.elastic.apmAgentKey,
+    ),
     enclaveUserSecretKey: new aws.ssm.Parameter(`ssm-param-enclave-user-key`, {
       type: 'SecureString',
       value: pulumi.secret(
@@ -104,7 +110,7 @@ export async function LoadSecrets(
     }),
     otelConfig: new aws.ssm.Parameter(`ssm-param-otelconfig`, {
       type: 'SecureString',
-      value: fs.readFileSync('./otel/config.yml', 'utf8'),
+      value: fs.readFileSync('./monitoring/otel.yml', 'utf8'),
       name: `/static_secrets/otelconfig-${stack}`,
     }),
     dbPassword: pulumi.secret(auroraDbPassword.result),

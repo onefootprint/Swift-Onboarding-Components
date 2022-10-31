@@ -6,14 +6,18 @@ config:
     containers:
       apiVersion: latest
       enclaveVersion: latest
+    deletionProtection: true
     domain:
       base: api.onefootprint.com
-      prefix: ""
-    deletionProtection: true
+      prefix: ''
     elastic:
       apiKey:
-        secure: v1:XzHosuh3FHFZesM8:BFzoDFYHmZbxiai3KV6aR2zLW1ZoImnWTQoVodoiGnCH5g==
+        secure: v1:IuM1QjcgUc76uhEs:UzHJyEWwdT0iWEya1qfHfkIrYMESzQEZud0r70ygpwGW7V+9ptc=
+      apmAgentKey:
+        secure: v1:iFfrD+SyngCdEYCL:oeLX7nICFaJwJepbKblqZrR3d3s5gfkkzQ4PKkA/LQP/25cRHTvVlATLM3lwUTBxaEzgMikeMaNbdGpRuWD3IfJOVLzmyc7W6DMT3A==
       apmEndpoint: 66e04f7b644c4d1c98e26e58b75de669.apm.us-east-2.aws.elastic-cloud.com:443
+      heartbeatCloudId: dXMtZWFzdC0yLmF3cy5lbGFzdGljLWNsb3VkLmNvbSQ0MDZmYjczZWNlZjk0MDViODY5NzI3MmMwMDE1N2ExZCRjNGExNTAzOTBiMmU0M2UzODVlNWQ5OWY0YWRlYTc3OA==
+      id: omacKoQBB6pi8-b5UVPY
     enclaveCertPCR8: e865feba7ebc599a657c329387caa88db6b487591e249b65a8edf0ddf7a2bcf269f3a7aa952f56741b18bdafe6766b96
     idology:
       password:
@@ -25,6 +29,10 @@ config:
       instances: 2
       memoryMB: 512
     rpId: onefootprint.com
+    s3:
+      documentImagesBucket:
+        envVarName: DOCUMENT_S3_BUCKET
+        prefix: opaque-documents
     sendgrid:
       apiKey:
         secure: v1:bKv7D+zTxpPdjHoO:qfXikLY0jplLN/CmQ4/P0/Ts4akQLZttRFJKjW08xIEQDuFGW5DUK2VnihJq1OVtS0CgV81VJTeHdJfE5YesX4GCRVdO03bnR010AC5tJeyPnHPs/Q==
@@ -37,17 +45,13 @@ config:
         secure: v1:g/Buavshjo4oCE/9:iYXVkuHQxY8XO4HFDPvM69p/Xph/A6VZoYYtwgYJmN7Ofh9mwWxMUQAdl9cmckt25gM=
       apiKeySecret:
         secure: v1:WTH51OSrsdCEdap7:bIRwAeQZYkdPq0+VXdOeL2/A3eDYJ1/pruElC2LyDU/XMnZgQniODR9bWbfqGo44
-      integrationTestPhoneNumber: "+13393311410"
-      phoneNumber: "+15105883668"
+      integrationTestPhoneNumber: '+13393311410'
+      phoneNumber: '+15105883668'
     workos:
       clientId: client_01G371B7G8Y43RETQKQ0D63F88
       defaultOrg: org_01G39KR1V1E52JEZV6BYNG590J
       secretKey:
         secure: v1:qBwY9xkQ5AxOOFFR:nJs8FBGP1lGvhsAUJ/ANgv2PKoIWYJovYxCyLtDBWa24r+sDRpLxD7EC3z6ZWcVOlBb2hoYuR4vJobSyQ/3FBe7jPAFqLDJhrL9m6LEsX0NFg6iP/hYMKnPCqVfE+L2YaE5m
-    s3:
-      documentImagesBucket:
-        prefix: opaque-documents
-        envVarName: DOCUMENT_S3_BUCKET
   infra:serverTailscaleKey:
     secure: v1:TpGKPahow+vWfc9V:ARTcJC1DUX8g58pQWNUVQN1jQzYkKJfNw34IaOg4LwcPZRt8nTuIOtmXUsZ451cH57XgQrfMQdRw
   infra:tailscaleKey:

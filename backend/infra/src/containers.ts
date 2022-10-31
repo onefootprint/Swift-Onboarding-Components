@@ -28,6 +28,13 @@ export abstract class ServiceContainers {
       constants,
     );
 
+    const hearbeats = ServiceContainers.createHeartbeatContainer(
+      name,
+      appPort,
+      secretsStore,
+      constants,
+    );
+
     const current = await aws.getCallerIdentity({});
     const image = `${current.accountId}.dkr.ecr.us-east-1.amazonaws.com/api:${constants.containers.apiVersion}`;
 
@@ -43,8 +50,8 @@ export abstract class ServiceContainers {
     }
 
     const containerDef = pulumi
-      .all([otelCollector])
-      .apply(([otelCollector]) => {
+      .all([otelCollector, hearbeats])
+      .apply(([otelCollector, hearbeats]) => {
         return pulumi
           .all([
             enclaveKeyDescriptor.rootKeyId,
@@ -224,6 +231,7 @@ export abstract class ServiceContainers {
                   },
                 },
                 otelCollector,
+                hearbeats,
               ];
 
               return JSON.stringify(def);
@@ -241,7 +249,7 @@ export abstract class ServiceContainers {
     constants: Config,
   ): pulumi.Output<aws.ecs.ContainerDefinition> {
     const out = pulumi
-      .all([secrets.otelConfig.arn, secrets.elasticApiKey.arn])
+      .all([secrets.otelConfig.arn, secrets.elasticApmAgentKey.arn])
       .apply(([config, apiKey]) => [
         {
           name: 'AOT_CONFIG_CONTENT',
@@ -269,6 +277,65 @@ export abstract class ServiceContainers {
             {
               name: 'ELASTIC_APM_SERVER_ENDPOINT',
               value: constants.elastic.apmEndpoint,
+            },
+          ],
+        };
+
+        return def;
+      });
+
+    return out;
+  }
+
+  /**
+   * Heartbeat agent
+   */
+  static createHeartbeatContainer(
+    appName: string,
+    appPort: number,
+    secrets: StaticSecrets,
+    constants: Config,
+  ): pulumi.Output<aws.ecs.ContainerDefinition> {
+    const serviceEnvironment = pulumi.getStack();
+
+    const out = pulumi
+      .all([secrets.elasticApiKey.arn])
+      .apply(([apiKey]) => [
+        {
+          name: 'ELASTIC_APM_API_KEY',
+          valueFrom: apiKey,
+        },
+      ])
+      .apply(secrets => {
+        let def: aws.ecs.ContainerDefinition = {
+          name: 'heartbeat',
+          image:
+            'ghcr.io/onefootprint/heartbeat@sha256:56773827f9fb79264e46b95d128f448c0a4e49b9692ae3dd5bb408812e0efe82',
+          essential: true,
+          secrets,
+          links: [`${appName}:${appName}`],
+          dependsOn: [{ containerName: appName, condition: 'START' }],
+          linuxParameters: {
+            capabilities: {
+              add: ['NET_RAW'],
+            },
+          },
+          environment: [
+            {
+              name: 'FPC_MONITOR_URL',
+              value: `http://${appName}:${appPort}/status`,
+            },
+            {
+              name: 'FPC_ENV',
+              value: serviceEnvironment,
+            },
+            {
+              name: 'ELASTIC_APM_ID',
+              value: constants.elastic.id,
+            },
+            {
+              name: 'ELASTIC_CLOUD_ID',
+              value: `heartbeat:${constants.elastic.heartbeatCloudId}`,
             },
           ],
         };

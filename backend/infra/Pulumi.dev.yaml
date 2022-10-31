@@ -12,8 +12,12 @@ config:
       prefix: api.
     elastic:
       apiKey:
-        secure: v1:lefOi07p1WAkmMbb:6IK3746SDP+nra5/Tpym+AisWeELd2cSzgcTNbdzxBcaSQ==
+        secure: v1:kY0kR444OvfOf2Cr:gpD4whb9fFctHbhO+WxwZmXLo9Na0wc+zbkMtGUUIIlfr0FGEnM=
+      apmAgentKey:
+        secure: v1:/j+tQQrAZu22zElr:/U7YkTF6tIlg667BydswZUqKeGS9ByYAIXVhAUZdlzso0bY7+9RgFdVNXIi4cZxIKbYUhaQfqWT+CXow5Z7BpWJArnufqewpHo42pQ==
       apmEndpoint: 66e04f7b644c4d1c98e26e58b75de669.apm.us-east-2.aws.elastic-cloud.com:443
+      heartbeatCloudId: dXMtZWFzdC0yLmF3cy5lbGFzdGljLWNsb3VkLmNvbSQ0MDZmYjczZWNlZjk0MDViODY5NzI3MmMwMDE1N2ExZCRjNGExNTAzOTBiMmU0M2UzODVlNWQ5OWY0YWRlYTc3OA==
+      id: omacKoQBB6pi8-b5UVPY
     enclaveCertPCR8: 48cb393ec504192fb147ffb2818c2a00c8e2d74659b509cc449a48ffe1c257a266b6a9f9ac356c4cd38a6c11825dd600
     idology:
       password:
@@ -25,6 +29,10 @@ config:
       instances: 2
       memoryMB: 512
     rpId: onefootprint.com
+    s3:
+      documentImagesBucket:
+        envVarName: DOCUMENT_S3_BUCKET
+        prefix: opaque-documents
     sendgrid:
       apiKey:
         secure: v1:rcN9jM7uB9KA3jjQ:H49idM5tdoD3IoVXyA2T5rSIbr5xvjxqJJXHYh7jCtKefwzpE7VakZc2VzMeAC3kAX4W0uRTdvI9iSKycCMFDAXYaLH5P715BhcWm9lr739sJ849wg==
@@ -37,17 +45,13 @@ config:
         secure: v1:TddbkBlhZ7cYtOFN:ZsI5nrIil+wAJHlVffj8YcI8sn82QZuLxbb8E2ekbBg4TUAqffmXMvNoahef/hyzKnc=
       apiKeySecret:
         secure: v1:Mj1lvo0d2hHkitB4:bc7qwKQOSkoIe0WhqEJ3nRIqGK4Zht2klh96woc9EL3HNBp8R9GAcmxuE2TbVJYt
-      integrationTestPhoneNumber: "+13393311410"
-      phoneNumber: "+15105883668"
+      integrationTestPhoneNumber: '+13393311410'
+      phoneNumber: '+15105883668'
     workos:
       clientId: client_01G371B7G8Y43RETQKQ0D63F88
       defaultOrg: org_01G39KR1V1E52JEZV6BYNG590J
       secretKey:
         secure: v1:UrxmsAzi5youwRK1:Jlywwi1ZR82IGh3ZSJe58HQmEni8yL5+Ff/3DPQbcMbN5qE2wTJ1Yuye4vhADlRDaCaZf5kBhZGWC3Uxx4SZ47wmg8b+C123NVk8K1ieVGqO6IYF4HTKNI8KsQFyv6MA3QbD
-    s3:
-      documentImagesBucket:
-        prefix: opaque-documents
-        envVarName: DOCUMENT_S3_BUCKET
   infra:serverTailscaleKey:
     secure: v1:UfYpRSy/H0RL5lcZ:1iCjNgCUpHsS3/6wbdqGB8WbQYcDDtmcqGrRTc9EYalbjfkwTsau2jpZGjRde5TUF9gE0KVHEOTq
   infra:tailscaleKey:

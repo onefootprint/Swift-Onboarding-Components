@@ -30,7 +30,9 @@ export interface Resources {
 }
 
 export interface Elastic {
+  id: string;
   apmEndpoint: string;
+  heartbeatCloudId: string;
 }
 
 export interface Containers {
