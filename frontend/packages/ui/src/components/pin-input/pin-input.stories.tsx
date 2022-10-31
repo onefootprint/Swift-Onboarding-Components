@@ -57,7 +57,7 @@ const Template: Story<PinInputProps> = ({
     <Box
       sx={{
         alignItems: 'center',
-        borderRadius: 'small',
+        borderRadius: 'compact',
         display: 'flex',
         elevation: 2,
         flexDirection: 'column',

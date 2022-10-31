@@ -38,7 +38,7 @@ const Template: Story<ContainerProps> = ({
         width: '100%',
         backgroundColor: 'tertiary',
         height: '100vh',
-        borderRadius: 'small',
+        borderRadius: 'compact',
         padding: 6,
       }}
     >
