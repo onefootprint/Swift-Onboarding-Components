@@ -32,7 +32,6 @@ const TableFilter = ({
     <>
       <TableFilterContainer>
         <SearchInput
-          inputSize="compact"
           onChangeText={handleChangeText}
           sx={{ width: '300px' }}
           value={search}

@@ -72,6 +72,12 @@ export default {
       control: 'text',
       description: 'Controlled value',
     },
+    size: {
+      control: 'select',
+      description: 'Input size',
+      options: ['default', 'compact'],
+      required: false,
+    },
   },
 } as Meta;
 
@@ -86,6 +92,7 @@ const Template: Story<TextInputProps> = ({
   onChange,
   onChangeText,
   placeholder,
+  size,
   testID,
   type,
   value: initialValue = '',
@@ -107,6 +114,7 @@ const Template: Story<TextInputProps> = ({
       onChange={onChange}
       onChangeText={handleChangeText}
       placeholder={placeholder}
+      size={size}
       testID={testID}
       type={type}
       value={value}
@@ -116,14 +124,16 @@ const Template: Story<TextInputProps> = ({
 
 export const Base = Template.bind({});
 Base.args = {
-  mask: undefined,
   disabled: false,
+  hasError: false,
   hint: '',
   label: 'Email',
+  mask: undefined,
   maxLength: 100,
   minLength: 0,
   onChange: console.log,
   placeholder: 'your.email@email.com',
+  size: 'default',
   testID: 'input-test-id',
   type: 'email',
   value: '',

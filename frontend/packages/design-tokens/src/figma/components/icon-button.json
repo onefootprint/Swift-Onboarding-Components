@@ -18,65 +18,125 @@
       "value": "{border-radius.full}",
       "type": "borderRadius"
     },
-    "initial": {
-      "bg": {
-        "value": "{semantic.bg.primary}",
-        "type": "color"
+    "transparent": {
+      "initial": {
+        "bg": {
+          "value": "rgba({semantic.bg.primary}, {opacity.transparent})",
+          "type": "color"
+        },
+        "icon": {
+          "value": "{semantic.text.primary}",
+          "type": "color"
+        },
+        "border": {
+          "value": "rgba({semantic.border.tertiary}, {opacity.transparent})",
+          "type": "color"
+        }
       },
-      "icon": {
-        "value": "{semantic.text.primary}",
-        "type": "color"
+      "hover": {
+        "bg": {
+          "value": "{primitives.gray.50}",
+          "type": "color"
+        },
+        "icon": {
+          "value": "{semantic.text.primary}",
+          "type": "color"
+        },
+        "border": {
+          "value": "rgba({semantic.border.tertiary}, {opacity.transparent})",
+          "type": "color"
+        }
       },
-      "border": {
-        "value": "{opacity.transparent}",
-        "type": "color"
-      }
-    },
-    "hover": {
-      "bg": {
-        "value": "{primitives.gray.50}",
-        "type": "color"
+      "active": {
+        "bg": {
+          "value": "{primitives.gray.100}",
+          "type": "color"
+        },
+        "icon": {
+          "value": "{semantic.text.primary}",
+          "type": "color"
+        },
+        "border": {
+          "value": "rgba({semantic.border.tertiary}, {opacity.transparent})",
+          "type": "color"
+        }
       },
-      "icon": {
-        "value": "{semantic.text.primary}",
-        "type": "color"
-      },
-      "border": {
-        "value": "{opacity.transparent}",
-        "type": "color"
-      }
-    },
-    "active": {
-      "bg": {
-        "value": "{primitives.gray.100}",
-        "type": "color"
-      },
-      "icon": {
-        "value": "{semantic.text.primary}",
-        "type": "color"
-      },
-      "border": {
-        "value": "{opacity.transparent}",
-        "type": "color"
-      }
-    },
-    "disabled": {
-      "bg": {
-        "value": "{semantic.bg.secondary}",
-        "type": "color"
-      },
-      "icon": {
-        "value": "{semantic.text.quaternary}",
-        "type": "color"
-      },
-      "border": {
-        "value": "{opacity.transparent}",
-        "type": "color"
+      "disabled": {
+        "bg": {
+          "value": "{semantic.bg.secondary}",
+          "type": "color"
+        },
+        "icon": {
+          "value": "{semantic.text.quaternary}",
+          "type": "color"
+        },
+        "border": {
+          "value": "rgba({semantic.border.tertiary}, {opacity.transparent})",
+          "type": "color"
+        }
       }
     },
     "elevation": {
       "value": "{elevation.0}",
       "type": "boxShadow"
+    },
+    "solid": {
+      "initial": {
+        "bg": {
+          "value": "{semantic.bg.primary}",
+          "type": "color"
+        },
+        "icon": {
+          "value": "{semantic.text.primary}",
+          "type": "color"
+        },
+        "border": {
+          "value": "{semantic.border.tertiary}",
+          "type": "color"
+        }
+      },
+      "hover": {
+        "bg": {
+          "value": "{primitives.gray.50}",
+          "type": "color"
+        },
+        "icon": {
+          "value": "{semantic.text.primary}",
+          "type": "color"
+        },
+        "border": {
+          "value": "{semantic.border.tertiary}",
+          "type": "color"
+        }
+      },
+      "active": {
+        "bg": {
+          "value": "{primitives.gray.100}",
+          "type": "color"
+        },
+        "icon": {
+          "value": "{semantic.text.primary}",
+          "type": "color"
+        },
+        "border": {
+          "value": "{semantic.border.tertiary}",
+          "type": "color"
+        }
+      },
+      "disabled": {
+        "bg": {
+          "value": "{semantic.bg.secondary}",
+          "type": "color"
+        },
+        "icon": {
+          "value": "{semantic.text.quaternary}",
+          "type": "color"
+        },
+        "border": {
+          "value": "{semantic.border.tertiary}",
+          "type": "color"
+        }
+      }
     }
   }
 }

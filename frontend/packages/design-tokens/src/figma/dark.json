@@ -336,15 +336,15 @@
     },
     "elevation": {
       "1": {
-        "value": "#212121",
+        "value": "#262626",
         "type": "color"
       },
       "2": {
-        "value": "#2E2E2E",
+        "value": "#2e2e2e",
         "type": "color"
       },
       "3": {
-        "value": "#383838",
+        "value": "#363636",
         "type": "color"
       }
     }

@@ -1,5 +1,33 @@
 [
   {
+    "id": "4a3ba87089acc025793856f79225a6f4d44b8af1",
+    "name": "Ramp",
+    "selectedTokenSets": {
+      "global": "enabled",
+      "light": "enabled",
+      "dark": "disabled",
+      "components/date-range-input": "enabled",
+      "components/fp-button": "enabled",
+      "components/buttons": "enabled",
+      "components/google-button": "enabled",
+      "components/link-button": "enabled",
+      "components/icon-button": "enabled",
+      "components/base-inputs": "enabled",
+      "components/phone-inputs": "enabled",
+      "components/select": "enabled",
+      "components/bifrost-dialog": "enabled",
+      "components/confirmation-dialog": "enabled",
+      "components/dialog": "disabled",
+      "customization/ramp/base-inputs": "enabled",
+      "customization/ramp/buttons": "enabled",
+      "customization/ramp/global": "enabled",
+      "customization/ramp/light": "enabled",
+      "customization/ramp/bifrost-dialog": "enabled",
+      "components/base-dropdown": "disabled"
+    },
+    "$figmaStyleReferences": {}
+  },
+  {
     "id": "1c4dcc2af3cc823e157dca0d11cfa0201d09cff6",
     "name": "Footprint",
     "selectedTokenSets": {
@@ -17,7 +45,13 @@
       "components/date-range-input": "enabled",
       "components/phone-inputs": "enabled",
       "components/select": "enabled",
-      "components/icon-button": "enabled"
+      "components/icon-button": "enabled",
+      "customization/ramp/base-inputs": "disabled",
+      "customization/ramp/buttons": "disabled",
+      "customization/ramp/global": "disabled",
+      "customization/ramp/light": "disabled",
+      "customization/ramp/bifrost-dialog": "disabled",
+      "components/base-dropdown": "enabled"
     },
     "$figmaStyleReferences": {
       "color.select.initial.background": "S:077a2b433c1cafe9407041ada99f2d07420ca53a,",

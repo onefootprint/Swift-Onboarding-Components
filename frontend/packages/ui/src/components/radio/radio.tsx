@@ -2,7 +2,7 @@ import React, { forwardRef, useId } from 'react';
 import styled, { css } from 'styled-components';
 
 import { createFontStyles } from '../../utils/mixins';
-import Hint from '../internal/hint';
+import InputHint from '../internal/hint';
 import { createCheckedStyled, createPseudoStyles } from './radio.utils';
 
 export type RadioProps = {
@@ -74,13 +74,9 @@ const Radio = forwardRef<HTMLInputElement, RadioProps>(
           {label}
         </Label>
         {hint && (
-          <StyledHint
-            color={hasError ? 'error' : 'tertiary'}
-            id={`${id}-hint`}
-            variant="body-3"
-          >
+          <StyledInputHint hasError={hasError} id={`${id}-hint`} size="compact">
             {hint}
-          </StyledHint>
+          </StyledInputHint>
         )}
       </Container>
     );
@@ -167,10 +163,9 @@ const Input = styled.input<Pick<RadioProps, 'hasError'>>`
   }}
 `;
 
-const StyledHint = styled(Hint)`
+const StyledInputHint = styled(InputHint)`
   ${({ theme }) => css`
     margin-top: ${theme.spacing[2]}px;
-    // This subtraction is required because of the checkbox borders
     margin-left: ${theme.spacing[8] - theme.spacing[1]}px;
   `}
 `;

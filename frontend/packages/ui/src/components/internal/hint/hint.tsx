@@ -1,36 +1,58 @@
-import type { Color, FontVariant } from '@onefootprint/design-tokens';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-import Typography from '../../typography';
+import { createTypography } from '../../../utils/mixins';
 
 export type HintProps = {
+  size?: 'compact' | 'default';
   children: string;
   className?: string;
-  color: Color;
+  hasError?: boolean;
   id?: string;
-  variant?: FontVariant;
 };
 
 const Hint = ({
   children,
   className,
-  color,
+  hasError = false,
   id,
-  variant = 'caption-2',
+  size = 'default',
 }: HintProps) => (
-  <Container id={id} className={className}>
-    <Typography as="p" color={color} variant={variant}>
-      {children}
-    </Typography>
-  </Container>
+  <HintContainer
+    id={id}
+    className={`${className} fp-input-hint`}
+    data-has-error={hasError}
+    data-size={size}
+  >
+    {children}
+  </HintContainer>
 );
 
-const Container = styled.div`
-  ${({ theme }) => css`
-    margin-top: ${theme.spacing[3]}px;
-    text-align: left;
-  `}
+const HintContainer = styled.div`
+  ${({ theme }) => {
+    const { inputHint } = theme.components;
+
+    return css`
+      margin-top: ${theme.spacing[3]}px;
+      text-align: left;
+
+      &[data-has-error='false'] {
+        color: ${inputHint.states.default.color};
+      }
+
+      &[data-has-error='true'] {
+        color: ${inputHint.states.error.color};
+      }
+
+      &[data-size='default'] {
+        ${createTypography(inputHint.size.default.typography)}
+      }
+
+      &[data-size='compact'] {
+        ${createTypography(inputHint.size.compact.typography)}
+      }
+    `;
+  }}
 `;
 
 export default Hint;

@@ -1,11 +1,11 @@
 import { FontVariant } from '@onefootprint/design-tokens';
 import { CleaveOptions } from 'cleave.js/options';
-import React, { forwardRef, InputHTMLAttributes } from 'react';
+import React, { forwardRef, InputHTMLAttributes, useId } from 'react';
 import styled, { css } from 'styled-components';
 
 import useSx, { SXStyleProps, SXStyles } from '../../../hooks/use-sx';
 import Field, { FieldProps } from '../field';
-import Hint from '../hint';
+import InputHint from '../hint';
 import Label from '../label';
 
 export type InternalInputProps = {
@@ -14,20 +14,23 @@ export type InternalInputProps = {
   fontVariant?: FontVariant;
 };
 
-export type InputProps = FieldProps & {
+type NativeInputProps = Omit<InputHTMLAttributes<HTMLInputElement>, 'size'>;
+
+export type InputProps = {
   value?: string;
   mask?: CleaveOptions;
   sx?: SXStyleProps;
-} & InputHTMLAttributes<HTMLInputElement>;
+} & NativeInputProps &
+  FieldProps;
 
 type AllInputProps = InputProps & InternalInputProps;
 
 const BaseInput = forwardRef<HTMLInputElement, AllInputProps>(
   (
     {
-      fontVariant = 'body-3',
-      hasError,
-      hasFocus,
+      size = 'default',
+      hasError = false,
+      hasFocus = false,
       hint,
       id: baseID,
       label,
@@ -40,13 +43,13 @@ const BaseInput = forwardRef<HTMLInputElement, AllInputProps>(
       suffixComponent,
       sx,
       testID,
+      disabled = false,
       ...props
     }: AllInputProps,
     ref,
   ) => {
-    // TODO: Migrate to useId once we migrate to react 18
-    // https://github.com/onefootprint/frontend-monorepo/issues/61
-    const id = baseID || `input-${label || placeholder}`;
+    const internalId = useId();
+    const id = baseID || internalId;
     const sxStyles = useSx(sx);
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -59,21 +62,32 @@ const BaseInput = forwardRef<HTMLInputElement, AllInputProps>(
     };
 
     return (
-      <div>
-        {label && <Label htmlFor={id}>{label}</Label>}
+      <div
+        className="fp-input-container"
+        data-has-error={hasError}
+        data-size={size}
+        data-disabled={disabled}
+      >
+        {label && (
+          <Label hasError={hasError} size={size} htmlFor={id}>
+            {label}
+          </Label>
+        )}
         <InputContainer>
           {prefixComponent && (
             <PrefixContainer>{prefixComponent}</PrefixContainer>
           )}
           <StyledField
             {...props}
-            $hasError={hasError}
-            $hasFocus={hasFocus}
             $sx={sxStyles}
             aria-required={required}
             as={mask ? undefined : 'input'}
+            className="fp-input"
+            data-has-error={hasError}
+            data-has-focus={hasFocus}
+            data-size={size}
             data-testid={testID}
-            fontVariant={fontVariant}
+            disabled={disabled}
             id={id}
             onChange={handleChange}
             options={mask}
@@ -89,7 +103,7 @@ const BaseInput = forwardRef<HTMLInputElement, AllInputProps>(
             <SuffixContainer>{suffixComponent}</SuffixContainer>
           )}
         </InputContainer>
-        {hint && <Hint color={hasError ? 'error' : 'tertiary'}>{hint}</Hint>}
+        {hint && <InputHint hasError={hasError}>{hint}</InputHint>}
       </div>
     );
   },

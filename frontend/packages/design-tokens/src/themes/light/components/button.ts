@@ -2,7 +2,8 @@ import * as t from '../../../output/light';
 import type { Button } from '../../types/components/button';
 
 const button: Button = {
-  globals: {
+  global: {
+    borderRadius: t.buttonsBorderRadius,
     borderWidth: t.buttonBorderWidth,
     outlineOffset: t.spacing2,
     elevation: {
@@ -60,25 +61,21 @@ const button: Button = {
   size: {
     large: {
       height: t.buttonsHeightLarge,
-      borderRadius: t.buttonsBorderRadius,
       paddingHorizontal: t.buttonsSpacingPaddingsHorizontalLarge,
       typography: t.buttonsTypographyLarge,
     },
     compact: {
       height: t.buttonsHeightCompact,
-      borderRadius: t.buttonsBorderRadius,
       paddingHorizontal: t.buttonsSpacingPaddingsHorizontalCompact,
       typography: t.buttonsTypographyCompact,
     },
     small: {
       height: t.buttonsHeightSmall,
-      borderRadius: t.buttonsBorderRadius,
       paddingHorizontal: t.buttonsSpacingPaddingsHorizontalSmall,
       typography: t.buttonsTypographySmall,
     },
     default: {
       height: t.buttonsHeightDefault,
-      borderRadius: t.buttonsBorderRadius,
       paddingHorizontal: t.buttonsSpacingPaddingsHorizontalDefault,
       typography: t.buttonsTypographyDefault,
     },

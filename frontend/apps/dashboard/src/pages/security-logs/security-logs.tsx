@@ -55,7 +55,6 @@ const SecurityLogs = () => {
       <SearchAndFilterContainer>
         <SearchInput
           sx={{ width: '300px' }}
-          inputSize="compact"
           onChangeText={value => setFilter({ search: value })}
           value={filters.search || ''}
         />

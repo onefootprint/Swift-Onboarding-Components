@@ -32,26 +32,31 @@ describe('<TextArea />', () => {
 
   it('should add a test id attribute', () => {
     renderTextArea({ testID: 'textarea-id' });
+
     expect(screen.getByTestId('textarea-id')).toBeInTheDocument();
   });
 
   it('should render value', () => {
     renderTextArea({ value: '123' });
+
     expect(screen.getByDisplayValue('123')).toBeInTheDocument();
   });
 
   it('should render the label', () => {
     renderTextArea({ label: 'some label' });
+
     expect(screen.getByLabelText('some label')).toBeInTheDocument();
   });
 
   it('should render the placeholder', () => {
     renderTextArea({ placeholder: 'some placeholder' });
+
     expect(screen.getByPlaceholderText('some placeholder')).toBeInTheDocument();
   });
 
   it('should render the hint text', () => {
     renderTextArea({ hint: 'hint' });
+
     expect(screen.getByText('hint')).toBeInTheDocument();
   });
 
@@ -61,9 +66,13 @@ describe('<TextArea />', () => {
         hasError: true,
         placeholder: 'placeholder',
       });
+
       const input = screen.getByPlaceholderText('placeholder');
+
       expect(input).toHaveStyle({
-        border: `1px solid ${themes.light.borderColor.error}`,
+        borderWidth: '1px',
+        borderStyle: 'solid',
+        borderColor: themes.light.borderColor.error,
       });
     });
 
@@ -72,7 +81,9 @@ describe('<TextArea />', () => {
         hasError: true,
         hint: 'Hint',
       });
+
       const hint = screen.getByText('Hint');
+
       expect(hint).toHaveStyle({
         color: themes.light.color.error,
       });
@@ -86,8 +97,10 @@ describe('<TextArea />', () => {
         onChange: onChangeMockFn,
         placeholder: 'placeholder text',
       });
+
       const input = screen.getByPlaceholderText('placeholder text');
       await userEvent.type(input, 'foo');
+
       expect(onChangeMockFn).toHaveBeenCalled();
     });
 
@@ -97,8 +110,10 @@ describe('<TextArea />', () => {
         onChangeText: onChangeTextMockFn,
         testID: 'textarea-id',
       });
+
       const input = screen.getByTestId('textarea-id');
       await userEvent.type(input, 'f');
+
       expect(onChangeTextMockFn).toHaveBeenCalledWith('f');
     });
 
@@ -110,8 +125,10 @@ describe('<TextArea />', () => {
           onChangeText: onChangeTextMockFn,
           testID: 'textarea-id',
         });
+
         const input = screen.getByTestId('textarea-id');
         userEvent.type(input, 'foo');
+
         expect(onChangeTextMockFn).not.toHaveBeenCalled();
       });
     });

@@ -9,7 +9,7 @@ styleDictionary.registerTransform({
   transformer: token => {
     const { value } = token;
     const rgbaColor = color(value.color).rgb().string();
-    return `${value.x}px ${value.y}px ${value.blur}px ${rgbaColor}`;
+    return `${value.x}px ${value.y}px ${value.blur}px ${value.spread}px ${rgbaColor}`;
   },
 });
 

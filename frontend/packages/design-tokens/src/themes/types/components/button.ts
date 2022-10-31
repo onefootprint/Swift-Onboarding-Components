@@ -23,7 +23,6 @@ type Variant = {
 
 type Size = {
   height: number;
-  borderRadius: number;
   paddingHorizontal: number;
   typography: {
     fontFamily: string;
@@ -34,8 +33,9 @@ type Size = {
 };
 
 export type Button = {
-  globals: {
+  global: {
     borderWidth: number;
+    borderRadius: number;
     outlineOffset: number;
     elevation: {
       initial: string;
@@ -54,5 +54,3 @@ export type Button = {
     default: Size;
   };
 };
-
-export default Button;

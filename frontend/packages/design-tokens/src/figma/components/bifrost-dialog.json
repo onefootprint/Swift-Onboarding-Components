@@ -2,7 +2,7 @@
   "bifrost-dialog": {
     "header": {
       "bg": {
-        "value": "{semantic.bg.surface2}",
+        "value": "{semantic.bg.surface1}",
         "type": "color"
       },
       "text": {
@@ -21,7 +21,7 @@
     "body": {
       "bg": {
         "primary": {
-          "value": "{semantic.bg.surface2}",
+          "value": "{semantic.bg.surface1}",
           "type": "color"
         },
         "secondary": {
@@ -63,11 +63,11 @@
       }
     },
     "elevation": {
-      "value": "{elevation.2}",
+      "value": "{elevation.1}",
       "type": "boxShadow"
     },
     "border-radius": {
-      "value": "{border-radius.default}",
+      "value": "6",
       "type": "borderRadius"
     },
     "typography": {

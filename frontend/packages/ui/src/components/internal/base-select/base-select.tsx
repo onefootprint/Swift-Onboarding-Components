@@ -172,7 +172,7 @@ const BaseSelect = <Option extends BaseSelectOption>({
           </DropdownMenu>
         )}
       </Dropdown>
-      {hint && <Hint color={hasError ? 'error' : 'tertiary'}>{hint}</Hint>}
+      {hint && <Hint hasError={hasError}>{hint}</Hint>}
     </Box>
   );
 };

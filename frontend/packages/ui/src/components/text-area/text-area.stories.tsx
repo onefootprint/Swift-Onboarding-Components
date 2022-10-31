@@ -98,7 +98,8 @@ Base.args = {
   label: 'Specify the reason',
   onChange: console.log,
   onChangeText: console.log,
-  placeholder: '',
-  testID: 'input-test-id',
+  placeholder: 'Give a detailed reason',
+  testID: 'textarea-test-id',
   value: '',
+  hasError: false,
 };

@@ -1,36 +1,32 @@
-import { IcoClose16, IcoCloseSmall16 } from '@onefootprint/icons';
+import { IcoCloseSmall16 } from '@onefootprint/icons';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-import { sizeToIconMargin } from '../../search-input.constants';
-import type { Size } from '../../search-input.types';
-
 type ClearButtonProps = {
   'aria-label': string;
-  size: Size;
   onClick: () => void;
 };
 
 const ClearButton = ({
   'aria-label': ariaLabel,
-  size,
   onClick,
 }: ClearButtonProps) => (
-  <ClearButtonContainer size={size} onClick={onClick} aria-label={ariaLabel}>
-    {size === 'compact' ? <IcoCloseSmall16 /> : <IcoClose16 />}
+  <ClearButtonContainer onClick={onClick} aria-label={ariaLabel}>
+    <IcoCloseSmall16 />
   </ClearButtonContainer>
 );
 
-const ClearButtonContainer = styled.button<{ size: Size }>`
-  ${({ theme, size }) => css`
-    padding: 0;
+const ClearButtonContainer = styled.button`
+  ${({ theme }) => css`
     align-items: center;
     background: none;
     border: none;
+    cursor: pointer;
     display: flex;
     height: 100%;
-    margin-right: ${theme.spacing[sizeToIconMargin[size]]}px;
+    margin-right: ${theme.spacing[4]}px;
     outline: none;
+    padding: 0;
     transition: 0.2s opacity;
 
     :hover {

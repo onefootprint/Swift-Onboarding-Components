@@ -29,10 +29,6 @@ export default {
       control: 'text',
       description: 'Append an attribute data-testid for testing purposes',
     },
-    inputSize: {
-      control: 'select',
-      options: ['default', 'large', 'compact'],
-    },
     value: {
       control: 'text',
       description: 'Controlled value',
@@ -41,7 +37,6 @@ export default {
 } as Meta;
 
 const Template: Story<SearchInputProps> = ({
-  inputSize,
   onChange,
   onChangeText,
   onReset,
@@ -56,7 +51,6 @@ const Template: Story<SearchInputProps> = ({
   };
   return (
     <SearchInput
-      inputSize={inputSize}
       onChange={onChange}
       onChangeText={handleChangeText}
       onReset={onReset}
@@ -77,5 +71,4 @@ Base.args = {
   placeholder: 'Search...',
   testID: 'search-input-test-id',
   value: '',
-  inputSize: 'default',
 };

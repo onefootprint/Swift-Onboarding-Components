@@ -4,11 +4,11 @@
       "value": "{semantic.text.quaternary}",
       "type": "color"
     },
-    "icon-active": {
+    "icon-focus": {
       "value": "{semantic.text.accent}",
       "type": "color"
     },
-    "icon-active-error": {
+    "icon-focus-error": {
       "value": "{semantic.text.error}",
       "type": "color"
     }

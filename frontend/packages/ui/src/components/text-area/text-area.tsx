@@ -1,4 +1,4 @@
-import React, { forwardRef, TextareaHTMLAttributes } from 'react';
+import React, { forwardRef, TextareaHTMLAttributes, useId } from 'react';
 import styled, { css } from 'styled-components';
 
 import Box from '../box';
@@ -25,7 +25,9 @@ const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
     }: TextAreaProps,
     ref,
   ) => {
-    const id = baseID || `input-${label || placeholder}`;
+    const internalId = useId();
+    const id = baseID || internalId;
+
     const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
       if (onChange) {
         onChange(event);
@@ -40,16 +42,18 @@ const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
         {label && <Label htmlFor={id}>{label}</Label>}
         <StyledField
           {...remainingProps}
-          $hasError={hasError}
           aria-required={required}
           as="textarea"
+          className="fp-textarea"
+          data-has-error={hasError}
+          data-size="default"
           data-testid={testID}
           id={id}
           onChange={handleChange}
           placeholder={placeholder}
           ref={ref}
         />
-        {hint && <Hint color={hasError ? 'error' : 'tertiary'}>{hint}</Hint>}
+        {hint && <Hint hasError={hasError}>{hint}</Hint>}
       </Box>
     );
   },

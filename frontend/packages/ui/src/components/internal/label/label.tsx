@@ -1,17 +1,31 @@
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-import { createFontStyles } from '../../../utils/mixins';
+import { createTypography } from '../../../utils/mixins';
 
 export type LabelProps = {
   children: string;
+  hasError?: boolean;
   htmlFor: string;
   id?: string;
+  size?: 'default' | 'compact';
 };
 
-const Label = ({ children, htmlFor, id }: LabelProps) => (
+const Label = ({
+  children,
+  hasError = false,
+  htmlFor,
+  id,
+  size = 'default',
+}: LabelProps) => (
   <Container>
-    <StyledLabel htmlFor={htmlFor} id={id}>
+    <StyledLabel
+      className="fp-label"
+      data-has-error={hasError}
+      data-size={size}
+      htmlFor={htmlFor}
+      id={id}
+    >
       {children}
     </StyledLabel>
   </Container>
@@ -24,10 +38,27 @@ const Container = styled.div`
 `;
 
 const StyledLabel = styled.label`
-  ${({ theme }) => css`
-    ${createFontStyles('body-3')};
-    color: ${theme.color.primary};
-  `}
+  ${({ theme }) => {
+    const { inputLabel } = theme.components;
+
+    return css`
+      &[data-has-error='false'] {
+        color: ${inputLabel.states.default.color};
+      }
+
+      &[data-has-error='true'] {
+        color: ${inputLabel.states.error.color};
+      }
+
+      &[data-size='default'] {
+        ${createTypography(inputLabel.size.default.typography)}
+      }
+
+      &[data-size='compact'] {
+        ${createTypography(inputLabel.size.compact.typography)}
+      }
+    `;
+  }}
 `;
 
 export default Label;

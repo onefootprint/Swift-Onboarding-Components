@@ -109,7 +109,7 @@ const PinInput = ({
           );
         })}
       </PinContainer>
-      {!!hint && <Hint color={hasError ? 'error' : 'primary'}>{hint}</Hint>}
+      {!!hint && <Hint hasError={hasError}>{hint}</Hint>}
     </Container>
   );
 };

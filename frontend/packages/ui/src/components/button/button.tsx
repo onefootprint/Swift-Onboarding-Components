@@ -77,39 +77,37 @@ const ButtonContainer = styled.button<{
   sx?: SXStyles;
 }>`
   ${({ theme, variant, size, sx }) => {
-    const {
-      components: { button },
-    } = theme;
+    const { button } = theme.components;
 
     return css`
       ${createTypography(button.size[size].typography)};
-      box-shadow: ${button.globals.elevation.initial};
+      box-shadow: ${button.global.elevation.initial};
       align-items: center;
       background-color: ${button.variant[variant].bg.initial};
       border-color: ${button.variant[variant].border.initial};
-      border-radius: ${button.size[size].borderRadius}px;
+      border-radius: ${button.global.borderRadius}px;
       border-style: solid;
-      border-width: ${button.globals.borderWidth}px;
+      border-width: ${button.global.borderWidth}px;
       color: ${button.variant[variant].color.initial};
       cursor: pointer;
       display: flex;
       height: ${button.size[size].height}px;
       justify-content: center;
-      outline-offset: ${button.globals.outlineOffset}px;
+      outline-offset: ${button.global.outlineOffset}px;
       padding: 0 ${button.size[size].paddingHorizontal}px;
       text-decoration: none;
       user-select: none;
       ${sx};
 
       &:hover {
-        box-shadow: ${button.globals.elevation.initial};
+        box-shadow: ${button.global.elevation.initial};
         background-color: ${button.variant[variant].bg.hover};
         border-color: ${button.variant[variant].border.hover};
         color: ${button.variant[variant].color.hover};
       }
 
       &:active {
-        box-shadow: ${button.globals.elevation.active};
+        box-shadow: ${button.global.elevation.active};
         background-color: ${button.variant[variant].bg.active};
         border-color: ${button.variant[variant].border.active};
         color: ${button.variant[variant].color.active};

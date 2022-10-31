@@ -75,11 +75,7 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
           {label}
         </Label>
         {hint && (
-          <StyledHint
-            color={hasError ? 'error' : 'tertiary'}
-            id={`${id}-hint`}
-            variant="body-3"
-          >
+          <StyledHint hasError={hasError} id={`${id}-hint`} size="compact">
             {hint}
           </StyledHint>
         )}
@@ -169,7 +165,6 @@ const Input = styled.input<Pick<CheckboxProps, 'hasError'>>`
 const StyledHint = styled(Hint)`
   ${({ theme }) => css`
     margin-top: ${theme.spacing[2]}px;
-    // This subtraction is required because of the checkbox borders
     margin-left: ${theme.spacing[8] - theme.spacing[1]}px;
   `}
 `;

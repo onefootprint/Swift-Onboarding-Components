@@ -7,8 +7,14 @@ describe('<Label />', () => {
   const renderLabel = ({
     children = 'Lorem',
     htmlFor = 'ipsu',
+    hasError = false,
+    size = 'default',
   }: Partial<LabelProps>) =>
-    customRender(<Label htmlFor={htmlFor}>{children}</Label>);
+    customRender(
+      <Label htmlFor={htmlFor} hasError={hasError} size={size}>
+        {children}
+      </Label>,
+    );
 
   it('should render the text', () => {
     renderLabel({ children: 'Lorem' });
