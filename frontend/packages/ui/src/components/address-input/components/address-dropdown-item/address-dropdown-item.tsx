@@ -54,7 +54,7 @@ const AddressDropdownItem = forwardRef<HTMLLIElement, AddressDropdownItemProps>(
             highlightStyle={{
               background: 'none',
               color: theme.color.primary,
-              fontWeight: theme.typography['label-3'].fontWeight,
+              fontWeight: 600,
             }}
           />
         </Typography>

@@ -1,4 +1,3 @@
-import themes from '@onefootprint/design-tokens';
 import { customRender, screen, userEvent } from '@onefootprint/test-utils';
 import React from 'react';
 
@@ -59,7 +58,7 @@ describe('<Tooltip />', () => {
       await userEvent.hover(trigger);
       const tooltip = screen.getByRole('tooltip');
       expect(tooltip).toHaveStyle({
-        'font-size': themes.light.typography['body-4'].fontSize,
+        font: '400 14px/20px "DM Sans"',
       });
     });
 
@@ -69,7 +68,7 @@ describe('<Tooltip />', () => {
       await userEvent.hover(trigger);
       const tooltip = screen.getByRole('tooltip');
       expect(tooltip).toHaveStyle({
-        'font-size': themes.light.typography['caption-2'].fontSize,
+        font: '400 13px/16px "DM Sans"',
       });
     });
   });

@@ -2,7 +2,6 @@ import React, { forwardRef } from 'react';
 import styled, { css } from 'styled-components';
 
 import useSX, { SXStyleProps, SXStyles } from '../../hooks/use-sx';
-import { createTypography } from '../../utils/mixins';
 import LoadingIndicator from '../loading-indicator';
 import type { ButtonSize, ButtonVariant } from './button.types';
 
@@ -80,7 +79,7 @@ const ButtonContainer = styled.button<{
     const { button } = theme.components;
 
     return css`
-      ${createTypography(button.size[size].typography)};
+      font: ${button.size[size].typography};
       box-shadow: ${button.global.elevation.initial};
       align-items: center;
       background-color: ${button.variant[variant].bg.initial};

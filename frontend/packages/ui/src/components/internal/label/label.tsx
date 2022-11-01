@@ -1,8 +1,6 @@
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-import { createTypography } from '../../../utils/mixins';
-
 export type LabelProps = {
   children: string;
   hasError?: boolean;
@@ -51,11 +49,11 @@ const StyledLabel = styled.label`
       }
 
       &[data-size='default'] {
-        ${createTypography(inputLabel.size.default.typography)}
+        font: ${inputLabel.size.default.typography};
       }
 
       &[data-size='compact'] {
-        ${createTypography(inputLabel.size.compact.typography)}
+        font: ${inputLabel.size.compact.typography};
       }
     `;
   }}

@@ -1,3 +1,5 @@
+import type { Typography } from './typography';
+
 export type LinkButton = {
   variant: {
     default: {
@@ -36,48 +38,23 @@ export type LinkButton = {
   size: {
     default: {
       height: number;
-      typography: {
-        fontFamily: string;
-        fontWeight: number;
-        lineHeight: string;
-        fontSize: string;
-      };
+      typography: Typography;
     };
     compact: {
       height: number;
-      typography: {
-        fontFamily: string;
-        fontWeight: number;
-        lineHeight: string;
-        fontSize: string;
-      };
+      typography: Typography;
     };
     tiny: {
       height: number;
-      typography: {
-        fontFamily: string;
-        fontWeight: number;
-        lineHeight: string;
-        fontSize: string;
-      };
+      typography: Typography;
     };
     xTiny: {
       height: number;
-      typography: {
-        fontFamily: string;
-        fontWeight: number;
-        lineHeight: string;
-        fontSize: string;
-      };
+      typography: Typography;
     };
     xxTiny: {
       height: number;
-      typography: {
-        fontFamily: string;
-        fontWeight: number;
-        lineHeight: string;
-        fontSize: string;
-      };
+      typography: Typography;
     };
   };
 };

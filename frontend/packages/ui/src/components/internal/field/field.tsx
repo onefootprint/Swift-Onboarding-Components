@@ -3,8 +3,6 @@ import Cleave from 'cleave.js/react';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-import { createTypography } from '../../../utils';
-
 export type FieldProps = {
   hasError?: boolean;
   hasFocus?: boolean;
@@ -40,12 +38,12 @@ const Field = styled(Cleave).attrs<{ as?: 'textarea' | 'input' }>(({ as }) => ({
       width: 100%;
 
       &[data-size='default'] {
-        ${createTypography(input.size.default.typography)};
+        font: ${input.size.default.typography};
         height: ${input.size.default.height}px;
       }
 
       &[data-size='compact'] {
-        ${createTypography(input.size.compact.typography)};
+        font: ${input.size.compact.typography};
         height: ${input.size.compact.height}px;
       }
 

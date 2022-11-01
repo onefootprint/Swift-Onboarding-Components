@@ -1,8 +1,6 @@
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-import { createTypography } from '../../../utils/mixins';
-
 export type HintProps = {
   size?: 'compact' | 'default';
   children: string;
@@ -45,11 +43,11 @@ const HintContainer = styled.div`
       }
 
       &[data-size='default'] {
-        ${createTypography(inputHint.size.default.typography)}
+        font: ${inputHint.size.default.typography};
       }
 
       &[data-size='compact'] {
-        ${createTypography(inputHint.size.compact.typography)}
+        font: ${inputHint.size.compact.typography};
       }
     `;
   }}

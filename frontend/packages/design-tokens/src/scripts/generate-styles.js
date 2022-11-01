@@ -29,7 +29,7 @@ styleDictionary.registerTransform({
       return 400;
     };
 
-    return ` ${getFontWeight(token.value.fontWeight)} ${
+    return `${getFontWeight(token.value.fontWeight)} ${
       token.value.fontSize
     }px/${token.value.lineHeight}px "${token.value.fontFamily}"`;
   },
@@ -41,17 +41,15 @@ styleDictionary.registerTransform({
     platforms: {
       web: {
         transforms: [
-          'name/cti/kebab',
-          'size/px',
+          'name/cti/camel',
           'transformHexToRgb',
           'transformTypography',
         ],
-        prefix: 'fp',
         buildPath: `src/output/`,
         files: [
           {
-            destination: `${theme}.css`,
-            format: 'css/variables',
+            destination: `${theme}.ts`,
+            format: 'javascript/es6',
             selector: `.${theme}-theme`,
           },
         ],

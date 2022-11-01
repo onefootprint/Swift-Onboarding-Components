@@ -40,12 +40,7 @@ export type FontVariant =
   | 'snippet-1'
   | 'snippet-2';
 
-type Typography = {
-  fontSize: string;
-  lineHeight: string;
-  fontWeight: number;
-  fontFamily: any;
-};
+type Typography = string;
 
 export type Typographies = Record<FontVariant, Typography>;
 

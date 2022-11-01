@@ -24,12 +24,7 @@ type Variant = {
 type Size = {
   height: number;
   paddingHorizontal: number;
-  typography: {
-    fontFamily: string;
-    fontWeight: number;
-    lineHeight: string;
-    fontSize: string;
-  };
+  typography: string;
 };
 
 export type Button = {
