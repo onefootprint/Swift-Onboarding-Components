@@ -14,4 +14,4 @@ pub struct RiskSignalFilters {
     pub severity: Vec<SignalSeverity>,
 }
 
-export_schema!(ListUsersRequest);
+export_schema!(RiskSignalFilters);

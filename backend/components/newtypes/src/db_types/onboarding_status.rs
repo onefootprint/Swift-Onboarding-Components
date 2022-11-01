@@ -7,7 +7,7 @@ use strum_macros::{AsRefStr, EnumString};
 
 use crate::{RequirementStatus, VerificationInfoStatus};
 
-/// The type of data attribute
+/// The status of the onboarding. This includes in-progress statuses
 #[derive(
     Debug,
     Display,

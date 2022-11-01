@@ -2,6 +2,7 @@ use chrono::{DateTime, Utc};
 use paperclip::actix::Apiv2Schema;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
+use thiserror::Error;
 mod newtype_exports;
 
 pub mod resources;
@@ -85,3 +86,9 @@ pub mod util {
     pub(crate) use export_schema;
 }
 pub(crate) use self::util::export_schema;
+
+#[derive(Debug, Error)]
+pub enum Error {
+    #[error("Cannot convert value")]
+    ConversionError,
+}

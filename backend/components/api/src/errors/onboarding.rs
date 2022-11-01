@@ -23,4 +23,6 @@ pub enum OnboardingError {
     UnmetRequirements(Vec<OnboardingRequirementDiscriminant>),
     #[error("Required attributes are not set: {0:?}")]
     MissingAttributes(Vec<CollectedDataOption>),
+    #[error("Onboarding is not in a terminal state: {0:?}")]
+    NonTerminalState(OnboardingStatus),
 }

@@ -14,5 +14,6 @@ serde_json = { workspace = true }
 paperclip = { workspace = true }
 uuid = { workspace = true }
 schemars = { workspace = true }
+thiserror = { workspace = true }
 
 paste = "1.0"

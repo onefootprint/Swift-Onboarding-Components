@@ -1,6 +1,7 @@
 use crypto::{random::gen_random_alphanumeric_code, sha256};
 pub use derive_more::{Add, Display, From, FromStr, Into};
 use paperclip::actix::Apiv2Schema;
+use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
 /// An cryptographically generated auth token to authenticate a session
@@ -18,6 +19,7 @@ use serde::{Deserialize, Serialize};
     Deserialize,
     Default,
     Apiv2Schema,
+    JsonSchema,
 )]
 #[serde(transparent)]
 pub struct SessionAuthToken(String);
