@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 
 use actix_web_prom::{PrometheusMetrics, PrometheusMetricsBuilder};
+use gethostname::gethostname;
 
 use crate::config::Config;
 
@@ -10,6 +11,10 @@ pub fn init(config: &Config) -> PrometheusMetrics {
         (
             "environment".to_string(),
             config.service_config.environment.clone(),
+        ),
+        (
+            "host".to_string(),
+            gethostname().into_string().expect("Cannot extract host name"),
         ),
     ]);
     let prometheus = PrometheusMetricsBuilder::new("api")
