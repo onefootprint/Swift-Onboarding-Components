@@ -1,4 +1,4 @@
-use crate::run_migrations;
+use crate::{run_migrations, DbPool};
 use diesel::{Connection, PgConnection};
 use std::sync::Once;
 
@@ -12,11 +12,19 @@ pub(crate) fn run_migrations_once(db_url: String) {
     });
 }
 
+fn db_url() -> String {
+    std::env::var("DATABASE_URL").unwrap_or_else(|_| "postgresql://localhost/footprint_db".to_string())
+}
 pub fn test_db_conn() -> PgConnection {
     let _ = dotenv::dotenv(); // Don't actually care if this succeeds since env is set in github actions
-    let db_url =
-        std::env::var("DATABASE_URL").unwrap_or_else(|_| "postgresql://localhost/footprint_db".to_string());
+    let db_url = db_url();
 
     run_migrations_once(db_url.clone());
     PgConnection::establish(&db_url).expect("failed to open test db connection")
+}
+
+pub fn test_db_pool() -> DbPool {
+    let db_url = db_url();
+
+    crate::init(&db_url).unwrap()
 }
