@@ -5,9 +5,9 @@ use crate::{
 };
 
 use db::models::{onboarding::Onboarding, verification_request::VerificationRequest};
-use newtypes::{OnboardingStatus, TenantId, UserVaultId, Vendor, VendorAPI};
+use newtypes::{OnboardingStatus, TenantId, UserVaultId};
 
-use super::{verification_request::build_request, *};
+use super::*;
 /// The Engine module is the main entry point into running our verification logic
 ///
 ///
@@ -54,7 +54,7 @@ pub async fn run(
             let ob_id = ob.id.clone();
 
             // From the data in the vault, figure out which vendors we need to send to
-            let available_vendor_apis = user_vault_helper::get_vendor_apis_from_user_vault_wrapper(&uvw)?;
+            let available_vendor_apis = user_vault_helper::get_vendor_apis_from_user_vault_wrapper(&uvw);
             // From the possible vendors, select which ones we're sending to (logic TBD)
             let vendor_apis = verification_request::choose_vendor_apis(available_vendor_apis);
 

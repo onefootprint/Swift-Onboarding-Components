@@ -3,6 +3,7 @@ use crate::{errors::ApiError, State};
 use chrono::Utc;
 use db::models::{verification_request::NewVerificationRequest, verification_request::VerificationRequest};
 use db::HasDataAttributeFields;
+use newtypes::IdentityDocumentId;
 use newtypes::VendorAPI;
 use newtypes::{email::Email, DataAttribute, IdvData, OnboardingId, PhoneNumber, Vendor};
 use std::{collections::HashMap, str::FromStr};
@@ -57,6 +58,10 @@ pub fn build_verification_request(
     ob_id: OnboardingId,
     vendor_api: VendorAPI,
 ) -> NewVerificationRequest {
+    // TODO: need to figure out how to choose identity document based on type? recency?
+    let identity_document_for_request: Option<IdentityDocumentId> =
+        uvw.identity_documents.first().map(|i| i.id.clone());
+
     NewVerificationRequest {
         onboarding_id: ob_id,
         vendor: Vendor::from(vendor_api),
@@ -64,7 +69,7 @@ pub fn build_verification_request(
         email_id: uvw.email.as_ref().map(|e| e.id.clone()),
         phone_number_id: uvw.phone_number.as_ref().map(|e| e.id.clone()),
         identity_data_id: uvw.identity_data.as_ref().map(|e| e.id.clone()),
-        identity_document_id: None,
         vendor_api,
+        identity_document_id: identity_document_for_request,
     }
 }

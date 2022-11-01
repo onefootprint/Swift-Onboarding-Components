@@ -1,5 +1,6 @@
 use db::models::fingerprint::IsUnique;
 use db::models::identity_data::IdentityData;
+use db::models::identity_document::IdentityDocument;
 use db::models::kv_data::{KeyValueData, NewKeyValueDataArgs};
 use db::models::onboarding::Onboarding;
 use db::models::scoped_user::ScopedUser;
@@ -33,11 +34,22 @@ use itertools::Itertools;
 use super::identity_data_builder::IdentityDataBuilder;
 use db::HasDataAttributeFields;
 
+/// UserVaultWrapper represents the current "state" of the UserVault - the most up to date and complete information we have
+/// about a particular user.
+///
+/// In other words, the UserVault is a major dividing line in Footprint's product.
+///    1. the API routes and backend logic determine `OnboardingRequirements` that the frontend knows how to collect.
+///    2. The information collected is stashed in various tables (see the impls below for the actual locations)
+///    3. The decision engine and verification logic _only knows about what's in the UserVault_
+///         * it is the information we send to vendors (a UVW gets "serialized" in a `VerificationRequest` in the decision engine)
+///         * it is the source of truth to know what we datums we have collected from a User
 pub struct UserVaultWrapper {
     pub user_vault: UserVault,
     pub identity_data: Option<IdentityData>,
     pub phone_number: Option<PhoneNumber>,
     pub email: Option<Email>,
+    // It's very possible we will collect multiple documents for a single UserVault. Retries, different ID types, different country etc
+    pub identity_documents: Vec<IdentityDocument>,
     is_locked: bool,
     // Represents whether we have fetched the appropriate data
     is_hydrated: PhantomData<()>,
@@ -57,12 +69,14 @@ impl UserVaultWrapper {
         let identity_data = IdentityData::get_active(conn, &user_vault.id)?;
         let phone_number = PhoneNumber::get_primary(conn, &user_vault.id)?;
         let email = Email::get_primary(conn, &user_vault.id)?;
+        let identity_documents = IdentityDocument::get_for_user_vault_id(conn, &user_vault.id)?;
 
         Ok(Self {
             identity_data,
             user_vault,
             phone_number,
             email,
+            identity_documents,
             is_locked,
             is_hydrated: PhantomData,
         })
@@ -95,6 +109,9 @@ impl UserVaultWrapper {
             .map(|email| (email.user_vault_id.clone(), email))
             .collect();
 
+        // Fetch all the identity documents for the user vault ids
+        let mut identity_document_map = IdentityDocument::multi_get_for_user_vault_ids(conn, &uv_ids)?;
+
         // Map over our UserVaults, assembling the UserVaultWrappers from the data we fetched above
         Ok(user_vaults
             .into_iter()
@@ -105,6 +122,7 @@ impl UserVaultWrapper {
                     user_vault: uv,
                     phone_number: phone_number.remove(&uv_id),
                     email: email.remove(&uv_id),
+                    identity_documents: identity_document_map.remove(&uv_id).unwrap_or_default(),
                     is_locked,
                     is_hydrated: PhantomData,
                 }
@@ -132,11 +150,19 @@ impl UserVaultWrapper {
             .identity_data_id
             .map(|id| IdentityData::get(conn, &id, &user_vault.id))
             .transpose()?;
+
+        let identity_document = request
+            .identity_document_id
+            .map(|id| IdentityDocument::get(conn, id))
+            .transpose()?
+            .flatten();
+
         Ok(Self {
             identity_data,
             user_vault,
             phone_number,
             email,
+            identity_documents: vec![identity_document].into_iter().flatten().collect(),
             is_locked: false,
             is_hydrated: PhantomData,
         })
