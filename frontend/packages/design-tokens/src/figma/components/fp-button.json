@@ -53,50 +53,22 @@
       }
     },
     "height": {
-      "large": {
-        "value": "60",
-        "type": "sizing"
-      },
-      "default": {
-        "value": "48",
-        "type": "sizing"
-      },
-      "compact": {
-        "value": "40",
-        "type": "sizing"
-      }
+      "value": "48",
+      "type": "sizing"
     },
     "border-radius": {
       "value": "{border-radius.default}",
       "type": "borderRadius"
     },
     "spacing": {
-      "paddings-horizontal-large": {
-        "value": "{spacing.7}",
-        "type": "spacing"
-      },
-      "paddings-horizontal-default": {
-        "value": "{spacing.7}",
-        "type": "spacing"
-      },
-      "paddings-horizontal-compact": {
+      "paddings-horizontal": {
         "value": "{spacing.7}",
         "type": "spacing"
       }
     },
     "typography": {
-      "large": {
-        "value": "{typography.label1}",
-        "type": "typography"
-      },
-      "default": {
-        "value": "{typography.label1}",
-        "type": "typography"
-      },
-      "compact": {
-        "value": "{typography.label2}",
-        "type": "typography"
-      }
+      "value": "{typography.label1}",
+      "type": "typography"
     }
   }
 }

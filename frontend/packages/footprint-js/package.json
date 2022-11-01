@@ -31,6 +31,7 @@
   },
   "devDependencies": {
     "@onefootprint/jest-presets": "*",
+    "@onefootprint/design-tokens": "*",
     "@onefootprint/types": "*",
     "@types/postmate": "^1.5.2",
     "eslint-config-footprint": "*",

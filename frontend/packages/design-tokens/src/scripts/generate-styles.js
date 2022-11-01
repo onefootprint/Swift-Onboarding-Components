@@ -29,12 +29,9 @@ styleDictionary.registerTransform({
       return 400;
     };
 
-    return {
-      fontFamily: token.value.fontFamily,
-      fontWeight: getFontWeight(token.value.fontWeight),
-      lineHeight: `${token.value.lineHeight}px`,
-      fontSize: `${token.value.fontSize}px`,
-    };
+    return ` ${getFontWeight(token.value.fontWeight)} ${
+      token.value.fontSize
+    }px/${token.value.lineHeight}px "${token.value.fontFamily}"`;
   },
 });
 
@@ -44,15 +41,17 @@ styleDictionary.registerTransform({
     platforms: {
       web: {
         transforms: [
-          'name/cti/camel',
+          'name/cti/kebab',
+          'size/px',
           'transformHexToRgb',
           'transformTypography',
         ],
+        prefix: 'fp',
         buildPath: `src/output/`,
         files: [
           {
-            destination: `${theme}.ts`,
-            format: 'javascript/es6',
+            destination: `${theme}.css`,
+            format: 'css/variables',
             selector: `.${theme}-theme`,
           },
         ],

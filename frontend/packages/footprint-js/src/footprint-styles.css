@@ -1,11 +1,36 @@
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@500&display=swap');
 
+:root {
+  --fp-fp-button-initial-bg: #0e1438;
+  --fp-fp-button-initial-text: #ffffff;
+  --fp-fp-button-initial-icon: #76fb8f;
+  --fp-fp-button-hover-bg: #18234f;
+  --fp-fp-button-hover-text: #ffffff;
+  --fp-fp-button-hover-icon: #76fb8f;
+  --fp-fp-button-active-bg: #18234f;
+  --fp-fp-button-active-text: #ffffff;
+  --fp-fp-button-active-icon: #76fb8f;
+  --fp-fp-button-loading-bg: #0e1438;
+  --fp-fp-button-loading-icon: #ffffff;
+  --fp-fp-button-height: 48px;
+  --fp-fp-button-border-radius: 6px;
+  --fp-fp-button-spacing-paddings-horizontal: 24px;
+  --fp-fp-button-typography:  500 17px/28px "DM Sans";
+
+  --fp-loading-bg: rgba(0, 0, 0, 0.6);
+  --fp-loading-border-radius: 4px;
+  --fp-loading-padding: 16px;
+
+  --fp-overlay-bg: rgba(0, 0, 0, 0.3);
+}
+
 .footprint-body-locked {
   overflow: hidden;
 }
+
 .footprint-overlay {
   align-items: center;
-  background: rgba(0, 0, 0, 0.3);
+  background: var(--fp-overlay-bg);
   display: flex;
   height: 100%;
   justify-content: center;
@@ -27,9 +52,9 @@
 }
 
 .footprint-loading-indicator {
-  background: rgba(0, 0, 0, 0.6);
-  border-radius: 4px;
-  padding: 16px;
+  background: var(--fp-loading-bg);
+  border-radius: var(--fp-loading-border-radius);
+  padding: var(--fp-loading-padding);
 }
 
 .footprint-loading-spin {
@@ -46,39 +71,25 @@
 }
 
 .footprint-button {
-  -webkit-box-align: center;
   align-items: center;
-  background-color: rgb(14, 20, 56);
-  border-radius: 6px;
-  border: 0px;
-  box-shadow: rgb(0 0 0 / 0%) 0px 1px 1px, transparent 0px 0px 0px 1px;
-  color: rgb(255, 255, 255);
+  background: var(--fp-fp-button-initial-bg);
+  border-radius: var(--fp-fp-button-border-radius);
+  border: unset;
+  color: var(--fp-fp-button-initial-text);
   cursor: pointer;
   display: flex;
-  -webkit-box-pack: center;
+  font: var(--fp-fp-button-typography);
+  height: var(--fp-fp-button-height);
   justify-content: center;
-  text-decoration: none;
-  font-family: 'DM Sans';
-  font-size: 16px;
-  font-weight: 500;
-  line-height: 24px;
-  padding: 12px 24px;
+  padding: 0 var(--fp-fp-button-spacing-paddings-horizontal);
 }
 
 .footprint-button:hover {
-  background: linear-gradient(
-      rgba(255, 255, 255, 0.14),
-      rgba(255, 255, 255, 0.14)
-    ),
-    linear-gradient(rgb(14, 20, 56), rgb(14, 20, 56));
+  background: var(--fp-fp-button-hover-bg);
 }
 
 .footprint-button:active {
-  background: linear-gradient(
-      rgba(255, 255, 255, 0.18),
-      rgba(255, 255, 255, 0.18)
-    ),
-    linear-gradient(rgb(14, 20, 56), rgb(14, 20, 56));
+  background: var(--fp-fp-button-active-bg);
 }
 
 .footprint-button svg {

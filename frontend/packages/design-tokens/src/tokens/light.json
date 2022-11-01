@@ -1652,77 +1652,31 @@
       }
     },
     "height": {
-      "large": {
-        "value": 60,
-        "type": "sizing"
-      },
-      "default": {
-        "value": 48,
-        "type": "sizing"
-      },
-      "compact": {
-        "value": 40,
-        "type": "sizing"
-      }
+      "value": 48,
+      "type": "sizing"
     },
     "border-radius": {
       "value": 6,
       "type": "borderRadius"
     },
     "spacing": {
-      "paddings-horizontal-large": {
-        "value": 24,
-        "type": "spacing"
-      },
-      "paddings-horizontal-default": {
-        "value": 24,
-        "type": "spacing"
-      },
-      "paddings-horizontal-compact": {
+      "paddings-horizontal": {
         "value": 24,
         "type": "spacing"
       }
     },
     "typography": {
-      "large": {
-        "value": {
-          "fontFamily": "DM Sans",
-          "fontWeight": "Medium",
-          "lineHeight": 28,
-          "fontSize": 17,
-          "letterSpacing": 0,
-          "paragraphSpacing": 0,
-          "textCase": "none",
-          "textDecoration": "none"
-        },
-        "type": "typography"
+      "value": {
+        "fontFamily": "DM Sans",
+        "fontWeight": "Medium",
+        "lineHeight": 28,
+        "fontSize": 17,
+        "letterSpacing": 0,
+        "paragraphSpacing": 0,
+        "textCase": "none",
+        "textDecoration": "none"
       },
-      "default": {
-        "value": {
-          "fontFamily": "DM Sans",
-          "fontWeight": "Medium",
-          "lineHeight": 28,
-          "fontSize": 17,
-          "letterSpacing": 0,
-          "paragraphSpacing": 0,
-          "textCase": "none",
-          "textDecoration": "none"
-        },
-        "type": "typography"
-      },
-      "compact": {
-        "value": {
-          "fontFamily": "DM Sans",
-          "fontWeight": "Medium",
-          "lineHeight": 24,
-          "fontSize": 16,
-          "letterSpacing": 0,
-          "paragraphSpacing": 0,
-          "textCase": "none",
-          "textDecoration": "none"
-        },
-        "type": "typography"
-      }
+      "type": "typography"
     }
   },
   "dialog": {
