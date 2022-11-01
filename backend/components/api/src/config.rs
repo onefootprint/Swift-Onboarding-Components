@@ -153,8 +153,8 @@ pub struct EnclaveConfig {
 /// separate service config struct to load minimal memory footprint for sensitive values
 #[derive(Envconfig, Clone)]
 pub struct ServiceEnvironmentConfig {
-    #[envconfig(from = "SERVICE_ENVIRONMENT")]
-    pub environment: Option<String>,
+    #[envconfig(from = "SERVICE_ENVIRONMENT", default = "unspecified")]
+    pub environment: String,
 }
 
 lazy_static::lazy_static! {
@@ -169,10 +169,7 @@ impl ServiceEnvironmentConfig {
     }
 
     pub fn is_production(&self) -> bool {
-        self.environment
-            .as_ref()
-            .map(|s| s.as_str() == "production")
-            .unwrap_or(false)
+        self.environment.as_str() == "production"
     }
 }
 

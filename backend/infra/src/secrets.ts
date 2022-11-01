@@ -12,7 +12,8 @@ export interface StaticSecrets {
   secretsPolicyArn: pulumi.Output<string>;
   elasticApiKey: aws.ssm.Parameter;
   elasticApmAgentKey: aws.ssm.Parameter;
-  otelConfig: aws.ssm.Parameter;
+  traceOtelConfig: aws.ssm.Parameter;
+  promOtelConfig: aws.ssm.Parameter;
   enclaveUserSecretKey: aws.ssm.Parameter;
   enclaveSealedIkek: aws.ssm.Parameter;
   dbPassword: pulumi.Output<string>;
@@ -23,6 +24,7 @@ export interface StaticSecrets {
   sendgridApiKey: aws.ssm.Parameter;
   idologyUsername: aws.ssm.Parameter;
   idologyPassword: aws.ssm.Parameter;
+  grafanaPrometheusPushAuth: aws.ssm.Parameter;
 }
 
 interface SecretConstants {
@@ -31,6 +33,7 @@ interface SecretConstants {
   twilio: Twilio;
   sendgrid: Sendgrid;
   idology: IDology;
+  grafana: Grafana;
 }
 
 interface ElasticSecrets {
@@ -54,6 +57,10 @@ interface Sendgrid {
 interface IDology {
   username: string;
   password: string;
+}
+
+interface Grafana {
+  prometheusPushAuth: string;
 }
 
 export async function LoadSecrets(
@@ -108,10 +115,15 @@ export async function LoadSecrets(
       ),
       name: `/static_secrets/enclave-user-${stack}`,
     }),
-    otelConfig: new aws.ssm.Parameter(`ssm-param-otelconfig`, {
+    traceOtelConfig: new aws.ssm.Parameter(`ssm-param-trace-otelconfig`, {
       type: 'SecureString',
       value: fs.readFileSync('./monitoring/otel.yml', 'utf8'),
-      name: `/static_secrets/otelconfig-${stack}`,
+      name: `/static_secrets/trace-otelconfig-${stack}`,
+    }),
+    promOtelConfig: new aws.ssm.Parameter(`ssm-param-prom-otelconfig`, {
+      type: 'SecureString',
+      value: fs.readFileSync('./monitoring/prom-otel.yml', 'utf8'),
+      name: `/static_secrets/prom-otelconfig-${stack}`,
     }),
     dbPassword: pulumi.secret(auroraDbPassword.result),
     cookieSessionKey: new aws.ssm.Parameter(
@@ -149,6 +161,10 @@ export async function LoadSecrets(
     enclaveSealedIkek: createSecretParameter(
       `enclaveSealedIkek-${stack}`,
       enclaveKeyDescriptor.sealedIkek.hexValue,
+    ),
+    grafanaPrometheusPushAuth: createSecretParameter(
+      `grafanaPrometheusPushAuth-${stack}`,
+      secretConstants.grafana.prometheusPushAuth,
     ),
   };
 }

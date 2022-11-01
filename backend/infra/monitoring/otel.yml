@@ -5,13 +5,13 @@ receivers:
   statsd:
     endpoint: 0.0.0.0:8125
     aggregation_interval: 60s
-  awsecscontainermetrics:
   otlp:
     protocols:
       grpc:
         endpoint: 0.0.0.0:4317
       http:
         endpoint: 0.0.0.0:55681
+
 
 processors:
   batch/traces:
@@ -21,24 +21,10 @@ processors:
   batch/metrics:
     timeout: 30s
 
-  filter:
-    metrics:
-      include:
-        match_type: strict
-        metric_names:
-          - ecs.task.memory.reserved
-          - ecs.task.memory.utilized
-          - ecs.task.cpu.reserved
-          - ecs.task.cpu.utilized
-          - ecs.task.network.rate.rx
-          - ecs.task.network.rate.tx
-          - ecs.task.storage.read_bytes
-          - ecs.task.storage.write_bytes
-          - container.duration
-
 exporters:
   logging:
     loglevel: debug
+
   otlp/elastic:
     # Elastic APM server https endpoint without the "https://" prefix
     endpoint: '${ELASTIC_APM_SERVER_ENDPOINT}'
@@ -51,11 +37,6 @@ exporters:
     headers:
       'Authorization': 'Bearer 189225732777 ds1CdgeCvHzZp3oRu7Rc:s3PHTK91XmE7_ykZ7vk1J-BsLl6jWg0Y'
 
-  prometheusremotewrite:
-    endpoint: 'https://collect.observeinc.com/v1/prometheus'
-    headers:
-      'Authorization': 'Bearer 189225732777 ds1CdgeCvHzZp3oRu7Rc:s3PHTK91XmE7_ykZ7vk1J-BsLl6jWg0Y'
-
 service:
   pipelines:
     traces:
@@ -65,9 +46,5 @@ service:
     metrics/application:
       receivers: [otlp]
       processors: [batch/metrics]
-      exporters: [logging, otlp/elastic, prometheusremotewrite]
-    metrics/performance:
-      receivers: [awsecscontainermetrics]
-      processors: [filter]
-      exporters: [logging, otlp/elastic, prometheusremotewrite]
+      exporters: [logging, otlp/elastic]
   extensions: [health_check]

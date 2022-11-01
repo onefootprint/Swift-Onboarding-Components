@@ -5,6 +5,7 @@ use telemetry::TelemetrySpanBuilder;
 use tracing_actix_web::TracingLogger;
 
 mod config;
+mod prometheus;
 mod signed_hash;
 mod telemetry;
 
@@ -34,20 +35,17 @@ async fn main() -> std::io::Result<()> {
 
     // telemetry
     let _controller = telemetry::init(&config).expect("failed to init telemetry layers");
+    let prometheus = prometheus::init(&config);
 
     // sentry
-    let _guard = if let Some(env) = config.service_config.environment.clone() {
-        Some(sentry::init((
-            config.sentry_url.as_str(),
-            sentry::ClientOptions {
-                release: sentry::release_name!(),
-                environment: Some(Cow::Owned(env)),
-                ..Default::default()
-            },
-        )))
-    } else {
-        None
-    };
+    let _guard = sentry::init((
+        config.sentry_url.as_str(),
+        sentry::ClientOptions {
+            release: sentry::release_name!(),
+            environment: Some(Cow::Owned(config.service_config.environment.clone())),
+            ..Default::default()
+        },
+    ));
 
     // Add custom sentry tags here!
     sentry::configure_scope(|scope| {
@@ -88,6 +86,7 @@ async fn main() -> std::io::Result<()> {
 
         App::new()
             .app_data(web::Data::new(state.clone()))
+            .wrap(prometheus.clone())
             .wrap(
                 sentry_actix::Sentry::builder()
                     .capture_server_errors(true)
