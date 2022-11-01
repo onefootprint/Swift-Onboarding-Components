@@ -1,7 +1,8 @@
-import footprint from '@onefootprint/footprint-js';
-import React from 'react';
+import footprint, { FootprintAppearance } from '@onefootprint/footprint-js';
+import React, { useEffect } from 'react';
 
 export type FootprintButtonProps = {
+  appearance?: FootprintAppearance;
   label?: string;
   onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
   onCompleted?: (validationToken: string) => void;
@@ -11,6 +12,7 @@ export type FootprintButtonProps = {
 };
 
 const FootprintButton = ({
+  appearance,
   label = 'Verify with Footprint',
   onClick,
   onCompleted,
@@ -18,6 +20,12 @@ const FootprintButton = ({
   publicKey,
   testID,
 }: FootprintButtonProps) => {
+  useEffect(() => {
+    if (appearance) {
+      footprint.setAppearance(appearance);
+    }
+  }, [appearance]);
+
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     onClick?.(event);
     footprint.show({

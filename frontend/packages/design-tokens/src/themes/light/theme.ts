@@ -1,5 +1,4 @@
 import { rgba } from 'polished';
-import type { DefaultTheme } from 'styled-components';
 
 import * as t from '../../output/light';
 import borderRadius from '../shared/border-radius';
@@ -10,10 +9,11 @@ import grid from '../shared/grid';
 import spacing from '../shared/spacing';
 import typography from '../shared/typography';
 import zIndex from '../shared/z-index';
+import type { Theme } from '../types';
 import codeHighlight from './code-highlight';
 import components from './components';
 
-const theme: DefaultTheme = {
+const theme: Theme = {
   grid,
   typography,
   breakpoint,

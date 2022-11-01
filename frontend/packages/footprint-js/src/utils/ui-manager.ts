@@ -1,6 +1,48 @@
+import themes from '@onefootprint/design-tokens';
+
+import type { FootprintAppearance } from '../footprint-types';
+
 const CONTAINER_ID = 'footprint-container';
 const OVERLAY_ID = 'footprint-overlay';
 const LOADING_INDICATOR_ID = 'footprint-loading-indicator';
+const CUSTOM_STYLES_ID = 'footprint-custom-styles';
+
+const injectStyles = (styles: string) => {
+  if (typeof window === 'undefined') return;
+  const prevStyle = document.getElementById(CUSTOM_STYLES_ID);
+  if (prevStyle) {
+    prevStyle.remove();
+  }
+  const style = document.createElement('style');
+  style.setAttribute('id', 'footprint-custom-styles');
+  style.textContent = styles;
+  document.head.append(style);
+};
+
+export const injectExternalStyles = ({
+  theme,
+  variables,
+}: FootprintAppearance) => {
+  const { loading, overlay, fpButton } = themes[theme].components.bifrost;
+
+  injectStyles(`
+    :root {
+      --fp-fp-button-height: ${variables.fpButtonHeight || fpButton.height};
+      --fp-fp-button-border-radius: ${
+        variables.fpButtonBorderRadius || fpButton.borderRadius
+      };
+
+      --fp-loading-bg: ${variables.loadingBg || loading.bg};
+      --fp-loading-color: ${variables.loadingColor || loading.color};
+      --fp-loading-border-radius: ${
+        variables.loadingBorderRadius || loading.borderRadius
+      };
+      --fp-loading-padding: ${variables.loadingPadding || loading.padding};
+
+      --fp-overlay-bg:${variables.overlayBg || overlay.bg};
+    }
+  `);
+};
 
 export const createButton = (container: HTMLElement): HTMLButtonElement => {
   const button = createFootprintButton();
@@ -57,7 +99,6 @@ export const createLoadingIndicator = (loaderId: string) => {
   loader.setAttribute('aria-hidden', 'true');
   const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
   path.setAttribute('d', 'M12 2a10 10 0 0 1 10 10h-2a7.999 7.999 0 0 0-8-8V2Z');
-  path.setAttribute('fill', '#FFFFFF');
   loader.appendChild(path);
   inner.appendChild(loader);
   container.appendChild(inner);

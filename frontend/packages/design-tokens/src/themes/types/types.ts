@@ -1,6 +1,7 @@
 import * as CSS from 'csstype';
 
 import type {
+  Bifrost,
   Button,
   Input,
   InputHint,
@@ -52,6 +53,8 @@ export type Overlays = {
   'error-1': string;
   'error-2': string;
 };
+
+export type Overlay = keyof Overlays;
 
 type Colors = {
   primary: string;
@@ -166,8 +169,6 @@ type BackgroundColors = {
 
 export type BackgroundColor = keyof BackgroundColors;
 
-export type Overlay = keyof Overlays;
-
 export type BorderWidths = {
   0: number;
   1: number;
@@ -220,11 +221,12 @@ export type Theme = {
   typography: Typographies;
   zIndex: ZIndexes;
   components: {
-    linkButton: LinkButton;
     button: Button;
     input: Input;
-    inputLabel: InputLabel;
     inputHint: InputHint;
+    inputLabel: InputLabel;
+    linkButton: LinkButton;
+    bifrost: Bifrost;
   };
 };
 

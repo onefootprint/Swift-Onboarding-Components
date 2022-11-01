@@ -1,4 +1,7 @@
-import { FootprintButton } from '@onefootprint/footprint-react';
+import {
+  FootprintAppearance,
+  FootprintButton,
+} from '@onefootprint/footprint-react';
 import { Box, createFontStyles, media, Typography } from '@onefootprint/ui';
 import Head from 'next/head';
 import React, { useState } from 'react';
@@ -13,6 +16,21 @@ export type DemoProps = {
     feature_image: string;
     meta_title: string;
   };
+};
+
+const appearance: FootprintAppearance = {
+  theme: 'light',
+  variables: {
+    fpButtonHeight: '48px',
+    fpButtonBorderRadius: '6px',
+
+    loadingBg: 'rgba(0, 0, 0, 0.6)',
+    loadingColor: '#fff',
+    loadingBorderRadius: '4px',
+    loadingPadding: '16px',
+
+    overlayBg: 'rgba(0, 0, 0, 0.3)',
+  },
 };
 
 const publicKey = process.env.NEXT_PUBLIC_TENANT_KEY as string;
@@ -47,6 +65,7 @@ const Demo = ({ page }: DemoProps) => {
               <Content dangerouslySetInnerHTML={{ __html: page.html }} />
               <ButtonContainer>
                 <FootprintButton
+                  appearance={appearance}
                   publicKey={publicKey}
                   onCompleted={(validationToken: string) => {
                     setConfirmation(true);
