@@ -68,6 +68,15 @@ module.exports = {
       '@onefootprint/types',
     ],
   },
+  async redirects() {
+    return [
+      {
+        source: '/',
+        destination: '/users',
+        permanent: true,
+      },
+    ];
+  },
   async headers() {
     return [
       {
