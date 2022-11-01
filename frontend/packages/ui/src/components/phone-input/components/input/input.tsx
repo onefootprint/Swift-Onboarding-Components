@@ -51,6 +51,7 @@ const PhoneInput = forwardRef<HTMLInputElement, InputProps>(
           mask={hasMask ? mask : { prefix }}
           placeholder=""
           readOnly={isLoading}
+          className="fp-input-phone"
           prefixComponent={
             <Trigger
               onClick={isLoading ? undefined : selectTrigger.onClick}

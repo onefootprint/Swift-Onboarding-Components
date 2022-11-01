@@ -28,7 +28,8 @@ type AllInputProps = InputProps & InternalInputProps;
 const BaseInput = forwardRef<HTMLInputElement, AllInputProps>(
   (
     {
-      size = 'default',
+      className,
+      disabled = false,
       hasError = false,
       hasFocus = false,
       hint,
@@ -40,10 +41,10 @@ const BaseInput = forwardRef<HTMLInputElement, AllInputProps>(
       placeholder,
       prefixComponent,
       required,
+      size = 'default',
       suffixComponent,
       sx,
       testID,
-      disabled = false,
       ...props
     }: AllInputProps,
     ref,
@@ -82,7 +83,7 @@ const BaseInput = forwardRef<HTMLInputElement, AllInputProps>(
             $sx={sxStyles}
             aria-required={required}
             as={mask ? undefined : 'input'}
-            className="fp-input"
+            className={`fp-input ${className}`}
             data-has-error={hasError}
             data-has-focus={hasFocus}
             data-size={size}
