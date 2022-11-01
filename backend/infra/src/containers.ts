@@ -19,6 +19,7 @@ export abstract class ServiceContainers {
     parent: pulumi.Resource,
     database: DbOutput,
     s3Buckets: s3.S3Buckets,
+    metricsEndpointPath: string,
   ): Promise<pulumi.Output<string>> {
     const traceOtelCollecterContainerName = 'otelcollect-trace';
     const promOtelCollecterContainerName = 'otelcollect-prom';
@@ -31,8 +32,6 @@ export abstract class ServiceContainers {
     // containers sadly
     const traceOtelCollector = ServiceContainers.createTraceOtelCollector(
       traceOtelCollecterContainerName,
-      serverContainerName,
-      appPort,
       secretsStore,
       constants,
       region,
@@ -45,6 +44,7 @@ export abstract class ServiceContainers {
       secretsStore,
       constants,
       region,
+      metricsEndpointPath,
     );
 
     const hearbeats = ServiceContainers.createHeartbeatContainer(
@@ -65,6 +65,7 @@ export abstract class ServiceContainers {
       region,
       database,
       s3Buckets,
+      metricsEndpointPath,
     );
 
     const containerDef = pulumi
@@ -97,6 +98,7 @@ export abstract class ServiceContainers {
     region: Region,
     database: DbOutput,
     s3Buckets: s3.S3Buckets,
+    metricsEndpointPath: string,
   ): Promise<pulumi.Output<aws.ecs.ContainerDefinition>> {
     let serviceEnvironment: string;
     if (pulumi.getStack().startsWith('dev-')) {
@@ -266,6 +268,10 @@ export abstract class ServiceContainers {
                 name: s3Buckets.documentImages.bucketName,
                 value: s3Buckets.documentImages.envVarName,
               },
+              {
+                name: 'METRICS_ENDPOINT_PATH',
+                value: `${metricsEndpointPath}`,
+              },
             ],
             links: [
               `${traceOtelCollectorContainerName}:${traceOtelCollectorContainerName}`,
@@ -303,8 +309,6 @@ export abstract class ServiceContainers {
    */
   static createTraceOtelCollector(
     name: string,
-    serverContainerName: string,
-    serverContainerPort: number,
     secrets: StaticSecrets,
     constants: Config,
     region: Region,
@@ -339,10 +343,6 @@ export abstract class ServiceContainers {
               name: 'ELASTIC_APM_SERVER_ENDPOINT',
               value: constants.elastic.apmEndpoint,
             },
-            {
-              name: 'API_SERVER_TARGET',
-              value: `${serverContainerName}:${serverContainerPort}`,
-            },
           ],
           logConfiguration: {
             logDriver: 'awslogs',
@@ -371,6 +371,7 @@ export abstract class ServiceContainers {
     secrets: StaticSecrets,
     constants: Config,
     region: Region,
+    metricsEndpointPath: string,
   ): pulumi.Output<aws.ecs.ContainerDefinition> {
     const out = pulumi
       .all([
@@ -411,11 +412,15 @@ export abstract class ServiceContainers {
               name: 'API_SERVER_TARGET',
               value: `${serverContainerName}:${serverContainerPort}`,
             },
+            {
+              name: 'API_SERVER_METRICS_ENDPOINT_PATH',
+              value: `${metricsEndpointPath}`,
+            },
           ],
           logConfiguration: {
             logDriver: 'awslogs',
             options: {
-              'awslogs-group': `/ecs/otelcollect_logs`,
+              'awslogs-group': `/ecs/otelcollect_prom_logs`,
               'awslogs-region': `${region}`,
               'awslogs-create-group': 'true',
               'awslogs-stream-prefix': 'ecs',

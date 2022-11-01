@@ -155,6 +155,9 @@ pub struct EnclaveConfig {
 pub struct ServiceEnvironmentConfig {
     #[envconfig(from = "SERVICE_ENVIRONMENT", default = "unspecified")]
     pub environment: String,
+
+    #[envconfig(from = "METRICS_ENDPOINT_PATH", default = "metrics")]
+    pub metrics_endpoint_path: String,
 }
 
 lazy_static::lazy_static! {

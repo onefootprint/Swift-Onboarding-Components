@@ -12,6 +12,7 @@ import { DbOutput } from './db';
 import { FootprintVpc, Vpc } from './vpc';
 import { HmacSigningKeyDescriptor } from './hmac_key';
 import * as s3 from './s3';
+import { metrics } from '@pulumi/awsx/cloudwatch';
 
 export type ServiceLoadBalancer = {
   lb: awsx.lb.LoadBalancer;
@@ -60,10 +61,12 @@ export async function Create(
   const provider = vpcProvider.provider;
 
   // setup our load balancer and cloudfront CDN
+  const metricsEndpointPath = 'metrics';
   const loadBalancerTargetGroup = await createCdnFrontedLoadBalancer(
     vpcProvider,
     secretsStore,
     config,
+    metricsEndpointPath,
   );
 
   // init our cluster
@@ -90,6 +93,7 @@ export async function Create(
     cluster,
     database,
     s3Buckets,
+    metricsEndpointPath,
   );
 
   // setup the task
@@ -158,6 +162,7 @@ async function createCdnFrontedLoadBalancer(
   vpcProvider: FootprintVpc,
   secretsStore: StaticSecrets,
   config: ServiceConfig,
+  metricsEndpointPath: string,
 ): Promise<awsx.lb.TargetGroup> {
   const region = vpcProvider.region;
   const vpc = vpcProvider.vpc;
@@ -240,10 +245,37 @@ async function createCdnFrontedLoadBalancer(
     { provider },
   );
 
+  // dont't allow external traffic to hit the /metrics endpoint
+  web.addListenerRule(
+    `lb-cdntoken-metrics-rule-${serviceName}`,
+    {
+      priority: 1,
+      actions: [
+        {
+          type: 'fixed-response',
+          fixedResponse: {
+            contentType: 'text/plain',
+            messageBody: 'ALB not found',
+            statusCode: '404',
+          },
+        },
+      ],
+      conditions: [
+        {
+          pathPattern: {
+            values: [`*/${metricsEndpointPath}*`],
+          },
+        },
+      ],
+    },
+    { provider },
+  );
+
   // ensure ALB requests are only coming from cloudfront
-  const rule = web.addListenerRule(
+  web.addListenerRule(
     `lb-cdntoken-rule-${serviceName}`,
     {
+      priority: 2,
       actions: [
         {
           type: 'forward',

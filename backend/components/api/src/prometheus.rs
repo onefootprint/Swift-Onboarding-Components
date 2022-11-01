@@ -13,8 +13,7 @@ pub fn init(config: &Config) -> PrometheusMetrics {
         ),
     ]);
     let prometheus = PrometheusMetricsBuilder::new("api")
-        // TODO gate /metrics endpoint so it can only be hit locally
-        .endpoint("/metrics")
+        .endpoint(&format!("/{}", &config.service_config.metrics_endpoint_path))
         .const_labels(labels)
         .build()
         .expect("Failed to initialize prometheus client");
