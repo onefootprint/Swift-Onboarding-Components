@@ -23,7 +23,7 @@ use db::models::user_vault::UserVault;
 use db::{errors::DbError, PgConnection};
 use newtypes::{
     CollectedDataOption, DataAttribute, DataCollectedInfo, DataPriority, EmailId, Fingerprint, KvDataKey,
-    PiiString, SealedVaultBytes, TenantId, UserVaultId, ValidatedPhoneNumber,
+    OnboardingId, PiiString, SealedVaultBytes, TenantId, UserVaultId, ValidatedPhoneNumber,
 };
 
 use crate::errors::{ApiError, ApiResult};
@@ -302,6 +302,7 @@ impl UserVaultWrapper {
         conn: &mut TxnPgConnection,
         update: IdentityDataUpdate,
         fingerprints: Vec<(DataAttribute, Fingerprint, IsUnique)>,
+        onboarding_id: Option<OnboardingId>,
     ) -> Result<(), ApiError> {
         self.assert_is_locked(conn)?;
         let mut builder = IdentityDataBuilder::new(
@@ -347,8 +348,7 @@ impl UserVaultWrapper {
                     attributes: collected_data,
                 },
                 self.user_vault.id.clone(),
-                // TODO include ob_id if data is added during onboarding
-                None,
+                onboarding_id,
             )?;
         }
         self.identity_data = Some(identity_data);

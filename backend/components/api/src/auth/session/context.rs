@@ -41,6 +41,8 @@ impl<T> SessionContext<T>
 where
     T: AllowSessionUpdate,
 {
+    /// Replace the session data for the session used to authenticate this SessionContext with the
+    /// new provided data
     pub fn update_session(
         &mut self,
         conn: &mut PgConnection,
@@ -93,7 +95,7 @@ where
             // and if the session associated with the token cannot be converted to type T (in this case, OnboardingSession)
             // we fail
             let raw_session_data = session.data.clone();
-            let session_data = state
+            let parsed_session_data = state
                 .db_pool
                 .db_query(move |conn| {
                     T::try_from(raw_session_data, conn)
@@ -101,7 +103,7 @@ where
                 })
                 .await??;
             Ok(Self {
-                data: session_data,
+                data: parsed_session_data,
                 auth_token,
                 headers: MaskedHeaderMap(headers),
                 session,

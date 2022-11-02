@@ -213,8 +213,7 @@ pub async fn complete_post(
                     id: new_credential.id,
                 },
                 user_auth.user_vault_id(),
-                // TODO include ob_id if credential made during onboarding
-                None,
+                user_auth.onboarding_id(),
             )?;
             Ok(())
         })

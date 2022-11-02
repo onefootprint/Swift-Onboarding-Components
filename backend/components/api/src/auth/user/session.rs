@@ -1,5 +1,5 @@
 use db::PgConnection;
-use newtypes::UserVaultId;
+use newtypes::{OnboardingId, UserVaultId};
 use paperclip::actix::Apiv2Security;
 
 use super::{UserAuthScope, UserAuthScopeDiscriminant};
@@ -42,6 +42,21 @@ impl UserSession {
             user_vault_id: self.user_vault_id,
             scopes,
         })
+    }
+}
+
+impl SessionContext<UserSession> {
+    /// Returns the OnboardingId to which this auth session is tied, if any.
+    /// The OnboardingId will be stored in the OrgOnboarding auth scope if it exists.
+    pub fn onboarding_id(&self) -> Option<OnboardingId> {
+        self.data
+            .scopes
+            .iter()
+            .filter_map(|x| match x {
+                UserAuthScope::OrgOnboarding { id } => Some(id.clone()),
+                _ => None,
+            })
+            .next()
     }
 }
 

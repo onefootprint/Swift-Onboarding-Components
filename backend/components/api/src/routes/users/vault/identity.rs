@@ -103,7 +103,7 @@ pub fn put_internal(
             .collect(),
     }
     .create(conn)?;
-    uvw.update_identity_data(conn, update, fingerprints)?;
+    uvw.update_identity_data(conn, update, fingerprints, None)?;
     Ok(())
 }
 
