@@ -1,7 +1,7 @@
 use newtypes::TenantPermissionDiscriminants;
 use thiserror::Error;
 
-use self::user::UserAuthScope;
+use self::user::UserAuthScopeDiscriminant;
 
 pub mod custodian;
 pub mod session;
@@ -39,7 +39,7 @@ pub enum AuthError {
     #[error("not allowed: restricted to sandbox mode")]
     SandboxRestricted,
     #[error("Not allowed: requires one of the following scopes: {0:?}")]
-    MissingScope(Vec<UserAuthScope>),
+    MissingScope(Vec<UserAuthScopeDiscriminant>),
     #[error("Not allowed: required permission is missing: {0}")]
     MissingTenantPermission(TenantPermissionDiscriminants),
     #[error("Not allowed: role does not have permissions to decrypt attributes")]

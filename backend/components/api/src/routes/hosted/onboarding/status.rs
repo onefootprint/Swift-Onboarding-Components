@@ -2,7 +2,7 @@ use crate::auth::tenant::ParsedOnboardingSession;
 use crate::auth::tenant::PublicOnboardingContext;
 use crate::auth::user::UserAuth;
 use crate::auth::user::UserAuthContext;
-use crate::auth::user::UserAuthScope;
+use crate::auth::user::UserAuthScopeDiscriminant;
 use crate::auth::Either;
 use crate::auth::SessionContext;
 use crate::errors::ApiError;
@@ -30,7 +30,7 @@ pub async fn get(
     onboarding_context: Either<PublicOnboardingContext, SessionContext<ParsedOnboardingSession>>,
     user_auth: UserAuthContext,
 ) -> actix_web::Result<Json<ResponseData<OnboardingStatusResponse>>, ApiError> {
-    let user_auth = user_auth.check_permissions(vec![UserAuthScope::OrgOnboarding])?;
+    let user_auth = user_auth.check_permissions(vec![UserAuthScopeDiscriminant::OrgOnboarding])?;
 
     let (requirements, fields_to_authorize): (Vec<OnboardingRequirement>, AuthorizeFields) = state
         .db_pool

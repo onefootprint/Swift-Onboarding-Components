@@ -1,4 +1,4 @@
-use crate::auth::user::{UserAuthContext, UserAuthScope};
+use crate::auth::user::{UserAuthContext, UserAuthScopeDiscriminant};
 use crate::errors::ApiError;
 use crate::types::document::{DocumentErrorReason, DocumentResponse, DocumentResponseStatus};
 use crate::types::response::{EmptyResponse, ResponseData};
@@ -11,7 +11,7 @@ use paperclip::actix::{self, api_v2_operation, web::Json};
 pub async fn post(
     user_auth: UserAuthContext,
 ) -> actix_web::Result<Json<ResponseData<EmptyResponse>>, ApiError> {
-    user_auth.check_permissions(vec![UserAuthScope::OrgOnboarding])?;
+    user_auth.check_permissions(vec![UserAuthScopeDiscriminant::OrgOnboarding])?;
     ////////////////////
     // Temporary! getting shell for frontend
     ///////////////
@@ -29,7 +29,7 @@ pub async fn get(
     // Temporary! getting shell for frontend
     ///////////////
     // Just check permissions for now, we don't need anything out of the UserSession
-    user_auth.check_permissions(vec![UserAuthScope::OrgOnboarding])?;
+    user_auth.check_permissions(vec![UserAuthScopeDiscriminant::OrgOnboarding])?;
     let test_error = path.into_inner();
     tracing::info!(test_error);
 

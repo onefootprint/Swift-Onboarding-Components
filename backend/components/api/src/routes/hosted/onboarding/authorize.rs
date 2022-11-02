@@ -2,7 +2,7 @@ use crate::auth::tenant::ParsedOnboardingSession;
 use crate::auth::tenant::PublicOnboardingContext;
 use crate::auth::user::UserAuth;
 use crate::auth::user::UserAuthContext;
-use crate::auth::user::UserAuthScope;
+use crate::auth::user::UserAuthScopeDiscriminant;
 use crate::auth::Either;
 use crate::auth::SessionContext;
 use crate::errors::onboarding::OnboardingError;
@@ -30,7 +30,7 @@ pub async fn post(
     onboarding_context: Either<PublicOnboardingContext, SessionContext<ParsedOnboardingSession>>,
     state: web::Data<State>,
 ) -> actix_web::Result<Json<ResponseData<CommitResponse>>, ApiError> {
-    let user_auth = user_auth.check_permissions(vec![UserAuthScope::OrgOnboarding])?;
+    let user_auth = user_auth.check_permissions(vec![UserAuthScopeDiscriminant::OrgOnboarding])?;
 
     let session_key = state.session_sealing_key.clone();
     let validation_token = state

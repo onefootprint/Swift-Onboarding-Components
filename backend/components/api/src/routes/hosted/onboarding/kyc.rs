@@ -1,6 +1,6 @@
 use crate::auth::tenant::ParsedOnboardingSession;
 use crate::auth::tenant::PublicOnboardingContext;
-use crate::auth::user::{UserAuth, UserAuthContext, UserAuthScope};
+use crate::auth::user::{UserAuth, UserAuthContext, UserAuthScopeDiscriminant};
 use crate::auth::{Either, SessionContext};
 use crate::decision;
 use crate::errors::onboarding::OnboardingError;
@@ -23,7 +23,7 @@ pub async fn get(
     user_auth: UserAuthContext,
     onboarding_context: Either<PublicOnboardingContext, SessionContext<ParsedOnboardingSession>>,
 ) -> JsonApiResponse<StatusResponse> {
-    let user_auth = user_auth.check_permissions(vec![UserAuthScope::OrgOnboarding])?;
+    let user_auth = user_auth.check_permissions(vec![UserAuthScopeDiscriminant::OrgOnboarding])?;
 
     let ob = state
         .db_pool
@@ -51,7 +51,7 @@ pub async fn post(
     user_auth: UserAuthContext,
     onboarding_context: Either<PublicOnboardingContext, SessionContext<ParsedOnboardingSession>>,
 ) -> JsonApiResponse<EmptyResponse> {
-    let user_auth = user_auth.check_permissions(vec![UserAuthScope::OrgOnboarding])?;
+    let user_auth = user_auth.check_permissions(vec![UserAuthScopeDiscriminant::OrgOnboarding])?;
     let tenant_id = onboarding_context.tenant().id.clone();
 
     decision::engine::run(

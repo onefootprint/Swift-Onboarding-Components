@@ -2,7 +2,7 @@ use db::PgConnection;
 use newtypes::UserVaultId;
 use paperclip::actix::Apiv2Security;
 
-use super::UserAuthScope;
+use super::{UserAuthScope, UserAuthScopeDiscriminant};
 use crate::{
     auth::{
         session::{AuthSessionData, ExtractableAuthSession},
@@ -29,8 +29,9 @@ impl UserSession {
         })
     }
 
-    pub fn has_scope(&self, scope: UserAuthScope) -> bool {
-        self.scopes.contains(&scope)
+    pub fn has_scope(&self, scope: &UserAuthScopeDiscriminant) -> bool {
+        let discriminants: Vec<UserAuthScopeDiscriminant> = self.scopes.iter().map(|x| x.into()).collect();
+        discriminants.contains(scope)
     }
 }
 
@@ -69,11 +70,15 @@ impl ExtractableAuthSession for ParsedUserSession {
 }
 
 impl ParsedUserSession {
-    pub fn check_permissions(self, scopes: Vec<UserAuthScope>) -> Result<UserSession, AuthError> {
-        if scopes.iter().any(|s| self.0.has_scope(s.to_owned())) {
+    pub fn check_permissions<T>(self, scopes: Vec<T>) -> Result<UserSession, AuthError>
+    where
+        T: Into<UserAuthScopeDiscriminant>,
+    {
+        let scope_discriminants: Vec<_> = scopes.into_iter().map(|x| x.into()).collect();
+        if scope_discriminants.iter().any(|s| self.0.has_scope(s)) {
             Ok(self.0)
         } else {
-            Err(AuthError::MissingScope(scopes))
+            Err(AuthError::MissingScope(scope_discriminants))
         }
     }
 }
@@ -84,10 +89,10 @@ pub type UserAuthContext = SessionContext<ParsedUserSession>;
 impl UserAuthContext {
     /// Verifies that the auth token has one of the required scopes. If so, returns a UserAuth
     /// that is accessible
-    pub fn check_permissions(
-        self,
-        scopes: Vec<UserAuthScope>,
-    ) -> Result<SessionContext<UserSession>, AuthError> {
+    pub fn check_permissions<T>(self, scopes: Vec<T>) -> Result<SessionContext<UserSession>, AuthError>
+    where
+        T: Into<UserAuthScopeDiscriminant>,
+    {
         self.map(|c| c.check_permissions(scopes))
     }
 }

@@ -10,9 +10,14 @@ pub use session::*;
 mod email_verify;
 pub use email_verify::*;
 mod validate_user;
+use strum::EnumDiscriminants;
 pub use validate_user::*;
 
-#[derive(serde::Serialize, serde::Deserialize, PartialEq, Eq, Debug, Clone, Copy, Apiv2Schema)]
+#[derive(
+    serde::Serialize, serde::Deserialize, PartialEq, Eq, Debug, Clone, Apiv2Schema, EnumDiscriminants,
+)]
+#[strum_discriminants(name(UserAuthScopeDiscriminant))]
+#[strum_discriminants(vis(pub))]
 #[serde(rename = "snake_case")]
 pub enum UserAuthScope {
     // This is just the initial scope - we will update this to have scopes that represent perms for
