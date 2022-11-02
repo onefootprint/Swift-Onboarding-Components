@@ -144,32 +144,7 @@ mod tests {
 
     #[test]
     fn test_idology_response_list() {
-        let response = json!({
-            "response": {
-              "id-number": "3010453",
-              "summary-result": {
-                "key": "id.success",
-                "message": "Pass"
-              },
-              "results": {
-                "key": "result.match",
-                "message": "ID Located"
-              },
-              "qualifiers": {
-                "qualifier": [
-                  {
-                    "key": "resultcode.ip.not.located",
-                    "message": "IP Not Located"
-                  },
-                  {
-                    "key": "resultcode.street.name.does.not.match",
-                    "message": "Street name does not match"
-                  },
-                ]
-              }
-            }
-          }
-        );
+        let response = crate::test_fixtures::test_idology_expectid_response();
         let response = parse_response(response).expect("Could not parse response");
         let reason_codes = response.response.qualifiers.unwrap().parse_qualifiers();
         let expected = vec![

@@ -1,4 +1,4 @@
-use newtypes::{IdvData, SignalScope, Vendor};
+use newtypes::{IdvData, Vendor};
 use twilio::response::parse_response;
 
 use crate::{ParsedResponse, VendorResponse};
@@ -36,6 +36,5 @@ pub async fn lookup_v2(client: &twilio::Client, idv_data: IdvData) -> Result<Ven
         vendor: Vendor::Twilio,
         response: ParsedResponse::Twilio(parsed),
         raw_response: response,
-        verification_attributes: vec![SignalScope::PhoneNumber],
     })
 }

@@ -2,7 +2,7 @@
 /// we can use to make decisions
 use idv::{idology::verification::IDologySuccess, ParsedResponse};
 
-use newtypes::{OnboardingStatus, Signal, SignalScope, VerificationResultId};
+use newtypes::{OnboardingStatus, Signal, VerificationResultId};
 
 use super::vendor_result::VendorResult;
 
@@ -10,7 +10,6 @@ use super::vendor_result::VendorResult;
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct IDologyFeatures {
     pub status: OnboardingStatus,
-    pub verification_attributes: Vec<SignalScope>,
     pub signals: Vec<Signal>,
     pub id_located: bool,
     pub id_number_for_scan_required: Option<String>,
@@ -92,8 +91,6 @@ impl From<VendorResult> for FeatureVector {
                     is_id_scan_required: r.is_id_scan_required(),
                     id_number_for_scan_required: r.id_number.clone(),
                     signals: IDologyFeatures::signals_from_response_qualifiers(r),
-                    // These represent the signal scopes we have information about from the verification
-                    verification_attributes: response.verification_attributes,
                     verification_result: verification_result_id,
                 };
                 Self {
@@ -183,7 +180,6 @@ mod tests {
     #[test]
     fn test_features() -> Result<(), IdologyError> {
         let idology_result = create_idology_vendor_result("id.success")?;
-        let idology_response = idology_result.response.clone();
         let vendor_results = vec![idology_result.clone()];
 
         let feature_vector = create_features(vendor_results);
@@ -192,7 +188,6 @@ mod tests {
             id_located: true,
             is_id_scan_required: false,
             id_number_for_scan_required: Some("3010453".to_string()),
-            verification_attributes: idology_response.verification_attributes,
             signals: vec![
                 Signal {
                     kind: OldSignalSeverity::NotFound,
@@ -261,7 +256,6 @@ mod tests {
             vendor: Vendor::Idology,
             response: ParsedResponse::IDology(parsed_response),
             raw_response: raw,
-            verification_attributes: vec![SignalScope::Name, SignalScope::Ssn],
         };
         let result = VendorResult {
             response: res,

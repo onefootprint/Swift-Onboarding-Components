@@ -1,4 +1,5 @@
-use crate::schema::verification_request;
+use crate::schema::{verification_request, verification_result};
+use crate::DbResult;
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use diesel::{Insertable, PgConnection};
@@ -7,6 +8,8 @@ use newtypes::{
     VerificationRequestId,
 };
 use serde::{Deserialize, Serialize};
+
+use super::verification_result::VerificationResult;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Identifiable)]
 #[diesel(table_name = verification_request)]
@@ -46,5 +49,25 @@ impl VerificationRequest {
             .values(requests)
             .get_results(conn)?;
         Ok(result)
+    }
+
+    pub fn get_for_onboarding(conn: &mut PgConnection, onboarding_id: OnboardingId) -> DbResult<Vec<Self>> {
+        let res = verification_request::table
+            .filter(verification_request::onboarding_id.eq(onboarding_id))
+            .get_results(conn)?;
+
+        Ok(res)
+    }
+    /// Based on VerificationRequests for the onboarding, get VerificationResults
+    pub fn get_requests_and_results_for_onboarding(
+        conn: &mut PgConnection,
+        onboarding_id: OnboardingId,
+    ) -> DbResult<Vec<(VerificationRequest, Option<VerificationResult>)>> {
+        let req_and_res: Vec<(VerificationRequest, Option<VerificationResult>)> = verification_request::table
+            .filter(verification_request::onboarding_id.eq(onboarding_id))
+            .left_join(verification_result::table)
+            .get_results(conn)?;
+
+        Ok(req_and_res)
     }
 }

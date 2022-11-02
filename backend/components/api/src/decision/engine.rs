@@ -7,7 +7,7 @@ use crate::{
 use db::models::{onboarding::Onboarding, verification_request::VerificationRequest};
 use newtypes::{OnboardingStatus, TenantId, UserVaultId};
 
-use super::*;
+use super::{vendor_result::VendorResult, *};
 /// The Engine module is the main entry point into running our verification logic
 ///
 ///
@@ -34,10 +34,10 @@ pub async fn run(
         .await??;
     // Check if the user is a sandbox user. Sandbox users have the final KYC state encoded in their
     // phone number's sandbox suffix
-    let desired_status = utils::get_desired_status_for_testing(state, &uvw).await?;
+    let desired_status_for_testing = utils::get_desired_status_for_testing(state, &uvw).await?;
 
     // Build our VerificationRequests and save outputs
-    let (requests, ob_id) = state
+    let (requests, ob_id, previous_results) = state
         .db_pool
         .db_transaction(move |conn| -> Result<_, ApiError> {
             let (ob, _) = Onboarding::lock_by_config(conn, &uvw.user_vault.id, &ob_config.id)?
@@ -57,16 +57,24 @@ pub async fn run(
             let available_vendor_apis = user_vault_helper::get_vendor_apis_from_user_vault_wrapper(&uvw);
             // From the possible vendors, select which ones we're sending to (logic TBD)
             let vendor_apis = verification_request::choose_vendor_apis(available_vendor_apis);
-
             let requests = verification_request::build_verification_requests_and_checkpoint(
                 conn,
                 ob,
                 &uvw,
                 &tenantid,
-                desired_status,
+                desired_status_for_testing,
                 vendor_apis,
             )?;
-            Ok((requests, ob_id))
+
+            // Load our requests and results
+            // Importantly, this allows us to save VerificationRequests elsewhere in code and execute them here
+            let requests_and_results =
+                VerificationRequest::get_requests_and_results_for_onboarding(conn, ob_id.clone())?;
+            // In the case we have already run some verifications for this onboarding, create our previous VendorResults
+            let previous_results =
+                VendorResult::from_verification_results_for_onboarding(requests_and_results)?;
+
+            Ok((requests, ob_id, previous_results))
         })
         .await?;
 
@@ -75,30 +83,32 @@ pub async fn run(
 
     // Make requests
     // TODO: if any of the requests fail, this joined future will fail. Handle individual vendor failures separately
-    let results = futures::future::try_join_all(future_results).await?;
+    let results = futures::future::try_join_all(future_results)
+        .await?
+        .into_iter()
+        .chain(previous_results.into_iter())
+        .collect();
 
     // From our results, create a FeatureVector for the final decision output
     let features = features::create_features(results);
 
     // Create our final decision from the features we created, set final onboarding status, and emit risk signals
-    risk::create_final_decision(state, ob_id, features).await?;
+    risk::create_final_decision(state, ob_id, features, desired_status_for_testing).await?;
 
     Ok(())
 }
 
+/// Make our requests to a vendor, building data from the cached VerificationRequest
 async fn make_idv_request(
     state: &State,
     request: VerificationRequest,
 ) -> Result<vendor_result::VendorResult, ApiError> {
     let request_id = request.id.clone();
 
-    // TODO: could have different logic for different vendors?
     let data =
         verification_request::build_request::build_idv_data_from_verification_request(state, request.clone())
             .await?;
 
-    // TODO: mark requirement statuses as fulfilled. I don't totally like it going in here but it's ok for now
-    // TODO: handle collect doc - remove?
     let vendor_response = verification_request::make_request::send_idv_request(state, request, data).await?;
 
     let verification_result =

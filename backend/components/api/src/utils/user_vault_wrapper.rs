@@ -6,7 +6,7 @@ use db::models::onboarding::Onboarding;
 use db::models::scoped_user::ScopedUser;
 use db::models::user_timeline::UserTimeline;
 use db::models::verification_request::VerificationRequest;
-use db::{DbResult, TxnPgConnection};
+use db::TxnPgConnection;
 use enclave_proxy::DataTransform;
 
 use db::models::email::Email;
@@ -29,7 +29,6 @@ use newtypes::{
 use crate::errors::{ApiError, ApiResult};
 use crate::types::identity_data_request::IdentityDataUpdate;
 use crate::State;
-use itertools::Itertools;
 
 use super::identity_data_builder::IdentityDataBuilder;
 use db::HasDataAttributeFields;

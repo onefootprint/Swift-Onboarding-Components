@@ -3,14 +3,10 @@ use newtypes::{
     VerificationStatus,
 };
 
-use db::{
-    models::{
-        audit_trail::AuditTrail,
-        document_request::DocumentRequest,
-        onboarding::{Onboarding, OnboardingUpdate},
-        onboarding_decision::{NewOnboardingDecision, OnboardingDecision},
-    },
-    DbError, TxnPgConnection,
+use db::models::{
+    audit_trail::AuditTrail,
+    onboarding::{Onboarding, OnboardingUpdate},
+    onboarding_decision::{NewOnboardingDecision, OnboardingDecision},
 };
 
 use super::features::*;
@@ -21,6 +17,7 @@ pub async fn create_final_decision(
     state: &State,
     ob_id: OnboardingId,
     features: FeatureVector,
+    desired_status_for_testing: OnboardingStatus,
 ) -> Result<(), ApiError> {
     // TODO build process to run this asynchronously if we crashed before getting here
     // TODO: for now, just take status
@@ -34,8 +31,14 @@ pub async fn create_final_decision(
             let current_status = current_ob.status;
             let decision = final_decision(&features, current_ob);
 
+            // BIG TODO / FIX: We use prod vaults for demos, so take whatever the final status should be
+            // Should be:
+            //
+            // if decision.onboarding_status != current_status {
+            //     Onboarding::update_by_id(conn, &ob_id, OnboardingUpdate::status(decision.onboarding_status))?;
+            // }
             // Legacy write onboarding status. This will be replaced by Onboarding decision eventually
-            if decision.onboarding_status != current_status {
+            if desired_status_for_testing != current_status {
                 Onboarding::update_by_id(conn, &ob_id, OnboardingUpdate::status(decision.onboarding_status))?;
             }
 
@@ -66,8 +69,9 @@ pub async fn create_final_decision(
                 )?;
             }
 
+            // TODO: uncomment this shortly
             // Action decision, if applicable
-            action_decision(conn, decision)?;
+            // action_decision(conn, decision)?;
 
             Ok(())
         })
@@ -114,11 +118,11 @@ fn final_decision(features: &FeatureVector, current_onboarding: Onboarding) -> D
     }
 }
 
-/// Based on our decision, do any necessary actions (creating Requirements, manual reviews, etc)
-fn action_decision(conn: &mut TxnPgConnection, decision_output: DecisionOutput) -> Result<(), DbError> {
-    if decision_output.verification_status == VerificationStatus::NeedsIDDocument {
-        DocumentRequest::create(conn, decision_output.onboarding_id, decision_output.id_number)?;
-    }
+// Based on our decision, do any necessary actions (creating Requirements, manual reviews, etc)
+// fn action_decision(conn: &mut TxnPgConnection, decision_output: DecisionOutput) -> Result<(), DbError> {
+//     if decision_output.verification_status == VerificationStatus::NeedsIDDocument {
+//         DocumentRequest::create(conn, decision_output.onboarding_id, decision_output.id_number)?;
+//     }
 
-    Ok(())
-}
+//     Ok(())
+// }

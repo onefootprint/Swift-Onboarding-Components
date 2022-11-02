@@ -82,6 +82,9 @@ pub enum DbError {
 
     #[error("Not in transaction")]
     NotInTransaction,
+
+    #[error("Transaction RollBack in a unit test")]
+    TransactionRollbackTest,
 }
 
 impl DbError {
