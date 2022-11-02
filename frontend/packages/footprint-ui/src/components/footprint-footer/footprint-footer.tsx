@@ -18,7 +18,7 @@ const FootprintFooter = () => {
   ];
 
   return (
-    <Container>
+    <FootprintFooterContainer>
       <SecuredByFootprint />
       <LinksContainer>
         {links.map(({ href, label }) => (
@@ -31,11 +31,11 @@ const FootprintFooter = () => {
           </li>
         ))}
       </LinksContainer>
-    </Container>
+    </FootprintFooterContainer>
   );
 };
 
-const Container = styled.div`
+const FootprintFooterContainer = styled.footer`
   ${({ theme }) => css`
     position: sticky;
     z-index: ${theme.zIndex.sticky};

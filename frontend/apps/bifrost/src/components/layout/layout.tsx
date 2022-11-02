@@ -7,43 +7,52 @@ import BifrostNavigationHeaderContainer from '../bifrost-navigation-header-conta
 import SandboxBanner from '../sandbox-banner';
 import BIFROST_CONTAINER_ID from './constants';
 
-type ContentWithHeaderAndFooterProps = {
+type LayoutProps = {
   children: React.ReactNode;
 };
 
-const ContentWithHeaderAndFooter = ({
-  children,
-}: ContentWithHeaderAndFooterProps) => (
-  <Container id={BIFROST_CONTAINER_ID}>
+const Layout = ({ children }: LayoutProps) => (
+  <LayoutContainer id={BIFROST_CONTAINER_ID}>
     <SandboxBanner />
     <BifrostNavigationHeaderContainer />
-    <Content>{children}</Content>
+    <Body>{children}</Body>
     <FootprintFooter />
-  </Container>
+  </LayoutContainer>
 );
 
-const Container = styled.div`
+const LayoutContainer = styled.div`
   ${({ theme }) => css`
-    background: ${theme.backgroundColor.primary};
-    border-radius: ${theme.borderRadius.default}px;
+    background: ${theme.components.bifrost.dialog.bg};
+    border-radius: ${theme.components.bifrost.dialog.borderRadius};
     display: flex;
     flex-direction: column;
     height: 100vh;
     margin: 0;
-    position: relative;
     overflow-y: auto;
+    position: relative;
+
+    > *:first-child {
+      border-top-left-radius: ${theme.components.bifrost.dialog.borderRadius};
+      border-top-right-radius: ${theme.components.bifrost.dialog.borderRadius};
+    }
+
+    > *:last-child {
+      border-bottom-left-radius: ${theme.components.bifrost.dialog
+        .borderRadius};
+      border-bottom-right-radius: ${theme.components.bifrost.dialog
+        .borderRadius};
+    }
 
     ${media.greaterThan('md')`
       height: unset;
       margin: ${theme.spacing[9]}px auto ${theme.spacing[9]}px;
       max-width: 480px;
       max-height: calc(100vh - (2 * ${theme.spacing[9]}px));
-      
     `}
   `}
 `;
 
-const Content = styled.div`
+const Body = styled.div`
   ${({ theme }) => css`
     flex: 1 0 auto;
     padding: ${theme.spacing[5]}px;
@@ -54,4 +63,4 @@ const Content = styled.div`
   `}
 `;
 
-export default ContentWithHeaderAndFooter;
+export default Layout;

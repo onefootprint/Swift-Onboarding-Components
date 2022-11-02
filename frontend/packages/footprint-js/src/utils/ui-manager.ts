@@ -7,7 +7,7 @@ const OVERLAY_ID = 'footprint-overlay';
 const LOADING_INDICATOR_ID = 'footprint-loading-indicator';
 const CUSTOM_STYLES_ID = 'footprint-custom-styles';
 
-const injectStyles = (styles: string) => {
+const injectStylesToCurrentPage = (styles: string) => {
   if (typeof window === 'undefined') return;
   const prevStyle = document.getElementById(CUSTOM_STYLES_ID);
   if (prevStyle) {
@@ -19,27 +19,28 @@ const injectStyles = (styles: string) => {
   document.head.append(style);
 };
 
-export const injectExternalStyles = ({
-  theme,
-  variables,
-}: FootprintAppearance) => {
-  const { loading, overlay, fpButton } = themes[theme].components.bifrost;
+export const injectStyles = ({ theme, variables }: FootprintAppearance) => {
+  const { bifrost } = themes[theme].components;
 
-  injectStyles(`
+  injectStylesToCurrentPage(`
     :root {
-      --fp-fp-button-height: ${variables.fpButtonHeight || fpButton.height};
+      --fp-fp-button-height: ${
+        variables.fpButton?.height || bifrost.fpButton.height
+      };
       --fp-fp-button-border-radius: ${
-        variables.fpButtonBorderRadius || fpButton.borderRadius
+        variables.fpButton?.borderRadius || bifrost.fpButton.borderRadius
       };
 
-      --fp-loading-bg: ${variables.loadingBg || loading.bg};
-      --fp-loading-color: ${variables.loadingColor || loading.color};
+      --fp-loading-bg: ${variables.loading?.bg || bifrost.loading.bg};
+      --fp-loading-color: ${variables.loading?.color || bifrost.loading.color};
       --fp-loading-border-radius: ${
-        variables.loadingBorderRadius || loading.borderRadius
+        variables.loading?.borderRadius || bifrost.loading.borderRadius
       };
-      --fp-loading-padding: ${variables.loadingPadding || loading.padding};
+      --fp-loading-padding: ${
+        variables.loading?.padding || bifrost.loading.padding
+      };
 
-      --fp-overlay-bg:${variables.overlayBg || overlay.bg};
+      --fp-overlay-bg:${variables.overlay?.bg || bifrost.overlay.bg};
     }
   `);
 };

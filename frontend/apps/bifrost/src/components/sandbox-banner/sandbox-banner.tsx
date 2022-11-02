@@ -10,23 +10,18 @@ const SandboxBanner = () => {
   const { t } = useTranslation('components.sandbox-banner');
 
   return isSandbox ? (
-    <Container>
+    <SandboxBannerContainer>
       <Banner variant="warning">{t('label')}</Banner>
-    </Container>
+    </SandboxBannerContainer>
   ) : null;
 };
 
-const Container = styled.div`
+const SandboxBannerContainer = styled.div`
   ${({ theme }) => css`
+    border-bottom: ${theme.borderWidth[1]}px solid ${theme.borderColor.tertiary};
     position: sticky;
     top: 0;
     z-index: ${theme.zIndex.sticky};
-    border-bottom: ${theme.borderWidth[1]}px solid ${theme.borderColor.tertiary};
-
-    > [role='alert'] {
-      border-radius: ${theme.borderRadius.default}px
-        ${theme.borderRadius.default}px 0 0;
-    }
   `};
 `;
 

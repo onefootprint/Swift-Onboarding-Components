@@ -1,3 +1,5 @@
+import * as CSS from 'csstype';
+
 export enum FootprintEvents {
   closed = 'closed',
   completed = 'completed',
@@ -5,20 +7,27 @@ export enum FootprintEvents {
 }
 
 export type FootprintMainStyles = Partial<{
-  fontFamily: string;
-  borderRadius: string;
+  dialog: {
+    bg: CSS.Property.Background;
+    elevation: CSS.Property.BoxShadow;
+    borderRadius: CSS.Property.BorderRadius;
+  };
 }>;
 
 export type FootprintExternalStyles = Partial<{
-  fpButtonHeight: string;
-  fpButtonBorderRadius: string;
-
-  loadingBg: string;
-  loadingColor: string;
-  loadingBorderRadius: string;
-  loadingPadding: string;
-
-  overlayBg: string;
+  fpButton: {
+    height: CSS.Property.Height;
+    borderRadius: CSS.Property.BorderRadius;
+  };
+  loading: {
+    bg: CSS.Property.Background;
+    color: CSS.Property.Color;
+    borderRadius: CSS.Property.BorderRadius;
+    padding: CSS.Property.Padding;
+  };
+  overlay: {
+    bg: CSS.Property.Background;
+  };
 }>;
 
 export type FootprintAppearanceVariables = FootprintMainStyles &

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 
-import { BIFROST_CONTAINER_ID } from '../../components/content-with-header-and-footer';
+import { BIFROST_CONTAINER_ID } from '../../components/layout';
 
 const useBifrostHasScroll = () => {
   const [hasScroll, setHasScroll] = useState(false);

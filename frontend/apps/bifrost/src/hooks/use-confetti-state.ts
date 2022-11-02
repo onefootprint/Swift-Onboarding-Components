@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useTimeout } from 'usehooks-ts';
 
-import { BIFROST_CONTAINER_ID } from '../components/content-with-header-and-footer';
+import { BIFROST_CONTAINER_ID } from '../components/layout';
 
 const ANIMATION_DELAY = 0;
 const ANIMATION_DURATION = 5000;

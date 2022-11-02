@@ -21,15 +21,24 @@ export type DemoProps = {
 const appearance: FootprintAppearance = {
   theme: 'light',
   variables: {
-    fpButtonHeight: '48px',
-    fpButtonBorderRadius: '6px',
-
-    loadingBg: 'rgba(0, 0, 0, 0.6)',
-    loadingColor: '#fff',
-    loadingBorderRadius: '4px',
-    loadingPadding: '16px',
-
-    overlayBg: 'rgba(0, 0, 0, 0.3)',
+    dialog: {
+      bg: '#fff',
+      elevation: '0px 1px 4px 0px rgba(0, 0, 0, 0.12156862745098039)',
+      borderRadius: '6px',
+    },
+    fpButton: {
+      height: '48px',
+      borderRadius: '6px',
+    },
+    loading: {
+      bg: 'rgba(0, 0, 0, 0.6)',
+      color: '#fff',
+      borderRadius: '4px',
+      padding: '16px',
+    },
+    overlay: {
+      bg: 'rgba(0, 0, 0, 0.3)',
+    },
   },
 };
 

@@ -16,6 +16,11 @@ const overlay: Bifrost = {
     color: '#FFFFFFF',
     padding: '16px',
   },
+  dialog: {
+    bg: t.bifrostDialogHeaderBg,
+    elevation: t.bifrostDialogElevation,
+    borderRadius: `${t.bifrostDialogBorderRadius}px`,
+  },
 };
 
 export default overlay;

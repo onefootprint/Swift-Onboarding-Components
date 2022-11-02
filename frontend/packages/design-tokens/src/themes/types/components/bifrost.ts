@@ -14,8 +14,15 @@ type FpButton = {
   borderRadius: string;
 };
 
+type Dialog = {
+  bg: string;
+  elevation: string;
+  borderRadius: string;
+};
+
 export type Bifrost = {
-  overlay: Overlay;
-  loading: Loading;
+  dialog: Dialog;
   fpButton: FpButton;
+  loading: Loading;
+  overlay: Overlay;
 };
