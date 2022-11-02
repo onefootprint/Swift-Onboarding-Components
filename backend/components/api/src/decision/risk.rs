@@ -21,9 +21,10 @@ pub async fn create_final_decision(
     state: &State,
     ob_id: OnboardingId,
     features: FeatureVector,
-    desired_status_for_testing: Option<OnboardingStatus>,
 ) -> Result<(), ApiError> {
     // TODO build process to run this asynchronously if we crashed before getting here
+    // TODO: for now, just take status
+
     // TODO: Create our risk signals!
     // Save status
     state
@@ -33,12 +34,9 @@ pub async fn create_final_decision(
             let current_status = current_ob.status;
             let decision = final_decision(&features, current_ob);
 
-            // BIG TODO / FIX: We use prod vaults for demos, so in the case we don't have a desired_status set, let's just make this verified
-            let final_status = desired_status_for_testing.unwrap_or(OnboardingStatus::Verified);
             // Legacy write onboarding status. This will be replaced by Onboarding decision eventually
-            // Note: If we are testing, do not update anything!
-            if final_status != current_status {
-                Onboarding::update_by_id(conn, &ob_id, OnboardingUpdate::status(final_status))?;
+            if decision.onboarding_status != current_status {
+                Onboarding::update_by_id(conn, &ob_id, OnboardingUpdate::status(decision.onboarding_status))?;
             }
 
             // Create decision

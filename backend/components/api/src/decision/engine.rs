@@ -34,7 +34,7 @@ pub async fn run(
         .await??;
     // Check if the user is a sandbox user. Sandbox users have the final KYC state encoded in their
     // phone number's sandbox suffix
-    let desired_status_for_testing = utils::get_desired_status_for_testing(state, &uvw).await?;
+    let desired_status = utils::get_desired_status_for_testing(state, &uvw).await?;
 
     // Build our VerificationRequests and save outputs
     let (requests, ob_id) = state
@@ -63,7 +63,7 @@ pub async fn run(
                 ob,
                 &uvw,
                 &tenantid,
-                desired_status_for_testing,
+                desired_status,
                 vendor_apis,
             )?;
             Ok((requests, ob_id))
@@ -81,7 +81,7 @@ pub async fn run(
     let features = features::create_features(results);
 
     // Create our final decision from the features we created, set final onboarding status, and emit risk signals
-    risk::create_final_decision(state, ob_id, features, desired_status_for_testing).await?;
+    risk::create_final_decision(state, ob_id, features).await?;
 
     Ok(())
 }
