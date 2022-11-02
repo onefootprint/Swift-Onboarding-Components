@@ -26,7 +26,7 @@ use super::verification_request::build_request;
 pub(super) async fn get_desired_status_for_testing(
     state: &State,
     uvw: &UserVaultWrapper,
-) -> Result<OnboardingStatus, ApiError> {
+) -> Result<Option<OnboardingStatus>, ApiError> {
     let decrypted_phone = if !uvw.user_vault.is_live {
         let phone_number = uvw.get_decrypted_primary_phone(state).await?;
         Some(phone_number)
@@ -36,17 +36,16 @@ pub(super) async fn get_desired_status_for_testing(
     let desired_status = if let Some(decrypted_phone) = decrypted_phone {
         // This is a sandbox user vault. Check for pre-set validation cases
         if decrypted_phone.suffix.starts_with("fail") {
-            OnboardingStatus::Failed
+            Some(OnboardingStatus::Failed)
         } else if decrypted_phone.suffix.starts_with("manualreview") {
-            OnboardingStatus::ManualReview
+            Some(OnboardingStatus::ManualReview)
         } else if decrypted_phone.suffix.starts_with("idv") {
-            OnboardingStatus::Processing
+            Some(OnboardingStatus::Processing)
         } else {
-            OnboardingStatus::Verified
+            Some(OnboardingStatus::Verified)
         }
     } else {
-        // TODO kick off user verification with data vendors
-        OnboardingStatus::Verified
+        None
     };
 
     Ok(desired_status)
