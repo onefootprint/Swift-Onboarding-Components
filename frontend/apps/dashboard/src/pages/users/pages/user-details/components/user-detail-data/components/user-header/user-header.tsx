@@ -4,7 +4,7 @@ import {
   statusToBadgeVariant,
   statusToDisplayText,
 } from 'src/constants/onboarding-status-display';
-import { User } from 'src/pages/users/hooks/use-join-users';
+import { User } from 'src/pages/users/types/user.types';
 import styled, { css } from 'styled-components';
 
 import DecryptControls from './components/decrypt-controls';

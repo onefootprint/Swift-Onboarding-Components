@@ -1,4 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
+import { UserDataAttribute } from '@onefootprint/types';
 import {
   Badge,
   Button,
@@ -19,7 +20,8 @@ import {
 import FieldOrPlaceholder from './components/field-or-placeholder';
 import Filters from './components/filters';
 import useGetUsers from './hooks/use-get-users';
-import { nameData, User } from './hooks/use-join-users';
+import { User } from './types/user.types';
+import getFullNameDataValue from './utils/get-full-name-data';
 
 const PAGE_SIZE = 10;
 
@@ -85,7 +87,7 @@ const Users = () => {
         renderTr={({ item }: TableRow<User>) => (
           <>
             <td>
-              <FieldOrPlaceholder data={nameData(item.attributes)} />
+              <FieldOrPlaceholder data={getFullNameDataValue(item.vaultData)} />
             </td>
             <td>
               <CodeInline truncate>{item.id}</CodeInline>
@@ -97,15 +99,22 @@ const Users = () => {
               </Badge>
             </td>
             <td>
-              <FieldOrPlaceholder data={item.attributes.email} />
-            </td>
-            <td>
               <FieldOrPlaceholder
-                data={item.attributes.ssn9 || item.attributes.ssn4}
+                data={item.vaultData.kycData[UserDataAttribute.email]}
               />
             </td>
             <td>
-              <FieldOrPlaceholder data={item.attributes.phoneNumber} />
+              <FieldOrPlaceholder
+                data={
+                  item.vaultData.kycData[UserDataAttribute.ssn9] ||
+                  item.vaultData.kycData[UserDataAttribute.ssn4]
+                }
+              />
+            </td>
+            <td>
+              <FieldOrPlaceholder
+                data={item.vaultData.kycData[UserDataAttribute.phoneNumber]}
+              />
             </td>
             <td>
               <Typography variant="body-3" color="primary">

@@ -1,4 +1,4 @@
-import { DecryptedUserAttributes } from '../data';
+import { DecryptedUserDataAttributes } from '../data';
 
 export type DecryptUserRequest = {
   footprintUserId: string;
@@ -6,4 +6,4 @@ export type DecryptUserRequest = {
   reason: string;
 };
 
-export type DecryptUserResponse = DecryptedUserAttributes;
+export type DecryptUserResponse = DecryptedUserDataAttributes;

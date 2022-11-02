@@ -4,7 +4,7 @@ import { UserDataAttribute } from '@onefootprint/types';
 import { Checkbox, LinkButton } from '@onefootprint/ui';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
-import { User } from 'src/pages/users/hooks/use-join-users';
+import { User } from 'src/pages/users/types/user.types';
 
 import DataContainer from '../data-container';
 import useFormState from './hooks/use-form-state';
@@ -24,22 +24,22 @@ const AddressSection = ({ user }: AddressSectionProps) => {
 
   const selectValue = (value: boolean) => {
     if (!fieldsState[UserDataAttribute.country].disabled) {
-      setValue(UserDataAttribute.country, value);
+      setValue(`kycData.${UserDataAttribute.country}`, value);
     }
     if (!fieldsState[UserDataAttribute.addressLine1].disabled) {
-      setValue(UserDataAttribute.addressLine1, value);
+      setValue(`kycData.${UserDataAttribute.addressLine1}`, value);
     }
     if (!fieldsState[UserDataAttribute.addressLine2].disabled) {
-      setValue(UserDataAttribute.addressLine2, value);
+      setValue(`kycData.${UserDataAttribute.addressLine2}`, value);
     }
     if (!fieldsState[UserDataAttribute.city].disabled) {
-      setValue(UserDataAttribute.city, value);
+      setValue(`kycData.${UserDataAttribute.city}`, value);
     }
     if (!fieldsState[UserDataAttribute.zip].disabled) {
-      setValue(UserDataAttribute.zip, value);
+      setValue(`kycData.${UserDataAttribute.zip}`, value);
     }
     if (!fieldsState[UserDataAttribute.state].disabled) {
-      setValue(UserDataAttribute.state, value);
+      setValue(`kycData.${UserDataAttribute.state}`, value);
     }
   };
 
@@ -68,42 +68,42 @@ const AddressSection = ({ user }: AddressSectionProps) => {
     >
       {fieldsState[UserDataAttribute.country].visible && (
         <Checkbox
-          {...register(UserDataAttribute.country)}
+          {...register(`kycData.${UserDataAttribute.country}`)}
           disabled={fieldsState[UserDataAttribute.country].disabled}
           label={allT('user-data-attributes.country')}
         />
       )}
       {fieldsState[UserDataAttribute.addressLine1].visible && (
         <Checkbox
-          {...register(UserDataAttribute.addressLine1)}
+          {...register(`kycData.${UserDataAttribute.addressLine1}`)}
           disabled={fieldsState[UserDataAttribute.addressLine1].disabled}
           label={allT('user-data-attributes.address-line1')}
         />
       )}
       {fieldsState[UserDataAttribute.addressLine2].visible && (
         <Checkbox
-          {...register(UserDataAttribute.addressLine2)}
+          {...register(`kycData.${UserDataAttribute.addressLine2}`)}
           disabled={fieldsState[UserDataAttribute.addressLine2].disabled}
           label={allT('user-data-attributes.address-line2')}
         />
       )}
       {fieldsState[UserDataAttribute.city].visible && (
         <Checkbox
-          {...register(UserDataAttribute.city)}
+          {...register(`kycData.${UserDataAttribute.city}`)}
           disabled={fieldsState[UserDataAttribute.city].disabled}
           label={allT('user-data-attributes.city')}
         />
       )}
       {fieldsState[UserDataAttribute.zip].visible && (
         <Checkbox
-          {...register(UserDataAttribute.zip)}
+          {...register(`kycData.${UserDataAttribute.zip}`)}
           disabled={fieldsState[UserDataAttribute.zip].disabled}
           label={allT('user-data-attributes.zip')}
         />
       )}
       {fieldsState[UserDataAttribute.state].visible && (
         <Checkbox
-          {...register(UserDataAttribute.state)}
+          {...register(`kycData.${UserDataAttribute.state}`)}
           disabled={fieldsState[UserDataAttribute.state].disabled}
           label={allT('user-data-attributes.state')}
         />

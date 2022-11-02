@@ -1,6 +1,8 @@
 import { UserDataAttribute } from '@onefootprint/types';
 import { Control, FieldValues, useWatch } from 'react-hook-form';
-import { User } from 'src/pages/users/hooks/use-join-users';
+import { User } from 'src/pages/users/types/user.types';
+
+import isCheckboxDisabled from '../../../utils/is-checkbox-disabled';
 
 const useFormState = ({
   control,
@@ -9,55 +11,77 @@ const useFormState = ({
   control: Control<FieldValues>;
   user: User;
 }) => {
-  const country = useWatch({ control, name: UserDataAttribute.country });
+  const country = useWatch({
+    control,
+    name: `kycData.${UserDataAttribute.country}`,
+  });
   const addressLine1 = useWatch({
     control,
-    name: UserDataAttribute.addressLine1,
+    name: `kycData.${UserDataAttribute.addressLine1}`,
   });
   const addressLine2 = useWatch({
     control,
-    name: UserDataAttribute.addressLine2,
+    name: `kycData.${UserDataAttribute.addressLine2}`,
   });
-  const city = useWatch({ control, name: UserDataAttribute.city });
-  const zip = useWatch({ control, name: UserDataAttribute.zip });
-  const state = useWatch({ control, name: UserDataAttribute.state });
-
-  const isCheckboxDisabled = (value?: string | null) => value !== undefined;
+  const city = useWatch({
+    control,
+    name: `kycData.${UserDataAttribute.city}`,
+  });
+  const zip = useWatch({
+    control,
+    name: `kycData.${UserDataAttribute.zip}`,
+  });
+  const state = useWatch({
+    control,
+    name: `kycData.${UserDataAttribute.state}`,
+  });
 
   const fieldsState = {
     [UserDataAttribute.country]: {
       visible: user.identityDataAttributes.includes(UserDataAttribute.country),
       checked: !!country,
-      disabled: isCheckboxDisabled(user.attributes.country.value),
+      disabled: isCheckboxDisabled(
+        user.vaultData.kycData[UserDataAttribute.country],
+      ),
     },
     [UserDataAttribute.addressLine1]: {
       visible: user.identityDataAttributes.includes(
         UserDataAttribute.addressLine1,
       ),
       checked: !!addressLine1,
-      disabled: isCheckboxDisabled(user.attributes.addressLine1.value),
+      disabled: isCheckboxDisabled(
+        user.vaultData.kycData[UserDataAttribute.addressLine1],
+      ),
     },
     [UserDataAttribute.addressLine2]: {
       visible: user.identityDataAttributes.includes(
         UserDataAttribute.addressLine2,
       ),
       checked: !!addressLine2,
-      disabled: isCheckboxDisabled(user.attributes.addressLine2.value),
+      disabled: isCheckboxDisabled(
+        user.vaultData.kycData[UserDataAttribute.addressLine2],
+      ),
     },
     [UserDataAttribute.city]: {
       visible: user.identityDataAttributes.includes(UserDataAttribute.city),
       checked: !!city,
-      disabled: isCheckboxDisabled(user.attributes.city.value),
+      disabled: isCheckboxDisabled(
+        user.vaultData.kycData[UserDataAttribute.city],
+      ),
     },
     [UserDataAttribute.zip]: {
       visible: user.identityDataAttributes.includes(UserDataAttribute.zip),
       checked: !!zip,
-      disabled: isCheckboxDisabled(user.attributes.zip.value),
+      disabled: isCheckboxDisabled(
+        user.vaultData.kycData[UserDataAttribute.zip],
+      ),
     },
     [UserDataAttribute.state]: {
       visible: user.identityDataAttributes.includes(UserDataAttribute.state),
       checked: !!state,
-      disabled: isCheckboxDisabled(user.attributes.state.value),
+      disabled: isCheckboxDisabled(
+        user.vaultData.kycData[UserDataAttribute.state],
+      ),
     },
   };
 

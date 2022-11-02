@@ -2,23 +2,24 @@ import { useTranslation } from '@onefootprint/hooks';
 import { IcoFileText224 } from '@onefootprint/icons';
 import { UserDataAttribute } from '@onefootprint/types';
 import React from 'react';
-import { nameData } from 'src/pages/users/hooks/use-join-users';
-import { UserAttributes } from 'src/pages/users/hooks/use-user-data';
+import { UserVaultData } from 'src/pages/users/types/vault-data.types';
+import getFullNameDataValue from 'src/pages/users/utils/get-full-name-data';
 
 // import RiskSignalsOverview from '../../../risk-signals-overview';
 import DataRow from '../data-row';
 import DataSection from '../data-section';
 
 type BasicSectionProps = {
-  identityDataAttributes: UserDataAttribute[];
-  attributes: UserAttributes;
+  vaultData: UserVaultData;
 };
 
-const BasicSection = ({
-  identityDataAttributes,
-  attributes,
-}: BasicSectionProps) => {
-  const { t, allT } = useTranslation('pages.user-details');
+const BasicSection = ({ vaultData }: BasicSectionProps) => {
+  const { t, allT } = useTranslation('pages.user-details.user-info.basic');
+  const { kycData } = vaultData;
+  const firstName = kycData[UserDataAttribute.firstName];
+  const lastName = kycData[UserDataAttribute.lastName];
+  const email = kycData[UserDataAttribute.email];
+  const phoneNumber = kycData[UserDataAttribute.phoneNumber];
 
   return (
     <DataSection
@@ -45,25 +46,21 @@ const BasicSection = ({
       //     low={[]}
       //   />
       // )}
-      title={t('user-info.basic.title')}
+      title={t('title')}
     >
-      {identityDataAttributes.includes(UserDataAttribute.firstName) &&
-        identityDataAttributes.includes(UserDataAttribute.lastName) && (
-          <DataRow
-            data={nameData(attributes)}
-            title={allT('collected-data-options.name')}
-          />
-        )}
-      {identityDataAttributes.includes(UserDataAttribute.email) && (
+      {firstName !== undefined && lastName !== undefined && (
         <DataRow
-          title={allT('collected-data-options.email')}
-          data={attributes.email}
+          data={getFullNameDataValue(vaultData)}
+          title={allT('collected-data-options.name')}
         />
       )}
-      {identityDataAttributes.includes(UserDataAttribute.phoneNumber) && (
+      {email !== undefined && (
+        <DataRow title={allT('collected-data-options.email')} data={email} />
+      )}
+      {phoneNumber !== undefined && (
         <DataRow
           title={allT('collected-data-options.phone_number')}
-          data={attributes.phoneNumber}
+          data={phoneNumber}
         />
       )}
     </DataSection>

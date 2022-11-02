@@ -1,4 +1,5 @@
 import { UserDataAttribute } from '@onefootprint/types';
+import { IdDocDataAttribute } from 'src/pages/users/types/vault-data.types';
 
 export enum State {
   idle = 'idle',
@@ -31,7 +32,10 @@ export enum Action {
   assignReason = 'assignReason',
 }
 
-export type Fields = Partial<Record<UserDataAttribute, boolean>>;
+export type Fields = {
+  kycData: Partial<Record<UserDataAttribute, boolean>>;
+  idDoc: Partial<Record<IdDocDataAttribute, boolean>>;
+};
 
 export type Context = {
   reason?: string;

@@ -1,66 +1,45 @@
-import {
-  DecryptedUserAttributes,
-  UserDataAttributeKey,
-} from '@onefootprint/types';
+import { UserDataAttribute } from '@onefootprint/types';
 import constate from 'constate';
 import { useMap } from 'usehooks-ts';
 
-export type UserData = {
-  value?: string | null; // Undefined value is encrypted, null value is unset
-  exists: boolean;
-};
+import { IdDocDataAttribute, UserVaultData } from '../types/vault-data.types';
 
-export type UserAttributes = Record<UserDataAttributeKey, UserData>;
-
-// Hook with utilities for maintaining state on decrypted user attributes
+// Maintains state on decrypted user attributes
 const useUserDataImpl = () => {
-  const [decryptedUsers, { set: setDecryptedUser }] = useMap<
-    String,
-    UserAttributes
-  >(new Map());
+  const [userVaults, { set }] = useMap<String, UserVaultData>(new Map());
+  const updateUserVault = (userId: string, newData: UserVaultData) => {
+    const entry = userVaults.get(userId) || { kycData: {} };
+    const user = { ...entry };
+    const { kycData, idDoc } = newData;
 
-  const updateDecryptedUser = (
-    userId: string,
-    newDecryptedData: DecryptedUserAttributes,
-  ) => {
-    const currentDecryptedUser =
-      decryptedUsers.get(userId) || ({} as UserAttributes);
-
-    const newAttrs = Object.fromEntries(
-      Object.entries(newDecryptedData).map(x => [
-        x[0],
-        { value: x[1], isLoading: false, exists: true },
-      ]),
-    );
-    setDecryptedUser(userId, {
-      ...currentDecryptedUser,
-      ...newAttrs,
+    const kycKeys = Object.keys(kycData) as UserDataAttribute[];
+    kycKeys.forEach(key => {
+      const value = kycData[key];
+      const attrKey = (UserDataAttribute as any)[key] as UserDataAttribute;
+      if (value !== undefined) {
+        user.kycData[attrKey] = value;
+      }
     });
-  };
 
-  const setLoading = (
-    userId: string,
-    loadingAttributes: UserDataAttributeKey[],
-    value = true,
-  ) => {
-    const currentDecryptedUser =
-      decryptedUsers.get(userId) || ({} as UserAttributes);
-    const newAttrs = Object.fromEntries(
-      loadingAttributes.map(x => [
-        x,
-        { ...currentDecryptedUser[x], isLoading: value },
-      ]),
-    );
-    setDecryptedUser(userId, {
-      ...currentDecryptedUser,
-      ...newAttrs,
-    });
+    if (idDoc) {
+      const updatedIdDoc = idDoc ?? {};
+      const idDocKeys = Object.keys(idDoc) as IdDocDataAttribute[];
+      idDocKeys.forEach(key => {
+        const value = idDoc[key];
+        const attrKy = (IdDocDataAttribute as any)[key] as IdDocDataAttribute;
+        if (value !== undefined) {
+          updatedIdDoc[attrKy] = value;
+        }
+      });
+      user.idDoc = updatedIdDoc;
+    }
+
+    set(userId, user);
   };
 
   return {
-    decryptedUsers,
-    updateDecryptedUser,
-    setLoading,
+    userVaults,
+    updateUserVault,
   };
 };
 

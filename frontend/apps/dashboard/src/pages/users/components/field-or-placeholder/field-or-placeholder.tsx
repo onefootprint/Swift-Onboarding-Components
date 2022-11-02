@@ -2,19 +2,21 @@ import { Typography } from '@onefootprint/ui';
 import React from 'react';
 import EncryptedCell from 'src/components/encrypted-cell';
 
-import { UserData } from '../../hooks/use-user-data';
+import { DataValue } from '../../types/vault-data.types';
 
 type FieldOrPlaceholderProps = {
-  data: UserData;
+  data?: DataValue;
 };
 
-const FieldOrPlaceholder = ({ data }: FieldOrPlaceholderProps) =>
-  data.exists && data.value === undefined ? (
-    <EncryptedCell />
-  ) : (
+const FieldOrPlaceholder = ({ data }: FieldOrPlaceholderProps) => {
+  if (data === null) {
+    return <EncryptedCell />;
+  }
+  return (
     <Typography variant="body-3" color="primary" sx={{ whiteSpace: 'nowrap' }}>
-      {data.value || '-'}
+      {data || '-'}
     </Typography>
   );
+};
 
 export default FieldOrPlaceholder;

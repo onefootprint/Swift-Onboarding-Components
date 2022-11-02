@@ -1,7 +1,7 @@
 import { Box, Divider, Shimmer, Typography } from '@onefootprint/ui';
 import React from 'react';
 import Timeline from 'src/components/timeline';
-import { User } from 'src/pages/users/hooks/use-join-users';
+import { User } from 'src/pages/users/types/user.types';
 
 import auditTrailItem from './components/audit-trail-item';
 import useGetAuditTrail from './hooks/use-get-audit-trail';

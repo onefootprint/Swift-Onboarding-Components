@@ -14,22 +14,6 @@ export enum UserDataAttribute {
   zip = 'zip',
 }
 
-export const UserDataAttributeKeys: UserDataAttributeKey[] = [
-  'firstName',
-  'lastName',
-  'email',
-  'phoneNumber',
-  'ssn9',
-  'ssn4',
-  'dob',
-  'country',
-  'addressLine1',
-  'addressLine2',
-  'city',
-  'zip',
-  'state',
-];
-
 export const dataKindToDisplayName: Record<string, String> = {
   [UserDataAttribute.firstName]: 'First name',
   [UserDataAttribute.lastName]: 'Last name',
@@ -45,5 +29,3 @@ export const dataKindToDisplayName: Record<string, String> = {
   [UserDataAttribute.zip]: 'Zip code',
   [UserDataAttribute.country]: 'Country',
 };
-
-export type UserDataAttributeKey = keyof typeof UserDataAttribute;

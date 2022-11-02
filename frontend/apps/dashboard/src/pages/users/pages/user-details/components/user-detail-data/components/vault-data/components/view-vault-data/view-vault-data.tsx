@@ -1,6 +1,6 @@
 import { Box } from '@onefootprint/ui';
 import React from 'react';
-import { User } from 'src/pages/users/hooks/use-join-users';
+import { User } from 'src/pages/users/types/user.types';
 import styled, { css } from 'styled-components';
 
 import getSectionsVisibility from '../../utils/get-sections-visibility';
@@ -19,16 +19,8 @@ const ViewVaultData = ({ user }: ViewVaultDataProps) => {
 
   return (
     <DataGrid>
-      <BasicSection
-        identityDataAttributes={user.identityDataAttributes}
-        attributes={user.attributes}
-      />
-      {showIdentity && (
-        <IdentitySection
-          identityDataAttributes={user.identityDataAttributes}
-          attributes={user.attributes}
-        />
-      )}
+      <BasicSection vaultData={user.vaultData} />
+      {showIdentity && <IdentitySection vaultData={user.vaultData} />}
       {showAddress && (
         <Box
           sx={{
@@ -36,10 +28,7 @@ const ViewVaultData = ({ user }: ViewVaultDataProps) => {
             gridColumn: '2 / 2',
           }}
         >
-          <AddressSection
-            identityDataAttributes={user.identityDataAttributes}
-            attributes={user.attributes}
-          />
+          <AddressSection vaultData={user.vaultData} />
         </Box>
       )}
     </DataGrid>

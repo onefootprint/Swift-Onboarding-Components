@@ -1,14 +1,11 @@
-import {
-  UserDataAttributeKey,
-  UserDataAttributeKeys,
-} from '@onefootprint/types';
+import { UserDataAttribute } from '@onefootprint/types';
 import { ChangeEvent, useReducer } from 'react';
 
 const initialFields = Object.fromEntries(
-  UserDataAttributeKeys.map(x => [x, false]),
+  Object.keys(UserDataAttribute).map(k => [k, false]),
 ) as SelectedFields;
 
-type SelectedFields = Record<UserDataAttributeKey, boolean>;
+type SelectedFields = Record<UserDataAttribute, boolean>;
 
 const useDataKindSelectedFields = () => {
   const [selectedFields, updateSelectedFields] = useReducer(
@@ -18,7 +15,7 @@ const useDataKindSelectedFields = () => {
     }),
     initialFields,
   );
-  const clearSelectedFields = (initialSetValues?: UserDataAttributeKey[]) => {
+  const clearSelectedFields = (initialSetValues?: UserDataAttribute[]) => {
     // Clear values, but set some initial fields to true
     const initialSetValuesObj = Object.fromEntries(
       (initialSetValues || []).map(x => [x, true]),
@@ -26,7 +23,7 @@ const useDataKindSelectedFields = () => {
     updateSelectedFields({ ...initialFields, ...initialSetValuesObj });
   };
   const setFieldFor =
-    (...kinds: UserDataAttributeKey[]) =>
+    (...kinds: UserDataAttribute[]) =>
     (e: ChangeEvent<HTMLInputElement>) => {
       // Overwrite the selectedFields to match the checkbox value for all of the respective data kinds
       updateSelectedFields(

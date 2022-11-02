@@ -7,7 +7,7 @@ type DataContainerProps = {
   iconComponent: Icon;
   children: React.ReactNode;
   title: string;
-  renderCta: () => React.ReactNode;
+  renderCta?: () => React.ReactNode;
 };
 
 const DataContainer = ({
@@ -22,7 +22,7 @@ const DataContainer = ({
         <IconComponent />
         <Typography variant="label-3">{title}</Typography>
       </Box>
-      {renderCta()}
+      {renderCta?.()}
     </Header>
     <RowContainer>{children}</RowContainer>
   </StyledContainer>

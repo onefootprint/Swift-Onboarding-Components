@@ -4,7 +4,7 @@ import { UserDataAttribute } from '@onefootprint/types';
 import { Checkbox, LinkButton } from '@onefootprint/ui';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
-import { User } from 'src/pages/users/hooks/use-join-users';
+import { User } from 'src/pages/users/types/user.types';
 
 import DataContainer from '../data-container';
 import useFormState from './hooks/use-form-state';
@@ -24,13 +24,13 @@ const IdentitySection = ({ user }: IdentitySectionProps) => {
 
   const selectValue = (value: boolean) => {
     if (!fieldsState[UserDataAttribute.ssn9].disabled) {
-      setValue(UserDataAttribute.ssn9, value);
+      setValue(`kycData.${UserDataAttribute.ssn9}`, value);
     }
     if (!fieldsState[UserDataAttribute.ssn4].disabled) {
-      setValue(UserDataAttribute.ssn4, value);
+      setValue(`kycData.${UserDataAttribute.ssn4}`, value);
     }
     if (!fieldsState[UserDataAttribute.dob].disabled) {
-      setValue(UserDataAttribute.dob, value);
+      setValue(`kycData.${UserDataAttribute.dob}`, value);
     }
   };
 
@@ -60,21 +60,21 @@ const IdentitySection = ({ user }: IdentitySectionProps) => {
     >
       {fieldsState[UserDataAttribute.ssn9].visible && (
         <Checkbox
-          {...register(UserDataAttribute.ssn9)}
+          {...register(`kycData.${UserDataAttribute.ssn9}`)}
           disabled={fieldsState[UserDataAttribute.ssn9].disabled}
           label={allT('collected-data-options.ssn9')}
         />
       )}
       {fieldsState[UserDataAttribute.ssn4].visible && (
         <Checkbox
-          {...register(UserDataAttribute.ssn4)}
+          {...register(`kycData.${UserDataAttribute.ssn4}`)}
           disabled={fieldsState[UserDataAttribute.ssn4].disabled}
           label={allT('collected-data-options.ssn4')}
         />
       )}
       {fieldsState[UserDataAttribute.dob].visible && (
         <Checkbox
-          {...register(UserDataAttribute.dob)}
+          {...register(`kycData.${UserDataAttribute.dob}`)}
           disabled={fieldsState[UserDataAttribute.dob].disabled}
           label={allT('collected-data-options.dob')}
         />

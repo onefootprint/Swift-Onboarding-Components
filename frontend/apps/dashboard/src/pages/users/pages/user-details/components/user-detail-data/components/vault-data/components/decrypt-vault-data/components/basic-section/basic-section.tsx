@@ -4,7 +4,7 @@ import { UserDataAttribute } from '@onefootprint/types';
 import { Checkbox, LinkButton } from '@onefootprint/ui';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
-import { User } from 'src/pages/users/hooks/use-join-users';
+import { User } from 'src/pages/users/types/user.types';
 
 import DataContainer from '../data-container';
 import useFormState from './hooks/use-form-state';
@@ -24,13 +24,13 @@ const BasicSection = ({ user }: BasicSectionProps) => {
 
   const selectValue = (value: boolean) => {
     if (!fieldsState[UserDataAttribute.firstName].disabled) {
-      setValue(UserDataAttribute.firstName, value);
+      setValue(`kycData.${UserDataAttribute.firstName}`, value);
     }
     if (!fieldsState[UserDataAttribute.email].disabled) {
-      setValue(UserDataAttribute.email, value);
+      setValue(`kycData.${UserDataAttribute.email}`, value);
     }
     if (!fieldsState[UserDataAttribute.phoneNumber].disabled) {
-      setValue(UserDataAttribute.phoneNumber, value);
+      setValue(`kycData.${UserDataAttribute.phoneNumber}`, value);
     }
   };
 
@@ -59,21 +59,21 @@ const BasicSection = ({ user }: BasicSectionProps) => {
     >
       {fieldsState[UserDataAttribute.firstName].visible && (
         <Checkbox
-          {...register(UserDataAttribute.firstName)}
+          {...register(`kycData.${UserDataAttribute.firstName}`)}
           disabled={fieldsState[UserDataAttribute.firstName].disabled}
           label={allT('collected-data-options.name')}
         />
       )}
       {fieldsState[UserDataAttribute.email].visible && (
         <Checkbox
-          {...register(UserDataAttribute.email)}
+          {...register(`kycData.${UserDataAttribute.email}`)}
           disabled={fieldsState[UserDataAttribute.email].disabled}
           label={allT('collected-data-options.email')}
         />
       )}
       {fieldsState[UserDataAttribute.phoneNumber].visible && (
         <Checkbox
-          {...register(UserDataAttribute.phoneNumber)}
+          {...register(`kycData.${UserDataAttribute.phoneNumber}`)}
           disabled={fieldsState[UserDataAttribute.phoneNumber].disabled}
           label={allT('collected-data-options.phone_number')}
         />

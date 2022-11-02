@@ -1,6 +1,6 @@
 import { UserDataAttribute } from './user-data-attribute';
 
-export type DecryptedUserAttributes = {
+export type DecryptedUserDataAttributes = {
   [UserDataAttribute.firstName]: string;
   [UserDataAttribute.lastName]: string;
   [UserDataAttribute.dob]: string;

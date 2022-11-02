@@ -2,23 +2,22 @@ import { useTranslation } from '@onefootprint/hooks';
 import { IcoUserCircle24 } from '@onefootprint/icons';
 import { UserDataAttribute } from '@onefootprint/types';
 import React from 'react';
-import { UserAttributes } from 'src/pages/users/hooks/use-user-data';
+import { UserVaultData } from 'src/pages/users/types/vault-data.types';
 
 // import RiskSignalsOverview from '../../../risk-signals-overview';
 import DataRow from '../data-row';
 import DataSection from '../data-section';
 
 type IdentitySectionProps = {
-  identityDataAttributes: UserDataAttribute[];
-  attributes: UserAttributes;
+  vaultData: UserVaultData;
 };
 
-const IdentitySection = ({
-  identityDataAttributes,
-  attributes,
-}: IdentitySectionProps) => {
-  const { t, allT } = useTranslation('pages.user-details');
-
+const IdentitySection = ({ vaultData }: IdentitySectionProps) => {
+  const { t, allT } = useTranslation('pages.user-details.user-info.identity');
+  const { kycData } = vaultData;
+  const ssn9 = kycData[UserDataAttribute.ssn9];
+  const ssn4 = kycData[UserDataAttribute.ssn4];
+  const dob = kycData[UserDataAttribute.dob];
   return (
     <DataSection
       iconComponent={IcoUserCircle24}
@@ -45,25 +44,16 @@ const IdentitySection = ({
       //     low={[]}
       //   />
       // )}
-      title={t('user-info.identity.title')}
+      title={t('title')}
     >
-      {identityDataAttributes.includes(UserDataAttribute.ssn9) && (
-        <DataRow
-          title={allT('collected-data-options.ssn9')}
-          data={attributes.ssn9}
-        />
+      {ssn9 !== undefined && (
+        <DataRow title={allT('collected-data-options.ssn9')} data={ssn9} />
       )}
-      {identityDataAttributes.includes(UserDataAttribute.ssn4) && (
-        <DataRow
-          title={allT('collected-data-options.ssn4')}
-          data={attributes.ssn4}
-        />
+      {ssn4 !== undefined && (
+        <DataRow title={allT('collected-data-options.ssn4')} data={ssn4} />
       )}
-      {identityDataAttributes.includes(UserDataAttribute.dob) && (
-        <DataRow
-          title={allT('collected-data-options.dob')}
-          data={attributes.dob}
-        />
+      {dob !== undefined && (
+        <DataRow title={allT('collected-data-options.dob')} data={dob} />
       )}
     </DataSection>
   );

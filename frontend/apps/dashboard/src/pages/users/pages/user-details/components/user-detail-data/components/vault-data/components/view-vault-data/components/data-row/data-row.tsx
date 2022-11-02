@@ -1,12 +1,12 @@
 import { Typography } from '@onefootprint/ui';
 import React from 'react';
 import FieldOrPlaceholder from 'src/pages/users/components/field-or-placeholder';
-import { UserData } from 'src/pages/users/hooks/use-user-data';
+import { DataValue } from 'src/pages/users/types/vault-data.types';
 import styled from 'styled-components';
 
 export type DataRowProps = {
   title: string;
-  data: UserData;
+  data?: DataValue;
 };
 
 const DataRow = ({ title, data }: DataRowProps) => (

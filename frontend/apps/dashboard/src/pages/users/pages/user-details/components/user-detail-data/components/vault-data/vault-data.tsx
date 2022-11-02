@@ -1,6 +1,8 @@
 import { UserDataAttribute } from '@onefootprint/types';
 import React from 'react';
-import { User } from 'src/pages/users/hooks/use-join-users';
+import { User } from 'src/pages/users/types/user.types';
+import { IdDocDataAttribute } from 'src/pages/users/types/vault-data.types';
+import getAttrListFromFields from 'src/utils/get-attr-list-from-fields';
 import { useUpdateEffect } from 'usehooks-ts';
 
 import { State } from '../../../../utils/decrypt-state-machine';
@@ -11,21 +13,28 @@ import ViewBasicInfo from './components/view-vault-data';
 type VaultDataProps = {
   user: User;
   onDecrypt: (
-    fields: Partial<Record<UserDataAttribute, boolean>>,
+    kyc: UserDataAttribute[],
+    idDoc: IdDocDataAttribute[],
     reason: string,
   ) => void;
 };
 
 const VaultData = ({ user, onDecrypt }: VaultDataProps) => {
   const [state] = useDecryptMachine();
+  const { fields, reason } = state.context;
   const showCheckboxes =
     state.matches(State.selectingFields) ||
     state.matches(State.confirmingReason) ||
     state.matches(State.decrypting);
 
   useUpdateEffect(() => {
-    if (state.matches(State.decrypting)) {
-      onDecrypt(state.context.fields, state.context.reason);
+    if (state.matches(State.decrypting) && reason && fields) {
+      // Get the attribute names with true values
+      const { kycData, idDoc } = getAttrListFromFields(
+        fields.kycData,
+        fields.idDoc,
+      );
+      onDecrypt(kycData, idDoc, reason);
     }
   }, [state.value]);
 

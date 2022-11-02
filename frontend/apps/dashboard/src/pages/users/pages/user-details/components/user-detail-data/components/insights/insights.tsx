@@ -2,7 +2,7 @@ import { IcoCheckCircle16, IcoClose16 } from '@onefootprint/icons';
 import { Box, Divider, Shimmer, Typography } from '@onefootprint/ui';
 import GoogleMapReact from 'google-map-react';
 import React from 'react';
-import { User } from 'src/pages/users/hooks/use-join-users';
+import { User } from 'src/pages/users/types/user.types';
 import getRegionForInsightEvent from 'src/utils/insight-event-region';
 import { displayForUserAgent, icoForUserAgent } from 'src/utils/user-agent';
 import styled, { css } from 'styled-components';

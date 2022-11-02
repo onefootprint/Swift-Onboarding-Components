@@ -1,5 +1,4 @@
 import { yupResolver } from '@hookform/resolvers/yup';
-import type { UserDataAttributeKey } from '@onefootprint/types';
 import { UserDataAttribute } from '@onefootprint/types';
 import { Box, Button, Dialog, Divider, Typography } from '@onefootprint/ui';
 import React, { useState } from 'react';
@@ -16,6 +15,7 @@ import DateRangeSelector, {
   DateRangeSelectorFormValues,
 } from 'src/components/date-range-selector';
 import { getDateRange, serializeDateRange } from 'src/utils/date-range';
+import getAttrListFromFields from 'src/utils/get-attr-list-from-fields';
 import styled from 'styled-components';
 
 import { useFilters } from '../../hooks/use-filters';
@@ -26,7 +26,7 @@ type FormValues = DateRangeSelectorFormValues & {
 
 export const dataKindToType = Object.fromEntries(
   Object.entries(UserDataAttribute).map(x => [x[1], x[0]]),
-) as Record<UserDataAttribute, UserDataAttributeKey>;
+) as Record<UserDataAttribute, string>;
 
 const FilterDialog = () => {
   const [showDialog, setShowDialog] = useState(false);
@@ -38,7 +38,7 @@ const FilterDialog = () => {
   const { selectedFields, setFieldFor, clearSelectedFields } =
     useDataKindSelectedFields();
 
-  const isFieldSelected = (...kinds: UserDataAttributeKey[]) =>
+  const isFieldSelected = (...kinds: UserDataAttribute[]) =>
     kinds.every(kind => selectedFields[kind]);
   const isFieldDisabled = () => false;
 
@@ -47,12 +47,9 @@ const FilterDialog = () => {
     if (!isValidated) {
       return;
     }
-    const fields = Object.entries(selectedFields)
-      .filter(x => x[1])
-      .map(x => UserDataAttribute[x[0] as UserDataAttributeKey])
-      .join(',');
+    const { kycData } = getAttrListFromFields(selectedFields, {});
     setFilter({
-      dataKinds: fields,
+      dataKinds: kycData.join(','),
       dateRange: serializeDateRange(
         ...getValues(['dateRange', 'customDateStart', 'customDateEnd']),
       ),
@@ -69,7 +66,7 @@ const FilterDialog = () => {
     const dataKindsStr = filters.dataKinds || '';
     const initialSelectedFields = (
       dataKindsStr.length ? dataKindsStr.split(',') : []
-    ).map(x => dataKindToType[x as UserDataAttribute]);
+    ).map(x => dataKindToType[x as UserDataAttribute]) as UserDataAttribute[];
     clearSelectedFields(initialSelectedFields);
     const [dateRange, customDateStart, customDateEnd] = getDateRange(filters);
     setValue('dateRange', dateRange);

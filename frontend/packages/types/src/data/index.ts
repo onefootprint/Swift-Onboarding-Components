@@ -12,7 +12,7 @@ export * from './countries';
 export { default as D2PStatus } from './d2p-status';
 export { default as D2PStatusUpdate } from './d2p-status-update';
 export * from './date-range';
-export * from './decrypted-user-attributes';
+export * from './decrypted-user-data-attributes';
 export { default as IdScanBadImageError } from './id-scan-bad-image-error';
 export { default as IdScanDocType } from './id-scan-doc-type';
 export { default as IdentifyType } from './identify-type';

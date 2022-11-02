@@ -1,14 +1,14 @@
-import { UserDataAttributeKey } from '@onefootprint/types';
+import { UserDataAttribute } from '@onefootprint/types';
 import { Checkbox, SXStyles, Typography } from '@onefootprint/ui';
 import React, { ChangeEvent } from 'react';
 import styled, { css } from 'styled-components';
 
 type DataKindBoxesProps = {
   setFieldFor: (
-    ...kinds: UserDataAttributeKey[]
+    ...kinds: UserDataAttribute[]
   ) => (e: ChangeEvent<HTMLInputElement>) => void;
-  isFieldSelected: (...kinds: UserDataAttributeKey[]) => boolean;
-  isFieldDisabled: (...kinds: UserDataAttributeKey[]) => boolean;
+  isFieldSelected: (...kinds: UserDataAttribute[]) => boolean;
+  isFieldDisabled: (...kinds: UserDataAttribute[]) => boolean;
 };
 
 const DataKindBoxes = ({
@@ -24,21 +24,30 @@ const DataKindBoxes = ({
       </Typography>
       <Checkbox
         label="Name"
-        disabled={isFieldDisabled('firstName', 'lastName')}
-        checked={isFieldSelected('firstName', 'lastName')}
-        onChange={setFieldFor('firstName', 'lastName')}
+        disabled={isFieldDisabled(
+          UserDataAttribute.firstName,
+          UserDataAttribute.lastName,
+        )}
+        checked={isFieldSelected(
+          UserDataAttribute.firstName,
+          UserDataAttribute.lastName,
+        )}
+        onChange={setFieldFor(
+          UserDataAttribute.firstName,
+          UserDataAttribute.lastName,
+        )}
       />
       <Checkbox
         label="Email"
-        disabled={isFieldDisabled('email')}
-        checked={isFieldSelected('email')}
-        onChange={setFieldFor('email')}
+        disabled={isFieldDisabled(UserDataAttribute.email)}
+        checked={isFieldSelected(UserDataAttribute.email)}
+        onChange={setFieldFor(UserDataAttribute.email)}
       />
       <Checkbox
         label="Phone number"
-        disabled={isFieldDisabled('phoneNumber')}
-        checked={isFieldSelected('phoneNumber')}
-        onChange={setFieldFor('phoneNumber')}
+        disabled={isFieldDisabled(UserDataAttribute.phoneNumber)}
+        checked={isFieldSelected(UserDataAttribute.phoneNumber)}
+        onChange={setFieldFor(UserDataAttribute.phoneNumber)}
       />
     </DataGridItem>
     <DataGridItem sx={{ gridArea: '2 / 1 / span 1 / span 1' }}>
@@ -47,21 +56,24 @@ const DataKindBoxes = ({
       </Typography>
       <Checkbox
         label="SSN (full)"
-        disabled={isFieldDisabled('ssn9')}
-        checked={isFieldSelected('ssn9')}
-        onChange={setFieldFor('ssn9')}
+        disabled={isFieldDisabled(UserDataAttribute.ssn9)}
+        checked={isFieldSelected(UserDataAttribute.ssn9)}
+        onChange={setFieldFor(UserDataAttribute.ssn9)}
       />
       <Checkbox
         label="SSN (last four)"
-        disabled={isFieldDisabled('ssn4')}
-        checked={isFieldSelected('ssn4') || isFieldSelected('ssn9')}
-        onChange={setFieldFor('ssn4')}
+        disabled={isFieldDisabled(UserDataAttribute.ssn4)}
+        checked={
+          isFieldSelected(UserDataAttribute.ssn4) ||
+          isFieldSelected(UserDataAttribute.ssn9)
+        }
+        onChange={setFieldFor(UserDataAttribute.ssn4)}
       />
       <Checkbox
         label="Date of birth"
-        disabled={isFieldDisabled('dob')}
-        checked={isFieldSelected('dob')}
-        onChange={setFieldFor('dob')}
+        disabled={isFieldDisabled(UserDataAttribute.dob)}
+        checked={isFieldSelected(UserDataAttribute.dob)}
+        onChange={setFieldFor(UserDataAttribute.dob)}
       />
     </DataGridItem>
     <DataGridItem sx={{ gridArea: '1 / 2 / span 2 / span 1' }}>
@@ -70,39 +82,39 @@ const DataKindBoxes = ({
       </Typography>
       <Checkbox
         label="Country"
-        disabled={isFieldDisabled('country')}
-        checked={isFieldSelected('country')}
-        onChange={setFieldFor('country')}
+        disabled={isFieldDisabled(UserDataAttribute.country)}
+        checked={isFieldSelected(UserDataAttribute.country)}
+        onChange={setFieldFor(UserDataAttribute.country)}
       />
       <Checkbox
         label="Address line 1"
-        disabled={isFieldDisabled('addressLine1')}
-        checked={isFieldSelected('addressLine1')}
-        onChange={setFieldFor('addressLine1')}
+        disabled={isFieldDisabled(UserDataAttribute.addressLine1)}
+        checked={isFieldSelected(UserDataAttribute.addressLine1)}
+        onChange={setFieldFor(UserDataAttribute.addressLine1)}
       />
       <Checkbox
         label="Address line 2"
-        disabled={isFieldDisabled('addressLine2')}
-        checked={isFieldSelected('addressLine2')}
-        onChange={setFieldFor('addressLine2')}
+        disabled={isFieldDisabled(UserDataAttribute.addressLine2)}
+        checked={isFieldSelected(UserDataAttribute.addressLine2)}
+        onChange={setFieldFor(UserDataAttribute.addressLine2)}
       />
       <Checkbox
         label="City"
-        disabled={isFieldDisabled('city')}
-        checked={isFieldSelected('city')}
-        onChange={setFieldFor('city')}
+        disabled={isFieldDisabled(UserDataAttribute.city)}
+        checked={isFieldSelected(UserDataAttribute.city)}
+        onChange={setFieldFor(UserDataAttribute.city)}
       />
       <Checkbox
         label="Zip code"
-        disabled={isFieldDisabled('zip')}
-        checked={isFieldSelected('zip')}
-        onChange={setFieldFor('zip')}
+        disabled={isFieldDisabled(UserDataAttribute.zip)}
+        checked={isFieldSelected(UserDataAttribute.zip)}
+        onChange={setFieldFor(UserDataAttribute.zip)}
       />
       <Checkbox
         label="State"
-        disabled={isFieldDisabled('state')}
-        checked={isFieldSelected('state')}
-        onChange={setFieldFor('state')}
+        disabled={isFieldDisabled(UserDataAttribute.state)}
+        checked={isFieldSelected(UserDataAttribute.state)}
+        onChange={setFieldFor(UserDataAttribute.state)}
       />
     </DataGridItem>
   </DataGrid>
