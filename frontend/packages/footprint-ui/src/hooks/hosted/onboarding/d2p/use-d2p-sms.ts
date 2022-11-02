@@ -1,11 +1,11 @@
-import request, { RequestError } from '@onefootprint/request';
+import request from '@onefootprint/request';
 import { D2PSmsRequest, D2PSmsResponse } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
 
-import { AUTH_HEADER } from '../config/constants';
+import { AUTH_HEADER } from '../../../../config/constants';
 
 const d2pSms = async (payload: D2PSmsRequest) => {
-  const response = await request<{}>({
+  const response = await request<D2PSmsResponse>({
     method: 'POST',
     url: '/hosted/onboarding/d2p/sms',
     data: {
@@ -18,7 +18,6 @@ const d2pSms = async (payload: D2PSmsRequest) => {
   return response.data;
 };
 
-const useD2PSms = () =>
-  useMutation<D2PSmsResponse, RequestError, D2PSmsRequest>(d2pSms);
+const useD2PSms = () => useMutation(d2pSms);
 
 export default useD2PSms;

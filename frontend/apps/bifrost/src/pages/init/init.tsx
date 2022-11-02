@@ -1,12 +1,13 @@
 import { DeviceInfo, useDeviceInfo } from '@onefootprint/hooks';
+import { CollectedDataOptionLabels } from '@onefootprint/types';
 import { Box, Portal, Shimmer } from '@onefootprint/ui';
+import { useGetOnboardingConfig } from 'footprint-elements';
 import React from 'react';
 import useBifrostMachine from 'src/hooks/use-bifrost-machine';
 import { Events } from 'src/utils/state-machine/bifrost';
 import styled, { css } from 'styled-components';
 
 import useAuthenticationFlow from './hooks/use-authentication-flow';
-import useTenantInfo from './hooks/use-tenant-info';
 import useTenantPublicKey from './hooks/use-tenant-public-key';
 
 const Init = () => {
@@ -18,7 +19,31 @@ const Init = () => {
       payload: info,
     });
   });
-  useTenantInfo(tenantPk);
+
+  useGetOnboardingConfig(tenantPk, {
+    onSuccess: ({ orgName, name, isLive, mustCollectData, canAccessData }) => {
+      send({
+        type: Events.tenantInfoRequestSucceeded,
+        payload: {
+          pk: tenantPk,
+          orgName,
+          name,
+          isLive,
+          mustCollectData: mustCollectData.map(
+            (attr: string) => CollectedDataOptionLabels[attr],
+          ),
+          canAccessData: canAccessData.map(
+            (attr: string) => CollectedDataOptionLabels[attr],
+          ),
+        },
+      });
+    },
+    onError: () => {
+      send({
+        type: Events.tenantInfoRequestFailed,
+      });
+    },
+  });
   useAuthenticationFlow();
 
   return (

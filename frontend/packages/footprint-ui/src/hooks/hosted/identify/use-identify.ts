@@ -2,7 +2,7 @@ import request, { RequestError } from '@onefootprint/request';
 import { IdentifyRequest, IdentifyResponse } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
 
-import getRetryDisabledUntil from './get-retry-disabled-until';
+import getRetryDisabledUntil from './utils/get-retry-disabled-until';
 
 const identifyRequest = async (payload: IdentifyRequest) => {
   const response = await request<IdentifyResponse>({

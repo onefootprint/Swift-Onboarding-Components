@@ -10,12 +10,11 @@ import {
   Typography,
   useToast,
 } from '@onefootprint/ui';
+import { useIdentify, useIdentifyChallenge } from 'footprint-elements';
 import React, { useEffect } from 'react';
-import useIdentify from 'src/pages/identify/hooks/use-identify';
 import { Events } from 'src/utils/state-machine/identify/types';
 import styled, { css } from 'styled-components';
 
-import useIdentifyChallenge from '../../../../hooks/use-identify-challenge';
 import useIdentifyMachine from '../../../../hooks/use-identify-machine';
 
 const ResendCodeButton = () => {

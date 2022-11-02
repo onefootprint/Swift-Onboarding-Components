@@ -4,8 +4,7 @@ import {
   IdentifyResponse,
   IdentifyVerifyResponse,
 } from '@onefootprint/types';
-import useIdentify from 'src/pages/identify/hooks/use-identify';
-import useIdentityVerify from 'src/pages/identify/hooks/use-identify-verify';
+import { useIdentify, useIdentifyVerify } from 'footprint-elements';
 import generateLoginDeviceResponse from 'src/utils/biometric/login-challenge-response';
 import { Events } from 'src/utils/state-machine/identify/types';
 
@@ -14,7 +13,7 @@ import useIdentifyMachine from '../../../hooks/use-identify-machine';
 const useBiometricLoginRetry = () => {
   const [state, send] = useIdentifyMachine();
   const identifyMutation = useIdentify();
-  const identityVerifyMutation = useIdentityVerify();
+  const identityVerifyMutation = useIdentifyVerify();
 
   const requestBiometricChallenge = () => {
     identifyMutation.mutate(

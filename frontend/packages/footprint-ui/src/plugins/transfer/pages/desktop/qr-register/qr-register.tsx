@@ -6,7 +6,7 @@ import styled, { css } from 'styled-components';
 
 import HeaderTitle from '../../../../../components/header-title';
 import NavigationHeader from '../../../../../components/navigation-header';
-import { useGetD2PStatus } from '../../../../../hooks';
+import { useD2PSms, useGetD2PStatus } from '../../../../../hooks';
 import { createHandoffUrl } from '../../../../../utils/handoff-url';
 import useDesktopMachine, {
   Events,
@@ -14,7 +14,6 @@ import useDesktopMachine, {
 import useGenerateScopedAuthToken from '../../../hooks/desktop/use-generate-scoped-auth-token';
 import useHandleD2PStatusUpdate from '../../../hooks/desktop/use-handle-d2p-status-update';
 import useTranslationSourceForRequirements from '../../../hooks/desktop/use-translation-source-for-requirements';
-import useD2PSms from '../../../hooks/use-d2p-sms';
 
 const QRRegister = () => {
   const { t } = useTranslation('pages.desktop.qr-register');

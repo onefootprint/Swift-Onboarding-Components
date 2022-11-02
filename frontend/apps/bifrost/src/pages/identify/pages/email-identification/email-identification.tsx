@@ -8,14 +8,13 @@ import {
   UserDataAttribute,
 } from '@onefootprint/types';
 import { Typography } from '@onefootprint/ui';
+import { useIdentify, useIdentifyVerify } from 'footprint-elements';
 import Link from 'next/link';
 import React, { useState } from 'react';
-import useIdentify from 'src/pages/identify/hooks/use-identify';
 import { Events } from 'src/utils/state-machine/identify/types';
 
 import generateLoginDeviceResponse from '../../../../utils/biometric/login-challenge-response';
 import useIdentifyMachine from '../../hooks/use-identify-machine';
-import useIdentifyVerify from '../../hooks/use-identify-verify';
 import ChallengePicker from './components/challenge-picker';
 import EmailIdentificationForm from './components/email-identification-form';
 import EmailIdentificationHeader from './components/email-identification-header';

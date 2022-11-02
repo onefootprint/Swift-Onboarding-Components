@@ -1,13 +1,12 @@
 import { useRequestErrorToast, useTranslation } from '@onefootprint/hooks';
 import { IdentifyVerifyResponse } from '@onefootprint/types';
 import { PinInput } from '@onefootprint/ui';
+import { useIdentifyVerify, useUserEmail } from 'footprint-elements';
 import React from 'react';
 import { Events } from 'src/utils/state-machine/identify/types';
 
 import useIdentifyMachine from '../../../../hooks/use-identify-machine';
-import useIdentifyVerify from '../../../../hooks/use-identify-verify';
 import ResendCodeButton from '../resend-code-button/resend-code-button';
-import useUserEmail from './hooks/use-user-email';
 
 const SUCCESS_EVENT_DELAY_MS = 1500;
 

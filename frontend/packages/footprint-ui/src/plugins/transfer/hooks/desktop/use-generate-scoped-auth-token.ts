@@ -1,4 +1,4 @@
-import useD2PGenerate from '../use-d2p-generate';
+import { useD2PGenerate } from '../../../../hooks';
 import useDesktopMachine, { Events } from './use-desktop-machine';
 
 const useGenerateScopedAuthToken = () => {

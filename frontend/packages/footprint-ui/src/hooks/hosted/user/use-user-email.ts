@@ -1,7 +1,8 @@
-import request, { RequestError } from '@onefootprint/request';
+import request from '@onefootprint/request';
 import { UserEmailRequest, UserEmailResponse } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
-import { AUTH_HEADER } from 'src/config/constants';
+
+import { AUTH_HEADER } from '../../../config/constants';
 
 const userEmailRequest = async (payload: UserEmailRequest) => {
   const response = await request<UserEmailResponse>({
@@ -18,9 +19,6 @@ const userEmailRequest = async (payload: UserEmailRequest) => {
   return response.data;
 };
 
-const useUserEmail = () =>
-  useMutation<UserEmailResponse, RequestError, UserEmailRequest>(
-    userEmailRequest,
-  );
+const useUserEmail = () => useMutation(userEmailRequest);
 
 export default useUserEmail;

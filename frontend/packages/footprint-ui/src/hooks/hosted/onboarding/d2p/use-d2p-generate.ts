@@ -1,8 +1,8 @@
-import request, { RequestError } from '@onefootprint/request';
+import request from '@onefootprint/request';
 import { D2PGenerateRequest, D2PGenerateResponse } from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
 
-import { AUTH_HEADER } from '../config/constants';
+import { AUTH_HEADER } from '../../../../config/constants';
 
 const d2pGenerate = async (payload: D2PGenerateRequest) => {
   const response = await request<D2PGenerateResponse>({
@@ -16,9 +16,6 @@ const d2pGenerate = async (payload: D2PGenerateRequest) => {
   return response.data;
 };
 
-const useD2PGenerate = () =>
-  useMutation<D2PGenerateResponse, RequestError, D2PGenerateRequest>(
-    d2pGenerate,
-  );
+const useD2PGenerate = () => useMutation(d2pGenerate);
 
 export default useD2PGenerate;

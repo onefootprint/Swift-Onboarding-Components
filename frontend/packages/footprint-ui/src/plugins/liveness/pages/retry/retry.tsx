@@ -3,10 +3,10 @@ import { Button } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
+import { useSkipLiveness } from '../../../../hooks';
 import HeaderTitle from '../../components/header-title';
 import { useLivenessMachine } from '../../components/machine-provider';
 import useBiometricInit from '../../hooks/use-register-biometric';
-import useSkipLiveness from '../../hooks/use-skip-liveness';
 import { Events } from '../../utils/state-machine/types';
 
 const Retry = () => {

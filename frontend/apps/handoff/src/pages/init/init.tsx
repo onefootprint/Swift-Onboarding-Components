@@ -1,8 +1,14 @@
 import { DeviceInfo, useDeviceInfo } from '@onefootprint/hooks';
-import { D2PStatusUpdate, TenantInfo } from '@onefootprint/types';
+import {
+  CollectedDataOptionLabels,
+  D2PStatusUpdate,
+  GetOnboardingConfigResponse,
+  TenantInfo,
+} from '@onefootprint/types';
 import { LoadingIndicator } from '@onefootprint/ui';
 import {
   HandoffUrlQuery,
+  useGetOnboardingConfig,
   useParseHandoffUrl,
   useUpdateD2PStatus,
 } from 'footprint-elements';
@@ -10,10 +16,9 @@ import React from 'react';
 import useHandoffMachine from 'src/hooks/use-handoff-machine';
 import { Events } from 'src/utils/state-machine';
 
-import useTenantInfo from './hooks/use-tenant-info';
-
 const Init = () => {
-  const [, send] = useHandoffMachine();
+  const [state, send] = useHandoffMachine();
+  const { tenantPk: pk } = state.context;
   const updateD2PStatusMutation = useUpdateD2PStatus();
 
   useParseHandoffUrl({
@@ -47,8 +52,22 @@ const Init = () => {
     },
   });
 
-  useTenantInfo({
-    onSuccess: (tenant: TenantInfo) => {
+  useGetOnboardingConfig(pk ?? '', {
+    onSuccess: (data: GetOnboardingConfigResponse) => {
+      const { orgName, name, isLive, mustCollectData, canAccessData } = data;
+      const tenant: TenantInfo = {
+        pk: pk ?? '',
+        orgName,
+        name,
+        isLive,
+        mustCollectData: mustCollectData.map(
+          (attr: string) => CollectedDataOptionLabels[attr],
+        ),
+        canAccessData: canAccessData.map(
+          (attr: string) => CollectedDataOptionLabels[attr],
+        ),
+      };
+
       send({
         type: Events.tenantInfoReceived,
         payload: {
