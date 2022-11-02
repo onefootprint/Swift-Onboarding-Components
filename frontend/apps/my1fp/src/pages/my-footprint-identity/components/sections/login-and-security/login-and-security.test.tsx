@@ -67,6 +67,7 @@ describe('<LoginAndSecurity />', () => {
       method: 'post',
       path: 'hosted/user/email/challenge',
       response: {},
+      delay: 10,
     });
   };
 
@@ -286,11 +287,13 @@ describe('<LoginAndSecurity />', () => {
         renderLoginAndSecurity();
         const button = screen.getByTestId('verify-email');
         await userEvent.click(button);
-        expect(
-          screen.getByRole('progressbar', {
-            name: 'Sending email to verify your email address',
-          }),
-        ).toBeInTheDocument();
+        await waitFor(() => {
+          expect(
+            screen.getByRole('progressbar', {
+              name: 'Sending email to verify your email address',
+            }),
+          ).toBeInTheDocument();
+        });
       });
 
       it('should display a confirmation if the request succeeds', async () => {
