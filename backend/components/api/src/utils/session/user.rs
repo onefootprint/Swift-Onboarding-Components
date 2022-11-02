@@ -1,15 +1,16 @@
 use chrono::{DateTime, Duration, Utc};
 use crypto::aead::ScopedSealingKey;
 use db::{models::session::Session, PgConnection};
-use newtypes::{SealedSessionBytes, SessionAuthToken};
+use newtypes::{AuthTokenHash, SealedSessionBytes, SessionAuthToken};
 
 use crate::{
     auth::{session::AuthSessionData, AuthError},
     State,
 };
 
+#[derive(Debug, Clone)]
 pub struct AuthSession {
-    pub key: String,
+    pub key: AuthTokenHash,
     pub expires_at: DateTime<Utc>,
     pub data: AuthSessionData,
 }
@@ -64,5 +65,18 @@ impl AuthSession {
         let sealed_session_data = data.seal(session_sealing_key)?;
         Session::update_or_create(conn, token.id(), sealed_session_data.0, expires_at)?;
         Ok(token)
+    }
+
+    pub fn update(
+        &mut self,
+        conn: &mut PgConnection,
+        session_sealing_key: &ScopedSealingKey,
+        data: AuthSessionData,
+    ) -> Result<(), db::DbError> {
+        let sealed_session_data = data.seal(session_sealing_key)?;
+        // Keep the same expiration date and primary key in the DB - just update the data
+        Session::update_or_create(conn, self.key.clone(), sealed_session_data.0, self.expires_at)?;
+        self.data = data;
+        Ok(())
     }
 }

@@ -5,7 +5,7 @@ use paperclip::actix::Apiv2Security;
 use super::{UserAuthScope, UserAuthScopeDiscriminant};
 use crate::{
     auth::{
-        session::{AuthSessionData, ExtractableAuthSession},
+        session::{AllowSessionUpdate, AuthSessionData, ExtractableAuthSession},
         user::UserAuth,
         AuthError, SessionContext,
     },
@@ -21,6 +21,9 @@ pub struct UserSession {
     pub scopes: Vec<UserAuthScope>,
 }
 
+// Allow calling SessionContext<T>::update for T=UserSession
+impl AllowSessionUpdate for UserSession {}
+
 impl UserSession {
     pub fn create(user_vault_id: UserVaultId, scopes: Vec<UserAuthScope>) -> AuthSessionData {
         AuthSessionData::User(Self {
@@ -32,6 +35,13 @@ impl UserSession {
     pub fn has_scope(&self, scope: &UserAuthScopeDiscriminant) -> bool {
         let discriminants: Vec<UserAuthScopeDiscriminant> = self.scopes.iter().map(|x| x.into()).collect();
         discriminants.contains(scope)
+    }
+
+    pub fn replace_scopes(self, scopes: Vec<UserAuthScope>) -> AuthSessionData {
+        AuthSessionData::User(Self {
+            user_vault_id: self.user_vault_id,
+            scopes,
+        })
     }
 }
 

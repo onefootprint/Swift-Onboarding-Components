@@ -2,13 +2,19 @@ use std::{marker::PhantomData, pin::Pin};
 
 use actix_web::{http::header::HeaderMap, web, FromRequest};
 use chrono::{DateTime, Utc};
+use crypto::aead::ScopedSealingKey;
+use db::PgConnection;
 use futures_util::Future;
 use newtypes::SessionAuthToken;
 use paperclip::actix::Apiv2Security;
 
-use crate::{errors::ApiError, utils::session::AuthSession, State};
+use crate::{
+    errors::{ApiError, ApiResult},
+    utils::session::AuthSession,
+    State,
+};
 
-use super::ExtractableAuthSession;
+use super::{AuthSessionData, ExtractableAuthSession};
 use crate::auth::AuthError;
 
 /// Abstract Session Context Type
@@ -17,10 +23,33 @@ use crate::auth::AuthError;
 pub struct SessionContext<T> {
     pub data: T,
     pub auth_token: SessionAuthToken,
-    pub expires_at: DateTime<Utc>,
     pub headers: MaskedHeaderMap,
+    session: AuthSession,
     // prevents external construction
     pub(super) phantom: PhantomData<()>,
+}
+
+impl<T> SessionContext<T> {
+    pub fn expires_at(&self) -> DateTime<Utc> {
+        self.session.expires_at
+    }
+}
+
+pub trait AllowSessionUpdate {}
+
+impl<T> SessionContext<T>
+where
+    T: AllowSessionUpdate,
+{
+    pub fn update_session(
+        &mut self,
+        conn: &mut PgConnection,
+        session_sealing_key: &ScopedSealingKey,
+        data: AuthSessionData,
+    ) -> ApiResult<()> {
+        self.session.update(conn, session_sealing_key, data)?;
+        Ok(())
+    }
 }
 
 #[derive(Clone)]
@@ -63,18 +92,19 @@ where
             // that they allow (example: UserSession<OnboardingSessionData>)
             // and if the session associated with the token cannot be converted to type T (in this case, OnboardingSession)
             // we fail
+            let raw_session_data = session.data.clone();
             let session_data = state
                 .db_pool
                 .db_query(move |conn| {
-                    T::try_from(session.data, conn)
+                    T::try_from(raw_session_data, conn)
                         .map_err(|_| AuthError::InvalidTokenForHeader(allowed_headers))
                 })
                 .await??;
             Ok(Self {
                 data: session_data,
                 auth_token,
-                expires_at: session.expires_at,
                 headers: MaskedHeaderMap(headers),
+                session,
                 phantom: PhantomData,
             })
         })
@@ -89,15 +119,15 @@ impl<A> SessionContext<A> {
         let SessionContext {
             data,
             auth_token,
-            expires_at,
             headers,
+            session,
             phantom,
         } = self;
         let result = SessionContext {
             data: f(data)?,
             auth_token,
-            expires_at,
             headers,
+            session,
             phantom,
         };
         Ok(result)

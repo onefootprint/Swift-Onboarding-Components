@@ -101,18 +101,21 @@ class TestBifrost:
         }[token_type]
         body = post("hosted/onboarding", None, ob_auth, auth_token)
         assert not body["validation_token"]
+        # Try again to make sure this endpoint is idempotent
+        body = post("hosted/onboarding", None, ob_auth, auth_token)
+        assert not body["validation_token"]
 
         body = get("hosted/onboarding/status", None, ob_auth, auth_token)
 
         req = lambda kind: next(r for r in body["requirements"] if r["kind"] == kind)
-        authorize_fields = body['fields_to_authorize']
+        authorize_fields = body["fields_to_authorize"]
 
         identity_check_req = req("identity_check")
-        expected = set({"name","dob","ssn9","full_address","email"})
-       
-        assert set(identity_check_req["missing_attributes"]) ==expected
+        expected = set({"name", "dob", "ssn9", "full_address", "email"})
+
+        assert set(identity_check_req["missing_attributes"]) == expected
         # requirements are non-null, so we expect this to be None
-        assert not body['fields_to_authorize']
+        assert not body["fields_to_authorize"]
         assert req("liveness")
 
         # Shouldn't be able to complete the onboarding until user data is provided

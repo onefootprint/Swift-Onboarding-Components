@@ -52,6 +52,12 @@ macro_rules! define_newtype_id {
     };
 }
 
+define_newtype_id!(
+    AuthTokenHash,
+    String,
+    "Hash of a session auth token, used as the PK in the DB"
+);
+
 // define our raw ids here
 define_newtype_id!(TenantId, String, "Identifier for a Org");
 define_newtype_id!(TenantRoleId, String, "Identifier for a Org role");

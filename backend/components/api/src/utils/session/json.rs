@@ -1,7 +1,7 @@
 use chrono::{DateTime, Utc};
 use crypto::sha256;
 use db::{models::session::Session, PgConnection};
-use newtypes::{Base64Data, D2pSessionStatus};
+use newtypes::{AuthTokenHash, Base64Data, D2pSessionStatus};
 use serde::{de::DeserializeOwned, Serialize};
 
 use crate::errors::ApiError;
@@ -36,12 +36,18 @@ where
     }
 }
 
+impl From<JsonSessionKey> for AuthTokenHash {
+    fn from(s: JsonSessionKey) -> Self {
+        Self::from(s.0)
+    }
+}
+
 impl<C> JsonSession<C>
 where
     C: Serialize + DeserializeOwned,
 {
     pub fn get<S: Into<JsonSessionKey>>(conn: &mut PgConnection, key: S) -> Result<Option<Self>, ApiError> {
-        let session = Session::get(conn, key.into().0)?;
+        let session = Session::get(conn, key.into().0.into())?;
         let session = if let Some(session) = session {
             Some(Self {
                 expires_at: session.expires_at,
@@ -60,7 +66,7 @@ where
         expires_at: DateTime<Utc>,
     ) -> Result<(), ApiError> {
         let data = serde_json::to_vec(data)?;
-        Session::update_or_create(conn, key.into().0, data, expires_at)?;
+        Session::update_or_create(conn, key.into().0.into(), data, expires_at)?;
         Ok(())
     }
 }

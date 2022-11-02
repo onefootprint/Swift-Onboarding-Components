@@ -1,6 +1,5 @@
-use crate::auth::user::UserAuth;
 use crate::auth::user::UserAuthContext;
-use crate::auth::user::{UserAuthScope, UserSession};
+use crate::auth::user::UserAuthScope;
 use crate::errors::ApiError;
 use crate::types::response::ResponseData;
 use crate::utils::session::JsonSession;
@@ -34,10 +33,18 @@ pub async fn handler(
         .db_pool
         .db_query(move |conn| -> Result<_, ApiError> {
             let expires_in = Duration::minutes(10);
-            let data = UserSession::create(
-                user_auth.user_vault_id(),
-                vec![UserAuthScope::Handoff, UserAuthScope::OrgOnboarding],
-            );
+            // If the token used to generate the d2p token has the OrgOnboarding scope, pass it along to the d2p token
+            let onboarding_scope = user_auth
+                .data
+                .scopes
+                .iter()
+                .find(|x| matches!(x, UserAuthScope::OrgOnboarding { id: _ }))
+                .cloned();
+            let token_scopes = [Some(UserAuthScope::Handoff), onboarding_scope]
+                .into_iter()
+                .flatten()
+                .collect();
+            let data = user_auth.data.replace_scopes(token_scopes);
             let auth_token = AuthSession::create_sync(conn, &session_sealing_key, data, expires_in)?;
             // Also keep track of the status of the handoff session. We use a JsonSession keyed on
             // a hash of the auth token so both handoff clients can look up the status

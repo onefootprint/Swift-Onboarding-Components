@@ -4,6 +4,8 @@ use paperclip::actix::Apiv2Schema;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
+use crate::AuthTokenHash;
+
 /// An cryptographically generated auth token to authenticate a session
 #[derive(
     Debug,
@@ -38,8 +40,8 @@ impl SessionAuthToken {
     }
 
     /// computes the "id" for the auth token by taking it's hash
-    pub fn id(&self) -> String {
-        crypto::hex::encode(sha256(self.0.as_bytes()))
+    pub fn id(&self) -> AuthTokenHash {
+        AuthTokenHash::from(crypto::hex::encode(sha256(self.0.as_bytes())))
     }
 }
 

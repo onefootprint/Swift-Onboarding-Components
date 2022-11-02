@@ -1,6 +1,7 @@
 use crate::auth::tenant::ParsedOnboardingSession;
 use crate::auth::tenant::PublicOnboardingContext;
 use crate::auth::user::UserAuthContext;
+use crate::auth::user::UserAuthScope;
 use crate::auth::user::UserAuthScopeDiscriminant;
 use crate::auth::{user::UserAuth, Either, SessionContext};
 
@@ -38,7 +39,7 @@ pub async fn post(
     user_auth: UserAuthContext,
     insights: InsightHeaders,
 ) -> actix_web::Result<Json<ResponseData<OnboardingResponse>>, ApiError> {
-    let user_auth = user_auth.check_permissions(vec![UserAuthScopeDiscriminant::OrgOnboarding])?;
+    let mut user_auth = user_auth.check_permissions(vec![UserAuthScopeDiscriminant::OrgOnboardingInit])?;
 
     let session_key = state.session_sealing_key.clone();
     let validation_token = state
@@ -51,7 +52,7 @@ pub async fn post(
 
             let scoped_user = ScopedUser::get_or_create(
                 conn,
-                uvw.user_vault.id.clone(),
+                uvw.user_vault.id,
                 onboarding_context.tenant().id.clone(),
                 onboarding_context.ob_config().is_live,
             )?;
@@ -64,6 +65,19 @@ pub async fn post(
                 onboarding_context.ob_config().id.clone(),
                 insight_event,
             )?;
+            // Update the auth session in the DB to have the OrgOnboarding scope tied to this onboarding
+            let scopes = user_auth.data.scopes.clone();
+            // Even though the OrgOnboardingInit scope is only used by this endpoint, don't remove it
+            // since we want this endpoint to be idempotent (in case the client needs to retry)
+            let new_scopes = scopes
+                .into_iter()
+                // Filter out any old OrgOnboarding scopes on the token
+                .filter(|x| !matches!(x, UserAuthScope::OrgOnboarding{id: _}))
+                // And add a new OrgOnboarding scope with the just-created ob.id
+                .chain([UserAuthScope::OrgOnboarding { id: ob.id.clone() }].into_iter())
+                .collect();
+            let data = user_auth.data.clone().replace_scopes(new_scopes);
+            user_auth.update_session(conn, &session_key, data)?;
 
             // If the user has already onboarded onto this same ob config, return a validation token
             let validation_token =

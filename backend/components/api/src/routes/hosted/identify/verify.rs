@@ -65,7 +65,7 @@ pub async fn post(
     // create the session and token
     let (scopes, duration) = match challenge_state.identify_type {
         IdentifyType::Onboarding => (
-            vec![UserAuthScope::SignUp, UserAuthScope::OrgOnboarding],
+            vec![UserAuthScope::SignUp, UserAuthScope::OrgOnboardingInit],
             Duration::minutes(15),
         ),
         IdentifyType::My1fp => (

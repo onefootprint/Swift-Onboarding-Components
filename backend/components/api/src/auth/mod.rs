@@ -9,7 +9,6 @@ pub use session::SessionContext;
 mod either;
 pub use self::either::Either;
 pub mod tenant;
-mod traits;
 pub mod user;
 
 #[derive(Debug, Error)]

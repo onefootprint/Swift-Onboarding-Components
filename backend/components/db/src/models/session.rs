@@ -2,12 +2,13 @@ use crate::schema::session;
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
+use newtypes::AuthTokenHash;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable, Insertable)]
 #[diesel(table_name = session)]
 pub struct Session {
-    pub key: String,
+    pub key: AuthTokenHash,
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
     pub expires_at: DateTime<Utc>,
@@ -17,13 +18,13 @@ pub struct Session {
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable)]
 #[diesel(table_name = session)]
 pub struct UpdateSession {
-    pub key: String,
+    pub key: AuthTokenHash,
     pub data: Vec<u8>,
     pub expires_at: DateTime<Utc>,
 }
 
 impl Session {
-    pub fn get(conn: &mut PgConnection, key: String) -> Result<Option<Session>, crate::DbError> {
+    pub fn get(conn: &mut PgConnection, key: AuthTokenHash) -> Result<Option<Session>, crate::DbError> {
         let session = session::table
             .filter(session::key.eq(key))
             .first::<Session>(conn)
@@ -40,7 +41,7 @@ impl Session {
 
     pub fn update_or_create(
         conn: &mut PgConnection,
-        key: String,
+        key: AuthTokenHash,
         data: Vec<u8>,
         expires_at: DateTime<Utc>,
     ) -> Result<Session, crate::DbError> {
