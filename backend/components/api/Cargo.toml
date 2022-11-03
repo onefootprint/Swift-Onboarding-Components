@@ -77,10 +77,12 @@ lazy_static = { workspace = true }
 strum = { workspace = true }
 
 workos = "0.2"
+byteorder = "1.4"
 
 db = { path = "../db" }
 twilio = { path = "../twilio"}
 idv = { path = "../idv" }
+privacy_pass = { path = "../privacy_pass" }
 
 api_wire_types = { path = "../api_wire_types" }
 

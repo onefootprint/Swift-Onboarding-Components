@@ -1,6 +1,6 @@
 use aes_gcm::aead::Payload;
 use aes_gcm::{Aes256Gcm, Key, Nonce};
-use elliptic_curve::sec1::ToEncodedPoint;
+use p256::elliptic_curve::sec1::ToEncodedPoint;
 use p256::{ecdh::EphemeralSecret, EncodedPoint};
 use rand_core::{OsRng, RngCore};
 use serde::{Deserialize, Serialize};
@@ -133,7 +133,6 @@ pub mod unseal {
     use super::*;
     use aes_gcm::{aead::Aead, KeyInit, aes::Aes256};
     use elliptic_curve::{ecdh::diffie_hellman, sec1::ToEncodedPoint};
-
     pub struct Unsealed(pub Vec<u8>);
 
     /// raw private key BE

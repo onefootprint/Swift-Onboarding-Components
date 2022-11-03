@@ -24,6 +24,13 @@ pub fn gen_random_alphanumeric_code(length: usize) -> String {
         .collect()
 }
 
+pub fn gen_bytes<const N: usize>() -> [u8; N] {
+    let mut rng = rand::thread_rng();
+    let mut bytes = [0u8; N];
+    rng.fill_bytes(&mut bytes);
+    bytes
+}
+
 /// Generate a random symmetric key
 pub fn random_cookie_session_key_bytes() -> Vec<u8> {
     let mut rng = rand::thread_rng();

@@ -1,4 +1,5 @@
 use super::insight_event::CreateInsightEvent;
+use super::liveness_event::LivenessEvent;
 use super::onboarding_decision::OnboardingDecision;
 use super::scoped_user::ScopedUser;
 use super::tenant_user::TenantUser;
@@ -27,7 +28,6 @@ pub struct Onboarding {
     pub _updated_at: DateTime<Utc>,
     pub insight_event_id: InsightEventId,
     pub status: OnboardingStatus,
-    pub is_liveness_skipped: bool,
     pub is_authorized: bool,
 }
 
@@ -39,7 +39,6 @@ struct NewOnboarding {
     start_timestamp: DateTime<Utc>,
     insight_event_id: InsightEventId,
     status: OnboardingStatus,
-    is_liveness_skipped: bool,
     is_authorized: bool,
 }
 
@@ -47,7 +46,6 @@ struct NewOnboarding {
 #[diesel(table_name = onboarding)]
 pub struct OnboardingUpdate {
     pub status: Option<OnboardingStatus>,
-    pub is_liveness_skipped: Option<bool>,
     pub is_authorized: Option<bool>,
 }
 
@@ -55,13 +53,6 @@ impl OnboardingUpdate {
     pub fn status(status: OnboardingStatus) -> Self {
         Self {
             status: Some(status),
-            ..Self::default()
-        }
-    }
-
-    pub fn is_liveness_skipped(is_liveness_skipped: bool) -> Self {
-        Self {
-            is_liveness_skipped: Some(is_liveness_skipped),
             ..Self::default()
         }
     }
@@ -77,6 +68,7 @@ impl OnboardingUpdate {
 pub type OnboardingInfo = (
     Onboarding,
     ObConfiguration,
+    Option<LivenessEvent>,
     InsightEvent,
     Option<(OnboardingDecision, Option<TenantUser>)>,
 );
@@ -94,9 +86,13 @@ impl Onboarding {
         conn: &mut PgConnection,
         scoped_user_ids: Vec<&ScopedUserId>,
     ) -> Result<HashMap<ScopedUserId, Vec<OnboardingInfo>>, DbError> {
-        use crate::schema::{insight_event, ob_configuration, onboarding_decision, tenant_user};
+        use crate::schema::{
+            insight_event, liveness_event, ob_configuration, onboarding_decision, tenant_user,
+        };
         let obs: Vec<OnboardingInfo> = onboarding::table
             .inner_join(ob_configuration::table)
+            // TODO return all liveness events
+            .left_join(liveness_event::table)
             .inner_join(insight_event::table)
             // Get the active decision and its tenant_user, if any
             .left_join(
@@ -111,7 +107,7 @@ impl Onboarding {
         // group_by only groups adjacent items, so this requires that the vec is sorted by scoped_user_id
         let result = obs
             .into_iter()
-            .group_by(|(link, _, _, _)| link.scoped_user_id.clone())
+            .group_by(|(link, _, _, _, _)| link.scoped_user_id.clone())
             .into_iter()
             .map(|g| (g.0, g.1.collect()))
             .collect();
@@ -178,7 +174,6 @@ impl Onboarding {
             start_timestamp: Utc::now(),
             insight_event_id: insight_event.id,
             status: OnboardingStatus::New,
-            is_liveness_skipped: false,
             is_authorized: false,
         };
         let ob = diesel::insert_into(onboarding::table)

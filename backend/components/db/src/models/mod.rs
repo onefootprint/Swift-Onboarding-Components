@@ -24,3 +24,4 @@ pub mod user_vault;
 pub mod verification_request;
 pub mod verification_result;
 pub mod webauthn_credential;
+pub mod liveness_event;

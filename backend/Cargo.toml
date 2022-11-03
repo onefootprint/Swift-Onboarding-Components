@@ -17,6 +17,7 @@ members = [
     "components/app_attest",
     "components/twilio",
     "components/api_wire_types",
+    "components/privacy_pass"
 ]
 
 [workspace.dependencies]

@@ -92,10 +92,14 @@ pub enum ApiError {
     MethodNotAllowed,
     #[error("Idv error: {0}")]
     IdvError(#[from] idv::Error),
+    #[error("io error: {0}")]
+    Io(#[from] std::io::Error),
     #[error("{0}")]
     Custom(String),
     #[error("S3 error: {0}")]
     S3Error(#[from] crate::s3::S3Error),
+    #[error("privacy pass token error: {0}")]
+    PrivacyPassError(#[from] privacy_pass::Error),
 }
 
 impl<T> From<WorkOsError<T>> for ApiError
@@ -170,6 +174,7 @@ impl actix_web::ResponseError for ApiError {
             ApiError::TenantError(_) => StatusCode::BAD_REQUEST,
             ApiError::UserError(_) => StatusCode::BAD_REQUEST,
             ApiError::Webauthn(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            ApiError::Io(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::CannotDecodeUtf8(_)
             | ApiError::InvalidJsonBody(_)
             | ApiError::InvalidFormError(_)
@@ -182,6 +187,7 @@ impl actix_web::ResponseError for ApiError {
             ApiError::ResourceNotFound => StatusCode::NOT_FOUND,
             ApiError::MethodNotAllowed => StatusCode::METHOD_NOT_ALLOWED,
             ApiError::IdvError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            ApiError::PrivacyPassError(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::Custom(_) => StatusCode::BAD_REQUEST,
         }
     }

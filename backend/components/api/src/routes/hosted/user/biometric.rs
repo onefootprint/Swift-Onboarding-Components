@@ -14,6 +14,7 @@ use chrono::{Duration, Utc};
 use crypto::sha256;
 use db::models::{
     audit_trail::AuditTrail,
+    liveness_event::NewLivenessEvent,
     user_vault::UserVault,
     webauthn_credential::{NewWebauthnCredential, WebauthnCredential},
 };
@@ -22,6 +23,7 @@ use newtypes::{AttestationType, AuditTrailEvent, BiometricRegisteredInfo};
 use newtypes::{Base64Data, LivenessCheckInfo};
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 use serde::{Deserialize, Serialize};
+use serde_json::json;
 use serde_repr::{Deserialize_repr, Serialize_repr};
 use webauthn_rs_core::{
     proto::{AttestationCaList, AttestationMetadata},
@@ -137,10 +139,68 @@ pub async fn complete_post(
         credential_attestation: cred.attestation.metadata,
     };
 
+    // prepare our liveness attributes
+    let mut liveness_check_info: Option<LivenessCheckInfo> = None;
+    let mut liveness_event_attributes: Option<serde_json::Value> = None;
+
     let attestation_type = match cred.attestation_format {
-        AttestationFormat::AppleAnonymous => AttestationType::Apple,
-        AttestationFormat::AndroidKey => AttestationType::AndroidKey,
-        AttestationFormat::AndroidSafetyNet => AttestationType::AndroidSafetyNet,
+        AttestationFormat::AppleAnonymous => {
+            liveness_check_info = Some(LivenessCheckInfo {
+                attestations: vec!["Footprint".to_owned(), "Apple".to_owned()],
+                device: None,
+                os: None,
+                user_agent: insights.user_agent.clone(),
+                ip_address: insights.ip_address.clone(),
+                location: insights.location(),
+            });
+            liveness_event_attributes = Some(json!(
+                {
+                    "issuer": "Apple",
+                    "insight": insights.clone()
+                }
+            ));
+            AttestationType::Apple
+        }
+        AttestationFormat::AndroidKey => {
+            liveness_check_info = Some(LivenessCheckInfo {
+                attestations: vec!["Footprint".to_owned(), "Google".to_owned()],
+                device: None,
+                os: None,
+                user_agent: insights.user_agent.clone(),
+                ip_address: insights.ip_address.clone(),
+                location: insights.location(),
+            });
+
+            liveness_event_attributes = Some(json!(
+                {
+                    "issuer": "Google",
+                    "insight": insights.clone(),
+                    "metadata": attestation_metadata.credential_attestation.clone()
+                }
+            ));
+
+            AttestationType::AndroidKey
+        }
+        AttestationFormat::AndroidSafetyNet => {
+            liveness_check_info = Some(LivenessCheckInfo {
+                attestations: vec!["Footprint".to_owned(), "Google".to_owned()],
+                device: None,
+                os: None,
+                user_agent: insights.user_agent.clone(),
+                ip_address: insights.ip_address.clone(),
+                location: insights.location(),
+            });
+
+            liveness_event_attributes = Some(json!(
+                {
+                    "issuer": "Google",
+                    "insight": insights.clone(),
+                    "metadata": attestation_metadata.credential_attestation.clone()
+                }
+            ));
+
+            AttestationType::AndroidSafetyNet
+        }
         AttestationFormat::None => {
             // this is our work around for supplementary app-based attestation
             let metadata_json = request
@@ -156,8 +216,39 @@ pub async fn complete_post(
                             tracing::error!(error=?err, "failed to verify app attestation");
                         })
                         .map(|att| {
+                            match &att {
+                                AppAttestationMetadata::Apple { metadata, .. } => {
+                                    let location = if matches!(
+                                        metadata.location_match,
+                                        LocationMatchType::Match | LocationMatchType::Unknown
+                                    ) {
+                                        insights.location()
+                                    } else {
+                                        None
+                                    };
+
+                                    liveness_check_info = Some(LivenessCheckInfo {
+                                        attestations: vec!["Footprint".to_owned(), "Apple".to_owned()],
+                                        device: metadata.model.clone(),
+                                        os: metadata.os.clone(),
+                                        user_agent: insights.user_agent.clone(),
+                                        ip_address: insights.ip_address.clone(),
+                                        location,
+                                    });
+
+                                    liveness_event_attributes = Some(json!(
+                                        {
+                                            "issuer": "Apple",
+                                            "insight": insights.clone(),
+                                            "metadata": att.clone()
+                                        }
+                                    ));
+                                }
+                            };
+
                             // store the metadata
                             attestation_metadata.app_attestation = Some(att);
+
                             // return the verified type
                             AttestationType::AppleApp
                         })
@@ -185,15 +276,39 @@ pub async fn complete_post(
                 return Err(ChallengeError::BiometricCredentialAlreadyExists.into());
             }
 
-            let event = AuditTrailEvent::LivenessCheck(LivenessCheckInfo {
-                // TODO https://linear.app/footprint/issue/FP-477/correctly-extract-device-name-and-attestations-in-biometric-audit
-                attestations: vec!["Footprint".to_owned(), "Apple".to_owned()],
-                device: "Apple iPhone 13".to_owned(),
-                os: Some("iOS 16".to_owned()),
-                ip_address: insights.ip_address.clone(),
-                location: insights.location(),
-            });
-            AuditTrail::create(conn, event, user_auth.user_vault_id(), None, None)?;
+            if let Some(event) = liveness_check_info {
+                AuditTrail::create(
+                    conn,
+                    AuditTrailEvent::LivenessCheck(event),
+                    user_auth.user_vault_id(),
+                    None,
+                    None,
+                )?;
+            }
+
+            // if we're in an onboarding, optimisticaly try to submit a liveness event if the webauthn
+            if let Some(onboarding_id) = user_auth.onboarding_id() {
+                if let Some(attributes) = liveness_event_attributes {
+                    let _ = NewLivenessEvent {
+                        onboarding_id,
+                        liveness_source: newtypes::LivenessSource::WebauthnAttestation,
+                        attributes: Some(attributes),
+                    }
+                    .insert(conn)?;
+                } else {
+                    // TODO: remove this
+                    // RELATED: FP-1802 and FP-1800
+                    // this is only for backwards compatibility in order to
+                    // maintain the mechanics that webauthn -> liveness
+                    // we should update this such that liveness is skipped via API call
+                    let _ = NewLivenessEvent {
+                        onboarding_id,
+                        liveness_source: newtypes::LivenessSource::Skipped,
+                        attributes: None,
+                    }
+                    .insert(conn)?;
+                }
+            }
 
             let insight_event = CreateInsightEvent::from(insights).insert_with_conn(conn)?;
             let new_credential = NewWebauthnCredential {
@@ -224,7 +339,7 @@ pub async fn complete_post(
 
 /// Storable app attestation metadata
 /// TODO: move this struct to newtypes for use later
-#[derive(Debug, Serialize)]
+#[derive(Debug, Clone, Serialize)]
 enum AppAttestationMetadata {
     Apple {
         is_development: bool,
@@ -233,7 +348,7 @@ enum AppAttestationMetadata {
     },
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 struct AppleDeviceMetadata {
     location_match: LocationMatchType,
     model: Option<String>,

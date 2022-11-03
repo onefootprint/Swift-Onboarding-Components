@@ -1,0 +1,1 @@
+ALTER TABLE onboarding ADD COLUMN is_liveness_skipped BOOLEAN NOT NULL default false;

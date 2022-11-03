@@ -6,7 +6,8 @@ use crate::errors::onboarding::OnboardingError;
 use crate::errors::ApiError;
 use crate::types::{EmptyResponse, JsonApiResponse};
 use crate::State;
-use db::models::onboarding::{Onboarding, OnboardingUpdate};
+use db::models::liveness_event::NewLivenessEvent;
+use db::models::onboarding::Onboarding;
 use paperclip::actix::{self, api_v2_operation, web};
 
 #[api_v2_operation(
@@ -29,9 +30,16 @@ pub async fn post(
                 Onboarding::lock_by_config(conn, &user_auth.user_vault_id(), &ob_config.id)?
                     .ok_or(OnboardingError::NoOnboarding)?;
             if onboarding.is_authorized {
-                return Err(ApiError::Custom("Cannot edit completed onobarding".to_owned()));
+                return Err(ApiError::Custom("Cannot edit completed onboarding".to_owned()));
             }
-            onboarding.update(conn, OnboardingUpdate::is_liveness_skipped(true))?;
+
+            let _ = NewLivenessEvent {
+                onboarding_id: onboarding.id,
+                attributes: None,
+                liveness_source: newtypes::LivenessSource::Skipped,
+            }
+            .insert(conn)?;
+
             Ok(())
         })
         .await?;

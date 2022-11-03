@@ -8,6 +8,7 @@ use sha2::{Digest, Sha256};
 use std::str::Utf8Error;
 use thiserror::Error;
 
+pub use base64;
 pub use hex;
 use hmac::Mac;
 
@@ -34,7 +35,7 @@ pub enum Error {
     InvalidUtf8(#[from] Utf8Error),
 
     #[error("ecc error {0}")]
-    Ecc(#[from] elliptic_curve::Error),
+    Ecc(#[from] p256::elliptic_curve::Error),
 
     #[error("Invalid der public key")]
     InvalidDerP256PublicKey,

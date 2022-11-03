@@ -1,3 +1,5 @@
+#![recursion_limit = "256"]
+
 extern crate openssl; // this is needed because https://github.com/clux/muslrust#diesel-and-pq-builds
 
 #[macro_use]
@@ -196,7 +198,7 @@ pub async fn private_cleanup_integration_tests(
         .db_transaction(move |conn| -> Result<usize, DbError> {
             use schema::{
                 access_event, audit_trail, document_request, email, fingerprint, identity_data,
-                identity_document, onboarding, onboarding_decision,
+                identity_document, liveness_event, onboarding, onboarding_decision,
                 onboarding_decision_verification_result_junction, phone_number, requirement, risk_signal,
                 scoped_user, user_timeline, user_vault, verification_request, verification_result,
                 webauthn_credential,
@@ -235,6 +237,10 @@ pub async fn private_cleanup_integration_tests(
                     let ob_ids = onboarding::table
                         .filter(onboarding::scoped_user_id.eq_any(su_ids))
                         .select(onboarding::id);
+
+                    deleted_rows += diesel::delete(liveness_event::table)
+                        .filter(liveness_event::onboarding_id.eq_any(ob_ids))
+                        .execute(conn.conn())?;
 
                     // Onboarding decisions
                     {

@@ -41,7 +41,12 @@ impl SessionAuthToken {
 
     /// computes the "id" for the auth token by taking it's hash
     pub fn id(&self) -> AuthTokenHash {
-        AuthTokenHash::from(crypto::hex::encode(sha256(self.0.as_bytes())))
+        AuthTokenHash::from(crypto::hex::encode(self.hash_bytes()))
+    }
+
+    /// computes the hash of the auth token as bytes
+    pub fn hash_bytes(&self) -> [u8; 32] {
+        sha256(self.0.as_bytes())
     }
 }
 

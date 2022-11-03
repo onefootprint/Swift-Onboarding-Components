@@ -5,8 +5,9 @@ use chrono::{DateTime, Utc};
 use db::models::insight_event::CreateInsightEvent;
 use futures_util::Future;
 use paperclip::actix::Apiv2Schema;
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, Apiv2Schema)]
+#[derive(Debug, Clone, Apiv2Schema, Serialize, Deserialize)]
 pub struct InsightHeaders {
     pub ip_address: Option<String>,
     pub city: Option<String>,

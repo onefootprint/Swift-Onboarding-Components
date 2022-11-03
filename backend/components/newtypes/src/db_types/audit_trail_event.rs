@@ -16,7 +16,8 @@ pub enum AuditTrailEvent {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct LivenessCheckInfo {
     pub attestations: Vec<String>,
-    pub device: String,
+    pub user_agent: Option<String>,
+    pub device: Option<String>,
     pub os: Option<String>,
     pub ip_address: Option<String>,
     pub location: Option<String>,

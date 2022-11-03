@@ -23,6 +23,7 @@ use db::scoped_user::OnboardingListQueryParams;
 use db::HasDataAttributeFields;
 
 use newtypes::FootprintUserId;
+use newtypes::LivenessSource;
 use newtypes::TenantPermission;
 use newtypes::UserVaultId;
 use newtypes::{DataAttribute, Fingerprint, Fingerprinter};
@@ -199,10 +200,9 @@ impl<'a> DbToApi<UserDetail<'a>> for api_wire_types::User {
 }
 
 impl DbToApi<OnboardingInfo> for api_wire_types::Onboarding {
-    fn from_db((onboarding, config, insight, decision): OnboardingInfo) -> Self {
+    fn from_db((onboarding, config, liveness_event, insight, decision): OnboardingInfo) -> Self {
         let Onboarding {
             start_timestamp,
-            is_liveness_skipped,
             status,
             ..
         } = onboarding;
@@ -212,6 +212,7 @@ impl DbToApi<OnboardingInfo> for api_wire_types::Onboarding {
             can_access_identity_document_images,
             ..
         } = config;
+
         let can_access_data_attributes = can_access_data.iter().flat_map(|x| x.attributes()).collect();
         api_wire_types::Onboarding {
             id: onboarding.id,
@@ -219,7 +220,9 @@ impl DbToApi<OnboardingInfo> for api_wire_types::Onboarding {
             config_id: config.id,
             status,
             timestamp: start_timestamp,
-            is_liveness_skipped,
+            is_liveness_skipped: liveness_event
+                .map(|s| matches!(s.liveness_source, LivenessSource::Skipped))
+                .unwrap_or_default(),
             insight_event: api_wire_types::InsightEvent::from_db(insight),
             can_access_data,
             can_access_data_attributes,

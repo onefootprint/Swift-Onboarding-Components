@@ -12,7 +12,6 @@ pub struct Onboarding {
     pub timestamp: DateTime<Utc>,
     pub is_liveness_skipped: bool,
     pub insight_event: InsightEvent,
-
     pub can_access_data: Vec<CollectedDataOption>,
     pub can_access_data_attributes: Vec<DataAttribute>,
     pub can_access_identity_document_images: bool,

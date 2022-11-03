@@ -3,7 +3,7 @@ use crypto::aead::ScopedSealingKey;
 use db::{
     models::{
         document_request::DocumentRequest, identity_document::IdentityDocument,
-        ob_configuration::ObConfiguration, onboarding::Onboarding, webauthn_credential::WebauthnCredential,
+        liveness_event::LivenessEvent, ob_configuration::ObConfiguration, onboarding::Onboarding,
     },
     DbError, PgConnection,
 };
@@ -24,6 +24,7 @@ pub mod authorize;
 pub mod d2p;
 pub mod index;
 pub mod kyc;
+pub mod pat;
 pub mod skip_liveness;
 pub mod status;
 
@@ -34,7 +35,8 @@ pub fn routes(config: &mut web::ServiceConfig) {
         .service(status::get)
         .service(kyc::get)
         .service(kyc::post)
-        .service(skip_liveness::post);
+        .service(skip_liveness::post)
+        .service(pat::get);
     d2p::routes(config);
 }
 
@@ -60,7 +62,6 @@ pub fn get_requirements(
     let uvw = UserVaultWrapper::get(conn, user_vault_id)?;
     let onboarding = Onboarding::get_by_config(conn, user_vault_id, &ob_config.id)?
         .ok_or(OnboardingError::NoOnboarding)?;
-    let creds = WebauthnCredential::get_for_user_vault(conn, user_vault_id)?;
     let missing_attributes = uvw.missing_fields(ob_config);
     // Document requirements are determined by the presence of DocumentRequest database objects.
     // In various places in the codebase, we will determine if a DocumentRequest should be created
@@ -71,10 +72,18 @@ pub fn get_requirements(
         .map(|request| OnboardingRequirement::CollectDocument {
             document_request_id: request.id,
         });
+
+    // TODO: force liveness checks to be re-done and not shared across tenants
+    // RELATED: FP-1802 and FP-1800
+    let liveness_events = LivenessEvent::get_by_user_vault_id(conn, &uvw.user_vault.id)?;
+
     let requirements = vec![
         (onboarding.status == OnboardingStatus::New)
             .then_some(OnboardingRequirement::IdentityCheck { missing_attributes }),
-        (creds.is_empty() && !onboarding.is_liveness_skipped).then_some(OnboardingRequirement::Liveness),
+        // check if we have liveness events
+        liveness_events
+            .is_empty()
+            .then_some(OnboardingRequirement::Liveness),
     ]
     .into_iter()
     .flatten()

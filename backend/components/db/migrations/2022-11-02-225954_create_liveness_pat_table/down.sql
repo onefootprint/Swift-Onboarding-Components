@@ -1,0 +1,1 @@
+DROP TABLE liveness_event;

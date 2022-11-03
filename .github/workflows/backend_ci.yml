@@ -21,7 +21,7 @@ concurrency:
 
 jobs:
   check_test:
-    runs-on: [ beast, linux ]
+    runs-on: beast
 
     services:
       postgres:
@@ -71,7 +71,7 @@ jobs:
 
   integration_tests:
     name: integration + migrations
-    runs-on: [ beast, linux ]
+    runs-on: beast
     environment: dev
     strategy:
       matrix:
@@ -236,7 +236,7 @@ jobs:
 
   clippy:
     name: 'Clippy'
-    runs-on: [ beast, linux ]
+    runs-on: beast
 
     steps:
       - name: install deps

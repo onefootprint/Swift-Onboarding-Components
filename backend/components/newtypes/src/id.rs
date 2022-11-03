@@ -107,6 +107,7 @@ define_newtype_id!(IdentityDocumentId, String, "Identifier for an IdentityDocume
 define_newtype_id!(RequirementId, String, "Identifier for a Requirement");
 define_newtype_id!(OnboardingDecisionId, String, "Identifier for a decision");
 define_newtype_id!(RiskSignalId, String, "Identifier for a risk signal");
+define_newtype_id!(LivenessEventId, String, "Identifier for a liveness event");
 
 impl ObConfigurationKey {
     /// prefixed on LIVE keys

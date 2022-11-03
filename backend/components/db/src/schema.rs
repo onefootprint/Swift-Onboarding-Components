@@ -169,6 +169,21 @@ table! {
     use diesel::sql_types::*;
     use newtypes::db_types::*;
 
+    liveness_event (id) {
+        id -> Text,
+        onboarding_id -> Uuid,
+        liveness_source -> Text,
+        attributes -> Nullable<Jsonb>,
+        created_at -> Timestamptz,
+        _created_at -> Timestamptz,
+        _updated_at -> Timestamptz,
+    }
+}
+
+table! {
+    use diesel::sql_types::*;
+    use newtypes::db_types::*;
+
     ob_configuration (id) {
         id -> Text,
         key -> Text,
@@ -199,7 +214,6 @@ table! {
         _updated_at -> Timestamptz,
         insight_event_id -> Uuid,
         status -> Text,
-        is_liveness_skipped -> Bool,
         is_authorized -> Bool,
     }
 }
@@ -505,6 +519,7 @@ joinable!(identity_document -> document_request (request_id));
 joinable!(identity_document -> onboarding (onboarding_id));
 joinable!(kv_data -> tenant (tenant_id));
 joinable!(kv_data -> user_vault (user_vault_id));
+joinable!(liveness_event -> onboarding (onboarding_id));
 joinable!(ob_configuration -> tenant (tenant_id));
 joinable!(onboarding -> insight_event (insight_event_id));
 joinable!(onboarding -> ob_configuration (ob_configuration_id));
@@ -547,6 +562,7 @@ allow_tables_to_appear_in_same_query!(
     identity_document,
     insight_event,
     kv_data,
+    liveness_event,
     ob_configuration,
     onboarding,
     onboarding_decision,
