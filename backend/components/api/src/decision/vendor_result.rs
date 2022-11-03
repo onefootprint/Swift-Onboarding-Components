@@ -107,16 +107,9 @@ mod tests {
             vendor_api: VendorAPI::TwilioLookupV2,
         };
 
-        // Important Note!
-        //  This needs to be run inside a db transaction in order to avoid violating
-        //  foreign key constraints. You'll note we clean up before we commit
-        //
-        // Our PG tables have DEFERRABLE INITIAL DEFERRED constraints which makes it so we don't check constraints until the end of
-        // the transaction
-
-        // TODO: factor this out into it's own helper on DbPool
+        // See the note on db_test_transaction for the explanation why we use this.
         db_pool
-            .db_transaction(move |conn| -> Result<(), ApiError> {
+            .db_test_transaction(move |conn| -> Result<(), ApiError> {
                 // create VerificationRequests
                 let ob1_requests =
                     VerificationRequest::bulk_save(conn.conn(), vec![request1_ob1, request2_ob1])?;
@@ -152,8 +145,7 @@ mod tests {
                 assert_eq!(ob1_result.id, ob1_vendor_result[0].verification_result_id);
                 assert_eq!(ob2_result.id, ob2_vendor_result[0].verification_result_id);
 
-                // Induce an error, rolling back the transaction and avoiding any of our FK constraint violations from getting checked
-                Err(ApiError::Database(db::errors::DbError::TransactionRollbackTest))
+                Ok(())
             })
             .await
             .ok();

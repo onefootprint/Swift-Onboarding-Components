@@ -77,6 +77,29 @@ impl DbPool {
             TransactionError::DbError(e) => E::from(DbError::from(e)),
         })
     }
+
+    // In tests, we'd like to do DB read/writes without having constraints checked. Rolling back automatically helps us to do this.
+    // Additionally, using this makes it so unit test DB writes are rolled back and don't leave straggler data behind in the local DB!
+    //
+    // For example: our PG tables have DEFERRABLE INITIAL DEFERRED foreign key constraints which makes it so we don't check constraints until the end of
+    //   the transaction and you can avoid making tons of dependencies. Grep for this fn name to see examples!
+    pub async fn db_test_transaction<F, R, E>(&self, f: F) -> Result<R, E>
+    where
+        F: FnOnce(&mut TxnPgConnection) -> Result<R, E> + Send + 'static,
+        E: From<DbError> + Send + 'static,
+        R: Send + 'static,
+    {
+        self.db_transaction(|conn: &mut TxnPgConnection| -> Result<_, E> {
+            // Return errors as-is, but catch Ok(_) cases and coerce to an error.
+            match f(conn) {
+                Ok(_) => Err(E::from(crate::errors::DbError::DbError(
+                    diesel::result::Error::RollbackTransaction,
+                ))),
+                Err(e) => Err(e),
+            }
+        })
+        .await?
+    }
 }
 
 /// max age of a recycled connection in seconds (10min)
