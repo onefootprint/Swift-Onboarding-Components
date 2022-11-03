@@ -21,6 +21,8 @@ const useDecryptUser = () => {
     } = {},
   ) => {
     const { userId, kyc, reason } = payload;
+    // TODO: Decrypt ID Doc Images here
+    // https://linear.app/footprint/issue/FP-1791/make-api-call-to-decrypt-id-doc-images-in-dashboard
     userVaultDecryptMutation.mutate(
       {
         footprintUserId: userId,
@@ -29,7 +31,9 @@ const useDecryptUser = () => {
       },
       {
         onSuccess: (data: DecryptUserResponse) => {
-          updateUserVault(userId, { kycData: data });
+          updateUserVault(userId, {
+            kycData: data,
+          });
           options.onSuccess?.(data);
         },
         onError: options.onError,

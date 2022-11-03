@@ -1,20 +1,37 @@
 import { UserDataAttribute } from '@onefootprint/types';
+import {
+  IdDocDataAttribute,
+  UserVaultData,
+} from 'src/pages/users/types/vault-data.types';
 
-const getSectionsVisibility = (
-  identityDataAttributes: UserDataAttribute[],
-) => ({
-  basic: true,
-  identity:
-    identityDataAttributes.includes(UserDataAttribute.ssn4) ||
-    identityDataAttributes.includes(UserDataAttribute.ssn9) ||
-    identityDataAttributes.includes(UserDataAttribute.dob),
-  address:
-    identityDataAttributes.includes(UserDataAttribute.addressLine1) ||
-    identityDataAttributes.includes(UserDataAttribute.addressLine2) ||
-    identityDataAttributes.includes(UserDataAttribute.city) ||
-    identityDataAttributes.includes(UserDataAttribute.state) ||
-    identityDataAttributes.includes(UserDataAttribute.country) ||
-    identityDataAttributes.includes(UserDataAttribute.zip),
-});
+const getSectionsVisibility = (vaultData: UserVaultData) => {
+  const { kycData, idDoc } = vaultData;
+  const hasSsn4 = kycData[UserDataAttribute.ssn4] !== undefined;
+  const hasSsn9 = kycData[UserDataAttribute.ssn9] !== undefined;
+  const hasDob = kycData[UserDataAttribute.dob] !== undefined;
+  const hasAddressLine1 = kycData[UserDataAttribute.addressLine1] !== undefined;
+  const hasAddressLine2 = kycData[UserDataAttribute.addressLine2] !== undefined;
+  const hasCity = kycData[UserDataAttribute.city] !== undefined;
+  const hasState = kycData[UserDataAttribute.state] !== undefined;
+  const hasCountry = kycData[UserDataAttribute.country] !== undefined;
+  const hasZip = kycData[UserDataAttribute.zip] !== undefined;
+  const hasIdDocImages =
+    !!idDoc &&
+    (idDoc[IdDocDataAttribute.frontImage] !== undefined ||
+      idDoc[IdDocDataAttribute.backImage] !== undefined);
+
+  return {
+    basicSection: true,
+    identitySection: hasSsn4 || hasSsn9 || hasDob,
+    addressSection:
+      hasAddressLine1 ||
+      hasAddressLine2 ||
+      hasCity ||
+      hasState ||
+      hasCountry ||
+      hasZip,
+    idDocSection: hasIdDocImages,
+  };
+};
 
 export default getSectionsVisibility;
