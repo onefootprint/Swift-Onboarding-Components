@@ -19,6 +19,9 @@ jobs:
       - run: echo "Not required"
 
   integration_migration_tests:
+    strategy:
+      matrix:
+        python-version: ['3.9']
     steps:
       - run: echo "Not required"
 
