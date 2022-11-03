@@ -1,7 +1,7 @@
 pub fn test_idology_expectid_response() -> serde_json::Value {
     serde_json::json!({
         "response": {
-          "id-number": "3010453",
+          "id-number": 3010453,
           "summary-result": {
             "key": "id.success",
             "message": "Pass"

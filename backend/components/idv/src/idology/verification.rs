@@ -7,7 +7,7 @@ pub fn parse_response(value: serde_json::Value) -> Result<IDologyResponse, super
     Ok(response)
 }
 
-pub type IdNumber = String;
+pub type IdNumber = i32;
 
 #[derive(Debug, Clone, serde::Deserialize)]
 pub struct IDologyResponse {
@@ -116,7 +116,7 @@ mod tests {
     fn test_idology_response_single() {
         let response = json!({
             "response": {
-              "id-number": "3010453",
+              "id-number": 3010453,
               "summary-result": {
                 "key": "id.success",
                 "message": "Pass"
@@ -174,7 +174,7 @@ mod tests {
     fn test_idology_response_no_data() {
         let response = json!({
             "response": {
-                "id-number": "2972309",
+                "id-number": 2972309,
             }
         });
         let response = parse_response(response).expect("Could not parse response");

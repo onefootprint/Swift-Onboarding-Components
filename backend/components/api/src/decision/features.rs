@@ -12,7 +12,7 @@ pub struct IDologyFeatures {
     pub status: OnboardingStatus,
     pub signals: Vec<Signal>,
     pub id_located: bool,
-    pub id_number_for_scan_required: Option<String>,
+    pub id_number_for_scan_required: Option<i32>,
     pub is_id_scan_required: bool,
     pub verification_result: VerificationResultId,
 }
@@ -89,7 +89,7 @@ impl From<VendorResult> for FeatureVector {
                     status: r.status(),
                     id_located: r.id_located(),
                     is_id_scan_required: r.is_id_scan_required(),
-                    id_number_for_scan_required: r.id_number.clone(),
+                    id_number_for_scan_required: r.id_number,
                     signals: IDologyFeatures::signals_from_response_qualifiers(r),
                     verification_result: verification_result_id,
                 };
@@ -187,7 +187,7 @@ mod tests {
             status: OnboardingStatus::Verified,
             id_located: true,
             is_id_scan_required: false,
-            id_number_for_scan_required: Some("3010453".to_string()),
+            id_number_for_scan_required: Some(3010453),
             signals: vec![
                 Signal {
                     kind: OldSignalSeverity::NotFound,
@@ -227,7 +227,7 @@ mod tests {
 
     fn create_idology_vendor_result(summary_result_key: &str) -> Result<VendorResult, IdologyError> {
         let raw = json!({"response": {
-          "id-number": "3010453",
+          "id-number": 3010453,
           "summary-result": {
             "key": summary_result_key,
             "message": "Not used in tests yet"

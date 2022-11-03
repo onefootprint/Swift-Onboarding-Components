@@ -12,7 +12,8 @@ pub async fn send_idv_request(
     tracing::info!(
         msg = "Sending verification request",
         request_id = request.id.clone().to_string(),
-        vendor_api = request.vendor_api.clone().to_string()
+        vendor_api = request.vendor_api.clone().to_string(),
+        onboarding_id = request.onboarding_id.to_string(),
     );
     // Make the request to the IDV vendor
     let result = match request.vendor {

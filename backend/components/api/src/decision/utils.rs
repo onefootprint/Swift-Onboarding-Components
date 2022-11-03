@@ -71,7 +71,7 @@ pub(super) fn create_test_fixture_data(
         .ok_or(ApiError::ResourceNotFound)?;
     let raw_response = serde_json::json!({
         "response": {
-            "id-number": "3010453",
+            "id-number": 3010453,
             "summary-result": {
                 "key": "id.success",
                 "message": "Pass"
@@ -168,5 +168,3 @@ pub(super) fn create_test_fixture_data(
     })?;
     Ok(())
 }
-
-

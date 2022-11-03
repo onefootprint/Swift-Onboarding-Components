@@ -83,7 +83,7 @@ pub struct DecisionOutput {
     pub verification_status: VerificationStatus,
     pub compliance_status: ComplianceStatus,
     pub onboarding_status: OnboardingStatus,
-    pub id_number: Option<String>,
+    pub id_number: Option<i32>,
     pub onboarding_id: OnboardingId,
 }
 fn final_decision(features: &FeatureVector, current_onboarding: Onboarding) -> DecisionOutput {
