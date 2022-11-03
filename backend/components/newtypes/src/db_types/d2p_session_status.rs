@@ -1,7 +1,8 @@
 use paperclip::actix::Apiv2Schema;
 use serde::{Deserialize, Serialize};
+use strum_macros::Display;
 
-#[derive(Debug, Eq, PartialEq, Clone, Copy, Deserialize, Serialize, Apiv2Schema)]
+#[derive(Debug, Display, Eq, PartialEq, Clone, Copy, Deserialize, Serialize, Apiv2Schema)]
 #[serde(rename_all = "snake_case")]
 pub enum D2pSessionStatus {
     Waiting,

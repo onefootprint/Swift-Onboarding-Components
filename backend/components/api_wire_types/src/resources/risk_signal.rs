@@ -13,5 +13,19 @@ pub struct RiskSignal {
     pub timestamp: chrono::DateTime<Utc>,
     pub deactivated_at: Option<chrono::DateTime<Utc>>,
     pub vendors: Vec<Vendor>,
+    #[serde(skip_serializing_if = "is_null")]
+    pub raw_responses: Option<Vec<RiskSignalRawResponse>>,
 }
+
+fn is_null<T>(value: &Option<T>) -> bool {
+    value.is_none()
+}
+
 export_schema!(RiskSignal);
+
+#[derive(Debug, Clone, Deserialize, Serialize, Apiv2Schema, JsonSchema)]
+#[schemars(rename_all = "camelCase")]
+pub struct RiskSignalRawResponse {
+    pub vendor: Vendor,
+    pub response: serde_json::Value,
+}

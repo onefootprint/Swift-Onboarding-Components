@@ -1,3 +1,4 @@
+use crate::models::verification_request::VerificationRequest;
 use crate::schema::risk_signal;
 use crate::DbResult;
 use chrono::{DateTime, Utc};
@@ -5,6 +6,8 @@ use diesel::prelude::*;
 use diesel::{Insertable, PgConnection, Queryable};
 use newtypes::{FootprintReasonCode, FootprintUserId, OnboardingDecisionId, RiskSignalId, TenantId, Vendor};
 use serde::{Deserialize, Serialize};
+
+use super::verification_result::VerificationResult;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable)]
 #[diesel(table_name = risk_signal)]
@@ -87,10 +90,26 @@ impl RiskSignal {
         footprint_user_id: &FootprintUserId,
         tenant_id: &TenantId,
         is_live: bool,
-    ) -> DbResult<Self> {
-        let result = Self::query(footprint_user_id, tenant_id, is_live)
+    ) -> DbResult<(Self, Vec<(VerificationRequest, VerificationResult)>)> {
+        use crate::schema::{
+            onboarding_decision_verification_result_junction, verification_request, verification_result,
+        };
+        let signal = Self::query(footprint_user_id, tenant_id, is_live)
             .filter(risk_signal::id.eq(id))
             .get_result::<Self>(conn)?;
-        Ok(result)
+
+        // Fetch related verification results. We look at the VerificationResults tied to the same decision
+        let vr_ids = onboarding_decision_verification_result_junction::table
+            .filter(
+                onboarding_decision_verification_result_junction::onboarding_decision_id
+                    .eq(&signal.onboarding_decision_id),
+            )
+            .select(onboarding_decision_verification_result_junction::verification_result_id);
+        let vrs = verification_request::table
+            .inner_join(verification_result::table)
+            .filter(verification_result::id.eq_any(vr_ids))
+            .filter(verification_request::vendor.eq_any(&signal.vendors))
+            .get_results(conn)?;
+        Ok((signal, vrs))
     }
 }

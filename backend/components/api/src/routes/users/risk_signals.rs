@@ -11,6 +11,8 @@ use crate::State;
 
 use api_wire_types::RiskSignalFilters;
 use db::models::risk_signal::RiskSignal;
+use db::models::verification_request::VerificationRequest;
+use db::models::verification_result::VerificationResult;
 use itertools::Itertools;
 use newtypes::FootprintUserId;
 use newtypes::RiskSignalId;
@@ -46,7 +48,7 @@ pub async fn get(
     let signals = filter_and_sort(signals, filters.into_inner());
     let signals = signals
         .into_iter()
-        .map(<api_wire_types::RiskSignal as DbToApi<RiskSignal>>::from_db)
+        .map(api_wire_types::RiskSignal::from_db)
         .collect();
 
     ResponseData::ok(signals).json()
@@ -97,17 +99,25 @@ pub async fn get_detail(
     let is_live = auth.is_live()?;
     let (footprint_user_id, risk_signal_id) = request.into_inner();
 
-    let signal = state
+    let (signal, verification_results) = state
         .db_pool
         .db_query(move |conn| RiskSignal::get(conn, &risk_signal_id, &footprint_user_id, &tenant_id, is_live))
         .await??;
-    let signal = <api_wire_types::RiskSignal as DbToApi<RiskSignal>>::from_db(signal);
+    let signal = api_wire_types::RiskSignal::from_db((signal, Some(verification_results)));
 
     ResponseData::ok(signal).json()
 }
 
 impl DbToApi<RiskSignal> for api_wire_types::RiskSignal {
     fn from_db(target: RiskSignal) -> Self {
+        api_wire_types::RiskSignal::from_db((target, None))
+    }
+}
+
+impl DbToApi<(RiskSignal, Option<Vec<(VerificationRequest, VerificationResult)>>)>
+    for api_wire_types::RiskSignal
+{
+    fn from_db(target: (RiskSignal, Option<Vec<(VerificationRequest, VerificationResult)>>)) -> Self {
         let RiskSignal {
             id,
             onboarding_decision_id,
@@ -116,18 +126,33 @@ impl DbToApi<RiskSignal> for api_wire_types::RiskSignal {
             deactivated_at,
             vendors,
             ..
-        } = target;
+        } = target.0;
+        let raw_responses = target.1.map(|results| {
+            results
+                .into_iter()
+                .map(api_wire_types::RiskSignalRawResponse::from_db)
+                .collect()
+        });
+
         Self {
             id,
             onboarding_decision_id,
             reason_code,
             description: reason_code.description(),
-            // TODO better serialization of severity
             severity: reason_code.severity(),
             scopes: reason_code.scopes(),
             timestamp: created_at,
             deactivated_at,
             vendors,
+            raw_responses,
         }
+    }
+}
+
+impl DbToApi<(VerificationRequest, VerificationResult)> for api_wire_types::RiskSignalRawResponse {
+    fn from_db(target: (VerificationRequest, VerificationResult)) -> Self {
+        let VerificationRequest { vendor, .. } = target.0;
+        let VerificationResult { response, .. } = target.1;
+        Self { vendor, response }
     }
 }
