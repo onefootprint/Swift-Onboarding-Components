@@ -1,0 +1,27 @@
+name: Backend CI (skip)
+
+on:
+  push:
+    branches:
+      - master
+
+    paths-ignore:
+      - 'backend/**'
+
+  pull_request:
+    paths-ignore:
+      - 'backend/**'
+      - '.github/workflows/*.yml'
+
+jobs:
+  check_test:
+    steps:
+      - run: echo "Not required"
+
+  integration_tests:
+    steps:
+      - run: echo "Not required"
+
+  clippy:
+    steps:
+      - run: echo "Not required"
