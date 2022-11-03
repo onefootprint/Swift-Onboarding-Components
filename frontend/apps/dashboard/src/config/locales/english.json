@@ -440,7 +440,7 @@
           "feedback": {
             "success": {
               "title": "Success",
-              "description": "Onboarding key created successfully."
+              "description": "Onboarding config created successfully."
             }
           }
         },
