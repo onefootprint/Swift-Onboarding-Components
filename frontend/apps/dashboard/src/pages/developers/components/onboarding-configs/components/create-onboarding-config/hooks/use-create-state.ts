@@ -35,6 +35,8 @@ const initialState = {
     kycData: {
       [CollectedDataOption.email]: true,
       [CollectedDataOption.phoneNumber]: true,
+      [CollectedDataOption.name]: true,
+      [CollectedDataOption.fullAddress]: true,
     },
     idDoc: {},
   },

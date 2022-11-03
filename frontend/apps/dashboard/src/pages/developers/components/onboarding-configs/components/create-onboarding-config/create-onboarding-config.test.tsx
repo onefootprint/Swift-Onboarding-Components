@@ -163,8 +163,8 @@ describe('<CreateDialog />', () => {
         checked: true,
       });
 
-      // Phone number + Email + Full name
-      expect(allCheckboxes.length).toEqual(3);
+      // Phone number + Email + Full name + Address
+      expect(allCheckboxes.length).toEqual(4);
     });
 
     describe('when selecting the ssn', () => {

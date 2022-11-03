@@ -67,14 +67,13 @@ const CollectForm = ({ defaultValues, onSubmit }: CollectFormProps) => {
   const handleBeforeSubmit = (formData: FormData) => {
     const submittedData = {
       kycData: {
+        [CollectedDataOption.email]: true,
+        [CollectedDataOption.phoneNumber]: true,
+        [CollectedDataOption.name]: true,
+        [CollectedDataOption.fullAddress]: true,
         [CollectedDataOption.dob]: formData[CollectedDataOption.dob],
-        [CollectedDataOption.email]: formData[CollectedDataOption.email],
-        [CollectedDataOption.phoneNumber]:
-          formData[CollectedDataOption.phoneNumber],
-        [CollectedDataOption.name]: formData[CollectedDataOption.name],
         [UserDataAttribute.ssn4]: formData.ssnKind === UserDataAttribute.ssn4,
         [UserDataAttribute.ssn9]: formData.ssnKind === UserDataAttribute.ssn9,
-        [CollectedDataOption.fullAddress]: true,
       },
       idDoc: {
         idDocRequired: formData.idDocRequired,
