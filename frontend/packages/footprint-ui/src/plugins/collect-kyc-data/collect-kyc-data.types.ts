@@ -1,9 +1,9 @@
-import { CollectedDataOption } from '@onefootprint/types';
+import { CollectedKycDataOption } from '@onefootprint/types';
 
 import { BasePluginProps } from '../base-plugin';
 
 export type CollectKycDataContext = {
-  missingAttributes: CollectedDataOption[];
+  missingAttributes: CollectedKycDataOption[];
   userFound: boolean;
 };
 

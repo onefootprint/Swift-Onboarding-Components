@@ -1,4 +1,4 @@
-import { CollectedDataOption, UserDataAttribute } from '@onefootprint/types';
+import { CollectedKycDataOption, UserDataAttribute } from '@onefootprint/types';
 
 import { States } from '../state-machine/types';
 import {
@@ -18,16 +18,16 @@ describe('MissingAttributesUtils', () => {
 
     it('should return false if the user has the missing basic attributes', () => {
       expect(
-        isMissingBasicAttribute([CollectedDataOption.partialAddress]),
+        isMissingBasicAttribute([CollectedKycDataOption.partialAddress]),
       ).toEqual(false);
       expect(
-        isMissingBasicAttribute([CollectedDataOption.partialAddress], {
+        isMissingBasicAttribute([CollectedKycDataOption.partialAddress], {
           [UserDataAttribute.city]: 'Enclave',
         }),
       ).toEqual(false);
       expect(
         isMissingBasicAttribute(
-          [CollectedDataOption.name, CollectedDataOption.partialAddress],
+          [CollectedKycDataOption.name, CollectedKycDataOption.partialAddress],
           {
             [UserDataAttribute.firstName]: 'Belce',
             [UserDataAttribute.lastName]: 'Dogru',
@@ -39,7 +39,7 @@ describe('MissingAttributesUtils', () => {
     it('should return true if the user is missing any of the basic attributes', () => {
       expect(
         isMissingResidentialAttribute(
-          [CollectedDataOption.name, CollectedDataOption.partialAddress],
+          [CollectedKycDataOption.name, CollectedKycDataOption.partialAddress],
           {
             [UserDataAttribute.firstName]: undefined,
           },
@@ -47,7 +47,7 @@ describe('MissingAttributesUtils', () => {
       ).toEqual(true);
       expect(
         isMissingResidentialAttribute(
-          [CollectedDataOption.name, CollectedDataOption.partialAddress],
+          [CollectedKycDataOption.name, CollectedKycDataOption.partialAddress],
           {
             [UserDataAttribute.firstName]: 'Belce',
           },
@@ -55,7 +55,7 @@ describe('MissingAttributesUtils', () => {
       ).toEqual(true);
       expect(
         isMissingBasicAttribute(
-          [CollectedDataOption.name, CollectedDataOption.partialAddress],
+          [CollectedKycDataOption.name, CollectedKycDataOption.partialAddress],
           {},
         ),
       ).toEqual(true);
@@ -71,21 +71,21 @@ describe('MissingAttributesUtils', () => {
       expect(
         isMissingResidentialAttribute(
           [
-            CollectedDataOption.name,
-            CollectedDataOption.dob,
-            CollectedDataOption.ssn4,
+            CollectedKycDataOption.name,
+            CollectedKycDataOption.dob,
+            CollectedKycDataOption.ssn4,
           ],
           {},
         ),
       ).toEqual(false);
       expect(
-        isMissingResidentialAttribute([CollectedDataOption.partialAddress], {
+        isMissingResidentialAttribute([CollectedKycDataOption.partialAddress], {
           [UserDataAttribute.zip]: '94117',
           [UserDataAttribute.country]: 'US',
         }),
       ).toEqual(false);
       expect(
-        isMissingResidentialAttribute([CollectedDataOption.fullAddress], {
+        isMissingResidentialAttribute([CollectedKycDataOption.fullAddress], {
           [UserDataAttribute.addressLine1]: '94117',
           [UserDataAttribute.addressLine2]: undefined,
           [UserDataAttribute.city]: 'Enclave',
@@ -98,23 +98,26 @@ describe('MissingAttributesUtils', () => {
 
     it('should return true if the user is missing any of the residential attributes', () => {
       expect(
-        isMissingResidentialAttribute([CollectedDataOption.partialAddress], {}),
+        isMissingResidentialAttribute(
+          [CollectedKycDataOption.partialAddress],
+          {},
+        ),
       ).toEqual(true);
       expect(
-        isMissingResidentialAttribute([CollectedDataOption.fullAddress], {
+        isMissingResidentialAttribute([CollectedKycDataOption.fullAddress], {
           [UserDataAttribute.zip]: '94107',
           [UserDataAttribute.country]: 'US',
         }),
       ).toEqual(true);
       expect(
-        isMissingResidentialAttribute([CollectedDataOption.partialAddress], {
+        isMissingResidentialAttribute([CollectedKycDataOption.partialAddress], {
           [UserDataAttribute.zip]: '94117',
           [UserDataAttribute.country]: undefined,
         }),
       ).toEqual(true);
       expect(
         isMissingResidentialAttribute(
-          [CollectedDataOption.dob, CollectedDataOption.partialAddress],
+          [CollectedKycDataOption.dob, CollectedKycDataOption.partialAddress],
           {
             [UserDataAttribute.zip]: '94117',
             [UserDataAttribute.country]: undefined,
@@ -127,14 +130,14 @@ describe('MissingAttributesUtils', () => {
   describe('isMissingSsnAttribute', () => {
     it('should return false if missing attributes array is empty', () => {
       expect(isMissingSsnAttribute([], {})).toEqual(false);
-      expect(isMissingSsnAttribute([CollectedDataOption.dob], {})).toEqual(
+      expect(isMissingSsnAttribute([CollectedKycDataOption.dob], {})).toEqual(
         false,
       );
     });
 
     it('should return false if the user has SSN', () => {
       expect(
-        isMissingSsnAttribute([CollectedDataOption.ssn9], {
+        isMissingSsnAttribute([CollectedKycDataOption.ssn9], {
           [UserDataAttribute.ssn9]: '000000',
         }),
       ).toEqual(false);
@@ -142,26 +145,26 @@ describe('MissingAttributesUtils', () => {
 
     it('should return false if the user has last 4 digits of SSN', () => {
       expect(
-        isMissingSsnAttribute([CollectedDataOption.ssn4], {
+        isMissingSsnAttribute([CollectedKycDataOption.ssn4], {
           [UserDataAttribute.ssn4]: '000000',
         }),
       ).toEqual(false);
     });
 
     it('should return true if the user does not have the SSN', () => {
-      expect(isMissingSsnAttribute([CollectedDataOption.ssn9], {})).toEqual(
+      expect(isMissingSsnAttribute([CollectedKycDataOption.ssn9], {})).toEqual(
         true,
       );
-      expect(isMissingSsnAttribute([CollectedDataOption.ssn4], {})).toEqual(
+      expect(isMissingSsnAttribute([CollectedKycDataOption.ssn4], {})).toEqual(
         true,
       );
       expect(
-        isMissingSsnAttribute([CollectedDataOption.ssn4], {
+        isMissingSsnAttribute([CollectedKycDataOption.ssn4], {
           [UserDataAttribute.ssn9]: '0000000',
         }),
       ).toEqual(true);
       expect(
-        isMissingSsnAttribute([CollectedDataOption.ssn9], {
+        isMissingSsnAttribute([CollectedKycDataOption.ssn9], {
           [UserDataAttribute.ssn4]: '0000',
         }),
       ).toEqual(true);
@@ -176,7 +179,7 @@ describe('MissingAttributesUtils', () => {
     it('should return false if the user has all the missing attributes', () => {
       expect(
         hasMissingAttributes(
-          [CollectedDataOption.name, CollectedDataOption.ssn4],
+          [CollectedKycDataOption.name, CollectedKycDataOption.ssn4],
           {
             [UserDataAttribute.firstName]: 'Belce',
             [UserDataAttribute.lastName]: 'Dogru',
@@ -190,9 +193,9 @@ describe('MissingAttributesUtils', () => {
       expect(
         hasMissingAttributes(
           [
-            CollectedDataOption.name,
-            CollectedDataOption.ssn4,
-            CollectedDataOption.fullAddress,
+            CollectedKycDataOption.name,
+            CollectedKycDataOption.ssn4,
+            CollectedKycDataOption.fullAddress,
           ],
           {
             [UserDataAttribute.firstName]: 'Belce',
@@ -211,35 +214,35 @@ describe('MissingAttributesUtils', () => {
 
     it('returns correct max step', () => {
       expect(
-        getMaxStepFromMissingAttributes([CollectedDataOption.name]),
+        getMaxStepFromMissingAttributes([CollectedKycDataOption.name]),
       ).toEqual(1);
 
       expect(
         getMaxStepFromMissingAttributes([
-          CollectedDataOption.name,
-          CollectedDataOption.dob,
+          CollectedKycDataOption.name,
+          CollectedKycDataOption.dob,
         ]),
       ).toEqual(1);
 
       expect(
         getMaxStepFromMissingAttributes([
-          CollectedDataOption.name,
-          CollectedDataOption.ssn9,
+          CollectedKycDataOption.name,
+          CollectedKycDataOption.ssn9,
         ]),
       ).toEqual(2);
 
       expect(
         getMaxStepFromMissingAttributes([
-          CollectedDataOption.name,
-          CollectedDataOption.partialAddress,
+          CollectedKycDataOption.name,
+          CollectedKycDataOption.partialAddress,
         ]),
       ).toEqual(2);
 
       expect(
         getMaxStepFromMissingAttributes([
-          CollectedDataOption.name,
-          CollectedDataOption.fullAddress,
-          CollectedDataOption.ssn9,
+          CollectedKycDataOption.name,
+          CollectedKycDataOption.fullAddress,
+          CollectedKycDataOption.ssn9,
         ]),
       ).toEqual(3);
     });
@@ -255,7 +258,7 @@ describe('MissingAttributesUtils', () => {
     it('returns 1 if showing the page with only missing attribute', () => {
       expect(
         getCurrentStepFromMissingAttributes(
-          [CollectedDataOption.partialAddress],
+          [CollectedKycDataOption.partialAddress],
           States.residentialAddress,
         ),
       ).toEqual(1);
@@ -264,14 +267,14 @@ describe('MissingAttributesUtils', () => {
     it('calculates correctly with multiple missing attributes and pages', () => {
       expect(
         getCurrentStepFromMissingAttributes(
-          [CollectedDataOption.name, CollectedDataOption.fullAddress],
+          [CollectedKycDataOption.name, CollectedKycDataOption.fullAddress],
           States.basicInformation,
         ),
       ).toEqual(1);
 
       expect(
         getCurrentStepFromMissingAttributes(
-          [CollectedDataOption.dob, CollectedDataOption.fullAddress],
+          [CollectedKycDataOption.dob, CollectedKycDataOption.fullAddress],
           States.residentialAddress,
         ),
       ).toEqual(2);

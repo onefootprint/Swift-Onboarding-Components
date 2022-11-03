@@ -1,4 +1,4 @@
-import { CollectedDataOption } from './collected-data-option';
+import { CollectedKycDataOption } from './collected-kyc-data-option';
 import { InsightEvent } from './insight-event';
 import { OnboardingDecision } from './onboarding-decision';
 import OnboardingStatus from './onboarding-status';
@@ -13,7 +13,7 @@ export type Onboarding = {
   isLivenessSkipped: boolean;
   insightEvent: InsightEvent;
 
-  canAccessData: CollectedDataOption[];
+  canAccessData: CollectedKycDataOption[];
   canAccessDataAttributes: UserDataAttribute[];
   canAccessIdentityDocumentImages: boolean;
 

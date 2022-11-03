@@ -1,4 +1,4 @@
-import { CollectedDataOption } from '@onefootprint/types';
+import { CollectedKycDataOption } from '@onefootprint/types';
 import { useReducer } from 'react';
 
 import type {
@@ -33,10 +33,10 @@ const initialState: State = {
   data: {
     name: '',
     kycData: {
-      [CollectedDataOption.email]: true,
-      [CollectedDataOption.phoneNumber]: true,
-      [CollectedDataOption.fullAddress]: true,
-      [CollectedDataOption.name]: true,
+      [CollectedKycDataOption.email]: true,
+      [CollectedKycDataOption.phoneNumber]: true,
+      [CollectedKycDataOption.fullAddress]: true,
+      [CollectedKycDataOption.name]: true,
     },
     idDoc: {
       idDoc: false,

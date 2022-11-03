@@ -1,6 +1,6 @@
 import { DeviceInfo, useDeviceInfo } from '@onefootprint/hooks';
 import {
-  CollectedDataOptionLabels,
+  CollectedKycDataOptionLabels,
   D2PStatusUpdate,
   GetOnboardingConfigResponse,
   TenantInfo,
@@ -61,10 +61,10 @@ const Init = () => {
         name,
         isLive,
         mustCollectData: mustCollectData.map(
-          (attr: string) => CollectedDataOptionLabels[attr],
+          (attr: string) => CollectedKycDataOptionLabels[attr],
         ),
         canAccessData: canAccessData.map(
-          (attr: string) => CollectedDataOptionLabels[attr],
+          (attr: string) => CollectedKycDataOptionLabels[attr],
         ),
       };
 

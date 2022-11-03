@@ -7,7 +7,7 @@ export * from './biometric-login-challenge-json';
 export * from './biometric-register-challenge-json';
 export * from './challenge-data';
 export { default as ChallengeKind } from './challenge-kind';
-export * from './collected-data-option';
+export * from './collected-kyc-data-option';
 export * from './countries';
 export { default as D2PStatus } from './d2p-status';
 export { default as D2PStatusUpdate } from './d2p-status-update';

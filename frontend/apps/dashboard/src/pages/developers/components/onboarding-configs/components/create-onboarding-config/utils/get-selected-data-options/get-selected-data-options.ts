@@ -1,10 +1,10 @@
-import { CollectedDataOption } from '@onefootprint/types';
+import { CollectedKycDataOption } from '@onefootprint/types';
 
 export const getSelectedDataOptionsList = (
   formData: Record<string, boolean | string | number> = {},
 ) => {
-  const dataOptionsToShow: CollectedDataOption[] = [];
-  Object.entries({ ...CollectedDataOption }).forEach(([, inputName]) => {
+  const dataOptionsToShow: CollectedKycDataOption[] = [];
+  Object.entries({ ...CollectedKycDataOption }).forEach(([, inputName]) => {
     if (formData[inputName]) {
       dataOptionsToShow.push(inputName);
     }

@@ -61,21 +61,21 @@ const BasicSection = ({ user }: BasicSectionProps) => {
         <Checkbox
           {...register(`kycData.${UserDataAttribute.firstName}`)}
           disabled={fieldsState[UserDataAttribute.firstName].disabled}
-          label={allT('collected-data-options.name')}
+          label={allT('collected-kyc-data-options.name')}
         />
       )}
       {fieldsState[UserDataAttribute.email].visible && (
         <Checkbox
           {...register(`kycData.${UserDataAttribute.email}`)}
           disabled={fieldsState[UserDataAttribute.email].disabled}
-          label={allT('collected-data-options.email')}
+          label={allT('collected-kyc-data-options.email')}
         />
       )}
       {fieldsState[UserDataAttribute.phoneNumber].visible && (
         <Checkbox
           {...register(`kycData.${UserDataAttribute.phoneNumber}`)}
           disabled={fieldsState[UserDataAttribute.phoneNumber].disabled}
-          label={allT('collected-data-options.phone_number')}
+          label={allT('collected-kyc-data-options.phone_number')}
         />
       )}
     </DataContainer>

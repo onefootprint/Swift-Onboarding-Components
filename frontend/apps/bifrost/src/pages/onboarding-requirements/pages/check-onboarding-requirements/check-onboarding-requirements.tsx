@@ -1,11 +1,11 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoForbid40 } from '@onefootprint/icons';
 import {
+  CollectedKycDataOption,
   OnboardingRequirement,
   OnboardingRequirementKind,
   OnboardingStatusResponse,
 } from '@onefootprint/types';
-import { CollectedDataOption } from '@onefootprint/types/src/data/collected-data-option';
 import { LoadingIndicator, Typography } from '@onefootprint/ui';
 import { useGetOnboardingStatus } from 'footprint-elements';
 import React, { useState } from 'react';
@@ -25,7 +25,7 @@ const CheckOnboardingRequirements = () => {
 
     let missingLiveness = false;
     let missingIdDocument = false;
-    let missingKycData: CollectedDataOption[] | undefined;
+    let missingKycData: CollectedKycDataOption[] | undefined;
 
     requirements.forEach((req: OnboardingRequirement) => {
       if (req.kind === OnboardingRequirementKind.collectKycData) {

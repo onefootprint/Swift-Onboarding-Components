@@ -1,5 +1,5 @@
 import { DeviceInfo, useDeviceInfo } from '@onefootprint/hooks';
-import { CollectedDataOptionLabels } from '@onefootprint/types';
+import { CollectedKycDataOptionLabels } from '@onefootprint/types';
 import { Box, Portal, Shimmer } from '@onefootprint/ui';
 import { useGetOnboardingConfig } from 'footprint-elements';
 import React from 'react';
@@ -30,10 +30,10 @@ const Init = () => {
           name,
           isLive,
           mustCollectData: mustCollectData.map(
-            (attr: string) => CollectedDataOptionLabels[attr],
+            (attr: string) => CollectedKycDataOptionLabels[attr],
           ),
           canAccessData: canAccessData.map(
-            (attr: string) => CollectedDataOptionLabels[attr],
+            (attr: string) => CollectedKycDataOptionLabels[attr],
           ),
         },
       });

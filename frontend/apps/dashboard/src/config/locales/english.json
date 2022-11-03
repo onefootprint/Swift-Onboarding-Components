@@ -36,7 +36,7 @@
     "zip": "Zip code",
     "country": "Country"
   },
-  "collected-data-options": {
+  "collected-kyc-data-options": {
     "name": "Full name",
     "dob": "Date of Birth",
     "ssn9": "SSN (Full)",

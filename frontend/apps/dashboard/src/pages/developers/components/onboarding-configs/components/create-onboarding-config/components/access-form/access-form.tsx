@@ -1,5 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { CollectedDataOption } from '@onefootprint/types';
+import { CollectedKycDataOption } from '@onefootprint/types';
 import { Checkbox } from '@onefootprint/ui';
 import React from 'react';
 import { useForm } from 'react-hook-form';
@@ -19,7 +19,7 @@ export type AccessFormData = {
 type AccessFormProps = {
   defaultValues?: AccessFormData;
   fields: {
-    kycData: Map<CollectedDataOption, boolean>;
+    kycData: Map<CollectedKycDataOption, boolean>;
     idDoc: boolean;
   };
   onSubmit: (formData: AccessFormData) => void;
@@ -46,47 +46,47 @@ const AccessForm = ({
         description={t('access-form.description')}
       />
       <CheckboxContainer>
-        {kycData.has(CollectedDataOption.phoneNumber) && (
+        {kycData.has(CollectedKycDataOption.phoneNumber) && (
           <Checkbox
-            label={allT('collected-data-options.phone_number')}
-            {...register(`kycData.${CollectedDataOption.phoneNumber}`)}
+            label={allT('collected-kyc-data-options.phone_number')}
+            {...register(`kycData.${CollectedKycDataOption.phoneNumber}`)}
           />
         )}
-        {kycData.has(CollectedDataOption.email) && (
+        {kycData.has(CollectedKycDataOption.email) && (
           <Checkbox
-            label={allT('collected-data-options.email')}
-            {...register(`kycData.${CollectedDataOption.email}`)}
+            label={allT('collected-kyc-data-options.email')}
+            {...register(`kycData.${CollectedKycDataOption.email}`)}
           />
         )}
-        {kycData.has(CollectedDataOption.name) && (
+        {kycData.has(CollectedKycDataOption.name) && (
           <Checkbox
-            label={allT('collected-data-options.name')}
-            {...register(`kycData.${CollectedDataOption.name}`)}
+            label={allT('collected-kyc-data-options.name')}
+            {...register(`kycData.${CollectedKycDataOption.name}`)}
           />
         )}
-        {kycData.has(CollectedDataOption.dob) && (
+        {kycData.has(CollectedKycDataOption.dob) && (
           <Checkbox
-            label={allT('collected-data-options.dob')}
-            {...register(`kycData.${CollectedDataOption.dob}`)}
+            label={allT('collected-kyc-data-options.dob')}
+            {...register(`kycData.${CollectedKycDataOption.dob}`)}
           />
         )}
-        {kycData.has(CollectedDataOption.ssn9) && (
+        {kycData.has(CollectedKycDataOption.ssn9) && (
           <Checkbox
-            label={allT('collected-data-options.ssn9')}
-            {...register(`kycData.${CollectedDataOption.ssn9}`)}
+            label={allT('collected-kyc-data-options.ssn9')}
+            {...register(`kycData.${CollectedKycDataOption.ssn9}`)}
           />
         )}
-        {kycData.has(CollectedDataOption.ssn4) && (
+        {kycData.has(CollectedKycDataOption.ssn4) && (
           <Checkbox
-            label={allT('collected-data-options.ssn4')}
-            {...register(`kycData.${CollectedDataOption.ssn4}`)}
+            label={allT('collected-kyc-data-options.ssn4')}
+            {...register(`kycData.${CollectedKycDataOption.ssn4}`)}
           />
         )}
         {/* TODO: https://linear.app/footprint/issue/FP-1607/improve-toggle-react-hook-form-integration */}
-        {kycData.has(CollectedDataOption.fullAddress) && (
+        {kycData.has(CollectedKycDataOption.fullAddress) && (
           <Checkbox
-            label={allT('collected-data-options.full_address')}
-            {...register(`kycData.${CollectedDataOption.fullAddress}`)}
+            label={allT('collected-kyc-data-options.full_address')}
+            {...register(`kycData.${CollectedKycDataOption.fullAddress}`)}
           />
         )}
         {idDoc && (

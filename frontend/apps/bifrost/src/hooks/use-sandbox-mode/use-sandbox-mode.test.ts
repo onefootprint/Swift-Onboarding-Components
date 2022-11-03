@@ -1,5 +1,5 @@
 import { renderHook } from '@onefootprint/test-utils';
-import { CollectedDataOption, TenantInfo } from '@onefootprint/types';
+import { CollectedKycDataOption, TenantInfo } from '@onefootprint/types';
 
 import { BifrostMachineProvider } from '../../components/bifrost-machine-provider';
 import bifrostMachine from '../../utils/state-machine/bifrost';
@@ -12,8 +12,8 @@ describe('useSandboxMode', () => {
         isLive: true,
         pk: 'key',
         name: 'tenant',
-        mustCollectData: [CollectedDataOption.name],
-        canAccessData: [CollectedDataOption.name],
+        mustCollectData: [CollectedKycDataOption.name],
+        canAccessData: [CollectedKycDataOption.name],
         orgName: 'tenantOrg',
       };
       bifrostMachine.context.tenant = tenant;
@@ -30,8 +30,8 @@ describe('useSandboxMode', () => {
         isLive: false,
         pk: 'key',
         name: 'tenant',
-        mustCollectData: [CollectedDataOption.name],
-        canAccessData: [CollectedDataOption.name],
+        mustCollectData: [CollectedKycDataOption.name],
+        canAccessData: [CollectedKycDataOption.name],
         orgName: 'tenantOrg',
       };
       bifrostMachine.context.tenant = tenant;

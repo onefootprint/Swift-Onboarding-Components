@@ -1,5 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { CollectedDataOption } from '@onefootprint/types';
+import { CollectedKycDataOption } from '@onefootprint/types';
 import { useToast } from '@onefootprint/ui';
 import React from 'react';
 
@@ -58,7 +58,7 @@ const SSN = ({
     });
   };
 
-  if (missingAttributes.includes(CollectedDataOption.ssn4)) {
+  if (missingAttributes.includes(CollectedKycDataOption.ssn4)) {
     return (
       <SSN4
         onSubmit={onSubmit}
@@ -70,7 +70,7 @@ const SSN = ({
     );
   }
 
-  if (missingAttributes.includes(CollectedDataOption.ssn9)) {
+  if (missingAttributes.includes(CollectedKycDataOption.ssn9)) {
     return (
       <SSN9
         onSubmit={onSubmit}

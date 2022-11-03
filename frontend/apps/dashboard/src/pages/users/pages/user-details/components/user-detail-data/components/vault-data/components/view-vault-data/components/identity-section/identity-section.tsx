@@ -47,13 +47,13 @@ const IdentitySection = ({ vaultData }: IdentitySectionProps) => {
       title={t('title')}
     >
       {ssn9 !== undefined && (
-        <DataRow title={allT('collected-data-options.ssn9')} data={ssn9} />
+        <DataRow title={allT('collected-kyc-data-options.ssn9')} data={ssn9} />
       )}
       {ssn4 !== undefined && (
-        <DataRow title={allT('collected-data-options.ssn4')} data={ssn4} />
+        <DataRow title={allT('collected-kyc-data-options.ssn4')} data={ssn4} />
       )}
       {dob !== undefined && (
-        <DataRow title={allT('collected-data-options.dob')} data={dob} />
+        <DataRow title={allT('collected-kyc-data-options.dob')} data={dob} />
       )}
     </DataSection>
   );

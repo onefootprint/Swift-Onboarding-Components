@@ -1,4 +1,4 @@
-import { CollectedDataOption } from '@onefootprint/types';
+import { CollectedKycDataOption } from '@onefootprint/types';
 
 import {
   hasMissingAttributes,
@@ -9,7 +9,7 @@ import {
 import { States } from '../../../utils/state-machine/types';
 
 const getCurrentStepFromMissingAttributes = (
-  mustCollect: readonly CollectedDataOption[],
+  mustCollect: readonly CollectedKycDataOption[],
   state: States,
 ) => {
   if (!hasMissingAttributes(mustCollect)) {

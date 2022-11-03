@@ -1,4 +1,4 @@
-import { CollectedDataOption, OnboardingConfig } from '@onefootprint/types';
+import { CollectedKycDataOption, OnboardingConfig } from '@onefootprint/types';
 
 export const sandboxOnboardingConfig: OnboardingConfig = {
   id: 'ob_config_id_sFMH49H7gtMLdbO4FjywO',
@@ -6,8 +6,8 @@ export const sandboxOnboardingConfig: OnboardingConfig = {
   name: 'Acme Bank',
   orgName: 'Acme Bank',
   logoUrl: null,
-  mustCollectData: [CollectedDataOption.email],
-  canAccessData: [CollectedDataOption.email],
+  mustCollectData: [CollectedKycDataOption.email],
+  canAccessData: [CollectedKycDataOption.email],
   mustCollectIdentityDocument: false,
   isLive: false,
   createdAt: '7/20/22, 3:40 AM',
@@ -20,8 +20,8 @@ export const liveOnboardingKey: OnboardingConfig = {
   name: 'Lorem11',
   orgName: 'Acme Bank',
   logoUrl: null,
-  mustCollectData: [CollectedDataOption.ssn9],
-  canAccessData: [CollectedDataOption.ssn9],
+  mustCollectData: [CollectedKycDataOption.ssn9],
+  canAccessData: [CollectedKycDataOption.ssn9],
   mustCollectIdentityDocument: false,
   isLive: true,
   createdAt: '8/10/22, 11:56 AM',

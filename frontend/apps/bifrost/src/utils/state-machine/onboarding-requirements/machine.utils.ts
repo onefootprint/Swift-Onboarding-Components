@@ -1,5 +1,5 @@
 import { DeviceInfo } from '@onefootprint/hooks';
-import { CollectedDataOption } from '@onefootprint/types';
+import { CollectedKycDataOption } from '@onefootprint/types';
 
 import { MachineContext } from './types';
 
@@ -9,7 +9,7 @@ export const shouldRunCollectKycDataFromContext = (context: MachineContext) => {
 };
 
 export const shouldRunCollectKycData = (
-  missingKycData?: readonly CollectedDataOption[],
+  missingKycData?: readonly CollectedKycDataOption[],
 ) => typeof missingKycData !== 'undefined';
 
 export const shouldRunIdScanFromContext = (context: MachineContext) => {
@@ -41,5 +41,5 @@ export const shouldRunTransfer = (
 export const requiresAdditionalInfo = (
   userFound: boolean,
   missingIdDocument: boolean,
-  missingKycData?: readonly CollectedDataOption[],
+  missingKycData?: readonly CollectedKycDataOption[],
 ) => userFound && (!!missingKycData?.length || missingIdDocument);

@@ -1,5 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { CollectedDataOption } from '@onefootprint/types';
+import { CollectedKycDataOption } from '@onefootprint/types';
 import { useToast } from '@onefootprint/ui';
 import React from 'react';
 
@@ -59,8 +59,8 @@ const BasicInformation = ({
     });
   };
 
-  const requiresName = missingAttributes.includes(CollectedDataOption.name);
-  const requiresDob = missingAttributes.includes(CollectedDataOption.dob);
+  const requiresName = missingAttributes.includes(CollectedKycDataOption.name);
+  const requiresDob = missingAttributes.includes(CollectedKycDataOption.dob);
 
   const renderForm = () => {
     if (requiresName && requiresDob) {

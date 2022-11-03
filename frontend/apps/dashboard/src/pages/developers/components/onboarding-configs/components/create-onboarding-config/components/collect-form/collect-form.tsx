@@ -1,5 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { CollectedDataOption, UserDataAttribute } from '@onefootprint/types';
+import { CollectedKycDataOption, UserDataAttribute } from '@onefootprint/types';
 import { Box, Checkbox, Divider, Radio, Toggle } from '@onefootprint/ui';
 import React, { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
@@ -74,11 +74,11 @@ const CollectForm = ({ defaultValues, onSubmit }: CollectFormProps) => {
     const { kycData, idDoc } = formData;
     const submittedData = {
       kycData: {
-        [CollectedDataOption.email]: true,
-        [CollectedDataOption.phoneNumber]: true,
-        [CollectedDataOption.name]: true,
-        [CollectedDataOption.fullAddress]: true,
-        [CollectedDataOption.dob]: kycData[CollectedDataOption.dob],
+        [CollectedKycDataOption.email]: true,
+        [CollectedKycDataOption.phoneNumber]: true,
+        [CollectedKycDataOption.name]: true,
+        [CollectedKycDataOption.fullAddress]: true,
+        [CollectedKycDataOption.dob]: kycData[CollectedKycDataOption.dob],
         [UserDataAttribute.ssn4]: kycData.ssnKind === UserDataAttribute.ssn4,
         [UserDataAttribute.ssn9]: kycData.ssnKind === UserDataAttribute.ssn9,
       },
@@ -99,22 +99,22 @@ const CollectForm = ({ defaultValues, onSubmit }: CollectFormProps) => {
       />
       <CheckboxContainer>
         <Checkbox
-          label={allT('collected-data-options.phone_number')}
+          label={allT('collected-kyc-data-options.phone_number')}
           disabled
           checked
         />
         <Checkbox
-          label={allT('collected-data-options.email')}
+          label={allT('collected-kyc-data-options.email')}
           disabled
           checked
         />
         <Checkbox
-          label={allT('collected-data-options.name')}
+          label={allT('collected-kyc-data-options.name')}
           disabled
           checked
         />
         <Checkbox
-          label={allT('collected-data-options.dob')}
+          label={allT('collected-kyc-data-options.dob')}
           {...register(`kycData.${UserDataAttribute.dob}`)}
         />
         <Box>

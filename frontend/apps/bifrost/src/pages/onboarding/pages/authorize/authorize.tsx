@@ -10,7 +10,7 @@ import {
   IcoPhone24,
   IcoUserCircle24,
 } from '@onefootprint/icons';
-import { CollectedDataOption, IdScanDocType } from '@onefootprint/types';
+import { CollectedKycDataOption, IdScanDocType } from '@onefootprint/types';
 import {
   FootprintButton,
   LoadingIndicator,
@@ -29,15 +29,18 @@ import useOnboardingMachine from 'src/hooks/use-onboarding-machine';
 import { Events } from 'src/utils/state-machine/onboarding/types';
 import styled, { css } from 'styled-components';
 
-const IconByCollectedDataOption: Record<CollectedDataOption, JSX.Element> = {
-  [CollectedDataOption.name]: <IcoUserCircle24 />,
-  [CollectedDataOption.email]: <IcoEmail24 />,
-  [CollectedDataOption.phoneNumber]: <IcoPhone24 />,
-  [CollectedDataOption.ssn4]: <IcoFileText24 />,
-  [CollectedDataOption.ssn9]: <IcoFileText24 />,
-  [CollectedDataOption.dob]: <IcoCake24 />,
-  [CollectedDataOption.fullAddress]: <IcoBuilding24 />,
-  [CollectedDataOption.partialAddress]: <IcoBuilding24 />,
+const IconByCollectedKycDataOption: Record<
+  CollectedKycDataOption,
+  JSX.Element
+> = {
+  [CollectedKycDataOption.name]: <IcoUserCircle24 />,
+  [CollectedKycDataOption.email]: <IcoEmail24 />,
+  [CollectedKycDataOption.phoneNumber]: <IcoPhone24 />,
+  [CollectedKycDataOption.ssn4]: <IcoFileText24 />,
+  [CollectedKycDataOption.ssn9]: <IcoFileText24 />,
+  [CollectedKycDataOption.dob]: <IcoCake24 />,
+  [CollectedKycDataOption.fullAddress]: <IcoBuilding24 />,
+  [CollectedKycDataOption.partialAddress]: <IcoBuilding24 />,
 };
 
 const IconByIdDocType: Record<IdScanDocType, JSX.Element> = {
@@ -98,15 +101,15 @@ const Authorize = () => {
   const { canAccessData } = state.context.tenant;
   const requiredCategories = canAccessData;
 
-  const collectedDataOptionLabels: Record<CollectedDataOption, string> = {
-    [CollectedDataOption.name]: t('data-labels.name'),
-    [CollectedDataOption.email]: t('data-labels.email'),
-    [CollectedDataOption.phoneNumber]: t('data-labels.phone'),
-    [CollectedDataOption.ssn4]: t('data-labels.ssn4'),
-    [CollectedDataOption.ssn9]: t('data-labels.ssn9'),
-    [CollectedDataOption.dob]: t('data-labels.dob'),
-    [CollectedDataOption.fullAddress]: t('data-labels.address-full'),
-    [CollectedDataOption.partialAddress]: t('data-labels.address-partial'),
+  const collectedKycDataOptionLabels: Record<CollectedKycDataOption, string> = {
+    [CollectedKycDataOption.name]: t('data-labels.name'),
+    [CollectedKycDataOption.email]: t('data-labels.email'),
+    [CollectedKycDataOption.phoneNumber]: t('data-labels.phone'),
+    [CollectedKycDataOption.ssn4]: t('data-labels.ssn4'),
+    [CollectedKycDataOption.ssn9]: t('data-labels.ssn9'),
+    [CollectedKycDataOption.dob]: t('data-labels.dob'),
+    [CollectedKycDataOption.fullAddress]: t('data-labels.address-full'),
+    [CollectedKycDataOption.partialAddress]: t('data-labels.address-partial'),
   };
 
   const docTypeLabels: Record<IdScanDocType, string> = {
@@ -124,18 +127,16 @@ const Authorize = () => {
           subtitle={t('subtitle', { tenantName: state.context.tenant.name })}
         />
         <CategoriesContainer>
-          {requiredCategories.map(
-            (collectedDataOption: CollectedDataOption) => (
-              <Category key={collectedDataOption}>
-                <IconContainer>
-                  {IconByCollectedDataOption[collectedDataOption]}
-                </IconContainer>
-                <Typography variant="label-3">
-                  {collectedDataOptionLabels[collectedDataOption]}
-                </Typography>
-              </Category>
-            ),
-          )}
+          {requiredCategories.map((kycDataOpt: CollectedKycDataOption) => (
+            <Category key={kycDataOpt}>
+              <IconContainer>
+                {IconByCollectedKycDataOption[kycDataOpt]}
+              </IconContainer>
+              <Typography variant="label-3">
+                {collectedKycDataOptionLabels[kycDataOpt]}
+              </Typography>
+            </Category>
+          ))}
           {collectedDocs?.map((collectedDoc: IdScanDocType) => (
             <Category key={collectedDoc}>
               <IconContainer>{IconByIdDocType[collectedDoc]}</IconContainer>

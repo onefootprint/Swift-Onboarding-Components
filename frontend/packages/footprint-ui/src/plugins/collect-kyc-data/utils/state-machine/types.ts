@@ -1,5 +1,9 @@
 import { DeviceInfo } from '@onefootprint/hooks';
-import { CollectedDataOption, TenantInfo, UserData } from '@onefootprint/types';
+import {
+  CollectedKycDataOption,
+  TenantInfo,
+  UserData,
+} from '@onefootprint/types';
 
 import {
   BasicInformation,
@@ -8,7 +12,7 @@ import {
 } from '../data-types';
 
 export type OnboardingData = {
-  missingAttributes: CollectedDataOption[];
+  missingAttributes: CollectedKycDataOption[];
   data: UserData;
   validationToken?: string;
 };
@@ -36,7 +40,7 @@ export type MachineContext = {
   authToken?: string;
   userFound?: boolean;
   // Machine generated
-  missingAttributes: CollectedDataOption[];
+  missingAttributes: CollectedKycDataOption[];
   data: UserData;
   kycPending?: boolean;
 };
@@ -67,7 +71,7 @@ export type MachineEvents =
       type: Events.receivedContext;
       payload: {
         authToken: string;
-        missingAttributes: CollectedDataOption[];
+        missingAttributes: CollectedKycDataOption[];
         userFound: boolean;
         device: DeviceInfo;
         tenant: TenantInfo;

@@ -62,21 +62,21 @@ const IdentitySection = ({ user }: IdentitySectionProps) => {
         <Checkbox
           {...register(`kycData.${UserDataAttribute.ssn9}`)}
           disabled={fieldsState[UserDataAttribute.ssn9].disabled}
-          label={allT('collected-data-options.ssn9')}
+          label={allT('collected-kyc-data-options.ssn9')}
         />
       )}
       {fieldsState[UserDataAttribute.ssn4].visible && (
         <Checkbox
           {...register(`kycData.${UserDataAttribute.ssn4}`)}
           disabled={fieldsState[UserDataAttribute.ssn4].disabled}
-          label={allT('collected-data-options.ssn4')}
+          label={allT('collected-kyc-data-options.ssn4')}
         />
       )}
       {fieldsState[UserDataAttribute.dob].visible && (
         <Checkbox
           {...register(`kycData.${UserDataAttribute.dob}`)}
           disabled={fieldsState[UserDataAttribute.dob].disabled}
-          label={allT('collected-data-options.dob')}
+          label={allT('collected-kyc-data-options.dob')}
         />
       )}
     </DataContainer>

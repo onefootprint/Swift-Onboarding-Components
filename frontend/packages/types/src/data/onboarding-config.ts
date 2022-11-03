@@ -1,13 +1,13 @@
-import { CollectedDataOption } from './collected-data-option';
+import { CollectedKycDataOption } from './collected-kyc-data-option';
 
 export type OnboardingConfig = {
-  canAccessData: CollectedDataOption[];
+  canAccessData: CollectedKycDataOption[];
   createdAt: string;
   id: string;
   isLive: boolean;
   key: string;
   logoUrl: string | null;
-  mustCollectData: CollectedDataOption[];
+  mustCollectData: CollectedKycDataOption[];
   mustCollectIdentityDocument: boolean;
   name: string;
   orgName: string;

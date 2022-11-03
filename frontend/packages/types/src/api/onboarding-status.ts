@@ -1,4 +1,4 @@
-import { CollectedDataOption } from '../data/collected-data-option';
+import { CollectedKycDataOption } from '../data/collected-kyc-data-option';
 import IdScanDocType from '../data/id-scan-doc-type';
 
 export enum OnboardingRequirementKind {
@@ -9,7 +9,7 @@ export enum OnboardingRequirementKind {
 
 export type CollectKycDataRequirement = {
   kind: OnboardingRequirementKind.collectKycData;
-  missingAttributes: CollectedDataOption[];
+  missingAttributes: CollectedKycDataOption[];
 };
 
 export type CollectDocumentRequirement = {
@@ -31,7 +31,7 @@ export type OnboardingStatusRequest = {
 };
 
 export type AuthorizeFields = {
-  collectedData: CollectedDataOption[];
+  collectedData: CollectedKycDataOption[];
   identityDocumentType: IdScanDocType[];
 };
 

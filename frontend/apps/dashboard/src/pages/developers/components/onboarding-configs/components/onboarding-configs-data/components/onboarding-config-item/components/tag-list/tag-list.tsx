@@ -1,11 +1,11 @@
-import { CollectedDataOption } from '@onefootprint/types';
+import { CollectedKycDataOption } from '@onefootprint/types';
 import { Tag } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
 type TagListProps = {
-  dataList: CollectedDataOption[];
-  getLabel: (data: CollectedDataOption) => string;
+  dataList: CollectedKycDataOption[];
+  getLabel: (data: CollectedKycDataOption) => string;
   testID: string;
 };
 

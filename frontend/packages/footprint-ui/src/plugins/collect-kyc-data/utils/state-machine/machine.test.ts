@@ -1,6 +1,6 @@
 import { DeviceInfo } from '@onefootprint/hooks';
 import {
-  CollectedDataOption,
+  CollectedKycDataOption,
   TenantInfo,
   UserDataAttribute,
 } from '@onefootprint/types';
@@ -15,23 +15,23 @@ describe('Onboarding Machine Tests', () => {
     pk: 'pk',
     name: 'tenant',
     mustCollectData: [
-      CollectedDataOption.name,
-      CollectedDataOption.email,
-      CollectedDataOption.fullAddress,
-      CollectedDataOption.ssn9,
+      CollectedKycDataOption.name,
+      CollectedKycDataOption.email,
+      CollectedKycDataOption.fullAddress,
+      CollectedKycDataOption.ssn9,
     ],
     canAccessData: [
-      CollectedDataOption.name,
-      CollectedDataOption.email,
-      CollectedDataOption.fullAddress,
-      CollectedDataOption.ssn9,
+      CollectedKycDataOption.name,
+      CollectedKycDataOption.email,
+      CollectedKycDataOption.fullAddress,
+      CollectedKycDataOption.ssn9,
     ],
     orgName: 'tenantOrg',
   };
 
   const createMachine = (
     userFound: boolean,
-    missingAttributes: CollectedDataOption[],
+    missingAttributes: CollectedKycDataOption[],
     device: DeviceInfo = {
       type: 'mobile',
       hasSupportForWebauthn: false,
@@ -55,16 +55,16 @@ describe('Onboarding Machine Tests', () => {
   describe('When user has missing fields', () => {
     it('If missing at least one attribute from each page, takes user to all pages in order', () => {
       const machine = createMachine(true, [
-        CollectedDataOption.name,
-        CollectedDataOption.fullAddress,
-        CollectedDataOption.ssn9,
+        CollectedKycDataOption.name,
+        CollectedKycDataOption.fullAddress,
+        CollectedKycDataOption.ssn9,
       ]);
       let { state } = machine;
       let { context } = state;
       expect(context.missingAttributes).toEqual([
-        CollectedDataOption.name,
-        CollectedDataOption.fullAddress,
-        CollectedDataOption.ssn9,
+        CollectedKycDataOption.name,
+        CollectedKycDataOption.fullAddress,
+        CollectedKycDataOption.ssn9,
       ]);
       expect(state.value).toEqual(States.basicInformation);
 
@@ -154,15 +154,15 @@ describe('Onboarding Machine Tests', () => {
 
     it('Skips states without missing attributes', () => {
       const machine = createMachine(true, [
-        CollectedDataOption.name,
-        CollectedDataOption.ssn9,
+        CollectedKycDataOption.name,
+        CollectedKycDataOption.ssn9,
       ]);
 
       let { state } = machine;
       let { context } = state;
       expect(context.missingAttributes).toEqual([
-        CollectedDataOption.name,
-        CollectedDataOption.ssn9,
+        CollectedKycDataOption.name,
+        CollectedKycDataOption.ssn9,
       ]);
       expect(state.value).toEqual(States.basicInformation);
 

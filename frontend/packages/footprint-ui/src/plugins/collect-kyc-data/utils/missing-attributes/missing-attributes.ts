@@ -1,29 +1,35 @@
 import {
-  CollectedDataOption,
+  CollectedKycDataOption,
   OptionToRequiredAttributes,
   UserData,
 } from '@onefootprint/types';
 
 import { States } from '../state-machine/types';
 
-// The list of CollectedDataOptions that may be input on the basic info screen
-const BASIC_ATTRIBUTES = [CollectedDataOption.name, CollectedDataOption.dob];
-
-// The list of CollectedDataOptions that may be input on the residential screen
-const RESIDENTIAL_ATTRIBUTES = [
-  CollectedDataOption.fullAddress,
-  CollectedDataOption.partialAddress,
+// The list of CollectedKycDataOption that may be input on the basic info screen
+const BASIC_ATTRIBUTES = [
+  CollectedKycDataOption.name,
+  CollectedKycDataOption.dob,
 ];
 
-// The list of CollectedDataOptions that may be input on the ssn screen
-const SSN_ATTRIBUTES = [CollectedDataOption.ssn9, CollectedDataOption.ssn4];
+// The list of CollectedKycDataOption that may be input on the residential screen
+const RESIDENTIAL_ATTRIBUTES = [
+  CollectedKycDataOption.fullAddress,
+  CollectedKycDataOption.partialAddress,
+];
+
+// The list of CollectedKycDataOption that may be input on the ssn screen
+const SSN_ATTRIBUTES = [
+  CollectedKycDataOption.ssn9,
+  CollectedKycDataOption.ssn4,
+];
 
 // An attribute is missing if
 // (1) it must be collected for this onboarding session AND
 // (2) it hasn't yet been collected
 export const isMissing = (
-  attributes: readonly CollectedDataOption[],
-  mustCollect: readonly CollectedDataOption[],
+  attributes: readonly CollectedKycDataOption[],
+  mustCollect: readonly CollectedKycDataOption[],
   collectedData?: UserData,
 ) =>
   attributes
@@ -32,22 +38,22 @@ export const isMissing = (
     .some(attr => !collectedData || !collectedData[attr]);
 
 export const isMissingBasicAttribute = (
-  mustCollect: readonly CollectedDataOption[],
+  mustCollect: readonly CollectedKycDataOption[],
   collectedData?: UserData,
 ) => isMissing(BASIC_ATTRIBUTES, mustCollect, collectedData);
 
 export const isMissingResidentialAttribute = (
-  mustCollect: readonly CollectedDataOption[],
+  mustCollect: readonly CollectedKycDataOption[],
   collectedData?: UserData,
 ) => isMissing(RESIDENTIAL_ATTRIBUTES, mustCollect, collectedData);
 
 export const isMissingSsnAttribute = (
-  mustCollect: readonly CollectedDataOption[],
+  mustCollect: readonly CollectedKycDataOption[],
   collectedData?: UserData,
 ) => isMissing(SSN_ATTRIBUTES, mustCollect, collectedData);
 
 export const hasMissingAttributes = (
-  mustCollect: readonly CollectedDataOption[],
+  mustCollect: readonly CollectedKycDataOption[],
   collectedData?: UserData,
 ) =>
   mustCollect.some(option =>
@@ -57,7 +63,7 @@ export const hasMissingAttributes = (
   );
 
 export const getMaxStepFromMissingAttributes = (
-  attributes: readonly CollectedDataOption[],
+  attributes: readonly CollectedKycDataOption[],
 ) => {
   if (!hasMissingAttributes(attributes)) {
     return 0;
@@ -76,7 +82,7 @@ export const getMaxStepFromMissingAttributes = (
 };
 
 export const getCurrentStepFromMissingAttributes = (
-  attributes: readonly CollectedDataOption[],
+  attributes: readonly CollectedKycDataOption[],
   state: States,
 ) => {
   if (!hasMissingAttributes(attributes)) {

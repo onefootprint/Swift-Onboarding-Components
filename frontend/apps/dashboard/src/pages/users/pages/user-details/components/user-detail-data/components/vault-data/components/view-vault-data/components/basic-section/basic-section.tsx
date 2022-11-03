@@ -51,15 +51,18 @@ const BasicSection = ({ vaultData }: BasicSectionProps) => {
       {firstName !== undefined && lastName !== undefined && (
         <DataRow
           data={getFullNameDataValue(vaultData)}
-          title={allT('collected-data-options.name')}
+          title={allT('collected-kyc-data-options.name')}
         />
       )}
       {email !== undefined && (
-        <DataRow title={allT('collected-data-options.email')} data={email} />
+        <DataRow
+          title={allT('collected-kyc-data-options.email')}
+          data={email}
+        />
       )}
       {phoneNumber !== undefined && (
         <DataRow
-          title={allT('collected-data-options.phone_number')}
+          title={allT('collected-kyc-data-options.phone_number')}
           data={phoneNumber}
         />
       )}

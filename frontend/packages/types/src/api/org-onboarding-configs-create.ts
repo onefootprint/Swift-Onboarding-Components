@@ -1,10 +1,10 @@
-import { CollectedDataOption } from '../data/collected-data-option';
+import { CollectedKycDataOption } from '../data/collected-kyc-data-option';
 
 export type OrgOnboardingConfigCreateRequest = {
   name: string;
-  mustCollectData: CollectedDataOption[];
+  mustCollectData: CollectedKycDataOption[];
   mustCollectIdentityDocument?: boolean;
-  canAccessData: CollectedDataOption[];
+  canAccessData: CollectedKycDataOption[];
   canAccessIdentityDocumentImages?: boolean;
 };
 

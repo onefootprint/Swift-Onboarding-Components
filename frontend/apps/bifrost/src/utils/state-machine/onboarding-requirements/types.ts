@@ -1,5 +1,9 @@
 import { DeviceInfo } from '@onefootprint/hooks';
-import { CollectedDataOption, TenantInfo, UserData } from '@onefootprint/types';
+import {
+  CollectedKycDataOption,
+  TenantInfo,
+  UserData,
+} from '@onefootprint/types';
 
 export enum States {
   checkOnboardingRequirements = 'checkOnboardingRequirements',
@@ -14,7 +18,7 @@ export type MachineContext = {
   userFound: boolean;
   missingLiveness: boolean;
   missingIdDocument: boolean;
-  missingKycData?: readonly CollectedDataOption[]; // Initial set of attributes received from /onboarding
+  missingKycData?: readonly CollectedKycDataOption[]; // Initial set of attributes received from /onboarding
   kycData: UserData; // Filled user data
   tenant: TenantInfo;
   device: DeviceInfo;
@@ -42,7 +46,7 @@ export type MachineEvents =
       payload: {
         missingLiveness: boolean;
         missingIdDocument: boolean;
-        missingKycData?: readonly CollectedDataOption[];
+        missingKycData?: readonly CollectedKycDataOption[];
       };
     }
   | { type: Events.transferCompleted }

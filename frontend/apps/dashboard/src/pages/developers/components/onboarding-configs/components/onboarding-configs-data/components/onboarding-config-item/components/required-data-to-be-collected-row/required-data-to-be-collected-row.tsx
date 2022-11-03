@@ -1,6 +1,6 @@
 import { useTranslation } from '@onefootprint/hooks';
 import { IcoInfo16 } from '@onefootprint/icons';
-import { CollectedDataOption, OnboardingConfig } from '@onefootprint/types';
+import { CollectedKycDataOption, OnboardingConfig } from '@onefootprint/types';
 import { Box, Tooltip, Typography } from '@onefootprint/ui';
 import React from 'react';
 
@@ -42,8 +42,8 @@ const RequiredDataToBeCollectedRow = ({
       <td>
         <TagList
           dataList={mustCollectData}
-          getLabel={(tag: CollectedDataOption) =>
-            allT(`collected-data-options.${tag}`)
+          getLabel={(tag: CollectedKycDataOption) =>
+            allT(`collected-kyc-data-options.${tag}`)
           }
           testID={`must-collect-data-${id}`}
         />

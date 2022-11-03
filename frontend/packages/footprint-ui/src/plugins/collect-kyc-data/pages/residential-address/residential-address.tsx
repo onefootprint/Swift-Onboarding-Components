@@ -1,5 +1,5 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { CollectedDataOption } from '@onefootprint/types';
+import { CollectedKycDataOption } from '@onefootprint/types';
 import { useToast } from '@onefootprint/ui';
 import React from 'react';
 
@@ -59,7 +59,7 @@ const ResidentialAddress = ({
     });
   };
 
-  if (missingAttributes.includes(CollectedDataOption.fullAddress)) {
+  if (missingAttributes.includes(CollectedKycDataOption.fullAddress)) {
     return (
       <AddressFull
         onSubmit={handleSubmit}
@@ -70,7 +70,7 @@ const ResidentialAddress = ({
       />
     );
   }
-  if (missingAttributes.includes(CollectedDataOption.partialAddress)) {
+  if (missingAttributes.includes(CollectedKycDataOption.partialAddress)) {
     return (
       <AddressZipCodeAndCountry
         onSubmit={handleSubmit}
