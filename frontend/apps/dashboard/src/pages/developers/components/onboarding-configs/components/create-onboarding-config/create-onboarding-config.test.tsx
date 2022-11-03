@@ -114,6 +114,16 @@ describe('<CreateDialog />', () => {
         'Phone number',
       ) as HTMLInputElement;
       expect(phoneCheckbox).toBeDisabled();
+
+      const nameCheckbox = screen.getByLabelText(
+        'Full name',
+      ) as HTMLInputElement;
+      expect(nameCheckbox).toBeDisabled();
+
+      const addressCheckbox = screen.getByLabelText(
+        'Address',
+      ) as HTMLInputElement;
+      expect(addressCheckbox).toBeDisabled();
     });
 
     describe('when clicking on the back button', () => {
@@ -170,8 +180,25 @@ describe('<CreateDialog />', () => {
         checked: true,
       });
 
-      // Phone number + Email + Full name + Address
+      // Phone number + Email + Full name + address
       expect(allCheckboxes.length).toEqual(4);
+    });
+
+    it('should show id document if it was collected', async () => {
+      await renderCreateDialogOnTheCollectDataSection();
+
+      const idDocToggle = screen.getByRole('switch');
+      await userEvent.click(idDocToggle);
+
+      const continueButton = screen.getByRole('button', { name: 'Continue' });
+      await userEvent.click(continueButton);
+
+      await waitFor(() => {
+        expect(screen.getByTestId('access-form')).toBeVisible();
+      });
+
+      const idDocCheckbox = screen.getByLabelText('ID Document');
+      expect(idDocCheckbox).toBeInTheDocument();
     });
 
     describe('when selecting the ssn', () => {

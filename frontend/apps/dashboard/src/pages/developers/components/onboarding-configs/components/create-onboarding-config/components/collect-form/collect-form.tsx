@@ -17,11 +17,13 @@ export type CollectFormData = {
   idDoc: IdDocFormData;
 };
 
-type FormData = KycDataFormData &
-  IdDocFormData & {
+type FormData = {
+  kycData: KycDataFormData & {
     showSSNOptions: boolean;
     ssnKind?: UserDataAttribute.ssn4 | UserDataAttribute.ssn9;
   };
+  idDoc: IdDocFormData;
+};
 
 type CollectFormProps = {
   defaultValues: CollectFormData;
@@ -51,35 +53,37 @@ const CollectForm = ({ defaultValues, onSubmit }: CollectFormProps) => {
 
   const { setValue, register, handleSubmit, control } = useForm<FormData>({
     defaultValues: {
-      ...defaultKycData,
-      ...defaultIdDocData,
-      showSSNOptions: innerFields.ssn,
-      ssnKind: getInitialSSNKind(),
+      kycData: {
+        ...defaultKycData,
+        showSSNOptions: innerFields.ssn,
+        ssnKind: getInitialSSNKind(),
+      },
+      idDoc: {
+        ...defaultIdDocData,
+      },
     },
   });
 
   const handleSSNKindsChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { checked } = event.target;
     setInnerFields(prevState => ({ ...prevState, ssn: checked }));
-    setValue('ssnKind', checked ? UserDataAttribute.ssn9 : undefined);
+    setValue('kycData.ssnKind', checked ? UserDataAttribute.ssn9 : undefined);
   };
 
   const handleBeforeSubmit = (formData: FormData) => {
+    const { kycData, idDoc } = formData;
     const submittedData = {
       kycData: {
         [CollectedDataOption.email]: true,
         [CollectedDataOption.phoneNumber]: true,
         [CollectedDataOption.name]: true,
         [CollectedDataOption.fullAddress]: true,
-        [CollectedDataOption.dob]: formData[CollectedDataOption.dob],
-        [UserDataAttribute.ssn4]: formData.ssnKind === UserDataAttribute.ssn4,
-        [UserDataAttribute.ssn9]: formData.ssnKind === UserDataAttribute.ssn9,
+        [CollectedDataOption.dob]: kycData[CollectedDataOption.dob],
+        [UserDataAttribute.ssn4]: kycData.ssnKind === UserDataAttribute.ssn4,
+        [UserDataAttribute.ssn9]: kycData.ssnKind === UserDataAttribute.ssn9,
       },
-      idDoc: {
-        idDocRequired: formData.idDocRequired,
-      },
+      idDoc,
     };
-
     onSubmit(submittedData);
   };
 
@@ -111,24 +115,24 @@ const CollectForm = ({ defaultValues, onSubmit }: CollectFormProps) => {
         />
         <Checkbox
           label={allT('collected-data-options.dob')}
-          {...register(UserDataAttribute.dob)}
+          {...register(`kycData.${UserDataAttribute.dob}`)}
         />
         <Box>
           <Checkbox
             label={t('collected-data.ssn')}
-            {...register('showSSNOptions')}
+            {...register('kycData.showSSNOptions')}
             onChange={handleSSNKindsChange}
           />
           <RadioGroupContainer isExpanded={!!innerFields.ssn}>
             <Radio
               value={UserDataAttribute.ssn9}
               label={t('collected-data.ssn_full')}
-              {...register('ssnKind')}
+              {...register('kycData.ssnKind')}
             />
             <Radio
               value={UserDataAttribute.ssn4}
               label={t('collected-data.ssn_last_4')}
-              {...register('ssnKind')}
+              {...register('kycData.ssnKind')}
             />
           </RadioGroupContainer>
         </Box>
@@ -145,7 +149,7 @@ const CollectForm = ({ defaultValues, onSubmit }: CollectFormProps) => {
       {/* TODO: https://linear.app/footprint/issue/FP-1607/improve-toggle-react-hook-form-integration */}
       <Controller
         control={control}
-        name="idDocRequired"
+        name="idDoc.idDoc"
         render={({ field }) => (
           <Toggle
             onBlur={field.onBlur}

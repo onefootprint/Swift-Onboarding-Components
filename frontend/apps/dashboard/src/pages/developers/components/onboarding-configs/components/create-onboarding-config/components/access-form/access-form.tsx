@@ -5,22 +5,36 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import styled, { css } from 'styled-components';
 
-import type { KycDataFormData } from '../../create-onboarding-config.types';
+import type {
+  IdDocFormData,
+  KycDataFormData,
+} from '../../create-onboarding-config.types';
 import FormTitle from '../form-title';
 
-type FormData = KycDataFormData;
-
-type AccessFormProps = {
-  defaultValues?: KycDataFormData;
-  fields: Map<string, boolean>;
-  onSubmit: (formData: KycDataFormData) => void;
+export type AccessFormData = {
+  kycData: KycDataFormData;
+  idDoc: IdDocFormData;
 };
 
-const AccessForm = ({ defaultValues, onSubmit, fields }: AccessFormProps) => {
+type AccessFormProps = {
+  defaultValues?: AccessFormData;
+  fields: {
+    kycData: Map<CollectedDataOption, boolean>;
+    idDoc: boolean;
+  };
+  onSubmit: (formData: AccessFormData) => void;
+};
+
+const AccessForm = ({
+  defaultValues,
+  onSubmit,
+  fields: { kycData, idDoc },
+}: AccessFormProps) => {
   const { t, allT } = useTranslation(
     'pages.developers.onboarding-configs.create',
   );
-  const { register, handleSubmit } = useForm<FormData>({ defaultValues });
+  const { register, handleSubmit } = useForm<AccessFormData>({ defaultValues });
+
   return (
     <form
       id="access-form"
@@ -32,55 +46,55 @@ const AccessForm = ({ defaultValues, onSubmit, fields }: AccessFormProps) => {
         description={t('access-form.description')}
       />
       <CheckboxContainer>
-        {fields.has(CollectedDataOption.phoneNumber) && (
+        {kycData.has(CollectedDataOption.phoneNumber) && (
           <Checkbox
             label={allT('collected-data-options.phone_number')}
-            {...register(CollectedDataOption.phoneNumber)}
+            {...register(`kycData.${CollectedDataOption.phoneNumber}`)}
           />
         )}
-        {fields.has(CollectedDataOption.email) && (
+        {kycData.has(CollectedDataOption.email) && (
           <Checkbox
             label={allT('collected-data-options.email')}
-            {...register(CollectedDataOption.email)}
+            {...register(`kycData.${CollectedDataOption.email}`)}
           />
         )}
-        {fields.has(CollectedDataOption.name) && (
+        {kycData.has(CollectedDataOption.name) && (
           <Checkbox
             label={allT('collected-data-options.name')}
-            {...register(CollectedDataOption.name)}
+            {...register(`kycData.${CollectedDataOption.name}`)}
           />
         )}
-        {fields.has(CollectedDataOption.dob) && (
+        {kycData.has(CollectedDataOption.dob) && (
           <Checkbox
             label={allT('collected-data-options.dob')}
-            {...register(CollectedDataOption.dob)}
+            {...register(`kycData.${CollectedDataOption.dob}`)}
           />
         )}
-        {fields.has(CollectedDataOption.ssn9) && (
+        {kycData.has(CollectedDataOption.ssn9) && (
           <Checkbox
             label={allT('collected-data-options.ssn9')}
-            {...register(CollectedDataOption.ssn9)}
+            {...register(`kycData.${CollectedDataOption.ssn9}`)}
           />
         )}
-        {fields.has(CollectedDataOption.ssn4) && (
+        {kycData.has(CollectedDataOption.ssn4) && (
           <Checkbox
             label={allT('collected-data-options.ssn4')}
-            {...register(CollectedDataOption.ssn4)}
+            {...register(`kycData.${CollectedDataOption.ssn4}`)}
           />
         )}
         {/* TODO: https://linear.app/footprint/issue/FP-1607/improve-toggle-react-hook-form-integration */}
-        {fields.has(CollectedDataOption.fullAddress) && (
+        {kycData.has(CollectedDataOption.fullAddress) && (
           <Checkbox
             label={allT('collected-data-options.full_address')}
-            {...register(CollectedDataOption.fullAddress)}
+            {...register(`kycData.${CollectedDataOption.fullAddress}`)}
           />
         )}
-        {/* {fields.has(CollectedDataOption.partialAddress) && (
+        {idDoc && (
           <Checkbox
-            label={allT('collected-data-options.partial_address')}
-            {...register(CollectedDataOption.partialAddress)}
+            label={allT('collected-id-doc-attributes.id-doc-image')}
+            {...register(`idDoc.idDoc`)}
           />
-        )} */}
+        )}
       </CheckboxContainer>
     </form>
   );

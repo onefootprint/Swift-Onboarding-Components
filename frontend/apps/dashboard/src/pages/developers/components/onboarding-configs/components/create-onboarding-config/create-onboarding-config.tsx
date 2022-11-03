@@ -3,13 +3,10 @@ import { IcoChevronLeftBig24, IcoClose24 } from '@onefootprint/icons';
 import { Dialog, useConfirmationDialog, useToast } from '@onefootprint/ui';
 import React from 'react';
 
-import AccessForm from './components/access-form';
+import AccessForm, { AccessFormData } from './components/access-form';
 import CollectForm, { CollectFormData } from './components/collect-form';
 import NameForm from './components/name-form';
-import type {
-  KycDataFormData,
-  NameFormData,
-} from './create-onboarding-config.types';
+import type { NameFormData } from './create-onboarding-config.types';
 import useCreateOnboardingConfig from './hooks/use-create-onboarding-config';
 import useCreateState, { Actions } from './hooks/use-create-state';
 import {
@@ -91,13 +88,14 @@ const CreateOnboardingConfig = ({
     });
   };
 
-  const handleSubmitAccess = (accessFormData: KycDataFormData) => {
+  const handleSubmitAccess = (accessFormData: AccessFormData) => {
     mutation.mutate(
       {
         name: state.data.name,
         mustCollectData: getSelectedDataOptionsList(state.data.kycData),
-        mustCollectIdentityDocument: !!state.data.idDoc.idDocRequired,
-        canAccessData: getSelectedDataOptionsList(accessFormData),
+        mustCollectIdentityDocument: !!state.data.idDoc.idDoc,
+        canAccessData: getSelectedDataOptionsList(accessFormData.kycData),
+        canAccessIdentityDocumentImages: accessFormData.idDoc.idDoc,
       },
       {
         onSuccess: () => {
@@ -153,10 +151,18 @@ const CreateOnboardingConfig = ({
       {state.step === 2 && (
         <AccessForm
           onSubmit={handleSubmitAccess}
-          fields={getSelectedDataOptions(state.data.kycData)}
-          defaultValues={Object.fromEntries(
-            getSelectedDataOptions(state.data.kycData),
-          )}
+          fields={{
+            kycData: getSelectedDataOptions(state.data.kycData),
+            idDoc: !!state.data.idDoc.idDoc,
+          }}
+          defaultValues={{
+            kycData: Object.fromEntries(
+              getSelectedDataOptions(state.data.kycData),
+            ),
+            idDoc: {
+              idDoc: !!state.data.idDoc.idDoc,
+            },
+          }}
         />
       )}
     </Dialog>

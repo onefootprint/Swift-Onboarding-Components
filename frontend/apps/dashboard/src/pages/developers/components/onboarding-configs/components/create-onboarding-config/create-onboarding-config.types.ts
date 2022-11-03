@@ -16,5 +16,5 @@ export type KycDataFormData = {
 };
 
 export type IdDocFormData = {
-  idDocRequired?: boolean;
+  idDoc: boolean;
 };

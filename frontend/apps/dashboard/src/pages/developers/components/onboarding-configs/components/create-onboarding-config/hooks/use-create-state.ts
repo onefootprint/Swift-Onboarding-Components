@@ -28,17 +28,19 @@ type State = {
   data: StateData;
 };
 
-const initialState = {
+const initialState: State = {
   step: 0,
   data: {
     name: '',
     kycData: {
       [CollectedDataOption.email]: true,
       [CollectedDataOption.phoneNumber]: true,
-      [CollectedDataOption.name]: true,
       [CollectedDataOption.fullAddress]: true,
+      [CollectedDataOption.name]: true,
     },
-    idDoc: {},
+    idDoc: {
+      idDoc: false,
+    },
   },
 };
 
