@@ -10,13 +10,20 @@ import type { CreateOnboardingConfigProps } from './create-onboarding-config';
 import CreateDialog from './create-onboarding-config';
 
 describe('<CreateDialog />', () => {
-  const defaultOptions = { open: true, onClose: jest.fn() };
+  const defaultOptions = {
+    open: true,
+    onClose: jest.fn(),
+    onCreate: jest.fn(),
+  };
 
   const renderCreateDialog = ({
     open = defaultOptions.open,
     onClose = defaultOptions.onClose,
+    onCreate = defaultOptions.onCreate,
   }: Partial<CreateOnboardingConfigProps> = defaultOptions) =>
-    customRender(<CreateDialog open={open} onClose={onClose} />);
+    customRender(
+      <CreateDialog open={open} onClose={onClose} onCreate={onCreate} />,
+    );
 
   const renderCreateDialogOnTheCollectDataSection = async (
     options = {

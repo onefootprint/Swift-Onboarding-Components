@@ -20,11 +20,13 @@ import {
 export type CreateOnboardingConfigProps = {
   open: boolean;
   onClose: () => void;
+  onCreate: () => void;
 };
 
 const CreateOnboardingConfig = ({
   open,
   onClose,
+  onCreate,
 }: CreateOnboardingConfigProps) => {
   const [state, dispatch] = useCreateState();
   const mutation = useCreateOnboardingConfig();
@@ -103,6 +105,7 @@ const CreateOnboardingConfig = ({
             title: t('feedback.success.title'),
             description: t('feedback.success.description'),
           });
+          onCreate();
           close();
         },
       },

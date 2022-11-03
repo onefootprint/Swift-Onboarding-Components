@@ -14,7 +14,7 @@ const OnboardingConfigs = () => {
   const [isCreateDialogOpen, openCreateDialog, closeCreateDialog] =
     useToggle(false);
   const { t } = useTranslation('pages.developers.onboarding-configs');
-  const { data, error, isLoading } = useOnboardingConfigs();
+  const { data, error, isLoading, refetch } = useOnboardingConfigs();
 
   return (
     <section data-testid="onboarding-configs-section">
@@ -35,7 +35,11 @@ const OnboardingConfigs = () => {
       {data && <OnboardingConfigsData data={data} />}
       {isLoading && <OnboardingConfigsLoading />}
       {error && <OnboardingConfigsError message={getErrorMessage(error)} />}
-      <CreateDialog open={isCreateDialogOpen} onClose={closeCreateDialog} />
+      <CreateDialog
+        open={isCreateDialogOpen}
+        onClose={closeCreateDialog}
+        onCreate={refetch}
+      />
     </section>
   );
 };
