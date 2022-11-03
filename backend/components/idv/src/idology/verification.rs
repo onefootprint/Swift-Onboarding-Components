@@ -7,7 +7,8 @@ pub fn parse_response(value: serde_json::Value) -> Result<IDologyResponse, super
     Ok(response)
 }
 
-pub type IdNumber = i32;
+// TODO: haven't checked this works yet
+pub type IdNumber = u64;
 
 #[derive(Debug, Clone, serde::Deserialize)]
 pub struct IDologyResponse {

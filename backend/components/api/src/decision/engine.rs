@@ -53,17 +53,12 @@ pub async fn run(
             }
             let ob_id = ob.id.clone();
 
-            // From the data in the vault, figure out which vendors we need to send to
-            let available_vendor_apis = user_vault_helper::get_vendor_apis_from_user_vault_wrapper(&uvw);
-            // From the possible vendors, select which ones we're sending to (logic TBD)
-            let vendor_apis = verification_request::choose_vendor_apis(available_vendor_apis);
             let requests = verification_request::build_verification_requests_and_checkpoint(
                 conn,
                 ob,
                 &uvw,
                 &tenantid,
                 desired_status_for_testing,
-                vendor_apis,
             )?;
 
             // Load our requests and results

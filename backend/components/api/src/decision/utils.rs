@@ -45,7 +45,8 @@ pub(super) async fn get_desired_status_for_testing(
             Some(OnboardingStatus::Verified)
         }
     } else {
-        None
+        // BIG TODO: This controls whether or not we send actual verification requests, we need to revisit
+        Some(OnboardingStatus::Verified)
     };
 
     Ok(desired_status)

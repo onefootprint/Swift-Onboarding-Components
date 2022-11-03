@@ -12,7 +12,7 @@ pub struct IDologyFeatures {
     pub status: OnboardingStatus,
     pub signals: Vec<Signal>,
     pub id_located: bool,
-    pub id_number_for_scan_required: Option<i32>,
+    pub id_number_for_scan_required: Option<u64>,
     pub is_id_scan_required: bool,
     pub verification_result: VerificationResultId,
 }
