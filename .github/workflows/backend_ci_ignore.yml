@@ -15,10 +15,12 @@ on:
 
 jobs:
   check_test:
+    runs-on: ubuntu-latest
     steps:
       - run: echo "Not required"
 
   integration_migration_tests:
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         python-version: ['3.9']
@@ -26,5 +28,6 @@ jobs:
       - run: echo "Not required"
 
   clippy:
+    runs-on: ubuntu-latest
     steps:
       - run: echo "Not required"
