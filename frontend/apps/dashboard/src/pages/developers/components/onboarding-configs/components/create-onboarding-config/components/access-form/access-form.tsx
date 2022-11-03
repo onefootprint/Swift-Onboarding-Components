@@ -103,7 +103,7 @@ const AccessForm = ({
 const CheckboxContainer = styled.div`
   ${({ theme }) => css`
     display: grid;
-    gap: ${theme.spacing[3]}px;
+    gap: ${theme.spacing[3]};
   `}
 `;
 

@@ -51,10 +51,10 @@ const Input = <
 
 const InputContainer = styled.div`
   ${({ theme }) => css`
-    padding: 0 ${theme.spacing[3]}px;
+    padding: 0 ${theme.spacing[3]};
     align-items: center;
     display: flex;
-    gap: ${theme.spacing[3]}px;
+    gap: ${theme.spacing[3]};
   `}
 `;
 

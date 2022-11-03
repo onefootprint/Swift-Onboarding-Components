@@ -45,17 +45,17 @@ const Inner = styled.div`
   ${({ theme }) => css`
     display: flex;
     justify-content: space-between;
-    padding: ${theme.spacing[4]}px ${theme.spacing[7]}px;
+    padding: ${theme.spacing[4]} ${theme.spacing[7]};
     flex-direction: column;
 
     > :not(:first-child) {
-      margin-top: ${theme.spacing[3]}px;
+      margin-top: ${theme.spacing[3]};
     }
 
     ${media.greaterThan('md')`
       flex-direction: row;
-      margin-left: ${theme.spacing[10]}px;
-      margin-right: ${theme.spacing[10]}px;
+      margin-left: ${theme.spacing[10]};
+      margin-right: ${theme.spacing[10]};
 
       > :not(:first-child) {
         margin: 0;
@@ -74,7 +74,7 @@ const LinksContainer = styled.ul`
       &:not(:last-child) {
         &:after {
           content: '·';
-          margin: 0 ${theme.spacing[3]}px;
+          margin: 0 ${theme.spacing[3]};
         }
       }
     }

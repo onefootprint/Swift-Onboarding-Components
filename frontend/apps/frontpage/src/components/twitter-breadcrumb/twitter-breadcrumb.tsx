@@ -38,11 +38,11 @@ const TwitterBreadcrumb = ({
 const Breadcrumb = styled.div`
   ${({ theme }) => css`
     background: ${theme.backgroundColor.secondary};
-    border-radius: ${theme.borderRadius.default}px;
+    border-radius: ${theme.borderRadius.default};
     display: flex;
     justify-content: space-between;
-    margin: 0 -${theme.spacing[5]}px 0;
-    padding: ${theme.spacing[4]}px ${theme.spacing[5]}px;
+    margin: 0 calc(${theme.spacing[5]} * -1) 0;
+    padding: ${theme.spacing[4]} ${theme.spacing[5]};
 
     ${media.greaterThan('lg')`
       margin: initial;
@@ -68,7 +68,7 @@ const BreadcrumbTitleContainer = styled.div`
 
 const BreadcrumbContainer = styled.div`
   ${({ theme }) => css`
-    margin-bottom: ${theme.spacing[9]}px;
+    margin-bottom: ${theme.spacing[9]};
   `}
 `;
 

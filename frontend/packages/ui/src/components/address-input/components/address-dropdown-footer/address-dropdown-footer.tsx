@@ -18,9 +18,9 @@ const Container = styled.li`
     background: ${theme.backgroundColor.secondary};
     display: flex;
     justify-content: center;
-    margin-top: ${theme.spacing[3]}px;
-    padding: ${theme.spacing[4]}px 0;
-    border-top: ${theme.borderWidth[1]}px solid ${theme.borderColor.tertiary};
+    margin-top: ${theme.spacing[3]};
+    padding: ${theme.spacing[4]} 0;
+    border-top: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
   `}
 `;
 

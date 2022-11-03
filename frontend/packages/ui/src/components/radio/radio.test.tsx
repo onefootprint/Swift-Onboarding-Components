@@ -1,4 +1,3 @@
-import themes from '@onefootprint/design-tokens';
 import { customRender, screen, userEvent } from '@onefootprint/test-utils';
 import React from 'react';
 
@@ -63,24 +62,20 @@ describe('<Radio />', () => {
 
     describe('when it has an error', () => {
       it('should add an error border to the input', () => {
-        renderRadio({
-          hasError: true,
-          label: 'label',
-        });
+        renderRadio({ hasError: true, label: 'label' });
         const input = screen.getByLabelText('label') as HTMLInputElement;
+
         expect(input).toHaveStyle({
-          borderColor: themes.light.borderColor.error,
+          borderColor: 'var(--fp-primitives-red-500)',
         });
       });
 
       it('should add an error border to the hint', () => {
-        renderRadio({
-          hasError: true,
-          hint: 'Hint',
-        });
+        renderRadio({ hasError: true, hint: 'Hint' });
         const hint = screen.getByText('Hint');
+
         expect(hint).toHaveStyle({
-          color: themes.light.color.error,
+          color: 'var(--fp-primitives-red-600)',
         });
       });
     });

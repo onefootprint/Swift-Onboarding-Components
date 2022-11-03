@@ -66,7 +66,7 @@ const CountrySelect = ({
 
 const StyledFlag = styled(Flag)`
   ${({ theme }) => css`
-    margin-right: ${theme.spacing[4]}px;
+    margin-right: ${theme.spacing[4]};
   `}
 `;
 

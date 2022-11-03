@@ -58,13 +58,13 @@ const ContentContainer = styled.div`
 const ImageContainer = styled.div`
   ${({ theme }) => css`
     margin: 0 auto;
-    margin-top: ${theme.spacing[9]}px;
-    margin-bottom: ${theme.spacing[10]}px;
+    margin-top: ${theme.spacing[9]};
+    margin-bottom: ${theme.spacing[10]};
     max-width: 700px;
 
     ${media.greaterThan('lg')`
-      margin-top: ${theme.spacing[10]}px;
-      margin-bottom: ${theme.spacing[14]}px;
+      margin-top: ${theme.spacing[10]};
+      margin-bottom: ${theme.spacing[14]};
     `}
   `}
 `;

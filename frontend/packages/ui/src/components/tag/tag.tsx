@@ -11,9 +11,9 @@ const Tag = styled.span<TagProps>`
   ${({ theme }) => css`
     ${createFontStyles('label-4')};
     background-color: ${theme.backgroundColor.neutral};
-    border-radius: ${theme.borderRadius.compact}px;
+    border-radius: ${theme.borderRadius.compact};
     color: ${theme.color.neutral};
-    padding: ${theme.spacing[1]}px ${theme.spacing[2]}px;
+    padding: ${theme.spacing[1]} ${theme.spacing[2]};
   `};
 `;
 

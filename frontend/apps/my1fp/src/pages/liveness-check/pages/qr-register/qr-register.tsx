@@ -115,7 +115,7 @@ const QRCodeContainer = styled.div`
 const Container = styled.form`
   ${({ theme }) => css`
     display: grid;
-    row-gap: ${theme.spacing[7]}px;
+    row-gap: ${theme.spacing[7]};
     text-align: center;
   `}
 `;

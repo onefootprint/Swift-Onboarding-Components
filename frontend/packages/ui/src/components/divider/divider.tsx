@@ -6,7 +6,7 @@ const Divider = styled.div.attrs({
 })`
   ${({ theme }) => css`
     background-color: ${theme.borderColor.tertiary};
-    height: ${theme.borderWidth[1]}px;
+    height: ${theme.borderWidth[1]};
   `}
 `;
 

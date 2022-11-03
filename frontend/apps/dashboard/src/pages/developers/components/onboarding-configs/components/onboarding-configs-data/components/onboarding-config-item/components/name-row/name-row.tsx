@@ -56,7 +56,7 @@ const Name = styled.div`
   ${({ theme }) => css`
     align-items: center;
     display: flex;
-    gap: ${theme.spacing[3]}px;
+    gap: ${theme.spacing[3]};
   `}
 `;
 

@@ -40,7 +40,7 @@ const GoogleButton = ({
 
 const StyledIcon = styled(IcoGoogleColored24)`
   ${({ theme }) => css`
-    margin-right: ${theme.spacing[3]}px;
+    margin-right: ${theme.spacing[3]};
   `}
 `;
 

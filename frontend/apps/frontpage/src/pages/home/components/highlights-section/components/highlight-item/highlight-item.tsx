@@ -42,8 +42,8 @@ const HighlightItem = ({
 const Container = styled.article`
   ${({ theme }) => css`
     z-index: 5;
-    border-radius: ${theme.borderRadius.default}px;
-    border: ${theme.borderWidth[1]}px solid ${theme.borderColor.tertiary};
+    border-radius: ${theme.borderRadius.default};
+    border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
     backdrop-filter: blur(1px);
     background: rgba(255, 255, 255, 0.6);
   `}
@@ -51,13 +51,13 @@ const Container = styled.article`
 
 const ImageContainer = styled.div`
   ${({ theme }) => css`
-    margin-bottom: ${theme.spacing[5]}px;
+    margin-bottom: ${theme.spacing[5]};
   `}
 `;
 
 const Content = styled.div`
   ${({ theme }) => css`
-    padding: ${theme.spacing[7]}px;
+    padding: ${theme.spacing[7]};
   `}
 `;
 

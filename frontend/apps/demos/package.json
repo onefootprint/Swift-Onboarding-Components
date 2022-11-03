@@ -24,7 +24,6 @@
     "@onefootprint/ui": "*",
     "@tryghost/content-api": "^1.11.0",
     "next": "13.0.0",
-    "polished": "^4.2.2",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "styled-components": "^5.3.6"

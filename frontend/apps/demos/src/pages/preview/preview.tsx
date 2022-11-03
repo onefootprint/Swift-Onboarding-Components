@@ -87,18 +87,18 @@ const Container = styled.div`
 const Inner = styled.div`
   ${({ theme }) => css`
     background: ${theme.backgroundColor.primary};
-    border-radius: ${theme.borderRadius.compact}px;
-    border: ${theme.borderWidth[1]}px solid ${theme.borderColor.tertiary};
+    border-radius: ${theme.borderRadius.compact};
+    border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
     display: flex;
     flex-direction: column;
-    gap: ${theme.spacing[9]}px;
-    padding: ${theme.spacing[7]}px ${theme.spacing[5]}px;
+    gap: ${theme.spacing[9]};
+    padding: ${theme.spacing[7]} ${theme.spacing[5]};
     text-align: center;
     width: 90%;
 
     ${media.greaterThan('sm')`
       max-width: 552px;
-      padding: ${theme.spacing[9]}px;
+      padding: ${theme.spacing[9]};
     `}
 
     ${media.greaterThan('md')`

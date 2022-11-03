@@ -130,7 +130,7 @@ const ResendCodeButton = () => {
 
 const Container = styled.div`
   ${({ theme }) => css`
-    row-gap: ${theme.spacing[4]}px;
+    row-gap: ${theme.spacing[4]};
     flex-direction: column;
     display: flex;
     justify-content: center;

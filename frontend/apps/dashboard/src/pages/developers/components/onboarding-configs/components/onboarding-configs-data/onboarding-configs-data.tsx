@@ -32,7 +32,7 @@ const OnboardingConfigsData = ({ data }: OnboardingConfigsDataProps) => {
 const List = styled.div`
   ${({ theme }) => css`
     table {
-      margin-bottom: ${theme.spacing[7]}px;
+      margin-bottom: ${theme.spacing[7]};
     }
   `}
 `;

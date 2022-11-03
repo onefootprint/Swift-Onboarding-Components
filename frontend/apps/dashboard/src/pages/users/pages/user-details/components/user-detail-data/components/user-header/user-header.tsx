@@ -50,7 +50,7 @@ const HeaderContainer = styled.div`
   ${({ theme }) => css`
     display: flex;
     flex-direction: column;
-    gap: ${theme.spacing[2]}px;
+    gap: ${theme.spacing[2]};
   `};
 `;
 
@@ -59,7 +59,7 @@ const RowContainer = styled.div`
   flex-direction: row;
   align-items: center;
   ${({ theme }) => css`
-    gap: ${theme.spacing[3]}px;
+    gap: ${theme.spacing[3]};
   `};
 `;
 

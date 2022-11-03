@@ -1,7 +1,4 @@
-import {
-  FootprintAppearance,
-  FootprintButton,
-} from '@onefootprint/footprint-react';
+import { FootprintButton } from '@onefootprint/footprint-react';
 import { Box, createFontStyles, media, Typography } from '@onefootprint/ui';
 import Head from 'next/head';
 import React, { useState } from 'react';
@@ -16,30 +13,6 @@ export type DemoProps = {
     feature_image: string;
     meta_title: string;
   };
-};
-
-const appearance: FootprintAppearance = {
-  theme: 'light',
-  variables: {
-    dialog: {
-      bg: '#fff',
-      elevation: '0px 1px 4px 0px rgba(0, 0, 0, 0.12156862745098039)',
-      borderRadius: '6px',
-    },
-    fpButton: {
-      height: '48px',
-      borderRadius: '6px',
-    },
-    loading: {
-      bg: 'rgba(0, 0, 0, 0.6)',
-      color: '#fff',
-      borderRadius: '4px',
-      padding: '16px',
-    },
-    overlay: {
-      bg: 'rgba(0, 0, 0, 0.3)',
-    },
-  },
 };
 
 const publicKey = process.env.NEXT_PUBLIC_TENANT_KEY as string;
@@ -74,7 +47,6 @@ const Demo = ({ page }: DemoProps) => {
               <Content dangerouslySetInnerHTML={{ __html: page.html }} />
               <ButtonContainer>
                 <FootprintButton
-                  appearance={appearance}
                   publicKey={publicKey}
                   onCompleted={(validationToken: string) => {
                     setConfirmation(true);
@@ -112,18 +84,18 @@ const Container = styled.div`
 const Inner = styled.div`
   ${({ theme }) => css`
     background: ${theme.backgroundColor.primary};
-    border-radius: ${theme.borderRadius.compact}px;
-    border: ${theme.borderWidth[1]}px solid ${theme.borderColor.tertiary};
+    border-radius: ${theme.borderRadius.compact};
+    border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
     display: flex;
     flex-direction: column;
-    gap: ${theme.spacing[9]}px;
-    padding: ${theme.spacing[7]}px ${theme.spacing[5]}px;
+    gap: ${theme.spacing[9]};
+    padding: ${theme.spacing[7]} ${theme.spacing[5]};
     text-align: center;
     width: 90%;
 
     ${media.greaterThan('sm')`
       max-width: 552px;
-      padding: ${theme.spacing[9]}px;
+      padding: ${theme.spacing[9]};
     `}
 
     ${media.greaterThan('md')`
@@ -135,7 +107,7 @@ const Inner = styled.div`
 const Content = styled.div`
   ${({ theme }) => css`
     img {
-      margin-bottom: ${theme.spacing[7]}px;
+      margin-bottom: ${theme.spacing[7]};
     }
 
     h1,
@@ -143,7 +115,7 @@ const Content = styled.div`
     h3 {
       ${createFontStyles('heading-2')};
       color: ${theme.color.primary};
-      margin-bottom: ${theme.spacing[7]}px;
+      margin-bottom: ${theme.spacing[7]};
     }
 
     p {

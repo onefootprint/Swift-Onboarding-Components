@@ -1,41 +1,32 @@
-type Variant = {
-  bg: {
-    initial: string;
-    hover: string;
-    active: string;
-    disabled: string;
-    loading: string;
-  };
-  color: {
-    initial: string;
-    hover: string;
-    active: string;
-    disabled: string;
-    loading: string;
-  };
-  border: {
-    initial: string;
-    hover: string;
-    active: string;
-    disabled: string;
-  };
+import * as CSS from 'csstype';
+
+type VariantStyles = Partial<{
+  bg: CSS.Property.Background;
+  color: CSS.Property.Color;
+  borderColor: CSS.Property.BorderColor;
+}>;
+
+type Variant = VariantStyles & {
+  hover: VariantStyles;
+  active: VariantStyles;
+  loading: VariantStyles;
+  disabled: VariantStyles;
 };
 
 type Size = {
-  height: number;
-  paddingHorizontal: number;
+  height: CSS.Property.Height;
+  paddingHorizontal: CSS.Property.PaddingLeft | CSS.Property.PaddingRight;
   typography: string;
 };
 
 export type Button = {
   global: {
-    borderWidth: number;
-    borderRadius: number;
-    outlineOffset: number;
+    borderWidth: CSS.Property.BorderWidth;
+    borderRadius: CSS.Property.BorderRadius;
     elevation: {
-      initial: string;
-      hover: string;
-      active: string;
+      initial: CSS.Property.BoxShadow;
+      hover: CSS.Property.BoxShadow;
+      active: CSS.Property.BoxShadow;
     };
   };
   variant: {

@@ -153,11 +153,11 @@ const FloatingBox = styled.div`
   box-shadow: 0px 1px 8px rgba(0, 0, 0, 0.14);
   align-items: center;
   ${({ theme }) => css`
-    gap: ${theme.spacing[3]}px;
+    gap: ${theme.spacing[3]};
     background-color: ${theme.backgroundColor.primary};
     border: 1px solid ${theme.borderColor.tertiary};
-    padding: ${theme.spacing[7]}px;
-    border-radius: ${theme.borderRadius.default}px;
+    padding: ${theme.spacing[7]};
+    border-radius: ${theme.borderRadius.default};
   `};
 `;
 

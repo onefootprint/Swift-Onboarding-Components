@@ -81,7 +81,7 @@ const OptionContainer = styled.div<{
     display: flex;
     justify-content: space-between;
     left: 0;
-    padding: ${theme.spacing[3]}px ${theme.spacing[5]}px;
+    padding: ${theme.spacing[3]} ${theme.spacing[5]};
     position: absolute;
     top: 0;
     width: 100%;
@@ -100,7 +100,7 @@ const Content = styled.div`
 
 const StyledFlag = styled(Flag)`
   ${({ theme }) => css`
-    margin-right: ${theme.spacing[3]}px;
+    margin-right: ${theme.spacing[3]};
   `}
 `;
 

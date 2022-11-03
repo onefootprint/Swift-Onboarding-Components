@@ -133,8 +133,8 @@ const Header = styled.div`
     align-items: center;
     display: flex;
     justify-content: space-between;
-    margin-bottom: ${theme.spacing[5]}px;
-    padding: ${theme.spacing[6]}px ${theme.spacing[5]}px;
+    margin-bottom: ${theme.spacing[5]};
+    padding: ${theme.spacing[6]} ${theme.spacing[5]};
   `}
 `;
 
@@ -157,7 +157,7 @@ const NavTriggerButton = styled.button`
 
 const CtaContainer = styled.div`
   ${({ theme }) => css`
-    padding: ${theme.spacing[5]}px;
+    padding: ${theme.spacing[5]};
   `}
 `;
 

@@ -57,17 +57,17 @@ const SelectSearch = ({
 const Container = styled.div`
   ${({ theme }) => css`
     height: 44px;
-    border-bottom: ${theme.borderWidth[1]}px solid ${theme.borderColor.tertiary};
+    border-bottom: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
 
     svg {
-      left: ${theme.spacing[5]}px;
+      left: ${theme.spacing[5]};
       pointer-events: none;
       position: absolute;
-      top: ${theme.spacing[4] + theme.spacing[1]}px;
+      top: calc(${theme.spacing[4]} + ${theme.spacing[1]});
     }
 
     + ul {
-      padding-top: ${theme.spacing[2]}px;
+      padding-top: ${theme.spacing[2]};
     }
   `}
 `;
@@ -81,13 +81,13 @@ const Input = styled.input`
   ${({ theme }) => css`
     ${createFontStyles('body-3')};
     background: ${theme.backgroundColor.primary};
-    border-top-left-radius: ${theme.borderRadius.default}px;
-    border-top-right-radius: ${theme.borderRadius.default}px;
+    border-top-left-radius: ${theme.borderRadius.default};
+    border-top-right-radius: ${theme.borderRadius.default};
     border: none;
     color: ${theme.color.primary};
     height: 100%;
     outline: none;
-    padding-left: ${theme.spacing[9]}px;
+    padding-left: ${theme.spacing[9]};
     width: 100%;
 
     ::placeholder {

@@ -1,57 +1,56 @@
-import * as t from '../../../output/light';
-import type { Input } from '../../types/components/input';
+import type { Input } from '../../types/components';
 
 const input: Input = {
   global: {
-    borderRadius: t.baseInputsBorderRadius,
-    borderWidth: t.baseInputsBorderWidth,
-    color: t.baseInputsFocusTypingInputContent,
-    placeholderColor: t.baseInputsInitialPlaceholder,
+    borderRadius: 'var(--fp-base-inputs-border-radius)',
+    borderWidth: 'var(--fp-base-inputs-border-width)',
+    color: 'var(--fp-base-inputs-focus-typing-input-content)',
+    placeholderColor: 'var(--fp-base-inputs-initial-placeholder)',
   },
   state: {
     default: {
       initial: {
-        bg: t.baseInputsInitialBg,
-        border: t.baseInputsInitialBorder,
+        bg: 'var(--fp-base-inputs-initial-bg)',
+        border: 'var(--fp-base-inputs-initial-border)',
       },
       hover: {
-        bg: t.baseInputsHoverBg,
-        border: t.baseInputsHoverBorder,
+        bg: 'var(--fp-base-inputs-hover-bg)',
+        border: 'var(--fp-base-inputs-hover-border)',
       },
       focus: {
-        bg: t.baseInputsFocusBg,
-        border: t.baseInputsFocusBorder,
-        elevation: t.baseInputsElevationFocus,
+        bg: 'var(--fp-base-inputs-focus-bg)',
+        border: 'var(--fp-base-inputs-focus-border)',
+        elevation: 'var(--fp-base-inputs-elevation-focus)',
       },
     },
     error: {
       initial: {
-        bg: t.baseInputsFocusErrorBg,
-        border: t.baseInputsInitialErrorBorder,
+        bg: 'var(--fp-base-inputs-initial-error-bg)',
+        border: 'var(--fp-base-inputs-initial-error-border)',
       },
       hover: {
-        bg: t.baseInputsHoverErrorBg,
-        border: t.baseInputsHoverErrorBorder,
+        bg: 'var(--fp-base-inputs-hover-error-bg)',
+        border: 'var(--fp-base-inputs-hover-error-border)',
       },
       focus: {
-        bg: t.baseInputsFocusErrorBg,
-        border: t.baseInputsFocusErrorBorder,
-        elevation: t.baseInputsElevationFocusError,
+        bg: 'var(--fp-base-inputs-focus-error-bg)',
+        border: 'var(--fp-base-inputs-focus-error-border)',
+        elevation: 'var(--fp-base-inputs-elevation-focus-error)',
       },
     },
     disabled: {
-      bg: t.baseInputsDisabledBg,
-      border: t.baseInputsDisabledBorder,
+      bg: 'var(--fp-base-inputs-disabled-bg)',
+      border: 'var(--fp-base-inputs-disabled-border)',
     },
   },
   size: {
     default: {
-      height: t.baseInputsHeightDefault,
-      typography: t.baseInputsTypographyDefaultInputContent,
+      height: 'var(--fp-base-inputs-height-default)',
+      typography: 'var(--fp-base-inputs-typography-default-input-content)',
     },
     compact: {
-      height: t.baseInputsHeightCompact,
-      typography: t.baseInputsTypographyCompactInputContent,
+      height: 'var(--fp-base-inputs-height-compact)',
+      typography: 'var(--fp-base-inputs-typography-compact-input-content)',
     },
   },
 };

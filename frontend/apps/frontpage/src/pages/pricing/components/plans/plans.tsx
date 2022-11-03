@@ -14,10 +14,10 @@ const Plans = () => (
 
 const PlansContainer = styled.div`
   ${({ theme }) => css`
-    margin-bottom: ${theme.spacing[5]}px;
+    margin-bottom: ${theme.spacing[5]};
 
     ${media.greaterThan('md')`
-      margin-bottom: ${theme.spacing[8]}px;
+      margin-bottom: ${theme.spacing[8]};
     `}
   `}
 `;

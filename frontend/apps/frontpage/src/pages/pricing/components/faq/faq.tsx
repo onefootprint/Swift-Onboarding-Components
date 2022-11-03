@@ -33,11 +33,11 @@ const Faq = ({ title, items }: FaqProps) => (
 
 const TitleContainer = styled.div`
   ${({ theme }) => css`
-    margin-bottom: ${theme.spacing[7]}px;
+    margin-bottom: ${theme.spacing[7]};
     text-align: center;
 
     ${media.greaterThan('md')`
-      margin-bottom: ${theme.spacing[8]}px;
+      margin-bottom: ${theme.spacing[8]};
     `}
   `}
 `;
@@ -45,8 +45,8 @@ const TitleContainer = styled.div`
 const QuestionsContainer = styled.div`
   ${({ theme }) => css`
     display: grid;
-    gap: ${theme.spacing[5]}px;
-    margin-bottom: ${theme.spacing[10]}px;
+    gap: ${theme.spacing[5]};
+    margin-bottom: ${theme.spacing[10]};
   `}
 `;
 

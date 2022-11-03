@@ -87,7 +87,7 @@ const InputContainer = styled.div`
     position: relative;
 
     input[type='tel'] {
-      padding-left: ${theme.spacing[10] + theme.spacing[3]}px;
+      padding-left: calc(${theme.spacing[10]} + ${theme.spacing[3]});
     }
   `}
 `;
@@ -99,10 +99,10 @@ const Trigger = styled.button`
     border: none;
     cursor: pointer;
     display: flex;
-    gap: ${theme.spacing[2]}px;
+    gap: ${theme.spacing[2]};
     height: 100%;
     justify-content: center;
-    padding-left: ${theme.spacing[5]}px;
+    padding-left: ${theme.spacing[5]};
   `}
 `;
 
@@ -112,7 +112,7 @@ const LoadingContainer = styled.div`
   ${({ theme }) => css`
     height: 100%;
     display: flex;
-    padding-right: ${theme.spacing[5]}px;
+    padding-right: ${theme.spacing[5]};
   `}
 `;
 

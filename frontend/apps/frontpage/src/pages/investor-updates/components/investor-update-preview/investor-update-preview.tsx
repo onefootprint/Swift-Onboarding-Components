@@ -41,14 +41,16 @@ const InvestorUpdatePreview = ({
           </Typography>
         </Link>
         <Typography variant="body-2">{excerpt}</Typography>
-        <LinkButton
-          sx={{ marginTop: 7, cursor: 'pointer' }}
-          iconComponent={IcoArrowRightSmall16}
-          iconPosition="right"
-          href={href}
-        >
-          {t('read-more')}
-        </LinkButton>
+        <Link href={href} passHref legacyBehavior>
+          <LinkButton
+            sx={{ marginTop: 7, cursor: 'pointer' }}
+            iconComponent={IcoArrowRightSmall16}
+            iconPosition="right"
+            href={href}
+          >
+            {t('read-more')}
+          </LinkButton>
+        </Link>
       </Content>
     </Article>
   );
@@ -67,7 +69,7 @@ const Content = styled.div`
     display: flex;
     flex-direction: column;
     height: 100%;
-    padding-bottom: ${theme.spacing[9]}px;
+    padding-bottom: ${theme.spacing[9]};
 
     a {
       text-decoration: none;
@@ -82,7 +84,7 @@ const Header = styled.div`
     min-width: var(--header-width);
     display: flex;
     flex-direction: column;
-    margin-right: ${theme.spacing[7]}px;
+    margin-right: ${theme.spacing[7]};
   `}
 `;
 

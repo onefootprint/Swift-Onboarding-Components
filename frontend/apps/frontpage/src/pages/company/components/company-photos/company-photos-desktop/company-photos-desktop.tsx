@@ -33,15 +33,15 @@ const Container = styled.div`
       justify-content: center;
       align-items: center;
       flex-direction: row;
-      gap: ${theme.spacing[7]}px;
+      gap: ${theme.spacing[7]};
 
       img {
-        border-radius: ${theme.borderRadius.default}px;
+        border-radius: ${theme.borderRadius.default};
       }
     `}
 
     ${media.greaterThan('lg')`
-      margin: 0 -${theme.spacing[12]}px;
+      margin: 0 -${theme.spacing[12]};
     `}
   `}
 `;

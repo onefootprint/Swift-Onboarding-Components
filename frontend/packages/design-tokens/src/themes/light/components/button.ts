@@ -1,83 +1,87 @@
-import * as t from '../../../output/light';
-import type { Button } from '../../types/components/button';
+import type { Button } from '../../types/components';
 
 const button: Button = {
   global: {
-    borderRadius: t.buttonsBorderRadius,
-    borderWidth: t.buttonBorderWidth,
-    outlineOffset: t.spacing2,
+    borderRadius: 'var(--fp-buttons-border-radius)',
+    borderWidth: 'var(--fp-button-border-width)',
     elevation: {
-      initial: t.buttonElevationInitial,
-      hover: t.buttonElevationHover,
-      active: t.buttonElevationActive,
+      initial: 'var(--fp-button-elevation-initial)',
+      hover: 'var(--fp-button-elevation-hover)',
+      active: 'var(--fp-button-elevation-active)',
     },
   },
   variant: {
     primary: {
-      bg: {
-        initial: t.buttonsPrimaryInitialBg,
-        hover: t.buttonsPrimaryHoverBg,
-        active: t.buttonsPrimaryActiveBg,
-        disabled: t.buttonsPrimaryDisabledBg,
-        loading: t.buttonsPrimaryLoadingBg,
+      bg: 'var(--fp-buttons-primary-initial-bg)',
+      color: 'var(--fp-buttons-primary-initial-text)',
+      borderColor: 'var(--fp-buttons-primary-initial-border)',
+      hover: {
+        bg: 'var(--fp-buttons-primary-hover-bg)',
+        color: 'var(--fp-buttons-primary-hover-text)',
+        borderColor: 'var(--fp-buttons-primary-hover-border)',
       },
-      color: {
-        initial: t.buttonsPrimaryInitialText,
-        hover: t.buttonsPrimaryHoverText,
-        active: t.buttonsPrimaryActiveText,
-        disabled: t.buttonsPrimaryDisabledText,
-        loading: t.buttonsPrimaryLoadingIcon,
+      active: {
+        bg: 'var(--fp-buttons-primary-active-bg)',
+        color: 'var(--fp-buttons-primary-active-text)',
+        borderColor: 'var(--fp-buttons-primary-active-border)',
       },
-      border: {
-        initial: t.buttonsPrimaryInitialBorder,
-        hover: t.buttonsPrimaryHoverBorder,
-        active: t.buttonsPrimaryActiveBorder,
-        disabled: t.buttonsPrimaryDisabledBorder,
+      loading: {
+        bg: 'var(fp-buttons-primary-loading-bg)',
+        color: 'var(fp-buttons-primary-loading-bg)',
+      },
+      disabled: {
+        bg: 'var(fp-buttons-primary-disabled-bg)',
+        color: 'var(fp-buttons-primary-disabled-text)',
+        borderColor: 'var(fp-buttons-primary-disabled-border)',
       },
     },
     secondary: {
-      bg: {
-        initial: t.buttonsSecondaryInitialBg,
-        hover: t.buttonsSecondaryHoverBg,
-        active: t.buttonsSecondaryActiveBg,
-        disabled: t.buttonsSecondaryDisabledBg,
-        loading: t.buttonsSecondaryLoadingBg,
+      bg: 'var(--fp-buttons-secondary-initial-bg)',
+      color: 'var(--fp-buttons-secondary-initial-text)',
+      borderColor: 'var(--fp-buttons-secondary-initial-border)',
+      hover: {
+        bg: 'var(--fp-buttons-secondary-hover-bg)',
+        color: 'var(--fp-buttons-secondary-hover-text)',
+        borderColor: 'var(--fp-buttons-secondary-hover-border)',
       },
-      color: {
-        initial: t.buttonsSecondaryInitialText,
-        hover: t.buttonsSecondaryHoverText,
-        active: t.buttonsSecondaryActiveText,
-        disabled: t.buttonsSecondaryDisabledText,
-        loading: t.buttonsSecondaryLoadingIcon,
+      active: {
+        bg: 'var(--fp-buttons-secondary-active-bg)',
+        color: 'var(--fp-buttons-secondary-active-text)',
+        borderColor: 'var(--fp-buttons-secondary-active-border)',
       },
-      border: {
-        initial: t.buttonsSecondaryInitialBorder,
-        hover: t.buttonsSecondaryHoverBorder,
-        active: t.buttonsSecondaryActiveBorder,
-        disabled: t.buttonsSecondaryDisabledBorder,
+      loading: {
+        bg: 'var(fp-buttons-secondary-loading-bg)',
+        color: 'var(fp-buttons-secondary-loading-bg)',
+      },
+      disabled: {
+        bg: 'var(fp-buttons-secondary-disabled-bg)',
+        color: 'var(fp-buttons-secondary-disabled-text)',
+        borderColor: 'var(fp-buttons-secondary-disabled-border)',
       },
     },
   },
   size: {
     large: {
-      height: t.buttonsHeightLarge,
-      paddingHorizontal: t.buttonsSpacingPaddingsHorizontalLarge,
-      typography: t.buttonsTypographyLarge,
+      height: 'var(--fp-buttons-height-large)',
+      paddingHorizontal: 'var(--fp-buttons-spacing-paddings-horizontal-large)',
+      typography: 'var(--fp-buttons-typography-large)',
     },
     compact: {
-      height: t.buttonsHeightCompact,
-      paddingHorizontal: t.buttonsSpacingPaddingsHorizontalCompact,
-      typography: t.buttonsTypographyCompact,
+      height: 'var(--fp-buttons-height-compact)',
+      paddingHorizontal:
+        'var(--fp-buttons-spacing-paddings-horizontal-compact)',
+      typography: 'var(--fp-buttons-typography-compact)',
     },
     small: {
-      height: t.buttonsHeightSmall,
-      paddingHorizontal: t.buttonsSpacingPaddingsHorizontalSmall,
-      typography: t.buttonsTypographySmall,
+      height: 'var(--fp-buttons-height-small)',
+      paddingHorizontal: 'var(--fp-buttons-spacing-paddings-horizontal-small)',
+      typography: 'var(--fp-buttons-typography-small)',
     },
     default: {
-      height: t.buttonsHeightDefault,
-      paddingHorizontal: t.buttonsSpacingPaddingsHorizontalDefault,
-      typography: t.buttonsTypographyDefault,
+      height: 'var(--fp-buttons-height-default)',
+      paddingHorizontal:
+        'var(--fp-buttons-spacing-paddings-horizontal-default)',
+      typography: 'var(--fp-buttons-typography-default)',
     },
   },
 };

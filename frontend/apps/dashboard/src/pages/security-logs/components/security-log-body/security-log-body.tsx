@@ -79,8 +79,8 @@ const DataGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   ${({ theme }) => css`
-    row-gap: ${theme.spacing[3]}px;
-    margin-top: ${theme.spacing[5]}px;
+    row-gap: ${theme.spacing[3]};
+    margin-top: ${theme.spacing[5]};
   `};
 `;
 
@@ -88,9 +88,9 @@ const AccessEventBodyContainer = styled.div`
   display: flex;
   flex-direction: column;
   ${({ theme }) => css`
-    gap: ${theme.spacing[9]}px;
-    margin-top: ${theme.spacing[5]}px;
-    margin-bottom: ${theme.spacing[10]}px;
+    gap: ${theme.spacing[9]};
+    margin-top: ${theme.spacing[5]};
+    margin-bottom: ${theme.spacing[10]};
   `};
 `;
 

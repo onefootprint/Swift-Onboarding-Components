@@ -35,11 +35,11 @@ const Container = styled.div`
   ${({ theme }) => css`
     display: flex;
     flex-direction: column;
-    row-gap: ${theme.spacing[7]}px;
+    row-gap: ${theme.spacing[7]};
     justify-content: center;
     align-items: center;
     > button {
-      margin-top: -${theme.spacing[4]}px;
+      margin-top: -${theme.spacing[4]};
     }
   `}
 `;

@@ -58,10 +58,10 @@ const ToastContainer = styled.div`
   ${({ theme }) => css`
     display: flex;
     flex-direction: column;
-    gap: ${theme.spacing[5]}px;
+    gap: ${theme.spacing[5]};
     position: fixed;
-    right: ${theme.spacing[5]}px;
-    top: ${theme.spacing[5]}px;
+    right: ${theme.spacing[5]};
+    top: ${theme.spacing[5]};
     z-index: ${theme.zIndex.toast};
   `}
 `;

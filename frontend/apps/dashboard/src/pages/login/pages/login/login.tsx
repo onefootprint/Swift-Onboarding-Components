@@ -77,7 +77,7 @@ const Inner = styled.div`
     width: 350px;
     display: flex;
     flex-direction: column;
-    row-gap: ${theme.spacing[5]}px;
+    row-gap: ${theme.spacing[5]};
   `}
 `;
 
@@ -86,7 +86,7 @@ const TextContainer = styled.div`
 
   > * {
     display: inline;
-    margin-right: ${({ theme }) => theme.spacing[2]}px;
+    margin-right: ${({ theme }) => theme.spacing[2]};
   }
 `;
 

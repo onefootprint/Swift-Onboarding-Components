@@ -1,6 +1,4 @@
-import { BorderColor } from '@onefootprint/design-tokens';
 import { IcoChevronDown16 } from '@onefootprint/icons';
-import { darken, rgba } from 'polished';
 import React, { forwardRef } from 'react';
 import styled, { css } from 'styled-components';
 
@@ -20,9 +18,9 @@ const BaseSelectTrigger = forwardRef<HTMLButtonElement, BaseSelectTriggerProps>(
     ref,
   ) => (
     <BaseSelectTriggerContainer
+      data-has-error={hasError}
+      data-has-focus={hasFocus}
       disabled={disabled}
-      hasError={hasError}
-      hasFocus={hasFocus}
       onClick={onClick}
       ref={ref}
       type="button"
@@ -33,54 +31,60 @@ const BaseSelectTrigger = forwardRef<HTMLButtonElement, BaseSelectTriggerProps>(
   ),
 );
 
-const createFocusStyle = (borderColor: BorderColor) => css`
-  ${({ theme }) => css`
-    border-color: ${theme.borderColor[borderColor]};
-    box-shadow: 0 0 0 4px ${rgba(theme.borderColor[borderColor], 0.1)};
-  `}
-`;
-
 const BaseSelectTriggerContainer = styled.button<BaseSelectTriggerProps>`
-  ${({ hasError, hasFocus, theme }) => {
-    const defaultBorderColor = hasError ? 'error' : 'primary';
-    const hoverBorderColor = hasError ? 'error' : 'primary';
-    const focusBorderColor = hasError ? 'error' : 'secondary';
+  ${({ theme }) => {
+    const { input } = theme.components;
 
     return css`
       ${createFontStyles('body-3')};
       align-items: center;
-      background: ${theme.backgroundColor.primary};
-      border-radius: ${theme.borderRadius.default}px;
-      border: 1px solid ${theme.borderColor[defaultBorderColor]};
-      color: ${theme.color.primary};
+      background: ${input.state.default.initial.bg};
+      border-color: ${input.state.default.initial.border};
+      border-radius: ${input.global.borderRadius};
+      border-style: solid;
+      border-width: ${input.global.borderWidth};
+      color: ${input.global.color};
       display: flex;
-      height: 40px;
+      height: ${input.size.default.height};
       justify-content: space-between;
       outline: none;
-      padding: 0 ${theme.spacing[5]}px;
+      padding: 0 ${theme.spacing[5]};
       text-align: left;
       width: 100%;
 
-      ${!hasFocus &&
-      css`
-        &:hover:enabled {
-          border: 1px solid
-            ${hoverBorderColor === 'error'
-              ? darken(0.1, theme.borderColor[hoverBorderColor])
-              : darken(0.32, theme.borderColor[hoverBorderColor])};
+      &[data-has-error='false'] {
+        &:enabled:hover {
+          background: ${input.state.default.hover.bg};
+          border-color: ${input.state.default.hover.border};
         }
-      `}
 
-      &:focus:enabled {
-        ${createFocusStyle(focusBorderColor)}
+        &[data-has-focus='true'],
+        &:enabled:focus {
+          background: ${input.state.default.focus.bg};
+          border-color: ${input.state.default.focus.border};
+          box-shadow: ${input.state.default.focus.elevation};
+        }
       }
 
-      ${hasFocus && createFocusStyle(focusBorderColor)}
+      &[data-has-error='true'] {
+        background: ${input.state.error.initial.bg};
+        border-color: ${input.state.error.initial.border};
+
+        &:enabled:hover {
+          background: ${input.state.error.hover.bg};
+          border-color: ${input.state.error.hover.border};
+        }
+
+        &:enabled:focus {
+          background: ${input.state.error.focus.bg};
+          border-color: ${input.state.error.focus.border};
+          box-shadow: ${input.state.error.focus.elevation};
+        }
+      }
 
       &:disabled {
-        background: ${theme.backgroundColor.secondary};
-        color: ${theme.color.quaternary};
-        cursor: not-allowed;
+        background: ${input.state.disabled.bg};
+        border-color: ${input.state.disabled.border};
       }
     `;
   }}

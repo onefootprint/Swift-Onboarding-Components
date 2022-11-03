@@ -28,7 +28,7 @@ const Container = styled.div`
     justify-content: center;
     align-items: flex-start;
     flex-direction: column;
-    row-gap: ${theme.spacing[2]}px;
+    row-gap: ${theme.spacing[2]};
   `}
 `;
 

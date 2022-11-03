@@ -55,7 +55,7 @@ const Header = styled.header`
     align-items: center;
     display: flex;
     justify-content: space-between;
-    margin-bottom: ${theme.spacing[5]}px;
+    margin-bottom: ${theme.spacing[5]};
   `}
 `;
 

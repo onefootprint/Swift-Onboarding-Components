@@ -18,11 +18,11 @@ const SupportList = () => (
 
 const Container = styled.ul`
   ${({ theme }) => css`
-    border-top: ${theme.borderWidth[1]}px solid ${theme.borderColor.tertiary};
-    padding: ${theme.spacing[6]}px 0;
+    border-top: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
+    padding: ${theme.spacing[6]} 0;
 
     li:not(:last-child) {
-      margin-bottom: ${theme.spacing[4]}px;
+      margin-bottom: ${theme.spacing[4]};
     }
 
     a {
@@ -30,8 +30,8 @@ const Container = styled.ul`
       align-items: center;
       color: ${theme.color.tertiary};
       display: flex;
-      gap: ${theme.spacing[3]}px;
-      padding-left: ${theme.spacing[3]}px;
+      gap: ${theme.spacing[3]};
+      padding-left: ${theme.spacing[3]};
       text-decoration: none;
 
       &:hover {

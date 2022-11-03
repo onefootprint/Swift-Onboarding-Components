@@ -58,7 +58,7 @@ const Header = styled.header`
     align-items: center;
     display: flex;
     justify-content: space-between;
-    margin-bottom: ${theme.spacing[5]}px;
+    margin-bottom: ${theme.spacing[5]};
   `}
 `;
 
@@ -68,7 +68,7 @@ const Fieldset = styled.fieldset`
     flex-direction: column;
 
     > div:not(:last-child) {
-      margin-bottom: ${theme.spacing[7]}px;
+      margin-bottom: ${theme.spacing[7]};
     }
   `}
 `;

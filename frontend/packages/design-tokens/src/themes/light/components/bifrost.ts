@@ -1,11 +1,10 @@
-import * as t from '../../../output/light';
 import type { Bifrost } from '../../types/components';
 
 // TODO: Import this from theme - right now we don't have it
 const overlay: Bifrost = {
   fpButton: {
-    height: `${t.fpButtonHeight}px`,
-    borderRadius: `${t.fpButtonBorderRadius}px`,
+    height: 'var(--fp-fp-button-heigh)',
+    borderRadius: 'var(--fp-fp-button-border-radius)',
   },
   overlay: {
     bg: 'rgba(0, 0, 0, 0.3)',
@@ -17,9 +16,9 @@ const overlay: Bifrost = {
     padding: '16px',
   },
   dialog: {
-    bg: t.bifrostDialogHeaderBg,
-    elevation: t.bifrostDialogElevation,
-    borderRadius: `${t.bifrostDialogBorderRadius}px`,
+    bg: 'var(--fp-bifrost-dialog-body-bg-primary)',
+    elevation: 'var(--fp-bifrost-dialog-elevation)',
+    borderRadius: 'var(--fp-bifrost-dialog-border-radius)',
   },
 };
 

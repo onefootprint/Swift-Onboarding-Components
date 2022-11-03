@@ -2,12 +2,13 @@ import { useIntl, useTranslation } from '@onefootprint/hooks';
 import { Container, Divider, media } from '@onefootprint/ui';
 import React from 'react';
 import TwitterBreadcrumb from 'src/components/twitter-breadcrumb';
+import WritingLayout from 'src/components/writing-layout';
 import { getInitialPosts, PostType } from 'src/utils/ghost';
 import { Post } from 'src/utils/ghost/types';
 import styled, { css } from 'styled-components';
 
 import SEO from '../../components/seo';
-import SubscribeToNewsletter from '../../components/subscribe-to-newsletter';
+import SubscribeToNewsletter from '../../components/writing-layout/components/subscribe-to-newsletter';
 import LibraryPostPreview from './components/library-post-preview';
 
 export const getStaticProps = async () => {
@@ -26,7 +27,7 @@ const Library = ({ posts }: InvestorUpdatesProps) => {
     <>
       <SEO title={t('html-title')} slug="/library" />
       <Container>
-        <Inner>
+        <WritingLayout>
           <TwitterBreadcrumb
             title={t('breadcrumb.title')}
             description={t('breadcrumb.description')}
@@ -50,7 +51,7 @@ const Library = ({ posts }: InvestorUpdatesProps) => {
             ))}
           </Posts>
           <StyledDivider />
-        </Inner>
+        </WritingLayout>
         <SubscribeToNewsletter />
       </Container>
     </>
@@ -59,29 +60,17 @@ const Library = ({ posts }: InvestorUpdatesProps) => {
 
 const StyledDivider = styled(Divider)`
   ${({ theme }) => css`
-    margin-top: ${theme.spacing[9]}px;
+    margin-top: ${theme.spacing[9]};
   `}
 `;
 
 const Posts = styled.div`
   ${({ theme }) => css`
     display: grid;
-    gap: ${theme.spacing[9]}px;
+    gap: ${theme.spacing[9]};
 
     ${media.greaterThan('md')`
       grid-template-columns: repeat(2, 1fr);
-    `}
-  `}
-`;
-
-const Inner = styled.div`
-  ${({ theme }) => css`
-    margin: -${theme.spacing[7]}px auto ${theme.spacing[7]}px;
-    max-width: 960px;
-
-    ${media.greaterThan('lg')`
-      margin-bottom: ${theme.spacing[10]}px;
-      margin-top: -${theme.spacing[10]}px;
     `}
   `}
 `;

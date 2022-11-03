@@ -1,6 +1,5 @@
 import type { Icon } from '@onefootprint/icons';
 import { IcoChevronDown24 } from '@onefootprint/icons';
-import { darken } from 'polished';
 import React, { useId, useRef } from 'react';
 import styled, { css } from 'styled-components';
 
@@ -65,11 +64,11 @@ const Accordion = ({
 const Details = styled.div`
   ${({ theme }) => css`
     background: ${theme.backgroundColor.primary};
-    border-radius: ${theme.borderRadius.default}px;
-    border: ${theme.borderWidth[1]}px solid ${theme.borderColor.tertiary};
+    border-radius: ${theme.borderRadius.default};
+    border: ${theme.borderWidth[1]} solid ${theme.borderColor.primary};
 
     &:hover {
-      border-color: ${darken(0.32, theme.borderColor.primary)};
+      border-color: ${theme.borderColor.tertiary};
     }
   `}
 `;
@@ -81,9 +80,9 @@ const Summary = styled.button`
     border: none;
     cursor: pointer;
     display: flex;
-    gap: ${theme.spacing[3]}px;
+    gap: ${theme.spacing[3]};
     justify-content: space-between;
-    padding: ${theme.spacing[6]}px ${theme.spacing[5]}px;
+    padding: ${theme.spacing[6]} ${theme.spacing[5]};
     width: 100%;
   `}
 `;
@@ -91,7 +90,7 @@ const Summary = styled.button`
 const Title = styled.div`
   ${({ theme }) => css`
     display: flex;
-    gap: ${theme.spacing[3]}px;
+    gap: ${theme.spacing[3]};
   `}
 `;
 
@@ -111,7 +110,7 @@ const Content = styled.div<{ open: boolean }>`
 
 const ContentInner = styled.div`
   ${({ theme }) => css`
-    padding: ${theme.spacing[2]}px ${theme.spacing[6]}px ${theme.spacing[5]}px;
+    padding: ${theme.spacing[2]} ${theme.spacing[6]} ${theme.spacing[5]};
   `}
 `;
 

@@ -35,7 +35,7 @@ const Nav = styled.nav`
     ol {
       display: flex;
       flex-direction: row;
-      gap: ${theme.spacing[3]}px;
+      gap: ${theme.spacing[3]};
 
       a {
         text-decoration: none;

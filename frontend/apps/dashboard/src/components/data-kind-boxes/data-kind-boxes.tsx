@@ -124,7 +124,7 @@ const DataGrid = styled.div`
   display: grid;
   grid-template: auto auto / repeat(2, minmax(0, 1fr));
   ${({ theme }) => css`
-    gap: ${theme.spacing[7]}px;
+    gap: ${theme.spacing[7]};
   `};
 `;
 
@@ -132,7 +132,7 @@ const DataGridItem = styled.div<{ sx: SXStyles }>`
   display: flex;
   flex-direction: column;
   ${({ theme }) => css`
-    gap: ${theme.spacing[3]}px;
+    gap: ${theme.spacing[3]};
   `};
   ${({ sx }) => css`
     ${sx};

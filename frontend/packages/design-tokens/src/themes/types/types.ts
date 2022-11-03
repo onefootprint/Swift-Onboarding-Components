@@ -107,32 +107,32 @@ export type CodeHighlight<T = CSS.Properties> = {
 export type Color = keyof Colors;
 
 export type Spacings = {
-  0: number;
-  1: number;
-  2: number;
-  3: number;
-  4: number;
-  5: number;
-  6: number;
-  7: number;
-  8: number;
-  9: number;
-  10: number;
-  11: number;
-  12: number;
-  13: number;
-  14: number;
-  15: number;
+  0: string;
+  1: string;
+  2: string;
+  3: string;
+  4: string;
+  5: string;
+  6: string;
+  7: string;
+  8: string;
+  9: string;
+  10: string;
+  11: string;
+  12: string;
+  13: string;
+  14: string;
+  15: string;
 };
 
 export type Spacing = keyof Spacings;
 
 export type BorderRadiuses = {
-  none: number;
-  compact: number;
-  default: number;
-  large: number;
-  full: number;
+  none: string;
+  compact: string;
+  default: string;
+  large: string;
+  full: string;
 };
 
 export type BorderRadius = keyof BorderRadiuses;
@@ -170,9 +170,9 @@ type BackgroundColors = {
 export type BackgroundColor = keyof BackgroundColors;
 
 export type BorderWidths = {
-  0: number;
-  1: number;
-  2: number;
+  0: string;
+  1: string;
+  2: string;
 };
 
 export type BorderWidth = keyof BorderWidths;

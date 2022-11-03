@@ -34,13 +34,13 @@ export default BiometricLoginRetry;
 const ButtonContainer = styled.form`
   ${({ theme }) => css`
     display: grid;
-    row-gap: ${theme.spacing[4]}px;
+    row-gap: ${theme.spacing[4]};
   `}
 `;
 
 const Container = styled.form`
   ${({ theme }) => css`
     display: grid;
-    row-gap: ${theme.spacing[7]}px;
+    row-gap: ${theme.spacing[7]};
   `}
 `;

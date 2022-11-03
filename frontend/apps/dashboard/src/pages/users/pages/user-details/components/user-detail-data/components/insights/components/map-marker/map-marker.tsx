@@ -1,4 +1,3 @@
-import { rgba } from 'polished';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
@@ -23,20 +22,20 @@ const MapMarkerContainer = styled.div`
   align-items: center;
   justify-content: center;
   ${({ theme }) => css`
-    background-color: ${rgba(theme.backgroundColor.accent, 0.1)};
+    backdrop-filter: brightness(0.9);
     width: 324px;
     height: 324px;
-    border-radius: ${theme.borderRadius.full}px;
+    border-radius: ${theme.borderRadius.full};
   `};
 `;
 
 const MapMarkerDot = styled.div`
   ${({ theme }) => css`
     background-color: ${theme.backgroundColor.accent};
-    border: 2px solid #fff;
-    width: 16px;
+    border-radius: ${theme.borderRadius.full};
+    border: ${theme.borderWidth[2]} solid #fff;
     height: 16px;
-    border-radius: ${theme.borderRadius.full}px;
+    width: 16px;
   `};
 `;
 

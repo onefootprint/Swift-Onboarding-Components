@@ -205,8 +205,7 @@ const Table = styled.table`
     width: 100%;
 
     th {
-      border-bottom: ${theme.borderWidth[1]}px solid
-        ${theme.borderColor.tertiary};
+      border-bottom: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
     }
 
     th,
@@ -217,7 +216,7 @@ const Table = styled.table`
       width: 16%;
 
       &:first-child {
-        padding-left: ${theme.spacing[5]}px;
+        padding-left: ${theme.spacing[5]};
         text-align: left;
         width: 20%;
       }

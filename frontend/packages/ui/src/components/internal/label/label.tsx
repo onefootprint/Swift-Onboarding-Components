@@ -31,7 +31,7 @@ const Label = ({
 
 const Container = styled.div`
   ${({ theme }) => css`
-    margin-bottom: ${theme.spacing[3]}px;
+    margin-bottom: ${theme.spacing[3]};
   `}
 `;
 

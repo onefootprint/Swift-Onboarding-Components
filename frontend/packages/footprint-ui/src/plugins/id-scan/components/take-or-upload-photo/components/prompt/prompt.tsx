@@ -69,7 +69,7 @@ const ButtonsContainer = styled.div`
     width: 100%;
     display: flex;
     flex-direction: column;
-    row-gap: ${theme.spacing[4]}px;
+    row-gap: ${theme.spacing[4]};
   `}
 `;
 

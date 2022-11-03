@@ -13,7 +13,7 @@ const SearchIconContainer = styled.div`
     align-items: center;
     display: flex;
     height: 100%;
-    margin-left: ${theme.spacing[4]}px;
+    margin-left: ${theme.spacing[4]};
   `};
 `;
 

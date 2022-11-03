@@ -40,7 +40,7 @@ const QRCodeSent = () => {
 
 const Container = styled.form`
   ${({ theme }) => css`
-    row-gap: ${theme.spacing[7]}px;
+    row-gap: ${theme.spacing[7]};
     display: flex;
     justify-content: center;
     align-items: center;

@@ -131,12 +131,12 @@ const Inner = styled.div`
 
 const TextContainer = styled.div`
   ${({ theme }) => css`
-    margin-top: ${theme.spacing[5]}px;
+    margin-top: ${theme.spacing[5]};
     text-align: center;
 
     > * {
       display: inline;
-      margin-right: ${theme.spacing[2]}px;
+      margin-right: ${theme.spacing[2]};
     }
   `}
 `;

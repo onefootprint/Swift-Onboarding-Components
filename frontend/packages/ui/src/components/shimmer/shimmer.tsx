@@ -41,7 +41,7 @@ const blink = keyframes`
 const ShimmerContainer = styled.div<{ sx: SXStyles }>`
   ${({ theme }) => css`
     background: ${theme.backgroundColor.secondary};
-    border-radius: ${theme.borderRadius.compact}px;
+    border-radius: ${theme.borderRadius.compact};
     overflow: hidden;
     position: relative;
 

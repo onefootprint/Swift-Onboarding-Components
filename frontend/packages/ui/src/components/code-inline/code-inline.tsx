@@ -93,14 +93,14 @@ const CodeContent = styled.code`
   ${({ theme }) => css`
     ${createFontStyles('snippet-2')};
     background: ${theme.backgroundColor.secondary};
-    border-radius: ${theme.borderRadius.compact}px;
-    border: ${theme.borderWidth[1]}px solid ${theme.borderColor.tertiary};
+    border-radius: ${theme.borderRadius.compact};
+    border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
     color: ${theme.color.error};
     display: inline-block;
     flex-flow: wrap;
     height: 24px;
     height: auto;
-    padding: ${theme.spacing[1]}px ${theme.spacing[2]}px;
+    padding: ${theme.spacing[1]} ${theme.spacing[2]};
     text-align: left;
     white-space: break-spaces;
     word-break: break-word;

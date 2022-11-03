@@ -57,7 +57,7 @@ const Container = styled.div`
     flex-direction: column;
     height: 100%;
     justify-content: center;
-    row-gap: ${theme.spacing[7]}px;
+    row-gap: ${theme.spacing[7]};
   `}
 `;
 

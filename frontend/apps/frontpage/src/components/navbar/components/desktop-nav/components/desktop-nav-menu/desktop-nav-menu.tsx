@@ -62,7 +62,7 @@ const IconContainer = styled.div`
 
     svg {
       transition: all 0.2s linear;
-      margin-left: ${theme.spacing[2]}px;
+      margin-left: ${theme.spacing[2]};
     }
   `}
 `;
@@ -74,7 +74,7 @@ const ViewportPosition = styled.div`
     justify-content: center;
     width: 100%;
     top: 100%;
-    margin-top: ${theme.spacing[2]}px;
+    margin-top: ${theme.spacing[2]};
     left: 0;
   `}
 `;

@@ -45,7 +45,7 @@ const MissingPermissions = ({
 
 const Body = styled.div`
   ${({ theme }) => css`
-    padding: ${theme.spacing[7]}px 0;
+    padding: ${theme.spacing[7]} 0;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -55,8 +55,8 @@ const Body = styled.div`
 
 const TextContainer = styled.div`
   ${({ theme }) => css`
-    margin-top: ${theme.spacing[8]}px;
-    margin-bottom: ${theme.spacing[9]}px;
+    margin-top: ${theme.spacing[8]};
+    margin-bottom: ${theme.spacing[9]};
   `}
 `;
 

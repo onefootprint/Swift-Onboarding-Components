@@ -10,8 +10,8 @@ const DropdownContainer = styled.div<{ withPaddingTop: boolean }>`
   ${({ theme }) => css`
     z-index: ${theme.zIndex.dropdown};
     background: ${theme.backgroundColor.primary};
-    border-radius: ${theme.borderRadius.default}px;
-    border: ${theme.borderWidth[1]}px solid ${theme.borderColor.primary};
+    border-radius: ${theme.borderRadius.default};
+    border: ${theme.borderWidth[1]} solid ${theme.borderColor.primary};
     box-shadow: ${theme.elevation[2]};
     width: 100%;
   `}
@@ -19,13 +19,13 @@ const DropdownContainer = styled.div<{ withPaddingTop: boolean }>`
   ${({ withPaddingTop, theme }) =>
     withPaddingTop &&
     css`
-      padding: ${theme.spacing[2]}px 0 0;
+      padding: ${theme.spacing[2]} 0 0;
     `}
 `;
 
 const ListContainer = styled.div`
   ${({ theme }) => css`
-    border-radius: ${theme.borderRadius.default}px;
+    border-radius: ${theme.borderRadius.default};
     max-height: 180px;
     overflow: auto;
   `}
@@ -40,8 +40,8 @@ const EmptyState = styled.div`
   ${({ theme }) => css`
     ${createFontStyles('body-3')};
     color: ${theme.color.tertiary};
-    margin: ${theme.spacing[3]}px 0;
-    padding: ${theme.spacing[3]}px ${theme.spacing[5]}px;
+    margin: ${theme.spacing[3]} 0;
+    padding: ${theme.spacing[3]} ${theme.spacing[5]};
   `}
 `;
 
@@ -58,8 +58,8 @@ const DefaultOption = styled('li')<{
     cursor: pointer;
     display: flex;
     justify-content: space-between;
-    margin-bottom: ${theme.spacing[2]}px;
-    padding: ${theme.spacing[3]}px ${theme.spacing[5]}px;
+    margin-bottom: ${theme.spacing[2]};
+    padding: ${theme.spacing[3]} ${theme.spacing[5]};
   `}
 
   ${({ disableHoverStyles }) =>

@@ -45,9 +45,9 @@ const LayoutContainer = styled.div`
 
     ${media.greaterThan('md')`
       height: unset;
-      margin: ${theme.spacing[9]}px auto ${theme.spacing[9]}px;
+      margin: ${theme.spacing[9]} auto ${theme.spacing[9]};
       max-width: 480px;
-      max-height: calc(100vh - (2 * ${theme.spacing[9]}px));
+      max-height: calc(100vh - (2 * ${theme.spacing[9]}));
     `}
   `}
 `;
@@ -55,10 +55,10 @@ const LayoutContainer = styled.div`
 const Body = styled.div`
   ${({ theme }) => css`
     flex: 1 0 auto;
-    padding: ${theme.spacing[5]}px;
+    padding: ${theme.spacing[5]};
 
     ${media.greaterThan('md')`
-      padding: 0 ${theme.spacing[7]}px ${theme.spacing[7]}px;
+      padding: 0 ${theme.spacing[7]} ${theme.spacing[7]};
     `}
   `}
 `;

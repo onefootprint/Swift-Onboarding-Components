@@ -1,21 +1,20 @@
-import * as t from '../../../output/light';
-import type { InputLabel } from '../../types/components/input-label';
+import type { InputLabel } from '../../types/components';
 
 const inputLabel: InputLabel = {
   states: {
     default: {
-      color: t.baseInputsInitialLabel,
+      color: 'var(--fp-base-inputs-initial-label)',
     },
     error: {
-      color: t.baseInputsInitialErrorLabel,
+      color: 'var(--fp-base-inputs-initial-error-label)',
     },
   },
   size: {
     default: {
-      typography: t.baseInputsTypographyDefaultInputContent,
+      typography: 'var(--fp-base-inputs-typography-default-input-content)',
     },
     compact: {
-      typography: t.baseInputsTypographyCompactInputContent,
+      typography: 'var(--fp-base-inputs-typography-compact-input-content)',
     },
   },
 };

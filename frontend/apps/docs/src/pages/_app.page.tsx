@@ -1,3 +1,5 @@
+import '@onefootprint/design-tokens/src/output/theme.css';
+
 import themes from '@onefootprint/design-tokens';
 import { DesignSystemProvider, media } from '@onefootprint/ui';
 import { QueryClientProvider } from '@tanstack/react-query';
@@ -40,7 +42,7 @@ const GlobalStyle = createGlobalStyle`
         --header-height: 52px;
       `}
 
-      scroll-padding-top: calc(var(--header-height) + ${theme.spacing[5]}px);
+      scroll-padding-top: calc(var(--header-height) + ${theme.spacing[5]});
       scroll-behavior: smooth;
     }
   `};

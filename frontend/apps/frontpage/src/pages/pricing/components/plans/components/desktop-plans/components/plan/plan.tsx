@@ -75,7 +75,7 @@ const Content = styled.div`
     flex-direction: column;
     height: 152px;
     justify-content: space-between;
-    margin-bottom: ${theme.spacing[5]}px;
+    margin-bottom: ${theme.spacing[5]};
   `}
 `;
 

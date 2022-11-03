@@ -22,7 +22,7 @@ const Container = styled.div`
 
 const TextContainer = styled.div`
   ${({ theme }) => css`
-    margin-left: ${theme.spacing[2]}px;
+    margin-left: ${theme.spacing[2]};
   `}
 `;
 

@@ -2,8 +2,8 @@ import type { Typography } from './typography';
 
 export type Input = {
   global: {
-    borderRadius: number;
-    borderWidth: number;
+    borderRadius: string;
+    borderWidth: string;
     color: string;
     placeholderColor: string;
   };
@@ -45,11 +45,11 @@ export type Input = {
   };
   size: {
     default: {
-      height: number;
+      height: string;
       typography: Typography;
     };
     compact: {
-      height: number;
+      height: string;
       typography: Typography;
     };
   };

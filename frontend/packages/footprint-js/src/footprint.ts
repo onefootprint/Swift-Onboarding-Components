@@ -1,12 +1,13 @@
 import './footprint-styles.css';
 
-import type { FootprintAppearance } from './footprint-types';
-import { FootprintEvents, ShowFootprint } from './footprint-types';
+import type { FootprintAppearance } from './types/footprint.types';
+import { FootprintEvents, ShowFootprint } from './types/footprint.types';
 import IframeManager from './utils/iframe-manager';
 import { injectStyles } from './utils/ui-manager';
 
 const iframeManager = new IframeManager();
-let tokens = {};
+let tokensParams = {};
+let rulesParams = {};
 
 const footprint = (url: string) => {
   const handleOnCompleted = (callback: (validationToken: string) => void) =>
@@ -19,10 +20,31 @@ const footprint = (url: string) => {
   const handleOnCanceled = (callback: () => void) =>
     iframeManager.on(FootprintEvents.canceled, callback);
 
-  const setAppearance = ({ theme, variables }: FootprintAppearance) => {
-    const { fpButton, loading, overlay, ...remainingStyles } = variables;
-    tokens = encodeURI(JSON.stringify(remainingStyles));
-    injectStyles({ theme, variables: { fpButton, loading, overlay } });
+  const setAppearance = ({ theme, variables, rules }: FootprintAppearance) => {
+    const {
+      fpButtonHeight,
+      fpButtonBorderRadius,
+      loadingBg,
+      loadingColor,
+      loadingPadding,
+      loadingBorderRadius,
+      overlayBg,
+      ...remainingStyles
+    } = variables;
+    tokensParams = encodeURIComponent(JSON.stringify(remainingStyles));
+    rulesParams = encodeURIComponent(JSON.stringify(rules));
+    injectStyles({
+      theme,
+      variables: {
+        fpButtonHeight,
+        fpButtonBorderRadius,
+        loadingBg,
+        loadingColor,
+        loadingPadding,
+        loadingBorderRadius,
+        overlayBg,
+      },
+    });
   };
 
   const show = async ({
@@ -31,7 +53,9 @@ const footprint = (url: string) => {
     onCanceled,
   }: ShowFootprint) => {
     await iframeManager.show({
-      url: publicKey ? `${url}?public_key=${publicKey}&tokens=${tokens}` : url,
+      url: publicKey
+        ? `${url}?public_key=${publicKey}&tokens=${tokensParams}&rules=${rulesParams}`
+        : url,
     });
     if (onCompleted) {
       handleOnCompleted(onCompleted);

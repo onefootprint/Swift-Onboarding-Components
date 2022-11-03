@@ -44,7 +44,7 @@ const Container = styled.div`
     flex-direction: column;
 
     img {
-      border-radius: ${theme.borderRadius.default}px;
+      border-radius: ${theme.borderRadius.default};
     }
 
     > span {
@@ -61,7 +61,7 @@ const PagerContainer = styled.div`
   ${({ theme }) => css`
     display: flex;
     justify-content: center;
-    margin-top: ${theme.spacing[4]}px;
+    margin-top: ${theme.spacing[4]};
   `}
 `;
 

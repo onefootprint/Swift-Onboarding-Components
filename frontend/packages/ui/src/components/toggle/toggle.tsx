@@ -133,11 +133,11 @@ const Label = styled.label`
     cursor: pointer;
 
     &[data-placement='left'] {
-      margin-right: ${theme.spacing[3]}px;
+      margin-right: ${theme.spacing[3]};
     }
 
     &[data-placement='right'] {
-      margin-left: ${theme.spacing[3]}px;
+      margin-left: ${theme.spacing[3]};
     }
   `}
 `;
@@ -156,13 +156,13 @@ const Button = styled.button<{ checked?: boolean }>`
   ${({ theme, checked }) => css`
     background: ${theme.backgroundColor[checked ? 'accent' : 'secondary']};
     border-color: ${theme.borderColor[checked ? 'transparent' : 'primary']};
-    border-radius: ${theme.borderRadius.full}px;
+    border-radius: ${theme.borderRadius.full};
     border-style: solid;
-    border-width: ${theme.borderWidth[2]}px;
+    border-width: ${theme.borderWidth[2]};
     cursor: pointer;
     height: 24px;
-    outline-offset: ${theme.spacing[2]}px;
-    padding: ${theme.spacing[1]}px;
+    outline-offset: ${theme.spacing[2]};
+    padding: ${theme.spacing[1]};
     width: 36px;
 
     &:hover {
@@ -185,7 +185,7 @@ const StyledIcoToggleKnob16 = styled.div<{
 }>`
   ${({ theme, disabled, checked }) => css`
     background: ${theme.color[checked ? 'quinary' : 'tertiary']};
-    border-radius: ${theme.borderRadius.full}px;
+    border-radius: ${theme.borderRadius.full};
     display: block;
     height: 16px;
     transform: ${checked ? 'translateX(12px)' : 'translateX(0px)'};

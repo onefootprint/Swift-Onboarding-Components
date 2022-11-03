@@ -39,11 +39,11 @@ const Pager = ({ max, value, onClick }: PagerProps) => {
 const Container = styled.div`
   ${({ theme }) => css`
     background: ${theme.backgroundColor.secondary};
-    border-radius: ${theme.borderRadius.large}px;
-    border: ${theme.borderWidth[1]}px solid ${theme.borderColor.tertiary};
+    border-radius: ${theme.borderRadius.large};
+    border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
     display: inline-flex;
-    gap: ${theme.spacing[2]}px;
-    padding: ${theme.spacing[3]}px;
+    gap: ${theme.spacing[2]};
+    padding: ${theme.spacing[3]};
 
     ${media.greaterThan('lg')`
       display: none;
@@ -54,14 +54,14 @@ const Container = styled.div`
 const Button = styled.button<{ active: boolean }>`
   ${({ active, theme }) => css`
     background: ${theme.color.primary};
-    border-radius: ${theme.borderRadius.full}px;
+    border-radius: ${theme.borderRadius.full};
     border: none;
     cursor: pointer;
-    height: ${theme.spacing[3]}px;
+    height: ${theme.spacing[3]};
     margin: 0;
     opacity: 0.3;
     padding: 0;
-    width: ${theme.spacing[3]}px;
+    width: ${theme.spacing[3]};
 
     ${active &&
     css`

@@ -1,3 +1,5 @@
+import '@onefootprint/design-tokens/src/output/theme.css';
+
 import themes from '@onefootprint/design-tokens';
 import { DesignSystemProvider } from '@onefootprint/ui';
 import { QueryClientProvider } from '@tanstack/react-query';
@@ -54,7 +56,7 @@ const GlobalStyle = createGlobalStyle`
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      padding: ${theme.spacing[5]}px ${theme.spacing[6]}px;
+      padding: ${theme.spacing[5]} ${theme.spacing[6]};
     }
   `}`;
 

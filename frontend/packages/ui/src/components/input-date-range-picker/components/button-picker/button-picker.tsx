@@ -8,7 +8,7 @@ import React, {
 } from 'react';
 import mergeRefs from 'react-merge-refs';
 import { usePopper } from 'react-popper';
-import styled, { css, useTheme } from 'styled-components';
+import styled, { css } from 'styled-components';
 import { useOnClickOutside } from 'usehooks-ts';
 
 import {
@@ -32,7 +32,6 @@ const ButtonPicker = forwardRef(
     { disabledDays, onChange, value }: ButtonPickerProps,
     ref: Ref<ButtonPickerRef>,
   ) => {
-    const theme = useTheme();
     const containerRef = useRef<HTMLDivElement>(null);
     const buttonRef = useRef<HTMLButtonElement>(null);
     const [isPopperOpen, setIsPopperOpen] = useState(false);
@@ -42,9 +41,7 @@ const ButtonPicker = forwardRef(
     );
     const popper = usePopper(popperRef.current, popperElement, {
       placement: 'bottom-end',
-      modifiers: [
-        { name: 'offset', options: { offset: [0, theme.spacing[3]] } },
-      ],
+      modifiers: [{ name: 'offset', options: { offset: [0, 8] } }],
     });
 
     const openPopper = () => {
@@ -121,10 +118,10 @@ const ButtonPickerContainer = styled.button`
   ${({ theme }) => css`
     ${createFontStyles('body-4')};
     background: none;
-    border-radius: ${theme.borderRadius.default}px;
+    border-radius: ${theme.borderRadius.default};
     border: none;
     cursor: pointer;
-    padding: ${theme.spacing[1]}px ${theme.spacing[3]}px;
+    padding: ${theme.spacing[1]} ${theme.spacing[3]};
 
     &:hover {
       ${createOverlayBackground('darken-1', 'primary')};

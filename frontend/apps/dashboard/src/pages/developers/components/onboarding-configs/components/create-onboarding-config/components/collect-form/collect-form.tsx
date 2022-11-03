@@ -175,14 +175,14 @@ const CollectForm = ({ defaultValues, onSubmit }: CollectFormProps) => {
 
 const StyledDivider = styled(Divider)`
   ${({ theme }) => css`
-    margin: ${theme.spacing[8]}px 0;
+    margin: ${theme.spacing[8]} 0;
   `}
 `;
 
 const CheckboxContainer = styled.div`
   ${({ theme }) => css`
     display: grid;
-    gap: ${theme.spacing[3]}px;
+    gap: ${theme.spacing[3]};
   `}
 `;
 

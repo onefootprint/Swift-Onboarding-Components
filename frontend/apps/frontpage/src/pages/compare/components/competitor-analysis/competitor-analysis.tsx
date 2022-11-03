@@ -57,14 +57,14 @@ const ImageContainer = styled.div`
     align-items: center;
     display: flex;
     justify-content: center;
-    margin-bottom: ${theme.spacing[10]}px;
+    margin-bottom: ${theme.spacing[10]};
   `}
 `;
 
 const ContentContainer = styled.div`
   ${({ theme }) => css`
     p:not(:last-child) {
-      margin-bottom: ${theme.spacing[9]}px;
+      margin-bottom: ${theme.spacing[9]};
     }
   `}
 `;

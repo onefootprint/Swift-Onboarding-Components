@@ -1,6 +1,5 @@
 import { IcoMinusSmall24, IcoPlusSmall24 } from '@onefootprint/icons';
 import { createFontStyles, Typography } from '@onefootprint/ui';
-import { darken } from 'polished';
 import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
 
@@ -30,11 +29,12 @@ const FaqItem = ({ title, content }: FaqItemProps) => {
 
 const Details = styled.details`
   ${({ theme }) => css`
-    border-radius: ${theme.borderRadius.default}px;
-    border: ${theme.borderWidth[1]}px solid ${theme.borderColor.tertiary};
+    border-radius: ${theme.borderRadius.default};
+    border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
+    cursor: pointer;
 
     &:hover {
-      border-color: ${darken(0.32, theme.borderColor.primary)};
+      border-color: ${theme.borderColor.primary};
     }
   `}
 `;
@@ -43,10 +43,10 @@ const Summary = styled.summary`
   ${({ theme }) => css`
     align-items: center;
     display: flex;
-    gap: ${theme.spacing[3]}px;
+    gap: ${theme.spacing[3]};
     justify-content: space-between;
     list-style: none;
-    padding: ${theme.spacing[5]}px ${theme.spacing[6]}px;
+    padding: ${theme.spacing[5]} ${theme.spacing[6]};
 
     &::-webkit-details-marker {
       display: none;
@@ -58,8 +58,8 @@ const Content = styled.div`
   ${({ theme }) => css`
     ${createFontStyles('body-2')};
     color: ${theme.color.secondary};
-    margin-top: ${theme.spacing[5]}px;
-    padding: 0 ${theme.spacing[6]}px ${theme.spacing[5]}px;
+    margin-top: ${theme.spacing[5]};
+    padding: 0 ${theme.spacing[6]} ${theme.spacing[5]};
   `}
 `;
 

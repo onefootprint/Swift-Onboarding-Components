@@ -13,8 +13,8 @@ const StyledContent = styled(RadixNavigationMenu.Content)`
     background: ${theme.backgroundColor.primary};
     border: 1px solid ${theme.borderColor.tertiary};
     box-shadow: 0px 1px 8px rgba(0, 0, 0, 0.14);
-    border-radius: ${theme.borderRadius.default}px;
-    padding: ${theme.spacing[5]}px;
+    border-radius: ${theme.borderRadius.default};
+    padding: ${theme.spacing[5]};
   `}
 `;
 

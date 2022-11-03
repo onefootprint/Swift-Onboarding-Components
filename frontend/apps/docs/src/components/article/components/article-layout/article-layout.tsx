@@ -39,18 +39,18 @@ const Content = styled.div`
 const Main = styled.main`
   ${({ theme }) => css`
     background: ${theme.backgroundColor.primary};
-    padding: ${theme.spacing[7]}px ${theme.spacing[5]}px;
+    padding: ${theme.spacing[7]} ${theme.spacing[5]};
     width: 100%;
 
     ${media.greaterThan('md')`
-      padding: ${theme.spacing[9]}px;
+      padding: ${theme.spacing[9]};
     `}
 
     ${media.greaterThan('lg')`
       display: grid;
-      gap: ${theme.spacing[9]}px;
+      gap: ${theme.spacing[9]};
       grid-template-columns: auto 260px;
-      padding: ${theme.spacing[9]}px;
+      padding: ${theme.spacing[9]};
     `}
   `};
 `;

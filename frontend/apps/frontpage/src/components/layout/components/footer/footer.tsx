@@ -48,17 +48,17 @@ const Inner = styled.div`
   ${({ theme }) => css`
     display: flex;
     flex-direction: column;
-    gap: ${theme.spacing[5]}px;
-    margin-top: ${theme.spacing[10]}px;
-    padding: ${theme.spacing[6]}px 0 ${theme.spacing[9]}px;
+    gap: ${theme.spacing[5]};
+    margin-top: ${theme.spacing[10]};
+    padding: ${theme.spacing[6]} 0 ${theme.spacing[9]};
     text-align: center;
     align-items: center;
 
     ${media.greaterThan('md')`
       flex-direction: row;
       justify-content: space-between;
-      margin-top: ${theme.spacing[14]}px;
-      padding: ${theme.spacing[6]}px 0;
+      margin-top: ${theme.spacing[14]};
+      padding: ${theme.spacing[6]} 0;
       text-align: unset;
     `}
   `}
@@ -69,7 +69,7 @@ const NavContainer = styled.nav`
     ${media.greaterThan('md')`
       display: flex;
       align-items: center;
-      gap: ${theme.spacing[5]}px;
+      gap: ${theme.spacing[5]};
     `}
   `}
 `;
@@ -78,8 +78,8 @@ const Nav = styled.ul`
   ${({ theme }) => css`
     display: flex;
     justify-content: center;
-    gap: ${theme.spacing[5]}px;
-    margin-bottom: ${theme.spacing[7]}px;
+    gap: ${theme.spacing[5]};
+    margin-bottom: ${theme.spacing[7]};
 
     ${media.greaterThan('md')`
       margin-bottom: unset;

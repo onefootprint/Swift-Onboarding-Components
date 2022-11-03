@@ -1,6 +1,4 @@
-import themes from '@onefootprint/design-tokens';
-
-import type { FootprintAppearance } from '../footprint-types';
+import type { FootprintAppearance } from '../types/footprint.types';
 
 const CONTAINER_ID = 'footprint-container';
 const OVERLAY_ID = 'footprint-overlay';
@@ -19,28 +17,16 @@ const injectStylesToCurrentPage = (styles: string) => {
   document.head.append(style);
 };
 
-export const injectStyles = ({ theme, variables }: FootprintAppearance) => {
-  const { bifrost } = themes[theme].components;
-
+export const injectStyles = ({ variables }: FootprintAppearance) => {
   injectStylesToCurrentPage(`
     :root {
-      --fp-fp-button-height: ${
-        variables.fpButton?.height || bifrost.fpButton.height
-      };
-      --fp-fp-button-border-radius: ${
-        variables.fpButton?.borderRadius || bifrost.fpButton.borderRadius
-      };
-
-      --fp-loading-bg: ${variables.loading?.bg || bifrost.loading.bg};
-      --fp-loading-color: ${variables.loading?.color || bifrost.loading.color};
-      --fp-loading-border-radius: ${
-        variables.loading?.borderRadius || bifrost.loading.borderRadius
-      };
-      --fp-loading-padding: ${
-        variables.loading?.padding || bifrost.loading.padding
-      };
-
-      --fp-overlay-bg:${variables.overlay?.bg || bifrost.overlay.bg};
+      --fp-fp-button-height: ${variables.fpButtonHeight};
+      --fp-fp-button-border-radius: ${variables.fpButtonBorderRadius};
+      --fp-loading-bg: ${variables.loadingBg};
+      --fp-loading-color: ${variables.loadingColor};
+      --fp-loading-border-radius: ${variables.loadingBorderRadius};
+      --fp-loading-padding: ${variables.loadingPadding};
+      --fp-overlay-bg:${variables.overlayBg};
     }
   `);
 };

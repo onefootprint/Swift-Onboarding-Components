@@ -41,13 +41,13 @@ const FootprintFooterContainer = styled.footer`
     z-index: ${theme.zIndex.sticky};
     bottom: 0;
     background-color: ${theme.backgroundColor.secondary};
-    border-radius: 0 0 ${theme.borderRadius.default}px
-      ${theme.borderRadius.default}px;
-    border-top: ${theme.borderWidth[1]}px solid ${theme.borderColor.tertiary};
+    border-radius: 0 0 ${theme.borderRadius.default}
+      ${theme.borderRadius.default};
+    border-top: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    padding: ${theme.spacing[4]}px ${theme.spacing[7]}px;
+    padding: ${theme.spacing[4]} ${theme.spacing[7]};
   `}
 `;
 
@@ -61,7 +61,7 @@ const LinksContainer = styled.ul`
       &:not(:last-child) {
         &:after {
           content: '·';
-          margin: 0 ${theme.spacing[2]}px;
+          margin: 0 ${theme.spacing[2]};
         }
       }
     }

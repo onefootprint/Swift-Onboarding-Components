@@ -16,6 +16,21 @@ styleDictionary.registerTransform({
 styleDictionary.registerTransform({
   type: `value`,
   transitive: true,
+  name: `transformToPixels`,
+  matcher: token =>
+    token.type === 'spacing' ||
+    token.type === 'sizing' ||
+    token.type === 'borderRadius' ||
+    token.type === 'borderWidth',
+  transformer: token => {
+    const { value } = token;
+    return `${value}px`;
+  },
+});
+
+styleDictionary.registerTransform({
+  type: `value`,
+  transitive: true,
   name: `transformTypography`,
   matcher: token => token.type === 'typography',
   transformer: token => {
@@ -40,16 +55,18 @@ styleDictionary.registerTransform({
     source: [`src/tokens/${theme}.json`],
     platforms: {
       web: {
+        prefix: 'fp',
         transforms: [
-          'name/cti/camel',
+          'name/cti/kebab',
           'transformHexToRgb',
           'transformTypography',
+          'transformToPixels',
         ],
         buildPath: `src/output/`,
         files: [
           {
-            destination: `${theme}.ts`,
-            format: 'javascript/es6',
+            destination: `${theme}.css`,
+            format: 'css/variables',
             selector: `.${theme}-theme`,
           },
         ],

@@ -122,11 +122,11 @@ const EmailCard = styled.div`
   ${({ theme }) => css`
     align-items: center;
     background: ${theme.backgroundColor.secondary};
-    border-radius: ${theme.borderRadius.default}px;
+    border-radius: ${theme.borderRadius.default};
     display: flex;
-    gap: ${theme.spacing[4]}px;
-    margin-bottom: ${theme.spacing[8]}px;
-    padding: ${theme.spacing[5]}px;
+    gap: ${theme.spacing[4]};
+    margin-bottom: ${theme.spacing[8]};
+    padding: ${theme.spacing[5]};
 
     p {
       overflow: hidden;
@@ -146,9 +146,9 @@ const EmailCardContent = styled.div`
 
 const StyledIcoEmail24 = styled(IcoEmail24)`
   ${({ theme }) => css`
-    margin-right: ${theme.spacing[4]}px;
+    margin-right: ${theme.spacing[4]};
     position: relative;
-    top: ${theme.spacing[1]}px;
+    top: ${theme.spacing[1]};
   `}
 `;
 

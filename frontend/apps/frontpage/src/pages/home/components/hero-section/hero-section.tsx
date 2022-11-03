@@ -69,7 +69,7 @@ const ButtonsContainer = styled.div`
     display: inline-grid;
     grid-template-columns: repeat(1, 1fr);
     grid-template-rows: 2 1fr;
-    gap: ${theme.spacing[4]}px;
+    gap: ${theme.spacing[4]};
 
     ${media.greaterThan('sm')`
       grid-template-columns: repeat(2, 1fr);
@@ -83,7 +83,7 @@ const ContentContainer = styled.div`
     align-items: center;
     display: flex;
     flex-direction: column;
-    margin: 0 auto ${theme.spacing[10]}px;
+    margin: 0 auto ${theme.spacing[10]};
     text-align: center;
   `}
 `;

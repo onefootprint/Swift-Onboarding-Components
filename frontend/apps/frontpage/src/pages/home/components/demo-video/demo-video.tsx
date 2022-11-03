@@ -49,8 +49,8 @@ const CloseContainer = styled.div`
     top: 0;
     right: 0;
     transform: translate(0, -100%);
-    padding: ${theme.spacing[3]}px;
-    margin-right: -${theme.spacing[3]}px;
+    padding: ${theme.spacing[3]};
+    margin-right: -${theme.spacing[3]};
     cursor: pointer;
 
     &:hover {

@@ -1,11 +1,10 @@
-import * as t from '../../output/light';
 import type { Elevations } from '../types/types';
 
 const elevations: Elevations = {
   0: 'none',
-  1: t.elevation1,
-  2: t.elevation2,
-  3: t.elevation3,
+  1: 'var(--fp-elevation-1)',
+  2: 'var(--fp-elevation-2)',
+  3: 'var(--fp-elevation-3)',
 };
 
 export default elevations;

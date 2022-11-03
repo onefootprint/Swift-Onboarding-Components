@@ -80,52 +80,49 @@ const ButtonContainer = styled.button<{
 
     return css`
       font: ${button.size[size].typography};
-      box-shadow: ${button.global.elevation.initial};
       align-items: center;
-      background-color: ${button.variant[variant].bg.initial};
-      border-color: ${button.variant[variant].border.initial};
-      border-radius: ${button.global.borderRadius}px;
+      background-color: ${button.variant[variant].bg};
+      border-color: ${button.variant[variant].borderColor};
+      border-radius: ${button.global.borderRadius};
       border-style: solid;
-      border-width: ${button.global.borderWidth}px;
-      color: ${button.variant[variant].color.initial};
+      border-width: ${button.global.borderWidth};
+      color: ${button.variant[variant].color};
       cursor: pointer;
       display: flex;
-      height: ${button.size[size].height}px;
+      height: ${button.size[size].height};
       justify-content: center;
-      outline-offset: ${button.global.outlineOffset}px;
-      padding: 0 ${button.size[size].paddingHorizontal}px;
+      outline-offset: ${theme.spacing[2]};
+      padding: 0 ${button.size[size].paddingHorizontal};
       text-decoration: none;
       user-select: none;
       ${sx};
 
       &:hover {
-        box-shadow: ${button.global.elevation.initial};
-        background-color: ${button.variant[variant].bg.hover};
-        border-color: ${button.variant[variant].border.hover};
-        color: ${button.variant[variant].color.hover};
+        background-color: ${button.variant[variant].hover.bg};
+        border-color: ${button.variant[variant].hover.borderColor};
+        color: ${button.variant[variant].hover.color};
       }
 
       &:active {
-        box-shadow: ${button.global.elevation.active};
-        background-color: ${button.variant[variant].bg.active};
-        border-color: ${button.variant[variant].border.active};
-        color: ${button.variant[variant].color.active};
+        background-color: ${button.variant[variant].active.bg};
+        border-color: ${button.variant[variant].active.borderColor};
+        color: ${button.variant[variant].active.color};
       }
 
       &:disabled {
         cursor: not-allowed;
-        background-color: ${button.variant[variant].bg.disabled};
-        border-color: ${button.variant[variant].border.disabled};
-        color: ${button.variant[variant].color.disabled};
+        background-color: ${button.variant[variant].disabled.bg};
+        border-color: ${button.variant[variant].disabled.borderColor};
+        color: ${button.variant[variant].disabled.color};
       }
 
       &[data-loading='true'] {
-        background-color: ${button.variant[variant].bg.loading};
-        color: ${button.variant[variant].color.loading};
+        background-color: ${button.variant[variant].loading.bg};
+        color: ${button.variant[variant].loading.color};
         pointer-event: none;
 
         path {
-          fill: ${button.variant[variant].color.loading};
+          fill: ${button.variant[variant].loading.color};
         }
       }
 

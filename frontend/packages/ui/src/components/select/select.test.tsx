@@ -1,4 +1,3 @@
-import themes from '@onefootprint/design-tokens';
 import { customRender, screen, userEvent } from '@onefootprint/test-utils';
 import React from 'react';
 
@@ -161,7 +160,7 @@ describe('<Select />', () => {
         name: 'Select',
       }) as HTMLButtonElement;
       expect(trigger).toHaveStyle({
-        border: `1px solid ${themes.light.borderColor.error}`,
+        borderColor: 'var(--fp-base-inputs-base-hint-error)',
       });
     });
 
@@ -172,7 +171,7 @@ describe('<Select />', () => {
       });
       const hint = screen.getByText('Hint');
       expect(hint).toHaveStyle({
-        color: themes.light.color.error,
+        color: 'var(--fp-base-inputs-base-hint-error)',
       });
     });
   });

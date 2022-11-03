@@ -26,27 +26,27 @@ const PlaygroundSquare = ({
 const Square = styled.li<{ lastColumn: boolean; isSelected: boolean }>`
   ${({ theme }) => css`
     align-items: center;
-    border-bottom: ${theme.borderWidth[1]}px dashed #a2d3aa;
-    border-right: ${theme.borderWidth[1]}px dashed #a2d3aa;
+    border-bottom: ${theme.borderWidth[1]} dashed #a2d3aa;
+    border-right: ${theme.borderWidth[1]} dashed #a2d3aa;
     display: flex;
     justify-content: center;
     position: relative;
     transition: background 100ms ease 0s;
 
     &:first-child {
-      border-top-left-radius: ${theme.borderRadius.default}px;
+      border-top-left-radius: ${theme.borderRadius.default};
     }
 
     &:last-child {
-      border-bottom-right-radius: ${theme.borderRadius.default}px;
+      border-bottom-right-radius: ${theme.borderRadius.default};
     }
 
     &:nth-child(12) {
-      border-bottom-left-radius: ${theme.borderRadius.default}px;
+      border-bottom-left-radius: ${theme.borderRadius.default};
     }
 
     &:nth-child(325) {
-      border-top-right-radius: ${theme.borderRadius.default}px;
+      border-top-right-radius: ${theme.borderRadius.default};
     }
 
     &:nth-child(12n) {

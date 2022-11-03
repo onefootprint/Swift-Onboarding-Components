@@ -82,7 +82,7 @@ const TitleContainer = styled.div`
     align-items: center;
     display: flex;
     flex-direction: column;
-    row-gap: ${theme.spacing[2]}px;
+    row-gap: ${theme.spacing[2]};
     justify-content: center;
   `}
 `;

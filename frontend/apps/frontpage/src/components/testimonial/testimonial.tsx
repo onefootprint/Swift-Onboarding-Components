@@ -65,7 +65,7 @@ const Inner = styled.div`
 const AuthorContainer = styled.div`
   display: flex;
   flex-direction: row;
-  gap: ${({ theme }) => theme.spacing[5]}px;
+  gap: ${({ theme }) => theme.spacing[5]};
 `;
 
 const AuthorContentContainer = styled.div`

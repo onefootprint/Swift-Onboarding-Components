@@ -21,7 +21,7 @@ const Container = styled.div`
   ${({ theme }) => css`
     display: flex;
     flex-wrap: wrap;
-    gap: ${theme.spacing[2]}px;
+    gap: ${theme.spacing[2]};
   `}
 `;
 

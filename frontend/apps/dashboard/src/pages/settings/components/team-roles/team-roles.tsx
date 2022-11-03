@@ -96,9 +96,9 @@ const Header = styled.header`
   ${({ theme }) => css`
     align-items: center;
     display: flex;
-    gap: ${theme.spacing[2]}px;
+    gap: ${theme.spacing[2]};
     justify-content: space-between;
-    margin-bottom: ${theme.spacing[7]}px;
+    margin-bottom: ${theme.spacing[7]};
   `}
 `;
 
@@ -106,7 +106,7 @@ const ButtonsContainer = styled.div`
   ${({ theme }) => css`
     align-items: center;
     display: flex;
-    gap: ${theme.spacing[2]}px;
+    gap: ${theme.spacing[2]};
     justify-content: center;
   `}
 `;
@@ -114,7 +114,7 @@ const ButtonsContainer = styled.div`
 const Content = styled.div`
   ${({ theme }) => css`
     width: 100%;
-    margin-top: ${theme.spacing[5]}px;
+    margin-top: ${theme.spacing[5]};
   `}
 `;
 

@@ -29,11 +29,11 @@ const IconContainer = styled.div<{
   ${({ theme, backgroundColor, size }) => css`
     align-items: center;
     background-color: ${theme.backgroundColor[backgroundColor]};
-    border-radius: ${theme.borderRadius.full}px;
+    border-radius: ${theme.borderRadius.full};
     display: flex;
     height: ${size};
     justify-content: center;
-    margin-right: ${theme.spacing[3]}px;
+    margin-right: ${theme.spacing[3]};
     width: ${size};
   `}
 `;

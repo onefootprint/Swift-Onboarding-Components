@@ -1,4 +1,7 @@
-import * as CSS from 'csstype';
+import type {
+  FootprintExternalStyles,
+  FootprintMainStyles,
+} from './footprint-theme.type';
 
 export enum FootprintEvents {
   closed = 'closed',
@@ -6,38 +9,19 @@ export enum FootprintEvents {
   canceled = 'canceled',
 }
 
-export type FootprintMainStyles = Partial<{
-  dialog: {
-    bg: CSS.Property.Background;
-    elevation: CSS.Property.BoxShadow;
-    borderRadius: CSS.Property.BorderRadius;
-  };
-}>;
-
-export type FootprintExternalStyles = Partial<{
-  fpButton: {
-    height: CSS.Property.Height;
-    borderRadius: CSS.Property.BorderRadius;
-  };
-  loading: {
-    bg: CSS.Property.Background;
-    color: CSS.Property.Color;
-    borderRadius: CSS.Property.BorderRadius;
-    padding: CSS.Property.Padding;
-  };
-  overlay: {
-    bg: CSS.Property.Background;
-  };
-}>;
-
 export type FootprintAppearanceVariables = FootprintMainStyles &
   FootprintExternalStyles;
 
 export type FootprintAppearanceTheme = 'light' | 'dark';
 
+export type FootprintAppearanceRules = Partial<{
+  button: string;
+}>;
+
 export type FootprintAppearance = {
   theme: FootprintAppearanceTheme;
   variables: FootprintAppearanceVariables;
+  rules?: FootprintAppearanceRules;
 };
 
 export type ShowFootprint = {

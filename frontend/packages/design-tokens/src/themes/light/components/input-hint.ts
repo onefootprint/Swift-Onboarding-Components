@@ -1,21 +1,20 @@
-import * as t from '../../../output/light';
-import type { InputHint } from '../../types/components/input-hint';
+import type { InputHint } from '../../types/components';
 
 const inputHint: InputHint = {
   states: {
     default: {
-      color: t.baseInputsBaseHint,
+      color: 'var(--fp-base-inputs-base-hint)',
     },
     error: {
-      color: t.baseInputsBaseHintError,
+      color: 'var(--fp-base-inputs-base-hint-error)',
     },
   },
   size: {
     default: {
-      typography: t.baseInputsTypographyDefaultHint,
+      typography: 'var(--fp-base-inputs-typography-default-hint)',
     },
     compact: {
-      typography: t.baseInputsTypographyCompactHint,
+      typography: 'var(--fp-base-inputs-typography-compact-hint)',
     },
   },
 };

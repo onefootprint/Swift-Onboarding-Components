@@ -1,6 +1,6 @@
 import Postmate from 'postmate';
 
-import { FootprintEvents } from '../footprint-types';
+import { FootprintEvents } from '../types/footprint.types';
 import {
   createContainer,
   createFootprintButton,

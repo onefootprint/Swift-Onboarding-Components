@@ -88,16 +88,16 @@ const Compare = () => {
 
 const HeroContainer = styled.div`
   ${({ theme }) => css`
-    margin-bottom: ${theme.spacing[10]}px;
+    margin-bottom: ${theme.spacing[10]};
   `}
 `;
 
 const CarouselContainer = styled.div`
   ${({ theme }) => css`
-    margin-bottom: ${theme.spacing[10]}px;
+    margin-bottom: ${theme.spacing[10]};
 
     ${media.greaterThan('lg')`
-      margin-bottom: ${theme.spacing[11]}px;
+      margin-bottom: ${theme.spacing[11]};
     `}
   `}
 `;
@@ -105,7 +105,7 @@ const CarouselContainer = styled.div`
 const IntroductionContainer = styled.div`
   ${({ theme }) => css`
     max-width: 800px;
-    margin: 0 auto ${theme.spacing[10]}px;
+    margin: 0 auto ${theme.spacing[10]};
 
     ${media.greaterThan('lg')`
       text-align: initial;
@@ -116,10 +116,10 @@ const IntroductionContainer = styled.div`
 const ComparisonTableContainer = styled.div`
   ${({ theme }) => css`
     overflow: auto;
-    margin: 0 0 ${theme.spacing[10]}px;
+    margin: 0 0 ${theme.spacing[10]};
 
     ${media.greaterThan('lg')`
-      margin: 0 0 ${theme.spacing[10]}px;
+      margin: 0 0 ${theme.spacing[10]};
       text-align: initial;
     `}
   `}
@@ -127,10 +127,10 @@ const ComparisonTableContainer = styled.div`
 
 const RestContainer = styled.div`
   ${({ theme }) => css`
-    margin-bottom: ${theme.spacing[10]}px;
+    margin-bottom: ${theme.spacing[10]};
 
     ${media.greaterThan('lg')`
-      margin-bottom: ${theme.spacing[12]}px;
+      margin-bottom: ${theme.spacing[12]};
     `}
   `}
 `;
@@ -138,21 +138,21 @@ const RestContainer = styled.div`
 const TestimonialContainer = styled.div`
   ${({ theme }) => css`
     background: ${theme.backgroundColor.secondary};
-    margin-bottom: ${theme.spacing[10]}px;
-    padding: ${theme.spacing[11]}px 0;
+    margin-bottom: ${theme.spacing[10]};
+    padding: ${theme.spacing[11]} 0;
 
     ${media.greaterThan('lg')`
-      margin-bottom: ${theme.spacing[12]}px;
+      margin-bottom: ${theme.spacing[12]};
     `}
   `}
 `;
 
 const CompetitorAnalysisContainer = styled.div`
   ${({ theme }) => css`
-    margin-bottom: ${theme.spacing[11]}px;
+    margin-bottom: ${theme.spacing[11]};
 
     ${media.greaterThan('lg')`
-      margin-bottom: ${theme.spacing[14]}px;
+      margin-bottom: ${theme.spacing[14]};
     `}
   `}
 `;

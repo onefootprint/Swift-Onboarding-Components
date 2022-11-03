@@ -118,7 +118,7 @@ const Container = styled.div``;
 
 export const PinContainer = styled.div`
   display: flex;
-  gap: ${({ theme }) => theme.spacing[3]}px;
+  gap: ${({ theme }) => theme.spacing[3]};
 `;
 
 export default PinInput;

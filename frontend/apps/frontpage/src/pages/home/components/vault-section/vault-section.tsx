@@ -109,15 +109,15 @@ const Header = styled.div`
 const Article = styled.article`
   ${({ theme }) => css`
     background: ${theme.backgroundColor.secondary};
-    border-radius: ${theme.borderRadius.default}px;
-    padding: ${theme.spacing[6]}px;
+    border-radius: ${theme.borderRadius.default};
+    padding: ${theme.spacing[6]};
 
     ${media.between('sm', 'lg')`
-      padding: ${theme.spacing[7]}px;
+      padding: ${theme.spacing[7]};
     `}
 
     ${media.greaterThan('lg')`
-      padding: ${theme.spacing[9]}px;
+      padding: ${theme.spacing[9]};
     `}
   `}
 `;
@@ -125,11 +125,11 @@ const Article = styled.article`
 const MainArticle = styled(Article)`
   ${({ theme }) => css`
     display: inline-grid;
-    margin-bottom: ${theme.spacing[5]}px;
-    row-gap: ${theme.spacing[9]}px;
+    margin-bottom: ${theme.spacing[5]};
+    row-gap: ${theme.spacing[9]};
 
     ${media.greaterThan('lg')`
-      column-gap: ${theme.spacing[9]}px;
+      column-gap: ${theme.spacing[9]};
       grid-template-columns: repeat(2, 1fr);
     `}
   `}
@@ -152,10 +152,10 @@ const SecondaryArticles = styled.div`
   ${({ theme }) => css`
     display: inline-grid;
     grid-template-columns: repeat(1, 1fr);
-    row-gap: ${theme.spacing[5]}px;
+    row-gap: ${theme.spacing[5]};
 
     ${media.greaterThan('lg')`
-      column-gap: ${theme.spacing[5]}px;
+      column-gap: ${theme.spacing[5]};
       grid-template-columns: repeat(3, 1fr);
     `}
   `}

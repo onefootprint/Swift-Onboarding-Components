@@ -81,8 +81,8 @@ const GetStartedSection = ({
 const Inner = styled.div`
   ${({ theme }) => css`
     background-color: ${theme.backgroundColor.quaternary};
-    border-radius: ${theme.borderRadius.default}px;
-    padding: ${theme.spacing[9]}px ${theme.spacing[8]}px;
+    border-radius: ${theme.borderRadius.default};
+    padding: ${theme.spacing[9]} ${theme.spacing[8]};
     position: relative;
     overflow: hidden;
   `}
@@ -96,14 +96,14 @@ const Content = styled.div`
 
     ${media.greaterThan('md')`
       flex-direction: row-reverse;
-      padding: ${theme.spacing[10]}px;
+      padding: ${theme.spacing[10]};
     `}
   `}
 `;
 
 const PenguinContainer = styled.div`
   ${({ theme }) => css`
-    margin-bottom: ${theme.spacing[9]}px;
+    margin-bottom: ${theme.spacing[9]};
 
     ${media.greaterThan('md')`
       flex: 1;
@@ -163,7 +163,7 @@ const TitleImageContainer = styled.div`
   display: none;
 
   ${media.greaterThan('md')`
-    margin-left: ${({ theme }) => theme.spacing[5]}px;
+    margin-left: ${({ theme }) => theme.spacing[5]};
     display: block;
   `}
 `;

@@ -46,7 +46,7 @@ const Inner = styled.div`
     display: flex;
     max-width: 350px;
     flex-direction: column;
-    row-gap: ${theme.spacing[4]}px;
+    row-gap: ${theme.spacing[4]};
   `}
 `;
 

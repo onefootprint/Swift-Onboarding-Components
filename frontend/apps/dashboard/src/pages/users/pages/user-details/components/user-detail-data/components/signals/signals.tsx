@@ -68,7 +68,7 @@ const RiskSignals = () => {
 
 const Header = styled.header`
   ${({ theme }) => css`
-    margin-bottom: ${theme.spacing[7]}px;
+    margin-bottom: ${theme.spacing[7]};
   `}
 `;
 

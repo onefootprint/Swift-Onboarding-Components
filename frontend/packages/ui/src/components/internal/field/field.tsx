@@ -30,21 +30,21 @@ const Field = styled(Cleave).attrs<{ as?: 'textarea' | 'input' }>(({ as }) => ({
     return css`
       background: ${input.state.default.initial.bg};
       border-color: ${input.state.default.initial.border};
-      border-radius: ${input.global.borderRadius}px;
+      border-radius: ${input.global.borderRadius};
       border-style: solid;
-      border-width: ${input.global.borderWidth}px;
+      border-width: ${input.global.borderWidth};
       color: ${input.global.color};
       outline: none;
       width: 100%;
 
       &[data-size='default'] {
         font: ${input.size.default.typography};
-        height: ${input.size.default.height}px;
+        height: ${input.size.default.height};
       }
 
       &[data-size='compact'] {
         font: ${input.size.compact.typography};
-        height: ${input.size.compact.height}px;
+        height: ${input.size.compact.height};
       }
 
       ::placeholder {

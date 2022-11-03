@@ -49,7 +49,7 @@ const Container = styled.div`
 const UserDropdownItem = styled(Dropdown.Item)`
   ${({ theme }) => css`
     pointer-events: none;
-    padding: ${theme.spacing[3]}px ${theme.spacing[5]}px;
+    padding: ${theme.spacing[3]} ${theme.spacing[5]};
 
     div {
       overflow: hidden;
@@ -67,8 +67,8 @@ const LogoutDropdownItem = styled(Dropdown.Item)`
   ${({ theme }) => css`
     align-items: center;
     display: flex;
-    gap: ${theme.spacing[3]}px;
-    padding: ${theme.spacing[3]}px ${theme.spacing[4]}px;
+    gap: ${theme.spacing[3]};
+    padding: ${theme.spacing[3]} ${theme.spacing[4]};
   `};
 `;
 

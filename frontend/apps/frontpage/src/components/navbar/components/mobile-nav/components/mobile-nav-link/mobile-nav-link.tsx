@@ -21,7 +21,7 @@ const StyledLink = styled(Link)`
     ${createFontStyles('label-1')};
     color: ${theme.color.primary};
     display: block;
-    padding: ${theme.spacing[4]}px ${theme.spacing[6]}px;
+    padding: ${theme.spacing[4]} ${theme.spacing[6]};
     text-decoration: none;
   `}
 `;

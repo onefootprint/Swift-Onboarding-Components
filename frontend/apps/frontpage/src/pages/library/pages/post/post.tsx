@@ -1,17 +1,11 @@
 import { useIntl, useTranslation } from '@onefootprint/hooks';
 import { IcoChevronLeftBig24 } from '@onefootprint/icons';
-import {
-  Box,
-  Container,
-  LinkButton,
-  media,
-  Typography,
-} from '@onefootprint/ui';
+import { Box, Container, LinkButton, Typography } from '@onefootprint/ui';
 import Link from 'next/link';
 import React from 'react';
 import PostContent from 'src/components/post-content';
 import SEO from 'src/components/seo';
-import styled, { css } from 'styled-components';
+import WritingLayout from 'src/components/writing-layout';
 
 import DesktopSharePost from '../../../../components/desktop-share-post';
 import PostInfo from '../../../../components/post-info';
@@ -54,9 +48,9 @@ const Post = ({ post }: PostProps) => {
       />
       <article>
         <Container>
-          <Inner>
+          <WritingLayout>
             <Box sx={{ marginBottom: 8 }}>
-              <Link href="/library" passHref>
+              <Link href="/library" passHref legacyBehavior>
                 <LinkButton
                   iconPosition="left"
                   iconComponent={IcoChevronLeftBig24}
@@ -66,7 +60,7 @@ const Post = ({ post }: PostProps) => {
                 </LinkButton>
               </Link>
             </Box>
-            <Header>
+            <header>
               <Box
                 sx={{
                   display: 'flex',
@@ -93,26 +87,13 @@ const Post = ({ post }: PostProps) => {
               <Typography variant="display-2" as="h1" sx={{ marginY: 9 }}>
                 {post.title}
               </Typography>
-            </Header>
+            </header>
             <PostContent html={post.html} />
-          </Inner>
+          </WritingLayout>
         </Container>
       </article>
     </>
   );
 };
-
-const Inner = styled.div`
-  ${({ theme }) => css`
-    margin: -${theme.spacing[3]}px auto ${theme.spacing[10]}px;
-    max-width: 960px;
-
-    ${media.greaterThan('lg')`
-      margin-top: -${theme.spacing[10]}px;
-    `}
-  `}
-`;
-
-const Header = styled.header``;
 
 export default Post;

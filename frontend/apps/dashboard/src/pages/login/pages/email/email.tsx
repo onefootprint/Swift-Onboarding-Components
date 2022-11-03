@@ -103,7 +103,7 @@ const Form = styled.form`
 const Inner = styled.div`
   ${({ theme }) => css`
     display: grid;
-    row-gap: ${theme.spacing[5]}px;
+    row-gap: ${theme.spacing[5]};
   `}
 `;
 

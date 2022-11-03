@@ -52,7 +52,7 @@ const SectionContent = styled.div`
     justify-content: center;
     align-items: flex-start;
     width: 100%;
-    row-gap: ${theme.spacing[7]}px;
+    row-gap: ${theme.spacing[7]};
   `}
 `;
 
@@ -60,8 +60,8 @@ const Container = styled.div`
   ${({ theme }) => css`
     width: 100%;
     border: 1px solid ${theme.borderColor.tertiary};
-    border-radius: ${theme.borderRadius.default}px;
-    padding: ${theme.spacing[6]}px;
+    border-radius: ${theme.borderRadius.default};
+    padding: ${theme.spacing[6]};
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -75,7 +75,7 @@ const Header = styled.div`
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: ${theme.spacing[7]}px;
+    margin-bottom: ${theme.spacing[7]};
   `}
 `;
 

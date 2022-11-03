@@ -116,9 +116,9 @@ const Header = styled.header`
   ${({ theme }) => css`
     display: flex;
     align-items: center;
-    border-bottom: ${theme.borderWidth[1]}px solid ${theme.borderColor.tertiary};
+    border-bottom: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
     justify-content: center;
-    padding: 0 ${theme.spacing[10]}px;
+    padding: 0 ${theme.spacing[10]};
     height: 56px;
     position: relative;
 
@@ -133,13 +133,13 @@ const Header = styled.header`
 const CloseContainer = styled.div`
   ${({ theme }) => css`
     position: absolute;
-    left: ${theme.spacing[5]}px;
+    left: ${theme.spacing[5]};
   `}
 `;
 
 const Body = styled.div`
   ${({ theme }) => css`
-    padding: ${theme.spacing[7]}px;
+    padding: ${theme.spacing[7]};
     height: calc(100% - 56px);
     overflow: auto;
   `}

@@ -43,7 +43,7 @@ const Container = styled.div`
   ${({ theme }) => css`
     display: flex;
     flex-direction: column;
-    gap: ${theme.spacing[7]}px;
+    gap: ${theme.spacing[7]};
   `}
 `;
 

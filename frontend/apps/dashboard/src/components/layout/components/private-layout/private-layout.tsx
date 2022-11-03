@@ -81,7 +81,7 @@ const Footprint = styled.div`
     position: relative;
     display: flex;
     align-items: center;
-    padding: ${theme.spacing[4]}px 0;
+    padding: ${theme.spacing[4]} 0;
   `};
 `;
 
@@ -90,8 +90,8 @@ const Nav = styled.div`
     border-top: 1px solid ${theme.borderColor.tertiary};
     border-bottom: 1px solid ${theme.borderColor.tertiary};
     background-color: ${theme.backgroundColor.secondary};
-    padding: ${theme.spacing[3]}px 0;
-    margin-bottom: ${theme.spacing[7]}px;
+    padding: ${theme.spacing[3]} 0;
+    margin-bottom: ${theme.spacing[7]};
   `};
 `;
 
@@ -102,7 +102,7 @@ const Footer = styled.footer`
     justify-content: center;
 
     p {
-      margin: ${theme.spacing[7]}px 0 ${theme.spacing[5]}px;
+      margin: ${theme.spacing[7]} 0 ${theme.spacing[5]};
     }
   `};
 `;

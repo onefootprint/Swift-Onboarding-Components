@@ -1,23 +1,22 @@
-import * as t from '../../output/light';
 import type { Spacings } from '../types/types';
 
 const spacings: Spacings = {
-  0: t.spacing0,
-  1: t.spacing1,
-  2: t.spacing2,
-  3: t.spacing3,
-  4: t.spacing4,
-  5: t.spacing5,
-  6: t.spacing6,
-  7: t.spacing7,
-  8: t.spacing8,
-  9: t.spacing9,
-  10: t.spacing10,
-  11: t.spacing11,
-  12: t.spacing12,
-  13: t.spacing13,
-  14: t.spacing14,
-  15: t.spacing15,
+  0: 'var(--fp-spacing-0)',
+  1: 'var(--fp-spacing-1)',
+  2: 'var(--fp-spacing-2)',
+  3: 'var(--fp-spacing-3)',
+  4: 'var(--fp-spacing-4)',
+  5: 'var(--fp-spacing-5)',
+  6: 'var(--fp-spacing-6)',
+  7: 'var(--fp-spacing-7)',
+  8: 'var(--fp-spacing-8)',
+  9: 'var(--fp-spacing-9)',
+  10: 'var(--fp-spacing-10)',
+  11: 'var(--fp-spacing-11)',
+  12: 'var(--fp-spacing-12)',
+  13: 'var(--fp-spacing-13)',
+  14: 'var(--fp-spacing-14)',
+  15: 'var(--fp-spacing-15)',
 };
 
 export default spacings;

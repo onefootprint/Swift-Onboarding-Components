@@ -71,7 +71,7 @@ const Retry = () => {
 const Container = styled.form`
   ${({ theme }) => css`
     display: grid;
-    row-gap: ${theme.spacing[8]}px;
+    row-gap: ${theme.spacing[8]};
   `}
 `;
 

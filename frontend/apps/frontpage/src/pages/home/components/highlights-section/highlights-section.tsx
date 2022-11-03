@@ -53,12 +53,12 @@ const ItemsContainer = styled.div`
     display: inline-grid;
     grid-template-columns: repeat(1, 1fr);
     grid-template-rows: 3 1fr;
-    row-gap: ${theme.spacing[5]}px;
+    row-gap: ${theme.spacing[5]};
 
     ${media.greaterThan('md')`
       grid-template-columns: repeat(3, 1fr);
       grid-template-rows: 1 1fr;
-      column-gap: ${theme.spacing[5]}px;
+      column-gap: ${theme.spacing[5]};
     `}
   `}
 `;

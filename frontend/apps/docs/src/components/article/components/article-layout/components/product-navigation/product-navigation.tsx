@@ -58,13 +58,13 @@ const Container = styled.aside`
 
     ${media.greaterThan('sm')`
       background: ${theme.backgroundColor.primary};
-      border-right: ${theme.borderWidth[1]}px solid ${theme.borderColor.tertiary};
+      border-right: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
       display: flex;
       flex-direction: column;
       height: calc(100vh - var(--header-height));
       justify-content: space-between;
       left: 0;
-      padding: ${theme.spacing[7]}px ${theme.spacing[5]}px;
+      padding: ${theme.spacing[7]} 0 0;
       position: fixed;
       top: var(--header-height);
       width: var(--product-aside-nav-width);
@@ -74,8 +74,8 @@ const Container = styled.aside`
 
 const Header = styled.header`
   ${({ theme }) => css`
-    margin-bottom: ${theme.spacing[5]}px;
-    margin-left: ${theme.spacing[4]}px;
+    margin-bottom: ${theme.spacing[5]};
+    margin-left: ${theme.spacing[4]};
     text-transform: uppercase;
   `}
 `;
@@ -83,9 +83,9 @@ const Header = styled.header`
 const StyledLink = styled(Link)`
   ${({ theme }) => css`
     ${createFontStyles('label-3')};
-    border-radius: ${theme.borderRadius.default}px;
+    border-radius: ${theme.borderRadius.default};
     display: block;
-    padding: ${theme.spacing[3]}px ${theme.spacing[4]}px;
+    padding: ${theme.spacing[3]} ${theme.spacing[4]};
     text-decoration: none;
 
     &[data-selected='false'] {
@@ -106,9 +106,9 @@ const StyledLink = styled(Link)`
 const ThemeControl = styled.div`
   ${({ theme }) => css`
     background: ${theme.backgroundColor.secondary};
-    border-top: ${theme.borderWidth[1]}px solid ${theme.borderColor.tertiary};
-    margin: 0 -${theme.spacing[5]}px -${theme.spacing[7]}px;
-    padding: ${theme.spacing[4]}px ${theme.spacing[7]}px;
+    border-top: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
+    margin: 0 -${theme.spacing[5]} -${theme.spacing[7]};
+    padding: ${theme.spacing[4]} ${theme.spacing[7]};
   `}
 `;
 

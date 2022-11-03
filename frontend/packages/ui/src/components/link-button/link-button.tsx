@@ -138,11 +138,11 @@ export const LinkButtonStyled = styled.a.attrs<{
       }
 
       &[data-icon-position='left'] svg {
-        margin-right: ${theme.spacing[2]}px;
+        margin-right: ${theme.spacing[2]};
       }
 
       &[data-icon-position='right'] svg {
-        margin-left: ${theme.spacing[2]}px;
+        margin-left: ${theme.spacing[2]};
       }
     `;
   }}

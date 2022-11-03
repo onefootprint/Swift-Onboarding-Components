@@ -58,7 +58,7 @@ const MenuTitle = styled.div`
     color: ${theme.color.primary};
     display: flex;
     justify-content: space-between;
-    padding: ${theme.spacing[4]}px ${theme.spacing[6]}px;
+    padding: ${theme.spacing[4]} ${theme.spacing[6]};
     text-decoration: none;
     cursor: pointer;
   `}

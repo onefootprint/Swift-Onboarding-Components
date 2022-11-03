@@ -144,7 +144,7 @@ const Container = styled.div`
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    row-gap: ${theme.spacing[8]}px;
+    row-gap: ${theme.spacing[8]};
   `}
 `;
 
@@ -155,7 +155,7 @@ const SectionsContainer = styled.div`
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    row-gap: ${theme.spacing[5]}px;
+    row-gap: ${theme.spacing[5]};
   `}
 `;
 

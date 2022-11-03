@@ -14,7 +14,7 @@ const Content = styled.div`
     color: ${theme.color.secondary};
 
     ${media.greaterThan('sm')`
-      padding: 0 ${theme.spacing[11]}px;
+      padding: 0 ${theme.spacing[11]};
     `}
 
     figure {
@@ -25,7 +25,7 @@ const Content = styled.div`
     }
 
     img {
-      margin-bottom: ${theme.spacing[9]}px;
+      margin-bottom: ${theme.spacing[9]};
       max-width: 100%;
 
       object-fit: cover;
@@ -33,8 +33,8 @@ const Content = styled.div`
       height: auto;
 
       ${media.greaterThan('sm')`
-        max-width: calc(100% + ${2 * theme.spacing[11]}px);
-        margin: ${theme.spacing[9]}px -${theme.spacing[11]}px;
+        max-width: calc(100% + ${theme.spacing[11]} + ${theme.spacing[11]});
+        margin: ${theme.spacing[9]} -${theme.spacing[11]};
       `}
     }
 
@@ -46,15 +46,15 @@ const Content = styled.div`
       color: ${theme.color.primary};
 
       &:not(:last-child) {
-        margin-bottom: ${theme.spacing[6]}px;
+        margin-bottom: ${theme.spacing[6]};
       }
     }
 
     table {
       border-collapse: separate;
-      border-radius: ${theme.borderRadius.default}px;
+      border-radius: ${theme.borderRadius.default};
       border: 1px solid ${theme.borderColor.tertiary};
-      margin-bottom: ${theme.spacing[9]}px;
+      margin-bottom: ${theme.spacing[9]};
       table-layout: fixed;
       width: 100%;
 
@@ -64,15 +64,15 @@ const Content = styled.div`
 
       th,
       td {
-        padding: ${theme.spacing[5]}px ${theme.spacing[6]}px;
+        padding: ${theme.spacing[5]} ${theme.spacing[6]};
       }
 
       th {
         ${createFontStyles('caption-1')};
         background: ${theme.backgroundColor.secondary};
         border-bottom: 1px solid ${theme.borderColor.tertiary};
-        border-radius: ${theme.borderRadius.default}px
-          ${theme.borderRadius.default}px 0 0;
+        border-radius: ${theme.borderRadius.default}
+          ${theme.borderRadius.default} 0 0;
         color: ${theme.color.primary};
         text-align: left;
         text-transform: uppercase;
@@ -92,7 +92,7 @@ const Content = styled.div`
     }
 
     ol {
-      margin-bottom: ${theme.spacing[9]}px;
+      margin-bottom: ${theme.spacing[9]};
 
       li {
         list-style-type: decimal;
@@ -102,7 +102,7 @@ const Content = styled.div`
     }
 
     ul {
-      margin-bottom: ${theme.spacing[9]}px;
+      margin-bottom: ${theme.spacing[9]};
 
       li {
         list-style-type: disc;
@@ -115,7 +115,7 @@ const Content = styled.div`
       ${createFontStyles('body-1')};
 
       &:not(:last-child) {
-        margin-bottom: ${theme.spacing[9]}px;
+        margin-bottom: ${theme.spacing[9]};
       }
     }
 
@@ -129,13 +129,13 @@ const Content = styled.div`
 
     hr {
       background-color: ${theme.borderColor.tertiary};
-      height: ${theme.borderWidth[1]}px;
+      height: ${theme.borderWidth[1]};
       border: 0;
     }
 
     figcaption {
       ${createFontStyles('body-4')}
-      margin: -${theme.spacing[9]}px 0 ${theme.spacing[9]}px 0;
+      margin: -${theme.spacing[9]} 0 ${theme.spacing[9]} 0;
       color: ${theme.color.quaternary};
       text-align: center;
     }

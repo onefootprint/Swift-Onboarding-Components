@@ -37,7 +37,7 @@ const Header = styled.header`
   ${({ theme }) => css`
     align-items: center;
     display: flex;
-    gap: ${theme.spacing[2]}px;
+    gap: ${theme.spacing[2]};
     justify-content: space-between;
   `}
 `;

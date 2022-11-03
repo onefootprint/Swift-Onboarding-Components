@@ -74,7 +74,7 @@ const OptionContainer = styled.div<{
     display: flex;
     justify-content: space-between;
     left: 0;
-    padding: ${theme.spacing[3]}px ${theme.spacing[5]}px;
+    padding: ${theme.spacing[3]} ${theme.spacing[5]};
     position: absolute;
     top: 0;
     width: 100%;

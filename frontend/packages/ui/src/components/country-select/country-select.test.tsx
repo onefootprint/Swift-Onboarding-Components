@@ -1,4 +1,3 @@
-import themes from '@onefootprint/design-tokens';
 import { COUNTRIES as options } from '@onefootprint/global-constants';
 import { customRender, screen, userEvent } from '@onefootprint/test-utils';
 import take from 'lodash/take';
@@ -134,7 +133,7 @@ describe('<CountrySelect />', () => {
         name: 'Select',
       }) as HTMLButtonElement;
       expect(trigger).toHaveStyle({
-        border: `1px solid ${themes.light.borderColor.error}`,
+        borderColor: 'var(--fp-base-inputs-base-hint-error)',
       });
     });
 
@@ -145,7 +144,7 @@ describe('<CountrySelect />', () => {
       });
       const hint = screen.getByText('Hint');
       expect(hint).toHaveStyle({
-        color: themes.light.color.error,
+        color: 'var(--fp-base-inputs-base-hint-error)',
       });
     });
   });

@@ -64,7 +64,7 @@ const Header = styled.header`
     align-items: center;
     display: flex;
     justify-content: space-between;
-    margin-bottom: ${theme.spacing[9]}px;
+    margin-bottom: ${theme.spacing[9]};
   `};
 `;
 
@@ -72,7 +72,7 @@ const ToggleContainer = styled.div`
   ${({ theme }) => css`
     align-items: center;
     display: flex;
-    gap: ${theme.spacing[3]}px;
+    gap: ${theme.spacing[3]};
   `};
 `;
 

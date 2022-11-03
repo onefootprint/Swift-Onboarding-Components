@@ -18,7 +18,7 @@ const SandboxBanner = () => {
 
 const SandboxBannerContainer = styled.div`
   ${({ theme }) => css`
-    border-bottom: ${theme.borderWidth[1]}px solid ${theme.borderColor.tertiary};
+    border-bottom: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
     position: sticky;
     top: 0;
     z-index: ${theme.zIndex.sticky};

@@ -51,8 +51,8 @@ const ImageContainer = styled.div`
   ${({ theme }) => css`
     width: 100%;
     height: 110px;
-    border-radius: ${theme.borderRadius.default}px
-      ${theme.borderRadius.default}px 0 0;
+    border-radius: ${theme.borderRadius.default} ${theme.borderRadius.default} 0
+      0;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -63,8 +63,8 @@ const Footer = styled.div`
   ${({ theme }) => css`
     width: 100%;
     height: 32px;
-    border-radius: 0 0 ${theme.borderRadius.default}px
-      ${theme.borderRadius.default}px;
+    border-radius: 0 0 ${theme.borderRadius.default}
+      ${theme.borderRadius.default};
     display: flex;
     align-items: center;
     justify-content: center;
@@ -81,7 +81,7 @@ const Container = styled.div`
     flex-direction: column;
     align-items: center;
     border: 1px solid ${theme.borderColor.tertiary};
-    border-radius: ${theme.borderRadius.default}px;
+    border-radius: ${theme.borderRadius.default};
   `};
 `;
 

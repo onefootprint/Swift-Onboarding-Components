@@ -41,9 +41,9 @@ const DatePicker = ({
         {`
           .rdp {
             background: ${theme.backgroundColor.primary};
-            border-radius: ${theme.spacing[2]}px;
+            border-radius: ${theme.spacing[2]};
             box-shadow: ${theme.elevation[2]};
-            padding: ${theme.spacing[4]}px ${theme.spacing[5]}px;
+            padding: ${theme.spacing[4]} ${theme.spacing[5]};
             width: 312px;
           }
 
@@ -54,7 +54,7 @@ const DatePicker = ({
           }
 
           .rdp-table tbody tr:not(:last-child) td {
-            padding-bottom: ${theme.spacing[3]}px;
+            padding-bottom: ${theme.spacing[3]};
           }
 
           .rdp-head_cell {
@@ -67,7 +67,7 @@ const DatePicker = ({
             color: ${theme.color.tertiary};
             height: ${cellSize}px;
             height: 100%;
-            padding-bottom: ${theme.spacing[3]}px;
+            padding-bottom: ${theme.spacing[3]};
             text-align: center;
             vertical-align: middle;
           }

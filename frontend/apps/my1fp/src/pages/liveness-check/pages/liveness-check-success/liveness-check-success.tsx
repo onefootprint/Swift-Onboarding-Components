@@ -23,7 +23,7 @@ const TitleContainer = styled.div`
     align-items: center;
     display: flex;
     flex-direction: column;
-    row-gap: ${theme.spacing[2]}px;
+    row-gap: ${theme.spacing[2]};
     justify-content: center;
   `}
 `;
@@ -33,7 +33,7 @@ const Container = styled.div`
     align-items: center;
     display: flex;
     flex-direction: column;
-    row-gap: ${theme.spacing[7]}px;
+    row-gap: ${theme.spacing[7]};
     height: 156px;
     justify-content: center;
     text-align: center;

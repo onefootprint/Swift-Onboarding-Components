@@ -62,8 +62,8 @@ const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
 const StyledField = styled(Field)<TextAreaProps>`
   resize: none;
   ${({ theme }) => css`
-    padding: ${theme.spacing[4]}px ${theme.spacing[5]}px;
-    min-height: ${theme.spacing[11]}px;
+    padding: ${theme.spacing[4]} ${theme.spacing[5]};
+    min-height: ${theme.spacing[11]};
   `}
 `;
 

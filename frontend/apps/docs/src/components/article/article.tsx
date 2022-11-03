@@ -67,37 +67,37 @@ const Container = styled(Markdown)`
     color: ${theme.color.secondary};
 
     > p {
-      margin-bottom: ${theme.spacing[7]}px;
+      margin-bottom: ${theme.spacing[7]};
     }
 
     h1,
     h2,
     h3 {
-      margin-bottom: ${theme.spacing[7]}px;
+      margin-bottom: ${theme.spacing[7]};
     }
 
     a {
       &:not(:first-child) {
         h2 {
-          margin-top: ${theme.spacing[10]}px;
+          margin-top: ${theme.spacing[10]};
         }
       }
     }
 
     ol {
-      padding-left: ${theme.spacing[5]}px;
+      padding-left: ${theme.spacing[5]};
       list-style: octal;
 
       ul {
-        margin-left: ${theme.spacing[7]}px;
+        margin-left: ${theme.spacing[7]};
       }
 
       > li {
-        margin-bottom: ${theme.spacing[7]}px;
+        margin-bottom: ${theme.spacing[7]};
 
         p,
         li {
-          margin-bottom: ${theme.spacing[3]}px;
+          margin-bottom: ${theme.spacing[3]};
         }
       }
     }
@@ -107,7 +107,7 @@ const Container = styled(Markdown)`
     }
 
     pre > div {
-      margin-bottom: ${theme.spacing[7]}px;
+      margin-bottom: ${theme.spacing[7]};
     }
   `};
 `;

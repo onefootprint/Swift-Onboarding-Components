@@ -43,17 +43,17 @@ const MarkdownLayout = ({ children, meta }: MarkdownLayoutProps) => {
 
 const Inner = styled.div`
   ${({ theme }) => css`
-    padding-bottom: ${theme.spacing[10]}px;
+    padding-bottom: ${theme.spacing[10]};
 
     ${media.greaterThan('lg')`
-      padding-bottom: ${theme.spacing[14]}px;
+      padding-bottom: ${theme.spacing[14]};
     `}
   `}
 `;
 
 const Header = styled.header`
   ${({ theme }) => css`
-    margin-bottom: ${theme.spacing[10]}px;
+    margin-bottom: ${theme.spacing[10]};
   `}
 `;
 

@@ -45,7 +45,7 @@ const Container = styled.div`
       align-items: center;
       display: flex;
       flex-grow: 1;
-      gap: ${theme.spacing[7]}px;
+      gap: ${theme.spacing[7]};
       justify-content: space-between;
     `}
   `}
@@ -55,7 +55,7 @@ const Nav = styled.nav`
   ${({ theme }) => css`
     align-items: center;
     display: flex;
-    gap: ${theme.spacing[8]}px;
+    gap: ${theme.spacing[8]};
     a {
       ${createFontStyles('label-3')};
       color: ${theme.color.primary};

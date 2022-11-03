@@ -28,7 +28,6 @@
     "base64url": "^3.0.1",
     "focus-trap-react": "^9.0.2",
     "footprint-elements": "*",
-    "polished": "^4.2.2",
     "qrcode.react": "^3.0.2",
     "react-confetti": "^6.1.0",
     "use-places-autocomplete": "^4.0.0",

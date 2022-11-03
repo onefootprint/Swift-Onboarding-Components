@@ -20,14 +20,14 @@ const BifrostNavigationHeaderContainer = () => {
 
 const Header = styled.header<{ isSandbox: boolean; hasScroll: boolean }>`
   ${({ theme }) => css`
-    padding: 0 ${theme.spacing[5]}px;
+    padding: 0 ${theme.spacing[5]};
     height: var(--navigation-header-height);
     position: sticky;
     z-index: ${theme.zIndex.sticky};
     top: 0;
 
     ${media.greaterThan('md')`
-      padding: 0 ${theme.spacing[4]}px;
+      padding: 0 ${theme.spacing[4]};
       height: var(--navigation-header-height);
     `}
   `}

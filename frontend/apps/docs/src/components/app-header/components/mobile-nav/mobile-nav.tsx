@@ -108,7 +108,7 @@ const Header = styled.div`
     align-items: center;
     display: flex;
     justify-content: space-between;
-    padding: ${theme.spacing[5]}px;
+    padding: ${theme.spacing[5]};
   `};
 `;
 
@@ -121,18 +121,18 @@ const NavTriggerButton = styled.button`
     margin: 0;
     padding: 0;
     width: 24px;
-    margin-right: ${theme.spacing[4]}px;
+    margin-right: ${theme.spacing[4]};
   `};
 `;
 
 const Nav = styled.nav`
   ${({ theme }) => css`
     background: ${theme.backgroundColor.secondary};
-    border-top: ${theme.borderWidth[1]}px solid ${theme.borderColor.tertiary};
-    border-bottom: ${theme.borderWidth[1]}px solid ${theme.borderColor.tertiary};
+    border-top: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
+    border-bottom: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
     display: flex;
-    gap: ${theme.spacing[3]}px;
-    padding: ${theme.spacing[3]}px ${theme.spacing[5]}px;
+    gap: ${theme.spacing[3]};
+    padding: ${theme.spacing[3]} ${theme.spacing[5]};
   `};
 `;
 
@@ -142,7 +142,7 @@ const NavMenu = styled.div`
     --mobile-nav-height: 48px;
 
     background: ${theme.backgroundColor.primary};
-    padding: ${theme.spacing[7]}px ${theme.spacing[5]}px;
+    padding: ${theme.spacing[7]} ${theme.spacing[5]};
     height: calc(
       100vh - var(--mobile-header-height) - var(--mobile-nav-height)
     );

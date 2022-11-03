@@ -137,7 +137,7 @@ const DialogContainer = styled.div<{
 }>`
   ${({ theme, isResponsive }) => css`
     background-color: ${theme.backgroundColor.primary};
-    border-radius: ${theme.borderRadius.default}px;
+    border-radius: ${theme.borderRadius.default};
     box-shadow: ${theme.elevation[3]};
     z-index: ${theme.zIndex.dialog};
 
@@ -175,9 +175,9 @@ const Header = styled.header`
   ${({ theme }) => css`
     display: flex;
     align-items: center;
-    border-bottom: ${theme.borderWidth[1]}px solid ${theme.borderColor.tertiary};
+    border-bottom: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
     justify-content: center;
-    padding: 0 ${theme.spacing[5]}px;
+    padding: 0 ${theme.spacing[5]};
     height: 56px;
     position: relative;
   `}
@@ -186,13 +186,13 @@ const Header = styled.header`
 const CloseContainer = styled.div`
   ${({ theme }) => css`
     position: absolute;
-    left: ${theme.spacing[5]}px;
+    left: ${theme.spacing[5]};
   `}
 `;
 
 const Body = styled.div`
   ${({ theme }) => css`
-    padding: ${theme.spacing[7]}px;
+    padding: ${theme.spacing[7]};
   `}
 `;
 
@@ -201,14 +201,14 @@ const Footer = styled.footer`
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: ${theme.spacing[5]}px ${theme.spacing[7]}px;
+    padding: ${theme.spacing[5]} ${theme.spacing[7]};
   `}
 `;
 
 const ButtonsContainer = styled.div`
   ${({ theme }) => css`
     display: flex;
-    gap: ${theme.spacing[4]}px;
+    gap: ${theme.spacing[4]};
   `}
 `;
 

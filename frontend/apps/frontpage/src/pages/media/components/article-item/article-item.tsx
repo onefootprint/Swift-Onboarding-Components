@@ -49,7 +49,7 @@ const Anchor = styled.a`
     align-items: center;
     display: flex;
     justify-content: space-between;
-    padding: ${theme.spacing[7]}px ${theme.spacing[5]}px;
+    padding: ${theme.spacing[7]} ${theme.spacing[5]};
     text-decoration: none;
 
     ${media.greaterThan('lg')`

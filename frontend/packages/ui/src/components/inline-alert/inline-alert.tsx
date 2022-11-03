@@ -47,9 +47,9 @@ const InlineAlertContainer = styled.div<{
   ${({ theme, variant }) => css`
     ${createFontStyles('body-2')};
     ${createVariantStyles(variant)};
-    border-radius: ${theme.borderRadius.default}px;
+    border-radius: ${theme.borderRadius.default};
     display: flex;
-    padding: ${theme.spacing[4]}px ${theme.spacing[5]}px;
+    padding: ${theme.spacing[4]} ${theme.spacing[5]};
     width: 100%;
   `};
 

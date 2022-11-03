@@ -61,24 +61,24 @@ const Container = styled.div`
   ${({ theme }) => css`
     display: flex;
     flex-direction: column;
-    padding: ${theme.spacing[6]}px;
+    padding: ${theme.spacing[6]};
   `}
 `;
 
 const CtaContainer = styled.div`
   ${({ theme }) => css`
-    margin-bottom: ${theme.spacing[7]}px;
+    margin-bottom: ${theme.spacing[7]};
   `}
 `;
 
 const Features = styled.ul`
   ${({ theme }) => css`
     display: grid;
-    gap: ${theme.spacing[3]}px;
+    gap: ${theme.spacing[3]};
 
     li {
       display: flex;
-      gap: ${theme.spacing[3]}px;
+      gap: ${theme.spacing[3]};
     }
   `}
 `;

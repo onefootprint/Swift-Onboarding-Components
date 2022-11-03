@@ -79,7 +79,7 @@ const FieldsContainer = styled.div`
     width: 100%;
 
     > :first-child {
-      margin-right: ${theme.spacing[4]}px;
+      margin-right: ${theme.spacing[4]};
       margin-bottom: 0;
       width: 300px;
     }
@@ -90,7 +90,7 @@ const FieldsContainer = styled.div`
 
     ${media.lessThan('sm')`
       flex-direction: column;
-      row-gap: ${theme.spacing[4]}px;
+      row-gap: ${theme.spacing[4]};
       
       > :first-child {
         margin-right: 0;
@@ -114,7 +114,7 @@ const Form = styled.form`
 
 const FormHeader = styled.div`
   ${({ theme }) => css`
-    margin-bottom: ${theme.spacing[9]}px;
+    margin-bottom: ${theme.spacing[9]};
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -129,9 +129,9 @@ const FormContainer = styled.div`
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    margin: ${theme.spacing[11]}px 0;
+    margin: ${theme.spacing[11]} 0;
     text-align: center;
-    padding: 0 ${theme.spacing[10]}px;
+    padding: 0 ${theme.spacing[10]};
 
     ${media.lessThan('sm')`
       padding: 0;

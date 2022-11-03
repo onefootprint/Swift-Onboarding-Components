@@ -74,7 +74,7 @@ const IconContainer = styled.div<{ selected?: boolean }>`
 
 const OptionLabel = styled.div`
   ${({ theme }) => css`
-    margin-left: ${theme.spacing[4]}px;
+    margin-left: ${theme.spacing[4]};
   `}
 `;
 
@@ -85,19 +85,19 @@ const Option = styled.button<{ selected?: boolean }>`
     cursor: pointer;
     margin: 0;
     border: 1px solid ${theme.borderColor.tertiary};
-    padding: ${theme.spacing[5]}px;
+    padding: ${theme.spacing[5]};
     display: flex;
     justify-content: left;
     align-items: center;
 
     &:first-child {
-      border-radius: ${theme.borderRadius.default}px
-        ${theme.borderRadius.default}px 0 0;
+      border-radius: ${theme.borderRadius.default} ${theme.borderRadius.default}
+        0 0;
     }
 
     &:last-child {
-      border-radius: 0 0 ${theme.borderRadius.default}px
-        ${theme.borderRadius.default}px;
+      border-radius: 0 0 ${theme.borderRadius.default}
+        ${theme.borderRadius.default};
     }
 
     &:not(:first-child) {

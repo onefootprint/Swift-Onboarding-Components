@@ -54,7 +54,7 @@ const MyFootprintIdentity = () => {
 const Content = styled.div`
   ${({ theme }) => css`
     > :not(:last-child) {
-      margin-bottom: ${theme.spacing[4]}px;
+      margin-bottom: ${theme.spacing[4]};
     }
   `}
 `;
@@ -71,7 +71,7 @@ const PageContainer = styled.div`
 const SectionContainer = styled.div`
   ${({ theme }) => css`
     > div:not(:last-child) {
-      margin-bottom: ${theme.spacing[4]}px;
+      margin-bottom: ${theme.spacing[4]};
     }
   `}
 `;

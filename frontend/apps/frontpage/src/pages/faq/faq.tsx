@@ -94,7 +94,7 @@ const Container = styled.div`
   ${({ theme }) => css`
     margin: 0 auto;
     max-width: 800px;
-    padding: 0 ${theme.spacing[5]}px;
+    padding: 0 ${theme.spacing[5]};
 
     ${media.greaterThan('md')`
       padding: 0;
@@ -105,8 +105,8 @@ const Container = styled.div`
 const HeroContainer = styled.div`
   ${({ theme }) => css`
     display: grid;
-    gap: ${theme.spacing[5]}px;
-    margin-bottom: ${theme.spacing[10]}px;
+    gap: ${theme.spacing[5]};
+    margin-bottom: ${theme.spacing[10]};
     text-align: center;
   `}
 `;
@@ -114,8 +114,8 @@ const HeroContainer = styled.div`
 const QuestionsContainer = styled.div`
   ${({ theme }) => css`
     display: grid;
-    gap: ${theme.spacing[5]}px;
-    margin-bottom: ${theme.spacing[10]}px;
+    gap: ${theme.spacing[5]};
+    margin-bottom: ${theme.spacing[10]};
   `}
 `;
 
@@ -124,11 +124,11 @@ const ContactContainer = styled.div`
     align-items: center;
     display: flex;
     flex-direction: column;
-    margin-bottom: ${theme.spacing[10]}px;
+    margin-bottom: ${theme.spacing[10]};
     text-align: center;
 
     ${media.greaterThan('lg')`
-      margin-bottom: ${theme.spacing[11]}px;
+      margin-bottom: ${theme.spacing[11]};
     `}
   `}
 `;

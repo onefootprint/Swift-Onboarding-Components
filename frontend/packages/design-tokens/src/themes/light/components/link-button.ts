@@ -1,60 +1,60 @@
-import * as t from '../../../output/light';
+import type { LinkButton } from '../../types/components';
 
-const linkButton = {
+const linkButton: LinkButton = {
   variant: {
     default: {
       color: {
         text: {
-          initial: t.linkButtonDefaultInitialText,
-          active: t.linkButtonDefaultActiveText,
-          hover: t.linkButtonDefaultHoverText,
-          disabled: t.linkButtonDefaultDisabledText,
+          initial: 'var(--fp-link-button-default-initial-text)',
+          active: 'var(--fp-link-button-default-active-text)',
+          hover: 'var(--fp-link-button-default-hover-text)',
+          disabled: 'var(--fp-link-button-default-disabled-text)',
         },
         icon: {
-          initial: t.linkButtonDefaultInitialIcon,
-          active: t.linkButtonDefaultActiveIcon,
-          hover: t.linkButtonDefaultHoverIcon,
-          disabled: t.linkButtonDefaultDisabledIcon,
+          initial: 'var(--fp-link-button-default-initial-icon)',
+          active: 'var(--fp-link-button-default-active-icon)',
+          hover: 'var(--fp-link-button-default-hover-icon)',
+          disabled: 'var(--fp-link-button-default-disabled-icon)',
         },
       },
     },
     destructive: {
       color: {
         text: {
-          initial: t.linkButtonDestructiveInitialText,
-          active: t.linkButtonDestructiveActiveText,
-          hover: t.linkButtonDestructiveHoverText,
-          disabled: t.linkButtonDestructiveDisabledText,
+          initial: 'var(--fp-link-button-destructive-initial-text)',
+          active: 'var(--fp-link-button-destructive-active-text)',
+          hover: 'var(--fp-link-button-destructive-hover-text)',
+          disabled: 'var(--fp-link-button-destructive-disabled-text)',
         },
         icon: {
-          initial: t.linkButtonDestructiveInitialIcon,
-          active: t.linkButtonDestructiveActiveIcon,
-          hover: t.linkButtonDestructiveHoverIcon,
-          disabled: t.linkButtonDestructiveDisabledIcon,
+          initial: 'var(--fp-link-button-destructive-initial-icon)',
+          active: 'var(--fp-link-button-destructive-active-icon)',
+          hover: 'var(--fp-link-button-destructive-hover-icon)',
+          disabled: 'var(--fp-link-button-destructive-disabled-icon)',
         },
       },
     },
   },
   size: {
     default: {
-      height: t.linkButtonSizingDefault,
-      typography: t.linkButtonTypographyDefault,
+      height: 'var(--fp-link-button-sizing-default)',
+      typography: 'var(--fp-link-button-typography-default)',
     },
     compact: {
-      height: t.linkButtonSizingCompact,
-      typography: t.linkButtonTypographyCompact,
+      height: 'var(--fp-link-button-sizing-compact)',
+      typography: 'var(--fp-link-button-typography-compact)',
     },
     tiny: {
-      height: t.linkButtonSizingTiny,
-      typography: t.linkButtonTypographyTiny,
+      height: 'var(--fp-link-button-sizing-tiny)',
+      typography: 'var(--fp-link-button-typography-tiny)',
     },
     xTiny: {
-      height: t.linkButtonSizingXTiny,
-      typography: t.linkButtonTypographyXTiny,
+      height: 'var(--fp-link-button-sizing-x-tiny)',
+      typography: 'var(--fp-link-button-typography-x-tiny)',
     },
     xxTiny: {
-      height: t.linkButtonSizingXxTiny,
-      typography: t.linkButtonTypographyXxTiny,
+      height: 'var(--fp-link-button-sizing-xx-tiny)',
+      typography: 'var(--fp-link-button-typography-xx-tiny)',
     },
   },
 };

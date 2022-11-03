@@ -29,9 +29,9 @@ const Item = styled.button`
     cursor: pointer;
     align-items: center;
     display: flex;
-    padding-left: ${theme.spacing[3]}px;
+    padding-left: ${theme.spacing[3]};
     display: flex;
-    gap: ${theme.spacing[3]}px;
+    gap: ${theme.spacing[3]};
 
     &:hover {
       > * {

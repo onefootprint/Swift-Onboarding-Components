@@ -66,7 +66,7 @@ const TimelineContainer = styled.div`
   align-content: left;
   justify-content: left;
   ${({ theme }) => css`
-    gap: ${theme.spacing[3]}px ${theme.spacing[4]}px;
+    gap: ${theme.spacing[3]} ${theme.spacing[4]};
   `};
 `;
 
@@ -85,35 +85,35 @@ const Connector = styled.div<{
   margin-right: auto;
   ${({ theme }) => css`
     background-color: ${theme.backgroundColor.senary};
-    border-radius: ${theme.borderRadius.default}px;
+    border-radius: ${theme.borderRadius.default};
   `};
   ${({ theme, variant }) =>
     variant === 'tight' &&
     css`
       // Help to fill empty space when the iconComponents are smaller
-      margin-top: -${theme.spacing[3]}px;
-      margin-bottom: -${theme.spacing[3]}px;
+      margin-top: -${theme.spacing[3]};
+      margin-bottom: -${theme.spacing[3]};
     `};
 `;
 
 const HeaderContainer = styled.div`
   grid-column-start: 4;
   ${({ theme }) => css`
-    margin-left: ${theme.spacing[2]}px;
+    margin-left: ${theme.spacing[2]};
   `};
 `;
 
 const BodyContainer = styled.div`
   grid-column-start: 4;
   ${({ theme }) => css`
-    margin-left: ${theme.spacing[2] + theme.spacing[5]}px;
-    margin-bottom: ${theme.spacing[4]}px;
+    margin-left: calc(${theme.spacing[2]} + ${theme.spacing[5]});
+    margin-bottom: ${theme.spacing[4]};
   `};
 `;
 
 const LoadingContainer = styled.div`
   ${({ theme }) => css`
-    margin-bottom: ${theme.spacing[4]}px;
+    margin-bottom: ${theme.spacing[4]};
   `};
 `;
 

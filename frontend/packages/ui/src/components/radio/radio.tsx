@@ -49,7 +49,7 @@ const Radio = forwardRef<HTMLInputElement, RadioProps>(
         <Label
           aria-describedby={hint && `${id}-hint`}
           data-testid={testID}
-          hasError={hasError}
+          data-has-error={hasError}
           htmlFor={id}
         >
           <Input
@@ -85,13 +85,17 @@ const Radio = forwardRef<HTMLInputElement, RadioProps>(
 
 const Container = styled.div``;
 
-const Label = styled.label<Pick<RadioProps, 'hasError'>>`
-  ${({ theme, hasError }) => css`
+const Label = styled.label`
+  ${({ theme }) => css`
     ${createFontStyles('body-3')};
     align-items: center;
-    color: ${hasError ? theme.color.error : theme.color.primary};
+    color: ${theme.color.primary};
     display: inline-flex;
-    gap: ${theme.spacing[4]}px;
+    gap: ${theme.spacing[4]};
+
+    &[data-has-error='true'] {
+      color: ${theme.color.error};
+    }
   `}
 `;
 
@@ -99,12 +103,12 @@ const Input = styled.input<Pick<RadioProps, 'hasError'>>`
   ${({ theme }) => css`
     appearance: none;
     background-color: ${theme.backgroundColor.primary};
-    border-radius: ${theme.spacing[4]}px;
-    border: ${theme.borderWidth[1]}px solid ${theme.borderColor.primary};
+    border-radius: ${theme.spacing[4]};
+    border: ${theme.borderWidth[1]} solid ${theme.borderColor.primary};
     display: grid;
     height: 16px;
     margin: 0;
-    outline-offset: ${theme.spacing[2]}px;
+    outline-offset: ${theme.spacing[2]};
     place-content: center;
     width: 16px;
 
@@ -165,8 +169,8 @@ const Input = styled.input<Pick<RadioProps, 'hasError'>>`
 
 const StyledInputHint = styled(InputHint)`
   ${({ theme }) => css`
-    margin-top: ${theme.spacing[2]}px;
-    margin-left: ${theme.spacing[8] - theme.spacing[1]}px;
+    margin-top: ${theme.spacing[2]};
+    margin-left: calc(${theme.spacing[8]} - ${theme.spacing[1]});
   `}
 `;
 

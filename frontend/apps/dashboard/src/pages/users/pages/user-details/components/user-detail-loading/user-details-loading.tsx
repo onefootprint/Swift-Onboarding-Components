@@ -79,7 +79,7 @@ const UserDetailsLoading = () => (
 const DataGrid = styled.div`
   ${({ theme }) => css`
     display: grid;
-    gap: ${theme.spacing[5]}px;
+    gap: ${theme.spacing[5]};
     grid-template-columns: repeat(2, 1fr);
   `};
 `;

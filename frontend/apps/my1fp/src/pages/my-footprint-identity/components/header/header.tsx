@@ -35,7 +35,7 @@ const Inner = styled.div`
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: ${theme.spacing[4]}px ${theme.spacing[7]}px;
+    padding: ${theme.spacing[4]} ${theme.spacing[7]};
   `}
 `;
 

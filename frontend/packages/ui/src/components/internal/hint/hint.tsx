@@ -31,7 +31,7 @@ const HintContainer = styled.div`
     const { inputHint } = theme.components;
 
     return css`
-      margin-top: ${theme.spacing[3]}px;
+      margin-top: ${theme.spacing[3]};
       text-align: left;
 
       &[data-has-error='false'] {

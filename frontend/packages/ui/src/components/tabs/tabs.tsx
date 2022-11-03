@@ -32,17 +32,17 @@ const Container = styled.nav`
     }
 
     &[data-variant='pill'] {
-      gap: ${theme.spacing[3]}px;
+      gap: ${theme.spacing[3]};
 
       a,
       button {
         ${createFontStyles('body-4')};
-        border-radius: ${theme.borderRadius.large}px;
+        border-radius: ${theme.borderRadius.large};
         color: ${theme.color.primary};
         display: flex;
-        gap: ${theme.spacing[2]}px;
+        gap: ${theme.spacing[2]};
         justify-content: center;
-        padding: ${theme.spacing[2]}px ${theme.spacing[4]}px;
+        padding: ${theme.spacing[2]} ${theme.spacing[4]};
 
         &[data-selected='true'] {
           background: ${theme.backgroundColor.accent};
@@ -55,7 +55,7 @@ const Container = styled.nav`
 
         svg {
           position: relative;
-          top: ${theme.spacing[1]}px;
+          top: ${theme.spacing[1]};
 
           path {
             fill: ${theme.color.primary};
@@ -65,15 +65,15 @@ const Container = styled.nav`
     }
 
     &[data-variant='underlined'] {
-      gap: ${theme.spacing[7]}px;
+      gap: ${theme.spacing[7]};
       border-bottom: 1px solid ${theme.borderColor.tertiary};
 
       a,
       button {
         ${createFontStyles('body-3')};
-        border-bottom: ${theme.borderWidth[2]}px solid transparent;
+        border-bottom: ${theme.borderWidth[2]} solid transparent;
         color: ${theme.color.tertiary};
-        padding-bottom: ${theme.spacing[3]}px;
+        padding-bottom: ${theme.spacing[3]};
 
         &[data-selected='true'] {
           color: ${theme.color.accent};

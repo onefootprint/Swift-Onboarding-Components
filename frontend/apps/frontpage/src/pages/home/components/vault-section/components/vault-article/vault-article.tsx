@@ -35,7 +35,7 @@ const VaultArticle = ({
 
 const CircleContainer = styled.div`
   ${({ theme }) => css`
-    margin-bottom: ${theme.spacing[8]}px;
+    margin-bottom: ${theme.spacing[8]};
   `}
 `;
 

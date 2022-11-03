@@ -30,7 +30,7 @@ const SandboxBannerContainer = styled.div`
 
     button {
       padding: 0;
-      margin-left: ${theme.spacing[2]}px;
+      margin-left: ${theme.spacing[2]};
 
       &:disabled {
         cursor: default;

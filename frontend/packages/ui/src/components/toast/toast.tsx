@@ -82,13 +82,13 @@ const ToastContainer = styled.div`
     width: 380px;
     align-items: flex-start;
     background: ${theme.backgroundColor.primary};
-    border-radius: ${theme.borderRadius.default}px;
+    border-radius: ${theme.borderRadius.default};
     border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
     box-shadow: ${theme.elevation[2]};
     display: flex;
     flex-direction: row;
-    gap: ${theme.spacing[3]}px;
-    padding: ${theme.spacing[4]}px;
+    gap: ${theme.spacing[3]};
+    padding: ${theme.spacing[4]};
 
     &[data-leaving='true'] {
       animation: ${slideOut} 200ms forwards;
@@ -111,7 +111,7 @@ const ToastContainer = styled.div`
 const StyledIcoInfo16 = styled(IcoInfo16)`
   ${({ theme }) => css`
     position: relative;
-    top: ${theme.spacing[1]}px;
+    top: ${theme.spacing[1]};
   `}
 `;
 

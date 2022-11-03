@@ -15,7 +15,7 @@ const Banner = styled.div.attrs<BannerProps>({
   ${({ theme, variant }) => css`
     ${createFontStyles('label-3')};
     ${createVariantStyles(variant)};
-    padding: ${theme.spacing[4]}px ${theme.spacing[5]}px;
+    padding: ${theme.spacing[4]} ${theme.spacing[5]};
     text-align: center;
     width: 100%;
 

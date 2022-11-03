@@ -48,14 +48,14 @@ const Values = ({ title, description, items }: ValuesProps) => (
 
 const TitleContainer = styled.div`
   ${({ theme }) => css`
-    margin-bottom: ${theme.spacing[9]}px;
+    margin-bottom: ${theme.spacing[9]};
   `}
 `;
 
 const ItemsContainer = styled.ul`
   ${({ theme }) => css`
     display: grid;
-    gap: ${theme.spacing[5]}px;
+    gap: ${theme.spacing[5]};
     grid-template-columns: repeat(1, 1fr);
 
     ${media.greaterThan('lg')`
@@ -67,8 +67,8 @@ const ItemsContainer = styled.ul`
 const Item = styled.li`
   ${({ theme }) => css`
     background: ${theme.backgroundColor.secondary};
-    border-radius: ${theme.borderRadius.default}px;
-    padding: ${theme.spacing[8]}px;
+    border-radius: ${theme.borderRadius.default};
+    padding: ${theme.spacing[8]};
   `}
 `;
 
@@ -76,12 +76,12 @@ const IconContainer = styled.div`
   ${({ theme }) => css`
     align-items: center;
     background: ${rgba('#CBC1F6', 0.6)};
-    border-radius: ${theme.borderRadius.full}px;
+    border-radius: ${theme.borderRadius.full};
     display: flex;
     height: 56px;
     justify-content: center;
-    margin-bottom: ${theme.spacing[7]}px;
-    padding: ${theme.spacing[3]}px;
+    margin-bottom: ${theme.spacing[7]};
+    padding: ${theme.spacing[3]};
     width: 56px;
   `}
 `;

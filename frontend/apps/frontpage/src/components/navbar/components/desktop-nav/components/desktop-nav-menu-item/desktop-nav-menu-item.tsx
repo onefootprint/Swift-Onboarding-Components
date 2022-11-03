@@ -4,7 +4,6 @@ import React from 'react';
 import styled, { css } from 'styled-components';
 
 import { NavMenuItem } from '../../../../types';
-import NavigationMenu from '../navigation-menu';
 
 type DesktopNavMenuItemProps = {
   item: NavMenuItem;
@@ -12,24 +11,22 @@ type DesktopNavMenuItemProps = {
 
 const DesktopNavMenuItem = ({ item }: DesktopNavMenuItemProps) => (
   <Item>
-    <Link href={item.href} passHref>
-      <StyledLink href={item.href}>
-        <item.iconComponent />
-        <ItemText>
-          <Typography variant="label-3">{item.text}</Typography>
-          <Typography variant="body-3" color="tertiary">
-            {item.subtext}
-          </Typography>
-        </ItemText>
-      </StyledLink>
-    </Link>
+    <StyledLink href={item.href}>
+      <item.iconComponent />
+      <ItemText>
+        <Typography variant="label-3">{item.text}</Typography>
+        <Typography variant="body-3" color="tertiary">
+          {item.subtext}
+        </Typography>
+      </ItemText>
+    </StyledLink>
   </Item>
 );
 
 const Item = styled.div`
   ${({ theme }) => css`
-    padding: ${theme.spacing[3]}px ${theme.spacing[4]}px;
-    border-radius: ${theme.borderRadius.default}px;
+    padding: ${theme.spacing[3]} ${theme.spacing[4]};
+    border-radius: ${theme.borderRadius.default};
     :hover,
     :focus {
       ${createOverlayBackground('darken-1', 'primary')};
@@ -45,19 +42,19 @@ const Item = styled.div`
 
 const ItemText = styled.div`
   ${({ theme }) => css`
-    margin-top: ${theme.spacing[1]}px;
+    margin-top: ${theme.spacing[1]};
     display: flex;
     flex-direction: column;
-    margin-left: ${theme.spacing[4]}px;
+    margin-left: ${theme.spacing[4]};
     text-decoration: none;
 
     > :first-child {
-      margin-bottom: ${theme.spacing[1]}px;
+      margin-bottom: ${theme.spacing[1]};
     }
   `}
 `;
 
-const StyledLink = styled(NavigationMenu.Link)`
+const StyledLink = styled(Link)`
   text-decoration: none;
   display: flex;
   align-items: center;

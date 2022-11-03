@@ -65,7 +65,7 @@ const Container = styled.div`
 
     ${media.greaterThan('md')`
       display: flex;
-      gap: ${theme.spacing[4]}px;
+      gap: ${theme.spacing[4]};
     `}
   `}
 `;

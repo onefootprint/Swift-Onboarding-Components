@@ -1,4 +1,3 @@
-import themes from '@onefootprint/design-tokens';
 import { customRender, screen, userEvent } from '@onefootprint/test-utils';
 import React from 'react';
 
@@ -37,11 +36,8 @@ describe('<PinInput />', () => {
       });
 
       const firstInput = document.getElementsByTagName('input')[0];
-
       expect(firstInput).toHaveStyle({
-        borderWidth: '1px',
-        borderStyle: 'solid',
-        borderColor: themes.light.borderColor.error,
+        borderColor: 'var(--fp-base-inputs-base-hint-error)',
       });
     });
 
@@ -52,9 +48,8 @@ describe('<PinInput />', () => {
       });
 
       const hint = screen.getByText('Hint');
-
       expect(hint).toHaveStyle({
-        color: themes.light.color.error,
+        color: 'var(--fp-base-inputs-base-hint-error)',
       });
     });
   });

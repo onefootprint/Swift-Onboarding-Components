@@ -1,4 +1,4 @@
-import { Footprint } from '../footprint-types';
+import { Footprint } from '../types/footprint.types';
 import { createButton } from './ui-manager';
 
 const defer = (callback: () => void) => {

@@ -1,184 +1,138 @@
 import { UserDataAttribute } from '@onefootprint/types';
-import { IdDocDataAttribute } from 'src/pages/users/types/vault-data.types';
 
 import getSectionsVisibility from './get-sections-visibility';
 
 describe('getSectionsVisibility', () => {
   describe('when only the basic info is visible', () => {
     it('should return sections visibility', () => {
-      const sectionsVisibility = getSectionsVisibility({
-        kycData: {
-          [UserDataAttribute.firstName]: 'Piip',
-          [UserDataAttribute.lastName]: 'Footprint',
-          [UserDataAttribute.email]: 'piip@onefootprint.com',
-        },
-      });
+      const userDataAttributes = [
+        UserDataAttribute.firstName,
+        UserDataAttribute.lastName,
+        UserDataAttribute.email,
+      ];
+      const sectionsVisibility = getSectionsVisibility(userDataAttributes);
       expect(sectionsVisibility).toEqual({
-        basicSection: true,
-        identitySection: false,
-        addressSection: false,
-        idDocSection: false,
+        basic: true,
+        identity: false,
+        address: false,
       });
     });
   });
 
   describe('when identity is visible', () => {
     it('should return sections visibility', () => {
-      const sectionsVisibility = getSectionsVisibility({
-        kycData: {
-          [UserDataAttribute.firstName]: 'Piip',
-          [UserDataAttribute.lastName]: 'Footprint',
-          [UserDataAttribute.email]: 'piip@onefootprint.com',
-          [UserDataAttribute.ssn4]: '6009',
-        },
-      });
+      const userDataAttributes = [
+        UserDataAttribute.firstName,
+        UserDataAttribute.lastName,
+        UserDataAttribute.email,
+        UserDataAttribute.ssn4,
+      ];
+      const sectionsVisibility = getSectionsVisibility(userDataAttributes);
       expect(sectionsVisibility).toEqual({
-        basicSection: true,
-        identitySection: true,
-        addressSection: false,
-        idDocSection: false,
+        basic: true,
+        identity: true,
+        address: false,
       });
 
-      const sectionsVisibility1 = getSectionsVisibility({
-        kycData: {
-          [UserDataAttribute.firstName]: 'Piip',
-          [UserDataAttribute.lastName]: 'Footprint',
-          [UserDataAttribute.email]: 'piip@onefootprint.com',
-          [UserDataAttribute.ssn9]: '453436009',
-        },
-      });
+      const userDataAttributes1 = [
+        UserDataAttribute.firstName,
+        UserDataAttribute.lastName,
+        UserDataAttribute.email,
+        UserDataAttribute.ssn9,
+      ];
+      const sectionsVisibility1 = getSectionsVisibility(userDataAttributes1);
       expect(sectionsVisibility1).toEqual({
-        basicSection: true,
-        identitySection: true,
-        addressSection: false,
-        idDocSection: false,
+        basic: true,
+        identity: true,
+        address: false,
       });
 
-      const sectionsVisibility2 = getSectionsVisibility({
-        kycData: {
-          [UserDataAttribute.firstName]: 'Piip',
-          [UserDataAttribute.lastName]: 'Footprint',
-          [UserDataAttribute.email]: 'piip@onefootprint.com',
-          [UserDataAttribute.ssn9]: '453436009',
-          [UserDataAttribute.dob]: '01/01/2001',
-        },
-      });
+      const userDataAttributes2 = [
+        UserDataAttribute.firstName,
+        UserDataAttribute.lastName,
+        UserDataAttribute.email,
+        UserDataAttribute.ssn9,
+        UserDataAttribute.dob,
+      ];
+      const sectionsVisibility2 = getSectionsVisibility(userDataAttributes2);
       expect(sectionsVisibility2).toEqual({
-        basicSection: true,
-        identitySection: true,
-        addressSection: false,
-        idDocSection: false,
+        basic: true,
+        identity: true,
+        address: false,
       });
     });
   });
 
   describe('when adderss is visible', () => {
     it('should return sections visibility', () => {
-      const sectionsVisibility = getSectionsVisibility({
-        kycData: {
-          [UserDataAttribute.firstName]: 'Piip',
-          [UserDataAttribute.lastName]: 'Footprint',
-          [UserDataAttribute.email]: 'piip@onefootprint.com',
-          [UserDataAttribute.zip]: null,
-          [UserDataAttribute.country]: null,
-        },
-      });
+      const userDataAttributes = [
+        UserDataAttribute.firstName,
+        UserDataAttribute.lastName,
+        UserDataAttribute.email,
+        UserDataAttribute.country,
+        UserDataAttribute.zip,
+      ];
+      const sectionsVisibility = getSectionsVisibility(userDataAttributes);
       expect(sectionsVisibility).toEqual({
-        basicSection: true,
-        identitySection: false,
-        addressSection: true,
-        idDocSection: false,
+        basic: true,
+        identity: false,
+        address: true,
       });
 
-      const sectionsVisibility1 = getSectionsVisibility({
-        kycData: {
-          [UserDataAttribute.firstName]: 'Piip',
-          [UserDataAttribute.lastName]: 'Footprint',
-          [UserDataAttribute.email]: 'piip@onefootprint.com',
-          [UserDataAttribute.zip]: null,
-          [UserDataAttribute.state]: null,
-          [UserDataAttribute.addressLine1]: null,
-          [UserDataAttribute.addressLine2]: null,
-          [UserDataAttribute.country]: null,
-        },
-      });
+      const userDataAttributes1 = [
+        UserDataAttribute.firstName,
+        UserDataAttribute.lastName,
+        UserDataAttribute.email,
+        UserDataAttribute.addressLine1,
+        UserDataAttribute.addressLine2,
+        UserDataAttribute.country,
+        UserDataAttribute.state,
+        UserDataAttribute.zip,
+      ];
+      const sectionsVisibility1 = getSectionsVisibility(userDataAttributes1);
       expect(sectionsVisibility1).toEqual({
-        basicSection: true,
-        identitySection: false,
-        addressSection: true,
-        idDocSection: false,
-      });
-    });
-  });
-
-  describe('when id doc section is visible', () => {
-    it('should return sections visibility', () => {
-      const sectionsVisibility = getSectionsVisibility({
-        kycData: {
-          [UserDataAttribute.firstName]: 'Piip',
-          [UserDataAttribute.lastName]: 'Footprint',
-          [UserDataAttribute.email]: 'piip@onefootprint.com',
-          [UserDataAttribute.zip]: null,
-          [UserDataAttribute.country]: null,
-        },
-        idDoc: {
-          [IdDocDataAttribute.frontImage]: 'image_bytes',
-        },
-      });
-      expect(sectionsVisibility).toEqual({
-        basicSection: true,
-        identitySection: false,
-        addressSection: true,
-        idDocSection: true,
+        basic: true,
+        identity: false,
+        address: true,
       });
     });
   });
 
   describe('when all the sections are visible', () => {
     it('should return sections visibility', () => {
-      const sectionsVisibility = getSectionsVisibility({
-        kycData: {
-          [UserDataAttribute.firstName]: 'Piip',
-          [UserDataAttribute.lastName]: 'Footprint',
-          [UserDataAttribute.email]: 'piip@onefootprint.com',
-          [UserDataAttribute.ssn9]: null,
-          [UserDataAttribute.dob]: null,
-          [UserDataAttribute.zip]: null,
-          [UserDataAttribute.country]: null,
-        },
-        idDoc: {
-          [IdDocDataAttribute.frontImage]: 'image_bytes',
-        },
-      });
+      const userDataAttributes = [
+        UserDataAttribute.firstName,
+        UserDataAttribute.lastName,
+        UserDataAttribute.email,
+        UserDataAttribute.ssn9,
+        UserDataAttribute.dob,
+        UserDataAttribute.country,
+        UserDataAttribute.zip,
+      ];
+      const sectionsVisibility = getSectionsVisibility(userDataAttributes);
       expect(sectionsVisibility).toEqual({
-        basicSection: true,
-        identitySection: true,
-        addressSection: true,
-        idDocSection: true,
+        basic: true,
+        identity: true,
+        address: true,
       });
 
-      const sectionsVisibility1 = getSectionsVisibility({
-        kycData: {
-          [UserDataAttribute.firstName]: 'Piip',
-          [UserDataAttribute.lastName]: 'Footprint',
-          [UserDataAttribute.email]: 'piip@onefootprint.com',
-          [UserDataAttribute.ssn9]: null,
-          [UserDataAttribute.dob]: null,
-          [UserDataAttribute.zip]: null,
-          [UserDataAttribute.state]: null,
-          [UserDataAttribute.addressLine1]: null,
-          [UserDataAttribute.addressLine2]: null,
-          [UserDataAttribute.country]: null,
-        },
-        idDoc: {
-          [IdDocDataAttribute.frontImage]: 'image_bytes',
-        },
-      });
+      const userDataAttributes1 = [
+        UserDataAttribute.firstName,
+        UserDataAttribute.lastName,
+        UserDataAttribute.email,
+        UserDataAttribute.ssn9,
+        UserDataAttribute.dob,
+        UserDataAttribute.addressLine1,
+        UserDataAttribute.addressLine2,
+        UserDataAttribute.country,
+        UserDataAttribute.state,
+        UserDataAttribute.zip,
+      ];
+      const sectionsVisibility1 = getSectionsVisibility(userDataAttributes1);
       expect(sectionsVisibility1).toEqual({
-        basicSection: true,
-        identitySection: true,
-        addressSection: true,
-        idDocSection: true,
+        basic: true,
+        identity: true,
+        address: true,
       });
     });
   });

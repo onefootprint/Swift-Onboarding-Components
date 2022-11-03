@@ -74,9 +74,9 @@ const Team = ({ title, cta, description, items }: TeamProps) => (
 const ItemsContainer = styled.ul`
   ${({ theme }) => css`
     display: grid;
-    gap: ${theme.spacing[10]}px;
+    gap: ${theme.spacing[10]};
     grid-template-columns: repeat(1, 1fr);
-    margin-top: ${theme.spacing[10]}px;
+    margin-top: ${theme.spacing[10]};
     text-align: center;
 
     ${media.greaterThan('md')`
@@ -98,10 +98,10 @@ const Item = styled.li`
 
 const AvatarContainer = styled.div`
   ${({ theme }) => css`
-    margin-bottom: ${theme.spacing[7]}px;
+    margin-bottom: ${theme.spacing[7]};
 
     img {
-      border-radius: ${theme.borderRadius.default}px;
+      border-radius: ${theme.borderRadius.default};
     }
   `}
 `;
@@ -109,7 +109,7 @@ const AvatarContainer = styled.div`
 const SocialContainer = styled.div`
   ${({ theme }) => css`
     display: flex;
-    gap: ${theme.spacing[4]}px;
+    gap: ${theme.spacing[4]};
   `}
 `;
 

@@ -1,10 +1,8 @@
-import themes, { Color } from '@onefootprint/design-tokens';
 import { IcoArrowRightSmall24 } from '@onefootprint/icons';
 import { customRender, screen, userEvent } from '@onefootprint/test-utils';
 import React from 'react';
 
 import LinkButton, { LinkButtonProps } from './link-button';
-import type { LinkButtonVariant } from './link-button.types';
 
 describe('<LinkButton />', () => {
   const renderLinkButton = ({
@@ -70,27 +68,6 @@ describe('<LinkButton />', () => {
       );
       expect(onClickMockFn).toHaveBeenCalledTimes(1);
     });
-
-    const variants: {
-      variant: LinkButtonVariant;
-      styles: {
-        color: Color;
-      };
-    }[] = [
-      { variant: 'default', styles: { color: 'accent' } },
-      { variant: 'destructive', styles: { color: 'error' } },
-    ];
-    describe.each(variants)(
-      'when is set the variant $variant',
-      ({ variant, styles }) => {
-        it('should render with the correct styles', () => {
-          renderLinkButton({ children: 'Link button', variant });
-          expect(screen.getByRole('button')).toHaveStyle({
-            color: themes.light.color[styles.color],
-          });
-        });
-      },
-    );
 
     describe('when the button is disabled', () => {
       it('should NOT fire an event when pressing', async () => {

@@ -127,26 +127,26 @@ const HighlightsContainer = styled.section`
     background-position: 35% 35%, 30% -2%, 0% 74%, 90% 105%;
     background-repeat: no-repeat;
     display: grid;
-    padding: ${theme.spacing[10]}px 0;
+    padding: ${theme.spacing[10]} 0;
     position: relative;
-    row-gap: ${theme.spacing[10]}px;
+    row-gap: ${theme.spacing[10]};
 
     ${media.greaterThan('sm')`
       background-position: -15% 15%, top right, bottom left, 100% 120%;
     `}
 
     ${media.greaterThan('lg')`
-      padding: ${theme.spacing[14]}px 0;
-      row-gap: ${theme.spacing[14]}px;
+      padding: ${theme.spacing[14]} 0;
+      row-gap: ${theme.spacing[14]};
     `}
   `}
 `;
 
 const TestimonialContainer = styled.div`
   ${({ theme }) => css`
-    padding: ${theme.spacing[10]}px 0;
+    padding: ${theme.spacing[10]} 0;
     ${media.greaterThan('lg')`
-      padding: ${theme.spacing[12]}px 0;
+      padding: ${theme.spacing[12]} 0;
     `}
   `}
 `;
@@ -154,16 +154,16 @@ const TestimonialContainer = styled.div`
 const PenguinSeparatorContainer = styled.div`
   ${({ theme }) => css`
     ${media.greaterThan('lg')`
-      padding: ${theme.spacing[10]}px 0;
+      padding: ${theme.spacing[10]} 0;
     `}
   `}
 `;
 
 const VaultContainer = styled.div`
   ${({ theme }) => css`
-    padding: ${theme.spacing[10]}px 0;
+    padding: ${theme.spacing[10]} 0;
     ${media.greaterThan('lg')`
-      padding: ${theme.spacing[12]}px 0;
+      padding: ${theme.spacing[12]} 0;
     `}
   `}
 `;

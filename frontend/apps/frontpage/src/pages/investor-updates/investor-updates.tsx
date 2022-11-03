@@ -1,13 +1,13 @@
 import { useIntl, useTranslation } from '@onefootprint/hooks';
-import { Container, Divider, media } from '@onefootprint/ui';
+import { Container, Divider } from '@onefootprint/ui';
 import React from 'react';
 import TwitterBreadcrumb from 'src/components/twitter-breadcrumb';
+import WritingLayout from 'src/components/writing-layout';
 import { getInitialPosts, PostType } from 'src/utils/ghost';
 import { Post } from 'src/utils/ghost/types';
 import styled, { css } from 'styled-components';
 
 import SEO from '../../components/seo';
-import SubscribeToNewsletter from '../../components/subscribe-to-newsletter/subscribe-to-newsletter';
 import InvestorUpdatePreview from './components/investor-update-preview';
 import INVESTOR_UPDATE_HIDE_CREATED_DATE_BEFORE from './constants';
 
@@ -27,7 +27,7 @@ const InvestorUpdates = ({ posts }: InvestorUpdatesProps) => {
     <>
       <SEO title={t('html-title')} slug="/investor-updates" />
       <Container>
-        <Inner>
+        <WritingLayout>
           <TwitterBreadcrumb
             title={t('breadcrumb.title')}
             description={t('breadcrumb.description')}
@@ -55,29 +55,16 @@ const InvestorUpdates = ({ posts }: InvestorUpdatesProps) => {
             })}
           </Posts>
           <Divider />
-        </Inner>
-        <SubscribeToNewsletter />
+        </WritingLayout>
       </Container>
     </>
   );
 };
 
-const Inner = styled.div`
-  ${({ theme }) => css`
-    margin: -${theme.spacing[7]}px auto ${theme.spacing[7]}px;
-    max-width: 960px;
-
-    ${media.greaterThan('lg')`
-      margin-bottom: ${theme.spacing[10]}px;
-      margin-top: -${theme.spacing[10]}px;
-    `}
-  `}
-`;
-
 const Posts = styled.div`
   ${({ theme }) => css`
     display: grid;
-    gap: ${theme.spacing[9]}px;
+    gap: ${theme.spacing[9]};
 
     > :not(:last-child) {
       border-bottom: 1px solid ${theme.borderColor.tertiary};

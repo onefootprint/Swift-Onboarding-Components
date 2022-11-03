@@ -90,7 +90,7 @@ const Label = styled.label<Pick<CheckboxProps, 'hasError'>>`
     align-items: center;
     color: ${hasError ? theme.color.error : theme.color.primary};
     display: inline-flex;
-    gap: ${theme.spacing[4]}px;
+    gap: ${theme.spacing[4]};
   `}
 `;
 
@@ -98,12 +98,12 @@ const Input = styled.input<Pick<CheckboxProps, 'hasError'>>`
   ${({ theme }) => css`
     appearance: none;
     background-color: ${theme.backgroundColor.primary};
-    border-radius: ${theme.spacing[2]}px;
-    border: ${theme.borderWidth[1]}px solid ${theme.borderColor.primary};
+    border-radius: ${theme.spacing[2]};
+    border: ${theme.borderWidth[1]} solid ${theme.borderColor.primary};
     display: grid;
     height: 16px;
     margin: 0;
-    outline-offset: ${theme.spacing[2]}px;
+    outline-offset: ${theme.spacing[2]};
     place-content: center;
     width: 16px;
 
@@ -164,8 +164,8 @@ const Input = styled.input<Pick<CheckboxProps, 'hasError'>>`
 
 const StyledHint = styled(Hint)`
   ${({ theme }) => css`
-    margin-top: ${theme.spacing[2]}px;
-    margin-left: ${theme.spacing[8] - theme.spacing[1]}px;
+    margin-top: ${theme.spacing[2]};
+    margin-left: calc(${theme.spacing[8]} - ${theme.spacing[1]});
   `}
 `;
 

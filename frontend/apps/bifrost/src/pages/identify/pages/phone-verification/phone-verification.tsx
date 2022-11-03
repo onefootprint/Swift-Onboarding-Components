@@ -68,7 +68,7 @@ const Form = styled.form`
   ${({ theme }) => css`
     display: flex;
     flex-direction: column;
-    row-gap: ${theme.spacing[8]}px;
+    row-gap: ${theme.spacing[8]};
     justify-content: center;
     align-items: center;
     text-align: center;

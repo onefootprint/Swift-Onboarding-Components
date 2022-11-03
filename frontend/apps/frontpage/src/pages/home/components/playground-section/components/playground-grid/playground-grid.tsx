@@ -50,7 +50,7 @@ const Container = styled.div`
     display: flex;
     flex-direction: column;
     justify-content: center;
-    row-gap: ${theme.spacing[5]}px;
+    row-gap: ${theme.spacing[5]};
   `}
 `;
 
@@ -64,8 +64,8 @@ const InstructionsContainer = styled.div`
 
 const Grid = styled.ul<{ columns: number; rows: number; size: string }>`
   ${({ theme, columns, rows, size }) => css`
-    border-radius: ${theme.borderRadius.default}px;
-    border: ${theme.borderWidth[1]}px dashed #a2d3aa;
+    border-radius: ${theme.borderRadius.default};
+    border: ${theme.borderWidth[1]} dashed #a2d3aa;
     display: inline-grid;
     grid-auto-flow: column;
     grid-template-columns: repeat(${columns}, ${size});

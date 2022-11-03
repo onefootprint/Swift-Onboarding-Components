@@ -54,7 +54,7 @@ const MobilePlans = () => {
 const Container = styled.div`
   ${({ theme }) => css`
     display: grid;
-    gap: ${theme.spacing[5]}px;
+    gap: ${theme.spacing[5]};
 
     ${media.greaterThan('md')`
       display: none;
@@ -64,8 +64,8 @@ const Container = styled.div`
 
 const PlanContainer = styled.div`
   ${({ theme }) => css`
-    border: ${theme.borderWidth[1]}px solid ${theme.borderColor.tertiary};
-    border-radius: ${theme.borderRadius.default}px;
+    border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
+    border-radius: ${theme.borderRadius.default};
   `}
 `;
 

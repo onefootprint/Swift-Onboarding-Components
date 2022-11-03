@@ -28,13 +28,13 @@ const Anchor = styled.a`
     &:hover svg,
     &:focus svg {
       opacity: 1;
-      transform: translateX(${theme.spacing[2]}px);
+      transform: translateX(${theme.spacing[2]});
       visibility: visible;
     }
 
     svg {
       transition: all 0.2s;
-      transform: translateX(-${theme.spacing[3]}px);
+      transform: translateX(-${theme.spacing[3]});
       opacity: 0;
       visibility: hidden;
       vertical-align: middle;

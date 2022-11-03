@@ -99,7 +99,7 @@ const Carousel = () => {
 
 const Container = styled.div`
   ${({ theme }) => css`
-    margin: 0 ${theme.spacing[5]}px;
+    margin: 0 ${theme.spacing[5]};
     position: relative;
 
     ${media.greaterThan('md')`
@@ -168,7 +168,7 @@ const PagerContainer = styled.div`
   ${({ theme }) => css`
     display: flex;
     justify-content: center;
-    margin-top: ${theme.spacing[4]}px;
+    margin-top: ${theme.spacing[4]};
   `}
 `;
 

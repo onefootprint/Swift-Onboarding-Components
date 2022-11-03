@@ -1,7 +1,7 @@
 import type { Placement } from '@popperjs/core';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useId, useState } from 'react';
 import { usePopper } from 'react-popper';
-import styled, { css, useTheme } from 'styled-components';
+import styled, { css } from 'styled-components';
 import { useUpdateEffect } from 'usehooks-ts';
 
 import { createFontStyles } from '../../utils/mixins';
@@ -29,10 +29,7 @@ const Tooltip = ({
   testID,
   text,
 }: TooltipProps) => {
-  // TODO: Migrate to useId once we migrate to react 18
-  // https://github.com/onefootprint/frontend-monorepo/issues/61
-  const id = text;
-  const theme = useTheme();
+  const id = useId();
   const [refElement, setRefElement] = useState<HTMLElement | null>(null);
   const [popperElement, setPopperElement] = useState<HTMLElement | null>(null);
   const {
@@ -46,7 +43,7 @@ const Tooltip = ({
       {
         name: 'offset',
         options: {
-          offset: [0, theme.spacing[2]],
+          offset: [0, 4],
         },
       },
     ],
@@ -96,11 +93,11 @@ const TooltipContainer = styled.span<{ size: Size }>`
   ${({ theme, size }) => css`
     ${createFontStyles(size === 'default' ? 'body-4' : 'caption-2')};
     background: ${theme.backgroundColor.tertiary};
-    border-radius: ${theme.borderRadius.default}px;
+    border-radius: ${theme.borderRadius.default};
     box-shadow: ${theme.elevation[2]};
     color: ${theme.color.quinary};
     max-width: 220px;
-    padding: ${theme.spacing[2]}px ${theme.spacing[3]}px;
+    padding: ${theme.spacing[2]} ${theme.spacing[3]};
   `}
 `;
 

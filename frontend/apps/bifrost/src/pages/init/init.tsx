@@ -81,8 +81,8 @@ const TitleContainer = styled.div`
     display: flex;
     flex-direction: column;
     justify-content: center;
-    margin-bottom: ${theme.spacing[8]}px;
-    margin-top: ${theme.spacing[3] + theme.spacing[1]}px;
+    margin-bottom: ${theme.spacing[8]};
+    margin-top: calc(${theme.spacing[3]} + ${theme.spacing[1]});
   `}
 `;
 

@@ -33,12 +33,12 @@ const ProductNavigation = ({ articles }: ProductNavigationProps) => {
 
 const Container = styled.div`
   ${({ theme }) => css`
-    row-gap: ${theme.spacing[5]}px;
+    row-gap: ${theme.spacing[5]};
     display: flex;
     flex-direction: column;
 
     ul {
-      padding-top: ${theme.spacing[5]}px;
+      padding-top: ${theme.spacing[5]};
     }
   `}
 `;
@@ -46,9 +46,9 @@ const Container = styled.div`
 const StyledLink = styled(Link)`
   ${({ theme }) => css`
     ${createFontStyles('label-3')};
-    border-radius: ${theme.borderRadius.default}px;
+    border-radius: ${theme.borderRadius.default};
     display: block;
-    padding: ${theme.spacing[3]}px ${theme.spacing[4]}px;
+    padding: ${theme.spacing[3]} ${theme.spacing[4]};
     text-decoration: none;
 
     &[data-selected='false'] {

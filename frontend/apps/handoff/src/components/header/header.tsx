@@ -10,7 +10,7 @@ const Header = () => (
 
 const Container = styled.header`
   ${({ theme }) => css`
-    margin: ${theme.spacing[6]}px;
+    margin: ${theme.spacing[6]};
     display: flex;
     align-items: center;
     justify-content: center;

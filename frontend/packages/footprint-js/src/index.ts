@@ -18,5 +18,5 @@ const url = getUrl();
 const footprint = initFootprint(url);
 vanillaIntegration(footprint);
 
-export * from './footprint-types';
+export * from './types/footprint.types';
 export default footprint;

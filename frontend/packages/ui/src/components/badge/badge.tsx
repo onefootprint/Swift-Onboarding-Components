@@ -16,10 +16,10 @@ const Badge = styled.span.attrs<BadgeProps>(({ testID }) => ({
   ${({ theme, variant }) => css`
     ${createFontStyles('caption-1')};
     background-color: ${theme.backgroundColor[variant]};
-    border-radius: ${theme.borderRadius.large}px;
+    border-radius: ${theme.borderRadius.large};
     border: 0;
     color: ${theme.color[variant]};
-    padding: ${theme.spacing[2]}px ${theme.spacing[3]}px;
+    padding: ${theme.spacing[2]} ${theme.spacing[3]};
     text-decoration: none;
     text-transform: capitalize;
   `}

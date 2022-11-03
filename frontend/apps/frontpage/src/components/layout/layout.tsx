@@ -76,24 +76,29 @@ const Layout = ({ children }: LayoutProps) => {
 };
 
 const Content = styled.section`
-  ${({ theme }) => css`
-    > *:first-child {
-      padding-top: calc(var(--header-height) + ${theme.spacing[9]}px);
+  --desktop-padding-top: calc(
+    var(--desktop-header-height) + var(--desktop-spacing)
+  );
+  --mobile-padding-top: calc(
+    var(--mobile-header-height) + var(--mobile-spacing)
+  );
 
-      ${media.greaterThan('lg')`
-        padding-top: calc(var(--header-height) + ${theme.spacing[10]}px);
-      `}
-    }
-  `}
+  > *:first-child {
+    padding-top: var(--mobile-padding-top);
+
+    ${media.greaterThan('lg')`
+        padding-top: var(--desktop-padding-top);
+    `}
+  }
 `;
 
 const FooterContainer = styled.section`
   ${({ theme }) => css`
-    padding-top: ${theme.spacing[10]}px;
+    padding-top: ${theme.spacing[10]};
     background: ${theme.backgroundColor.tertiary};
 
     ${media.greaterThan('lg')`
-      padding-top: ${theme.spacing[14]}px;
+      padding-top: ${theme.spacing[14]};
     `}
   `}
 `;

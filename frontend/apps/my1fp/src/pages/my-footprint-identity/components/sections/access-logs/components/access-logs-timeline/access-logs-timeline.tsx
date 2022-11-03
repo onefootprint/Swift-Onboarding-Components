@@ -45,9 +45,9 @@ const Content = styled.div`
   ${({ theme }) => css`
     display: flex;
     flex-direction: column;
-    row-gap: ${theme.spacing[7]}px;
-    margin-left: ${theme.spacing[4]}px;
-    margin-bottom: ${theme.spacing[9]}px;
+    row-gap: ${theme.spacing[7]};
+    margin-left: ${theme.spacing[4]};
+    margin-bottom: ${theme.spacing[9]};
   `};
 `;
 
@@ -62,7 +62,7 @@ const Connector = styled.div`
     justify-content: center;
     align-items: center;
     flex-direction: column;
-    margin-top: ${theme.spacing[1]}px;
+    margin-top: ${theme.spacing[1]};
   `};
 `;
 
@@ -70,7 +70,7 @@ const Line = styled.div`
   ${({ theme }) => css`
     height: 100%;
     width: 2px;
-    border-radius: ${theme.borderRadius.default}px;
+    border-radius: ${theme.borderRadius.default};
     background-color: ${theme.backgroundColor.senary};
   `};
 `;

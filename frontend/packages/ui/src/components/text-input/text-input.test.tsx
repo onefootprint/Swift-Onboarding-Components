@@ -1,4 +1,3 @@
-import themes from '@onefootprint/design-tokens';
 import { customRender, screen, userEvent } from '@onefootprint/test-utils';
 import React from 'react';
 
@@ -63,12 +62,10 @@ describe('<TextInput />', () => {
         hasError: true,
         placeholder: 'placeholder',
       });
-      const input = screen.getByPlaceholderText('placeholder');
 
+      const input = screen.getByPlaceholderText('placeholder');
       expect(input).toHaveStyle({
-        borderWidth: '1px',
-        borderStyle: 'solid',
-        borderColor: themes.light.borderColor.error,
+        borderColor: 'var(--fp-base-inputs-initial-error-border)',
       });
     });
 
@@ -77,10 +74,10 @@ describe('<TextInput />', () => {
         hasError: true,
         hint: 'Hint',
       });
-      const hint = screen.getByText('Hint');
 
+      const hint = screen.getByText('Hint');
       expect(hint).toHaveStyle({
-        color: themes.light.color.error,
+        color: 'var(--fp-base-inputs-base-hint-error)',
       });
     });
   });

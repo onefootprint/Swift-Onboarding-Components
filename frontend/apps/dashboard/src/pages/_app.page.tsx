@@ -1,3 +1,5 @@
+import '@onefootprint/design-tokens/src/output/theme.css';
+
 import themes from '@onefootprint/design-tokens';
 import { DesignSystemProvider } from '@onefootprint/ui';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';

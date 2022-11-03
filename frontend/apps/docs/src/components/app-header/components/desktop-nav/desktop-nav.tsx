@@ -59,7 +59,7 @@ const InternalNavContainer = styled.div`
     justify-content: space-between;
     align-items: center;
     display: flex;
-    gap: ${theme.spacing[8]}px;
+    gap: ${theme.spacing[8]};
   `};
 `;
 
@@ -67,11 +67,11 @@ const Container = styled.div`
   ${({ theme }) => css`
     width: 100%;
     align-items: center;
-    border-bottom: ${theme.borderWidth[1]}px solid ${theme.borderColor.tertiary};
+    border-bottom: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
     display: none;
     height: var(--header-height);
     justify-content: space-between;
-    padding: ${theme.spacing[4]}px ${theme.spacing[7] + theme.spacing[2]}px;
+    padding: ${theme.spacing[4]} calc(${theme.spacing[7]} + ${theme.spacing[2]});
 
     nav > a {
       display: flex;
@@ -89,7 +89,7 @@ const Nav = styled.nav`
     justify-content: space-between;
     align-items: center;
     display: flex;
-    gap: ${theme.spacing[8]}px;
+    gap: ${theme.spacing[8]};
   `};
 `;
 

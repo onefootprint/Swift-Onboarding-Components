@@ -5,8 +5,8 @@ const ul = styled.ul`
   ${({ theme }) => css`
     color: ${theme.color.secondary};
     font: ${createFontStyles('body-2')};
-    margin-bottom: ${theme.spacing[9]}px;
-    margin-left: ${theme.spacing[7]}px;
+    margin-bottom: ${theme.spacing[9]};
+    margin-left: ${theme.spacing[7]};
 
     li {
       list-style: disc;

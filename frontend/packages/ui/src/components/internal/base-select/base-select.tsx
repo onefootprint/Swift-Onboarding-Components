@@ -163,9 +163,9 @@ const BaseSelect = <Option extends BaseSelectOption>({
                 },
                 borderRadius: 0,
                 spacing: {
-                  baseUnit: theme.spacing[2],
+                  baseUnit: 4,
                   controlHeight: 40,
-                  menuGutter: theme.spacing[3],
+                  menuGutter: 8,
                 },
               }}
             />
@@ -184,10 +184,10 @@ const Dropdown = styled.div`
 const DropdownMenu = styled.div`
   ${({ theme }) => css`
     background: ${theme.backgroundColor.primary};
-    border-radius: ${theme.borderRadius.default}px;
-    border: ${theme.borderWidth[1]}px solid ${theme.borderColor.primary};
+    border-radius: ${theme.borderRadius.default};
+    border: ${theme.borderWidth[1]} solid ${theme.borderColor.primary};
     box-shadow: ${theme.elevation[2]};
-    margin-top: ${theme.spacing[3]}px;
+    margin-top: ${theme.spacing[3]};
     position: absolute;
     width: 100%;
     z-index: ${theme.zIndex.dropdown};

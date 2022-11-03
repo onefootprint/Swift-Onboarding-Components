@@ -99,7 +99,7 @@ const Container = styled.div`
   ${({ theme }) => css`
     margin: 0 auto;
     max-width: 992px;
-    padding: ${theme.spacing[5]}px;
+    padding: ${theme.spacing[5]};
 
     ${media.greaterThan('md')`
       padding: 0;
@@ -112,21 +112,21 @@ const HeroContainer = styled.div`
     align-items: center;
     display: flex;
     flex-direction: column;
-    margin-bottom: ${theme.spacing[8]}px;
+    margin-bottom: ${theme.spacing[8]};
     text-align: center;
 
     ${media.greaterThan('md')`
-      margin-bottom: ${theme.spacing[10]}px;
+      margin-bottom: ${theme.spacing[10]};
     `}
   `}
 `;
 
 const PlansContainer = styled.div`
   ${({ theme }) => css`
-    margin-bottom: ${theme.spacing[10]}px;
+    margin-bottom: ${theme.spacing[10]};
 
     ${media.greaterThan('md')`
-    margin-bottom: ${theme.spacing[12]}px;
+    margin-bottom: ${theme.spacing[12]};
     `}
   `}
 `;

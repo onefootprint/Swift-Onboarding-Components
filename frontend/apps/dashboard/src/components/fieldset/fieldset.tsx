@@ -20,8 +20,8 @@ const FieldsetContainer = styled.fieldset`
   ${({ theme }) => css`
     &:not(:last-child) {
       border-bottom: 1px solid ${theme.borderColor.tertiary};
-      margin-bottom: ${theme.spacing[7]}px;
-      padding-bottom: ${theme.spacing[7]}px;
+      margin-bottom: ${theme.spacing[7]};
+      padding-bottom: ${theme.spacing[7]};
     }
   `};
 `;
@@ -30,12 +30,12 @@ const Content = styled.div`
   ${({ theme }) => css`
     display: flex;
     flex-direction: column;
-    gap: ${theme.spacing[3]}px;
+    gap: ${theme.spacing[3]};
 
     ${Grid.Column} {
       display: flex;
       flex-direction: column;
-      gap: ${theme.spacing[3]}px;
+      gap: ${theme.spacing[3]};
     }
   `};
 `;

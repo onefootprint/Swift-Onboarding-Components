@@ -13,13 +13,13 @@ const useStyles = () => {
     control: () => ({
       display: 'flex',
       alignItems: 'center',
-      borderBottom: `${theme.borderWidth[1]}px solid ${theme.borderColor.primary}`,
+      borderBottom: `${theme.borderWidth[1]} solid ${theme.borderColor.primary}`,
       flexWrap: 'wrap',
       justifyContent: 'space-between',
       outline: 0,
       position: 'relative',
       transition: 'all 100ms',
-      borderRadius: `${theme.borderRadius.default}px ${theme.borderRadius.default}px 0 0`,
+      borderRadius: `${theme.borderRadius.default} ${theme.borderRadius.default} 0 0`,
       background: '#fff',
       height: 40,
       '&:hover': {

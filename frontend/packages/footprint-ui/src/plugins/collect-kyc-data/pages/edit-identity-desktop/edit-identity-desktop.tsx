@@ -39,7 +39,7 @@ const EditIdentityDesktop = () => {
 
 const Container = styled.div`
   ${({ theme }) => css`
-    margin-top: ${theme.spacing[7]}px;
+    margin-top: ${theme.spacing[7]};
     border-top: 1px solid ${theme.borderColor.tertiary};
   `};
 `;

@@ -89,8 +89,8 @@ const Container = styled.article``;
 
 const StyledLink = styled(Link)`
   ${({ theme }) => css`
-    border-radius: ${theme.borderRadius.default}px;
-    border: ${theme.borderWidth[1]}px solid ${theme.borderColor.tertiary};
+    border-radius: ${theme.borderRadius.default};
+    border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
     box-shadow: ${theme.elevation[1]};
     display: flex;
     flex-direction: column;
@@ -100,8 +100,8 @@ const StyledLink = styled(Link)`
 `;
 const FeatureImage = styled(Image)`
   ${({ theme }) => css`
-    border-radius: ${theme.borderRadius.default}px
-      ${theme.borderRadius.default}px 0 0;
+    border-radius: ${theme.borderRadius.default} ${theme.borderRadius.default} 0
+      0;
     object-fit: cover;
   `}
 `;
@@ -125,33 +125,33 @@ const Content = styled.div`
     display: flex;
     flex-direction: column;
     flex-grow: 1;
-    padding: ${theme.spacing[7]}px;
+    padding: ${theme.spacing[7]};
   `}
 `;
 
 const Header = styled.header`
   ${({ theme }) => css`
-    margin-bottom: ${theme.spacing[3]}px;
+    margin-bottom: ${theme.spacing[3]};
   `}
 `;
 
 const Body = styled.div`
   ${({ theme }) => css`
-    margin-bottom: ${theme.spacing[6]}px;
-    min-height: ${theme.spacing[1]}px;
+    margin-bottom: ${theme.spacing[6]};
+    min-height: ${theme.spacing[1]};
   `}
 `;
 
 const Footer = styled.footer`
   ${({ theme }) => css`
     display: flex;
-    gap: ${theme.spacing[3]}px;
+    gap: ${theme.spacing[3]};
   `}
 `;
 
 const Avatar = styled(Image)`
   ${({ theme }) => css`
-    border-radius: ${theme.borderRadius.full}px;
+    border-radius: ${theme.borderRadius.full};
   `}
 `;
 

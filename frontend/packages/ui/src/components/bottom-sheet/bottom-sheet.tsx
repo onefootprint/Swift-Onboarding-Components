@@ -111,7 +111,7 @@ const CloseContainer = styled.div`
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    left: ${theme.spacing[5]}px;
+    left: ${theme.spacing[5]};
   `}
 `;
 
@@ -119,7 +119,7 @@ const Sheet = styled.div`
   ${({ theme }) => css`
     width: 100%;
     background-color: ${theme.backgroundColor.primary};
-    border-radius: ${theme.borderRadius.large}px ${
+    border-radius: ${theme.borderRadius.large} ${
     theme.borderRadius.large
   }px 0 0;
     z-index: ${theme.zIndex.overlay + 1};
@@ -140,7 +140,7 @@ const Sheet = styled.div`
 const Header = styled.div<{ hasBorder: boolean }>`
   ${({ theme, hasBorder }) => css`
     height: 56px;
-    padding: ${theme.spacing[5]}px;
+    padding: ${theme.spacing[5]};
     display: flex;
     justify-content: center;
     align-items: center;
@@ -155,7 +155,7 @@ const Header = styled.div<{ hasBorder: boolean }>`
 
 const Body = styled.div`
   ${({ theme }) => css`
-    padding: ${theme.spacing[5]}px;
+    padding: ${theme.spacing[5]};
   `}
 `;
 

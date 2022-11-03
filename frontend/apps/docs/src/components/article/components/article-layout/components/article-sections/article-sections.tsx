@@ -55,9 +55,9 @@ const Container = styled.aside`
   ${({ theme }) => css`
     display: none;
     height: max-content;
-    max-height: calc(100vh - ${theme.spacing[11]}px);
+    max-height: calc(100vh - ${theme.spacing[11]});
     position: sticky;
-    top: ${theme.spacing[11]}px;
+    top: ${theme.spacing[11]};
     width: 100%;
 
     ${media.greaterThan('lg')`
@@ -65,13 +65,13 @@ const Container = styled.aside`
     `}
 
     ul {
-      padding-left: ${theme.spacing[5]}px;
+      padding-left: ${theme.spacing[5]};
 
       &::before {
         background-color: ${theme.color.accent};
         content: '';
         height: 20px;
-        left: ${theme.spacing[1]}px;
+        left: ${theme.spacing[1]};
         position: absolute;
         transform: translateY(
           calc(
@@ -80,12 +80,12 @@ const Container = styled.aside`
           )
         );
         transition: transform 0.25s;
-        width: ${theme.borderWidth[2]}px;
+        width: ${theme.borderWidth[2]};
       }
     }
 
     li {
-      margin-bottom: ${theme.spacing[3]}px;
+      margin-bottom: ${theme.spacing[3]};
 
       a {
         display: block;
@@ -107,7 +107,7 @@ const Container = styled.aside`
       }
 
       &[data-level='2'] {
-        padding-left: ${theme.spacing[3]}px;
+        padding-left: ${theme.spacing[3]};
 
         a {
           ${createFontStyles('body-4')};
@@ -132,8 +132,8 @@ const Container = styled.aside`
 const Header = styled.div`
   ${({ theme }) => css`
     display: flex;
-    gap: ${theme.spacing[3]}px;
-    margin-bottom: ${theme.spacing[5]}px;
+    gap: ${theme.spacing[3]};
+    margin-bottom: ${theme.spacing[5]};
   `};
 `;
 

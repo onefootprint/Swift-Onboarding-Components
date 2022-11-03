@@ -24,7 +24,7 @@ const ClearButtonContainer = styled.button`
     cursor: pointer;
     display: flex;
     height: 100%;
-    margin-right: ${theme.spacing[4]}px;
+    margin-right: ${theme.spacing[4]};
     outline: none;
     padding: 0;
     transition: 0.2s opacity;

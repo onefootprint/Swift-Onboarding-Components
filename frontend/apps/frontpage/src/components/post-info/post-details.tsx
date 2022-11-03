@@ -55,13 +55,13 @@ const Separator = () => (
 const Container = styled.div`
   ${({ theme }) => css`
     display: flex;
-    gap: ${theme.spacing[4]}px;
+    gap: ${theme.spacing[4]};
   `}
 `;
 
 const Avatar = styled(Image)`
   ${({ theme }) => css`
-    border-radius: ${theme.borderRadius.full}px;
+    border-radius: ${theme.borderRadius.full};
   `}
 `;
 

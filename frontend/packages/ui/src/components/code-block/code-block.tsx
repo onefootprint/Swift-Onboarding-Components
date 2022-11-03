@@ -93,7 +93,7 @@ const Container = styled.div`
     justify-content: center;
     align-items: center;
     border: 1px solid ${theme.borderColor.tertiary};
-    border-radius: ${theme.borderRadius.default}px;
+    border-radius: ${theme.borderRadius.default};
     overflow: hidden;
   `}
 `;
@@ -106,7 +106,7 @@ const Header = styled.header`
     background-color: ${theme.backgroundColor.secondary};
     border-bottom: 1px solid ${theme.borderColor.tertiary};
     width: 100%;
-    padding: ${theme.spacing[3]}px ${theme.spacing[5]}px;
+    padding: ${theme.spacing[3]} ${theme.spacing[5]};
   `}
 `;
 
@@ -135,12 +135,12 @@ const Content = styled.div`
       content: '';
       position: absolute;
       top: 0px;
-      bottom: ${theme.spacing[3]}px;
+      bottom: ${theme.spacing[3]};
     }
 
     &::before {
       left: 0px;
-      width: ${theme.spacing[5]}px;
+      width: ${theme.spacing[5]};
       background: linear-gradient(
         -90deg,
         rgba(255, 255, 255, 0),
@@ -150,7 +150,7 @@ const Content = styled.div`
 
     &::after {
       right: 0px;
-      width: ${theme.spacing[7]}px;
+      width: ${theme.spacing[7]};
       background: linear-gradient(
         90deg,
         rgba(255, 255, 255, 0) 0%,
@@ -160,7 +160,7 @@ const Content = styled.div`
 
     pre {
       text-align: left;
-      padding: ${theme.spacing[5]}px !important;
+      padding: ${theme.spacing[5]} !important;
       background: none !important;
     }
   `}

@@ -1,8 +1,8 @@
 import { useIntl, useTranslation } from '@onefootprint/hooks';
 import { Container, Divider, media } from '@onefootprint/ui';
 import React from 'react';
-import SubscribeToNewsletter from 'src/components/subscribe-to-newsletter';
 import TwitterBreadcrumb from 'src/components/twitter-breadcrumb';
+import WritingLayout from 'src/components/writing-layout';
 import { getInitialPosts } from 'src/utils/ghost';
 import styled, { css } from 'styled-components';
 
@@ -29,7 +29,7 @@ const Blog = ({ posts }: BlogProps) => {
     <>
       <SEO title={t('html-title')} slug="/blog" />
       <Container>
-        <Inner>
+        <WritingLayout>
           <TwitterBreadcrumb
             title={t('breadcrumb.title')}
             description={t('breadcrumb.description')}
@@ -74,8 +74,7 @@ const Blog = ({ posts }: BlogProps) => {
             ))}
           </Posts>
           <StyledDivider />
-          <SubscribeToNewsletter />
-        </Inner>
+        </WritingLayout>
       </Container>
     </>
   );
@@ -83,32 +82,20 @@ const Blog = ({ posts }: BlogProps) => {
 
 const StyledDivider = styled(Divider)`
   ${({ theme }) => css`
-    margin-top: ${theme.spacing[10]}px;
-  `}
-`;
-
-const Inner = styled.div`
-  ${({ theme }) => css`
-    margin: -${theme.spacing[7]}px auto ${theme.spacing[7]}px;
-    max-width: 960px;
-
-    ${media.greaterThan('lg')`
-      margin-bottom: ${theme.spacing[10]}px;
-      margin-top: -${theme.spacing[10]}px;
-    `}
+    margin-top: ${theme.spacing[10]};
   `}
 `;
 
 const FeaturedPost = styled.div`
   ${({ theme }) => css`
-    margin-bottom: ${theme.spacing[7]}px;
+    margin-bottom: ${theme.spacing[7]};
   `}
 `;
 
 const Posts = styled.div`
   ${({ theme }) => css`
     display: grid;
-    gap: ${theme.spacing[7]}px;
+    gap: ${theme.spacing[7]};
 
     ${media.greaterThan('md')`
       grid-template-columns: repeat(2, 1fr);

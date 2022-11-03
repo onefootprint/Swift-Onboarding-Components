@@ -5,7 +5,7 @@ import styled, { css } from 'styled-components';
 
 import useSx, { SXStyleProps, SXStyles } from '../../../hooks/use-sx';
 import Field, { FieldProps } from '../field';
-import InputHint from '../hint';
+import Hint from '../hint';
 import Label from '../label';
 
 export type InternalInputProps = {
@@ -104,7 +104,7 @@ const BaseInput = forwardRef<HTMLInputElement, AllInputProps>(
             <SuffixContainer>{suffixComponent}</SuffixContainer>
           )}
         </InputContainer>
-        {hint && <InputHint hasError={hasError}>{hint}</InputHint>}
+        {hint && <Hint hasError={hasError}>{hint}</Hint>}
       </div>
     );
   },
@@ -128,8 +128,8 @@ const SuffixContainer = styled.div`
 
 const StyledField = styled(Field)<{ $sx: SXStyles }>`
   ${({ theme }) => css`
-    padding-left: ${theme.spacing[5]}px;
-    padding-right: ${theme.spacing[5]}px;
+    padding-left: ${theme.spacing[5]};
+    padding-right: ${theme.spacing[5]};
   `}
   ${({ $sx }) =>
     css`

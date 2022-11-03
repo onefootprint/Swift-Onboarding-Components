@@ -161,7 +161,7 @@ const Container = styled.div`
   ${({ theme }) => css`
     display: flex;
     flex-direction: column;
-    row-gap: ${theme.spacing[8]}px;
+    row-gap: ${theme.spacing[8]};
     justify-content: center;
     align-items: center;
   `}
@@ -169,7 +169,7 @@ const Container = styled.div`
 
 const IconContainer = styled.span`
   ${({ theme }) => css`
-    margin-right: ${theme.spacing[2]}px;
+    margin-right: ${theme.spacing[2]};
   `}
 `;
 
@@ -178,7 +178,7 @@ const Category = styled.div`
     display: flex;
     justify-content: left;
     align-items: center;
-    margin-bottom: ${theme.spacing[3]}px;
+    margin-bottom: ${theme.spacing[3]};
   `}
 `;
 
@@ -186,7 +186,7 @@ const CategoriesContainer = styled.div`
   ${({ theme }) => css`
     column-count: 2;
     width: 100%;
-    margin-bottom: -${theme.spacing[3]}px;
+    margin-bottom: -${theme.spacing[3]};
   `}
 `;
 

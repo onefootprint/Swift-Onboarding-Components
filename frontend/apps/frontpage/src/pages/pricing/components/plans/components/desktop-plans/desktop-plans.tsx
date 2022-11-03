@@ -88,7 +88,7 @@ const Column = styled.div`
     ${createFontStyles('body-2')};
     display: grid;
     grid-template-rows: [header] 264px [row] 56px [row] 80px [row] 56px [row] 56px [row] 56px [row] 56px [row] 80px [row] 80px [row] 56px [row] 56px;
-    padding: ${theme.spacing[7]}px;
+    padding: ${theme.spacing[7]};
     padding-bottom: unset;
 
     &:first-child {
@@ -96,12 +96,11 @@ const Column = styled.div`
     }
 
     > div {
-      padding: ${theme.spacing[5]}px 0;
+      padding: ${theme.spacing[5]} 0;
     }
 
     > div:not(:last-child) {
-      border-bottom: ${theme.borderWidth[1]}px solid
-        ${theme.borderColor.tertiary};
+      border-bottom: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
     }
   `}
 `;
@@ -116,7 +115,7 @@ const Features = styled(Column)`
 
 const PlanContainer = styled(Column)`
   ${({ theme }) => css`
-    border: ${theme.borderWidth[1]}px solid ${theme.borderColor.tertiary};
+    border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
 
     > div {
       display: flex;
@@ -128,8 +127,8 @@ const PlanContainer = styled(Column)`
 
 const PIIContainer = styled(PlanContainer)`
   ${({ theme }) => css`
-    border-radius: ${theme.borderRadius.default}px 0 0
-      ${theme.borderRadius.default}px;
+    border-radius: ${theme.borderRadius.default} 0 0
+      ${theme.borderRadius.default};
     border-right: unset;
   `}
 `;
@@ -137,8 +136,8 @@ const PIIContainer = styled(PlanContainer)`
 const KYCAndPIIContainer = styled(PlanContainer)`
   ${({ theme }) => css`
     background: ${theme.backgroundColor.secondary};
-    border-radius: 0 ${theme.borderRadius.default}px
-      ${theme.borderRadius.default}px 0;
+    border-radius: 0 ${theme.borderRadius.default} ${theme.borderRadius.default}
+      0;
   `}
 `;
 

@@ -1,13 +1,14 @@
+import '@onefootprint/design-tokens/src/output/theme.css';
 import '@typeform/embed/build/css/popup.css';
 
 import themes from '@onefootprint/design-tokens';
-import { DesignSystemProvider, media } from '@onefootprint/ui';
+import { DesignSystemProvider } from '@onefootprint/ui';
 import { QueryClientProvider } from '@tanstack/react-query';
 import Head from 'next/head';
 import Script from 'next/script';
 import React from 'react';
 import Drift from 'react-driftjs';
-import { createGlobalStyle } from 'styled-components';
+import { createGlobalStyle, css } from 'styled-components';
 
 import Layout from '../components/layout';
 import MDXProvider from '../components/mdx-provider';
@@ -23,13 +24,14 @@ type AppProps = {
 };
 
 const GlobalStyle = createGlobalStyle`
-  html {
-    --header-height: 72px;
-
-    ${media.greaterThan('lg')`
-      --header-height: 64px;
-    `}
-  }
+ ${({ theme }) => css`
+   :root {
+     --desktop-header-height: 64px;
+     --desktop-spacing: ${theme.spacing[10]};
+     --mobile-header-height: 72px;
+     --mobile-spacing: ${theme.spacing[9]};
+   }
+ `}
 `;
 
 const App = ({ Component, pageProps }: AppProps) => (

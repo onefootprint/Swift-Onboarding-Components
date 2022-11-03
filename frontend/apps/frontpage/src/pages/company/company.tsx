@@ -169,10 +169,10 @@ const Company = () => {
 
 const CompanyPhotosContainer = styled.div`
   ${({ theme }) => css`
-    margin-bottom: ${theme.spacing[10]}px;
+    margin-bottom: ${theme.spacing[10]};
 
     ${media.greaterThan('lg')`
-      margin-bottom: ${theme.spacing[11]}px;
+      margin-bottom: ${theme.spacing[11]};
     `}
   `}
 `;
@@ -181,7 +181,7 @@ const Container = styled.div`
   ${({ theme }) => css`
     margin: 0 auto;
     max-width: 960px;
-    padding: 0 ${theme.spacing[5]}px;
+    padding: 0 ${theme.spacing[5]};
 
     ${media.greaterThan('lg')`
       padding: 0;
@@ -191,7 +191,7 @@ const Container = styled.div`
 
 const HeroContainer = styled.div`
   ${({ theme }) => css`
-    margin: 0 auto ${theme.spacing[10]}px;
+    margin: 0 auto ${theme.spacing[10]};
     max-width: 700px;
     text-align: center;
   `}
@@ -199,20 +199,20 @@ const HeroContainer = styled.div`
 
 const ValuesContainer = styled.section`
   ${({ theme }) => css`
-    margin-bottom: ${theme.spacing[10]}px;
+    margin-bottom: ${theme.spacing[10]};
 
     ${media.greaterThan('lg')`
-      margin-bottom: ${theme.spacing[11]}px;
+      margin-bottom: ${theme.spacing[11]};
     `}
   `}
 `;
 
 const TeamContainer = styled.section`
   ${({ theme }) => css`
-    margin-bottom: ${theme.spacing[10]}px;
+    margin-bottom: ${theme.spacing[10]};
 
     ${media.greaterThan('lg')`
-      margin-bottom: ${theme.spacing[12]}px;
+      margin-bottom: ${theme.spacing[12]};
     `}
   `}
 `;

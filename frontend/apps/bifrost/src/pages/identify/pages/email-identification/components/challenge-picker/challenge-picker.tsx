@@ -96,8 +96,8 @@ const ChallengePicker = ({
 
 const Body = styled.div`
   ${({ theme }) => css`
-    padding: ${theme.spacing[5]}px;
-    row-gap: ${theme.spacing[5]}px;
+    padding: ${theme.spacing[5]};
+    row-gap: ${theme.spacing[5]};
     display: flex;
     flex-direction: column;
     text-align: center;

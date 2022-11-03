@@ -72,7 +72,7 @@ const ButtonContainer = styled.div`
   flex-direction: row;
   justify-content: right;
   ${({ theme }) => css`
-    gap: ${theme.spacing[3]}px;
+    gap: ${theme.spacing[3]};
   `};
 `;
 

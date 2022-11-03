@@ -49,7 +49,7 @@ const FootprintButton = ({
 
 const StyledIcoFootprint = styled(IcoFootprint24)`
   ${({ theme }) => css`
-    margin-right: ${theme.spacing[3]}px;
+    margin-right: ${theme.spacing[3]};
   `}
 `;
 

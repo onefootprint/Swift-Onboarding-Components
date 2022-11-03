@@ -66,7 +66,7 @@ const LivenessCheck = ({ onClose }: LivenessCheckProps) => {
 const DialogContainer = styled.div`
   ${({ theme }) => css`
     background-color: ${theme.backgroundColor.primary};
-    border-radius: ${theme.borderRadius.default}px;
+    border-radius: ${theme.borderRadius.default};
     box-shadow: ${theme.elevation[3]};
     z-index: ${theme.zIndex.dialog};
     width: 650px;
@@ -78,7 +78,7 @@ const Header = styled.header`
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 0 ${theme.spacing[5]}px;
+    padding: 0 ${theme.spacing[5]};
     height: 56px;
     position: relative;
   `}
@@ -87,13 +87,13 @@ const Header = styled.header`
 const CloseContainer = styled.div`
   ${({ theme }) => css`
     position: absolute;
-    left: ${theme.spacing[5]}px;
+    left: ${theme.spacing[5]};
   `}
 `;
 
 const Body = styled.div`
   ${({ theme }) => css`
-    padding: ${theme.spacing[7]}px;
+    padding: ${theme.spacing[7]};
   `}
 `;
 

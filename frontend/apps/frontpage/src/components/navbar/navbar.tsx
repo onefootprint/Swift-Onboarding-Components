@@ -114,18 +114,17 @@ const Header = styled.header<{ isFloating: boolean }>`
     css`
       backdrop-filter: blur(15px) saturate(125%);
       background-color: rgba(255, 255, 255, 0.75);
-      border-bottom: ${theme.borderWidth[1]}px solid
-        ${theme.borderColor.primary};
+      border-bottom: ${theme.borderWidth[1]} solid ${theme.borderColor.primary};
     `}
 `;
 
 const Inner = styled.div`
   position: relative;
   ${({ theme }) => css`
-    padding: ${theme.spacing[6]}px 0 ${theme.spacing[5]}px;
+    padding: ${theme.spacing[6]} 0 ${theme.spacing[5]};
 
     ${media.greaterThan('md')`
-      padding:  ${theme.spacing[4]}px;
+      padding:  ${theme.spacing[4]};
     `}
   `}
 `;

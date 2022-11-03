@@ -38,10 +38,10 @@ const Container = styled.div`
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     align-items: center;
-    padding: ${theme.spacing[5]}px 0;
+    padding: ${theme.spacing[5]} 0;
 
     ${media.greaterThan('md')`
-      padding:  ${theme.spacing[4]}px 0;
+      padding:  ${theme.spacing[4]} 0;
     `}
   `}
 `;

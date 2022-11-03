@@ -73,11 +73,11 @@ const Container = styled.li<{
   ${({ theme }) => css`
     background: ${theme.backgroundColor.primary};
     cursor: pointer;
-    margin-bottom: ${theme.spacing[2]}px;
-    padding: ${theme.spacing[2]}px ${theme.spacing[5]}px;
+    margin-bottom: ${theme.spacing[2]};
+    padding: ${theme.spacing[2]} ${theme.spacing[5]};
 
     > p:first-child {
-      margin-bottom: ${theme.spacing[2]}px;
+      margin-bottom: ${theme.spacing[2]};
     }
   `}
 

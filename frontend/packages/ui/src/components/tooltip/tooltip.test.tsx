@@ -58,7 +58,7 @@ describe('<Tooltip />', () => {
       await userEvent.hover(trigger);
       const tooltip = screen.getByRole('tooltip');
       expect(tooltip).toHaveStyle({
-        font: '400 14px/20px "DM Sans"',
+        font: 'var(--fp-typography-body4)',
       });
     });
 
@@ -68,7 +68,7 @@ describe('<Tooltip />', () => {
       await userEvent.hover(trigger);
       const tooltip = screen.getByRole('tooltip');
       expect(tooltip).toHaveStyle({
-        font: '400 13px/16px "DM Sans"',
+        font: 'var(--fp-typography-caption2)',
       });
     });
   });

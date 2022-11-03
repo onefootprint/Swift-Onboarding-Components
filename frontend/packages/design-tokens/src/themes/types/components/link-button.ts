@@ -37,23 +37,23 @@ export type LinkButton = {
   };
   size: {
     default: {
-      height: number;
+      height: string;
       typography: Typography;
     };
     compact: {
-      height: number;
+      height: string;
       typography: Typography;
     };
     tiny: {
-      height: number;
+      height: string;
       typography: Typography;
     };
     xTiny: {
-      height: number;
+      height: string;
       typography: Typography;
     };
     xxTiny: {
-      height: number;
+      height: string;
       typography: Typography;
     };
   };

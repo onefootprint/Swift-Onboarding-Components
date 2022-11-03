@@ -138,7 +138,7 @@ const Container = styled.div`
   ${({ theme }) => css`
     display: flex;
     flex-direction: column;
-    row-gap: ${theme.spacing[9]}px;
+    row-gap: ${theme.spacing[9]};
     justify-content: center;
     align-items: center;
   `}

@@ -27,8 +27,8 @@ const BackButton = () => {
 const Container = styled.div`
   ${({ theme }) => css`
     position: absolute;
-    top: ${theme.spacing[9]}px;
-    left: ${theme.spacing[9]}px;
+    top: ${theme.spacing[9]};
+    left: ${theme.spacing[9]};
   `}
 `;
 

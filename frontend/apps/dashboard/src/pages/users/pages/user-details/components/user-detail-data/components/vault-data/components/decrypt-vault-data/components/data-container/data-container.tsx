@@ -31,7 +31,7 @@ const DataContainer = ({
 const StyledContainer = styled.div`
   ${({ theme }) => css`
     border: 1px solid ${theme.borderColor.tertiary};
-    border-radius: ${theme.spacing[2]}px;
+    border-radius: ${theme.spacing[2]};
     height: 100%;
   `};
 `;
@@ -40,10 +40,10 @@ const Header = styled.header`
   ${({ theme }) => css`
     background-color: ${theme.backgroundColor.secondary};
     border-bottom: 1px solid ${theme.borderColor.tertiary};
-    border-radius: ${theme.spacing[2]}px ${theme.spacing[2]}px 0 0;
+    border-radius: ${theme.spacing[2]} ${theme.spacing[2]} 0 0;
     display: flex;
     justify-content: space-between;
-    padding: ${theme.spacing[3]}px ${theme.spacing[5]}px;
+    padding: ${theme.spacing[3]} ${theme.spacing[5]};
   `};
 `;
 
@@ -51,8 +51,8 @@ const RowContainer = styled.div`
   ${({ theme }) => css`
     display: flex;
     flex-direction: column;
-    gap: ${theme.spacing[4]}px;
-    padding: ${theme.spacing[5]}px ${theme.spacing[7]}px;
+    gap: ${theme.spacing[4]};
+    padding: ${theme.spacing[5]} ${theme.spacing[7]};
   `};
 `;
 

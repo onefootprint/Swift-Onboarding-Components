@@ -5,7 +5,7 @@ const ol = styled.ol`
   ${({ theme }) => css`
     color: ${theme.color.secondary};
     font: ${createFontStyles('body-2')};
-    margin-left: ${theme.spacing[7]}px;
+    margin-left: ${theme.spacing[7]};
 
     li {
       list-style: octal;
