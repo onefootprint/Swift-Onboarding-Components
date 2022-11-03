@@ -69,8 +69,7 @@ jobs:
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost/postgres
 
-  integration_tests:
-    name: integration + migrations
+  integration_migration_tests:
     runs-on: beast
     environment: dev
     strategy:
@@ -235,7 +234,6 @@ jobs:
           fi
 
   clippy:
-    name: 'Clippy'
     runs-on: beast
 
     steps:
