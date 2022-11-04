@@ -9,7 +9,7 @@ on:
   pull_request:
     paths:
       - 'frontend/**'
-      - '.github/workflows/*.yml'
+      - '.github/workflows/frontend_smoke_tests.yml'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
