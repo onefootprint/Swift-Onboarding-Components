@@ -54,7 +54,16 @@ pub async fn post(
     let user_auth = user_auth.check_permissions(vec![UserAuthScopeDiscriminant::OrgOnboarding])?;
     let tenant_id = onboarding_context.tenant().id.clone();
 
-    decision::engine::run(
+    // Check we can proceed
+    decision::engine::can_decide(
+        &state,
+        user_auth.user_vault_id(),
+        onboarding_context.ob_config().clone(),
+    )
+    .await?;
+
+    // produce our decision
+    decision::engine::decide(
         &state,
         user_auth.user_vault_id(),
         onboarding_context.ob_config().clone(),

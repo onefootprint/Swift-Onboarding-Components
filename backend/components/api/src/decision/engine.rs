@@ -4,8 +4,11 @@ use crate::{
     State,
 };
 
-use db::models::{onboarding::Onboarding, verification_request::VerificationRequest};
-use newtypes::{OnboardingStatus, TenantId, UserVaultId};
+use db::{
+    models::{onboarding::Onboarding, verification_request::VerificationRequest},
+    DbResult,
+};
+use newtypes::{OnboardingStatus, TenantId, UserVaultId, VerificationRequestId};
 
 use super::{vendor_result::VendorResult, *};
 /// The Engine module is the main entry point into running our verification logic
@@ -19,7 +22,7 @@ use super::{vendor_result::VendorResult, *};
 /// - Emitting AuditTrail events
 /// - test/demo data
 /// - producing decisions
-pub async fn run(
+pub async fn decide(
     state: &State,
     uvw_id: UserVaultId,
     ob_config: ObConfiguration,
@@ -41,16 +44,8 @@ pub async fn run(
         .db_pool
         .db_transaction(move |conn| -> Result<_, ApiError> {
             let (ob, _) = Onboarding::lock_by_config(conn, &uvw.user_vault.id, &ob_config.id)?
-                .ok_or(OnboardingError::NoOnboarding)?;
-            // Can only start KYC checks for onboarding that has all required fields
-            let missing_attributes = uvw.missing_fields(&ob_config);
-            if !missing_attributes.is_empty() {
-                return Err(OnboardingError::MissingAttributes(missing_attributes).into());
-            }
-            // Can only start KYC checks for onboardings whose KYC checks have not yet been started
-            if ob.status != OnboardingStatus::New {
-                return Err(OnboardingError::WrongKycState(ob.status).into());
-            }
+                .ok_or(OnboardingError::NoOnboarding)?; // we should never hit this here
+
             let ob_id = ob.id.clone();
 
             let requests = verification_request::build_verification_requests_and_checkpoint(
@@ -65,6 +60,7 @@ pub async fn run(
             // Importantly, this allows us to save VerificationRequests elsewhere in code and execute them here
             let requests_and_results =
                 VerificationRequest::get_requests_and_results_for_onboarding(conn, ob_id.clone())?;
+            // TODO: we should run any dangling VerificationRequests here
             // In the case we have already run some verifications for this onboarding, create our previous VendorResults
             let previous_results =
                 VendorResult::from_verification_results_for_onboarding(requests_and_results)?;
@@ -89,6 +85,37 @@ pub async fn run(
 
     // Create our final decision from the features we created, set final onboarding status, and emit risk signals
     risk::create_final_decision(state, ob_id, features, desired_status_for_testing).await?;
+
+    Ok(())
+}
+
+/// Determine if we are in a position to produce a decision.
+/// This is intimately tied to how the frontend is rendered
+pub async fn can_decide(
+    state: &State,
+    uvw_id: UserVaultId,
+    ob_config: ObConfiguration,
+) -> Result<(), ApiError> {
+    state
+        .db_pool
+        .db_transaction(move |conn| -> Result<_, ApiError> {
+            let uvw = UserVaultWrapper::get(conn, &uvw_id)?;
+
+            let (ob, _) = Onboarding::lock_by_config(conn, &uvw.user_vault.id, &ob_config.id)?
+                .ok_or(OnboardingError::NoOnboarding)?;
+            // Can only start KYC checks for onboarding that has all required fields
+            // Document Collection is handled synchronously in the frontend (to surface errors)
+            let missing_attributes = uvw.missing_fields(&ob_config);
+            if !missing_attributes.is_empty() {
+                return Err(OnboardingError::MissingAttributes(missing_attributes).into());
+            }
+            // Can only start KYC checks for onboardings whose KYC checks have not yet been started
+            if ob.status != OnboardingStatus::New {
+                return Err(OnboardingError::WrongKycState(ob.status).into());
+            }
+            Ok(())
+        })
+        .await?;
 
     Ok(())
 }
