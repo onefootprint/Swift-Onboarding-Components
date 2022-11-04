@@ -46,20 +46,20 @@ const Demo = () => {
                 <FootprintButton
                   appearance={{
                     variables: {
-                      borderRadius: '0px',
+                      linkColor: '#101010',
+
+                      buttonPrimaryBg: '#315E4C',
+                      buttonPrimaryHoverBg: '#46866c',
+                      buttonPrimaryActiveBg: '#46866c',
+                      buttonPrimaryColor: '#FFF',
+                      buttonBorderRadius: '70px',
                     },
                     rules: {
                       button: {
-                        background: 'red',
-                        transition: 'all 0.2s linear',
+                        transition: 'all .2s linear',
                       },
-                      'button:hover': {
-                        background: 'green',
-                        transform: 'scale(0.95)',
-                      },
-                      input: {
-                        borderWidth: '2px',
-                        borderColor: 'purple',
+                      'link:hover': {
+                        textDecoration: 'underline',
                       },
                     },
                   }}

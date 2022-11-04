@@ -193,6 +193,9 @@
   --fp-phone-inputs-icon-inactive: #8d8d8d;
   --fp-phone-inputs-icon-focus: #4a24db;
   --fp-phone-inputs-icon-focus-error: #991008;
+
+  --fp-link-color: #4a24db;
+
   --fp-link-button-default-initial-text: #4a24db;
   --fp-link-button-default-initial-icon: #4a24db;
   --fp-link-button-default-hover-text: #29147a;

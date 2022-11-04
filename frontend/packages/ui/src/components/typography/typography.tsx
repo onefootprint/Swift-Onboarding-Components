@@ -73,7 +73,7 @@ const StyledTypography = styled.p<{
     ${sx};
 
     a {
-      color: ${theme.color.accent};
+      color: var(--fp-link-color);
       text-decoration: none;
 
       &:hover {
