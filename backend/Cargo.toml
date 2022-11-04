@@ -63,12 +63,12 @@ deadpool = { version = "0.9.5", features=["managed"], default-features = false}
 
 paperclip = { version = "0.7.1", features = [
     "actix4",
-    "swagger-ui",
     "actix4-validator",
     "uuid",
     "chrono",
     "actix-session",
-    "v3"
+    "v3",
+    "rapidoc"
 ] }
 
 webauthn-rs-core = { git = "https://github.com/kanidm/webauthn-rs", rev = "9ffd732fb9d75c3cc20057c12a41b3323f3417b2"}
