@@ -6,8 +6,11 @@ import IframeManager from './utils/iframe-manager';
 import { injectStyles } from './utils/ui-manager';
 
 const iframeManager = new IframeManager();
-let variablesParams = '';
-let rulesParams = '';
+const appearanceParams = {
+  variables: '',
+  rules: '',
+  fontSrc: '',
+};
 
 const footprint = (url: string) => {
   const handleOnCompleted = (callback: (validationToken: string) => void) =>
@@ -21,46 +24,53 @@ const footprint = (url: string) => {
     iframeManager.on(FootprintEvents.canceled, callback);
 
   const setAppearance = ({
+    fontSrc,
     theme = 'light',
     variables = {},
     rules = {},
   }: FootprintAppearance) => {
     const {
-      fpButtonHeight,
       fpButtonBorderRadius,
+      fpButtonHeight,
       loadingBg,
+      loadingBorderRadius,
       loadingColor,
       loadingPadding,
-      loadingBorderRadius,
       overlayBg,
       ...remainingStyles
     } = variables;
     if (Object.keys(remainingStyles).length) {
-      variablesParams = encodeURIComponent(JSON.stringify(remainingStyles));
+      appearanceParams.variables = encodeURIComponent(
+        JSON.stringify(remainingStyles),
+      );
     }
     if (Object.keys(rules).length) {
-      rulesParams = encodeURIComponent(JSON.stringify(rules));
+      appearanceParams.rules = encodeURIComponent(JSON.stringify(rules));
+    }
+    if (fontSrc) {
+      appearanceParams.fontSrc = fontSrc;
     }
     injectStyles({
       theme,
       variables: {
-        fpButtonHeight,
         fpButtonBorderRadius,
+        fpButtonHeight,
         loadingBg,
+        loadingBorderRadius,
         loadingColor,
         loadingPadding,
-        loadingBorderRadius,
         overlayBg,
       },
     });
   };
 
   const getSearchParams = (params: {
+    fontSrc?: string;
     publicKey?: string;
-    variables?: string;
     rules?: string;
+    variables?: string;
   }) => {
-    const { publicKey, variables, rules } = params;
+    const { publicKey, variables, rules, fontSrc } = params;
     const searchParams = new URLSearchParams();
     if (publicKey) {
       searchParams.append('public_key', publicKey);
@@ -71,6 +81,9 @@ const footprint = (url: string) => {
     if (rules) {
       searchParams.append('rules', rules);
     }
+    if (fontSrc) {
+      searchParams.append('font_src', fontSrc);
+    }
     return searchParams.toString();
   };
 
@@ -80,9 +93,10 @@ const footprint = (url: string) => {
     onCanceled,
   }: ShowFootprint) => {
     const searchParams = getSearchParams({
+      fontSrc: appearanceParams.fontSrc,
       publicKey,
-      variables: variablesParams,
-      rules: rulesParams,
+      rules: appearanceParams.rules,
+      variables: appearanceParams.variables,
     });
     await iframeManager.show({ url: `${url}?${searchParams}` });
     if (onCompleted) {

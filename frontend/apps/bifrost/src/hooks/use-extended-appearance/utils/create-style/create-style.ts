@@ -1,4 +1,4 @@
-const injectStyles = (styleId: string, styles: string) => {
+const createStyle = (styleId: string, styles: string) => {
   const prevStyle = document.getElementById(styleId);
   if (prevStyle) {
     prevStyle.remove();
@@ -9,4 +9,4 @@ const injectStyles = (styleId: string, styles: string) => {
   document.head.append(style);
 };
 
-export default injectStyles;
+export default createStyle;

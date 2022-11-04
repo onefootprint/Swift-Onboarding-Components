@@ -44,22 +44,6 @@ const Demo = () => {
               </Typography>
               <Box sx={{ marginTop: 7 }}>
                 <FootprintButton
-                  appearance={{
-                    variables: {
-                      linkColor: '#101010',
-
-                      buttonPrimaryBg: '#315E4C',
-                      buttonPrimaryHoverBg: '#46866c',
-                      buttonPrimaryActiveBg: '#46866c',
-                      buttonPrimaryColor: '#FFF',
-                      buttonBorderRadius: '70px',
-                    },
-                    rules: {
-                      button: {
-                        transition: 'all .2s linear',
-                      },
-                    },
-                  }}
                   publicKey={publicKey}
                   onCompleted={(validationToken: string) => {
                     setConfirmation(true);

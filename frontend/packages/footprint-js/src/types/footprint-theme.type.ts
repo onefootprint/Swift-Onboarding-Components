@@ -1,22 +1,58 @@
 import * as CSS from 'csstype';
 
 export type FootprintMainStyles = Partial<{
+  // globals
   borderRadius: CSS.Property.BorderRadius;
-
   colorInfo: CSS.Property.Color;
   colorError: CSS.Property.Color;
   colorWarning: CSS.Property.Color;
   colorSuccess: CSS.Property.Color;
   colorAccent: CSS.Property.Color;
+  borderColorError: CSS.Property.BorderColor;
 
-  borderError: CSS.Property.BorderColor;
-
+  // link
   linkColor: CSS.Property.Color;
 
+  // dialog
   dialogBg: CSS.Property.Background;
   dialogBoxShadow: CSS.Property.BoxShadow;
   dialogBorderRadius: CSS.Property.BorderRadius;
 
+  // typography
+  fontFamily: CSS.Property.FontFamily;
+
+  // label
+  labelColor: CSS.Property.Color;
+  labelFont: CSS.Property.Font;
+
+  // input
+  inputBorderRadius: CSS.Property.BorderRadius;
+  inputBorderWidth: CSS.Property.BorderWidth;
+  inputFont: CSS.Property.Font;
+  inputHeight: CSS.Property.Height;
+  inputPlaceholderColor: CSS.Property.Color;
+  inputColor: CSS.Property.Color;
+  inputBg: CSS.Property.Background;
+  inputBorderColor: CSS.Property.BorderColor;
+  inputHoverBg: CSS.Property.Background;
+  inputHoverBorderColor: CSS.Property.BorderColor;
+  inputFocusBg: CSS.Property.Background;
+  inputFocusBorderColor: CSS.Property.BorderColor;
+  inputFocusElevation: CSS.Property.BoxShadow;
+  inputErrorBg: CSS.Property.Background;
+  inputErrorBorderColor: CSS.Property.BorderColor;
+  inputErrorHoverBg: CSS.Property.Background;
+  inputErrorHoverBorderColor: CSS.Property.BorderColor;
+  inputErrorFocusBg: CSS.Property.Background;
+  inputErrorFocusBorderColor: CSS.Property.BorderColor;
+  inputErrorFocusElevation: CSS.Property.BoxShadow;
+
+  // hint
+  hintColor: CSS.Property.Color;
+  hintErrorColor: CSS.Property.Color;
+  hintFont: CSS.Property.Font;
+
+  // link button
   linkButtonColor: CSS.Property.Color;
   linkButtonHoverColor: CSS.Property.Color;
   linkButtonActiveColor: CSS.Property.Color;
@@ -24,6 +60,7 @@ export type FootprintMainStyles = Partial<{
   linkButtonDestructiveHoverColor: CSS.Property.Color;
   linkButtonDestructiveActiveColor: CSS.Property.Color;
 
+  // button
   buttonBorderRadius: CSS.Property.BorderRadius;
   buttonBorderWidth: CSS.Property.BorderWidth;
   buttonElevation: CSS.Property.BoxShadow;

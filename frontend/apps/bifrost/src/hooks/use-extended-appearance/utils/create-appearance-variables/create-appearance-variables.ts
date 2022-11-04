@@ -1,4 +1,4 @@
-import variablesMapper from './constants/variables-mapper';
+import variablesMap from './constants/variables-map';
 
 const generateAppearanceVariables = (variables: string) => {
   const parsedVariables = getParsedValue(variables);
@@ -23,7 +23,7 @@ const iterateOverTokens = (options: {
 }) => {
   let { styles } = options;
   const { tokens, tokenName, tokenValue } = options;
-  const definitions = variablesMapper.get(tokenName);
+  const definitions = variablesMap.get(tokenName);
   if (definitions) {
     const cssVariable = definitions.var;
     styles = addStyleRow({

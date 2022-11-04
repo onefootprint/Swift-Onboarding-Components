@@ -1,76 +1,7 @@
-const jsToCssVariables = new Map<
+const buttonVariables = new Map<
   string,
   { var: string; assignDefault?: string[] }
 >([
-  [
-    'borderRadius',
-    {
-      var: '--fp-border-radius-default',
-      assignDefault: ['buttonBorderRadius', 'dialogBorderRadius'],
-    },
-  ],
-  [
-    'colorError',
-    {
-      var: '--fp-semantic-text-info',
-      assignDefault: [
-        'linkButtonDestructiveColor',
-        'linkButtonDestructiveHoverColor',
-        'linkButtonDestructiveActiveColor',
-      ],
-    },
-  ],
-  [
-    'colorWarning',
-    {
-      var: '--fp-semantic-text-info',
-      assignDefault: [],
-    },
-  ],
-  [
-    'colorSuccess',
-    {
-      var: '--fp-semantic-text-info',
-      assignDefault: [],
-    },
-  ],
-  [
-    'colorAccent',
-    {
-      var: '--fp-semantic-text-info',
-      assignDefault: [
-        'linkColor',
-        'linkButtonColor',
-        'linkButtonHoverColor',
-        'linkButtonActiveColor',
-      ],
-    },
-  ],
-  [
-    'linkColor',
-    {
-      var: '--fp-link-color',
-      assignDefault: [],
-    },
-  ],
-  [
-    'dialogBg',
-    {
-      var: '--fp-bifrost-dialog-body-bg-primary',
-    },
-  ],
-  [
-    'dialogBoxShadow',
-    {
-      var: '--fp-bifrost-dialog-elevation',
-    },
-  ],
-  [
-    'dialogBorderRadius',
-    {
-      var: '--fp-bifrost-dialog-border-radius',
-    },
-  ],
   [
     'buttonBorderRadius',
     {
@@ -258,48 +189,6 @@ const jsToCssVariables = new Map<
       var: 'fp-buttons-secondary-loading-bg',
     },
   ],
-
-  [
-    'linkButtonColor',
-    {
-      var: '--fp-link-button-default-initial-text',
-      assignDefault: ['linkButtonHoverColor', 'linkButtonActiveColor'],
-    },
-  ],
-  [
-    'linkButtonHoverColor',
-    {
-      var: '--fp-link-button-default-hover-text',
-    },
-  ],
-  [
-    'linkButtonActiveColor',
-    {
-      var: '--fp-link-button-default-active-text',
-    },
-  ],
-  [
-    'linkButtonDestructiveColor',
-    {
-      var: '--fp-link-button-destructive-initial-text',
-      assignDefault: [
-        'linkButtonDestructiveHoverColor',
-        'linkButtonDestructiveActiveColor',
-      ],
-    },
-  ],
-  [
-    'linkButtonDestructiveHoverColor',
-    {
-      var: '--fp-link-button-destructive-hover-text',
-    },
-  ],
-  [
-    'linkButtonDestructiveActiveColor',
-    {
-      var: '--fp-link-button-destructive-active-text',
-    },
-  ],
 ]);
 
-export default jsToCssVariables;
+export default buttonVariables;

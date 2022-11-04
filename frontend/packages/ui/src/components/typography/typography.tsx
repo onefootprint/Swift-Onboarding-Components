@@ -69,6 +69,7 @@ const StyledTypography = styled.p<{
 }>`
   ${({ theme, $color, variant, sx }) => css`
     ${createFontStyles(variant)}
+    font-family: var(--fp-font-family-default);
     color: ${theme.color[$color]};
     ${sx};
 

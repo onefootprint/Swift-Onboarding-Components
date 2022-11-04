@@ -33,9 +33,10 @@ export type FootprintAppearanceRules = Partial<{
 }>;
 
 export type FootprintAppearance = {
+  fontSrc?: string;
+  rules?: FootprintAppearanceRules;
   theme?: FootprintAppearanceTheme;
   variables?: FootprintAppearanceVariables;
-  rules?: FootprintAppearanceRules;
 };
 
 export type ShowFootprint = {

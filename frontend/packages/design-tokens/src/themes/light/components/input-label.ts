@@ -11,10 +11,10 @@ const inputLabel: InputLabel = {
   },
   size: {
     default: {
-      typography: 'var(--fp-base-inputs-typography-default-input-content)',
+      typography: 'var(--fp-base-inputs-typography-default-label)',
     },
     compact: {
-      typography: 'var(--fp-base-inputs-typography-compact-input-content)',
+      typography: 'var(--fp-base-inputs-typography-compact-label)',
     },
   },
 };
