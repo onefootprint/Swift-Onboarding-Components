@@ -15,7 +15,7 @@ export type OnboardingMachineArgs = {
   userFound: boolean;
   device: DeviceInfo;
   tenant: TenantInfo;
-  authToken?: string;
+  authToken: string;
 };
 
 const createOnboardingMachine = ({
@@ -64,7 +64,7 @@ const createOnboardingMachine = ({
               createOnboardingRequirementsMachine({
                 userFound: context.userFound,
                 device: context.device,
-                authToken: context.authToken,
+                authToken: context.authToken!,
                 tenant: context.tenant,
               }),
             onDone: {

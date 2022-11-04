@@ -2,7 +2,10 @@ import { useTranslation } from '@onefootprint/hooks';
 import { Button } from '@onefootprint/ui';
 import { HeaderTitle, NavigationHeader } from 'footprint-elements';
 import React from 'react';
-import { Events } from 'src/utils/state-machine/onboarding-requirements';
+import {
+  Events,
+  OnboardingRequirementsMachineContext,
+} from 'src/utils/state-machine/onboarding-requirements';
 import styled, { css } from 'styled-components';
 
 import useOnboardingRequirementsMachine from '../../hooks/use-onboarding-requirements-machine';
@@ -10,7 +13,11 @@ import useOnboardingRequirementsMachine from '../../hooks/use-onboarding-require
 const AdditionalInfoRequired = () => {
   const { t } = useTranslation('pages.additional-info-required');
   const [state, send] = useOnboardingRequirementsMachine();
-  const { name } = state.context.tenant;
+  const {
+    onboardingContext: {
+      tenant: { name },
+    },
+  }: OnboardingRequirementsMachineContext = state.context;
   const handleClick = () => {
     send({
       type: Events.additionalInfoRequired,

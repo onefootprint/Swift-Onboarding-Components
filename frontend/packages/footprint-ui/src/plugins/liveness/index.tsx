@@ -37,9 +37,9 @@ const App = ({ context, onDone }: LivenessProps) => {
   );
 };
 
-const AppWithMachine = ({ context, metadata, onDone }: LivenessProps) => (
+const AppWithMachine = ({ context, onDone }: LivenessProps) => (
   <MachineProvider>
-    <App context={context} metadata={metadata} onDone={onDone} />
+    <App context={context} onDone={onDone} />
   </MachineProvider>
 );
 

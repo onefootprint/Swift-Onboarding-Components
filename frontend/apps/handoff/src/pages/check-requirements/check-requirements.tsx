@@ -23,7 +23,7 @@ const CheckRequirements = () => {
         if (req.kind === OnboardingRequirementKind.liveness) {
           missingLiveness = true;
         }
-        if (req.kind === OnboardingRequirementKind.collectDocument) {
+        if (req.kind === OnboardingRequirementKind.idDoc) {
           missingIdDocument = true;
         }
       });

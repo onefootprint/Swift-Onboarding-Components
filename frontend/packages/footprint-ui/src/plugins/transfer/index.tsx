@@ -6,18 +6,18 @@ import DesktopApp from './desktop-app';
 import MobileApp from './mobile-app';
 import { TransferProps } from './types';
 
-const AppWithMachine = ({ context, metadata, onDone }: TransferProps) => {
+const AppWithMachine = ({ context, onDone }: TransferProps) => {
   const { device } = context;
   if (device.type === 'mobile') {
     return (
       <MobileMachineProvider>
-        <MobileApp context={context} metadata={metadata} onDone={onDone} />
+        <MobileApp context={context} onDone={onDone} />
       </MobileMachineProvider>
     );
   }
   return (
     <DesktopMachineProvider>
-      <DesktopApp context={context} metadata={metadata} onDone={onDone} />
+      <DesktopApp context={context} onDone={onDone} />
     </DesktopMachineProvider>
   );
 };

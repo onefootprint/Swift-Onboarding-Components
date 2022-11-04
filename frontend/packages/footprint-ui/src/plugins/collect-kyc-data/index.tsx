@@ -45,9 +45,9 @@ const App = ({ context, onDone }: CollectKycDataProps) => {
   );
 };
 
-const AppWithMachine = ({ context, metadata, onDone }: CollectKycDataProps) => (
+const AppWithMachine = ({ context, onDone }: CollectKycDataProps) => (
   <MachineProvider>
-    <App context={context} metadata={metadata} onDone={onDone} />
+    <App context={context} onDone={onDone} />
   </MachineProvider>
 );
 

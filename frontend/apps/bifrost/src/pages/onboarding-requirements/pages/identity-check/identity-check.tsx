@@ -1,19 +1,23 @@
 import { useTranslation } from '@onefootprint/hooks';
-import { KycStatus, StartKycResponse } from '@onefootprint/types';
+import { KycStatus } from '@onefootprint/types';
 import { LoadingIndicator, useToast } from '@onefootprint/ui';
-import React from 'react';
+import { useGetKycStatus, useOnboardingSubmit } from 'footprint-elements';
+import React, { useState } from 'react';
+import { OnboardingRequirementsMachineContext } from 'src/utils/state-machine/onboarding-requirements';
 import styled from 'styled-components';
 import { useEffectOnce } from 'usehooks-ts';
 
-import { useGetKycStatus, useOnboardingSubmit } from '../../../../hooks';
-import useCollectKycDataMachine, {
+import useOnboardingRequirementsMachine, {
   Events,
-} from '../../hooks/use-collect-kyc-data-machine';
+} from '../../hooks/use-onboarding-requirements-machine';
 
-const StartKyc = () => {
-  const { t } = useTranslation('pages.confirm');
-  const [state, send] = useCollectKycDataMachine();
-  const { tenant, kycPending, authToken } = state.context;
+const IdentityCheck = () => {
+  const { t } = useTranslation('pages.identity-check');
+  const [kycPending, setKycPending] = useState(false);
+  const [state, send] = useOnboardingRequirementsMachine();
+  const {
+    onboardingContext: { tenant, authToken },
+  }: OnboardingRequirementsMachineContext = state.context;
   const startKycMutation = useOnboardingSubmit();
   const toast = useToast();
 
@@ -21,12 +25,12 @@ const StartKyc = () => {
     if (!tenant || !authToken) {
       return;
     }
-    // Once data is synced to user vault, we need to start the kyc check
     startKycMutation.mutate(
       { authToken, tenantPk: tenant.pk },
       {
-        onSuccess: (response: StartKycResponse) =>
-          handleKycSuccess(response.status),
+        onSuccess: () => {
+          setKycPending(true);
+        },
         onError: handleError,
       },
     );
@@ -40,22 +44,21 @@ const StartKyc = () => {
     });
   };
 
-  const handleKycSuccess = (status: KycStatus) => {
+  const handleKycStatus = (status: KycStatus) => {
     const isDone =
       status === KycStatus.canceled ||
       status === KycStatus.failed ||
       status === KycStatus.completed;
-    send({
-      type: Events.confirmed,
-      payload: {
-        kycPending: !isDone,
-      },
-    });
+
+    if (isDone) {
+      send({
+        type: Events.requirementCompleted,
+      });
+    }
   };
 
-  const kycStatusPollingEnabled = !!kycPending;
-  useGetKycStatus(kycStatusPollingEnabled, authToken ?? '', tenant?.pk ?? '', {
-    onSuccess: response => handleKycSuccess(response.status),
+  useGetKycStatus(kycPending, authToken ?? '', tenant?.pk ?? '', {
+    onSuccess: response => handleKycStatus(response.status),
     onError: handleError,
   });
 
@@ -74,4 +77,4 @@ const Container = styled.div`
   align-items: center;
 `;
 
-export default StartKyc;
+export default IdentityCheck;

@@ -3,19 +3,17 @@ import { TenantInfo } from '@onefootprint/types';
 import { assign, createMachine } from 'xstate';
 
 import {
+  areRequirementsEmpty,
+  RequirementCompletedTransitions,
+  RequirementTargets,
   requiresAdditionalInfo,
-  shouldRunCollectKycData,
-  shouldRunCollectKycDataFromContext,
-  shouldRunIdScan,
-  shouldRunIdScanFromContext,
-  shouldRunTransfer,
-  shouldRunTransferFromContext,
 } from './machine.utils';
 import {
   Actions,
   Events,
-  MachineContext,
   MachineEvents,
+  OnboardingRequirementsMachineContext,
+  Requirements,
   States,
 } from './types';
 
@@ -23,7 +21,14 @@ export type OnboardingRequirementsMachineArgs = {
   userFound: boolean;
   device: DeviceInfo;
   tenant: TenantInfo;
-  authToken?: string;
+  authToken: string;
+};
+
+const defaultRequirements: Requirements = {
+  idDoc: false,
+  liveness: false,
+  kycData: [],
+  identityCheck: false,
 };
 
 const createOnboardingRequirementsMachine = ({
@@ -32,133 +37,76 @@ const createOnboardingRequirementsMachine = ({
   authToken,
   tenant,
 }: OnboardingRequirementsMachineArgs) =>
-  createMachine<MachineContext, MachineEvents>(
+  createMachine<OnboardingRequirementsMachineContext, MachineEvents>(
     {
       predictableActionArguments: true,
       id: 'onboarding-requirements',
       initial: States.checkOnboardingRequirements,
       context: {
-        userFound,
-        missingLiveness: false,
-        missingIdDocument: false,
+        onboardingContext: {
+          userFound,
+          device,
+          authToken,
+          tenant,
+        },
+        requirements: defaultRequirements,
+        receivedRequirements: defaultRequirements,
         kycData: {},
-        device,
-        authToken,
-        tenant,
       },
       states: {
         [States.checkOnboardingRequirements]: {
           on: {
             [Events.onboardingRequirementsReceived]: [
               {
-                cond: (context, event) =>
-                  requiresAdditionalInfo(
-                    context.userFound,
-                    event.payload.missingIdDocument,
-                    event.payload.missingKycData,
-                  ),
-                target: States.additionalInfoRequired,
-                actions: [
-                  Actions.assignMissingKycData,
-                  Actions.assignMissingLiveness,
-                  Actions.assignMissingIdDocument,
-                ],
-              },
-              {
-                target: States.collectKycData,
-                cond: (context, event) =>
-                  shouldRunCollectKycData(event.payload.missingKycData),
-                actions: [
-                  Actions.assignMissingKycData,
-                  Actions.assignMissingLiveness,
-                  Actions.assignMissingIdDocument,
-                ],
-              },
-              {
-                target: States.idScan,
-                cond: (context, event) =>
-                  shouldRunIdScan(
-                    event.payload.missingIdDocument,
-                    context.device,
-                  ),
-                actions: [
-                  Actions.assignMissingKycData,
-                  Actions.assignMissingLiveness,
-                  Actions.assignMissingIdDocument,
-                ],
-              },
-              {
-                target: States.transfer,
-                cond: (context, event) =>
-                  shouldRunTransfer(
-                    event.payload.missingIdDocument,
-                    event.payload.missingLiveness,
-                    context.device,
-                  ),
-                actions: [
-                  Actions.assignMissingKycData,
-                  Actions.assignMissingLiveness,
-                  Actions.assignMissingIdDocument,
-                ],
-              },
-              {
                 target: States.success,
+                cond: (context, event) => areRequirementsEmpty(event.payload),
+              },
+              {
+                target: States.router,
+                actions: [Actions.assignRequirements],
               },
             ],
           },
+        },
+        [States.router]: {
+          always: [
+            {
+              cond: context => requiresAdditionalInfo(context),
+              target: States.additionalInfoRequired,
+            },
+            ...RequirementTargets,
+            {
+              target: States.success,
+            },
+          ],
         },
         [States.additionalInfoRequired]: {
           on: {
-            [Events.additionalInfoRequired]: [
-              {
-                target: States.collectKycData,
-                cond: context => shouldRunCollectKycDataFromContext(context),
-              },
-              {
-                target: States.transfer,
-                description:
-                  'If we need to do webauthn but need to do a transfer first',
-                cond: context => shouldRunTransferFromContext(context),
-              },
-              {
-                target: States.idScan,
-                cond: context => shouldRunIdScanFromContext(context),
-              },
-              {
-                target: States.success,
-              },
-            ],
+            ...RequirementCompletedTransitions,
           },
         },
-        [States.collectKycData]: {
+        [States.kycData]: {
+          entry: [Actions.startKycData],
           on: {
-            [Events.collectKycDataCompleted]: [
-              {
-                target: States.transfer,
-                cond: context => shouldRunTransferFromContext(context),
-              },
-              {
-                target: States.idScan,
-                cond: context => shouldRunIdScanFromContext(context),
-              },
-              {
-                target: States.checkOnboardingRequirements,
-              },
-            ],
+            ...RequirementCompletedTransitions,
           },
         },
         [States.transfer]: {
+          entry: [Actions.startTransfer],
           on: {
-            [Events.transferCompleted]: {
-              target: States.checkOnboardingRequirements,
-            },
+            ...RequirementCompletedTransitions,
           },
         },
         [States.idScan]: {
+          entry: [Actions.startIdScan],
           on: {
-            [Events.idScanCompleted]: {
-              target: States.checkOnboardingRequirements,
-            },
+            ...RequirementCompletedTransitions,
+          },
+        },
+        [States.identityCheck]: {
+          entry: [Actions.startIdentityCheck],
+          on: {
+            ...RequirementCompletedTransitions,
           },
         },
         [States.success]: {
@@ -168,22 +116,31 @@ const createOnboardingRequirementsMachine = ({
     },
     {
       actions: {
-        [Actions.assignMissingKycData]: assign((context, event) => {
+        [Actions.assignRequirements]: assign((context, event) => {
           if (event.type === Events.onboardingRequirementsReceived) {
-            context.missingKycData = event.payload.missingKycData;
+            context.receivedRequirements = { ...event.payload };
+            context.requirements = { ...event.payload };
           }
           return context;
         }),
-        [Actions.assignMissingLiveness]: assign((context, event) => {
-          if (event.type === Events.onboardingRequirementsReceived) {
-            context.missingLiveness = event.payload.missingLiveness;
+        [Actions.startKycData]: assign(context => {
+          context.requirements.kycData = [];
+          return context;
+        }),
+        [Actions.startTransfer]: assign(context => {
+          context.requirements.liveness = false;
+          // If we are on mobile, idScan plugin will run separately
+          if (context.onboardingContext.device.type !== 'mobile') {
+            context.requirements.idDoc = false;
           }
           return context;
         }),
-        [Actions.assignMissingIdDocument]: assign((context, event) => {
-          if (event.type === Events.onboardingRequirementsReceived) {
-            context.missingIdDocument = event.payload.missingIdDocument;
-          }
+        [Actions.startIdScan]: assign(context => {
+          context.requirements.idDoc = false;
+          return context;
+        }),
+        [Actions.startIdentityCheck]: assign(context => {
+          context.requirements.identityCheck = false;
           return context;
         }),
       },

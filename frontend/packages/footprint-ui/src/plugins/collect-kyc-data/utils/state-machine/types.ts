@@ -28,8 +28,6 @@ export enum States {
   basicInfoEditDesktop = 'basicInfoEditDesktop',
   addressEditDesktop = 'addressEditDesktop',
   identityEditDesktop = 'identityEditDesktop',
-
-  startKyc = 'startKyc',
   completed = 'completed',
 }
 
@@ -42,7 +40,6 @@ export type MachineContext = {
   // Machine generated
   missingAttributes: CollectedKycDataOption[];
   data: UserData;
-  kycPending?: boolean;
 };
 
 export enum Events {
@@ -63,7 +60,6 @@ export enum Actions {
   assignBasicInformation = 'assignBasicInformation',
   assignResidentialAddress = 'assignResidentialAddress',
   assignSsn = 'assignSsn',
-  assignKycPending = 'assignKycPending',
 }
 
 export type MachineEvents =
@@ -71,7 +67,7 @@ export type MachineEvents =
       type: Events.receivedContext;
       payload: {
         authToken: string;
-        missingAttributes: CollectedKycDataOption[];
+        missingAttributes: readonly CollectedKycDataOption[];
         userFound: boolean;
         device: DeviceInfo;
         tenant: TenantInfo;
@@ -92,12 +88,7 @@ export type MachineEvents =
       payload: SSNInformation;
     }
   | { type: Events.navigatedToPrevPage }
-  | {
-      type: Events.confirmed;
-      payload?: {
-        kycPending?: boolean;
-      };
-    }
+  | { type: Events.confirmed }
   | { type: Events.editBasicInfo }
   | { type: Events.editAddress }
   | { type: Events.editIdentity }

@@ -1,45 +1,91 @@
-import { DeviceInfo } from '@onefootprint/hooks';
-import { CollectedKycDataOption } from '@onefootprint/types';
+import { TransitionsConfig } from 'xstate';
 
-import { MachineContext } from './types';
+import {
+  Events,
+  MachineEvents,
+  OnboardingRequirementsMachineContext,
+  Requirements,
+  States,
+} from './types';
 
-export const shouldRunCollectKycDataFromContext = (context: MachineContext) => {
-  const { missingKycData } = context;
-  return shouldRunCollectKycData(missingKycData);
+type MachineTarget = {
+  target: States;
+  cond: (context: OnboardingRequirementsMachineContext) => boolean;
 };
 
-export const shouldRunCollectKycData = (
-  missingKycData?: readonly CollectedKycDataOption[],
-) => typeof missingKycData !== 'undefined';
+export const RequirementTargets: MachineTarget[] = [
+  {
+    target: States.kycData,
+    cond: context => shouldRunCollectKycData(context),
+  },
+  {
+    target: States.transfer,
+    cond: context => shouldRunTransfer(context),
+  },
+  {
+    target: States.idScan,
+    cond: context => shouldRunIdScan(context),
+  },
+  {
+    target: States.identityCheck,
+    cond: context => shouldRunIdentityCheck(context),
+  },
+];
 
-export const shouldRunIdScanFromContext = (context: MachineContext) => {
-  const { missingIdDocument, device } = context;
-  return shouldRunIdScan(missingIdDocument, device);
+export const RequirementCompletedTransitions: TransitionsConfig<
+  OnboardingRequirementsMachineContext,
+  MachineEvents
+> = {
+  [Events.requirementCompleted]: [
+    ...RequirementTargets,
+    {
+      target: States.checkOnboardingRequirements,
+    },
+  ],
 };
 
-export const shouldRunIdScan = (
-  missingIdDocument: boolean,
-  device: DeviceInfo,
-) => missingIdDocument && device.type === 'mobile';
-
-export const shouldRunTransferFromContext = (context: MachineContext) => {
-  const { missingIdDocument, missingLiveness, device } = context;
-  return shouldRunTransfer(missingIdDocument, missingLiveness, device);
+export const areRequirementsEmpty = (requirements: Requirements) => {
+  const { kycData, liveness, idDoc, identityCheck } = requirements;
+  return kycData.length === 0 && !liveness && !idDoc && !identityCheck;
 };
 
-export const shouldRunTransfer = (
-  missingIdDocument: boolean,
-  missingLiveness: boolean,
-  device: DeviceInfo,
-) => {
-  if (device.type === 'mobile') {
-    return missingLiveness;
+const shouldRunCollectKycData = (
+  context: OnboardingRequirementsMachineContext,
+) => context.requirements.kycData.length > 0;
+
+const shouldRunIdScan = (context: OnboardingRequirementsMachineContext) => {
+  const {
+    requirements: { idDoc },
+    onboardingContext: {
+      device: { type },
+    },
+  } = context;
+  return idDoc && type === 'mobile';
+};
+
+const shouldRunTransfer = (context: OnboardingRequirementsMachineContext) => {
+  const {
+    requirements: { idDoc, liveness },
+    onboardingContext: {
+      device: { type },
+    },
+  } = context;
+  if (type === 'mobile') {
+    return liveness;
   }
-  return missingIdDocument || missingLiveness;
+  return idDoc || liveness;
 };
 
 export const requiresAdditionalInfo = (
-  userFound: boolean,
-  missingIdDocument: boolean,
-  missingKycData?: readonly CollectedKycDataOption[],
-) => userFound && (!!missingKycData?.length || missingIdDocument);
+  context: OnboardingRequirementsMachineContext,
+) => {
+  const {
+    onboardingContext: { userFound },
+    requirements: { kycData, idDoc },
+  } = context;
+  return userFound && (kycData.length > 0 || idDoc);
+};
+
+const shouldRunIdentityCheck = (
+  context: OnboardingRequirementsMachineContext,
+) => !!context.requirements.identityCheck;

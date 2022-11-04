@@ -10,6 +10,5 @@ export type PluginContext<T> = {
 
 export type BasePluginProps<T = void> = {
   context: PluginContext<T>;
-  metadata: any;
   onDone: () => void;
 };

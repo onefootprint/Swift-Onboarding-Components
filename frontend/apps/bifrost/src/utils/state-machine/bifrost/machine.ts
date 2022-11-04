@@ -78,7 +78,7 @@ const bifrostMachine = createMachine<BifrostContext, BifrostEvent>(
             createOnboardingMachine({
               userFound: context.userFound,
               device: context.device!,
-              authToken: context.authToken,
+              authToken: context.authToken!,
               tenant: context.tenant!,
             }),
           onDone: [

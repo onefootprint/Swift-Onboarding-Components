@@ -7,11 +7,14 @@ use strum::EnumDiscriminants;
 #[serde(tag = "kind")]
 #[serde(rename_all = "snake_case")]
 pub enum OnboardingRequirement {
-    IdentityCheck {
+    /// There is missing data that must be collected
+    CollectData {
         missing_attributes: Vec<CollectedDataOption>,
     },
+    /// Perform liveness checks
     Liveness,
-    // TODO(argoff) add `DocumentRequestReason` here once we add it to the DocumentRequest table
+    /// The KYC checks have not yet been initiated for the user's data
+    IdentityCheck,
     CollectDocument {
         document_request_id: DocumentRequestId,
     },

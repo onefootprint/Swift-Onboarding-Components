@@ -9,7 +9,6 @@ import EditBasicInfoDesktop from '../edit-basic-info-desktop';
 import EditIdentityDesktop from '../edit-identity-desktop';
 import Address from '../residential-address';
 import Ssn from '../ssn';
-import StartKyc from '../start-kyc';
 
 type RouterProps = {
   onDone: () => void;
@@ -45,9 +44,6 @@ const Router = ({ onDone }: RouterProps) => {
   }
   if (state.matches(States.identityEditDesktop)) {
     return <EditIdentityDesktop />;
-  }
-  if (state.matches(States.startKyc)) {
-    return <StartKyc />;
   }
 
   return null;

@@ -1,5 +1,8 @@
 import request from '@onefootprint/request';
-import { StartKycRequest, StartKycResponse } from '@onefootprint/types';
+import {
+  OnboardingSubmitRequest,
+  OnboardingSubmitResponse,
+} from '@onefootprint/types';
 import { useMutation } from '@tanstack/react-query';
 
 import {
@@ -7,8 +10,8 @@ import {
   ONBOARDING_CONFIG_KEY_HEADER,
 } from '../../../config/constants';
 
-const onboardingSubmit = async (payload: StartKycRequest) => {
-  const response = await request<StartKycResponse>({
+const onboardingSubmit = async (payload: OnboardingSubmitRequest) => {
+  const response = await request<OnboardingSubmitResponse>({
     method: 'POST',
     url: '/hosted/onboarding/submit',
     headers: {

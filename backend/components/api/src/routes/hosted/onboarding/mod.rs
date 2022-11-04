@@ -78,12 +78,12 @@ pub fn get_requirements(
     let liveness_events = LivenessEvent::get_by_user_vault_id(conn, &uvw.user_vault.id)?;
 
     let requirements = vec![
-        (onboarding.status == OnboardingStatus::New)
-            .then_some(OnboardingRequirement::IdentityCheck { missing_attributes }),
+        (!missing_attributes.is_empty()).then_some(OnboardingRequirement::CollectData { missing_attributes }),
         // check if we have liveness events
         liveness_events
             .is_empty()
             .then_some(OnboardingRequirement::Liveness),
+        (onboarding.status == OnboardingStatus::New).then_some(OnboardingRequirement::IdentityCheck),
     ]
     .into_iter()
     .flatten()

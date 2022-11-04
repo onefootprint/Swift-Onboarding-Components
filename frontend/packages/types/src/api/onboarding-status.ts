@@ -3,8 +3,9 @@ import IdScanDocType from '../data/id-scan-doc-type';
 
 export enum OnboardingRequirementKind {
   liveness = 'liveness',
-  collectDocument = 'collect_document',
-  collectKycData = 'identity_check',
+  idDoc = 'collect_document',
+  collectKycData = 'collect_data',
+  identityCheck = 'identity_check',
 }
 
 export type CollectKycDataRequirement = {
@@ -12,18 +13,23 @@ export type CollectKycDataRequirement = {
   missingAttributes: CollectedKycDataOption[];
 };
 
-export type CollectDocumentRequirement = {
-  kind: OnboardingRequirementKind.collectDocument;
+export type IdDocRequirement = {
+  kind: OnboardingRequirementKind.idDoc;
 };
 
 export type LivenessRequirement = {
   kind: OnboardingRequirementKind.liveness;
 };
 
+export type IdentityCheckRequirements = {
+  kind: OnboardingRequirementKind.identityCheck;
+};
+
 export type OnboardingRequirement =
   | CollectKycDataRequirement
-  | CollectDocumentRequirement
-  | LivenessRequirement;
+  | IdDocRequirement
+  | LivenessRequirement
+  | IdentityCheckRequirements;
 
 export type OnboardingStatusRequest = {
   authToken: string;

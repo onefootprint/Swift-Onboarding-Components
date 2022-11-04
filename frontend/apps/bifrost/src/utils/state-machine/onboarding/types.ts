@@ -12,7 +12,7 @@ export type MachineContext = {
   userFound: boolean;
   tenant: TenantInfo;
   device: DeviceInfo;
-  authToken?: string;
+  authToken: string;
   validationToken?: string;
 };
 

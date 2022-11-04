@@ -9,7 +9,7 @@ import { interpret } from 'xstate';
 import createCollectKycDataMachine from './machine';
 import { Events, States } from './types';
 
-describe('Onboarding Machine Tests', () => {
+describe('Collect KYC Data Machine Tests', () => {
   const tenant: TenantInfo = {
     isLive: true,
     pk: 'pk',
@@ -138,15 +138,6 @@ describe('Onboarding Machine Tests', () => {
 
       state = machine.send({
         type: Events.confirmed,
-        payload: {
-          kycPending: true,
-        },
-      });
-      context = state.context;
-      expect(state.value).toEqual(States.confirm);
-
-      state = machine.send({
-        type: Events.confirmed,
       });
       context = state.context;
       expect(state.value).toEqual(States.completed);
@@ -218,12 +209,7 @@ describe('Onboarding Machine Tests', () => {
   describe('When user has onboarded to tenant with current configuration', () => {
     it('Onboarding ends', () => {
       const machine = createMachine(true, []);
-      let { state } = machine;
-      expect(state.value).toEqual(States.startKyc);
-
-      state = machine.send({
-        type: Events.confirmed,
-      });
+      const { state } = machine;
       expect(state.value).toEqual(States.completed);
     });
   });

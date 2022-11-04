@@ -37,9 +37,9 @@ const App = ({ context, onDone }: IdScanProps) => {
   );
 };
 
-const AppWithMachine = ({ context, metadata, onDone }: IdScanProps) => (
+const AppWithMachine = ({ context, onDone }: IdScanProps) => (
   <MachineProvider>
-    <App context={context} metadata={metadata} onDone={onDone} />
+    <App context={context} onDone={onDone} />
   </MachineProvider>
 );
 

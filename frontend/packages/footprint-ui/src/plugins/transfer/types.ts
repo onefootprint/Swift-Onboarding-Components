@@ -2,7 +2,7 @@ import { BasePluginProps } from '../base-plugin';
 
 export type TransferRequirements = {
   liveness?: boolean;
-  idScan?: boolean;
+  idDoc?: boolean;
 };
 
 export type TransferCustomData = {

@@ -3,10 +3,10 @@ import useDesktopMachine from './use-desktop-machine';
 const useTranslationSourceForRequirements = () => {
   const [state] = useDesktopMachine();
   const { missingRequirements } = state.context;
-  const { liveness, idScan } = missingRequirements;
+  const { liveness, idDoc } = missingRequirements;
 
   let translationSource = '';
-  if (liveness && idScan) {
+  if (liveness && idDoc) {
     translationSource = 'liveness-with-id-scan';
   } else if (liveness) {
     translationSource = 'liveness';

@@ -7,6 +7,7 @@ import {
 import React from 'react';
 import {
   Events,
+  OnboardingRequirementsMachineContext,
   States,
 } from 'src/utils/state-machine/onboarding-requirements';
 
@@ -14,18 +15,20 @@ import MachineProvider from './components/machine-provider';
 import useOnboardingRequirementsMachine from './hooks/use-onboarding-requirements-machine';
 import AdditionalInfoRequired from './pages/additional-info-required';
 import CheckOnboardingRequirements from './pages/check-onboarding-requirements';
+import IdentityCheck from './pages/identity-check';
 
 const OnboardingRequirements = () => {
   const [state, send] = useOnboardingRequirementsMachine();
   const {
-    authToken,
-    device,
-    tenant,
-    missingKycData,
-    missingLiveness,
-    missingIdDocument,
-    userFound,
-  } = state.context;
+    onboardingContext: { authToken, device, tenant, userFound },
+    receivedRequirements: { kycData, liveness, idDoc },
+  }: OnboardingRequirementsMachineContext = state.context;
+
+  const handleRequirementCompleted = () => {
+    send({
+      type: Events.requirementCompleted,
+    });
+  };
 
   if (state.matches(States.checkOnboardingRequirements)) {
     return <CheckOnboardingRequirements />;
@@ -33,7 +36,7 @@ const OnboardingRequirements = () => {
   if (state.matches(States.additionalInfoRequired)) {
     return <AdditionalInfoRequired />;
   }
-  if (state.matches(States.collectKycData)) {
+  if (state.matches(States.kycData)) {
     return (
       <CollectKycData
         context={{
@@ -41,14 +44,11 @@ const OnboardingRequirements = () => {
           device,
           tenant,
           customData: {
-            missingAttributes: missingKycData,
+            missingAttributes: kycData,
             userFound,
           },
         }}
-        metadata={{}}
-        onDone={() => {
-          send({ type: Events.collectKycDataCompleted });
-        }}
+        onDone={handleRequirementCompleted}
       />
     );
   }
@@ -61,15 +61,12 @@ const OnboardingRequirements = () => {
           tenant,
           customData: {
             missingRequirements: {
-              liveness: !!missingLiveness,
-              idScan: !!missingIdDocument,
+              liveness,
+              idDoc,
             },
           },
         }}
-        metadata={{}}
-        onDone={() => {
-          send({ type: Events.transferCompleted });
-        }}
+        onDone={handleRequirementCompleted}
       />
     );
   }
@@ -81,12 +78,12 @@ const OnboardingRequirements = () => {
           device,
           tenant,
         }}
-        metadata={{}}
-        onDone={() => {
-          send({ type: Events.idScanCompleted });
-        }}
+        onDone={handleRequirementCompleted}
       />
     );
+  }
+  if (state.matches(States.identityCheck)) {
+    return <IdentityCheck />;
   }
   return null;
 };

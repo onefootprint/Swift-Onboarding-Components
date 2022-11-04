@@ -7,48 +7,54 @@ import {
 
 export enum States {
   checkOnboardingRequirements = 'checkOnboardingRequirements',
+  router = 'router',
   additionalInfoRequired = 'additionalInfoRequired',
-  collectKycData = 'collectKycData',
+  kycData = 'kycData',
   transfer = 'transfer',
   idScan = 'idScan',
+  identityCheck = 'identityCheck',
   success = 'success',
 }
 
-export type MachineContext = {
-  userFound: boolean;
-  missingLiveness: boolean;
-  missingIdDocument: boolean;
-  missingKycData?: readonly CollectedKycDataOption[]; // Initial set of attributes received from /onboarding
+export type Requirements = {
+  identityCheck: boolean;
+  liveness: boolean;
+  idDoc: boolean;
+  kycData: readonly CollectedKycDataOption[];
+};
+
+export type OnboardingRequirementsMachineContext = {
+  onboardingContext: {
+    userFound: boolean;
+    tenant: TenantInfo;
+    device: DeviceInfo;
+    authToken: string;
+  };
+  requirements: Requirements;
+  receivedRequirements: Requirements;
   kycData: UserData; // Filled user data
-  tenant: TenantInfo;
-  device: DeviceInfo;
-  authToken?: string;
 };
 
 export enum Events {
   onboardingRequirementsReceived = 'onboardingRequirementsReceived',
   additionalInfoRequired = 'additionalInfoRequired',
-  transferCompleted = 'transferCompleted',
-  idScanCompleted = 'idScanCompleted',
-  collectKycDataCompleted = 'collectKycDataCompleted',
+  requirementCompleted = 'requirementCompleted',
 }
 
 export enum Actions {
-  assignMissingKycData = 'assignMissingKycData',
-  assignMissingLiveness = 'assignMissingLiveness',
-  assignMissingIdDocument = 'assignMissingIdDocument',
+  assignRequirements = 'assignRequirements',
+  startKycData = 'startKycData',
+  startTransfer = 'startTransfer',
+  startIdScan = 'startIdScan',
+  startIdentityCheck = 'startIdentityCheckRequirement',
 }
 
 export type MachineEvents =
   | { type: Events.additionalInfoRequired }
   | {
-      type: Events.onboardingRequirementsReceived;
-      payload: {
-        missingLiveness: boolean;
-        missingIdDocument: boolean;
-        missingKycData?: readonly CollectedKycDataOption[];
-      };
+      type: Events.requirementCompleted;
     }
-  | { type: Events.transferCompleted }
-  | { type: Events.idScanCompleted }
-  | { type: Events.collectKycDataCompleted };
+  | {
+      type: Events.onboardingRequirementsReceived;
+      payload: Requirements;
+    };

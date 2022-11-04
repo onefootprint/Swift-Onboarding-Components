@@ -64,7 +64,6 @@ const Root = () => {
           device,
           tenant,
         }}
-        metadata={{}}
         onDone={() => {
           send({ type: Events.livenessCompleted });
         }}
@@ -82,7 +81,6 @@ const Root = () => {
           device,
           tenant,
         }}
-        metadata={{}}
         onDone={() => {
           send({ type: Events.idScanCompleted });
         }}

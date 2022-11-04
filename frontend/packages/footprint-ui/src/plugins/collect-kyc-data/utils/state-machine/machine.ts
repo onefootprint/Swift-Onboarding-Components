@@ -55,22 +55,7 @@ const createCollectKycDataMachine = () =>
                   ),
               },
               {
-                target: States.startKyc,
-                actions: Actions.assignInitialContext,
-              },
-            ],
-          },
-        },
-        [States.startKyc]: {
-          on: {
-            [Events.confirmed]: [
-              {
                 target: States.completed,
-                actions: [Actions.assignKycPending],
-                cond: (context, event) => !event.payload?.kycPending,
-              },
-              {
-                actions: [Actions.assignKycPending],
               },
             ],
           },
@@ -164,11 +149,6 @@ const createCollectKycDataMachine = () =>
             [Events.confirmed]: [
               {
                 target: States.completed,
-                actions: [Actions.assignKycPending],
-                cond: (context, event) => !event.payload?.kycPending,
-              },
-              {
-                actions: [Actions.assignKycPending],
               },
             ],
             [Events.navigatedToPrevPage]: [
@@ -289,12 +269,6 @@ const createCollectKycDataMachine = () =>
             ...context.data,
             ...event.payload,
           };
-          return context;
-        }),
-        [Actions.assignKycPending]: assign((context, event) => {
-          if (event.type === Events.confirmed) {
-            context.kycPending = event.payload?.kycPending;
-          }
           return context;
         }),
       },

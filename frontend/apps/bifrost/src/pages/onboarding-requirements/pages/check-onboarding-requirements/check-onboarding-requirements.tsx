@@ -9,7 +9,10 @@ import {
 import { LoadingIndicator, Typography } from '@onefootprint/ui';
 import { useGetOnboardingStatus } from 'footprint-elements';
 import React, { useState } from 'react';
-import { Events } from 'src/utils/state-machine/onboarding-requirements';
+import {
+  Events,
+  OnboardingRequirementsMachineContext,
+} from 'src/utils/state-machine/onboarding-requirements';
 import styled, { css } from 'styled-components';
 
 import useOnboardingRequirementsMachine from '../../hooks/use-onboarding-requirements-machine';
@@ -17,34 +20,40 @@ import useOnboardingRequirementsMachine from '../../hooks/use-onboarding-require
 const CheckOnboardingRequirements = () => {
   const { t } = useTranslation('pages.check-onboarding-requirements');
   const [state, send] = useOnboardingRequirementsMachine();
-  const { authToken, tenant } = state.context;
+  const {
+    onboardingContext: { authToken, tenant },
+  }: OnboardingRequirementsMachineContext = state.context;
   const [error, setError] = useState(false);
 
   const handleSuccess = (response: OnboardingStatusResponse) => {
     const { requirements } = response;
 
-    let missingLiveness = false;
-    let missingIdDocument = false;
-    let missingKycData: CollectedKycDataOption[] | undefined;
-
+    let liveness = false;
+    let idDoc = false;
+    let kycData: CollectedKycDataOption[] = [];
+    let identityCheck = false;
     requirements.forEach((req: OnboardingRequirement) => {
       if (req.kind === OnboardingRequirementKind.collectKycData) {
-        missingKycData = req.missingAttributes;
+        kycData = req.missingAttributes;
       }
       if (req.kind === OnboardingRequirementKind.liveness) {
-        missingLiveness = true;
+        liveness = true;
       }
-      if (req.kind === OnboardingRequirementKind.collectDocument) {
-        missingIdDocument = true;
+      if (req.kind === OnboardingRequirementKind.idDoc) {
+        idDoc = true;
+      }
+      if (req.kind === OnboardingRequirementKind.identityCheck) {
+        identityCheck = true;
       }
     });
 
     send({
       type: Events.onboardingRequirementsReceived,
       payload: {
-        missingLiveness,
-        missingIdDocument,
-        missingKycData,
+        liveness,
+        idDoc,
+        kycData,
+        identityCheck,
       },
     });
   };
