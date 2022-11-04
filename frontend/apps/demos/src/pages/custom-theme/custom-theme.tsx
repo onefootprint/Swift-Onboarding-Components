@@ -57,6 +57,10 @@ const Demo = () => {
                         background: 'green',
                         transform: 'scale(0.95)',
                       },
+                      input: {
+                        borderWidth: '2px',
+                        borderColor: 'purple',
+                      },
                     },
                   }}
                   publicKey={publicKey}

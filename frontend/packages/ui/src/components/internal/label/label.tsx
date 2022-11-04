@@ -40,16 +40,11 @@ const StyledLabel = styled.label`
     const { inputLabel } = theme.components;
 
     return css`
-      &[data-has-error='false'] {
-        color: ${inputLabel.states.default.color};
-      }
+      color: ${inputLabel.states.default.color};
+      font: ${inputLabel.size.default.typography};
 
       &[data-has-error='true'] {
         color: ${inputLabel.states.error.color};
-      }
-
-      &[data-size='default'] {
-        font: ${inputLabel.size.default.typography};
       }
 
       &[data-size='compact'] {

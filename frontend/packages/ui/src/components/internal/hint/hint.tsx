@@ -18,7 +18,7 @@ const Hint = ({
 }: HintProps) => (
   <HintContainer
     id={id}
-    className={`${className} fp-input-hint`}
+    className={`${className} fp-hint`}
     data-has-error={hasError}
     data-size={size}
   >
