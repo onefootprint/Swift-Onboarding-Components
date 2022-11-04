@@ -58,9 +58,6 @@ const Demo = () => {
                       button: {
                         transition: 'all .2s linear',
                       },
-                      'link:hover': {
-                        textDecoration: 'underline',
-                      },
                     },
                   }}
                   publicKey={publicKey}
