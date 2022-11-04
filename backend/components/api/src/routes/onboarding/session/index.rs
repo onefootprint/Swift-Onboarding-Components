@@ -4,12 +4,14 @@ use crate::auth::tenant::SecretTenantAuthContext;
 
 use crate::auth::tenant::CheckTenantPermissions;
 
+use crate::errors::ApiResult;
 use crate::types::response::ResponseData;
 
 use crate::types::JsonApiResponse;
 use crate::utils::session::AuthSession;
 use crate::State;
 
+use db::models::ob_configuration::ObConfigIdentifier;
 use db::models::ob_configuration::ObConfiguration;
 use newtypes::ObConfigurationId;
 use newtypes::SessionAuthToken;
@@ -44,18 +46,19 @@ pub async fn post(
 
     let (ob_config, tenant) = state
         .db_pool
-        .db_transaction(move |conn| {
-            ObConfiguration::get_enabled_by_id(
-                conn,
-                request.into_inner().onboarding_config_id,
-                tenant.id,
+        .db_transaction(move |conn| -> ApiResult<_> {
+            let identifier = ObConfigIdentifier::Tenant {
+                id: request.into_inner().onboarding_config_id,
+                tenant_id: tenant.id,
                 is_live,
-            )
+            };
+            let result = ObConfiguration::get_enabled(conn, identifier)?;
+            Ok(result)
         })
         .await?;
 
     let session_data = AuthSessionData::OnboardingSession(OnboardingSession {
-        onboarding_id: ob_config.id,
+        ob_config_id: ob_config.id,
         tenant_id: tenant.id,
         is_live,
     });

@@ -1,6 +1,6 @@
 use crate::schema::ob_configuration::BoxedQuery;
 use crate::schema::{ob_configuration, onboarding, tenant};
-use crate::DbError;
+use crate::{DbError, DbResult};
 use crate::{DbPool, TxnPgConnection};
 use chrono::{DateTime, Utc};
 use diesel::pg::Pg;
@@ -49,6 +49,17 @@ struct NewObConfiguration {
     can_access_identity_document_images: bool,
 }
 
+#[derive(Debug)]
+pub enum ObConfigIdentifier {
+    Id(ObConfigurationId),
+    Key(ObConfigurationKey),
+    Tenant {
+        id: ObConfigurationId,
+        tenant_id: TenantId,
+        is_live: bool,
+    },
+}
+
 #[derive(AsChangeset)]
 #[diesel(table_name = ob_configuration)]
 struct ObConfigurationUpdate {
@@ -75,7 +86,7 @@ impl ObConfiguration {
         query: &ObConfigurationQuery,
         cursor: Option<DateTime<Utc>>,
         page_size: i64,
-    ) -> Result<Vec<ObConfiguration>, DbError> {
+    ) -> DbResult<Vec<Self>> {
         let mut query = Self::list_query(query)
             .order_by(ob_configuration::created_at.desc())
             .limit(page_size);
@@ -83,11 +94,11 @@ impl ObConfiguration {
         if let Some(cursor) = cursor {
             query = query.filter(ob_configuration::created_at.le(cursor))
         }
-        let results = query.load::<ObConfiguration>(conn)?;
+        let results = query.load::<Self>(conn)?;
         Ok(results)
     }
 
-    pub fn count(conn: &mut PgConnection, query: &ObConfigurationQuery) -> Result<i64, DbError> {
+    pub fn count(conn: &mut PgConnection, query: &ObConfigurationQuery) -> DbResult<i64> {
         let count = Self::list_query(query).count().get_result(conn)?;
         Ok(count)
     }
@@ -95,7 +106,7 @@ impl ObConfiguration {
     pub fn list_authorized_for_user(
         conn: &mut PgConnection,
         scoped_user_id: ScopedUserId,
-    ) -> Result<Vec<ObConfiguration>, crate::DbError> {
+    ) -> DbResult<Vec<Self>> {
         let obcs = ob_configuration::table
             .inner_join(onboarding::table)
             .filter(onboarding::scoped_user_id.eq(scoped_user_id))
@@ -105,40 +116,28 @@ impl ObConfiguration {
         Ok(obcs)
     }
 
-    pub fn get_enabled(
-        conn: &mut PgConnection,
-        key: ObConfigurationKey,
-    ) -> Result<Option<(ObConfiguration, Tenant)>, crate::DbError> {
-        let result: Option<(ObConfiguration, Tenant)> = ob_configuration::table
-            .inner_join(tenant::table)
-            .filter(ob_configuration::key.eq(key))
-            .first(conn)
-            .optional()?;
-        if let Some((obc, _)) = &result {
-            if obc.status != ApiKeyStatus::Enabled {
-                return Err(DbError::ApiKeyDisabled);
+    pub fn get_enabled(conn: &mut PgConnection, identifier: ObConfigIdentifier) -> DbResult<(Self, Tenant)> {
+        let mut query = ob_configuration::table.inner_join(tenant::table).into_boxed();
+
+        match identifier {
+            ObConfigIdentifier::Id(id) => query = query.filter(ob_configuration::id.eq(id)),
+            ObConfigIdentifier::Key(key) => query = query.filter(ob_configuration::key.eq(key)),
+            ObConfigIdentifier::Tenant {
+                id,
+                tenant_id,
+                is_live,
+            } => {
+                query = query
+                    .filter(ob_configuration::id.eq(id))
+                    .filter(ob_configuration::tenant_id.eq(tenant_id))
+                    .filter(ob_configuration::is_live.eq(is_live))
             }
         }
-        Ok(result)
-    }
 
-    pub fn get_enabled_by_id(
-        conn: &mut PgConnection,
-        id: ObConfigurationId,
-        tenant_id: TenantId,
-        is_live: bool,
-    ) -> Result<(ObConfiguration, Tenant), crate::DbError> {
-        let result: (ObConfiguration, Tenant) = ob_configuration::table
-            .inner_join(tenant::table)
-            .filter(ob_configuration::id.eq(id))
-            .filter(ob_configuration::tenant_id.eq(tenant_id))
-            .filter(ob_configuration::is_live.eq(is_live))
-            .first(conn)?;
-
+        let result: (ObConfiguration, Tenant) = query.first(conn)?;
         if result.0.status != ApiKeyStatus::Enabled {
             return Err(DbError::ApiKeyDisabled);
         }
-
         Ok(result)
     }
 
@@ -151,7 +150,7 @@ impl ObConfiguration {
         must_collect_identity_document: bool,
         can_access_identity_document_images: bool,
         is_live: bool,
-    ) -> Result<ObConfiguration, crate::DbError> {
+    ) -> DbResult<Self> {
         let config = NewObConfiguration {
             key: ObConfigurationKey::generate(is_live),
             name,
@@ -181,7 +180,7 @@ impl ObConfiguration {
         is_live: bool,
         name: Option<String>,
         status: Option<ApiKeyStatus>,
-    ) -> Result<Self, DbError> {
+    ) -> DbResult<Self> {
         let update = ObConfigurationUpdate { name, status };
         let results: Vec<Self> = diesel::update(ob_configuration::table)
             .filter(ob_configuration::id.eq(id))

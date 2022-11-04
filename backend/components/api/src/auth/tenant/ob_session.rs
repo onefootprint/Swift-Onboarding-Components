@@ -1,5 +1,8 @@
 use db::{
-    models::{ob_configuration::ObConfiguration, tenant::Tenant},
+    models::{
+        ob_configuration::{ObConfigIdentifier, ObConfiguration},
+        tenant::Tenant,
+    },
     PgConnection,
 };
 use newtypes::{ObConfigurationId, TenantId};
@@ -11,7 +14,7 @@ use crate::{auth::AuthError, errors::ApiError};
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
 pub struct OnboardingSession {
     pub tenant_id: TenantId,
-    pub onboarding_id: ObConfigurationId,
+    pub ob_config_id: ObConfigurationId,
     pub is_live: bool,
 }
 
@@ -39,8 +42,12 @@ impl ExtractableAuthSession for ParsedOnboardingSession {
                 return Err(AuthError::SessionTypeError.into());
             }
         };
-        let (ob_config, tenant) =
-            ObConfiguration::get_enabled_by_id(conn, data.onboarding_id, data.tenant_id, data.is_live)?;
+        let identifier = ObConfigIdentifier::Tenant {
+            id: data.ob_config_id,
+            tenant_id: data.tenant_id,
+            is_live: data.is_live,
+        };
+        let (ob_config, tenant) = ObConfiguration::get_enabled(conn, identifier)?;
         Ok(ParsedOnboardingSession { ob_config, tenant })
     }
 }
