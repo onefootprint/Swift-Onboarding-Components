@@ -44,6 +44,45 @@ const Demo = () => {
               </Typography>
               <Box sx={{ marginTop: 7 }}>
                 <FootprintButton
+                  appearance={{
+                    fontSrc:
+                      'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap',
+                    variables: {
+                      fontFamily: '"Inter"',
+                      linkColor: '#101010',
+                      colorError: '#E33D19',
+
+                      buttonPrimaryBg: '#315E4C',
+                      buttonPrimaryHoverBg: '#46866c',
+                      buttonPrimaryColor: '#FFF',
+                      buttonBorderRadius: '70px',
+
+                      linkButtonColor: '#315E4C',
+
+                      labelColor: '#101010',
+                      labelFont: '600 15px/18px "Inter"',
+
+                      inputBorderRadius: '8px',
+                      inputBorderWidth: '1px',
+                      inputFont: '500 15px/21.42px "Inter"',
+                      inputHeight: '50px',
+                      inputPlaceholderColor: '#B5B5B5',
+                      inputColor: '#101010',
+                      inputBg: '#FFFFFF',
+                      inputBorderColor: '#B5B5B5',
+                      inputHoverBorderColor: '#707070',
+                      inputFocusBorderColor: '#707070',
+                      inputFocusElevation: 'none',
+                      inputErrorFocusElevation: 'none',
+                      hintColor: '#101010',
+                      hintFont: '400 13px/20px "Inter"',
+                    },
+                    rules: {
+                      button: {
+                        transition: 'all .2s linear',
+                      },
+                    },
+                  }}
                   publicKey={publicKey}
                   onCompleted={(validationToken: string) => {
                     setConfirmation(true);
