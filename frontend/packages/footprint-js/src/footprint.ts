@@ -6,8 +6,8 @@ import IframeManager from './utils/iframe-manager';
 import { injectStyles } from './utils/ui-manager';
 
 const iframeManager = new IframeManager();
-let tokensParams = {};
-let rulesParams = {};
+let variablesParams = '';
+let rulesParams = '';
 
 const footprint = (url: string) => {
   const handleOnCompleted = (callback: (validationToken: string) => void) =>
@@ -20,7 +20,11 @@ const footprint = (url: string) => {
   const handleOnCanceled = (callback: () => void) =>
     iframeManager.on(FootprintEvents.canceled, callback);
 
-  const setAppearance = ({ theme, variables, rules }: FootprintAppearance) => {
+  const setAppearance = ({
+    theme = 'light',
+    variables = {},
+    rules = {},
+  }: FootprintAppearance) => {
     const {
       fpButtonHeight,
       fpButtonBorderRadius,
@@ -31,8 +35,12 @@ const footprint = (url: string) => {
       overlayBg,
       ...remainingStyles
     } = variables;
-    tokensParams = encodeURIComponent(JSON.stringify(remainingStyles));
-    rulesParams = encodeURIComponent(JSON.stringify(rules));
+    if (Object.keys(remainingStyles).length) {
+      variablesParams = encodeURIComponent(JSON.stringify(remainingStyles));
+    }
+    if (Object.keys(rules).length) {
+      rulesParams = encodeURIComponent(JSON.stringify(rules));
+    }
     injectStyles({
       theme,
       variables: {
@@ -47,16 +55,36 @@ const footprint = (url: string) => {
     });
   };
 
+  const getSearchParams = (params: {
+    publicKey?: string;
+    variables?: string;
+    rules?: string;
+  }) => {
+    const { publicKey, variables, rules } = params;
+    const searchParams = new URLSearchParams();
+    if (publicKey) {
+      searchParams.append('public_key', publicKey);
+    }
+    if (variables) {
+      searchParams.append('tokens', variables);
+    }
+    if (rules) {
+      searchParams.append('rules', rules);
+    }
+    return searchParams.toString();
+  };
+
   const show = async ({
     publicKey,
     onCompleted,
     onCanceled,
   }: ShowFootprint) => {
-    await iframeManager.show({
-      url: publicKey
-        ? `${url}?public_key=${publicKey}&tokens=${tokensParams}&rules=${rulesParams}`
-        : url,
+    const searchParams = getSearchParams({
+      publicKey,
+      variables: variablesParams,
+      rules: rulesParams,
     });
+    await iframeManager.show({ url: `${url}?${searchParams}` });
     if (onCompleted) {
       handleOnCompleted(onCompleted);
     }

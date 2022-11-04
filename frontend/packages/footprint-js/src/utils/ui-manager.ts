@@ -17,16 +17,25 @@ const injectStylesToCurrentPage = (styles: string) => {
   document.head.append(style);
 };
 
-export const injectStyles = ({ variables }: FootprintAppearance) => {
+const addStyleRule = (selector: string, value?: any) =>
+  value ? `${selector}: ${value}` : '';
+
+export const injectStyles = ({ variables = {} }: FootprintAppearance) => {
   injectStylesToCurrentPage(`
     :root {
-      --fp-fp-button-height: ${variables.fpButtonHeight};
-      --fp-fp-button-border-radius: ${variables.fpButtonBorderRadius};
-      --fp-loading-bg: ${variables.loadingBg};
-      --fp-loading-color: ${variables.loadingColor};
-      --fp-loading-border-radius: ${variables.loadingBorderRadius};
-      --fp-loading-padding: ${variables.loadingPadding};
-      --fp-overlay-bg:${variables.overlayBg};
+      ${addStyleRule('--fp-fp-button-height', variables.fpButtonHeight)}
+      ${addStyleRule(
+        '--fp-fp-button-border-radius',
+        variables.fpButtonBorderRadius,
+      )}
+      ${addStyleRule('--fp-loading-bg', variables.loadingBg)}
+      ${addStyleRule('--fp-loading-color', variables.loadingColor)}
+      ${addStyleRule(
+        '--fp-loading-border-radius',
+        variables.loadingBorderRadius,
+      )}
+      ${addStyleRule('--fp-loading-padding', variables.loadingPadding)}
+      ${addStyleRule('--fp-overlay-bg', variables.overlayBg)}
     }
   `);
 };

@@ -70,7 +70,7 @@ export const createStylesFromRules = (rules: Record<string, any>) => {
 
 export const getParsedValue = (params: string) => {
   try {
-    const parsedParams = JSON.parse(params);
+    const parsedParams = JSON.parse(decodeURIComponent(params));
     return parsedParams;
   } catch (_) {
     console.warn(

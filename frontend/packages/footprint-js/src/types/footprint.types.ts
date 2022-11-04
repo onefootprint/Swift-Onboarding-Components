@@ -1,3 +1,5 @@
+import type * as CSS from 'csstype';
+
 import type {
   FootprintExternalStyles,
   FootprintMainStyles,
@@ -15,17 +17,19 @@ export type FootprintAppearanceVariables = FootprintMainStyles &
 export type FootprintAppearanceTheme = 'light' | 'dark';
 
 export type FootprintAppearanceRules = Partial<{
-  button: string;
+  button: CSS.Properties;
+  'button:hover': CSS.Properties;
+  'button:focus': CSS.Properties;
+  'button:active': CSS.Properties;
 }>;
 
 export type FootprintAppearance = {
-  theme: FootprintAppearanceTheme;
-  variables: FootprintAppearanceVariables;
+  theme?: FootprintAppearanceTheme;
+  variables?: FootprintAppearanceVariables;
   rules?: FootprintAppearanceRules;
 };
 
 export type ShowFootprint = {
-  appearance?: FootprintAppearance;
   onCanceled?: () => void;
   onCompleted?: (validationToken: string) => void;
   publicKey?: string;
