@@ -101,7 +101,7 @@ jobs:
         with:
           payload: |
             {
-              "user": "${{ github.event.commits[0].author.name }}",
+              "user": "${{ github.triggering_actor }}",
               "environment": "[Backend PROD]",
               "url": "${{ needs.deploy_stack_prod.outputs.url }}"
             }
