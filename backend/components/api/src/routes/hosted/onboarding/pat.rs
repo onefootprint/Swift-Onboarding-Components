@@ -50,13 +50,12 @@ pub async fn get(
         )
         .await
     } else {
-        challenge_privacy_pass(state, onboarding_context, user_auth).await
+        challenge_privacy_pass(state, user_auth).await
     }
 }
 
 async fn challenge_privacy_pass(
     state: web::Data<State>,
-    _onboarding_context: Either<PublicOnboardingContext, SessionContext<ParsedOnboardingSession>>,
     user_auth: UserAuthContext,
 ) -> ApiResult<HttpResponse> {
     let nonce = user_auth.auth_token.hash_bytes();
