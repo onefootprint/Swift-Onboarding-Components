@@ -7,8 +7,8 @@ import { useUpdateEffect } from 'usehooks-ts';
 
 import { State } from '../../../../utils/decrypt-state-machine';
 import { useDecryptMachine } from '../../../decrypt-machine-provider';
-import DecryptBasicInfo from './components/decrypt-vault-data';
-import ViewBasicInfo from './components/view-vault-data';
+import DecryptVaultData from './components/decrypt-vault-data';
+import ViewVaultData from './components/view-vault-data';
 
 type VaultDataProps = {
   user: User;
@@ -39,9 +39,9 @@ const VaultData = ({ user, onDecrypt }: VaultDataProps) => {
   }, [state.value]);
 
   return showCheckboxes ? (
-    <DecryptBasicInfo user={user} />
+    <DecryptVaultData user={user} />
   ) : (
-    <ViewBasicInfo user={user} />
+    <ViewVaultData user={user} />
   );
 };
 

@@ -40,17 +40,31 @@ const DecryptVaultData = ({ user }: DecryptVaultDataProps) => {
   const showIdentity = sectionsVisibility.identity;
   const showAddress = sectionsVisibility.address;
 
+  const showMinSelectionError = () => {
+    toast.show({
+      description: t('decrypt.errors.min-selected.description'),
+      title: t('decrypt.errors.min-selected.title'),
+      variant: 'error',
+    });
+  };
+
   const handleBeforeSubmit = (formData: FormData) => {
     const { kycData, idDoc } = formData;
     const attrLists = getAttrListFromFields(kycData, idDoc);
-    const hasSelectedFields =
-      attrLists.kycData.length > 0 || attrLists.idDoc.length > 0;
-    if (!hasSelectedFields) {
-      toast.show({
-        description: t('decrypt.errors.min-selected.description'),
-        title: t('decrypt.errors.min-selected.title'),
-        variant: 'error',
-      });
+
+    if (attrLists.kycData.length === 0 && attrLists.idDoc.length === 0) {
+      showMinSelectionError();
+      return;
+    }
+    const { idDoc: vaultIdDocData, kycData: vaultKycData } = user.vaultData;
+    const allKycDecrypted = attrLists.kycData.every(
+      attr => typeof vaultKycData[attr] === 'string',
+    );
+    const allIdDocDecrypted =
+      !vaultIdDocData ||
+      attrLists.idDoc.every(attr => typeof vaultIdDocData[attr] === 'string');
+    if (allKycDecrypted && allIdDocDecrypted) {
+      showMinSelectionError();
       return;
     }
 
