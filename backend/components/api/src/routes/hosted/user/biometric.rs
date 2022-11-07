@@ -287,10 +287,11 @@ pub async fn complete_post(
             }
 
             // if we're in an onboarding, optimisticaly try to submit a liveness event if the webauthn
-            if let Some(onboarding_id) = user_auth.onboarding_id() {
+            let ob_info = user_auth.onboarding(conn)?;
+            if let Some(ref ob_info) = ob_info {
                 if let Some(attributes) = liveness_event_attributes {
                     let _ = NewLivenessEvent {
-                        onboarding_id,
+                        onboarding_id: ob_info.onboarding.id.clone(),
                         liveness_source: newtypes::LivenessSource::WebauthnAttestation,
                         attributes: Some(attributes),
                     }
@@ -302,7 +303,7 @@ pub async fn complete_post(
                     // maintain the mechanics that webauthn -> liveness
                     // we should update this such that liveness is skipped via API call
                     let _ = NewLivenessEvent {
-                        onboarding_id,
+                        onboarding_id: ob_info.onboarding.id.clone(),
                         liveness_source: newtypes::LivenessSource::Skipped,
                         attributes: None,
                     }
@@ -328,7 +329,7 @@ pub async fn complete_post(
                     id: new_credential.id,
                 },
                 user_auth.user_vault_id(),
-                user_auth.onboarding_id(),
+                ob_info.map(|o| o.onboarding.id),
             )?;
             Ok(())
         })

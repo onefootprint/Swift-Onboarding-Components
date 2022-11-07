@@ -1,10 +1,5 @@
-use crate::auth::tenant::ParsedOnboardingSession;
-use crate::auth::tenant::PublicOnboardingContext;
-use crate::auth::user::UserAuth;
 use crate::auth::user::UserAuthContext;
 use crate::auth::user::UserAuthScopeDiscriminant;
-use crate::auth::Either;
-use crate::auth::SessionContext;
 use crate::errors::ApiError;
 use crate::hosted::onboarding::{get_fields_to_authorize, get_requirements};
 use crate::types::onboarding_requirement::OnboardingRequirement;
@@ -27,7 +22,6 @@ pub struct OnboardingStatusResponse {
 #[actix::get("/hosted/onboarding/status")]
 pub async fn get(
     state: web::Data<State>,
-    onboarding_context: Either<PublicOnboardingContext, SessionContext<ParsedOnboardingSession>>,
     user_auth: UserAuthContext,
 ) -> actix_web::Result<Json<ResponseData<OnboardingStatusResponse>>, ApiError> {
     let user_auth = user_auth.check_permissions(vec![UserAuthScopeDiscriminant::OrgOnboarding])?;
@@ -35,10 +29,11 @@ pub async fn get(
     let (requirements, fields_to_authorize): (Vec<OnboardingRequirement>, AuthorizeFields) = state
         .db_pool
         .db_query(move |conn| {
+            let ob_info = user_auth.assert_onboarding(conn)?;
             let (requirements, _): (Vec<OnboardingRequirement>, _) =
-                get_requirements(conn, &user_auth.user_vault_id(), onboarding_context.ob_config())?;
+                get_requirements(conn, &ob_info.user_vault_id, &ob_info.ob_config)?;
             let fields_to_authorize: AuthorizeFields =
-                get_fields_to_authorize(conn, &user_auth.user_vault_id(), onboarding_context.ob_config())?;
+                get_fields_to_authorize(conn, &ob_info.user_vault_id, &ob_info.ob_config)?;
             let res: (Vec<OnboardingRequirement>, AuthorizeFields) = (requirements, fields_to_authorize);
 
             Ok::<(Vec<OnboardingRequirement>, AuthorizeFields), ApiError>(res)

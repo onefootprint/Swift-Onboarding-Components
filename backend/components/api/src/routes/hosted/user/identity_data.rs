@@ -31,7 +31,8 @@ async fn post(
         .db_pool
         .db_transaction(move |conn| -> Result<_, ApiError> {
             let mut uvw = UserVaultWrapper::lock(conn, &user_auth.user_vault_id())?;
-            uvw.update_identity_data(conn, update, fingerprints, user_auth.onboarding_id())?;
+            let ob_id = user_auth.onboarding(conn)?.map(|o| o.onboarding.id);
+            uvw.update_identity_data(conn, update, fingerprints, ob_id)?;
 
             Ok(())
         })

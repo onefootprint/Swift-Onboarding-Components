@@ -1,4 +1,4 @@
-use crate::auth::user::{UserAuth, UserAuthContext, UserAuthScope};
+use crate::auth::user::{UserAuth, UserAuthContext, UserAuthScope, UserAuthScopeDiscriminant};
 use crate::errors::ApiError;
 use crate::types::response::ResponseData;
 use chrono::{DateTime, Utc};
@@ -8,7 +8,7 @@ use paperclip::actix::{self, api_v2_operation, web::Json, Apiv2Schema};
 #[derive(Debug, Clone, Apiv2Schema, serde::Serialize)]
 pub struct TokenResponse {
     pub user_vault_id: UserVaultId,
-    pub scopes: Vec<UserAuthScope>,
+    pub scopes: Vec<UserAuthScopeDiscriminant>,
     pub expires_at: DateTime<Utc>,
 }
 
@@ -22,6 +22,6 @@ pub async fn get(
     Ok(Json(ResponseData::ok(TokenResponse {
         user_vault_id: user_auth.user_vault_id(),
         expires_at: user_auth.expires_at(),
-        scopes: user_auth.data.scopes,
+        scopes: user_auth.data.scopes(),
     })))
 }

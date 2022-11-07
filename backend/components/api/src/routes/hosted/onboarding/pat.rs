@@ -13,11 +13,7 @@ use serde_json::json;
 use web::HttpResponse;
 
 use crate::{
-    auth::{
-        tenant::{ParsedOnboardingSession, PublicOnboardingContext},
-        user::{UserAuth, UserAuthContext, UserAuthScopeDiscriminant},
-        Either, SessionContext,
-    },
+    auth::user::{UserAuthContext, UserAuthScopeDiscriminant},
     errors::{onboarding::OnboardingError, ApiError, ApiResult},
     types::EmptyResponse,
     utils::insight_headers::InsightHeaders,
@@ -29,7 +25,6 @@ use crate::{
 pub async fn get(
     state: web::Data<State>,
     req: web::HttpRequest,
-    onboarding_context: Either<PublicOnboardingContext, SessionContext<ParsedOnboardingSession>>,
     user_auth: UserAuthContext,
     insight: InsightHeaders,
 ) -> ApiResult<HttpResponse> {
@@ -41,14 +36,7 @@ pub async fn get(
         .filter_map(|h| h.strip_prefix("PrivateToken token="))
         .next()
     {
-        authorize_privacy_pass(
-            private_access_token,
-            state,
-            onboarding_context,
-            user_auth,
-            insight,
-        )
-        .await
+        authorize_privacy_pass(private_access_token, state, user_auth, insight).await
     } else {
         challenge_privacy_pass(state, user_auth).await
     }
@@ -77,12 +65,10 @@ async fn challenge_privacy_pass(
 async fn authorize_privacy_pass(
     private_access_token: &str,
     state: web::Data<State>,
-    onboarding_context: Either<PublicOnboardingContext, SessionContext<ParsedOnboardingSession>>,
     user_auth: UserAuthContext,
     insight: InsightHeaders,
 ) -> ApiResult<HttpResponse> {
     let user_auth = user_auth.check_permissions(vec![UserAuthScopeDiscriminant::OrgOnboarding])?;
-
     let nonce = user_auth.auth_token.hash_bytes();
 
     let challenge = privacy_pass::TokenChallenge::new(state.config.rp_id.clone(), nonce);
@@ -96,10 +82,10 @@ async fn authorize_privacy_pass(
     state
         .db_pool
         .db_transaction(move |conn| -> Result<_, ApiError> {
-            let ob_config = onboarding_context.ob_config();
-            let (onboarding, _) =
-                Onboarding::lock_by_config(conn, &user_auth.user_vault_id(), &ob_config.id)?
-                    .ok_or(OnboardingError::NoOnboarding)?;
+            let ob_info = user_auth.assert_onboarding(conn)?;
+            let ob_config = ob_info.ob_config;
+            let (onboarding, _) = Onboarding::lock_by_config(conn, &ob_info.user_vault_id, &ob_config.id)?
+                .ok_or(OnboardingError::NoOnboarding)?;
 
             if onboarding.is_authorized {
                 return Err(ApiError::Custom("Cannot edit completed onboarding".to_owned()));
@@ -114,7 +100,7 @@ async fn authorize_privacy_pass(
                 ip_address: insight.ip_address.clone(),
                 location: insight.location(),
             });
-            AuditTrail::create(conn, trail_event, user_auth.user_vault_id(), None, None)?;
+            AuditTrail::create(conn, trail_event, ob_info.user_vault_id, None, None)?;
 
             let attributes = Some(json!({
                 // TODO: get issuer programmatically

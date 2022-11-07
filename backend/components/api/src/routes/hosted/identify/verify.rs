@@ -74,7 +74,7 @@ pub async fn post(
         ),
         IdentifyType::Unspecified => return Err(ApiError::NotImplemented),
     };
-    let data = UserSession::create(user_vault_id, scopes);
+    let data = UserSession::make(user_vault_id, scopes);
     let auth_token = AuthSession::create(&state, data, duration).await?;
 
     Ok(Json(ResponseData {

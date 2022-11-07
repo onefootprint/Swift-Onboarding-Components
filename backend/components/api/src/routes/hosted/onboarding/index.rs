@@ -66,17 +66,12 @@ pub async fn post(
                 insight_event,
             )?;
             // Update the auth session in the DB to have the OrgOnboarding scope tied to this onboarding
-            let scopes = user_auth.data.scopes.clone();
-            // Even though the OrgOnboardingInit scope is only used by this endpoint, don't remove it
-            // since we want this endpoint to be idempotent (in case the client needs to retry)
-            let new_scopes = scopes
-                .into_iter()
-                // Filter out any old OrgOnboarding scopes on the token
-                .filter(|x| !matches!(x, UserAuthScope::OrgOnboarding{id: _}))
-                // And add a new OrgOnboarding scope with the just-created ob.id
-                .chain([UserAuthScope::OrgOnboarding { id: ob.id.clone() }].into_iter())
-                .collect();
-            let data = user_auth.data.clone().replace_scopes(new_scopes);
+            // Even though the OrgOnboardingInit scope is only used by this endpoint, we notably don't remove
+            // it since we want this endpoint to be idempotent (in case the client needs to retry)
+            let data = user_auth
+                .data
+                .clone()
+                .replace_scope(UserAuthScope::OrgOnboarding { id: ob.id.clone() });
             user_auth.update_session(conn, &session_key, data)?;
 
             // If the user has already onboarded onto this same ob config, return a validation token

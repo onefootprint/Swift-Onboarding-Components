@@ -4,11 +4,8 @@ use crate::{
     State,
 };
 
-use db::{
-    models::{onboarding::Onboarding, verification_request::VerificationRequest},
-    DbResult,
-};
-use newtypes::{OnboardingStatus, TenantId, UserVaultId, VerificationRequestId};
+use db::models::{onboarding::Onboarding, verification_request::VerificationRequest};
+use newtypes::{OnboardingId, OnboardingStatus, UserVaultId};
 
 use super::{vendor_result::VendorResult, *};
 /// The Engine module is the main entry point into running our verification logic
@@ -24,13 +21,12 @@ use super::{vendor_result::VendorResult, *};
 /// - producing decisions
 pub async fn decide(
     state: &State,
-    uvw_id: UserVaultId,
+    uv_id: UserVaultId,
+    ob: Onboarding,
     ob_config: ObConfiguration,
-    tenant_id: TenantId,
 ) -> Result<(), ApiError> {
     // initialize some variables since we have a lot of closures that move ownership below
-    let uvwid = uvw_id.clone();
-    let tenantid: TenantId = tenant_id.clone();
+    let uvwid = uv_id.clone();
     let uvw = state
         .db_pool
         .db_query(move |conn| UserVaultWrapper::get(conn, &uvwid))
@@ -43,16 +39,13 @@ pub async fn decide(
     let (requests, ob_id, previous_results) = state
         .db_pool
         .db_transaction(move |conn| -> Result<_, ApiError> {
-            let (ob, _) = Onboarding::lock_by_config(conn, &uvw.user_vault.id, &ob_config.id)?
-                .ok_or(OnboardingError::NoOnboarding)?; // we should never hit this here
-
             let ob_id = ob.id.clone();
 
             let requests = verification_request::build_verification_requests_and_checkpoint(
                 conn,
                 ob,
                 &uvw,
-                &tenantid,
+                &ob_config.tenant_id,
                 desired_status_for_testing,
             )?;
 
@@ -94,15 +87,16 @@ pub async fn decide(
 pub async fn can_decide(
     state: &State,
     uvw_id: UserVaultId,
+    ob_id: OnboardingId,
     ob_config: ObConfiguration,
 ) -> Result<(), ApiError> {
     state
         .db_pool
         .db_transaction(move |conn| -> Result<_, ApiError> {
             let uvw = UserVaultWrapper::get(conn, &uvw_id)?;
+            // TODO this lock doesn't do anything right now. Fix race condition
+            let ob = Onboarding::lock(conn, &ob_id)?;
 
-            let (ob, _) = Onboarding::lock_by_config(conn, &uvw.user_vault.id, &ob_config.id)?
-                .ok_or(OnboardingError::NoOnboarding)?;
             // Can only start KYC checks for onboarding that has all required fields
             // Document Collection is handled synchronously in the frontend (to surface errors)
             let missing_attributes = uvw.missing_fields(&ob_config);

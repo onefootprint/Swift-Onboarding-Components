@@ -82,6 +82,19 @@ impl Onboarding {
         Ok(ob)
     }
 
+    pub fn get_for_user(
+        conn: &mut PgConnection,
+        id: &OnboardingId,
+        user_vault_id: &UserVaultId,
+    ) -> Result<(Onboarding, ScopedUser), DbError> {
+        let ob = onboarding::table
+            .inner_join(scoped_user::table)
+            .filter(onboarding::id.eq(id))
+            .filter(scoped_user::user_vault_id.eq(user_vault_id))
+            .first(conn)?;
+        Ok(ob)
+    }
+
     pub fn get_for_scoped_users(
         conn: &mut PgConnection,
         scoped_user_ids: Vec<&ScopedUserId>,

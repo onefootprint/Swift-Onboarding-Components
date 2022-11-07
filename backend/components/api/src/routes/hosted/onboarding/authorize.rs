@@ -1,10 +1,5 @@
-use crate::auth::tenant::ParsedOnboardingSession;
-use crate::auth::tenant::PublicOnboardingContext;
-use crate::auth::user::UserAuth;
 use crate::auth::user::UserAuthContext;
 use crate::auth::user::UserAuthScopeDiscriminant;
-use crate::auth::Either;
-use crate::auth::SessionContext;
 use crate::errors::onboarding::OnboardingError;
 use crate::errors::ApiError;
 use crate::hosted::onboarding::get_requirements;
@@ -27,7 +22,6 @@ pub struct CommitResponse {
 #[actix::post("/hosted/onboarding/authorize")]
 pub async fn post(
     user_auth: UserAuthContext,
-    onboarding_context: Either<PublicOnboardingContext, SessionContext<ParsedOnboardingSession>>,
     state: web::Data<State>,
 ) -> actix_web::Result<Json<ResponseData<CommitResponse>>, ApiError> {
     let user_auth = user_auth.check_permissions(vec![UserAuthScopeDiscriminant::OrgOnboarding])?;
@@ -37,8 +31,8 @@ pub async fn post(
         .db_pool
         .db_query(move |conn| -> Result<_, ApiError> {
             // Verify there are no unmet requirements
-            let (requirements, ob) =
-                get_requirements(conn, &user_auth.user_vault_id(), onboarding_context.ob_config())?;
+            let ob_info = user_auth.assert_onboarding(conn)?;
+            let (requirements, ob) = get_requirements(conn, &ob_info.user_vault_id, &ob_info.ob_config)?;
             if !requirements.is_empty() {
                 let unmet_requirements = requirements.into_iter().map(|x| x.into()).collect();
                 return Err(OnboardingError::UnmetRequirements(unmet_requirements).into());
