@@ -174,6 +174,10 @@ impl ServiceEnvironmentConfig {
     pub fn is_production(&self) -> bool {
         self.environment.as_str() == "production"
     }
+
+    pub fn is_local(&self) -> bool {
+        self.environment.as_str() == "local"
+    }
 }
 
 impl enclave_proxy::StreamConfig for EnclaveConfig {

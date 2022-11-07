@@ -39,11 +39,18 @@ async fn main() -> std::io::Result<()> {
     let prometheus = prometheus::init(&config);
 
     // sentry
+    let sample_rate = if config.service_config.is_local() {
+        // Don't send local errors to sentry
+        0.0
+    } else {
+        1.0
+    };
     let _guard = sentry::init((
         config.sentry_url.as_str(),
         sentry::ClientOptions {
             release: sentry::release_name!(),
             environment: Some(Cow::Owned(config.service_config.environment.clone())),
+            sample_rate,
             ..Default::default()
         },
     ));
