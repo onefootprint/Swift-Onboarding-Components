@@ -12,6 +12,8 @@ pub struct OnboardingDecision {
     pub source: DecisionSource,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub ob_configuration: Option<LiteObConfiguration>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub vendors: Option<Vec<Vendor>>,
 }
 
 /// ObConfiguration serialization used inside of an OnboardingDecision

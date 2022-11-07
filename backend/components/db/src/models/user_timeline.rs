@@ -10,9 +10,7 @@ use newtypes::{DbUserTimelineEvent, FootprintUserId, OnboardingId, TenantId, Use
 use serde::{Deserialize, Serialize};
 
 use super::insight_event::InsightEvent;
-use super::ob_configuration::ObConfiguration;
-use super::onboarding_decision::OnboardingDecision;
-use super::tenant_user::TenantUser;
+use super::onboarding_decision::{OnboardingDecision, SaturatedOnboardingDecisionInfo};
 use super::webauthn_credential::WebauthnCredential;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable)]
@@ -40,7 +38,7 @@ pub struct NewUserTimeline {
 pub enum SaturatedTimelineEvent {
     DataCollected(newtypes::DataCollectedInfo),
     BiometricRegistered((WebauthnCredential, InsightEvent)),
-    OnboardingDecision((OnboardingDecision, ObConfiguration, Option<TenantUser>)),
+    OnboardingDecision(SaturatedOnboardingDecisionInfo),
     DocumentUploaded(newtypes::DocumentUploadedInfo), // TODO
 }
 

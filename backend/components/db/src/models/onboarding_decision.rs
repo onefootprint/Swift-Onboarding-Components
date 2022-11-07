@@ -1,3 +1,4 @@
+use crate::models::verification_request::VerificationRequest;
 use crate::TxnPgConnection;
 use crate::{
     schema::{onboarding_decision, onboarding_decision_verification_result_junction},
@@ -6,6 +7,7 @@ use crate::{
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
+use itertools::Itertools;
 use newtypes::{
     ComplianceStatus, OnboardingDecisionId, OnboardingDecisionInfo, OnboardingId, TenantUserId, UserVaultId,
     VerificationResultId, VerificationStatus,
@@ -61,6 +63,13 @@ pub struct NewOnboardingDecision {
     pub result_ids: Vec<VerificationResultId>,
 }
 
+pub type SaturatedOnboardingDecisionInfo = (
+    OnboardingDecision,
+    ObConfiguration,
+    Vec<VerificationRequest>,
+    Option<TenantUser>,
+);
+
 impl OnboardingDecision {
     pub fn create(conn: &mut TxnPgConnection, decision: NewOnboardingDecision) -> DbResult<Self> {
         // Lock Onboarding so a new decision isn't added while we deactivate the old
@@ -114,15 +123,43 @@ impl OnboardingDecision {
     pub fn get_bulk(
         conn: &mut PgConnection,
         ids: Vec<&OnboardingDecisionId>,
-    ) -> DbResult<Vec<(Self, ObConfiguration, Option<TenantUser>)>> {
-        use crate::schema::{ob_configuration, onboarding, tenant_user};
-        let results = onboarding_decision::table
-            .inner_join(onboarding::table.inner_join(ob_configuration::table))
-            .left_join(tenant_user::table)
-            .filter(onboarding_decision::id.eq_any(ids))
-            .get_results::<(Self, (Onboarding, ObConfiguration), Option<TenantUser>)>(conn)?
+    ) -> DbResult<Vec<SaturatedOnboardingDecisionInfo>> {
+        use crate::schema::{
+            ob_configuration, onboarding, tenant_user, verification_request, verification_result,
+        };
+        let results: Vec<(Self, (Onboarding, ObConfiguration), Option<TenantUser>)> =
+            onboarding_decision::table
+                .inner_join(onboarding::table.inner_join(ob_configuration::table))
+                .left_join(tenant_user::table)
+                .filter(onboarding_decision::id.eq_any(ids))
+                .get_results(conn)?;
+
+        let decision_ids: Vec<_> = results.iter().map(|(decision, _, _)| &decision.id).collect();
+
+        // Get VRs associated with each decision
+        let vrs = onboarding_decision_verification_result_junction::table
+            .inner_join(verification_result::table.inner_join(verification_request::table))
+            .filter(
+                onboarding_decision_verification_result_junction::onboarding_decision_id.eq_any(decision_ids),
+            )
+            .select((
+                onboarding_decision_verification_result_junction::onboarding_decision_id,
+                verification_request::all_columns,
+            ))
+            .get_results::<(OnboardingDecisionId, VerificationRequest)>(conn)?
             .into_iter()
-            .map(|(ob_decision, (_, ob_config), tenant_user)| (ob_decision, ob_config, tenant_user))
+            .into_group_map();
+
+        let results = results
+            .into_iter()
+            .map(|(ob_decision, (_, ob_config), tenant_user)| {
+                (
+                    ob_decision.clone(),
+                    ob_config,
+                    vrs.get(&ob_decision.id).unwrap_or(&vec![]).clone(),
+                    tenant_user,
+                )
+            })
             .collect();
 
         Ok(results)

@@ -64,10 +64,11 @@ impl DbToApi<SaturatedTimelineEvent> for api_wire_types::UserTimelineEvent {
                 Self::BiometricRegistered(api_wire_types::LivenessEvent::from_db(e))
             }
             SaturatedTimelineEvent::DocumentUploaded(_) => Self::DocumentUploaded(), // TODO
-            SaturatedTimelineEvent::OnboardingDecision((decision, ob_config, tenant_user)) => {
+            SaturatedTimelineEvent::OnboardingDecision((decision, ob_config, vrs, tenant_user)) => {
                 Self::OnboardingDecision(api_wire_types::OnboardingDecision::from_db((
                     decision,
                     Some(ob_config),
+                    Some(vrs),
                     tenant_user,
                 )))
             }
