@@ -35,7 +35,7 @@ pub enum VerificationStatus {
     Failed,
     ManualReview,
     Verified,
-    NeedsIDDocument,
+    NeedsIdDocument,
 }
 crate::util::impl_enum_str_diesel!(VerificationStatus);
 
@@ -46,7 +46,7 @@ impl From<OnboardingStatus> for VerificationStatus {
             OnboardingStatus::Processing => Self::InformationRequired,
             OnboardingStatus::ManualReview => Self::ManualReview,
             // Temp, this will need to change.
-            OnboardingStatus::StepUpRequired => Self::NeedsIDDocument,
+            OnboardingStatus::StepUpRequired => Self::NeedsIdDocument,
             OnboardingStatus::Verified => Self::Verified,
             OnboardingStatus::Failed => Self::Failed,
         }

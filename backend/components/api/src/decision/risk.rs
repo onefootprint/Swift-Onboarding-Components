@@ -96,7 +96,7 @@ fn final_decision(features: &FeatureVector, current_onboarding: Onboarding) -> D
 
     let (verification_status, onboarding_status) = if maybe_id_doc_number.is_some() {
         (
-            VerificationStatus::NeedsIDDocument,
+            VerificationStatus::NeedsIdDocument,
             OnboardingStatus::StepUpRequired,
         )
     } else {
