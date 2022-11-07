@@ -52,7 +52,7 @@ const securityHeaders = [
 
 module.exports = {
   pageExtensions: ['page.tsx', 'page.ts', 'page.jsx', 'page.js'],
-  reactStrictMode: true,
+  reactStrictMode: false,
   compiler: {
     styledComponents: true,
   },
