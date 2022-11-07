@@ -24,6 +24,8 @@ class ObConfiguration(NamedTuple):
     status: str
     must_collect_data: list
     can_access_data: list
+    must_collect_identity_document: bool
+    can_access_identity_document: bool
 
     def from_response(resp):
         return ObConfiguration(
@@ -33,13 +35,18 @@ class ObConfiguration(NamedTuple):
             resp["status"],
             resp["must_collect_data"],
             resp["can_access_data"],
+            resp.get("must_collect_identity_document", False),
+            resp.get("can_access_identity_document", False),
         )
 
 
 class Tenant(NamedTuple):
-    ob_config: ObConfiguration
+    ob_configs: dict 
     sk: SecretApiKey
     auth_token: DashboardAuth
+
+    def ob_config(self):
+        return self.ob_configs["default"]
 
 
 class BasicUser(NamedTuple):

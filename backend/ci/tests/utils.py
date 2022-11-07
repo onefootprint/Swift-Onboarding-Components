@@ -168,24 +168,30 @@ def create_basic_user(twilio, suffix=None):
     )
 
 
-def create_tenant(org_data, ob_conf_data):
+def create_tenant(org_data, ob_conf_data, ob_conf_name="default"):
     body = post("private/tenant", org_data, CUSTODIAN_AUTH)
     sk = SecretApiKey.from_response(body["key"])
     auth_token = DashboardAuth(body["auth_token"])
     print("\n======org info======")
     print(body)
+    tenant = Tenant(
+        ob_configs={},
+        sk=sk,
+        auth_token=auth_token,
+    )
+    create_ob_config_for_tenant(tenant, ob_conf_data)
 
-    body = post("org/onboarding_configs", ob_conf_data, sk.key)
+    return tenant
+
+def create_ob_config_for_tenant(tenant, ob_conf_data, ob_conf_name="default"):
+    body = post("org/onboarding_configs", ob_conf_data, tenant.sk.key)
     ob_config = ObConfiguration.from_response(body)
     print("\n======org onboarding info======")
     print(body)
 
-    return Tenant(
-        ob_config=ob_config,
-        sk=sk,
-        auth_token=auth_token,
-    )
+    tenant.ob_configs[ob_conf_name] = ob_config
 
+    return tenant
 
 def build_user_data():
     ssn = _gen_random_ssn()

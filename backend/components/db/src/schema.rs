@@ -121,7 +121,6 @@ table! {
         created_at -> Timestamptz,
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
-        e_decryption_key -> Bytea,
         onboarding_id -> Nullable<Uuid>,
     }
 }

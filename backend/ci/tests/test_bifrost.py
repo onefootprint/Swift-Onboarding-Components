@@ -96,7 +96,7 @@ class TestBifrost:
         self, workos_tenant, token_type, ob_session_token, auth_token
     ):
         ob_auth = {
-            "publishable": workos_tenant.ob_config.key,
+            "publishable": workos_tenant.ob_config().key,
             "session": ob_session_token,
         }[token_type]
         body = post("hosted/onboarding", None, ob_auth, auth_token)
@@ -124,7 +124,7 @@ class TestBifrost:
         post(
             "hosted/onboarding/authorize",
             None,
-            workos_tenant.ob_config.key,
+            workos_tenant.ob_config().key,
             auth_token,
             status_code=400,
         )
@@ -132,20 +132,20 @@ class TestBifrost:
     def test_skip_liveness(self, auth_token, workos_tenant):
         # Liveness requirement exists
         body = get(
-            "hosted/onboarding/status", None, workos_tenant.ob_config.key, auth_token
+            "hosted/onboarding/status", None, workos_tenant.ob_config().key, auth_token
         )
         assert list(r for r in body["requirements"] if r["kind"] == "liveness")
 
         post(
             "hosted/onboarding/skip_liveness",
             None,
-            workos_tenant.ob_config.key,
+            workos_tenant.ob_config().key,
             auth_token,
         )
 
         # After skipping, liveness requirement does not exist
         body = get(
-            "hosted/onboarding/status", None, workos_tenant.ob_config.key, auth_token
+            "hosted/onboarding/status", None, workos_tenant.ob_config().key, auth_token
         )
         assert not list(r for r in body["requirements"] if r["kind"] == "liveness")
 
@@ -248,20 +248,20 @@ class TestBifrost:
 
     def test_onboarding_kyc(self, workos_tenant, auth_token):
         body = get(
-            "hosted/onboarding/kyc", None, workos_tenant.ob_config.key, auth_token
+            "hosted/onboarding/kyc", None, workos_tenant.ob_config().key, auth_token
         )
         assert body["status"] == "pending"
 
-        post("hosted/onboarding/submit", None, workos_tenant.ob_config.key, auth_token)
+        post("hosted/onboarding/submit", None, workos_tenant.ob_config().key, auth_token)
 
         body = get(
-            "hosted/onboarding/kyc", None, workos_tenant.ob_config.key, auth_token
+            "hosted/onboarding/kyc", None, workos_tenant.ob_config().key, auth_token
         )
         assert body["status"] == "complete"
 
     def test_onboarding_authorize(self, workos_tenant, auth_token):
         body = post(
-            "hosted/onboarding/authorize", None, workos_tenant.ob_config.key, auth_token
+            "hosted/onboarding/authorize", None, workos_tenant.ob_config().key, auth_token
         )
         validation_token = body["validation_token"]
 
@@ -274,7 +274,7 @@ class TestBifrost:
         assert body["status"]
 
     def test_onboard_onto_same_tenant(self, workos_tenant, auth_token):
-        body = post("hosted/onboarding", None, workos_tenant.ob_config.key, auth_token)
+        body = post("hosted/onboarding", None, workos_tenant.ob_config().key, auth_token)
         validation_token = body["validation_token"]
         data = dict(validation_token=validation_token)
         body = post("onboarding/session/validate", data, workos_tenant.sk.key)
@@ -283,7 +283,7 @@ class TestBifrost:
         # We won't ever actually hit onboarding/authorize if the tenant has already onboarded,
         # but if we do, we should no-op and succeed
         body = post(
-            "hosted/onboarding/authorize", None, workos_tenant.ob_config.key, auth_token
+            "hosted/onboarding/authorize", None, workos_tenant.ob_config().key, auth_token
         )
         validation_token = body["validation_token"]
         data = dict(validation_token=validation_token)
@@ -389,13 +389,13 @@ class TestBifrost:
 
         def onboard_onto_tenant(tenant):
             # Start onboarding for user
-            post("hosted/onboarding", None, tenant.ob_config.key, auth_token)
+            post("hosted/onboarding", None, tenant.ob_config().key, auth_token)
 
-            post("hosted/onboarding/submit", None, tenant.ob_config.key, auth_token)
+            post("hosted/onboarding/submit", None, tenant.ob_config().key, auth_token)
 
             # authorize onboarding for user
             body = post(
-                "hosted/onboarding/authorize", None, tenant.ob_config.key, auth_token
+                "hosted/onboarding/authorize", None, tenant.ob_config().key, auth_token
             )
             validation_token = body["validation_token"]
             assert validation_token
@@ -420,7 +420,7 @@ class TestBifrost:
             "country_code": "USA",
         }
         body = post(
-            f"hosted/user/document/", data, auth_token, workos_tenant.ob_config.key
+            f"hosted/user/document/", data, auth_token, workos_tenant.ob_config().key
         )
         assert body == {}
 
@@ -434,7 +434,7 @@ class TestBifrost:
             f"hosted/user/document/back_error",
             data,
             auth_token,
-            workos_tenant.ob_config.key,
+            workos_tenant.ob_config().key,
         )
         assert get_body == expected
 
@@ -457,27 +457,27 @@ class TestBifrostSandbox:
         post(
             "hosted/onboarding",
             None,
-            workos_sandbox_tenant.ob_config.key,
+            workos_sandbox_tenant.ob_config().key,
             basic_user.auth_token,
         )
         post("hosted/user/data/identity", user_data, basic_user.auth_token)
         post(
             "hosted/onboarding/skip_liveness",
             None,
-            workos_sandbox_tenant.ob_config.key,
+            workos_sandbox_tenant.ob_config().key,
             basic_user.auth_token,
         )
         post(
             "hosted/onboarding/submit",
             None,
-            workos_sandbox_tenant.ob_config.key,
+            workos_sandbox_tenant.ob_config().key,
             basic_user.auth_token,
         )
 
         body = post(
             "hosted/onboarding/authorize",
             None,
-            workos_sandbox_tenant.ob_config.key,
+            workos_sandbox_tenant.ob_config().key,
             basic_user.auth_token,
         )
         validation_token = body["validation_token"]

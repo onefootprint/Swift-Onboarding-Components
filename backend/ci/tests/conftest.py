@@ -130,7 +130,7 @@ def user(workos_sandbox_tenant, twilio):
     post(
         "hosted/onboarding",
         None,
-        workos_sandbox_tenant.ob_config.key,
+        workos_sandbox_tenant.ob_config().key,
         basic_user.auth_token,
     )
 
@@ -153,7 +153,7 @@ def user(workos_sandbox_tenant, twilio):
     post(
         "hosted/onboarding/submit",
         None,
-        workos_sandbox_tenant.ob_config.key,
+        workos_sandbox_tenant.ob_config().key,
         basic_user.auth_token,
     )
 
@@ -161,7 +161,7 @@ def user(workos_sandbox_tenant, twilio):
     body = post(
         "hosted/onboarding/authorize",
         None,
-        workos_sandbox_tenant.ob_config.key,
+        workos_sandbox_tenant.ob_config().key,
         basic_user.auth_token,
     )
     validation_token = body["validation_token"]
@@ -192,6 +192,6 @@ def user(workos_sandbox_tenant, twilio):
 
 @pytest.fixture(scope="module")
 def ob_session_token(workos_tenant):
-    data = {"onboarding_config_id": workos_tenant.ob_config.id}
+    data = {"onboarding_config_id": workos_tenant.ob_config().id}
     body = post("onboarding/session", data, workos_tenant.sk.key)
     return OnboardingSessionToken(body["session_token"])

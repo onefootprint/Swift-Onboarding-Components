@@ -21,7 +21,6 @@ pub struct IdentityDocument {
     pub created_at: DateTime<Utc>,
     pub _created_at: DateTime<Utc>,
     pub _updated_at: DateTime<Utc>,
-    pub e_decryption_key: SealedVaultBytes,
     pub onboarding_id: Option<OnboardingId>,
 }
 
@@ -30,7 +29,6 @@ pub struct IdentityDocument {
 pub struct NewIdentityDocument {
     pub request_id: DocumentRequestId,
     pub user_vault_id: UserVaultId,
-    pub e_decryption_key: SealedVaultBytes,
     pub front_image_s3_url: Option<String>,
     pub back_image_s3_url: Option<String>,
     pub document_type: String,
@@ -44,7 +42,6 @@ impl IdentityDocument {
         conn: &mut PgConnection,
         request_id: DocumentRequestId,
         user_vault_id: UserVaultId,
-        e_decryption_key: SealedVaultBytes,
         front_image_s3_url: Option<String>,
         back_image_s3_url: Option<String>,
         document_type: String,
@@ -54,7 +51,6 @@ impl IdentityDocument {
         let new = NewIdentityDocument {
             request_id,
             user_vault_id,
-            e_decryption_key,
             front_image_s3_url,
             back_image_s3_url,
             document_type,
