@@ -8,6 +8,8 @@ import useUserVaultDecrypt from './use-user-vault-decrypt';
 const useDecryptUser = () => {
   const { userVaults: decryptedUsers, updateUserVault } = useUserData();
   const userVaultDecryptMutation = useUserVaultDecrypt();
+  // TODO: Decrypt ID Doc Images here
+  // https://linear.app/footprint/issue/FP-1791/make-api-call-to-decrypt-id-doc-images-in-dashboard
   const decryptUser = (
     payload: {
       userId: string;
