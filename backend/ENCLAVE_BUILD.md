@@ -1,8 +1,13 @@
 
 # Build the enclave builder
 
+> TODO: make this auto-update if rust version changes. Currently need to run this manually on @nitro-devbox!
+
+
 ```shell
-RUST_VERSION="1.64.0" docker build -t ne_builder2 \
+export RUST_VERSION="1.65.0"
+
+docker build -t ne_builder2 \
         --build-arg USER=$(whoami) \
         --build-arg USER_ID=$(id -u) \
         --build-arg GROUP_ID=$(id -g) \
