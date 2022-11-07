@@ -60,13 +60,15 @@ pub async fn post(
     state
         .db_pool
         .db_query(move |conn| -> Result<_, ApiError> {
+            // TODO lock session
             let session = JsonSession::<HandoffRecord>::get(conn, &user_auth.auth_token)?
                 .ok_or(HandoffError::HandoffSessionNotFound)?;
+            if status == session.data.status {
+                // No-op when the status is already updated
+                return Ok(());
+            }
             if status.priority() <= session.data.status.priority() {
-                return Err(HandoffError::InvalidStatusTransition(
-                    serde_json::ser::to_string(&status).unwrap(),
-                )
-                .into());
+                return Err(HandoffError::InvalidStatusTransition(status).into());
             }
             let handoff_record = HandoffRecord { status };
             JsonSession::update_or_create(conn, &user_auth.auth_token, &handoff_record, session.expires_at)?;
