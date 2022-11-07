@@ -19,7 +19,6 @@ use chrono::DateTime;
 use chrono::Utc;
 use db::models::ob_configuration::ObConfiguration;
 use db::models::ob_configuration::ObConfigurationQuery;
-use db::models::tenant::Tenant;
 use db::DbError;
 use itertools::Itertools;
 use newtypes::CollectedDataOption;
@@ -220,41 +219,4 @@ async fn patch(
     Ok(Json(ResponseData::ok(
         api_wire_types::OnboardingConfiguration::from_db((result, tenant)),
     )))
-}
-
-impl DbToApi<(ObConfiguration, Tenant)> for api_wire_types::OnboardingConfiguration {
-    fn from_db((ob_config, tenant): (ObConfiguration, Tenant)) -> Self {
-        let ObConfiguration {
-            id,
-            key,
-            name,
-            created_at,
-            must_collect_data,
-            status,
-            can_access_data,
-            is_live,
-            must_collect_identity_document,
-            can_access_identity_document_images,
-            ..
-        } = ob_config;
-        let Tenant {
-            name: org_name,
-            logo_url,
-            ..
-        } = tenant;
-        Self {
-            id,
-            key,
-            name,
-            org_name,
-            logo_url,
-            must_collect_data,
-            can_access_data,
-            must_collect_identity_document,
-            can_access_identity_document_images,
-            is_live,
-            created_at,
-            status,
-        }
-    }
 }

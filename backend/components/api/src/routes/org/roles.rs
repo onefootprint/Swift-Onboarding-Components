@@ -119,21 +119,3 @@ async fn deactivate(
     let result = api_wire_types::OrganizationRole::from_db(result);
     ResponseData::ok(result).json()
 }
-
-impl DbToApi<TenantRole> for api_wire_types::OrganizationRole {
-    fn from_db(target: TenantRole) -> Self {
-        let TenantRole {
-            id,
-            name,
-            permissions,
-            created_at,
-            ..
-        } = target;
-        Self {
-            id,
-            name,
-            permissions,
-            created_at,
-        }
-    }
-}

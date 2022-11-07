@@ -5,6 +5,7 @@ use crate::auth::tenant::SecretTenantAuthContext;
 use crate::auth::tenant::WorkOsAuthContext;
 use crate::auth::Either;
 use crate::errors::ApiError;
+use crate::serializers::UserDetail;
 use crate::types::request::PaginatedRequest;
 use crate::types::response::PaginatedResponseData;
 use crate::types::JsonApiResponse;
@@ -12,20 +13,12 @@ use crate::types::ResponseData;
 use crate::utils::db2api::DbToApi;
 use crate::utils::user_vault_wrapper::UserVaultWrapper;
 use crate::State;
-use api_wire_types::DecisionSource;
 use api_wire_types::ListUsersRequest;
-use db::models::ob_configuration::ObConfiguration;
 use db::models::onboarding::Onboarding;
-use db::models::onboarding::OnboardingInfo;
-use db::models::onboarding_decision::OnboardingDecision;
-use db::models::scoped_user::ScopedUser;
-use db::models::tenant_user::TenantUser;
-use db::models::verification_request::VerificationRequest;
 use db::scoped_user::OnboardingListQueryParams;
 use db::HasDataAttributeFields;
 
 use newtypes::FootprintUserId;
-use newtypes::LivenessSource;
 use newtypes::TenantPermission;
 use newtypes::UserVaultId;
 use newtypes::{DataAttribute, Fingerprint, Fingerprinter};
@@ -174,118 +167,4 @@ pub async fn get_detail(
         uvw.user_vault.is_portable,
     ));
     Ok(ResponseData::ok(response).json())
-}
-
-type UserDetail<'a> = (Vec<DataAttribute>, &'a [OnboardingInfo], ScopedUser, bool);
-
-impl<'a> DbToApi<UserDetail<'a>> for api_wire_types::User {
-    fn from_db((identity_data_attributes, onboarding_info, scoped_user, is_portable): UserDetail) -> Self {
-        let ScopedUser {
-            fp_user_id,
-            start_timestamp,
-            ordering_id,
-            ..
-        } = scoped_user;
-
-        api_wire_types::User {
-            id: fp_user_id,
-            is_portable,
-            identity_data_attributes,
-            start_timestamp,
-            onboardings: onboarding_info
-                .iter()
-                .map(|x| api_wire_types::Onboarding::from_db(x.clone()))
-                .collect(),
-            ordering_id,
-        }
-    }
-}
-
-impl DbToApi<OnboardingInfo> for api_wire_types::Onboarding {
-    fn from_db((onboarding, config, liveness_event, insight, decision): OnboardingInfo) -> Self {
-        let Onboarding {
-            start_timestamp,
-            status,
-            ..
-        } = onboarding;
-        let db::models::ob_configuration::ObConfiguration {
-            name,
-            can_access_data,
-            can_access_identity_document_images,
-            ..
-        } = config;
-
-        let can_access_data_attributes = can_access_data.iter().flat_map(|x| x.attributes()).collect();
-        api_wire_types::Onboarding {
-            id: onboarding.id,
-            name,
-            config_id: config.id,
-            status,
-            timestamp: start_timestamp,
-            is_liveness_skipped: liveness_event
-                .map(|s| matches!(s.liveness_source, LivenessSource::Skipped))
-                .unwrap_or_default(),
-            insight_event: api_wire_types::InsightEvent::from_db(insight),
-            can_access_data,
-            can_access_data_attributes,
-            can_access_identity_document_images,
-            latest_decision: decision.map(api_wire_types::OnboardingDecision::from_db),
-        }
-    }
-}
-
-impl DbToApi<(OnboardingDecision, Option<TenantUser>)> for api_wire_types::OnboardingDecision {
-    fn from_db((decision, tenant_user): (OnboardingDecision, Option<TenantUser>)) -> Self {
-        Self::from_db((decision, None, None, tenant_user))
-    }
-}
-
-type OnboardingDecisionInfo = (
-    OnboardingDecision,
-    Option<ObConfiguration>,
-    Option<Vec<VerificationRequest>>,
-    Option<TenantUser>,
-);
-
-impl DbToApi<OnboardingDecisionInfo> for api_wire_types::OnboardingDecision {
-    fn from_db((decision, ob_configuration, vrs, tenant_user): OnboardingDecisionInfo) -> Self {
-        let OnboardingDecision {
-            id,
-            verification_status,
-            compliance_status,
-            created_at,
-            ..
-        } = decision;
-        let source = if let Some(tenant_user) = tenant_user {
-            DecisionSource::Organization {
-                member: tenant_user.email,
-            }
-        } else {
-            DecisionSource::Footprint
-        };
-        let vendors = vrs.map(|vrs| vrs.into_iter().map(|vr| vr.vendor).collect());
-        api_wire_types::OnboardingDecision {
-            id,
-            verification_status,
-            compliance_status,
-            timestamp: created_at,
-            source,
-            ob_configuration: ob_configuration.map(api_wire_types::LiteObConfiguration::from_db),
-            vendors,
-        }
-    }
-}
-
-impl DbToApi<ObConfiguration> for api_wire_types::LiteObConfiguration {
-    fn from_db(ob_configuration: ObConfiguration) -> Self {
-        let ObConfiguration {
-            must_collect_data,
-            must_collect_identity_document,
-            ..
-        } = ob_configuration;
-        api_wire_types::LiteObConfiguration {
-            must_collect_data,
-            must_collect_identity_document,
-        }
-    }
 }

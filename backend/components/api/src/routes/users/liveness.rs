@@ -6,7 +6,6 @@ use crate::errors::ApiError;
 use crate::types::response::ResponseData;
 use crate::utils::db2api::DbToApi;
 use crate::State;
-use db::models::insight_event::InsightEvent;
 use db::models::webauthn_credential::WebauthnCredential;
 use newtypes::FootprintUserId;
 use newtypes::TenantPermission;
@@ -39,12 +38,4 @@ pub async fn get(
         .map(api_wire_types::LivenessEvent::from_db)
         .collect::<Vec<_>>();
     Ok(Json(ResponseData::ok(response)))
-}
-
-impl DbToApi<(WebauthnCredential, InsightEvent)> for api_wire_types::LivenessEvent {
-    fn from_db((_, insight_event): (WebauthnCredential, InsightEvent)) -> Self {
-        Self {
-            insight_event: api_wire_types::InsightEvent::from_db(insight_event),
-        }
-    }
 }

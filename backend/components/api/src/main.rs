@@ -14,6 +14,7 @@ mod decision;
 mod enclave_client;
 mod errors;
 mod routes;
+mod serializers;
 use self::routes::*;
 mod s3;
 mod state;

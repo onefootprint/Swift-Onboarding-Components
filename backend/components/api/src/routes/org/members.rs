@@ -12,7 +12,6 @@ use crate::types::ResponseData;
 use crate::utils::db2api::DbToApi;
 use crate::State;
 use chrono::{DateTime, Utc};
-use db::models::tenant_role::TenantRole;
 use db::models::tenant_user::{TenantUser, TenantUserUpdate};
 use newtypes::TenantPermission;
 use newtypes::TenantRoleId;
@@ -149,29 +148,4 @@ async fn deactivate(
         .await?;
 
     EmptyResponse::ok().json()
-}
-
-impl DbToApi<(TenantUser, TenantRole)> for api_wire_types::OrganizationMember {
-    fn from_db((user, role): (TenantUser, TenantRole)) -> Self {
-        let TenantUser {
-            id,
-            email,
-            last_login_at,
-            created_at,
-            ..
-        } = user;
-        let TenantRole {
-            name: role_name,
-            id: role_id,
-            ..
-        } = role;
-        Self {
-            id,
-            email: email.0,
-            last_login_at,
-            created_at,
-            role_name,
-            role_id,
-        }
-    }
 }
