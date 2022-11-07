@@ -12,6 +12,7 @@ use newtypes::{
 };
 use serde::{Deserialize, Serialize};
 
+use super::ob_configuration::ObConfiguration;
 use super::onboarding::Onboarding;
 use super::tenant_user::TenantUser;
 use super::user_timeline::UserTimeline;
@@ -113,12 +114,16 @@ impl OnboardingDecision {
     pub fn get_bulk(
         conn: &mut PgConnection,
         ids: Vec<&OnboardingDecisionId>,
-    ) -> DbResult<Vec<(Self, Option<TenantUser>)>> {
-        use crate::schema::tenant_user;
+    ) -> DbResult<Vec<(Self, ObConfiguration, Option<TenantUser>)>> {
+        use crate::schema::{ob_configuration, onboarding, tenant_user};
         let results = onboarding_decision::table
+            .inner_join(onboarding::table.inner_join(ob_configuration::table))
             .left_join(tenant_user::table)
             .filter(onboarding_decision::id.eq_any(ids))
-            .get_results(conn)?;
+            .get_results::<(Self, (Onboarding, ObConfiguration), Option<TenantUser>)>(conn)?
+            .into_iter()
+            .map(|(ob_decision, (_, ob_config), tenant_user)| (ob_decision, ob_config, tenant_user))
+            .collect();
 
         Ok(results)
     }

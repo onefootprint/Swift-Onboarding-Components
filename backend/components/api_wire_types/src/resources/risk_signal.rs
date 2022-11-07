@@ -13,12 +13,8 @@ pub struct RiskSignal {
     pub timestamp: chrono::DateTime<Utc>,
     pub deactivated_at: Option<chrono::DateTime<Utc>>,
     pub vendors: Vec<Vendor>,
-    #[serde(skip_serializing_if = "is_null")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub raw_responses: Option<Vec<RiskSignalRawResponse>>,
-}
-
-fn is_null<T>(value: &Option<T>) -> bool {
-    value.is_none()
 }
 
 export_schema!(RiskSignal);

@@ -14,6 +14,7 @@ use crate::utils::user_vault_wrapper::UserVaultWrapper;
 use crate::State;
 use api_wire_types::DecisionSource;
 use api_wire_types::ListUsersRequest;
+use db::models::ob_configuration::ObConfiguration;
 use db::models::onboarding::Onboarding;
 use db::models::onboarding::OnboardingInfo;
 use db::models::onboarding_decision::OnboardingDecision;
@@ -233,8 +234,21 @@ impl DbToApi<OnboardingInfo> for api_wire_types::Onboarding {
 }
 
 impl DbToApi<(OnboardingDecision, Option<TenantUser>)> for api_wire_types::OnboardingDecision {
-    fn from_db(d: (OnboardingDecision, Option<TenantUser>)) -> Self {
-        let (decision, tenant_user) = d;
+    fn from_db((decision, tenant_user): (OnboardingDecision, Option<TenantUser>)) -> Self {
+        Self::from_db((decision, None, tenant_user))
+    }
+}
+
+impl DbToApi<(OnboardingDecision, Option<ObConfiguration>, Option<TenantUser>)>
+    for api_wire_types::OnboardingDecision
+{
+    fn from_db(
+        (decision, ob_configuration, tenant_user): (
+            OnboardingDecision,
+            Option<ObConfiguration>,
+            Option<TenantUser>,
+        ),
+    ) -> Self {
         let OnboardingDecision {
             id,
             verification_status,
@@ -255,6 +269,21 @@ impl DbToApi<(OnboardingDecision, Option<TenantUser>)> for api_wire_types::Onboa
             compliance_status,
             timestamp: created_at,
             source,
+            ob_configuration: ob_configuration.map(api_wire_types::LiteObConfiguration::from_db),
+        }
+    }
+}
+
+impl DbToApi<ObConfiguration> for api_wire_types::LiteObConfiguration {
+    fn from_db(ob_configuration: ObConfiguration) -> Self {
+        let ObConfiguration {
+            must_collect_data,
+            must_collect_identity_document,
+            ..
+        } = ob_configuration;
+        api_wire_types::LiteObConfiguration {
+            must_collect_data,
+            must_collect_identity_document,
         }
     }
 }
