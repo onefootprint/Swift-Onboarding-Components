@@ -48,7 +48,7 @@ const securityHeaders = [
 module.exports = {
   productionBrowserSourceMaps: true,
   pageExtensions: ['page.tsx', 'page.ts', 'page.jsx', 'page.js'],
-  reactStrictMode: true,
+  reactStrictMode: false,
   compiler: {
     styledComponents: true,
   },
