@@ -151,8 +151,8 @@ class TestDashboard:
     def test_config_create(self, workos_sandbox_tenant, basic_user):
         data = dict(
             name="Acme Bank Loan",
-            must_collect_data=["ssn4"],
-            can_access_data=["ssn4"],
+            must_collect_data=["ssn4", "phone_number", "email", "name", "full_address"],
+            can_access_data=["ssn4", "phone_number", "email", "name", "full_address"],
         )
         body = post("org/onboarding_configs", data, workos_sandbox_tenant.sk.key)
         ob_config = body
@@ -163,11 +163,19 @@ class TestDashboard:
     @pytest.mark.parametrize(
         "must_collect,can_access,expected_status",
         [
-            (["ssn4", "partial_address", "name"], [], 200),
-            (["ssn4", "ssn9"], [], 400),
-            (["full_address", "partial_address"], [], 400),
+            (["ssn4", "name", "full_address", "email", "phone_number"], [], 200),
             (
-                ["first_name", "last_name"],
+                ["ssn4", "ssn9", "name", "full_address", "email", "phone_number"],
+                [],
+                400,
+            ),
+            (
+                ["full_address", "partial_address", "name", "email", "phone_number"],
+                [],
+                400,
+            ),
+            (
+                ["name", "email", "phone_number", "full_address"],
                 ["ssn9"],
                 400,
             ),  # can_access must be < must_collect

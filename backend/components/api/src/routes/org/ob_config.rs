@@ -97,6 +97,13 @@ pub struct CreateOnboardingConfigurationRequest {
     can_access_identity_document_images: bool,
 }
 
+const REQUIRED_FIELDS: [CollectedDataOption; 4] = [
+    CollectedDataOption::Name,
+    CollectedDataOption::FullAddress,
+    CollectedDataOption::Email,
+    CollectedDataOption::PhoneNumber,
+];
+
 impl CreateOnboardingConfigurationRequest {
     fn validate(&self) -> Result<(), TenantError> {
         let invalid_config = self
@@ -110,23 +117,32 @@ impl CreateOnboardingConfigurationRequest {
             .map(|(_, g)| g.map(|x| x.1).collect())
             .find(|x: &Vec<_>| x.len() > 1);
         if let Some(invalid_config) = invalid_config {
-            Err(TenantError::ValidationError(format!(
+            return Err(TenantError::ValidationError(format!(
                 "Cannot provide both {} and {}",
                 invalid_config[0], invalid_config[1]
-            )))
+            )));
         } else if !HashSet::<&CollectedDataOption>::from_iter(self.can_access_data.iter()).is_subset(
             &HashSet::<&CollectedDataOption>::from_iter(self.must_collect_data.iter()),
         ) {
-            Err(TenantError::ValidationError(
+            return Err(TenantError::ValidationError(
                 "Decryptable fields must be a subset of collected fields".to_owned(),
-            ))
+            ));
         } else if self.can_access_identity_document_images && !self.must_collect_identity_document {
-            Err(TenantError::ValidationError(
+            return Err(TenantError::ValidationError(
                 "Cannot access document images without collecting them".to_owned(),
-            ))
-        } else {
-            Ok(())
+            ));
         }
+        let missing_required_fields: Vec<_> = REQUIRED_FIELDS
+            .into_iter()
+            .filter(|x| !self.must_collect_data.contains(x))
+            .collect();
+        if !missing_required_fields.is_empty() {
+            return Err(TenantError::ValidationError(format!(
+                "All ob configurations must require {:?}",
+                missing_required_fields
+            )));
+        }
+        Ok(())
     }
 }
 
