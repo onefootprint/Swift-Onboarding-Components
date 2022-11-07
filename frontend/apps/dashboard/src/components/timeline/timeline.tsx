@@ -1,3 +1,4 @@
+import { useTranslation } from '@onefootprint/hooks';
 import { LoadingIndicator, Typography } from '@onefootprint/ui';
 import React, { Fragment } from 'react';
 import styled, { css } from 'styled-components';
@@ -20,8 +21,9 @@ const Timeline = ({
   isLoading,
   connectorVariant = 'default',
 }: TimelineProps) => {
+  const { t } = useTranslation('components.timeline');
   if (!isLoading && !items.length) {
-    return <Typography variant="body-4">No items</Typography>;
+    return <Typography variant="body-4">{t('empty')}</Typography>;
   }
   return (
     <>
@@ -45,9 +47,9 @@ const Timeline = ({
             <IconContainer>{item.iconComponent}</IconContainer>
             <HeaderContainer>{item.headerComponent}</HeaderContainer>
             {i !== items.length - 1 && <Connector variant={connectorVariant} />}
-            <BodyContainer>
-              {item.bodyComponent && item.bodyComponent}
-            </BodyContainer>
+            {item.bodyComponent && (
+              <BodyContainer>{item.bodyComponent}</BodyContainer>
+            )}
           </Fragment>
         ))}
       </TimelineContainer>

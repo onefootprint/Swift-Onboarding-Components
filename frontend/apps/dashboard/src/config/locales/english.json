@@ -74,6 +74,9 @@
         "title": "Sandbox mode.",
         "disable": "Disable",
         "tooltip": "To access live data you have to activate your account first. Please contact us to do so."
+      },
+      "timeline": {
+        "empty": "No items"
       }
     }
   },
@@ -172,6 +175,9 @@
         "image": {
           "alt": "A penguin playing with his phone"
         }
+      },
+      "audit-trail": {
+        "title": "Audit trail"
       },
       "user-info": {
         "cta": {

@@ -1,3 +1,4 @@
+import { useTranslation } from '@onefootprint/hooks';
 import { Box, Divider, Shimmer, Typography } from '@onefootprint/ui';
 import React from 'react';
 import Timeline from 'src/components/timeline';
@@ -11,11 +12,13 @@ type AuditTrailProps = {
 };
 
 const AuditTrail = ({ user }: AuditTrailProps) => {
+  const { t } = useTranslation('pages.user-details.audit-trail');
   const getAuditTrail = useGetAuditTrail(user.id);
+
   return (
     <>
       <Typography variant="label-1" as="h2">
-        Audit trail
+        {t('audit-trail')}
       </Typography>
       <Box sx={{ marginTop: 5, marginBottom: 5 }}>
         <Divider />
