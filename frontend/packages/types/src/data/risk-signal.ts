@@ -7,7 +7,7 @@ export enum RiskSignalSeverity {
 }
 
 export type RiskSignal = {
-  deactivated_at: Date | null;
+  deactivatedAt: Date | null;
   description: string;
   id: string;
   onboardingDecisionId: string;

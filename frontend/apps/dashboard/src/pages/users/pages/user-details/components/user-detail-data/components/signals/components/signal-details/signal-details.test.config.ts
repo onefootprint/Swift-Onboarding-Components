@@ -14,7 +14,7 @@ export const riskSignalDetailsFixture: RiskSignal = {
   severity: RiskSignalSeverity.Low,
   scopes: [SignalAttribute.phoneNumber],
   timestamp: '2022-10-24T21:56:12.682238Z',
-  deactivated_at: null,
+  deactivatedAt: null,
   vendors: ['idology'],
 };
 

@@ -13,7 +13,7 @@ export const signalsFixture: RiskSignal[] = [
     reasonCode: 'mobile_number',
     description:
       "The consumer's phone number is possibly a wireless mobile number.",
-    deactivated_at: null,
+    deactivatedAt: null,
     onboardingDecisionId: 'decision_d4uTQ1FIh6cKvDxeRJzyZK',
     vendors: ['idology'],
     timestamp: '2022-10-24T21:56:12.682238Z',
@@ -27,7 +27,7 @@ export const signalsFixture: RiskSignal[] = [
     severity: RiskSignalSeverity.Low,
     scopes: [SignalAttribute.email],
     timestamp: '2022-10-24T21:56:12.682238Z',
-    deactivated_at: null,
+    deactivatedAt: null,
     vendors: ['idology'],
   },
 ];

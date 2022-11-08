@@ -1,12 +1,12 @@
 import themes from '@onefootprint/design-tokens';
-import { HookWrapper, renderHook } from '@onefootprint/test-utils';
+import { renderHook, Wrapper } from '@onefootprint/test-utils';
 
 import useSX from './use-sx';
 
 describe('useSX', () => {
   describe('when the parameter is undefined', () => {
     it('should return an empty object', () => {
-      const { result } = renderHook(() => useSX(), { wrapper: HookWrapper });
+      const { result } = renderHook(() => useSX(), { wrapper: Wrapper });
       expect(result.current).toMatchObject({});
     });
   });
@@ -16,7 +16,7 @@ describe('useSX', () => {
       const { result } = renderHook(
         () =>
           useSX({ backgroundColor: 'primary', marginX: 3, display: 'flex' }),
-        { wrapper: HookWrapper },
+        { wrapper: Wrapper },
       );
       expect(result.current).toMatchObject({
         backgroundColor: themes.light.backgroundColor.primary,

@@ -36,12 +36,6 @@ export const Wrapper = ({ children }: WrapperProps) => (
   </React.StrictMode>
 );
 
-export const HookWrapper = ({ children }: WrapperProps) => (
-  <React.StrictMode>
-    <ThemeProvider theme={themes.light}>{children}</ThemeProvider>
-  </React.StrictMode>
-);
-
 export const customRender = (Component?: React.ReactNode) => {
   throwOnConsoleErrors();
   return render(<Wrapper>{Component}</Wrapper>);

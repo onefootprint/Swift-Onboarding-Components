@@ -36,7 +36,7 @@ const useSignals = () => {
   return useQuery(
     ['riskSignals', authHeaders, userId, params],
     () => getSignals({ authHeaders, userId, params }),
-    { enabled: !!userId && typeof userId === 'string' },
+    { enabled: !!userId },
   );
 };
 
