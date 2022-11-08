@@ -25,6 +25,7 @@ const Timeline = ({
   if (!isLoading && !items.length) {
     return <Typography variant="body-4">{t('empty')}</Typography>;
   }
+
   return (
     <>
       <TimelineContainer>
@@ -33,8 +34,8 @@ const Timeline = ({
           <Fragment key={`${item.timestamp}-${i}`}>
             <Typography variant="label-3" color="tertiary">
               {new Date(item.timestamp).toLocaleString('en-us', {
-                month: 'numeric',
-                day: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
                 year: '2-digit',
               })}
             </Typography>
@@ -47,9 +48,7 @@ const Timeline = ({
             <IconContainer>{item.iconComponent}</IconContainer>
             <HeaderContainer>{item.headerComponent}</HeaderContainer>
             {i !== items.length - 1 && <Connector variant={connectorVariant} />}
-            {item.bodyComponent && (
-              <BodyContainer>{item.bodyComponent}</BodyContainer>
-            )}
+            <BodyContainer>{item.bodyComponent}</BodyContainer>
           </Fragment>
         ))}
       </TimelineContainer>
@@ -100,9 +99,6 @@ const Connector = styled.div<{
 
 const HeaderContainer = styled.div`
   grid-column-start: 4;
-  ${({ theme }) => css`
-    margin-left: ${theme.spacing[2]};
-  `};
 `;
 
 const BodyContainer = styled.div`

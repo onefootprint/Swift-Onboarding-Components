@@ -46,6 +46,18 @@
     "email": "Email",
     "phone_number": "Phone number"
   },
+  "id-doc-type": {
+    "id_card": "ID card",
+    "drivers_license": "Driver's License",
+    "passport": "Passport"
+  },
+  "vendors": {
+    "idology": "Idology",
+    "socure": "Socure",
+    "lexis_nexis": "LexisNexis",
+    "experian": "Experian",
+    "twilio": "Twilio"
+  },
   "collected-id-doc-attributes": {
     "id-doc-image": "ID Document"
   },
@@ -176,9 +188,6 @@
           "alt": "A penguin playing with his phone"
         }
       },
-      "audit-trail": {
-        "title": "Audit trail"
-      },
       "user-info": {
         "cta": {
           "select-all": "Select all",
@@ -304,6 +313,50 @@
             "title": "Raw response",
             "show": "Show",
             "hide": "Hide"
+          }
+        }
+      },
+      "audit-trail": {
+        "title": "Audit trail",
+        "empty": "No audit trail entries",
+        "timeline": {
+          "biometric-registered-event": {
+            "title": "Liveness check succeeded",
+            "attested-by": "Attested by {{attestations}}",
+            "ip-address": "{{ipAddress}} (IP Address)"
+          },
+          "id-doc-uploaded-event": {
+            "title": "Collected "
+          },
+          "kyc-data-collected-event": {
+            "title": "Collected "
+          },
+          "onboarding-decision-event": {
+            "verified-by-footprint": "Verified by Footprint",
+            "not-verified-by-footprint": "Could not be verified by Footprint",
+            "verified": "Verified",
+            "not-verified": "Not Verified",
+            "verification-status": {
+              "information_required": "Step up with additional information required",
+              "failed": "Failed",
+              "manual_review": "Manual review required",
+              "verified": "Verified ",
+              "needs_id_document": "Step up with ID document required"
+            },
+            "with": " with ",
+            "org-overwrite": {
+              "title": "Marked as {{decision}} by {{user}}",
+              "see-details": "See details",
+              "drawer": {
+                "title": "Review details",
+                "decision": "Decision",
+                "reviewer": "Reviewer",
+                "date": "Date",
+                "reason": "Reason",
+                "note": "Note",
+                "pin-note": "Pin note to the top of the page"
+              }
+            }
           }
         }
       }

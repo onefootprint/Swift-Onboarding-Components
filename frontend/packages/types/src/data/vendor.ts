@@ -1,4 +1,4 @@
-export enum Vendor {
+enum Vendor {
   footprint = 'footprint',
   idology = 'idology',
   socure = 'socure',
@@ -7,11 +7,4 @@ export enum Vendor {
   twilio = 'twilio',
 }
 
-export const vendorToDisplayName: Record<Vendor, String> = {
-  [Vendor.footprint]: 'Footprint',
-  [Vendor.idology]: 'IDology',
-  [Vendor.socure]: 'Socure',
-  [Vendor.lexisNexis]: 'LexisNexis',
-  [Vendor.experian]: 'Experian',
-  [Vendor.twilio]: 'Twilio',
-};
+export default Vendor;
