@@ -17,13 +17,13 @@
     "@onefootprint/jest-presets": "*",
     "@types/axios": "^0.14.0",
     "axios-case-converter": "^0.9.0",
-    "axios": "^0.27.2",
+    "axios": "^1.1.3",
     "eslint-config-footprint": "*",
     "tsconfig": "*",
     "typescript": "4.8.4"
   },
   "peerDependencies": {
-    "axios": "^0.27.2",
+    "axios": "^1.1.3",
     "axios-case-converter": "^0.9.0"
   },
   "jest": {
