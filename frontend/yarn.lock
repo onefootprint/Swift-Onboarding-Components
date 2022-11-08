@@ -7646,7 +7646,7 @@ enhanced-resolve@^4.5.0:
     memory-fs "^0.5.0"
     tapable "^1.0.0"
 
-enhanced-resolve@^5.10.0, enhanced-resolve@^5.7.0:
+enhanced-resolve@^5.10.0:
   version "5.10.0"
   resolved "https://registry.yarnpkg.com/enhanced-resolve/-/enhanced-resolve-5.10.0.tgz#0dc579c3bb2a1032e357ac45b8f3a6f3ad4fb1e6"
   integrity sha512-T0yTFjdpldGY8PmuXXR0PyQ1ufZpEGiHVrp7zHKB7jdR4qlmZHhONVM5AQOAWXuF/w3dnHbEQVrNptJgt7F+cQ==
@@ -12533,14 +12533,6 @@ next-compose-plugins@^2.2.1:
   resolved "https://registry.yarnpkg.com/next-compose-plugins/-/next-compose-plugins-2.2.1.tgz#020fc53f275a7e719d62521bef4300fbb6fde5ab"
   integrity sha512-OjJ+fV15FXO2uQXQagLD4C0abYErBjyjE0I0FHpOEIB8upw0hg1ldFP6cqHTJBH1cZqy96OeR3u1dJ+Ez2D4Bg==
 
-next-transpile-modules@9.0.0:
-  version "9.0.0"
-  resolved "https://registry.yarnpkg.com/next-transpile-modules/-/next-transpile-modules-9.0.0.tgz#133b1742af082e61cc76b02a0f12ffd40ce2bf90"
-  integrity sha512-VCNFOazIAnXn1hvgYYSTYMnoWgKgwlYh4lm1pKbSfiB3kj5ZYLcKVhfh3jkPOg1cnd9DP+pte9yCUocdPEUBTQ==
-  dependencies:
-    enhanced-resolve "^5.7.0"
-    escalade "^3.1.1"
-
 next@13.0.2:
   version "13.0.2"
   resolved "https://registry.yarnpkg.com/next/-/next-13.0.2.tgz#b8c8642c70f736ed91105645391d335fc51c8f62"
@@ -13916,10 +13908,10 @@ react-highlight-words@^0.18.0:
     memoize-one "^4.0.0"
     prop-types "^15.5.8"
 
-react-hook-form@^7.36.1:
-  version "7.38.0"
-  resolved "https://registry.yarnpkg.com/react-hook-form/-/react-hook-form-7.38.0.tgz#53d6a68df587ce4ce88352f63e0ecc7fc8779320"
-  integrity sha512-gxWW1kMeru9xR1GoR+Iw4hA+JBOM3SHfr4DWCUKY0xc7Vv1MLsF109oHtBeWl9shcyPFx67KHru44DheN0XY5A==
+react-hook-form@^7.39.1:
+  version "7.39.1"
+  resolved "https://registry.yarnpkg.com/react-hook-form/-/react-hook-form-7.39.1.tgz#ded87d4b3f6692d1f9219515f78ca282b6e1ebf7"
+  integrity sha512-MiF9PCILN5KulhSGbnjohMiTOrB47GerDTichMNP0y2cPUu1GTRFqbunOxCE9N1499YTLMV/ne4gFzqCp1rxrQ==
 
 react-i18next@^11.18.6:
   version "11.18.6"
