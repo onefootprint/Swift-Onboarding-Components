@@ -6,8 +6,8 @@ import { useFormContext } from 'react-hook-form';
 import { User } from 'src/pages/users/types/user.types';
 
 import { IdDocDataAttribute } from '../../../../../../../../../../types/vault-data.types';
+import DataSection from '../../../data-section';
 import isCheckboxDisabled from '../../utils/is-checkbox-disabled';
-import DataContainer from '../data-container';
 
 type IdDocSectionProps = {
   user: User;
@@ -19,7 +19,7 @@ const IdDocSection = ({ user }: IdDocSectionProps) => {
   const { idDoc } = user.vaultData;
 
   return (
-    <DataContainer iconComponent={IcoIdCard24} title={t('title')}>
+    <DataSection iconComponent={IcoIdCard24} title={t('title')}>
       <Checkbox
         {...register(`idDoc.${IdDocDataAttribute.frontImage}`)}
         disabled={
@@ -27,7 +27,7 @@ const IdDocSection = ({ user }: IdDocSectionProps) => {
         }
         label={allT('collected-id-doc-attributes.id-doc-image')}
       />
-    </DataContainer>
+    </DataSection>
   );
 };
 

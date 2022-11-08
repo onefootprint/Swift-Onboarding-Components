@@ -6,7 +6,7 @@ import React from 'react';
 import { useFormContext } from 'react-hook-form';
 import { User } from 'src/pages/users/types/user.types';
 
-import DataContainer from '../data-container';
+import DataSection from '../../../data-section';
 import useFormState from './hooks/use-form-state';
 
 type AddressSectionProps = {
@@ -52,7 +52,7 @@ const AddressSection = ({ user }: AddressSectionProps) => {
   };
 
   return (
-    <DataContainer
+    <DataSection
       iconComponent={IcoBuilding24}
       title={t('address.title')}
       renderCta={() =>
@@ -108,7 +108,7 @@ const AddressSection = ({ user }: AddressSectionProps) => {
           label={allT('user-data-attributes.state')}
         />
       )}
-    </DataContainer>
+    </DataSection>
   );
 };
 

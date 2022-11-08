@@ -6,7 +6,7 @@ import React from 'react';
 import { useFormContext } from 'react-hook-form';
 import { User } from 'src/pages/users/types/user.types';
 
-import DataContainer from '../data-container';
+import DataSection from '../../../data-section';
 import useFormState from './hooks/use-form-state';
 
 type BasicSectionProps = {
@@ -43,7 +43,7 @@ const BasicSection = ({ user }: BasicSectionProps) => {
   };
 
   return (
-    <DataContainer
+    <DataSection
       iconComponent={IcoFileText224}
       title={t('basic.title')}
       renderCta={() =>
@@ -78,7 +78,7 @@ const BasicSection = ({ user }: BasicSectionProps) => {
           label={allT('collected-kyc-data-options.phone_number')}
         />
       )}
-    </DataContainer>
+    </DataSection>
   );
 };
 

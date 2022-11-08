@@ -6,7 +6,7 @@ import React from 'react';
 import { useFormContext } from 'react-hook-form';
 import { User } from 'src/pages/users/types/user.types';
 
-import DataContainer from '../data-container';
+import DataSection from '../../../data-section';
 import useFormState from './hooks/use-form-state';
 
 type IdentitySectionProps = {
@@ -43,7 +43,7 @@ const IdentitySection = ({ user }: IdentitySectionProps) => {
   };
 
   return (
-    <DataContainer
+    <DataSection
       iconComponent={IcoUserCircle24}
       title={t('identity.title')}
       renderCta={() =>
@@ -79,7 +79,7 @@ const IdentitySection = ({ user }: IdentitySectionProps) => {
           label={allT('collected-kyc-data-options.dob')}
         />
       )}
-    </DataContainer>
+    </DataSection>
   );
 };
 

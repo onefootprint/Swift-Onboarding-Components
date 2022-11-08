@@ -3,20 +3,20 @@ import { Box, Typography } from '@onefootprint/ui';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-type DataContainerProps = {
-  iconComponent: Icon;
+export type DataSectionProps = {
   children: React.ReactNode;
-  title: string;
+  iconComponent: Icon;
   renderCta?: () => React.ReactNode;
+  title: string;
 };
 
-const DataContainer = ({
-  iconComponent: IconComponent,
-  title,
+const DataSection = ({
   children,
+  iconComponent: IconComponent,
   renderCta,
-}: DataContainerProps) => (
-  <StyledContainer>
+  title,
+}: DataSectionProps) => (
+  <DataSectionContainer>
     <Header>
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
         <IconComponent />
@@ -24,14 +24,14 @@ const DataContainer = ({
       </Box>
       {renderCta?.()}
     </Header>
-    <RowContainer>{children}</RowContainer>
-  </StyledContainer>
+    <Fieldset>{children}</Fieldset>
+  </DataSectionContainer>
 );
 
-const StyledContainer = styled.div`
+const DataSectionContainer = styled.div`
   ${({ theme }) => css`
-    border: 1px solid ${theme.borderColor.tertiary};
     border-radius: ${theme.spacing[2]};
+    border: ${theme.borderWidth[1]} solid ${theme.borderColor.tertiary};
     height: 100%;
   `};
 `;
@@ -47,7 +47,7 @@ const Header = styled.header`
   `};
 `;
 
-const RowContainer = styled.div`
+const Fieldset = styled.fieldset`
   ${({ theme }) => css`
     display: flex;
     flex-direction: column;
@@ -56,4 +56,4 @@ const RowContainer = styled.div`
   `};
 `;
 
-export default DataContainer;
+export default DataSection;

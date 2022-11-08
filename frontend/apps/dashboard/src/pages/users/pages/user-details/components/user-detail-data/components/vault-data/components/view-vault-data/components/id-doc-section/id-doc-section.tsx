@@ -6,7 +6,7 @@ import {
   UserVaultData,
 } from 'src/pages/users/types/vault-data.types';
 
-import DataSection from '../data-section';
+import DataSection from '../../../data-section';
 import ImageDataRow from './components/image-data-row';
 
 type IdDocSectionProps = {

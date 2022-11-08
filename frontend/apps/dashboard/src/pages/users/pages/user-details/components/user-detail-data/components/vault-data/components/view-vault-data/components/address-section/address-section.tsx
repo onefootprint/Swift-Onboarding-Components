@@ -4,9 +4,8 @@ import { UserDataAttribute } from '@onefootprint/types';
 import React from 'react';
 import { UserVaultData } from 'src/pages/users/types/vault-data.types';
 
-// import RiskSignalsOverview from '../../../risk-signals-overview';
+import DataSection from '../../../data-section';
 import DataRow from '../data-row';
-import DataSection from '../data-section';
 
 type AddressSectionProps = {
   vaultData: UserVaultData;
@@ -23,41 +22,7 @@ const AddressSection = ({ vaultData }: AddressSectionProps) => {
   const state = kycData[UserDataAttribute.state];
 
   return (
-    <DataSection
-      // renderFooter={() => (
-      //   <RiskSignalsOverview
-      //     high={[
-      //       {
-      //         id: '1',
-      //         severity: 'high',
-      //         scope: 'Address',
-      //         note: 'Warm Address Alert',
-      //         noteDetails: 'Lorem Ipsum dolor simet at magna lorem ipsum',
-      //       },
-      //     ]}
-      //     medium={[
-      //       {
-      //         id: '2',
-      //         severity: 'medium',
-      //         scope: 'Address',
-      //         note: 'Street Name Does Not Match',
-      //         noteDetails: 'Lorem Ipsum dolor simet at magna lorem ipsum',
-      //       },
-      //     ]}
-      //     low={[
-      //       {
-      //         id: '3',
-      //         severity: 'low',
-      //         scope: 'Address',
-      //         note: 'Zip Code Does Not Match',
-      //         noteDetails: 'Lorem Ipsum dolor simet at magna lorem ipsum',
-      //       },
-      //     ]}
-      //   />
-      // )}
-      iconComponent={IcoBuilding24}
-      title={t('title')}
-    >
+    <DataSection iconComponent={IcoBuilding24} title={t('title')}>
       {country !== undefined && (
         <DataRow title={allT('user-data-attributes.country')} data={country} />
       )}
