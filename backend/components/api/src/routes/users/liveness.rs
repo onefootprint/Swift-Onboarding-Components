@@ -6,7 +6,6 @@ use crate::errors::ApiError;
 use crate::types::response::ResponseData;
 use crate::utils::db2api::DbToApi;
 use crate::State;
-use db::models::webauthn_credential::WebauthnCredential;
 use newtypes::FootprintUserId;
 use newtypes::TenantPermission;
 use paperclip::actix::{api_v2_operation, get, web, web::Json};
@@ -26,14 +25,19 @@ pub async fn get(
     let is_live = auth.is_live()?;
     let footprint_user_id = request.into_inner();
 
-    let creds = state
+    let liveness_events = state
         .db_pool
         .db_query(move |conn| {
-            WebauthnCredential::get_for_scoped_user(conn, &tenant_id, &footprint_user_id, is_live)
+            db::models::liveness_event::LivenessEvent::get_for_scoped_user(
+                conn,
+                &footprint_user_id,
+                &tenant_id,
+                is_live,
+            )
         })
         .await??;
 
-    let response = creds
+    let response = liveness_events
         .into_iter()
         .map(api_wire_types::LivenessEvent::from_db)
         .collect::<Vec<_>>();

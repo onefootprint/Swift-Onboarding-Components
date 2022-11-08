@@ -10,3 +10,5 @@ export_schema!(VerificationStatus);
 export_schema!(ComplianceStatus);
 export_schema!(Vendor);
 export_schema!(OnboardingStatus);
+export_schema!(LivenessSource);
+export_schema!(LivenessAttributes);

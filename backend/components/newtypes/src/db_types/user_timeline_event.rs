@@ -3,16 +3,19 @@ use diesel_as_jsonb::AsJsonb;
 use paperclip::actix::Apiv2Schema;
 use serde::{Deserialize, Serialize};
 
-use crate::{CollectedDataOption, IdentityDocumentId, OnboardingDecisionId, WebauthnCredentialId};
+use crate::{
+    CollectedDataOption, IdentityDocumentId, LivenessEventId,
+    OnboardingDecisionId, WebauthnCredentialId,
+};
 
 #[derive(Debug, Clone, Serialize, Deserialize, Apiv2Schema, AsJsonb)]
 #[serde(rename_all = "snake_case")]
 #[serde(tag = "kind", content = "data")]
 pub enum DbUserTimelineEvent {
     DataCollected(DataCollectedInfo),
-    BiometricRegistered(BiometricRegisteredInfo),
     DocumentUploaded(DocumentUploadedInfo),
     OnboardingDecision(OnboardingDecisionInfo),
+    Liveness(LivenessInfo),
 }
 
 impl From<DataCollectedInfo> for DbUserTimelineEvent {
@@ -21,11 +24,6 @@ impl From<DataCollectedInfo> for DbUserTimelineEvent {
     }
 }
 
-impl From<BiometricRegisteredInfo> for DbUserTimelineEvent {
-    fn from(s: BiometricRegisteredInfo) -> Self {
-        Self::BiometricRegistered(s)
-    }
-}
 
 impl From<DocumentUploadedInfo> for DbUserTimelineEvent {
     fn from(s: DocumentUploadedInfo) -> Self {
@@ -36,6 +34,12 @@ impl From<DocumentUploadedInfo> for DbUserTimelineEvent {
 impl From<OnboardingDecisionInfo> for DbUserTimelineEvent {
     fn from(s: OnboardingDecisionInfo) -> Self {
         Self::OnboardingDecision(s)
+    }
+}
+
+impl From<LivenessInfo> for DbUserTimelineEvent {
+    fn from(s: LivenessInfo) -> Self {
+        Self::Liveness(s)
     }
 }
 
@@ -57,4 +61,9 @@ pub struct DocumentUploadedInfo {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct OnboardingDecisionInfo {
     pub id: OnboardingDecisionId,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct LivenessInfo {
+    pub id: LivenessEventId,
 }

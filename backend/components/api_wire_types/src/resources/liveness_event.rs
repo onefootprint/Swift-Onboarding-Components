@@ -4,6 +4,8 @@ use crate::*;
 #[derive(Debug, Clone, Deserialize, Serialize, Apiv2Schema, JsonSchema)]
 #[schemars(rename_all = "camelCase")]
 pub struct LivenessEvent {
+    pub source: LivenessSource,
+    pub attributes: Option<LivenessAttributes>,
     pub insight_event: InsightEvent,
 }
 
