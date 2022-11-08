@@ -2,18 +2,21 @@
 //! https://www.ietf.org/archive/id/draft-ietf-privacypass-auth-scheme-02.html
 
 use actix_web::HttpResponseBuilder;
-use db::models::{audit_trail::AuditTrail, liveness_event::NewLivenessEvent, onboarding::Onboarding};
-use newtypes::{AuditTrailEvent, LivenessCheckInfo};
+use db::models::{
+    insight_event::CreateInsightEvent, liveness_event::NewLivenessEvent,
+    onboarding::Onboarding, user_timeline::UserTimeline,
+};
+use newtypes::{LivenessAttributes, LivenessInfo, LivenessIssuer};
 use paperclip::actix::{
     api_v2_operation, get,
     web::{self},
 };
 use reqwest::{header::AUTHORIZATION, StatusCode};
-use serde_json::json;
+
 use web::HttpResponse;
 
 use crate::{
-    auth::user::{UserAuthContext, UserAuthScopeDiscriminant},
+    auth::user::{UserAuthContext, UserAuthScopeDiscriminant, UserAuth},
     errors::{onboarding::OnboardingError, ApiError, ApiResult},
     types::EmptyResponse,
     utils::insight_headers::InsightHeaders,
@@ -91,29 +94,27 @@ async fn authorize_privacy_pass(
                 return Err(ApiError::Custom("Cannot edit completed onboarding".to_owned()));
             }
 
-            let trail_event = AuditTrailEvent::LivenessCheck(LivenessCheckInfo {
-                // TODO: get issuer programmatically
-                attestations: vec!["Footprint".to_owned(), "Cloudflare".to_owned()],
-                device: None,
-                os: None,
-                user_agent: insight.user_agent.clone(),
-                ip_address: insight.ip_address.clone(),
-                location: insight.location(),
-            });
-            AuditTrail::create(conn, trail_event, ob_info.user_vault_id, None, None)?;
+            let insight_event = CreateInsightEvent::from(insight).insert_with_conn(conn)?;
 
-            let attributes = Some(json!({
-                // TODO: get issuer programmatically
-                "issuer": "Cloudflare",
-                "insight": insight
-            }));
-
-            let _ = NewLivenessEvent {
+            let liveness_event = NewLivenessEvent {
                 onboarding_id: onboarding.id,
-                attributes,
+                attributes: Some(LivenessAttributes {
+                    issuers: vec![LivenessIssuer::Cloudflare, LivenessIssuer::Footprint],
+                    ..Default::default()
+                }),
                 liveness_source: newtypes::LivenessSource::PrivacyPass,
+                insight_event_id: insight_event.id,
             }
             .insert(conn)?;
+
+            UserTimeline::create(
+                conn,
+                LivenessInfo {
+                    id: liveness_event.id,
+                },
+                user_auth.user_vault_id(),
+                Some(ob_info.onboarding.id)
+            )?;
 
             Ok(())
         })

@@ -19,9 +19,10 @@ export_schema!(UserTimeline);
 #[derive(Debug, Clone, Deserialize, Serialize, Apiv2Schema, JsonSchema)]
 #[serde(rename_all = "snake_case")]
 #[serde(tag = "kind", content = "data")]
+#[allow(clippy::large_enum_variant)]
 pub enum UserTimelineEvent {
     DataCollected(DataCollectedInfo),
-    BiometricRegistered(LivenessEvent),
+    Liveness(LivenessEvent),
     DocumentUploaded(), // TODO
     OnboardingDecision(OnboardingDecision),
 }

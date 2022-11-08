@@ -176,6 +176,7 @@ table! {
         created_at -> Timestamptz,
         _created_at -> Timestamptz,
         _updated_at -> Timestamptz,
+        insight_event_id -> Uuid,
     }
 }
 
@@ -518,6 +519,7 @@ joinable!(identity_document -> document_request (request_id));
 joinable!(identity_document -> onboarding (onboarding_id));
 joinable!(kv_data -> tenant (tenant_id));
 joinable!(kv_data -> user_vault (user_vault_id));
+joinable!(liveness_event -> insight_event (insight_event_id));
 joinable!(liveness_event -> onboarding (onboarding_id));
 joinable!(ob_configuration -> tenant (tenant_id));
 joinable!(onboarding -> insight_event (insight_event_id));

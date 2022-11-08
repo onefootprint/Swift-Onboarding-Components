@@ -2,7 +2,9 @@ use crate::auth::user::{UserAuthContext, UserAuthScopeDiscriminant};
 use crate::errors::onboarding::OnboardingError;
 use crate::errors::ApiError;
 use crate::types::{EmptyResponse, JsonApiResponse};
+use crate::utils::insight_headers::InsightHeaders;
 use crate::State;
+use db::models::insight_event::CreateInsightEvent;
 use db::models::liveness_event::NewLivenessEvent;
 use db::models::onboarding::Onboarding;
 use paperclip::actix::{self, api_v2_operation, web};
@@ -12,7 +14,11 @@ use paperclip::actix::{self, api_v2_operation, web};
     description = "Allows skipping liveness checks for an onboarding. Only temporary"
 )]
 #[actix::post("/hosted/onboarding/skip_liveness")]
-pub async fn post(state: web::Data<State>, user_auth: UserAuthContext) -> JsonApiResponse<EmptyResponse> {
+pub async fn post(
+    state: web::Data<State>,
+    user_auth: UserAuthContext,
+    insights: InsightHeaders,
+) -> JsonApiResponse<EmptyResponse> {
     let user_auth = user_auth.check_permissions(vec![UserAuthScopeDiscriminant::OrgOnboarding])?;
 
     state
@@ -26,10 +32,13 @@ pub async fn post(state: web::Data<State>, user_auth: UserAuthContext) -> JsonAp
                 return Err(ApiError::Custom("Cannot edit completed onboarding".to_owned()));
             }
 
+            let insight_event = CreateInsightEvent::from(insights).insert_with_conn(conn)?;
+
             let _ = NewLivenessEvent {
                 onboarding_id: onboarding.id,
                 attributes: None,
                 liveness_source: newtypes::LivenessSource::Skipped,
+                insight_event_id: insight_event.id,
             }
             .insert(conn)?;
 
