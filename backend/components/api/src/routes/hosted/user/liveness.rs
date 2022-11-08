@@ -3,8 +3,7 @@ use crate::errors::ApiError;
 use crate::types::response::ResponseData;
 use crate::utils::db2api::DbToApi;
 use crate::State;
-use db::models::liveness_event::LivenessEvent;
-
+use db::models::webauthn_credential::WebauthnCredential;
 use paperclip::actix::{self, api_v2_operation, web, web::Json};
 
 type LivenessResponse = Vec<api_wire_types::LivenessEvent>;
@@ -22,7 +21,7 @@ pub async fn get(
 
     let creds = state
         .db_pool
-        .db_query(move |conn| LivenessEvent::get_by_user_vault_id(conn, &user_auth.user_vault_id()))
+        .db_query(move |conn| WebauthnCredential::list(conn, &user_auth.user_vault_id()))
         .await??;
 
     let response = creds

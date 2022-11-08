@@ -4,7 +4,7 @@ use crate::DbResult;
 use chrono::{DateTime, Utc};
 use diesel::{Insertable, PgConnection, QueryDsl, Queryable, RunQueryDsl};
 use newtypes::{
-    AttestationType, InsightEventId, UserVaultId, WebauthnCredentialId,
+    AttestationType, FootprintUserId, InsightEventId, TenantId, UserVaultId, WebauthnCredentialId,
 };
 use serde::{Deserialize, Serialize};
 
@@ -57,6 +57,25 @@ impl WebauthnCredential {
             .get_results::<(WebauthnCredential, InsightEvent)>(conn)?;
 
         Ok(results)
+    }
+
+    pub fn get_for_scoped_user(
+        conn: &mut PgConnection,
+        tenant_id: &TenantId,
+        footprint_user_id: &FootprintUserId,
+        is_live: bool,
+    ) -> DbResult<Vec<(Self, InsightEvent)>> {
+        let user_vault_ids = schema::scoped_user::table
+            .filter(schema::scoped_user::tenant_id.eq(tenant_id))
+            .filter(schema::scoped_user::fp_user_id.eq(footprint_user_id))
+            .filter(schema::scoped_user::is_live.eq(is_live))
+            .select(schema::scoped_user::user_vault_id);
+        let creds = schema::webauthn_credential::table
+            .inner_join(schema::insight_event::table)
+            .filter(schema::webauthn_credential::user_vault_id.eq_any(user_vault_ids))
+            .get_results(conn)?;
+
+        Ok(creds)
     }
 }
 

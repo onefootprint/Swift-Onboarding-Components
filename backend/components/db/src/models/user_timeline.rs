@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 
-use crate::models::liveness_event::LivenessEvent;
 use crate::models::scoped_user::ScopedUser;
 use crate::DbError;
 use crate::{schema::user_timeline, DbResult};
@@ -12,6 +11,7 @@ use serde::{Deserialize, Serialize};
 
 use super::insight_event::InsightEvent;
 use super::onboarding_decision::{OnboardingDecision, SaturatedOnboardingDecisionInfo};
+use super::webauthn_credential::WebauthnCredential;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Queryable)]
 #[diesel(table_name = user_timeline)]
@@ -37,9 +37,9 @@ pub struct NewUserTimeline {
 /// Mirrors structure of DbUserTimelineEvent but includes resources hydrated from the DB rather than identifiers
 pub enum SaturatedTimelineEvent {
     DataCollected(newtypes::DataCollectedInfo),
+    BiometricRegistered((WebauthnCredential, InsightEvent)),
     OnboardingDecision(SaturatedOnboardingDecisionInfo),
     DocumentUploaded(newtypes::DocumentUploadedInfo), // TODO
-    Liveness(LivenessEvent, InsightEvent),
 }
 
 pub struct UserTimelineInfo(pub UserTimeline, pub SaturatedTimelineEvent);
@@ -98,8 +98,8 @@ impl UserTimeline {
             DbUserTimelineEvent::OnboardingDecision(ref e) => Some(&e.id),
             _ => None,
         });
-        let liveness_event_ids = results.iter().flat_map(|ut| match ut.event {
-            DbUserTimelineEvent::Liveness(ref e) => Some(&e.id),
+        let credential_ids = results.iter().flat_map(|ut| match ut.event {
+            DbUserTimelineEvent::BiometricRegistered(ref e) => Some(&e.id),
             _ => None,
         });
 
@@ -108,7 +108,7 @@ impl UserTimeline {
             .map(|d| (d.0.id.clone(), d))
             .collect();
 
-        let mut liveness_events: HashMap<_, _> = LivenessEvent::get_bulk(conn, liveness_event_ids.collect())?
+        let mut credentials: HashMap<_, _> = WebauthnCredential::get_bulk(conn, credential_ids.collect())?
             .into_iter()
             .map(|c| (c.0.id.clone(), c))
             .collect();
@@ -126,15 +126,13 @@ impl UserTimeline {
                             decisions.remove(&e.id).ok_or(DbError::RelatedObjectNotFound)?,
                         )
                     }
+                    DbUserTimelineEvent::BiometricRegistered(ref e) => {
+                        SaturatedTimelineEvent::BiometricRegistered(
+                            credentials.remove(&e.id).ok_or(DbError::RelatedObjectNotFound)?,
+                        )
+                    }
                     DbUserTimelineEvent::DocumentUploaded(ref e) => {
                         SaturatedTimelineEvent::DocumentUploaded(e.clone())
-                    }
-                    DbUserTimelineEvent::Liveness(ref e) => {
-                        let (liveness, insight) = liveness_events
-                            .remove(&e.id)
-                            .ok_or(DbError::RelatedObjectNotFound)?;
-
-                        SaturatedTimelineEvent::Liveness(liveness, insight)
                     }
                 };
                 Ok(UserTimelineInfo(ut, saturated_event))

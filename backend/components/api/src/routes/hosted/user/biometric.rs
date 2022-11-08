@@ -12,17 +12,18 @@ use crate::{
 use app_attest::error::AttestationError;
 use chrono::{Duration, Utc};
 use crypto::sha256;
-use db::models::{insight_event::CreateInsightEvent, user_timeline::UserTimeline};
 use db::models::{
+    audit_trail::AuditTrail,
     liveness_event::NewLivenessEvent,
     user_vault::UserVault,
     webauthn_credential::{NewWebauthnCredential, WebauthnCredential},
 };
-use newtypes::Base64Data;
-use newtypes::{AttestationType, LivenessAttributes, LivenessInfo, LivenessIssuer};
+use db::models::{insight_event::CreateInsightEvent, user_timeline::UserTimeline};
+use newtypes::{AttestationType, AuditTrailEvent, BiometricRegisteredInfo};
+use newtypes::{Base64Data, LivenessCheckInfo};
 use paperclip::actix::{api_v2_operation, post, web, web::Json, Apiv2Schema};
 use serde::{Deserialize, Serialize};
-
+use serde_json::json;
 use serde_repr::{Deserialize_repr, Serialize_repr};
 use webauthn_rs_core::{
     proto::{AttestationCaList, AttestationMetadata},
@@ -138,34 +139,68 @@ pub async fn complete_post(
         credential_attestation: cred.attestation.metadata,
     };
 
-    let (attestation_type, liveness_event_attributes) = match cred.attestation_format {
-        AttestationFormat::AppleAnonymous => (
-            AttestationType::Apple,
-            Some(LivenessAttributes {
-                issuers: vec![LivenessIssuer::Apple, LivenessIssuer::Footprint],
-                ..Default::default()
-            }),
-        ),
-        AttestationFormat::AndroidKey => (
-            AttestationType::AndroidKey,
-            Some(LivenessAttributes {
-                issuers: vec![LivenessIssuer::Google, LivenessIssuer::Footprint],
-                metadata: Some(serde_json::to_value(
-                    &attestation_metadata.credential_attestation,
-                )?),
-                ..Default::default()
-            }),
-        ),
-        AttestationFormat::AndroidSafetyNet => (
-            AttestationType::AndroidSafetyNet,
-            Some(LivenessAttributes {
-                issuers: vec![LivenessIssuer::Google, LivenessIssuer::Footprint],
-                metadata: Some(serde_json::to_value(
-                    &attestation_metadata.credential_attestation,
-                )?),
-                ..Default::default()
-            }),
-        ),
+    // prepare our liveness attributes
+    let mut liveness_check_info: Option<LivenessCheckInfo> = None;
+    let mut liveness_event_attributes: Option<serde_json::Value> = None;
+
+    let attestation_type = match cred.attestation_format {
+        AttestationFormat::AppleAnonymous => {
+            liveness_check_info = Some(LivenessCheckInfo {
+                attestations: vec!["Footprint".to_owned(), "Apple".to_owned()],
+                device: None,
+                os: None,
+                user_agent: insights.user_agent.clone(),
+                ip_address: insights.ip_address.clone(),
+                location: insights.location(),
+            });
+            liveness_event_attributes = Some(json!(
+                {
+                    "issuer": "Apple",
+                    "insight": insights.clone()
+                }
+            ));
+            AttestationType::Apple
+        }
+        AttestationFormat::AndroidKey => {
+            liveness_check_info = Some(LivenessCheckInfo {
+                attestations: vec!["Footprint".to_owned(), "Google".to_owned()],
+                device: None,
+                os: None,
+                user_agent: insights.user_agent.clone(),
+                ip_address: insights.ip_address.clone(),
+                location: insights.location(),
+            });
+
+            liveness_event_attributes = Some(json!(
+                {
+                    "issuer": "Google",
+                    "insight": insights.clone(),
+                    "metadata": attestation_metadata.credential_attestation.clone()
+                }
+            ));
+
+            AttestationType::AndroidKey
+        }
+        AttestationFormat::AndroidSafetyNet => {
+            liveness_check_info = Some(LivenessCheckInfo {
+                attestations: vec!["Footprint".to_owned(), "Google".to_owned()],
+                device: None,
+                os: None,
+                user_agent: insights.user_agent.clone(),
+                ip_address: insights.ip_address.clone(),
+                location: insights.location(),
+            });
+
+            liveness_event_attributes = Some(json!(
+                {
+                    "issuer": "Google",
+                    "insight": insights.clone(),
+                    "metadata": attestation_metadata.credential_attestation.clone()
+                }
+            ));
+
+            AttestationType::AndroidSafetyNet
+        }
         AttestationFormat::None => {
             // this is our work around for supplementary app-based attestation
             let metadata_json = request
@@ -181,28 +216,48 @@ pub async fn complete_post(
                             tracing::error!(error=?err, "failed to verify app attestation");
                         })
                         .map(|att| {
-                            let metadata = match &att {
-                                AppAttestationMetadata::Apple { metadata, .. } => metadata,
+                            match &att {
+                                AppAttestationMetadata::Apple { metadata, .. } => {
+                                    let location = if matches!(
+                                        metadata.location_match,
+                                        LocationMatchType::Match | LocationMatchType::Unknown
+                                    ) {
+                                        insights.location()
+                                    } else {
+                                        None
+                                    };
+
+                                    liveness_check_info = Some(LivenessCheckInfo {
+                                        attestations: vec!["Footprint".to_owned(), "Apple".to_owned()],
+                                        device: metadata.model.clone(),
+                                        os: metadata.os.clone(),
+                                        user_agent: insights.user_agent.clone(),
+                                        ip_address: insights.ip_address.clone(),
+                                        location,
+                                    });
+
+                                    liveness_event_attributes = Some(json!(
+                                        {
+                                            "issuer": "Apple",
+                                            "insight": insights.clone(),
+                                            "metadata": att.clone()
+                                        }
+                                    ));
+                                }
                             };
 
-                            let attributes = LivenessAttributes {
-                                issuers: vec![LivenessIssuer::Apple, LivenessIssuer::Footprint],
-                                metadata: serde_json::to_value(&metadata).ok(),
-                                os: metadata.os.clone(),
-                                device: metadata.model.clone(),
-                            };
                             // store the metadata
                             attestation_metadata.app_attestation = Some(att);
 
                             // return the verified type
-                            (AttestationType::AppleApp, Some(attributes))
+                            AttestationType::AppleApp
                         })
-                        .unwrap_or((AttestationType::None, None))
+                        .unwrap_or(AttestationType::None)
                 }
-                None => (AttestationType::None, None),
+                None => AttestationType::None,
             }
         }
-        _ => (AttestationType::Unknown, None),
+        _ => AttestationType::Unknown,
     };
 
     tracing::info!(attestation=?attestation_metadata, "attestation details");
@@ -221,46 +276,43 @@ pub async fn complete_post(
                 return Err(ChallengeError::BiometricCredentialAlreadyExists.into());
             }
 
-            let insight_event = CreateInsightEvent::from(insights).insert_with_conn(conn)?;
+            if let Some(event) = liveness_check_info {
+                AuditTrail::create(
+                    conn,
+                    AuditTrailEvent::LivenessCheck(event),
+                    user_auth.user_vault_id(),
+                    None,
+                    None,
+                )?;
+            }
 
             // if we're in an onboarding, optimisticaly try to submit a liveness event if the webauthn
             let ob_info = user_auth.onboarding(conn)?;
             if let Some(ref ob_info) = ob_info {
-                let liveness_event = if let Some(attributes) = liveness_event_attributes {
-                    NewLivenessEvent {
+                if let Some(attributes) = liveness_event_attributes {
+                    let _ = NewLivenessEvent {
                         onboarding_id: ob_info.onboarding.id.clone(),
                         liveness_source: newtypes::LivenessSource::WebauthnAttestation,
                         attributes: Some(attributes),
-                        insight_event_id: insight_event.id.clone(),
                     }
-                    .insert(conn)?
+                    .insert(conn)?;
                 } else {
                     // TODO: remove this
                     // RELATED: FP-1802 and FP-1800
                     // this is only for backwards compatibility in order to
                     // maintain the mechanics that webauthn -> liveness
                     // we should update this such that liveness is skipped via API call
-                    NewLivenessEvent {
+                    let _ = NewLivenessEvent {
                         onboarding_id: ob_info.onboarding.id.clone(),
                         liveness_source: newtypes::LivenessSource::Skipped,
                         attributes: None,
-                        insight_event_id: insight_event.id.clone(),
                     }
-                    .insert(conn)?
-                };
-
-                // create the timeline event for a liveness
-                UserTimeline::create(
-                    conn,
-                    LivenessInfo {
-                        id: liveness_event.id,
-                    },
-                    user_auth.user_vault_id(),
-                    Some(ob_info.onboarding.id.clone()),
-                )?;
+                    .insert(conn)?;
+                }
             }
 
-            let _ = NewWebauthnCredential {
+            let insight_event = CreateInsightEvent::from(insights).insert_with_conn(conn)?;
+            let new_credential = NewWebauthnCredential {
                 user_vault_id: user_auth.user_vault_id(),
                 credential_id: cred.cred_id.0,
                 public_key,
@@ -271,6 +323,14 @@ pub async fn complete_post(
             }
             .save(conn)?;
 
+            UserTimeline::create(
+                conn,
+                BiometricRegisteredInfo {
+                    id: new_credential.id,
+                },
+                user_auth.user_vault_id(),
+                ob_info.map(|o| o.onboarding.id),
+            )?;
             Ok(())
         })
         .await?;
