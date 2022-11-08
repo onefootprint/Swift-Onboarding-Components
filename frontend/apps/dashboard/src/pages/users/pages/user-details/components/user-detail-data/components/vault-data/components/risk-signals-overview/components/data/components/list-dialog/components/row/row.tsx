@@ -3,12 +3,13 @@ import { IcoChevronRight24 } from '@onefootprint/icons';
 import { RiskSignal, RiskSignalSeverity } from '@onefootprint/types';
 import { Badge, Box } from '@onefootprint/ui';
 import React from 'react';
+import styled from 'styled-components';
 
-type RiskSignalRowProps = {
+type RowProps = {
   riskSignal: RiskSignal;
 };
 
-const RiskSignalRow = ({ riskSignal }: RiskSignalRowProps) => {
+const Row = ({ riskSignal }: RowProps) => {
   const { t } = useTranslation('pages.user-details.signals.severity');
 
   return (
@@ -24,7 +25,9 @@ const RiskSignalRow = ({ riskSignal }: RiskSignalRowProps) => {
           <Badge variant="info">{t('low')}</Badge>
         )}
       </td>
-      <td>{riskSignal.description}</td>
+      <td title={riskSignal.description}>
+        <Description>{riskSignal.description}</Description>
+      </td>
       <td>
         <Box
           sx={{
@@ -39,4 +42,10 @@ const RiskSignalRow = ({ riskSignal }: RiskSignalRowProps) => {
   );
 };
 
-export default RiskSignalRow;
+const Description = styled.div`
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+`;
+
+export default Row;

@@ -6,7 +6,9 @@ import React from 'react';
 import { useFormContext } from 'react-hook-form';
 import { User } from 'src/pages/users/types/user.types';
 
+import useRiskSignalsOverview from '../../../../hooks/use-risk-signals-overview';
 import DataSection from '../../../data-section';
+import RiskSignalsOverview from '../../../risk-signals-overview';
 import useFormState from './hooks/use-form-state';
 
 type BasicSectionProps = {
@@ -16,6 +18,7 @@ type BasicSectionProps = {
 const BasicSection = ({ user }: BasicSectionProps) => {
   const { t, allT } = useTranslation('pages.user-details.user-info');
   const { register, setValue, control } = useFormContext();
+  const riskSignalsOverview = useRiskSignalsOverview();
   const { areAllFieldsSelected, areAllFieldsDisabled, fieldsState } =
     useFormState({
       control,
@@ -46,6 +49,13 @@ const BasicSection = ({ user }: BasicSectionProps) => {
     <DataSection
       iconComponent={IcoFileText224}
       title={t('basic.title')}
+      footer={
+        <RiskSignalsOverview
+          data={riskSignalsOverview.data?.basic}
+          error={riskSignalsOverview.error}
+          isLoading={riskSignalsOverview.isLoading}
+        />
+      }
       renderCta={() =>
         areAllFieldsDisabled ? null : (
           <LinkButton

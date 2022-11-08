@@ -5,17 +5,13 @@ import React from 'react';
 import { Trans } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
-export type RiskSignalsCountProps = {
+export type CountProps = {
   high?: RiskSignal[];
   medium?: RiskSignal[];
   low?: RiskSignal[];
 };
 
-const RiskSignalsCount = ({
-  high = [],
-  medium = [],
-  low = [],
-}: RiskSignalsCountProps) => {
+const Count = ({ high = [], medium = [], low = [] }: CountProps) => {
   const { t } = useTranslation('pages.user-details.user-info.risks');
   const hasHighRisks = high.length > 0;
   const hasMediumRisks = medium.length > 0;
@@ -146,4 +142,4 @@ const Intensity = styled.strong`
   `};
 `;
 
-export default RiskSignalsCount;
+export default Count;

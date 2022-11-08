@@ -24,6 +24,9 @@ export type PaginatedRequestResponse<T> = {
 export const isFootprintError = (error: unknown): error is RequestError =>
   (error as RequestError)?.response?.data !== undefined;
 
+export const isUnhandledError = (error: unknown): error is Error =>
+  (error as Error)?.message !== undefined;
+
 export const isFootprintServerError = (
   error: unknown,
 ): FootprintServerError | undefined => {
@@ -42,9 +45,14 @@ export const isLogoutError = (error: unknown) => {
   );
 };
 
-export const getErrorMessage = (error: unknown): string => {
+export const getErrorMessage = (error: unknown | Error): string => {
   if (isFootprintError(error)) {
-    return error?.response?.data?.error?.message || error?.message;
+    if (error.response?.data.error.message) {
+      return error.response?.data.error.message;
+    }
+  }
+  if (isUnhandledError(error)) {
+    return error.message;
   }
   return 'Something went wrong';
 };

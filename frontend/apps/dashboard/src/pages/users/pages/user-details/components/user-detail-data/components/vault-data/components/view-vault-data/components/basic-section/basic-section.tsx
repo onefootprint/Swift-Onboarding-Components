@@ -5,7 +5,9 @@ import React from 'react';
 import { UserVaultData } from 'src/pages/users/types/vault-data.types';
 import getFullNameDataValue from 'src/pages/users/utils/get-full-name-data';
 
+import useRiskSignalsOverview from '../../../../hooks/use-risk-signals-overview';
 import DataSection from '../../../data-section';
+import RiskSignalsOverview from '../../../risk-signals-overview';
 import DataRow from '../data-row';
 
 type BasicSectionProps = {
@@ -13,6 +15,7 @@ type BasicSectionProps = {
 };
 
 const BasicSection = ({ vaultData }: BasicSectionProps) => {
+  const riskSignalsOverview = useRiskSignalsOverview();
   const { t, allT } = useTranslation('pages.user-details.user-info.basic');
   const { kycData } = vaultData;
   const firstName = kycData[UserDataAttribute.firstName];
@@ -21,7 +24,17 @@ const BasicSection = ({ vaultData }: BasicSectionProps) => {
   const phoneNumber = kycData[UserDataAttribute.phoneNumber];
 
   return (
-    <DataSection iconComponent={IcoFileText224} title={t('title')}>
+    <DataSection
+      iconComponent={IcoFileText224}
+      title={t('title')}
+      footer={
+        <RiskSignalsOverview
+          data={riskSignalsOverview.data?.basic}
+          error={riskSignalsOverview.error}
+          isLoading={riskSignalsOverview.isLoading}
+        />
+      }
+    >
       {firstName !== undefined && lastName !== undefined && (
         <DataRow
           data={getFullNameDataValue(vaultData)}

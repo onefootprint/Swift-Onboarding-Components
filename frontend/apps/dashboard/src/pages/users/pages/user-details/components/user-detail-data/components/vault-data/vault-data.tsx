@@ -7,8 +7,8 @@ import { useUpdateEffect } from 'usehooks-ts';
 
 import { State } from '../../../../utils/decrypt-state-machine';
 import { useDecryptMachine } from '../../../decrypt-machine-provider';
-import DecryptVaultData from './components/decrypt-vault-data';
-import ViewVaultData from './components/view-vault-data';
+import { DecryptVaultData, ViewVaultData } from './components';
+import useRiskSignalsOverview from './hooks/use-risk-signals-overview';
 
 type VaultDataProps = {
   user: User;
@@ -20,9 +20,10 @@ type VaultDataProps = {
 };
 
 const VaultData = ({ user, onDecrypt }: VaultDataProps) => {
+  useRiskSignalsOverview();
   const [state] = useDecryptMachine();
   const { fields, reason } = state.context;
-  const showCheckboxes =
+  const showForm =
     state.matches(State.selectingFields) ||
     state.matches(State.confirmingReason) ||
     state.matches(State.decrypting);
@@ -38,7 +39,7 @@ const VaultData = ({ user, onDecrypt }: VaultDataProps) => {
     }
   }, [state.value]);
 
-  return showCheckboxes ? (
+  return showForm ? (
     <DecryptVaultData user={user} />
   ) : (
     <ViewVaultData user={user} />

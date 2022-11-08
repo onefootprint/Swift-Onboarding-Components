@@ -41,7 +41,7 @@ const useRiskSignalsOverview = () => {
   const params = {};
 
   return useQuery(
-    ['risksOverview', authHeaders, userId, params],
+    ['riskSignals', authHeaders, userId, params],
     () => getRiskSignals({ authHeaders, userId, params }),
     {
       enabled: !!userId,

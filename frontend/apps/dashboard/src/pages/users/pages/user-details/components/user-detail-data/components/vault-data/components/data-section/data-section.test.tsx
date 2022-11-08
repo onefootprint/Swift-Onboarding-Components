@@ -9,12 +9,14 @@ describe('<DataSection />', () => {
     title = 'Lorem',
     children,
     renderCta,
+    footer,
     iconComponent = IcoUserCircle24,
   }: Partial<DataSectionProps>) =>
     customRender(
       <DataSection
         title={title}
         renderCta={renderCta}
+        footer={footer}
         iconComponent={iconComponent}
       >
         {children}
@@ -38,5 +40,11 @@ describe('<DataSection />', () => {
     renderDataSection({ renderCta });
     const cta = screen.getByText('Descrypt all');
     expect(cta).toBeInTheDocument();
+  });
+
+  it('should render the footer', () => {
+    renderDataSection({ footer: 'No risk signals' });
+    const footer = screen.getByText('No risk signals');
+    expect(footer).toBeInTheDocument();
   });
 });

@@ -3,22 +3,17 @@ import { RiskSignal } from '@onefootprint/types';
 import { Box, Dialog, Table, TableRow, Typography } from '@onefootprint/ui';
 import React, { useState } from 'react';
 
-import RiskRow from './components/risk-signal-row';
+import Row from './components/row';
 import useRiskSignalsOverviewFilters from './hooks/use-risk-signals-overview-filters';
 
-const renderTr = ({ item }: TableRow<RiskSignal>) => (
-  <RiskRow riskSignal={item} />
-);
+const renderTr = ({ item }: TableRow<RiskSignal>) => <Row riskSignal={item} />;
 
-export type RiskSignalsOverviewDialogProps = {
+export type ListDialogProps = {
   riskSignals: RiskSignal[];
   renderCta: (options: { onClick: () => void }) => React.ReactNode;
 };
 
-const RiskSignalsOverviewDialog = ({
-  riskSignals,
-  renderCta,
-}: RiskSignalsOverviewDialogProps) => {
+const ListDialog = ({ riskSignals, renderCta }: ListDialogProps) => {
   const filters = useRiskSignalsOverviewFilters();
   const { t } = useTranslation(
     'pages.user-details.user-info.risks.list-dialog',
@@ -70,4 +65,4 @@ const RiskSignalsOverviewDialog = ({
   );
 };
 
-export default RiskSignalsOverviewDialog;
+export default ListDialog;

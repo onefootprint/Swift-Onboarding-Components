@@ -11,10 +11,12 @@ import styled, { css } from 'styled-components';
 import { Event, Fields } from '../../../../../../utils/decrypt-state-machine';
 import { useDecryptMachine } from '../../../../../decrypt-machine-provider';
 import getSectionsVisibility from '../../utils/get-sections-visibility';
-import AddressSection from './components/address-section';
-import BasicSection from './components/basic-section';
-import IdDocSection from './components/id-doc-section';
-import IdentitySection from './components/identity-section';
+import {
+  AddressSection,
+  BasicSection,
+  IdDocSection,
+  IdentitySection,
+} from './components';
 
 type DecryptVaultDataProps = {
   user: User;

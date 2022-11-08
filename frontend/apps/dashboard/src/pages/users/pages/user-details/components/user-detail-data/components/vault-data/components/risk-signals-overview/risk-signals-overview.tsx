@@ -1,48 +1,36 @@
-import { useTranslation } from '@onefootprint/hooks';
+import { getErrorMessage } from '@onefootprint/request';
 import { RiskSignal } from '@onefootprint/types';
-import { LinkButton } from '@onefootprint/ui';
 import React from 'react';
-import styled from 'styled-components';
 
-import RiskSignalsCount from './components/risk-signals-count';
-import RiskSignalsOverviewDialog from './components/risk-signals-overview-dialog';
+import Data from './components/data';
+import Error from './components/error';
+import Loading from './components/loading';
 
 export type RiskSignalsOverviewProps = {
-  high?: RiskSignal[];
-  medium?: RiskSignal[];
-  low?: RiskSignal[];
+  data?: {
+    high: RiskSignal[];
+    low: RiskSignal[];
+    medium: RiskSignal[];
+  };
+  error?: unknown;
+  isLoading?: boolean;
 };
 
 const RiskSignalsOverview = ({
-  high = [],
-  medium = [],
-  low = [],
+  data,
+  error,
+  isLoading,
 }: RiskSignalsOverviewProps) => {
-  const { t } = useTranslation('pages.user-details.user-info.risks');
-  const hasAnyRisk = high.length > 0 || medium.length > 0 || low.length > 0;
-
-  return (
-    <RisksOverviewContainer>
-      <RiskSignalsCount high={high} medium={medium} low={low} />
-      {hasAnyRisk && (
-        <RiskSignalsOverviewDialog
-          riskSignals={[...high, ...medium, ...low]}
-          renderCta={({ onClick }) => (
-            <LinkButton size="compact" onClick={onClick}>
-              {t('cta')}
-            </LinkButton>
-          )}
-        />
-      )}
-    </RisksOverviewContainer>
-  );
+  if (isLoading) {
+    return <Loading />;
+  }
+  if (error) {
+    return <Error>{getErrorMessage(error)}</Error>;
+  }
+  if (data) {
+    return <Data high={data.high} medium={data.medium} low={data.low} />;
+  }
+  return null;
 };
-
-const RisksOverviewContainer = styled.div`
-  align-items: center;
-  display: flex;
-  justify-content: space-between;
-  width: 100%;
-`;
 
 export default RiskSignalsOverview;

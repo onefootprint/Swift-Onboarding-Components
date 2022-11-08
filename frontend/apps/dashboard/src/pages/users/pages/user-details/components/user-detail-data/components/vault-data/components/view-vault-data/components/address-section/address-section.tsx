@@ -4,7 +4,9 @@ import { UserDataAttribute } from '@onefootprint/types';
 import React from 'react';
 import { UserVaultData } from 'src/pages/users/types/vault-data.types';
 
+import useRiskSignalsOverview from '../../../../hooks/use-risk-signals-overview';
 import DataSection from '../../../data-section';
+import RiskSignalsOverview from '../../../risk-signals-overview';
 import DataRow from '../data-row';
 
 type AddressSectionProps = {
@@ -12,6 +14,7 @@ type AddressSectionProps = {
 };
 
 const AddressSection = ({ vaultData }: AddressSectionProps) => {
+  const riskSignalsOverview = useRiskSignalsOverview();
   const { t, allT } = useTranslation('pages.user-details.user-info.address');
   const { kycData } = vaultData;
   const country = kycData[UserDataAttribute.country];
@@ -22,7 +25,17 @@ const AddressSection = ({ vaultData }: AddressSectionProps) => {
   const state = kycData[UserDataAttribute.state];
 
   return (
-    <DataSection iconComponent={IcoBuilding24} title={t('title')}>
+    <DataSection
+      iconComponent={IcoBuilding24}
+      title={t('title')}
+      footer={
+        <RiskSignalsOverview
+          data={riskSignalsOverview.data?.address}
+          error={riskSignalsOverview.error}
+          isLoading={riskSignalsOverview.isLoading}
+        />
+      }
+    >
       {country !== undefined && (
         <DataRow title={allT('user-data-attributes.country')} data={country} />
       )}
