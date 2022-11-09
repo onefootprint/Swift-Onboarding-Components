@@ -3,7 +3,7 @@ use crate::decision;
 use crate::errors::ApiError;
 use crate::types::{EmptyResponse, JsonApiResponse, ResponseData};
 use crate::State;
-use db::models::onboarding::Onboarding;
+use db::models::onboarding::{Onboarding, OnboardingIdentifier};
 use newtypes::RequirementStatus;
 use paperclip::actix::{self, api_v2_operation, web, Apiv2Schema};
 
@@ -20,7 +20,11 @@ pub async fn get(state: web::Data<State>, user_auth: UserAuthContext) -> JsonApi
         .db_pool
         .db_query(move |conn| -> Result<_, ApiError> {
             let ob_info = user_auth.assert_onboarding(conn)?;
-            let (ob, _) = Onboarding::get_for_user(conn, &ob_info.onboarding.id, &ob_info.user_vault_id)?;
+            let identifier = OnboardingIdentifier::UserId {
+                id: &ob_info.onboarding.id,
+                user_vault_id: &ob_info.user_vault_id,
+            };
+            let (ob, _) = Onboarding::get(conn, identifier)?;
             Ok(ob)
         })
         .await??;

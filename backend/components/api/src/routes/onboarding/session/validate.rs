@@ -7,7 +7,7 @@ use crate::types::response::ResponseData;
 use crate::utils::session::AuthSession;
 use crate::State;
 use api_wire_types::{ValidateRequest, ValidateResponse};
-use db::models::onboarding::Onboarding;
+use db::models::onboarding::{Onboarding, OnboardingIdentifier};
 use paperclip::actix::{api_v2_operation, post, web, web::Json};
 
 #[api_v2_operation(
@@ -33,7 +33,7 @@ pub async fn post(
 
     let (ob, scoped_user) = state
         .db_pool
-        .db_query(move |conn| Onboarding::get(conn, &ob_id))
+        .db_query(move |conn| Onboarding::get(conn, OnboardingIdentifier::Id(&ob_id)))
         .await??;
     if scoped_user.tenant_id != auth.tenant().id {
         return Err(OnboardingError::TenantMismatch.into());

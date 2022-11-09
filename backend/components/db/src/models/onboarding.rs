@@ -6,13 +6,13 @@ use super::tenant_user::TenantUser;
 use crate::models::insight_event::InsightEvent;
 use crate::models::ob_configuration::ObConfiguration;
 use crate::schema::{onboarding, scoped_user};
-use crate::{DbError, DbResult, TxnPgConnection};
+use crate::{DbResult, TxnPgConnection};
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use diesel::{Insertable, Queryable};
 use itertools::Itertools;
 use newtypes::{
-    InsightEventId, ObConfigurationId, OnboardingId, OnboardingStatus, ScopedUserId, UserVaultId,
+    InsightEventId, ObConfigurationId, OnboardingId, OnboardingStatus, ScopedUserId, TenantId, UserVaultId,
 };
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
@@ -65,6 +65,23 @@ impl OnboardingUpdate {
     }
 }
 
+#[derive(Debug)]
+pub enum OnboardingIdentifier<'a> {
+    Id(&'a OnboardingId),
+    TenantId {
+        id: &'a OnboardingId,
+        tenant_id: &'a TenantId,
+    },
+    UserId {
+        id: &'a OnboardingId,
+        user_vault_id: &'a UserVaultId,
+    },
+    ConfigId {
+        user_vault_id: &'a UserVaultId,
+        ob_config_id: &'a ObConfigurationId,
+    },
+}
+
 pub type OnboardingInfo = (
     Onboarding,
     ObConfiguration,
@@ -74,31 +91,68 @@ pub type OnboardingInfo = (
 );
 
 impl Onboarding {
-    pub fn get(conn: &mut PgConnection, id: &OnboardingId) -> Result<(Onboarding, ScopedUser), DbError> {
-        let ob = onboarding::table
-            .inner_join(scoped_user::table)
-            .filter(onboarding::id.eq(id))
-            .first(conn)?;
-        Ok(ob)
+    pub fn get<'a>(
+        conn: &'a mut PgConnection,
+        id: OnboardingIdentifier<'a>,
+    ) -> DbResult<(Onboarding, ScopedUser)> {
+        let mut query = onboarding::table.inner_join(scoped_user::table).into_boxed();
+
+        match id {
+            OnboardingIdentifier::Id(id) => query = query.filter(onboarding::id.eq(id)),
+            OnboardingIdentifier::TenantId { id, tenant_id } => {
+                query = query
+                    .filter(onboarding::id.eq(id))
+                    .filter(scoped_user::tenant_id.eq(tenant_id))
+            }
+            OnboardingIdentifier::UserId { id, user_vault_id } => {
+                query = query
+                    .filter(onboarding::id.eq(id))
+                    .filter(scoped_user::user_vault_id.eq(user_vault_id))
+            }
+            OnboardingIdentifier::ConfigId {
+                user_vault_id,
+                ob_config_id,
+            } => {
+                query = query
+                    .filter(scoped_user::user_vault_id.eq(user_vault_id))
+                    .filter(onboarding::ob_configuration_id.eq(ob_config_id))
+            }
+        }
+
+        let result = query.first(conn)?;
+
+        Ok(result)
     }
 
-    pub fn get_for_user(
-        conn: &mut PgConnection,
-        id: &OnboardingId,
+    // TODO generify lock functions to use OnboardingIdentifier.
+    // It is difficult because we can't call .for_update() on boxed queries
+    pub fn lock_by_config(
+        conn: &mut TxnPgConnection,
         user_vault_id: &UserVaultId,
-    ) -> Result<(Onboarding, ScopedUser), DbError> {
-        let ob = onboarding::table
+        ob_configuration_id: &ObConfigurationId,
+    ) -> DbResult<Option<(Onboarding, ScopedUser)>> {
+        let result = onboarding::table
             .inner_join(scoped_user::table)
-            .filter(onboarding::id.eq(id))
             .filter(scoped_user::user_vault_id.eq(user_vault_id))
-            .first(conn)?;
-        Ok(ob)
+            .filter(onboarding::ob_configuration_id.eq(ob_configuration_id))
+            .for_no_key_update()
+            .first(conn.conn())
+            .optional()?;
+        Ok(result)
+    }
+
+    pub fn lock(conn: &mut TxnPgConnection, id: &OnboardingId) -> DbResult<Self> {
+        let result = onboarding::table
+            .filter(onboarding::id.eq(id))
+            .for_no_key_update()
+            .get_result(conn.conn())?;
+        Ok(result)
     }
 
     pub fn get_for_scoped_users(
         conn: &mut PgConnection,
         scoped_user_ids: Vec<&ScopedUserId>,
-    ) -> Result<HashMap<ScopedUserId, Vec<OnboardingInfo>>, DbError> {
+    ) -> DbResult<HashMap<ScopedUserId, Vec<OnboardingInfo>>> {
         use crate::schema::{
             insight_event, liveness_event, ob_configuration, onboarding_decision, tenant_user,
         };
@@ -127,50 +181,12 @@ impl Onboarding {
         Ok(result)
     }
 
-    pub fn lock_by_config(
-        conn: &mut TxnPgConnection,
-        user_vault_id: &UserVaultId,
-        ob_configuration_id: &ObConfigurationId,
-    ) -> Result<Option<(Onboarding, ScopedUser)>, DbError> {
-        let result = onboarding::table
-            .inner_join(scoped_user::table)
-            .filter(scoped_user::user_vault_id.eq(user_vault_id))
-            .filter(onboarding::ob_configuration_id.eq(ob_configuration_id))
-            .for_no_key_update()
-            .first(conn.conn())
-            .optional()?;
-        Ok(result)
-    }
-
-    pub fn lock(conn: &mut TxnPgConnection, id: &OnboardingId) -> Result<Self, DbError> {
-        let result = onboarding::table
-            .filter(onboarding::id.eq(id))
-            .for_no_key_update()
-            .get_result(conn.conn())?;
-        Ok(result)
-    }
-
-    pub fn get_by_config(
-        conn: &mut PgConnection,
-        user_vault_id: &UserVaultId,
-        ob_configuration_id: &ObConfigurationId,
-    ) -> Result<Option<Onboarding>, DbError> {
-        let onboarding = onboarding::table
-            .inner_join(scoped_user::table)
-            .filter(scoped_user::user_vault_id.eq(user_vault_id))
-            .filter(onboarding::ob_configuration_id.eq(ob_configuration_id))
-            .select(onboarding::all_columns)
-            .first(conn)
-            .optional()?;
-        Ok(onboarding)
-    }
-
     pub fn get_or_create(
         conn: &mut PgConnection,
         scoped_user_id: ScopedUserId,
         ob_configuration_id: ObConfigurationId,
         insight_event: CreateInsightEvent,
-    ) -> Result<Onboarding, DbError> {
+    ) -> DbResult<Onboarding> {
         let ob = onboarding::table
             .filter(onboarding::scoped_user_id.eq(&scoped_user_id))
             .filter(onboarding::ob_configuration_id.eq(&ob_configuration_id))

@@ -2,7 +2,7 @@ use db::models::fingerprint::IsUnique;
 use db::models::identity_data::IdentityData;
 use db::models::identity_document::IdentityDocument;
 use db::models::kv_data::{KeyValueData, NewKeyValueDataArgs};
-use db::models::onboarding::Onboarding;
+use db::models::onboarding::{Onboarding, OnboardingIdentifier};
 use db::models::scoped_user::ScopedUser;
 use db::models::user_timeline::UserTimeline;
 use db::models::verification_request::VerificationRequest;
@@ -134,7 +134,7 @@ impl UserVaultWrapper {
         conn: &mut PgConnection,
         request: VerificationRequest,
     ) -> Result<Self, DbError> {
-        let (_, scoped_user) = Onboarding::get(conn, &request.onboarding_id)?;
+        let (_, scoped_user) = Onboarding::get(conn, OnboardingIdentifier::Id(&request.onboarding_id))?;
         let user_vault = UserVault::get(conn, &scoped_user.user_vault_id)?;
         let email = request
             .email_id

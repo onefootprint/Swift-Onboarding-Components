@@ -1,7 +1,7 @@
 use db::{
     models::{
         ob_configuration::{ObConfigIdentifier, ObConfiguration},
-        onboarding::Onboarding,
+        onboarding::{Onboarding, OnboardingIdentifier},
         scoped_user::ScopedUser,
         tenant::Tenant,
     },
@@ -91,9 +91,13 @@ impl SessionContext<UserSession> {
         let Some(onboarding_id) = onboarding_id else {
             return Ok(None);
         };
+
         // Confirm that the onboarding in the auth token belongs to the user
-        let (onboarding, scoped_user) =
-            Onboarding::get_for_user(conn, &onboarding_id, &self.data.user_vault_id)?;
+        let identifier = OnboardingIdentifier::UserId {
+            id: &onboarding_id,
+            user_vault_id: &self.data.user_vault_id,
+        };
+        let (onboarding, scoped_user) = Onboarding::get(conn, identifier)?;
         // Confirm that the ob config is active
         let (ob_config, tenant) = ObConfiguration::get_enabled(
             conn,
