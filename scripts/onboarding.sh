@@ -20,22 +20,33 @@ brew install postgresql@14
 brew install awscli
 brew install jq
 brew install wget
+brew install watchman
+brew install node@16
+
+# For iOS / React Native
+curl -sSL https://get.rvm.io | bash -s stable --ruby
+source ~/.zshrc
+source ~/.bash_profile
+rvm install 2.7.5
+rvm use 2.7.5 --default
 
 if [[ $(command -v code) == "" ]]; then
  brew install visual-studio-code
 fi
 
-brew install node@16
-
 # Yarn
-corepack enable
 npm install -g yarn
 npm install -g vercel
+corepack enable
 
 # Developer tools
 if [[ $(command -v xcode-select) == "" ]]; then
  xcode-select --install
 fi
+
+# Install frontend deps
+cd frontend
+yarn install
 
 ## Set github user name and email
 echo 'Setting up github config:'
