@@ -38,14 +38,6 @@ export function CreateBuckets(
         // https://docs.aws.amazon.com/AmazonS3/latest/API/API_ListBuckets.html
         // https://docs.aws.amazon.com/AmazonS3/latest/API/API_PutObject.html
         // https://docs.aws.amazon.com/AmazonS3/latest/API/API_GetObject.html
-        // you need ListAllMyBuckets to ListBucket
-        {
-          Effect: 'Allow',
-
-          Action: ['s3:ListAllMyBuckets'],
-          // Since this needs to list all s3 resources, it's in another statement
-          Resource: [`arn:aws:s3:::*`],
-        },
         {
           Effect: 'Allow',
           Action: ['s3:GetObject', 's3:ListBucket', 's3:PutObject'],

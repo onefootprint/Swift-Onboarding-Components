@@ -74,28 +74,6 @@ impl S3Client {
     }
 }
 
-impl S3Client {
-    // Small helper to check buckets so server start will fail, rather than having run-time errors
-    // (e.g. IAM gets messed up for an AWS ID, or we change AWS ID and forget to set permissions, or something)
-    pub async fn check_bucket_access_on_server_start(
-        &self,
-        expected_buckets: Vec<String>,
-    ) -> Result<(), S3Error> {
-        let buckets: Vec<String> = self
-            .list_buckets()
-            .await?
-            .into_iter()
-            .filter_map(move |b| b.name)
-            .collect();
-
-        if buckets >= expected_buckets {
-            Ok(())
-        } else {
-            Err(S3Error::BucketNotFound)
-        }
-    }
-}
-
 #[derive(Debug, Error)]
 pub enum S3Error {
     #[error("ListBucketsError")]
