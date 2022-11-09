@@ -18,7 +18,7 @@ from tests.utils import (
     create_basic_user,
     build_user_data,
     identify_verify,
-    create_inherited_non_sandbox_user, 
+    create_inherited_non_sandbox_user,
     get_requirement_from_requirements,
 )
 
@@ -70,6 +70,7 @@ def bar_tenant(must_collect_data, can_access_data):
 
     return create_tenant(org_data, ob_data)
 
+
 @pytest.fixture(scope="session")
 def document_requesting_tenant(must_collect_data, can_access_data):
     org_data = {
@@ -81,7 +82,7 @@ def document_requesting_tenant(must_collect_data, can_access_data):
         "name": "Bar Insurance",
         "must_collect_data": must_collect_data,
         "can_access_data": can_access_data,
-        "must_collect_identity_document": True
+        "must_collect_identity_document": True,
     }
 
     return create_tenant(org_data, ob_data)
@@ -271,7 +272,9 @@ class TestBifrost:
         )
         assert body["status"] == "pending"
 
-        post("hosted/onboarding/submit", None, workos_tenant.ob_config().key, auth_token)
+        post(
+            "hosted/onboarding/submit", None, workos_tenant.ob_config().key, auth_token
+        )
 
         body = get(
             "hosted/onboarding/kyc", None, workos_tenant.ob_config().key, auth_token
@@ -280,7 +283,10 @@ class TestBifrost:
 
     def test_onboarding_authorize(self, workos_tenant, auth_token):
         body = post(
-            "hosted/onboarding/authorize", None, workos_tenant.ob_config().key, auth_token
+            "hosted/onboarding/authorize",
+            None,
+            workos_tenant.ob_config().key,
+            auth_token,
         )
         validation_token = body["validation_token"]
 
@@ -293,7 +299,9 @@ class TestBifrost:
         assert body["status"]
 
     def test_onboard_onto_same_tenant(self, workos_tenant, auth_token):
-        body = post("hosted/onboarding", None, workos_tenant.ob_config().key, auth_token)
+        body = post(
+            "hosted/onboarding", None, workos_tenant.ob_config().key, auth_token
+        )
         validation_token = body["validation_token"]
         data = dict(validation_token=validation_token)
         body = post("onboarding/session/validate", data, workos_tenant.sk.key)
@@ -302,7 +310,10 @@ class TestBifrost:
         # We won't ever actually hit onboarding/authorize if the tenant has already onboarded,
         # but if we do, we should no-op and succeed
         body = post(
-            "hosted/onboarding/authorize", None, workos_tenant.ob_config().key, auth_token
+            "hosted/onboarding/authorize",
+            None,
+            workos_tenant.ob_config().key,
+            auth_token,
         )
         validation_token = body["validation_token"]
         data = dict(validation_token=validation_token)
@@ -310,7 +321,7 @@ class TestBifrost:
         footprint_user_id = body["footprint_user_id"]
         assert footprint_user_id
 
-        body = get(f"users/{footprint_user_id}/audit_trail", None, workos_tenant.sk.key)
+        body = get(f"users/{footprint_user_id}/timeline", None, workos_tenant.sk.key)
         assert len(body) > 0
 
     def test_identify_login_repeat_customer_biometric(self, auth_token):
@@ -381,7 +392,7 @@ class TestBifrost:
     def test_identify_repeat_customer(self, foo_tenant, bar_tenant, twilio, auth_token):
         # Not used in test, but want to make sure the user has been created before running this test
         auth_token
-        
+
         # Log in as the user
         auth_token = create_inherited_non_sandbox_user(twilio)
 
@@ -409,8 +420,7 @@ class TestBifrost:
             foo_fp_user_id != bar_fp_user_id
         ), "Onboarding onto different tenants should give different fp_user_id"
 
-
-    # In this test we 
+    # In this test we
     #   - Create a live user by re-using a previously challenged phone number
     #   - onboard this user onto a tenant, with an ob_config that asks for a document
     #   - submit a document
@@ -418,21 +428,36 @@ class TestBifrost:
     # Other steps we should test (see TODOs on the API route)
     #   - document request moves into UPLOADED after post
     #   - after document request gets moved out of PENDING, requirement is no longer there
-    def test_onboarding_requiring_document(self, twilio, auth_token, document_requesting_tenant):
+    def test_onboarding_requiring_document(
+        self, twilio, auth_token, document_requesting_tenant
+    ):
         from .image_fixtures import hello_world
+
         # This user is inherited because all integration tests use the same PHONE_NUMBER
         # At some point we'll revisit this
         user_auth_token = create_inherited_non_sandbox_user(twilio)
 
         # Onboard a user onto a tenant that requests a document
-        post("hosted/onboarding", None, document_requesting_tenant.ob_config().key, user_auth_token)
-        
-        body = get("hosted/onboarding/status", None, document_requesting_tenant.ob_config().key, user_auth_token)
+        post(
+            "hosted/onboarding",
+            None,
+            document_requesting_tenant.ob_config().key,
+            user_auth_token,
+        )
+
+        body = get(
+            "hosted/onboarding/status",
+            None,
+            document_requesting_tenant.ob_config().key,
+            user_auth_token,
+        )
         # We have a requirement
-        req = get_requirement_from_requirements('collect_document', body['requirements'])
+        req = get_requirement_from_requirements(
+            "collect_document", body["requirements"]
+        )
         assert req
         # stash the request id
-        document_request_id = req['document_request_id']
+        document_request_id = req["document_request_id"]
 
         # Submit the document
         data = {
@@ -442,19 +467,26 @@ class TestBifrost:
             "country_code": "USA",
         }
         post_body = post(
-            f"hosted/user/document/{document_request_id}", data, user_auth_token, document_requesting_tenant.ob_config().key
-        ) 
-        
+            f"hosted/user/document/{document_request_id}",
+            data,
+            user_auth_token,
+            document_requesting_tenant.ob_config().key,
+        )
+
         assert post_body == {}
-       
+
         # get status
         expected = {
             "status": {"kind": "pending"},
             "front_image_error": None,
             "back_image_error": None,
         }
-        get_body = get(f"hosted/user/document/{document_request_id}/status",data,user_auth_token,document_requesting_tenant.ob_config().key,
-)
+        get_body = get(
+            f"hosted/user/document/{document_request_id}/status",
+            data,
+            user_auth_token,
+            document_requesting_tenant.ob_config().key,
+        )
         assert get_body == expected
 
 

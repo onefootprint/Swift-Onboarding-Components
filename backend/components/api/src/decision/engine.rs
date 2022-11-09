@@ -19,21 +19,21 @@ use super::{vendor_result::VendorResult, *};
 /// - Emitting AuditTrail events
 /// - test/demo data
 /// - producing decisions
-pub async fn decide(
-    state: &State,
-    uv_id: UserVaultId,
-    ob: Onboarding,
-    ob_config: ObConfiguration,
-) -> Result<(), ApiError> {
+pub async fn decide(state: &State, uv_id: UserVaultId, ob: Onboarding) -> Result<(), ApiError> {
     // initialize some variables since we have a lot of closures that move ownership below
     let uvwid = uv_id.clone();
     let uvw = state
         .db_pool
         .db_query(move |conn| UserVaultWrapper::get(conn, &uvwid))
         .await??;
+
     // Check if the user is a sandbox user. Sandbox users have the final KYC state encoded in their
     // phone number's sandbox suffix
-    let desired_status_for_testing = utils::get_desired_status_for_testing(state, &uvw).await?;
+    let should_initiate_verification_requests =
+        utils::should_initiate_idv_or_else_setup_test_fixtures(state, uvw.clone(), ob.id.clone()).await?;
+    if !should_initiate_verification_requests {
+        return Ok(());
+    }
 
     // Build our VerificationRequests and save outputs
     let (requests, ob_id, previous_results) = state
@@ -41,13 +41,8 @@ pub async fn decide(
         .db_transaction(move |conn| -> Result<_, ApiError> {
             let ob_id = ob.id.clone();
 
-            let requests = verification_request::build_verification_requests_and_checkpoint(
-                conn,
-                ob,
-                &uvw,
-                &ob_config.tenant_id,
-                desired_status_for_testing,
-            )?;
+            // Unconditionally set the onboarding status to Pending to checkpoint and create VerificationRequests
+            let requests = verification_request::build_verification_requests_and_checkpoint(conn, ob, &uvw)?;
 
             // Load our requests and results
             // Importantly, this allows us to save VerificationRequests elsewhere in code and execute them here
@@ -77,7 +72,7 @@ pub async fn decide(
     let features = features::create_features(results);
 
     // Create our final decision from the features we created, set final onboarding status, and emit risk signals
-    risk::create_final_decision(state, ob_id, features, desired_status_for_testing).await?;
+    risk::create_final_decision(state, ob_id, features).await?;
 
     Ok(())
 }

@@ -53,13 +53,7 @@ pub async fn post(state: web::Data<State>, user_auth: UserAuthContext) -> JsonAp
     .await?;
 
     // produce our decision
-    decision::engine::decide(
-        &state,
-        ob_info.user_vault_id,
-        ob_info.onboarding,
-        ob_info.ob_config,
-    )
-    .await?;
+    decision::engine::decide(&state, ob_info.user_vault_id, ob_info.onboarding).await?;
 
     EmptyResponse::ok().json()
 }

@@ -42,6 +42,7 @@ use db::HasDataAttributeFields;
 ///    3. The decision engine and verification logic _only knows about what's in the UserVault_
 ///         * it is the information we send to vendors (a UVW gets "serialized" in a `VerificationRequest` in the decision engine)
 ///         * it is the source of truth to know what we datums we have collected from a User
+#[derive(Debug, Clone)]
 pub struct UserVaultWrapper {
     pub user_vault: UserVault,
     pub identity_data: Option<IdentityData>,
