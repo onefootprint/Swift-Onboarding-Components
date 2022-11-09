@@ -11,7 +11,6 @@ use crate::types::JsonApiResponse;
 use crate::utils::session::AuthSession;
 use crate::State;
 
-use db::models::ob_configuration::ObConfigIdentifier;
 use db::models::ob_configuration::ObConfiguration;
 use newtypes::ObConfigurationId;
 use newtypes::SessionAuthToken;
@@ -47,12 +46,8 @@ pub async fn post(
     let (ob_config, tenant) = state
         .db_pool
         .db_transaction(move |conn| -> ApiResult<_> {
-            let identifier = ObConfigIdentifier::Tenant {
-                id: request.into_inner().onboarding_config_id,
-                tenant_id: tenant.id,
-                is_live,
-            };
-            let result = ObConfiguration::get_enabled(conn, identifier)?;
+            let result =
+                ObConfiguration::get_enabled(conn, (&request.onboarding_config_id, &tenant.id, is_live))?;
             Ok(result)
         })
         .await?;

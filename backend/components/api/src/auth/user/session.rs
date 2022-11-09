@@ -1,9 +1,6 @@
 use db::{
     models::{
-        ob_configuration::{ObConfigIdentifier, ObConfiguration},
-        onboarding::{Onboarding, OnboardingIdentifier},
-        scoped_user::ScopedUser,
-        tenant::Tenant,
+        ob_configuration::ObConfiguration, onboarding::Onboarding, scoped_user::ScopedUser, tenant::Tenant,
     },
     PgConnection,
 };
@@ -93,16 +90,9 @@ impl SessionContext<UserSession> {
         };
 
         // Confirm that the onboarding in the auth token belongs to the user
-        let identifier = OnboardingIdentifier::UserId {
-            id: &onboarding_id,
-            user_vault_id: &self.data.user_vault_id,
-        };
-        let (onboarding, scoped_user) = Onboarding::get(conn, identifier)?;
+        let (onboarding, scoped_user) = Onboarding::get(conn, (&onboarding_id, &self.data.user_vault_id))?;
         // Confirm that the ob config is active
-        let (ob_config, tenant) = ObConfiguration::get_enabled(
-            conn,
-            ObConfigIdentifier::Id(onboarding.ob_configuration_id.clone()),
-        )?;
+        let (ob_config, tenant) = ObConfiguration::get_enabled(conn, &onboarding.ob_configuration_id)?;
         let info = AuthedOnboardingInfo {
             user_vault_id: self.data.user_vault_id.clone(),
             onboarding,

@@ -1,10 +1,7 @@
 use std::{marker::PhantomData, pin::Pin};
 
 use actix_web::{web, FromRequest};
-use db::models::{
-    ob_configuration::{ObConfigIdentifier, ObConfiguration},
-    tenant::Tenant,
-};
+use db::models::{ob_configuration::ObConfiguration, tenant::Tenant};
 use futures_util::Future;
 use newtypes::ObConfigurationKey;
 use paperclip::actix::Apiv2Header;
@@ -53,7 +50,7 @@ impl FromRequest for PublicOnboardingContext {
                 .map_err(|_| AuthError::InvalidTokenForHeader(HEADER_NAME.to_string()))?;
             let (ob_config, tenant) = state
                 .db_pool
-                .db_query(|conn| ObConfiguration::get_enabled(conn, ObConfigIdentifier::Key(key)))
+                .db_query(move |conn| ObConfiguration::get_enabled(conn, &key))
                 .await?
                 .map_err(|e| -> Self::Error {
                     if e.is_not_found() {

@@ -5,7 +5,7 @@ use newtypes::{
 
 use db::models::{
     audit_trail::AuditTrail,
-    onboarding::{Onboarding, OnboardingIdentifier, OnboardingUpdate},
+    onboarding::{Onboarding, OnboardingUpdate},
     onboarding_decision::{NewOnboardingDecision, OnboardingDecision},
 };
 
@@ -25,7 +25,7 @@ pub async fn create_final_decision(
     state
         .db_pool
         .db_transaction(move |conn| -> Result<_, ApiError> {
-            let (current_ob, scoped_user) = Onboarding::get(conn, OnboardingIdentifier::Id(&ob_id))?;
+            let (current_ob, scoped_user) = Onboarding::get(conn, &ob_id)?;
             let current_status = current_ob.status;
             let decision = final_decision(&features, current_ob);
 

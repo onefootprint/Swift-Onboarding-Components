@@ -50,14 +50,36 @@ struct NewObConfiguration {
 }
 
 #[derive(Debug)]
-pub enum ObConfigIdentifier {
-    Id(ObConfigurationId),
-    Key(ObConfigurationKey),
+pub enum ObConfigIdentifier<'a> {
+    Id(&'a ObConfigurationId),
+    Key(&'a ObConfigurationKey),
     Tenant {
-        id: ObConfigurationId,
-        tenant_id: TenantId,
+        id: &'a ObConfigurationId,
+        tenant_id: &'a TenantId,
         is_live: bool,
     },
+}
+
+impl<'a> From<&'a ObConfigurationId> for ObConfigIdentifier<'a> {
+    fn from(id: &'a ObConfigurationId) -> Self {
+        Self::Id(id)
+    }
+}
+
+impl<'a> From<&'a ObConfigurationKey> for ObConfigIdentifier<'a> {
+    fn from(key: &'a ObConfigurationKey) -> Self {
+        Self::Key(key)
+    }
+}
+
+impl<'a> From<(&'a ObConfigurationId, &'a TenantId, bool)> for ObConfigIdentifier<'a> {
+    fn from((id, tenant_id, is_live): (&'a ObConfigurationId, &'a TenantId, bool)) -> Self {
+        Self::Tenant {
+            id,
+            tenant_id,
+            is_live,
+        }
+    }
 }
 
 #[derive(AsChangeset)]
@@ -116,10 +138,13 @@ impl ObConfiguration {
         Ok(obcs)
     }
 
-    pub fn get_enabled(conn: &mut PgConnection, identifier: ObConfigIdentifier) -> DbResult<(Self, Tenant)> {
+    pub fn get_enabled<'a, T>(conn: &mut PgConnection, id: T) -> DbResult<(Self, Tenant)>
+    where
+        T: Into<ObConfigIdentifier<'a>>,
+    {
         let mut query = ob_configuration::table.inner_join(tenant::table).into_boxed();
 
-        match identifier {
+        match id.into() {
             ObConfigIdentifier::Id(id) => query = query.filter(ob_configuration::id.eq(id)),
             ObConfigIdentifier::Key(key) => query = query.filter(ob_configuration::key.eq(key)),
             ObConfigIdentifier::Tenant {

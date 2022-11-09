@@ -1,8 +1,5 @@
 use db::{
-    models::{
-        ob_configuration::{ObConfigIdentifier, ObConfiguration},
-        tenant::Tenant,
-    },
+    models::{ob_configuration::ObConfiguration, tenant::Tenant},
     PgConnection,
 };
 use newtypes::{ObConfigurationId, TenantId};
@@ -42,12 +39,8 @@ impl ExtractableAuthSession for ParsedOnboardingSession {
                 return Err(AuthError::SessionTypeError.into());
             }
         };
-        let identifier = ObConfigIdentifier::Tenant {
-            id: data.ob_config_id,
-            tenant_id: data.tenant_id,
-            is_live: data.is_live,
-        };
-        let (ob_config, tenant) = ObConfiguration::get_enabled(conn, identifier)?;
+        let (ob_config, tenant) =
+            ObConfiguration::get_enabled(conn, (&data.ob_config_id, &data.tenant_id, data.is_live))?;
         Ok(ParsedOnboardingSession { ob_config, tenant })
     }
 }

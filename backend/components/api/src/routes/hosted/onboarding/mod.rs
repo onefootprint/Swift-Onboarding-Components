@@ -2,11 +2,8 @@ use chrono::Duration;
 use crypto::aead::ScopedSealingKey;
 use db::{
     models::{
-        document_request::DocumentRequest,
-        identity_document::IdentityDocument,
-        liveness_event::LivenessEvent,
-        ob_configuration::ObConfiguration,
-        onboarding::{Onboarding, OnboardingIdentifier},
+        document_request::DocumentRequest, identity_document::IdentityDocument,
+        liveness_event::LivenessEvent, ob_configuration::ObConfiguration, onboarding::Onboarding,
     },
     DbError, PgConnection,
 };
@@ -63,11 +60,7 @@ pub fn get_requirements(
     ob_config: &ObConfiguration,
 ) -> ApiResult<(Vec<OnboardingRequirement>, Onboarding)> {
     let uvw = UserVaultWrapper::get(conn, user_vault_id)?;
-    let identifier = OnboardingIdentifier::ConfigId {
-        user_vault_id,
-        ob_config_id: &ob_config.id,
-    };
-    let (onboarding, _) = Onboarding::get(conn, identifier)?;
+    let (onboarding, _) = Onboarding::get(conn, (user_vault_id, &ob_config.id))?;
     let missing_attributes = uvw.missing_fields(ob_config);
     // Document requirements are determined by the presence of DocumentRequest database objects.
     // In various places in the codebase, we will determine if a DocumentRequest should be created
@@ -112,11 +105,7 @@ pub fn get_fields_to_authorize(
     user_vault_id: &UserVaultId,
     ob_config: &ObConfiguration,
 ) -> ApiResult<AuthorizeFields> {
-    let identifier = OnboardingIdentifier::ConfigId {
-        user_vault_id,
-        ob_config_id: &ob_config.id,
-    };
-    let (onboarding, _) = Onboarding::get(conn, identifier)?;
+    let (onboarding, _) = Onboarding::get(conn, (user_vault_id, &ob_config.id))?;
 
     let mut identity_documents: Vec<String> = vec![];
     if ob_config.can_access_identity_document_images {

@@ -82,6 +82,33 @@ pub enum OnboardingIdentifier<'a> {
     },
 }
 
+impl<'a> From<&'a OnboardingId> for OnboardingIdentifier<'a> {
+    fn from(id: &'a OnboardingId) -> Self {
+        Self::Id(id)
+    }
+}
+
+impl<'a> From<(&'a OnboardingId, &'a TenantId)> for OnboardingIdentifier<'a> {
+    fn from((id, tenant_id): (&'a OnboardingId, &'a TenantId)) -> Self {
+        Self::TenantId { id, tenant_id }
+    }
+}
+
+impl<'a> From<(&'a OnboardingId, &'a UserVaultId)> for OnboardingIdentifier<'a> {
+    fn from((id, user_vault_id): (&'a OnboardingId, &'a UserVaultId)) -> Self {
+        Self::UserId { id, user_vault_id }
+    }
+}
+
+impl<'a> From<(&'a UserVaultId, &'a ObConfigurationId)> for OnboardingIdentifier<'a> {
+    fn from((user_vault_id, ob_config_id): (&'a UserVaultId, &'a ObConfigurationId)) -> Self {
+        Self::ConfigId {
+            user_vault_id,
+            ob_config_id,
+        }
+    }
+}
+
 pub type OnboardingInfo = (
     Onboarding,
     ObConfiguration,
@@ -91,13 +118,13 @@ pub type OnboardingInfo = (
 );
 
 impl Onboarding {
-    pub fn get<'a>(
-        conn: &'a mut PgConnection,
-        id: OnboardingIdentifier<'a>,
-    ) -> DbResult<(Onboarding, ScopedUser)> {
+    pub fn get<'a, T>(conn: &'a mut PgConnection, id: T) -> DbResult<(Onboarding, ScopedUser)>
+    where
+        T: Into<OnboardingIdentifier<'a>>,
+    {
         let mut query = onboarding::table.inner_join(scoped_user::table).into_boxed();
 
-        match id {
+        match id.into() {
             OnboardingIdentifier::Id(id) => query = query.filter(onboarding::id.eq(id)),
             OnboardingIdentifier::TenantId { id, tenant_id } => {
                 query = query
