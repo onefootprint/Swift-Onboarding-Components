@@ -265,8 +265,8 @@ export abstract class ServiceContainers {
                 value: constants.twilio.integrationTestPhoneNumber,
               },
               {
-                name: s3Buckets.documentImages.bucketName,
-                value: s3Buckets.documentImages.envVarName,
+                name: s3Buckets.documentImages.envVarName,
+                value: s3Buckets.documentImages.bucketName,
               },
               {
                 name: 'METRICS_ENDPOINT_PATH',
